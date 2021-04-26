@@ -696,4 +696,27 @@ settingSchema.statics.getWatermarkInfoByUid = async (uid) => {
     watermarkStream,
   };
 }
+/*
+* 判断用户阅读指定时间的内容时是否受到限制
+* @param {Date} toc 内容发表时间
+* @param {[String]} userRolesId 用户拥有的证书
+* @param {[Number]} userGradeId 用户的等级
+* @author pengxiguaa 2021-4-26
+* */
+settingSchema.statics.restrictAccess = async (toc, userRolesId, userGradeId) => {
+  const throwError = require('../nkcModules/throwError');
+  const nkcRender = require('../nkcModules/nkcRender');
+  const SettingModel = mongoose.model('settings');
+  const threadSettings = await SettingModel.getSettings('thread');
+  const {status, errorInfo, time, rolesId, gradesId} = threadSettings.disablePost;
+  if(!status) return; // 未开启
+  const settingTime = new Date(`${time} 00:00:00`).getTime();
+  const inputTime = toc.getTime();
+  if(inputTime >= settingTime) return;
+  if(gradesId.includes(userGradeId)) return;
+  const existRolesId = userRolesId.filter(userRoleId => rolesId.includes(userRoleId));
+  if(existRolesId.length > 0) return;
+  throwError(451, {errorInfo: nkcRender.plainEscape(errorInfo), errorStatus: '451 Unavailable For Legal Reasons'}, 'simpleErrorPage');
+}
+
 module.exports = mongoose.model('settings', settingSchema);
