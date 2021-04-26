@@ -23,6 +23,7 @@ body{
   width: 40rem;
   background-color: #fff;
   border-top: 2px solid #2b90d9;
+
 }
 .error-list ul{
   padding: 0;
@@ -31,6 +32,7 @@ body{
 .error-header{
   color: #282c37;
   font-size: 1.3rem;
+  line-height: 2.4rem;
 }
 .error-list ul li{
   list-style: none;

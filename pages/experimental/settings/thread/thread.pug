@@ -11,14 +11,14 @@ block eContent
             small &nbsp;拥有已勾选证书或等级的用户可见附件列表
           .form-group
             label.col-sm-2.control-label 证书限制：
-            .col-sm-10
+            .col-sm-6
               .checkbox
                 label.m-r-1(v-for="r in roles")
                   input(type="checkbox" v-model="settings.displayPostAttachments.rolesId" :value="r._id")
                   span {{r.displayName}}
           .form-group
             label.col-sm-2.control-label 普通会员等级限制：
-            .col-sm-10
+            .col-sm-6
               .checkbox
                 label.m-r-1(v-for="g in grades")
                   input(type="checkbox" v-model="settings.displayPostAttachments.gradesId" :value="g._id")
@@ -27,15 +27,54 @@ block eContent
           h4 视频播放器遮罩提示
           .form-group
             label.col-sm-2.control-label 是否显示遮罩
-            .col-sm-10
-              label.m-r-1
-                input(type="checkbox" v-model="settings.playerTips.isDisplay")
-                | 显示遮罩
+            .col-sm-6
+              .checkbox
+                label
+                  input(type="checkbox" v-model="settings.playerTips.isDisplay")
+                  | 显示遮罩
           .form-group
             label.col-sm-2.control-label 提示内容
-            .col-sm-10
-              textarea.m-r-1(name="tipContent" cols="40" rows="6" v-model="settings.playerTips.tipContent")
+            .col-sm-6
+              textarea.form-control.m-r-1(name="tipContent" cols="40" rows="6" v-model="settings.playerTips.tipContent")
 
+          h4 文章限制
+          .form-group
+            label.col-sm-2.control-label 开启限制
+            .col-sm-6
+              .radio
+                label.m-r-1
+                  input(type="radio" :value='true' v-model="settings.disablePost.status")
+                  | 开启
+                label
+                  input(type="radio" :value='false' v-model="settings.disablePost.status")
+                  | 关闭
+                h5.text-danger 开启后，用户将无法查看发表于{{settings.disablePost.time}}之前的文章、回复和评论。
+          .form-group
+            label.col-sm-2.control-label 受限截止日期
+            .col-sm-4
+              input.form-control(type='text' v-model='settings.disablePost.time')
+              h5.text-danger 时间格式：YYYY-MM-DD，例如：2021-04-09
+          .form-group
+            label.col-sm-2.control-label 页面提示
+            .col-sm-6
+              textarea.form-control(rows=8 v-model='settings.disablePost.errorInfo')
+              h5.text-danger 查看受限文章时页面上的提示内容，支持换行和空格。
+          .form-group
+            label.col-sm-2.control-label 证书白名单
+            .col-sm-6
+              .checkbox
+                label.m-r-1(v-for='r in roles')
+                  input(type='checkbox' :value="r._id" v-model='settings.disablePost.rolesId')
+                  span {{r.displayName}}
+              h5.text-danger 拥有已勾选证书之一的用户不受限制
+          .form-group
+            label.col-sm-2.control-label 等级白名单
+            .col-sm-6
+              .checkbox
+                label.m-r-1(v-for='g in grades')
+                  input(type='checkbox' :value="g._id" v-model='settings.disablePost.gradesId')
+                  span {{g.displayName}}
+              h5.text-danger 满足已勾选等级之一的用户不受限制
           .form-group
             label.col-sm-2.control-label
             .col-sm-10
