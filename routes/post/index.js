@@ -74,6 +74,7 @@ router
 	    userOperationsId: data.userOperationsId,
 	    user
     };
+    await db.SettingModel.restrictAccess(post.toc, data.userRoles.map(role => role._id), data.userGrade._id);
     // 权限判断
     if(!token){
       // 权限判断
