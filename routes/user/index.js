@@ -142,6 +142,7 @@ userRouter
     const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
     const targetUserSubForums = await db.SubscribeModel.find({
       uid: targetUser.uid,
+      cancel: false,
       type: "forum"
     }, {fid: 1});
     const subForumsId = targetUserSubForums.map(f => f.fid).filter(fid => accessibleFid.includes(fid));
@@ -183,6 +184,7 @@ userRouter
     if(t !== "fans") {
       const sub = await db.SubscribeModel.find({
         type: "user",
+        cancel: false,
         tUid: targetUser.uid
       }, {uid: 1}).sort({toc: -1}).limit(9);
       const targetUserFans = await db.UserModel.find({
@@ -196,6 +198,7 @@ userRouter
     if(t !== "follow") {
       const sub = await db.SubscribeModel.find({
         type: "user",
+        cancel: false,
         uid: targetUser.uid
       }, {tUid: 1}).sort({toc: -1}).limit(9);
       const targetUserFollowers = await db.UserModel.find({
@@ -466,7 +469,8 @@ userRouter
       if(t === "follow") {
         const q = {
           uid: targetUser.uid,
-          type: "user"
+          type: "user",
+          cancel: false,
         };
         const count = await db.SubscribeModel.countDocuments(q);
         paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardUserList);
@@ -478,7 +482,8 @@ userRouter
       } else {
         const q = {
           tUid: targetUser.uid,
-          type: "user"
+          type: "user",
+          cancel: false,
         };
         const count = await db.SubscribeModel.countDocuments(q);
         paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardUserList);

@@ -238,6 +238,7 @@ router
 		// 获取最新关注的用户
 		const subUsers = await db.SubscribeModel.find({
       type: "forum",
+			cancel: false,
       fid: forum.fid
     }).sort({toc: -1}).limit(9);
 
@@ -298,10 +299,11 @@ router
 			data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
 		}
 
-		data.subUsersCount = await db.SubscribeModel.countDocuments({fid, type: "forum"});
+		data.subUsersCount = await db.SubscribeModel.countDocuments({cancel: false, fid, type: "forum"});
 		if(data.user) {
       const sub = await db.SubscribeModel.countDocuments({
         uid: data.user.uid,
+				cancel: false,
         type: "forum",
         fid
       });

@@ -1,0 +1,43 @@
+extends ../columnBase
+block columnTitle
+  title 专栏统计
+  +includeCSS('/columns/settings/settings.css')
+  block settingsTitle
+block content
+  -var columnId = data.column._id;
+  -var columnHomeUrl = `/m/${columnId}`;
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        .column-settings
+          .column-settings-navs.box-shadow-panel
+            div
+              ul
+                li
+                  a(href=columnHomeUrl + '/status' class=data.nav === 'status'?'active':'')
+                    .fa.fa-pie-chart
+                    span 数据统计
+                li
+                  a(href=columnHomeUrl + '/settings/post' class=data.nav === 'post'?'active':'')
+                    .fa.fa-file-text
+                    span 文章管理
+                li
+                  a(href=columnHomeUrl + '/settings/category' class=data.nav === 'category'?'active':'')
+                    .fa.fa-tags
+                    span 分类管理
+                li
+                  a(href=columnHomeUrl + '/settings/page' class=data.nav === 'page'?'active':'')
+                    .fa.fa-flask
+                    span 自定义页
+                li
+                  a(href=columnHomeUrl + '/settings/fans' class=data.nav === 'fans'?'active':'')
+                    .fa.fa-users
+                    span 粉丝管理
+                li
+                  a(href=columnHomeUrl + '/settings' class=data.nav === 'settings'?'active':'')
+                    .fa.fa-cog
+                    span 专栏设置
+          .column-settings-content.box-shadow-panel
+            block settingsContent
+block scripts
+  block settingsScripts

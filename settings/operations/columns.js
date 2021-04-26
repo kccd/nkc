@@ -39,6 +39,7 @@ module.exports = {
       },
       category: {
         GET: "column_single_settings_post",
+        PUT: "column_single_settings_post",
         PARAMETER: {
           GET: "column_single_settings_post"
         }
@@ -56,6 +57,9 @@ module.exports = {
         editor: {
           GET: "column_single_settings_page",
         }
+      },
+      fans: {
+        GET: 'column_single_settings_fans',
       }
     },
     contribute: {

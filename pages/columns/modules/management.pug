@@ -51,29 +51,17 @@ if data.user && data.user.uid === data.column.uid
       .column-header
         .fa.fa-cog &nbsp;专栏管理
       .row.m-t-1
-        //-a(href=`/m/${data.column._id}/status` target="_blank").col-xs-4
-          .fa.fa-line-chart
+        a(href=`/m/${data.column._id}/status` target="_blank").col-xs-4
+          .fa.fa-pie-chart
           .name 统计
-        a(href=`/m/${data.column._id}/settings/post` target='_blank').col-xs-4
-          .fa.fa-newspaper-o
-          .name 文章管理
         a(href=`/m/${data.column._id}/settings/contribute` target='_blank').col-xs-4
           .fa.fa-bell-o
           .name 投稿通知
           if data.contributeCount > 0
             .contribute-count=data.contributeCount
-        a(href=`/m/${data.column._id}/settings/post/add` target='_blank').col-xs-4
-          .fa.fa-plus-circle
-          .name 添加文章
-        a(href=`/m/${data.column._id}/settings/category` target='_blank').col-xs-4
-          .fa.fa-list
-          .name 分类管理
         a(href=`/m/${data.column._id}/settings` target='_blank').col-xs-4
           .fa.fa-wrench
           .name 专栏设置
-        a(href=`/m/${data.column._id}/settings/page` target='_blank').col-xs-4
-          .fa.fa-window-restore
-          .name 自定义页
       .row.m-t-1.text-center.column-fast-set-btn
         .col-xs-6(onclick="showSetDom()")
           span 快捷设置&nbsp;

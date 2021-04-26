@@ -11,7 +11,7 @@ operationRouter
     if(thread.disabled) ctx.throw(403, '不能收藏已被封禁的文章');
     await thread.extendForums(['mainForums', 'minorForums']);
     await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-    let collection = await db.SubscribeModel.findOne({tid: tid, uid: user.uid, type: "collection"});
+    let collection = await db.SubscribeModel.findOne({cancel: false, tid: tid, uid: user.uid, type: "collection"});
     if(type) {
       if(collection) ctx.throw(400, "文章已收藏，请勿重复提交");
       for(const typeId of cid) {
@@ -30,7 +30,8 @@ operationRouter
     } else {
       if(!collection) ctx.throw(400, "文章未在收藏夹中，请刷新");
       const {cid} = collection;
-      await collection.deleteOne();
+      await collection.cancelSubscribe();
+      // await collection.deleteOne();
       await db.SubscribeTypeModel.updateCount(cid);
     }
     await db.SubscribeModel.saveUserCollectionThreadsId(user.uid);

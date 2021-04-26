@@ -4,13 +4,19 @@ data.categories.unshift({
   name: "全部",
   count: data.count,
 });
+data.minorCategories.unshift({
+  _id: 'all',
+  name: '全部'
+});
 var app = new Vue({
   el: "#app",
   data: {
     column: data.column,
     categories: data.categories,
+    minorCategories: data.minorCategories,
     columnPosts: [],
     category: "",
+    minorCategory: '',
     threads: "",
     paging: "",
 
@@ -24,7 +30,10 @@ var app = new Vue({
   },
   mounted: function() {
     if(this.categories.length !== 0) {
-      this.selectCategory(this.categories[0]);
+      this.selectCategory(this.categories[0], true);
+    }
+    if(this.minorCategories.length !== 0) {
+      this.selectMinorCategory(this.minorCategories[0]);
     }
     moduleToColumn.init();
   },
@@ -35,13 +44,15 @@ var app = new Vue({
       if(selectedColumnPostsId.length === 0) return screenTopWarning("请勾选需要处理的文章");
       this.move(selectedColumnPostsId);
     },
-    move: function(_id, selectedCid) {
+    move: function(_id, selectedMainCategoriesId, selectedMinorCategoriesId) {
       moduleToColumn.show(function(data) {
-        var categoriesId = data.categoriesId;
+        var minorCategoriesId = data.minorCategoriesId;
+        var mainCategoriesId = data.mainCategoriesId;
         nkcAPI("/m/" + app.column._id + "/post", "POST", {
           type: "moveById",
           postsId: _id,
-          categoriesId: categoriesId
+          mainCategoriesId: mainCategoriesId,
+          minorCategoriesId: minorCategoriesId
         })
           .then(function() {
             app.selectCategory(app.category);
@@ -53,7 +64,8 @@ var app = new Vue({
           })
       }, {
         selectMul: true,
-        selectedCid: selectedCid
+        selectedMainCategoriesId: selectedMainCategoriesId,
+        selectedMinorCategoriesId: selectedMinorCategoriesId
       });
     },
     movePost: function(type, id) {
@@ -77,12 +89,17 @@ var app = new Vue({
     getCategories: function() {
       nkcAPI("/m/" + this.column._id + "/category?t=list", "GET")
         .then(function(data) {
-          data.categories.unshift({
+          data.mainCategories.unshift({
             name: "全部",
             count: data.count,
             _id: "all"
           });
-          app.categories = data.categories;
+          data.minorCategories.unshift({
+            name: '全部',
+            _id: 'all'
+          })
+          app.categories = data.mainCategories;
+          app.minorCategories = data.minorCategories;
         })
         .catch(function(data) {
           screenTopWarning(data);
@@ -166,10 +183,14 @@ var app = new Vue({
     },
     getPosts: function(page) {
       var cid = this.category._id;
+      var mcid = this.minorCategory._id;
       if(page === undefined) page = this.paging.page;
       var url = "/m/" + this.column._id + "/post?page=" + page;
       if(cid !== "all") {
         url += "&cid=" + cid;
+      }
+      if(mcid !== 'all') {
+        url += '&mcid=' + mcid;
       }
       nkcAPI(url, "GET")
         .then(function(data) {
@@ -187,10 +208,19 @@ var app = new Vue({
         buttonValue: []
       };
     },
-    selectCategory: function(category) {
+    selectCategory: function(category, disableGetPosts) {
       this.init();
       this.category = category;
-      this.getPosts(0);
+      if(!disableGetPosts) {
+        this.getPosts(0);
+      }
+    },
+    selectMinorCategory: function(category, disableGetPosts) {
+      this.init();
+      this.minorCategory = category;
+      if(!disableGetPosts) {
+        this.getPosts(0);
+      }
     },
     cancelAdd: function() {
       this.init();

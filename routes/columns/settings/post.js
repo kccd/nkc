@@ -6,15 +6,16 @@ router
     const {data, db} = ctx;
     const {column} = data;
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
+    data.minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id);
     data.count = await db.ColumnPostModel.countDocuments({columnId: column._id});
-    data.highlight = "post";
+    data.nav = 'post';
     await next();
   })
   .get("/add", async (ctx, next) => {
     const {db, data, query, nkcModules} = ctx;
     const {column, user} = data;
     let {page=0, c} = query;
-    perpage = parseInt(c);
+    let perpage = parseInt(c);
     if(isNaN(perpage) || perpage < 1) perpage = 0;
     const columnPosts = await db.ColumnPostModel.find({columnId: column._id}, {pid: 1});
     const columnPostsId = columnPosts.map(p => p.pid);

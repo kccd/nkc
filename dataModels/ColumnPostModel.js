@@ -41,8 +41,14 @@ const schema = new Schema({
     required: true,
     index: 1
   },
-  // 专栏内的文章分类ID
+  // 专栏内的文章主分类ID
   cid: {
+    type: [Number],
+    default: [],
+    index: 1
+  },
+  // 专栏内的文章辅助分类ID
+  mcid: {
     type: [Number],
     default: [],
     index: 1

@@ -7,9 +7,16 @@ const redisClient = require('../settings/redisClient');
 
 const schema = new Schema({
   _id: Number,
+  // 关注时的时间
   toc: {
     type: Date,
     default: Date.now,
+    index: 1
+  },
+  // 取消关注时的时间
+  tlm: {
+    type: Date,
+    default: null,
     index: 1
   },
   // 类型
@@ -65,6 +72,12 @@ const schema = new Schema({
     type: [Number],
     default: [],
     index: 1
+  },
+  // 关注是否取消
+  cancel: {
+    type: Boolean,
+    default: false,
+    index: 1
   }
 }, {
   collection: "subscribes"
@@ -94,6 +107,7 @@ schema.statics.saveUserSubUsersId = async (uid) => {
   const SubscribeModel = mongoose.model("subscribes");
   const sub = await SubscribeModel.find({
     type: "user",
+    cancel: false,
     uid
   }, {tUid: 1}).sort({toc: -1});
   const usersId = sub.map(s => s.tUid);
@@ -131,6 +145,7 @@ schema.statics.saveUserFansId = async (uid) => {
   const SubscribeModel = mongoose.model("subscribes");
   const sub = await SubscribeModel.find({
     type: "user",
+    cancel: false,
     tUid: uid
   }, {uid: 1}).sort({toc: -1});
   const usersId = sub.map(s => s.uid);
@@ -172,6 +187,7 @@ schema.statics.getUserSubForumsId = async (uid, type) => {
 schema.statics.saveUserSubForumsId = async (uid) => {
   const subs = await mongoose.model("subscribes").find({
     type: "forum",
+    cancel: false,
     uid
   }, {fid: 1}).sort({toc: -1});
   const forumsId = subs.map(s => s.fid);
@@ -208,6 +224,7 @@ schema.statics.getUserSubColumnsId = async (uid) => {
 schema.statics.saveUserSubColumnsId = async (uid) => {
   const subs = await mongoose.model("subscribes").find({
     type: "column",
+    cancel: false,
     uid
   }, {columnId: 1}).sort({toc: -1});
   const columnsId = subs.map(s => s.columnId);
@@ -249,6 +266,7 @@ schema.statics.saveUserSubThreadsId = async (uid, detail) => {
   const total = [], reply = [], sub = [];
   const subs = await mongoose.model("subscribes").find({
     type: "thread",
+    cancel: false,
     uid
   }, {tid: 1, detail: 1}).sort({toc: -1});
   subs.map(s => {
@@ -305,6 +323,7 @@ schema.statics.getUserCollectionThreadsId = async (uid) => {
 schema.statics.saveUserCollectionThreadsId = async (uid) => {
   const subs = await mongoose.model("subscribes").find({
     type: "collection",
+    cancel: false,
     uid
   }, {tid: 1}).sort({toc: -1});
   const threadsId = subs.map(s => s.tid);
@@ -412,7 +431,8 @@ schema.statics.getUserSubscribeTypesResults = async (uid) => {
   for(const defaultType of defaultTypes) {
     for(const t of newSubscribeTypes) {
       const match = {
-        uid
+        uid,
+        cancel: false,
       };
       if(t === "all") {
 
@@ -532,14 +552,14 @@ schema.statics.autoAttentionForum = async function(options) {
   let SubscribeModel = mongoose.model("subscribes");
   let SettingModel = mongoose.model("settings");
   for(let scr of fids) {
-    let subscribeForum = await SubscribeModel.findOne({type: "forum", fid: scr, uid: uid});
+    let subscribeForum = await SubscribeModel.findOne({cancel: false, type: "forum", fid: scr, uid: uid});
     if(!subscribeForum) {
       const sid = await SettingModel.operateSystemID('subscribes', 1);
       let newSubscribeForum = new SubscribeModel({
         _id: sid,
         uid: uid,
         type: "forum",
-        fid: scr
+        fid: scr,
       });
       await newSubscribeForum.save();
     }
@@ -658,7 +678,7 @@ schema.statics.createDefaultType = async (type, uid) => {
 * */
 schema.statics.insertSubscribe = async (type, uid, tid) => {
   const SubscribeModel = mongoose.model("subscribes");
-  let sub = await SubscribeModel.findOne({uid, tid, type: "thread", detail: type});
+  let sub = await SubscribeModel.findOne({cancel: false, uid, tid, type: "thread", detail: type});
   if(sub) return;
   sub = SubscribeModel({
     _id: await mongoose.model("settings").operateSystemID("subscribes", 1),
@@ -679,7 +699,7 @@ schema.statics.insertSubscribe = async (type, uid, tid) => {
 * */
 schema.statics.checkCollectionThread = async (uid, tid) => {
   const SubscribeModel = mongoose.model('subscribes');
-  const count = await SubscribeModel.countDocuments({uid, tid, type: 'collection'});
+  const count = await SubscribeModel.countDocuments({cancel: false, uid, tid, type: 'collection'});
   return count > 0;
 };
 /*
@@ -691,8 +711,20 @@ schema.statics.checkCollectionThread = async (uid, tid) => {
 * */
 schema.statics.checkSubscribeThread = async (uid, tid) => {
   const SubscribeModel = mongoose.model('subscribes');
-  const count = await SubscribeModel.countDocuments({uid, tid, type: 'thread'});
+  const count = await SubscribeModel.countDocuments({cancel: false, uid, tid, type: 'thread'});
   return count > 0;
+};
+
+/*
+* 取消关注 2021-4-20 用于专栏统计取消关注的数量
+* */
+schema.methods.cancelSubscribe = async function() {
+  await this.updateOne({
+    $set: {
+      cancel: true,
+      tlm: Date.now()
+    }
+  });
 };
 
 module.exports = mongoose.model('subscribes', schema);

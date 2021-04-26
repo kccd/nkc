@@ -1,0 +1,168 @@
+@import '../../publicModules/base';
+@navListWidth: 15rem;
+body{
+  background-color: #f4f4f4;
+}
+.column-settings{
+  min-height: 30rem;
+  .column-settings-navs{
+    position: fixed;
+    width: @navListWidth;
+    &>div{
+      padding: 0;
+    }
+    ul{
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      li{
+        @liHeight: 4rem;
+        a{
+          display: block;
+          height: @liHeight;
+          line-height: @liHeight;
+          border-bottom: 1px solid #f4f4f4;
+          text-decoration: none;
+          padding-left: @liHeight + 1rem;
+          position: relative;
+          .fa{
+            position: absolute;
+            height: @liHeight;
+            width: @liHeight + 1rem;
+            text-align: center;
+            line-height: @liHeight;
+            top: 0;
+            left: 0;
+            color: #555;
+            font-size: 1.4rem;
+          }
+          span{
+            font-size: 1.25rem;
+            color: #555;
+          }
+          &:hover>*, &.active>*{
+            color: @primary;
+          }
+        }
+      }
+    }
+  }
+  .column-settings-content{
+    margin-left: @navListWidth + 1rem;
+  }
+}
+.column-settings-content{
+  .column-status{
+    .status-number{
+      border-radius: 5px;
+      background-color: #f4f4f4;
+      height: 7rem;
+      text-align: center;
+      span{
+        height: 3rem;
+        line-height: 3rem;
+        font-weight: 700;
+      }
+      .number{
+        height: 4rem;
+        line-height: 4rem;
+        font-size: 2rem;
+      }
+    }
+  }
+}
+.column-fans{
+  @avatarHeight: 5rem;
+  .column-fans-item{
+    position: relative;
+    min-height: @avatarHeight;
+    margin: 1rem 0;
+    .column-fans-avatar{
+      position: absolute;
+      top: 0;
+      left: 0;
+      img{
+        height: @avatarHeight;
+        width: @avatarHeight;
+        border-radius: 50%;
+      }
+    }
+    .column-fans-info{
+      padding-left: @avatarHeight + 1rem;
+      .column-fans-name{
+        height: 2rem;
+        margin-bottom: 0.5rem;
+        overflow: hidden;
+        .hideText(@line: 1);
+        a{
+          font-size: 1.4rem;
+          color: @primary;
+        }
+      }
+      .column-fans-description{
+        height: 1.8rem;
+        overflow: hidden;
+        .hideText(@line: 1);
+      }
+    }
+    .column-fans-options{
+
+    }
+  }
+}
+.column-categories-container{
+  padding-left: 2rem;
+}
+.column-categorise{
+  .column-category{
+    height: 3rem;
+    background-color: #aaa;
+  }
+}
+.column-category-item, .column-category-minor-item{
+  background-color: rgba(0, 0, 0, 0.08);
+  border-radius: 3px;
+  margin-bottom: 0.5rem;
+}
+.column-category-info{
+  @height: 3rem;
+  @optionWidth: 7rem;
+  user-select: none;
+  height: @height;
+  line-height: @height;
+  padding-right: @optionWidth;
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding-left: 3rem;
+  position: relative;
+  .column-category-handle{
+    height: @height;
+    width: @height;
+    text-align: center;
+    line-height: @height;
+    position: absolute;
+    top: 0;
+    font-size: 1.4rem;
+    left: 0;
+  }
+  .column-category-options{
+    position: absolute;
+    padding-right: 0.5rem;
+    top: 0;
+    text-align: right;
+    right: 0;
+    height: @height;
+    width: @optionWidth;
+    line-height: @height;
+    font-size: 1.6rem;
+  }
+}
+.column-category-item.sortable-chosen, .column-category-minor-item.sortable-chosen{
+  background-color: @primary;
+  color: #fff;
+}
+
+.column-settings-post-categories-minor{
+  cursor: pointer;
+  user-select: none;
+}

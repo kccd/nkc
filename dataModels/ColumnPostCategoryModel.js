@@ -2,48 +2,63 @@ const mongoose = require("../settings/database");
 const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: Number,
+  // 专栏ID
   columnId: {
     type: Number,
     required: true,
     index: 1
   },
+  // 分类中置顶的内容 columnPostId
   topped: {
     type: [Number],
     default: [],
     index: 1
   },
+  // 分类顺序
   order: {
     type: Number,
     default: 1000,
     index: 1
   },
+  // 上级分类
   parentId: {
     type: Number,
     default: null,
     index: 1
   },
+  // 所在层级
   level: {
     type: Number,
     default: 0,
     index: 1
   },
+  // 是否为默认分类
   default: {
     type: Boolean,
     default: false,
     index: 1
   },
+  // 分类名称
   name: {
     type: String,
     required: true,
     index: 1
   },
+  // 分类介绍
   description: {
     type: String,
     default: ""
   },
+  // 分类的创建时间
   toc: {
     type: Date,
     default: Date.now,
+    index: 1
+  },
+  // 分类的类型 主分类或辅分类
+  type: {
+    type: String,
+    enum: ['main', 'minor'],
     index: 1
   }
 }, {
@@ -70,7 +85,12 @@ schema.statics.extendCategories = async (categories) => {
 * */
 
 schema.statics.getCategoryTree = async (columnId) => {
-  let categories = await mongoose.model("columnPostCategories").find({columnId}).sort({order: 1});
+  const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
+  const ColumnPostModel = mongoose.model('columnPosts');
+  let categories = await ColumnPostCategoryModel.find({
+    columnId,
+    type: 'main'
+  }).sort({order: 1});
   const parents = [];
   const categoriesObj = {};
   categories = categories.map(c => {
@@ -80,7 +100,7 @@ schema.statics.getCategoryTree = async (columnId) => {
     return c;
   });
   for(const c of categories) {
-    c.count = await mongoose.model("columnPosts").countDocuments({cid: c._id});
+    c.count = await ColumnPostModel.countDocuments({cid: c._id});
     let insert = false;
     if(c.parentId) {
       const parent = categoriesObj[c.parentId];
@@ -129,9 +149,15 @@ schema.statics.findById = async (_id) => {
 * */
 schema.statics.getCategoryNav = async (_id) => {
   const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
-  const category = await ColumnPostCategoryModel.findOne({_id});
+  const category = await ColumnPostCategoryModel.findOne({
+    _id,
+    type: 'main'
+  });
   if(!category) return [];
-  const categories = await ColumnPostCategoryModel.find({columnId: category.columnId});
+  const categories = await ColumnPostCategoryModel.find({
+    columnId: category.columnId,
+    type: 'main'
+  });
   const categoriesObj = {};
   categories.map(c => {
     categoriesObj[c._id] = c;
@@ -172,7 +198,10 @@ schema.statics.computeCategoryOrder = async (_id) => {
 * */
 schema.statics.getChildCategory = async (categoryId) => {
   const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
-  const category = await ColumnPostCategoryModel.findOne({_id: categoryId});
+  const category = await ColumnPostCategoryModel.findOne({
+    _id: categoryId,
+    type: 'main'
+  });
   const results = [];
   const categories = await ColumnPostCategoryModel.getCategoryList(category.columnId);
   const func = (category) => {
@@ -192,7 +221,11 @@ schema.statics.getChildCategory = async (categoryId) => {
 * */
 schema.statics.getColumnNavCategory = async (columnId) => {
   const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
-  const categories = await ColumnPostCategoryModel.find({columnId, level: 0}).sort({order: 1});
+  const categories = await ColumnPostCategoryModel.find({
+    columnId,
+    type: 'main',
+    level: 0
+  }).sort({order: 1});
   const results = [];
   for(let category of categories) {
     category = category.toObject();
@@ -218,9 +251,9 @@ schema.statics.getChildCategoryId = async (categoryId) => {
 * @param {Number} columnId 专栏ID
 * */
 schema.statics.removeToppedThreads = async (columnId) => {
-  const ColumnPostCategories = mongoose.model("columnPostCategories");
+  const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
   const ColumnPostModel = mongoose.model("columnPosts");
-  const categories = await ColumnPostCategories.find({columnId});
+  const categories = await ColumnPostCategoryModel.find({columnId});
   await Promise.all(categories.map(async c => {
     let {topped} = c;
     const markId = [];
@@ -233,6 +266,44 @@ schema.statics.removeToppedThreads = async (columnId) => {
     topped = topped.filter(t => !markId.includes(t));
     await c.updateOne({topped});
   }));
+};
+schema.statics.getCategories = async (columnId) => {
+  const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
+  return await ColumnPostCategoryModel.find({columnId}).sort({order: 1});
+};
+/*
+* 获取制定专栏的全部辅分类
+* */
+schema.statics.getMinorCategories = async (columnId) => {
+  const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
+  return await ColumnPostCategoryModel.find({
+    columnId,
+    type: 'minor'
+  }).sort({order: 1});
+};
+/*
+* 拓展制定主分类下辅助分类中文章的数量
+*
+* */
+schema.statics.extendMinorCategoriesByMainCategoryId = async (minorCategories, cid) => {
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const mcid = [];
+  for(const mc of minorCategories) {
+    mcid.push(mc._id);
+  }
+  const match = {
+    mcid: {$in: mcid}
+  };
+  if(cid) {
+    match.cid = cid;
+  }
+  const result = await ColumnPostModel.aggregate(
+    [
+      {
+        $match: match
+      }
+    ]
+  )
 };
 
 module.exports = mongoose.model("columnPostCategories", schema);

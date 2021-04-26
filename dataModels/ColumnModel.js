@@ -398,10 +398,21 @@ schema.methods.updateBasicInfo = async function() {
   const ColumnPostModel = mongoose.model('columnPosts');
   const ThreadModel = mongoose.model('threads');
   const PostModel = mongoose.model('posts');
+  const UsersBehaviorModel = mongoose.model('usersBehaviors');
   const {_id} = this;
-  const columnPosts = await ColumnPostModel.find({columnId: _id}, {pid: 1});
-  const postsId = columnPosts.map(cp => cp.pid);
+  const columnPosts = await ColumnPostModel.find({columnId: _id}, {pid: 1, tid: 1});
+  const postsId = [];
+  const threadsId = [];
+  columnPosts.map(cp => {
+    postsId.push(cp.pid);
+    threadsId.push(cp.tid);
+  });
   const columnPostCount = columnPosts.length;
+  const hits = await UsersBehaviorModel.countDocuments({
+    tid: {$in: threadsId},
+    operationId: 'visitThread'
+  });
+  /*
   let hits = await ThreadModel.aggregate([
     {
       $match: {
@@ -417,7 +428,7 @@ schema.methods.updateBasicInfo = async function() {
       }
     }
   ]);
-  hits = hits.length? hits[0].count: 0;
+  hits = hits.length? hits[0].count: 0;*/
   let voteUp = await PostModel.aggregate([
     {
       $match: {
@@ -442,5 +453,293 @@ schema.methods.updateBasicInfo = async function() {
   this.postVoteUp = voteUp;
   await this.save();
 };
-
+schema.statics.getTrendTime = async (minTime, maxTime) => {
+  const apiFunction = require('../nkcModules/apiFunction');
+  const minTimeNumber = apiFunction.today(minTime).getTime();
+  const times = [];
+  const maxTimeNumber = maxTime.getTime();
+  const oneDay = 24 * 60 * 60 * 1000;
+  for(let i = minTimeNumber; i < maxTimeNumber; i += oneDay) {
+    const t = new Date(i);
+    times.push(moment(t).format(`YYYY-MM-DD`));
+  }
+  return {
+    times,
+    minTime: new Date(minTimeNumber),
+    maxTime
+  };
+}
+/*
+* 获取专栏的订阅趋势
+* @param {Date} minTime 最小时间
+* @param {Date} maxTime 最大时间
+* @return {Array} [{time: '2021-02-06', count: 23}, ...]
+* */
+schema.methods.getSubscriptionTrends = async function(minTime, maxTime) {
+  const ColumnModel = mongoose.model('columns');
+  const SubscribeModel = mongoose.model('subscribes');
+  const columnId = this._id;
+  const {
+    times,
+    minTime: _minTime,
+    maxTime: _maxTime
+  } = await ColumnModel.getTrendTime(minTime, maxTime);
+  let sub = await SubscribeModel.aggregate(
+    [
+      {
+        $match: {
+          type: 'column',
+          columnId: columnId,
+          toc: {
+            $gte: _minTime,
+            $lt: _maxTime
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$toc'
+            }
+          },
+          count: {
+            $sum: 1
+          }
+        }
+      }
+    ]
+  );
+  let unsub = await SubscribeModel.aggregate(
+    [
+      {
+        $match: {
+          type: 'column',
+          columnId: columnId,
+          tlm: {
+            $gte: _minTime,
+            $lt: _maxTime
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$tlm'
+            }
+          },
+          count: {
+            $sum: 1
+          }
+        }
+      }
+    ]
+  );
+  const subObj = {};
+  const unsubObj = {};
+  for(const s of sub) {
+    subObj[s._id] = s.count;
+  }
+  for(const s of unsub) {
+    unsubObj[s._id] = s.count;
+  }
+  const subscriptions = [];
+  for(const time of times) {
+    const sub = subObj[time] || 0;
+    const unsub = unsubObj[time] || 0;
+    subscriptions.push({
+      time,
+      count: sub - unsub
+    });
+  }
+  return subscriptions;
+};
+/*
+* 获取专栏的阅读趋势
+* @param {Date} minTime 最小时间
+* @param {Date} maxTime 最大时间
+* */
+schema.methods.getHitTrends = async function(minTime, maxTime) {
+  const ColumnModel = mongoose.model('columns');
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const UsersBehaviorModel = mongoose.model('usersBehaviors');
+  const columnId = this._id;
+  const {
+    times,
+    minTime: _minTime,
+    maxTime: _maxTime
+  } = await ColumnModel.getTrendTime(minTime, maxTime);
+  const columnPosts = await ColumnPostModel.find({
+    from: 'own',
+    type: 'thread',
+    columnId: columnId,
+  }, {
+    tid: 1
+  });
+  const columnThreadsId = columnPosts.map(cp => cp.tid);
+  let hits = await UsersBehaviorModel.aggregate(
+    [
+      {
+        $match: {
+          tid: {$in: columnThreadsId},
+          operationId: 'visitThread',
+          timeStamp: {
+            $gte: _minTime,
+            $lt: _maxTime,
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$timeStamp'
+            }
+          },
+          count: {
+            $sum: 1
+          }
+        }
+      }
+    ]
+  );
+  const hitObj = {};
+  for(const h of hits) {
+    hitObj[h._id] = h.count;
+  }
+  const _hits = [];
+  for(const time of times) {
+    const count = hitObj[time] || 0;
+    _hits.push({
+      time,
+      count
+    });
+  }
+  return _hits;
+};
+schema.methods.getVoteUpTrends = async function(minTime, maxTime) {
+  const ColumnModel = mongoose.model('columns');
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const PostsVoteModel = mongoose.model('postsVotes');
+  const columnId = this._id;
+  const {
+    times,
+    minTime: _minTime,
+    maxTime: _maxTime
+  } = await ColumnModel.getTrendTime(minTime, maxTime);
+  const columnPosts = await ColumnPostModel.find({
+    from: 'own',
+    type: 'thread',
+    columnId: columnId,
+  }, {
+    pid: 1
+  });
+  const columnPostsId = columnPosts.map(cp => cp.pid);
+  let voteUp = await PostsVoteModel.aggregate(
+    [
+      {
+        $match: {
+          pid: {$in: columnPostsId},
+          type: 'up',
+          toc: {
+            $gte: _minTime,
+            $lt: _maxTime,
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$toc'
+            }
+          },
+          count: {
+            $sum: '$num'
+          }
+        }
+      }
+    ]
+  );
+  const voteUpObj = {};
+  for(const h of voteUp) {
+    voteUpObj[h._id] = h.count;
+  }
+  voteUp = [];
+  for(const time of times) {
+    const count = voteUpObj[time] || 0;
+    voteUp.push({
+      time,
+      count
+    });
+  }
+  return voteUp;
+};
+/*
+* 获取专栏文章分享趋势
+* */
+schema.methods.getShareTrends = async function(minTime, maxTime) {
+  const ColumnModel = mongoose.model('columns');
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const ShareModel = mongoose.model('share');
+  const columnId = this._id;
+  const {
+    times,
+    minTime: _minTime,
+    maxTime: _maxTime
+  } = await ColumnModel.getTrendTime(minTime, maxTime);
+  const columnPosts = await ColumnPostModel.find({
+    from: 'own',
+    type: 'thread',
+    columnId: columnId,
+  }, {
+    pid: 1
+  });
+  const columnPostsId = columnPosts.map(cp => cp.pid);
+  let share = await ShareModel.aggregate(
+    [
+      {
+        $match: {
+          tokenType: 'post',
+          targetId: {$in: columnPostsId},
+          toc: {
+            $gte: _minTime,
+            $lt: _maxTime,
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$toc'
+            }
+          },
+          count: {
+            $sum: 1
+          }
+        }
+      }
+    ]
+  );
+  const shareObj = {};
+  for(const h of share) {
+    shareObj[h._id] = h.count;
+  }
+  share = [];
+  for(const time of times) {
+    const count = shareObj[time] || 0;
+    share.push({
+      time,
+      count
+    });
+  }
+  return share;
+};
 module.exports = mongoose.model("columns", schema);

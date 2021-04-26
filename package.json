@@ -114,7 +114,8 @@
     "urllib": "^2.37.0",
     "vue": "^2.5.16",
     "xbbcode-parser": "^0.1.2",
-    "xss": "^1.0.3"
+    "xss": "^1.0.3",
+    "sortablejs": "^1.13.0"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",

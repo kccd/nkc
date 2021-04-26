@@ -5,6 +5,7 @@ module.exports = async (ctx, next) => {
   const {match} = state;
   match.uid = targetUser.uid;
   match.type = "collection";
+  match.cancel = false;
   const count = await db.SubscribeModel.countDocuments(match);
   const paging = nkcModules.apiFunction.paging(page, count);
   const subscribes = await db.SubscribeModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);

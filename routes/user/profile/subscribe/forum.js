@@ -6,6 +6,7 @@ module.exports = async (ctx, next) => {
   const {targetUser} = data;
   match.uid = targetUser.uid;
   match.type = "forum";
+  match.cancel = false;
   if(t !== undefined) {
     t = Number(t);
     if(!fcId.includes(t)) ctx.throw(400, `未知的专业分类 id: ${t}`);

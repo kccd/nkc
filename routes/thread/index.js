@@ -619,11 +619,12 @@ threadRouter
 		data.collected = false;
 		data.subscribed = false;
 		if(data.user) {
-			const collection = await db.SubscribeModel.findOne({uid: data.user.uid, tid, type: "collection"});
+			const collection = await db.SubscribeModel.findOne({cancel: false, uid: data.user.uid, tid, type: "collection"});
 			if(collection) {
 				data.collected = true;
 			}
 			const sub = await db.SubscribeModel.findOne({
+        cancel: false,
         type: "thread",
         tid,
         uid: data.user.uid
