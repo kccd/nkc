@@ -1,56 +1,52 @@
-extends ./base
-block columnTitle
+extends ./settings
+block settingsTitle
   title 分类管理
 block settingsContent
-  .hidden#data=objToStr({column: data.column, categoryTree: data.categoryTree, categoryList: data.categoryList})
-  .row#app(v-cloak)
-    .col-xs-12.col-md-12
-      h4.m-b-1
-        a(href=`/m/${data.column._id}/settings/category/add`) 创建新分类
-      .column-category-list(v-for="c, index in categoryList")
-        .column-category-li
-          .row
-            .col-xs-12.col-md-6
-              span(v-for='index in c.level') &nbsp;&nbsp;&nbsp;&nbsp;
-                //span(v-for='index in (c.level+1)') #
-                //span(v-if="c.level >= 0") &nbsp;
-              span {{c.name}}
-                span(v-if="c.default") （默认）
-            .col-xs-12.col-md-6
+  #data.hidden=objToStr({categoryTree: data.categoryTree, minorCategories: data.minorCategories, columnId: data.column._id})
+  div
+    h3 分类管理
+    hr
+    mixin renderCategaties(categories)
+      .column-categories-item-container
+        for category in categories
+          .column-category-item(data-id=category._id)
+            .column-category-info
+              .fa.fa-arrows.column-category-handle
+              span.column-category-name=category.name
+              if category.default
+                span &nbsp;(默认)
+              //.description=category.description
+              .column-category-options
+                if !category.default
+                  button.btn.btn-xs.btn-danger(
+                    onclick=`removeCategory('main', ${category._id})`
+                    class=category.children && category.children.length?"hidden":''
+                    ) 删除
+                button.btn.btn-xs.btn-default(onclick=`editCategory(${category._id})`) 编辑
+            .column-categories-container
+              +renderCategaties(category.children)
+    .row
+      .col-xs-12
+        button.btn.btn-default.btn-sm(onclick='createCategory()') 添加分类
+      .col-xs-12.col-md-6
+        h5 主分类
+        +renderCategaties(data.categoryTree)
+      .col-xs-12.col-md-6
+        h5 辅分类
+        .column-categories-minor
+          for c in data.minorCategories
+            .column-category-minor-item(data-id=c._id)
+              .column-category-info
+                .fa.fa-arrows.column-category-handle
+                span.column-category-name=c.name
+                .column-category-options
+                  button.btn.btn-xs.btn-danger(
+                    onclick=`removeCategory('minor', ${c._id})`
+                  ) 删除
+                  button.btn.btn-xs.btn-default(onclick=`editCategory(${c._id})`) 编辑
 
-              .text-right
-                a.btn.btn-default.btn-xs(:href="'/m/' + column._id + '/settings/category/' + c._id") 编辑
-                button.btn.btn-default.btn-xs(@click="move('up', c)") 上移
-                button.btn.btn-default.btn-xs(@click="move('down', c)") 下移
-                button.btn.btn-default.btn-xs(@click="move('top', c)") 移到顶部
-                button.btn.btn-default.btn-xs(@click="move('bottom', c)") 移到底部
-                button.btn.btn-danger.btn-xs(@click="remove(c)") 删除
-    //-.col-xs-12.col-md-12
-      .form(v-if="category")
-        .form-group(v-if="!category._id")
-          h4
-            b 新建分类
-        .form-group
-          label 分类名（不超过50字符）
-          input.form-control(type="text" v-model.tirm="category.name")
-        .form-group
-          label 分类简介（不超过100字符）
-          textarea.form-control(v-model.tirm="category.description" rows=5)
-        .form-group
-          label 父分类：
-          span {{getCategoryNameById(category.parentId)}}
 
-          div
-            button.btn.btn-default.btn-sm(@click="category.parentId = ''") 设置为主分类
-            button.btn.btn-default.btn-sm(@click="selectCategory") 选择分类
-
-        .form-group
-          h5.text-danger(v-if="error") {{error}}
-          h5.text-success(v-if="info") {{info}}
-          button.btn.btn-primary.btn-sm.btn-block(@click="save") 保存
-          .text-right.m-t-1(style="color: #777;")
-            span.pointer(@click="remove") 删除分类
-  -const column = data.column;
-  include ../../publicModules/toColumn/toColumn
-block scripts
-  +includeJS("/columns/settings/category.js")
+block settingsScripts
+  include ../../publicModules/commonModal/commonModal
+  +includeJS('/sortablejs/Sortable.min.js')
+  +includeJS('/columns/settings/category.js')
