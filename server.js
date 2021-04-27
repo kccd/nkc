@@ -69,9 +69,12 @@ const start = async () => {
       require('./watch.js');
     }
 
-    process.on('message', function(msg) {
+    console.log(require('mongoose'))
+
+    process.on('message', async function(msg) {
       if (msg === 'shutdown') {
         server.close();
+        await require('mongoose').disconnect();
         console.log(`nkc service ${global.NKC.processId} stopped`.green);
         process.exit(0);
       }
