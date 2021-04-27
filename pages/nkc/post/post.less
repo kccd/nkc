@@ -2,38 +2,84 @@
 .management-posts{
   .management-post{
     vertical-align: top;
-    //border-bottom: 4px solid #aaa;
+    background-color: #f4f4f4;
+    padding-top: 1rem;
     .post-header{
-      font-style: oblique;
       font-weight: 700;
+      font-size: 0;
+      vertical-align: middle;
+      &>*{
+        font-size: 1.2rem;
+      }
       .post-time{
         display: inline-block;
         margin-right: 0.5rem;
-        color: @accent;
-        font-size: 1.3rem;
+        color: #fff;
+        font-size: 1.2rem;
+        height: 2rem;
+        background-color: @darkGray;
+        line-height: 2rem;
+        border-radius: 3px;
+        width: 12rem;
+        text-align: center;
+      }
+      .post-type{
+        display: inline-block;
+        height: 2rem;
+        line-height: 2rem;
+        margin-right: 0.5rem;
+        padding: 0 0.2rem;
+        text-align: center;
+        background-color: @accent;
+        border-radius: 3px;
+        color: #fff;
+        width: 3.5rem;
       }
       &>span{
         margin-right: 0.5rem;
       }
       .post-user{
+        color: #fff;
+        height: 2rem;
+        line-height: 2rem;
+        border-radius: 3px;
+        width: 10rem;
+        padding: 0 0.5rem;
+        overflow: hidden;
         display: inline-block;
-        color: @primary;
+        background-color: @primary;
+        position: relative;
+        margin-right: 0.5rem;
+        vertical-align: top;
+        padding-left: 2rem;
         img{
-          margin-top: -2px;
-          display: inline-block;
+          position: absolute;
+          top: 3px;
+          left: 3px;
           height: 1.5rem;
           width: 1.5rem;
           border-radius: 50%;
-          margin-right: 0.3rem;
         }
-        margin-right: 0.5rem;
+      }
+      .post-forum{
+        display: inline-block;
       }
       .post-url{
-
+        display: inline-block;
+        width: 6rem;
+        border-radius: 3px;
+        margin-right: 0.5rem;
+        height: 2rem;
+        line-height: 2rem;
+        text-align: center;
+        background-color: @darkGray;
+        color: #fff;
+      }
+      .post-options{
+        float: right;
       }
     }
     .post-body{
-      background-color: #f4f4f4;
       .post-title{
         font-weight: 700;
       }
