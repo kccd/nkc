@@ -285,14 +285,21 @@ schema.statics.getMinorCategories = async (columnId) => {
 * 拓展制定主分类下辅助分类中文章的数量
 *
 * */
-schema.statics.extendMinorCategoriesByMainCategoryId = async (minorCategories, cid) => {
+schema.statics.extendMinorCategoriesPostCount = async (minorCategories, cid) => {
   const ColumnPostModel = mongoose.model('columnPosts');
   const mcid = [];
-  for(const mc of minorCategories) {
+  const categoriesObj = {};
+  const categories = [];
+  for(let mc of minorCategories) {
+    if(mc.toObject) mc = mc.toObject();
     mcid.push(mc._id);
+    categories.push(mc);
+    categoriesObj[mc._id] = mc;
   }
   const match = {
-    mcid: {$in: mcid}
+    mcid: {
+      $in: mcid
+    }
   };
   if(cid) {
     match.cid = cid;
@@ -301,9 +308,27 @@ schema.statics.extendMinorCategoriesByMainCategoryId = async (minorCategories, c
     [
       {
         $match: match
+      },
+      {
+        $unwind: {
+          path: "$mcid"
+        }
+      },
+      {
+        $group: {
+          _id: "$mcid",
+          count: {
+            $sum: 1
+          }
+        }
       }
     ]
-  )
+  );
+  for(const r of result) {
+    const {_id, count} = r;
+    categoriesObj[_id].count = count;
+  }
+  return categories;
 };
 
 module.exports = mongoose.model("columnPostCategories", schema);

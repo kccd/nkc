@@ -23,6 +23,8 @@ router
     const paging = nkcModules.apiFunction.paging(page, count);
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
     data.columnPosts = await db.ColumnPostModel.extendColumnPosts(columnPosts);
+    const minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id);
+    data.minorCategories = await db.ColumnPostCategoryModel.extendMinorCategoriesPostCount(minorCategories, cid || null);
     data.paging = paging;
     await next();
   })

@@ -28,7 +28,7 @@ block settingsContent
         .column-settings-post-categories-minor
           ul.nav.nav-tabs
             li(v-for='c in minorCategories' :class='{"active": minorCategory === c}')
-              a(@click='selectMinorCategory(c)') {{c.name}}
+              a(@click='selectMinorCategory(c)') {{c.name}}({{c.count}})
 
         .column-settings-posts(v-if="category")
           .blank(v-if="!columnPosts || columnPosts.length === 0") 空空如也~
