@@ -69,8 +69,6 @@ const start = async () => {
       require('./watch.js');
     }
 
-    console.log(require('mongoose'))
-
     process.on('message', async function(msg) {
       if (msg === 'shutdown') {
         server.close();
