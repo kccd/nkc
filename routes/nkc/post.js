@@ -27,6 +27,9 @@ router
     } else {
 
     }
+
+    const recycleId = await db.SettingModel.getRecycleId();
+
     const count = await db.PostModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count, 100);
     let posts = await db.PostModel
@@ -66,10 +69,18 @@ router
       }
     }
 
-    for(const post of posts) {
-      if(post.type === 'post') {
-
+    const colors = ['red', 'green', 'blue', '#791E94', 'yellow', '#87314e'];
+    let colorIndex = 0;
+    const getColor = () => {
+      const color = colors[colorIndex];
+      colorIndex ++;
+      if(colorIndex > colors.length - 1) {
+        colorIndex = 0;
       }
+      return color;
+    };
+
+    for(const post of posts) {
       let postType;
       if(post.type === 'thread') {
         postType = 'thread';
@@ -77,6 +88,21 @@ router
         postType = 'comment';
       } else {
         postType = 'post';
+      }
+
+      let status = 'normal';
+      if(postType === 'thread') {
+        if(post.mainForumsId.includes(recycleId)) {
+          status = 'disabled';
+        }
+      } else {
+        if(post.disabled) {
+          if(post.toDraft) {
+            status = 'toDraft';
+          } else {
+            status = 'disabled';
+          }
+        }
       }
 
       const _forums = [];
@@ -117,7 +143,9 @@ router
         keyWordsEn: post.keyWordsEn,
         url: post.url,
         mainForumsId: post.mainForumsId,
-        categoriesId: post.categoriesId
+        categoriesId: post.categoriesId,
+        status,
+        borderColor: getColor(),
       }
 
       results.push(result);

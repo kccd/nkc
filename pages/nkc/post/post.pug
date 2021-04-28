@@ -22,7 +22,7 @@ block nkcContent
     include ../../publicModules/paging/paging_input
     .management-posts
       for post in data.posts
-        .management-post
+        .management-post(class=post.status style=`border-right: 10px solid ${post.borderColor}`)
           .post-header
             .post-time=format("YYYY/MM/DD HH:mm:ss", post.toc)
 
@@ -45,6 +45,10 @@ block nkcContent
 
             .post-options
               .hidden(id=`data_${post.pid}`)=objToStr({tid: post.thread.tid, pid: post.pid, mainForumsId: post.mainForumsId, categoriesId: post.categoriesId})
+              if post.status === 'disabled'
+                span.status 已被屏蔽
+              else if post.status === 'toDraft'
+                span.status 已被退休
               if permission("moveThreads") && post.type === 'thread'
                 button.btn-xs.btn.btn-primary(onclick=`moveThread('${post.pid}')`) 移动
               if permissionsOr(["movePostsToDraft", "movePostsToRecycle"])
