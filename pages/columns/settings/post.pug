@@ -11,7 +11,7 @@ block settingsContent
       .col-xs-12.col-md-3.m-b-2
         ul.nav.nav-tabs
         .column-settings-post-categories
-          .column-settings-post-category(v-for="c in categories" @click="selectCategory(c)" :class="{'active': c === category}")
+          .column-settings-post-category(v-for="c in mainCategories" @click="selectMainCategory(c)" :class="{'active': c === category}")
             span(v-for='index in c.level') &nbsp;&nbsp;&nbsp;&nbsp;
             span {{c.name}} {{c.default?"(默认)":""}}
               .pull-right
@@ -28,7 +28,8 @@ block settingsContent
         .column-settings-post-categories-minor
           ul.nav.nav-tabs
             li(v-for='c in minorCategories' :class='{"active": minorCategory === c}')
-              a(@click='selectMinorCategory(c)') {{c.name}}({{c.count}})
+              a(@click='selectMinorCategory(c)') {{c.name}}
+                span.post-count(v-if='c.count > 0') &nbsp;{{c.count}}
 
         .column-settings-posts(v-if="category")
           .blank(v-if="!columnPosts || columnPosts.length === 0") 空空如也~

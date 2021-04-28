@@ -5,11 +5,39 @@ router
   .get("/", async (ctx, next) => {
     const {data, db, query} = ctx;
     const {column} = data;
-    const {t} = query;
-    if(t === "list") {
+    const {from} = query;
+    if(from === 'post') {
+      let {cid} = query;
+      if (cid) cid = parseInt(cid);
+      data.mainCategories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
+      const mainCategoryPostCount = await db.ColumnPostModel.countDocuments({columnId: column._id});
+      data.mainCategories.unshift({
+        _id: 'all',
+        name: '全部',
+        count: mainCategoryPostCount
+      });
+      let minorCategoryPostCount = 0;
+      for (const mc of data.mainCategories) {
+        if (!cid) {
+          minorCategoryPostCount = data.mainCategories[0].count;
+          break;
+        } else if (mc._id === cid) {
+          minorCategoryPostCount = mc.count;
+          break;
+        }
+      }
+      data.minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id, cid);
+      data.minorCategories.unshift({
+        _id: 'all',
+        name: '全部',
+        count: minorCategoryPostCount
+      });
+    } else if(from === 'dialog') {
       data.mainCategories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
       data.minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id);
-      data.count = await db.ColumnPostModel.countDocuments({columnId: column._id});
+    } else if(from === 'fastPost') {
+      data.mainCategories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
+      data.minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id);
     } else {
       const categories = await db.ColumnPostCategoryModel.find({columnId: column._id}).sort({toc: 1});
       data.categories = await db.ColumnPostCategoryModel.extendCategories(categories);
@@ -104,7 +132,17 @@ router
       parentId: categoryId
     });
     if(children > 0) ctx.throw(400, "该分类下还有其他分类，无法删除");
-    const postCount = await db.ColumnPostModel.countDocuments({columnId: column._id, cid: categoryId});
+    const match = {
+      columnId: column._id,
+    };
+    if(category.type === 'main') {
+      // 主分类
+      match.cid = category._id;
+    } else {
+      // 辅分类
+      match.mcid = category._id;
+    }
+    const postCount = await db.ColumnPostModel.countDocuments(match);
     if(postCount > 0) ctx.throw(400, "该分类下存在内容，无法删除");
     await db.ColumnPostCategoryModel.deleteOne({columnId: column._id, _id: category._id});
     await next();

@@ -3,12 +3,7 @@ const router = new Router();
 router
   .get("/", async (ctx, next) => {
     ctx.template = "columns/settings/post.pug";
-    const {data, db} = ctx;
-    const {column} = data;
-    data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
-    const minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id);
-    data.minorCategories = await db.ColumnPostCategoryModel.extendMinorCategoriesPostCount(minorCategories, null);
-    data.count = await db.ColumnPostModel.countDocuments({columnId: column._id});
+    const {data} = ctx;
     data.nav = 'post';
     await next();
   })

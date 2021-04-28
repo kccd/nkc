@@ -223,7 +223,7 @@ schema.statics.getToppedColumnPosts = async (columnId, fidOfCanGetThread, cid) =
 * @param {[Number]} categoriesId 专栏文章分类ID数组
 * @param [String] postsId postId数组
 * */
-schema.statics.addColumnPosts = async (columnId, categoriesId, postsId) => {
+schema.statics.addColumnPosts = async (columnId, categoriesId, minorCategoriesId, postsId) => {
   const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
   const PostModel = mongoose.model("posts");
   const ThreadModel = mongoose.model("threads");
@@ -234,17 +234,22 @@ schema.statics.addColumnPosts = async (columnId, categoriesId, postsId) => {
     const category = await ColumnPostCategoryModel.findOne({columnId, default: true});
     categoriesId = [category._id];
   }
-  const categoriesId_ = [];
+  const categoriesId_ = [], minorCategoriesId_ = [];
   for(const _id of categoriesId) {
     const c = await ColumnPostCategoryModel.findOne({_id, columnId});
     if(c) categoriesId_.push(_id);
+  }
+  for(const _id of minorCategoriesId) {
+    const c = await ColumnPostCategoryModel.findOne({_id, columnId});
+    if(c) minorCategoriesId_.push(_id);
   }
   for(const pid of postsId) {
     let columnPost = await ColumnPostModel.findOne({columnId, pid});
     const order = await ColumnPostModel.getCategoriesOrder(categoriesId);
     if(columnPost) {
       await columnPost.updateOne({
-        cid: categoriesId,
+        cid: categoriesId_,
+        mcid: minorCategoriesId_,
         order
       });
       continue;
@@ -260,7 +265,8 @@ schema.statics.addColumnPosts = async (columnId, categoriesId, postsId) => {
       pid,
       type: thread.oc === pid? "thread": "post",
       columnId: column._id,
-      cid: categoriesId_
+      cid: categoriesId_,
+      mcid: minorCategoriesId_,
     });
     await columnPost.save();
   }

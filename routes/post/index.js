@@ -318,7 +318,7 @@ router
     const post = body.post;
 
     const {
-      columnCategoriesId=[], anonymous, t, c, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState,
+      columnMainCategoriesId = [], columnMinorCategoriesId = [], anonymous, t, c, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState,
       survey, did, cover = ""
     } = post;
     const {pid} = ctx.params;
@@ -466,8 +466,8 @@ router
 	  	q.disabled = false;
 	  }
     // 转发到专栏
-    if(columnCategoriesId.length > 0 && state.userColumn) {
-      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnCategoriesId, [targetThread.oc]);
+    if(columnMainCategoriesId.length > 0 && state.userColumn) {
+      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnMainCategoriesId, columnMinorCategoriesId, [targetThread.oc]);
     }
     data.redirect = await db.PostModel.getUrl(pid);
     data.targetUser = targetUser;

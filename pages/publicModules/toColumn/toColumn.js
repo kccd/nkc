@@ -101,7 +101,7 @@ moduleToColumn.init = function(callback) {
       },
       getCategories: function() {
         var this_ = this;
-        nkcAPI("/m/" + this.columnId + "/category?t=list", "GET")
+        nkcAPI("/m/" + this.columnId + "/category?from=dialog", "GET")
           .then(function(data) {
             this_.column = data.column;
             for(var i = 0; i < data.mainCategories.length; i++) {

@@ -83,11 +83,10 @@ router
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
     data.timeline = await db.ColumnModel.getTimeline(column._id);
     if(ctx.permission("pushColumnToHome")) {
-      const homeSettings = await db.SettingModel.getSettings("home");
-      data.topped = homeSettings.columnsId.includes(data.column._id);
+      const homeSettings = await db.SettingModel.getSettings('home');
+      data.columnTopped = homeSettings.columnsId.includes(column._id);
     }
-    const homeSettings = await db.SettingModel.getSettings('home');
-    data.columnTopped = homeSettings.columnsId.includes(column._id);
+
     await next();
   })
   .put("/", async (ctx, next) => {

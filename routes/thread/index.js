@@ -796,7 +796,7 @@ threadRouter
     ) {
       ctx.throw(403, `当前回复不允许评论`);
     }
-		const {columnCategoriesId = [], anonymous = false, did} = post;
+		const {columnMainCategoriesId = [], columnMinorCategoriesId = [], anonymous = false, did} = post;
     if(post.t && post.t.length > 100) ctx.throw(400, `标题不能超过100个字`);
     const content = customCheerio.load(post.c).text();
     if(content.length < 2) ctx.throw(400, `内容不能少于2个字`);
@@ -839,8 +839,8 @@ threadRouter
     data.blacklistUsersId = await db.BlacklistModel.getBlacklistUsersId(data.user.uid);
 
 		// 转发到专栏
-    if(columnCategoriesId.length > 0 && state.userColumn) {
-      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnCategoriesId, [data.thread.oc]);
+    if(columnMainCategoriesId.length > 0 && state.userColumn) {
+      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnMainCategoriesId, columnMinorCategoriesId, [data.thread.oc]);
     }
 
     // 发表匿名内容

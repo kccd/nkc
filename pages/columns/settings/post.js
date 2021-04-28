@@ -1,22 +1,16 @@
 var data = NKC.methods.getDataById("data");
-data.categories.unshift({
-  _id: "all",
-  name: "全部",
-  count: data.count,
-});
-data.minorCategories.unshift({
-  _id: 'all',
-  name: '全部'
-});
+
 var app = new Vue({
   el: "#app",
   data: {
     column: data.column,
-    categories: data.categories,
-    minorCategories: data.minorCategories,
+    mainCategories: [],
+    minorCategories: [],
     columnPosts: [],
-    category: "",
-    minorCategory: '',
+
+    selectedMainCategoryId: 'all',
+    selectedMinorCategoryId: 'all',
+
     threads: "",
     paging: "",
 
@@ -29,13 +23,39 @@ var app = new Vue({
     selectMul: true,
   },
   mounted: function() {
-    if(this.categories.length !== 0) {
-      this.selectCategory(this.categories[0], true);
-    }
-    if(this.minorCategories.length !== 0) {
-      this.selectMinorCategory(this.minorCategories[0]);
-    }
+    this.init();
+    this.getCategories();
+    this.getPosts(0);
     moduleToColumn.init();
+  },
+  computed: {
+    category: function() {
+      return this.mainCategory;
+    },
+    mainCategory: function() {
+      var cid = this.selectedMainCategoryId;
+      var category;
+      for(var i = 0; i < this.mainCategories.length; i ++) {
+        var _category = this.mainCategories[i];
+        if(_category._id === cid) {
+          category = _category;
+          break;
+        }
+      }
+      return category;
+    },
+    minorCategory: function() {
+      var cid = this.selectedMinorCategoryId;
+      var category;
+      for(var i = 0; i < this.minorCategories.length; i ++) {
+        var _category = this.minorCategories[i];
+        if(_category._id === cid) {
+          category = _category;
+          break;
+        }
+      }
+      return category;
+    }
   },
   methods: {
     format: NKC.methods.format,
@@ -55,7 +75,7 @@ var app = new Vue({
           minorCategoriesId: minorCategoriesId
         })
           .then(function() {
-            app.selectCategory(app.category);
+            app.selectMainCategory(app.category);
             app.getCategories();
             moduleToColumn.hide();
           })
@@ -87,18 +107,12 @@ var app = new Vue({
         })
     },
     getCategories: function() {
-      nkcAPI("/m/" + this.column._id + "/category?t=list", "GET")
+      var cid = this.selectedMainCategoryId;
+      var url = "/m/" + this.column._id + "/category?from=post";
+      if(cid && cid !== 'all') url += '&cid=' + cid;
+      nkcAPI(url, "GET")
         .then(function(data) {
-          data.mainCategories.unshift({
-            name: "全部",
-            count: data.count,
-            _id: "all"
-          });
-          data.minorCategories.unshift({
-            name: '全部',
-            _id: 'all'
-          })
-          app.categories = data.mainCategories;
+          app.mainCategories = data.mainCategories;
           app.minorCategories = data.minorCategories;
         })
         .catch(function(data) {
@@ -170,26 +184,19 @@ var app = new Vue({
         this.selectedColumnPostsId = [];
       }
     },
-    addCategory: function() {
-      this.category = {
-        name: "",
-        description: ""
-      };
-      this.editInfo = true;
-    },
     selectPage: function(type, num) {
       if(type === "null") return;
       this.getPosts(num);
     },
     getPosts: function(page) {
-      var cid = this.category._id;
-      var mcid = this.minorCategory._id;
+      var cid = this.selectedMainCategoryId;
+      var mcid = this.selectedMinorCategoryId;
       if(page === undefined) page = this.paging.page;
       var url = "/m/" + this.column._id + "/post?page=" + page;
-      if(cid !== "all") {
+      if(cid && cid !== 'all') {
         url += "&cid=" + cid;
       }
-      if(mcid !== 'all') {
+      if(mcid && mcid !== 'all') {
         url += '&mcid=' + mcid;
       }
       nkcAPI(url, "GET")
@@ -208,63 +215,20 @@ var app = new Vue({
         buttonValue: []
       };
     },
-    selectCategory: function(category, disableGetPosts) {
+    selectMainCategory: function(category, disableGetPosts) {
       this.init();
-      this.category = category;
+      this.selectedMainCategoryId = category._id;
       if(!disableGetPosts) {
         this.getPosts(0);
+        this.getCategories();
       }
     },
     selectMinorCategory: function(category, disableGetPosts) {
       this.init();
-      this.minorCategory = category;
+      this.selectedMinorCategoryId = category._id;
       if(!disableGetPosts) {
         this.getPosts(0);
       }
-    },
-    cancelAdd: function() {
-      this.init();
-      if(!this.category && !this.category._id && this.categories.length > 0) {
-        this.selectCategory(this.categories[0])
-      }
-    },
-    removeCategory: function(category) {
-      if(!confirm("确认要删除分类？")) return;
-      nkcAPI("/m/" + this.column._id + "/category/" + category._id, "DELETE")
-        .then(function() {
-          var index = app.categories.indexOf(category);
-          if(index !== -1) app.categories.splice(index, 1);
-          if(app.categories.length > 0) app.selectCategory(app.categories[0]);
-        })
-        .catch(function(data) {
-          screenTopWarning(data);
-        })
-    },
-    saveInfo: function() {
-      this.error = "";
-      var category = this.category;
-      if(!category.name) return this.error = "请输入分类名";
-      if(!category.description) return this.error = "请输入分类介绍";
-      if(category._id) { // 修改分类
-        nkcAPI("/m/" + this.column._id + "/category/" + category._id, "PUT", category)
-          .then(function() {
-            app.editInfo = false;
-          })
-          .catch(function(data) {
-            app.error = data.error || data;
-          });
-      } else { // 新建分类
-        nkcAPI("/m/" + this.column._id + "/category", "POST", category)
-          .then(function(data) {
-            app.categories.push(data.category);
-            app.editInfo = false;
-            app.selectCategory(data.category);
-          })
-          .catch(function(data) {
-            app.error = data.error || data;
-          });
-      }
-
     }
   }
 });

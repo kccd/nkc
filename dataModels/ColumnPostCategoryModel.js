@@ -273,13 +273,59 @@ schema.statics.getCategories = async (columnId) => {
 };
 /*
 * 获取制定专栏的全部辅分类
+* @param {Number} columnId 专栏ID
+* @param {Number} cid 主分类ID
 * */
-schema.statics.getMinorCategories = async (columnId) => {
+schema.statics.getMinorCategories = async (columnId, cid) => {
   const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
-  return await ColumnPostCategoryModel.find({
+  const ColumnPostModel = mongoose.model('columnPosts');
+  let minorCategories = await ColumnPostCategoryModel.find({
     columnId,
     type: 'minor'
   }).sort({order: 1});
+  const minorCategoriesObj = {};
+  const mcid = [];
+  minorCategories = minorCategories.map(category => {
+    category = category.toObject();
+    minorCategoriesObj[category._id] = category;
+    mcid.push(category._id);
+    return category;
+  });
+  const match = {
+    mcid: {
+      $in: mcid
+    }
+  };
+  if(cid) {
+    match.cid = cid;
+  }
+  const result = await ColumnPostModel.aggregate(
+    [
+      {
+        $match: match
+      },
+      {
+        $unwind: {
+          path: "$mcid"
+        }
+      },
+      {
+        $group: {
+          _id: "$mcid",
+          count: {
+            $sum: 1
+          }
+        }
+      }
+    ]
+  );
+  for(const r of result) {
+    const {_id, count} = r;
+    const category = minorCategoriesObj[_id];
+    if(!category) continue;
+    category.count = count;
+  }
+  return minorCategories;
 };
 /*
 * 拓展制定主分类下辅助分类中文章的数量

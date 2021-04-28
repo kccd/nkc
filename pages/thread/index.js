@@ -406,7 +406,9 @@ function getPost() {
     throw "请填写回复内容"
   }
   // 专栏文章分类
-  post.columnCategoriesId = getSelectedColumnCategoriesId();
+  const columnCategoriesId = getSelectedColumnCategoriesId();
+  post.columnMainCategoriesId = columnCategoriesId.mainCategoriesId;
+  post.columnMinorCategoriesId = columnCategoriesId.minorCategoriesId;
   var sendAnonymousPostDom = $("#sendAnonymousPost");
   if(sendAnonymousPostDom.length) {
     post.anonymous = sendAnonymousPostDom.prop("checked");
@@ -1022,11 +1024,14 @@ function getSelectedColumnCategoriesId() {
   if(!window.ColumnCategoriesDom) return [];
   var status = ColumnCategoriesDom.getStatus();
   if(status.checkbox) {
-    if(status.selectedCategoriesId.length === 0) {
-      throw("请选择专栏文章分类");
+    if(status.selectedMainCategoriesId.length === 0) {
+      throw("请选择专栏文章主分类");
     }
   }
-  return status.selectedCategoriesId;
+  return {
+    mainCategoriesId: status.selectedMainCategoriesId || [],
+    minorCategoriesId: status.selectedMinorCategoriesId || [],
+  };
 
 }
 

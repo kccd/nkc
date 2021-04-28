@@ -11,7 +11,7 @@ router
     data.categoryList = await db.ColumnPostCategoryModel.getCategoryList(column._id);
     data.categoryTree = await db.ColumnPostCategoryModel.getCategoryTree(column._id);
     data.minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id);
-    data.highlight = "category";
+    data.nav = "category";
     await next();
   })
   .put('/', async (ctx, next) => {
