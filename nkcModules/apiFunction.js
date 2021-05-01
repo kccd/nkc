@@ -470,8 +470,13 @@ fn.getIpAddress = async (ip) => {
         chunks.push(chunk);
       })
       res.on('end', () => {
-        const buffer = Buffer.concat(chunks).toString();
-        resolve(JSON.parse(buffer));
+        try {
+         const buffer = Buffer.concat(chunks).toString();
+         resolve(JSON.parse(buffer));
+        } catch(err) {
+         reject(err);
+        }
+        
       });
     })
     // 请求出错
