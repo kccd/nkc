@@ -2,8 +2,21 @@
 .management-posts{
   .management-post{
     vertical-align: top;
-    background-color: #f4f4f4;
     padding-top: 1rem;
+    &.normal{
+      background-color: #f4f4f4;
+    }
+    &.disabled{
+      background-color: #aaa;
+    }
+    &.toDraft{
+      background-color: #e29d9d;
+    }
+    .post-content{
+      span[data-tag="nkcsource"][data-type="picture"]{
+        max-width: 20rem;
+      }
+    }
     .post-header{
       font-weight: 700;
       font-size: 0;
@@ -77,6 +90,10 @@
       }
       .post-options{
         float: right;
+        .status{
+          font-weight: 700;
+          color: #000;
+        }
       }
     }
     .post-body{
