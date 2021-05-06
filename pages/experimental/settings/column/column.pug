@@ -30,22 +30,27 @@ block eContent
                   span {{g.displayName}}
 
           .col-xs-12.col-md-12
-            h4 说明
+            h4 注意事项
           .form-group
-            label.col-sm-2.control-label 投稿说明
+            label.col-sm-2.control-label 开设专栏
             .col-sm-5
               h5 支持换行、空格
-              textarea.form-control(v-model.number="columnSettings.contributeInfo" rows=7)
+              textarea.form-control(v-model="columnSettings.createColumnInfo" rows=7)
           .form-group
-            label.col-sm-2.control-label 专栏转让说明
+            label.col-sm-2.control-label 投稿
             .col-sm-5
               h5 支持换行、空格
-              textarea.form-control(v-model.number="columnSettings.transferInfo" rows=7)
+              textarea.form-control(v-model="columnSettings.contributeInfo" rows=7)
           .form-group
-            label.col-sm-2.control-label 关闭专栏说明
+            label.col-sm-2.control-label 专栏转让
             .col-sm-5
               h5 支持换行、空格
-              textarea.form-control(v-model.number="columnSettings.closeColumnInfo" rows=7)
+              textarea.form-control(v-model="columnSettings.transferInfo" rows=7)
+          .form-group
+            label.col-sm-2.control-label 关闭专栏
+            .col-sm-5
+              h5 支持换行、空格
+              textarea.form-control(v-model="columnSettings.closeColumnInfo" rows=7)
           .col-xs-12.col-md-12
             h4 管理员
           .form-group

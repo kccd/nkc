@@ -3,8 +3,7 @@ const router = new Router();
 router
   .get("/", async (ctx, next) => {
     ctx.template = "experimental/settings/column/column.pug";
-    const columnSettings = await ctx.db.SettingModel.findById("column");
-    ctx.data.columnSettings = columnSettings.c;
+    ctx.data.columnSettings = await ctx.db.SettingModel.getSettings('column');
     ctx.data.grades = await ctx.db.UsersGradeModel.find({}).sort({_id: 1});
     ctx.data.roles = await ctx.db.RoleModel.find({}).sort({toc: -1});
     await next();
@@ -15,6 +14,7 @@ router
     let {
       xsfCount, digestCount, userGrade,
       contributeInfo, threadCount, transferInfo, closeColumnInfo,
+      createColumnInfo,
       adminCertsId, pageCount, columnHomePostCountMin, columnHomeSort
     } = body;
     checkNumber(xsfCount, {
@@ -37,9 +37,10 @@ router
       const cert = await db.RoleModel.findOne({_id});
       return !!cert;
     }));
-    if(!contributeInfo) ctx.throw(400, "投稿说明不能为空");
-    if(!transferInfo) ctx.throw(400, "专栏转让说明不能为空");
-    if(!closeColumnInfo) ctx.throw(400, "关闭专栏说明不能为空");
+    if(!createColumnInfo) ctx.throw(400, "开设专栏注意事项不能为空")
+    if(!contributeInfo) ctx.throw(400, "投稿注意事项不能为空");
+    if(!transferInfo) ctx.throw(400, "专栏转让注意事项不能为空");
+    if(!closeColumnInfo) ctx.throw(400, "关闭专栏注意事项不能为空");
     checkNumber(pageCount, {
       name: '专栏设置 自定义页面个数',
       min: 0
@@ -60,6 +61,7 @@ router
         "c.threadCount": threadCount,
         "c.pageCount": pageCount,
         "c.transferInfo": transferInfo,
+        "c.createColumnInfo": createColumnInfo,
         "c.closeColumnInfo": closeColumnInfo,
         "c.adminCertsId": adminCertsId,
         "c.columnHomePostCountMin": columnHomePostCountMin,

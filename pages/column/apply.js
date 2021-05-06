@@ -14,7 +14,9 @@ var app = new Vue({
       name: "",
       abbr: "",
       description: ""
-    }
+    },
+
+    checked: false,
 
   },
   mounted: function() {
