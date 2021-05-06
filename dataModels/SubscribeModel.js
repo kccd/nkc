@@ -215,6 +215,34 @@ schema.statics.getUserSubColumnsId = async (uid) => {
   }
   return columnsId.map(id => Number(id));
 };
+
+/*
+* 获取用户关注的专栏
+* @param {String} uid 用户ID
+* @return {[Object]} 专栏数组
+* */
+schema.statics.getUserSubColumns = async (uid) => {
+  const SubscribeModel = mongoose.model('subscribes');
+  const ColumnModel = mongoose.model('columns');
+  const columnsId = await SubscribeModel.getUserSubColumnsId(uid);
+  const columns = await ColumnModel.find({
+    _id: {$in: columnsId},
+    disabled: false,
+    closed: false
+  });
+  const columnsObj = {};
+  for(const column of columns) {
+    columnsObj[column._id] = column;
+  }
+  const _columns = [];
+  for(const columnId of columnsId) {
+    const c = columnsObj[columnId];
+    if(!c) continue;
+    _columns.push(c);
+  }
+  return _columns;
+};
+
 /*
 * 将用户关注的专栏ID存入redis
 * @param {String} uid 用户ID

@@ -3,11 +3,17 @@
 body{
   background-color: #f4f4f4;
 }
+.column-settings-container{
+  @media(max-width: 767px) {
+    padding: 0;
+  }
+}
 .column-settings{
-  min-height: 30rem;
+  min-height: 32rem;
   .column-settings-navs{
     position: fixed;
     width: @navListWidth;
+
     &>div{
       padding: 0;
     }
@@ -46,9 +52,31 @@ body{
         }
       }
     }
+    @media(max-width: 767px) {
+      position: relative;
+      width: 100%;
+      ul{
+        width: 100%;
+        white-space: nowrap;
+        overflow-x: auto;
+        li{
+          display: inline-block;
+          a{
+            padding: 0 0.5rem;
+            display: inline-block;
+            .fa{
+              display: none;
+            }
+          }
+        }
+      }
+    }
   }
   .column-settings-content{
     margin-left: @navListWidth + 1rem;
+    @media(max-width: 767px) {
+      margin-left: 0;
+    }
   }
 }
 .column-settings-content{
@@ -58,6 +86,7 @@ body{
       background-color: #f4f4f4;
       height: 7rem;
       text-align: center;
+      margin-bottom: 0.5rem;
       span{
         height: 3rem;
         line-height: 3rem;
@@ -126,7 +155,7 @@ body{
 }
 .column-category-info{
   @height: 3rem;
-  @optionWidth: 7rem;
+  @optionWidth: 8rem;
   user-select: none;
   height: @height;
   line-height: @height;
@@ -169,4 +198,12 @@ body{
 .post-count{
   font-weight: 700;
   font-size: 1rem;
+}
+.column-contributes-container{
+  .nav{
+    li{
+      cursor: pointer;
+      user-select: none;
+    }
+  }
 }

@@ -1,14 +1,14 @@
 extends ../columnBase
 block columnTitle
-  title 专栏统计
   +includeCSS('/columns/settings/settings.css')
   block settingsTitle
+    title 专栏统计
 block content
   -var columnId = data.column._id;
   -var columnHomeUrl = `/m/${columnId}`;
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-12
+      .col-xs-12.col-md-12.column-settings-container
         .column-settings
           .column-settings-navs.box-shadow-panel
             div
@@ -21,6 +21,14 @@ block content
                   a(href=columnHomeUrl + '/settings/post' class=data.nav === 'post'?'active':'')
                     .fa.fa-file-text
                     span 文章管理
+                li
+                  a(href=columnHomeUrl + '/settings/post/add' class=data.nav === 'addPost' ? 'active' : '')
+                    .fa.fa-file-text
+                    span 添加内容
+                li
+                  a(href=columnHomeUrl + '/settings/contribute' class=data.nav === 'contribute' ? 'active' : '')
+                    .fa.fa-archive
+                    span 投稿处理
                 li
                   a(href=columnHomeUrl + '/settings/category' class=data.nav === 'category'?'active':'')
                     .fa.fa-tags

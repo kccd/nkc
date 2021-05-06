@@ -40,7 +40,7 @@ router
     });
     data.paging = paging;
     ctx.template = "columns/settings/addPost.pug";
-    data.highlight = "addPost";
+    data.nav = "addPost";
     await next();
   });
 module.exports = router;

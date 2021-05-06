@@ -1,85 +1,7 @@
 extends ../bootstrap_base
 block title
   title 专栏列表
-  style.
-    .columns-container{
-      font-size: 0;
-    }
-    .column{
-      border-radius: 5px;
-      width: 16.4rem;
-      margin: 0.6rem 1.2rem 0.6rem 0;
-      display: inline-block;
-      background-color: #fff;
-      border: 1px solid #eaeaea;
-      overflow: hidden;
-      padding: 2rem 1rem 2rem 1rem;
-      text-align: center;
-      transition: box-shadow 200ms;
-    }
-    .column:hover{
-      box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.1);
-    }
-    .column .column-avatar{
-      height: 5rem;
-      width: 5rem;
-      border-radius: 50%;
-      margin-bottom: 1rem;
-    }
-    .column .column-abbr{
-      font-size: 1rem;
-      margin-bottom: 0.6rem;
-    }
-    .column .column-name{
-      font-size: 1.4rem;
-      display: block;
-      height: 2rem;
-      overflow: hidden;
-      margin-bottom: 0.6rem;
-      word-break: break-word;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 1;
-      text-decoration: none;
-      color: #333;
-      font-weight: 700;
-    }
-    .column .column-description{
-      font-size: 1.2rem;
-      height: 3.3rem;
-      overflow: hidden;
-      color: #333;
-      margin-bottom: 1rem;
-      word-break: break-word;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
-    }
-    .column .column-subscription{
-
-    }
-    @media(max-width: 767px) {
-      .column .column-avatar{
-        height: 3rem;
-        width: 3rem;
-        margin-bottom: 0.2rem;
-      }
-      .column{
-        width: 100%;
-        padding: 0.5rem 0.3rem 0.5rem 0.3rem;
-      }
-      .column .column-name{
-        font-size: 1.2rem;
-        height: 1.6rem;
-        margin-bottom: 0.5rem;
-      }
-      .column .column-description{
-        height: 3.2rem;
-      }
-      .column .column-abbr{
-        margin-bottom: 0.2rem;
-      }
-    }
+  +includeCSS('/columns/columns.css')
 block content
   .container-fluid.max-width
     .row
@@ -94,25 +16,49 @@ block content
 
         .columns-container
           for column in data.columns
-            .column(data-column-id=column._id)
-              img.column-avatar(src=tools.getUrl('columnAvatar', column.avatar))
-              a(href=tools.getUrl('columnHome', column._id) target="_blank").column-name=column.name
-              .column-abbr
-                span=`${column.subCount}人关注，${column.postCount}篇文章`
-                div.m-t-05
-                  +fromNow(column.tlm)
-                  | 更新
-              .column-description(title=column.abbr)=column.abbr
-              .column-subsription
-                a.m-r-05.btn.btn-sm.btn-default(href=tools.getUrl('columnHome', column._id) target='_blank') 进入专栏
-                -var subscribed = state.subColumnsId?state.subColumnsId.includes(column._id): false;
-                -var klass = subscribed? 'btn-default': 'btn-primary';
-                -var text = subscribed? '已关注': '关注'
-                button.column-subscription.btn.btn-sm(
-                  data-subscribed=subscribed?'true': 'false'
-                  class=klass
-                  onclick=`subscribeColumn(${column._id})`
+            -var klass = '';
+            -var pre = '';
+            if column.disabled
+              -klass += 'column-list-disabled';
+              -pre = `「已被屏蔽」`
+            if column.closed
+              -klass += 'column-list-closed';
+              -pre = `「已被关闭」`
+            .column(data-column-id=column._id class=klass)
+              .column-top-container
+                .column-top-left-container
+                  img.column-avatar(src=tools.getUrl('columnAvatar', column.avatar))
+                .column-top-right-container
+                  a(href=tools.getUrl('columnHome', column._id) target="_blank").column-name=column.name
+                  .column-abbr
+                    span.text-danger=pre
+                    span=`${column.subCount}人关注，${column.postCount}篇文章`
+                    div.m-t-05
+                      +fromNow(column.tlm)
+                      | 更新
+                  .column-description(title=column.abbr)=column.abbr
+              .column-bottom-container
+                .column-buttons
+                  a.m-r-05.btn.btn-xs.btn-default(href=tools.getUrl('columnHome', column._id) target='_blank') 进入专栏
+                  -var subscribed = state.subColumnsId ? state.subColumnsId.includes(column._id) : false;
+                  -var klass = subscribed ? 'btn-default' : 'btn-primary';
+                  -var text = subscribed ? '已关注' : '关注'
+                  button.m-r-05.column-subscription.btn.btn-xs(
+                    data-subscribed=subscribed ? 'true' : 'false'
+                    class=klass
+                    onclick=`subscribeColumn(${column._id})`
                   )=text
+                  if data.permissionPushColumnToHome
+                    -var klass = column.homeTopped? 'btn-danger': 'btn-default';
+                    -var text = column.homeTopped? '取消热门': '设为热门';
+                    button.column-topped.btn.btn-default.btn-xs(
+                      data-topped=column.homeTopped?'true': 'false'
+                      class=klass
+                      onclick=`setColumnTopped(${column._id})`
+                    )=text
+              .column-threads
+                for thread in column.latestThreads
+                  a(href=`/t/${thread.tid}` title=thread.t target="_blank")=thread.t
         include ../publicModules/paging/paging_input
 block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
@@ -146,6 +92,29 @@ block scripts
               .removeClass('btn-primary')
               .addClass('btn-default')
               .text('已关注');
+          })
+          .catch(sweetError);
+      }
+    }
+    function setColumnTopped(columnId) {
+      var dom = $('.column[data-column-id="'+columnId+'"] .column-topped');
+      var topped = dom.attr('data-topped');
+      if(topped === 'true') {
+        // 取消热门
+        nkcAPI("/m/" + columnId + "/top", 'DELETE')
+          .then(function () {
+            dom.attr('data-topped', 'false');
+            dom.text('设为热门');
+            dom.removeClass('btn-danger').addClass('btn-default');
+          })
+          .catch(sweetError);
+      } else {
+        // 设为热门
+        nkcAPI('/m/' + columnId + '/top', 'POST')
+          .then(function() {
+            dom.attr('data-topped', 'true');
+            dom.text('取消热门');
+            dom.removeClass('btn-default').addClass('btn-danger');
           })
           .catch(sweetError);
       }

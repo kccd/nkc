@@ -321,4 +321,47 @@ schema.statics.checkColumnPost = async (columnId, pid) => {
   const count = await ColumnPostModel.countDocuments({columnId, pid});
   return count > 0;
 }
+
+/*
+* 加载指定数目的专栏最新文章
+* @param {Number} columnId 专栏ID
+* @param {Number} count 条数
+* */
+schema.statics.getLatestThreads = async (columnId, count = 3, fids) => {
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const PostModel = mongoose.model('posts');
+  const columnPosts = await ColumnPostModel.find({
+    hidden: false,
+    columnId,
+    type: 'thread'
+  }, {
+    pid: 1
+  })
+    .sort({toc: -1})
+    .limit(count);
+  const postsId = columnPosts.map(cp => cp.pid);
+  const posts = await PostModel.find({
+    pid: {
+      $in: postsId
+    },
+    type: 'thread',
+    mainForumsId: {$in: fids}
+  }, {
+    t: 1,
+    pid: 1,
+    tid: 1,
+  });
+  const postsObj = {};
+  for(const post of posts) {
+    postsObj[post.pid] = post;
+  }
+  const results = [];
+  for(const pid of postsId) {
+    const post = postsObj[pid];
+    if(!post) continue;
+    results.push(post);
+  }
+  return results;
+};
+
 module.exports = mongoose.model("columnPosts", schema);

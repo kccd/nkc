@@ -1,8 +1,8 @@
 extends ./settings
 block settingsTitle
-  title 内容管理
+  title 文章管理
 block settingsContent
-  #data.hidden=objToStr({minorCategories: data.minorCategories, categories: data.categories, column: data.column, count: data.count})
+  #data.hidden=objToStr({column: data.column})
   #app(v-cloak)
     .row
       .col-xs-12.col-md-12

@@ -10,7 +10,11 @@ const schema = new Schema({
   },
   cid: {
     type: [Number],
-    required: true
+    required: true,
+  },
+  mcid: {
+    type: [Number],
+    default: [],
   },
   pid: {
     type: String,

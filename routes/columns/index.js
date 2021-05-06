@@ -13,6 +13,8 @@ router
       match.closed = false;
       match.disabled = false;
     }
+    const fidOfCanGetThread = await db.ForumModel.getReadableForumsIdByUid(data.user? data.user.uid: '');
+    data.permissionPushColumnToHome = ctx.permission('pushColumnToHome');
     match.postCount = {$gte: columnSettings.columnHomePostCountMin};
     const count = await db.ColumnModel.countDocuments(match);
     const paging = ctx.nkcModules.apiFunction.paging(page, count);
@@ -31,10 +33,20 @@ router
     } else {
       sort.postCount = -1;
     }
-    data.columns = await db.ColumnModel.find(match)
+    const homeSettings = await db.SettingModel.getSettings('home');
+    data.columns = await db.ColumnModel.find(match, {_v: 0})
       .sort(sort)
       .skip(paging.start)
       .limit(paging.perpage);
+    const threadsId = [];
+    for(const column of data.columns) {
+      column.homeTopped = homeSettings.columnsId.includes(column._id);
+      column.latestThreads = await db.ColumnPostModel.getLatestThreads(column._id, 3, fidOfCanGetThread);
+    }
+    data.columns.map(column => {
+      column.homeTopped = homeSettings.columnsId.includes(column._id);
+      return column;
+    });
     ctx.template = 'columns/columns.pug';
     data.t = t;
     data.paging = paging;

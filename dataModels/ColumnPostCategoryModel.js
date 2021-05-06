@@ -272,11 +272,12 @@ schema.statics.getCategories = async (columnId) => {
   return await ColumnPostCategoryModel.find({columnId}).sort({order: 1});
 };
 /*
-* 获取制定专栏的全部辅分类
+* 获取指定专栏的全部辅分类
 * @param {Number} columnId 专栏ID
 * @param {Number} cid 主分类ID
+* @param {Boolean} containChildCategoryPostCount 辅分类条数包含主分类以及主分类下的子分类文章的条数
 * */
-schema.statics.getMinorCategories = async (columnId, cid) => {
+schema.statics.getMinorCategories = async (columnId, cid, containChildCategoryPostCount = false) => {
   const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
   const ColumnPostModel = mongoose.model('columnPosts');
   let minorCategories = await ColumnPostCategoryModel.find({
@@ -297,7 +298,14 @@ schema.statics.getMinorCategories = async (columnId, cid) => {
     }
   };
   if(cid) {
-    match.cid = cid;
+    if(containChildCategoryPostCount) {
+      const childCategoryId = await ColumnPostCategoryModel.getChildCategoryId(cid);
+      childCategoryId.push(cid);
+      match.cid = {$in: childCategoryId};
+    } else {
+      match.cid = cid;
+    }
+
   }
   const result = await ColumnPostModel.aggregate(
     [
@@ -326,55 +334,6 @@ schema.statics.getMinorCategories = async (columnId, cid) => {
     category.count = count;
   }
   return minorCategories;
-};
-/*
-* 拓展制定主分类下辅助分类中文章的数量
-*
-* */
-schema.statics.extendMinorCategoriesPostCount = async (minorCategories, cid) => {
-  const ColumnPostModel = mongoose.model('columnPosts');
-  const mcid = [];
-  const categoriesObj = {};
-  const categories = [];
-  for(let mc of minorCategories) {
-    if(mc.toObject) mc = mc.toObject();
-    mcid.push(mc._id);
-    categories.push(mc);
-    categoriesObj[mc._id] = mc;
-  }
-  const match = {
-    mcid: {
-      $in: mcid
-    }
-  };
-  if(cid) {
-    match.cid = cid;
-  }
-  const result = await ColumnPostModel.aggregate(
-    [
-      {
-        $match: match
-      },
-      {
-        $unwind: {
-          path: "$mcid"
-        }
-      },
-      {
-        $group: {
-          _id: "$mcid",
-          count: {
-            $sum: 1
-          }
-        }
-      }
-    ]
-  );
-  for(const r of result) {
-    const {_id, count} = r;
-    categoriesObj[_id].count = count;
-  }
-  return categories;
 };
 
 module.exports = mongoose.model("columnPostCategories", schema);
