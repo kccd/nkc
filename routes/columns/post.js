@@ -5,7 +5,7 @@ router
     const {query, data, db, nkcModules} = ctx;
     const {page = 0, cid, mcid} = query;
     const {column, user} = data;
-    if(column.uid !== user.uid) ctx.throw(403, "权限不足");
+    if(column.uid !== user.uid && !ctx.permission('column_single_disabled')) ctx.throw(403, "权限不足");
     const q = {
       columnId: column._id
     };
