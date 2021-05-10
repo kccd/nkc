@@ -13,7 +13,20 @@ body{
   .column-settings-navs{
     position: fixed;
     width: @navListWidth;
-
+    @numberHeight: 1.2rem;
+    .number{
+      position: absolute;
+      top: -0.5rem;
+      right: -0.5rem;
+      height: @numberHeight;
+      line-height: @numberHeight;
+      border-radius: @numberHeight / 2;
+      padding: 0 0.32rem;
+      font-size: 1rem;
+      color: #fff;
+      text-align: center;
+      background-color: rgba(255, 0, 0, 0.6);
+    }
     &>div{
       padding: 0;
     }
@@ -45,6 +58,7 @@ body{
           span{
             font-size: 1.25rem;
             color: #555;
+            position: relative;
           }
           &:hover>*, &.active>*{
             color: @primary;

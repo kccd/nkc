@@ -14,9 +14,9 @@ if canManagement
         else if data.column.closed
           h4.text-danger.col-xs-12.text-center 专栏已关闭
 
-        //- 专栏置顶
-        if permission("pushColumnToHome")
-          if data.columnTopped
+        //- 热门专栏
+        if permission("homeHotColumn")
+          if data.homeHotColumn
             a(onclick=`pushToHome(${data.column._id}, 'unPush')` title="取消设为热门专栏").col-xs-4
               .fa.fa-fire
               .name 取消热门专栏
@@ -24,7 +24,16 @@ if canManagement
             a(onclick=`pushToHome(${data.column._id}, 'push')` title="设为热门专栏").col-xs-4
               .fa.fa-fire
               .name 设为热门专栏
-
+        //- 专栏制定
+        if permission("homeToppedColumn")
+          if data.homeToppedColumn
+            a(onclick=`toppedColumn(${data.column._id}, 'unPush')` title="取消置顶专栏").col-xs-4
+              .fa.fa-level-up
+              .name 取消置顶专栏
+          else
+            a(onclick=`toppedColumn(${data.column._id}, 'push')` title="置顶专栏").col-xs-4
+              .fa.fa-level-up
+              .name 置顶专栏
         if !data.column.disabled
           a(onclick=`managementColumn(${data.column._id}, 'column', true)`).col-xs-4
             .fa.fa-ban

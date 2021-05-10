@@ -4,11 +4,11 @@ router
     const {db, data} = ctx;
     const {column} = data;
     const homeSettings = await db.SettingModel.getSettings("home");
-    if(homeSettings.toppedColumnsId.includes(column._id)) ctx.throw(400, "专栏已经被推送到首页了");
-    homeSettings.toppedColumnsId.unshift(column._id);
+    if(homeSettings.columnsId.includes(column._id)) ctx.throw(400, "专栏已经被设为热门了");
+    homeSettings.columnsId.unshift(column._id);
     await db.SettingModel.updateOne({_id: "home"}, {
       $set: {
-        "c.toppedColumnsId": homeSettings.toppedColumnsId
+        "c.columnsId": homeSettings.columnsId
       }
     });
     await db.SettingModel.saveSettingsToRedis("home");
@@ -18,10 +18,10 @@ router
     const {db, data} = ctx;
     const {column} = data;
     const homeSettings = await db.SettingModel.getSettings("home");
-    if(!homeSettings.toppedColumnsId.includes(column._id)) ctx.throw(400, "专栏未被推送到首页");
+    if(!homeSettings.columnsId.includes(column._id)) ctx.throw(400, "专栏未被设为热门");
     await db.SettingModel.updateOne({_id: "home"}, {
       $pull: {
-        "c.toppedColumnsId": column._id
+        "c.columnsId": column._id
       }
     });
     await db.SettingModel.saveSettingsToRedis("home");

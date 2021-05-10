@@ -17,21 +17,10 @@ const addFriend = require("./addFriend");
 const categoryRouter = require('./category');
 const moment = require("moment");
 messageRouter
-  .use('/', async (ctx, next) => {
-    // 未完善资料的用户跳转到完善资料页
-    const {user} = ctx.data;
-    // 判断用户是否已完善账号基本信息（username, avatar, banner）
-    /*if(!await ctx.db.UserModel.checkUserBaseInfo(user)) {
-      ctx.nkcModules.throwError(403, "未完善账号基本信息", "userBaseInfo");
-    }*/
-    await next();
-  })
   .get('/', async (ctx, next) => {
-    const {data, db, query, state, nkcModules} = ctx;
+    const {data, db, query, nkcModules} = ctx;
     const {user} = data;
-
     data.page = query.page;
-
     if(ctx.reqType === "app") {
       data.templates = await db.MessageTypeModel.getTemplates("app");
     } else {
@@ -41,8 +30,7 @@ messageRouter
       digest: true,
       uid: user.uid
     });
-    data.messageSettings = (await db.SettingModel.findById("message")).c;
-
+    data.messageSettings = await db.SettingModel.getSettings('message');
     const from = ctx.request.get('FROM');
     if(from !== 'nkcAPI') {
       if(query.uid) {
@@ -54,16 +42,8 @@ messageRouter
       data.grades = await db.UsersGradeModel.find({}).sort({_id: 1});
       return await next();
     }
-
     data.messageTypes = await db.MessageTypeModel.find().sort({toc: 1});
-    const blackList = await db.BlacklistModel.find({
-      uid: user.uid
-    }, {
-      tUid: 1
-    });
-
-    data.blackListUid = blackList.map(b => b.tUid);
-
+    data.blackListUid = await db.BlacklistModel.getBlacklistUsersId(user.uid);
     const list = [];
     const userList = [];
 
@@ -74,15 +54,28 @@ messageRouter
       uidArr.add(c.tUid);
       if(c.lmId) midArr.add(c.lmId);
     }
-    const users = await db.UserModel.find({uid: {$in: [...uidArr]}});
+    let users = await db.UserModel.find({
+      uid: {
+        $in: [...uidArr]
+      }
+    }, {
+      uid: 1,
+      username: 1,
+      avatar: 1,
+      certs: 1,
+      xsf: 1,
+      postCount: 1,
+      threadCount: 1,
+      disabledPostsCount: 1,
+      disabledThreadsCount: 1
+    });
     const messages = await db.MessageModel.find({_id: {$in: [...midArr]}}, {ip: 0, port: 0});
     const friendsArr = await db.FriendModel.find({uid: user.uid, tUid: {$in: [...uidArr]}});
-    for(let u of users) {
-      await u.extendGrade();
-      await db.UserModel.extendUserInfo(u);
-      u = u.toObject();
+    await db.UserModel.extendUsersGrade(users);
+    for(const u of users) {
       userObj[u.uid] = u;
     }
+    await db.UserModel.extendUsersInfo(users);
     for(const m of messages) {
       messageObj[m._id] = m;
     }
@@ -219,7 +212,6 @@ messageRouter
         userList.push(o);
       }
     }
-
     // 加载好友
     const friends = await db.FriendModel.find({uid: user.uid});
 
@@ -252,7 +244,6 @@ messageRouter
       friendList.push(fl);
       usersIcon[fl.uid] = fl.icon;
     }
-
     friendList = nkcModules.pinyin.getGroupsByFirstLetter(friendList, 'name');
 
     friendList.unshift({
@@ -287,6 +278,7 @@ messageRouter
         },
       ]
     });
+
     data.friendList = friendList;
 
     data.usersFriends = usersFriends;

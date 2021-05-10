@@ -7,6 +7,7 @@ const randomatic = require('randomatic');
 const searchIp = require('node-ip2region').create();
 moment.locale('zh-cn');
 const defaultPerpage = paging.perpage;
+const axios = require('axios');
 let fn = {};
 fn.paging = (page = 0, count, perpage, buttonCount = 5) => {
   if(!perpage) perpage = defaultPerpage;
@@ -454,32 +455,23 @@ fn.doExchange = (arr) => {
 fn.getIpAddress = async (ip) => {
   const aliAppCode = require("../config/aliAppCode");
   const {appCode} = aliAppCode;
-  const options = {
-    hostname: `iploc.market.alicloudapi.com`,    //接口域
-    path: `/v3/ip?ip=${ip}`,    //请求地址
-    headers: {    //请求头
-      "Content-Type": "application/json; charset=utf-8",
-      "Authorization": "APPCODE " + appCode
-    }
-  }
   return new Promise((resolve, reject) => {
-    // 发起请求
-    const req = http.request(options, res => {
-      const chunks = [];
-      res.on('data', chunk => {
-        chunks.push(chunk);
+    axios({
+      method: 'get',
+      url: 'http://iploc.market.alicloudapi.com/v3/ip',
+      params: {
+        ip
+      },
+      headers: {
+        Authorization: `APPCODE ${appCode}`
+      }
+    })
+      .then(res => {
+        resolve(res.data);
       })
-      res.on('end', () => {
-        const buffer = Buffer.concat(chunks).toString();
-        resolve(JSON.parse(buffer));
-      });
-    })
-    // 请求出错
-    req.on('error', err => {
-      reject(err);
-    })
-    // 请求结束
-    req.end();
+      .catch(err => {
+        reject(err.message);
+      })
   });
 }
 /*

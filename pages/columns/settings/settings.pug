@@ -29,6 +29,8 @@ block content
                   a(href=columnHomeUrl + '/settings/contribute' class=data.nav === 'contribute' ? 'active' : '')
                     .fa.fa-archive
                     span 投稿处理
+                      if data.contributeCount > 0
+                        .number=data.contributeCount
                 li
                   a(href=columnHomeUrl + '/settings/category' class=data.nav === 'category'?'active':'')
                     .fa.fa-tags
@@ -40,7 +42,7 @@ block content
                 li
                   a(href=columnHomeUrl + '/settings/fans' class=data.nav === 'fans'?'active':'')
                     .fa.fa-users
-                    span 粉丝管理
+                    span 粉丝列表
                 li
                   a(href=columnHomeUrl + '/settings' class=data.nav === 'settings'?'active':'')
                     .fa.fa-cog

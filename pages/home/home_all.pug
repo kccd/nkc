@@ -126,34 +126,41 @@ block content
 
         if data.toppedThreads.length
           .home-forums-list.m-b-1
-            .panel-header.m-b-0 置顶
+            .panel-header.m-b-0 置顶文章
             //-.home-header
               //-.fa.fa-tags
               .header-name 置顶
             .home-threads
               for thread in data.toppedThreads
                 include ../publicModules/thread_panel/thread_panel
-
-        // 专栏列表
+        mixin columnPanel(column, klass)
+          .home-main-column.row
+            .col-xs-12.col-md-6
+              .home-main-column-left
+                .home-main-column-avatar
+                  img(src=tools.getUrl('columnAvatar', column.avatar))
+                .home-main-column-info
+                  a(href=tools.getUrl('columnHome', column._id) target="_blank").home-main-column-name=column.name
+                  .home-main-column-desc(title=column.abbr)=column.abbr || '暂无简介'
+            .col-xs-12.col-md-6
+              .home-main-column-right(class=klass || '')
+                .home-main-column-posts(style=`border-left: 3px solid ${0 || '#ccc'};`)
+                  for p, index in column.posts
+                    .home-main-column-post
+                      .latest-thread-point
+                      a(href=`/t/${p.tid}` target="_blank" title=p.t)=p.t
+                      .home-main-column-post-time
+                        +fromNow(p.toc)
+        //- 置顶专栏
+        if data.toppedColumns && data.toppedColumns.length > 0
+          .home-forums-list.m-b-1
+            .panel-header 置顶专栏
+            .home-main-columns
+              for column, index in data.toppedColumns
+                -var klass = index === data.toppedColumns.length - 1? 'm-b-0': ''
+                +columnPanel(column, klass)
+        //- 热门专栏
         if data.columnListPosition === 'main' && data.columns && data.columns.length > 0
-          mixin columnPanel(column)
-            .home-main-column.row
-              .col-xs-12.col-md-6
-                .home-main-column-left
-                  .home-main-column-avatar
-                    img(src=tools.getUrl('columnAvatar', column.avatar))
-                  .home-main-column-info
-                    a(href=tools.getUrl('columnHome', column._id) target="_blank").home-main-column-name=column.name
-                    .home-main-column-desc(title=column.abbr)=column.abbr || '暂无简介'
-              .col-xs-12.col-md-6
-                .home-main-column-right
-                  .home-main-column-posts(style=`border-left: 3px solid ${0 || '#ccc'};`)
-                    for  p in column.posts
-                      .home-main-column-post
-                        .latest-thread-point
-                        a(href=`/t/${p.tid}` target="_blank" title=p.t)=p.t
-                        .home-main-column-post-time
-                          +fromNow(p.toc)
 
           .home-forums-list.m-b-1
             .panel-header 热门专栏

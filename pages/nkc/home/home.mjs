@@ -21,6 +21,8 @@ const app = new Vue({
     ads: data.ads,
     recommendForums: data.recommendForums,
     columns: data.columns,
+    poolColumns: data.poolColumns,
+    toppedColumns: data.toppedColumns,
     goods: data.goods,
     toppedThreads: data.toppedThreads,
     latestToppedThreads: data.latestToppedThreads,
@@ -30,12 +32,16 @@ const app = new Vue({
     // 是否在首页显示“活动”入口
     showActivityEnter: data.showActivityEnter ? "show" : "hidden",
     updating: false,
+    columnUpdating: false,
     columnListPosition: data.columnListPosition,
-    columnCount: data.columnCount
+    columnCount: data.columnCount,
+    columnListSort: data.columnListSort,
+    columnPool: data.columnPool
   },
   mounted() {
     window.SelectImage = new NKC.methods.selectImage();
     window.MoveThread = new NKC.modules.MoveThread();
+    // this.selectPage(this.nav[3]);
   },
   computed: {
     selectedRecommendForumsId() {
@@ -55,6 +61,14 @@ const app = new Vue({
         {
           id: 'fixed',
           name: '固定图'
+        },
+        {
+          id: 'hotColumn',
+          name: '热门专栏'
+        },
+        {
+          id: 'toppedColumn',
+          name: '置顶专栏'
         }
       ];
       arr.map(a => {
@@ -77,6 +91,7 @@ const app = new Vue({
     getUrl: NKC.methods.tools.getUrl,
     floatUserInfo: NKC.methods.tools.floatUserInfo,
     visitUrl: NKC.methods.visitUrl,
+    fromNow: NKC.methods.tools.fromNow,
     removeFromArr(arr, index) {
       arr.splice(index, 1);
     },
@@ -133,8 +148,24 @@ const app = new Vue({
           self.updating = false;
         })
         .catch(err => {
+          sweetError(err);
           self.updating = false;
         });
+    },
+    updateHomeHotColumns() {
+      const self = this;
+      this.columnUpdating = true;
+      nkcAPI('/nkc/home', 'PUT', {
+        operation: 'updateHomeHotColumns',
+      })
+        .then(data => {
+          self.poolColumns = data.poolColumns;
+          this.columnUpdating = false;
+        })
+        .catch(err => {
+          sweetError(err);
+          this.columnUpdating = false;
+        })
     },
     selectLocalFile(ad) {
       const options = {};
@@ -261,14 +292,29 @@ const app = new Vue({
     },
     saveColumns(){
       const columnsId = this.columns.map(c => c._id);
+      const poolColumnsId = this.poolColumns.map(c => c._id);
       nkcAPI("/nkc/home", "PUT", {
         operation: "saveColumns",
         columnsId,
         columnListPosition: this.columnListPosition,
-        columnCount: this.columnCount
+        columnCount: this.columnCount,
+        columnPool: this.columnPool,
+        columnListSort: this.columnListSort,
+        poolColumnsId: poolColumnsId,
       })
         .then(() => {
           sweetSuccess("保存成功");
+        })
+        .catch(sweetError);
+    },
+    saveToppedColumns() {
+      const columnsId = this.toppedColumns.map(c => c._id);
+      nkcAPI('/nkc/home', 'PUT', {
+        operation: 'saveToppedColumns',
+        columnsId,
+      })
+        .then(() => {
+          sweetSuccess('保存成功');
         })
         .catch(sweetError);
     },

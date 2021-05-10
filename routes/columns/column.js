@@ -9,6 +9,7 @@ const contributeRouter = require("./contribute");
 const disabledRouter = require("./disabled");
 const contactRouter = require("./contact");
 const topRouter = require("./top");
+const hotRouter = require('./hot');
 const pageRouter = require("./page");
 router
   .use("/", async (ctx, next) => {
@@ -94,11 +95,13 @@ router
     data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
     data.timeline = await db.ColumnModel.getTimeline(column._id);
-    if(ctx.permission("pushColumnToHome")) {
-      const homeSettings = await db.SettingModel.getSettings('home');
-      data.columnTopped = homeSettings.columnsId.includes(column._id);
+    const homeSettings = await db.SettingModel.getSettings('home');
+    if(ctx.permission("homeHotColumn")) {
+      data.homeHotColumn = homeSettings.columnsId.includes(column._id);
     }
-
+    if(ctx.permission("homeToppedColumn")) {
+      data.homeToppedColumn = homeSettings.toppedColumnsId.includes(column._id);
+    }
     await next();
   })
   .put("/", async (ctx, next) => {
@@ -221,5 +224,6 @@ router
   .use("/contact", contactRouter.routes(), contactRouter.allowedMethods())
   .use("/page", pageRouter.routes(), pageRouter.allowedMethods())
   .use("/top", topRouter.routes(), topRouter.allowedMethods())
+  .use("/hot", hotRouter.routes(), hotRouter.allowedMethods())
   .use("/settings", settingsRouter.routes(), settingsRouter.allowedMethods());
 module.exports = router;

@@ -3,9 +3,13 @@ module.exports = {
   PARAMETER: {
     GET: 'column_single_get',
     PUT: "column_single_settings",
+    hot: {
+      POST: "homeHotColumn",
+      DELETE: 'homeHotColumn'
+    },
     top: {
-      POST: "pushColumnToHome",
-      DELETE: "pushColumnToHome"
+      POST: "homeToppedColumn",
+      DELETE: "homeToppedColumn"
     },
     category: {
       GET: "column_single_settings_post",

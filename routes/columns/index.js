@@ -14,7 +14,8 @@ router
       match.disabled = false;
     }
     const fidOfCanGetThread = await db.ForumModel.getReadableForumsIdByUid(data.user? data.user.uid: '');
-    data.permissionPushColumnToHome = ctx.permission('pushColumnToHome');
+    data.permissionHomeHotColumn = ctx.permission('homeHotColumn');
+    data.permissionHomeToppedColumn = ctx.permission('homeToppedColumn');
     match.postCount = {$gte: columnSettings.columnHomePostCountMin};
     const count = await db.ColumnModel.countDocuments(match);
     const paging = ctx.nkcModules.apiFunction.paging(page, count);
@@ -39,14 +40,13 @@ router
       .skip(paging.start)
       .limit(paging.perpage);
     const threadsId = [];
-    for(const column of data.columns) {
-      column.homeTopped = homeSettings.columnsId.includes(column._id);
+    data.columns = await Promise.all(data.columns.map(async column => {
+      column = column.toObject();
+      column.hot = homeSettings.columnsId.includes(column._id);
+      column.top = homeSettings.toppedColumnsId.includes(column._id);
       column.latestThreads = await db.ColumnPostModel.getLatestThreads(column._id, 3, fidOfCanGetThread);
-    }
-    data.columns.map(column => {
-      column.homeTopped = homeSettings.columnsId.includes(column._id);
       return column;
-    });
+    }));
     ctx.template = 'columns/columns.pug';
     data.t = t;
     data.paging = paging;

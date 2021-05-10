@@ -309,37 +309,15 @@ schema.statics.saveAllColumnToElasticSearch = async () => {
   console.log(`【同步Column到ES】完成`);
 };
 
-
 /*
-* 获取置顶专栏
+* 拓展专栏的最新文章
 * */
-schema.statics.getToppedColumns = async (columnCount) => {
-  const homeSettings = await mongoose.model("settings").getSettings("home");
-  if(columnCount === undefined) {
-    columnCount = homeSettings.columnCount;
-  }
+schema.statics.extendColumnsPosts = async (columns, count) => {
   const ColumnPostModel = mongoose.model('columnPosts');
   const PostModel = mongoose.model('posts');
-  if(!homeSettings.columnsId.length) return [];
-  let columnsId = [];
-  if(homeSettings.columnsId.length <= columnCount) {
-    columnsId = homeSettings.columnsId;
-  } else {
-    const {getRandomNumber$2} = require('../nkcModules/apiFunction');
-    const arr = getRandomNumber$2({
-      min: 0,
-      max: homeSettings.columnsId.length - 1,
-      count: columnCount,
-      repeat: false
-    });
-    for(const index of arr) {
-      columnsId.push(homeSettings.columnsId[index]);
-    }
-  }
-  const columns = await mongoose.model("columns").find({_id: {$in: columnsId}}).sort({tlm: -1});
-  columnsId = columns.map(c => c._id);
   const columnsObj = {};
-  const postsId = [], columnIdObj = {};
+  const columnIdObj = {};
+  const postsId = [];
   const tocObj = {};
   for(let column of columns) {
     let {_id} = column;
@@ -352,7 +330,7 @@ schema.statics.getToppedColumns = async (columnCount) => {
       pid: 1,
       columnId: 1,
       toc: 1,
-    }).sort({toc: -1}).limit(3);
+    }).sort({toc: -1}).limit(count);
     for(const cp of columnPosts) {
       const {pid, columnId, toc} = cp;
       tocObj[pid] = toc;
@@ -372,10 +350,8 @@ schema.statics.getToppedColumns = async (columnCount) => {
     postsObj[post.pid] = post;
   });
   const results = [];
-  columnsId.map(cid => {
-    let column = columnsObj[cid];
-    if(!column) return;
-    column = column.toObject();
+  columns.map(column => {
+    column = column.toObject? column.toObject(): column;
     const postsId = columnIdObj[column._id] || [];
     const posts = [];
     for(const pid of postsId) {
@@ -387,6 +363,24 @@ schema.statics.getToppedColumns = async (columnCount) => {
     results.push(column);
   });
   return results;
+};
+
+/*
+* 获取主页热门专栏
+* */
+schema.statics.getHomeHotColumns = async () => {
+  const ColumnModel = mongoose.model('columns');
+  const {hotColumns} = await ColumnModel.getHotColumns();
+  return await ColumnModel.extendColumnsPosts(hotColumns, 3);
+};
+
+/*
+* 获取主页置顶专栏
+* */
+schema.statics.getHomeToppedColumns = async () => {
+  const ColumnModel = mongoose.model('columns');
+  const {toppedColumns} = await ColumnModel.getHotColumns();
+  return await ColumnModel.extendColumnsPosts(toppedColumns, 3);
 };
 
 /*
@@ -742,4 +736,122 @@ schema.methods.getShareTrends = async function(minTime, maxTime) {
   }
   return share;
 };
+
+/*
+* 更新首页热门专栏
+* */
+schema.statics.updateHomeHotColumns = async () => {
+  const SettingModel = mongoose.model('settings');
+  const ColumnModel = mongoose.model('columns');
+  const homeSettings = await SettingModel.getSettings('home');
+  const {
+    columnCount,
+    minPostCount,
+    updateTime,
+    minSubscriptionCount,
+  } = homeSettings.columnPool;
+  const existingColumnsId = homeSettings.columnsId.concat(homeSettings.toppedColumnsId);
+  let columnsId;
+  if(columnCount === 0) {
+    columnsId  = [];
+  } else {
+    let columns = await ColumnModel.aggregate([
+      {
+        $match: {
+          disabled: false,
+          closed: false,
+          _id: {$nin: existingColumnsId},
+          postCount: {
+            $gte: minPostCount
+          },
+          tlm: {
+            $gte: new Date(Date.now() - updateTime * 24 * 60 * 60 * 1000)
+          },
+          subCount: {
+            $gte: minSubscriptionCount
+          }
+        }
+      },
+      {
+        $sample: {
+          size: columnCount
+        }
+      },
+      {
+        $group: {
+          _id: '$_id'
+        }
+      }
+    ]);
+    columns = columns || [];
+    columnsId = columns.map(c => c._id);
+  }
+  await SettingModel.updateOne({_id: 'home'}, {
+    $set: {
+      'c.columnPool.columnsId': columnsId
+    }
+  });
+  await SettingModel.saveSettingsToRedis('home');
+};
+
+/*
+* 获取主页热门专栏
+* */
+schema.statics.getHotColumns = async () => {
+  const SettingModel = mongoose.model('settings');
+  const ColumnModel = mongoose.model('columns');
+  const apiFunction = require('../nkcModules/apiFunction');
+  const homeSettings = await SettingModel.getSettings('home');
+  const columnsId = homeSettings.columnsId;
+  const poolColumnsId = homeSettings.columnPool.columnsId;
+  const toppedColumnsId = homeSettings.toppedColumnsId;
+  let sort;
+  if(homeSettings.columnListSort === 'updateTime') {
+    sort = {
+      tlm: -1
+    }
+  } else {
+    sort = {
+      postCount: -1
+    }
+  }
+  let _columns = await ColumnModel.find({
+    _id: {
+      $in: columnsId.concat(poolColumnsId, toppedColumnsId)
+    },
+    disabled: false,
+    closed: false,
+  })
+    .sort(sort);
+  const columnsObj = {};
+  let allColumnsId = [];
+  const allHotColumnsId = columnsId.concat(poolColumnsId);
+  _columns.map(column => {
+    columnsObj[column._id] = column;
+    if(allHotColumnsId.includes(column._id)) {
+      allColumnsId.push(column._id);
+    }
+  });
+  const columns = [];
+  const poolColumns = [];
+  for(const cid of columnsId) {
+    const column = columnsObj[cid];
+    if(!column) continue;
+    columns.push(column);
+  }
+  for(const cid of poolColumnsId) {
+    const column = columnsObj[cid];
+    if(!column) continue;
+    poolColumns.push(column);
+  }
+  allColumnsId = apiFunction.arrayShuffle(allColumnsId);
+  const targetColumnsId = allColumnsId.slice(0, homeSettings.columnCount);
+  return {
+    columns,
+    poolColumns,
+    hotColumns: _columns.filter(c => targetColumnsId.includes(c._id)),
+    toppedColumns: _columns.filter(c => toppedColumnsId.includes(c._id))
+  };
+};
+
 module.exports = mongoose.model("columns", schema);

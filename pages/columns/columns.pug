@@ -48,11 +48,19 @@ block content
                     class=klass
                     onclick=`subscribeColumn(${column._id})`
                   )=text
-                  if data.permissionPushColumnToHome
-                    -var klass = column.homeTopped? 'btn-danger': 'btn-default';
-                    -var text = column.homeTopped? '取消热门': '设为热门';
-                    button.column-topped.btn.btn-default.btn-xs(
-                      data-topped=column.homeTopped?'true': 'false'
+                  if data.permissionHomeHotColumn
+                    -var klass = column.hot? 'btn-danger': 'btn-default';
+                    -var text = column.hot? '取消热门': '设为热门';
+                    button.m-r-05.column-hot.btn.btn-default.btn-xs(
+                      data-hot=column.hot?'true': 'false'
+                      class=klass
+                      onclick=`setColumnHot(${column._id})`
+                    )=text
+                  if data.permissionHomeToppedColumn
+                    -var klass = column.top ? 'btn-danger' : 'btn-default';
+                    -var text = column.top ? '取消置顶' : '置顶';
+                    button.column-top.btn.btn-default.btn-xs(
+                      data-top=column.top ? 'true' : 'false'
                       class=klass
                       onclick=`setColumnTopped(${column._id})`
                     )=text
@@ -96,24 +104,48 @@ block scripts
           .catch(sweetError);
       }
     }
-    function setColumnTopped(columnId) {
-      var dom = $('.column[data-column-id="'+columnId+'"] .column-topped');
-      var topped = dom.attr('data-topped');
-      if(topped === 'true') {
+    function setColumnHot(columnId) {
+      var dom = $('.column[data-column-id="'+columnId+'"] .column-hot');
+      var hot = dom.attr('data-hot');
+      if(hot === 'true') {
         // 取消热门
-        nkcAPI("/m/" + columnId + "/top", 'DELETE')
+        nkcAPI("/m/" + columnId + "/hot", 'DELETE')
           .then(function () {
-            dom.attr('data-topped', 'false');
+            dom.attr('data-hot', 'false');
             dom.text('设为热门');
             dom.removeClass('btn-danger').addClass('btn-default');
           })
           .catch(sweetError);
       } else {
         // 设为热门
-        nkcAPI('/m/' + columnId + '/top', 'POST')
+        nkcAPI('/m/' + columnId + '/hot', 'POST')
           .then(function() {
-            dom.attr('data-topped', 'true');
+            dom.attr('data-hot', 'true');
             dom.text('取消热门');
+            dom.removeClass('btn-default').addClass('btn-danger');
+          })
+          .catch(sweetError);
+      }
+    }
+
+    function setColumnTopped(columnId) {
+      var dom = $('.column[data-column-id="' + columnId + '"] .column-top');
+      var top = dom.attr('data-top');
+      if (top === 'true') {
+        // 取消热门
+        nkcAPI("/m/" + columnId + "/top", 'DELETE')
+          .then(function () {
+            dom.attr('data-top', 'false');
+            dom.text('置顶');
+            dom.removeClass('btn-danger').addClass('btn-default');
+          })
+          .catch(sweetError);
+      } else {
+        // 设为热门
+        nkcAPI('/m/' + columnId + '/top', 'POST')
+          .then(function () {
+            dom.attr('data-top', 'true');
+            dom.text('取消置顶');
             dom.removeClass('btn-default').addClass('btn-danger');
           })
           .catch(sweetError);

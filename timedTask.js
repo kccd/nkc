@@ -22,6 +22,7 @@ const run = async () => {
   await timedTasks.cacheActiveUsers();
   await timedTasks.clearTimeoutPageCache();
   await timedTasks.updateRecommendThreads();
+  await timedTasks.updateHomeHotColumns();
   await timedTasks.clearResourceState();
   await timedTasks.updateAllForumLatestThread();
   await timedTasks.updateForumsMessage();

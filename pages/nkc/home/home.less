@@ -82,3 +82,67 @@
     }
   }
 }
+
+.nkc-home-columns{
+  .nkc-home-column{
+    @height: 4.5rem;
+    @width: 20rem;
+    height: @height;
+    border: 1px solid #dcdcdc;
+    width: @width;
+    position: relative;
+    padding-left: @height + 1rem;
+    display: inline-block;
+    margin: 0 1.2rem 0.8rem 0;
+    overflow: hidden;
+    background-color: #f4f4f4;
+    border-radius: 3px;
+    .nkc-home-column-avatar{
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: @height;
+      width: @height;
+      img{
+        height: 100%;
+        width: 100%;
+        border-radius: 3px;
+      }
+    }
+    .nkc-home-column-info{
+      .nkc-home-column-name{
+        @nameHeight: 1.5rem;
+        position: relative;
+        height: @nameHeight;
+        overflow: hidden;
+        margin-bottom: 0.1rem;
+        .hideText(@line: 1);
+        padding-right: @nameHeight;
+        a{
+          font-size: 1.2rem;
+          font-weight: 700;
+        }
+        .nkc-home-column-remove{
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: @nameHeight;
+          width: @nameHeight;
+          text-align: center;
+          line-height: @nameHeight;
+          &:hover{
+            background-color: #aaa;
+            color: #fff;
+            cursor: pointer;
+          }
+        }
+      }
+      .nkc-home-column-abbr{
+        font-size: 1rem;
+        height: 1.4rem;
+        overflow: hidden;
+        .hideText(@line: 1);
+      }
+    }
+  }
+}

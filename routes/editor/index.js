@@ -271,6 +271,10 @@ router
     if(["modifyPost", "modifyThread", "newPost"].includes(data.type) && state.userColumn) {
       data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: state.userColumn._id, type: "thread", tid: data.thread.tid})) > 0;
     }
+    // 判断用户是否是在专栏主页点击了「我要投稿」
+    if(state.userColumn && query.toColumn === 'true' && data.type === 'newThread') {
+      data.toColumn = true;
+    }
     if(["modifyThread", "newThread"].includes(data.type)) {
       // 判断用户是否有权限发起调查
       data.createSurveyPermission = await db.SurveyModel.ensureCreatePermission("postToForum", data.user.uid);
