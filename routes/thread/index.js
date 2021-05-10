@@ -620,11 +620,12 @@ threadRouter
 		data.collected = false;
 		data.subscribed = false;
 		if(data.user) {
-			const collection = await db.SubscribeModel.findOne({uid: data.user.uid, tid, type: "collection"});
+			const collection = await db.SubscribeModel.findOne({cancel: false, uid: data.user.uid, tid, type: "collection"});
 			if(collection) {
 				data.collected = true;
 			}
 			const sub = await db.SubscribeModel.findOne({
+        cancel: false,
         type: "thread",
         tid,
         uid: data.user.uid
@@ -795,7 +796,7 @@ threadRouter
     ) {
       ctx.throw(403, `当前回复不允许评论`);
     }
-		const {columnCategoriesId = [], anonymous = false, did} = post;
+		const {columnMainCategoriesId = [], columnMinorCategoriesId = [], anonymous = false, did} = post;
     if(post.t && post.t.length > 100) ctx.throw(400, `标题不能超过100个字`);
     const content = customCheerio.load(post.c).text();
     if(content.length < 2) ctx.throw(400, `内容不能少于2个字`);
@@ -838,8 +839,8 @@ threadRouter
     data.blacklistUsersId = await db.BlacklistModel.getBlacklistUsersId(data.user.uid);
 
 		// 转发到专栏
-    if(columnCategoriesId.length > 0 && state.userColumn) {
-      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnCategoriesId, [data.thread.oc]);
+    if(columnMainCategoriesId.length > 0 && state.userColumn) {
+      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnMainCategoriesId, columnMinorCategoriesId, [data.thread.oc]);
     }
 
     // 发表匿名内容

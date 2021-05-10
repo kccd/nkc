@@ -80,6 +80,25 @@ func.updateRecommendThreads = async () => {
 
 
 /*
+* 更新主页热门专栏
+* */
+func.updateHomeHotColumns = async () => {
+  const homeSettings = await db.SettingModel.getSettings('home');
+  setTimeout(async () => {
+    try{
+      console.log(`正在更新主页热门专栏...`);
+      await db.ColumnModel.updateHomeHotColumns();
+    } catch(err) {
+      console.error(err);
+    } finally {
+      console.log(`主页热门专栏更新完成`);
+      await func.updateHomeHotColumns();
+    }
+  }, homeSettings.columnPool.updateInterval * 60 * 1000);
+};
+
+
+/*
 * 修改resource上传状态，修改两小时之前上传且状态任然处于【正在上传】的文件的状态为【上传失败】。
 * */
 func.clearResourceState = async() => {

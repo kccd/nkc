@@ -1,0 +1,124 @@
+@import "../publicModules/base";
+.columns-container{
+  font-size: 0;
+}
+.column{
+  border-radius: 5px;
+  width: 34rem;
+  margin: 0.6rem 1.2rem 0.6rem 0;
+  display: inline-block;
+  background-color: #fff;
+  border: 1px solid #eaeaea;
+  overflow: hidden;
+  padding: 1rem 1rem 1rem 1rem;
+  transition: box-shadow 200ms;
+  &.column-list-disabled{
+    background-color: #ddd;
+  }
+  &.column-list-closed{
+    background-color: #ddd;
+  }
+}
+.column:hover{
+  box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.1);
+}
+.column .column-abbr{
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
+}
+.column .column-name{
+  font-size: 1.6rem;
+  display: block;
+  height: 2rem;
+  overflow: hidden;
+  margin-bottom: 0.6rem;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  text-decoration: none;
+  color: #333;
+  font-weight: 700;
+}
+.column .column-description{
+  font-size: 1.2rem;
+  height: 3.3rem;
+  overflow: hidden;
+  color: #333;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.column .column-subscription{
+
+}
+@media(max-width: 767px) {
+  .column .column-avatar{
+    height: 3rem;
+    width: 3rem;
+    margin-bottom: 0.2rem;
+  }
+  .column{
+    width: 100%;
+    padding: 0.5rem 0.3rem 0.5rem 0.3rem;
+  }
+  .column .column-name{
+    font-size: 1.2rem;
+    height: 1.6rem;
+    margin-bottom: 0.5rem;
+  }
+  .column .column-description{
+    height: 3.2rem;
+  }
+  .column .column-abbr{
+    margin-bottom: 0.2rem;
+  }
+}
+.column-top-container{
+  @leftWidth: 10rem;
+  position: relative;
+  height: @leftWidth;
+  margin-bottom: 0.5rem;
+  .column-top-left-container{
+    width: @leftWidth;
+    position: absolute;
+    top: 0;
+    left: 0;
+    .column-avatar{
+      width: @leftWidth;
+      height: @leftWidth;
+      border-radius: 3px;
+    }
+  }
+  .column-top-right-container{
+    padding-left: @leftWidth + 1;
+  }
+}
+.column-threads{
+  height: 4.5rem;
+  margin-top: 0.7rem;
+  a{
+    height: 1.5rem;
+    overflow: hidden;
+    .hideText(@line: 1);
+    font-size: 1.2rem;
+    color: @primary;
+    //font-style: oblique;
+    position: relative;
+    padding-left: 0.7rem;
+    &::after{
+      content: '';
+      height: 3px;
+      width: 3px;
+      background-color: #333;
+      border-radius: 50%;
+      position: absolute;
+      top: 0.7rem;
+      left: 0;
+    }
+  }
+}
+button.column-topped{
+  float: right;
+}

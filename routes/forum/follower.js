@@ -13,7 +13,8 @@ followerRouter
 		}
 		const q = {
 		  type: "forum",
-      fid: forum.fid
+      fid: forum.fid,
+			cancel: false,
     };
 		const count = await db.SubscribeModel.countDocuments(q);
 		const paging = apiFunction.paging(page, count, pageSettings.forumUserList);

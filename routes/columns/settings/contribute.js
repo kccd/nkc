@@ -6,20 +6,22 @@ router
     const {page=0, t} = query;
     const {column} = data;
     let q;
-    if(!t) {
+    data.mainCategories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
+    data.minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id);
+    data.nav = "contribute";
+    if(t === 'unresolved') {
       q = {
         columnId: column._id,
         passed: null
       };
-    } else if(t === "passed") {
+    } else if(t === 'resolved') {
       q = {
         columnId: column._id,
         passed: {$ne: null}
       }
     } else {
-      q = {
-        columnId: column._id
-      }
+      ctx.template = 'columns/settings/contribute.pug';
+      return await next();
     }
     const count = await db.ColumnContributeModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
@@ -27,21 +29,18 @@ router
     data.contributes = await db.ColumnContributeModel.extendContributes(contributes);
     data.resolvedCount = await db.ColumnContributeModel.countDocuments({columnId: column._id, passed: {$ne: null}});
     data.unresolvedCount = await db.ColumnContributeModel.countDocuments({columnId: column._id, passed: null});
-    data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
-    ctx.template = "columns/settings/contribute.pug";
     data.paging = paging;
     data.t = t;
-    data.highlight = "contribute";
     await next();
   })
   .post("/", async (ctx, next) => {
     const {data, db, body} = ctx;
-    const {contributesId, type, reason, categoriesId} = body;
+    const {contributesId, type, reason, mainCategoriesId, minorCategoriesId} = body;
     const {column} = data;
-    if(!categoriesId || categoriesId.length === 0) {
+    if(!mainCategoriesId || mainCategoriesId.length === 0) {
       if(type === "agree") ctx.throw(400, "请选择文章分类");
     }
-    for(const _id of categoriesId) {
+    for(const _id of mainCategoriesId.concat(minorCategoriesId)) {
       const c = await db.ColumnPostCategoryModel.findOne({_id, columnId: column._id});
       if(!c) ctx.throw(400, `ID为${_id}的分类不存在`);
     }
@@ -58,7 +57,7 @@ router
       if(type === "agree") {
         const p = await db.ColumnPostModel.findOne({columnId: column._id, pid: thread.oc});
         if(p) continue;
-        const categoriesOrder = await db.ColumnPostModel.getCategoriesOrder(categoriesId);
+        const categoriesOrder = await db.ColumnPostModel.getCategoriesOrder(mainCategoriesId);
         await db.ColumnPostModel({
           _id: await db.SettingModel.operateSystemID("columnPosts", 1),
           tid: thread.tid,
@@ -68,7 +67,8 @@ router
           type: "thread",
           order: categoriesOrder,
           top: thread.toc,
-          cid: categoriesId
+          cid: mainCategoriesId,
+          mcid: minorCategoriesId,
         }).save();
       }
       const message = db.MessageModel({

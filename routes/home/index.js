@@ -386,7 +386,9 @@ router
         activity.push(a);
       }
       data.activity = activity;
-
+      if(data.user) {
+        data.subColumns = await db.SubscribeModel.getUserSubColumns(data.user.uid);
+      }
     } else if(threadListType === "recommend") {
       q = await db.ThreadModel.getRecommendMatch(fidOfCanGetThreads);
     } else if(threadListType === "column"){

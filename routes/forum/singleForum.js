@@ -25,7 +25,7 @@ router
     } catch(err) {
       ctx.throw(403, `因为缺少必要的账户信息，无法完成该操作。具体信息：${err.message}`);
     }
-		const {c, t, fids, cids, cat, mid, columnCategoriesId = [], anonymous = false, survey} = post;
+		const {c, t, fids, cids, cat, mid, columnMainCategoriesId = [], columnMinorCategoriesId = [], anonymous = false, survey} = post;
 		if(t.length < 3) ctx.throw(400, `标题不能少于3个字`);
 		if(t.length > 100) ctx.throw(400, `标题不能超过100个字`);
 		const content = customCheerio.load(c).text();
@@ -71,8 +71,8 @@ router
     }
 
     // 转发到专栏
-    if(columnCategoriesId.length > 0 && state.userColumn) {
-      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnCategoriesId, [_post.pid]);
+    if(columnMainCategoriesId.length > 0 && state.userColumn) {
+      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnMainCategoriesId, columnMinorCategoriesId, [_post.pid]);
     }
 
     // 发表匿名内容
@@ -238,6 +238,7 @@ router
 		// 获取最新关注的用户
 		const subUsers = await db.SubscribeModel.find({
       type: "forum",
+			cancel: false,
       fid: forum.fid
     }).sort({toc: -1}).limit(9);
 
@@ -298,10 +299,11 @@ router
 			data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
 		}
 
-		data.subUsersCount = await db.SubscribeModel.countDocuments({fid, type: "forum"});
+		data.subUsersCount = await db.SubscribeModel.countDocuments({cancel: false, fid, type: "forum"});
 		if(data.user) {
       const sub = await db.SubscribeModel.countDocuments({
         uid: data.user.uid,
+				cancel: false,
         type: "forum",
         fid
       });

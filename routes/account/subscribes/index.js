@@ -11,7 +11,8 @@ router
       return await next();
     }
     let q = {
-      uid: user.uid
+      uid: user.uid,
+      cancel: false,
     };
     if(t === "other") {
       q.cid = [];

@@ -2,7 +2,7 @@ const Router = require("koa-router");
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
-    if(!ctx.state.columnPermission) ctx.throw(403, "您的账号暂未满足开设专栏的条件");
+    if(!ctx.state.columnPermission) ctx.throw(403, "你的账号暂未满足开设专栏的条件");
     ctx.template = "column/column.pug";
     const {data, db} = ctx;
     const {user} = data;
@@ -63,9 +63,12 @@ router
     await next();
   })
   .get("/apply", async (ctx, next) => {
-    if(!ctx.state.columnPermission) ctx.throw(403, "您的账号暂未满足开设专栏的条件");
+    if(!ctx.state.columnPermission) ctx.throw(403, "你的账号暂未满足开设专栏的条件");
     ctx.template = "column/apply.pug";
-    const {data, db} = ctx;
+    const {data, db, nkcModules} = ctx;
+    const nkcRender = nkcModules.nkcRender;
+    const createColumnInfo = (await db.SettingModel.getSettings('column')).createColumnInfo;
+    data.createColumnInfo = nkcRender.plainEscape(createColumnInfo);
     const {user} = data;
     const column = await db.ColumnModel.findOne({uid: user.uid});
     if(column) {

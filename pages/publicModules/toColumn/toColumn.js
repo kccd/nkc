@@ -10,20 +10,29 @@ moduleToColumn.init = function(callback) {
       uid: uid,
       selectMul: false,
       columnId: columnId,
-      categories: [],
+      mainCategories: [],
+      minorCategories: [],
       exclude: [],
       category: "",
       column: "",
       loading: true,
-      categoryId: "",
+      mainCategoryId: "",
+      minorCategoryId: '',
 
-      categoriesId: [],
+
+      mainCategoriesId: [],
+      minorCategoriesId: [],
+
 
       createCategory: false,
+
+
+
       newCategory: {
         parentId: "",
         name: "",
-        description: ""
+        description: "",
+        type: 'main' // main, minor
       },
 
       info: "",
@@ -68,7 +77,8 @@ moduleToColumn.init = function(callback) {
             this_.newCategory = {
               name: "",
               description: "",
-              parentId: ""
+              parentId: "",
+              type: 'main'
             };
           })
           .catch(function(data) {
@@ -83,29 +93,30 @@ moduleToColumn.init = function(callback) {
       },
       getChildren: function(_id) {
         var arr = [];
-        for(var i = 0; i < this.categories.length; i++) {
-          var c = this.categories[i];
+        for(var i = 0; i < this.mainCategories.length; i++) {
+          var c = this.mainCategories[i];
           if(c.parentId === _id) arr.push(c._id);
         }
         return arr;
       },
       getCategories: function() {
         var this_ = this;
-        nkcAPI("/m/" + this.columnId + "/category?t=list", "GET")
+        nkcAPI("/m/" + this.columnId + "/category?from=dialog", "GET")
           .then(function(data) {
             this_.column = data.column;
-            for(var i = 0; i < data.categories.length; i++) {
-              var c = data.categories[i];
+            for(var i = 0; i < data.mainCategories.length; i++) {
+              var c = data.mainCategories[i];
               var str = "";
               for(var j = 0; j < c.level; j++) {
                 str += "&nbsp;&nbsp;&nbsp;";
               }
               c.str = str;
             }
-            this_.categories = data.categories;
+            this_.mainCategories = data.mainCategories;
+            this_.minorCategories = data.minorCategories;
             this_.loading = false;
-            if(this_.categories.length > 0) {
-              this_.categoryId = this_.categories[0]._id;
+            if(this_.mainCategories.length > 0) {
+              this_.mainCategoryId = this_.mainCategories[0]._id;
             }
           })
           .catch(function(data) {
@@ -117,24 +128,29 @@ moduleToColumn.init = function(callback) {
         if(options) {
           this.exclude = options.exclude || [];
           this.selectMul = options.selectMul || false;
-          this.categoriesId = options.selectedCid || [];
+          this.mainCategoriesId = options.selectedMainCategoriesId || options.selectedCid || [];
+          this.minorCategoriesId = options.selectedMinorCategoriesId || [];
         }
         $('#moduleToColumn').modal("show");
         this.getCategories();
       },
       hide: function() {
         $('#moduleToColumn').modal("hide");
-        this.categoryId = "";
-        this.categoriesId = [];
+        this.mainCategoryId = "";
+        this.minorCategoryId = '';
+        this.minorCategoriesId = [];
+        this.mainCategoriesId = [];
       },
       complete: function() {
-        if(!this.categoryId) return screenTopWarning("请选择分类");
+        if(!this.mainCategoryId) return screenTopWarning("请选择分类");
         if(!this.columnId || !this.uid) return screenTopWarning("数据加载中，请稍后重试");
         moduleToColumn.callback({
-          categoryId: this.categoryId,
+          mainCategoryId: this.mainCategoryId,
+          minorCategoryId: this.minorCategoryId,
           columnId: this.columnId,
           uid: this.uid,
-          categoriesId: this.categoriesId
+          mainCategoriesId: this.mainCategoriesId,
+          minorCategoriesId: this.minorCategoriesId
         });
       }
     }

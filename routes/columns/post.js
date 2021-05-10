@@ -3,9 +3,9 @@ const router = new Router();
 router
   .get("/", async (ctx, next) => {
     const {query, data, db, nkcModules} = ctx;
-    const {page = 0, cid} = query;
+    const {page = 0, cid, mcid} = query;
     const {column, user} = data;
-    if(column.uid !== user.uid) ctx.throw(403, "权限不足");
+    if(column.uid !== user.uid && !ctx.permission('column_single_disabled')) ctx.throw(403, "权限不足");
     const q = {
       columnId: column._id
     };
@@ -16,6 +16,9 @@ router
     } else {
       sort[`order.cid_default`] = -1;
     }
+    if(mcid) {
+      q.mcid = mcid;
+    }
     const count = await db.ColumnPostModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
@@ -25,7 +28,10 @@ router
   })
   .post("/", async (ctx, next) => {
     const {body, data, db} = ctx;
-    const {postsId, categoriesId, type, categoryId} = body;
+    const {
+      postsId, type, categoryId,
+      mainCategoriesId, minorCategoriesId
+    } = body;
     const {column, user} = data;
     if(column.uid !== user.uid) ctx.throw(403, "权限不足");
     if(!postsId || postsId.length === 0) {
@@ -34,17 +40,18 @@ router
       }
     }
     if(type === "addToColumn") { // 推送文章到专栏
-      if(!categoriesId || categoriesId.length === 0) ctx.throw(400, "文章分类不能为空");
-      for(const _id of categoriesId) {
+      if(!mainCategoriesId || mainCategoriesId.length === 0) ctx.throw(400, "文章分类不能为空");
+      for(const _id of mainCategoriesId.concat(minorCategoriesId)) {
         const c = await db.ColumnPostCategoryModel.findOne({_id, columnId: column._id});
         if(!c) ctx.throw(400, `ID为${_id}的分类不存在`);
       }
       for(const pid of postsId) {
         let columnPost = await db.ColumnPostModel.findOne({columnId: column._id, pid});
-        const order = await db.ColumnPostModel.getCategoriesOrder(categoriesId);
+        const order = await db.ColumnPostModel.getCategoriesOrder(mainCategoriesId);
         if(columnPost) {
           await columnPost.updateOne({
-            cid: categoriesId,
+            cid: mainCategoriesId,
+            mcid: minorCategoriesId,
             order
           });
           continue;
@@ -60,7 +67,8 @@ router
           pid,
           type: thread.oc === pid? "thread": "post",
           columnId: column._id,
-          cid: categoriesId
+          cid: mainCategoriesId,
+          mcid: minorCategoriesId,
         });
         await columnPost.save();
       }
@@ -83,8 +91,8 @@ router
       }
       await db.ColumnPostCategoryModel.removeToppedThreads(column._id);
     } else if(type === "moveById") { // 更改专栏内容分类
-      if(!categoriesId || categoriesId.length === 0) ctx.throw(400, "文章分类不能为空");
-      for(const _id of categoriesId) {
+      if(!mainCategoriesId || mainCategoriesId.length === 0) ctx.throw(400, "文章分类不能为空");
+      for(const _id of mainCategoriesId.concat(minorCategoriesId)) {
         const c = await db.ColumnPostCategoryModel.findOne({_id, columnId: column._id});
         if(!c) ctx.throw(400, `ID为${_id}的分类不存在`);
       }
@@ -93,7 +101,7 @@ router
         if(!columnPost) continue;
         const {order} = columnPost;
         const newOrder = {};
-        for(const cid of categoriesId) {
+        for(const cid of mainCategoriesId) {
           let o = order[`cid_${cid}`];
           if(o === undefined) o = await db.SettingModel.operateSystemID("columnPostOrders", 1);
           newOrder[`cid_${cid}`] = o
@@ -103,7 +111,8 @@ router
           _id
         }, {
           $set: {
-            cid: categoriesId,
+            cid: mainCategoriesId,
+            mcid: minorCategoriesId,
             order: newOrder
           }
         });

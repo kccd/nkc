@@ -23,7 +23,7 @@ router
       }
       ctx.template = "columns/settings/page.pug";
     }
-    data.highlight = "page";
+    data.nav = "page";
     await next();
   });
 module.exports = router;

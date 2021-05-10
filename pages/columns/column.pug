@@ -19,11 +19,21 @@ block content
           div
             if data.category
               .column-category-nav
-                a(href=`/m/${data.column._id}`) 首页
+                a(href=`/m/${data.column._id}` data-type='reload') 首页
                 for c, index in data.categoriesNav
                   span /
-                  a(href=`/m/${data.column._id}?c=${c._id}`)= c.name
+                  a(href=`/m/${data.column._id}?c=${c._id}` data-type='reload')= c.name
                 .column-category-abbr=data.category.description
+              if data.minorCategories.length > 0
+                .column-minor-categories
+                  a(data-type='reload' href=`/m/${data.column._id}?c=${data.category._id}` class=!data.minorCategory?'active':'').column-minor-category 全部
+                  for c, index in data.minorCategories
+                    a(
+                      href=`/m/${data.column._id}?c=${data.category._id}-${c._id}`
+                      class=data.minorCategory && data.minorCategory._id === c._id? 'active':''
+                      title=c.description
+                      data-type='reload'
+                      ).column-minor-category=c.name
             if data.paging.page === 0 && data.topped.length > 0
               .m-t-05
               for columnPost in data.topped

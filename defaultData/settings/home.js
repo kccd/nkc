@@ -99,6 +99,17 @@ module.exports = {
     showActivityEnter: true,                  // 显示活动入口
     latestToppedThreadsId: [],
     columnListPosition: 'side', // 专栏显示位置 main: 中间, side: 侧边, null: 不显示
+    columnListSort: 'updateTime', // updateTime, postCount
     columnCount: 12, // 首页热门专栏数量
+    columnPool: {
+      columnsId: [], // 已选取的专栏ID
+      columnCount: 10, // 专栏推荐池中专栏的最大数量
+      updateInterval: 30, // 推荐池更新时间（分钟）
+      minPostCount: 0,
+      updateTime: 60,
+      postCount: 0,
+      minSubscriptionCount: 0,
+    },
+    toppedColumnsId: []
   }
 };

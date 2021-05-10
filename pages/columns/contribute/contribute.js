@@ -10,7 +10,12 @@ var app = new Vue({
     succeed: false,
     showThreads: false,
     categories: data.categories,
-    categoriesId: [],
+    mainCategoriesId: [],
+    minorCategoriesId: [],
+
+    mainCategories: data.mainCategories,
+    minorCategories: data.minorCategories,
+
     pid: "",
     paging: {
       page: 0
@@ -126,10 +131,11 @@ var app = new Vue({
       this.error = "";
       var selectedThreadsId = this.selectedThreadsId;
       if(selectedThreadsId.length === 0) return this.error = "请选择需要投稿的文章";
-      if(!this.categoriesId || this.categoriesId.length === 0) return this.error = "请选择文章分类";
+      if(!this.mainCategoriesId || this.mainCategoriesId.length === 0) return this.error = "请选择文章分类";
       nkcAPI("/m/" + this.column._id + "/contribute", "POST", {
         threadsId: selectedThreadsId,
-        categoriesId: this.categoriesId,
+        mainCategoriesId: this.mainCategoriesId,
+        minorCategoriesId: this.minorCategoriesId,
         description: this.description
       })
         .then(function() {

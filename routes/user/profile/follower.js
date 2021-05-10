@@ -5,7 +5,8 @@ module.exports = async (ctx, next) => {
   const {targetUser} = data;
   const match = {
     type: "user",
-    tUid: targetUser.uid
+    tUid: targetUser.uid,
+    cancel: false,
   };
   const count = await db.SubscribeModel.countDocuments(match);
   const paging = nkcModules.apiFunction.paging(page, count);
@@ -14,6 +15,7 @@ module.exports = async (ctx, next) => {
   const fansId = subscribes.map(s => s.uid);
   const subscribeUsers = await db.SubscribeModel.find({
     type: "user",
+    cancel: false,
     uid: targetUser.uid,
     tUid: {$in: fansId}
   });

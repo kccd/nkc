@@ -3875,9 +3875,8 @@ span[data-tag="nkcsource"][data-type="twemoji"]>img{
   max-height: 26px;
 }
 span[data-tag="nkcsource"][data-type="video-not-found"]{
-  display: block;
+  display: table;
   height: 20rem;
-  line-height: 20rem;
   text-align: center;
   width: 40rem;
   margin: auto;
@@ -3885,7 +3884,12 @@ span[data-tag="nkcsource"][data-type="video-not-found"]{
   background-color: #b9b9b9;
   color: #919191;
   border-radius: 2px;
-  font-size: 1.8rem;
+  font-size: 1.4rem;
+  padding: 1rem;
+}
+span[data-tag="nkcsource"][data-type="video-not-found"]>span{
+  display: table-cell;
+  vertical-align: middle;
 }
 /*文章中的图片 旧*/
 

@@ -47,14 +47,13 @@ module.exports = async (options) => {
   // 推荐专业
   // data.recommendForums = await db.ForumModel.getRecommendForums(fidOfCanGetThreads);
   // 热门专栏
-  if(homeSettings.columnListPosition === 'main') {
-    data.columns = await db.ColumnModel.getToppedColumns();
-  } else if(homeSettings.columnListPosition === 'side') {
-    data.columns = await db.ColumnModel.getToppedColumns(6);
+  if(['main', 'side'].includes(homeSettings.columnListPosition)) {
+    data.columns = await db.ColumnModel.getHomeHotColumns();
   } else {
     data.columns = [];
   }
-
+  // 置顶专栏
+  data.toppedColumns = await db.ColumnModel.getHomeToppedColumns();
   // 一周活跃用户
   data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
   // 热销商品

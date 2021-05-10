@@ -70,7 +70,7 @@ router
     const {subscribeType, user} = data;
     const childTypesCount = await db.SubscribeTypeModel.countDocuments({uid: user.uid, pid: subscribeType._id});
     if(childTypesCount) ctx.throw(400, "分类下存在子分类，无法删除");
-    const subCount = await db.SubscribeModel.countDocuments({uid: user.uid, cid: subscribeType._id});
+    const subCount = await db.SubscribeModel.countDocuments({cancel: false, uid: user.uid, cid: subscribeType._id});
     if(subCount) ctx.throw(400, "分类下存在关注的内容，无法删除");
     await subscribeType.deleteOne();
     await next();

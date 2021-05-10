@@ -58,11 +58,13 @@ function selectMark() {
   }
   if(postsId.length === 0) return;
   moduleToColumn.show(function(data) {
-    var categoriesId = data.categoriesId;
+    var mainCategoriesId = data.mainCategoriesId;
+    var minorCategoriesId = data.minorCategoriesId;
     var columnId = data.columnId;
     nkcAPI("/m/" + columnId + "/post", "POST", {
       postsId: postsId,
-      categoriesId: categoriesId,
+      mainCategoriesId: mainCategoriesId,
+      minorCategoriesId: minorCategoriesId,
       type: "addToColumn"
     })
       .then(function() {

@@ -689,7 +689,9 @@ function initVueApp() {
         if(PostToColumn && PostToColumn.getStatus) {
           var status = PostToColumn.getStatus();
           if(status.checkbox) {
-            post.columnCategoriesId = status.selectedCategoriesId || [];
+            // post.columnCategoriesId = status.selectedCategoriesId || [];
+            post.columnMainCategoriesId = status.selectedMainCategoriesId || [];
+            post.columnMinorCategoriesId = status.selectedMinorCategoriesId || [];
           }
         }
         // 调查表单数据

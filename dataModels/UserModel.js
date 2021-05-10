@@ -959,7 +959,7 @@ userSchema.methods.getPostLimit = async function() {
 */
 userSchema.statics.extendUsersInfo = async (users) => {
   const RoleModel = mongoose.model('roles');
-  const UserModel = mongoose.model('users');
+  const ColumnModel = mongoose.model('columns');
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const uid = new Set(), personalObj = {};
   for(const user of users) {
@@ -970,8 +970,12 @@ userSchema.statics.extendUsersInfo = async (users) => {
     personalObj[personal.uid] = personal;
   }
 
+  const columns = await ColumnModel.find({uid: {$in: [...uid]}});
+  const columnsObj = {};
+  for(const column of columns) {
+    columnsObj[column.uid] = column;
+  }
   const users_ = []; // 普通对象
-
   for(const user of users) {
     let certs = user.certs.concat([]);
     // 若用户拥有“banned”证书，则忽略其他证书
@@ -988,7 +992,7 @@ userSchema.statics.extendUsersInfo = async (users) => {
     }
     const info = {};
     info.certsName = [];
-    const column = await UserModel.getUserColumn(user.uid);
+    const column = columnsObj[user.uid];
     if(column) {
       user.column = {
         _id: column._id,
@@ -1004,6 +1008,7 @@ userSchema.statics.extendUsersInfo = async (users) => {
         info.certsName.push(role.displayName);
       }
     }
+
     if(!certs.includes('banned')) {
       const userPersonal = personalObj[user.uid];
       // 若用户绑定了手机号，则临时添加“机友”标志
@@ -1016,7 +1021,8 @@ userSchema.statics.extendUsersInfo = async (users) => {
     if(!user.grade && user.extendGrade) {
       await user.extendGrade();
     }
-    users_.push(user.toObject());
+    const _user = user.toObject? user.toObject(): user;
+    users_.push(_user);
   }
   return users_;
 };
@@ -1135,6 +1141,7 @@ userSchema.methods.ensureSubLimit = async function(type) {
     if(subUserCountLimit <= 0) throwErr(400, "关注用户功能已关闭");
     const userCount = await SubscribeModel.countDocuments({
       uid: this.uid,
+      cancel: false,
       type: "user"
     });
     if(userCount >= subUserCountLimit) throwErr(400, "关注用户数量已达上限");
@@ -1142,6 +1149,7 @@ userSchema.methods.ensureSubLimit = async function(type) {
     if(subForumCountLimit <= 0) throwErr(400, "关注专业已关闭");
     const forumCount = await SubscribeModel.countDocuments({
       uid: this.uid,
+      cancel: false,
       type: "forum"
     });
     if(forumCount >= subForumCountLimit) throwErr(400, "关注专业数量已达上限");
@@ -1149,6 +1157,7 @@ userSchema.methods.ensureSubLimit = async function(type) {
     if (subThreadCountLimit <= 0) throwErr(400, "关注文章功能已关闭");
     const threadCount = await SubscribeModel.countDocuments({
       uid: this.uid,
+      cancel: false,
       type: "thread"
     });
     if (threadCount >= subThreadCountLimit) throwErr(400, "关注文章数量已达上限");
@@ -1156,6 +1165,7 @@ userSchema.methods.ensureSubLimit = async function(type) {
     if(subColumnCountLimit <= 0) throwErr(400, "关注专栏功能已关闭");
     const columnCount = await SubscribeModel.countDocuments({
       uid: this.uid,
+      cancel: false,
       type: "column"
     });
     if(columnCount >= subColumnCountLimit) throwErr(400, "关注专栏数量已达上限");
@@ -2456,6 +2466,32 @@ userSchema.statics.allowAllMessage = async function(uid) {
   const targetUserGeneral = await UsersGeneralModel.findOnly({uid}, {messageSettings: 1});
   return targetUserGeneral.messageSettings.allowAllMessageWhenSale && onSale;
 }
+
+/*
+* 拓展多个用户的等级
+* @param {[Object]} users 用户对象组成的数组 必要字段: score
+* */
+userSchema.statics.extendUsersGrade = async (users) => {
+  const UsersGradeModel = mongoose.model('usersGrades');
+  const grades = await UsersGradeModel.find({}).sort({score: -1});
+  for(const user of users) {
+    let score = user.score;
+    if(!score || score < 0) {
+      score = 0;
+    }
+    let g;
+    for(const grade of grades) {
+      if(grade.score > score) continue;
+      g = grade;
+      break;
+    }
+    if(!g) {
+      g = grades[grades.length - 1];
+    }
+    user.grade = g;
+  }
+  return users;
+};
 
 module.exports = mongoose.model('users', userSchema);
 

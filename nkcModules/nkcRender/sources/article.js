@@ -56,7 +56,7 @@ module.exports = {
       <span class="nkcsource-video-title">${resource.oname} <span class="display-i-b text-danger" style="font-weight: 700">${getSize(resource.size)}</span></span>
     `.trim();
     } else {
-      return `<span data-tag="nkcsource" data-type="video-not-found">视频已丢失（${oname}）</span>`
+      return `<span data-tag="nkcsource" data-type="video-not-found"><span>视频已丢失（${oname}）</span></span>`
     }
 
     //<span class="nkcsource-video-title">${resource.oname}</span>
