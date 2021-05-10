@@ -44,3 +44,58 @@ function renderData(domId, d) {
   };
   chart.setOption(option);
 }
+
+window.app = new Vue({
+  el: '#threadList',
+  data: {
+    columnId: data.column._id,
+    sort: 'hit', // hit, postCount, voteUp
+    columnPosts: [],
+    nav: [
+      {
+        type: 'hit',
+        name: '阅读量'
+      },
+      {
+        type: 'postCount',
+        name: '回复数'
+      },
+      {
+        type: 'voteUp',
+        name: '点赞数'
+      }
+    ],
+    paging: {
+      page: 0,
+      buttonValue: []
+    },
+  },
+  mounted: function() {
+    this.getPosts();
+  },
+  methods: {
+    briefNumber: NKC.methods.tools.briefNumber,
+    selectPage: function(t, page) {
+      if(t === 'null') return;
+      this.getPosts(page);
+    },
+    getPosts: function(page) {
+      var self = this;
+      if(page === undefined) page = this.paging.page;
+      var url = '/m/' + this.columnId + '/status?sort=' + this.sort + '&page=' + page;
+      nkcAPI(url, 'GET')
+        .then(function(data) {
+          console.log(data);
+          self.columnPosts= data.columnPosts;
+          self.paging = data.paging;
+        })
+        .catch(function(err) {
+          sweetError(err);
+        })
+    },
+    switchSort: function(t) {
+      this.sort = t;
+      this.getPosts(0);
+    }
+  }
+})
