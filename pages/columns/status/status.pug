@@ -40,20 +40,23 @@ block settingsContent
     .m-b-1
       h4 最热文章
       #threadList(v-cloak).column-status-threads
-        ul.nav.nav-tabs.column-status-threads-nav.m-b-1
+        ul.nav.nav-tabs.column-status-threads-nav.m-b-05
           li(v-for='n in nav' :class="{'active': n.type === sort}" @click='switchSort(n.type)')
             a {{n.name}}
-        .column-status-threads-container
-          .paging-button(v-if='paging.buttonValue.length')
+        mixin pageButton
+          .paging-button(v-if='paging.buttonValue.length').m-t-05
             a.button.pointer(v-for="b, index in paging.buttonValue"
               :class="{'active':b.type==='active', 'radius-left': index===0, 'radius-right': index+1 === paging.buttonValue.length}"
               @click="selectPage(b.type, b.num)"
             ) {{b.num>=0?b.num+1:"..."}}
+        .column-status-threads-container
+          +pageButton
           .column-status-thread(v-for='p in columnPosts')
             span.column-status-number(v-if='sort === "hit"') {{briefNumber(p.hits)}}
             span.column-status-number(v-else-if='sort === "postCount"') {{briefNumber(p.postCount)}}
             span.column-status-number(v-else) {{briefNumber(p.voteUp)}}
             a.column-status-title(:href="p.url" target="_blank") {{p.title}}
+          +pageButton
   .hidden#data=objToStr({column: data.column, times: data.times, subscriptions: data.subscriptions, hits: data.hits, voteUp: data.voteUp, share: data.share})
 block settingsScripts
   +includeJS("/echarts/dist/echarts.min.js")
