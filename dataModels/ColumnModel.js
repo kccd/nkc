@@ -402,11 +402,10 @@ schema.methods.updateBasicInfo = async function() {
     threadsId.push(cp.tid);
   });
   const columnPostCount = columnPosts.length;
-  const hits = await UsersBehaviorModel.countDocuments({
+  /*const hits = await UsersBehaviorModel.countDocuments({
     tid: {$in: threadsId},
     operationId: 'visitThread'
-  });
-  /*
+  });*/
   let hits = await ThreadModel.aggregate([
     {
       $match: {
@@ -422,7 +421,7 @@ schema.methods.updateBasicInfo = async function() {
       }
     }
   ]);
-  hits = hits.length? hits[0].count: 0;*/
+  hits = hits.length? hits[0].count: 0;
   let voteUp = await PostModel.aggregate([
     {
       $match: {

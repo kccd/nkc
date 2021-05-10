@@ -8,6 +8,7 @@ router
     if(column.uid !== user.uid && !ctx.permission('column_single_disabled')) ctx.throw(403, "权限不足");
     const {sort, page} = query;
     if(sort === undefined) {
+      await column.updateBasicInfo();
       data.nav = 'status';
       const maxTime = new Date();
       const minTime = new Date(maxTime.getTime() - 30 * 24 * 60 * 60 * 1000);
