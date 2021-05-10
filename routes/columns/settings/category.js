@@ -3,9 +3,6 @@ const router = new Router();
 router
   .get("/", async (ctx, next) => {
     ctx.template = "columns/settings/category.pug";
-    if(ctx.query.old) {
-      ctx.template = 'columns/settings/category_old.pug';
-    }
     const {db, data} = ctx;
     const {column} = data;
     data.categoryList = await db.ColumnPostCategoryModel.getCategoryList(column._id);

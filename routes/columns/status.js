@@ -4,7 +4,8 @@ const router = new Router();
 router
   .get("/", async (ctx, next) => {
     const {data, query, db, nkcModules} = ctx;
-    const {column} = data;
+    const {user, column} = data;
+    if(column.uid !== user.uid && !ctx.permission('column_single_disabled')) ctx.throw(403, "权限不足");
     const {sort, page} = query;
     if(sort === undefined) {
       data.nav = 'status';

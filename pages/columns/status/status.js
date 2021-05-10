@@ -1,5 +1,4 @@
 var data = NKC.methods.getDataById('data');
-console.log(data);
 renderData('subscriptionDom', data.subscriptions);
 renderData('hitDom', data.hits);
 renderData('voteUpDom', data.voteUp);
@@ -85,7 +84,6 @@ window.app = new Vue({
       var url = '/m/' + this.columnId + '/status?sort=' + this.sort + '&page=' + page;
       nkcAPI(url, 'GET')
         .then(function(data) {
-          console.log(data);
           self.columnPosts= data.columnPosts;
           self.paging = data.paging;
         })
