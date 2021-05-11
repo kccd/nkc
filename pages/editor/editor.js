@@ -17,6 +17,7 @@
 /*var editor;
 var CommonModal;
 var PostInfo, PostButton, PostToColumn, PostSurvey, ForumSelector;*/
+window.PostToColumn = undefined;
 // 标志：编辑器是否已初始化
 var EditorReady = false;
 var data;
