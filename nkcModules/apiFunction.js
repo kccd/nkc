@@ -8,6 +8,7 @@ const searchIp = require('node-ip2region').create();
 moment.locale('zh-cn');
 const defaultPerpage = paging.perpage;
 let fn = {};
+
 fn.paging = (page = 0, count, perpage, buttonCount = 5) => {
   if(!perpage) perpage = defaultPerpage;
   page = parseInt(page);
@@ -110,8 +111,8 @@ fn.newPasswordObject = (plain) => {
     hashType:'sha256HMAC',
     secret: fn.getRandomString("aA0", 64),
     password:{
-      hash:hash,
-      salt:salt,
+      hash: hash,
+      salt: salt,
     }
   };
 };
@@ -471,7 +472,13 @@ fn.getIpAddress = async (ip) => {
       })
       res.on('end', () => {
         const buffer = Buffer.concat(chunks).toString();
-        resolve(JSON.parse(buffer));
+        let data;
+        try {
+          data = JSON.parse(buffer);
+        } catch (error) {
+          return reject(error);
+        }
+        resolve(data);
       });
     })
     // 请求出错
