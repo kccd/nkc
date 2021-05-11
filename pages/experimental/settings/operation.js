@@ -2,7 +2,7 @@ var data = $('#data').text();
 var types;
 if(data) {
 	data = JSON.parse(data);
-	types = data.types;
+	window.types = data.types;
 }
 
 $('input[name="selectOperation"]').iCheck({
@@ -136,3 +136,16 @@ function editorOperation(id, description, errInfo) {
 			screenTopAlert(data.error || data);
 		})
 }
+
+Object.assign(window, {
+	data,
+	getIdByDisplayName,
+	addOperationType,
+	modifyOperationType,
+	deleteOperationType,
+	getSelectedOperations,
+	getTypeId,
+	moveOperations,
+	deleteOperations,
+	editorOperation,
+});

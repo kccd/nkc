@@ -1,26 +1,26 @@
-extends ../nkc
-block nkcTitle
-  title 板块管理 - 前台管理
-  +includeCSS("/_element-ui@2.13.2@element-ui/lib/theme-chalk/index.css")
-block nkcContent
-  #data.hidden= objToStr(data)
-  .col-xs-12.col-md-12.box-shadow-panel.management-home#app
-    el-row
-      h4 导航设置
-      el-tabs(v-model="editableTabsValue" type="card" closable @tab-remove="removeTab")
-        el-tab-pane(v-for="(item, index) in editableTabs" :key="item.name" :label="item.title" :name="item.name")
-          a(:href="item.link" target="_blank") {{item.link}}
-      el-button(size="small" @click="addTab(editableTabsValue)" style="margin-top: 10px") 添加链接
-    el-row
-      h4 显示设置
-      el-checkbox(label="显示公告" border)
-      el-checkbox(label="显示网站应用" border)
-      el-checkbox(label="显示最新基金申请" border)
-      el-checkbox(label="显示最新回复" border)
+//- extends ../nkc
+//- block nkcTitle
+//-   title 板块管理 - 前台管理
+//-   +includeCSS("/_element-ui@2.13.2@element-ui/lib/theme-chalk/index.css")
+//- block nkcContent
+//-   #data.hidden= objToStr(data)
+//-   .col-xs-12.col-md-12.box-shadow-panel.management-home#app
+//-     el-row
+//-       h4 导航设置
+//-       el-tabs(v-model="editableTabsValue" type="card" closable @tab-remove="removeTab")
+//-         el-tab-pane(v-for="(item, index) in editableTabs" :key="item.name" :label="item.title" :name="item.name")
+//-           a(:href="item.link" target="_blank") {{item.link}}
+//-       el-button(size="small" @click="addTab(editableTabsValue)" style="margin-top: 10px") 添加链接
+//-     el-row
+//-       h4 显示设置
+//-       el-checkbox(label="显示公告" border)
+//-       el-checkbox(label="显示网站应用" border)
+//-       el-checkbox(label="显示最新基金申请" border)
+//-       el-checkbox(label="显示最新回复" border)
     
-block nkcScripts
-  include ../../publicModules/floatUserPanel/floatUserPanel
-  +includeJS("/echarts/dist/echarts.min.js")
-  +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
-  +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
-  +includeJS("/nkc/section/section.js")
+//- block nkcScripts
+//-   include ../../publicModules/floatUserPanel/floatUserPanel
+//-   +includeJS("/echarts/dist/echarts.min.js")
+//-   +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
+//-   +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
+//-   +includeJS("/nkc/section/section.js")

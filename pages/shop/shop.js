@@ -222,3 +222,16 @@ function banSale(productId) {
     })
   }
 }
+
+Object.assign(window, {
+  calculateFreightPrice,
+  addToCart,
+  choiceProductParams,
+  addProductToCart,
+  submitProductToBill,
+  addStock,
+  delStock,
+  numToFloatTwo,
+  numToNumberTwo,
+  banSale,
+});

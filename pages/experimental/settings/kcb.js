@@ -69,3 +69,5 @@ function numToFloatTwo(str){
   str = (str/100).toFixed(2);
   return str;
 }
+
+window.numToFloatTwo = numToFloatTwo;

@@ -1,15 +1,13 @@
-var positionObj;
 var hasImg = false;
 var upLoadFile;
 function init() {
 	hasImg = true;
-	positionObj = undefined;
 }
 
 $('#imageUpload').on('change', function() {
 	var file = $('#imageUpload')[0].files[0];
 	if(file) {
-		upLoadFile = file;
+		window.upLoadFile = file;
 	}
 	var reader = new FileReader();
 	reader.onload = function() {
@@ -65,3 +63,9 @@ function delCarousel(index) {
     screenTopWarning(data | data.error)
   })
 }
+
+Object.assign(window, {
+	displayAvatar,
+	submit,
+	delCarousel,
+});

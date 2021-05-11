@@ -2,8 +2,8 @@ var MoveThread, DisabledPost;
 
 
 $(function() {
-  MoveThread = new NKC.modules.MoveThread();
-  DisabledPost = new NKC.modules.DisabledPost();
+  window.MoveThread = new NKC.modules.MoveThread();
+  window.DisabledPost = new NKC.modules.DisabledPost();
 });
 
 function getSelectedThreadsId() {
@@ -140,3 +140,12 @@ function selectAll() {
     dom.prop("checked", true);
   }
 }
+
+Object.assign(window, {
+  getSelectedThreadsId,
+  getSelectedPostsId,
+  disabledSelectedPosts,
+  moveSelectedThreads,
+  managementThreads,
+  selectAll,
+});

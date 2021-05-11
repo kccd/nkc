@@ -254,3 +254,14 @@ if(vueDom) {
     }
   });
 }
+
+Object.assign(window, {
+	saveAdsOrder,
+	defaultLogo,
+	deleteLogo,
+	removeNotice,
+	saveWaterMarkSettings,
+	uploadHomeBigLogo,
+	saveHomeListSettings,
+	vueDom,
+});

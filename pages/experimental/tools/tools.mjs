@@ -189,3 +189,5 @@ new Vue({
     }
   }
 });
+
+window.CommonModal = CommonModal;

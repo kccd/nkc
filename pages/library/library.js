@@ -1,6 +1,6 @@
 var ResourceInfo;
 $(function() {
-  ResourceInfo = new NKC.modules.ResourceInfo();
+  window.ResourceInfo = new NKC.modules.ResourceInfo();
 });
 
 function showResource(rid) {
@@ -8,3 +8,5 @@ function showResource(rid) {
     rid: rid
   });
 }
+
+window.showResource = showResource;

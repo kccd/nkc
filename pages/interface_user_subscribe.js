@@ -27,3 +27,5 @@ function submit(id) {
 			screenTopWarning(data.error);
 		})
 }
+
+window.submit = submit;

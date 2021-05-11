@@ -234,3 +234,5 @@ window.app = new Vue({
     },
   }
 });
+
+window.func = func;

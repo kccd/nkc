@@ -34,3 +34,9 @@ function refuseApplicationForm(id) {
 			screenTopWarning(data.error);
 		})
 }
+
+Object.assign(window, {
+	ensureRemittance,
+	withdrawApplicationForm,
+	refuseApplicationForm,
+});

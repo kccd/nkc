@@ -8,16 +8,16 @@ var historyFid = "";
 var forumTypeEditor;
 
 $(document).ready(function() {
-  isThroughForum = getSearchKV();
+  window.isThroughForum = getSearchKV();
   if(isThroughForum.type && isThroughForum.type === "forum") {
-    historyFid = isThroughForum.id;
+    window.historyFid = isThroughForum.id;
   }
-  forumList = JSON.parse($('#allForumListData').text());
-  cidArr = JSON.parse($('#cidArr').text());
-  disciplineArr = JSON.parse($('#disciplineDom').text());
-  topicArr = JSON.parse($('#topicDom').text());
-  forumTypeEditor = $("#forumType").text();
-  app = new Vue({
+  window.forumList = JSON.parse($('#allForumListData').text());
+  window.cidArr = JSON.parse($('#cidArr').text());
+  window.disciplineArr = JSON.parse($('#disciplineDom').text());
+  window.topicArr = JSON.parse($('#topicDom').text());
+  window.forumTypeEditor = $("#forumType").text();
+  window.app = new Vue({
     el: "#forumChoice",
     data: {
       activeClass: 'mdui-color-theme-accent',
@@ -281,3 +281,14 @@ function getFidAndCidResult() {
   obj.cids = app.categoryIdArr;
   return obj
 }
+
+Object.assign(window, {
+  selectDiscipline,
+  selectTopic,
+  selectDisciplineCate,
+  selectTopicCate,
+  shuchu,
+  moreForum,
+  selectNewOption,
+  getFidAndCidResult,
+});

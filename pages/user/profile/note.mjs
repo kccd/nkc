@@ -97,3 +97,5 @@ const noteApp = new Vue({
     }
   }
 });
+
+window.noteApp = noteApp;

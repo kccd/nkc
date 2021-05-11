@@ -40,3 +40,4 @@ function save() {
 
 
 }
+window.save = save;

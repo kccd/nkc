@@ -39,3 +39,8 @@ const app = new Vue({
     }
   }
 })
+
+Object.assign(window, {
+  moveThread,
+  app,
+});

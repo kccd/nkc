@@ -5,7 +5,7 @@ var app = new Vue({
   },
   mounted: function() {
     var data = document.getElementById("data");
-    data = JSON.parse(data.innerHTML);
+    data = JSON.parse(decodeURIComponent(data.innerHTML));
     this.shopSettings = data.shopSettings;
   },
   methods: {

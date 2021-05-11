@@ -1,4 +1,4 @@
-importScripts("/serviceWorker/socket.io.min.js");
+importScripts("/socketio/socket.io.min.js");
 
 self.addEventListener("install", event => self.skipWaiting());
 
@@ -60,3 +60,5 @@ socket.onAny(function() {
 self.addEventListener("message", event => {
   console.log("页面发来的消息: ", event);
 });
+
+self.socket = socket;

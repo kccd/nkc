@@ -579,3 +579,34 @@ function submitCert(uid) {
       sweetError(data.error || data);
     })
 }
+
+Object.assign(window, {
+	initTime,
+	educationRender,
+	industriesRender,
+	addEduElement,
+	addIndElement,
+	displayInd,
+	displayEdu,
+	deleteEdu,
+	deleteInd,
+	addEdu,
+	addInd,
+	load,
+	changeSelect,
+	selectInd,
+	selectDuty,
+	submit,
+	loadDisplayResume,
+	addAccountElement,
+	displayAccount,
+	addAccount,
+	deleteAccount,
+	loadAccounts,
+	submitSocial,
+	initEvent,
+	removePhoto,
+	uploadLifePhotos,
+	submitPhoto,
+	submitCert,
+});

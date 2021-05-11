@@ -431,3 +431,25 @@ function editNotGoods() {
     sweetWarning(data || data.error);
   })
 }
+
+Object.assign(window, {
+  initTime,
+  sendGoods,
+  sendGoodsNoLog,
+  openSendGoodsModal,
+  editOrder,
+  openEditOrderModal,
+  visitLogisticsInfo,
+  editTrackNum,
+  saveTrackNum,
+  editSellMessage,
+  editProductSinglePrice,
+  saveProductSinglePrice,
+  editOrderFreightPrice,
+  saveOrderFreightPrice,
+  editOrderProductCount,
+  saveOrderProductCount,
+  openLogositicEdit,
+  editGoods,
+  editNotGoods,
+});

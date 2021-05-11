@@ -15,3 +15,5 @@ function disabledHistories(pid, type) {
 			screenTopWarning(data.error||data);
 		})
 }
+
+window.disabledHistories = disabledHistories;

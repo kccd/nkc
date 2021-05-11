@@ -156,7 +156,7 @@ var app = new Vue({
       } catch(err) {}
     }
     if(NKC.modules.SubscribeTypes) {
-      SubscribeTypes = new NKC.modules.SubscribeTypes();
+      window.SubscribeTypes = new NKC.modules.SubscribeTypes();
     }
   }
 });
@@ -164,9 +164,15 @@ var app = new Vue({
 var ResourceInfo;
 
 $(function() {
-  ResourceInfo = new NKC.modules.ResourceInfo();
+  window.ResourceInfo = new NKC.modules.ResourceInfo();
 });
 
 function showResource(lid) {
   ResourceInfo.open({lid: lid})
 }
+
+Object.assign(window, {
+  initComplexOptions,
+  app,
+  showResource,
+});

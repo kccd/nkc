@@ -17,7 +17,7 @@ var swiper = new Swiper('.swiper-container', {
 var SubscribeTypes;
 $(function() {
   if(!window.SubscribeTypes && NKC.modules.SubscribeTypes)
-    SubscribeTypes = new NKC.modules.SubscribeTypes();
+    window.SubscribeTypes = new NKC.modules.SubscribeTypes();
   if(NKC.configs.swipeLeft) {
     window.ready()
       .then(function() {
@@ -27,3 +27,5 @@ $(function() {
       })
   }
 });
+
+window.swiper = swiper;

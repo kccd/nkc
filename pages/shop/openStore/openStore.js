@@ -20,3 +20,8 @@ function applyForOpenStore() {
 function accountAuth() {
   alert("账号认证")
 }
+
+Object.assign(window, {
+  applyForOpenStore,
+  accountAuth,
+});

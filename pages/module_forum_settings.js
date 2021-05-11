@@ -7,3 +7,5 @@ function changeForum (value, type) {
 		}
 	}
 }
+
+window.changeForum = changeForum;

@@ -1839,7 +1839,9 @@ $(function() {
         }
       }
     }
-  })
+  });
+
+  window.app = app;
 });
 
 
@@ -1956,3 +1958,26 @@ function addFriendByUid() {
       screenTopWarning(data.error || data);
     })
 }
+
+Object.assign(window, {
+  winWidth,
+  xss,
+  data,
+  templates,
+  targetUser,
+  grades,
+  messageSettings,
+  userDigestThreadCount,
+  pageName,
+  addHistory,
+  secondToMinute,
+  startPlayAudio,
+  stopPlayAudio,
+  restartPlayAudio,
+  stopOrStartPlay,
+  stopPlayType,
+  startPlayType,
+  closeFrameOfAddFriend,
+  openFrameOfAddFriend,
+  addFriendByUid,
+});

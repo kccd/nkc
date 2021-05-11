@@ -174,4 +174,4 @@ function newMessageRemind(name) {
 }
 
 
-
+window.socket = socket;

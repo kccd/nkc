@@ -5,11 +5,12 @@ var data = JSON.parse($('#forumListData1').text());
 var forumList = data.forumList;
 var threadTypes = data.forumsThreadTypes;
 var disabledCategory = data.disabledCategory;
+
 if(data.selectedArr) {
-	selectedArr = data.selectedArr;
+	window.selectedArr = data.selectedArr;
 }
 if(data.cat) {
-	cat = parseInt(data.cat);
+	window.cat = parseInt(data.cat);
 }
 displaySelect1();
 
@@ -30,7 +31,7 @@ function initEvent1() {
 					}
 				}
       }
-      selectedArr = newArr;
+      window.selectedArr = newArr;
 			displaySelect1();
 		}
 	})
@@ -178,3 +179,18 @@ function selectbtn(){
 		arr.prop('checked', true);
 	}
 }
+
+Object.assign(window, {
+	dropdownDiv1,
+	forumList,
+	threadTypes,
+	disabledCategory,
+	initEvent1,
+	createSelect1,
+	displaySelect1,
+	parentForum1,
+	getChildrenForums1,
+	getThreadTypes1,
+	getResult1,
+	selectbtn,
+});

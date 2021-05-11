@@ -94,3 +94,11 @@ function hideUserHome(isHidden, uid) {
     .catch(sweetError)
     .then(function() {location.reload()});
 }
+
+Object.assign(window, {
+  managementPosts,
+  selectAll,
+  toColumn,
+  clearUserInfo,
+  hideUserHome,
+});

@@ -137,11 +137,19 @@ $("#searchInput").keydown(function (e) {//当按下按键时
 });
 var ModifyAccountInfo;
 $(function() {
-  ModifyAccountInfo = new NKC.modules.ModifyAccountSensitiveInfo();
+  window.ModifyAccountInfo = new NKC.modules.ModifyAccountSensitiveInfo();
 });
 function editUserInfo(uid) {
   ModifyAccountInfo.open({
     uid: uid
   });
 }
+
+Object.assign(window, {
+  searchUser,
+  createElements,
+  saveUserInfo,
+  editorRole,
+  editUserInfo,
+});
 

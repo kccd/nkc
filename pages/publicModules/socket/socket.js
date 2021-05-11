@@ -119,3 +119,6 @@ function newMessageRemind(name) {
   var number = getNewMessageNumber();
   setNewMessageNumber(number+1);
 }
+
+
+window.socket = socket;

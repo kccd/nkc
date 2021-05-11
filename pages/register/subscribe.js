@@ -13,7 +13,7 @@ var app = new Vue({
   mounted: function() {
     this.getUsers();
     if(NKC.modules.SubscribeTypes) {
-      SubscribeTypes = new NKC.modules.SubscribeTypes();
+      window.SubscribeTypes = new NKC.modules.SubscribeTypes();
     }
     // this.getColumns();
     // this.getForums();
@@ -74,3 +74,5 @@ var app = new Vue({
     }
   }
 });
+
+window.app = app;

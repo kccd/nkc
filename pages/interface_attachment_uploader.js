@@ -172,3 +172,8 @@ var uploader = attachment_uploader({
 geid("paste-target").addEventListener("paste", uploader.paste_handler);
 //上传附件的按钮
 geid('upload-button').addEventListener('click', uploader.uploadfile_click);
+
+Object.assign(window, {
+  attachment_uploader,
+  uploader,
+});

@@ -130,3 +130,13 @@ var app = new Vue({
 function emitEventToUpdateLocalUser(data) {
   if(NKC.configs.isApp) NKC.methods.rn.emit("updateLocalUser", {});
 }
+
+Object.assign(window, {
+  submit,
+  changeUsername,
+  getFocus,
+  selectAvatar,
+  selectBanner,
+  app,
+  emitEventToUpdateLocalUser,
+});

@@ -102,6 +102,8 @@ class SharePanel extends NKC.modules.DraggablePanel {
 }
 const sharePanel = new SharePanel();
 
+window.sharePanel = sharePanel;
+
 NKC.methods.initSharePanel = () => {
   const shareDom = $('[data-type="share"]');
   for(let i = 0; i < shareDom.length; i++) {

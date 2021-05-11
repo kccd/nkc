@@ -13,7 +13,7 @@ block title
     }
 
 block content
-  #data.hidden= objToStr({wordGroupInfo: data.wordGroupInfo, fid: data.fid, keywordReviewPlanUseTo: data.keywordReviewPlanUseTo, useGroup: data.useGroup, reviewPlan: data.reviewPlan, roles: data.roles, grades: data.grades, roleGradeReview: data.roleGradeReview})
+  #data.hidden= objToStr({wordGroupInfo: data.wordGroupInfo, fid: data.fid, forumReviewSettings: data.forumReviewSettings, roles: data.roles, grades: data.grades})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
@@ -31,45 +31,82 @@ block content
                     //- label
                       input(type="checkbox" v-model="allContentShouldReview")
                     label
-                      input(type="radio" v-model="reviewPlan" value="all")
+                      input(type="radio" v-model="settings.content.range" value="all")
                       | 文章和回复
                   .radio
                     label
-                      input(type="radio" v-model="reviewPlan" value="only_thread")
+                      input(type="radio" v-model="settings.content.range" value="only_thread")
                       | 仅文章
                   .radio
                     label
-                      input(type="radio" v-model="reviewPlan" value="only_reply")
-                      | 仅回复
-                  .radio
+                      input(type="radio" v-model="settings.content.range" value="only_reply")
+                      | 仅回复/评论
+
+              div(v-if="['only_thread', 'all'].indexOf(settings.content.range) >= 0")
+                .form-group
+                  label.col-sm-2.control-label 文章送审规则:
+                  .col-sm-10
+                    .checkbox
+                      label.m-r-1
+                        input(type='checkbox' v-model="settings.content.rule.thread.anyone")
+                        span 所有人
+                .form-group(v-if="!settings.content.rule.thread.anyone")
+                  .col-sm-2.control-label 角色
+                  .col-sm-10
+                    .checkbox
+                      label(v-for='r in roles').m-r-1
+                        input(type='checkbox' :value='r._id' v-model="settings.content.rule.thread.roles")
+                        span {{r.displayName}}
+                .form-group(v-if="!settings.content.rule.thread.anyone")
+                  label.col-sm-2.control-label
+                  .col-sm-10
                     label
-                      input(type="radio" v-model="reviewPlan" value="all_no_rule")
-                      | 所有用户的文章和回复均送审（无视以下规则）
-              .form-group
-                label.col-sm-2.control-label 送审规则:
-                .col-sm-10.m-t-05
-                  span(style="color:#848484") 勾选的才会纳入匹配（即黑名单制）
-              .form-group
-                .col-sm-2.control-label 角色
-                .col-sm-10
-                  .checkbox
-                    label(v-for='r in roles').m-r-1
-                      input(type='checkbox' :value='r._id' v-model="roleGradeReview.roles")
-                      span {{r.displayName}}
+                      select(v-model="settings.content.rule.thread.relationship")
+                        option(value="and") 与
+                        option(value="or") 或
+                .form-group(v-if="!settings.content.rule.thread.anyone")
+                  .col-sm-2.control-label 等级
+                  .col-sm-10
+                    .checkbox
+                      label(v-for='r in grades').m-r-1
+                        input(type='checkbox' :value='r._id' v-model="settings.content.rule.thread.grades")
+                        span {{r.displayName}}
+
+              div(v-if="['only_reply', 'all'].indexOf(settings.content.range) >= 0")
+                .form-group
+                  label.col-sm-2.control-label 回复/评论送审规则:
+                  .col-sm-10
+                    .checkbox
+                      label.m-r-1
+                        input(type='checkbox' v-model="settings.content.rule.reply.anyone")
+                        span 所有人
+                .form-group(v-if="!settings.content.rule.reply.anyone")
+                  .col-sm-2.control-label 角色
+                  .col-sm-10
+                    .checkbox
+                      label(v-for='r in roles').m-r-1
+                        input(type='checkbox' :value='r._id' v-model="settings.content.rule.reply.roles")
+                        span {{r.displayName}}
+                .form-group(v-if="!settings.content.rule.reply.anyone")
+                  label.col-sm-2.control-label
+                  .col-sm-10
+                    label
+                      select(v-model="settings.content.rule.reply.relationship")
+                        option(value="and") 与
+                        option(value="or") 或
+                .form-group(v-if="!settings.content.rule.reply.anyone")
+                  .col-sm-2.control-label 等级
+                  .col-sm-10
+                    .checkbox
+                      label(v-for='r in grades').m-r-1
+                        input(type='checkbox' :value='r._id' v-model="settings.content.rule.reply.grades")
+                        span {{r.displayName}}
+
               .form-group
                 label.col-sm-2.control-label
                 .col-sm-10
-                  label
-                    select(v-model="roleGradeReview.relationship")
-                      option(value="and") 与
-                      option(value="or") 或
-              .form-group
-                .col-sm-2.control-label 等级
-                .col-sm-10
-                  .checkbox
-                    label(v-for='r in grades').m-r-1
-                      input(type='checkbox' :value='r._id' v-model="roleGradeReview.grades")
-                      span {{r.displayName}}
+                  p.text-warning * 送审规则是黑名单制的
+
 
         .panel.panel-default
           .panel-heading
@@ -83,22 +120,32 @@ block content
                     //- label
                       input(type="checkbox" v-model="allContentShouldReview")
                     label
-                      input(type="radio" v-model="keywordReview.keywordReviewPlanUseTo" value="all")
+                      input(type="radio" v-model="settings.keyword.range" value="all")
                       | 文章和回复
                   .radio
                     label
-                      input(type="radio" v-model="keywordReview.keywordReviewPlanUseTo" value="only_thread")
+                      input(type="radio" v-model="settings.keyword.range" value="only_thread")
                       | 仅文章
                   .radio
                     label
-                      input(type="radio" v-model="keywordReview.keywordReviewPlanUseTo" value="only_reply")
-                      | 仅回复
-              .form-group
-                label.col-sm-2.control-label 使用敏感词组
+                      input(type="radio" v-model="settings.keyword.range" value="only_reply")
+                      | 仅回复/评论
+
+              .form-group(v-if="['only_thread', 'all'].indexOf(settings.keyword.range) >= 0")
+                label.col-sm-2.control-label 文章使用敏感词组
                 .col-sm-10
-                  .checkbox(v-for="(group, index) in keywordReview.wordGroupInfo")
+                  .checkbox(v-for="(group, index) in wordGroupInfo")
                     label
-                      input(type="checkbox" :value="group.id" v-model="keywordReview.selectedGroup")
+                      input(type="checkbox" :value="group.id" v-model="settings.keyword.rule.thread.useGroups")
+                      span.group-name {{group.name}}
+                      span.group-keywords-count 共{{group.len}}个敏感词
+
+              .form-group(v-if="['only_reply', 'all'].indexOf(settings.keyword.range) >= 0")
+                label.col-sm-2.control-label 回复/评论使用敏感词组
+                .col-sm-10
+                  .checkbox(v-for="(group, index) in wordGroupInfo")
+                    label
+                      input(type="checkbox" :value="group.id" v-model="settings.keyword.rule.reply.useGroups")
                       span.group-name {{group.name}}
                       span.group-keywords-count 共{{group.len}}个敏感词
         .m-t-1

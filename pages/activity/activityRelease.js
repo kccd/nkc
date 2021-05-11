@@ -2,6 +2,7 @@ var upLoadFile;
 
 // 初始化编辑器
 var ue = UE.getEditor("editor", NKC.configs.ueditor.activityConfigs);
+window.ue = ue;
 
 $.getJSON('../location.json',function(data){
 	for (var i = 0; i < data.length; i++) {
@@ -237,3 +238,17 @@ function addOneForm() {
 function delOneForm(para) {
   $(para).parent().remove();
 }
+
+Object.assign(window, {
+  ue,
+  customForm,
+  insertToImage,
+  submitRelease,
+  timeStampCheck,
+  deadlineCheck,
+  postPoster,
+  choosePoster,
+  savePoster,
+  addOneForm,
+  delOneForm,
+});

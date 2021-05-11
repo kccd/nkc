@@ -167,7 +167,7 @@ window.PostOption = new Vue({
     },
     viewAuthorInfo() {
       if(!UserInfo) {
-        UserInfo = new NKC.modules.UserInfo();
+        window.UserInfo = new NKC.modules.UserInfo();
       }
       UserInfo.open({
         type: "showUserByPid",

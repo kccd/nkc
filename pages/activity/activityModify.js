@@ -288,3 +288,16 @@ function sendMessage(acid) {
       screenTopWarning(data.error)
     })
 }
+
+Object.assign(window, {
+  htmlDecode,
+  insertToImage,
+  timeStampCheck,
+  deadlineCheck,
+  savePoster,
+  submitredit,
+  cancelApply,
+  closeActivity,
+  sendMessage,
+  ue
+});

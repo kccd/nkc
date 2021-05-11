@@ -20,3 +20,8 @@ function submit(id) {
 			screenTopWarning(data.error);
 		})
 }
+
+Object.assign(window, {
+	fnString,
+	submit,
+});

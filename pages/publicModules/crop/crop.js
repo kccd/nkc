@@ -142,3 +142,5 @@ moduleCrop.init = function(callback, o) {
     }
   }
 };
+
+window.moduleCrop = moduleCrop;

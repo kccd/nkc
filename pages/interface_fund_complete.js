@@ -368,3 +368,27 @@ function refund(money) {
 function disappearMask(){
 	$('#donation-mask').addClass('hidden');
 }
+
+Object.assign(window, {
+	getThreads,
+	createPageList,
+	displayPageList,
+	createThreadsList,
+	disabledRolling,
+	initThreadsList,
+	displayThreadsList,
+	deleteThread,
+	addThread,
+	displaySelectedThreads,
+	clearLog,
+	submit,
+	submitCompletedAudit,
+	initActualMoney,
+	displayActualMoney,
+	divBlur,
+	addList,
+	deleteList,
+	compute,
+	refund,
+	disappearMask,
+});

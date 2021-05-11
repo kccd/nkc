@@ -147,3 +147,11 @@ window.app = new Vue({
     }
   },
 });
+
+Object.assign(window, {
+  initTime,
+  getResults,
+  reset,
+  getData,
+  display,
+});

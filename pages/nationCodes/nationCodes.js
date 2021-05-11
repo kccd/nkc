@@ -217,3 +217,5 @@ var nationCodes = [
 	{"location":"Saint Kitts and Nevis","chineseName":"圣基茨和尼维斯","abbr":"KN","code":"1869","unitPrice":"0.0947 "},
 	{"location":"Jamaica","chineseName":"牙买加","abbr":"JM","code":"1876","unitPrice":"0.0374 "}
 ];
+
+window.nationCodes = nationCodes;

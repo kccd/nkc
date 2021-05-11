@@ -167,3 +167,17 @@ function init() {
   uploadPhoto('#uploadIdCardHandheld', 'HandheldIdCard');
   uploadPhoto('#uploadLife', 'life');
 }
+
+Object.assign(window, {
+  threads,
+  application,
+  loadThreads,
+  chooseThread,
+  displayThreadList,
+  removeThread,
+  clearThreads,
+  postUpload,
+  uploadPhoto,
+  uploadSuccess,
+  init,
+});

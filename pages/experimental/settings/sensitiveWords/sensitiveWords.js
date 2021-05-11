@@ -252,3 +252,10 @@ var app = new Vue({
     }
   }
 });
+
+Object.assign(window, {
+  keywordSetting,
+  initGroup,
+  wordGroup,
+  app,
+});

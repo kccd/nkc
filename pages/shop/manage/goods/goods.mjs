@@ -1,4 +1,7 @@
 const CommonModal = new NKC.modules.CommonModal();
+
+window.CommonModal = CommonModal;
+
 window.modifyParam = function (productId, paramId) {
   const param = getParam(productId, paramId);
   CommonModal.open(data => {

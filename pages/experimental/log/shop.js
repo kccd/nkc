@@ -37,3 +37,5 @@ var app = new Vue({
     }
   }
 });
+
+window.showOrderInfo = showOrderInfo;

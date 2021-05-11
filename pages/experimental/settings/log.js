@@ -13,3 +13,5 @@ function saveLogSettings(){
 		})
 		.catch(sweetError)
 }
+
+window.saveLogSettings = saveLogSettings;

@@ -32,3 +32,8 @@ function delClassify(storeId, name) {
     screenTopWarning(data || data.error)
   })
 }
+
+Object.assign(window, {
+  addClassify,
+  delClassify,
+});

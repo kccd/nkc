@@ -332,36 +332,63 @@ const forumSchema = new Schema({
     type: Array,
     default: [],
   },
-  // 敏感词检测用于哪部分（仅文章、仅回复或者全部）和下面的审核方案类似
-  keywordReviewPlanUseTo: {
-    type: String,
-    default: "all",
-    match: /^(all|only_thread|only_reply)$/
-  },
-  // 敏感词审核使用的词组
-  keywordReviewUseGroup: {
-    type: [String],
-    default: [],
-  },
-  // 是否本专业所有内容都需要送审
-  // WARNNING: 这个字段改为了 reviewPlan(审核策略)
-  // allContentShouldReview: {
-  //   type: Boolean,
-  //   default: false
-  // },
-  // 审核方案
-  reviewPlan: {
-    type: String,
-    default: "all",
-    match: /^(all|all_no_rule|only_thread|only_reply)$/
-  },
-  // 按角色和等级之间的关系送审
-  roleGradeReview: {
-    roles: Array,
-    grades: Array,
-    relationship: {
-      type: String,
-      match: /^(and|or)$/
+  // 审核设置
+  reviewSettings: {
+    // 内容送审
+    content: {
+      // 范围
+      range: {
+        type: String,
+        match: /^(all|only_thread|only_reply)$/,
+        default: "all"
+      },
+      // 规则
+      rule: {
+        thread: {
+          anyone: { type: Boolean, default: false },
+          roles: { type: [String], default: [] },
+          grades: { type: [Number], default: [] },
+          relationship: {
+            type: String,
+            match: /^(and|or)$/,
+            default: "or"
+          }
+        },
+        reply: {
+          anyone: { type: Boolean, default: false },
+          roles: { type: [String], default: [] },
+          grades: { type: [Number], default: [] },
+          relationship: {
+            type: String,
+            match: /^(and|or)$/,
+            default: "or"
+          }
+        }
+      }
+    },
+    // 敏感词送审
+    keyword: {
+      // 范围
+      range: {
+        type: String,
+        match: /^(all|only_thread|only_reply)$/,
+        default: "all"
+      },
+      // 规则
+      rule: {
+        thread: {
+          useGroups: {
+            type: [String],
+            default: [],
+          }
+        },
+        reply: {
+          useGroups: {
+            type: [String],
+            default: [],
+          }
+        }
+      }
     }
   }
 }, {toObject: {
