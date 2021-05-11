@@ -113,7 +113,7 @@ async function compileJS(filename) {
     name: basename,
     file: output,
     format: "umd",
-    sourcemap: "inline",
+    sourcemap: process.env.NODE_ENV === "production" ? false : "inline",
     compact: false
   });
   await bundle.close();
