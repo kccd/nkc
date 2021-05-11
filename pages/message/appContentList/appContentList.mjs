@@ -1,6 +1,8 @@
 const data = NKC.methods.getDataById('data');
 const audio = new Audio();
 
+window.audio = audio;
+
 window.app = new Vue({
   el: '#app',
   data: {

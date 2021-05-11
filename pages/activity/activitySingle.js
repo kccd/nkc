@@ -148,3 +148,15 @@ function cancelApply(acid) {
 function editApply(acid) {
 
 }
+
+Object.assign(window, {
+  customForm,
+  changeToApply,
+  changeToEdit,
+  changeToDescription,
+  onedit,
+  onpost,
+  submitComment,
+  cancelApply,
+  editApply,
+});

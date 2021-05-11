@@ -238,3 +238,5 @@ var app = new Vue({
     }
   }
 });
+
+window.selectImage = selectImage;

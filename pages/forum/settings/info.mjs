@@ -108,3 +108,9 @@ const app = new Vue({
 		}
 	}
 });
+
+Object.assign(window, {
+	forum,
+	selectImage,
+	app,
+})

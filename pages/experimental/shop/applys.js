@@ -23,3 +23,8 @@ function rejectApply(id) {
     screenTopWarning(data.error || data);
   })
 }
+
+Object.assign(window, {
+  approveApply,
+  rejectApply,
+});

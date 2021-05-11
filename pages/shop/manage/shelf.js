@@ -3,6 +3,7 @@
 */
 
 var ue = UE.getEditor('container', NKC.configs.ueditor.shopConfigs);
+window.ue = ue;
 var testTh;
 if(NKC.modules.MoveThread) {
   testTh = new NKC.modules.MoveThread();
@@ -1210,3 +1211,38 @@ function appAttachHideOrShow() {
     $("#attach").css("display", "block")
   }
 }
+
+Object.assign(window, {
+  testThOpen,
+  initTime,
+  submitToShelf,
+  productToShelf,
+  productToHouse,
+  autoCalcuPrice,
+  openImageManage,
+  IsPC,
+  manageImageLoader,
+  prevPageManage,
+  nextPageManage,
+  insertImageToProduct,
+  deleteImageInProduct,
+  addNewParam,
+  addSingleParam,
+  delSingleParam,
+  getSingleParams,
+  saveNewParam,
+  delParamTable,
+  tableTurnParams,
+  tableTurnMulArray,
+  mulArrExchangeArr,
+  mulArrExchangeStr,
+  getParaGroup,
+  mulArrTurnTable,
+  banParam,
+  enableParam,
+  obtainProductPrice,
+  addAttention,
+  getShopForum,
+  editProductShelf,
+  appAttachHideOrShow,
+});

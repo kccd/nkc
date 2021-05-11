@@ -47,4 +47,11 @@ function deleteQuestion(qid) {
     .catch(function(data) {
       screenTopWarning(data);
     });
-}    
+}   
+
+Object.assign(window, {
+  disabledQuestion,
+  enabledQuestion,
+  auth,
+  deleteQuestion,
+});

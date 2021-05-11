@@ -125,3 +125,9 @@ new Vue({
 // 选择用户组件
 const selectUserModule = new NKC.modules.SelectUser();
 
+
+Object.assign(window, {
+  stepCheckerMap,
+  stepNames,
+  selectUserModule,
+});

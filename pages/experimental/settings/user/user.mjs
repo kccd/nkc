@@ -89,3 +89,8 @@ const app = new Vue({
     }, 500)
   }
 });
+
+Object.assign(window, {
+  usersObj,
+  app,
+});

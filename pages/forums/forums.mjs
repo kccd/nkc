@@ -36,3 +36,8 @@ function unSubscribed(fid) {
   number.text(num? num - 1: num);
 }
 
+Object.assign(window, {
+  subscribed,
+  unSubscribed,
+});
+

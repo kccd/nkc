@@ -209,3 +209,18 @@ function removeLastThreadPanel() {
   if(length === 0) return;
   threadPanel.eq(length - 1).remove();
 }
+
+Object.assign(window, {
+  threadUrlSwitchKey,
+  modifyThreadUrl,
+  getThreadUrlSwitchStatus,
+  setThreadUrlSwitchStatus,
+  joinRoom,
+  connectForumRoom,
+  createTimeoutToUpdateThreadListCount,
+  createClickEventToUpdateThreadListCount,
+  updateThreadListCount,
+  createMouseEvents,
+  setThreadListNewCount,
+  removeLastThreadPanel,
+});

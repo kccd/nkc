@@ -321,3 +321,6 @@ const app = new Vue({
     }
   }
 });
+
+window.modifyAd = modifyAd;
+window.app = app;

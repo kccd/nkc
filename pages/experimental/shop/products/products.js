@@ -13,3 +13,5 @@ function clearBanSale(productId) {
     })
   }
 }
+
+window.clearBanSale = clearBanSale;

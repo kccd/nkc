@@ -102,3 +102,8 @@ const app = new Vue({
     }
   }
 });
+
+Object.assign(window, {
+  selectUser,
+  app,
+});

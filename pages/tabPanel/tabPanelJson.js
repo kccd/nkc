@@ -63,4 +63,6 @@ var panelJson = [
     "name":"顶级板块四",
     "son":[]
   }
-]
+];
+
+window.panelJson = panelJson;

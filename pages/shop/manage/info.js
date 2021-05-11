@@ -2,8 +2,8 @@ var positionObj;
 var hasImg = false;
 var upLoadFile;
 function init() {
-	hasImg = true;
-	positionObj = undefined;
+	window.hasImg = true;
+	window.positionObj = undefined;
 }
 
 $(document).ready(function() {
@@ -19,7 +19,7 @@ $(document).ready(function() {
 $('#inputFile').on('change', function() {
 	var file = $('#inputFile')[0].files[0];
 	if(file) {
-		upLoadFile = file;
+		window.upLoadFile = file;
 	}
 	var reader = new FileReader();
 	reader.onload = function() {
@@ -93,3 +93,10 @@ function saveToInfo(uid) {
     screenTopWarning(data || data.error);
   })
 }
+
+Object.assign(window, {
+	init,
+	displayAvatar,
+	submit,
+	saveToInfo,
+})

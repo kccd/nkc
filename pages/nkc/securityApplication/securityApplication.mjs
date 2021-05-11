@@ -44,3 +44,5 @@ const app = new Vue({
     floatUserPanel.initPanel();
   }
 })
+
+window.app = app;

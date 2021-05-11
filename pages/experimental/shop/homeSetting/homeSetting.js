@@ -84,3 +84,12 @@ function delPopular(productId) {
     screenTopWarning(data || data.error);
   })
 }
+
+Object.assign(window, {
+  addFeatured,
+  delFeatured,
+  test,
+  addRecommendation,
+  addPopular,
+  delPopular,
+});

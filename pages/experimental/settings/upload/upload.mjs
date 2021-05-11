@@ -1,5 +1,3 @@
-const { forEachTransformDependencies } = require("mathjs");
-
 var data = NKC.methods.getDataById("data");
 const {extensionLimit} = data.uploadSettings;
 extensionLimit._defaultWhitelist = extensionLimit.defaultWhitelist.join(', ');
@@ -159,3 +157,9 @@ function isOverlap(a, b) {
   if(a.end <= b.start || a.start >= b.end) return false;
   return true;
 }
+
+Object.assign(window, {
+  extensionLimit,
+  verifyVideoVBRControlConfig,
+  isOverlap,
+});

@@ -21,7 +21,7 @@ function submitBase() {
 			screenTopWarning(data.error || data);
 		})
 }
-
+window.submitBase = submitBase;
 
 var app = new Vue({
   el: "#app",

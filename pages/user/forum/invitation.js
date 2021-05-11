@@ -43,3 +43,9 @@ new Vue({
     }
   }
 });
+
+Object.assign(window, {
+  dataEl,
+  data,
+  pfid,
+});

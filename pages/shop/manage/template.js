@@ -1,7 +1,7 @@
 var app;
 var dealInfo = JSON.parse($("#dealInfo").text());
 
-app = new Vue({
+window.app = new Vue({
   el: "#app",
   data: {
     templates: dealInfo.templates,

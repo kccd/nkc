@@ -13,3 +13,5 @@ function removeResourceFromLibrary(rid) {
         })
     }).catch(function(){})
 }
+
+window.removeResourceFromLibrary = removeResourceFromLibrary;

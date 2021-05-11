@@ -208,3 +208,13 @@ function next() {
   NKC.methods.visitUrl('/shop/bill?cartsId=' + arr.join('-'));
 }
 
+Object.assign(window, {
+  selectAll,
+  getNumber,
+  changeCount,
+  computePrice,
+  deleteCart,
+  showButton,
+  next,
+});
+

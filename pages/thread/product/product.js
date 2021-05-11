@@ -37,3 +37,10 @@ function hideKeywords() {
   $("#showWords").css("display", "")
   $("#hideWords").css("display", "none")
 }
+
+Object.assign(window, {
+  showAbstract,
+  hideAbstract,
+  showKeywords,
+  hideKeywords,
+});

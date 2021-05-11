@@ -60,3 +60,10 @@ function submit(name){
 			})
 	});
 }
+
+Object.assign(window, {
+	targetUid,
+	displayInput,
+	disappearInput,
+	submit,
+});

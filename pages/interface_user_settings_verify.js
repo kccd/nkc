@@ -38,3 +38,9 @@ function unSubmitAuth(uid, number) {
 			screenTopWarning(data.error);
 		})
 }
+
+Object.assign(window, {
+	initEvent,
+	submitAuth,
+	unSubmitAuth,
+});

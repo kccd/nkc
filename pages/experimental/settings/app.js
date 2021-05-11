@@ -229,3 +229,11 @@ var app = new Vue({
   }
 });
 */
+
+Object.assign(window, {
+  logs,
+  CommonModal,
+  setStable,
+  setDisabled,
+  edit,
+});

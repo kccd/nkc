@@ -16,3 +16,8 @@ function deleteFund(name, money, id){
 function openToEditFundManage(url) {
   openToNewLocation(url);
 }
+
+Object.assign(window, {
+  deleteFund,
+  openToEditFundManage,
+});

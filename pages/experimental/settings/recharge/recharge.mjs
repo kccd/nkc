@@ -129,3 +129,8 @@ function getHMS(t) {
 function HMSToNumber(t) {
   return t.hour * 60 * 60 * 1000 + t.min * 60 * 1000 + t.sec * 1000;
 }
+
+Object.assign(window, {
+  getHMS,
+  HMSToNumber
+});

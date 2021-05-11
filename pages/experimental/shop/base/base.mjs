@@ -17,3 +17,5 @@ const appBase = new Vue({
   }
 });
 
+window.appBase = appBase;
+

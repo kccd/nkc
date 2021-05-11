@@ -82,3 +82,5 @@ gallery.init().then(function(){
   gallery.start()
   gallery.click()
 })
+
+window.gallery = gallery;

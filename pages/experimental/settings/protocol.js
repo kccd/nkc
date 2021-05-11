@@ -96,3 +96,12 @@ function getProtocol() {
   }
   return post;
 }
+
+Object.assign(window, {
+  test,
+  addProtocol,
+  turnProtocolUpdate,
+  updateProtocol,
+  deleteProtocol,
+  getProtocol,
+});

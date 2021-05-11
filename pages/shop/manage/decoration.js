@@ -3,7 +3,7 @@ var hasImage = false;
 $('#uploadSignModal').on('change', function() {
 	var file = $('#uploadSignModal')[0].files[0];
 	if(file) {
-		upLoadFile = file;
+		window.upLoadFile = file;
 	}
 	var reader = new FileReader();
 	reader.onload = function() {
@@ -58,10 +58,6 @@ function saveStoreSign(storeId) {
 function editStoreNavigation() {
 
 }
-
-/**
- * 
- */
 
 /**
  * 编辑客服中心
@@ -371,3 +367,25 @@ function saveStoreClassify(storeId) {
   // window.location.href = '/shop/manage/'+storeId+'/decoration';
   openToNewLocation('/shop/manage/'+storeId+'/decoration')
 }
+
+Object.assign(window, {
+  editStoreSign,
+  saveStoreSign,
+  editStoreNavigation,
+  editStoreService,
+  saveStoreService,
+  editStoreSearch,
+  saveStoreSearch,
+  editStoreClassfy,
+  editStoreFeatured,
+  addStoreFeatured,
+  delStoreFeatured,
+  saveStoreFeatured,
+  editStoreClassPick,
+  addStoreClass,
+  delStoreClass,
+  editSingleClassify,
+  addSingleClassify,
+  delSingleClassify,
+  saveStoreClassify,
+});

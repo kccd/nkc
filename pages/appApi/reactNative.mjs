@@ -67,7 +67,7 @@ function urlPathEval(fromUrl, toUrl) {
   let fullFromUrl = new URL(fromUrl, location.origin);
   return new URL(toUrl, fullFromUrl).href;
 }
-
+window.urlPathEval = urlPathEval;
 
 
 document.addEventListener('click', (e)  => {

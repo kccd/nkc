@@ -1,5 +1,3 @@
-var cs;
-
 var app = new Vue({
   el: '#app',
   data: {

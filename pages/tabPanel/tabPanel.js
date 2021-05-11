@@ -466,3 +466,19 @@ if(demoQuery && demoQuery.type == "forum" && demoQuery.id){
         }
     }
 }
+
+Object.assign(window, {
+    panelArr,
+    panelProto,
+    openPanel,
+    clickTags,
+    clickContent,
+    outChooseTags,
+    findNextJson,
+    flatten,
+    getFloorArr,
+    getItemByDataId,
+    IsPC,
+    editTag,
+    demoQuery,
+});

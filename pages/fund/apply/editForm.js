@@ -363,7 +363,7 @@ var app = new Vue({
 });
 
 
-appButton = new Vue({
+window.appButton = new Vue({
   el: "#app_button",
   data: {
     step: Number(data.step),
@@ -388,3 +388,9 @@ appButton = new Vue({
     },
   }
 });
+
+
+Object.assign(window, {
+  ue,
+  app
+})

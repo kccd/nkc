@@ -126,3 +126,15 @@ function subscribeColumn(columnId) {
     })
     .catch(sweetError);
 }
+
+Object.assign(window, {
+  bodyBackgroundColor,
+  CommonModal,
+  SubscribeTypes,
+  showSetDom,
+  showShareDom,
+  saveSettings,
+  openNewWindow,
+  pushToHome,
+  subscribeColumn,
+});

@@ -146,3 +146,5 @@ moduleToColumn.init = function(callback) {
     moduleToColumn.app.hide();
   };
 };
+
+window.moduleToColumn = moduleToColumn;

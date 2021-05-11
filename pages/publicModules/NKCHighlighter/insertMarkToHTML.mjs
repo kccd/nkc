@@ -102,3 +102,9 @@ function getNotes(parent, offset, length) {
 }
 
 insertMarkToHTML(html, notes);
+
+Object.assign(window, {
+  notes,
+  insertMarkToHTML,
+  getNotes,
+});

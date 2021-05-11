@@ -48,3 +48,6 @@ var app = new Vue({
     }
   }
 });
+
+window.phoneVerify = phoneVerify;
+window.app = app;

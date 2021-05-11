@@ -68,3 +68,8 @@ var moduleComplaint = new Vue({
 function complaint(type, id) {
 
 }
+
+Object.assign(window, {
+  moduleComplaint,
+  complaint,
+});

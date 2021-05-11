@@ -233,8 +233,6 @@ function set_selection(the_id,start_pos,end_pos)
 }
 
 var replyTarget = ga('replytarget','value');
-var screenTopAlert = screenTopAlert;
-
 
 function cartThread(tid){
 	nkcAPI('addThreadToCart',{tid:tid})
@@ -868,12 +866,14 @@ function htmlDecode(text){
 function displayManagement() {
 	$('.managementDiv').slideToggle();
 }
+window.displayManagement = displayManagement;
 var threadContent = $('.thread-content');
 var hiddenThreadContent = $('.hiddenThreadContent');
 var maxHeight = threadContent.css('max-height');
 var showThreadContentBtn = $('.showThreadContentBtn');
 var showText = showThreadContentBtn.text();
 var hideText = showThreadContentBtn.attr('hide-text');
+
 function showThreadContent() {
 	if(hiddenThreadContent.css('display') === 'none') {
 		hiddenThreadContent.show();
@@ -889,6 +889,7 @@ function showThreadContent() {
 $(".dropdown-menu.stop-propagation").on("click",function (e) {
 	e.stopPropagation();
 });
+
 function removeForumsId(tid, fid) {
   nkcAPI('/t/' + tid + '/forum?fid=' + fid, 'DELETE', {})
   .then(function() {
@@ -1345,4 +1346,70 @@ ue.ready(function() {
 			$("#ButtonReply").click();
     }
 	})
+});
+
+
+Object.assign(window, {
+	addToColumn,
+	removeToColumn,
+	get_selection,
+	replace_selection,
+	set_selection,
+	cartThread,
+	cartPost,
+	setDigest,
+	cancelDigest,
+	setTopped,
+	cancelTopped,
+	assemblePostObject,
+	modifyMathJax,
+	getPost,
+	autoSaveDraft,
+	saveDraft,
+	setSubmitButton,
+	submit,
+	quotePost,
+	dateTimeString,
+	at,
+	goEditor,
+	extractfid,
+	moveThreadTo,
+	askCategoryOfForum,
+	recycleThread,
+	widerArea,
+	switchVInPersonalForum,
+	moveToPersonalForum,
+	switchDInPersonalForum,
+	switchTInPersonalForum,
+	adSwitch,
+	htmlDecode,
+	displayManagement,
+	showThreadContent,
+	removeForumsId,
+	addForum,
+	originTextShow,
+	originTextClose,
+	originPanelShow,
+	originPanelClose,
+	turnUser,
+	turnSearch,
+	getSelectedColumnCategoriesId,
+	disabledPostButtonByProtocol,
+	topPost,
+	showAttachments,
+	displayAuthor,
+	pushGoodsToHome,
+	moveThread,
+	deleteThread,
+	openHidePostPanel,
+	getPostsDom,
+	resetCheckbox,
+	markAllPosts,
+	managePosts,
+	getMarkedPostsId,
+	disabledThreadPost,
+	disabledMarkedPosts,
+	joinPostRoom,
+	insertRenderedPost,
+	insertRenderedComment
 });
