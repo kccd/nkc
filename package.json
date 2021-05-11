@@ -12,6 +12,7 @@
     "watch-node": "nodemon --ignore pages/ --ignore dist/ --delay 1000ms server.js",
     "watch-pages": "concurrently -p \"[{name}]\" -n \"css,js,assets\" -c \"green,cyan,blue\" \"gulp watch:css\" \"gulp watch:js\" \"gulp watch:assets\"",
     "build-pages": "gulp compile:css && gulp compile:js && gulp copy:assets",
+    "build-pages-p": "cross-env NODE_ENV=production npm run build-pages",
     "clear": "rimraf dist"
   },
   "repository": {

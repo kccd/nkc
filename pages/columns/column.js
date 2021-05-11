@@ -145,4 +145,5 @@ Object.assign(window, {
   openNewWindow,
   pushToHome,
   subscribeColumn,
+  toppedColumn
 });
