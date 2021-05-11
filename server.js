@@ -66,7 +66,6 @@ const start = async () => {
       const socket = require('./socket/index');
       await socket(server);
       require('./timedTask');
-      require('./watch.js');
     }
 
     process.on('message', function(msg) {
