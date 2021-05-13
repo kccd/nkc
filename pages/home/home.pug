@@ -1,7 +1,6 @@
 extends ../bootstrap_base
 block title
   include ../publicModules/web_header
-  +includeCSS("/swiper/dist/css/swiper.css")
   +includeCSS("/home/home.css")
 
 block content
@@ -164,7 +163,6 @@ block footer
 block scripts
   if state.isApp && data.t === "latest"
     script!=`NKC.configs.swipeLeft = true;`
-  +includeJS("/swiper/dist/js/swiper.js")
   +includeJS("/home/home.js")
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatForumPanel/floatForumPanel
