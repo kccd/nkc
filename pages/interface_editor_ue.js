@@ -130,10 +130,10 @@ function saveDraft() {
 * */
 var postData = NKC.methods.getDataById("postData");
 var targetPost = postData.targetPost;
-var ColumnCategoriesDom;
-var anonymousData;
-var SurveyEdit;
-var SelectUser;
+window.ColumnCategoriesDom = undefined;
+window.anonymousData = undefined;
+window.SurveyEdit = undefined;
+window.SelectUser = undefined;
 $(function() {
   if(NKC.modules.SelectColumnCategories) {
     window.ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();

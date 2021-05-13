@@ -1,6 +1,6 @@
-var customForm;
+window.customForm = undefined;
 if(NKC.modules.customForm) {
-  customForm = new NKC.modules.customForm();
+  window.customForm = new NKC.modules.customForm();
 }
 
 $("document").ready(function() {

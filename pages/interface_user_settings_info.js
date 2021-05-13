@@ -26,10 +26,10 @@ function getFocus(a){
     $(a).css('border-color','')
   })
 }
-var selectImage;
+window.selectImage = undefined;
 $(function() {
   if(NKC.methods.selectImage) {
-    selectImage = new NKC.methods.selectImage
+    window.selectImage = new NKC.methods.selectImage
   }
 });
 

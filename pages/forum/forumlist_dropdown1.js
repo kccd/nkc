@@ -1,5 +1,5 @@
 var selectedArr = [];
-var cat;
+window.cat = undefined;
 var dropdownDiv1 = $('#dropdownDiv1');
 var data = JSON.parse($('#forumListData1').text());
 var forumList = data.forumList;

@@ -1,4 +1,4 @@
-var testTh;
+window.testTh = undefined;
 if(NKC.modules.MoveThread) {
   window.testTh = new NKC.modules.MoveThread();
 }

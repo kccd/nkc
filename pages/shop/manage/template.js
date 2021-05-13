@@ -1,4 +1,4 @@
-var app;
+window.app = undefined;
 var dealInfo = JSON.parse($("#dealInfo").text());
 
 window.app = new Vue({

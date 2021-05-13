@@ -1,5 +1,5 @@
 // 定义最后光标对象
-var lastEditRange;
+window.lastEditRange = undefined;
 function geid(id){return document.getElementById(id);}
 function gv(id){return geid(id).value;}
 function ga(id,attr){return geid(id).getAttribute(attr);}
@@ -12,7 +12,6 @@ Object.assign(window, { geid, gv, ga, hset, display })
 if (!HTMLCanvasElement.prototype.toBlob) {
   Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
     value: function (callback, type, quality) {
-
       var binStr = atob( this.toDataURL(type, quality).split(',')[1] ),
         len = binStr.length,
         arr = new Uint8Array(len);

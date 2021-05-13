@@ -1,14 +1,15 @@
-var checkbox;
-var checkboxBody;
-var SubscribeTypes;
+window.checkbox = undefined;
+window.checkboxBody = undefined;
+window.SubscribeTypes = undefined;
 $(function() {
-  checkbox = $(".post-checkbox input[type='checkbox']");
-  checkboxBody = $(".post-checkbox label");
+  window.checkbox = $(".post-checkbox input[type='checkbox']");
+  window.checkboxBody = $(".post-checkbox label");
   if(window.moduleToColumn) {
     moduleToColumn.init();
   }
-  if(!window.SubscribeTypes && NKC.modules.SubscribeTypes)
-    SubscribeTypes = new NKC.modules.SubscribeTypes();
+  if(!window.SubscribeTypes && NKC.modules.SubscribeTypes) {
+    window.SubscribeTypes = new NKC.modules.SubscribeTypes();
+  }
 });
 function managementPosts() {
   var btn = $("a.button[onclick='managementPosts()']");

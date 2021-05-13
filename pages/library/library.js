@@ -1,4 +1,4 @@
-var ResourceInfo;
+window.ResourceInfo = undefined;
 $(function() {
   window.ResourceInfo = new NKC.modules.ResourceInfo();
 });

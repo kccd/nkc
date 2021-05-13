@@ -14,15 +14,12 @@
 *   forumDeclare: 编辑专业说明的草稿
 *
 * */
-/*var editor;
-var CommonModal;
-var PostInfo, PostButton, PostToColumn, PostSurvey, ForumSelector;*/
 window.PostToColumn = undefined;
 // 标志：编辑器是否已初始化
 var EditorReady = false;
-var data;
+window.data = undefined;
 $(function() {
-  data = NKC.methods.getDataById("data");
+  window.data = NKC.methods.getDataById("data");
   window.editor = UE.getEditor("content", NKC.configs.ueditor.editorConfigs);
   editor.methods = {};
   editor.addListener( 'ready', function( statu ) {

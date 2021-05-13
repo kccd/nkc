@@ -14,7 +14,7 @@ var swiper = new Swiper('.swiper-container', {
   },
 });
 
-var SubscribeTypes;
+window.SubscribeTypes = undefined;
 $(function() {
   if(!window.SubscribeTypes && NKC.modules.SubscribeTypes)
     window.SubscribeTypes = new NKC.modules.SubscribeTypes();

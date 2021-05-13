@@ -1,5 +1,5 @@
 var hasImg = false;
-var upLoadFile;
+window.upLoadFile = undefined;
 function init() {
 	hasImg = true;
 }

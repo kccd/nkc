@@ -1,4 +1,4 @@
-var app;
+window.app = undefined;
 $(function() {
 	window.app = new Vue({
 		el: '#app',

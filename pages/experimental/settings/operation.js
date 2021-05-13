@@ -1,5 +1,5 @@
 var data = $('#data').text();
-var types;
+window.types = undefined;
 if(data) {
 	data = JSON.parse(data);
 	window.types = data.types;

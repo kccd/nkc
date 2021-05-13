@@ -1,3 +1,5 @@
+import Sortable from "sortablejs";
+
 var data = NKC.methods.getDataById('data');
 
 var categoryTree = data.categoryTree;
@@ -285,3 +287,16 @@ function insertCategory(category) {
   categoryArr.push(category);
   categoryObj[category._id] = category;
 }
+
+Object.assign(window, {
+  getChildren,
+  mainCategoryOnEnd,
+  optionControl,
+  removeCategory,
+  minorCategoryOnEnd,
+  CommonModel,
+  createCategory,
+  putCategories,
+  editCategory,
+  insertCategory,
+});

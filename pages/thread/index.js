@@ -1,8 +1,6 @@
 var SubscribeTypes, surveyForms = [], draftId = "", author = {};
-var hidePostMaxHeight;
-var hidePostFloat;
-var Attachments;
-var quotePostApp;
+window.Attachments = undefined;
+window.quotePostApp = undefined;
 $(document).ready(function(){
   new Promise(function(resolve, reject) {
   	if(NKC.configs.isApp) {
@@ -1007,10 +1005,10 @@ function turnSearch(text) {
 }
 
 
-var ColumnCategoriesDom;
+window.ColumnCategoriesDom = undefined;
 $(function() {
   if(NKC.modules.SelectColumnCategories) {
-    ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
+    window.ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
   }
   var proDom = $("#protocolCheckbox");
   proDom.on("change", function() {
@@ -1059,26 +1057,9 @@ function topPost(pid, topped) {
     });
 }
 
-/*function showAttachments(dom) {
-	dom = $(dom);
-	var fa = dom.find(".icon");
-	if(fa.hasClass("fa-angle-double-down")) {
-		if(!window.Attachments) {
-			Attachments = new NKC.modules.Attachments({
-				pid: NKC.configs.pid,
-				fid: NKC.configs.fid
-			});
-		}
-		Attachments.show();
-		fa.removeClass("fa-angle-double-down").addClass("fa-angle-double-up");
-	} else {
-		Attachments.hidden();
-		fa.removeClass("fa-angle-double-up").addClass("fa-angle-double-down");
-	}
-}*/
 function showAttachments() {
 	if(!window.Attachments) {
-		Attachments = new NKC.modules.Attachments({
+		window.Attachments = new NKC.modules.Attachments({
 			pid: NKC.configs.pid,
 			fid: NKC.configs.fid
 		});

@@ -1,4 +1,4 @@
-var SubscribeTypes;
+window.SubscribeTypes = undefined;
 var initComplexOptions = !!localStorage.getItem("search_complexOptions");
 
 var app = new Vue({
@@ -161,7 +161,7 @@ var app = new Vue({
   }
 });
 
-var ResourceInfo;
+window.ResourceInfo = undefined;
 
 $(function() {
   window.ResourceInfo = new NKC.modules.ResourceInfo();

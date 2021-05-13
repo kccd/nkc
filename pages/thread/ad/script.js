@@ -1,5 +1,5 @@
 var data = NKC.methods.getDataById("data");
-var SelectImage;
+window.SelectImage = undefined;
 var app = new Vue({
   el: "#app",
   data: {

@@ -1,11 +1,11 @@
-var cidArr;
-var disciplineArr;
-var topicArr;
-var app;
-var forumList;
-var isThroughForum;
-var historyFid = "";
-var forumTypeEditor;
+window.cidArr = undefined;
+window.disciplineArr = undefined;
+window.topicArr = undefined;
+window.app = undefined;
+window.forumList = undefined;
+window.isThroughForum = undefined;
+window.historyFid = "";
+window.forumTypeEditor = undefined;
 
 $(document).ready(function() {
   window.isThroughForum = getSearchKV();

@@ -1,4 +1,4 @@
-var SubscribeTypes;
+window.SubscribeTypes = undefined;
 var data = NKC.methods.getDataById("data");
 var app = new Vue({
   el: "#subscribe",
@@ -35,7 +35,7 @@ var app = new Vue({
     $("body").show();
     this.getData();
     this.getTypes();
-    SubscribeTypes = new NKC.modules.SubscribeTypes();
+    window.SubscribeTypes = new NKC.modules.SubscribeTypes();
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,

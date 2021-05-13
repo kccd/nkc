@@ -1,4 +1,4 @@
-var SubscribeTypes;
+window.SubscribeTypes = undefined;
 var app = new Vue({
   el: "#app",
   data: {

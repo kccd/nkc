@@ -147,7 +147,7 @@ $("#searchInput").keydown(function (e) {//当按下按键时
 		searchUser();
 	}
 });
-var ModifyAccountInfo;
+window.ModifyAccountInfo = undefined;
 $(function() {
   window.ModifyAccountInfo = new NKC.modules.ModifyAccountInfo();
 });

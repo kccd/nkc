@@ -11,7 +11,7 @@ var payMethod = '';
 var timeToAutoSave = 5*60; // 秒
 
 //申请表id
-var applicationFormId;
+window.applicationFormId = undefined;
 $(function() {
 	init();
 	initTeam();
@@ -19,7 +19,7 @@ $(function() {
 	initFundPay();
 	objString = $('#applicationFormId').text();
 	obj = JSON.parse(objString);
-	applicationFormId = parseInt(obj.id);
+	window.applicationFormId = parseInt(obj.id);
 	s = parseInt(obj.s);
 	// autoSaveProject(applicationFormId);
 	initBudgetMoney();
@@ -33,7 +33,7 @@ var selectedThreads = [];
 // 临时存放加载的帖子
 var tempThreads = [];
 //禁止滚动
-var fixedFn;
+window.fixedFn = undefined;
 //生活照
 var lifePhotos = [];
 function init() {
@@ -657,7 +657,7 @@ function compute() {
 function displayPopupPanel() {
 	$('.popupPanel').removeClass('disabled');
 	var scrollTop = $(window).scrollTop();
-	fixedFn = disabledRolling;
+	window.fixedFn = disabledRolling;
 	$('html, body').css('overflow', 'hidden');
 	$(window).scroll(function() {
 		fixedFn(scrollTop);
@@ -690,7 +690,7 @@ function createLifePhotosHtml(arr) {
 function disappearPopupPanel() {
 	$('.popupPanel').addClass('disabled');
 	$('html, body').css('overflow', 'auto');
-	fixedFn = function(){};
+	window.fixedFn = function(){};
 }
 
 // 生成帖子列表html字符串

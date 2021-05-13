@@ -1,6 +1,6 @@
-var positionObj;
-var hasImg = false;
-var upLoadFile;
+window.positionObj = undefined;
+window.hasImg = false;
+window.upLoadFile = undefined;
 function init() {
 	window.hasImg = true;
 	window.positionObj = undefined;

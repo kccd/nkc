@@ -2,7 +2,6 @@ var realUrl = "";
 localStorage.setItem("apptype", "app");
 var allLinks = document.querySelectorAll("a");
 var allButtons = document.querySelectorAll("button");
-var imgDownTimeOut;
 // 禁止点击连接执行跳转
 Array.prototype.forEach.call(allLinks, function(link) {
   link.addEventListener("click", function(e) {
@@ -28,15 +27,6 @@ apiready = function() {
   // 为所有图片添加点击事件
   var allImgs = document.querySelectorAll("img");
   Array.prototype.forEach.call(allImgs, function(img) {
-    // img.addEventListener("touchstart", function() {
-    //   imgDownTimeOut = setTimeout("imageToApiDownload('"+this.src+"')", 1000)
-    // })
-    // img.addEventListener("touchmove", function() {
-    //   clearTimeout(imgDownTimeOut);
-    // })
-    // img.addEventListener("touchend", function() {
-    //   clearTimeout(imgDownTimeOut)
-    // })
     img.addEventListener("click", function() {
       if(this.getAttribute("dataimg") && this.getAttribute("dataimg") == "content") {
         if(this.src && this.src.indexOf("/r/") > -1) {

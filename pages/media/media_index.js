@@ -11,12 +11,12 @@ moduleCrop.init(function(data) {
 
 var quota = 12; // 每页显示数量
 var skip = 0; // 当前页数
-var media;
+window.media = undefined;
 var j = 0;
 const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 const videoExts = ["mp4", "mov", "3gp", "avi"];
 const audioExts = ["mp3", "wav"];
-var isPc;
+window.isPc = undefined;
 $(document).ready(function() {
   window.isPc = IsPC();
   window.media = new Vue({

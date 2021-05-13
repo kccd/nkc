@@ -1,4 +1,4 @@
-var upLoadFile;
+window.upLoadFile = undefined;
 var hasImage = false;
 $('#uploadSignModal').on('change', function() {
 	var file = $('#uploadSignModal')[0].files[0];
