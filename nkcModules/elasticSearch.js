@@ -3,14 +3,12 @@ const func = {};
 func.UserModel = {};
 func.PostModel = {};
 
-const esConfig = require("../config/elasticSearch");
-const ES = require("elasticsearch");
+const elasticSearch = require('../settings/elasticSearch');
+const client = elasticSearch();
 
-const {address, port, analyzer, searchAnalyzer, indexName} = esConfig;
-const client = new ES.Client({
-  node: address + ":" + port,
-  requestTimeout: 90000
-});
+const esConfig = require("../config/elasticSearch");
+
+const {analyzer, searchAnalyzer, indexName} = esConfig;
 
 func.client = client;
 

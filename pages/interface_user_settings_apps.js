@@ -202,6 +202,7 @@ Object.assign(window, {
   hideButton,
   yesPayForWater,
   noPayForWater,
+  turnImg,
   saveAppInfo,
   app,
 });

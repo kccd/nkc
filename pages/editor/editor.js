@@ -14,7 +14,14 @@
 *   forumDeclare: 编辑专业说明的草稿
 *
 * */
+
+window.editor = undefined;
+window.PostInfo = undefined;
+window.PostButton = undefined;
 window.PostToColumn = undefined;
+window.PostSurvey = undefined;
+window.ForumSelector = undefined;
+window.CommonModal = undefined;
 // 标志：编辑器是否已初始化
 var EditorReady = false;
 window.data = undefined;

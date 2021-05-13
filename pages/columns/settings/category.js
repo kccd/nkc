@@ -289,14 +289,14 @@ function insertCategory(category) {
 }
 
 Object.assign(window, {
-  getChildren,
   mainCategoryOnEnd,
   optionControl,
-  removeCategory,
-  minorCategoryOnEnd,
-  CommonModel,
-  createCategory,
-  putCategories,
   editCategory,
+  removeCategory,
   insertCategory,
-});
+  putCategories,
+  createCategory,
+  minorCategoryOnEnd,
+  getChildren,
+  CommonModel
+})
