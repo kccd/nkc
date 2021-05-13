@@ -121,4 +121,12 @@ function newMessageRemind(name) {
 }
 
 
-window.socket = socket;
+Object.assign(window, {
+  pageName,
+  query,
+  addSocketStatusChangedEvent,
+  getNewMessageNumber,
+  setNewMessageNumber,
+  newMessageRemind,
+  socket
+});
