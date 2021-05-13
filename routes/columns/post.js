@@ -56,9 +56,12 @@ router
           });
           continue;
         }
-        const post = await db.PostModel.findOne({pid, uid: column.uid});
-        if(!post || post.uid !== user.uid) continue;
-        const thread = await db.ThreadModel.findOne({tid: post.tid});
+        // const post = await db.PostModel.findOne({pid, uid: column.uid});
+        // if(!post || post.uid !== user.uid) continue;
+
+        await db.ColumnPostModel.addColumnPosts(column, mainCategoriesId, minorCategoriesId, [pid]);
+
+        /*const thread = await db.ThreadModel.findOne({tid: post.tid});
         columnPost = db.ColumnPostModel({
           _id: await db.SettingModel.operateSystemID("columnPosts", 1),
           tid: thread.tid,
@@ -70,7 +73,7 @@ router
           cid: mainCategoriesId,
           mcid: minorCategoriesId,
         });
-        await columnPost.save();
+        await columnPost.save();*/
       }
     } else if(type === "removeColumnPostById") { // 通过ID删除专栏内容
       for(const _id of postsId) {

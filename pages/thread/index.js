@@ -129,10 +129,12 @@ $(document).ready(function(){
 function addToColumn(pid, columnId) {
   moduleToColumn.show(function(data) {
     var columnId = data.columnId;
-    var categoriesId = data.categoriesId;
+    var mainCategoriesId = data.mainCategoriesId;
+    var minorCategoriesId = data.minorCategoriesId;
     nkcAPI("/m/" + columnId + "/post", "POST", {
       type: "addToColumn",
-      categoriesId: categoriesId,
+      mainCategoriesId,
+      minorCategoriesId,
       postsId: [pid]
     })
       .then(function() {
