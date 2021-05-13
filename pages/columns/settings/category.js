@@ -285,3 +285,15 @@ function insertCategory(category) {
   categoryArr.push(category);
   categoryObj[category._id] = category;
 }
+
+Object.assign(window, {
+  mainCategoryOnEnd,
+  optionControl,
+  editCategory,
+  removeCategory,
+  insertCategory,
+  putCategories,
+  createCategory,
+  minorCategoryOnEnd,
+  getChildren
+})

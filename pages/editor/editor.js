@@ -17,7 +17,13 @@
 /*var editor;
 var CommonModal;
 var PostInfo, PostButton, PostToColumn, PostSurvey, ForumSelector;*/
+window.editor = undefined;
+window.PostInfo = undefined;
+window.PostButton = undefined;
 window.PostToColumn = undefined;
+window.PostSurvey = undefined;
+window.ForumSelector = undefined;
+window.CommonModal = undefined;
 // 标志：编辑器是否已初始化
 var EditorReady = false;
 var data;
