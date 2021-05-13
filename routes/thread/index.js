@@ -177,6 +177,7 @@ threadRouter
 		// 验证权限 - new
 		// 如果是分享出去的连接，含有token，则允许直接访问
     // 【待改】判断用户是否是通过分享链接阅读文章，如果是则越过权限
+    await db.SettingModel.restrictAccess(thread.toc, data.userRoles.map(role => role._id), data.userGrade._id);
 		if(!token){
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		}else{
@@ -619,11 +620,12 @@ threadRouter
 		data.collected = false;
 		data.subscribed = false;
 		if(data.user) {
-			const collection = await db.SubscribeModel.findOne({uid: data.user.uid, tid, type: "collection"});
+			const collection = await db.SubscribeModel.findOne({cancel: false, uid: data.user.uid, tid, type: "collection"});
 			if(collection) {
 				data.collected = true;
 			}
 			const sub = await db.SubscribeModel.findOne({
+        cancel: false,
         type: "thread",
         tid,
         uid: data.user.uid
@@ -794,7 +796,7 @@ threadRouter
     ) {
       ctx.throw(403, `当前回复不允许评论`);
     }
-		const {columnCategoriesId = [], anonymous = false, did} = post;
+		const {columnMainCategoriesId = [], columnMinorCategoriesId = [], anonymous = false, did} = post;
     if(post.t && post.t.length > 100) ctx.throw(400, `标题不能超过100个字`);
     const content = customCheerio.load(post.c).text();
     if(content.length < 2) ctx.throw(400, `内容不能少于2个字`);
@@ -837,8 +839,8 @@ threadRouter
     data.blacklistUsersId = await db.BlacklistModel.getBlacklistUsersId(data.user.uid);
 
 		// 转发到专栏
-    if(columnCategoriesId.length > 0 && state.userColumn) {
-      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnCategoriesId, [data.thread.oc]);
+    if(columnMainCategoriesId.length > 0 && state.userColumn) {
+      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnMainCategoriesId, columnMinorCategoriesId, [data.thread.oc]);
     }
 
     // 发表匿名内容

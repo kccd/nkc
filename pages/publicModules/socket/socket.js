@@ -119,3 +119,14 @@ function newMessageRemind(name) {
   var number = getNewMessageNumber();
   setNewMessageNumber(number+1);
 }
+
+
+Object.assign(window, {
+  pageName,
+  query,
+  addSocketStatusChangedEvent,
+  getNewMessageNumber,
+  setNewMessageNumber,
+  newMessageRemind,
+  socket
+});

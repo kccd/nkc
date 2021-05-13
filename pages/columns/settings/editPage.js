@@ -1,9 +1,9 @@
-var data;
-var pageEditor;
+window.data = undefined;
+window.pageEditor = undefined;
 $(function() {
-  data = NKC.methods.getDataById("data");
+  window.data = NKC.methods.getDataById("data");
 
-  pageEditor = UE.getEditor("pageContent", NKC.configs.ueditor.columnPageConfigs);
+  window.pageEditor = UE.getEditor("pageContent", NKC.configs.ueditor.columnPageConfigs);
 
   if(data.page) {
     $("#title").val(data.page.t);
@@ -40,3 +40,4 @@ function save() {
 
 
 }
+window.save = save;

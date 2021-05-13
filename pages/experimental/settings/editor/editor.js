@@ -1,1 +1,18 @@
-!function o(u,s,c){function f(e,t){if(!s[e]){if(!u[e]){var r="function"==typeof require&&require;if(!t&&r)return r(e,!0);if(a)return a(e,!0);var n=new Error("Cannot find module '"+e+"'");throw n.code="MODULE_NOT_FOUND",n}var i=s[e]={exports:{}};u[e][0].call(i.exports,function(t){return f(u[e][1][t]||t)},i,i.exports,o,u,s,c)}return s[e].exports}for(var a="function"==typeof require&&require,t=0;t<c.length;t++)f(c[t]);return f}({1:[function(t,e,r){"use strict";var n=NKC.methods.getDataById("data");new Vue({el:"#app",data:{editorSettings:n.editorSettings},methods:{submit:function(){nkcAPI("/e/settings/editor","PUT",{editorSettings:this.editorSettings}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById("data");
+const app = new Vue({
+  el: "#app",
+  data: {
+    editorSettings: data.editorSettings
+  },
+  methods: {
+    submit() {
+      nkcAPI("/e/settings/editor", "PUT", {
+        editorSettings: this.editorSettings
+      })
+      .then(() => {
+        sweetSuccess("保存成功");
+      })
+      .catch(sweetError);
+    }
+  }
+});

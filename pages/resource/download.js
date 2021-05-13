@@ -1,1 +1,41 @@
-!function c(a,i,d){function u(t,e){if(!i[t]){if(!a[t]){var r="function"==typeof require&&require;if(!e&&r)return r(t,!0);if(f)return f(t,!0);var o=new Error("Cannot find module '"+t+"'");throw o.code="MODULE_NOT_FOUND",o}var n=i[t]={exports:{}};a[t][0].call(n.exports,function(e){return u(a[t][1][e]||e)},n,n.exports,c,a,i,d)}return i[t].exports}for(var f="function"==typeof require&&require,e=0;e<d.length;e++)u(d[e]);return u}({1:[function(e,t,r){"use strict";var o=!1;window.payForDownloadResource=function(e){var t=document.createElement("a");o?t.href="/r/".concat(e,"?d=attachment&random=").concat(Math.random()):(t.href="/r/".concat(e,"?c=download&random=").concat(Math.random()),t.setAttributeNode(document.createAttribute("download")),o=!0),t.click(),$(".resource-scores").remove(),$(".error-code").remove(),$(".resource-downloaded-tip").show(),$(".download-button").text("重新下载")},window.previewPDFResource=function(e){var t=document.createElement("a");o?(t.href=NKC.methods.tools.getUrl("pdf",e),t.setAttribute("target","_blank"),t.click()):(t.href="/r/".concat(e,"?c=preview_pdf&random=").concat(Math.random()),t.setAttribute("target","_blank"),t.click(),o=!0)},window.closePage=function(){"reactNative"===NKC.configs.platform?NKC.methods.appClosePage():window.close()}},{}]},{},[1]);
+let opened = false;
+// 支付积分并下载
+window.payForDownloadResource = function(rid) {
+  let a = document.createElement("a");
+  if(opened) {
+    a.href = `/r/${rid}?d=attachment&random=${Math.random()}`;
+  }else {
+    a.href = `/r/${rid}?c=download&random=${Math.random()}`;
+    a.setAttributeNode(document.createAttribute("download"));
+    opened = true;
+  }
+  // console.log(`访问: ${a.href}`);
+  a.click();
+  $(".resource-scores").remove();
+  $(".error-code").remove();
+  $(".resource-downloaded-tip").show();
+  $(".download-button").text("重新下载");
+}
+
+// 预览PDF
+window.previewPDFResource = function(rid) {
+  let a = document.createElement("a");
+  if(!opened) {
+    a.href = `/r/${rid}?c=preview_pdf&random=${Math.random()}`;
+    a.setAttribute("target", "_blank");
+    a.click();
+    opened = true;
+  } else {
+    a.href = NKC.methods.tools.getUrl('pdf', rid);
+    a.setAttribute("target", "_blank");
+    a.click();
+  }
+  // console.log(`访问: ${a.href}`);
+}
+window.closePage = function() {
+  if(NKC.configs.platform === 'reactNative') {
+    NKC.methods.appClosePage();
+  } else {
+    window.close();
+  }
+}

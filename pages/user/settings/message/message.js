@@ -10,3 +10,4 @@ function removeFromBlackList(uid) {
       screenTopWarning(data);
     })
 }
+window.removeFromBlackList = removeFromBlackList;

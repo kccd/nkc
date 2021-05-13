@@ -1,1 +1,40 @@
-!function r(c,u,a){function d(o,e){if(!u[o]){if(!c[o]){var n="function"==typeof require&&require;if(!e&&n)return n(o,!0);if(s)return s(o,!0);var t=new Error("Cannot find module '"+o+"'");throw t.code="MODULE_NOT_FOUND",t}var i=u[o]={exports:{}};c[o][0].call(i.exports,function(e){return d(c[o][1][e]||e)},i,i.exports,r,c,u,a)}return u[o].exports}for(var s="function"==typeof require&&require,e=0;e<a.length;e++)d(a[e]);return d}({1:[function(e,o,n){"use strict";NKC.modules.HidePost=function(){return function e(){!function(e,o){if(!(e instanceof o))throw new TypeError("Cannot call a class as a function")}(this,e);var i=this;i.dom=$("#moduleHidePost"),i.dom.modal({show:!1}),i.app=new Vue({el:"#moduleHidePostApp",data:{pid:"",hide:""},methods:{open:function(e,o){i.callback=e;var n=o.pid,t=o.hide;this.pid=n,this.hide=t,i.dom.modal("show")},close:function(){i.dom.modal("hide")},submit:function(){nkcAPI("/p/".concat(this.pid,"/hide"),"PUT",{hide:this.hide}).then(function(){i.callback(),i.app.close()}).catch(sweetError)}}}),i.open=i.app.open,i.close=i.app.close}}()},{}]},{},[1]);
+NKC.modules.HidePost = class {
+  constructor() {
+    const self = this;
+    self.dom = $("#moduleHidePost"); 
+    self.dom.modal({
+      show: false
+    });
+    self.app = new Vue({
+      el: "#moduleHidePostApp",
+      data: {
+        pid: "",
+        hide: ""        
+      },
+      methods: {
+        open(callback, options) {
+          self.callback = callback;
+          const {pid, hide} = options;
+          this.pid = pid;
+          this.hide = hide;
+          self.dom.modal("show");
+        },
+        close() {
+          self.dom.modal("hide");
+        },
+        submit() {
+          nkcAPI(`/p/${this.pid}/hide`, "PUT", {
+            hide: this.hide
+          })
+            .then(() => {
+              self.callback();
+              self.app.close();
+            })
+            .catch(sweetError);
+        }
+      }
+    });
+    self.open = self.app.open;
+    self.close = self.app.close;
+  }
+}

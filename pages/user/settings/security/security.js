@@ -443,3 +443,18 @@ var mobileApp = new Vue({
     }
   }
 });
+
+Object.assign(window, {
+  submitPassword,
+  nationCode,
+  chooseCountryNum,
+  changeNumber,
+  email,
+  sendBindEmail,
+  verifyOldEmail,
+  sendNewEmail,
+  displayChangeDiv,
+  data,
+  app,
+  mobileApp,
+});

@@ -1,1 +1,46 @@
-!function i(u,f,s){function a(r,t){if(!f[r]){if(!u[r]){var e="function"==typeof require&&require;if(!t&&e)return e(r,!0);if(c)return c(r,!0);var o=new Error("Cannot find module '"+r+"'");throw o.code="MODULE_NOT_FOUND",o}var n=f[r]={exports:{}};u[r][0].call(n.exports,function(t){return a(u[r][1][t]||t)},n,n.exports,i,u,f,s)}return f[r].exports}for(var c="function"==typeof require&&require,t=0;t<s.length;t++)a(s[t]);return a}({1:[function(t,r,e){"use strict";var o=NKC.methods.getDataById("data"),n=new NKC.modules.MoveThread;new Vue({el:"#app",data:{forum:o.forum,targetForum:null,submitting:!1},methods:{selectForum:function(){var r=this;n.open(function(t){r.targetForum=t.originForums[0],n.close()},{hideMoveType:!0,forumCountLimit:1})},submit:function(){var t=this;t.submitting=!0,Promise.resolve().then(function(){if(!t.targetForum)throw"请选择目标专业";return nkcAPI("/f/".concat(t.forum.fid,"/settings/merge"),"PUT",{targetForumId:t.targetForum.fid})}).then(function(){sweetSuccess("合并成功，正在前往目标专业..."),NKC.methods.visitUrl("/f/".concat(t.targetForum.fid),!1)}).catch(sweetError).finally(function(){t.submitting=!1})}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const moveThread = new NKC.modules.MoveThread();
+const app = new Vue({
+  el: '#app',
+  data: {
+    forum: data.forum,
+    targetForum: null,
+    submitting: false
+  },
+  methods: {
+    selectForum() {
+      const self = this;
+      moveThread.open(data => {
+        self.targetForum = data.originForums[0];
+        moveThread.close();
+      }, {
+        hideMoveType: true,
+        forumCountLimit: 1,
+      })
+    },
+    submit() {
+      const self = this;
+      self.submitting = true;
+      Promise.resolve()
+        .then(() => {
+          if(!self.targetForum) {
+            throw '请选择目标专业';
+          }
+          return nkcAPI(`/f/${self.forum.fid}/settings/merge`, 'PUT', {targetForumId: self.targetForum.fid});
+        })
+        .then(() => {
+          sweetSuccess('合并成功，正在前往目标专业...');
+          NKC.methods.visitUrl(`/f/${self.targetForum.fid}`, false);
+        })
+        .catch(sweetError)
+        .finally(() => {
+          self.submitting = false;
+        })
+    }
+  }
+})
+
+Object.assign(window, {
+  moveThread,
+  app,
+});

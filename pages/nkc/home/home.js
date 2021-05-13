@@ -1,1 +1,372 @@
-!function i(s,a,c){function d(o,e){if(!a[o]){if(!s[o]){var t="function"==typeof require&&require;if(!e&&t)return t(o,!0);if(u)return u(o,!0);var n=new Error("Cannot find module '"+o+"'");throw n.code="MODULE_NOT_FOUND",n}var r=a[o]={exports:{}};s[o][0].call(r.exports,function(e){return d(s[o][1][e]||e)},r,r.exports,i,s,a,c)}return a[o].exports}for(var u="function"==typeof require&&require,e=0;e<c.length;e++)d(c[e]);return d}({1:[function(e,o,t){"use strict";for(var n=NKC.methods.getDataById("data"),r=function(e,o){e.type=o},i=0;i<n.ads.movable.length;i++){r(n.ads.movable[i],"movable")}for(var s=0;s<n.ads.fixed.length;s++){r(n.ads.fixed[s],"fixed")}new Vue({el:"#app",data:{page:{id:"other",name:"其他"},recommendThreads:n.recommendThreads,ads:n.ads,recommendForums:n.recommendForums,columns:n.columns,goods:n.goods,toppedThreads:n.toppedThreads,latestToppedThreads:n.latestToppedThreads,showShopGoods:n.showGoods?"t":"",originalThreadDisplayMode:n.originalThreadDisplayMode,showActivityEnter:n.showActivityEnter?"show":"hidden",updating:!1,columnListPosition:n.columnListPosition,columnCount:n.columnCount},mounted:function(){window.SelectImage=new NKC.methods.selectImage,window.MoveThread=new NKC.modules.MoveThread},computed:{selectedRecommendForumsId:function(){return n.recommendForums.map(function(e){return e.fid})},nav:function(){var o=this.page,e=[{id:"other",name:"其他"},{id:"movable",name:"轮播图"},{id:"fixed",name:"固定图"}];return e.map(function(e){e.active=e.id===o.id}),e},threadCount:function(){var e=this.recommendThreads[this.page.id],o=e.automaticProportion,t=e.count,n=Math.round(t*o/(o+1));return{automaticCount:n,manualCount:t-n}}},methods:{checkString:NKC.methods.checkData.checkString,checkNumber:NKC.methods.checkData.checkNumber,getUrl:NKC.methods.tools.getUrl,floatUserInfo:NKC.methods.tools.floatUserInfo,visitUrl:NKC.methods.visitUrl,removeFromArr:function(e,o){e.splice(o,1)},moveFromArr:function(e,o,t){var n,r,i,s=e.length;0===o&&"left"===t||o+1===s&&"right"===t||(n="left"===t?o-1:o+1,r=e[o],i=e[n],Vue.set(e,o,i),Vue.set(e,n,r))},getRecommendTypeName:function(e){return{movable:"轮播图",fixed:"固定图"}[e]},selectPage:function(e){this.page=e},saveRecommendThreads:function(){var e=this.page,o=this.recommendThreads[e.id];nkcAPI("/nkc/home","PUT",{operation:"saveRecommendThreads",type:e.id,options:o}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)},updateThreadList:function(){var e=this.page;this.updating=!0;var o=e.id,t=this;nkcAPI("/nkc/home","PUT",{operation:"updateThreadList",type:o}).then(function(e){t.recommendThreads[o].automaticallySelectedThreads=e.automaticallySelectedThreads,Vue.set(t.saveRecommendThreads),sweetSuccess("更新成功"),t.updating=!1}).catch(function(e){t.updating=!1})},selectLocalFile:function(t){var e={};"movable"===t.type?e.aspectRatio=800/336:e.aspectRatio=400/253,SelectImage.show(function(e){var o=new FormData;o.append("cover",e),o.append("topType",t.type),o.append("tid",t.tid),nkcUploadFile("/nkc/home","POST",o).then(function(e){t.cover=e.coverHash,console.log(t.cover)}).catch(sweetError),SelectImage.close()},e)},move:function(e,o){var t,n,r="movable"===e.type?this.ads.movable:this.ads.fixed,i=r.indexOf(e);"left"===o&&0===i||"right"===o&&i+1===r.length||(n=r[t="left"===o?i-1:i+1],r.splice(i,1,n),r.splice(t,1,e))},saveAds:function(){var e=this.ads,o=e.movable,t=e.fixed,n=e.movableOrder,r=e.fixedOrder,i=this;Promise.resolve().then(function(){return o.concat(t).map(function(e){if(i.checkString(e.title,{name:"标题",minLength:1,maxLength:200}),!e.cover)throw"封面图不能为空";if(!e.tid)throw"文章ID不能为空"}),nkcAPI("/nkc/home","PUT",{operation:"saveAds",movable:o,fixed:t,movableOrder:n,fixedOrder:r})}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)},remove:function(e,o){e.splice(o,1)},addForum:function(){var o=this;MoveThread.open(function(e){e.originForums.map(function(e){o.selectedRecommendForumsId.includes(e.fid)||o.recommendForums.push(e)}),MoveThread.close()},{hideMoveType:!0})},moveForum:function(e,o,t){var n,r,i=e.indexOf(o);"left"===t&&0===i||"right"===t&&i+1===e.length||(r=e[n="left"===t?i-1:i+1],e.splice(i,1,r),e.splice(n,1,o))},removeForum:function(e,o){e.splice(o,1)},saveRecommendForums:function(){var e=this.recommendForums.map(function(e){return e.fid});nkcAPI("/nkc/home","PUT",{operation:"saveRecommendForums",forumsId:e}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)},saveColumns:function(){var e=this.columns.map(function(e){return e._id});nkcAPI("/nkc/home","PUT",{operation:"saveColumns",columnsId:e,columnListPosition:this.columnListPosition,columnCount:this.columnCount}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)},saveGoods:function(){var e=this.goods.map(function(e){return e.productId}),o=!!this.showShopGoods;nkcAPI("/nkc/home","PUT",{operation:"saveGoods",goodsId:e,showShopGoods:o}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)},saveToppedThreads:function(){var e=this.toppedThreads.map(function(e){return e.tid}),o=this.latestToppedThreads.map(function(e){return e.tid});nkcAPI("/nkc/home","PUT",{operation:"saveToppedThreads",toppedThreadsId:e,latestToppedThreadsId:o}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)},saveOriginalThreadDisplayMode:function(){var e=this.originalThreadDisplayMode;nkcAPI("/nkc/home","PUT",{operation:"saveOriginalThreadDisplayMode",originalThreadDisplayMode:e}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)},saveShowActivityEnter:function(){var e="show"===this.showActivityEnter;nkcAPI("/nkc/home/showActivityEnter","PUT",{showActivityEnter:e}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById("data");
+const modifyAd = (ad, type) => {
+  ad.type = type;
+};
+
+for(let i = 0; i < data.ads.movable.length; i++) {
+  const ad = data.ads.movable[i];
+  modifyAd(ad, "movable");
+}
+
+for(let i = 0; i < data.ads.fixed.length; i++) {
+  const ad = data.ads.fixed[i];
+  modifyAd(ad, "fixed");
+}
+
+const app = new Vue({
+  el: "#app",
+  data: {
+    page: {id: 'other', name: '其他'},
+    recommendThreads: data.recommendThreads,
+    ads: data.ads,
+    recommendForums: data.recommendForums,
+    columns: data.columns,
+    poolColumns: data.poolColumns,
+    toppedColumns: data.toppedColumns,
+    goods: data.goods,
+    toppedThreads: data.toppedThreads,
+    latestToppedThreads: data.latestToppedThreads,
+    showShopGoods: (data.showGoods? "t": ""),
+    // 首页“最新原创”文章条目显示模式，为空就默认为简略显示
+    originalThreadDisplayMode: data.originalThreadDisplayMode,
+    // 是否在首页显示“活动”入口
+    showActivityEnter: data.showActivityEnter ? "show" : "hidden",
+    updating: false,
+    columnUpdating: false,
+    columnListPosition: data.columnListPosition,
+    columnCount: data.columnCount,
+    columnListSort: data.columnListSort,
+    columnPool: data.columnPool
+  },
+  mounted() {
+    window.SelectImage = new NKC.methods.selectImage();
+    window.MoveThread = new NKC.modules.MoveThread();
+    // this.selectPage(this.nav[3]);
+  },
+  computed: {
+    selectedRecommendForumsId() {
+      return data.recommendForums.map(f => f.fid);
+    },
+    nav() {
+      const {page} = this;
+      const arr = [
+        {
+          id: 'other',
+          name: '其他'
+        },
+        {
+          id: 'movable',
+          name: '轮播图'
+        },
+        {
+          id: 'fixed',
+          name: '固定图'
+        },
+        {
+          id: 'hotColumn',
+          name: '热门专栏'
+        },
+        {
+          id: 'toppedColumn',
+          name: '置顶专栏'
+        }
+      ];
+      arr.map(a => {
+        a.active = a.id === page.id;
+      });
+      return arr;
+    },
+    threadCount() {
+      const {automaticProportion, count} = this.recommendThreads[this.page.id];
+      const automaticCount = Math.round(count * automaticProportion / (automaticProportion + 1));
+      return {
+        automaticCount,
+        manualCount: count - automaticCount
+      };
+    }
+  },
+  methods: {
+    checkString: NKC.methods.checkData.checkString,
+    checkNumber: NKC.methods.checkData.checkNumber,
+    getUrl: NKC.methods.tools.getUrl,
+    floatUserInfo: NKC.methods.tools.floatUserInfo,
+    visitUrl: NKC.methods.visitUrl,
+    fromNow: NKC.methods.tools.fromNow,
+    removeFromArr(arr, index) {
+      arr.splice(index, 1);
+    },
+    moveFromArr(arr, index, type) {
+      const count = arr.length;
+      if(index === 0 && type === 'left') return;
+      if(index + 1 === count && type === 'right') return;
+      let _index;
+      if(type === 'left') {
+        _index = index - 1;
+      } else {
+        _index = index + 1;
+      }
+      const item = arr[index];
+      const _item = arr[_index];
+      Vue.set(arr, index, _item);
+      Vue.set(arr, _index, item);
+    },
+    getRecommendTypeName(id) {
+      return {
+        movable: '轮播图',
+        fixed: '固定图'
+      }[id]
+    },
+    selectPage(page) {
+      this.page = page;
+    },
+    saveRecommendThreads() {
+      const {page} = this;
+      const options = this.recommendThreads[page.id];
+      nkcAPI(`/nkc/home`, 'PUT', {
+        operation: 'saveRecommendThreads',
+        type: page.id,
+        options
+      })
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
+        .catch(sweetError);
+    },
+    updateThreadList() {
+      const {page} = this;
+      this.updating = true;
+      const pageId = page.id;
+      const self = this;
+      nkcAPI('/nkc/home', 'PUT', {
+        operation: 'updateThreadList',
+        type: pageId
+      })
+        .then(data => {
+          self.recommendThreads[pageId].automaticallySelectedThreads = data.automaticallySelectedThreads;
+          Vue.set(self.saveRecommendThreads);
+          sweetSuccess('更新成功');
+          self.updating = false;
+        })
+        .catch(err => {
+          sweetError(err);
+          self.updating = false;
+        });
+    },
+    updateHomeHotColumns() {
+      const self = this;
+      this.columnUpdating = true;
+      nkcAPI('/nkc/home', 'PUT', {
+        operation: 'updateHomeHotColumns',
+      })
+        .then(data => {
+          self.poolColumns = data.poolColumns;
+          this.columnUpdating = false;
+        })
+        .catch(err => {
+          sweetError(err);
+          this.columnUpdating = false;
+        })
+    },
+    selectLocalFile(ad) {
+      const options = {};
+      if(ad.type === "movable") {
+        options.aspectRatio = 800/336;
+      } else {
+        options.aspectRatio = 400/253;
+      }
+      SelectImage.show(data => {
+        const formData = new FormData();
+        formData.append("cover", data);
+        formData.append("topType", ad.type);
+        formData.append("tid", ad.tid);
+        nkcUploadFile("/nkc/home", "POST", formData)
+          .then(data => {
+            ad.cover = data.coverHash;
+            console.log(ad.cover);
+          })
+          .catch(sweetError);
+        SelectImage.close();
+      }, options);
+    },
+    move(ad, type) {
+      let ads;
+      if(ad.type === "movable") {
+        ads = this.ads.movable;
+      } else {
+        ads = this.ads.fixed;
+      }
+      const index = ads.indexOf(ad);
+      if((type === "left" && index === 0) || (type === "right" && index+1 === ads.length)) return;
+      let newIndex;
+      if(type === "left") {
+        newIndex = index - 1;
+      } else {
+        newIndex = index + 1;
+      }
+      const otherAd = ads[newIndex];
+      ads.splice(index, 1, otherAd);
+      ads.splice(newIndex, 1, ad);
+    },
+    saveAds(){
+      const {movable, fixed, movableOrder, fixedOrder} = this.ads;
+      const self = this;
+      Promise.resolve()
+        .then(() => {
+          movable.concat(fixed).map(ad => {
+            self.checkString(ad.title, {
+              name: "标题",
+              minLength: 1,
+              maxLength: 200
+            });
+            if(!ad.cover) throw "封面图不能为空";
+            if(!ad.tid) throw "文章ID不能为空";
+          });
+          return nkcAPI("/nkc/home", "PUT", {
+            operation: "saveAds",
+            movable,
+            fixed,
+            movableOrder,
+            fixedOrder
+          });
+        })
+        .then(() => {
+          sweetSuccess("保存成功");
+        })
+        .catch(sweetError);
+    },
+    remove(ads, index){
+      ads.splice(index, 1)
+      /*sweetQuestion("确定要执行删除操作？")
+        .then(() => {
+          ads.splice(index, 1)
+        })
+        .catch(() => {})*/
+
+    },
+    addForum() {
+      const self = this;
+      MoveThread.open(data => {
+        const {originForums} = data;
+        originForums.map(forum => {
+          if(!self.selectedRecommendForumsId.includes(forum.fid)) {
+            self.recommendForums.push(forum)
+          }
+        });
+        MoveThread.close();
+      }, {
+        hideMoveType: true
+      })
+    },
+    moveForum(arr, f, type) {
+      const index = arr.indexOf(f);
+      if((type === "left" && index === 0) || (type === "right" && index+1 === arr.length)) return;
+      let newIndex;
+      if(type === "left") {
+        newIndex = index - 1;
+      } else {
+        newIndex = index + 1;
+      }
+      const otherAd = arr[newIndex];
+      arr.splice(index, 1, otherAd);
+      arr.splice(newIndex, 1, f);
+    },
+    removeForum(arr, index) {
+      arr.splice(index, 1);
+      /*const self = this;
+      sweetQuestion("确定要执行删除操作？")
+        .then(() => {
+          arr.splice(index, 1);
+        })
+        .catch(() => {})*/
+    },
+    saveRecommendForums() {
+      const forumsId = this.recommendForums.map(forum => forum.fid);
+      nkcAPI("/nkc/home", "PUT", {
+        operation: "saveRecommendForums",
+        forumsId
+      })
+        .then(function() {
+          sweetSuccess("保存成功");
+        })
+        .catch(sweetError);
+    },
+    saveColumns(){
+      const columnsId = this.columns.map(c => c._id);
+      const poolColumnsId = this.poolColumns.map(c => c._id);
+      nkcAPI("/nkc/home", "PUT", {
+        operation: "saveColumns",
+        columnsId,
+        columnListPosition: this.columnListPosition,
+        columnCount: this.columnCount,
+        columnPool: this.columnPool,
+        columnListSort: this.columnListSort,
+        poolColumnsId: poolColumnsId,
+      })
+        .then(() => {
+          sweetSuccess("保存成功");
+        })
+        .catch(sweetError);
+    },
+    saveToppedColumns() {
+      const columnsId = this.toppedColumns.map(c => c._id);
+      nkcAPI('/nkc/home', 'PUT', {
+        operation: 'saveToppedColumns',
+        columnsId,
+      })
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
+        .catch(sweetError);
+    },
+    saveGoods() {
+      const goodsId = this.goods.map(g => g.productId);
+      const showShopGoods = !!this.showShopGoods;
+      nkcAPI("/nkc/home", "PUT", {
+        operation: "saveGoods",
+        goodsId,
+        showShopGoods
+      })
+        .then(() => {
+          sweetSuccess("保存成功");
+        })
+        .catch(sweetError);
+    },
+    saveToppedThreads() {
+      const toppedThreadsId = this.toppedThreads.map(t => t.tid);
+      const latestToppedThreadsId = this.latestToppedThreads.map(t => t.tid);
+      nkcAPI("/nkc/home", "PUT", {
+        operation: "saveToppedThreads",
+        toppedThreadsId,
+        latestToppedThreadsId
+      })
+        .then(() => {
+          sweetSuccess("保存成功");
+        })
+        .catch(sweetError)
+    },
+    saveOriginalThreadDisplayMode() {
+      const originalThreadDisplayMode = this.originalThreadDisplayMode;
+      nkcAPI("/nkc/home", "PUT", {
+        operation: "saveOriginalThreadDisplayMode",
+        originalThreadDisplayMode
+      })
+        .then(() => {
+          sweetSuccess("保存成功");
+        })
+        .catch(sweetError)
+    },
+    saveShowActivityEnter() {
+      let value = this.showActivityEnter === "show";
+      nkcAPI("/nkc/home/showActivityEnter", "PUT", {
+        showActivityEnter: value
+      })
+      .then(() => {
+        sweetSuccess("保存成功");
+      })
+      .catch(sweetError)
+    }
+  }
+});
+
+window.modifyAd = modifyAd;
+window.app = app;

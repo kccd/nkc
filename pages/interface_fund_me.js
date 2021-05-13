@@ -12,3 +12,5 @@ function removeApplicationForm(aid) {
 			})
 	}
 }
+
+window.removeApplicationForm = removeApplicationForm;

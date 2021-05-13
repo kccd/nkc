@@ -119,3 +119,12 @@ function getLogs() {
       sweetError(data);
     })
 }
+
+Object.assign(window, {
+  initTime,
+  getResults,
+  reset,
+  getData,
+  display,
+  getLogs,
+});

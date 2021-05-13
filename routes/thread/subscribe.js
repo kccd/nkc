@@ -11,6 +11,7 @@ router
     const q = {
       type: "thread",
       tid,
+      cancel: false,
       uid: user.uid
     };
     let sub = await db.SubscribeModel.findOne(q);
@@ -24,6 +25,7 @@ router
       await user.ensureSubLimit("thread");
       q.detail = "sub";
       q.cid = cid;
+      q.cancel = false;
       q._id = await db.SettingModel.operateSystemID("subscribes", 1);
       await db.SubscribeModel(q).save();
       await db.SubscribeModel.saveUserSubThreadsId(user.uid);
@@ -37,13 +39,15 @@ router
     const {user} = data;
     const sub = await db.SubscribeModel.findOne({
       type: "thread",
+      cancel: false,
       tid,
       uid: user.uid
     });
     let cid = [];
     if(sub) {
       cid = sub.cid;
-      await sub.deleteOne();
+      await sub.cancelSubscribe();
+      // await sub.deleteOne();
       await db.SubscribeTypeModel.updateCount(cid);
       await db.SubscribeModel.saveUserSubThreadsId(user.uid);
     }

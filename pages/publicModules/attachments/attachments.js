@@ -1,1 +1,94 @@
-!function i(a,s,c){function u(e,t){if(!s[e]){if(!a[e]){var n="function"==typeof require&&require;if(!t&&n)return n(e,!0);if(f)return f(e,!0);var r=new Error("Cannot find module '"+e+"'");throw r.code="MODULE_NOT_FOUND",r}var o=s[e]={exports:{}};a[e][0].call(o.exports,function(t){return u(a[e][1][t]||t)},o,o.exports,i,a,s,c)}return s[e].exports}for(var f="function"==typeof require&&require,t=0;t<c.length;t++)u(c[t]);return u}({1:[function(t,e,n){"use strict";function r(t,e){for(var n=0;n<e.length;n++){var r=e[n];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(t,r.key,r)}}NKC.modules.Attachments=function(){function o(t){!function(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}(this,o);var e=this,n=t.pid,r=t.fid;if(!n)return sweetError("附件模块初始化失败，id不能为空");this.app=new Vue({el:"#moduleAttachments",data:{pid:n,fid:r,loaded:!1,mark:!1,hidden:!1,createFilePermission:!1,attachments:[]},mounted:function(){this.getAttachments(),window.ResourceInfo||(NKC.modules.ResourceInfo?window.ResourceInfo=new NKC.modules.ResourceInfo:sweetError("未引入资源信息模块"))},computed:{selectedAttachmentCount:function(){var e=0;return this.attachments.map(function(t){t.mark&&e++}),e}},methods:{getUrl:NKC.methods.tools.getUrl,getSize:NKC.methods.tools.getSize,visitUrl:NKC.methods.visitUrl,format:NKC.methods.format,displayResourceInfo:function(t){ResourceInfo.open({rid:t.rid})},postToLibrary:function(){var t=this.attachments,e=[];t.map(function(t){t.mark&&e.push(t.rid)}),0!==e.length&&(e=e.join("-"),this.visitUrl("/f/".concat(r,"/library?t=upload&id=").concat(e),!0))},markAttachment:function(t){this.attachments.map(function(t){return t.mark=!1}),this.mark=!!t},markAll:function(){var t=this.attachments,e=0;this.attachments.map(function(t){t.mark&&e++});var n=t.length!==e;this.attachments.map(function(t){return t.mark=n})},getAttachments:function(){this.request().then(function(t){e.app.createFilePermission=t.createFilePermission,t.resources.map(function(t){t.mark=!1}),e.app.attachments=t.resources,e.app.loaded=!0}).catch(function(t){sweetError(t)})},request:function(){var t=this.pid;return nkcAPI("/p/".concat(t,"/resources?d=attachment"),"GET")}}})}var t,e,n;return t=o,(e=[{key:"hide",value:function(){this.app.hidden=!0}},{key:"show",value:function(){this.app.hidden=!1}}])&&r(t.prototype,e),n&&r(t,n),o}()},{}]},{},[1]);
+NKC.modules.Attachments = class {
+  constructor(options) {
+    const self = this;
+    const {pid, fid} = options;
+    if(!pid) return sweetError("附件模块初始化失败，id不能为空");
+    this.app = new Vue({
+      el: "#moduleAttachments",
+      data: {
+        pid, // post ID
+        fid, // 存在文库的专业ID，可能为空。为空时不允许推送到文库
+        loaded: false, // 是否已经加载完成
+        mark: false, // 多选
+        hidden: false,
+        createFilePermission: false, // 是否有权限上传文件到文库
+        attachments: []
+      },
+      mounted() {
+        this.getAttachments();
+        if(!window.ResourceInfo) {
+          if(!NKC.modules.ResourceInfo) {
+            sweetError("未引入资源信息模块");
+          } else {
+            window.ResourceInfo = new NKC.modules.ResourceInfo();
+          }
+        }
+      },
+      computed: {
+        selectedAttachmentCount() {
+          let count = 0;
+          this.attachments.map(a => {
+            if(a.mark) count ++;
+          });
+          return count;
+        }
+      },
+      methods: {
+        getUrl: NKC.methods.tools.getUrl,
+        getSize: NKC.methods.tools.getSize,
+        visitUrl: NKC.methods.visitUrl,
+        format: NKC.methods.format,
+        displayResourceInfo(r) {
+          ResourceInfo.open({rid: r.rid});
+        },
+        postToLibrary() {
+          const {attachments} = this;
+          let rid = [];
+          attachments.map(a => {
+            if(a.mark) rid.push(a.rid);
+          });
+          if(rid.length === 0) return;
+          rid = rid.join("-");
+          this.visitUrl(`/f/${fid}/library?t=upload&id=${rid}`, true);
+        },
+        markAttachment(mark) {
+          this.attachments.map(a => a.mark = false);
+          this.mark = !!mark;
+        },
+        markAll() {
+          const {attachments} = this;
+          let markCount = 0;
+          this.attachments.map(a => {
+            if(a.mark) markCount++;
+          });
+          const mark = attachments.length !== markCount;
+          this.attachments.map(a => a.mark = mark)
+        },
+        getAttachments() {
+          this.request()
+            .then(data => {
+              self.app.createFilePermission = data.createFilePermission;
+              data.resources.map(r => {
+                r.mark = false;
+              });
+              self.app.attachments = data.resources;
+              self.app.loaded = true;
+            })
+            .catch(err => {
+              sweetError(err);
+            })
+        },
+        request() {
+          const {pid} = this;
+          return nkcAPI(`/p/${pid}/resources?d=attachment`, "GET");
+        }
+      }
+    });
+  }
+  hide() {
+    this.app.hidden = true;
+  }
+  show() {
+    this.app.hidden = false;
+  }
+};

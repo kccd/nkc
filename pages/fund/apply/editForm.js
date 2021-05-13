@@ -1,6 +1,6 @@
 
-var ue;
-var appButton;
+window.ue = undefined;
+window.appButton = undefined;
 var data = NKC.methods.getDataById("data");
 var selectedMembers = [];
 
@@ -56,7 +56,7 @@ var app = new Vue({
   },
   mounted: function() {
     if(document.getElementById("project")) {
-      ue = UE.getEditor("project", NKC.configs.ueditor.fundConfigs);
+      window.ue = UE.getEditor("project", NKC.configs.ueditor.fundConfigs);
       ue.ready(function() {
         ue.setContent(app.form.project.c || "");
       });
@@ -363,7 +363,7 @@ var app = new Vue({
 });
 
 
-appButton = new Vue({
+window.appButton = new Vue({
   el: "#app_button",
   data: {
     step: Number(data.step),
@@ -388,3 +388,9 @@ appButton = new Vue({
     },
   }
 });
+
+
+Object.assign(window, {
+  ue,
+  app
+})

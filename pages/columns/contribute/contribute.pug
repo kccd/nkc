@@ -1,8 +1,12 @@
 extends ../columnBase
 block columnTitle
   title 投稿
+  style.
+    body{
+        background-color: #fff;
+    }
 block content
-  #data.hidden=objToStr({user: data.user, column: data.column, categories: data.categories})
+  #data.hidden=objToStr({user: data.user, column: data.column, mainCategories: data.mainCategories, minorCategories: data.minorCategories})
   .container-fluid.max-width#app(v-cloak)
     .row
       .col-xs-12.col-md-8.col-md-offset-2(v-if="succeed")
@@ -93,12 +97,21 @@ block content
               .form-group.m-t-2
                 h5
                   b 选择文章分类
-                div
-                  .checkbox(v-for="c in categories")
-                    label
-                      span(v-for="index in c.level") &nbsp;&nbsp;&nbsp;&nbsp;
-                      input(type="checkbox" :value="c._id" v-model="categoriesId")
-                      span {{c.name}}
+                .row
+                  .col-xs-12.col-md-6
+                    strong.category-type 主分类
+                    .checkbox(v-for="c in mainCategories")
+                      label
+                        span(v-for="index in c.level") &nbsp;&nbsp;&nbsp;&nbsp;
+                        input(type="checkbox" :value="c._id" v-model="mainCategoriesId")
+                        span {{c.name}}
+                  .col-xs-12.col-md-6
+                    strong.category-type 辅分类
+                    .checkbox(v-for="c in minorCategories")
+                      label
+                        span(v-for="index in c.level") &nbsp;&nbsp;&nbsp;&nbsp;
+                        input(type="checkbox" :value="c._id" v-model="minorCategoriesId")
+                        span {{c.name}}
               .form-group
                 h5
                   b 补充说明（选填）

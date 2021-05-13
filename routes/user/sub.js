@@ -9,7 +9,8 @@ router
     if(uid !== user.uid) ctx.throw(403, "权限不足");
     const q = {
       type: "thread",
-      uid: user.uid
+      uid: user.uid,
+      cancel: false
     };
     const count = await db.SubscribeModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);

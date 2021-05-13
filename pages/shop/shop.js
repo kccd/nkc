@@ -1,18 +1,18 @@
-var totalPrice;
-var isFreePost;
-var firstFreightPrice; // 首重运费
-var addFreightPrice; // 增加运费
+window.totalPrice = undefined;
+window.isFreePost = undefined;
+window.firstFreightPrice = undefined; // 首重运费
+window.addFreightPrice = undefined; // 增加运费
 $(document).ready(function() {
-  isFreePost = $("#isFreePost").val();
+  window.isFreePost = $("#isFreePost").val();
   if(isFreePost == "freePost") {
 
   }else{
     // firstFreightPrice = $("#freightPrice").text();
-    // addFreightPrice = $("#addFreightPrice").text();
-    firstFreightPrice = $("#freightTemplates option:selected").attr("datafirstprice");
-    addFreightPrice = $("#freightTemplates option:selected").attr("dataaddPrice");
-    firstFreightPrice = numToNumberTwo(Number(firstFreightPrice));
-    addFreightPrice = numToNumberTwo(Number(addFreightPrice))
+    // window.addFreightPrice = $("#addFreightPrice").text();
+    window.firstFreightPrice = $("#freightTemplates option:selected").attr("datafirstprice");
+    window.addFreightPrice = $("#freightTemplates option:selected").attr("dataaddPrice");
+    window.firstFreightPrice = numToNumberTwo(Number(firstFreightPrice));
+    window.addFreightPrice = numToNumberTwo(Number(addFreightPrice))
     $("#buyCount").bind("input propertychange", function() {
       var productCount = $(this).val();
       productCount = Number(productCount);
@@ -21,10 +21,10 @@ $(document).ready(function() {
   }
 
   $("#freightTemplates").change(function() {
-    firstFreightPrice = $("#freightTemplates option:selected").attr("datafirstprice");
-    addFreightPrice = $("#freightTemplates option:selected").attr("dataaddPrice");
-    firstFreightPrice = numToNumberTwo(Number(firstFreightPrice));
-    addFreightPrice = numToNumberTwo(Number(addFreightPrice))
+    window.firstFreightPrice = $("#freightTemplates option:selected").attr("datafirstprice");
+    window.addFreightPrice = $("#freightTemplates option:selected").attr("dataaddPrice");
+    window.firstFreightPrice = numToNumberTwo(Number(firstFreightPrice));
+    window.addFreightPrice = numToNumberTwo(Number(addFreightPrice))
     $("#freightPrice").text(firstFreightPrice)
     $("#addFreightPrice").text(addFreightPrice)
     var buyCount = Number($("#buyCount").val());
@@ -37,9 +37,9 @@ $(document).ready(function() {
  */
 function calculateFreightPrice(count) {
   if(isNaN(count) || count <= 0) {
-    totalPrice = firstFreightPrice;
+    window.totalPrice = firstFreightPrice;
   }else{
-    totalPrice = firstFreightPrice + (addFreightPrice * (count-1));
+    window.totalPrice = firstFreightPrice + (addFreightPrice * (count-1));
   }
   $("#freightPrice").text(totalPrice);
 }
@@ -222,3 +222,16 @@ function banSale(productId) {
     })
   }
 }
+
+Object.assign(window, {
+  calculateFreightPrice,
+  addToCart,
+  choiceProductParams,
+  addProductToCart,
+  submitProductToBill,
+  addStock,
+  delStock,
+  numToFloatTwo,
+  numToNumberTwo,
+  banSale,
+});

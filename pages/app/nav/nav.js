@@ -1,1 +1,24 @@
-!function i(u,c,f){function a(o,n){if(!c[o]){if(!u[o]){var t="function"==typeof require&&require;if(!n&&t)return t(o,!0);if(p)return p(o,!0);var e=new Error("Cannot find module '"+o+"'");throw e.code="MODULE_NOT_FOUND",e}var r=c[o]={exports:{}};u[o][0].call(r.exports,function(n){return a(u[o][1][n]||n)},r,r.exports,i,u,c,f)}return c[o].exports}for(var p="function"==typeof require&&require,n=0;n<f.length;n++)a(f[n]);return a}({1:[function(n,o,t){"use strict";window.closeWin=function(){"apiCloud"===NKC.configs.platform?api.closeWin():"reactNative"===NKC.configs.platform&&NKC.methods.rn.emit("closeWebView",{drawer:!0})},window.logout=function(){nkcAPI("/logout","GET").then(function(){"apiCloud"===NKC.configs.platform?emitEvent("logout"):"reactNative"===NKC.configs.platform&&NKC.methods.rn.emit("logout")}).catch(function(n){screenTopWarning(n)})},window.updateApp=function(){NKC.methods.rn.emit("check_and_update_app")}},{}]},{},[1]);
+window.closeWin = function() {
+  if(NKC.configs.platform === 'apiCloud') {
+    api.closeWin();
+  } else if(NKC.configs.platform === 'reactNative') {
+    NKC.methods.rn.emit('closeWebView', {drawer: true});
+  }
+};
+window.logout = function() {
+  nkcAPI("/logout", "GET")
+    .then(() => {
+      if(NKC.configs.platform === 'apiCloud') {
+        emitEvent("logout");
+      } else if(NKC.configs.platform === 'reactNative') {
+        NKC.methods.rn.emit('logout');
+      }
+    })
+    .catch(data => {
+      screenTopWarning(data);
+    })
+};
+
+window.updateApp = function() {
+  NKC.methods.rn.emit('check_and_update_app');
+}

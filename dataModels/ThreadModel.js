@@ -1379,7 +1379,7 @@ threadSchema.statics.getUserThreads = async (uid, fid) => {
 threadSchema.statics.getUserSubThreads = async (uid, fid) => {
   const SubscribeModel = mongoose.model("subscribes");
   const ThreadModel = mongoose.model("threads");
-  const subs = await SubscribeModel.find({uid}, {
+  const subs = await SubscribeModel.find({cancel: false, uid}, {
     fid: 1,
     tid: 1,
     tUid: 1,
@@ -2028,6 +2028,7 @@ threadSchema.statics.getCollectedCountByTid = async (tid) => {
   const SubscribeModel = mongoose.model('subscribes');
   return await SubscribeModel.countDocuments({
     type: 'collection',
+    cancel: false,
     tid
   });
 };

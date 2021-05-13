@@ -173,3 +173,6 @@ var app = new Vue({
     }
   }
 });
+
+window.defaultQuestion = defaultQuestion;
+window.app = app;

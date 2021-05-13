@@ -256,3 +256,8 @@ var app = new Vue({
     }
   }
 });
+
+Object.assign(window, {
+  wordGroup,
+  app
+});

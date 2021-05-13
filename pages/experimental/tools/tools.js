@@ -1,1 +1,193 @@
-!function l(r,u,c){function i(n,e){if(!u[n]){if(!r[n]){var o="function"==typeof require&&require;if(!e&&o)return o(n,!0);if(d)return d(n,!0);var a=new Error("Cannot find module '"+n+"'");throw a.code="MODULE_NOT_FOUND",a}var t=u[n]={exports:{}};r[n][0].call(t.exports,function(e){return i(r[n][1][e]||e)},t,t.exports,l,r,u,c)}return u[n].exports}for(var d="function"==typeof require&&require,e=0;e<c.length;e++)i(c[e]);return i}({1:[function(e,n,o){"use strict";var c=new NKC.modules.CommonModal;new Vue({el:"#app",data:{selected:!1},methods:{editTool:function(e,n,o,a,t,l,r,u){c.open(function(e){var n=new FormData;e.forEach(function(e){n.append(e.name,e.value)}),n.append("_id",u),nkcUploadFile("/tools/update","post",n,function(e,n){}).then(function(){asyncSweetSuccess("修改成功",{autoHide:!1}),c.close()}).then(function(){return location.reload()}).catch(asyncSweetError)},{title:"修改工具信息",data:[{dom:"input",label:"版本号",name:"version",value:e,placeholder:"1.0"},{dom:"input",label:"工具名",name:"name",value:n,placeholder:"必填"},{dom:"input",label:"简介",name:"summary",value:o,placeholder:"可缺省"},{dom:"input",label:"作者",name:"author",value:t,placeholder:"缺省显示为[匿名]"},{dom:"input",label:"作者uid",name:"uid",value:a,placeholder:"可缺省"},{dom:"input",label:"入口文件",name:"entry",value:l,placeholder:"必填，默认/index.html"},{dom:"radio",label:"是否是站外站点",value:r,name:"isOtherSite",radios:[{name:"是",value:!0},{name:"否",value:!1}]},{dom:"input",label:"工具压缩包",type:"file",name:"file",accept:".zip"}]})},deleteTool:function(e,n){sweetConfirm("确定要删除 ".concat(n," 吗？（此操作不可恢复）")).then(function(){return nkcAPI("/tools/delete?_id="+e,"DELETE")}).then(function(){return asyncSweetSuccess("删除成功",{autoHide:!1})}).then(function(){return location.reload()}).catch(asyncSweetError)},addTool:function(){c.open(function(e){var n=new FormData;e.forEach(function(e){n.append(e.name,e.value)}),nkcUploadFile("/tools/upload","post",n,function(e,n){console.log(n)}).then(function(){asyncSweetSuccess("上传成功",{autoHide:!1}),c.close()}).then(function(){return location.reload()}).catch(asyncSweetError)},{title:"上传工具",data:[{dom:"input",label:"版本号",name:"version",value:"",placeholder:"1.0"},{dom:"input",label:"工具名",name:"name",value:"",placeholder:"必填"},{dom:"input",label:"简介",name:"summary",value:"",placeholder:"可缺省"},{dom:"input",label:"作者",name:"author",value:"",placeholder:"缺省显示为[匿名]"},{dom:"input",label:"作者uid",name:"uid",value:"",placeholder:"可缺省"},{dom:"input",label:"入口文件",name:"entry",value:"",placeholder:"必填，默认/index.html"},{dom:"radio",label:"是否是站外站点",value:!1,name:"isOtherSite",radios:[{name:"是",value:!0},{name:"否",value:!1}]},{dom:"input",label:"工具压缩包",type:"file",name:"file",accept:".zip"}]})},hideTool:function(e,n,o){sweetConfirm(o?"要解除屏蔽 ".concat(n," 吗？"):"确定要屏蔽 ".concat(n," 吗？（可以随时解除屏蔽）")).then(function(){return nkcAPI("/tools/hide?_id="+e,"DELETE")}).then(function(){return asyncSweetSuccess(o?"已解除":"已屏蔽",{autoHide:!1})}).then(function(){return location.reload()}).catch(asyncSweetError)},enableSiteTool:function(){nkcAPI("/tools/enableSiteTools","POST").then(function(e){return asyncSweetSuccess(e.message,{autoHide:!1})}).then(function(){return location.reload()}).catch(asyncSweetError)}}})},{}]},{},[1]);
+var CommonModal = new NKC.modules.CommonModal();
+
+new Vue({
+  el: "#app",
+  data: {
+    selected: false
+  },
+  methods: {
+    editTool: function(version, name, summary, uid, author, entry, isOtherSite, id) {
+      CommonModal.open(function(form) {
+        let formData = new FormData();
+        form.forEach(d => {
+          formData.append(d.name, d.value);
+        });
+        formData.append("_id", id);
+        nkcUploadFile("/tools/update", "post", formData, (e, percent) => {
+          // console.log(percent)
+        })
+        .then(() => {
+          asyncSweetSuccess("修改成功", {autoHide: false});
+          CommonModal.close();
+        })
+        .then(() => location.reload())
+        .catch(asyncSweetError);
+      }, {
+        title: '修改工具信息',
+        data: [
+          {
+            dom: 'input',
+            label: "版本号",
+            name: "version",
+            value: version,
+            placeholder: "1.0"
+          },
+          {
+            dom: "input",
+            label: "工具名",
+            name: "name",
+            value: name,
+            placeholder: "必填"
+          },
+          {
+            dom: "input",
+            label: "简介",
+            name: "summary",
+            value: summary,
+            placeholder: "可缺省"
+          },
+          {
+            dom: "input",
+            label: "作者",
+            name: "author",
+            value: author,
+            placeholder: "缺省显示为[匿名]"
+          },
+          {
+            dom: "input",
+            label: "作者uid",
+            name: "uid",
+            value: uid,
+            placeholder: "可缺省"
+          },
+          {
+            dom: "input",
+            label: "入口文件",
+            name: "entry",
+            value: entry,
+            placeholder: "必填，默认/index.html"
+          },
+          {
+            dom: "radio",
+            label: "是否是站外站点",
+            value: isOtherSite,
+            name: "isOtherSite",
+            radios: [
+              {name: "是", value: true},
+              {name: "否", value: false}
+            ]
+          },
+          {
+            dom: "input",
+            label: "工具压缩包",
+            type: "file",
+            name: "file",
+            accept: ".zip"
+          }
+        ]
+      });
+    },
+    deleteTool: function(id, toolname) {
+      sweetConfirm(`确定要删除 ${toolname} 吗？（此操作不可恢复）`)
+      .then(() => nkcAPI("/tools/delete?_id=" + id, "DELETE"))
+      .then(() => asyncSweetSuccess("删除成功", {autoHide: false}))
+      .then(() => location.reload())
+      .catch(asyncSweetError);
+    },
+    addTool: function() {
+      CommonModal.open(function(form){
+        let formData = new FormData();
+        form.forEach(d => {
+          formData.append(d.name, d.value);
+        });
+        nkcUploadFile("/tools/upload", "post", formData, (e, percent) => {
+          console.log(percent)
+        })
+        .then(() => {
+          asyncSweetSuccess("上传成功", {autoHide: false});
+          CommonModal.close();
+        })
+        .then(() => location.reload())
+        .catch(asyncSweetError);
+      }, {
+        title: '上传工具',
+        data: [
+          {
+            dom: 'input',
+            label: "版本号",
+            name: "version",
+            value: "",
+            placeholder: "1.0"
+          },
+          {
+            dom: "input",
+            label: "工具名",
+            name: "name",
+            value: "",
+            placeholder: "必填"
+          },
+          {
+            dom: "input",
+            label: "简介",
+            name: "summary",
+            value: "",
+            placeholder: "可缺省"
+          },
+          {
+            dom: "input",
+            label: "作者",
+            name: "author",
+            value: "",
+            placeholder: "缺省显示为[匿名]"
+          },
+          {
+            dom: "input",
+            label: "作者uid",
+            name: "uid",
+            value: "",
+            placeholder: "可缺省"
+          },
+          {
+            dom: "input",
+            label: "入口文件",
+            name: "entry",
+            value: "",
+            placeholder: "必填，默认/index.html"
+          },
+          {
+            dom: "radio",
+            label: "是否是站外站点",
+            value: false,
+            name: "isOtherSite",
+            radios: [
+              {name: "是", value: true},
+              {name: "否", value: false}
+            ]
+          },
+          {
+            dom: "input",
+            label: "工具压缩包",
+            type: "file",
+            name: "file",
+            accept: ".zip"
+          }
+        ]
+      })
+    },
+    hideTool: function(id, toolname, isHide) {
+      sweetConfirm(isHide? `要解除屏蔽 ${toolname} 吗？`:`确定要屏蔽 ${toolname} 吗？（可以随时解除屏蔽）`)
+      .then(() => nkcAPI("/tools/hide?_id=" + id, "DELETE"))
+      .then(() => asyncSweetSuccess(isHide? "已解除":"已屏蔽", {autoHide: false}))
+      .then(() => location.reload())
+      .catch(asyncSweetError);
+    },
+    enableSiteTool: function() {
+      nkcAPI("/tools/enableSiteTools", "POST")
+        .then(data => asyncSweetSuccess(data.message, {autoHide: false}))
+        .then(() => location.reload())
+        .catch(asyncSweetError);
+    }
+  }
+});
+
+window.CommonModal = CommonModal;

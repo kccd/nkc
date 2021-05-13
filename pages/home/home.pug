@@ -25,6 +25,16 @@ block content
                   else
                     .visited-forum-icon(style=`background-color: ${f.color}`)
                   a(href=`/f/${f.fid}`).visited-forum-name= f.displayName
+        if !state.isApp && data.user && data.subColumns && data.subColumns.length
+          .m-b-1
+            .panel-header 我关注的专栏
+              .panel-header-right-button
+                a(href=`/u/${data.user.uid}/profile/subscribe/column` target="_blank") 管理
+            .visited-forums
+              for c in data.subColumns
+                .visited-forum
+                  img.visited-forum-icon(src=tools.getUrl("columnAvatar", c.avatar))
+                  a(href=`/m/${c._id}`).visited-forum-name= c.name
         div
           -let threadPanelATarget;
           if data.t === "subscribe" && state.platform !== 'reactNative'

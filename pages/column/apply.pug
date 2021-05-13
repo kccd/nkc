@@ -25,9 +25,18 @@ block content
               h4 专栏介绍（不超过1000字符）
               textarea.form-control(rows=9 v-model.trim="column.description")
             .form-group
+              h5.text-danger 注意事项
+              p!=data.createColumnInfo
+              .checkbox
+                label
+                  input(type='checkbox' :value='true' v-model='checked')
+                  span 我已阅读并同意遵守与本次发表相关的全部协议。
+                  a(href=`/protocol` target="_blank") 查看协议
+            .form-group
               h5.text-danger(v-if="error") {{error}}
               h5.text-success(v-if="info") {{info}}
-              button.btn.btn-primary.btn-block(@click="submit") 提交
+              button.btn.btn-primary.btn-block(disabled v-if='!checked' title='请先勾选同意协议') 提交
+              button.btn.btn-primary.btn-block(@click="submit" v-else) 提交
 block scripts
   include ../publicModules/crop/crop_new
   +includeJS("/column/apply.js")

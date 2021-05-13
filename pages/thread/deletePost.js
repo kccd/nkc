@@ -1,1 +1,14 @@
-!function u(i,f,c){function s(t,e){if(!f[t]){if(!i[t]){var n="function"==typeof require&&require;if(!e&&n)return n(t,!0);if(l)return l(t,!0);var r=new Error("Cannot find module '"+t+"'");throw r.code="MODULE_NOT_FOUND",r}var o=f[t]={exports:{}};i[t][0].call(o.exports,function(e){return s(i[t][1][e]||e)},o,o.exports,u,i,f,c)}return f[t].exports}for(var l="function"==typeof require&&require,e=0;e<c.length;e++)s(c[e]);return s}({1:[function(e,t,n){"use strict";NKC&&NKC.methods&&(NKC.methods.deletePost=function(e){sweetQuestion("你确定要删除吗？").then(function(){return nkcAPI("/p/".concat(e,"/delete"),"GET")}).then(function(e){console.log(e)})})},{}]},{},[1]);
+;(function(){
+  if(!NKC) return;
+  if(!NKC.methods) return;
+
+  function deletePost(postId) {
+    sweetQuestion("你确定要删除吗？")
+      .then(() => nkcAPI(`/p/${postId}/delete`, "GET"))
+      .then(res => {
+        console.log(res);
+      })
+  };
+
+  NKC.methods.deletePost = deletePost;
+}());

@@ -65,7 +65,7 @@
         else
           a(href="/editor?toColumn=true" target="_blank")
             button 发表
-      if permission("pushColumnToHome")
+      if permission("homeHotColumn")
         if data.topped
           .column-sub-button(onclick=`pushToHome(${data.column._id}, 'unPush')` title="取消设为热门专栏")
             button 取消热门

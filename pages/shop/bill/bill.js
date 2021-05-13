@@ -1,1 +1,236 @@
-!function s(i,a,c){function d(t,e){if(!a[t]){if(!i[t]){var r="function"==typeof require&&require;if(!e&&r)return r(t,!0);if(u)return u(t,!0);var n=new Error("Cannot find module '"+t+"'");throw n.code="MODULE_NOT_FOUND",n}var o=a[t]={exports:{}};i[t][0].call(o.exports,function(e){return d(i[t][1][e]||e)},o,o.exports,s,i,a,c)}return a[t].exports}for(var u="function"==typeof require&&require,e=0;e<c.length;e++)d(c[e]);return d}({1:[function(e,t,r){"use strict";function h(e,t){var r;if("undefined"==typeof Symbol||null==e[Symbol.iterator]){if(Array.isArray(e)||(r=function(e,t){if(!e)return;if("string"==typeof e)return c(e,t);var r=Object.prototype.toString.call(e).slice(8,-1);"Object"===r&&e.constructor&&(r=e.constructor.name);if("Map"===r||"Set"===r)return Array.from(e);if("Arguments"===r||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(r))return c(e,t)}(e))||t&&e&&"number"==typeof e.length){r&&(e=r);var n=0,o=function(){};return{s:o,n:function(){return n>=e.length?{done:!0}:{done:!1,value:e[n++]}},e:function(e){throw e},f:o}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var s,i=!0,a=!1;return{s:function(){r=e[Symbol.iterator]()},n:function(){var e=r.next();return i=e.done,e},e:function(e){a=!0,s=e},f:function(){try{i||null==r.return||r.return()}finally{if(a)throw s}}}}function c(e,t){(null==t||t>e.length)&&(t=e.length);for(var r=0,n=new Array(t);r<t;r++)n[r]=e[r];return n}var n=NKC.methods.getDataById("data");n.results.map(function(e){e.buyMessage="",e.products.map(function(e){var t=e.product;t.isFreePost||(e.freightName=t.freightTemplates[0].name,e.certId="")})});new Vue({el:"#app",data:{addresses:n.addresses,selectedAddress:n.addresses[0]||"",results:n.results,freightTotal:0,priceTotal:0,showAddressForm:!1,addressForm:{username:"",address:"",location:"",mobile:""}},mounted:function(){this.extendProduct(),window.SelectAddress=new NKC.modules.SelectAddress},methods:{getUrl:NKC.methods.tools.getUrl,visitUrl:NKC.methods.visitUrl,checkString:NKC.methods.checkData.checkString,switchAddressForm:function(){this.showAddressForm=!this.showAddressForm},saveAddressForm:function(){var t=this,e=this.addressForm,r=e.username,n=e.address,o=e.location,s=e.mobile;Promise.resolve().then(function(){return t.checkString(r,{name:"收件人姓名",minLength:1,maxLength:50}),t.checkString(o,{name:"所在地区",minLength:1,maxLength:100}),t.checkString(n,{name:"详细地址",minLength:1,maxLength:500}),t.checkString(s,{name:"手机号",minLength:1,maxLength:100}),nkcAPI("/u/".concat(NKC.configs.uid,"/settings/transaction"),"PUT",{operation:"add",addresses:[t.addressForm]})}).then(function(e){t.addresses=e.addresses,t.addresses.length?t.selectedAddress=t.addresses[t.addresses.length-1]:t.selectedAddress="",t.switchAddressForm()}).catch(sweetError)},selectLocation:function(){var t=this;SelectAddress.open(function(e){t.addressForm.location=e.join(" ")})},changeCount:function(e,t){if("up"==e){if(t.count>=t.productParam.stocksSurplus)return void screenTopWarning("库存不足");t.count++}else 1<t.count&&t.count--;this.extendProduct()},extendProduct:function(){var u=0,f=0;this.results.map(function(e){e.products.map(function(e){var t=e.freightName,r=e.product,n=r.freightTemplates,o=r.isFreePost;if(!o){var s,i=h(n);try{for(i.s();!(s=i.n()).done;){var a=s.value;a.name===t&&(e.freight=a)}}catch(e){i.e(e)}finally{i.f()}}var c=0,d=0;e.params.map(function(e){var t=e.count,r=e.price;c+=t,d+=t*r}),e.countTotal=c,e.priceTotal=d,e.freightTotal=0,o||(1===e.countTotal?e.freightTotal=e.freight.firstPrice:e.freightTotal=e.freight.firstPrice+e.freight.addPrice*(e.countTotal-1)),u+=e.freightTotal,f+=e.priceTotal})}),this.freightTotal=u,this.priceTotal=f},selectAddress:function(e){this.selectedAddress=e},setFreightByName:function(){this.extendProduct()},getAddresses:function(){var t=this;nkcAPI(window.location.href+"&t=".concat(Date.now()),"GET").then(function(e){t.addresses=e.addresses,sweetSuccess("刷新成功")}).catch(sweetError)},selectedFile:function(t,r){var e=r.product,n=$("input.hidden.input-".concat(e.productId))[0].files[0],o=new FormData;o.append("type","shopping"),o.append("file",n),nkcUploadFile("/shop/cert","POST",o).then(function(e){r.certId=e.cert._id,Vue.set(t.products,t.products.indexOf(r),r),sweetSuccess("上传成功")}).catch(sweetError)},getCert:function(e){NKC.methods.visitUrl("/shop/cert/".concat(e),!0)},submit:function(){var e=this.results,o={params:[],address:this.selectedAddress};Promise.resolve().then(function(){if(!o.address)throw"请选择收货地址";return e.map(function(e){var t=e.products,r=e.user,n=e.buyMessage,c={uid:r.uid,buyMessage:n,products:[]};t.map(function(e){var t=e.product,r=e.params,n=e.priceTotal,o=e.freightTotal,s=e.certId,i=e.freightName;if(t.uploadCert&&!s)throw"请上传凭证";if(!t.isFreePost&&!i)throw"请选择物流";var a={productId:t.productId,priceTotal:n,freightTotal:o,certId:s,freightName:i,productParams:[]};r.map(function(e){var t=e.productParam,r=e.count,n=e.price,o=e.cartId;a.productParams.push({_id:t._id,cartId:o,count:r,price:n})}),c.products.push(a)}),o.params.push(c)}),console.log(o),nkcAPI("/shop/order","POST",o)}).then(function(e){openToNewLocation("/shop/pay?ordersId="+e.ordersId.join("-")),sweetSuccess("提交成功，正在前往付款页面")}).catch(sweetError)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById("data");
+
+// 默认选择第一个运费模板
+data.results.map(r => {
+  r.buyMessage = "";
+  r.products.map(p => {
+    const product = p.product;
+    if(!product.isFreePost) {
+      p.freightName = product.freightTemplates[0].name
+      p.certId = "";
+    }
+  })
+})
+
+const app = new Vue({
+  el: "#app",
+  data: {
+    addresses: data.addresses, // 地址
+    selectedAddress: data.addresses[0] || "", // 已选择的地址
+    results: data.results, // 商品规格数据
+    freightTotal: 0, // 运费总计
+    priceTotal: 0, // 商品总计
+
+    showAddressForm: false,
+    addressForm: {
+      username: "",
+      address: "",
+      location: "",
+      mobile: ""
+    }
+  },
+  mounted() {
+    this.extendProduct();
+    window.SelectAddress = new NKC.modules.SelectAddress();
+  },
+  methods: {
+    getUrl: NKC.methods.tools.getUrl,
+    visitUrl: NKC.methods.visitUrl,
+    checkString: NKC.methods.checkData.checkString,
+    // 隐藏添加地址的输入框
+    switchAddressForm() {
+      this.showAddressForm = !this.showAddressForm;
+    },
+    // 添加新地址
+    saveAddressForm() {
+      const self = this;
+      const {username, address, location, mobile} = this.addressForm;
+      Promise.resolve()
+        .then(() => {
+          self.checkString(username, {
+            name: "收件人姓名",
+            minLength: 1,
+            maxLength: 50
+          });
+          self.checkString(location, {
+            name: "所在地区",
+            minLength: 1,
+            maxLength: 100
+          });
+          self.checkString(address, {
+            name: "详细地址",
+            minLength: 1,
+            maxLength: 500
+          });
+          self.checkString(mobile, {
+            name: "手机号",
+            minLength: 1,
+            maxLength: 100
+          });
+          return nkcAPI(`/u/${NKC.configs.uid}/settings/transaction`, "PUT", {
+            operation: "add",
+            addresses: [self.addressForm]
+          })
+        })
+        .then(data => {
+          self.addresses = data.addresses;
+          if(self.addresses.length) {
+            self.selectedAddress = self.addresses[self.addresses.length - 1];
+          } else {
+            self.selectedAddress = "";
+          }
+          self.switchAddressForm();
+        })
+        .catch(sweetError);
+    },
+    selectLocation() {
+      const self = this;
+      SelectAddress.open(data => {
+        self.addressForm.location = data.join(" ");
+      })
+    },
+    // 改变规格的数量
+    changeCount(type, param) {
+      if(type == "up") {
+        if(param.count >= param.productParam.stocksSurplus) { // 数量不能大于规格库存
+          screenTopWarning("库存不足");
+          return
+        };
+        param.count ++;
+      } else if(param.count > 1){
+        param.count --;
+      }
+      this.extendProduct();
+    },
+    // 计算规格运费、价格
+    extendProduct() {
+      let freightTotal = 0, priceTotal_ = 0;
+      this.results.map(r => {
+        r.products.map(p => {
+          // 根据用户选择的快递名获取快递模板
+          const {freightName} = p;
+          const {freightTemplates, isFreePost} = p.product;
+          if(!isFreePost) {
+            for(const t of freightTemplates) {
+              if(t.name === freightName) {
+                p.freight = t;
+              }
+            }
+          }
+          // 统计同一商品下规格的总个数以及总价格
+          let countTotal = 0, priceTotal = 0;
+          p.params.map(param => {
+            const {count, price} = param;
+            countTotal += count;
+            priceTotal += (count * price);
+          });
+          p.countTotal = countTotal;
+          p.priceTotal = priceTotal;
+          p.freightTotal = 0;
+          if(!isFreePost) {
+            if(p.countTotal === 1) {
+              p.freightTotal = p.freight.firstPrice;
+            } else {
+              p.freightTotal = p.freight.firstPrice + (p.freight.addPrice * (p.countTotal - 1));
+            }
+          }
+          // 根据每个商品的总运费、商品总价格计算整个订单的运费以及商品价格
+          freightTotal += p.freightTotal;
+          priceTotal_ += p.priceTotal;
+        });
+      });
+      this.freightTotal = freightTotal;
+      this.priceTotal = priceTotal_;
+    },
+    selectAddress(address) {
+      this.selectedAddress = address;
+    },
+    setFreightByName() {
+      this.extendProduct();
+    },
+    // 刷新用户的快递信息
+    getAddresses() {
+      const self = this;
+      nkcAPI(window.location.href + `&t=${Date.now()}`, "GET")
+        .then(data => {
+          self.addresses = data.addresses;
+          sweetSuccess("刷新成功");
+        })
+        .catch(sweetError)
+    },
+    // 用户选择了凭证文件
+    selectedFile(r, p) {
+      const {product} = p;
+      let dom = $(`input.hidden.input-${product.productId}`);
+      dom = dom[0];
+      const file = dom.files[0];
+      const formData = new FormData();
+      formData.append("type", "shopping");
+      formData.append("file", file);
+      nkcUploadFile("/shop/cert", "POST", formData)
+        .then(data => {
+          p.certId = data.cert._id;
+          Vue.set(r.products, r.products.indexOf(p), p);
+          sweetSuccess("上传成功");
+        })
+        .catch(sweetError);
+    },
+    // 查看凭证
+    getCert(certId) {
+      NKC.methods.visitUrl(`/shop/cert/${certId}`, true);
+    },
+    submit() {
+      const {results, selectedAddress} = this;
+      const body = {
+        params: [],
+        address: selectedAddress
+      };
+
+      Promise.resolve()
+        .then(() => {
+          if(!body.address) throw "请选择收货地址";
+          results.map(userObj => {
+            const {products, user, buyMessage} = userObj;
+            const r = {
+              uid: user.uid,
+              buyMessage,
+              products: []
+            }
+            products.map(productObj => {
+              const {product, params, priceTotal, freightTotal, certId, freightName} = productObj;
+              if(product.uploadCert && !certId) throw "请上传凭证";
+              if(!product.isFreePost && !freightName) throw "请选择物流";
+              const p = {
+                productId: product.productId,
+                priceTotal,
+                freightTotal,
+                certId,
+                freightName,
+                productParams: []
+              };
+              params.map(paramObj => {
+                const {productParam, count, price, cartId} = paramObj;
+                p.productParams.push({
+                  _id: productParam._id,
+                  cartId,
+                  count,
+                  price
+                });
+              });
+              r.products.push(p);
+            })
+            body.params.push(r);
+          });
+          console.log(body);
+          return nkcAPI("/shop/order", "POST", body);
+        })
+        .then(data => {
+          openToNewLocation('/shop/pay?ordersId=' + data.ordersId.join("-"));
+          sweetSuccess("提交成功，正在前往付款页面");
+        })
+        .catch(sweetError);
+    }
+  }
+})
+
+window.app = app;

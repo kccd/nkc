@@ -114,3 +114,15 @@ function newForum(forumType) {
       screenTopWarning(data.error || data);
     })
 }
+
+Object.assign(window, {
+	data,
+	forums,
+	fidArr,
+	selectedFid,
+	createSpan,
+	getForumByFid,
+	initEvent,
+	saveForumsOrder,
+	newForum,
+});

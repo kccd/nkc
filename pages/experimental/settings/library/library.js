@@ -93,3 +93,15 @@ function getAllOperations() {
   }
   return arr;
 }
+
+Object.assign(window, {
+  rolesObj,
+  gradesObj,
+  libSettings,
+  permission,
+  roles,
+  grades,
+  permissionRoles,
+  app,
+  getAllOperations,
+})

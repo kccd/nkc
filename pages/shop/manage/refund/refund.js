@@ -209,3 +209,5 @@ var app = new Vue({
     }
   }
 });
+
+window.app = app;

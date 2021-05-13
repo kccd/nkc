@@ -1,4 +1,4 @@
-var SubscribeTypes;
+window.SubscribeTypes = undefined;
 var initComplexOptions = !!localStorage.getItem("search_complexOptions");
 
 var app = new Vue({
@@ -156,17 +156,23 @@ var app = new Vue({
       } catch(err) {}
     }
     if(NKC.modules.SubscribeTypes) {
-      SubscribeTypes = new NKC.modules.SubscribeTypes();
+      window.SubscribeTypes = new NKC.modules.SubscribeTypes();
     }
   }
 });
 
-var ResourceInfo;
+window.ResourceInfo = undefined;
 
 $(function() {
-  ResourceInfo = new NKC.modules.ResourceInfo();
+  window.ResourceInfo = new NKC.modules.ResourceInfo();
 });
 
 function showResource(lid) {
   ResourceInfo.open({lid: lid})
 }
+
+Object.assign(window, {
+  initComplexOptions,
+  app,
+  showResource,
+});

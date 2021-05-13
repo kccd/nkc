@@ -1,1 +1,112 @@
-!function o(s,u,c){function a(e,t){if(!u[e]){if(!s[e]){var n="function"==typeof require&&require;if(!t&&n)return n(e,!0);if(f)return f(e,!0);var r=new Error("Cannot find module '"+e+"'");throw r.code="MODULE_NOT_FOUND",r}var i=u[e]={exports:{}};s[e][0].call(i.exports,function(t){return a(s[e][1][t]||t)},i,i.exports,o,s,u,c)}return u[e].exports}for(var f="function"==typeof require&&require,t=0;t<c.length;t++)a(c[t]);return a}({1:[function(t,e,n){"use strict";function f(t,e){var n;if("undefined"==typeof Symbol||null==t[Symbol.iterator]){if(Array.isArray(t)||(n=function(t,e){if(!t)return;if("string"==typeof t)return c(t,e);var n=Object.prototype.toString.call(t).slice(8,-1);"Object"===n&&t.constructor&&(n=t.constructor.name);if("Map"===n||"Set"===n)return Array.from(t);if("Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return c(t,e)}(t))||e&&t&&"number"==typeof t.length){n&&(t=n);var r=0,i=function(){};return{s:i,n:function(){return r>=t.length?{done:!0}:{done:!1,value:t[r++]}},e:function(t){throw t},f:i}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var o,s=!0,u=!1;return{s:function(){n=t[Symbol.iterator]()},n:function(){var t=n.next();return s=t.done,t},e:function(t){u=!0,o=t},f:function(){try{s||null==n.return||n.return()}finally{if(u)throw o}}}}function c(t,e){(null==e||e>t.length)&&(e=t.length);for(var n=0,r=new Array(e);n<e;n++)r[n]=t[n];return r}var r=NKC.methods.getDataById("data");r.stickers.map(function(t){null===t.reviewed?(t.status=!0,t.size="md"):t.size=""});new Vue({el:"#app",data:{stickers:r.stickers},mounted:function(){floatUserPanel.initPanel(),NKC.methods.initImageViewer(".sticker-image")},methods:{getUrl:NKC.methods.tools.getUrl,format:NKC.methods.format,visitUrl:NKC.methods.visitUrl,checkString:NKC.methods.checkData.checkString,setAll:function(e){this.stickers.map(function(t){null===t.reviewed&&(t.status=!!e)})},submit:function(c){var a=this;c=c.filter(function(t){return null===t.reviewed}),sweetQuestion("确定要执行此操作？").then(function(){var t,e=[],n=f(c);try{for(n.s();!(t=n.n()).done;){var r=t.value,i=r._id,o=r.status,s=r.reason,u=r.size;o||a.checkString(s,{name:"原因",minLength:0,maxLength:500}),e.push({_id:i,status:o,size:u,reason:s})}}catch(t){n.e(t)}finally{n.f()}return nkcAPI("/nkc/sticker","POST",{stickers:e,type:"review"})}).then(function(){window.location.reload()}).catch(sweetError)},submitAll:function(){"unReviewed"===r.t?this.submit(this.stickers):"reviewed"===r.t&&this.submitSize(this.stickers)},submitSize:function(s){sweetQuestion("确定要执行此操作？").then(function(){var t,e=[],n=f(s);try{for(n.s();!(t=n.n()).done;){var r=t.value;if(null!==r.reviewed){var i=r._id,o=r.size;if(!["md","sm","xs"].includes(o))throw"请选择表情大小";e.push({_id:i,size:o})}}}catch(t){n.e(t)}finally{n.f()}return screenTopAlert("后台处理中，请稍候"),nkcAPI("/nkc/sticker","POST",{stickers:e,type:"modifySize"})}).then(function(){window.location.reload()}).catch(sweetError)},modifySize:function(e){this.stickers.map(function(t){return t.size=e})},disableSticker:function(t,e){nkcAPI("/nkc/sticker","POST",{stickers:[t],disabled:!!e,type:"disable"}).then(function(){t.disabled=!!e}).catch(sweetError)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById("data");
+data.stickers.map(s => {
+  if(s.reviewed === null) {
+    s.status = true;
+    s.size = "md";
+  } else {
+    s.size = ""
+  }
+});
+const app = new Vue({
+  el: "#app",
+  data: {
+    stickers: data.stickers
+  },
+  mounted() {
+    floatUserPanel.initPanel();
+    NKC.methods.initImageViewer(".sticker-image")
+  },
+  methods: {
+    getUrl: NKC.methods.tools.getUrl,
+    format: NKC.methods.format,
+    visitUrl: NKC.methods.visitUrl,
+    checkString: NKC.methods.checkData.checkString,
+    setAll(t) {
+      this.stickers.map(s => {
+        if(s.reviewed === null) {
+          s.status = !!t;
+        }
+      })
+    },
+    submit(stickers) {
+      const self = this;
+      stickers = stickers.filter(s => s.reviewed === null);
+      sweetQuestion("确定要执行此操作？")
+        .then(() => {
+          const arr = [];
+          for(const s of stickers) {
+            const {_id, status, reason, size} = s;
+            if(!status) {
+              self.checkString(reason, {
+                name: "原因",
+                minLength: 0,
+                maxLength: 500
+              });
+            }
+            arr.push({
+              _id,
+              status,
+              size,
+              reason
+            });
+          }
+          return nkcAPI("/nkc/sticker", "POST", {
+            stickers: arr,
+            type: "review"
+          });
+        })
+        .then(() => {
+          // stickers.map(s => s.reviewed = s.status);
+          window.location.reload();
+        })
+        .catch(sweetError)
+    },
+    submitAll() {
+      if(data.t === "unReviewed") {
+        this.submit(this.stickers);
+      } else if(data.t === "reviewed") {
+        this.submitSize(this.stickers);
+      }
+    },
+    submitSize(stickers) {
+      sweetQuestion("确定要执行此操作？")
+        .then(() => {
+          const arr = [];
+          for(const sticker of stickers) {
+            if(sticker.reviewed === null) continue;
+            const {_id, size} = sticker;
+            if(!["md", "sm", "xs"].includes(size)) throw "请选择表情大小";
+            arr.push({
+              _id,
+              size
+            });
+          }
+          screenTopAlert("后台处理中，请稍候");
+          return nkcAPI("/nkc/sticker", "POST", {
+            stickers: arr,
+            type: "modifySize"
+          });
+        })
+        .then(() => {
+          window.location.reload();
+        })
+        .catch(sweetError);
+    },
+    modifySize(size) {
+      this.stickers.map(s => s.size = size);
+    },
+    disableSticker(s, d) {
+      nkcAPI("/nkc/sticker", "POST", {
+        stickers: [s],
+        disabled: !!d,
+        type: "disable"
+      })
+        .then(() => {
+          s.disabled = !!d;
+        })
+        .catch(sweetError)
+    }
+  }
+});
+
+window.app = app;

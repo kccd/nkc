@@ -9,6 +9,7 @@ const contributeRouter = require("./contribute");
 const disabledRouter = require("./disabled");
 const contactRouter = require("./contact");
 const topRouter = require("./top");
+const hotRouter = require('./hot');
 const pageRouter = require("./page");
 router
   .use("/", async (ctx, next) => {
@@ -46,27 +47,39 @@ router
   })
   .get("/", async (ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
-    let {page = 0, c} = query;
-    c = Number(c);
+    const {page = 0, c: categoriesIdString = ''} = query;
+    const categoriesId = categoriesIdString.split('-');
+    let cid = categoriesId[0];
+    let mcid = categoriesId[1];
+    if(cid) cid = parseInt(cid);
+    if(mcid) mcid = parseInt(mcid);
     ctx.template = "columns/column.pug";
     const {column} = data;
     data.column = await column.extendColumn();
     const q = {
       columnId: column._id
     };
-    // const fidOfCanGetThread = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
     const fidOfCanGetThread = await db.ForumModel.getReadableForumsIdByUid(data.user? data.user.uid: '');
     const sort = {};
-    if(c) {
-      const category = await db.ColumnPostCategoryModel.findById(c);
-      if(category.columnId !== column._id) ctx.throw(400, `文章分类【${c}】不存在或已被专栏主删除`);
+    if(cid) {
+      const category = await db.ColumnPostCategoryModel.findById(cid);
+      if(category.columnId !== column._id) ctx.throw(400, `文章分类【${cid}】不存在或已被专栏主删除`);
       data.category = category;
       data.categoriesNav = await db.ColumnPostCategoryModel.getCategoryNav(category._id);
-      const childCategoryId = await db.ColumnPostCategoryModel.getChildCategoryId(c);
-      childCategoryId.push(c);
+      const minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id, data.category._id, true);
+      data.minorCategories = minorCategories.filter(mc => mc.count > 0);
+      const childCategoryId = await db.ColumnPostCategoryModel.getChildCategoryId(cid);
+      childCategoryId.push(cid);
+      let minorCategory;
+      if(mcid) {
+        minorCategory = await db.ColumnPostCategoryModel.findOne({_id: mcid});
+      }
+      if(minorCategory) {
+        q.mcid = minorCategory._id;
+        data.minorCategory = minorCategory;
+      }
       q.cid = {$in: childCategoryId};
-      data.c = c;
-      data.topped = await db.ColumnPostModel.getToppedColumnPosts(column._id, fidOfCanGetThread, c);
+      data.topped = await db.ColumnPostModel.getToppedColumnPosts(column._id, fidOfCanGetThread, cid);
       data.toppedId = data.category.topped;
       sort[`order.cid_${category._id}`] = -1;
     } else {
@@ -82,12 +95,13 @@ router
     data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
     data.timeline = await db.ColumnModel.getTimeline(column._id);
-    if(ctx.permission("pushColumnToHome")) {
-      const homeSettings = await db.SettingModel.getSettings("home");
-      data.topped = homeSettings.columnsId.includes(data.column._id);
-    }
     const homeSettings = await db.SettingModel.getSettings('home');
-    data.columnTopped = homeSettings.columnsId.includes(column._id);
+    if(ctx.permission("homeHotColumn")) {
+      data.homeHotColumn = homeSettings.columnsId.includes(column._id);
+    }
+    if(ctx.permission("homeToppedColumn")) {
+      data.homeToppedColumn = homeSettings.toppedColumnsId.includes(column._id);
+    }
     await next();
   })
   .put("/", async (ctx, next) => {
@@ -210,5 +224,6 @@ router
   .use("/contact", contactRouter.routes(), contactRouter.allowedMethods())
   .use("/page", pageRouter.routes(), pageRouter.allowedMethods())
   .use("/top", topRouter.routes(), topRouter.allowedMethods())
+  .use("/hot", hotRouter.routes(), hotRouter.allowedMethods())
   .use("/settings", settingsRouter.routes(), settingsRouter.allowedMethods());
 module.exports = router;

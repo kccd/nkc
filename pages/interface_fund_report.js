@@ -269,3 +269,21 @@ function disabledReport(applicationFormId, reportId, type) {
 			screenTopWarning(data.error);
 		})
 }
+
+Object.assign(window, {
+	submit,
+	getThreads,
+	createPageList,
+	displayPageList,
+	createThreadsList,
+	disabledRolling,
+	initThreadsList,
+	displayThreadsList,
+	deleteThread,
+	addThread,
+	displaySelectedThreads,
+	clearLog,
+	submitReport,
+	submittedReportAudit,
+	disabledReport,
+});

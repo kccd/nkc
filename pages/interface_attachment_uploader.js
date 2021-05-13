@@ -1,5 +1,4 @@
-var fileName;
-var extension;
+window.extension = undefined;
 
 var attachment_uploader = function(options){
   var uploader = {};
@@ -78,7 +77,7 @@ var attachment_uploader = function(options){
         formData.append('file', item);
         var index1=item.name.lastIndexOf(".");
         var index2=item.name.length;
-        extension = item.name.substring(index1,index2);
+        window.extension = item.name.substring(index1,index2);
         console.log(item)
         return create_upload(formData)
         .catch(function(err){
@@ -172,3 +171,8 @@ var uploader = attachment_uploader({
 geid("paste-target").addEventListener("paste", uploader.paste_handler);
 //上传附件的按钮
 geid('upload-button').addEventListener('click', uploader.uploadfile_click);
+
+Object.assign(window, {
+  attachment_uploader,
+  uploader,
+});

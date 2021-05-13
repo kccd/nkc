@@ -22,3 +22,4 @@ function submit() {
 			screenTopWarning(data.error);
 		})
 }
+window.submit = submit;

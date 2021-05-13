@@ -1,1 +1,136 @@
-!function a(m,o,u){function h(t,e){if(!o[t]){if(!m[t]){var i="function"==typeof require&&require;if(!e&&i)return i(t,!0);if(s)return s(t,!0);var r=new Error("Cannot find module '"+t+"'");throw r.code="MODULE_NOT_FOUND",r}var n=o[t]={exports:{}};m[t][0].call(n.exports,function(e){return h(m[t][1][e]||e)},n,n.exports,a,m,o,u)}return o[t].exports}for(var s="function"==typeof require&&require,e=0;e<u.length;e++)h(u[e]);return h}({1:[function(e,t,i){"use strict";var r=NKC.methods.getDataById("data");new Vue({el:"#app",data:{submitting:!1,recharge:null,withdraw:null},mounted:function(){var e=r.rechargeSettings,t=e.recharge,i=e.withdraw;i._startingTime=this.getHMS(i.startingTime),i._endTime=this.getHMS(i.endTime),this.convertNumber(i,"toPage"),this.convertNumber(t,"toPage"),this.recharge=t,this.withdraw=i},methods:{getHMS:function(e){return{hour:Math.floor(e/36e5),min:Math.floor(e/6e4)%60,sec:Math.floor(e/1e3)%60}},HMSToNumber:function(e){return 60*e.hour*60*1e3+60*e.min*1e3+1e3*e.sec},checkNumber:NKC.methods.checkData.checkNumber,checkString:NKC.methods.checkData.checkString,bigNumber:NKC.modules.math.bignumber,convertNumber:function(e,t){"toPage"===t?(e._min=e.min/100,e._max=e.max/100,e.aliPay._fee=NKC.modules.math.chain(this.bigNumber(e.aliPay.fee)).multiply(100).done().toNumber(),e.weChat._fee=NKC.modules.math.chain(this.bigNumber(e.weChat.fee)).multiply(100).done().toNumber()):(e.min=100*e._min,e.max=100*e._max,e.aliPay.fee=NKC.modules.math.chain(this.bigNumber(e.aliPay._fee)).multiply(this.bigNumber(.01)).done().toNumber(),e.weChat.fee=NKC.modules.math.chain(this.bigNumber(e.weChat._fee)).multiply(this.bigNumber(.01)).done().toNumber(),delete e.aliPay._fee,delete e.weChat._fee,delete e._min,delete e._max)},save:function(){var e=this,t=JSON.parse(JSON.stringify(this.recharge)),i=JSON.parse(JSON.stringify(this.withdraw)),r=this.checkNumber,n=this;Promise.resolve().then(function(){if(r(t._min,{name:"单次最小充值金额",min:.01,fractionDigits:2}),r(t._max,{name:"单次最大充值金额",min:.01,fractionDigits:2}),t._min>t._max)throw"单次充值金额设置错误";if(r(t.aliPay._fee,{name:"支付宝充值手续费",min:0,max:100,fractionDigits:2}),r(t.weChat._fee,{name:"微信支付充值手续费",min:0,max:100,fractionDigits:2}),r(i._min,{name:"单次最小提现金额",min:.01,fractionDigits:2}),r(i._max,{name:"单次最大提现金额",min:.01,fractionDigits:2}),i._min>i._max)throw"单次提现金额设置错误";return r(i.countOneDay,{name:"每天最大提现次数",min:0}),r(i.aliPay._fee,{name:"支付宝提现手续费",min:0,max:100,fractionDigits:2}),r(i.weChat._fee,{name:"微信支付提现手续费",min:0,max:100,fractionDigits:2}),i.startingTime=e.HMSToNumber(i._startingTime),i.endTime=e.HMSToNumber(i._endTime),delete i._startingTime,delete i._endTime,e.convertNumber(i,"toServer"),e.convertNumber(t,"toServer"),e.submitting=!0,nkcAPI("/e/settings/recharge","PUT",{recharge:t,withdraw:i})}).then(function(){n.submitting=!1,sweetSuccess("保存成功")}).catch(function(e){n.submitting=!1,sweetError(e)})}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const app = new Vue({
+  el: '#app',
+  data: {
+    submitting: false,
+    recharge: null,
+    withdraw: null
+  },
+  mounted() {
+    const {recharge, withdraw} = data.rechargeSettings;
+    // 处理提现时间限制
+    withdraw._startingTime = this.getHMS(withdraw.startingTime);
+    withdraw._endTime = this.getHMS(withdraw.endTime);
+    // 转换金额
+    this.convertNumber(withdraw, 'toPage');
+    this.convertNumber(recharge, 'toPage');
+    this.recharge = recharge;
+    this.withdraw = withdraw;
+  },
+  methods: {
+    getHMS,
+    HMSToNumber,
+    checkNumber: NKC.methods.checkData.checkNumber,
+    checkString: NKC.methods.checkData.checkString,
+    bigNumber: NKC.modules.math.bignumber,
+    convertNumber(withdraw, type) { // type: toPage, toServer
+      if(type === 'toPage') {
+        withdraw._min = withdraw.min / 100;
+        withdraw._max = withdraw.max / 100;
+        withdraw.aliPay._fee = NKC.modules.math.chain(this.bigNumber(withdraw.aliPay.fee)).multiply(100).done().toNumber();
+        withdraw.weChat._fee = NKC.modules.math.chain(this.bigNumber(withdraw.weChat.fee)).multiply(100).done().toNumber();
+      } else {
+        withdraw.min = withdraw._min * 100;
+        withdraw.max = withdraw._max * 100;
+        withdraw.aliPay.fee = NKC.modules.math.chain(this.bigNumber(withdraw.aliPay._fee)).multiply(this.bigNumber(0.01)).done().toNumber();
+        withdraw.weChat.fee = NKC.modules.math.chain(this.bigNumber(withdraw.weChat._fee)).multiply(this.bigNumber(0.01)).done().toNumber();
+        delete withdraw.aliPay._fee;
+        delete withdraw.weChat._fee;
+        delete withdraw._min;
+        delete withdraw._max;
+      }
+    },
+    save() {
+      const recharge = JSON.parse(JSON.stringify(this.recharge));
+      const withdraw = JSON.parse(JSON.stringify(this.withdraw));
+      const {checkNumber} = this;
+      const self = this;
+      Promise.resolve()
+        .then(() => {
+          checkNumber(recharge._min, {
+            name: '单次最小充值金额',
+            min: 0.01,
+            fractionDigits: 2,
+          });
+          checkNumber(recharge._max, {
+            name: '单次最大充值金额',
+            min: 0.01,
+            fractionDigits: 2
+          });
+          if(recharge._min > recharge._max) throw `单次充值金额设置错误`;
+          checkNumber(recharge.aliPay._fee, {
+            name: '支付宝充值手续费',
+            min: 0,
+            max: 100,
+            fractionDigits: 2
+          });
+          checkNumber(recharge.weChat._fee, {
+            name: '微信支付充值手续费',
+            min: 0,
+            max: 100,
+            fractionDigits: 2
+          });
+          checkNumber(withdraw._min, {
+            name: '单次最小提现金额',
+            min: 0.01,
+            fractionDigits: 2,
+          });
+          checkNumber(withdraw._max, {
+            name: '单次最大提现金额',
+            min: 0.01,
+            fractionDigits: 2
+          });
+          if(withdraw._min > withdraw._max) throw `单次提现金额设置错误`;
+          checkNumber(withdraw.countOneDay, {
+            name: '每天最大提现次数',
+            min: 0
+          });
+          checkNumber(withdraw.aliPay._fee, {
+            name: '支付宝提现手续费',
+            min: 0,
+            max: 100,
+            fractionDigits: 2
+          });
+          checkNumber(withdraw.weChat._fee, {
+            name: '微信支付提现手续费',
+            min: 0,
+            max: 100,
+            fractionDigits: 2
+          });
+          withdraw.startingTime = this.HMSToNumber(withdraw._startingTime);
+          withdraw.endTime = this.HMSToNumber(withdraw._endTime);
+          delete withdraw._startingTime;
+          delete withdraw._endTime;
+          this.convertNumber(withdraw, 'toServer');
+          this.convertNumber(recharge, 'toServer');
+          this.submitting = true;
+          return nkcAPI('/e/settings/recharge', 'PUT', {recharge, withdraw})
+        })
+        .then(() => {
+          self.submitting = false;
+          sweetSuccess('保存成功');
+        })
+        .catch(err => {
+          self.submitting = false;
+          sweetError(err);
+        });
+    }
+  }
+});
+
+function getHMS(t) {
+  return {
+    hour: Math.floor(t/3600000),
+    min: Math.floor(t/60000) % 60,
+    sec: Math.floor(t/1000) % 60
+  }
+}
+
+function HMSToNumber(t) {
+  return t.hour * 60 * 60 * 1000 + t.min * 60 * 1000 + t.sec * 1000;
+}
+
+Object.assign(window, {
+  getHMS,
+  HMSToNumber
+});

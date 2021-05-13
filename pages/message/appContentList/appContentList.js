@@ -1,1 +1,414 @@
-!function r(i,a,c){function u(t,e){if(!a[t]){if(!i[t]){var n="function"==typeof require&&require;if(!e&&n)return n(t,!0);if(l)return l(t,!0);var s=new Error("Cannot find module '"+t+"'");throw s.code="MODULE_NOT_FOUND",s}var o=a[t]={exports:{}};i[t][0].call(o.exports,function(e){return u(i[t][1][e]||e)},o,o.exports,r,i,a,c)}return a[t].exports}for(var l="function"==typeof require&&require,e=0;e<c.length;e++)u(c[e]);return u}({1:[function(e,t,n){"use strict";function w(e){return function(e){if(Array.isArray(e))return s(e)}(e)||function(e){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(e))return Array.from(e)}(e)||c(e)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function U(e,t){var n;if("undefined"==typeof Symbol||null==e[Symbol.iterator]){if(Array.isArray(e)||(n=c(e))||t&&e&&"number"==typeof e.length){n&&(e=n);var s=0,o=function(){};return{s:o,n:function(){return s>=e.length?{done:!0}:{done:!1,value:e[s++]}},e:function(e){throw e},f:o}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var r,i=!0,a=!1;return{s:function(){n=e[Symbol.iterator]()},n:function(){var e=n.next();return i=e.done,e},e:function(e){a=!0,r=e},f:function(){try{i||null==n.return||n.return()}finally{if(a)throw r}}}}function c(e,t){if(e){if("string"==typeof e)return s(e,t);var n=Object.prototype.toString.call(e).slice(8,-1);return"Object"===n&&e.constructor&&(n=e.constructor.name),"Map"===n||"Set"===n?Array.from(e):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?s(e,t):void 0}}function s(e,t){(null==t||t>e.length)&&(t=e.length);for(var n=0,s=new Array(t);n<t;n++)s[n]=e[n];return s}var o=NKC.methods.getDataById("data");new Audio;window.app=new Vue({el:"#app",data:{socketId:Date.now()+""+Math.round(1e3*Math.random()),type:o.type,originMessages:o.messages,showStickerPanel:!1,twemoji:o.twemoji,tUser:o.tUser,mUser:o.mUser,content:"",getMessageStatus:"canLoad",audio:new Audio},methods:{timeFormat:NKC.methods.timeFormat,getUrl:NKC.methods.tools.getUrl,toast:function(e){e=e.error||e.message||e,NKC.methods.rn.emit("toast",{content:e})},scrollToBottom:function(){var t=this;setTimeout(function(){var e=t.$refs.listContent;e.scrollTop=e.scrollHeight+1e4},200)},switchStickerPanel:function(e){this.showStickerPanel=void 0===e?!this.showStickerPanel:!!e},selectSticker:function(e){var t,n,s,o=this,r=this.content,i=this.$refs.input;i.selectionStart?t=i.selectionStart:document.selection&&(i.focus(),(s=(n=document.selection.createRange()).duplicate()).moveToElementText(i),s.setEndPoint("EndToEnd",n),t=s.text.length-n.text.length);var a,c,u="[f/"+e+"]";1<t?(c=(a=r.substring(0,t))+u,this.content=r.replace(a,c)):this.content=u+(this.content||""),setTimeout(function(){o.autoResize()},200)},autoResize:function(e){var t=this.$refs.input;t.style.height=2.8*12+"px",!e&&2.8*12<t.scrollHeight&&(t.style.height=t.scrollHeight+"px")},keepFocus:function(e){e&&this.$refs.input.focus()},visitImages:function(e){var t,n=[],s=U(this.messages);try{for(s.s();!(t=s.n()).done;){var o=t.value;"img"===o.contentType&&n.push({name:o.content.filename,url:o.content.fileUrl})}}catch(e){s.e(e)}finally{s.f()}var r=n.map(function(e){return e.url}).indexOf(e);n.map(function(e){return e.url=location.origin+e.url}),NKC.methods.rn.emit("viewImage",{index:r,urls:n})},openUserHome:function(e){"UTU"===e.messageType&&(NKC.configs.uid===e.s?NKC.methods.visitUrl(NKC.methods.tools.getUrl("userHome",e.s),!0):NKC.methods.visitUrl(NKC.methods.tools.getUrl("messageUserDetail",e.s),!0))},selectLocalFiles:function(){var e=this.$refs.file;e.value=null,e.click()},selectedLocalFiles:function(){var e,t=U(this.$refs.file.files);try{for(t.s();!(e=t.n()).done;){var n=e.value;this.sendMessage("sendFile",n)}}catch(e){t.e(e)}finally{t.f()}},sendMessage:function(e,t){var n,s,o=this;NKC.methods.rn.emit("getKeyboardStatus",{},function(e){o.keepFocus("show"===e.keyboardStatus)}),["sendText","sendFile"].includes(e)?(n={_id:Date.now(),contentType:"html",s:o.mUser.uid,r:o.tUser.uid,messageType:"UTU"},s=new FormData,"sendText"===e?n.content=t:(n.content=t.name,s.append("file",t)),s.append("content",n.content),s.append("socketId",o.socketId),n.formData=s):n=t,n.status="sending",n.time=Date.now(),Promise.resolve().then(function(){if(!n.content)throw"请输入聊天内容";return"resend"!==e&&o.originMessages.push(n),o.content="",o.autoResize(!0),o.scrollToBottom(),nkcUploadFile("/message/user/".concat(n.r),"POST",n.formData)}).then(function(e){var t=o.originMessages.indexOf(n);n.status="sent",0<=t&&(Vue.set(o.originMessages,t,e.message2),o.scrollToBottom())}).catch(function(e){n.status="error",o.toast(e.error||e.message||e)})},getMessage:function(){var e=self=this,t=e.firstMessageId,n=e.tUser,s=e.type,o="/message/data?type=".concat(s);if(t&&(o+="&firstMessageId=".concat(t)),n.uid&&(o+="&uid=".concat(n.uid)),"canLoad"===self.getMessageStatus)return self.getMessageStatus="loading",nkcAPI(o,"GET").then(function(e){self.originMessages=self.originMessages.concat(e.messages2),e.messages2.length?self.getMessageStatus="canLoad":self.getMessageStatus="cantLoad"}).catch(function(e){self.toast(e),self.getMessageStatus="canLoad"})},getOriginMessageById:function(e){var t,n=U(this.originMessages);try{for(n.s();!(t=n.n()).done;){var s=t.value;if(s._id===e)return s}}catch(e){n.e(e)}finally{n.f()}},insertMessage:function(e){var t=e.messageType,n=e.r,s=e.s,o=this.tUser,r=this.mUser;if("UTU"===t){var i=[o.uid,r.uid];if(!i.includes(n)||!i.includes(s))return;this.mUser.uid!==e.s&&this.markAsRead()}else if("STU"===t){if(n!==r.uid)return;this.markAsRead()}else if("STE"===t)this.markAsRead();else if("friendsApplication"===t&&n!==r.uid)return;this.originMessages.push(e),this.scrollToBottom()},withdrawn:function(t,e){var n=this;Promise.resolve().then(function(){if(!e)return nkcAPI("/message/withdrawn","PUT",{messageId:t})}).then(function(){var e=n.getOriginMessageById(t);e&&(e.contentType="withdrawn")}).catch(n.toast)},markAsRead:function(){var e=self=this,t=e.type,n=e.tUser;setTimeout(function(){nkcAPI("/message/mark","PUT",{type:t,uid:n.uid}).catch(self.toast)},1e3)},useCamera:function(e){var t="takePictureAndSendToUser";"video"===e?t="takeVideoAndSendToUser":"audio"===e&&(t="recordAudioAndSendToUser"),NKC.methods.rn.emit(t,{uid:this.tUser.uid,socketId:null})},newFriendOperation:function(e,t){var n=this.getOriginMessageById(e);nkcAPI("/u/"+n.s+"/friends/agree","POST",{agree:t}).then(function(e){n.content=e.message.content}).catch(this.toast)},playVoice:function(e){var t=this.audio,n=this.stopPlayVoice,s=this.getOriginMessageById;if("playing"===e.content.playStatus)return n();n(),t.src=e.content.fileUrl+"&t=".concat(Date.now()),setTimeout(function(){t.play(),s(e._id).content.playStatus="playing"},200)},stopPlayVoice:function(){var e=this.audio;try{e.pause()}catch(e){}var t,n=U(this.originMessages);try{for(n.s();!(t=n.n()).done;){var s=t.value;"voice"===s.contentType&&(s.content.playStatus="unPlay")}}catch(e){n.e(e)}finally{n.f()}}},computed:{firstMessageId:function(){var e,t=U(this.messages);try{for(t.s();!(e=t.n()).done;){var n=e.value;if("time"!==n.contentType)return n._id}}catch(e){t.e(e)}finally{t.f()}},messages:function(){var e,t=this.originMessages,n=this.mUser,s=this.tUser,o=(new Date).getTime(),r=[],i={},a=[],c=U(t);try{for(c.s();!(e=c.n()).done;){var u=e.value,l=u._id,f=u.s===n.uid;r.push(l),u.position=f?"right":"left",u.sUser=f?n:s,u.canWithdrawn="sent"===u.status&&f&&o-new Date(u.time)<6e4,i[l]=u}}catch(e){c.e(e)}finally{c.f()}var d,h=U(r=(r=w(new Set(r))).sort(function(e,t){return e-t}));try{for(h.s();!(d=h.n()).done;){var g=d.value;a.push(i[g])}}catch(e){h.e(e)}finally{h.f()}for(var m=[],p=0;p<a.length;p++){var y,v=a[p],T=v.time;0===p?m.push({contentType:"time",content:T}):(y=a[p-1],6e4<new Date(T).getTime()-new Date(y.time).getTime()&&m.push({contentType:"time",content:T})),m.push(v)}return m}},mounted:function(){var t=this,n=t.$refs.listContent;window.addEventListener("click",function(){t.showStickerPanel&&t.switchStickerPanel(!1)}),t.scrollToBottom(),n.onscroll=function(){20<this.scrollTop||(n.scrollTo=n.scrollTop,n.height=n.scrollHeight,t.getMessage().then(function(){var e=n.scrollHeight;n.scrollTop=e-n.height}).catch(function(e){t.toast(e.error||e.message||e)}))},t.audio.addEventListener("ended",function(){t.stopPlayVoice()})}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const audio = new Audio();
+
+window.audio = audio;
+
+window.app = new Vue({
+  el: '#app',
+  data: {
+    // socketID
+    socketId: Date.now() + '' + Math.round(Math.random()*1000),
+    // 消息类型，UTU, STU, STE
+    type: data.type,
+    // 消息内容列表
+    originMessages: data.messages,
+    // 是否显示表情列表
+    showStickerPanel: false,
+    // 表情数据
+    twemoji: data.twemoji,
+    // 对方
+    tUser: data.tUser,
+    // 自己
+    mUser: data.mUser,
+    // 输入框输入的内容
+    content: '',
+    // 获取消息内容 锁
+    getMessageStatus: 'canLoad', // canLoad, loading, cantLoad
+    // 语音播放器实例
+    audio: new Audio(),
+  },
+  methods: {
+    // 格式化时间
+    timeFormat: NKC.methods.timeFormat,
+    // 获取链接
+    getUrl: NKC.methods.tools.getUrl,
+    toast(c) {
+      c = c.error || c.message || c;
+      NKC.methods.rn.emit('toast', {
+        content: c
+      });
+    },
+    // 滚动内容到底部
+    scrollToBottom() {
+      setTimeout(() => {
+        const listContent = this.$refs.listContent;
+        listContent.scrollTop = listContent.scrollHeight + 10000;
+      }, 200)
+    },
+    // 切换表情面板状态
+    switchStickerPanel(f) {
+      this.showStickerPanel = f === undefined? !this.showStickerPanel: !!f;
+    },
+    // 选择表情
+    selectSticker(tmj) {
+      const inputText = this.content;
+      const e = this.$refs.input;
+      let index;
+      if (e.selectionStart) {
+        index = e.selectionStart;
+      } else if (document.selection) {
+        e.focus();
+        const r = document.selection.createRange();
+        const sr = r.duplicate();
+        sr.moveToElementText(e);
+        sr.setEndPoint('EndToEnd', r);
+        index = sr.text.length - r.text.length;
+      }
+      const emoji = '[f/' + tmj + ']';
+
+      if(index > 1) {
+        const str = inputText.substring(0, index);
+        const str2 = str + emoji;
+        this.content = inputText.replace(str, str2);
+      } else {
+        this.content = emoji + (this.content || '');
+      }
+      setTimeout(() => {
+        this.autoResize();
+      }, 200);
+
+    },
+    // 输入框自动调整高度
+    autoResize(init) {
+      const textArea = this.$refs.input;
+      const num = 2.8 * 12;
+      textArea.style.height = num + 'px';
+      if(!init && num < textArea.scrollHeight) {
+        textArea.style.height = textArea.scrollHeight + 'px';
+      }
+    },
+    // 输入框保持聚焦
+    keepFocus(focus) {
+      if(focus) {
+        this.$refs.input.focus();
+      }
+    },
+    // 浏览聊天内容中的图片
+    visitImages(url) {
+      let urls = [];
+      for(const m of this.messages) {
+        if(m.contentType === 'img') {
+          urls.push({
+            name: m.content.filename,
+            url: m.content.fileUrl
+          });
+        }
+      }
+      // urls.reverse();
+      const index = urls.map(u => u.url).indexOf(url);
+      urls.map(u => u.url = location.origin + u.url);
+      NKC.methods.rn.emit('viewImage', {
+        index,
+        urls
+      })
+    },
+    // 访问用户主页
+    openUserHome(message) {
+      if(message.messageType !== 'UTU') return;
+      if(NKC.configs.uid === message.s) {
+        NKC.methods.visitUrl(NKC.methods.tools.getUrl('userHome', message.s), true);
+      } else {
+        NKC.methods.visitUrl(NKC.methods.tools.getUrl('messageUserDetail', message.s), true);
+      }
+    },
+    // 选择本地附件
+    selectLocalFiles() {
+      const fileDom = this.$refs.file;
+      fileDom.value = null;
+      fileDom.click();
+    },
+    // 选择完本地附件
+    selectedLocalFiles() {
+      const fileDom = this.$refs.file;
+      for(const file of fileDom.files) {
+        this.sendMessage('sendFile', file);
+      }
+    },
+    // 发送消息
+    sendMessage(type, c) {
+      const self = this;
+      NKC.methods.rn.emit('getKeyboardStatus', {}, function(data) {
+        self.keepFocus(data.keyboardStatus === 'show');
+      })
+      let message
+
+      if(['sendText', 'sendFile'].includes(type)) {
+        // 发送一条信息
+        const localMessageId = Date.now();
+        message = {
+          _id: localMessageId,
+          contentType: 'html',
+          s: self.mUser.uid,
+          r: self.tUser.uid,
+          messageType: 'UTU',
+        }
+        const formData = new FormData();
+        if(type === 'sendText') {
+          message.content = c;
+        } else {
+          message.content = c.name;
+          formData.append('file', c);
+        }
+        formData.append('content', message.content);
+        formData.append('socketId', self.socketId);
+        message.formData = formData;
+      } else {
+        // 重发一条消息
+        message = c;
+      }
+      message.status = 'sending'; // sent已发送、sending正在发送、error出错
+      message.time = Date.now();
+
+      Promise.resolve()
+        .then(() => {
+          if(!message.content) throw '请输入聊天内容';
+          if(type !== 'resend') {
+            self.originMessages.push(message);
+          }
+          self.content = "";
+          self.autoResize(true);
+          self.scrollToBottom();
+          // self.keepFocus(true);
+
+          return nkcUploadFile(`/message/user/${message.r}`, 'POST', message.formData);
+        })
+        .then((data) => {
+          const index = self.originMessages.indexOf(message);
+          message.status = 'sent';
+          if(index >= 0) {
+            Vue.set(self.originMessages, index, data.message2);
+            self.scrollToBottom();
+          }
+        })
+        .catch(data => {
+          message.status = 'error';
+          self.toast(data.error || data.message || data);
+        })
+    },
+    // 获取消息
+    getMessage() {
+      const {firstMessageId, tUser, type} = self = this;
+      let url = `/message/data?type=${type}`;
+      if(firstMessageId) {
+        url += `&firstMessageId=${firstMessageId}`;
+      }
+      if(tUser.uid) {
+        url += `&uid=${tUser.uid}`;
+      }
+      if(self.getMessageStatus !== 'canLoad') return;
+      self.getMessageStatus = 'loading';
+      return nkcAPI(url, 'GET')
+        .then(data => {
+          self.originMessages = self.originMessages.concat(data.messages2);
+          if(data.messages2.length) {
+            self.getMessageStatus = 'canLoad';
+          } else {
+            self.getMessageStatus = 'cantLoad';
+          }
+        })
+        .catch(data => {
+          self.toast(data);
+          self.getMessageStatus = 'canLoad';
+        });
+    },
+    getOriginMessageById(id) {
+      for(const m of this.originMessages) {
+        if(m._id === id) return m;
+      }
+    },
+    // rn接收到新消息通知web
+    insertMessage(message) {
+      const {messageType, r, s} = message;
+      const {tUser, mUser} = this;
+
+      if(messageType === 'UTU') {
+        const usersId = [tUser.uid, mUser.uid];
+        if(!usersId.includes(r) || !usersId.includes(s)) return;
+        if(this.mUser.uid !== message.s) {
+          this.markAsRead();
+        }
+      } else if(messageType === 'STU') {
+        if(r !== mUser.uid) return;
+        this.markAsRead();
+      } else if(messageType === 'STE') {
+        this.markAsRead();
+      } else if(messageType === 'friendsApplication') {
+        if(r !== mUser.uid) return;
+      }
+      this.originMessages.push(message);
+      this.scrollToBottom();
+    },
+    // 撤回
+    withdrawn(messageId, targetUser) {
+      const self = this;
+      Promise.resolve()
+        .then(() => {
+          if(!targetUser) {
+            return nkcAPI('/message/withdrawn', 'PUT', {messageId})
+          }
+        })
+        .then(() => {
+          const originMessage = self.getOriginMessageById(messageId);
+          if(originMessage) originMessage.contentType = 'withdrawn';
+        })
+        .catch(self.toast)
+    },
+    // 标记为已读
+    markAsRead() {
+      const {type, tUser} = self = this;
+      setTimeout(() => {
+        nkcAPI('/message/mark', 'PUT', {
+          type,
+          uid: tUser.uid
+        })
+          .catch(self.toast)
+      }, 1000);
+
+    },
+    // 调用原生拍照、录像和录音
+    useCamera(type) {
+      let name = 'takePictureAndSendToUser';
+      if(type === 'video') {
+        name = 'takeVideoAndSendToUser';
+      } else if(type === 'audio') {
+        name = 'recordAudioAndSendToUser';
+      }
+      NKC.methods.rn.emit(name, {
+        uid: this.tUser.uid,
+        socketId: null
+      });
+    },
+    // 处理好友添加申请
+    newFriendOperation(id, agree) {
+      const self = this;
+      const message = self.getOriginMessageById(id);
+      nkcAPI('/u/' + message.s + '/friends/agree', 'POST', {
+        agree,
+      })
+        .then(function(data) {
+          message.content = data.message.content;
+        })
+        .catch(self.toast)
+    },
+    // 播放语音
+    playVoice(message) {
+      const {audio, stopPlayVoice, getOriginMessageById} = this;
+      if(message.content.playStatus === 'playing') {
+        return stopPlayVoice();
+      }
+      stopPlayVoice();
+      audio.src = message.content.fileUrl + `&t=${Date.now()}`;
+      setTimeout(() => {
+        audio.play();
+        const originMessage = getOriginMessageById(message._id);
+        originMessage.content.playStatus = 'playing';
+      }, 200);
+    },
+    // 停止播放语音
+    stopPlayVoice() {
+      const {audio} = this;
+      try{
+        audio.pause()
+      } catch(err) {}
+      for(const m of this.originMessages) {
+        if(m.contentType === 'voice') {
+          m.content.playStatus = 'unPlay';
+        }
+      }
+    },
+  },
+  computed: {
+    // 第一条消息的ID，用户加载消息内容列表
+    firstMessageId() {
+      const {messages} = this;
+      for(const m of messages) {
+        if(m.contentType !== 'time') {
+          return m._id;
+        }
+      }
+    },
+    // 处理过的消息内容列表
+    messages() {
+      const {originMessages, mUser, tUser} = this;
+      const now = new Date().getTime();
+      let messagesId = [];
+      const messagesObj = {};
+      const messages = [];
+      for(const m of originMessages) {
+        const {_id, s} = m;
+        const ownMessage = s === mUser.uid;
+        messagesId.push(_id);
+        m.position = ownMessage? 'right': 'left';
+        m.sUser = ownMessage? mUser: tUser;
+        m.canWithdrawn = m.status === 'sent' && ownMessage && (now - new Date(m.time) < 60000);
+
+        messagesObj[_id] = m;
+      }
+      messagesId = [...new Set(messagesId)];
+      messagesId = messagesId.sort((a, b) => a - b);
+      for(const id of messagesId) {
+        messages.push(messagesObj[id]);
+      }
+      const arr = [];
+      for(let i = 0; i < messages.length; i++) {
+        const message = messages[i]
+        const {time} = message;
+        if(i === 0) {
+          arr.push({
+            contentType: 'time',
+            content: time,
+          });
+        } else {
+          const lastMessage = messages[i - 1];
+          if(new Date(time).getTime() - new Date(lastMessage.time).getTime() > 60000) {
+            arr.push({
+              contentType: 'time',
+              content: time,
+            });
+          }
+        }
+        arr.push(message);
+      }
+      return arr;
+    }
+  },
+  mounted() {
+    const self = this;
+    const listContent = self.$refs.listContent;
+    window.addEventListener('click', () => {
+      if(self.showStickerPanel) {
+        self.switchStickerPanel(false);
+      }
+    });
+    self.scrollToBottom();
+    listContent.onscroll = function() {
+      const scrollTop = this.scrollTop;
+      if(scrollTop > 20) return;
+      listContent.scrollTo = listContent.scrollTop;
+      listContent.height = listContent.scrollHeight;
+      self.getMessage()
+        .then(function() {
+          const height = listContent.scrollHeight;
+          listContent.scrollTop = height - listContent.height;
+        })
+        .catch(function(data){
+          self.toast(data.error || data.message || data);
+        })
+
+    }
+
+    self.audio.addEventListener('ended', () => {
+      self.stopPlayVoice();
+    });
+  }
+});

@@ -31,10 +31,14 @@ router
       extendOptions.renderHTML = false;
     }
     const ipToken = [];
+    const uidlm = [];
     histories.map(h => {
       ipToken.push(h.iplm);
       ipToken.push(h.ipoc);
-    })
+      if(!targetPost.anonymous) {
+        uidlm.push(h.uidlm);
+      }
+    });
     const ipsObj = await db.IPModel.getIPByTokens(ipToken);
     histories = await db.PostModel.extendPosts(histories, extendOptions);
     for(let i = 0; i < histories.length; i++) {
@@ -54,10 +58,14 @@ router
     } else {
       data.c = c;
     }
+    const users = await db.UserModel.find({uid: {$in: uidlm}});
+    const usersObj = {};
+    users.map(u => usersObj[u.uid] = u);
     for(const h of data.histories) {
       if(h._id.toString() === data.c.toString()) {
         data.notes = await db.NoteModel.getNotesByPost(h);
       }
+      h.targetUser = usersObj[h.uidlm];
     }
     ctx.template = 'post/history.pug';
     await next();

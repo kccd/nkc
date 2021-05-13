@@ -1,1 +1,25 @@
-!function e(a,f,u){function d(i,t){if(!f[i]){if(!a[i]){var n="function"==typeof require&&require;if(!t&&n)return n(i,!0);if(p)return p(i,!0);var r=new Error("Cannot find module '"+i+"'");throw r.code="MODULE_NOT_FOUND",r}var o=f[i]={exports:{}};a[i][0].call(o.exports,function(t){return d(a[i][1][t]||t)},o,o.exports,e,a,f,u)}return f[i].exports}for(var p="function"==typeof require&&require,t=0;t<u.length;t++)d(u[t]);return d}({1:[function(t,i,n){"use strict";NKC.methods.initUnfixedPanel=function(){var t=$(".unfixed-panel:not('[data-init=\"true\"]')");t.draggable({scroll:!1,handle:".unfixed-panel-title",drag:function(t,i){i.position.top<0&&(i.position.top=0);var n=$(window).height();i.position.top>n-30&&(i.position.top=n-30);var r=$(window).width();i.position.left>r-30&&(i.position.left=r-30)}}),t.attr("data-init","true");for(var i=$(window).width(),n=0;n<t.length;n++){var r=t.eq(n);r.css("left",.5*(i-r.width()))}}},{}]},{},[1]);
+/*
+* 初始化非固定类弹窗
+* 设置.unfixed-panel为可拖动
+* 设置.unfixed-panel-title为拖动手柄
+* */
+NKC.methods.initUnfixedPanel = function() {
+  var dom = $(".unfixed-panel:not('[data-init=\"true\"]')");
+  dom.draggable({
+    scroll: false,
+    handle: ".unfixed-panel-title",
+    drag: function(event, ui) {
+      if(ui.position.top < 0) ui.position.top = 0;
+      var height = $(window).height();
+      if(ui.position.top > height - 30) ui.position.top = height - 30;
+      var winWidth = $(window).width();
+      if(ui.position.left > winWidth - 30) ui.position.left = winWidth - 30;
+    }
+  });
+  dom.attr("data-init", "true");
+  var width = $(window).width();
+  for(var i = 0; i < dom.length; i++) {
+    var d = dom.eq(i);
+    d.css("left", (width - d.width())*0.5);
+  }
+};

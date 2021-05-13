@@ -1368,7 +1368,7 @@ forumSchema.statics.getForumsNewTree = async (userRoles, userGrade, user) => {
   const ThreadTypeModel = mongoose.model("threadTypes");
   const threadTypes = await ThreadTypeModel.find({});
   let fid = await ForumModel.visibleFid(userRoles, userGrade, user);
-  const subForums = await SubscribeModel.find({type: "forum", uid: user.uid});
+  const subForums = await SubscribeModel.find({cancel: false, type: "forum", uid: user.uid});
   let forums = await ForumModel.find({
     fid: {
       $in: fid

@@ -1,10 +1,9 @@
-var app;
 $(function() {
   var data = NKC.methods.getDataById("data");
   for(var i = 0; i < data.warnings.length; i++) {
     data.warnings[i].modify = false;
   }
-  app = new Vue({
+  window.app = new Vue({
     el: "#app",
     data: {
       warnings: data.warnings

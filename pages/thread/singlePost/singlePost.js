@@ -1,1 +1,576 @@
-!function i(r,s,c){function d(e,t){if(!s[e]){if(!r[e]){var n="function"==typeof require&&require;if(!t&&n)return n(e,!0);if(m)return m(e,!0);var o=new Error("Cannot find module '"+e+"'");throw o.code="MODULE_NOT_FOUND",o}var a=s[e]={exports:{}};r[e][0].call(a.exports,function(t){return d(r[e][1][t]||t)},a,a.exports,i,r,s,c)}return s[e].exports}for(var m="function"==typeof require&&require,t=0;t<c.length;t++)d(c[t]);return d}({1:[function(t,e,n){"use strict";function s(t,e){var n;if("undefined"==typeof Symbol||null==t[Symbol.iterator]){if(Array.isArray(t)||(n=function(t,e){if(!t)return;if("string"==typeof t)return c(t,e);var n=Object.prototype.toString.call(t).slice(8,-1);"Object"===n&&t.constructor&&(n=t.constructor.name);if("Map"===n||"Set"===n)return Array.from(t);if("Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return c(t,e)}(t))||e&&t&&"number"==typeof t.length){n&&(t=n);var o=0,a=function(){};return{s:a,n:function(){return o>=t.length?{done:!0}:{done:!1,value:t[o++]}},e:function(t){throw t},f:a}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var i,r=!0,s=!1;return{s:function(){n=t[Symbol.iterator]()},n:function(){var t=n.next();return r=t.done,t},e:function(t){s=!0,i=t},f:function(){try{r||null==n.return||n.return()}finally{if(s)throw i}}}}function c(t,e){(null==e||e>t.length)&&(e=t.length);for(var n=0,o=new Array(e);n<e;n++)o[n]=t[n];return o}function a(t,e){for(var n=0;n<e.length;n++){var o=e[n];o.enumerable=o.enumerable||!1,o.configurable=!0,"value"in o&&(o.writable=!0),Object.defineProperty(t,o.key,o)}}var o=new(function(){function t(){!function(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}(this,t),this.editors={},this.tid=null,this.cWriteInfo=!0,this.postPermission={permit:!1,warning:null},this.sendAnonymousPost=!1}var e,n,o;return e=t,(n=[{key:"getPostHeightFloat",value:function(){var t=$('.hidden[data-type="hidePostContentSettings"]');if(!t.length)throw"未读取到与post内容隐藏相关的配置";return(t=NKC.methods.strToObj(t.html())).float}},{key:"getPostMaxHeight",value:function(){var t=$(document).width(),e=$('.hidden[data-type="hidePostContentSettings"]');if(!e.length)throw"未读取到与post内容隐藏相关的配置";return e=NKC.methods.strToObj(e.html()),t<768?e.xs:t<992?e.sm:e.md}},{key:"autoHidePostContent",value:function(){for(var t=$(".single-post-container"),e=0;e<t.length;e++){var n=t.eq(e),o=n.attr("data-hide"),a=n.attr("data-pid");"not"!==o&&this.getPostMaxHeight()<n.find(".single-post-center").height()&&this.hidePostContent(a)}}},{key:"hidePostContent",value:function(t){var e=$('.single-post-container[data-pid="'.concat(t,'"]')),n=e.find(".single-post-center"),o=this.getPostHeightFloat(),a=this.getPostMaxHeight();n.css({"max-height":a*o+"px"});var i=e.find(".switch-hidden-status");i.find(".switch-hidden-status-button").html('<div class="fa fa-angle-down"><strong> 加载全文</strong></div>'),e.attr("data-hidden","true"),i.removeClass("hidden")}},{key:"showPostContent",value:function(t){var e=$('.single-post-container[data-pid="'.concat(t,'"]'));e.find(".single-post-center").css({"max-height":"none"});var n=e.find(".switch-hidden-status");n.find(".switch-hidden-status-button").html('<div class="fa fa-angle-up"> 收起</div>'),e.attr("data-hidden","false"),n.removeClass("hidden")}},{key:"switchPostContent",value:function(t){var e,n;"true"===$('.single-post-container[data-pid="'.concat(t,'"]')).attr("data-hidden")?(e=$(document).scrollTop(),this.showPostContent(t),scrollTo(0,e)):(n=new NKC.modules.PagePosition,this.hidePostContent(t),n.restore())}},{key:"getPostContainer",value:function(t){return $('.single-post-container[data-pid="'.concat(t,'"]'))}},{key:"getCommentContainer",value:function(t){return $('[data-type="singlePostCommentContainer"][data-pid="'.concat(t,'"]'))}},{key:"getSingleComment",value:function(t){return $('.single-comment[data-pid="'.concat(t,'"]'))}},{key:"getCommentButton",value:function(t){return $('[data-type="singlePostCommentButton"][data-pid="'.concat(t,'"]'))}},{key:"createCommentElements",value:function(t){var e=$('.single-comments[data-pid="'.concat(t,'"]'));return e.length||(e=$('<div class="single-comments" data-pid="'.concat(t,'"></div>'))),e}},{key:"getPages",value:function(t,e){var n=$('.single-comment-paging[data-pid="'.concat(t,'"]'));n.length||(n=$('<div class="single-comment-paging" data-pid="'.concat(t,'"></div>'))),n.html("");var o,a=s(e.buttonValue);try{for(a.s();!(o=a.n()).done;){var i=o.value,r=$('<span class="'.concat(i.type,'">..</span>'));"null"!==i.type&&(r.text(i.num+1),r.attr("onclick","NKC.methods.getPostCommentsByPage('".concat(t,"', ").concat(i.num,")"))),n.append(r)}}catch(t){a.e(t)}finally{a.f()}return n}},{key:"switchPostBackgroundColor",value:function(t,e){this.getPostContainer(t).attr("data-show-comments",e?"true":"false")}},{key:"showPostComment",value:function(d,t,e){var m=this,n=1<arguments.length&&void 0!==t?t:0,o=(2<arguments.length&&void 0!==e?e:{}).highlightCommentId,u=void 0===o?null:o;this.removeAllEditorApp(d);var l=this,h=this.getCommentContainer(d);this.switchPostBackgroundColor(d,!0);var a=this.getCommentButton(d),i=h.find(".single-post-comment-loading"),r=h.find(".single-post-comment-error");0<i.length&&i.remove(),0<r.length&&r.remove();var p=$("<div class=\"single-post-comment-loading\"><div class='fa fa-spinner fa-spin'></div>加载中...</div>");"true"!==h.attr("data-opened")&&h.append(p),h.attr("data-hide","false"),a.attr("data-show-number","false"),this.renderPostCommentNumber(d),this.getPostComments(d,n).then(function(t){p.remove();var e=t.tid,n=t.htmlContent,o=t.paging,a=t.postPermission;o.page+1>=o.pageCount?h.attr("data-last-page","true"):h.attr("data-last-page","false"),l.postPermission=a,l.tid=e,l.sendAnonymousPost=t.sendAnonymousPost;var i=m.createCommentElements(d);i.html(n);var r=l.getPages(d,o);"true"!==h.attr("data-opened")&&(h.append(r),h.append(i),h.append(r.clone(!0)),h.attr("data-opened","true"));var s,c=l.getEditorApp(d,h,{cancelEvent:"switchPostComment",keepOpened:!0,position:"bottom"});m.cWriteInfo=t.cWriteInfo,t.cWriteInfo?h.append($('<div class="text-danger single-post-comment-error">'.concat(t.cWriteInfo,"</div>"))):(c.show=!0,c.container.show()),u&&(s=$('.single-comment[data-pid="'.concat(u,'"]>.single-comment-center')),NKC.methods.scrollToDom(s),NKC.methods.markDom(s)),l.autoSaveDraft(d)}).then(function(){l.initNKCSource()}).catch(function(t){var e=$('<div class="single-post-comment-error text-danger">'.concat(t.error||t.message||t,"</div>"));h.html(e)})}},{key:"initNKCSource",value:function(){floatUserPanel.initPanel(),NKC.methods.initSharePanel(),NKC.methods.initPostOption(),NKC.methods.initStickerViewer(),NKC.configs.isApp||NKC.methods.initImageViewer(),NKC.methods.initVideo()}},{key:"removeAllEditorApp",value:function(t){for(var e=this.getCommentContainer(t).find(".single-comment"),n=0;n<e.length;n++){var o=e.eq(n);this.removeEditorApp(o.attr("data-pid"))}this.removeEditorApp(t)}},{key:"hidePostComment",value:function(t){this.switchPostBackgroundColor(t,!1);var e=this.getCommentContainer(t),n=this.getCommentButton(t);e.attr("data-hide","true"),n.attr("data-show-number","true"),this.renderPostCommentNumber(t)}},{key:"renderPostCommentNumber",value:function(t){var e,n=this.getCommentButton(t),o=Number(n.attr("data-number"));"true"===n.attr("data-show-number")?(e="评论",0<o&&(e+="(".concat(o,")"))):e="折叠评论",n.text(e)}},{key:"setPostCommentNumber",value:function(t,e){var n=this.getCommentButton(t),o=Number(n.attr("data-number"));n.attr("data-number",o+1)}},{key:"switchPostComment",value:function(t,e,n){var o;"false"===this.getCommentContainer(t).attr("data-hide")?e?(o=new NKC.modules.PagePosition,this.hidePostComment(t),o.restore()):this.hidePostComment(t):this.showPostComment(t,n)}},{key:"getPostComments",value:function(t,e){var n=1<arguments.length&&void 0!==e?e:0;return nkcAPI("/p/".concat(t,"/comments?page=").concat(n),"GET")}},{key:"removeEditorApp",value:function(t){var e=this.getEditorAppData(t);e&&(clearTimeout(e.timeoutId),e.app&&e.app.destroy&&e.app.destroy(),e.container&&e.container.remove&&e.container.remove(),delete this.editors[t])}},{key:"getEditorAppData",value:function(t){return this.editors[t]}},{key:"getEditorApp",value:function(t,e,n){var o=2<arguments.length&&void 0!==n?n:{};o.keepOpened=o.keepOpened||!1;var a,i,r,s,c,d,m,u,l=o.cancelEvent,h=void 0===l?"switchCommentForm":l,p=o.position,f=void 0===p?"top":p;return void 0===this.editors[t]&&(a=e,i=$('<div class="single-comment-editor-container"></div>'),(r=$('<div class="single-comment-warning"></div>')).html(this.postPermission.warning),i.append(r),this.postPermission.permit&&(s=$('<div class="single-comment-editor" id="singlePostEditor_'.concat(t,'">')),d=$('<div class="single-comment-prompt">200字以内，仅用于支线交流，主线讨论请采用回复功能。</div>'),m=$('<div class="single-comment-button" data-type="'.concat(t,'"></div>')),u="NKC.methods.".concat(h,'("').concat(t,'", true)'),this.sendAnonymousPost&&m.append($('\n          <div class="checkbox">\n            <label>\n              <input type="checkbox" data-type="anonymous" /> 匿名发表\n            </label>\n          </div>\n        ')),m.append($('\n          <div class="checkbox">  \n            <label>\n              <input type="checkbox" checked="checked" data-type="protocol" onchange="NKC.methods.setProtocolStatus(\''.concat(t,'\')" /> 我已阅读并同意遵守与本次发表相关的全部协议。<a href="/protocol" target="_blank">查看协议</a>\n            </label>\n          </div>\n        '))),m.append($('<button class="btn btn-primary btn-sm" data-type="post-button" onclick="NKC.methods.postData(\''.concat(t,"')\">提交</button>"))).append($('<button class="btn btn-default btn-sm" onclick="NKC.methods.saveDraft(\''.concat(t,"')\">存草稿</button>"))).append($('<button class="btn btn-default btn-sm" onclick=\''.concat(u,"'>取消</button>"))),i.append(d).append(s).append(m)),"top"===f?a.prepend(i):a.append(i),s&&(c=UE.getEditor(s.attr("id"),NKC.configs.ueditor.commentConfigs)),i.hide(),this.editors[t]={app:c,draftId:null,options:o,container:i,pid:t,show:!1,timeoutId:null,prevDraft:""}),this.editors[t]}},{key:"switchCommentForm",value:function(t){if(!NKC.configs.uid)return NKC.methods.toLogin();var e=this.getSingleComment(t);if(e.find(".single-post-comment-error").remove(),this.cWriteInfo)return e.append($('<div class="single-post-comment-error text-danger">'.concat(this.cWriteInfo,"</div>")));var n=e.children(".single-comment-bottom"),o=this.getEditorApp(t,n);if(o.show){if(o.options.keepOpened)return;o.show=!1,o.container.hide(),clearTimeout(o.timeoutId),this.removeEditorApp(t)}else o.show=!0,o.container.show(),this.autoSaveDraft(t)}},{key:"getEditorContent",value:function(t){return this.getEditorApp(t).app.getContent()}},{key:"clearEditorContent",value:function(t){this.getEditorApp(t).app.setContent("")}},{key:"changeEditorButtonStatus",value:function(t,e){var n=this.getEditorApp(t).container.find("[data-type=post-button]");n.attr("disabled",e),e?n.html('<div class="fa fa-spinner fa-spin"></div> 提交中...'):n.html("提交")}},{key:"postData",value:function(n){var e=this.getEditorContent(n),o=this;return Promise.resolve().then(function(){if(!e)throw"评论内容不能为空";var t=$('.single-comment-button[data-type="'.concat(n,'"]')).find('input[data-type="anonymous"]').prop("checked");return o.changeEditorButtonStatus(n,!0),nkcAPI("/t/"+o.tid,"POST",{postType:"comment",post:{c:e,l:"html",anonymous:t,parentPostId:n}})}).then(function(t){screenTopAlert("发表成功");var e=t.renderedPost;o.clearEditorContent(n),o.changeEditorButtonStatus(n,!1),o.switchCommentForm(n),e&&o.insertComment(e.parentCommentId,e.parentPostId,e.html)}).catch(function(t){sweetError(t),o.changeEditorButtonStatus(n,!1)})}},{key:"saveDraftData",value:function(t){var e=this.getEditorApp(t),n=(e.prevDraft,this.getEditorContent(t));e.prevDraft=n;var o=this;return Promise.resolve().then(function(){if(n)return nkcAPI("/u/".concat(NKC.configs.uid,"/drafts"),"POST",{post:{c:n,l:"html"},draftId:e.draftId,desType:"thread",desTypeId:o.tid})}).then(function(t){return t?(e.draftId=t.draft.did,{saved:!0}):{saved:!1,error:"草稿内容不能为空"}})}},{key:"saveDraft",value:function(t){this.saveDraftData(t).then(function(t){var e=t.saved,n=t.error;e?sweetSuccess("草稿已保存"):sweetError(n)}).catch(sweetError)}},{key:"autoSaveDraft",value:function(e){var n=this,t=n.getEditorApp(e);t&&t.show&&(clearTimeout(t.timeoutId),t.timeoutId=setTimeout(function(){n.saveDraftData(e).then(function(){n.autoSaveDraft(e)}).catch(function(t){screenTopWarning(t),n.autoSaveDraft(e)})},1e4))}},{key:"insertComment",value:function(t,e,n){var o=this.getCommentContainer(t);if(o.length){if("false"===o.attr("data-last-page"))return;o.children('.single-comments[data-pid="'.concat(t,'"]')).children('.single-comments[data-pid="'.concat(t,'"]')).append($(n))}else{this.getSingleComment(t).children(".single-comment-bottom").children('.single-comments[data-pid="'.concat(t,'"]')).append($(n))}this.setPostCommentNumber(e,1),this.renderPostCommentNumber(e),this.initNKCSource()}},{key:"setProtocolStatus",value:function(t){var e=$('.single-comment-button[data-type="'.concat(t,'"]')),n=e.find('input[data-type="protocol"]'),o=e.find('button[data-type="post-button"]');n.prop("checked")?o.removeAttr("disabled"):o.attr("disabled","disabled")}}])&&a(e.prototype,n),o&&a(e,o),t}());NKC.methods.autoHidePostContent=function(){o.autoHidePostContent()},NKC.methods.switchPostContent=function(t){o.switchPostContent(t)},NKC.methods.switchPostComment=function(t,e,n){o.switchPostComment(t,e,n)},NKC.methods.switchCommentForm=function(t){o.switchCommentForm(t)},NKC.methods.postData=function(t){o.postData(t)},NKC.methods.saveDraft=function(t){o.saveDraft(t)},NKC.methods.getPostCommentsByPage=function(t,e){o.showPostComment(t,e)},NKC.methods.showPostComment=function(t,e,n){o.showPostComment(t,e,n)},NKC.methods.insertComment=function(t,e,n){o.insertComment(t,e,n)},NKC.methods.setProtocolStatus=function(t){o.setProtocolStatus(t)}},{}]},{},[1]);
+class SinglePostModule {
+  constructor() {
+    this.editors = {};
+    this.tid = null;
+    // 如果不允许评论，此字段为相关说明
+    this.cWriteInfo = true;
+    this.postPermission = {
+      permit: false,
+      warning: null
+    };
+    this.sendAnonymousPost = false;
+  }
+  getPostHeightFloat() {
+    let postHeight = $('.hidden[data-type="hidePostContentSettings"]');
+    if(!postHeight.length) throw '未读取到与post内容隐藏相关的配置';
+    postHeight = NKC.methods.strToObj(postHeight.html());
+    return postHeight.float;
+  }
+  // 获取后台有关post高度的配置
+  // 根据屏幕尺寸判断是否需要隐藏
+  getPostMaxHeight() {
+    const DW = $(document).width();
+    let postHeight = $('.hidden[data-type="hidePostContentSettings"]');
+    if(!postHeight.length) throw '未读取到与post内容隐藏相关的配置';
+    postHeight = NKC.methods.strToObj(postHeight.html());
+    let hidePostMaxHeight;
+    if(DW < 768) {
+      hidePostMaxHeight = postHeight.xs;
+    } else if(DW < 992) {
+      hidePostMaxHeight = postHeight.sm;
+    } else {
+      hidePostMaxHeight = postHeight.md;
+    }
+    return hidePostMaxHeight;
+  }
+  // 自动获取post列表、判断高度以及属性然后隐藏满足条件的post
+  autoHidePostContent() {
+    const containers = $('.single-post-container');
+    for(let i = 0; i < containers.length; i++) {
+      const c = containers.eq(i);
+      const hide = c.attr('data-hide');
+      const pid = c.attr('data-pid');
+      if(hide === 'not') continue;
+      const hidePostMaxHeight = this.getPostMaxHeight();
+      const contentHeight = c.find('.single-post-center').height();
+      if(contentHeight > hidePostMaxHeight) {
+        this.hidePostContent(pid);
+      }
+    }
+  }
+  // 隐藏post内容
+  hidePostContent(pid) {
+    const container = $(`.single-post-container[data-pid="${pid}"]`);
+    const postCenter = container.find('.single-post-center');
+    const hidePostFloat = this.getPostHeightFloat();
+    const hidePostMaxHeight = this.getPostMaxHeight();
+    postCenter.css({
+      "max-height": hidePostMaxHeight * hidePostFloat + "px"
+    });
+    const buttonContainer = container.find('.switch-hidden-status');
+    const button = buttonContainer.find('.switch-hidden-status-button');
+    button.html(`<div class="fa fa-angle-down"><strong> 加载全文</strong></div>`);
+    container.attr('data-hidden', 'true');
+    buttonContainer.removeClass('hidden');
+  }
+  // 取消隐藏post内容
+  showPostContent(pid) {
+    const container = $(`.single-post-container[data-pid="${pid}"]`);
+    const postCenter = container.find('.single-post-center');
+    postCenter.css({
+      "max-height": 'none'
+    });
+    const buttonContainer = container.find('.switch-hidden-status');
+    const button = buttonContainer.find('.switch-hidden-status-button');
+    button.html(`<div class="fa fa-angle-up"> 收起</div>`);
+    container.attr('data-hidden', 'false');
+    buttonContainer.removeClass('hidden');
+  }
+  // 切换post隐藏状态
+  switchPostContent(pid) {
+    const container = $(`.single-post-container[data-pid="${pid}"]`);
+    const hidden = container.attr('data-hidden');
+    if(hidden === 'true') {
+      const scrollY = $(document).scrollTop();
+      this.showPostContent(pid);
+      scrollTo(0, scrollY);
+    } else {
+      const pagePosition = new NKC.modules.PagePosition();
+      this.hidePostContent(pid);
+      pagePosition.restore();
+    }
+  }
+  // 获取回复最外层dom
+  getPostContainer(pid) {
+    return $(`.single-post-container[data-pid="${pid}"]`);
+  }
+  // 获取评论框最外层dom
+  getCommentContainer(pid) {
+    return $(`[data-type="singlePostCommentContainer"][data-pid="${pid}"]`);
+  }
+  // 获取单条评论最外层
+  getSingleComment(pid) {
+    return $(`.single-comment[data-pid="${pid}"]`);
+  }
+  // 获取控制评论显示与隐藏的按钮
+  getCommentButton(pid) {
+    return $(`[data-type="singlePostCommentButton"][data-pid="${pid}"]`);
+  }
+  // 获取编辑器以及编辑器上的提示
+  createCommentElements(pid) {
+    let comments = $(`.single-comments[data-pid="${pid}"]`);
+    if(!comments.length) comments = $(`<div class="single-comments" data-pid="${pid}"></div>`);
+    return comments;
+  }
+  getPages(pid, paging) {
+    let pages = $(`.single-comment-paging[data-pid="${pid}"]`);
+    if(!pages.length) pages = $(`<div class="single-comment-paging" data-pid="${pid}"></div>`);
+    pages.html("");
+    for(const button of paging.buttonValue) {
+      const b = $(`<span class="${button.type}">..</span>`);
+      if(button.type !== 'null') {
+        b.text(button.num + 1);
+        b.attr('onclick', `NKC.methods.getPostCommentsByPage('${pid}', ${button.num})`)
+      }
+      pages.append(b);
+    }
+    return pages;
+  }
+  // 展开评论 添加或移除post背景
+  switchPostBackgroundColor(pid, show) {
+    const postContainer = this.getPostContainer(pid);
+    postContainer.attr('data-show-comments', show? 'true': 'false');
+  }
+  showPostComment(pid, page = 0, options={}) {
+    const {highlightCommentId = null} = options;
+    this.removeAllEditorApp(pid);
+    const self = this;
+    const container = this.getCommentContainer(pid);
+    this.switchPostBackgroundColor(pid, true);
+    const button = this.getCommentButton(pid);
+
+    const _loadDom = container.find('.single-post-comment-loading');
+    const _errorDom = container.find('.single-post-comment-error');
+    if(_loadDom.length > 0) {
+      _loadDom.remove();
+    }
+    if(_errorDom.length > 0) {
+      _errorDom.remove();
+    }
+    const loading = $(`<div class="single-post-comment-loading"><div class='fa fa-spinner fa-spin'></div>加载中...</div>`);
+    if(container.attr('data-opened') !== 'true') {
+      container.append(loading);
+    }
+    container.attr('data-hide', 'false');
+    button.attr('data-show-number', 'false');
+    this.renderPostCommentNumber(pid);
+    this.getPostComments(pid, page)
+      .then(data => {
+        loading.remove();
+        const {tid, htmlContent, paging, postPermission} = data;
+        if(paging.page+1 >= paging.pageCount) {
+          container.attr('data-last-page', 'true')
+        } else {
+          container.attr('data-last-page', 'false')
+        }
+        self.postPermission = postPermission;
+        self.tid = tid;
+        self.sendAnonymousPost = data.sendAnonymousPost;
+        const comments = this.createCommentElements(pid);
+        comments.html(htmlContent);
+        const pagesDom = self.getPages(pid, paging);
+        if(container.attr('data-opened') !== 'true') {
+          container.append(pagesDom);
+          container.append(comments);
+          container.append(pagesDom.clone(true));
+          container.attr('data-opened', 'true');
+        }
+        const editorApp = self.getEditorApp(pid, container, {
+          cancelEvent: 'switchPostComment',
+          keepOpened: true,
+          position: 'bottom'
+        });
+        this.cWriteInfo = data.cWriteInfo;
+        if(!data.cWriteInfo) {
+          editorApp.show = true;
+          editorApp.container.show();
+        } else {
+          container.append($(`<div class="text-danger single-post-comment-error">${data.cWriteInfo}</div>`));
+        }
+        if(highlightCommentId) {
+          const targetComment = $(`.single-comment[data-pid="${highlightCommentId}"]>.single-comment-center`);
+          NKC.methods.scrollToDom(targetComment);
+          NKC.methods.markDom(targetComment);
+        }
+        self.autoSaveDraft(pid);
+      })
+      .then(() => {
+        self.initNKCSource();
+      })
+      .catch(data => {
+        const errorDom = $(`<div class="single-post-comment-error text-danger">${data.error || data.message || data}</div>`);
+        container.html(errorDom);
+      });
+  }
+  initNKCSource() {
+    floatUserPanel.initPanel();
+    NKC.methods.initSharePanel();
+    NKC.methods.initPostOption();
+    NKC.methods.initStickerViewer();
+    if(!NKC.configs.isApp) NKC.methods.initImageViewer();
+    NKC.methods.initVideo();
+  }
+  // 移除所有评论框和定时事件
+  removeAllEditorApp(pid) {
+    const container = this.getCommentContainer(pid);
+    const comments = container.find(`.single-comment`);
+    for(let i = 0; i < comments.length; i++) {
+      const c = comments.eq(i);
+      this.removeEditorApp(c.attr('data-pid'))
+    }
+    this.removeEditorApp(pid)
+  }
+  // 隐藏评论
+  hidePostComment(pid) {
+    this.switchPostBackgroundColor(pid, false);
+    const container = this.getCommentContainer(pid);
+    const button = this.getCommentButton(pid);
+    container.attr('data-hide', 'true');
+    button.attr('data-show-number', 'true');
+    this.renderPostCommentNumber(pid);
+  }
+  renderPostCommentNumber(pid) {
+    const button = this.getCommentButton(pid);
+    const number = Number(button.attr('data-number'));
+    const showNumber = button.attr('data-show-number');
+    let text;
+    if(showNumber === 'true') {
+      text = '评论';
+      if(number > 0) {
+        text += `(${number})`;
+      }
+    } else {
+      text = '折叠评论';
+    }
+    button.text(text);
+  }
+  setPostCommentNumber(pid, num = 1) {
+    const button = this.getCommentButton(pid);
+    const number = Number(button.attr('data-number'));
+    button.attr('data-number', number + 1);
+  }
+  // 显示、隐藏评论
+  switchPostComment(pid, fixPosition, page) {
+    const container = this.getCommentContainer(pid);
+    if(container.attr('data-hide') === 'false') {
+      if(fixPosition) {
+        const pagePosition = new NKC.modules.PagePosition();
+        this.hidePostComment(pid);
+        pagePosition.restore();
+      } else {
+        this.hidePostComment(pid);
+      }
+    } else {
+      this.showPostComment(pid, page);
+    }
+  }
+  // 获取post下的评论
+  getPostComments(pid, page = 0) {
+    return nkcAPI(`/p/${pid}/comments?page=${page}`, 'GET')
+  }
+  // 移除编辑框
+  removeEditorApp(pid) {
+    const editorApp = this.getEditorAppData(pid);
+    if(!editorApp) return;
+    clearTimeout(editorApp.timeoutId);
+    if(editorApp.app && editorApp.app.destroy) {
+      editorApp.app.destroy();
+    }
+    if(editorApp.container && editorApp.container.remove) {
+      editorApp.container.remove();
+    }
+    delete this.editors[pid];
+  }
+  getEditorAppData(pid) {
+    return this.editors[pid];
+  }
+  // 获取编辑器dom
+  getEditorApp(pid, parentDom, props = {}) {
+    props.keepOpened = props.keepOpened || false;
+    const {
+      cancelEvent = 'switchCommentForm',
+      position = 'top',
+    } = props;
+    const editorApp = this.editors[pid];
+    if(
+      editorApp === undefined
+    ) {
+      const singleCommentBottom = parentDom;
+      const editorContainer = $(`<div class="single-comment-editor-container"></div>`);
+      const warningDom = $(`<div class="single-comment-warning"></div>`);
+      warningDom.html(this.postPermission.warning);
+      editorContainer
+        .append(warningDom)
+      let editorDom, app;
+      if(this.postPermission.permit) {
+        editorDom = $(`<div class="single-comment-editor" id="singlePostEditor_${pid}">`);
+        const promptDom = $(`<div class="single-comment-prompt">200字以内，仅用于支线交流，主线讨论请采用回复功能。</div>`);
+        const buttonDom = $(`<div class="single-comment-button" data-type="${pid}"></div>`);
+        const onclick = `NKC.methods.${cancelEvent}("${pid}", true)`;
+        if(this.sendAnonymousPost) {
+          buttonDom.append($(`
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" data-type="anonymous" /> 匿名发表
+            </label>
+          </div>
+        `));
+        }
+        buttonDom.append($(`
+          <div class="checkbox">  
+            <label>
+              <input type="checkbox" checked="checked" data-type="protocol" onchange="NKC.methods.setProtocolStatus('${pid}')" /> 我已阅读并同意遵守与本次发表相关的全部协议。<a href="/protocol" target="_blank">查看协议</a>
+            </label>
+          </div>
+        `));
+        buttonDom
+          .append($(`<button class="btn btn-primary btn-sm" data-type="post-button" onclick="NKC.methods.postData('${pid}')">提交</button>`))
+          .append($(`<button class="btn btn-default btn-sm" onclick="NKC.methods.saveDraft('${pid}')">存草稿</button>`))
+          .append($(`<button class="btn btn-default btn-sm" onclick='${onclick}'>取消</button>`));
+
+        editorContainer
+          .append(promptDom)
+          .append(editorDom)
+          .append(buttonDom)
+      }
+
+      if(position === 'top') {
+        singleCommentBottom.prepend(editorContainer);
+      } else {
+        singleCommentBottom.append(editorContainer);
+      }
+
+
+      if(editorDom) {
+        app = UE.getEditor(editorDom.attr('id'), NKC.configs.ueditor.commentConfigs);
+      }
+
+      editorContainer.hide();
+
+      this.editors[pid] = {
+        app,
+        draftId: null,
+        options: props,
+        container: editorContainer,
+        pid: pid,
+        show: false,
+        timeoutId: null,
+        prevDraft: ""
+      };
+    }
+    return this.editors[pid];
+  }
+  // 打开回评输入框
+  switchCommentForm(pid) {
+    if(!NKC.configs.uid) {
+      return NKC.methods.toLogin();
+    }
+    const singleComment = this.getSingleComment(pid);
+    singleComment.find('.single-post-comment-error').remove();
+    if(this.cWriteInfo) {
+      return singleComment.append($(`<div class="single-post-comment-error text-danger">${this.cWriteInfo}</div>`));
+    }
+    const singleCommentBottom = singleComment.children('.single-comment-bottom');
+    const editorApp = this.getEditorApp(pid, singleCommentBottom);
+    if(editorApp.show) {
+      if(editorApp.options.keepOpened) return;
+      editorApp.show = false;
+      editorApp.container.hide();
+      clearTimeout(editorApp.timeoutId);
+      this.removeEditorApp(pid);
+    } else {
+      editorApp.show = true;
+      editorApp.container.show();
+      this.autoSaveDraft(pid);
+    }
+  }
+  // 获取指定编辑器的内容
+  getEditorContent(pid) {
+    const editorApp = this.getEditorApp(pid);
+    return editorApp.app.getContent();
+  }
+  // 清除编辑器内的内容
+  clearEditorContent(pid) {
+    const editorApp = this.getEditorApp(pid);
+    editorApp.app.setContent('');
+  }
+  // 屏蔽提交按钮
+  changeEditorButtonStatus(pid, disabled) {
+    const editorApp = this.getEditorApp(pid);
+    const button = editorApp.container.find('[data-type=post-button]');
+    button.attr('disabled', disabled);
+    if(disabled) {
+      button.html(`<div class="fa fa-spinner fa-spin"></div> 提交中...`);
+    } else {
+      button.html(`提交`);
+    }
+  }
+  // 点击回复按钮
+  postData(pid) {
+    const content = this.getEditorContent(pid);
+    const self = this;
+    return Promise.resolve()
+      .then(() => {
+        if(!content) throw '评论内容不能为空';
+        const buttonDom = $(`.single-comment-button[data-type="${pid}"]`);
+        const anonymousButton = buttonDom.find(`input[data-type="anonymous"]`);
+        const isAnonymous = anonymousButton.prop('checked');
+        self.changeEditorButtonStatus(pid, true);
+        return nkcAPI("/t/" + self.tid, "POST", {
+          postType: "comment",
+          post: {
+            c: content,
+            l: "html",
+            anonymous: isAnonymous,
+            parentPostId: pid
+          }
+        })
+      })
+      .then((data) => {
+        screenTopAlert('发表成功');
+        const renderedComment = data.renderedPost;
+        self.clearEditorContent(pid);
+        self.changeEditorButtonStatus(pid, false);
+        self.switchCommentForm(pid);
+        if(renderedComment) {
+          self.insertComment(
+            renderedComment.parentCommentId,
+            renderedComment.parentPostId,
+            renderedComment.html
+          );
+        }
+      })
+      .catch(err => {
+        sweetError(err);
+        self.changeEditorButtonStatus(pid, false);
+      })
+  }
+  // 保存草稿
+  saveDraftData(pid) {
+    const editorApp = this.getEditorApp(pid);
+    const { prevDraft } = editorApp;
+    const content = this.getEditorContent(pid);
+    /*if(prevDraft === content) {
+      console.log("内容相同，不保存新草稿");
+      return Promise.resolve();
+    } else {
+      editorApp.prevDraft = content;
+    }*/
+    editorApp.prevDraft = content;
+    const self = this;
+    return Promise.resolve()
+      .then(() => {
+        if(!content) return;
+        return nkcAPI(`/u/${NKC.configs.uid}/drafts`, 'POST', {
+          post: {
+            c: content,
+            l: 'html'
+          },
+          draftId: editorApp.draftId,
+          desType: 'thread',
+          desTypeId: self.tid
+        })
+      })
+      .then(data => {
+        if(!data) return {saved: false, error: '草稿内容不能为空'};
+        editorApp.draftId = data.draft.did;
+        return {saved: true};
+      })
+  }
+  // 手动点击保存草稿
+  saveDraft(pid) {
+    this.saveDraftData(pid)
+      .then(({saved, error}) => {
+        if(saved) {
+          sweetSuccess('草稿已保存');
+        } else {
+          sweetError(error);
+        }
+      })
+      .catch(sweetError);
+  }
+  // 自动保存草稿
+  autoSaveDraft(pid) {
+    const self = this;
+    const editorApp = self.getEditorApp(pid);
+    if(!editorApp || !editorApp.show) return;
+    clearTimeout(editorApp.timeoutId);
+    editorApp.timeoutId = setTimeout(() => {
+      self.saveDraftData(pid)
+        .then(() => {
+          self.autoSaveDraft(pid);
+        })
+        .catch(err => {
+          screenTopWarning(err);
+          self.autoSaveDraft(pid);
+        })
+    }, 10000);
+  }
+  /*
+  * 插入一条评论
+  * @param {String} parentCommentId 当前评论的直接上级pid
+  * @param {String} parentPostId 当前评论的最顶级pid
+  * @param {String} html 已经在后端渲染好的单条评论的内容
+  * */
+  insertComment(parentCommentId, parentPostId,  html) {
+    const container = this.getCommentContainer(parentCommentId);
+    if(container.length) {
+      // 最外层 仅仅在最后一页时才插入内容
+      if(container.attr('data-last-page') === 'false') return;
+      container.children(`.single-comments[data-pid="${parentCommentId}"]`)
+        .children(`.single-comments[data-pid="${parentCommentId}"]`).append($(html));
+    } else {
+      // 内层
+      const singleComment = this.getSingleComment(parentCommentId);
+      singleComment.children('.single-comment-bottom')
+        .children(`.single-comments[data-pid="${parentCommentId}"]`).append($(html));
+    }
+    this.setPostCommentNumber(parentPostId, 1);
+    this.renderPostCommentNumber(parentPostId);
+    this.initNKCSource();
+  }
+  setProtocolStatus(pid) {
+    const buttonDom = $(`.single-comment-button[data-type="${pid}"]`);
+    const protocolButton = buttonDom.find(`input[data-type="protocol"]`);
+    const postButton = buttonDom.find(`button[data-type="post-button"]`);
+    const checked = protocolButton.prop('checked');
+    if(checked) {
+      postButton.removeAttr('disabled');
+    } else {
+      postButton.attr('disabled', 'disabled');
+    }
+  }
+}
+
+const singlePostModule = new SinglePostModule();
+
+NKC.methods.autoHidePostContent = function() {
+  singlePostModule.autoHidePostContent();
+};
+NKC.methods.switchPostContent = function(pid) {
+  singlePostModule.switchPostContent(pid);
+}
+NKC.methods.switchPostComment = function(pid, fix, page) {
+  singlePostModule.switchPostComment(pid, fix, page);
+}
+NKC.methods.switchCommentForm  = function(pid) {
+  singlePostModule.switchCommentForm (pid);
+}
+NKC.methods.postData = function(pid) {
+  singlePostModule.postData(pid);
+};
+NKC.methods.saveDraft = function(pid) {
+  singlePostModule.saveDraft(pid);
+}
+NKC.methods.getPostCommentsByPage = function(pid, page) {
+  singlePostModule.showPostComment(pid, page);
+}
+NKC.methods.showPostComment = function(pid, page, options) {
+  singlePostModule.showPostComment(pid, page, options);
+}
+NKC.methods.insertComment = function(parentCommentId, parentPostId, html) {
+  singlePostModule.insertComment(parentCommentId, parentPostId, html);
+}
+NKC.methods.setProtocolStatus = function(pid) {
+  singlePostModule.setProtocolStatus(pid);
+}

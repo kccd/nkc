@@ -1,1 +1,34 @@
-!function o(c,u,a){function s(e,t){if(!u[e]){if(!c[e]){var n="function"==typeof require&&require;if(!t&&n)return n(e,!0);if(d)return d(e,!0);var r=new Error("Cannot find module '"+e+"'");throw r.code="MODULE_NOT_FOUND",r}var i=u[e]={exports:{}};c[e][0].call(i.exports,function(t){return s(c[e][1][t]||t)},i,i.exports,o,c,u,a)}return u[e].exports}for(var d="function"==typeof require&&require,t=0;t<a.length;t++)s(a[t]);return s}({1:[function(t,e,n){"use strict";var r=NKC.methods.getDataById("data");new Vue({el:"#app",data:{content:"",tUid:r.tUid,submitted:!1},methods:{checkString:NKC.methods.checkData.checkString,submit:function(){var t=this.content,e=this.checkString,n=this.tUid,r=this;Promise.resolve().then(function(){return e(t,{name:"验证信息",min:0,max:1e3}),nkcAPI("/u/".concat(n,"/friends"),"POST",{description:t}).then(function(){NKC.methods.appToast("发送成功"),r.submitted=!0}).catch(NKC.methods.appToast)})}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById("data");
+const app = new Vue({
+  el: '#app',
+  data: {
+    content: '',
+    tUid: data.tUid,
+    submitted: false,
+  },
+  methods: {
+    checkString: NKC.methods.checkData.checkString,
+    submit() {
+      const {content, checkString, tUid} = this;
+      const self = this;
+      Promise.resolve()
+        .then(() => {
+          checkString(content, {
+            name: '验证信息',
+            min: 0,
+            max: 1000
+          });
+          return nkcAPI(`/u/${tUid}/friends`, 'POST', {
+            description: content
+          })
+            .then(() => {
+              NKC.methods.appToast('发送成功');
+              self.submitted = true;
+            })
+            .catch(NKC.methods.appToast)
+        })
+    }
+  }
+})
+
+window.app = app;

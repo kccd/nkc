@@ -1,1 +1,161 @@
-!function i(u,c,s){function f(e,t){if(!c[e]){if(!u[e]){var r="function"==typeof require&&require;if(!t&&r)return r(e,!0);if(a)return a(e,!0);var o=new Error("Cannot find module '"+e+"'");throw o.code="MODULE_NOT_FOUND",o}var n=c[e]={exports:{}};u[e][0].call(n.exports,function(t){return f(u[e][1][t]||t)},n,n.exports,i,u,c,s)}return c[e].exports}for(var a="function"==typeof require&&require,t=0;t<s.length;t++)f(s[t]);return f}({1:[function(t,e,r){"use strict";function o(e,t){var r,o=Object.keys(e);return Object.getOwnPropertySymbols&&(r=Object.getOwnPropertySymbols(e),t&&(r=r.filter(function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable})),o.push.apply(o,r)),o}function i(n){for(var t=1;t<arguments.length;t++){var i=null!=arguments[t]?arguments[t]:{};t%2?o(Object(i),!0).forEach(function(t){var e,r,o;e=n,o=i[r=t],r in e?Object.defineProperty(e,r,{value:o,enumerable:!0,configurable:!0,writable:!0}):e[r]=o}):Object.getOwnPropertyDescriptors?Object.defineProperties(n,Object.getOwnPropertyDescriptors(i)):o(Object(i)).forEach(function(t){Object.defineProperty(n,t,Object.getOwnPropertyDescriptor(i,t))})}return n}function s(t,e,r,o,n,i,u){try{var c=t[i](u),s=c.value}catch(t){return void r(t)}c.done?e(s):Promise.resolve(s).then(o,n)}window.floatForumPanel=new Vue({el:"#floatForumPanel",data:{forum:"",uid:NKC.configs.uid,subscribed:!1,over:!1,show:!1,count:1,onPanel:!1,forums:{},timeoutName:""},mounted:function(){if($(this.$el).css({top:0,left:0}),this.uid&&!window.SubscribeTypes){if(!NKC.modules.SubscribeTypes)return sweetError("未引入与关注相关的模块");window.SubscribeTypes=new NKC.modules.SubscribeTypes}this.initPanel()},methods:{getUrl:NKC.methods.tools.getUrl,initPanel:function(){for(var t=$("[data-float-fid]"),e=0;e<t.length;e++){var r,o=t.eq(e);"true"!==o.attr("data-float-init")&&(r=o.attr("data-float-position"),this.initEvent(t.eq(e),r))}},reset:function(){this.show=!1,this.onPanel=!1,this.over=!1,this.forum=""},initEvent:function(o,t){var a=1<arguments.length&&void 0!==t?t:"right",m=this;o.on("mouseleave",function(){m.timeoutName=setTimeout(function(){m.reset()},200)}),o.on("mouseover",function(){var c,e=(c=regeneratorRuntime.mark(function t(e){var r,i,u,c,s,f;return regeneratorRuntime.wrap(function(t){for(;;)switch(t.prev=t.next){case 0:clearTimeout(m.timeoutName),m.count++,m.over=!0,i=m.count,m.timeout(300).then(function(){if(i!==m.count)throw"timeout 1";if(!m.over)throw"timeout 2";return r=o.attr("data-float-fid"),u=o.offset().left,c=o.offset().top,s=o.width(),f=o.height(),m.getForumById(r)}).then(function(t){var e=t.forum,r=t.subscribed;if(i!==m.count)throw"timeout 3";if(!m.over)throw"timeout 4";m.forum=e,m.subscribed=r;var o=$(m.$el);m.show=!0,o.on("mouseleave",function(){m.reset()}),o.on("mouseover",function(){clearTimeout(m.timeoutName),m.onPanel=!0});var n=$(document).width()-10;"bottom"===a?(c+=f+10,u-=s+10):(u+=s+10,c+=f+10),n<u+288&&(u=n-288),o.css({top:c,left:u})}).catch(function(t){});case 5:case"end":return t.stop()}},t)}),function(){var t=this,u=arguments;return new Promise(function(e,r){var o=c.apply(t,u);function n(t){s(o,e,r,n,i,"next",t)}function i(t){s(o,e,r,n,i,"throw",t)}n(void 0)})});return function(t){return e.apply(this,arguments)}}()),o.attr("data-float-init","true")},timeout:function(r){return new Promise(function(t,e){setTimeout(function(){t()},r)})},getForumById:function(t){var n=this;return new Promise(function(e,r){var o=n.forums[t];o?e(o):nkcAPI("/f/".concat(t,"/card"),"GET").then(function(t){o={forum:i(i({},t.forum),{},{latestThreads:t.latestThreads}),subscribed:t.subscribed},n.forums[t.forum.fid]=o,e(o)}).catch(function(t){r(t)})})},subscribe:function(){var t=this.forum,e=this.subscribed;SubscribeTypes.subscribeForum(t.fid,!e)},close:function(){}}})},{}]},{},[1]);
+window.floatForumPanel = new Vue({
+  el: "#floatForumPanel",
+  data: {
+    forum: "",
+    uid: NKC.configs.uid,
+    subscribed: false,
+    over: false,
+    show: false,
+    count: 1,
+    onPanel: false,
+    forums: {},
+    timeoutName: "",
+  },
+  mounted() {
+    const self = this;
+    const panel = $(self.$el);
+    panel.css({
+      top: 0,
+      left: 0
+    });
+
+    if(this.uid && !window.SubscribeTypes) {
+      if(!NKC.modules.SubscribeTypes) {
+        return sweetError("未引入与关注相关的模块");
+      } else {
+        window.SubscribeTypes = new NKC.modules.SubscribeTypes();
+      }
+    }
+
+    this.initPanel();
+
+  },
+  methods: {
+    getUrl: NKC.methods.tools.getUrl,
+    initPanel() {
+      const doms = $(`[data-float-fid]`);
+      for(var i = 0; i < doms.length; i++) {
+        const dom = doms.eq(i);
+        if(dom.attr("data-float-init") === "true") continue;
+        let position = dom.attr("data-float-position");
+        this.initEvent(doms.eq(i), position);
+      }
+    },
+    reset() {
+      this.show = false;
+      this.onPanel = false;
+      this.over = false;
+      this.forum = "";
+    },
+    initEvent(dom, position = 'right') {
+      const self = this;
+      dom.on("mouseleave", function() {
+        self.timeoutName = setTimeout(() => {
+          self.reset();
+        }, 200);
+      });
+      dom.on("mouseover", async function(e) {
+        // 鼠标已悬浮在元素上
+        clearTimeout(self.timeoutName);
+        self.count ++;
+        self.over = true;
+        let fid;
+        let count_ = self.count;
+        let left, top, width, height;
+        // 做一个延迟，过滤掉鼠标意外划过元素的情况。
+        self.timeout(300)
+          .then(() => {
+            if(count_ !== self.count) throw "timeout 1";
+            if(!self.over) throw "timeout 2";
+            fid = dom.attr("data-float-fid");
+            left = dom.offset().left;
+            top = dom.offset().top;
+            width = dom.width();
+            height = dom.height();
+            return self.getForumById(fid);
+          })
+          .then(forumObj => {
+            const {forum, subscribed} = forumObj;
+            if(count_ !== self.count) throw "timeout 3";
+            if(!self.over) throw "timeout 4";
+            self.forum = forum;
+            self.subscribed = subscribed;
+            const panel = $(self.$el);
+            self.show = true;
+            panel.on("mouseleave", function() {
+              self.reset();
+            });
+            panel.on("mouseover", function() {
+              clearTimeout(self.timeoutName);
+              self.onPanel = true;
+            });
+
+            const documentWidth = $(document).width() - 10;
+
+            const panelWidth = 24 * 12;
+
+            if(position === 'bottom') {
+              top += height + 10;
+              left -= (width + 10);
+            } else {
+              left += width + 10;
+              top += height + 10;
+            }
+
+            if((left + panelWidth) > documentWidth) {
+              left = documentWidth - panelWidth;
+            }
+
+            panel.css({
+              top,
+              left
+            });
+          })
+          .catch(err => {
+            // console.log(err);
+          });
+      });
+      dom.attr("data-float-init", "true");
+    },
+    timeout(t) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve();
+        }, t)
+      });
+    },
+    getForumById(fid) {
+      const self = this;
+      return new Promise((resolve, reject) => {
+        let forumsObj = self.forums[fid];
+        if(forumsObj) {
+          resolve(forumsObj);
+        } else {
+          nkcAPI(`/f/${fid}/card`, "GET")
+            .then(data => {
+              forumsObj = {
+                forum: {
+                  ...data.forum,
+                  latestThreads: data.latestThreads
+                },
+                subscribed: data.subscribed,
+              };
+              self.forums[data.forum.fid] = forumsObj;
+              resolve(forumsObj);
+            })
+            .catch(err => {
+              reject(err);
+            });
+        }
+      });
+    },
+    subscribe() {
+      const {forum, subscribed} = this;
+      SubscribeTypes.subscribeForum(forum.fid, !subscribed);
+    },
+    close() {
+
+    },
+
+  }
+});

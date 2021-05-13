@@ -1,1 +1,184 @@
-!function r(a,c,s){function p(t,e){if(!c[t]){if(!a[t]){var i="function"==typeof require&&require;if(!e&&i)return i(t,!0);if(l)return l(t,!0);var o=new Error("Cannot find module '"+t+"'");throw o.code="MODULE_NOT_FOUND",o}var n=c[t]={exports:{}};a[t][0].call(n.exports,function(e){return p(a[t][1][e]||e)},n,n.exports,r,a,c,s)}return c[t].exports}for(var l="function"==typeof require&&require,e=0;e<s.length;e++)p(s[e]);return p}({1:[function(e,t,i){"use strict";NKC.modules.SelectSticker=function(){var r=this;r.dom=$("#moduleSelectSticker"),r.app=new Vue({el:"#moduleSelectStickerApp",data:{type:"own",pageNumber:"",perpage:20,sharePerpage:24,emoji:[],share:!1,localStickers:[],stickers:[],paging:{}},mounted:function(){},methods:{getUrl:NKC.methods.tools.getUrl,initModule:function(){r.dom.css({height:"43.5rem"}),r.dom.draggable({scroll:!1,handle:".module-ss-title",drag:function(e,t){t.position.top<0&&(t.position.top=0);var i=$(window).height();t.position.top>i-30&&(t.position.top=i-30);var o=r.dom.width();t.position.left<100-o&&(t.position.left=100-o);var n=$(window).width();t.position.left>n-100&&(t.position.left=n-100)}})},resetDomPosition:function(){var e=r.dom,t=$(window).width();$(window).height();t<700?e.css({width:.8*t,top:0,right:0}):e.css("left",.5*(t-e.width())-40)},selectType:function(e){this.type=e,["own","share"].includes(e)&&this.getStickers()},changePage:function(e){var t,i=this.paging;i.buttonValue.length<=1||"last"===e&&0===i.page||"next"===e&&i.page+1===i.pageCount||(t="last"===e?-1:1,this.getStickers(i.page+t))},getStickers:function(e){var t,i=0<arguments.length&&void 0!==e?e:0,o=this.type;["own","share"].includes(o)&&(t="/sticker?page=".concat(i,"&c=own&reviewed=true&perpage=").concat(this.perpage),"share"===o&&(t="/stickers?page=".concat(i,"&perpage=").concat(this.sharePerpage)),nkcAPI(t,"GET").then(function(e){r.app.stickers=e.stickers,r.app.paging=e.paging,e.emoji&&(r.app.emoji=e.emoji)}).catch(sweetError))},fastSelectPage:function(){var e=this.pageNumber-1,t=this.paging;if(t&&t.buttonValue.length){var i=t.buttonValue[t.buttonValue.length-1].num;if(e<0||i<e)return sweetInfo("输入的页数超出范围");this.getStickers(e)}},selectSticker:function(e){r.callback({type:"sticker",data:e})},selectEmoji:function(e){r.callback({type:"emoji",data:e})},addLocalFile:function(e){this.fileToSticker(e).then(function(e){r.app.localStickers.push(e),r.app.uploadLocalSticker(e)})},fileToSticker:function(o){return new Promise(function(t,e){var i={file:o,status:"unUploaded",progress:0};NKC.methods.fileToUrl(o).then(function(e){i.url=e,t(i)}).catch(e)})},selectedLocalFile:function(){for(var e=$("#moduleSelectStickerInput")[0].files,t=0;t<e.length;t++){var i=e[t];r.app.addLocalFile(i)}},selectLocalFile:function(){$("#moduleSelectStickerInput").click()},uploadLocalSticker:function(i){Promise.resolve().then(function(){i.status="uploading";var e=new FormData;return e.append("file",i.file),e.append("type","sticker"),e.append("fileName",i.file.name),r.app.share&&e.append("share","true"),nkcUploadFile("/r","POST",e,function(e,t){i.progress=t})}).then(function(){i.status="uploaded",r.app.localStickers.splice(r.app.localStickers.indexOf(i),1),r.app.localStickers.length||r.app.selectType("own")}).catch(function(e){screenTopWarning(e.error||e),i.error=e.error||e,i.status="unUploaded"})},restartUpload:function(e){this.uploadLocalSticker(e)},open:function(e){r.callback=e,this.resetDomPosition(),this.initModule(),r.dom.show(),this.getStickers()},close:function(){r.dom.hide()}}}),r.open=r.app.open,r.close=r.app.close}},{}]},{},[1]);
+NKC.modules.SelectSticker = function() {
+  var self = this;
+  self.dom = $("#moduleSelectSticker");
+  self.app = new Vue({
+    el: "#moduleSelectStickerApp",
+    data: {
+      type: "own",
+      pageNumber: "",
+      perpage: 20,
+      sharePerpage: 24,
+      emoji: [],
+      share: false,
+      localStickers: [],
+      stickers: [],
+      paging: {}
+    },
+    mounted: function () {
+    
+    },
+    methods: {
+      getUrl: NKC.methods.tools.getUrl,
+      initModule() {
+        var height = "43.5rem";
+        self.dom.css({
+          height: height
+        });
+        self.dom.draggable({
+          scroll: false,
+          handle: ".module-ss-title",
+          drag: function(event, ui) {
+            if(ui.position.top < 0) ui.position.top = 0;
+            var height = $(window).height();
+            if(ui.position.top > height - 30) ui.position.top = height - 30;
+            var width = self.dom.width();
+            if(ui.position.left < 100 - width) ui.position.left = 100 - width;
+            var winWidth = $(window).width();
+            if(ui.position.left > winWidth - 100) ui.position.left = winWidth - 100;
+          }
+        });
+      },
+      resetDomPosition: function() {
+        var dom = self.dom;
+        var width = $(window).width();
+        var height = $(window).height();
+        if(width < 700) {
+          // 小屏幕
+          dom.css({
+            "width": width * 0.8,
+            "top": 0,
+            "right": 0
+          });
+        } else {
+          // 宽屏
+          dom.css("left", (width - dom.width())*0.5 -  40);
+        }
+      },
+      selectType(type) {
+        this.type = type;
+        if(["own", "share"].includes(type)) {
+          this.getStickers();
+        }
+      },
+      changePage(type) {
+        const paging = this.paging;
+        if(paging.buttonValue.length <= 1) return;
+        if(type === "last" && paging.page === 0) return;
+        if(type === "next" && paging.page + 1 === paging.pageCount) return;
+        const count = type === "last"? -1: 1;
+        this.getStickers(paging.page + count);
+      },
+      getStickers(page = 0) {
+        const {type} = this;
+        if(!["own", "share"].includes(type)) return;
+        let url = `/sticker?page=${page}&c=own&reviewed=true&perpage=${this.perpage}`;
+        if(type === "share") {
+          url = `/stickers?page=${page}&perpage=${this.sharePerpage}`;
+        }
+        
+        nkcAPI(url, "GET")
+          .then(data => {
+            self.app.stickers = data.stickers;
+            self.app.paging = data.paging;
+            if(data.emoji) {
+              self.app.emoji = data.emoji;
+            }
+          })
+          .catch(sweetError);
+      },
+      fastSelectPage() {
+        const pageNumber = this.pageNumber - 1;
+        const paging = this.paging;
+        if(!paging || !paging.buttonValue.length) return;
+        const lastNumber = paging.buttonValue[paging.buttonValue.length - 1].num;
+        if(pageNumber < 0 || lastNumber < pageNumber) return sweetInfo("输入的页数超出范围");
+        this.getStickers(pageNumber);
+      },
+      selectSticker(sticker) {
+        self.callback({
+          type: "sticker",
+          data: sticker
+        });
+      },
+      selectEmoji(emojiCode, index) {
+        self.callback({
+          type: "emoji",
+          data: emojiCode
+        });
+      },
+      addLocalFile(file) {
+        this.fileToSticker(file)
+          .then(sticker => {
+            self.app.localStickers.push(sticker);
+            self.app.uploadLocalSticker(sticker);
+          })
+      },
+      fileToSticker(file) {
+        return new Promise((resolve, reject) => {
+          const sticker = {file};
+          sticker.status = "unUploaded";
+          sticker.progress = 0;
+          NKC.methods.fileToUrl(file)
+            .then(base64 => {
+              sticker.url = base64;
+              resolve(sticker);
+            })
+            .catch(reject);
+        });
+        
+      },
+      selectedLocalFile() {
+        const input = $("#moduleSelectStickerInput");
+        const files = input[0].files;
+        for(let i = 0; i < files.length; i ++) {
+          const file = files[i];
+          self.app.addLocalFile(file);
+        }
+      },
+      selectLocalFile() {
+        $("#moduleSelectStickerInput").click();
+      },
+      uploadLocalSticker(sticker) {
+        Promise.resolve()
+          .then(() => {
+            sticker.status = "uploading";
+            const formData = new FormData();
+            formData.append("file", sticker.file);
+            formData.append("type", "sticker");
+            formData.append("fileName", sticker.file.name);
+            if(self.app.share) {
+              formData.append("share", "true");
+            }
+            return nkcUploadFile("/r", "POST", formData, function(e, progress) {
+              sticker.progress = progress;
+            });
+          })
+          .then(() => {
+            sticker.status = "uploaded";
+            self.app.localStickers.splice(self.app.localStickers.indexOf(sticker), 1);
+            if(!self.app.localStickers.length) self.app.selectType("own");
+          })
+          .catch((data) => {
+            screenTopWarning(data.error || data);
+            sticker.error = data.error || data;
+            sticker.status = "unUploaded";
+          });
+      },
+      restartUpload(s) {
+        this.uploadLocalSticker(s);
+      },
+      open(callback, options) {
+        self.callback = callback;
+        this.resetDomPosition();
+        this.initModule();
+        self.dom.show();
+        this.getStickers();
+      },
+      close() {
+        self.dom.hide();
+      }
+    }
+  });
+  self.open = self.app.open;
+  self.close = self.app.close;
+};

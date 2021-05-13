@@ -1,1 +1,160 @@
-!function i(u,s,a){function c(e,t){if(!s[e]){if(!u[e]){var r="function"==typeof require&&require;if(!t&&r)return r(e,!0);if(f)return f(e,!0);var o=new Error("Cannot find module '"+e+"'");throw o.code="MODULE_NOT_FOUND",o}var n=s[e]={exports:{}};u[e][0].call(n.exports,function(t){return c(u[e][1][t]||t)},n,n.exports,i,u,s,a)}return s[e].exports}for(var f="function"==typeof require&&require,t=0;t<a.length;t++)c(a[t]);return c}({1:[function(t,e,r){"use strict";function a(t,e,r,o,n,i,u){try{var s=t[i](u),a=s.value}catch(t){return void r(t)}s.done?e(a):Promise.resolve(a).then(o,n)}window.floatUserPanel=new Vue({el:"#floatUserPanel",data:{user:"",uid:NKC.configs.uid,over:!1,show:!1,count:1,onPanel:!1,users:{},timeoutName:""},mounted:function(){var t=$(this.$el);if(t.css({top:0,left:0}),t.css({top:300,left:300}),this.uid&&!window.SubscribeTypes){if(!NKC.modules.SubscribeTypes)return sweetError("未引入与关注相关的模块");window.SubscribeTypes=new NKC.modules.SubscribeTypes}this.initPanel()},methods:{getUrl:NKC.methods.tools.getUrl,format:NKC.methods.format,fromNow:NKC.methods.fromNow,initPanel:function(){for(var t=$("[data-float-uid]"),e=0;e<t.length;e++){var r,o=t.eq(e);"true"!==o.attr("data-float-init")&&(r=o.attr("data-float-position"),this.initEvent(t.eq(e),r))}},reset:function(){this.show=!1,this.onPanel=!1,this.over=!1,this.user=""},initEvent:function(o,t){var f=1<arguments.length&&void 0!==t?t:"right",h=this;o.on("mouseleave",function(){h.timeoutName=setTimeout(function(){h.reset()},200)}),o.on("mouseover",function(){var s,e=(s=regeneratorRuntime.mark(function t(e){var r,i,u,s,a,c;return regeneratorRuntime.wrap(function(t){for(;;)switch(t.prev=t.next){case 0:clearTimeout(h.timeoutName),h.count++,h.over=!0,i=h.count,h.timeout(300).then(function(){if(i!==h.count)throw"timeout 1";if(!h.over)throw"timeout 2";return r=o.attr("data-float-uid"),u=o.offset().left,s=o.offset().top,a=o.width(),c=o.height(),h.getUserById(r)}).then(function(t){var e=t.user,r=t.subscribed;if(i!==h.count)throw"timeout 3";if(!h.over)throw"timeout 4";h.user=e,h.subscribed=r;var o=$(h.$el);h.show=!0,o.on("mouseleave",function(){h.reset()}),o.on("mouseover",function(){clearTimeout(h.timeoutName),h.onPanel=!0});var n=$(document).width()-10;"bottom"===f?(s+=c+10,u-=a+10):(u+=a+10,s+=c+10),n<u+312&&(u=n-312),o.css({top:s,left:u})}).catch(function(t){});case 5:case"end":return t.stop()}},t)}),function(){var t=this,u=arguments;return new Promise(function(e,r){var o=s.apply(t,u);function n(t){a(o,e,r,n,i,"next",t)}function i(t){a(o,e,r,n,i,"throw",t)}n(void 0)})});return function(t){return e.apply(this,arguments)}}()),o.attr("data-float-init","true")},timeout:function(r){return new Promise(function(t,e){setTimeout(function(){t()},r)})},getUserById:function(o){var n=this;return new Promise(function(r,e){var t=n.users[o];t?r(t):nkcAPI("/u/".concat(o,"?from=panel"),"GET").then(function(t){var e;t.targetUser.hidden||(e={subscribed:t.subscribed,user:t.targetUser},n.users[t.targetUser.uid]=e,r(e))}).catch(function(t){console.log(t),e(t)})})},subscribe:function(){var t=this.user,e=this.subscribed;SubscribeTypes.subscribeUser(t.uid,!e)}}})},{}]},{},[1]);
+window.floatUserPanel = new Vue({
+  el: "#floatUserPanel",
+  data: {
+    user: "",
+    uid: NKC.configs.uid,
+    over: false,
+    show: false,
+    count: 1,
+    onPanel: false,
+    users: {},
+    timeoutName: "",
+  },
+  mounted() {
+    const self = this;
+    const panel = $(self.$el);
+    panel.css({
+      top: 0,
+      left: 0
+    });
+    panel.css({
+      top: 300,
+      left: 300
+    });
+    if(this.uid && !window.SubscribeTypes) {
+      if(!NKC.modules.SubscribeTypes) {
+        return sweetError("未引入与关注相关的模块");
+      } else {
+        window.SubscribeTypes = new NKC.modules.SubscribeTypes();
+      }
+    }
+
+    this.initPanel();
+
+  },
+  methods: {
+    getUrl: NKC.methods.tools.getUrl,
+    format: NKC.methods.format,
+    fromNow: NKC.methods.fromNow,
+    initPanel() {
+      const doms = $(`[data-float-uid]`);
+      for(var i = 0; i < doms.length; i++) {
+        const dom = doms.eq(i);
+        if(dom.attr("data-float-init") === "true") continue;
+        let position = dom.attr("data-float-position");
+        this.initEvent(doms.eq(i), position);
+      }
+    },
+    reset() {
+      this.show = false;
+      this.onPanel = false;
+      this.over = false;
+      this.user = "";
+    },
+    initEvent(dom, position = "right") {
+      const self = this;
+      dom.on("mouseleave", function() {
+        self.timeoutName = setTimeout(() => {
+          self.reset();
+        }, 200);
+      });
+      dom.on("mouseover", async function(e) {
+        // 鼠标已悬浮在元素上
+        clearTimeout(self.timeoutName);
+        self.count ++;
+        self.over = true;
+        let uid;
+        let count_ = self.count;
+        let left, top, width, height;
+        // 做一个延迟，过滤掉鼠标意外划过元素的情况。
+        self.timeout(300)
+          .then(() => {
+            if(count_ !== self.count) throw "timeout 1";
+            if(!self.over) throw "timeout 2";
+            uid = dom.attr("data-float-uid");
+            left = dom.offset().left;
+            top = dom.offset().top;
+            width = dom.width();
+            height = dom.height();
+            return self.getUserById(uid);
+          })
+          .then(userObj => {
+            const {user, subscribed} = userObj;
+            if(count_ !== self.count) throw "timeout 3";
+            if(!self.over) throw "timeout 4";
+            self.user = user;
+            self.subscribed = subscribed;
+            const panel = $(self.$el);
+            self.show = true;
+            panel.on("mouseleave", function() {
+              self.reset();
+            });
+            panel.on("mouseover", function() {
+              clearTimeout(self.timeoutName);
+              self.onPanel = true;
+            });
+
+            const documentWidth = $(document).width() - 10;
+
+            const panelWidth = 26 * 12;
+
+            if(position === 'bottom') {
+              top += height + 10;
+              left -= (width + 10);
+            } else {
+              left += width + 10;
+              top += height + 10;
+            }
+
+            if((left + panelWidth) > documentWidth) {
+              left = documentWidth - panelWidth;
+            }
+
+            panel.css({
+              top,
+              left
+            });
+          })
+          .catch(err => {
+            // console.log(err);
+          });
+      });
+      dom.attr("data-float-init", "true");
+    },
+    timeout(t) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve();
+        }, t)
+      });
+    },
+    getUserById(id) {
+      const self = this;
+      return new Promise((resolve, reject) => {
+        let userObj = self.users[id];
+        if(userObj) {
+          resolve(userObj);
+        } else {
+          nkcAPI(`/u/${id}?from=panel`, "GET")
+            .then(data => {
+              if(data.targetUser.hidden) return;
+              const userObj = {
+                subscribed: data.subscribed,
+                user: data.targetUser
+              };
+              self.users[data.targetUser.uid] = userObj;
+              resolve(userObj);
+            })
+            .catch(err => {
+              console.log(err);
+              reject(err);
+            });
+        }
+      });
+    },
+    subscribe() {
+      const {user, subscribed} = this;
+      SubscribeTypes.subscribeUser(user.uid, !subscribed);
+    }
+  }
+});

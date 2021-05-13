@@ -24,6 +24,7 @@ subscribeRouter
     let sub = await db.SubscribeModel.findOne({
       uid: user.uid,
       fid,
+      cancel: false,
       type: "forum"
     });
 
@@ -61,11 +62,13 @@ subscribeRouter
 		const sub = await db.SubscribeModel.findOne({
       uid: user.uid,
       fid: forum.fid,
+      cancel: false,
       type: "forum"
     });
 		if(!sub) ctx.throw(400, "您未关注过该专业，请刷新");
 		const {cid} = sub;
-    await sub.deleteOne();
+		await sub.cancelSubscribe();
+    // await sub.deleteOne();
     /*await forum.updateOne({
       $inc: {followerCount: -1}
     });*/

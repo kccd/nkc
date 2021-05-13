@@ -1,1 +1,109 @@
-!function i(a,s,u){function f(t,r){if(!s[t]){if(!a[t]){var e="function"==typeof require&&require;if(!r&&e)return e(t,!0);if(c)return c(t,!0);var n=new Error("Cannot find module '"+t+"'");throw n.code="MODULE_NOT_FOUND",n}var o=s[t]={exports:{}};a[t][0].call(o.exports,function(r){return f(a[t][1][r]||r)},o,o.exports,i,a,s,u)}return s[t].exports}for(var c="function"==typeof require&&require,r=0;r<u.length;r++)f(u[r]);return f}({1:[function(r,t,e){"use strict";function s(r,t){var e;if("undefined"==typeof Symbol||null==r[Symbol.iterator]){if(Array.isArray(r)||(e=function(r,t){if(!r)return;if("string"==typeof r)return u(r,t);var e=Object.prototype.toString.call(r).slice(8,-1);"Object"===e&&r.constructor&&(e=r.constructor.name);if("Map"===e||"Set"===e)return Array.from(r);if("Arguments"===e||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(e))return u(r,t)}(r))||t&&r&&"number"==typeof r.length){e&&(r=e);var n=0,o=function(){};return{s:o,n:function(){return n>=r.length?{done:!0}:{done:!1,value:r[n++]}},e:function(r){throw r},f:o}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var i,a=!0,s=!1;return{s:function(){e=r[Symbol.iterator]()},n:function(){var r=e.next();return a=r.done,r},e:function(r){s=!0,i=r},f:function(){try{a||null==e.return||e.return()}finally{if(s)throw i}}}}function u(r,t){(null==t||t>r.length)&&(t=r.length);for(var e=0,n=new Array(t);e<t;e++)n[e]=r[e];return n}var n=NKC.methods.getDataById("data"),o=new NKC.modules.SelectUser;new Vue({el:"#app",data:{forum:n.forum,roles:n.roles,grades:n.grades,permission:n.permission,operations:n.operation,libraryClosed:n.libraryClosed,saving:!1,moderators:n.moderators},computed:{users:function(){var r,t={},e=s(this.moderators);try{for(e.s();!(r=e.n()).done;){var n=r.value;t[n.uid]=n}}catch(r){e.e(r)}finally{e.f()}return t},operationsId:function(){for(var r=[],t=0;t<this.operations.length;t++)r.push(this.operations[t].name);return r}},mounted:function(){this.initUserPanel()},updated:function(){this.initUserPanel()},methods:{initUserPanel:function(){setTimeout(function(){window.floatUserPanel.initPanel()},500)},selectAll:function(r){r.operationsId.length===this.operationsId.length?r.operationsId=[]:r.operationsId=this.operationsId},removeModerator:function(r){this.forum.moderators.splice(r,1)},addModerator:function(){var a=this;o.open(function(r){var t=r.users,e=r.usersId;a.moderators=a.moderators.concat(t);var n,o=s(e);try{for(o.s();!(n=o.n()).done;){var i=n.value;a.forum.moderators.includes(i)||a.forum.moderators.push(i)}}catch(r){o.e(r)}finally{o.f()}})},libraryOperation:function(r,t){var n=this;sweetQuestion("确定要".concat({create:"开设",open:"开启",close:"关闭"}[t],"文库？")).then(function(){return nkcAPI("/f/"+r+"/library","POST",{type:t})}).then(function(r){var t=r.libraryClosed,e=r.library;n.forum.lid=e._id,n.libraryClosed=t,sweetSuccess("执行成功")}).catch(function(r){sweetError(r)})},save:function(){var r=this.forum;this.saving=!0;var t=this;return nkcAPI("/f/".concat(r.fid,"/settings/permission"),"PUT",{forum:r}).then(function(){sweetSuccess("保存成功"),t.saving=!1}).catch(function(r){t.saving=!1,sweetError(r)})}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const selectUser = new NKC.modules.SelectUser();
+const app = new Vue({
+  el: '#app',
+  data: {
+    forum: data.forum,
+    roles: data.roles,
+    grades: data.grades,
+    permission: data.permission,
+    operations: data.operation,
+    libraryClosed: data.libraryClosed,
+    saving: false,
+    moderators: data.moderators
+  },
+  computed: {
+    users() {
+      const {moderators} = this;
+      const users = {};
+      for(const u of moderators) {
+        users[u.uid] = u;
+      }
+      return users;
+    },
+    operationsId: function() {
+      var arr = [];
+      for(var i = 0; i < this.operations.length; i++) {
+        arr.push(this.operations[i].name);
+      }
+      return arr;
+    }
+  },
+  mounted() {
+    this.initUserPanel();
+  },
+  updated() {
+    this.initUserPanel();
+  },
+  methods: {
+    initUserPanel() {
+      setTimeout(() => {
+        window.floatUserPanel.initPanel();
+      }, 500)
+    },
+    selectAll: function(p) {
+      if(p.operationsId.length === this.operationsId.length) {
+        p.operationsId = [];
+      } else {
+        p.operationsId = this.operationsId;
+      }
+    },
+    removeModerator(index) {
+      this.forum.moderators.splice(index, 1);
+    },
+    addModerator() {
+      const self = this;
+      selectUser.open(data => {
+        const {users, usersId} = data;
+        self.moderators = self.moderators.concat(users);
+        for(const uid of usersId) {
+          if(!self.forum.moderators.includes(uid)) self.forum.moderators.push(uid);
+        }
+      });
+    },
+    libraryOperation(fid, type) {
+      const self = this;
+      const typeName = {
+        create: '开设',
+        open: '开启',
+        close: '关闭'
+      }[type];
+      sweetQuestion(`确定要${typeName}文库？`)
+        .then(() => {
+          return nkcAPI("/f/" + fid + "/library", "POST", {
+            type: type
+          });
+        })
+        .then(function(data) {
+          const {libraryClosed, library} = data;
+          self.forum.lid = library._id;
+          self.libraryClosed = libraryClosed;
+          sweetSuccess("执行成功");
+        })
+        .catch(function(data) {
+          sweetError(data);
+        })
+    },
+    save() {
+      const {forum} = this;
+      this.saving = true;
+      const self = this;
+      return nkcAPI(`/f/${forum.fid}/settings/permission`, 'PUT', {
+        forum
+      })
+        .then(() => {
+          sweetSuccess('保存成功');
+          self.saving = false;
+        })
+        .catch(err => {
+          self.saving = false;
+          sweetError(err);
+        });
+    }
+  }
+});
+
+Object.assign(window, {
+  selectUser,
+  app,
+});

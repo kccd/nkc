@@ -148,3 +148,17 @@ function disabledReport(applicationFormId, reportId, type) {
 			screenTopWarning(data.error);
 		})
 }
+
+Object.assign(window, {
+	agree,
+	disagree,
+	support,
+	against,
+	revoked,
+	disableApplicationForm,
+	excellent,
+	submitComment,
+	disabledComment,
+	restoreApplicationForm,
+	disabledReport,
+});

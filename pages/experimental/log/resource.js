@@ -1,1 +1,17 @@
-!function a(c,i,u){function s(r,e){if(!i[r]){if(!c[r]){var t="function"==typeof require&&require;if(!e&&t)return t(r,!0);if(f)return f(r,!0);var n=new Error("Cannot find module '"+r+"'");throw n.code="MODULE_NOT_FOUND",n}var o=i[r]={exports:{}};c[r][0].call(o.exports,function(e){return s(c[r][1][e]||e)},o,o.exports,a,c,i,u)}return i[r].exports}for(var f="function"==typeof require&&require,e=0;e<u.length;e++)s(u[e]);return s}({1:[function(e,r,t){"use strict";var n=NKC.methods.getDataById("data");new Vue({el:"#app",data:{t:n.t||"",searchType:n.searchType||"rid",searchContent:n.searchContent||""},methods:{search:function(){var e=this.searchType,r=this.searchContent,t=this.t;if(!r)return sweetError("请输入搜索内容");window.location.href="/e/log/resource?t=".concat(t,"&c=").concat(e,",").concat(r)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const app = new Vue({
+  el: "#app",
+  data: {
+    t: data.t || '',
+    searchType: data.searchType || 'rid',
+    searchContent: data.searchContent || '',
+  },
+  methods: {
+    search() {
+      const {searchType, searchContent, t} = this;
+      if(!searchContent) return sweetError('请输入搜索内容');
+      window.location.href = `/e/log/resource?t=${t}&c=${searchType},${searchContent}`;
+    }
+  }
+});
+

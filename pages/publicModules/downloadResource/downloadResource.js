@@ -1,1 +1,159 @@
-!function r(s,a,c){function u(o,t){if(!a[o]){if(!s[o]){var e="function"==typeof require&&require;if(!t&&e)return e(o,!0);if(d)return d(o,!0);var n=new Error("Cannot find module '"+o+"'");throw n.code="MODULE_NOT_FOUND",n}var i=a[o]={exports:{}};s[o][0].call(i.exports,function(t){return u(s[o][1][t]||t)},i,i.exports,r,s,a,c)}return a[o].exports}for(var d="function"==typeof require&&require,t=0;t<c.length;t++)u(c[t]);return u}({1:[function(t,o,e){"use strict";var n;NKC.modules.downloadResource=function(){return function t(){!function(t,o){if(!(t instanceof o))throw new TypeError("Cannot call a class as a function")}(this,t);var r=this;r.dom=$("#moduleDownloadResource"),r.app=new Vue({el:"#moduleDownloadResourceApp",data:{uid:NKC.configs.uid,rid:"",fileName:"未知",type:"",size:0,costs:[],hold:[],status:"loading",fileCountLimitInfo:"",errorInfo:"",settingNoNeed:!1,description:""},computed:{costMessage:function(){return this.costs.map(function(t){return t.name+t.number}).join("、")},holdMessage:function(){return this.hold.map(function(t){return t.name+t.number}).join("、")}},methods:{fromNow:NKC.methods.fromNow,initDom:function(){r.dom.css({height:"37rem"}),r.dom.draggable({scroll:!1,handle:".module-sd-title",drag:function(t,o){o.position.top<0&&(o.position.top=0);var e=$(window).height();o.position.top>e-30&&(o.position.top=e-30);var n=r.dom.width();o.position.left<100-n&&(o.position.left=100-n);var i=$(window).width();o.position.left>i-100&&(o.position.left=i-100)}});var t=$(window).width();t<700?r.dom.css({width:.8*t,top:0,right:0}):r.dom.css("left",.5*(t-r.dom.width())-20),r.dom.show()},getResourceInfo:function(t){var c=this;c.status="loading",c.errorInfo="",nkcAPI("/r/".concat(t,"/detail"),"GET").then(function(t){var o=t.detail,e=o.free,n=o.paid,i=o.resource,r=o.costScores,s=o.fileCountLimitInfo,a=(o.needScore,o.description);c.description=a,c.fileCountLimitInfo=s,i.isFileExist?(c.status=e||n?"noNeedScore":"needScore",c.free=e,c.paid=n,c.fileName=i.oname,c.rid=i.rid,c.type=i.ext,c.size=NKC.methods.getSize(i.size),r&&(c.costs=r.map(function(t){return{name:t.name,number:t.addNumber/100*-1}}),c.hold=r.map(function(t){return{name:t.name,number:t.number/100}}))):c.status="fileNotExist"}).catch(function(t){c.fileCountLimitInfo=t.detail.fileCountLimitInfo,c.status="error",c.errorInfo=t.error||t.message||t})},download:function(){var t=this,o=this.rid;this.fileName,nkcAPI("/r/".concat(o,"/pay"),"POST").then(function(){window.location.href="/r/".concat(o,"?d=attachment")}).catch(sweetError).then(function(){return t.getResourceInfo(t.rid)})},fetchResource:function(){var t=this.rid;this.fileName,window.location.href="/r/".concat(t,"?d=attachment")},open:function(t){this.status="loading",this.initDom(),this.getResourceInfo(t)},close:function(){r.dom.hide()}}}),r.open=r.app.open,r.close=r.app.close}}(),n=new NKC.modules.downloadResource,NKC.methods.openFilePanel=function(t){n.open(t)},$("#wrap, .post").on("click",function(t){if("clickAttachmentTitle"===$(t.target).attr("data-type")){t.preventDefault(),t.stopPropagation();var o=$(t.target).attr("data-id");return n.open(o),!1}})},{}]},{},[1]);
+NKC.modules.downloadResource = class {
+  constructor() {
+    const self = this;
+    self.dom = $("#moduleDownloadResource");
+    self.app = new Vue({
+      el: "#moduleDownloadResourceApp",
+      data: {
+        uid: NKC.configs.uid,
+        rid: "",
+        fileName: "未知",
+        type: "",
+        size: 0,
+        costs: [],
+        hold: [],
+        status: "loading",
+        fileCountLimitInfo: '',
+        errorInfo: '',
+        settingNoNeed: false,
+        description: ''
+      },
+      computed: {
+        costMessage() {
+          return this.costs.map(c => c.name + c.number).join("、");
+        },
+        holdMessage() {
+          return this.hold.map(c => c.name + c.number).join("、");
+        }
+      },
+      methods: {
+        fromNow: NKC.methods.fromNow,
+        initDom() {
+          const height = "37rem";
+          self.dom.css({
+            height
+          });
+          self.dom.draggable({
+            scroll: false,
+            handle: ".module-sd-title",
+            drag: function(event, ui) {
+              if(ui.position.top < 0) ui.position.top = 0;
+              const height = $(window).height();
+              if(ui.position.top > height - 30) ui.position.top = height - 30;
+              const width = self.dom.width();
+              if(ui.position.left < 100 - width) ui.position.left = 100 - width;
+              const winWidth = $(window).width();
+              if(ui.position.left > winWidth - 100) ui.position.left = winWidth - 100;
+            }
+          });
+          const width = $(window).width();
+          if(width < 700) {
+            // 小屏幕
+            self.dom.css({
+              "width": width * 0.8,
+              "top": 0,
+              "right": 0
+            });
+          } else {
+            // 宽屏
+            self.dom.css("left", (width - self.dom.width())*0.5 - 20);
+          }
+          self.dom.show();
+        },
+        getResourceInfo(rid) {
+          let self = this;
+          self.status = 'loading';
+          self.errorInfo = '';
+          nkcAPI(`/r/${rid}/detail`, "GET")
+            .then(data => {
+              let {free, paid, resource, costScores, fileCountLimitInfo, needScore, description} = data.detail;
+              self.description = description;
+              self.fileCountLimitInfo = fileCountLimitInfo;
+              if(!resource.isFileExist) {
+                self.status = "fileNotExist";
+                return;
+              }
+              self.status = (!free && !paid) ? "needScore": "noNeedScore";
+              self.free = free;
+              self.paid = paid;
+              self.fileName = resource.oname;
+              self.rid = resource.rid;
+              self.type = resource.ext;
+              self.size = NKC.methods.getSize(resource.size);
+              if(!costScores) return;
+              self.costs = costScores.map(score => {
+                return {
+                  name: score.name,
+                  number: score.addNumber / 100 * -1
+                }
+              });
+              self.hold = costScores.map(score => {
+                return {
+                  name: score.name,
+                  number: score.number / 100
+                }
+              });
+            })
+            .catch(data => {
+              self.fileCountLimitInfo = data.detail.fileCountLimitInfo;
+              self.status = 'error';
+              self.errorInfo = data.error || data.message || data;
+            })
+        },
+        download() {
+          let self = this;
+          let {rid, fileName} = this;
+          nkcAPI(`/r/${rid}/pay`, "POST")
+            .then(() => {
+              window.location.href = `/r/${rid}?d=attachment`;
+              /*
+              let downloader = document.createElement("a");
+              downloader.setAttribute("download", fileName);
+              downloader.href = `/r/${rid}?d=attachment`;
+              downloader.click();*/
+            })
+            .catch(sweetError)
+            .then(() => self.getResourceInfo(self.rid))
+        },
+        fetchResource() {
+          let {rid, fileName} = this;
+          window.location.href = `/r/${rid}?d=attachment`;
+          /*let downloader = document.createElement("a");
+          downloader.setAttribute("download", fileName);
+          downloader.href = `/r/${rid}?d=attachment`;
+          downloader.click();*/
+        },
+        open(rid) {
+          this.status = "loading";
+          this.initDom();
+          this.getResourceInfo(rid);
+        },
+        close() {
+          self.dom.hide();
+        }
+      }
+    });
+    self.open = self.app.open;
+    self.close = self.app.close;
+  }
+};
+
+
+(function() {
+  const dr = new NKC.modules.downloadResource();
+  NKC.methods.openFilePanel = function(rid) {
+    dr.open(rid);
+  }
+
+  // 监听评论盒子
+  $("#wrap, .post").on("click", function(e) {
+    let type = $(e.target).attr("data-type");
+    if(type === "clickAttachmentTitle") {
+      e.preventDefault();
+      e.stopPropagation();
+      let rid = $(e.target).attr("data-id");
+      dr.open(rid);
+      return false;
+    }
+  });
+}());

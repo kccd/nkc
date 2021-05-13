@@ -1,4 +1,4 @@
-var selectImage;
+window.selectImage = undefined;
 var app = new Vue({
   el: "#app",
   data: {
@@ -14,11 +14,13 @@ var app = new Vue({
       name: "",
       abbr: "",
       description: ""
-    }
+    },
+
+    checked: false,
 
   },
   mounted: function() {
-    selectImage = new NKC.methods.selectImage();
+    window.selectImage = new NKC.methods.selectImage();
   },
   methods: {
     selectedImage: function(data, name) {

@@ -1,1 +1,21 @@
-!function s(i,u,a){function f(e,t){if(!u[e]){if(!i[e]){var r="function"==typeof require&&require;if(!t&&r)return r(e,!0);if(c)return c(e,!0);var n=new Error("Cannot find module '"+e+"'");throw n.code="MODULE_NOT_FOUND",n}var o=u[e]={exports:{}};i[e][0].call(o.exports,function(t){return f(i[e][1][t]||t)},o,o.exports,s,i,u,a)}return u[e].exports}for(var c="function"==typeof require&&require,t=0;t<a.length;t++)f(a[t]);return f}({1:[function(t,e,r){"use strict";var n=NKC.methods.getDataById("data");new Vue({el:"#appBaseInfo",data:{shopSettings:n.shopSettings},methods:{save:function(){nkcAPI("/e/settings/shop","PUT",{shopSettings:this.shopSettings}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const appBase = new Vue({
+  el: '#appBaseInfo',
+  data: {
+    shopSettings: data.shopSettings,
+  },
+  methods: {
+    save() {
+      nkcAPI('/e/settings/shop', 'PUT', {
+        shopSettings: this.shopSettings
+      })
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
+        .catch(sweetError);
+    }
+  }
+});
+
+window.appBase = appBase;
+

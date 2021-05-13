@@ -1,1 +1,181 @@
-!function i(a,c,s){function u(t,e){if(!c[t]){if(!a[t]){var n="function"==typeof require&&require;if(!e&&n)return n(t,!0);if(l)return l(t,!0);var o=new Error("Cannot find module '"+t+"'");throw o.code="MODULE_NOT_FOUND",o}var r=c[t]={exports:{}};a[t][0].call(r.exports,function(e){return u(a[t][1][e]||e)},r,r.exports,i,a,c,s)}return c[t].exports}for(var l="function"==typeof require&&require,e=0;e<s.length;e++)u(s[e]);return u}({1:[function(e,t,n){"use strict";function o(e,t){for(var n=0;n<t.length;n++){var o=t[n];o.enumerable=o.enumerable||!1,o.configurable=!0,"value"in o&&(o.writable=!0),Object.defineProperty(e,o.key,o)}}NKC.modules.NKCHL=function(){function s(e){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,s);var o=this,t=e.type,n=e.targetId,r=e.notes,i=void 0===r?[]:r;o.type=t,o.id=n;var a="".concat(t,"-content-").concat(n);o.rootElement=document.getElementById(a),window.addEventListener("mouseup",function(){setTimeout(function(){o.removeBtn()},50)},!0);var c=new NKCHighlighter({rootElementId:a,clownClass:["MathJax_CHTML","MathJax"],clownAttr:{"data-tag":"nkcsource"}});(o.hl=c).on(c.eventNames.select,function(e){var n;NKC.methods.getLoginStatus()&&(n=e.range,o.sleep(200).then(function(){var e=o.hl.getStartNodeOffset(n);e&&(o.createBtn2(e).onclick=function(){var e=c.getNodes(n),t=c.getNodesContent(e);$(window).width()<768?NKC.methods.visitUrl("/note?content=".concat(t,"&targetId=").concat(o.id,"&type=post&offset=").concat(e.offset,"&length=").concat(e.length),!0):o.newNote({id:"",content:t,targetId:o.id,type:"post",notes:[],node:e}).then(function(e){c.createSource(e._id,e.node)}).catch(sweetError)})}).catch(sweetError))}).on(c.eventNames.create,function(e){}).on(c.eventNames.click,function(e){NKC.methods.getLoginStatus()?768<=$(window).width()?o.showNotePanel(e.id):NKC.methods.visitUrl("/note/".concat(e.id),!0):NKC.methods.toLogin("login")}).on(c.eventNames.hover,function(e){c.addClass(e,"post-node-hover")}).on(c.eventNames.hoverOut,function(e){c.removeClass(e,"post-node-hover")}),c.restoreSources(i)}var e,t,n;return e=s,(t=[{key:"createBtn2",value:function(e){this.removeBtn();var t=e.top,n=e.left,o=$("<span><span>添加笔记</span></span>");return o.addClass("nkc-hl-btn"),768<=$(window).width()?o.css({top:t-2.6*12+"px",left:n-21.6+"px"}):o.css({top:t-$(document).scrollTop()-3+"px"}),$(body).append(o),o[0]}},{key:"createBtn",value:function(e){this.removeBtn();var t=document.createElement("span");t.classList.add("nkc-hl-btn"),t.innerText="记笔记";var n=$(this.rootElement),o=n.offset(),r=o.top,i=o.left,a=$(window).scrollTop(),c=n.width(),s=e.y-r+a,u=e.x-i;return i+c<u+60&&(u=i+c-60),t.style.top=s+"px",t.style.left=u+"px",this.rootElement.appendChild(t),t}},{key:"removeBtn",value:function(){$(".nkc-hl-btn").remove()}},{key:"sleep",value:function(t){return new Promise(function(e){setTimeout(function(){e()},t)})}},{key:"initNotePanel",value:function(){window.notePanel||(window.notePanel=new NKC.modules.NotePanel)}},{key:"newNote",value:function(n){return this.initNotePanel(),new Promise(function(t,e){window.notePanel.open(function(e){t(e)},{note:n})})}},{key:"showNotePanel",value:function(e){this.initNotePanel(),window.notePanel.open(function(e){},{id:e})}}])&&o(e.prototype,t),n&&o(e,n),s}()},{}]},{},[1]);
+/*
+* 统计字数时需要排除以下dom结构，主要是媒体文件dom。
+  此类dom在渲染的时候可能会为其添加辅助文字，如果不排除，当辅助文字发生变动，这将会影响当前已创建的所有批注。
+  div.article-img-body 图片
+  div.article-attachment 附件
+  div.article-audio 音频
+  div.article-video-body 视频
+                         代码
+                         公式
+*
+*
+*
+* */
+
+NKC.modules.NKCHL = class {
+  constructor(options) {
+    const self = this;
+    const {type, targetId, notes = []} = options;
+    self.type = type;
+    self.id = targetId;
+
+    const el = `${type}-content-${targetId}`;
+    self.rootElement = document.getElementById(el);
+    window.addEventListener("mouseup", () => {
+      setTimeout(() => {
+        self.removeBtn();
+      }, 50)
+    }, true);
+    const hl = new NKCHighlighter({
+      rootElementId: el,
+      clownClass: [
+        "MathJax_CHTML", // 公式
+        "MathJax"
+      ],
+      clownAttr: {
+        "data-tag": "nkcsource"
+      },
+      /*clownTagName: [
+        "code",
+        "svg",
+        "pre",
+        "video",
+        "audio",
+        "source",
+        "table",
+        "style",
+        "script"
+      ]*/
+    });
+    self.hl = hl;
+    hl
+      .on(hl.eventNames.select, data => {
+        if(!NKC.methods.getLoginStatus()) {
+          return;
+        }
+        // if(window.notePanel && window.notePanel.isOpen()) return;
+        let {range} = data;
+        self.sleep(200)
+          .then(() => {
+            const offset = self.hl.getStartNodeOffset(range);
+            if(!offset) return;
+            const btn = self.createBtn2(offset);
+            // const btn = self.createBtn(position);
+            btn.onclick = () => {
+              // 重新获取range
+              // 避免dom变化导致range对象未更新的问题
+              // range = hl.getRange();
+              let node = hl.getNodes(range);
+              const content = hl.getNodesContent(node);
+              if($(window).width() < 768) {
+                NKC.methods.visitUrl(`/note?content=${content}&targetId=${self.id}&type=post&offset=${node.offset}&length=${node.length}`, true);
+              } else {
+                self.newNote({
+                  id: "",
+                  content,
+                  targetId: self.id,
+                  type: "post",
+                  notes: [],
+                  node,
+                })
+                  .then(note => {
+                    hl.createSource(note._id, note.node);
+                  })
+                  .catch(sweetError)
+              }
+            }
+          })
+          .catch(sweetError)
+      })
+      .on(hl.eventNames.create, source => {
+        // hl.addClass(source, "post-node-mark");
+      })
+      .on(hl.eventNames.click, function(source) {
+        if(NKC.methods.getLoginStatus()) {
+          if($(window).width() >= 768) {
+            // if(window.notePanel && window.notePanel.isOpen()) return;
+            self.showNotePanel(source.id);
+          } else {
+            NKC.methods.visitUrl(`/note/${source.id}`, true);
+          }
+        } else {
+          NKC.methods.toLogin("login");
+        }
+      })
+      .on(hl.eventNames.hover, function(source) {
+        hl.addClass(source, "post-node-hover");
+      })
+      .on(hl.eventNames.hoverOut, function(source) {
+        hl.removeClass(source, "post-node-hover");
+      });
+    hl.restoreSources(notes);
+  }
+  createBtn2(offset) {
+    this.removeBtn();
+    const {top, left} = offset;
+    const span = $("<span><span>添加笔记</span></span>");
+    span.addClass("nkc-hl-btn");
+    if($(window).width() >= 768) {
+      span.css({
+        top: top - 2.6 * 12 + "px",
+        left: left - 1.8 * 12 + "px"
+      });
+    } else {
+      span.css({
+        top: top - $(document).scrollTop() - 3+ "px"
+      });
+    }
+    $(body).append(span);
+    return span[0];
+  }
+  createBtn(position) {
+    this.removeBtn();
+    const btn = document.createElement("span");
+    btn.classList.add("nkc-hl-btn");
+    btn.innerText = "记笔记";
+    const rootJQ = $(this.rootElement);
+    const {top, left} = rootJQ.offset();
+    const scrollTop = $(window).scrollTop();
+    const width = rootJQ.width();
+    let btnTop = position.y - top + scrollTop;
+    let btnLeft = position.x - left;
+    if(btnLeft + 5*12 > left + width) btnLeft = left + width - 5*12;
+    btn.style.top = btnTop + "px";
+    btn.style.left = btnLeft + "px";
+    this.rootElement.appendChild(btn);
+    return btn;
+  }
+  removeBtn() {
+    $(".nkc-hl-btn").remove();
+  }
+  sleep(t) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, t)
+    });
+  }
+  initNotePanel() {
+    if(!window.notePanel) {
+      window.notePanel = new NKC.modules.NotePanel();
+    }
+  }
+  newNote(note) {
+    this.initNotePanel();
+    return new Promise((resolve, reject) => {
+      window.notePanel.open(data => {
+        resolve(data);
+      }, {
+        note
+      });
+    });
+  }
+  showNotePanel(id) {
+    this.initNotePanel();
+    window.notePanel.open(data => {
+    }, {
+      id
+    });
+  }
+};
+

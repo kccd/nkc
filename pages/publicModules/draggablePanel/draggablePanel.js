@@ -1,1 +1,90 @@
-!function r(s,a,d){function l(i,t){if(!a[i]){if(!s[i]){var e="function"==typeof require&&require;if(!t&&e)return e(i,!0);if(u)return u(i,!0);var o=new Error("Cannot find module '"+i+"'");throw o.code="MODULE_NOT_FOUND",o}var n=a[i]={exports:{}};s[i][0].call(n.exports,function(t){return l(s[i][1][t]||t)},n,n.exports,r,s,a,d)}return a[i].exports}for(var u="function"==typeof require&&require,t=0;t<d.length;t++)l(d[t]);return l}({1:[function(t,i,e){"use strict";function n(t,i){for(var e=0;e<i.length;e++){var o=i[e];o.enumerable=o.enumerable||!1,o.configurable=!0,"value"in o&&(o.writable=!0),Object.defineProperty(t,o.key,o)}}NKC.modules.DraggablePanel=function(){function i(t){!function(t,i){if(!(t instanceof i))throw new TypeError("Cannot call a class as a function")}(this,i);var r=this;r.dom=$(t);r.dom.draggable({scroll:!1,handle:".draggable-panel-title",drag:function(t,i){i.position.top<0&&(i.position.top=0);var e=$(window).height();i.position.top>e-30&&(i.position.top=e-30);var o=r.dom.width();i.position.left<100-o&&(i.position.left=100-o);var n=$(window).width();i.position.left>n-100&&(i.position.left=n-100)}}),r.resetPosition(),r.dom.on("click",function(){r.active()}),window.addEventListener("popstate",function(t){r.hidePanel()})}var t,e,o;return t=i,(e=[{key:"resetPosition",value:function(){var t=this.dom,i=$(window).width(),e=$(window).height();i<700?t.css({top:0,left:0}):(t.css("left",.5*(i-t.width())),t.css("top",.5*(e-t.height())))}},{key:"active",value:function(){for(var t,i=$(".draggable-panel"),e=0;e<i.length;e++){var o=i.eq(e).attr("data-z-index");0,o=Number(o),(void 0===t||t<o)&&(t=o)}t=(t||5e3)+1,this.dom.css({"z-index":t}),this.dom.attr("data-z-index",t)}},{key:"setSize",value:function(t){var i=this.dom;$(window).width()<700&&("show"===t?i.css({width:"80%",left:"20%"}):i.css({width:"auto"}))}},{key:"showPanel",value:function(){this.resetPosition(),this.setSize("show"),this.active(),this.dom.css("display","block"),window.history.pushState({sign:"draggablePanel"},"",""),window.history.go(1)}},{key:"hidePanel",value:function(){this.dom.css("display","none"),this.setSize("hide"),window.history.state&&"draggablePanel"===window.history.state.sign&&window.history.go(-1)}}])&&n(t.prototype,e),o&&n(t,o),i}()},{}]},{},[1]);
+NKC.modules.DraggablePanel = class {
+  constructor(domId) {
+    const self = this;
+    self.dom = $(domId);
+    const handle = `.draggable-panel-title`;
+    self.dom.draggable({
+      scroll: false,
+      handle,
+      drag: function(event, ui) {
+        if(ui.position.top < 0) ui.position.top = 0;
+        var height = $(window).height();
+        if(ui.position.top > height - 30) ui.position.top = height - 30;
+        var width = self.dom.width();
+        if(ui.position.left < 100 - width) ui.position.left = 100 - width;
+        var winWidth = $(window).width();
+        if(ui.position.left > winWidth - 100) ui.position.left = winWidth - 100;
+      }
+    });
+    self.resetPosition();
+    self.dom.on("click", function() {
+      self.active();
+    });
+    window.addEventListener("popstate", event => {
+      self.hidePanel();
+    })
+  }
+  resetPosition() {
+    const dom = this.dom;
+    const width = $(window).width();
+    const height = $(window).height();
+    if(width < 700) {
+      // 小屏幕
+      dom.css({
+        "top": 0,
+        "left": 0,
+      });
+    } else {
+      // 宽屏
+      dom.css("left", (width - dom.width())*0.5);
+      dom.css('top', (height - dom.height()) * 0.5);
+    }
+  }
+  active() {
+    const panels = $('.draggable-panel');
+    let maxIndex;
+    for(let i = 0; i < panels.length; i++) {
+      const d = panels.eq(i);
+      let _index = d.attr('data-z-index');
+      if(!_index === undefined) continue;
+      _index = Number(_index);
+      if(maxIndex === undefined || maxIndex < _index) maxIndex = _index;
+    }
+    maxIndex = (maxIndex || 5000) + 1;
+    this.dom.css({
+      'z-index': maxIndex
+    });
+    this.dom.attr('data-z-index', maxIndex);
+  }
+  setSize(type) {
+    const dom = this.dom;
+    const width = $(window).width();
+    if(width < 700) {
+      if(type === 'show') {
+        dom.css({
+          width: '80%',
+          left: '20%',
+        });
+      } else {
+        dom.css({
+          width: 'auto',
+        });
+      }
+    }
+  }
+  showPanel() {
+    this.resetPosition();
+    this.setSize('show');
+    this.active();
+    this.dom.css('display', 'block');
+    window.history.pushState({ sign: "draggablePanel" }, "", "" );
+    window.history.go(1);
+  }
+  hidePanel() {
+    this.dom.css('display', 'none');
+    this.setSize('hide');
+    if(window.history.state && window.history.state.sign === "draggablePanel") {
+      window.history.go(-1);
+    }
+  }
+}

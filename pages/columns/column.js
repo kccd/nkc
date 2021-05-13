@@ -85,11 +85,19 @@ function openNewWindow(url) {
 }
 function pushToHome(id, type) {
   var method = type === "push"? "POST": "DELETE";
-  nkcAPI("/m/" + id + "/top", method)
+  nkcAPI("/m/" + id + "/hot", method)
     .then(function() {
       window.location.reload();
     })
     .catch(sweetError);
+}
+function toppedColumn(id, type) {
+  var method = type === 'push'? 'POST': 'DELETE';
+  nkcAPI("/m/" + id + "/top", method)
+    .then(function() {
+      window.location.reload();
+    })
+    .catch(sweetError)
 }
 function subscribeColumn(columnId) {
   if(!NKC.configs.uid) return NKC.methods.toLogin();
@@ -126,3 +134,16 @@ function subscribeColumn(columnId) {
     })
     .catch(sweetError);
 }
+
+Object.assign(window, {
+  bodyBackgroundColor,
+  CommonModal,
+  SubscribeTypes,
+  showSetDom,
+  showShareDom,
+  saveSettings,
+  openNewWindow,
+  pushToHome,
+  subscribeColumn,
+  toppedColumn
+});

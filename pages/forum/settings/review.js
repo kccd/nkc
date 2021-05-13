@@ -1,1 +1,28 @@
-!function i(u,s,f){function a(e,r){if(!s[e]){if(!u[e]){var t="function"==typeof require&&require;if(!r&&t)return t(e,!0);if(c)return c(e,!0);var n=new Error("Cannot find module '"+e+"'");throw n.code="MODULE_NOT_FOUND",n}var o=s[e]={exports:{}};u[e][0].call(o.exports,function(r){return a(u[e][1][r]||r)},o,o.exports,i,u,s,f)}return s[e].exports}for(var c="function"==typeof require&&require,r=0;r<f.length;r++)a(f[r]);return a}({1:[function(r,e,t){"use strict";var n=NKC.methods.getDataById("data"),o=n.fid;new Vue({el:"#app",data:{roles:n.roles,grades:n.grades,wordGroupInfo:n.wordGroupInfo,settings:n.forumReviewSettings},methods:{submit:function(){var r=this.settings;return nkcAPI("/f/".concat(o,"/settings/review"),"PUT",{settings:r}).then(function(){return sweetAlert("保存成功")}).catch(sweetError)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const fid = data.fid;
+const app = new Vue({
+  el: '#app',
+  data: {
+    roles: data.roles,
+    grades: data.grades,
+    wordGroupInfo: data.wordGroupInfo,
+    settings: data.forumReviewSettings,
+  },
+  methods: {
+    submit() {
+      const {
+        settings
+      } = this;
+      return nkcAPI(`/f/${fid}/settings/review`, "PUT", {
+        settings
+      })
+      .then(() => sweetAlert("保存成功"))
+      .catch(sweetError);
+    }
+  }
+})
+
+Object.assign(window, {
+  fid,
+  app,
+});

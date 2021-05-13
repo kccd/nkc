@@ -8,7 +8,7 @@
         .quote-content(v-if="quote") {{quote}}
       .modal-body
         .form
-          .form-group(v-for="d, index in data")
+          .form-group(v-for="(d, index) in data")
             h5(v-if="d.label") {{d.label}}
             //- 数字input
             input.form-control(v-if="d.dom === 'input' && d.type === 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model.number="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )

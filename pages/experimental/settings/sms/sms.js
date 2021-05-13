@@ -1,1 +1,163 @@
-!function s(o,a,c){function m(t,e){if(!a[t]){if(!o[t]){var n="function"==typeof require&&require;if(!e&&n)return n(t,!0);if(u)return u(t,!0);var r=new Error("Cannot find module '"+t+"'");throw r.code="MODULE_NOT_FOUND",r}var i=a[t]={exports:{}};o[t][0].call(i.exports,function(e){return m(o[t][1][e]||e)},i,i.exports,s,o,a,c)}return a[t].exports}for(var u="function"==typeof require&&require,e=0;e<c.length;e++)m(c[e]);return m}({1:[function(e,t,n){"use strict";var r=NKC.methods.getDataById("data");window.app=new Vue({el:"#app",data:{smsSettings:r.smsSettings,nationCodes:nationCodes,modifyApp:!1,test:{name:"register",mobile:"",nationCode:"86",content:""}},methods:{checkString:NKC.methods.checkData.checkString,saveApp:function(){var e=this.smsSettings,t=e.appId,n=e.appKey,r=e.smsSign,i=e.platform,s=this;Promise.resolve().then(function(){if(!i)throw"请选择短信平台";return s.checkString(t,{name:"App ID",minLength:1}),s.checkString(n,{name:"App Key",minLength:1}),s.checkString(r,{name:"短信签名",minLength:1}),nkcAPI("/e/settings/sms","PUT",{type:"modifyApp",smsSettings:{appId:t,appKey:n,smsSign:r,platform:i}})}).then(function(e){sweetSuccess("保存成功")}).catch(sweetError)},getChineseName:function(t){var n="";return this.nationCodes.forEach(function(e){e.code===t&&(n=e.chineseName)}),n},isDisabled:function(e){for(var t=0;t<this.smsSettings.restrictedNumber.length;t++)if(e===this.smsSettings.restrictedNumber[t].code)return!0;return!1},tran:function(e){switch(e){case"register":return"注册";case"login":return"登录";case"getback":return"找回密码";case"bindMobile":return"绑定手机";case"changeMobile":return"更改手机号";case"reset":return"绑定新手机号";case"withdraw":return"提现";case"destroy":return"账号注销";case"unbindMobile":return"解绑手机号";case"changeUnusedPhoneNumber":return"更换失效的手机号";case"verifyPhoneNumber":return"定期验证手机号"}},testSendMessage:function(){var e=this,t=e.test.name,n=e.test.mobile,r=e.test.nationCode,i=e.test.content;Promise.resolve().then(function(){if(!t)throw"请选择测试类型";if(!r)throw"请选择测试手机国际区号";if(!n)throw"请输入测试手机号码";if(!i)throw"请输入自定义验证码";return sweetQuestion("确定要发送短消息？")}).then(function(){return nkcAPI("/e/settings/sms/test","POST",{name:t,mobile:n,nationCode:r,content:i})}).then(function(){sweetSuccess("短信发送成功")}).catch(sweetError)},save:function(){var o=this.smsSettings,a=this;Promise.resolve().then(function(){o.appId+="";var e=o.appId,t=o.appKey,n=o.smsSign;a.checkString(e,{name:"App ID",minLength:1}),a.checkString(t,{name:"App Key",minLength:1}),a.checkString(n,{name:"短信签名",minLength:1});for(var r=0;r<o.templates.length;r++){var i=o.templates[r];if(o.status){if(""===i.id)throw i.name+"的模板ID不能为空";if(""===i.validityPeriod)throw i.name+"的有效时间不能为空";if(i.validityPeriod<=0)throw i.name+"的有效时间必须大于0";if(""===i.sameIpOneDay)throw i.name+"的IP次数限制不能为空";if(i.sameIpOneDay<=0)throw i.name+"的IP次数限制必须大于0";if(""===i.sameMobileOneDay)throw i.name+"的手机号码次数限制不能为空";if(i.sameMobileOneDay<=0)throw i.name+"的手机号码次数限制必须大于0"}}var s=NKC.methods.checkData.checkString;o.restrictedNumber.forEach(function(e){e.number=e.number.toString(),s(e.code,{name:"国际区号",minLength:1}),s(e.number,{name:"受限号码",minLength:"1"}),e.number=e.number.trim().split(",").filter(function(e){return e.trim()})})}).then(function(){return nkcAPI("/e/settings/sms","PUT",{smsSettings:o})}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById("data");
+window.app = new Vue({
+  el: '#app',
+  data: {
+    smsSettings: data.smsSettings,
+    nationCodes: nationCodes,
+    modifyApp: false,
+    test: {
+      name: 'register',
+      mobile: '',
+      nationCode: '86',
+      content: ""
+    }
+  },
+  methods: {
+    checkString: NKC.methods.checkData.checkString,
+    saveApp() {
+      // 保存AppId、App Key和短信签名
+      const {appId, appKey, smsSign, platform} = this.smsSettings;
+      const self = this;
+      Promise.resolve()
+        .then(() => {
+          if(!platform) throw '请选择短信平台';
+          self.checkString(appId, {
+            name: "App ID",
+            minLength: 1
+          });
+          self.checkString(appKey, {
+            name: "App Key",
+            minLength: 1
+          });
+          self.checkString(smsSign, {
+            name: "短信签名",
+            minLength: 1
+          });
+          const body = {
+            type: "modifyApp",
+            smsSettings: {
+              appId,
+              appKey,
+              smsSign,
+              platform
+            }
+          };
+          return nkcAPI("/e/settings/sms", "PUT", body)
+        })
+        .then(data => {
+          sweetSuccess("保存成功");
+        })
+        .catch(sweetError);
+    },
+    getChineseName: function(code) {
+      var chineseName = '';
+      this.nationCodes.forEach(function (ele) {
+        if (ele.code === code) {
+          chineseName = ele.chineseName
+        }
+      });
+      return chineseName
+    },
+    isDisabled: function(nationCode) {
+      for (var i=0;  i < this.smsSettings.restrictedNumber.length; i++) {
+        if (nationCode === this.smsSettings.restrictedNumber[i].code) return true;
+      }
+      return false
+    },
+    tran: function(name) {
+      switch (name) {
+        case 'register': return '注册';
+        case 'login': return '登录';
+        case 'getback': return '找回密码';
+        case 'bindMobile': return '绑定手机';
+        case 'changeMobile': return '更改手机号';
+        case 'reset': return '绑定新手机号';
+        case 'withdraw': return '提现';
+        case 'destroy': return '账号注销';
+        case "unbindMobile": return "解绑手机号";
+        case 'changeUnusedPhoneNumber': return "更换失效的手机号";
+        case 'verifyPhoneNumber': return "定期验证手机号"
+      }
+    },
+    testSendMessage: function() {
+      var self = this;
+      var name = self.test.name;
+      var mobile = self.test.mobile;
+      var nationCode = self.test.nationCode;
+      var content = self.test.content;
+      Promise.resolve()
+        .then(() => {
+          if(!name) throw('请选择测试类型');
+          if(!nationCode) throw('请选择测试手机国际区号');
+          if(!mobile) throw('请输入测试手机号码');
+          if(!content) throw("请输入自定义验证码");
+          return sweetQuestion("确定要发送短消息？")
+        })
+        .then(() => {
+          return nkcAPI('/e/settings/sms/test', 'POST', {name: name, mobile: mobile, nationCode: nationCode, content: content})
+        })
+        .then(function() {
+          sweetSuccess('短信发送成功');
+        })
+        .catch(sweetError)
+    },
+    save: function() {
+      var smsSettings = this.smsSettings;
+      const self = this;
+      // 验证限制号码字符串 去掉无用数据 并转为数组
+      Promise.resolve()
+        .then(function() {
+          smsSettings.appId += '';
+          const {appId, appKey, smsSign} = smsSettings;
+          self.checkString(appId, {
+            name: "App ID",
+            minLength: 1
+          });
+          self.checkString(appKey, {
+            name: "App Key",
+            minLength: 1
+          });
+          self.checkString(smsSign, {
+            name: "短信签名",
+            minLength: 1
+          });
+
+          for(var i = 0 ; i < smsSettings.templates.length ; i++) {
+            var template = smsSettings.templates[i];
+            if(smsSettings.status) {
+              if(template.id === '') throw(template.name + '的模板ID不能为空');
+              if(template.validityPeriod === '') throw(template.name + '的有效时间不能为空');
+              if(template.validityPeriod <= 0) throw(template.name + '的有效时间必须大于0');
+              if(template.sameIpOneDay === '') throw(template.name + '的IP次数限制不能为空');
+              if(template.sameIpOneDay <= 0) throw(template.name + '的IP次数限制必须大于0');
+              if(template.sameMobileOneDay === '') throw(template.name + '的手机号码次数限制不能为空');
+              if(template.sameMobileOneDay <= 0) throw(template.name + '的手机号码次数限制必须大于0');
+            }
+          }
+
+          var checkString = NKC.methods.checkData.checkString;
+          smsSettings.restrictedNumber.forEach(function (ele) {
+            ele.number = ele.number.toString();
+            checkString(ele.code, {
+              name: "国际区号",
+              minLength: 1,
+            });
+            checkString(ele.number,{
+              name: '受限号码',
+              minLength: '1'
+            });
+            ele.number = ele.number.trim().split(',').filter(function (n) {
+              return n.trim();
+            })
+          })
+        })
+        .then(function () {
+          return nkcAPI('/e/settings/sms', 'PUT', {smsSettings: smsSettings})
+        })
+        .then(function() {
+          sweetSuccess("保存成功");
+        })
+        .catch(sweetError)
+    }
+  }
+});

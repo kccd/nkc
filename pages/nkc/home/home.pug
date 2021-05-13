@@ -3,7 +3,7 @@ block nkcTitle
   title 主页设置 - 前台管理
   +includeCSS('/nkc/home/home.css')
 block nkcContent
-  #data.hidden=objToStr({columnCount: data.columnCount, columnListPosition: data.columnListPosition, recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, latestToppedThreads: data.latestToppedThreads, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode, showActivityEnter: data.showActivityEnter})
+  #data.hidden=objToStr({toppedColumns: data.toppedColumns, poolColumns: data.poolColumns, columnPool: data.columnPool, columnListSort: data.columnListSort, columnCount: data.columnCount, columnListPosition: data.columnListPosition, recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, latestToppedThreads: data.latestToppedThreads, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode, showActivityEnter: data.showActivityEnter})
   .col-xs-12.col-md-12.management-home#app(v-cloak)
     ul.nav.nav-tabs
       li(v-for='n in nav' :class='{"active": n.active}' @click='selectPage(n)')
@@ -132,62 +132,100 @@ block nkcContent
           +threadList({name: '自动推荐', listName: 'automaticallySelectedThreads'})
         .m-t-1
           button.btn.btn-primary(@click='saveRecommendThreads') 保存
+    div(v-else-if='page.id === "hotColumn"')
+      div
+        .form.form-horizontal.m-t-1
+          .form-group
+            label.col-sm-3.control-label 列表位置
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='main' v-model='columnListPosition')
+                  span 主栏
+                label.m-r-1
+                  input(type='radio' value='side' v-model='columnListPosition')
+                  span 侧边
+                label
+                  input(type='radio' value='null' v-model='columnListPosition')
+                  span 不显示
+          .form-group
+            label.col-sm-3.control-label 列表排序方式
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value="updateTime" v-model='columnListSort')
+                  span 更新时间
+                label
+                  input(type='radio' value="postCount" v-model='columnListSort')
+                  span 文章数量
+          .form-group
+            label.col-sm-3.control-label 列表专栏数量
+            .col-sm-6
+              input.form-control(type='text' v-model.number="columnCount")
+          .form-group
+            label.col-sm-3.control-label 自动推荐
+            .col-sm-6
+              h5 专栏数量
+              input.form-control(type='text' v-model.number='columnPool.columnCount')
+              h5 更新间隔（分钟）
+              input.form-control(type='text' v-model.number='columnPool.updateInterval')
+              h5 最小文章数限制
+              input.form-control(type='text' v-model.number='columnPool.minPostCount')
+              h5 最近更新时间限制（天）
+              input.form-control(type='text' v-model.number='columnPool.updateTime')
+              h5 最小订阅数限制
+              input.form-control(type='text' v-model.number='columnPool.minSubscriptionCount')
+        div
+          hr
+          h4 手动推荐专栏列表
+          .nkc-home-columns
+            .nkc-home-column(v-for='(c, index) in columns')
+              .nkc-home-column-avatar
+                img(:src="getUrl('columnAvatar', c.avatar)")
+              .nkc-home-column-info
+                .nkc-home-column-name
+                  a(:href="getUrl('columnHome', c._id)" target="_blank") {{c.name}}
+                  .nkc-home-column-remove(@click="removeForum(columns, index)")
+                    .fa.fa-trash
+                .nkc-home-column-abbr
+                  span {{c.subCount}}人关注，{{c.postCount}}篇文章
+                .nkc-home-column-abbr
+                  span {{fromNow(c.tlm)}}更新
+          hr
+          h4 自动推荐专栏列表
+            button.btn.btn-xs.btn-default(@click='updateHomeHotColumns') 更新
+          .nkc-home-columns.m-t-1
+            .nkc-home-column(v-for='(c, index) in poolColumns')
+              .nkc-home-column-avatar
+                img(:src="getUrl('columnAvatar', c.avatar)")
+              .nkc-home-column-info
+                .nkc-home-column-name
+                  a(:href="getUrl('columnHome', c._id)" target="_blank") {{c.name}}
+                  .nkc-home-column-remove(@click="removeForum(poolColumns, index)")
+                    .fa.fa-trash
+                .nkc-home-column-abbr
+                  span {{c.subCount}}人关注，{{c.postCount}}篇文章
+                .nkc-home-column-abbr
+                  span {{fromNow(c.tlm)}}更新
+          .form-group
+            button.btn.btn-primary(@click='saveColumns') 保存
+    div(v-else-if='page.id === "toppedColumn"')
+      .nkc-home-columns.m-t-1
+        .nkc-home-column(v-for='(c, index) in toppedColumns')
+          .nkc-home-column-avatar
+            img(:src="getUrl('columnAvatar', c.avatar)")
+          .nkc-home-column-info
+            .nkc-home-column-name
+              a(:href="getUrl('columnHome', c._id)" target="_blank") {{c.name}}
+              .nkc-home-column-remove(@click="removeForum(toppedColumns, index)")
+                .fa.fa-trash
+            .nkc-home-column-abbr
+              span {{c.subCount}}人关注，{{c.postCount}}篇文章
+            .nkc-home-column-abbr
+              span {{fromNow(c.tlm)}}更新
+        div
+          button.btn.btn-primary(@click='saveToppedColumns') 保存
     div(v-else-if='page.id === "other"')
-      //-div
-        .management-header 首页推荐
-        .home-top-threads
-          .row
-            .col-xs-12.col-md-12
-              h4 轮播图
-              .radio
-                span 显示顺序：
-                label.m-r-1
-                  input(type="radio" value="random" v-model="ads.movableOrder")
-                  span 随机
-                label.m-r-1
-                  input(type="radio" value="fixed" v-model="ads.movableOrder")
-                  span 正序
-            .col-xs-12.col-md-6(v-for="ad, index in ads.movable").m-b-1
-              .home-top-thread
-                .home-top-thread-cover
-                  .home-top-thread-remove(@click="remove(ads.movable, index)")
-                    .fa.fa-trash
-                  img.pointer(:src="getUrl('postCover', ad.cover)" @click="visitUrl('/t/' + ad.tid, true)")
-                  input.home-top-thread-title(v-model="ad.title")
-                  //.home-top-thread-index {{index + 1 }}
-                  .home-top-thread-button(@click="selectLocalFile(ad)" title="更换封面")
-                    .fa.fa-cloud-upload
-                  .home-top-thread-buttons
-                    .fa.fa-angle-left(@click="move(ad, 'left')" title="左移")
-                    div {{index + 1}}
-                    .fa.fa-angle-right(@click="move(ad, 'right')" title="右移")
-          .row.m-t-2
-            .col-xs-12.col-md-12
-              h4 固定图，只显示6篇
-              .radio
-                span 显示顺序：
-                label.m-r-1
-                  input(type="radio" value="random" v-model="ads.fixedOrder")
-                  span 随机
-                label.m-r-1
-                  input(type="radio" value="fixed" v-model="ads.fixedOrder")
-                  span 正序
-            .col-xs-12.col-md-3(v-for="ad, index in ads.fixed").m-b-1
-              .home-top-thread.fixed
-                .home-top-thread-cover
-                  .home-top-thread-remove(@click="remove(ads.fixed, index)")
-                    .fa.fa-trash
-                  img.pointer(:src="getUrl('postCover', ad.cover)" @click="visitUrl('/t/' + ad.tid, true)")
-                  input.home-top-thread-title(v-model="ad.title")
-                  //.home-top-thread-index {{index + 1 }}
-                  .home-top-thread-button(@click="selectLocalFile(ad)" title="更换封面")
-                    .fa.fa-cloud-upload
-                  .home-top-thread-buttons
-                    .fa.fa-angle-left(@click="move(ad, 'left')" title="左移")
-                    div {{index + 1}}
-                    .fa.fa-angle-right(@click="move(ad, 'right')" title="右移")
-            .col-xs-12.col-md-12.m-t-1
-              button.management-button(@click="saveAds") 保存
       div.m-t-2
         .management-header 首页推荐专业
         .home-top-forums
@@ -205,7 +243,7 @@ block nkcContent
                 a.pointer(@click="visitUrl('/f/' + f.fid, true)").home-top-forum-name {{f.displayName}}
           .m-t-1
             button.management-button(@click="saveRecommendForums") 保存
-      div.m-t-2
+      //-div.m-t-2
         .management-header 首页专栏
         .home-top-forums
           .home-top-forum(v-for="f,index in columns")

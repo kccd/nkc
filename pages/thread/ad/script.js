@@ -1,5 +1,5 @@
 var data = NKC.methods.getDataById("data");
-var SelectImage;
+window.SelectImage = undefined;
 var app = new Vue({
   el: "#app",
   data: {
@@ -15,7 +15,7 @@ var app = new Vue({
     coverMovableData: ""
   },
   mounted: function() {
-    SelectImage = new NKC.methods.selectImage();
+    window.SelectImage = new NKC.methods.selectImage();
   },
   computed: {
     coverData: function() {
@@ -93,3 +93,5 @@ var app = new Vue({
     }
   }
 });
+
+window.app = app;

@@ -415,3 +415,30 @@ function clearKind(fid) {
 		})
 	}
 }
+
+
+Object.assign(window, {
+	createChildForums,
+	exchangeChildForum,
+	createSelect,
+	createOption,
+	getFid,
+	selectForum,
+	getChildrenForums,
+	getParentForum,
+	getForumByFid,
+	showSelect,
+	moveForum,
+	selectForumType,
+	getThreadTypeByCid,
+	createThreadType,
+	exchangeThreadTypes,
+	addThreadType,
+	createThreadTypesSelect,
+	getThreadTypeSelectValue,
+	deleteThreadType,
+	editorThreadType,
+	submit,
+	saveKind,
+	clearKind,
+});

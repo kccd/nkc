@@ -51,3 +51,9 @@ function shareToOther(shareType, type, title, pid, description, avatar){
       })
   }
 }
+
+Object.assign(window, {
+  clipboard,
+  shareShowWeChat,
+  shareToOther,
+});

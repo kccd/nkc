@@ -1,5 +1,5 @@
 var data = $('#data').text();
-data = JSON.parse(data);
+window.data = JSON.parse(data);
 update();
 $('#title, #content, #reason, #solution, #QQ, #email, #log').on('input', function() {
 	update();
@@ -88,3 +88,11 @@ $(function() {
 })
 
 checkMark();
+
+Object.assign(window, {
+	update,
+	submit,
+	deleteProblem,
+	changeType,
+	checkMark,
+});

@@ -7,7 +7,7 @@ router
     const {column, user} = data;
     if(type === "subscribe") {
       await user.ensureSubLimit("column");
-      let sub = await db.SubscribeModel.findOne({uid: user.uid, type: "column", columnId: column._id});
+      let sub = await db.SubscribeModel.findOne({cancel: false, uid: user.uid, type: "column", columnId: column._id});
       if(sub) ctx.throw(400, "您已经关注过该专栏了，请刷新");
       for(const typeId of cid) {
         const subType = await db.SubscribeTypeModel.findOne({_id: typeId, uid: user.uid});
@@ -21,13 +21,14 @@ router
         type: "column"
       }).save();
     } else {
-      const sub = await db.SubscribeModel.findOne({type: "column", columnId: column._id, uid: user.uid});
+      const sub = await db.SubscribeModel.findOne({cancel: false, type: "column", columnId: column._id, uid: user.uid});
       if(!sub) ctx.throw(400, "您暂未关注该专栏，请刷新");
       cid = sub.cid;
-      await sub.deleteOne();
+      await sub.cancelSubscribe();
+      // await sub.deleteOne();
     }
     await db.SubscribeModel.saveUserSubColumnsId(user.uid);
-    data.subCount = await db.SubscribeModel.countDocuments({type: "column", columnId: column._id});
+    data.subCount = await db.SubscribeModel.countDocuments({cancel: false, type: "column", columnId: column._id});
     await column.updateOne({subCount: data.subCount});
     await db.SubscribeTypeModel.updateCount(cid);
     await next();

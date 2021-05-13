@@ -1,1 +1,96 @@
-!function o(i,c,u){function a(t,e){if(!c[t]){if(!i[t]){var s="function"==typeof require&&require;if(!e&&s)return s(t,!0);if(d)return d(t,!0);var n=new Error("Cannot find module '"+t+"'");throw n.code="MODULE_NOT_FOUND",n}var r=c[t]={exports:{}};i[t][0].call(r.exports,function(e){return a(i[t][1][e]||e)},r,r.exports,o,i,c,u)}return c[t].exports}for(var d="function"==typeof require&&require,e=0;e<u.length;e++)a(u[e]);return a}({1:[function(e,t,s){"use strict";var n=NKC.methods.getDataById("data"),r={};n.users.map(function(e){e.showDetail=!1,r[e.uid]=e});new Vue({el:"#app",data:{t:n.t,searchType:n.searchType||"username",searchContent:n.searchContent||"",users:n.users,usersObj:r,roles:n.roles,selectedUsersId:[]},computed:{selectedUsers:function(){var t=this.usersObj;return this.selectedUsersId.map(function(e){return t[e]})},isChecked:function(){return this.selectedUsersId.length===this.users.length}},methods:{format:NKC.methods.format,getUrl:NKC.methods.tools.getUrl,getIpUrl:NKC.methods.tools.getIpUrl,search:function(){var e=this.t,t=this.searchType,s=this.searchContent;s||sweetError("请输入搜索内容"),window.location.href="/e/settings/user?t=".concat(e,"&c=").concat(t,",").concat(s)},switchDetail:function(e){e.showDetail=!e.showDetail},editUser:function(e){window.ModifyAccountInfo||(window.ModifyAccountInfo=new NKC.modules.ModifyAccountInfo),window.ModifyAccountInfo.open({uid:e.uid})},toDisableUser:function(e,t,s,n){var r="all"===t?[].concat(this.selectedUsersId):[n.uid];return Promise.resolve().then(function(){if(!r.length)throw"未选择用户";return nkcAPI("/e/settings/user","PUT",{type:e,usersId:r,disable:!!s})}).then(function(){sweetSuccess("执行成功")}).catch(function(e){console.log(e),sweetError(e)})},disableUsers:function(e,t,s){this.toDisableUser("disable",e,t,s)},hiddenUsersHome:function(e,t,s){this.toDisableUser("hidden",e,t,s)},selectAllUsers:function(){var e=this.users,t=this.isChecked;this.selectedUsersId=t?[]:e.map(function(e){return e.uid})}},mounted:function(){setTimeout(function(){floatUserPanel.initPanel()},500)}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const usersObj = {};
+data.users.map(u => {
+  u.showDetail = false;
+  usersObj[u.uid] = u
+});
+const app = new Vue({
+  el: '#app',
+  data: {
+    t: data.t,
+    searchType: data.searchType || 'username',
+    searchContent: data.searchContent || '',
+    users: data.users,
+    usersObj,
+    roles: data.roles,
+    selectedUsersId: [],
+  },
+  computed: {
+    selectedUsers() {
+      const {usersObj} = this;
+      return this.selectedUsersId.map(uid => usersObj[uid]);
+    },
+    isChecked() {
+      return this.selectedUsersId.length === this.users.length;
+    }
+  },
+  methods: {
+    format: NKC.methods.format,
+    getUrl: NKC.methods.tools.getUrl,
+    getIpUrl: NKC.methods.tools.getIpUrl,
+    search() {
+      const {t, searchType, searchContent} = this;
+      if(!searchContent) sweetError('请输入搜索内容');
+      window.location.href = `/e/settings/user?t=${t}&c=${searchType},${searchContent}`;
+    },
+    switchDetail(u) {
+      u.showDetail = !u.showDetail;
+    },
+    editUser(u) {
+      if(!window.ModifyAccountInfo) {
+        window.ModifyAccountInfo = new NKC.modules.ModifyAccountInfo();
+      }
+      window.ModifyAccountInfo.open({
+        uid: u.uid
+      });
+    },
+    toDisableUser(postType, type, disable, user) {
+      let usersId;
+      if(type === 'all') {
+        usersId = [].concat(this.selectedUsersId);
+      } else {
+        usersId = [user.uid];
+      }
+      return Promise.resolve()
+        .then(() => {
+          if(!usersId.length) throw '未选择用户';
+          return nkcAPI(`/e/settings/user`, 'PUT', {
+            type: postType,
+            usersId,
+            disable: !!disable
+          });
+        })
+        .then(() => {
+          sweetSuccess('执行成功');
+        })
+        .catch(err => {
+          console.log(err);
+          sweetError(err);
+        });
+    },
+    disableUsers(type, disable, user) {
+      this.toDisableUser('disable', type, disable, user);
+    },
+    hiddenUsersHome(type, disable, user) {
+      this.toDisableUser('hidden', type, disable, user);
+    },
+    selectAllUsers() {
+      const {users, isChecked} = this;
+      if(!isChecked) {
+        this.selectedUsersId = users.map(u => u.uid);
+      } else {
+        this.selectedUsersId = [];
+      }
+    }
+  },
+  mounted() {
+    setTimeout(() => {
+      floatUserPanel.initPanel();
+    }, 500)
+  }
+});
+
+Object.assign(window, {
+  usersObj,
+  app,
+});

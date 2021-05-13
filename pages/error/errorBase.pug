@@ -7,10 +7,11 @@ block head
   +includeCSS('/font-awesome/css/font-awesome.css')
   +includeCSS('/bootstrap/css/bootstrap.css')
   link(rel='shortcut icon' href='/favicon.ico')
-  title= `${data.status}${data.error?':'+data.error: ''}`
   +includeCSS("/publicModules/public.css")
   +includeCSS("/nkc_styles.css")
   +includeCSS("/error/error.css")
+  block errorTitle
+    title= `${data.status}${data.error ? ':' + data.error : ''}`
 
 block body
   .container-fluid.max-width
@@ -18,7 +19,7 @@ block body
       if !data.user && data.status === 403
         .error-icon=`403 Forbidden`
         .error-list.b-s-10
-          .error-header 你暂未登录，无法确定是否有权浏览。
+          .error-header 根据有关政策，内容不予显示。
           h4.text-center
             button.btn.btn-default.btn-sm(onclick="NKC.methods.toLogin('login')") 登录
             | &nbsp;或

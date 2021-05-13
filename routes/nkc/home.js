@@ -16,13 +16,35 @@ router
       if(forum) data.recommendForums.push(forum);
     });
     data.columns = [];
-    const columns = await db.ColumnModel.find({_id: {$in: homeSettings.columnsId}});
+    data.poolColumns = [];
+    data.toppedColumns = [];
+    const columns = await db.ColumnModel.find({
+      _id: {
+        $in: homeSettings.columnsId.concat(homeSettings.columnPool.columnsId, homeSettings.toppedColumnsId)
+      }
+    }, {
+      name: 1,
+      _id: 1,
+      subCount: 1,
+      postCount: 1,
+      tlm: 1,
+      toc: 1,
+      avatar: 1
+    });
     const columnsObj = {};
     columns.map(c => columnsObj[c._id] = c);
     homeSettings.columnsId.map(cid => {
       const column = columnsObj[cid];
       if(column) data.columns.push(column);
     });
+    homeSettings.columnPool.columnsId.map(cid => {
+      const column = columnsObj[cid];
+      if(column) data.poolColumns.push(column);
+    })
+    homeSettings.toppedColumnsId.map(cid => {
+      const column = columnsObj[cid];
+      if(column) data.toppedColumns.push(column);
+    })
     let goods = await db.ShopGoodsModel.find({disabled: false, productId: {$in: homeSettings.shopGoodsId}});
     goods = await db.ShopGoodsModel.extendProductsInfo(goods, {
       user: true,
@@ -67,6 +89,8 @@ router
     data.showActivityEnter = homeSettings.showActivityEnter;
     data.columnListPosition = homeSettings.columnListPosition;
     data.columnCount = homeSettings.columnCount;
+    data.columnListSort = homeSettings.columnListSort;
+    data.columnPool = homeSettings.columnPool;
     ctx.template = "nkc/home/home.pug";
     await next();
   })
@@ -104,10 +128,14 @@ router
       });
     } else if(operation === 'updateThreadList') {
       const {type} = body;
-      if(!['fixed', 'movable'].includes(type)) ctx.throw(500, `数据类型错误 type: ${type}`);
+      if (!['fixed', 'movable'].includes(type)) ctx.throw(500, `数据类型错误 type: ${type}`);
       await db.ThreadModel.updateAutomaticRecommendThreadsByType(type);
       const homeSettings = await db.SettingModel.getSettings('home');
       data.automaticallySelectedThreads = homeSettings.recommendThreads[type].automaticallySelectedThreads;
+    } else if(operation === 'updateHomeHotColumns') {
+      await db.ColumnModel.updateHomeHotColumns();
+      const hotColumns = await db.ColumnModel.getHotColumns();
+      data.poolColumns = hotColumns.poolColumns;
     } else if(operation === 'saveRecommendThreads') {
       const {type, options} = body;
       if(!['fixed', 'movable'].includes(type)) ctx.throw(500, `数据类型错误 type: ${type}`);
@@ -210,19 +238,67 @@ router
         }
       });
     } else if(operation === "saveColumns") {
-      const {columnsId, columnListPosition, columnCount} = body;
-      if(!['main', 'side', 'null'].includes(columnListPosition)) ctx.throw(400, `首页专栏显示位置设置错误`);
-      for(const columnId of columnsId) {
+      const {
+        columnsId,
+        poolColumnsId,
+        columnListPosition,
+        columnCount,
+        columnPool,
+        columnListSort
+      } = body;
+      if (!['main', 'side', 'null'].includes(columnListPosition)) ctx.throw(400, `首页专栏显示位置设置错误`);
+      if (!['updateTime', 'postCount'].includes(columnListSort)) ctx.throw(400, `专栏列表排序方式设置错误`);
+      checkNumber(columnPool.columnCount, {
+        name: '自动推荐-专栏数量',
+        min: 0
+      });
+      checkNumber(columnPool.updateInterval, {
+        name: '自动推荐-更新间隔',
+        min: 0,
+        fractionDigits: 2,
+      });
+      checkNumber(columnPool.minPostCount, {
+        name: '自动推荐-最小文章数',
+        min: 0
+      });
+      checkNumber(columnPool.updateTime, {
+        name: '自动推荐-最近更新时间',
+        min: 0,
+        fractionDigits: 2
+      });
+      checkNumber(columnPool.minSubscriptionCount, {
+        name: '自动推荐-最小订阅数',
+        min: 0
+      });
+      for (const columnId of columnsId.concat(poolColumnsId)) {
         const column = await db.ColumnModel.findOne({_id: columnId});
-        if(!column) ctx.throw(400, `未找到ID为${columnId}的专业`);
+        if (!column) ctx.throw(400, `未找到ID为${columnId}的专栏`);
       }
       await db.SettingModel.updateOne({_id: "home"}, {
         $set: {
           "c.columnsId": columnsId,
           "c.columnListPosition": columnListPosition,
-          "c.columnCount": columnCount
+          "c.columnCount": columnCount,
+          "c.columnListSort": columnListSort,
+          "c.columnPool.columnCount": columnPool.columnCount,
+          "c.columnPool.updateInterval": columnPool.updateInterval,
+          "c.columnPool.minPostCount": columnPool.minPostCount,
+          "c.columnPool.updateTime": columnPool.updateTime,
+          "c.columnPool.minSubscriptionCount": columnPool.minSubscriptionCount,
+          "c.columnPool.columnsId": poolColumnsId,
         }
       });
+    } else if(operation === 'saveToppedColumns') {
+      let {columnsId} = body;
+      const columns = await db.ColumnModel.find({_id: {$in: columnsId}}, {_id: 1});
+      const columnsIdDB = columns.map(c => c._id);
+      columnsId = columnsId.filter(id => columnsIdDB.includes(id));
+      await db.SettingModel.updateOne({_id: 'home'}, {
+        $set: {
+          'c.toppedColumnsId': columnsId
+        }
+      })
+
     } else if(operation === "saveGoods") {
       const {goodsId, showShopGoods} = body;
       for(const productId of goodsId) {

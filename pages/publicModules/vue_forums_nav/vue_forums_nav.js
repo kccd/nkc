@@ -53,3 +53,5 @@ var vue_forums_Nav = new Vue({
     }
   }
 });
+
+window.vue_forums_Nav = vue_forums_Nav;

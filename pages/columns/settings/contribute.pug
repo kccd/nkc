@@ -1,26 +1,33 @@
-extends ./base
-block columnTitle
+extends ./settings
+block settingsTitle
   title 投稿处理
 block settingsContent
-  #data.hidden=objToStr({contributes: data.contributes, column: data.column, categories: data.categories})
-  .row#app(v-cloak)
-    .col-xs-12.col-md-3.contribute-list-nav
-      a(href=`/m/${data.column._id}/settings/contribute` class=!data.t?"active":"") 未处理
-        .pull-right
-          span=data.unresolvedCount|| ""
-          | &nbsp;
-          .fa.fa-angle-right
-      a(href=`/m/${data.column._id}/settings/contribute?t=passed` class=data.t==="passed"?"active":"") 已处理
-        .pull-right
-          span=data.resolvedCount|| ""
-          | &nbsp;
-          .fa.fa-angle-right
-    .col-xs-12.col-md-9
-      if data.contributes.length === 0
-        h4.text-center.m-t-4 空空如也~
-      else
+  #data.hidden=objToStr({column: data.column, mainCategories: data.mainCategories, minorCategories: data.minorCategories})
+  .column-contributes-container
+    h3 投稿处理
+    hr
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12.m-b-1
+        ul.nav.nav-tabs
+          li(:class="{'active': nav === 'unresolved'}")
+            a(@click='switchNav("unresolved")') 待处理
+              strong(v-if='unresolvedCount > 0') &nbsp;{{unresolvedCount}}
+          li(:class="{'active': nav === 'resolved'}")
+            a(@click='switchNav("resolved")') 已处理
+              strong(v-if='resolvedCount > 0') &nbsp;{{resolvedCount}}
+      .col-xs-12.col-md-12
+        mixin paging
+          .paging-button
+            a.button.pointer(v-for="(b, index) in paging.buttonValue"
+              :class="{'active':b.type==='active', 'radius-left': index===0, 'radius-right': index+1 === paging.buttonValue.length}"
+              @click="selectPage(b.type, b.num)"
+            ) {{b.num>=0?b.num+1:"..."}}
         include ../../publicModules/paging/paging
         div
+          +paging
+        div(v-if='contributes.length === 0')
+          .p-t-3.p-b-3.text-center 空空如也~
+        div(v-else)
           .contribute-list-li(v-for="c in contributes")
             span.anonymous-name(v-if="c.thread.firstPost.anonymous")=anonymousInfo.username
             a(v-else :href="'/u/' + c.uid" target="_blank") {{c.user.username}}
@@ -40,11 +47,21 @@ block settingsContent
                     input(type="radio" :value="false" v-model="c.agree")
                     | 拒绝
                 div(v-if="c.agree")
-                  .checkbox(v-for="category in categories")
-                    label
-                      span(v-for="index in category.level") &nbsp;&nbsp;&nbsp;&nbsp;
-                      input(type="checkbox" :value="category._id" v-model="c.cid")
-                      span.m-r-05 {{category.name}}
+                  .row
+                    .col-xs-12.col-md-6
+                      strong 主分类
+                      .checkbox(v-for="category in mainCategories")
+                        label
+                          span(v-for="index in category.level") &nbsp;&nbsp;&nbsp;&nbsp;
+                          input(type="checkbox" :value="category._id" v-model="c.cid")
+                          span.m-r-05 {{category.name}}
+                    .col-xs-12.col-md-6
+                      strong 辅分类
+                      .checkbox(v-for="category in minorCategories")
+                        label
+                          span(v-for="index in category.level") &nbsp;&nbsp;&nbsp;&nbsp;
+                          input(type="checkbox" :value="category._id" v-model="c.mcid")
+                          span.m-r-05 {{category.name}}
                 .m-b-05(v-else-if="c.agree === false")
                   h5 拒绝理由（选填）
                   textarea.form-control(rows=3 style="max-width:30rem" v-model="c.reason")
@@ -53,7 +70,8 @@ block settingsContent
                 h5.text-success 已同意
               div(v-else)
                 h5.text-danger 已拒绝
-        include ../../publicModules/paging/paging_input
-block scripts
+        div
+          +paging
+block settingsScripts
   include ../../publicModules/moment
   +includeJS("/columns/settings/contribute.js")

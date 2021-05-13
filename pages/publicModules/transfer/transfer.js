@@ -1,1 +1,71 @@
-!function c(a,i,s){function u(n,r){if(!i[n]){if(!a[n]){var e="function"==typeof require&&require;if(!r&&e)return e(n,!0);if(p)return p(n,!0);var o=new Error("Cannot find module '"+n+"'");throw o.code="MODULE_NOT_FOUND",o}var t=i[n]={exports:{}};a[n][0].call(t.exports,function(r){return u(a[n][1][r]||r)},t,t.exports,c,a,i,s)}return i[n].exports}for(var p="function"==typeof require&&require,r=0;r<s.length;r++)u(s[r]);return u}({1:[function(r,n,e){"use strict";NKC.modules.Transfer=function(){return function r(){!function(r,n){if(!(r instanceof n))throw new TypeError("Cannot call a class as a function")}(this,r);var c=this;c.dom=$("#moduleTransfer"),c.dom.modal({show:!1,backdrop:"static"}),c.app=new Vue({el:"#moduleTransferApp",data:{loading:!0,score:"",error:"",password:"",number:"",tUid:"",kcbOnce:""},methods:{open:function(r,n){this.tUid=n,nkcAPI("/u/".concat(n,"/transfer?t=").concat(Date.now()),"GET").then(function(r){c.app.kcbOnce=r.kcbOnce,c.app.score=r.shopScore}).catch(function(r){c.app.kcbOnce=r.kcbOnce,c.app.error=r.error||r}),c.callback=r,c.dom.modal("show")},close:function(){c.dom.modal("hide"),c.app.password=""},submit:function(){this.error="",Promise.resolve().then(function(){var r=NKC.methods.checkData.checkNumber,n=c.app,e=n.password,o=n.number,t=n.kcbOnce;if(r(o,{name:"转账金额",min:.01,fractionDigits:2}),t<(o=parseInt(100*o)))throw"转账金额不能超过".concat(t/100,"kcb");if(!e)throw"请输入密码";return nkcAPI("/u/".concat(c.app.tUid,"/transfer"),"POST",{password:e,number:o})}).then(function(){sweetSuccess("转账成功"),c.close()}).catch(function(r){c.app.error=r.error||r})}}}),c.open=c.app.open,c.close=c.app.close}}()},{}]},{},[1]);
+NKC.modules.Transfer = class {
+  constructor() {
+    const self = this;
+    self.dom = $("#moduleTransfer");
+    self.dom.modal({
+      show: false,
+      backdrop: "static"
+    });
+    self.app = new Vue({
+      el: "#moduleTransferApp",
+      data: {
+        loading: true,
+        score: '',
+        error: "",
+        password: "",
+        number: "",
+        tUid: "",
+        kcbOnce: "",
+      },
+      methods: {
+        open(callback, tUid) {
+          this.tUid = tUid;
+          nkcAPI(`/u/${tUid}/transfer?t=${Date.now()}`, "GET")
+            .then(data => {
+              self.app.kcbOnce = data.kcbOnce;
+              self.app.score = data.shopScore;
+            })
+            .catch(data => {
+              self.app.kcbOnce = data.kcbOnce;
+              self.app.error = data.error || data;
+            });
+          self.callback = callback;
+          self.dom.modal("show");
+        },
+        close() {
+          self.dom.modal("hide");
+          self.app.password = "";
+        },
+        submit() {
+          this.error = "";
+          Promise.resolve()
+            .then(() => {
+              const {checkNumber} = NKC.methods.checkData;
+              let {password, number, kcbOnce} = self.app;
+              checkNumber(number, {
+                name: "转账金额",
+                min: 0.01,
+                fractionDigits: 2
+              });
+              number = parseInt(number * 100);
+              if(number > kcbOnce) throw `转账金额不能超过${kcbOnce/100}kcb`;
+              if(!password) throw "请输入密码";
+              return nkcAPI(`/u/${self.app.tUid}/transfer`, "POST", {
+                password,
+                number
+              });
+            })
+            .then(() => {
+              sweetSuccess("转账成功");
+              self.close();
+            })
+            .catch(data => {
+              self.app.error = data.error || data;
+            });
+        }
+      }
+    });
+    self.open = self.app.open;
+    self.close = self.app.close;
+  }
+}

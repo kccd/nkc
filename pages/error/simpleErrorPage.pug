@@ -1,5 +1,9 @@
 extends ./errorBase
+block errorTitle
+  -var errorStatus = data.error && data.error.errorStatus ? data.error.errorStatus : '403 Forbidden';
+  -var errorInfo = data.error && data.error.errorInfo ? data.error.errorInfo : '根据相关法律法规和政策，内容不予显示。';
+  title=errorStatus
 block errorContent
-    .error-icon=`403 Forbidden`
+    .error-icon=errorStatus
     .error-list.b-s-10
-        .error-header=data.error || '根据相关法律法规和政策，内容不予显示。'
+        .error-header!=errorInfo

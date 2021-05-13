@@ -1,4 +1,4 @@
-var app;
+window.app = undefined;
 
 var winWidth = $(window).width();
 
@@ -15,7 +15,6 @@ var targetUser = data.targetUser;
 var grades = data.grades;
 var messageSettings = data.messageSettings;
 var userDigestThreadCount = data.userDigestThreadCount;
-var timeout;
 
 var mobile = winWidth < 1100;
 
@@ -27,7 +26,7 @@ if(mobile) {
 
 $(function() {
 
-  app = new Vue({
+  window.app = new Vue({
     el: '#app',
     data: {
       voiceHisIndex: '',
@@ -1381,34 +1380,6 @@ $(function() {
           .catch(function(data) {
             screenTopWarning(data.error || data);
           })
-
-        /*clearTimeout(timeout);
-        this.sendFailedMessages = [];
-        for(var i = 0; i < this.messages.length; i++) {
-          var message = this.messages[i];
-          if (message.status) {
-            this.sendFailedMessages.push(message);
-          }
-        }
-        this.messages = [];
-        this.canGetMessage = true;
-        var this_ = this;
-        timeout = setTimeout(function(){
-          this_.getUserList();
-          if(!this_.target) return;
-          this_.getMessage()
-            .then(function() {
-              // 清空当前用户的新信息条数
-              for(var i = 0; i < this_.userList.length; i++) {
-                var li = this_.userList[i];
-                if(li.user && this_.targetUser && li.user.uid === this_.targetUser.uid) {
-                  li.count = 0;
-                }
-              }
-              // 插入未发送成功的信息
-              this_.messages = this_.messages.concat(this_.sendFailedMessages);
-            });
-        }, 2000);*/
       },
 
       // 搜索用户
@@ -1839,7 +1810,7 @@ $(function() {
         }
       }
     }
-  })
+  });
 });
 
 
@@ -1956,3 +1927,26 @@ function addFriendByUid() {
       screenTopWarning(data.error || data);
     })
 }
+
+Object.assign(window, {
+  winWidth,
+  xss,
+  data,
+  templates,
+  targetUser,
+  grades,
+  messageSettings,
+  userDigestThreadCount,
+  pageName,
+  addHistory,
+  secondToMinute,
+  startPlayAudio,
+  stopPlayAudio,
+  restartPlayAudio,
+  stopOrStartPlay,
+  stopPlayType,
+  startPlayType,
+  closeFrameOfAddFriend,
+  openFrameOfAddFriend,
+  addFriendByUid,
+});

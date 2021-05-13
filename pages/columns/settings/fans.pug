@@ -1,0 +1,22 @@
+extends settings
+block settingsTitle
+  title 粉丝列表
+block settingsContent
+  div
+    h3 粉丝列表
+    hr
+    include ../../publicModules/paging/paging
+    .column-fans
+      for u in data.fans
+        .column-fans-item
+          .column-fans-avatar
+            img(src=tools.getUrl('userAvatar', u.avatar) data-float-uid=u.uid)
+          .column-fans-info
+            .column-fans-name
+              a(href=tools.getUrl('userHome', u.uid) target='_blank' data-float-uid=u.uid)=u.username
+            .column-fans-description=u.description || '暂无简介'
+          .column-fans-options
+
+    include ../../publicModules/paging/paging_input
+block settingsScripts
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug

@@ -1,1 +1,152 @@
-!function o(c,a,s){function u(t,e){if(!a[t]){if(!c[t]){var r="function"==typeof require&&require;if(!e&&r)return r(t,!0);if(f)return f(t,!0);var n=new Error("Cannot find module '"+t+"'");throw n.code="MODULE_NOT_FOUND",n}var i=a[t]={exports:{}};c[t][0].call(i.exports,function(e){return u(c[t][1][e]||e)},i,i.exports,o,c,a,s)}return a[t].exports}for(var f="function"==typeof require&&require,e=0;e<s.length;e++)u(s[e]);return u}({1:[function(e,t,r){"use strict";function f(e,t){var r;if("undefined"==typeof Symbol||null==e[Symbol.iterator]){if(Array.isArray(e)||(r=function(e,t){if(!e)return;if("string"==typeof e)return s(e,t);var r=Object.prototype.toString.call(e).slice(8,-1);"Object"===r&&e.constructor&&(r=e.constructor.name);if("Map"===r||"Set"===r)return Array.from(e);if("Arguments"===r||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(r))return s(e,t)}(e))||t&&e&&"number"==typeof e.length){r&&(e=r);var n=0,i=function(){};return{s:i,n:function(){return n>=e.length?{done:!0}:{done:!1,value:e[n++]}},e:function(e){throw e},f:i}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var o,c=!0,a=!1;return{s:function(){r=e[Symbol.iterator]()},n:function(){var e=r.next();return c=e.done,e},e:function(e){a=!0,o=e},f:function(){try{c||null==r.return||r.return()}finally{if(a)throw o}}}}function s(e,t){(null==t||t>e.length)&&(t=e.length);for(var r=0,n=new Array(t);r<t;r++)n[r]=e[r];return n}var n=NKC.methods.getDataById("data"),i=new NKC.methods.selectImage,o=n.scoreSettings.scores;n.scoreSettings._withdrawTimeBegin=p(n.scoreSettings.withdrawTimeBegin),n.scoreSettings._withdrawTimeEnd=p(n.scoreSettings.withdrawTimeEnd),n.scoreSettings._creditMin=n.scoreSettings.creditMin/100,n.scoreSettings._creditMax=n.scoreSettings.creditMax/100;var c=n.scoresType;n.scoreSettings.operations.map(function(e){var t,r=f(c);try{for(r.s();!(t=r.n()).done;){var n=t.value,i=e[n];e["_".concat(n)]=void 0===i?0:i/100}}catch(e){r.e(e)}finally{r.f()}});var a,u=[],l=f(o);try{for(l.s();!(a=l.n()).done;){var d=a.value,h=d.type,m=d.icon;u.push({type:h,icon:m,iconFile:"",iconData:""})}}catch(e){l.e(e)}finally{l.f()}new Vue({el:"#app",data:{scoreSettings:n.scoreSettings,scores:o,types:c,iconArr:u,submitting:!1},computed:{mainScoreSelect:function(){var t=[];return this.scores.map(function(e){e.enabled&&t.push({type:e.type,name:e.name})}),t},commonScoreSelect:function(){return this.mainScoreSelect}},methods:{getUrl:NKC.methods.tools.getUrl,getHMS:p,HMSToNumber:g,checkString:NKC.methods.checkData.checkString,checkNumber:NKC.methods.checkData.checkNumber,selectIcon:function(r){i.show(function(e){var t=NKC.methods.blobToFile(e);NKC.methods.fileToUrl(t).then(function(e){r.iconData=e,r.iconFile=t,i.close()})},{aspectRatio:1})},save:function(){var c=this,a=this.iconArr,s=JSON.parse(JSON.stringify(this.scoreSettings));s.withdrawTimeBegin=g(s._withdrawTimeBegin),s.withdrawTimeEnd=g(s._withdrawTimeEnd);var u=this;Promise.resolve().then(function(){if(s.operations.map(function(e){var t,r=f(u.types);try{for(r.s();!(t=r.n()).done;){var n=t.value,i=e["_".concat(n)];u.checkNumber(i,{name:"积分策略中加减的积分值",fractionDigits:2}),e[n]=parseInt(100*i),delete e["_".concat(n)]}}catch(e){r.e(e)}finally{r.f()}}),c.checkNumber(s._creditMin,{name:"最小鼓励金额",min:.01,fractionDigits:2}),c.checkNumber(s._creditMax,{name:"最大鼓励金额",min:.01,fractionDigits:2}),s._creditMin>s._creditMax)throw"鼓励金额设置错误";s.creditMin=parseInt(100*s._creditMin),s.creditMax=parseInt(100*s._creditMax),delete s._creditMin,delete s._creditMax,delete s._withdrawTimeEnd,delete s._withdrawTimeBegin;var e=new FormData;e.append("scoreSettings",JSON.stringify(s));var t,r=f(a);try{for(r.s();!(t=r.n()).done;){var n=t.value,i=n.iconFile,o=n.type;i&&e.append(o,i,i.name)}}catch(e){r.e(e)}finally{r.f()}return nkcUploadFile("/e/settings/score","PUT",e)}).then(function(){sweetSuccess("保存成功")}).catch(function(e){sweetError(e)})}}});function p(e){return{hour:Math.floor(e/36e5),min:Math.floor(e/6e4)%60,sec:Math.floor(e/1e3)%60}}function g(e){return 60*e.hour*60*1e3+60*e.min*1e3+1e3*e.sec}},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const selectImage = new NKC.methods.selectImage();
+const {scores} = data.scoreSettings;
+data.scoreSettings._withdrawTimeBegin = getHMS(data.scoreSettings.withdrawTimeBegin);
+data.scoreSettings._withdrawTimeEnd = getHMS(data.scoreSettings.withdrawTimeEnd);
+
+data.scoreSettings._creditMin = data.scoreSettings.creditMin / 100;
+data.scoreSettings._creditMax = data.scoreSettings.creditMax / 100;
+
+const types = data.scoresType;
+data.scoreSettings.operations.map(operation => {
+  for(const type of types) {
+    const oldValue = operation[type];
+    operation[`_${type}`] = oldValue === undefined? 0: oldValue / 100;
+  }
+});
+
+const iconArr = [];
+
+for(const score of scores) {
+  const {type, icon} = score;
+  iconArr.push({
+    type,
+    icon,
+    iconFile: '',
+    iconData: ''
+  });
+}
+
+const app = new Vue({
+  el: '#app',
+  data: {
+    scoreSettings: data.scoreSettings,
+    scores,
+    types,
+    iconArr,
+    submitting: false,
+  },
+  computed: {
+    mainScoreSelect() {
+      const arr = [];
+      this.scores.map(n => {
+        if(!n.enabled) return;
+        arr.push({
+          type: n.type,
+          name: n.name
+        });
+      });
+      return arr;
+    },
+    commonScoreSelect() {
+      return this.mainScoreSelect;
+    }
+  },
+  methods: {
+    getUrl: NKC.methods.tools.getUrl,
+    getHMS,
+    HMSToNumber,
+    checkString: NKC.methods.checkData.checkString,
+    checkNumber: NKC.methods.checkData.checkNumber,
+    selectIcon(a) {
+      selectImage.show(blob => {
+        const file = NKC.methods.blobToFile(blob);
+        NKC.methods.fileToUrl(file)
+          .then(data => {
+            a.iconData = data;
+            a.iconFile = file;
+            selectImage.close();
+          });
+      }, {
+        aspectRatio: 1
+      });
+    },
+    save() {
+      const {
+        iconArr
+      } = this;
+      const scoreSettings = JSON.parse(JSON.stringify(this.scoreSettings));
+      scoreSettings.withdrawTimeBegin = HMSToNumber(scoreSettings._withdrawTimeBegin);
+      scoreSettings.withdrawTimeEnd = HMSToNumber(scoreSettings._withdrawTimeEnd);
+      const self = this;
+      Promise.resolve()
+        .then(() => {
+          scoreSettings.operations.map(operation => {
+            for(const type of self.types) {
+              const oldValue = operation[`_${type}`];
+              self.checkNumber(oldValue, {
+                name: '积分策略中加减的积分值',
+                fractionDigits: 2,
+              });
+              operation[type] = parseInt(oldValue * 100);
+              delete operation[`_${type}`];
+            }
+          });
+
+          this.checkNumber(scoreSettings._creditMin, {
+            name: '最小鼓励金额',
+            min: 0.01,
+            fractionDigits: 2
+          });
+          this.checkNumber(scoreSettings._creditMax, {
+            name: '最大鼓励金额',
+            min: 0.01,
+            fractionDigits: 2
+          });
+          if(scoreSettings._creditMin > scoreSettings._creditMax) throw '鼓励金额设置错误';
+          scoreSettings.creditMin = parseInt(scoreSettings._creditMin * 100);
+          scoreSettings.creditMax = parseInt(scoreSettings._creditMax * 100);
+          delete scoreSettings._creditMin;
+          delete scoreSettings._creditMax;
+          delete scoreSettings._withdrawTimeEnd;
+          delete scoreSettings._withdrawTimeBegin;
+          const formData = new FormData();
+          formData.append('scoreSettings', JSON.stringify(scoreSettings));
+          for(const icon of iconArr) {
+            const {iconFile, type} = icon;
+            if (!iconFile) continue;
+            formData.append(type, iconFile, iconFile.name);
+          }
+          return nkcUploadFile('/e/settings/score', 'PUT', formData)
+        })
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
+        .catch(err => {
+          sweetError(err);
+        });
+    }
+  }
+});
+
+function getHMS(t) {
+  return {
+    hour: Math.floor(t/3600000),
+    min: Math.floor(t/60000) % 60,
+    sec: Math.floor(t/1000) % 60
+  }
+}
+
+function HMSToNumber(t) {
+  return t.hour * 60 * 60 * 1000 + t.min * 60 * 1000 + t.sec * 1000;
+}
+
+Object.assign(window, {
+  selectImage,
+  scores,
+  types,
+  iconArr,
+  app,
+  getHMS,
+  HMSToNumber,
+});

@@ -94,3 +94,9 @@ function submitHandHeldAuth(uid) {
 			screenTopWarning(data.error||data);
 		})
 }
+
+Object.assign(window, {
+	init,
+	submitIdCardAuth,
+	submitHandHeldAuth,
+});

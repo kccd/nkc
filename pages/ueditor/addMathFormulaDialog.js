@@ -76,3 +76,5 @@ function IsPC() {
     }
     return flag;
 }
+
+window.IsPC = IsPC;

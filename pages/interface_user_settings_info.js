@@ -26,10 +26,10 @@ function getFocus(a){
     $(a).css('border-color','')
   })
 }
-var selectImage;
+window.selectImage = undefined;
 $(function() {
   if(NKC.methods.selectImage) {
-    selectImage = new NKC.methods.selectImage
+    window.selectImage = new NKC.methods.selectImage
   }
 });
 
@@ -130,3 +130,13 @@ var app = new Vue({
 function emitEventToUpdateLocalUser(data) {
   if(NKC.configs.isApp) NKC.methods.rn.emit("updateLocalUser", {});
 }
+
+Object.assign(window, {
+  submit,
+  changeUsername,
+  getFocus,
+  selectAvatar,
+  selectBanner,
+  app,
+  emitEventToUpdateLocalUser,
+});

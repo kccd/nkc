@@ -109,3 +109,12 @@ function paramToEdit(uid,paraId) {
     sweetWarning(data || data.error)
   })
 }
+
+Object.assign(window, {
+  editProductParamInfo,
+  shelfRightNow,
+  stopSale,
+  goonSale,
+  editParam,
+  paramToEdit,
+});

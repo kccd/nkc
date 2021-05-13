@@ -1,1 +1,83 @@
-!function a(c,i,u){function p(e,r){if(!i[e]){if(!c[e]){var o="function"==typeof require&&require;if(!r&&o)return o(e,!0);if(s)return s(e,!0);var t=new Error("Cannot find module '"+e+"'");throw t.code="MODULE_NOT_FOUND",t}var n=i[e]={exports:{}};c[e][0].call(n.exports,function(r){return p(c[e][1][r]||r)},n,n.exports,a,c,i,u)}return i[e].exports}for(var s="function"==typeof require&&require,r=0;r<u.length;r++)p(u[r]);return p}({1:[function(r,e,o){"use strict";function n(r,e){for(var o=0;o<e.length;o++){var t=e[o];t.enumerable=t.enumerable||!1,t.configurable=!0,"value"in t&&(t.writable=!0),Object.defineProperty(r,t.key,t)}}NKC.modules.ShopShip=function(){function r(){!function(r,e){if(!(r instanceof e))throw new TypeError("Cannot call a class as a function")}(this,r);var c=this;c.dom=$("#moduleShopShip"),c.dom.modal({show:!1,backdrop:"static"}),c.app=new Vue({el:"#moduleShopShipApp",data:{loading:!0,order:"",trackNumber:"",trackName:"AUTO",track:!0,trackNames:NKC.configs.trackNames,trackList:[]},methods:{copy:function(){},open:function(r,e){var o=(1<arguments.length&&void 0!==e?e:{}).orderId;c.dom.modal("show"),Promise.resolve().then(function(){return nkcAPI("/shop/manage/".concat(NKC.configs.uid,"/order/detail?orderId=").concat(o,"&t=").concat(Date.now()),"GET")}).then(function(r){c.app.loading=!1,c.app.order=r.order,c.app.trackName=r.order.trackName||"AUTO","no"===r.order.trackNumber?(c.app.track=!1,c.app.trackNumber=""):(c.app.trackNumber=r.order.trackNumber||"",c.app.track=!0)}).catch(sweetError)},close:function(){c.dom.modal("hide")},submit:function(){var r=this.track,e=this.order,o=this.trackName,t=this.trackNumber,n={orderId:e.orderId},a="/shop/manage/".concat(NKC.configs.uid,"/order/sendGoods");"unSign"===e.orderStatus&&(a="/shop/manage/".concat(NKC.configs.uid,"/order/editGoods")),r?(n.trackName=o,n.trackNumber=t):(n.trackName="",n.trackNumber="no"),nkcAPI(a,"PUT",{post:n}).then(function(){c.close(),sweetSuccess("保存成功")}).catch(sweetError)}}}),c.open=c.app.open,c.close=c.app.close}var e,o,t;return e=r,(o=[{key:"open",value:function(r,e){this.app.open(r,e)}},{key:"close",value:function(){this.app.close()}}])&&n(e.prototype,o),t&&n(e,t),r}()},{}]},{},[1]);
+NKC.modules.ShopShip = class {
+  constructor() {
+    const self = this;
+    self.dom = $("#moduleShopShip");
+    self.dom.modal({
+      show: false,
+      backdrop: "static"
+    });
+    self.app = new Vue({
+      el: "#moduleShopShipApp",
+      data: {
+        loading: true,
+        order: "",
+        trackNumber: "",
+        trackName: "AUTO",
+        track: true,
+        trackNames: NKC.configs.trackNames,
+        trackList: [],
+      },
+      methods: {
+        copy(text) {
+        
+        },
+        open(func, options = {}) {
+          const {orderId} = options;
+          self.dom.modal("show");
+          Promise.resolve()
+            .then(() => {
+              return nkcAPI(`/shop/manage/${NKC.configs.uid}/order/detail?orderId=${orderId}&t=${Date.now()}`, "GET");
+            })
+            .then(data => {
+              self.app.loading = false;
+              self.app.order = data.order;
+              self.app.trackName = data.order.trackName || "AUTO";
+              if(data.order.trackNumber === "no") {
+                self.app.track = false;
+                self.app.trackNumber = "";
+              } else {
+                self.app.trackNumber = data.order.trackNumber || "";
+                self.app.track = true;
+              }
+            })
+            .catch(sweetError);
+        },
+        close() {
+          self.dom.modal("hide");
+        },
+        submit() {
+          const {track, order, trackName, trackNumber} = this;
+          const body = {
+            orderId: order.orderId
+          };
+          
+          let url = `/shop/manage/${NKC.configs.uid}/order/sendGoods`;
+          if(order.orderStatus === "unSign") {
+            url = `/shop/manage/${NKC.configs.uid}/order/editGoods`;
+          }
+          if(!track) {
+            body.trackName = "";
+            body.trackNumber = "no";
+          } else {
+            body.trackName = trackName;
+            body.trackNumber = trackNumber;
+          }
+          nkcAPI(url, "PUT", {post: body})
+            .then(function() {
+              self.close();
+              sweetSuccess("保存成功")
+            })
+            .catch(sweetError)
+        }
+      }
+    });
+    self.open = self.app.open;
+    self.close = self.app.close;
+  }
+  open (func, options) {
+    this.app.open(func, options);
+  }
+  close() {
+    this.app.close();
+  }
+};

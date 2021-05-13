@@ -4,11 +4,11 @@ router
     const {db, data} = ctx;
     const {column} = data;
     const homeSettings = await db.SettingModel.getSettings("home");
-    if(homeSettings.columnsId.includes(column._id)) ctx.throw(400, "专栏已经被推送到首页了");
-    homeSettings.columnsId.unshift(column._id);
+    if(homeSettings.toppedColumnsId.includes(column._id)) ctx.throw(400, "专栏已经被推送到首页了");
+    homeSettings.toppedColumnsId.unshift(column._id);
     await db.SettingModel.updateOne({_id: "home"}, {
       $set: {
-        "c.columnsId": homeSettings.columnsId
+        "c.toppedColumnsId": homeSettings.toppedColumnsId
       }
     });
     await db.SettingModel.saveSettingsToRedis("home");
@@ -18,10 +18,10 @@ router
     const {db, data} = ctx;
     const {column} = data;
     const homeSettings = await db.SettingModel.getSettings("home");
-    if(!homeSettings.columnsId.includes(column._id)) ctx.throw(400, "专栏未被推送到首页");
+    if(!homeSettings.toppedColumnsId.includes(column._id)) ctx.throw(400, "专栏未被推送到首页");
     await db.SettingModel.updateOne({_id: "home"}, {
       $pull: {
-        "c.columnsId": column._id
+        "c.toppedColumnsId": column._id
       }
     });
     await db.SettingModel.saveSettingsToRedis("home");

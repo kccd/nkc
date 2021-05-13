@@ -7,8 +7,8 @@ router
     const {count} = query;
     if(count) {
       data.counts = {
-        total: await db.SubscribeModel.countDocuments({uid: user.uid}),
-        other: await db.SubscribeModel.countDocuments({uid: user.uid, cid: []}),
+        total: await db.SubscribeModel.countDocuments({cancel: false, uid: user.uid}),
+        other: await db.SubscribeModel.countDocuments({cancel: false, uid: user.uid, cid: []}),
       };
       const forums = await db.ForumModel.find({}, {fid: 1, forumType: 1});
       const topic = [];
@@ -20,8 +20,8 @@ router
           discipline.push(forum.fid);
         }
       });
-      data.counts.topic = await db.SubscribeModel.countDocuments({uid: user.uid, type: "forum", fid: {$in: topic}});
-      data.counts.discipline = await db.SubscribeModel.countDocuments({uid: user.uid, type: "forum", fid: {$in: discipline}});
+      data.counts.topic = await db.SubscribeModel.countDocuments({cancel: false, uid: user.uid, type: "forum", fid: {$in: topic}});
+      data.counts.discipline = await db.SubscribeModel.countDocuments({cancel: false, uid: user.uid, type: "forum", fid: {$in: discipline}});
     }
     data.types = await db.SubscribeTypeModel.getTypesList(user.uid);
     await next();

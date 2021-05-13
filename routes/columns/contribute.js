@@ -3,20 +3,22 @@ const router = new Router();
 router
   .get("/", async (ctx, next) => {
     const {data, db} = ctx;
+    const {column} = data;
     const columnSettings = await db.SettingModel.findById("column");
     data.columnSettings = columnSettings.c;
-    data.categories = await db.ColumnPostCategoryModel.getCategoryList(data.column._id);
+    data.mainCategories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
+    data.minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id);
     ctx.template = "columns/contribute/contribute.pug";
     await next();
   })
   .post("/", async (ctx, next) => {
     const {db, body, data} = ctx;
     const {user, column} = data;
-    if(user.uid === column.uid)  ctx.throw(400, "自己的专栏无需投稿，可在文章页直接将文章推送到专栏");
-    let {threadsId, description, categoriesId} = body;
+    if(user.uid === column.uid) ctx.throw(400, "自己的专栏无需投稿，可在文章页直接将文章推送到专栏");
+    let {threadsId, description, mainCategoriesId, minorCategoriesId} = body;
     if(threadsId.length === 0) ctx.throw(400, "请选择需要投稿的文章");
-    if(!categoriesId || categoriesId.length === 0) ctx.throw(400, "请选择文章分类");
-    for(const _id of categoriesId) {
+    if(!mainCategoriesId || mainCategoriesId.length === 0) ctx.throw(400, "请选择文章分类");
+    for(const _id of mainCategoriesId.concat(minorCategoriesId)) {
       const c = await db.ColumnPostCategoryModel.findOne({_id, columnId: column._id});
       if(!c) ctx.throw(400, `ID为${_id}的分类不存在`);
     }
@@ -40,7 +42,8 @@ router
         uid: user.uid,
         tid,
         pid: thread.oc,
-        cid: categoriesId,
+        cid: mainCategoriesId,
+        mcid: minorCategoriesId,
         description,
         columnId: column._id
       });

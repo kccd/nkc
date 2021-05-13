@@ -1,1 +1,519 @@
-!function o(s,a,u){function c(t,e){if(!a[t]){if(!s[t]){var i="function"==typeof require&&require;if(!e&&i)return i(t,!0);if(m)return m(t,!0);var n=new Error("Cannot find module '"+t+"'");throw n.code="MODULE_NOT_FOUND",n}var r=a[t]={exports:{}};s[t][0].call(r.exports,function(e){return c(s[t][1][e]||e)},r,r.exports,o,s,a,u)}return a[t].exports}for(var m="function"==typeof require&&require,e=0;e<u.length;e++)c(u[e]);return c}({1:[function(e,t,i){"use strict";var n=NKC.methods.getDataById("data"),r=n.grades,o=n.dealInfo,u=n.product,s={},a={status:!1,count:2};o.templates.map(function(e){e.firstPrice=parseFloat(e.firstPrice),e.addPrice=parseFloat(e.addPrice)}),u&&(u.vipDisGroup.map(function(e){return s[e.vipLevel]=e}),-1==u.purchaseLimitCount?a.status=!1:(a.status=!0,a.count=u.purchaseLimitCount),u.imgIntroductions.length=5,u.productParams.map(function(e){e.price=e.price/100,e.originPrice=e.originPrice/100}),u.freightTemplates.map(function(e){e.firstPrice=e.firstPrice/100,e.addPrice=e.addPrice/100}));var c=r.map(function(e){var t=s[e._id];return{vipLevel:e._id,grade:e,vipNum:t?t.vipNum:100}});window.app=new Vue({el:"#app",data:{type:u?"modify":"create",submitting:!1,showCloseInfo:!0,shopForums:n.shopForumTypes,selectedShopForumId:"",mainForums:[],title:"",abstract:"",content:"",keywords:[],imgIntroductions:u?u.imgIntroductions:["","","","",""],paramForum:!1,selectedParams:u?u.productParams:[],params:[],vipDisGroup:c,vipDiscount:!!u&&!!u.vipDiscount,stockCostMethod:u?u.stockCostMethod:"orderReduceStock",purchaseLimit:a,uploadCert:!!u&&!!u.uploadCert,uploadCertDescription:u?u.uploadCertDescription:"",productSettings:u?u.productSettings:{priceShowToVisit:!0,priceShowAfterStop:!0},isFreePost:!u||!!u.isFreePost,defaultTemplates:o.templates,freightTemplates:u?u.freightTemplates:[],shelfType:"immediately",shelfTime:""},watch:{shelfType:function(){this.initTime()}},mounted:function(){u||(window.CommonModal=new NKC.modules.CommonModal,window.SelectForums=new NKC.modules.ForumSelector,window.editor=UE.getEditor("container",NKC.configs.ueditor.shopConfigs),this.initTime(),this.addParam())},computed:{selectedShopForum:function(){if(this.selectedShopForum)return this.selectedShopForum.fid},imgMaster:function(){return this.imgIntroductions[0]},paramAttributes:function(){var e=this.params,t=[];return e.map(function(e){(e=(e=(e=(e=e.value.replace(/，/g,",")).split(",")).map(function(e){return(e+"").trim()})).filter(function(e){return!!e})).length&&t.push(e)}),t=(t=NKC.methods.doExchange(t)).map(function(e){return Array.isArray(e)&&(e=e.join(", ")),e})},freightTemplateNames:function(){return this.freightTemplates.map(function(e){return e.name})}},methods:{save:function(){var r=this,e=NKC.methods.checkData,s=e.checkNumber,a=e.checkString,o={};Promise.resolve().then(function(){if(r.submitting=!0,"create"===r.type){if(r.content=editor.getContent(),!r.selectedShopForumId)throw"请选择商品分类";o.mainForumsId=[r.selectedShopForumId].concat(r.mainForums.map(function(e){return e.fid})),a(r.title,{name:"商品标题",minLength:6,maxLength:200}),o.productName=r.title,a(r.abstract,{name:"商品简介",minLength:6,maxLength:1e3}),o.productDescription=r.abstract,r.keywords.map(function(e){a(e,{name:"关键词",minLength:1,maxLength:20})}),o.attention=r.keywords,a(r.content,{name:"图文描述",minLength:1,maxLength:1e5}),o.productDetails=r.content}var e=r.imgIntroductions.filter(function(e){return!!e});if(!e.length)throw"请至少选择一张商品图";o.imgIntroductions=e;var t,i,n=[];if(!(n=r.selectedParams).length)throw"请至少添加一个商品规格";if(n.map(function(e){var t=e.name,i=e.originPrice,n=e.price,r=e.useDiscount,o=e.stocksTotal;if(a(t,{name:"规格名称",minLength:1,maxLength:100}),s(o,{name:"规格库存",min:0}),s(i,{name:"规格价格",min:.01,fractionDigits:2}),r&&(s(n,{name:"规格优惠价",min:.01,fractionDigits:2}),i<=n))throw"规格优惠价必须小于原价"}),o.productParams=n,o.vipDisGroup=[],r.vipDiscount&&(r.vipDisGroup.map(function(e){var t=e.vipNum;s(t,{name:"折扣率",min:1,max:100})}),o.vipDisGroup=r.vipDisGroup),o.vipDiscount=r.vipDiscount,!r.isFreePost){if(!r.freightTemplates.length)throw"请至少添加一条运费信息";r.freightTemplates.map(function(e){var t=e.name,i=e.firstPrice,n=e.addPrice;a(t,{name:"物流名称",minLength:1,maxLength:100}),s(i,{name:"物流首件价格",min:0,fractionDigits:2}),s(n,{name:"物流每增加一件的价格",min:0,fractionDigits:2})}),o.freightTemplates=r.freightTemplates}return o.isFreePost=!!r.isFreePost,o.productSettings=r.productSettings,o.stockCostMethod=r.stockCostMethod,r.purchaseLimit.status?(s(r.purchaseLimit.count,{name:"限购数量",min:1}),o.purchaseLimitCount=r.purchaseLimit.count):o.purchaseLimitCount=-1,r.uploadCert&&(a(r.uploadCertDescription,{name:"凭证说明",minLength:1,maxLength:1e3}),o.uploadCertDescription=r.uploadCertDescription),o.uploadCert=r.uploadCert,"create"===r.type?"immediately"===r.shelfType?o.productStatus="insale":"save"===r.shelfType?o.productStatus="notonshelf":(o.productStatus="notonshelf",t=$("#shelfTime"),i=new Date(t.val()).getTime(),o.shelfTime=i):o.productId=u.productId,nkcAPI("/shop/manage/shelf","POST",{post:o})}).then(function(e){sweetSuccess("提交成功"),r.submitting=!1,r.showCloseInfo=!1,NKC.methods.visitUrl("/shop/manage/goods")}).catch(function(e){r.submitting=!1,sweetError(e)})},disabledSelectParam:function(e){if(e._id){if(e.isEnable){var t=0;if(this.selectedParams.map(function(e){e.isEnable&&t++}),t<=1)return sweetError("不允许屏蔽所有规格")}e.isEnable=!e.isEnable}},initTime:function(){$(".time").datetimepicker({language:"zh-CN",format:"yyyy-mm-dd hh:ii",autoclose:!0,todayHighlight:1,startView:2,minView:0,forceParse:0})},selectPictures:function(t){var i=this;window.SelectResource||(window.SelectResource=new NKC.modules.SelectResource),SelectResource.open(function(e){return["png","jpg","jpeg"].includes(e.resources[0].ext)?void Vue.set(i.imgIntroductions,t,e.resourcesId[0]):sweetInfo("仅支持png、jpg和jpeg格式的图片")},{allowedExt:["picture"],countLimit:1})},changeArrIndex:function(e,t,i){var n,r=e[t],o=e.length;if("left"===i){if(0===t)return;n=t-1}else{if(t+1===o)return;n=t+1}var s=e[n];Vue.set(e,t,s),Vue.set(e,n,r)},removePicture:function(e){var t=this;sweetQuestion("确定要删除当前商品图片？").then(function(){Vue.set(t.imgIntroductions,e,"")}).catch(function(e){})},reloadTemplate:function(){var t=this;nkcAPI("/shop/manage/settings","GET").then(function(e){t.defaultTemplates=e.dealInfo.templates,sweetSuccess("刷新成功")}).catch(sweetError)},addTemplate:function(){this.freightTemplates.push({name:"",firstPrice:"",addPrice:""})},removeFromArr:function(e,t){e.splice(t,1)},selectTemplate:function(e){this.freightTemplateNames.includes(e.name)||this.freightTemplates.push(Object.assign({},e))},removeKeyword:function(e){this.keywords.splice(e,1)},selectForum:function(){var t=this,e=t.shopForums.map(function(e){return e.fid});window.SelectForums.open(function(e){t.mainForums=[e.forum]},{selectedForumsId:t.selectedShopForumId?[t.selectedShopForumId]:[],disabledForumsId:e})},addKeywords:function(){var n=this;CommonModal.open(function(e){var t=e[0].value;t=(t=t.replace(/，/g,",")).split(",");var i=[];t.map(function(e){(e=(e=e||"").trim())&&!i.includes(e)&&i.push(e)}),n.keywords=i,CommonModal.close()},{title:"添加关键词",data:[{dom:"textarea",label:"多个关键词以逗号分隔",value:this.keywords.join(", ")}]})},removeParamAttribute:function(e){this.params.splice(e,1)},resetParamForum:function(){this.params=[{value:""},{value:""}]},removeSelectParam:function(e){this.selectedParams.splice(e,1)},addParam:function(e){e=e&&e.name?e:this.newParam(),this.selectedParams.push(e)},newParam:function(e){return e?e="":this.selectedParams.length||(e="默认"),{name:e,originPrice:"",price:"",isEnable:!0,useDiscount:!1,stocksTotal:""}},addParams:function(){this.resetParamForum(),this.paramForum=!0},addParamAttribute:function(){this.params.push({value:""})},saveParamAttribute:function(){var e=this.paramAttributes,t=this;if(!e.length)return sweetError("请至少填写一个属性值");e.map(function(e){t.addParam(t.newParam(e))}),this.paramForum=!1}}}),window.onbeforeunload=function(){if(app.showCloseInfo)return"关闭页面后，已填写的内容将会丢失。确定要关闭当前页面？"}},{}]},{},[1]);
+const data = NKC.methods.getDataById("data");
+
+const {grades, dealInfo, product} = data;
+
+const vipDisGroupObj = {};
+
+const purchaseLimit = {
+  status: false,
+  count: 2
+};
+
+dealInfo.templates.map(t => {
+  t.firstPrice = parseFloat(t.firstPrice);
+  t.addPrice = parseFloat(t.addPrice);
+})
+
+if(product) {
+  product.vipDisGroup.map(v => vipDisGroupObj[v.vipLevel] = v);
+  if(product.purchaseLimitCount == -1) {
+    purchaseLimit.status = false;
+  } else {
+    purchaseLimit.status = true;
+    purchaseLimit.count = product.purchaseLimitCount;
+  }
+  product.imgIntroductions.length = 5;
+  product.productParams.map(p => {
+    p.price = p.price / 100;
+    p.originPrice = p.originPrice / 100;
+  });
+  product.freightTemplates.map(t => {
+    t.firstPrice = t.firstPrice / 100;
+    t.addPrice = t.addPrice / 100;
+  });
+}
+
+const vipDisGroup = grades.map(g => {
+  const group = vipDisGroupObj[g._id];
+  return {
+    vipLevel: g._id,
+    grade: g,
+    vipNum: group? group.vipNum: 100
+  };
+});
+
+
+window.app = new Vue({
+  el: "#app",
+  data: {
+
+    type: product? "modify": "create", // 新上架：create, 编辑：modify
+
+    submitting: false,
+
+    showCloseInfo: true,
+
+    // 提供选择的交易板块
+    shopForums: data.shopForumTypes,
+    selectedShopForumId: "",
+    // 辅助板块
+    mainForums: [],
+    // 商品标题、描述、关键词
+    title: "",
+    abstract: "",
+    content: "",
+    keywords: [],
+    // 商品介绍图
+    imgIntroductions: product? product.imgIntroductions: ["", "", "", "", ""],
+
+    // 添加多个规格
+    paramForum: false,
+
+    // 规格信息
+    // 已勾选 新的规格分类  独立规格直接新建此数组内
+    selectedParams: product?product.productParams:[],
+    // 规格名
+    /*
+    {
+      name: "颜色",
+      values: [
+        "红",
+        "黄",
+        "蓝"
+      ]
+    }
+    */
+    params: [],
+    // 会员折扣
+    vipDisGroup,
+    vipDiscount: product?!!product.vipDiscount: false,
+    // 减库存
+    stockCostMethod: product? product.stockCostMethod: "orderReduceStock", // 下单减库存：orderReduceStock，付款减库存：payReduceStock
+    // 限购相关
+    purchaseLimit,
+    // 购买时是否需要上传凭证、凭证说明
+    uploadCert: product? !!product.uploadCert: false,
+    uploadCertDescription: product? product.uploadCertDescription: "",
+
+    // 价格显示相关
+    productSettings: product? product.productSettings: {
+      // 游客是否可见
+      priceShowToVisit: true,
+      // 停售后是否可见
+      priceShowAfterStop: true
+    },
+
+    // 是否免邮费
+    isFreePost: product? !!product.isFreePost: true,
+    // 运费模板
+    defaultTemplates: dealInfo.templates,
+    freightTemplates: product? product.freightTemplates: [],
+    // 上架时间
+    shelfType: "immediately", // 立即上架：immediately，timing: 定时上架，save: 暂存不发布
+    shelfTime: ""
+
+  },
+  watch: {
+    shelfType() {
+      this.initTime();
+    }
+  },
+  mounted() {
+    // 编辑商品 预制内容
+    if(product) {
+
+    } else {
+      window.CommonModal = new NKC.modules.CommonModal();
+      window.SelectForums = new NKC.modules.ForumSelector();
+      window.editor = UE.getEditor('container', NKC.configs.ueditor.shopConfigs);
+      this.initTime();
+      this.addParam();
+    }
+
+  },
+  computed: {
+    selectedShopForum() {
+      if(this.selectedShopForum) {
+        return this.selectedShopForum.fid;
+      }
+    },
+    imgMaster() {
+      return this.imgIntroductions[0];
+    },
+    paramAttributes() {
+      const {params} = this;
+      let arr = [];
+      params.map(p => {
+        p = p.value.replace(/，/g, ",");
+        p = p.split(",");
+        p = p.map(v => (v + "").trim())
+        p = p.filter(v => !!v);
+        if(p.length) {
+          arr.push(p)
+        }
+      });
+      arr = NKC.methods.doExchange(arr);
+      arr = arr.map(a => {
+        if(Array.isArray(a)) {
+          a = a.join(", ");
+        }
+        return a;
+      });
+      return arr
+    },
+    freightTemplateNames() {
+      return this.freightTemplates.map(f => f.name);
+    }
+  },
+  methods: {
+    save() {
+      const self = this;
+      const {checkNumber, checkString} = NKC.methods.checkData;
+      const body = {};
+      Promise.resolve()
+        .then(() => {
+          self.submitting = true;
+          if(self.type === "create") {
+            self.content = editor.getContent();
+            if(!self.selectedShopForumId) throw "请选择商品分类";
+            // if(!self.mainForums.length) throw "请选择商品辅助分类";
+            body.mainForumsId = [self.selectedShopForumId].concat(self.mainForums.map(forum => forum.fid));
+            checkString(self.title, {
+              name: "商品标题",
+              minLength: 6,
+              maxLength: 200
+            });
+            body.productName = self.title;
+            checkString(self.abstract, {
+              name: "商品简介",
+              minLength: 6,
+              maxLength: 1000,
+            });
+            body.productDescription = self.abstract;
+            self.keywords.map(k => {
+              checkString(k, {
+                name: "关键词",
+                minLength: 1,
+                maxLength: 20
+              });
+            });
+            body.attention = self.keywords;
+            checkString(self.content, {
+              name: "图文描述",
+              minLength: 1,
+              maxLength: 100000
+            });
+            body.productDetails = self.content;
+          }
+          // 判断商品图
+          const picturesId = self.imgIntroductions.filter(i => !!i);
+          if(!picturesId.length) throw "请至少选择一张商品图";
+          body.imgIntroductions = picturesId;
+          // 判断商品规格
+          let productParams = [];
+          productParams = self.selectedParams;
+          if(!productParams.length) throw "请至少添加一个商品规格";
+          productParams.map(param => {
+            const {
+              name, originPrice,
+              price, useDiscount,
+              stocksTotal
+            } = param;
+            checkString(name, {
+              name: "规格名称",
+              minLength: 1,
+              maxLength: 100
+            });
+            checkNumber(stocksTotal, {
+              name: "规格库存",
+              min: 0
+            }),
+            checkNumber(originPrice, {
+              name: "规格价格",
+              min: 0.01,
+              fractionDigits: 2
+            });
+            if(useDiscount) {
+              checkNumber(price, {
+                name: "规格优惠价",
+                min: 0.01,
+                fractionDigits: 2
+              });
+              if(price >= originPrice) throw "规格优惠价必须小于原价";
+            }
+          });
+          body.productParams = productParams;
+          body.vipDisGroup = [];
+          // 会员折扣
+          if(self.vipDiscount) {
+            self.vipDisGroup.map(v => {
+              const {vipNum} = v;
+              checkNumber(vipNum, {
+                name: "折扣率",
+                min: 1,
+                max: 100
+              });
+            });
+            body.vipDisGroup = self.vipDisGroup;
+          }
+          body.vipDiscount = self.vipDiscount;
+          // 运费
+          if(!self.isFreePost) {
+            if(!self.freightTemplates.length) throw "请至少添加一条运费信息";
+            self.freightTemplates.map(f => {
+              const {name, firstPrice, addPrice} = f;
+              checkString(name, {
+                name: "物流名称",
+                minLength: 1,
+                maxLength: 100
+              });
+              checkNumber(firstPrice, {
+                name: "物流首件价格",
+                min: 0,
+                fractionDigits: 2
+              });
+              checkNumber(addPrice, {
+                name: "物流每增加一件的价格",
+                min: 0,
+                fractionDigits: 2
+              });
+            });
+            body.freightTemplates = self.freightTemplates;
+          }
+          body.isFreePost = !!self.isFreePost;
+          // 价格显示
+          body.productSettings = self.productSettings;
+          // 库存
+          body.stockCostMethod = self.stockCostMethod;
+          // 购买限制
+          if(self.purchaseLimit.status) {
+            checkNumber(self.purchaseLimit.count, {
+              name: "限购数量",
+              min: 1
+            });
+            body.purchaseLimitCount = self.purchaseLimit.count;
+          } else {
+            body.purchaseLimitCount = -1;
+          }
+          // 购买凭证
+          if(self.uploadCert) {
+            checkString(self.uploadCertDescription, {
+              name: "凭证说明",
+              minLength: 1,
+              maxLength: 1000
+            });
+            body.uploadCertDescription = self.uploadCertDescription;
+          }
+          body.uploadCert = self.uploadCert;
+          if(self.type === "create") {
+            // 上架时间
+            if(self.shelfType === "immediately") {
+              body.productStatus = "insale";
+            } else if(self.shelfType === "save") {
+              body.productStatus = "notonshelf";
+            } else {
+              body.productStatus = "notonshelf";
+              const dom = $("#shelfTime");
+              let shelfTime = new Date(dom.val()).getTime();
+              body.shelfTime = shelfTime;
+            }
+
+          } else {
+            body.productId = product.productId;
+          }
+          return nkcAPI("/shop/manage/shelf", "POST", {post:  body});
+        })
+        .then(data => {
+          sweetSuccess("提交成功");
+          self.submitting = false;
+          self.showCloseInfo = false;
+          NKC.methods.visitUrl("/shop/manage/goods");
+        })
+        .catch(err => {
+          self.submitting = false;
+          sweetError(err);
+        });
+    },
+    disabledSelectParam(param) {
+      if(!param._id) return;
+      if(param.isEnable) {
+        let total = 0;
+        this.selectedParams.map(p => {
+          if(p.isEnable) total ++;
+        });
+        if(total <= 1) return sweetError("不允许屏蔽所有规格");
+      }
+
+      param.isEnable = !param.isEnable;
+    },
+    initTime() {
+      $('.time').datetimepicker({
+        language:  'zh-CN',
+        format: 'yyyy-mm-dd hh:ii',
+        autoclose: true,
+        todayHighlight: 1,
+        startView: 2,
+        minView: 0,
+        forceParse: 0
+      });
+    },
+    selectPictures(index) {
+      const self = this;
+      if(!window.SelectResource) {
+        window.SelectResource = new NKC.modules.SelectResource();
+      }
+      SelectResource.open(data => {
+        if(!["png", "jpg", "jpeg"].includes(data.resources[0].ext)) return sweetInfo("仅支持png、jpg和jpeg格式的图片");
+        Vue.set(self.imgIntroductions, index, data.resourcesId[0]);
+      }, {
+        allowedExt: ["picture"],
+        countLimit: 1
+      })
+    },
+    changeArrIndex(arr, index, t) {
+      const i = arr[index];
+      const length = arr.length;
+      let otherIndex;
+      if(t === "left") {
+        if(index === 0) return;
+        otherIndex = index - 1;
+      } else {
+        if(index + 1 === length) return;
+        otherIndex = index + 1;
+      }
+      const other = arr[otherIndex];
+      Vue.set(arr, index, other);
+      Vue.set(arr, otherIndex, i);
+    },
+    removePicture(index) {
+      sweetQuestion("确定要删除当前商品图片？")
+        .then(() => {
+          Vue.set(this.imgIntroductions, index, "");
+        })
+        .catch(err => {})
+
+    },
+    reloadTemplate() {
+      const self = this;
+      nkcAPI("/shop/manage/settings", "GET")
+        .then(data => {
+          self.defaultTemplates = data.dealInfo.templates;
+          sweetSuccess("刷新成功");
+        })
+        .catch(sweetError);
+    },
+    addTemplate() {
+      this.freightTemplates.push({
+        name: "",
+        firstPrice: "",
+        addPrice: ""
+      });
+    },
+    removeFromArr(arr, index) {
+      arr.splice(index, 1);
+    },
+    selectTemplate(t) {
+      if(this.freightTemplateNames.includes(t.name)) return;
+      this.freightTemplates.push(Object.assign({}, t));
+    },
+    removeKeyword(index) {
+      this.keywords.splice(index, 1);
+    },
+    selectForum() {
+      const self = this;
+      const shopForumsId = self.shopForums.map(f => f.fid);
+      window.SelectForums.open(data => {
+        self.mainForums = [data.forum];
+      }, {
+        selectedForumsId: self.selectedShopForumId? [self.selectedShopForumId]: [],
+        disabledForumsId: shopForumsId
+      })
+    },
+    addKeywords() {
+      CommonModal.open(data => {
+        let keywords = data[0].value;
+        keywords = keywords.replace(/，/g, ",");
+        keywords = keywords.split(",");
+        const arr = [];
+        keywords.map(k => {
+          k = k || "";
+          k = k.trim();
+          if(k && !arr.includes(k)) {
+            arr.push(k);
+          }
+        })
+        this.keywords = arr;
+        CommonModal.close();
+      }, {
+        title: "添加关键词",
+        data: [
+          {
+            dom: "textarea",
+            label: "多个关键词以逗号分隔",
+            value: this.keywords.join(", ")
+          }
+        ]
+      })
+    },
+    removeParamAttribute(index) {
+      this.params.splice(index, 1);
+    },
+    resetParamForum() {
+      this.params = [
+        {
+          value: ""
+        },
+        {
+          value: ""
+        }
+      ]
+    },
+    removeSelectParam(index) {
+      this.selectedParams.splice(index, 1);
+    },
+    addParam(param) {
+      param = param && param.name? param : this.newParam();
+      this.selectedParams.push(param);
+    },
+    newParam(name) {
+      if(!name) {
+        if(!this.selectedParams.length) name = "默认";
+      } else {
+        name = "";
+      }
+      return {
+        name,
+        originPrice: "",
+        price: "",
+        isEnable: true,
+        useDiscount: false,
+        stocksTotal: ""
+      }
+    },
+    addParams() {
+      this.resetParamForum();
+      this.paramForum = true;
+    },
+    addParamAttribute() {
+      this.params.push({
+        value: ""
+      });
+    },
+    saveParamAttribute() {
+      const {paramAttributes} = this;
+      const self = this;
+      if(!paramAttributes.length) return sweetError("请至少填写一个属性值");
+      paramAttributes.map(name => {
+        self.addParam(self.newParam(name));
+      })
+      this.paramForum = false;
+    }
+  }
+});
+
+// 监听页面关闭，提示保存草稿
+window.onbeforeunload = function() {
+  if(app.showCloseInfo){
+    return "关闭页面后，已填写的内容将会丢失。确定要关闭当前页面？"
+  }
+};

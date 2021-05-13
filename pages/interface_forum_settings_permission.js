@@ -77,3 +77,10 @@ function libraryOperation(fid, type) {
     sweetError(data);
   })
 }
+
+
+Object.assign(window, {
+	switchStatus,
+	submit,
+	libraryOperation,
+});

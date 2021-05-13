@@ -14,6 +14,7 @@ subscribeRouter
 		data.forums = await dbFunction.forumsListSort(forums);
 		const subForums = await db.SubscribeModel.find({
       uid: data.user.uid,
+      cancel: false,
       type: "forum"
     });
 		data.subFid = subForums.map(s => s.fid);
@@ -39,6 +40,7 @@ subscribeRouter
 				if(forum) {
 					let sub = await db.SubscribeModel.findOne({
             type: "forum",
+            cancel: false,
             fid: forum.fid,
             uid: user.uid
           });
@@ -76,6 +78,7 @@ subscribeRouter
     }
     let sub = await db.SubscribeModel.findOne({
       type: "user",
+      cancel: false,
       uid: user.uid,
       tUid: uid
     });
@@ -106,11 +109,13 @@ subscribeRouter
     const sub = await db.SubscribeModel.findOne({
       type: "user",
       uid: user.uid,
+      cancel: false,
       tUid: uid
     });
     if(!sub) ctx.throw(400, '您之前没有关注过该用户，操作无效');
     const cid = sub.cid;
-    await sub.deleteOne();
+    await sub.cancelSubscribe();
+    // await sub.deleteOne();
     await db.SubscribeModel.saveUserSubUsersId(user.uid);
     await db.SubscribeTypeModel.updateCount(cid);
     ctx.data.targetUser = await db.UserModel.findOnly({uid});

@@ -262,3 +262,21 @@ function initUserPanel() {
   if(NKC.methods.initStickerViewer) NKC.methods.initStickerViewer();
   if(NKC.methods.initSharePanel) NKC.methods.initSharePanel();
 }
+
+Object.assign(window, {
+  editor,
+  draftsId,
+  timeout,
+  disableButton,
+  closeSaveCommentDraft,
+  autoSaveCommentDraft,
+  saveCommentDraft,
+  postComment,
+  closePostComment,
+  submitPostComment,
+  comments,
+  viewPostComments,
+  createPageDom,
+  hidePostComments,
+  initUserPanel,
+});

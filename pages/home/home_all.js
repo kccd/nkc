@@ -1,1 +1,35 @@
-!function i(a,u,l){function f(n,e){if(!u[n]){if(!a[n]){var r="function"==typeof require&&require;if(!e&&r)return r(n,!0);if(p)return p(n,!0);var o=new Error("Cannot find module '"+n+"'");throw o.code="MODULE_NOT_FOUND",o}var t=u[n]={exports:{}};a[n][0].call(t.exports,function(e){return f(a[n][1][e]||e)},t,t.exports,i,a,u,l)}return u[n].exports}for(var p="function"==typeof require&&require,e=0;e<l.length;e++)f(l[e]);return f}({1:[function(e,n,r){"use strict";$(function(){var e=new Swiper(".swiper-container",{pagination:{el:".swiper-pagination",type:"fraction"},navigation:{nextEl:".swiper-button-next",prevEl:".swiper-button-prev"},loop:!0,autoplay:{delay:3e3,disableOnInteraction:!1}});e.el.onmouseover=function(){e.autoplay.stop()},e.el.onmouseleave=function(){e.autoplay.start()},$(window).scroll(function(e){var n=$(window).scrollTop(),r=$(".navbar-default.nkcshade");10<n?r.addClass("home-fixed-header"):r.removeClass("home-fixed-header")})})},{}]},{},[1]);
+$(function() {
+  // 轮播图
+  var swiper = new Swiper('.swiper-container', {
+    pagination: {
+      el: '.swiper-pagination',
+      type: 'fraction',
+    },
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+    loop: true,
+    autoplay: {
+      delay: 3000,
+      disableOnInteraction: false,
+    },
+  });
+  swiper.el.onmouseover = function(){
+    swiper.autoplay.stop();
+  };
+  swiper.el.onmouseleave = function() {
+    swiper.autoplay.start();
+  };
+  // 监听页面滚动 更改header样式
+  $(window).scroll(function(event){
+    const scrollTop = $(window).scrollTop();
+    const header = $(".navbar-default.nkcshade");
+    if(scrollTop > 10) {
+      header.addClass("home-fixed-header");
+    } else {
+      header.removeClass("home-fixed-header");
+    }
+  });
+});
+

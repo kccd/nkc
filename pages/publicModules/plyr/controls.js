@@ -1,1 +1,60 @@
-!function i(u,f,a){function c(n,r){if(!f[n]){if(!u[n]){var t="function"==typeof require&&require;if(!r&&t)return t(n,!0);if(l)return l(n,!0);var e=new Error("Cannot find module '"+n+"'");throw e.code="MODULE_NOT_FOUND",e}var o=f[n]={exports:{}};u[n][0].call(o.exports,function(r){return c(u[n][1][r]||r)},o,o.exports,i,u,f,a)}return f[n].exports}for(var l="function"==typeof require&&require,r=0;r<a.length;r++)c(a[r]);return c}({1:[function(r,n,t){"use strict";function e(r,n){var t;if("undefined"==typeof Symbol||null==r[Symbol.iterator]){if(Array.isArray(r)||(t=function(r,n){if(!r)return;if("string"==typeof r)return a(r,n);var t=Object.prototype.toString.call(r).slice(8,-1);"Object"===t&&r.constructor&&(t=r.constructor.name);if("Map"===t||"Set"===t)return Array.from(r);if("Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t))return a(r,n)}(r))||n&&r&&"number"==typeof r.length){t&&(r=t);var e=0,o=function(){};return{s:o,n:function(){return e>=r.length?{done:!0}:{done:!1,value:r[e++]}},e:function(r){throw r},f:o}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var i,u=!0,f=!1;return{s:function(){t=r[Symbol.iterator]()},n:function(){var r=t.next();return u=r.done,r},e:function(r){f=!0,i=r},f:function(){try{u||null==t.return||t.return()}finally{if(f)throw i}}}}function a(r,n){(null==n||n>r.length)&&(n=r.length);for(var t=0,e=new Array(n);t<n;t++)e[t]=r[t];return e}function o(n){function t(r){var t=r.detail.plyr;n.forEach(function(r){var n;r!==t&&((n=r).currentTime=0,n.pause())})}n.map(function(r){return r.on("play",t)})}NKC.methods.initPlayerControls=function(r){var i;o(r),(i=r).map(function(r){return r.on("ended",function(r){var n=r.detail.plyr,t=i.indexOf(n);if(!(t<0))for(var e=t;e<i.length;e++){var o=i[t+1];if(o&&"audio"===o.type)return o.play()}})}),function(r){var n,t=e(r);try{for(t.s();!(n=t.n()).done;)(function(){var r=n.value;if("audio"===r.type)return;r.on("enterfullscreen",function(){r.quality=1080})})()}catch(r){t.e(r)}finally{t.f()}}(r)}},{}]},{},[1]);
+// 从开头播放
+function playWithStart(player) {
+  if(player.paused) {
+    player.currentTime = 0;
+    return player.play();
+  }
+}
+
+// 回到开头并暂停播放
+function pauseAndGoToStart(player) {
+  player.currentTime = 0;
+  player.pause();
+}
+
+// 同时只能有一个在播放状态
+function onlyOnePlayingAnytime(players) {
+  function handle(event){
+    const currentPlayer = event.detail.plyr;
+    players.forEach(player => {
+      if(player !== currentPlayer) {
+        pauseAndGoToStart(player);
+      }
+    })
+  }
+  players.map(player => player.on("play", handle));
+}
+
+// 播放完前一个紧接着播放下一个音频
+function autoPlayNextAudio(players) {
+  players.map(player =>
+    player.on("ended", event => {
+      const currentPlayer = event.detail.plyr;
+      let index = players.indexOf(currentPlayer);
+      if(index < 0) return;
+      for(let i = index; i < players.length; i++) {
+        const nextPlayer = players[index + 1];
+        if(nextPlayer && nextPlayer.type === "audio") {
+          return nextPlayer.play();
+        }
+      }
+    }
+  ))
+}
+
+NKC.methods.initPlayerControls = function(players) {
+  onlyOnePlayingAnytime(players);
+  autoPlayNextAudio(players);
+  // 视频进入全屏时，自动切换到最高画质
+  whenFullscreenSwitchHighestQuality(players);
+}
+
+// 全屏时自动切换到最高画质
+function whenFullscreenSwitchHighestQuality(players) {
+  for(const player of players) {
+    if(player.type === "audio") continue;
+    player.on("enterfullscreen", () => {
+      player.quality = 1080;
+    })
+  }
+}

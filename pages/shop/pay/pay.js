@@ -1,1 +1,98 @@
-!function i(a,s,c){function u(t,e){if(!s[t]){if(!a[t]){var r="function"==typeof require&&require;if(!e&&r)return r(t,!0);if(f)return f(t,!0);var o=new Error("Cannot find module '"+t+"'");throw o.code="MODULE_NOT_FOUND",o}var n=s[t]={exports:{}};a[t][0].call(n.exports,function(e){return u(a[t][1][e]||e)},n,n.exports,i,a,s,c)}return s[t].exports}for(var f="function"==typeof require&&require,e=0;e<c.length;e++)u(c[e]);return u}({1:[function(e,t,r){"use strict";var o=NKC.methods.getDataById("data");new Vue({el:"#app",data:{rechargeSettings:o.rechargeSettings,userMainScore:o.userMainScore,mainScore:o.mainScore,totalMoney:o.totalMoney,ordersId:o.ordersId,payment:"mainScore",password:""},computed:{aliPay:function(){var e=this.rechargeSettings.aliPay,t=this.totalMoney/(1-e.fee),r=t-this.totalMoney;return{enabled:e.enabled,fee:e.fee,_fee:Number((100*e.fee).toFixed(4)),totalPrice:Number(t.toFixed(2)),feePrice:Number(r.toFixed(2))}},weChat:function(){return this.rechargeSettings.weChat},needRecharge:function(){return this.userMainScore/100<this.totalMoney}},methods:{getUrl:NKC.methods.tools.getUrl,selectPayment:function(e){this.payment=e},submit:function(){var e=this.password,t=this.ordersId,r=this.totalMoney,o=this;Promise.resolve().then(function(){if(!e)throw"请输入登录密码";return nkcAPI("/shop/pay","POST",{ordersId:t,password:e,totalPrice:r})}).then(function(){sweetSuccess("支付成功"),o.password="",setTimeout(function(){NKC.methods.visitUrl("/shop/order")},3e3)}).catch(sweetError)},useAliPay:function(){var t,e=this.ordersId,r=this.aliPay,o=r.totalPrice,n=(r.feePrice,"/shop/pay/alipay?ordersId=".concat(e,"&money=").concat(o)),i=NKC.methods.isPhone();if("reactNative"!==NKC.configs.platform){if(i)return n+="&redirect=true",screenTopAlert("正在前往支付宝..."),window.location.href=n;t=window.open()}Promise.resolve().then(function(){return nkcAPI(n,"GET").then(function(e){"reactNative"===NKC.configs.platform?NKC.methods.visitUrl(e.alipayUrl,!0):t.location=e.alipayUrl,sweetInfo("请在浏览器新打开的窗口完成支付！若没有新窗口打开，请检查新窗口是否已被浏览器拦截。")}).catch(function(e){sweetError(e),t&&(t.document.body.innerHTML=e.error||e)})})}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+
+const app = new Vue({
+  el: '#app',
+  data: {
+    rechargeSettings: data.rechargeSettings,
+    userMainScore: data.userMainScore,
+    mainScore: data.mainScore,
+    totalMoney: data.totalMoney,
+    ordersId: data.ordersId,
+    payment: 'mainScore',
+    password: '',
+  },
+  computed: {
+    aliPay() {
+      const a = this.rechargeSettings.aliPay;
+      let totalPrice = this.totalMoney / (1 - a.fee);
+      let feePrice = totalPrice - this.totalMoney;
+      return {
+        enabled: a.enabled,
+        fee: a.fee,
+        _fee: Number((a.fee * 100).toFixed(4)),
+        totalPrice: Number((totalPrice.toFixed(2))),
+        feePrice: Number(feePrice.toFixed(2))
+      };
+    },
+    weChat() {
+      return this.rechargeSettings.weChat;
+    },
+    needRecharge() {
+      const {userMainScore, totalMoney} = this;
+      return userMainScore / 100 < totalMoney;
+    },
+  },
+  methods: {
+    getUrl: NKC.methods.tools.getUrl,
+    selectPayment(type) {
+      this.payment = type;
+    },
+    submit() {
+      const {password, ordersId, totalMoney} = this;
+      const self = this;
+      Promise.resolve()
+        .then(() => {
+          if(!password) throw '请输入登录密码';
+          return nkcAPI('/shop/pay', 'POST', {
+            ordersId,
+            password,
+            totalPrice: totalMoney
+          });
+        })
+        .then(() => {
+          sweetSuccess('支付成功');
+          self.password = '';
+          setTimeout(() => {
+            NKC.methods.visitUrl('/shop/order');
+          }, 3000);
+        })
+        .catch(sweetError);
+    },
+    useAliPay() {
+      const {ordersId, aliPay} = this;
+      const {totalPrice, feePrice} = aliPay;
+      let url = `/shop/pay/alipay?ordersId=${ordersId}&money=${totalPrice}`;
+      const isPhone = NKC.methods.isPhone();
+      let newWindow;
+      if(NKC.configs.platform !== 'reactNative') {
+        if(isPhone) {
+          url += '&redirect=true';
+          screenTopAlert('正在前往支付宝...');
+          return window.location.href = url;
+        } else {
+          newWindow = window.open();
+        }
+      }
+      Promise.resolve()
+        .then(() => {
+          return nkcAPI(url, 'GET')
+            .then(data => {
+              if(NKC.configs.platform === 'reactNative') {
+                NKC.methods.visitUrl(data.alipayUrl, true);
+              } else {
+                newWindow.location = data.alipayUrl;
+              }
+              sweetInfo('请在浏览器新打开的窗口完成支付！若没有新窗口打开，请检查新窗口是否已被浏览器拦截。');
+            })
+            .catch(err => {
+              sweetError(err);
+              if(newWindow) {
+                newWindow.document.body.innerHTML = err.error || err;
+              }
+            });
+        })
+    }
+  }
+});
+
+window.app = app;

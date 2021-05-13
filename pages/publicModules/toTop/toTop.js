@@ -1,1 +1,24 @@
-!function i(u,c,f){function s(o,r){if(!c[o]){if(!u[o]){var e="function"==typeof require&&require;if(!r&&e)return e(o,!0);if(p)return p(o,!0);var t=new Error("Cannot find module '"+o+"'");throw t.code="MODULE_NOT_FOUND",t}var n=c[o]={exports:{}};u[o][0].call(n.exports,function(r){return s(u[o][1][r]||r)},n,n.exports,i,u,c,f)}return c[o].exports}for(var p="function"==typeof require&&require,r=0;r<f.length;r++)s(f[r]);return s}({1:[function(r,o,e){"use strict";function t(){800<n.scrollTop()?$("#moduleToTop").css({right:"2rem",opacity:1}):$("#moduleToTop").css({right:"-4rem",opacity:0})}var n;n=$(document),window.addEventListener("scroll",function(){t()}),t()},{}]},{},[1]);
+(() => {
+  const d = $(document);
+  const modifyCSS = () => {
+    const distance = d.scrollTop();
+    let dom;
+    if(distance > 800) {
+      dom = $("#moduleToTop");
+      dom.css({
+        right: "2rem",
+        opacity: 1
+      });
+    } else {
+      dom = $("#moduleToTop");
+      dom.css({
+        right: "-4rem",
+        opacity: 0
+      });
+    }
+  };
+  window.addEventListener("scroll", () => {
+    modifyCSS();
+  });
+  modifyCSS();
+})();

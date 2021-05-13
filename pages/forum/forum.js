@@ -1,1 +1,226 @@
-!function i(a,d,s){function l(e,t){if(!d[e]){if(!a[e]){var o="function"==typeof require&&require;if(!t&&o)return o(e,!0);if(c)return c(e,!0);var r=new Error("Cannot find module '"+e+"'");throw r.code="MODULE_NOT_FOUND",r}var n=d[e]={exports:{}};a[e][0].call(n.exports,function(t){return l(a[e][1][t]||t)},n,n.exports,i,a,d,s)}return d[e].exports}for(var c="function"==typeof require&&require,t=0;t<s.length;t++)l(s[t]);return l}({1:[function(t,e,o){"use strict";var r=NKC.methods.getDataById("forumInfo"),n=r.fid,d=r.page,s=r.digest,l=r.sort;$(function(){var t=$("#navbar_custom_dom"),e=$("#leftDom");t.html(e.html()),NKC.configs.lid&&(window.Library=new NKC.modules.Library({lid:NKC.configs.lid,folderId:NKC.configs.folderId,tLid:NKC.configs.tLid,closed:NKC.configs.closed,uploadResourcesId:NKC.configs.uploadResourcesId?NKC.configs.uploadResourcesId.split("-"):[]}));var o=$("#threadUrlSwitch");o.length&&(a("true"===localStorage.getItem(i)),o.on("click",function(){a($(this).prop("checked"))})),NKC.configs.uid&&function(){socket.on("connect",function(){c()}),socket.on("forumMessage",function(t){var e=t.html,o=t.tid,r=t.contentType,n=$("div.normal-thread-list"),i=n.find('div[data-tid="'+o+'"]');if(0!==d||!(!s||s&&t.digest)||"thread"!==r&&"tlm"!==l){if(!i)return}else i.length?i.remove():function(){var t=$("div.normal-thread-list>.thread-panel"),e=t.length;if(0===e)return;t.eq(e-1).remove()}(),i=$(e),n.prepend(i);var a=NKC.methods.getThreadListNewPostCount(o);a++,NKC.methods.setThreadListNewPostCount(o,a),u(o),floatUserPanel.initPanel(),floatForumPanel.initPanel()}),socket.connected&&c();(function t(){setTimeout(function(){f(),t()},1e4)})(),document.body.addEventListener("click",function(t){var e,o,r=t.target;"a"===r.tagName.toLowerCase()&&(e=(r=$(r)).attr("href"),/^\/t\/([0-9]+)\??/gi.test(e)&&(o=RegExp.$1,NKC.methods.setThreadListNewPostCount(o,0),u(o)))}),f()}()});var i="forum_thread_a_target";function a(t){var e,o=t?"_blank":"_self";$(".thread-panel-url").attr("target",o),$("#threadUrlSwitch").prop("checked",!!t),e=t,localStorage.setItem(i,e)}function c(){socket.emit("joinRoom",{type:"forum",data:{forumId:n}})}function f(){for(var t=$("div.normal-thread-list").find(".thread-panel"),e=0;e<t.length;e++){var o=t.eq(e).attr("data-tid");u(o,NKC.methods.getThreadListNewPostCount(o))}}function u(t){var e=$("div.normal-thread-list");e.find('div[data-tid="'+t+'"] .thread-panel-author-info').length&&e.find('div[data-tid="'+t+'"] span.thread-panel-point').remove()}window.openEditSite=function(){var t=window.location.origin+"/editor?type=forum&id="+n;"reactNative"===NKC.configs.platform?NKC.methods.rn.emit("openEditorPage",{url:t}):"apiCloud"===NKC.configs.platform?api.openWin({name:t,url:"widget://html/common/editorInfo.html",pageParam:{realUrl:t,shareType:"common"}}):NKC.methods.visitUrl(t,!0)}},{}]},{},[1]);
+const forumInfo = NKC.methods.getDataById('forumInfo');
+const {fid, page, digest, sort} = forumInfo;
+
+$(function() {
+  const dom = $("#navbar_custom_dom");
+  const leftDom = $("#leftDom");
+  dom.html(leftDom.html());
+  if(NKC.configs.lid) {
+    window.Library = new NKC.modules.Library({
+      lid: NKC.configs.lid,
+      folderId: NKC.configs.folderId,
+      tLid: NKC.configs.tLid,
+      closed: NKC.configs.closed,
+      uploadResourcesId: NKC.configs.uploadResourcesId?NKC.configs.uploadResourcesId.split("-"):[]
+    });
+  }
+  const threadUrlSwitch = $('#threadUrlSwitch');
+  if(threadUrlSwitch.length) {
+    const threadUrlSwitchStatus = getThreadUrlSwitchStatus();
+    modifyThreadUrl(threadUrlSwitchStatus);
+    threadUrlSwitch.on("click", function() {
+      const s = $(this).prop('checked');
+      modifyThreadUrl(s);
+    });
+  }
+  if(NKC.configs.uid) {
+    connectForumRoom();
+  }
+});
+
+const threadUrlSwitchKey = 'forum_thread_a_target';
+
+function modifyThreadUrl(status) {
+  var target = status? '_blank': '_self';
+  $('.thread-panel-url').attr('target', target);
+  $('#threadUrlSwitch').prop('checked', !!status);
+  setThreadUrlSwitchStatus(status);
+}
+/*
+* @return {Boolean}
+* */
+function getThreadUrlSwitchStatus() {
+  return localStorage.getItem(threadUrlSwitchKey) === 'true';
+}
+
+function setThreadUrlSwitchStatus(status) {
+  localStorage.setItem(threadUrlSwitchKey, status);
+}
+
+window.openEditSite = function() {
+  const url = window.location.origin + "/editor?type=forum&id=" + fid;
+
+  if(NKC.configs.platform === 'reactNative') {
+    NKC.methods.rn.emit("openEditorPage", {
+      url: url
+    })
+  } else if(NKC.configs.platform === 'apiCloud') {
+    api.openWin({
+      name: url,
+      url: 'widget://html/common/editorInfo.html',
+      pageParam: {
+        realUrl: url,
+        shareType: "common"
+      }
+    })
+  } else {
+    NKC.methods.visitUrl(url, true);
+  }
+}
+
+/*
+* 连入房间
+* */
+function joinRoom() {
+  socket.emit('joinRoom', {
+    type: 'forum',
+    data: {
+      forumId: fid
+    }
+  });
+}
+
+/*
+* 连接上专业房间
+* */
+function connectForumRoom() {
+  socket.on('connect', function() {
+    joinRoom();
+  });
+  socket.on('forumMessage', function(data) {
+    const {html, tid, contentType} = data;
+    const threadList = $('div.normal-thread-list');
+    let targetThread = threadList.find('div[data-tid="'+tid+'"]');
+    if(
+      page === 0 && // 处于专业首页
+      (!digest || digest && data.digest) &&
+      (contentType === 'thread' || sort === 'tlm') // 发表文章或发表回复且按回复排序
+    ) {
+      // 如果文章存在则先移除再在列表头部创建
+      // 如果文章不存在则移除列表最后一项再在列表头部创建
+      if(targetThread.length) {
+        targetThread.remove();
+      } else {
+        removeLastThreadPanel();
+      }
+      targetThread = $(html);
+      threadList.prepend(targetThread);
+    } else {
+      if(!targetThread) return;
+    }
+
+    let count = NKC.methods.getThreadListNewPostCount(tid);
+
+    count ++;
+
+    NKC.methods.setThreadListNewPostCount(tid, count);
+
+    setThreadListNewCount(tid, count);
+
+    createMouseEvents();
+
+  });
+  if(socket.connected) {
+    joinRoom();
+  }
+
+  createTimeoutToUpdateThreadListCount();
+  createClickEventToUpdateThreadListCount();
+  updateThreadListCount();
+}
+
+/*
+* 设置一个10秒的定时器 定时从本地获取条数更新dom
+* @author pengxiguaa 2020-12-11
+* */
+function createTimeoutToUpdateThreadListCount() {
+  setTimeout(() => {
+    updateThreadListCount();
+    createTimeoutToUpdateThreadListCount();
+  }, 10 * 1000);
+}
+function createClickEventToUpdateThreadListCount() {
+  document.body.addEventListener('click', function(e) {
+    let target = e.target;
+    if(target.tagName.toLowerCase() !== 'a') return;
+    target = $(target);
+    const href = target.attr('href');
+    const reg = /^\/t\/([0-9]+)\??/ig;
+    if(!reg.test(href)) return;
+    const tid = RegExp.$1;
+    NKC.methods.setThreadListNewPostCount(tid, 0);
+    setThreadListNewCount(tid, 0);
+  });
+}
+/*
+* 从本地获取数据更新dom
+* @author pengxiguaa 2020-12-11
+* */
+function updateThreadListCount() {
+  const threadList = $('div.normal-thread-list');
+  const threads = threadList.find('.thread-panel');
+  for(let i = 0; i < threads.length; i++) {
+    const thread = threads.eq(i);
+    const tid = thread.attr('data-tid');
+    const count = NKC.methods.getThreadListNewPostCount(tid);
+    setThreadListNewCount(tid, count);
+  }
+}
+
+/*
+* 添加鼠标事件
+* @author pengxiguaa 2020-12-11
+* */
+function createMouseEvents() {
+  floatUserPanel.initPanel();
+  floatForumPanel.initPanel();
+}
+
+/*
+* 设置文章的未读数
+* @param {String} tid 文章ID
+* @param {Number} count 未读数
+* @author pengxiguaa 2020-12-11
+* */
+function setThreadListNewCount(tid, count) {
+  const threadList = $('div.normal-thread-list');
+  const targetThreadInfo = threadList.find('div[data-tid="'+tid+'"] .thread-panel-author-info');
+  if(!targetThreadInfo.length) return;
+  const targetThreadCounter = threadList.find('div[data-tid="'+tid+'"] span.thread-panel-point');
+  targetThreadCounter.remove();
+  if(count === 0) return;
+
+  // 暂时评论红点提示 当前仅仅指定文章而不显示红点
+  // 显示条数
+  //const newCounter = $("<span class='thread-panel-counter' data-count='"+count+"' title='"+count+"条更新'>"+count+"</span>");
+
+  // 只显示红点
+  // const newCounter = $("<span class='thread-panel-point' data-count='"+count+"'></span>");
+  // targetThreadInfo.append(newCounter);
+}
+
+/*
+* 移除文章列表中的最后一条
+* @author pengxiguaa 2020-12-14
+* */
+function removeLastThreadPanel() {
+  const threadPanel = $('div.normal-thread-list>.thread-panel');
+  const length = threadPanel.length;
+  if(length === 0) return;
+  threadPanel.eq(length - 1).remove();
+}
+
+Object.assign(window, {
+  threadUrlSwitchKey,
+  modifyThreadUrl,
+  getThreadUrlSwitchStatus,
+  setThreadUrlSwitchStatus,
+  joinRoom,
+  connectForumRoom,
+  createTimeoutToUpdateThreadListCount,
+  createClickEventToUpdateThreadListCount,
+  updateThreadListCount,
+  createMouseEvents,
+  setThreadListNewCount,
+  removeLastThreadPanel,
+});

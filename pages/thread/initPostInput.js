@@ -1,4 +1,5 @@
 var ue = UE.getEditor('container', NKC.configs.ueditor.postConfigs);
+window.ue = ue;
 
 /*
 var ue = UE.getEditor('container', {

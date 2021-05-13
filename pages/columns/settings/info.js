@@ -1,4 +1,4 @@
-var selectImage;
+window.selectImage = undefined;
 var data = NKC.methods.getDataById("data");
 var reg = /^(http|https):\/\//i;
 for(var i = 0; i < data.column.links.length; i++) {
@@ -21,7 +21,7 @@ var app = new Vue({
     error: ""
   },
   mounted: function() {
-    selectImage = new NKC.methods.selectImage();
+    window.selectImage = new NKC.methods.selectImage();
     NKC.methods.initSelectColor(function(hex) {
       app.column.color = hex;
     });

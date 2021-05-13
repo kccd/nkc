@@ -247,3 +247,20 @@ function openToEditFundApply(url) {
 	// window.location.href = url;
 	openToNewLocation(url)
 }
+
+Object.assign(window, {
+	openToEditFundApply,
+	verifyRemittance,
+	applyRemittance,
+	submitReport,
+	clearLog,
+	displaySelectedThreads,
+	addThread,
+	displayThreadsList,
+	initThreadsList,
+	disabledRolling,
+	createThreadsList,
+	displayPageList,
+	createPageList,
+	getThreads
+})

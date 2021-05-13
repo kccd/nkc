@@ -74,6 +74,9 @@ schema.statics.getIPByTokens = async (tokens) => {
   const IPModel = mongoose.model('ips');
   const ips = await IPModel.find({_id: {$in: tokens}});
   const result = {};
+  for(const t of tokens) {
+    result[t] = t;
+  }
   for(const i of ips) {
     result[i._id] = i.ip;
   }

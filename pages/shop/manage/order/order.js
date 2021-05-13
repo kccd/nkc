@@ -1,1 +1,189 @@
-!function n(c,i,d){function u(t,e){if(!i[t]){if(!c[t]){var r="function"==typeof require&&require;if(!e&&r)return r(t,!0);if(m)return m(t,!0);var a=new Error("Cannot find module '"+t+"'");throw a.code="MODULE_NOT_FOUND",a}var o=i[t]={exports:{}};c[t][0].call(o.exports,function(e){return u(c[t][1][e]||e)},o,o.exports,n,c,i,d)}return i[t].exports}for(var m="function"==typeof require&&require,e=0;e<d.length;e++)u(d[e]);return u}({1:[function(e,t,r){"use strict";var u=new NKC.modules.CommonModal,a=new NKC.modules.ShopShip,m=new NKC.modules.ShopModifyPrice,o=new NKC.modules.Transfer;window.transfer=function(e){o.open(function(){},e)},window.modifySellMessage=function(r,a){var o=$("tr[data-order-id='".concat(a,"'] .data-sell-message"));u.open(function(e){var t=e[0].value;nkcAPI("/shop/manage/"+r+"/order/editSellMessage","PUT",{sellMessage:t,orderId:a}).then(function(){o.text(t),u.close(),sweetSuccess("保存成功")}).catch(sweetWarning)},{title:"修改备注",data:[{value:o.text(),dom:"textarea"}]})},window.getNumber=function(e){var t=1<arguments.length&&void 0!==arguments[1]?arguments[1]:0;return e=(e+="").replace("￥",""),e=(e=parseFloat(e)).toFixed(t),parseFloat(e)},window.computeOrderPrice=function(e){for(var t=$("tr[data-order-id='".concat(e,"']")),r=t.find(".data-param-price"),a=t.find(".data-param-count"),o=t.find(".data-params-freight"),n=[],c=[],i=0;i<r.length;i++){var d=r.eq(i);n.push(getNumber(d.text(),2))}for(var u=0;u<a.length;u++){var m=a.eq(u);c.push(getNumber(m.text(),0))}if(n.length!==c.length)return sweetError("订单页面错误，请刷新页面");for(var s=0,f=0;f<n.length;f++)s+=n[f]*c[f];var p=getNumber(o.text(),2);return t.find(".data-params-price").text("￥".concat(s.toFixed(2))),t.find(".data-order-price").text("￥".concat((s+p).toFixed(2))),{paramsPrice:s,freightPrice:p,orderPrice:s+p}},window.modifyParamPrice=function(a,o,n){var c=$("tr[data-order-id='".concat(o,"'][data-order-param-id='").concat(n,"'] .data-param-price")),e=$("tr[data-order-id='".concat(o,"'][data-order-param-id='").concat(n,"'] .data-param-count")),t=$("tr[data-order-id='".concat(o,"'] .data-params-freight")),i=getNumber(t.text(),2),r=getNumber(c.text(),2),d=getNumber(e.text(),0);return m.open(function(e){var t=e,r=NKC.methods.checkData.checkNumber;Promise.resolve().then(function(){return r(t,{name:"商品单价",min:.01,fractionDigits:2}),nkcAPI("/shop/manage/".concat(a,"/order/editCostRecord"),"PUT",{type:"modifyParam",costId:n,orderId:o,freightPrice:100*i,costObj:{singlePrice:100*t,count:d}})}).then(function(){c.text("￥".concat(t.toFixed(2))),computeOrderPrice(o),u.close()}).catch(sweetError)},r)},window.modifyParamCount=function(r,a,o){var n=$("tr[data-order-id='".concat(a,"'][data-order-param-id='").concat(o,"'] .data-param-count")),e=$("tr[data-order-id='".concat(a,"'][data-order-param-id='").concat(o,"'] .data-param-price")),t=$("tr[data-order-id='".concat(a,"'] .data-params-freight")),c=getNumber(t.text(),2),i=getNumber(e.text(),2),d=getNumber(n.text(),0);u.open(function(e){var t=getNumber(e[0].value,2);Promise.resolve().then(function(){return NKC.methods.checkData.checkNumber(t,{name:"商品数量",min:1}),nkcAPI("/shop/manage/".concat(r,"/order/editCostRecord"),"PUT",{type:"modifyParam",costId:o,orderId:a,freightPrice:100*c,costObj:{singlePrice:100*i,count:t}})}).then(function(){n.text("".concat(t)),computeOrderPrice(a),u.close()}).catch(sweetError)},{title:"修改数量",data:[{dom:"input",value:d}]})},window.modifyFreight=function(r,a){var o=$("tr[data-order-id='".concat(a,"'] .data-params-freight")),e=getNumber(o.text(),2);return m.open(function(e){var t=e;Promise.resolve().then(function(){return NKC.methods.checkData.checkNumber(t,{name:"运费",min:0,fractionDigits:2}),nkcAPI("/shop/manage/".concat(r,"/order/editCostRecord"),"PUT",{type:"modifyFreight",orderId:a,freightPrice:100*t})}).then(function(){o.text("￥".concat(t.toFixed(2))),computeOrderPrice(a),u.close()}).catch(sweetError)},e)},window.ship=function(e){a.open(function(){},{orderId:e})}},{}]},{},[1]);
+const CommonModal = new NKC.modules.CommonModal();
+const Ship = new NKC.modules.ShopShip();
+const ModifyPrice = new NKC.modules.ShopModifyPrice();
+const Transfer = new NKC.modules.Transfer();
+window.transfer = function(tUid) {
+  Transfer.open(function() {
+
+  }, tUid);
+}
+// 修改卖家备注
+window.modifySellMessage = function(uid, orderId) {
+  const dom = $(`tr[data-order-id='${orderId}'] .data-sell-message`);
+  CommonModal.open((data) => {
+    const value = data[0].value;
+    nkcAPI('/shop/manage/'+uid+'/order/editSellMessage', "PUT", {sellMessage: value, orderId: orderId})
+      .then(function() {
+        dom.text(value);
+        CommonModal.close();
+        sweetSuccess("保存成功");
+      })
+      .catch(sweetWarning)
+  }, {
+    title: "修改备注",
+    data: [
+      {
+        value: dom.text(),
+        dom: "textarea"
+      }
+    ]
+  })
+}
+// 获取金额 转换成数字且去掉￥
+window.getNumber = function(str, fractionDigits = 0) {
+  str = str + "";
+  str = str.replace("￥", "");
+  str = parseFloat(str);
+  str = str.toFixed(fractionDigits);
+  return parseFloat(str);
+}
+// 重新计算订单总价
+window.computeOrderPrice = function(orderId) {
+  const orderDom = $(`tr[data-order-id='${orderId}']`);
+  const paramPriceDom = orderDom.find(".data-param-price");
+  const countDom = orderDom.find(".data-param-count");
+  const freightDom = orderDom.find(".data-params-freight");
+  const prices = [];
+  const counts = [];
+  for(let i = 0; i < paramPriceDom.length; i++) {
+    const dom = paramPriceDom.eq(i);
+    prices.push(getNumber(dom.text(), 2));
+  }
+  for(let i = 0; i < countDom.length; i++) {
+    const dom = countDom.eq(i);
+    counts.push(getNumber(dom.text(), 0));
+  }
+  if(prices.length !== counts.length) return sweetError("订单页面错误，请刷新页面");
+  let totalPrice = 0;
+  for(let i = 0; i < prices.length; i++) {
+    totalPrice += prices[i] * counts[i];
+  }
+  const freight = getNumber(freightDom.text(), 2);
+  orderDom.find(`.data-params-price`).text(`￥${totalPrice.toFixed(2)}`);
+  orderDom.find(`.data-order-price`).text(`￥${(totalPrice + freight).toFixed(2)}`);
+  return {
+    paramsPrice: totalPrice,
+    freightPrice: freight,
+    orderPrice: totalPrice + freight
+  }
+}
+
+
+// 修改商品单价
+window.modifyParamPrice = function(sellUid, orderId, costId) {
+  const priceDom = $(`tr[data-order-id='${orderId}'][data-order-param-id='${costId}'] .data-param-price`);
+  const countDom = $(`tr[data-order-id='${orderId}'][data-order-param-id='${costId}'] .data-param-count`);
+  const freightDom = $(`tr[data-order-id='${orderId}'] .data-params-freight`);
+  const freightPrice = getNumber(freightDom.text(), 2);
+  const price = getNumber(priceDom.text(), 2);
+  const count = getNumber(countDom.text(), 0);
+  return ModifyPrice.open(data => {
+    const newPrice = data;
+    const checkNumber = NKC.methods.checkData.checkNumber;
+    Promise.resolve()
+      .then(() => {
+        checkNumber(newPrice, {
+          name: "商品单价",
+          min: 0.01,
+          fractionDigits: 2
+        });
+        return nkcAPI(`/shop/manage/${sellUid}/order/editCostRecord`, "PUT", {
+          type: "modifyParam",
+          costId,
+          orderId,
+          freightPrice: freightPrice * 100,
+          costObj: {
+            singlePrice: newPrice * 100,
+            count
+          }
+        })
+      })
+      .then(() => {
+        priceDom.text(`￥${newPrice.toFixed(2)}`);
+        computeOrderPrice(orderId);
+        CommonModal.close();
+      })
+      .catch(sweetError);
+  }, price)
+}
+
+// 修改商品数量
+window.modifyParamCount = function(sellUid, orderId, costId) {
+  const countDom = $(`tr[data-order-id='${orderId}'][data-order-param-id='${costId}'] .data-param-count`);
+  const priceDom = $(`tr[data-order-id='${orderId}'][data-order-param-id='${costId}'] .data-param-price`);
+  const freightDom = $(`tr[data-order-id='${orderId}'] .data-params-freight`);
+  const freightPrice = getNumber(freightDom.text(), 2);
+  const price = getNumber(priceDom.text(), 2);
+  const count = getNumber(countDom.text(), 0);
+  CommonModal.open((data) => {
+    const newCount = getNumber(data[0].value, 2);
+    Promise.resolve()
+      .then(() => {
+        NKC.methods.checkData.checkNumber(newCount, {
+          name: "商品数量",
+          min: 1
+        });
+        return nkcAPI(`/shop/manage/${sellUid}/order/editCostRecord`, "PUT", {
+          type: "modifyParam",
+          costId,
+          orderId,
+          freightPrice: freightPrice * 100,
+          costObj: {
+            singlePrice: price * 100,
+            count: newCount
+          }
+        })
+      })
+    
+      .then(() => {
+        countDom.text(`${newCount}`);
+        computeOrderPrice(orderId);
+        CommonModal.close();
+      })
+      .catch(sweetError);
+  }, {
+    title: "修改数量",
+    data: [
+      {
+        dom: "input",
+        value: count
+      }
+    ]
+  });
+}
+
+// 修改运费
+window.modifyFreight = function(sellUid, orderId) {
+  const freightDom = $(`tr[data-order-id='${orderId}'] .data-params-freight`);
+  const freightPrice = getNumber(freightDom.text(), 2);
+  return ModifyPrice.open(data => {
+    const newFreightPrice = data;
+    Promise.resolve()
+      .then(() => {
+        NKC.methods.checkData.checkNumber(newFreightPrice, {
+          name: "运费",
+          min: 0,
+          fractionDigits: 2
+        });
+        return nkcAPI(`/shop/manage/${sellUid}/order/editCostRecord`, "PUT", {
+          type: "modifyFreight",
+          orderId,
+          freightPrice: newFreightPrice * 100,
+        });
+      })
+      .then(() => {
+        freightDom.text(`￥${newFreightPrice.toFixed(2)}`);
+        computeOrderPrice(orderId);
+        CommonModal.close();
+      })
+      .catch(sweetError);
+  }, freightPrice);
+}
+// 发货/修改物流信息
+window.ship = function(orderId) {
+  Ship.open(() => {
+  
+  }, {
+    orderId
+  })
+}

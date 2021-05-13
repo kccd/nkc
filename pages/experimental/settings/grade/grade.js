@@ -1,1 +1,44 @@
-!function o(i,c,s){function d(t,e){if(!c[t]){if(!i[t]){var r="function"==typeof require&&require;if(!e&&r)return r(t,!0);if(u)return u(t,!0);var a=new Error("Cannot find module '"+t+"'");throw a.code="MODULE_NOT_FOUND",a}var n=c[t]={exports:{}};i[t][0].call(n.exports,function(e){return d(i[t][1][e]||e)},n,n.exports,o,i,c,s)}return c[t].exports}for(var u="function"==typeof require&&require,e=0;e<s.length;e++)d(s[e]);return d}({1:[function(e,t,r){"use strict";var a=NKC.methods.getDataById("data"),i=new Vue({el:"#app",data:{grades:a.grades,gradeSettings:a.gradeSettings},mounted:function(){NKC.methods.initSelectColor()},methods:{checkNumber:NKC.methods.checkData.checkNumber,checkString:NKC.methods.checkData.checkString,save:function(){for(var e=$("input.color"),t=0;t<e.length;t++){var r=e.eq(t),a=r.attr("data-index");i.grades[a].color=r.val()}var n=this.grades,o=this.gradeSettings;nkcAPI("/e/settings/grade","PUT",{grades:n,gradeSettings:o}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)},removeGrade:function(e){this.grades.splice(e,1)},addGrade:function(){this.grades.push({_id:"",displayName:"新建等级",score:0,color:"#aaaaaa",description:""})}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById("data");
+const app = new Vue({
+	el: "#app",
+	data: {
+		grades: data.grades,
+		gradeSettings: data.gradeSettings
+	},
+	mounted: function() {
+		NKC.methods.initSelectColor();
+	},
+	methods: {
+		checkNumber: NKC.methods.checkData.checkNumber,
+		checkString: NKC.methods.checkData.checkString,
+		save: function() {
+			const colors = $("input.color");
+			for(let i = 0; i < colors.length; i++) {
+				const color = colors.eq(i);
+				const index = color.attr("data-index");
+				app.grades[index].color = color.val();
+			}
+			const {grades, gradeSettings} = this;
+			nkcAPI("/e/settings/grade", "PUT", {
+				grades,
+				gradeSettings,
+			})
+				.then(function() {
+					sweetSuccess("保存成功");
+				})
+				.catch(sweetError)
+		},
+		removeGrade: function(index) {
+			this.grades.splice(index, 1);
+		},
+		addGrade: function() {
+			this.grades.push({
+				_id: "",
+				displayName: "新建等级",
+				score: 0,
+				color: "#aaaaaa",
+				description: ""
+			});
+		}
+	}
+});

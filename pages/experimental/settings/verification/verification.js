@@ -1,1 +1,19 @@
-!function o(s,u,a){function c(e,t){if(!u[e]){if(!s[e]){var r="function"==typeof require&&require;if(!t&&r)return r(e,!0);if(f)return f(e,!0);var n=new Error("Cannot find module '"+e+"'");throw n.code="MODULE_NOT_FOUND",n}var i=u[e]={exports:{}};s[e][0].call(i.exports,function(t){return c(s[e][1][t]||t)},i,i.exports,o,s,u,a)}return u[e].exports}for(var f="function"==typeof require&&require,t=0;t<a.length;t++)c(a[t]);return c}({1:[function(t,e,r){"use strict";var n=NKC.methods.getDataById("data");new Vue({el:"#app",data:{settings:n.verificationSettings,types:n.verificationTypes},methods:{save:function(){nkcAPI("/e/settings/verification","PUT",{verificationSettings:this.settings}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const app = new Vue({
+  el: '#app',
+  data: {
+    settings: data.verificationSettings,
+    types: data.verificationTypes,
+  },
+  methods: {
+    save() {
+      nkcAPI('/e/settings/verification', 'PUT', {
+        verificationSettings: this.settings
+      })
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
+        .catch(sweetError)
+    }
+  }
+});
