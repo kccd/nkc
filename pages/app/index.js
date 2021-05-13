@@ -1,4 +1,3 @@
-alert(123)
 var app = new Vue({
   el: '#app',
   computed: {
