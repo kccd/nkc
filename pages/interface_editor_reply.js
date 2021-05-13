@@ -556,3 +556,25 @@
   
     screenfitted = !screenfitted
   }
+
+  Object.assign(window, {
+    dataURItoBlob,
+    get_selection,
+    replace_selection,
+    set_selection,
+    getSearchKV,
+    blockOnChange,
+    threadTypesOnChange,
+    childrenOnChange,
+    parentsOnChange,
+    onPost,
+    groupingForums,
+    createOption,
+    mathfresh,
+    fitscreen,
+    extract_resource_from_tag,
+    mathfreshnew,
+    mathfresha1,
+    reedit,
+    fitscreennew,
+  });

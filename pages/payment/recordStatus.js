@@ -56,3 +56,5 @@ var app = new Vue({
     if(this.recordStatus === 'waiting') this.toPay();
   }
 });
+
+window.app = app;

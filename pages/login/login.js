@@ -1,6 +1,6 @@
-var app;
+window.app = undefined;
 $(function() {
-	app = new Vue({
+	window.app = new Vue({
 		el: '#app',
 		data: {
 			warning: {
@@ -234,3 +234,9 @@ function timeOut(){
 		timeOut();
 	}, 1000);
 }
+
+Object.assign(window, {
+	focus,
+	clearWarning,
+	timeOut,
+});

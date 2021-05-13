@@ -1,1 +1,103 @@
-!function t(r,s,n){function d(i,e){if(!s[i]){if(!r[i]){var o="function"==typeof require&&require;if(!e&&o)return o(i,!0);if(a)return a(i,!0);throw(o=new Error("Cannot find module '"+i+"'")).code="MODULE_NOT_FOUND",o}o=s[i]={exports:{}},r[i][0].call(o.exports,function(e){return d(r[i][1][e]||e)},o,o.exports,t,r,s,n)}return s[i].exports}for(var a="function"==typeof require&&require,e=0;e<n.length;e++)d(n[e]);return d}({1:[function(e,i,o){"use strict";var t=NKC.methods.getDataById("data");new Vue({el:"#app",data:{verifyEmail:t.verifyEmail,verifyMobile:t.verifyMobile,verifyPassword:t.verifyPassword,mobileCode:"",emailCode:"",password:"",passed:!t.verifyEmail&&!t.verifyMobile&&!t.verifyPassword,mobileTime:0,emailTime:0},computed:{disableVerifyButton:function(){var e=this.verifyEmail,i=this.verifyMobile,o=this.verifyPassword,t=this.mobileCode,r=this.emailCode,s=this.password;return o&&!s||e&&!r||i&&!t}},methods:{reduceTime:function(e){var i=this;setTimeout(function(){i[e]--,0<i[e]&&i.reduceTime(e)},1e3)},sendEmailCode:function(){var e;0<this.emailTime||(e=this,NKC.methods.sendEmailCode("destroy").then(function(){sweetSuccess("验证码已发送"),e.emailTime=120,e.reduceTime("emailTime")}).catch(sweetError))},sendMobileCode:function(){var e;0<this.mobileTime||(e=this,NKC.methods.sendMobileCode("destroy").then(function(){sweetSuccess("验证码已发送"),e.mobileTime=120,e.reduceTime("mobileTime")}).catch(sweetError))},verify:function(){var e=this,i=this.emailCode,o=this.mobileCode,t=this.password;nkcAPI("/u/".concat(NKC.configs.uid,"/destroy"),"POST",{type:"verify",form:{emailCode:i,mobileCode:o,password:t}}).then(function(){e.passed=!0}).catch(sweetError)},submit:function(){var e=this.emailCode,i=this.mobileCode,o=this.password;sweetQuestion("确定即会注销，注销后短期内不能使用原有用户名重新注册，你将不能再对该账号、积分、发表的内容进行处置，你想好了吗？").then(function(){return nkcAPI("/u/".concat(NKC.configs.uid,"/destroy"),"POST",{type:"destroy",form:{emailCode:e,mobileCode:i,password:o}})}).then(function(){NKC.configs.isApp?emitEvent("logout"):window.location.href="/"}).catch(sweetError)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById("data");
+const app = new Vue({
+  el: "#app",
+  data: {
+    verifyEmail: data.verifyEmail,
+    verifyMobile: data.verifyMobile,
+    verifyPassword: data.verifyPassword,
+
+    mobileCode: "",
+    emailCode: "",
+    password: "",
+
+    passed: (!data.verifyEmail && !data.verifyMobile && !data.verifyPassword),
+
+    mobileTime: 0,
+    emailTime:  0
+  },
+  computed: {
+    disableVerifyButton() {
+      const {
+        verifyEmail, verifyMobile, verifyPassword,
+        mobileCode, emailCode, password
+      } = this;
+      return (verifyPassword && !password) || (verifyEmail && !emailCode) || (verifyMobile && !mobileCode);
+    }
+  },
+  methods: {
+    reduceTime(type) {
+      const self = this;
+      setTimeout(() => {
+        self[type] --;
+        if(self[type] > 0) {
+          self.reduceTime(type);
+        }
+      }, 1000)
+    },
+    sendEmailCode() {
+      if(this.emailTime > 0) return;
+      const self = this;
+      NKC.methods.sendEmailCode("destroy")
+        .then(() => {
+          sweetSuccess("验证码已发送");
+          self.emailTime = 120;
+          self.reduceTime("emailTime");
+        })
+        .catch(sweetError);
+    },
+    sendMobileCode() {
+      if(this.mobileTime > 0) return;
+      const self = this;
+      NKC.methods.sendMobileCode("destroy")
+        .then(() => {
+          sweetSuccess("验证码已发送");
+          self.mobileTime = 120;
+          self.reduceTime("mobileTime");
+        })
+        .catch(sweetError);
+    },
+    verify() {
+      const self = this;
+      const {
+        emailCode, mobileCode, password
+      } = this;
+      nkcAPI(`/u/${NKC.configs.uid}/destroy`, "POST", {
+        type: "verify",
+        form: {
+          emailCode,
+          mobileCode,
+          password
+        }
+      })
+        .then(() => {
+          self.passed = true;
+        })
+        .catch(sweetError)
+    },
+    submit() {
+      const {emailCode, mobileCode, password} = this;
+      sweetQuestion("确定即会注销，注销后短期内不能使用原有用户名重新注册，你将不能再对该账号、积分、发表的内容进行处置，你想好了吗？")
+        .then(() => {
+          return nkcAPI(`/u/${NKC.configs.uid}/destroy`, "POST", {
+            type: "destroy",
+            form: {
+              emailCode,
+              mobileCode,
+              password
+            }
+          });
+        })
+        .then(() => {
+          // 注销完成
+          if(NKC.configs.isApp) {
+            emitEvent("logout");
+          } else {
+            window.location.href = "/";
+          }
+        })
+        .catch(sweetError);
+    }
+  }
+});
+
+window.app = app;

@@ -1,1 +1,35 @@
-!function t(r,i,c){function d(n,o){if(!i[n]){if(!r[n]){var e="function"==typeof require&&require;if(!o&&e)return e(n,!0);if(a)return a(n,!0);throw(e=new Error("Cannot find module '"+n+"'")).code="MODULE_NOT_FOUND",e}e=i[n]={exports:{}},r[n][0].call(e.exports,function(o){return d(r[n][1][o]||o)},e,e.exports,t,r,i,c)}return i[n].exports}for(var a="function"==typeof require&&require,o=0;o<c.length;o++)d(c[o]);return d}({1:[function(o,n,e){"use strict";window.disableNote=function(o,n){nkcAPI("/nkc/note","POST",{type:n?"disable":"cancelDisable",noteContentId:o}).then(function(){window.location.reload()}).catch(sweetError)},window.editNote=function(n,o){window.commonModal||(window.commonModal=new NKC.modules.CommonModal),window.commonModal.open(function(o){nkcAPI("/nkc/note","POST",{type:"modify",noteContentId:n,content:o[0].value}).then(function(){window.commonModal.close(),window.location.reload()}).catch(sweetError)},{title:"编辑笔记",data:[{dom:"textarea",value:NKC.methods.strToObj(o).content}]})}},{}]},{},[1]);
+window.disableNote = (id, disable) => {
+  nkcAPI(`/nkc/note`, "POST", {
+    type: disable? "disable": "cancelDisable",
+    noteContentId: id
+  })
+    .then(() => {
+      window.location.reload();
+    })
+    .catch(sweetError)
+};
+window.editNote = (id, content) => {
+  if(!window.commonModal) {
+    window.commonModal = new NKC.modules.CommonModal();
+  }
+  window.commonModal.open(data => {
+    nkcAPI("/nkc/note", "POST", {
+      type: "modify",
+      noteContentId: id,
+      content: data[0].value
+    })
+      .then(() => {
+        window.commonModal.close();
+        window.location.reload();
+      })
+      .catch(sweetError)
+  }, {
+    title: "编辑笔记",
+    data: [
+      {
+        dom: "textarea",
+        value: NKC.methods.strToObj(content).content
+      }
+    ]
+  });
+};

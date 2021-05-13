@@ -1,1 +1,103 @@
-!function i(a,r,c){function o(n,e){if(!r[n]){if(!a[n]){var t="function"==typeof require&&require;if(!e&&t)return t(n,!0);if(s)return s(n,!0);throw(t=new Error("Cannot find module '"+n+"'")).code="MODULE_NOT_FOUND",t}t=r[n]={exports:{}},a[n][0].call(t.exports,function(e){return o(a[n][1][e]||e)},t,t.exports,i,a,r,c)}return r[n].exports}for(var s="function"==typeof require&&require,e=0;e<c.length;e++)o(c[e]);return o}({1:[function(e,n,t){"use strict";var i=NKC.methods.getDataById("data").dealInfo||{},a=i.address,r=i.dealDescription,c=void 0===r?"":r,o=i.dealAnnouncement,s=void 0===o?"":o,r=i.templates,o=void 0===r?[]:r,i="",a=(r=void 0===a?"":a).indexOf("&"),r=-1===a?(i=r,""):(i=r.slice(0,a),r.slice(a+1));window.app=new Vue({el:"#address",data:{dealDescription:c,dealAnnouncement:s,address:r,templates:o,location:i},mounted:function(){window.SelectAddress=new NKC.modules.SelectAddress},methods:{selectAddress:function(e){SelectAddress.open(function(e){app.location=e.join("/")},{onlyChina:!0})},checkString:NKC.methods.checkData.checkString,checkNumber:NKC.methods.checkData.checkNumber,save:function(){var e=this.dealDescription,n=this.dealAnnouncement,t=this.address,i=this.templates,a=this.location;Promise.resolve().then(function(){if(app.checkString(e,{name:"供货说明",minLength:0,maxLength:500}),app.checkString(n,{name:"全局公告",minLength:0,maxLength:500}),!a)throw"请选择区域";if(app.checkString(a,{name:"区域",minLength:1,maxLength:500}),!t)throw"请输入详细地址";return app.checkString(t,{name:"详细地址",minLength:1,maxLength:500}),i.map(function(e){e.firstPrice=parseFloat(e.firstPrice),e.addPrice=parseFloat(e.addPrice);var n=e.name,t=e.firstPrice,e=e.addPrice;app.checkString(n,{name:"模板名称",minLength:1,maxLength:100}),app.checkNumber(t,{name:"首件价格",min:0,fractionDigits:2}),app.checkNumber(e,{name:"首件后每件价格",min:0,fractionDigits:2})}),nkcAPI("/shop/manage/settings","PUT",{dealDescription:e,dealAnnouncement:n,address:t,templates:i,location:a})}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)},addTemplate:function(){this.templates.push({name:"新建模板",firstPrice:0,addPrice:0})},removeTemplate:function(e){this.templates.splice(e,1)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById("data");
+let {address = "", dealDescription = "", dealAnnouncement = "", templates = []} = data.dealInfo || {};
+let locationStr = "";
+
+const index = address.indexOf("&");
+if(index === -1) {
+  locationStr = address;
+  address = "";
+} else {
+  locationStr = address.slice(0, index);
+  address = address.slice(index + 1);
+}
+window.app = new Vue({
+  el: "#address",
+  data: {
+    dealDescription,
+    dealAnnouncement,
+    address,
+    templates,
+    location: locationStr
+  },
+  mounted() {
+    window.SelectAddress = new NKC.modules.SelectAddress();
+  },
+  methods: {
+    selectAddress(address) {
+      SelectAddress.open(function(d) {
+        app.location = d.join("/");
+      }, {
+        onlyChina: true
+      });
+    },
+    checkString: NKC.methods.checkData.checkString,
+    checkNumber: NKC.methods.checkData.checkNumber,
+    save() {
+      const {
+        dealDescription, dealAnnouncement, address, templates, location
+      } = this;
+      Promise.resolve()
+        .then(() => {
+          app.checkString(dealDescription, {
+            name: "供货说明",
+            minLength: 0,
+            maxLength: 500
+          });
+          app.checkString(dealAnnouncement, {
+            name: "全局公告",
+            minLength: 0,
+            maxLength: 500
+          });
+          if(!location) throw "请选择区域";
+          app.checkString(location, {
+            name: "区域",
+            minLength: 1,
+            maxLength: 500
+          });
+          if(!address) throw "请输入详细地址";
+          app.checkString(address, {
+            name: "详细地址",
+            minLength: 1,
+            maxLength: 500
+          });
+          templates.map(t => {
+            t.firstPrice = parseFloat(t.firstPrice);
+            t.addPrice = parseFloat(t.addPrice);
+            let {name, firstPrice, addPrice} = t;
+            app.checkString(name, {
+              name: "模板名称",
+              minLength: 1,
+              maxLength: 100
+            });
+            app.checkNumber(firstPrice, {
+              name: "首件价格",
+              min: 0,
+              fractionDigits: 2
+            });
+            app.checkNumber(addPrice, {
+              name: "首件后每件价格",
+              min: 0,
+              fractionDigits: 2
+            });
+          });
+          return nkcAPI("/shop/manage/settings", "PUT", {
+            dealDescription, dealAnnouncement, address, templates, location
+          });
+        })
+        .then(() => {
+          sweetSuccess("保存成功");
+        })
+        .catch(sweetError);
+    },
+    addTemplate() {
+      this.templates.push({
+        name: "新建模板",
+        firstPrice: 0,
+        addPrice: 0
+      });
+    },
+    removeTemplate(index) {
+      this.templates.splice(index, 1);
+    }
+  }
+});

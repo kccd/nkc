@@ -1,1 +1,85 @@
-!function r(o,s,a){function u(e,t){if(!s[e]){if(!o[e]){var n="function"==typeof require&&require;if(!t&&n)return n(e,!0);if(c)return c(e,!0);throw(n=new Error("Cannot find module '"+e+"'")).code="MODULE_NOT_FOUND",n}n=s[e]={exports:{}},o[e][0].call(n.exports,function(t){return u(o[e][1][t]||t)},n,n.exports,r,o,s,a)}return s[e].exports}for(var c="function"==typeof require&&require,t=0;t<a.length;t++)u(a[t]);return u}({1:[function(t,e,n){"use strict";var r=NKC.methods.getDataById("data");new Vue({el:"#app",data:{content:"",users:[],friendsUid:r.friendsUid,page:0,pageCount:999999,end:!1,status:"unSearch"},methods:{getUrl:NKC.methods.tools.getUrl,toast:NKC.methods.appToast,checkContent:function(){var n=this;return new Promise(function(t,e){n.content?t(n.content):e("请输入内容")})},resetStatus:function(){this.status="unSearch"},getUser:function(){var r=this,t=this.page,e=this.content;if("searching"!==r.status)return r.status="searching",Promise.resolve().then(function(){return nkcAPI("/message/search?uid=".concat(e,"&username=").concat(e,"&page=").concat(t,"&t=").concat(Date.now()),"GET")}).then(function(t){var e=t.paging,n=e.page,e=e.pageCount;r.page=n,r.pageCount=e,r.users=r.users.concat(t.users),e<=n+1&&(r.end=!0),r.resetStatus()})},search:function(){var e=this;e.checkContent().then(function(){return e.page=0,e.end=!1,e.users=[],e.pageCount=999999,e.getUser()}).catch(function(t){e.resetStatus(),e.toast(t)})},loadMore:function(){var e=this;e.checkContent().then(function(){if(e.page+1>=e.pageCount)throw"到底了";return e.page+=1,e.getUser()}).catch(function(t){e.resetStatus(),e.toast(t)})},toSendMessage:function(t){NKC.methods.toChat(t.uid)},addFriend:function(t){NKC.methods.visitUrl("/message/addFriend?uid=".concat(t.uid),!0)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const app = new Vue({
+  el: "#app",
+  data: {
+    content: '',
+    users: [],
+    friendsUid: data.friendsUid,
+    page: 0,
+    pageCount: 999999,
+    end: false,
+    status: 'unSearch', // unSearch, searching
+  },
+  methods: {
+    getUrl: NKC.methods.tools.getUrl,
+    toast: NKC.methods.appToast,
+    checkContent() {
+      const self = this;
+      return new Promise(((resolve, reject) => {
+        if(!self.content) {
+          reject('请输入内容');
+        } else {
+          resolve(self.content);
+        }
+      }));
+    },
+    resetStatus() {
+      this.status = 'unSearch';
+    },
+    getUser() {
+      const self = this;
+      const {page, content} = this;
+      if(self.status === 'searching') return;
+      self.status = 'searching';
+      return Promise.resolve()
+        .then(() => {
+          return nkcAPI(`/message/search?uid=${content}&username=${content}&page=${page}&t=${Date.now()}`, 'GET')
+        })
+        .then(data => {
+          const {page, pageCount} = data.paging;
+          self.page = page;
+          self.pageCount = pageCount;
+          self.users = self.users.concat(data.users);
+          if(page + 1 >= pageCount) self.end = true;
+          self.resetStatus();
+        })
+
+    },
+    search() {
+      const self = this;
+      self.checkContent()
+        .then(() => {
+          self.page = 0;
+          self.end = false;
+          self.users = [];
+          self.pageCount = 999999;
+          return self.getUser();
+        })
+        .catch(data => {
+          self.resetStatus();
+          self.toast(data);
+        });
+    },
+    loadMore() {
+      const self = this;
+      self.checkContent()
+        .then(() => {
+          if(self.page + 1 >= self.pageCount) throw '到底了';
+          self.page += 1;
+          return self.getUser();
+        })
+        .catch((data) => {
+          self.resetStatus();
+          self.toast(data);
+        });
+    },
+    toSendMessage(u) {
+      NKC.methods.toChat(u.uid);
+    },
+    addFriend(u) {
+      NKC.methods.visitUrl(`/message/addFriend?uid=${u.uid}`, true);
+    }
+  }
+})
+
+window.app = app;

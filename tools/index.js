@@ -1,2 +1,1 @@
-const requireFolder = require('../requireFolder');
-module.exports = requireFolder(__dirname);
+module.exports = require('../requireFolder')(__dirname, ["script-helper"]);

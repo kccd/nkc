@@ -1,1 +1,253 @@
-!function s(r,i,o){function u(t,e){if(!i[t]){if(!r[t]){var n="function"==typeof require&&require;if(!e&&n)return n(t,!0);if(c)return c(t,!0);throw(n=new Error("Cannot find module '"+t+"'")).code="MODULE_NOT_FOUND",n}n=i[t]={exports:{}},r[t][0].call(n.exports,function(e){return u(r[t][1][e]||e)},n,n.exports,s,r,i,o)}return i[t].exports}for(var c="function"==typeof require&&require,e=0;e<o.length;e++)u(o[e]);return u}({1:[function(e,t,n){"use strict";function s(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function r(e,t){for(var n=0;n<t.length;n++){var s=t[n];s.enumerable=s.enumerable||!1,s.configurable=!0,"value"in s&&(s.writable=!0),Object.defineProperty(e,s.key,s)}}function i(e,t,n){return t&&r(e.prototype,t),n&&r(e,n),e}window.draft=new(function(){function e(){s(this,e)}return i(e,[{key:"removeDraft",value:function(e){nkcAPI("/u/"+NKC.configs.uid+"/drafts/"+e,"DELETE").then(function(){window.location.reload()}).catch(function(e){sweetError(e)})}},{key:"removeDraftSingle",value:function(e){var t=this;sweetQuestion("确定要删除当前草稿？删除后不可恢复。").then(function(){t.removeDraft(e)}).catch(function(){})}},{key:"removeAll",value:function(){var e=this;sweetQuestion("确定要删除全部草稿？删除后不可恢复。").then(function(){e.removeDraft("all")}).catch(function(){})}},{key:"getInputs",value:function(){return $(".draft-checkbox input")}},{key:"getSelectedDraftsId",value:function(){for(var e=[],t=this.getInputs(),n=0;n<t.length;n++){var s=t.eq(n);s.prop("checked")&&e.push(s.attr("data-did"))}return e}},{key:"selectAll",value:function(){var e=this.getSelectedDraftsId(),t=this.getInputs();e.length!==t.length?t.prop("checked",!0):t.prop("checked",!1)}},{key:"removeSelectedDrafts",value:function(){var e,t=this.getSelectedDraftsId(),n=this;t.length&&(e=t.join("-"),sweetQuestion("确定要删除已勾选的草稿？删除后不可恢复。").then(function(){n.removeDraft(e)}).catch(function(){}))}}]),e}());var o=NKC.methods.getDataById("subUsersId");window.SubscribeTypes||(window.SubscribeTypes=new NKC.modules.SubscribeTypes),window.user=new(function(){function e(){s(this,e),this.subUsersId=o.subUsersId,this.subForumsId=o.subForumsId,this.subColumnsId=o.subColumnsId,this.subThreadsId=o.subThreadsId,this.collectionThreadsId=o.collectionThreadsId,this.subscribes=o.subscribes}return i(e,[{key:"moveSub",value:function(e){this.moveSubs([e])}},{key:"moveSubs",value:function(){var e=0<arguments.length&&void 0!==arguments[0]?arguments[0]:[],n=[],t=this;e.map(function(e){e=t.subscribes[e];e&&n.push(e)});var s=[];if(1===n.length)s=n[0].cid;else if(0===n.length)return;e=n.map(function(e){return e._id}),SubscribeTypes.open(function(t){nkcAPI("/account/subscribes","PUT",{type:"modifyType",typesId:t,subscribesId:e}).then(function(){SubscribeTypes.close(),n.map(function(e){e.cid=t}),sweetSuccess("执行成功")}).catch(function(e){sweetError(e)})},{selectedTypesId:s,hideInfo:!0,selectTypesWhenSubscribe:!0})}},{key:"subscribe",value:function(t,n){var s,r,i=$(".account-follower-buttons[data-".concat(n,"='").concat(t,"']"));"user"===n?(s=this.subUsersId,r=SubscribeTypes.subscribeUserPromise):"forum"===n?(s=this.subForumsId,r=SubscribeTypes.subscribeForumPromise):"column"===n?(s=this.subColumnsId,t=Number(t),r=SubscribeTypes.subscribeColumnPromise):"thread"===n?(s=this.subThreadsId,r=SubscribeTypes.subscribeThreadPromise):"collection"===n&&(s=this.collectionThreadsId,r=SubscribeTypes.collectionThreadPromise);var o=!s.includes(t);new Promise(function(t,e){["user","collection","thread"].includes(n)&&o?SubscribeTypes.open(function(e){t(e)}):t()}).then(function(e){return e?r(t,o,e):r(t,o)}).then(function(){var e;SubscribeTypes.close(),o?("collection"===n?sweetSuccess("收藏成功"):sweetSuccess("关注成功"),i.addClass("active"),-1===s.indexOf(t)&&s.push(t)):("collection"===n?sweetSuccess("收藏已取消"):sweetSuccess("关注已取消"),i.removeClass("active"),-1!==(e=s.indexOf(t))&&s.splice(e,1))}).catch(sweetError)}},{key:"editType",value:function(){SubscribeTypes.open(function(){},{editType:!0})}}]),e}()),window.removeBlacklist=function(e,t){NKC.methods.removeUserFromBlacklist(e).then(function(e){!e||(e=$('[data-type="blacklist"][data-id="'.concat(t,'"]')))&&e.length&&e.remove()})},NKC.configs.isApp&&window.ready().then(function(){newEvent("userChanged",function(e){e.user&&(window.location.href=window.location.pathname.replace(/\/u\/([0-9]+\/)/gi,"/u/"+e.user.uid+"/"))})})},{}]},{},[1]);
+window.draft = new (class {
+  constructor() {
+
+  }
+  removeDraft(did) {
+    nkcAPI('/u/' + NKC.configs.uid + "/drafts/" + did, "DELETE")
+      .then(function() {
+        window.location.reload();
+      })
+      .catch(function(data) {
+        sweetError(data);
+      })
+  }
+  removeDraftSingle(did) {
+    const self = this;
+    sweetQuestion("确定要删除当前草稿？删除后不可恢复。")
+      .then(function() {
+        self.removeDraft(did);
+      })
+      .catch(function() {})
+  }
+  /*
+  * 清空草稿箱
+  * */
+  removeAll() {
+    var self = this;
+    sweetQuestion("确定要删除全部草稿？删除后不可恢复。")
+      .then(function() {
+        self.removeDraft("all");
+      })
+      .catch(function(){})
+  }
+
+  getInputs() {
+    return $(".draft-checkbox input");
+  }
+
+  getSelectedDraftsId() {
+    var arr = [];
+    var dom = this.getInputs();
+    for(var i = 0; i < dom.length; i++) {
+      var d = dom.eq(i);
+      if(d.prop("checked")) {
+        arr.push(d.attr("data-did"));
+      }
+    }
+    return arr;
+  }
+
+  selectAll() {
+    var selectedDraftsId = this.getSelectedDraftsId();
+    var dom = this.getInputs();
+    if(selectedDraftsId.length !== dom.length) {
+      dom.prop("checked", true);
+    } else {
+      dom.prop("checked", false);
+    }
+  }
+
+  removeSelectedDrafts() {
+    var selectedDraftsId = this.getSelectedDraftsId();
+    var self = this;    if(!selectedDraftsId.length) return;
+    var did = selectedDraftsId.join("-");
+    sweetQuestion("确定要删除已勾选的草稿？删除后不可恢复。")
+      .then(function() {
+        self.removeDraft(did);
+      })
+      .catch(function() {})
+  }
+})();
+const data = NKC.methods.getDataById("subUsersId");
+if(!window.SubscribeTypes) {
+  window.SubscribeTypes = new NKC.modules.SubscribeTypes();
+}
+window.user = new (class {
+  constructor() {
+    this.subUsersId = data.subUsersId;
+    this.subForumsId = data.subForumsId;
+    this.subColumnsId = data.subColumnsId;
+    this.subThreadsId = data.subThreadsId;
+    this.collectionThreadsId = data.collectionThreadsId;
+    this.subscribes = data.subscribes;
+  }
+  moveSub(subId) {
+    this.moveSubs([subId]);
+  }
+  moveSubs(subsId = []) {
+    const subscribes = [];
+    const self = this;
+    subsId.map(id => {
+      const s = self.subscribes[id];
+      if(s) subscribes.push(s);
+    });
+    let selectedTypesId = [];
+    if(subscribes.length === 1) {
+      selectedTypesId = subscribes[0].cid;
+    } else if(subscribes.length === 0) {
+      return;
+    }
+    subsId = subscribes.map(s => s._id);
+
+    SubscribeTypes.open(function(typesId) {
+      nkcAPI("/account/subscribes", "PUT", {
+        type: "modifyType",
+        typesId: typesId,
+        subscribesId: subsId
+      })
+        .then(function() {
+          SubscribeTypes.close();
+          subscribes.map(s => {
+            s.cid = typesId
+          });
+          sweetSuccess("执行成功");
+        })
+        .catch(function(data) {
+          sweetError(data);
+        })
+    }, {
+      selectedTypesId: selectedTypesId,
+      hideInfo: true,
+      selectTypesWhenSubscribe: true
+    });
+  }
+
+  subscribe(id, type) {
+    const buttonsDom = $(`.account-follower-buttons[data-${type}='${id}']`);
+    let subId, func;
+    if(type === "user") {
+      subId = this.subUsersId;
+      func = SubscribeTypes.subscribeUserPromise;
+    } else if(type === "forum") {
+      subId = this.subForumsId;
+      func = SubscribeTypes.subscribeForumPromise;
+    } else if(type === "column") {
+      subId = this.subColumnsId;
+      id = Number(id);
+      func = SubscribeTypes.subscribeColumnPromise;
+    } else if(type === "thread") {
+      subId = this.subThreadsId;
+      func = SubscribeTypes.subscribeThreadPromise;
+    } else if(type === "collection") {
+      subId = this.collectionThreadsId;
+      func = SubscribeTypes.collectionThreadPromise;
+    }
+
+    const sub = !subId.includes(id);
+
+    new Promise((resolve, reject) => {
+      if(!["user", "collection", "thread"].includes(type) || !sub) {
+        resolve();
+      } else {
+        SubscribeTypes.open((cid) => {
+          resolve(cid);
+        });
+      }
+    })
+      .then(cid => {
+        if(cid) {
+          return func(id, sub, cid);
+        } else {
+          return func(id, sub);
+        }
+      })
+      .then(() => {
+        SubscribeTypes.close();
+        if(sub) {
+          if(type === "collection") {
+            sweetSuccess("收藏成功");
+          } else {
+            sweetSuccess("关注成功");
+          }
+          buttonsDom.addClass("active");
+          const index = subId.indexOf(id);
+          if(index === -1) subId.push(id);
+        } else {
+          if(type === "collection") {
+            sweetSuccess("收藏已取消");
+          } else {
+            sweetSuccess("关注已取消");
+          }
+          buttonsDom.removeClass("active");
+          const index = subId.indexOf(id);
+          if(index !== -1) subId.splice(index, 1);
+        }
+      })
+      .catch(sweetError);
+
+
+    /*if(sub) {
+      SubscribeTypes.open(function(cid) {
+        func(id, sub, cid)
+          .then(function() {
+            SubscribeTypes.close();
+            if(type === "collection") {
+              sweetSuccess("收藏成功");
+            } else {
+              sweetSuccess("关注成功");
+            }
+            buttonsDom.addClass("active");
+            const index = subId.indexOf(id);
+            if(index === -1) subId.push(id);
+          })
+          .catch(function(data) {
+            sweetError(data);
+          })
+      });
+
+    } else {
+
+      func(id, sub)
+        .then(function() {
+          buttonsDom.removeClass("active");
+          if(type === "collection") {
+            sweetSuccess("收藏已取消");
+          } else {
+            sweetSuccess("关注已取消");
+          }
+          const index = subId.indexOf(id);
+          if(index !== -1) subId.splice(index, 1);
+        })
+        .catch(function(data) {
+          sweetError(data);
+        })
+    }*/
+  }
+  editType() {
+    SubscribeTypes.open(function() {
+
+    }, {
+      editType: true
+    })
+  }
+})();
+
+
+window.removeBlacklist = (uid, _id) => {
+  NKC.methods.removeUserFromBlacklist(uid)
+    .then(data => {
+      if(!data) return;
+      const dom = $(`[data-type="blacklist"][data-id="${_id}"]`);
+      if(dom && dom.length) dom.remove();
+    })
+}
+
+if(NKC.configs.isApp) {
+  window.ready()
+    .then(function() {
+      newEvent("userChanged", function(data) {
+        if(!data.user) return;
+        window.location.href = window.location.pathname.replace(/\/u\/([0-9]+\/)/ig, "/u/" + data.user.uid + "/");
+      });
+    })
+}

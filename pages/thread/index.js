@@ -1,8 +1,6 @@
 var SubscribeTypes, surveyForms = [], draftId = "", author = {};
-var hidePostMaxHeight;
-var hidePostFloat;
-var Attachments;
-var quotePostApp;
+window.Attachments = undefined;
+window.quotePostApp = undefined;
 $(document).ready(function(){
   new Promise(function(resolve, reject) {
   	if(NKC.configs.isApp) {
@@ -233,8 +231,6 @@ function set_selection(the_id,start_pos,end_pos)
 }
 
 var replyTarget = ga('replytarget','value');
-var screenTopAlert = screenTopAlert;
-
 
 function cartThread(tid){
 	nkcAPI('addThreadToCart',{tid:tid})
@@ -870,12 +866,14 @@ function htmlDecode(text){
 function displayManagement() {
 	$('.managementDiv').slideToggle();
 }
+window.displayManagement = displayManagement;
 var threadContent = $('.thread-content');
 var hiddenThreadContent = $('.hiddenThreadContent');
 var maxHeight = threadContent.css('max-height');
 var showThreadContentBtn = $('.showThreadContentBtn');
 var showText = showThreadContentBtn.text();
 var hideText = showThreadContentBtn.attr('hide-text');
+
 function showThreadContent() {
 	if(hiddenThreadContent.css('display') === 'none') {
 		hiddenThreadContent.show();
@@ -891,6 +889,7 @@ function showThreadContent() {
 $(".dropdown-menu.stop-propagation").on("click",function (e) {
 	e.stopPropagation();
 });
+
 function removeForumsId(tid, fid) {
   nkcAPI('/t/' + tid + '/forum?fid=' + fid, 'DELETE', {})
   .then(function() {
@@ -1006,10 +1005,10 @@ function turnSearch(text) {
 }
 
 
-var ColumnCategoriesDom;
+window.ColumnCategoriesDom = undefined;
 $(function() {
   if(NKC.modules.SelectColumnCategories) {
-    ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
+    window.ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
   }
   var proDom = $("#protocolCheckbox");
   proDom.on("change", function() {
@@ -1058,26 +1057,9 @@ function topPost(pid, topped) {
     });
 }
 
-/*function showAttachments(dom) {
-	dom = $(dom);
-	var fa = dom.find(".icon");
-	if(fa.hasClass("fa-angle-double-down")) {
-		if(!window.Attachments) {
-			Attachments = new NKC.modules.Attachments({
-				pid: NKC.configs.pid,
-				fid: NKC.configs.fid
-			});
-		}
-		Attachments.show();
-		fa.removeClass("fa-angle-double-down").addClass("fa-angle-double-up");
-	} else {
-		Attachments.hidden();
-		fa.removeClass("fa-angle-double-up").addClass("fa-angle-double-down");
-	}
-}*/
 function showAttachments() {
 	if(!window.Attachments) {
-		Attachments = new NKC.modules.Attachments({
+		window.Attachments = new NKC.modules.Attachments({
 			pid: NKC.configs.pid,
 			fid: NKC.configs.fid
 		});
@@ -1350,4 +1332,70 @@ ue.ready(function() {
 			$("#ButtonReply").click();
     }
 	})
+});
+
+
+Object.assign(window, {
+	addToColumn,
+	removeToColumn,
+	get_selection,
+	replace_selection,
+	set_selection,
+	cartThread,
+	cartPost,
+	setDigest,
+	cancelDigest,
+	setTopped,
+	cancelTopped,
+	assemblePostObject,
+	modifyMathJax,
+	getPost,
+	autoSaveDraft,
+	saveDraft,
+	setSubmitButton,
+	submit,
+	quotePost,
+	dateTimeString,
+	at,
+	goEditor,
+	extractfid,
+	moveThreadTo,
+	askCategoryOfForum,
+	recycleThread,
+	widerArea,
+	switchVInPersonalForum,
+	moveToPersonalForum,
+	switchDInPersonalForum,
+	switchTInPersonalForum,
+	adSwitch,
+	htmlDecode,
+	displayManagement,
+	showThreadContent,
+	removeForumsId,
+	addForum,
+	originTextShow,
+	originTextClose,
+	originPanelShow,
+	originPanelClose,
+	turnUser,
+	turnSearch,
+	getSelectedColumnCategoriesId,
+	disabledPostButtonByProtocol,
+	topPost,
+	showAttachments,
+	displayAuthor,
+	pushGoodsToHome,
+	moveThread,
+	deleteThread,
+	openHidePostPanel,
+	getPostsDom,
+	resetCheckbox,
+	markAllPosts,
+	managePosts,
+	getMarkedPostsId,
+	disabledThreadPost,
+	disabledMarkedPosts,
+	joinPostRoom,
+	insertRenderedPost,
+	insertRenderedComment
 });

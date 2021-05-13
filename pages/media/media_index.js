@@ -11,15 +11,15 @@ moduleCrop.init(function(data) {
 
 var quota = 12; // 每页显示数量
 var skip = 0; // 当前页数
-var media;
+window.media = undefined;
 var j = 0;
 const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 const videoExts = ["mp4", "mov", "3gp", "avi"];
 const audioExts = ["mp3", "wav"];
-var isPc;
+window.isPc = undefined;
 $(document).ready(function() {
-  isPc = IsPC();
-  media = new Vue({
+  window.isPc = IsPC();
+  window.media = new Vue({
     el: "#mediaList",
     data: {
       mediaType: 'all',
@@ -445,7 +445,7 @@ function pictureEdit(rid) {
   .then(function(data) {
     if(data.originId) {
       moduleCrop.replace("/ro/"+data.originId)
-      originId = data.originId;
+      window.originId = data.originId;
     }else{
       moduleCrop.replace("/r/"+rid)
     }
@@ -522,3 +522,27 @@ function mediaInsertUE(rid, fileType, name) {
     screenTopWarning("缺少编辑器")
   }
 }
+
+Object.assign(window, {
+  loadMedia,
+  prevPage,
+  nextPage,
+  turnPage,
+  allInsert,
+  pictureInsert,
+  videoInsert,
+  audioInsert,
+  attachmentInsert,
+  fileSelect,
+  filePaste,
+  uploadFile,
+  clickButton,
+  fileSizeFormat,
+  cancelFailure,
+  IsPC,
+  fileNameShrink,
+  pictureEdit,
+  saveNewEditPicture,
+  fileListToArray,
+  mediaInsertUE,
+});

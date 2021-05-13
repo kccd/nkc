@@ -373,3 +373,20 @@ function submit(id) {
 			screenTopWarning(data.error);
 		})
 }
+
+Object.assign(window, {
+	fundObj,
+	loadSettings,
+	colorSet,
+	color,
+	uploadFundImage,
+	uploadfundLogoImage,
+	uploadSuccess,
+	uploadAvatarImgSuccess,
+	moneyFixedSet,
+	moneyFixed,
+	deleteBanner,
+	deleteLogo,
+	stringToArr,
+	submit,
+});

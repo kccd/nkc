@@ -1,1 +1,116 @@
-!function r(o,i,u){function a(t,e){if(!i[t]){if(!o[t]){var n="function"==typeof require&&require;if(!e&&n)return n(t,!0);if(l)return l(t,!0);throw(n=new Error("Cannot find module '"+t+"'")).code="MODULE_NOT_FOUND",n}n=i[t]={exports:{}},o[t][0].call(n.exports,function(e){return a(o[t][1][e]||e)},n,n.exports,r,o,i,u)}return i[t].exports}for(var l="function"==typeof require&&require,e=0;e<u.length;e++)a(u[e]);return a}({1:[function(e,t,n){"use strict";function r(e,t){var n;if("undefined"==typeof Symbol||null==e[Symbol.iterator]){if(Array.isArray(e)||(n=function(e,t){if(e){if("string"==typeof e)return a(e,t);var n=Object.prototype.toString.call(e).slice(8,-1);return"Map"===(n="Object"===n&&e.constructor?e.constructor.name:n)||"Set"===n?Array.from(e):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?a(e,t):void 0}}(e))||t&&e&&"number"==typeof e.length){n&&(e=n);var r=0,t=function(){};return{s:t,n:function(){return r>=e.length?{done:!0}:{done:!1,value:e[r++]}},e:function(e){throw e},f:t}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var o,i=!0,u=!1;return{s:function(){n=e[Symbol.iterator]()},n:function(){var e=n.next();return i=e.done,e},e:function(e){u=!0,o=e},f:function(){try{i||null==n.return||n.return()}finally{if(u)throw o}}}}function a(e,t){(null==t||t>e.length)&&(t=e.length);for(var n=0,r=new Array(t);n<t;n++)r[n]=e[n];return r}var o=new NKC.methods.selectImage;window.app=new Vue({el:"#app",data:{type:"multiple",name:"",description:"",cover:"",coverData:"",share:!1,stickers:[],error:"",uploading:!1},computed:{disableButton:function(){var e,t=!0,n=r(this.stickers);try{for(n.s();!(e=n.n()).done;)"uploaded"!==e.value.status&&(t=!1)}catch(e){n.e(e)}finally{n.f()}return t}},methods:{getSize:NKC.methods.getSize,selectLocalFile:function(){$("#uploadInput").click()},selectedLocalFile:function(){var e,t=r($("#uploadInput")[0].files);try{for(t.s();!(e=t.n()).done;){var n=e.value;this.addSticker(n)}}catch(e){t.e(e)}finally{t.f()}},addSticker:function(e){var t=this;this.getStickerByFile(e).then(function(e){t.stickers.push(e)})},getStickerByFile:function(r,o){return new Promise(function(t,e){var n={file:r,progress:0,error:"",status:"unUploaded",name:o||r.name||Date.now()+".png"};NKC.methods.fileToUrl(r).then(function(e){n.url=e,t(n)})})},removeFormArr:function(e,t){e.splice(t,1)},cropImage:function(t){var n=this.stickers.indexOf(t),r=this;o.show(function(e){e=NKC.methods.blobToFile(e);r.getStickerByFile(e,t.file.name).then(function(e){Vue.set(r.stickers,n,e),o.close()})},{url:t.url,aspectRatio:1})},upload:function(t,n){var r=this;if(!t.length||n>=t.length||!t[n])return r.uploading=!1;var o=t[n];r.uploading=!0,Promise.resolve().then(function(){o.status="uploading";var e=new FormData;return e.append("file",o.file),e.append("type","sticker"),e.append("fileName",o.name),r.share&&e.append("share","true"),nkcUploadFile("/r","POST",e,function(e,t){o.progress=t})}).then(function(){o.status="uploaded",r.upload(t,n+1)}).catch(function(e){o.error=e.error||e,o.status="unUploaded",r.upload(t,n+1)})},submit:function(){var e=(e=this.stickers).filter(function(e){return"uploaded"!==e.status});this.upload(e,0)}}})},{}]},{},[1]);
+const SelectImage = new NKC.methods.selectImage();
+window.app = new Vue({
+  el: "#app",
+  data: {
+    type: "multiple", // multiple、single
+    name: "",
+    description: "",
+    cover: "",
+    coverData: "",
+    share: false,
+    stickers: [],
+    error: "",
+    uploading: false
+  },
+  computed: {
+    disableButton() {
+      let disable = true;
+      for(const s of this.stickers) {
+        if(s.status !== "uploaded") disable = false;
+      }
+      return disable;
+    },
+  },
+  methods: {
+    getSize: NKC.methods.getSize,
+    selectLocalFile() {
+      $("#uploadInput").click();
+    },
+    selectedLocalFile() {
+      const input = $("#uploadInput")[0];
+      const files = input.files;
+      for(let file of files) {
+        this.addSticker(file);
+      }
+    },
+    addSticker(file){
+      const self = this;
+      this.getStickerByFile(file)
+        .then(s => {
+          self.stickers.push(s);
+        })
+    },
+    getStickerByFile(file, filename) {
+      const self = this;
+      return new Promise((resolve, reject) => {
+        const sticker = {
+          file,
+          progress: 0,
+          error: "",
+          status: "unUploaded",
+          name: filename || file.name || (Date.now() + ".png")
+        };
+        NKC.methods.fileToUrl(file)
+          .then(url => {
+            sticker.url = url;
+            resolve(sticker);
+          });
+      });
+    },
+    removeFormArr(arr, index) {
+      arr.splice(index, 1);
+    },
+    cropImage(sticker) {
+      const index = this.stickers.indexOf(sticker);
+      const self = this;
+      SelectImage.show(data => {
+        const file = NKC.methods.blobToFile(data);
+        self.getStickerByFile(file, sticker.file.name)
+          .then(s => {
+            Vue.set(self.stickers, index, s);
+            SelectImage.close();
+          })
+      }, {
+        url: sticker.url,
+        aspectRatio: 1
+      })
+    },
+    upload(arr, index) {
+      const self = this;
+      if(!arr.length || index >= arr.length || !arr[index]) {
+        return self.uploading = false;
+      }
+      const sticker = arr[index];
+      self.uploading = true;
+      Promise.resolve()
+        .then(() => {
+          sticker.status = "uploading";
+          var formData = new FormData();
+          formData.append("file", sticker.file);
+          formData.append("type", "sticker");
+          formData.append("fileName", sticker.name);
+          if(self.share) {
+            formData.append("share", "true");
+          }
+          return nkcUploadFile("/r", "POST", formData, function(e, progress) {
+            sticker.progress = progress;
+          });
+        })
+        .then(() => {
+          sticker.status = "uploaded";
+          self.upload(arr, index + 1);
+        })
+        .catch((data) => {
+          sticker.error = data.error || data;
+          sticker.status = "unUploaded";
+          self.upload(arr, index + 1);
+        })
+    },
+    submit() {
+      const self = this;
+      let {stickers} = self;
+      stickers = stickers.filter(s => s.status !== "uploaded");
+      this.upload(stickers, 0);
+    }
+  }
+});

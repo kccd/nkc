@@ -78,3 +78,11 @@ function selectMark() {
     selectMul: true
   })
 }
+
+Object.assign(window, {
+  setPerpage,
+  showInfo,
+  showAll,
+  selectAll,
+  selectMark,
+})

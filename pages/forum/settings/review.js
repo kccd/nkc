@@ -1,1 +1,28 @@
-!function t(n,i,s){function a(r,e){if(!i[r]){if(!n[r]){var o="function"==typeof require&&require;if(!e&&o)return o(r,!0);if(u)return u(r,!0);throw(o=new Error("Cannot find module '"+r+"'")).code="MODULE_NOT_FOUND",o}o=i[r]={exports:{}},n[r][0].call(o.exports,function(e){return a(n[r][1][e]||e)},o,o.exports,t,n,i,s)}return i[r].exports}for(var u="function"==typeof require&&require,e=0;e<s.length;e++)a(s[e]);return a}({1:[function(e,r,o){"use strict";var t=NKC.methods.getDataById("data"),n=t.fid,i=t.wordGroupInfo,s=t.keywordReviewPlanUseTo,a=t.useGroup,u=t.reviewPlan,w=t.roleGradeReview;new Vue({el:"#app",data:{roles:t.roles,grades:t.grades,keywordReview:{wordGroupInfo:i,keywordReviewPlanUseTo:s,selectedGroup:a||[]},reviewPlan:u,roleGradeReview:{roles:w.roles||[],grades:w.grades||[],relationship:w.relationship||"or"}},methods:{submit:function(){var e=this.keywordReview,r=this.reviewPlan,o=this.roleGradeReview;return nkcAPI("/f/".concat(n,"/settings/review"),"PUT",{keywordReviewPlanUseTo:e.keywordReviewPlanUseTo,newUseWordGroup:e.selectedGroup,reviewPlan:r,roleGradeReview:o}).then(function(){return sweetAlert("保存成功")}).catch(sweetError)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const fid = data.fid;
+const app = new Vue({
+  el: '#app',
+  data: {
+    roles: data.roles,
+    grades: data.grades,
+    wordGroupInfo: data.wordGroupInfo,
+    settings: data.forumReviewSettings,
+  },
+  methods: {
+    submit() {
+      const {
+        settings
+      } = this;
+      return nkcAPI(`/f/${fid}/settings/review`, "PUT", {
+        settings
+      })
+      .then(() => sweetAlert("保存成功"))
+      .catch(sweetError);
+    }
+  }
+})
+
+Object.assign(window, {
+  fid,
+  app,
+});

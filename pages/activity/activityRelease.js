@@ -1,7 +1,8 @@
-var upLoadFile;
+window.upLoadFile = undefined;
 
 // 初始化编辑器
 var ue = UE.getEditor("editor", NKC.configs.ueditor.activityConfigs);
+window.ue = ue;
 
 $.getJSON('../location.json',function(data){
 	for (var i = 0; i < data.length; i++) {
@@ -15,7 +16,7 @@ $.getJSON('../location.json',function(data){
 $('#inputFile').on('change', function() {
 	var file = $('#inputFile')[0].files[0];
 	if(file) {
-		upLoadFile = file;
+		window.upLoadFile = file;
 	}
 	// var reader = new FileReader();
 	// reader.onload = function() {
@@ -27,9 +28,9 @@ $('#inputFile').on('change', function() {
 });
 
 
-var customForm;
+window.customForm = undefined;
 if(NKC.modules.customForm) {
-  customForm = new NKC.modules.customForm();
+  window.customForm = new NKC.modules.customForm();
 }
 $(document).ready(function() {
   customForm.init();
@@ -237,3 +238,17 @@ function addOneForm() {
 function delOneForm(para) {
   $(para).parent().remove();
 }
+
+Object.assign(window, {
+  ue,
+  customForm,
+  insertToImage,
+  submitRelease,
+  timeStampCheck,
+  deadlineCheck,
+  postPoster,
+  choosePoster,
+  savePoster,
+  addOneForm,
+  delOneForm,
+});

@@ -1,1 +1,133 @@
-!function r(o,s,u){function i(t,e){if(!s[t]){if(!o[t]){var n="function"==typeof require&&require;if(!e&&n)return n(t,!0);if(a)return a(t,!0);throw(n=new Error("Cannot find module '"+t+"'")).code="MODULE_NOT_FOUND",n}n=s[t]={exports:{}},o[t][0].call(n.exports,function(e){return i(o[t][1][e]||e)},n,n.exports,r,o,s,u)}return s[t].exports}for(var a="function"==typeof require&&require,e=0;e<u.length;e++)i(u[e]);return i}({1:[function(e,t,n){"use strict";function a(e,t){var n;if("undefined"==typeof Symbol||null==e[Symbol.iterator]){if(Array.isArray(e)||(n=function(e,t){if(e){if("string"==typeof e)return i(e,t);var n=Object.prototype.toString.call(e).slice(8,-1);return"Map"===(n="Object"===n&&e.constructor?e.constructor.name:n)||"Set"===n?Array.from(e):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?i(e,t):void 0}}(e))||t&&e&&"number"==typeof e.length){n&&(e=n);var r=0,t=function(){};return{s:t,n:function(){return r>=e.length?{done:!0}:{done:!1,value:e[r++]}},e:function(e){throw e},f:t}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var o,s=!0,u=!1;return{s:function(){n=e[Symbol.iterator]()},n:function(){var e=n.next();return s=e.done,e},e:function(e){u=!0,o=e},f:function(){try{s||null==n.return||n.return()}finally{if(u)throw o}}}}function i(e,t){(null==t||t>e.length)&&(t=e.length);for(var n=0,r=new Array(t);n<t;n++)r[n]=e[n];return r}var r=NKC.methods.getDataById("data"),o=new Map([["protocol",function(e){return e.protocol.haveReadProtocol?{passed:!0}:{passed:!1,message:"请先仔细阅读开办指南"}}],["enter_info",function(e){var t=e.enterInfo,n=e.sendInvite;return t.newForumName&&t.reason&&t.youWantToDo?t.reason.length<200?{passed:!1,message:"申请理由至少200个字符"}:n.userId.length<3?{passed:!1,message:"请至少选择3个人作为专业共同创始人"}:void e.commitData():{passed:!1,message:"请先完整填写"}}],["sucess_section",function(e){}]]),s=Array.from(o.keys());new Vue({el:"#app",data:{step:0,protocol:{haveReadProtocol:!1},enterInfo:{newForumName:"",reason:"",youWantToDo:""},sendInvite:{userId:[],users:[]},appliedForums:r.appliedForums,reviewNewForumGuide:r.reviewNewForumGuide,buttonName:"提交",submitting:!1},computed:{stepName:function(){return s[this.step]||s[0]}},methods:{toStep:function(e){var t=(0,this.checker)(this.stepName),n=t.passed,t=t.message;return n?this.step=e:sweetError(t)},checker:function(e){if(o.has(e)){e=o.get(e);return"function"==typeof e?e(this):{}}return{}},selectUsers:function(){var i=this;u.open(function(e){var t,n=a(e.users);try{for(n.s();!(t=n.n()).done;){var r=t.value,o=r.uid,s=r.username,u=r.avatar;i.sendInvite.userId.includes(o)||(i.sendInvite.users.push({username:s,avatarUrl:NKC.methods.tools.getUrl("userAvatar",u),uid:o}),i.sendInvite.userId.push(o))}}catch(e){n.e(e)}finally{n.f()}},{userCount:99})},deleteFounder:function(e){this.sendInvite.users.splice(e,1),this.sendInvite.userId.splice(e,1)},commitData:function(){var e=this.enterInfo,t=this.sendInvite,n=this;return n.buttonName="提交中...",n.submitting=!0,nkcAPI("/u/".concat(NKC.configs.uid,"/forum/apply"),"POST",{info:e,invites:t.userId}).then(function(){console.log("提交成功"),n.buttonName="提交",n.submitting=!1,n.step=2}).catch(function(e){n.step=1,sweetError(e)}).finally(function(){n.buttonName="提交",n.submitting=!1})}}});var u=new NKC.modules.SelectUser},{}]},{},[1]);
+let data = NKC.methods.getDataById("data");
+
+const stepCheckerMap = new Map([
+  ["protocol",    // 开办指南
+    function({ protocol }) {
+      return protocol.haveReadProtocol
+        ? {passed:true}
+        : {passed:false, message: "请先仔细阅读开办指南"}
+    }
+  ],
+  ["enter_info",   // 录入信息
+    function(vm) {
+      let { enterInfo, sendInvite } = vm;
+      if(!enterInfo.newForumName || !enterInfo.reason || !enterInfo.youWantToDo) {
+        return {passed: false, message: "请先完整填写"}
+      }
+      if(enterInfo.reason.length < 200) {
+        return {passed: false, message: "申请理由至少200个字符"}
+      }
+      if(sendInvite.userId.length < 3) {
+        return {passed: false, message: "请至少选择3个人作为专业共同创始人"}
+      } else {
+        vm.commitData();
+      }
+    }
+  ],
+  ["sucess_section",  // 提交成功提示
+    function(vm) {
+
+    }
+  ]
+])
+
+const stepNames = Array.from(stepCheckerMap.keys());
+
+new Vue({
+  el: "#app",
+  data: {
+    step: 0,
+    protocol: {
+      haveReadProtocol: false,
+    },
+    enterInfo: {
+      newForumName: "",
+      reason: "",
+      youWantToDo: ""
+    },
+    sendInvite: {
+      userId: [],
+      users: []
+    },
+    appliedForums: data.appliedForums,
+    reviewNewForumGuide: data.reviewNewForumGuide,
+    buttonName: "提交",
+    submitting: false
+  },
+  computed: {
+    stepName() {
+      return stepNames[this.step] || stepNames[0];
+    }
+  },
+  methods: {
+    toStep(index) {
+      let { checker, stepName } = this;
+      let { passed, message } = checker(stepName);
+      return passed
+        ? this.step = index
+        : sweetError(message);
+    },
+    checker(stepName) {
+      let vm = this;
+      if(stepCheckerMap.has(stepName)) {
+        let stepChecker = stepCheckerMap.get(stepName);
+        return typeof stepChecker === "function"
+          ? stepChecker(vm)
+          : {}
+      }
+      return {};
+    },
+    selectUsers() {
+      let self = this;
+      selectUserModule.open((data) => {
+        const {users} = data;
+        for(const user of users) {
+          const {uid, username, avatar} = user;
+          if(self.sendInvite.userId.includes(uid)) continue;
+          self.sendInvite.users.push({
+            username,
+            avatarUrl: NKC.methods.tools.getUrl('userAvatar', avatar),
+            uid
+          });
+          self.sendInvite.userId.push(uid);
+        }
+      }, {userCount: 99})
+    },
+    deleteFounder(index) {
+      this.sendInvite.users.splice(index, 1);
+      this.sendInvite.userId.splice(index, 1);
+    },
+    commitData() {
+      let { enterInfo, sendInvite } = this;
+      let self = this;
+      self.buttonName = "提交中...";
+      self.submitting = true;
+      return nkcAPI(`/u/${NKC.configs.uid}/forum/apply`, "POST", {info: enterInfo, invites: sendInvite.userId})
+        .then(() => {
+          console.log("提交成功");
+          self.buttonName = "提交";
+          self.submitting = false;
+          self.step = 2;
+        })
+        .catch((data) => {
+          self.step = 1;
+          sweetError(data);
+        })
+        .finally(() => {
+          self.buttonName = "提交";
+          self.submitting = false;
+        })
+    }
+  }
+})
+
+
+// 选择用户组件
+const selectUserModule = new NKC.modules.SelectUser();
+
+
+Object.assign(window, {
+  stepCheckerMap,
+  stepNames,
+  selectUserModule,
+});

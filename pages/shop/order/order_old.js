@@ -62,3 +62,11 @@ function joinToDiscuss(threadId) {
   // window.location.href = targetUrl;
   openToNewLocation(targetUrl);
 }
+
+Object.assign(window, {
+  cancelOrder,
+  visitLogisticsInfo,
+  comfirmReceipt,
+  payNow,
+  joinToDiscuss,
+});

@@ -143,3 +143,5 @@ var floatUserPanel = new Vue({
     }*/
   }
 });
+
+window.floatUserPanel = floatUserPanel;

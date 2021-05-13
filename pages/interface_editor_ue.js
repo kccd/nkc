@@ -130,19 +130,19 @@ function saveDraft() {
 * */
 var postData = NKC.methods.getDataById("postData");
 var targetPost = postData.targetPost;
-var ColumnCategoriesDom;
-var anonymousData;
-var SurveyEdit;
-var SelectUser;
+window.ColumnCategoriesDom = undefined;
+window.anonymousData = undefined;
+window.SurveyEdit = undefined;
+window.SelectUser = undefined;
 $(function() {
   if(NKC.modules.SelectColumnCategories) {
-    ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
+    window.ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
   }
   if(NKC.modules.SelectUser) {
-    SelectUser = new NKC.modules.SelectUser();
+    window.SelectUser = new NKC.modules.SelectUser();
   }
   if(NKC.modules.SurveyEdit && $("#moduleSurveyEdit").length) {
-    SurveyEdit = new NKC.modules.SurveyEdit();
+    window.SurveyEdit = new NKC.modules.SurveyEdit();
     SurveyEdit.init({
       surveyId: targetPost?targetPost.surveyId: ""
     });
@@ -157,7 +157,7 @@ $(function() {
   disabledPostButtonByProtocol(proDom.prop("checked"));
   var anonymousDom = $("#sendAnonymousDom");
   if(anonymousDom.length) {
-    anonymousData = NKC.methods.getDataById("anonymousData");
+    window.anonymousData = NKC.methods.getDataById("anonymousData");
     anonymousData.targetForumsId = anonymousData.targetForumsId || [];
     toggleAnonymousDom(verifyAnonymousPermission(anonymousData.targetForumsId));
     setInterval(function() {
@@ -762,3 +762,27 @@ function disabledSurveyForm(e) {
     dom.removeClass("btn-danger").addClass("btn-success");
   }
 }
+
+Object.assign(window, {
+  articleTransfer,
+  saveToThreadWithCheck,
+  saveDraft,
+  disabledPostButtonByProtocol,
+  toggleAnonymousDom,
+  verifyAnonymousPermission,
+  getSelectedColumnCategoriesId,
+  postToThreadWithCheck,
+  onPost,
+  getSearchKV,
+  GetUrlParam,
+  htmlDecode,
+  mediaInsertUE,
+  appUpdateVideo,
+  appUpdateImage,
+  appAttachHideOrShow,
+  saveUEContentToLocal,
+  setLocalContentToUE,
+  removeLocalContent,
+  getSurveyData,
+  disabledSurveyForm,
+});

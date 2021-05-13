@@ -1,1 +1,245 @@
-!function o(n,i,a){function s(e,r){if(!i[e]){if(!n[e]){var t="function"==typeof require&&require;if(!r&&t)return t(e,!0);if(l)return l(e,!0);throw(t=new Error("Cannot find module '"+e+"'")).code="MODULE_NOT_FOUND",t}t=i[e]={exports:{}},n[e][0].call(t.exports,function(r){return s(n[e][1][r]||r)},t,t.exports,o,n,i,a)}return i[e].exports}for(var l="function"==typeof require&&require,r=0;r<a.length;r++)s(a[r]);return s}({1:[function(r,e,t){"use strict";function c(r,e){var t;if("undefined"==typeof Symbol||null==r[Symbol.iterator]){if(Array.isArray(r)||(t=function(r,e){if(r){if("string"==typeof r)return s(r,e);var t=Object.prototype.toString.call(r).slice(8,-1);return"Map"===(t="Object"===t&&r.constructor?r.constructor.name:t)||"Set"===t?Array.from(r):"Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?s(r,e):void 0}}(r))||e&&r&&"number"==typeof r.length){t&&(r=t);var o=0,e=function(){};return{s:e,n:function(){return o>=r.length?{done:!0}:{done:!1,value:r[o++]}},e:function(r){throw r},f:e}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var n,i=!0,a=!1;return{s:function(){t=r[Symbol.iterator]()},n:function(){var r=t.next();return i=r.done,r},e:function(r){a=!0,n=r},f:function(){try{i||null==t.return||t.return()}finally{if(a)throw n}}}}function s(r,e){(null==e||e>r.length)&&(e=r.length);for(var t=0,o=new Array(e);t<e;t++)o[t]=r[t];return o}function n(r,e){for(var t=0;t<e.length;t++){var o=e[t];o.enumerable=o.enumerable||!1,o.configurable=!0,"value"in o&&(o.writable=!0),Object.defineProperty(r,o.key,o)}}NKC.modules.LibraryPath=function(){function r(){!function(r,e){if(!(r instanceof e))throw new TypeError("Cannot call a class as a function")}(this,r);var f=this;f.dom=$("#moduleLibraryPath"),f.dom.modal({show:!1,backdrop:"static"}),f.app=new Vue({el:"#moduleLibraryPathApp",data:{uid:NKC.configs.uid,folders:[],warning:"",folder:"",originFolders:[],permission:[],form:{type:"",folder:"",name:"",description:""}},computed:{originFoldersId:function(){return this.originFolders.map(function(r){return r._id})},selectedFolderId:function(){if(this.folder)return this.folder._id},activeLine:function(){var r=this.folders,n=this.folder,i=0;return function r(e){for(var t=0;t<e.length;t++){var o=e[t];if(i++,o._id===n._id)return;if(o.folders&&o.folders.length)return r(o.folders)}}(r),i},nav:function(){if(this.folder)return this.getFolderNav(this.folder)},path:function(){if(this.nav)return"/"+this.nav.map(function(r){return r.name}).join("/")}},methods:{per:function(r){return this.permission.includes(r)},submitForm:function(){var r,e=this.form,t=e.type,o=e.folder,n=e.name,i=e.description,e="create"===t?(r="POST","/library/".concat(o._id,"/list")):(r="PUT","/library/".concat(o._id));nkcAPI(e,r,{name:n,description:i}).then(function(){f.app.form.folder="","create"===t?(o.close=!0,o.loaded=!1,o.folderCount=(o.folderCount||0)+1,f.app.switchFolder(o)):(o.name=n,o.description=i)}).catch(function(r){sweetError(r)})},toForm:function(r,e){"modify"===(this.form.type=r)?(this.form.name=e.name,this.form.description=e.description):(this.form.name="",this.form.description=""),this.form.folder=e},getFolderNav:function(r){for(var e=this.originFolders,t=r.lid,o=[r];t;){var n,i=c(e);try{for(i.s();!(n=i.n()).done;){var a=n.value;a._id===t&&(o.unshift(a),t=a.lid)}}catch(r){i.e(r)}finally{i.f()}}return o},saveToOrigin:function(r){var e,t=f.app,o=t.originFoldersId,n=t.originFolders,i=c(r);try{for(i.s();!(e=i.n()).done;){var a=e.value;o.includes(a._id)||n.push(a);var s=a.folders,l=void 0===s?[]:s;f.app.saveToOrigin(l)}}catch(r){i.e(r)}finally{i.f()}},scrollToActive:function(){var t=this;setTimeout(function(){var r=t.activeLine,r=0<(r-=3)?r:0,e=t.$refs.listBody;NKC.methods.scrollTop(e,30*r)},100)},submit:function(){this.folder&&(f.callback({folder:this.folder,nav:this.nav,path:this.path}),this.close())},switchFolder:function(r){this.selectFolder(r),r.close?(r.close=!1,r.loaded||this.getFolders(r)):r.close=!0},selectFolder:function(r){this.folder=r},initFolders:function(e){var r="/library?type=init&lid=".concat(e,"&t=").concat(Date.now());nkcAPI(r,"GET").then(function(r){f.app.folders=r.folders,f.app.folder=r.folder,f.app.permission=r.permission,f.app.saveToOrigin(r.folders),e&&f.app.scrollToActive()}).catch(function(r){sweetError(r)})},getFolders:function(e){var r=(e?"/library?type=getFolders&lid=".concat(e._id,"&t="):"/library?type=getFolders&t=").concat(Date.now());nkcAPI(r,"GET").then(function(r){f.app.permission=r.permission,e&&(e.loaded=!0),r.folders.map(function(r){r.close=!0,r.loaded=!1,r.folders=[],e&&(r.parent=e)}),e?e.folders=r.folders:f.app.folders=r.folders,f.app.saveToOrigin(r.folders)}).catch(function(r){e&&(e.close=!0),sweetError(r)})},open:function(){var r=0<arguments.length&&void 0!==arguments[0]?arguments[0]:{},e=r.lid,r=r.warning;this.warning=void 0===r?"":r,e?(this.folder="",this.initFolders(e)):this.folders&&this.folders.length||this.getFolders(),f.dom.modal("show")},close:function(){f.dom.modal("hide")}}})}var e,t,o;return e=r,(t=[{key:"open",value:function(r,e){this.callback=r,this.app.open(e)}},{key:"close",value:function(){this.app.close()}}])&&n(e.prototype,t),o&&n(e,o),r}()},{}]},{},[1]);
+NKC.modules.LibraryPath = class {
+  constructor() {
+    const self = this;
+    self.dom = $("#moduleLibraryPath");
+    self.dom.modal({
+      show: false,
+      backdrop: "static"
+    });
+    self.app = new Vue({
+      el: "#moduleLibraryPathApp",
+      data: {
+        uid: NKC.configs.uid,
+        folders: [],
+        warning: "",
+        folder: "",
+        originFolders: [],
+        permission: [],
+        form: {
+          type: "",
+          folder: "",
+          name: "",
+          description: ""
+        }
+      },
+      computed: {
+        originFoldersId() {
+          return this.originFolders.map(f => f._id);
+        },
+        selectedFolderId() {
+          if(this.folder) return this.folder._id;
+        },
+        // 计算高亮横排的行数
+        activeLine() {
+          const {folders, folder} = this;
+          let line = 0;
+          const func = (arr) => {
+            for(let i = 0; i < arr.length; i++) {
+              const a = arr[i];
+              line ++;
+              if(a._id === folder._id) {
+                return;
+              } else if(a.folders && a.folders.length) {
+                return func(a.folders);
+              }
+            }
+          };
+          func(folders);
+          return line;
+        },
+        nav() {
+          if(!this.folder) return;
+          return this.getFolderNav(this.folder);
+        },
+        path() {
+          if(!this.nav) return;
+          return "/" + this.nav.map(n => n.name).join("/");
+        }
+      },
+      methods: {
+        per(name) {
+          return this.permission.includes(name);
+        },
+        submitForm() {
+          const form = this.form;
+          const {type, folder, name, description} = form;
+
+          let method, url;
+          if(type === "create") {
+            method = "POST";
+            url = `/library/${folder._id}/list`;
+          } else {
+            method = "PUT";
+            url = `/library/${folder._id}`;
+          }
+          nkcAPI(url, method, {
+            name,
+            description
+          })
+            .then(() => {
+              self.app.form.folder = "";
+              if(type === "create") {
+                folder.close = true;
+                folder.loaded = false;  
+                folder.folderCount = (folder.folderCount || 0) + 1;
+                self.app.switchFolder(folder);
+              } else {
+                folder.name = name;
+                folder.description = description;
+              }
+              
+            })
+            .catch(err => {
+              sweetError(err);
+            })
+        },
+        toForm(type, folder) {
+          this.form.type = type;
+          if(type === "modify") {
+            this.form.name = folder.name;
+            this.form.description = folder.description;
+          } else {
+            this.form.name = "";
+            this.form.description = "";
+          }
+          this.form.folder = folder;
+        },
+        getFolderNav(folder) {
+          const {originFolders} = this;
+          let lid = folder.lid;
+          const nav = [folder];
+          while(lid) {
+            for(const f of originFolders) {
+              if(f._id !== lid) continue;
+              nav.unshift(f);
+              lid = f.lid;
+            }
+          }
+          return nav;
+        },
+        // 存入源文件夹数组
+        saveToOrigin(folders) {
+          const {originFoldersId, originFolders} = self.app;
+          for(const folder of folders) {
+            if(!originFoldersId.includes(folder._id)) originFolders.push(folder);
+            const {folders = []} = folder;
+            self.app.saveToOrigin(folders);
+          }
+        },
+        // 滚动到高亮处
+        scrollToActive() {
+          setTimeout(() => {
+            let line = this.activeLine;
+            line -= 3;
+            line = line>0?line: 0;
+            const height = 30*line; // 每一横排占30px(与css设置有关，若css改动则此处也需要做相应调整。)
+            const listBody = this.$refs.listBody;
+            NKC.methods.scrollTop(listBody, height);
+          }, 100)
+        },
+        // 点击确定
+        submit() {
+          if(!this.folder) return;
+          self.callback({
+            folder: this.folder,
+            nav: this.nav,
+            path: this.path
+          });
+          this.close();
+        },
+        // 展开文件夹
+        switchFolder(f) {
+          this.selectFolder(f);
+          if(f.close) {
+            f.close = false;
+            // 加载下层文件夹
+            if(!f.loaded) {
+              this.getFolders(f);
+            }
+          } else {
+            f.close = true;
+          }
+        },
+        // 选择文件夹
+        selectFolder(f) {
+          this.folder = f;
+        },
+        // 加载文件夹列表
+        // 默认只加载顶层文件夹
+        // 可通过lid加载指定的文件夹，并自动定位、展开上级目录
+        initFolders(lid) {
+          const url = `/library?type=init&lid=${lid}&t=${Date.now()}`;
+          nkcAPI(url, "GET")
+            .then(data => {
+              self.app.folders = data.folders;
+              self.app.folder = data.folder;
+              self.app.permission = data.permission;
+              self.app.saveToOrigin(data.folders);
+              if(lid) {
+                self.app.scrollToActive();
+              }
+            })
+            .catch(data => {
+              sweetError(data);
+            });
+        },
+        getFolders(folder) {
+          let url;
+          if(folder) {
+            url = `/library?type=getFolders&lid=${folder._id}&t=${Date.now()}`;
+          } else {
+            url = `/library?type=getFolders&t=${Date.now()}`;
+          }
+          nkcAPI(url, "GET")
+            .then((data) => {
+              self.app.permission = data.permission;
+              if(folder) folder.loaded = true;
+              data.folders.map(f => {
+                f.close = true;
+                f.loaded = false;
+                f.folders = [];
+                if(folder) {
+                  f.parent = folder;
+                }
+              });
+              if(folder) {
+                folder.folders = data.folders;
+              } else {
+                self.app.folders = data.folders;
+              }
+              self.app.saveToOrigin(data.folders);
+            })
+            .catch((data) => {
+              if(folder) folder.close = true;
+              sweetError(data);
+            })
+        },
+        open(options = {}) {
+          const {lid, warning = ""} = options;
+          this.warning = warning;
+          if(lid) {
+            this.folder = "";
+            this.initFolders(lid);
+          } else {
+            if(!this.folders || !this.folders.length) {
+              this.getFolders();
+            }
+          }
+          self.dom.modal("show");
+        },
+        close() {
+          self.dom.modal("hide");
+        }
+      }
+    });
+  }
+  open(callback, options) {
+    this.callback = callback;
+    this.app.open(options);
+  }
+  close() {
+    this.app.close();
+  }
+}
+
+

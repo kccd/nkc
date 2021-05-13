@@ -176,3 +176,20 @@ function unSubmitAuth(uid, number) {
 			screenTopWarning(data.error);
 		})
 }
+
+Object.assign(window, {
+	lifePhotoArr,
+	certsPhotoArr,
+	init,
+	chooseFile,
+	uploadFile,
+	outSize,
+	uploadSuccess,
+	initLifePhoto,
+	displayCertsPhoto,
+	displayLifePhoto,
+	initCertsPhoto,
+	removePhoto,
+	submitAuth,
+	unSubmitAuth,
+});

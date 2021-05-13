@@ -1,1 +1,19 @@
-!function e(o,i,l){function u(t,n){if(!i[t]){if(!o[t]){var r="function"==typeof require&&require;if(!n&&r)return r(t,!0);if(a)return a(t,!0);throw(r=new Error("Cannot find module '"+t+"'")).code="MODULE_NOT_FOUND",r}r=i[t]={exports:{}},o[t][0].call(r.exports,function(n){return u(o[t][1][n]||n)},r,r.exports,e,o,i,l)}return i[t].exports}for(var a="function"==typeof require&&require,n=0;n<l.length;n++)u(l[n]);return u}({1:[function(n,t,r){"use strict";NKC.methods.getDataById("threadSettings").isDisplay?NKC.methods.initPlyrMask=function(n){var t,r,e,o;"audio"!==n.type&&(t=n.elements.container,$(t).find(".plyr__control.plyr__control--overlaid").remove(),e=(r=$("#plyrMask .plyr-mask").clone(!1)).find(".player-tip-button .play"),o=r.find(".player-tip-button .download"),e.on("click",function(){r.remove(),n.play()}),o.on("click",function(){return NKC.methods.visitUrl(n.download,"_blank")}),$(t).append(r))}:NKC.methods.initPlyrMask=function(){}},{}]},{},[1]);
+const threadSettings = NKC.methods.getDataById("threadSettings");
+if(!threadSettings.isDisplay) {
+  NKC.methods.initPlyrMask = () => {};
+} else {
+  NKC.methods.initPlyrMask = function(player) {
+    if(player.type === "audio") return;
+    const container = player.elements.container;
+    $(container).find(".plyr__control.plyr__control--overlaid").remove();
+    let maskDom = $("#plyrMask .plyr-mask").clone(false);
+    let maskPlayButton = maskDom.find(".player-tip-button .play");
+    let maskDownloadButton = maskDom.find(".player-tip-button .download");
+    maskPlayButton.on("click", () => {
+      maskDom.remove();
+      player.play();
+    });
+    maskDownloadButton.on("click", () => NKC.methods.visitUrl(player.download, "_blank"));
+    $(container).append(maskDom);
+  }
+}

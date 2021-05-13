@@ -6,7 +6,7 @@ router
     const { forum } = data;
     data.roles = await db.RoleModel.find().sort({toc: 1});
     data.grades = await db.UsersGradeModel.find().sort({score: 1});
-    data.roleGradeReview = forum.roleGradeReview;
+    // data.roleGradeReview = forum.roleGradeReview;
     const reviewSettings = await db.SettingModel.getSettings("review");
     const wordGroup = reviewSettings.keyword.wordGroup;
     data.wordGroupInfo = wordGroup.map(group => ({
@@ -14,9 +14,10 @@ router
       name: group.name,
       len: group.keywords.length
     }));
-    data.keywordReviewPlanUseTo = forum.keywordReviewPlanUseTo;
-    data.useGroup = forum.keywordReviewUseGroup;
-    data.reviewPlan = forum.reviewPlan;
+    data.forumReviewSettings = forum.reviewSettings;
+    // data.keywordReviewPlanUseTo = forum.keywordReviewPlanUseTo;
+    // data.useGroup = forum.keywordReviewUseGroup;
+    // data.reviewPlan = forum.reviewPlan;
     data.fid = forum.fid;
 		ctx.template = 'forum/settings/review.pug';
 		await next();
@@ -25,18 +26,13 @@ router
     const {data, db, body} = ctx;
     const { forum } = data;
     const {
-      keywordReviewPlanUseTo, // 敏感词检测用于哪部分
-      newUseWordGroup,      // 里面是敏感词组组名组成的数组
-      reviewPlan,   // 是否本专业所有内容都需要送审
-      roleGradeReview,          // 按角色和等级之间关系送审
+      settings
     } = body;
-    if(newUseWordGroup instanceof Array) {
-      await db.ForumModel.updateOne({ fid: forum.fid }, {
-        keywordReviewPlanUseTo,
-        reviewPlan,
-        roleGradeReview
-      })
-    }
+    await db.ForumModel.updateOne({ fid: forum.fid }, {
+      $set: {
+        reviewSettings: settings
+      }
+    });
     await next();
   });
 module.exports = router;

@@ -173,5 +173,10 @@ function newMessageRemind(name) {
   setNewMessageNumber(number+1);
 }
 
-
-
+Object.assign(window, {
+  socket,
+  addSocketStatusChangedEvent,
+  getNewMessageNumber,
+  setNewMessageNumber,
+  newMessageRemind,
+});

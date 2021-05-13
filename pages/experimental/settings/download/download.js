@@ -1,1 +1,70 @@
-!function r(i,o,s){function d(t,e){if(!o[t]){if(!i[t]){var n="function"==typeof require&&require;if(!e&&n)return n(t,!0);if(u)return u(t,!0);throw(n=new Error("Cannot find module '"+t+"'")).code="MODULE_NOT_FOUND",n}n=o[t]={exports:{}},i[t][0].call(n.exports,function(e){return d(i[t][1][e]||e)},n,n.exports,r,i,o,s)}return o[t].exports}for(var u="function"==typeof require&&require,e=0;e<s.length;e++)d(s[e]);return d}({1:[function(e,t,n){"use strict";for(var r=NKC.methods.getDataById("data"),i=[],o=0;o<=24;o++)i.push(o);var s=r.certList.filter(function(e){return 0===e.type.indexOf("grade-")||["role-visitor"].includes(e.type)}),d=r.certList.filter(function(e){return 0===e.type.indexOf("role-")&&!["role-visitor"].includes(e.type)});new Vue({el:"#app",data:{hours:i,certList:r.certList,gradeList:s,roleList:d,settings:r.downloadSettings},methods:{addSpeed:function(e){e.push({startingTime:0,endTime:24,speed:0})},addFileCount:function(e){e.push({startingTime:0,endTime:24,fileCount:0})},removeFromArray:function(e,t){e.splice(t,1)},addCert:function(e){var t={type:"",data:[]};"speed"===(1<arguments.length&&void 0!==arguments[1]?arguments[1]:"speed")?this.addSpeed(t.data):this.addFileCount(t.data),e.push(t)},addRole:function(e){e.push({type:"",fileCount:0})},save:function(){nkcAPI("/e/settings/download","PUT",{downloadSettings:this.settings}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const hours = [];
+for(let i = 0; i <=24; i++) {
+  hours.push(i);
+}
+const gradeList = data.certList.filter(c => c.type.indexOf('grade-') === 0 || ['role-visitor'].includes(c.type));
+const roleList = data.certList.filter(c => c.type.indexOf('role-') === 0 && !['role-visitor'].includes(c.type));
+const app = new Vue({
+  el: '#app',
+  data: {
+    hours,
+    certList: data.certList,
+    gradeList,
+    roleList,
+    settings: data.downloadSettings
+  },
+  methods: {
+    addSpeed(arr) {
+      arr.push({
+        startingTime: 0,
+        endTime: 24,
+        speed: 0
+      });
+    },
+    addFileCount(arr) {
+      arr.push({
+        startingTime: 0,
+        endTime: 24,
+        fileCount: 0
+      });
+    },
+    removeFromArray(arr, index) {
+      arr.splice(index, 1);
+    },
+    addCert(arr, type = 'speed') {
+      const item = {
+        type: '',
+        data: []
+      };
+      if(type === 'speed') {
+        this.addSpeed(item.data);
+      } else {
+        this.addFileCount(item.data);
+      }
+      arr.push(item);
+    },
+    addRole(arr) {
+      arr.push({
+        type:'',
+        fileCount: 0
+      })
+    },
+    save() {
+      nkcAPI('/e/settings/download', 'PUT', {
+        downloadSettings: this.settings
+      })
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
+        .catch(sweetError)
+    }
+  }
+});
+
+Object.assign(window, {
+  hours,
+  gradeList,
+  roleList,
+  app,
+});

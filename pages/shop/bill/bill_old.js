@@ -23,9 +23,9 @@ $(document).ready(function() {
 function submitOrders() {
   // 获取配送地址
   var receiveDom = $("input[name='address']:checked");
-  receiveAddress = receiveDom.next().find(".address").text();
-  receiveName = receiveDom.next().find(".username").text();
-  receiveMobile = receiveDom.next().find(".mobile").text();
+  window.receiveAddress = receiveDom.next().find(".address").text();
+  window.receiveName = receiveDom.next().find(".username").text();
+  window.receiveMobile = receiveDom.next().find(".mobile").text();
   if(!receiveAddress) return sweetWarning("请选择收货地址")
   if(!receiveName) return sweetWarning("收件人不得为空，请完善信息后提交订单");
   if(!receiveMobile) return sweetWarning("联系方式不得为空, 请完善信息后提交订单");
@@ -274,3 +274,17 @@ function changeFreightTemplate(para) {
   $("#billTotalPrice"+billId).text(numToNumberTwo(freightSinglePlus + Number($("#billTotalPrice"+billId).text())*100));
   $("#totalPrice").text(numToNumberTwo(freightSinglePlus + Number($("#totalPrice").text())*100));
 }
+
+Object.assign(window, {
+  paramCert,
+  submitOrders,
+  addAddress,
+  uploadCert,
+  inputChange,
+  viewCert,
+  countAddOne,
+  countPlusOne,
+  reCountSinglePrice,
+  numToFloatTwo,
+  changeFreightTemplate,
+});

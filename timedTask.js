@@ -9,8 +9,10 @@ const updateDate = require("./settings/updateDate");
 
 const jobs = require('./timedTasks/scheduleJob');
 const timedTasks = require('./timedTasks/timedTasks');
+const dbStatus = require('./settings/dbStatus');
 const run = async () => {
   // 以下任务固定时间执行
+  await dbStatus.database();
   jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
   jobs.clearForumAndThreadPostCount();
   jobs.shop();
@@ -43,4 +45,5 @@ run()
   .catch(err => {
     console.log(`timed task stopped`.red);
     console.log((err.stack || err.message || err).red);
+    process.exit(1);
   })

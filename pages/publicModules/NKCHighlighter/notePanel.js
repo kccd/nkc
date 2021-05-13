@@ -1,1 +1,205 @@
-!function o(i,c,s){function r(e,t){if(!c[e]){if(!i[e]){var n="function"==typeof require&&require;if(!t&&n)return n(e,!0);if(a)return a(e,!0);throw(n=new Error("Cannot find module '"+e+"'")).code="MODULE_NOT_FOUND",n}n=c[e]={exports:{}},i[e][0].call(n.exports,function(t){return r(i[e][1][t]||t)},n,n.exports,o,i,c,s)}return c[e].exports}for(var a="function"==typeof require&&require,t=0;t<s.length;t++)r(s[t]);return r}({1:[function(t,e,n){"use strict";NKC.modules.NotePanel=function(){return function t(){var e=this;!function(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}(this,t);var s=this;s.app=new Vue({el:"#moduleNotePanel",data:{uid:NKC.configs.uid,disableNoteContent:!1,show:!1,edit:!1,submitting:!1,content:"",note:""},updated:function(){this.resetDom()},methods:{fromNow:NKC.methods.fromNow,getUrl:NKC.methods.tools.getUrl,visitUrl:NKC.methods.visitUrl,setTextareaSize:function(t){this.$el.getElementsByClassName("create-textarea")[0].style.height=t},resetTextarea:function(){this.content="",this.setTextareaSize("2.5rem")},autoResize:function(t){(t=t.target).style.height="2.5rem",30<t.scrollHeight&&(t.style.height=t.scrollHeight+"px")},saveNewNote:function(){var i=this.content,c=this.note;Promise.resolve().then(function(){if(!i)throw"请输入笔记内容";var t=c.type,e=c.targetId,n=c.node,o=c._id;return s.app.submitting=!0,nkcAPI("/note","POST",{_id:o,type:t,targetId:e,content:i,node:n})}).then(function(t){s.app.content="",s.app.resetTextarea(),s.app.resetDom(),s.callback(t.note),s.app.extendNoteContent(t.note),s.app.note=t.note,s.app.submitting=!1,setTimeout(function(){s.app.scrollToBottom()},200)}).catch(function(t){sweetError(t),s.app.submitting=!1})},modifyNoteContent:function(t){t.edit?t.edit=!1:(t.edit=!0,t._content||(t._content=t.content))},extendNoteContent:function(t){t.notes.map(function(t){t.edit=!1,t._content=""})},saveNote:function(e){var t,n,o=this.note,i=this.uid,c={};e.uid===i?(t="/note/".concat(o._id,"/c/").concat(e._id),n="PUT"):(t="/nkc/note",n="POST",c.type="modify",c.noteId=o._id,c.noteContentId=e._id),c.content=e._content,nkcAPI(t,n,c).then(function(t){e.content=e._content,e.html=t.noteContentHTML,s.app.modifyNoteContent(e),Vue.set(o.notes,o.notes.indexOf(e),e)}).catch(sweetError)},open:function(i,c){var t=this;new Promise(function(e,t){s.app.resetDom(),s.callback=i;var n=c.id,o=c.note;o?(s.app.note=o,e()):nkcAPI("/note/".concat(n),"GET").then(function(t){s.app.extendNoteContent(t.note),s.app.note=t.note,e()}).catch(t)}).then(function(){t.show=!0,NKC.methods.initUnfixedPanel()}).catch(sweetError)},close:function(){this.show=!1},resetDom:function(){this.$el.style.height="auto"},scrollToBottom:function(){var t=this.$el.getElementsByClassName("note-panel-notes")[0];t.scrollTop=t.scrollHeight+1e4},deleteNoteContent:function(t,e){var n,o,i=this.note,c={};"delete"===e?(n="/note/".concat(i._id,"/c/").concat(t._id),o="DELETE"):(o="POST",n="/nkc/note",t.disabled?c.type="cancelDisable":c.type="disable",c.noteId=i._id,c.noteContentId=t._id),sweetQuestion("确定要执行此操作？").then(function(){return nkcAPI(n,o,c)}).then(function(){"delete"===e?t.deleted=!0:t.disabled=!t.disabled,sweetSuccess("操作成功")}).catch(sweetError)}}}),s.open=s.app.open,s.close=s.app.close,s.isOpen=function(){return!!e.app.show}}}()},{}]},{},[1]);
+NKC.modules.NotePanel = class {
+  constructor() {
+    const self = this;
+    self.app = new Vue({
+      el: "#moduleNotePanel",
+      data: {
+        uid: NKC.configs.uid,
+        disableNoteContent: false,
+        show: false,
+        edit: false,
+        submitting: false,
+        // 新添加的笔记内容
+        content: "",
+        // 显示笔记
+        note: "",
+          /* note的数据结构
+          {
+            _id: Number,
+            type,
+            targetId,
+            notes: [
+              {
+                toc: Date,
+                uid: String,
+                user: {
+                  username: String,
+                  avatar: String,
+                  uid: String
+                },
+                content: String
+              }
+            ],
+          }
+          */
+      },
+      updated() {
+        this.resetDom();
+      },
+      methods: {
+        fromNow: NKC.methods.fromNow,
+        getUrl: NKC.methods.tools.getUrl,
+        visitUrl: NKC.methods.visitUrl,
+        setTextareaSize(size) {
+          const textarea = this.$el.getElementsByClassName("create-textarea")[0];
+          textarea.style.height = size;
+        },
+        resetTextarea() {
+          this.content = "";
+          this.setTextareaSize("2.5rem");
+        },
+        autoResize(e) {
+          const textArea = e.target;
+          const num = 2.5 * 12;
+          textArea.style.height = '2.5rem';
+          if(num < textArea.scrollHeight) {
+            textArea.style.height = textArea.scrollHeight + 'px';
+          }
+        },
+        saveNewNote() {
+          // 创建新的
+          const {content, note} = this;
+          Promise.resolve()
+            .then(() => {
+              if(!content) throw "请输入笔记内容";
+              const {type, targetId, node, _id} = note;
+              self.app.submitting = true;
+              return nkcAPI("/note", "POST", {
+                _id,
+                type,
+                targetId,
+                content,
+                node
+              });
+            })
+            .then(data => {
+              self.app.content = "";
+              self.app.resetTextarea();
+              self.app.resetDom();
+              self.callback(data.note);
+              self.app.extendNoteContent(data.note);
+              self.app.note = data.note;
+              self.app.submitting = false;
+              setTimeout(() => {
+                self.app.scrollToBottom();
+              }, 200)
+            })
+            .catch(err => {
+              sweetError(err);
+              self.app.submitting = false;
+            });
+        },
+        modifyNoteContent(n) {
+          if(n.edit) {
+            n.edit = false;
+          } else {
+            n.edit = true;
+            if(!n._content) n._content = n.content;
+          }
+        },
+        extendNoteContent(note) {
+          note.notes.map(n => {
+            n.edit = false;
+            n._content = "";
+          });
+        },
+        saveNote(n) {
+          // 保存编辑
+          const {note, uid} = this;
+          let url, method, data = {};
+          if(n.uid === uid) {
+            url = `/note/${note._id}/c/${n._id}`;
+            method = "PUT";
+            data.content = n._content;
+          } else {
+            url = `/nkc/note`;
+            method = "POST";
+            data.type = "modify";
+            data.noteId = note._id;
+            data.noteContentId = n._id;
+            data.content = n._content;
+          }
+          nkcAPI(url, method, data)
+            .then((data) => {
+              n.content = n._content;
+              n.html = data.noteContentHTML;
+              self.app.modifyNoteContent(n);
+              Vue.set(note.notes, note.notes.indexOf(n), n);
+            })
+            .catch(sweetError);
+        },
+        open(callback, options) {
+          new Promise((resolve, reject) => {
+            self.app.resetDom();
+            self.callback = callback;
+            const {id, note} = options;
+            if(note) {
+              self.app.note = note;
+              resolve();
+            } else {
+              nkcAPI(`/note/${id}`, "GET")
+                .then(data => {
+                  self.app.extendNoteContent(data.note);
+                  self.app.note = data.note;
+                  resolve();
+                })
+                .catch(reject)
+            }
+          })
+            .then(() => {
+              this.show = true;
+              NKC.methods.initUnfixedPanel();
+            })
+            .catch(sweetError);
+        },
+        close() {
+          this.show = false;
+        },
+        resetDom() {
+          const dom = this.$el;
+          dom.style.height = "auto";
+        },
+        scrollToBottom() {
+          const dom = this.$el.getElementsByClassName("note-panel-notes")[0];
+          dom.scrollTop = dom.scrollHeight + 10000;
+        },
+        deleteNoteContent(n, type) {
+          const {note} = this;
+          let url, method, data = {};
+          if(type === "delete") {
+            url = `/note/${note._id}/c/${n._id}`;
+            method = "DELETE";
+          } else {
+            method = "POST";
+            url = `/nkc/note`;
+            if(n.disabled) {
+              data.type = "cancelDisable";
+            } else {
+              data.type = "disable";
+            }
+            data.noteId = note._id;
+            data.noteContentId = n._id;
+          }
+          sweetQuestion("确定要执行此操作？")
+            .then(() => {
+              return nkcAPI(url, method, data);
+            })
+            .then(function() {
+              if(type === "delete") {
+                n.deleted = true;
+              } else {
+                n.disabled = !n.disabled;
+              }
+              sweetSuccess("操作成功");
+            })
+            .catch(sweetError)
+        }
+      }
+    });
+    self.open = self.app.open;
+    self.close = self.app.close;
+    self.isOpen = () => {
+      return !!this.app.show;
+    }
+  }
+};

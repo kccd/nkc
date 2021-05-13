@@ -1,1 +1,45 @@
-!function r(i,a,o){function c(t,e){if(!a[t]){if(!i[t]){var n="function"==typeof require&&require;if(!e&&n)return n(t,!0);if(s)return s(t,!0);throw(n=new Error("Cannot find module '"+t+"'")).code="MODULE_NOT_FOUND",n}n=a[t]={exports:{}},i[t][0].call(n.exports,function(e){return c(i[t][1][e]||e)},n,n.exports,r,i,a,o)}return a[t].exports}for(var s="function"==typeof require&&require,e=0;e<o.length;e++)c(o[e]);return c}({1:[function(e,t,n){"use strict";var r=NKC.methods.getDataById("data"),i=new Vue({el:"#app",data:{emailSettings:r.emailSettings,test:{name:"bindEmail",content:"",email:""}},methods:{tran:function(e){switch(e){case"bindEmail":return"绑定邮箱";case"getback":return"找回密码";case"changeEmail":return"更换邮箱";case"destroy":return"账号注销";case"unbindEmail":return"解绑邮箱"}},testSendEmail:function(){sweetQuestion("确定要发送邮件验证码？").then(function(){return nkcAPI("/e/settings/email/test","POST",i.test)}).then(function(){screenTopAlert("测试邮件发送成功")}).catch(function(e){screenTopWarning(e.error||e)})},save:function(){nkcAPI("/e/settings/email","PUT",{emailSettings:this.emailSettings}).then(function(){screenTopAlert("保存成功")}).catch(function(e){screenTopWarning(e.error||e)})}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById("data");
+const app = new Vue({
+  el: '#app',
+  data: {
+    emailSettings: data.emailSettings,
+    test: {
+      name: 'bindEmail',
+      content: "",
+      email: ''
+    }
+  },
+  methods: {
+    tran: function(w) {
+      switch (w) {
+        case 'bindEmail': return '绑定邮箱';
+        case 'getback': return '找回密码';
+        case 'changeEmail': return '更换邮箱';
+        case "destroy": return "账号注销";
+        case "unbindEmail": return "解绑邮箱"
+      }
+    },
+    testSendEmail: function() {
+      sweetQuestion("确定要发送邮件验证码？")
+        .then(function() {
+          return nkcAPI('/e/settings/email/test', 'POST', app.test);
+        })
+        .then(function() {
+          screenTopAlert('测试邮件发送成功');
+        })
+        .catch(function(data) {
+          screenTopWarning(data.error || data);
+        })
+
+    },
+    save: function() {
+      nkcAPI('/e/settings/email', 'PUT', {emailSettings: this.emailSettings})
+        .then(function() {
+          screenTopAlert('保存成功');
+        })
+        .catch(function(data) {
+          screenTopWarning(data.error || data);
+        })
+    }
+  }
+});

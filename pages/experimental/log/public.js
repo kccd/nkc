@@ -180,3 +180,12 @@ function deleteCurrentRecord() {
     })
     .catch(sweetError);
 }
+
+Object.assign(window, {
+  delLogs,
+  dateFormat,
+  subCalcDate,
+  checkFormData,
+  searchLogs,
+  deleteCurrentRecord,
+})

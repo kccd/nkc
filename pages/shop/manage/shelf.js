@@ -3,9 +3,10 @@
 */
 
 var ue = UE.getEditor('container', NKC.configs.ueditor.shopConfigs);
-var testTh;
+window.ue = ue;
+window.testTh = undefined;
 if(NKC.modules.MoveThread) {
-  testTh = new NKC.modules.MoveThread();
+  window.testTh = new NKC.modules.MoveThread();
 }
 function testThOpen() {
   var selectedForumsId = [], selectedCategoriesId = [];
@@ -49,7 +50,7 @@ function initTime() {
 }
 initTime();
 
-var productImageDomId;
+window.productImageDomId = undefined;
 var skip = 0;
 $(function () { $("[data-toggle='popover']").popover(); });
 
@@ -468,7 +469,7 @@ function autoCalcuPrice() {
  * 打开图片管理器
  */
 function openImageManage(id) {
-  productImageDomId = id;
+  window.productImageDomId = id;
   manageImageLoader();
 }
 
@@ -1210,3 +1211,38 @@ function appAttachHideOrShow() {
     $("#attach").css("display", "block")
   }
 }
+
+Object.assign(window, {
+  testThOpen,
+  initTime,
+  submitToShelf,
+  productToShelf,
+  productToHouse,
+  autoCalcuPrice,
+  openImageManage,
+  IsPC,
+  manageImageLoader,
+  prevPageManage,
+  nextPageManage,
+  insertImageToProduct,
+  deleteImageInProduct,
+  addNewParam,
+  addSingleParam,
+  delSingleParam,
+  getSingleParams,
+  saveNewParam,
+  delParamTable,
+  tableTurnParams,
+  tableTurnMulArray,
+  mulArrExchangeArr,
+  mulArrExchangeStr,
+  getParaGroup,
+  mulArrTurnTable,
+  banParam,
+  enableParam,
+  obtainProductPrice,
+  addAttention,
+  getShopForum,
+  editProductShelf,
+  appAttachHideOrShow,
+});

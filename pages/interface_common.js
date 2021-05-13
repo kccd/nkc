@@ -1,16 +1,17 @@
 // 定义最后光标对象
-var lastEditRange;
+window.lastEditRange = undefined;
 function geid(id){return document.getElementById(id);}
 function gv(id){return geid(id).value;}
 function ga(id,attr){return geid(id).getAttribute(attr);}
 function hset(id,content){geid(id).innerHTML=content;}
 function display(id){geid(id).style = 'display:inherit;'}
 
+Object.assign(window, { geid, gv, ga, hset, display })
+
 // 兼容代码，部分浏览器canvas对象没有toBlob方法
 if (!HTMLCanvasElement.prototype.toBlob) {
   Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
     value: function (callback, type, quality) {
-
       var binStr = atob( this.toDataURL(type, quality).split(',')[1] ),
         len = binStr.length,
         arr = new Uint8Array(len);
@@ -114,58 +115,6 @@ function nkcUploadFile(url, method, data, progress) {
   return generalRequest("upload", url, method, data, progress);
 }
 
-/*// nkcAPI接口核心
-function generalRequest(obj,opt,callback){
-  var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function(){
-    var res;
-    if (xhr.readyState === 4){
-      try {
-        res = JSON.parse(xhr.responseText);
-      } catch(e) {
-        res = xhr.responseText
-      }
-      if(xhr.status === 0) {
-        callback('发起请求失败，请检查网络连接');
-      } else if(xhr.status >= 400 || res.error || res instanceof Error) {
-        callback(res);
-      } else {
-        callback(null,res);
-      }
-    }
-  };
-
-  try{
-    xhr.open(opt.method,opt.url,true);
-	  xhr.setRequestHeader("Content-type","application/json");
-    xhr.setRequestHeader("FROM","nkcAPI");
-    xhr.send(JSON.stringify(obj));
-  }catch(err){
-    callback(err);
-  }
-}
-// nkcAPI接口核心 promise
-function nkcOperationAPI(obj){
-  return new Promise(function(resolve,reject){
-    generalRequest(obj,{
-      method:obj.method,
-      url:obj.url
-    },
-    function(err,back){
-      if(err){
-        return reject(err);
-      }
-      resolve(back);
-    });
-  })
-}
-function nkcAPI(operationName,method,remainingParams){  //操作名，参数
-  remainingParams = remainingParams || {};
-  remainingParams.url = operationName;
-  remainingParams.method = method;
-  return nkcOperationAPI(remainingParams)
-}*/
-
 
 /***********************各种弹出框*******************************************/
 function jalert(obj){
@@ -239,6 +188,7 @@ function sweetSuccess(text, options) {
     }).then(backState);
   }
 }
+
 function sweetError(text) {
   var backState = toAlertOpenState(function() {
     Swal.close();
@@ -253,6 +203,7 @@ function sweetError(text) {
   })
   .then(backState)
 }
+
 function sweetInfo(text) {
   var backState = toAlertOpenState(function() {
     Swal.close();
@@ -265,6 +216,7 @@ function sweetInfo(text) {
   })
   .then(backState);
 }
+
 function sweetWarning(text) {
   var backState = toAlertOpenState(function() {
     Swal.close();
@@ -277,6 +229,7 @@ function sweetWarning(text) {
   })
   .then(backState)
 }
+
 function sweetConfirm(text) {
   var backState = toAlertOpenState(function() {
     Swal.close();
@@ -300,6 +253,7 @@ function sweetConfirm(text) {
     })
   });
 }
+
 function sweetQuestion(text) {
   var backState = toAlertOpenState(function() {
     Swal.close();
@@ -323,6 +277,7 @@ function sweetQuestion(text) {
       })
   });
 }
+
 // html内容弹窗
 function asyncSweetCustom(html) {
   var backState = toAlertOpenState(function() {
@@ -334,6 +289,7 @@ function asyncSweetCustom(html) {
   })
   .then(backState);
 }
+
 // promise版本弹框
 function asyncSweetSuccess(text, options) {
   var backState = toAlertOpenState(function() {
@@ -366,6 +322,7 @@ function asyncSweetSuccess(text, options) {
   })
   .then(backState);
 }
+
 function asyncSweetError(text) {
   var backState = toAlertOpenState(function() {
     Swal.close();
@@ -417,6 +374,7 @@ function screenTopAlertOfStyle(text,stylestring){
     },2000)
   })
 }
+
 function getID(){
   _alertcount++;
   var itemID = 'alert'+_alertcount.toString()
@@ -733,7 +691,7 @@ function insertHtmlAtCaret(html) {
     // IE < 9
     document.selection.createRange().pasteHTML(html);
   }
-  lastEditRange = sel.getRangeAt(0)
+  window.lastEditRange = sel.getRangeAt(0)
 }
 
 
@@ -793,11 +751,11 @@ function uploadFile(url, id, callback) {
 $("document").ready(function(){
   $("#text-elem").on("click",function(){
     var selection = document.getSelection();
-    lastEditRange = selection.getRangeAt(0)
+    window.lastEditRange = selection.getRangeAt(0)
   });
   $("#text-elem").on("keyup",function(){
     var selection = document.getSelection();
-    lastEditRange = selection.getRangeAt(0)
+    window.lastEditRange = selection.getRangeAt(0)
   })
 });
 /***********************************************************************************************/
@@ -2107,3 +2065,90 @@ function addApptypeToUrl(url) {
   }
   return paramStr;
 }
+
+Object.assign(window, {
+  generalRequest,
+  nkcAPI,
+  nkcUploadFile,
+  jalert,
+  jwarning,
+  toAlertOpenState,
+  sweetAlert,
+  sweetSuccess,
+  sweetError,
+  sweetInfo,
+  sweetWarning,
+  sweetConfirm,
+  sweetQuestion,
+  asyncSweetCustom,
+  asyncSweetSuccess,
+  asyncSweetError,
+  screenTopAlert,
+  screenTopWarning,
+  screenTopAlertOfStyle,
+  getID,
+  screenTopQuestion,
+  screenTopAlertInit,
+  redirect,
+  common,
+  edInsertContent,
+  insertHtmlAtCaret,
+  postUpload,
+  uploadFile,
+  uploadFilePromise,
+  deleteBill,
+  bannedUser,
+  newElement,
+  iconSwitch,
+  deleteForum,
+  openPostWarningDom,
+  submitPostWarning,
+  cancelXsf,
+  credit,
+  removedraft,
+  htmlAPI,
+  createProgressBar,
+  removeProgressBar,
+  homeTop,
+  unHomeTop,
+  latestTop,
+  unLatestTop,
+  unHomeAd,
+  openThread,
+  closeThread,
+  digestPost,
+  unDigestPost,
+  beep,
+  updateBeep,
+  initPhotoSwipe,
+  shareTo,
+  copyLink,
+  openwin,
+  obtainPureText,
+  postsVote,
+  hideKcbRecordReason,
+  lottery,
+  closeLottery,
+  scrollToBottom,
+  scrollToTop,
+  disablePostClick,
+  disablePost,
+  enablePost,
+  disabledThread,
+  moveThread,
+  numToFloatTwo,
+  nkcDrawerBodyTop,
+  openNKCDrawer,
+  closeNKCDrawer,
+  toggleNKCDrawer,
+  stopBodyScroll,
+  openLeftDrawer,
+  openRightDrawer,
+  closeDrawer,
+  openVideo,
+  reviewPost,
+  switchChildren,
+  reload,
+  openToNewLocation,
+  addApptypeToUrl,
+});

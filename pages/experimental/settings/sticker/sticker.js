@@ -1,1 +1,19 @@
-!function n(i,s,o){function u(e,t){if(!s[e]){if(!i[e]){var r="function"==typeof require&&require;if(!t&&r)return r(e,!0);if(c)return c(e,!0);throw(r=new Error("Cannot find module '"+e+"'")).code="MODULE_NOT_FOUND",r}r=s[e]={exports:{}},i[e][0].call(r.exports,function(t){return u(i[e][1][t]||t)},r,r.exports,n,i,s,o)}return s[e].exports}for(var c="function"==typeof require&&require,t=0;t<o.length;t++)u(o[t]);return u}({1:[function(t,e,r){"use strict";var n=NKC.methods.getDataById("data");new Vue({el:"#app",data:{stickerSettings:n.stickerSettings},methods:{submit:function(){var t=this.stickerSettings;nkcAPI("/e/settings/sticker","PUT",{stickerSettings:t}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById("data");
+const app = new Vue({
+  el: "#app",
+  data: {
+    stickerSettings: data.stickerSettings
+  },
+  methods: {
+    submit() {
+      const {stickerSettings} = this;
+      nkcAPI("/e/settings/sticker", "PUT", {
+        stickerSettings
+      })
+      .then(() => {
+        sweetSuccess("保存成功");
+      })
+      .catch(sweetError);
+    }
+  }
+});

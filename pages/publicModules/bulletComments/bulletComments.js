@@ -1,1 +1,251 @@
-!function n(i,s,r){function a(e,t){if(!s[e]){if(!i[e]){var o="function"==typeof require&&require;if(!t&&o)return o(e,!0);if(u)return u(e,!0);throw(o=new Error("Cannot find module '"+e+"'")).code="MODULE_NOT_FOUND",o}o=s[e]={exports:{}},i[e][0].call(o.exports,function(t){return a(i[e][1][t]||t)},o,o.exports,n,i,s,r)}return s[e].exports}for(var u="function"==typeof require&&require,t=0;t<r.length;t++)a(r[t]);return a}({1:[function(t,e,o){"use strict";function r(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}function n(t,e){for(var o=0;o<e.length;o++){var n=e[o];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(t,n.key,n)}}function i(t,e,o){return e&&n(t.prototype,e),o&&n(t,o),t}function a(t){r(this,a),this.id="nkcBullet_".concat(t.postId),t.id=this.id,this.info=t}var u=function(){function t(){r(this,t),this.dom=$('<a class="bullet" target="_blank"><img class="bullet-avatar" /><p class="bullet-content"></p></a>'),this.working=!1,this.top=0,this.speed=0,this.width=0,this.left=0,this.timeout=null}return i(t,[{key:"initMouseEvent",value:function(){function t(t){var e=i.dom.offset().left,o=i.dom.width(),o=i.getTransitionTimeByDistance(e+o);i.dom.css({transform:"translatex(0)",transition:"transform ".concat(o,"ms linear 0s"),"z-index":"5555"}),n.createTimeout(o)}function e(t){i.removeTimeout();var e=i.dom.offset().left;i.dom.css({transform:"translatex(".concat(e-i.left,"px)"),transition:"transform 0ms linear 0s","z-index":"9999"})}var n=this,i=this;this.dom.on("mouseover",e),this.dom.on("touchstart",e),this.dom.on("mouseleave",t),this.dom.on("touchend",t)}},{key:"clearMouseEvent",value:function(){this.dom.off("mouseover").off("mouseleave").off("touchstart").off("touchend")}},{key:"setInfo",value:function(t){this.clearMouseEvent(),this.working=!0;var e=t.contentUrl,o=t.id,n=t.avatarUrl,i=t.content,t=t.username;this.dom.attr({href:e,"data-id":o}),this.dom.find(".bullet-avatar").attr({src:n,alt:t}),this.dom.find(".bullet-content").text(i)}},{key:"setPosition",value:function(t){var e=t.top,o=t.speed;this.clearMouseEvent(),this.speed=o,this.top=e;t=$(body).width(),o=this.dom.width();this.left=-o,this.dom.css({transform:"translatex(".concat(t+o,"px)"),transition:"transform 0ms",left:this.left+"px",top:e+"px"}),this.initMouseEvent()}},{key:"getTransitionTimeByDistance",value:function(t){return Math.round(t/(this.speed/1e3))}},{key:"removeTimeout",value:function(){clearTimeout(this.timeout)}},{key:"createTimeout",value:function(t){var e=this;this.timeout=setTimeout(function(){e.working=!1},t)}},{key:"getDom",value:function(){return this.dom}},{key:"move",value:function(){var t=this.dom.width(),e=$(body).width(),e=this.getTransitionTimeByDistance(t+e);this.dom.css({transform:"translatex(0)",transition:"transform ".concat(e,"ms linear 0s")}),this.createTimeout(e)}}]),t}(),h=function(){function e(t){t=t.top;r(this,e),768<$(body).width()?this.speed=Math.round(50*Math.random()+60):this.speed=Math.round(50*Math.random()+40),this.top=t,this.boat=null}return i(e,[{key:"isFree",value:function(){var t,e=!0;return!this.boat||(t=this.boat.getDom()).offset().left+t.width()>$("body").width()&&(e=!1),e}}]),e}();NKC.modules.BulletComments=function(){function s(t){r(this,s);var e=t||{},t=e.trackCount,o=void 0===t?8:t,t=e.offsetTop,n=void 0===t?60:t,e=e.boatCount,e=void 0===e?64:e;this.id="nkcBullet".concat(Date.now()).concat(Math.round(1e3*Math.random())),this.setTimeoutId=null,this.bullets=[],this.boats=[],this.boatCount=e,this.tracks=[];for(var i=0;i<o;i++)this.tracks.push(new h({top:n+46*i}))}return i(s,[{key:"add",value:function(t){t=new a(t);this.bullets.push(t),this.setTimeoutId||this.transition()}},{key:"getFreeBoats",value:function(){for(var t=this.tracks.length,e=[],o=0;o<this.boats.length;o++){var n=this.boats[o];if(!n.working&&(e.push(n),t<=e))break}var i=t-e.length;if(0<i)for(var s=this.boatCount-this.boats.length,r=0;r<(s<i?s:i);r++){var a=new u;this.boats.push(a),e.push(a)}return e}},{key:"transition",value:function(){var a=this,u=this,h=this.tracks,f=this.bullets;this.setTimeoutId=setTimeout(function(){for(var t=u.getFreeBoats(),e=0;e<h.length;e++){var o,n,i,s,r=h[e];r.isFree()&&((o=f.shift())&&(n=r.top,i=r.speed,(s=t.pop())&&(s.setInfo(o.info),r=(r.boat=s).getDom(),$(body).append(r),s.setPosition({top:n,speed:i}),s.move())))}f.length?u.transition():a.setTimeoutId=null},300)}}]),s}()},{}]},{},[1]);
+class Boat {
+  constructor() {
+    this.dom = $(`<a class="bullet" target="_blank"><img class="bullet-avatar" /><p class="bullet-content"></p></a>`);
+    // 当前dom是否正在工作
+    this.working = false;
+    // dom距离上边框的距离
+    this.top = 0;
+    // 当前dom移动速度
+    this.speed = 0;
+    // dom宽
+    this.width = 0;
+    // dom距离左边框的距离
+    this.left = 0;
+    // 定时器，定时更改dom的状态（working）
+    this.timeout = null;
+  }
+  // 申明鼠标点击事件和触摸事件
+  initMouseEvent() {
+    const self = this;
+    // 鼠标悬浮或触摸开始
+    const leaveEvent = (e) => {
+      const domLeft = self.dom.offset().left;
+      const domWidth = self.dom.width();
+      // 根据当前距离和速度，计算出dom消失所需要的时间
+      const time = self.getTransitionTimeByDistance(domLeft + domWidth);
+      self.dom.css({
+        transform: `translatex(0)`,
+        transition: `transform ${time}ms linear 0s`,
+        "z-index": '5555',
+      });4
+      // 创建定时器，清除working标志
+      this.createTimeout(time);
+    }
+    // 鼠标离开或触摸结束
+    const overEvent = (e) => {
+      self.removeTimeout();
+      const {left} = self.dom.offset();
+      self.dom.css({
+        transform: `translatex(${left - self.left}px)`,
+        transition: `transform 0ms linear 0s`,
+        "z-index": '9999'
+      });
+    };
+    this.dom.on('mouseover', overEvent);
+    this.dom.on('touchstart', overEvent);
+    this.dom.on('mouseleave', leaveEvent);
+    this.dom.on('touchend', leaveEvent);
+  }
+  // 清除鼠标点击事件以及触摸事件
+  clearMouseEvent() {
+    this.dom
+      .off('mouseover')
+      .off('mouseleave')
+      .off('touchstart')
+      .off('touchend')
+  }
+  // 设置弹幕内容信息
+  setInfo(info) {
+    // 清除旧的事件
+    this.clearMouseEvent();
+    // 将当前dom标记为工作状态
+    this.working = true;
+    const {contentUrl, id, avatarUrl, content, username} = info;
+    this.dom.attr({
+      'href': contentUrl,
+      'data-id': id
+    });
+    this.dom.find('.bullet-avatar').attr({
+      'src': avatarUrl,
+      'alt': username
+    });
+    this.dom.find('.bullet-content').text(content);
+  }
+  // 设置dom的位置信息定义鼠标点击事件和触摸事件
+  setPosition({top, speed}) {
+    this.clearMouseEvent();
+    this.speed = speed;
+    this.top = top;
+    const bodyWidth = $(body).width();
+    const domWidth = this.dom.width();
+    this.left = -domWidth;
+    this.dom.css({
+      transform: `translatex(${bodyWidth + domWidth}px)`,
+      transition: `transform 0ms`,
+      left: this.left + 'px',
+      top: top + 'px',
+    });
+    this.initMouseEvent();
+  }
+  // 根据距离和速度计算出所需时间
+  getTransitionTimeByDistance(distance) {
+    return Math.round(distance / (this.speed / 1000));
+  }
+  // 移除定时器
+  removeTimeout() {
+    clearTimeout(this.timeout);
+  }
+  // 创建定时器，清除working状态
+  createTimeout(time) {
+    this.timeout = setTimeout(() => {
+      this.working = false;
+    }, time);
+  }
+  getDom() {
+    return this.dom;
+  }
+  // 设置dom的目标状态，启动定时器
+  move() {
+    const domWidth = this.dom.width();
+    const bodyWidth = $(body).width();
+    const time = this.getTransitionTimeByDistance(domWidth + bodyWidth);
+    this.dom.css({
+      transform: `translatex(0)`,
+      transition: `transform ${time}ms linear 0s`,
+    });
+    this.createTimeout(time);
+  }
+}
+
+class Bullet {
+  constructor(info) {
+    this.id = `nkcBullet_${info.postId}`;
+    info.id = this.id;
+    this.info = info;
+  }
+}
+
+class Track {
+  constructor({top}) {
+    // 轨道上弹幕的速度
+    if($(body).width() > 768) {
+      // 60px~110px/s
+      this.speed = Math.round(Math.random() * 50 + 60);
+    } else {
+      // 40px~90px/s
+      this.speed = Math.round(Math.random() * 50 + 40);
+    }
+    // 轨道距离上边框的位置
+    this.top = top;
+    // 当前轨道上的最后一条弹幕
+    this.boat = null;
+  }
+  // 判断轨道当前是否可以添加弹幕
+  isFree() {
+    let free = true;
+    if(this.boat) {
+      const dom = this.boat.getDom();
+      if((dom.offset().left + dom.width()) > $('body').width()) {
+        free = false;
+      }
+    }
+    return free;
+  }
+}
+
+
+class BulletComments {
+  constructor(options) {
+    // trackCount：弹幕轨道数
+    // offsetTop: 第一条弹幕轨道距离上边框的距离
+    const {trackCount = 8, offsetTop = 60, boatCount = 64} = options || {};
+    this.id = `nkcBullet${Date.now()}${Math.round(Math.random() * 1000)}`;
+    // 定时器 用于定时向轨道推送弹幕
+    this.setTimeoutId = null;
+    // 待显示的弹幕信息
+    this.bullets = [];
+    // 运送弹幕的dom，最大未this.boatCount
+    this.boats = [];
+    // 弹幕dom最大数量
+    this.boatCount = boatCount;
+    // 轨道
+    this.tracks = [];
+    // 创建trackCount个弹幕轨道
+    for(let i = 0; i < trackCount; i++) {
+      this.tracks.push(new Track({top: offsetTop + 46 * i}));
+    }
+  }
+  // 塞入一条信息，判断是否启动定时任务，未启动则启动
+  add(comment) {
+    const bullet = new Bullet(comment);
+    this.bullets.push(bullet);
+    if(!this.setTimeoutId) {
+      this.transition();
+    }
+  }
+  // 获取当前空闲的dom，数量不超过轨道数
+  getFreeBoats() {
+    const maxCount = this.tracks.length;
+    const freeBoats = [];
+    for(let i = 0; i < this.boats.length; i++) {
+      const boat = this.boats[i];
+      if (boat.working) continue;
+      freeBoats.push(boat);
+      if(freeBoats >= maxCount) break;
+    }
+    const need = maxCount - freeBoats.length;
+    if(need > 0) {
+      const max = this.boatCount - this.boats.length;
+      for(let i = 0; i < (need > max?max:need); i++) {
+        const boat = new Boat();
+        this.boats.push(boat);
+        freeBoats.push(boat);
+      }
+    }
+    return freeBoats;
+  }
+  // 启动定时任务，推送弹幕
+  transition() {
+    const self = this;
+    const {
+      tracks,
+      bullets,
+    } = this;
+    this.setTimeoutId = setTimeout(() => {
+      // 获取空闲dom
+      const freeBoats = self.getFreeBoats();
+      for(let i = 0; i <tracks.length; i++) {
+        // 判断当前轨道是否可以添加弹幕
+        const track = tracks[i];
+        if(!track.isFree()) continue;
+        // 取出一条待显示信息
+        const bullet = bullets.shift();
+        if(!bullet) continue;
+        const {top, speed} = track;
+        // 获取一个空闲dom
+        const boat = freeBoats.pop();
+        if(!boat) continue;
+        // 设置dom信息
+        boat.setInfo(bullet.info);
+        track.boat = boat;
+        const dom = boat.getDom();
+        $(body).append(dom);
+        // 设置dom位置
+        boat.setPosition({
+          top,
+          speed,
+        });
+        // 开始移动
+        boat.move();
+      }
+      if(bullets.length) {
+        self.transition();
+      } else {
+        this.setTimeoutId = null;
+      }
+    }, 300);
+  }
+}
+
+
+NKC.modules.BulletComments = BulletComments;

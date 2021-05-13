@@ -1,6 +1,6 @@
-var testTh;
+window.testTh = undefined;
 if(NKC.modules.MoveThread) {
-  testTh = new NKC.modules.MoveThread();
+  window.testTh = new NKC.modules.MoveThread();
 }
 function testThOpen() {
   var selectedForumsId = [], selectedCategoriesId = [];
@@ -602,3 +602,21 @@ function changeCountry(para) {
     $(para).next().css("display", "none")
   }
 }
+
+Object.assign(window, {
+  testThOpen,
+  paperProto,
+  openKeyWordsPanel,
+  removeOneKeyWords,
+  addOneAuthorInfo,
+  delOneAuthorInfo,
+  upToTop,
+  downToBottom,
+  outputAuthorInfosList,
+  useOriginState,
+  useContractAuthor,
+  testbtn,
+  countryArr,
+  getCountryList,
+  changeCountry,
+});

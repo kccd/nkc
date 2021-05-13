@@ -1,1 +1,145 @@
-!function o(i,r,s){function c(e,t){if(!r[e]){if(!i[e]){var n="function"==typeof require&&require;if(!t&&n)return n(e,!0);if(d)return d(e,!0);throw(n=new Error("Cannot find module '"+e+"'")).code="MODULE_NOT_FOUND",n}n=r[e]={exports:{}},i[e][0].call(n.exports,function(t){return c(i[e][1][t]||t)},n,n.exports,o,i,r,s)}return r[e].exports}for(var d="function"==typeof require&&require,t=0;t<s.length;t++)c(s[t]);return c}({1:[function(t,e,n){"use strict";var o=NKC.methods.getDataById("data");o.note.notes.map(function(t){t.edit=!1,t.options=!1});var s=new Vue({el:"#note",data:{uid:NKC.configs.uid,note:o.note,submitting:!1,content:""},mounted:function(){document.body.addEventListener("click",function(t){t.target.classList.contains("note-options-icon")||s.note.notes.map(function(t){return t.options=!1})})},methods:{visitUrl:NKC.methods.visitUrl,getUrl:NKC.methods.tools.getUrl,fromNow:NKC.methods.fromNow,openOptions:function(t){s.note.notes.map(function(t){return t.options=!1}),t.options=!t.options},resetTextarea:function(t){t=t?this.$refs[t._id][0]:this.$refs.newNote;t&&(t.style.height="5rem",60<t.scrollHeight&&(t.style.height=t.scrollHeight+"px"))},saveNewNote:function(){var i=this.content,r=this.note;Promise.resolve().then(function(){if(!i)throw"请输入笔记内容";var t=r.type,e=r.targetId,n=r._id,o=r.node;return s.submitting=!0,nkcAPI("/note","POST",{_id:n,type:t,targetId:e,node:o,content:i})}).then(function(t){s.content="",t.note.notes.map(function(t){t.options=!1,t.edit=!1}),s.note=t.note,s.submitting=!1,setTimeout(function(){s.resetTextarea()},50)}).catch(function(t){s.submitting=!1,sweetError(t)})},saveNote:function(e){var t,n,o=this.note,i=this.uid,r={};e.uid===i?(t="/note/".concat(o._id,"/c/").concat(e._id),n="PUT"):(t="/nkc/note",n="POST",r.type="modify",r.noteId=o._id,r.noteContentId=e._id),r.content=e.content,nkcAPI(t,n,r).then(function(t){e.html=t.noteContentHTML,s.modifyNoteContent(e),Vue.set(o.notes,o.notes.indexOf(e),e)}).catch(sweetError)},modifyNoteContent:function(t){t.edit=!t.edit,t.edit&&setTimeout(function(){s.resetTextarea(t)},50)},deleteNoteContent:function(t,e){var n,o,i=this.note,r={};"delete"===e?(n="/note/".concat(i._id,"/c/").concat(t._id),o="DELETE"):(o="POST",n="/nkc/note",t.disabled?r.type="cancelDisable":r.type="disable",r.noteId=i._id,r.noteContentId=t._id),sweetQuestion("确定要执行此操作？").then(function(){return nkcAPI(n,o,r)}).then(function(){"delete"===e?t.deleted=!0:t.disabled=!t.disabled,sweetSuccess("操作成功")}).catch(sweetError)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById("data");
+data.note.notes.map(note => {
+  note.edit = false;
+  note.options = false;
+});
+const app = new Vue({
+  el: "#note",
+  data: {
+    uid: NKC.configs.uid,
+    note: data.note,
+    submitting: false,
+    content: ""
+  },
+  mounted() {
+    document.body.addEventListener("click", (e) => {
+      if(e.target.classList.contains("note-options-icon")) return;
+      app.note.notes.map(note => note.options = false);
+    });
+  },
+  methods: {
+    visitUrl: NKC.methods.visitUrl,
+    getUrl: NKC.methods.tools.getUrl,
+    fromNow: NKC.methods.fromNow,
+    openOptions(nc) {
+      app.note.notes.map(note => note.options = false);
+      nc.options = !nc.options;
+    },
+    resetTextarea(nc) {
+      let textArea;
+      if(!nc) {
+        textArea = this.$refs.newNote;
+      } else {
+        textArea = this.$refs[nc._id][0];
+      }
+      if(!textArea) return;
+      const rem = 5;
+      const num = rem * 12;
+      textArea.style.height = rem + 'rem';
+      if(num < textArea.scrollHeight) {
+        textArea.style.height = textArea.scrollHeight + 'px';
+      }
+    },
+    saveNewNote() {
+      // 创建新的
+      const {content, note} = this;
+      Promise.resolve()
+        .then(() => {
+          if(!content) throw "请输入笔记内容";
+          const {type, targetId, _id, node} = note;
+          app.submitting = true;
+          return nkcAPI("/note", "POST", {
+            _id,
+            type,
+            targetId,
+            node,
+            content
+          });
+        })
+        .then(data => {
+          app.content = "";
+          /*if(!app.note._id) {
+            window.location.href = `/note/${data.note._id}`;
+          }*/
+          data.note.notes.map(note => {
+            note.options = false;
+            note.edit = false;
+          });
+          app.note = data.note;
+          app.submitting = false;
+          setTimeout(() => {
+            app.resetTextarea();
+          }, 50)
+        })
+        .catch(err => {
+          app.submitting = false;
+          sweetError(err);
+        });
+    },
+    saveNote(n) {
+      // 保存编辑
+      const {note, uid} = this;
+      let url, method, data = {};
+      if(n.uid === uid) {
+        url = `/note/${note._id}/c/${n._id}`;
+        method = "PUT";
+        data.content = n.content;
+      } else {
+        url = `/nkc/note`;
+        method = "POST";
+        data.type = "modify";
+        data.noteId = note._id;
+        data.noteContentId = n._id;
+        data.content = n.content;
+      }
+      nkcAPI(url, method, data)
+        .then((data) => {
+          n.html = data.noteContentHTML;
+          app.modifyNoteContent(n);
+          Vue.set(note.notes, note.notes.indexOf(n), n);
+        })
+        .catch(sweetError);
+    },
+    modifyNoteContent(nc) {
+      nc.edit = !nc.edit;
+      if(nc.edit) {
+        setTimeout(() => {
+          app.resetTextarea(nc);
+        }, 50);
+      }
+    },
+    deleteNoteContent(n, type) {
+      const {note} = this;
+      let url, method, data = {};
+      if(type === "delete") {
+        url = `/note/${note._id}/c/${n._id}`;
+        method = "DELETE";
+      } else {
+        method = "POST";
+        url = `/nkc/note`;
+        if(n.disabled) {
+          data.type = "cancelDisable";
+        } else {
+          data.type = "disable";
+        }
+        data.noteId = note._id;
+        data.noteContentId = n._id;
+      }
+      sweetQuestion("确定要执行此操作？")
+        .then(() => {
+          return nkcAPI(url, method, data);
+        })
+        .then(function() {
+          if(type === "delete") {
+            n.deleted = true;
+          } else {
+            n.disabled = !n.disabled;
+          }
+          sweetSuccess("操作成功");
+        })
+        .catch(sweetError)
+    }
+  }
+});
+
+window.app = app;

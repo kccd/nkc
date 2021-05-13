@@ -222,3 +222,16 @@ function checkPass(s){
    }
    return ls
  }
+
+Object.assign(window, {
+  chooseCountryNum,
+  error_report,
+  info_report,
+  error_report2,
+  info_report2,
+  submit,
+  submit2,
+  getMcode,
+  getFocus,
+  checkPass,
+});

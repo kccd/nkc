@@ -1,1 +1,116 @@
-!function r(n,i,a){function s(t,e){if(!i[t]){if(!n[t]){var o="function"==typeof require&&require;if(!e&&o)return o(t,!0);if(l)return l(t,!0);throw(o=new Error("Cannot find module '"+t+"'")).code="MODULE_NOT_FOUND",o}o=i[t]={exports:{}},n[t][0].call(o.exports,function(e){return s(n[t][1][e]||e)},o,o.exports,r,n,i,a)}return i[t].exports}for(var l="function"==typeof require&&require,e=0;e<a.length;e++)s(a[e]);return s}({1:[function(e,t,o){"use strict";var r=NKC.methods.getDataById("data").forum;r._noticeThreadsId=(r.noticeThreadsId||[]).join(", "),r._basicThreadsId=(r.basicThreadsId||[]).join(", "),r._valuableThreadsId=(r.valuableThreadsId||[]).join(", ");var n=new NKC.methods.selectImage;new Vue({el:"#app",data:{logoData:"",logoFile:"",bannerData:"",bannerFile:"",submitting:!1,forum:r},mounted:function(){var t=this;setTimeout(function(){NKC.methods.initSelectColor(function(e){t.forum.color=e})},100)},methods:{getUrl:NKC.methods.tools.getUrl,str2arr:function(e){var e=e.split(","),t=[];return e.map(function(e){(e=e.trim())&&t.push(e)}),t},selectLogo:function(){var o=this;n.show(function(e){var t=NKC.methods.blobToFile(e);NKC.methods.fileToUrl(t).then(function(e){o.logoData=e,o.logoFile=t,n.close()})},{aspectRatio:1})},selectBanner:function(){var o=this;n.show(function(e){var t=NKC.methods.blobToFile(e);NKC.methods.fileToUrl(t).then(function(e){o.bannerData=e,o.bannerFile=t,n.close()})},{aspectRatio:4})},toEditor:function(){NKC.methods.visitUrl("/editor?type=forum_declare&id="+this.forum.fid,!0)},toLatestNoticeEditor:function(){NKC.methods.visitUrl("/editor?type=forum_latest_notice&id="+this.forum.fid,!0)},save:function(){var t=this,o=t.forum;Promise.resolve().then(function(){t.submitting=!0,o.noticeThreadsId=t.str2arr(o._noticeThreadsId),o.basicThreadsId=t.str2arr(o._basicThreadsId),o.valuableThreadsId=t.str2arr(o._valuableThreadsId);var e=new FormData;return e.append("forum",JSON.stringify(o)),t.logoFile&&e.append("logo",t.logoFile),t.bannerFile&&e.append("banner",t.bannerFile),nkcUploadFile("/f/".concat(t.forum.fid,"/settings/info"),"PUT",e)}).then(function(e){e.logo&&(t.logoData="",t.logoFile="",t.forum.logo=e.logo),e.banner&&(t.bannerData="",t.bannerFile="",t.forum.banner=e.banner),sweetSuccess("保存成功"),t.submitting=!1}).catch(function(e){t.submitting=!1,sweetError(e)})}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const forum = data.forum;
+forum._noticeThreadsId = (forum.noticeThreadsId || []).join(", ");
+forum._basicThreadsId = (forum.basicThreadsId || []).join(", ");
+forum._valuableThreadsId = (forum.valuableThreadsId || []).join(", ");
+const selectImage = new NKC.methods.selectImage()
+const app = new Vue({
+	el: '#app',
+	data: {
+		logoData: '',
+		logoFile: '',
+		bannerData: '',
+		bannerFile: '',
+		submitting: false,
+		forum
+	},
+	mounted() {
+		const self = this;
+		setTimeout(() => {
+			NKC.methods.initSelectColor(color => {
+				self.forum.color = color;
+			});
+		}, 100)
+
+	},
+	methods: {
+		getUrl: NKC.methods.tools.getUrl,
+		str2arr(str) {
+			const arr = str.split(',');
+			const _arr = [];
+			arr.map(a => {
+				a = a.trim();
+				if(a) _arr.push(a);
+			});
+			return _arr;
+		},
+		selectLogo() {
+			const self = this;
+			selectImage.show(d => {
+				const file = NKC.methods.blobToFile(d);
+				NKC.methods.fileToUrl(file)
+					.then(d => {
+						self.logoData = d;
+						self.logoFile = file;
+						selectImage.close();
+					})
+			}, {
+				aspectRatio: 1
+			});
+		},
+		selectBanner() {
+			const self = this;
+			selectImage.show(d => {
+				const file = NKC.methods.blobToFile(d);
+				NKC.methods.fileToUrl(file)
+					.then(d => {
+						self.bannerData = d;
+						self.bannerFile = file;
+						selectImage.close();
+					})
+			}, {
+				aspectRatio: 4
+			});
+		},
+		toEditor() {
+			NKC.methods.visitUrl('/editor?type=forum_declare&id='+this.forum.fid, true);
+		},
+		toLatestNoticeEditor() {
+			NKC.methods.visitUrl('/editor?type=forum_latest_notice&id='+this.forum.fid, true);
+		},
+		save() {
+			const self = this;
+			const {forum} = self;
+			Promise.resolve()
+				.then(() => {
+					self.submitting = true;
+					forum.noticeThreadsId = self.str2arr(forum._noticeThreadsId);
+					forum.basicThreadsId = self.str2arr(forum._basicThreadsId);
+					forum.valuableThreadsId = self.str2arr(forum._valuableThreadsId);
+					const formData = new FormData();
+					formData.append('forum', JSON.stringify(forum));
+					if(self.logoFile) {
+						formData.append('logo', self.logoFile);
+					}
+					if(self.bannerFile) {
+						formData.append('banner', self.bannerFile);
+					}
+					return nkcUploadFile(`/f/${self.forum.fid}/settings/info`, 'PUT', formData);
+				})
+				.then((data) => {
+					if(data.logo) {
+						self.logoData = '';
+						self.logoFile = '';
+						self.forum.logo = data.logo;
+					}
+					if(data.banner) {
+						self.bannerData = '';
+						self.bannerFile = '';
+						self.forum.banner = data.banner;
+					}
+					sweetSuccess('保存成功');
+					self.submitting = false;
+				})
+				.catch(err => {
+					self.submitting = false;
+					sweetError(err);
+				});
+		}
+	}
+});
+
+Object.assign(window, {
+	forum,
+	selectImage,
+	app,
+})

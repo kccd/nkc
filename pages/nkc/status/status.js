@@ -1,1 +1,157 @@
-!function i(a,r,o){function s(e,t){if(!r[e]){if(!a[e]){var n="function"==typeof require&&require;if(!t&&n)return n(e,!0);if(u)return u(e,!0);throw(n=new Error("Cannot find module '"+e+"'")).code="MODULE_NOT_FOUND",n}n=r[e]={exports:{}},a[e][0].call(n.exports,function(t){return s(a[e][1][t]||t)},n,n.exports,i,a,r,o)}return r[e].exports}for(var u="function"==typeof require&&require,t=0;t<o.length;t++)s(o[t]);return s}({1:[function(t,e,n){"use strict";function i(t){t=t.type;"custom"===t?$("#custom").show():($("#custom").hide(),a(t))}function a(t){var e="/nkc?type="+t;"custom"===t&&(e="/nkc?type="+t+"&time1="+$('#custom input[name="time1"]').val()+"&time2="+$('#custom input[name="time2"]').val()),nkcAPI(e,"GET",{}).then(function(t){var e;e=t.results,t=echarts.init(document.getElementById("main")),e={title:{text:""},tooltip:{trigger:"axis"},legend:{data:["发表文章","发表回复","用户注册"]},xAxis:{data:e.x},yAxis:{},series:[{name:"发表文章",type:"line",stack:"发表文章",data:e.threadsData},{name:"发表回复",type:"line",stack:"发表回复",data:e.postsData},{name:"用户注册",type:"line",stack:"用户注册",data:e.usersData}]},t.setOption(e)}).catch(function(t){screenTopWarning(t.error||t)})}$(function(){$(".time").datetimepicker({language:"zh-CN",format:"yyyy-mm",autoclose:1,todayHighlight:1,startView:4,minView:3,forceParse:0}),i({type:"today"});var n=$('input:radio[name="statusType"]');n.on("ifChanged",function(){for(var t=0;t<n.length;t++){var e=n.eq(t);e.prop("checked")&&i({type:e.attr("data-type")})}})}),window.getResults=i,window.reset=function(){$('#custom input[name="time1"]').val(""),$('#custom input[name="time2"]').val("")},window.getData=a;var r=NKC.methods.getDataById("data");window.app=new Vue({el:"#app",data:{originOperations:r.operations,sortType:"count"},methods:{clearData:function(){return sweetQuestion("确定要清除记录？").then(function(){return nkcAPI("/nkc","POST",{type:"removeStatisticsOperation"})}).then(function(){sweetSuccess("清除成功")}).catch(sweetError)},changeSortType:function(t){this.sortType=t}},computed:{operations:function(){var n=this.sortType;return this.originOperations.sort(function(t,e){return e[n]-t[n]})}}})},{}]},{},[1]);
+function initTime() {
+  $('.time').datetimepicker({
+    language:  'zh-CN',
+    format: 'yyyy-mm',
+    autoclose: 1,
+    todayHighlight: 1,
+    startView: 4,
+    minView: 3,
+    forceParse: 0
+  });
+}
+
+$(function() {
+  initTime();
+  getResults({type: 'today'});
+  var radios = $('input:radio[name="statusType"]');
+  radios.on('ifChanged', function() {
+    for(var i = 0; i < radios.length; i ++) {
+      var radio = radios.eq(i);
+      if(radio.prop('checked')) {
+        var type = radio.attr('data-type');
+        getResults({type: type});
+      }
+    }
+  });
+});
+
+/*$('input[name="statusType"]').iCheck({
+  checkboxClass: 'icheckbox_minimal-red',
+  radioClass: 'iradio_minimal-red',
+});*/
+
+
+function getResults(options) {
+  var type = options.type;
+  if(type === 'custom') {
+    $('#custom').show();
+  } else {
+    $('#custom').hide();
+    getData(type)
+  }
+
+}
+
+function reset() {
+  $('#custom input[name="time1"]').val('');
+  $('#custom input[name="time2"]').val('');
+}
+
+function getData(type) {
+  var url = '/nkc?type='+type;
+  if(type === 'custom') {
+    var time1 = $('#custom input[name="time1"]').val();
+    var time2 = $('#custom input[name="time2"]').val();
+    url = '/nkc?type='+type+'&time1='+time1+'&time2='+time2;
+  }
+  nkcAPI(url, 'GET', {})
+    .then(function(data) {
+      display(data.results);
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error|| data);
+    })
+}
+
+function display(results) {
+
+
+  var myChart = echarts.init(document.getElementById('main'));
+
+
+  // 指定图表的配置项和数据
+  var option = {
+    title: {
+      text: ''
+    },
+    tooltip: {
+      trigger: 'axis'
+    },
+    legend: {
+      data:['发表文章', '发表回复', '用户注册']
+    },
+    xAxis: {
+      data: results.x
+    },
+    yAxis: {},
+    series: [
+      {
+        name: '发表文章',
+        type: 'line',
+        stack: '发表文章',
+        data: results.threadsData
+      },
+      {
+        name: '发表回复',
+        type: 'line',
+        stack: '发表回复',
+        data: results.postsData
+      },
+      {
+        name: '用户注册',
+        type: 'line',
+        stack: '用户注册',
+        data: results.usersData
+      }
+    ]
+  };
+
+  // 使用刚指定的配置项和数据显示图表。
+  myChart.setOption(option);
+}
+window.getResults = getResults;
+window.reset = reset;
+window.getData = getData;
+
+const data = NKC.methods.getDataById('data');
+window.app = new Vue({
+  el: '#app',
+  data: {
+    originOperations: data.operations,
+    sortType: 'count'
+  },
+  methods: {
+    clearData() {
+      return sweetQuestion(`确定要清除记录？`)
+        .then(() => {
+          return nkcAPI('/nkc', 'POST', {
+            type: 'removeStatisticsOperation'
+          });
+        })
+
+        .then(() => {
+          sweetSuccess(`清除成功`);
+        })
+        .catch(sweetError);
+    },
+    changeSortType(sortType) {
+      this.sortType = sortType;
+    }
+  },
+  computed: {
+    operations() {
+      const {sortType, originOperations} = this;
+      return originOperations.sort(function(v1, v2) {
+        return v2[sortType] - v1[sortType];
+      });
+    }
+  },
+});
+
+Object.assign(window, {
+  initTime,
+  getResults,
+  reset,
+  getData,
+  display,
+});

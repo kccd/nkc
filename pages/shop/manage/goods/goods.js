@@ -1,1 +1,251 @@
-!function o(r,a,i){function c(t,e){if(!a[t]){if(!r[t]){var n="function"==typeof require&&require;if(!e&&n)return n(t,!0);if(u)return u(t,!0);throw(n=new Error("Cannot find module '"+t+"'")).code="MODULE_NOT_FOUND",n}n=a[t]={exports:{}},r[t][0].call(n.exports,function(e){return c(r[t][1][e]||e)},n,n.exports,o,r,a,i)}return a[t].exports}for(var u="function"==typeof require&&require,e=0;e<i.length;e++)c(i[e]);return c}({1:[function(e,t,n){"use strict";var r=new NKC.modules.CommonModal;window.modifyParam=function(n,o){var e=getParam(n,o);r.open(function(e){var t={name:e[0].value,originPrice:e[1].value,stocksSurplus:e[2].value,price:e[3].value,useDiscount:e[4].value,isEnable:e[5].value,paramId:o,productId:n};nkcAPI("/shop/manage/".concat(NKC.configs.uid,"/goodslist/editParam"),"PUT",{paramData:t}).then(function(){sweetSuccess("修改成功"),r.close(),setParam(n,o,t)}).catch(sweetError)},{title:"修改规格",data:[{dom:"input",type:"text",label:"名称",value:e.name},{dom:"input",type:"number",label:"价格（元，精确到0.01）",value:e.originPrice},{dom:"input",type:"number",label:"库存",value:e.stocksSurplus},{dom:"input",type:"number",label:"优惠价（元，精确到0.01）",value:e.price},{dom:"radio",label:"是否使用优惠价",value:e.useDiscount,radios:[{value:!0,name:"是"},{value:!1,name:"否"}]},{dom:"radio",label:"是否屏蔽",value:e.isEnable,radios:[{value:!1,name:"是"},{value:!0,name:"否"}]}]})},window.computeStocks=function(e){},window.getNumber=function(e){var t=1<arguments.length&&void 0!==arguments[1]?arguments[1]:0;return e=(e+="").replace("￥",""),e=(e=parseFloat(e)).toFixed(t),parseFloat(e)},window.getParamDom=function(e,t){var n=$(".param[data-product-id='".concat(e,"'][data-param-id='").concat(t,"']")),o=n.find(".origin-price"),r=n.find(".price"),e=n.find(".name"),t=n.find(".stocks-surplus");return{dom:n,name:e,originPrice:o,price:r,stocksSurplus:t}},window.getParam=function(e,t){var n=getParamDom(e,t),o=n.dom,r=n.originPrice,a=n.price,i=n.name,e=n.stocksSurplus,r=getNumber(r.text(),2),t=!1;"无"===a.text()?a="":(a=getNumber(a.text(),2),t=!0);e=getNumber(e.text()),n=!0;return o.hasClass("disabled")&&(n=!1),{name:i=i.text(),isEnable:n,useDiscount:t,originPrice:r,price:a,stocksSurplus:e}},window.setParam=function(a,e,t){var i=getParamDom(a,e),c=t.name,u=t.originPrice,s=t.price,d=t.useDiscount,l=t.stocksSurplus,m=t.isEnable,t=NKC.methods.checkData,p=t.checkString,f=t.checkNumber;Promise.resolve().then(function(){if(p(c,{name:"名称",minLength:1,maxLength:100}),f(l,{name:"库存",min:0}),f(u,{name:"价格",min:.01,fractionDigits:2}),d){if(u<=s)throw"规格优惠价必须小于原价";f(s,{name:"优惠价",min:.01,fractionDigits:2})}m?i.dom.removeClass("disabled"):i.dom.addClass("disabled"),i.name.text(c),i.originPrice.text("￥".concat(u.toFixed(2))),i.stocksSurplus.text(l),d?i.price.text("￥".concat(s.toFixed(2))).addClass("number"):i.price.text("无").removeClass("number");for(var e=$(".product[data-product-id='".concat(a,"'] .stocks-surplus")),t=$(".param[data-product-id='".concat(a,"'] .stocks-surplus")),n=0,o=0;o<t.length;o++){var r=t.eq(o);n+=getNumber(r.text())}e.text(n)}).catch(sweetError)},window.shelfNow=function(e){sweetQuestion("确认要上架该商品？").then(function(){return nkcAPI("/shop/manage/".concat(NKC.configs.uid,"/goodslist/shelfRightNow"),"PUT",{productId:e})}).then(function(){sweetSuccess("商品已上架")}).catch(sweetError)},window.stopSale=function(e){sweetQuestion("确认要停售该商品？").then(function(){return nkcAPI("/shop/manage/".concat(NKC.configs.uid,"/goodslist/productStopSale"),"PUT",{productId:e})}).then(function(){sweetSuccess("商品已停售")}).catch(sweetError)},window.goonSale=function(e){sweetQuestion("确认要复售该商品？").then(function(){return nkcAPI("/shop/manage/".concat(NKC.configs.uid,"/goodslist/productGoonSale"),"PUT",{productId:e})}).then(function(){sweetSuccess("商品已复售")}).catch(sweetError)}},{}]},{},[1]);
+const CommonModal = new NKC.modules.CommonModal();
+
+window.CommonModal = CommonModal;
+
+window.modifyParam = function (productId, paramId) {
+  const param = getParam(productId, paramId);
+  CommonModal.open(data => {
+    const paramData = {
+      name: data[0].value,
+      originPrice: data[1].value,
+      stocksSurplus: data[2].value,
+      price: data[3].value,
+      useDiscount: data[4].value,
+      isEnable: data[5].value,
+      paramId,
+      productId
+    };
+
+
+    nkcAPI(`/shop/manage/${NKC.configs.uid}/goodslist/editParam`, "PUT", {paramData})
+      .then(() => {
+        sweetSuccess("修改成功");
+        CommonModal.close();
+        setParam(productId, paramId, paramData);    
+      })
+      .catch(sweetError)
+    
+  }, {
+    title: "修改规格",
+    data: [
+      {
+        dom: "input",
+        type: "text",
+        label: "名称",
+        value: param.name
+      },
+      {
+        dom: "input",
+        type: "number",
+        label: "价格（元，精确到0.01）",
+        value: param.originPrice
+      },
+      {
+        dom: "input",
+        type: "number",
+        label: "库存",
+        value: param.stocksSurplus
+      },
+      {
+        dom: "input",
+        type: "number",
+        label: "优惠价（元，精确到0.01）",
+        value: param.price
+      },
+      {
+        dom: "radio",
+        label: "是否使用优惠价",
+        value: param.useDiscount,
+        radios: [
+          {
+            value: true,
+            name: "是"
+          },
+          {
+            value: false,
+            name: "否"
+          }
+        ]
+      },
+      {
+        dom: "radio",
+        label: "是否屏蔽",
+        value: param.isEnable,
+        radios: [
+          {
+            value: false,
+            name: "是"
+          },
+          {
+            value: true,
+            name: "否"
+          }
+        ]
+      }
+    ]
+  });
+}
+
+// 重新计算一个商品的总库存和总销量
+window.computeStocks = function(productId) {
+
+}
+
+// 字符串数字提取
+window.getNumber = function(str, fractionDigits = 0) {
+  str = str + "";
+  str = str.replace("￥", "");
+  str = parseFloat(str);
+  str = str.toFixed(fractionDigits);
+  return parseFloat(str);
+}
+
+// 获取规格相关的dom
+window.getParamDom = function(productId, paramId) {
+  const dom = $(`.param[data-product-id='${productId}'][data-param-id='${paramId}']`);
+  let originPrice = dom.find(".origin-price");
+  let price = dom.find(".price");
+  let name = dom.find(".name");
+  let stocksSurplus = dom.find(".stocks-surplus");
+  return {
+    dom,
+    name,
+    originPrice,
+    price,
+    stocksSurplus
+  }
+}
+
+// 获取规格信息
+window.getParam = function(productId, paramId) {
+  let {
+    dom,
+    originPrice,
+    price,
+    name,
+    stocksSurplus
+  } = getParamDom(productId, paramId);
+  originPrice = getNumber(originPrice.text(), 2);
+  let useDiscount = false;
+  if(price.text() === "无") {
+    price = "";
+  } else {
+    price = getNumber(price.text(), 2);
+    useDiscount = true;
+  }
+  stocksSurplus = getNumber(stocksSurplus.text());
+  let isEnable = true;
+  if(dom.hasClass("disabled")) isEnable = false;
+  name = name.text();
+  return {
+    name,
+    isEnable,
+    useDiscount,
+    originPrice,
+    price,
+    stocksSurplus
+  }
+}
+
+window.setParam = function(productId, paramId, param) {
+  const paramDom = getParamDom(productId, paramId);
+  const {
+    name, 
+    originPrice,
+    price,
+    useDiscount,
+    stocksSurplus,
+    isEnable
+  } = param;
+
+  const {checkString, checkNumber} = NKC.methods.checkData;
+
+  Promise.resolve()
+    .then(() => {
+      checkString(name, {
+        name: "名称",
+        minLength: 1,
+        maxLength: 100
+      });
+      checkNumber(stocksSurplus, {
+        name: "库存",
+        min: 0
+      }),
+      checkNumber(originPrice, {
+        name: "价格",
+        min: 0.01,
+        fractionDigits: 2
+      });
+      if(useDiscount) {
+        if(price >= originPrice) throw "规格优惠价必须小于原价";
+        checkNumber(price, {
+          name: "优惠价",
+          min: 0.01,
+          fractionDigits: 2
+        });
+      }
+      if(isEnable) {
+        paramDom.dom.removeClass("disabled");
+      } else {
+        paramDom.dom.addClass("disabled");
+      }
+      paramDom.name.text(name);
+      paramDom.originPrice.text(`￥${originPrice.toFixed(2)}`);
+      paramDom.stocksSurplus.text(stocksSurplus);
+      if(useDiscount) {
+        paramDom.price.text(`￥${price.toFixed(2)}`).addClass("number");
+      } else {
+        paramDom.price.text(`无`).removeClass("number");
+      }
+      const productDom = $(`.product[data-product-id='${productId}'] .stocks-surplus`);
+      const stocksDoms = $(`.param[data-product-id='${productId}'] .stocks-surplus`);
+      let count = 0;
+      for(let i = 0 ; i < stocksDoms.length; i++) {
+        const s = stocksDoms.eq(i);
+        count += getNumber(s.text());
+      }
+      productDom.text(count);
+    })
+    .catch(sweetError);
+}
+
+/*
+* 立即上架
+* */
+window.shelfNow = function(productId) {
+  sweetQuestion("确认要上架该商品？")
+    .then(() => {
+      return nkcAPI(`/shop/manage/${NKC.configs.uid}/goodslist/shelfRightNow`, "PUT", {productId});
+    })
+    .then(() => {
+      sweetSuccess("商品已上架");
+    })
+    .catch(sweetError);
+}
+/**
+ * 商品停售
+ */
+window.stopSale = function(productId) {
+  sweetQuestion("确认要停售该商品？")
+    .then(() => {
+      return nkcAPI(`/shop/manage/${NKC.configs.uid}/goodslist/productStopSale`, "PUT", {productId});
+    })
+    .then(() => {
+      sweetSuccess("商品已停售");
+    })
+    .catch(sweetError);
+}
+
+/**
+ * 商品复售
+ */
+window.goonSale = function(productId) {
+  sweetQuestion("确认要复售该商品？")
+    .then(() => {
+      return nkcAPI(`/shop/manage/${NKC.configs.uid}/goodslist/productGoonSale`, "PUT", {productId});
+    })
+    .then(() => {
+      sweetSuccess("商品已复售");
+    })
+    .catch(sweetError);
+}

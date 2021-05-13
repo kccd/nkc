@@ -67,3 +67,5 @@ vueSelectForum.init = function(options) {
     }
   });
 };
+
+window.vueSelectForum = vueSelectForum;

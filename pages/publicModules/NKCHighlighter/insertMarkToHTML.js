@@ -1,1 +1,110 @@
-!function t(o,i,u){function f(r,e){if(!i[r]){if(!o[r]){var n="function"==typeof require&&require;if(!e&&n)return n(r,!0);if(c)return c(r,!0);throw(n=new Error("Cannot find module '"+r+"'")).code="MODULE_NOT_FOUND",n}n=i[r]={exports:{}},o[r][0].call(n.exports,function(e){return f(o[r][1][e]||e)},n,n.exports,t,o,i,u)}return i[r].exports}for(var c="function"==typeof require&&require,e=0;e<u.length;e++)f(u[e]);return f}({1:[function(e,r,n){"use strict";var t,o,i=(i=document.getElementById("html")).innerHTML;t=i,(o=document.createElement("div")).innerHTML=t,console.log(o)},{}]},{},[1]);
+let html = document.getElementById("html");
+
+html = html.innerHTML;
+
+const notes = [
+  {
+    _id: 1,
+    node: {
+      offset: 2,
+      length: 3
+    }
+  },
+  {
+    _id: 2,
+    node: {
+      offset: 5,
+      length: 12
+    }
+  },
+  {
+    _id: 3,
+    node: {
+      offset: 7,
+      length: 9
+    }
+  }
+];
+
+
+function insertMarkToHTML(html, notes) {
+  const root = document.createElement("div");
+  root.innerHTML = html;
+  console.log(root);
+
+}
+
+function getNotes(parent, offset, length) {
+  const nodeStack = [parent];
+  let curOffset = 0;
+  let node = null;
+  let curLength = length;
+  let nodes = [];
+  let started = false;
+  const self = this;
+  while(!!(node = nodeStack.pop())) {
+    const children = node.childNodes;
+    loop:
+      for (let i = children.length - 1; i >= 0; i--) {
+        const node = children[i];
+        if(node.nodeType === 1) {
+          const cl = node.classList;
+          for(const c of self.hl.excludedElementClass) {
+            if(cl.contains(c)) {
+              continue loop;
+            }
+          }
+          const elementTagName = node.tagName.toLowerCase();
+          if(self.hl.excludedElementTagName.includes(elementTagName)) {
+            continue;
+          }
+        }
+        nodeStack.push(node);
+      }
+    if(node.nodeType === 3 && node.textContent.length) {
+      curOffset += node.textContent.length;
+      if(curOffset > offset) {
+        if(curLength <= 0) break;
+        let startOffset;
+        if(!started) {
+          startOffset = node.textContent.length - (curOffset - offset);
+        } else {
+          startOffset = 0;
+        }
+        started = true;
+        let needLength;
+        if(curLength <= node.textContent.length - startOffset) {
+          needLength = curLength;
+          curLength = 0;
+        } else {
+          needLength = node.textContent.length - startOffset;
+          curLength -= needLength;
+        }
+        nodes.push({
+          node,
+          startOffset,
+          needLength
+        });
+      }
+    }
+  }
+  nodes = nodes.map(obj => {
+    let {node, startOffset, needLength} = obj;
+    if(startOffset > 0) {
+      node = node.splitText(startOffset);
+    }
+    if(node.textContent.length !== needLength) {
+      node.splitText(needLength);
+    }
+    return node;
+  });
+  return nodes;
+}
+
+insertMarkToHTML(html, notes);
+
+Object.assign(window, {
+  notes,
+  insertMarkToHTML,
+  getNotes,
+});

@@ -1,1 +1,48 @@
-!function r(o,i,a){function s(e,t){if(!i[e]){if(!o[e]){var n="function"==typeof require&&require;if(!t&&n)return n(e,!0);if(c)return c(e,!0);throw(n=new Error("Cannot find module '"+e+"'")).code="MODULE_NOT_FOUND",n}n=i[e]={exports:{}},o[e][0].call(n.exports,function(t){return s(o[e][1][t]||t)},n,n.exports,r,o,i,a)}return i[e].exports}for(var c="function"==typeof require&&require,t=0;t<a.length;t++)s(a[t]);return s}({1:[function(t,e,n){"use strict";var r=NKC.methods.getDataById("data");r.applications.map(function(t){t._status="pending"});new Vue({el:"#app",data:{applications:r.applications},methods:{fromNow:NKC.methods.fromNow,timeFormat:NKC.methods.timeFormat,getUrl:NKC.methods.tools.getUrl,checkString:NKC.methods.checkData.checkString,close:function(t){t._status="pending"},submit:function(t){var e=this,n=t._status,r=t._id,o=t.remarks,i=t.reason;Promise.resolve().then(function(){return"rejected"===n&&e.checkString(i,{name:"理由",minLength:1,maxLength:1e3}),nkcAPI("/nkc/securityApplication","POST",{applicationId:r,remarks:o,reason:i,status:n})}).then(function(){t.status=n}).catch(sweetError)}},updated:function(){floatUserPanel.initPanel()}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+data.applications.map(a => {
+  a._status = 'pending';
+});
+const app = new Vue({
+  el: '#app',
+  data: {
+    applications: data.applications,
+  },
+  methods: {
+    fromNow: NKC.methods.fromNow,
+    timeFormat: NKC.methods.timeFormat,
+    getUrl: NKC.methods.tools.getUrl,
+    checkString: NKC.methods.checkData.checkString,
+    close(a) {
+      a._status = 'pending';
+    },
+    submit(a) {
+      const {_status, _id, remarks, reason} = a;
+      const self = this;
+      Promise.resolve()
+        .then(() => {
+          if(_status === 'rejected') {
+            this.checkString(reason, {
+              name: '理由',
+              minLength: 1,
+              maxLength: 1000
+            });
+          }
+          return nkcAPI('/nkc/securityApplication', 'POST', {
+            applicationId: _id,
+            remarks,
+            reason,
+            status: _status
+          });
+        })
+        .then(() => {
+          a.status = _status;
+        })
+        .catch(sweetError);
+    }
+  },
+  updated() {
+    floatUserPanel.initPanel();
+  }
+})
+
+window.app = app;

@@ -1,1 +1,33 @@
-!function o(n,i,u){function s(t,e){if(!i[t]){if(!n[t]){var r="function"==typeof require&&require;if(!e&&r)return r(t,!0);if(a)return a(t,!0);throw(r=new Error("Cannot find module '"+t+"'")).code="MODULE_NOT_FOUND",r}r=i[t]={exports:{}},n[t][0].call(r.exports,function(e){return s(n[t][1][e]||e)},r,r.exports,o,n,i,u)}return i[t].exports}for(var a="function"==typeof require&&require,e=0;e<u.length;e++)s(u[e]);return s}({1:[function(e,t,r){"use strict";var o=NKC.methods.getDataById("data");new Vue({el:"#app",data:{pForums:o.pForums},methods:{timeFormat:NKC.methods.tools.timeFormat,getUrl:NKC.methods.tools.getUrl,agree:function(e){this.post(e,!0)},disagree:function(e){this.post(e,!1)},post:function(t,e){nkcAPI("/nkc/applyForum","POST",{pfid:t.pfid,agree:!!e}).then(function(e){t.review=e.review,sweetSuccess("执行成功")}).catch(sweetError)}},mounted:function(){floatUserPanel.initPanel()}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const app = new Vue({
+  el: "#app",
+  data: {
+    pForums: data.pForums
+  },
+  methods: {
+    timeFormat: NKC.methods.tools.timeFormat,
+    getUrl: NKC.methods.tools.getUrl,
+    agree(f) {
+      this.post(f, true);
+    },
+    disagree(f) {
+      this.post(f, false);
+    },
+    post(f, agree) {
+      nkcAPI('/nkc/applyForum', 'POST', {
+        pfid: f.pfid,
+        agree: !!agree,
+      })
+        .then((data) => {
+          f.review = data.review;
+          sweetSuccess('执行成功');
+        })
+        .catch(sweetError)
+    }
+  },
+  mounted() {
+    floatUserPanel.initPanel();
+  }
+});
+
+window.app = app;

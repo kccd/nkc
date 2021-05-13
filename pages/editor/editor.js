@@ -14,15 +14,20 @@
 *   forumDeclare: 编辑专业说明的草稿
 *
 * */
-var editor;
-var CommonModal;
-var PostInfo, PostButton, PostToColumn, PostSurvey, ForumSelector;
+
+window.editor = undefined;
+window.PostInfo = undefined;
+window.PostButton = undefined;
+window.PostToColumn = undefined;
+window.PostSurvey = undefined;
+window.ForumSelector = undefined;
+window.CommonModal = undefined;
 // 标志：编辑器是否已初始化
 var EditorReady = false;
-var data;
+window.data = undefined;
 $(function() {
-  data = NKC.methods.getDataById("data");
-  editor = UE.getEditor("content", NKC.configs.ueditor.editorConfigs);
+  window.data = NKC.methods.getDataById("data");
+  window.editor = UE.getEditor("content", NKC.configs.ueditor.editorConfigs);
   editor.methods = {};
   editor.addListener( 'ready', function( statu ) {
     // 编辑器准备就绪
@@ -35,12 +40,12 @@ $(function() {
   // 实例化专栏模块，如果不存在构造函数则用户没有权限转发。
   // 在提交数据前，读取专栏分类的时候，注意判断是否存在实例PostToColumn。
   if(NKC.modules.SelectColumnCategories) {
-    PostToColumn = new NKC.modules.SelectColumnCategories();
+    window.PostToColumn = new NKC.modules.SelectColumnCategories();
   }
   // 实例化投票模块
   // 获取数据时需判断实例是否存在
   if(NKC.modules.SurveyEdit && $("#moduleSurveyEdit").length) {
-    PostSurvey = new NKC.modules.SurveyEdit();
+    window.PostSurvey = new NKC.modules.SurveyEdit();
     PostSurvey.init({surveyId: data.post? data.post.surveyId: ""});
     if(data.type !== "newThread") {
       hideButton();
@@ -49,13 +54,14 @@ $(function() {
       disabledSurveyForm();
     }
   }
+  window.editor = editor;
 });
 
 function initVueApp() {
   // 内容相关的vue实例
   // 下边的PostButton是按钮及提示相关的vue实例
   // 分开写是因为在这两部分中间可能插入其他通过vue实现的模块
-  PostInfo = new Vue({
+  window.PostInfo = new Vue({
     el: "#postInfo",
     data: {
       // 辅助专业数量限制
@@ -851,7 +857,7 @@ function initVueApp() {
       },
     }
   });
-  PostButton = new Vue({
+  window.PostButton = new Vue({
     el: "#postButton",
     data: {
       disabledSubmit: false, // 锁定提交按钮
@@ -1112,3 +1118,16 @@ window.onbeforeunload = function() {
 NKC.methods.selectedDraft = function(draft) {
   PostInfo.insertDraft(draft);
 }
+
+Object.assign(window, {
+  initVueApp,
+  resetBodyPaddingTop,
+  disabledSurveyForm,
+  hideButton,
+  mediaInsertUE,
+  saveUEContentToLocal,
+  setLocalContentToUE,
+  appUpdateVideo,
+  appUpdateImage,
+  EditorReady
+});

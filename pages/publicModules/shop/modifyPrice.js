@@ -1,1 +1,81 @@
-!function i(o,r,c){function u(n,t){if(!r[n]){if(!o[n]){var e="function"==typeof require&&require;if(!t&&e)return e(n,!0);if(a)return a(n,!0);throw(e=new Error("Cannot find module '"+n+"'")).code="MODULE_NOT_FOUND",e}e=r[n]={exports:{}},o[n][0].call(e.exports,function(t){return u(o[n][1][t]||t)},e,e.exports,i,o,r,c)}return r[n].exports}for(var a="function"==typeof require&&require,t=0;t<c.length;t++)u(c[t]);return u}({1:[function(t,n,e){"use strict";NKC.modules.ShopModifyPrice=function(){return function t(){!function(t,n){if(!(t instanceof n))throw new TypeError("Cannot call a class as a function")}(this,t);var e=this;e.dom=$("#moduleModifyPrice"),e.dom.modal({show:!1,backdrop:"static"}),e.app=new Vue({el:"#moduleModifyPriceApp",data:{price:0,type:"discount",number:"",warning:""},mounted:function(){this.checkData()},watch:{number:function(){this.checkData()},type:function(){this.checkData()}},computed:{resultPrice:function(){var t=this.price,n=this.number,e=this.type,n=n||0;return("input"===e?n:"discount"===e?n*t/100:t-n).toFixed(2)}},methods:{checkData:function(){this.warning="";var t=this.price,n=this.number,e=this.type;"discount"===e?1<=n&&n<=100||(this.warning="折扣数值不在规定的范围内"):"reduce"===e?.01<=n&&n<t||(this.warning="减去的数值不在规定的范围内"):.01<=n||(this.warning="改价后的数值不能小于0.01")},open:function(t,n){e.callback=t,e.app.price=n,e.dom.modal("show")},close:function(){e.dom.modal("hide")},submit:function(){e.callback(parseFloat(this.resultPrice)),this.close()}}}),e.open=e.app.open,e.close=e.app.close}}()},{}]},{},[1]);
+NKC.modules.ShopModifyPrice = class {
+  constructor() {
+    const self = this;
+    self.dom = $("#moduleModifyPrice");
+    self.dom.modal({
+      show: false,
+      backdrop: "static"
+    });
+    
+    self.app = new Vue({
+      el: "#moduleModifyPriceApp",
+      data: {
+        price: 0,
+        type: "discount", // discount: 折扣，reduce: 减价, input: 直接输入
+        number: "",
+        warning: ""
+      },
+      mounted() {
+        this.checkData();
+      },
+      watch: {
+        number() {
+          this.checkData();
+        },
+        type() {
+          this.checkData();
+        }
+      },
+      computed: {
+        resultPrice() {
+          let {price, number, type} = this;
+          number = number || 0;
+          if(type === "input") {
+            return number.toFixed(2);
+          } else if(type === "discount") {
+            return (number * price / 100).toFixed(2);
+          } else {
+            return (price - number).toFixed(2);
+          } 
+        }
+      },
+      methods: {
+        checkData() {
+          this.warning = "";
+          let {price, number, type} = this;
+          if(type === "discount") {
+            if(number >= 1 && number <= 100){}
+            else{
+              this.warning = "折扣数值不在规定的范围内";
+            }
+          } else if(type === "reduce") {
+            if(number >= 0.01 && number < price) {}
+            else {
+              this.warning = "减去的数值不在规定的范围内";
+            }
+          } else {
+            if(number >= 0.01) {}
+            else {
+              this.warning = "改价后的数值不能小于0.01";
+            }
+          }
+        },
+        open(callback, price) {
+          self.callback = callback;
+          self.app.price = price;
+          self.dom.modal("show");
+        },
+        close() {
+          self.dom.modal("hide");
+        },
+        submit() {
+          self.callback(parseFloat(this.resultPrice));
+          this.close();
+        }
+      }
+    });
+    self.open = self.app.open;
+    self.close = self.app.close;
+  }
+
+}

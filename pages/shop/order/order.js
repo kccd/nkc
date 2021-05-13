@@ -1,1 +1,12 @@
-!function t(o,i,u){function c(n,e){if(!i[n]){if(!o[n]){var r="function"==typeof require&&require;if(!e&&r)return r(n,!0);if(f)return f(n,!0);throw(r=new Error("Cannot find module '"+n+"'")).code="MODULE_NOT_FOUND",r}r=i[n]={exports:{}},o[n][0].call(r.exports,function(e){return c(o[n][1][e]||e)},r,r.exports,t,o,i,u)}return i[n].exports}for(var f="function"==typeof require&&require,e=0;e<u.length;e++)c(u[e]);return c}({1:[function(e,n,r){"use strict";window.comfirmReceipt=function(e){sweetQuestion("确认收货后，货款将打入卖家账户，请再次确认。").then(function(){nkcAPI("/shop/order/"+e+"/receipt","PUT",{}).then(function(e){sweetSuccess("执行成功"),window.location.reload()}).catch(sweetErro)}).catch(function(e){return null})}},{}]},{},[1]);
+window.comfirmReceipt = function(orderId) {
+  sweetQuestion("确认收货后，货款将打入卖家账户，请再次确认。")
+    .then(() => {
+      nkcAPI('/shop/order/'+orderId+'/receipt', "PUT", {})
+        .then(function(data) {
+          sweetSuccess("执行成功");
+          window.location.reload();
+        })
+        .catch(sweetErro)
+    })
+    .catch(err => null)
+}

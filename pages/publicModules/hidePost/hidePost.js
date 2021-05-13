@@ -1,1 +1,40 @@
-!function t(i,r,c){function u(o,e){if(!r[o]){if(!i[o]){var n="function"==typeof require&&require;if(!e&&n)return n(o,!0);if(d)return d(o,!0);throw(n=new Error("Cannot find module '"+o+"'")).code="MODULE_NOT_FOUND",n}n=r[o]={exports:{}},i[o][0].call(n.exports,function(e){return u(i[o][1][e]||e)},n,n.exports,t,i,r,c)}return r[o].exports}for(var d="function"==typeof require&&require,e=0;e<c.length;e++)u(c[e]);return u}({1:[function(e,o,n){"use strict";NKC.modules.HidePost=function(){return function e(){!function(e,o){if(!(e instanceof o))throw new TypeError("Cannot call a class as a function")}(this,e);var n=this;n.dom=$("#moduleHidePost"),n.dom.modal({show:!1}),n.app=new Vue({el:"#moduleHidePostApp",data:{pid:"",hide:""},methods:{open:function(e,o){n.callback=e,e=o.pid,o=o.hide,this.pid=e,this.hide=o,n.dom.modal("show")},close:function(){n.dom.modal("hide")},submit:function(){nkcAPI("/p/".concat(this.pid,"/hide"),"PUT",{hide:this.hide}).then(function(){n.callback(),n.app.close()}).catch(sweetError)}}}),n.open=n.app.open,n.close=n.app.close}}()},{}]},{},[1]);
+NKC.modules.HidePost = class {
+  constructor() {
+    const self = this;
+    self.dom = $("#moduleHidePost"); 
+    self.dom.modal({
+      show: false
+    });
+    self.app = new Vue({
+      el: "#moduleHidePostApp",
+      data: {
+        pid: "",
+        hide: ""        
+      },
+      methods: {
+        open(callback, options) {
+          self.callback = callback;
+          const {pid, hide} = options;
+          this.pid = pid;
+          this.hide = hide;
+          self.dom.modal("show");
+        },
+        close() {
+          self.dom.modal("hide");
+        },
+        submit() {
+          nkcAPI(`/p/${this.pid}/hide`, "PUT", {
+            hide: this.hide
+          })
+            .then(() => {
+              self.callback();
+              self.app.close();
+            })
+            .catch(sweetError);
+        }
+      }
+    });
+    self.open = self.app.open;
+    self.close = self.app.close;
+  }
+}

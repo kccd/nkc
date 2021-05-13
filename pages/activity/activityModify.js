@@ -1,16 +1,16 @@
-var customForm;
+window.customForm = undefined;
 if(NKC.modules.customForm) {
-  customForm = new NKC.modules.customForm();
+  window.customForm = new NKC.modules.customForm();
 }
 $(document).ready(function() {
   var options = JSON.parse($("#contionJSON").text());
   customForm.init(options);
 })
-var ue;
+window.ue = undefined;
 $(document).ready(function(){
   // 初始化编辑器
   var replyCon = $("#replyxxx").text();
-  ue = UE.getEditor("editor", NKC.configs.ueditor.activityConfigs);
+  window.ue = UE.getEditor("editor", NKC.configs.ueditor.activityConfigs);
   ue.ready(function() {
     ue.setContent(replyCon);
   });
@@ -288,3 +288,16 @@ function sendMessage(acid) {
       screenTopWarning(data.error)
     })
 }
+
+Object.assign(window, {
+  htmlDecode,
+  insertToImage,
+  timeStampCheck,
+  deadlineCheck,
+  savePoster,
+  submitredit,
+  cancelApply,
+  closeActivity,
+  sendMessage,
+  ue
+});

@@ -1,3 +1,0 @@
-function openUploadPanel() {
-  $("#stickerInput").click();
-}

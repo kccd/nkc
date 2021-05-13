@@ -808,3 +808,29 @@ function cancelQuote(){
   geid('quoteContent').innerHTML = "";
   geid('quoteCancel').style.display = "none";
 }
+
+
+Object.assign(window, {
+  dataURItoBlob,
+  get_selection,
+  replace_selection,
+  set_selection,
+  Editor,
+  getSearchKV,
+  blockOnChange,
+  threadTypesOnChange,
+  childrenOnChange,
+  parentsOnChange,
+  saveDraft,
+  onPost,
+  groupingForums,
+  createOption,
+  mathfresh,
+  fitscreen,
+  extract_resource_from_tag,
+  mathfreshnew,
+  mathfresha1,
+  reedit,
+  fitscreennew,
+  cancelQuote,
+});

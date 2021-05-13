@@ -71,3 +71,8 @@ function managementColumn(columnId, type, disabled) {
       })
   }
 }
+
+Object.assign(window, {
+  disabledColumn,
+  managementColumn,
+});

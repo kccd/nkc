@@ -24,3 +24,5 @@ function orderSearch(uid) {
   // window.location.href = "/shop/manage/" + uid + "/order/orderListToExcel?orderStartStamp=" + orderStartStamp + "&orderEndStamp=" + orderEndStamp;
   openToNewLocation("/shop/manage/" + uid + "/order/orderListToExcel?orderStartStamp=" + orderStartStamp + "&orderEndStamp=" + orderEndStamp);
 }
+
+window.orderSearch = orderSearch;

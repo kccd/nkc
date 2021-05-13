@@ -147,9 +147,9 @@ $("#searchInput").keydown(function (e) {//当按下按键时
 		searchUser();
 	}
 });
-var ModifyAccountInfo;
+window.ModifyAccountInfo = undefined;
 $(function() {
-  ModifyAccountInfo = new NKC.modules.ModifyAccountInfo();
+  window.ModifyAccountInfo = new NKC.modules.ModifyAccountInfo();
 });
 function editUserInfo(uid) {
   ModifyAccountInfo.open({
@@ -176,4 +176,13 @@ function showUserScores(uid) {
       $("#myAllScore").html(str);
     })
 }
+
+Object.assign(window, {
+  searchUser,
+  createElements,
+  saveUserInfo,
+  editorRole,
+  editUserInfo,
+  showUserScores,
+});
 

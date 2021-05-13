@@ -223,3 +223,4 @@ NKC.modules.Login = function() {
 };
 
 var Login = new NKC.modules.Login();
+window.Login = Login;

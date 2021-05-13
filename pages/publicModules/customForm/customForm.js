@@ -734,3 +734,25 @@ function downToForm(para) {
     next.after(parents);
   }).fadeIn();
 }
+
+Object.assign(window, {
+  addCommonFormOption,
+  commonFormListObj,
+  addCustomFormOption,
+  addCodeToOption,
+  customFormListObj,
+  delCustomFormOption,
+  addOptionValue,
+  delOptionValue,
+  reViewFormList,
+  buildUpFormListCond,
+  buildUpOneFormCond,
+  reviewFormListObjCond,
+  buildUpFormList,
+  buildUpOneForm,
+  reviewFormListObj,
+  outputFormListJSON,
+  makeRandomCode,
+  upToForm,
+  downToForm,
+});

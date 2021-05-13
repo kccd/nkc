@@ -65,3 +65,11 @@ function unBlockCurrentActivity(acid) {
     sweetWarning(data.error);
   })
 }
+
+Object.assign(window, {
+  initTime,
+  errInfoTips,
+  clearErrTips,
+  blockCurrentActivity,
+  unBlockCurrentActivity,
+});

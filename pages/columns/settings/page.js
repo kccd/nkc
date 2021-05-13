@@ -57,3 +57,9 @@ $(function() {
     func(i);
   }
 });
+
+Object.assign(window, {
+  setHidden,
+  deletePage,
+  toNav,
+});

@@ -1,1 +1,155 @@
-!function r(i,o,a){function u(e,t){if(!o[e]){if(!i[e]){var n="function"==typeof require&&require;if(!t&&n)return n(e,!0);if(s)return s(e,!0);throw(n=new Error("Cannot find module '"+e+"'")).code="MODULE_NOT_FOUND",n}n=o[e]={exports:{}},i[e][0].call(n.exports,function(t){return u(i[e][1][t]||t)},n,n.exports,r,i,o,a)}return o[e].exports}for(var s="function"==typeof require&&require,t=0;t<a.length;t++)u(a[t]);return u}({1:[function(t,e,n){"use strict";function p(t,e){e||(e=t,t=location.href);t=new URL(t,location.origin);return new URL(e,t).href}NKC.methods.rn={index:0,callback:{}},NKC.methods.rn.postMessage=function(t){window.ReactNativeWebView.postMessage(JSON.stringify(t))},NKC.methods.rn.emit=function(t,e,n){e=e||{};var r=NKC.methods.rn.index++;NKC.methods.rn.callback[r]=n,NKC.methods.rn.postMessage({type:t,data:e,webFunctionId:r})},NKC.methods.rn.onMessage=function(t){var e=t.webFunctionId,t=t.data,e=NKC.methods.rn.callback[e];e&&e(t)},NKC.methods.rn.updateMusicListAndPlay=function(t){for(var e=$('span[data-tag="nkcsource"][data-type="audio"]'),n=[],r=[],i=0;i<e.length;i++){var o=e.eq(i),a=o.attr("data-id"),o=o.find(".app-audio-title");o.length&&(o=o.text()),-1===n.indexOf(a)&&(n.push(a),r.push(o))}var u=n.indexOf(t);0<u&&(t=n.splice(0,u),u=r.splice(0,u),n=n.concat(t),r=r.concat(u));for(var s=[],d=0;d<n.length;d++)s.push({url:window.location.origin+"/r/"+n[d],name:r[d],from:window.location.href});NKC.methods.rn.emit("updateMusicListAndPlay",{list:s})},document.addEventListener("click",function(t){var e=t.target,n=e.nodeName.toLowerCase(),r=e.getAttribute("data-type");if(o=(o=e.getAttribute("data-src"))||e.getAttribute("src"),"img"===n&&"view"===r&&o){for(var i,o=window.location.origin+o,a=document.querySelectorAll('img[data-type="view"]'),u=[],s=0;s<a.length;s++){var d=a[s],c=d.getAttribute("alt"),l=d.getAttribute("data-src");if(!(l=l||d.getAttribute("src")))return;(l=window.location.origin+l)===o&&(i=s),u.push({url:l,name:c})}NKC.methods.rn.emit("viewImage",{urls:u,index:i}),t.preventDefault()}else{var f,r=null;if("a"===n?r=e:(r=$(e).parents("a")).length&&(r=r[0]),r&&(h=r.getAttribute("href"),f=r.getAttribute("title")),h){var h,e=r.getAttribute("data-type"),r=r.getAttribute("data-title");if("download"===e){t.preventDefault();var m=p(location.href,h),g=r||Date.now()+"_"+Math.floor(1e3*Math.random())+".file";return sweetQuestion("确定要下载「".concat(g,"」?")).then(function(){NKC.methods.rn.emit("downloadFile",{url:m,filename:g})})}"reload"!==e&&(t.preventDefault(),h=p(location.href,h),NKC.methods.rn.emit("openNewPage",{href:h,title:f}))}}}),NKC.methods.rn.emit("syncPageInfo",{uid:NKC.configs.uid}),NKC.methods.rn.alert=function(t){NKC.methods.rn.emit("alert_message",{message:t})}},{}]},{},[1]);
+NKC.methods.rn = {
+  index: 0,
+  callback: {}
+};
+
+NKC.methods.rn.postMessage = function(obj) {
+  window.ReactNativeWebView.postMessage(JSON.stringify(obj));
+};
+
+NKC.methods.rn.emit = function(type, data, callback) {
+  data = data || {};
+  var index = NKC.methods.rn.index++;
+  NKC.methods.rn.callback[index] = callback;
+  NKC.methods.rn.postMessage({
+    type: type,
+    data: data,
+    webFunctionId: index
+  });
+};
+
+NKC.methods.rn.onMessage = function(res) {
+  var webFunctionId = res.webFunctionId;
+  var data = res.data;
+  var func = NKC.methods.rn.callback[webFunctionId];
+  if(func) {
+    func(data);
+  }
+}
+
+NKC.methods.rn.updateMusicListAndPlay = function(targetRid) {
+  var elements = $('span[data-tag="nkcsource"][data-type="audio"]');
+  var audiosId = [], audiosTitle = [];
+  for(var i = 0; i < elements.length; i ++) {
+    var e = elements.eq(i);
+    var rid = e.attr('data-id');
+    var title = e.find('.app-audio-title');
+    if(title.length) title = title.text();
+    if(audiosId.indexOf(rid) === -1) {
+      audiosId.push(rid);
+      audiosTitle.push(title);
+    }
+  }
+  var index = audiosId.indexOf(targetRid);
+  if(index > 0) {
+    var _audiosId = audiosId.splice(0, index);
+    var _audiosTitle = audiosTitle.splice(0, index);
+    audiosId = audiosId.concat(_audiosId);
+    audiosTitle = audiosTitle.concat(_audiosTitle);
+  }
+  var list = [];
+  for(let i = 0; i < audiosId.length; i ++) {
+    list.push({
+      url: window.location.origin + '/r/' + audiosId[i],
+      name: audiosTitle[i],
+      from: window.location.href,
+    });
+  }
+  NKC.methods.rn.emit('updateMusicListAndPlay', {list: list});
+}
+
+
+function urlPathEval(fromUrl, toUrl) {
+  if (!toUrl) {
+    toUrl = fromUrl;
+    fromUrl = location.href;
+  }
+  let fullFromUrl = new URL(fromUrl, location.origin);
+  return new URL(toUrl, fullFromUrl).href;
+}
+window.urlPathEval = urlPathEval;
+
+
+document.addEventListener('click', (e)  => {
+  const target = e.target;
+  const targetNodeName = target.nodeName.toLowerCase();
+  const dataType = target.getAttribute('data-type');
+  let src = target.getAttribute('data-src');
+  if(!src) src = target.getAttribute('src');
+  if(targetNodeName === 'img' && dataType === 'view' && src) {
+    src = window.location.origin + src;
+    // 图片处理
+    const images = document.querySelectorAll('img[data-type="view"]');
+    const urls = [];
+    let index;
+    for(let i = 0; i < images.length; i++) {
+      const image = images[i];
+      const name = image.getAttribute('alt');
+      let _src = image.getAttribute('data-src');
+      if(!_src) {
+        _src = image.getAttribute('src');
+      }
+      if(!_src) return;
+      _src = window.location.origin + _src;
+      if(_src === src) {
+        index = i;
+      }
+      urls.push({
+        url: _src,
+        name
+      });
+    }
+    NKC.methods.rn.emit('viewImage', {
+      urls,
+      index,
+    });
+    e.preventDefault();
+  } else {
+    // 链接处理
+    let $a = null;
+    if (targetNodeName === 'a') {
+      $a = target;
+    } else {
+      $a = $(target).parents('a');
+      if($a.length) $a = $a[0];
+    }
+    let href, title;
+    if($a) {
+      href = $a.getAttribute('href');
+      title = $a.getAttribute('title');
+    }
+    if(!href) return;
+    const aDataType = $a.getAttribute('data-type');
+    const aDataTitle = $a.getAttribute('data-title');
+    if(aDataType === 'download') {
+      e.preventDefault();
+      const targetUrl = urlPathEval(location.href, href);
+      const filename = aDataTitle || (Date.now()+ '_' + Math.floor(Math.random() * 1000) + '.file');
+      return sweetQuestion(`确定要下载「${filename}」?`)
+        .then(() => {
+          NKC.methods.rn.emit('downloadFile', {
+            url: targetUrl,
+            filename
+          });
+        })
+
+    } else if(aDataType !== 'reload') {
+      e.preventDefault();
+      const targetUrl = urlPathEval(location.href, href);
+      NKC.methods.rn.emit('openNewPage', {
+        href: targetUrl,
+        title
+      });
+    }
+  }
+});
+
+// 同步cookie信息
+NKC.methods.rn.emit('syncPageInfo', {uid: NKC.configs.uid});
+
+
+NKC.methods.rn.alert = function(msg) {
+  NKC.methods.rn.emit('alert_message', {
+    message: msg
+  });
+}

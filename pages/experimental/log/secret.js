@@ -51,3 +51,5 @@ function restore(id) {
 
 
 }
+
+window.restore = restore;

@@ -979,3 +979,5 @@ NKC.methods.isPcBrowser = function() {
       console.log('Registration failed with ' + error);
     })
 }*/
+
+window.NKC = NKC;

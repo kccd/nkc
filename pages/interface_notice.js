@@ -12,3 +12,5 @@ function submit(uid) {
 			screenTopWarning(data.error);
 		})
 }
+
+window.submit = submit;

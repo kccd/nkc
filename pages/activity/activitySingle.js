@@ -1,6 +1,6 @@
-var customForm;
+window.customForm = undefined;
 if(NKC.modules.customForm) {
-  customForm = new NKC.modules.customForm();
+  window.customForm = new NKC.modules.customForm();
 }
 
 $("document").ready(function() {
@@ -148,3 +148,15 @@ function cancelApply(acid) {
 function editApply(acid) {
 
 }
+
+Object.assign(window, {
+  customForm,
+  changeToApply,
+  changeToEdit,
+  changeToDescription,
+  onedit,
+  onpost,
+  submitComment,
+  cancelApply,
+  editApply,
+});

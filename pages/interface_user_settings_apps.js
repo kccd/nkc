@@ -192,3 +192,17 @@ var app = new Vue({
     }
   }
 });
+
+Object.assign(window, {
+  changeWaterStyle,
+  changeWaterPosition,
+  submit,
+  isAlreadyPay,
+  showButton,
+  hideButton,
+  yesPayForWater,
+  noPayForWater,
+  turnImg,
+  saveAppInfo,
+  app,
+});

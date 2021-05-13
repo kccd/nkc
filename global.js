@@ -34,4 +34,5 @@ Object.defineProperty(Array.prototype, "shuffle", {
 // 处理EMFILE问题
 const fs = require('fs');
 const gfs = require('graceful-fs');
+// monkey patch
 gfs.gracefulify(fs);

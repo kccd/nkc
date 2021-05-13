@@ -1,1 +1,67 @@
-!function n(o,a,c){function i(e,r){if(!a[e]){if(!o[e]){var t="function"==typeof require&&require;if(!r&&t)return t(e,!0);if(u)return u(e,!0);throw(t=new Error("Cannot find module '"+e+"'")).code="MODULE_NOT_FOUND",t}t=a[e]={exports:{}},o[e][0].call(t.exports,function(r){return i(o[e][1][r]||r)},t,t.exports,n,o,a,c)}return a[e].exports}for(var u="function"==typeof require&&require,r=0;r<c.length;r++)i(c[r]);return i}({1:[function(r,e,t){"use strict";function l(r,e){var t;if("undefined"==typeof Symbol||null==r[Symbol.iterator]){if(Array.isArray(r)||(t=function(r,e){if(r){if("string"==typeof r)return i(r,e);var t=Object.prototype.toString.call(r).slice(8,-1);return"Map"===(t="Object"===t&&r.constructor?r.constructor.name:t)||"Set"===t?Array.from(r):"Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?i(r,e):void 0}}(r))||e&&r&&"number"==typeof r.length){t&&(r=t);var n=0,e=function(){};return{s:e,n:function(){return n>=r.length?{done:!0}:{done:!1,value:r[n++]}},e:function(r){throw r},f:e}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var o,a=!0,c=!1;return{s:function(){t=r[Symbol.iterator]()},n:function(){var r=t.next();return a=r.done,r},e:function(r){c=!0,o=r},f:function(){try{a||null==t.return||t.return()}finally{if(c)throw o}}}}function i(r,e){(null==e||e>r.length)&&(e=r.length);for(var t=0,n=new Array(e);t<e;t++)n[t]=r[t];return n}var a=NKC.methods.getDataById("data");a.forumScoreOperations.map(function(r){var e,t=l(a.scoresType);try{for(t.s();!(e=t.n()).done;){var n=e.value,o=r[n];r["_".concat(n)]=void 0===o?0:o/100}}catch(r){t.e(r)}finally{t.f()}});new Vue({el:"#app",data:{forumAvailableScoreOperations:a.forumAvailableScoreOperations,forumScoreOperations:a.forumScoreOperations,scores:a.scores,scoresType:a.scoresType,forum:a.forum},methods:{checkNumber:NKC.methods.checkData.checkNumber,addScoreOperation:function(){var r,e={type:"",cycle:"day",count:0},t=l(this.scoresType);try{for(t.s();!(r=t.n()).done;)e["_"+r.value]=0}catch(r){t.e(r)}finally{t.f()}this.forumScoreOperations.push(e)},removeScoreOperation:function(r){this.forumScoreOperations.splice(r,1)},save:function(){var i=this.forumScoreOperations,u=this.checkNumber,f=this.scoresType,s=this.forum,i=JSON.parse(JSON.stringify(i));Promise.resolve().then(function(){var r,e=l(i);try{for(e.s();!(r=e.n()).done;){var t,n=r.value,o=l(f);try{for(o.s();!(t=o.n()).done;){var a=t.value,c=n["_".concat(a)];u(c,{name:"积分策略中加减的积分值",fractionDigits:2}),n[a]=parseInt(100*c),delete n["_".concat(a)]}}catch(r){o.e(r)}finally{o.f()}}}catch(r){e.e(r)}finally{e.f()}return nkcAPI("/f/".concat(s.fid,"/settings/score"),"PUT",{forumScoreOperations:i})}).then(function(){sweetSuccess("保存成功")}).catch(sweetError)}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+
+data.forumScoreOperations.map(s => {
+  for(const scoreType of data.scoresType) {
+    const oldValue = s[scoreType];
+    s[`_${scoreType}`] = oldValue === undefined? 0: oldValue / 100;
+  }
+});
+const app = new Vue({
+  el: '#app',
+  data: {
+    forumAvailableScoreOperations: data.forumAvailableScoreOperations,
+    forumScoreOperations: data.forumScoreOperations,
+    scores: data.scores,
+    scoresType: data.scoresType,
+    forum: data.forum,
+  },
+  methods: {
+    checkNumber: NKC.methods.checkData.checkNumber,
+    addScoreOperation() {
+      const scoreOperation = {
+        type: '',
+        cycle: 'day',
+        count: 0,
+      };
+      for(const scoreType of this.scoresType) {
+        scoreOperation['_' + scoreType] = 0;
+      }
+      this.forumScoreOperations.push(scoreOperation);
+    },
+    removeScoreOperation(index) {
+      this.forumScoreOperations.splice(index, 1);
+    },
+    save() {
+      let {
+        forumScoreOperations,
+        checkNumber,
+        scoresType,
+        forum,
+      } = this;
+      forumScoreOperations = JSON.parse(JSON.stringify(forumScoreOperations));
+      Promise.resolve()
+        .then(() => {
+          for(const scoreOperation of forumScoreOperations) {
+            for(const scoreType of scoresType) {
+              const oldValue = scoreOperation[`_${scoreType}`];
+              checkNumber(oldValue, {
+                name: '积分策略中加减的积分值',
+                fractionDigits: 2
+              });
+              scoreOperation[scoreType] = parseInt(oldValue * 100);
+              delete scoreOperation[`_${scoreType}`];
+            }
+          }
+          return nkcAPI(`/f/${forum.fid}/settings/score`, 'PUT', {
+            forumScoreOperations
+          });
+        })
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
+        .catch(sweetError);
+    }
+  }
+});
+
+window.app = app;

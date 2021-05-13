@@ -328,3 +328,19 @@ function moveThreadToRecycle(id,para) {
 	};
 	fn(n);
 }
+
+Object.assign(window, {
+	initEvent,
+	createSelect,
+	displaySelect,
+	parentForum,
+	getChildrenForums,
+	getThreadTypes,
+	getResult,
+	getResultForumId,
+	getResultHaveForumId,
+	selectbtn,
+	moveListThreads,
+	moveThreads,
+	moveThreadToRecycle,
+});

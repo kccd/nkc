@@ -155,3 +155,13 @@ function jump(obj){
 		}
 	}
 }
+
+Object.assign(window, {
+	initFromTo,
+	getUser,
+	inputAbstract,
+	load,
+	loadFromTo,
+	submit,
+	jump,
+});

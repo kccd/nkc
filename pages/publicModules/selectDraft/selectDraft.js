@@ -1,1 +1,130 @@
-!function e(i,r,a){function c(o,t){if(!r[o]){if(!i[o]){var n="function"==typeof require&&require;if(!t&&n)return n(o,!0);if(f)return f(o,!0);throw(n=new Error("Cannot find module '"+o+"'")).code="MODULE_NOT_FOUND",n}n=r[o]={exports:{}},i[o][0].call(n.exports,function(t){return c(i[o][1][t]||t)},n,n.exports,e,i,r,a)}return r[o].exports}for(var f="function"==typeof require&&require,t=0;t<a.length;t++)c(a[t]);return c}({1:[function(t,o,n){"use strict";NKC.modules.SelectDraft=function(){return function t(){!function(t,o){if(!(t instanceof o))throw new TypeError("Cannot call a class as a function")}(this,t);var e=this;e.dom=$("#moduleSelectDraft"),e.app=new Vue({el:"#moduleSelectDraftApp",data:{uid:NKC.configs.uid,paging:{},perpage:7,loading:!0,drafts:[]},methods:{fromNow:NKC.methods.fromNow,initDom:function(){e.dom.css({height:"43.5rem"}),e.dom.draggable({scroll:!1,handle:".module-sd-title",drag:function(t,o){o.position.top<0&&(o.position.top=0);var n=$(window).height();o.position.top>n-30&&(o.position.top=n-30),n=e.dom.width(),o.position.left<100-n&&(o.position.left=100-n),n=$(window).width(),o.position.left>n-100&&(o.position.left=n-100)}});var t=$(window).width();t<700?e.dom.css({width:.8*t,top:0,right:0}):e.dom.css("left",.5*(t-e.dom.width())-20),e.dom.show()},getDraftInfo:function(t){var o=t.type,n=t.thread,t=t.forum;return"newThread"===o?"发表文章":"newPost"===o?"在文章《".concat(n.title,"》下发表回复"):"modifyPost"===o?"修改文章《".concat(n.title,"》下的回复"):"modifyThread"===o?"修改文章《".concat(n.title,"》"):"修改专业《".concat(t.title,"modifyForumLatestNotice"===o?"》最新页板块公告":"》的专业说明")},insert:function(o){var t=NKC.methods.ueditor.setContent(o.content);e.callback({content:t}),o.delay=3,function t(){setTimeout(function(){o.delay--,0<o.delay&&t()},1e3)}()},removeDraft:function(t){var o=this;sweetQuestion("确定要删除草稿吗？").then(function(){nkcAPI("/u/"+o.uid+"/drafts/"+t.did,"DELETE").then(function(){e.app.getDrafts(e.app.paging.page)}).catch(function(t){sweetError(t)})})},getDrafts:function(){var t=0<arguments.length&&void 0!==arguments[0]?arguments[0]:0;nkcAPI("/u/".concat(this.uid,"/profile/draft?page=").concat(t,"&perpage=").concat(this.perpage),"GET").then(function(t){t.drafts.map(function(t){t.delay=0}),e.app.drafts=t.drafts,e.app.paging=t.paging,e.app.loading=!1}).catch(sweetError)},loadDraft:function(t){sweetQuestion("继续创作将会覆盖编辑器中全部内容，确定继续？").then(function(){window.PostInfo&&window.PostInfo.showCloseInfo&&(window.PostInfo.showCloseInfo=!1),window.location.href="/editor?type=redit&id=".concat(t.did)}).catch(sweetError)},refresh:function(){this.getDrafts(e.app.paging.page)},open:function(t){e.callback=t,this.initDom(),this.getDrafts()},close:function(){e.dom.hide()}}}),e.open=e.app.open,e.close=e.app.close}}()},{}]},{},[1]);
+NKC.modules.SelectDraft = class {
+  constructor() {
+    const self = this;
+    self.dom = $("#moduleSelectDraft");
+    self.app = new Vue({
+      el: "#moduleSelectDraftApp",
+      data: {
+        uid: NKC.configs.uid,
+        paging: {},
+        perpage: 7,
+        loading: true,
+        drafts: []
+      },
+      methods: {
+        fromNow: NKC.methods.fromNow,
+        initDom() {
+          const height = "43.5rem";
+          self.dom.css({
+            height
+          });
+          self.dom.draggable({
+            scroll: false,
+            handle: ".module-sd-title",
+            drag: function(event, ui) {
+              if(ui.position.top < 0) ui.position.top = 0;
+              const height = $(window).height();
+              if(ui.position.top > height - 30) ui.position.top = height - 30;
+              const width = self.dom.width();
+              if(ui.position.left < 100 - width) ui.position.left = 100 - width;
+              const winWidth = $(window).width();
+              if(ui.position.left > winWidth - 100) ui.position.left = winWidth - 100;
+            }
+          });
+          const width = $(window).width();
+          if(width < 700) {
+            // 小屏幕
+            self.dom.css({
+              "width": width * 0.8,
+              "top": 0,
+              "right": 0
+            });
+          } else {
+            // 宽屏
+            self.dom.css("left", (width - self.dom.width())*0.5 - 20);
+          }
+          self.dom.show();
+        },
+        getDraftInfo(draft) {
+          const {type, thread, forum} = draft;
+          let info = "";
+          if(type === "newThread") {
+            info = `发表文章`;
+          } else if(type === "newPost") {
+            info = `在文章《${thread.title}》下发表回复`;
+          } else if(type === "modifyPost") {
+            info = `修改文章《${thread.title}》下的回复`;
+          } else if(type === "modifyThread") {
+            info = `修改文章《${thread.title}》`;
+          } else if(type === 'modifyForumLatestNotice') {
+            info = `修改专业《${forum.title}》最新页板块公告`;
+          } else {
+            info = `修改专业《${forum.title}》的专业说明`;
+          }
+          return info;
+        },
+        insert(data) {
+          var content = NKC.methods.ueditor.setContent(data.content);
+          self.callback({content:content});
+          data.delay = 3;
+          const func = () => {
+            setTimeout(() => {
+              data.delay --;
+              if(data.delay > 0) {
+                func();
+              }
+            }, 1000);
+          }
+          func();
+        },
+        removeDraft(draft) {
+          sweetQuestion("确定要删除草稿吗？")
+            .then(() => {
+              nkcAPI('/u/' + this.uid + "/drafts/" + draft.did, "DELETE")
+                .then(function() {
+                  self.app.getDrafts(self.app.paging.page);
+                })
+                .catch(function(data) {
+                  sweetError(data);
+                })
+            })
+        },
+        getDrafts(page = 0) {
+          nkcAPI(`/u/${this.uid}/profile/draft?page=${page}&perpage=${this.perpage}`, "GET")
+            .then(data => {
+              data.drafts.map(d => {
+                d.delay = 0;
+              });
+              self.app.drafts = data.drafts;
+              self.app.paging = data.paging;
+              self.app.loading = false;
+            })
+            .catch(sweetError);
+        },
+        loadDraft(d) {
+          sweetQuestion(`继续创作将会覆盖编辑器中全部内容，确定继续？`)
+            .then(() => {
+              if(window.PostInfo && window.PostInfo.showCloseInfo) {
+                window.PostInfo.showCloseInfo = false;
+              }
+              window.location.href = `/editor?type=redit&id=${d.did}`;
+            })
+            .catch(sweetError);
+        },
+        refresh() {
+          this.getDrafts(self.app.paging.page);
+        },
+        open(callback) {
+          self.callback = callback;
+          this.initDom();
+          this.getDrafts();
+        },
+        close() {
+          self.dom.hide();
+        }
+      }
+    });
+    self.open = self.app.open;
+    self.close = self.app.close;
+  }
+};

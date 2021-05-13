@@ -1,1 +1,121 @@
-!function n(r,c,o){function a(e,t){if(!c[e]){if(!r[e]){var i="function"==typeof require&&require;if(!t&&i)return i(e,!0);if(s)return s(e,!0);throw(i=new Error("Cannot find module '"+e+"'")).code="MODULE_NOT_FOUND",i}i=c[e]={exports:{}},r[e][0].call(i.exports,function(t){return a(r[e][1][t]||t)},i,i.exports,n,r,c,o)}return c[e].exports}for(var s="function"==typeof require&&require,t=0;t<o.length;t++)a(o[t]);return a}({1:[function(t,e,i){"use strict";var n=new function t(){!function(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}(this,t);var n=this;n.dom=$("#moduleStickerViewer"),n.dom.modal({show:!1}),n.app=new Vue({el:"#moduleStickerViewerApp",data:{sticker:"",uid:NKC.configs.uid,management:!1,loading:!1},mounted:function(){this.init()},methods:{getUrl:NKC.methods.tools.getUrl,fromNow:NKC.methods.fromNow,collection:function(){nkcAPI("/sticker","POST",{type:"collection",stickersId:[this.sticker._id]}).then(function(){n.app.close(),sweetSuccess("表情已添加")}).catch(sweetError)},moveSticker:function(){var t={type:"move",stickersId:[this.sticker.collected._id]};nkcAPI("/sticker","POST",t).then(function(){n.app.close(),window.location.reload()}).catch(sweetError)},shareSticker:function(){var t={type:"share",stickersId:[this.sticker._id]};nkcAPI("/sticker","POST",t).then(function(){sweetSuccess("操作成功")}).catch(sweetError)},removeSticker:function(){var e=this.sticker;sweetQuestion("确定要删除表情？").then(function(){var t={type:"delete",stickersId:[e.collected._id]};return nkcAPI("/sticker","POST",t)}).then(function(){n.app.close(),window.location.reload()}).catch(sweetError)},init:function(){for(var t=$("[data-sticker-rid]"),e=0;e<t.length;e++){var i=t.eq(e);"true"!==i.attr("data-sticker-init")&&(i.on("click",function(){n.app.open($(this).attr("data-sticker-rid"),!!$(this).attr("data-sticker-management"))}),i.attr("data-sticker-init","true"))}$("span[data-tag='nkcsource'][data-type='sticker']").each(function(){var t=$(this);"true"!==t.attr("data-sticker-init")&&(t.on("click",function(){n.app.open($(this).attr("data-id"),!!$(this).attr("data-sticker-management"))}),t.attr("data-sticker-init","true"))})},open:function(t,e){n.app.management=!!e,n.dom.modal("show"),this.loading=!0,nkcAPI("/sticker/".concat(t,"?t=json"),"GET").then(function(t){n.app.sticker=t.sticker,n.app.loading=!1}).catch(function(t){sweetError(t),n.app.close()})},close:function(){n.dom.modal("hide")}}}),n.initPanel=n.app.init};NKC.methods.initStickerViewer=n.app.init},{}]},{},[1]);
+class StickerViewer {
+  constructor() {
+    const self = this;
+    self.dom = $("#moduleStickerViewer");
+    self.dom.modal({
+      show: false
+    });
+    self.app = new Vue({
+      el: "#moduleStickerViewerApp",
+      data: {
+        sticker: "",
+        uid: NKC.configs.uid,
+        management: false,
+        loading: false
+      },
+      mounted() {
+        this.init();
+      },
+      methods: {
+        getUrl: NKC.methods.tools.getUrl,
+        fromNow: NKC.methods.fromNow,
+        collection() {
+          nkcAPI(`/sticker`, "POST", {
+            type: "collection",
+            stickersId: [this.sticker._id]
+          })
+            .then(function() {
+              self.app.close();
+              sweetSuccess("表情已添加");
+            })
+            .catch(sweetError);
+        },
+        moveSticker() {
+          const {sticker} = this;
+          const body = {
+            type: "move",
+            stickersId: [sticker.collected._id]
+          };
+          nkcAPI("/sticker", "POST", body)
+            .then(() => {
+              self.app.close();
+              window.location.reload();
+            })
+            .catch(sweetError);
+        },
+        shareSticker() {
+          const {sticker} = this;
+          const body = {
+            type: "share",
+            stickersId: [sticker._id]
+          };
+          nkcAPI("/sticker", "POST", body)
+            .then(() => {
+              sweetSuccess("操作成功");
+            })
+            .catch(sweetError);
+        },
+        removeSticker() {
+          const {sticker} = this;
+          sweetQuestion(`确定要删除表情？`)
+            .then(() => {
+              const body = {
+                type: "delete",
+                stickersId: [sticker.collected._id]
+              };
+              return nkcAPI("/sticker", "POST", body);
+            })
+            .then(() => {
+              self.app.close();
+              window.location.reload();
+            })
+            .catch(sweetError);
+        },
+        init() {
+          // 旧 数据统一后可移除
+          const dom = $("[data-sticker-rid]");
+
+          for(let i = 0; i < dom.length; i++) {
+            const d = dom.eq(i);
+            if(d.attr("data-sticker-init") === "true") continue;
+            d.on("click", function() {
+              self.app.open($(this).attr("data-sticker-rid"), !!$(this).attr("data-sticker-management"));
+            });
+            d.attr("data-sticker-init", "true");
+          }
+
+          // 新
+          const dom2 = $("span[data-tag='nkcsource'][data-type='sticker']");
+          dom2.each(function() {
+            const d = $(this);
+            if(d.attr("data-sticker-init") === "true") return;
+            d.on("click", function() {
+              self.app.open($(this).attr("data-id"), !!$(this).attr("data-sticker-management"));
+            });
+            d.attr("data-sticker-init", "true");
+          });
+        },
+        open(rid, management) {
+          self.app.management = !!management;
+          self.dom.modal("show");
+          this.loading = true;
+          nkcAPI(`/sticker/${rid}?t=json`, "GET")
+            .then(data => {
+              self.app.sticker = data.sticker;
+              self.app.loading = false;
+            })
+            .catch(data => {
+              sweetError(data);
+              self.app.close();
+            });
+        },
+        close() {
+          self.dom.modal("hide");
+        }
+      }
+    });
+    self.initPanel = self.app.init;
+  }
+}
+const stickerViewer = new StickerViewer();
+NKC.methods.initStickerViewer = stickerViewer.app.init;

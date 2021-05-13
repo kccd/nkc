@@ -1,1 +1,101 @@
-!function n(s,i,o){function c(t,e){if(!i[t]){if(!s[t]){var r="function"==typeof require&&require;if(!e&&r)return r(t,!0);if(a)return a(t,!0);throw(r=new Error("Cannot find module '"+t+"'")).code="MODULE_NOT_FOUND",r}r=i[t]={exports:{}},s[t][0].call(r.exports,function(e){return c(s[t][1][e]||e)},r,r.exports,n,s,i,o)}return i[t].exports}for(var a="function"==typeof require&&require,e=0;e<o.length;e++)c(o[e]);return c}({1:[function(e,t,r){"use strict";var n=NKC.methods.getDataById("data"),s={};n.users.map(function(e){e.data.map(function(e){return s[e.uid]=e})});new Vue({el:"#app",data:{edit:!n.category,category:n.category||{name:"",description:"",friendsId:[]},users:n.users,usersObj:s},computed:{selectedUsers:function(){var t=[],r=this;return this.category.friendsId.map(function(e){e=r.usersObj[e];e&&t.push(e)}),t},selectedUsersId:function(){return this.selectedUsers.map(function(e){return e.uid})}},methods:{getUrl:NKC.methods.tools.getUrl,selectUser:function(e){var t=this.category.friendsId;-1===t.indexOf(e.uid)?t.push(e.uid):this.unSelectUser(e)},unSelectUser:function(e){var t=this.category.friendsId,e=t.indexOf(e.uid);-1!==e&&t.splice(e,1)},save:function(){var e,t=this,r=t.category,n=r._id,s=r.name,i=r.description,r=n?(e="PUT","/friend_category/".concat(n)):(e="POST","/friend_category");return nkcAPI(r,e,{name:s,description:i,friendsId:t.selectedUsersId}).then(function(e){t.edit=!1,NKC.methods.appToast("保存成功"),n||NKC.methods.visitUrl("/message/category?cid=".concat(e.category._id))}).catch(NKC.methods.appToast)},visitUserHome:function(e){NKC.methods.visitUrl(NKC.methods.tools.getUrl("messageUserDetail",e.uid),!0)},toEdit:function(){this.edit=!0},remove:function(){var e=this;sweetQuestion("删除分组「".concat(this.category.name,"」？")).then(function(){return nkcAPI("/friend_category/".concat(e.category._id),"DELETE").then(function(){NKC.methods.appToast("删除成功"),NKC.methods.appClosePage()}).catch(NKC.methods.appToast)})}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById('data');
+const usersObj = {};
+data.users.map(ug => {
+  ug.data.map(u => usersObj[u.uid] = u);
+});
+const app = new Vue({
+  el: '#app',
+  data: {
+    edit: !data.category,
+    category: data.category || {
+      name: '',
+      description: '',
+      friendsId: [],
+    },
+    users: data.users,
+    usersObj,
+  },
+  computed: {
+    selectedUsers() {
+      const arr = [];
+      const self = this;
+      this.category.friendsId.map(uid => {
+        const u = self.usersObj[uid];
+        if(u) arr.push(u);
+      });
+      return arr;
+    },
+    selectedUsersId() {
+      const {selectedUsers} = this;
+      return selectedUsers.map(u => u.uid);
+    }
+  },
+  methods: {
+    getUrl: NKC.methods.tools.getUrl,
+    selectUser(u) {
+      const friendsId = this.category.friendsId;
+      const index = friendsId.indexOf(u.uid);
+      if(index === -1) {
+        friendsId.push(u.uid);
+        // Vue.set(friendsId, friendsId.length, u.uid)
+      } else {
+        this.unSelectUser(u);
+      }
+    },
+    unSelectUser(u) {
+      const friendsId = this.category.friendsId;
+      const index = friendsId.indexOf(u.uid);
+      if(index !== -1) {
+        friendsId.splice(index, 1);
+      }
+    },
+    save() {
+      const self = this;
+      const {_id, name, description} = self.category;
+      let method, url;
+      if(_id) {
+        method = 'PUT';
+        url = `/friend_category/${_id}`;
+      } else {
+        method = 'POST';
+        url = `/friend_category`;
+      }
+      return nkcAPI(url, method, {
+        name,
+        description,
+        friendsId: self.selectedUsersId
+      })
+        .then((data) => {
+          self.edit = false;
+          NKC.methods.appToast('保存成功');
+          if(!_id) {
+            NKC.methods.visitUrl(`/message/category?cid=${data.category._id}`);
+          }
+        })
+        .catch(NKC.methods.appToast);
+    },
+    visitUserHome(u) {
+      NKC.methods.visitUrl(NKC.methods.tools.getUrl('messageUserDetail', u.uid), true);
+    },
+    toEdit() {
+      this.edit = true;
+    },
+    remove() {
+      const self = this;
+      sweetQuestion(`删除分组「${this.category.name}」？`)
+        .then(() => {
+          return nkcAPI(`/friend_category/${self.category._id}`, 'DELETE')
+            .then(() => {
+              NKC.methods.appToast('删除成功');
+              NKC.methods.appClosePage();
+            })
+            .catch(NKC.methods.appToast);
+        })
+    }
+  }
+})
+
+Object.assign(window, {
+  usersObj,
+  app,
+});

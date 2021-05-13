@@ -27,9 +27,9 @@ var app = new Vue({
     }
   },
   mounted: function() {
-    SelectResource = new NKC.modules.SelectResource();
-    SelectForum = new NKC.modules.MoveThread();
-    SelectImage = new NKC.methods.selectImage();
+    window.SelectResource = new NKC.modules.SelectResource();
+    window.SelectForum = new NKC.modules.MoveThread();
+    window.SelectImage = new NKC.methods.selectImage();
     if(data.rid) {
       this.getResource(data.rid);
     }
@@ -225,3 +225,5 @@ var app = new Vue({
     }
   }
 });
+
+window.app = app;

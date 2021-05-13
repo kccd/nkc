@@ -167,3 +167,12 @@ function selectMoney(m) {
 function disappearMask(){
 	$('#donation-mask').addClass('hidden');
 }
+
+Object.assign(window, {
+	init,
+	submit,
+	ensureBill,
+	selectFund,
+	selectMoney,
+	disappearMask,
+});

@@ -1,1 +1,91 @@
-!function r(o,i,c){function s(e,t){if(!i[e]){if(!o[e]){var n="function"==typeof require&&require;if(!t&&n)return n(e,!0);if(a)return a(e,!0);throw(n=new Error("Cannot find module '"+e+"'")).code="MODULE_NOT_FOUND",n}n=i[e]={exports:{}},o[e][0].call(n.exports,function(t){return s(o[e][1][t]||t)},n,n.exports,r,o,i,c)}return i[e].exports}for(var a="function"==typeof require&&require,t=0;t<c.length;t++)s(c[t]);return s}({1:[function(t,e,n){"use strict";function o(t,e){var n;if("undefined"==typeof Symbol||null==t[Symbol.iterator]){if(Array.isArray(t)||(n=function(t,e){if(t){if("string"==typeof t)return s(t,e);var n=Object.prototype.toString.call(t).slice(8,-1);return"Map"===(n="Object"===n&&t.constructor?t.constructor.name:n)||"Set"===n?Array.from(t):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?s(t,e):void 0}}(t))||e&&t&&"number"==typeof t.length){n&&(t=n);var r=0,e=function(){};return{s:e,n:function(){return r>=t.length?{done:!0}:{done:!1,value:t[r++]}},e:function(t){throw t},f:e}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var o,i=!0,c=!1;return{s:function(){n=t[Symbol.iterator]()},n:function(){var t=n.next();return i=t.done,t},e:function(t){c=!0,o=t},f:function(){try{i||null==n.return||n.return()}finally{if(c)throw o}}}}function s(t,e){(null==e||e>t.length)&&(e=t.length);for(var n=0,r=new Array(e);n<e;n++)r[n]=t[n];return r}var r=NKC.methods.getDataById("data");r.ownStickers.map(function(t){t.selected=!1});new Vue({el:"#app",data:{ownStickers:r.ownStickers,hotStickers:r.hotStickers,management:!1},computed:{selectedStickers:function(){return this.ownStickers.filter(function(t){return!!t.selected})}},mounted:function(){NKC.methods.initStickerViewer()},methods:{getUrl:NKC.methods.tools.getUrl,visitUrl:NKC.methods.visitUrl,switchManagement:function(){this.management=!this.management,this.changeStickersStatus(!1)},showReason:function(t){sweetInfo(t.reason)},moveSticker:function(){var t=this.selectedStickers;t.length&&(t={type:"move",stickersId:t.map(function(t){return t._id})},nkcAPI("/sticker","POST",t).then(function(){window.location.reload()}).catch(sweetError))},removeSticker:function(){var e=this.selectedStickers;e.length&&sweetQuestion("确定要删除已选中的".concat(e.length,"个表情？")).then(function(){var t={type:"delete",stickersId:e.map(function(t){return t._id})};return nkcAPI("/sticker","POST",t)}).then(function(){window.location.reload()}).catch(sweetError)},select:function(t){t.selected=!t.selected},changeStickersStatus:function(e){this.ownStickers.map(function(t){return t.selected=!!e})},selectAll:function(){var t,e=0,n=!0,r=o(this.ownStickers);try{for(r.s();!(t=r.n()).done;)t.value.selected&&e++}catch(t){r.e(t)}finally{r.f()}e===this.ownStickers.length&&(n=!1),this.changeStickersStatus(n)},shareSticker:function(){var t=this.selectedStickers;t.length&&(t={type:"share",stickersId:t.map(function(t){return t._id})},nkcAPI("/sticker","POST",t).then(function(){window.location.reload()}).catch(sweetError))}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById("data");
+data.ownStickers.map(s => {
+  s.selected = false
+});
+const app = new Vue({
+  el: "#app",
+  data: {
+    ownStickers: data.ownStickers,
+    hotStickers: data.hotStickers,
+    management: false
+  },
+  computed: {
+    selectedStickers() {
+      return this.ownStickers.filter(s => !!s.selected);
+    }
+  },
+  mounted() {
+    NKC.methods.initStickerViewer();
+  },
+  methods: {
+    getUrl: NKC.methods.tools.getUrl,
+    visitUrl: NKC.methods.visitUrl,
+    switchManagement() {
+      this.management = !this.management;
+      this.changeStickersStatus(false);
+    },
+    showReason(s) {
+      sweetInfo(s.reason);
+    },
+    moveSticker() {
+      const {selectedStickers} = this;
+      if(!selectedStickers.length) return;
+      const body = {
+        type: "move",
+        stickersId: selectedStickers.map(s => s._id)
+      };
+      nkcAPI("/sticker", "POST", body)
+        .then(() => {
+          window.location.reload();
+        })
+        .catch(sweetError);
+    },
+    removeSticker() {
+      const {selectedStickers} = this;
+      if(!selectedStickers.length) return;
+      sweetQuestion(`确定要删除已选中的${selectedStickers.length}个表情？`)
+        .then(() => {
+          const body = {
+            type: "delete",
+            stickersId: selectedStickers.map(s => s._id)
+          };
+          return nkcAPI("/sticker", "POST", body);
+        })
+        .then(() => {
+          window.location.reload();
+        })
+        .catch(sweetError);
+    },
+    select(s) {
+      s.selected = !s.selected;
+    },
+    changeStickersStatus(select) {
+      this.ownStickers.map(s => s.selected = !!select);
+    },
+    selectAll() {
+      let count = 0, select = true;
+      for(const s of this.ownStickers) {
+        if(s.selected) count ++;
+      }
+      if(count === this.ownStickers.length) {
+        select = false;
+      }
+      this.changeStickersStatus(select);
+    },
+    shareSticker() {
+      const {selectedStickers} = this;
+      if(!selectedStickers.length) return;
+      const body = {
+        type: "share",
+        stickersId: selectedStickers.map(s => s._id)
+      };
+      nkcAPI("/sticker", "POST", body)
+        .then(() => {
+          window.location.reload();
+        })
+        .catch(sweetError);
+    }
+  }
+});
+
+window.app = app;

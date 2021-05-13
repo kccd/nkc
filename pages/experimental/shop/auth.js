@@ -39,3 +39,9 @@ function delBanUid(uid) {
     })
   }
 }
+
+Object.assign(window, {
+  saveAuth,
+  addBanUid,
+  delBanUid,
+});

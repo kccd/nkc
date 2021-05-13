@@ -1,1 +1,101 @@
-!function o(r,i,s){function c(e,t){if(!i[e]){if(!r[e]){var n="function"==typeof require&&require;if(!t&&n)return n(e,!0);if(a)return a(e,!0);throw(n=new Error("Cannot find module '"+e+"'")).code="MODULE_NOT_FOUND",n}n=i[e]={exports:{}},r[e][0].call(n.exports,function(t){return c(r[e][1][t]||t)},n,n.exports,o,r,i,s)}return i[e].exports}for(var a="function"==typeof require&&require,t=0;t<s.length;t++)c(s[t]);return c}({1:[function(t,e,n){"use strict";var o=NKC.methods.getDataById("subUsersId"),i=new Vue({el:"#note",data:{uid:NKC.configs.uid,threads:o.threads,timeout:null},mounted:function(){window.floatUserPanel&&window.floatUserPanel.initPanel()},methods:{getUrl:NKC.methods.tools.getUrl,visitUrl:NKC.methods.visitUrl,fromNow:NKC.methods.fromNow,modifyNote:function(t){t.edit=!t.edit,t.edit&&setTimeout(function(){i.textareaAutoResize(t)},50)},saveNewNote:function(e){var t=e._id,n=e.newContent,o=e.targetId,r=e.type;Promise.resolve().then(function(){if(!n)throw"请输入笔记内容";return nkcAPI("/note","POST",{_id:t,type:r,targetId:o,content:n})}).then(function(t){e.notes.push(t.noteContent),e.newContent="",i.addNote(e),i.textareaAutoResize(e,"note")}).catch(sweetError)},addNote:function(t){t.edit=!t.edit},deleteNote:function(e,n){sweetQuestion("确定要执行删除操作？").then(function(){var t=n.noteId,e=n._id;return nkcAPI("/note/".concat(t,"/c/").concat(e),"DELETE")}).then(function(){var t=e.notes.indexOf(n);-1!==t&&e.notes.splice(t,1)}).catch(sweetError)},saveContent:function(e){var t=e.content,n=e.noteId,o=e._id;nkcAPI("/note/".concat(n,"/c/").concat(o),"PUT",{content:t}).then(function(t){e.html=t.noteContentHTML,i.resetTextarea(e)}).catch(sweetError)},getTextarea:function(t){return this.$refs[(1<arguments.length&&void 0!==arguments[1]?arguments[1]:"")+t._id][0]},resetTextarea:function(t,e){t.edit=!1,this.textareaAutoResize(t,e)},textareaAutoResize:function(t,e){e=this.getTextarea(t,e);48<e.scrollHeight?e.style.height=e.scrollHeight+"px":e.style.height="4rem"}}})},{}]},{},[1]);
+const data = NKC.methods.getDataById("subUsersId");
+const noteApp = new Vue({
+  el: "#note",
+  data: {
+    uid: NKC.configs.uid,
+    threads: data.threads,
+    timeout: null
+  },
+  mounted() {
+    if(window.floatUserPanel) {
+      window.floatUserPanel.initPanel();
+    }
+  },
+  methods: {
+    getUrl: NKC.methods.tools.getUrl,
+    visitUrl: NKC.methods.visitUrl,
+    fromNow: NKC.methods.fromNow,
+    modifyNote(nc) {
+      nc.edit = !nc.edit;
+      if(nc.edit) {
+        setTimeout(() => {
+          noteApp.textareaAutoResize(nc);
+        }, 50)
+      }
+    },
+    saveNewNote(note) {
+      const {_id, newContent, targetId, type} = note;
+      Promise.resolve()
+        .then(() => {
+          if(!newContent) throw "请输入笔记内容";
+          return nkcAPI("/note", "POST", {
+            _id,
+            type,
+            targetId,
+            content: newContent
+          });
+        })
+        .then(data => {
+          note.notes.push(data.noteContent);
+          note.newContent = "";
+          noteApp.addNote(note);
+          noteApp.textareaAutoResize(note, "note");
+        })
+        .catch(sweetError);
+    },
+    addNote(note) {
+      note.edit = !note.edit;
+    },
+    deleteNote(note, nc) {
+      sweetQuestion("确定要执行删除操作？")
+        .then(() => {
+          const {noteId, _id} = nc;
+          return nkcAPI(`/note/${noteId}/c/${_id}`, "DELETE");
+        })
+        .then(() => {
+          const index = note.notes.indexOf(nc);
+          if(index !== -1) note.notes.splice(index, 1);
+        })
+        .catch(sweetError);
+    },
+    saveContent(nc) {
+      const {content, noteId, _id} = nc;
+      nkcAPI(`/note/${noteId}/c/${_id}`, "PUT", {
+        content
+      })
+        .then(data => {
+          nc.html = data.noteContentHTML;
+          noteApp.resetTextarea(nc);
+        })
+        .catch(sweetError);
+    },
+    getTextarea(nc, t = "") {
+      return this.$refs[t+nc._id][0];
+    },
+    resetTextarea(nc, t) {
+      nc.edit = false;
+      this.textareaAutoResize(nc, t);
+    },
+    textareaAutoResize(nc, t) {
+      const textArea = this.getTextarea(nc, t);
+      const num = 4 * 12;
+      if(num < textArea.scrollHeight) {
+        textArea.style.height = textArea.scrollHeight + 'px';
+      } else {
+        textArea.style.height = '4rem';
+      }
+      /*clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        const textArea = this.getTextarea(nc, t);
+        const num = 4 * 12;
+        if(num < textArea.scrollHeight) {
+          textArea.style.height = textArea.scrollHeight + 'px';
+        } else {
+          textArea.style.height = '4rem';
+        }
+      }, 100);*/
+    }
+  }
+});
+
+window.noteApp = noteApp;

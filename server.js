@@ -6,18 +6,10 @@ process.on('uncaughtException', function (err) {
 });
 
 require('colors');
-const http = require('http'),
-  redisClient = require('./settings/redisClient'),
-  app = require('./app'),
-  elasticSearch = require("./nkcModules/elasticSearch"),
-  redLock = require('./nkcModules/redLock'),
-  serverConfig = require('./config/server'),
-  communication = require('./nkcModules/communication'),
-  {
-    RoleModel,
-    ForumModel,
-  } = require('./dataModels'),
-  permission = require('./nkcModules/permission');
+const http = require('http');
+const dbStatus = require('./settings/dbStatus');
+const serverConfig = require('./config/server');
+const permission = require('./nkcModules/permission');
 let server;
 
 const dataInit = async () => {
@@ -25,6 +17,7 @@ const dataInit = async () => {
   await defaultData.init();
   // 运维包含所有的操作权限
   const operationsId = permission.getOperationsId();
+  const {RoleModel, ForumModel} = require('./dataModels');
   await RoleModel.updateOne({_id: 'dev'}, {$set: {operationsId: operationsId}});
   await ForumModel.updateMany({}, {$addToSet: {rolesId: 'dev'}});
 };
@@ -32,6 +25,13 @@ const dataInit = async () => {
 
 const start = async () => {
   try {
+    const redLock = require('./nkcModules/redLock');
+    const redisClient = require('./settings/redisClient');
+    const elasticSearch = require("./nkcModules/elasticSearch");
+    const communication = require('./nkcModules/communication');
+
+    await dbStatus.database();
+
     const startTime = global.NKC.startTime;
     const startTimeKey = `server:start:time`;
     const lock = await redLock.lock(`server:start`, 30 * 1000);
@@ -52,6 +52,8 @@ const start = async () => {
 
     const port = Number(serverConfig.port) + global.NKC.processId;
     const address = serverConfig.address;
+
+    const app = require('./app');
     server = http.createServer(app);
     server.keepAliveTimeout = 10 * 1000;
     server.listen(port, address, async () => {
@@ -66,7 +68,6 @@ const start = async () => {
       const socket = require('./socket/index');
       await socket(server);
       require('./timedTask');
-      require('./watch.js');
     }
 
     process.on('message', async function(msg) {

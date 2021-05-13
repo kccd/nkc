@@ -1,1 +1,191 @@
-!function r(i,a,o){function c(t,e){if(!a[t]){if(!i[t]){var n="function"==typeof require&&require;if(!e&&n)return n(t,!0);if(s)return s(t,!0);throw(n=new Error("Cannot find module '"+t+"'")).code="MODULE_NOT_FOUND",n}n=a[t]={exports:{}},i[t][0].call(n.exports,function(e){return c(i[t][1][e]||e)},n,n.exports,r,i,a,o)}return a[t].exports}for(var s="function"==typeof require&&require,e=0;e<o.length;e++)c(o[e]);return c}({1:[function(e,t,n){"use strict";function i(e,t){for(var n=0;n<t.length;n++){var r=t[n];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(e,r.key,r)}}NKC.modules.Verifications=function(){function e(){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e);var n=this;n.dom=$("#moduleVerifications"),n.dom.modal({show:!1,backdrop:"static"}),n.app=new Vue({el:"#moduleVerificationsApp",data:{type:"",error:"",vernierCaliper:{init:!1,answer:0,data:{question:"",backgroundColor:"",mainImageBase64:"",secondaryImageBase64:""}},touchCaptcha:{answer:[],data:{question:"",image:{base64:"",width:0,height:0}}}},methods:{getData:function(){var t=0<arguments.length&&void 0!==arguments[0]&&arguments[0];return this.error="",nkcAPI("/verifications","GET").then(function(e){if("unEnabled"===e.verificationData.type)return n.done({secret:e.verificationData.type});t&&n.dom.modal("show"),n.app.type=e.verificationData.type,n.app[n.app.type].data=e.verificationData;e=n.app["".concat(n.app.type,"Init")];e&&e()}).catch(function(e){console.log(e),n.app.error=e.error||e.message||e,n.app.type="error",t&&n.dom.modal("show")})},close:function(){n.close()},vernierCaliperInit:function(){var a,o=this,c=0,s=0,u=!1;this.vernierCaliper.answer=0,this.vernierCaliper.init||(a=this,setTimeout(function(){function t(e){return(void 0===e.screenX?e.touches[0]:e).screenX}function e(e){e.preventDefault(),s=t(e),u=!0}var n=a.$refs.button,r=function(e){u=!1,c=a.vernierCaliper.answer},i=function(e){u&&(a.vernierCaliper.answer=c+t(e)-s)};n.addEventListener("mousedown",e),document.addEventListener("mousemove",i),document.addEventListener("mouseup",r),n.addEventListener("touchstart",e),document.addEventListener("touchmove",i),document.addEventListener("touchend",r);i=o.$refs,r=i.moveLeft,i=i.moveRight;r.onclick=function(){a.vernierCaliper.answer--,a.vernierCaliper.tempLeft=a.vernierCaliper.answer},i.onclick=function(){a.vernierCaliper.answer++,a.vernierCaliper.tempLeft=a.vernierCaliper.answer}},300))},touchCaptchaInit:function(){this.touchCaptcha.answer.length=0},touchCaptchaClick:function(e){var t=e.offsetX,n=e.offsetY,e=e.target;3!==this.touchCaptcha.answer.length&&this.touchCaptcha.answer.push({x:t,y:n,w:e.width,h:e.height})},submit:function(){var e=this[this.type],t=e.data,e=e.answer;nkcAPI("/verifications","POST",{verificationData:{answer:e,_id:t._id,type:t.type}}).then(function(e){n.done({secret:e.secret}),n.close()}).catch(function(e){console.log(e),screenTopWarning(e),n.app.getData()})}}})}var t,n,r;return t=e,(n=[{key:"open",value:function(e){var n=this;if(!e)return new Promise(function(e,t){n.resolve=e,n.reject=t,n.callback=void 0,n.app.getData(!0)});this.resolve=void 0,this.reject=void 0,this.callback=e,this.app.getData(!0)}},{key:"close",value:function(){var e=new Error("验证失败");this.callback?this.callback(e):this.reject(e),this.dom.modal("hide")}},{key:"done",value:function(e){this.callback?this.callback(void 0,e):this.resolve(e)}}])&&i(t.prototype,n),r&&i(t,r),e}()},{}]},{},[1]);
+class Verifications {
+  constructor() {
+    const self = this;
+    self.dom = $("#moduleVerifications");
+    self.dom.modal({
+      show: false,
+      backdrop: "static"
+    });
+    self.app = new Vue({
+      el: '#moduleVerificationsApp',
+      data: {
+        type: '',
+        error: '',
+        vernierCaliper: {
+          init: false,
+          answer: 0,
+          data: {
+            question: '',
+            backgroundColor: '',
+            mainImageBase64: '',
+            secondaryImageBase64: ''
+          }
+        },
+        touchCaptcha: {
+          answer: [],
+          data: {
+            question: "",
+            image: {
+              base64: "",
+              width: 0,
+              height: 0
+            }
+          }
+        }
+      },
+      methods: {
+        getData(showModal = false) {
+          this.error = '';
+          return nkcAPI(`/verifications`, 'GET')
+            .then(data => {
+              if(data.verificationData.type === 'unEnabled') {
+                return self.done({secret: data.verificationData.type});
+              }
+              if(showModal) {
+                self.dom.modal('show');
+              }
+              self.app.type = data.verificationData.type;
+              self.app[self.app.type].data = data.verificationData;
+              const initFunc = self.app[`${self.app.type}Init`];
+              if(initFunc) initFunc();
+            })
+            .catch(err => {
+              console.log(err);
+              // sweetError(err);
+              self.app.error = err.error || err.message || err;
+              self.app.type = 'error';
+              if(showModal) {
+                self.dom.modal('show');
+              }
+            });
+        },
+        close() {
+          self.close();
+        },
+        vernierCaliperInit() {
+          let tempLeft = 0;
+          let mouseLeft = 0;
+          let selected = false;
+          this.vernierCaliper.answer = 0;
+          if(this.vernierCaliper.init) return;
+          const _this = this;
+          setTimeout(() => {
+            const button = _this.$refs.button;
+            const getX = (e) => {
+              if(e.screenX === undefined) {
+                return e.touches[0].screenX;
+              } else {
+                return e.screenX;
+              }
+            };
+
+            const onMouseDown = (e) => {
+              // console.log(`按下`, e);
+              e.preventDefault();
+              mouseLeft = getX(e);
+              selected = true;
+            };
+            const onMouseUp = (e) => {
+              // console.log(`抬起`, e);
+              selected = false;
+              tempLeft = _this.vernierCaliper.answer;
+            };
+            const onMouseMove = (e) => {
+              // console.log(`移动`, e);
+
+              if(!selected) return;
+              _this.vernierCaliper.answer = tempLeft + getX(e) - mouseLeft;
+            };
+            button.addEventListener('mousedown', onMouseDown);
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+
+            button.addEventListener('touchstart', onMouseDown);
+            document.addEventListener('touchmove', onMouseMove);
+            document.addEventListener('touchend', onMouseUp);
+
+            const {moveLeft, moveRight} = this.$refs;
+            moveLeft.onclick = () => {
+              _this.vernierCaliper.answer --;
+              _this.vernierCaliper.tempLeft = _this.vernierCaliper.answer;
+            };
+            moveRight.onclick = () => {
+              _this.vernierCaliper.answer ++;
+              _this.vernierCaliper.tempLeft = _this.vernierCaliper.answer;
+            };
+
+          }, 300);
+        },
+        touchCaptchaInit() {
+          let self = this;
+          this.touchCaptcha.answer.length = 0;
+        },
+        touchCaptchaClick(e) {
+          let {offsetX, offsetY, target} = e;
+          if(this.touchCaptcha.answer.length === 3) return;
+          this.touchCaptcha.answer.push({
+            x: offsetX,
+            y: offsetY,
+            w: target.width,
+            h: target.height
+          });
+        },
+        submit() {
+          const {data: verificationData, answer} = this[this.type];
+          nkcAPI(`/verifications`, 'POST', {
+            verificationData: {
+              answer,
+              _id: verificationData._id,
+              type: verificationData.type
+            }
+          })
+            .then((data) => {
+              self.done({
+                secret: data.secret
+              });
+              self.close();
+            })
+            .catch(err => {
+              console.log(err);
+              screenTopWarning(err);
+              self.app.getData();
+            });
+        }
+      },
+    });
+  }
+  open(callback) {
+    if(callback) {
+      this.resolve = undefined;
+      this.reject = undefined;
+      this.callback = callback;
+      this.app.getData(true);
+    } else {
+      return new Promise((resolve, reject) => {
+        this.resolve = resolve;
+        this.reject = reject;
+        this.callback = undefined;
+        this.app.getData(true);
+      });
+    }
+  }
+  close() {
+    const err = new Error('验证失败');
+    if(this.callback) {
+      this.callback(err);
+    } else {
+      this.reject(err);
+    }
+    this.dom.modal('hide');
+  }
+  done(res) {
+    if(this.callback) {
+      this.callback(undefined, res);
+    } else {
+      this.resolve(res);
+    }
+  }
+}
+
+
+NKC.modules.Verifications = Verifications;
