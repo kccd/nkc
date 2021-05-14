@@ -14,12 +14,16 @@ const { terser } = require("rollup-plugin-terser");
 const { babel } = require("@rollup/plugin-babel");
 const logUpdate = require("log-update");
 const mute = require("mute");
+const { Worker, MessageChannel } = require("worker_threads");
 
 const SCRIPTS_GLOBS = "pages/**/*.{js,mjs}";
 const LESS_GLOBS = "pages/**/*.{less,css}";
 const ASSETS_GLOBS = "pages/**/*.!(less|css|mjs|js)";
 const DIST_DIR = "dist";
 const spin = "-\\|/";
+let spin_slice = 0;
+const rotateChar = () => spin[spin_slice++ % spin.length];
+function noop() {};
 
 const autoprefixPlugin = new LessPluginAutoPrefix({browsers: ["last 2 versions"]});
 
@@ -56,30 +60,46 @@ async function compileAllCss() {
       return console.log(error);
     }
     unmute();
-    r = ++r % spin.length;
-    log(`${spin[r]} [${Number(index) + 1}/${filenames.length}] ${filename} ${colors.bold("->")} ${output}`);
+    log(`${rotateChar()} [${Number(index) + 1}/${filenames.length}] ${filename} ${colors.bold("->")} ${output}`);
   }
 }
 
 // 编译所有js脚本文件
-async function compileAllJS() {
-  let r = 0;
+function compileAllJS() {
+  let finish = noop;
   const log = logUpdate.create(process.stdout);
   const filenames = glob.sync(SCRIPTS_GLOBS);
-  for(let index in filenames) {
-    const filename = filenames[index];
-    let output;
-    const unmute = mute();
-    try {
-      output = await compileJS(filename);
-    } catch (error) {
-      unmute();
-      return console.log(error);
+  /** @type Worker[] */
+  const pool = Array(20).fill(new Worker("./compile-js-worker.js"));
+  const workerPorts = pool.map(worker => {
+    const { port1, port2 } = new MessageChannel();
+    worker.postMessage({ port: port1 }, [port1]);
+    return port2;
+  });
+  let ok = 0;;
+  let iterator = filenames.entries();
+  workerPorts.forEach(port => {
+    port.addListener("message", data => {
+      const { filename, output, error } = data;
+      if(error) {
+        return finish();
+      }
+      log(`${rotateChar()} [${(ok++) + 1}/${filenames.length}] ${filename} ${colors.bold("->")} ${output}`);
+      if(filenames.length === ok) {
+        return finish();
+      }
+      todoNextTask();
+    });
+    function todoNextTask() {
+      const item = iterator.next();
+      if(item.done) return;
+      const filename = item.value[1];
+      port.postMessage({ filename: filename });
     }
-    unmute();
-    r = ++r % spin.length;
-    log(`${spin[r]} [${Number(index) + 1}/${filenames.length}] ${filename} ${colors.bold("->")} ${output}`);
-  }
+    todoNextTask();
+  });
+  return new Promise(resolve => finish = resolve)
+  .then(() => workerPorts.forEach(port => port.postMessage({ exit: true })));
 }
 
 // 打包编译单个js脚本
@@ -107,7 +127,8 @@ async function compileJS(filename) {
         plugins: ["@babel/plugin-transform-object-assign"]
       }),
       process.env.NODE_ENV === "production" && terser()
-    ]
+    ],
+    cache: true
   });
   await bundle.write({
     name: basename,
@@ -145,8 +166,7 @@ async function copyAllAssets() {
       return console.log(error);
     }
     unmute();
-    r = ++r % spin.length;
-    log(`${spin[r]} [${Number(index) + 1}/${filenames.length}] ${filename} ${colors.bold("->")} ${dest}`);
+    log(`${rotateChar()} [${Number(index) + 1}/${filenames.length}] ${filename} ${colors.bold("->")} ${dest}`);
   }
 }
 
@@ -219,6 +239,6 @@ module.exports = {
   "watch:css":   () => watchCompileCss(),
   "compile:js":   () => compileAllJS(),
   "watch:js":     () => watchCompileJS(),
-  default: (done) => done()
+  default: (done) => done(),
 }
 
