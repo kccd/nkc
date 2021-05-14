@@ -64,7 +64,7 @@ img.apply-column-banner{
 .column-banner{
   width: 100%;
   overflow: hidden;
-  height: 35rem;
+  height: 25rem;
   position: relative;
   background-position: center center;
 }
@@ -1138,7 +1138,7 @@ img.apply-column-banner{
       content: '我要投稿';
       border: 1px solid #5d5d5d;
       color: #252525;
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: 700;
       position: absolute;
       top: 0;
@@ -1176,5 +1176,47 @@ img.apply-column-banner{
     &.active, &:hover{
       color: @primary;
     }
+  }
+}
+.column-management-entrance{
+  @height: 5rem;
+  display: block;
+  height: @height;
+  line-height: @height;
+  text-align: center;
+  color: #444;
+  font-weight: 700;
+  font-size: 1.3rem;
+  text-decoration: none;
+  z-index: 100;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  &:link, &:visited{
+    text-decoration: none;
+    color: #000;
+  }
+  &:hover, &:active{
+    text-decoration: none;
+    color: #000;
+    opacity: 0.7;
+  }
+  position: relative;
+  &:before{
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: @gray;
+    top: 0.6rem;
+    left: 0.6rem;
+  }
+  &:after{
+    content: '专栏管理';
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    border: 1px solid #444;
   }
 }

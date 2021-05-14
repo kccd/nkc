@@ -17,7 +17,7 @@ router
       sort[`order.cid_default`] = -1;
     }
     if(mcid) {
-      q.mcid = mcid;
+      q.mcid = mcid === 'other'? []: mcid;
     }
     const count = await db.ColumnPostModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
@@ -30,7 +30,7 @@ router
     const {body, data, db} = ctx;
     const {
       postsId, type, categoryId,
-      mainCategoriesId, minorCategoriesId
+      mainCategoriesId, minorCategoriesId, categoryType
     } = body;
     const {column, user} = data;
     if(column.uid !== user.uid) ctx.throw(403, "权限不足");
@@ -94,30 +94,34 @@ router
       }
       await db.ColumnPostCategoryModel.removeToppedThreads(column._id);
     } else if(type === "moveById") { // 更改专栏内容分类
-      if(!mainCategoriesId || mainCategoriesId.length === 0) ctx.throw(400, "文章分类不能为空");
-      for(const _id of mainCategoriesId.concat(minorCategoriesId)) {
-        const c = await db.ColumnPostCategoryModel.findOne({_id, columnId: column._id});
-        if(!c) ctx.throw(400, `ID为${_id}的分类不存在`);
+      const setObj = {};
+      if(['all', 'main'].includes(categoryType)) {
+        if(!mainCategoriesId || mainCategoriesId.length === 0) ctx.throw(400, '文章主分类不能为空');
+        await db.ColumnPostCategoryModel.checkCategoriesId(mainCategoriesId);
+        setObj.cid = mainCategoriesId;
+      }
+      if(['all', 'minor'].includes(categoryType)) {
+        await db.ColumnPostCategoryModel.checkCategoriesId(minorCategoriesId);
+        setObj.mcid = minorCategoriesId;
       }
       for(const _id of postsId) {
         const columnPost = await db.ColumnPostModel.findOne({columnId: column._id, _id});
         if(!columnPost) continue;
-        const {order} = columnPost;
-        const newOrder = {};
-        for(const cid of mainCategoriesId) {
-          let o = order[`cid_${cid}`];
-          if(o === undefined) o = await db.SettingModel.operateSystemID("columnPostOrders", 1);
-          newOrder[`cid_${cid}`] = o
+        if(['all', 'main'].includes(categoryType)) {
+          const {order} = columnPost;
+          const newOrder = {};
+          for(const cid of setObj.cid) {
+            let o = order[`cid_${cid}`];
+            if(o === undefined) o = await db.SettingModel.operateSystemID("columnPostOrders", 1);
+            newOrder[`cid_${cid}`] = o
+          }
+          setObj.order = newOrder;
         }
         await db.ColumnPostModel.updateOne({
           columnId: column._id,
           _id
         }, {
-          $set: {
-            cid: mainCategoriesId,
-            mcid: minorCategoriesId,
-            order: newOrder
-          }
+          $set: setObj
         });
       }
       await db.ColumnPostCategoryModel.removeToppedThreads(column._id);

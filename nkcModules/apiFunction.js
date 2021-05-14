@@ -9,6 +9,7 @@ moment.locale('zh-cn');
 const defaultPerpage = paging.perpage;
 const axios = require('axios');
 let fn = {};
+
 fn.paging = (page = 0, count, perpage, buttonCount = 5) => {
   if(!perpage) perpage = defaultPerpage;
   page = parseInt(page);
@@ -111,8 +112,8 @@ fn.newPasswordObject = (plain) => {
     hashType:'sha256HMAC',
     secret: fn.getRandomString("aA0", 64),
     password:{
-      hash:hash,
-      salt:salt,
+      hash: hash,
+      salt: salt,
     }
   };
 };

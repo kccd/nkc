@@ -14,6 +14,7 @@ router
       data.mainCategories.unshift({
         _id: 'all',
         name: '全部',
+        fixed: true,
         count: mainCategoryPostCount
       });
       let minorCategoryPostCount = 0;
@@ -26,9 +27,24 @@ router
           break;
         }
       }
+      const match = {
+        columnId: column._id,
+        mcid: []
+      };
+      if(cid) {
+        match.cid = cid;
+      }
+      const minorCategoryPostCountOther = await db.ColumnPostModel.countDocuments(match);
       data.minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id, cid);
       data.minorCategories.unshift({
+        _id: 'other',
+        name: '未分类',
+        fixed: true,
+        count: minorCategoryPostCountOther
+      });
+      data.minorCategories.unshift({
         _id: 'all',
+        fixed: true,
         name: '全部',
         count: minorCategoryPostCount
       });

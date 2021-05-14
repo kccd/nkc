@@ -68,9 +68,11 @@ var app = new Vue({
       moduleToColumn.show(function(data) {
         var minorCategoriesId = data.minorCategoriesId;
         var mainCategoriesId = data.mainCategoriesId;
+        var categoryType = data.categoryType;
         nkcAPI("/m/" + app.column._id + "/post", "POST", {
           type: "moveById",
           postsId: _id,
+          categoryType,
           mainCategoriesId: mainCategoriesId,
           minorCategoriesId: minorCategoriesId
         })
@@ -84,6 +86,7 @@ var app = new Vue({
           })
       }, {
         selectMul: true,
+        showCategoryType: true,
         selectedMainCategoriesId: selectedMainCategoriesId,
         selectedMinorCategoriesId: selectedMinorCategoriesId
       });

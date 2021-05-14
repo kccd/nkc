@@ -88,7 +88,7 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
     pid.add(post.pid);
     tid.add(post.tid);
     columnId.add(post.columnId);
-    cid = cid.concat(post.cid);
+    cid = cid.concat(post.cid, post.mcid);
   });
   const threadMatch = {
     tid: {
@@ -140,7 +140,7 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
   users.map(user => {
     usersObj[user.uid] = user;
   });
-  const categories = await ColumnPostCategoryModel.find({_id: {$in: cid}});
+  const categories = await ColumnPostCategoryModel.find({_id: {$in: cid}}, {_id: 1, name: 1, description: 1});
   const categoriesObj = {};
   categories.map(c => {
     categoriesObj[c._id] = c;
@@ -171,11 +171,18 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
       p.post.c = obtainPureText(p.post.c, true, 200);
     }
     p.post.url = await PostModel.getUrl(p.pid);
-    p.categories = [];
+    p.mainCategories = [];
+    p.minorCategories = [];
     for(const id of p.cid) {
       const c = categoriesObj[id];
       if(c) {
-        p.categories.push(c);
+        p.mainCategories.push(c);
+      }
+    }
+    for(const id of p.mcid) {
+      const c = categoriesObj[id];
+      if(c) {
+        p.minorCategories.push(c);
       }
     }
     results.push(p)
@@ -267,6 +274,7 @@ schema.statics.addColumnPosts = async (columnId, categoriesId, minorCategoriesId
       columnId: column._id,
       cid: categoriesId_,
       mcid: minorCategoriesId_,
+      from: post.uid === column.uid? 'own': 'reprint'
     });
     await columnPost.save();
   }

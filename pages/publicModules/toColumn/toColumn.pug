@@ -20,30 +20,43 @@ if column
           .text-center.m-t-3.m-b-3(v-if="loading") 加载中...
           div(v-else)
             div(v-if="!createCategory")
-              .category-type 主分类
-              .radio(v-if="!selectMul" v-for="c in mainCategories")
-                label(v-if="excludes.indexOf(c._id) === -1")
-                  span(v-html="c.str")
-                  input(type="radio" :value="c._id" v-model="mainCategoryId")
-                  span {{c.name}}
-              .checkbox(v-else)
-                label(v-if="excludes.indexOf(c._id) === -1")
-                  span(v-html="c.str")
-                  input(type="checkbox" :value="c._id" v-model="mainCategoriesId")
-                  span {{c.name}}
-              .category-type 辅分类
-              .radio(v-if="!selectMul" v-for="c in minorCategories")
-                label(v-if="excludes.indexOf(c._id) === -1")
-                  span(v-html="c.str")
-                  input(type="radio" :value="c._id" v-model="minorCategoryId")
-                  span {{c.name}}
-              .checkbox(v-else)
-                label(v-if="excludes.indexOf(c._id) === -1")
-                  span(v-html="c.str")
-                  input(type="checkbox" :value="c._id" v-model="minorCategoriesId")
-                  span {{c.name}}
+              .radio.m-t-0(v-if='showCategoryType')
+                label.m-r-1
+                  input(type='radio' value='all' v-model='categoryType')
+                  span 全部
+                label.m-r-1
+                  input(type='radio' value='main' v-model='categoryType')
+                  span 仅主分类
+                label.m-r-1
+                  input(type='radio' value='minor' v-model='categoryType')
+                  span 仅辅分类
+              //.category-type 更改对象
+              div(v-if='categoryType !== "minor"')
+                .category-type 主分类
+                .radio(v-if="!selectMul" v-for="c in mainCategories")
+                  label(v-if="excludes.indexOf(c._id) === -1")
+                    span(v-html="c.str")
+                    input(type="radio" :value="c._id" v-model="mainCategoryId")
+                    span {{c.name}}
+                .checkbox(v-else)
+                  label(v-if="excludes.indexOf(c._id) === -1")
+                    span(v-html="c.str")
+                    input(type="checkbox" :value="c._id" v-model="mainCategoriesId")
+                    span {{c.name}}
+              div(v-if='categoryType !== "main"')
+                .category-type 辅分类
+                .radio(v-if="!selectMul" v-for="c in minorCategories")
+                  label(v-if="excludes.indexOf(c._id) === -1")
+                    span(v-html="c.str")
+                    input(type="radio" :value="c._id" v-model="minorCategoryId")
+                    span {{c.name}}
+                .checkbox(v-else)
+                  label(v-if="excludes.indexOf(c._id) === -1")
+                    span(v-html="c.str")
+                    input(type="checkbox" :value="c._id" v-model="minorCategoriesId")
+                    span {{c.name}}
               .text-center
-                .pointer(@click="addCategory").m-t-1.m-b-05
+                .pointer(@click="addCategory").m-t-2.m-b-05
                   .fa.fa-plus-circle &nbsp;添加分类
             .m-t-1(v-else)
               .form(v-if="createCategory")
