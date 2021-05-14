@@ -19,14 +19,14 @@ moduleToColumn.init = function(callback) {
       mainCategoryId: "",
       minorCategoryId: '',
 
+      categoryType: 'all', // main: 主分类, minor: 辅分类, all: 全部
+      showCategoryType: false,
 
       mainCategoriesId: [],
       minorCategoriesId: [],
 
 
       createCategory: false,
-
-
 
       newCategory: {
         parentId: "",
@@ -62,7 +62,7 @@ moduleToColumn.init = function(callback) {
         };
         func(exclude);
         return arr;
-      }
+      },
     },
     methods: {
       saveCategory: function() {
@@ -130,7 +130,9 @@ moduleToColumn.init = function(callback) {
           this.selectMul = options.selectMul || false;
           this.mainCategoriesId = options.selectedMainCategoriesId || options.selectedCid || [];
           this.minorCategoriesId = options.selectedMinorCategoriesId || [];
+          this.showCategoryType = options.showCategoryType || false;
         }
+        this.categoryType = 'all';
         $('#moduleToColumn').modal("show");
         this.getCategories();
       },
@@ -142,7 +144,6 @@ moduleToColumn.init = function(callback) {
         this.mainCategoriesId = [];
       },
       complete: function() {
-        if(!this.mainCategoryId) return screenTopWarning("请选择分类");
         if(!this.columnId || !this.uid) return screenTopWarning("数据加载中，请稍后重试");
         moduleToColumn.callback({
           mainCategoryId: this.mainCategoryId,
@@ -150,7 +151,8 @@ moduleToColumn.init = function(callback) {
           columnId: this.columnId,
           uid: this.uid,
           mainCategoriesId: this.mainCategoriesId,
-          minorCategoriesId: this.minorCategoriesId
+          minorCategoriesId: this.minorCategoriesId,
+          categoryType: this.categoryType
         });
       }
     }

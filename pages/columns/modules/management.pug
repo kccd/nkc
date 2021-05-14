@@ -57,9 +57,12 @@ if canManagement
 if data.user && data.user.uid === data.column.uid
   .m-b-1
     .column-management
-      .column-header
-        .fa.fa-cog &nbsp;专栏管理
-      .row.m-t-1
+      a(
+        href=`/m/${data.column._id}/status`
+        target="_blank"
+        ).column-management-entrance
+      //.row.m-t-1
+
         a(href=`/m/${data.column._id}/status` target="_blank").col-xs-4
           .fa.fa-pie-chart
           .name 统计

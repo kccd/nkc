@@ -10,5 +10,6 @@ mixin mixinColumnHeader(options)
           padding-top: 0;
         }
       +mixinColumnBanner(column.banner)
-    +mixinColumnAvatar(user, column, subColumnsId, hideBanner)
-    +mixinColumnNavLink(column, navCategories, categories)
+    .max-width.container-fluid
+      +mixinColumnAvatar(user, column, subColumnsId, hideBanner)
+      +mixinColumnNavLink(column, navCategories, categories)

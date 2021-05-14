@@ -336,4 +336,20 @@ schema.statics.getMinorCategories = async (columnId, cid, containChildCategoryPo
   return minorCategories;
 };
 
+/*
+* 检测专栏文章分类ID是否存在
+* */
+schema.statics.checkCategoriesId = async (categoriesId) => {
+  const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
+  const categories = await ColumnPostCategoryModel.find({_id: categoriesId}, {_id: 1});
+  const _categoriesId = categories.map(c => c._id);
+  for(const id of categoriesId) {
+    if(!_categoriesId.includes(id)) {
+      const err = new Error(`未找到ID为${id}的专栏文章分类`);
+      err.status = 400;
+      throw err;
+    }
+  }
+}
+
 module.exports = mongoose.model("columnPostCategories", schema);

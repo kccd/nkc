@@ -27,7 +27,7 @@ block settingsContent
         //- 辅分类
         .column-settings-post-categories-minor
           ul.nav.nav-tabs
-            li(v-for='c in minorCategories' :class='{"active": minorCategory === c}')
+            li(v-for='c in minorCategories' :class='{"active": minorCategory === c, "fixed": c.fixed}')
               a(@click='selectMinorCategory(c)') {{c.name}}
                 span.post-count(v-if='c.count > 0') &nbsp;{{c.count}}
 
@@ -59,11 +59,17 @@ block settingsContent
               .column-post-management-abstract(v-if="p.type === 'post'") {{p.post.c}}...
               .post-info
                 span.m-r-1 ID：{{p._id}}
-                span.m-r-1 来源：{{p.from==="own"?"自己":"投稿"}}
+                span.m-r-1 来源：
+                  span(v-if='p.from === "own"') 自己
+                  span(v-else-if='p.from === "contribute"') 投稿
+                  span(v-else) 转载
                 span.m-r-1 类型：{{p.type==="thread"?"文章":"回复"}}
                 span.m-r-1 发表时间：{{format("YYYY/MM/DD HH:mm:ss", p.top)}}
-                span(v-if="category._id === 'all'") 分类：
-                  span(v-for="c in p.categories") {{c.name}}&nbsp;
+                span.m-r-1(v-if="1 || category._id === 'all'") 主分类：
+                  span(v-for="c in p.mainCategories") {{c.name}}&nbsp;
+                span 辅分类：
+                  span(v-if='p.minorCategories.length === 0') 无
+                  span(v-else v-for="c in p.minorCategories") {{c.name}}&nbsp;
               b.text-danger(v-if="p.thread.disabled") 文章已屏蔽，仅后台可见
               b.text-danger(v-else-if="p.post.disabled") 回复已屏蔽，仅后台可见
               b.text-danger(v-else-if="p.thread.recycleMark") 文章已退修，仅后台可见
