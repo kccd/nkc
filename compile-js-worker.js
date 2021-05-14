@@ -64,7 +64,8 @@ async function compileJS(filename) {
         plugins: ["@babel/plugin-transform-object-assign"]
       }),
       process.env.NODE_ENV === "production" && terser()
-    ]
+    ],
+    cache: true,
   });
   await bundle.write({
     name: basename,
