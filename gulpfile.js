@@ -14,6 +14,7 @@ const { terser } = require("rollup-plugin-terser");
 const { babel } = require("@rollup/plugin-babel");
 const logUpdate = require("log-update");
 const mute = require("mute");
+const os = require('os');
 const { Worker, MessageChannel } = require("worker_threads");
 
 const SCRIPTS_GLOBS = "pages/**/*.{js,mjs}";
@@ -70,13 +71,13 @@ function compileAllJS() {
   const log = logUpdate.create(process.stdout);
   const filenames = glob.sync(SCRIPTS_GLOBS);
   /** @type Worker[] */
-  const pool = Array(20).fill(new Worker("./compile-js-worker.js"));
+  const pool = Array(os.cpus().length).fill(new Worker("./compile-js-worker.js"));
   const workerPorts = pool.map(worker => {
     const { port1, port2 } = new MessageChannel();
     worker.postMessage({ port: port1 }, [port1]);
     return port2;
   });
-  let ok = 0;;
+  let ok = 0;
   let iterator = filenames.entries();
   workerPorts.forEach(port => {
     port.addListener("message", data => {
