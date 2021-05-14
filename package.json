@@ -38,7 +38,7 @@
     "axios": "^0.21.1",
     "big.js": "^6.0.1",
     "bluebird": "^3.5.3",
-    "canvas": "github:Automattic/node-canvas",
+    "canvas": "^2.7.0",
     "chart.js": "^2.7.2",
     "cheerio": "^1.0.0-rc.3",
     "cli-cursor": "^3.1.0",
