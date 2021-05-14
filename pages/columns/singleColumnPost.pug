@@ -1,4 +1,4 @@
--var {column, from, type, post, thread, categories, columnId, toc} = columnPost
+-var {column, from, type, post, thread, mainCategories, columnId, toc} = columnPost
 -var {firstPost} = thread;
 .column-posts-post
   .column-post-body(class=thread.firstPost.cover?"cover":"")
@@ -39,7 +39,7 @@
         .column-post-forums
           if data.column
             -let category = "";
-            for c in categories
+            for c in mainCategories
               if !category || category.level > c.level
                 -category = c;
             if category
