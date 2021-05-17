@@ -102,6 +102,7 @@ router
     if(ctx.permission("homeToppedColumn")) {
       data.homeToppedColumn = homeSettings.toppedColumnsId.includes(column._id);
     }
+    data.c = categoriesIdString;
     await next();
   })
   .put("/", async (ctx, next) => {
