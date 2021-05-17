@@ -12,6 +12,7 @@ const commonjs = require("@rollup/plugin-commonjs");
 const nodePolyfills = require("rollup-plugin-node-polyfills");
 const { terser } = require("rollup-plugin-terser");
 const { babel } = require("@rollup/plugin-babel");
+const { string } = require("rollup-plugin-string");
 const logUpdate = require("log-update");
 const mute = require("mute");
 const os = require('os');
@@ -126,6 +127,9 @@ async function compileJS(filename) {
           }]
         ],
         plugins: ["@babel/plugin-transform-object-assign"]
+      }),
+      string({
+        include: "pages/**/*.html"
       }),
       process.env.NODE_ENV === "production" && terser()
     ],
