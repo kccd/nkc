@@ -71,7 +71,13 @@ function compileAllJS() {
   const log = logUpdate.create(process.stdout);
   const filenames = glob.sync(SCRIPTS_GLOBS);
   /** @type Worker[] */
-  const pool = Array(20).fill(new Worker("./compile-js-worker.js"));
+  let threadCount = Math.floor(os.cpus().length / 2);
+  if(threadCount < 1) {
+    threadCount = 1;
+  } else if(threadCount > 5) {
+    threadCount = 5;
+  }
+  const pool = Array(threadCount).fill(new Worker("./compile-js-worker.js"));
   const workerPorts = pool.map(worker => {
     const { port1, port2 } = new MessageChannel();
     worker.postMessage({ port: port1 }, [port1]);
