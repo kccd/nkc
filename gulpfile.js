@@ -19,12 +19,12 @@ const { Worker, MessageChannel } = require("worker_threads");
 
 const SCRIPTS_GLOBS = "pages/**/*.{js,mjs}";
 const LESS_GLOBS = "pages/**/*.{less,css}";
-const ASSETS_GLOBS = "pages/**/*.!(less|css|mjs|js)";
+const ASSETS_GLOBS = "pages/**/*.{pug,html}";
 const DIST_DIR = "dist";
 const spin = "-\\|/";
 let spin_slice = 0;
 const rotateChar = () => spin[spin_slice++ % spin.length];
-function noop() {};
+function noop() {}
 
 const autoprefixPlugin = new LessPluginAutoPrefix({browsers: ["last 2 versions"]});
 
@@ -71,7 +71,13 @@ function compileAllJS() {
   const log = logUpdate.create(process.stdout);
   const filenames = glob.sync(SCRIPTS_GLOBS);
   /** @type Worker[] */
-  const pool = Array(os.cpus().length).fill(new Worker("./compile-js-worker.js"));
+  let threadCount = Math.floor(os.cpus().length / 2);
+  if(threadCount < 1) {
+    threadCount = 1;
+  } else if(threadCount > 5) {
+    threadCount = 5;
+  }
+  const pool = Array(threadCount).fill(new Worker("./compile-js-worker.js"));
   const workerPorts = pool.map(worker => {
     const { port1, port2 } = new MessageChannel();
     worker.postMessage({ port: port1 }, [port1]);
@@ -153,7 +159,6 @@ async function copyAsset(from, to) {
 
 // 复制全部静态文件
 async function copyAllAssets() {
-  let r = 0;
   const log = logUpdate.create(process.stdout);
   const filenames = glob.sync(ASSETS_GLOBS);
   for(let index in filenames) {

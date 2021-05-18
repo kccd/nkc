@@ -1,31 +1,32 @@
-//- +includeJS("/ueditor/MathJax-2.6-latest/MathJax.js")
-include ../../../MathJax.pug
-+includeCSS("/ueditor/dialogs/mathformulaV2/mathformula.css")
-#mathformulaContainer
-  #mathformulaApp(v-cloak)
-    .module-sr-body
-      .module-sr-header
-        .module-sr-title 插入公式
-        .fa.fa-remove(@click="close")
-      .module-sr-content
-        .container-fluid
-          .row
-            .form-group
-              label.type-tip 温馨提示
-                p 1. 公式行内显示(inline)：请使用  $....$  或  \(....\)  包裹代码
-                p 2. 公式独占一行显示(display)：请使用  $$....$$  或  \[....\]  包裹代码
-                p 3. 插入的公式在编辑时不会渲染，请检查无误后再插入。
-          .row
-            .form-group
-              label 公式输入
-              textarea.formula-text-input(placeholder="$\\sum_{i=0}^N\\int_{a}^{b}g(t,i)\\text{d}t$" v-model="text" @input="rendering()")
-          .row
-            .form-group
-              label 公式预览
-                #mathOutput.pre-view-formula(v-pre) $\sum_{i=0}^N\int_{a}^{b}g(t,i)\text{d}t$
-          .row
-            .col-xs-5
-            button.btn.btn-default.col-xs-3(@click="close") 取消
-            button.btn.btn-primary.col-xs-3.insert-forumla-action(@click="insert") 插入
+if !isIncluded('mathFormula')
+  //- +includeJS("/ueditor/MathJax-2.6-latest/MathJax.js")
+  include ../../../MathJax.pug
+  +includeCSS("/ueditor/dialogs/mathformulaV2/mathformula.css")
+  #mathformulaContainer
+    #mathformulaApp(v-cloak)
+      .module-sr-body
+        .module-sr-header
+          .module-sr-title 插入公式
+          .fa.fa-remove(@click="close")
+        .module-sr-content
+          .container-fluid
+            .row
+              .form-group
+                label.type-tip 温馨提示
+                  p 1. 公式行内显示(inline)：请使用  $....$  或  \(....\)  包裹代码
+                  p 2. 公式独占一行显示(display)：请使用  $$....$$  或  \[....\]  包裹代码
+                  p 3. 插入的公式在编辑时不会渲染，请检查无误后再插入。
+            .row
+              .form-group
+                label 公式输入
+                textarea.formula-text-input(placeholder="$\\sum_{i=0}^N\\int_{a}^{b}g(t,i)\\text{d}t$" v-model="text" @input="rendering()")
+            .row
+              .form-group
+                label 公式预览
+                  #mathOutput.pre-view-formula(v-pre) $\sum_{i=0}^N\int_{a}^{b}g(t,i)\text{d}t$
+            .row
+              .col-xs-5
+              button.btn.btn-default.col-xs-3(@click="close") 取消
+              button.btn.btn-primary.col-xs-3.insert-forumla-action(@click="insert") 插入
 
-+includeJS("/ueditor/dialogs/mathformulaV2/mathformula.js")
+  +includeJS("/ueditor/dialogs/mathformulaV2/mathformula.js")

@@ -49,6 +49,11 @@ const schema = new Schema({
     type: String,
     default: ""
   },
+  // 分类简介
+  brief: {
+    type: String,
+    default: ''
+  },
   // 分类的创建时间
   toc: {
     type: Date,
@@ -350,6 +355,40 @@ schema.statics.checkCategoriesId = async (categoriesId) => {
       throw err;
     }
   }
+}
+/*
+* 渲染分类介绍
+* */
+schema.methods.renderDescription = async function() {
+  const {_id, description} = this;
+  const ResourceModel = mongoose.model('resources');
+  const referenceId = `columnCategory-${_id}`;
+  const resources = await ResourceModel.getResourcesByReference(referenceId);
+  const nkcRender = require('../nkcModules/nkcRender');
+  this.description = nkcRender.renderHTML({
+    type: "article",
+    post: {
+      c: description,
+      resources
+    }
+  });
+  return description;
+};
+/*
+* 获取专业分类的下级分类
+* */
+schema.methods.getChildCategories = async function() {
+  const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
+  const {_id} = this;
+  return await ColumnPostCategoryModel.find({
+    parentId: _id
+  }, {
+    name: 1,
+    _id: 1,
+    brief: 1
+  }).sort({
+    order: 1
+  });
 }
 
 module.exports = mongoose.model("columnPostCategories", schema);

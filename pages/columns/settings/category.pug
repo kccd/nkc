@@ -26,8 +26,39 @@ block settingsContent
             .column-categories-container
               +renderCategaties(category.children)
     .row
-      .col-xs-12
-        button.btn.btn-default.btn-sm(onclick='createCategory()') 添加分类
+      .col-xs-12#categoryForm(v-cloak).p-t-3
+        button.btn.btn-default.btn-sm(onclick='createCategory()' v-if='!showForm') 添加分类
+        .form.form-horizontal(v-show='showForm' :style='showForm?"padding: 1rem;background-color: #ebebeb":""').p-b-2.p-t-2
+          h4(v-if='!!categoryId') # 编辑分类
+          h4(v-else) # 添加分类
+          .form-group
+            label.col-sm-2.control-label 分类类型
+            .col-sm-8
+              .radio
+                label.m-r-1
+                  input(type='radio' value='main' v-model='type' :disabled='disableCategoryType')
+                  span 主分类
+                label
+                  input(type='radio' value='minor' v-model='type' :disabled='disableCategoryType')
+                  span 辅分类
+          .form-group
+            label.col-sm-2.control-label 分类名称
+            .col-sm-8
+              input.form-control(type='text' v-model='name' placeholder='不超过20个字符')
+          .form-group
+            label.col-sm-2.control-label 分类简介
+            .col-sm-8
+              textarea.form-control(rows=2 v-model='brief' placeholder='不超过100个字符')
+          .form-group
+            label.col-sm-2.control-label 分类介绍
+            .col-sm-8
+              #columnCategoryEditor
+          .form-group
+            label.col-sm-2.control-label
+            .col-sm-8
+              button.btn.btn-primary(@click="saveCategoryForm") 提交
+              button.btn.btn-default(@click='closeCategoryForm') 取消
+
       .col-xs-12.col-md-6
         h5 主分类
         +renderCategaties(data.categoryTree)
@@ -47,5 +78,6 @@ block settingsContent
 
 
 block settingsScripts
+  include ../../ueditor/ueditorBase
   include ../../publicModules/commonModal/commonModal
   +includeJS('/columns/settings/category.js')

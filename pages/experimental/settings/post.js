@@ -69,11 +69,14 @@ var app = new Vue({
             roles: app.roles,
             grades: app.grades
           };
-          self.checkNumber(results_.survey.deadlineMax, {
-            name: "调查的最长天数",
-            min: 0.1,
-            fractionDigits: 1
-          });
+          if(['postToForum', 'postToThread'].includes(self.type)) {
+            self.checkNumber(results_.survey.deadlineMax, {
+              name: "调查的最长天数",
+              min: 0.1,
+              fractionDigits: 1
+            });
+          }
+
           delete results_.examCountLimit;
           delete results_.authLevel;
           obj[self.type] = results_;
