@@ -23,7 +23,7 @@ block settingsContent
           div(v-if="!editInfo")
             .column-settings-category-name.h4.m-t-0 {{category.name}}
               small &nbsp;{{category.default?"(默认)":""}}
-            p {{category.description}}
+            p {{category.brief}}
         //- 辅分类
         .column-settings-post-categories-minor
           ul.nav.nav-tabs

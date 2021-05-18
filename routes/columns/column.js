@@ -62,8 +62,10 @@ router
     const fidOfCanGetThread = await db.ForumModel.getReadableForumsIdByUid(data.user? data.user.uid: '');
     const sort = {};
     if(cid) {
-      const category = await db.ColumnPostCategoryModel.findById(cid);
+      const category = await db.ColumnPostCategoryModel.findOnly({_id: cid});
       if(category.columnId !== column._id) ctx.throw(400, `文章分类【${cid}】不存在或已被专栏主删除`);
+      await category.renderDescription();
+      data.childCategories = await category.getChildCategories();
       data.category = category;
       data.categoriesNav = await db.ColumnPostCategoryModel.getCategoryNav(category._id);
       const minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id, data.category._id, true);

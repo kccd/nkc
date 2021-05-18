@@ -25,15 +25,47 @@ router
     const parentCategoriesObj = {};
     parentCategories.map(c => parentCategoriesObj[c._id] = c);
     for(const category of categories) {
-      let {_id, order, parentId} = category;
+      let {parentId} = category;
       const parentCategory = parentCategoriesObj[parentId];
-      if(!parentCategory) parentId = null;
-      await db.ColumnPostCategoryModel.updateOne({_id, columnId: column._id}, {
+      if(!parentCategory) category.parentId = null;
+      /*await db.ColumnPostCategoryModel.updateOne({_id, columnId: column._id}, {
         $set: {
           order,
           parentId
         }
-      });
+      });*/
+    }
+    // const categoriesDB = await db.ColumnPostCategoryModel.find({}, {_id: 1, parentId: 1});
+    const categoriesDB = categories;
+    const parentsObj = {};
+    const topCategories = [];
+    for(const c of categoriesDB) {
+      const {parentId} = c;
+      if(parentId) {
+        parentsObj[parentId] = parentsObj[parentId] || [];
+        parentsObj[parentId].push(c);
+      } else {
+        topCategories.push(c);
+      }
+    }
+    const func = (arr, level) => {
+      for(const c of arr) {
+        c.level = level;
+        const childCategories = parentsObj[c._id] || [];
+        func(childCategories, level + 1);
+      }
+    };
+    func(topCategories, 0);
+    categoriesDB.map(category => parentsObj[category._id] = category);
+    for(const c of categories) {
+      const {_id, order, parentId, level} = c;
+      await db.ColumnPostCategoryModel.updateOne({_id, columnId: column._id}, {
+        $set: {
+          order,
+          parentId,
+          level
+        }
+      })
     }
     await next();
   })

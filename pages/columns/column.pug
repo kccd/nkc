@@ -22,8 +22,17 @@ block content
                 a(href=`/m/${data.column._id}` data-type='reload') 首页
                 for c, index in data.categoriesNav
                   span /
-                  a(href=`/m/${data.column._id}?c=${c._id}` data-type='reload')= c.name
-                .column-category-abbr=data.category.description
+                  a(
+                    href=`/m/${data.column._id}?c=${c._id}`
+                    data-type='reload'
+                    title=c.brief
+                    )= c.name
+              if data.childCategories && data.childCategories.length > 0
+                .column-child-categories
+                  span 子分类：
+                  for c in data.childCategories
+                    a.column-child-category(href=`/m/${data.column._id}?c=${c._id}`)=c.name
+              .column-category-abbr!=data.category.description
               if data.minorCategories.length > 0
                 .column-minor-categories
                   a(data-type='reload' href=`/m/${data.column._id}?c=${data.category._id}` class=!data.minorCategory?'active':'').column-minor-category 全部
@@ -31,7 +40,7 @@ block content
                     a(
                       href=`/m/${data.column._id}?c=${data.category._id}-${c._id}`
                       class=data.minorCategory && data.minorCategory._id === c._id? 'active':''
-                      title=c.description
+                      title=c.brief
                       data-type='reload'
                       ).column-minor-category=c.name
             if data.paging.page === 0 && data.topped.length > 0
@@ -67,6 +76,7 @@ block scripts
   include ../publicModules/commonModal/commonModal
   include ../publicModules/selectColor
   include ../publicModules/subscribeTypes/subscribeTypes
+  include ../publicModules/nkcSource
   +includeJS("/columns/column.js")
   +includeJS("/columns/management.js")
   +mixinColumnNavLinkScript()
