@@ -19,12 +19,12 @@ const { Worker, MessageChannel } = require("worker_threads");
 
 const SCRIPTS_GLOBS = "pages/**/*.{js,mjs}";
 const LESS_GLOBS = "pages/**/*.{less,css}";
-const ASSETS_GLOBS = "pages/**/*.!(less|css|mjs|js)";
+const ASSETS_GLOBS = "pages/**/*.{pug,html}";
 const DIST_DIR = "dist";
 const spin = "-\\|/";
 let spin_slice = 0;
 const rotateChar = () => spin[spin_slice++ % spin.length];
-function noop() {};
+function noop() {}
 
 const autoprefixPlugin = new LessPluginAutoPrefix({browsers: ["last 2 versions"]});
 
@@ -159,7 +159,6 @@ async function copyAsset(from, to) {
 
 // 复制全部静态文件
 async function copyAllAssets() {
-  let r = 0;
   const log = logUpdate.create(process.stdout);
   const filenames = glob.sync(ASSETS_GLOBS);
   for(let index in filenames) {
