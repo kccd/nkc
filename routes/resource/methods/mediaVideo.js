@@ -60,13 +60,13 @@ module.exports = async (options) => {
       output: outputVideoPath,
       imageStream: watermarkStream,
       position: waterMaskPosition,
-      scalaByWidth: isReachFHD
-        ? widthFHD
+      scalaByHeight: isReachFHD
+        ? fhd.height
         : isReachHD
-        ? widthHD
+        ? hd.height
         : isReachSD
-        ? widthSD
-        : videoWidth,
+        ? sd.height
+        : videoHeight,
       bitRate: isReachFHD
         ? bitrateFHD
         : isReachHD
