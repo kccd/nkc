@@ -127,7 +127,7 @@ const schema = new Schema({
   // 展开分类，专栏导航显示一级分类
   navCategory: {
     type: Boolean,
-    default: false
+    default: true
   },
   // 隐藏默认分类
   hideDefaultCategory: {
