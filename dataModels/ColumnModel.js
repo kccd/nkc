@@ -132,7 +132,7 @@ const schema = new Schema({
   // 隐藏默认分类
   hideDefaultCategory: {
     type: Boolean,
-    default: false,
+    default: true,
   },
   // 每页内容条数
   perpage: {
@@ -392,14 +392,13 @@ schema.methods.updateBasicInfo = async function() {
   const ColumnPostModel = mongoose.model('columnPosts');
   const ThreadModel = mongoose.model('threads');
   const PostModel = mongoose.model('posts');
-  const UsersBehaviorModel = mongoose.model('usersBehaviors');
   const {_id} = this;
   const columnPosts = await ColumnPostModel.find({columnId: _id}, {pid: 1, tid: 1});
   const postsId = [];
-  const threadsId = [];
+  // const threadsId = [];
   columnPosts.map(cp => {
     postsId.push(cp.pid);
-    threadsId.push(cp.tid);
+    // threadsId.push(cp.tid);
   });
   const columnPostCount = columnPosts.length;
   /*const hits = await UsersBehaviorModel.countDocuments({
