@@ -20,7 +20,7 @@ const { Worker, MessageChannel } = require("worker_threads");
 const SCRIPTS_GLOBS = "pages/**/*.{js,mjs}";
 const LESS_GLOBS = "pages/**/*.{less,css}";
 const ASSETS_GLOBS = "pages/**/*.{pug,html}";
-const DIST_DIR = "dist";
+const DIST_DIR = process.env.NODE_ENV === "production"? "dist-prod": "dist";
 const spin = "-\\|/";
 let spin_slice = 0;
 const rotateChar = () => spin[spin_slice++ % spin.length];
@@ -77,7 +77,11 @@ function compileAllJS() {
   } else if(threadCount > 5) {
     threadCount = 5;
   }
-  const pool = Array(threadCount).fill(new Worker("./compile-js-worker.js"));
+  const pool = Array(threadCount).fill(new Worker("./compile-js-worker.js", {
+    workerData: {
+      DIST_DIR
+    }
+  }));
   const workerPorts = pool.map(worker => {
     const { port1, port2 } = new MessageChannel();
     worker.postMessage({ port: port1 }, [port1]);
