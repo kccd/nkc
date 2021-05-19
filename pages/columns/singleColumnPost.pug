@@ -9,7 +9,7 @@
       if type === "post"
         .column-post-content.post
           if !post.anonymous
-            a.column-thread-author(href=`/u/${post.uid}` target="_blank")
+            a.column-thread-author(href=`/u/${post.uid}` target="_blank" data-float-uid=post.uid)
               span=post.user.username
           else
             span.anonymous-name=anonymousInfo.username
@@ -23,7 +23,7 @@
       .column-post-info
         if !data.column || data.column.uid !== post.uid
           if !thread.firstPost.anonymous
-            a(href=`/u/${thread.firstPost.uid}` target="_blank").column-post-author
+            a(href=`/u/${thread.firstPost.uid}` target="_blank" data-float-uid=thread.firstPost.uid).column-post-author
               img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm'))
               span=thread.firstPost.user.username
           else
@@ -38,7 +38,7 @@
             span 来自投稿
         .column-post-forums
           if data.column
-            -let category = "";
+            -var category = "";
             for c in mainCategories
               if !category || category.level > c.level
                 -category = c;

@@ -1,6 +1,15 @@
+$(function() {
+  if(!window.CommonModal) {
+    window.CommonModal = new NKC.modules.CommonModal();
+  }
+  if(!window.SubscribeTypes) {
+    SubscribeTypes = new NKC.modules.SubscribeTypes();
+  }
+});
 var data = NKC.methods.getDataById("data");
 var bodyBackgroundColor = data.color;
-var CommonModal, SubscribeTypes;
+var SubscribeTypes = window.SubscribeTypes;
+var CommonModal = window.CommonModal;
 $(function() {
   NKC.methods.initSelectColor(function(color) {
     $("body").css({
@@ -8,10 +17,6 @@ $(function() {
     });
     bodyBackgroundColor = color;
   });
-  CommonModal = new NKC.modules.CommonModal();
-  if(NKC.modules.SubscribeTypes) {
-    SubscribeTypes = new NKC.modules.SubscribeTypes();
-  }
   var columnSubscribe = $('.column-subscribe');
   var columnButton = columnSubscribe.find('.column-button');
   var columnNumber = columnSubscribe.find('.column-number');
