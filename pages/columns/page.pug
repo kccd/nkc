@@ -12,14 +12,20 @@ block columnTitle
   style=`body{background-color: ${data.column.color};}`
 
 block content
-  include ./modules/banner
-  div.m-t-2.box-shadow-panel
-    .column
-      include ./modules/nav
+  include ./modules/columnHeader
+  include ./modules/contribute
+  +mixinColumnHeader({
+    user: data.user,
+    column: data.column,
+    subColumnsId: state.subColumnsId,
+    navCategories: data.navCategories,
+    categories: data.categories,
+    hideBanner: false
+  })
   .container-fluid.max-width
     .column
       .row
-        .col-xs-12.col-md-8.box-shadow-panel.m-t-2
+        .col-xs-12.col-md-8.box-shadow-panel.m-t-1.p-r-0
           div
             if data.page.t
               .column-page-title=data.page.t
@@ -32,7 +38,7 @@ block content
                 else
                   button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, true)`) 关闭
                 a.m-l-05.btn.btn-xs.btn-default(href=`/m/${data.column._id}/settings/page?t=edit&id=${data.page._id}`) 编辑
-        .col-xs-12.col-md-4.box-shadow-panel.m-t-2
+        .col-xs-12.col-md-4.box-shadow-panel.m-t-1
           include ./modules/management
           include ./modules/info
 block scripts
@@ -44,3 +50,4 @@ block scripts
   +includeJS("/columns/settings/page.js")
   +includeJS("/columns/column.js")
   +includeJS("/columns/management.js")
+  +mixinColumnNavLinkScript()
