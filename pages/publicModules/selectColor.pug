@@ -5,10 +5,9 @@
 +includeCSS('/jquery/jquery.minicolors.css')
 +includeJS('/jquery/jquery.minicolors.js')
 script.
-  NKC.methods.initSelectColor = function(callback) {
-    var dom = $('input[data-control="selectColor"]');
-    if(dom.length !== 0) {
-      dom.minicolors({
+  (function () {
+    var initEvent = function (jqDom, callback) {
+      jqDom.minicolors({
 
         control: $(this).attr('data-control') || 'selectColor',
 
@@ -22,17 +21,19 @@ script.
 
         position: $(this).attr('data-position') || 'bottom left',
 
-        change: function(hex, opacity) {
-
-          if( !hex ) return;
-
-          if( opacity ) hex += ', ' + opacity;
-          if(callback) callback(hex);
-
+        change: function (hex, opacity) {
+          if (!hex) return;
+          if (opacity) hex += ', ' + opacity;
+          if (callback) callback(hex, jqDom.attr('id'));
         },
-
         theme: 'bootstrap'
-
       });
+    };
+    NKC.methods.initSelectColor = function (callback) {
+      var colorDocuments = $('input[data-control="selectColor"]');
+      for (var i = 0; i < colorDocuments.length; i++) {
+        var colorDocument = colorDocuments.eq(i);
+        initEvent(colorDocument, callback);
+      }
     }
-  }
+  })();

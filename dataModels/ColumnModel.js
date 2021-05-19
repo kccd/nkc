@@ -28,6 +28,14 @@ const schema = new Schema({
     type: String,
     default: "#eee"
   },
+  listColor: {
+    type: String,
+    default: '#ffffff'
+  },
+  toolColor: {
+    type: String,
+    default: '#ffffff'
+  },
   topped: {
     type: [Number],
     default: [],
@@ -851,5 +859,26 @@ schema.statics.getHotColumns = async () => {
     toppedColumns: _columns.filter(c => toppedColumnsId.includes(c._id))
   };
 };
+
+schema.statics.getHomePageByColumnId = async function(columnId) {
+  const ColumnPageModel = mongoose.model('columnPages');
+  const ResourceModel= mongoose.model('resources');
+  const nkcRender = require('../nkcModules/nkcRender');
+  const page = await ColumnPageModel.findOne({
+    columnId,
+    hidden: false,
+    asHome: true
+  });
+  if(page) {
+    page.c = nkcRender.renderHTML({
+      type: 'article',
+      post: {
+        c: page.c,
+        resources: await ResourceModel.getResourcesByReference(`column-${page._id}`)
+      }
+    });
+  }
+  return page;
+}
 
 module.exports = mongoose.model("columns", schema);

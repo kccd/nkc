@@ -8,14 +8,32 @@ $(function() {
 });
 var data = NKC.methods.getDataById("data");
 var bodyBackgroundColor = data.color;
+var listBackgroundColor = data.listColor;
+var toolsBackgroundColor = data.toolColor;
 var SubscribeTypes = window.SubscribeTypes;
 var CommonModal = window.CommonModal;
 $(function() {
-  NKC.methods.initSelectColor(function(color) {
-    $("body").css({
-      "background-color": color
-    });
-    bodyBackgroundColor = color;
+  NKC.methods.initSelectColor(function(color, id) {
+    if(id === 'columnColor') {
+      // 专栏背景颜色
+      $("body").css({
+        "background-color": color
+      });
+      bodyBackgroundColor = color;
+    } else if(id === 'listColor') {
+      // 文章列表背景颜色
+      console.log(color)
+      $(".column-thread-list-container").css({
+        "background-color": color
+      });
+      listBackgroundColor = color;
+    } else if(id === 'toolColor'){
+      // 文章工具背景颜色
+      $(".column-tool-container").css({
+        "background-color": color
+      });
+      toolsBackgroundColor = color;
+    }
   });
   var columnSubscribe = $('.column-subscribe');
   var columnButton = columnSubscribe.find('.column-button');
@@ -67,7 +85,9 @@ function showShareDom(){
 function saveSettings() {
   nkcAPI("/m/" + data.columnId, "PUT", {
     type: "color",
-    color: bodyBackgroundColor
+    color: bodyBackgroundColor,
+    listColor: listBackgroundColor,
+    toolColor: toolsBackgroundColor
   })
     .then(function() {
       screenTopAlert("保存成功");

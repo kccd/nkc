@@ -35,6 +35,10 @@ block settingsContent
                   button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${page._id}, false)`) 开启
                 else
                   button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${page._id}, true)`) 关闭
+                if page.asHome
+                  button.btn.btn-xs.btn-danger(onclick=`setAsColumnHome(${data.column._id}, ${page._id}, false)`) 取消专栏首页
+                else
+                  button.btn.btn-xs.btn-default(onclick=`setAsColumnHome(${data.column._id}, ${page._id}, true)`) 设为专栏首页
                 button.btn.btn-xs.btn-danger(onclick=`deletePage(${data.column._id}, ${page._id})`) 删除
 block settingsScripts
   +includeJS("/clipboard/clipboard.min.js")

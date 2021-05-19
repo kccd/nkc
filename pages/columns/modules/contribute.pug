@@ -1,5 +1,5 @@
-mixin mixinColumnContribute(user, column)
-  .column-contribute-body
+mixin mixinColumnContribute(user, column, columnToolStyle)
+  .column-tool-container.column-contribute-body(style=columnToolStyle)
     if !user
       .column-contribute(onclick='NKC.methods.toLogin()')
     else if user.uid !== column.uid

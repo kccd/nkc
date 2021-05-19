@@ -4,7 +4,7 @@
 -var canManagement = permission("column_single_disabled");
 .hidden#data=objToStr({columnId: data.column._id, color: data.column.color})
 if canManagement
-  .m-b-1
+  .m-b-1.column-tool-container(style=columnToolStyle)
     .column-management
       .column-header
         .fa.fa-shield &nbsp;管理
@@ -55,7 +55,7 @@ if canManagement
           .fa.fa-align-center
           .name 删除简介
 if data.user && data.user.uid === data.column.uid
-  .m-b-1
+  .m-b-1.column-tool-container(style=columnToolStyle)
     .column-management
       a(
         href=`/m/${data.column._id}/status`
@@ -87,5 +87,9 @@ if data.user && data.user.uid === data.column.uid
         .form-group
           label 专栏背景
           input.form-control(data-control="selectColor" id="columnColor" value=data.column.color)
+          label 文章列表背景
+          input.form-control(data-control="selectColor" id="listColor" value=data.column.listColor)
+          label 工具栏背景
+          input.form-control(data-control="selectColor" id="toolColor" value=data.column.toolColor)
         .form-group
           button.btn.btn-block.btn-primary(onclick="saveSettings()") 保存

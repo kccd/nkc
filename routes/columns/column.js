@@ -89,6 +89,9 @@ router
       data.toppedId = data.column.topped;
       sort[`order.cid_default`] = -1;
     }
+    if(!query.page && !query.c) {
+      data.homePage = await db.ColumnModel.getHomePageByColumnId(column._id);
+    }
     const count = await db.ColumnPostModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, column.perpage);
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
@@ -110,7 +113,8 @@ router
   .put("/", async (ctx, next) => {
     const {data, db, body, nkcModules, tools} = ctx;
     const {contentLength} = tools.checkString;
-    const {column} = data;
+    const {column, user} = data;
+    if(column.uid !== user.uid && !ctx.permission('column_single_disabled')) ctx.throw(403, "权限不足");
     const {files, fields} = body;
     const type = body.type || fields.type;
     if(!type) {
@@ -211,9 +215,11 @@ router
       }
       await db.ColumnModel.toSearch(column._id);
     } else if(type === "color") {
-      const {color} = body;
+      const {color, listColor, toolColor} = body;
       await column.updateOne({
-        color
+        color,
+        listColor,
+        toolColor
       });
     }
     await next();
