@@ -2,7 +2,6 @@
   @param data.contributeCount 待处理的投稿数
 
 -var canManagement = permission("column_single_disabled");
-.hidden#data=objToStr({columnId: data.column._id, color: data.column.color})
 if canManagement
   .m-b-1.column-tool-container(style=columnToolStyle)
     .column-management

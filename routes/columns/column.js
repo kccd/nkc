@@ -121,7 +121,7 @@ router
       let {
         abbr, name, description, color, notice, links = [],
         otherLinks = [], blocks = [], navCategory, perpage = 30,
-        hideDefaultCategory
+        hideDefaultCategory, listColor, toolColor
       } = fields;
       const {avatar, banner} = files;
       if(!name) ctx.throw(400, "专栏名不能为空");
@@ -196,6 +196,8 @@ router
       await column.updateOne({
         name,
         color,
+        listColor,
+        toolColor,
         perpage,
         links,
         hideDefaultCategory,

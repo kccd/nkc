@@ -33,9 +33,17 @@ block settingsContent
             h4 专栏介绍（不超过1000字符）
             textarea.form-control(rows=6 v-model.trim="column.description")
           .form-group
-            label.col-sm-2.control-label 背景颜色
+            label.col-sm-2.control-label 专栏背景颜色
             .col-sm-8
-              input.form-control(data-control="selectColor" v-model.trim="column.color")
+              input.form-control(data-control="selectColor" v-model.trim="column.color" id='color')
+          .form-group
+            label.col-sm-2.control-label 文章列表背景颜色
+            .col-sm-8
+              input.form-control(data-control="selectColor" v-model.trim="column.listColor" id='listColor')
+          .form-group
+            label.col-sm-2.control-label 工具栏背景颜色
+            .col-sm-8
+              input.form-control(data-control="selectColor" v-model.trim="column.toolColor" id='toolColor')
           .form-group
             label.col-sm-2.control-label 公告通知
             .col-sm-8

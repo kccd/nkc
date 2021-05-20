@@ -12,6 +12,7 @@ block content
     categories: data.categories,
     hideBanner: false
   })
+  .hidden#data=objToStr({columnId: data.column._id, color: data.column.color, listColor: data.column.listColor, toolColor: data.column.toolColor})
   .container-fluid.max-width
     .column
       .row
