@@ -581,7 +581,10 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   // 创建post数据
   const IPModel = mongoose.model('ips');
   const ipToken = await IPModel.saveIPAndGetToken(ip);
+  const nowTime = Date.now();
   let _post = await new PostModel({
+    toc: nowTime,
+    tlm: nowTime,
     pid,
     c,
     t,
@@ -608,7 +611,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   _post = _post.toObject();
   await this.updateOne({
     lm: pid,
-    tlm: Date.now()
+    tlm: nowTime
   });
   // 如果存在引用，则给被引用者发送引用通知
   if(quotePost) {

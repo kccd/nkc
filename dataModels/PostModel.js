@@ -129,7 +129,7 @@ const postSchema = new Schema({
     default: Date.now,
     index: 1
   },
-  // 修改的时间
+  // 修改的时间 默认同toc
   tlm: {
     type: Date,
     default: Date.now,
