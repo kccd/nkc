@@ -548,11 +548,14 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const MessageModel = mongoose.model('messages');
   const UserModel = mongoose.model('users');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {quote = "", c, t, l, abstractCn, abstractEn, keyWordsCn = [], keyWordsEn = [], authorInfos=[], originState, parentPostId} = post;
+  const {c, t, l, abstractCn, abstractEn, keyWordsCn = [], keyWordsEn = [], authorInfos=[], originState, parentPostId} = post;
+  let {quote = ''} = post;
   // 如果存在引用，则先判断引用的post是否存在
   let quotePost;
   if(quote) {
-    quotePost = await PostModel.findOne({tid: this.tid, pid: post.quote, type: "post"});
+    quotePost = await PostModel.findOne({tid: this.tid, pid: post.quote, type: "post"}, {cv: 1, pid: 1, uid: 1});
+    // 记录被引用的Post的id和内容版本号cv
+    quote += `:${quotePost.cv || 1}`
   }
   // 处理作者信息
   let newAuthInfos = [];

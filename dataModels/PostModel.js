@@ -66,7 +66,7 @@ const postSchema = new Schema({
     type: [String],
     default: []
   },
-  // 引用的post id
+  // 引用的post id:cv (cv代表内容版本号)
   quote: {
     type: String,
     default: ""
@@ -837,6 +837,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
   const ThreadModel = mongoose.model('threads');
   const XsfsRecordModel = mongoose.model('xsfsRecords');
   const SettingModel = mongoose.model('settings');
+  const HistoryModel = mongoose.model('histories');
   const creditScore = await SettingModel.getScoreByOperationType('creditScore');
   const o = Object.assign({}, defaultOptions);
   Object.assign(o, options);
@@ -845,13 +846,41 @@ postSchema.statics.extendPosts = async (posts, options) => {
   let postsId = [], postsObj = {};
   let threadsId = new Set(), threadsAuthor = {};
   let grades, resources;
+
+  const quotePostsCVMatch = [];
+
   posts.map(post => {
     threadsId.add(post.tid);
     pid.add(post.pid);
     if(o.user) {
       uid.add(post.uid);
     }
+    if(o.quote && post.quote) {
+      const [quotePid, cv] = post.quote.split(':');
+      if(cv !== undefined) {
+        quotePostsCVMatch.push({
+          pid: quotePid,
+          cv: Number(cv)
+        });
+      }
+    }
   });
+
+  let quoteHistories = {};
+
+  if(quotePostsCVMatch.length > 0) {
+    const histories = await HistoryModel.find({
+      $or: quotePostsCVMatch
+    }, {
+      pid: 1, cv: 1, c: 1
+    });
+    for(const h of histories) {
+      const {pid, cv, c} = h;
+      quoteHistories[`${pid}:${cv}`] = c;
+    }
+  }
+
+
   const threads = await ThreadModel.find({tid: {$in: [...threadsId]}}, {tid: 1, uid: 1});
   for(const t of threads) {
     threadsAuthor[t.tid] = t.uid;
@@ -988,9 +1017,18 @@ postSchema.statics.extendPosts = async (posts, options) => {
     }
     // 如果存在引用
     if(o.quote && post.quote) {
-      const quotePost = postsObj[post.quote];
-      const index = postsId.indexOf(post.quote);
+      const [quotePostId, cv] = post.quote.split(':');
+      const quotePost = postsObj[quotePostId];
+      const index = postsId.indexOf(quotePostId);
       if(index !== -1 && quotePost) {
+
+        let quoteContent;
+        if(cv !== undefined && quoteHistories[post.quote] !== undefined) {
+          quoteContent = quoteHistories[post.quote];
+        } else {
+          quoteContent = quotePost.c;
+        }
+
         let username, uid;
         if(quotePost.anonymous) {
           username = "匿名用户";
@@ -999,7 +1037,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
           username = user.username;
           uid = quotePost.uid;
         }
-        const c = nkcRender.htmlToPlain(quotePost.c, 50);
+        const c = nkcRender.htmlToPlain(quoteContent, 50);
         post.quotePost = {
           pid: quotePost.pid,
           username,
