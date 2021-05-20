@@ -1,9 +1,9 @@
 var MoveThread, DisabledPost;
-
-
 $(function() {
   window.MoveThread = new NKC.modules.MoveThread();
   window.DisabledPost = new NKC.modules.DisabledPost();
+  MoveThread = window.MoveThread;
+  DisabledPost = window.DisabledPost;
 });
 
 function getSelectedThreadsId() {
