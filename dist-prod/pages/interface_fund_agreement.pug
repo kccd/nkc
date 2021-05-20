@@ -1,0 +1,48 @@
+extends bootstrap_base
+block title
+
+  -const fund = data.fund;
+  -const photos = data.photos;
+  -const {applicationForm} = data;
+  -const notAllow = data.notAllow;
+  -const mainContainer1400 = true
+  title= `科创基金-${fund.name}-条款`
+  link(rel='stylesheet' href='/fund.css')
+
+block content
+  .container-fluid.max-width
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-12
+        .panel.panel-default
+          .panel-body
+            include interface_fund_terms
+            br
+            hr
+            br
+            h2.text-center= `${fund.name}条款`
+            div!= markdown_safe(fund.description.terms)
+            br
+            br
+            .row
+              .col-xs-12.col-md-12
+                p 同意以上全部条款：
+              .col-xs-12.col-md-12
+                .radio
+                  label.m-r-1
+                    input(type='radio' name='fund' checked=false)
+                    span 是
+                  label
+                    input(type='radio' name='fund' checked=true)
+                    span 否
+            br
+            hr
+            br
+            .row
+              .col-xs-12.col-md-2.col-md-offset-5
+                button.btn.btn-block.disabled#submit(onclick=`submit("${fund._id.toLowerCase()}")`) 提交
+
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_agreement.js')

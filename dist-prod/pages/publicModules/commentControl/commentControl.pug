@@ -1,0 +1,31 @@
+if !isIncluded('commentControl')
+  include ../draggablePanel/draggablePanel
+  +includeCSS('/publicModules/commentControl/commentControl.css')
+  #moduleCommentControl.draggable-panel
+    #moduleCommentControlApp(v-cloak)
+      .draggable-panel-header
+        .draggable-panel-title 评论控制
+        .draggable-panel-right-button(@click='close')
+          .fa.fa-remove
+      .draggable-panel-body
+        .draggable-panel-loading(v-if='loading') 加载中...
+        .draggable-panel-content(v-else)
+          .p-a-1.p-t-05
+            div 文号：{{pid}}
+            .radio
+              label
+                input(type='radio'  value='rw' v-model='comment')
+                span 可查看、可评论
+            .radio
+              label
+                input(type='radio'  value='r' v-model='comment')
+                span 只可查看
+            .radio
+              label
+                input(type='radio'  value='n' v-model='comment')
+                span 不可查看、不可评论
+            div.text-right
+              button.btn.btn-default.btn-sm(@click='close') 取消
+              button.btn.btn-primary.btn-sm(@click='submit') 保存
+
+  +includeJS('/publicModules/commentControl/commentControl.js')

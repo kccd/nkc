@@ -1,0 +1,22 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+.watermark {
+  border: 1px solid #aaa;
+  display: inline-block;
+}
+.watermark img {
+  max-width: 16rem;
+}
+.file-count {
+  width: 5rem;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIjxpbnB1dCBjc3MgMjg+IiwicGFnZXMvcHVibGljTW9kdWxlcy9iYXNlLmxlc3MiLCJwYWdlcy9leHBlcmltZW50YWwvc2V0dGluZ3MvdXBsb2FkL3VwbG9hZC5sZXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLFVBQVU7QUFDVixVQUFVO0FDT1Y7RUFDRSxtQkFBQTtFQUNBLE9BQUE7RUFDQSxRQUFBO0VBQ0EsU0FBQTtFQUNBLFVBQUE7RUFDQSxhQUFBO0NETEQ7QUFDRCxrQkFBa0I7QUVQbEI7RUFDRSx1QkFBQTtFQUNBLHNCQUFBO0NGU0Q7QUVYRDtFQUlJLGlCQUFBO0NGVUg7QUVORDtFQUNFLFlBQUE7Q0ZRRCIsImZpbGUiOiJ0by5jc3MifQ== */

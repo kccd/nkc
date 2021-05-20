@@ -1,0 +1,145 @@
+extends ../../shop
+block shopTitle
+  title 订单管理
+block shopContent
+  .order-navs
+    a(class=!data.t || data.t === "all" ? "active" : "" href=`/shop/manage/order`).order-nav 全部
+    a(class=data.t === "unCost" ? "active" : "" href=`/shop/manage/order?t=unCost`).order-nav 待付款
+      if data.counter.unCost
+        .number=data.counter.unCost
+    a(class=data.t === "unShip" ? "active" : "" href=`/shop/manage/order?t=unShip`).order-nav 待发货
+      if data.counter.unShip
+        .number=data.counter.unShip
+    a(class=data.t === "unSign" ? "active" : "" href=`/shop/manage/order?t=unSign`).order-nav 待收货
+      if data.counter.unSign
+        .number=data.counter.unSign
+    a(class=data.t === "finish" ? "active" : "" href=`/shop/manage/order?t=finish`).order-nav 已完成
+    a(class=data.t === "close" ? "active" : "" href=`/shop/manage/order?t=close`).order-nav 已关闭
+    a(class=data.t === "refunding" ? "active" : "" href=`/shop/manage/order?t=refunding`).order-nav 正在退款
+      if data.counter.refunding
+        .number=data.counter.refunding
+  div
+    include ../../../publicModules/paging/paging
+    if !data.orders.length
+      .null 空空如也~
+    else
+      .table-responsive
+        table.table.table-bordered
+          thead
+            tr
+              th 商品名称
+              th.text-center 商品单价
+              th.text-center 数量
+              th 实际收款
+              th.text-center 交易状态
+              th.text-center 其他
+          tbody
+            for order in data.orders
+              tr
+                td(colspan="11").order-infos
+                  .order-info
+                    .value.time=format("YYYY/MM/DD HH:mm:ss", order.orderToc)
+                  .order-info
+                    .name 订单号：
+                    .value=order.orderId
+
+                  .order-info
+                    .name 买家：
+                    a.value(href=`/u/${order.buyUid}` data-float-uid=order.buyUid)=order.buyUser.username
+                    a.value.m-r-1(href=`/message?uid=${order.buyUid}` title=`联系买家(${order.buyUser.online ? "在线" : "离线"})` target="_blank")
+                      .fa.fa-commenting-o(class=order.buyUser.online ? "active" : "")
+                    if order.orderStatus !== "unCost" && permission("transferKcbToUser") 
+                      button.order-button(onclick=`transfer('${order.buyUid}')`) 转账
+                for param,key in order.params
+                  tr(data-order-id=order.orderId data-order-param-id=param.costId)
+                    td
+                      div.order-name-info
+                        .order-cover
+                          img(src=`/r/${param.product.imgMaster}`)
+                        .order-name
+                          a(href=`/shop/product/${param.product.productId}` title=param.product.name)=param.product.name
+                          .order-param(title=param.productParam.name)=`规格：${param.productParam.name}`
+                    td
+                      div.order-price
+
+                        //- 商品的单价
+                        .number.data-param-price=`￥${numToFloatTwo(param.singlePrice)}`
+                        if param.refundStatus === "success"
+
+                          span 已退款
+
+                        //- 修改单价
+                        if order.orderStatus === "unCost" && !order.closeStatus
+                          button.order-button(onclick=`modifyParamPrice("${order.sellUid}", "${order.orderId}", "${param.costId}")`) 修改
+                    td
+                      div.order-count
+
+                        //- 商品的数量
+                        .number.data-param-count=param.count
+
+
+                        //- 修改数量
+                        if order.orderStatus === "unCost" && !order.closeStatus
+                          button.order-button(onclick=`modifyParamCount("${order.sellUid}", "${order.orderId}", "${param.costId}")`) 修改
+                    if !key
+                      -const paramsCount = order.params.length;
+                      td(rowspan=paramsCount)
+                        div.order-price(style="text-align: left;")
+                          div
+                            span 商品总价：
+                            span.number.sm.data-params-price=`￥${numToFloatTwo(order.orderPrice)}`
+                          div
+                            span 运费总计：
+
+                            //- 运费总计
+                            span.number.sm.data-params-freight=`￥${numToFloatTwo(order.orderFreightPrice)}`
+
+
+                            //- 修改运费
+                            if order.orderStatus === "unCost" && !order.closeStatus
+                              button.order-button(onclick=`modifyFreight("${order.sellUid}", "${order.orderId}")`) 修改
+                          div
+                            strong 订单总计：
+
+                            //- 订单总计
+                            span.number.data-order-price=`￥${numToFloatTwo(order.orderPrice + order.orderFreightPrice)}`
+
+
+                      td.order-status(rowspan=paramsCount)=order.status
+                      td.order-links(rowspan=paramsCount)
+                        a(href=`/shop/manage/${data.user.uid}/order/detail?orderId=${order.orderId}`) 订单详情
+                        //- 正在退款 查看退款状态
+                        if order.refundStatus === "ing"
+                          a(href=`/shop/manage/${data.user.uid}/order/refund?orderId=${order.orderId}`) 退款详情
+                        if !order.closeStatus && ["unCost", "unShip"].includes(order.orderStatus)
+                          //- 订单未关闭 且 订单待付款或待发货
+                          a(href=`/shop/manage/${data.user.uid}/order/cancel?orderId=${order.orderId}`) 取消订单
+                        if order.orderStatus === "unSign" || order.orderStatus === "finish"
+                          //- 已完成或已发货 可查看物流信息
+                          if !order.trackNumber || order.trackNumber === "no"
+                            a 无物流配送
+                          else
+                            a(href=`/shop/manage/${data.user.uid}/order/logositics?orderId=${order.orderId}`) 查看物流
+                        if order.orderStatus === "unSign" && !order.closeStatus
+                          button(onclick=`ship(${order.orderId})`) 修改物流信息
+                        if order.orderStatus === "unShip" && !order.closeStatus
+                          button(onclick=`ship(${order.orderId})`) 发货
+                if order.buyMessage
+                  tr
+                    td(colspan="6").order-message
+                      .name 买家留言：
+                      span=`${order.buyMessage}`
+                tr(data-order-id=order.orderId)
+                  td(colspan="6").order-message
+                    .name 备注：
+                    span.data-sell-message=order.sellMessage || "无"
+                    button.order-button(onclick=`modifySellMessage('${order.sellUid}', '${order.orderId}')`) 修改
+    include ../../../publicModules/paging/paging_input
+block shopScripts
+  include ../../../publicModules/subscribeTypes/subscribeTypes
+  include ../../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../../../publicModules/commonModal/commonModal
+  include ../../../publicModules/shop/modifyPrice
+  include ../../../publicModules/shop/ship
+  include ../../../publicModules/transfer/transfer
+  +includeJS("/shop/manage/order/order.js")

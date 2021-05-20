@@ -1,0 +1,63 @@
+body .payment:last-child {
+  border: 1px solid #ccc;
+}
+.fee-info {
+  font-size: 1rem;
+  color: #444;
+}
+.payment {
+  min-height: 4.4rem;
+  border: 1px solid #ccc;
+  border-bottom: none;
+  padding-right: 4rem;
+  position: relative;
+}
+.payment.active {
+  background-color: rgba(43, 144, 217, 0.1);
+}
+.payment .icon {
+  position: absolute;
+  top: 0.4rem;
+  left: 1rem;
+  height: 3.6rem;
+  width: 3.6rem;
+  line-height: 3.6rem;
+  text-align: center;
+  overflow: hidden;
+}
+.payment .icon img {
+  height: 100%;
+  width: 100%;
+}
+.payment .icon.aliPay img {
+  position: absolute;
+  top: 0;
+  left: -7.2rem;
+  height: 100%;
+  width: auto;
+}
+.payment .info {
+  padding-left: 6rem;
+}
+.payment .info .name {
+  margin-top: 0.3rem;
+  font-size: 1.3rem;
+}
+.payment .selection {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  right: 0;
+  height: 4.4rem;
+  line-height: 4.4rem;
+  width: 4rem;
+  overflow: hidden;
+  text-align: center;
+}
+.payment .selection label {
+  width: 100%;
+}
+.payment .selection input {
+  position: relative;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL3Nob3AvcGF5L3BheS5sZXNzIiwiPGlucHV0IGNzcyAxMTc+Il0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBRUksdUJBQUE7Q0NBSDtBREdEO0VBQ0UsZ0JBQUE7RUFDQSxZQUFBO0NDREQ7QURHRDtFQUNFLG1CQUFBO0VBQ0EsdUJBQUE7RUFDQSxvQkFBQTtFQUNBLG9CQUFBO0VBQ0EsbUJBQUE7Q0NERDtBREVDO0VBQ0UsMENBQUE7Q0NBSDtBRFBEO0VBVUksbUJBQUE7RUFDQSxZQUFBO0VBQ0EsV0FBQTtFQUNBLGVBQUE7RUFDQSxjQUFBO0VBQ0Esb0JBQUE7RUFDQSxtQkFBQTtFQUNBLGlCQUFBO0NDQUg7QURqQkQ7RUFtQk0sYUFBQTtFQUNBLFlBQUE7Q0NDTDtBRENHO0VBRUksbUJBQUE7RUFDQSxPQUFBO0VBQ0EsY0FBQTtFQUNBLGFBQUE7RUFDQSxZQUFBO0NDQVA7QUQ1QkQ7RUFpQ0ksbUJBQUE7Q0NGSDtBRC9CRDtFQW1DTSxtQkFBQTtFQUNBLGtCQUFBO0NDREw7QURuQ0Q7RUEyQ0ksbUJBQUE7RUFDQSxnQkFBQTtFQUNBLE9BQUE7RUFDQSxTQUFBO0VBQ0EsZUFBQTtFQUNBLG9CQUFBO0VBQ0EsWUFBQTtFQUNBLGlCQUFBO0VBQ0EsbUJBQUE7Q0NMSDtBRDlDRDtFQXFETSxZQUFBO0NDSkw7QURqREQ7RUF3RE0sbUJBQUE7Q0NKTCIsImZpbGUiOiJ0by5jc3MifQ== */

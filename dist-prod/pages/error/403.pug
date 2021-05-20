@@ -1,0 +1,20 @@
+.error-icon=`403 Forbidden`
+.error-list.b-s-10
+  .error-header 很抱歉！你没有访问该页面的权限，可能是因为：
+  .error-header
+  ul
+    li
+      .num 1
+      | 账号等级太低
+    li
+      .num 2
+      | 没有相应证书
+  .error-code
+    span message：
+    code= data.error
+  .error-info 请
+    a(href=`/exam`) 参加考试
+    | 以获得相关证书，并多发优质内容提升账号等级。
+    | 若问题依然存在，请
+    a(href=`/problem/add?c=${data.error}`) 上报问题
+    | 。

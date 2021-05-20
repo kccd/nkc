@@ -1,0 +1,26 @@
+extends settings
+block settingsTitle
+  title 粉丝管理
+block settingsContent
+  .hidden#data=objToStr({columnId: data.column._id})
+  div
+    h3 粉丝管理
+    hr
+    include ../../publicModules/paging/paging
+    .column-fans
+      for u, index in data.fans
+        if index > 0
+          hr.m-b-05.m-t-05
+        .column-fans-item
+          .column-fans-avatar
+            img(src=tools.getUrl('userAvatar', u.avatar) data-float-uid=u.uid)
+          .column-fans-info
+            .column-fans-name
+              a(href=tools.getUrl('userHome', u.uid) target='_blank' data-float-uid=u.uid)=u.username
+            .column-fans-description=u.description || '暂无简介'
+          .column-fans-options
+            button.btn.btn-default(data-type='removeFans' data-uid=u.uid) 移除
+    include ../../publicModules/paging/paging_input
+block settingsScripts
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  +includeJS('/columns/settings/fans.js')

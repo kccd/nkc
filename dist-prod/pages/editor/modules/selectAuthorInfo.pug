@@ -1,0 +1,35 @@
+.modal.fade#moduleSelectAuthorInfo(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+  .modal-dialog.modal-sm(role="document" v-cloak)#moduleSelectAuthorInfoApp
+    .modal-content
+      .modal-header
+        button.close(data-dismiss="modal" aria-label="Close")
+          span(aria-hidden="true") &times;
+        h4.modal-title 作者信息
+      .modal-body
+      .modal-footer
+        button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭
+        button(type="button" class="btn btn-primary btn-sm" @click="submit") 确定
+
+script.
+  NKC.modules.SelectAuthorInfo = function() {
+    var self = this;
+    self.dom = $("#moduleSelectAuthorInfo");
+    self.dom.modal({
+      show: true,
+      dropdown: "static"
+    });
+    self.app = new Vue({
+      el: "#moduleSelectAuthorInfoApp",
+      data: {
+
+      }
+    });
+    self.open = function(callback, options) {
+      self.callback = callback;
+      options = options || {};
+      self.dom.modal("show");
+    };
+    self.close = function() {
+      self.dom.modal("hide");
+    }
+  };

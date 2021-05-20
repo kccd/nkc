@@ -1,0 +1,179 @@
+#floatUserPanel .content {
+  position: fixed;
+  top: 100px;
+  left: 100px;
+  height: 15rem;
+  z-index: 10000;
+  width: 25rem;
+  background-color: #fff;
+  -webkit-box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.5);
+          box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.5);
+  border-radius: 3px;
+  background-size: cover;
+}
+#floatUserPanel .user_base {
+  height: 10rem;
+  position: relative;
+}
+#floatUserPanel .user_banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  z-index: 10009;
+}
+#floatUserPanel .user_info {
+  padding: 0.5rem 0;
+  font-size: 1rem;
+  height: 5rem;
+}
+#floatUserPanel .user_info .col-xs-3 {
+  padding: 0;
+}
+#floatUserPanel .user_avatar {
+  height: 10rem;
+  width: 10rem;
+  position: absolute;
+  display: inline-block;
+  vertical-align: top;
+  z-index: 10020;
+}
+#floatUserPanel .user_mask {
+  position: absolute;
+  z-index: 10010;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+#floatUserPanel .user_avatar a {
+  display: block;
+  background-color: #d9e1e8;
+  height: 8rem;
+  border-radius: 3px;
+}
+#floatUserPanel .user_avatar img {
+  height: 92px;
+  border-radius: 3px;
+  width: 92px;
+  margin: 2px 0 0 2px;
+}
+#floatUserPanel .user_sub_btn {
+  font-size: 1rem;
+  line-height: 15px;
+  text-align: center;
+  background-color: #2b90d9;
+  color: #fff;
+  font-weight: 700;
+}
+#floatUserPanel .user_sub_btn.subscribed {
+  background-color: #9baec8;
+}
+#floatUserPanel .user_avatar_div {
+  position: relative;
+  width: 8rem;
+  margin-left: 1rem;
+  margin-top: -1rem;
+}
+#floatUserPanel .user_div {
+  position: absolute;
+  display: inline-block;
+  vertical-align: top;
+  z-index: 10020;
+  height: 10rem;
+  width: 14.5rem;
+  right: 0.5rem;
+  top: 0;
+}
+#floatUserPanel .user_name {
+  height: 2.3rem;
+  overflow: hidden;
+  margin-right: 1rem;
+  display: inline-block;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-height: 2.7rem;
+  -webkit-line-clamp: 1;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+}
+#floatUserPanel .user_name:hover {
+  text-decoration: none;
+}
+#floatUserPanel .user_description {
+  font-size: 1rem;
+  max-height: 4rem;
+  overflow: hidden;
+  color: #ddd;
+  display: inline-block;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+#floatUserPanel .user_cert {
+  font-size: 1rem;
+  font-weight: 700;
+  height: 1.4rem;
+  line-height: 1.4rem;
+  overflow: hidden;
+  display: inline-block;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  color: #e85a71;
+}
+#floatUserPanel .user_sub {
+  margin-top: 0;
+}
+#floatUserPanel .user_info_count {
+  font-weight: 700;
+  font-size: 1.2rem;
+  height: 2rem;
+  overflow: hidden;
+  line-height: 2rem;
+  text-align: center;
+  color: #444;
+  display: block;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  word-break: break-all;
+  -webkit-line-clamp: 1;
+}
+#floatUserPanel .user_info_title {
+  font-size: 1rem;
+  height: 2rem;
+  overflow: hidden;
+  line-height: 2rem;
+  color: #777;
+  text-align: center;
+}
+#floatUserPanel .user_id {
+  font-size: 1.2rem;
+  padding-top: 0.5rem;
+  text-align: center;
+  font-weight: 700;
+  color: #fff;
+}
+#floatUserPanel .user-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 2rem;
+  cursor: pointer;
+  width: 2rem;
+  text-align: center;
+  line-height: 2rem;
+  z-index: 10030;
+  color: #fff;
+  font-size: 1.4rem;
+}
+#floatUserPanel .user_register {
+  font-size: 1rem;
+  color: #fff;
+  /*font-weight: 700;*/
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL3B1YmxpY01vZHVsZXMvZmxvYXRVc2VyUGFuZWwvZmxvYXRVc2VyUGFuZWwubGVzcyIsIjxpbnB1dCBjc3MgNzY+Il0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsZ0JBQUE7RUFDQSxXQUFBO0VBQ0EsWUFBQTtFQUNBLGNBQUE7RUFDQSxlQUFBO0VBQ0EsYUFBQTtFQUNBLHVCQUFBO0VBQ0Esa0RBQUE7VUFBQSwwQ0FBQTtFQUNBLG1CQUFBO0VBQ0EsdUJBQUE7Q0NDRDtBRENEO0VBQ0UsY0FBQTtFQUNBLG1CQUFBO0NDQ0Q7QURDRDtFQUNFLG1CQUFBO0VBQ0EsT0FBQTtFQUNBLFFBQUE7RUFDQSxZQUFBO0VBQ0EsYUFBQTtFQUNBLHVCQUFBO0VBQ0EsZUFBQTtDQ0NEO0FEQ0Q7RUFDRSxrQkFBQTtFQUNBLGdCQUFBO0VBQ0EsYUFBQTtDQ0NEO0FEQ0Q7RUFDRSxXQUFBO0NDQ0Q7QURDRDtFQUNFLGNBQUE7RUFDQSxhQUFBO0VBQ0EsbUJBQUE7RUFDQSxzQkFBQTtFQUNBLG9CQUFBO0VBQ0EsZUFBQTtDQ0NEO0FEQ0Q7RUFDRSxtQkFBQTtFQUNBLGVBQUE7RUFDQSxPQUFBO0VBQ0EsUUFBQTtFQUNBLGFBQUE7RUFDQSxZQUFBO0VBQ0EscUNBQUE7Q0NDRDtBRENEO0VBQ0UsZUFBQTtFQUNBLDBCQUFBO0VBQ0EsYUFBQTtFQUNBLG1CQUFBO0NDQ0Q7QURDRDtFQUNFLGFBQUE7RUFDQSxtQkFBQTtFQUNBLFlBQUE7RUFDQSxvQkFBQTtDQ0NEO0FEQ0Q7RUFDRSxnQkFBQTtFQUNBLGtCQUFBO0VBQ0EsbUJBQUE7RUFDQSwwQkFBQTtFQUNBLFlBQUE7RUFDQSxpQkFBQTtDQ0NEO0FEQ0Q7RUFDRSwwQkFBQTtDQ0NEO0FEQ0Q7RUFDRSxtQkFBQTtFQUNBLFlBQUE7RUFDQSxrQkFBQTtFQUNBLGtCQUFBO0NDQ0Q7QURFRDtFQUNFLG1CQUFBO0VBQ0Esc0JBQUE7RUFDQSxvQkFBQTtFQUNBLGVBQUE7RUFDQSxjQUFBO0VBQ0EsZUFBQTtFQUVBLGNBQUE7RUFDQSxPQUFBO0NDREQ7QURHRDtFQUNFLGVBQUE7RUFDQSxpQkFBQTtFQUNBLG1CQUFBO0VBQ0Esc0JBQUE7RUFDQSxxQkFBQTtFQUNBLDZCQUFBO0VBQ0Esb0JBQUE7RUFDQSxzQkFBQTtFQUNBLGtCQUFBO0VBQ0EsaUJBQUE7RUFDQSxZQUFBO0NDREQ7QURHRDtFQUNFLHNCQUFBO0NDREQ7QURHRDtFQUNFLGdCQUFBO0VBQ0EsaUJBQUE7RUFDQSxpQkFBQTtFQUNBLFlBQUE7RUFDQSxzQkFBQTtFQUNBLHFCQUFBO0VBQ0EsNkJBQUE7RUFDQSxzQkFBQTtDQ0REO0FER0Q7RUFDRSxnQkFBQTtFQUNBLGlCQUFBO0VBQ0EsZUFBQTtFQUNBLG9CQUFBO0VBQ0EsaUJBQUE7RUFDQSxzQkFBQTtFQUNBLHFCQUFBO0VBQ0EsNkJBQUE7RUFDQSxzQkFBQTtFQUNBLGVBQUE7Q0NERDtBREdEO0VBQ0UsY0FBQTtDQ0REO0FER0Q7RUFDRSxpQkFBQTtFQUNBLGtCQUFBO0VBQ0EsYUFBQTtFQUNBLGlCQUFBO0VBQ0Esa0JBQUE7RUFDQSxtQkFBQTtFQUNBLFlBQUE7RUFDQSxlQUFBO0VBQ0EscUJBQUE7RUFDQSw2QkFBQTtFQUNBLHNCQUFBO0VBQ0Esc0JBQUE7Q0NERDtBREdEO0VBQ0UsZ0JBQUE7RUFDQSxhQUFBO0VBQ0EsaUJBQUE7RUFDQSxrQkFBQTtFQUNBLFlBQUE7RUFDQSxtQkFBQTtDQ0REO0FER0Q7RUFDRSxrQkFBQTtFQUNBLG9CQUFBO0VBQ0EsbUJBQUE7RUFDQSxpQkFBQTtFQUNBLFlBQUE7Q0NERDtBREdEO0VBQ0UsbUJBQUE7RUFDQSxPQUFBO0VBQ0EsU0FBQTtFQUNBLGFBQUE7RUFDQSxnQkFBQTtFQUNBLFlBQUE7RUFDQSxtQkFBQTtFQUNBLGtCQUFBO0VBQ0EsZUFBQTtFQUNBLFlBQUE7RUFDQSxrQkFBQTtDQ0REO0FER0Q7RUFDRSxnQkFBQTtFQUNBLFlBQUE7RUNEQSxxQkFBcUI7Q0FDdEIiLCJmaWxlIjoidG8uY3NzIn0= */

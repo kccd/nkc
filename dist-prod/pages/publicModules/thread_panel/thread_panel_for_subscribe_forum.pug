@@ -1,0 +1,25 @@
+.thread-panel-for-subscribe-forum
+  .thread-panel-body
+    .thread-panel-content
+      //- 文章标题
+      .thread-panel-title
+        a.title-content(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=thread.post.t)= thread.post.t
+
+      //- 作者信息 专业信息 时间
+      .thread-panel-author-info
+        if thread.user.uid
+          .thread-panel-author(data-float-uid=thread.user.uid)
+            a(href=`/u/${thread.user.uid}` target="_blank")= thread.user.username
+        else
+          .thread-panel-author
+            span.anonymous-name= thread.user.username
+
+        .thread-panel-time=fromNow(thread.toc)
+
+        .thread-panel-button
+          if thread.post.voteUp
+            .fa.fa-thumbs-up=` ${thread.post.voteUp || ''}`
+          if thread.hits
+            .fa.fa-eye=` ${thread.hits}`
+          if thread.count
+            .fa.fa-comment=` ${thread.count}`

@@ -1,0 +1,152 @@
+body {
+  background-color: #fff;
+}
+.fund input.form-control,
+.fund .btn,
+.fund textarea.form-control {
+  /*border-radius: 0;*/
+}
+input[type="radio"],
+input[type="checkbox"] {
+  margin: 4px 0 0;
+}
+.fund-navbar ul {
+  padding: 0.5rem;
+  margin: 0;
+}
+.fund-navbar ul li {
+  list-style: none;
+  display: inline-block;
+}
+.fund-navbar ul li a {
+  display: inline-block;
+  height: 3rem;
+  line-height: 3rem;
+  padding: 0 0.7rem;
+  border-radius: 3px;
+  font-weight: 700;
+  color: #9baec8;
+  -webkit-transition: color 200ms;
+  transition: color 200ms;
+}
+.fund-navbar ul li a:hover,
+.fund-navbar ul li a:focus {
+  text-decoration: none;
+  color: #282c37;
+}
+.edit-fund-step {
+  display: inline-block;
+}
+.edit-fund-step .fund-step-line {
+  display: inline-block;
+  height: 1px;
+  background-color: #d9e1e8;
+  margin: 0 0.5rem;
+  width: 30px;
+  vertical-align: middle;
+}
+.edit-fund-step .fund-step-num {
+  display: inline-block;
+  color: #fff;
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 50%;
+  line-height: 1.5rem;
+  text-align: center;
+  background-color: #d9e1e8;
+}
+.edit-fund-step .fund-step-name {
+  display: inline-block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #d9e1e8;
+}
+.edit-fund-step.completed .fund-step-name {
+  color: #2b90d9;
+}
+.edit-fund-step.completed .fund-step-num {
+  background-color: #2b90d9;
+}
+.edit-fund-steps {
+  padding: 2rem 0 2rem 0;
+  border-bottom: 1px solid #eee;
+}
+.edit-fund-body {
+  min-height: 40rem;
+  margin-top: 2rem;
+}
+.fund-user-panel {
+  display: inline-block;
+  background-color: #2b90d9;
+  color: #fff;
+  font-size: 0;
+  height: 2rem;
+  line-height: 2rem;
+  cursor: pointer;
+  border-radius: 1rem;
+  margin: 0 0.5rem 0.5rem 0;
+}
+.fund-user {
+  margin: 1rem 0;
+}
+.fund-user-panel img {
+  height: 2rem;
+  vertical-align: top;
+  width: 2rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+.fund-user-panel a {
+  font-size: 1rem;
+  color: #fff;
+}
+.fund-user-panel a:hover,
+.fund-user-panel a:focus {
+  text-decoration: none;
+  color: #fff;
+}
+.fund-user-panel .fa {
+  padding: 0 1rem;
+  font-size: 1rem;
+}
+.fund-user-panel .fa:hover {
+  color: #f6f6f6;
+}
+.edit-fund-buttons {
+  text-align: center;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+.fund-reminder-user-info {
+  font-size: 1rem;
+  color: red;
+  margin-top: 0.8rem;
+}
+.fund-uploaded-photo > div {
+  position: relative;
+  display: inline-block;
+}
+.fund-uploaded-photo img {
+  display: inline-block;
+  height: 8rem;
+  margin: 0 0.8rem 0.8rem 0;
+}
+.fund-uploaded-photo {
+  display: inline-block;
+}
+.fund-uploaded-photo .fa {
+  height: 2rem;
+  width: 2rem;
+  background-color: #e85a71;
+  color: #fff;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  line-height: 2rem;
+  text-align: center;
+  right: 0.8rem;
+}
+.fund-uploaded-photo .fa.add {
+  background-color: #2b90d9;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL2Z1bmQvZnVuZC5sZXNzIiwiPGlucHV0IGNzcyAzNz4iXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRSx1QkFBQTtDQ0NEO0FEQ0Q7OztFQ0dFLHFCQUFxQjtDQUN0QjtBREREOztFQUNFLGdCQUFBO0NDSUQ7QURGRDtFQUNFLGdCQUFBO0VBQ0EsVUFBQTtDQ0lEO0FERkQ7RUFDRSxpQkFBQTtFQUNBLHNCQUFBO0NDSUQ7QURGRDtFQUNFLHNCQUFBO0VBQ0EsYUFBQTtFQUNBLGtCQUFBO0VBQ0Esa0JBQUE7RUFDQSxtQkFBQTtFQUNBLGlCQUFBO0VBQ0EsZUFBQTtFQUNBLGdDQUFBO0VBQUEsd0JBQUE7Q0NJRDtBREZEOztFQUNFLHNCQUFBO0VBQ0EsZUFBQTtDQ0tEO0FESEQ7RUFDRSxzQkFBQTtDQ0tEO0FESEQ7RUFDRSxzQkFBQTtFQUNBLFlBQUE7RUFDQSwwQkFBQTtFQUNBLGlCQUFBO0VBQ0EsWUFBQTtFQUNBLHVCQUFBO0NDS0Q7QURIRDtFQUNFLHNCQUFBO0VBQ0EsWUFBQTtFQUNBLGVBQUE7RUFDQSxjQUFBO0VBQ0EsbUJBQUE7RUFDQSxvQkFBQTtFQUNBLG1CQUFBO0VBQ0EsMEJBQUE7Q0NLRDtBREhEO0VBQ0Usc0JBQUE7RUFDQSxrQkFBQTtFQUNBLGlCQUFBO0VBQ0EsZUFBQTtDQ0tEO0FESEQ7RUFDRSxlQUFBO0NDS0Q7QURIRDtFQUNFLDBCQUFBO0NDS0Q7QURIRDtFQUNFLHVCQUFBO0VBQ0EsOEJBQUE7Q0NLRDtBREhEO0VBQ0Usa0JBQUE7RUFDQSxpQkFBQTtDQ0tEO0FESEQ7RUFDRSxzQkFBQTtFQUNBLDBCQUFBO0VBQ0EsWUFBQTtFQUNBLGFBQUE7RUFDQSxhQUFBO0VBQ0Esa0JBQUE7RUFDQSxnQkFBQTtFQUNBLG9CQUFBO0VBQ0EsMEJBQUE7Q0NLRDtBREhEO0VBQ0UsZUFBQTtDQ0tEO0FESEQ7RUFDRSxhQUFBO0VBQ0Esb0JBQUE7RUFDQSxZQUFBO0VBQ0EsbUJBQUE7RUFDQSxxQkFBQTtDQ0tEO0FESEQ7RUFDRSxnQkFBQTtFQUNBLFlBQUE7Q0NLRDtBREhEOztFQUNFLHNCQUFBO0VBQ0EsWUFBQTtDQ01EO0FESkQ7RUFDRSxnQkFBQTtFQUNBLGdCQUFBO0NDTUQ7QURKRDtFQUNFLGVBQUE7Q0NNRDtBREpEO0VBQ0UsbUJBQUE7RUFDQSwyQkFBQTtFQUNBLGtCQUFBO0NDTUQ7QURKRDtFQUNFLGdCQUFBO0VBQ0EsV0FBQTtFQUNBLG1CQUFBO0NDTUQ7QURKRDtFQUNFLG1CQUFBO0VBQ0Esc0JBQUE7Q0NNRDtBREpEO0VBQ0Usc0JBQUE7RUFDQSxhQUFBO0VBQ0EsMEJBQUE7Q0NNRDtBREpEO0VBQ0Usc0JBQUE7Q0NNRDtBREpEO0VBQ0UsYUFBQTtFQUNBLFlBQUE7RUFDQSwwQkFBQTtFQUNBLFlBQUE7RUFDQSxnQkFBQTtFQUNBLG1CQUFBO0VBQ0EsT0FBQTtFQUNBLGtCQUFBO0VBQ0EsbUJBQUE7RUFDQSxjQUFBO0NDTUQ7QURKRDtFQUNFLDBCQUFBO0NDTUQiLCJmaWxlIjoidG8uY3NzIn0= */

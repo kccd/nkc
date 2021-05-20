@@ -1,0 +1,62 @@
+#vue_forums_Nav(v-cloak)
+  .hidden(ref="vue_forums_nav_data")=objToStr({forums: data.forums, subForums: data.subForums})
+  div(v-if="subForums && subForums.length > 0")
+    .forums-nav-header
+      +listHeader('我关注的')
+    .home-topic-item-div
+      a(
+        v-for="f in subForums"
+        :href="'/f/' + f.fid"
+        :style="'background-color: '+f.color+';'"
+        :title="f.description"
+      ).topic-item
+        img(
+          v-if="f.logo"
+          :src="getUrl('forumLogo', f.logo)"
+        )
+        span {{f.displayName}}
+  .forums-nav-header
+    +listHeader('话题')
+  div(v-for="forum in forums" v-if='forum.forumType === "topic"' :title="forum.description")
+    .home-topic-list-li
+      a(:href="'/f/' + forum.fid")
+        img(:src="getUrl('forumLogo', forum.logo)"
+          v-if="forum.logo"
+        )
+        img(v-else :style="'background-color:' + forum.color + ';'")
+        span {{forum.displayName}}
+    .home-topic-item-div(v-if="forum.childrenForums && forum.childrenForums.length")
+      a(
+        v-for="f in forum.childrenForums"
+        :href="'/f/' + f.fid"
+        :style="'background-color: '+f.color+';'"
+        :title="f.description"
+      ).topic-item
+        img(
+          v-if="f.logo"
+          :src="getUrl('forumLogo', f.logo)"
+        )
+        span {{f.displayName}}
+  .forums-nav-header
+    +listHeader('学科')
+  div(v-for="forum in forums" v-if='forum.forumType === "discipline"' :title="forum.description")
+    .home-topic-list-li
+      a(:href="'/f/' + forum.fid")
+        img(:src="getUrl('forumLogo', forum.logo)"
+          v-if="forum.logo"
+        )
+        img(v-else :style="'background-color:' + forum.color + ';'")
+        span {{forum.displayName}}
+    .home-topic-item-div(v-if="forum.childrenForums && forum.childrenForums.length")
+      a(
+        v-for="f in forum.childrenForums"
+        :href="'/f/' + f.fid"
+        :style="'background-color: '+f.color+';'"
+        :title="f.description"
+      ).topic-item
+        img(
+          v-if="f.logo"
+          :src="getUrl('forumLogo', f.logo)"
+        )
+        span {{f.displayName}}
++includeJS("/publicModules/vue_forums_nav/vue_forums_nav.js")

@@ -1,0 +1,19 @@
+if !state.isApp
+  -shareDescription = (shareDescription || "").replace(/\n/ig, " ");
+  +includeCSS("/publicModules/share/share.css")
+  .share
+    .share-icon(onclick=`shareToOther("${shareType}", "qq", "${shareTitle}", "${shareId}", "${shareDescription}", "${shareAvatar}")` title="分享给QQ好友")
+      img(src='/default/QQ.png')
+    .share-icon(onclick=`shareToOther("${shareType}", "qzone", "${shareTitle}", "${shareId}", "${shareDescription}", "${shareAvatar}")` title="分享到QQ空间")
+      img(src='/default/qzone.png')
+    .share-icon(onclick=`shareToOther("${shareType}", "weibo", "${shareTitle}", "${shareId}", "${shareDescription}", "${shareAvatar}")` title="分享到微博")
+      img(src='/default/weibo.png')
+    .share-icon(onclick="shareShowWeChat()" title="分享到微信")
+      img(src='/default/weChat.png')
+    .share-icon(title="点击复制分享链接")
+      #shareLinkButton
+        .fa.fa-link
+    .weChat-image
+      canvas.qrcode-canvas
+  +includeJS("/clipboard/clipboard.min.js")
+  +includeJS("/publicModules/share/share.js")

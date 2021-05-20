@@ -1,0 +1,198 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+.forums-header {
+  margin-bottom: 0.5rem;
+  background-color: #f6f6f6;
+  height: 3rem;
+  line-height: 3.2rem;
+  padding: 0 1rem;
+  color: #555;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+.app-forums-inline {
+  padding: 0 1rem;
+}
+.app-forums-inline .app-forum-inline {
+  display: inline-block;
+  color: #333;
+  font-weight: 700;
+  margin: 0 0.5rem 0.5rem 0;
+  font-size: 1.2rem;
+  padding: 0.3rem;
+  background-color: #fff;
+  border-radius: 3px;
+}
+.app-forums-inline .app-forum-inline:hover,
+.app-forums-inline .app-forum-inline:active,
+.app-forums-inline .app-forum-inline:visited {
+  text-decoration: none;
+  color: #555;
+}
+.container-fluid .app-forum {
+  -webkit-transition: background-color 500ms;
+  transition: background-color 500ms;
+}
+.container-fluid .app-forum:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+.container-fluid .app-forum .app-forum-avatar div,
+.container-fluid .app-forum .app-forum-avatar img {
+  margin-left: 0!important;
+}
+.bgColor {
+  background-color: #fff;
+}
+.app-forums .app-forum {
+  margin: 0.5rem 0;
+  padding: 0.2rem 0;
+  position: relative;
+}
+.app-forums .app-forum.border {
+  border-bottom: 1px solid #f6f6f6;
+}
+.app-forums .app-forum .app-forum-avatar {
+  display: table-cell;
+  vertical-align: top;
+  padding-top: 0.1rem;
+}
+.app-forums .app-forum .app-forum-avatar div,
+.app-forums .app-forum .app-forum-avatar img {
+  height: 3rem;
+  width: 3rem;
+  border-radius: 4px;
+}
+.app-forums .app-forum .app-forum-avatar:active {
+  background-color: #f6f6f6;
+}
+.app-forums .app-forum .app-forum-body {
+  color: #555;
+  padding-right: 0.5rem;
+  display: table-cell;
+  vertical-align: top;
+  padding-left: 1rem;
+  width: 100%;
+}
+.app-forums .app-forum .app-forum-body:active {
+  background-color: #f6f6f6;
+}
+.app-forums .app-forum .app-forum-body:hover,
+.app-forums .app-forum .app-forum-body:active,
+.app-forums .app-forum .app-forum-body:visited,
+.app-forums .app-forum .app-forum-body:link {
+  text-decoration: none;
+}
+.app-forums .app-forum .app-forum-body .app-forum-name {
+  font-size: 1.4rem;
+  height: 2rem;
+  color: #555;
+  font-weight: 700;
+  padding-right: 6rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.app-forums .app-forum .app-forum-body .app-forum-description {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  font-size: 1rem;
+  color: #666;
+  max-height: 3.5rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-style: oblique;
+}
+.app-forums .app-forum .app-forum-body .app-forum-info .name {
+  font-size: 1rem;
+  margin-right: 0.4rem;
+  font-style: oblique;
+}
+.app-forums .app-forum .app-forum-body .app-forum-info .value {
+  font-style: oblique;
+  margin-right: 0.1rem;
+  font-size: 1.2rem;
+  color: #e87a8c;
+  font-weight: 700;
+}
+.app-forums .app-forum .app-forum-number {
+  display: inline-block;
+  font-size: 1rem;
+}
+.app-forums .app-forum .app-forum-number .number {
+  color: #e85a71;
+}
+.app-forums .app-forum .app-forum-subscribe {
+  height: 6rem;
+  position: absolute;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  top: -0.1rem;
+  right: 0;
+  margin: auto;
+  width: 6rem;
+  /*div:last-child{
+        margin-top: 0.3rem;
+        font-style: oblique;
+        color: #777;
+        font-size: 1.1rem;
+        font-weight: 700;
+        position: relative;
+        &:after{
+          content: "+1";
+          position: absolute;
+          right: 0;
+          font-size: 1rem;
+          bottom: 0.1rem;
+          color: rgba(232, 122, 140, 0);
+          font-style: oblique;
+        }
+        &.show:after{
+          color: rgba(232, 122, 140, 1);
+          bottom: 0.1rem;
+          transition: color 1000ms, bottom 1000ms;
+        }
+        &.move:after{
+          bottom: 1.7rem;
+          color: rgba(232, 122, 140, 0);
+        }
+      }*/
+}
+.app-forums .app-forum .app-forum-subscribe div {
+  margin: auto;
+  text-align: center;
+}
+.app-forums .app-forum .app-forum-subscribe div:first-child {
+  margin-top: 0;
+  cursor: pointer;
+  border-radius: 1rem;
+  border: 1px solid #2b90d9;
+  color: #2b90d9;
+  width: 4rem;
+  font-size: 1rem;
+  height: 2rem;
+  line-height: 2rem;
+  text-align: center;
+}
+.app-forums .app-forum .app-forum-subscribe div:first-child.cancel {
+  color: #9baec8;
+  border: 1px solid #9baec8;
+}
+.app-forums .app-forum .app-forum-subscribe div:first-child:active {
+  background-color: #2b90d9;
+  color: #fff;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIjxpbnB1dCBjc3MgMzU+IiwicGFnZXMvcHVibGljTW9kdWxlcy9iYXNlLmxlc3MiLCJwYWdlcy9mb3J1bXMvZm9ydW1zLmxlc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsVUFBVTtBQUNWLFVBQVU7QUNPVjtFQUNFLG1CQUFBO0VBQ0EsT0FBQTtFQUNBLFFBQUE7RUFDQSxTQUFBO0VBQ0EsVUFBQTtFQUNBLGFBQUE7Q0RMRDtBQUNELGtCQUFrQjtBRVRsQjtFQUNFLHNCQUFBO0VBQ0EsMEJBQUE7RUFDQSxhQUFBO0VBQ0Esb0JBQUE7RUFDQSxnQkFBQTtFQUNBLFlBQUE7RUFDQSxpQkFBQTtFQUNBLGtCQUFBO0NGV0Q7QUVURDtFQUNFLGdCQUFBO0NGV0Q7QUVaRDtFQUdJLHNCQUFBO0VBQ0EsWUFBQTtFQUNBLGlCQUFBO0VBQ0EsMEJBQUE7RUFDQSxrQkFBQTtFQUNBLGdCQUFBO0VBQ0EsdUJBQUE7RUFDQSxtQkFBQTtDRllIO0FFWEc7OztFQUNFLHNCQUFBO0VBQ0EsWUFBQTtDRmVMO0FFWEQ7RUFFSSwyQ0FBQTtFQUFBLG1DQUFBO0NGWUg7QUVYRztFQUNFLHNDQUFBO0NGYUw7QUVqQkQ7O0VBUVEseUJBQUE7Q0ZhUDtBRVJEO0VBQ0UsdUJBQUE7Q0ZVRDtBRVJEO0VBSUksaUJBQUE7RUFDQSxrQkFBQTtFQUNBLG1CQUFBO0NGT0g7QUVORztFQUNFLGlDQUFBO0NGUUw7QUVoQkQ7RUFXTSxvQkFBQTtFQUNBLG9CQUFBO0VBQ0Esb0JBQUE7Q0ZRTDtBRXJCRDs7RUFlUSxhQUFBO0VBQ0EsWUFBQTtFQUNBLG1CQUFBO0NGVVA7QUVSSztFQUNFLDBCQUFBO0NGVVA7QUU5QkQ7RUEyQk0sWUFBQTtFQUlBLHNCQUFBO0VBQ0Esb0JBQUE7RUFDQSxvQkFBQTtFQUNBLG1CQUFBO0VBQ0EsWUFBQTtDRkdMO0FFZEs7RUFDRSwwQkFBQTtDRmdCUDtBRWJLOzs7O0VBQ0Usc0JBQUE7Q0ZrQlA7QUUvQ0Q7RUFxQ1Esa0JBQUE7RUFDQSxhQUFBO0VBQ0EsWUFBQTtFQUNBLGlCQUFBO0VBQ0Esb0JBQUE7RURsRU4sdUJBQUE7RUFDQSxxQkFBQTtFQUNBLGlCQUFBO0VBQ0EsNkJBQUE7RUFDQSxzQkFBQTtDRGdGRDtBRTNERDtFQThDUSwrQkFBQTtVQUFBLHVCQUFBO0VBR0EsZ0JBQUE7RUFDQSxZQUFBO0VBQ0EsbUJBQUE7RUQ1RU4sdUJBQUE7RUFDQSxxQkFBQTtFQUNBLGlCQUFBO0VBQ0EsNkJBQUE7RUFDQSxzQkFBQTtFQzBFTSxvQkFBQTtDRmtCUDtBRXZFRDtFQTBEVSxnQkFBQTtFQUNBLHFCQUFBO0VBQ0Esb0JBQUE7Q0ZnQlQ7QUU1RUQ7RUErRFUsb0JBQUE7RUFDQSxxQkFBQTtFQUNBLGtCQUFBO0VBQ0EsZUFBQTtFQUNBLGlCQUFBO0NGZ0JUO0FFbkZEO0VBd0VNLHNCQUFBO0VBQ0EsZ0JBQUE7Q0ZjTDtBRXZGRDtFQTJFUSxlQUFBO0NGZVA7QUUxRkQ7RUErRU0sYUFBQTtFQUNBLG1CQUFBO0VBQ0EsK0JBQUE7VUFBQSx1QkFBQTtFQUNBLGFBQUE7RUFDQSxTQUFBO0VBQ0EsYUFBQTtFQUNBLFlBQUE7RUZjSjs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztTQXlCTztDQUNSO0FFN0hEO0VBdUZRLGFBQUE7RUFDQSxtQkFBQTtDRnlDUDtBRWpJRDtFQTJGUSxjQUFBO0VBQ0EsZ0JBQUE7RUFFQSxvQkFBQTtFQUNBLDBCQUFBO0VBQ0EsZUFBQTtFQUNBLFlBQUE7RUFDQSxnQkFBQTtFQUNBLGFBQUE7RUFDQSxrQkFBQTtFQUNBLG1CQUFBO0NGd0NQO0FFdENPO0VBQ0UsZUFBQTtFQUNBLDBCQUFBO0NGd0NUO0FFdENPO0VBQ0UsMEJBQUE7RUFDQSxZQUFBO0NGd0NUIiwiZmlsZSI6InRvLmNzcyJ9 */

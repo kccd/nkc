@@ -1,0 +1,437 @@
+extends bootstrap_base
+block title
+
+  -const fund = data.fund.toObject();
+  -const {applicationForm, s} = data;
+  -const mainContainer1400 = true
+  -const {authLevel} = fund.applicant;
+  -const {status, members, project, budgetMoney, projectCycle, threads, fixedMoney} = applicationForm;
+  -const {submitted} = status;
+  -let disabledSubmit = false;
+  -let aggregate = 0;
+  title= `${fund.name} - 科创基金`
+  link(rel='stylesheet' href='/fund.css')
+  style.
+
+
+block content
+  -const obj = {id: applicationForm._id, s: s, detailedProject: fund.detailedProject};
+  #applicationFormId(style='display: none')= JSON.stringify(obj)
+  .container-fluid.max-width
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-12
+        .panel.panel-default
+          .panel-body
+            .nav-link.center-block
+              ul
+                -const arr = [{en: 'chooseType', ch: '第1步、选择申请方式'},{en: 'inputApplicantMessages', ch: '第2步、填写身份信息'},{en: 'inputProjectMessages', ch: '第3步、填写项目内容'},{en: 'inputOtherMessages', ch: '第4步、填写其他信息'},{en: 'submit', ch: '第5步、提交申请'}];
+                -for (let i = 0; i < arr.length; i++)
+                  li
+                    a(href=`###` class='active')= arr[i].ch
+            hr
+
+            .fund-apply-head= arr[s-1].ch
+            if s === 1
+              .row(style='padding: 3rem 0;')
+                .col-xs-12.col-md-4.col-md-offset-4
+                  if fund.applicationMethod.personal
+                    if fund.applicationMethod.team
+                      h5 注意：申请方式选择后一旦提交将无法修改。
+                    else
+                      h5.redFontColor 注意：该基金只限个人申请。
+                  else
+                    if fund.applicationMethod.team
+                      h5.redFontColor 注意：该基金只限团队申请。
+                .col-xs-6.col-md-2.col-md-offset-4
+                  if fund.applicationMethod.personal
+                    .choose-content-div#personal(class=applicationForm.from === 'personal'? 'active': '') 个人申请
+                  else
+                    .choose-content-div.disabled(class=applicationForm.from === 'personal'? 'active': '') 个人申请
+                .col-xs-6.col-md-2
+                  if fund.applicationMethod.team
+                    .choose-content-div#team(class=applicationForm.from !== 'personal'? 'active': '') 团队申请
+                  else
+                    .choose-content-div.disabled(class=applicationForm.from !== 'personal'? 'active': '') 团队申请
+              .row#teamDiv
+                .col-xs-12.col-md-4.col-md-offset-4
+                  .row
+                    .col-xs-12.col-md-12
+                      #selectedUsersDiv
+                        if applicationForm.members.length === 0
+                          h4 暂未添加组员
+                        else
+                          h4 已选择组员：
+                          -for(let user of applicationForm.members)
+                            span.fund-span.selectedUser.selected(uid=user.uid onclick=`deleteUser(${user.uid})`)= user.user.username
+                              span.fund-span.delete.glyphicon.glyphicon-minus
+                      hr
+                      h4(style='margin-bottom: 0.5rem;') 添加组员:
+                      .form
+                        input.fund-input#username(style='width: 78%;' type='text' placeholder='输入用户名或uid')
+                        input.fund-submit(onclick='getUser()' type='submit' value='搜索')
+                      span.fund-span.transparent(onclick=`getSubscribeUsers('${user.uid}')`) 我的关注
+                      span.fund-span.transparent(onclick=`getSubscribers('${user.uid}')`) 我的粉丝
+                  .row
+                    .col-xs-12.col-md-12
+                      #usersList
+                        .blank 暂无数据
+            else if s === 2 && chooseType !== null
+              -const applicant = applicationForm.applicant || {};
+              -const options = {name: applicant.name, idCardNumber: applicant.idCardNumber, description: applicant.description, mobile: applicant.mobile, members: false, account: applicationForm.account};
+              //include interface_fund_userMessagesForm
+              .row(style='padding: 0.5rem 0;')
+                .col-xs-12.col-md-4.col-md-offset-4
+                  .row(style='padding: 3rem 0;')
+                    .col-xs-12.col-md-12
+                      span 真实姓名（将公开展示）：
+                      input.fund-input#name(placeholder='请输入您的真实姓名' autofocus='true' value=options.name || '')
+                    .col-xs-12.col-md-12
+                      span 身份证号（仅自己和审查员可见）：
+                      input.fund-input#idCardNumber(placeholder='请输入您的身份证号码' value=options.idCardNumber || '')
+                    .col-xs-12.col-md-12
+                      span 联系电话（仅自己和审查员可见）：
+                      input.fund-input#mobile(placeholder='请输入您的电话号码' value=options.mobile || '')
+                    if !options.members
+                      .col-xs-12.col-md-12
+                        span 收款方式（仅自己和审查员可见）：
+                        p(style='color:#aaa;') 推荐使用支付宝，到账更快
+                        .paymenMethods
+                          div &nbsp;
+                          //div 微信
+                          //  .pay.wechat(class=options.account.paymentType === 'wechat'? 'active': '')
+                          div 支付宝
+                            .pay.alipay(class=options.account.paymentType === 'alipay' ? 'active' : '')
+                          if fund.auditType !== 'system'
+                            div 银行卡
+                              .pay.bankCard(class=options.account.paymentType === 'bankCard' ? 'active' : '')
+                      .col-xs-12.col-md-12#bankName(style=`display: ${options.account.paymentType === 'bankCard' ? 'block' : 'none'}`)
+                        span 银行全称（仅自己和审查员可见）：
+                        input.fund-input(placeholder='请输入银行全称' value=options.account.bankName || '')
+                      .col-xs-12.col-md-12#bankCardName
+                        span 户名（必须与收款账号对应，仅自己和审查员可见）：
+                        input.fund-input(placeholder='请输入户名' value=options.account.name || '')
+                      .col-xs-12.col-md-12
+                        span 收款账号（仅自己和审查员可见）：
+                        input.fund-input#account(placeholder='请输入收款账号' value=options.account.number || '')
+                    .col-xs-12.col-md-12
+                      span 自我介绍（将公开展示）：
+                      p.fund-description 1、简要的介绍自己，重点是科技爱好活动的经历。如果您是学生，建议说明您的年级、专业。
+                      p.fund-description 2、用自己的话简单介绍您的项目所属的科技领域，便于网友了解项目的背景知识。
+                      textarea.fund-textarea#description(placeholder='介绍一下自己')!= options.description || ''
+                    .col-xs-12.col-md-12
+                      h4 添加生活照（将公开展示）
+                      a.btn.btn-default(onclick='displayPopupPanel()') 选择生活照
+                      //if data.lifePhotos.length === 0 && applicant.lifePhotos.length === 0
+                      //  a.btn.btn-default(href="/set/album" target="_blank") 未上传生活照，去上传
+                      //else
+                      //  a.btn.btn-default(onclick='displayPopupPanel()') 选择生活照
+                    .col-xs-12.col-md-12
+                      span#selectLifePhotoInfo
+                      .photo-selected
+                        .row
+                          -for(let i = 0; i < applicant.lifePhotos.length; i++)
+                            -const photo = applicant.lifePhotos[i];
+                            .col-xs-12.col-md-4.photo-content
+                              .glyphicon.glyphicon-minus.delete-photo(onclick=`removePhoto(${photo._id})`)
+                              img(src= `/photo_small/${photo._id}` photoId=photo._id )
+                    .popupPanel.disabled
+                      .popupPanel-body
+                        .popupPanel-close.glyphicon.glyphicon-remove(onclick='disappearPopupPanel()')
+                        .popupPanel-title 选择生活照
+                        span 至少选择一张，如需显示新上传的图片，请点击
+                        button.btn.btn-default.btn-sm(onclick='getLifePhotos()') 刷新
+                        .popupPanel-content
+                          .fund-photo-list
+                            if data.lifePhotos.length === 0
+                              br
+                              h4.text-center 未上传任何照片
+                                a(href=`/u/${data.user.uid}/settings/resume` target="_blank") 去上传
+                            //else
+                            //  -for (let i = 0; i < data.lifePhotos.length; i++)
+                            //    -let photo = data.lifePhotos[i];
+                            //    .col-xs-12.col-md-4
+                            //      img(photoId=photo._id src=`/photo_small/${photo._id}` onclick=`selectLifePhoto(${photo._id})`)
+            else if s === 3 && inputApplicantMessages !== null
+              .row
+                .col-xs-12.col-md-6.col-md-offset-3
+                  br
+                  -let projectTitle, abstract, projectContent
+                  if project
+                    -projectTitle = project.t;
+                    -abstract = project.abstract;
+                    -projectContent = project.c;
+                  h4 项目名称：
+                    input.fund-input#title(value=projectTitle?projectTitle: '')
+                  if !fund.detailedProject
+                    h4 项目内容：
+                    textarea.form-control#content(rows=6 placeholder='请简要介绍项目内容')= projectContent?projectContent: ''
+                  else
+                    h4 摘要：
+                    textarea.form-control#abstract(rows=6 placeholder='200字以内')= abstract?abstract: ''
+                    h4 项目内容（请在编辑器详细填写）：
+                    //#projectContent.div-textarea(style='min-height: 30rem;' contenteditable=true)= content
+                    if(project && project.c)
+                      -project.c = hideContentByUser(project.c, data.user, 'thread');
+                      div#projectContent!= experimental_render(project)
+                    else
+                      div#projectContent!= ''
+                    //span.fund-span.transparent(onclick=`saveProject(${applicationForm._id})` style='margin-left: 0;') 保存
+                    if project && project.c
+                      button.btn.btn-default(onclick=`toEditor()` ) 去编辑器修改
+                    else
+                      button.btn.btn-default(onclick=`toEditor()` ) 去编辑器填写
+                    //span &nbsp;&nbsp;
+                    //span.autoSaveTime#saveTime 0秒
+                    //span.autoSaveTime 后自动保存
+            else if s === 4 && inputProject!== null
+              .row
+                .col-xs-12.col-md-6.col-md-offset-3
+                  br
+                  h4 研究周期
+                    small （天）
+                  input.fund-input#projectCycle(value=projectCycle !== null? projectCycle: '' )
+                  if fixedMoney
+                    h4 资金用途
+                    //span 常用：
+                    //span.fund-span.addPurpose 购买电子元器件
+                    //span.fund-span.addPurpose 印电路板
+                    textarea.fund-textarea#purpose(style='height: 20rem;margin-bottom: 0;' placeholder="详细说说资金用来做什么")= typeof(budgetMoney) === 'string'? budgetMoney: ''
+                    //span.fund-span.transparent(onclick=`savePurpose(${applicationForm._id})` style='margin-left: 0;') 保存
+                  else
+                    h4 资金预算
+                    #budgetMoney
+                      .fund-money-list.head
+                        .purpose 用途
+                        .count 数量
+                        .money 单价(元)
+                        .total 合计(元)
+                      .list
+                        if budgetMoney === null || budgetMoney === [] || typeof budgetMoney === 'string'
+                          .blank(style="color: #ccc;line-height: 4rem;") 暂无数据
+                        else
+                          -for (let i = 0; i < budgetMoney.length; i++)
+                            -let total = (budgetMoney[i].count*budgetMoney[i].money);
+                            -aggregate += total;
+                            .fund-money-list(num= i)
+                              .purpose(contenteditable=true num= i)= budgetMoney[i].purpose
+                              .count(contenteditable=true num= i)= budgetMoney[i].count
+                              .money(contenteditable=true num= i)= budgetMoney[i].money
+                              .total= total
+                              .delete.glyphicon.glyphicon-minus(onclick=`deleteList(${i})`)
+                      #aggregate(style='margin-left: 0.5rem;')=(budgetMoney !== null && budgetMoney.length !== 0 && typeof(budgetMoney) !== 'string')? `总计：${aggregate}元`: ''
+                    .button
+                      span.fund-span.transparent(style='margin-left: 0;' onclick='addList()') 添加
+                      //span.fund-span.transparent(onclick='editor()') 编辑
+                      span.fund-span.transparent(onclick='compute()') 计算
+                      //span.fund-span.transparent(onclick=`saveBudgetMoney(${applicationForm._id})`) 保存
+                  if fund.thread.count > 0
+                    br
+                    -const threadCount = fund.thread.count;
+                    h4=`申请人曾经发表的相关文章（从论坛发文中选择${threadCount > 0?`，至少${threadCount}篇`:''}）`
+                    .popupPanel.disabled
+                      .popupPanel-body
+                        .popupPanel-close.glyphicon.glyphicon-remove(onclick='disappearPopupPanel()')
+                        .popupPanel-title 添加文章
+                        .popupPanel-content
+                          .col-xs-12.col-md-12
+                            .form
+                              input.fund-input#searchThread(style='width: 78%;' type='text' placeholder='组员用户名，文号' autofocus=true)
+                              input.fund-submit(onclick=`getThreads()` type='submit' value='搜索')
+                            span.fund-span.transparent(style='margin-left: 0' onclick=`getThreads(0, true)`) 我的文章
+                            nav(aria-label='navigation')
+                              ul.pagination.pagination-sm.pageList
+                            .unselectedThreads
+                              .blank.blank-selectedThread 暂无数据
+                            nav(aria-label='navigation')
+                              ul.pagination.pagination-sm.pageList
+
+                    h5 已选择的文章
+                    .selectedThreads
+                      if threads.applying.length === 0
+                        .blank.blank-selectedThread 暂无数据
+                      else
+                        -for(let i = 0; i < threads.applying.length; i++)
+                          -const thread = threads.applying[i];
+                          -const firstPost = thread.firstPost;
+                          -let postString = {tid: firstPost.tid, uid: firstPost.uid, username: firstPost.user.username, t: firstPost.t, toc: firstPost.toc.toLocaleString(), pid: firstPost.pid};
+                          -postString = JSON.stringify(postString);
+                          .threadList
+                            .col-xs-10.col-md-10
+                              .displayNone.postString= postString
+                              span 文号：
+                              span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
+                              a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
+                              span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
+                              br
+                              a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
+                            .col-xs-2.col-md-2.delete.glyphicon.glyphicon-minus(onclick=`deleteThread("${thread.tid}")`)
+                    //.span.fund-span.transparent(onclick='displayDeleteThreadBtn()' style="margin-left: 0;") 编辑
+                    .span.fund-span.transparent(onclick="displayPopupPanel()") 去添加
+                    //.span.fund-span.transparent(onclick=`saveThreadsList(${applicationForm._id})`) 保存
+                  br
+                  br
+                  h4 学科分类（请在下方列表中点击）
+                  br
+                  h4 已选择：
+                    if applicationForm.forum
+                      strong#category(style='color: #ff8707;' fid=applicationForm.forum.fid)= applicationForm.forum.displayName
+                    else
+                      strong(style='color: #ff8707;')#category= '暂未选择'
+                  br
+                  for parentForum in data.forumList
+                    if parentForum
+                      span(onclick=`chooseCategory('${parentForum.fid}', '${parentForum.displayName}')` style='cursor: pointer')= parentForum.displayName
+                      if parentForum.childrenForums && parentForum.childrenForums.length
+                        span ：
+                        for childrenForum in parentForum.childrenForums
+                          span(onclick=`chooseCategory('${childrenForum.fid}', '${childrenForum.displayName}')` style='cursor: pointer')= childrenForum.displayName
+                          span &nbsp;&nbsp;&nbsp;
+                      br
+
+            else if s === 5 && inputApplicantMessages !== null
+              -const agreeIsFalse = [], agreeIsTrue = [], agreeIsNull = [];
+              -for(let u of members)
+                if u.agree === null
+                  -agreeIsNull.push(u);
+                else if u.agree === true
+                  -agreeIsTrue.push(u);
+                else
+                  -agreeIsFalse.push(u);
+              -const nullLength = agreeIsNull.length, trueLength = agreeIsTrue.length, falseLength = agreeIsFalse.length;
+
+              .row
+                .col-xs-12.col-md-12
+                  br
+                  br
+                .col-xs-12.col-md-8.col.col-md-offset-1
+                  include interface_fund_apply_messages
+                .col-xs-12.col-md-3
+                  if applicationForm.from === 'team'
+                    h3 注意事项
+                    br
+                    p 1、如果没有好友同意你的邀请你将无法提交申请表，您可以邀请其他好友或更改申请方式为个人申请。
+                    p 2、提交申请表默认会移除拒绝和未处理的好友，并且会从附带的文章中移除这些好友的文章。
+                    br
+                    br
+                  -let n = 0;
+
+                  mixin ds(text)
+                    -n++;
+                    -disabledSubmit = true;
+                    if n === 1
+                      br
+                      h4 存在下列问题，请补充完善。
+                    h5.redFontColor= `${n}、${text}`
+                  -const difference = fund.modifyCount - applicationForm.modifyCount;
+                  h3= `当前剩余修改次数: ${difference}`
+                  if difference <= 0
+                    +ds('申请表修改次数超出限制')
+                  if applicationForm.from === 'team'
+                    if nullLength !== 0
+                      h3 未处理的团队成员：
+                      -for(let u of agreeIsNull)
+                        h4
+                          a(href=`/m/${u.uid}`)= u.user.username
+                          span &nbsp;&nbsp;&nbsp;
+                    if falseLength !== 0
+                      h3 拒绝的团队成员：
+                      -for(let u of agreeIsFalse)
+                        h4
+                          a(href=`/m/${u.uid}`)= u.user.username
+                          span &nbsp;&nbsp;&nbsp;
+                    if agreeIsTrue.length === 0
+                      +ds('暂未有团队成员接受邀请或所有成员都拒绝参加（可返回第一步修改团队成员）')
+                  if applicationForm.from === 'personal'
+                    if !fund.applicationMethod.personal
+                      +ds('该基金不允许个人申请')
+                  else
+                    if !fund.applicationMethod.team
+                      +ds('该基金不允许团队申请')
+                  if !applicationForm.applicant.lifePhotosId || applicationForm.applicant.lifePhotosId.length === 0
+                    +ds('请至少添加一张生活照')
+                  if !applicationForm.applicant.name
+                    +ds('请填写您的真实姓名')
+                  if !applicationForm.applicant.idCardNumber
+                    +ds('请填写您的身份证号码')
+                  if !applicationForm.applicant.mobile
+                    +ds('请填写您的联系电话')
+                  if !applicationForm.account.paymentType
+                    +ds('请选择收款方式')
+                  if !applicationForm.account.number
+                    +ds('请填写您的收款账号')
+                  if !applicationForm.applicant.description
+                    +ds('请填写您的自我介绍')
+                  if !project
+                    +ds('请填写项目信息')
+                  else
+                    if !project.t
+                      +ds('请填写项目名称')
+                    if !project.c
+                      +ds('请输入项目内容')
+                    if !project.abstract && applicationForm.fund.detailedProject
+                      +ds('请输入项目摘要')
+                  if applicationForm.projectCycle === null
+                    +ds('请填写研究周期')
+                  if fund.money.max === null
+                    if !applicationForm.budgetMoney
+                      +ds('请输入资金用途')
+                  else
+                    if !applicationForm.budgetMoney || applicationForm.budgetMoney.length === 0
+                      +ds('请输入资金用途')
+                    else
+                      if !applicationForm.budgetMoney || typeof applicationForm.budgetMoney === 'string'
+                        +ds('请输入资金用途')
+                      else
+                        -let aggregate = 0;
+                        -for(let b of applicationForm.budgetMoney)
+                          -aggregate += b.count*b.money
+                        if aggregate === 0
+                          +ds('资金预算不能为0')
+                        if aggregate > fund.money.max
+                          +ds(`资金预算金额已超过该基金项目单笔申请的最大金额（${fund.money.max}元）`)
+                  if fund.thread.count > applicationForm.threadsId.applying.length
+                    +ds(`申请人曾经发表的相关文章数未达到最低要求(至少选择${fund.thread.count}篇)`)
+                  if !applicationForm.category
+                    +ds('未选择学科分类。')
+                  if !disabledSubmit
+                    h3.greenFontColor 信息录入完整，可提交申请！
+
+            -let funSave, funNext;
+            if s === 1
+              -funSave = `saveApplicationMethod()`;
+              -funNext = `submitApplicationMethod`;
+            if s === 2
+              -funSave = `saveApplicantMessages()`;
+              -funNext = `submitApplicantMessages`;
+            if s === 3
+              -funSave = `saveProject()`;
+              -funNext = `submitProject`;
+            if s === 4
+              -funSave = `saveOtherMessages()`;
+              -funNext = `submitOtherMessages`;
+            if s === 5
+              -funNext = `back`;
+            hr
+            //.col-xs-12.col-md-2.col-md-offset-5
+            //  button.btn.btn-info.btn-block(style='width: 100%;' onclick=funSave) 暂存
+            //  br
+            //.col-xs-12.col-md-2.col-md-offset-5
+            //  button.btn.btn-info.btn-block(style='width: 100%;' onclick=funNext) 下一步
+            .col-xs-12.col-md-4.col-md-offset-4.text-center
+              if s > 1
+                button.btn.btn-info(onclick=`${funNext}("last")`) &nbsp;&nbsp;上一步&nbsp;&nbsp;
+              if s < 5
+                button.btn.btn-info(onclick=`${funNext}()`) &nbsp;&nbsp;下一步&nbsp;&nbsp;
+              if s !== 5
+                button.btn.btn-info(onclick=funSave) &nbsp;&nbsp;暂存&nbsp;&nbsp;
+              else
+                if disabledSubmit
+                  button.btn.btn-info(onclick='screenTopWarning("条件不满足，无法提交")' disabled="disabled") 提交申请
+                else
+                  button.btn.btn-info(onclick='submitApplicationForm()') 提交申请
+              if !applicationForm.status.submitted
+                button.btn.btn-danger(onclick=`deleteApplicationForm(${applicationForm._id})`) &nbsp;&nbsp;删除&nbsp;&nbsp;
+block scripts
+  script(src='/interface_common.js' type='application/javascript')
+  script(src='/interface_fund_apply.js' type='application/javascript')

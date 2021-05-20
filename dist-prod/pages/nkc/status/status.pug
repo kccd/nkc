@@ -1,0 +1,67 @@
+extends ../nkc
+block nkcTitle
+  title 网站总览 - 前台管理
+  +includeCSS("/bootstrap/css/bootstrap-datetimepicker.min.css")
+block nkcContent
+  #data.hidden=objToStr({operations: data.statisticsOperation})
+  .col-xs-12.col-md-12.m-b-1
+    .e-panel
+      button.btn.btn-default(onclick="getResults({type: 'today'})") 今日
+      button.btn.btn-default(onclick="getResults({type: 'month'})") 本月
+      button.btn.btn-default(onclick="getResults({type: 'year'})") 今年
+      button.btn.btn-default(onclick="getResults({type: 'all'})") 全部
+      button.btn.btn-default(onclick="getResults({type: 'custom'})") 自定义
+      .form-inline(style='margin: 1rem 0rem;display:none;')#custom
+        .form-group
+          label 开始时间
+          input.form-control.time(readonly type='text' name='time1')
+        .form-group
+          label 结束时间
+          input.form-control.time(readonly type='text' name='time2')
+        .form-group
+          button.btn.btn-primary(onclick='getData("custom")') 提交
+          button.btn.btn-danger(onclick='reset()') 重置
+      div(style='margin-top: 2rem;')
+        div#main(style="width: 100%;height: 45rem;")
+  if data.onlineUsers && data.onlineUsersCount > 0
+    .col-xs-12.col-md-12.m-b-1
+      .e-panel
+        h5=`当前在线总人数：${data.onlineUsersCount}`
+        if data.onlineUsersCount > 5000
+          h5 最近活动的5000名在线用户
+        for targetUser in data.onlineUsers
+          a.m-r-05.m-b-05.display-i-b(href=`/u/${targetUser.uid}` data-float-uid=targetUser.uid)=targetUser.username
+  .col-xs-12.col-md-12.m-b-1#app(v-cloak)
+    h5 操作统计
+    .m-b-1
+      span 排序：
+      button.btn.btn-default(:class='{"btn-primary": sortType === "count"}' @click='changeSortType("count")') 访问次数
+      button.btn.btn-default(:class='{"btn-primary": sortType === "averageTime"}' @click='changeSortType("averageTime")') 平均耗时
+      button.btn.btn-default(:class='{"btn-primary": sortType === "maxTime"}' @click='changeSortType("maxTime")') 最大耗时
+      button.m-r-1.btn.btn-default(:class='{"btn-primary": sortType === "minTime"}' @click='changeSortType("minTime")') 最小耗时
+      button.btn.btn-danger(@click="clearData") 清空记录
+    .m-b-1
+      table.table.nkc-table
+        thead
+          tr
+            th 操作名
+            th 总次数
+            th 平均耗时（ms）
+            th 最大耗时（ms）
+            th 最小耗时（ms）
+        tbody
+          tr(v-for='o in operations')
+            th {{o.operationName}}({{o.operationId}})
+            th {{o.count}}
+            th {{o.averageTime}}
+            th {{o.maxTime}}
+            th {{o.minTime}}
+
+
+block nkcScripts
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  +includeJS("/echarts/dist/echarts.min.js")
+  +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
+  +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
+  +includeJS("/nkc/status/status.js")

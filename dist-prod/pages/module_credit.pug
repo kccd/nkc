@@ -1,0 +1,26 @@
+if data.user && data.xsfSettings && data.creditScore
+  .credit-panel.bootstrap-modal
+    div(class="modal fade" id="creditModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-credit-score-name=data.creditScore.name).bootstrap-modal
+      div(class="modal-dialog modal-sm" role="document")
+        .modal-content
+          .modal-header
+            button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+              span(aria-hidden="true") &times;
+            h4.modal-title
+          .modal-body
+            .form
+              .form-group
+                span.kcb-info= `向作者转账${data.creditScore.name}以资鼓励`
+              .form-group
+                label 分值
+                span.kcb-info(style='display:inline-block;')=`（${data.creditSettings.min/100} - ${data.creditSettings.max/100}）`
+                span.xsf-info(style='display:inline-block;')=`（-${data.xsfSettings.reduceLimit} 到 ${data.xsfSettings.addLimit}）`
+                input.form-control.num(value='1' type='number')
+              .form-group
+                label 原因
+                span.kcb-info(style='display:inline-block;') （不超过60个字）
+                span.xsf-info(style='display:inline-block;') （不超过500个字）
+                textarea.form-control.description(rows=3)
+          .modal-footer
+            button(type="button" class="btn btn-default" data-dismiss="modal") 关闭
+            button(type="button" class="btn btn-primary") 确认

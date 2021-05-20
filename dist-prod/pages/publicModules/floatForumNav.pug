@@ -1,0 +1,82 @@
+//-
+  @param {[Object]}
+    @param {String} fid 专业ID
+    @param {String} name 专业名称
+
+if !isIncluded('floatForumNav')
+  style.
+    .float-forum-nav{
+      width: 7rem;
+      position: fixed;
+      top: 51px;
+      padding: 0 0 0.5rem 0!important;
+      margin-left: -7.5rem;
+      transition: top 200ms;
+      overflow: hidden;
+    }
+    .float-forum-nav .float-forum-item{
+      display: block;
+      height: 2rem;
+      line-height: 2rem;
+      padding: 0 0.5rem;
+      text-decoration: none;
+      color: #333;
+      word-break: break-word;
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+    }
+    .float-forum-nav .float-forum-header{
+      color: #fff;
+      padding-left: 0.5rem;
+      background-color: #9baec8;
+      height: 2rem;
+      line-height: 2rem;
+      font-size: 1rem;
+    }
+    .float-forum-nav .float-forum-item:hover{
+      background-color: #f4f4f4;
+    }
+    .float-forum-nav.disabled{
+      top: -100%;
+    }
+
+  mixin floatForumNav(props)
+    -var {forums, categories, parentForums, sameLevelForums} = props
+    mixin renderNav(title, arr)
+      if arr && arr.length
+        .float-forum-header=title
+        .float-forum-container
+          for f , index in arr
+            -var {fid, displayName, cid} = f;
+            a.float-forum-item(href=tools.getUrl('forumHome', fid) + (cid?`?cat=${cid}`:'') data-float-fid=fid)= displayName
+
+    .float-forum-nav.disabled#floatForumNav
+      +renderNav('所属专业', forums)
+      +renderNav('所属分类', categories)
+      +renderNav('上级专业', parentForums)
+      +renderNav('同级专业', sameLevelForums)
+
+    script.
+      (function() {
+        var onChange = function() {
+          var scrollHeight = document.documentElement.scrollTop || document.body.scrollTop;
+          var floatForumNav = document.getElementById('floatForumNav');
+          var offsetLeft = floatForumNav.offsetLeft;
+          var classString = floatForumNav.getAttribute('class');
+          if(scrollHeight > 240 && offsetLeft >= 0) {
+            if(classString.indexOf('disabled') === -1) return;
+            classString = classString.replace('disabled', '');
+          } else {
+            if(classString.indexOf('disabled') !== -1) return;
+            classString = classString + ' disabled'
+          }
+          floatForumNav.setAttribute('class', classString);
+        };
+        window.addEventListener('scroll', onChange);
+        window.addEventListener('resize', onChange);
+        onChange();
+      })();
+
+

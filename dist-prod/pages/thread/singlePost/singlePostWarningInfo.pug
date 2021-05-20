@@ -1,0 +1,26 @@
+if !isIncluded('singlePostWarningInfo')
+  mixin singlePostWarningInfo(props)
+    -var {draft, disabled, pid, reviewed, reviewReason} = props;
+    if draft
+      .single-post-header
+        .reture 当前内容已被退回修改，请作者点击编辑按钮修改
+        span=`原因：${draft.reason}`
+    else if disabled
+      .single-post-header
+        .disabled
+          span.m-r-05 内容已被屏蔽
+          if permission('unblockPosts')
+            a(onclick=`enablePost('${pid}')`) 点击解封
+    else if !reviewed
+      .single-post-header
+        .review 内容待审核
+        if permission('review')
+          if reviewReason
+            span= "送审原因：" + reviewReason
+          div
+            | 通过请点击
+            button.btn.btn-xs.btn-default(onclick=`reviewPost('${pid}')`) 通过
+            | &nbsp;  按钮，不通过请点击
+            button.btn.btn-xs.btn-default(onclick=`NKC.methods.disabledPosts('${pid}')`) 退修或删除
+            | 按钮。
+            a(href=`/review` target="_blank") 待审核列表

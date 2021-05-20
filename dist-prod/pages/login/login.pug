@@ -1,0 +1,36 @@
+extends ../bootstrap_base
+block title
+  title 账号登陆
+  style.
+    body{
+      background-color: #ffffff;
+    }
+block content
+block scripts
+  script.
+    $(function() {
+      Login.open('login');
+    });
+
+  if state.isApp && state.platform === 'reactNative'
+    style.
+      #moduleLogin{
+        height: 100%!important;
+        width: 100%!important;
+      }
+      #moduleLogin>div{
+        margin: 0;
+        transition: none;
+      }
+      #moduleLogin>div>div{
+        border: none;
+        border-radius: 0;
+      }
+      #moduleLogin>div, #moduleLogin>div>div{
+        width: 100%!important;
+        height: 100%!important;
+      }
+      .modal-backdrop.in{
+        opacity: 0;
+      }
+

@@ -1,0 +1,53 @@
+extends ./columnBase
+block columnTitle
+  if data.page.t
+    title=`${data.page.t} - ${data.column.name}`
+  else
+    title=`${data.column.name}`
+  style.
+    body {
+      padding-top: 0;
+      background-color: #f6f6f6;
+    }
+  style=`body{background-color: ${data.column.color};}`
+
+block content
+  include ./modules/columnHeader
+  include ./modules/contribute
+  +mixinColumnHeader({
+    user: data.user,
+    column: data.column,
+    subColumnsId: state.subColumnsId,
+    navCategories: data.navCategories,
+    categories: data.categories,
+    hideBanner: false
+  })
+  .container-fluid.max-width
+    .column
+      .row
+        .col-xs-12.col-md-8.box-shadow-panel.m-t-1.p-r-0
+          div
+            if data.page.t
+              .column-page-title=data.page.t
+            .column-page-content!=data.page.c
+            if data.user && data.user.uid === data.column.uid
+              .m-t-1.text-right
+                if data.page.hidden
+                  span.m-t-2.text-danger 已关闭，仅自己可见。
+                  button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, false)`) 开启
+                else
+                  button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, true)`) 关闭
+                a.m-l-05.btn.btn-xs.btn-default(href=`/m/${data.column._id}/settings/page?t=edit&id=${data.page._id}`) 编辑
+        .col-xs-12.col-md-4.box-shadow-panel.m-t-1
+          include ./modules/management
+          include ./modules/info
+block scripts
+  include ../publicModules/nkcSource
+  include ../publicModules/commonModal/commonModal
+  include ../publicModules/selectColor
+  include ../publicModules/subscribeTypes/subscribeTypes
+
+  +includeJS("/columns/settings/page.js")
+  +includeJS("/columns/column.js")
+  +includeJS("/columns/management.js")
+  +mixinColumnNavLinkScript()

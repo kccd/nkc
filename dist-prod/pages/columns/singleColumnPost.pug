@@ -1,0 +1,48 @@
+-var {column, from, type, post, thread, mainCategories, columnId, toc} = columnPost
+-var {firstPost} = thread;
+.column-posts-post
+  .column-post-body(class=thread.firstPost.cover?"cover":"")
+    if thread.firstPost.cover
+      .column-post-cover
+        div(style=`background-image:url(${tools.getUrl("postCover", thread.firstPost.cover)})`)
+    .column-post-abstract
+      if type === "post"
+        .column-post-content.post
+          if !post.anonymous
+            a.column-thread-author(href=`/u/${post.uid}` target="_blank" data-float-uid=post.uid)
+              span=post.user.username
+          else
+            span.anonymous-name=anonymousInfo.username
+          | ：
+          span=post.c
+      .column-post-title
+        a(href=post.url target='_blank')=firstPost.t
+        //a(href=tools.getUrl('columnPost', data.column._id, post.pid))=firstPost.t
+      if type === "thread"
+        .column-post-content= post.c
+      .column-post-info
+        if !data.column || data.column.uid !== post.uid
+          if !thread.firstPost.anonymous
+            a(href=`/u/${thread.firstPost.uid}` target="_blank" data-float-uid=thread.firstPost.uid).column-post-author
+              img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm'))
+              span=thread.firstPost.user.username
+          else
+            span.column-post-author
+              img(src=anonymousInfo.avatar)
+              span.anonymous-name=anonymousInfo.username
+        .column-post-time
+          span.m-r-05
+            //-=fromNow(toc)
+            +fromNow(toc)
+          if data.column && from === "contribute"
+            span 来自投稿
+        .column-post-forums
+          if data.column
+            -var category = "";
+            for c in mainCategories
+              if !category || category.level > c.level
+                -category = c;
+            if category
+              a.column-post-forum(href=`/m/${columnId}?c=${category._id}`)= category.name
+          else
+            a.column-post-forum(href=`/m/${columnId}`)= column.name

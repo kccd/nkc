@@ -1,0 +1,8 @@
+-let klass = 'img-warning glyphicon-remove';
+if success
+  -klass = 'img-alert glyphicon-ok'
+
+.col-xs-12.col-md-4.col-md-offset-4
+  .glyphicon.text-center.center-block(class=klass)
+  h2.text-center(style='font-size:3rem;color: #555555;')=` ${prompt}`
+  hr

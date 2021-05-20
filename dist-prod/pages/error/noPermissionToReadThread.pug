@@ -1,0 +1,16 @@
+extends ./errorBase
+block errorContent
+  .error-icon=`${data.status} Forbidden`
+  .error-list.b-s-10
+    .error-header 抱歉！该文章仅限下列专业用户阅读：
+    ul
+      li
+        .num 1
+        | 通过至少一个专业的B卷考试，且符合有关要求（包括但不限于精选文章数、账号等级、学术分）。
+
+    .error-code
+      span message：
+      code= data.error
+    .error-info 如果尚未通过B卷考试，请
+      a(href=`/exam`) 参加考试
+      |。

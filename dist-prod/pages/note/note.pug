@@ -1,0 +1,40 @@
+extends ../bootstrap_base
+block title
+  title 笔记
+  +includeCSS("/note/note.css")
+block content
+  #note(v-cloak)
+    .origin-content {{note.content}}
+    .notes
+      .note(v-for="n in note.notes")
+        .note-user
+          a.note-user-avatar(@click="visitUrl('/u/' + n.user.uid, true)")
+            img(:src="getUrl('userAvatar', n.user.avatar)")
+          a(@click="visitUrl('/u/' + n.user.uid, true)").note-user-username {{n.user.username}}
+          .note-time {{fromNow(n.toc)}} {{n.disabled?"已屏蔽":""}} {{n.deleted?"已删除":""}}
+          .note-options(v-if=`n.user.uid === uid || ${permission('managementNote')}`)
+            .note-options-icon.fa.fa-ellipsis-v(@click="openOptions(n)")
+            ul(v-if="n.options")
+              li(@click="modifyNoteContent(n)") 编辑
+              li(@click="deleteNoteContent(n, 'delete')" v-if="n.user.uid === uid") 删除
+              li(@click="deleteNoteContent(n, 'disable')" v-if=`${permission('managementNote')}`) {{n.disabled?"解除屏蔽":"屏蔽"}}
+        .note-content-body
+          .note-content(v-if="!n.edit" v-html="n.html || '笔记内容已丢失'")
+          .note-content(v-else)
+            textarea.form-control.note-note-textarea(:ref="n._id" placeholder="编辑笔记（公开、200字限制）" v-model="n.content" @input="resetTextarea(n)" @keyup.ctrl.enter="saveNote(n)" @focus="resetTextarea(n)")
+            .m-t-05
+              button.btn.btn-sm.btn-primary(@click="saveNote(n)" :disabled="n.content === n._content") 保存
+              button.btn.btn-sm.btn-default(@click="modifyNoteContent(n)") 取消
+      .m-t-05.form
+        textarea.form-control(ref="newNote" v-model="content" placeholder="添加笔记（公开、500字限制）" @keyup.ctrl.enter="saveNewNote"
+          @input="resetTextarea(null)"
+          @focus="resetTextarea(null)"
+        )
+        .m-t-05.m-b-1
+          button.btn-block.btn.btn-primary(:disabled="!content" v-if="submitting") 保存中...
+          button.btn-block.btn.btn-primary(:disabled="!content" @click="saveNewNote" v-else) 保存
+
+  .hidden#data=objToStr({note: data.note})
+block scripts
+  include ../publicModules/moment
+  +includeJS("/note/note.js")

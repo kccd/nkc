@@ -1,0 +1,163 @@
+extends ../../experimental
+
+block eTitle
+  title 聊天设置
+block eContent
+  .container-fluid.max-width
+    .hidden#data=objToStr({messageSettings: data.messageSettings, messageTypes: data.messageTypes, roles: data.roles, grades: data.grades, messageTypesLanguage: data.messageTypesLanguage})
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12.m-b-1
+        ul.nav.nav-tabs
+          li.pointer(@click="type = 'limit'" :class="{'active': type === 'limit'}")
+            a 发表限制
+          li.pointer(@click="type = 'template'" :class="{'active': type === 'template'}")
+            a 模板设置
+
+      .col-xs-12.col-md-8.col-md-offset-2(v-if="type === 'template'")
+        .row
+          .col-xs-12.col-md-12(v-if="selectedMessageType")
+            h4 参数说明：
+             h5 插入链接：[url=链接(链接名)]，例如[url=threadURL(threadTitle)]
+             h5 插入文本：[text=文本内容]，例如[text=reason]
+            .form
+              .form-group
+                label 类型名
+                input.form-control(v-model="selectedMessageType.name")
+              .form-group
+                label 简介
+                textarea.form-control(v-model="selectedMessageType.description")
+
+            div(v-for="template in selectedMessageType.templates").m-t-2
+              h4
+                b {{lang(template.type)}}
+              h5 可用参数：
+                span.m-r-1(v-for="parameter in template.parameters") {{parameter}}({{lang(parameter)}})
+              textarea.form-control(rows=4 v-model="template.content")
+
+            .m-t-1
+              h5.text-danger(v-if="error") {{error}}
+              h5.text-success(v-if="info") {{info}}
+              button.btn.btn-block.btn-primary(@click="save(selectedMessageType)") 保存
+
+      .col-xs-12.col-md-8.col-md-offset-2(v-else-if="type === 'limit'")
+        .row
+          .col-xs-12.col-md-12(v-if="messageSettings")
+            h4 防骚扰提示&nbsp;
+              small 不限制发送短消息
+            h5
+              b 受限发送方：
+              span(v-for="grade in grades")
+                input(type="checkbox" :value="grade._id" v-model="messageSettings.gradeLimit")
+                span {{grade.displayName}}&nbsp;&nbsp;&nbsp;
+            h5
+              b 保护接收方：
+              span(v-for="grade in grades")
+                input(type="checkbox" :value="grade._id" v-model="messageSettings.gradeProtect")
+                span {{grade.displayName}}&nbsp;&nbsp;&nbsp;
+            h5
+              b 受限时提示(80个汉字以内)
+
+            textarea.form-control(rows=4 v-model="messageSettings.systemLimitInfo")
+
+            h4.m-t-3 防骚扰-系统限制&nbsp;
+              small 未满足以下条件的用户无法发送短消息
+            .form
+              .form-group
+                label 通过审核且未被屏蔽的文章数量
+                input.form-control(type="text" v-model.number="messageSettings.mandatoryLimit.threadCount")
+              .form-group
+                label 通过审核且未被屏蔽的回复数量
+                input.form-control(type="text" v-model.number="messageSettings.mandatoryLimit.postCount")
+              .form-group
+                label 管理员证书
+                  span.text-danger &nbsp;受限后可向拥有管理员证书的用户发送短消息
+                .checkbox
+                  label.m-r-1(v-for="r in roles")
+                    input(type="checkbox" :value="r._id" v-model="messageSettings.adminRolesId")
+                    span {{r.displayName}}
+              .form-group
+                label 黑名单
+                  span.text-danger &nbsp;已勾选等级的接收方不会受到保护
+                .checkbox
+                  label.m-r-1(v-for="g in grades")
+                    input(type="checkbox" :value="g._id" v-model="messageSettings.mandatoryLimitGradeProtect")
+                    span {{g.displayName}}
+
+            h5
+              b 受限时提示(80个汉字以内)
+            textarea.form-control(rows=4 v-model="messageSettings.mandatoryLimitInfo")
+
+            h4.m-t-3 防骚扰-用户自定义限制&nbsp;
+              small 限制发送短消息
+            h5
+              b 受限时提示(80个汉字以内)
+            textarea.form-control(rows=4 v-model="messageSettings.customizeLimitInfo")
+          .col-xs-12.col-md-12.m-t-3
+            h4 短消息数量设置
+            .row
+              .col-xs-12.col-md-12
+                h4 证书
+                table.table.table-striped
+                  thead
+                    tr
+                      th 序号
+                      th 证书名
+                      th 聊天人数/天
+                      th 信息数/天
+                  tbody
+                    tr(v-for="role, index in roles")
+                      th {{index+1}}
+                      th {{role.displayName}}
+                      th
+                        input(style="max-width: 6rem;" type="number" v-model="role.messagePersonCountLimit")
+                      th
+                        input(style="max-width: 6rem;" type="number" v-model="role.messageCountLimit")
+              .col-xs-12.col-md-12
+                h4 等级
+                table.table.table-striped
+                  thead
+                    tr
+                      th 等级
+                      th 等级名
+                      th 聊天人数/每天
+                      th 信息数/每天
+                  tbody
+                    tr(v-for="grade, index in grades")
+                      th {{index}}
+                      th {{grade.displayName}}
+                      th
+                        input(style="max-width: 6rem;" type="number" v-model="grade.messagePersonCountLimit")
+                      th
+                        input(style="max-width: 6rem;" type="number" v-model="grade.messageCountLimit")
+
+          .col-xs-12.col-md-12(v-if='messageSettings').m-t-3
+            .form.form-horizontal
+              .form-group.m-b-2
+                h4 文件大小限制
+                .col-sm-12
+                  table.table.table-bordered.m-b-05
+                    thead
+                      tr
+                        th 格式
+                        th 尺寸（KB）
+                        th 其他
+                    tbody
+                      tr(v-for='s, index in messageSettings.sizeLimit.others')
+                        th
+                          input.form-control(type='text' v-model.trim='s.ext')
+                        th
+                          input.form-control(type='text' v-model.number='s.size')
+                        th
+                          button.btn.btn-xs.btn-default(@click="removeFromArr(messageSettings.sizeLimit.others, index)") 删除
+                      tr
+                        th
+                          input.form-control(type='text' value='其他' disabled)
+                        th
+                          input.form-control(type='text' v-model.number='messageSettings.sizeLimit.default')
+                        th
+                  button.btn.btn-default.btn-sm(@click="addSizeLimit") 添加
+          .col-xs-12.col-md-12
+            button.btn.btn-primary.btn-block(@click='submit') 保存
+block scripts
+  +includeJS("/interface_common.js")
+  +includeJS("/experimental/settings/message/message.js")

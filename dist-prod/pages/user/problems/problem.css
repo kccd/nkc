@@ -1,0 +1,10 @@
+.mdui-container-fluid {
+  padding: 0;
+}
+body {
+  background-color: #f6f6f6;
+}
+.mdui-btn.active {
+  background-color: #ccc;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL3VzZXIvcHJvYmxlbXMvcHJvYmxlbS5sZXNzIiwiPGlucHV0IGNzcyAxMzI+Il0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsV0FBQTtDQ0NEO0FEQ0Q7RUFDRSwwQkFBQTtDQ0NEO0FEQ0Q7RUFDRSx1QkFBQTtDQ0NEIiwiZmlsZSI6InRvLmNzcyJ9 */

@@ -1,0 +1,260 @@
++includeCSS("/publicModules/survey/form.css")
+#moduleSurveyEdit(v-cloak v-if="!disabled")
+  //.survey-edit-header {{formName}}
+  .survey-edit-body(v-if="survey && roles.length")
+    .form.form-horizontal
+      .form-group(v-if="!survey._id")
+        label.col-sm-2.control-label 类别
+        .col-sm-10
+          .survey-type(@click="selectType('vote')")
+            .fa.fa-check-circle(v-if="survey.type === 'vote'")
+            .fa.fa-circle-o(v-else)
+            span 投票
+          .survey-type(@click="selectType('score')")
+            .fa.fa-check-circle(v-if="survey.type === 'score'")
+            .fa.fa-circle-o(v-else)
+            span 评分
+          .survey-type(@click="selectType('survey')")
+            .fa.fa-check-circle(v-if="survey.type === 'survey'")
+            .fa.fa-circle-o(v-else)
+            span 问卷调查
+      .form-group(v-if="survey.type !== 'vote'")
+        label.col-sm-2.control-label 调查说明
+        .col-sm-9
+          textarea.form-control(v-model="survey.description" rows=4 placeholder="请输入调查说明")
+      .form-group
+        label.col-sm-2.control-label 问题
+        .col-sm-9
+          .survey-options.m-b-05
+            .survey-option(v-for="o, index in survey.options" v-if="survey.type !== 'vote' || index === 0")
+              .option-index 问题{{index+1}}
+                .pull-right
+                  span(v-if="survey.type !== 'vote'")
+                    .fa.fa-chevron-circle-up(title="上移" @click="moveOption('up', o)")
+                    .fa.fa-chevron-circle-down(title="下移" @click="moveOption('down', o)")
+                  .fa.fa-trash(title="移除" @click="removeOption(index)")
+              textarea.form-control(v-model="o.content" placeholder="请输入问题内容")
+              .row.option-links.m-t-05(v-if="o.links_ && o.links_.length")
+                .option-link.m-b-05(v-for="link, index in o.links_")
+                  .col-xs-12.col-md-8
+                    input.form-control(type="text" v-model="link.link" placeholder="内容链接" @change="checkHttp(link)")
+                  .col-xs-12.col-md-4
+                    button.btn.btn-default(@click="removeLink(o, index)") 删除
+              .option-resources
+                .option-resource(v-for="r, index in o.resourcesId")
+                  img(:src="'/rt/' + r" @click="visitUrl('/r/' + r)")
+                  //.option-resource-img(:style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
+                  .fa.fa-remove(@click="removeResourceId(o, index)")
+              .survey-option-buttons.m-t-05.m-b-05
+                button.btn.btn-default.btn-xs(@click="addLink(o)") 添加链接
+                button.btn.btn-default.btn-xs(@click="addResource(o)") 添加图片
+              .option-answers(v-if="o.answers && o.answers.length")
+                .survey-answer(v-for="a, index in o.answers")
+                  .m-b-05.option-index 选项{{index+1}}
+                    .pull-right
+                      .fa.fa-files-o(title="复制并添加选项" @click="copy(o.answers, a)")
+                      .fa.fa-chevron-circle-up(title="上移" @click="moveOption('up', o, a)")
+                      .fa.fa-chevron-circle-down(title="下移" @click="moveOption('down', o, a)")
+                      .fa.fa-trash(title="移除" @click="removeAnswer(o, index)")
+
+                  textarea.form-control.m-b-05(placeholder="请输入选项内容" v-model="a.content")
+                  .row.option-links.m-t-05(v-if="a.links_ && a.links_.length")
+                    .option-link.m-b-05(v-for="link, index in a.links_")
+                      .col-xs-12.col-md-8
+                        input.form-control(type="text" v-model="link.link" placeholder="选项链接" @change="checkHttp(link)")
+                      .col-xs-12.col-md-4
+                        button.btn.btn-default(@click="removeLink(a, index)") 删除
+                  .option-resources
+                    .option-resource(v-for="r, index in a.resourcesId")
+                      img(:src="'/rt/' + r" @click="visitUrl('/r/' + r)")
+                      //.option-resource-img(:style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
+                      .fa.fa-remove(@click="removeResourceId(a, index)")
+                  button.btn.btn-default.btn-xs(@click="addLink(a)") 添加链接
+                  button.btn.btn-default.btn-xs(@click="addResource(a)") 添加图片
+                  .survey-scores(v-if="survey.type === 'score'").form-inline
+                    h5
+                      b 打分范围（有效范围-150到150，精确到0.01）：
+                      | 最小
+                      input(type="text" v-model.number="a.minScore" @change="toInt")
+                      | &nbsp;最大
+                      input(type="text" v-model.number="a.maxScore" @change="toInt")
+              .survey-option-buttons.m-t-05
+                button.btn.btn-default.btn-xs(@click="addAnswer(o)") 添加选项
+              h5(v-if="survey.type !== 'score'") 可选选项数量限制：
+                | 最小
+                select(v-model="o.minVoteCount")
+                  option(v-for="i in getVoteCount(o)" :value="i") {{i}}
+                | &nbsp;最大
+                select(v-model="o.maxVoteCount")
+                  option(v-for="i in getVoteCount(o)" :value="i") {{i}}
+          button.btn.btn-default.btn-sm(@click="addOption" v-if="survey.type !== 'vote'")
+            .fa.fa-plus.add-option-button &nbsp;添加问题
+          button.btn.btn-default.btn-sm(@click="copy(survey.options)" v-if="survey.type !== 'vote' && survey.options.length")
+            .fa.fa-files-o &nbsp;复制问题
+      .form-group
+        label.col-sm-2.control-label 结果展示
+        .col-sm-9
+          .radio
+            label.m-r-1
+              input(type="radio" v-model="survey.showResult" value="all")
+              | 所有人可见
+            label.m-r-1
+              input(type="radio" v-model="survey.showResult" value="posted")
+              | 参与者可见
+            label.m-r-1
+              input(type="radio" v-model="survey.showResult" value="self")
+              | 仅自己可见
+          div(v-if="survey.showResult !== 'self'")
+            hr.m-t-05.m-b-05
+            .checkbox
+              label
+                input(type="checkbox" v-model="survey.showResultAfterTheEnd" :value="true")
+                span 结束后展示结果
+      .form-group
+        label.col-sm-2.control-label 显示参与人
+        .col-sm-9
+          .radio
+            label.m-r-1
+              input(type="radio" v-model="survey.showVoter" value="always")
+              | 始终
+            label.m-r-1
+              input(type="radio" v-model="survey.showVoter" value="after")
+              | 结束后
+            label.m-r-1
+              input(type="radio" v-model="survey.showVoter" value="never")
+              | 不显示
+      .form-group
+        label.col-sm-2.control-label 奖励
+        .col-sm-9
+          .radio
+            label.m-r-1
+              input(type="radio" v-model="survey.reward.status" :value="false")
+              span 关闭
+            label
+              input(type="radio" v-model="survey.reward.status" :value="true")
+              span 开启
+          .survey-scores(v-if="survey.reward.status")
+            h5.text-info 你当前拥有{{targetUserSurveyRewardScore/100}}{{surveyRewardScore.unit}}{{surveyRewardScore.name}}。
+            h5.text-info(v-if="rewardKcbTotal") 每次提交奖励 {{survey.reward.onceKcb}} {{surveyRewardScore.unit}}{{surveyRewardScore.name}}，总共奖励 {{survey.reward.rewardCount}} 次，共计 {{rewardKcbTotal}} {{surveyRewardScore.unit}}{{surveyRewardScore.name}}。
+            h5.text-danger(v-if="rewardWarning") {{rewardWarning}}
+            h5 单次奖励
+              input(type="text" v-model.number="survey.reward.onceKcb" @change="toInt")
+              | &nbsp;{{surveyRewardScore.unit}}{{surveyRewardScore.name}}（精确到0.01），
+              | 总奖励次数
+              input(type="text" v-model.number="survey.reward.rewardCount" @change="toInt")
+      .form-group
+        label.col-sm-2.control-label 权限
+        .col-sm-9.m-t-05.survey-scores
+          .form.col-sm-12
+            .form-group
+              label 允许游客参与：
+              .radio-inline.m-r-05.p-t-0
+                label
+                  input(type="radio" v-model="survey.permission.visitor" :value="false")
+                  | 否
+              .radio-inline.p-t-0
+                label
+                  input(type="radio" v-model="survey.permission.visitor" :value="true")
+                  | 是
+          div(v-if="!survey.permission.visitor")
+            .form.col-sm-12
+              .form-group
+                label 注册天数：
+                input(type="text" v-model.number="survey.permission.registerTime" @change="toInt")
+            .form.col-sm-12
+              .form-group
+                label 精选文章数：
+                input(type="text" v-model.number="survey.permission.digestThreadCount" @change="toInt")
+            .form.col-sm-12
+              .form-group
+                label 文章总数：
+                input(type="text" v-model.number="survey.permission.threadCount" @change="toInt")
+            .form.col-sm-12
+              .form-group
+                label 回复总数：
+                input(type="text" v-model.number="survey.permission.postCount" @change="toInt")
+            .form.col-sm-12
+              .form-group
+                label 点赞数：
+                input(type="text" v-model.number="survey.permission.voteUpCount" @change="toInt")
+            .form.col-sm-12
+              .form-group
+                label 用户等级：
+                .checkbox
+                  label.m-r-1(v-for="g in grades")
+                    input(type="checkbox" v-model="survey.permission.gradesId" :value="g._id")
+                    span {{g.displayName}}
+            if permission("showSurveyCertLimit")
+              .form.col-sm-12
+                .form-group
+                  label 用户证书
+                  .checkbox
+                    label.m-r-1(v-for="r in roles")
+                      input(type="checkbox" v-model="survey.permission.certsId" :value="r._id")
+                      span {{r.displayName}}
+            h5.text-danger 用户必须同时满足以上条件才能参与。
+            .form.col-sm-12
+              .form-group
+                label 指定用户：
+                .selected-users(v-if="selectedUsers.length")
+                  .selected-user(v-for="u in selectedUsers")
+                    .selected-user-avatar
+                      img(:src="getUrl('userAvatar', u.avatar, 'sm')")
+                    .selected-user-name {{u.username}}
+                      .fa.fa-remove(@click="removeUser(index)")
+
+                button.btn.btn-xs.btn-default(@click="selectUser") 选择用户
+                h5.text-danger 指定的用户无需满足以上条件即可参与。
+      .form-group
+        label.col-sm-2.control-label 时间
+        .col-sm-9.m-t-05
+          .col-sm-12.form
+            .form-group
+              label 开始：
+              select(v-model="timeStart.year")
+                //option(value=(new Date()).getFullYear())=(new Date()).getFullYear()
+                -for(var i = new Date().getFullYear(); i < 2030; i++)
+                  option(value=i)=i
+              | &nbsp;年
+              select(v-model="timeStart.month")
+                -for(var i = 1; i < 13; i++)
+                  option(value=i)=i
+              | &nbsp;月
+              select(v-model="timeStart.day")
+                option(v-for="i in timeStartDay" :value="i") {{i}}
+              | &nbsp;日&nbsp;
+              select(v-model="timeStart.hour")
+                -for(var i = 0; i < 24; i++)
+                  option(value=i)=i
+              | &nbsp;时
+              select(v-model="timeStart.minute")
+                -for(var i = 0; i < 60; i++)
+                  option(value=i)=i
+              | &nbsp;分
+            .form-group
+              label 结束：
+              select(v-model="timeEnd.year")
+                -for(var i = (new Date().getFullYear()); i < 2030; i++)
+                  option(value=i)=i
+              | &nbsp;年
+              select(v-model="timeEnd.month")
+                -for(var i = 1; i < 13; i++)
+                  option(value=i)=i
+              | &nbsp;月
+              select(v-model="timeEnd.day")
+                option(v-for="i in timeEndDay" :value="i") {{i}}
+              | &nbsp;日&nbsp;
+              select(v-model="timeEnd.hour")
+                -for(var i = 0; i < 24; i++)
+                  option(value=i)=i
+              | &nbsp;时
+              select(v-model="timeEnd.minute")
+                -for(var i = 0; i < 60; i++)
+                  option(value=i)=i
+              | &nbsp;分
+              h5.text-danger(v-if="deadlineMax") 调查时间不能超过{{deadlineMax}}天。
+      //-.form-group
+        label.col-sm-2.control-label
+        .col-sm-9
+          h5.text-danger(v-if="error") {{error}}
+          button.btn.btn-primary(@click="submit") 提交

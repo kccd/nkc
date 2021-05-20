@@ -1,0 +1,81 @@
+#moduleModifyPrice {
+  /* 弹窗皮肤 */
+  /* 弹窗模块可引入该文件用于默认的弹窗样式 */
+  /* 默认颜色 */
+  /* 垂直居中 */
+  /* 文本超出隐藏并显示省略号 */
+}
+#moduleModifyPrice .vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+#moduleModifyPrice .modal-dialog .modal-content {
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+#moduleModifyPrice .modal-dialog .modal-content .modal-header {
+  text-align: center;
+  position: relative;
+  padding: 0;
+  border: none;
+  overflow: hidden;
+}
+#moduleModifyPrice .modal-dialog .modal-content .modal-header .modal-title {
+  height: 5rem;
+  color: #282c37;
+  font-weight: 700;
+  line-height: 5rem;
+  font-size: 1.3rem;
+}
+#moduleModifyPrice .modal-dialog .modal-content .modal-header .fa {
+  cursor: pointer;
+  color: #aaa;
+  font-size: 1.2rem;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  text-align: center;
+}
+#moduleModifyPrice .modal-dialog .modal-content .modal-header .fa:hover {
+  background-color: #eee;
+}
+#moduleModifyPrice .modal-dialog .modal-content .modal-body {
+  padding: 0 1rem;
+  overflow: hidden;
+}
+#moduleModifyPrice .modal-dialog .modal-content .modal-footer {
+  border: none;
+  padding: 0 1rem 1rem 1rem;
+}
+#moduleModifyPrice .modal-dialog .modal-content .modal-footer .options-button {
+  padding-right: 0;
+}
+#moduleModifyPrice .modal-dialog .modal-content .modal-footer .options-button > a:last-child {
+  margin-right: 0;
+}
+#moduleModifyPrice .modal-backdrop.in {
+  filter: alpha(opacity=20);
+  opacity: 0.2;
+}
+#moduleModifyPrice .price .number {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-style: oblique;
+  color: #e85a71;
+  vertical-align: top;
+  display: inline-block;
+}
+#moduleModifyPrice .warning {
+  font-style: oblique;
+  color: #e85a71;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL3B1YmxpY01vZHVsZXMvc2hvcC9tb2RpZnlQcmljZS5sZXNzIiwiPGlucHV0IGNzcyA5Nz4iLCJwYWdlcy9wdWJsaWNNb2R1bGVzL2Jhc2UubGVzcyIsInBhZ2VzL3B1YmxpY01vZHVsZXMvc2tpbi5sZXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VDQ0UsVUFBVTtFQUNWLHlCQUF5QjtFQUN6QixVQUFVO0VBQ1YsVUFBVTtFQUNWLGtCQUFrQjtDQUNuQjtBRE5EO0VFU0UsbUJBQUE7RUFDQSxPQUFBO0VBQ0EsUUFBQTtFQUNBLFNBQUE7RUFDQSxVQUFBO0VBQ0EsYUFBQTtDREFEO0FEZEQ7RUdLSSxtQkFBQTtFQUNBLHFDQUFBO0VBQ0EsZ0RBQUE7VUFBQSx3Q0FBQTtDRllIO0FEbkJEO0VHU00sbUJBQUE7RUFDQSxtQkFBQTtFQUNBLFdBQUE7RUFDQSxhQUFBO0VBQ0EsaUJBQUE7Q0ZhTDtBRDFCRDtFR2dCUSxhQUFBO0VBQ0EsZUFBQTtFQUNBLGlCQUFBO0VBQ0Esa0JBQUE7RUFDQSxrQkFBQTtDRmFQO0FEakNEO0VHdUJRLGdCQUFBO0VBQ0EsWUFBQTtFQUNBLGtCQUFBO0VBQ0EsbUJBQUE7RUFDQSxTQUFBO0VBQ0EsT0FBQTtFQUNBLGNBQUE7RUFDQSxlQUFBO0VBQ0Esb0JBQUE7RUFDQSxtQkFBQTtDRmFQO0FFWk87RUFDRSx1QkFBQTtDRmNUO0FEaEREO0VHdUNNLGdCQUFBO0VBQ0EsaUJBQUE7Q0ZZTDtBRHBERDtFRzJDTSxhQUFBO0VBQ0EsMEJBQUE7Q0ZZTDtBRHhERDtFRzhDUSxpQkFBQTtDRmFQO0FEM0REO0VHaURRLGdCQUFBO0NGYVA7QUQ5REQ7RUd1REUsMEJBQUE7RUFDQSxhQUFBO0NGVUQ7QURsRUQ7RUFJTSxrQkFBQTtFQUNBLGlCQUFBO0VBQ0Esb0JBQUE7RUFDQSxlQUFBO0VBQ0Esb0JBQUE7RUFDQSxzQkFBQTtDQ2lFTDtBRDFFRDtFQWFJLG9CQUFBO0VBQ0EsZUFBQTtDQ2dFSCIsImZpbGUiOiJ0by5jc3MifQ== */

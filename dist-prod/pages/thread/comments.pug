@@ -1,0 +1,5 @@
+mixin renderComments(comments, pid)
+  .post-comments(id=("post_comments_div_" + pid || ""))
+    for comment in comments
+      include ./comment
++renderComments(data.posts, data.post.pid)

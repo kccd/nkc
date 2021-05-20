@@ -1,0 +1,90 @@
+extends ../bootstrap_base
+block title
+  title=`${state.serverSettings.websiteName} | 考试系统`
+  -const {countOneDay, count, waitingTime, examNotes} = data.examSettings;
+  +includeCSS('/exam/exam.css')
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8.bg-color-ffffff
+        .row.m-t-1
+          .col-xs-12.col-md-12
+            h2 考试须知
+        .row.m-t-1
+          .col-xs-12.col-md-12
+            .pre-content= examNotes
+        .row.m-t-1
+          .col-xs-12.col-md-12
+            h5= `每天最多进行 ${countOneDay} 次考试，考试次数累计达到 ${count} 次时，在 ${waitingTime} 天之内将无法再次参加考试。`
+
+        .row.m-t-2.exam-link
+          .col-xs-12.col-md-6
+            +listHeader('A卷（基础级）')
+            for category in data.examsCategories
+              if category.volume === 'A'
+                span.h4.m-r-1(style='display: inline-block;')
+                  a(href=`/exam/paper?cid=${category._id}`)=`【${category.name}】`
+                  //-p=category.description
+          .col-xs-12.col-md-6
+            +listHeader('B卷（专业级）')
+            for category in data.examsCategories
+              if category.volume === 'B'
+                  span.h4.m-r-1(style='display: inline-block;')
+                    a(href=`/exam/paper?cid=${category._id}`)=`【${category.name}】`
+                  //-p=category.description
+      .col-xs-12.col-md-3.col-md-offset-1.bg-color-ffffff
+        if permission('visitEditQuestion')
+          a.m-t-1.exam-add-question-btn(href=`/exam/editor`) 参与出题
+          a.m-t-1.btn.btn-default.btn-block(href=`/exam/record/question`) 出题记录
+            if data.unViewedCount > 0
+              .red-point=` ${data.unViewedCount}`
+        else
+          a.m-t-1.exam-add-question-btn(style='background-color: #aaa;') 参与出题
+          p 当前只允许学术分1分以上的会员命题，你还没有学术分。
+            //
+              | 点击
+              a(href='https://www.kechuang.org/t/67256' target='_blank') 这里
+              |了解学术分制度。
+        a.m-t-1.btn.btn-default.btn-block(href=`/exam/record/paper?t=self`) 考试记录
+        if permission('addExamsCategory') || permission('visitExamsQuestionAuth') || permission('visitExamsQuestionAuth')
+          .p-t-2
+          +listHeader('管理操作')
+          if permission('addExamsCategory')
+            a.m-t-1.btn.btn-default.btn-block(href=`/exam/categories/editor`) 考卷管理
+          if permission('visitExamQuestionManagement')
+            a.m-t-1.btn.btn-default.btn-block(href=`/exam/questions`) 试题管理
+          if permission('visitExamsQuestionAuth')
+            a.m-t-1.btn.btn-default.btn-block(href=`/exam/auth`)
+              if data.unauthCount
+                span= `试题审核 `
+                span.red-point=data.unauthCount
+              else
+                | 试题审核
+        .p-t-2
+        +listHeader('考试记录')
+        for paper in data.papers
+          .m-t-1
+            span=fromNow(paper.tlm)
+            | &nbsp;
+            a(href=`/u/${paper.user.uid}` target='_blank')= paper.user.username || `用户${paper.user.uid}`
+            | &nbsp;
+            | 通过了【
+            span=paper.category.name
+            | 】
+            if paper.category.volume === 'A'
+              span 基础级
+            else
+              span 专业级
+        .p-t-2
+        +listHeader('命题人')
+        for li in data.usersList
+          a(href=`/u/${li.user.uid}` target='_blank' style='display:inline-block;')
+            - var title = `${li.user.username}\n`+`学术分 ${li.user.xsf}\n`+`${li.user.info.certsName}`;
+            img.user-list-avatar(src=tools.getUrl('userAvatar', li.user.avatar, 'sm') title=title)
+block scripts
+  script.
+    $(function() {
+      if (!NKC.configs.uid) {
+        $(".exam-link a").removeAttr("href").attr("onclick", "Login.open('login')").addClass("pointer");
+      }
+    });

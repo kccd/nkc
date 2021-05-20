@@ -1,0 +1,61 @@
+extends ../bootstrap_base
+block title
+  link(rel='stylesheet', href='/fund.css')
+  title 科创活动
+
+  -const mainContainer1400 = true
+  -const {activitys} = data;
+  link(href='../bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
+  link(href='../bootstrap/css/bootstrap-chinese-region.min.css' media="screen" rel='stylesheet')
+  link(rel="stylesheet", href="../external_pkgs/cropper/css/cropper.css")
+block content
+  .container-fluid.max-width
+      include activityNav.pug
+      .row
+        -for(let a of activitys)
+          .col-xs-12.col-md-3
+            .nkcpanel(style="padding:")
+              .form-horizontal
+                a(href=`/activity/single/${a.acid}`)
+                  .form-group
+                    img(src=`/poster/${a.posterId}` style="width:100%")
+                  .form-group
+                    .col-md-1
+                      span
+                        i.fa.fa-clock-o
+                    .col-md-10
+                      span.lighttext=`${a.holdStartTime}`
+                  .form-group
+                    .col-sm-12(style="height:44px")
+                      span=`${a.activityTitle}`
+                  .form-group
+                    .col-sm-1
+                      span
+                        i.fa.fa-map-marker
+                    .col-sm-10(style="height:44px")
+                      span.lighttext=`${a.address}`
+                  //- hr
+                  //- .form-group
+                  //-   .col-sm-12
+                  //-     span.lighttext(style="float:right")
+                  //-       i.fa.fa-eye 123
+          //- if data.bills.length === 0
+          //-   .blank 暂无数据
+          //- else
+          //-   if displayBalance
+          //-     if data.type !== 'fundPool'
+          //-       h4(style='color:#ff7979;')= `总资金(资金池+所有基金项目)剩余：${data.balance.toFixed(1)}元`
+          //-     else
+          //-       h5=`资金池介绍：${data.fundSettings.fundPoolDescription}`
+          //-       h4(style='color:#ff7979;')= `资金池剩余：${data.balance.toFixed(1)}元`
+          //-   else
+          //-     h4= `所有赞助记录：`
+          //-   -const url = `/fund/bills`;
+
+block scripts
+  script(src=`/jquery-ui-1.10.4.custom.js?v=${global.NKC.startTime}`)
+  script(src=`../interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`../bootstrap/js/bootstrap-datetimepicker.min.js?v=${global.NKC.startTime}` charset="UTF-8")
+  script(src=`../bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js?v=${global.NKC.startTime}` charset="UTF-8")
+  script(src=`../bootstrap/js/bootstrap-chinese-region.min.js?v=${global.NKC.startTime}` charset="UTF-8")
+  script(src=`./activityCommon.js?v=${global.NKC.startTime}` charset="UTF-8")

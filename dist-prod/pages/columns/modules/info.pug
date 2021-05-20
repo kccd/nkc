@@ -1,0 +1,92 @@
+//- 专栏其他信息 专栏主、文章分类、自定义内容、友情链接和内容统计等
+  @param data.contributeCount 待处理的投稿数
+  @param data.timeline 内容统计
+
+-var canManagement = permission("column_single_disabled");
+.m-b-1.column-tool-container(style=columnToolStyle)
+  .column-user
+    .column-user-avatar
+      a(href=`/u/${data.column.uid}`)
+        img(src=tools.getUrl('userAvatar', data.column.user.avatar))
+    a(href=`/u/${data.column.uid}`).column-user-username=data.column.user.username
+    if data.user && data.user.uid !== data.column.uid
+      .column-user-button
+        a(href=`/message?uid=${data.column.uid}` target="_blank") 私信
+        if data.user.subUid.includes(data.column.uid)
+          a.pointer(onclick=`SubscribeTypes.subscribeUser("${data.column.uid}", false)` target="_blank") 取关
+        else
+          a.pointer(onclick=`SubscribeTypes.subscribeUser("${data.column.uid}", true)` target="_blank") 关注
+    if data.column.user.description
+      .column-user-description=data.column.user.description
+.m-b-1.column-tool-container(style=columnToolStyle)
+  include ../../publicModules/share/column
+if data.column.notice && (!data.column.noticeDisabled || canManagement)
+  div.m-b-1.column-tool-container(style=columnToolStyle)
+    .column-threads
+      .column-header
+        .fa.fa-bullhorn &nbsp;公告通知
+          if canManagement
+            if data.column.noticeDisabled
+              .column-management-button.fa.fa-minus-circle(onclick=`managementColumn(${data.column._id}, 'notice', false)`) &nbsp;解除屏蔽
+            else
+              .column-management-button.fa.fa-minus-circle(onclick=`managementColumn(${data.column._id}, 'notice', true)`) &nbsp;屏蔽
+      p!=markdown_safe(data.column.notice)
+div.m-b-1.column-tool-container(style=columnToolStyle)
+  .column-management
+    .column-header
+      .fa.fa-list &nbsp;文章分类
+    .column-categories
+      a.column-category(href=`/m/${data.column._id}` class=!data.c?"active":"")
+        span 全部
+        .pull-right
+          if data.columnPostcount > 0
+            .column-category-count=data.columnPostcount
+          .fa.fa-angle-right
+      for c in data.categories
+        if !data.column.hideDefaultCategory || !c.default
+          a.column-category(href=`/m/${data.column._id}?c=${c._id}` class=Number(data.c)===c._id?"active":"")
+            -for(var i = 0; i < c.level; i++)
+              span &nbsp;&nbsp;&nbsp;&nbsp;
+            span=c.name
+            .pull-right
+              if c.count > 0
+                .column-category-count=c.count
+              .fa.fa-angle-right
+if data.timeline && data.timeline.length > 0
+  div.m-b-1.column-tool-container(style=columnToolStyle)
+    .column-management
+      .column-header
+        .fa.fa-calendar &nbsp;内容统计
+      .m-t-05
+        for t in data.timeline
+          .column-timeline=t.time
+            .pull-right=`${t.count} 篇`
+if !data.column.blocksDisabled || canManagement
+  if canManagement || data.column.blocks.length > 0
+    div.m-b-1.column-tool-container(style=columnToolStyle)
+      .column-block
+        .column-header 自定义内容
+          if data.column.blocksDisabled
+            .column-management-button.fa.fa-minus-circle(onclick=`managementColumn(${data.column._id}, "blocks", false)`) &nbsp;解除屏蔽
+          else
+            .column-management-button.fa.fa-minus-circle(onclick=`managementColumn(${data.column._id}, "blocks", true)`) &nbsp;屏蔽
+  for block, index in data.column.blocks
+    if block.show
+      div.m-b-1.column-tool-container(style=columnToolStyle)
+        .column-block
+          .column-header=block.name
+          p!=markdown_safe(block.content)
+if data.column.otherLinks && data.column.otherLinks.length > 0
+  if !data.column.otherLinksDisabled || canManagement
+    div.m-b-1.column-tool-container(style=columnToolStyle)
+      .column-threads
+        .column-header
+          .fa.fa-link &nbsp;友情链接
+            if canManagement
+              if data.column.otherLinksDisabled
+                .column-management-button.fa.fa-minus-circle(onclick=`managementColumn(${data.column._id}, "otherLinks", false)`) &nbsp;解除屏蔽
+              else
+                .column-management-button.fa.fa-minus-circle(onclick=`managementColumn(${data.column._id}, "otherLinks", true)`) &nbsp;屏蔽
+        .column-links
+          for link in data.column.otherLinks
+            a(onclick=`openNewWindow('${link.url}')`)= link.name

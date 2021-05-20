@@ -1,0 +1,13 @@
+mixin mixinColumnContribute(user, column, columnToolStyle)
+  .column-tool-container.column-contribute-body(style=columnToolStyle)
+    if !user
+      .column-contribute(onclick='NKC.methods.toLogin()')
+    else if user.uid !== column.uid
+      a.column-contribute(href=`/m/${column._id}/contribute` target='_blank')
+    else
+      a.column-contribute(href=`/editor?toColumn=true`)
+    if !user || user.uid !== column.uid
+      p 通过审核即可在本专栏显示
+    else
+      p 发表文章并同步到本专栏
+

@@ -1,0 +1,60 @@
+if data.type !== 'category' && data.type !== 'merge'
+  - data.forumList = data.forums
+  - data.disabledCategory = true;
+  include forumlist_dropdown
+.panel.panel-default
+  .panel-heading
+    span= data.forum.displayName
+    span &nbsp;&nbsp;&nbsp;
+    a(href=`/f/${data.forum.fid}` style='text-decoration: none;') 查看专业
+
+  .list-group
+    a.list-group-item(href=`/f/${data.forum.fid}/settings/info`)
+      span.fa.fa-user-circle &nbsp;&nbsp;
+      span 基本信息设置
+    a.list-group-item(href=`/f/${data.forum.fid}/settings/category`)
+      span.fa.fa-user-circle &nbsp;&nbsp;
+      span 分类设置
+    if permission('visitForumPermissionSettings')
+      a.list-group-item(href=`/f/${data.forum.fid}/settings/permission`)
+        span.fa.fa-user-circle &nbsp;&nbsp;
+        span 权限设置
+    if permission('forumScoreSettings')
+      a.list-group-item(href=`/f/${data.forum.fid}/settings/score`)
+        span.fa.fa-user-circle &nbsp;&nbsp;
+        span 积分策略设置
+    if permission('visitForumMergeSettings')
+      a.list-group-item(href=`/f/${data.forum.fid}/settings/merge`)
+        span.fa.fa-user-circle &nbsp;&nbsp;
+        span 合并专业
+    if permission('forumReviewSettings')
+      a.list-group-item(href=`/f/${data.forum.fid}/settings/review`)
+        span.fa.fa-user-circle &nbsp;&nbsp;
+        span 审核设置
+if permission('deleteForum')
+  button.btn.btn-danger.btn-block(onclick=`deleteForum("${data.forum.fid}")`) 删除当前专业
+h4 当前专业
+.text-center.h2
+  a(href=`/f/${data.forum.fid}`)= data.forum.displayName
+br
+if data.breadcrumbForums.length !== 0
+  h4 上级专业
+  for forum in data.breadcrumbForums
+    a(href=`/f/${forum.fid}/settings/${data.type}`)= forum.displayName
+    span &nbsp;/&nbsp;
+  span= data.forum.displayName
+if data.breadcrumbForums.length !== 0
+  h4 同级专业
+  for forum in data.sameLevelForums
+    a(href=`/f/${forum.fid}/settings/${data.type}`)= forum.displayName
+    span &nbsp;&nbsp;
+if data.childrenForums.length !== 0
+  h4 下级专业
+  for forum in data.childrenForums
+    a(href=`/f/${forum.fid}/settings/${data.type}`)= forum.displayName
+    span &nbsp;&nbsp;
+h4 顶级专业
+for forum in data.level1Forums
+  a(href=`/f/${forum.fid}/settings/${data.type}`)= forum.displayName
+  span &nbsp;&nbsp;
+

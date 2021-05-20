@@ -1,0 +1,49 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 分享设置
+block content
+
+  .container-fluid.max-width
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .row#app(v-cloak)
+          .col-xs-12.col-md-6
+            table.table.table-striped
+              thead
+                tr
+                  th 名称
+                  th 分享类型
+                  th 有效时长(小时)
+                  th 有效次数(次)
+                  //- th 操作
+              tbody
+                tr(v-for="(li,key) in shareLimit")
+                  //- div(v-if="li.shareName == ''")
+                  th(v-if="li.shareName != ''") {{li.shareName}}
+                  th(v-else)
+                    input(style="max-width: 6rem;" type="text" v-model="li.shareName")
+                  //- div(v-else)
+                  //-   th
+                  //-     input(style="max-width: 6rem;" type="text" v-model="li.shareName")
+                  th(v-if="li.shareType != ''") {{li.shareType}}
+                  th(v-else)
+                    input(style="max-width: 6rem;" type="text" v-model="li.shareType")
+                  //- th {{li.shareType}}
+                  th
+                    input(style="max-width: 6rem;" type="text" v-model="li.shareLimitTime")
+                  th
+                    input(style="max-width: 6rem;" type="text" v-model="li.shareLimitCount")
+                  //- th
+                  //-   button(@click='del(key)') 删除
+            button.btn.btn-primary(@click='submit') 保存
+            //- button.btn.btn-default(@click='add') 添加新项
+
+
+block scripts
+
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/experimental/settings/share.js?v=${global.NKC.startTime}`)

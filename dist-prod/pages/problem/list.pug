@@ -1,0 +1,70 @@
+extends ../bootstrap_base
+block title
+  title 问题列表
+  style.
+    .problem-avatar img{
+      height: 2rem;
+      width: 2rem;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+    .problem-title{
+      /*max-width: 20rem;*/
+    }
+    .problem-title a{
+      /*font-size: 1.25rem;*/
+    }
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.box-shadow-panel.problem
+        div
+          ul.nav.nav-pills.m-b-1
+            li(class=!data.c? 'active':'')
+              a(href=`/problem/list` data-type='reload') 全部
+            li(class=data.c === 'unsolved'? 'active':'')
+              a(href=`/problem/list?c=unsolved` data-type='reload') 未处理
+          include ../publicModules/paging/paging
+          .table-responsive
+            table.table.table-bordered.nkc-table
+              thead
+                tr
+                  th 时间
+                  th 标题
+                  th 用户
+                  th 状态
+              tbody
+                for p in data.problems
+                  -var klass = '';
+                  if !p.resolved
+                    if !p.viewed
+                      -klass += 'bg-warning';
+                    else
+                      -klass += 'bg-danger';
+                  tr(class=klass)
+                    th
+                      +fromNow(p.toc)
+                    th.problem-title
+                      a(
+                        href=`/problem/list/${p._id}`
+                        class=!p.resolved?'text-danger':'text-success'
+                      )=p.t
+                    th.problem-avatar
+                      if !p.user
+                        -var anonymousUserInfo = tools.getAnonymousInfo();
+                        img(src=anonymousUserInfo.avatarUrl)
+                        span=anonymousUserInfo.username
+                      else
+                        img(src=tools.getUrl('userAvatar', p.user.avatar))
+                        a(href=tools.getUrl('userHome', p.user.uid) data-float-uid=p.user.uid)=p.user.username
+
+                    th
+                      if !p.viewed
+                        span.text-warning 未读&nbsp;
+                      if !p.resolved
+                        span.text-danger 未处理
+                      else
+                        span.text-success 已处理
+          include ../publicModules/paging/paging_input
+block scripts
+  include ../publicModules/floatUserPanel/floatUserPanel.2.pug

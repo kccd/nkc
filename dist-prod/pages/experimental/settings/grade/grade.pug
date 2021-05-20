@@ -1,0 +1,58 @@
+extends ../../experimental
+block eTitle
+  title 用户等级设置
+  +includeCSS('/experimental/settings/grade/grade.css')
+block eContent
+  .container-fluid.max-width
+    #data.hidden=objToStr({grades: data.grades, gradeSettings: data.gradeSettings})
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12.m-b-3
+        h4 用户积分公式
+        | 用户积分 = 在线天数 x&nbsp;
+        input.inline-input(type='text' v-model.number='gradeSettings.coefficients.dailyLogin')
+        | &nbsp;+ 文章数 x&nbsp;
+        input.inline-input(type='text' v-model.number='gradeSettings.coefficients.postToForum')
+        | &nbsp;+ 回复数 x&nbsp;
+        input.inline-input(type='text' v-model.number='gradeSettings.coefficients.postToThread')
+        | &nbsp;+ 精选文章数 x&nbsp;
+        input.inline-input(type='text' v-model.number='gradeSettings.coefficients.digest')
+        | &nbsp;+ 精选回复数 x&nbsp;
+        input.inline-input(type='text' v-model.number='gradeSettings.coefficients.digestPost')
+        | &nbsp;+ 被点赞数^(1/2) x&nbsp;
+        input.inline-input(type='text' v-model.number='gradeSettings.coefficients.thumbsUp')
+        | &nbsp;+ 学术分 x&nbsp;
+        input.inline-input(type='text' v-model.number='gradeSettings.coefficients.xsf')
+        | &nbsp;+ 违规数 x&nbsp;
+        input.inline-input(type='text' v-model.number='gradeSettings.coefficients.violation')
+      .col-xs-12.col-md-12
+        h4 用户等级
+        h5 保存后会根据积分值重新划分等级，刷新页面后可见新的排序。
+        table.table.table-bordered
+          thead
+            tr
+              th 等级
+              th 名称
+              th 积分值
+              th 颜色
+              th 简介
+              th 其他
+          tbody
+            tr(v-for="grade, index in grades")
+              th {{grade._id}}
+              th
+                input.form-control(type="text" v-model="grade.displayName")
+              th
+                input.form-control(type="text" v-model.number="grade.score")
+              th
+                input.form-control.color(type="text" v-model="grade.color" data-control="selectColor" :data-index="index")
+              th
+                textarea.form-control(v-model="grade.description")
+              th
+                button.btn.btn-danger.btn-xs(@click="removeGrade(index)") 删除
+        .m-t-05
+          button.btn.btn-default.btn-sm(@click="addGrade") 新增等级
+          button.btn.btn-primary.btn-sm(@click="save") 保存
+block scripts
+  include ../../../publicModules/selectColor
+  +includeJS("/experimental/settings/grade/grade.js")
+

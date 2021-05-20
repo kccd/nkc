@@ -1,0 +1,121 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  link(href='/experimental/index.css' rel='stylesheet')
+  title 科创币设置
+block content
+  div(style='background-color: red;color: #fff;font-size: 2rem;height: 5rem;line-height: 5rem;text-align: center;')
+    | 当前页面已废弃，仅做参考
+  .container-fluid.max-width
+    .row
+      include ../nav
+      #app(v-cloak)
+        .col-xs-12.col-md-12
+          .hidden(ref='data')= JSON.stringify({kcbsTypes: data.kcbsTypes, kcbSettings: data.kcbSettings})
+        .col-xs-12.col-md-12(v-if='kcbSettings.withdrawMin')
+          h4 提现设置
+          .form-horizontal
+            .form-group
+              label.col-sm-2.control-label 提现功能
+              .col-sm-10
+                <label class="radio-inline">
+                <input type="radio" :value="true" v-model="kcbSettings.withdrawStatus"> 开启
+                </label>
+                <label class="radio-inline">
+                <input type="radio" :value="false" v-model="kcbSettings.withdrawStatus"> 关闭
+                </label>
+            .form-group
+              label.col-sm-2.control-label 最小提现金额
+              .col-sm-4
+                input.form-control(type="text" v-model.number="kcbSettings.withdrawMin")
+                h5.text-danger 若用户的科创币小于最小提现金额则用户无法申请提现。
+            .form-group
+              label.col-sm-2.control-label 最大提现金额
+              .col-sm-4
+                input.form-control(type="text" v-model.number="kcbSettings.withdrawMax")
+                h5.text-danger 单笔最大提现金额，与”每天最大提现次数“可限制用户每天能提现的总金额。
+            .form-group
+              label.col-sm-2.control-label 每天最大提现次数
+              .col-md-4
+                input.form-control(type="text" v-model.number="kcbSettings.withdrawCount")
+                h5.text-danger 次数达最大值后用户当天无法再申请提现。
+            .form-group
+              label.col-sm-2.control-label 允许提现的时间段
+              .col-md-10.form-inline
+                select.form-control(v-model.number="kcbSettings.withdrawTimeBegin.hour")
+                  -for(var i = 0; i < 24; i++)
+                    option(:value=i)=i
+                span 时
+                select.form-control(v-model.number="kcbSettings.withdrawTimeBegin.min")
+                  -for(var i = 0; i < 60; i++)
+                    option(:value=i)=i
+                span 分
+                select.form-control(v-model.number="kcbSettings.withdrawTimeBegin.sec")
+                  -for(var i = 0; i < 60; i++)
+                    option(:value=i)=i
+                span 秒
+                span.m-l-1.m-r-1 至
+                select.form-control(v-model.number="kcbSettings.withdrawTimeEnd.hour")
+                  -for(var i = 0; i < 24; i++)
+                    option(:value=i)=i
+                span 时
+                select.form-control(v-model.number="kcbSettings.withdrawTimeEnd.min")
+                  -for(var i = 0; i < 60; i++)
+                    option(:value=i)=i
+                span 分
+                select.form-control(v-model.number="kcbSettings.withdrawTimeEnd.sec")
+                  -for(var i = 0; i < 60; i++)
+                    option(:value=i)=i
+                span 秒
+            .form-group
+              label.col-sm-2.control-label 提现手续费
+              .col-md-4
+                .row
+                  .col-md-4
+                    input.form-control(type="text" v-model.number="kcbSettings.withdrawFee")
+                  .col-md-4
+                    h5
+                      strong %
+                  .col-md-12
+                    h5.text-danger 提现1000，实际到账{{(1000*(1-kcbSettings.withdrawFee)).toFixed(2)}}
+        .col-xs-12.col-md-12.table-responsive.m-t-4
+          h4 科创币设置
+          table.table
+            thead
+              tr
+                th 序号
+                th 操作名
+                th 每天次数（无限制：-1）
+                th 科创币
+                th 描述
+            tbody
+              tr(v-for='(type, index) of kcbsTypes')
+                th {{index + 1}}
+                th {{type.description}}
+                th
+                  input(v-model.number="type.count")
+                th
+                  input(v-model.number="type.num")
+                th
+                  span(v-if="type.count === 0") 未启用
+                  span(v-else-if="type.count === -1") 无限次数 | 每次 {{type.num>0?'+': ''}}{{type.num}} 科创币
+                  span(v-else) 每天 {{type.count}} 次 | 每次 {{type.num>0?'+':''}}{{type.num}} 科创币
+        .col-xs-12.col-md-12
+          h4 转账限制
+          .form.form-inline
+            .form-group
+              label 最小值：
+              input.form-control(type='number' v-model.number='kcbSettings.minCount')
+            .form-group
+              label 最大值：
+              input.form-control(type='number' v-model.number='kcbSettings.maxCount')
+        .btn-fixed-save(@click='save') 保存
+
+
+block scripts
+  script(src=`/experimental/settings/kcb.js?v=${global.NKC.startTime}`)
+
+
+
+

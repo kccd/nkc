@@ -1,0 +1,1 @@
+!function(n){"function"==typeof define&&define.amd?define(n):n()}((function(){"use strict";window.comfirmReceipt=function(n){sweetQuestion("确认收货后，货款将打入卖家账户，请再次确认。").then((function(){nkcAPI("/shop/order/"+n+"/receipt","PUT",{}).then((function(n){sweetSuccess("执行成功"),window.location.reload()})).catch(sweetErro)})).catch((function(n){return null}))}}));

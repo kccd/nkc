@@ -1,0 +1,26 @@
+if creditPost && creditPost.credits && creditPost.credits.length > 0
+  .nkcpanel.ThreadPostCredits
+    for c,index in creditPost.credits
+      .ThreadPostCreditItem
+        -var number = c.num;
+        if c.type === "creditKcb"
+          -number = number/100;
+        span.TPCQ!= `${(number > 0 ? '+' : '')}${number} &nbsp;`
+        if c.type === 'xsf'
+          span.TPCType 学术分 &nbsp;&nbsp;
+        else
+          span.TPCType=`${data.creditScore.name} `
+            |&nbsp;&nbsp;
+        span.TPCIA
+          a(href=`/u/${c.fromUser.uid}` style='text-decoration: none;' data-float-uid=c.fromUser.uid)
+            img.TPCIAI(src=tools.getUrl('userAvatar', c.fromUser.avatar, 'sm'))
+            span.TPCIssuer &nbsp;#{c.fromUser.username} &nbsp;&nbsp;
+        span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
+        span.TPCReason #{c.description}
+        if c.type === 'xsf' && data.user && permission('cancelXsf')
+          a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${creditPost.pid}", ${c._id})`) 撤销
+        if c.type === 'creditKcb' && data.user && permission('modifyKcbRecordReason')
+          if !c.hideDescription
+            a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${creditPost.pid}", ${c._id}, true)`) 屏蔽
+          else
+            a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${creditPost.pid}", ${c._id}, false)`) 取消屏蔽

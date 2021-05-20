@@ -1,0 +1,63 @@
+if !comment
+  -comment = data.comment;
+if !comment.reviewed
+  -let reviewData = {reviewPid: comment.pid, reviewType: "post"}
+  include ../publicModules/module_review
+-let klass = [];
+if comment.disabled
+  -klass.push("disabled");
+if data.highlight === comment.pid
+  -klass.push("highlight-dom");
+.post-comment(class=klass id=`post_comment_${comment.pid}`)
+  .post-comment-body.highlight
+    if !comment.anonymous
+      a.post-comment-user(href=`/u/${comment.uid}` target="_blank" data-float-uid=comment.uid)
+        img(src=tools.getUrl('userAvatar', comment.user.avatar, 'sm'))
+        span=comment.user.username
+    else
+      span.post-comment-user
+        img(src=anonymousInfo.avatar)
+        span.anonymous-name=anonymousInfo.username
+    //-if data.post.uid === comment.uid
+      span (层主)
+    if comment.parentPost
+      span.m-l-05.m-r-05 评论
+      if !comment.parentPost.anonymous
+        a.display-i-b.post-comment-user(href=`/u/${comment.parentPost.user.uid}` target="_blank" data-float-uid=comment.parentPost.user.uid)
+          span=comment.parentPost.user.username
+      else
+        .display-i-b.post-comment-user
+          span.anonymous-name=anonymousInfo.username
+      //-if data.post.uid === comment.parentPost.uid
+        span (层主)
+    //-.post-comment-time=fromNow(comment.toc)
+    if data.user
+      span.comment-btn.pointer.m-l-05.m-r-05(onclick=`postComment('${comment.tid}', '${comment.pid}')`) 回评
+    include ../thread/postOptions
+    .pointer.display-i-b.pull-right(style='font-size: 0;')
+      span(data-type='share' data-share-type='post' data-share-id=comment.pid style='color: #aaaaaa;vertical-align: top;margin-right: 0.3rem;font-size: 1.15rem;')
+        .fa.fa-share-square-o
+    .display-i-b.pull-right
+      if comment.digest
+        span.fa.fa-star.m-r-05(style='color: #ffbf16;' title='精选')
+      include ../module_vote
+      +voteButtons(comment, !!data.user)
+    -comment.c = hideContentByUser(comment.c, data.user, 'thread')
+    .post-comment-content!=comment.c
+    -let creditPost = comment;
+    include ./postCredits
+  div
+    if comment.todraft
+      div
+        .text-center [本条回复已被退回修改，请作者点击编辑按钮修改]
+        p.text-center.text-danger= `退修原因：${comment.reason}`
+    if comment.disabled
+      span.text-primary [此楼已屏蔽]&nbsp;
+      if permission("unblockPosts") && data.isModerator
+        a(onclick=`enablePost('${comment.pid}')`) [点击解除]
+
+
+  include ./postEdit
+
+  if comment.posts && comment.posts.length
+    +renderComments(comment.posts, comment.pid)

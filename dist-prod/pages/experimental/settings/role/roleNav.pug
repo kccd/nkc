@@ -1,0 +1,28 @@
+a.role-nav(href='/e/settings/role') 首页
+.dropdown.display-i-b
+  a.role-nav.dropdown-toggle(type='button' id='dropdownMenu1' data-toggle='dropdown' aria-haspopup="true" aria-expanded="true")
+    | 系统类证书&nbsp;
+    span.caret
+  ul(class="dropdown-menu" aria-labelledby="dropdownMenu1")
+    for role in data.roles
+      if role.type === 'system'
+        li
+          a(href=`/e/settings/role/${role._id}`)=role.displayName
+.dropdown.display-i-b
+  a.role-nav.dropdown-toggle(type='button' id='dropdownMenu2' data-toggle='dropdown' aria-haspopup="true" aria-expanded="true")
+    | 管理类证书&nbsp;
+    span.caret
+  ul(class="dropdown-menu" aria-labelledby="dropdownMenu2")
+    for role, index in data.roles
+      if role.type === 'management'
+        li
+          a(href=`/e/settings/role/${role._id}`)=role.displayName
+.dropdown.display-i-b
+  a.role-nav.dropdown-toggle(type='button' id='dropdownMenu3' data-toggle='dropdown' aria-haspopup="true" aria-expanded="true")
+    | 普通证书&nbsp;
+    span.caret
+  ul(class="dropdown-menu" aria-labelledby="dropdownMenu3")
+    for role, index in data.roles
+      if role.type === 'common'
+        li
+          a(href=`/e/settings/role/${role._id}`)=role.displayName  

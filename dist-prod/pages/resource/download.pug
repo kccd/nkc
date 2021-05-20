@@ -1,0 +1,65 @@
+extends ../bootstrap_base
+
+block title
+  title 资料下载
+
+block content
+  +includeCSS("/resource/download.css")
+  .container-fluid.max-width(style="padding-bottom: 100px")
+    .tip-wrap
+      .error-list.b-s-10
+        - let {rid, ext, size, oname} = data.resource;
+        - let text = (() => {
+        -  let str = "";
+        -  for(let score of data.myAllScore) {
+        -    if(score.addNumber == 0) continue;
+        -    str += score.name;
+        -    str += score.addNumber * -1 / 100;
+        -    str += score.unit;
+        -    str += "、";
+        -  }
+        -  str = str.substring(0, str.length - 1);
+        -  return str;
+        - })()
+        .resource-oname= oname
+        .resource-size= `大小：${tools.getSize(size)}`
+        .resource-info.m-t-1 下载当前附件将花费&nbsp;
+          for score, index in data.myAllScore
+            if index !== 0
+              span.name 、
+            span.name=score.name
+            strong.text-danger=score.addNumber * -1 / 100
+            span.name=score.unit
+          span.name 。
+        .resource-info 你当前剩余&nbsp;
+          for score, index in data.myAllScore
+            if index !== 0
+              span.name 、
+            span.name=score.name
+            strong.text-danger=score.number / 100
+            span.name=score.unit
+          span.name 。
+        if !data.enough
+          .error-code
+            code 积分不足
+        .resource-downloaded-tip.m-t-1
+          span.name= `附件下载中... （${(data.resourceExpired / 1000 / 60 / 60)}小时内重复下载不会扣分）`
+        .error-info.m-t-1
+          a.m-l-0.download-button(href=`/r/${rid}?d=attachment&c=download&random=${Math.random()}`) 立即下载
+          if data.resource.ext === "pdf"
+            | &nbsp;&nbsp;&nbsp;
+            a.m-l-0(href=`/r/${rid}?c=preview_pdf&random=${Math.random()}` ) 免费预览
+            //-if data.enough
+              a.m-l-0.download-button(onclick=`payForDownloadResource(${rid})`) 立即下载
+              if data.resource.ext === "pdf"
+                | &nbsp;&nbsp;&nbsp;
+                a.m-l-0(onclick=`previewPDFResource(${rid})`) 预览
+          else
+            a.m-l-0(href=`/account/finance/recharge`) 充值
+          | &nbsp;&nbsp;&nbsp;
+          a(onclick="closePage()") 返回上一页
+        .m-t-1
+          -const fileCountLimitInfo = data.fileCountLimitInfo;
+          include ../publicModules/fileCountLimitInfo
+
+  +includeJS("/resource/download.js")
