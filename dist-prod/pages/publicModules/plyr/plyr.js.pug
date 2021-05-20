@@ -1,0 +1,104 @@
+if !isIncluded('plyr')
+  +includeJS("/external_pkgs/plyr/plyr.polyfilled.min.js")
+  +includeJS("/external_pkgs/plyr/plyr.min.js")
+  include ./mask.pug
+
+  +includeJS('/publicModules/plyr/controls.js')
+  script.
+    ;(function(){
+      var players = [];
+      var videoControls = ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'download', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'];
+      var audioControls = ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'download', 'captions', 'pip', 'airplay', 'fullscreen'];
+      // 切换视频分辨率之后重新设置视频的下载链接
+      var setPlayerDownloadUrl = function(player, dom) {
+        player.download = dom.attr('src') + '&d=attachment';
+      };
+      var addEvents = function(player, dom) {
+        player.on('qualitychange', function () {
+          setPlayerDownloadUrl(player, dom);
+        });
+        player.on('ready', function(d) {
+          setPlayerDownloadUrl(player, dom);
+        });
+      }
+
+      NKC.methods.initNKCAudio = function() {
+        var audios = $('span[data-tag="nkcsource"][data-type="audio"]');
+        for(var i = 0; i < audios.length; i++) {
+          var audio = audios.eq(i);
+          if(audio.attr('data-init') === 'true') continue;
+          var rid = audio.attr('data-id');
+          var title = audio.find('span.nkcsource-audio-title');
+          if(NKC.configs.platform === 'reactNative') {
+            title.find('span').remove();
+          }
+          if (title.length !== 0) title = title.text();
+          if(NKC.configs.platform === 'reactNative') {
+            var size = audio.find('audio[data-size]');
+            if (size.length !== 0) {
+              size = Number(size.attr('data-size'));
+            } else {
+              size = 0;
+            }
+            size = NKC.methods.tools.getSize(size);
+            var url = "/r/" + rid + "?d=attachment";
+            var appAudio = $('<div class="app-audio"><div class="fa fa-play app-audio-icon" onclick="NKC.methods.rn.updateMusicListAndPlay(\'' + rid
+              + '\')"></div><div class="app-audio-container"><a class="app-audio-title" href="' + url
+              + '" target="_blank" data-type="download" data-title="' + title
+              + '">' + title
+              + '</a><div class="app-audio-info"><span class="m-r-05">' + size
+              + '</span><a href="' + url + '" target="_blank" data-type="download" data-title="' + title + '">下载</a></div></div></div>')
+            audio.html(appAudio);
+            audio.attr('data-init', 'true')
+          } else {
+            var plyrDom = audio.find('.plyr-dom');
+            if(plyrDom.length === 0) continue;
+            var player = new Plyr(plyrDom, {
+              ratio: '4:3',
+              title: title,
+              controls: audioControls,
+              settings: ['quality'],
+              quality: {default: 480, options: [1080, 720, 480]},
+              blankVideo: "/external_pkgs/plyr/blank.mp4",
+              autopause: true,
+            });
+            player.download = "/r/" + rid + "?d=attachment";
+            player.speed = 1;
+            NKC.methods.initPlyrMask(player);
+            players.push(player);
+          }
+        }
+      }
+
+      NKC.methods.initNKCVideo = function() {
+        var videos = $('span[data-tag="nkcsource"][data-type="video"]');
+        for(var i = 0; i < videos.length; i++) {
+          var video = videos.eq(i);
+          var title = video.attr("data-plyr-title");
+          var rid = video.attr("data-rid");
+          var plyrDom = video.find('.plyr-dom');
+          if (plyrDom.length === 0) continue;
+          var player = new Plyr(plyrDom, {
+            ratio: '4:3',
+            title: title,
+            controls: videoControls,
+            settings: ['quality'],
+            quality: {default: 480, options: [1080, 720, 480]},
+            blankVideo: "/external_pkgs/plyr/blank.mp4",
+            autopause: true,
+          });
+          addEvents(player, plyrDom);
+          player.speed = 1;
+          NKC.methods.initPlyrMask(player);
+          players.push(player);
+        }
+      }
+
+      NKC.methods.initVideo = function() {
+        NKC.methods.initNKCAudio();
+        NKC.methods.initNKCVideo();
+        NKC.methods.initPlayerControls(players);
+      }
+      NKC.methods.initVideo();
+    }());
+

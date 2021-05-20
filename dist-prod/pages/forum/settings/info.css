@@ -1,0 +1,27 @@
+.forum-logo {
+  height: 10rem;
+  width: 10rem;
+  border: 1px solid #f4f4f4;
+  text-align: center;
+  line-height: 10rem;
+  background-color: #f4f4f4;
+  color: #888;
+}
+.forum-logo img {
+  height: 100%;
+  width: 100%;
+}
+.forum-banner {
+  height: 10rem;
+  width: 40rem;
+  text-align: center;
+  line-height: 10rem;
+  color: #888;
+  background-color: #f4f4f4;
+  border: 1px solid #f4f4f4;
+}
+.forum-banner img {
+  height: 100%;
+  width: 100%;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL2ZvcnVtL3NldHRpbmdzL2luZm8ubGVzcyIsIjxpbnB1dCBjc3MgMzM+Il0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsY0FBQTtFQUNBLGFBQUE7RUFDQSwwQkFBQTtFQUNBLG1CQUFBO0VBQ0EsbUJBQUE7RUFDQSwwQkFBQTtFQUNBLFlBQUE7Q0NDRDtBRFJEO0VBU0ksYUFBQTtFQUNBLFlBQUE7Q0NFSDtBRENEO0VBQ0UsY0FBQTtFQUNBLGFBQUE7RUFDQSxtQkFBQTtFQUNBLG1CQUFBO0VBQ0EsWUFBQTtFQUNBLDBCQUFBO0VBQ0EsMEJBQUE7Q0NDRDtBRFJEO0VBU0ksYUFBQTtFQUNBLFlBQUE7Q0NFSCIsImZpbGUiOiJ0by5jc3MifQ== */

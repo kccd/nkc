@@ -1,0 +1,39 @@
+extends ../experimental
+
+block eTitle
+  title 商城设置
+block eContent
+  .hidden#data=objToStr({shopSettings: data.shopSettings})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        .row#content
+          .col-xs-12.col-sm-2.col-md-2(style='margin-bottom: 1rem;')
+            ul#main-nav.nav.nav-tabs.nav-stacked(style='')
+              li
+                a.list-group-item(href=`/e/settings/shop`)
+                  i.fa.fa-cogs
+                  | &nbsp;基本设置
+              li
+                a.list-group-item(href='/e/settings/shop/refunds', type='button')
+                  i.fa.fa-cogs
+                  | &nbsp;退款申请处理
+              li
+                a.list-group-item(href='/e/settings/shop/refunds/settings', type='button')
+                  i.fa.fa-cogs
+                  | &nbsp;退款设置
+              li
+                a.list-group-item(href='/e/settings/shop/auth', type='button')
+                  i.fa.fa-cogs
+                  | &nbsp;权限设置
+              li
+                a.list-group-item(href=`/e/settings/shop/products` type="button")
+                  i.fa.fa-cogs
+                  | &nbsp;商品管理
+          block shopSettings
+block scripts
+  block shopSettingScripts
+
+
+
+

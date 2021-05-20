@@ -1,0 +1,21 @@
+.black-list
+  include ../../publicModules/paging/paging
+  .list-container
+    .row
+      if !data.bl.length
+        .null 空空如也~
+      for b in data.bl
+        .col-xs-12.col-md-6(data-type='blacklist' data-id=b._id)
+          .list-body
+            .item-left
+              img(src=tools.getUrl('userAvatar', b.user.avatar) data-float-uid=b.user.uid)
+            .item-center
+              a.username(href=`/u/${b.user.uid}` target='_blank' data-float-uid=b.user.uid)=b.user.username
+              .description(title=`${format('YYYY/MM/DD HH:mm:ss', b.toc)}`)=`${fromNow(b.toc)}`
+                | &nbsp;&nbsp;来自&nbsp;&nbsp;
+                span!=b.fromHTML
+            .item-right
+              .icon(title="移除" onclick=`removeBlacklist('${b.user.uid}', ${b._id})`)
+                .fa.fa-trash
+  include ../../publicModules/paging/paging_input
+

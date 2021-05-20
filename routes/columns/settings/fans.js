@@ -45,5 +45,21 @@ router
     ctx.template = 'columns/settings/fans.pug';
     data.nav = 'fans';
     await next();
+  })
+  .del('/', async (ctx, next) => {
+    const {db, data, query} = ctx;
+    const {uid} = query;
+    const {column} = data;
+    const subscribe = await db.SubscribeModel.findOne({
+      type: 'column',
+      uid,
+      cancel: false,
+      columnId: column._id,
+    });
+    if(subscribe) {
+      await subscribe.cancelSubscribe();
+      await db.SubscribeModel.saveUserSubColumnsId(uid);
+    }
+    await next();
   });
 module.exports = router;

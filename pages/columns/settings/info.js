@@ -22,8 +22,8 @@ var app = new Vue({
   },
   mounted: function() {
     window.selectImage = new NKC.methods.selectImage();
-    NKC.methods.initSelectColor(function(hex) {
-      app.column.color = hex;
+    NKC.methods.initSelectColor(function(hex, id) {
+      app.column[id] = hex;
     });
   },
   methods: {
@@ -112,6 +112,8 @@ var app = new Vue({
           formData.append("perpage", column.perpage);
           formData.append("hideDefaultCategory", column.hideDefaultCategory);
           if(column.color) formData.append("color", column.color);
+          if(column.listColor) formData.append("listColor", column.listColor);
+          if(column.toolColor) formData.append("toolColor", column.toolColor);
           for(var i = 0; i < column.blocks.length; i++) {
             var block = column.blocks[i];
             if(!block.name) throw new Error("自定义内容标题不能为空");

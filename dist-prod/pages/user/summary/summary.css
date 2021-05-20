@@ -1,0 +1,15 @@
+.summary-pie {
+  min-height: 30rem;
+  position: relative;
+}
+.summary-calendar {
+  min-height: 19rem;
+  position: relative;
+}
+.summary-calendar select {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 1px solid #eee;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL3VzZXIvc3VtbWFyeS9zdW1tYXJ5Lmxlc3MiLCI8aW5wdXQgY3NzIDEzNj4iXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRSxrQkFBQTtFQUNBLG1CQUFBO0NDQ0Q7QURDRDtFQUNFLGtCQUFBO0VBQ0EsbUJBQUE7Q0NDRDtBRENEO0VBQ0UsbUJBQUE7RUFDQSxPQUFBO0VBQ0EsU0FBQTtFQUNBLHVCQUFBO0NDQ0QiLCJmaWxlIjoidG8uY3NzIn0= */

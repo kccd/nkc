@@ -1,0 +1,214 @@
+extends ../../bootstrap_base
+block title
+  if !data.type
+    title 主页
+  else
+    title=`主页 - ${data.name}`
+  +includeCSS("/user/profile/profile.css")
+block content
+  .container-fluid.max-width
+    .row
+      if state.isApp
+        if state.platform !== 'reactNative'
+          .col-xs-12.col-md-3.box-shadow-panel
+            .app-navs
+              for link in data.appLinks
+                a.app-nav(href=link.url class=link.type===data.type?"active":"" data-type="reload")=link.name
+
+      else
+        .col-xs-12.col-md-3.box-shadow-panel
+          if data.type
+            .account-nav-xs.hidden-md.hidden-lg=data.name
+          .account-nav(class=data.type?"hidden-sm hidden-xs":"")
+            .account-user-banner
+              a(href=tools.getUrl('userBanner', data.targetUser.banner, 'lg') target="_blank")
+                img(src=tools.getUrl('userBanner', data.targetUser.banner))
+            .account-user-avatar
+              a(href=tools.getUrl('userAvatar', data.targetUser.avatar, 'lg') target="_blank")
+                img(src=tools.getUrl('userAvatar', data.targetUser.avatar))
+            .account-user-name=data.targetUser.username
+            .account-user-level
+              span.user-grade(style=`color: ${data.targetUser.grade.color};`)
+                span= data.targetUser.grade.displayName
+                img.grade-icon(src=`/statics/grade_icon/v${data.targetUser.grade._id}l.png` title=data.targetUser.grade.displayName)
+            .account-user-certs=data.targetUser.info.certsName
+            .account-user-description!=markdown_safe(data.targetUser.description)
+            .account-user-kcb
+              -const targetUserScores = data.targetUserScores;
+              -const targetUserXSF = data.targetUser.xsf;
+              include ../../publicModules/userScores
+            .account-user-toc= `注册于${format(`YYYY/MM/DD HH:mm:ss`, data.targetUser.toc)}`
+            .account-user-links
+              .account-user-links
+                a(href=`/u/${data.targetUser.uid}` target='_blank').col-xs-6.account-user-link
+                  .fa.fa-user-circle-o
+                  | 访客视角
+                a(href="/message" target='_blank').col-xs-6.account-user-link
+                  .fa.fa-comments
+                  | 消息中心
+                a(href="/sticker" target='_blank').col-xs-6.account-user-link
+                  .fa.fa-smile-o
+                  | 我的表情
+                a(href=`/u/${data.targetUser.uid}/settings` target='_blank').col-xs-6.account-user-link
+                  .fa.fa-cog
+                  | 资料设置
+                if data.targetColumn
+                  a(href=`/m/${data.targetColumn._id}` target='_blank').col-xs-6.account-user-link
+                    .fa.fa-columns
+                    | 我的专栏
+                else if data.targetColumnPermission
+                  a(href=`/column/apply` target='_blank').col-xs-6.account-user-link
+                    .fa.fa-columns
+                    | 开设专栏
+
+                a(href=`/u/${data.targetUser.uid}/profile/finance?t=all`).col-xs-6.account-user-link
+                  .fa.fa-file-text-o
+                  | 我的账单
+            for navLink in data.navLinks
+              .account-ul
+                if navLink.name
+                  .account-name=navLink.name
+                .account-lis
+                  for link in navLink.links
+                    a.account-li(href=link.url class=link.type===data.type?"active":"")
+                      .name=link.name
+                        span=link.count || ""
+                      .fa.fa-angle-right
+      .col-xs-12.col-md-7.box-shadow-panel
+        if !data.type
+          .account-info
+            .row
+              //-
+                .col-xs-6.col-md-3
+                  a(href=`/u/${data.targetUser.uid}/profile/thread` title="点击查看全部文章")
+                    .account-info-value=data.numberOfOtherUserOperation.read
+                    .account-info-name 被阅读量
+                .col-xs-6.col-md-3
+                  a(href=`/u/${data.targetUser.uid}/profile/thread` title="点击查看全部文章")
+                    .account-info-value=data.numberOfOtherUserOperation.voteUp
+                    .account-info-name 被点赞量
+                .col-xs-6.col-md-3
+                  a(href=`/u/${data.targetUser.uid}/profile/thread` title="点击查看全部文章")
+                    .account-info-value=data.numberOfOtherUserOperation.post
+                    .account-info-name 被回复/评论量
+              .col-xs-6.col-md-4
+                a(href=`/u/${data.targetUser.uid}/profile/thread` title="点击查看全部文章")
+                  .account-info-value=data.targetUser.threadCount
+                  .account-info-name 文章
+              .col-xs-6.col-md-4
+                a(href=`/u/${data.targetUser.uid}/profile/post` title="点击查看回复")
+                  .account-info-value=data.targetUser.postCount
+                  .account-info-name 回复
+              .col-xs-6.col-md-4
+                a
+                  .account-info-value=data.targetUser.xsf
+                  .account-info-name 学术分
+
+          .account-summary
+            .summary-calendar(data-uid=data.targetUser.uid)
+          .account-summary
+            .summary-pie(data-uid=data.targetUser.uid)
+          .account-logs
+            .account-header 最近阅读
+            .account-description
+            div
+              for vt in data.visitThreadLogs
+                .account-logs-thread
+                  +fromNow(vt.timeStamp)
+                  span 看过
+                  //-span=fromNow(vt.timeStamp) + "看过"
+                  a(href=`/t/${vt.tid}`)=vt.thread.firstPost.t
+          .account-logs
+            .account-header 看过的用户
+            .account-description
+            div
+              if !data.visitUserLogs.length
+                .null 空空如也~
+              for log in data.visitUserLogs
+                .account-logs-user
+                  .account-logs-user-avatar
+                    img(src=tools.getUrl("userAvatar", log.targetUser.avatar, "sm") data-float-uid=log.toUid)
+                  .account-logs-user-info
+                    a(href=`/u/${log.toUid}`).account-logs-user-name=log.targetUser.username
+                    .account-logs-user-time
+                      //-=fromNow(log.timeStamp)
+                      +fromNow(log.timeStamp)
+
+          .account-logs
+            .account-header 我的读者排名
+            .account-description
+            div
+              if !data.visitSelfLogs.length
+                .null 空空如也~
+              for log in data.visitSelfLogs
+                .account-logs-user
+                  .account-logs-user-avatar
+                    img(src=tools.getUrl("userAvatar", log.user.avatar, "sm") data-float-uid=log.uid)
+                  .account-logs-user-info
+                    a(href=`/u/${log.uid}`).account-logs-user-name=log.user.username
+                    .account-logs-user-time
+                      //-=fromNow(log.timeStamp)
+                      +fromNow(log.timeStamp)
+
+        else if data.type === "thread"
+          include ./thread
+        else if data.type === "post"
+          include ./post
+        else if data.type === "draft"
+          include ./draft
+        else if data.type === "finance"
+          include ./finance
+        else if data.type === "follower"
+          include ./follower
+        else if data.type === "note"
+          include ./note
+        else if data.type === "subscribe/user"
+          include ./subscribe/user
+        else if data.type === "subscribe/topic"
+          include ./subscribe/topic
+        else if data.type === "subscribe/discipline"
+          include ./subscribe/discipline
+        else if data.type === "subscribe/column"
+          include ./subscribe/column
+        else if data.type === "subscribe/thread"
+          include ./subscribe/thread
+        else if data.type === "subscribe/collection"
+          include ./subscribe/collection
+        else if data.type === "blacklist"
+          include ./blacklist
+        else if data.type === 'subscribe/forum'
+          include ./subscribe/forum
+      if !state.isApp
+        .col-xs-12.col-md-2.box-shadow-panel.hidden-sm.hidden-xs
+          .account-nav
+            .account-user-links
+              .account-user-links
+                a(href=`/shop/order`).col-xs-12.account-user-link
+                  .fa.fa-file-text-o
+                  | 我的订单
+                a(href=`/shop/manage/order`).col-xs-12.account-user-link
+                  .fa.fa-archive
+                  | 我出售的
+                a(href=`/shop/cart`).col-xs-12.account-user-link
+                  .fa.fa-shopping-cart
+                  | 购物车
+                //-a(href=`./forum`).col-xs-12.account-user-link
+                  .fa.fa-commenting-o
+                  | 我的专业
+
+
+  .hidden#subUsersId=objToStr({threads: data.threads, subThreadsId: data.subThreadsId, collectionThreadsId: data.collectionThreadsId, subUsersId: data.subUsersId, subForumsId: data.subForumsId, subColumnsId: data.subColumnsId, subscribes: data.subscribesObj})
+block scripts
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/commonModal/commonModal
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../../publicModules/moment
+  if !data.type
+    include ../../user/summary/calendar
+    include ../../user/summary/pie
+    script.
+      var SummaryCalendar = new NKC.modules.SummaryCalender($(".summary-calendar")[0]);
+      var SummaryPie = new NKC.modules.SummaryPie($(".summary-pie")[0]);
+  +includeJS("/user/profile/profile.js")
+  if data.type === "note"
+    +includeJS("/user/profile/note.js")

@@ -1,0 +1,112 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+.management-posts .management-post {
+  vertical-align: top;
+  padding-top: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+}
+.management-posts .management-post.normal {
+  background-color: #f4f4f4;
+}
+.management-posts .management-post.disabled {
+  background-color: #aaa;
+}
+.management-posts .management-post.toDraft {
+  background-color: #e29d9d;
+}
+.management-posts .management-post .post-content span[data-tag="nkcsource"][data-type="picture"] {
+  max-width: 20rem;
+}
+.management-posts .management-post .post-header {
+  font-weight: 700;
+  font-size: 0;
+  vertical-align: middle;
+}
+.management-posts .management-post .post-header > * {
+  font-size: 1.2rem;
+}
+.management-posts .management-post .post-header .post-time {
+  display: inline-block;
+  margin-right: 0.5rem;
+  color: #fff;
+  font-size: 1.2rem;
+  height: 2rem;
+  background-color: #9baec8;
+  line-height: 2rem;
+  border-radius: 3px;
+  width: 12rem;
+  text-align: center;
+}
+.management-posts .management-post .post-header .post-type {
+  display: inline-block;
+  height: 2rem;
+  line-height: 2rem;
+  margin-right: 0.5rem;
+  padding: 0 0.2rem;
+  text-align: center;
+  background-color: #e85a71;
+  border-radius: 3px;
+  color: #fff;
+  width: 3.5rem;
+}
+.management-posts .management-post .post-header > span {
+  margin-right: 0.5rem;
+}
+.management-posts .management-post .post-header .post-user {
+  color: #fff;
+  height: 2rem;
+  line-height: 2rem;
+  border-radius: 3px;
+  width: 10rem;
+  padding: 0 0.5rem;
+  overflow: hidden;
+  display: inline-block;
+  background-color: #2b90d9;
+  position: relative;
+  margin-right: 0.5rem;
+  vertical-align: top;
+  padding-left: 2rem;
+}
+.management-posts .management-post .post-header .post-user img {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 50%;
+}
+.management-posts .management-post .post-header .post-forum {
+  display: inline-block;
+}
+.management-posts .management-post .post-header .post-url {
+  display: inline-block;
+  width: 6rem;
+  border-radius: 3px;
+  margin-right: 0.5rem;
+  height: 2rem;
+  line-height: 2rem;
+  text-align: center;
+  background-color: #9baec8;
+  color: #fff;
+}
+.management-posts .management-post .post-header .post-options {
+  float: right;
+}
+.management-posts .management-post .post-header .post-options .status {
+  font-weight: 700;
+  color: #000;
+}
+.management-posts .management-post .post-body .post-title {
+  font-weight: 700;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIjxpbnB1dCBjc3MgNTM+IiwicGFnZXMvcHVibGljTW9kdWxlcy9iYXNlLmxlc3MiLCJwYWdlcy9ua2MvcG9zdC9wb3N0Lmxlc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsVUFBVTtBQUNWLFVBQVU7QUNPVjtFQUNFLG1CQUFBO0VBQ0EsT0FBQTtFQUNBLFFBQUE7RUFDQSxTQUFBO0VBQ0EsVUFBQTtFQUNBLGFBQUE7Q0RMRDtBQUNELGtCQUFrQjtBRVRsQjtFQUVJLG9CQUFBO0VBQ0Esa0JBQUE7RUFxR0Esb0JBQUE7RUFDQSxxQkFBQTtDRjFGSDtBRVhHO0VBQ0UsMEJBQUE7Q0ZhTDtBRVhHO0VBQ0UsdUJBQUE7Q0ZhTDtBRVhHO0VBQ0UsMEJBQUE7Q0ZhTDtBRXhCRDtFQWVRLGlCQUFBO0NGWVA7QUUzQkQ7RUFtQk0saUJBQUE7RUFDQSxhQUFBO0VBQ0EsdUJBQUE7Q0ZXTDtBRVZLO0VBQ0Usa0JBQUE7Q0ZZUDtBRW5DRDtFQTBCUSxzQkFBQTtFQUNBLHFCQUFBO0VBQ0EsWUFBQTtFQUNBLGtCQUFBO0VBQ0EsYUFBQTtFQUNBLDBCQUFBO0VBQ0Esa0JBQUE7RUFDQSxtQkFBQTtFQUNBLGFBQUE7RUFDQSxtQkFBQTtDRllQO0FFL0NEO0VBc0NRLHNCQUFBO0VBQ0EsYUFBQTtFQUNBLGtCQUFBO0VBQ0EscUJBQUE7RUFDQSxrQkFBQTtFQUNBLG1CQUFBO0VBQ0EsMEJBQUE7RUFDQSxtQkFBQTtFQUNBLFlBQUE7RUFDQSxjQUFBO0NGWVA7QUVWSztFQUNFLHFCQUFBO0NGWVA7QUU5REQ7RUFxRFEsWUFBQTtFQUNBLGFBQUE7RUFDQSxrQkFBQTtFQUNBLG1CQUFBO0VBQ0EsYUFBQTtFQUNBLGtCQUFBO0VBQ0EsaUJBQUE7RUFDQSxzQkFBQTtFQUNBLDBCQUFBO0VBQ0EsbUJBQUE7RUFDQSxxQkFBQTtFQUNBLG9CQUFBO0VBQ0EsbUJBQUE7Q0ZZUDtBRTdFRDtFQW1FVSxtQkFBQTtFQUNBLFNBQUE7RUFDQSxVQUFBO0VBQ0EsZUFBQTtFQUNBLGNBQUE7RUFDQSxtQkFBQTtDRmFUO0FFckZEO0VBNEVRLHNCQUFBO0NGWVA7QUV4RkQ7RUErRVEsc0JBQUE7RUFDQSxZQUFBO0VBQ0EsbUJBQUE7RUFDQSxxQkFBQTtFQUNBLGFBQUE7RUFDQSxrQkFBQTtFQUNBLG1CQUFBO0VBQ0EsMEJBQUE7RUFDQSxZQUFBO0NGWVA7QUVuR0Q7RUEwRlEsYUFBQTtDRllQO0FFdEdEO0VBNEZVLGlCQUFBO0VBQ0EsWUFBQTtDRmFUO0FFMUdEO0VBbUdRLGlCQUFBO0NGVVAiLCJmaWxlIjoidG8uY3NzIn0= */

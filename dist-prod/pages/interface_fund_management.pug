@@ -1,0 +1,25 @@
+extends bootstrap_base
+block title
+  link(rel='stylesheet', href='/fund.css')
+  title 科创基金
+block content
+  -var mainContainer1400 = true
+  .container-fluid.max-width
+    include interface_fund_nav
+    .row
+      .col-xs-12.col-md-12
+        -for (let fund of data.fundList)
+          -const {id, name, color, money} = fund;
+          .col-xs-6.col-sm-4.col-md-3.fund-list
+            a(href=`###`)
+              .fund-mask
+                .div(onclick=`openToEditFundManage("/fund/list/${id}/settings")`) 修改
+                .div(onclick=`deleteFund("${name}",${money.max || money.fixed}, "${id}")`) 删除
+              .fund-name(style=`background-color: ${color};background-image:${fund && fund.image? `url(/fundLogo/${fund.image})`: ''}`)= name
+              .fund-money!= `￥${money.max || money.fixed}&nbsp`
+        .col-xs-6.col-sm-4.col-md-3.fund-list
+          a(href=`/fund/add`)
+            .fund-add +
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_management.js')

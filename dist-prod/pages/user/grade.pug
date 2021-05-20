@@ -1,0 +1,10 @@
+if !isIncluded('userGrade')
+  style.
+    .mixin-user-grade{
+      height: 1rem;
+      width: 1rem;
+      vertical-align: middle;
+    }
+  mixin userGrade(gradeId, gradeName)
+    if gradeId > 0
+      img.mixin-user-grade(src=tools.getUrl('gradeIcon', gradeId) title=gradeName)

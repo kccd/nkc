@@ -1,0 +1,1 @@
+!function(e){"function"==typeof define&&define.amd?define(e):e()}((function(){"use strict";NKC&&NKC.methods&&(NKC.methods.deletePost=function(e){sweetQuestion("你确定要删除吗？").then((function(){return nkcAPI("/p/".concat(e,"/delete"),"GET")})).then((function(e){console.log(e)}))})}));

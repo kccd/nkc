@@ -1,0 +1,24 @@
+#violationRecord {
+  /* 默认颜色 */
+  /* 垂直居中 */
+  /* 文本超出隐藏并显示省略号 */
+}
+#violationRecord .vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+#violationRecord span {
+  margin-right: 0.5rem;
+}
+#violationRecord span.time {
+  font-style: oblique;
+  color: #555;
+}
+#violationRecord span.type {
+  color: #e85a71;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL3B1YmxpY01vZHVsZXMvdmlvbGF0aW9uUmVjb3JkL3Zpb2xhdGlvblJlY29yZC5sZXNzIiwiPGlucHV0IGNzcyAxMDg+IiwicGFnZXMvcHVibGljTW9kdWxlcy9iYXNlLmxlc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUNDRSxVQUFVO0VBQ1YsVUFBVTtFQUNWLGtCQUFrQjtDQUNuQjtBREpEO0VFU0UsbUJBQUE7RUFDQSxPQUFBO0VBQ0EsUUFBQTtFQUNBLFNBQUE7RUFDQSxVQUFBO0VBQ0EsYUFBQTtDREZEO0FEWkQ7RUFHSSxxQkFBQTtDQ1lIO0FEWEc7RUFDRSxvQkFBQTtFQUNBLFlBQUE7Q0NhTDtBRFhHO0VBQ0UsZUFBQTtDQ2FMIiwiZmlsZSI6InRvLmNzcyJ9 */

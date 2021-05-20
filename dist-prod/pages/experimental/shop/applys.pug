@@ -1,0 +1,27 @@
+extends ./index.pug
+block shopSettings
+  .col-xs-12.col-sm-10.col-md-10(style='margin-bottom: 1rem;')
+    .row
+      .col-xs-12.col-md-12
+        table.table.table-hover
+          thead
+            tr
+              th 批量操作
+              th 申请人
+              th 申请人ID
+              th 申请时间
+              th
+          tbody
+            for apply in data.applysDealing
+              tr
+                th
+                  input#check(type="checkbox", name="")
+                th= apply.username
+                th= apply.uid
+                th= fromNow(apply.submitApplyToc)
+                th
+                  button(onclick=`approveApply("${apply._id}")`) 批准
+                  button(onclick=`rejectApply("${apply._id}")`) 驳回
+
+block shopSettingScripts
+  +includeJS("/experimental/shop/applys.js")

@@ -1,0 +1,76 @@
+div
+  include ../../publicModules/paging/paging
+  .account-threads
+    if !data.posts.length
+      .null 空空如也~
+    for post in data.posts
+      //-被回复/评论的用户
+      -const parentPost = post.parentPost? post.parentPost:(post.thread? post.thread.firstPost: null);
+      -let klass = "";
+      if post.toDraft
+        -klass += "draft";
+      else if post.disabled
+        -klass += "disabled";
+      else if !post.reviewed
+        -klass += "review";
+      .account-thread(class=klass)
+        if post.toDraft
+          .account-reason 退修中，仅自己可见，修改后对所有人可见。
+        else if post.disabled
+          .account-reason 已屏蔽，仅自己可见。
+        else if !post.reviewed
+          .account-reason 审核中，仅自己可见，通过后对所有人可见。
+        .account-post-thread-user
+          .time
+            //-=`${fromNow(post.toc)}`
+            +fromNow(post.toc)
+          span=post.parentPostId? `评论`: '回复'
+          if !post.thread
+            span &nbsp;未知用户
+          else if parentPost.anonymous
+            img(src=anonymousInfo.avatar)
+            span=anonymousInfo.username
+          else
+            a(href=`/u/${parentPost.uid}` data-float-uid=parentPost.uid)
+              img(src=tools.getUrl("userAvatar", parentPost.user.avatar, "sm"))
+              span=parentPost.user.username
+          span ：
+        a(href=post.url).account-post-content=post.c
+        .account-post-thread
+          if post.parentPost
+            .account-thread-abstract=parentPost.abstractCN || parentPost.c
+          else if !post.thread
+            .account-post-thread-warning
+              .fa.fa-exclamation-circle
+              span=post.threadInfo
+          else
+            .account-thread-avatar
+              if post.thread.firstPost.cover
+                div(style=`background-image: url(${tools.getUrl("postCover", post.thread.firstPost.cover)})`)
+            .account-thread-content(style=!post.thread.firstPost.cover?"display: block":"")
+              .account-thread-title(class=post.thread.digest?"digest":"")
+                a(href=`/t/${post.thread.tid}` title=post.thread.firstPost.t)=post.thread.firstPost.t
+              .account-thread-abstract=post.thread.firstPost.abstractCN || post.thread.firstPost.c
+              .account-thread-info
+                //-.thread-time=format("YYYY/MM/DD HH:mm:ss", post.thread.toc)
+                .thread-time
+                  //-=`${fromNow(post.thread.toc)}`
+                  +fromNow(post.thread.toc)
+                a.thread-forum-link(href=`/f/${post.thread.forums[0].fid}` target="_blank")=post.thread.forums[0].displayName
+                if post.thread.firstPost.voteUp
+                  .thread-thumbup
+                    .fa.fa-thumbs-up
+                    span=post.thread.firstPost.voteUp
+                if post.thread.hits
+                  .thread-hits
+                    .fa.fa-eye
+                    span=post.thread.hits
+                if post.thread.count
+                  .thread-comment
+                    .fa.fa-comment
+                    span=post.thread.count
+                if post.thread.firstPost.anonymous
+                  span 匿名
+  if data.paging.pageCount > 1
+    .m-t-05
+      include ../../publicModules/paging/paging_input

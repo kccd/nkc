@@ -1,0 +1,31 @@
+extends ../../bootstrap_base
+block title
+  title 合并设置
+block content
+  #data.hidden=objToStr({forum: data.forum})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-2
+        include ../../module_forum_settings
+      .col-xs-12.col-md-10
+        .panel.panel-default
+          .panel-heading
+            span 合并至目标专业
+          .panel-body(v-cloak)#app
+            div.form-horizontal
+              .form-group
+                label.col-sm-2.control-label 目标专业：
+                .col-sm-10.m-t-05
+                  a(v-if='targetForum' :href='"/f/" + targetForum.fid' target="_blank") {{targetForum.displayName}}
+                  span(v-else) 无
+                  span.m-r-1
+                  button.btn.btn-default.btn-sm(@click='selectForum') 选择专业
+              .form-group
+                .col-sm-5.col-sm-offset-2
+                  button.btn.btn-default(@click='submit' v-if='!submitting') 开始合并
+                  button.btn.btn-default(v-else disabled) 合并中...
+                    .fa.fa-spinner.fa-spin
+
+block scripts
+  include ../../publicModules/moveThread/moveThread
+  +includeJS('/forum/settings/merge.js')

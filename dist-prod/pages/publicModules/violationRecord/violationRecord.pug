@@ -1,0 +1,25 @@
++includeCSS("/publicModules/violationRecord/violationRecord.css")
+
+.modal.fade#violationRecord(v-cloak tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+  .modal-dialog.modal-lg(role="document")#violationRecordApp
+    .modal-content
+      .modal-header
+        button.close(data-dismiss="modal" aria-label="Close")
+          span(aria-hidden="true") &times;
+        h4.modal-title 违规记录
+      .modal-body
+        p 拉黑数：{{blacklistCount.count}}, 被拉黑数：{{blacklistCount.tCount}}
+        //- 加载完了并且有至少一条记录
+        div(v-if="!loading && list.length")
+          p(v-for="res, index of list")
+            span.time {{format("YYYY-MM-DD HH:mm:ss", res.toc)}}
+            span.type {{res.type}}
+            span.reason {{res.reason}}
+        //- 加载完了并且没有违规记录
+        span(v-else-if="!loading && !list.length") 无违规记录
+        //- 没加载完
+        span(v-else) 加载中...
+      .modal-footer
+        button.btn.btn-primary.btn-sm(@click='close()') 确定
+include ../moment
++includeJS("/publicModules/violationRecord/violationRecord.js")

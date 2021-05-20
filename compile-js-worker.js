@@ -1,5 +1,5 @@
 const path = require("path");
-const { parentPort, MessagePort } = require("worker_threads");
+const { parentPort, MessagePort, workerData} = require("worker_threads");
 const rollup = require("rollup");
 const { nodeResolve } = require("@rollup/plugin-node-resolve");
 const commonjs = require("@rollup/plugin-commonjs");
@@ -7,8 +7,7 @@ const nodePolyfills = require("rollup-plugin-node-polyfills");
 const { terser } = require("rollup-plugin-terser");
 const { babel } = require("@rollup/plugin-babel");
 const mute = require("mute");
-
-const DIST_DIR = "dist";
+const {DIST_DIR} = workerData;
 
 const unmute = mute();
 

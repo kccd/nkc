@@ -1,0 +1,129 @@
+extends ../columnBase
+block columnTitle
+  title 投稿
+  style.
+    body{
+        background-color: #fff;
+    }
+block content
+  #data.hidden=objToStr({user: data.user, column: data.column, mainCategories: data.mainCategories, minorCategories: data.minorCategories})
+  .container-fluid.max-width#app(v-cloak)
+    .row
+      .col-xs-12.col-md-8.col-md-offset-2(v-if="succeed")
+        .m-t-5
+          .text-center
+            include ../../publicModules/icon-success
+            h3 投稿成功
+            p 等待专栏主审核，审核通过后文章可在专栏显示。
+            a(href=`/m/${data.column._id}`) 返回专栏
+
+      .col-xs-12.col-md-8.col-md-offset-2(v-else)
+        h4
+          b 投稿说明
+        p!=LineFeedConversion(data.columnSettings.contributeInfo)
+        hr
+        h4
+          b 目标专栏
+        .contribute-column.m-b-4
+          img(src=tools.getUrl('columnAvatar', data.column.avatar, 'sm'))
+          .contribute-column-info
+            a(href=`/m/${data.column._id}` target="_blank").name=data.column.name
+            .description=data.column.abbr
+        .row
+          .col-xs-12.col-md-12
+            .form
+              .form-group
+                h5
+                  b 已选择的文章
+                .m-b-3.text-center(v-if="selectedThreads.length === 0") 暂无数据
+                div(v-else)
+                  .contribute-thread(v-for="thread, index in selectedThreads")
+                    .checkbox
+                      button.m-r-05.btn.btn-danger.btn-xs(@click="remove(index)") 删除
+                      a(:href="'/t/' + thread.tid" target="_blank") {{thread.firstPost.t}}
+              .form-group
+                h5
+                  b 我的文章&nbsp;
+                    small 请勾选需要投稿的文章
+                .m-t-05
+                  button.btn.btn-default.btn-xs(@click="showThreadsToggle") 点击{{showThreads?"折叠":"展开"}}
+                    .fa.fa-caret-down
+                div(v-if="showThreads")
+                  .form-inline.m-t-1
+                    .form-group
+                      input.form-control(type="text" placeholder="文号" v-model="pid")
+                      button.btn.btn-primary(@click="search") 搜索
+                      button.btn.btn-default(@click="reset") 重置
+                  div.p-t-1
+                    .paging-button
+                      a.button.radius-left(@click="showAllThreadsInfo") 全部展开
+                      a.button.radius-right(@click="checkAll") 全选
+                    .paging-button
+                      button.btn.btn-sm.btn-success(@click="choose" v-if="chooseTid.length > 0") 添加已选
+                    .paging-button
+                      a.button.pointer(v-for="b, index in paging.buttonValue"
+                        :class="{'active':b.type==='active', 'radius-left': index===0, 'radius-right': index+1 === paging.buttonValue.length}"
+                        @click="selectPage(b.type, b.num)"
+                      ) {{b.num>=0?b.num+1:"..."}}
+                    .m-t-1.m-b-1(v-if="threads.length === 0") {{paging.pageCount > 1?"当前页暂无可投稿的文章":"无可投稿的文章"}}
+                    .contribute-thread(v-for="thread in threads" v-else)
+                      .checkbox
+                        label
+                          input(type="checkbox" :value="thread.tid" v-model="chooseTid")
+                        span.column-thread-title(@click="thread.showInfo = !thread.showInfo") {{thread.firstPost.t}}
+                        a.column-thread-url(:href="'/t/' + thread.tid" target="_blank")
+                          .fa.fa-external-link
+                        .column-thread-info(v-if="thread.showInfo" style="display: block")
+                          .column-thread-cover(v-if="thread.firstPost.cover")
+                            img(:src="getUrl('postCover', thread.firstPost.cover)")
+                          .column-thread-content
+                            .column-thread-abstract {{thread.firstPost.c}}
+                            .column-thread-forums.m-t-05
+                              span 所在专业：
+                              a.m-r-1(v-for="f in thread.forums" :href="'/f/' + f.fid" target="_blank") {{f.displayName}}
+                    .paging-button
+                      a.button.radius-left.radius-right(@click="showAllThreadsInfo") 全部展开
+                      a.button.radius-left(@click="checkAll") 全选
+                    .paging-button
+                      button.btn.btn-sm.btn-success(@click="choose" v-if="chooseTid.length > 0") 添加已选
+                    .paging-button
+                      a.button.pointer(v-for="b, index in paging.buttonValue"
+                        :class="{'active':b.type==='active', 'radius-left': index===0, 'radius-right': index+1 === paging.buttonValue.length}"
+                        @click="selectPage(b.type, b.num)"
+                      ) {{b.num>=0?b.num+1:"..."}}
+                  .m-t-05
+                    button.btn.btn-default.btn-xs(@click="showThreadsToggle") 点击折叠
+                      .fa.fa-caret-down
+              .form-group.m-t-2
+                h5
+                  b 选择文章分类
+                .row
+                  .col-xs-12.col-md-6
+                    strong.category-type 主分类
+                    .checkbox(v-for="c in mainCategories")
+                      label
+                        span(v-for="index in c.level") &nbsp;&nbsp;&nbsp;&nbsp;
+                        input(type="checkbox" :value="c._id" v-model="mainCategoriesId")
+                        span {{c.name}}
+                  .col-xs-12.col-md-6
+                    strong.category-type 辅分类
+                    .checkbox(v-for="c in minorCategories")
+                      label
+                        span(v-for="index in c.level") &nbsp;&nbsp;&nbsp;&nbsp;
+                        input(type="checkbox" :value="c._id" v-model="minorCategoriesId")
+                        span {{c.name}}
+              .form-group
+                h5
+                  b 补充说明（选填）
+                textarea.form-control(rows=6 v-model="description")
+              .form-group
+                h5.text-danger(v-if="error") {{error}}
+                button.btn.btn-primary.btn-sm(@click="submit") 提交
+          .col-xs-12.col-md-6
+
+block scripts
+  +includeJS("/tools.js")
+  +includeJS("/columns/contribute/contribute.js")
+
+
+

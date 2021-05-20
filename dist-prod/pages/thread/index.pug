@@ -1,0 +1,557 @@
+extends ../bootstrap_base.pug
+
+block title
+  -let showEditor = true;
+  -const thread = data.thread;
+  title= `${thread.firstPost.t} - ${state.serverSettings.websiteName}`
+  meta#replytarget(value=`${data.replyTarget}`)
+
+  //- 用于回复时间戳的显示
+  -let hidePostTimeCount = 0;
+
+  -const disablePost = permissionsOr(["movePostsToRecycle", "movePostsToDraft"]) && data.isModerator;
+  -const unblockPosts = permission("unblockPosts") && data.isModerator;
+
+  if (thread.firstPost&&thread.firstPost.c)
+    -var processed=thread.firstPost.c.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
+
+    meta(name='description' content=`${processed}`)
+    meta(name='keywords' content=`${thread.firstPost.t}`)
+
+    +includeCSS("/external_pkgs/imageToBig/preview.css")
+    +includeCSS("/jquery-ui-1.10.4.custom.css")
+    +includeJS("/external_pkgs/imageToBig/preview.js")
+    include ../publicModules/plyr/plyr.css.pug
+  if !state.isApp
+    style=`body{background-color: ${(data.user?data.user.color:null) || state.serverSettings.backgroundColor}!important;`
+
+  style.
+    #wrap {
+      color: black;
+    }
+
+  //- 与post隐藏相关的设置
+  include ./hidePostContentSettings
+    +hidePostContentSettings(data.postHeight)
+
+  include ./postEditTime
+  include ../publicModules/floatForumNav
+
+block content
+  if !(state.isApp && state.platform === 'reactNative')
+    include ../publicModules/mobile_drawer/right_drawer
+  -const moveThread = data.isModerator || data.userOperationsId.includes('moveThread');
+  -const {exactPost} = data
+    .container-fluid.max-width
+      .hidden#threadId= data.thread.tid
+      .hidden#threadForumsId=objToStr({isLastPage: (data.paging.page + 1) === data.paging.pageCount, notes: data.notes, pid: data.thread.oc, tid: data.thread.tid, mainForumsId: data.thread.mainForumsId, categoriesId: data.thread.categoriesId})
+      if data.step
+        .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
+      include ../module_credit
+      include ../module_digest
+      .row
+        .col-xs-12.col-md-9#wrap.box-shadow-panel
+          .m-b-1
+            .row
+              .thread-div
+                -const showManagement = data.user && data.isModerator && permissionsOr(['moveDraft', 'moveThread', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']);
+                .col-xs-12.col-md-12.thread-nav.p-t-1.p-b-2
+                  .thread-nav-left.hidden-xs
+                    a.nav-link(href='/?t=home' title=state.serverSettings.brief) 主页
+                    for n in data.threadNav
+                      -const {fid, cid, name} = n;
+                      span.nav-delimiter >
+                      a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}` data-float-fid=fid)= name
+                  .thread-nav-right
+                    .nav-count
+                      .nav-post-id=`文号 ${data.thread.oc}`
+                    .nav-count(title=`浏览数`)
+                      .fa.fa-eye
+                      span=data.thread.hits
+                    .nav-count(title=`回复数`)
+                      .fa.fa-comment
+                      span=data.thread.count
+                    //-.nav-count
+                      //-.fa.fa-share-square-o
+                      span 分享
+                    -let collectEvent;
+                    if !data.user
+                      -collectEvent = `NKC.methods.toLogin()`;
+                    else if data.collected
+                      -collectEvent = `SubscribeTypes.collectionThread('${thread.tid}', false)`;
+                    else
+                      -collectEvent = `SubscribeTypes.collectionThread('${thread.tid}', true)`;
+                    .nav-count.pointer(
+                      onclick=collectEvent
+                    )
+                      //-.fa.fa-folder-o
+                      span=`${data.collected?'已收藏': '收藏'}${data.collectedCount?`(${data.collectedCount})`: ''}`
+                    if showManagement
+                      .nav-count
+                        .fa.fa-cog(onclick="displayManagement()")
+                if showManagement
+                  .col-xs-12.col-md-12
+                    .thread-management
+                      .title
+                        if data.user
+                          div.managementDiv(style='display: none;margin-top: 1rem;')
+                            .form-inline
+                              //- 设置置顶
+                              if data.isModerator && data.userOperationsId.includes('toppedThread') && !thread.topped
+                                button.btn.btn-default.btn-sm#threadTop(onclick=`setTopped('${data.thread.tid}')`) 专业置顶
+                              if data.isModerator && data.userOperationsId.includes('unToppedThread') && thread.topped
+                                button.btn.btn-default.btn-sm#threadTop(onclick=`cancelTopped('${data.thread.tid}')`) 取消专业置顶
+                              if data.userOperationsId.includes("homeAd")
+                                if data.homeAd
+                                  button.btn.btn-default.btn-sm(onclick=`unHomeAd('${data.thread.tid}')`) 取消首页推荐
+                                else
+                                  a.btn.btn-default.btn-sm(href=`/t/${data.thread.tid}/ad`).m-l-05 首页推荐
+                              if data.userOperationsId.includes("homeTop")
+                                if data.homeTopped
+                                  button.btn.btn-default.btn-sm(onclick=`unHomeTop('${data.thread.tid}')`) 取消首页置顶
+                                else
+                                  button.btn.btn-default.btn-sm(onclick=`homeTop('${data.thread.tid}')`) 首页置顶
+                                if data.latestTopped
+                                  button.btn.btn-default.btn-sm(onclick=`unLatestTop('${data.thread.tid}')`) 取消最新页置顶
+                                else
+                                  button.btn.btn-default.btn-sm(onclick=`latestTop('${data.thread.tid}')`) 最新页置顶
+
+                              if data.userOperationsId.includes("pushGoodsToHome") && data.product
+                                if data.goodsHomeTopped
+                                  button.btn.btn-default.btn-sm(onclick=`pushGoodsToHome('${data.product.productId}', 'unPush')`) 取消热销
+                                else
+                                  button.btn.btn-default.btn-sm(onclick=`pushGoodsToHome('${data.product.productId}', 'push')`) 设为热销
+
+                              if data.userOperationsId.includes('closeThread') && !thread.closed
+                                button.btn.btn-default.btn-sm(onclick=`closeThread('${data.thread.tid}')`) 关闭主题
+                              if data.userOperationsId.includes('openThread') && thread.closed
+                                button.btn.btn-default.btn-sm(onclick=`openThread('${data.thread.tid}')`) 开放主题
+                              if permission("moveThreads")
+                                button.btn-sm.btn.btn-default(onclick="moveThread()") 移动
+                              if permissionsOr(["movePostsToDraft", "movePostsToRecycle"])
+                                button.btn-sm.btn.btn-danger(onclick="deleteThread()") 退修/删除
+                            if data.thread.type === "fund"
+                              h5.text-danger 基金类文章无法退修
+                .col-xs-12.col-md-12
+                  .row
+                    if !thread.reviewed
+                      -let reviewData = {reviewPid: thread.oc, reviewType: "thread", reviewReason: data.threadReviewReason}
+                      include ../publicModules/module_review
+                    .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${thread.recycleMark?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
+                      if thread.recycleMark
+                        .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
+                        p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${thread.reason}`
+                      if thread.type !== "fund"
+                        .h3.thread-title.text-center= thread.firstPost.t
+                      -const post = thread.firstPost;
+                      if post.authorInfos && post.authorInfos.length > 0 && data.thread.type !== "product"
+                        -var agencyIndex = 1;
+                        -var agencyArray = [];
+                        -var agencyAddArray = [];
+                        -for(var i=0;i<post.authorInfos.length;i++) {
+                          -if(post.authorInfos[i].agency){
+                            -if(agencyArray.indexOf(post.authorInfos[i].agency) == -1){
+                              -agencyArray.push(post.authorInfos[i].agency);
+                              -if(post.authorInfos[i].agencyCountry && post.authorInfos[i].agencyCountry.length > 0){
+                                -post.authorInfos[i].agencyAdd = post.authorInfos[i].agencyAdd.replace(/\//igm, " ");
+                                -agencyAddArray.push(post.authorInfos[i].agency+"，"+post.authorInfos[i].agencyCountry+" "+post.authorInfos[i].agencyAdd);
+                              -}else if(post.authorInfos[i].agencyAdd){
+                                -agencyAddArray.push(post.authorInfos[i].agency+"，" + post.authorInfos[i].agencyAdd);
+                              -}else{
+                                -agencyAddArray.push(post.authorInfos[i].agency);
+                              -}
+                              -post.authorInfos[i].agencyIndex = agencyIndex;
+                              -agencyIndex++;
+                            -}else{
+                              -post.authorInfos[i].agencyIndex = agencyArray.indexOf(post.authorInfos[i].agency)+1;
+                            -}
+                          -}
+                        -}
+                        .thread-info.text-center(style="color:#000;margin-top:1rem")
+                          if post.authorInfos.length > 1
+                            for auth,index in post.authorInfos
+                              span(style="margin-right:10px;font-weight: bold;")
+                                if auth.kcid.length > 0
+                                  span(style="cursor: pointer;" onclick=`turnUser(${auth.kcid})`)!=`${auth.name}`
+                                  if auth.agencyIndex && agencyAddArray.length > 1
+                                    sup!=`${auth.agencyIndex}`
+                                else
+                                  span!=`${auth.name}`
+                                  if auth.agencyIndex && agencyAddArray.length > 1
+                                    sup!=`${auth.agencyIndex}`
+                                if auth.isContract
+                                  span.fa.fa-envelope-open-o(style="color:#000" onclick="displayAuthor('"+objToStr(auth.contractObj)+"')")
+
+                          else
+                            for auth,index in post.authorInfos
+                              span(style="margin-right:10px;font-weight: bold;")
+                                if auth.kcid.length > 0
+                                  span(style="cursor: pointer;" onclick=`turnUser(${auth.kcid})`)!=`${auth.name}`
+                                else
+                                  span!=`${auth.name}`
+                                if auth.isContract
+                                  span.fa.fa-envelope-open-o(style="color:#000" onclick="displayAuthor('"+objToStr(auth.contractObj)+"')")
+
+                        .thread-info.text-center(style="color:#000;margin-top:1rem")
+                          if post.authorInfos.length > 1
+                            for agad,index in agencyAddArray
+                              span(style="margin-right:10px")!=`${index+1}.${agad}`
+                          else
+                            for agad,index in agencyAddArray
+                              span(style="margin-right:10px")!=`${agad}`
+                      if thread.type !== "fund"
+                        .thread-info.text-center(style="margin-top:1.5rem")
+                          if !thread.firstPost.anonymous
+                            a(href=`/u/${thread.uid}` data-float-uid=thread.uid target="_blank")
+                              img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+                              span= ` ${thread.firstPost.user.username}`
+                          else
+                            img(src=anonymousInfo.avatar style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+                            span.anonymous-name= ` ${anonymousInfo.username}`
+                          span(style='color: #555555;margin-right:5px')= ` ${thread.toc.toLocaleDateString()}`
+                          if thread.firstPost.originState && thread.firstPost.originState !== "0"
+                            -var levelText = getOriginLevel(thread.firstPost.originState);
+                            if thread.firstPost.originState == "3" || thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
+                              span(style="color:#9baec8;margin-right:3px") 原创
+                            span(class="dropdown")
+                              a(id="dropdown-level" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle")
+                                span.fa.fa-caret-square-o-down(style="color:#b5b4b4")
+                              .dropdown-menu(aria-labelledby='dropdown-level')
+                                span(style="padding:5px")!=`${levelText}`
+                          if data.columnPost
+                            a(href=`/m/${data.targetColumn._id}`)= data.targetColumn.name
+                          else
+                            for forum, index in thread.forums
+                              if index > 0
+                                //-span ,&nbsp;
+                                span(style='color: #333;') ，
+                              a(href=`/f/${forum.fid}` data-float-fid=forum.fid)=forum.displayName
+                        if (post.abstractCn.length !== 0 || post.abstractEn.length !== 0) && data.thread.type !== "product"
+                          .abstract(style="margin-top:1rem; word-break: break-all;")
+                            if post.abstractCn.length !== 0
+                              .panel.panel-default(style="border:0;margin-bottom:0")
+                                .panel-heading.paperHeader 中文摘要
+                                .panel-body!=LineFeedConversion(post.abstractCn)
+                            if post.abstractEn.length !== 0
+                              .panel.panel-default(style="border:0;margin-bottom:0")
+                                .panel-heading.paperHeader Abstract
+                                .panel-body!=LineFeedConversion(post.abstractEn)
+                        if (post.keyWordsCn.length !== 0 || post.keyWordsEn.length !== 0) && data.thread.type !== "product"
+                          .keyWords(style="margin-top:1rem;")
+                            .panel.panel-default(style="border:0;margin-bottom:0")
+                              .panel-heading.paperHeader 关键词
+                              .panel-body(style="padding:5px")
+                                if post.keyWordsCn.length !== 0
+                                  div
+                                    for keyCn in post.keyWordsCn
+                                      span.keyWordstagCn(style="cursor:pointer" onclick=`turnSearch("${keyCn}")`)!=keyCn
+                                if post.keyWordsEn.length !== 0
+                                  div(style="margin-top:5px")
+                                    for keyEn in post.keyWordsEn
+                                      span.keyWordstagEn(style="cursor:pointer" onclick=`turnSearch("${keyEn}")`)!=keyEn
+                      if data.paging.page === 0
+                        if data.thread.type === "article"
+                          //- div.thread-content.ThreadPostBody#thread-content!= experimental_render(post)
+                          div.thread-content.ThreadPostBody#thread-content!= post.c
+                        else if data.thread.type === "product"
+                          div.thread-content.ThreadPostBody
+                            include ./product/product.pug
+                        else if data.thread.type === "fund"
+                          include ../fund/initData
+                          div.thread-content.ThreadPostBody#thread-content
+                            include ./fund/fund.pug
+                        +postEditTime(post.toc, post.tlm)
+                        -const creditPost = data.thread.firstPost;
+                        include ./postCredits
+                      else
+                        div.thread-content(style='max-height: 10rem;')
+                          .hiddenThreadContent
+                          div.ThreadPostBody#thread-content!= post.c
+                          +postEditTime(post.toc, post.tlm)
+                          -const creditPost = data.thread.firstPost;
+                          include ./postCredits
+                        .text-center
+                          .showThreadContentBtn(onclick='showThreadContent()' hide-text='收起') 加载全文
+                      if post.disabled && disablePost
+                        a(onclick=`enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
+                      .m-t-05
+                        //- 文章所属专业
+                        span 来自：
+                        for forums, index in data.forumsNav
+                          if index !== 0
+                            span ，
+                          for f,index in forums
+                            if index !== 0
+                              span &nbsp;/&nbsp;
+                            a(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+                        .pull-right.text-right
+                          if thread.firstPost.digest
+                            .inline-block
+                              span.fa.fa-star(style='color: #ffbf16;' title='精选')
+                              span &nbsp;
+                          .inline-block(style="vertical-align: text-top;")
+                            include ../module_vote
+                            +voteButtons(thread.firstPost, !!data.user)
+                          //- 展开附件
+                          if data.attachmentsCount > 0
+                            .pointer.inline-block(style="color: #aaa;margin-right: 2px;" onclick="showAttachments()")
+                              .fa.fa-file-o
+                              span &nbsp;查看附件
+                          if !thread.firstPost.anonymous && permission('creditKcb') && data.user && thread.firstPost.uid !== data.user.uid
+                            .single-post-bottom-item
+                              .fa.fa-cny.credit-kcb(title='鼓励' style='cursor:pointer;' onclick=`credit("${thread.firstPost.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励&nbsp;
+                          .single-post-bottom-item(data-type='share' data-share-type='post' data-share-id=thread.firstPost.pid title='分享')
+                            .fa.fa-share-square-o.share-icon &nbsp;分享
+                          .single-post-bottom-item(data-type='postOption' data-pid=thread.firstPost.pid title='其他操作' data-direction='down')
+                            .fa.fa-sliders.option-icon
+                      if data.attachmentsCount > 0
+                        .thread-attachment.m-t-1
+                          include ../publicModules/attachments/attachments
+          //- 问卷调查组件
+          if data.thread.firstPost.surveyId
+            .m-b-1
+              -const surveyFormId = `surveyForm${data.thread.firstPost.pid}`;
+              -const surveyId = data.thread.firstPost.surveyId;
+              include ../publicModules/survey/form
+          //- 被置顶的POST
+          if data.toppedPosts && data.toppedPosts.length
+            div
+              .topped-post
+                .fa.fa-thumb-tack &nbsp;
+                | 置顶回复
+            .m-b-1.p-a-0
+              include ./singlePost/singleToppedPost
+              for post in data.toopedPosts
+                +singleToppedPost(post)
+          //- 批量管理POST
+          mixin managePosts
+            .paging-button
+              a.button.radius-left(onclick="managePosts()") 管理
+              a.button(onclick="markAllPosts()") 全选
+              a.button.radius-right(onclick="disabledMarkedPosts()") 屏蔽或退修
+          //- 发表人筛选
+          mixin articleNav
+            .paging-button
+              a.button.radius-left(href=`/t/${thread.tid}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
+              a.button.radius-right(href=`/t/${thread.tid}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
+          //- 回复列表头部分页、管理按钮
+          .p-l-2.p-r-2.m-b--05
+            include ../publicModules/paging/paging
+            +articleNav
+            if disablePost
+              //- 回复的批量管理
+              +managePosts
+          //- 回复列表内容
+          div.p-a-0.single-posts-container
+            include ./singlePost/singlePost
+            for post in data.posts
+              //- post数据格式详见/pages/thread/singlePost/singlePost.pug
+              -post.highlight = data.highlight;
+              +singlePost(post)
+          //- 回复列表尾部分页、管理按钮
+          .p-l-2.p-r-2.m-b--05
+            include ../publicModules/paging/paging_input
+            //-+articleNav
+            if disablePost
+              //- 回复的批量管理
+              +managePosts
+          //- 编辑器相关
+          div
+            if data.user
+              //- 回复的输入面板
+              mixin inputPanel
+                .m-b-1#quoteContent(v-cloak v-if="pid")
+                  blockquote.quote-post
+                    .quote-cancel(@click="clear")
+                      .fa.fa-remove
+                    .quote-position
+                      | 引用
+                      a(:href="'/u/' + uid" target="_blank" v-if="uid") {{username}}
+                      span(v-else) {{username}}
+                      | 发表于
+                      a(:href="getUrl('post', pid, true)" target="_blank") {{step}}
+                      | 楼的内容
+                    .quote-content {{c}}
+                //- 编辑器的编辑框
+                .m-b-1(style="background-color:#fff;")
+                  script#container(name='content', type='text/plain')
+                div
+                  //- 发表并添加到专栏
+                  label(style="font-size:16px") 专栏
+                  //- 快速创建专栏文章分类
+                  include ../editor/toColumn
+                  //- 发表匿名回复
+                  if data.sendAnonymousPost
+                    .checkbox
+                      label
+                        if data.user && data.thread && data.thread.firstPost && data.thread.firstPost.ownPost && data.thread.firstPost.anonymous
+                          input#sendAnonymousPost(type='checkbox' checked=true)
+                        else
+                          input#sendAnonymousPost(type='checkbox')
+                        span 匿名发表
+                  div
+                    .checkbox
+                      label
+                        input#protocolCheckbox(type="checkbox" checked=true)
+                        span
+                          | 我已阅读并同意遵守与本次发表相关的全部协议。
+                          a(href=`/protocol` target="_blank") 查看协议
+                  .form-group
+                    button#ButtonReply.btn.btn-primary(onclick=`submit(${thread.tid})`) 回复
+                    button#draft.btn.btn-primary(onclick=`saveDraft(${thread.tid},${data.user.uid})`) 保存草稿
+                    button#GoEditor.btn.btn-default(onclick='goEditor()') 去编辑器
+              //- 主题已关闭
+              if thread.closed
+                .col-xs-12.col-md-12(style='margin: 2rem 0;')
+                  .h4.text-center(style='color: #aaaaaa;')
+                    span.fa.fa-times &nbsp;主题已关闭，暂不能发表回复/评论
+              else
+                //- 发表权限判断
+                //- warning中的内容为html，由服务器根据发表设置动态渲染
+                if data.postPermission.warning
+                  .m-b-1.text-danger!=data.postPermission.warning
+                //- 是否显示编辑器
+                if data.postPermission.permit
+                  -const blacklistInfo = data.blacklistInfo;
+                  include ../publicModules/blacklistInfo
+                  +inputPanel
+            else
+              //- 游客
+              p 想参与大家的讨论？现在就&nbsp;
+                a.pointer(onclick="NKC.methods.toLogin('login')") 登录
+                | &nbsp;或者&nbsp;
+                a.pointer(onclick="NKC.methods.toLogin('register')") 注册
+                | 。
+          -var floatCategories = [];
+          for f in data.threadNav
+            -var {fid, name, cid} = f;
+            if cid
+              -floatCategories.push({fid, cid, displayName: name});
+          -var floatParentForums = [], floatParentForumsId = [];
+          for f in data.forumsNav
+            if f[0] && !floatParentForumsId.includes(f[0].fid)
+              -floatParentForums.push({fid: f[0].fid, displayName: f[0].displayName});
+              -floatParentForumsId.push(f[0].fid);
+          +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
+
+        .col-xs-12.col-md-3.box-shadow-panel#rightDom
+          if data.thread.type === "fund"
+            include ../fund/initData
+            include ../fund/options
+          if data.targetUser
+            .m-b-1
+              //- .panel-header 作者
+              -const author = data.targetUser;
+              include ./authorInfo
+            if data.targetUserThreads && data.targetUserThreads.length
+              -let sideThreads = data.targetUserThreads
+              -let sideThreadsHeader= "作者最新文章"
+              -let sideThreadsHideInfo = false;
+              include ../publicModules/side_thread_list
+          if data.sameThreads && data.sameThreads.length
+            -let sideThreads = data.sameThreads
+            -let sideThreadsHeader = "相似文章推荐"
+            -let sideThreadsHideInfo = false;
+            include ../publicModules/side_thread_list
+          .hidden-sm.hidden-xs
+            include ../publicModules/footer/footer_sm
+
+          include ../module_scrollTo
+
+    //- 作者信息
+    .modal.fade#moduleAuthor(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+      .modal-dialog.modal-sm(role="document" v-cloak v-if="contract")#moduleAuthorApp
+        .modal-content
+          .modal-header
+            button.close(data-dismiss="modal" aria-label="Close")
+              span(aria-hidden="true") &times;
+            h4.modal-title 通信作者
+          .modal-body
+            .form
+              .form-group(v-if="contract.contractEmail")
+                h5 通信邮箱：
+                strong {{contract.contractEmail}}
+              .form-group(v-if="contract.contractTel")
+                h5 电话号码：
+                strong {{contract.contractTel}}
+              .form-group(v-if="contract.contractAdd")
+                h5 通信地址：
+                strong {{contract.contractAdd}}
+              .form-group(v-if="contract.contractCode")
+                h5 邮政编码：
+                strong {{contract.contractCode}}
+
+    include ../debug_output.pug
+    include ../publicModules/post_warning
+    if state.userColumn
+      -const column = state.userColumn
+      include ../publicModules/toColumn/toColumn
+
+block scripts
+  include ../publicModules/plyr/plyr.js.pug
+  script(src='/commonmark/dist/commonmark.js')
+  script(src='/plainEscaper.js')
+  script(src='/xbbcode-parser/xbbcode.js')
+  script(src='/xss/dist/xss.js')
+
+  +includeJS("/interface_editor_reply.js")
+  +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
+  +includeJS('/shop/shop.js')
+  +includeJS("/publicModules/survey/form.js")
+  include ../publicModules/subscribeTypes/subscribeTypes
+  include ../publicModules/sticker/sticker
+  include ../publicModules/selectResource/selectResource
+  include ../publicModules/sticker/selectSticker
+  include ../publicModules/selectDraft/selectDraft
+  include ../publicModules/floatForumPanel/floatForumPanel
+  include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../publicModules/insertHideContent/insertHideContent
+  //-include ../publicModules/highlight/highlight_editor
+  include ../publicModules/highlight/highlight
+  include ../publicModules/complaint/complaint
+  include ../publicModules/crop/crop
+  include ../publicModules/moment
+  include ../publicModules/hidePost/hidePost
+  include ../publicModules/lazySizes
+  include ../publicModules/moveThread/moveThread
+  include ../publicModules/disabledPost/disabledPost
+  include ../ueditor/dialogs/mathformulaV2/mathformula
+  include ../publicModules/bulletComments/bulletComments
+  include ../publicModules/share/sharePanel
+  include ../publicModules/commentControl/commentControl
+  include ../post/options/options
+  //- 通用socket
+  if data.user
+    include ../publicModules/socket/socket
+  //- 下载资料询问框
+  //if state.downloadNeedScore
+  include ../publicModules/downloadResource/downloadResource
+  //- 违规记录模块 NKC.modules.violationRecord
+  if permission("violationRecord")
+    include ../publicModules/violationRecord/violationRecord.pug
+  include ../MathJax.pug
+  if permission("viewNote")
+    include ../publicModules/NKCHighlighter/NKCHighlighter
+  //- include ../publicModules/postNotes/postNotes
+  if data.attachmentsCount > 0
+    include ../publicModules/resourceInfo/resourceInfo
+    include ../publicModules/attachments/attachments_js
+    script=`NKC.configs.pid = '${data.thread.oc}';`
+    -let fid;
+    for f in data.thread.forums
+      if f.lid
+        -fid = f.fid;
+    if fid
+      script=`NKC.configs.fid = '${fid}';`
+  if data.user
+    include ../ueditor/ueditorBase
+  if data.user && showEditor
+    +includeJS("/thread/initPostInput.js")
+  if state.userColumn && !data.addedToColumn && showEditor
+    +includeJS("/publicModules/toColumn/selectCategories.js")
+  +includeJS("/thread/comments.js")
+  if permission("getPostAuthor")
+    include ../publicModules/floatUserPanel/userInfo
+  include ../publicModules/imageViewer
+  +includeJS("/thread/index.js")
+  +includeJS("/thread/deletePost.js")

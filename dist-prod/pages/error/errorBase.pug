@@ -1,0 +1,47 @@
+extends ../scratch.pug
+block head
+  meta(charset='UTF-8')
+  meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
+  meta(name="viewport" content="width=device-width, initial-scale=1")
+  meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
+  +includeCSS('/font-awesome/css/font-awesome.css')
+  +includeCSS('/bootstrap/css/bootstrap.css')
+  link(rel='shortcut icon' href='/favicon.ico')
+  +includeCSS("/publicModules/public.css")
+  +includeCSS("/nkc_styles.css")
+  +includeCSS("/error/error.css")
+  block errorTitle
+    title= `${data.status}${data.error ? ':' + data.error : ''}`
+
+block body
+  .container-fluid.max-width
+    .error-content
+      if !data.user && data.status === 403
+        .error-icon=`403 Forbidden`
+        .error-list.b-s-10
+          .error-header 根据有关政策，内容不予显示。
+          h4.text-center
+            button.btn.btn-default.btn-sm(onclick="NKC.methods.toLogin('login')") 登录
+            | &nbsp;或
+            button.btn.btn-default.btn-sm(onclick="NKC.methods.toLogin('register')") 注册
+          .error-code
+            span message：
+            code= data.error
+      else
+        block errorContent
+      .error-button
+        if !state.isApp
+          a(href="/") 网站首页
+          | &nbsp;&nbsp;&nbsp;
+          a(onclick="history.back(-1)") 返回上一页
+  +includeJS('/Promise/promise.min.js')
+  +includeJS('/jquery/jquery-1.11.1.js')
+  +includeJS('/bootstrap/js/bootstrap.min.js')
+  +includeJS('/vue/dist/vue.js')
+  +includeJS("/publicModules/common.js")
+  if state.isApp && state.platform === 'apiCloud'
+    script!=`NKC.configs.isApp = true;NKC.configs.appOS="${state.appOS}";`
+    +includeJS("/appAPi/app.js")
+  +includeJS("/interface_common.js")
+  if !data.user && data.status === 403
+    include ../publicModules/login/login

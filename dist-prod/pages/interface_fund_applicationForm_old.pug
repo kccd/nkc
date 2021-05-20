@@ -1,0 +1,184 @@
+extends bootstrap_base
+block title
+  -const fund = data.fund;
+  -const photos = data.photos;
+  title= `${fund.name}申请表`
+  link(rel='stylesheet' href='/fund.css')
+block content
+  -const mainContainer1400 = true
+  -const preconditions = fund.preconditions;
+  -const authentication = preconditions.authentication;
+  -const {idCard, lifePhoto, idCardPhoto, handheldIdCardPhoto} = authentication;
+  .container-fluid.max-width
+    .row
+      h2.text-center=`${fund.name}申请表`
+      br
+      .col-xs-12.col-md-12
+        ul.nav.nav-tabs
+          li(role="presentation" class=data.team?'': 'active')
+            a(href=`/fund/${fund._id.toLowerCase()}/application`) 个人申请
+          li(role="presentation" class=data.team ? 'active' : '')
+            a(href=`/fund/${fund._id.toLowerCase()}/application?team=true`) 团体申请
+        if(idCard || lifePhoto || idCardPhoto || handheldIdCardPhoto)
+          br
+          h4 个人信息
+          hr
+          if authentication.idCard
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 真实姓名
+              .col-xs-12.col-md-2
+                input.form-control(type="text" placeholder='请输入真实姓名')
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 身份证号码
+              .col-xs-12.col-md-3
+                input.form-control(type="text" placeholder='请输入身份证号码')
+          if(idCardPhoto)
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 身份证照片
+              .col-xs-12.col-md-10(style='padding: 0')
+                .col-xs-12.col-md-4
+                  input#uploadIdCardA(type='file' accept='.jpg, .png, .jpeg' multiple='multiple' style='display: none')
+                  input#uploadIdCardB(type='file' accept='.jpg, .png, .jpeg' multiple='multiple' style='display: none')
+                  input#uploadIdCardHandheld(type='file' accept='.jpg, .png, .jpeg' multiple='multiple' style='display: none')
+                  if photos.idCardA
+                    h5.text-center 身份证正面&nbsp;&nbsp;
+                      span.glyphicon.glyphicon-ok-circle
+                    .idCardPhoto#idCardPhotoA
+                      img(src=`/photo_small/${photos.idCardA}`)
+                  else
+                    h5.text-center 身份证正面&nbsp;&nbsp;
+                      span
+                    .idCardPhoto#idCardPhotoA
+                      img(src='/default/idCard_setting.jpg')
+                .col-xs-12.col-md-4
+                  if photos.idCardB
+                    h5.text-center 身份证反面&nbsp;&nbsp;
+                      span.glyphicon.glyphicon-ok-circle
+                    .idCardPhoto#idCardPhotoB
+                      img(src=`/photo_small/${photos.idCardB}`)
+                  else
+                    h5.text-center 身份证反面&nbsp;&nbsp;
+                      span
+                    .idCardPhoto#idCardPhotoB
+                      img(src='/default/idCard_setting.jpg')
+          if(handheldIdCardPhoto)
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 手持身份证照片
+              .col-xs-12.col-md-10(style='padding: 0')
+                .col-xs-12.col-md-4
+                  input#uploadIdCardHandheld( style='display: none' type='file' accept='.jpg, .png, .jpeg' multiple='multiple')
+                  if photos.handheldIdCard
+                    h5.text-center 手持身份证照片&nbsp;&nbsp;
+                      span.glyphicon.glyphicon-ok-circle
+                    .idCardPhoto#idCardPhotoHandheld
+                      img(src=`/photo_small/${photos.handheldIdCard}`)
+                  else
+                    h5.text-center 手持身份证照片&nbsp;&nbsp;
+                      span
+                    .idCardPhoto#idCardPhotoHandheld
+                      img(src='/default/idCard_setting.jpg')
+          if(lifePhoto)
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 生活照
+              .col-xs-12.col-md-10(style='padding: 0')
+                input#uploadLife(style='display: none;' type='file' accept='.jpg, .png, .jpeg' multiple='multiple')
+                .col-xs-12.col-md-4
+                  if 0
+                    h5.text-center 生活照&nbsp;&nbsp;
+                      span.glyphicon.glyphicon-ok-circle
+                    .idCardPhoto#idCardPhotoB
+                      img(src='/r/278312')
+                  else
+                    h5.text-center 生活照&nbsp;&nbsp;
+                      span
+                    .idCardPhoto#lifePhoto
+                      img(src='/default/idCard_setting.jpg')
+                .col-xs-12.col-md-8
+                  button.btn.btn-default.center-block 从已上传照片中选择
+
+          hr
+        if data.team
+          h4 成员身份信息
+          hr
+          .fund-setting-list
+            .col-xs-12.col-md-2
+              h5 添加成员
+            .col-xs-12.col-md-2
+              input.form-control(type="text" placeholder='请输入真实姓名')
+          .fund-setting-list
+            .col-xs-12.col-md-2
+              h5 身份证号码
+            .col-xs-12.col-md-3
+              input.form-control(type="text" placeholder='请输入身份证号码')
+          hr
+        h4 项目信息
+        hr
+        .fund-setting-list
+          .col-xs-12.col-md-2
+            h5 课题名称
+          .col-xs-12.col-md-8
+            input.form-control#projecTitle(type="text" placeholder='请输入项目名称')
+        .fund-setting-list
+          .col-xs-12.col-md-2
+            h5 研究目标
+          .col-xs-12.col-md-8
+            textarea.form-control#projectAim(type="text" placeholder='请输入研究目标' rows=4)
+        .fund-setting-list
+          .col-xs-12.col-md-2
+            h5 研究内容
+          .col-xs-12.col-md-8
+            textarea.form-control#projectContent(type="text" placeholder='请输入研究内容' rows=10)
+        -const threadCount = fund.preconditions.attachments.threadCount;
+        if threadCount > 0
+          .fund-setting-list
+            .col-xs-12.col-md-2
+              h5=`附带文章（至少${threadCount}篇）`
+            .col-xs-12.col-md-10
+              .col-xs-12.col-md-6(style='padding: 0')
+                .col-xs-12.col-md-6(style='padding: 0')
+                  .input-group
+                    input#pid.form-control(type='text' placeholder='输入文号进行搜索')
+                    span.input-group-btn
+                      button#submitOfSearch.btn.btn-default(type='button') 搜索
+                .col-xs-12.col-md-2
+                  button(onclick='loadThreads()').btn.btn-default 所有文章
+                .col-xs-12.col-md-4
+                  button(onclick='clearThreads()').btn.btn-default 清空
+                .col-xs-12.col-md-12#threadList
+                .col-xs-12.col-md-12.thread-list-page
+                  ul(style='overflow: hidden; padding-left: 0')#threadListPage
+              .col-xs-12.col-md-6(style='padding: 0')
+                h5 已选择文章
+                  span#choseThread &nbsp;0 篇
+                #threadListChose
+        -const paperCount = fund.preconditions.attachments.paper.count;
+        //if paperCount > 0
+        //  .fund-setting-list
+        //    .col-xs-12.col-md-2
+        //      h5=`附带论文（至少${threadCount}篇）`
+        //    .col-xs-12.col-md-10
+        //      .col-xs-12.col-md-6(style='padding: 0')
+        //        .col-xs-12.col-md-6(style='padding: 0')
+        //          .input-group
+        //            input#paperId.form-control(type='text' placeholder='输入文号进行搜索')
+        //            span.input-group-btn
+        //              button#submitOfSearchPaper.btn.btn-default(type='button') 搜索
+        //        .col-xs-12.col-md-2
+        //          button(onclick='loadPapers()').btn.btn-default 所有文章
+        //        .col-xs-12.col-md-4
+        //          button(onclick='clearPapers()').btn.btn-default 清空
+        //        .col-xs-12.col-md-12#parperList
+        //        .col-xs-12.col-md-12.thread-list-page
+        //          ul(style='overflow: hidden; padding-left: 0')#paperListPage
+        //      .col-xs-12.col-md-6(style='padding: 0')
+        //        h5 已选择论文
+        //          span#chosePaper &nbsp;0 篇
+        //        #paperListChose
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_applicationForm_old.js')

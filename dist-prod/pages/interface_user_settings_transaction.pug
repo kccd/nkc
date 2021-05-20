@@ -1,0 +1,130 @@
+extends bootstrap_base
+block title
+  title 交易信息设置
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-2
+        include module_user_settings
+      .col-xs-12.col-md-10
+        #app(v-cloak)
+          .panel.panel-default
+            .panel-heading
+              span 收货地址
+            .panel-body
+              .form-horizontal(style='margin: 2rem 0;' v-for="a, index in addresses")
+                .form-group
+                  label.col-sm-2.control-label
+                  .col-sm-10
+                    h4 收货地址&nbsp;
+                      span.addressNumber {{index+1}}
+                .form-group
+                  label.col-sm-2.control-label 收货地址：
+                  .col-sm-6
+                    input.form-control.m-b-05(name='', type='text', placeholder='请选择地区', autocomplete='off', readonly='true', v-model="a.location" @click="selectAddress(a)")
+                    input.form-control(type='text' placeholder="请填写详细地址" v-model="a.address")
+                .form-group
+                  label.col-sm-2.control-label 联系电话：
+                  .col-sm-6
+                    input.form-control.mobile(type='text' v-model="a.mobile")
+                .form-group
+                  label.col-sm-2.control-label 收件人：
+                  .col-sm-6
+                    input.form-control.username(type='text' v-model="a.username")
+                .form-group
+                  label.col-sm-2.control-label
+                  .col-sm-6
+                    button.btn.btn-primary.btn-sm(@click=`save`) 保存
+                    button.btn.btn-danger.btn-sm(@click="remove(index)") 删除
+              button.btn.btn-primary.btn-sm(@click='addAddress') 添加
+
+          .panel.panel-default
+            .panel-heading
+              span 支付宝账号
+            .panel-body
+              h5.text-danger 最多可添加5个支付宝账号
+              //- 已绑定的支付宝账号信息
+              .bound.m-t-3
+                //-h4 编辑绑定
+                .table-responsive
+                  table.table
+                    thead
+                      tr
+                        th
+                        th 支付宝账号
+                        th 真实姓名
+                        //-th 绑定日期
+                        th 其他
+                    tbody
+                      tr(v-for="alipay in alipayAccounts")
+                        th.h5
+                          strong.text-success(v-if="alipay.default") 默认
+                        th
+                          input.form-control(v-if="account === alipay" type="text" v-model="alipay.account")
+                          span(v-else) {{alipay.account}}
+                        th
+                          input.form-control(v-if="account === alipay" type="text" v-model="alipay.name")
+                          span(v-else) {{alipay.name}}
+                        th
+                          span(v-if="account === alipay" )
+                            button.btn-xs.btn.btn-success(@click="saveAccounts") 保存
+                            button.btn-xs.btn.btn-default(@click="cancelAccounts(alipay)") 取消
+                          span(v-else)
+                            button.btn-xs.btn.btn-primary(@click="modifyAccount(alipay)") 修改
+                            button.btn-xs.btn.btn-danger(@click="deleteAccount(alipay)") 删除
+                            button.btn.btn-xs.btn-default(v-if="!alipay.default" @click="setDefault(alipay)") 设为默认
+                .m-t-1
+                  button.btn.btn-primary.btn-sm(@click="addAccount") 添加
+          .panel.panel-default
+            .panel-heading
+              span 银行卡
+            .panel-body
+              h5.text-danger 最多可添加5张银行卡
+              //- 已添加的支付宝账号信息
+              .bound.m-t-3
+                .table-responsive
+                  //-h4 编辑添加
+                  table.table
+                    thead
+                      tr
+                        th
+                        th 银行名称
+                        th 银行卡账号
+                        th 开户姓名
+                        th 开户手机号
+                        th 其他
+                    tbody
+                      tr(v-for="bank in bankAccounts")
+                        th.h5
+                          strong.text-success(v-if="bank.default") 默认
+                        th
+                          input.form-control(v-if="accountBank === bank" type="text" v-model="bank.bankName")
+                          span(v-else) {{bank.bankName}}
+                        th
+                          input.form-control(v-if="accountBank === bank" type="text" v-model="bank.account")
+                          span(v-else) {{bank.account}}
+                        th
+                          input.form-control(v-if="accountBank === bank" type="text" v-model="bank.name")
+                          span(v-else) {{bank.name}}
+                        th
+                          input.form-control(v-if="accountBank === bank" type="text" v-model="bank.mobile")
+                          span(v-else) {{bank.mobile}}
+                        //-th
+                          span(v-if="alipay.time") {{format("YYYY-MM-DD HH:mm:ss", alipay.time)}}
+                        th
+                          span(v-if="accountBank === bank" )
+                            button.btn-xs.btn.btn-success(@click="saveBankAccounts") 保存
+                            button.btn-xs.btn.btn-default(@click="cancelBankAccounts(bank)") 取消
+                          span(v-else)
+                            button.btn-xs.btn.btn-primary(@click="modifyBankAccount(bank)") 修改
+                            button.btn-xs.btn.btn-danger(@click="deleteBankAccount(bank)") 删除
+                            button.btn.btn-xs.btn-default(v-if="!bank.default" @click="setDefaultBank(bank)") 设为默认
+                .m-t-1
+                  button.btn.btn-primary.btn-sm(@click="addAccountBank") 添加
+  #data.hidden= JSON.stringify({bankAccounts: data.bankAccounts, addresses: data.addresses, user: data.targetUser, alipayAccounts: data.alipayAccounts})
+
+block scripts
+  include ./publicModules/moment
+  include ./publicModules/selectAddress/selectAddress
+  script(src='/bootstrap/js/bootstrap-chinese-region.min.js' charset="UTF-8")
+  +includeJS(`/interface_user_settings_transaction.js`)

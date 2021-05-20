@@ -1,0 +1,1 @@
+!function(n){"function"==typeof define&&define.amd?define(n):n()}((function(){"use strict";window.disabledHistories=function(n,i){var e={},o="屏蔽成功";!0===i?e.operation="disableHistories":(o="解除屏蔽成功",e.operation="unDisableHistories"),nkcAPI("/p/"+n+"/history","PUT",e).then((function(){screenTopAlert(o)})).catch((function(n){screenTopWarning(n.error||n)}))}}));

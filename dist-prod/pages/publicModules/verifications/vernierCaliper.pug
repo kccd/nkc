@@ -1,0 +1,15 @@
+.vernier-caliper
+  .question 请拖动副尺使游标卡尺读数为
+    span &nbsp;{{vernierCaliper.data.question}}
+  .images
+    .main-image(:style='"background-color: " + vernierCaliper.data.backgroundColor')
+      img(:src='vernierCaliper.data.mainImageBase64')
+    .secondary-image(ref='button' :style='"background-color: " + vernierCaliper.data.backgroundColor')
+      div(
+        :style='"background-image: url(\'" + vernierCaliper.data.secondaryImageBase64 + "\');left: " + vernierCaliper.answer + "px;"'
+        )
+      span.fa.fa-long-arrow-left.left(ref='moveLeft')
+      span.fa.fa-long-arrow-right.right(ref='moveRight')
+      //img(:src='vernierCaliper.data.secondaryImageBase64'
+        //:style='"margin-left: " + (vernierCaliper.left) + "px;"')
+  include ./buttons

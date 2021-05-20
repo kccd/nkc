@@ -1,0 +1,99 @@
+extends ../columnBase
+block columnTitle
+  title 专栏转让
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        h4
+          b 专栏转让说明
+        p!=LineFeedConversion(data.columnSettings.transferInfo)
+        hr
+        h4
+          b 目标专栏
+        .contribute-column.m-b-2
+          img(src=`/a/${data.column.avatar}?t=sm`)
+          .contribute-column-info
+            a(href=`/m/${data.column._id}`).name=data.column.name
+            .description=data.column.abbr
+      #data.hidden=objToStr({column: data.column, user: data.user})
+      .col-xs-12.col-md-12#app(v-cloak)
+        div(v-if="!targetUser")
+          h4
+            b 选择目标用户
+          .form.form-inline
+            input.form-control(type="text" placeholder="用户名或用户ID" v-model="keyword" @keyup.enter="search")
+            button.btn.btn-default(@click="search") 搜索
+          div
+            .column-transfer-user(v-for="u in targetUsers")
+              .inline-block(v-if="u.uid !== user.uid")
+                img(:src="getUrl('userAvatar', u.avatar)")
+                span 用户名：{{u.name}}, 用户ID：{{u.uid}}
+                a.btn.btn-xs.btn-default(:href="'/u/' + u.uid" target="_blank") 个人名片
+                button.btn.btn-xs.btn-success(@click="targetUser = u") 选择
+        div(v-else)
+          button.btn.btn-xs.btn-default(@click="targetUser = ''") 重新选择目标用户
+          h4
+            b 目标用户
+          div.m-b-1
+            img.m-r-05(:src="getUrl('userAvatar', targetUser.avatar)" style="width: 2rem;height: 2rem;border-radius:3px;")
+            a(:href="'/u/' + targetUser.uid"
+              style="font-size: 1.6rem;vertical-align: top;" target="_blank"
+            ) {{targetUser.username}}
+          h4
+            b 登录密码
+          div
+            .form-inline
+              input.form-control(type="password" v-model.trim="password")
+          .m-t-1
+            h5.text-danger(v-if="error") {{error}}
+            button.btn.btn-primary.btn-sm(@click="transfer") 确认转让
+block scripts
+  script.
+    var data = NKC.methods.getDataById("data");
+    var app = new Vue({
+      el: "#app",
+      data: {
+        targetUser: "",
+        password: "",
+        column: data.column,
+        user: data.user,
+        targetUsers: [],
+        targetUid: "",
+        keyword: "",
+        error : ""
+      },
+      mounted: function() {
+      },
+      methods: {
+        getUrl: NKC.methods.tools.getUrl,
+        search: function() {
+          var keyword = this.keyword;
+          if(!keyword) return;
+          nkcAPI("/u?uid=" + keyword + "&username=" + keyword, "GET")
+            .then(function(data) {
+              app.targetUsers = data.targetUsers;
+            })
+            .catch(function(data) {
+              screenTopWarning(data);
+            })
+        },
+        transfer: function() {
+          this.error = "";
+          var targetUser = this.targetUser;
+          var password = this.password;
+          if(!password) return this.error = "请输入登录密码";
+          nkcAPI("/m/" + this.column._id + "/settings/transfer", "POST", {
+            targetUid: targetUser.uid,
+            password: password
+          })
+            .then(function() {
+              openToNewLocation("/m/" + app.column._id);
+            })
+            .catch(function(data) {
+              app.error = data.error || data;
+            })
+        }
+      }
+    });
+

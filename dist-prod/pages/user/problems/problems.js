@@ -1,0 +1,1 @@
+!function(e){"function"==typeof define&&define.amd?define(e):e()}((function(){"use strict";var e=new Vue({el:"#app",methods:{addProblem:function(){openToNewLocation("/problem/add")}}});window.app=e}));

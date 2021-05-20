@@ -1,0 +1,95 @@
+extends ../../experimental
+block eTitle
+  title 专栏设置
+block eContent
+  .container-fluid.max-width
+    #data.hidden=objToStr({columnSettings: data.columnSettings, grades: data.grades, roles: data.roles})
+    #app.row(v-cloak)
+      .col-xs-12.col-md-12
+        .form-horizontal
+          .col-xs-12.col-md-12
+            h4 开设条件
+          .form-group
+            label.col-sm-2.control-label 学术分
+            .col-sm-5
+              input.form-control(type='text' v-model.number="columnSettings.xsfCount")
+          .form-group
+            label.col-sm-2.control-label 精华数
+            .col-sm-5
+              input.form-control(type='text' v-model.number="columnSettings.digestCount")
+          .form-group
+            label.col-sm-2.control-label 文章数
+            .col-sm-5
+              input.form-control(type='text' v-model.number="columnSettings.threadCount")
+          .form-group
+            label.col-sm-2.control-label 用户等级
+            .col-sm-5
+              .checkbox.inline-block.m-r-1(v-for="g in grades")
+                label
+                  input(type="checkbox" :value="g._id" v-model="columnSettings.userGrade")
+                  span {{g.displayName}}
+
+          .col-xs-12.col-md-12
+            h4 注意事项
+          .form-group
+            label.col-sm-2.control-label 开设专栏
+            .col-sm-5
+              h5 支持换行、空格
+              textarea.form-control(v-model="columnSettings.createColumnInfo" rows=7)
+          .form-group
+            label.col-sm-2.control-label 投稿
+            .col-sm-5
+              h5 支持换行、空格
+              textarea.form-control(v-model="columnSettings.contributeInfo" rows=7)
+          .form-group
+            label.col-sm-2.control-label 专栏转让
+            .col-sm-5
+              h5 支持换行、空格
+              textarea.form-control(v-model="columnSettings.transferInfo" rows=7)
+          .form-group
+            label.col-sm-2.control-label 关闭专栏
+            .col-sm-5
+              h5 支持换行、空格
+              textarea.form-control(v-model="columnSettings.closeColumnInfo" rows=7)
+          .col-xs-12.col-md-12
+            h4 管理员
+          .form-group
+            label.col-sm-2.control-label 通过证书指定
+            .col-sm-5
+              .checkbox.inline-block.m-r-1(v-for="r in roles")
+                label
+                  input(type="checkbox" :value="r._id" v-model="columnSettings.adminCertsId")
+                  span {{r.displayName}}
+          .col-xs-12.col-md-12
+            h4 专栏设置
+          .form-group
+            label.col-sm-2.control-label 自定义页面个数
+            .col-sm-5
+              input.form-control(type="text" v-model.number="columnSettings.pageCount")
+          .col-xs-12.col-md-12
+            h4 专栏列表
+          .form-group
+            label.col-sm-2.control-label 最小文章数
+            .col-sm-5
+              input.form-control(type="text" v-model.number="columnSettings.columnHomePostCountMin")
+              .m-t-05.text-info 专栏列表页仅显示文章数量不小于{{columnSettings.columnHomePostCountMin}}的专栏
+          .form-group
+            label.col-sm-2.control-label 排序
+            .col-sm-5
+              .radio
+                label.m-r-1
+                  input(type='radio' value='updateTime' v-model='columnSettings.columnHomeSort')
+                  span 文章更新时间
+                label
+                  input(type='radio' value='subscription' v-model='columnSettings.columnHomeSort')
+                  span 专栏订阅数
+          .form-group
+            label.col-sm-2.control-label
+            .col-sm-5
+              h5.text-danger(v-if="error") {{error}}
+              h5.text-success(v-if="info") {{info}}
+              button.btn.btn-primary(@click="save") 保存
+
+
+block scripts
+  +includeJS("/experimental/settings/column/column.js")

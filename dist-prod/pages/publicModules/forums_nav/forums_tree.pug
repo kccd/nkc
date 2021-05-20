@@ -1,0 +1,96 @@
+//- 左侧专业导航
+  @param {[Object]} state.subForums 用户关注的专业对象所组成的数组
+  @param {[Object]} state.forumsTree 专业树状结构数组 通过方法ForumModel.getForumsTree获取
+  @author pengxiguaa 2019-7-8
+
+
+mixin renderForums(forums)
+  for forum in forums
+    .forum-block.hide-children
+      .forum-block-info(class=data.forum && data.forum.fid === forum.fid?"active": "")
+        //- 暂时调整 去掉专业导航中的专业图标
+          if forum.iconFileName
+            img.forum-block-icon(src=`/forum_avatar/${forum.fid}`)
+          else
+            .forum-block-icon(style=`background-color: ${forum.color}`)
+        a(href=`/f/${forum.fid}` class=(!forum.childrenForums || !forum.childrenForums.length)?"child":"parent").forum-block-name
+          span(data-float-fid=forum.fid)=forum.displayName
+      if forum.childrenForums && forum.childrenForums.length
+        -let inside = false;
+        if data.forum && forum.childrenForums
+          for ff in forum.childrenForums
+            if ff.fid === data.forum.fid
+              -inside = true;
+              -break;
+        if !forum.parentsId.length || inside
+          .fa.fa-angle-up(onclick=`switchChildren("${forum.fid}", this)`)
+          .forum-block-children(data-fid=forum.fid)
+            +renderForums(forum.childrenForums)
+        else
+          .fa.fa-angle-down(onclick=`switchChildren("${forum.fid}", this)`)
+          .forum-block-children(data-fid=forum.fid style="display: none")
+              +renderForums(forum.childrenForums)
+mixin renderSimpleForums(forums)
+  for forum in forums
+    .forum-simple
+      a.forum-parent(href=tools.getUrl('forumHome', forum.fid) data-float-fid=forum.fid)=forum.displayName
+      for cf, index in forum.childrenForums
+        if index === 0
+          span ：
+        else
+          span |
+        a.forum-child(href=tools.getUrl('forumHome', cf.fid) data-float-fid=cf.fid style=`background-color: ${hexToRgba(cf.color, 0.1)}`)=cf.displayName
+
+if data.forum && data.forum.childrenForums && data.forum.childrenForums.length
+  .m-b-1
+    .panel-header 细分专业
+    .home-topic-item-div
+      for forum in data.forum.childrenForums
+        .forum-block
+          .forum-block-info
+            a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
+
+if data.user && data.forum && state.subForums && state.subForums.length >0
+  .m-b-1
+    .panel-header 关注的专业
+      .panel-header-right-button
+        a(href=`/u/${data.user.uid}/profile/subscribe/forum` target="_blank") 管理
+    .home-topic-item-div
+      for forum in state.subForums
+        .forum-block
+          .forum-block-info()
+            //-
+              if forum.iconFileName
+                img.forum-block-icon(src=`/forum_avatar/${forum.fid}`)
+              else
+                .forum-block-icon(style=`background-color: ${forum.color}`)
+            a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
+if data.visitedForums && data.visitedForums.length
+  .m-b-1
+    .panel-header 最近访问
+    .home-topic-item-div
+      for forum in data.visitedForums
+        .forum-block
+          .forum-block-info()
+            //-
+              if forum.iconFileName
+                img.forum-block-icon(src=`/forum_avatar/${forum.fid}`)
+              else
+                .forum-block-icon(style=`background-color: ${forum.color}`)
+            a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
+.m-b-1
+  .panel-header 文章汇总
+  .home-topic-item-div
+    .forum-block
+      .forum-block-info
+        a(href=`/?t=latest`).forum-block-name 最新文章
+for fc in state.categoryForums
+  if fc.forums.length
+    .m-b-1
+      .panel-header(title=fc.description)=fc.name
+      if fc.displayStyle === 'simple'
+        +renderSimpleForums(fc.forums)
+      else
+        +renderForums(fc.forums)
+
+

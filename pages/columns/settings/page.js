@@ -37,6 +37,17 @@ function toNav(columnId, pageId) {
     })
 }
 
+function setAsColumnHome(columnId, pageId, asHome) {
+  nkcAPI(`/m/${columnId}/page/${pageId}`, 'PUT', {
+    type: 'setAsHome',
+    asHome: !!asHome
+  })
+    .then(() => {
+      sweetSuccess('设置成功');
+    })
+    .catch(sweetError);
+}
+
 $(function() {
   var button = $(".copy-button");
   var obj = {};
@@ -62,4 +73,5 @@ Object.assign(window, {
   setHidden,
   deletePage,
   toNav,
+  setAsColumnHome
 });

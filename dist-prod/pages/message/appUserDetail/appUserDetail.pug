@@ -1,0 +1,68 @@
+extends ../../bootstrap_base
+block title
+  //title=data.targetUserName
+  title 用户详情
+  +includeCSS('/message/appUserDetail/appUserDetail.css')
+block content
+  -const {targetUser} = data;
+  .hidden#data=objToStr({targetUserName: data.targetUserName, inBlacklist: data.inBlacklist, friend: data.friend, targetUser: data.targetUser, friendCategories: data.friendCategories})
+  #app(v-cloak)
+    .user-info
+      .avatar-container
+        img(src=tools.getUrl('userAvatar', targetUser.avatar))
+      .name-container
+        .name=targetUser.username
+        .cert
+          img(src=`/statics/grade_icon/v${targetUser.grade._id}l.png`)
+          span=`${targetUser.info.certsName}`
+        .description=targetUser.description || '暂无简介'
+    .friend-info
+      button.btn.btn-success.btn-block(@click='sendToUser') 发消息
+      button.btn.btn-default.btn-block(@click='visitUserHome') 动态
+      button.btn.btn-default.btn-block(@click='switchNote' v-if='friend').btn-note 备注信息
+        .fa.fa-angle-up(v-if="showNote")
+        .fa.fa-angle-down(v-else)
+      .m-t-05(v-if="!friend")
+        button.btn.btn-default.btn-block(@click='addFriend(false)') 加为好友
+        button.btn.btn-default.btn-block(@click='moveToBlacklist')=data.inBlacklist? '移出黑名单': '加入黑名单'
+      .m-t-05(v-else)
+        .note.m-b-4(v-if="showNote")
+          .form
+            .form-group
+              label 备注名
+              input.form-control(type='text' v-model='friend.info.name' placeholder='请输入备注名')
+            .form-group
+              label 分组
+              .checkbox.m-t-0
+                label(v-for='c in fc').m-r-05
+                  input(type='checkbox' :value='c._id' v-model='friend.cid')
+                  span {{c.name}}
+            .form-group
+              label 简介
+              textarea.form-control(rows=4 v-model='friend.info.description' placeholder='请输入用户简介')
+            .form-group
+              label 所在地区
+              div(@click="selectLocation")
+                input.form-control(disabled type='text' v-model="friend.info.location" placeholder='请选择地区')
+            .form-group
+              label 联系电话
+              .row(v-for='(p, index) in friend.info._phone').m-b-05
+                .col-xs-9
+                  input.form-control(type='text' placeholder='请输入联系电话' v-model='p.number')
+                .col-xs-3
+                  button.btn.btn-default(@click="removePhone(index)") 删除
+              button.m-t-05.btn-block.btn.btn-default(@click='addPhone') 添加联系电话
+            .form-group
+              label 附加图片
+              div
+                input.hidden(ref='input' type='file' accept='image/*' @change='selectedFriendImage')
+                .friend-image(v-if='friend.info.image')
+                  img(:src="friendImageUrl" @click='selectFriendImage')
+                  button.m-t-05.btn.btn-default.btn-block(@click='removeFriendImage') 删除图片
+                button.m-t-05.btn.btn-default.btn-block(@click='selectFriendImage') 选择图片
+            .form-group
+              button.btn.btn-success.btn-block.btn-md(@click="saveFriendInfo") 保存
+        button.btn.btn-default.btn-block(@click='addFriend(true)') 删除好友
+        button.btn.btn-default.btn-block(@click='moveToBlacklist')=data.inBlacklist? '移出黑名单': '加入黑名单'
+block scripts
+  +includeJS('/message/appUserDetail/appUserDetail.js')

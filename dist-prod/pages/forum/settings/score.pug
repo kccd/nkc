@@ -1,0 +1,46 @@
+extends ../../bootstrap_base
+block title
+  title 积分策略设置
+  +includeCSS('/forum/settings/info.css')
+block content
+  -data.forumAvailableScoreOperations = data.forumAvailableScoreOperations.map(s => {s.name = lang('kcbsTypes', s.type);return s;})
+  #data.hidden=objToStr({scoresType: data.scoresType, scores: data.scores, forum: data.forum, forumAvailableScoreOperations: data.forumAvailableScoreOperations, forumScoreOperations: data.forumScoreOperations})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-2
+        include ../../module_forum_settings
+      .col-xs-12.col-md-10#app(v-cloak)
+        -const style = '!s.enabled?"background-color: #aaa":""';
+        table.table.table-bordered
+          tbody
+            tr
+              th(colspan=4) 积分名
+              th(v-for='s in scores' :style=style)
+                span {{s.name}}
+            tr
+              th 操作名
+              th 周期
+              th 次数(0关闭, -1无限次)
+              th 其他
+              th(colspan=100).text-center 加减的分值（支持小数点后两位，为正加分，为负扣分，为零则不作处理。）
+            tr(v-for='f, index in forumScoreOperations')
+              th
+                select.form-control(v-model='f.type')
+                  option(v-for='_f in forumAvailableScoreOperations' :value='_f.type') {{_f.name}}
+              th
+                select.form-control(v-model='f.cycle')
+                  option(value='day') 每天
+              th
+                input(type='text' v-model.number='f.count' style='width: 4rem;')
+              th
+                button.btn.btn-danger.btn-xs(@click='removeScoreOperation(index)') 刪除
+              th(v-for='s in scores' :style=style)
+                input(type='text' v-model.number='f["_" + s.type]' style='width: 4rem;')
+            tr(v-if='!forumScoreOperations.length')
+              th(colspan=100).text-center 空空如也~
+
+        .m-t-1
+          button.btn.btn-primary(@click='save') 保存
+          button.btn.btn-default(@click='addScoreOperation') 添加积分策略
+block scripts
+  +includeJS('/forum/settings/score.js')

@@ -1,0 +1,76 @@
+-var paging = data.paging || {};
+-var page = paging.page || 0;
+-var pageCount = paging.pageCount || 1;
+-var min, max;
+-var query = '';
+if data.t
+  -query = `&t=${data.t}`;
+if data.c
+  -query += `&c=${data.c}`;
+if data.d
+  -query += `&d=${data.d}`;
+if data.cat
+  -query += `&cat=${data.cat}`;
+//-if data.s
+//-  -query += `&s=${data.s}`;
+if showPagingDigestButton
+  .paging-button
+    a.radius-left.button(href=`${state.url}` class=!data.d?"active": "" data-type="reload") 全部
+    a.radius-right.button(href=`${state.url}?d=true` class=data.d?"active": "" data-type="reload") 精选
+if showPagingSortButton
+  .paging-button
+    a.radius-left.button(href=`?page=${page}${query}&s=tlm` class=data.s!=='toc'? "active": '' data-type="reload") 复序
+    a.radius-right.button(href=`?page=${page}${query}&s=toc` class=data.s==="toc"?" active": "" data-type="reload") 帖序
+if data.s
+  -query += `&s=${data.s}`
+if pageCount > 1
+  -const arr = [];
+  -let n = 7;
+  -let reduce1 = page-3;
+  -let reduce2 =  page+3;
+  if(reduce1 > 0)
+    if(reduce2 > pageCount)
+      -max = pageCount;
+      if(reduce1-(reduce2 - pageCount) < 0)
+        -min = 0;
+      else
+        -min = reduce1-(reduce2 - pageCount);
+    else
+      -max = reduce2;
+      -min = reduce1;
+  else
+    -min = 0;
+    if(reduce2 < pageCount)
+      if(pageCount < reduce2 - reduce1)
+        -max = pageCount;
+      else
+        -max = reduce2-reduce1;
+    else
+      -max = pageCount - 1;
+  nav(aria-label='navigation').paging-nav
+    ul(style='margin: 0')
+      if min !== 0
+        li
+          a(href=`${state.url}?page=${0}${skipId || ''}${query}` data-type="reload") 1
+        if min > 1
+          li ...
+      -for(let i = 0; i < pageCount; i++)
+        if i >= min && i <= max
+          -let active = '';
+          if(page === i)
+            -active = 'active';
+          li(class=active)
+            a(href=`${state.url}?page=${i}${skipId || ''}${query}` data-type="reload")= i+1
+      if max < pageCount - 1
+        if max < pageCount - 2
+          li ...
+        li
+          a(href=`${state.url}?page=${pageCount - 1}${skipId || ''}${query}` data-type="reload")= pageCount
+      if showPagingInput && (max < pageCount - 1 || min !== 0)
+        li
+          | 跳转到
+          input(type="number" id="paging_nav_input")
+          |页
+          button(
+            id="paging_nav_button"
+            onclick=`var newPage = Number($("#paging_nav_input").val());openToNewLocation('${state.url}?page='+(newPage>0?newPage-1:0)+'${skipId || ''}${query}')`) 确定

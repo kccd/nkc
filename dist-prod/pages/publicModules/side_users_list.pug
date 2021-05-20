@@ -1,0 +1,9 @@
+.side-user-list
+  .side-user-content
+    for u, index in sideUsers
+      if index < 8
+        .side-user(
+          data-float-uid=u.uid
+        )
+          a(href=`/u/${u.uid}` target="_blank")
+            img(src=tools.getUrl('userAvatar', u.avatar))

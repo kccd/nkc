@@ -64,6 +64,7 @@ module.exports = {
       },
       fans: {
         GET: 'column_single_settings_fans',
+        DELETE: 'column_single_settings_fans'
       }
     },
     contribute: {

@@ -1,0 +1,60 @@
+mixin loadInfo(obj)
+  if obj.type === 'fundPool'
+    th= '资金池'
+  if obj.type === 'fund'
+    th
+      span (基金)
+      a(href=`/fund/list/${obj.fund._id.toLowerCase()}` target='_blank')= obj.fund.name
+  if obj.type === 'user'
+    if obj.anonymous
+      th 匿名用户
+    else
+      th
+        span (用户)
+        a(href=`/u/${obj.user.uid}` target='_blank')= obj.user.username
+  if obj.type === 'other'
+    th= obj.id
+table.table.table-bordered
+  thead
+    tr
+      th 时间
+      th 交易编号
+      th 摘要
+      th 操作者
+      th 来自于
+      th 作用于
+      th 金额（元）
+      th 备注
+      if displayBalance
+        th 剩余（元）
+      th 操作
+  tbody
+    -for(let b of data.bills)
+      -let color = '#fff';
+      if !b.verify
+        -color = '#aaa';
+      tr(style='background-color: '+color+';')
+        th= b.toc.toLocaleString()
+        th= b._id
+        th= b.abstract
+        th
+          if b.user
+            if b.fromInfo.type === 'user' && b.fromInfo.anonymous
+              span 匿名用户
+            else
+              a(href=`/u/${b.user.uid}`)= b.user.username
+          else
+            span 系统
+        +loadInfo(b.fromInfo)
+        +loadInfo(b.toInfo)
+        th= b.money.toFixed(1)
+        th= b.notes
+        if displayBalance
+          th= b.balance.toFixed(1)
+        if data.userOperationsId.includes("modifyFundBill") || ((b.fund || data.fund) && ensureFundOperatorPermission('financialStaff', data.user, data.fund || b.fund))
+          th
+            a(href=`/fund/bills/${b._id}`) 修改
+            span &nbsp;&nbsp;
+            a.text-danger(style='cursor: pointer;' onclick=`deleteBill(${b._id})`) 删除
+        else
+          th= ''

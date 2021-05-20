@@ -1,0 +1,23 @@
+
+extends ../index
+block shopSettings
+  .col-xs-12.col-sm-10.col-md-10
+    h4 限制长时间未登录用户的商品
+    .form.form-horizontal#appBaseInfo(v-cloak)
+      .form-group
+        label.control-label.col-sm-2 活动时间(天)
+        .col-sm-8
+          input.form-control(type='text' v-model.number='shopSettings.closeSale.lastVisitTime')
+          span.text-danger 用户无法购买超过{{shopSettings.closeSale.lastVisitTime}}天未活动用户的商品
+      .form-group
+        label.control-label.col-sm-2 受限时的提示
+        .col-sm-8
+          textarea.form-control(v-model='shopSettings.closeSale.description' rows=4)
+          span.text-danger 500字节限制
+      .form-group
+        .col-sm-2
+        .col-sm-10
+          button.btn.btn-primary(@click='save') 保存
+
+block shopSettingScripts
+  +includeJS('/experimental/shop/base/base.js')

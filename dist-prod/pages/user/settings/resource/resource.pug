@@ -1,0 +1,22 @@
+extends ../../../bootstrap_base
+block title
+  title 资源文件
+  +includeCSS("/user/settings/resource/resource.css")
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-2
+        include ../../../module_user_settings
+      .col-xs-12.col-md-10
+        ul.nav.nav-tabs
+          li(class=!data.t || data.t === 'resource'?"active":"")
+            a(href=`/u/${data.user.uid}/settings/resource` data-type="reload") 附件
+          li(class=data.t === "sticker"?"active":"")
+            a(href=`/u/${data.user.uid}/settings/resource?t=sticker` data-type="reload") 表情
+        if data.t === "sticker"
+          div
+            input#stickerInput.hidden
+            button.btn.btn-sm.btn-default(onclick="openUploadPanel()") 上传新表情
+
+block scripts
+  +includeJS("/user/settings/resource/resource.js")

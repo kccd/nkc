@@ -1,0 +1,82 @@
+extends ./index.pug
+block name
+  -const orderLists = data.orderLists
+  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
+  .row
+    .col-md-12.col-sm-12.col-xs-12(style="text-align:end;margin-bottom:15px")
+      .form-inline
+        .form-group
+          .input-group
+            input.form-control.time#orderStartTime(readonly size="10" type="text" placeholder="开始时间")
+            span.input-group-addon
+              i.fa.fa-calendar   
+          .input-group
+            span -                 
+          .input-group
+            input.form-control.time#orderEndTime(readonly size="10" type="text" placeholder="结束时间")
+            span.input-group-addon
+              i.fa.fa-calendar
+          a.btn.btn-primary.btn-sm(style="margin-left:15px" onclick=`orderSearch(${data.user.uid})`) 订单查询
+          a.btn.btn-warning.btn-sm#text(style="margin-left:15px") 导出excel
+    .col-md-12.col-sm-12.col-xs-12(style='font-size: 1rem;')
+      .table-responsive
+        table.table.table-striped#texttable(border="1")
+          thead
+            tr
+              th 日期
+              th 订单号
+              th 订单状态
+              th 买家UID
+              th 买家昵称
+              th 商品名称
+              th 商品规格
+              th 数量
+              th 商品小计
+              th 订单金额
+              th 收货人
+              th 收货地址
+              th 联系方式
+              th 物流方式
+              th 物流单号
+              th 物流公司
+          tbody
+            for order in orderLists 
+              if order.params
+                for param,key in order.params
+                  if key == 0
+                    tr  
+                      td(rowspan=`${order.params.length}`)=order.orderToc.toLocaleString()
+                      td(rowspan=`${order.params.length}`)=order.orderId
+                      td(rowspan=`${order.params.length}`)=order.status
+                      td(rowspan=`${order.params.length}`)=order.buyUid
+                      td(rowspan=`${order.params.length}`)=order.buyUser.username
+                      td=param.product.name
+                      td=param.productParam.name
+                      td=param.count
+                      td #{numToFloatTwo(param.productPrice)}
+                      td(rowspan=`${order.params.length}`) #{numToFloatTwo(order.orderPrice)}
+                      td(rowspan=`${order.params.length}`)=order.receiveName
+                      td(rowspan=`${order.params.length}`)=order.receiveAddress
+                      td(rowspan=`${order.params.length}`)=order.receiveMobile
+                      if !order.trackNumber || order.trackNumber == "no"
+                        td(rowspan=`${order.params.length}`) 自提或虚拟发货
+                        td(rowspan=`${order.params.length}`) null
+                        td(rowspan=`${order.params.length}`) null
+                      else
+                        td(rowspan=`${order.params.length}`) 物流
+                        td(rowspan=`${order.params.length}`)=order.trackNumber
+                        if order.trackName == "AUTO"
+                          td(rowspan=`${order.params.length}`) null
+                        else
+                          td(rowspan=`${order.params.length}`)=order.trackName
+                  else
+                    tr
+                      td=param.product.name
+                      td=param.productParam.name
+                      td=param.count
+                      td #{numToFloatTwo(param.productPrice)}
+block manageScripts
+  +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
+  +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
+  +includeJS("/shop/manage/order.js")
+  +includeJS("/shop/manage/orderList.js")

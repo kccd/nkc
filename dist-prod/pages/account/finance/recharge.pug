@@ -1,0 +1,72 @@
+extends ../../bootstrap_base
+block title
+  title 充值中心
+  +includeCSS('/account/finance/finance.css')
+block content
+  #data.hidden=objToStr({mainScore: data.mainScore, rechargeSettings: data.rechargeSettings})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8.col-md-offset-2.box-shadow-panel
+        -const pageType = "recharge";
+        #app(v-cloak)
+          -const targetUserScores = data.userScores;
+          include ./nav
+          include ../../account/finance/rechargeNav
+          .row
+            if data.rechargeSettings.enabled
+              .col-xs-12.col-xs-12.m-t-1
+                h5.text-danger 注意事项：
+                ul
+                  li 单笔充值金额不能低于
+                    strong.text-danger &nbsp;{{rechargeSettings.min/100}}&nbsp;
+                    | 元，不能超过
+                    strong.text-danger &nbsp;{{rechargeSettings.max/100}}&nbsp;
+                    | 元
+              .col-xs-12.col-xs-12.m-t-1
+                h4 充值金额
+                .row
+                  .col-xs-6.col-md-3(v-for='d in defaultKCB')
+                    .default-panel(:class="{'active': money === d}" @click='select(d)')
+                      .pointer(v-if='money === d')
+                        .fa.fa-check
+                      .kcb {{mainScore.name}}{{d}}{{mainScore.unit}}
+                      .rmb {{d}}元
+                  .col-xs-6.col-md-3
+                    .default-panel(:class="{'active': !money}" @click='select("")')
+                      .pointer(v-if='!money')
+                        .fa.fa-check
+                      .kcb.kcb-input
+                        h5 自定义{{mainScore.name}}({{mainScore.unit}})
+                        input(v-model.number='input' type='text' @input='inputNumber')
+                      .rmb {{input || 0}}元
+                h4 支付方式
+                .row
+                  .col-xs-4.col-md-2(v-for="p in payments")
+                    .payment-panel(:class="{'active': payment === p.type}" @click='selectPayment(p.type)')
+                      .pointer(v-if='payment === p.type')
+                        .fa.fa-check
+                      span {{p.name}}
+                  .col-xs-12.m-t-05
+                    span.fee-info {{payInfo}}
+                div(v-if="finalPrice && payment")
+                  hr
+                  .text-right
+                    .money-panel
+                      span.info {{mainScore.name}} {{(finalPrice/100).toFixed(2)}} {{mainScore.unit}}：
+                      span.money {{(finalPrice / 100).toFixed(2)}}元
+                    .money-panel(v-if="fee > 0")
+                      span.info 手续费：
+                      span.money {{(fee / 100).toFixed(2)}}元
+                    .money-panel
+                      span.info.total 总计：
+                      span.money.total {{(totalPrice / 100).toFixed(2)}}元
+                    h5.text-danger(v-if='error') {{error}}
+                    button.m-t-05.pay.cp(@click='toPay') 去支付
+            else
+              .col-xs-12.p-t-2.p-b-1
+                .text-center 充值功能已关闭
+
+
+block scripts
+  include ../../publicModules/math
+  +includeJS('/account/finance/recharge.js')

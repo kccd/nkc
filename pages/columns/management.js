@@ -1,6 +1,12 @@
 // 封禁专栏
+
+$(function() {
+  if(!window.CommonModal) {
+    window.CommonModal = new NKC.modules.CommonModal();
+  }
+})
 function disabledColumn(columnId, type, index) {
-  CommonModal.open(function() {
+  window.CommonModal.open(function() {
     if(!confirm("确定要执行该操作？")) return;
     nkcAPI("/m/" + columnId + "/disabled", "POST", {
       type: type,
@@ -36,12 +42,12 @@ function managementColumn(columnId, type, disabled) {
     disabled: disabled
   };
   if(disabled) {
-    CommonModal.open(function(data) {
+    window.CommonModal.open(function(data) {
       if(!data[0].value) return screenTopWarning("请填写屏蔽原因");
       body.reason = data[0].value;
       nkcAPI(url, method, body)
         .then(function() {
-          CommonModal.close();
+          window.CommonModal.close();
           screenTopAlert("操作成功");
         })
         .catch(function(data) {
@@ -51,7 +57,6 @@ function managementColumn(columnId, type, disabled) {
       title: "专栏",
       data:[
         {
-          _id: "reason",
           dom: "textarea",
           rows: 5,
           label: "请输入屏蔽原因：",

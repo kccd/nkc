@@ -1,0 +1,139 @@
+extends ../../experimental
+block eTitle
+  title 积分设置
+  +includeCSS(`/experimental/settings/score/score.css`)
+block eContent
+  .container-fluid.max-width
+    #data.hidden=objToStr({scoreSettings: data.scoreSettings, scoresType: data.scoresType})
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12.m-b-2
+        h4 积分列表
+        table.table.table-bordered
+          tbody
+            tr
+              th(colspan=3) 启用
+              th(v-for='a, index in scores')
+                .checkbox
+                  label
+                    input(type='checkbox' :value='true' v-model='a.enabled' v-if='index !== 0')
+                    input(type='checkbox' :value='true' v-model='a.enabled' disabled v-else)
+                    .checkbox-span {{a.type}}
+            tr
+              th(colspan=3) 名称
+              th(v-for='a in scores')
+                input.form-control(type='text' v-model.trim='a.name')
+            tr
+              th(colspan=3) 图标
+              th(v-for='a in iconArr')
+                .score-icon
+                  img(:src="a.iconData" v-if='a.iconData')
+                  img(:src="getUrl('scoreIcon', a.icon)" v-else)
+                button.btn.btn-default.btn-xs(@click='selectIcon(a)') 更换
+            tr
+              th(colspan=3) 单位
+              th(v-for='a in scores')
+                input.form-control(type='text' v-model.trim='a.unit')
+            tr
+              th(colspan=3) 汇率
+              th(v-for='a, index in scores')
+                input.form-control(type='text' v-model.number='a.weight' v-if='index === 0' disabled)
+                input.form-control(type='text' v-model.number='a.weight' v-else)
+            tr
+              th(colspan=3) 兑出到其他积分
+              th(v-for='a in scores')
+                .checkbox
+                  label
+                    input(type='checkbox' :value='true' v-model='a.score2other')
+            tr
+              th(colspan=3) 从其他积分兑入
+              th(v-for='a in scores')
+                .checkbox
+                  label
+                    input(type='checkbox' :value='true' v-model='a.other2score')
+            tr
+              th(colspan=10).score-operations-header
+                .text-center - 积分策略 -
+          tbody
+            tr
+              th 操作名
+              th 周期
+              th 次数(0关闭, -1无限次)
+              th(colspan=100).text-center 加减的分值（支持小数点后两位，为正加分，为负扣分，为零则不作处理。）
+            tr(v-for='o in scoreSettings.operations')
+              th {{o.name}}
+              th
+                select.form-control(v-model='o.cycle')
+                  option(value='day') 每天
+              th
+                input.form-control(type='text' v-model.number='o.count')
+              th(v-for='t in types')
+                input.form-control(type='text' v-model.number='o["_" + t]')
+      .col-xs-12.col-md-12.m-b-2
+        h4 其他
+        .form.form-horizontal
+          .form-group
+            label.col-sm-2.control-label 系统账户名称
+            .col-sm-3.form-inline
+              input.form-control(type='text' v-model.trim='scoreSettings.nkcBankName')
+          .form-group
+            label.col-sm-2.control-label 附件交易
+            .col-sm-3.form-inline
+              select.form-control(v-model='scoreSettings.attachmentScore')
+                option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
+          .form-group
+            label.col-sm-2.control-label 商品买卖
+            .col-sm-3.form-inline
+              select.form-control(v-model='scoreSettings.shopScore')
+                option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
+          .form-group
+            label.col-sm-2.control-label 用户名修改
+            .col-sm-3.form-inline
+              select.form-control(v-model='scoreSettings.usernameScore')
+                option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
+          .form-group
+            label.col-sm-2.control-label 去图片/视频水印
+            .col-sm-3.form-inline
+              select.form-control(v-model='scoreSettings.watermarkScore')
+                option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
+          .form-group
+            label.col-sm-2.control-label 随机红包
+            .col-sm-3.form-inline
+              select.form-control(v-model='scoreSettings.postRewardScore')
+                option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
+          .form-group
+            label.col-sm-2.control-label 精选稿费
+            .col-sm-3.form-inline
+              select.form-control(v-model='scoreSettings.digestRewardScore')
+                option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
+          .form-group
+            label.col-sm-2.control-label 分享奖励
+            .col-sm-3.form-inline
+              select.form-control(v-model='scoreSettings.shareRewardScore')
+                option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
+          .form-group
+            label.col-sm-2.control-label 问卷调查奖励
+            .col-sm-3.form-inline
+              select.form-control(v-model='scoreSettings.surveyRewardScore')
+                option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
+          .form-group
+            label.col-sm-2.control-label 鼓励转账
+            .col-sm-3.form-inline
+              select.form-control(v-model='scoreSettings.creditScore')
+                option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
+          .form-group
+            label.col-sm-2.control-label 最小鼓励金额
+            .col-sm-3.form-inline
+              input.form-control(type='text' v-model.number='scoreSettings._creditMin')
+          .form-group
+            label.col-sm-2.control-label 最大鼓励金额
+            .col-sm-3.form-inline
+              input.form-control(type='text' v-model.number='scoreSettings._creditMax')
+      .col-xs-12.col-md-12.m-b-2
+        h4
+        .m-t-1
+          button.btn.btn-primary(@click='save' v-if='!submitting') 保存
+          button.btn.btn-primary(disabled v-else) 保存中...
+            .fa.fa-spinner.fa-spin
+block scripts
+  include ../../../publicModules/crop/crop_new
+  +includeJS(`/experimental/settings/score/score.js`)

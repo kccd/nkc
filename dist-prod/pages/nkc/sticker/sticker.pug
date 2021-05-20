@@ -1,0 +1,112 @@
+extends ../nkc
+block nkcTitle
+  title 前台管理 - 共享表情
+  +includeCSS("/nkc/sticker/sticker.css")
+block nkcContent
+  #data.hidden=objToStr({stickers: data.stickers, t: data.t})
+  .col-xs-12.col-md-12.management-sticker#app(v-cloak)
+    div
+      ul.nav.nav-tabs.m-b-1
+        li(class=!data.t?"active":"")
+          a(href=`/nkc/sticker`) 全部
+        li(class=data.t === "unReviewed"?"active":"")
+          a(href=`/nkc/sticker?t=unReviewed`) 待审核
+        li(class=data.t === "reviewed"?"active":"")
+          a(href=`/nkc/sticker?t=reviewed`) 已审核
+        li(class=data.t === "disabled"?"active":"")
+          a(href=`/nkc/sticker?t=disabled`) 已屏蔽
+        li(class=data.t === "unShared" ? "active" : "")
+          a(href=`/nkc/sticker?t=unShared`) 未共享
+        li(class=data.t === "shared" ? "active" : "")
+          a(href=`/nkc/sticker?t=shared`) 已共享
+      if ["unReviewed", "reviewed"].includes(data.t)
+        .options-button
+          if data.t === "unReviewed"
+            a.active(@click="setAll(true)") 全设为通过
+            a.active(@click="setAll(false)") 全设为不通过
+          a.active(@click="modifySize('md')") 全设为大图
+          a.active(@click="modifySize('sm')") 全设为中图
+          a.active(@click="modifySize('xs')") 全设为小图
+          a.active(@click="submitAll") 提交全部
+      include ../../publicModules/paging/paging
+      .table-responsive
+        table.table.table-bordered
+          thead
+            tr
+              th 表情
+              th 上传时间
+              th 用户
+              th 共享状态
+              th 是否屏蔽
+              th 其他
+          tbody
+            tr.sticker-list(v-for="s in stickers" :class="{'gray': s.disabled}")
+              th
+                .sticker-image
+                  img(:src="getUrl('sticker', s.rid)" :class="s.size")
+              th {{format("YYYY/MM/DD HH:mm:ss", s.toc)}}
+              th.user-avatar
+                img(:src="getUrl('userAvatar', s.user.avatar)" :data-float-uid="s.uid")
+                a(@click="visitUrl('/u/' + s.uid, true)") {{s.user.username}}
+              th
+                span(v-if="s.shared") 已共享
+                span(v-else)
+                  span(v-if="s.reviewed === null") 待审核
+                  span(v-if="s.reviewed === false") 未共享，审核未通过
+                  span(v-if="s.reviewed === true") 未共享
+              th
+                div(v-if="s.disabled")
+                  span 是&nbsp;
+                  button.btn.btn-xs.btn-danger(@click="disableSticker(s, false)") 解除屏蔽
+
+                div(v-else)
+                  span 否&nbsp;
+                  button.btn.btn-xs.btn-danger(@click="disableSticker(s, true)") 屏蔽
+              th
+                .text-danger(v-if="s.reviewed === false")
+                  div 原因：{{s.reason || "暂未填写"}}
+                if !data.t || data.t === "unReviewed"
+                  div(v-if="s.reviewed === null")
+                    .radio
+                      label.m-r-1
+                        input(type="radio" :value="true" v-model="s.status")
+                        span 通过
+                      label
+                        input(type="radio" :value="false" v-model="s.status")
+                        span 不通过
+                    .radio
+                      label.m-r-1
+                        input(type="radio" value="md" v-model="s.size")    
+                        span 大
+                      label.m-r-1
+                        input(type="radio" value="sm" v-model="s.size")    
+                        span 中
+                      label.m-r-1
+                        input(type="radio" value="xs" v-model="s.size")    
+                        span 小    
+                    div(v-if="!s.status")
+                      textarea.form-control(rows=3 v-model="s.reason" placeholder="请输入原因")
+                    .m-t-05
+                      button.btn.btn-primary.btn-xs(@click="submit([s])") 保存
+                else if data.t === "reviewed"      
+                  div
+                    .radio
+                      label.m-r-1
+                        input(type="radio" value="md" v-model="s.size")
+                        span 大
+                      label.m-r-1
+                        input(type="radio" value="sm" v-model="s.size")
+                        span 中
+                      label
+                        input(type="radio" value="xs" v-model="s.size")
+                        span 小    
+                    .m-t-05
+                      button.btn.btn-primary.btn-xs(@click="submitSize([s])") 保存    
+      include ../../publicModules/paging/paging_input
+
+block nkcScripts
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../../publicModules/moment
+  include ../../publicModules/imageViewer
+  +includeJS("/nkc/sticker/sticker.js")

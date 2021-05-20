@@ -1,0 +1,1 @@
+!function(e){"function"==typeof define&&define.amd?define(e):e()}((function(){"use strict";new Vue({el:"#app",computed:{toBrowser:function(){var e=window.navigator.userAgent.toLowerCase();return e.indexOf("micromessenger")>-1||e.indexOf(" qq")>-1}},methods:{toHome:function(){openToNewLocation("/")}}})}));

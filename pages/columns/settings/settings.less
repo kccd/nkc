@@ -143,7 +143,7 @@ body{
   }
 }
 .column-fans{
-  @avatarHeight: 5rem;
+  @avatarHeight: 4.5rem;
   .column-fans-item{
     position: relative;
     min-height: @avatarHeight;
@@ -160,6 +160,7 @@ body{
     }
     .column-fans-info{
       padding-left: @avatarHeight + 1rem;
+      padding-right: @avatarHeight + 1rem;
       .column-fans-name{
         height: 2rem;
         margin-bottom: 0.5rem;
@@ -177,7 +178,9 @@ body{
       }
     }
     .column-fans-options{
-
+      position: absolute;
+      top: 0.5rem;
+      right: 0;
     }
   }
 }

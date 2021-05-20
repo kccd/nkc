@@ -1,0 +1,44 @@
++includeCSS("/publicModules/selectDraft/selectDraft.css")
+#moduleSelectDraft
+
+  #moduleSelectDraftApp(v-cloak)
+    .module-header
+      .module-sd-title 草稿箱
+      .module-sd-close.fa.fa-close(@click="close")
+    .module-sd-body
+      .module-content(v-if="loading")
+        .null 加载中...
+      .module-content(v-else)
+        .module-drafts
+          .module-draft-warning 此处只插入正文，如果要使用草稿中的其余内容，请点击继续创作。
+          .paging-button
+            a.button.m-r-05.radius-left.radius-right(@click="refresh") 刷新
+            span(v-for="b, index in paging.buttonValue")
+              span(v-if="b.type === 'active'")
+                a.button.active(@click="getDrafts(b.num)"
+                  :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
+                ) {{b.num+1}}
+              span(v-else-if="b.type === 'common'")
+                a.button(@click="getDrafts(b.num)"
+                  :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
+                ) {{b.num+1}}
+              span(v-else)
+                a.button ..    
+          .module-draft(v-for="d in drafts")
+            .module-info
+              .module-time {{fromNow(d.toc)}}
+              .module-from {{getDraftInfo(d)}}
+            .module-article-title 标题：
+              span {{d.t}}
+            .module-article-content 内容：
+              span {{d.c}}
+            .module-buttons
+              div(title="继续创作" @click="loadDraft(d)") 
+                span 继续创作
+              div
+                span(title="删除草稿" @click="removeDraft(d)").m-r-05 删除
+                span.disabled(title="已插入" v-if="d.delay !== 0") 插入
+                span(title="插入内容" @click="insert(d)" v-else) 插入
+        
+include ../moment
++includeJS("/publicModules/selectDraft/selectDraft.js")

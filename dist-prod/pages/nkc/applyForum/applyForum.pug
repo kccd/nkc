@@ -1,0 +1,64 @@
+extends ../nkc
+block nkcTitle
+  title 专业申请列表 - 前台管理
+  style.
+    .user-avatar{
+      height: 1.4rem;
+      width: 1.4rem;
+      margin-right: 0.5rem;
+      border-radius: 2px;
+    }
+    .management-apply-forum{
+      font-size: 1rem;
+    }
+    th{
+      max-width: 18rem;
+    }
+block nkcContent
+  #data.hidden=objToStr({pForums: data.pForums})
+  .col-xs-12.col-md-12.management-apply-forum#app(v-cloak)
+    .m-b-1
+      include ../../publicModules/paging/paging
+    .table-responsive
+      table.table
+        thead
+          tr
+            th 时间
+            th 申请人
+            th 团队成员
+            th 专业名
+            th 开办理由
+            th 贡献计划
+            th 状态
+        tbody
+          tr(v-for='f in pForums')
+            th {{timeFormat(f.toc)}}
+            th
+              a(:href='getUrl("userHome", f.user.uid)' :data-float-uid="f.user.uid" target="_blank")
+                img.user-avatar(:src="getUrl('userAvatar', f.user.avatar)")
+                span {{f.user.username}}
+            th
+              div(v-for='u in f.founders')
+                a(:href='getUrl("userHome", u.user.uid)' :data-float-uid="u.user.uid" target="_blank")
+                  img.user-avatar(:src="getUrl('userAvatar', u.user.avatar)")
+                  span {{u.user.username}}
+                span &nbsp;
+                span.text-success(v-if='u.accept === "resolved"') 已接受
+                span.text-danger(v-else-if='u.accept === "rejected"') 已拒绝
+                span.text-danger(v-else-if='u.accept === "timeout"') 已过期
+                span(v-else) 待处理
+            th {{f.info.newForumName}}
+            th {{f.info.reason}}
+            th {{f.info.youWantToDo}}
+            th
+              span.text-success(v-if='f.review === "resolved"') 已通过
+              span.text-danger(v-else-if='f.review === "rejected"') 已驳回
+              span(v-else)
+                button.btn.btn-success.btn-xs(@click='agree(f)') 通过
+                button.btn.btn-danger.btn-xs(@click='disagree(f)') 驳回
+    include ../../publicModules/paging/paging
+block nkcScripts
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../../publicModules/moment
+  +includeJS("/nkc/applyForum/applyForum.js")

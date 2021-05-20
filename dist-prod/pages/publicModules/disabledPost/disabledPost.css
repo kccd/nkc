@@ -1,0 +1,21 @@
+.moduleDisabledPostType {
+  margin-bottom: 0.3rem;
+  overflow: hidden;
+}
+.moduleDisabledPostType > div:first-child {
+  border-right: 1px solid #fff;
+}
+.moduleDisabledPostType > div {
+  height: 3rem;
+  cursor: pointer;
+  line-height: 3rem;
+  text-align: center;
+  color: #aaa;
+  background-color: #eee;
+}
+.moduleDisabledPostType > div.active,
+.moduleDisabledPostType > div:hover {
+  background-color: #2b90d9;
+  color: #fff;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL3B1YmxpY01vZHVsZXMvZGlzYWJsZWRQb3N0L2Rpc2FibGVkUG9zdC5sZXNzIiwiPGlucHV0IGNzcyA3MD4iXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRSxzQkFBQTtFQUNBLGlCQUFBO0NDQ0Q7QURDRDtFQUNFLDZCQUFBO0NDQ0Q7QURDRDtFQUNFLGFBQUE7RUFDQSxnQkFBQTtFQUNBLGtCQUFBO0VBQ0EsbUJBQUE7RUFDQSxZQUFBO0VBQ0EsdUJBQUE7Q0NDRDtBRENEOztFQUNFLDBCQUFBO0VBQ0EsWUFBQTtDQ0VEIiwiZmlsZSI6InRvLmNzcyJ9 */

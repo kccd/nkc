@@ -1,0 +1,84 @@
+extends ../experimental
+
+block eTitle
+  title 积分交易记录
+  style.
+    tbody tr th {
+      max-width: 12rem;
+    }
+block eContent
+  #data.hidden=objToStr({scoreType: data.scoreType, kcbsRecords: data.kcbsRecords, content: data.content, t: data.t, operationId: data.operationId, scores: data.scores})
+  .container-fluid.max-width
+    .row
+      #app(v-cloak)
+        .col-xs-12.col-md-12
+          h4 按条件查询记录
+        .col-xs-12.col-md-12
+          .form-inline(style='margin-bottom: 1rem;')
+            .form-group
+              select.form-control(v-model='searchType' @change="optionChange" ref="selectTypeDom")
+                option(value='username') 用户名
+                option(value='uid') UID
+                option(value='ip') IP
+            .form-group
+              input.form-control(:placeholder='searchTextPlaceholder' v-model='searchText' @keyup.enter='searchUser')
+            .form-group
+              label 操作名：
+              select.form-control(v-model='searchoperationId')
+                option(value='') 不限
+                each val, key in data.kcbsTypes
+                  option(value=`${key}`) #{val}
+            .form-group
+              label 积分类型：
+              select.form-control(v-model='searchScoreType')
+                option(value='') 不限
+                for s in data.scores
+                  option(value=s.type)=s.name
+            .form-group
+              button.btn.btn-primary(type='submit' @click='searchUser') 搜索
+              span &nbsp;
+              a.btn.btn-default(type='submit' href='/e/log/kcb') 全部
+            .text-danger= data.info
+        .col-xs-12.col-md-12.table-responsive
+          include ../../interface_navigation_paging
+          table.table.table-bordered(style='font-size:1rem;')
+            thead
+              tr
+                th 时间
+                th 账单ID
+                th 积分名
+                th 操作名/操作ID
+                th 支出者
+                th 收入者
+                th 数目
+                th 说明
+                th 文号
+                th IP
+                th 验证
+            tbody
+              tr(v-for='(record, index) of kcbsRecords' :style="!record.verify?'background-color: #aaa;': ''")
+                th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
+                th {{record._id}}
+                th {{record.scoreName}}
+                th {{record.typeInfo}}（{{record.type}}）
+
+                th
+                  span(v-if='record.from === "bank"')=data.nkcBankName
+                  a(:href="'/u/' + record.fromUser.uid" v-else target='_blank' :data-float-uid='record.fromUser.uid') {{record.fromUser.username}}
+                th
+                  span(v-if='record.to === "bank"')=data.nkcBankName
+                  a(:href="'/u/' + record.toUser.uid" v-else target='_blank' :data-float-uid='record.toUser.uid') {{record.toUser.username}}
+                th {{record.num>0?'+':''}}{{record.num/100}}
+                th {{record.description}}
+                  span.text-danger {{record.hideDescription?"【已屏蔽】":""}}
+                th
+                  a(v-if="record.pid" :href="record.post.url") {{record.pid}}
+                th
+                  a(:href="ipUrl(record.ip)" target="_blank") {{record.ip}}:{{record.port}}
+                th {{record.verify?"是":"否"}}
+          include ../../interface_navigation_paging
+block scripts
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../../publicModules/moment
+  script(src=`/experimental/log/kcb.js?v=${global.NKC.startTime}`)

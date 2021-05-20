@@ -31,6 +31,11 @@ const schema = new Schema({
   tlm: {
     type: Date,
     default: null
+  },
+  asHome: {
+    type: Boolean,
+    default: false,
+    index: 1
   }
 }, {
   collection: "columnPages"
