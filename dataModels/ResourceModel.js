@@ -231,10 +231,16 @@ resourceSchema.statics.toReferenceSource = async function(id, declare) {
 };
 
 
-// 查找一个post引用的所有source
+/*
+* 查找一个post引用的所有source
+* @param {String | [String]} 引用者ID字符串或ID字符串数组
+* */
 resourceSchema.statics.getResourcesByReference = async function(id) {
-  let model = mongoose.model("resources");
-  let resources = await model.find({references: id});
+  const ResourceModel = mongoose.model("resources");
+  if(!Array.isArray(id)) {
+    id = [id];
+  }
+  const resources = await ResourceModel.find({references: {$in: id}});
   for(let resource of resources) {
     await resource.setFileExist();
   }

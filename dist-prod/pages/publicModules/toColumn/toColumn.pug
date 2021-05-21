@@ -20,17 +20,28 @@ if column
           .text-center.m-t-3.m-b-3(v-if="loading") 加载中...
           div(v-else)
             div(v-if="!createCategory")
-              .radio.m-t-0(v-if='showCategoryType')
-                label.m-r-1
-                  input(type='radio' value='all' v-model='categoryType')
-                  span 全部
-                label.m-r-1
-                  input(type='radio' value='main' v-model='categoryType')
-                  span 仅主分类
-                label.m-r-1
-                  input(type='radio' value='minor' v-model='categoryType')
-                  span 仅辅分类
-              //.category-type 更改对象
+              div(v-if='showOperationType')
+                .category-type 操作类型
+                .radio
+                  label
+                    input(type='radio' value='add' v-model='operationType')
+                    span 添加分类（不影响已有分类）
+                .radio
+                  label
+                    input(type='radio' value='replace' v-model='operationType')
+                    span 替换已有分类
+              div(v-if='showCategoryType')
+                .category-type 作用范围
+                .radio
+                  label.m-r-1
+                    input(type='radio' value='all' v-model='categoryType')
+                    span 全部
+                  label.m-r-1
+                    input(type='radio' value='main' v-model='categoryType')
+                    span 仅主分类
+                  label
+                    input(type='radio' value='minor' v-model='categoryType')
+                    span 仅辅分类
               div(v-if='categoryType !== "minor"')
                 .category-type 主分类
                 .radio(v-if="!selectMul" v-for="c in mainCategories")
