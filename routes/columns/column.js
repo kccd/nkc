@@ -67,6 +67,7 @@ router
       await category.renderDescription();
       data.childCategories = await category.getChildCategories();
       data.category = category;
+      data.categoryPostCount = await db.ColumnPostModel.countDocuments({columnId: column._id, cid: category._id});
       data.categoriesNav = await db.ColumnPostCategoryModel.getCategoryNav(category._id);
       const minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id, data.category._id, true);
       data.minorCategories = minorCategories.filter(mc => mc.count > 0);
@@ -79,6 +80,7 @@ router
       if(minorCategory) {
         q.mcid = minorCategory._id;
         data.minorCategory = minorCategory;
+        await data.minorCategory.renderDescription();
       }
       q.cid = {$in: childCategoryId};
       data.topped = await db.ColumnPostModel.getToppedColumnPosts(column._id, fidOfCanGetThread, cid);

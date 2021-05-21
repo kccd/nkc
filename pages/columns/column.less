@@ -628,7 +628,7 @@ img.apply-column-banner{
   margin-bottom: 0.5rem;
 }
 .column-category-nav a{
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   color: #282c37;
   font-weight: 700;
 }
@@ -1081,7 +1081,7 @@ img.apply-column-banner{
         text-align: center;
         line-height: @aHeight;
         color: #000;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         text-decoration: none;
         @media (max-width: 991px) {
           //@aHeight: 3rem;
@@ -1166,10 +1166,11 @@ img.apply-column-banner{
 }
 
 .column-minor-categories{
-  padding: 0.5rem 1rem;
-  background-color: #f4f4f4;
+  padding: 0.8rem 1rem;
+  background-color: rgba(0, 0, 0, 0.05);
   margin-bottom: 1rem;
-  border: 1px solid #dedede;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: 1.25rem;
   .column-minor-category{
     color: #555;
     text-decoration: none;
@@ -1224,6 +1225,9 @@ img.apply-column-banner{
 }
 .column-child-categories{
   margin-bottom: 0.5rem;
+  &>*{
+    font-size: 1.2rem;
+  }
 }
 .column-child-category{
   color: #333;
