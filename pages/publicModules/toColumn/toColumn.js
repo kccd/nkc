@@ -20,11 +20,13 @@ moduleToColumn.init = function(callback) {
       minorCategoryId: '',
 
       categoryType: 'all', // main: 主分类, minor: 辅分类, all: 全部
+      showOperationType: false,
       showCategoryType: false,
 
       mainCategoriesId: [],
       minorCategoriesId: [],
 
+      operationType: 'add', // add: 添加，不影响现有分类 replace: 替换原有分类
 
       createCategory: false,
 
@@ -130,9 +132,9 @@ moduleToColumn.init = function(callback) {
           this.selectMul = options.selectMul || false;
           this.mainCategoriesId = options.selectedMainCategoriesId || options.selectedCid || [];
           this.minorCategoriesId = options.selectedMinorCategoriesId || [];
+          this.showOperationType = options.showOperationType || false;
           this.showCategoryType = options.showCategoryType || false;
         }
-        this.categoryType = 'all';
         $('#moduleToColumn').modal("show");
         this.getCategories();
       },
@@ -152,6 +154,7 @@ moduleToColumn.init = function(callback) {
           uid: this.uid,
           mainCategoriesId: this.mainCategoriesId,
           minorCategoriesId: this.minorCategoriesId,
+          operationType: this.operationType,
           categoryType: this.categoryType
         });
       }
