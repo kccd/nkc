@@ -10,6 +10,21 @@ body{
 }
 .column-settings{
   min-height: 32rem;
+  .column-settings-home-button{
+    @buttonHeight: 4rem;
+    display: block;
+    height: @buttonHeight;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #454545;
+    line-height: @buttonHeight;
+    text-align: center;
+    width: 100%;
+    text-decoration: none;
+    &:hover{
+      color: #000;
+    }
+  }
   .column-settings-navs{
     position: fixed;
     width: @navListWidth;
