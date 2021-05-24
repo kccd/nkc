@@ -50,7 +50,7 @@ var app = new Vue({
       selectImage.show(function(data){
         app.selectedBanner(data);
       }, {
-        aspectRatio: 4
+        aspectRatio: 6.4
       });
     },
     selectAvatar: function() {
