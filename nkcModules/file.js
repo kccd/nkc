@@ -6,7 +6,6 @@ const fs = require("fs");
 const fsPromise = fs.promises;
 const db = require("../dataModels");
 const mime = require('mime');
-const func = {};
 const moment = require('moment');
 const PATH = require('path');
 const attachmentConfig = require("../config/attachment.json");
@@ -16,7 +15,10 @@ const pictureExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif", "webp"];
 const videoExtensions = ["mp4", "mov", "3gp", "avi", 'webm'];
 const audioExtensions = ["wav", "amr", "mp3", "aac", 'flac'];
 const breakpointExtensions = ['mp4', 'mp3', 'pdf'];
-func.folders = {
+
+const func = module.exports;
+
+exports.folders = {
   attachment: './attachment',
   resource: './resource',
 }
@@ -39,7 +41,7 @@ func.folders = {
 * @param {Date} t 时间，默认为当前时间
 * @return {String} 路径
 * */
-func.getBasePath = async (t) => {
+exports.getBasePath = async (t) => {
   let now;
   if(t) {
     now = new Date(t).getTime();
@@ -66,7 +68,7 @@ func.getBasePath = async (t) => {
   return basePath;
 }
 
-func.getFullPath = async (p, t) => {
+exports.getFullPath = async (p, t) => {
   const path = PATH.resolve(await func.getBasePath(t), p);
   await mkdirp(path);
   return path;
@@ -78,7 +80,7 @@ func.getFullPath = async (p, t) => {
 * @param {Date/undefined} time 指定的时间，默认取当前时间
 * @return {String} 完成目录
 * */
-func.getPath = async (type, time) => {
+exports.getPath = async (type, time) => {
   const _path = await func.getFileFolderPathByFileType(type);
   if(!_path) throwErr(500, `文件类型错误 type: ${type}`);
   time = time || new Date();
@@ -92,7 +94,7 @@ func.getPath = async (type, time) => {
 * @return {String} 路劲
 * @author pengxiguaa 2020/7/20
 * */
-func.getFileFolderPathByFileType = async (type) => {
+exports.getFileFolderPathByFileType = async (type) => {
   const fileFolder = require('../settings/fileFolder');
   return fileFolder[type];
 }
@@ -100,7 +102,7 @@ func.getFileFolderPathByFileType = async (type) => {
 /*
 * 获取附件的类型 picture, video, audio, attachment
 * */
-func.getMediaTypeByExtension = (extension) => {
+exports.getMediaTypeByExtension = (extension) => {
   if(pictureExtensions.includes(extension)) {
     return 'mediaPicture'
   } else if(videoExtensions.includes(extension)) {
@@ -114,7 +116,7 @@ func.getMediaTypeByExtension = (extension) => {
 /*
 * 获取制定类型的文件格式
 * */
-func.getExtensionByType = (type) => {
+exports.getExtensionByType = (type) => {
   if(type === 'mediaPicture') {
     return pictureExtensions;
   } else if(type === 'mediaVideo') {
@@ -172,7 +174,7 @@ func.saveColumnAvatar$2 = async (columnId, file) => {
 
 
 // 删除专栏头像文件
-func.deleteColumnAvatar = async (columnId) => {
+exports.deleteColumnAvatar = async (columnId) => {
   const column = await db.ColumnModel.findOnly({_id: columnId});
   await column.updateOne({avatar: ""});
 };
@@ -222,7 +224,7 @@ func.saveColumnBanner$2 = async (columnId, file) => {
 
 
 // 删除专栏背景文件
-func.deleteColumnBanner = async (columnId) => {
+exports.deleteColumnBanner = async (columnId) => {
   const column = await db.ColumnModel.findOnly({_id: columnId});
   await column.updateOne({banner: ""});
 };
@@ -265,7 +267,7 @@ func.saveUserAvatar$2 = async (uid, file) => {
 * @param {String} uid 用户ID
 * @author pengxiguaa 2019-8-2
 * */
-func.deleteUserAvatar = async (uid) =>{
+exports.deleteUserAvatar = async (uid) =>{
   const user = await db.UserModel.findOnly({uid});
   await user.updateOne({avatar: ""});
 };
@@ -314,7 +316,7 @@ func.saveUserBanner$2 = async (uid, file) => {
 * @param {String} uid 用户ID
 * @author pengxiguaa 2019-8-2
 * */
-func.deleteUserBanner = async (uid) =>{
+exports.deleteUserBanner = async (uid) =>{
   const user = await db.UserModel.findOnly({uid});
   await user.updateOne({banner: ""});
 };
@@ -324,7 +326,7 @@ func.deleteUserBanner = async (uid) =>{
 * @param {String} hash 图片hash
 * @author pengxiguaa 2019-9-17
 * */
-func.getPostCover = async (hash) => {
+exports.getPostCover = async (hash) => {
   let filePath = upload.coverPath + "/" + hash + ".jpg";
   if(!hash || !await func.access(filePath)) {
     filePath = statics.defaultPostCoverPath;
@@ -338,7 +340,7 @@ func.getPostCover = async (hash) => {
 * @param {File} 图像数据
 * @author pengxiguaa 2019-10-16
 * */
-func.saveResourceCover = async (rid, file) => {
+exports.saveResourceCover = async (rid, file) => {
   const resource = await db.ResourceModel.findOnly({rid});
   const {hash, path} = file;
   const filePath = upload.coverPath + "/" + hash + ".jpg";
@@ -364,7 +366,7 @@ func.saveResourceCover = async (rid, file) => {
 *   }
 * @author pengxiguaa 2019-9-17
 * */
-func.modifyPostCovers = async (pid, covers) => {
+exports.modifyPostCovers = async (pid, covers) => {
   const post = await db.PostModel.findOnly({pid});
   let coversHash = [], files = [];
   for(const c of covers) {
@@ -403,7 +405,7 @@ func.modifyPostCovers = async (pid, covers) => {
 /*
   根据postID生成封面图
 */
-func.createPostCoverByPostId = async (pid) => {
+exports.createPostCoverByPostId = async (pid) => {
   const post = await db.PostModel.findOne({pid});
   if(!post) return;
   const ext = ["jpg", "jpeg", "bmp", "png", "mp4"];
@@ -432,7 +434,7 @@ func.createPostCoverByPostId = async (pid) => {
 /*
 * 首页指定文章封面图
 * */
-func.saveHomeAdCover = async (file, type) => {
+exports.saveHomeAdCover = async (file, type) => {
   const {hash, path} = file;
   const filePath = upload.coverPath + "/" + hash + ".jpg";
   let height = 253, width = 400;
@@ -451,7 +453,7 @@ func.saveHomeAdCover = async (file, type) => {
 /*
 * 检查文件类型与格式是否对应，返回文件格式
 * */
-func.getFileExtension = async (file, extensions = []) => {
+exports.getFileExtension = async (file, extensions = []) => {
   // let extension = await FileType.fromFile(file.path);
   let extension;
   const pathExtension = PATH.extname(file.name).replace('.', '').toLowerCase();
@@ -479,7 +481,7 @@ func.getFileExtension = async (file, extensions = []) => {
 * 手动构建File对象
 * @param {String} filePath 文件路径
 * */
-func.getFileObjectByFilePath = async (filePath) => {
+exports.getFileObjectByFilePath = async (filePath) => {
   const HASH = require('../nkcModules/hash');
   const name = PATH.basename(filePath);
   const ext = PATH.extname(filePath).replace('.', '');
@@ -503,7 +505,7 @@ func.getFileObjectByFilePath = async (filePath) => {
 * @return {Boolean}
 * @author pengxiguaa 2020/8/10
 * */
-func.exist = async (targetPath) => {
+exports.exist = async (targetPath) => {
   try{
     await fsPromise.stat(targetPath);
     return true;
@@ -515,7 +517,7 @@ func.exist = async (targetPath) => {
 /*
 * 同上
 * */
-func.access = async (targetPath) => {
+exports.access = async (targetPath) => {
   try{
     await fsPromise.access(targetPath);
     return true;
@@ -552,5 +554,3 @@ function resizeImage(fromFile, toFile) {
     quality
   });
 }
-
-module.exports = func;
