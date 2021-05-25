@@ -6,21 +6,11 @@ const { watch } = require("gulp");
 const less = require("less");
 const LessPluginAutoPrefix = require("less-plugin-autoprefix");
 const glob = require("glob");
-const rollup = require("rollup");
-const { nodeResolve } = require("@rollup/plugin-node-resolve");
-const commonjs = require("@rollup/plugin-commonjs");
-const nodePolyfills = require("rollup-plugin-node-polyfills");
-const { terser } = require("rollup-plugin-terser");
-const { babel } = require("@rollup/plugin-babel");
-const { string } = require("rollup-plugin-string");
 const logUpdate = require("log-update");
 const mute = require("mute");
-const os = require('os');
-const { Worker, MessageChannel } = require("worker_threads");
 
-const SCRIPTS_GLOBS = "pages/**/*.{js,mjs}";
-const LESS_GLOBS = "pages/**/*.{less,css}";
-const ASSETS_GLOBS = "pages/**/*.!(less|css|mjs|js)";
+const LESS_GLOBS = "pages/**/*.less";
+const ASSETS_GLOBS = "pages/**/*.{pug,html}";
 const DIST_DIR = "dist";
 const spin = "-\\|/";
 let spin_slice = 0;
@@ -64,87 +54,6 @@ async function compileAllCss() {
     unmute();
     log(`${rotateChar()} [${Number(index) + 1}/${filenames.length}] ${filename} ${colors.bold("->")} ${output}`);
   }
-}
-
-// 编译所有js脚本文件
-function compileAllJS() {
-  let finish = noop;
-  const log = logUpdate.create(process.stdout);
-  const filenames = glob.sync(SCRIPTS_GLOBS);
-  /** @type Worker[] */
-  const pool = Array(os.cpus().length).fill(new Worker("./compile-js-worker.js"));
-  const workerPorts = pool.map(worker => {
-    const { port1, port2 } = new MessageChannel();
-    worker.postMessage({ port: port1 }, [port1]);
-    return port2;
-  });
-  let ok = 0;
-  let iterator = filenames.entries();
-  workerPorts.forEach(port => {
-    port.addListener("message", data => {
-      const { filename, output, error } = data;
-      if(error) {
-        return finish();
-      }
-      log(`${rotateChar()} [${(ok++) + 1}/${filenames.length}] ${filename} ${colors.bold("->")} ${output}`);
-      if(filenames.length === ok) {
-        return finish();
-      }
-      todoNextTask();
-    });
-    function todoNextTask() {
-      const item = iterator.next();
-      if(item.done) return;
-      const filename = item.value[1];
-      port.postMessage({ filename: filename });
-    }
-    todoNextTask();
-  });
-  return new Promise(resolve => finish = resolve)
-  .then(() => workerPorts.forEach(port => port.postMessage({ exit: true })));
-}
-
-// 打包编译单个js脚本
-async function compileJS(filename) {
-  const ext = path.extname(filename);
-  const basename = path.basename(filename, ext);
-  const output = path.join(__dirname, DIST_DIR, filename, "../", basename + ".js");
-  console.log(`${colors.cyan.bold("compiling")}: ${filename}`);
-  const bundle = await rollup.rollup({
-    input: filename,
-    plugins: [
-      nodePolyfills(),
-      nodeResolve(),
-      commonjs(),
-      babel({
-        babelHelpers: "bundled",
-        presets: [
-          ["@babel/preset-env", {
-            targets: {
-              chrome: "38",
-              ie: "11"
-            }
-          }]
-        ],
-        plugins: ["@babel/plugin-transform-object-assign"]
-      }),
-      string({
-        include: "pages/**/*.html"
-      }),
-      process.env.NODE_ENV === "production" && terser()
-    ],
-    cache: true
-  });
-  await bundle.write({
-    name: basename,
-    file: output,
-    format: "umd",
-    sourcemap: process.env.NODE_ENV === "production" ? false : "inline",
-    compact: false
-  });
-  await bundle.close();
-  console.log(`${colors.green.bold("complied")}: ${filename} -> ${path.relative(__dirname, output)}`);
-  return output;
 }
 
 // 复制单个静态文件文件
@@ -197,27 +106,6 @@ function watchCompileCss() {
 }
 
 
-// 监听编译js文件
-function watchCompileJS() {
-  const onCompile = async path => {
-    try {
-      compileJS(path)
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  watch(SCRIPTS_GLOBS).on("change", onCompile);
-  watch(SCRIPTS_GLOBS).on("add", onCompile);
-  watch(SCRIPTS_GLOBS).on("unlink", filename => {
-    const ext = path.extname(filename);
-    const basename = path.basename(filename, ext);
-    const dest = path.join(__dirname, DIST_DIR, filename, "../", basename + ".js");
-    rimraf(dest, () => console.log(`${colors.green.bold("unlink")}: ${path.relative(__dirname, dest)}`));
-  });
-  console.log("Watching js file changes...");
-}
-
-
 // 监听拷贝静态资源
 function watchAssets() {
   const destPath = filename => path.join(__dirname, DIST_DIR, filename);
@@ -242,8 +130,6 @@ module.exports = {
   "watch:assets": () => watchAssets(),
   "compile:css": () => compileAllCss(),
   "watch:css":   () => watchCompileCss(),
-  "compile:js":   () => compileAllJS(),
-  "watch:js":     () => watchCompileJS(),
   default: (done) => done(),
 }
 
