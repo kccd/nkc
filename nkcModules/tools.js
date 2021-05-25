@@ -85,6 +85,9 @@ var Tools = function() {
       case "thread": {
         return "/t/" + id;
       }
+      case "editThread": {
+        return "/editor?"
+      }
       case 'mediaPicture': {
         return "/r/" + id + t;
       }
@@ -135,6 +138,7 @@ var Tools = function() {
   self.getAnonymousInfo = function() {
     return {
       username: '匿名用户',
+      uid: '',
       avatarUrl: self.getUrl('anonymousUserAvatar')
     }
   };

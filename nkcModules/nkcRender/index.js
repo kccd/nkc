@@ -161,8 +161,7 @@ class NKCRender {
     return htmlFilter(c);
   }
   URLifyHTML(c) {
-    c = URLifyHTML(c);
-    return htmlFilter(c);
+    return URLifyHTML(c);
   }
   htmlToPlain(html = "", count) {
     const $ = cheerio.load(html);

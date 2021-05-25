@@ -261,6 +261,569 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
   }
 
 };
+/*
+* 拓展应用通知信息，拓展参数字段
+* @param {Object} message STU类message
+* */
+messageSchema.statics.getParametersData = async (message) => {
+  const moment = require("moment");
+  const PostModel = mongoose.model("posts");
+  const UserModel = mongoose.model("users");
+  const ThreadModel = mongoose.model("threads");
+  const FundApplicationFormModel = mongoose.model("fundApplicationForms");
+  const ShopOrdersModel = mongoose.model("shopOrders");
+  const ColumnModel = mongoose.model("columns");
+  const ShopRefundModel = mongoose.model("shopRefunds");
+  const ActivityModel = mongoose.model("activity");
+  const ComplaintModel = mongoose.model('complaints');
+  const SettingModel= mongoose.model('settings');
+  const ProblemModel = mongoose.model("problems");
+  const PostsVoteModel = mongoose.model('postsVotes');
+  const SecurityApplicationModel = mongoose.model('securityApplications');
+  const ForumModel = mongoose.model('forums');
+  const PreparationForumModel = mongoose.model('pForum');
+  const apiFunction = require("../nkcModules/apiFunction");
+  const {getUrl, getAnonymousInfo} = require('../nkcModules/tools');
+  const timeout = 72 * 60 * 60 * 1000;
+  let parameters = {};
+  const {type} = message.c;
+  if(type === 'at') {
+    const {targetPid, targetUid} = message.c;
+    const post = await PostModel.findOne({pid: targetPid}, {pid: 1, tid: 1, c: 1, uid: 1});
+    if (!post) return null;
+    const thread = await ThreadModel.findOne({tid: post.tid});
+    if (!thread) return null;
+    const firstPost = await thread.extendFirstPost();
+    let user = {};
+    if(post.anonymous) {
+      user = getAnonymousInfo();
+    } else {
+      user = await UserModel.findOne({uid: targetUid});
+      if (!user) return null;
+    }
+    parameters = {
+      threadURL: getUrl('thread', thread.tid),
+      threadTitle: firstPost.t,
+      postURL: await PostModel.getUrl(post),
+      username: user.username,
+      userURL: user.uid? getUrl('userHome', user.uid): ''
+    };
+  } else if(type === 'xsf') {
+    const {pid, num} = message.c;
+    const post = await PostModel.findOne({pid});
+    if(!post) return null;
+    parameters = {
+      postURL: await PostModel.getUrl(post),
+      xsfCount: num
+    };
+  } else if(type === 'scoreTransfer') {
+    const {pid, uid, scoreType, number} = message.c;
+    const post = await PostModel.findOne({pid});
+    if(!post) return null;
+    const thread = await ThreadModel.findOne({tid: post.tid});
+    if(!thread) return null;
+    const firstPost = await thread.extendFirstPost();
+    const user = await UserModel.findOne({uid});
+    if(!user) return null;
+    let scoreConfig = await SettingModel.getScoreByScoreType(scoreType);
+    const scoreName = scoreConfig.name;
+    const scoreNumber = number / 100;
+    parameters = {
+      username: user.username,
+      postURL: await PostModel.getUrl(post),
+      threadTitle: firstPost.t,
+      scoreNumber,
+      scoreName,
+    };
+  } else if(type === 'digestPost') {
+    const {pid} = message.c;
+    const post = await PostModel.findOne({pid});
+    if(!post) return null;
+    parameters = {
+      postURL: await PostModel.getUrl(post)
+    };
+  } else if(type === 'digestThread') {
+    const {pid} = message.c;
+    const post = await PostModel.findOne({pid})
+    if(!post) return null;
+    const thread = await ThreadModel.findOne({tid: post.tid});
+    if(!thread) return null;
+    const firstPost = await thread.extendFirstPost();
+    parameters = {
+      threadTitle: firstPost.t,
+      threadURL: getUrl('thread', thread.tid)
+    };
+  } else if(type === 'bannedThread') {
+    const {tid, rea} = message.c;
+    const thread = await ThreadModel.findOne({tid});
+    if(!thread) return null;
+    const firstPost = await thread.extendFirstPost();
+    parameters = {
+      threadTitle: firstPost.t,
+      threadURL: getUrl('thread', thread.tid),
+      reason: rea
+    };
+  } else if(type === 'bannedPost') {
+    const {pid, rea} = message.c;
+    const post = await PostModel.findOne({pid});
+    if(!post) return null;
+    const thread = await ThreadModel.findOne({tid: post.tid});
+    if(!thread) return null;
+    const firstPost = await thread.extendFirstPost();
+    parameters = {
+      threadTitle: firstPost.t,
+      threadURL: getUrl('thread', thread.tid),
+      reason: rea
+    };
+  } else if(type === 'threadWasReturned') {
+    const {tid, rea} = message.c;
+    const thread = await ThreadModel.findOne({tid});
+    if(!thread) return null;
+    const firstPost = await thread.extendFirstPost();
+    parameters = {
+      threadTitle: firstPost.t,
+      threadURL: getUrl('thread', thread.tid),
+      editThreadURL: `/editor?type=post&id=${thread.oc}`,
+      reason: rea,
+      deadline: moment(Date.now() + timeout).format("YYYY-MM-DD HH:mm:ss")
+    };
+  } else if(type === 'postWasReturned') {
+    const {pid, rea} = message.c;
+    const post = await PostModel.findOne({pid});
+    if(!post) return null;
+    const thread = await ThreadModel.findOne({tid: post.tid});
+    if(!thread) return null;
+    const firstPost = await thread.extendFirstPost();
+    parameters = {
+      threadTitle: firstPost.t,
+      threadURL: getUrl('thread', thread.tid),
+      editPostURL: `/editor?type=post&id=${post.pid}`,
+      reason: rea,
+      deadline: moment(Date.now() + timeout).format("YYYY-MM-DD HH:mm:ss")
+    };
+  } else if(type === 'replyPost') {
+    const {targetPid} = message.c;
+    const post = await PostModel.findOne({pid: targetPid});
+    if(!post) return null;
+    const thread = await ThreadModel.findOne({tid: post.tid});
+    if(!thread) return null;
+    const firstPost = await thread.extendFirstPost();
+    let user = {};
+    if(post.anonymous) {
+      user = getAnonymousInfo();
+    } else {
+      user = await UserModel.findOne({uid: post.uid});
+      if(!user) return null;
+    }
+    parameters = {
+      userURL: user.uid? getUrl('userHome', user.uid): '',
+      username: user.username,
+      threadURL: getUrl('thread', thread.tid),
+      threadTitle: firstPost.t,
+      postURL: await PostModel.getUrl(post),
+      postContent: apiFunction.obtainPureText(post.c)
+    };
+  } else if(type === 'replyThread') {
+    const {targetPid} = message.c;
+    const post = await PostModel.findOne({pid: targetPid});
+    if(!post) return null;
+    let user = {};
+    if(post.anonymous) {
+      user = getAnonymousInfo();
+    } else {
+      user = await UserModel.findOne({uid: post.uid});
+      if(!user) return null;
+    }
+    const thread = await ThreadModel.findOne({tid: post.tid});
+    if(!thread) return null;
+    const firstPost = await thread.extendFirstPost();
+    parameters = {
+      userURL: user.uid? getUrl('userHome', user.uid): '',
+      username: user.username,
+      threadURL: getUrl('thread', thread.tid),
+      threadTitle: firstPost.t,
+      postURL: await PostModel.getUrl(post),
+      postContent: apiFunction.obtainPureText(post.c)
+    };
+  } else if(type === 'comment') {
+    const {pid} = message.c;
+    const post = await PostModel.findOne({pid});
+    if(!post) return null;
+    let user = {};
+    if(post.anonymous) {
+      user = getAnonymousInfo();
+    } else {
+      user = await UserModel.findOne({uid: post.uid});
+      if(!user) return null;
+    }
+    parameters = {
+      postURL: await PostModel.getUrl(post),
+      postContent: apiFunction.obtainPureText(post.c),
+      userURL: user.uid? getUrl('userHome', user.uid): '',
+      username: user.username
+    };
+  } else if(type === 'userAuthApply') {
+    const {targetUid} =  message.c;
+    const user = await UserModel.findOne({uid: targetUid});
+    if(!user) return null;
+    parameters = {
+      username: user.username,
+      userAuthApplyURL: `/u/${user.uid}/auth`
+    };
+  } else if(type === 'shopSellerNewOrder') {
+    const {orderId} = message.c;
+    const order = await ShopOrdersModel.findOne({orderId: orderId});
+    if(!order) return null;
+    parameters = {
+      orderID: order.orderId,
+      sellerOrderListURL: `/shop/manage/order`
+    };
+  } else if(type === 'shopBuyerOrderChange') {
+    const {orderId} = message.c;
+    const order = await ShopOrdersModel.findOne({orderId});
+    if(!order) return null;
+    parameters = {
+      orderID: order.orderId,
+      buyerOrderURL: `/shop/order/${order.orderId}/detail`
+    };
+  } else if(type === 'problemFixed') {
+    const {pid} = message.c;
+    const problem = await ProblemModel.findOne({_id: pid});
+    if(!problem) return null;
+    const restorer = await UserModel.findOne({uid: problem.restorerId});
+    if(!restorer) return null;
+    parameters = {
+      problemTitle: problem.t,
+      restorerURL: getUrl('userHome', restorer.uid),
+      restorerName: restorer.username,
+      problemURL: `/u/${problem.uid}/myProblems/${problem._id}`
+    };
+  } else if(
+    [
+      "shopBuyerOrderChange",
+      "shopSellerNewOrder",
+      "shopBuyerPay",
+      "shopBuyerConfirmReceipt",
+      "shopSellerShip",
+      "shopSellerCancelOrder",
+      "shopBuyerApplyRefund",
+      "shopBuyerRefundChange",
+      "shopSellerRefundChange",
+    ].includes(type)
+  ) {
+    const {r} = message;
+    const {orderId, refundId} = message.c;
+    let order, refund;
+    if(orderId) {
+      order = await ShopOrdersModel.findOne({orderId});
+      if(!order) return null;
+    }
+    if(refundId) {
+      refund = await ShopRefundModel.findOne({_id: refundId});
+    }
+    const user = await UserModel.findOne({uid: r});
+    if(!user) return null;
+
+    if(type === 'shopBuyerOrderChange') {
+      parameters = {
+        orderID: order.orderId,
+        buyerOrderURL: `/shop/order/${order.orderId}/detail`
+      };
+    } else if(type === 'shopSellerNewOrder') {
+      parameters = {
+        orderID: order.orderId,
+        sellerOrderListURL: `/shop/manage/order`
+      };
+    } else if(type === 'shopBuyerPay') {
+      parameters = {
+        orderID: order.orderId,
+        sellerOrderURL: `/shop/manage/${user.uid}/order/detail?orderId=${order.orderId}`
+      };
+    } else if(type === 'shopBuyerConfirmReceipt') {
+      parameters = {
+        orderID: order.orderId,
+        sellerOrderURL: `/shop/manage/${user.uid}/order/detail?orderId=${order.orderId}`
+      };
+    } else if(type === 'shopSellerShip') {
+      parameters = {
+        orderID: order.orderId,
+        buyerOrderURL: `/shop/order/${order.orderId}/detail`
+      };
+    } else if(type === 'shopSellerCancelOrder') {
+      parameters = {
+        orderID: order.orderId,
+        buyerOrderURL: `/shop/order/${order.orderId}/detail`
+      };
+    } else if(type === 'shopBuyerApplyRefund') {
+      parameters = {
+        orderID: order.orderId,
+        sellerOrderRefundURL: `/shop/manage/${user.uid}/order/refund?orderId=${order.orderId}`
+      };
+    } else if(type === 'shopBuyerRefundChange') {
+      parameters = {
+        orderID: order.orderId,
+        buyerOrderRefundURL: `/shop/order/${order.orderId}/refund`
+      };
+    } else if(type === 'shopSellerRefundChange') {
+      parameters = {
+        orderID: order.orderId,
+        sellerOrderRefundURL: `/shop/manage/${user.uid}/order/refund?orderId=${order.orderId}`
+      };
+    }
+  } else if(['warningPost', 'warningThread'].includes(type)) {
+    const {pid, rea} = message.c;
+    const post = await PostModel.findOne({pid});
+    if(!post) return null;
+    const thread = await ThreadModel.findOne({tid: post.tid});
+    if(!thread) return null;
+    const firstPost = await thread.extendFirstPost();
+    parameters = {
+      threadURL: getUrl('thread', thread.tid),
+      threadTitle: firstPost.t,
+      reason: rea,
+    }
+    if(type === 'warningPost') {
+      parameters.postURL = await PostModel.getUrl(post);
+      parameters.editPostURL = `/editor?type=post&id=${post.pid}`;
+    } else if(type === 'warningThread') {
+      parameters.editThreadURL = `/editor?type=post&id=${thread.oc}`
+    }
+  } else if(type === 'activityChangeNotice') {
+    const {acid, content, cTitle} = message.c;
+    const activity = await ActivityModel.findOne({acid});
+    if(!activity) return null;
+    parameters = {
+      activityUrl: `/activity/single/${activity.acid}`,
+      activityTitle: activity.activityTitle,
+      noticeContent: content,
+      cTitle: cTitle,
+    };
+  } else if(["newReview", "passReview"].includes(type)) {
+    const {pid} = message.c;
+    const post = await PostModel.findOne({pid});
+    if(!post) return null;
+    parameters = {
+      reviewLink: await PostModel.getUrl(post)
+    };
+  } else if(["fundAdmin", "fundApplicant", "fundMember"].includes(type)) {
+    const {applicationFormId} = message.c;
+    let applicationForm = await FundApplicationFormModel.findOne({_id: applicationFormId});
+    if(!applicationForm) return null;
+    applicationForm = applicationForm.toObject();
+    const user = await UserModel.findOne({uid: applicationForm.uid});
+    if(!user) return null;
+    applicationForm.url = `/fund/a/${applicationForm._id}`;
+    parameters = {
+      applicationFormURL: `/fund/a/${applicationForm._id}`,
+      applicationFormCode: applicationForm.code,
+    };
+    if(type === 'fundMember') {
+      parameters.username = user.username;
+      parameters.userURL = getUrl('userHome', user.uid);
+    }
+  } else if([
+    "newColumnContribute", "columnContributeChange",
+    "disabledColumn", "disabledColumnInfo",
+    "columnContactAdmin"
+  ].includes(type)) {
+    const {columnId, rea} = message.c;
+    const column = await ColumnModel.findOne({_id: columnId});
+    if(!column) return null;
+    if(type === 'newColumnContribute') {
+      parameters = {
+        columnContributeURL: `/m/${column._id}/settings/contribute`,
+        columnURL: `/m/${column._id}`,
+        columnName: column.name
+      };
+    } else if(type === 'columnContributeChange') {
+      parameters = {
+        userContributeURL: `/account/contribute`,
+        columnURL: `/m/${column._id}`,
+        columnName: column.name
+      };
+    } else if(type === 'disabledColumn') {
+      parameters = {
+        columnURL: `/m/${column._id}`,
+        columnName: column.name,
+        reason: rea,
+      };
+    } else if(type === 'disabledColumnInfo') {
+      parameters = {
+        columnURL: `/m/${column._id}`,
+        columnName: column.name,
+        reason: rea,
+        columnInfoType: ({
+          'notice': '公告通知',
+          'otherLinks': '友情链接',
+          'blocks': '自定义内容',
+          'name': '专栏名',
+          'abbr': '专栏简介',
+          'logo': 'logo',
+          'banner': 'banner'
+        })[c.columnInfoType]
+      };
+    } else if(type === 'columnContactAdmin') {
+      parameters = {
+        columnURL: `/m/${column._id}`,
+        columnName: column.name,
+      };
+    }
+  } else if(type === 'latestVotes') {
+    let {votesId} = message.c;
+    votesId = votesId.map(v => {
+      return mongoose.Types.ObjectId(v);
+    });
+    const votes = await PostsVoteModel.find({_id: {$in: votesId}}, {
+      pid: 1, uid: 1
+    });
+    if(!votes.length) return null;
+    const usersId = [];
+    let pid = '';
+    votes.map(v => {
+      usersId.push(v.uid);
+      pid = v.pid;
+    });
+    const users = await UserModel.find({uid: {$in: usersId}}, {username: 1});
+    if(!users.length) return null;
+    const usernames = users.map(user => user.username);
+    parameters = {
+      LVUsernames: usernames.slice(0, 6).join("、"),
+      LVTotal: usersId.length
+    };
+    // 目标post
+    const post = await PostModel.findOne({pid}, {type: 1, tid: 1, t: 1, pid});
+    if(!post) return null;
+    // 如果是文章
+    if(post.type === "thread") {
+      parameters.LVTarget = getUrl('thread', post.tid);
+      parameters.LVTargetDesc = `文章《${post.t}》`;
+    } else if(post.type === "post") {
+      parameters.LVTarget = await PostModel.getUrl(post);
+      parameters.LVTargetDesc = `回复(点击查看)`;
+    }
+  } else if(type === 'complaintsResolve') {
+    // 投诉类型
+    const {complaintId} = message.c;
+    const complaint = await ComplaintModel.findOne({_id: complaintId});
+    if(!complaint || !complaint.resolved || !complaint.informed) return null;
+    const {type: complaintType, contentId, result, reasonDescription} = complaint;
+    let CRType, CRTarget, CRTargetDesc;
+    if(complaintType === "thread") {
+      CRType = "文章";
+      // 投诉目标链接
+      CRTarget = tools.getUrl("thread", contentId)
+      // 投诉目标描述
+      const thread = await ThreadModel.findOne({tid: contentId});
+      if(!thread) return null;
+      const firstPost = await thread.extendFirstPost();
+      CRTargetDesc = `《${firstPost.t}》`;
+    } else if(complaintType === "user") {
+      CRType = "用户";
+      // 投诉目标链接
+      CRTarget = tools.getUrl("userHome", contentId);
+      // 投诉目标描述
+      const user = await UserModel.findOne({uid: contentId}, {username: 1});
+      if(!user) return null;
+      CRTargetDesc = user.username;
+    } else if(complaintType === "post") {
+      CRType = "回复";
+      // 投诉目标链接
+      CRTarget = tools.getUrl("post", contentId);
+      // 投诉目标描述
+      CRTargetDesc = "点击查看";
+    } else {
+      return null;
+    }
+    parameters = {
+      CRReason: reasonDescription,
+      CRResult: result,
+      CRType,
+      CRTarget,
+      CRTargetDesc
+    };
+  } else if(type === 'newForumReview') {
+    let {pfid} = message.c;
+    let pForum = await PreparationForumModel.findOne({pfid});
+    if(!pForum) return null;
+    let { uid, info } = pForum;
+    let { newForumName } = info;
+    const user = await UserModel.findOne({uid}, {username: 1});
+    if(!user) return null;
+    parameters = {
+      NFRUserProfile: tools.getUrl("userHome", uid),
+      NFRUserName: user.username,
+      NFRName: newForumName,
+      NFRReview: "/nkc/applyForum"
+    };
+  } else if(type === 'inviteFounder') {
+    let { pfid, myUid } = message.c;
+    let pForum = await PreparationForumModel.findOne({pfid});
+    if(!pForum) return null;
+    let { uid, info } = pForum;
+    let { newForumName } = info;
+    const user = await UserModel.findOne({uid}, {username: 1});
+    if(!user) return null;
+    parameters = {
+      IFUserProfile: tools.getUrl("userHome", uid),
+      IFUserName: user.username,
+      IFName: newForumName,
+      IFAcceptPageUrl: `/u/${r.r}/forum/invitation?pfid=${pfid}`
+    };
+  } else if(type === 'newForumReviewResolve') {
+    let { pfid, fid } = message.c;
+    let forum = await ForumModel.findOne({fid});
+    let pForum = await PreparationForumModel.findOne({pfid});
+    if(!forum) return null;
+    let { displayName } = forum;
+    // 专业名
+    parameters = {
+      NFRSName: displayName,
+      NFRSUrl: tools.getUrl("forumHome", fid),
+      NFRSExpired: tools.timeFormat(pForum.expired)
+    };
+  } else if(type === 'newForumReviewReject') {
+    let { pfid } = message.c;
+    let pForum = await PreparationForumModel.findOne({pfid});
+    if(!pForum) return null;
+    let { info } = pForum;
+    let { newForumName } = info;
+    parameters = {
+      NFRJName: newForumName,
+    };
+  } else if(type === 'becomeFormalForum') {
+    let { name, formal } = message.c;
+    parameters = {
+      BFFName: name,
+    };
+    if(formal) {
+      parameters.BFFMessage = "已转为正式专业";
+    } else {
+      parameters.BFFMessage = "已被关停，此筹备专业未能在30天内产出50篇文章";
+    }
+  }
+   else if([
+    'securityApplicationRejected',
+    'securityApplicationResolved'
+  ].includes(type)) {
+    const {securityApplicationId} = message.c;
+    const application = await SecurityApplicationModel.findOne({_id: securityApplicationId});
+    if(!application) return null;
+    parameters = {
+      reason: application.reason
+    };
+  } else if(type === 'violation') {
+     const {threadId, rea}= message.c;
+     const thread = await ThreadModel.findOne({tid: threadId});
+     if(!thread) return null;
+     const firstPost = await thread.extendFirstPost();
+     parameters = {
+       threadTitle: firstPost.t,
+       threadUrl: getUrl(`thread`, thread.tid),
+       reason: rea,
+     };
+  }
+  return parameters;
+};
 
 messageSchema.statics.extendSTUMessages = async (arr) => {
   const moment = require("moment");
@@ -657,6 +1220,15 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       const application = await SecurityApplicationModel.findOne({_id: securityApplicationId});
       if(!application) continue;
       r.c.rea = application.reason;
+    } else if(type === 'violation') {
+      const {threadId} = r.c;
+      const thread = await ThreadModel.findOne({tid: threadId}, {oc: 1, tid: 1});
+      if(!thread) continue;
+      const firstPost = await PostModel.findOne({pid: thread.oc}, {t: 1});
+      if(!firstPost) continue;
+      r.c.threadTitle = firstPost.t;
+      r.c.threadUrl = `/t/${thread.tid}`;
+      r.c.reason = r.c.rea;
     }
 
     if(r.c.thread) {
@@ -946,7 +1518,7 @@ messageSchema.statics.extendMessage = async (uid, message) => {
 * */
 messageSchema.statics.getSTUMessageContent = async (message) => {
   const MessageTypeModel = mongoose.model("messageTypes");
-  const getValue = MessageTypeModel.getValue;
+  const MessageModel = mongoose.model('messages');
   const plainEscaper = require("../nkcModules/plainEscaper");
   const messageType = await MessageTypeModel.findOne({_id: 'STU'});
   const {templates} = messageType;
@@ -955,29 +1527,18 @@ messageSchema.statics.getSTUMessageContent = async (message) => {
   const {c} = message;
   const {type} = c;
   const template = templatesObj[type];
-  const {parameters} = template;
   let content = plainEscaper(template.content);
+  const parametersData = await MessageModel.getParametersData(message);
+  if(parametersData === null) {
+    return null;
+  }
   content = content.replace(/\[url=(.*?)\((.*?)\)]/ig, (v1, v2, v3) => {
-    let url, name;
-    if(!parameters.includes(v2)) {
-      url = v2;
-    } else {
-      url = getValue(v2, c);
-    }
-    if(!parameters.includes(v3)) {
-      name = v3;
-    } else {
-      name = getValue(v3, c);
-    }
+    const url = parametersData[v2] !== undefined? parametersData[v2]: v2;
+    const name = parametersData[v3] !== undefined? parametersData[v3]: v3;
     return `&nbsp;<a href="${url}" target="_blank">${name}</a>&nbsp;`
   });
   content = content.replace(/\[text=(.*?)]/ig, (v1, v2) => {
-    let text;
-    if(!parameters.includes(v2)) {
-      text = v2;
-    } else {
-      text = getValue(v2, c);
-    }
+    const text = parametersData[v2] !== undefined? parametersData[v2]: v2;
     return `&nbsp;<b>${text}</b>&nbsp;`
   });
   return content;
@@ -992,6 +1553,7 @@ messageSchema.statics.extendMessages = async (uid, messages) => {
   // status: sent, sending, error
 
   const nkcRender = require("../nkcModules/nkcRender");
+  const {filterAllHTML, filterMessageContent} = require('../nkcModules/xssFilters');
   const MessageModel = mongoose.model("messages");
   const {getUrl} = tools;
   const _messages = [];
@@ -1049,12 +1611,12 @@ messageSchema.statics.extendMessages = async (uid, messages) => {
       message.s = m.uid;
       message.content = `
         <div class="server-message">
-          用户「
+          用户&nbsp;
           <a href="/u/${m.uid}" target="_blank">
             ${username}
           </a>
-          」申请添加你为好友。
-          </br>附加说明：${description || '无'}
+          &nbsp;申请添加你为好友。
+          </br>附加说明：${filterAllHTML(description) || '无'}
           </br>
           <div class="button-container">
           ${(() => {
@@ -1081,11 +1643,12 @@ messageSchema.statics.extendMessages = async (uid, messages) => {
       message.content = message.content || "";
       if(['STE', 'UTU'].includes(ty)) {
         // 系统通知、用户间消息
-
         // 替换空格
         message.content = message.content.replace(/ /g, '&nbsp;');
-        // 处理链接 上下顺序不能变 处理链接函数里做了 > 判断
+        // 处理链接
         message.content = nkcRender.URLifyHTML(message.content);
+        // 过滤标签 仅保留标签 a['href']
+        message.content = filterMessageContent(message.content);
         // 替换换行符
         message.content = message.content.replace(/\n/g, '<br/>');
         message.content = message.content.replace(/\[f\/(.*?)]/g, function(r, v1) {

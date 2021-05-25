@@ -426,6 +426,15 @@ module.exports = {
             ],
             type: 'securityApplicationRejected',
             content: '手机号申诉未通过审核，理由：[text=reason]'
+        },
+        {
+            parameters: [
+                'reason',
+                'threadTitle',
+                'threadUrl'
+            ],
+          type: 'violation',
+          content: '你的文章[url=threadUrl(threadTitle)]由于[text=reason]的原因违规。'
         }
     ]
 };
