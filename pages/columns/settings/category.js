@@ -9,8 +9,7 @@ var categories = [];
 var categoriesObj = {};
 var minorCategoriesObj = {};
 
-for(var i = 0; i < minorCategories.length; i++ ) {
-  var minorCategory = minorCategories[i];
+for(const minorCategory of minorCategories) {
   minorCategoriesObj[minorCategory._id] = minorCategory;
 }
 
@@ -64,37 +63,36 @@ new Sortable(document.getElementsByClassName('column-categories-minor')[0], {
 
 function mainCategoryOnEnd(e) {
   // 处理顺序
-  var itemsContainer = $('.column-categories-item-container');
+  const itemsContainer = $('.column-categories-item-container');
 
-  for(var j = 0; j < itemsContainer.length; j++) {
-    var itemContainer = itemsContainer.eq(j);
-    var items = itemContainer.children('.column-category-item');
-    for(var i = 0; i < items.length; i++) {
-      var item = items.eq(i);
-      var categoryId = Number(item.attr('data-id'));
-      var category = categoriesObj[categoryId];
+  for(let j = 0; j < itemsContainer.length; j++) {
+    const itemContainer = itemsContainer.eq(j);
+    const items = itemContainer.children('.column-category-item');
+    for(let i = 0; i < items.length; i++) {
+      const item = items.eq(i);
+      const categoryId = Number(item.attr('data-id'));
+      const category = categoriesObj[categoryId];
       category.order = i + 1;
     }
   }
 
-  for(var i = 0; i < categories.length; i++) {
-    var category = categories[i];
+  for(const category of categories) {
     category.childrenId = [];
   }
 
-  var items = $('.column-category-item');
-  for(var i = 0; i < items.length; i++) {
-    var item = items.eq(i);
-    var categoryId = Number(item.attr('data-id'));
-    var parentDom = item.parent().parent().parent();
-    var category = categoriesObj[categoryId];
+  const items = $('.column-category-item');
+  for(let i = 0; i < items.length; i++) {
+    const item = items.eq(i);
+    const categoryId = Number(item.attr('data-id'));
+    const parentDom = item.parent().parent().parent();
+    const category = categoriesObj[categoryId];
     // 处理层级关系
     if(!parentDom.hasClass('column-category-item')) {
       // 顶层
       category.parentId = null;
     } else {
-      var parentId = Number(parentDom.attr('data-id'));
-      var parent = categoriesObj[parentId];
+      const parentId = Number(parentDom.attr('data-id'));
+      const parent = categoriesObj[parentId];
       parent.childrenId.push(categoryId);
       category.parentId = parentId;
     }
@@ -163,6 +161,7 @@ function minorCategoryOnEnd() {
 var CommonModel = new NKC.modules.CommonModal();
 
 function createCategory() {
+  return window.categoryForm.newCategory();
   CommonModel.open(function(formData) {
     var type = formData[0].value;
     var name = formData[1].value;
@@ -233,6 +232,7 @@ function putCategories() {
 }
 
 function editCategory(categoryId) {
+  return window.categoryForm.editCategory(categoryId);
   var category = categoriesObj[categoryId] || minorCategoriesObj[categoryId];
   CommonModel.open(function(formData) {
     var name = formData[0].value;
@@ -287,6 +287,126 @@ function insertCategory(category) {
   categoryArr.push(category);
   categoryObj[category._id] = category;
 }
+
+/*
+* 专栏分类 编辑器
+* */
+
+window.categoryForm = new Vue({
+  el: '#categoryForm',
+  data: {
+
+    showForm: false,
+
+    categoryId: '',
+    disableCategoryType: false,
+    type: 'main',
+    name: '',
+    brief: '',
+    description: '',
+    categoryEditor: null,
+  },
+  mounted() {
+    this.categoryEditor = UE.getEditor("columnCategoryEditor", NKC.configs.ueditor.columnCategory);
+  },
+  methods: {
+    setDescription() {
+    this.categoryEditor.setContent(this.description);
+    },
+    getDescription() {
+      this.description = this.categoryEditor.getContent();
+    },
+    newCategory() {
+      this.disableCategoryType = false;
+      this.type = 'main';
+      this.name = '';
+      this.brief = '';
+      this.description = '';
+      this.categoryId = '';
+      this.setDescription();
+      this.showForm = true;
+    },
+    editCategory(categoryId) {
+      nkcAPI(`/m/${data.columnId}/settings/category/${categoryId}`, 'GET')
+        .then(({category}) => {
+          const {
+            _id,
+            type,
+            name,
+            brief,
+            description,
+          } = category;
+          this.categoryId = _id;
+          this.name = name;
+          this.brief = brief;
+          this.description = description;
+          this.type = type;
+          this.disableCategoryType = true;
+          this.setDescription();
+          this.showForm = true;
+          window.location.href = window.location.pathname + '#categoryForm';
+        })
+        .catch(sweetError);
+    },
+    saveCategoryForm() {
+      this.getDescription();
+      const {
+        categoryId,
+        name,
+        brief,
+        description,
+        type,
+      } = this;
+      let method;
+      let url;
+      let body;
+      if(!categoryId) {
+        method = 'POST';
+        url = `/m/${data.columnId}/category`;
+        body = {
+          type,
+          name,
+          brief,
+          description,
+          parentId: null
+        };
+      } else {
+        method = 'PUT';
+        url = `/m/${data.columnId}/category/${categoryId}`;
+        body = {
+          name,
+          description,
+          brief
+        }
+      }
+      const _this = this;
+      nkcAPI(url, method, body)
+        .then(() => {
+          if(method === 'POST') {
+            window.location.reload();
+          } else {
+            const category = categoriesObj[categoryId] || minorCategoriesObj[categoryId];
+            category.name = name;
+            category.description = description;
+            var categoryDom;
+            if(category.type === 'main') {
+              categoryDom = $('.column-category-item[data-id="'+categoryId+'"]>.column-category-info>.column-category-name');
+            } else {
+              categoryDom = $('.column-category-minor-item[data-id="'+categoryId+'"]>.column-category-info>.column-category-name');
+            }
+            categoryDom.text(name);
+            _this.closeCategoryForm();
+            screenTopAlert('提交成功');
+          }
+        })
+        .catch(sweetError);
+    },
+    closeCategoryForm() {
+      this.showForm = false;
+    }
+  }
+})
+
 
 Object.assign(window, {
   mainCategoryOnEnd,

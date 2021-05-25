@@ -21,6 +21,10 @@ module.exports = {
     GET: "nkcManagementPost",
     POST: "nkcManagementPost"
   },
+  column: {
+    GET: "nkcManagementColumn",
+    POST: 'nkcManagementColumn',
+  },
   section: {
     GET: "nkcManagementSection",
     POST: "nkcManagementSection"

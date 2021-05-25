@@ -1,0 +1,22 @@
+.user-panel
+  .text-center
+    a(href=tools.getUrl('userAvatar', userPanel.avatar, 'lg') target="_blank").user-panel-avatar
+      img(src=tools.getUrl('userAvatar', userPanel.avatar))
+    .user-panel-username
+      a(href=`/u/${userPanel.uid}`)=userPanel.username
+      -const targetUser = userPanel
+      .user-panel-grade
+        include ../user/module_user_grade
+  .user-panel-cert=userPanel.info.certsName
+  .user-panel-number-div
+    .col-xs-4
+      .user-panel-number=userPanel.threadCount
+      .user-panel-title 文章
+    .col-xs-4
+      .user-panel-number=userPanel.postCount
+      .user-panel-title 回复
+    .col-xs-4
+      .user-panel-number=userPanel.xsf
+      .user-panel-title 学术分
+
+  .user-panel-description!=markdown(userPanel.description || "")

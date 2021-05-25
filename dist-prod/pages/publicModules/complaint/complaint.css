@@ -1,0 +1,113 @@
+#moduleComplaint {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: none;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+}
+.complaint-header {
+  color: #e85a71;
+  text-align: center;
+  font-weight: 700;
+  height: 5rem;
+  line-height: 5rem;
+  font-size: 1.8rem;
+  position: relative;
+}
+.complaint-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  height: 2.5rem;
+  width: 2.5rem;
+  line-height: 2.5rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #9baec8;
+}
+.complaint-close:hover {
+  background-color: #282c37;
+  color: #fff;
+}
+.complaint-content {
+  width: 34rem;
+  max-width: 100%;
+  height: auto;
+  max-height: 40rem;
+  border-radius: 0 0 3px 3px;
+  border-top: 2px solid #2b90d9;
+  position: absolute;
+  background-color: #fff;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+.complaint-body {
+  padding: 1rem;
+}
+.complaint-body h5 {
+  margin-top: 0;
+}
+.complaint-reason {
+  height: 3rem;
+  border-radius: 3px;
+  margin: 0.5rem 0.5rem;
+  display: inline-block;
+  cursor: pointer;
+  color: #282c37;
+  font-weight: 700;
+  line-height: 3rem;
+  padding: 0 1rem;
+  border: 1px solid #2b90d9;
+  -webkit-transition: background-color 100ms, color 100ms;
+  transition: background-color 100ms, color 100ms;
+}
+.complaint-reason.active {
+  border: 1px solid #2b90d9;
+  color: #fff;
+  background-color: #2b90d9;
+}
+.complaint-input {
+  margin-top: 1rem;
+  height: 10rem!important;
+}
+.complaint-button {
+  margin: 1rem 0;
+}
+.complaint-button button {
+  background-color: #2b90d9;
+  border-color: #2b90d9;
+}
+.complaint-title {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  height: 3rem;
+  line-height: 3rem;
+}
+.complaint-title .fa {
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  height: 2.5rem;
+  width: 2.5rem;
+  text-align: center;
+  line-height: 2.5rem;
+  background-color: #33c333;
+  color: #fff;
+  font-size: 1.6rem;
+  border-radius: 50%;
+}
+.complaint-description {
+  color: #282c37;
+  font-size: 1.3rem;
+  line-height: 2rem;
+  margin-top: 4rem;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL3B1YmxpY01vZHVsZXMvY29tcGxhaW50L2NvbXBsYWludC5sZXNzIiwiPGlucHV0IGNzcyA2OD4iXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRSxnQkFBQTtFQUNBLE9BQUE7RUFDQSxRQUFBO0VBQ0EsWUFBQTtFQUNBLGNBQUE7RUFDQSxhQUFBO0VBQ0EscUNBQUE7RUFDQSxlQUFBO0NDQ0Q7QURDRDtFQUNFLGVBQUE7RUFDQSxtQkFBQTtFQUNBLGlCQUFBO0VBQ0EsYUFBQTtFQUNBLGtCQUFBO0VBQ0Esa0JBQUE7RUFDQSxtQkFBQTtDQ0NEO0FEQ0Q7RUFDRSxtQkFBQTtFQUNBLFlBQUE7RUFDQSxjQUFBO0VBQ0EsZUFBQTtFQUNBLGNBQUE7RUFDQSxvQkFBQTtFQUNBLG1CQUFBO0VBQ0EsaUJBQUE7RUFDQSxrQkFBQTtFQUNBLGdCQUFBO0VBQ0EsZUFBQTtDQ0NEO0FEQ0Q7RUFDRSwwQkFBQTtFQUNBLFlBQUE7Q0NDRDtBRENEO0VBQ0UsYUFBQTtFQUNBLGdCQUFBO0VBQ0EsYUFBQTtFQUNBLGtCQUFBO0VBQ0EsMkJBQUE7RUFDQSw4QkFBQTtFQUNBLG1CQUFBO0VBQ0EsdUJBQUE7RUFDQSxPQUFBO0VBQ0EsUUFBQTtFQUNBLFNBQUE7RUFDQSxVQUFBO0VBQ0EsYUFBQTtDQ0NEO0FEQ0Q7RUFDRSxjQUFBO0NDQ0Q7QURDRDtFQUNFLGNBQUE7Q0NDRDtBRENEO0VBQ0UsYUFBQTtFQUNBLG1CQUFBO0VBQ0Esc0JBQUE7RUFDQSxzQkFBQTtFQUNBLGdCQUFBO0VBQ0EsZUFBQTtFQUNBLGlCQUFBO0VBQ0Esa0JBQUE7RUFDQSxnQkFBQTtFQUNBLDBCQUFBO0VBQ0Esd0RBQUE7RUFBQSxnREFBQTtDQ0NEO0FEQ0Q7RUFDRSwwQkFBQTtFQUNBLFlBQUE7RUFDQSwwQkFBQTtDQ0NEO0FEQ0Q7RUFDRSxpQkFBQTtFQUNBLHdCQUFBO0NDQ0Q7QURDRDtFQUNFLGVBQUE7Q0NDRDtBRENEO0VBQ0UsMEJBQUE7RUFDQSxzQkFBQTtDQ0NEO0FEQ0Q7RUFDRSxnQkFBQTtFQUNBLGlCQUFBO0VBQ0EsbUJBQUE7RUFDQSxhQUFBO0VBQ0Esa0JBQUE7Q0NDRDtBRENEO0VBQ0UscUJBQUE7RUFDQSx1QkFBQTtFQUNBLGVBQUE7RUFDQSxjQUFBO0VBQ0EsbUJBQUE7RUFDQSxvQkFBQTtFQUNBLDBCQUFBO0VBQ0EsWUFBQTtFQUNBLGtCQUFBO0VBQ0EsbUJBQUE7Q0NDRDtBRENEO0VBQ0UsZUFBQTtFQUNBLGtCQUFBO0VBQ0Esa0JBQUE7RUFDQSxpQkFBQTtDQ0NEIiwiZmlsZSI6InRvLmNzcyJ9 */

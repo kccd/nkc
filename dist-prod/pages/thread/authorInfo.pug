@@ -1,0 +1,38 @@
+.thread-author-info
+  if data.user
+    if state.subUsersId.includes(author.uid)
+      button.thread-author-subscribe(onclick=`SubscribeTypes.subscribeUser("${author.uid}", false)`) 取关
+    else
+      button.thread-author-subscribe.active(onclick=`SubscribeTypes.subscribeUser("${author.uid}", true)`) 关注
+  .thread-author-avatar
+    img(src=tools.getUrl("userAvatar", author.avatar)  style=(author.certs.indexOf('banned') >= 0 ? "filter: grayscale(1);": ""))
+  .thread-author-base
+    a(href=`/u/${author.uid}` target='_blank').thread-author-name=author.username
+    .thread-author-cert
+      if author.certs.indexOf('banned') < 0
+        img(src=tools.getUrl("gradeIcon", author.grade._id) title=author.grade.displayName)
+      span(title=author.info.certsName)=author.info.certsName
+    .thread-author-number
+      .group
+        .name 文章
+        .number=author.threadCount - author.disabledThreadsCount
+      .group
+        .name 回复
+        .number=author.postCount - author.disabledPostsCount
+      .group
+        .name 学术分
+        .number=author.xsf
+    .thread-author-time=`${format('YYYY/MM/DD', author.toc)}注册，${fromNow(author.tlv)}活动`
+  .thread-author-description!=markdown_safe(author.description) || "暂无简介"
+  .thread-author-links
+    a(href=`/u/${author.uid}` target='_blank').thread-author-link 名片
+    if author.column
+      a(href=`/m/${author.column._id}` target='_blank').thread-author-link 专栏
+    if data.user
+      a(href=`/message?uid=${author.uid}` target='_blank').thread-author-link 私信
+    else
+      a.pointer(onclick="NKC.methods.toLogin()").thread-author-link 私信
+    if(data.userOperationsId.includes('bannedUser') && !author.certs.includes('banned'))
+      a.pointer(onclick=`bannedUser("${author.uid}", true)`).thread-author-link 封禁此人
+    if(data.userOperationsId.includes('unBannedUser') && author.certs.includes('banned'))
+      a.pointer(onclick=`bannedUser("${author.uid}", false)`).thread-author-link 解封此人

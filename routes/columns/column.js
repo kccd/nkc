@@ -62,9 +62,12 @@ router
     const fidOfCanGetThread = await db.ForumModel.getReadableForumsIdByUid(data.user? data.user.uid: '');
     const sort = {};
     if(cid) {
-      const category = await db.ColumnPostCategoryModel.findById(cid);
+      const category = await db.ColumnPostCategoryModel.findOnly({_id: cid});
       if(category.columnId !== column._id) ctx.throw(400, `文章分类【${cid}】不存在或已被专栏主删除`);
+      await category.renderDescription();
+      data.childCategories = await category.getChildCategories();
       data.category = category;
+      data.categoryPostCount = await db.ColumnPostModel.countDocuments({columnId: column._id, cid: category._id});
       data.categoriesNav = await db.ColumnPostCategoryModel.getCategoryNav(category._id);
       const minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id, data.category._id, true);
       data.minorCategories = minorCategories.filter(mc => mc.count > 0);
@@ -77,6 +80,7 @@ router
       if(minorCategory) {
         q.mcid = minorCategory._id;
         data.minorCategory = minorCategory;
+        await data.minorCategory.renderDescription();
       }
       q.cid = {$in: childCategoryId};
       data.topped = await db.ColumnPostModel.getToppedColumnPosts(column._id, fidOfCanGetThread, cid);
@@ -86,6 +90,9 @@ router
       data.topped = await db.ColumnPostModel.getToppedColumnPosts(column._id, fidOfCanGetThread);
       data.toppedId = data.column.topped;
       sort[`order.cid_default`] = -1;
+    }
+    if(!query.page && !query.c) {
+      data.homePage = await db.ColumnModel.getHomePageByColumnId(column._id);
     }
     const count = await db.ColumnPostModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, column.perpage);
@@ -102,19 +109,21 @@ router
     if(ctx.permission("homeToppedColumn")) {
       data.homeToppedColumn = homeSettings.toppedColumnsId.includes(column._id);
     }
+    data.c = categoriesIdString;
     await next();
   })
   .put("/", async (ctx, next) => {
     const {data, db, body, nkcModules, tools} = ctx;
     const {contentLength} = tools.checkString;
-    const {column} = data;
+    const {column, user} = data;
+    if(column.uid !== user.uid && !ctx.permission('column_single_disabled')) ctx.throw(403, "权限不足");
     const {files, fields} = body;
     const type = body.type || fields.type;
     if(!type) {
       let {
         abbr, name, description, color, notice, links = [],
         otherLinks = [], blocks = [], navCategory, perpage = 30,
-        hideDefaultCategory
+        hideDefaultCategory, listColor, toolColor
       } = fields;
       const {avatar, banner} = files;
       if(!name) ctx.throw(400, "专栏名不能为空");
@@ -189,6 +198,8 @@ router
       await column.updateOne({
         name,
         color,
+        listColor,
+        toolColor,
         perpage,
         links,
         hideDefaultCategory,
@@ -208,9 +219,11 @@ router
       }
       await db.ColumnModel.toSearch(column._id);
     } else if(type === "color") {
-      const {color} = body;
+      const {color, listColor, toolColor} = body;
       await column.updateOne({
-        color
+        color,
+        listColor,
+        toolColor
       });
     }
     await next();

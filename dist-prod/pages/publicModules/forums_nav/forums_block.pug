@@ -1,0 +1,63 @@
+//- 左侧专业导航
+  @param {[Object]} data.subForums 用户关注的专业对象所组成的数组
+  @param {[Object]} data.forums 专业树状结构数组 通过方法ForumModel.getForumsTree获取
+  @author pengxiguaa 2019-5-6
+
+
+div
+  if state.subForums && state.subForums.length >0
+    .forums-nav-header
+      +listHeader("我关注的")
+    .home-topic-item-div
+      for forum in state.subForums
+        .forum-block
+          .forum-block-info
+            if forum.logo
+              img.forum-block-icon(src=tools.getUrl('forumLogo', forum.logo))
+            else
+              .forum-block-icon(style=`background-color: ${forum.color}`)
+            a(href=`/f/${forum.fid}` title=`${forum.description}`).forum-block-name=forum.displayName
+  .forums-nav-header
+    +listHeader("话题")
+  for pf in state.forumsTree
+    if pf.forumType === "topic"
+      .forum-block.hide-children
+        .forum-block-info
+          if pf.logo
+            img.forum-block-icon(src=tools.getUrl('forumLogo', pf.logo))
+          else
+            .forum-block-icon(style=`background-color: ${pf.color}`)
+          a(href=`/f/${pf.fid}` title=`${pf.description}`).forum-block-name=pf.displayName
+        .fa.fa-angle-down(onclick=`switchChildren("${pf.fid}", this)`)
+        if pf.childrenForums && pf.childrenForums.length
+          .forum-block-children(data-fid=pf.fid)
+            for cf in pf.childrenForums
+              .forum-block.hide-children
+                .forum-block-info
+                  if cf.logo
+                    img.forum-block-icon(src=tools.getUrl('forumLogo', cf.logo))
+                  else
+                    .forum-block-icon(style=`background-color: ${cf.color}`)
+                  a(href=`/f/${cf.fid}` title=`${cf.description}`).forum-block-name=cf.displayName
+  .forums-nav-header
+    +listHeader("学科")
+  for pf in state.forumsTree
+    if pf.forumType === "discipline"
+      .forum-block.hide-children
+        .forum-block-info
+          if pf.logo
+            img.forum-block-icon(src=tools.getUrl('forumLogo', pf.fid))
+          else
+            .forum-block-icon(style=`background-color: ${pf.color}`)
+          a(href=`/f/${pf.fid}` title=`${pf.description}`).forum-block-name=pf.displayName
+        .fa.fa-angle-down(onclick=`switchChildren("${pf.fid}", this)`)
+        if pf.childrenForums && pf.childrenForums.length
+          .forum-block-children(data-fid=pf.fid)
+            for cf in pf.childrenForums
+              .forum-block.hide-children
+                .forum-block-info
+                  if cf.logo
+                    img.forum-block-icon(src=tools.getUrl('forumLogo', cf.logo))
+                  else
+                    .forum-block-icon(style=`background-color: ${cf.color}`)
+                  a(href=`/f/${cf.fid}` title=`${cf.description}`).forum-block-name=cf.displayName

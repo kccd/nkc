@@ -1,0 +1,69 @@
+extends ../../bootstrap_base
+block title
+  title 相似账号
+  style.
+    .nkc-table img{
+      height: 1.4rem;
+      width: 1.4rem;
+      border-radius: 2px;
+    }
+    .ip{
+      display: inline-block;
+      height: 1.6rem;
+      padding: 0 0.5rem;
+      line-height: 1.6rem;
+      background-color: #00a0e9;
+      font-size: 1rem;
+      color: #fff;
+      margin: 0 0.3rem 0.3rem 0;
+      border-radius: 2px;
+    }
+    .avatar{
+      height: 2rem;
+      width: 2rem;
+      border-radius: 50%;
+      margin-right: 0.3rem;
+    }
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12.box-shadow-panel
+        div.m-b-1
+          h4 使用过相同IP的账号
+          .table-responsive
+            table.table.nkc-table
+              thead
+                tr
+                  th #
+                  th 用户
+                  th 相同IP、使用次数以及位置
+              tbody
+                for a, index in data.accounts
+                  tr
+                    th(style='min-width: 5rem;')=index + 1
+                    th(style='min-width: 10rem;')
+                      img(src=tools.getUrl('userAvatar', a.user.avatar))
+                      | &nbsp;
+                      a(href=tools.getUrl('userHome', a.user.uid) data-float-uid=a.user.uid target="_blank")
+                        if a.user.banned
+                          del=a.user.username
+                        else
+                          span=a.user.username
+                    th
+                      for ip in a.ips
+                        span.ip=`${ip.ip} 「${ip.count} ${ip.location}」`
+            if !data.accounts.length
+              .p-t-2.p-b-2.text-center 空空如也~
+        div
+          div.m-b-05
+            img.avatar(src=tools.getUrl('userAvatar', data.targetUser.avatar))
+            a.m-r-05(
+              href=tools.getUrl('userHome', data.targetUser.uid) data-float-uid=data.targetUser.uid
+              target="_blank"
+            )=data.targetUser.username
+            span 已使用过的IP：
+          div
+            for ip in data.ips
+              span.ip=`${ip.ip} 「${ip.count} ${ip.location}」`
+block scripts
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug

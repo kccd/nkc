@@ -1,0 +1,175 @@
+extends ../bootstrap_base
+block title
+  include ../publicModules/web_header
+  +includeCSS("/home/home.css")
+
+block content
+  -var canManagement = permission("superModerator") && data.t !== 'subscribe';
+  .container-fluid.max-width
+    .row
+      include ../publicModules/checkDefaultUsername
+      .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom.box-shadow-panel.p-r-0
+        include ../publicModules/forums_nav/forums_tree
+      .col-xs-12.col-md-7.box-shadow-panel.p-r-0
+        if !state.isApp && data.user && state.subForums.length
+          .m-b-1
+            .panel-header 我关注的专业
+              .panel-header-right-button
+                a(href=`/u/${data.user.uid}/profile/subscribe/forum` target="_blank") 管理
+            .visited-forums
+              for f in state.subForums
+                .visited-forum(data-float-fid=f.fid)
+                  if f.logo
+                    img.visited-forum-icon(src=tools.getUrl("forumLogo", f.logo))
+                  else
+                    .visited-forum-icon(style=`background-color: ${f.color}`)
+                  a(href=`/f/${f.fid}`).visited-forum-name= f.displayName
+        if !state.isApp && data.user && data.subColumns && data.subColumns.length
+          .m-b-1
+            .panel-header 我关注的专栏
+              .panel-header-right-button
+                a(href=`/u/${data.user.uid}/profile/subscribe/column` target="_blank") 管理
+            .visited-forums
+              for c in data.subColumns
+                .visited-forum
+                  img.visited-forum-icon(src=tools.getUrl("columnAvatar", c.avatar))
+                  a(href=`/m/${c._id}`).visited-forum-name= c.name
+        div
+          -let threadPanelATarget;
+          if data.t === "subscribe" && state.platform !== 'reactNative'
+            -threadPanelATarget = '_blank';
+            .subscribe-lists.m-b-1
+              .subscribe-list
+                a(data-type="reload" href=`/?t=subscribe&d=all${data.c ? `&c=${data.c}` : ""}`
+                  class=!data.d || data.d === 'all' ? "active" : ""
+                ) 全部
+              //-.subscribe-list
+                a(data-type="reload" href=`/?t=subscribe&d=own${data.c ? `&c=${data.c}` : ""}`
+                  class=data.d === "own" ? "active" : ""
+                ) 我的文章
+              .subscribe-list
+                a(data-type="reload" href=`/?t=subscribe&d=thread${data.c ? `&c=${data.c}` : ""}`
+                  class=data.d === "thread" ? "active" : ""
+                ) 文章
+              //-.subscribe-list
+                a(data-type="reload" href=`/?t=subscribe&d=reply${data.c ? `&c=${data.c}` : ""}`
+                  class=data.d === "reply" ? "active" : ""
+                ) 参与过的文章
+              .subscribe-list
+                a(data-type="reload" href=`/?t=subscribe&d=user${data.c ? `&c=${data.c}` : ""}`
+                  class=data.d === "user" ? "active" : ""
+                ) 用户
+              .subscribe-list
+                a(data-type="reload" href=`/?t=subscribe&d=column${data.c ?`&c=${data.c}`:""}`
+                    class=data.d==="column"? "active" : ""
+                ) 专栏
+              .subscribe-list
+                a(data-type="reload" href=`/?t=subscribe&d=forum${data.c ? `&c=${data.c}` : ""}`
+                  class=data.d === "forum" ? "active" : ""
+                ) 专业
+          .m-b-0
+
+            if !(state.isApp && state.platform === 'reactNative')
+              include ../publicModules/mobile_drawer/right_drawer
+
+            -let showPagingSortButton = true;
+            if canManagement
+              .paging-button
+                a.button.radius-left.radius-right(onclick="managementThreads()") 管理
+              .paging-button.management-thread-panel
+                a.button.radius-left(onclick="selectAll()") 全选
+                a.button(onclick="moveSelectedThreads()") 移动
+                a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
+            if (data.t === "latest" || data.t === "column" || data.t === "recommend") && state.platform !== 'reactNative'
+              .paging-button
+                a.radius-left.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "" data-type="reload") 全部
+                a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "" data-type="reload") 推荐
+                a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "" data-type="reload") 专栏
+
+            if data.t === "subscribe"
+              if !data.activity || data.activity.length === 0
+                .p-t-5.p-b-5.text-center
+                  h4
+                    b 空空如也~
+              else
+                -showPagingSortButton = false;
+                include ../publicModules/paging/paging
+                include ./postActivity
+                  for a in data.activity
+                    +postActivity(a)
+                include ../publicModules/paging/paging_input
+            else
+              if !data.threads.length && !data.latestToppedThreads.length
+                .p-t-5.p-b-5.text-center
+                  h4
+                    b 空空如也~
+              else
+                include ../publicModules/paging/paging
+
+                if data.t === 'latest' && data.paging.page === 0 && data.latestToppedThreads.length > 0
+                  -const defaultThreadListStyle = {type: 'minimalist'}
+                  for thread in data.latestToppedThreads
+                    include ../publicModules/thread_panel/thread_panel
+                  div.topped-thread-header - 以上是置顶 -
+
+                for thread in data.threads
+                  include ../publicModules/thread_panel/thread_panel
+                -showPagingSortButton = false;
+                -showHomeButton = false;
+                if canManagement
+                  .paging-button
+                    a.button.radius-left.radius-right(onclick="managementThreads()") 管理
+                  .paging-button.management-thread-panel
+                    a.button.radius-left(onclick="selectAll()") 全选
+                    a.button(onclick="moveSelectedThreads()") 移动
+                    a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
+                include ../publicModules/paging/paging_input
+      .col-xs-12.col-md-3
+        .hidden-xs.hidden-sm#rightDom.box-shadow-panel
+          .hidden-xs.hidden-sm.m-b-1
+            include ../publicModules/canvas_logo
+          include ../publicModules/improveUserInfo
+          include ../publicModules/management/management
+          include ../publicModules/apps/apps
+          if data.noticeThreads && data.noticeThreads.length > 0
+            -let sideThreads = data.noticeThreads
+            -let sideThreadsHideInfo = true;
+            -let sideThreadsHeader= "公告通知"
+            include ../publicModules/side_thread_list
+          if data.featuredThreads && data.featuredThreads.length > 0
+            -let sideThreads = data.featuredThreads
+            -let sideThreadsHideInfo = false;
+            -let sideThreadsHeader= "精选文章"
+            include ../publicModules/side_thread_list
+          if data.subscribeThreads && data.subscribeThreads.length > 0
+            -let sideThreads = data.subscribeThreads
+            -let sideThreadsHideInfo = false;
+            -let sideThreadsHeader= "我关注的"
+            include ../publicModules/side_thread_list
+          if data.latestThreads && data.latestThreads.length > 0
+            -let sideThreads = data.latestThreads
+            -let sideThreadsHideInfo = false;
+            -let sideThreadsHeader= "最新文章"
+            include ../publicModules/side_thread_list
+          if data.recommendThreads && data.recommendThreads.length > 0
+            -let sideThreads = data.recommendThreads
+            -let sideThreadsHideInfo = false;
+            -let sideThreadsHeader= "推荐文章"
+            include ../publicModules/side_thread_list
+          include ../publicModules/active_users
+        include ../publicModules/scrollTo
+block footer
+  include ../publicModules/footer/footer
+block scripts
+  if state.isApp && data.t === "latest"
+    script!=`NKC.configs.swipeLeft = true;`
+  +includeJS("/home/home.js")
+  include ../publicModules/subscribeTypes/subscribeTypes
+  include ../publicModules/floatForumPanel/floatForumPanel
+  include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  //-include ../publicModules/toTop
+  if canManagement
+    include ../publicModules/moveThread/moveThread
+    include ../publicModules/disabledPost/disabledPost
+    +includeJS("/publicModules/thread_panel/management.js")
+

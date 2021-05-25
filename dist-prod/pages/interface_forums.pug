@@ -1,0 +1,38 @@
+extends bootstrap_base
+
+block title
+  meta(name='description' content=state.serverSettings.description)
+  meta(name='keywords' content=state.serverSettings.keywords.join(","))
+  title=`${state.serverSettings.websiteName} - ${state.serverSettings.brief}`
+block content
+  mixin createForumsDisList(forums)
+    for forum in forums
+      include module_children_forum_single
+      if forum.childrenForums && forum.childrenForums.length > 0
+        .row
+          .col-xs-12.col-md-12(style='padding-left: 4rem;')
+            +createForumsDisList(forum.childrenForums)
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8.col-md-offset-2
+        h2.doc-chapter-title.mdui-text-color-theme 学科
+        hr
+      .col-xs-12.col-md-8.col-md-offset-2
+        +createForumsDisList(data.disciplineForums)
+  br
+  hr
+  br
+  mixin createForumsTopList(forums)
+    for forum in forums
+      include module_children_forum_single
+      if forum.childrenForums && forum.childrenForums.length > 0
+        .row
+          .col-xs-12.col-md-12(style='padding-left: 4rem;')
+            +createForumsTopList(forum.childrenForums)
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8.col-md-offset-2
+        h2.doc-chapter-title.mdui-text-color-theme 话题
+        hr
+      .col-xs-12.col-md-8.col-md-offset-2
+        +createForumsTopList(data.topicForums)

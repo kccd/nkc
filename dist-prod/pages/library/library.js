@@ -1,0 +1,1 @@
+!function(n){"function"==typeof define&&define.amd?define(n):n()}((function(){"use strict";window.ResourceInfo=void 0,$((function(){window.ResourceInfo=new NKC.modules.ResourceInfo})),window.showResource=function(n){ResourceInfo.open({rid:n})}}));

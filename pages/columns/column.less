@@ -57,7 +57,7 @@ img.apply-column-banner{
 }
 .column{
   /*min-height: 50rem;*/
-  max-width: 1000px;
+  max-width: 1300px;
   width: 100%;
   margin: auto;
 }
@@ -597,7 +597,7 @@ img.apply-column-banner{
   font-size: 1.2rem;
   font-weight: 700;
   color: #282c37;
-  background-color: #f4f4f4;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 .column-category{
   display: block;
@@ -618,16 +618,17 @@ img.apply-column-banner{
   color: #282c37;
 }
 .column-category:hover, .column-category.active{
-  background-color: #f8f8f8;
+  //background-color: #f8f8f8;
+  color: #000;
 }
 .column-categories{
   padding-top: 0.5rem;
 }
 .column-category-nav{
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 .column-category-nav a{
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   color: #282c37;
   font-weight: 700;
 }
@@ -639,10 +640,10 @@ img.apply-column-banner{
   padding: 0.5rem;
 }
 .column-category-abbr{
-  color: #767778;
+  /*color: #767778;
   font-size: 1.2rem;
   margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.5rem;*/
 }
 .column-transfer-user{
   margin: 1rem 0;
@@ -1080,7 +1081,7 @@ img.apply-column-banner{
         text-align: center;
         line-height: @aHeight;
         color: #000;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         text-decoration: none;
         @media (max-width: 991px) {
           //@aHeight: 3rem;
@@ -1152,7 +1153,7 @@ img.apply-column-banner{
     &:before{
       content: '';
       border-radius: 1px;
-      background-color: @gray;
+      background-color: rgba(0, 0, 0, 0.1);
       //background-color: rgba(43, 144, 217, 0.28);
       position: absolute;
       top: 0.6rem;
@@ -1165,9 +1166,11 @@ img.apply-column-banner{
 }
 
 .column-minor-categories{
-  padding: 0.5rem 1rem;
-  background-color: #f4f4f4;
+  padding: 0.8rem 1rem;
+  background-color: rgba(0, 0, 0, 0.05);
   margin-bottom: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: 1.25rem;
   .column-minor-category{
     color: #555;
     text-decoration: none;
@@ -1206,7 +1209,7 @@ img.apply-column-banner{
     position: absolute;
     height: 100%;
     width: 100%;
-    background-color: @gray;
+    background-color: rgba(0, 0, 0, 0.1);
     top: 0.6rem;
     left: 0.6rem;
   }
@@ -1218,5 +1221,21 @@ img.apply-column-banner{
     top: 0;
     left: 0;
     border: 1px solid #444;
+  }
+}
+.column-child-categories{
+  margin-bottom: 0.5rem;
+  &>*{
+    font-size: 1.2rem;
+  }
+}
+.column-child-category{
+  color: #333;
+  margin-right: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  &:hover{
+    color: @primary;
+    text-decoration: none;
   }
 }

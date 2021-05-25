@@ -1,0 +1,63 @@
+.forum-body {
+  overflow: hidden;
+}
+.forum-name {
+  font-size: 1.3rem;
+}
+.move-thread-forum-name {
+  display: block;
+  height: 2.2rem;
+  line-height: 2.2rem;
+  font-weight: 700;
+}
+.move-thread-forum-name img {
+  height: 1.4rem;
+  width: 1.4rem;
+  border-radius: 2px;
+  vertical-align: text-bottom;
+  margin-right: 0.5rem;
+}
+.move-thread-child-forums .move-thread-forum-name,
+.move-thread-selected-forums .move-thread-forum-name {
+  display: inline-block;
+  font-size: 1rem;
+  padding: 0 0.5rem;
+  font-weight: normal;
+  border-radius: 3px;
+  cursor: pointer;
+  margin: 0 0.5rem 0.5rem 0;
+  color: #fff;
+}
+.move-thread-selected-forums h5 {
+  font-weight: 700;
+}
+.move-thread-selected-forums {
+  margin-bottom: 0;
+}
+.move-thread-select-forums {
+  max-height: 40rem;
+  overflow-y: scroll;
+  background-color: #eee;
+  padding: 0.5rem;
+  border-radius: 3px;
+}
+.move-thread-select-forums.topic {
+  background-color: #d9e1e8;
+}
+@media (max-width: 767px) {
+  .move-thread-select-forums {
+    max-height: 30rem;
+  }
+}
+.move-thread-thread-type {
+  display: inline-block;
+  margin: 0 0.5rem 0.5rem 0;
+  height: 2rem;
+  line-height: 2rem;
+  padding: 0 0.5rem;
+  cursor: pointer;
+  border-radius: 3px;
+  background-color: #999;
+  color: #fff;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL3B1YmxpY01vZHVsZXMvbW92ZVRocmVhZC9tb3ZlVGhyZWFkLmxlc3MiLCI8aW5wdXQgY3NzIDg1PiJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLGlCQUFBO0NDQ0Q7QURDRDtFQUNFLGtCQUFBO0NDQ0Q7QURDRDtFQUNFLGVBQUE7RUFDQSxlQUFBO0VBQ0Esb0JBQUE7RUFDQSxpQkFBQTtDQ0NEO0FEQ0Q7RUFDRSxlQUFBO0VBQ0EsY0FBQTtFQUNBLG1CQUFBO0VBQ0EsNEJBQUE7RUFDQSxxQkFBQTtDQ0NEO0FEQ0Q7O0VBQ0Usc0JBQUE7RUFDQSxnQkFBQTtFQUNBLGtCQUFBO0VBQ0Esb0JBQUE7RUFDQSxtQkFBQTtFQUNBLGdCQUFBO0VBQ0EsMEJBQUE7RUFDQSxZQUFBO0NDRUQ7QURBRDtFQUNFLGlCQUFBO0NDRUQ7QURBRDtFQUNFLGlCQUFBO0NDRUQ7QURBRDtFQUNFLGtCQUFBO0VBQ0EsbUJBQUE7RUFDQSx1QkFBQTtFQUNBLGdCQUFBO0VBQ0EsbUJBQUE7Q0NFRDtBREFEO0VBQ0UsMEJBQUE7Q0NFRDtBREFEO0VBQ0U7SUFDRSxrQkFBQTtHQ0VEO0NBQ0Y7QURBRDtFQUNFLHNCQUFBO0VBQ0EsMEJBQUE7RUFDQSxhQUFBO0VBQ0Esa0JBQUE7RUFDQSxrQkFBQTtFQUNBLGdCQUFBO0VBQ0EsbUJBQUE7RUFDQSx1QkFBQTtFQUNBLFlBQUE7Q0NFRCIsImZpbGUiOiJ0by5jc3MifQ== */

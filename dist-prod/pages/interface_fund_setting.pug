@@ -1,0 +1,412 @@
+extends bootstrap_base
+block title
+  link(rel='stylesheet', href='/fund.css')
+  title 科创基金
+block content
+  -const mainContainer1400 = true
+  -const fund = data.fund
+  -const member = fund? fund.member: '';
+  -const applicant = fund? fund.applicant: '';
+  -const thread = fund? fund.thread: '';
+  -const paper = fund? fund.paper: '';
+  .container-fluid.max-width
+    include ./interface_fund_nav
+    .panel.panel-default
+      .panel-body
+        .row
+          .col-xs-12.col-md-12
+            h4 基本信息
+            hr
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 基金编号
+              .col-xs-12.col-md-2
+                input.form-control#fundId(type="text" placeholder='大写字母' value=fund ? fund._id : '' disabled=!!fund)
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 基金名
+              .col-xs-12.col-md-2
+                input.form-control#fundName(type="text" placeholder='默认为 "科创基金"' value=fund?fund.name: '')
+              .col-xs-12.col-md-2
+                //h5#fundNameInfo
+            //.fund-setting-list
+            //  .col-xs-12.col-md-2
+            //    h5 基金初始金额
+            //  .col-xs-12.col-md-2
+            //    input.form-control#fundInitial(type="Number" placeholder='初始金额' value=fund ? fund.money.initial: '')
+            //  .col-xs-12.col-md-2
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 申请金额
+              .col-xs-12.col-md-10
+                .row
+                  .col-xs-12.col-md-12
+                    label.radio-inline
+                      input(type='radio' name='moneyFixed' checked=fund ? (fund.money.fixed) : true)
+                      span 定额
+                    label.radio-inline
+                      input(type='radio' name='moneyFixed' checked=fund ? (!fund.money.fixed) : false)
+                      span 不定额
+                  .col-xs-12.col-md-4
+                    -let text = '固定金额（人民币元，不能有小数点）';
+                    if fund && !fund.money.fixed
+                      -text = '最大申请金额（人民币元，不能有小数点）';
+                    h5#fundMoneyText= text
+                    input.form-control#fundMoney(type="number" placeholder=placeholder value=fund?fund.money.fixed || fund.money.max: '')
+                  .col-xs-12.col-md-3
+                    //h5#fundMoneyInfo
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 基金简介
+              .col-xs-12.col-md-5
+                textarea.form-control#briefDescription(type="text" placeholder="介绍一下该基金（建议50字以内）" rows=5)=fund ? fund.description.brief : ''
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 基金补充说明
+              .col-xs-12.col-md-5
+                textarea.form-control#detailedDescription(type="text" placeholder="基金补充说明" rows=15)=fund ? fund.description.detailed : ''
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 条款
+              .col-xs-12.col-md-5
+                textarea.form-control#terms(type="text" placeholder="基金条款" rows=15)=fund ? fund.description.terms : ''
+
+
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 banner背景颜色
+              .col-xs-12.col-md-2
+                input.form-control#fundColor(type="text" placeholder="默认为 #7f9eb2" value=fund?fund.color: '')
+              .col-xs-12.col-md-2
+                #fundColorDisplay(style=`background-color: ${fund?fund.color: '#7f9eb2'};`)
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 banner图片
+              .col-xs-12.col-md-2
+                input#fundImage(type="file" style='display: none')
+                button.btn.btn-default(onclick='$("#fundImage").click()') 上传banner图片
+                button.btn.btn-default(onclick='deleteBanner()') 删除banner图片
+              .col-xs-12.col-md-8
+                if fund && fund.image && fund.image.banner
+                  img#fundImageDisplay(imageId= fund.image.banner src=`/fundBanner/${fund.image.banner}` style='width: 100%;')
+                else
+                  img#fundImageDisplay(src=`#` style='display:none;width: 100%;')
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 logo图片
+              .col-xs-12.col-md-2
+                input#fundLogoImage(type="file" style='display: none')
+                button.btn.btn-default(onclick='$("#fundLogoImage").click()') 上传logo图片
+                button.btn.btn-default(onclick='deleteLogo()') 删除logo图片
+              .col-xs-12.col-md-2
+                if fund && fund.image && fund.image.logo
+                  img#fundLogoImageDisplay(imageId= fund.image.logo src=`/fundLogo/${fund.image.logo}`)
+                else
+                  img#fundLogoImageDisplay(src=`#` style='display:none;')
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 审核方式
+              .col-xs-12.col-md-2
+                label.radio-inline
+                  input(type='radio' name='auditType' checked=fund ? (fund.auditType === 'person') : false)
+                  span 人工
+                label.radio-inline
+                  input(type='radio' name='auditType' checked=fund ? (fund.auditType === 'system') : true)
+                  span 系统
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 显示入口
+              .col-xs-12.col-md-5
+                label.radio-inline
+                  input(type='radio' name='display' checked=fund?(fund.display): true)
+                  span 是
+                label.radio-inline
+                  input(type='radio' name='display' checked=fund?(!fund.display):false)
+                  span 否
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 接受新申请
+              .col-xs-12.col-md-5
+                label.radio-inline
+                  input(type='radio' name='canApply' checked=fund ? (fund.canApply) : true)
+                  span 是
+                label.radio-inline
+                  input(type='radio' name='canApply' checked=fund ? (!fund.canApply) : false)
+                  span 否
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 设为历史基金
+              .col-xs-12.col-md-5
+                label.radio-inline
+                  input(type='radio' name='history' checked=fund ? (fund.history) : false)
+                  span 是
+                label.radio-inline
+                  input(type='radio' name='history' checked=fund ? (!fund.history) : true)
+                  span 否
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 完全屏蔽
+              .col-xs-12.col-md-5
+                label.radio-inline
+                  input(type='radio' name='disabled' checked=fund ? (fund.disabled) : false)
+                  span 是
+                label.radio-inline
+                  input(type='radio' name='disabled' checked=fund ? (!fund.disabled) : true)
+                  span 否
+            hr
+            h4 相关人员权限设置
+            hr
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 专家
+              .col-xs-12.col-md-10
+                .row
+                  .col-xs-12.col-md-12
+                    -for (let certObj of data.fundCerts)
+                      if fund && fund.expert.certs.length !== 0
+                        label.checkbox-inline
+                          input(type='checkbox' name='expertCert' cert=certObj._id checked=fund.expert.certs.includes(certObj._id))
+                          span= certObj.displayName
+                      else
+                        label.checkbox-inline
+                          input(type='checkbox' name='expertCert' cert=certObj._id)
+                          span= certObj.displayName
+                  .col-xs-12.col-md-5
+                    h5 指定用户UID，以英文逗号分隔
+                    input.form-control#expertUid(placeholder="填入uid" value=fund && fund.expert.appointed.length !== 0? fund.expert.appointed.join(','): '')
+            .fund-setting-list
+              hr
+              .col-xs-12.col-md-2
+                h5 财务
+              .col-xs-12.col-md-10
+                .row
+                  .col-xs-12.col-md-12
+                    -for (let certObj of data.fundCerts)
+                      if fund && fund.financialStaff.certs.length !== 0
+                        label.checkbox-inline
+                          input(type='checkbox' name='financialStaffCert' cert=certObj._id checked=fund.financialStaff.certs.includes(certObj._id))
+                          span= certObj.displayName
+                      else
+                        label.checkbox-inline
+                          input(type='checkbox' name='financialStaffCert' cert=certObj._id)
+                          span= certObj.displayName
+                  .col-xs-12.col-md-5
+                    h5 指定用户UID，以英文逗号分隔
+                    input.form-control#financialStaffUid(placeholder="填入uid" value=fund && fund.financialStaff.appointed.length !== 0? fund.financialStaff.appointed.join(','): '')
+            .fund-setting-list
+              hr
+              .col-xs-12.col-md-2
+                h5 检查员
+              .col-xs-12.col-md-10
+                .row
+                  .col-xs-12.col-md-12
+                    -for (let certObj of data.fundCerts)
+                      if fund && fund.censor.certs.length !== 0
+                        label.checkbox-inline
+                          input(type='checkbox' name='censorCert' cert=certObj._id checked=fund.censor.certs.includes(certObj._id))
+                          span= certObj.displayName
+                      else
+                        label.checkbox-inline
+                          input(type='checkbox' name='censorCert' cert=certObj._id)
+                          span= certObj.displayName
+                  .col-xs-12.col-md-5
+                    h5 指定用户UID，以英文逗号分隔
+                    input.form-control#censorUid(placeholder="填入uid" value=fund && fund.censor.appointed.length !== 0? fund.censor.appointed.join(','): '')
+            .fund-setting-list
+              hr
+              .col-xs-12.col-md-2
+                h5 管理员
+              .col-xs-12.col-md-10
+                .row
+                  .col-xs-12.col-md-12
+                    -for (let certObj of data.fundCerts)
+                      if fund && fund.admin.certs.length !== 0
+                        label.checkbox-inline
+                          input(type='checkbox' name='adminCert' cert=certObj._id checked=fund.admin.certs.includes(certObj._id))
+                          span= certObj.displayName
+                      else
+                        label.checkbox-inline
+                          input(type='checkbox' name='adminCert' cert=certObj._id)
+                          span= certObj.displayName
+                  .col-xs-12.col-md-5
+                    h5 指定用户UID，以英文逗号分隔
+                    input.form-control#adminUid(placeholder="填入uid" value=fund && fund.admin.appointed.length !== 0? fund.admin.appointed.join(','): '')
+            .fund-setting-list
+              hr
+              .col-xs-12.col-md-2
+                h5 评论人员
+              .col-xs-12.col-md-10
+                .row
+                  .col-xs-12.col-md-12
+                    -for (let certObj of data.fundCerts)
+                      if fund && fund.commentator.certs.length !== 0
+                        label.checkbox-inline
+                          input(type='checkbox' name='commentatorCert' cert=certObj._id checked=fund.commentator.certs.includes(certObj._id))
+                          span= certObj.displayName
+                      else
+                        label.checkbox-inline
+                          input(type='checkbox' name='commentatorCert' cert=certObj._id)
+                          span= certObj.displayName
+                  .col-xs-12.col-md-5
+                    h5 指定用户UID，以英文逗号分隔
+                    input.form-control#commentatorUid(placeholder="填入uid" value=fund && fund.commentator.appointed.length !== 0? fund.commentator.appointed.join(','): '')
+            .fund-setting-list
+              hr
+              .col-xs-12.col-md-2
+                h5 投票人员
+              .col-xs-12.col-md-10
+                .row
+                  .col-xs-12.col-md-12
+                    -for (let certObj of data.fundCerts)
+                      if fund && fund.voter.certs.length !== 0
+                        label.checkbox-inline
+                          input(type='checkbox' name='voterCert' cert=certObj._id checked=fund.voter.certs.includes(certObj._id))
+                          span= certObj.displayName
+                      else
+                        label.checkbox-inline
+                          input(type='checkbox' name='voterCert' cert=certObj._id)
+                          span= certObj.displayName
+                  .col-xs-12.col-md-5
+                    h5 指定用户UID，以英文逗号分隔
+                    input.form-control#voterUid(placeholder="填入uid" value=fund && fund.voter.appointed.length !== 0? fund.voter.appointed.join(','): '')
+            hr
+            h4 申请人资格
+            hr
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 账号等级
+              .col-xs-12.col-md-2
+                input.form-control#userLevel(type="number" placeholder="默认为0" value=applicant? applicant.userLevel: '')
+              .col-xs-12.col-md-2
+                h5#userLevelInfo
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 发帖量
+              .col-xs-12.col-md-2
+                input.form-control#threadCount(type="number" placeholder="默认为0" value=applicant? applicant.threadCount: '')
+              .col-xs-12.col-md-2
+                h5#threadCountInfo
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 回帖量
+              .col-xs-12.col-md-2
+                input.form-control#postCount(type="number" placeholder="默认为0" value=applicant ? applicant.postCount : '')
+              .col-xs-12.col-md-2
+                h5#postCountInfo
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 注册时间（天）
+              .col-xs-12.col-md-2
+                input.form-control#timeToRegister(type="number" placeholder="默认为0" value=applicant ? applicant.timeToRegister : '')
+              .col-xs-12.col-md-2
+                h5#regiserTimeInfo
+              .col-xs-12.col-md-2
+                h5#supportCountInfo
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 申请人身份认证等级
+              .col-xs-12.col-md-2
+                input.form-control#applicantAuthLevel(type='number' placeholder='默认1' value=applicant.authLevel?applicant.authLevel:'')
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 组员身份认证等级
+              .col-xs-12.col-md-2
+                input.form-control#memberAuthLevel(type='number' placeholder='默认1' value=member.authLevel?member.authLevel:'')
+            hr
+            h4 其他信息
+            hr
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 项目内容
+              .col-xs-12.col-md-10
+                label.radio-inline
+                  input(type='radio' name='detailedProject' checked=fund ? fund.detailedProject : true)
+                  span 详细
+                label.radio-inline
+                  input(type='radio' name='detailedProject' checked=fund ? !fund.detailedProject : false)
+                  span 简单
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 申请方式
+              .col-xs-12.col-md-10
+                label.checkbox-inline
+                  input(type='checkbox' name='applicationMethod' checked=fund? fund.applicationMethod.personal: false)
+                  span 个人申请
+                label.checkbox-inline
+                  input(type='checkbox' name='applicationMethod' checked=fund? fund.applicationMethod.team: false)
+                  span 团队申请
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 附带文章数目
+              .col-xs-12.col-md-2
+                input.form-control#attachmentsThreads(type="number" placeholder="默认为0" value=thread ? thread.count : '')
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 附带论文数目
+              .col-xs-12.col-md-2
+                input.form-control#attachmentsPapers(type="number" placeholder="默认为0" value=paper ? paper.count : '')
+              .col-xs-12.col-md-4
+                span 是否已通过审核&nbsp;&nbsp;
+                label.radio-inline
+                  input#passed(type='radio' name='passed' checked=fund ? fund.paper.passed : true)
+                  span 是
+                label.radio-inline
+                  input(type='radio' name='passed' checked=fund ? !fund.paper.passed : false)
+                  span 否
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 允许退修次数
+              .col-xs-12.col-md-2
+                input.form-control#modifyCount(type="number" placeholder="默认为5" value=fund? fund.modifyCount: '')
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 好友支持数
+              .col-xs-12.col-md-2
+                input.form-control#supportCount(type="number" placeholder="默认为0" value=fund ? fund.supportCount : '')
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 示众天数
+              .col-xs-12.col-md-2
+                input.form-control#timeOfPublicity(type="number" placeholder="默认为0" value=fund? fund.timeOfPublicity: '')
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 年最大申请次数
+              .col-xs-12.col-md-2
+                input.form-control#applicationCountLimit(type="" placeholder="默认为10" value=fund? fund.applicationCountLimit: '')
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 互斥
+              .col-xs-12.col-md-10
+                label.checkbox-inline
+                  input(type='checkbox' name='conflict' checked=fund ? fund.conflict.self : false)
+                  span 与自己互斥
+                label.checkbox-inline
+                  input(type='checkbox' name='conflict' checked=fund ? fund.conflict.other : false)
+                  span 与相同设置的基金互斥
+            hr
+            h4 温馨提示：
+            hr
+
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 填写自我介绍时的提示
+              .col-xs-12.col-md-5
+                textarea.form-control#inputUserInfo(type="text" placeholder="填写自我介绍时的提示" rows=10)=fund ? fund.reminder.inputUserInfo : ''
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 填写项目内容时的提示
+              .col-xs-12.col-md-5
+                textarea.form-control#inputProject(type="text" placeholder="填写项目内容时的提示" rows=15)=fund ? fund.reminder.inputProject : ''
+            .fund-setting-list
+              .col-xs-12.col-md-2.col-md-offset-5
+                br
+                if fund
+                  button.btn.btn-info(style='width: 100%' onclick=`submit("${fund.id}")`) 提交
+                else
+                  button.btn.btn-info(style='width: 100%' onclick='submit()') 提交
+
+    br
+    br
+block scripts
+  script(src='/interface_common.js')
+  script(src='/interface_fund_setting.js')

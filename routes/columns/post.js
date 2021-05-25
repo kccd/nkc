@@ -30,7 +30,7 @@ router
     const {body, data, db} = ctx;
     const {
       postsId, type, categoryId,
-      mainCategoriesId, minorCategoriesId, categoryType
+      mainCategoriesId, minorCategoriesId, categoryType, operationType
     } = body;
     const {column, user} = data;
     if(column.uid !== user.uid) ctx.throw(403, "权限不足");
@@ -95,8 +95,10 @@ router
       await db.ColumnPostCategoryModel.removeToppedThreads(column._id);
     } else if(type === "moveById") { // 更改专栏内容分类
       const setObj = {};
+      // categoryType: 修改文章的分类类型，all: 主分类 + 辅分类，main: 仅主分类，minor: 仅辅分类
+      // operationType: 操作类型，replace: 替换原有分类，add: 添加分类
       if(['all', 'main'].includes(categoryType)) {
-        if(!mainCategoriesId || mainCategoriesId.length === 0) ctx.throw(400, '文章主分类不能为空');
+        if(operationType === 'replace' && mainCategoriesId.length === 0) ctx.throw(400, '文章主分类不能为空');
         await db.ColumnPostCategoryModel.checkCategoriesId(mainCategoriesId);
         setObj.cid = mainCategoriesId;
       }
@@ -116,6 +118,12 @@ router
             newOrder[`cid_${cid}`] = o
           }
           setObj.order = newOrder;
+        }
+        // 仅仅是增加分类
+        if(operationType === 'add') {
+          if(setObj.cid) setObj.cid = [...new Set(setObj.cid.concat(columnPost.cid))];
+          if(setObj.mcid) setObj.mcid = [...new Set(setObj.mcid.concat(columnPost.mcid))];
+          if(setObj.order) Object.assign(setObj.order, columnPost.order);
         }
         await db.ColumnPostModel.updateOne({
           columnId: column._id,

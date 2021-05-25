@@ -1,0 +1,27 @@
+//- include ./nav
+div
+  include ../../../publicModules/paging/paging
+  .account-followers.account-forums
+    if !data.subscribes.length
+      .null 空空如也~
+    for subscribe in data.subscribes
+      .account-follower
+        .account-follower-avatar
+          if subscribe.forum.logo
+            img.img(src=tools.getUrl("forumLogo", subscribe.forum.logo))
+          else
+            .img(style=`background-color: ${subscribe.forum.color};`)
+        .account-follower-content
+          .account-follower-name
+            .account-follower-buttons(data-forum=subscribe.forum.fid class=data.subForumsId.includes(subscribe.forum.fid)?"active":"")
+              //- button.category(onclick=`user.moveSub("${subscribe.forum.fid}")`) 分类
+              button.subscribe(onclick=`user.subscribe("${subscribe.forum.fid}", "forum")`)
+            a(href=`/f/${subscribe.forum.fid}`)=subscribe.forum.displayName
+          .account-follower-info
+            | 文章：
+            span=subscribe.forum.countThreads
+            | 回复：
+            span=subscribe.forum.countPosts
+          .account-follower-description=subscribe.forum.description || "暂无简介"
+  if data.paging.pageCount > 1
+    include ../../../publicModules/paging/paging_input

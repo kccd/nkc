@@ -2,6 +2,7 @@ const router = require("koa-router")();
 const homeRouter = require("./home");
 const stickerRouter = require("./sticker");
 const noteRouter = require("./note");
+const columnRouter = require('./column');
 const postRouter = require("./post");
 const section = require("./section");
 const applyForumRouter = require('./applyForum');
@@ -225,5 +226,6 @@ router
   .use("/post", postRouter.routes(), postRouter.allowedMethods())
   .use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods())
   .use('/securityApplication', securityApplication.routes(), securityApplication.allowedMethods())
+  .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
   .use("/section", section.routes(), section.allowedMethods());
 module.exports = router;

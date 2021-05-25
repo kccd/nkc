@@ -1,0 +1,75 @@
+extends ../bootstrap_base
+block title
+  title 问题列表
+  +includeCSS('/mdui/css/mdui.min.css')
+  +includeCSS('/problem/problem.css')
+block content
+  .container-fluid.max-width#app(v-cloak)
+    .row(v-if='show')
+      //- 分类栏
+      .col-xs-12.col-md-12
+        ul.top-label
+          for type in data.problemsTypes
+            -var cls = ['mdui-btn','mdui-btn-raised','mdui-ripple','mdui-btn-block'];
+            if(data.cid === type._id)
+              -cls.push('active');
+            -var link = `openToNewLocation('/problem/list?cid=${type._id}')`
+            li.m-r-05(class=cls onclick=link)= `${type.name} ${type.count}`
+        <button class="mdui-btn mdui-btn-raised mdui-ripple mdui-btn-block" @click='addType' style="background: #d9e1e8;color: #2b90d9">新建分类</button>
+
+      .col-xs-12.col-md-12.box-shadow-panel
+        //- 工具栏
+        .col-xs-12.col-md-12
+          h3= data.problemsType.name
+            span &nbsp;&nbsp;&nbsp;
+            button(mdui-tooltip="{content: '新建记录'}" class="mdui-btn mdui-btn-dense mdui-ripple mdui-btn-icon mdui-color-pink" @click=`addProblem(${data.problemsType._id}, "${data.problemsType.name}")`)
+              <i class="mdui-icon material-icons">&#xe145;</i>
+            button(mdui-tooltip="{content: '修改分类名'}" class="mdui-btn mdui-btn-dense mdui-ripple mdui-btn-icon mdui-color-pink" @click=`modifyType(${data.problemsType._id}, "${data.problemsType.name}")`)
+              <i class="mdui-icon material-icons">&#xe3c9;</i>
+            if data.problemsType._id !== 0
+              button(mdui-tooltip="{content: '删除分类'}" class="mdui-btn mdui-btn-dense mdui-ripple mdui-btn-icon mdui-color-pink" @click=`deleteType(${data.problemsType._id}, "${data.problemsType.name}")`)
+                <i class="mdui-icon material-icons">&#xe872;</i>
+        //- 问题列表
+        .col-xs-12.col-md-12
+          .col-xs-12.col-md-12
+            include ../publicModules/paging/paging.pug
+          for problem in data.problems
+            .media.col-xs-12.col-md-6
+              hr(style='margin: 5px 0;')
+              .media-left
+                if problem.user
+                  a(href=`/u/${problem.user.uid}` target='_blank')
+                    img.media-object(src=tools.getUrl('userAvatar', problem.user.avatar) style='width: 50px;height: 50px;border-radius: 50%;' data-float-uid=problem.user.uid)
+                else
+                  .text-center(style='height: 50px;width: 50px;line-height: 50px;background-color: #aaa;border-radius: 50%;color: #fff;font-size: 2em;') 匿
+              .media-body
+                if data.type !== 'resolved'
+                  if !problem.viewed
+                    span.label.label-warning 未读
+                    span &nbsp;&nbsp;
+                  if !data.type
+                    if problem.resolved
+                      span.label.label-success 已完成
+                    else
+                      span.label.label-danger 未完成
+                    span &nbsp;&nbsp;
+                div(style='color: #aaa;display: inline')
+                  span
+                    if problem.user
+                      a(href=`/u/${problem.user.uid}` target='_blank' data-float-uid=problem.user.uid)= problem.user.username
+                    else
+                      span 匿名用户
+                  span &nbsp;&nbsp;上报于&nbsp;&nbsp;
+                    span= `${fromNow(problem.toc)}`
+                  a(href=`/problem/list/${problem._id}` style='text-decoration: none;')
+                    h4= problem.t
+
+          .col-xs-12.col-md-12
+            hr(style='margin: 5px 0 15px 0;')
+            include ../publicModules/paging/paging.pug
+
+block scripts
+  +includeJS('/mdui/js/mdui.min.js')
+  +includeJS('/problem/problem_list.js')
+  include ../publicModules/subscribeTypes/subscribeTypes
+  include ../publicModules/floatUserPanel/floatUserPanel.2.pug

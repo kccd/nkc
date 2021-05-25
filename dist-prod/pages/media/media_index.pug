@@ -1,0 +1,280 @@
+style.
+  [v-vloak]{display:none}
+style.
+  .pastearea {
+    border-color: #9baec8;
+    border-width: 2px;
+    border-style: dashed;
+    background-color: #d9e1e8;
+    //height: 60px;
+    //margin-top:10px;
+    //margin-bottom:-15px;
+  }
+  .uploadFileFail {
+    color: red;
+  }
+  .mediaButtonActive {
+    color: rgba(0, 0, 0, .87) !important;
+    background-color: #e0e0e0 !important;
+  }
+  .media-grid-tile {
+    position: relative;
+    box-sizing: border-box;
+    margin-bottom: 4px;
+    overflow: hidden;
+  }
+  .media-grid-tile img {
+    display: block;
+    width: 100%;
+  }
+  .media-grid-tile-actions {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    box-sizing: border-box;
+    padding: 16px;
+    color: #fff;
+    background: rgba(0, 0, 0, .2);
+    -webkit-box-align: center;
+    align-items: center;
+    max-height: 30px;
+    min-height: 20px;
+  }
+  .media-grid-tile-text {
+    overflow: hidden;
+    -webkit-box-flex: 1;
+    flex: 1;
+  }
+  .media-grid-tile-title {
+    height: 16px;
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .media-grid-tile-buttons {
+    margin: -8px;
+    white-space: nowrap;
+    -webkit-box-flex: 0;
+    flex: none;
+    display: block;
+  }
+  .media-btn-icon {
+    background: transparent
+  }
+  .mediaListPadding {
+    padding-right: 2px;
+    padding-left: 2px
+  }
+  .media-card {
+    cursor: pointer;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+    color: #000;
+    background-color: #fff;
+    border-radius: 2px;
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12);
+  }
+  .media-card-media {
+    position: relative;
+  }
+  .media-card-primary {
+    position: relative;
+    padding: 5px;
+  }
+  .media-card-primary-subtitle {
+    display: block;
+    font-size: 10px;
+    line-height: 15px;
+    opacity: .54;
+  }
+.panel.panel-default#mediaList(v-cloak)
+  .row(style="margin:0" v-if="isPc")
+    .col-xs-2(style="padding:5px")
+      .col-xs-12(style="padding:0")
+        button#mediaAllLists.btn.btn-sm.btn-default(style="width:100%;" @click="buttonClick('all')" v-bind:class="mediaType == 'all'?uploadButtonClass:''") 全部
+      .col-xs-6(style="padding:0")
+        button#mediaPictureLists.btn.btn-sm.btn-default(style="width:100%" @click="buttonClick('picture')" v-bind:class="mediaType == 'picture'?uploadButtonClass:''") 图片
+      .col-xs-6(style="padding:0")
+        button#mediaVideoLists.btn.btn-sm.btn-default(style="width:100%" @click="buttonClick('video')" :class="mediaType == 'video'?uploadButtonClass:''") 视频
+      .col-xs-6(style="padding:0")
+        button#mediaAudioLists.btn.btn-sm.btn-default(style="width:100%" @click="buttonClick('audio')" :class="mediaType == 'audio'?uploadButtonClass:''") 音频
+      .col-xs-6(style="padding:0")
+        button#mediaAttachmentLists.btn.btn-sm.btn-default(style="width:100%" @click="buttonClick('attachment')" :class="mediaType == 'attachment'?uploadButtonClass:''") 附件
+      .col-xs-12(style="padding:0")
+        button.btn.btn-sm.btn-info(onclick="clickButton()" style="float:right;width:100%;margin-top: 5px;" ) 上传
+      .col-xs-12(style="padding:0")
+        button.btn.btn-sm.btn-info(onclick="uploadFile()" style="float:right;width:100%;margin-top: 5px;" v-bind:style="netWord == false ? 'display:block' : 'display:none'") 重新上传
+      .col-xs-12(style="padding:0")
+        .pastearea#paste-target(style="color:#000")
+          p.text-center#paste-center 剪贴板上传，先点一下我，再 Ctrl+V 黏贴。   
+    .col-xs-10
+      // 翻页 prev next
+      .panel-body(v-bind:style="uploadFileInfoArr && uploadFileInfoArr.length != 0 ? 'display:block' : 'display:none'" style="padding:5px")
+        .table-responsive(style="max-height:150px")
+          table.table.table-condensed       
+            tbody
+              tr(v-for = "(file, index) in uploadFileInfoArr" v-if="file.showType") 
+                td(v-bind:id="'#name'+index") {{file.name}}
+                td(v-bind:id="'#size'+index") {{file.size}}
+                td(v-bind:id="'#type'+index") {{file.fileType}}
+                td(v-bind:id="'#percent'+index") {{file.percent}}%
+                td(v-bind:id="'#status'+index" v-bind:style="file.statusType == 'fail'?'color:red':''") {{file.status}}
+                td(v-bind:id="'#opera'+index" v-if="file.statusType == 'fail'")
+                  button.btn.media-btn-icon(style="font-size:16px" @click="cancelFailure(index)")
+                    i.fa.fa-window-close-o
+      .panel-body(style="padding:5px")
+        // 全部 all
+        .row#allDom(v-bind:style="mediaType == 'all' ? 'display:block' : 'display:none'")
+          .col-xs-4.col-sm-2.col-md-2.col-lg-2.col-xl-2.mediaListPadding(v-for = "(all, index) in mediaAllLists")
+            .media-grid-tile(v-bind:title="all.oname" v-if="!all.dealStatus || all.dealStatus !== 'ing'")
+              div(v-if="['mp4', '3gp', 'swf', 'jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'].indexOf(all.ext) > -1")
+                img(v-bind:src="all.ext=='mp4' ? '/frameImg/'+all.rid : '/rt/'+all.rid" style="height:90px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
+              div(v-else)
+                img(v-bind:src="'/attachIcon/'+all.ext+'.png'" style="height:90px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
+              .media-grid-tile-actions(style="max-height:30px;min-height:20px")
+                .media-grid-tile-text
+                  .media-grid-tile-title(style="font-size:13px") {{all.oname}}
+                .media-grid-tile-buttons(v-bind:style="['png', 'jpg'].indexOf(all.ext) > -1 ? 'display:block' : 'display:none'")
+                  button.btn.media-btn-icon(@click="pictureEdit(all.rid)")
+                    i.fa.fa-pencil-square-o
+            .media-grid-tile(v-else)
+              img(src="/default/imageDealing.jpg" style="height:90px;cursor: pointer")
+              .media-grid-tile-actions(style="max-height:30px;min-height:20px")
+                .media-grid-tile-text
+                  .media-grid-tile-title(style="font-size:13px") 正在处理中...
+        // 图片 picture
+        .row#picturesDom(v-bind:style="mediaType == 'picture' ? 'display:block' : 'display:none'")
+          .col-xs-4.col-sm-2.col-md-2.col-lg-2.col-xl-2.mediaListPadding(v-for = "(picture, index) in mediaPictureLists")
+            .media-grid-tile( v-bind:title="picture.oname" v-if="!picture.dealStatus || picture.dealStatus !== 'ing'")
+              img(v-bind:src="'/rt/'+picture.rid" style="height:90px;cursor: pointer" @click="pictureInsert(picture.rid, picture.ext, picture.oname)")
+              .media-grid-tile-actions(style="max-height:30px;min-height:20px")
+                .media-grid-tile-text
+                  .media-grid-tile-title(style="font-size:13px") {{picture.oname}}
+                .media-grid-tile-buttons
+                  button.btn.media-btn-icon(@click="pictureEdit(picture.rid)")
+                    i.fa.fa-pencil-square-o
+            .media-grid-tile(v-else)
+              img(src="/default/imageDealing.jpg" style="height:90px;cursor: pointer")
+              .media-grid-tile-actions(style="max-height:30px;min-height:20px")
+                .media-grid-tile-text
+                  .media-grid-tile-title(style="font-size:13px") 正在处理中...
+        // 视频 video
+        .row#videosDom(v-bind:style="mediaType == 'video' ? 'display:block' : 'display:none'")
+          .col-xs-4.col-sm-3.col-md-2.col-lg-2.col-xl-2.mediaListPadding(v-for = "(video, index) in mediaVideoLists")
+            .media-grid-tile(v-bind:title="video.oname" @click="videoInsert(video.rid, video.ext, video.oname)")
+              img(v-bind:src="'/frameImg/' + video.rid" style="width:100%;height:90px;cursor: pointer")
+              .media-grid-tile-actions(style="max-height:30px;min-height:20px")
+                .media-grid-tile-text
+                  .media-grid-tile-title(style="font-size:13px") {{video.oname}}
+                .media-grid-tile-buttons
+                  button.btn.media-btn-icon
+                    i.fa.fa-video-camera
+
+        // 音频 audio
+        .row#audiosDom(v-bind:style="mediaType == 'audio' ? 'display:block' : 'display:none'")
+          .col-xs-2.col-sm-2.col-md-1.col-lg-1.col-xl-1.mediaListPadding(v-for = "(audio, index) in mediaAudioLists")
+            .media-grid-tile(style="max-height:100px")
+              .media-card
+                .media-card-media(@click="audioInsert(audio.rid, audio.ext, audio.oname)" style="cursor:pointer" v-bind:title="audio.oname")
+                  img(src="/attachIcon/mp3.png")
+                .media-card-primary(style="padding:5px")
+                  .media-card-primary-subtitle(style="font-size:10px;line-height:15px") {{audio.oname}}
+        // 附件 attachment
+        .row#attachmentsDom(v-bind:style="mediaType == 'attachment' ? 'display:block' : 'display:none'")
+          .col-xs-2.col-sm-2.col-md-1.col-lg-1.col-xl-1.mediaListPadding(v-for = "(attachment, index) in mediaAttachmentLists")
+            .media-grid-tile(style="max-height:100px")
+              .media-card(@click="attachmentInsert(attachment.rid, attachment.ext, attachment.oname)" style="cursor:pointer" v-bind:title="attachment.oname")
+                .media-card-media
+                  img(v-bind:src="'/attachIcon/'+attachment.ext+'.png'")
+                .media-card-primary(style="padding:5px")
+                  .media-card-primary-subtitle(style="font-size:10px;line-height:15px") {{fileNameShrink(attachment.oname,8)}}
+      // 翻页、跳转
+      .panel-footer(style="padding:0;background-color:#fff;border:0;")
+        .row
+          .col-xs-12
+            div(style="float:right")
+              button.btn.btn-sm.btn-default#prevButton(onclick="prevPage()" style="min-width:5px")
+                i.fa.fa-chevron-left
+              span#currrentPage {{currentSkip}}
+              span /
+              span#totalPage {{maxSkip}}
+              button.btn.btn-sm.btn-default#nextPrev(onclick="nextPage()" style="min-width:5px")
+                i.fa.fa-chevron-right
+              input(type="text" v-model="appointSkip" style="width:40px")
+              button.btn.btn-sm.btn-default(style="min-width:5px" onclick="turnPage()") 跳转
+            div(style="font-size:10px;color:#9baec8") 注:上传文件不大于200M.图片格式:jpg|jpeg|png|gif|svg|bmp.视频格式:mp4|mov|3gp|avi.音频格式:mp3|wav|amr.
+      // 上传按钮
+      .panel-footer#uploadFileButtonDom(style="padding:0px 15px;background-color:#FFF;border-top:1px solid #fff;display:none")
+        nav(aria-label="...")
+          ul.pager(style="margin:5px 0;")
+            li.next
+              button.btn.btn-sm.btn-default(onclick="clickButton()" style="float:right") 选择文件&nbsp;
+            li(style="display:none")
+              input(id="fileList" type="file" multiple="multiple" onchange="fileSelect(this)")
+  .row(style="margin:0" v-else)     
+    .col-xs-12
+      // 翻页 prev next
+      .panel-body(v-bind:style="uploadFileInfoArr && uploadFileInfoArr.length != 0 ? 'display:block' : 'display:none'" style="padding:5px")
+        .table-responsive(style="max-height:150px")
+          table.table.table-condensed           
+            tbody
+              tr(v-for = "(file, index) in uploadFileInfoArr" v-if="file.showType") 
+                td(v-bind:id="'#name'+index") {{fileNameShrink(file.name, 6)}}
+                td(v-bind:id="'#percent'+index") {{file.percent}}%
+                td(v-bind:id="'#status'+index" v-if="file.statusType == 'fail'" style="color:red") 上传失败
+                td(v-bind:id="'#status'+index" v-else) {{file.status}}
+                td(v-bind:id="'#opera'+index" v-if="file.statusType == 'fail'")
+                  button.btn.media-btn-icon(style="font-size:16px" @click="cancelFailure(index)")
+                    i.fa.fa-window-close-o
+      .panel-body(style="padding:5px")
+        // 全部 all
+        .row#allDom(v-bind:style="mediaType == 'all' ? 'display:block' : 'display:none'")
+          .col-xs-3.col-sm-2.col-md-2.col-lg-2.col-xl-2.mediaListPadding(v-for = "(all, index) in mediaAllLists")
+            .media-grid-tile(v-bind:title="all.oname" v-if="!all.dealStatus || all.dealStatus !== 'ing'")
+              div(v-if="['mp4', '3gp', 'swf', 'jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'].indexOf(all.ext) > -1")
+                img(v-bind:src="all.ext=='mp4' ? '/frameImg/'+all.rid : '/rt/'+all.rid" style="height:90px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
+              div(v-else)
+                img(v-bind:src="'/attachIcon/'+all.ext+'.png'" style="height:90px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
+              .media-grid-tile-actions(style="max-height:30px;min-height:20px;padding:5px")
+                .media-grid-tile-text
+                  .media-grid-tile-title(style="font-size:11px;overflow:unset") {{all.oname}}
+                .media-grid-tile-buttons(v-bind:style="['png', 'jpg'].indexOf(all.ext) > -1 ? 'display:block' : 'display:none'")
+                  button.btn.media-btn-icon(@click="pictureEdit(all.rid)")
+                    i.fa.fa-pencil-square-o
+            .media-grid-tile(v-else)
+              img(src="/default/imageDealing.jpg" style="height:90px;cursor: pointer")
+              .media-grid-tile-actions(style="max-height:30px;min-height:20px")
+                .media-grid-tile-text
+                  .media-grid-tile-title(style="font-size:13px") 正在处理中...
+      // 翻页、跳转
+      .panel-footer(style="padding:0;background-color:#fff;border:0;padding-top:10px;")
+        .row
+          .col-xs-2
+            button.btn.btn-sm.btn-info(onclick="clickButton()") 上传
+          .col-xs-10
+            div(style="float:right")
+              button.btn.btn-sm.btn-default#prevButton(onclick="prevPage()" style="min-width:5px")
+                i.fa.fa-chevron-left
+              span#currrentPage {{currentSkip}}
+              span /
+              span#totalPage {{maxSkip}}
+              button.btn.btn-sm.btn-default#nextPrev(onclick="nextPage()" style="min-width:5px")
+                i.fa.fa-chevron-right
+              input(type="text" v-model="appointSkip" style="width:40px")
+              button.btn.btn-sm.btn-default(style="min-width:5px" onclick="turnPage()") 跳转
+        .row
+          .col-xs-12(style="font-size:10px;color:blue")
+            span(style="font-size:10px;color:#9baec8") 图片:jpg|jpeg|png|gif|svg|bmp.视频:mp4|mov|3gp|avi.音频:mp3|wav|amr.文件大小不得超过200M
+      // 上传按钮
+      .panel-footer#uploadFileButtonDom(style="padding:0px 15px;background-color:#FFF;border-top:1px solid #fff;display:none")
+        nav(aria-label="...")
+          ul.pager(style="margin:5px 0;")
+            li.next
+              button.btn.btn-sm.btn-default(onclick="clickButton()" style="float:right") 选择文件&nbsp;
+            li(style="display:none")
+              input(id="fileList" type="file" multiple="multiple" onchange="fileSelect(this)")

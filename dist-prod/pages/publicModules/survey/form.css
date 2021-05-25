@@ -1,0 +1,343 @@
+#moduleSurveyEdit .survey-type {
+  display: inline-block;
+  margin-right: 1rem;
+  cursor: pointer;
+  padding-top: 7px;
+}
+#moduleSurveyEdit .survey-type span {
+  font-weight: 700;
+}
+#moduleSurveyEdit .survey-type .fa {
+  margin-right: 0.3rem;
+  font-size: 15px;
+  color: green;
+}
+#moduleSurveyEdit .survey-type .fa-circle-o {
+  color: #555;
+}
+#moduleSurveyEdit .option-answers {
+  padding: 0.5rem;
+  padding-left: 2rem;
+  /*background-color: #eee;*/
+}
+#moduleSurveyEdit .add-option-button {
+  cursor: pointer;
+  font-weight: 700;
+  /*color: #2b90d9;*/
+}
+#moduleSurveyEdit .survey-option {
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  background-color: #f4f4f4;
+  border-radius: 3px;
+}
+#moduleSurveyEdit .survey-option:first-child {
+  border-top: none;
+}
+#moduleSurveyEdit .survey-option .fa {
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #888;
+  display: inline-block;
+  width: 1.5rem;
+  text-align: center;
+}
+#moduleSurveyEdit .survey-options {
+  margin-top: 0.5rem;
+}
+#moduleSurveyEdit .option-index {
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+#moduleSurveyEdit .option-resources {
+  margin-top: 0.5rem;
+  font-size: 0;
+}
+#moduleSurveyEdit .option-resource {
+  height: 5rem;
+  display: inline-block;
+  width: 7rem;
+  line-height: 5rem;
+  background-color: #000;
+  margin: 0 0.5rem 0.5rem 0;
+}
+#moduleSurveyEdit .option-resource-img {
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+}
+#moduleSurveyEdit .option-resource {
+  font-size: 0;
+  cursor: pointer;
+  position: relative;
+  text-align: center;
+}
+#moduleSurveyEdit .option-resource img {
+  max-height: 100%;
+  max-width: 100%;
+}
+#moduleSurveyEdit .option-resource .fa {
+  position: absolute;
+  display: none;
+  top: 0;
+  right: 0;
+  height: 2rem;
+  font-size: 1rem;
+  text-align: center;
+  line-height: 2rem;
+  width: 2rem;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+}
+#moduleSurveyEdit .option-resource:hover .fa {
+  display: block;
+}
+@media (max-width: 991px) {
+  #moduleSurveyEdit .option-resource .fa {
+    display: block;
+  }
+}
+#moduleSurveyEdit .survey-answers {
+  background-color: #f4f4f4;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+#moduleSurveyEdit .survey-answer {
+  margin-bottom: 0.5rem;
+}
+#moduleSurveyEdit .survey-scores input {
+  max-width: 3rem;
+}
+.module-survey-form .option-resource {
+  /*display: table-cell;*/
+  /*width: 4rem;*/
+}
+.module-survey-form .option-content {
+  font-weight: 700;
+  /*margin-bottom: 0.5rem;*/
+}
+.module-survey-form .survey-form-description {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.module-survey-form .option-resource > img {
+  height: 6rem;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+.module-survey-form .option-resource > div {
+  height: 6rem;
+  display: inline-block;
+  width: 9rem;
+  margin-right: 0.5rem;
+  border-radius: 3px;
+  vertical-align: top;
+  cursor: pointer;
+  background-size: cover;
+}
+.module-survey-form .survey-form-option {
+  margin: 1rem 0;
+}
+.module-survey-form .option-links {
+  display: table-cell;
+  vertical-align: top;
+}
+.module-survey-form .option-link {
+  width: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  word-break: break-all;
+  height: 1.5rem;
+}
+.module-survey-form .option-content {
+  position: relative;
+  padding-right: 6rem;
+}
+.module-survey-form .option-content.option-survey {
+  padding-right: 0;
+}
+.module-survey-form .option-button {
+  width: 6rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  text-align: right;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+.module-survey-form .option-button select {
+  font-size: 1.2rem;
+  font-weight: normal;
+}
+.module-survey-form .option-button span.score {
+  font-size: 1.2rem;
+  font-weight: normal;
+  color: #667282;
+}
+.module-survey-form .option-button .fa.fa-square-o {
+  color: #888;
+}
+.module-survey-form .option-button .fa.fa-check-square-o {
+  color: #2b90d9;
+}
+.module-survey-form .form-warning {
+  color: #808080;
+  margin-bottom: 0.5rem;
+}
+.module-survey-form .option-answer span.active {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #2b90d9;
+}
+.module-survey-form .option-answers {
+  padding-left: 1rem;
+}
+.module-survey-form .option-answer.error {
+  border: 3px solid #ff5200;
+}
+.module-survey-form .option-answer {
+  background-color: #f6f6f6;
+  margin: 0.5rem 0;
+  border-radius: 3px;
+  padding: 0.5rem;
+}
+.module-survey-form .option-content {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 1.25rem;
+  /*background-color: #f4f4f4;*/
+}
+.module-survey-form .answer-content {
+  background-color: #f6f6f6;
+  font-weight: normal;
+  padding-right: 0;
+  font-size: 1.2rem;
+  margin-bottom: 0;
+}
+.module-survey-form .answer-content .option-button {
+  width: 10rem;
+}
+.module-survey-form .survey-score-input {
+  max-width: 2rem;
+  font-size: 1.2rem;
+}
+.module-survey-form .survey-score-score {
+  font-size: 1rem;
+}
+.module-survey-form .option-status {
+  position: relative;
+  overflow: hidden;
+  height: 2rem;
+  line-height: 2rem;
+}
+.module-survey-form .option-status .number {
+  position: absolute;
+  -webkit-transition: width 2s;
+  transition: width 2s;
+  top: 0;
+  left: 0;
+  height: 8px;
+  border-radius: 4px;
+}
+.module-survey-form .number-background {
+  position: absolute;
+  border-radius: 4px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.module-survey-form .option-status-container {
+  position: relative;
+  margin-right: 8rem;
+  margin-top: 0.6rem;
+}
+.module-survey-form .option-status-info {
+  position: absolute;
+  top: 0;
+  width: 8rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  text-align: right;
+  word-break: break-all;
+  color: #9baec8;
+  right: 0;
+}
+.module-survey-form .option-status-info.survey-score {
+  width: 100%;
+  position: relative;
+  padding-top: 0.3rem;
+  text-align: right;
+}
+.module-survey-form .form-post-users a {
+  display: inline-block;
+  margin-right: -1rem;
+}
+.module-survey-form .form-post-users a img {
+  height: 3rem;
+  width: 3rem;
+  border: 2px solid #f4f4f4;
+  border-radius: 50%;
+}
+.module-survey-form .option-score-input {
+  display: inline-block;
+  color: #888;
+}
+.module-survey-form .option-score-input input {
+  width: 4rem;
+}
+.module-survey-form .option-score-input .score {
+  font-size: 1.2rem;
+  font-weight: 700;
+  /*color: #9baec8;*/
+  display: inline;
+}
+.module-survey-form .option-score-limit {
+  display: inline-block;
+}
+.module-survey-form .option-select-count {
+  text-align: right;
+  font-size: 1.2rem;
+  color: #9baec8;
+}
+#moduleSurveyEdit .selected-users {
+  padding: 0.5rem 0;
+}
+#moduleSurveyEdit .selected-user {
+  font-size: 0;
+  display: inline-block;
+  margin: 0 0.5rem 0.5rem 0;
+  vertical-align: top;
+}
+#moduleSurveyEdit .selected-user-avatar img {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 3px 0 0 3px;
+}
+#moduleSurveyEdit .selected-user-avatar {
+  display: inline-block;
+  vertical-align: top;
+}
+#moduleSurveyEdit .selected-user-name {
+  vertical-align: top;
+  display: inline-block;
+  height: 2rem;
+  line-height: 2rem;
+  padding: 0 0.5rem;
+  border-radius: 0 3px 3px 0;
+  font-size: 1.2rem;
+  background-color: #999;
+  color: #fff;
+}
+#moduleSurveyEdit .selected-user-name .fa {
+  cursor: pointer;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL3B1YmxpY01vZHVsZXMvc3VydmV5L2Zvcm0ubGVzcyIsIjxpbnB1dCBjc3MgMTA0PiJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLHNCQUFBO0VBQ0EsbUJBQUE7RUFDQSxnQkFBQTtFQUNBLGlCQUFBO0NDQ0Q7QURDRDtFQUNFLGlCQUFBO0NDQ0Q7QURDRDtFQUNFLHFCQUFBO0VBQ0EsZ0JBQUE7RUFDQSxhQUFBO0NDQ0Q7QURDRDtFQUNFLFlBQUE7Q0NDRDtBRENEO0VBQ0UsZ0JBQUE7RUFDQSxtQkFBQTtFQ0NBLDJCQUEyQjtDQUM1QjtBREVEO0VBQ0UsZ0JBQUE7RUFDQSxpQkFBQTtFQ0FBLG1CQUFtQjtDQUNwQjtBREVEO0VBQ0UsZ0JBQUE7RUFDQSxvQkFBQTtFQUNBLDBCQUFBO0VBQ0EsbUJBQUE7Q0NBRDtBREVEO0VBQ0UsaUJBQUE7Q0NBRDtBREVEO0VBQ0UsZ0JBQUE7RUFDQSxrQkFBQTtFQUNBLFlBQUE7RUFDQSxzQkFBQTtFQUNBLGNBQUE7RUFDQSxtQkFBQTtDQ0FEO0FERUQ7RUFDRSxtQkFBQTtDQ0FEO0FERUQ7RUFDRSxpQkFBQTtFQUNBLGtCQUFBO0VBQ0Esc0JBQUE7Q0NBRDtBREVEO0VBQ0UsbUJBQUE7RUFDQSxhQUFBO0NDQUQ7QURFRDtFQUNFLGFBQUE7RUFDQSxzQkFBQTtFQUNBLFlBQUE7RUFDQSxrQkFBQTtFQUNBLHVCQUFBO0VBQ0EsMEJBQUE7Q0NBRDtBREVEO0VBQ0UsYUFBQTtFQUNBLFlBQUE7RUFDQSx1QkFBQTtDQ0FEO0FERUQ7RUFDRSxhQUFBO0VBQ0EsZ0JBQUE7RUFDQSxtQkFBQTtFQUNBLG1CQUFBO0NDQUQ7QURHRDtFQUNFLGlCQUFBO0VBQ0EsZ0JBQUE7Q0NERDtBREdEO0VBQ0UsbUJBQUE7RUFDQSxjQUFBO0VBQ0EsT0FBQTtFQUNBLFNBQUE7RUFDQSxhQUFBO0VBQ0EsZ0JBQUE7RUFDQSxtQkFBQTtFQUNBLGtCQUFBO0VBQ0EsWUFBQTtFQUNBLCtCQUFBO0VBQ0EsWUFBQTtDQ0RE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 */

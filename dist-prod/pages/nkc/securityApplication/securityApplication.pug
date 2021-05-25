@@ -1,0 +1,87 @@
+extends ../nkc
+block nkcTitle
+  title 手机号申诉
+  style.
+    .avatar img{
+      height: 1.4rem;
+      width: 1.4rem;
+    }
+    th.input{
+      max-width: 18rem;
+    }
+    th.input textarea{
+      font-size: 1rem;
+    }
+    tr.resolved{
+      background-color: #cceacc;
+    }
+    tr.rejected{
+      background-color: #efcaca;
+    }
+block nkcContent
+  #data.hidden=objToStr({applications: data.applications})
+  #app(v-cloak)
+    ul.nav.nav-tabs.m-b-1
+      li(class=data.t==='pending'? 'active':'')
+        a(href='/nkc/securityApplication?t=pending') 待处理
+      li(class=data.t==='resolved'? 'active':'')
+        a(href='/nkc/securityApplication?t=resolved') 已通过
+      li(class=data.t==='rejected'? 'active':'')
+        a(href='/nkc/securityApplication?t=rejected') 已驳回
+    include ../../publicModules/paging/paging
+    .table-responsive
+      table.table.nkc-table
+        thead
+          tr
+            th 时间
+            th 申请人
+            th 新手机号
+            th 旧手机号
+            th 常用登录地址
+            th IP
+            th 申诉说明
+            th 状态
+            th 其他
+        tbody
+          tr(v-for='a in applications' :class="{'resolved': a._status ==='resolved', 'rejected': a._status === 'rejected'}")
+            th {{timeFormat(a.toc)}}
+            th.avatar
+              img(:src="getUrl('userAvatar', a.user.avatar)")
+              a(:href="getUrl('userHome', a.user.uid)" :data-float-uid='a.user.uid') {{a.user.username}}
+            th +{{a.newPhoneNumber.nationCode}} {{a.newPhoneNumber.number}}
+            th +{{a.oldPhoneNumber.nationCode}} {{a.oldPhoneNumber.number}}
+            th
+              div(v-for='(l, index) in a.addresses') {{index + 1}}. {{l}}
+            th {{a.ip}}
+            th(style='width: 10rem;') {{a.description}}
+            th
+              span(v-if='a.status === "pending"') 待处理
+              span.text-success(v-else-if='a.status === "resolved"') 已通过
+              span.text-danger(v-else) 已驳回
+            th.input
+              div(v-if='a.status === "pending"')
+                .radio
+                  label.m-r-05
+                    input(type='radio' value="resolved" v-model='a._status')
+                    span 通过
+                  label
+                    input(type='radio' value='rejected' v-model='a._status')
+                    span 驳回
+                div(v-if='a._status === "resolved"')
+                  textarea.form-control(rows=3 placeholder='备注（用户不可见）' v-model='a.remarks')
+                  button.m-t-05.btn.btn-primary.btn-xs(@click='submit(a)') 提交
+                  button.m-t-05.btn.btn-default.btn-xs(@click='close(a)') 关闭
+                div(v-if='a._status === "rejected"')
+                  textarea.form-control(rows=3 placeholder='理由（用户可见）' v-model='a.reason')
+                  button.m-t-05.btn.btn-primary.btn-xs(@click='submit(a)') 提交
+                  button.m-t-05.btn.btn-default.btn-xs(@click='close(a)') 关闭
+              div(v-else-if='a.status === "resolved"') 备注：{{a.remarks}}
+              div(v-else) 理由：{{a.reason}}
+      if !data.applications.length
+        .p-t-1.p-b-2.text-center 空空如也~
+    include ../../publicModules/paging/paging_input
+
+block nkcScripts
+  include ../../publicModules/moment
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  +includeJS('/nkc/securityApplication/securityApplication.js')

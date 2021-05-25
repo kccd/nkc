@@ -1,0 +1,372 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+body {
+  background-color: #f6f6f6;
+}
+.management .nav {
+  padding: 0;
+}
+.management .nav ul {
+  padding: 0;
+  margin: 0;
+}
+.management .nav ul li:first-child a {
+  border-radius: 2px 2px 0 0;
+}
+.management .nav ul li:last-child a {
+  border-radius: 0 0 2px 2px ;
+}
+.management .nav ul li {
+  list-style: none;
+  display: block;
+}
+.management .nav ul li a {
+  display: block;
+  height: 3.2rem;
+  line-height: 3.2rem;
+  font-size: 1.2rem;
+  padding: 0 0.5rem;
+  position: relative;
+  color: #282c37;
+  cursor: pointer;
+  -webkit-transition: background-color 100ms, color 100ms;
+  transition: background-color 100ms, color 100ms;
+}
+.management .nav ul li a .fa {
+  display: inline-block;
+  width: 3rem;
+  color: #555;
+  text-align: center;
+  font-size: 1.2rem;
+}
+.management .nav ul li a:hover,
+.management .nav ul li a:focus {
+  text-decoration: none;
+  background-color: #f6f6f6;
+}
+.management .nav ul li.active a {
+  color: #2b90d9;
+}
+.management-header {
+  font-size: 1.6rem;
+  font-weight: 700;
+  background-color: #f6f6f6;
+  margin-bottom: 0.5rem;
+  border-radius: 3px;
+  padding: 0 1rem;
+  height: 4rem;
+  line-height: 4rem;
+}
+.management-button {
+  height: 3rem;
+  padding: 0 2rem;
+  border: #2b90d9;
+  background-color: #2b90d9;
+  color: #fff;
+  border-radius: 3px;
+  -webkit-transition: background-color 100ms;
+  transition: background-color 100ms;
+}
+.management-button:hover {
+  background-color: #2477b3;
+}
+.management-home .home-top-threads .home-top-thread .home-top-thread-cover {
+  font-size: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  border: 3px solid #eee;
+  width: 100%;
+  position: relative;
+}
+.management-home .home-top-threads .home-top-thread .home-top-thread-cover img {
+  width: 100%;
+}
+.management-home .home-top-threads .home-top-thread .home-top-thread-cover .home-top-thread-title {
+  position: absolute;
+  padding: 0 0.5rem;
+  border: none;
+  width: 100%;
+  color: #fff;
+  top: 0;
+  height: 3rem;
+  padding-right: 3rem;
+  line-height: 3rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  font-size: 1.25rem;
+  background-color: rgba(0, 0, 0, 0.4);
+  left: 0;
+}
+.management-home .home-top-threads .home-top-thread .home-top-thread-cover .home-top-thread-index {
+  position: absolute;
+  display: inline-block;
+  padding: 0 0.5rem;
+  color: #fff;
+  text-align: center;
+  height: 3rem;
+  width: 3rem;
+  border: none;
+  font-weight: 700;
+  line-height: 3rem;
+  font-size: 1.25rem;
+  background-color: #e85a71;
+  left: 0;
+  top: 0;
+}
+.management-home .home-top-threads .home-top-thread .home-top-thread-cover .home-top-thread-button {
+  font-size: 1.6rem;
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  height: 3rem;
+  text-align: center;
+  border-radius: 50%;
+  -webkit-box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+          box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+  line-height: 3rem;
+  width: 3rem;
+  background-color: #2b90d9;
+  color: #fff;
+  cursor: pointer;
+  -webkit-transition: background-color 100ms;
+  transition: background-color 100ms;
+}
+.management-home .home-top-threads .home-top-thread .home-top-thread-cover .home-top-thread-button:hover {
+  background-color: #0b5ba2;
+}
+.management-home .home-top-threads .home-top-thread .home-top-thread-cover .home-top-thread-buttons {
+  font-size: 1.3rem;
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  background-color: #e85a71;
+  border-radius: 3px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+.management-home .home-top-threads .home-top-thread .home-top-thread-cover .home-top-thread-buttons > div {
+  height: 2rem;
+  width: 2rem;
+  color: #fff;
+  display: inline-block;
+  text-align: center;
+  line-height: 2rem;
+}
+.management-home .home-top-threads .home-top-thread .home-top-thread-cover .home-top-thread-buttons .fa {
+  cursor: pointer;
+  -webkit-transition: background-color 100ms;
+  transition: background-color 100ms;
+  border-radius: 3px;
+}
+.management-home .home-top-threads .home-top-thread .home-top-thread-cover .home-top-thread-buttons .fa:hover {
+  background-color: #af4355;
+}
+.management-home .home-top-threads .home-top-thread .home-top-thread-cover .home-top-thread-remove {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3rem;
+  height: 3rem;
+  text-align: center;
+  line-height: 3rem;
+  font-size: 1.4rem;
+  cursor: pointer;
+  -webkit-transition: background-color 100ms;
+  transition: background-color 100ms;
+  z-index: 100;
+  background-color: #e85a71;
+  color: #fff;
+}
+.management-home .home-top-threads .home-top-thread .home-top-thread-cover .home-top-thread-remove:hover {
+  background-color: #af4355;
+}
+.management-home .home-top-forums .home-top-forum {
+  margin: 0 1rem 1rem 0;
+  background-color: #f6f6f6;
+  display: inline-block;
+  padding: 0.5rem;
+  min-width: 12rem;
+  -webkit-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+          box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+.management-home .home-top-forums .home-top-forum .home-top-forum-buttons {
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+.management-home .home-top-forums .home-top-forum .home-top-forum-buttons div {
+  height: 2rem;
+  width: 2rem;
+  line-height: 2rem;
+  margin-right: 0.5rem;
+  text-align: center;
+  cursor: pointer;
+}
+.management-home .home-top-forums .home-top-forum .home-top-forum-buttons div.fa:hover {
+  background-color: #eee;
+}
+.management-home .home-top-forums .home-top-forum .home-top-forum-info {
+  vertical-align: top;
+  margin-top: 0.5rem;
+  height: 2rem;
+  line-height: 2rem;
+}
+.management-home .home-top-forums .home-top-forum .home-top-forum-info .home-top-forum-icon {
+  vertical-align: top;
+  height: 2rem;
+  width: 2rem;
+  display: inline-block;
+  border-radius: 50%;
+  margin-right: 0.3rem;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  border: 2px solid #eee;
+}
+.management-home .home-top-forums .home-top-forum .home-top-forum-info .home-top-forum-name {
+  vertical-align: top;
+  font-weight: 700;
+  display: inline-block;
+  color: #282c37;
+}
+.management-home .home-top-forums .home-top-forum .home-top-forum-info .home-top-forum-name:hover,
+.management-home .home-top-forums .home-top-forum .home-top-forum-info .home-top-forum-name:focus {
+  text-decoration: none;
+  color: #282c37;
+}
+.home-goods-buttons {
+  text-align: right;
+  background-color: #eee;
+  padding: 0 0.5rem;
+}
+.home-goods-buttons .fa {
+  height: 3rem;
+  width: 3rem;
+  line-height: 3rem;
+  margin-right: 1rem;
+  text-align: center;
+  cursor: pointer;
+  font-size: 1.4rem;
+}
+.home-goods-buttons .fa:hover {
+  background-color: #ddd;
+}
+.home-goods-content {
+  padding-top: 0.6rem;
+  display: block;
+  background-color: #eee;
+  margin-bottom: 0.5rem;
+}
+.home-goods-content:hover,
+.home-goods-content:focus {
+  text-decoration: none;
+}
+.home-goods-content .home-goods-avatar {
+  display: table-cell;
+}
+.home-goods-content .home-goods-avatar > div {
+  height: 10rem;
+  width: 16rem;
+  border-radius: 5px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  border: 2px solid #eee;
+  background-size: cover;
+  margin-right: 1rem;
+}
+.home-goods-content .home-goods-info {
+  vertical-align: top;
+  display: table-cell;
+  width: 100%;
+  padding-top: 0;
+}
+.home-goods-content .home-goods-info .home-goods-name {
+  font-size: 1.6rem;
+  height: 2.2rem;
+  color: #3a3a3a;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.home-goods-content .home-goods-info .home-goods-name:hover {
+  color: #cf8425;
+}
+.home-goods-content .home-goods-info .home-goods-description {
+  font-size: 1.2rem;
+  height: 3.6rem;
+  margin-top: 0.8rem;
+  color: #777;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.home-goods-content .home-goods-info .home-goods-other {
+  position: relative;
+  margin-top: 1rem;
+  height: 2.2rem;
+  line-height: 2.2rem;
+  text-align: left;
+}
+.home-goods-content .home-goods-info .home-goods-other .home-goods-user {
+  vertical-align: top;
+  display: inline-block;
+  height: 100%;
+  color: #777;
+}
+.home-goods-content .home-goods-info .home-goods-other .home-goods-user:hover,
+.home-goods-content .home-goods-info .home-goods-other .home-goods-user:focus {
+  text-decoration: none;
+  color: #e85a71;
+}
+.home-goods-content .home-goods-info .home-goods-other .home-goods-user img {
+  height: 1.6rem;
+  width: 1.6rem;
+  margin-right: 0.3rem;
+  margin-top: -2px;
+  border-radius: 50%;
+}
+.home-goods-content .home-goods-info .home-goods-other .home-goods-user span {
+  font-size: 1.1rem;
+}
+.home-goods-content .home-goods-info .home-goods-other .home-goods-price {
+  position: absolute;
+  right: 1rem;
+  top: 0;
+  font-size: 1.6rem;
+  color: #ff4400;
+  font-weight: 700;
+  font-style: italic;
+}
+.order-user {
+  display: inline-block;
+}
+.order-user img {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  margin-right: 0.3rem;
+}
+@media (max-width: 500px) {
+  .home-goods-content .home-goods-avatar > div {
+    width: 10rem;
+    height: 7rem;
+  }
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIjxpbnB1dCBjc3MgNTI+IiwicGFnZXMvcHVibGljTW9kdWxlcy9iYXNlLmxlc3MiLCJwYWdlcy9ua2MvbmtjLmxlc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsVUFBVTtBQUNWLFVBQVU7QUNPVjtFQUNFLG1CQUFBO0VBQ0EsT0FBQTtFQUNBLFFBQUE7RUFDQSxTQUFBO0VBQ0EsVUFBQTtFQUNBLGFBQUE7Q0RMRDtBQUNELGtCQUFrQjtBRVRsQjtFQUNFLDBCQUFBO0NGV0Q7QUVURDtFQUVJLFdBQUE7Q0ZVSDtBRVpEO0VBSU0sV0FBQTtFQUNBLFVBQUE7Q0ZXTDtBRVRLO0VBQ0UsMkJBQUE7Q0ZXUDtBRVRLO0VBQ0UsNEJBQUE7Q0ZXUDtBRXRCRDtFQWNRLGlCQUFBO0VBQ0EsZUFBQTtDRldQO0FFMUJEO0VBaUJVLGVBQUE7RUFDQSxlQUFBO0VBQ0Esb0JBQUE7RUFDQSxrQkFBQTtFQUNBLGtCQUFBO0VBQ0EsbUJBQUE7RUFDQSxlQUFBO0VBQ0EsZ0JBQUE7RUFDQSx3REFBQTtFQUFBLGdEQUFBO0NGWVQ7QUVyQ0Q7RUEyQlksc0JBQUE7RUFDQSxZQUFBO0VBQ0EsWUFBQTtFQUNBLG1CQUFBO0VBQ0Esa0JBQUE7Q0ZhWDtBRVhTOztFQUNFLHNCQUFBO0VBQ0EsMEJBQUE7Q0ZjWDtBRVZPO0VBRUksZUFBQTtDRldYO0FFSkQ7RUFDRSxrQkFBQTtFQUNBLGlCQUFBO0VBQ0EsMEJBQUE7RUFDQSxzQkFBQTtFQUNBLG1CQUFBO0VBQ0EsZ0JBQUE7RUFDQSxhQUFBO0VBQ0Esa0JBQUE7Q0ZNRDtBRUpEO0VBQ0UsYUFBQTtFQUNBLGdCQUFBO0VBQ0EsZ0JBQUE7RUFDQSwwQkFBQTtFQUNBLFlBQUE7RUFDQSxtQkFBQTtFQUNBLDJDQUFBO0VBQUEsbUNBQUE7Q0ZNRDtBRUxDO0VBQ0UsMEJBQUE7Q0ZPSDtBRUpEO0VBS1EsYUFBQTtFQUNBLCtCQUFBO1VBQUEsdUJBQUE7RUFDQSx1QkFBQTtFQUNBLFlBQUE7RUFDQSxtQkFBQTtDRkVQO0FFWEQ7RUFX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 */

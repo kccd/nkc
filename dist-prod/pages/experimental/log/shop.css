@@ -1,0 +1,37 @@
+.order-user {
+  display: inline-block;
+}
+.order-user img {
+  height: 1.6rem;
+  width: 1.6rem;
+  border-radius: 50%;
+  margin-right: 0.3rem;
+}
+.product-info {
+  background-color: #f4f4f4;
+  display: none;
+}
+.product-cover {
+  display: table-cell;
+  vertical-align: top;
+}
+.product {
+  margin-bottom: 1rem;
+}
+.product-cover div {
+  width: 8rem;
+  height: 6rem;
+  line-height: 6rem;
+  text-align: center;
+  border: 1px solid #aaa;
+  margin-right: 0.5rem;
+}
+.product-cover div img {
+  max-width: 100%;
+  max-height: 100%;
+}
+.product-content {
+  display: table-cell;
+  vertical-align: top;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL2V4cGVyaW1lbnRhbC9sb2cvc2hvcC5sZXNzIiwiPGlucHV0IGNzcyAxOD4iXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRSxzQkFBQTtDQ0NEO0FEQ0Q7RUFDRSxlQUFBO0VBQ0EsY0FBQTtFQUNBLG1CQUFBO0VBQ0EscUJBQUE7Q0NDRDtBRENEO0VBQ0UsMEJBQUE7RUFDQSxjQUFBO0NDQ0Q7QURDRDtFQUNFLG9CQUFBO0VBQ0Esb0JBQUE7Q0NDRDtBRENEO0VBQ0Usb0JBQUE7Q0NDRDtBRENEO0VBQ0UsWUFBQTtFQUNBLGFBQUE7RUFDQSxrQkFBQTtFQUNBLG1CQUFBO0VBQ0EsdUJBQUE7RUFDQSxxQkFBQTtDQ0NEO0FEQ0Q7RUFDRSxnQkFBQTtFQUNBLGlCQUFBO0NDQ0Q7QURDRDtFQUNFLG9CQUFBO0VBQ0Esb0JBQUE7Q0NDRCIsImZpbGUiOiJ0by5jc3MifQ== */

@@ -1,0 +1,7 @@
+.forum-block
+  .forum-block-info
+    if forumData.logo
+      img.forum-block-icon(src=tools.getUrl('forumLogo', forumData.logo) data-float-fid=forumData.fid)
+    else
+      .forum-block-icon(style=`background-color: ${forumData.color}` data-float-fid=forumData.fid)
+    a(href=`/f/${forumData.fid}` data-float-fid=forumData.fid).forum-block-name=forumData.displayName

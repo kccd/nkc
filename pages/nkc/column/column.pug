@@ -1,0 +1,81 @@
+extends ../nkc
+block nkcTitle
+  title 专栏 - 前台管理
+  +includeCSS('/nkc/column/column.css')
+  style.
+    .management-column-list .closed {
+      background-color: #ffeaea;
+    }
+
+    .management-column-list .disabled {
+      background-color: #ccc;
+    }
+block nkcContent
+  .col-xs-12.col-md-12.management-column
+    .m-b-1
+      ul.nav.nav-tabs
+        li(class=!data.t ? 'active' : '')
+          a(href='/nkc/column') 专栏列表
+        li(class=data.t === 'page' ? 'active' : '')
+          a(href='/nkc/column?t=page') 自定义页
+    if data.t === 'page'
+      .management-column-pages
+        include ../../publicModules/paging/paging
+        for p in data.pages
+          .management-column-page(style=`border-right: 10px solid ${p.color}`)
+            .management-column-page-header
+              .time
+                +timeFormat(p.toc)
+              a(href=tools.getUrl('columnHome', p.column._id)).name=p.column.name
+            .management-column-page-content
+              div=`标题：`
+                strong=p.t || "无"
+              div!=p.c
+        include ../../publicModules/paging/paging_input
+    else
+      .management-column-list
+        include ../../publicModules/paging/paging
+        .table-responsive
+          table.table.table-bordered.nkc-table
+            thead
+              tr
+                th 开设时间
+                th 专栏名称
+                th 专栏主
+                th 专栏简介
+                th 状态
+                th 其他
+            tbody
+              for c in data.columns
+                -var klass = '';
+                if c.closed
+                  -klass += 'closed';
+                if c.disabled
+                  -klass += ' disabled'
+                tr(class=klass)
+                  th(style='width: 11rem;')
+                    +timeFormat(c.toc)
+                  th(style='width: 11rem;')
+                    img.m-r-05(src=tools.getUrl('columnAvatar', c.avatar) style='width: 1.4rem;height: 1.4rem;border-radius: 50%;')
+                    a(href=tools.getUrl('columnHome', c._id) target="_blank")=c.name
+                  th(style='width: 11rem;')
+                    img.m-r-05(src=tools.getUrl('userAvatar', c.user.avatar) style='width: 1.4rem;height: 1.4rem;border-radius: 50%;')
+                    a(href=tools.getUrl('userHome', c.uid) target="_blank" data-float-uid=c.uid)=c.user.username
+                  th(style='width: 30rem;')=c.abbr
+                  th(style='width: 10rem;')
+                    if c.closed
+                      span.text-danger 已关闭&nbsp;
+                    if c.disabled
+                      span.text-danger 已屏蔽
+                  th
+                    if c.disabled
+                      button.btn.btn-xs.btn-danger(data-type='enableColumn' data-column-id=c._id) 解除屏蔽
+                    else
+                      button.btn.btn-xs.btn-default(data-type='disableColumn' data-column-id=c._id) 屏蔽
+        include ../../publicModules/paging/paging_input
+block nkcScripts
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../../publicModules/nkcSource
+  include ../../publicModules/commonModal/commonModal
+  +includeJS('/columns/management.js')
+  +includeJS('/nkc/column/column.js')

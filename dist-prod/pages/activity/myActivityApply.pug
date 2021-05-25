@@ -1,0 +1,46 @@
+extends ../bootstrap_base
+block title
+  title 科创活动-我的申请
+  -const nowTimeStamp = new Date().getTime()
+  +includeCSS("/bootstrap/css/bootstrap-datetimepicker.min.css")
+  +includeCSS("/bootstrap/css/bootstrap-chinese-region.min.css")
+  +includeCSS("/external_pkgs/cropper/css/cropper.css")
+  +includeCSS("/fund.css")
+block content
+  .container-fluid.max-width
+      include activityNav.pug
+      .row
+        .col-xs-12.col-md-12
+          .table-responsive
+            table.table.table-striped
+              thead
+                tr
+                  th 活动标题
+                  th 报名截止
+                  th 活动截止
+                  th 参加人数
+                  th 活动状态
+                  th 我的状态
+                  th 链接
+              tbody
+                -for(let apply of data.applys)
+                  tr
+                    th
+                      a(href=`/activity/single/${apply.activity.acid}`)!=apply.activity.activityTitle
+                    th!=apply.activity.enrollEndTime.toLocaleString()
+                    th!=apply.activity.holdEndTime.toLocaleString()
+                    th!=apply.activity.signUser.length
+                    -if(apply.activity.activityType == "close")
+                      th 已关闭
+                    -else if(nowTimeStamp < parseInt(new Date(apply.activity.holdStartTime).getTime() ))
+                      th 未开始
+                    -else if(nowTimeStamp > parseInt(new Date(apply.activity.holdEndTime).getTime() ))
+                      th 已结束
+                    -else
+                      th 进行中
+                    th 已报名
+                    th 
+                      a(href=`/activity/single/${apply.acid}`) 查看详情
+block scripts
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}`)

@@ -1,0 +1,266 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  -const hiddenFooter = true;
+  link(rel='stylesheet' href=`/mdui/css/mdui.min.css`)
+  link(href=`/experimental/index.css?v=${startTime}` rel='stylesheet')
+  title 发表设置
+block content
+
+  .container-fluid.max-width.mdui-m-b-5
+    .row
+      include ../nav
+      .col-xs-12.col-md-12
+        .row#app(v-cloak v-if='postSettings')
+          .col-xs-12.col-md-12
+            .row
+              .col-sm-12.mdui-m-a-1
+                button.mdui-btn(:class='{"mdui-color-theme": type === "postToForum"}' @click='type = "postToForum"') 发表文章
+                button.mdui-btn(:class='{"mdui-color-theme": type === "postToThread"}' @click='type = "postToThread"') 发表回复
+                button.mdui-btn(:class='{"mdui-color-theme": type === "postLibrary"}' @click='type = "postLibrary"') 文库操作
+                //button.mdui-btn(:class='{"mdui-color-theme": type === "postResource"}' @click='type = "postResource"') 上传资源
+              .col-sm-2.text-right
+                h4 最小认证等级
+              .col-sm-10
+                <label class="mdui-radio mdui-m-r-2">
+                <input type="radio" :value='0' v-model='postSettings[type].authLevelMin' />
+                <i class="mdui-radio-icon"></i>
+                | 等级0（已注册）
+                </label>
+                <label class="mdui-radio mdui-m-r-2">
+                <input type="radio" :value='1' v-model='postSettings[type].authLevelMin' />
+                <i class="mdui-radio-icon"></i>
+                | 等级1（绑定手机号码）
+                </label>
+                <label class="mdui-radio">
+                <input type="radio" :value='2' v-model='postSettings[type].authLevelMin'/>
+                <i class="mdui-radio-icon"></i>
+                | 等级2（身份证正反面照）
+                </label>
+                <label class="mdui-radio">
+                <input type="radio" :value='3' v-model='postSettings[type].authLevelMin'/>
+                <i class="mdui-radio-icon"></i>
+                | 等级3（手持省份证照）
+                </label>
+                hr
+            .row
+              .col-sm-2.text-right
+                h4 通过考试
+              .col-sm-10
+                <label class="mdui-checkbox mdui-m-r-2">
+                <input type="checkbox" value="notPass" v-model='postSettings[type].exam'/ @change='extendVolume'>
+                <i class="mdui-checkbox-icon"></i>
+                | 未考试
+                </label>
+                <label class="mdui-checkbox mdui-m-r-2">
+                <input type="checkbox" value="volumeA" v-model='postSettings[type].exam'/ @change='extendVolume'>
+                <i class="mdui-checkbox-icon"></i>
+                | A卷
+                </label>
+                <label class="mdui-checkbox ">
+                <input type="checkbox" value="volumeB" v-model='postSettings[type].exam'/ @change='extendVolume'>
+                <i class="mdui-checkbox-icon"></i>
+                | B卷
+                </label>
+                div(v-if="displayNotPassCountLimit && ['postToForum', 'postToThread'].indexOf(type) !== -1")
+                  h5 未考试用户发表数目限制
+                  <label class="mdui-radio mdui-m-r-2">
+                  <input type="radio" value='true' v-model='postSettings[type].examCountLimit.unlimited' name='notPassExamCount'/>
+                  <i class="mdui-radio-icon"></i>
+                  | 无限制
+                  </label>
+                  <label class="mdui-radio mdui-m-r-2">
+                  <input type="radio" value='false' v-model='postSettings[type].examCountLimit.unlimited' name='notPassExamCount'/>
+                  <i class="mdui-radio-icon"></i>
+                  | 限制
+                  </label>
+                  span
+                    input(class="table-input" v-model='postSettings[type].examCountLimit.countLimit')
+                    | &nbsp;条/每天
+                hr
+            .row(v-if="['postToForum', 'postToThread'].indexOf(type) !== -1")
+              .col-sm-2.text-right
+                h4 证书限制
+              .col-sm-10
+                .text-danger
+                  h5 通过证书限制用户每天发表内容的条数以及最小间隔时间。
+                  h5 若用户拥有“会员”证书，则需要考虑用户等级。
+                  h5 “每天最大条数”取最大，“最小间隔时间”取最小。
+                .mdui-table-fluid
+                  table.mdui-table
+                    thead
+                      tr
+                        th 证书
+                        th 每天最大条数
+                        th 最小间隔时间(分钟)
+                    tbody
+                      tr(v-for='role, index in roles' v-if="role._id !== 'default'")
+                        th {{role.displayName}}
+                        th
+                          <label class="mdui-radio mdui-m-r-2">
+                          <input type="radio" value="true" v-model='role[type].countLimit.unlimited' :name="role._id + 'Group' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 无限制
+                          </label>
+                          <label class="mdui-radio">
+                          <input type="radio"value="false" v-model='role[type].countLimit.unlimited' :name="role._id + 'Group' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 限制
+                          </label>
+                          input(class="table-input" v-model.number='role[type].countLimit.num')
+                        th
+                          <label class="mdui-radio mdui-m-r-2">
+                          <input type="radio" value="true" v-model='role[type].timeLimit.unlimited' :name="role._id + 'Group2' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 无限制
+                          </label>
+                          <label class="mdui-radio">
+                          <input type="radio" value="false" v-model='role[type].timeLimit.unlimited' :name="role._id + 'Group2' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 限制
+                          </label>
+                          input(class="table-input" v-model.number='role[type].timeLimit.num')
+                .mdui-table-fluid
+                  table.mdui-table
+                    thead
+                      tr
+                        th 等级限制（普通会员）
+                        th 每天最大条数
+                        th 最小间隔时间(分钟)
+                    tbody
+                      tr(v-for='grade, index in grades')
+                        th {{grade.displayName}}
+                        th
+                          <label class="mdui-radio mdui-m-r-2">
+                          <input type="radio" value="true" v-model='grade[type].countLimit.unlimited' :name="grade._id + 'Group' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 无限制
+                          </label>
+                          <label class="mdui-radio">
+                          <input type="radio" value="false" v-model='grade[type].countLimit.unlimited' :name="grade._id + 'Group' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 限制
+                          </label>
+                          input(class="table-input" v-model.number='grade[type].countLimit.num')
+                        th
+                          <label class="mdui-radio mdui-m-r-2">
+                          <input type="radio" value="true" v-model='grade[type].timeLimit.unlimited'  :name="grade._id + 'Group2' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 无限制
+                          </label>
+                          <label class="mdui-radio">
+                          <input type="radio" value="false" v-model='grade[type].timeLimit.unlimited' :name="grade._id + 'Group2' + index"/>
+                          <i class="mdui-radio-icon"></i>
+                          | 限制
+                          </label>
+                          input(class="table-input" v-model.number='grade[type].timeLimit.num')
+                hr
+            .row(v-if="['postToForum', 'postToThread'].indexOf(type) !== -1")
+              .col-sm-2.text-right
+                h4 匿名发表
+              .col-sm-10
+                div 状态：
+                  <label class="mdui-radio mdui-m-r-2">
+                  <input type="radio" :value="true" v-model='postSettings[type].anonymous.status'/>
+                  <i class="mdui-radio-icon"></i>
+                  | 开启
+                  </label>
+                  <label class="mdui-radio mdui-m-r-2">
+                  <input type="radio" :value="false" v-model='postSettings[type].anonymous.status'/>
+                  <i class="mdui-radio-icon"></i>
+                  | 关闭
+                  </label>
+                div 证书限制：
+                  <label class="mdui-checkbox mdui-m-r-2" v-for="role, index in roles">
+                    <input type="checkbox" :value="role._id" v-model='postSettings[type].anonymous.rolesId'/>
+                    <i class="mdui-checkbox-icon"></i>
+                    | {{role.displayName}}
+                  </label>
+                div(v-if="postSettings[type].anonymous.rolesId.indexOf('default') !== -1") 会员等级限制：
+                  <label class="mdui-checkbox mdui-m-r-2" v-for="grade, index in grades">
+                    <input type="checkbox" :value="grade._id" v-model='postSettings[type].anonymous.defaultCertGradesId'/>
+                    <i class="mdui-checkbox-icon"></i>
+                    | {{grade.displayName}}
+                  </label>
+                div 指定用户：
+                  input(type="text"  v-model.trim="uid" @keyup.enter="addUser('anonymous')" placeholder="请输入用户ID")
+                  button(@click="addUser('anonymous')") 添加
+                  div(v-if="selectedUsers.length > 0")
+                    .review-user-span(v-for="user, index in selectedUsers")
+                      img(:src="getUrl('userAvatar', user.avatar, 'sm')")
+                      a(:href="'/u/' + user.uid"  target="_blank" title="访问用户主页") {{user.username}}
+                      .fa.fa-remove(@click="removeUser(index, 'anonymous')" title="点击移除")
+                hr
+            .row(v-if="['postToForum', 'postToThread'].indexOf(type) !== -1")
+              .col-sm-2.text-right
+                h4 发起调查
+              .col-sm-10
+                div 状态：
+                  <label class="mdui-radio mdui-m-r-2">
+                  <input type="radio" :value="true" v-model='postSettings[type].survey.status'/>
+                  <i class="mdui-radio-icon"></i>
+                  | 开启
+                  </label>
+                  <label class="mdui-radio mdui-m-r-2">
+                  <input type="radio" :value="false" v-model='postSettings[type].survey.status'/>
+                  <i class="mdui-radio-icon"></i>
+                  | 关闭
+                  </label>
+                div 证书限制：
+                  <label class="mdui-checkbox mdui-m-r-2" v-for="role, index in roles">
+                  <input type="checkbox" :value="role._id" v-model='postSettings[type].survey.rolesId'/>
+                  <i class="mdui-checkbox-icon"></i>
+                  | {{role.displayName}}
+                  </label>
+                div(v-if="postSettings[type].survey.rolesId.indexOf('default') !== -1") 会员等级限制：
+                  <label class="mdui-checkbox mdui-m-r-2" v-for="grade, index in grades">
+                  <input type="checkbox" :value="grade._id" v-model='postSettings[type].survey.defaultCertGradesId'/>
+                  <i class="mdui-checkbox-icon"></i>
+                  | {{grade.displayName}}
+                  </label>
+                div 指定用户：
+                  input(type="text"  v-model.trim="uid" @keyup.enter="addUser('survey')" placeholder="请输入用户ID")
+                  button(@click="addUser('survey')") 添加
+                  div(v-if="selectedUsersSurvey.length > 0")
+                    .review-user-span(v-for="user, index in selectedUsersSurvey")
+                      img(:src="getUrl('userAvatar', user.avatar, 'sm')")
+                      a(:href="'/u/' + user.uid"  target="_blank" title="访问用户主页") {{user.username}}
+                      .fa.fa-remove(@click="removeUser(index, 'survey')" title="点击移除")
+                div.m-t-1 时间限制：
+                  div.m-l-2.m-t-05
+                    span 调查的最长时间不能超过
+                    input(type="text" v-model.number="postSettings[type].survey.deadlineMax")
+                    | 天
+                  div.m-l-2.m-t-05
+                    span 拥有以下已勾选证书的用户不受限制
+                    div
+                      <label class="mdui-checkbox mdui-m-r-2" v-for="role, index in roles">
+                      <input type="checkbox" :value="role._id" v-model='postSettings[type].survey.ignoredRolesId'/>
+                      <i class="mdui-checkbox-icon"></i>
+                      | {{role.displayName}}
+                      </label>
+                hr
+            .row(v-if="type === 'postToForum'")
+              .col-sm-2.text-right
+                h4 原创申明
+              .col-sm-10
+                .m-t-05 文章内容最小字数：
+                  input(type="text" v-model.number="postSettings[type].originalWordLimit")
+                hr
+            .row(v-if="type === 'postToForum'")
+              .col-sm-2.text-right
+                h4 辅助专业数量
+              .col-sm-10
+                .m-t-05 最小
+                  input(type="text" v-model.number="postSettings[type].minorForumCount.min")
+                  | 最大
+                  input(type="text" v-model.number="postSettings[type].minorForumCount.max")
+            .row
+              .col-sm-10.col-sm-offset-2.mdui-m-t-3.text-right
+                button.mdui-btn.mdui-color-theme.mdui-btn-block(@click='save') 保存
+
+block scripts
+  +includeJS('/mdui/js/mdui.min.js')
+  +includeJS('/experimental/settings/post.js')
+

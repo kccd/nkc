@@ -1,0 +1,264 @@
+include ../../publicModules/mixin
+-const aTarget = threadPanelATarget || '_self';
+if data.singleThread
+  -thread = data.singleThread;
+mixin threadCover(klass)
+  if thread.firstPost.cover
+    .thread-panel-cover-big.hidden-xs.hidden-sm(class=klass)
+      .thread-panel-image(
+        style=`background-image: url(${tools.getUrl('postCover', thread.firstPost.cover)})`
+      )
+
+mixin minThreadCover(klass)
+  if thread.firstPost.cover
+    .thread-panel-cover.hidden-md.hidden-lg(class=klass)
+      .thread-panel-image(
+        style=`background-image: url(${tools.getUrl('postCover', thread.firstPost.cover)})`
+      )
+mixin checkBox
+  if canManagement
+    .checkbox.thread-checkbox
+      label
+        input(
+          type="checkbox"
+          data-thread-id=thread.tid
+          data-post-id=thread.oc
+          data-thread-fids=thread.mainForumsId.join("-")
+          data-thread-cids=(thread.categoriesId || []).join("-")
+        )
+mixin displayForum
+  if data.forum
+    -let displayForumNav = false;
+    for f in thread.forums
+      if f.fid !== data.forum.fid
+        -displayForumNav = true;
+        .thread-panel-forum
+          a(href=`/f/${f.fid}` data-float-fid=f.fid target=aTarget)= f.displayName
+    if !displayForumNav && thread.categories.length !== 0
+      for category in thread.categories
+        if data.threadTypesId.includes(category.cid)
+          .thread-panel-forum
+            a(href=`/f/${data.forum.fid}?cat=${category.cid}` target=aTarget)= category.name
+  else
+    -let forum;
+    if thread.forums && thread.forums.length
+      -forum = thread.forums[0];
+    if forum
+      .thread-panel-forum
+        a(href=`/f/${forum.fid}` data-float-fid=forum.fid target=aTarget)= forum.displayName
+
+mixin displayPageCount
+  -const pageCount = Math.ceil(thread.count / state.pageSettings.threadPostList)
+  -let ellipsis = false;
+  if pageCount >= 2
+    a.thread-title-page(href=`/t/${thread.tid}?&page=${1}`)= 2
+  if pageCount > 3
+    span.thread-title-page.p-a-0 ...
+  if pageCount >= 3
+    a.thread-title-page(href=`/t/${thread.tid}?&page=${pageCount - 1}`)= pageCount
+  //--for (let i = 1; i < pageCount; i++)
+    if i < 4 || i > pageCount - 3
+      a.thread-title-page(href=`/t/${thread.tid}?&page=${i}`)= i + 1
+    else if !ellipsis
+      span.thread-title-page ...
+      -ellipsis = true;
+-const lastPostUrl = `/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`;
+-const hasReply = thread.firstPost.pid !== thread.lastPost.pid;
+-const threadListStyle = defaultThreadListStyle || state.threadListStyle;
+-let postCoverPosition = 'null';
+-let styleType = threadListStyle.type;
+- if (styleType === 'abstract') {
+  -postCoverPosition = threadListStyle.cover;
+-}
+
+-let threadPanelClass = !thread.reviewed || thread.recycleMark || thread.disabled?"reviewed":"";
+-if (styleType !== 'abstract') {
+  -threadPanelClass += ' p-b-0';
+-}
+
+.thread-panel(class=threadPanelClass data-tid=thread.tid)
+  if !thread.reviewed
+    include ../module_review
+  if thread.disabled
+    include ../module_disabled
+  if thread.recycleMark
+    include ../module_toDraft
+  .thread-panel-body(class=styleType)
+    if styleType === 'minimalist'
+      .thread-panel-content
+        .thread-panel-author-info
+          if !thread.firstPost.anonymous
+            a.thread-panel-minimalist-avatar(href=`/u/${thread.uid}` target="_blank" data-float-uid=thread.uid)
+              img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') class=thread.firstPost.user.certs.includes('banned')?'user-banned-avatar':'')
+          else
+            .thread-panel-minimalist-avatar
+              img(src=anonymousInfo.avatar)
+          .thread-panel-minimalist-title
+            +checkBox
+            a.thread-panel-minimalist-title-a.thread-panel-url(href=`/t/${thread.tid}` title=thread.firstPost.t class=thread.digest ? "digest" : ""  target=aTarget)=thread.firstPost.t
+            +displayPageCount
+          .absolute-count
+            -const toc = tools.briefTime(thread.firstPost.toc);
+            -let tlm;
+            if hasReply
+              -tlm = tools.briefTime(thread.lastPost.toc);
+            span.thread-panel-minimalist-toc
+              if toc
+                span(title=`发表于${format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc)}`)=toc
+              if thread.count
+                if toc
+                  span.thread-panel-minimalist-line /
+                span.count(title=`回复数${thread.count}`)
+                  //.fa.fa-comment
+                  span=thread.count
+              if tlm
+                if toc || thread.count
+                  span.thread-panel-minimalist-line /
+                a(href=lastPostUrl target=aTarget)
+                  span(title=`最新回复于${format('YYYY-MM-DD HH:mm:ss', thread.firstPost.tlm)}`)=tlm
+    else if styleType === 'brief'
+      .thread-panel-content
+        .thread-panel-author-avatar
+          if !thread.firstPost.anonymous
+            .thread-panel-author(data-float-uid=thread.uid)
+              a(href=`/u/${thread.uid}` target="_blank")
+                img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') class=thread.firstPost.user.certs.includes('banned')?'user-banned-avatar':'')
+          else
+            .thread-panel-author
+              img(src=anonymousInfo.avatar)
+        .thread-panel-author-info
+          +checkBox
+          //- 文章标题
+          .thread-panel-title
+            a.title-content.thread-panel-url(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=thread.firstPost.t target=aTarget)= thread.firstPost.t
+            +displayPageCount
+          if !thread.firstPost.anonymous
+            .thread-panel-author(data-float-uid=thread.uid)
+              a(
+                href=`/u/${thread.uid}` target="_blank"
+              )= thread.firstPost.user.username
+          else
+            .thread-panel-author
+              span.anonymous-name= anonymousInfo.username
+
+          .thread-panel-time
+            +fromNow(thread.toc)
+            //-=fromNow(thread.toc)
+
+          +displayForum
+
+          if thread.from
+            .thread-panel-from
+              if thread.from === 'own'
+                span 自己的文章
+              else if thread.from === 'subForum'
+                span 关注的专业
+              else if thread.from === 'subFriend'
+                span 关注的好友
+              else if thread.from === "subThread"
+                span 关注的文章
+              else if thread.from === "collection"
+                span 收藏
+              else if thread.from === 'subColumn'
+                span 关注的专栏
+
+          .thread-panel-button
+            if thread.firstPost.voteUp
+              .fa.fa-thumbs-up=` ${thread.firstPost.voteUp || ''}`
+            if thread.hits
+              .fa.fa-eye=` ${thread.hits}`
+            if thread.count
+              .fa.fa-comment=` ${thread.count}`
+          if hasReply
+            .thread-panel-brief-replay
+              if !thread.lastPost.anonymous
+                a(href=`/u/${thread.lastPost.uid}` target="_blank" data-float-uid=thread.lastPost.uid)=thread.lastPost.user.username
+              else
+                span 匿名用户
+              | &nbsp;
+              a(href=lastPostUrl target=aTarget)
+                +fromNow(thread.lastPost.toc)
+                //-span(title=format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc))=`${fromNow(thread.lastPost.toc)}`
+
+    else
+      if postCoverPosition === 'left'
+        +threadCover('p-r-1')
+      .thread-panel-content
+        //- 作者信息 专业信息 时间
+        .thread-panel-author-info
+          +checkBox
+
+          if !thread.firstPost.anonymous
+            .thread-panel-author(data-float-uid=thread.uid)
+              a(href=`/u/${thread.uid}` target="_blank")
+                img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') class=thread.firstPost.user.certs.includes('banned')?'user-banned-avatar':'')
+              a(
+                href=`/u/${thread.uid}` target="_blank"
+              )= thread.firstPost.user.username
+          else
+            .thread-panel-author
+              img(src=anonymousInfo.avatar)
+              span.anonymous-name= anonymousInfo.username
+
+          +displayForum
+
+          .thread-panel-time
+            // -=fromNow(thread.toc)
+            +fromNow(thread.toc)
+
+          .thread-panel-button
+            if thread.firstPost.voteUp
+              .fa.fa-thumbs-up=` ${thread.firstPost.voteUp || ''}`
+            if thread.hits
+              .fa.fa-eye=` ${thread.hits}`
+            if thread.count
+              .fa.fa-comment=` ${thread.count}`
+          if thread.from
+            .thread-panel-from
+              if thread.from === 'own'
+                span 我的文章
+              else if thread.from === 'subForum'
+                span 关注的专业
+              else if thread.from === 'subFriend'
+                span 关注的用户
+              else if thread.from === "subThread"
+                span 关注的文章
+              else if thread.from === "collection"
+                  span 收藏
+
+
+        //- 文章标题
+        .thread-panel-title
+          a.title-content.thread-panel-url(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=thread.firstPost.t target=aTarget)= thread.firstPost.t
+          -const pageCount = thread.count / state.pageSettings.threadPostList
+          -let ellipsis = false;
+          -for(let i = 1; i < pageCount; i++)
+            if i < 4 || i > pageCount - 3
+              a.thread-title-page(href=`/t/${thread.tid}?&page=${i}`)= i + 1
+            else if !ellipsis
+              span.thread-title-page ...
+              -ellipsis = true;
+        .thread-panel-abstract
+          if postCoverPosition === 'left'
+            +minThreadCover('p-r-1')
+          .thread-panel-abstract-content
+            if thread.firstPost.abstractCn
+              a.thread-panel-url(href=`/t/${thread.tid}` target=aTarget).thread-panel-post=thread.firstPost.abstractCn.slice(0, 200)
+            else
+              a.thread-panel-url(href=`/t/${thread.tid}` target=aTarget).thread-panel-post=thread.firstPost.c.slice(0, 200)
+            if hasReply
+              .thread-panel-reply
+                a(href=lastPostUrl target=aTarget)
+                  //-=fromNow(thread.lastPost.toc) + " · " + thread.lastPost.c.slice(0, 200)
+                  +fromNow(thread.lastPost.toc)
+                  span=`· ${thread.lastPost.c.slice(0, 200)}`
+                if !thread.lastPost.anonymous
+                  a.thread-panel-reply-user(href=`/u/${thread.lastPost.uid}` target="_blank" data-float-uid=thread.lastPost.uid)
+                    img(src=tools.getUrl("userAvatar", thread.lastPost.user.avatar, "sm"))
+                else
+                  .thread-panel-reply-user
+                    img(src=tools.getUrl("anonymousUserAvatar"))
+          if postCoverPosition === 'right'
+            +minThreadCover('p-l-1')
+      if postCoverPosition === 'right'
+        +threadCover('p-l-1')

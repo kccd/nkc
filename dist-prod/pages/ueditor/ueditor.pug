@@ -1,0 +1,60 @@
++includeCSS("/editor/editor.css")
+// 配置文件
++includeJS('/ueditor/ueditor.config.js')
+// 编辑器源码文件
++includeJS('/ueditor/ueditor.all.js')
+// 添加下拉框
++includeJS('/ueditor/addMathFormulaDialog.js')
++includeJS('/ueditor/ueditorButtons.js')
++includeJS('/ueditor/ueditorConfigs.js')
+// 实例化编辑器
+-if(state.isApp)
+  script.
+    window.localStorage.setItem("apptype", "app")
+-else
+  script.
+    window.localStorage.removeItem("apptype")
+script(type='text/javascript').
+  window.localStorage.setItem("withE", true);
+  // 根据不同页面传递不同参数
+  var apptype = window.localStorage.getItem("apptype");
+  var topOffsetValue;
+  if(apptype) {
+    topOffsetValue = 0
+  }else{
+    topOffsetValue = 50;
+  }
+  var pathName = window.location.pathname;
+  var initialFrameHeight = 200;
+  var topOffset = 0;
+  if(pathName.indexOf("editor") > -1) {
+    initialFrameHeight = 500
+    topOffset = topOffsetValue;
+  }
+  // 获取header高度
+
+
+div#postToThreadWithCheckDom.modal.fade(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel")
+  div.modal-dialog(role='document')
+    .modal-content
+      .modal-header
+        button.close(type='button', data-dismiss='modal', aria-label='Close')
+          span(aria-hidden='true') ×
+      .modal-body
+        p 图片自动上传尚未执行完毕，是否仍然发起提交
+      .modal-footer
+        button.btn.btn-default(type='button', data-dismiss='modal') 再等会儿
+        button.btn.btn-primary(type='button' onclick="onPost()") 立即提交
+
+
+div#saveToThreadWithCheckDom.modal.fade(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel")
+  div.modal-dialog(role='document')
+    .modal-content
+      .modal-header
+        button.close(type='button', data-dismiss='modal', aria-label='Close')
+          span(aria-hidden='true') ×
+      .modal-body
+        p 图片自动上传尚未执行完毕，是否仍然保存草稿
+      .modal-footer
+        button.btn.btn-default(type='button', data-dismiss='modal') 再等会儿
+        button.btn.btn-primary(type='button' onclick="saveDraft()") 立即保存

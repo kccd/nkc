@@ -4,7 +4,13 @@ router
   .post("/", async (ctx, next) => {
     const {db, data, body} = ctx;
     const {user} = data;
-    const {moveType, threadsId, forums} = body;
+    const {
+      moveType,
+      threadsId,
+      forums,
+      violation,
+      violationReason
+    } = body;
     const forumsObj = {};
     const forumsId = new Set();
     const threadTypesId = new Set();
@@ -33,8 +39,13 @@ router
       if(!isModerator) ctx.throw(403, `您没有权限处理ID为 ${thread.tid} 的文章`);
     }
     await db.ForumModel.updateCount(threads, false);
-    if(moveType === "add") {
-      for(const thread of threads) {
+
+    const usersId = threads.map(t => t.uid);
+    const users = await db.UserModel.find({uid: {$in: usersId}});
+    const usersObj = {};
+    users.map(u => usersObj[u.uid] = u);
+    for(const thread of threads) {
+      if(moveType === 'add') {
         let {mainForumsId, categoriesId} = thread;
         if(mainForumsId.includes(recycleId)) ctx.throw(403, `无法给回收站中的文章添加专业`);
         // 排除掉已选专业中未被选择的文章分类
@@ -50,12 +61,7 @@ router
         await thread.updateThreadMessage();
         thread.mainForumsId = newMainForumsId;
         thread.categoriesId = newCategoriesId;
-      }
-    } else {
-      let oldForumsId = [];
-      for(const thread of threads) {
-        const {mainForumsId} = thread;
-        oldForumsId = oldForumsId.concat(mainForumsId);
+      } else {
         await thread.updateOne({
           mainForumsId: [...forumsId],
           categoriesId: [...threadTypesId],
@@ -65,7 +71,27 @@ router
         thread.mainForumsId = [...forumsId];
         thread.categoriesId = [...threadTypesId];
       }
+
+
+      // 处理违规
+      if(violation) {
+        const u = usersObj[thread.uid];
+        if(!u) continue;
+        await db.KcbsRecordModel.insertSystemRecord('violation', u, ctx);
+        await db.UsersScoreLogModel.insertLog({
+          user: u,
+          type: 'score',
+          typeIdOfScoreChange: 'violation',
+          port: ctx.port,
+          ip: ctx.address,
+          key: 'violationCount',
+          tid: thread.tid,
+          description: violationReason || '移动文章并标记为违规'
+        });
+      }
     }
+
+
     await db.ForumModel.updateCount(threads, true);
     await next();
   });

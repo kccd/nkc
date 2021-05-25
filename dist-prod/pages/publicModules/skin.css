@@ -1,0 +1,67 @@
+/* 弹窗皮肤 */
+/* 弹窗模块可引入该文件用于默认的弹窗样式 */
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+.modal-dialog .modal-content {
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+.modal-dialog .modal-content .modal-header {
+  text-align: center;
+  position: relative;
+  padding: 0;
+  border: none;
+  overflow: hidden;
+}
+.modal-dialog .modal-content .modal-header .modal-title {
+  height: 5rem;
+  color: #282c37;
+  font-weight: 700;
+  line-height: 5rem;
+  font-size: 1.3rem;
+}
+.modal-dialog .modal-content .modal-header .fa {
+  cursor: pointer;
+  color: #aaa;
+  font-size: 1.2rem;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  text-align: center;
+}
+.modal-dialog .modal-content .modal-header .fa:hover {
+  background-color: #eee;
+}
+.modal-dialog .modal-content .modal-body {
+  padding: 0 1rem;
+  overflow: hidden;
+}
+.modal-dialog .modal-content .modal-footer {
+  border: none;
+  padding: 0 1rem 1rem 1rem;
+}
+.modal-dialog .modal-content .modal-footer .options-button {
+  padding-right: 0;
+}
+.modal-dialog .modal-content .modal-footer .options-button > a:last-child {
+  margin-right: 0;
+}
+.modal-backdrop.in {
+  filter: alpha(opacity=20);
+  opacity: 0.2;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIjxpbnB1dCBjc3MgMTAwPiIsInBhZ2VzL3B1YmxpY01vZHVsZXMvYmFzZS5sZXNzIiwicGFnZXMvcHVibGljTW9kdWxlcy9za2luLmxlc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsVUFBVTtBQUNWLHlCQUF5QjtBQUN6QixVQUFVO0FBQ1YsVUFBVTtBQ0tWO0VBQ0UsbUJBQUE7RUFDQSxPQUFBO0VBQ0EsUUFBQTtFQUNBLFNBQUE7RUFDQSxVQUFBO0VBQ0EsYUFBQTtDREhEO0FBQ0Qsa0JBQWtCO0FFVGxCO0VBRUksbUJBQUE7RUFDQSxxQ0FBQTtFQUNBLGdEQUFBO1VBQUEsd0NBQUE7Q0ZVSDtBRWREO0VBTU0sbUJBQUE7RUFDQSxtQkFBQTtFQUNBLFdBQUE7RUFDQSxhQUFBO0VBQ0EsaUJBQUE7Q0ZXTDtBRXJCRDtFQWFRLGFBQUE7RUFDQSxlQUFBO0VBQ0EsaUJBQUE7RUFDQSxrQkFBQTtFQUNBLGtCQUFBO0NGV1A7QUU1QkQ7RUFvQlEsZ0JBQUE7RUFDQSxZQUFBO0VBQ0Esa0JBQUE7RUFDQSxtQkFBQTtFQUNBLFNBQUE7RUFDQSxPQUFBO0VBQ0EsY0FBQTtFQUNBLGVBQUE7RUFDQSxvQkFBQTtFQUNBLG1CQUFBO0NGV1A7QUVWTztFQUNFLHVCQUFBO0NGWVQ7QUUzQ0Q7RUFvQ00sZ0JBQUE7RUFDQSxpQkFBQTtDRlVMO0FFL0NEO0VBd0NNLGFBQUE7RUFDQSwwQkFBQTtDRlVMO0FFbkREO0VBMkNRLGlCQUFBO0NGV1A7QUV0REQ7RUE4Q1EsZ0JBQUE7Q0ZXUDtBRU5EO0VBQ0UsMEJBQUE7RUFDQSxhQUFBO0NGUUQiLCJmaWxlIjoidG8uY3NzIn0= */

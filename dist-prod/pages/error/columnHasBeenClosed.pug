@@ -1,0 +1,11 @@
+extends ./errorBase
+block errorContent
+  .error-icon=`${data.status} Forbidden`
+  .error-list.b-s-10
+    .error-header 专栏已被运营者关闭，暂无法访问。
+    .error-code
+      span message：
+      code=data.error
+    //-.error-info 想了解更多信息，请阅读
+      a(href=`/t/66350`) 禁止事项
+      | 。

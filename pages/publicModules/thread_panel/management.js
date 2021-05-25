@@ -1,9 +1,9 @@
 var MoveThread, DisabledPost;
-
-
 $(function() {
   window.MoveThread = new NKC.modules.MoveThread();
   window.DisabledPost = new NKC.modules.DisabledPost();
+  MoveThread = window.MoveThread;
+  DisabledPost = window.DisabledPost;
 });
 
 function getSelectedThreadsId() {
@@ -94,11 +94,17 @@ function moveSelectedThreads() {
   MoveThread.open(function(data) {
     var forums = data.forums;
     var moveType = data.moveType;
+    var {
+      violation,
+      violationReason
+    } = data;
     MoveThread.lock();
     nkcAPI("/threads/move", "POST", {
       forums: forums,
       moveType: moveType,
-      threadsId: threadsId
+      threadsId: threadsId,
+      violation,
+      violationReason
     })
       .then(function() {
         screenTopAlert("操作成功");

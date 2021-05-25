@@ -1,0 +1,130 @@
+#floatForumPanel {
+  /* 默认颜色 */
+  /* 垂直居中 */
+  /* 文本超出隐藏并显示省略号 */
+  top: 0;
+  left: 0;
+  position: absolute;
+  z-index: 1000;
+}
+#floatForumPanel .vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+#floatForumPanel .float-forum {
+  background-size: cover;
+  border: 1px solid #ccc;
+  min-height: 7.5rem;
+  padding-bottom: 0.8rem;
+  width: 24rem;
+  background-color: #fff;
+  -webkit-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+          box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+  border-radius: 3px;
+}
+#floatForumPanel .float-forum .float-forum-cover {
+  height: 6rem;
+  width: 6rem;
+  position: absolute;
+  z-index: 100;
+  top: -1rem;
+  left: 0.5rem;
+  border-radius: 5px;
+  overflow: hidden;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  border: 3px solid #eee;
+}
+#floatForumPanel .float-forum .float-forum-cover .float-forum-icon {
+  height: 100%;
+  width: 100%;
+}
+#floatForumPanel .float-forum .float-forum-info {
+  padding-left: 7rem;
+  height: 5rem;
+  overflow: hidden;
+  position: relative;
+}
+#floatForumPanel .float-forum .float-forum-info .float-forum-name {
+  font-size: 1.3rem;
+  height: 2rem;
+  line-height: 2rem;
+  margin-top: 0.9rem;
+  display: block;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  color: #282c37;
+}
+#floatForumPanel .float-forum .float-forum-info .float-forum-name:hover,
+#floatForumPanel .float-forum .float-forum-info .float-forum-name:focus {
+  text-decoration: none;
+}
+#floatForumPanel .float-forum .float-forum-info button {
+  -webkit-box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+          box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 2px;
+  position: absolute;
+  top: 0.9rem;
+  right: 1rem;
+  font-size: 1rem;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  color: #fff;
+  line-height: 1.8rem;
+  height: 1.8rem;
+  background-color: #ccc;
+}
+#floatForumPanel .float-forum .float-forum-info button:focus {
+  outline: none;
+}
+#floatForumPanel .float-forum .float-forum-info button:hover {
+  background-color: #aaa;
+}
+#floatForumPanel .float-forum .float-forum-info button.active {
+  background-color: #2b90d9;
+}
+#floatForumPanel .float-forum .float-forum-info button.active:hover {
+  background-color: #2378b5;
+}
+#floatForumPanel .float-forum .float-forum-description {
+  padding: 0 0.8rem;
+  margin-top: 0.45rem;
+  font-style: oblique;
+  font-size: 1rem;
+  color: #666;
+  max-height: 3rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+#floatForumPanel .float-forum .float-forum-count {
+  font-size: 1rem;
+}
+#floatForumPanel .float-forum .float-forum-count .number {
+  display: inline-block;
+  font-style: oblique;
+  font-size: 1.2rem;
+  margin-right: 0.2rem;
+  color: #e85a71;
+  font-weight: 700;
+}
+#floatForumPanel .float-forum .float-forum-latest {
+  padding: 0 0.8rem;
+}
+#floatForumPanel .float-forum .float-forum-latest .title {
+  font-size: 1em;
+  font-weight: bold;
+  color: black;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL3B1YmxpY01vZHVsZXMvZmxvYXRGb3J1bVBhbmVsL2Zsb2F0Rm9ydW1QYW5lbC5sZXNzIiwiPGlucHV0IGNzcyA3NT4iLCJwYWdlcy9wdWJsaWNNb2R1bGVzL2Jhc2UubGVzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQ0NFLFVBQVU7RUFDVixVQUFVO0VBQ1Ysa0JBQWtCO0VERGxCLE9BQUE7RUFDQSxRQUFBO0VBQ0EsbUJBQUE7RUFDQSxjQUFBO0NDR0Q7QURSRDtFRVNFLG1CQUFBO0VBQ0EsT0FBQTtFQUNBLFFBQUE7RUFDQSxTQUFBO0VBQ0EsVUFBQTtFQUNBLGFBQUE7Q0RFRDtBRGhCRDtFQU9JLHVCQUFBO0VBRUEsdUJBQUE7RUFDQSxtQkFBQTtFQUNBLHVCQUFBO0VBQ0EsYUFBQTtFQUNBLHVCQUFBO0VBQ0EsbURBQUE7VUFBQSwyQ0FBQTtFQUNBLG1CQUFBO0VBQ0EsbUJBQUE7Q0NXSDtBRDNCRDtFQWtCTSxhQUFBO0VBQ0EsWUFBQTtFQUNBLG1CQUFBO0VBQ0EsYUFBQTtFQUNBLFdBQUE7RUFDQSxhQUFBO0VBQ0EsbUJBQUE7RUFDQSxpQkFBQTtFQUNBLCtCQUFBO1VBQUEsdUJBQUE7RUFDQSx1QkFBQTtDQ1lMO0FEdkNEO0VBNkJRLGFBQUE7RUFDQSxZQUFBO0NDYVA7QUQzQ0Q7RUFrQ00sbUJBQUE7RUFDQSxhQUFBO0VBQ0EsaUJBQUE7RUFDQSxtQkFBQTtDQ1lMO0FEakREO0VBdUNRLGtCQUFBO0VBQ0EsYUFBQTtFQUNBLGtCQUFBO0VBQ0EsbUJBQUE7RUFDQSxlQUFBO0VFeEJOLHVCQUFBO0VBQ0EscUJBQUE7RUFDQSxpQkFBQTtFQUNBLDZCQUFBO0VBQ0Esc0JBQUE7RUZzQk0sZUFBQTtDQ2lCUDtBRGhCTzs7RUFDRSxzQkFBQTtDQ21CVDtBRGxFRDtFQW1EUSxtREFBQTtVQUFBLDJDQUFBO0VBQ0EsYUFBQTtFQUNBLG1CQUFBO0VBQ0EsbUJBQUE7RUFDQSxZQUFBO0VBQ0EsWUFBQTtFQUNBLGdCQUFBO0VBQ0EsK0JBQUE7VUFBQSx1QkFBQTtFQUNBLFlBQUE7RUFDQSxvQkFBQTtFQUNBLGVBQUE7RUFDQSx1QkFBQTtDQ2tCUDtBRGpCTztFQUNFLGNBQUE7Q0NtQlQ7QURqQk87RUFDRSx1QkFBQTtDQ21CVDtBRGpCTztFQUNFLDBCQUFBO0NDbUJUO0FEbEJTO0VBQ0UsMEJBQUE7Q0NvQlg7QUQ1RkQ7RUFnRk0sa0JBQUE7RUFDQSxvQkFBQTtFQUNBLG9CQUFBO0VBQ0EsZ0JBQUE7RUFDQSxZQUFBO0VBQ0EsaUJBQUE7RUVsRUosdUJBQUE7RUFDQSxxQkFBQTtFQUNBLGlCQUFBO0VBQ0EsNkJBQUE7RUFDQSxzQkFBQTtDRGtGRDtBRHpHRDtFQXlGTSxnQkFBQTtDQ21CTDtBRDVHRDtFQTJGUSxzQkFBQTtFQUNBLG9CQUFBO0VBQ0Esa0JBQUE7RUFDQSxxQkFBQTtFQUNBLGVBQUE7RUFDQSxpQkFBQTtDQ29CUDtBRHBIRDtFQW9HTSxrQkFBQTtDQ21CTDtBRHZIRDtFQXNHUSxlQUFBO0VBQ0Esa0JBQUE7RUFDQSxhQUFBO0NDb0JQIiwiZmlsZSI6InRvLmNzcyJ9 */

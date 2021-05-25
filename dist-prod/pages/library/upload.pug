@@ -1,0 +1,90 @@
+extends ../bootstrap_base
+block title
+  title 上传文件到文库
+  +includeCSS("/library/upload.css")
+block content
+  #data.hidden=objToStr({forum: data.forum, rid: data.rid})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        .row
+          .col-xs-12.col-md-8.box-shadow-panel
+            div
+              .form.form-horizontal#app(v-cloak).p-t-2
+                .form-group
+                  label.col-sm-2.control-label 选择文件
+                    span.text-danger *
+                  .col-sm-10
+                    div(v-if="resource")
+                      .library-r-name {{resource.oname}}
+                      .library-r-info
+                        span 时间&nbsp;
+                        span.library-r-time {{format("YYYY/MM/DD", resource.toc)}}
+                        span ，文件大小&nbsp;
+                        span.library-r-size {{getSize(resource.size)}}
+                    .m-t-05
+                      input#localFile(type="file" @change="slf").hidden
+                      button.btn.btn-default.btn-sm(onclick="$('#localFile').click()") 选择本地文件
+                      button.btn.btn-default.btn-sm(@click="sr") 从已上传中选择
+                .form-group
+                  label.col-sm-2.control-label 文件类型
+                    span.text-danger *
+                  .col-sm-10
+                    select.form-control(v-model="category")
+                      option(value="book") 图书
+                      option(value="paper") 论文
+                      option(value="program") 程序
+                      option(value="media") 媒体
+                      option(value="other") 其他
+                .form-group
+                  label.col-sm-2.control-label 文件名称
+                    span.text-danger *
+                  .col-sm-10
+                    input.form-control(type="text" v-model="name")
+                .form-group
+                  label.col-sm-2.control-label 文件说明
+                    span.text-danger *
+                  .col-sm-10
+                    textarea.form-control(rows=8 v-model="description")
+                .form-group
+                  label.col-sm-2.control-label 专业领域
+                    span.text-danger *
+                  .col-sm-10
+                    div
+                      button.btn.btn-default.btn-sm(@click="sf") 选择专业
+                    .library-fs.p-t-05
+                      .library-f(v-for="forum, index in forums" :style="'background-color:' + forum.color + ';'")
+                        | {{forum.displayName}}
+                        .fa.fa-remove(@click="removeForum(index)")
+                .form-group
+                  label.col-sm-2.control-label 文件封面
+                    span.text-danger &nbsp;
+                  .col-sm-10
+                    .m-b-05.m-t-05
+                      button.btn.btn-default.btn-sm(@click="sc") 选择封面
+                      button.btn.btn-default.btn-sm(@click="clearCover" v-if="coverUrl || cover") 清除
+                    .library-r-cover
+                      img(:src="coverUrl" v-if="coverUrl")
+                      img(:src="'/nr/cover/' + cover" v-else-if="cover")
+                .form-group
+                  hr
+                .form-group.text-center
+                  button.btn.btn-success(v-if="!submitting" @click="submit") 立即提交
+                  button.btn.btn-success(v-else disabled) 正在提交...&nbsp;
+                    .fa.fa-spinner.fa-spin
+                .remove-r(v-if="resource && resource.rid && resource.forumsId.length" @click="removeResourceFromLibrary(resource.rid)") 从所有文库中删除
+          .col-xs-12.col-md-4.box-shadow-panel
+            div
+              h4.text-danger  注意事项：
+              p 1. 文件大小不能超过200MB。
+              p 2. 文件的编辑和删除操作将会在所有已选专业文库中同步。
+              p 3. 从已上传中选择文件时，输入框的内容将会被线上文件的信息覆盖掉，请注意保存已输入的内容。
+
+block scripts
+  include ../publicModules/moveThread/moveThread
+  include ../publicModules/crop/crop_new
+  include ../publicModules/selectResource/selectResource
+  include ../publicModules/moment
+  +includeJS("/tools.js")
+  +includeJS("/library/common.js")
+  +includeJS("/library/upload.js")

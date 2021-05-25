@@ -1,0 +1,91 @@
+extends ../../shop
+block shopTitle
+  title 商品管理
+block shopContent
+  .order-navs
+    a(class=!data.t || data.t === "onSale" ? "active" : "" href=`/shop/manage/goods`).order-nav 已上架
+    a(class=data.t === "unSale" ? "active" : "" href=`/shop/manage/goods?t=unSale`).order-nav 未上架
+    a(class=data.t === "stopped" ? "active" : "" href=`/shop/manage/goods?t=stopped`).order-nav 已下架
+  .goods
+    include ../../../publicModules/paging/paging
+    .table-responsive
+      table.table.table-bordered
+        thead
+          tr.product-header
+            th.product-name 商品信息
+            th 总库存
+            th 总销量
+            th 限购
+            th 运费
+            th 商品状态
+            th 其他
+        tbody
+          for product in data.products
+            -let total = 0, sold = 0;
+              for param in product.productParams
+                -total += param.stocksSurplus
+                -sold += param.sellCount;
+            tr.product(data-product-id=product.productId)
+              th.product-name 
+                div.order-name-info
+                  .order-cover
+                    img(src=`/r/${product.imgMaster}`)
+                  .order-name
+                    a(href=`/shop/product/${product.productId}` title=product.name)=product.name
+                    .order-param=`上架时间：${format("YYYY/MM/DD HH:mm:ss", product.toc)}`
+              th
+                div.stocks-surplus=total
+              th  
+                div=sold
+              th 
+                if product.purchaseLimitCount === -1
+                  div 不限购
+                else
+                  div=`每人限购${product.purchaseLimitCount}件`
+              th 
+                if product.isFreePost
+                  div 包邮
+                else 
+                  div 不包邮
+              th
+                if product.productStatus === "insale"
+                  div 已上架
+                else if product.productStatus === "stopsale"
+                  div 已下架
+                else 
+                  div 待上架  
+              th.order-links
+                a(href=`/editor?type=post&id=${product.oc}` target="_blank") 修改商品信息
+                a(href=`/shop/manage/shelf?productId=${product.productId}`) 修改出售信息
+                if product.productStatus === "insale"
+                  a.pointer(onclick=`stopSale('${product.productId}')`) 停售
+                else if product.productStatus === "stopsale"
+                  a.pointer(onclick=`goonSale('${product.productId}')`) 复售
+                else
+                  a.pointer(onclick=`shelfNow('${product.productId}')`) 立即上架
+            tr.param-header
+              td(colspan=1 rowspan=product.productParams.length + 1)
+              th 规格名
+              th 原价
+              th 优惠价
+              th 库存
+              th 销量
+              th 其他
+            for p in product.productParams
+              tr.param(data-product-id=product.productId data-param-id=p._id class=p.isEnable?"":"disabled")
+                th.name=p.name
+                th.order-price
+                    .number.origin-price="￥" + numToFloatTwo(p.originPrice)
+                th.order-price
+                  if p.useDiscount
+                    .number.price="￥" + numToFloatTwo(p.price)
+                  else 
+                    .price 无
+                th.stocks-surplus=p.stocksSurplus
+                th=p.sellCount
+                th.order-links
+                  button(onclick=`modifyParam('${product.productId}', '${p._id}')`) 编辑      
+    include ../../../publicModules/paging/paging            
+block shopScripts    
+  include ../../../publicModules/commonModal/commonModal
+  +includeJS("/shop/manage/goods/goods.js")

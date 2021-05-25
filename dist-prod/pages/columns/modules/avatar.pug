@@ -1,0 +1,64 @@
+mixin mixinColumnAvatar(user, column, subColumnsId, hideBanner)
+  -subColumnsId = subColumnsId || []
+  .column-avatar-body(class=hideBanner?'hide-banner':"")
+    .column
+      .column-avatar-container
+        .column-avatar
+          img(src=tools.getUrl('columnAvatar', column.avatar))
+        .column-name-info
+          -var subscribed = false;
+          if user
+            -subscribed = subColumnsId.includes(column._id)
+          .column-name=column.name
+            button.btn.btn-xs.hidden-sm.hidden-xs(
+            data-column-id=column._id
+            data-type='subscriptionButton'
+            data-subscribed=subscribed?'true':'false'
+            class=subscribed? 'btn-default':'btn-primary'
+            onclick=`subscribeColumn(${column._id})`
+            )=subscribed? '已关注': '关注'
+          .column-abbr=column.abbr
+          .hidden-md.hidden-lg
+            include ../modules/buttons_sm
+        .column-name-numbers.hidden-sm.hidden-xs
+          .column-name-number
+            h5 关注数
+            span.subscribe-number(
+              data-number=column.subCount
+              data-type='subscriptionNumber'
+              data-column-id=column._id
+              )=tools.briefNumber(column.subCount)
+          .column-name-number
+            h5 获赞数
+            span=tools.briefNumber(column.postVoteUp)
+          .column-name-number
+            h5 阅读数
+            span=tools.briefNumber(column.postHits)
+
+        //-
+          // 关注按钮
+          -var subscribed = subColumnsId.includes(column._id);
+          .column-subscribe(
+            data-subscribed=subscribed?'true':'false'
+            data-number=column.subCount
+            data-column-id=column._id
+          )
+            .column-subscribe-container
+              .column-button
+              .column-number(class=!column.subCount? 'hidden':'')=column.subCount
+
+        //-.column-subscribe
+          -var subscribed = false;
+          if user
+            -subscribed = subColumnsId.includes(column._id)
+          .column-subscribe-container(class=subscribed? 'subscribed': '')
+            if !user
+              .column-button(onclick=`Login.open('login')`)
+            else if subColumnsId.includes(column._id)
+              .column-button.subscribed(onclick=`SubscribeTypes.subscribeColumn(${column._id}, false)`)
+            else
+              .column-button(onclick=`SubscribeTypes.subscribeColumn(${column._id}, true)`)
+            if column.subCount
+              .column-number(class=subscribed?'subscribed':'' title=`关注量`)
+                span=column.subCount
+

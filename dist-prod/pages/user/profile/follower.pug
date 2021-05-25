@@ -1,0 +1,24 @@
+div
+  include ../../publicModules/paging/paging
+  .account-threads.account-followers
+    if !data.subscribes.length
+      .null 空空如也~
+    for subscribe in data.subscribes
+      .account-follower
+        .account-follower-avatar
+          img.img(src=tools.getUrl("userAvatar", subscribe.user.avatar, "sm") onmouseover=tools.floatUserInfo(subscribe.user.uid))
+        .account-follower-content
+          .account-follower-name
+            .account-follower-buttons(data-user=subscribe.user.uid class=data.subUsersId.includes(subscribe.user.uid)?"active":"")
+              button.category(onclick=`user.moveSub("${subscribe.user.uid}")`) 分类
+              button.subscribe(onclick=`user.subscribe("${subscribe.user.uid}", "user")`)
+            a(href=`/u/${subscribe.user.uid}`)=subscribe.user.username
+          .account-follower-level
+            .account-follower-grade
+              span(style=`color: ${subscribe.user.grade.color};`)= subscribe.user.grade.displayName
+              img.grade-icon(src=tools.getUrl("gradeIcon", subscribe.user.grade._id) title=subscribe.user.grade.displayName )
+            .account-follower-certs=subscribe.user.info.certsName
+          .account-follower-description=subscribe.user.description || "暂无简介"
+  if data.paging.pageCount > 1
+    .m-t-05
+      include ../../publicModules/paging/paging_input

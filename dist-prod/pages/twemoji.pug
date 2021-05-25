@@ -1,0 +1,8 @@
+.dropdown(style='display: inline-block;')
+  ul.dropdown-menu(role='menu' aria-labelledby='twemoji' style='width: 420px;')
+    li#proxy(role='presentation')
+      for tmj in state.twemoji
+        a(style='display: inline-block; padding: 3px 3px;cursor: pointer;')
+          img.emoji(src=`/twemoji/2/svg/${tmj}.svg` data-unicode=`${String.fromCodePoint(parseInt(tmj, 16))}`)
+  button.btn.btn-default.dropdown-toggle#twemoji(type='button' data-toggle="dropdown") 表情
+    span.caret

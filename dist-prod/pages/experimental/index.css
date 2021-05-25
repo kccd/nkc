@@ -1,0 +1,230 @@
+.e-nav .nav.nav-pills li,
+.e-nav .nav.nav-pills li a {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #555;
+}
+.e-nav {
+  background-color: #f6f6f6 !important;
+}
+body {
+  background-color: #fff;
+}
+.e-nav .nav.nav-pills {
+  border-radius: 0 0 5px 5px;
+}
+.ItemContainer {
+  border-width: 1px;
+  /* border: black; */
+  border-color: #eee;
+  border-style: solid;
+  padding: 2px;
+  margin-bottom: 2px;
+  font-size: 14px;
+}
+.ItemContainerSelected {
+  background-color: #eee;
+}
+.MyList {
+  border-width: 1px;
+  border-color: #ccc;
+  border-style: solid;
+  padding: 2px;
+  margin-bottom: 5px;
+  max-height: 400px;
+  min-height: 100px;
+  overflow-y: scroll;
+}
+.MyButton {
+  margin-right: 5px;
+}
+.ItemTypeText {
+  display: inline-block;
+  color: #080;
+  width: 30%;
+  max-width: 80px;
+  margin-right: 10px;
+}
+.ItemMeta {
+  color: #c20;
+  max-width: 250px;
+  width: 30%;
+  margin-right: 10px;
+  display: inline-block;
+}
+.ItemText {
+  display: inline;
+}
+.invisible {
+  display: none;
+}
+.now-at {
+  background-color: silver;
+}
+.operation-type-span {
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-block;
+  border-radius: 7px;
+  padding: 0.5rem 1rem;
+  margin: 0.5rem 0.5rem 0 0;
+  background-color: #aaaaaa;
+}
+.operation-type-span:hover {
+  background-color: #555555;
+}
+.e-panel {
+  -webkit-box-shadow: 0 1px 3px 0 #aaa;
+          box-shadow: 0 1px 3px 0 #aaa;
+  padding: 2rem;
+  background-color: #fff;
+  margin: 0.5rem 0;
+}
+.table-input {
+  margin: 0 0.5rem;
+  width: 4rem;
+  font-size: 1.2rem;
+}
+.mdui-list-active {
+  background-color: #f0f0f0;
+}
+.role-nav {
+  color: #555;
+  margin-right: 1rem;
+  font-size: 1.3rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+.role-nav:hover {
+  text-decoration: none;
+  color: #555;
+}
+.review-user-span {
+  display: inline-block;
+  height: 2rem;
+  line-height: 2rem;
+  background-color: #2b90d9;
+  color: #fff;
+  margin: 0.5rem;
+  border-radius: 1rem;
+  font-size: 0;
+}
+.review-user-span img {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 1rem;
+  margin-right: 0.5rem;
+  vertical-align: top;
+}
+.review-user-span a {
+  font-size: 1rem;
+  color: #fff;
+}
+.review-user-span a:hover,
+.review-user-span a:focus {
+  text-decoration: none;
+}
+.review-user-span .fa {
+  height: 2rem;
+  width: 3rem;
+  font-size: 1rem;
+  text-align: center;
+  line-height: 2rem;
+  cursor: pointer;
+}
+.cert-panel .form-inline {
+  display: inline-block;
+}
+.cert-panel span {
+  display: inline-block;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  border-radius: 3px;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  padding: 0 1rem;
+  color: #fff;
+}
+.cert-panel span .fa {
+  margin-left: 0.5rem;
+}
+.review-time {
+  margin-left: 0.5rem;
+  color: #e85a71;
+  font-weight: 700;
+}
+tbody tr th {
+  max-width: 12rem;
+  font-size: 1rem;
+}
+.user-agent {
+  max-height: 2rem;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  cursor: pointer;
+}
+.referer {
+  cursor: pointer;
+  max-height: 4rem;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+#timeRange,
+#cleanupTimeRange {
+  width: 300px;
+}
+.setting-block-title {
+  position: relative;
+}
+.setting-block-title::after {
+  content: "";
+  display: block;
+  height: 100%;
+  width: 6px;
+  background-color: red;
+  position: absolute;
+  left: -12px;
+  top: 0;
+  border-radius: 3px;
+}
+.setting-item-label {
+  font-weight: normal;
+}
+.setting-item-label + .setting-item-label {
+  margin-left: 14px;
+}
+.logo-item {
+  position: relative;
+}
+.logo-item > .logo-item-control {
+  position: absolute;
+  top: 6px;
+  right: 20px;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  background-color: red;
+  padding: 6px;
+  -webkit-transform: scale(0);
+          transform: scale(0);
+  -webkit-transition: 0.2s -webkit-transform;
+  transition: 0.2s -webkit-transform;
+  transition: 0.2s transform;
+  transition: 0.2s transform, 0.2s -webkit-transform;
+}
+.logo-item:hover > .logo-item-control {
+  -webkit-transform: scale(1);
+          transform: scale(1);
+}
+.logo-item > img {
+  width: 100%;
+}
+#selectSiteIcon {
+  cursor: pointer;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL2V4cGVyaW1lbnRhbC9pbmRleC5sZXNzIiwiPGlucHV0IGNzcyAxNj4iXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7O0VBQ0Usa0JBQUE7RUFDQSxpQkFBQTtFQUNBLFlBQUE7Q0NFRDtBRENEO0VBQ0UscUNBQUE7Q0NDRDtBRENEO0VBQ0UsdUJBQUE7Q0NDRDtBRENEO0VBQ0UsMkJBQUE7Q0NDRDtBRENEO0VBQ0Usa0JBQUE7RUNDQSxvQkFBb0I7RURDcEIsbUJBQUE7RUFDQSxvQkFBQTtFQUNBLGFBQUE7RUFDQSxtQkFBQTtFQUVBLGdCQUFBO0NDQUQ7QURHRDtFQUNFLHVCQUFBO0NDREQ7QURJRDtFQUNFLGtCQUFBO0VBQ0EsbUJBQUE7RUFDQSxvQkFBQTtFQUNBLGFBQUE7RUFDQSxtQkFBQTtFQUVBLGtCQUFBO0VBQ0Esa0JBQUE7RUFDQSxtQkFBQTtDQ0hEO0FETUQ7RUFDRSxrQkFBQTtDQ0pEO0FET0Q7RUFDRSxzQkFBQTtFQUNBLFlBQUE7RUFDQSxXQUFBO0VBQ0EsZ0JBQUE7RUFDQSxtQkFBQTtDQ0xEO0FET0Q7RUFDRSxZQUFBO0VBQ0EsaUJBQUE7RUFDQSxXQUFBO0VBQ0EsbUJBQUE7RUFDQSxzQkFBQTtDQ0xEO0FET0Q7RUFDRSxnQkFBQTtDQ0xEO0FET0Q7RUFDRSxjQUFBO0NDTEQ7QURPRDtFQUNFLHlCQUFBO0NDTEQ7QURPRDtFQUNFLGVBQUE7RUFDQSxnQkFBQTtFQUNBLHNCQUFBO0VBQ0EsbUJBQUE7RUFDQSxxQkFBQTtFQUNBLDBCQUFBO0VBQ0EsMEJBQUE7Q0NMRDtBRE9EO0VBQ0UsMEJBQUE7Q0NMRDtBRE9EO0VBQ0UscUNBQUE7VUFBQSw2QkFBQTtFQUNBLGNBQUE7RUFDQSx1QkFBQTtFQUNBLGlCQUFBO0NDTEQ7QURPRDtFQUNFLGlCQUFBO0VBQ0EsWUFBQTtFQUNBLGtCQUFBO0NDTEQ7QURPRDtFQUNFLDBCQUFBO0NDTEQ7QURPRDtFQUNFLFlBQUE7RUFDQSxtQkFBQTtFQUNBLGtCQUFBO0VBQ0Esc0JBQUE7RUFDQSxnQkFBQTtDQ0xEO0FET0Q7RUFDRSxzQkFBQTtFQUNBLFlBQUE7Q0NMRDtBRFFEO0VBQ0Usc0JBQUE7RUFDQSxhQUFBO0VBQ0Esa0JBQUE7RUFDQSwwQkFBQTtFQUNBLFlBQUE7RUFDQSxlQUFBO0VBQ0Esb0JBQUE7RUFDQSxhQUFBO0NDTkQ7QURRRDtFQUNFLGFBQUE7RUFDQSxZQUFBO0VBQ0Esb0JBQUE7RUFDQSxxQkFBQTtFQUNBLG9CQUFBO0NDTkQ7QURRRDtFQUNFLGdCQUFBO0VBQ0EsWUFBQTtDQ05EO0FEUUQ7O0VBQ0Usc0JBQUE7Q0NMRDtBRE9EO0VBQ0UsYUFBQTtFQUNBLFlBQUE7RUFDQSxnQkFBQTtFQUNBLG1CQUFBO0VBQ0Esa0JBQUE7RUFDQSxnQkFBQTtDQ0xEO0FET0Q7RUFDRSxzQkFBQTtDQ0xEO0FET0Q7RUFDRSxzQkFBQTtFQUNBLGVBQUE7RUFDQSxvQkFBQTtFQUNBLG1CQUFBO0VBQ0EscUJBQUE7RUFDQSxnQkFBQTtFQUNBLHNCQUFBO0VBQ0EsZ0JBQUE7RUFDQSxZQUFBO0NDTEQ7QURPRDtFQUNFLG9CQUFBO0NDTEQ7QURPRDtFQUNFLG9CQUFBO0VBQ0EsZUFBQTtFQUNBLGlCQUFBO0NDTEQ7QURPRDtFQUNFLGlCQUFBO0VBQ0EsZ0JBQUE7Q0NMRDtBRE9EO0VBQ0UsaUJBQUE7RUFDQSxxQkFBQTtFQUNBLGlCQUFBO0VBQ0EsNkJBQUE7RUFDQSxzQkFBQTtFQUNBLGdCQUFBO0NDTEQ7QURPRDtFQUNFLGdCQUFBO0VBQ0EsaUJBQUE7RUFDQSxxQkFBQTtFQUNBLGlCQUFBO0VBQ0EsNkJBQUE7RUFDQSxzQkFBQTtDQ0xEO0FEU0Q7O0VBRUUsYUFBQTtDQ1BEO0FEV0Q7RUFDRSxtQkFBQTtDQ1REO0FEV0Q7RUFDRSxZQUFBO0VBQ0EsZUFBQTtFQUNBLGFBQUE7RUFDQSxXQUFBO0VBQ0Esc0JBQUE7RUFDQSxtQkFBQTtFQUNBLFlBQUE7RUFDQSxPQUFBO0VBQ0EsbUJBQUE7Q0NURDtBRFlEO0VBQ0Usb0JBQUE7Q0NWRDtBRFlEO0VBQ0Usa0JBQUE7Q0NWRDtBRGFEO0VBQ0UsbUJBQUE7Q0NYRDtBRGFEO0VBQ0UsbUJBQUE7RUFDQSxTQUFBO0VBQ0EsWUFBQTtFQUNBLGFBQUE7RUFDQSxnQkFBQTtFQUNBLGdCQUFBO0VBQ0Esc0JBQUE7RUFDQSxhQUFBO0VBQ0EsNEJBQUE7VUFBQSxvQkFBQTtFQUNBLDJDQUFBO0VBQUEsbUNBQUE7RUFBQSwyQkFBQTtFQUFBLG1EQUFBO0NDWEQ7QURhRDtFQUNFLDRCQUFBO1VBQUEsb0JBQUE7Q0NYRDtBRGFEO0VBQ0UsWUFBQTtDQ1hEO0FEZUQ7RUFDRSxnQkFBQTtDQ2JEIiwiZmlsZSI6InRvLmNzcyJ9 */

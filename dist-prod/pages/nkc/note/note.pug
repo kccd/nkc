@@ -1,0 +1,60 @@
+extends ../nkc
+block nkcTitle
+  title 笔记管理
+  +includeCSS("/nkc/note/note.css")
+block nkcContent
+  .col-xs-12.col-md-12.management-notes
+    .table-responsive
+      include ../../publicModules/paging/paging
+      table.table
+        thead
+          tr
+            th ID
+            th 时间
+            th 划词内容
+            th 用户
+            th 笔记内容
+            th 状态
+            th 链接
+            th 其他
+        tbody
+          for n in data.noteContent
+            -let klass = "";
+            if n.disabled
+              -klass += "disabled ";
+            if n.deleted
+              -klass += "deleted"
+            tr(class=klass)
+              th=n._id
+              th=format("YYYY/MM/DD HH:mm:ss", n.toc)
+              th.text=n.note.content
+              th
+                a(href=`/u/${n.user.uid}` target="_blank").user
+                  img(src=tools.getUrl("userAvatar", n.user.avatar) data-float-uid=n.user.uid)
+                  span=n.user.username
+              th.text!=n.html
+              th
+                if n.cid
+                  span=`${n.cid}历史 `
+                else if !n.disabled && !n.deleted
+                  span 正常
+                if n.disabled
+                  span 已屏蔽&nbsp;
+                if n.deleted
+                  span 已删除
+              th
+                a(href=n.url target="_blank") 链接
+              th
+                button.btn.btn-xs.btn-default.btn-sm(onclick=`editNote(${n._id}, '${objToStr({content: n.content})}')`) 编辑
+                if n.disabled
+                  button.btn.btn-xs.btn-sm.btn-danger(onclick=`disableNote(${n._id}, false)`) 解除屏蔽
+                else
+                  button.btn.btn-xs.btn-default.btn-sm(onclick=`disableNote(${n._id}, true)`) 屏蔽
+      include ../../publicModules/paging/paging_input
+
+
+block nkcScripts
+  include ../../publicModules/commonModal/commonModal
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  +includeJS("/nkc/note/note.js")

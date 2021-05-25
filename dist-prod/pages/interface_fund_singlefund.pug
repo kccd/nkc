@@ -1,0 +1,13 @@
+.col-xs-6.col-sm-4.col-md-3.fund-list
+  a(href=`/fund/list/${id.toLowerCase()}`)
+    .fund-name(style=`background-color: ${color};background-image:${fund && fund.image && fund.image.logo ? `url(/fundLogo/${fund.image.logo})` : ''}`)
+      div= name
+        if fund.money.fixed
+          h4!= `定额${money.fixed}元`
+        else
+          h4!= `单笔最高${money.max}元`
+    -const brief = fund.description.brief || '';
+    if brief.length > 35
+      .fund-brief= brief.slice(0, 35) + '...'
+    else
+      .fund-brief= brief

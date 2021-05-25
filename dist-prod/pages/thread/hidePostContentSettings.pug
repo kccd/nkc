@@ -1,0 +1,6 @@
+if !isIncluded('hidePostContentSettings')
+  mixin hidePostContentSettings(props)
+    -var {xs, sm, md, float} = props;
+    -float = float || 0.5;
+    .hidden(data-type='hidePostContentSettings')=objToStr({xs, sm, md, float})
+

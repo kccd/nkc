@@ -1,0 +1,76 @@
+extends ../experimental
+
+block eTitle
+  title 分享操作日志
+block eContent
+  .container-fluid.max-width
+    .row
+      #data.hidden=objToStr({t: data.t, c: data.c})
+      .col-xs-12.col-md-12#app(v-cloak)
+        .form-inline
+          .form-group
+            select.form-control(v-model="t")
+              option(value="username") 用户名
+              option(value="uid") 用户ID
+              option(value="ip") IP
+              option(value="token") 分享码
+          .form-group
+            input.form-control(type="text" v-model="c" @keyup.enter="search")
+          .form-group
+            button.btn.btn-primary(@click='search') 搜索
+            span &nbsp;
+            a.btn.btn-default(href='/e/log/share') 重置
+      .col-xs-12.col-md-12.m-t-1
+        include ../../publicModules/paging/paging
+      .col-xs-12.col-md-12.table-responsive
+        table.table.table-bordered(style='font-size: 1rem;')
+          thead
+            tr
+              th 时间
+              th 类型
+              th 点击者
+              th 分享者
+              th 分享码
+              th 原始Url
+              th 分享者获得科创币
+              th ip:端口
+              th 来源
+              th 设备信息
+          tbody
+            for log in data.shareLogs
+              tr
+                th=log.toc.toLocaleString()
+                th
+                  span=log.type==="cli"?"点击":"发起"
+                th
+                  if log.type === "cli"
+                    if !log.user
+                      span 游客
+                    else
+                      span
+                        a(href=`/u/${log.uid}` target="_blank" onmouseover=tools.floatUserInfo(log.uid))=log.user.username
+                th
+                  if !log.shareUser
+                    span 游客
+                  else
+                    span
+                      a(href=`/u/${log.shareUid}` target="_blank" onmouseover=tools.floatUserInfo(log.shareUid))=log.shareUser.username
+                th
+                  span=log.code
+                th
+                  a(href=`${log.originUrl}` target="_blank")=log.originUrl
+                th
+                  span=log.kcb/100
+                th
+                  a(href=ipUrl(log.ip) target="_blank")=`${log.ip}:${log.port}`
+                th
+                  .referer
+                    a(href=log.referer target="_blank")=log.referer
+                th
+                  .user-agent(onclick=`sweetAlert('${log.machine}')`)=log.machine
+
+      .col-xs-12.col-md-12
+        include ../../publicModules/paging/paging_input
+block scripts
+  include ../../publicModules/floatUserPanel/floatUserPanel
+  +includeJS('/experimental/log/share.js')

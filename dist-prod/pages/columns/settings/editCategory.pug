@@ -1,0 +1,35 @@
+extends ./base
+block columnTitle
+  title 分类管理
+block settingsContent
+  .hidden#data=objToStr({column: data.column, categoryList: data.categoryList, category: data.category})
+  .row#app(v-cloak)
+    .col-xs-12.col-md-6.col-md-offset-3
+      span <&nbsp;
+      a(href=`/m/${data.column._id}/settings/category`) 返回分类管理
+      .form(v-if="category")
+        .form-group(v-if="!category._id")
+          h4.text-center 新建分类
+        .form-group(v-else)
+          h4.text-center 编辑分类
+        .form-group
+          label 分类名（不超过20字符）
+          input.form-control(type="text" v-model.tirm="category.name")
+        .form-group
+          label 分类简介（不超过100字符）
+          textarea.form-control(v-model.tirm="category.description" rows=5)
+        .form-group
+          label 父分类：
+          span.h4 {{getCategoryNameById(category.parentId)}}
+          .m-r-1
+            button.btn.btn-default.btn-sm(@click="category.parentId = ''") 重置
+            button.btn.btn-default.btn-sm(@click="selectCategory") 选择分类
+
+        .form-group
+          h5.text-danger(v-if="error") {{error}}
+          h5.text-success(v-if="info") {{info}}
+          button.btn.btn-primary.btn-sm.btn-block(@click="save") 保存
+  -const column = data.column;
+  include ../../publicModules/toColumn/toColumn
+block scripts
+  +includeJS("/columns/settings/editCategory.js")

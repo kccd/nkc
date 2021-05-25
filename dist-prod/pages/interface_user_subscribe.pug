@@ -1,0 +1,37 @@
+extends bootstrap_base
+block title
+  title 注册成功
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+block content
+  -const mainContainer1400 = true
+  .container-fluid.max-width
+    .row
+      if data.type === 'register'
+        .col-xs-12.col-md-4.col-md-offset-4
+          .img-alert.glyphicon.glyphicon-ok.text-center.center-block
+          h2.text-center(style='font-size:3rem;color: #555555;') &nbsp;注册成功
+          hr
+      .col-xs-12.col-md-8.col-md-offset-2
+        br
+        h4.text-center(style='color: #888888') 请选择您感兴趣的话题或学科，优先向您展示关注的内容。
+      -const selectBox = true;
+      -const disabledA = true;
+      mixin createForumsList(forums)
+        for forum in forums
+          include module_children_forum_single
+          if forum.childrenForums && forum.childrenForums.length > 0
+            .row
+              .col-xs-12.col-md-12(style='padding-left: 3rem;')
+                +createForumsList(forum.childrenForums)
+      .col-xs-12.col-md-10.col-md-offset-1
+        +createForumsList(data.forums)
+      .col-xs-12.col-md-2.col-md-offset-5
+        .row
+          .col-xs-12.col-md-6.col-md-offset-3
+            br
+            button.btn.btn-info.btn-block(onclick=`submit(${data.user.uid})`) 提交
+
+block scripts
+  script(src='/interface_common.js')
+  script(src='/icheck/icheck.js')
+  script(src='/interface_user_subscribe.js')

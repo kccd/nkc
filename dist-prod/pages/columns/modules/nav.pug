@@ -1,0 +1,86 @@
+//- 专栏导航
+  @param data.column 专栏对象
+  @param data.navCategories 专栏分类数组 缩进模式
+  @param data.categories 专栏分类数组 嵌套模式
+.row
+  .col-xs-12.col-md-8
+    ul.column-nav
+      li
+        a(href=`/m/${data.column._id}`) 首页
+      if !data.column.navCategory
+        li
+          a(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 分类&nbsp;
+            .fa.fa-caret-down
+          ul.dropdown-menu
+            li
+              a(href=`/m/${data.column._id}` style="overflow:hidden;")
+                span 全部
+            for c in data.categories
+              if !data.column.hideDefaultCategory || !c.default
+                li
+                  a(href=`/m/${data.column._id}?c=${c._id}` style="overflow:hidden;")
+                    -for(var i = 0; i < c.level; i++)
+                    span &nbsp;&nbsp;&nbsp;&nbsp;
+                    span=c.name
+            //li.divider(role="separator")
+      else
+        for c in data.navCategories
+          if !data.column.hideDefaultCategory || !c.default
+            if c.children && c.children.length
+              li
+                a(href=`/m/${data.column._id}?c=${c._id}` style="margin-right: 0;padding-right:0")=c.name
+                a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                ul.dropdown-menu
+                  for cc in c.children
+                    li
+                      a(href=`/m/${data.column._id}?c=${cc._id}` style="overflow:hidden")
+                        -for(var i = 0; i < (cc.level - 1); i++)
+                        span &nbsp;&nbsp;&nbsp;&nbsp;
+                        span=cc.name
+            else
+              li
+                a(href=`/m/${data.column._id}?c=${c._id}`)=c.name
+      for link in data.column.links
+        if link.links && link.links.length > 0
+          li
+            a(title=link.url onclick=`openNewWindow('${link.url}')` style="margin-right: 0;padding-right:0")=link.name
+            a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+            ul.dropdown-menu
+              for l in link.links
+                li
+                  a(title=link.url onclick=`openNewWindow('${l.url}')` style="overflow:hidden")=l.name
+        else
+          li
+            a(title=link.url onclick=`openNewWindow('${link.url}')`)= link.name
+  .col-xs-12.col-md-4
+    .column-button
+      .column-sub-button.active
+        if !data.user || data.user.uid !== data.column.uid
+          if data.user
+            a(href=`/m/${data.column._id}/contribute` target="_blank")
+              button 投稿
+          else
+            a.pointer(onclick="Login.open('login')")
+              button 投稿
+        else
+          a(href="/editor?toColumn=true" target="_blank")
+            button 发表
+      if permission("homeHotColumn")
+        if data.topped
+          .column-sub-button(onclick=`pushToHome(${data.column._id}, 'unPush')` title="取消设为热门专栏")
+            button 取消热门
+        else
+          .active.column-sub-button(onclick=`pushToHome(${data.column._id}, 'push')` title="设为热门专栏")
+            button 设为热门
+      .column-sub-button
+        //(onclick=`subscribeColumn(${data.column._id}, true, this)`)
+        if !data.user
+          a.pointer(onclick="Login.open('login')" target="_blank")
+            button + 关注
+        else
+          if state.subColumnsId.includes(data.column._id)
+            button(onclick=`SubscribeTypes.subscribeColumn(${data.column._id}, false)`) 已关注
+          else
+            button(onclick=`SubscribeTypes.subscribeColumn(${data.column._id}, true)`) + 关注
+        if data.column.subCount > 0
+          span=data.column.subCount

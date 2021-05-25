@@ -1,0 +1,87 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+#moduleCommonModal {
+  /* 弹窗皮肤 */
+  /* 弹窗模块可引入该文件用于默认的弹窗样式 */
+}
+#moduleCommonModal .modal-dialog .modal-content {
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+#moduleCommonModal .modal-dialog .modal-content .modal-header {
+  text-align: center;
+  position: relative;
+  padding: 0;
+  border: none;
+  overflow: hidden;
+}
+#moduleCommonModal .modal-dialog .modal-content .modal-header .modal-title {
+  height: 5rem;
+  color: #282c37;
+  font-weight: 700;
+  line-height: 5rem;
+  font-size: 1.3rem;
+}
+#moduleCommonModal .modal-dialog .modal-content .modal-header .fa {
+  cursor: pointer;
+  color: #aaa;
+  font-size: 1.2rem;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  text-align: center;
+}
+#moduleCommonModal .modal-dialog .modal-content .modal-header .fa:hover {
+  background-color: #eee;
+}
+#moduleCommonModal .modal-dialog .modal-content .modal-body {
+  padding: 0 1rem;
+  overflow: hidden;
+}
+#moduleCommonModal .modal-dialog .modal-content .modal-footer {
+  border: none;
+  padding: 0 1rem 1rem 1rem;
+}
+#moduleCommonModal .modal-dialog .modal-content .modal-footer .options-button {
+  padding-right: 0;
+}
+#moduleCommonModal .modal-dialog .modal-content .modal-footer .options-button > a:last-child {
+  margin-right: 0;
+}
+#moduleCommonModal .modal-backdrop.in {
+  filter: alpha(opacity=20);
+  opacity: 0.2;
+}
+#moduleCommonModal .quote-content {
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  max-height: 3.3rem;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  border-left: 4px solid #aaa;
+  border-radius: 0 3px 3px 0;
+  color: #555;
+  font-size: 1rem;
+  margin: 0 1rem 1rem 1rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  background-color: #f4f4f4;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIjxpbnB1dCBjc3MgNjc+IiwicGFnZXMvcHVibGljTW9kdWxlcy9iYXNlLmxlc3MiLCJwYWdlcy9wdWJsaWNNb2R1bGVzL2NvbW1vbk1vZGFsL2NvbW1vbk1vZGFsLmxlc3MiLCJwYWdlcy9wdWJsaWNNb2R1bGVzL3NraW4ubGVzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxVQUFVO0FBQ1YsVUFBVTtBQ09WO0VBQ0UsbUJBQUE7RUFDQSxPQUFBO0VBQ0EsUUFBQTtFQUNBLFNBQUE7RUFDQSxVQUFBO0VBQ0EsYUFBQTtDRExEO0FBQ0Qsa0JBQWtCO0FFVGxCO0VGV0UsVUFBVTtFQUNWLHlCQUF5QjtDQUMxQjtBRWJEO0VDSUksbUJBQUE7RUFDQSxxQ0FBQTtFQUNBLGdEQUFBO1VBQUEsd0NBQUE7Q0hZSDtBRWxCRDtFQ1FNLG1CQUFBO0VBQ0EsbUJBQUE7RUFDQSxXQUFBO0VBQ0EsYUFBQTtFQUNBLGlCQUFBO0NIYUw7QUV6QkQ7RUNlUSxhQUFBO0VBQ0EsZUFBQTtFQUNBLGlCQUFBO0VBQ0Esa0JBQUE7RUFDQSxrQkFBQTtDSGFQO0FFaENEO0VDc0JRLGdCQUFBO0VBQ0EsWUFBQTtFQUNBLGtCQUFBO0VBQ0EsbUJBQUE7RUFDQSxTQUFBO0VBQ0EsT0FBQTtFQUNBLGNBQUE7RUFDQSxlQUFBO0VBQ0Esb0JBQUE7RUFDQSxtQkFBQTtDSGFQO0FHWk87RUFDRSx1QkFBQTtDSGNUO0FFL0NEO0VDc0NNLGdCQUFBO0VBQ0EsaUJBQUE7Q0hZTDtBRW5ERDtFQzBDTSxhQUFBO0VBQ0EsMEJBQUE7Q0hZTDtBRXZERDtFQzZDUSxpQkFBQTtDSGFQO0FFMUREO0VDZ0RRLGdCQUFBO0NIYVA7QUU3REQ7RUNzREUsMEJBQUE7RUFDQSxhQUFBO0NIVUQ7QUVqRUQ7RUFHSSxpQkFBQTtFQUNBLHVCQUFBO0VBQ0EsbUJBQUE7RUFFQSwrQkFBQTtVQUFBLHVCQUFBO0VBQ0EsNEJBQUE7RUFDQSwyQkFBQTtFQUNBLFlBQUE7RUFDQSxnQkFBQTtFQUNBLHlCQUFBO0VETUYsdUJBQUE7RUFDQSxxQkFBQTtFQUNBLGlCQUFBO0VBQ0EsNkJBQUE7RUFDQSxzQkFBQTtFQ1JFLDBCQUFBO0NGb0VIIiwiZmlsZSI6InRvLmNzcyJ9 */

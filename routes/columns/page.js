@@ -62,6 +62,23 @@ router
           }
         });
       }
+    } else if(type === 'setAsHome') {
+      const {asHome} = body;
+      await db.ColumnPageModel.updateMany({
+        columnId: column._id,
+        asHome: true,
+      }, {
+        $set: {
+          asHome: false,
+        }
+      });
+      if(asHome) {
+        await page.updateOne({
+          $set: {
+            asHome: true,
+          }
+        });
+      }
     }
     data.page = page;
     await next();

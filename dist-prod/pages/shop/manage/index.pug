@@ -1,0 +1,65 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  -const hiddenFooter = true;
+  title 商城卖家服务控制台
+  //- link(rel='stylesheet' href='/shop/manage/style.css')
+  link(rel='stylesheet' href='/shop/manage/manage.css')
+  link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
+  style.
+    .button {
+      margin-right: 5px
+    }
+  link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        if !data.dealInfo || !data.dealInfo.dataPerfect
+          p.text-danger(style="text-align:center") 提示：发布商品操作需完善交易基础信息
+        if data.isban
+          p.text-danger(style="text-align:center") 提示：您已被禁止使用商品上架功能
+      .col-xs-12.col-md-12(style='margin-bottom: 1rem;')
+        .paging-button
+          a.button(href=`/shop/manage/home?active=home` class=data.active == "home" ? "active" : "") 我出售的
+          a.button(href=`/shop/manage/shelf` class=data.active == "shelf" ? "active" : "") 商品上架
+          a.button(href=`/shop/manage/goods` class=data.active == "goodlist" ? "active" : "") 商品管理
+          a.button(href=`/shop/manage/order` class=data.active == "order" ? "active" : "") 订单管理 
+          a.button(href=`/shop/manage/settings` class=data.active == "info" ? "active" : "") 交易设置 
+      .col-xs-12.col-md-12
+        block name      
+  #sendGoodsModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h4#myModalLabel.modal-title 填写运单号
+        .modal-body
+          .form-horizontal
+            .form-group 
+              label.col-sm-2.control-label 快递单号
+              .col-sm-8
+                input.form-control#newtracknumber(type='text')
+            .form-group
+              label.col-sm-2.control-label 快递列表
+              .col-sm-8
+                select.form-control#trackList(name="")
+          input#newstoreidEdit(type="text" style="display:none")
+          input#neworderidEdit(type="text" style="display:none")
+        .modal-footer(style="text-align:left")
+          button.btn.btn-info.btn-sm(type="button",onclick=`sendGoodsNoLog()` ) 无物流发货
+          button.btn.btn-primary.btn-sm(type='button', onclick=`sendGoods()`) 发货
+          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消         
+block scripts
+  script(src='/shop/manage/manage.js')
+  script.
+    var trackListDom = "";
+    $.getJSON('/track.json',function(data){
+      for(var i in data){
+        trackListDom += "<option value='"+data[i]+"'>"+i+"</option>";
+      }
+      $("#trackList").html(trackListDom)
+    });
+  block manageScripts

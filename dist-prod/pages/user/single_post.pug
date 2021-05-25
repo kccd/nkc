@@ -1,0 +1,35 @@
+.single-post(class=!post.reviewed || post.toDraft || post.disabled?"reviewed":"")
+  if !post.reviewed
+    include ../publicModules/module_review
+  if post.toDraft
+    include ../publicModules/module_toDraft
+  if post.disabled
+    include ../publicModules/module_disabled
+  .single-post-info
+    .post-checkbox.checkbox
+      label
+        input(type="checkbox" data-pid=post.pid)
+    .post-time
+      //-=fromNow(post.time)
+      +fromNow(post.time)
+    if post.postType === "postToForum"
+      .post-type=`${post.anonymous?"匿名":""}发表文章`
+      a(href=`/t/${post.tid}`).post-title=post.title
+    else
+      .post-type 在文章
+      a(href=`/t/${post.tid}`).post-title=post.title
+      .post-type=`下${post.anonymous?"匿名":""}发表`
+        if post.parentPostId
+          | 评论
+        else
+          | 回复
+  if post.postType === "postToThread" || !post.cover
+    a(href=post.link).single-post-content=post.abstract || post.content
+  else
+    .post-content-body
+      .post-cover
+        .post-cover-img(style=`background-image:url(${tools.getUrl('postCover', post.cover)})`)
+      .post-content
+        a(href=post.link).single-post-content=post.abstract || post.content
+
+

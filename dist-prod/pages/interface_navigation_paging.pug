@@ -1,0 +1,50 @@
+- var paging = data.paging
+- var digest = data.digest
+- var cat = data.cat
+- var sortby = data.sortby
+- var tab = data.tab
+- var content = data.content
+- var r = data.r
+- var t = data.t
+- var v = data.v
+- var operationId=data.operationId
+- var scoreType = data.scoreType;
+- var fid = data.fid
+- var sTime = data.sTime;
+- var eTime = data.eTime;
+- var uid = data.uid;
+- var ip = data.ip;
+- var orderStatus = data.orderStatus;
+- var productStatus = data.productStatus;
+- var productType = data.productType;
+if paging
+  - var pagingarray = []
+  - var pageCount = paging.pageCount
+  - var page = paging.page
+  - var disp_length = 7, half_disp_length = 3,start=0,end=1
+
+  - if(page<half_disp_length){start=0,end=Math.min(disp_length,pageCount)}
+  - else if(page>pageCount - half_disp_length - 1){end=pageCount,start = Math.max(0,pageCount-disp_length)}
+  - else {start = page-half_disp_length,end = page+half_disp_length+1}
+
+  //- var start = Math.min(0,page>half_disp_length?page-half_disp_length:0)
+  //- var end = Math.max(pageCount, page<pageCount-half_disp_length?page+half_disp_length:pageCount)
+
+  - for(i = start; i < end ; i++){pagingarray.push(i)}
+
+  if pageCount==1
+    //ignore navigation, 1 page only
+  else
+    ul.pagination.NavigationPaging
+      if start>0
+        li()
+          a(href=`${toQueryString({page:0,fid,v, cat,operationId,scoreType, sTime,eTime,uid,ip,digest,sortby,tab, content, type, t, q, r, orderStatus, productStatus, productType})}`) 始
+
+      each pagenum,index in pagingarray
+        - var class_str = pagenum==paging.page?'active':''
+
+        li(class=`${class_str}`)
+          a(href=`${toQueryString({page:pagenum,fid,v, cat,operationId,scoreType, sTime,eTime,uid,ip,digest,sortby,tab, content, t, type, q, r, orderStatus, productStatus, productType})}`) #{pagenum + 1}
+      if end<pageCount
+        li()
+          a(href=`${toQueryString({page:pageCount-1,fid,v, cat,operationId,scoreType, sTime,eTime,uid,ip,digest,sortby,tab, content, t, type, q, r, orderStatus, productStatus, productType})}`) 末

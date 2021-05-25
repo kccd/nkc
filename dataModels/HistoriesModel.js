@@ -44,8 +44,11 @@ const schema = new Schema({
     default: "",
     index: 1
   },
+  // 内容版本
   cv: {
-    type: Number
+    type: Number,
+    default: null,
+    index: 1
   },
   // 中文摘要
   abstractCn: {

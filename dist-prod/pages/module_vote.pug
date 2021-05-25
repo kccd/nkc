@@ -1,0 +1,8 @@
+if !isIncluded('voteButtons')
+  mixin voteButtons(votePost, logged)
+    .posts-vote
+      .posts-vote-up(class=votePost.usersVote==='up'?'active': '' data-pid=votePost.pid onclick=`postsVote("${votePost.pid}", "${logged?'up': 'login'}")`)
+        .fa.fa-caret-up
+        .posts-vote-number(data-pid=votePost.pid)= votePost.voteUp ||''
+      .posts-vote-down(class=votePost.usersVote==='down'?'active': '' data-pid=votePost.pid onclick=`postsVote("${votePost.pid}", "${logged?'down': 'login'}")`)
+        .fa.fa-caret-down

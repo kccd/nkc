@@ -1,0 +1,14 @@
+if data.user && data.navbar && data.navbar.highlight === "subscribe" && data.subscribeTypes && data.subscribeTypes.length
+  +listHeader("我的分类")
+  .subscribe-types
+    a(href=`/latest?t=subscribe${data.d ? `&d=${data.d}` : ""}` class=!data.c ? "active" : "").subscribe-type
+      span 全部
+      .pull-right=data.subscribeCounts.total
+    a(href=`/latest?t=subscribe&c=other${data.d ? `&d=${data.d}` : ""}` class=data.c === "other" ? "active" : "").subscribe-type
+      span 未分类
+      .pull-right=data.subscribeCounts.other
+    for st in data.subscribeTypes
+      a(href=`/latest?t=subscribe&c=${st._id}${data.d?`&d=${data.d}`:""}` class=data.c&&Number(data.c)===st._id?"active":"").subscribe-type
+        span(class=st.pid?"m-l-1":"")=st.name
+        .pull-right=st.count
+    a.management-sub-link(href=`/account/subscribes`) 管理我的分类

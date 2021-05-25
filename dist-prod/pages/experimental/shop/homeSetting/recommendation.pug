@@ -1,0 +1,49 @@
+extends ../index.pug
+block title
+  title 店铺推荐 | 商城设置
+block shopSettings
+  .col-xs-12.col-sm-10.col-md-10(style='margin-bottom: 1rem;padding:1rem')
+    .row
+      .col-xs-12.col-md-12
+        button.btn.btn-info(data-toggle="modal" data-target="#myModal")
+          span.fa.fa-plus
+          | &nbsp;添加推荐
+      .col-xs-12.col-md-12(style="margin-top:20px")
+        .table-responsive
+          table.table.table-bordered
+            thead
+              tr
+                th.text-center #
+                th.text-center 店铺ID
+                th.text-center 店铺名称
+                th.text-center 店主uid
+                th.text-center 操作
+            tbody
+              for recommendation,index in data.recommendationItems
+                tr
+                  th.text-center(style="")=index+1
+                  th.text-center=recommendation.storeId
+                  th.text-center
+                    a(href=`/shop/store/${recommendation.storeId}`)=recommendation.storeName
+                  th.text-center
+                    a(href=`/u/${recommendation.uid}`)=recommendation.uid
+                  th.text-center 
+                    a.btn.btn-warning.btn-xs(href="javascript:void(0);" onclick=`delRecommendation("${recommendation.storeId}")`)
+                      i.fa.fa-trash
+      #myModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+        .modal-dialog(role='document')
+          .modal-content
+            .modal-header
+              button.close(type='button', data-dismiss='modal', aria-label='Close')
+                span(aria-hidden='true') ×
+              h4#myModalLabel.modal-title 添加店铺推荐
+            .modal-body
+              .form-group
+                label(for='recommendationLink') 店铺Id
+                input#recommendationLink.form-control(type='text', placeholder='请输入正确的店铺Id')
+
+            .modal-footer
+              button.btn.btn-default(type='button', data-dismiss='modal') 取消
+              button.btn.btn-primary(type='button', onclick="addRecommendation()") 提交
+block shopSettingScripts
+  +includeJS('/experimental/shop/homeSetting/homeSetting.js')

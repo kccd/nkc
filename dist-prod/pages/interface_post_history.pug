@@ -1,0 +1,34 @@
+extends bootstrap_base.pug
+
+block title
+  title 楼历史 - 科创论坛
+  
+block content
+  
+  .container
+    .row
+      .col-xs-12
+        if data.userOperationsId.includes('disableHistories')
+          if data.post.hideHistories
+            button.btn.btn-danger(onclick=`disabledHistories("${data.post.pid}", false)`) 解除屏蔽
+          else
+            button.btn.btn-danger(onclick=`disabledHistories("${data.post.pid}", true)`) 屏蔽所有
+        h3 目前版本
+        -var p = data.post
+        -p.c = p.c.replace(/<[^>]+>|&nbsp;/g,"");
+        -p.c = hideContentByUser(p.c, data.user, 'thread')
+        include interface_post_history_single.pug
+        
+        h3 过去版本
+
+        each post, index in data.histories
+          -var i = index - 1
+          -var p = i > -1? data.histories[i]: data.post
+          -var formerPost = data.histories[index]
+          -formerPost.c = formerPost.c.replace(/<[^>]+>|&nbsp;/g,"");
+          include interface_post_history_single.pug
+    
+  
+  include debug_output.pug
+block scripts
+  +includeJS('/interface_post_history.js')

@@ -60,13 +60,13 @@ module.exports = async (options) => {
       output: outputVideoPath,
       imageStream: watermarkStream,
       position: waterMaskPosition,
-      scalaByWidth: isReachFHD
-        ? widthFHD
+      scalaByHeight: isReachFHD
+        ? fhd.height
         : isReachHD
-        ? widthHD
+        ? hd.height
         : isReachSD
-        ? widthSD
-        : videoWidth,
+        ? sd.height
+        : videoHeight,
       bitRate: isReachFHD
         ? bitrateFHD
         : isReachHD
@@ -228,11 +228,11 @@ const gravityToPositionMap = {
   },
   southwest: {
     x: "10",
-    y: "10"
+    y: "H-h-10"
   },
   northwest: {
     x: "10",
-    y: "H-h-10"
+    y: "10"
   },
   center: {
     x: "(W-w)/2",

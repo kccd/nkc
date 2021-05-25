@@ -1,0 +1,154 @@
+extends ../bootstrap_base
+block title
+  title 专栏列表
+  +includeCSS('/columns/columns.css')
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        h4 专栏列表
+      .col-xs-12.col-md-12
+        include ../publicModules/paging/paging
+        .paging-button
+          a.button.radius-left(href=`/m?t=l` class=data.t==='l'?"active":"") 最近更新
+          a.button(href=`/m?t=s` class=data.t==="s"?'active':"") 最多订阅
+          a.button.radius-right(href=`/m?t=p` class=data.t==='p'?'active':'') 最多文章
+
+        .columns-container
+          for column in data.columns
+            -var klass = '';
+            -var pre = '';
+            if column.disabled
+              -klass += 'column-list-disabled';
+              -pre = `「已被屏蔽」`
+            if column.closed
+              -klass += 'column-list-closed';
+              -pre = `「已被关闭」`
+            .column(data-column-id=column._id class=klass)
+              .column-top-container
+                .column-top-left-container
+                  img.column-avatar(src=tools.getUrl('columnAvatar', column.avatar))
+                .column-top-right-container
+                  a(href=tools.getUrl('columnHome', column._id) target="_blank").column-name=column.name
+                  .column-abbr
+                    span.text-danger=pre
+                    span=`${column.subCount}人关注，${column.postCount}篇文章`
+                    div.m-t-05
+                      +fromNow(column.tlm)
+                      | 更新
+                  .column-description(title=column.abbr)=column.abbr
+              .column-bottom-container
+                .column-buttons
+                  a.m-r-05.btn.btn-xs.btn-default(href=tools.getUrl('columnHome', column._id) target='_blank') 进入专栏
+                  -var subscribed = state.subColumnsId ? state.subColumnsId.includes(column._id) : false;
+                  -var klass = subscribed ? 'btn-default' : 'btn-primary';
+                  -var text = subscribed ? '已关注' : '关注'
+                  button.m-r-05.column-subscription.btn.btn-xs(
+                    data-subscribed=subscribed ? 'true' : 'false'
+                    class=klass
+                    onclick=`subscribeColumn(${column._id})`
+                  )=text
+                  if data.permissionHomeHotColumn
+                    -var klass = column.hot? 'btn-danger': 'btn-default';
+                    -var text = column.hot? '取消热门': '设为热门';
+                    button.m-r-05.column-hot.btn.btn-default.btn-xs(
+                      data-hot=column.hot?'true': 'false'
+                      class=klass
+                      onclick=`setColumnHot(${column._id})`
+                    )=text
+                  if data.permissionHomeToppedColumn
+                    -var klass = column.top ? 'btn-danger' : 'btn-default';
+                    -var text = column.top ? '取消置顶' : '置顶';
+                    button.column-top.btn.btn-default.btn-xs(
+                      data-top=column.top ? 'true' : 'false'
+                      class=klass
+                      onclick=`setColumnTopped(${column._id})`
+                    )=text
+              .column-threads
+                for thread in column.latestThreads
+                  a(href=`/t/${thread.tid}` title=thread.t target="_blank")=thread.t
+        include ../publicModules/paging/paging_input
+block scripts
+  include ../publicModules/subscribeTypes/subscribeTypes
+  script.
+    if(!window.SubscribeTypes) {
+      window.SubscribeTypes = new NKC.modules.SubscribeTypes();
+    }
+    function subscribeColumn(columnId) {
+      if(!NKC.configs.uid) {
+        return NKC.methods.toLogin();
+      }
+      var dom = $('.column[data-column-id="'+columnId+'"] .column-subscription');
+      var subscribed = dom.attr('data-subscribed');
+      if(subscribed === 'true') {
+        // 取消关注
+        SubscribeTypes.subscribeColumnPromise(columnId, false)
+        .then(function() {
+          dom
+            .attr('data-subscribed', 'false')
+            .removeClass('btn-default')
+            .addClass('btn-primary')
+            .text('关注');
+        })
+        .catch(sweetError);
+      } else {
+        // 关注
+        SubscribeTypes.subscribeColumnPromise(columnId, true)
+          .then(function () {
+            dom
+              .attr('data-subscribed', 'true')
+              .removeClass('btn-primary')
+              .addClass('btn-default')
+              .text('已关注');
+          })
+          .catch(sweetError);
+      }
+    }
+    function setColumnHot(columnId) {
+      var dom = $('.column[data-column-id="'+columnId+'"] .column-hot');
+      var hot = dom.attr('data-hot');
+      if(hot === 'true') {
+        // 取消热门
+        nkcAPI("/m/" + columnId + "/hot", 'DELETE')
+          .then(function () {
+            dom.attr('data-hot', 'false');
+            dom.text('设为热门');
+            dom.removeClass('btn-danger').addClass('btn-default');
+          })
+          .catch(sweetError);
+      } else {
+        // 设为热门
+        nkcAPI('/m/' + columnId + '/hot', 'POST')
+          .then(function() {
+            dom.attr('data-hot', 'true');
+            dom.text('取消热门');
+            dom.removeClass('btn-default').addClass('btn-danger');
+          })
+          .catch(sweetError);
+      }
+    }
+
+    function setColumnTopped(columnId) {
+      var dom = $('.column[data-column-id="' + columnId + '"] .column-top');
+      var top = dom.attr('data-top');
+      if (top === 'true') {
+        // 取消热门
+        nkcAPI("/m/" + columnId + "/top", 'DELETE')
+          .then(function () {
+            dom.attr('data-top', 'false');
+            dom.text('置顶');
+            dom.removeClass('btn-danger').addClass('btn-default');
+          })
+          .catch(sweetError);
+      } else {
+        // 设为热门
+        nkcAPI('/m/' + columnId + '/top', 'POST')
+          .then(function () {
+            dom.attr('data-top', 'true');
+            dom.text('取消置顶');
+            dom.removeClass('btn-default').addClass('btn-danger');
+          })
+          .catch(sweetError);
+      }
+    }
+

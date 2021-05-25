@@ -1,0 +1,102 @@
+extends ../../experimental
+
+block eTitle
+  title 列表设置
+block eContent
+  .container-fluid.max-width
+    #data.hidden=objToStr({pageSettings: data.pageSettings})
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12
+        .form-horizontal
+          .col-xs-12.col-md-12
+            h4 分页设置
+          .form-group
+            label.col-sm-3.control-label 首页文章列表
+            .col-sm-3
+              input.form-control(type='text' v-model.number="pageSettings.homeThreadList")
+          .form-group
+            label.col-sm-3.control-label 专业文章列表
+            .col-sm-3
+              input.form-control(type='text' v-model.number="pageSettings.forumThreadList")
+          .form-group
+            label.col-sm-3.control-label 专业用户列表
+            .col-sm-3
+              input.form-control(type='text' v-model.number="pageSettings.forumUserList")
+          .form-group
+            label.col-sm-3.control-label 用户名片文章列表
+            .col-sm-3
+              input.form-control(type='text' v-model.number="pageSettings.userCardThreadList")
+          .form-group
+            label.col-sm-3.control-label 用户名片用户列表
+            .col-sm-3
+              input.form-control(type='text' v-model.number="pageSettings.userCardUserList")
+          .form-group
+            label.col-sm-3.control-label 文章页回复列表
+            .col-sm-3
+              input.form-control(type='text' v-model.number="pageSettings.threadPostList")
+          .form-group
+            label.col-sm-3.control-label 搜索页文章列表
+            .col-sm-3
+              input.form-control(type='text' v-model.number="pageSettings.searchThreadList")
+          .form-group
+            label.col-sm-3.control-label 搜索页回复列表
+            .col-sm-3
+              input.form-control(type='text' v-model.number="pageSettings.searchPostList")
+          .form-group
+            label.col-sm-3.control-label 搜索页全部列表
+            .col-sm-3
+              input.form-control(type='text' v-model.number="pageSettings.searchAllList")
+          .form-group
+            label.col-sm-3.control-label 搜索页用户列表
+            .col-sm-3
+              input.form-control(type='text' v-model.number="pageSettings.searchUserList")
+          .form-group
+            label.col-sm-3.control-label 搜索页专栏列表
+            .col-sm-3
+              input.form-control(type='text' v-model.number="pageSettings.searchColumnList")
+          .form-group
+            label.col-sm-3.control-label 搜索页文件列表
+            .col-sm-3
+              input.form-control(type='text' v-model.number="pageSettings.searchResourceList")
+          .form-group
+            label.col-sm-3.control-label 文章页/回复详细页的评论列表
+            .col-sm-3
+              input.form-control(type='text' v-model.number="pageSettings.threadPostCommentList")
+          .col-xs-12.col-md-12
+            h4 文章列表样式设置
+          .form-group
+            label.col-sm-3.control-label 显示模式
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='abstract' v-model='pageSettings.threadListStyle.type')
+                  span 摘要模式
+                label.m-r-1
+                  input(type='radio' value='brief' v-model='pageSettings.threadListStyle.type')
+                  span 简要模式
+                label
+                  input(type='radio' value='minimalist' v-model='pageSettings.threadListStyle.type')
+                  span 极简模式
+          .form-group
+            label.col-sm-3.control-label 封面图
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='left' v-model='pageSettings.threadListStyle.cover')
+                  span 左侧
+                label.m-r-1
+                  input(type='radio' value='right' v-model='pageSettings.threadListStyle.cover')
+                  span 右侧
+                label
+                  input(type='radio' value='null' v-model='pageSettings.threadListStyle.cover')
+                  span 不显示
+          .form-group
+            label.col-sm-3.control-label
+            .col-sm-3
+              button.btn.btn-primary(@click='save') 保存
+block scripts
+
+  +includeJS("/experimental/settings/page/page.js")
+
+
+

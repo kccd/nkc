@@ -1,0 +1,38 @@
+extends ../../bootstrap_base
+block title
+  title 投稿记录
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        h4 投稿记录
+      .col-xs-12.col-md-12
+        include ../../publicModules/paging/paging
+        .table-responsive
+          table.table
+            thead
+              tr
+                th 投稿时间
+                th 专栏
+                th 文章
+                th 附加说明
+                th 状态
+            tbody
+              for c in data.contributes
+                tr
+                  th=format("YYYY/MM/DD HH:mm:ss", c.toc)
+                  th
+                    a(href=`/m/${c.columnId}` target="_blank")=c.column.name
+                  th
+                    a(href=`/t/${c.tid}` target="_blank")=c.thread.firstPost.t
+                  th=c.description
+                  th
+                    if c.passed === null
+                      span 待处理
+                    else if c.passed === true
+                      span.text-success 已同意
+                    else
+                      span.text-danger=`已拒绝(理由：${c.reason||"无"})`
+        include ../../publicModules/paging/paging_input
+block scripts
+  +includeJS("/account/contribute/contribute.js")

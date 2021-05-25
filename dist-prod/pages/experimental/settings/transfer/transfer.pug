@@ -1,0 +1,118 @@
+extends ../../experimental
+block eTitle
+  title 转账
+  style.
+    .transfer-user{
+      width: 20rem;
+      padding: 1rem;
+      background-color: #eee;
+      text-align: center;
+    }
+    .transfer-user-avatar{
+      height: 4rem;
+      width: 4rem;
+      border-radius: 3px;
+    }
+    .transfer-username{
+      margin-top: 0.5rem;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+    .transfer-form{
+      padding: 1rem;
+      background-color: #fff;
+      border: 1px solid #eee;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+    }
+block eContent
+  .container-fluid.max-width
+    .hidden#data=objToStr({shopScore: data.shopScore, enabledScores: data.enabledScores, transferSettings: data.transferSettings, toppingSettings: data.toppingSettings, roles: data.roles, grades: data.grades})
+    #app(v-cloak)
+      .row.m-b-3
+        .col-xs-12.col-md-4
+          .transfer-form
+            h3 小额转账设置
+            .form
+              .form-group
+                label=`单次转账${data.shopScore.name}上限（精确到0.01）`
+                input.form-control(type="text" v-model.number="transferSettings.kcbOnce")
+              .form-group
+                label 每天转账总次数上限
+                input.form-control(type="text" v-model.number="transferSettings.countOneDay")
+              .form-group
+                label 对同一用户每天转账次数上限
+                input.form-control(type="text" v-model.number="transferSettings.countToUserOneDay")
+              .form-group
+                button.btn.btn-primary(@click="saveTransferSettings") 保存
+        .col-xs-12
+          hr
+      .row
+        .col-xs-12.col-md-6
+          h4 支付方
+          hr
+          .radio
+            label.m-r-2
+              input(type="radio" value="bank" v-model="from.type")
+              span=data.nkcBankName
+            label
+              input(type="radio" value="user" v-model="from.type")
+              span 指定用户
+          div(v-if="from.type === 'user'").m-b-05
+            button.btn.btn-default.btn-sm(@click="getUser('from')") 选择用户
+          div(v-if="from.type === 'user' && from.user")
+            .transfer-user
+              img.transfer-user-avatar(:src="getUrl('userAvatar', from.user.avatar)")
+              .transfer-username
+                a.pointer(@click="visitUrl('/u/' + from.user.uid, true)") {{from.user.username}}
+              .description {{from.user.description}}
+              //.info 当前KCB：
+                strong.text-danger {{from.user.kcb/100}}
+              .info 注册于{{format('YYYY/MM/DD HH:mm:ss', from.user.toc)}}
+              .info 最后活动 {{fromNow(from.user.tlv)}}
+        .col-xs-12.col-md-6
+          h4 收款方
+          hr
+          .radio
+            label.m-r-2
+              input(type="radio" value="bank" v-model="to.type")
+              span=data.nkcBankName
+            label
+              input(type="radio" value="user" v-model="to.type")
+              span 指定用户
+          div(v-if="to.type === 'user'").m-b-05
+            button.btn.btn-default.btn-sm(@click="getUser('to')") 选择用户
+          div(v-if="to.type === 'user' && to.user")
+            .transfer-user
+              img.transfer-user-avatar(:src="getUrl('userAvatar', to.user.avatar)")
+              .transfer-username
+                a.pointer(@click="visitUrl('/u/' + to.user.uid, true)") {{to.user.username}}
+              .description {{to.user.description}}
+              //.info 当前KCB：
+                strong.text-danger {{to.user.kcb/100}}
+              .info 注册于{{format('YYYY/MM/DD HH:mm:ss', to.user.toc)}}
+              .info 最后活动 {{fromNow(to.user.tlv)}}
+        .col-xs-12.col-md-12.m-t-1
+          hr
+          .form
+            .form-group
+              label 积分类型
+              .form-inline
+                select.form-control(v-model='scoreType')
+                  option(v-for='e in enabledScores' :value='e.type') {{e.name}}
+            .form-group
+              label 数额（大于0，精确到0.01）
+              .form-inline
+                input.form-control(v-model.number="num" type="text")
+            .form-group
+              label 请输入登录密码
+              .form-inline
+                input.form-control(v-model="password" type="password")
+            .form-group
+              button.btn.btn-primary(v-if="submitting" disabled) 提交
+              button.btn.btn-primary(v-else @click="submit") 提交
+block scripts
+  include ../../../publicModules/selectUser/selectUser
+  include ../../../publicModules/moment
+  +includeJS("/tools.js")
+  +includeJS("/experimental/settings/transfer/transfer.js")

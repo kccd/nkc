@@ -1,0 +1,66 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+.user-avatar {
+  text-align: center;
+  padding: 1rem 0 0.5rem 0;
+}
+.user-avatar img {
+  height: 5rem;
+  width: 5rem;
+  border-radius: 50%;
+}
+.username {
+  text-align: center;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+.submitted {
+  margin-top: 10rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+.submitted .info {
+  font-size: 1.8rem;
+  color: #444;
+  margin-top: 1rem;
+}
+.submitted .icon {
+  height: 4rem;
+  width: 4rem;
+  border-radius: 50%;
+  background-color: green;
+  color: #fff;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.submitted .icon .fa {
+  font-size: 2.4rem;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIjxpbnB1dCBjc3MgNDM+IiwicGFnZXMvcHVibGljTW9kdWxlcy9iYXNlLmxlc3MiLCJwYWdlcy9tZXNzYWdlL2FwcEFkZEZyaWVuZC9hcHBBZGRGcmllbmQubGVzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxVQUFVO0FBQ1YsVUFBVTtBQ09WO0VBQ0UsbUJBQUE7RUFDQSxPQUFBO0VBQ0EsUUFBQTtFQUNBLFNBQUE7RUFDQSxVQUFBO0VBQ0EsYUFBQTtDRExEO0FBQ0Qsa0JBQWtCO0FFUmxCO0VBQ0UsbUJBQUE7RUFDQSx5QkFBQTtDRlVEO0FFWkQ7RUFJSSxhQUFBO0VBQ0EsWUFBQTtFQUNBLG1CQUFBO0NGV0g7QUVSRDtFQUNFLG1CQUFBO0VBQ0Esa0JBQUE7RUFDQSxvQkFBQTtDRlVEO0FFUEQ7RUFDRSxrQkFBQTtFQUNBLHFCQUFBO0VBQUEscUJBQUE7RUFBQSxjQUFBO0VBQ0EseUJBQUE7TUFBQSxzQkFBQTtVQUFBLHdCQUFBO0VBQ0EsMEJBQUE7TUFBQSx1QkFBQTtVQUFBLG9CQUFBO0VBQ0EsNkJBQUE7RUFBQSw4QkFBQTtNQUFBLDJCQUFBO1VBQUEsdUJBQUE7Q0ZTRDtBRWREO0VBT0ksa0JBQUE7RUFDQSxZQUFBO0VBQ0EsaUJBQUE7Q0ZVSDtBRW5CRDtFQVlJLGFBQUE7RUFDQSxZQUFBO0VBQ0EsbUJBQUE7RUFDQSx3QkFBQTtFQUNBLFlBQUE7RUFDQSx5QkFBQTtNQUFBLHNCQUFBO1VBQUEsd0JBQUE7RUFDQSwwQkFBQTtNQUFBLHVCQUFBO1VBQUEsb0JBQUE7RUFDQSxxQkFBQTtFQUFBLHFCQUFBO0VBQUEsY0FBQTtDRlVIO0FFN0JEO0VBcUJNLGtCQUFBO0NGV0wiLCJmaWxlIjoidG8uY3NzIn0= */

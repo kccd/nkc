@@ -1,0 +1,22 @@
+ol,
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.skin-box-bd {
+  border: 1px solid #e4e4e4;
+  background: none no-repeat scroll 0 0 #fff;
+}
+.service-block {
+  border-bottom: 1px dashed #DBDBDB;
+  margin-bottom: 5px;
+  padding-left: 5px;
+}
+.service-content {
+  padding-left: 10px;
+}
+.boldFont {
+  font-weight: bold;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL3Nob3Avc3RvcmUvc3RvcmUubGVzcyIsIjxpbnB1dCBjc3MgMTIxPiJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTs7RUFDRSxpQkFBQTtFQUNBLFVBQUE7RUFDQSxXQUFBO0NDRUQ7QURDRDtFQUNFLDBCQUFBO0VBQ0EsMkNBQUE7Q0NDRDtBREVEO0VBQ0Usa0NBQUE7RUFDQSxtQkFBQTtFQUNBLGtCQUFBO0NDQUQ7QURHRDtFQUNFLG1CQUFBO0NDREQ7QURJRDtFQUNFLGtCQUFBO0NDRkQiLCJmaWxlIjoidG8uY3NzIn0= */

@@ -1,0 +1,123 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+#note .origin-content {
+  padding: 1rem;
+  color: #555;
+  background-color: #f4f4f4;
+  font-size: 1.3rem;
+  font-style: oblique;
+}
+#note .notes {
+  padding: 1rem;
+}
+#note .notes .form textarea {
+  width: 100%;
+  height: 5rem;
+  resize: none;
+  overflow: hidden;
+}
+#note .notes .note {
+  margin: 0 0 1rem 0;
+}
+#note .notes .note .note-user {
+  position: relative;
+  width: 100%;
+}
+#note .notes .note .note-user .note-user-avatar {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 0.5rem;
+}
+#note .notes .note .note-user .note-user-avatar img {
+  margin-top: -2px;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 3px;
+}
+#note .notes .note .note-user .note-user-username {
+  cursor: pointer;
+  display: inline-block;
+  font-size: 1rem;
+  color: #999;
+  font-style: oblique;
+  margin-right: 0.3rem;
+}
+#note .notes .note .note-user .note-time {
+  font-size: 1rem;
+  display: inline-block;
+  color: #999;
+  font-style: oblique;
+}
+#note .notes .note .note-user .note-options {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+#note .notes .note .note-user .note-options ul {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  right: 0;
+  -webkit-transition: width 200ms;
+  transition: width 200ms;
+  display: block;
+  width: 5rem;
+  height: auto;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  background-color: #fff;
+  border: 1px solid #f4f4f4;
+  -webkit-box-shadow: 2px 3px 12px 0 rgba(0, 0, 0, 0.1);
+          box-shadow: 2px 3px 12px 0 rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+#note .notes .note .note-user .note-options ul li {
+  font-size: 1rem;
+  list-style: none;
+  height: 3rem;
+  line-height: 3rem;
+  text-align: center;
+  cursor: pointer;
+  border-bottom: 1px solid #f4f4f4;
+}
+#note .notes .note .note-user .note-options ul li:hover {
+  background-color: #2b90d9;
+  color: #fff;
+}
+#note .notes .note .note-user .note-options ul li:last-child {
+  border-bottom: none;
+}
+#note .notes .note .note-user .note-options > .fa {
+  cursor: pointer;
+  height: 1.4rem;
+  width: 1.4rem;
+  text-align: center;
+  line-height: 1.4rem;
+  color: #aaa;
+}
+#note .notes .note .note-user .note-options > .fa:hover {
+  color: #555;
+}
+#note .notes .note .note-content-body {
+  width: 100%;
+}
+#note .notes .note .note-content-body .note-content textarea {
+  width: 100%;
+  height: 5rem;
+  resize: none;
+  overflow: hidden;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIjxpbnB1dCBjc3MgNTc+IiwicGFnZXMvcHVibGljTW9kdWxlcy9iYXNlLmxlc3MiLCJwYWdlcy9ub3RlL25vdGUubGVzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxVQUFVO0FBQ1YsVUFBVTtBQ09WO0VBQ0UsbUJBQUE7RUFDQSxPQUFBO0VBQ0EsUUFBQTtFQUNBLFNBQUE7RUFDQSxVQUFBO0VBQ0EsYUFBQTtDRExEO0FBQ0Qsa0JBQWtCO0FFVGxCO0VBRUksY0FBQTtFQUNBLFlBQUE7RUFDQSwwQkFBQTtFQUNBLGtCQUFBO0VBQ0Esb0JBQUE7Q0ZVSDtBRWhCRDtFQVNJLGNBQUE7Q0ZVSDtBRW5CRDtFQVlRLFlBQUE7RUFDQSxhQUFBO0VBQ0EsYUFBQTtFQUNBLGlCQUFBO0NGVVA7QUV6QkQ7RUFtQk0sbUJBQUE7Q0ZTTDtBRTVCRDtFQXFCUSxtQkFBQTtFQUNBLFlBQUE7Q0ZVUDtBRWhDRDtFQXdCVSxzQkFBQTtFQUNBLG9CQUFBO0VBQ0EscUJBQUE7Q0ZXVDtBRXJDRDtFQTRCWSxpQkFBQTtFQUNBLGNBQUE7RUFDQSxlQUFBO0VBQ0EsbUJBQUE7Q0ZZWDtBRTNDRDtFQW1DVSxnQkFBQTtFQUNBLHNCQUFBO0VBQ0EsZ0JBQUE7RUFDQSxZQUFBO0VBQ0Esb0JBQUE7RUFDQSxxQkFBQTtDRldUO0FFbkREO0VBMkNVLGdCQUFBO0VBQ0Esc0JBQUE7RUFDQSxZQUFBO0VBQ0Esb0JBQUE7Q0ZXVDtBRXpERDtFQWtEVSxtQkFBQTtFQUNBLE9BQUE7RUFDQSxTQUFBO0NGVVQ7QUU5REQ7RUFzRFksV0FBQTtFQUNBLFVBQUE7RUFDQSxpQkFBQTtFQUNBLG1CQUFBO0VBQ0EsT0FBQTtFQUNBLFNBQUE7RUFDQSxnQ0FBQTtFQUFBLHdCQUFBO0VBQ0EsZUFBQTtFQUNBLFlBQUE7RUFDQSxhQUFBO0VBQ0EsMEJBQUE7S0FBQSx1QkFBQTtNQUFBLHNCQUFBO1VBQUEsa0JBQUE7RUFDQSx1QkFBQTtFQUNBLDBCQUFBO0VBQ0Esc0RBQUE7VUFBQSw4Q0FBQTtFQUNBLGFBQUE7Q0ZXWDtBRS9FRDtFQXNFYyxnQkFBQTtFQUNBLGlCQUFBO0VBQ0EsYUFBQTtFQUNBLGtCQUFBO0VBQ0EsbUJBQUE7RUFDQSxnQkFBQTtFQUNBLGlDQUFBO0NGWWI7QUVYYTtFQUNFLDBCQUFBO0VBQ0EsWUFBQTtDRmFmO0FFWGE7RUFDRSxvQkFBQTtDRmFmO0FFUlM7RUFDRSxnQkFBQTtFQUNBLGVBQUE7RUFDQSxjQUFBO0VBQ0EsbUJBQUE7RUFDQSxvQkFBQTtFQUNBLFlBQUE7Q0ZVWDtBRVRXO0VBQ0UsWUFBQTtDRldiO0FFMUdEO0VBcUdRLFlBQUE7Q0ZRUDtBRTdHRDtFQXdHWSxZQUFBO0VBQ0EsYUFBQTtFQUNBLGFBQUE7RUFDQSxpQkFBQTtDRlFYIiwiZmlsZSI6InRvLmNzcyJ9 */

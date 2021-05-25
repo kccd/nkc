@@ -1,0 +1,58 @@
+#moduleResourceInfo .r-info-author {
+  margin-top: 0.5rem;
+}
+#moduleResourceInfo .r-info-author img {
+  height: 1.4rem;
+  width: 1.4rem;
+  border-radius: 50%;
+  margin-top: -2px;
+  margin-right: 2px;
+}
+#moduleResourceInfo .r-info-cover {
+  display: table-cell;
+}
+#moduleResourceInfo .r-info-cover > div {
+  width: 6rem;
+  height: 6rem;
+  position: relative;
+  border: 1px solid #ddd;
+  margin-right: 1rem;
+}
+#moduleResourceInfo .r-info-cover > div > img {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  max-height: 100%;
+  max-width: 100%;
+}
+#moduleResourceInfo .r-info-content {
+  display: table-cell;
+  vertical-align: top;
+  width: 100%;
+}
+#moduleResourceInfo .r-info-title {
+  font-size: 1.3rem;
+  word-break: break-all;
+  font-weight: 700;
+}
+#moduleResourceInfo .r-info-d {
+  background-color: #f4f4f4;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 3px;
+  word-break: break-all;
+  width: 100%;
+}
+#moduleResourceInfo .r-info-bottom {
+  margin-top: 1rem;
+}
+#moduleResourceInfo .r-info-size {
+  margin-top: 0.4rem;
+}
+#moduleResourceInfo .r-info-size span {
+  color: #e85a71;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL3B1YmxpY01vZHVsZXMvcmVzb3VyY2VJbmZvL3Jlc291cmNlSW5mby5sZXNzIiwiPGlucHV0IGNzcyA5MD4iXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRSxtQkFBQTtDQ0NEO0FEQ0Q7RUFDRSxlQUFBO0VBQ0EsY0FBQTtFQUNBLG1CQUFBO0VBQ0EsaUJBQUE7RUFDQSxrQkFBQTtDQ0NEO0FERUQ7RUFDRSxvQkFBQTtDQ0FEO0FERUQ7RUFDRSxZQUFBO0VBQ0EsYUFBQTtFQUNBLG1CQUFBO0VBQ0EsdUJBQUE7RUFDQSxtQkFBQTtDQ0FEO0FERUQ7RUFDRSxtQkFBQTtFQUNBLE9BQUE7RUFDQSxVQUFBO0VBQ0EsUUFBQTtFQUNBLFNBQUE7RUFDQSxhQUFBO0VBQ0EsaUJBQUE7RUFDQSxnQkFBQTtDQ0FEO0FERUQ7RUFDRSxvQkFBQTtFQUNBLG9CQUFBO0VBQ0EsWUFBQTtDQ0FEO0FERUQ7RUFDRSxrQkFBQTtFQUNBLHNCQUFBO0VBQ0EsaUJBQUE7Q0NBRDtBREVEO0VBQ0UsMEJBQUE7RUFDQSxtQkFBQTtFQUNBLGdCQUFBO0VBQ0EsbUJBQUE7RUFDQSxzQkFBQTtFQUNBLFlBQUE7Q0NBRDtBREVEO0VBQ0UsaUJBQUE7Q0NBRDtBREVEO0VBQ0UsbUJBQUE7Q0NBRDtBREVEO0VBQ0UsZUFBQTtDQ0FEIiwiZmlsZSI6InRvLmNzcyJ9 */

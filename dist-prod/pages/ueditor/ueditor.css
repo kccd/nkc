@@ -1,0 +1,13 @@
+.edui-default .edui-toolbar .edui-button .edui-icon,
+.edui-default .edui-toolbar .edui-menubutton .edui-icon,
+.edui-default .edui-toolbar .edui-splitbutton .edui-icon {
+  background-size: cover;
+}
+.editor .edui-default .edui-toolbar .edui-button,
+.edui-default .edui-toolbar .edui-splitbutton,
+.edui-default .edui-toolbar .edui-menubutton,
+.edui-default .edui-toolbar .edui-combox {
+  margin: 1px 2px!important;
+  cursor: pointer;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL3VlZGl0b3IvdWVkaXRvci5sZXNzIiwiPGlucHV0IGNzcyAxMjg+Il0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBOzs7RUFDRSx1QkFBQTtDQ0dEO0FEREQ7Ozs7RUFDRSwwQkFBQTtFQUNBLGdCQUFBO0NDTUQiLCJmaWxlIjoidG8uY3NzIn0= */

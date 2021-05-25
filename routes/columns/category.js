@@ -61,18 +61,29 @@ router
     await next();
   })
   .post("/", async (ctx, next) => {
-    const {tools, data, db, body} = ctx;
+    const {data, db, body, nkcModules} = ctx;
     const {column, user} = data;
     if(column.uid !== user.uid) ctx.throw(403, "权限不足");
-    const {contentLength} = tools.checkString;
-    let {name, description, parentId, type} = body;
-    if(!name) ctx.throw(400, "分类名不能为空");
-    if(contentLength(name) > 20) ctx.throw(400, "分类名不能超过20字符");
-    if(!description) ctx.throw(400, "分类简介不能为空");
-    if(contentLength(description) > 100) ctx.throw(400, "分类简介不能超过100字符");
+    let {name, description, parentId, type, brief} = body;
+    const {checkString} = nkcModules.checkData;
+    if(!['main', 'minor'].includes(type)) ctx.throw(400, `分类类型错误 type: ${type}`);
+    checkString(name, {
+      name: '分类名',
+      minLength: 1,
+      maxLength: 20
+    });
     const sameName = await db.ColumnPostCategoryModel.findOne({columnId: column._id, name});
     if(sameName) ctx.throw(400, "分类名已存在");
-    if(!['main', 'minor'].includes(type)) ctx.throw(400, `分类类型错误 type: ${type}`);
+    checkString(brief, {
+      name: '分类简介',
+      minLength: 1,
+      maxLength: 100
+    });
+    checkString(description, {
+      name: '分类介绍',
+      minLength: 0,
+      maxLength: 100000,
+    });
     if(type === 'main') {
       if(parentId) {
         const parentCategory = await db.ColumnPostCategoryModel.findOne({columnId: column._id, _id: parentId});
@@ -86,11 +97,13 @@ router
       name,
       type,
       description,
+      brief,
       parentId,
       columnId: column._id
     });
     await category.save();
     data.category = category;
+    await db.ResourceModel.toReferenceSource("columnCategory-" + category._id, description);
     await db.ColumnPostCategoryModel.computeCategoryOrder(column._id);
     await next();
   })
@@ -108,29 +121,37 @@ router
     await next();
   })
   .put("/:categoryId", async (ctx, next) => {
-    const {tools, data, db, body} = ctx;
+    const {nkcModules, data, db, body} = ctx;
     const {categoryId} = ctx.params;
     const {column, user} = data;
     if(column.uid !== user.uid) ctx.throw(403, "权限不足");
     const category = await db.ColumnPostCategoryModel.findOne({_id: categoryId});
     if(!category) ctx.throw(400, "分类不存在");
-    const {contentLength} = tools.checkString;
-    const {name, description, parentId} = body;
-    if(!name) ctx.throw(400, "分类名不能为空");
-    if(contentLength(name) > 20) ctx.throw(400, "分类名不能超过20字符");
-    if(!description) ctx.throw(400, "分类简介不能为空");
-    if(contentLength(description) > 100) ctx.throw(400, "分类简介不能超过100字符");
+    const {checkString} = nkcModules.checkData;
+    const {name, description, brief} = body;
+    checkString(name, {
+      name: '分类名',
+      minLength: 1,
+      maxLength: 20
+    });
     const sameName = await db.ColumnPostCategoryModel.findOne({columnId: column._id, name, _id: {$ne: categoryId}});
     if(sameName) ctx.throw(400, "分类名已存在");
-    if(parentId) {
-      const parentCategory = await db.ColumnPostCategoryModel.findOne({columnId: column._id, _id: parentId});
-      if(!parentCategory) ctx.throw(400, "父分类设置错误，请刷新");
-    }
+    checkString(brief, {
+      name: '分类简介',
+      minLength: 1,
+      maxLength: 100
+    });
+    checkString(description, {
+      name: '分类介绍',
+      minLength: 0,
+      maxLength: 100000,
+    });
     await category.updateOne({
       name,
-      parentId,
+      brief,
       description
     });
+    await db.ResourceModel.toReferenceSource("columnCategory-" + category._id, description);
     await db.ColumnPostCategoryModel.computeCategoryOrder(column._id);
     await next();
   })

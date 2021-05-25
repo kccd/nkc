@@ -1,0 +1,388 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+body,
+html,
+#app {
+  height: 100%;
+  background-color: #f2f2f2;
+}
+#container {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  position: relative;
+  height: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+#container #listContainer {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  width: 100%;
+  /*height: 100%;
+    width: 100%;*/
+}
+#container #listContainer #info {
+  text-align: center;
+  color: #888;
+  padding: 0.5rem 0;
+}
+#container #listContainer .message-emoji {
+  height: 1.8rem;
+  width: 1.8rem;
+  vertical-align: text-bottom;
+}
+#container #listContainer .listItem {
+  margin: 1rem 1rem;
+}
+#container #listContainer .listItem .message-time {
+  text-align: center;
+}
+#container #listContainer .listItem .message-time span {
+  display: inline-block;
+  font-size: 1.1rem;
+  color: #999;
+  border-radius: 5px;
+}
+#container #listContainer .listItem .message-withdrawn {
+  text-align: center;
+}
+#container #listContainer .listItem .message-withdrawn span {
+  display: inline-block;
+  font-size: 1.1rem;
+  color: #999;
+  border-radius: 5px;
+}
+#container #listContainer .listItem .message {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+#container #listContainer .listItem .message.left {
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+}
+#container #listContainer .listItem .message.left .messageContainer {
+  margin-left: 1rem;
+  margin-right: 3rem;
+}
+#container #listContainer .listItem .message.left .messageContainer .messageContent {
+  background-color: #fff;
+  color: #555;
+}
+#container #listContainer .listItem .message.left .messageContainer .smart {
+  left: -12px;
+  border-top: 6px solid transparent;
+  border-right: 6px solid #fff;
+  border-bottom: 6px solid transparent;
+  border-left: 6px solid transparent;
+}
+#container #listContainer .listItem .message.left .messageContainer .smart:before {
+  left: 0;
+}
+#container #listContainer .listItem .message.left .messageContainer .status {
+  right: -2rem;
+}
+#container #listContainer .listItem .message.right {
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: reverse;
+      -ms-flex-direction: row-reverse;
+          flex-direction: row-reverse;
+}
+#container #listContainer .listItem .message.right .messageContainer {
+  margin-left: 3rem;
+  margin-right: 1rem;
+}
+#container #listContainer .listItem .message.right .messageContainer .messageContent {
+  background-color: #6aafe6;
+  color: #fff;
+}
+#container #listContainer .listItem .message.right .messageContainer .messageContent a {
+  color: #fff;
+}
+#container #listContainer .listItem .message.right .messageContainer .smart {
+  right: -12px;
+  border-top: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 6px solid #6aafe6;
+}
+#container #listContainer .listItem .message.right .messageContainer .smart:before {
+  right: 0;
+}
+#container #listContainer .listItem .message.right .messageContainer .status {
+  left: -2rem;
+}
+#container #listContainer .listItem .message .icon {
+  width: 36px;
+}
+#container #listContainer .listItem .message .icon img {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+}
+#container #listContainer .listItem .message .messageContainer {
+  min-height: 36px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  position: relative;
+}
+#container #listContainer .listItem .message .messageContainer.nkc-media {
+  padding-top: 0.5rem;
+}
+#container #listContainer .listItem .message .messageContainer.nkc-media .messageContent {
+  font-size: 0!important;
+  overflow: hidden;
+  border-radius: 3px;
+  padding: 0;
+}
+#container #listContainer .listItem .message .messageContainer.nkc-media .smart {
+  display: none;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent {
+  min-height: 36px;
+  display: inline-block;
+  word-break: break-all;
+  font-size: 1.3rem;
+  border-radius: 3px;
+  padding: 0.8rem 0.8rem 0.5rem 0.8rem;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent a {
+  text-decoration: underline;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .image {
+  width: 100%;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .image img {
+  max-height: 18rem;
+  max-width: 100%;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .video {
+  width: 100%;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .video video {
+  max-height: 18rem;
+  max-width: 100%;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .audio {
+  width: 8rem;
+  position: relative;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .audio img {
+  height: 1.6rem;
+  width: 1.6rem;
+  position: absolute;
+  top: 0;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .audio .time {
+  height: 1.6rem;
+  width: 1.6rem;
+  position: absolute;
+  top: 0;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .audio .left .time {
+  right: 0;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .audio .left img {
+  left: 0;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .audio .right .time {
+  left: 0;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .audio .right img {
+  right: 0;
+}
+#container #listContainer .listItem .message .messageContainer .smart {
+  position: absolute;
+  top: 10px;
+  width: 0;
+  height: 0;
+}
+#container #listContainer .listItem .message .messageContainer .smart:before {
+  height: 12px;
+  width: 6px;
+  background-color: #f2f2f2;
+  position: absolute;
+  border-radius: 5px;
+  content: "";
+  top: -12px;
+}
+#container #listContainer .listItem .message .messageContainer .status {
+  position: absolute;
+  top: 0;
+  font-size: 1.8rem;
+  width: 2rem;
+  text-align: center;
+}
+#container #listContainer .listItem .message .messageContainer .status.error {
+  color: #e85a71;
+}
+#container #listContainer .listItem .message .messageContainer .status.sending {
+  color: #ccc;
+  font-size: 1.5rem;
+}
+#container #listContainer .listItem .message .messageContainer .status.withdrawn {
+  color: #ccc;
+  font-size: 1.8rem;
+}
+#container #listContainer .listItem .message .messageContainer .server-message button {
+  border: none;
+  height: 2.4rem;
+  border-radius: 3px;
+  padding: 0 1.2rem;
+  margin: 0 0.5rem;
+}
+#container #listContainer .listItem .message .messageContainer .server-message button:focus {
+  outline: none;
+}
+#container #listContainer .listItem .message .messageContainer .server-message button.agree {
+  color: #fff;
+  background-color: #209620;
+}
+#container #listContainer .listItem .message .messageContainer .server-message button.disagree {
+  color: #fff;
+  background-color: #d9534f;
+}
+#container #listContainer .listItem .message .messageContainer .server-message button.ignored {
+  color: #fff;
+  background-color: #aaa;
+}
+#container #listContainer .listItem .message .messageContainer .server-message div {
+  display: block;
+  text-align: center;
+  padding: 0.5rem 0;
+  font-size: 1.2rem;
+  border-radius: 3px;
+  color: #fff;
+}
+#container #listContainer .listItem .message .messageContainer .server-message div.agree {
+  background-color: #209620;
+}
+#container #listContainer .listItem .message .messageContainer .server-message div.disagree {
+  background-color: #d9534f;
+}
+#container #listContainer .listItem .message .messageContainer .server-message div.ignored {
+  background-color: #aaa;
+}
+#container #inputContainer {
+  width: 100%;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  background-color: #fff;
+  padding: 0.5rem 1rem;
+}
+#container #inputContainer .options {
+  height: 2rem;
+  line-height: 2.4rem;
+  margin-bottom: 0.5rem;
+}
+#container #inputContainer .options .option-item {
+  margin-right: 1rem;
+  font-size: 1.8rem;
+  display: inline-block;
+}
+#container #inputContainer .options .option-item:active {
+  opacity: 0.7;
+}
+#container #inputContainer .options .option-item.photo {
+  font-size: 1.7rem;
+}
+#container #inputContainer .options .option-item.file {
+  font-size: 1.7rem;
+}
+#container #inputContainer .form {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+#container #inputContainer .form .textarea {
+  font-size: 0;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+#container #inputContainer .form .textarea textarea {
+  width: 100%;
+  font-size: 1.3rem;
+  padding: 0.5rem;
+  min-height: 3.2rem;
+  max-height: 7rem;
+  height: 3.2rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-radius: 3px;
+  border: 1px solid #eee;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  resize: none;
+}
+#container #inputContainer .form .textarea textarea:focus {
+  outline: none;
+}
+#container #inputContainer .form .button {
+  width: 5rem;
+  margin-left: 1rem;
+  position: relative;
+}
+#container #inputContainer .form .button button {
+  width: 100%;
+  position: absolute;
+  border-radius: 3px;
+  color: #fff;
+  height: 3.2rem;
+  bottom: 0;
+  left: 0;
+  border: none;
+  background-color: #2b90d9;
+}
+#container #inputContainer .form .button button:focus {
+  outline: none;
+}
+#container #inputContainer .form .button button:active {
+  opacity: 0.7;
+}
+#container #inputContainer .form .button button.disabled {
+  opacity: 0.7;
+}
+#container #inputContainer .option-body.sticker-panel {
+  background-color: #f4f4f4;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+#container #inputContainer .option-body.sticker-panel .sticker-item {
+  display: inline-block;
+  height: 2rem;
+  width: 12.5%;
+  margin: 0.5rem 0;
+}
+#container #inputContainer .option-body.sticker-panel .sticker-item img {
+  height: 100%;
+  width: 100%;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIjxpbnB1dCBjc3MgNDU+IiwicGFnZXMvcHVibGljTW9kdWxlcy9iYXNlLmxlc3MiLCJwYWdlcy9tZXNzYWdlL2FwcENvbnRlbnRMaXN0L2FwcENvbnRlbnRMaXN0Lmxlc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsVUFBVTtBQUNWLFVBQVU7QUNPVjtFQUNFLG1CQUFBO0VBQ0EsT0FBQTtFQUNBLFFBQUE7RUFDQSxTQUFBO0VBQ0EsVUFBQTtFQUNBLGFBQUE7Q0RMRDtBQUNELGtCQUFrQjtBRVJsQjs7O0VBQ0UsYUFBQTtFQUNBLDBCQUFBO0NGWUQ7QUVWRDtFQUNFLCtCQUFBO1VBQUEsdUJBQUE7RUFDQSxtQkFBQTtFQUNBLGFBQUE7RUFFQSxxQkFBQTtFQUFBLHFCQUFBO0VBQUEsY0FBQTtFQUNBLDZCQUFBO0VBQUEsOEJBQUE7TUFBQSwyQkFBQTtVQUFBLHVCQUFBO0NGV0Q7QUVqQkQ7RUFRSSwrQkFBQTtVQUFBLHVCQUFBO0VBQ0EsbUJBQUE7RUFDQSxpQkFBQTtFQUNBLG9CQUFBO01BQUEsWUFBQTtVQUFBLFFBQUE7RUFDQSxZQUFBO0VGWUY7a0JBQ2dCO0NBQ2pCO0FFMUJEO0VBaUJNLG1CQUFBO0VBQ0EsWUFBQTtFQUNBLGtCQUFBO0NGWUw7QUUvQkQ7RUFzQk0sZUFBQTtFQUNBLGNBQUE7RUFDQSw0QkFBQTtDRllMO0FFcENEO0VBMkJNLGtCQUFBO0NGWUw7QUV2Q0Q7RUE2QlEsbUJBQUE7Q0ZhUDtBRTFDRDtFQStCVSxzQkFBQTtFQUNBLGtCQUFBO0VBQ0EsWUFBQTtFQUNBLG1CQUFBO0NGY1Q7QUVoREQ7RUFzQ1EsbUJBQUE7Q0ZhUDtBRW5ERDtFQXdDVSxzQkFBQTtFQUNBLGtCQUFBO0VBQ0EsWUFBQTtFQUNBLG1CQUFBO0NGY1Q7QUV6REQ7RUErQ1EscUJBQUE7RUFBQSxxQkFBQTtFQUFBLGNBQUE7Q0ZhUDtBRVZPO0VBQ0UsK0JBQUE7RUFBQSw4QkFBQTtNQUFBLHdCQUFBO1VBQUEsb0JBQUE7Q0ZZVDtBRWJPO0VBR0ksa0JBQUE7RUFDQSxtQkFBQTtDRmFYO0FFakJPO0VBTU0sdUJBQUE7RUFDQSxZQUFBO0NGY2I7QUVyQk87RUFVTSxZQUFBO0VBQ0Esa0NBQUE7RUFDQSw2QkFBQTtFQUNBLHFDQUFBO0VBQ0EsbUNBQUE7Q0ZjYjtBRWJhO0VBQ0UsUUFBQTtDRmVmO0FFL0JPO0VBb0JNLGFBQUE7Q0ZjYjtBRVZPO0VBQ0UsK0JBQUE7RUFBQSwrQkFBQTtNQUFBLGdDQUFBO1VBQUEsNEJBQUE7Q0ZZVDtBRWJPO0VBR0ksa0JBQUE7RUFDQSxtQkFBQTtDRmFYO0FFakJPO0VBTU0sMEJBQUE7RUFDQSxZQUFBO0NGY2I7QUVyQk87RUFTUSxZQUFBO0NGZWY7QUV4Qk87RUFhTSxhQUFBO0VBQ0Esa0NBQUE7RUFDQSxvQ0FBQTtFQUNBLHFDQUFBO0VBQ0EsK0JBQUE7Q0ZjYjtBRWJhO0VBQ0UsU0FBQTtDRmVmO0FFbENPO0VBdUJNLFlBQUE7Q0ZjYjtBRS9HRDtFQXNHVSxZQUFBO0NGWVQ7QUVsSEQ7RUF3R1ksK0JBQUE7VUFBQSx1QkFBQTtFQUVBLFlBQUE7RUFDQSxhQUFBO0VBQ0Esb0JBQUE7Q0ZZWDtBRXhIRDtFQWdIVSxpQkFBQTtFQUNBLHFCQUFBO0VBQUEscUJBQUE7RUFBQSxjQUFBO0VBQ0EsMEJBQUE7TUFBQSx1QkFBQTtVQUFBLG9CQUFBO0VBQ0EsbUJBQUE7Q0ZXVDtBRVZTO0VBQ0Usb0JBQUE7Q0ZZWDtBRWJTO0VBR0ksdUJBQUE7RUFDQSxpQkFBQTtFQUNBLG1CQUFBO0VBQ0EsV0FBQTtDRmFiO0FFbkJTO0VBU0ksY0FBQTtDRmFiO0FFMUlEO0VBaUlZLGlCQUFBO0VBQ0Esc0JBQUE7RUFDQSxzQkFBQTtFQUNBLGtCQUFBO0VBQ0EsbUJBQUE7RUFDQSxxQ0FBQTtDRllYO0FFbEpEO0VBd0ljLDJCQUFBO0NGYWI7QUVySkQ7RUEySWMsWUFBQTtDRmFiO0FFeEpEO0VBNklnQixrQkFBQTtFQUNBLGdCQUFBO0NGY2Y7QUU1SkQ7RUFrSmMsWUFBQTtDRmFiO0FFL0pEO0VBb0pnQixrQkFBQTtFQUNBLGdCQUFBO0NGY2Y7QUVuS0Q7RUF5SmMsWUFBQTtFQUNBLG1CQUFBO0NGYWI7QUV2S0Q7RUE0SmdCLGVBQUE7RUFDQSxjQUFBO0VBQ0EsbUJBQUE7RUFDQSxPQUFBO0NGY2Y7QUU3S0Q7RUFrS2dCLGVBQUE7RUFDQSxjQUFBO0VBQ0EsbUJBQUE7RUFDQSxPQUFBO0NGY2Y7QUVuTEQ7RUF5S2tCLFNBQUE7Q0ZhakI7QUV0TEQ7RUE0S2tCLFFBQUE7Q0ZhakI7QUV6TEQ7RUFpTGtCLFFBQUE7Q0ZXakI7QUU1TEQ7RUFvTGtCLFNBQUE7Q0ZXakI7QUUvTEQ7RUEwTFksbUJBQUE7RUFDQSxVQUFBO0VBQ0EsU0FBQTtFQUNBLFVBQUE7Q0ZRWDtBRVBXO0VBQ0UsYUFBQTtFQUNBLFdBQUE7RUFDQSwwQkFBQTtFQUNBLG1CQUFBO0VBQ0EsbUJBQUE7RUFDQSxZQUFBO0VBQ0EsV0FBQTtDRlNiO0FFOU1EO0VBeU1ZLG1CQUFBO0VBQ0EsT0FBQTtFQUNBLGtCQUFBO0VBQ0EsWUFBQTtFQUNBLG1CQUFBO0NGUVg7QUVQVztFQUNFLGVBQUE7Q0ZTYjtBRVBXO0VBQ0UsWUFBQTtFQUNBLGtCQUFBO0NGU2I7QUVQVztFQUNFLFlBQUE7RUFDQSxrQkFBQTtDRlNiO0FFaE9EO0VBK05jLGFBQUE7RUFDQSxlQUFBO0VBQ0EsbUJBQUE7RUFDQSxrQkFBQTtFQUNBLGlCQUFBO0NGSWI7QUVIYTtFQUNFLGNBQUE7Q0ZLZjtBRUhhO0VBQ0UsWUFBQTtFQUNBLDBCQUFBO0NGS2Y7QUVIYTtFQUNFLFlBQUE7RUFDQSwwQkFBQTtDRktmO0FFSGE7RUFDRyxZQUFBO0VBQ0QsdUJBQUE7Q0ZLZjtBRXRQRDtFQXFQYyxlQUFBO0VBQ0EsbUJBQUE7RUFDQSxrQkFBQTtFQUNBLGtCQUFBO0VBQ0EsbUJBQUE7RUFDQSxZQUFBO0NGSWI7QUVIYTtFQUNFLDBCQUFBO0NGS2Y7QUVIYTtFQUNFLDBCQUFBO0NGS2Y7QUVIYTtFQUNFLHVCQUFBO0NGS2Y7QUV2UUQ7RUErUUksWUFBQTtFQUNBLCtCQUFBO1VBQUEsdUJBQUE7RUFDQSx1QkFBQTtFQUNBLHFCQUFBO0NGTEg7QUU3UUQ7RUFvUk0sYUFBQTtFQUNBLG9CQUFBO0VBQ0Esc0JBQUE7Q0ZKTDtBRWxSRDtFQXdSUSxtQkFBQTtFQUNBLGtCQUFBO0VBQ0Esc0JBQUE7Q0ZIUDtBRUlPO0VBQ0UsYUFBQTtDRkZUO0FFSU87RUFDRSxrQkFBQTtDRkZUO0FFSU87RUFDRSxrQkFBQTtDRkZUO0FFaFNEO0VBdVNNLHFCQUFBO0VBQUEscUJBQUE7RUFBQSxjQUFBO0NGSkw7QUVuU0Q7RUEwU1EsYUFBQTtFQUNBLG9CQUFBO01BQUEsWUFBQTtVQUFBLFFBQUE7Q0ZKUDtBRXZTRDtFQTZTVSxZQUFBO0VBQ0Esa0JBQUE7RUFDQSxnQkFBQTtFQUNBLG1CQUFBO0VBQ0EsaUJBQUE7RUFDQSxlQUFBO0VBQ0EsbUJBQUE7RUFDQSxpQkFBQTtFQUNBLG1CQUFBO0VBQ0EsdUJBQUE7RUFDQSwrQkFBQTtVQUFBLHVCQUFBO0VBQ0EsYUFBQTtDRkhUO0FFSVM7RUFDRSxjQUFBO0NGRlg7QUV4VEQ7RUErVFEsWUFBQTtFQUNBLGtCQUFBO0VBQ0EsbUJBQUE7Q0ZKUDtBRTdURDtFQW1VVSxZQUFBO0VBQ0EsbUJBQUE7RUFDQSxtQkFBQTtFQUNBLFlBQUE7RUFDQSxlQUFBO0VBQ0EsVUFBQTtFQUNBLFFBQUE7RUFDQSxhQUFBO0VBQ0EsMEJBQUE7Q0ZIVDtBRUlTO0VBQ0UsY0FBQTtDRkZYO0FFSVM7RUFDRSxhQUFBO0NGRlg7QUVJUztFQUNFLGFBQUE7Q0ZGWDtBRWpWRDtFQXlWTSwwQkFBQTtFQUNBLG1CQUFBO0VBQ0Esc0JBQUE7Q0ZMTDtBRXRWRDtFQTZWUSxzQkFBQTtFQUNBLGFBQUE7RUFDQSxhQUFBO0VBQ0EsaUJBQUE7Q0ZKUDtBRTVWRDtFQWtXVSxhQUFBO0VBQ0EsWUFBQTtDRkhUIiwiZmlsZSI6InRvLmNzcyJ9 */

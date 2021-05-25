@@ -1,0 +1,30 @@
+.warning-time {
+  margin-right: 0.5rem;
+  color: #e85a71;
+  font-weight: 700;
+}
+.warning-handler a {
+  font-weight: 700;
+  margin-right: 0.5rem;
+}
+.warning-info {
+  font-weight: 700;
+  margin-right: 0.5rem;
+  color: #555;
+}
+.warning-type {
+  font-weight: 700;
+  color: #282c37;
+}
+.warning-link {
+  height: 2.5rem;
+  padding-top: 0.5rem;
+}
+.warning-panel {
+  border-bottom: 1px solid #eee;
+  padding: 1rem 0;
+}
+.warning-panel:last-child {
+  border: none;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL2V4cGVyaW1lbnRhbC9sb2cvd2FybmluZy5sZXNzIiwiPGlucHV0IGNzcyAxOT4iXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRSxxQkFBQTtFQUNBLGVBQUE7RUFDQSxpQkFBQTtDQ0NEO0FEQ0Q7RUFDRSxpQkFBQTtFQUNBLHFCQUFBO0NDQ0Q7QURDRDtFQUNFLGlCQUFBO0VBQ0EscUJBQUE7RUFDQSxZQUFBO0NDQ0Q7QURDRDtFQUNFLGlCQUFBO0VBQ0EsZUFBQTtDQ0NEO0FEQ0Q7RUFDRSxlQUFBO0VBQ0Esb0JBQUE7Q0NDRDtBRENEO0VBQ0UsOEJBQUE7RUFDQSxnQkFBQTtDQ0NEO0FEQ0Q7RUFDRSxhQUFBO0NDQ0QiLCJmaWxlIjoidG8uY3NzIn0= */

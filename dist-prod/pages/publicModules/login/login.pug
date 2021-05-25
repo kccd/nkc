@@ -1,0 +1,118 @@
+include ../verifications/verifications
++includeCSS("/publicModules/login/login.css")
+//- script(src="https://ssl.captcha.qq.com/TCaptcha.js")
+.modal.fade#moduleLogin(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+  .modal-dialog(role="document")#moduleLoginApp
+    .modal-content
+      .modal-header
+        if !state.isApp
+          button.close(@click="close")
+            span(aria-hidden="true") &times;
+        else
+          .rn-close(@click="close") 关闭
+          //h4.modal-title 图片选择
+      .modal-body.p-t-0.p-b-0
+        .row
+          .col-xs-12.col-md-12
+            div.site-name=state.serverSettings.websiteName
+            p.site-description=state.serverSettings.brief
+          .col-xs-12.col-md-12(v-if="type === 'login'")
+            .login-types
+              .login-type(:class="{'active':category==='username'}" @click="selectCategory('username')")
+                .login-type-icon
+                  .fa.fa-user
+                .login-type-info 用户名+密码
+              .login-type(:class="{'active':category==='mobile'}" @click="selectCategory('mobile')")
+                .login-type-icon
+                  .fa.fa-mobile
+                .login-type-info 手机号+密码
+              .login-type(:class="{'active':category==='mobileCode'}" @click="selectCategory('mobileCode')")
+                .login-type-icon
+                  .fa.fa-commenting
+                .login-type-info 手机号+验证码
+          .login-form.col-xs-12.col-md-12
+            .form
+              div(v-if="type === 'login'")
+                div(v-if="category === 'username'")
+                  .form-group
+                    input.form-control.input(type="text" name="username" placeholder="用户名" v-model.trim="username" @input="throwError('')" @keyup.enter="submit" autocomplete="username")
+                  .form-group
+                    input.form-control.input(type="password" name="password" placeholder="密码" v-model.trim="password" @input="throwError('')" @keyup.enter="submit" autocomplete="current-password")
+                div(v-else-if="category === 'mobile'")
+                  .form-group
+                    select.form-control.input(v-model="nationCode" @input="throwError('')" @keyup.enter="submit")
+                      option(v-for="code in nationCodes" :value="code.code") +{{code.code}} {{code.chineseName}}
+                  .form-group
+                    <input type="password" name="txtPassword" style="display:none">
+                    input.form-control.input(name="txtPassword" type="text" placeholder="手机号" v-model.trim="mobile" @input="throwError('')" @keyup.enter="submit" autocomplete="tel")
+                  .form-group
+                    input.form-control.input(type="password" placeholder="密码" v-model.trim="password" @input="throwError('')" @keyup.enter="submit" autocomplete="current-password")
+                div(v-else-if="category === 'mobileCode'")
+                  .form-group
+                    select.form-control.input(v-model="nationCode" @input="throwError('')" @keyup.enter="submit")
+                      option(v-for="code in nationCodes" :value="code.code") +{{code.code}} {{code.chineseName}}
+                  .form-group
+                    input.form-control.input(type="text" placeholder="手机号" v-model.trim="mobile" @input="throwError('')" @keyup.enter="submit" autocomplete="tel")
+                  .row
+                    .col-xs-6
+                      .form-group
+                        input.form-control.input(type="text" placeholder="短信验证码" v-model.trim="code" @input="throwError('')" @keyup.enter="submit")
+                    .col-xs-6.text-right
+                      .send-mobile-code(v-if="waiting === 0" @click="sendMobileCode") 发送验证码
+                      .send-mobile-code.disabled(v-else) 发送验证码({{waiting}})
+              //- 有关注册
+              div(v-else)
+                div(v-if='registerStep === 2')
+                  .form-group
+                    select.form-control.input(v-model="nationCode" @input="throwError('')" @keyup.enter="submit")
+                      option(v-for="code in nationCodes" :value="code.code") +{{code.code}} {{code.chineseName}}
+                    h5.text-danger(v-if="nationCode !== '86' && nationCode !== 86" style="font-size: 1rem")
+                      | 【海外用户】请注册后立即绑定邮箱，否则无密保功能。
+                      div(style="margin-top: 0.5rem;") 【海外用户】发表的内容可能需要经过人工审核才显示。
+                  .form-group
+                    input.form-control.input(type="text" placeholder="手机号" v-model.trim="mobile" @input="throwError('')" @keyup.enter="submit")
+                  .row
+                    .col-xs-6
+                      .form-group
+                        input.form-control.input(type="text" placeholder="短信验证码" v-model.trim="code" @input="throwError('')" @keyup.enter="submit")
+                    .col-xs-6.text-right
+                      .send-mobile-code(v-if="waiting === 0" @click="sendMobileCode('register')") 发送验证码
+                      .send-mobile-code.disabled(v-else) 发送验证码({{waiting}})
+                div(v-else)
+                  .form-group
+                    input.form-control.input(type="text" placeholder="用户名" v-model.trim="username" @input="throwError('')" @keyup.enter="submit")
+                  .form-group
+                    input.form-control.input(type='password' placeholder='密码' v-model.trim='password' @input='throwError("")' @keyup.enter='submit')
+                  .form-group
+                    input.form-control.input(type='password' placeholder='重复密码' v-model.trim='repeatPassword' @input='throwError("")' @keyup.enter='submit')
+              .form-group
+                .text-left.m-b-1
+                  .text-danger(v-if="error")
+                    .fa.fa-exclamation-circle
+                    span {{error}}
+                .text-left.m-b-1(style="font-size:1rem" v-if="type === 'register'") 注册即代表同意
+                  a(href=`/protocol?type=register` target="_blank")=`《${state.serverSettings.websiteName}统一服务协议（注册协议）》`
+                .text-right
+                  .pull-left.link(v-if="type === 'login'")
+                    a(@click="selectType('register')") 注册
+                    | &nbsp;·&nbsp;
+                    a(href="/forgotPassword/mobile") 忘记密码
+                  .pull-left.link(v-else)
+                    a(@click="selectType('login')") 登录
+                  div(v-if="succeed")
+                    button.btn.post-button.button-icon.succeed 跳转中..
+                      //.fa.fa-check
+                  div(v-else-if='type === "login"')
+                    button.btn.post-button(@click="submit" v-if="!submitting") 登录
+                    button.btn.post-button(v-else)
+                      .fa.fa-spinner.fa-spin.fa-3x.fa-fw.button-icon
+                  div(v-else)
+
+                    button.btn.post-button.register-step(v-if='registerStep === 2' @click='changeStep(1)') 上一步
+                    button.btn.post-button.register-step(v-if='registerStep === 1' @click='changeStep(2)') 下一步
+
+                    button.btn.post-button(@click="submit" v-if="!submitting && registerStep === 2 && !submitting") 注册
+                    button.btn.post-button(v-if='submitting')
+                      .fa.fa-spinner.fa-spin.fa-3x.fa-fw.button-icon
++includeJS("/nationCodes/nationCodes.js")
++includeJS("/publicModules/login/login.js")

@@ -1,0 +1,239 @@
+extends ../../bootstrap_base
+block title
+  title=`权限设置 | ${data.forum.displayName}`
+  +includeCSS('/forum/settings/permission.css')
+block content
+  .container-fluid.max-width
+    #data.hidden=objToStr({libraryClosed: data.libraryClosed, forum: data.forum, roles: data.roles, grades: data.grades, permission: data.permission, operations: data.operations, moderators: data.moderators})
+    .row
+      .col-xs-12.col-md-2
+        include ../../module_forum_settings
+      .col-xs-12.col-md-10#app(v-cloak)
+        .panel.panel-default
+          .panel-heading 基本
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 总开关
+                .col-sm-10
+                  <label class="radio-inline">
+                    <input type="radio" :value="true" v-model='forum.accessible'> 开
+                  </label>
+                  <label class="radio-inline">
+                    <input type="radio" :value="false" v-model='forum.accessible'> 关
+                  </label>
+              .form-group
+                label.col-sm-2.control-label 导航可见
+                .col-sm-10
+                  <label class="radio-inline">
+                    <input type="radio" :value="true" v-model='forum.visibility'> 是
+                  </label>
+                  <label class="radio-inline">
+                    <input type="radio" :value="false" v-model='forum.visibility'> 否
+                  </label>
+              .form-group
+                label.col-sm-2.control-label 无权用户在导航可见
+                .col-sm-10
+                  <label class="radio-inline">
+                    <input type="radio" :value="true" v-model='forum.isVisibleForNCC'> 是
+                  </label>
+                  <label class="radio-inline">
+                    <input type="radio" :value="false" v-model='forum.isVisibleForNCC'> 否
+                  </label>
+              .form-group
+                label.col-sm-2.control-label 在父板块显示文章列表
+                .col-sm-10
+                  <label class="radio-inline">
+                  <input type="radio" :value="true" v-model='forum.displayOnParent'> 是
+                  </label>
+                  <label class="radio-inline">
+                  <input type="radio" :value="false" v-model='forum.displayOnParent'> 否
+                  </label>
+              .form-group
+                label.col-sm-2.control-label 在搜索页显示文章
+                .col-sm-10
+                  <label class="radio-inline">
+                  <input type="radio" :value="true" v-model='forum.displayOnSearch'> 是
+                  </label>
+                  <label class="radio-inline">
+                  <input type="radio" :value="false" v-model='forum.displayOnSearch'> 否
+                  </label>
+
+            p.text-danger
+              | 若「总开关」设置为「关」，则其余设置均默认为「否」。
+              br
+              | 若「导航可见」设置为「否」，则「无权用户在导航可见」默认为「否」。
+        .panel.panel-default
+          .panel-heading 阅读权限
+          .panel-body
+            strong 证书
+            .checkbox
+              label(v-for='r in roles').m-r-1
+                input(type='checkbox' :value='r._id' v-model='forum.permission.read.rolesId')
+                span {{r.displayName}}
+            strong 等级
+            .checkbox
+              label(v-for='r in grades').m-r-1
+                input(type='checkbox' :value='r._id' v-model='forum.permission.read.gradesId')
+                span {{r.displayName}}
+            strong 证书等级关系
+            .radio
+              label.m-r-1
+                input(type='radio' value='and' v-model='forum.permission.read.relation')
+                span 与
+              label
+                input(type='radio' value='or' v-model='forum.permission.read.relation')
+                span 或
+        .panel.panel-default
+          .panel-heading 发表权限（文章）
+          .panel-body
+            strong 证书
+            .checkbox
+              label(v-for='r in roles').m-r-1
+                input(type='checkbox' :value='r._id' v-model='forum.permission.write.rolesId')
+                span {{r.displayName}}
+            strong 等级
+            .checkbox
+              label(v-for='r in grades').m-r-1
+                input(type='checkbox' :value='r._id' v-model='forum.permission.write.gradesId')
+                span {{r.displayName}}
+            strong 证书等级关系
+            .radio
+              label.m-r-1
+                input(type='radio' value='and' v-model='forum.permission.write.relation')
+                span 与
+              label
+                input(type='radio' value='or' v-model='forum.permission.write.relation')
+                span 或
+        .panel.panel-default
+          .panel-heading 发表权限（回复和评论）
+          .panel-body
+            strong 证书
+            .checkbox
+              label(v-for='r in roles').m-r-1
+                input(type='checkbox' :value='r._id' v-model='forum.permission.writePost.rolesId')
+                span {{r.displayName}}
+            strong 等级
+            .checkbox
+              label(v-for='r in grades').m-r-1
+                input(type='checkbox' :value='r._id' v-model='forum.permission.writePost.gradesId')
+                span {{r.displayName}}
+            strong 证书等级关系
+            .radio
+              label.m-r-1
+                input(type='radio' value='and' v-model='forum.permission.writePost.relation')
+                span 与
+              label
+                input(type='radio' value='or' v-model='forum.permission.writePost.relation')
+                span 或
+        .panel.panel-default
+          .panel-heading 主管专家
+          .panel-body
+            .forum-moderators
+              span.forum-moderator(v-for='uid, index in forum.moderators').m-r-1
+                a(:href="'/u/' + uid" target='_blank' :data-float-uid='uid') {{users[uid].username}}
+                .icon.fa.fa-remove(title='移除' @click='removeModerator(index)')
+            .m-t-05
+              button.btn.btn-default(@click='addModerator') 添加
+        .panel.panel-default
+          .panel-heading 其他
+          .panel-body
+            .form.form-horizontal
+              .form-group
+                label.col-sm-3.control-label 分享链接访问次数限制
+                .col-sm-7
+                  input.form-control(type='text' v-model.number='forum.shareLimitCount')
+              .form-group
+                label.col-sm-3.control-label 分享链接有效时间(小时)
+                .col-sm-7
+                  input.form-control(type='text' v-model.number='forum.shareLimitTime')
+              .form-group
+                label.col-sm-3.control-label 关注类型
+                .col-sm-7
+                  .radio
+                    label
+                      input(type='radio' value='force' v-model='forum.subType')
+                      span.m-l-1 强制关注（未关注的可关注，关注后无法取消）
+                  .radio
+                    label
+                      input(type='radio' value='free' v-model='forum.subType')
+                      span.m-l-1 自由关注（可随意关注或取消关注）
+                  .radio
+                    label
+                      input(type='radio' value='unSub' v-model='forum.subType')
+                      span.m-l-1 不可关注（不可关注，已关注的可取消关注）
+              .form-group
+                label.col-sm-3.control-label 发表匿名内容
+                .col-sm-7
+                  .radio
+                    label.m-r-1
+                      input(type='radio' :value='true' v-model='forum.allowedAnonymousPost')
+                      span 允许
+                    label
+                      input(type='radio' :value='false' v-model='forum.allowedAnonymousPost')
+                      span 禁止
+              .form-group
+                label.col-sm-3.control-label 流控
+                .col-sm-7
+                  .radio
+                    label.m-r-1
+                      input(type='radio' :value='true' v-model='forum.openReduceVisits')
+                      span 开启
+                    label
+                      input(type='radio' :value='false' v-model='forum.openReduceVisits')
+                      span 关闭
+              .form-group
+                label.col-sm-3.control-label 文章排序
+                .col-sm-7
+                  .radio
+                    label.m-r-1
+                      input(type='radio' value='tlm' v-model='forum.orderBy')
+                      span 按回复时间
+                    label
+                      input(type='radio' value='toc' v-model='forum.orderBy')
+                      span 按发表时间
+              //displayPostAbstract
+              .form-group
+                label.col-sm-3.control-label 文章列表显示模式
+                .col-sm-7
+                  .radio
+                    label.m-r-1
+                      input(type='radio' value='abstract' v-model='forum.threadListStyle.type')
+                      span 摘要模式
+                    label.m-r-1
+                      input(type='radio' value='brief' v-model='forum.threadListStyle.type')
+                      span 简略模式
+                    label
+                      input(type='radio' value='minimalist' v-model='forum.threadListStyle.type')
+                      span 极简模式
+              .form-group
+                label.col-sm-3.control-label 文章列表封面图
+                .col-sm-7
+                  .radio
+                    label.m-r-1
+                      input(type='radio' value='left' v-model='forum.threadListStyle.cover')
+                      span 左侧
+                    label.m-r-1
+                      input(type='radio' value='right' v-model='forum.threadListStyle.cover')
+                      span 右侧
+                    label
+                      input(type='radio' value='null' v-model='forum.threadListStyle.cover')
+                      span 不显示
+              .form-group
+                label.col-sm-3.control-label 专业文库
+                .col-sm-7
+                  div(v-if='!forum.lid')
+                    button.btn.btn-sm.btn-default(@click=`libraryOperation('${data.forum.fid}', 'create')`) 开设文库
+                  div(v-else)
+                    button.btn.btn-sm.btn-default(@click=`libraryOperation('${data.forum.fid}', 'open')` v-if='libraryClosed') 开启文库
+                    button.btn.btn-sm.btn-default(@click=`libraryOperation('${data.forum.fid}', 'close')` v-else) 关闭文库
+        .m-t-1
+          button.btn.btn-primary.btn-block(@click='save' v-if='!saving') 保存
+          button.btn.btn-primary.btn-block(disabled v-else) 保存中...
+            .fa.fa-spinner.fa-spin
+block scripts
+  include ../../publicModules/selectUser/selectUser
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  +includeJS('/module_dropdown.js')
+  +includeJS('/forum/settings/permission.js')

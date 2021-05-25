@@ -1,0 +1,353 @@
+extends ./index.pug
+block title
+  -const product = data.product
+  -const dealInfo = data.dealInfo
+block name
+  .hidden#data= JSON.stringify({product: data.product})
+  link(href='/bootstrap/css/bootstrap-tagsinput.css' media="screen" rel='stylesheet')
+  link(href='/shop/manage/manage.css' media="screen" rel='stylesheet')
+  style.
+    .padding-0 {
+      padding: 0
+    }
+    .margin-0 {
+      margin: 0
+    }
+    .margin-right-10 {
+      margin-right: 10px
+    }
+    .pnameCla {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+      display: inline-block;
+      padding: 4px 6px;
+      color: #555;
+      vertical-align: middle;
+      border-radius: 4px;
+      max-width: 100%;
+      line-height: 22px;
+      cursor: text;
+    }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none !important;
+        margin: 0;
+    }
+  .row    
+    .col-xs-12.col-md-12
+      .col-xs-12
+        a.btn.btn-info(href=`/shop/manage/${data.user.uid}/goodslist`)
+          span.fa.fa-backward
+          | &nbsp;返回
+    .col-md-12.col-sm-12.col-xs-12
+      .col-xs-12
+        p 
+          span 商品名称：
+          span!=`${product.name}`
+      .col-xs-12
+        .panel.panel-info
+          .panel-heading
+            | 规格信息
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 商品多规格
+                .col-sm-10
+                  .checkbox
+                    label
+                      input#useparams(type='checkbox' checked=product.params.length==0?false:true)
+                      |  自定义多规格
+              #useParamsDom(style=product.params.length==0?"display:none":"")
+                .form-group
+                  label.col-sm-2.control-label 自定义规格
+                  .col-sm-10
+                    .panel.panel-default
+                      .panel-heading(style="padding:5px")
+                        span 商品属性列表
+                        //- a.fa.fa-plus(style="float:right;cursor:pointer"  data-toggle="modal" data-target="#addProductParams") 添加
+                        a.fa.fa-plus(style="float:right;cursor:pointer"  onclick="addNewParam()") 添加
+                      .panel-body(style="padding:5px")
+                        table.table.table-condensed.margin-0#paramsTable
+                          thead
+                            tr
+                              th
+                              th 属性名称
+                              th 
+                                span 属性值
+                                span.text-danger &nbsp;(多个标记请使用回车;标记最多字数8;标记最大个数5)
+                              th 
+                          tbody
+                .form-group
+                  label.col-sm-2.control-label 销售规格
+                  .col-sm-10
+                    .table-responsive
+                      table#arrayTable.table.table-condensed.table-bordered.margin-0.panel.panel-info
+                        thead.panel-heading
+                          tr
+                            th 规格名称
+                            th 是否禁用
+                            th 价格（元）
+                            th 数量（件）
+                            th 是否使用优惠
+                            th 优惠后价格
+                        tbody.panel-body()
+                .form-group
+                  label.col-sm-2
+                  .col-sm-10
+                    hr
+                .form-group
+                  label.col-sm-2.control-label 独立规格
+                  .col-sm-10
+                    .panel.panel-default
+                      .panel-heading(style="padding:5px")
+                        span 独立规格列表
+                        span.text-danger(style="font-size:10px") (如自定义规格不满足规格需求，可在此单独添加规格)
+                        a.fa.fa-plus(style="float:right;cursor:pointer"  onclick="addSingleParam()") 添加
+                      .panel-body(style="padding:5px")
+                        table.table.table-condensed.margin-0#singleParams
+                          thead
+                            tr
+                              th 规格名称
+                              th 价格（元）
+                              th 数量（件）
+                              th 是否适用优惠
+                              th 优惠后价格
+                              th 
+                          tbody
+              #nouseParamsDom(style=product.params.length==0?"display:block":"display:none")
+                .form-group
+                  label.col-sm-2.control-label 商品价格
+                  .col-sm-5
+                    .input-group
+                      input.form-control#originalPrice(type='number', placeholder="Product's Price", aria-describedby='originalPrice' value=product.params.length==0?numToFloatTwo(product.productParams[0].originPrice):"")
+                      span.input-group-addon 元
+                .form-group
+                  label.col-sm-2.control-label
+                  .col-sm-5
+                    .checkbox
+                      label
+                        input#usedis(type='checkbox' checked=product.params.length==0&&product.productParams.length > 0&&product.productParams[0].useDiscount?true:false)
+                        |  是否使用优惠后价格
+                .form-group#disCostDom(style=product.params.length==0&&product.productParams.length > 0&&product.productParams[0].useDiscount?"":"display:none")
+                  label.col-sm-2.control-label 优惠后价格
+                  .col-sm-5
+                    input#afterDisCost.form-control(type="number", name="" value=product.params.length==0&&product.productParams.length > 0&&product.productParams[0].useDiscount?numToFloatTwo(product.productParams[0].price):"")
+                .form-group
+                  label.col-sm-2.control-label 库存数量
+                  .col-sm-5
+                    .input-group
+                      input.form-control#stockQuantity(type='number', placeholder="Stock's Quantity", aria-describedby='stockQuantity' value=product.params.length==0?product.productParams[0].stocksSurplus:"")
+                      span.input-group-addon 件
+              .form-group
+                label.col-sm-2.control-label 会员折扣
+                .col-sm-10
+                  .checkbox
+                    label
+                      input#vipDiscount(type='checkbox' checked=product.vipDiscount?true:false)
+                      |  是否使用会员折扣（与优惠价格叠加）
+              .form-group#vipDisDom(style=checked=product.vipDiscount?"":"display:none")
+                label.col-sm-2.control-label 折扣详情
+                .col-sm-5.col-sm-10
+                  .table-responsive
+                    table.table.table-condensed.table-responsive.margin-0(style="padding:0")
+                      thead
+                        tr
+                          th vip等级
+                          th 折扣率(%)
+                      tbody
+                        for vip,index in product.vipDisGroup
+                          tr.viptr
+                            td.viplevel(style="width:30%" vid=`${vip.vipLevel}`)!=`v${vip.vipLevel}`
+                            td(style="width:70%")
+                              input.vipnum(type="text" style="width:100%" value=`${vip.vipNum}`)
+
+        .panel.panel-info
+          .panel-heading
+            | 销售信息
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 库存计数
+                .col-sm-8
+                  .radio
+                    label
+                      input#stockMethod1(type='radio', name='stockCostMethod', value='orderReduceStock', checked=product.stockCostMethod=='orderReduceStock'?true:false)
+                      |     买家拍下减库存
+                      b(style="color:red")  （拍下减库存，存在恶拍风险）
+                  .radio
+                    label
+                      input#stockMethod2(type='radio', name='stockCostMethod', value='payReduceStock' checked=product.stockCostMethod=='payReduceStock'?true:false)
+                      |     买家付款减库存
+                      b(style="color:red")  （付款减库存，存在超卖风险）
+        .panel.panel-info
+          .panel-heading
+            | 显示设置
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 价格显示
+                .col-sm-10
+                  .checkbox
+                    label
+                      input#priceShowToVisit(type='checkbox' checked=product.productSettings.priceShowToVisit?true:false)
+                      |  价格是否游客可见
+              .form-group
+                label.col-sm-2.control-label 
+                .col-sm-10
+                  .checkbox
+                    label
+                      input#priceShowAfterStop(type='checkbox' checked=product.productSettings.priceShowAfterStop?true:false)
+                      |  停售以后，是否显示价格
+        .panel.panel-info
+          .panel-heading
+            | 购买条件
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 购买限制
+                .col-sm-10
+                  .checkbox
+                    label
+                      input#isPurchaseLimit(type='checkbox' checked=product.purchaseLimitCount>-1?true:false)
+                      |  是否限购
+              .form-group#purchaseLimitDom(style=product.purchaseLimitCount>-1?"":"display:none")
+                label.col-sm-2.control-label 每人限购数量
+                .col-sm-8
+                  input.form-control#purchaseLimitCount(type="number", name="" value=product.purchaseLimitCount!==-1?product.purchaseLimitCount:"")
+              .form-group
+                label.col-sm-2.control-label 购买凭证
+                .col-sm-10
+                  .checkbox
+                    label
+                      input#isUploadCert(type='checkbox' checked=product.uploadCert?true:false)
+                      |  是否需要上传购买凭证
+              .form-group#uploadCertDom(style=product.uploadCert?"":"display:none")
+                label.col-sm-2.control-label 凭证说明
+                .col-sm-8
+                  input.form-control#uploadCertDescription(type="text", name="" maxlength="50" placeholder="请简单说明买家需上传哪种凭证，不超过50字" value=product.uploadCert?product.uploadCertDescription:"")
+        .panel.panel-info
+          .panel-heading
+            | 运费物流
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-1.control-label 运费承担
+                .col-sm-8
+                  label.radio-inline
+                    input#freightMethod1(type='radio', name='freightMethod', value='freePost' checked=product.isFreePost ? true : false)
+                    |  免邮费
+                  label.radio-inline
+                    input#freightMethod2(type='radio', name='freightMethod', value='payPost' checked=product.isFreePost ? false : true)
+                    |  买家承担邮费
+              .form-group#freightPriceDom(style=product.isFreePost ? "display:none": "")
+                label.col-sm-1.control-label
+                .col-sm-8
+                  .table-responsive
+                    table.table-bordered.table-condensed#templateTable
+                      thead
+                        tr 
+                          th 
+                          th 模板
+                          th 运费价格
+                      tbody
+                        tr 
+                          td(colspan=3) 当前商品运费
+                        for proTemp in product.freightTemplates
+                          tr
+                            td
+                              input.tempCheck(type="checkbox" checked="checked")
+                            td
+                              span.tempName!=`${proTemp.name}`
+                            td
+                              span 首件商品运费 
+                              span 
+                                input.firstFreightPrice(type="number", name="", style="width:30px", value=numToFloatTwo(proTemp.firstPrice))
+                              span  元，
+                              span 每增加 1 件商品，增加运费 
+                              span 
+                                input.addFreightPrice(type="number", name="", style="width:30px", value=numToFloatTwo(proTemp.addPrice))
+                              span  元 
+                        tr
+                          td(colspan=3) 运费模板
+                        for dealTemp in dealInfo.templates
+                          tr
+                            td
+                              input.tempCheck(type="checkbox")
+                            td
+                              span.tempName!=`${dealTemp.name}`
+                            td
+                              span 首件商品运费 
+                              span 
+                                input.firstFreightPrice(type="number", name="", style="width:30px", value=`${dealTemp.firstPrice}`)
+                              span  元，
+                              span 每增加 1 件商品，增加运费 
+                              span 
+                                input.addFreightPrice(type="number", name="", style="width:30px", value=`${dealTemp.addPrice}`)
+                              span  元 
+                  p.text-danger 注意： 运费模板提供便捷的运费选择，与当前商品运费互不冲突，可存在相同模板名称，请自行区别。
+        .panel.panel-info
+          .panel-heading
+            | 图文描述
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-1.control-label 商品图片
+                -let n = 0
+                .col-sm-8#productImages
+                  while n < 5
+                    .upload_image_item(id=`productImage${n+1}`)
+                      if product.imgIntroductions && product.imgIntroductions[n]
+                        .upload_image_item_border(onclick=`openImageManage('productImage${n+1}')` data-toggle="modal" data-target="#myModal" style="display:none")
+                          .upload_image_item_content
+                            i.upload_image_plus.fa.fa-plus
+                            p.upload_image_text 点击添加商品图
+                        .upload_image_card
+                          img.picShow(src=`/r/${product.imgIntroductions[n]}` imageId=`${product.imgIntroductions[n]}`)
+                          .upload_image-tools
+                            i.fa.fa-trash.upload_image_trash(onclick=`deleteImageInProduct('productImage${n+1}')`)
+                      else
+                        .upload_image_item_border(onclick=`openImageManage('productImage${n+1}')` data-toggle="modal" data-target="#myModal")
+                          .upload_image_item_content
+                            i.upload_image_plus.fa.fa-plus
+                            p.upload_image_text 点击添加商品图
+                        .upload_image_card(style="display:none")
+                          img(src="")
+                          .upload_image-tools
+                            i.fa.fa-trash.upload_image_trash(onclick=`deleteImageInProduct('productImage${n+1}')`)
+                    -n++
+        .form-group
+          label.col-sm-2.control-label
+          .col-sm-8(style="text-align:center")
+            button#resaveBtn.btn.btn-primary.radius(onclick=`editProductShelf("${data.user.uid}","${product.productId}")`, type='submit')
+              i.fa.fa-save
+              | &nbsp;保存修改
+      #myModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+        .modal-dialog(role='document')
+          .modal-content
+            .modal-header
+              button.close(type='button', data-dismiss='modal', aria-label='Close')
+                span(aria-hidden='true') ×
+              h4#myModalLabel.modal-title 图片管理器
+            .modal-body
+              .row#imageArrayDom()
+            .modal-footer
+              nav(aria-label='Page navigation')
+                ul.pagination(style="margin:0")  
+                  li
+                    a(href='javascript:void(0);', aria-label='Previous' onclick="prevPageManage()")
+                      span(aria-hidden='true') «
+                  li 
+                    b#currentSkip 
+                    b /
+                    b#maxSkip     
+                  li
+                    a(href='javascript:void(0);', aria-label='Next' onclick="nextPageManage()")
+                      span(aria-hidden='true') »     
+block manageScripts
+  +includeJS("/interface_common.js")
+  +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
+  +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
+  +includeJS("/bootstrap/js/bootstrap-tagsinput.js")
+  +includeJS("/shop/manage/shelf.js")
+  +includeJS("/shop/manage/goodslist.js")

@@ -1,10 +1,10 @@
 # nkc
 
 ## Requirements
-- Base: [Node.js](https://nodejs.org) v8.9.1
+- Base: [Node.js](https://nodejs.org) v12.14.0
       
 - Database: 
-    1. **[mongoDB](https://www.mongodb.com)** v3.4
+    1. **[mongoDB](https://www.mongodb.com)** v4.4.5
     2. **[Redis](https://redis.io/)** v3.2.100
  
 - Image Processing: **[ImageMagick](https://www.imagemagick.org)** v7.0 or higher
@@ -13,8 +13,8 @@
 
 ## Main Frameworks
 - Web Framework: **[Koa](http://koajs.com)**
-- Template Language: **[pug](https://pugjs.org)**
-- ORM: **[mongoose](https://www.mongoosejs.com)** v4.\*, v5.\* may not be compatible.
+- Template Language: **[Pug](https://pugjs.org)**
+- ORM: **[Mongoose](https://www.mongoosejs.com)**
 
 ## Install
 

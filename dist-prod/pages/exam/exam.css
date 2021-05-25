@@ -1,0 +1,175 @@
+.exam-logo {
+  height: 7rem;
+  width: 7rem;
+}
+.exam-image {
+  width: 100%;
+}
+.exam-add-question-btn {
+  height: 5rem;
+  display: block;
+  font-size: 2rem;
+  text-align: center;
+  line-height: 5rem;
+  background-color: #3389b7;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 2px;
+}
+.exam-add-question-btn:hover,
+.exam-add-question-btn:visited,
+.exam-add-question-btn:active,
+.exam-add-question-btn:link {
+  text-decoration: none;
+  color: #fff;
+}
+.user-list-avatar {
+  vertical-align: middle;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  margin-right: 1.1rem;
+  margin-bottom: 1rem;
+}
+.paper-radio {
+  display: block;
+}
+.paper-radio p {
+  margin: 0;
+}
+.paper-content {
+  font-size: 1.3rem;
+}
+.paper-answer {
+  font-size: 1.2rem;
+  color: #333;
+  padding-bottom: 1rem;
+}
+.category-link {
+  padding-right: 1rem;
+}
+.exam-nav {
+  padding: 0.5rem 1rem;
+  background-color: #eee;
+  overflow: hidden;
+  border-radius: 2px;
+}
+.exam-nav li {
+  list-style: none;
+  float: left;
+  margin-right: 1rem;
+}
+.exam-nav li a {
+  color: #555;
+  font-size: 1.2rem;
+}
+.red-point {
+  /* height: 16px;
+  font-size: 1rem;
+  border-radius: 50%;
+  vertical-align: middle;
+  min-width: 16px;
+  background-color: red;
+  color: #fff;
+  text-align: center;
+  line-height: 16px; */
+  display: inline-block;
+  color: red;
+}
+.question-editor {
+  width: 100%;
+  background-color: #fff;
+  height: 100%;
+  overflow-y: scroll;
+  position: fixed;
+  left: 0;
+  top: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  z-index: 1000;
+  padding: 2rem;
+}
+.question-header {
+  text-align: right;
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 2rem;
+  width: 100%;
+  z-index: 1001;
+}
+.question-info {
+  width: 60rem;
+  margin: auto;
+  max-width: 100%;
+}
+.question-user-avatar {
+  height: 1.5rem;
+  width: 1.5rem;
+  margin-right: 2px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+.question-panel {
+  font-size: 1.2rem;
+  padding: 2rem 0;
+}
+.question-panel a {
+  font-size: 1.2rem;
+  color: #555 !important;
+}
+.question-panel span {
+  display: inline-block;
+  /*margin-right: 1rem;*/
+  color: #555;
+}
+.question-content {
+  margin: 0.5rem 0;
+  font-size: 1.3rem;
+}
+.question-content img {
+  max-width: 100%;
+}
+.question-content p {
+  margin-bottom: 0;
+}
+.question-answer {
+  margin: 0.5rem 0;
+  vertical-align: middle;
+  font-size: 1.2rem;
+}
+.category-name a {
+  color: #555 !important;
+  font-size: 1.6rem;
+}
+.category-description {
+  font-size: 1rem;
+  height: 3.5rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.paper-panel {
+  /*padding: 1rem;*/
+}
+.editor-icon-submitted {
+  /*padding-top: 4rem;*/
+  /*text-align: center;*/
+}
+.paper-img {
+  margin-top: 1rem;
+}
+.paper-panel p {
+  margin-bottom: 0;
+}
+.question-answer p {
+  margin-bottom: 0;
+}
+.question-option {
+  margin-right: 1rem;
+}
+.pre-content {
+  white-space: pre-wrap;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL2V4YW0vZXhhbS5sZXNzIiwiPGlucHV0IGNzcyAxND4iXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRSxhQUFBO0VBQ0EsWUFBQTtDQ0NEO0FEQ0Q7RUFDRSxZQUFBO0NDQ0Q7QURDRDtFQUNFLGFBQUE7RUFDQSxlQUFBO0VBQ0EsZ0JBQUE7RUFDQSxtQkFBQTtFQUNBLGtCQUFBO0VBQ0EsMEJBQUE7RUFDQSxZQUFBO0VBQ0Esc0JBQUE7RUFDQSxtQkFBQTtDQ0NEO0FEQ0Q7Ozs7RUFDRSxzQkFBQTtFQUNBLFlBQUE7Q0NJRDtBREZEO0VBQ0UsdUJBQUE7RUFDQSxZQUFBO0VBQ0EsYUFBQTtFQUNBLG1CQUFBO0VBQ0EscUJBQUE7RUFDQSxvQkFBQTtDQ0lEO0FERkQ7RUFDRSxlQUFBO0NDSUQ7QURGRDtFQUNFLFVBQUE7Q0NJRDtBREZEO0VBQ0Usa0JBQUE7Q0NJRDtBREZEO0VBQ0Usa0JBQUE7RUFDQSxZQUFBO0VBQ0EscUJBQUE7Q0NJRDtBREZEO0VBQ0Usb0JBQUE7Q0NJRDtBREZEO0VBQ0UscUJBQUE7RUFDQSx1QkFBQTtFQUNBLGlCQUFBO0VBQ0EsbUJBQUE7Q0NJRDtBREZEO0VBQ0UsaUJBQUE7RUFDQSxZQUFBO0VBQ0EsbUJBQUE7Q0NJRDtBREZEO0VBQ0UsWUFBQTtFQUNBLGtCQUFBO0NDSUQ7QURGRDtFQ0lFOzs7Ozs7Ozt1QkFRcUI7RURGckIsc0JBQUE7RUFDQSxXQUFBO0NDSUQ7QURFRDtFQUNFLFlBQUE7RUFDQSx1QkFBQTtFQUNBLGFBQUE7RUFDQSxtQkFBQTtFQUNBLGdCQUFBO0VBQ0EsUUFBQTtFQUNBLE9BQUE7RUFDQSwrQkFBQTtVQUFBLHVCQUFBO0VBQ0EsY0FBQTtFQUNBLGNBQUE7Q0NBRDtBREVEO0VBQ0Usa0JBQUE7RUFDQSxnQkFBQTtFQUNBLE9BQUE7RUFDQSxTQUFBO0VBQ0EsY0FBQTtFQUNBLFlBQUE7RUFDQSxjQUFBO0NDQUQ7QURFRDtFQUNFLGFBQUE7RUFDQSxhQUFBO0VBQ0EsZ0JBQUE7Q0NBRDtBREVEO0VBQ0UsZUFBQTtFQUNBLGNBQUE7RUFDQSxrQkFBQTtFQUNBLG1CQUFBO0VBQ0EsdUJBQUE7Q0NBRDtBREVEO0VBQ0Usa0JBQUE7RUFDQSxnQkFBQTtDQ0FEO0FERUQ7RUFDRSxrQkFBQTtFQUNBLHVCQUFBO0NDQUQ7QURFRDtFQUNFLHNCQUFBO0VDQUEsdUJBQXVCO0VERXZCLFlBQUE7Q0NBRDtBREVEO0VBQ0UsaUJBQUE7RUFDQSxrQkFBQTtDQ0FEO0FERUQ7RUFDRSxnQkFBQTtDQ0FEO0FER0Q7RUFDRSxpQkFBQTtDQ0REO0FER0Q7RUFDRSxpQkFBQTtFQUNBLHVCQUFBO0VBQ0Esa0JBQUE7Q0NERDtBREdEO0VBQ0UsdUJBQUE7RUFDQSxrQkFBQTtDQ0REO0FER0Q7RUFDRSxnQkFBQTtFQUNBLGVBQUE7RUFDQSxxQkFBQTtFQUNBLDZCQUFBO0VBQ0Esc0JBQUE7RUFDQSxpQkFBQTtDQ0REO0FER0Q7RUNERSxrQkFBa0I7Q0FDbkI7QURHRDtFQ0RFLHNCQUFzQjtFQUN0Qix1QkFBdUI7Q0FDeEI7QURHRDtFQUNFLGlCQUFBO0NDREQ7QURHRDtFQUNFLGlCQUFBO0NDREQ7QURHRDtFQUNFLGlCQUFBO0NDREQ7QURHRDtFQUNFLG1CQUFBO0NDREQ7QURJRDtFQUNFLHNCQUFBO0NDRkQiLCJmaWxlIjoidG8uY3NzIn0= */

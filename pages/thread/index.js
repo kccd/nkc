@@ -1098,19 +1098,22 @@ function moveThread() {
 	window.MoveThread.open(function(data) {
 		var forums = data.forums;
 		var moveType = data.moveType;
-		MoveThread.lock();
+		const {violation, violationReason} = data;
+		window.MoveThread.lock();
 		nkcAPI("/threads/move", "POST", {
 			forums: forums,
 			moveType: moveType,
-			threadsId: [threadData.tid]
+			threadsId: [threadData.tid],
+      violation,
+      violationReason
 		})
 			.then(function() {
 				screenTopAlert("操作成功");
-				MoveThread.close();
+				window.MoveThread.close();
 			})
 			.catch(function(data) {
 				sweetError(data);
-				MoveThread.unlock();
+				window.MoveThread.unlock();
 			})
 	}, {
 		selectedCategoriesId: threadData.categoriesId,

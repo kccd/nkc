@@ -1,0 +1,135 @@
++includeCSS("/publicModules/survey/form.css")
+.survey-form.module-survey-form(v-cloak id=surveyFormId || "moduleSurveyForm" data-survey-id=surveyId || "")
+  .text-center.m-t-3.m-b-3(v-if="loading")
+    b 加载中...
+  div(v-else)
+    //- 表单介绍，当类型为"vote"时，内容从option[0].content中取
+    .survey-form-description(v-if="survey.type !== 'vote'") {{survey.description}}
+    .survey-form-description(v-else) {{survey.options[0].content}}
+
+    .option-resources(v-if="survey.type === 'vote'")
+      .option-resource
+        img(v-for="r in survey.options[0].resourcesId" :src="'/rt/' + r" :data-src="'/r/' + r" data-type='view')
+      .option-links(v-if="survey.options[0].links && survey.options[0].links")
+        a.option-link(v-for="l in survey.options[0].links" @click="visitUrl(l)" :title="l") {{l}}
+
+    // 投票
+    .survey-form-options(v-if="survey.type === 'vote'")
+      .survey-form-option.option-answer(v-for="o, index in survey.options[0].answers")
+        .option-content {{index + 1}}. {{o.content}}
+          .option-button(@click="selectOption(0, index)" v-if="havePermission")
+            .fa.fa-check-square-o(v-if="optionsObj[survey.options[0]._id + '-' + o._id] && optionsObj[survey.options[0]._id + '-' + o._id].selected")
+            .fa.fa-square-o(v-else-if="!posted")
+        .option-info
+          .option-resources(v-if="o.resourcesId && o.resourcesId.length")
+            .option-resource
+              img(v-for="r in o.resourcesId" :src="'/rt/' + r" :data-src="'/r/' + r" data-type='view')
+            .option-links(v-if="o.links && o.links.length")
+              a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
+        .option-status(v-if="showResult")
+          .option-status-container
+            .number-background
+            .number(:style="'width: ' + o.domProgress + '%;background-color:' + o.color")
+          .option-status-info(:title="o.progress + '% ' + o.postCount + '票'") {{o.progress}}% {{o.postCount}}票
+      .option-select-count {{selectCount(survey.options[0])}}
+    // 问卷调查
+    .survey-form-options(v-else-if="survey.type === 'survey'")
+      .survey-form-option(v-for="o, index in survey.options")
+        .option-content.option-survey {{index + 1}}. {{o.content}}
+        .option-info
+          .option-resources
+            .option-resource(v-if="o.resourcesId && o.resourcesId.length")
+              img(v-for="r in o.resourcesId" :src="'/rt/' + r" :data-src="'/r/' + r" data-type='view')
+            //p {{o.description}}
+            .option-links(v-if="o.links && o.links.length")
+              a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
+        .option-answers(v-if="o.answers && o.answers.length")
+          .option-answer(v-for="a,index_ in o.answers")
+            .option-content.answer-content {{index+1}}-{{index_+1}}. {{a.content}}
+              .option-button(@click="selectOption(index, index_)" v-if="havePermission")
+                .fa.fa-check-square-o(v-if="optionsObj[o._id + '-' + a._id] && optionsObj[o._id + '-' + a._id].selected")
+                .fa.fa-square-o(v-else-if="!posted")
+            .option-info
+              .option-resources
+                .option-resource(v-if="a.resourcesId && a.resourcesId.length")
+                  img(v-for="r in a.resourcesId" :src="'/rt/' + r" :data-src="'/r/' + r" data-type='view')
+                .option-links(v-if="a.links && a.links.length")
+                  a.option-link(v-for="l in a.links" @click="visitUrl(l)" :title="l") {{l}}
+            .option-status(v-if="showResult")
+              .option-status-container
+                .number-background
+                .number(:style="'width: ' + a.domProgress + '%;background-color:' + a.color")
+              .option-status-info(:title="a.progress + '% ' + a.postCount + '票'") {{a.progress}}% {{a.postCount}}票
+        //- 勾选数量限制
+        .option-select-count {{selectCount(o)}}
+    // 打分
+    .survey-form-options(v-else)
+      .survey-form-option(v-for="o, index in survey.options")
+        .option-content.option-survey {{index + 1}}. {{o.content}}
+        .option-info
+          .option-resources
+            .option-resource(v-if="o.resourcesId && o.resourcesId.length")
+              img(v-for="r in o.resourcesId" :src="'/rt/' + r" :data-src="'/r/' + r" data-type='view')
+            .option-links(v-if="o.links && o.links.length")
+              a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
+        .option-answers(v-if="o.answers && o.answers.length")
+          .option-answer(v-for="a,index_ in o.answers" :class="{'error': !!errorInfo[o._id + '_' + a._id]}" :id="o._id + '_' + a._id")
+            .option-content.answer-content {{index+1}}-{{index_+1}}. {{a.content}}
+            .option-info
+              .option-resources
+                .option-resource(v-if="a.resourcesId && a.resourcesId.length")
+                  img(v-for="r in a.resourcesId" :src="'/rt/' + r" :data-src="'/r/' + r" data-type='view')
+                //p {{o.description}}
+                .option-links(v-if="a.links && a.links.length")
+                  a.option-link(v-for="l in a.links" @click="visitUrl(l)" :title="l") {{l}}
+            .option-score-input(v-if="havePermission || posted") 得分：
+              input(type="text" v-model.number="optionsObj[o._id + '-' + a._id].score" v-if="!posted")
+              .score(v-else-if="optionsObj[o._id + '-' + a._id]") {{optionsObj[o._id + '-' + a._id].score}}
+              .score(v-else) 未打分
+              | （范围{{a.minScore}}到{{a.maxScore}}，精确到 0.01）
+            .option-status-info.survey-score(v-if="showResult") 平均：{{a.average}}，最高：{{a.postMaxScore.toFixed(2)}}，最低：{{a.postMinScore.toFixed(2)}}
+        .option-select-count(v-if="showResult") 总平均分：{{o.postScore?(o.postScore/(survey.postCount)).toFixed(2):0}}
+    .survey-form-button
+      .form-warning
+        //- 显示投票结果
+        div(v-if="showResult")
+          p {{postResult}}
+          .form-post-users(v-if='users && users.length')
+            a(onclick="NKC.methods.visitUrl('/u/' + user.uid)" :data-float-uid="user.uid" v-for="user in users")
+              img(:src="getUrl('userAvatar', user.avatar)")
+        //- 时间限制
+        p(v-if="timeInfo") {{timeInfo}}
+        //- 奖励
+        p(v-if="rewardInfo") {{rewardInfo}}
+        //- 结果展示
+        p(v-if="survey.showResult === 'self'") 结果不公开。
+        p(v-else-if="survey.showResult === 'posted'")
+          span(v-if="survey.showResultAfterTheEnd") 参与的用户在结束后可查看结果。
+          span(v-else) 结果只向参与的用户展示。
+        p(v-else-if="survey.showResult === 'all'")
+          span(v-if="survey.showResultAfterTheEnd") 结束后可查看结果。
+        //- 提交时间
+        p(v-if="postTime")
+          if data.user
+            | 你已于 {{postTime}} 提交结果。
+            a.pointer(@click='modifyPost' v-if="status === 'beginning'") 修改
+          else
+            | 你的IP已于 {{postTime}} 提交结果。若你没有提交过，请&nbsp;
+            a(onclick="Login.open('login')") 登录
+            | &nbsp;或&nbsp;
+            a(onclick="Login.open('register')") 注册
+            | 。
+        //- 权限提示
+        p(v-if="!havePermission")
+          if data.user
+            | 作者限定了参与人员的范围，你的账号不在参与范围之内。
+          else
+            | 作者限定了参与人员的范围，请先&nbsp;
+            a(onclick="Login.open('login')") 登录
+            | &nbsp;或&nbsp;
+            a(onclick="Login.open('register')") 注册
+            | 。
+
+      .form-button(v-if="!posted")
+        button.btn.btn-primary.btn-sm(disabled v-if="!havePermission || status !== 'beginning'")  提交
+        button.btn.btn-primary.btn-sm(@click="submit" v-else)  提交

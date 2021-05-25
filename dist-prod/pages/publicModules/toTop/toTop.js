@@ -1,0 +1,1 @@
+!function(o){"function"==typeof define&&define.amd?define(o):o()}((function(){"use strict";var o,n;o=$(document),n=function(){o.scrollTop()>800?$("#moduleToTop").css({right:"2rem",opacity:1}):$("#moduleToTop").css({right:"-4rem",opacity:0})},window.addEventListener("scroll",(function(){n()})),n()}));

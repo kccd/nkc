@@ -1,0 +1,81 @@
+extends ../nkc
+block nkcTitle
+  title 最新发表
+  +includeCSS("/nkc/post/post.css")
+block nkcContent
+  div
+    .m-b-05
+      h4 内容截止于：
+        span.m-r-05
+          +timeFormat(data.c)
+        a(href=`/nkc/post?${data.t?'t=' + data.t: ''}`).btn.btn-default.btn-xs 重置
+    .m-b-05
+      ul.nav.nav-tabs
+        li(class=!data.t?'active':"")
+          a(href=`/nkc/post?c=${data.c}`) 全部
+        li(class=data.t === 'thread'?'active':"")
+          a(href=`/nkc/post?c=${data.c}&t=thread`) 文章
+        li(class=data.t === 'post'?'active':"")
+          a(href=`/nkc/post?c=${data.c}&t=post`) 回复
+        li(class=data.t === 'comment'?'active':"")
+          a(href=`/nkc/post?c=${data.c}&t=comment`) 评论
+    include ../../publicModules/paging/paging_input
+    .management-posts
+      for post in data.posts
+        .management-post(class=post.status style=`border-right: 10px solid ${post.borderColor}`)
+          .post-header
+            .post-time=format("YYYY/MM/DD HH:mm:ss", post.toc)
+
+            .post-type
+              if post.type === "thread"
+                span 文章
+              else if post.type === 'post'
+                span 回复
+              else
+                span 评论
+            a(href=`/u/${post.user.uid}` target="_blank" data-float-uid=post.user.uid).post-user
+              img(src=tools.getUrl("userAvatar", post.user.avatar))
+              span= post.user.username
+            a.post-url(href=post.url target="_blank") 原文链接
+            .post-forum
+              for f, index in post.forums
+                if index > 0
+                  span ，
+                a(href=`/f/${f.fid}` target='_blank' data-float-fid=f.fid)=f.displayName
+
+            .post-options
+              .hidden(id=`data_${post.pid}`)=objToStr({tid: post.thread.tid, pid: post.pid, mainForumsId: post.mainForumsId, categoriesId: post.categoriesId})
+              if post.status === 'disabled'
+                span.status 已被屏蔽
+              else if post.status === 'toDraft'
+                span.status 已被退休
+              if permission("moveThreads") && post.type === 'thread'
+                button.btn-xs.btn.btn-primary(onclick=`moveThread('${post.pid}')`) 移动
+              if permissionsOr(["movePostsToDraft", "movePostsToRecycle"])
+                button.btn-xs.btn.btn-danger(onclick=`deleteThread('${post.pid}')`) 退修/删除
+          .post-body
+            .row
+              .col-xs-12.col-md-6
+                .post-title=`文章标题：`
+                  a(href=`/t/${post.thread.tid}` target='_blank')=post.thread.t
+              .col-xs-12.col-md-6
+                .post-title=`内容标题：${post.t || '无'}`
+              .col-xs-12.col-md-6
+                .post-title=`中文摘要：${post.abstractCn || '无'}`
+              .col-xs-12.col-md-6
+                .post-title=`英文摘要：${post.abstractEn || '无'}`
+              .col-xs-12.col-md-6
+                .post-title=`中文关键词：${post.keyWordsCn.join(', ') || '无'}`
+              .col-xs-12.col-md-6
+                .post-title=`英文关键词：${post.keyWordsEn.join(', ') || '无'}`
+            .post-content!=post.c
+    include ../../publicModules/paging/paging_input
+
+block nkcScripts
+  include ../../publicModules/nkcSource
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../../publicModules/floatForumPanel/floatForumPanel
+  include ../../publicModules/moveThread/moveThread
+  include ../../publicModules/disabledPost/disabledPost
+  +includeJS("/nkc/post/post.js")

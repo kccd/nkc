@@ -393,7 +393,7 @@ async function addWaterMask(options) {
     position = {x: 10, y: 10},
     flex = 0.4,
     bitRate,
-    scalaByWidth
+    scalaByHeight
   } = options;
   const { width, height } = await getVideoInfo(videoPath);
   return await new Promise((resolve, reject) => {
@@ -401,9 +401,9 @@ async function addWaterMask(options) {
     ff(videoPath)
       .input(imageStream)
       .complexFilter([
-        `[1:v]scale=${imageWidth}:${imageWidth}/a[logo]`,
+        `[1:v]scale=${imageWidth}:-2[logo]`,
         `[0:v][logo]overlay=${position.x}:${position.y}[o]`,
-        `[o]scale=${scalaByWidth}:${scalaByWidth}/a`
+        `[o]scale=-2:${scalaByHeight}`
       ])
       .videoBitrate(bitRate)
       .output(output)

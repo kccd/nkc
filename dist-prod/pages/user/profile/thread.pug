@@ -1,0 +1,49 @@
+div
+  include ../../publicModules/paging/paging
+  .account-threads
+    if !data.threads.length
+      .null 空空如也~
+    for thread in data.threads
+      -let klass = "";
+      if thread.disabled
+        -klass += "disabled";
+      else if thread.recycleMark
+        -klass += "draft";
+      else if !thread.reviewed
+        -klass += "review";
+      .account-thread(class=klass)
+        if thread.disabled
+          .account-reason 已屏蔽，仅自己可见。
+        else if thread.recycleMark
+          .account-reason 退修中，仅自己可见，修改后对所有人可见。
+        else if !thread.reviewed
+          .account-reason 审核中，仅自己可见，通过后对所有人可见。
+        .account-thread-avatar
+          if thread.firstPost.cover
+            div(style=`background-image: url(${tools.getUrl("postCover", thread.firstPost.cover)})`)
+        .account-thread-content(style=!thread.firstPost.cover?"display: block":"")
+          .account-thread-title(class=thread.digest?"digest":"")
+            a(href=`/t/${thread.tid}` title=thread.firstPost.t)=thread.firstPost.t
+          .account-thread-abstract=thread.firstPost.abstractCN || thread.firstPost.c
+          .account-thread-info
+            //-.thread-time=format("YYYY/MM/DD HH:mm:ss", thread.toc)
+            .thread-time
+              //-=`${fromNow(thread.toc)}`
+              +fromNow(thread.toc)
+            a.thread-forum-link(href=`/f/${thread.forums[0].fid}` target="_blank")=thread.forums[0].displayName
+            if thread.firstPost.voteUp
+              .thread-thumbup
+                .fa.fa-thumbs-up
+                span=thread.firstPost.voteUp
+            if thread.hits
+              .thread-hits
+                .fa.fa-eye
+                span=thread.hits
+            if thread.count
+              .thread-comment
+                .fa.fa-comment
+                span=thread.count
+            if thread.firstPost.anonymous
+              span 匿名
+  .m-t-05
+    include ../../publicModules/paging/paging_input

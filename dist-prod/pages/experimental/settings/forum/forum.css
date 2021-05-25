@@ -1,0 +1,39 @@
+.forum {
+  display: inline-block;
+  padding: 0.5rem;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  -webkit-box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+          box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+  margin: 0 1rem 1rem 0;
+}
+.forum .forum-top .forum-avatar {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+.forum .forum-top .forum-name {
+  font-size: 1.2rem;
+}
+.forum .forum-bottom {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+.forums-order .radio {
+  margin: 0!important;
+}
+.forums-order th {
+  padding-top: 2px!important;
+  padding-bottom: 2px!important;
+}
+.forums-order input.order {
+  width: 5rem;
+}
+.forums-order .child {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.forums-order .child .forum-displayName {
+  padding: 2rem;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInBhZ2VzL2V4cGVyaW1lbnRhbC9zZXR0aW5ncy9mb3J1bS9mb3J1bS5sZXNzIiwiPGlucHV0IGNzcyAyMT4iXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRSxzQkFBQTtFQUNBLGdCQUFBO0VBQ0EsdUJBQUE7RUFDQSx1QkFBQTtFQUNBLG1EQUFBO1VBQUEsMkNBQUE7RUFDQSxzQkFBQTtDQ0NEO0FEUEQ7RUFTTSxhQUFBO0VBQ0EsWUFBQTtFQUNBLG1CQUFBO0VBQ0EscUJBQUE7Q0NDTDtBRGJEO0VBZU0sa0JBQUE7Q0NDTDtBRGhCRDtFQW1CSSxtQkFBQTtFQUNBLG1CQUFBO0NDQUg7QURJRDtFQUVJLG9CQUFBO0NDSEg7QURDRDtFQUtJLDJCQUFBO0VBQ0EsOEJBQUE7Q0NISDtBREhEO0VBWUksWUFBQTtDQ05IO0FETkQ7RUFlSSxzQ0FBQTtDQ05IO0FEVEQ7RUFpQk0sY0FBQTtDQ0xMIiwiZmlsZSI6InRvLmNzcyJ9 */

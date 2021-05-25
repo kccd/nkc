@@ -28,6 +28,14 @@ const schema = new Schema({
     type: String,
     default: "#eee"
   },
+  listColor: {
+    type: String,
+    default: '#ffffff'
+  },
+  toolColor: {
+    type: String,
+    default: '#ffffff'
+  },
   topped: {
     type: [Number],
     default: [],
@@ -127,12 +135,12 @@ const schema = new Schema({
   // 展开分类，专栏导航显示一级分类
   navCategory: {
     type: Boolean,
-    default: false
+    default: true
   },
   // 隐藏默认分类
   hideDefaultCategory: {
     type: Boolean,
-    default: false,
+    default: true,
   },
   // 每页内容条数
   perpage: {
@@ -392,14 +400,13 @@ schema.methods.updateBasicInfo = async function() {
   const ColumnPostModel = mongoose.model('columnPosts');
   const ThreadModel = mongoose.model('threads');
   const PostModel = mongoose.model('posts');
-  const UsersBehaviorModel = mongoose.model('usersBehaviors');
   const {_id} = this;
   const columnPosts = await ColumnPostModel.find({columnId: _id}, {pid: 1, tid: 1});
   const postsId = [];
-  const threadsId = [];
+  // const threadsId = [];
   columnPosts.map(cp => {
     postsId.push(cp.pid);
-    threadsId.push(cp.tid);
+    // threadsId.push(cp.tid);
   });
   const columnPostCount = columnPosts.length;
   /*const hits = await UsersBehaviorModel.countDocuments({
@@ -852,5 +859,26 @@ schema.statics.getHotColumns = async () => {
     toppedColumns: _columns.filter(c => toppedColumnsId.includes(c._id))
   };
 };
+
+schema.statics.getHomePageByColumnId = async function(columnId) {
+  const ColumnPageModel = mongoose.model('columnPages');
+  const ResourceModel= mongoose.model('resources');
+  const nkcRender = require('../nkcModules/nkcRender');
+  const page = await ColumnPageModel.findOne({
+    columnId,
+    hidden: false,
+    asHome: true
+  });
+  if(page) {
+    page.c = nkcRender.renderHTML({
+      type: 'article',
+      post: {
+        c: page.c,
+        resources: await ResourceModel.getResourcesByReference(`column-${page._id}`)
+      }
+    });
+  }
+  return page;
+}
 
 module.exports = mongoose.model("columns", schema);
