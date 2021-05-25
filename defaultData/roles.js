@@ -360,7 +360,9 @@ module.exports = [
       "visitUserSubThreads",
       "visitUserTransactionSettings",
       "visitUserWaterSettings",
-      "visitVerifySettings"
+      "visitVerifySettings",
+      "verify3VideoUpload",
+      "verify2ImageUpload"
     ]
   },
   {

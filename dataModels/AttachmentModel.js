@@ -8,6 +8,8 @@ const fsPromise = fs.promises;
 const statics = require('../settings/statics');
 const FileType = require('file-type');
 const PATH = require('path');
+const folderTools = require("../nkcModules/file");
+
 const schema = new Schema({
   // 附件ID mongoose.Types.ObjectId().toString()
   _id: String,
@@ -628,6 +630,32 @@ schema.statics.saveProblemImages = async (_id, files = []) => {
   }
   await problem.updateOne({attachId});
 };
+
+/**
+ * 通用附件存储
+ * @returns {string} 附件id
+ */
+schema.statics.saveAttachment = async ({ size, hash, name, path, uid, c, toc }) => {
+  const AttachmentModel = mongoose.model("attachments");
+  const _id = await AttachmentModel.getNewId();
+  const ext = PATH.extname(name).substring(1);
+  const attachment = AttachmentModel({
+    _id,
+    toc: toc || new Date(),
+    size,
+    hash,
+    name,
+    type: "mediaAttachment",
+    ext,
+    uid,
+    c
+  });
+  await attachment.save();
+  const dir = await folderTools.getPath("mediaAttachment");
+  const savePath = PATH.join(dir, `${_id}${PATH.extname(name)}`);
+  await fs.promises.copyFile(path, savePath);
+  return _id;
+}
 
 
 module.exports = mongoose.model('attachments', schema);
