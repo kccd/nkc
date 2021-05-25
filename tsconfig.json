@@ -4,7 +4,7 @@
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "resolveJsonModule": true,
-        "target": "es6",
+        "target": "es2017",
         "allowJs": true,
         "noImplicitAny": true,
         "moduleResolution": "node",

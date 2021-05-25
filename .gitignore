@@ -12,7 +12,6 @@
 /log.txt
 /settings/alipaySecret.js
 /key
-/.vscode
 /settings/backup.js
 /backup.log
 /scripts

@@ -1,14 +1,19 @@
-import path from "path";
-import glob from "glob";
-import babel from "@rollup/plugin-babel";
-import commonjs from "@rollup/plugin-commonjs";
-import { nodeResolve } from "@rollup/plugin-node-resolve";
-import { terser } from "rollup-plugin-terser";
+const path = require("path");
+const glob = require("glob");
+const { nodeResolve } = require("@rollup/plugin-node-resolve");
+const commonjs = require("@rollup/plugin-commonjs");
+const nodePolyfills = require("rollup-plugin-node-polyfills");
+const { terser } = require("rollup-plugin-terser");
+const { babel } = require("@rollup/plugin-babel");
+const { string } = require("rollup-plugin-string");
+const styles = require("rollup-plugin-styles");
+const vue = require("rollup-plugin-vue");
 
 const DIST_DIR = "dist";
-const files = glob.sync("pages/**/*.{js,mjs}");
+const SCRIPTS_GLOBS = "pages/**/*.js";
+const files = glob.sync(SCRIPTS_GLOBS);
 
-export default files.map(filename => {
+const configuration = files.map(filename => {
   const ext = path.extname(filename);
   const basename = path.basename(filename, ext);
   const output = path.join(__dirname, DIST_DIR, filename, "../", basename + ".js");
@@ -18,14 +23,21 @@ export default files.map(filename => {
       name: basename,
       file: output,
       format: "umd",
-      sourcemap: "inline",
+      sourcemap: process.env.NODE_ENV === "production" ? false : "inline",
       compact: false
     },
     plugins: [
-      commonjs(),
+      nodePolyfills(),
       nodeResolve(),
+      commonjs(),
+      vue(),
       babel({ babelHelpers: "bundled" }),
-      process.env.NODE_ENV === "production"? terser() : null
-    ]
+      styles({ minimize: true }),
+      string({ include: "pages/**/*.html" }),
+      process.env.NODE_ENV === "production" && terser()
+    ],
+    cache: true,
   }
 });
+
+module.exports = configuration;
