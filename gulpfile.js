@@ -10,7 +10,7 @@ const logUpdate = require("log-update");
 const mute = require("mute");
 
 const LESS_GLOBS = "pages/**/*.less";
-const ASSETS_GLOBS = "pages/**/*.{pug,html}";
+const ASSETS_GLOBS = "pages/**/*.pug";
 const DIST_DIR = process.env.NODE_ENV === "production"? "dist-prod": "dist";
 const spin = "-\\|/";
 let spin_slice = 0;
