@@ -36,7 +36,7 @@ const configuration = files.map(filename => {
       string({ include: "pages/**/*.html" }),
       process.env.NODE_ENV === "production" && terser()
     ],
-    cache: true,
+    cache: true
   }
 });
 
