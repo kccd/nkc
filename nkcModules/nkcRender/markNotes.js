@@ -1,4 +1,5 @@
 const cheerio = require('./customCheerio');
+const stringify = require("domutils/lib/stringify");
 const htmlFilter = require('./htmlFilter');
 const twemoji = require("twemoji");
 const {htmlEscape} = require("./htmlEscape");
@@ -260,7 +261,7 @@ function setMark(html, notes = []) {
     prevLen += text.length;
   }, true)
 
-  html = $(body).html();
+  html = stringify.getInnerHTML(body, { decodeEntities: false });
   // 还原数学公式
   html = reduFormulaExpression(html);
   // 还原emoji

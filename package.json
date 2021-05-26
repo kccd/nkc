@@ -53,6 +53,7 @@
     "destroy": "^1.0.4",
     "diff": "^3.4.0",
     "direct-alipay": "^3.0.0",
+    "domutils": "^2.6.0",
     "easyimage": "^3.1.1",
     "echarts": "^4.1.0",
     "elasticsearch": "^16.7.2",
