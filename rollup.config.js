@@ -30,7 +30,9 @@ const configuration = files.map(filename => {
       nodePolyfills(),
       nodeResolve(),
       commonjs(),
-      vue(),
+      vue({
+        needMap: false
+      }),
       babel({ babelHelpers: "bundled" }),
       styles({ minimize: true }),
       string({ include: "pages/**/*.html" }),
