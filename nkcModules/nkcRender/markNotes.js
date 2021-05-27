@@ -1,4 +1,5 @@
-const cheerio = require('./customCheerio');
+const cheerio = require('cheerio');
+const stringify = require("domutils/lib/stringify");
 const htmlFilter = require('./htmlFilter');
 const twemoji = require("twemoji");
 const {htmlEscape} = require("./htmlEscape");
@@ -18,7 +19,7 @@ function eachTextNode(node, handle, escape) {
       // 跳过并转义nkcsource
       if(child.attribs && child.attribs["data-tag"] === "nkcsource") {
         if(escape)
-          escapeEachTextNode(child);
+          // escapeEachTextNode(child);
         continue;
       }
       // 遍历子节点
@@ -77,14 +78,13 @@ function canvertFormulaExpression(html) {
  * 把数学公式临时标签换回字符串
  * @param {string} html 
  */
-function reduFormulaExpression(html) {
-  const $ = cheerio.load(html);
+function reduFormulaExpression(bodyNode) {
+  const $ = cheerio.load(bodyNode);
   $("[this-is-formula]")
     .each((_, el) => {
       let formula = $(el).attr("data");      
       $(el).replaceWith(formula);
-    })
-  return $("body").safeHtml();
+    });
 }
 
 
@@ -110,14 +110,13 @@ function canvertEmojis(html) {
  * 把emoji临时标签换回字符串
  * @param {string} html 
  */
-function reduEmojis(html) {
-  const $ = cheerio.load(html);
+function reduEmojis(bodyNode) {
+  const $ = cheerio.load(bodyNode);
   $("[this-is-emoji]")
     .each((_, el) => {
       let emoji = $(el).attr("alt");      
-      $(el).replaceWith(emoji);
+      $(el).replaceWith(emoji);    
     })
-  return $("body").safeHtml();
 }
 
 
@@ -183,11 +182,14 @@ function createNote(noteId, start, end, content, focusContent) {
  * @param {string} notes[].length - 笔记关键字长度
  */
 function setMark(html, notes = []) {
+  // console.log("income html: " + html);
   if(!notes.length) return html;
   // 处理数学公式
   html = canvertFormulaExpression(html);
   // 处理emoji
+  console.log(html);
   html = canvertEmojis(html);
+  console.log(html);
   // 包含所有笔记位置信息的映射表,偏移量为键,值为笔记的开始或结束点组成的数组
   let map = {};
   notes.forEach(note => {
@@ -206,6 +208,10 @@ function setMark(html, notes = []) {
     }
   });
   
+  // 稍后需要替换的节点和新节点内容
+  const replaceMap = new Map();
+  // 用于文本处理过程中临时替换 < 和 > 的标识符
+  const signIndex = Math.floor(Math.random() * 100000);
   let offsets = Object.keys(map);
   const $ = cheerio.load(html);
   let body = $("body")[0];
@@ -216,16 +222,6 @@ function setMark(html, notes = []) {
     // 当此前已遍历的总字数超过了某个偏移量,说明这个本文节点存在那个偏移量的点,即此处要插标签(但此时还不知到标签应当插到此文本节点的何处)
     let willMark = offsets.filter(offset => prevLen + len >= offset);
     offsets = offsets.filter(offset => !willMark.includes(offset));
-    // 如果这个文本节点上不需要插标签,那么就跳过此节点,并且把此文本节点的长度计入总字数,然后转义<>
-    if(!willMark.length) {
-      prevLen += text.length;
-      node.data = htmlEscape(text);
-      /*node.data = text.replace(/\<|\>/g, source => {
-        if(source === "<") return "&lt;";
-        if(source === ">") return "&gt;";
-      })*/
-      return;
-    }
     // 计算这些标签需要插入到此文本节点的哪些位置,并按这些位置分割文本为数组
     let textOffsets = willMark.map(offset => offset - prevLen);
     let textFragment = [];
@@ -234,38 +230,37 @@ function setMark(html, notes = []) {
       textFragment.push(frag);
     })
     textFragment.unshift(text.substring(0, textOffsets[0]));
-    textFragment = textFragment.map(frag => {
-      return htmlEscape(frag);
-      /*return frag.replace(/\<|\>/g, source => {
-        if(source === "<") return "&lt;";
-        if(source === ">") return "&gt;";
-      })*/
-    });
+    textFragment = textFragment.map(text => text.replace(/</g, `--[${signIndex}`).replace(/>/g, `--${signIndex}]`));
 
     // 重组这些文本,并借此在适当位置插入标签
     let newNodeData = textFragment[0];
     willMark.forEach((offset, index) => {
       let tags = map[offset];
       newNodeData += tags.map(tag => 
-        `<em 
-          note-tag 
-          note-id='${tag.id}' 
-          tag-type='${tag.type}'></em>`
+        `<em note-tag note-id='${tag.id}' tag-type='${tag.type}'></em>`
       ).join("");
       newNodeData += textFragment[index + 1];
     })
+    // 先记录下需要替换的节点和新内容，等退出循环之后再集中替换，此时替换会让迭代变得不安全
+    replaceMap.set(node, newNodeData);
+    // $(node).replaceWith(newNodeData);
     // 修改文本节内容
-    node.data = newNodeData;
+    // node.data = newNodeData;
     // 计入总字数
     prevLen += text.length;
   }, true)
+  // 替换节点
+  replaceMap.forEach((html, node) => $(node).replaceWith(html));
 
-  html = $(body).html();
   // 还原数学公式
-  html = reduFormulaExpression(html);
+  reduFormulaExpression(body);
   // 还原emoji
-  html = reduEmojis(html);
+  reduEmojis(body);
+  html = stringify.getInnerHTML(body, { decodeEntities: false });
+  html = html.replace(new RegExp(`\\-\\-\\[${signIndex}`, "g"), "&lt;").replace(new RegExp(`\\-\\-${signIndex}\\]`, "g"), "&gt;");
   html = htmlFilter(html);
+  // 还原 < 和 >
+  console.log("output html: " + html);
   return html;
 }
 
@@ -288,10 +283,13 @@ exports.setMark = setMark;
  * ]
  */
 function getMark(html) {
+  // 用于文本处理过程中临时替换 < 和 > 的标识符
+  const signIndex = Math.floor(Math.random() * 100000);
   // 处理数学公式
   html = canvertFormulaExpression(html);
   // 处理emoji
   html = canvertEmojis(html);
+  console.log(html);
   const $ = cheerio.load(html);
   let body = $("body")[0];
   let prevLen = 0, content = "";
@@ -302,6 +300,7 @@ function getMark(html) {
   eachTextNode(body, (text, node) => {
     let parentNode = node.parent;
     if(text === random && hasAttr($(parentNode), "note-tag")) {
+      console.log(text);
       let noteId = $(parentNode).attr("note-id");
       let tagType = $(parentNode).attr("tag-type");
       if(!map[noteId]) 
@@ -314,6 +313,7 @@ function getMark(html) {
         let index = recording.indexOf(noteId);
         if(index >= 0) recording.splice(index, 1);    // 关闭录制内容
       }
+      $(parentNode).remove();
       return;
     }
     // 正在录制的noteId,此文本节点的内容追加到content字段
@@ -330,31 +330,13 @@ function getMark(html) {
   for(let noteId in map) {
     let rec = map[noteId];
     notes.push(createNote(noteId, rec.start, rec.end, content, rec.content));
-    // let note = { _id: noteId };
-    // if(!rec.hasOwnProperty("start") || !rec.hasOwnProperty("end")) {
-    //   notes.push({ ...note, length: 0, isLost: true});
-    // }else {
-    //   let start = map[noteId].start;
-    //   let end = map[noteId].end;
-    //   notes.push({
-    //     ...note,
-    //     offset: start,
-    //     length: end - start,
-    //     content: rec.content
-    //   });
-    // }
   }
-
-  // console.log(notes);
-  
- 
-  html = $("body").safeHtml();
   // 还原数学公式
-  html = reduFormulaExpression(html);
+  reduFormulaExpression(body);
   // 还原emoji
-  html = reduEmojis(html);
+  reduEmojis(body);
+  html = stringify.getInnerHTML(body);
   html = htmlFilter(html);
-  
   return {
     html: html,
     notes
