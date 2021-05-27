@@ -113,7 +113,7 @@ module.exports = {
   },
   pre(html) {
     return html.replace(/<pre(.*?)>([\s\S]*?)<\/pre>/ig, (content, v1, v2) => {
-      v2 = htmlEscape(v2);
+      // v2 = htmlEscape(v2);
       return `<pre${v1}>${v2}</pre>`;
     });
   },
