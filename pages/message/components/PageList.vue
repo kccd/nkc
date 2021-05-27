@@ -8,7 +8,10 @@
         @click="clickNav(l)"
         ) {{l.name}}
     .list-container
-      .list-item(v-if="activeListId === 'chat'")
+      .list-item-container(v-if="activeListId === 'chat'")
+        .list-item(v-for="chatData in chatListData") {{chatData.time}}
+      .list-item-container(v-if="activeListId === 'user'")
+      .list-item-container(v-if="activeListId === 'category'")
 
 </template>
 
@@ -38,8 +41,8 @@
 
 <script>
   export default {
+    props: ['chatListData', 'userListData', 'categoryListData'],
     data: () => ({
-
       activeListId: 'chat', // chat, user, category
       list: [
         {
