@@ -1,5 +1,4 @@
 const cheerio = require('cheerio');
-const stringify = require("domutils/lib/stringify");
 const htmlFilter = require('./htmlFilter');
 const twemoji = require("twemoji");
 const {htmlEscape} = require("./htmlEscape");
@@ -235,13 +234,13 @@ function setMark(html, notes = []) {
   reduFormulaExpression(body);
   // 还原emoji
   reduEmojis(body);
-  html = stringify.getInnerHTML(body, { decodeEntities: false });
+  html = $(body).html();
+  // 还原 < 、 > 以及 &
   html = html
     .replace(new RegExp(`\\-\\-\\[${signIndex}\\]`, "g"), "&amp;")
     .replace(new RegExp(`\\-\\-\\[${signIndex}`, "g"), "&lt;")
     .replace(new RegExp(`\\-\\-${signIndex}\\]`, "g"), "&gt;")
   html = htmlFilter(html);
-  // 还原 < 、 > 以及 &
   return html;
 }
 
