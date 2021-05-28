@@ -114,8 +114,8 @@ function reduEmojis(bodyNode) {
   const $ = cheerio.load(bodyNode);
   $("[this-is-emoji]")
     .each((_, el) => {
-      let emoji = $(el).attr("alt");      
-      $(el).replaceWith(emoji);    
+      let emoji = $(el).attr("alt");
+      $(el).replaceWith(emoji);
     })
 }
 
@@ -187,9 +187,7 @@ function setMark(html, notes = []) {
   // 处理数学公式
   html = canvertFormulaExpression(html);
   // 处理emoji
-  console.log(html);
   html = canvertEmojis(html);
-  console.log(html);
   // 包含所有笔记位置信息的映射表,偏移量为键,值为笔记的开始或结束点组成的数组
   let map = {};
   notes.forEach(note => {
@@ -230,8 +228,7 @@ function setMark(html, notes = []) {
       textFragment.push(frag);
     })
     textFragment.unshift(text.substring(0, textOffsets[0]));
-    textFragment = textFragment.map(text => text.replace(/</g, `--[${signIndex}`).replace(/>/g, `--${signIndex}]`));
-
+    textFragment = textFragment.map(text => text.replace(/&/g, `--[${signIndex}]`).replace(/</g, `--[${signIndex}`).replace(/>/g, `--${signIndex}]`));
     // 重组这些文本,并借此在适当位置插入标签
     let newNodeData = textFragment[0];
     willMark.forEach((offset, index) => {
@@ -257,10 +254,12 @@ function setMark(html, notes = []) {
   // 还原emoji
   reduEmojis(body);
   html = stringify.getInnerHTML(body, { decodeEntities: false });
-  html = html.replace(new RegExp(`\\-\\-\\[${signIndex}`, "g"), "&lt;").replace(new RegExp(`\\-\\-${signIndex}\\]`, "g"), "&gt;");
+  html = html
+    .replace(new RegExp(`\\-\\-\\[${signIndex}\\]`, "g"), "&amp;")
+    .replace(new RegExp(`\\-\\-\\[${signIndex}`, "g"), "&lt;")
+    .replace(new RegExp(`\\-\\-${signIndex}\\]`, "g"), "&gt;")
   html = htmlFilter(html);
-  // 还原 < 和 >
-  console.log("output html: " + html);
+  // 还原 < 、 > 以及 &
   return html;
 }
 
@@ -289,7 +288,6 @@ function getMark(html) {
   html = canvertFormulaExpression(html);
   // 处理emoji
   html = canvertEmojis(html);
-  console.log(html);
   const $ = cheerio.load(html);
   let body = $("body")[0];
   let prevLen = 0, content = "";
@@ -300,7 +298,6 @@ function getMark(html) {
   eachTextNode(body, (text, node) => {
     let parentNode = node.parent;
     if(text === random && hasAttr($(parentNode), "note-tag")) {
-      console.log(text);
       let noteId = $(parentNode).attr("note-id");
       let tagType = $(parentNode).attr("tag-type");
       if(!map[noteId]) 
@@ -335,7 +332,8 @@ function getMark(html) {
   reduFormulaExpression(body);
   // 还原emoji
   reduEmojis(body);
-  html = stringify.getInnerHTML(body);
+  // html = stringify.getInnerHTML(body);
+  html = $(body).html();
   html = htmlFilter(html);
   return {
     html: html,
