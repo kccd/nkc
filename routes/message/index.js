@@ -111,6 +111,10 @@ messageRouter
       if(friend) {
         name = friend.info.name;
       }
+      let status = '离线';
+      if(targetUser.online) {
+        status = targetUser.onlineType === 'phone'? '手机在线': '网页在线';
+      }
       userList.push({
         time: tlm || toc,
         type: 'UTU',
@@ -118,6 +122,8 @@ messageRouter
         uid: targetUser.uid,
         icon: nkcModules.tools.getUrl('userAvatar', targetUser.avatar),
         platform: targetUser.online? (targetUser.onlineType === 'phone'? 'app': 'web'): 'outline',
+        online: targetUser.online,
+        status,
         abstract,
         messageId: message? message._id: null,
         user: targetUser,
@@ -142,6 +148,7 @@ messageRouter
           type: 'STE',
           message,
           uid: null,
+          status: null,
           count: user.newMessage.newSystemInfoCount,
           name: '系统通知',
           icon: '/statics/message_type/STE.jpg',
@@ -162,6 +169,7 @@ messageRouter
         type: 'STU',
         message,
         uid: null,
+        status: null,
         messageId: message? message._id: null,
         count: user.newMessage.newReminderCount,
         content: message?ctx.state.lang("messageTypes", message.c.type):"",
@@ -184,6 +192,7 @@ messageRouter
             count: newFriendsApplicationCount,
             uid: null,
             targetUser,
+            status: null,
             messageId: null,
             name: '新朋友',
             icon: '/statics/message_type/newFriends.jpg',

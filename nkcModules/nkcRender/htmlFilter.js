@@ -1,1 +1,1 @@
-module.exports = require('../xssFilters').postContent;
+module.exports = require('../xssFilters').filterEditorContent;
