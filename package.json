@@ -9,11 +9,11 @@
     "serve": "node ./server.js",
     "test": "mocha -t 10000",
     "build-js": "rollup -c rollup.config.js",
-    "watch-js": "npm run build-js -- --watch --no-watch.clearScreen",
+    "watch-js": "npm run build-js -- --watch",
     "watch-node": "nodemon --ignore resources/ --ignore tmp/ --ignore scripts/ --ignore node_modules/ --ignore pages/ --ignore dist/ --ignore lib/ --delay 1000ms server.js",
     "watch-pages": "concurrently -p \"[{name}]\" -n \"css,js,assets\" -c \"green,cyan,blue\" \"gulp watch:css\" \"npm run watch-js\" \"gulp watch:assets\"",
     "watch": "concurrently -p \"[{name}]\" -n \"node,pages\" -c \"green,cyan\" \"npm run watch-node\" \"npm run watch-pages\"",
-    "build-pages": "npm run build-js && gulp compile:css && gulp copy:assets",
+    "build-pages": "npm run clear && npm run build-js && gulp compile:css && gulp copy:assets",
     "build-pages-p": "cross-env NODE_ENV=production npm run build-pages",
     "clear": "rimraf dist"
   },
@@ -161,6 +161,7 @@
     "babelify": "^10.0.0",
     "browserify": "^16.5.0",
     "concurrently": "^6.0.2",
+    "cz-conventional-changelog": "^3.3.0",
     "del-cli": "^3.0.1",
     "glob": "7.1.6",
     "gulp": "^4.0.2",
@@ -190,6 +191,12 @@
     "ts-node": "^9.1.1",
     "typescript": "^3.9.5",
     "vinyl-buffer": "^1.0.1",
-    "vinyl-source-stream": "^2.0.0"
+    "vinyl-source-stream": "^2.0.0",
+    "vue-template-compiler": "^2.6.12"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
