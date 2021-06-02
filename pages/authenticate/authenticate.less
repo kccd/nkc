@@ -1,3 +1,24 @@
+#app {
+  animation: panel_into .6s ease .1s 1;
+  animation-fill-mode: forwards;
+  opacity: 0;
+}
+
+[v-cloak] {
+  animation: none;
+}
+
+@keyframes panel_into {
+  from {
+    transform: translateX(-60px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 .verify2__img {
   img {
     height: 260px;
