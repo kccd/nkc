@@ -2,7 +2,8 @@ extends ../bootstrap_base
 block title
   title 测试
 block content
-  .container-fluid.max-width
+  #app.container-fluid.max-width
+    cssmodule
     .row
       .col-xs-12.col-md-12
         button.btn.btn-default.btn-sm(onclick='forumSelector.app.open()') 主分类
@@ -13,6 +14,7 @@ block content
 block scripts
   include ../publicModules/forumSelector/forumSelector.pug
   include ../publicModules/verifications/verifications
+  +includeJS("/test/test.js")
   script.
     function RUN(count) {
       for(var i = 0 ; i < count ; i++) {
