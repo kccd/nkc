@@ -904,6 +904,19 @@ function initVueApp() {
   })
 }
 
+new Vue({
+  el: "#notes",
+  data: {
+    openOnEditNotes: localStorage.getItem("open-on-edit-notes") === "yes"
+  },
+  watch: {
+    openOnEditNotes: function(val) {
+      console.log(val);
+      localStorage.setItem("open-on-edit-notes", val? "yes" : "no");
+    }
+  }
+});
+
 // 根据导航栏和工具栏的高度重置body的padding-top
 function resetBodyPaddingTop() {
   var tools = $(".editor .edui-editor-toolbarbox.edui-default");

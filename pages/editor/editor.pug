@@ -14,7 +14,7 @@ block content
     .row
       .col-xs-12.col-md-9.box-shadow-panel.m-b-2
         div
-          .m-b-1.m-t-1.m-l-05.m-r-05
+          #notes.m-b-1.m-t-1.m-l-05.m-r-05(v-cloak)
             if data.type === "newPost"
               .editor-type-info
                 .fa.fa-lightbulb-o
@@ -33,6 +33,10 @@ block content
                 |正在编辑文章《
                 a(href=data.thread.url target="_blank")=`${data.thread.title}`
                 |》
+                .on-edit-notes 
+                  .on-edit-label 您正在修改已经发表的内容，以下提示非常重要，请务必详读。
+                    a.detail(@click="openOnEditNotes = !openOnEditNotes") {{openOnEditNotes? "收起":"详细"}}
+                  div(v-if="openOnEditNotes")!=nkcRender.plainEscape(state.editorSettings.onEditNotes)
             else if data.type === "modifyPost"
               .editor-type-info
                 .fa.fa-lightbulb-o
@@ -43,6 +47,10 @@ block content
                   | 评论
                 else
                   | 回复
+                .on-edit-notes 
+                  .on-edit-label 您正在修改已经发表的内容，以下提示非常重要，请务必详读。
+                    a.detail(@click="openOnEditNotes = !openOnEditNotes") {{openOnEditNotes? "收起":"详细"}}
+                  div(v-if="openOnEditNotes")!=nkcRender.plainEscape(state.editorSettings.onEditNotes)
             else if data.type === "modifyForumDeclare"
               .editor-type-info
                 .fa.fa-lightbulb-o
