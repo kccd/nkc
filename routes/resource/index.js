@@ -238,11 +238,11 @@ resourceRouter
           data: {rid: r.rid, state: "fileProcessFinish"}
         });
       } catch(err) {
-        console.log(err.stack || err);
+        console.log(err);
         // 通知前端转换失败了
         ctx.nkcModules.socket.sendDataMessage(user.uid, {
           event: "fileTransformProcess",
-          data: {err: err.message || err, state: "fileProcessFailed"}
+          data: {err: err.message, state: "fileProcessFailed"}
         });
         await r.updateOne({state: 'useless'});
       }
