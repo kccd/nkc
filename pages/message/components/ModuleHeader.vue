@@ -1,12 +1,17 @@
 <template lang="pug">
   .page-header
     .page-header-left
+      div(@click="clickLeftButton" v-if="leftIcon")
+        div(:class="leftIcon")
     .page-header-center {{title}}
     .page-header-right
+      div(@click="clickRightButton" v-if="rightIcon")
+        div(:class="rightIcon")
 </template>
 
 <style scoped lang="less">
-  @height: 4rem;
+  @import "../message.2.0.less";
+  @height: @headerHeight;
   .page-header{
     margin: 0;
     height: @height;
@@ -23,9 +28,20 @@
       position: absolute;
       top: 0;
       left: 0;
-      background-color: red;
-      height: 100%;
+      height: @height;
       width: @height;
+      line-height: @height;
+      text-align: center;
+      font-size: 1.6rem;
+      &>div{
+        height: 100%;
+        width: 100%;
+        cursor: pointer;
+        &:hover, &:active{
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+      }
+
     }
     .page-header-right{
       left: auto;
@@ -36,12 +52,17 @@
 
 <script>
   export default {
-    props: ['title'],
+    props: ['title', 'leftIcon', 'rightIcon'],
     data: () => ({
 
     }),
     methods: {
-
+      clickLeftButton() {
+        this.$emit('onClickLeftButton');
+      },
+      clickRightButton() {
+        this.$emit('onClickRightButton');
+      },
     }
   }
 </script>

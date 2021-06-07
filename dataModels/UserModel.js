@@ -830,43 +830,61 @@ userSchema.methods.getNewMessagesCount = async function() {
 	const MessageModel = mongoose.model('messages');
 	const FriendsApplicationModel = mongoose.model("friendsApplications");
 	const SystemInfoLogModel = mongoose.model('systemInfoLogs');
+	const UsersGeneralSettings = mongoose.model('usersGeneral');
+	const {messageSettings} = await UsersGeneralSettings.findOnly({
+    uid: this.uid
+	}, {
+    messageSettings: 1
+  });
+	const {newFriends, systemInfo, reminder} = messageSettings.chat;
 	// 系统通知
-  const allSystemInfoCount = await MessageModel.countDocuments({ty: 'STE'});
-  const viewedSystemInfoCount = await SystemInfoLogModel.countDocuments({uid: this.uid});
-  const newSystemInfoCount = allSystemInfoCount - viewedSystemInfoCount;
-  // 可能会生成多条相同的阅读记录 以下判断用于消除重复的数据
-  if(newSystemInfoCount < 0) {
-    const systemInfoLog = await SystemInfoLogModel.aggregate([
-      {
-        $match: {
-          uid: this.uid
-        }
-      },
-      {
-        $group: {
-          _id: "$mid",
-          count: {
-            $sum: 1
+  let newSystemInfoCount = 0;
+  let newApplicationsCount = 0;
+  let newReminderCount = 0;
+  if(systemInfo) {
+    const allSystemInfoCount = await MessageModel.countDocuments({ty: 'STE'});
+    const viewedSystemInfoCount = await SystemInfoLogModel.countDocuments({uid: this.uid});
+    newSystemInfoCount = allSystemInfoCount - viewedSystemInfoCount;
+    // 可能会生成多条相同的阅读记录 以下判断用于消除重复的数据
+    if(newSystemInfoCount < 0) {
+      const systemInfoLog = await SystemInfoLogModel.aggregate([
+        {
+          $match: {
+            uid: this.uid
+          }
+        },
+        {
+          $group: {
+            _id: "$mid",
+            count: {
+              $sum: 1
+            }
           }
         }
-      }
-    ]);
-    for(const log of systemInfoLog) {
-      if(log.count <= 1) continue;
-      const logs = await SystemInfoLogModel.find({mid: log._id, uid: this.uid});
-      for(let i = 0; i < logs.length; i++) {
-        if(i > 0) {
-          await logs[i].deleteOne();
+      ]);
+      for(const log of systemInfoLog) {
+        if(log.count <= 1) continue;
+        const logs = await SystemInfoLogModel.find({mid: log._id, uid: this.uid});
+        for(let i = 0; i < logs.length; i++) {
+          if(i > 0) {
+            await logs[i].deleteOne();
+          }
         }
       }
     }
   }
+
 	// 系统提醒
-  const newReminderCount = await MessageModel.countDocuments({ty: 'STU', r: this.uid, vd: false});
-  const newApplicationsCount = await FriendsApplicationModel.countDocuments({
-    agree: "null",
-    respondentId: this.uid
-  });
+  if(reminder) {
+    newReminderCount = await MessageModel.countDocuments({ty: 'STU', r: this.uid, vd: false});
+  }
+  // 添加好友
+  if(newFriends) {
+    newApplicationsCount = await FriendsApplicationModel.countDocuments({
+      agree: "null",
+      respondentId: this.uid
+    });
+  }
 	// 用户信息
   const newUsersMessagesCount = await MessageModel.countDocuments({ty: 'UTU', s: {$ne: this.uid}, r: this.uid, vd: false});
 	return {
@@ -2491,6 +2509,14 @@ userSchema.statics.extendUsersGrade = async (users) => {
     user.grade = g;
   }
   return users;
+};
+
+userSchema.methods.getStatus = function() {
+  let status = '离线';
+  if(this.online) {
+    status = this.onlineType === 'phone'? '手机在线': '网页在线';
+  }
+  return status;
 };
 
 module.exports = mongoose.model('users', userSchema);

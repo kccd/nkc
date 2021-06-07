@@ -99,6 +99,9 @@ var Tools = function() {
       case "attach": {
         return "/a/" + id
       }
+      case "messageFriendImage": {
+        return "/friend/" + id + "/image";
+      }
       case "videoCover": {
         return "/frameImg/" + id
       }

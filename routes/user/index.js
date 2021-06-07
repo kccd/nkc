@@ -9,7 +9,6 @@ const authRouter = require('./auth');
 const transactionRouter = require('./transaction');
 // const bannerRouter = require('./banner');
 const clearRouter = require("./clear");
-const friendsRouter = require('./friends');
 const subRouter = require("./sub");
 const profileRouter = require("./profile");
 const transferRouter = require("./transfer");
@@ -519,7 +518,6 @@ userRouter
 	.use('/:uid/banned', bannedRouter.routes(), bannedRouter.allowedMethods())
 	.use('/:uid/drafts', draftsRouter.routes(), draftsRouter.allowedMethods())
 	.use('/:uid/settings', settingRouter.routes(), settingRouter.allowedMethods())
-  .use('/:uid/friends', friendsRouter.routes(), friendsRouter.allowedMethods())
   .use("/:uid/sub", subRouter.routes(), subRouter.allowedMethods())
   .use("/:uid/clear", clearRouter.routes(), clearRouter.allowedMethods())
   .use("/:uid/transfer", transferRouter.routes(), transferRouter.allowedMethods())

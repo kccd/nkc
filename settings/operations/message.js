@@ -1,5 +1,8 @@
 module.exports = {
   GET: 'visitMessagePage',
+  list: {
+    GET: 'messageGetData'
+  },
   systemInfo: {
     //GET: 'getSystemInfo'
   },
@@ -12,7 +15,16 @@ module.exports = {
   friendsApplication: {
     GET: 'getFriendsApplication'
   },
+  friend: {
+    POST: 'messagePostData',
+    DELETE: 'messagePostData',
+    PUT: 'messagePostData',
+    apply: {
+      POST: 'messagePostData'
+    }
+  },
   user: {
+    GET: 'messageGetData',
     PARAMETER: {
       //GET: 'getUserMessage',
       POST: 'sendMessageToUser'
@@ -59,6 +71,7 @@ module.exports = {
     GET: 'sendAnApplicationToAddAFriend'
   },
   category: {
-    GET: 'messageCategory'
+    GET: 'messageCategory',
+    POST: 'messagePostData'
   },
 };

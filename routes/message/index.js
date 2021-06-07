@@ -15,6 +15,8 @@ const searchRouter = require('./search');
 const frameRouter = require('./frame');
 const addFriend = require("./addFriend");
 const categoryRouter = require('./category');
+const listRouter = require('./list');
+const friendRouter = require('./friend');
 const moment = require("moment");
 messageRouter
   .get('/', async (ctx, next) => {
@@ -67,7 +69,9 @@ messageRouter
       postCount: 1,
       threadCount: 1,
       disabledPostsCount: 1,
-      disabledThreadsCount: 1
+      disabledThreadsCount: 1,
+      online: 1,
+      onlineType: 1
     });
     const messages = await db.MessageModel.find({_id: {$in: [...midArr]}}, {ip: 0, port: 0});
     const friendsArr = await db.FriendModel.find({uid: user.uid, tUid: {$in: [...uidArr]}});
@@ -325,5 +329,7 @@ messageRouter
   .use("/frame", frameRouter.routes(), frameRouter.allowedMethods())
   .use("/addFriend", addFriend.routes(), addFriend.allowedMethods())
   .use('/category', categoryRouter.routes(), categoryRouter.allowedMethods())
+  .use('/list', listRouter.routes(), listRouter.allowedMethods())
+  .use('/friend', friendRouter.routes(), friendRouter.allowedMethods())
   .use("/data", dataRouter.routes(), dataRouter.allowedMethods());
 module.exports = messageRouter;

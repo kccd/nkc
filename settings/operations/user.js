@@ -150,19 +150,6 @@ module.exports = {
 		bills: {
 			GET: 'visitUserBills'
 		},
-		/*banner: {
-			GET: 'getUserBanner',
-			POST: 'modifyUserBanner'
-		},*/
-    friends: {
-		  POST: 'sendAnApplicationToAddAFriend',
-      agree: {
-		    POST: 'agreeApplicationToAddAFriend'
-      },
-      disagree: {
-		    POST: 'disagreeApplicationToAddAFriend'
-      }
-    },
     transfer: {
       GET: "transferKcbToUser",
       POST: "transferKcbToUser"

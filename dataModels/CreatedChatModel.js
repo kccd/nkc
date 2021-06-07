@@ -109,5 +109,225 @@ chatSchema.statics.createChat = async (uid, targetUid, both) => {
   }
 };
 
-const CreatedChatModel = mongoose.model('createdChat', chatSchema);
-module.exports = CreatedChatModel;
+/*
+* 获取已创建的对话列表
+* */
+
+chatSchema.statics.getCreatedChat = async (uid) => {
+  const CreatedChatModel = mongoose.model('createdChat');
+  const UserModel = mongoose.model('users');
+  const MessageModel = mongoose.model('messages');
+  const FriendModel = mongoose.model('friends');
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const MessageTypeModel = mongoose.model('messageTypes');
+  const FriendsApplicationModel = mongoose.model('friendsApplications');
+  const translate = require('../nkcModules/translate');
+  const user = await UserModel.findOnly({uid});
+  const {getUrl} = require('../nkcModules/tools');
+  const chats = await CreatedChatModel.find({uid}).sort({tlm: -1});
+  const uidArr = new Set();
+  const midArr = new Set();
+  const userObj = {};
+  const messageObj = {};
+  const friendObj = {};
+  const chatList = [];
+  for(const c of chats) {
+    uidArr.add(c.tUid);
+    if(c.lmId) midArr.add(c.lmId);
+  }
+  const users = await UserModel.find({
+    uid: {
+      $in: [...uidArr]
+    }
+  }, {
+    uid: 1,
+    username: 1,
+    avatar: 1,
+    online: 1,
+    onlineType: 1,
+    description: 1,
+  });
+  const messages = await MessageModel.find({
+    _id: {
+      $in: [...midArr]
+    }
+  }, {
+    ip: 0,
+    port: 0
+  });
+  const friendsArr = await FriendModel.find({
+    uid,
+    tUid: {
+      $in: [...uidArr]
+    }
+  });
+  for(const u of users) {
+    userObj[u.uid] = u;
+  }
+  for(const m of messages) {
+    messageObj[m._id] = m;
+  }
+  for(const f of friendsArr) {
+    friendObj[f.tUid] = f;
+  }
+  for(const c of chats) {
+    if(c.tUid === uid) continue;
+    const {
+      unread,
+      tUid,
+      lmId,
+      tlm,
+      toc,
+      _id,
+    } = c;
+    let message = messageObj[lmId];
+    if(!message) {
+      message = {
+        _id: null,
+        ty: "UTU",
+        c: "",
+        tc: c.toc
+      }
+    }
+    const targetUser = userObj[tUid];
+    if(!targetUser) continue;
+    const friend = friendObj[tUid];
+    let abstract;
+    if(message.withdrawn) {
+      abstract = message.r === uid? '对方撤回了一条消息': '你撤回了一条消息';
+    } else {
+      abstract = typeof message.c === 'string'? message.c: message.c.na;
+    }
+    let name;
+    if(friend) {
+      name = friend.info.name;
+    }
+    name = name || targetUser.username || targetUser.uid;
+    const status = targetUser.getStatus();
+    chatList.push({
+      _id, // chat ID
+      time: tlm || toc, // 最近更新时间
+      type: 'UTU', // 对话类型 UTU(用户间) STU(应用通知) STE(系统通知)
+      name, // 显示的名称 昵称或者是用户填写的备注信息
+      uid: targetUser.uid, // 对方ID
+      icon: getUrl('userAvatar', targetUser.avatar), // 显示的头像
+      status, // 在线状态
+      abstract, // 摘要
+      count: unread // 未读条数
+    });
+  }
+  const usersGeneral = await UsersGeneralModel.findOne({uid});
+  const {
+    newSystemInfoCount,
+    newApplicationsCount,
+    newReminderCount
+  } = await user.getNewMessagesCount();
+  const {chat}= usersGeneral.messageSettings;
+
+  const insertChat = (arr, item) => {
+    let itemTime = item.time.getTime();
+    for(let i = 0; i < arr.length; i++) {
+      const chat = arr[i];
+      if(itemTime > chat.time.getTime()) {
+        arr.splice(i, 0, item);
+        itemTime = 'inserted';
+        break;
+      }
+    }
+    if(itemTime !== 'inserted') {
+      arr.push(item);
+    }
+  };
+
+  if(chat.reminder) {
+    const message = await MessageModel.findOne({
+      ty: 'STE'
+    }, {
+      ip: 0,
+      port: 0
+    })
+      .sort({tc: -1});
+    if(message) {
+      insertChat(chatList, {
+        _id: 'STE',
+        time: message.tc,
+        type: 'STE',
+        uid: null,
+        status: null,
+        count: newSystemInfoCount,
+        name: '系统通知',
+        icon: '/statics/message_type/STE.jpg',
+        abstract: message.c,
+      });
+    }
+  }
+  if(chat.reminder) {
+    const message = await MessageModel.findOne({ty: 'STU', r: user.uid}, {ip: 0, port: 0}).sort({tc: -1});
+    const messageType = await MessageTypeModel.findOnly({_id: "STU"});
+    if(message) {
+      insertChat(chatList, {
+        _id: 'STU',
+        time: message.tc,
+        name: messageType.name,
+        type: 'STU',
+        uid: null,
+        status: null,
+        count: newReminderCount,
+        icon: '/statics/message_type/STU.jpg',
+        abstract: translate(usersGeneral.language, "messageTypes", message.c.type),
+      });
+    }
+  }
+  if(chat.newFriends) {
+    const friendsApplication = await FriendsApplicationModel.findOne({respondentId: user.uid}).sort({toc: -1});
+    if(friendsApplication) {
+      const targetUser = await UserModel.findOne({uid: friendsApplication.applicantId}, {username: 1});
+      if(targetUser) {
+        insertChat(chatList, {
+          _id: 'newFriends',
+          type: 'newFriends',
+          time: friendsApplication.toc,
+          count: newApplicationsCount,
+          uid: null,
+          status: null,
+          name: '新朋友',
+          icon: '/statics/message_type/newFriends.jpg',
+          abstract: `${targetUser.username}申请添加你为好友`,
+        });
+      }
+    }
+  }
+  return chatList;
+};
+
+/*
+* 删除与某人的对话
+* @param {String} type UTU, STU, STE, newFriends
+* @param {String} uid 自己
+* @param {String} tUid 对方的ID
+* @author pengxiguaa 2021-6-3
+* */
+chatSchema.statics.removeChat = async (type, uid, tUid) => {
+  const CreatedChatModel = mongoose.model('createdChat');
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const MessageModel = mongoose.model('messages');
+  await MessageModel.markAsRead(type, uid, tUid);
+  if(type === 'UTU') {
+    const chat = await CreatedChatModel.findOne({uid, tUid});
+    if(chat) await chat.deleteOne();
+  } else if(type === 'STU') {
+    await UsersGeneralModel.updateOne({uid}, {
+      $set: {'messageSettings.chat.reminder': false}
+    });
+  } else if(type === 'STE') {
+    await UsersGeneralModel.updateOne({uid}, {
+      $set: {'messageSettings.chat.systemInfo': false}
+    });
+  } else if(type === 'newFriends') {
+    await UsersGeneralModel.updateOne({uid}, {
+      $set: {'messageSettings.chat.newFriends': false}
+    });
+  }
+};
+
+module.exports =  mongoose.model('createdChat', chatSchema);

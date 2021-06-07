@@ -1,14 +1,35 @@
 <template lang="pug">
-  div
+  .page-list-container
     .list-nav-bar
+      .nav-options(@click="showOptions = !showOptions")
+        .fa.fa-bars
       .nav-item(
         v-for="l in list"
         :class="{'active': l.id === activeListId}"
         @click="clickNav(l)"
         ) {{l.name}}
+    .nav-left-container-mask(v-if="showOptions" @click="switchLeftContainer")
+    .nav-left-container(:class="{'show': showOptions}" v-if="mUser")
+      .nav-left-header
+        .fa.fa-arrow-left(@click="switchLeftContainer")
+      .nav-left-banner-container
+        img.nav-left-banner(:src="mUser.bannerUrl")
+        img.nav-left-avatar(:src="mUser.avatarUrl")
+      ul.nav-left-list
+        li(@click="clickNavItem('search')")
+          .fa.fa-search
+          .item 搜索用户
+        li(@click="clickNavItem('createCategory')")
+          .fa.fa-users
+          .item 创建分组
+        li(@click="clickNavItem('setting')")
+          .fa.fa-cog
+          .item 设置
+      .nav-left-footer NKC CHAT 2.0
     .list-container
       .list-item-container(v-if="activeListId === listId.chat")
-        .list-item(v-for="chatData in chatListData" @click="clickChatItem(chatData.type, chatData.uid)")
+        .list-info(v-if="chatListData.length === 0") 空空如也
+        .list-item(:key="chatData._id" v-for="chatData in chatListData" @click="clickChatItem(chatData.type, chatData.uid)")
           .list-item-avatar
             img(:src="chatData.icon")
           .list-item-right
@@ -20,9 +41,10 @@
               .list-item-abstract {{chatData.abstract}}
               .list-item-number(v-if="chatData.count > 0") {{chatData.count}}
       .list-item-container(v-if="activeListId === listId.user")
+        .list-info(v-if="userListData.length === 0") 空空如也
         .list-item-users(v-for="usersData in userListData")
           .list-item-header {{usersData.title.toUpperCase()}}
-          .list-item(v-for="userData in usersData.data")
+          .list-item(:key="usersData._id" v-for="userData in usersData.data" @click="clickUserItem(userData.type, userData.uid)")
             .list-item-avatar
               img(:src="userData.icon")
             .list-item-right
@@ -32,7 +54,8 @@
                 .list-item-status(v-if="userData.status") [{{userData.status}}]
                 .list-item-abstract {{userData.abstract}}
       .list-item-container(v-if="activeListId === listId.category")
-        .list-item(v-for="categoryData in categoryListData")
+        .list-info(v-if="categoryListData.length === 0") 空空如也
+        .list-item(:key="categoryData._id" v-for="categoryData in categoryListData" @click="clickCategoryItem(categoryData._id)")
           .list-item-avatar.category
             img(:src="i" v-for="i in categoryData.icon" v-if="!!i")
           .list-item-right
@@ -44,33 +67,180 @@
 
 
 <style lang="less" scoped>
-  @import '../../publicModules/base';
+  @import '../message.2.0.less';
   @listHeight: 3.5rem;
   @listPaddingTop: 0.8rem;
   @listRightTopHeight: 1.8rem;
   @listRightBottomHeight: @listHeight - @listRightTopHeight;
+  .list-item-container{
+    padding: 0.5rem 0;
+  }
+  .page-list-container{
+    position: relative;
+    overflow: hidden;
+  }
+  .list-info{
+    height: 2rem;
+    line-height: 2rem;
+    text-align: center;
+    color: #555;
+  }
+  .nav-left-container-mask{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: 200;
+  }
+  .nav-left-container{
+    background-color: #fff;
+    position: absolute;
+    left: -50%;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    z-index: 300;
+    box-shadow: 1px 1px 13px -7px rgba(0,0,0,0.66);
+    border: 1px solid #f4f4f4;
+    border-radius: 3px;
+    transition: left 200ms;
+    &.show{
+      left: 0;
+    }
+    .nav-left-header{
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: @headerHeight;
+      text-align: right;
+      .fa{
+        cursor: pointer;
+        height: @headerHeight;
+        line-height: @headerHeight;
+        width: @headerHeight;
+        text-align: center;
+        &:hover, &:active{
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+      }
+      z-index: 400;
+      color: #fff;
+      font-size: 1.4rem;
+    }
+    .nav-left-banner-container{
+      width: 100%;
+      z-index: 300;
+      position: relative;
+      .nav-left-banner{
+        width: 100%;
+      }
+      &:before{
+        height: 100%;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.2);
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 200;
+        content: '';
+      }
+    }
+    .nav-left-avatar{
+      height: 5rem;
+      width: 5rem;
+      border-radius: 50%;
+      position: absolute;
+      bottom: 2rem;
+      left: 1rem;
+      z-index: 300;
+    }
+    .nav-left-footer{
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: @headerHeight;
+      line-height: @headerHeight;
+      text-align: center;
+      font-size: 1.2rem;
+      color: #aaa;
+    }
+    .nav-left-list{
+      padding: 0;
+      margin: 0;
+      @liHeight: 4rem;
+      li{
+        list-style: none;
+        padding-left: @liHeight;
+        height: @liHeight;
+        position: relative;
+        .fa{
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: @liHeight;
+          width: @liHeight;
+          text-align: center;
+          line-height: @liHeight;
+          font-size: 1.4rem;
+        }
+        .item{
+          height: @liHeight;
+          line-height: @liHeight;
+          border-bottom: 1px solid #e2e2e2;
+          padding-left: 0.5rem;
+          cursor: pointer;
+          &:hover, &.active{
+            background-color: rgba(0, 0, 0, 0.05);
+          }
+        }
+      }
+    }
+  }
   .list-nav-bar{
-    @height: 4rem;
+    @height: @headerHeight;
     height: @height;
     user-select: none;
     box-shadow: 1px 1px 13px -7px rgba(0,0,0,0.66);
+    text-align: center;
+    position: relative;
+    .nav-options{
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: @height;
+      width: @height;
+      font-size: 1.4rem;
+      line-height: @height;
+      text-align: center;
+      cursor: pointer;
+      &:hover, &:active{
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+    }
     .nav-item{
       height: @height;
       line-height: @height;
       cursor: pointer;
-      width: 33.3%;
+      width: 6rem;
       display: inline-block;
       text-align: center;
-      &:hover, &:active{
-        background-color: #f6f6f6;
+      font-weight: 700;
+      font-size: 1.25rem;
+      position: relative;
+      &:hover{
+        background-color: #f4f4f4;
       }
       &.active{
-        background-color: #f4f4f4;
+        color: @primary;
       }
     }
   }
   .list-container{
-    height: 50rem;
+    height: @containerHeight;
     overflow-y: auto;
   }
   .list-item{
@@ -152,6 +322,7 @@
     background-color: #f4f4f4;
     border: 1px solid #ddd;
     box-sizing: content-box;
+    line-height: 0;
     & img{
       width: 33.3%;
       height: 33.3%;
@@ -170,9 +341,19 @@
 
 
 <script>
+  import {
+    openChatPage,
+    openUserPage,
+    openCategoryPage,
+    openSettingPage,
+    openSearchPage,
+  } from '../message.2.0.js';
   export default {
-    props: ['chatListData', 'userListData', 'categoryListData'],
     data: () => ({
+      showOptions: false,
+      chatListData: [],
+      userListData: [],
+      categoryListData: [],
       activeListId: 'chat', // chat, user, category
       list: [
         {
@@ -187,7 +368,8 @@
           id: 'category',
           name: '分组',
         }
-      ]
+      ],
+      mUser: null,
     }),
     computed: {
       listId() {
@@ -199,7 +381,16 @@
       }
     },
     mounted() {
-
+      const app = this;
+      nkcAPI('/message/list', 'GET')
+        .then(data => {
+          const {mUser, chatList, userList, categoryList} = data;
+          app.chatListData = chatList;
+          app.userListData = userList;
+          app.categoryListData = categoryList;
+          app.mUser = mUser;
+        })
+        .catch(sweetError);
     },
     methods: {
       // 格式化时间
@@ -219,7 +410,28 @@
       },
       // 点击列表中的某一项 type: chat、user、category id: uid、uid、categoryId
       clickChatItem(type, uid) {
-        console.log(type, uid)
+        openChatPage(this, type, uid);
+      },
+      // 点击联系人列表中的某一项
+      clickUserItem(type, uid) {
+        openUserPage(this, type, uid)
+      },
+      clickCategoryItem(id) {
+        openCategoryPage(this, id);
+      },
+      switchLeftContainer(show) {
+        this.showOptions = !this.showOptions;
+      },
+      clickNavItem(name) {
+        if(name === 'search') {
+          openSearchPage(this);
+        } else if(name === 'createCategory') {
+          openCategoryPage(this, null);
+        } else if(name === 'setting') {
+          this.$emit('onClickSettingItem');
+          openSettingPage(this);
+        }
+
       }
     }
   }

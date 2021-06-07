@@ -1520,6 +1520,7 @@ messageSchema.statics.getSTUMessageContent = async (message) => {
   const MessageTypeModel = mongoose.model("messageTypes");
   const MessageModel = mongoose.model('messages');
   const plainEscaper = require("../nkcModules/plainEscaper");
+  const filterAllHTML = require('../nkcModules/xssFilters/filterAllHTML');
   const messageType = await MessageTypeModel.findOne({_id: 'STU'});
   const {templates} = messageType;
   const templatesObj = {};
@@ -1535,11 +1536,11 @@ messageSchema.statics.getSTUMessageContent = async (message) => {
   content = content.replace(/\[url=(.*?)\((.*?)\)]/ig, (v1, v2, v3) => {
     const url = parametersData[v2] !== undefined? parametersData[v2]: v2;
     const name = parametersData[v3] !== undefined? parametersData[v3]: v3;
-    return `&nbsp;<a href="${url}" target="_blank">${name}</a>&nbsp;`
+    return `&nbsp;<a href="${url}" target="_blank">${filterAllHTML(name)}</a>&nbsp;`
   });
   content = content.replace(/\[text=(.*?)]/ig, (v1, v2) => {
     const text = parametersData[v2] !== undefined? parametersData[v2]: v2;
-    return `&nbsp;<b>${text}</b>&nbsp;`
+    return `&nbsp;<b>${filterAllHTML(text)}</b>&nbsp;`
   });
   return content;
 }
@@ -1606,7 +1607,7 @@ messageSchema.statics.extendMessages = async (uid, messages) => {
       message.content = await MessageModel.getSTUMessageContent(m);
     } else if(ty === 'newFriends') {
       // 新朋友
-      const {toc, username, agree, description, _id} = m;
+      const {toc, username, agree, description, _id, uid} = m;
       message.time = toc;
       message.s = m.uid;
       message.content = `
@@ -1622,9 +1623,9 @@ messageSchema.statics.extendMessages = async (uid, messages) => {
           ${(() => {
             if(agree === 'null') {
               return `
-                <button class="agree" onclick="window.app.newFriendOperation(${_id}, 'true')">同意</button>
-                <button class="disagree" onclick="window.app.newFriendOperation(${_id}, 'false')">拒绝</button>
-                <button class="ignored" onclick="window.app.newFriendOperation(${_id}, 'ignored')">忽略</button>` 
+                <button class="agree" onclick="window._messageFriendApplication('${uid}', 'agree')">同意</button>
+                <button class="disagree" onclick="window._messageFriendApplication('${uid}', 'disagree')">拒绝</button>
+                <button class="ignored" onclick="window._messageFriendApplication('${uid}', 'ignored')">忽略</button>` 
             } else if(agree === 'true') {
               return `<div class="agree">已同意</div>`
             } else if(agree === 'false') {
@@ -1656,7 +1657,6 @@ messageSchema.statics.extendMessages = async (uid, messages) => {
         });
       }
     }
-
     _messages.push(message);
   }
 
@@ -1664,13 +1664,17 @@ messageSchema.statics.extendMessages = async (uid, messages) => {
 };
 
 /*
-* 标记信息为已读
+* 标记与某个用户的消息为全部已读 不包含添加好友（newFriends）
+* @param {String} type UTU, STU, STE, newFriends
+* @param {String} uid 自己
+* @param {String} tUid 对方
+* @author pengxiguaa 2021-6-3
 * */
 messageSchema.statics.markAsRead = async (type, uid, tUid) => {
   const MessageModel = mongoose.model("messages");
   const CreatedChatModel = mongoose.model('createdChat');
   const SystemInfoLogModel = mongoose.model('systemInfoLogs');
-  const redis = require("../redis");
+  const FriendsApplicationModel = mongoose.model('friendsApplications');
   if(type === "UTU") {
     await MessageModel.updateMany({
       ty: 'UTU',
@@ -1706,13 +1710,16 @@ messageSchema.statics.markAsRead = async (type, uid, tUid) => {
     }
   } else if(type === 'STU'){
     await MessageModel.updateMany({ty: type, r: uid, vd: false}, {$set: {vd: true}});
+  } else if(type === 'newFriends') {
+    /*await FriendsApplicationModel.updateMany({
+      respondentId: uid,
+      agree: 'null'
+    }, {
+      $set: {
+        agree: 'ignored'
+      }
+    });*/
   }
-  await redis.pubMessage({
-    ty: 'markAsRead',
-    messageType: type,
-    uid,
-    targetUid: tUid
-  });
 }
 
 /*

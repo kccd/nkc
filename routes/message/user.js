@@ -1,9 +1,45 @@
 const Router = require('koa-router');
 const userRouter = new Router();
 const PATH = require("path");
-const FILE = require('../../nkcModules/file');
 
 userRouter
+  .get('/', async (ctx, next) => {
+    const {db, data, query, nkcModules} = ctx;
+    const {uid} = query;
+    const {user} = data;
+    let targetUser = await db.UserModel.findOnly({
+      uid
+    });
+    targetUser = await db.UserModel.extendUserInfo(targetUser);
+    data.tUser = {
+      homeUrl: nkcModules.tools.getUrl('userHome', targetUser.uid),
+      uid: targetUser.uid,
+      name: targetUser.username,
+      avatar: nkcModules.tools.getUrl('userAvatar', targetUser.avatar),
+      description: targetUser.description,
+      certsName: targetUser.info.certsName,
+      gradeIcon: nkcModules.tools.getUrl('gradeIcon', targetUser.grade._id),
+      inBlacklist: await db.BlacklistModel.inBlacklist(user.uid, targetUser.uid)
+    }
+    data.friend = await db.FriendModel.findOne({
+      uid: user.uid,
+      tUid: uid
+    });
+    if(data.friend) {
+      await data.friend.extendCid();
+    }
+    if(data.friend && data.friend.info.image) {
+      data.friend = data.friend.toObject();
+      data.friend.info.imageUrl = nkcModules.tools.getUrl('messageFriendImage', targetUser.uid) + "?t=" + Date.now();
+    }
+    data.categories = await db.FriendsCategoryModel.find({
+      uid: user.uid,
+    }, {
+      _id: 1,
+      name: 1,
+    }).sort({toc: -1});
+    await next();
+  })
   .get('/:uid', async (ctx, next) => {
     const {data, db, query, params} = ctx;
     const {uid} = params;
