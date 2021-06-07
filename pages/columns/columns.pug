@@ -13,7 +13,8 @@ block content
           a.button.radius-left(href=`/m?t=l` class=data.t==='l'?"active":"") 最近更新
           a.button(href=`/m?t=s` class=data.t==="s"?'active':"") 最多订阅
           a.button.radius-right(href=`/m?t=p` class=data.t==='p'?'active':'') 最多文章
-
+        .paging-button
+          a.button.radius-right.radius-left(href=`/column` target="_blank") 开设专栏
         .columns-container
           for column in data.columns
             -var klass = '';
