@@ -42,7 +42,6 @@ router
         hasGrade
       ],
     };
-    console.log(data.conditions);
     ctx.template = "column/column.pug";
     await next();
   })
