@@ -5,9 +5,8 @@ const commonjs = require("@rollup/plugin-commonjs");
 const nodePolyfills = require("rollup-plugin-node-polyfills");
 const { terser } = require("rollup-plugin-terser");
 const { babel } = require("@rollup/plugin-babel");
-const { string } = require("rollup-plugin-string");
-const styles = require("rollup-plugin-styles");
 const vue = require("rollup-plugin-vue");
+const json = require("@rollup/plugin-json");
 
 const DIST_DIR = "dist";
 const SCRIPTS_GLOBS = "pages/**/*.js";
@@ -32,8 +31,7 @@ const configuration = files.map(filename => {
       commonjs(),
       vue({ needMap: false }),
       babel({ babelHelpers: "bundled" }),
-      styles({ minimize: true }),
-      string({ include: "pages/**/*.html" }),
+      json(),
       process.env.NODE_ENV === "production" && terser()
     ],
     cache: true
