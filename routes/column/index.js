@@ -2,8 +2,6 @@ const Router = require("koa-router");
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
-    if(!ctx.state.columnPermission) ctx.throw(403, "你的账号暂未满足开设专栏的条件");
-    ctx.template = "column/column.pug";
     const {data, db} = ctx;
     const {user} = data;
     const column = await db.ColumnModel.findOne({uid: user.uid});
@@ -11,6 +9,40 @@ router
       let url = `/m/${column._id}`;
       return ctx.redirect(url);
     }
+    const columnSettings = await db.SettingModel.getSettings('column');
+    const grades = await db.UsersGradeModel.find({}, {displayName: 1, _id: 1}).sort({_id: 1})
+    let hasGrade = false;
+    let userGrades = [];
+    for(const ug of grades) {
+      if(ug._id === user.grade._id) hasGrade = true;
+      if(!columnSettings.userGrade.includes(ug._id)) continue;
+      userGrades.push(ug.displayName);
+    }
+    data.conditions = {
+      xsfCount: [
+        '学术分',
+        columnSettings.xsfCount,
+        user.xsf,
+        columnSettings.xsfCount <= user.xsf
+      ],
+      digestCount: [
+        '精选数',
+        columnSettings.digestCount,
+        user.digestThreadsCount,
+        columnSettings.digestCount <= user.digestThreadsCount],
+      threadCount: [
+        '文章数',
+        columnSettings.threadCount,
+        user.threadCount - user.disabledThreadsCount,
+        columnSettings.threadCount <= user.threadCount - user.disabledThreadsCount],
+      userGrade: [
+        '用户等级',
+        userGrades,
+        user.grade.displayName,
+        hasGrade
+      ],
+    };
+    ctx.template = "column/column.pug";
     await next();
   })
   .post("/", async (ctx, next) => {
