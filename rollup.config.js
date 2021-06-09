@@ -7,6 +7,7 @@ const { terser } = require("rollup-plugin-terser");
 const { babel } = require("@rollup/plugin-babel");
 const vue = require("rollup-plugin-vue");
 const json = require("@rollup/plugin-json");
+const styles = require("rollup-plugin-styles");
 
 const DIST_DIR = "dist";
 const SCRIPTS_GLOBS = "pages/**/*.js";
@@ -32,6 +33,7 @@ const configuration = files.map(filename => {
       vue({ needMap: false }),
       babel({ babelHelpers: "bundled" }),
       json(),
+      styles(),
       process.env.NODE_ENV === "production" && terser()
     ],
     cache: true
