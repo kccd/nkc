@@ -1,19 +1,18 @@
-const path = require("path");
-const glob = require("glob");
-const { nodeResolve } = require("@rollup/plugin-node-resolve");
-const commonjs = require("@rollup/plugin-commonjs");
-const nodePolyfills = require("rollup-plugin-node-polyfills");
-const { terser } = require("rollup-plugin-terser");
-const { babel } = require("@rollup/plugin-babel");
-const vue = require("rollup-plugin-vue");
-const json = require("@rollup/plugin-json");
-const styles = require("rollup-plugin-styles");
+import path from "path";
+import glob from "glob";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import { terser } from "rollup-plugin-terser";
+import { babel } from "@rollup/plugin-babel";
+import vue from "rollup-plugin-vue";
+import json from "@rollup/plugin-json";
+import styles from "rollup-plugin-styles";
 
 const DIST_DIR = "dist";
 const SCRIPTS_GLOBS = "pages/**/*.js";
 const files = glob.sync(SCRIPTS_GLOBS);
 
-const configuration = files.map(filename => {
+export default files.map(filename => {
   const ext = path.extname(filename);
   const basename = path.basename(filename, ext);
   const output = path.join(__dirname, DIST_DIR, filename, "../", basename + ".js");
@@ -27,17 +26,17 @@ const configuration = files.map(filename => {
       compact: false
     },
     plugins: [
-      nodePolyfills(),
       nodeResolve(),
       commonjs(),
-      vue({ needMap: false }),
-      babel({ babelHelpers: "bundled" }),
       json(),
       styles(),
+      vue({ needMap: false }),
+      babel({
+        babelHelpers: "bundled",
+        extensions: [".js", ".vue"]
+      }),
       process.env.NODE_ENV === "production" && terser()
     ],
     cache: true
   }
 });
-
-module.exports = configuration;

@@ -4,6 +4,7 @@
       Hello World
       <a :class="$style.link" href="http://www.google.com">Google</a>
     </h1>
+    <div @click="consolePrint()">console print</div>
   </div>
 </template>
 <script>
@@ -15,6 +16,10 @@ export default {
     change() {
       console.log(this.$style)
       this.custom = this.$style.small;
+    },
+    consolePrint: () => {
+      const a = 100;
+      console.log(a);
     }
   }
 }
