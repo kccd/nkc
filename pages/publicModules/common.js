@@ -1,6 +1,6 @@
 import Vue from "vue";
 
-window.Vue = vue;
+window.Vue = Vue;
 
 var NKC = {
   methods: {},
