@@ -62,6 +62,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "font-awesome": "^4.7.0",
     "fs-extra": "^7.0.1",
+    "globby": "^11.0.3",
     "graceful-fs": "^4.2.4",
     "hex-to-rgba": "^2.0.1",
     "icheck": "^1.0.2",
