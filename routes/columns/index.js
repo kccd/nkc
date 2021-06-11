@@ -47,6 +47,7 @@ router
       column.latestThreads = await db.ColumnPostModel.getLatestThreads(column._id, 3, fidOfCanGetThread);
       return column;
     }));
+    data.navbar_highlight = 'columns';
     ctx.template = 'columns/columns.pug';
     data.t = t;
     data.paging = paging;
