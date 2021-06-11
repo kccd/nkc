@@ -126,7 +126,7 @@
     "uglify-js": "^3.10.4",
     "urllib": "^2.37.0",
     "vue": "^2.5.16",
-    "vue-datetime": "*",
+    "vue-datetime": "^1.0.0-beta.14",
     "xbbcode-parser": "^0.1.2",
     "xss": "^1.0.3"
   },
