@@ -8,9 +8,8 @@
   </div>
 </template>
 <script>
-import bundle from /* preval */ "./lib/bundle.macro.js";
+import bundle from /* preval */ "./lib/bundle.preval.js";
 console.log(bundle);
-
 
 export default {
   data: () => ({
