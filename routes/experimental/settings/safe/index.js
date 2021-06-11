@@ -1,4 +1,5 @@
 const Router = require("koa-router");
+const Querys = require("./query");
 
 const router = new Router();
 router
@@ -47,135 +48,23 @@ router
     ctx.template = "experimental/settings/safe/unverifiedPhone/unverifiedPhone.pug";
     const { data, db, nkcModules, query } = ctx;
     const { page = 0, type, content } = query;
-    const safeSetting = await db.SettingModel.getSettings("safe");
-    const { enable, interval  } = safeSetting.phoneVerify;
-    if(!enable) {
-      data.list = [];
-      return next();
-    }
-    // 现在的时间 - 间隔时间 => 最近应该进行验证的时间
-    // 最后验证时间 < 最近应该进行验证的时间 说明验证过期了
-    const earliestDate = new Date(Date.now() - interval * 60 * 60 * 1000);
-    let personal;
+
+    let result = {};
     if(!type || !content) {
-      const count = await db.UsersPersonalModel.countDocuments({
-        $or: [{
-          lastVerifyPhoneNumberTime: { $exists: false }
-        }, {
-          lastVerifyPhoneNumberTime: { $lt: earliestDate }
-        }]
-      });
-      const paging = nkcModules.apiFunction.paging(page, count);
-      data.paging = paging;
-      personal = await db.UsersPersonalModel.aggregate([
-        { $match: {
-            $or: [
-              { lastVerifyPhoneNumberTime: { $exists: false } },
-              { lastVerifyPhoneNumberTime: { $lt: earliestDate } }
-            ]
-        } },
-        { $sort: { lastVerifyPhoneNumberTime: -1 } },
-        { $skip: paging.start },
-        { $limit: paging.perpage },
-        { $lookup: {
-            from: "users",
-            localField: "uid",
-            foreignField: "uid",
-            as: "userinfo"
-        } },
-        { $unwind: "$userinfo" },
-        { $project: {
-            uid: 1,
-            lastVerifyPhoneNumberTime: 1,
-            nationCode: 1,
-            mobile: 1,
-            _id: 0,
-            "userinfo.username": 1,
-            "userinfo.avatar": 1
-        } },
-      ]).exec();
+      result = await Querys.queryUnverifiedPhone(page);
     } else if(type === "username") {
-      personal = await db.UsersPersonalModel.aggregate([
-        { $match: {
-            $or: [
-              { lastVerifyPhoneNumberTime: { $exists: false } },
-              { lastVerifyPhoneNumberTime: { $lt: earliestDate } }
-            ]
-        } },
-        { $lookup: {
-            from: "users",
-            localField: "uid",
-            foreignField: "uid",
-            as: "userinfo"
-        } },
-        { $unwind: "$userinfo" },
-        { $match: {
-          "userinfo.username": content
-        } },
-        { $project: {
-              uid: 1,
-              lastVerifyPhoneNumberTime: 1,
-              nationCode: 1,
-              mobile: 1,
-              _id: 0,
-              "userinfo.username": 1,
-              "userinfo.avatar": 1
-        } },
-      ]).exec();
+      result = await Querys.queryUnverifiedPhoneByUsername(page, content);
     } else if(type === "phone") {
-      personal = await db.UsersPersonalModel.aggregate([
-        { $match: {
-            $or: [
-              { lastVerifyPhoneNumberTime: { $exists: false } },
-              { lastVerifyPhoneNumberTime: { $lt: earliestDate } }
-            ],
-            mobile: content
-        } },
-        { $lookup: {
-            from: "users",
-            localField: "uid",
-            foreignField: "uid",
-            as: "userinfo"
-        } },
-        { $unwind: "$userinfo" },
-        { $project: {
-              uid: 1,
-              lastVerifyPhoneNumberTime: 1,
-              nationCode: 1,
-              mobile: 1,
-              _id: 0,
-              "userinfo.username": 1,
-              "userinfo.avatar": 1
-        } },
-      ]).exec();
+      result = await Querys.queryUnverifiedPhoneByPhone(page, content);
     } else if(type === "uid") {
-      personal = await db.UsersPersonalModel.aggregate([
-        { $match: {
-            $or: [
-              { lastVerifyPhoneNumberTime: { $exists: false } },
-              { lastVerifyPhoneNumberTime: { $lt: earliestDate } }
-            ],
-            uid: content
-        } },
-        { $lookup: {
-            from: "users",
-            localField: "uid",
-            foreignField: "uid",
-            as: "userinfo"
-        } },
-        { $unwind: "$userinfo" },
-        { $project: {
-              uid: 1,
-              lastVerifyPhoneNumberTime: 1,
-              nationCode: 1,
-              mobile: 1,
-              _id: 0,
-              "userinfo.username": 1,
-              "userinfo.avatar": 1
-        } },
-      ]).exec();
+      result = await Querys.queryUnverifiedPhoneByUid(page, content);
     }
-    const personalObj = personal.map(person => {
+
+    const { paging, personals } = result;
+    data.paging = paging;
+
+    const earliestDate = await Querys.getEarliestDate();
+    const personalObj = personals.map(person => {
       const { nationCode, mobile } = person;
         if(person.lastVerifyPhoneNumberTime) {
           person.timeout = (earliestDate - person.lastVerifyPhoneNumberTime) / 1000 / 60 / 60;

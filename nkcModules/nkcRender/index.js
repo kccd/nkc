@@ -1,4 +1,5 @@
-const cheerio = require("./customCheerio");
+// const cheerio = require("./customCheerio");
+const cheerio = require("cheerio");
 const htmlFilter = require("./htmlFilter");
 const markNotes = require("./markNotes");
 const twemoji = require("twemoji");
@@ -100,7 +101,8 @@ class NKCRender {
     if(type === 'article') {
       replaceATInfo(body[0], atUsers);
     }
-    html = body.safeHtml();
+    html = body.html();
+    // html = body.safeHtml();
     if(type === "article") {
       // 将#nkcat{uid}替换成a标签
       if(atUsers && atUsers.length) {

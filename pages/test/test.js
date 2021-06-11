@@ -1,11 +1,13 @@
-import Vue from 'vue';
-import Message from '../message/message.2.0.vue';
+import Vue from "vue";
+import Cssmodule from "./cssmodule.vue";
+import { sayHello } from "./lib/util";
 
-const app = new Vue({
-  el: '#app',
-  components: {
-    message: Message
-  },
+sayHello();
+
+Vue.component("cssmodule", Cssmodule);
+
+new Vue({
+  el: "#app",
   data: {
 
   }

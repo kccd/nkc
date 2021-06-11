@@ -1,3 +1,7 @@
+import Vue from "vue";
+
+window.Vue = Vue;
+
 var NKC = {
   methods: {},
   modules: {},

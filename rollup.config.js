@@ -1,45 +1,78 @@
-const path = require("path");
-const glob = require("glob");
-const { nodeResolve } = require("@rollup/plugin-node-resolve");
-const commonjs = require("@rollup/plugin-commonjs");
-const nodePolyfills = require("rollup-plugin-node-polyfills");
-const { terser } = require("rollup-plugin-terser");
-const { babel } = require("@rollup/plugin-babel");
-const { string } = require("rollup-plugin-string");
-const styles = require("rollup-plugin-styles");
-const vue = require("rollup-plugin-vue");
+import path from "path";
+import globby from "globby";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import { terser } from "rollup-plugin-terser";
+import { babel } from "@rollup/plugin-babel";
+import vue from "rollup-plugin-vue";
+import json from "@rollup/plugin-json";
+import styles from "rollup-plugin-styles";
 
-const DIST_DIR = "dist";
-const SCRIPTS_GLOBS = "pages/**/*.js";
-const files = glob.sync(SCRIPTS_GLOBS);
+const DIST_DIR = process.env.NODE_ENV === "production"? "dist-prod": "dist";
+const LIB_DIR_PATTERN = "!pages/**/lib";
+const SCRIPTS_PATTERNS = ["pages/**/*.js", LIB_DIR_PATTERN];
+const STYLES_PATTERNS = ["pages/**/*.less", LIB_DIR_PATTERN];
 
-const configuration = files.map(filename => {
+function getOutputPath(filename, outputExt) {
   const ext = path.extname(filename);
   const basename = path.basename(filename, ext);
-  const output = path.join(__dirname, DIST_DIR, filename, "../", basename + ".js");
-  return {
-    input: filename,
-    output: {
-      name: basename,
-      file: output,
-      format: "umd",
-      sourcemap: process.env.NODE_ENV === "production" ? false : "inline",
-      compact: false
-    },
-    plugins: [
-      nodePolyfills(),
-      nodeResolve(),
-      commonjs(),
-      vue({
-        needMap: false
-      }),
-      babel({ babelHelpers: "bundled" }),
-      styles({ minimize: true }),
-      string({ include: "pages/**/*.html" }),
-      process.env.NODE_ENV === "production" && terser()
-    ],
-    cache: true
-  }
-});
+  return path.join(__dirname, DIST_DIR, filename, "../", basename + (outputExt || ext));
+}
 
-module.exports = configuration;
+export default (async () => {
+  const scriptFiles = await globby(SCRIPTS_PATTERNS);
+  const styleFiles = await globby(STYLES_PATTERNS);
+  let configs = [
+    // scripts
+    ...scriptFiles.map(filename => {
+      return {
+        input: filename,
+        output: {
+          name: path.basename(filename, ".js"),
+          file: getOutputPath(filename),
+          format: "umd",
+          sourcemap: process.env.NODE_ENV === "production" ? false : "inline",
+          compact: false
+        },
+        plugins: [
+          nodeResolve(),
+          commonjs(),
+          json(),
+          styles(),
+          vue({ needMap: false }),
+          babel({
+            babelHelpers: "bundled",
+            extensions: [".js", ".vue"]
+          }),
+          process.env.NODE_ENV === "production" && terser()
+        ],
+        cache: true
+      }
+    }),
+
+    // styles
+    ...styleFiles.map(filename => {
+      const tempFile = getOutputPath(filename, ".css.js");
+      const basename = path.basename(filename, path.extname(filename));
+      return {
+        input: filename,
+        output: {
+          file: tempFile,
+          assetFileNames: "[name][extname]",
+          format: "umd",
+          name: basename,
+          exports: "named"
+        },
+        plugins: [
+          styles({
+            mode: ["extract", basename + ".css"],
+            minimize: process.env.NODE_ENV === "production",
+            sourceMap: process.env.NODE_ENV === "production" ? false : "inline"
+          })
+        ]
+      }
+    })
+  ];
+
+  return configs;
+})();

@@ -52,8 +52,8 @@ module.exports = {
         <video class="plyr-dom" preload="none" controls="controls" poster="${poster}" data-rid="${rid}" data-plyr-title="${oname}">
           ${sourceHtml}
         </video>
+        <span class="nkcsource-video-title">${resource.oname} <span class="display-i-b text-danger" style="font-weight: 700">${getSize(resource.size)}</span></span>
       </span>
-      <span class="nkcsource-video-title">${resource.oname} <span class="display-i-b text-danger" style="font-weight: 700">${getSize(resource.size)}</span></span>
     `.trim();
     } else {
       return `<span data-tag="nkcsource" data-type="video-not-found"><span>视频已丢失（${oname}）</span></span>`
@@ -113,7 +113,7 @@ module.exports = {
   },
   pre(html) {
     return html.replace(/<pre(.*?)>([\s\S]*?)<\/pre>/ig, (content, v1, v2) => {
-      v2 = htmlEscape(v2);
+      // v2 = htmlEscape(v2);
       return `<pre${v1}>${v2}</pre>`;
     });
   },
