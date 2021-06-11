@@ -1,5 +1,5 @@
 <template lang="pug">
-  .message-category-container
+  .message-category-container.message-container
     ModuleHeader(
       :title="title"
       :leftIcon="'fa fa-angle-left'"
@@ -47,13 +47,19 @@
                       .category-edit-user-name {{u.username}}
                       .category-edit-option
                         .fa.fa-remove
+          .form-group(v-if="category")
+            button.btn.btn-block.btn-danger(@click="removeCategory") 删除
 </template>
 
 <style lang="less">
   @import "../message.2.0.less";
   .message-category-container{
     .category-info{
-      height: @containerHeight;
+      position: absolute;
+      top: @headerHeight;
+      bottom: 0;
+      left: 0;
+      width: 100%;
       overflow-y: auto;
       padding: 2rem;
       .category-name{
@@ -63,6 +69,7 @@
       }
       .category-description{
         margin-bottom: 0.5rem;
+        word-break: break-all;
       }
       .category-users{
         .category-user{
@@ -287,6 +294,18 @@
           .then((data) => {
             const {categoryId} = data;
             app.reload(categoryId);
+          })
+          .catch(sweetError);
+      },
+      removeCategory() {
+        const {category} = this;
+        const app = this;
+        sweetQuestion(`确定要删除当前分类？`)
+          .then(() => {
+            return nkcAPI(`/message/category?cid=${category._id}`, 'DELETE')
+          })
+          .then(() => {
+            app.closePage();
           })
           .catch(sweetError);
       }

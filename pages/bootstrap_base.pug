@@ -76,15 +76,8 @@ block body
     //- 通用socket
     if !state.isApp
       //- 接入即时通信
-      include ./publicModules/socket/socket
-
-    //- 新增好评
-    //- if data.user.newVoteUp > 0
-    //-   script!=`sweetAlert("你发表的内容新增了 ${data.user.newVoteUp} 个好评👍！")`
-    // 因精选而获得的科创币
-    // -let kcb = data.user.generalSettings.draftFeeSettings.kcb;
-    //-if kcb > 0
-      script!=`sweetAlert("你发表的内容被评为精选，共获得 ${kcb/100} 个科创币！")`
+      +includeJS('/message/connectSocket.js')
+      include ./message/chat
 
   if (!state.isApp || state.platform === 'reactNative') && !data.user
     include ./publicModules/login/login

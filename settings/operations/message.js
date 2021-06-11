@@ -16,6 +16,7 @@ module.exports = {
     GET: 'getFriendsApplication'
   },
   friend: {
+    GET: 'messageGetData',
     POST: 'messagePostData',
     DELETE: 'messagePostData',
     PUT: 'messagePostData',
@@ -42,10 +43,8 @@ module.exports = {
     }
   },
   settings: {
+    GET: 'messageGetData',
     PUT: 'modifyMessageSettings',
-    PARAMETER: {
-      PUT: 'modifyMessageSettingsForUser'
-    }
   },
   mark: {
     PUT: 'modifyMessageStatus'
@@ -57,9 +56,7 @@ module.exports = {
     GET: 'getNewMessages'
   },
   chat: {
-    PARAMETER: {
-      DELETE: 'removeMessageChat'
-    }
+    DELETE: 'messagePostData'
   },
   search: {
     GET: 'messageSearchUser'
@@ -72,6 +69,7 @@ module.exports = {
   },
   category: {
     GET: 'messageCategory',
-    POST: 'messagePostData'
+    POST: 'messagePostData',
+    DELETE: 'messagePostData',
   },
 };

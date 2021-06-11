@@ -11,16 +11,15 @@
 
 <style scoped lang="less">
   @import "../message.2.0.less";
-  @height: @headerHeight;
   .page-header{
     margin: 0;
-    height: @height;
+    height: @headerHeight;
     box-shadow: 1px 1px 13px -7px rgba(0,0,0,0.66);
     border-bottom: 1px solid #ddd;
     position: relative;
-    padding: 0 @height;
+    padding: 0 @headerHeight;
     .page-header-center{
-      line-height: @height;
+      line-height: @headerHeight;
       text-align: center;
       font-size: 1.3rem;
     }
@@ -28,9 +27,9 @@
       position: absolute;
       top: 0;
       left: 0;
-      height: @height;
-      width: @height;
-      line-height: @height;
+      height: @headerHeight;
+      width: @headerHeight;
+      line-height: @headerHeight;
       text-align: center;
       font-size: 1.6rem;
       &>div{

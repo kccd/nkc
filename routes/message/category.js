@@ -10,7 +10,7 @@ router
 
     if(cid) {
       // 查看、编辑分组
-      data.category = await db.FriendsCategoryModel.findOne({_id: cid}, {
+      data.category = await db.FriendsCategoryModel.findOne({_id: cid, uid: user.uid}, {
         _id: 1,
         name: 1,
         description: 1,
@@ -55,7 +55,7 @@ router
     const newUsersId = friendsId.filter(id => friendsUid.includes(id));
     let category;
     if(type === 'modifyCategory') {
-      category = await db.FriendsCategoryModel.findOnly({_id});
+      category = await db.FriendsCategoryModel.findOnly({_id, uid: user.uid});
       await category.updateOne({
         $set: {
           name,
@@ -74,6 +74,14 @@ router
       await category.save();
     }
     data.categoryId = category._id;
+    await next();
+  })
+  .del('/', async (ctx, next) => {
+    const {query, db, data} = ctx;
+    const {user} = data;
+    const {cid} = query;
+    const category = await db.FriendsCategoryModel.findOne({uid: user.uid, _id: cid});
+    if(category) await category.remove();
     await next();
   });
 

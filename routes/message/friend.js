@@ -1,6 +1,15 @@
 const router = require('koa-router')();
 const fsPromises = require('fs').promises;
 router
+  .get('/', async (ctx, next) => {
+    const {query, db, data} = ctx;
+    const {type} = query;
+    const {user} = data;
+    if(type === 'friendsUid') {
+      data.friendsUid = await db.FriendModel.getFriendsUid(user.uid);
+    }
+    await next();
+  })
   .post('/', async (ctx, next) => {
     const {db, data, body, nkcModules} = ctx;
     const {uid, type} = body;

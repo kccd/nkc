@@ -20,6 +20,10 @@ const friendRouter = require('./friend');
 const moment = require("moment");
 messageRouter
   .get('/', async (ctx, next) => {
+    ctx.template = 'message/message.2.pug';
+    await next();
+  })
+  .get('/old', async (ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
     const {user} = data;
     data.page = query.page;

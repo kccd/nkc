@@ -1,5 +1,5 @@
 <template lang="pug">
-  .chat
+  .chat.message-container
     //- 通用header组件
     ModuleHeader(
       :title="tUser? (tUser.friendName||tUser.name): '加载中...'"
@@ -37,7 +37,7 @@
             .icon(@click='openUserHome(message)')
               img(:src="message.sUser.icon")
             //- 消息内容 .nkc-media 代表媒体内容 可用于单独控制背景
-            .message-container(:class="['img', 'video'].includes(message.contentType)?'nkc-media':''")
+            .message-body(:class="['img', 'video'].includes(message.contentType)?'nkc-media':''")
               //- 头像旁的箭头 同于标识谁发的消息
               .smart
               //- 图标 表示消息正在发送中
@@ -107,11 +107,14 @@
     color: #555;
   }
   .chat-container{
-    height: @containerHeight;
+    width: 100%;
+    position: absolute;
+    top: @headerHeight;
+    bottom: 0;
+    left: 0;
     overflow-y: auto;
-    position: relative;
     &[data-type='UTU']{
-      height: @containerHeight - @textareaContainerHeight - @buttonContainerHeight;
+      bottom: @textareaContainerHeight + @buttonContainerHeight;
     }
   }
   .chat{
@@ -119,6 +122,9 @@
   }
   .chat-form{
     width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
     height: @textareaContainerHeight + @buttonContainerHeight;
     background-color: #fff;
     .textarea-container{
@@ -211,15 +217,15 @@
         left: auto;
       }
     }
-    .message-container{
+    .message-body{
       background-color: @primary;
       color: #fff;
-      padding: 0.6rem 0.5rem;
+      padding: 0.7rem 0.5rem;
       font-size: 1.17rem;
       position: relative;
       border-radius: 5px;
       display: inline-block;
-      max-width: 100%;
+      max-width: 40rem;
       &.nkc-media{
         //padding: 0;
         .image{
@@ -294,6 +300,7 @@
       .message-content{
         text-align: left;
         word-break: break-all;
+        font-size: 1.1rem;
         .html{
           & /deep/ a{
             color: #fff;
@@ -308,7 +315,7 @@
     }
     &.right{
       text-align: right;
-      .message-container{
+      .message-body{
         text-align: left;
         .smart{
           right: -8px;

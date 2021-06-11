@@ -1,5 +1,5 @@
 <template lang="pug">
-  .page-list-container
+  .page-list-container.message-container
     .list-nav-bar
       .nav-options(@click="showOptions = !showOptions")
         .fa.fa-bars
@@ -68,7 +68,7 @@
 
 <style lang="less" scoped>
   @import '../message.2.0.less';
-  @listHeight: 3.5rem;
+  @listHeight: 3rem;
   @listPaddingTop: 0.8rem;
   @listRightTopHeight: 1.8rem;
   @listRightBottomHeight: @listHeight - @listRightTopHeight;
@@ -97,9 +97,9 @@
   .nav-left-container{
     background-color: #fff;
     position: absolute;
-    left: -50%;
+    left: -70%;
     top: 0;
-    width: 50%;
+    width: 60%;
     height: 100%;
     z-index: 300;
     box-shadow: 1px 1px 13px -7px rgba(0,0,0,0.66);
@@ -128,7 +128,7 @@
       }
       z-index: 400;
       color: #fff;
-      font-size: 1.4rem;
+      font-size: 1.2rem;
     }
     .nav-left-banner-container{
       width: 100%;
@@ -149,11 +149,11 @@
       }
     }
     .nav-left-avatar{
-      height: 5rem;
-      width: 5rem;
+      height: 3.4rem;
+      width: 3.4rem;
       border-radius: 50%;
       position: absolute;
-      bottom: 2rem;
+      bottom: 1rem;
       left: 1rem;
       z-index: 300;
     }
@@ -165,13 +165,13 @@
       height: @headerHeight;
       line-height: @headerHeight;
       text-align: center;
-      font-size: 1.2rem;
+      font-size: 1rem;
       color: #aaa;
     }
     .nav-left-list{
       padding: 0;
       margin: 0;
-      @liHeight: 4rem;
+      @liHeight: 3rem;
       li{
         list-style: none;
         padding-left: @liHeight;
@@ -185,9 +185,10 @@
           width: @liHeight;
           text-align: center;
           line-height: @liHeight;
-          font-size: 1.4rem;
+          font-size: 1.2rem;
         }
         .item{
+          font-size: 1rem;
           height: @liHeight;
           line-height: @liHeight;
           border-bottom: 1px solid #e2e2e2;
@@ -213,7 +214,7 @@
       left: 0;
       height: @height;
       width: @height;
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       line-height: @height;
       text-align: center;
       cursor: pointer;
@@ -225,11 +226,11 @@
       height: @height;
       line-height: @height;
       cursor: pointer;
-      width: 6rem;
+      width: 4.4rem;
       display: inline-block;
       text-align: center;
       font-weight: 700;
-      font-size: 1.25rem;
+      font-size: 1.16rem;
       position: relative;
       &:hover{
         background-color: #f4f4f4;
@@ -240,7 +241,11 @@
     }
   }
   .list-container{
-    height: @containerHeight;
+    position: absolute;
+    top: @headerHeight;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     overflow-y: auto;
   }
   .list-item{
@@ -258,14 +263,14 @@
         position: relative;
         padding-right: @timeWidth;
         .list-item-username{
-          font-size: 1.3rem;
-          color: #333;
+          font-size: 1.2rem;
+          color: #000;
           .hideText(@line: 1);
         }
         .list-item-time{
           position: absolute;
           top: 0;
-          font-size: 1.1rem;
+          font-size: 1rem;
           right: 0;
           height: 100%;
           text-align: right;
@@ -275,7 +280,7 @@
       .list-item-right-bottom{
         height: @listRightBottomHeight;
         position: relative;
-        font-size: 1.2rem;
+        font-size: 1rem;
         color: #7f7f7f;
         @numberHeight: 1.4rem;
         padding-right: @numberHeight + 0.5rem;
@@ -289,13 +294,13 @@
           word-break: break-all;
         }
         .list-item-number{
-          @height: 1.3rem;
+          @height: 1.2rem;
           position: absolute;
           top: 0;
           right: 0;
           height: @height;
           line-height: @height;
-          padding: 0 0.4rem;
+          padding: 0 0.35rem;
           background-color: red;
           color: #fff;
           text-align: center;
@@ -431,7 +436,7 @@
           this.$emit('onClickSettingItem');
           openSettingPage(this);
         }
-
+        this.switchLeftContainer();
       }
     }
   }

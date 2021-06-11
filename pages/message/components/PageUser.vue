@@ -1,5 +1,5 @@
 <template lang="pug">
-  div
+  .page-user.message-container
     ModuleHeader(
       :title="'用户详情'"
       :leftIcon="'fa fa-angle-left'"
@@ -58,7 +58,9 @@
             .form-group
               button.btn.btn-primary.btn-sm.m-r-05(@click="saveFriendInfo") 保存
               button.btn.btn-default.btn-sm(@click="showFriendInfo = false") 取消
+          button.btn.btn-block.btn-default(@click="toRemoveChat") 移除对话
           button.btn.btn-block.btn-default(v-if="!friend" @click="addFriend") 添加好友
+          button.btn.btn-block.btn-default(v-if="friend" @click="addFriend") 移除好友
           button.btn.btn-block.btn-default(v-if="!tUser.inBlacklist" @click="addToBlacklist") 加入黑名单
           button.btn.btn-block.btn-danger(v-else @click="removeFromBlacklist") 从黑名单移出
 
@@ -67,7 +69,10 @@
   @import '../message.2.0.less';
   .chat-user{
     padding: 2rem;
-    height: @containerHeight;
+    position: absolute;
+    top: @headerHeight;
+    bottom: 0;
+    width: 100%;
     overflow-y: auto;
   }
   .chat-user-base{
@@ -117,7 +122,8 @@
   import ModuleHeader from './ModuleHeader.vue';
   import {
     closePage,
-    openChatPage
+    openChatPage,
+    removeChat
   } from '../message.2.0.js';
   export default {
     data: () => ({
@@ -310,6 +316,10 @@
             sweetSuccess('保存成功');
           })
           .catch(sweetError);
+      },
+      toRemoveChat() {
+        const {tUser} = this;
+        removeChat(tUser.uid);
       }
     }
   }
