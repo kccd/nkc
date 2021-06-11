@@ -164,6 +164,26 @@ function sweetAlert(text) {
   .then(backState)
 }
 
+function sweetPrompt(title) {
+  return new Promise(resolve => {
+    Swal.fire({
+      title,
+      input: 'textarea',
+      inputAttributes: {
+        autocapitalize: 'off'
+      },
+      allowOutsideClick: false,
+      showCancelButton: true,
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      showLoaderOnConfirm: true,
+      preConfirm: (text) => {
+        resolve(text);
+      }
+    });
+  });
+}
+
 function sweetSuccess(text, options) {
   var backState = toAlertOpenState(function() {
     Swal.close();
@@ -2151,4 +2171,5 @@ Object.assign(window, {
   reload,
   openToNewLocation,
   addApptypeToUrl,
+  sweetPrompt,
 });

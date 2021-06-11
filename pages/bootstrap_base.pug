@@ -1,17 +1,24 @@
 extends scratch.pug
 block head
-
+  -var windowData = {};
+  if data.user
+    -windowData.uid = data.user.uid;
+    -windowData.selectTypesWhenSubscribe = !!data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe;
+    -windowData.refererOperationId = data.operationId;
+  if state.isApp
+    -windowData.isApp = true;
+    -windowData.appOS = state.appOS;
+    -windowData.platform = state.platform;
   meta(charset='UTF-8')
   meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
   meta(name="viewport" content="width=device-width, initial-scale=1")
   meta(name="format-detection" content="telephone=no")
   meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
+  meta(name='window-data' content=objToStr(windowData))
   if state.isApp && state.platform === 'reactNative'
     meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
   link(rel='shortcut icon' href=tools.getUrl('siteIcon', state.serverSettings.siteIcon, 'ico'))
   +includeJS('/publicModules/common.js')
-  if data.user
-    script!=`NKC.configs.uid="${data.user.uid}";`
   if state.isApp && state.platform === 'apiCloud'
     +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
@@ -49,10 +56,8 @@ block body
     audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
   +includeJS('/jquery/jquery-ui.1.11.4.min.js')
   //-app使用的js
-  if state.isApp
-    script!=`NKC.configs.isApp = true;NKC.configs.appOS="${state.appOS}";NKC.configs.platform="${state.platform}"`
-    if state.platform === 'apiCloud'
-      +includeJS("/appAPi/app.js")
+  if state.isApp && state.platform === 'apiCloud'
+    +includeJS("/appAPi/app.js")
   +includeJS('/bootstrap/js/bootstrap.min.js')
   +includeJS('/twemoji/2/twemoji.min.js')
   +includeJS('/Promise/promise.min.js')
@@ -68,13 +73,12 @@ block body
   //- 旧版common.js兼容旧的页面
   +includeJS('/interface_common.js')
   if data.user
-    script!=`NKC.configs.selectTypesWhenSubscribe=!!${data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe};`
-    script!=`NKC.configs.refererOperationId="${data.operationId}"`
     +includeJS('/socket.io-client/dist/socket.io.js')
     //- 通用socket
     if !state.isApp
       //- 接入即时通信
-      include ./publicModules/socket/socket
+      +includeJS('/message/connectSocket.js')
+      include ./message/chat
 
   if (!state.isApp || state.platform === 'reactNative') && !data.user
     include ./publicModules/login/login
@@ -83,7 +87,7 @@ block body
     //- 生成二维码 页脚
     include ./publicModules/qrcode/qrcode
     script.
-      console.log('(c)2019 成都科创科学文化研究院')
+      console.log('(c)2021 成都科创科学文化研究院')
       console.log('Project Repository: https://github.com/kccd/nkc')
   if state.isApp && state.platform === 'reactNative'
     script.

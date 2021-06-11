@@ -1,6 +1,7 @@
 const Cookies = require('cookies-string-parse');
 const languages = require('../languages');
 const cookieConfig = require("../config/cookie");
+const translate = require('../nkcModules/translate');
 const {files: fileOperations} = require('../settings/operationsType');
 
 module.exports = async (ctx, next) => {
@@ -160,9 +161,9 @@ module.exports = async (ctx, next) => {
   }
   // 根据用户语言设置加载语言对象
   ctx.state.language = languages[languageName];
-  ctx.state.lang = (type, operationId) => {
-    return ctx.state.language[type][operationId] || operationId;
-  };
+	ctx.state.lang = (type, operationId) => {
+	  return translate(languageName, type, operationId);
+  }
 
 	data.userOperationsId = [...new Set(userOperationsId)];
 	data.userRoles = userRoles;

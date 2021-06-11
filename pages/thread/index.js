@@ -1098,13 +1098,14 @@ function moveThread() {
 	window.MoveThread.open(function(data) {
 		var forums = data.forums;
 		var moveType = data.moveType;
-		const {violation, violationReason} = data;
+		const {violation, violationReason, remindUser} = data;
 		window.MoveThread.lock();
 		nkcAPI("/threads/move", "POST", {
 			forums: forums,
 			moveType: moveType,
 			threadsId: [threadData.tid],
       violation,
+      remindUser,
       violationReason
 		})
 			.then(function() {

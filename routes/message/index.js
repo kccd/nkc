@@ -15,9 +15,15 @@ const searchRouter = require('./search');
 const frameRouter = require('./frame');
 const addFriend = require("./addFriend");
 const categoryRouter = require('./category');
+const listRouter = require('./list');
+const friendRouter = require('./friend');
 const moment = require("moment");
 messageRouter
   .get('/', async (ctx, next) => {
+    ctx.template = 'message/message.2.pug';
+    await next();
+  })
+  .get('/old', async (ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
     const {user} = data;
     data.page = query.page;
@@ -67,7 +73,9 @@ messageRouter
       postCount: 1,
       threadCount: 1,
       disabledPostsCount: 1,
-      disabledThreadsCount: 1
+      disabledThreadsCount: 1,
+      online: 1,
+      onlineType: 1
     });
     const messages = await db.MessageModel.find({_id: {$in: [...midArr]}}, {ip: 0, port: 0});
     const friendsArr = await db.FriendModel.find({uid: user.uid, tUid: {$in: [...uidArr]}});
@@ -111,6 +119,10 @@ messageRouter
       if(friend) {
         name = friend.info.name;
       }
+      let status = '离线';
+      if(targetUser.online) {
+        status = targetUser.onlineType === 'phone'? '手机在线': '网页在线';
+      }
       userList.push({
         time: tlm || toc,
         type: 'UTU',
@@ -118,6 +130,8 @@ messageRouter
         uid: targetUser.uid,
         icon: nkcModules.tools.getUrl('userAvatar', targetUser.avatar),
         platform: targetUser.online? (targetUser.onlineType === 'phone'? 'app': 'web'): 'outline',
+        online: targetUser.online,
+        status,
         abstract,
         messageId: message? message._id: null,
         user: targetUser,
@@ -142,6 +156,7 @@ messageRouter
           type: 'STE',
           message,
           uid: null,
+          status: null,
           count: user.newMessage.newSystemInfoCount,
           name: '系统通知',
           icon: '/statics/message_type/STE.jpg',
@@ -162,6 +177,7 @@ messageRouter
         type: 'STU',
         message,
         uid: null,
+        status: null,
         messageId: message? message._id: null,
         count: user.newMessage.newReminderCount,
         content: message?ctx.state.lang("messageTypes", message.c.type):"",
@@ -184,6 +200,7 @@ messageRouter
             count: newFriendsApplicationCount,
             uid: null,
             targetUser,
+            status: null,
             messageId: null,
             name: '新朋友',
             icon: '/statics/message_type/newFriends.jpg',
@@ -316,5 +333,7 @@ messageRouter
   .use("/frame", frameRouter.routes(), frameRouter.allowedMethods())
   .use("/addFriend", addFriend.routes(), addFriend.allowedMethods())
   .use('/category', categoryRouter.routes(), categoryRouter.allowedMethods())
+  .use('/list', listRouter.routes(), listRouter.allowedMethods())
+  .use('/friend', friendRouter.routes(), friendRouter.allowedMethods())
   .use("/data", dataRouter.routes(), dataRouter.allowedMethods());
 module.exports = messageRouter;

@@ -17,7 +17,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         span.icon-bar
         span.icon-bar
         span.icon-bar
-      a.navbar-brand.website-logo(href="/" )= state.serverSettings.websiteName
+      a.navbar-brand.website-logo(href="/?t=home" )= state.serverSettings.websiteName
 
       .navbar-search.hidden-lg.hidden-md.hidden-sm.inline-block.form-inline
         input.inline-block.form-control(type='text' id="navSearchInputSM" placeholder='关键词 文号 用户')
@@ -46,24 +46,15 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
     //- 电脑屏幕
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
       ul.nav.navbar-nav.navbar-md
-        if data.user
-          li(class=navbar_highlight === 'home' ? 'active' : '')
-            a(href='/?t=home') 主页
-          //-li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
-            a(href='/?t=latest') 最新
-          li(class=navbar_highlight === 'subscribe' ? 'active' : '')
+        li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
+          a(href='/?t=latest') 最新
+        li(class=navbar_highlight === 'subscribe' ? 'active' : '')
+          if data.user
             a(href='/?t=subscribe') 关注
-          li(class=navbar_highlight === 'profile' ? 'active' : '')
-            a(href=`/u/${data.user.uid}/profile`) 我的
-        else
-          li(class=navbar_highlight === 'home' ? 'active' : '')
-            a(href='/?t=home') 主页
-          //li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
-            a(href='/?t=latest') 最新
-          li(class=navbar_highlight === 'subscribe' ? 'active' : '')
-            a.pointer(onclick="Login.open('login')") 关注
-          li(class=navbar_highlight === 'profile' ? 'active' : '')
-            a.pointer(onclick="Login.open('login')") 我的
+          else
+            a.pointer(onclick='NKC.methods.toLogin()') 关注
+        li(class=navbar_highlight === 'columns' ? 'active' : '')
+          a(href=`/m`) 专栏
 
       ul.nav.navbar-nav.navbar-right.nav-font-color.navbar-md
         if data.user
@@ -73,8 +64,8 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             if data.forum
               -editorHref = `/editor?type=forum&id=${data.forum.fid}`;
             a(href=editorHref target='_blank') 发表文章
-          li.new-message.message-switch(class=messageSum?"":"hidden")
-            a(href="/message") 消息
+          li.new-message.message-switch.pointer(class=messageSum?"":"hidden" onclick='messageApp.toChat()')
+            span 消息
             .nav-user-avatar-count.message-switch.message-count(class=messageSum?"":"hidden")=messageSum?messageSum:""
 
           li.dropdown.userInfo.nav-user(onmousover="displayOwnInfo()")
@@ -111,7 +102,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                         | 开设专栏
                     else
                       -showColumnLink = false;
-                    a(href="/message" target='_blank').col-xs-6.nav-user-link
+                    .col-xs-6.nav-user-link(onclick='messageApp.toChat()')
                       .fa.fa-envelope-o
                       | 消息中心
                       .count.message-switch.message-count(class=messageSum?"":"hidden")=messageSum?messageSum:""
@@ -158,17 +149,14 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
 
     .navbar-link
       .col-xs-4
-        a(href='/?t=home') 主页
+        a(href='/?t=home') 最新
       .col-xs-4
         if data.user
           a(href='/?t=subscribe') 关注
         else
           a(onclick="Login.open()") 关注
       .col-xs-4
-        if data.user
-          a(href=`/u/${data.user.uid}/profile`) 我的
-        else
-          a(onclick="Login.open()") 我的
+        a(href=`/m`) 专栏
     .m-a-1#navbar_custom_dom
 
     .m-a-1
@@ -225,15 +213,12 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
               span.fa.fa-columns &nbsp;开设专栏
               span.pull-right.fa.fa-angle-right
         li
-          a(href=`/message`)
+          span
             span.fa.fa-envelope-o &nbsp;消息中心
-              span.nkc-drawer-message.nkc-drawer-link.message-switch-div(class=!messageSum ? "disabled": "" href='/message')
+              span.nkc-drawer-message.nkc-drawer-link.message-switch-div(class=!messageSum ? "disabled": "" )
                 span.message-switch.message-count(class=!messageSum ? "disabled": "")=messageSum
             span.pull-right.fa.fa-angle-right
-        //- li
-          a(href=`/account/subscribes`)
-            span.fa.fa-bookmark-o &nbsp;关注管理
-            span.pull-right.fa.fa-angle-right
+
         li
           a(href=`/u/${data.user.uid}/profile/draft`)
             span.fa.fa-inbox &nbsp;我的草稿

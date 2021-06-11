@@ -24,6 +24,7 @@ NKC.modules.MoveThread = function() {
       recycleId: '',
 
       violation: false,
+      remindUser: true,
       violationReason: ''
     },
     computed: {
@@ -132,6 +133,7 @@ NKC.modules.MoveThread = function() {
           originForums: this.selectedForums,
           violation: this.violation,
           violationReason: this.violationReason,
+          remindUser: this.remindUser,
         });
       },
       showThreadType: function(forum) {

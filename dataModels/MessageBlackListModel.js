@@ -21,4 +21,6 @@ const schema = new Schema({
   collection: "messageBlackLists"
 });
 
+
+
 module.exports = mongoose.model("messageBlackLists", schema);

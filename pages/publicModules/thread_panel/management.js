@@ -96,7 +96,8 @@ function moveSelectedThreads() {
     var moveType = data.moveType;
     var {
       violation,
-      violationReason
+      violationReason,
+      remindUser
     } = data;
     MoveThread.lock();
     nkcAPI("/threads/move", "POST", {
@@ -104,6 +105,7 @@ function moveSelectedThreads() {
       moveType: moveType,
       threadsId: threadsId,
       violation,
+      remindUser,
       violationReason
     })
       .then(function() {

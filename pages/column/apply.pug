@@ -36,6 +36,7 @@ block content
               h5.text-danger(v-if="error") {{error}}
               h5.text-success(v-if="info") {{info}}
               button.btn.btn-primary.btn-block(disabled v-if='!checked' title='请先勾选同意协议') 提交
+              button.btn.btn-primary.btn-block(disabled v-else-if='submitting') 提交
               button.btn.btn-primary.btn-block(@click="submit" v-else) 提交
 block scripts
   include ../publicModules/crop/crop_new

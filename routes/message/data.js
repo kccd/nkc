@@ -34,16 +34,20 @@ router
       });
       data.messages = messages.reverse();
       data.targetUser = targetUser;
+      const friend = await db.FriendModel.findOne({uid: user.uid, tUid: targetUser.uid}, {info: 1});
+      const name = friend && friend.info.name? friend.info.name: (targetUser.username || targetUser.uid);
       data.tUser = {
         uid: targetUser.uid,
         home: getUrl('userHome', targetUser.uid),
         icon: getUrl('userAvatar', targetUser.avatar),
-        name: targetUser.username || targetUser.uid
+        name
       }
       await db.UserModel.extendUserInfo(targetUser);
       data.targetUserGrade = await targetUser.extendGrade();
-      await db.MessageModel.updateMany({ty: 'UTU', r: user.uid, s: uid, vd: false}, {$set: {vd: true}});
-      // 判断是否已创建聊天
+      // 将所有消息标记为已读
+      await db.MessageModel.markAsRead('UTU', user.uid, uid);
+      // await db.MessageModel.updateMany({ty: 'UTU', r: user.uid, s: uid, vd: false}, {$set: {vd: true}});
+      // 判断是否已创建对话，如果没有则创建
       await db.CreatedChatModel.createChat(user.uid, uid);
       data.targetUserSendLimit = (await db.UsersGeneralModel.findOnly({uid: targetUser.uid})).messageSettings.limit;
       // 用户是否能够发送短消息

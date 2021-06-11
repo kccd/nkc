@@ -85,6 +85,9 @@ var Tools = function() {
       case "thread": {
         return "/t/" + id;
       }
+      case "editThread": {
+        return "/editor?"
+      }
       case 'mediaPicture': {
         return "/r/" + id + t;
       }
@@ -95,6 +98,9 @@ var Tools = function() {
       // 其他资源，包含avatar, banner等等
       case "attach": {
         return "/a/" + id
+      }
+      case "messageFriendImage": {
+        return "/friend/" + id + "/image";
       }
       case "videoCover": {
         return "/frameImg/" + id
@@ -135,6 +141,7 @@ var Tools = function() {
   self.getAnonymousInfo = function() {
     return {
       username: '匿名用户',
+      uid: '',
       avatarUrl: self.getUrl('anonymousUserAvatar')
     }
   };

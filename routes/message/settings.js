@@ -1,6 +1,14 @@
 const Router = require('koa-router');
 const settingsRouter = new Router();
 settingsRouter
+  .get('/', async (ctx, next) => {
+    const {db, data} = ctx;
+    const {user} = data;
+    data.grades = await db.UsersGradeModel.find({}, {_id: 1, displayName: 1}).sort({_id: 1});
+    const {messageSettings} = await db.UsersGeneralModel.findOne({uid: user.uid}, {messageSettings: 1});
+    data.messageSettings = messageSettings;
+    await next();
+  })
   .put('/', async (ctx, next) => {
     const {data, db, body} = ctx;
     const {user} = data;
