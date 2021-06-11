@@ -1,5 +1,3 @@
-const path = require("path");
-
 module.exports = {
   presets: [
     ["@babel/preset-env", {
@@ -10,6 +8,7 @@ module.exports = {
     }]
   ],
   plugins: [
+    [require.resolve("babel-plugin-preval")],
     [require.resolve("@babel/plugin-transform-object-assign")],
     [require.resolve("babel-plugin-module-resolver"),
       {
