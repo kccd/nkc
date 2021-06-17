@@ -75,7 +75,7 @@ userRouter
     await next();
   })
   .post('/:uid', async (ctx, next) => {
-    const {db, body, params, data, redis, settings, fs, fsPromise, tools} = ctx;
+    const {db, body, params, data, nkcModules, fsPromise, tools} = ctx;
     const {uid} = params;
     const {ffmpeg} = tools;
     const targetUser = await db.UserModel.findOnly({uid});
@@ -85,12 +85,13 @@ userRouter
     await db.MessageModel.ensureSystemLimitPermission(user.uid, targetUser.uid);
     await db.MessageModel.ensurePermission(user.uid, uid, data.userOperationsId.includes('canSendToEveryOne'));
 
-    let file, content, socketId, voiceTime;
+    let file, content, socketId, voiceTime, localId;
 
     if(body.fields) {
       content = body.fields.content;
       socketId = body.fields.socketId;
       voiceTime = body.fields.voiceTime;
+      localId = body.fields.localId;
       file = body.files.file || null;
     } else {
       content = body.content;
@@ -198,7 +199,8 @@ userRouter
     await db.CreatedChatModel.createChat(user.uid, uid, true);
     const message_ = message.toObject();
     message_.socketId = socketId;
-    await redis.pubMessage(message_);
+    await nkcModules.socket.sendMessageToUser(message._id, localId);
+    // await redis.pubMessage(message_);
     data.message = message;
     data.targetUser = targetUser;
     await next();

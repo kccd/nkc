@@ -60,7 +60,7 @@
               button.btn.btn-default.btn-sm(@click="showFriendInfo = false") 取消
           button.btn.btn-block.btn-default(@click="toRemoveChat") 移除对话
           button.btn.btn-block.btn-default(v-if="!friend" @click="addFriend") 添加好友
-          button.btn.btn-block.btn-default(v-if="friend" @click="addFriend") 移除好友
+          button.btn.btn-block.btn-default(v-if="friend" @click="removeFriend") 移除好友
           button.btn.btn-block.btn-default(v-if="!tUser.inBlacklist" @click="addToBlacklist") 加入黑名单
           button.btn.btn-block.btn-danger(v-else @click="removeFromBlacklist") 从黑名单移出
 

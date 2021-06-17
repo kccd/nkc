@@ -1388,6 +1388,12 @@ messageSchema.statics.sendBecomeFormalForum = async ({pfid, targetUid, formal}) 
   await redis.pubMessage(message);
 }
 
+/*
+* 获取自己存在于对方的对话列表时，对方的UID
+* 获取自己好友的UID
+* @param {String} uid
+* @return {[String]}
+* */
 messageSchema.statics.getUsersFriendsUid = async (uid) => {
   const CreatedChatModel = mongoose.model('createdChat');
   const FriendModel = mongoose.model('friends');
@@ -1503,8 +1509,8 @@ messageSchema.statics.sendFundMessage = async (applicationFormId, type) => {
   }
 };
 
-messageSchema.statics.extendMessage = async (uid, message) => {
-  const messages = await mongoose.model("messages").extendMessages(uid, [message]);
+messageSchema.statics.extendMessage = async (message) => {
+  const messages = await mongoose.model("messages").extendMessages([message]);
   for(const m of messages) {
     if(m.contentType !== 'time') {
       return m;
@@ -1548,7 +1554,7 @@ messageSchema.statics.getSTUMessageContent = async (message) => {
 /*
 * 拓展消息对象，用于reactNativeAPP，web端调整后公用
 * */
-messageSchema.statics.extendMessages = async (uid, messages) => {
+messageSchema.statics.extendMessages = async (messages) => {
 
   // contentType: html, file, video, voice, img, time
   // status: sent, sending, error
@@ -1708,6 +1714,7 @@ messageSchema.statics.markAsRead = async (type, uid, tUid) => {
         await log.save();
       }
     }
+    console.log(`有努力清除标志`);
   } else if(type === 'STU'){
     await MessageModel.updateMany({ty: type, r: uid, vd: false}, {$set: {vd: true}});
   } else if(type === 'newFriends') {

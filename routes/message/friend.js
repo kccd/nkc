@@ -28,11 +28,17 @@ router
     let {agree} = application;
     if(type === 'agree') {
       await db.FriendModel.createFriend(user.uid, targetUser.uid);
+      await nkcModules.socket.sendEventUpdateUserList(user.uid);
+      await nkcModules.socket.sendEventUpdateChatList(user.uid);
+      await nkcModules.socket.sendEventUpdateUserList(targetUser.uid);
+      await nkcModules.socket.sendEventUpdateChatList(targetUser.uid);
       agree = 'true';
     } else if(type === 'disagree') {
       agree = 'false';
+      await nkcModules.socket.sendEventUpdateChatList(user.uid);
     } else if(type === 'ignored') {
       agree = 'ignored';
+      await nkcModules.socket.sendEventUpdateChatList(user.uid);
     }
     await application.updateOne({
       $set: {
@@ -150,14 +156,17 @@ router
       await tools.imageMagick.friendImageify(path, targetFilePath);
     }
     data.imageUrl = nkcModules.tools.getUrl('messageFriendImage', uid);
+    await nkcModules.socket.sendEventUpdateUserList(user.uid);
+    await nkcModules.socket.sendEventUpdateChatList(user.uid);
     await next();
   })
   .del('/', async (ctx, next) => {
-    const {db, query, data} = ctx;
+    const {nkcModules, db, query, data} = ctx;
     const {uid} = query;
     const {user} = data;
     const targetUser = await db.UserModel.findOnly({uid});
     await db.FriendModel.removeFriend(targetUser.uid, user.uid);
+    await nkcModules.socket.sendEventRemoveFriend(user.uid, uid);
     await next();
   });
 

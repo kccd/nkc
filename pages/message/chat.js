@@ -51,6 +51,8 @@ const messageApp = new Vue({
     maximize: false,
 
     boxContent: '暂无消息',
+
+    audio: null,
   },
   components: {
     Message
@@ -79,6 +81,12 @@ const messageApp = new Vue({
   },
   mounted() {
     this.initContainer();
+    this.initAudio();
+    const app = this;
+    socket.on('receiveMessage', (data) => {
+      if(data.localId) return;
+      app.playAudio();
+    });
   },
   watch: {
     showPanel() {
@@ -95,6 +103,7 @@ const messageApp = new Vue({
   },
   methods: {
     // 初始化 数据来源于本地或默认数据
+    getUrl: NKC.methods.tools.getUrl,
     initContainer() {
       const {
         mode,
@@ -356,6 +365,13 @@ const messageApp = new Vue({
     setMaximize() {
       this.setModeData('narrow');
       this.setContainerModeData('maximize');
+    },
+    playAudio() {
+      this.audio.play();
+    },
+    initAudio() {
+      this.audio = new Audio();
+      this.audio.src = this.getUrl('messageTone');
     },
   }
 });

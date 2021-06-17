@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const chatRouter = new Router();
 chatRouter
   .del('/', async (ctx, next) => {
-    const {data, query, db} = ctx;
+    const {nkcModules, data, query, db} = ctx;
     const {user} = data;
     const {uid} = query;
     let type;
@@ -14,6 +14,7 @@ chatRouter
       tUid = uid;
     }
     await db.CreatedChatModel.removeChat(type, user.uid, tUid);
+    await nkcModules.socket.sendEventRemoveChat(type, user.uid, tUid);
     await next();
   });
 module.exports = chatRouter;

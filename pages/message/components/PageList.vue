@@ -437,6 +437,99 @@
           openSettingPage(this);
         }
         this.switchLeftContainer();
+      },
+      updateUserStatus(type, uid, status) {
+        const {chatListData, userListData} = this;
+        for(const chat of chatListData) {
+          if(chat.type === type && chat.uid === uid) {
+            chat.status = status;
+            break;
+          }
+        }
+        loop:
+          for(const arr of userListData) {
+            for(const userData of arr.data) {
+              if(userData.type === type && userData.uid === uid) {
+                userData.status = status;
+                break loop;
+              }
+            }
+        }
+      },
+      // 移除对话
+      removeChat(type, uid) {
+        const {chatListData} = this;
+        for(let i = 0; i < chatListData.length; i ++) {
+          const chat = chatListData[i];
+          if(chat.type === type && chat.uid === uid) {
+            chatListData.splice(i, 1);
+          }
+        }
+      },
+      // 移除好友
+      removeFriend(type, uid) {
+        const {userListData} = this;
+        loop:
+          for (let i = 0; i < userListData.length; i++) {
+            const arr = userListData[i];
+            for (let j = 0; j < arr.data.length; j++) {
+              const userData = arr.data[j];
+              if (userData.type === type && userData.uid === uid) {
+                if (arr.data.length === 1) {
+                  userListData.splice(i, 1);
+                } else {
+                  arr.data.splice(j, 1);
+                }
+                break loop;
+              }
+            }
+          }
+        this.removeChat(type, uid);
+      },
+      // 移除分组
+      removeCategory(cid) {
+        const {categoryListData} = this;
+        for(let i = 0; i < categoryListData.length; i++) {
+          const categoryData = categoryListData[i];
+          if(categoryData._id === cid) {
+            categoryListData.splice(i, 1);
+            break;
+          }
+        }
+      },
+      // 更新整个分组列表
+      updateCategoryList(categoryList) {
+        this.categoryListData = categoryList;
+      },
+      // 更新用户（联系人）列表
+      updateUserList(userList) {
+        this.userListData = userList;
+      },
+      // 更新对话列表
+      updateChatList(chatList) {
+        this.chatListData = chatList;
+      },
+      // 标记为已读
+      markAsRead(type, uid) {
+        const {chatListData} = this;
+        for(const chat of chatListData) {
+          if(chat.type === type && chat.uid === uid) {
+            chat.count = 0;
+            break;
+          }
+        }
+      },
+      // 添加对话并置顶
+      updateChat(chat) {
+        const {type, uid} = chat;
+        for(let i = 0; i < this.chatListData.length; i++) {
+          const chat_ = this.chatListData[i];
+          if(chat_.type === type && chat_.uid === uid) {
+            this.chatListData.splice(i, 1);
+            break;
+          }
+        }
+        this.chatListData.unshift(chat);
       }
     }
   }

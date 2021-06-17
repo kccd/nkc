@@ -110,6 +110,128 @@ chatSchema.statics.createChat = async (uid, targetUid, both) => {
 };
 
 /*
+* 获取单个对话
+* @param {String} 对话类型  UTU, STE, STU, newFriends
+* @param {String} uid 当前用户UID
+* @param {String} tUid 对方用户UID
+* @return {Object}
+*   {
+*     time: Date,
+*     type: String, STE, STU, UTU, newFriends
+*     uid: String or null,
+*     status: String or null
+*     count: Number,
+*     name: String,
+*     icon: String,
+*     abstract: String,
+*   }
+* */
+chatSchema.statics.getSingleChat = async (type, uid, tUid = null) => {
+  const FriendModel = mongoose.model('friends');
+  const UserModel = mongoose.model('users');
+  const translate = require('../nkcModules/translate');
+  const {getUrl} = require('../nkcModules/tools');
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const MessageModel = mongoose.model('messages');
+  const user = await UserModel.findOne({uid});
+  const usersGeneral = await UsersGeneralModel.findOne({uid});
+  const chat = {
+    time: new Date(),
+    type,
+    uid: null,
+    status: null,
+    count: 0,
+    name: null,
+    icon: '',
+    abstract: ''
+  };
+  if(type === 'STE') {
+    const {
+      newSystemInfoCount,
+    } = await user.getNewMessagesCount();
+    const message = await MessageModel.findOne({
+      ty: 'STE'
+    }, {
+      ip: 0,
+      port: 0
+    })
+      .sort({tc: -1});
+    if(message) {
+      chat.time = message.tc;
+      chat.abstract = message.c;
+    }
+    chat.name = '系统通知';
+    chat.icon = `/statics/message_type/STE.jpg`;
+    chat.count = newSystemInfoCount;
+  } else if(type === 'STU') {
+    const {
+      newReminderCount
+    } = await user.getNewMessagesCount();
+    const message = await MessageModel.findOne({ty: 'STU', r: user.uid}, {ip: 0, port: 0}).sort({tc: -1});
+    const messageType = await MessageTypeModel.findOnly({_id: "STU"});
+    if(message) {
+      chat.time = message.tc;
+      chat.abstract = translate(usersGeneral.language, "messageTypes", message.c.type);
+    }
+    chat.count = newReminderCount;
+    chat.name = messageType.name;
+    chat.icon = `/statics/message_type/STU.jpg`;
+  } else if(type === 'newFriends') {
+    const {
+      newApplicationsCount,
+    } = await user.getNewMessagesCount();
+    const friendsApplication = await FriendsApplicationModel.findOne({respondentId: user.uid}).sort({toc: -1});
+    if(friendsApplication) {
+      const targetUser = await UserModel.findOne({uid: friendsApplication.applicantId}, {username: 1});
+      if(targetUser) {
+        chat.time = friendsApplication.toc;
+        chat.abstract = `${targetUser.username}申请添加你为好友`;
+      }
+      chat.count = newApplicationsCount;
+      chat.name = '新朋友';
+      chat.icon = `/statics/message_type/newFriends.jpg`;
+    }
+  } else {
+    const friend = await FriendModel.findOne({uid, tUid}, {info: 1});
+    const targetUser = await UserModel.findOne({uid: tUid});
+    const message = await MessageModel.findOne({
+      $or: [
+        {
+          s: uid,
+          r: tUid
+        },
+        {
+          r: uid,
+          s: tUid
+        }
+      ]
+    }).sort({tc: -1});
+    if(message) {
+      chat.time = message.tc;
+      if(message.withdrawn) {
+        chat.abstract = message.r === uid? '对方撤回一条消息': '你撤回了一条消息';
+      } else {
+        chat.abstract = typeof message.c === 'string'? message.c: message.c.na;
+      }
+    }
+    if(friend && friend.info.name) {
+      chat.name = friend.info.name;
+    } else {
+      chat.name = targetUser.username || targetUser.uid;
+    }
+    chat.status = await targetUser.getOnlineStatus();
+    chat.uid = tUid;
+    chat.count = await MessageModel.countDocuments({
+      s: tUid,
+      r: uid,
+      vd: false
+    });
+    chat.icon = getUrl('userAvatar', targetUser.avatar);
+  }
+  return chat;
+};
+
+/*
 * 获取已创建的对话列表
 * */
 
@@ -178,7 +300,6 @@ chatSchema.statics.getCreatedChat = async (uid) => {
       lmId,
       tlm,
       toc,
-      _id,
     } = c;
     let message = messageObj[lmId];
     if(!message) {
@@ -203,9 +324,8 @@ chatSchema.statics.getCreatedChat = async (uid) => {
       name = friend.info.name;
     }
     name = name || targetUser.username || targetUser.uid;
-    const status = targetUser.getStatus();
+    const status = await targetUser.getOnlineStatus();
     chatList.push({
-      _id, // chat ID
       time: tlm || toc, // 最近更新时间
       type: 'UTU', // 对话类型 UTU(用户间) STU(应用通知) STE(系统通知)
       name, // 显示的名称 昵称或者是用户填写的备注信息
@@ -217,6 +337,7 @@ chatSchema.statics.getCreatedChat = async (uid) => {
     });
   }
   const usersGeneral = await UsersGeneralModel.findOne({uid});
+  const t = Date.now();
   const {
     newSystemInfoCount,
     newApplicationsCount,
@@ -239,7 +360,7 @@ chatSchema.statics.getCreatedChat = async (uid) => {
     }
   };
 
-  if(chat.reminder) {
+  if(chat.systemInfo) {
     const message = await MessageModel.findOne({
       ty: 'STE'
     }, {
@@ -249,7 +370,6 @@ chatSchema.statics.getCreatedChat = async (uid) => {
       .sort({tc: -1});
     if(message) {
       insertChat(chatList, {
-        _id: 'STE',
         time: message.tc,
         type: 'STE',
         uid: null,
@@ -266,7 +386,6 @@ chatSchema.statics.getCreatedChat = async (uid) => {
     const messageType = await MessageTypeModel.findOnly({_id: "STU"});
     if(message) {
       insertChat(chatList, {
-        _id: 'STU',
         time: message.tc,
         name: messageType.name,
         type: 'STU',
@@ -284,7 +403,6 @@ chatSchema.statics.getCreatedChat = async (uid) => {
       const targetUser = await UserModel.findOne({uid: friendsApplication.applicantId}, {username: 1});
       if(targetUser) {
         insertChat(chatList, {
-          _id: 'newFriends',
           type: 'newFriends',
           time: friendsApplication.toc,
           count: newApplicationsCount,

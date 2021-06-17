@@ -3,7 +3,7 @@ block title
   title 聊天窗口
   +includeCSS('/message/appContentList/appContentList.css')
 block content
-  .hidden#data=objToStr({type: data.type, tUser: data.tUser, mUser: data.mUser, messages: data.messages2, type: data.type, twemoji: data.twemoji})
+  .hidden#data=objToStr({type: data.type, tUser: data.tUser, mUser: data.mUser, messages: data.messages, type: data.type, twemoji: data.twemoji})
   #app(v-cloak)
     #container
       #listContainer(ref="listContent")

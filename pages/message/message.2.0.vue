@@ -2,6 +2,7 @@
   .nkc-message-2
     .mode-container.narrow(v-if="mode === modes.narrow")
       PageList(
+        ref="PageList"
         v-show='activePageId === pageId.PageList'
         @event="eventListener"
       )
@@ -33,6 +34,7 @@
     .mode-container.wide(v-else)
       .container-left
         PageList(
+          ref="PageList"
           @event="eventListener"
         )
       .container-right
@@ -155,6 +157,25 @@
   import PageSearch from './components/PageSearch.vue';
   import PageSetting from './components/PageSetting.vue';
 
+  import {
+    receiveMessage,
+    markAsRead,
+    withdrawn
+  } from './socketEvents/message.js';
+  import {
+    removeChat,
+    updateChatList
+  } from './socketEvents/chat.js';
+  import {
+    removeCategory,
+    updateCategoryList
+  } from './socketEvents/category.js'
+  import {
+    updateUserStatus,
+    removeFriend,
+    updateUserList
+  } from './socketEvents/user.js'
+
   export default {
     props: ['mode', 'socket'],
     data: function() {
@@ -171,6 +192,10 @@
           {
             id: 'PageList',
             name: '聊天、用户以及分组列表'
+          },
+          {
+            id: 'PageChat',
+            name: '聊天窗口',
           },
           {
             id: 'PageList',
@@ -227,34 +252,29 @@
       initSocket(socketApp) {
         if(this.socketApp === socketApp) return;
         this.socketApp = socketApp;
-        socket.on('message', data => {
-          console.log(data);
-        });
-        socket.on('markAsRead', data => {
+        // 接收消息
+        socket.on('receiveMessage', receiveMessage.bind(this));
+        // 标记消息为已读
+        socket.on('markAsRead', markAsRead.bind(this));
+        // 撤回消息
+        socket.on('withdrawn', withdrawn.bind(this));
 
-        });
-        socket.on('userConnection', data => {
+        // 更新用户状态
+        socket.on('updateUserStatus', updateUserStatus.bind(this));
 
-        });
-        socket.on('userDisconnection', data => {
+        // 删除对话
+        socket.on('removeChat', removeChat.bind(this));
+        // 删除好友
+        socket.on('removeFriend', removeFriend.bind(this));
+        // 删除分组
+        socket.on('removeCategory', removeCategory.bind(this));
 
-        });
-        socket.on('removeChat', data => {
-
-        });
-        socket.on('removeFriend', data => {
-
-        });
-        socket.on('modifyCategory', data => {
-
-        });
-        socket.on('modifyFriendInfo', data => {
-
-        });
-        socket.on('withdraw', data => {
-
-        });
-
+        // 更新对话列表
+        socket.on('updateChatList', updateChatList.bind(this));
+        // 更新用户（联系人）列表
+        socket.on('updateUserList', updateUserList.bind(this));
+        // 更新分组信息
+        socket.on('updateCategoryList', updateCategoryList.bind(this))
       },
       selectPage(t) {
         this.activePageId = t;

@@ -209,8 +209,8 @@ window.app = new Vue({
       self.getMessageStatus = 'loading';
       return nkcAPI(url, 'GET')
         .then(data => {
-          self.originMessages = self.originMessages.concat(data.messages2);
-          if(data.messages2.length) {
+          self.originMessages = self.originMessages.concat(data.messages);
+          if(data.messages.length) {
             self.getMessageStatus = 'canLoad';
           } else {
             self.getMessageStatus = 'cantLoad';

@@ -132,15 +132,10 @@ const userSchema = new Schema({
 		default: false
 	},
 	online: {
-  	type: Boolean,
-		default: false,
+  	type: String,
+		default: '',
 		index: 1
 	},
-  onlineType: {
-    type: String,
-    default: '',
-    index: 1
-  },
   // 头像文件hash
   avatar: {
     type: String,
@@ -2511,12 +2506,24 @@ userSchema.statics.extendUsersGrade = async (users) => {
   return users;
 };
 
-userSchema.methods.getStatus = function() {
-  let status = '离线';
-  if(this.online) {
-    status = this.onlineType === 'phone'? '手机在线': '网页在线';
-  }
-  return status;
+/*
+* 获取用户的在线状态
+* @param {String} uid 用户ID
+* @return {String}
+* */
+userSchema.statics.getUserOnlineStatus = async (uid) => {
+  const UserModel = mongoose.model('users');
+  const user = await UserModel.findOne({uid});
+  return await user.getOnlineStatus();
+};
+/*
+* 获取用户的在线状态
+* @return {String}
+* */
+userSchema.methods.getOnlineStatus = async function() {
+  if(this.online === 'web') return '网页在线';
+  if(this.online === 'app') return '手机在线';
+  return '离线';
 };
 
 module.exports = mongoose.model('users', userSchema);

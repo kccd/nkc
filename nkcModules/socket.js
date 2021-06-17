@@ -318,4 +318,189 @@ async function sendMessageToUser(channel, message) {
   }
 }
 
+/*
+* 移除对话
+* */
+func.sendEventRemoveChat = async (type, uid, tUid) => {
+  const socketClient = communication.getCommunicationClient();
+  socketClient.sendMessage(socketServiceName, {
+    eventName: 'removeChat',
+    roomName: getRoomName('user', uid),
+    data: {
+      type,
+      uid: tUid
+    }
+  });
+};
+/*
+* 移除好友
+* */
+func.sendEventRemoveFriend = async (uid, tUid) => {
+  const socketClient = communication.getCommunicationClient();
+  socketClient.sendMessage(socketServiceName, {
+    eventName: 'removeFriend',
+    roomName: getRoomName('user', uid),
+    data: {
+      type: 'UTU',
+      uid: tUid
+    }
+  });
+  socketClient.sendMessage(socketServiceName, {
+    eventName: 'removeFriend',
+    roomName: getRoomName('user', tUid),
+    data: {
+      type: 'UTU',
+      uid: uid
+    }
+  });
+};
+
+/*
+* 移除分组
+* */
+func.sendEventRemoveCategory = async (uid, cid) => {
+  const socketClient = communication.getCommunicationClient();
+  socketClient.sendMessage(socketServiceName, {
+    eventName: 'removeCategory',
+    roomName: getRoomName('user', uid),
+    data: {
+      cid
+    }
+  });
+};
+
+/*
+* 更新分组列表
+* */
+func.sendEventUpdateCategoryList = async (uid) => {
+  const categoryList = await db.FriendsCategoryModel.getCategories(uid);
+  const socketClient = communication.getCommunicationClient();
+  socketClient.sendMessage(socketServiceName, {
+    eventName: 'updateCategoryList',
+    roomName: getRoomName('user', uid),
+    data: {
+      categoryList
+    }
+  });
+};
+/*
+* 更新用户好友列表
+* */
+func.sendEventUpdateUserList = async (uid) => {
+  const userList = await db.FriendModel.getFriends(uid);
+  const socketClient = communication.getCommunicationClient();
+  socketClient.sendMessage(socketServiceName, {
+    eventName: 'updateUserList',
+    roomName: getRoomName('user', uid),
+    data: {
+      userList
+    }
+  });
+};
+
+/*
+* 更新用户对话列表
+* */
+func.sendEventUpdateChatList = async (uid) => {
+  const chatList = await db.CreatedChatModel.getCreatedChat(uid);
+  const socketClient = communication.getCommunicationClient();
+  socketClient.sendMessage(socketServiceName, {
+    eventName: 'updateChatList',
+    roomName: getRoomName('user', uid),
+    data: {
+      chatList
+    }
+  });
+};
+
+/*
+* 撤回消息
+* */
+func.sendEventWithdrawn = async (uid, tUid, messageId) => {
+  const socketClient = communication.getCommunicationClient();
+  socketClient.sendMessage(socketServiceName, {
+    eventName: 'withdrawn',
+    roomName: getRoomName('user', uid),
+    data: {
+      messageId
+    }
+  });
+  socketClient.sendMessage(socketServiceName, {
+    eventName: 'withdrawn',
+    roomName: getRoomName('user', tUid),
+    data: {
+      messageId
+    }
+  });
+};
+
+/*
+* 标记为已读
+* */
+func.sendEventMarkAsRead = async (type, uid, tUid) => {
+  const socketClient = communication.getCommunicationClient();
+  socketClient.sendMessage(socketServiceName, {
+    eventName: 'markAsRead',
+    roomName: getRoomName('user', uid),
+    data: {
+      type,
+      uid: tUid
+    }
+  });
+};
+
+/*
+* 发送普通消息
+* */
+func.sendMessageToUser = async (messageId, localId) => {
+  let message = await db.MessageModel.findOne({_id: messageId});
+  if(!message) return;
+  const {ty, s, r} = message;
+  message = await db.MessageModel.extendMessage(message);
+  const socketClient = communication.getCommunicationClient();
+  const rChat = await db.CreatedChatModel.getSingleChat(ty, r, s);
+  if(ty === 'UTU') {
+    const sChat = await db.CreatedChatModel.getSingleChat(ty, s, r);
+    socketClient.sendMessage(socketServiceName, {
+      eventName: 'receiveMessage',
+      roomName: getRoomName('user', s),
+      data: {
+        localId,
+        message,
+        chat: sChat
+      }
+    });
+  }
+  socketClient.sendMessage(socketServiceName, {
+    eventName: 'receiveMessage',
+    roomName: getRoomName('user', r),
+    data: {
+      message,
+      chat: rChat
+    }
+  });
+};
+
+/*
+* 向在线用户推送系统通知
+* */
+func.sendSystemInfoToUser = async (messageId) => {
+  let message = await db.MessageModel.findOne({_id: messageId});
+  if(!message) return;
+  message = await db.MessageModel.extendMessage(message);
+  const users = await db.UserModel.find({online: {$ne: ''}}, {uid: 1}).sort({toc: 1});
+  const socketClient = communication.getCommunicationClient();
+  for(const u of users) {
+    const rChat = await db.CreatedChatModel.getSingleChat('STE', u.uid);
+    socketClient.sendMessage(socketServiceName, {
+      eventName: 'receiveMessage',
+      roomName: getRoomName('user', u.uid),
+      data: {
+        message,
+        chat: rChat
+      }
+    })
+  }
+};
+
 module.exports = func;

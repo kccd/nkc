@@ -13,13 +13,13 @@
       //- 对话列表容器 长度无限制
       .chat-messages
         //- 加载消息时的状态显示
-        .chat-message-info(v-if="loading") 加载中...
-        //- 没有消息可加载时的显示
-        .chat-message-info(v-else-if="loadFinished")
-          //- 存在对话时
-          span(v-if="messages.length > 0") 没有更多信息了
-          //- 不存在对话时
-          span(v-else) 空空如也
+        .chat-message-info
+          span(v-if="loading") 加载中...
+          span(v-else-if="loadFinished")
+            //- 存在对话时
+            span(v-if="messages.length > 0") 没有更多信息了
+            //- 不存在对话时
+            span(v-else) 空空如也
         //- 单条对话信息
         .chat-message-item(v-for="message in messages" :key="message._id")
           //- 时间戳
@@ -33,6 +33,8 @@
             span(v-else) 你撤回了一条消息
           //- 消息内容容器
           .message(v-else :class='message.position')
+
+            .timestamp {{message.sUser.name}} {{message.timeString}}
             //- 发信人头像
             .icon(@click='openUserHome(message)')
               img(:src="message.sUser.icon")
@@ -40,14 +42,10 @@
             .message-body(:class="['img', 'video'].includes(message.contentType)?'nkc-media':''")
               //- 头像旁的箭头 同于标识谁发的消息
               .smart
-              //- 图标 表示消息正在发送中
-              .status.sending(v-if='message.status === "sending"')
-                .fa.fa-circle-o-notch.fa-spin
-              //- 图标 表示消息发送失败 点击可重发
-              .status.error(v-else-if='message.status === "error"' @click="sendMessage('resend', message)")
+              .status.error(v-if='message.status === "error"' @click="sendMessage(message, true)")
                 .fa.fa-exclamation-circle
               //- 图标 表示消息发送成功并可以撤回 点击后消息将被撤回
-              .status.withdrawn(v-if='message.canWithdrawn' @click="withdrawn(message._id)")
+              .status.withdrawn(v-if='message.canWithdrawn' @click="withdrawn(message._id)" title="撤回")
                 .fa.fa-trash
               //- 具体的消息内容 如果是
               .message-content
@@ -78,26 +76,36 @@
                     .time {{message.content.fileTimer}}''
                     img(src=`/default/stopLeft.png` v-if="message.content.playStatus === 'unPlay'")
                     img(v-else src=`/default/playLeft.gif`)
+              //- 发送进度
+              .sending-progress(v-if="message.status === 'sending'")
+                .fa.fa-circle-o-notch.fa-spin
+                span(v-if="message.progress !== 100") 上传中...{{message.progress}}%
+                span(v-else) 上传成功，处理中...
     //- 输入面板 仅在与用户对话时显示
     .chat-form(v-if="showForm")
+      // 表情面板
+      .chat-twemoji(ref="twemojiContainer" v-if="showTwemoji")
+        .icon(v-for="e in twemoji" @click="selectIcon(e.code)")
+          img(:src="e.url")
       //- 输入框容器
       .textarea-container
         //- 输入框
-        textarea(ref="input" placeholder="请输入内容...")
+        textarea(ref="input" placeholder="请输入内容..." @keyup.ctrl.enter="sendTextMessage" v-model="content")
       //- 按钮容器
       .button-container
-        .button
+        .button(@click="toShowTwemoji" title="表情")
           .fa.fa-smile-o
-        .button
+        .button(@click="selectFile" title="文件")
+          input.hidden(ref="fileInput" type="file" @change="selectedFile" multiple="multiple")
           .fa.fa-file-o
         .button.tip Ctrl + Enter 快捷发送
-        .button.send
+        .button.send(@click="sendTextMessage")
           span 发送
 </template>
 
 <style scoped lang="less">
   @import "../message.2.0.less";
-  @textareaContainerHeight: 5rem;
+  @textareaContainerHeight: 6rem;
   @buttonContainerHeight: 3rem;
   .chat-message-info{
     height: 2rem;
@@ -127,6 +135,9 @@
     bottom: 0;
     height: @textareaContainerHeight + @buttonContainerHeight;
     background-color: #fff;
+    &>div{
+      height: 100%;
+    }
     .textarea-container{
       height: @textareaContainerHeight;
       box-sizing: border-box;
@@ -138,6 +149,7 @@
       width: 100%;
       padding-left: 1rem;
       .button{
+        cursor: pointer;
         display: inline-block;
         height: @buttonContainerHeight;
         line-height: @buttonContainerHeight;
@@ -217,6 +229,15 @@
         left: auto;
       }
     }
+    .timestamp{
+      height: 1px;
+      width: 1px;
+      overflow: hidden;
+      color: #fff;
+      position: absolute;
+      top: 0;
+      left: -10rem;
+    }
     .message-body{
       background-color: @primary;
       color: #fff;
@@ -226,6 +247,20 @@
       border-radius: 5px;
       display: inline-block;
       max-width: 40rem;
+      .sending-progress{
+        height: 2rem;
+        width: 100%;
+        text-align: center;
+        line-height: 2rem;
+        font-size: 1rem;
+        font-style: oblique;
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 3px;
+        color: #eee;
+        .fa{
+          margin-right: 0.2rem;
+        }
+      }
       &.nkc-media{
         //padding: 0;
         .image{
@@ -294,13 +329,14 @@
         }
         &.withdrawn{
           color: #ccc;
-          font-size: 1.8rem;
+          font-size: 1.4rem;
+          cursor: pointer;
         }
       }
       .message-content{
         text-align: left;
         word-break: break-all;
-        font-size: 1.1rem;
+        font-size: 1.2rem;
         .html{
           & /deep/ a{
             color: #fff;
@@ -309,6 +345,26 @@
           }
           & /deep/ .message-emoji{
               width: 2rem;
+          }
+        }
+        .file{
+          a{
+            color: #fff;
+            text-decoration: none;
+            &:hover, &:active{
+              text-decoration: none;
+            }
+            &:after{
+              margin-top: 0.5rem;
+              border-radius: 3px;
+              content: '下载';
+              height: 2rem;
+              display: block;
+              line-height: 2rem;
+              background-color: rgba(0, 0, 0, 0.3);
+              text-align: center;
+              font-size: 1rem;
+            }
           }
         }
       }
@@ -335,10 +391,30 @@
   .chat{
     position: relative;
   }
+  .chat-twemoji{
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+    z-index: 500;
+    .icon{
+      cursor: pointer;
+      height: 2rem;
+      width: 2rem;
+      display: inline-block;
+      margin: 0.2rem;
+      img{
+        height: 100%;
+        width: 100%;
+      }
+    }
+  }
 </style>
 
 <script>
+  const CHAT_CONTENT_ID = `NKC_CHAT_CONTENT`;
   import ModuleHeader from './ModuleHeader.vue';
+  import {saveToLocalStorage, getFromLocalStorage} from "../../lib/js/localStorage";
   import {
     closePage,
     openUserPage,
@@ -362,11 +438,26 @@
       textareaHeight: 100,
       page: 0,
 
+      originTwemoji: [],
+
+      showTwemoji: false,
+
+      content: '',
 
     }),
+    watch: {
+      content() {
+        const {content, type, uid} = this;
+        if(type !== 'UTU') return;
+        const chatContent = getFromLocalStorage(CHAT_CONTENT_ID);
+        chatContent[uid] = content;
+        saveToLocalStorage(CHAT_CONTENT_ID, chatContent);
+      }
+    },
     mounted() {
       const app = this;
       const listContent = app.$refs.listContent;
+      // 滚动到顶部加载历史记录
       listContent.onscroll = function() {
         const scrollTop = this.scrollTop;
         if(scrollTop > 20 || app.loadFinished || app.loading) return;
@@ -381,7 +472,11 @@
             sweetError(err);
           })
 
-      }
+      };
+      // 点击后收起表情面板
+      listContent.addEventListener('click', () => {
+        app.toHideTwemoji();
+      });
     },
     computed: {
       leftIcon() {
@@ -408,6 +503,17 @@
         const {type} = this;
         return type === 'UTU';
       },
+      twemoji() {
+        const {originTwemoji, getUrl} = this;
+        const arr = [];
+        for(const e of originTwemoji) {
+          arr.push({
+            code: e,
+            url: getUrl('twemoji', e)
+          });
+        }
+        return arr;
+      },
       messages() {
         const {originMessages, mUser, tUser, timeout} = this;
         const now = new Date().getTime();
@@ -415,7 +521,7 @@
         const messagesObj = {};
         const messages = [];
         for(const m of originMessages) {
-          const {_id, s} = m;
+          const {_id, s, time} = m;
           const ownMessage = s === mUser.uid;
           messagesId.push(_id);
           m.position = ownMessage? 'right': 'left';
@@ -423,6 +529,8 @@
           m.canWithdrawn = m.status === 'sent' && ownMessage && (now - new Date(m.time) < timeout);
 
           messagesObj[_id] = m;
+
+          m.timeString = NKC.methods.tools.timeFormat(m.time);
         }
         messagesId = [...new Set(messagesId)];
         messagesId = messagesId.sort((a, b) => a - b);
@@ -456,6 +564,7 @@
       ModuleHeader
     },
     methods: {
+      getUrl: NKC.methods.tools.getUrl,
       timeFormat: NKC.methods.tools.timeFormat,
       closePage() {
         this.reset();
@@ -480,9 +589,10 @@
           .then(data => {
             app.tUser = data.tUser;
             app.mUser = data.mUser;
-            app.originMessages = data.messages2.concat(app.originMessages);
+            app.originMessages = data.messages.concat(app.originMessages);
             app.loading = false;
-            if(data.messages2.length === 0) {
+            app.originTwemoji = data.twemoji;
+            if(data.messages.length === 0) {
               app.loadFinished = true;
             }
           })
@@ -498,10 +608,17 @@
         this.tUser = null;
         this.mUser = null;
       },
+      setContentFromLocalStorage() {
+        const {type, uid} = this;
+        if(type !== 'UTU') return;
+        const chatContent = getFromLocalStorage(CHAT_CONTENT_ID);
+        this.content = chatContent[uid] || '';
+      },
       init({type, uid}) {
         const app = this;
         this.reset();
         this.setTargetInfo(type, uid);
+        this.setContentFromLocalStorage();
         this.getMessage(0)
         .then(() => {
           app.scrollToBottom();
@@ -510,8 +627,16 @@
       scrollToBottom() {
         setTimeout(() => {
           const listContent = this.$refs.listContent;
-          listContent.scrollTop = listContent.scrollHeight + 10000;
+          listContent.scrollTop = listContent.scrollHeight + $(listContent).height();
         }, 100)
+      },
+      checkScrollTopAndScrollToBottom() {
+        const app = this;
+        setTimeout(() => {
+          const listContent = app.$refs.listContent;
+          if(listContent.scrollHeight - (listContent.scrollTop + $(listContent).height()) > 500) return;
+          app.scrollToBottom();
+        }, 100);
       },
       autoResize(init) {
         const textArea = this.$refs.input;
@@ -524,11 +649,175 @@
       openUserHome() {
         openUserPage(this, this.type, this.uid);
       },
-      sendMessage() {
-
+      withdrawn(messageId) {
+        nkcAPI(`/message/withdrawn`, 'PUT', {
+          messageId
+        })
+          .catch(sweetError);
       },
-      withdrawn() {}
+      onWithdrawn(messageId) {
+        const {originMessages} = this;
+        for(const message of originMessages) {
+          if(message._id === messageId) {
+            message.contentType = 'withdrawn';
+            message.content = null;
+            break;
+          }
+        }
+      },
+      onReceiveMessage(localId, message) {
+        const {r, messageType, s} = message;
+        const {mUser, tUser, type, originMessages} = this;
+        if(messageType !== type) return;
+        if(type === 'UTU' && (r !== mUser.uid && r !== tUser.uid)) return;
+        let hasMessage = false;
+        for(let i = 0; i < originMessages.length; i++) {
+          const originMessage = originMessages[i];
+          if(originMessage._id === localId) {
+            originMessages.splice(i, 1, message);
+            hasMessage = true;
+            break;
+          }
+        }
+        if(hasMessage === false) {
+          this.originMessages.unshift(message);
+        }
+        this.checkScrollTopAndScrollToBottom();
+        if(r === mUser.uid) {
+          this.markAsRead();
+        }
+      },
+      markAsRead() {
+        const {type, uid} = this;
+        nkcAPI(`/message/mark`, 'PUT', {
+          type, uid
+        })
+        .catch(console.error);
+      },
+      selectIcon(code) {
+        let content = this.content;
+        const e = this.$refs.input;
+        let index;
+        if (e.selectionStart) {
+          index = e.selectionStart;
+        } else if (document.selection) {
+          e.focus();
+          const r = document.selection.createRange();
+          const sr = r.duplicate();
+          sr.moveToElementText(e);
+          sr.setEndPoint('EndToEnd', r);
+          index = sr.text.length - r.text.length;
+        }
+        const emoji = `[f/${code}]`;
 
+        if(index > 1) {
+          const str = content.substring(0, index);
+          const str2 = str + emoji;
+          content = content.replace(str, str2);
+        } else {
+          content = emoji + (content || '');
+        }
+        this.content = content;
+        this.toHideTwemoji();
+      },
+      toHideTwemoji() {
+        this.showTwemoji = false;
+      },
+      toShowTwemoji() {
+        this.showTwemoji = true;
+        setTimeout(() => {
+          const container = this.$refs.twemojiContainer;
+          container.scrollTop = 0;
+        });
+      },
+      switchTwemoji() {
+        if(this.showTwemoji) {
+          this.toHideTwemoji();
+        } else {
+          this.toShowTwemoji();
+        }
+      },
+      selectFile() {
+        this.$refs.fileInput.click();
+      },
+      selectedFile() {
+        const files = this.$refs.fileInput.files;
+        for(const file of files) {
+          this.sendFileMessage(file);
+        }
+      },
+      sendMessage(message, resend = false) {
+        const app = this;
+        const {tUser} = this;
+        const {formData} = message;
+        // 延迟显示发送状态（发送中...），提升用户体验
+        clearTimeout(message.timeout);
+        message.timeout = setTimeout(() => {
+          message.status = 'sending';
+        }, 2000);
+        return Promise.resolve()
+          .then(() => {
+            if(!resend) {
+              app.originMessages.push(message);
+              app.checkScrollTopAndScrollToBottom();
+              if(message.clearContent) app.content = '';
+            }
+            return nkcUploadFile(`/message/user/${tUser.uid}`, 'POST', formData, (e, num) => {
+              message.progress = num;
+            })
+          })
+          .then(() => {
+            clearTimeout(message.timeout);
+            message.status = 'sent';
+          })
+          .catch(err => {
+            clearTimeout(message.timeout);
+            message.status = 'error';
+            sweetError(err);
+          });
+      },
+      getLocalMessage(content) {
+        const {mUser, tUser} = this;
+        const localId = `local_id_${Date.now()}`;
+        return {
+          canWithdrawn: false,
+          content,
+          contentType: 'html',
+          messageType: 'UTU',
+          position: 'right',
+          r: tUser.uid,
+          s: mUser.uid,
+          sUser: mUser,
+          status: 'notSend',
+          time: new Date(),
+          _id: localId,
+          progress: 0,
+        };
+      },
+      sendFileMessage(file) {
+        const {name} = file;
+        const message = this.getLocalMessage(name);
+        const formData = new FormData();
+        formData.append('localId', message._id);
+        formData.append('file', file);
+        message.formData = formData;
+        message.isFile = true;
+        this.sendMessage(message);
+      },
+      sendTextMessage() {
+        const {content} = this;
+        if(content.length === 0) return;
+        const message = this.getLocalMessage(content);
+        const formData = new FormData();
+        formData.append('content', content);
+        formData.append('localId', message._id);
+        message.formData = formData;
+        message.clearContent = true;
+        this.sendMessage(message);
+      },
+      playVoice(message) {
+
+      }
     }
   }
 </script>

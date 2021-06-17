@@ -3,9 +3,10 @@ const router = new Router();
 
 router
   .get("/", async (ctx, next) => {
-    const {db, query, data, state, nkcModules, redis} = ctx;
+    const {db, query, data, state, nkcModules} = ctx;
     const {user} = data;
-    const {type, firstMessageId, uid} = query;
+    const {type, firstMessageId} = query;
+    const uid = !query.uid || query.uid === 'null'? null: query.uid;
     data.twemoji = state.twemoji;
     const {getUrl} = nkcModules.tools;
     if(type === "UTU") {
@@ -139,12 +140,13 @@ router
       icon: getUrl('userAvatar', user.avatar),
       name: user.username || user.uid
     }
-    data.messages2 = await db.MessageModel.extendMessages(data.user.uid, data.messages);
+    data.messages = await db.MessageModel.extendMessages(data.messages);
 
     const messageSettings = await db.SettingModel.getSettings('message');
     data.sizeLimit = messageSettings.sizeLimit;
 
     await db.MessageModel.markAsRead(type, user.uid, uid);
+    await nkcModules.socket.sendEventMarkAsRead(type, user.uid, uid);
 
     ctx.template = 'message/appContentList/appContentList.pug';
     await next();
