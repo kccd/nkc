@@ -1,25 +1,22 @@
 <template>
   <div>
-    <h1 :class="[$style.title, custom]" @click="change()">
+    <h1 class="title">
       Hello World
-      <a :class="$style.link" href="http://www.google.com">Google</a>
+      <a class="link" href="http://www.google.com">Google</a>
     </h1>
     <div @click="consolePrint()">console print</div>
   </div>
 </template>
 <script>
 import bundle from /* preval */ "./lib/bundle.preval.js";
+
 console.log(bundle);
 
 export default {
   data: () => ({
-    custom: ""
+    
   }),
   methods: {
-    change() {
-      console.log(this.$style)
-      this.custom = this.$style.small;
-    },
     consolePrint: () => {
       const a = 100;
       console.log(a);
@@ -28,7 +25,7 @@ export default {
 }
 </script>
 
-<style module scoped lang="less">
+<style scoped lang="less">
   .title {
     color: green;
     transition: font-size .5s;
