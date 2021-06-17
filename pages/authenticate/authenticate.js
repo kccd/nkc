@@ -1,8 +1,6 @@
 import Vue from "vue";
-import { Datetime } from "vue-datetime";
-import "vue-datetime/dist/vue-datetime.css";
-
-Vue.component("datetime", Datetime);
+import DatePicker from "element-ui/lib/date-picker";
+import "element-ui/lib/theme-chalk/index.css";
 
 const DEFAULT_IMAGE = "/default/photo_setting.jpg";
 const _data = JSON.parse($("#data").text());
@@ -26,7 +24,33 @@ new Vue({
 			status: "passed",
 			expiredDate: "",
 			message: ""
-		}
+		},
+		datePickerOptions: {
+			disabledDate(time) {
+				return time.getTime() < Date.now();
+			},
+			shortcuts: [{
+				text: "7天后",
+				onClick(picker) {
+					picker.$emit('pick', new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+				}
+			}, {
+				text: "30天后",
+				onClick(picker) {
+					picker.$emit('pick', new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
+				}
+			}, {
+				text: "90天后",
+				onClick(picker) {
+					picker.$emit('pick', new Date(Date.now() + 90 * 24 * 60 * 60 * 1000));
+				}
+			}, {
+				text: '365天后',
+				onClick(picker) {
+					picker.$emit('pick', new Date(Date.now() + 365 * 24 * 60 * 60 * 1000));
+				}
+			}]
+		},
 	},
 	computed: {
 		IDCardA() {
@@ -77,5 +101,8 @@ new Vue({
 			}
 			location.reload();
 		}
+	},
+	components: {
+		"el-date-picker": DatePicker
 	}
 });

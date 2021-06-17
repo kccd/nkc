@@ -8,6 +8,7 @@ import vue from "rollup-plugin-vue";
 import json from "@rollup/plugin-json";
 import styles from "rollup-plugin-styles";
 import buble from "@rollup/plugin-buble";
+import replace from "@rollup/plugin-replace";
 
 const DIST_DIR = process.env.NODE_ENV === "production"? "dist-prod": "dist";
 const LIB_DIR_PATTERN = "!pages/**/lib";
@@ -45,7 +46,11 @@ export default (async () => {
             babelHelpers: "bundled",
             extensions: [ ".js", ".ts", ".tsx", ".jsx", ".es6", ".es", ".mjs", ".vue" ]
           }),
-          buble({}),
+          buble({ transforms: { forOf: false } }),
+          replace({
+            preventAssignment: true,
+            "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+          }),
           process.env.NODE_ENV === "production" && terser()
         ],
         cache: true

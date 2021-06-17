@@ -13,7 +13,7 @@ module.exports = {
     [require.resolve("babel-plugin-module-resolver"),
       {
         alias: {
-          vue: "Vue/dist/vue.esm.browser.js"
+          "vue": "vue/dist/vue.esm.browser.js"
         }
       }
     ]
