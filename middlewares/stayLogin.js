@@ -75,7 +75,13 @@ module.exports = async (ctx, next) => {
     if(ctx.data.operationId === "getResources" || !isResourcePost) {
       const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
       await db.UserModel.extendUsersInfo([user]);
-      user.newMessage = await user.getNewMessagesCount();
+      const {
+        newSystemInfoCount,
+        newApplicationsCount,
+        newReminderCount,
+        newUsersMessagesCount
+      } = await user.getNewMessagesCount();
+      user.newMessage = newSystemInfoCount + newApplicationsCount + newReminderCount + newUsersMessagesCount;
       user.authLevel = await userPersonal.getAuthLevel();
       user.setPassword = userPersonal.password.salt && userPersonal.password.hash;
       user.boundMobile = userPersonal.nationCode && userPersonal.mobile;

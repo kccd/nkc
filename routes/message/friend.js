@@ -46,6 +46,7 @@ router
         tlm: new Date(),
       }
     });
+    await nkcModules.socket.sendNewFriendApplication(application._id);
     await next();
   })
   .post('/apply', async (ctx, next) => {
@@ -87,6 +88,8 @@ router
       await applicationLog.save();
     }
     await db.UsersGeneralModel.updateOne({uid: uid}, {$set: {'messageSettings.chat.newFriends': true}});
+
+    await ctx.nkcModules.socket.sendNewFriendApplication(applicationLog._id);
     await next();
   })
   .put('/', async (ctx, next) => {

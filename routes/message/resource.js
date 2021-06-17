@@ -134,7 +134,7 @@ resourceRouter
     data.messages = [message];
     const message_ = message.toObject();
     message_.socketId = socketId;
-    await ctx.redis.pubMessage(message_);
+    await ctx.nkcModules.socket.sendMessageToUser(message_._id)
     // 判断是否已创建聊天
     await db.CreatedChatModel.createChat(user.uid, targetUid, true);
     await next();

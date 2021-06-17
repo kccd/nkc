@@ -95,7 +95,7 @@
     }
     .container-right{
       height: 100%;
-      border-left: 1px solid #ccc;
+      border-left: 1px solid #e7e7e7;
       position: relative;
       .empty-page{
         @height: 10rem;
@@ -175,6 +175,8 @@
     removeFriend,
     updateUserList
   } from './socketEvents/user.js'
+  import {addSocketStatusChangedEvent, getSocketStatus} from "../lib/js/socket";
+  import {sendNewMessageCount} from "./message.2.0";
 
   export default {
     props: ['mode', 'socket'],
@@ -246,35 +248,44 @@
     mounted() {
       this.selectPage(this.pageId.PageList);
       // this.openUserPage({type: 'UTU', uid: '74230'})
-      this.initSocket(socket);
+      this.initSocket(this.socket);
+      const socketStatus = getSocketStatus(this.socketApp);
+      this.setSocketStatus(socketStatus);
     },
     methods: {
       initSocket(socketApp) {
         if(this.socketApp === socketApp) return;
         this.socketApp = socketApp;
         // 接收消息
-        socket.on('receiveMessage', receiveMessage.bind(this));
+        socketApp.on('receiveMessage', receiveMessage.bind(this));
         // 标记消息为已读
-        socket.on('markAsRead', markAsRead.bind(this));
+        socketApp.on('markAsRead', markAsRead.bind(this));
         // 撤回消息
-        socket.on('withdrawn', withdrawn.bind(this));
+        socketApp.on('withdrawn', withdrawn.bind(this));
 
         // 更新用户状态
-        socket.on('updateUserStatus', updateUserStatus.bind(this));
+        socketApp.on('updateUserStatus', updateUserStatus.bind(this));
 
         // 删除对话
-        socket.on('removeChat', removeChat.bind(this));
+        socketApp.on('removeChat', removeChat.bind(this));
         // 删除好友
-        socket.on('removeFriend', removeFriend.bind(this));
+        socketApp.on('removeFriend', removeFriend.bind(this));
         // 删除分组
-        socket.on('removeCategory', removeCategory.bind(this));
+        socketApp.on('removeCategory', removeCategory.bind(this));
 
         // 更新对话列表
-        socket.on('updateChatList', updateChatList.bind(this));
+        socketApp.on('updateChatList', updateChatList.bind(this));
         // 更新用户（联系人）列表
-        socket.on('updateUserList', updateUserList.bind(this));
+        socketApp.on('updateUserList', updateUserList.bind(this));
         // 更新分组信息
-        socket.on('updateCategoryList', updateCategoryList.bind(this))
+        socketApp.on('updateCategoryList', updateCategoryList.bind(this));
+
+        addSocketStatusChangedEvent(socketApp, this.setSocketStatus)
+      },
+      setSocketStatus(data) {
+        const {type, name} = data;
+        const socketStatus = type !== 'connect'? name: '';
+        this.$refs[this.pageId.PageList].setSocketStatus(socketStatus);
       },
       selectPage(t) {
         this.activePageId = t;
@@ -290,6 +301,9 @@
         }
         this.activePageIdHistories.pop();
         this.activePageId = this.activePageIdHistories[this.activePageIdHistories.length - 1];
+      },
+      updateNewMessageCount(count) {
+        this.$emit('update-new-message-count', count);
       },
       openPage(props) {
         const {pageId, data} = props;

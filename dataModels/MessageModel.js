@@ -1269,7 +1269,7 @@ messageSchema.statics.sendShopMessage = async (options) => {
   const {type, r, orderId, refundId} = options;
   const MessageModel = mongoose.model("messages");
   const SettingModel = mongoose.model("settings");
-  const redis = require("../redis");
+  const socket = require('../nkcModules/socket');
   const message = MessageModel({
     _id: await SettingModel.operateSystemID("messages", 1),
     r,
@@ -1281,7 +1281,7 @@ messageSchema.statics.sendShopMessage = async (options) => {
     }
   });
   await message.save();
-  await redis.pubMessage(message);
+  await socket.sendMessageToUser(message._id);
 };
 
 /**
@@ -1290,7 +1290,7 @@ messageSchema.statics.sendShopMessage = async (options) => {
 messageSchema.statics.sendNewForumReviewMessage = async ({uid, pfid}) => {
   const MessageModel = mongoose.model("messages");
   const SettingModel = mongoose.model("settings");
-  const redis = require("../redis");
+  const socket = require('../nkcModules/socket');
   const message = MessageModel({
     _id: await SettingModel.operateSystemID("messages", 1),
     r: uid,
@@ -1301,7 +1301,7 @@ messageSchema.statics.sendNewForumReviewMessage = async ({uid, pfid}) => {
     }
   });
   await message.save();
-  await redis.pubMessage(message);
+  await socket.sendMessageToUser(message._id);
 }
 
 /**
@@ -1310,7 +1310,7 @@ messageSchema.statics.sendNewForumReviewMessage = async ({uid, pfid}) => {
 messageSchema.statics.sendInviteFounder = async ({pfid, targetUid}) => {
   const MessageModel = mongoose.model("messages");
   const SettingModel = mongoose.model("settings");
-  const redis = require("../redis");
+  const socket = require('../nkcModules/socket');
   const message = MessageModel({
     _id: await SettingModel.operateSystemID("messages", 1),
     r: targetUid,
@@ -1321,7 +1321,7 @@ messageSchema.statics.sendInviteFounder = async ({pfid, targetUid}) => {
     }
   });
   await message.save();
-  await redis.pubMessage(message);
+  await socket.sendMessageToUser(message._id);
 }
 
 /**
@@ -1330,7 +1330,7 @@ messageSchema.statics.sendInviteFounder = async ({pfid, targetUid}) => {
 messageSchema.statics.sendNewForumReviewResolve = async ({pfid, fid, targetUid}) => {
   const MessageModel = mongoose.model("messages");
   const SettingModel = mongoose.model("settings");
-  const redis = require("../redis");
+  const socket = require('../nkcModules/socket');
   const message = MessageModel({
     _id: await SettingModel.operateSystemID("messages", 1),
     r: targetUid,
@@ -1342,7 +1342,7 @@ messageSchema.statics.sendNewForumReviewResolve = async ({pfid, fid, targetUid})
     }
   });
   await message.save();
-  await redis.pubMessage(message);
+  await socket.sendMessageToUser(message._id);
 }
 
 /**
@@ -1351,7 +1351,7 @@ messageSchema.statics.sendNewForumReviewResolve = async ({pfid, fid, targetUid})
 messageSchema.statics.sendNewForumReviewReject = async ({pfid, targetUid}) => {
   const MessageModel = mongoose.model("messages");
   const SettingModel = mongoose.model("settings");
-  const redis = require("../redis");
+  const socket = require('../nkcModules/socket');
   const message = MessageModel({
     _id: await SettingModel.operateSystemID("messages", 1),
     r: targetUid,
@@ -1362,7 +1362,7 @@ messageSchema.statics.sendNewForumReviewReject = async ({pfid, targetUid}) => {
     }
   });
   await message.save();
-  await redis.pubMessage(message);
+  await socket.sendMessageToUser(message._id);
 }
 
 /**
@@ -1372,7 +1372,7 @@ messageSchema.statics.sendBecomeFormalForum = async ({pfid, targetUid, formal}) 
   const MessageModel = mongoose.model("messages");
   const SettingModel = mongoose.model("settings");
   const PreparationForumModel   = mongoose.model("pForum");
-  const redis = require("../redis");
+  const socket = require('../nkcModules/socket');
   const pForum = await PreparationForumModel.findOne({pfid});
   const message = MessageModel({
     _id: await SettingModel.operateSystemID("messages", 1),
@@ -1385,7 +1385,7 @@ messageSchema.statics.sendBecomeFormalForum = async ({pfid, targetUid, formal}) 
     }
   });
   await message.save();
-  await redis.pubMessage(message);
+  await socket.sendMessageToUser(message._id);
 }
 
 /*
@@ -1443,7 +1443,7 @@ messageSchema.statics.sendReviewMessage = async (pid) => {
   if(!pid) throwErr(500, "pid不能为空");
   const SettingModel = mongoose.model("settings");
   const MessageModel = mongoose.model("messages");
-  const redis = require("../redis");
+  const socket = require('../nkcModules/socket');
   let reviewSettings = await SettingModel.findById("review");
   reviewSettings = reviewSettings.c;
   const users = await mongoose.model("users").find({certs: {$in: reviewSettings.certsId}}, {uid:1});
@@ -1458,7 +1458,7 @@ messageSchema.statics.sendReviewMessage = async (pid) => {
       }
     });
     await message.save();
-    await redis.pubMessage(message);
+    await socket.sendMessageToUser(message._id);
   }
 };
 
@@ -1471,7 +1471,7 @@ messageSchema.statics.sendFundMessage = async (applicationFormId, type) => {
   const UserModel = mongoose.model("users");
   const SettingModel = mongoose.model("settings");
   const MessageModel = mongoose.model("messages");
-  const redis = require("../redis");
+  const socket = require('../nkcModules/socket');
   const form = await FundApplicationFormModel.findOnly({_id: applicationFormId});
   const fund = await FundModel.findOnly({_id: form.fundId});
   if(type === "applicant") {
@@ -1485,7 +1485,7 @@ messageSchema.statics.sendFundMessage = async (applicationFormId, type) => {
       }
     });
     await message.save();
-    await redis.pubMessage(message);
+    await socket.sendMessageToUser(message._id);
   } else {
     const {certs, appointed} = fund[type];
     let users = await UserModel.find({certs: {$in: certs}}, {uid: 1});
@@ -1504,7 +1504,7 @@ messageSchema.statics.sendFundMessage = async (applicationFormId, type) => {
         }
       });
       await message.save();
-      await redis.pubMessage(message);
+      await socket.sendMessageToUser(message._id);
     }
   }
 };
@@ -1613,7 +1613,7 @@ messageSchema.statics.extendMessages = async (messages) => {
       message.content = await MessageModel.getSTUMessageContent(m);
     } else if(ty === 'newFriends') {
       // 新朋友
-      const {toc, username, agree, description, _id, uid} = m;
+      const {toc, username, agree, description, uid} = m;
       message.time = toc;
       message.s = m.uid;
       message.content = `

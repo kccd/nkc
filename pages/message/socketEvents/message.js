@@ -1,15 +1,21 @@
 export function receiveMessage(data) {
   const {localId, message, chat} = data;
   const PageChat = this.$refs[this.pageId.PageChat];
+  const PageList = this.$refs[this.pageId.PageList];
   if(PageChat && PageChat.onReceiveMessage) {
     PageChat.onReceiveMessage(localId, message);
   }
-  this.$refs[this.pageId.PageList].updateChat(chat);
+  if(PageList && PageList.updateChat) {
+    PageList.updateChat(chat);
+  }
 }
 
 export function markAsRead(data) {
   const {type, uid} = data;
-  this.$refs[this.pageId.PageList].markAsRead(type, uid);
+  const PageList = this.$refs[this.pageId.PageList];
+  if(PageList && PageList.markAsRead) {
+    PageList.markAsRead(type, uid);
+  }
 }
 
 export function withdrawn(data) {

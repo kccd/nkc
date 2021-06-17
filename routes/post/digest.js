@@ -132,7 +132,7 @@ router
 		if(!redEnvelopeSettings.c.draftFee.close) {
       await usersGeneralSettings.updateOne({$inc: {'draftFeeSettings.kcb': num}});
     }
-    await ctx.redis.pubMessage(message);
+    await ctx.nkcModules.socket.sendMessageToUser(message._id);
     data.targetUser.kcb = await db.UserModel.updateUserKcb(data.targetUser.uid);
 		await next();
 	})

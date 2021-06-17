@@ -6,6 +6,7 @@ block head
     -windowData.uid = data.user.uid;
     -windowData.selectTypesWhenSubscribe = !!data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe;
     -windowData.refererOperationId = data.operationId;
+    -windowData.newMessageCount = data.user.newMessage;
   if state.isApp
     -windowData.isApp = true;
     -windowData.appOS = state.appOS;

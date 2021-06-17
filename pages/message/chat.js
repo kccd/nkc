@@ -50,7 +50,7 @@ const messageApp = new Vue({
     minimize: false,
     maximize: false,
 
-    boxContent: '暂无消息',
+    newMessageCount: 0,
 
     audio: null,
   },
@@ -58,6 +58,14 @@ const messageApp = new Vue({
     Message
   },
   computed: {
+    boxContent() {
+      const {newMessageCount} = this;
+      if(newMessageCount === 0) {
+        return '';
+      } else {
+        return `${newMessageCount} 条新消息`;
+      }
+    },
     modeName() {
       const {mode} = this;
       return mode === 'wide'? '简洁模式': '经典模式';
@@ -86,7 +94,10 @@ const messageApp = new Vue({
     socket.on('receiveMessage', (data) => {
       if(data.localId) return;
       app.playAudio();
+      app.updateNewMessageCount(app.newMessageCount + 1);
     });
+    const newMessageCount = this.getNewMessageCountFromNKC();
+    this.updateNewMessageCount(newMessageCount);
   },
   watch: {
     showPanel() {
@@ -129,6 +140,33 @@ const messageApp = new Vue({
         width: narrowWidth,
       });
     },
+    getNewMessageCountFromNKC() {
+      return NKC.configs.newMessageCount;
+    },
+    updateNewMessageCountToDom(count) {
+      const documents = $('.message-count');
+      const containers = $('.message-count-container')
+      if(count === 0) {
+        containers.addClass('hidden');
+        documents
+          .addClass('hidden')
+          .text('');
+
+      } else {
+        containers.removeClass('hidden');
+        documents
+          .removeClass('hidden')
+          .text(count);
+      }
+    },
+    updateNewMessageCountToNKC(count) {
+      NKC.configs.newMessageCount = count;
+    },
+    updateNewMessageCount: debounce(function(count) {
+      this.newMessageCount = count;
+      this.updateNewMessageCountToDom(count);
+      this.updateNewMessageCountToNKC(count);
+    }, 500),
     onContainerPositionChange: debounce(function(position) {
       const {left, top} = position;
       this.setContainerPositionData({left, top});
@@ -242,6 +280,7 @@ const messageApp = new Vue({
       if(this.fixed) return;
       const {mode} = this;
       const {width, height} = this.getContainerSizeFromDom();
+      if(width === null || height === null) return;
       this.setContainerSizeData(mode, {
         width, height
       });

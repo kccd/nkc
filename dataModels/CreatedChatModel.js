@@ -134,6 +134,8 @@ chatSchema.statics.getSingleChat = async (type, uid, tUid = null) => {
   const UsersGeneralModel = mongoose.model('usersGeneral');
   const MessageModel = mongoose.model('messages');
   const user = await UserModel.findOne({uid});
+  const MessageTypeModel = mongoose.model('messageTypes');
+  const FriendsApplicationModel = mongoose.model('friendsApplications');
   const usersGeneral = await UsersGeneralModel.findOne({uid});
   const chat = {
     time: new Date(),

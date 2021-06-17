@@ -36,7 +36,7 @@
 
             .timestamp {{message.sUser.name}} {{message.timeString}}
             //- 发信人头像
-            .icon(@click='openUserHome(message)')
+            .icon(@click='openUserHome(message.position)')
               img(:src="message.sUser.icon")
             //- 消息内容 .nkc-media 代表媒体内容 可用于单独控制背景
             .message-body(:class="['img', 'video'].includes(message.contentType)?'nkc-media':''")
@@ -107,6 +107,8 @@
   @import "../message.2.0.less";
   @textareaContainerHeight: 6rem;
   @buttonContainerHeight: 3rem;
+  @bgColor: #eee;
+  @bubbleBgColor: #fff;
   .chat-message-info{
     height: 2rem;
     line-height: 2rem;
@@ -116,6 +118,7 @@
   }
   .chat-container{
     width: 100%;
+    background-color: @bgColor;
     position: absolute;
     top: @headerHeight;
     bottom: 0;
@@ -185,7 +188,7 @@
         outline: none;
       }
     }
-    box-shadow: 1px 1px 15px -7px rgba(0, 0, 0, 0.66);
+    //box-shadow: 1px 1px 15px -7px rgba(0, 0, 0, 0.66);
   }
   .message-time, .message-withdrawn{
     text-align: center;
@@ -196,11 +199,12 @@
       line-height: @height;
       display: inline-block;
       padding: 0 0.5rem;
-      background-color: @gray;
+      background-color: #e7e7e7;
       color: #555;
       font-size: 1rem;
       text-align: center;
       border-radius: 3px;
+      border: 1px solid #e2e2e2;
     }
   }
   .chat-message-item>div{
@@ -239,9 +243,9 @@
       left: -10rem;
     }
     .message-body{
-      background-color: @primary;
-      color: #fff;
-      padding: 0.7rem 0.5rem;
+      background-color: @bubbleBgColor;
+      color: #333;
+      padding: 0.7rem 0.7rem;
       font-size: 1.17rem;
       position: relative;
       border-radius: 5px;
@@ -300,7 +304,7 @@
         height: 20px;
         width: 8px;
         border-radius: 0 0 0 15px;
-        background-color: @primary;
+        background-color: @bubbleBgColor;
         &:after {
           content: '';
           display: block;
@@ -310,7 +314,7 @@
           top: -5px;
           left: -8px;
           border-radius: 0 0 0 20px;
-          background-color: #fff;
+          background-color: @bgColor;
         }
       }
       .status{
@@ -339,9 +343,7 @@
         font-size: 1.2rem;
         .html{
           & /deep/ a{
-            color: #fff;
-            border-bottom: 1px solid #fff;
-            text-decoration: none;
+            //text-decoration: none;
           }
           & /deep/ .message-emoji{
               width: 2rem;
@@ -634,7 +636,7 @@
         const app = this;
         setTimeout(() => {
           const listContent = app.$refs.listContent;
-          if(listContent.scrollHeight - (listContent.scrollTop + $(listContent).height()) > 500) return;
+          if(listContent.scrollHeight - (listContent.scrollTop + $(listContent).height()) > 1000) return;
           app.scrollToBottom();
         }, 100);
       },
@@ -646,8 +648,12 @@
         }
         this.textareaHeight = num;
       },
-      openUserHome() {
-        openUserPage(this, this.type, this.uid);
+      openUserHome(position = 'left') {
+        if(position === 'left') {
+          openUserPage(this, this.type, this.uid);
+        } else {
+          NKC.methods.visitUrl(this.mUser.home)
+        }
       },
       withdrawn(messageId) {
         nkcAPI(`/message/withdrawn`, 'PUT', {
@@ -669,7 +675,11 @@
         const {r, messageType, s} = message;
         const {mUser, tUser, type, originMessages} = this;
         if(messageType !== type) return;
-        if(type === 'UTU' && (r !== mUser.uid && r !== tUser.uid)) return;
+        if(
+          type === 'UTU' &&
+          (r !== mUser.uid || s !== tUser.uid) &&
+          (s !== mUser.uid || r !== tUser.uid)
+        ) return
         let hasMessage = false;
         for(let i = 0; i < originMessages.length; i++) {
           const originMessage = originMessages[i];

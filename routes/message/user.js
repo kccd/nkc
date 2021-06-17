@@ -200,7 +200,6 @@ userRouter
     const message_ = message.toObject();
     message_.socketId = socketId;
     await nkcModules.socket.sendMessageToUser(message._id, localId);
-    // await redis.pubMessage(message_);
     data.message = message;
     data.targetUser = targetUser;
     await next();

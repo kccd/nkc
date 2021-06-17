@@ -2,6 +2,10 @@ export function closePage(app) {
   app.$emit('event', 'closePage');
 }
 
+export function sendNewMessageCount(app, count) {
+  app.$emit('event', 'updateNewMessageCount', count);
+}
+
 export function openPage(app, pageId, data) {
   setTimeout(() => {
     app.$emit('event', 'openPage', {

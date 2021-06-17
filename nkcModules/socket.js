@@ -503,4 +503,23 @@ func.sendSystemInfoToUser = async (messageId) => {
   }
 };
 
+/*
+* 发送新朋友添加请求
+* */
+func.sendNewFriendApplication = async (applicationId) => {
+  const applicationMessage = await db.FriendsApplicationModel.getApplicationMessage(applicationId);
+  const message = await db.MessageModel.extendMessage(applicationMessage);
+  const chat = await db.CreatedChatModel.getSingleChat('newFriends', applicationMessage.tUid);
+  const socketClient = communication.getCommunicationClient();
+  socketClient.sendMessage(socketServiceName, {
+    eventName: 'receiveMessage',
+    roomName: getRoomName('user', applicationMessage.tUid),
+    data: {
+      localId: applicationId,
+      message,
+      chat
+    }
+  })
+};
+
 module.exports = func;

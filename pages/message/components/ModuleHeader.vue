@@ -14,8 +14,8 @@
   .page-header{
     margin: 0;
     height: @headerHeight;
-    box-shadow: 1px 1px 13px -7px rgba(0,0,0,0.66);
-    border-bottom: 1px solid #ddd;
+    //box-shadow: 1px 1px 13px -7px rgba(0,0,0,0.66);
+    border-bottom: 1px solid #e7e7e7;
     position: relative;
     padding: 0 @headerHeight;
     .page-header-center{

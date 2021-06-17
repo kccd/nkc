@@ -995,5 +995,5 @@ NKC.configs.appOS = windowData.appOS;
 NKC.configs.platform = windowData.platform;
 NKC.configs.selectTypesWhenSubscribe = windowData.selectTypesWhenSubscribe;
 NKC.configs.refererOperationId = windowData.refererOperationId;
-
+NKC.configs.newMessageCount = windowData.newMessageCount || 0;
 window.NKC = NKC;

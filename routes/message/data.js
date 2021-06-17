@@ -110,20 +110,8 @@ router
       const friendsApplications = await db.FriendsApplicationModel.find(q).sort({toc: -1}).limit(30);
       const applications = [];
       for(const f of friendsApplications) {
-        const targetUser = await db.UserModel.findOne({uid: f.applicantId});
-        await db.UserModel.extendUserInfo(targetUser);
-        if(!targetUser) return;
-        applications.push({
-          _id: f._id,
-          ty: 'newFriends',
-          username: targetUser.username || targetUser.uid,
-          avatar: targetUser.avatar,
-          description: f.description,
-          uid: targetUser.uid,
-          toc: f.toc,
-          agree: f.agree,
-          tlm: f.tlm
-        });
+        const applicationMessage = await db.FriendsApplicationModel.getApplicationMessage(f._id);
+        applications.push(applicationMessage);
       }
       data.messages = applications.reverse();
       data.tUser = {

@@ -1,13 +1,6 @@
 <template lang="pug">
   .page-list-container.message-container
-    .list-nav-bar
-      .nav-options(@click="showOptions = !showOptions")
-        .fa.fa-bars
-      .nav-item(
-        v-for="l in list"
-        :class="{'active': l.id === activeListId}"
-        @click="clickNav(l)"
-        ) {{l.name}}
+    // 侧滑面板
     .nav-left-container-mask(v-if="showOptions" @click="switchLeftContainer")
     .nav-left-container(:class="{'show': showOptions}" v-if="mUser")
       .nav-left-header
@@ -25,8 +18,20 @@
         li(@click="clickNavItem('setting')")
           .fa.fa-cog
           .item 设置
-      .nav-left-footer NKC CHAT 2.0
-    .list-container
+      .nav-left-footer NKC MESSAGE 2.0
+    // 列表导航
+    .list-nav-bar
+      .nav-options(@click="showOptions = !showOptions")
+        .fa.fa-bars
+      .nav-item(
+        v-for="l in list"
+        :class="{'active': l.id === activeListId}"
+        @click="clickNav(l)"
+      ) {{l.name}}
+    // socket 状态
+    .list-socket-status(v-if="socketStatus") {{socketStatus}}
+    // 对话列表
+    .list-container(:class="{'socket-status': !!socketStatus}")
       .list-item-container(v-if="activeListId === listId.chat")
         .list-info(v-if="chatListData.length === 0") 空空如也
         .list-item(:key="chatData._id" v-for="chatData in chatListData" @click="clickChatItem(chatData.type, chatData.uid)")
@@ -72,6 +77,7 @@
   @listPaddingTop: 0.8rem;
   @listRightTopHeight: 1.8rem;
   @listRightBottomHeight: @listHeight - @listRightTopHeight;
+  @listSocketStatusHeight: 2rem;
   .list-item-container{
     padding: 0.5rem 0;
   }
@@ -201,11 +207,20 @@
       }
     }
   }
+  .list-socket-status{
+    height: @listSocketStatusHeight;
+    line-height: @listSocketStatusHeight;
+    background-color: #ff7373;
+    color: #fff;
+    font-size: 1rem;
+    text-align: center;
+  }
   .list-nav-bar{
     @height: @headerHeight;
     height: @height;
     user-select: none;
-    box-shadow: 1px 1px 13px -7px rgba(0,0,0,0.66);
+    //box-shadow: 1px 1px 13px -7px rgba(0,0,0,0.66);
+    border-bottom: 1px solid #e7e7e7;
     text-align: center;
     position: relative;
     .nav-options{
@@ -247,6 +262,9 @@
     left: 0;
     width: 100%;
     overflow-y: auto;
+    &.socket-status{
+      top: @headerHeight + @listSocketStatusHeight;
+    }
   }
   .list-item{
     height: @listHeight + 2 * @listPaddingTop;
@@ -352,6 +370,7 @@
     openCategoryPage,
     openSettingPage,
     openSearchPage,
+    sendNewMessageCount,
   } from '../message.2.0.js';
   export default {
     data: () => ({
@@ -375,14 +394,29 @@
         }
       ],
       mUser: null,
+
+      socketStatus: '',
     }),
     computed: {
+      newMessageCount() {
+        const {chatListData} = this;
+        let count = 0;
+        for(const chat of chatListData) {
+          count += chat.count || 0;
+        }
+        return count;
+      },
       listId() {
         const obj = {};
         for(const l of this.list) {
           obj[l.id] = l.id;
         }
         return obj;
+      }
+    },
+    watch: {
+      newMessageCount() {
+        sendNewMessageCount(this, this.newMessageCount);
       }
     },
     mounted() {
@@ -399,6 +433,9 @@
     },
     methods: {
       // 格式化时间
+      setSocketStatus(socketStatus) {
+        this.socketStatus = socketStatus;
+      },
       briefTime(time) {
         time = new Date(time);
         const addZero = (num) => {

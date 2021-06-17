@@ -1,9 +1,15 @@
 export function removeChat(data) {
   const {type, uid} = data;
-  this.$refs[this.pageId.PageList].removeChat(type, uid);
+  const PageList = this.$refs[this.pageId.PageList];
+  if(PageList && PageList.removeChat) {
+    PageList.removeChat(type, uid);
+  }
 }
 
 export function updateChatList(data) {
   const {chatList} = data;
-  this.$refs[this.pageId.PageList].updateChatList(chatList);
+  const PageList = this.$refs[this.pageId.PageList];
+  if(PageList && PageList.updateChatList) {
+    PageList.updateChatList(chatList);
+  }
 }
