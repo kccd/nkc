@@ -5,6 +5,7 @@ const fsSync = require("../nkcModules/fsSync");
 const fs = require("fs");
 const fsPromise = fs.promises;
 const db = require("../dataModels");
+const UserModel = require("../dataModels/UserModel");
 const mime = require('mime');
 const moment = require('moment');
 const PATH = require('path');
@@ -237,7 +238,7 @@ exports.deleteColumnBanner = async (columnId) => {
  */
 func.saveUserAvatar$2 = async (uid, file) => {
   const AM = db.AttachmentModel;
-  const user = await db.UserModel.findOnly({uid});
+  const user = await UserModel.findOnly({uid});
   if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
   const ext = await func.getFileExtension(file, ['png', 'jpg', 'jpeg']);
   const now = new Date;
