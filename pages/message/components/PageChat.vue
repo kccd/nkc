@@ -39,7 +39,7 @@
             .icon(@click='openUserHome(message.position)')
               img(:src="message.sUser.icon")
             //- 消息内容 .nkc-media 代表媒体内容 可用于单独控制背景
-            .message-body(:class="['img', 'video'].includes(message.contentType)?'nkc-media':''")
+            .message-body(:class="['image', 'video'].includes(message.contentType)?'nkc-media':''")
               //- 头像旁的箭头 同于标识谁发的消息
               .smart
               .status.error(v-if='message.status === "error"' @click="sendMessage(message, true)")
@@ -52,35 +52,40 @@
                 //- 富文本内容 包含普通消息、添加好友、应用通知以及系统提醒
                 .html(v-html='message.content' v-if="message.contentType === 'html'")
                 //- 发送的图片消息
-                .image(v-if="message.contentType === 'img'" @click="visitImages(message.content.fileUrl)")
+                .image(v-else-if="message.contentType === 'image'" @click="visitImages(message.content.fileUrl)")
                   img(:src="message.content.fileUrl")
                 //- 发送的文件消息
-                .file(v-if="message.contentType === 'file'")
+                .file(v-else-if="message.contentType === 'file'")
                   a(:href="message.content.fileUrl" target='_blank') {{message.content.filename}}
+                    button 下载 {{getSize(message.content.fileSize)}}
                 //- 发送的视频消息
-                .video(v-if="message.contentType === 'video'")
+                .video(v-else-if="message.contentType === 'video'")
                   video(preload='none' controls='controls' :src="message.content.fileUrl" type="video/mp4" :poster="message.content.fileCover")
                     | 你的浏览器不支持video标签，请升级。
                 //- 发送的音频消息
-                .audio(v-if="message.contentType === 'voice'" @click="playVoice(message)")
+                .audio(v-else-if="message.contentType === 'audio'")
+                  .filename {{message.content.filename}}
+                  audio(controls='controls' :src="message.content.fileUrl")
+                //- 发送的音频消息
+                .audio(v-else-if="message.contentType === 'voice'" @click="playVoice(message)")
                   //- 接收到的音频消息
                   div.left(v-if='message.position === "left"')
                     //- 音频图标 静态
-                    img(src=`/default/stopRight.png` v-if="message.content.playStatus === 'unPlay'")
+                    img(src=`/default/stopRight.png` v-if="playAudioFileId !== message.content.fileId")
                     //- 音频图标 动态
                     img(v-else src=`/default/playRight.gif`)
                     //- 音频时间长度
-                    .time {{message.content.fileTimer}}''
+                    .time {{message.content.fileDuration}}''
                   //- 自己发出的音频消息
                   div.right(v-else)
-                    .time {{message.content.fileTimer}}''
-                    img(src=`/default/stopLeft.png` v-if="message.content.playStatus === 'unPlay'")
+                    .time {{message.content.fileDuration}}''
+                    img(src=`/default/stopLeft.png` v-if="playAudioFileId !== message.content.fileId")
                     img(v-else src=`/default/playLeft.gif`)
               //- 发送进度
               .sending-progress(v-if="message.status === 'sending'")
                 .fa.fa-circle-o-notch.fa-spin
-                span(v-if="message.progress !== 100") 上传中...{{message.progress}}%
-                span(v-else) 上传成功，处理中...
+                span(v-if="message.progress !== 100") 发送中...{{message.progress}}%
+                span(v-else) 发送成功，处理中...
     //- 输入面板 仅在与用户对话时显示
     .chat-form(v-if="showForm")
       // 表情面板
@@ -245,22 +250,25 @@
     .message-body{
       background-color: @bubbleBgColor;
       color: #333;
+      min-height: 3rem;
       padding: 0.7rem 0.7rem;
       font-size: 1.17rem;
       position: relative;
       border-radius: 5px;
       display: inline-block;
-      max-width: 40rem;
+      max-width: 30rem;
       .sending-progress{
-        height: 2rem;
+        margin-top: 0.2rem;
+        height: 1.8rem;
         width: 100%;
+        padding: 0 0.5rem;
         text-align: center;
-        line-height: 2rem;
+        line-height: 1.8rem;
         font-size: 1rem;
-        font-style: oblique;
-        background-color: rgba(0, 0, 0, 0.3);
+        background-color: #f4f4f4;
         border-radius: 3px;
-        color: #eee;
+        border: 1px solid #e2e2e2;
+        color: #888;
         .fa{
           margin-right: 0.2rem;
         }
@@ -281,6 +289,12 @@
         }
       }
       .audio{
+        audio{
+          max-width: 100%;
+        }
+        .filename{
+          font-size: 1.2rem;
+        }
         .left, .right{
           &>*{
             display: inline-block;
@@ -351,21 +365,26 @@
         }
         .file{
           a{
-            color: #fff;
+            color: #333;
             text-decoration: none;
             &:hover, &:active{
               text-decoration: none;
             }
-            &:after{
+            button{
               margin-top: 0.5rem;
+              color: #fff;
               border-radius: 3px;
-              content: '下载';
               height: 2rem;
               display: block;
               line-height: 2rem;
-              background-color: rgba(0, 0, 0, 0.3);
+              background-color: @primary;
               text-align: center;
               font-size: 1rem;
+              outline: none;
+              border: none;
+              &:hover, &:active{
+                opacity: 0.7;
+              }
             }
           }
         }
@@ -446,6 +465,10 @@
 
       content: '',
 
+      audio: null,
+
+      playAudioFileId: ''
+
     }),
     watch: {
       content() {
@@ -473,12 +496,12 @@
           .catch(function(err){
             sweetError(err);
           })
-
       };
       // 点击后收起表情面板
       listContent.addEventListener('click', () => {
         app.toHideTwemoji();
       });
+      this.initAudio();
     },
     computed: {
       leftIcon() {
@@ -567,7 +590,18 @@
     },
     methods: {
       getUrl: NKC.methods.tools.getUrl,
+      getSize: NKC.methods.tools.getSize,
       timeFormat: NKC.methods.tools.timeFormat,
+      initAudio() {
+        const app = this;
+        this.audio = new Audio();
+        this.audio.onended = function() {
+          app.playAudioFileId = '';
+        };
+        this.audio.onload = function() {
+          app.audio.play();
+        };
+      },
       closePage() {
         this.reset();
         closePage(this);
@@ -652,7 +686,7 @@
         if(position === 'left') {
           openUserPage(this, this.type, this.uid);
         } else {
-          NKC.methods.visitUrl(this.mUser.home)
+          NKC.methods.visitUrl(this.mUser.home, true);
         }
       },
       withdrawn(messageId) {
@@ -675,6 +709,7 @@
         const {r, messageType, s} = message;
         const {mUser, tUser, type, originMessages} = this;
         if(messageType !== type) return;
+        if(!mUser || (type === 'UTU' && !tUser)) return;
         if(
           type === 'UTU' &&
           (r !== mUser.uid || s !== tUser.uid) &&
@@ -755,6 +790,7 @@
         for(const file of files) {
           this.sendFileMessage(file);
         }
+        this.$refs.fileInput.value = '';
       },
       sendMessage(message, resend = false) {
         const app = this;
@@ -825,8 +861,19 @@
         message.clearContent = true;
         this.sendMessage(message);
       },
+      stopPlayVoice() {
+        this.playAudioFileId = null;
+        this.audio.src = '';
+      },
       playVoice(message) {
-
+        const {fileUrl, fileId} = message.content;
+        if(this.playAudioFileId === fileId) {
+          this.stopPlayVoice();
+        } else {
+          this.playAudioFileId = fileId;
+          this.audio.src = fileUrl;
+          this.audio.play();
+        }
       }
     }
   }

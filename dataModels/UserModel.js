@@ -2526,5 +2526,30 @@ userSchema.methods.getOnlineStatus = async function() {
   return '离线';
 };
 
+/*
+* 获取消息通知音链接
+* @param {String} 用户UID
+* @param {String} type 消息类型 UTU/STU/STE/newFriends
+* */
+userSchema.statics.getMessageBeep = async (uid, type) => {
+  const {getUrl} = require('../nkcModules/tools');
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const usersGeneral = await UsersGeneralModel.findOnly({uid}, {messageSettings: 1});
+  const {
+    systemInfo,
+    reminder,
+    usersMessage
+  } = usersGeneral.messageSettings.beep || {};
+  let beep = null;
+  if(
+    (['UTU', 'newFriends'].includes(type) && usersMessage) ||
+    (type === 'STE' && systemInfo) ||
+    (type === 'STU' && reminder)
+  ) {
+    beep = getUrl('messageTone');
+  }
+  return beep;
+};
+
 module.exports = mongoose.model('users', userSchema);
 

@@ -93,7 +93,9 @@ const messageApp = new Vue({
     const app = this;
     socket.on('receiveMessage', (data) => {
       if(data.localId) return;
-      app.playAudio();
+      if(data.beep) {
+        app.playAudio(data.beep);
+      }
       app.updateNewMessageCount(app.newMessageCount + 1);
     });
     const newMessageCount = this.getNewMessageCountFromNKC();
@@ -405,7 +407,12 @@ const messageApp = new Vue({
       this.setModeData('narrow');
       this.setContainerModeData('maximize');
     },
-    playAudio() {
+    playAudio(url) {
+      const app = this;
+      this.audio.onload = function() {
+        app.play();
+      };
+      this.audio.src = url;
       this.audio.play();
     },
     initAudio() {

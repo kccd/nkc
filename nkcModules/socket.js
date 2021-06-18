@@ -476,7 +476,8 @@ func.sendMessageToUser = async (messageId, localId) => {
     roomName: getRoomName('user', r),
     data: {
       message,
-      chat: rChat
+      chat: rChat,
+      beep: await db.UserModel.getMessageBeep(r, 'UTU'),
     }
   });
 };
@@ -497,7 +498,8 @@ func.sendSystemInfoToUser = async (messageId) => {
       roomName: getRoomName('user', u.uid),
       data: {
         message,
-        chat: rChat
+        chat: rChat,
+        beep: await db.UserModel.getMessageBeep(u.uid, 'STE'),
       }
     })
   }
@@ -517,7 +519,8 @@ func.sendNewFriendApplication = async (applicationId) => {
     data: {
       localId: applicationId,
       message,
-      chat
+      chat,
+      beep: await db.UserModel.getMessageBeep(applicationMessage.tUid, 'newFriends'),
     }
   })
 };

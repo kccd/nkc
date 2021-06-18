@@ -27,10 +27,12 @@ module.exports = {
   messageVideo: './message/video',
   // 聊天中的图片文件
   messageImage: './message/image',
-  // 聊天中的音频文件
+  // 聊天中的语音文件
   messageVoice: './message/voice',
   // 聊天中的附件
   messageFile: './message/file',
+  // 聊天中的音频文件
+  messageAudio: './message/audio',
 
   // 上传附件 图片
   mediaPicture: './resource/picture',

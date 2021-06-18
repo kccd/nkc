@@ -135,6 +135,42 @@ const audioWMATransMP3 = async (inputPath, outputPath) => {
 const audioFLACTransMP3 = async (inputPath, outputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath]);
 }
+
+const audioTransMP3 = async (inputPath, outputPath, ext) => {
+  let func = async (inputPath, outputPath) => {
+    return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath]);
+  }
+  if(ext === 'amr') {
+    func = audioAMRTransMP3;
+  } else if(ext === 'aac') {
+    func = audioAACTransMP3;
+  } else if(ext === 'wav') {
+    func = audioWAVTransMP3;
+  } else if(ext === 'wma') {
+    func = audioWMATransMP3;
+  } else if(ext === 'flac') {
+    func = audioFLACTransMP3;
+  }
+  return func(inputPath, outputPath);
+};
+
+const videoTransMP4 = async (inputPath, outputPath, ext) => {
+  let func;
+  if(ext === '3gp') {
+    func = video3GPTransMP4;
+  } else if(ext === 'mp4') {
+    func = videoMP4TransH264;
+  } else if(ext === 'mov') {
+    func = videoMOVTransMP4;
+  } else if(ext === 'avi') {
+    func = videoAVITransMP4;
+  } else if(ext === 'webm') {
+    func = videoWEBMTransMP4;
+  } else {
+    func = videoMP4TransH264;
+  }
+  return func(inputPath, outputPath);
+}
 /**
  * 获取视频的帧宽高
  * @param {string} inputPath 视频路径
@@ -381,6 +417,25 @@ async function getVideoInfo(inputFilePath) {
   })
 }
 
+async function getAudioDuration(filePath) {
+  return new Promise((resolve, reject) => {
+    ff.ffprobe(filePath, (err, metadata) => {
+      if(err) return reject(err);
+      const {streams} = metadata;
+      const audioInfo = streams.filter(stream => stream['codec_type'] === 'audio').shift();
+      if(!audioInfo) {
+        return reject(new Error('Cannot get audio stream detail'));
+      }
+      const {
+        duration
+      } = audioInfo;
+      resolve({
+        duration
+      });
+    })
+  });
+}
+
 
 /**
  * 视频打水印
@@ -428,10 +483,12 @@ module.exports = {
   videoMOVTransMP4,
   videoAVITransMP4,
   videoWEBMTransMP4,
+  videoTransMP4,
   audioAMRTransMP3,
   audioFLACTransMP3,
   audioWAVTransMP3,
   audioWMATransMP3,
+  audioTransMP3,
   getVideoSize,
   getImageSize,
   getDrawTextSize,
@@ -440,5 +497,6 @@ module.exports = {
   addImageWaterMask,
   addImageTextWaterMask,
   addImageTextWaterMaskForImage,
-  addWaterMask
+  addWaterMask,
+  getAudioDuration
 };

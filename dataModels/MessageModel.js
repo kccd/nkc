@@ -1562,8 +1562,19 @@ messageSchema.statics.extendMessages = async (messages) => {
   const nkcRender = require("../nkcModules/nkcRender");
   const {filterAllHTML, filterMessageContent} = require('../nkcModules/xssFilters');
   const MessageModel = mongoose.model("messages");
+  const MessageFileModel = mongoose.model('messageFiles');
   const {getUrl} = tools;
   const _messages = [];
+
+  const filesId = [];
+  for(const m of messages) {
+    if(m.ty === 'UTU' && m.c.fileId) {
+      filesId.push(m.c.fileId);
+    }
+  }
+  const files = await MessageFileModel.find({_id: {$in: filesId}});
+  const filesObj = {};
+  files.map(file => filesObj[file._id] = file);
 
   for(let i = 0; i < messages.length; i++) {
 
@@ -1589,18 +1600,16 @@ messageSchema.statics.extendMessages = async (messages) => {
           message.contentType = 'html';
           message.content = c;
         } else {
-          const {id, na, ty, vl} = c;
-          message.contentType = ty; // img, voice, file, video
+          const {fileId} = c;
+          const file = filesObj[fileId];
+          message.contentType = file.type; // img, voice, file, video
           message.content = {
-            filename: na,
-            fileId: id,
-            fileUrl: getUrl('messageResource', id),
-            fileCover: getUrl('messageCover', id),
-            fileTimer: vl
-          }
-          if(ty === 'voice') {
-            message.content.fileUrl += "?channel=mp3";
-            message.content.playStatus = 'unPlay';
+            filename: file.oname,
+            fileId: file._id,
+            fileUrl: getUrl('messageResource', file._id),
+            fileCover: getUrl('messageCover', file._id),
+            fileSize: file.size,
+            fileDuration: file.duration
           }
         }
       }
