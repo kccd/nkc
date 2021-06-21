@@ -48,8 +48,6 @@ router
       // 将所有消息标记为已读
       await db.MessageModel.markAsRead('UTU', user.uid, uid);
       // await db.MessageModel.updateMany({ty: 'UTU', r: user.uid, s: uid, vd: false}, {$set: {vd: true}});
-      // 判断是否已创建对话，如果没有则创建
-      await db.CreatedChatModel.createChat(user.uid, uid);
       data.targetUserSendLimit = (await db.UsersGeneralModel.findOnly({uid: targetUser.uid})).messageSettings.limit;
       // 用户是否能够发送短消息
       data.showMandatoryLimitInfo = false;
@@ -60,6 +58,10 @@ router
       }
       data.blacklistInfo = await db.BlacklistModel.getBlacklistInfo(targetUser.uid, data.user.uid);
       data.targetUserAllowAllMessage = await db.UserModel.allowAllMessage(targetUser.uid);
+      const chat = await db.CreatedChatModel.findOne({uid: user.uid, tUid: targetUser.uid});
+      if(!chat) await ctx.nkcModules.socket.sendEventUpdateChat('UTU', user.uid, targetUser.uid);
+      // 判断是否已创建对话，如果没有则创建
+      await db.CreatedChatModel.createChat(user.uid, uid);
     } else if(type === "STE") {
       const q = {
         ty: 'STE'

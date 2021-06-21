@@ -13,3 +13,11 @@ export function updateChatList(data) {
     PageList.updateChatList(chatList);
   }
 }
+
+export function updateChat(data) {
+  const {chat} = data;
+  const PageList = this.$refs[this.pageId.PageList];
+  if(PageList && PageList.updateChat) {
+    PageList.updateChat(chat);
+  }
+}

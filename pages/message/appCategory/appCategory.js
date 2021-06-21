@@ -52,15 +52,10 @@ const app = new Vue({
     save() {
       const self = this;
       const {_id, name, description} = self.category;
-      let method, url;
-      if(_id) {
-        method = 'PUT';
-        url = `/friend_category/${_id}`;
-      } else {
-        method = 'POST';
-        url = `/friend_category`;
-      }
-      return nkcAPI(url, method, {
+      const type = _id? 'modifyCategory': 'createCategory';
+      return nkcAPI(`/message/category`, 'POST', {
+        _id,
+        type,
         name,
         description,
         friendsId: self.selectedUsersId
@@ -69,7 +64,7 @@ const app = new Vue({
           self.edit = false;
           NKC.methods.appToast('保存成功');
           if(!_id) {
-            NKC.methods.visitUrl(`/message/category?cid=${data.category._id}`);
+            NKC.methods.visitUrl(`/message/category?cid=${data.categoryId}`);
           }
         })
         .catch(NKC.methods.appToast);
@@ -84,7 +79,7 @@ const app = new Vue({
       const self = this;
       sweetQuestion(`删除分组「${this.category.name}」？`)
         .then(() => {
-          return nkcAPI(`/friend_category/${self.category._id}`, 'DELETE')
+          return nkcAPI(`/message/friend?cid=${self.category._id}`, 'DELETE')
             .then(() => {
               NKC.methods.appToast('删除成功');
               NKC.methods.appClosePage();

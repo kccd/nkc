@@ -1,13 +1,11 @@
+import {updateChat} from './chat.js';
 export function receiveMessage(data) {
   const {localId, message, chat} = data;
   const PageChat = this.$refs[this.pageId.PageChat];
-  const PageList = this.$refs[this.pageId.PageList];
   if(PageChat && PageChat.onReceiveMessage) {
     PageChat.onReceiveMessage(localId, message);
   }
-  if(PageList && PageList.updateChat) {
-    PageList.updateChat(chat);
-  }
+  updateChat.bind(this)({chat});
 }
 
 export function markAsRead(data) {

@@ -147,7 +147,6 @@ userRouter
       }
 
       const newFile = await nkcModules.file.getFileObjectByFilePath(targetFilePath);
-
       let duration = 0;
 
       if(['video'].includes(fileType)) {

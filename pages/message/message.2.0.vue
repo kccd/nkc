@@ -160,9 +160,10 @@
   import {
     receiveMessage,
     markAsRead,
-    withdrawn
+    withdrawn,
   } from './socketEvents/message.js';
   import {
+    updateChat,
     removeChat,
     updateChatList
   } from './socketEvents/chat.js';
@@ -171,7 +172,7 @@
     updateCategoryList
   } from './socketEvents/category.js'
   import {
-    updateUserStatus,
+    updateUserOnlineStatus,
     removeFriend,
     updateUserList
   } from './socketEvents/user.js'
@@ -264,7 +265,7 @@
         socketApp.on('withdrawn', withdrawn.bind(this));
 
         // 更新用户状态
-        socketApp.on('updateUserStatus', updateUserStatus.bind(this));
+        socketApp.on('updateUserOnlineStatus', updateUserOnlineStatus.bind(this));
 
         // 删除对话
         socketApp.on('removeChat', removeChat.bind(this));
@@ -272,6 +273,8 @@
         socketApp.on('removeFriend', removeFriend.bind(this));
         // 删除分组
         socketApp.on('removeCategory', removeCategory.bind(this));
+
+        socketApp.on('updateChat', updateChat.bind(this));
 
         // 更新对话列表
         socketApp.on('updateChatList', updateChatList.bind(this));
@@ -285,7 +288,8 @@
       setSocketStatus(data) {
         const {type, name} = data;
         const socketStatus = type !== 'connect'? name: '';
-        this.$refs[this.pageId.PageList].setSocketStatus(socketStatus);
+        const PageList = this.$refs[this.pageId.PageList];
+        if(PageList) PageList.setSocketStatus(socketStatus);
       },
       selectPage(t) {
         this.activePageId = t;

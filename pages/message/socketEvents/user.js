@@ -1,4 +1,4 @@
-export function updateUserStatus(data) {
+export function updateUserOnlineStatus(data) {
   const {uid, status} = data;
   const PageList = this.$refs[this.pageId.PageList];
   if(PageList && PageList.updateUserStatus) {

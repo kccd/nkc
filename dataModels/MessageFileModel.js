@@ -66,8 +66,7 @@ const messageFileSchema = new Schema({
 * */
 messageFileSchema.methods.getFilePath = async function(t) {
   const MessageFileModel = mongoose.model('messageFiles');
-  const fileType = await MessageFileModel.getFileTypeByExtension(this.ext);
-  const fileFolder = await MessageFileModel.getFileFolder(fileType, this.toc);
+  const fileFolder = await MessageFileModel.getFileFolder(this.type, this.toc);
   const FILE = require('../nkcModules/file');
   const normalPath = PATH.resolve(fileFolder, `./${this._id}.${this.ext}`);
   if(t) {

@@ -296,16 +296,16 @@
         const app = this;
         const {tUser, friend, imageFile, phone, imageUrl} = this;
         const {info, cid} = friend;
-        const {name, description, location} = info;
+        const {name, description, location, image} = info;
         const formData = new FormData();
+        formData.append('uid', tUser.uid);
         formData.append('friend', JSON.stringify({
           cid,
           name,
           description,
           location,
           phone,
-          image: !!imageUrl,
-          uid: tUser.uid
+          image: !!imageUrl || image,
         }));
         if(imageFile) {
           formData.append('file', imageFile);
@@ -319,7 +319,7 @@
       },
       toRemoveChat() {
         const {tUser} = this;
-        removeChat(tUser.uid);
+        removeChat('UTU', tUser.uid);
       }
     }
   }

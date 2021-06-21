@@ -45,6 +45,8 @@
               .list-item-status(v-if="chatData.status") [{{chatData.status}}]
               .list-item-abstract {{chatData.abstract}}
               .list-item-number(v-if="chatData.count > 0") {{chatData.count}}
+          .list-item-options(@click.stop="toRemoveChat(chatData.type, chatData.uid)")
+            .fa.fa-trash-o
       .list-item-container(v-if="activeListId === listId.user")
         .list-info(v-if="userListData.length === 0") 空空如也
         .list-item-users(v-for="usersData in userListData")
@@ -267,12 +269,29 @@
     }
   }
   .list-item{
+    @optionWidth: 2rem;
     height: @listHeight + 2 * @listPaddingTop;
     padding: @listPaddingTop @listPaddingTop @listPaddingTop @listHeight + 2 * @listPaddingTop;
     position: relative;
     overflow: hidden;
+    transition: padding-right 100ms;
     &:active, &:hover{
       background-color: rgba(0, 0, 0, 0.05);
+    }
+    &:hover{
+      padding-right:  @optionWidth;
+      .list-item-options{
+        display: block;
+      }
+    }
+    .list-item-options{
+      position: absolute;
+      top: 0.6rem;
+      right: 0;
+      width: @optionWidth;
+      text-align: center;
+      color: #777;
+      display: none;
     }
     .list-item-right{
       @timeWidth: 6.5rem;
@@ -371,6 +390,7 @@
     openSettingPage,
     openSearchPage,
     sendNewMessageCount,
+    removeChat
   } from '../message.2.0.js';
   export default {
     data: () => ({
@@ -494,7 +514,11 @@
         }
       },
       // 移除对话
+      toRemoveChat(type, uid) {
+        removeChat(type, uid);
+      },
       removeChat(type, uid) {
+        console.log(type, uid)
         const {chatListData} = this;
         for(let i = 0; i < chatListData.length; i ++) {
           const chat = chatListData[i];

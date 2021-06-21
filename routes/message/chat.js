@@ -4,17 +4,9 @@ chatRouter
   .del('/', async (ctx, next) => {
     const {nkcModules, data, query, db} = ctx;
     const {user} = data;
-    const {uid} = query;
-    let type;
-    let tUid;
-    if(['STU', 'STE', 'newFriends'].includes(uid)) {
-      type = uid;
-    } else {
-      type = 'UTU';
-      tUid = uid;
-    }
-    await db.CreatedChatModel.removeChat(type, user.uid, tUid);
-    await nkcModules.socket.sendEventRemoveChat(type, user.uid, tUid);
+    const {uid, type} = query;
+    await db.CreatedChatModel.removeChat(type, user.uid, uid);
+    await nkcModules.socket.sendEventRemoveChat(type, user.uid, uid);
     await next();
   });
 module.exports = chatRouter;

@@ -11,7 +11,6 @@ block content
           span(v-if="getMessageStatus === 'loading'")
             .fa.fa-circle-o-notch.fa-spin
             | &nbsp;加载中...
-          //span(v-else-if="getMessageStatus === 'canLoad'") 加载中~
           span(v-else-if="getMessageStatus === 'cantLoad'") 到顶了
         .listItem(v-for="message in messages")
           //- 时间戳
@@ -25,7 +24,7 @@ block content
           .message(v-else :class='message.position')
             .icon(@click='openUserHome(message)')
               img(:src="message.sUser.icon")
-            .messageContainer(:class="['img', 'video'].includes(message.contentType)?'nkc-media':''")
+            .messageContainer(:class="['image', 'video'].includes(message.contentType)?'nkc-media':''")
               .smart
               .status.sending(v-if='message.status === "sending"')
                 .fa.fa-circle-o-notch.fa-spin
@@ -33,23 +32,26 @@ block content
                 .fa.fa-exclamation-circle
               .status.withdrawn(v-if='message.canWithdrawn' @click="withdrawn(message._id)")
                 .fa.fa-trash
-              .messageContent(:class="['img', 'video'].includes(message.contentType)?'p-a-0':''")
+              .messageContent(:class="['image', 'video'].includes(message.contentType)?'p-a-0':''")
                 .html(v-html='message.content' v-if="message.contentType === 'html'")
-                .image(v-if="message.contentType === 'img'" @click="visitImages(message.content.fileUrl)")
+                .image(v-if="message.contentType === 'image'" @click="visitImages(message.content.fileUrl)")
                   img(:src="message.content.fileUrl")
                 .file(v-if="message.contentType === 'file'")
                   a(:href="message.content.fileUrl" target='_blank') {{message.content.filename}}
                 .video(v-if="message.contentType === 'video'")
                   video(preload='none' controls='controls' :src="message.content.fileUrl" type="video/mp4" :poster="message.content.fileCover")
                     | 你的浏览器不支持video标签，请升级。
-                .audio(v-if="message.contentType === 'voice'" @click="playVoice(message)")
+                .audio(v-if='message.contentType === "audio"')
+                  .filename {{message.content.filename}}
+                  audio(controls='controls' :src="message.content.fileUrl")
+                .voice(v-if="message.contentType === 'voice'" @click="playVoice(message)")
                   div.left(v-if='message.position === "left"')
-                    img(src=`/default/stopRight.png` v-if="message.content.playStatus === 'unPlay'")
+                    img(src=`/default/stopRight.png` v-if="playVoiceId !== message.content.fileId")
                     img(v-else src=`/default/playRight.gif`)
-                    .time {{message.content.fileTimer}}''
+                    .time {{message.content.fileDuration}}''
                   div.right(v-else)
-                    .time {{message.content.fileTimer}}''
-                    img(src=`/default/stopLeft.png` v-if="message.content.playStatus === 'unPlay'")
+                    .time {{message.content.fileDuration}}''
+                    img(src=`/default/stopLeft.png` v-if="playVoiceId !== message.content.fileId")
                     img(v-else src=`/default/playLeft.gif`)
 
 

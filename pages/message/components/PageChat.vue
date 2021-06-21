@@ -440,6 +440,7 @@
     closePage,
     openUserPage,
   } from '../message.2.0.js';
+  import {withdrawn, onWithdrawn} from '../message.2.0.js';
   export default {
     data: () => ({
       type: '',
@@ -690,20 +691,11 @@
         }
       },
       withdrawn(messageId) {
-        nkcAPI(`/message/withdrawn`, 'PUT', {
-          messageId
-        })
+        withdrawn(messageId)
           .catch(sweetError);
       },
       onWithdrawn(messageId) {
-        const {originMessages} = this;
-        for(const message of originMessages) {
-          if(message._id === messageId) {
-            message.contentType = 'withdrawn';
-            message.content = null;
-            break;
-          }
-        }
+        onWithdrawn(this.originMessages, messageId);
       },
       onReceiveMessage(localId, message) {
         const {r, messageType, s} = message;

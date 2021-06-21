@@ -1609,7 +1609,7 @@ messageSchema.statics.extendMessages = async (messages) => {
             fileUrl: getUrl('messageResource', file._id),
             fileCover: getUrl('messageCover', file._id),
             fileSize: file.size,
-            fileDuration: file.duration
+            fileDuration: Math.round(file.duration / 1000)
           }
         }
       }

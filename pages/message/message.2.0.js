@@ -53,13 +53,27 @@ export function addFriend(uid) {
     .catch(sweetError);
 }
 
-export function removeChat(uid) {
+export function removeChat(type, uid) {
   return sweetQuestion(`确定要从消息列表中移除当前对话？`)
     .then(() => {
-      return nkcAPI(`/message/chat?uid=${uid}`, 'DELETE')
+      return nkcAPI(`/message/chat?type=${type}&uid=${uid}`, 'DELETE')
     })
     .then(() => {
 
     })
     .catch(sweetError)
+}
+
+export function withdrawn(messageId) {
+  return nkcAPI('/message/withdrawn', 'PUT', {messageId});
+}
+
+export function onWithdrawn(originMessages, messageId) {
+  for(const message of originMessages) {
+    if(message._id === messageId) {
+      message.contentType = 'withdrawn';
+      message.content = null;
+      break;
+    }
+  }
 }

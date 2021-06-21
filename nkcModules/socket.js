@@ -450,6 +450,24 @@ func.sendEventMarkAsRead = async (type, uid, tUid) => {
 };
 
 /*
+* 更新单个chat
+* @param {String} type UTU/STU/STE/newFriends
+* @param {String} uid 当前
+* @param {String} tUid 对方
+* */
+func.sendEventUpdateChat = async (type, uid, tUid) => {
+  const chat = await db.CreatedChatModel.getSingleChat(type, uid, tUid);
+  const socketClient = communication.getCommunicationClient();
+  socketClient.sendMessage(socketServiceName, {
+    eventName: 'updateChat',
+    roomName: getRoomName('user', uid),
+    data: {
+      chat
+    }
+  });
+};
+
+/*
 * 发送普通消息
 * */
 func.sendMessageToUser = async (messageId, localId) => {

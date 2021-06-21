@@ -97,8 +97,9 @@ router
     const {user} = data;
     const {fields, files} = body;
     const friendData = JSON.parse(fields.friend);
+    const uid = fields.uid;
     const file = files.file;
-    const {cid, uid, name, description, image, phone, location} = friendData;
+    const {cid, name, description, image, phone, location} = friendData;
     const friend = await db.FriendModel.findOne({uid: user.uid, tUid: uid});
     if(!friend) ctx.throw(400, `你暂未与对方建立好友关系，请刷新后重试`);
     const {checkString} = nkcModules.checkData;

@@ -24,7 +24,7 @@ module.exports = async (socket, io) => {
   // 给每个好友通知我已经上线了!
   const status = await db.UserModel.getUserOnlineStatus(user.uid);
   await Promise.all(friendsUid.map(friendUid => {
-    io.in(userRoom(friendUid)).emit('updateUserStatus', {
+    io.in(userRoom(friendUid)).emit('updateUserOnlineStatus', {
       uid: user.uid,
       status,
     });
@@ -43,7 +43,7 @@ module.exports = async (socket, io) => {
     // 给每个好友通知我下线了!
     const status = await db.UserModel.getUserOnlineStatus(user.uid);
     await Promise.all(friendsUid.map(friendUid => {
-      io.in(userRoom(friendUid)).emit('updateUserStatus', {
+      io.in(userRoom(friendUid)).emit('updateUserOnlineStatus', {
         uid: user.uid,
         status,
       });
