@@ -184,13 +184,13 @@ router
         await db.UserModel.updateUserScores(record.to);
         // await db.UserModel.updateUserKcb(record.to);
       } else {
-        if(record.payment !== totalAmount) {
-          updateObj.error = '系统账单金额与支付宝账单金额不相等';
-        }
         const updateObj = {
           verify: true,
           c: body
         };
+        if(record.payment !== totalAmount) {
+          updateObj.error = '系统账单金额与支付宝账单金额不相等';
+        }
         const ordersId = backParams.ordersId;
         let orders = [];
         let totalMoney = 0;
@@ -221,7 +221,7 @@ router
             type: 'pay',
             ordersId: [order.orderId],
             num: order.orderPrice + order.orderFreightPrice,
-            description: ordersInfo.description,
+            description: ordersInfo.description.join(','),
             ip: ctx.address,
             port: ctx.port,
             verify: true
@@ -243,7 +243,7 @@ router
         await record.updateOne(updateObj);
         await db.ShopProductsParamModel.productParamReduceStock(orders,'payReduceStock');
         // await db.UserModel.updateUserKcb(record.from);
-        await db.UserModel.updateUserScores(record.from);
+        await db.UserModel.updateUserScores(record.to);
 
       }
       return ctx.body = 'success';
