@@ -513,6 +513,7 @@
         if(type === 'UTU') {
           return 'fa fa-user-circle-o';
         }
+        return '';
       },
       formHeight() {
         return this.textareaHeight + this.buttonContainerHeight;
