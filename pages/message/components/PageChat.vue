@@ -524,6 +524,7 @@
             return m._id;
           }
         }
+        return null;
       },
       showForm() {
         const {type} = this;
@@ -617,9 +618,9 @@
           .then(() => {
             // if(app.loadFinished) throw new Error(`所有消息加载完成`);
             // if(app.loading) throw new Error(`上次加载尚未完成，请稍后重试`);
-            const {type, uid, firstMessageId = ''} = app;
+            const {type, uid, firstMessageId} = app;
             if(page === undefined) page = this.page;
-            const url = `/message/data?type=${type}&uid=${uid}&firstMessageId=${firstMessageId}`;
+            const url = `/message/data?type=${type}&uid=${uid}${firstMessageId? `&firstMessageId=${firstMessageId}`: ''}`;
             this.loading = true;
             return nkcAPI(url, 'GET')
           })
