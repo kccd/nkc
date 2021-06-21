@@ -18,6 +18,7 @@ block head
   if state.isApp && state.platform === 'reactNative'
     meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
   link(rel='shortcut icon' href=tools.getUrl('siteIcon', state.serverSettings.siteIcon, 'ico'))
+  script(src="/external_pkgs/vue.min.js")
   +includeJS('/publicModules/common.js')
   if state.isApp && state.platform === 'apiCloud'
     +includeJS("/appAPi/api.js")
