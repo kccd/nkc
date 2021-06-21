@@ -67,7 +67,7 @@ router
       }
     });
 		await message.save();
-		await redis.pubMessage(message);
+		await ctx.nkcModules.socket.sendMessageToUser(message._id);
 		await next();
 	})
   .del('/xsf/:recordId', async (ctx, next) => {
@@ -185,7 +185,7 @@ router
       }
     });
 		await message.save();
-    await redis.pubMessage(message);
+    await ctx.nkcModules.socket.sendMessageToUser(message._id);
 		await next();
 	})
   .put("/kcb/:recordId", async (ctx, next) => {

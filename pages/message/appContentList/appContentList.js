@@ -3,6 +3,8 @@ const audio = new Audio();
 
 window.audio = audio;
 
+import {onWithdrawn, withdrawn} from '../message.2.0.js';
+
 window.app = new Vue({
   el: '#app',
   data: {
@@ -26,6 +28,9 @@ window.app = new Vue({
     getMessageStatus: 'canLoad', // canLoad, loading, cantLoad
     // 语音播放器实例
     audio: new Audio(),
+
+    // 正在播放的声音ID
+    playVoiceId: null,
   },
   methods: {
     // 格式化时间
@@ -97,7 +102,7 @@ window.app = new Vue({
     visitImages(url) {
       let urls = [];
       for(const m of this.messages) {
-        if(m.contentType === 'img') {
+        if(m.contentType === 'image') {
           urls.push({
             name: m.content.filename,
             url: m.content.fileUrl
@@ -144,7 +149,7 @@ window.app = new Vue({
 
       if(['sendText', 'sendFile'].includes(type)) {
         // 发送一条信息
-        const localMessageId = Date.now();
+        const localMessageId = `local_id_${Date.now()}`;
         message = {
           _id: localMessageId,
           contentType: 'html',
@@ -159,6 +164,7 @@ window.app = new Vue({
           message.content = c.name;
           formData.append('file', c);
         }
+        formData.append('localId', message._id);
         formData.append('content', message.content);
         formData.append('socketId', self.socketId);
         message.formData = formData;
@@ -186,7 +192,7 @@ window.app = new Vue({
           const index = self.originMessages.indexOf(message);
           message.status = 'sent';
           if(index >= 0) {
-            Vue.set(self.originMessages, index, data.message2);
+            // Vue.set(self.originMessages, index, data.message2);
             self.scrollToBottom();
           }
         })
@@ -209,8 +215,8 @@ window.app = new Vue({
       self.getMessageStatus = 'loading';
       return nkcAPI(url, 'GET')
         .then(data => {
-          self.originMessages = self.originMessages.concat(data.messages2);
-          if(data.messages2.length) {
+          self.originMessages = self.originMessages.concat(data.messages);
+          if(data.messages.length) {
             self.getMessageStatus = 'canLoad';
           } else {
             self.getMessageStatus = 'cantLoad';
@@ -227,41 +233,44 @@ window.app = new Vue({
       }
     },
     // rn接收到新消息通知web
-    insertMessage(message) {
+    insertMessage(message, localId) {
       const {messageType, r, s} = message;
-      const {tUser, mUser} = this;
+      const {tUser, mUser, type, originMessages} = this;
 
-      if(messageType === 'UTU') {
-        const usersId = [tUser.uid, mUser.uid];
-        if(!usersId.includes(r) || !usersId.includes(s)) return;
-        if(this.mUser.uid !== message.s) {
-          this.markAsRead();
+      if(messageType !== type) return;
+      if(!mUser || (type === 'UTU' && !tUser)) return;
+      if(
+        type === 'UTU' &&
+        (r !== mUser.uid || s !== tUser.uid) &&
+        (s !== mUser.uid || r !== tUser.uid)
+      ) return;
+      let hasMessage = false;
+      for(let i = 0; i < originMessages.length; i++) {
+        const originMessage = originMessages[i];
+        let _localId = typeof originMessage._id === 'number'? Number(localId): localId;
+        if(originMessage._id === _localId) {
+          originMessages.splice(i, 1, message);
+          hasMessage = true;
+          break;
         }
-      } else if(messageType === 'STU') {
-        if(r !== mUser.uid) return;
-        this.markAsRead();
-      } else if(messageType === 'STE') {
-        this.markAsRead();
-      } else if(messageType === 'friendsApplication') {
-        if(r !== mUser.uid) return;
       }
-      this.originMessages.push(message);
+      if(hasMessage === false) {
+        this.originMessages.unshift(message);
+      }
+
+      if(r === mUser.uid) {
+        this.markAsRead();
+      }
+
       this.scrollToBottom();
     },
+    onWithdrawn(messageId) {
+      onWithdrawn(this.originMessages, messageId);
+    },
     // 撤回
-    withdrawn(messageId, targetUser) {
-      const self = this;
-      Promise.resolve()
-        .then(() => {
-          if(!targetUser) {
-            return nkcAPI('/message/withdrawn', 'PUT', {messageId})
-          }
-        })
-        .then(() => {
-          const originMessage = self.getOriginMessageById(messageId);
-          if(originMessage) originMessage.contentType = 'withdrawn';
-        })
-        .catch(self.toast)
+    withdrawn(messageId) {
+      withdrawn(messageId)
+        .catch(self.toast);
     },
     // 标记为已读
     markAsRead() {
@@ -302,29 +311,25 @@ window.app = new Vue({
     },
     // 播放语音
     playVoice(message) {
-      const {audio, stopPlayVoice, getOriginMessageById} = this;
-      if(message.content.playStatus === 'playing') {
+      const {audio, stopPlayVoice, getOriginMessageById, playVoiceId} = this;
+      if(message.content.fileId === playVoiceId) {
         return stopPlayVoice();
       }
       stopPlayVoice();
-      audio.src = message.content.fileUrl + `&t=${Date.now()}`;
+      audio.src = message.content.fileUrl + `?t=${Date.now()}`;
+      const self = this;
       setTimeout(() => {
         audio.play();
-        const originMessage = getOriginMessageById(message._id);
-        originMessage.content.playStatus = 'playing';
+        self.playVoiceId = message.content.fileId;
       }, 200);
     },
     // 停止播放语音
     stopPlayVoice() {
       const {audio} = this;
       try{
-        audio.pause()
+        audio.pause();
+        this.playVoiceId = null;
       } catch(err) {}
-      for(const m of this.originMessages) {
-        if(m.contentType === 'voice') {
-          m.content.playStatus = 'unPlay';
-        }
-      }
     },
   },
   computed: {
@@ -412,3 +417,11 @@ window.app = new Vue({
     });
   }
 });
+
+window._messageFriendApplication = (uid, type) => {
+  nkcAPI(`/message/friend`, 'POST', {
+    uid,
+    type
+  })
+    .catch(sweetError);
+};

@@ -136,6 +136,9 @@ var Tools = function() {
       case 'columnCategory': {
         return "/m/" + id + '?c=' + size;
       }
+      case 'messageTone': {
+        return "/default/message.wav";
+      }
     }
   };
   self.getAnonymousInfo = function() {

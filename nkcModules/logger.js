@@ -7,8 +7,9 @@ module.exports = async (ctx) => {
   const processTime = passed.toString();
   const {
     status = 500, error, method, path, _body, address, port,
-    reqTime, data, state, db
+    reqTime, data, state, db, url
   } = ctx;
+
   const referer = ctx.get("referer");
   const userAgent = ctx.get("User-Agent");
   const {operation, logSettings} = state;
@@ -17,7 +18,7 @@ module.exports = async (ctx) => {
   const log = {
     error,
     method,
-    path,
+    path: global.NKC.isProduction? path: url,
     query: _body,
     status,
     ip: address,

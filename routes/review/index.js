@@ -131,7 +131,7 @@ router
       }
     });
     await message.save();
-    await ctx.redis.pubMessage(message);
+    await ctx.nkcModules.socket.sendMessageToUser(message._id);
     await next();
   });
 module.exports = router;

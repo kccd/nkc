@@ -23,14 +23,14 @@ block content
                     .header {{ug.title}}
                     .user(v-for="u in ug.data" @click="selectUser(u)" :class='{"active": selectedUsersId.indexOf(u.uid) !== -1}')
                       .avatar
-                        img(:src="getUrl('userAvatar', u.avatar)")
+                        img(:src="u.avatar")
                       .name {{u.username}}
               .col-xs-6
                 .friend-header 已选好友
                 .friends
                   .user(v-for="u in selectedUsers" @click="unSelectUser(u)")
                     .avatar
-                      img(:src="getUrl('userAvatar', u.avatar)")
+                      img(:src="u.avatar")
                     .name {{u.username}}
         .category-info(v-else)
           .name {{category.name}}
@@ -38,7 +38,7 @@ block content
           .users
             .user(v-for="u in selectedUsers" @click="visitUserHome(u)")
               .avatar
-                img(:src="getUrl('userAvatar', u.avatar)")
+                img(:src="u.avatar")
               .name {{u.username}}
     .button-save.remove(@click='remove' v-if='edit')
       .fa.fa-trash

@@ -32,8 +32,7 @@ module.exports = async (io) => {
   if(global.NKC.processId === 0) {
     await db.UserModel.updateMany({online: true}, {
       $set: {
-        online: false,
-        onlineType: ''
+        online: ''
       }
     });
   }
@@ -64,18 +63,6 @@ module.exports = async (io) => {
         console.log(err.message);
       }
     }
-    // 平台判断
-    let onlineType = query.os;
-    if(!['phone', 'computer'].includes(onlineType)) {
-      onlineType = 'computer';
-    }
-    socket.NKC.onlineType = onlineType;
-    await db.UserModel.updateOne({uid: user.uid}, {
-      $set: {
-        online: true,
-        onlineType
-      }
-    });
 
     await message(socket, io);
 

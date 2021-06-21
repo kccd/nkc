@@ -32,7 +32,7 @@ router
       }
     });
     await message.save();
-    ctx.redis.pubMessage(message);
+    await ctx.nkcModules.socket.sendMessageToUser(message._id);
     await next();
   })
   .put("/", async (ctx, next) =>{

@@ -27,7 +27,7 @@ router
         }
       });
       await message.save();
-      await ctx.redis.pubMessage(message);
+      await ctx.nkcModules.socket.sendMessageToUser(message._id);
     }
     await column.updateOne({contacted: true});
     await next();

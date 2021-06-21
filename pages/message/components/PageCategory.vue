@@ -229,6 +229,7 @@
       },
       init(id) {
         const app = this;
+        app.reset();
         let url;
         if(id) {
           url = `/message/category?cid=${id}`;
@@ -237,7 +238,6 @@
         }
         nkcAPI(url, 'GET')
           .then(data => {
-            console.log(data);
             const {category, users} = data;
             app.users = users;
             if(id) {

@@ -18,7 +18,8 @@ const app = new Vue({
             min: 0,
             max: 1000
           });
-          return nkcAPI(`/u/${tUid}/friends`, 'POST', {
+          return nkcAPI(`/message/friend/apply`, 'POST', {
+            uid: tUid,
             description: content
           })
             .then(() => {

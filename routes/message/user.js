@@ -75,7 +75,7 @@ userRouter
     await next();
   })
   .post('/:uid', async (ctx, next) => {
-    const {db, body, params, data, redis, settings, fs, fsPromise, tools} = ctx;
+    const {db, body, params, data, nkcModules, fsPromise, tools} = ctx;
     const {uid} = params;
     const {ffmpeg} = tools;
     const targetUser = await db.UserModel.findOnly({uid});
@@ -85,16 +85,15 @@ userRouter
     await db.MessageModel.ensureSystemLimitPermission(user.uid, targetUser.uid);
     await db.MessageModel.ensurePermission(user.uid, uid, data.userOperationsId.includes('canSendToEveryOne'));
 
-    let file, content, socketId, voiceTime;
+    let file, content, voiceTime, localId, isVoice;
 
     if(body.fields) {
       content = body.fields.content;
-      socketId = body.fields.socketId;
-      voiceTime = body.fields.voiceTime;
+      localId = body.fields.localId;
+      isVoice = body.fields.isVoice;
       file = body.files.file || null;
     } else {
       content = body.content;
-      socketId = body.socketId;
     }
 
     // 仅普通信息
@@ -109,74 +108,71 @@ userRouter
       // 附件尺寸限制
       await db.MessageModel.checkFileSize(file);
 
-      let ext = PATH.extname(name);
+      const ext = await nkcModules.file.getFileExtension(file);
 
-      if(!ext) ctx.throw(400, '无法识别文件格式');
+      if(['exe', 'bat'].includes(ext)) ctx.throw(403, '暂不支持上传该类型的文件');
 
-      ext = ext.toLowerCase();
-      ext = ext.replace('.', '');
-
-      if(['exe'].includes(ext)) ctx.throw(403, '暂不支持上传该类型的文件');
+      const fileType = await db.MessageFileModel.getFileTypeByExtension(ext, isVoice);
 
       const _id = await db.SettingModel.operateSystemID('messageFiles', 1);
+
       const toc = Date.now();
+
       // 文件存储文件夹
-      let messageTy;
-      const fileType = await db.MessageFileModel.getFileTypeByExtension(ext);
-      let saveFileDir = await db.MessageFileModel.getFileFolder(fileType, toc);
-      if(fileType === 'image') {
-        messageTy = "img"
-      }else if(fileType === 'voice') {
-        messageTy = "voice"
-        ext = "mp3";
-      }else if(fileType === 'video') {
-        messageTy = "video"
+      const saveFileDir = await db.MessageFileModel.getFileFolder(fileType, toc);
+
+      let extension = ext;
+      let targetFilePath;
+
+      if(fileType === 'voice') {
+        const extension = 'mp3';
+        targetFilePath = `${saveFileDir}/${_id}.${extension}`;
+        await ffmpeg.audioTransMP3(path, targetFilePath, ext);
+      } else if(fileType === 'video') {
+        const extension = 'mp4';
+        targetFilePath = `${saveFileDir}/${_id}.${extension}`;
+        await ffmpeg.videoTransMP4(path, targetFilePath, ext);
+        // 视频封面图路径
+        await ffmpeg.videoFirstThumbTaker(targetFilePath, `${saveFileDir}/${_id}_cover.jpg`);
+      } else if(fileType === 'audio') {
+        const extension = 'mp3';
+        targetFilePath = `${saveFileDir}/${_id}.${extension}`;
+        await ffmpeg.audioTransMP3(path, targetFilePath, ext);
+      } else if(fileType === 'image') {
+        targetFilePath = `${saveFileDir}/${_id}.${extension}`;
+        await tools.imageMagick.messageImageSMify(path, targetFilePath);
       } else {
-        messageTy = "file";
+        targetFilePath = `${saveFileDir}/${_id}.${extension}`;
+        await fsPromise.copyFile(path, targetFilePath);
       }
-      // 此文件的目标存储位置
-      let targetPath = `${saveFileDir}/${_id}.${ext}`;
+
+      const newFile = await nkcModules.file.getFileObjectByFilePath(targetFilePath);
+      let duration = 0;
+
+      if(['video'].includes(fileType)) {
+        const fileInfo = await ffmpeg.getVideoInfo(targetFilePath);
+        duration = Math.round(fileInfo.duration * 1000);
+      } else if(['voice', 'audio'].includes(fileType)) {
+        const fileInfo = await ffmpeg.getAudioDuration(targetFilePath);
+        duration = Math.round(fileInfo.duration * 1000);
+      }
+
       // 消息文件文档对象
       const messageFile = db.MessageFileModel({
         _id,
+        type: fileType,
         oname: name,
-        size,
-        ext,
-        path: targetPath,
+        size: newFile.size,
+        ext: newFile.ext,
         uid: user.uid,
-        targetUid: targetUser.uid
+        targetUid: targetUser.uid,
+        duration
       });
 
       content = {
-        ty: messageTy,
-        id: _id,
-        na: name,
-        vl: voiceTime || null
-      }
+        fileId: _id
+      };
 
-      // 将amr语音文件转为mp3
-      if(voiceExt.includes(ext)){
-        await ffmpeg.audioAMRTransMP3(path, targetPath);
-      } else if(imageExt.includes(ext)) {
-        await tools.imageMagick.messageImageSMify(path, targetPath);
-      } else if(videoExt.includes(ext)) {
-        // 对视频进行转码
-        if(['3gp'].indexOf(ext.toLowerCase()) > -1){
-          await ffmpeg.video3GPTransMP4(path, targetPath);
-        }else if(['mp4'].indexOf(ext.toLowerCase()) > -1) {
-          await ffmpeg.videoMP4TransH264(path, targetPath);
-        }else if(['mov'].indexOf(ext.toLowerCase()) > -1) {
-          await ffmpeg.videoMOVTransMP4(path, targetPath);
-        }else if(['avi'].indexOf(ext.toLowerCase()) > -1) {
-          await ffmpeg.videoAviTransAvi(path, path);
-          await ffmpeg.videoAVITransMP4(path, targetPath);
-        }
-        // 视频封面图路径
-        var videoCoverPath = `${saveFileDir}/${_id}_cover.jpg`;
-        await ffmpeg.videoFirstThumbTaker(targetPath, videoCoverPath);
-      } else {
-        await fsPromise.copyFile(path, targetPath);
-      }
       await messageFile.save();
     }
 
@@ -192,15 +188,8 @@ userRouter
     });
     await message.save();
     // 判断是否已创建聊天
-    delete message.ip;
-    delete message.port;
-    data.message2 = await db.MessageModel.extendMessage(data.user.uid, message);
     await db.CreatedChatModel.createChat(user.uid, uid, true);
-    const message_ = message.toObject();
-    message_.socketId = socketId;
-    await redis.pubMessage(message_);
-    data.message = message;
-    data.targetUser = targetUser;
+    await nkcModules.socket.sendMessageToUser(message._id, localId);
     await next();
   });
 module.exports = userRouter;

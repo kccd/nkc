@@ -3,7 +3,7 @@ const router = new Router();
 
 router
   .put('/', async (ctx, next) => {
-    const {body, db, redis, data} = ctx;
+    const {body, db, nkcModules,  data} = ctx;
     const {user} = data;
     const {messageId} = body;
     const message = await db.MessageModel.findOnly({_id: messageId});
@@ -14,7 +14,7 @@ router
     if(message.tc < (Date.now() - 60*1000)) ctx.throw(400, '仅支持撤回一分钟以内所发送的信息');
     await message.updateOne({withdrawn: true});
     message.withdrawn = true;
-    await redis.pubWithdrawn(message);
+    await nkcModules.socket.sendEventWithdrawn(user.uid, message.r, messageId);
     await next();
   });
 

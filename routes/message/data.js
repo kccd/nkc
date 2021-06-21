@@ -3,9 +3,10 @@ const router = new Router();
 
 router
   .get("/", async (ctx, next) => {
-    const {db, query, data, state, nkcModules, redis} = ctx;
+    const {db, query, data, state, nkcModules} = ctx;
     const {user} = data;
-    const {type, firstMessageId, uid} = query;
+    const {type, firstMessageId} = query;
+    const uid = !query.uid || query.uid === 'null'? null: query.uid;
     data.twemoji = state.twemoji;
     const {getUrl} = nkcModules.tools;
     if(type === "UTU") {
@@ -47,8 +48,6 @@ router
       // 将所有消息标记为已读
       await db.MessageModel.markAsRead('UTU', user.uid, uid);
       // await db.MessageModel.updateMany({ty: 'UTU', r: user.uid, s: uid, vd: false}, {$set: {vd: true}});
-      // 判断是否已创建对话，如果没有则创建
-      await db.CreatedChatModel.createChat(user.uid, uid);
       data.targetUserSendLimit = (await db.UsersGeneralModel.findOnly({uid: targetUser.uid})).messageSettings.limit;
       // 用户是否能够发送短消息
       data.showMandatoryLimitInfo = false;
@@ -59,6 +58,10 @@ router
       }
       data.blacklistInfo = await db.BlacklistModel.getBlacklistInfo(targetUser.uid, data.user.uid);
       data.targetUserAllowAllMessage = await db.UserModel.allowAllMessage(targetUser.uid);
+      const chat = await db.CreatedChatModel.findOne({uid: user.uid, tUid: targetUser.uid});
+      if(!chat) await ctx.nkcModules.socket.sendEventUpdateChat('UTU', user.uid, targetUser.uid);
+      // 判断是否已创建对话，如果没有则创建
+      await db.CreatedChatModel.createChat(user.uid, uid);
     } else if(type === "STE") {
       const q = {
         ty: 'STE'
@@ -109,20 +112,8 @@ router
       const friendsApplications = await db.FriendsApplicationModel.find(q).sort({toc: -1}).limit(30);
       const applications = [];
       for(const f of friendsApplications) {
-        const targetUser = await db.UserModel.findOne({uid: f.applicantId});
-        await db.UserModel.extendUserInfo(targetUser);
-        if(!targetUser) return;
-        applications.push({
-          _id: f._id,
-          ty: 'newFriends',
-          username: targetUser.username || targetUser.uid,
-          avatar: targetUser.avatar,
-          description: f.description,
-          uid: targetUser.uid,
-          toc: f.toc,
-          agree: f.agree,
-          tlm: f.tlm
-        });
+        const applicationMessage = await db.FriendsApplicationModel.getApplicationMessage(f._id);
+        applications.push(applicationMessage);
       }
       data.messages = applications.reverse();
       data.tUser = {
@@ -139,12 +130,13 @@ router
       icon: getUrl('userAvatar', user.avatar),
       name: user.username || user.uid
     }
-    data.messages2 = await db.MessageModel.extendMessages(data.user.uid, data.messages);
+    data.messages = await db.MessageModel.extendMessages(data.messages);
 
     const messageSettings = await db.SettingModel.getSettings('message');
     data.sizeLimit = messageSettings.sizeLimit;
 
     await db.MessageModel.markAsRead(type, user.uid, uid);
+    await nkcModules.socket.sendEventMarkAsRead(type, user.uid, uid);
 
     ctx.template = 'message/appContentList/appContentList.pug';
     await next();

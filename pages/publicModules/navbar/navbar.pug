@@ -27,7 +27,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
       if data.user
         //- 已登录状态 显示头像
         .navbar-brand.userInfo-m
-          .userInfo-m-point.message-switch.message-count(class=!messageSum?"disabled":"")=messageSum
+          .userInfo-m-point.message-switch.message-count(class="hidden")
           img(
             src=tools.getUrl('userAvatar', data.user.avatar)
             onclick="toggleNKCDrawer('right')"
@@ -64,9 +64,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             if data.forum
               -editorHref = `/editor?type=forum&id=${data.forum.fid}`;
             a(href=editorHref target='_blank') 发表文章
-          li.new-message.message-switch.pointer(class=messageSum?"":"hidden" onclick='messageApp.toChat()')
+          li.new-message.message-switch.pointer.message-count-container(class="hidden" onclick='messageApp.toChat()')
             span 消息
-            .nav-user-avatar-count.message-switch.message-count(class=messageSum?"":"hidden")=messageSum?messageSum:""
+            .nav-user-avatar-count.message-switch.message-count(class="hidden")
 
           li.dropdown.userInfo.nav-user(onmousover="displayOwnInfo()")
             .nav-user-content
@@ -105,7 +105,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                     .col-xs-6.nav-user-link(onclick='messageApp.toChat()')
                       .fa.fa-envelope-o
                       | 消息中心
-                      .count.message-switch.message-count(class=messageSum?"":"hidden")=messageSum?messageSum:""
+                      .count.message-switch.message-count(class="hidden")
                     a(href=`/u/${data.user.uid}/profile/draft` target='_blank').col-xs-6.nav-user-link
                       .fa.fa-inbox
                       | 我的草稿
@@ -213,10 +213,10 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
               span.fa.fa-columns &nbsp;开设专栏
               span.pull-right.fa.fa-angle-right
         li
-          span
+          a(onclick='messageApp.toChat()')
             span.fa.fa-envelope-o &nbsp;消息中心
-              span.nkc-drawer-message.nkc-drawer-link.message-switch-div(class=!messageSum ? "disabled": "" )
-                span.message-switch.message-count(class=!messageSum ? "disabled": "")=messageSum
+              span.nkc-drawer-message.nkc-drawer-link.message-switch-div.message-count-container(class="hidden" )
+                span.message-switch.message-count(class="hidden")
             span.pull-right.fa.fa-angle-right
 
         li

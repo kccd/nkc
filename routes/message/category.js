@@ -74,14 +74,18 @@ router
       await category.save();
     }
     data.categoryId = category._id;
+    await nkcModules.socket.sendEventUpdateCategoryList(user.uid);
     await next();
   })
   .del('/', async (ctx, next) => {
-    const {query, db, data} = ctx;
+    const {nkcModules, query, db, data} = ctx;
     const {user} = data;
     const {cid} = query;
     const category = await db.FriendsCategoryModel.findOne({uid: user.uid, _id: cid});
-    if(category) await category.remove();
+    if(category) {
+      await category.remove();
+      await nkcModules.socket.sendEventRemoveCategory(user.uid, category._id);
+    }
     await next();
   });
 

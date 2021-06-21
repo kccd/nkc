@@ -1,20 +1,24 @@
 extends scratch.pug
 block head
+  //- 以下数据传递到浏览器环境
   -var windowData = {};
   if data.user
     -windowData.uid = data.user.uid;
     -windowData.selectTypesWhenSubscribe = !!data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe;
     -windowData.refererOperationId = data.operationId;
+    -windowData.newMessageCount = data.user.newMessage;
   if state.isApp
     -windowData.isApp = true;
     -windowData.appOS = state.appOS;
     -windowData.platform = state.platform;
+
   meta(charset='UTF-8')
   meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
   meta(name="viewport" content="width=device-width, initial-scale=1")
   meta(name="format-detection" content="telephone=no")
   meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
   meta(name='window-data' content=objToStr(windowData))
+
   if state.isApp && state.platform === 'reactNative'
     meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
   link(rel='shortcut icon' href=tools.getUrl('siteIcon', state.serverSettings.siteIcon, 'ico'))
@@ -23,7 +27,6 @@ block head
   if state.isApp && state.platform === 'apiCloud'
     +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
-  //- 字体图标 http://www.fontawesome.com.cn/icons-ui/
   +includeCSS('/font-awesome/css/font-awesome.css')
   style=`body{background-color: ${state.serverSettings.backgroundColor}}`
   +includeCSS('/nkc_styles.css')
@@ -53,7 +56,7 @@ block body
   if data.user
     if data.user.generalSettings.lotterySettings.status
       include module_lottery
-    -const {systemInfo, reminder, usersMessage} = data.user.generalSettings.messageSettings.beep;
+    -var {systemInfo, reminder, usersMessage} = data.user.generalSettings.messageSettings.beep;
     audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
   +includeJS('/jquery/jquery-ui.1.11.4.min.js')
   //-app使用的js

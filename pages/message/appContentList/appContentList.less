@@ -23,7 +23,8 @@ body, html, #app{
     #info{
       text-align: center;
       color: #888;
-      padding: 0.5rem 0;
+      height: 3rem;
+      line-height: 3rem;
     }
     .message-emoji{
       height: 1.8rem;
@@ -157,6 +158,14 @@ body, html, #app{
               }
             }
             .audio{
+              audio{
+                max-width: 100%;
+              }
+              .filename{
+                font-size: 1.2rem;
+              }
+            }
+            .voice{
               width: 8rem;
               position: relative;
               img{
@@ -167,7 +176,7 @@ body, html, #app{
               }
               .time{
                 height: 1.6rem;
-                width: 1.6rem;
+                min-width: 1.6rem;
                 position: absolute;
                 top: 0;
               }

@@ -28,11 +28,17 @@ router
     let {agree} = application;
     if(type === 'agree') {
       await db.FriendModel.createFriend(user.uid, targetUser.uid);
+      await nkcModules.socket.sendEventUpdateUserList(user.uid);
+      await nkcModules.socket.sendEventUpdateChatList(user.uid);
+      await nkcModules.socket.sendEventUpdateUserList(targetUser.uid);
+      await nkcModules.socket.sendEventUpdateChatList(targetUser.uid);
       agree = 'true';
     } else if(type === 'disagree') {
       agree = 'false';
+      await nkcModules.socket.sendEventUpdateChatList(user.uid);
     } else if(type === 'ignored') {
       agree = 'ignored';
+      await nkcModules.socket.sendEventUpdateChatList(user.uid);
     }
     await application.updateOne({
       $set: {
@@ -40,6 +46,7 @@ router
         tlm: new Date(),
       }
     });
+    await nkcModules.socket.sendNewFriendApplication(application._id);
     await next();
   })
   .post('/apply', async (ctx, next) => {
@@ -81,6 +88,8 @@ router
       await applicationLog.save();
     }
     await db.UsersGeneralModel.updateOne({uid: uid}, {$set: {'messageSettings.chat.newFriends': true}});
+
+    await ctx.nkcModules.socket.sendNewFriendApplication(applicationLog._id);
     await next();
   })
   .put('/', async (ctx, next) => {
@@ -88,8 +97,9 @@ router
     const {user} = data;
     const {fields, files} = body;
     const friendData = JSON.parse(fields.friend);
+    const uid = fields.uid;
     const file = files.file;
-    const {cid, uid, name, description, image, phone, location} = friendData;
+    const {cid, name, description, image, phone, location} = friendData;
     const friend = await db.FriendModel.findOne({uid: user.uid, tUid: uid});
     if(!friend) ctx.throw(400, `你暂未与对方建立好友关系，请刷新后重试`);
     const {checkString} = nkcModules.checkData;
@@ -150,14 +160,17 @@ router
       await tools.imageMagick.friendImageify(path, targetFilePath);
     }
     data.imageUrl = nkcModules.tools.getUrl('messageFriendImage', uid);
+    await nkcModules.socket.sendEventUpdateUserList(user.uid);
+    await nkcModules.socket.sendEventUpdateChatList(user.uid);
     await next();
   })
   .del('/', async (ctx, next) => {
-    const {db, query, data} = ctx;
+    const {nkcModules, db, query, data} = ctx;
     const {uid} = query;
     const {user} = data;
     const targetUser = await db.UserModel.findOnly({uid});
     await db.FriendModel.removeFriend(targetUser.uid, user.uid);
+    await nkcModules.socket.sendEventRemoveFriend(user.uid, uid);
     await next();
   });
 

@@ -56,8 +56,8 @@ block content
               label 附加图片
               div
                 input.hidden(ref='input' type='file' accept='image/*' @change='selectedFriendImage')
-                .friend-image(v-if='friend.info.image')
-                  img(:src="friendImageUrl" @click='selectFriendImage')
+                .friend-image(v-if='fileUrl || friend.info.image')
+                  img(:src="fileUrl || friendImageUrl" @click='selectFriendImage')
                   button.m-t-05.btn.btn-default.btn-block(@click='removeFriendImage') 删除图片
                 button.m-t-05.btn.btn-default.btn-block(@click='selectFriendImage') 选择图片
             .form-group

@@ -1,13 +1,6 @@
 <template lang="pug">
   .page-list-container.message-container
-    .list-nav-bar
-      .nav-options(@click="showOptions = !showOptions")
-        .fa.fa-bars
-      .nav-item(
-        v-for="l in list"
-        :class="{'active': l.id === activeListId}"
-        @click="clickNav(l)"
-        ) {{l.name}}
+    // 侧滑面板
     .nav-left-container-mask(v-if="showOptions" @click="switchLeftContainer")
     .nav-left-container(:class="{'show': showOptions}" v-if="mUser")
       .nav-left-header
@@ -25,8 +18,20 @@
         li(@click="clickNavItem('setting')")
           .fa.fa-cog
           .item 设置
-      .nav-left-footer NKC CHAT 2.0
-    .list-container
+      .nav-left-footer NKC MESSAGE 2.0
+    // 列表导航
+    .list-nav-bar
+      .nav-options(@click="showOptions = !showOptions")
+        .fa.fa-bars
+      .nav-item(
+        v-for="l in list"
+        :class="{'active': l.id === activeListId}"
+        @click="clickNav(l)"
+      ) {{l.name}}
+    // socket 状态
+    .list-socket-status(v-if="socketStatus") {{socketStatus}}
+    // 对话列表
+    .list-container(:class="{'socket-status': !!socketStatus}")
       .list-item-container(v-if="activeListId === listId.chat")
         .list-info(v-if="chatListData.length === 0") 空空如也
         .list-item(:key="chatData._id" v-for="chatData in chatListData" @click="clickChatItem(chatData.type, chatData.uid)")
@@ -40,6 +45,8 @@
               .list-item-status(v-if="chatData.status") [{{chatData.status}}]
               .list-item-abstract {{chatData.abstract}}
               .list-item-number(v-if="chatData.count > 0") {{chatData.count}}
+          .list-item-options(@click.stop="toRemoveChat(chatData.type, chatData.uid)")
+            .fa.fa-trash-o
       .list-item-container(v-if="activeListId === listId.user")
         .list-info(v-if="userListData.length === 0") 空空如也
         .list-item-users(v-for="usersData in userListData")
@@ -72,6 +79,7 @@
   @listPaddingTop: 0.8rem;
   @listRightTopHeight: 1.8rem;
   @listRightBottomHeight: @listHeight - @listRightTopHeight;
+  @listSocketStatusHeight: 2rem;
   .list-item-container{
     padding: 0.5rem 0;
   }
@@ -201,11 +209,20 @@
       }
     }
   }
+  .list-socket-status{
+    height: @listSocketStatusHeight;
+    line-height: @listSocketStatusHeight;
+    background-color: #ff7373;
+    color: #fff;
+    font-size: 1rem;
+    text-align: center;
+  }
   .list-nav-bar{
     @height: @headerHeight;
     height: @height;
     user-select: none;
-    box-shadow: 1px 1px 13px -7px rgba(0,0,0,0.66);
+    //box-shadow: 1px 1px 13px -7px rgba(0,0,0,0.66);
+    border-bottom: 1px solid #e7e7e7;
     text-align: center;
     position: relative;
     .nav-options{
@@ -247,14 +264,34 @@
     left: 0;
     width: 100%;
     overflow-y: auto;
+    &.socket-status{
+      top: @headerHeight + @listSocketStatusHeight;
+    }
   }
   .list-item{
+    @optionWidth: 2rem;
     height: @listHeight + 2 * @listPaddingTop;
     padding: @listPaddingTop @listPaddingTop @listPaddingTop @listHeight + 2 * @listPaddingTop;
     position: relative;
     overflow: hidden;
+    transition: padding-right 100ms;
     &:active, &:hover{
       background-color: rgba(0, 0, 0, 0.05);
+    }
+    &:hover{
+      padding-right:  @optionWidth;
+      .list-item-options{
+        display: block;
+      }
+    }
+    .list-item-options{
+      position: absolute;
+      top: 0.6rem;
+      right: 0;
+      width: @optionWidth;
+      text-align: center;
+      color: #777;
+      display: none;
     }
     .list-item-right{
       @timeWidth: 6.5rem;
@@ -352,6 +389,8 @@
     openCategoryPage,
     openSettingPage,
     openSearchPage,
+    sendNewMessageCount,
+    removeChat
   } from '../message.2.0.js';
   export default {
     data: () => ({
@@ -375,14 +414,29 @@
         }
       ],
       mUser: null,
+
+      socketStatus: '',
     }),
     computed: {
+      newMessageCount() {
+        const {chatListData} = this;
+        let count = 0;
+        for(const chat of chatListData) {
+          count += chat.count || 0;
+        }
+        return count;
+      },
       listId() {
         const obj = {};
         for(const l of this.list) {
           obj[l.id] = l.id;
         }
         return obj;
+      }
+    },
+    watch: {
+      newMessageCount() {
+        sendNewMessageCount(this, this.newMessageCount);
       }
     },
     mounted() {
@@ -399,6 +453,9 @@
     },
     methods: {
       // 格式化时间
+      setSocketStatus(socketStatus) {
+        this.socketStatus = socketStatus;
+      },
       briefTime(time) {
         time = new Date(time);
         const addZero = (num) => {
@@ -437,6 +494,103 @@
           openSettingPage(this);
         }
         this.switchLeftContainer();
+      },
+      updateUserStatus(type, uid, status) {
+        const {chatListData, userListData} = this;
+        for(const chat of chatListData) {
+          if(chat.type === type && chat.uid === uid) {
+            chat.status = status;
+            break;
+          }
+        }
+        loop:
+          for(const arr of userListData) {
+            for(const userData of arr.data) {
+              if(userData.type === type && userData.uid === uid) {
+                userData.status = status;
+                break loop;
+              }
+            }
+        }
+      },
+      // 移除对话
+      toRemoveChat(type, uid) {
+        removeChat(type, uid);
+      },
+      removeChat(type, uid) {
+        console.log(type, uid)
+        const {chatListData} = this;
+        for(let i = 0; i < chatListData.length; i ++) {
+          const chat = chatListData[i];
+          if(chat.type === type && chat.uid === uid) {
+            chatListData.splice(i, 1);
+          }
+        }
+      },
+      // 移除好友
+      removeFriend(type, uid) {
+        const {userListData} = this;
+        loop:
+          for (let i = 0; i < userListData.length; i++) {
+            const arr = userListData[i];
+            for (let j = 0; j < arr.data.length; j++) {
+              const userData = arr.data[j];
+              if (userData.type === type && userData.uid === uid) {
+                if (arr.data.length === 1) {
+                  userListData.splice(i, 1);
+                } else {
+                  arr.data.splice(j, 1);
+                }
+                break loop;
+              }
+            }
+          }
+        this.removeChat(type, uid);
+      },
+      // 移除分组
+      removeCategory(cid) {
+        const {categoryListData} = this;
+        for(let i = 0; i < categoryListData.length; i++) {
+          const categoryData = categoryListData[i];
+          if(categoryData._id === cid) {
+            categoryListData.splice(i, 1);
+            break;
+          }
+        }
+      },
+      // 更新整个分组列表
+      updateCategoryList(categoryList) {
+        this.categoryListData = categoryList;
+      },
+      // 更新用户（联系人）列表
+      updateUserList(userList) {
+        this.userListData = userList;
+      },
+      // 更新对话列表
+      updateChatList(chatList) {
+        this.chatListData = chatList;
+      },
+      // 标记为已读
+      markAsRead(type, uid) {
+        const {chatListData} = this;
+        for(const chat of chatListData) {
+          if(chat.type === type && chat.uid === uid) {
+            chat.count = 0;
+            break;
+          }
+        }
+      },
+      // 添加对话并置顶
+      updateChat(chat) {
+        const {type, uid} = chat;
+        for(let i = 0; i < this.chatListData.length; i++) {
+          const chat_ = this.chatListData[i];
+          if(chat_.type === type && chat_.uid === uid) {
+            this.chatListData.splice(i, 1);
+            break;
+          }
+        }
+        this.chatListData.unshift(chat);
       }
     }
   }

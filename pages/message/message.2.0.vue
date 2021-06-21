@@ -2,6 +2,7 @@
   .nkc-message-2
     .mode-container.narrow(v-if="mode === modes.narrow")
       PageList(
+        ref="PageList"
         v-show='activePageId === pageId.PageList'
         @event="eventListener"
       )
@@ -33,6 +34,7 @@
     .mode-container.wide(v-else)
       .container-left
         PageList(
+          ref="PageList"
           @event="eventListener"
         )
       .container-right
@@ -93,7 +95,7 @@
     }
     .container-right{
       height: 100%;
-      border-left: 1px solid #ccc;
+      border-left: 1px solid #e7e7e7;
       position: relative;
       .empty-page{
         @height: 10rem;
@@ -155,6 +157,28 @@
   import PageSearch from './components/PageSearch.vue';
   import PageSetting from './components/PageSetting.vue';
 
+  import {
+    receiveMessage,
+    markAsRead,
+    withdrawn,
+  } from './socketEvents/message.js';
+  import {
+    updateChat,
+    removeChat,
+    updateChatList
+  } from './socketEvents/chat.js';
+  import {
+    removeCategory,
+    updateCategoryList
+  } from './socketEvents/category.js'
+  import {
+    updateUserOnlineStatus,
+    removeFriend,
+    updateUserList
+  } from './socketEvents/user.js'
+  import {addSocketStatusChangedEvent, getSocketStatus} from "../lib/js/socket";
+  import {sendNewMessageCount} from "./message.2.0";
+
   export default {
     props: ['mode', 'socket'],
     data: function() {
@@ -171,6 +195,10 @@
           {
             id: 'PageList',
             name: '聊天、用户以及分组列表'
+          },
+          {
+            id: 'PageChat',
+            name: '聊天窗口',
           },
           {
             id: 'PageList',
@@ -221,40 +249,47 @@
     mounted() {
       this.selectPage(this.pageId.PageList);
       // this.openUserPage({type: 'UTU', uid: '74230'})
-      this.initSocket(socket);
+      this.initSocket(this.socket);
+      const socketStatus = getSocketStatus(this.socketApp);
+      this.setSocketStatus(socketStatus);
     },
     methods: {
       initSocket(socketApp) {
         if(this.socketApp === socketApp) return;
         this.socketApp = socketApp;
-        socket.on('message', data => {
-          console.log(data);
-        });
-        socket.on('markAsRead', data => {
+        // 接收消息
+        socketApp.on('receiveMessage', receiveMessage.bind(this));
+        // 标记消息为已读
+        socketApp.on('markAsRead', markAsRead.bind(this));
+        // 撤回消息
+        socketApp.on('withdrawn', withdrawn.bind(this));
 
-        });
-        socket.on('userConnection', data => {
+        // 更新用户状态
+        socketApp.on('updateUserOnlineStatus', updateUserOnlineStatus.bind(this));
 
-        });
-        socket.on('userDisconnection', data => {
+        // 删除对话
+        socketApp.on('removeChat', removeChat.bind(this));
+        // 删除好友
+        socketApp.on('removeFriend', removeFriend.bind(this));
+        // 删除分组
+        socketApp.on('removeCategory', removeCategory.bind(this));
 
-        });
-        socket.on('removeChat', data => {
+        socketApp.on('updateChat', updateChat.bind(this));
 
-        });
-        socket.on('removeFriend', data => {
+        // 更新对话列表
+        socketApp.on('updateChatList', updateChatList.bind(this));
+        // 更新用户（联系人）列表
+        socketApp.on('updateUserList', updateUserList.bind(this));
+        // 更新分组信息
+        socketApp.on('updateCategoryList', updateCategoryList.bind(this));
 
-        });
-        socket.on('modifyCategory', data => {
-
-        });
-        socket.on('modifyFriendInfo', data => {
-
-        });
-        socket.on('withdraw', data => {
-
-        });
-
+        addSocketStatusChangedEvent(socketApp, this.setSocketStatus)
+      },
+      setSocketStatus(data) {
+        const {type, name} = data;
+        const socketStatus = type !== 'connect'? name: '';
+        const PageList = this.$refs[this.pageId.PageList];
+        if(PageList) PageList.setSocketStatus(socketStatus);
       },
       selectPage(t) {
         this.activePageId = t;
@@ -270,6 +305,9 @@
         }
         this.activePageIdHistories.pop();
         this.activePageId = this.activePageIdHistories[this.activePageIdHistories.length - 1];
+      },
+      updateNewMessageCount(count) {
+        this.$emit('update-new-message-count', count);
       },
       openPage(props) {
         const {pageId, data} = props;

@@ -723,7 +723,14 @@ NKC.methods.appToast = function(data) {
     screenTopAlert(content);
   }
 }
-
+/*
+* app console.log
+* */
+NKC.methods.appConsoleLog = function(data) {
+  NKC.methods.rn.emit('consoleLog', {
+    content: data
+  });
+}
 /*
 * app reload webView
 * */
@@ -783,7 +790,7 @@ NKC.methods.addUserToBlacklist = function(tUid, from, pid) {
     })
     .then(function() {
       if(isFriend) {
-        return nkcAPI('/friend/' + tUid, 'DELETE', {})
+        return nkcAPI(`/message/friend?uid=` + tUid, 'DELETE', {})
       }
     })
     .then(function() {
@@ -995,5 +1002,5 @@ NKC.configs.appOS = windowData.appOS;
 NKC.configs.platform = windowData.platform;
 NKC.configs.selectTypesWhenSubscribe = windowData.selectTypesWhenSubscribe;
 NKC.configs.refererOperationId = windowData.refererOperationId;
-
+NKC.configs.newMessageCount = windowData.newMessageCount || 0;
 window.NKC = NKC;

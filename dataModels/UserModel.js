@@ -132,15 +132,10 @@ const userSchema = new Schema({
 		default: false
 	},
 	online: {
-  	type: Boolean,
-		default: false,
+  	type: String,
+		default: '',
 		index: 1
 	},
-  onlineType: {
-    type: String,
-    default: '',
-    index: 1
-  },
   // 头像文件hash
   avatar: {
     type: String,
@@ -2511,12 +2506,49 @@ userSchema.statics.extendUsersGrade = async (users) => {
   return users;
 };
 
-userSchema.methods.getStatus = function() {
-  let status = '离线';
-  if(this.online) {
-    status = this.onlineType === 'phone'? '手机在线': '网页在线';
+/*
+* 获取用户的在线状态
+* @param {String} uid 用户ID
+* @return {String}
+* */
+userSchema.statics.getUserOnlineStatus = async (uid) => {
+  const UserModel = mongoose.model('users');
+  const user = await UserModel.findOne({uid});
+  return await user.getOnlineStatus();
+};
+/*
+* 获取用户的在线状态
+* @return {String}
+* */
+userSchema.methods.getOnlineStatus = async function() {
+  if(this.online === 'web') return '网页在线';
+  if(this.online === 'app') return '手机在线';
+  return '离线';
+};
+
+/*
+* 获取消息通知音链接
+* @param {String} 用户UID
+* @param {String} type 消息类型 UTU/STU/STE/newFriends
+* */
+userSchema.statics.getMessageBeep = async (uid, type) => {
+  const {getUrl} = require('../nkcModules/tools');
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const usersGeneral = await UsersGeneralModel.findOnly({uid}, {messageSettings: 1});
+  const {
+    systemInfo,
+    reminder,
+    usersMessage
+  } = usersGeneral.messageSettings.beep || {};
+  let beep = null;
+  if(
+    (['UTU', 'newFriends'].includes(type) && usersMessage) ||
+    (type === 'STE' && systemInfo) ||
+    (type === 'STU' && reminder)
+  ) {
+    beep = getUrl('messageTone');
   }
-  return status;
+  return beep;
 };
 
 module.exports = mongoose.model('users', userSchema);

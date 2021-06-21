@@ -53,7 +53,6 @@ const message = require('./message');
 const activity = require('./activity');
 const s = require('./share');
 const friend = require('./friend');
-const friend_category = require('./friendCatagory');
 const subscription = require('./homeSubscription');
 const lottery = require('./lottery');
 const shop = require('./shop');
@@ -229,9 +228,6 @@ operationObj.operationTree = {
 		message, // 信息（新）
 
     friend, // 好友
-
-
-    friend_category, // 好友分组
 
     subscription, // 首页我的关注
 

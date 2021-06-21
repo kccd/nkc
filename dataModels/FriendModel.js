@@ -103,7 +103,7 @@ friendSchema.statics.getFriends = async (uid) => {
     if(!targetUser) continue;
     userList.push({
       _id,
-      status: await targetUser.getStatus(),
+      status: await targetUser.getOnlineStatus(),
       uid: targetUser.uid,
       name: name || targetUser.username || targetUser.uid,
       icon: getUrl('userAvatar', targetUser.avatar),
