@@ -65,7 +65,8 @@ router
       threadListType =  t;
     }
     if(!t) {
-      if(!user) {
+      threadListType = 'home';
+      /*if(!user) {
         const {visitorThreadList} = homeSettings;
         if(visitorThreadList === "latest") {
           threadListType = "latest"
@@ -87,7 +88,7 @@ router
         } else {
           threadListType = "column";
         }
-      }
+      }*/
     }
 
     data.t = threadListType;
