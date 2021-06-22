@@ -46,6 +46,7 @@ var app = new Vue({
   },
   methods: {
     save: function() {
+      const self = this;
       this.error = "";
       this.info = "";
       var settings = this.serverSettings;
@@ -57,7 +58,7 @@ var app = new Vue({
       form.append("settings", JSON.stringify(settings));
       return nkcUploadFile("/e/settings/base", "PUT", form)
         .then(function() {
-          this.shouldUploadSiteIcon = false;
+          self.shouldUploadSiteIcon = false;
           sweetSuccess("保存成功");
         })
         .catch(function(data) {
@@ -92,8 +93,7 @@ var app = new Vue({
     selectSiteIconInputChange: function() {
       var input = this.$refs.selectSiteIconInput;
       var file = input.files[0];
-      var url = URL.createObjectURL(file);
-      this.tempSiteIcon = url;
+      this.tempSiteIcon = URL.createObjectURL(file);
       this.shouldUploadSiteIcon = true;
     }
   }
