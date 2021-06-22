@@ -88,6 +88,11 @@
                 span(v-else) 发送成功，处理中...
     //- 输入面板 仅在与用户对话时显示
     .chat-form(v-if="showForm")
+      // 警告信息展示面板
+      .warning-info-panel(v-if="warningContent")
+        .warning-content {{warningContent}}
+        .warning-button(v-if="canSendMessage")
+          button(@click="clearWarningContent") 关闭
       // 表情面板
       .chat-twemoji(ref="twemojiContainer" v-if="showTwemoji")
         .icon(v-for="e in twemoji" @click="selectIcon(e.code)")
@@ -114,6 +119,7 @@
   @buttonContainerHeight: 3rem;
   @bgColor: #eee;
   @bubbleBgColor: #fff;
+  @bubbleBgColorRight: @primary;
   .chat-message-info{
     height: 2rem;
     line-height: 2rem;
@@ -274,7 +280,10 @@
         }
       }
       &.nkc-media{
-        //padding: 0;
+        padding: 0;
+        .smart{
+          display: none;
+        }
         .image{
           img{
             max-width: 100%;
@@ -282,6 +291,7 @@
           }
         }
         .video{
+          font-size: 0;
           video{
             max-width: 100%;
             max-height: 20rem;
@@ -394,10 +404,13 @@
       text-align: right;
       .message-body{
         text-align: left;
+        background-color: @bubbleBgColorRight;
+        color: #fff;
         .smart{
           right: -8px;
           left: auto;
           border-radius: 0 0 15px 0;
+          background-color: @bubbleBgColorRight;
           &:after {
             height: 17px;
             width: 18px;
@@ -427,6 +440,25 @@
       img{
         height: 100%;
         width: 100%;
+      }
+    }
+  }
+  .warning-info-panel{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+    padding: 0.5rem;
+    z-index: 600;
+    background-color: rgba(200, 200, 200, 0.94);
+    color: #000;
+    .warning-button{
+      text-align: center;
+      padding-top: 0.5rem;
+      button{
+
       }
     }
   }
@@ -468,7 +500,10 @@
 
       audio: null,
 
-      playAudioFileId: ''
+      playAudioFileId: '',
+
+      canSendMessage: true,
+      warningContent: '',
 
     }),
     watch: {
@@ -595,6 +630,9 @@
       getUrl: NKC.methods.tools.getUrl,
       getSize: NKC.methods.tools.getSize,
       timeFormat: NKC.methods.tools.timeFormat,
+      clearWarningContent() {
+        this.warningContent = ''
+      },
       initAudio() {
         const app = this;
         this.audio = new Audio();
@@ -633,6 +671,11 @@
             app.originTwemoji = data.twemoji;
             if(data.messages.length === 0) {
               app.loadFinished = true;
+            }
+            if(data.statusOfSendingMessage) {
+              const {canSendMessage, warningContent} = data.statusOfSendingMessage;
+              app.canSendMessage = canSendMessage;
+              app.warningContent = warningContent;
             }
           })
           .catch(err => {

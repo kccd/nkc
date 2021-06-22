@@ -353,7 +353,7 @@
   "sendActivityMessage": "发送活动通知",
   "getShareToken": "获取分享链接的Token",
   "visitShareLink": "访问分享的链接",
-  "canSendToEveryOne": "有权给任何人发信息",
+  "canSendToEveryOne": "有权给任何人发信息，无视任何限制",
   "post-vote-up": "回复或文章-点赞",
   "post-vote-down": "回复或文章-点踩",
   "visitExperimentalKcb": "访问【后台管理-查看记录-科创币】",

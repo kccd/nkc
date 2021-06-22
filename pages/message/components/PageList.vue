@@ -32,22 +32,22 @@
     .list-socket-status(v-if="socketStatus") {{socketStatus}}
     // 对话列表
     .list-container(:class="{'socket-status': !!socketStatus}")
-      .list-item-container(v-if="activeListId === listId.chat")
+      .list-item-container(v-show="activeListId === listId.chat")
         .list-info(v-if="chatListData.length === 0") 空空如也
-        .list-item(:key="chatData._id" v-for="chatData in chatListData" @click="clickChatItem(chatData.type, chatData.uid)")
+        .list-item(:key="chatData.type + chatData.uid" v-for="chatData in chatListDataShow" @click="clickChatItem(chatData.type, chatData.uid)")
           .list-item-avatar
             img(:src="chatData.icon")
           .list-item-right
             .list-item-right-top
               .list-item-username {{chatData.name}}
-              .list-item-time {{briefTime(chatData.time)}}
+              .list-item-time {{chatData.timeStr}}
             .list-item-right-bottom
               .list-item-status(v-if="chatData.status") [{{chatData.status}}]
               .list-item-abstract {{chatData.abstract}}
               .list-item-number(v-if="chatData.count > 0") {{chatData.count}}
-          .list-item-options(@click.stop="toRemoveChat(chatData.type, chatData.uid)")
+          .list-item-options(@click.stop="toRemoveChat(chatData.type, chatData.uid)" title="删除对话")
             .fa.fa-trash-o
-      .list-item-container(v-if="activeListId === listId.user")
+      .list-item-container(v-show="activeListId === listId.user")
         .list-info(v-if="userListData.length === 0") 空空如也
         .list-item-users(v-for="usersData in userListData")
           .list-item-header {{usersData.title.toUpperCase()}}
@@ -60,7 +60,7 @@
               .list-item-right-bottom
                 .list-item-status(v-if="userData.status") [{{userData.status}}]
                 .list-item-abstract {{userData.abstract}}
-      .list-item-container(v-if="activeListId === listId.category")
+      .list-item-container(v-show="activeListId === listId.category")
         .list-info(v-if="categoryListData.length === 0") 空空如也
         .list-item(:key="categoryData._id" v-for="categoryData in categoryListData" @click="clickCategoryItem(categoryData._id)")
           .list-item-avatar.category
@@ -392,6 +392,7 @@
     sendNewMessageCount,
     removeChat
   } from '../message.2.0.js';
+  import {briefTime} from '../../lib/js/time.js';
   export default {
     data: () => ({
       showOptions: false,
@@ -418,6 +419,13 @@
       socketStatus: '',
     }),
     computed: {
+      chatListDataShow() {
+        const {chatListData} = this;
+        return chatListData.map(chat => {
+          chat.timeStr = briefTime(chat.time);
+          return chat
+        });
+      },
       newMessageCount() {
         const {chatListData} = this;
         let count = 0;
@@ -457,6 +465,7 @@
         this.socketStatus = socketStatus;
       },
       briefTime(time) {
+        return briefTime(time);
         time = new Date(time);
         const addZero = (num) => {
           return num > 9? num + '': '0' + num;
