@@ -505,6 +505,8 @@
       canSendMessage: true,
       warningContent: '',
 
+      listContentBottom: 0,
+
     }),
     watch: {
       content() {
@@ -660,7 +662,8 @@
             const {type, uid, firstMessageId} = app;
             if(page === undefined) page = this.page;
             const url = `/message/data?type=${type}&uid=${uid}${firstMessageId? `&firstMessageId=${firstMessageId}`: ''}`;
-            this.loading = true;
+            app.loading = true;
+            // app.saveListContentBottom();
             return nkcAPI(url, 'GET')
           })
           .then(data => {
@@ -677,6 +680,8 @@
               app.canSendMessage = canSendMessage;
               app.warningContent = warningContent;
             }
+            // 兼容旧浏览器
+            // app.setListContentBottom();
           })
           .catch(err => {
             console.error(err);
@@ -706,17 +711,34 @@
           app.scrollToBottom();
         })
       },
+      // 遨游浏览器加载历史信息后会自动跳转到滚动容器顶部
+      // 暂未启用
+      saveListContentBottom() {
+        this.listContentBottom = this.getListContentBottom();
+      },
+      setListContentBottom() {
+        const app = this;
+        setTimeout(() => {
+          const {listContentBottom} = app;
+          const listContent = app.$refs.listContent;
+          listContent.scrollTop = listContent.scrollHeight - listContentBottom - $(listContent).height();
+        });
+      },
       scrollToBottom() {
         setTimeout(() => {
           const listContent = this.$refs.listContent;
-          listContent.scrollTop = listContent.scrollHeight + $(listContent).height();
+          listContent.scrollTop = (listContent.scrollHeight + $(listContent).height());
         }, 100)
+      },
+      getListContentBottom() {
+        const listContent = this.$refs.listContent;
+        return listContent.scrollHeight - (listContent.scrollTop + $(listContent).height());
       },
       checkScrollTopAndScrollToBottom() {
         const app = this;
         setTimeout(() => {
-          const listContent = app.$refs.listContent;
-          if(listContent.scrollHeight - (listContent.scrollTop + $(listContent).height()) > 1000) return;
+          const listContentBottom = app.getListContentBottom();
+          if(listContentBottom > 1000) return;
           app.scrollToBottom();
         }, 100);
       },
