@@ -12,6 +12,9 @@ const STYLES_PATTERNS = ["./pages/**/*.less", LIB_DIR_PATTERN];
 const scriptFiles = globby.sync(SCRIPTS_PATTERNS);
 const styleFiles = globby.sync(STYLES_PATTERNS);
 
+/**
+ * 生成bundle到entry的映射关系图
+ */
 function makeEntryMap(files) {
   const map = Object.create(null);
   files.forEach(file => {
@@ -24,7 +27,7 @@ function makeEntryMap(files) {
 }
 
 const baseConfig = {
-  mode: "development",
+  mode: process.env.NODE_ENV || "development",
   devtool: process.env.NODE_ENV === "production" ? false : "inline-source-map",
   target: "es5",
   cache: true
@@ -59,18 +62,25 @@ module.exports = [
         },
         {
           test: /\.(eot|svg|ttf|woff|woff2|png|jpg|ico)(\?\S*)?$/,
-          loader: "file-loader"
+          loader: "file-loader",
+          options: {
+            name: "[name]-[contenthash].[ext]",
+            outputPath: "pages",
+            publicPath: "/"
+          }
         },
         {
-          test: /\.js$/,
+          test: /\.jsx?$/,
           use: [
-            {
-              loader: "buble-loader"
-            },
+            // 出现语法兼容性问题时启用这个loader，但是*不推荐*，因为它会破坏源码映射
+            // {
+            //   loader: "buble-loader"
+            // },
             {
               loader: "babel-loader",
               options: {
                 presets: [
+                  ["@vue/babel-preset-jsx"],
                   ["@babel/preset-env", {
                     targets: {
                       ie: "8"
@@ -98,6 +108,9 @@ module.exports = [
     ],
     externals: {
       vue: "Vue"
+    },
+    resolve: {
+      extensions: [".js", ".jsx", ".json"]
     }
   },
 
