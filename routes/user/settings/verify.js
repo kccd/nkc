@@ -62,4 +62,7 @@ verifyRouter
     return next();
   });
 
+  // 查看认证者上传的认证材料路由
+  // user -> verifiedAssets.js
+
 module.exports = verifyRouter;

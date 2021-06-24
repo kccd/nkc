@@ -25,6 +25,8 @@ const forumRouter = require("./forum");
 const phoneVerifyRouter = require("./phoneVerify");
 // 查询可能存在的小号
 const altRouter = require('./alt');
+// 访问身份认证上传的材料
+const verifiedAssets = require("./verifiedAssets");
 
 
 userRouter
@@ -529,5 +531,6 @@ userRouter
   .use("/:uid/hide", hideRouter.routes(), hideRouter.allowedMethods())
   .use("/:uid/forum", forumRouter.routes(), forumRouter.allowedMethods())
   .use("/:uid/phoneVerify", phoneVerifyRouter.routes(), phoneVerifyRouter.allowedMethods())
-  .use("/:uid/alt", altRouter.routes(), altRouter.allowedMethods());
+  .use("/:uid/alt", altRouter.routes(), altRouter.allowedMethods())
+  .use("/:uid/verifiedAssets", verifiedAssets.routes(), verifiedAssets.allowedMethods());
 module.exports = userRouter;

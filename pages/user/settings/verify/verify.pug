@@ -70,7 +70,7 @@ block content
             p 注意：
               span.text-danger 请使用手机拍摄，保留周围背景，且保证身份证上的内容清晰可见，大小不超过300M，并且只能为.mp4格式。
             h5.text-danger(v-if="authenticate.video.status === 'passed' && authenticate.video.isExpired") 已过期
-            h5(v-if="authenticate.video.status === 'passed' && !authenticate.video.isExpired") 过期时间：{{verify2ExpiryDate}}
+            h5(v-if="authenticate.video.status === 'passed' && !authenticate.video.isExpired") 过期时间：{{verify3ExpiryDate}}
             .row
               .col-xs-12.col-md-6.text-center
                 h5(v-if="authenticate.video.status === 'unsubmit'") 代码：{{videoCode}}

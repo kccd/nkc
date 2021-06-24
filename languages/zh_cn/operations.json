@@ -82,6 +82,7 @@
   "visitVerifySettings": "访问身份认证页面",
   "verify3VideoUpload": "身份认证3视频上传",
   "verify2ImageUpload": "身份认证2身份证正反面上传",
+  "visitVerifiedUpload": "查看用户身份认证时上传的材料",
   "visitUserAuth": "访问用户身份认证审核页面",
   "cancelSubmitVerify": "撤销身份认证申请",
   "submitVerify": "提交身份认证申请",
