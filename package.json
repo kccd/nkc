@@ -171,6 +171,7 @@
     "less": "^3.13.1",
     "less-loader": "^10.0.0",
     "less-plugin-autoprefix": "^2.0.0",
+    "mini-css-extract-plugin": "^1.6.0",
     "nodemon": "^2.0.7",
     "pdfjs-dist": "^2.2.228",
     "pug-plain-loader": "^1.1.0",
