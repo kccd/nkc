@@ -57,6 +57,7 @@ module.exports = {
   },
   module: {
     rules: [
+      // https://vue-loader.vuejs.org/zh/guide/linting.html#eslint
       {
         enforce: "pre",
         test: /\.vue$/,
