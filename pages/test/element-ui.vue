@@ -6,6 +6,14 @@
       type="datetime"
       placeholder="选择日期时间">
     </el-date-picker>
+    <p
+      :class="{
+        title: true, 
+        [$style.big]: clicked
+      }"
+      @click="change()">
+      {{clicked? "BIG!!!" : "click me"}}
+    </p>
   </div>
 </template>
 
@@ -15,7 +23,8 @@ import { DatePicker, Button } from "element-ui";
 export default {
   data: () => ({
     msg: "Hello",
-    date: new Date()
+    date: new Date(),
+    clicked: false
   }),
   components: {
     [Button.name]: Button,
@@ -24,9 +33,23 @@ export default {
   methods: {
     print() {
       console.log("123")
+    },
+    change() {
+      this.clicked = !this.clicked;
     }
   }
 };
 </script>
 
+<!-- 一个组件可以有多个style标签 -->
 <style src="element-ui/lib/theme-chalk/index.css"></style>
+<style scoped>
+.title {
+  color: red;
+}
+</style>
+<style module>
+.big {
+  font-size: 2em;
+}
+</style>
