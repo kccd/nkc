@@ -4,8 +4,13 @@ block title
 block content
   #app.container-fluid.max-width
       #app.col-xs-12.col-md-6.p-t-1.p-b-1(v-cloak)
-        cssmodule
-        ui
+        element-ui
+        x-component
+        functional-component
+        define-component(msg="pass")
+        eslint-component
+        vue-xcomponent
+        functional-component-sfc(msg="Hello")
 
 block scripts
   +includeJS('/test/test.js')

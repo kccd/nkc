@@ -2,6 +2,7 @@ import Vue from "vue";
 import DatePicker from "element-ui/lib/date-picker";
 import "element-ui/lib/theme-chalk/index.css";
 
+const UID = NKC.configs.uid;
 const DEFAULT_IMAGE = "/default/photo_setting.jpg";
 const _data = JSON.parse($("#data").text());
 const authenticate = _data.authenticate;
@@ -54,21 +55,21 @@ new Vue({
 	},
 	computed: {
 		IDCardA() {
-			const aid = this.authenticate.card.attachments[0];
-			return aid && ["in_review", "passed"].includes(this.authenticate.card.status)
-				? `/a/${aid}`
+			const vid = this.authenticate.card.attachments[0];
+			return vid && ["in_review", "passed"].includes(this.authenticate.card.status)
+				? `/u/${UID}/verifiedAssets/${vid}`
 				: DEFAULT_IMAGE;
 		},
 		IDCardB() {
-			const aid = this.authenticate.card.attachments[1];
-			return aid && ["in_review", "passed"].includes(this.authenticate.card.status)
-				? `/a/${aid}`
+			const vid = this.authenticate.card.attachments[1];
+			return vid && ["in_review", "passed"].includes(this.authenticate.card.status)
+				? `/u/${UID}/verifiedAssets/${vid}`
 				: DEFAULT_IMAGE;
 		},
 		video() {
-			const aid = this.authenticate.video.attachments[0];
-			return aid && ["in_review", "passed"].includes(this.authenticate.video.status)
-				? `/a/${aid}`
+			const vid = this.authenticate.video.attachments[0];
+			return vid && ["in_review", "passed"].includes(this.authenticate.video.status)
+				? `/u/${UID}/verifiedAssets/${vid}`
 				: DEFAULT_IMAGE;
 		}
 	},

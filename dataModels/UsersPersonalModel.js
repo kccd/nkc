@@ -598,7 +598,7 @@ usersPersonalSchema.methods.generateAuthenticateVerify2 = async function(files) 
 	}
 	const aids = await Promise.all(
 		[ imageA, imageB ].map(async (file) => {
-			return await AttachmentModel.saveAttachment({
+			return await AttachmentModel.saveVerifiedUpload({
 				size: file.size,
 				hash: file.hash,
 				name: file.name,
@@ -624,7 +624,7 @@ usersPersonalSchema.methods.generateAuthenticateVerify3 = async function(file, c
 	if(!file) {
 		throw new Error("must get a video file.");
 	}
-	const aid = await AttachmentModel.saveAttachment({
+	const aid = await AttachmentModel.saveVerifiedUpload({
 		size: file.size,
 		hash: file.hash,
 		name: file.name,

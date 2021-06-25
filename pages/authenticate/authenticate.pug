@@ -124,7 +124,16 @@ block content
                 br
               .col-xs-12.col-md-4.col-md-offset-4.text-center(v-if="verify3form.status === 'passed'")
                 span(v-if="['unsubmit', 'fail'].indexOf(authenticate.video.status) < 0") 过期时间：
-                datetime(v-model="verify3form.expiredDate" v-if="authenticate.video.status === 'in_review'")
+                el-date-picker(
+                  v-if="authenticate.video.status === 'in_review'"
+                  v-model="verify3form.expiredDate"
+                  align="left"
+                  size="small"
+                  type="date"
+                  placeholder="选择日期"
+                  format="yyyy年MM月dd日"
+                  :picker-options="datePickerOptions"
+                )
                 span(v-else-if="authenticate.video.isExpired") 已过期
                 span(v-else-if="authenticate.video.status === 'passed'") {{authenticate.video.expiryDate}}
               .col-xs-12.col-md-4.col-md-offset-4.text-center(v-if="authenticate.video.status === 'in_review' && verify3form.status === 'fail'")

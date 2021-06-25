@@ -1,6 +1,7 @@
 import Vue from "vue";
 
 const DEFAULT_IMAGE = "/default/photo_setting.jpg";
+const UID = NKC.configs.uid;
 
 const vm = new Vue({
 	el: "#app",
@@ -19,9 +20,9 @@ const vm = new Vue({
 			if(this.authenticate.card.status === "fail") {
 				return DEFAULT_IMAGE;
 			}
-			const aid = this.authenticate.card.attachments[0];
-			return aid && ["in_review", "passed"].includes(this.authenticate.card.status)
-				? `/a/${aid}`
+			const vid = this.authenticate.card.attachments[0];
+			return vid && ["in_review", "passed"].includes(this.authenticate.card.status)
+				? `/u/${UID}/verifiedAssets/${vid}`
 				: DEFAULT_IMAGE;
 		},
 		IDCardB() {
@@ -31,9 +32,9 @@ const vm = new Vue({
 			if(this.authenticate.card.status === "fail") {
 				return DEFAULT_IMAGE;
 			}
-			const aid = this.authenticate.card.attachments[1];
-			return aid && ["in_review", "passed"].includes(this.authenticate.card.status)
-				? `/a/${aid}`
+			const vid = this.authenticate.card.attachments[1];
+			return vid && ["in_review", "passed"].includes(this.authenticate.card.status)
+				? `/u/${UID}/verifiedAssets/${vid}`
 				: DEFAULT_IMAGE;
 		},
 		verify2ExpiryDate() {
@@ -45,11 +46,15 @@ const vm = new Vue({
 			if(videoInputFile) {
 				return URL.createObjectURL(videoInputFile);
 			}
-			const aid = this.authenticate.video.attachments[0];
-			return aid && ["in_review", "passed"].includes(this.authenticate.video.status)
-				? `/a/${aid}`
+			const vid = this.authenticate.video.attachments[0];
+			return vid && ["in_review", "passed"].includes(this.authenticate.video.status)
+				? `/u/${UID}/verifiedAssets/${vid}`
 				: DEFAULT_IMAGE;
-		}
+		},
+		verify3ExpiryDate() {
+			const date = new Date(this.authenticate.video.expiryDate || null);
+			return date.toLocaleDateString();
+		},
 	},
 	methods: {
 		IDCardAInputFileChange(file) {

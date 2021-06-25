@@ -22,7 +22,10 @@ block head
   if state.isApp && state.platform === 'reactNative'
     meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
   link(rel='shortcut icon' href=tools.getUrl('siteIcon', state.serverSettings.siteIcon, 'ico'))
-  script(src="/external_pkgs/vue.min.js")
+  if process.env.NODE_ENV === "production"
+    +includeJS("/external_pkgs/vue.min.js", true)
+  else
+    +includeJS("/external_pkgs/vue.js", true)
   +includeJS('/publicModules/common.js')
   if state.isApp && state.platform === 'apiCloud'
     +includeJS("/appAPi/api.js")
@@ -58,26 +61,26 @@ block body
       include module_lottery
     -var {systemInfo, reminder, usersMessage} = data.user.generalSettings.messageSettings.beep;
     audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
-  +includeJS('/jquery/jquery-ui.1.11.4.min.js')
+  +includeJS('/jquery/jquery-ui.1.11.4.min.js', true)
   //-app使用的js
   if state.isApp && state.platform === 'apiCloud'
     +includeJS("/appAPi/app.js")
-  +includeJS('/bootstrap/js/bootstrap.min.js')
-  +includeJS('/twemoji/2/twemoji.min.js')
-  +includeJS('/Promise/promise.min.js')
-  +includeJS('/external_pkgs/polyfill/dist/polyfill.min.js')
+  +includeJS('/bootstrap/js/bootstrap.min.js', true)
+  +includeJS('/twemoji/2/twemoji.min.js', true)
+  +includeJS('/Promise/promise.min.js', true)
+  +includeJS('/external_pkgs/polyfill/dist/polyfill.min.js', true)
   if NODE_ENV === "production"
     script.
       Vue.config.productionTip = false;
   //- 弹窗模块
-  +includeJS("/sweetalert2/dist/sweetalert2.all.min.js")
+  +includeJS("/sweetalert2/dist/sweetalert2.all.min.js", true)
   +includeJS('/tools.js')
   // 前后端公用 数据类型检查
   +includeJS("/checkData.js")
   //- 旧版common.js兼容旧的页面
   +includeJS('/interface_common.js')
   if data.user
-    +includeJS('/socket.io-client/dist/socket.io.js')
+    +includeJS('/socket.io-client/dist/socket.io.js', true)
     //- 通用socket
     if !state.isApp
       //- 接入即时通信

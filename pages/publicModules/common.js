@@ -1,7 +1,5 @@
-import Vue from "vue";
 import JQuery from "jquery";
 
-window.Vue = Vue;
 window.$ = JQuery;
 window.jQuery = JQuery;
 
