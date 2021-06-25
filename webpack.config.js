@@ -24,7 +24,7 @@ function makeEntryMap(files, query = "") {
 }
 
 function makeFilename(info) {
-  const file = info.chunk.id;
+  const file = info.chunk.name;
   const dir = path.dirname(file);
   const ext = path.extname(file);
   const basename = path.basename(file, ext);
@@ -158,7 +158,7 @@ module.exports = {
     new webpack.ProgressPlugin(),
     new MiniCssExtractPlugin({
       filename: info => {
-        const file = info.chunk.id;
+        const file = info.chunk.name;
         const dir = path.dirname(file);
         const ext = path.extname(file);
         const basename = path.basename(file, ext);
