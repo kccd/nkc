@@ -4,7 +4,7 @@ const globby = require("globby");
 const { VueLoaderPlugin } = require('vue-loader');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-const DIST_DIR = process.env.NODE_ENV === "production"? "dist-prod": "dist";
+const DIST_DIR = "dist";
 const LIB_DIR_PATTERN = "!pages/**/lib";
 const SCRIPTS_PATTERNS = ["./pages/**/*.js", LIB_DIR_PATTERN];
 // const SCRIPTS_PATTERNS = ["./pages/test/*.js", LIB_DIR_PATTERN];
