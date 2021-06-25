@@ -10,7 +10,6 @@ const expiryDate1 = new Date(authenticate.card.expiryDate);
 const expiryDate2 = new Date(authenticate.video.expiryDate);
 authenticate.card.expiryDate = `${expiryDate1.getFullYear()}年${expiryDate1.getMonth() + 1}月${expiryDate1.getDate()}日`;
 authenticate.video.expiryDate = `${expiryDate2.getFullYear()}年${expiryDate2.getMonth() + 1}月${expiryDate2.getDate()}日`;
-console.log(authenticate);
 
 new Vue({
 	el: "#app",
