@@ -12,7 +12,6 @@
     "watch-pages": "npm run build-pages -- -w",
     "watch": "concurrently -p \"[{name}]\" -n \"node,pages\" -c \"green,cyan\" \"npm run watch-node\" \"npm run watch-pages\"",
     "build-pages": "webpack",
-    "build-pages-p": "cross-env NODE_ENV=production webpack",
     "clear": "rimraf dist"
   },
   "repository": {
