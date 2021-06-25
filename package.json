@@ -1,8 +1,8 @@
 {
   "name": "nkc",
   "version": "1.0.0",
-  "description": "source of [www.kechuang.org]",
-  "homepage": "https://www.kechuang.org",
+  "description": "source of [kechuang.org]",
+  "homepage": "https://kechuang.org",
   "private": true,
   "scripts": {
     "start": "cross-env NODE_ENV=production node server.js ",
