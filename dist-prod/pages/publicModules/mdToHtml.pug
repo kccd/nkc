@@ -1,9 +1,0 @@
-+includeJS('/markdown-it/dist/markdown-it.js')
-include ./xss
-script.
-  NKC.methods.mdToHtml = function (md){
-    return window.markdownit().render(md);
-  };
-  NKC.methods.mdToHtmlSafe = function(md) {
-    return NKC.methods.custom_xss_process(NKC.methods.mdToHtml(md));
-  }

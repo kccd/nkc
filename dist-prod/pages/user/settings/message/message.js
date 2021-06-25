@@ -1,1 +1,0 @@
-!function(n){"function"==typeof define&&define.amd?define(n):n()}((function(){"use strict";window.removeFromBlackList=function(n){nkcAPI("/message/blackList","POST",{type:"remove",tUid:n}).then((function(){screenTopAlert("移除成功")})).catch((function(n){screenTopWarning(n)}))}}));

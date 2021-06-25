@@ -1,7 +1,0 @@
-if !isIncluded('singleCommentBottom')
-  mixin singleCommentBottom(props)
-    -var {childPosts, pid} = props;
-    .single-comment-bottom
-      .single-comments(data-pid=pid)
-        for comment in childPosts
-          +singleComment(comment)

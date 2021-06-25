@@ -1,1 +1,0 @@
-!function(e){"function"==typeof define&&define.amd?define(e):e()}((function(){"use strict";var e=NKC.methods.getDataById("data");new Vue({el:"#app",data:{t:e.t||"username",c:e.c||""},methods:{search:function(){var e="/e/log/share?t="+this.t+"&c="+this.c;NKC.methods.visitUrl(e,!1)},reset:function(){NKC.methods.visitUrl("/e/log/share",!1)}}})}));

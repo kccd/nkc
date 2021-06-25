@@ -1,8 +1,0 @@
-if debug_output && data
-  hr
-  .container-fluid.max-width
-    .row
-      .col-md-12
-        h2 debug_output.pug
-        p 这是用于渲染 Pug 模板的 res.data 对象的 JSON 表示，其中包含敏感内容。 正式上线的版本不会输出这些内容。
-        div!= plain(JSON.stringify(data,null,4))
