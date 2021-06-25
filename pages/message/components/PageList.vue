@@ -527,7 +527,6 @@
         removeChat(type, uid);
       },
       removeChat(type, uid) {
-        console.log(type, uid)
         const {chatListData} = this;
         for(let i = 0; i < chatListData.length; i ++) {
           const chat = chatListData[i];
