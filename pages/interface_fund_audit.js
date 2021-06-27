@@ -268,3 +268,17 @@ function refuse(id) {
 			screenTopWarning(data.error);
 		})
 }
+
+Object.assign(window, {
+  initNumber,
+  init,
+  initSuggestMoney,
+  initFactMoney,
+  displayRemittance,
+  createList,
+  submitProjectAudit,
+  computeRemainder,
+  displayRemainder,
+  submitAdminAudit,
+  refuse
+});
