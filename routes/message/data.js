@@ -9,6 +9,10 @@ router
     const uid = !query.uid || query.uid === 'null'? null: query.uid;
     data.twemoji = state.twemoji;
     const {getUrl} = nkcModules.tools;
+    data.statusOfSendingMessage = {
+      canSendMessage: false,
+      warningContent: ''
+    };
     if(type === "UTU") {
       const targetUser = await db.UserModel.findOnly({uid});
       const q = {
@@ -64,6 +68,7 @@ router
         await ctx.nkcModules.socket.sendEventUpdateChat('UTU', user.uid, targetUser.uid);
       }
       await db.CreatedChatModel.createChat(user.uid, uid);
+
     } else if(type === "STE") {
       const q = {
         ty: 'STE'
