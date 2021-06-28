@@ -139,6 +139,9 @@
           if permission('experimentalThreadSettings')
             li
               a(href='/e/settings/thread') 文章
+          if permission('experimentalVisitSettings')
+            li
+              a(href='/e/settings/visit') 访问
           <li role="separator" class="divider"></li>
           if permission('visitRoleSettings')
             li

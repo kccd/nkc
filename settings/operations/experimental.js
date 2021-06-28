@@ -5,6 +5,10 @@ module.exports = {
     POST: "experimentalLogin"
   },
 	settings: {
+	  visit: {
+	    GET: 'experimentalVisitSettings',
+      PUT: 'experimentalVisitSettings'
+    },
 		verification: {
 			GET: "experimentalVerificationSettings",
 			PUT: 'experimentalVerificationSettings'
