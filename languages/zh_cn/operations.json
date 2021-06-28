@@ -747,6 +747,7 @@
   "donwloadNeedScore": "询问下载此附件是否需要积分",
   "getVerifications": "获取验证码（游标卡尺、图形点选、图形旋转）",
   "experimentalVerificationSettings": "后台管理 - 图形验证",
+  "experimentalVisitSettings": "后台管理 - 访问设置",
 
   "buyResource": "购买资源",
   "getPostOption": "获取文章和回复的操作菜单",
