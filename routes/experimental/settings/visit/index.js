@@ -8,17 +8,24 @@ router
   })
   .put('/', async (ctx, next) => {
     const {db, body, nkcModules} = ctx;
-    const {status, description} = body.visitSettings.limitVisitor;
-    console.log(body.visitSettings);
-    nkcModules.checkData.checkString(description, {
-      name: '提示内容',
+    const {globalLimitVisitor, userHomeLimitVisitor} = body.visitSettings;
+    nkcModules.checkData.checkString(globalLimitVisitor.description, {
+      name: '全局游客限制 - 提示内容',
+      maxLength: 100000,
+    });
+    nkcModules.checkData.checkString(globalLimitVisitor.description, {
+      name: '用户名片页游客限制 - 提示内容',
       maxLength: 100000,
     });
     await db.SettingModel.updateOne({_id: 'visit'}, {
       $set: {
-        "c.limitVisitor": {
-          status: !!status,
-          description
+        "c.globalLimitVisitor": {
+          status: !!globalLimitVisitor.status,
+          description: globalLimitVisitor.description
+        },
+        "c.userHomeLimitVisitor": {
+          status: !!userHomeLimitVisitor.status,
+          description: userHomeLimitVisitor.description
         }
       }
     });

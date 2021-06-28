@@ -60,7 +60,6 @@ const attachmentRouter = routers.attachment;
 const paymentRouter = routers.payment;
 
 const path = require('path');
-const render = require('../nkcModules/render');
 
 router.use('/', async (ctx, next) => {
   const {data, state, db, nkcModules} = ctx;
@@ -79,7 +78,6 @@ router.use('/', async (ctx, next) => {
       'sendGetBackPasswordMessage',
       'sendPhoneMessage',
 
-
       'visitFindPasswordByMobile', // 忘记密码相关
       'visitFindPasswordByEmail',
       'findPasswordVerifyMobile',
@@ -91,10 +89,10 @@ router.use('/', async (ctx, next) => {
     ].includes(operationId)
   ) {
     const visitSettings = await db.SettingModel.getSettings('visit');
-    if(visitSettings.limitVisitor.status) {
-      data.description = nkcModules.nkcRender.plainEscape(visitSettings.limitVisitor.description);
+    if(visitSettings.globalLimitVisitor.status) {
+      data.description = nkcModules.nkcRender.plainEscape(visitSettings.globalLimitVisitor.description);
       ctx.status = 401;
-      return ctx.body = render(path.resolve(__dirname, '../pages/filter_visitor.pug'), data, state);
+      return ctx.body = nkcModules.render(path.resolve(__dirname, '../pages/filter_visitor.pug'), data, state);
     }
   }
   await next();
