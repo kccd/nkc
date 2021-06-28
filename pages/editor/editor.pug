@@ -265,7 +265,7 @@ block scripts
   include ../publicModules/insertHideContent/insertHideContent
   include ../ueditor/dialogs/mathformulaV2/mathformula
   include ../publicModules/forumSelector/forumSelector
-  include ../publicModules/socket/socket
+  +includeJS('/message/connectSocket.js')
   +includeJS('/tools.js')
   if state.userColumn && !data.addedToColumn
     +includeJS("/publicModules/toColumn/selectCategories.js")
