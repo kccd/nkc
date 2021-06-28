@@ -1,0 +1,1 @@
+!function(t){"function"==typeof define&&define.amd?define(t):t()}((function(){"use strict";var t=NKC.methods.getDataById("data");new Vue({el:"#app",data:{visitSettings:t.visitSettings},methods:{submit:function(){var t=this.visitSettings;nkcAPI("/e/settings/visit","PUT",{visitSettings:t}).then((function(){sweetSuccess("保存成功")})).catch(sweetError)}}})}));
