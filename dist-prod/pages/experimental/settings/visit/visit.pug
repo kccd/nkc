@@ -22,7 +22,7 @@ block eContent
           .form-group
             label.col-sm-2.control-label 提示内容
             .col-sm-6
-              textarea.form-control(rows=5 v-model.number="visitSettings.globalLimitVisitor.description")
+              textarea.form-control(rows=5 v-model="visitSettings.globalLimitVisitor.description")
               span.text-info 支持空格和换行
           h4 用户名片页游客限制
           .form-group
@@ -39,7 +39,7 @@ block eContent
           .form-group
             label.col-sm-2.control-label 提示内容
             .col-sm-6
-              textarea.form-control(rows=5 v-model.number="visitSettings.userHomeLimitVisitor.description")
+              textarea.form-control(rows=5 v-model="visitSettings.userHomeLimitVisitor.description")
               span.text-info 支持空格和换行
           .form-group
             label.col-sm-2.control-label
