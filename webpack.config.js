@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const DIST_DIR = process.env.NODE_ENV === "production"? "dist-prod": "dist";
 const LIB_DIR_PATTERN = "!pages/**/lib";
-const SCRIPTS_PATTERNS = ["./pages/**/*.js", LIB_DIR_PATTERN];
+const SCRIPTS_PATTERNS = ["./pages/**/*{.js,.jsx}", LIB_DIR_PATTERN];
 // const SCRIPTS_PATTERNS = ["./pages/test/*.js", LIB_DIR_PATTERN];
 const STYLES_PATTERNS = ["./pages/**/*.less", LIB_DIR_PATTERN];
 
@@ -131,16 +131,18 @@ module.exports = {
             loader: "babel-loader",
             options: {
               presets: [
-                ["@vue/babel-preset-jsx"],
                 ["@babel/preset-env", {
                   targets: {
-                    ie: "8"
+                    ie: "8",
+                    chrome: "36"
                   }
-                }]
+                }],
+                ["@vue/babel-preset-jsx"]
               ],
               plugins: [
-                [require.resolve("babel-plugin-preval")],
-                [require.resolve("@babel/plugin-transform-object-assign")]
+                [require.resolve("@babel/plugin-transform-modules-commonjs")],
+                [require.resolve("@babel/plugin-transform-runtime")],
+                [require.resolve("babel-plugin-preval")]
               ],
               compact: false
             }
