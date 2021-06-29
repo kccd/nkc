@@ -28,7 +28,7 @@ block shopAccountContent
     for item in data.goods
       .shop-goods
         .shop-goods-img
-          img(src=`http://www.kechuang.org/avatar/${item._id}`)
+          img(src=`/avatar/${item._id}`)
         .shop-goods-info
           .title= item.name
           for i in item.info

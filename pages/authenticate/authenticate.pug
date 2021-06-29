@@ -1,12 +1,10 @@
-extends /bootstrap_base
+extends ../bootstrap_base
 block title
   title 用户身份审核
-  -const mainContainer1400 = true
-  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
   +includeCSS("/authenticate/authenticate.css")
 block content
   #data.hidden= JSON.stringify(data)
-  #app.container-fluid.max-width(c-cloak)
+  #app.container-fluid.max-width(v-cloak)
     .row
       .col-xs-12.col-md-12
         h4
@@ -142,7 +140,4 @@ block content
                 br
                 button.btn.btn-primary(@click="verify3Submit()") 提交
 block scripts
-  script(src='/interface_common.js')
-  script(src="/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
-  script(src="/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8")
-  script(src='/authenticate/authenticate.js' charset="UTF-8")
+  +includeJS('/authenticate/authenticate.js')

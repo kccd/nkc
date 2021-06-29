@@ -1,6 +1,8 @@
 const data = NKC.methods.getDataById('data');
 const audio = new Audio();
 
+const {canSendMessage, warningContent} = data.statusOfSendingMessage;
+
 window.audio = audio;
 
 import {onWithdrawn, withdrawn} from '../message.2.0.js';
@@ -29,6 +31,10 @@ window.app = new Vue({
     // 语音播放器实例
     audio: new Audio(),
 
+    // 能否发送消息
+    canSendMessage,
+    warningContent,
+
     // 正在播放的声音ID
     playVoiceId: null,
   },
@@ -37,6 +43,9 @@ window.app = new Vue({
     timeFormat: NKC.methods.timeFormat,
     // 获取链接
     getUrl: NKC.methods.tools.getUrl,
+    clearWarningContent() {
+      this.warningContent = ''
+    },
     toast(c) {
       c = c.error || c.message || c;
       NKC.methods.rn.emit('toast', {
@@ -220,6 +229,11 @@ window.app = new Vue({
             self.getMessageStatus = 'canLoad';
           } else {
             self.getMessageStatus = 'cantLoad';
+          }
+          if(data.statusOfSendingMessage) {
+            const {canSendMessage, warningContent} = data.statusOfSendingMessage;
+            self.canSendMessage = canSendMessage;
+            self.warningContent = warningContent;
           }
         })
         .catch(data => {

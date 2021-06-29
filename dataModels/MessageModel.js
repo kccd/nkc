@@ -103,28 +103,37 @@ const messageSchema = new Schema({
   }
 });
 /*
-* 根据用户的文章和回复的数量判断用户是否能够发送短消息
+* 根据用户的文章、回复的数量以及目标用户的等级判断用户是否能够发送短消息
 * @param {String} uid 发送者ID
 * @param {String} tUid 接受者ID
-* @author pengxiguaa 2019-10-11
+* @author pengxiguaa 2021-06-22
+* @return {String|null} 限制时的说明 null表示不限制
 * */
-messageSchema.statics.ensureSystemLimitPermission = async (uid, tUid) => {
+messageSchema.statics.getSystemLimitInfo = async (uid, tUid) => {
   const SettingModel = mongoose.model("settings");
   const ThreadModel = mongoose.model("threads");
   const UserModel = mongoose.model("users");
   const PostModel = mongoose.model("posts");
-  const recycleId = await SettingModel.getRecycleId();
-  const targetUser = await UserModel.findOne({uid: tUid});
-  if(!targetUser) throwErr(500, `user not found, uid: ${tUid}`);
-  const allowAllMessage = await UserModel.allowAllMessage(targetUser.uid);
-  if(allowAllMessage) return;
-  await targetUser.extendGrade();
   const messageSettings = await SettingModel.getSettings("message");
   const {mandatoryLimitInfo, mandatoryLimit, adminRolesId, mandatoryLimitGradeProtect} = messageSettings;
-  if(mandatoryLimitGradeProtect.includes(targetUser.grade._id)) return;
+
+  const limitInfo = mandatoryLimitInfo;
+
+  const notLimitInfo = null;
+
+  const targetUser = await UserModel.findOnly({uid: tUid});
+  // 判断用户是否正在售卖商品且勾选在售卖商品时允许任何人向自己发送消息
+  const allowAllMessage = await UserModel.allowAllMessage(targetUser.uid);
+  if(allowAllMessage) return notLimitInfo;
+
+  await targetUser.extendGrade();
+  // 处于等级黑名单的目标用户不受保护
+  if(mandatoryLimitGradeProtect.includes(targetUser.grade._id)) return notLimitInfo;
+  // 指定证书的管理员可收到任何人的消息
   for(const cert of targetUser.certs) {
-    if(adminRolesId.includes(cert)) return;
+    if(adminRolesId.includes(cert)) return notLimitInfo;
   }
+  const recycleId = await SettingModel.getRecycleId();
   const {threadCount, postCount} = mandatoryLimit;
   const userThreadCount = await ThreadModel.countDocuments({
     uid,
@@ -133,7 +142,9 @@ messageSchema.statics.ensureSystemLimitPermission = async (uid, tUid) => {
     recycleMark: {$ne: true},
     mainForumsId: {$ne: recycleId}
   });
-  if(userThreadCount < threadCount) throwErr(403, mandatoryLimitInfo);
+  if(userThreadCount < threadCount) {
+    return limitInfo;
+  }
   const userPostCount = await PostModel.countDocuments({
     uid,
     reviewed: true,
@@ -141,31 +152,26 @@ messageSchema.statics.ensureSystemLimitPermission = async (uid, tUid) => {
     toDraft: {$ne: true},
     mainForumsId: {$ne: recycleId}
   });
-  if(userPostCount < postCount) throwErr(403, mandatoryLimitInfo);
+  if(userPostCount < postCount) {
+    return limitInfo;
+  }
 };
 
-
 /*
-  判断用户是否有权限发送信息
-  @param fromUid 当前用户ID
-  @param toUid 对方用户ID
-  @parma sendToEveryOne 是否拥有”消息管理员“的权限
-  @author pengxiguaa 2019/2/12
-*/
-messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) => {
+* 获取用户短消息条数限制
+* @param {String} uid 当前用户
+* @param {String} tUid 目标用户
+* @return {String|null} 受限时的说明 null表示不限制
+* */
+messageSchema.statics.getMessageCountLimitInfo = async (uid, tUid) => {
   const UserModel = mongoose.model('users');
   const MessageModel = mongoose.model('messages');
-  const FriendModel = mongoose.model('friends');
-  const UsersGeneralModel = mongoose.model('usersGeneral');
-  const BlacklistModel = mongoose.model("blacklists");
-  const ThreadModel = mongoose.model("threads");
   const apiFunction = require('../nkcModules/apiFunction');
-  const user = await UserModel.findOnly({uid: fromUid});
-  const targetUser = await UserModel.findOnly({uid: toUid});
+  const user = await UserModel.findOnly({uid});
   const {messageCountLimit, messagePersonCountLimit} = await user.getMessageLimit();
   const today = apiFunction.today();
+
   // 消息管理员无需权限判断
-  if(sendToEveryOne) return;
   const messageCount = await MessageModel.countDocuments({
     s: user.uid,
     ty: 'UTU',
@@ -174,7 +180,7 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
     }
   });
   if(messageCount >= messageCountLimit) {
-    throwErr(403, `根据你的证书和等级，你每天最多只能发送${messageCountLimit}条信息`);
+    return `根据你的证书和等级，你每天最多只能发送${messageCountLimit}条信息`;
   }
   let todayUid = await MessageModel.aggregate([
     {
@@ -193,74 +199,117 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
     }
   ]);
   todayUid = todayUid.map(o => o._id);
-  if(!todayUid.includes(toUid)) {
+  if(!todayUid.includes(tUid)) {
     if(todayUid.length >= messagePersonCountLimit) {
-      throwErr(403, `根据你的证书和等级，你每天最多只能给${messagePersonCountLimit}个用户发送信息`);
+      return `根据你的证书和等级，你每天最多只能给${messagePersonCountLimit}个用户发送信息`;
     }
   }
+  return null;
+};
 
-  // 判断对方是否设置了“需要添加好友之后才能聊天” 2019-5-27 移除该设置
-  /*const friendRelationship = await FriendModel.findOne({uid: user.uid, tUid: targetUser.uid});
-  if(!friendRelationship && !sendToEveryOne) {
-    const targetUserGeneralSettings = await UsersGeneralModel.findOnly({uid: targetUser.uid});
-    const onlyReceiveFromFriends = targetUserGeneralSettings.messageSettings.onlyReceiveFromFriends;
-    if(onlyReceiveFromFriends) throwErr(403, '对方设置了只接收好友的聊天信息，请先添加该用户为好友。');
-  }*/
+/*
+  判断用户是否有权给某个用户发送短消息 根据黑白名单以及目标用户的防骚扰设置来判断
+  @param uid 当前用户ID
+  @param tUid 目标用户ID
+  @author pengxiguaa 2021-6-22
+  @return {String|null} 受限时的说明 null表示不限制
+*/
+messageSchema.statics.getUserLimitInfo = async (uid, tUid) => {
+  const UserModel = mongoose.model('users');
+  const SettingModel = mongoose.model("settings");
+  const FriendModel = mongoose.model('friends');
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const BlacklistModel = mongoose.model("blacklists");
+  const ThreadModel = mongoose.model("threads");
+  const user = await UserModel.findOnly({uid: uid});
+  const targetUser = await UserModel.findOnly({uid: tUid});
 
-  // 黑名单判断
-  let blackList = await BlacklistModel.findOne({
-    uid: fromUid,
-    tUid: toUid
-  });
-  if(blackList) throwErr(403, "你已将对方加入黑名单，无法发送消息。");
-  blackList = await BlacklistModel.findOne({
-    uid: toUid,
-    tUid: fromUid
-  });
-  if(blackList) throwErr(403, "你在对方的黑名单中，对方可能不希望与你交流。");
+  const notLimitInfo = null;
 
   const allowAllMessage = await UserModel.allowAllMessage(targetUser.uid);
 
-  if(allowAllMessage) return;
+  if(allowAllMessage) return notLimitInfo;
+
+  // 黑名单判断
+  let blackList = await BlacklistModel.findOne({
+    uid: uid,
+    tUid: tUid
+  });
+  if(blackList) {
+    return "你已将对方加入黑名单，无法发送消息。";
+  }
+  blackList = await BlacklistModel.findOne({
+    uid: tUid,
+    tUid: uid
+  });
+  if(blackList) {
+    return "你在对方的黑名单中，对方可能不希望与你交流。";
+  }
 
   // 好友间发消息无需防骚扰判断
   const friendRelationship = await FriendModel.findOne({uid: user.uid, tUid: targetUser.uid});
-  if(friendRelationship) return;
+  if(friendRelationship) return notLimitInfo;
 
   // 系统防骚扰
-  const messageSettings = (await mongoose.model("settings").findById("message")).c;
-  const {customizeLimitInfo} = messageSettings;
+  const {customizeLimitInfo} = await SettingModel.getSettings('message');
   const userGeneral = await UsersGeneralModel.findOnly({uid: targetUser.uid});
   const {status, timeLimit, digestLimit, xsfLimit, gradeLimit, volumeA, volumeB} = userGeneral.messageSettings.limit;
-  const throwLimitError = () => {
-    throwErr(403, customizeLimitInfo);
-  };
+  const limitInfo = customizeLimitInfo;
   // 如果用户开启了自定义防骚扰
   if(status) {
     // 注册时间大于30天
-    if(timeLimit && user.toc > Date.now() - 30*24*60*60*1000) throwLimitError();
+    if(timeLimit && user.toc > Date.now() - 30*24*60*60*1000) return limitInfo;
     // 有加入精选的文章
     if(digestLimit) {
       const count = await ThreadModel.countDocuments({
         digest: true,
         uid: user.uid
       });
-      if(count === 0) throwLimitError();
+      if(count === 0) return limitInfo;
     }
     // 有学术分
-    if(xsfLimit && user.xsf <= 0) throwLimitError();
+    if(xsfLimit && user.xsf <= 0) return limitInfo;
     // 是否通过相应考试。通过B卷默认通过A卷。
     if(volumeB) {
-      if(!user.volumeB) throwLimitError();
+      if(!user.volumeB) return limitInfo;
     } else if(volumeA) {
-      if(!user.volumeA) throwLimitError();
+      if(!user.volumeA) return limitInfo;
     }
     if(!user.grade) await user.extendGrade();
     // 达到一定等级
-    if(Number(gradeLimit) > Number(user.grade._id)) throwLimitError();
+    if(Number(gradeLimit) > Number(user.grade._id)) return limitInfo;
   }
-
+  return notLimitInfo;
 };
+
+/*
+* 判断在发送消息时是否显示系统警告信息
+* @param {String} uid 当前用户
+* @param {String} tUid 目标用户
+* @return {String|null} 警告内容 null表示不显示警告
+* */
+messageSchema.statics.getSystemWarningInfo = async (uid, tUid) => {
+  const UserModel = mongoose.model('users');
+  const SettingModel = mongoose.model('settings');
+  const user = await UserModel.findOnly({uid});
+  const targetUser = await UserModel.findOnly({uid: tUid});
+  const {
+    gradeLimit,
+    gradeProtect,
+    systemLimitInfo
+  } = await SettingModel.getSettings('message');
+  await user.extendGrade();
+  await targetUser.extendGrade();
+  if(
+    gradeLimit.includes(user.grade._id) ||
+    gradeProtect.includes(targetUser.grade._id)
+  ) {
+    return systemLimitInfo;
+  } else {
+    return null;
+  }
+};
+
 /*
 * 拓展应用通知信息，拓展参数字段
 * @param {Object} message STU类message
@@ -1769,6 +1818,57 @@ messageSchema.statics.checkFileSize = async (file) => {
   else {
     throwErr(400, `${ext}文件不能超过${getSize(settingSize * 1024, 1)}`);
   }
+};
+
+/*
+* 获取用户的发表状态
+* @param {String} uid 当前用户UID
+* @param {String} tUid 目标用户UID
+* @param {Boolean} canSendToEveryOne 特殊发表权限
+* @return {Object}
+*   @param {Boolean} canSendMessage 是否有权发送短消息
+*   @param {String|null} 是否需要显示提示（警告）内容
+* */
+messageSchema.statics.getStatusOfSendingMessage = async (uid, tUid, canSendToEveryOne = false) => {
+  const MessageModel = mongoose.model('messages');
+  if(canSendToEveryOne) {
+    return {
+      canSendMessage: true,
+      warningContent: null
+    };
+  }
+  const systemLimitInfo = await MessageModel.getSystemLimitInfo(uid, tUid);
+  if(systemLimitInfo !== null) {
+    return {
+      canSendMessage: false,
+      warningContent: systemLimitInfo
+    };
+  }
+  const userLimitInfo = await MessageModel.getUserLimitInfo(uid, tUid);
+  if(userLimitInfo !== null) {
+    return {
+      canSendMessage: false,
+      warningContent: userLimitInfo
+    };
+  }
+  const messageCountLimitInfo = await MessageModel.getMessageCountLimitInfo(uid, tUid);
+  if(messageCountLimitInfo) {
+    return {
+      canSendMessage: false,
+      warningContent: messageCountLimitInfo
+    };
+  }
+  const systemWarningInfo = await MessageModel.getSystemWarningInfo(uid, tUid);
+  if(systemWarningInfo !== null) {
+    return {
+      canSendMessage: true,
+      warningContent: systemWarningInfo
+    }
+  }
+  return {
+    canSendMessage: true,
+    warningContent: null
+  };
 };
 
 const MessageModel = mongoose.model('messages', messageSchema);

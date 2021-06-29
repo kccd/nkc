@@ -35,8 +35,8 @@ block content
                 |》
                 .on-edit-notes 
                   .on-edit-label 您正在修改已经发表的内容，以下提示非常重要，请务必详读。
-                    a.detail(@click="openOnEditNotes = !openOnEditNotes") {{openOnEditNotes? "收起":"详细"}}
-                  div(v-if="openOnEditNotes")!=nkcRender.plainEscape(state.editorSettings.onEditNotes)
+                    a.detail(@click="openOnEditNotes = !openOnEditNotes") {{openOnEditNotes? "收起":"展开"}}
+                  .on-edit-note-content(v-if="openOnEditNotes")!=nkcRender.plainEscape(state.editorSettings.onEditNotes)
             else if data.type === "modifyPost"
               .editor-type-info
                 .fa.fa-lightbulb-o
@@ -265,7 +265,7 @@ block scripts
   include ../publicModules/insertHideContent/insertHideContent
   include ../ueditor/dialogs/mathformulaV2/mathformula
   include ../publicModules/forumSelector/forumSelector
-  include ../publicModules/socket/socket
+  +includeJS('/message/connectSocket.js')
   +includeJS('/tools.js')
   if state.userColumn && !data.addedToColumn
     +includeJS("/publicModules/toColumn/selectCategories.js")

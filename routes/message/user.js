@@ -82,8 +82,13 @@ userRouter
     if(targetUser.destroyed) ctx.throw(403, "对方账号已注销");
     const {user} = data;
     // 判断是否有权限发送信息
-    await db.MessageModel.ensureSystemLimitPermission(user.uid, targetUser.uid);
-    await db.MessageModel.ensurePermission(user.uid, uid, data.userOperationsId.includes('canSendToEveryOne'));
+    const {canSendMessage, warningContent} = await db.MessageModel.getStatusOfSendingMessage(
+      user.uid,
+      targetUser.uid,
+      ctx.permission('canSendToEveryOne')
+    );
+
+    if(!canSendMessage) ctx.throw(403, warningContent);
 
     let file, content, voiceTime, localId, isVoice;
 

@@ -9,6 +9,10 @@ router
     const uid = !query.uid || query.uid === 'null'? null: query.uid;
     data.twemoji = state.twemoji;
     const {getUrl} = nkcModules.tools;
+    data.statusOfSendingMessage = {
+      canSendMessage: false,
+      warningContent: ''
+    };
     if(type === "UTU") {
       const targetUser = await db.UserModel.findOnly({uid});
       const q = {
@@ -47,21 +51,24 @@ router
       data.targetUserGrade = await targetUser.extendGrade();
       // 将所有消息标记为已读
       await db.MessageModel.markAsRead('UTU', user.uid, uid);
-      // await db.MessageModel.updateMany({ty: 'UTU', r: user.uid, s: uid, vd: false}, {$set: {vd: true}});
-      data.targetUserSendLimit = (await db.UsersGeneralModel.findOnly({uid: targetUser.uid})).messageSettings.limit;
-      // 用户是否能够发送短消息
-      data.showMandatoryLimitInfo = false;
-      try{
-        await db.MessageModel.ensureSystemLimitPermission(user.uid, targetUser.uid);
-      } catch(err) {
-        data.showMandatoryLimitInfo = true;
+
+      // 获取用户的发送状态 系统限制、用户限制、条数限制以及系统警告
+      if(!firstMessageId) {
+        data.statusOfSendingMessage = await db.MessageModel.getStatusOfSendingMessage(
+          user.uid,
+          targetUser.uid,
+          ctx.permission('canSendToEveryOne')
+        );
       }
-      data.blacklistInfo = await db.BlacklistModel.getBlacklistInfo(targetUser.uid, data.user.uid);
-      data.targetUserAllowAllMessage = await db.UserModel.allowAllMessage(targetUser.uid);
+
+
+      // 判断是否已创建对话，如果没有则创建并发送
       const chat = await db.CreatedChatModel.findOne({uid: user.uid, tUid: targetUser.uid});
-      if(!chat) await ctx.nkcModules.socket.sendEventUpdateChat('UTU', user.uid, targetUser.uid);
-      // 判断是否已创建对话，如果没有则创建
+      if(!chat) {
+        await ctx.nkcModules.socket.sendEventUpdateChat('UTU', user.uid, targetUser.uid);
+      }
       await db.CreatedChatModel.createChat(user.uid, uid);
+
     } else if(type === "STE") {
       const q = {
         ty: 'STE'

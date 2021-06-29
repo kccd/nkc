@@ -1,1 +1,0 @@
-!function(n){"function"==typeof define&&define.amd?define(n):n()}((function(){"use strict";$((function(){for(var n=$('button[data-type="disableColumn"], button[data-type="enableColumn"]'),t=function(t){var a=n.eq(t);a.on("click",(function(){var n="disableColumn"===a.attr("data-type"),t=a.attr("data-column-id");managementColumn(t,"column",n)}))},a=0;a<n.length;a++)t(a)}))}));

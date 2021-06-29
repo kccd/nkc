@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const forgotPasswordRouter = new Router();
+const {domain} = require('../../config/server.json');
 forgotPasswordRouter
 	.use('/', async (ctx, next) => {
 		const {nkcModules} = ctx;
@@ -93,7 +94,7 @@ forgotPasswordRouter
 	});
 	await emailCode.save();
 	const text = `有人在 ${(new Date()).toLocaleString()} 请求重置账户密码。如果不是你的操作，请忽略。`;
-	const href = `https://www.kechuang.org/forgotPassword/email?email=${email}&token=${token}`;
+	const href = `${domain}/forgotPassword/email?email=${email}&token=${token}`;
 	const link = `<a href="${href}">${href}</a>`;
 	const {sendEmail} = ctx.nkcModules;
 	await sendEmail({

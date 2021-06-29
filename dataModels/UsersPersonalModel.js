@@ -318,19 +318,40 @@ const usersPersonalSchema = new Schema({
 				type: String,
 				default: "unsubmit"
 			},
-			message: String,
-			expiryDate: Date,
-			attachments: [],
+			message: {
+			  type: String,
+        default: ''
+      },
+			expiryDate: {
+			  type: Date,
+        default: null
+      },
+			attachments: {
+			  type: [String],
+        default: []
+      },
 		},
 		video: {
 			status: {
 				type: String,
 				default: "unsubmit"
 			},
-			message: String,
-			expiryDate: Date,
-			code: Number,
-			attachments: [],
+			message: {
+			  type: String,
+        default: ''
+      },
+			expiryDate: {
+			  type: Date,
+        default: null
+      },
+			code: {
+			  type: String,
+        default: ''
+      },
+			attachments: {
+			  type: [String],
+        default: []
+      },
 		}
 	}
 },

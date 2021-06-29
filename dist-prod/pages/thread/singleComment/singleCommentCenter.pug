@@ -1,9 +1,0 @@
-if !isIncluded('singleCommentCenter')
-  include ../singlePost/singlePostCredit
-  mixin singleCommentCenter(props)
-    -var {content, xsf, kcb, pid} = props;
-    .single-comment-center
-      .single-comment-content!=content
-      +singlePostCredit(pid, xsf.concat(kcb))
-
-

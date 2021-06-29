@@ -1,7 +1,0 @@
-if permissionsOr(["complaintGet", "review"])
-  .management-panel
-    .side-thread-header 管理面板
-    if permission("complaintGet")
-      a.clear-a-style(href=`/complaint`) 投诉列表
-    if permission("review")
-      a.clear-a-style(href=`/review`) 审核内容

@@ -13,12 +13,6 @@ const schema = new Schema({
     default: '',
     index: 1,
   },
-  // 附件目录 不包含文件名
-  path: {
-    type: String,
-    default: '',
-    index: 1,
-  },
   // 附件类型
   type: {
     type: String,

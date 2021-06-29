@@ -39,7 +39,7 @@ app
   .use(staticServe(path.resolve('./nkcModules')))
   .use(staticServe(path.resolve('./public')))
   .use(staticServe(path.resolve('./node_modules')))
-  .use(staticServe(path.resolve(global.NKC.isProduction? './dist-prod/pages': './dist/pages')))
+  .use(staticServe(path.resolve('./dist/pages')))
   .use(favicon(__dirname + '/public/statics/site/favicon.ico'))
   .use(awesomeStatic("./resources/tools", {route: "/tools"}))
   // 请求头安全设置

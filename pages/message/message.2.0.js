@@ -54,7 +54,7 @@ export function addFriend(uid) {
 }
 
 export function removeChat(type, uid) {
-  return sweetQuestion(`确定要从消息列表中移除当前对话？`)
+  return sweetQuestion(`确定要从消息列表中删除当前对话？`)
     .then(() => {
       return nkcAPI(`/message/chat?type=${type}&uid=${uid}`, 'DELETE')
     })

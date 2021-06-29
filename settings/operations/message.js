@@ -32,7 +32,6 @@ module.exports = {
     }
   },
   resource: {
-    POST: 'sendMessageFile',
     PARAMETER: {
       GET: 'getMessageFile'
     }
