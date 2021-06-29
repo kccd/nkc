@@ -13,6 +13,7 @@ router
     let {gradesId, rolesId} = body.threadSettings.displayPostAttachments;
     const {disablePost} = body.threadSettings;
     let {isDisplay, tipContent} = body.threadSettings.playerTips;
+    const { confirm } = body.threadSettings.offsiteLink;
     rolesId = rolesId.filter(r => r !== "default");
     const grades = await db.UsersGradeModel.find({_id: {$in: gradesId}});
     const roles = await db.RoleModel.find({_id: {$in: rolesId}});
@@ -44,6 +45,9 @@ router
           errorInfo: (disablePost.errorInfo || ''),
           rolesId: disablePostRoles.map(r => r._id),
           gradesId: disablePostGrades.map(g => g._id),
+        },
+        "c.offsiteLink": {
+          confirm
         }
       }
     });

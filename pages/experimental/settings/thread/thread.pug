@@ -75,10 +75,17 @@ block eContent
                   input(type='checkbox' :value="g._id" v-model='settings.disablePost.gradesId')
                   span {{g.displayName}}
               h5.text-danger 满足已勾选等级之一的用户不受限制
+
+          h4 站外链接访问
+          .form-group
+            label.col-sm-2.control-label 提示语
+            .col-sm-6
+              textarea.form-control.m-r-1(cols="40" rows="6" v-model="settings.offsiteLink.confirm")
+
+
           .form-group
             label.col-sm-2.control-label
             .col-sm-10
               button.btn.btn-sm.btn-primary(@click="save") 保存
-
 block scripts
   +includeJS("/experimental/settings/thread/thread.js")

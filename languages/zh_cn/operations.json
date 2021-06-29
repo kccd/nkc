@@ -784,5 +784,8 @@
   "postAliPayInfo": "发起支付宝支付",
 
   "messageGetData": "消息系统获取数据",
-  "messagePostData": "消息系统提交数据"
+  "messagePostData": "消息系统提交数据",
+
+  "linkToTarget": "尝试访问目标外链",
+  "reportLinkToTarget": "用户确认访问目标外链"
 }

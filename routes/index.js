@@ -57,6 +57,8 @@ const blacklistRouter = routers.blacklist;
 const attachmentRouter = routers.attachment;
 // 支付
 const paymentRouter = routers.payment;
+// 外链跳转
+const linkRouter = routers.link;
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
@@ -107,5 +109,6 @@ router.use("/ipinfo", ipinfoRouter.routes(), ipinfoRouter.allowedMethods());
 router.use('/blacklist', blacklistRouter.routes(), blacklistRouter.allowedMethods());
 router.use('/a', attachmentRouter.routes(), attachmentRouter.allowedMethods());
 router.use('/verifications', verificationsRouter.routes(), verificationsRouter.allowedMethods());
-router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods());
+router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods())
+router.use("/link", linkRouter.routes(), linkRouter.allowedMethods());
 module.exports = router;

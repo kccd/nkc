@@ -78,6 +78,7 @@ const blacklist = require('./blacklist');
 const attachment = require("./attachment");
 const verifications = require('./verifications');
 const payment = require('./payment');
+const link = require('./link');
 const operationObj = {};
 
 
@@ -269,6 +270,7 @@ operationObj.operationTree = {
 		a: attachment, // 网站附件， 通用接口
 		verifications, // 图形验证码相关
 		payment, // 支付相关
+		link, // 外链跳转
     test,
 	}
 };
