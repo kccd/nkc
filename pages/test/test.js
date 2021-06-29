@@ -10,7 +10,7 @@ import {
   FunctionalComponent,
   DefineComponent,
   ESLintComponent
-} from "./xcomponent";
+} from "./lib/xcomponent.jsx";
 import VueXcomponent from "./xcomponent.vue";
 import FunctionalComponentSfc from "./functional.vue";
 // 模块化css  (css-loader提供)
