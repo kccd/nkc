@@ -47,7 +47,8 @@ router
   })
   .get("/", async (ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
-    const {page = 0, c: categoriesIdString = ''} = query;
+    let {page = 0, c: categoriesIdString = ''} = query;
+    page = Number(page);
     const categoriesId = categoriesIdString.split('-');
     let cid = categoriesId[0];
     let mcid = categoriesId[1];
@@ -64,7 +65,9 @@ router
     if(cid) {
       const category = await db.ColumnPostCategoryModel.findOnly({_id: cid});
       if(category.columnId !== column._id) ctx.throw(400, `文章分类【${cid}】不存在或已被专栏主删除`);
-      await category.renderDescription();
+      if(page === 0 && !mcid) {
+        data.categoryDescription = await category.renderDescription();
+      }
       data.childCategories = await category.getChildCategories();
       data.category = category;
       data.categoryPostCount = await db.ColumnPostModel.countDocuments({columnId: column._id, cid: category._id});
@@ -91,7 +94,7 @@ router
       data.toppedId = data.column.topped;
       sort[`order.cid_default`] = -1;
     }
-    if(!query.page && !query.c) {
+    if((page === 0) && !query.c) {
       data.homePage = await db.ColumnModel.getHomePageByColumnId(column._id);
     }
     const count = await db.ColumnPostModel.countDocuments(q);

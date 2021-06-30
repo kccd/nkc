@@ -372,7 +372,7 @@ schema.methods.renderDescription = async function() {
       resources
     }
   });
-  return description;
+  return this.description;
 };
 /*
 * 获取专业分类的下级分类
