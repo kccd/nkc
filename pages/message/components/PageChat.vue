@@ -52,8 +52,8 @@
                 //- 富文本内容 包含普通消息、添加好友、应用通知以及系统提醒
                 .html(v-html='message.content' v-if="message.contentType === 'html'")
                 //- 发送的图片消息
-                .image(v-else-if="message.contentType === 'image'" @click="visitImages(message.content.fileUrl)")
-                  img(:src="message.content.fileUrl")
+                .image(v-else-if="message.contentType === 'image'")
+                  img.chat-message-image(:src="message.content.fileUrl")
                 //- 发送的文件消息
                 .file(v-else-if="message.contentType === 'file'")
                   a(:href="message.content.fileUrl" target='_blank') {{message.content.filename}}
@@ -285,6 +285,7 @@
           display: none;
         }
         .image{
+          cursor: pointer;
           img{
             max-width: 100%;
             max-height: 20rem;
@@ -515,6 +516,11 @@
         const chatContent = getFromLocalStorage(CHAT_CONTENT_ID);
         chatContent[uid] = content;
         saveToLocalStorage(CHAT_CONTENT_ID, chatContent);
+      },
+      messages() {
+        setTimeout(() => {
+          NKC.methods.initImageViewer('.chat-message-image');
+        }, 200);
       }
     },
     mounted() {
