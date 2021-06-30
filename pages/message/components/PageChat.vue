@@ -675,7 +675,7 @@
             if(data.messages.length === 0) {
               app.loadFinished = true;
             }
-            if(data.statusOfSendingMessage) {
+            if(data.statusOfSendingMessage && data.setStatusOfSendingMessage) {
               const {canSendMessage, warningContent} = data.statusOfSendingMessage;
               app.canSendMessage = canSendMessage;
               app.warningContent = warningContent;

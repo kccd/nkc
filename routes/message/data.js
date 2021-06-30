@@ -9,10 +9,6 @@ router
     const uid = !query.uid || query.uid === 'null'? null: query.uid;
     data.twemoji = state.twemoji;
     const {getUrl} = nkcModules.tools;
-    data.statusOfSendingMessage = {
-      canSendMessage: false,
-      warningContent: ''
-    };
     if(type === "UTU") {
       const targetUser = await db.UserModel.findOnly({uid});
       const q = {
@@ -54,6 +50,7 @@ router
 
       // 获取用户的发送状态 系统限制、用户限制、条数限制以及系统警告
       if(!firstMessageId) {
+        data.setStatusOfSendingMessage = true;
         data.statusOfSendingMessage = await db.MessageModel.getStatusOfSendingMessage(
           user.uid,
           targetUser.uid,
