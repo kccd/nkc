@@ -73,7 +73,7 @@
     "image-size": "^0.8.3",
     "immutable": "^3.8.2",
     "ioredis": "^4.0.0",
-    "jquery": "^2.2.4",
+    "jquery": "^3.5.0",
     "jquery-pjax": "^2.0.1",
     "jscrollpane": "^2.2.0",
     "koa": "^2.4.1",
