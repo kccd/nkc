@@ -443,6 +443,7 @@ let pugRender = (template, data, state) => {
       username: "匿名用户",
       avatar: "/default/default_anonymous_user_avatar.jpg"
     },
+		basedir: process.cwd() + "/pages",
     tools
   };
   options.data = data;

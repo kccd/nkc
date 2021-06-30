@@ -32,11 +32,11 @@ module.exports = {
       other: [
         {
           name: "科创",
-          url: "https://www.kechuang.org"
+          url: "https://kechuang.org"
         },
         {
           name: "故园怀旧",
-          url: "http://gyhj.org"
+          url: "https://gyhj.org"
         },
       ]
     }

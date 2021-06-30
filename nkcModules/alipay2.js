@@ -11,16 +11,16 @@ const {
   receipt
 } = alipayConfig;
 
+const {domain} = require('../config/server.json');
+
 const {seller_id, seller_email, key} = receipt;
 
 directAlipay.config({
   seller_email,
   partner: seller_id,
   key,
-  return_url: process.env.NODE_ENV === 'production'?
-    'https://www.kechuang.org/fund/donation/return':
-    'http://localhost:9000/fund/donation/return',
-  notify_url: 'https://www.kechuang.org/fund/donation/verify'
+  return_url: `${domain}/fund/donation/return`,
+  notify_url: `${domain}/fund/donation/verify`
 });
 
 const serverConfig = require('../config/server.json');

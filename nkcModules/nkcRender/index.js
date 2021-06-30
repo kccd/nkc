@@ -9,6 +9,8 @@ const fs = require("fs");
 const path = require("path");
 const filePath = path.resolve(__dirname, "./sources");
 const files = fs.readdirSync(filePath);
+const base64js = require("base64-js");
+
 const sources = {};
 for(const filename of files) {
   const name = filename.split(".")[0];
@@ -49,13 +51,18 @@ class NKCRender {
       _resources[r.rid] = r;
     }
     if(type === "article") {
-      // 外链在新标签页打开
-      const links = $("a[target!='_blank']");
+      // 文中的所有a标签
+      const links = $("a");
       for(let i = 0; i < links.length; i++) {
         const a = links.eq(i);
         const href = a.attr("href");
+        // 外链在新标签页打开
         if(!linkReg.test(href)) {
           a.attr("target", "_blank");
+          // 通过提示页代理外链的访问
+          const byteArray = new Uint8Array(href.split("").map(char => char.charCodeAt(0)));
+          const url = base64js.fromByteArray(byteArray);
+          a.attr("href", "/link?target=" + url);
         }
       }
     }
@@ -163,8 +170,7 @@ class NKCRender {
     return htmlFilter(c);
   }
   URLifyHTML(c) {
-    c = URLifyHTML(c);
-    return htmlFilter(c);
+    return URLifyHTML(c);
   }
   htmlToPlain(html = "", count) {
     const $ = cheerio.load(html);

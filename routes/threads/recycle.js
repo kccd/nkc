@@ -102,7 +102,7 @@ router
             }
           });
           await message.save();
-          await ctx.redis.pubMessage(message);
+          await ctx.nkcModules.socket.sendMessageToUser(message._id);
         }
         // 如果文章之前未审核 则生成审核记录
         if(!thread.reviewed) await db.ReviewModel.newReview("disabledThread", post, user, reason);
@@ -142,7 +142,7 @@ router
             }
           });
           await message.save();
-          await ctx.redis.pubMessage(message);
+          await ctx.nkcModules.socket.sendMessageToUser(message._id);
         }
         if(violation) {
           await db.KcbsRecordModel.insertSystemRecord('violation', targetUser, ctx);

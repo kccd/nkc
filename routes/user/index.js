@@ -9,7 +9,6 @@ const authRouter = require('./auth');
 const transactionRouter = require('./transaction');
 // const bannerRouter = require('./banner');
 const clearRouter = require("./clear");
-const friendsRouter = require('./friends');
 const subRouter = require("./sub");
 const profileRouter = require("./profile");
 const transferRouter = require("./transfer");
@@ -26,6 +25,8 @@ const forumRouter = require("./forum");
 const phoneVerifyRouter = require("./phoneVerify");
 // 查询可能存在的小号
 const altRouter = require('./alt');
+// 访问身份认证上传的材料
+const verifiedAssets = require("./verifiedAssets");
 
 const path = require('path');
 
@@ -534,7 +535,6 @@ userRouter
 	.use('/:uid/banned', bannedRouter.routes(), bannedRouter.allowedMethods())
 	.use('/:uid/drafts', draftsRouter.routes(), draftsRouter.allowedMethods())
 	.use('/:uid/settings', settingRouter.routes(), settingRouter.allowedMethods())
-  .use('/:uid/friends', friendsRouter.routes(), friendsRouter.allowedMethods())
   .use("/:uid/sub", subRouter.routes(), subRouter.allowedMethods())
   .use("/:uid/clear", clearRouter.routes(), clearRouter.allowedMethods())
   .use("/:uid/transfer", transferRouter.routes(), transferRouter.allowedMethods())
@@ -546,5 +546,6 @@ userRouter
   .use("/:uid/hide", hideRouter.routes(), hideRouter.allowedMethods())
   .use("/:uid/forum", forumRouter.routes(), forumRouter.allowedMethods())
   .use("/:uid/phoneVerify", phoneVerifyRouter.routes(), phoneVerifyRouter.allowedMethods())
-  .use("/:uid/alt", altRouter.routes(), altRouter.allowedMethods());
+  .use("/:uid/alt", altRouter.routes(), altRouter.allowedMethods())
+  .use("/:uid/verifiedAssets", verifiedAssets.routes(), verifiedAssets.allowedMethods());
 module.exports = userRouter;

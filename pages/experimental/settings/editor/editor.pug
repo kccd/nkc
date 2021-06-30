@@ -12,7 +12,13 @@ block eContent
           .form-group
             label 温馨提示，支持空格和换行
             textarea.form-control(rows=5 v-model="editorSettings.notes")
+
           .form-group
-            button.btn.btn-primary.btn-sm(@click="submit") 保存  
+            label 编辑操作醒目提示
+            textarea.form-control(rows=5 v-model="editorSettings.onEditNotes")
+            vue-markdown(:source="editorSettings.onEditNotes")
+
+          .form-group
+            button.btn.btn-primary.btn-sm(@click="submit") 保存
 block scripts
   +includeJS("/experimental/settings/editor/editor.js")            

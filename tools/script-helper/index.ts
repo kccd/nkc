@@ -1,1 +1,0 @@
-export * as NKCDB from "./database";

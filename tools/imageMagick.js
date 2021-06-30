@@ -449,7 +449,16 @@ const webLogoify = async (path, targetPath) => {
 };
 
 const messageImageSMify = async (path, targetPath) => {
-  const {width, height} = sizeLimit.messageImageSM;
+  const {width: staticWidth, height: staticHeight} = sizeLimit.messageImageSM;
+  const {width: imageWidth, height: imageHeight} = await info(path);
+  let height, width;
+  if(imageHeight > staticHeight || imageWidth > staticWidth) {
+    height = staticHeight;
+    width = staticWidth;
+  } else {
+    height = imageHeight;
+    width = imageWidth;
+  }
   if(linux) {
     return spawnProcess('convert', [path, '-resize', `${width}x${height}^`, targetPath])
   }

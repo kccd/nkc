@@ -10,6 +10,8 @@ var app = new Vue({
     avatarUrl: "",
     bannerUrl: "",
 
+    submitting: false,
+
     column: {
       name: "",
       abbr: "",
@@ -50,7 +52,7 @@ var app = new Vue({
       selectImage.show(function(data){
         app.selectedBanner(data);
       }, {
-        aspectRatio: 4
+        aspectRatio: 6.4
       });
     },
     selectAvatar: function() {
@@ -75,15 +77,23 @@ var app = new Vue({
       formData.append("name", column.name);
       formData.append("abbr", column.abbr);
       formData.append("description", column.description);
+      this.submitting = true;
+      const _this = this;
       uploadFilePromise("/column", formData, function(e, a) {
-        app.info = "提交中..." + a + "%";
+        if(a === 100) {
+          app.info = "处理中，请稍候...";
+        } else {
+          app.info = "提交中..." + a + "%";
+        }
       })
         .then(function(data) {
           NKC.methods.visitUrl("/m/" + data.column._id);
+          _this.submitting = false;
         })
         .catch(function(data) {
           app.info = "";
           app.error = data.error || data;
+          _this.submitting = false;
         })
     }
   }

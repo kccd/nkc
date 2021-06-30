@@ -76,7 +76,7 @@ router
             }
           });
           await message.save();
-          await ctx.redis.pubMessage(message);
+          await ctx.nkcModules.socket.sendMessageToUser(message._id);
         }
         if(!thread.reviewed) await db.ReviewModel.newReview("returnThread", post, user, reason);
       } else {
@@ -115,7 +115,7 @@ router
             }
           });
           await message.save();
-          await ctx.redis.pubMessage(message);
+          await ctx.nkcModules.socket.sendMessageToUser(message._id);
         }
         if(violation) {
           await db.UsersScoreLogModel.insertLog({

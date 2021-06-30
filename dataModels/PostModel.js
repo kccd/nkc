@@ -774,7 +774,7 @@ postSchema.post('save', async function(doc, next) {
   // if p.atUsers has changed, we should generate a invitation
 
   try {
-    const redis = require('../redis');
+    const socket = require('../nkcModules/socket');
     const MessageModel = mongoose.model('messages');
     const SettingModel = mongoose.model('settings');
 
@@ -796,7 +796,7 @@ postSchema.post('save', async function(doc, next) {
         }
       });
       await message.save();
-      await redis.pubMessage(message);
+      await socket.sendMessageToUser(message._id);
     }));
     return next()
   } catch(e) {
@@ -1134,6 +1134,7 @@ postSchema.statics.newPost = async (options) => {
   const ThreadModel = mongoose.model('threads');
   const PostModel = mongoose.model('posts');
   const IPModel = mongoose.model('ips');
+  const socket = require('../nkcModules/socket');
   const {contentLength} = require('../tools/checkString');
   const {title, content, uid, ip, abstractCn, tid, keyWordsCn} = options;
   const thread = await ThreadModel.findOne({tid});
@@ -1195,8 +1196,7 @@ postSchema.statics.newPost = async (options) => {
       });
 
       await message.save();
-
-      await redis.pubMessage(message);
+      await socket.sendMessageToUser(message._id);
     }
   }
   // 红包奖励判断

@@ -12,12 +12,12 @@ block settingsContent
           .form-group
             label.col-sm-2.control-label 专栏背景
             .col-sm-8
-              .column-settings-banner(@click="selectBanner")
+              .column-settings-banner(@click="selectBanner" title='点击更换专栏背景')
                 img(:src="bannerUrl")
           .form-group
             label.col-sm-2.control-label 专栏头像
             .col-sm-8
-              .pointer.column-settings-avatar(@click="selectAvatar")
+              .pointer.column-settings-avatar(@click="selectAvatar" title='点击更换专栏头像')
                 img(:src="avatarUrl")
           .form-group
             label.col-sm-2.control-label 专栏名

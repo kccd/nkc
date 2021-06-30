@@ -44,6 +44,35 @@ const friendsApplicationSchema = new Schema({
   collection: 'friendsApplications'
 });
 
-const FriendsApplicationModel = mongoose.model('friendsApplications', friendsApplicationSchema);
+/*
+* 通过好友申请ID 获取消息系统对话窗口可用的数据
+* @param {Number} 好友申请ID
+* */
+friendsApplicationSchema.statics.getApplicationMessage = async (applicationId) => {
+  const FriendsApplicationModel = mongoose.model('friendsApplications');
+  const application = await FriendsApplicationModel.findOnly({_id: applicationId});
+  return await application.getMessage();
+};
 
-module.exports = FriendsApplicationModel;
+/*
+* 获取适用于消息系统的数据
+* */
+friendsApplicationSchema.methods.getMessage = async function() {
+  const UserModel = mongoose.model('users');
+  const application = this;
+  const targetUser = await UserModel.findOnly({uid: application.applicantId});
+  return {
+    _id: application._id,
+    ty: 'newFriends',
+    username: targetUser.username || targetUser.uid,
+    avatar: targetUser.avatar,
+    description: application.description,
+    uid: targetUser.uid,
+    toc: application.toc,
+    agree: application.agree,
+    tlm: application.tlm,
+    tUid: application.respondentId,
+  };
+}
+
+module.exports = mongoose.model('friendsApplications', friendsApplicationSchema);

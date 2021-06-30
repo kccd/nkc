@@ -80,6 +80,9 @@
   "visitEmailSettings": "访问绑定邮箱页面",
   "bindEmail": "绑定邮箱",
   "visitVerifySettings": "访问身份认证页面",
+  "verify3VideoUpload": "身份认证3视频上传",
+  "verify2ImageUpload": "身份认证2身份证正反面上传",
+  "visitVerifiedUpload": "查看用户身份认证时上传的材料",
   "visitUserAuth": "访问用户身份认证审核页面",
   "cancelSubmitVerify": "撤销身份认证申请",
   "submitVerify": "提交身份认证申请",
@@ -351,7 +354,7 @@
   "sendActivityMessage": "发送活动通知",
   "getShareToken": "获取分享链接的Token",
   "visitShareLink": "访问分享的链接",
-  "canSendToEveryOne": "有权给任何人发信息",
+  "canSendToEveryOne": "有权给任何人发信息，无视任何限制",
   "post-vote-up": "回复或文章-点赞",
   "post-vote-down": "回复或文章-点踩",
   "visitExperimentalKcb": "访问【后台管理-查看记录-科创币】",
@@ -779,5 +782,11 @@
   "receiveWeChatPaymentInfo": "接收微信支付通知",
   "postWeChatPayInfo": "发起微信支付",
   "receiveAliPayPaymentInfo": "接收支付宝支付通知",
-  "postAliPayInfo": "发起支付宝支付"
+  "postAliPayInfo": "发起支付宝支付",
+
+  "messageGetData": "消息系统获取数据",
+  "messagePostData": "消息系统提交数据",
+
+  "linkToTarget": "尝试访问目标外链",
+  "reportLinkToTarget": "用户确认访问目标外链"
 }

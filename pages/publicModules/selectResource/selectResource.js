@@ -565,8 +565,7 @@ NKC.modules.SelectResource = function() {
   if(socket && socket.on) {
     socket.on("fileTransformProcess", function(data) {
       if(data.state === "fileProcessFailed") {
-        console.error(data.err);
-        sweetError("文件处理失败\n附件中含有不支持的特殊格式，请处理以后再上传");
+        sweetError(`文件处理失败\n${data.err}`);
       }
       self.app.getResources(0);
     })

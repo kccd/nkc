@@ -1,1 +1,0 @@
-!function(n){"function"==typeof define&&define.amd?define(n):n()}((function(){"use strict";window.removeApplicationForm=function(n){!0===confirm("确定要删除？")&&nkcAPI("/fund/a/"+n,"DELETE",{}).then((function(){screenTopAlert("删除成功！"),setTimeout((function(){window.location.reload()}),2e3)})).catch((function(n){screenTopWarning(n.error)}))}}));

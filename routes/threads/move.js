@@ -9,7 +9,8 @@ router
       threadsId,
       forums,
       violation,
-      violationReason
+      violationReason,
+      remindUser
     } = body;
     const forumsObj = {};
     const forumsId = new Set();
@@ -88,6 +89,22 @@ router
           tid: thread.tid,
           description: violationReason || '移动文章并标记为违规'
         });
+        if(remindUser) {
+          const mId = await db.SettingModel.operateSystemID('messages', 1);
+          const message = db.MessageModel({
+            _id: mId,
+            ty: 'STU',
+            r: thread.uid,
+            c: {
+              type: 'violation',
+              tid: thread.tid,
+              rea: violationReason
+            }
+          });
+          await message.save();
+          await ctx.nkcModules.socket.sendMessageToUser(message._id);
+        }
+
       }
     }
 

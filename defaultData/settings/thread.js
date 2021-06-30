@@ -15,6 +15,9 @@ module.exports = {
       errorInfo: '根据相关法律法规和政策，内容不予显示。',
       rolesId: ['dev'],
       gradesId: [],
+    },
+    offsiteLink: {
+      confirm: "您即将离开科创，请注意您的账号和财产安全。"
     }
   }
 };

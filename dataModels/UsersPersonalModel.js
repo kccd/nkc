@@ -1,4 +1,7 @@
+const fs = require("fs");
+const path = require("path");
 const settings = require('../settings');
+const folderTools = require("../nkcModules/file");
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
@@ -72,11 +75,6 @@ const usersPersonalSchema = new Schema({
     type: Number,
     default: 0
   },
-	submittedAuth: {
-		type: Boolean,
-		default: false,
-		index: 1
-	},
   // 交易地址管理
   /*
   * {
@@ -311,6 +309,50 @@ const usersPersonalSchema = new Schema({
   		type: Number,
 			default: 0
 		}
+	},
+
+	// 认证信息
+	authenticate: {
+		card: {
+			status: {
+				type: String,
+				default: "unsubmit"
+			},
+			message: {
+			  type: String,
+        default: ''
+      },
+			expiryDate: {
+			  type: Date,
+        default: null
+      },
+			attachments: {
+			  type: [String],
+        default: []
+      },
+		},
+		video: {
+			status: {
+				type: String,
+				default: "unsubmit"
+			},
+			message: {
+			  type: String,
+        default: ''
+      },
+			expiryDate: {
+			  type: Date,
+        default: null
+      },
+			code: {
+			  type: String,
+        default: ''
+      },
+			attachments: {
+			  type: [String],
+        default: []
+      },
+		}
 	}
 },
   {
@@ -370,11 +412,17 @@ usersPersonalSchema.methods.extendIdPhotos = async function() {
 
 // 获取身份认证等级
 usersPersonalSchema.methods.getAuthLevel = async function() {
-	if(!this.mobile) return 0;
-	const {idCardA, idCardB, handheldIdCard} = await this.extendIdPhotos();
-	if(!(idCardA && idCardA.status === 'passed' && idCardB && idCardB.status === 'passed')) return 1;
-	if(!(handheldIdCard && handheldIdCard.status === 'passed')) return 2;
-	return 3;
+	const UserPersonalModel = mongoose.model("usersPersonal");
+	await UserPersonalModel.checkExpiryAuthenticate(this.uid);
+	const userPersonal = await UserPersonalModel.findOne({ uid: this.uid });
+	if(userPersonal.authenticate.video.status === "passed") {
+		return 3;
+	}
+	if(userPersonal.authenticate.card.status === "passed") {
+		return 2;
+	}
+	if(userPersonal.mobile) return 1;
+	return 0;
 };
 
 usersPersonalSchema.methods.extendLifePhotos = async function() {
@@ -559,4 +607,164 @@ usersPersonalSchema.statics.modifyVerifyPhoneNumberTime = async (uid) => {
     }
   });
 }
+
+/**
+ * 生成身份认证2记录
+ */
+usersPersonalSchema.methods.generateAuthenticateVerify2 = async function(files) {
+	const AttachmentModel = mongoose.model("attachments");
+	const [ imageA, imageB ] = files;
+	if(!imageA || !imageB) {
+		throw new Error("must get A and B surface of IDCard.");
+	}
+	const aids = await Promise.all(
+		[ imageA, imageB ].map(async (file) => {
+			return await AttachmentModel.saveVerifiedUpload({
+				size: file.size,
+				hash: file.hash,
+				name: file.name,
+				path: file.path,
+				uid: this.uid
+			})
+		})
+	);
+
+	await this.updateOne({
+		$set: {
+			"authenticate.card.attachments": aids,
+			"authenticate.card.status": "in_review"
+		}
+	});
+}
+
+/**
+ * 生成身份认证3记录
+ */
+usersPersonalSchema.methods.generateAuthenticateVerify3 = async function(file, code) {
+	const AttachmentModel = mongoose.model("attachments");
+	if(!file) {
+		throw new Error("must get a video file.");
+	}
+	const aid = await AttachmentModel.saveVerifiedUpload({
+		size: file.size,
+		hash: file.hash,
+		name: file.name,
+		path: file.path,
+		uid: this.uid
+	});
+	await this.updateOne({
+		$set: {
+			"authenticate.video.attachments": [aid],
+			"authenticate.video.code": code,
+			"authenticate.video.status": "in_review"
+		}
+	});
+}
+
+/**
+ * 改变身份认证2的状态
+ * @param {"unsubmit" | "in_review" | "passed" | "fail"} status 状态
+ */
+usersPersonalSchema.methods.changeVerify2Status = async function(status) {
+	const valueList = ["unsubmit", "in_review", "passed", "fail"];
+	if(!valueList.includes(status)) {
+		throw new Error(`must incoming value of status is one of [${valueList.join(", ")}]`);
+	}
+	await this.updateOne({
+		$set: {
+			"authenticate.card.status": status
+		}
+	});
+}
+
+/**
+ * 审核通过此用户的身份认证2
+ * @param {Date} expiryDate 过期日期
+ */
+usersPersonalSchema.methods.passVerify2 = async function(expiryDate) {
+	await this.changeVerify2Status("passed");
+	await this.updateOne({
+		$set: {
+			"authenticate.card.expiryDate": expiryDate
+		}
+	});
+}
+
+/**
+ * 把此用户的身份认证2置为审核不通过状态
+ * @param {string} message 给用户看的信息
+ */
+usersPersonalSchema.methods.rejectVerify2 = async function(message) {
+	await this.changeVerify2Status("fail");
+	await this.updateOne({
+		$set: {
+			"authenticate.card.message": message
+		}
+	});
+}
+
+/**
+ * 检查并过期认证，并更新状态
+ * @param {string} uid user id
+ */
+usersPersonalSchema.statics.checkExpiryAuthenticate = async function(uid) {
+	const UsersPersonalModel = mongoose.model("usersPersonal");
+	const userPersonal = await UsersPersonalModel.findOnly({ uid });
+	const authenticate = userPersonal.authenticate;
+	if(authenticate.video.status === "passed" && authenticate.video.expiryDate.getTime() < Date.now()) {
+		await userPersonal.updateOne({
+			$set: { "authenticate.video.status": "unsubmit" }
+		});
+	}
+	if(authenticate.card.status === "passed" && authenticate.card.expiryDate.getTime() < Date.now()) {
+		await userPersonal.updateOne({
+			$set: { "authenticate.card.status": "unsubmit" }
+		});
+	}
+}
+
+
+
+/**
+ * 改变身份认证3的状态
+ * @param {"unsubmit" | "in_review" | "passed" | "fail"} status 状态
+ */
+ usersPersonalSchema.methods.changeVerify3Status = async function(status) {
+	const valueList = ["unsubmit", "in_review", "passed", "fail"];
+	if(!valueList.includes(status)) {
+		throw new Error(`must incoming value of status is one of [${valueList.join(", ")}]`);
+	}
+	await this.updateOne({
+		$set: {
+			"authenticate.video.status": status
+		}
+	});
+}
+
+/**
+ * 审核通过此用户的身份认证3
+ * @param {Date} expiryDate 过期日期
+ */
+usersPersonalSchema.methods.passVerify3 = async function(expiryDate) {
+	await this.changeVerify3Status("passed");
+	await this.updateOne({
+		$set: {
+			"authenticate.video.expiryDate": expiryDate
+		}
+	});
+}
+
+/**
+ * 把此用户的身份认证3置为审核不通过状态
+ * @param {string} message 给用户看的信息
+ */
+usersPersonalSchema.methods.rejectVerify3 = async function(message) {
+	await this.changeVerify3Status("fail");
+	await this.updateOne({
+		$set: {
+			"authenticate.video.message": message
+		}
+	});
+}
+
 module.exports = mongoose.model('usersPersonal', usersPersonalSchema, 'usersPersonal');

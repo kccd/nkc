@@ -54,7 +54,7 @@ block content
           .m-b-1
             .row
               .thread-div
-                -const showManagement = data.user && data.isModerator && permissionsOr(['moveDraft', 'moveThread', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']);
+                -const showManagement = data.user && data.isModerator && permissionsOr(['moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']);
                 .col-xs-12.col-md-12.thread-nav.p-t-1.p-b-2
                   .thread-nav-left.hidden-xs
                     a.nav-link(href='/?t=home' title=state.serverSettings.brief) 主页
@@ -522,7 +522,7 @@ block scripts
   include ../post/options/options
   //- 通用socket
   if data.user
-    include ../publicModules/socket/socket
+    +includeJS('/message/connectSocket.js')
   //- 下载资料询问框
   //if state.downloadNeedScore
   include ../publicModules/downloadResource/downloadResource

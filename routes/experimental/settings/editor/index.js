@@ -17,7 +17,8 @@ router
     });
     await db.SettingModel.updateOne({_id: "editor"}, {
       $set: {
-        "c.notes": editorSettings.notes
+        "c.notes": editorSettings.notes,
+        "c.onEditNotes": editorSettings.onEditNotes
       }
     });
     await db.SettingModel.saveSettingsToRedis("editor");

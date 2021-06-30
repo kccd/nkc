@@ -1,1 +1,0 @@
-!function(e){"function"==typeof define&&define.amd?define(e):e()}((function(){"use strict";window.removeResourceFromLibrary=function(e){sweetQuestion("确定要从所有文库中删除该文件？").then((function(){nkcAPI("/library","POST",{operation:"removeResourceFromLibrary",rid:e}).then((function(){sweetSuccess("删除成功")})).catch((function(e){sweetError(e)}))})).catch((function(){}))}}));

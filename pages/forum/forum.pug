@@ -315,7 +315,7 @@ block content
 block scripts
   //- 通用socket
   if data.user
-    include ../publicModules/socket/socket
+    +includeJS('/message/connectSocket.js')
   include ../publicModules/subscribeTypes/subscribeTypes
   if data.type === "home"
     include ../publicModules/nkcSource

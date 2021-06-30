@@ -114,7 +114,7 @@ document.addEventListener('click', (e)  => {
       if($a.length) $a = $a[0];
     }
     let href, title;
-    if($a) {
+    if($a && $a.getAttribute) {
       href = $a.getAttribute('href');
       title = $a.getAttribute('title');
     }

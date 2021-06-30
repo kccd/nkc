@@ -1,0 +1,21 @@
+{
+  "spellright.language": [
+    "en"
+  ],
+  "spellright.documentTypes": [
+    "markdown",
+    "latex",
+    "plaintext"
+  ],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "vue"
+  ],
+  "editor.dragAndDrop": false,
+  "typescript.disableAutomaticTypeAcquisition": true,
+  "vetur.languageFeatures.codeActions": false,
+  "vetur.languageFeatures.semanticTokens": false,
+  "vetur.validation.interpolation": false,
+  "vetur.trace.server": "messages"
+}

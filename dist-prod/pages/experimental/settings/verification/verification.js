@@ -1,1 +1,0 @@
-!function(t){"function"==typeof define&&define.amd?define(t):t()}((function(){"use strict";var t=NKC.methods.getDataById("data");new Vue({el:"#app",data:{settings:t.verificationSettings,types:t.verificationTypes},methods:{save:function(){nkcAPI("/e/settings/verification","PUT",{verificationSettings:this.settings}).then((function(){sweetSuccess("保存成功")})).catch(sweetError)}}})}));

@@ -30,10 +30,10 @@ body{
 }
 .apply-column-banner{
   width: 100%;
-  height: 14rem;
-  font-size: 3rem;
+  height: 8rem;
+  font-size: 1.25rem;
   color: #aaa;
-  line-height: 14rem;
+  line-height: 8rem;
   border-radius: 3px;
   text-align: center;
   cursor: pointer;
@@ -47,13 +47,13 @@ img.apply-column-banner{
   margin-top: 1rem;
   margin-bottom: 1rem;
   border-radius: 3px;
-  height: 14rem;
+  height: 12rem;
   cursor: pointer;
   color: #aaa;
-  width: 14rem;
+  width: 12rem;
   background-color: #ddd;
   text-align: center;
-  line-height: 14rem;
+  line-height: 12rem;
 }
 .column{
   /*min-height: 50rem;*/
@@ -228,19 +228,29 @@ img.apply-column-banner{
   position: relative;
   cursor: pointer;
 }
+.column-settings-banner:before{
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0,0,0,0.5);
+  content: "";
+  left: 0;
+  top: 0;
+  position: absolute;
+}
 .column-settings-banner:after{
   content: "点击更换专栏背景";
-  font-size: 1.4rem;
-  font-weight: 700;
+  font-size: 1.25rem;
   color: #fff;
   top: 0;
   left: 0;
-  padding-top: 4rem;
-  background-color: rgba(0,0,0,0.5);
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  display: block;
   text-align: center;
   position: absolute;
-  height: 100%;
-  width: 100%;
+  height: 2rem;
+  width: 10rem;
 }
 .column-settings-banner img{
   width: 100%;
@@ -252,15 +262,22 @@ img.apply-column-banner{
   display: inline-block;
   position: relative;
 }
-.column-settings-avatar:after{
-  content: "点击更换专栏头像";
-  font-size: 1.2rem;
+.column-settings-avatar:before{
+  content: '';
   position: absolute;
-  padding-top: 6rem;
-  font-weight: 700;
   height: 100%;
   width: 100%;
+  left: 0;
+  top: 0;
   background-color: rgba(0,0,0,0.5);
+}
+.column-settings-avatar:after{
+  content: "点击更换专栏头像";
+  font-size: 1.25rem;
+  position: absolute;
+  padding-top: 6rem;
+  height: 100%;
+  width: 100%;
   text-align: center;
   top: 0;
   left: 0;

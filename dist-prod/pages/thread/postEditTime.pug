@@ -1,7 +1,0 @@
-if !isIncluded('postEditTime')
-  //-
-    @param {Date} toc 发表时间
-    @param {Date} tlm 修改时间
-  mixin postEditTime(toc, tlm)
-    if toc.toLocaleString() !== tlm.toLocaleString()
-      p.lighttext=`[修改于 ${fromNow(tlm)} - ${dateString(tlm)}]`

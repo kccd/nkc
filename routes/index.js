@@ -19,7 +19,6 @@ const appRouter = routers.app;
 const messageRouter = routers.message;
 const activityRouter = routers.activity;
 const friendRouter = routers.friend;
-const friendCategoryRouter = routers.friendCategory;
 const homeRouter = routers.home;
 const shareRouter = routers.share;
 const lotteryRouter = routers.lottery;
@@ -58,6 +57,8 @@ const blacklistRouter = routers.blacklist;
 const attachmentRouter = routers.attachment;
 // 支付
 const paymentRouter = routers.payment;
+// 外链跳转
+const linkRouter = routers.link;
 
 const path = require('path');
 
@@ -91,7 +92,8 @@ router.use('/', async (ctx, next) => {
     const visitSettings = await db.SettingModel.getSettings('visit');
     if(visitSettings.globalLimitVisitor.status) {
       data.description = nkcModules.nkcRender.plainEscape(visitSettings.globalLimitVisitor.description);
-      ctx.status = 401;
+      if(!state.isApp) ctx.status = 401;
+
       return ctx.body = nkcModules.render(path.resolve(__dirname, '../pages/filter_visitor.pug'), data, state);
     }
   }
@@ -123,7 +125,6 @@ router.use('/login', loginRouter.routes(), loginRouter.allowedMethods());
 router.use('/message', messageRouter.routes(), messageRouter.allowedMethods());
 router.use('/activity', activityRouter.routes(),activityRouter.allowedMethods());
 router.use('/friend', friendRouter.routes(), friendRouter.allowedMethods());
-router.use('/friend_category', friendCategoryRouter.routes(), friendCategoryRouter.allowedMethods());
 router.use("/complaint" ,complaintRouter.routes(), complaintRouter.allowedMethods());
 router.use('/exam', examRouter.routes(), examRouter.allowedMethods());
 router.use('/s', shareRouter.routes(), shareRouter.allowedMethods());
@@ -148,5 +149,6 @@ router.use("/ipinfo", ipinfoRouter.routes(), ipinfoRouter.allowedMethods());
 router.use('/blacklist', blacklistRouter.routes(), blacklistRouter.allowedMethods());
 router.use('/a', attachmentRouter.routes(), attachmentRouter.allowedMethods());
 router.use('/verifications', verificationsRouter.routes(), verificationsRouter.allowedMethods());
-router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods());
+router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods())
+router.use("/link", linkRouter.routes(), linkRouter.allowedMethods());
 module.exports = router;

@@ -1,21 +1,35 @@
 extends scratch.pug
 block head
+  //- 以下数据传递到浏览器环境
+  -var windowData = {};
+  if data.user
+    -windowData.uid = data.user.uid;
+    -windowData.selectTypesWhenSubscribe = !!data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe;
+    -windowData.refererOperationId = data.operationId;
+    -windowData.newMessageCount = data.user.newMessage;
+  if state.isApp
+    -windowData.isApp = true;
+    -windowData.appOS = state.appOS;
+    -windowData.platform = state.platform;
 
   meta(charset='UTF-8')
   meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
   meta(name="viewport" content="width=device-width, initial-scale=1")
   meta(name="format-detection" content="telephone=no")
   meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
+  meta(name='window-data' content=objToStr(windowData))
+
   if state.isApp && state.platform === 'reactNative'
     meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
   link(rel='shortcut icon' href=tools.getUrl('siteIcon', state.serverSettings.siteIcon, 'ico'))
+  if process.env.NODE_ENV === "production"
+    +includeJS("/external_pkgs/vue.min.js", true)
+  else
+    +includeJS("/external_pkgs/vue.js", true)
   +includeJS('/publicModules/common.js')
-  if data.user
-    script!=`NKC.configs.uid="${data.user.uid}";`
   if state.isApp && state.platform === 'apiCloud'
     +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
-  //- 字体图标 http://www.fontawesome.com.cn/icons-ui/
   +includeCSS('/font-awesome/css/font-awesome.css')
   style=`body{background-color: ${state.serverSettings.backgroundColor}}`
   +includeCSS('/nkc_styles.css')
@@ -45,46 +59,33 @@ block body
   if data.user
     if data.user.generalSettings.lotterySettings.status
       include module_lottery
-    -const {systemInfo, reminder, usersMessage} = data.user.generalSettings.messageSettings.beep;
+    -var {systemInfo, reminder, usersMessage} = data.user.generalSettings.messageSettings.beep;
     audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
-  +includeJS('/jquery/jquery-1.11.1.js')
-  +includeJS('/jquery/jquery-ui.1.11.4.min.js')
+  +includeJS('/jquery/jquery-ui.1.11.4.min.js', true)
   //-app使用的js
-  if state.isApp
-    script!=`NKC.configs.isApp = true;NKC.configs.appOS="${state.appOS}";NKC.configs.platform="${state.platform}"`
-    if state.platform === 'apiCloud'
-      +includeJS("/appAPi/app.js")
-  +includeJS('/bootstrap/js/bootstrap.min.js')
-  +includeJS('/twemoji/2/twemoji.min.js')
-  +includeJS('/Promise/promise.min.js')
-  +includeJS('/external_pkgs/polyfill/dist/polyfill.min.js')
-  +includeJS('/vue/dist/vue.js')
+  if state.isApp && state.platform === 'apiCloud'
+    +includeJS("/appAPi/app.js")
+  +includeJS('/bootstrap/js/bootstrap.min.js', true)
+  +includeJS('/twemoji/2/twemoji.min.js', true)
+  +includeJS('/Promise/promise.min.js', true)
+  +includeJS('/external_pkgs/polyfill/dist/polyfill.min.js', true)
   if NODE_ENV === "production"
     script.
       Vue.config.productionTip = false;
   //- 弹窗模块
-  +includeJS("/sweetalert2/dist/sweetalert2.all.min.js")
+  +includeJS("/sweetalert2/dist/sweetalert2.all.min.js", true)
   +includeJS('/tools.js')
   // 前后端公用 数据类型检查
   +includeJS("/checkData.js")
   //- 旧版common.js兼容旧的页面
   +includeJS('/interface_common.js')
   if data.user
-    script!=`NKC.configs.selectTypesWhenSubscribe=!!${data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe};`
-    script!=`NKC.configs.refererOperationId="${data.operationId}"`
-    +includeJS('/socket.io-client/dist/socket.io.js')
+    +includeJS('/socket.io-client/dist/socket.io.js', true)
     //- 通用socket
     if !state.isApp
       //- 接入即时通信
-      include ./publicModules/socket/socket
-
-    //- 新增好评
-    //- if data.user.newVoteUp > 0
-    //-   script!=`sweetAlert("你发表的内容新增了 ${data.user.newVoteUp} 个好评👍！")`
-    // 因精选而获得的科创币
-    // -let kcb = data.user.generalSettings.draftFeeSettings.kcb;
-    //-if kcb > 0
-      script!=`sweetAlert("你发表的内容被评为精选，共获得 ${kcb/100} 个科创币！")`
+      +includeJS('/message/connectSocket.js')
+      include ./message/chat
 
   if (!state.isApp || state.platform === 'reactNative') && !data.user
     include ./publicModules/login/login
@@ -93,7 +94,7 @@ block body
     //- 生成二维码 页脚
     include ./publicModules/qrcode/qrcode
     script.
-      console.log('(c)2019 成都科创科学文化研究院')
+      console.log('(c)2021 成都科创科学文化研究院')
       console.log('Project Repository: https://github.com/kccd/nkc')
   if state.isApp && state.platform === 'reactNative'
     script.

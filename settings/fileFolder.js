@@ -23,14 +23,18 @@ module.exports = {
   postCover: './attachment/cover',
   // 首页推荐文章的封面（轮播图、固定图）
   recommendThreadCover: './attachment/cover',
+  // 用户实名身份认证上传的身份证、视频
+  verifiedUpload: './identity/authenticate',
   // 聊天中的视频文件
   messageVideo: './message/video',
   // 聊天中的图片文件
   messageImage: './message/image',
-  // 聊天中的音频文件
+  // 聊天中的语音文件
   messageVoice: './message/voice',
   // 聊天中的附件
   messageFile: './message/file',
+  // 聊天中的音频文件
+  messageAudio: './message/audio',
 
   // 上传附件 图片
   mediaPicture: './resource/picture',

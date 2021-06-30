@@ -1,1 +1,0 @@
-!function(e){"function"==typeof define&&define.amd?define(e):e()}((function(){"use strict";window.saveLogSettings=function(){for(var e=$("input[name='operation']"),t=[],n=0;n<e.length;n++){var o=e.eq(n);o.prop("checked")&&t.push(o.attr("data-operation"))}nkcAPI("/e/settings/log","POST",{selectedOperationsId:t}).then((function(){sweetSuccess("保存成功")})).catch(sweetError)}}));

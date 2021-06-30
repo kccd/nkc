@@ -106,7 +106,7 @@ router
         }
       });
       await message.save();
-      await redis.pubMessage(message);
+      await ctx.nkcModules.socket.sendMessageToUser(message._id);
     }
     await next();
   });

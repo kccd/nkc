@@ -8,7 +8,7 @@ sysInfoRouter
     await next();
   })
   .post('/', async (ctx, next) => {
-    const {db, body, redis} = ctx;
+    const {db, body, nkcModules} = ctx;
     const {content} = body;
     if(!content) ctx.throw(400, '内容不能为空');
     const _id = await db.SettingModel.operateSystemID('messages', 1);
@@ -19,7 +19,7 @@ sysInfoRouter
     });
     await message.save();
     await db.UsersGeneralModel.updateMany({'messageSettings.chat.systemInfo': false}, {$set: {'messageSettings.chat.systemInfo': true}});
-    await redis.pubMessage(message);
+    await nkcModules.socket.sendSystemInfoToUser(message._id);
     await next();
   })
   .put("/", async (ctx, next) => {

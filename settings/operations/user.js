@@ -2,6 +2,11 @@ module.exports = {
 	GET: 'searchUser',
 	PARAMETER: {
 		GET: 'visitUserCard',
+		verifiedAssets: {
+			PARAMETER: {
+				GET: "visitVerifiedUpload"
+			}
+		},
 		myProblems: {
 			GET: "visitSelfProblems",
 			PARAMETER: {
@@ -40,9 +45,6 @@ module.exports = {
 			  GET: "visitUserInfoSettings",
         PUT: "modifyUserInfo"
       },
-			/* resource: {
-				GET: "userSettingsResource"
-			}, */
       apps: {
         GET: 'visitUserInfoSettings',
         PUT: 'modifyUserInfo'
@@ -102,9 +104,12 @@ module.exports = {
 				}
 			},
 			verify: {
-			  GET: "visitVerifySettings",
-				PARAMETER: {
-					GET: 'visitVerifySettings',
+				GET: "visitVerifySettings",
+				verify3_form: {
+					POST: "verify3VideoUpload"
+				},
+				verify2_form: {
+					POST: "verify2ImageUpload"
 				}
 			},
       'red_envelope': {
@@ -125,9 +130,11 @@ module.exports = {
 		auth: {
 			GET: 'visitUserAuth',
 			DELETE: 'cancelSubmitVerify',
-			PARAMETER: {
-				POST: 'submitVerify',
-				PUT: 'modifyUserVerifyStatus'
+			verify2: {
+				POST: "modifyUserVerifyStatus"
+			},
+			verify3: {
+				POST: "modifyUserVerifyStatus"
 			}
 		},
 		drafts: {
@@ -148,19 +155,6 @@ module.exports = {
 		bills: {
 			GET: 'visitUserBills'
 		},
-		/*banner: {
-			GET: 'getUserBanner',
-			POST: 'modifyUserBanner'
-		},*/
-    friends: {
-		  POST: 'sendAnApplicationToAddAFriend',
-      agree: {
-		    POST: 'agreeApplicationToAddAFriend'
-      },
-      disagree: {
-		    POST: 'disagreeApplicationToAddAFriend'
-      }
-    },
     transfer: {
       GET: "transferKcbToUser",
       POST: "transferKcbToUser"

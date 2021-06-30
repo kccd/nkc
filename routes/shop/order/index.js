@@ -261,7 +261,7 @@ router
         }
       });
       await message.save();
-      await ctx.redis.pubMessage(message);
+      await ctx.nkcModules.socket.sendMessageToUser(message._id);
     }
 
     data.ordersId = ordersId;
@@ -411,7 +411,7 @@ router
         }
       });
       await message.save();
-      await ctx.redis.pubMessage(message);
+      await ctx.nkcModules.socket.sendMessageToUser(message._id);
 
     }
     data.ordersId = ordersId.join('-');

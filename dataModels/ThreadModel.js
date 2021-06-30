@@ -544,7 +544,7 @@ threadSchema.methods.updateThreadMessage = async function(toSearch = true) {
 threadSchema.methods.newPost = async function(post, user, ip) {
   const SettingModel = mongoose.model('settings');
   const PostModel = mongoose.model('posts');
-  const redis = require('../redis');
+  const socket = require('../nkcModules/socket');
   const MessageModel = mongoose.model('messages');
   const UserModel = mongoose.model('users');
   const pid = await SettingModel.operateSystemID('posts', 1);
@@ -632,7 +632,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
 
     await message.save();
 
-    await redis.pubMessage(message);
+    await socket.sendMessageToUser(message._id);
     // 如果引用作者的回复，则作者将只会收到 引用提醒
     if(quotePost.uid === this.uid) {
       _post.hasQuote = true;
@@ -1593,7 +1593,7 @@ threadSchema.statics.postNewThread = async (options) => {
 threadSchema.methods.createNewPost = async function(post) {
   const SettingModel = mongoose.model('settings');
   const PostModel = mongoose.model('posts');
-  const redis = require('../redis');
+  const socket = require('../nkcModules/socket');
   const MessageModel = mongoose.model('messages');
   const UserModel = mongoose.model('users');
   const UserGeneralModel = mongoose.model("usersGeneral");
@@ -1686,7 +1686,7 @@ threadSchema.methods.createNewPost = async function(post) {
 
       await message.save();
 
-      await redis.pubMessage(message);
+      await socket.sendMessageToUser(message._id);
       // 如果引用作者的回复，则作者将只会收到 引用提醒
       if(quPost.uid === this.uid) {
         _post.hasQuote = true;

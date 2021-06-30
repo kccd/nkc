@@ -53,7 +53,6 @@ const message = require('./message');
 const activity = require('./activity');
 const s = require('./share');
 const friend = require('./friend');
-const friend_category = require('./friendCatagory');
 const subscription = require('./homeSubscription');
 const lottery = require('./lottery');
 const shop = require('./shop');
@@ -79,6 +78,7 @@ const blacklist = require('./blacklist');
 const attachment = require("./attachment");
 const verifications = require('./verifications');
 const payment = require('./payment');
+const link = require('./link');
 const operationObj = {};
 
 
@@ -230,9 +230,6 @@ operationObj.operationTree = {
 
     friend, // 好友
 
-
-    friend_category, // 好友分组
-
     subscription, // 首页我的关注
 
 		lottery, // 抽奖页
@@ -273,6 +270,7 @@ operationObj.operationTree = {
 		a: attachment, // 网站附件， 通用接口
 		verifications, // 图形验证码相关
 		payment, // 支付相关
+		link, // 外链跳转
     test,
 	}
 };

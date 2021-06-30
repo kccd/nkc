@@ -1,7 +1,6 @@
 const cheerio = require('cheerio');
 const htmlFilter = require('./htmlFilter');
 const twemoji = require("twemoji");
-const {htmlEscape} = require("./htmlEscape");
 
 /**
  * 按顺序遍历文本节点,需传入handle

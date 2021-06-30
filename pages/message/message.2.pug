@@ -1,0 +1,41 @@
+extends ../bootstrap_base
+block title
+  title 消息
+  style.
+    body{
+      padding: 0;
+    }
+    .footer, .navbar{
+      display: none;
+    }
+    .message-status-container{
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      background-color: #737373;
+    }
+    .message-status{
+      display: inline-block;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+      position: absolute;
+      height: 5rem;
+      width: 5rem;
+      text-align: center;
+    }
+block content
+  .message-status-container
+    .message-status
+      .fa.fa-spinner.fa-spin.fa-2x
+      .m-t-05 加载中
+block scripts
+  script.
+    messageApp.showMessagePanel();
+    if($(window).width() <= 768) {
+      messageApp.setMaximize();
+    } else {
+      $('.message-status').hide();
+    }

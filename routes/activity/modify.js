@@ -124,7 +124,7 @@ modifyRouter
         //   unread: await db.MessageModel.countDocuments({s: user.uid, r: uid, vd: false})
         // });
         // const message_ = message.toObject();
-        await ctx.redis.pubMessage(message);
+        await nkcModules.socket.sendMessageToUser(message._id);
       }
     }
     await next();
@@ -194,7 +194,7 @@ modifyRouter
         unread: await db.MessageModel.countDocuments({s: user.uid, r: uid, vd: false})
       });
       const message_ = message.toObject();
-      await ctx.redis.pubMessage(message_);
+      await ctx.nkcModules.socket.sendMessageToUser(message_._id);
     }
     await next();
   })

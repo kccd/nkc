@@ -132,15 +132,10 @@ const userSchema = new Schema({
 		default: false
 	},
 	online: {
-  	type: Boolean,
-		default: false,
+  	type: String,
+		default: '',
 		index: 1
 	},
-  onlineType: {
-    type: String,
-    default: '',
-    index: 1
-  },
   // 头像文件hash
   avatar: {
     type: String,
@@ -830,43 +825,61 @@ userSchema.methods.getNewMessagesCount = async function() {
 	const MessageModel = mongoose.model('messages');
 	const FriendsApplicationModel = mongoose.model("friendsApplications");
 	const SystemInfoLogModel = mongoose.model('systemInfoLogs');
+	const UsersGeneralSettings = mongoose.model('usersGeneral');
+	const {messageSettings} = await UsersGeneralSettings.findOnly({
+    uid: this.uid
+	}, {
+    messageSettings: 1
+  });
+	const {newFriends, systemInfo, reminder} = messageSettings.chat;
 	// 系统通知
-  const allSystemInfoCount = await MessageModel.countDocuments({ty: 'STE'});
-  const viewedSystemInfoCount = await SystemInfoLogModel.countDocuments({uid: this.uid});
-  const newSystemInfoCount = allSystemInfoCount - viewedSystemInfoCount;
-  // 可能会生成多条相同的阅读记录 以下判断用于消除重复的数据
-  if(newSystemInfoCount < 0) {
-    const systemInfoLog = await SystemInfoLogModel.aggregate([
-      {
-        $match: {
-          uid: this.uid
-        }
-      },
-      {
-        $group: {
-          _id: "$mid",
-          count: {
-            $sum: 1
+  let newSystemInfoCount = 0;
+  let newApplicationsCount = 0;
+  let newReminderCount = 0;
+  if(systemInfo) {
+    const allSystemInfoCount = await MessageModel.countDocuments({ty: 'STE'});
+    const viewedSystemInfoCount = await SystemInfoLogModel.countDocuments({uid: this.uid});
+    newSystemInfoCount = allSystemInfoCount - viewedSystemInfoCount;
+    // 可能会生成多条相同的阅读记录 以下判断用于消除重复的数据
+    if(newSystemInfoCount < 0) {
+      const systemInfoLog = await SystemInfoLogModel.aggregate([
+        {
+          $match: {
+            uid: this.uid
+          }
+        },
+        {
+          $group: {
+            _id: "$mid",
+            count: {
+              $sum: 1
+            }
           }
         }
-      }
-    ]);
-    for(const log of systemInfoLog) {
-      if(log.count <= 1) continue;
-      const logs = await SystemInfoLogModel.find({mid: log._id, uid: this.uid});
-      for(let i = 0; i < logs.length; i++) {
-        if(i > 0) {
-          await logs[i].deleteOne();
+      ]);
+      for(const log of systemInfoLog) {
+        if(log.count <= 1) continue;
+        const logs = await SystemInfoLogModel.find({mid: log._id, uid: this.uid});
+        for(let i = 0; i < logs.length; i++) {
+          if(i > 0) {
+            await logs[i].deleteOne();
+          }
         }
       }
     }
   }
+
 	// 系统提醒
-  const newReminderCount = await MessageModel.countDocuments({ty: 'STU', r: this.uid, vd: false});
-  const newApplicationsCount = await FriendsApplicationModel.countDocuments({
-    agree: "null",
-    respondentId: this.uid
-  });
+  if(reminder) {
+    newReminderCount = await MessageModel.countDocuments({ty: 'STU', r: this.uid, vd: false});
+  }
+  // 添加好友
+  if(newFriends) {
+    newApplicationsCount = await FriendsApplicationModel.countDocuments({
+      agree: "null",
+      respondentId: this.uid
+    });
+  }
 	// 用户信息
   const newUsersMessagesCount = await MessageModel.countDocuments({ty: 'UTU', s: {$ne: this.uid}, r: this.uid, vd: false});
 	return {
@@ -2491,6 +2504,51 @@ userSchema.statics.extendUsersGrade = async (users) => {
     user.grade = g;
   }
   return users;
+};
+
+/*
+* 获取用户的在线状态
+* @param {String} uid 用户ID
+* @return {String}
+* */
+userSchema.statics.getUserOnlineStatus = async (uid) => {
+  const UserModel = mongoose.model('users');
+  const user = await UserModel.findOne({uid});
+  return await user.getOnlineStatus();
+};
+/*
+* 获取用户的在线状态
+* @return {String}
+* */
+userSchema.methods.getOnlineStatus = async function() {
+  if(this.online === 'web') return '网页在线';
+  if(this.online === 'app') return '手机在线';
+  return '离线';
+};
+
+/*
+* 获取消息通知音链接
+* @param {String} 用户UID
+* @param {String} type 消息类型 UTU/STU/STE/newFriends
+* */
+userSchema.statics.getMessageBeep = async (uid, type) => {
+  const {getUrl} = require('../nkcModules/tools');
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const usersGeneral = await UsersGeneralModel.findOnly({uid}, {messageSettings: 1});
+  const {
+    systemInfo,
+    reminder,
+    usersMessage
+  } = usersGeneral.messageSettings.beep || {};
+  let beep = null;
+  if(
+    (['UTU', 'newFriends'].includes(type) && usersMessage) ||
+    (type === 'STE' && systemInfo) ||
+    (type === 'STU' && reminder)
+  ) {
+    beep = getUrl('messageTone');
+  }
+  return beep;
 };
 
 module.exports = mongoose.model('users', userSchema);

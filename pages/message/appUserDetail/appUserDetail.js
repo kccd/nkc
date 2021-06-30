@@ -19,6 +19,9 @@ window.app = new Vue({
     inBlacklist: data.inBlacklist,
     friendImageUrl: '',
     showNote: false,
+
+    file: null,
+    fileUrl: ''
   },
   methods: {
     // 访问用户首页
@@ -27,7 +30,7 @@ window.app = new Vue({
     },
     _removeFriend() {
       const tUid = this.targetUser.uid;
-      return nkcAPI('/friend/' + tUid, 'DELETE', {});
+      return nkcAPI(`/message/friend?uid=` + tUid, 'DELETE', {});
     },
     // 添加、删除好友
     addFriend(isFriend) {
@@ -114,6 +117,8 @@ window.app = new Vue({
     // 删除图片
     removeFriendImage() {
       this.friend.info.image = false;
+      this.file = null;
+      this.fileUrl = '';
     },
     // 选择完图片后
     selectedFriendImage() {
@@ -121,16 +126,12 @@ window.app = new Vue({
       const {files} = this.$refs.input;
       if(!files.length) return;
       const file = files[0];
-      const formData = new FormData();
-      formData.append('file', file);
-      NKC.methods.appToast('上传中，请稍候');
-      nkcUploadFile(`/friend/${self.targetUser.uid}/image`, 'POST', formData)
-        .then(() => {
-          NKC.methods.appToast('上传成功');
-          self.setFriendImageUrl();
-          self.friend.info.image = true;
+      NKC.methods.fileToUrl(file)
+        .then(fileUrl => {
+          self.fileUrl = fileUrl;
+          self.file = file;
         })
-        .catch(NKC.methods.appToast);
+        .catch(sweetError);
     },
     // 显示，隐藏备注信息
     switchNote() {
@@ -138,12 +139,24 @@ window.app = new Vue({
     },
     // 保存好友信息
     saveFriendInfo() {
-      const {friend, targetUser} = this;
+      const {friend, file, fileUrl, targetUser} = this;
       friend.info.phone = friend.info._phone.map(p => p.number);
-      nkcAPI(`/message/settings/${targetUser.uid}`, 'PUT', {
-        info: friend.info,
-        cid: friend.cid,
-      })
+      const {info, cid} = friend;
+      const {name, description, location, phone, image} = info;
+      const formData = new FormData();
+      formData.append('friend', JSON.stringify({
+        cid,
+        name,
+        description,
+        location,
+        phone,
+        image: !!fileUrl || image
+      }));
+      formData.append('uid', targetUser.uid);
+      if(file) {
+        formData.append('file', file);
+      }
+      nkcUploadFile(`/message/friend`, 'PUT', formData)
         .then(() => {
           NKC.methods.appToast('保存成功');
         })
