@@ -85,7 +85,11 @@ router.use('/', async (ctx, next) => {
       'modifyPasswordByMobile',
       'findPasswordSendVerifyEmail',
       'modifyPasswordByEmail',
-      'findPasswordVerifyEmail'
+      'findPasswordVerifyEmail',
+
+      'visitAppDownload', // app 相关
+      'downloadApp',
+      'APPcheckout',
 
     ].includes(operationId)
   ) {
