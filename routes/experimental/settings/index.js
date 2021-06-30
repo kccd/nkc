@@ -45,6 +45,7 @@ const userSensitiveRouter = require("./userSensitive");
 const userScoresRouter = require("./userScores");
 const verificationRouter = require('./verification');
 const sensitiveWordsRouter = require('./sensitiveWords');
+const visitRouter = require('./visit');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -96,5 +97,6 @@ settingRouter
 	.use('/sensitive', userSensitiveRouter.routes(), userSensitiveRouter.allowedMethods())
 	.use('/verification', verificationRouter.routes(), verificationRouter.allowedMethods())
 	.use('/userScores', userScoresRouter.routes(), userScoresRouter.allowedMethods())
+  .use('/visit', visitRouter.routes(), visitRouter.allowedMethods())
 	.use('/sensitiveWords', sensitiveWordsRouter.routes(), sensitiveWordsRouter.allowedMethods());
 module.exports = settingRouter;

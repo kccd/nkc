@@ -60,6 +60,46 @@ const paymentRouter = routers.payment;
 // 外链跳转
 const linkRouter = routers.link;
 
+const path = require('path');
+
+router.use('/', async (ctx, next) => {
+  const {data, state, db, nkcModules} = ctx;
+  const {user, operationId} = data;
+  if(
+    !user &&
+    ![
+      'visitLogin',
+      'submitLogin',
+      'getRegisterCode',
+      'submitRegister',
+      'sendLoginMessage',
+      'getVerifications',
+      'registerSubscribe',
+      'sendRegisterMessage',
+      'sendGetBackPasswordMessage',
+      'sendPhoneMessage',
+
+      'visitFindPasswordByMobile', // 忘记密码相关
+      'visitFindPasswordByEmail',
+      'findPasswordVerifyMobile',
+      'modifyPasswordByMobile',
+      'findPasswordSendVerifyEmail',
+      'modifyPasswordByEmail',
+      'findPasswordVerifyEmail'
+
+    ].includes(operationId)
+  ) {
+    const visitSettings = await db.SettingModel.getSettings('visit');
+    if(visitSettings.globalLimitVisitor.status) {
+      data.description = nkcModules.nkcRender.plainEscape(visitSettings.globalLimitVisitor.description);
+      if(!state.isApp) ctx.status = 401;
+
+      return ctx.body = nkcModules.render(path.resolve(__dirname, '../pages/filter_visitor.pug'), data, state);
+    }
+  }
+  await next();
+});
+
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
 router.use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());

@@ -1,0 +1,49 @@
+extends ../../experimental
+block eTitle
+  title 访问设置
+block eContent
+  .container-fluid.max-width
+    .row
+      .hidden#data= objToStr({visitSettings: data.visitSettings})
+      .col-xs-12.col-md-12#app(v-cloak)
+        .form-horizontal
+          h4 全局游客限制
+          .form-group
+            label.col-sm-2.control-label 状态
+            .col-sm-10
+              .radio
+                label.m-r-1
+                  input(type="radio" v-model="visitSettings.globalLimitVisitor.status" :value="true")
+                  | 开启
+                label
+                  input(type="radio" v-model="visitSettings.globalLimitVisitor.status" :value="false")
+                  | 关闭
+
+          .form-group
+            label.col-sm-2.control-label 提示内容
+            .col-sm-6
+              textarea.form-control(rows=5 v-model="visitSettings.globalLimitVisitor.description")
+              span.text-info 支持空格和换行
+          h4 用户名片页游客限制
+          .form-group
+            label.col-sm-2.control-label 状态
+            .col-sm-10
+              .radio
+                label.m-r-1
+                  input(type="radio" v-model="visitSettings.userHomeLimitVisitor.status" :value="true")
+                  | 开启
+                label
+                  input(type="radio" v-model="visitSettings.userHomeLimitVisitor.status" :value="false")
+                  | 关闭
+
+          .form-group
+            label.col-sm-2.control-label 提示内容
+            .col-sm-6
+              textarea.form-control(rows=5 v-model="visitSettings.userHomeLimitVisitor.description")
+              span.text-info 支持空格和换行
+          .form-group
+            label.col-sm-2.control-label
+            .col-sm-6
+              button.btn.btn-primary(@click="submit") 保存
+block scripts
+  +includeJS("/experimental/settings/visit/visit.js")
