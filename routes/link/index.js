@@ -14,7 +14,9 @@ router
     const doc = await OffsiteLinkModel.create({
       target: url,
       referer: header.referer,
-      uid: user? user.uid : null
+      uid: user? user.uid : null,
+      port: ctx.port,
+      ip: ctx.address,
     });
     const threadSettings = await SettingModel.getSettings("thread");
     const serverSettings = await SettingModel.getSettings("server");
@@ -33,7 +35,9 @@ router
     await OffsiteLinkModel.updateOne({ uid: user? user.uid : null, _id: id }, {
       $set: {
         accessAt: Date.now(),
-        isComplete: accept
+        isComplete: accept,
+        port: ctx.port,
+        ip: ctx.address,
       }
     });
     return next();
