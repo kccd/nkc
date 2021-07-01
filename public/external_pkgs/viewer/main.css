@@ -2,10 +2,10 @@
   padding-left: 0.75rem;
   padding-right: 0.75rem;
 }
-
-.list-group-item {
+/* css 全局污染 暂时屏蔽 */
+/*.list-group-item {
   padding: 0.25rem 1rem;
-}
+}*/
 
 .d-flex > .btn {
   flex: 1;
