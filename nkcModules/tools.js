@@ -106,7 +106,7 @@ var Tools = function() {
         return "/frameImg/" + id
       }
       case "messageResource": {
-        return "/message/resource/" + id;
+        return "/message/resource/" + id + t;
       }
       case "userHome": {
         if(id === 'default') return false

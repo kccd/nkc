@@ -448,7 +448,7 @@ const webLogoify = async (path, targetPath) => {
 	return spawnProcess('magick', ['convert', path, targetPath]);
 };
 
-const messageImageSMify = async (path, targetPath) => {
+const messageImageify = async (path, targetPath) => {
   const {width: staticWidth, height: staticHeight} = sizeLimit.messageImageSM;
   const {width: imageWidth, height: imageHeight} = await info(path);
   let height, width;
@@ -563,7 +563,7 @@ module.exports = {
   forumAvatarify,
   imageNarrow,
   userBannerify,
-  messageImageSMify,
+  messageImageify,
   friendImageify,
   avatarLargeify,
   firstFrameToImg,
