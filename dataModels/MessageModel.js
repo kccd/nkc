@@ -155,6 +155,7 @@ messageSchema.statics.getSystemLimitInfo = async (uid, tUid) => {
   if(userPostCount < postCount) {
     return limitInfo;
   }
+  return notLimitInfo;
 };
 
 /*
