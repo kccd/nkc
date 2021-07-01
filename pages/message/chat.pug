@@ -7,8 +7,6 @@ if !isIncluded('chat')
     #displaySocketContainer(v-show='containerMode !== "minimize"')
       #socketContainer(
         v-if='showPanel'
-        @mouseleave='onMouseLeave'
-        @mouseover='onMouseOver'
         :style='containerStyle'
         ref='socketContainer'
       )
