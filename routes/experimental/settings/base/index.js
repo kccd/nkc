@@ -17,7 +17,6 @@ baseRouter
 		if(!websiteCode) ctx.throw(400, `网站代号不能为空`);
 		websiteName = websiteName.trim();
 		const serverSettings = await db.SettingModel.findOnly({_id: 'server'});
-		const keywordsArr = keywords.split(',');
 		const obj = {
 			c: {
 				websiteCode,
@@ -29,7 +28,7 @@ baseRouter
 				record,
 				statement,
 				description,
-				keywords: keywordsArr,
+				keywords,
 				brief,
 				telephone,
 				links,
