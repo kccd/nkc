@@ -108,6 +108,10 @@ block content
             else
               span!=markdown_safe(data.targetUser.description || "")
           .user-register.p-b-1=`${format("YYYY/MM/DD", data.targetUser.toc)}注册，${fromNow(data.targetUser.tlv)}活动`
+        if data.targetUserCode
+          .m-b-1
+            .panel-header 动态码
+            .user-code=data.targetUserCode
         if data.targetUser.column
           .user-column.m-b-1
             .panel-header 专栏
