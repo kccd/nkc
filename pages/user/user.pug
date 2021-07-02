@@ -72,7 +72,7 @@ block content
                   if state.platform === 'reactNative'
                     a(onclick=`NKC.methods.toChat("${data.targetUser.uid}", '${data.targetUser.username}')` target="_blank") 私信
                   else
-                    a(href=`/message?uid=${data.targetUser.uid}` target="_blank") 私信
+                    a.pointer(onclick=`NKC.methods.toChat("${data.targetUser.uid}")` target="_blank") 私信
                   if data.userSubUid.includes(data.targetUser.uid)
                     a(onclick=` SubscribeTypes.subscribeUser("${data.targetUser.uid}", false)`) 已关注
                   else

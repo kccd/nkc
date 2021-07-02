@@ -30,8 +30,6 @@ const notes = [
 function insertMarkToHTML(html, notes) {
   const root = document.createElement("div");
   root.innerHTML = html;
-  console.log(root);
-
 }
 
 function getNotes(parent, offset, length) {

@@ -9,7 +9,7 @@ block shopSettings
       h5 用户名：
         a(href=`/u/${u.uid}` target="_blank")= u.username
         | &nbsp;
-        a(target="_blank" href=`/message?uid=${u.uid}`) 发私信
+        a.pointer(onclick=`NKC.methods.toChat("${u.uid}")` target="_blank") 发私信
       h5=`文章：${u.threadCount}，回复：${u.postCount}，学术分：${u.xsf}`
       h5=`手机号：${u.nationCode?"+"+u.nationCode+" ":""}${u.mobile}`
       h5=`邮箱：${u.email? u.email: "未绑定"}`

@@ -702,7 +702,8 @@ NKC.methods.toChat = function(uid, name, type) {
       type: type || 'UTU'
     });
   } else {
-    NKC.methods.visitUrl("/message?uid=" + uid, true);
+    messageApp.toChat(uid);
+    // NKC.methods.visitUrl("/message?uid=" + uid, true);
   }
 }
 
