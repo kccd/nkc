@@ -353,7 +353,18 @@ const usersPersonalSchema = new Schema({
         default: []
       },
 		}
-	}
+	},
+  // 用户动态码
+  code: {
+    t: { // 上一次更新的时间
+      type: Date,
+      default: Date.now,
+    },
+    c: { // 动态码的内容
+      type: String,
+      default: ''
+    }
+  }
 },
   {
   	usePushEach: true,
@@ -766,5 +777,26 @@ usersPersonalSchema.methods.rejectVerify3 = async function(message) {
 		}
 	});
 }
+
+/*
+* 更新动态码
+* */
+usersPersonalSchema.methods.getCode = async function() {
+  const {getRandomString} = require('../nkcModules/apiFunction');
+  const now = new Date();
+  let {t, c} = this.code;
+  if( // 动态码有效时间为 1 个小时
+    now.getTime() - new Date(t).getTime() > 60 * 60 * 1000
+  ) {
+    t = now;
+    c = getRandomString(`A0`, 6);
+    await this.updateOne({
+      $set: {
+        code: {t, c}
+      }
+    });
+  }
+  return c;
+};
 
 module.exports = mongoose.model('usersPersonal', usersPersonalSchema, 'usersPersonal');

@@ -109,6 +109,7 @@ operationObj.defaultOperations = [
 	"visitAllUserProfile", // 可查看任何人的个人中心
 	"managementNote", // 可屏蔽编辑任何人的笔记
 	"viewUserScores", // 可在用户名片页查看用户的积分
+  "viewUserCode", // 可查看任意用户的动态码
 ];
 
 
