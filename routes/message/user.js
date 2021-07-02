@@ -145,7 +145,9 @@ userRouter
         await ffmpeg.audioTransMP3(path, targetFilePath, ext);
       } else if(fileType === 'image') {
         targetFilePath = `${saveFileDir}/${_id}.${extension}`;
-        await tools.imageMagick.messageImageSMify(path, targetFilePath);
+        const targetSMFilePath = `${saveFileDir}/${_id}_sm.${extension}`;
+        await tools.imageMagick.messageImageify(path, targetSMFilePath);
+        await fsPromise.copyFile(path, targetFilePath);
       } else {
         targetFilePath = `${saveFileDir}/${_id}.${extension}`;
         await fsPromise.copyFile(path, targetFilePath);

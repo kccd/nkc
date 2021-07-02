@@ -1,5 +1,3 @@
-const PATH = require('path');
-const FILE = require('../../nkcModules/file');
 const Router = require('koa-router');
 const resourceRouter = new Router();
 resourceRouter
@@ -7,11 +5,11 @@ resourceRouter
     const {db, params, settings, fs, query, data} = ctx;
     const {_id} = params;
     const {user} = data;
-    const {type, channel} = query;
+    const {t} = query;
     const messageFile = await db.MessageFileModel.findOnly({_id});
     if(messageFile.targetUid !== user.uid && messageFile.uid !== user.uid && !ctx.permission("getAllMessagesResources")) ctx.throw(403, '权限不足');
     let {ext} = messageFile;
-    let filePath = await messageFile.getFilePath(type);
+    let filePath = await messageFile.getFilePath(t);
     const fileType = await db.MessageFileModel.getFileTypeByExtension(ext);
     if(fileType === 'image') {
       try {

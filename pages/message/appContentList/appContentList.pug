@@ -35,7 +35,7 @@ block content
               .messageContent(:class="['image', 'video'].includes(message.contentType)?'p-a-0':''")
                 .html(v-html='message.content' v-if="message.contentType === 'html'")
                 .image(v-if="message.contentType === 'image'" @click="visitImages(message.content.fileUrl)")
-                  img(:src="message.content.fileUrl")
+                  img(:src="message.content.fileUrlSM")
                 .file(v-if="message.contentType === 'file'")
                   a(:href="message.content.fileUrl" target='_blank') {{message.content.filename}}
                 .video(v-if="message.contentType === 'video'")
