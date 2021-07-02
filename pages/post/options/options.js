@@ -1,4 +1,3 @@
-let UserInfo;
 window.PostOption = new Vue({
   el: '#modulePostOptions',
   data: {
@@ -166,10 +165,10 @@ window.PostOption = new Vue({
 
     },
     viewAuthorInfo() {
-      if(!UserInfo) {
+      if(!window.UserInfo) {
         window.UserInfo = new NKC.modules.UserInfo();
       }
-      UserInfo.open({
+      window.UserInfo.open({
         type: "showUserByPid",
         pid: this.pid
       });
