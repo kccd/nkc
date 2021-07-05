@@ -63,35 +63,11 @@ const linkRouter = routers.link;
 const path = require('path');
 
 router.use('/', async (ctx, next) => {
-  const {data, state, db, nkcModules} = ctx;
+  const {data, state, db, nkcModules, settings} = ctx;
   const {user, operationId} = data;
   if(
     !user &&
-    ![
-      'visitLogin',
-      'submitLogin',
-      'getRegisterCode',
-      'submitRegister',
-      'sendLoginMessage',
-      'getVerifications',
-      'registerSubscribe',
-      'sendRegisterMessage',
-      'sendGetBackPasswordMessage',
-      'sendPhoneMessage',
-
-      'visitFindPasswordByMobile', // 忘记密码相关
-      'visitFindPasswordByEmail',
-      'findPasswordVerifyMobile',
-      'modifyPasswordByMobile',
-      'findPasswordSendVerifyEmail',
-      'modifyPasswordByEmail',
-      'findPasswordVerifyEmail',
-
-      'visitAppDownload', // app 相关
-      'downloadApp',
-      'APPcheckout',
-
-    ].includes(operationId)
+    !settings.operationTypes.whitelistOfVisitorLimit.includes(operationId)
   ) {
     const visitSettings = await db.SettingModel.getSettings('visit');
     if(visitSettings.globalLimitVisitor.status) {
