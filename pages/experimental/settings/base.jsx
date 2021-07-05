@@ -11,7 +11,6 @@ import Sortable from "sortablejs";
 
 const tools = new Tools();
 
-console.log(data);
 const vueApp = createApp({
   setup() {
     return {
@@ -87,6 +86,9 @@ const vueApp = createApp({
                     vModel={this.newTag}
                     size="small"
                     vOn:keyup_enter_native={() => {
+                      if(this.settings.keywords.includes(this.newTag)) {
+                        return this.$message.error(`关键词 「${this.newTag}」 已存在`);
+                      }
                       this.settings.keywords.push(this.newTag);
                       this.editNewTag = false;
                       this.newTag = "";
@@ -189,6 +191,9 @@ const Wrapper = styled.div`
   .el-upload__input {
     display: none;
   }
+  .list-icon{
+    cursor: move;
+  }
 `;
 
 const InputItem = defineComponent({
@@ -273,7 +278,10 @@ const LinksTable = defineComponent({
             label="显示名称"
             scopedSlots={{
               default: scoped => (
-                <span>{scoped.row.name}</span>
+                <div>
+                  <span class="fa fa-bars m-r-1 list-icon" />
+                  <span>{scoped.row.name}</span>
+                </div>
               )
             }}>
           </TableColumn>
