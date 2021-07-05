@@ -1,7 +1,10 @@
 const data = NKC.methods.getDataById('data');
 const audio = new Audio();
 
-const {canSendMessage, warningContent} = data.statusOfSendingMessage;
+const {canSendMessage, warningContent} = data.statusOfSendingMessage || {
+  canSendMessage: false,
+  warningContent: ''
+};
 
 window.audio = audio;
 
