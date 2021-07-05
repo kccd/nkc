@@ -436,6 +436,15 @@ usersPersonalSchema.methods.getAuthLevel = async function() {
 	return 0;
 };
 
+// 根据 photo 表判断用户的认证等级 临时
+usersPersonalSchema.methods.getAuthLevelFromPhoto = async function() {
+  if(!this.mobile) return 0;
+  const {idCardA, idCardB, handheldIdCard} = await this.extendIdPhotos();
+  if(!(idCardA && idCardA.status === 'passed' && idCardB && idCardB.status === 'passed')) return 1;
+  if(!(handheldIdCard && handheldIdCard.status === 'passed')) return 2;
+  return 3;
+};
+
 usersPersonalSchema.methods.extendLifePhotos = async function() {
 	const PhotoModel = require('./PhotoModel');
 	const lifePhotos = await PhotoModel.find({uid: this.uid, type: 'life', status: {$ne: 'deleted'}}).sort({toc: -1});
