@@ -83,6 +83,30 @@ block eContent
               textarea.form-control.m-r-1(cols="40" rows="6" v-model="settings.offsiteLink.confirm")
 
 
+          h4 高赞回复列表
+          .form-group
+            label.col-sm-2.control-label 状态
+            .col-sm-6
+              .radio
+                label.m-r-1
+                  input(type='radio' value='show' v-model='settings.voteUpPost.status')
+                  span 开启
+                label
+                  input(type='radio' value='hide' v-model='settings.voteUpPost.status')
+                  span 关闭
+          .form-group
+            label.col-sm-2.control-label 最小点赞数
+            .col-sm-4
+              input.form-control(type='text' v-model.number='settings.voteUpPost.voteUpCount')
+          .form-group
+            label.col-sm-2.control-label 高赞回复数
+            .col-sm-4
+              input.form-control(type='text' v-model.number='settings.voteUpPost.postCount')
+          .form-group
+            label.col-sm-2.control-label 选取高赞回复数
+            .col-sm-4
+              input.form-control(type='text' v-model.number='settings.voteUpPost.selectedPostCount')
+              .text-danger.m-t-1 有超过 {{settings.voteUpPost.postCount}} 篇回复的点赞数 ≥{{settings.voteUpPost.voteUpCount}} 时，选取点赞数前 {{settings.voteUpPost.selectedPostCount}} 的回复
           .form-group
             label.col-sm-2.control-label
             .col-sm-10

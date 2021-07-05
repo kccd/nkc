@@ -75,7 +75,7 @@ if !isIncluded('singlePost')
     -var {pid, floor, toc, tlm, title, count, content, vote, reviewed, reviewReason, draft} = props;
     -var {user, quote, kcb, xsf, isAuthor, disabled, voteUp} = props;
     -var {digest, type, tid, highlight, hide} = props;
-    -var {cancelTopped, hidePostBottom, cRead} = props;
+    -var {cancelTopped, hidePostBottom, cRead, hideComment} = props;
     .single-post-container(
       data-un-reviewed=!reviewed
       data-disabled=disabled
@@ -90,5 +90,6 @@ if !isIncluded('singlePost')
       +singlePostTop(Object.assign({}, user, {pid, isAuthor, floor, reviewed, reviewReason, reason, toc, digest, tlm, cancelTopped}))
       +singlePostCenter({pid, title, content, quote, kcb, xsf})
       if !hidePostBottom
-        +singlePostBottom({vote, voteUp, pid, count, tid, cRead})
-      +singlePostComment({pid})
+        +singlePostBottom({vote, voteUp, pid, count, tid, cRead, hideComment})
+      if !hideComment
+        +singlePostComment({pid})

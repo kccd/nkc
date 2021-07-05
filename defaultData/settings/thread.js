@@ -18,6 +18,12 @@ module.exports = {
     },
     offsiteLink: {
       confirm: "您即将离开科创，请注意您的账号和财产安全。"
+    },
+    voteUpPost: {
+      status: 'hide', // show, hide
+      postCount: 1,
+      voteUpCount: 1,
+      selectedPostCount: 1,
     }
   }
 };

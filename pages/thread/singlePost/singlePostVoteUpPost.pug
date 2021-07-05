@@ -1,0 +1,11 @@
+//-
+  高赞回复
+if !isIncluded('singlePostVoteUpPost')
+  include ./singlePost
+  include ./singlePostVote
+  mixin singlePostVoteUpPost(props)
+    -var {pid, vote, voteUp} = props;
+    +singlePost(Object.assign({}, props, {hideComment: true}))
+
+
+

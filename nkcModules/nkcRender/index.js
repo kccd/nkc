@@ -139,10 +139,10 @@ class NKCRender {
     html = htmlFilter(html);
     let id;
     if(post.pid) {
-      id = `post-content-${post.pid}`;
+      id = `${post.pid}`;
     }
     if(html) {
-      return `<div class="render-content math-jax" id="${id}">${html}</div>`;
+      return `<div class="render-content math-jax" data-type="nkc-render-content" data-id="${id}">${html}</div>`;
     } else {
       return '';
     }

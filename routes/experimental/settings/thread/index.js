@@ -11,7 +11,7 @@ router
   .put("/", async (ctx, next) => {
     const {db, body, nkcModules} = ctx;
     let {gradesId, rolesId} = body.threadSettings.displayPostAttachments;
-    const {disablePost} = body.threadSettings;
+    const {disablePost, voteUpPost} = body.threadSettings;
     let {isDisplay, tipContent} = body.threadSettings.playerTips;
     const { confirm } = body.threadSettings.offsiteLink;
     rolesId = rolesId.filter(r => r !== "default");
@@ -27,6 +27,19 @@ router
       _id: {$in: disablePost.gradesId}
     });
     disablePost.status = !!disablePost.status;
+    const {checkNumber} = nkcModules.checkData;
+    if(!['show', 'hide'].includes(voteUpPost.status)) ctx.throw(400, `高赞回复列表状态类型错误`);
+    checkNumber(voteUpPost.postCount, {
+      name: '高赞回复列表 - 高赞回复数',
+      min: 1,
+    });
+    checkNumber(voteUpPost.voteUpCount, {
+      name: '高赞回复列表 - 最小点赞数',
+      min: 1,
+    });
+    checkNumber(voteUpPost.selectedPostCount, {
+      name: '高赞回复列表 - 选取高赞回复数'
+    });
     await db.SettingModel.updateOne({
       _id: "thread"
     }, {
@@ -48,6 +61,12 @@ router
         },
         "c.offsiteLink": {
           confirm
+        },
+        "c.voteUpPost": {
+          status: voteUpPost.status,
+          voteUpCount: voteUpPost.voteUpCount,
+          postCount: voteUpPost.postCount,
+          selectedPostCount: voteUpPost.selectedPostCount
         }
       }
     });

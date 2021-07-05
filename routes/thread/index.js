@@ -374,8 +374,9 @@ threadRouter
     }));
     // 获取置顶文章
     if(paging.page === 0 && thread.toppedPostsId && thread.toppedPostsId.length) {
-      match.pid = {$in: thread.toppedPostsId};
-      let toppedPosts = await db.PostModel.find(match);
+      const toppedMatch = Object.assign({}, match);
+      toppedMatch.pid = {$in: thread.toppedPostsId};
+      let toppedPosts = await db.PostModel.find(toppedMatch);
       toppedPosts = await db.PostModel.extendPosts(toppedPosts, {
         uid: data.user? data.user.uid: "",
         visitor: data.user,
@@ -391,6 +392,48 @@ threadRouter
         if(p) data.toppedPosts.push(p);
       }
       data.toopedPosts = await db.PostModel.filterPostsInfo(data.toppedPosts);
+    }
+    if(paging.page === 0) {
+      // 获取高赞文章
+      const voteUpPostSettings = await thread.forums[0].getVoteUpPostSettings();
+      const {
+        voteUpCount,
+        postCount,
+        selectedPostCount
+      } = voteUpPostSettings;
+      data.voteUpPostInfo = `当不小于 ${postCount} 篇回复的点赞数 ≥ ${voteUpCount} 时，选取点赞数前 ${selectedPostCount} 的回复`;
+      data.voteUpPosts = [];
+      if(voteUpPostSettings.status === 'show') {
+        let voteUpPostsId = await db.PostModel.find({
+          tid,
+          voteUp: {
+            $gte: voteUpCount
+          }
+        }, {
+          pid: 1
+        })
+          .sort({voteUp: -1}).limit(postCount);
+        if(voteUpPostsId.length === postCount) {
+          voteUpPostsId = voteUpPostsId.splice(0, selectedPostCount).map(p => p.pid);
+          const voteUpMatch = Object.assign({}, match);
+          voteUpMatch.pid = {$in: voteUpPostsId};
+          let voteUpPosts = await db.PostModel.find(voteUpMatch);
+          voteUpPosts = await db.PostModel.extendPosts(voteUpPosts, {
+            uid: data.user? data.user.uid: "",
+            visitor: data.user,
+            url: true
+          });
+          const voteUpPostsObj = {};
+          voteUpPosts.map(p => {
+            voteUpPostsObj[p.pid] = p;
+          });
+          for(const voteUpPostId of voteUpPostsId) {
+            const p = voteUpPostsObj[voteUpPostId];
+            if(p) data.voteUpPosts.push(p);
+          }
+          data.voteUpPosts = await db.PostModel.filterPostsInfo(data.voteUpPosts);
+        }
+      }
     }
     // 判断 如果文章为匿名发表，则清除作者信息
     if(thread.firstPost.anonymous) {

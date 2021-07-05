@@ -15,19 +15,17 @@
 NKC.modules.NKCHL = class {
   constructor(options) {
     const self = this;
-    const {type, targetId, notes = []} = options;
+    const {type, targetId, notes = [], rootElement} = options;
     self.type = type;
     self.id = targetId;
-
-    const el = `${type}-content-${targetId}`;
-    self.rootElement = document.getElementById(el);
+    self.rootElement = rootElement;
     window.addEventListener("mouseup", () => {
       setTimeout(() => {
         self.removeBtn();
       }, 50)
     }, true);
     const hl = new NKCHighlighter({
-      rootElementId: el,
+      rootElement: self.rootElement,
       clownClass: [
         "MathJax_CHTML", // 公式
         "MathJax"

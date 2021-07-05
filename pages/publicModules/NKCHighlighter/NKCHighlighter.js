@@ -219,13 +219,13 @@ window.Source = class {
 window.NKCHighlighter = class {
   constructor(options) {
     const {
-      rootElementId, excludedElementClass = [],
+      rootElement, excludedElementClass = [],
       excludedElementTagName = [],
 
       clownClass = [], clownAttr = [], clownTagName = []
     } = options;
     const self = this;
-    self.root = document.getElementById(rootElementId);
+    self.root = rootElement;
     self.excludedElementClass = excludedElementClass;
     self.excludedElementTagName = excludedElementTagName;
 

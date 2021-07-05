@@ -220,6 +220,26 @@ block content
                       input(type='radio' value='null' v-model='forum.threadListStyle.cover')
                       span 不显示
               .form-group
+                label.col-sm-3.control-label 高赞列表
+                .col-sm-7
+                  h5 状态
+                  .radio
+                    label.m-r-1
+                      input(type='radio' value='show' v-model='forum.voteUpPost.status')
+                      span 开启
+                    label.m-r-1
+                      input(type='radio' value='hide' v-model='forum.voteUpPost.status')
+                      span 关闭
+                    label
+                      input(type='radio' value='inherit' v-model='forum.voteUpPost.status')
+                      span 继承于全局
+                  h5 最小点赞数
+                  input.form-control(type='text' v-model.number='forum.voteUpPost.voteUpCount')
+                  h5 高赞回复数
+                  input.form-control(type='text' v-model.number='forum.voteUpPost.postCount')
+                  h5 选取高赞回复数
+                  input.form-control(type='text' v-model.number='forum.voteUpPost.selectedPostCount')
+              .form-group
                 label.col-sm-3.control-label 专业文库
                 .col-sm-7
                   div(v-if='!forum.lid')
