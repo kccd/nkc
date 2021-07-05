@@ -67,7 +67,7 @@ router.use('/', async (ctx, next) => {
   const {user, operationId} = data;
   if(
     !user &&
-    !settings.operationTypes.whitelistOfVisitorLimit.includes(operationId)
+    !settings.operationsType.whitelistOfVisitorLimit.includes(operationId)
   ) {
     const visitSettings = await db.SettingModel.getSettings('visit');
     if(visitSettings.globalLimitVisitor.status) {
