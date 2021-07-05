@@ -29,7 +29,7 @@ const app = createApp({
             onClick={async () => {
               if(this.wait) return;
               this.wait = true;
-              await nkcAPI("./link/report", "POST", {
+              await nkcAPI("./l/report", "POST", {
                 accept: true,
                 id: this.id
               });
@@ -73,6 +73,9 @@ const Wrapper = styled.div`
     .link {
       cursor: pointer;
       margin-bottom: 12px;
+    }
+    .info {
+      white-space: pre;
     }
   }
   .actions {

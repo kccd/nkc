@@ -62,7 +62,7 @@ class NKCRender {
           // 通过提示页代理外链的访问
           const byteArray = new Uint8Array(href.split("").map(char => char.charCodeAt(0)));
           const url = base64js.fromByteArray(byteArray);
-          a.attr("href", "/link?target=" + url);
+          a.attr("href", "/l?t=" + url);
         }
       }
     }

@@ -10,7 +10,7 @@ const schema = new Schema({
   // 从站内哪个页面访问此链接（url）
   referer: {
     type: String,
-    required: true
+    default: ""
   },
   uid: {
     type: String,

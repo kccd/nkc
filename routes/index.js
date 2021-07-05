@@ -130,5 +130,5 @@ router.use('/blacklist', blacklistRouter.routes(), blacklistRouter.allowedMethod
 router.use('/a', attachmentRouter.routes(), attachmentRouter.allowedMethods());
 router.use('/verifications', verificationsRouter.routes(), verificationsRouter.allowedMethods());
 router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods())
-router.use("/link", linkRouter.routes(), linkRouter.allowedMethods());
+router.use("/l", linkRouter.routes(), linkRouter.allowedMethods());
 module.exports = router;

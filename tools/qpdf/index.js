@@ -4,10 +4,11 @@ const { execSync } = require("child_process");
 
 let executablePath;
 const platform = os.platform();
-if(platform === "win32") {
+if(process.env.QPDF) {
+  executablePath = process.env.QPDF;
+} else if(platform === "win32") {
   executablePath = path.join(__dirname, "qpdf-10.3.2-bin-mingw64/bin/qpdf.exe");
-}
-if(platform === "linux") {
+} else if(platform === "linux") {
   executablePath = path.join(__dirname, "qpdf-10.3.2-bin-linux-x86_64/bin/qpdf")
 }
 
