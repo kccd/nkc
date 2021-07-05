@@ -7,9 +7,9 @@ const base64js = require("base64-js");
 router
   .get("/", async (ctx, next) => {
     const { data, header } = ctx;
-    const { target } = ctx.query;
+    const { t } = ctx.query;
     const { user } = data;
-    const byteArray = base64js.toByteArray(target);
+    const byteArray = base64js.toByteArray(t);
     const url = String.fromCharCode(...byteArray);
     const doc = await OffsiteLinkModel.create({
       target: url,
@@ -19,7 +19,7 @@ router
     const threadSettings = await SettingModel.getSettings("thread");
     const serverSettings = await SettingModel.getSettings("server");
     data.id = doc._id;
-    data.target = target;
+    data.target = t;
     data.confirm = threadSettings.offsiteLink.confirm
     data.siteName = serverSettings.websiteAbbr;
     ctx.template = "/link/link.pug"

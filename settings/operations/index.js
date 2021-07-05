@@ -270,7 +270,7 @@ operationObj.operationTree = {
 		a: attachment, // 网站附件， 通用接口
 		verifications, // 图形验证码相关
 		payment, // 支付相关
-		link, // 外链跳转
+		l: link, // 外链跳转
     test,
 	}
 };
