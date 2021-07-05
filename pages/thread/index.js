@@ -1230,11 +1230,16 @@ $(function() {
 		if(data.notes && data.notes.length) {
 			for(var i = 0; i < data.notes.length; i++) {
 				var n = data.notes[i];
-				nkchl.push(new NKC.modules.NKCHL({
-					type: n.type,
-					targetId: n.targetId,
-					notes: n.notes
-				}));
+				const elements = document.querySelectorAll(`[data-type="nkc-render-content"][data-id="${n.targetId}"]`);
+				for(let i = 0; i < elements.length; i++) {
+				  const element = elements[i];
+          nkchl.push(new NKC.modules.NKCHL({
+            type: n.type,
+            targetId: n.targetId,
+            notes: n.notes,
+            rootElement: element
+          }));
+        }
 			}
 		}
 		next();
@@ -1309,11 +1314,16 @@ function insertRenderedPost(renderedPost) {
 	// 图片预览
 	if(!NKC.configs.isApp) NKC.methods.initImageViewer();
 	// 划词笔记
-	nkchl.push(new NKC.modules.NKCHL({
-		type: 'post',
-		targetId: renderedPost.postId,
-		notes: []
-	}));
+  const elements = document.querySelectorAll(`[data-type="nkc-render-content"][data-id="${renderedPost.postId}"]`);
+  for(let i = 0; i < elements.length; i++) {
+    const element = elements[i];
+    nkchl.push(new NKC.modules.NKCHL({
+      type: 'post',
+      targetId: renderedPost.postId,
+      notes: [],
+      rootElement: element
+    }));
+  }
 }
 function insertRenderedComment(renderedComment) {
 	if(!renderedComment) return;

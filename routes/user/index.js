@@ -88,6 +88,9 @@ userRouter
     const targetUser = await db.UserModel.findById(uid);
     await targetUser.extendGrade();
     data.targetUser = targetUser;
+    if(ctx.permission('viewUserCode')) {
+      data.targetUserCode = await targetUser.getCode();
+    }
 
     // 用户积分
     if(ctx.permission('viewUserScores')) {

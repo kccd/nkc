@@ -41,7 +41,7 @@
                     button.btn.btn-xs.btn-default(onclick=`SubscribeTypes.subscribeUser('${result.user.uid}', false)`) 取关
                   else
                     button.btn.btn-xs.btn-default(onclick=`SubscribeTypes.subscribeUser('${result.user.uid}', true)`) 关注
-                  a.m-l-05.btn.btn-xs.btn-default(href=`/message?uid=${result.user.uid}` target="_blank") 私信
+                  a.pointer.m-l-05.btn.btn-xs.btn-default(onclick=`NKC.methods.toChat("${result.user.uid}")` target="_blank") 私信
               .search-result-certs=result.user.info.certsName
               .search-result-post
                 div

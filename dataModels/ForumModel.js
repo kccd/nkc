@@ -389,7 +389,26 @@ const forumSchema = new Schema({
           }
         }
       }
-    }
+    },
+  },
+  // 高赞列表筛选条件
+  voteUpPost: {
+    status: {
+      type: String,
+      default: 'inherit', // show, hide, inherit
+    },
+    postCount: {
+      type: Number,
+      default: 1
+    },
+    voteUpCount: {
+      type: Number,
+      default: 1
+    },
+    selectedPostCount: {
+      type: Number,
+      default: 1
+    },
   }
 }, {toObject: {
 		getters: true,
@@ -2365,5 +2384,23 @@ forumSchema.statics.createForum = async (displayName, type ="forum") => {
   await ForumModel.saveForumToRedis(_id);
   return newForum;
 };
+
+/*
+* 获取专业的高赞回复设置
+* @return {Object}
+*   @param {String} status hide, show 高赞列表的显示、隐藏
+*   @param {Number} voteUpCount 最小点赞数
+*   @param {Number} postCount 高赞回复数
+*   @param {Number} selectedPostCount 选择的高赞回复数
+* */
+forumSchema.methods.getVoteUpPostSettings = async function() {
+  if(this.voteUpPost.status === 'inherit') {
+    const SettingModel = mongoose.model('settings');
+    const threadSettings = await SettingModel.getSettings('thread');
+    return threadSettings.voteUpPost;
+  } else {
+    return this.voteUpPost;
+  }
+}
 
 module.exports = mongoose.model('forums', forumSchema);

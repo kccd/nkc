@@ -72,7 +72,7 @@ block content
                   if state.platform === 'reactNative'
                     a(onclick=`NKC.methods.toChat("${data.targetUser.uid}", '${data.targetUser.username}')` target="_blank") 私信
                   else
-                    a(href=`/message?uid=${data.targetUser.uid}` target="_blank") 私信
+                    a.pointer(onclick=`NKC.methods.toChat("${data.targetUser.uid}")` target="_blank") 私信
                   if data.userSubUid.includes(data.targetUser.uid)
                     a(onclick=` SubscribeTypes.subscribeUser("${data.targetUser.uid}", false)`) 已关注
                   else
@@ -108,6 +108,10 @@ block content
             else
               span!=markdown_safe(data.targetUser.description || "")
           .user-register.p-b-1=`${format("YYYY/MM/DD", data.targetUser.toc)}注册，${fromNow(data.targetUser.tlv)}活动`
+        if data.targetUserCode
+          .m-b-1
+            .panel-header 动态码
+            .user-code=data.targetUserCode
         if data.targetUser.column
           .user-column.m-b-1
             .panel-header 专栏

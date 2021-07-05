@@ -11,7 +11,7 @@
     a(href=`/u/${data.column.uid}`).column-user-username=data.column.user.username
     if data.user && data.user.uid !== data.column.uid
       .column-user-button
-        a(href=`/message?uid=${data.column.uid}` target="_blank") 私信
+        a.pointer(onclick=`NKC.methods.toChat("${data.column.uid}")` target="_blank") 私信
         if data.user.subUid.includes(data.column.uid)
           a.pointer(onclick=`SubscribeTypes.subscribeUser("${data.column.uid}", false)` target="_blank") 取关
         else

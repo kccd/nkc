@@ -39,7 +39,7 @@ include ../subscribeTypes/subscribeTypes
             .title 学术分
             .number {{user.xsf}}
           .border-left.col
-            a.link(:href="'/message?uid=' + user.uid" v-if="uid") 私信
+            a.link(:onclick="'NKC.methods.toChat(\"' +user.uid+'\")'" v-if="uid") 私信
             a.link(onclick="Login.open()" v-else) 私信
           .border-left.col(v-if="user.column")
             a.link(:href="'/m/' + user.column._id" target="_blank" :title="user.column.name") 专栏

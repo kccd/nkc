@@ -51,9 +51,6 @@ module.exports = {
   withdrawn: {
     PUT: 'userWithdrawnMessage'
   },
-  newMessages: {
-    GET: 'getNewMessages'
-  },
   chat: {
     DELETE: 'messagePostData'
   },

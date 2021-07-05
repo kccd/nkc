@@ -353,7 +353,18 @@ const usersPersonalSchema = new Schema({
         default: []
       },
 		}
-	}
+	},
+  // 用户动态码
+  code: {
+    t: { // 上一次更新的时间
+      type: Date,
+      default: Date.now,
+    },
+    c: { // 动态码的内容
+      type: String,
+      default: ''
+    }
+  }
 },
   {
   	usePushEach: true,
@@ -423,6 +434,15 @@ usersPersonalSchema.methods.getAuthLevel = async function() {
 	}
 	if(userPersonal.mobile) return 1;
 	return 0;
+};
+
+// 根据 photo 表判断用户的认证等级 临时
+usersPersonalSchema.methods.getAuthLevelFromPhoto = async function() {
+  if(!this.mobile) return 0;
+  const {idCardA, idCardB, handheldIdCard} = await this.extendIdPhotos();
+  if(!(idCardA && idCardA.status === 'passed' && idCardB && idCardB.status === 'passed')) return 1;
+  if(!(handheldIdCard && handheldIdCard.status === 'passed')) return 2;
+  return 3;
 };
 
 usersPersonalSchema.methods.extendLifePhotos = async function() {
@@ -766,5 +786,26 @@ usersPersonalSchema.methods.rejectVerify3 = async function(message) {
 		}
 	});
 }
+
+/*
+* 更新动态码
+* */
+usersPersonalSchema.methods.getCode = async function() {
+  const {getRandomString} = require('../nkcModules/apiFunction');
+  const now = new Date();
+  let {t, c} = this.code;
+  if( // 动态码有效时间为 1 个小时
+    now.getTime() - new Date(t).getTime() > 60 * 60 * 1000
+  ) {
+    t = now;
+    c = getRandomString(`A0`, 6);
+    await this.updateOne({
+      $set: {
+        code: {t, c}
+      }
+    });
+  }
+  return c;
+};
 
 module.exports = mongoose.model('usersPersonal', usersPersonalSchema, 'usersPersonal');

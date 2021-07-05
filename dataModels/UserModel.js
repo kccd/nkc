@@ -2551,5 +2551,16 @@ userSchema.statics.getMessageBeep = async (uid, type) => {
   return beep;
 };
 
+
+/*
+* 获取用户动态码
+* @return {String} code
+* */
+userSchema.methods.getCode = async function() {
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const usersPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
+  return await usersPersonal.getCode();
+}
+
 module.exports = mongoose.model('users', userSchema);
 

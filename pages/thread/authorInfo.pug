@@ -29,7 +29,7 @@
     if author.column
       a(href=`/m/${author.column._id}` target='_blank').thread-author-link 专栏
     if data.user
-      a(href=`/message?uid=${author.uid}` target='_blank').thread-author-link 私信
+      a.pointer(onclick=`NKC.methods.toChat("${author.uid}")` target='_blank').thread-author-link 私信
     else
       a.pointer(onclick="NKC.methods.toLogin()").thread-author-link 私信
     if(data.userOperationsId.includes('bannedUser') && !author.certs.includes('banned'))

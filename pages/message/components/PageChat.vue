@@ -939,6 +939,10 @@
           this.audio.src = fileUrl;
           this.audio.play();
         }
+      },
+      reconnect() {
+        const {type, uid} = this;
+        this.init({type, uid});
       }
     }
   }

@@ -70,5 +70,34 @@ module.exports = {
     "getSmallPhoto",
     "visitForumBanner",
     "getMessageFile"
+  ],
+  whitelistOfVisitorLimit: [
+    'visitLogin',
+    'submitLogin',
+    'getRegisterCode',
+    'submitRegister',
+    'sendLoginMessage',
+    'getVerifications',
+    'registerSubscribe',
+    'sendRegisterMessage',
+    'sendGetBackPasswordMessage',
+    'sendPhoneMessage',
+
+    'visitFindPasswordByMobile', // 忘记密码相关
+    'visitFindPasswordByEmail',
+    'findPasswordVerifyMobile',
+    'modifyPasswordByMobile',
+    'findPasswordSendVerifyEmail',
+    'modifyPasswordByEmail',
+    'findPasswordVerifyEmail',
+
+    'visitAppDownload', // app 相关
+    'downloadApp',
+    'APPcheckout',
+
+    'rechargePost', // 支付相关
+    'receiveAliPayPaymentInfo',
+    'receiveWeChatPaymentInfo',
+    'fundDonation'
   ]
 }

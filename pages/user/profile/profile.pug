@@ -38,6 +38,7 @@ block content
               -const targetUserXSF = data.targetUser.xsf;
               include ../../publicModules/userScores
             .account-user-toc= `注册于${format(`YYYY/MM/DD HH:mm:ss`, data.targetUser.toc)}`
+            .account-code=`动态码：${data.code}`
             .account-user-links
               .account-user-links
                 a(href=`/u/${data.targetUser.uid}` target='_blank').col-xs-6.account-user-link

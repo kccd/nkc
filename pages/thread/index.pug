@@ -315,14 +315,25 @@ block content
               include ../publicModules/survey/form
           //- 被置顶的POST
           if data.toppedPosts && data.toppedPosts.length
-            div
-              .topped-post
+            .m-b-1
+              .panel-header
                 .fa.fa-thumb-tack &nbsp;
                 | 置顶回复
-            .m-b-1.p-a-0
-              include ./singlePost/singleToppedPost
-              for post in data.toopedPosts
-                +singleToppedPost(post)
+              div
+                include ./singlePost/singleToppedPost
+                for post in data.toopedPosts
+                  +singleToppedPost(post)
+          //- 高赞回复
+          if data.voteUpPosts && data.voteUpPosts.length
+            .m-b-1
+              .panel-header
+                .fa.fa-thumbs-up &nbsp;
+                | 高赞回复&nbsp;
+                span.fa.fa-question-circle-o(title=data.voteUpPostInfo onclick=`sweetInfo("${data.voteUpPostInfo}")`)
+              div
+                include ./singlePost/singlePostVoteUpPost
+                for post in data.voteUpPosts
+                  +singlePostVoteUpPost(post)
           //- 批量管理POST
           mixin managePosts
             .paging-button
