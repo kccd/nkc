@@ -255,6 +255,7 @@
     },
     methods: {
       initSocket(socketApp) {
+        const app = this;
         if(this.socketApp === socketApp) return;
         this.socketApp = socketApp;
         // 接收消息
@@ -283,7 +284,21 @@
         // 更新分组信息
         socketApp.on('updateCategoryList', updateCategoryList.bind(this));
 
+        socketApp.on('connect', () => {
+          const PageList = this.getPage('PageList');
+          const PageChat = this.getPage('PageChat');
+          if(PageList) {
+            PageList.reconnect();
+          }
+          if(PageChat) {
+            PageChat.reconnect();
+          }
+        });
+
         addSocketStatusChangedEvent(socketApp, this.setSocketStatus)
+      },
+      getPage(pageId) {
+        return this.$refs[this.pageId[pageId]];
       },
       setSocketStatus(data) {
         const {type, name} = data;

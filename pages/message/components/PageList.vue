@@ -448,21 +448,24 @@
       }
     },
     mounted() {
-      const app = this;
-      nkcAPI('/message/list', 'GET')
-        .then(data => {
-          const {mUser, chatList, userList, categoryList} = data;
-          app.chatListData = chatList;
-          app.userListData = userList;
-          app.categoryListData = categoryList;
-          app.mUser = mUser;
-        })
-        .catch(sweetError);
+      this.getList();
     },
     methods: {
       // 格式化时间
       setSocketStatus(socketStatus) {
         this.socketStatus = socketStatus;
+      },
+      getList() {
+        const app = this;
+        nkcAPI('/message/list', 'GET')
+          .then(data => {
+            const {mUser, chatList, userList, categoryList} = data;
+            app.chatListData = chatList;
+            app.userListData = userList;
+            app.categoryListData = categoryList;
+            app.mUser = mUser;
+          })
+          .catch(sweetError);
       },
       briefTime(time) {
         return briefTime(time);
@@ -599,6 +602,10 @@
           }
         }
         this.chatListData.unshift(chat);
+      },
+      // socket 重新连接后
+      reconnect() {
+        this.getList();
       }
     }
   }
