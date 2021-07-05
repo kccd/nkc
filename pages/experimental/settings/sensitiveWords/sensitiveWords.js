@@ -209,7 +209,7 @@ var app = new Vue({
       group.searchedWords.length = 0;
       if(!group.searchInputText) return;
       group.keywords.forEach(function(keyword) {
-        if(keyword.indexOf(el.value) !== -1) {
+        if(keyword.indexOf(el.value.toLowerCase()) !== -1) {
           group.searchedWords.push(keyword);
         }
       });
