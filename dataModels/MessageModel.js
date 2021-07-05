@@ -155,6 +155,7 @@ messageSchema.statics.getSystemLimitInfo = async (uid, tUid) => {
   if(userPostCount < postCount) {
     return limitInfo;
   }
+  return notLimitInfo;
 };
 
 /*
@@ -1656,6 +1657,7 @@ messageSchema.statics.extendMessages = async (messages) => {
             filename: file.oname,
             fileId: file._id,
             fileUrl: getUrl('messageResource', file._id),
+            fileUrlSM: getUrl(`messageResource`, file._id, `sm`),
             fileCover: getUrl('messageCover', file._id),
             fileSize: file.size,
             fileDuration: Math.round(file.duration / 1000)

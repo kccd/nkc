@@ -4,6 +4,7 @@ import {getScrollBarWidth, hasScrollBar} from "../lib/js/scrollBar";
 import {setAsDraggableElement} from "../lib/js/draggable";
 import {getFromLocalStorage, updateInLocalStorage, saveToLocalStorage} from "../lib/js/localStorage";
 import {debounce} from "../lib/js/execution";
+import {sleep} from "../lib/js/timeout";
 
 const messageAppId = '#messageApp';
 const socketContainer = '#socketContainer';
@@ -102,12 +103,13 @@ const messageApp = new Vue({
     this.updateNewMessageCount(newMessageCount);
   },
   watch: {
-    showPanel() {
+    async showPanel() {
       const app = this;
       if(this.showPanel) {
-        setTimeout(() => {
-          setAsDraggableElement(socketContainer, app.onContainerPositionChange);
-        })
+        await sleep(100);
+        setAsDraggableElement(socketContainer, app.onContainerPositionChange);
+        await sleep(100);
+        app.initSocketContainerMouseEvent();
       }
     },
     mode() {
@@ -117,6 +119,16 @@ const messageApp = new Vue({
   methods: {
     // 初始化 数据来源于本地或默认数据
     getUrl: NKC.methods.tools.getUrl,
+    initSocketContainerMouseEvent() {
+      const app = this;
+      const socketContainerElement = $(socketContainer);
+      socketContainerElement.on('mouseleave', () => {
+        app.onMouseLeave();
+      });
+      socketContainerElement.on('mouseover', () => {
+        app.onMouseOver();
+      });
+    },
     initContainer() {
       const {
         mode,

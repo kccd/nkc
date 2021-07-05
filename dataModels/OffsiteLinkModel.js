@@ -29,6 +29,16 @@ const schema = new Schema({
   isComplete: {
     type: Boolean,
     default: false
+  },
+  ip: {
+    type: String,
+    default: '',
+    index: 1
+  },
+  port: {
+    type: String,
+    default: '',
+    index: 1
   }
 });
 

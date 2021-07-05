@@ -52,7 +52,7 @@ class NKCRender {
     }
     if(type === "article") {
       // 文中的所有a标签
-      const links = $("a[target!='_blank']");
+      const links = $("a");
       for(let i = 0; i < links.length; i++) {
         const a = links.eq(i);
         const href = a.attr("href");

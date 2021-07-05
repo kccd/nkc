@@ -28,6 +28,8 @@ const altRouter = require('./alt');
 // 访问身份认证上传的材料
 const verifiedAssets = require("./verifiedAssets");
 
+const path = require('path');
+
 
 userRouter
   .get('/', async (ctx, next) => {
@@ -57,6 +59,19 @@ userRouter
     await data.targetUser.extendGrade();
     await data.targetUser.extendDraftCount();
     await db.UserModel.extendUserInfo(data.targetUser);
+    await next();
+  })
+  .use('/:uid', async (ctx, next) => {
+    const {data, db, state, nkcModules} = ctx;
+    const {user} = data;
+    if(!user) {
+      const visitSettings = await db.SettingModel.getSettings('visit');
+      if(visitSettings.userHomeLimitVisitor.status) {
+        data.description = nkcModules.nkcRender.plainEscape(visitSettings.userHomeLimitVisitor.description);
+        ctx.status = 401;
+        return ctx.body = nkcModules.render(path.resolve(__dirname, '../../pages/filter_visitor.pug'), data, state);
+      }
+    }
     await next();
   })
   .get("/:uid", async (ctx, next) => {

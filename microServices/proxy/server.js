@@ -91,7 +91,7 @@ httpsServer.on('upgrade', upgrade);
 function upgrade(req, socket, head) {
   const {host} = req.headers;
   const PS = httpsProxyServer[host] || httpProxyServer[host];
-  if(PS) {
+  if(PS && PS.type === 'proxy') {
     const server = getProxyServer(req, null, PS.servers, PS.socketServers, PS.httpBalanceType, PS.socketBalanceType);
     server.ws(req, socket, head);
   }

@@ -41,7 +41,8 @@ block content
         if data.category && data.category.description
           .col-xs-12.m-t-2
             +renderCategoryNav(data.column, data.categoriesNav, data.childCategories)
-            .column-category-abbr!=data.category.description
+            if data.categoryDescription
+              .column-category-abbr!=data.categoryDescription
         .col-xs-12.col-md-9.box-shadow-panel.m-t-1.p-r-0
           div.column-thread-list-container(
             style=`background-color: ${data.column.listColor}`
