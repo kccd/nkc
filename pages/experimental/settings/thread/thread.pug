@@ -106,7 +106,7 @@ block eContent
             label.col-sm-2.control-label 选取高赞回复数
             .col-sm-4
               input.form-control(type='text' v-model.number='settings.voteUpPost.selectedPostCount')
-              .text-danger.m-t-1 有超过 {{settings.voteUpPost.postCount}} 篇回复的点赞数 ≥{{settings.voteUpPost.voteUpCount}} 时，选取点赞数前 {{settings.voteUpPost.selectedPostCount}} 的回复
+              .text-danger.m-t-1 不小于 {{settings.voteUpPost.postCount}} 篇回复的点赞数 ≥{{settings.voteUpPost.voteUpCount}} 时，选取点赞数前 {{settings.voteUpPost.selectedPostCount}} 的回复
           .form-group
             label.col-sm-2.control-label
             .col-sm-10
