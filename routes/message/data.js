@@ -96,8 +96,7 @@ router
       }
       // await db.MessageModel.updateMany({ty: 'STU', r: user.uid, vd: false}, {$set: {vd: true}});
       const remind = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
-      const messages = await db.MessageModel.extendSTUMessages(remind);
-      data.messages = messages.reverse();
+      data.messages = remind.reverse();
       data.tUser = {
         icon: '/statics/message_type/STU.jpg',
         name: '应用提醒',
