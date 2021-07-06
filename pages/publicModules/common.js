@@ -994,12 +994,15 @@ NKC.methods.isPcBrowser = function() {
 }*/
 
 const windowDataDom = document.querySelector('meta[name="window-data"]');
-const windowData = NKC.methods.strToObj(windowDataDom.getAttribute('content'));
-NKC.configs.uid = windowData.uid;
-NKC.configs.isApp = windowData.isApp;
-NKC.configs.appOS = windowData.appOS;
-NKC.configs.platform = windowData.platform;
-NKC.configs.selectTypesWhenSubscribe = windowData.selectTypesWhenSubscribe;
-NKC.configs.refererOperationId = windowData.refererOperationId;
-NKC.configs.newMessageCount = windowData.newMessageCount || 0;
+if(windowDataDom) {
+  const windowData = NKC.methods.strToObj(windowDataDom.getAttribute('content'));
+  NKC.configs.uid = windowData.uid;
+  NKC.configs.isApp = windowData.isApp;
+  NKC.configs.appOS = windowData.appOS;
+  NKC.configs.platform = windowData.platform;
+  NKC.configs.selectTypesWhenSubscribe = windowData.selectTypesWhenSubscribe;
+  NKC.configs.refererOperationId = windowData.refererOperationId;
+  NKC.configs.newMessageCount = windowData.newMessageCount || 0;
+}
+
 window.NKC = NKC;

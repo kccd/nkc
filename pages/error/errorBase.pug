@@ -34,11 +34,12 @@ block body
           a(href="/") 网站首页
           | &nbsp;&nbsp;&nbsp;
           a(onclick="history.back(-1)") 返回上一页
-  +includeJS('/Promise/promise.min.js')
-  +includeJS('/jquery/jquery-1.11.1.js')
-  +includeJS('/bootstrap/js/bootstrap.min.js')
-  +includeJS('/vue/dist/vue.js')
+  if process.env.NODE_ENV === "production"
+    +includeJS("/external_pkgs/vue.min.js", true)
+  else
+    +includeJS("/external_pkgs/vue.js", true)
   +includeJS("/publicModules/common.js")
+  +includeJS('/bootstrap/js/bootstrap.min.js')
   if state.isApp && state.platform === 'apiCloud'
     script!=`NKC.configs.isApp = true;NKC.configs.appOS="${state.appOS}";`
     +includeJS("/appAPi/app.js")
