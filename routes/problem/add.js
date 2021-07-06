@@ -35,8 +35,8 @@ addRouter
 		const {checkString} = nkcModules.checkData;
 		checkString(title, {
 			name: '标题',
-			minLength: 1,
-			maxLength: 100,
+			minLength: 0,
+			maxLength: 500,
 		});
 		checkString(content, {
 			name: '详细内容',
@@ -73,7 +73,7 @@ addRouter
 		const _id = await db.SettingModel.operateSystemID('problems', 1);
 		const obj = {
       _id,
-      t: title,
+      t: title? title: content.slice(0, 20),
       c: content,
       QQ: qq,
       email,

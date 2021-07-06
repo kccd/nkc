@@ -145,8 +145,8 @@ block scripts
             .then(function() {
               self.checkString(self.title, {
                 name: '标题',
-                minLength: 1,
-                maxLength: 100,
+                minLength: 0,
+                maxLength: 500,
               });
               self.checkString(self.content, {
                 name: '详细内容',
