@@ -75,7 +75,7 @@ block content
               .col-xs-12.col-md-6.text-center
                 h5(v-if="authenticate.video.status === 'unsubmit'") 代码：{{videoCode}}
                 .center-block.idcard-video
-                  video(:src="video" controls v-if="videoInputFile || (authenticate.video.attachments.length && ['in_review', 'passed'].includes(authenticate.video.status))")
+                  video(:src="video" controls v-if="videoInputFile || (authenticate.video.attachments.length && ['in_review', 'passed', 'fail'].includes(authenticate.video.status))")
                 br
                 div(v-if="authenticate.video.status === 'unsubmit'")
                   input.hidden(type='file' accept="video/mp4" ref="videoInput" @change="videoInputFile = $event.target.files[0]")
