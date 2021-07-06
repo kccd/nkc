@@ -89,7 +89,7 @@ userRouter
     await targetUser.extendGrade();
     data.targetUser = targetUser;
     if(ctx.permission('viewUserCode')) {
-      data.targetUserCode = await targetUser.getCode();
+      data.targetUserCodes = await targetUser.getCode();
     }
 
     // 用户积分
