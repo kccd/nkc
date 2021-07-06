@@ -4,11 +4,8 @@ testRouter
     ctx.template = "test/test.pug";
     await next();
   })
-  .get("/home", async (ctx, next) => {
-    ctx.template = "home/home_all.pug";
-    await next();
-  })
-  .put('/', async (ctx, next) => {
+  .get("/demo", async (ctx, next) => {
+    ctx.template = "demo/index.pug";
     await next();
   });
 
