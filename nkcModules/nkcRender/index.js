@@ -57,7 +57,7 @@ class NKCRender {
         const a = links.eq(i);
         const href = a.attr("href");
         // 外链在新标签页打开
-        if(!linkReg.test(href)) {
+        if(href && !linkReg.test(href)) {
           a.attr("target", "_blank");
           // 通过提示页代理外链的访问
           const byteArray = new Uint8Array(href.split("").map(char => char.charCodeAt(0)));
