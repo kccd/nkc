@@ -11,6 +11,7 @@ const moment = require('moment');
 const PATH = require('path');
 const attachmentConfig = require("../config/attachment.json");
 const mkdirp = require("mkdirp");
+const mongoose = require("mongoose");
 
 const pictureExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif", "webp"];
 const videoExtensions = ["mp4", "mov", "3gp", "avi", 'webm'];
@@ -237,7 +238,7 @@ exports.deleteColumnBanner = async (columnId) => {
 * @param {File} file 文件对象
  */
 func.saveUserAvatar$2 = async (uid, file) => {
-  const AM = db.AttachmentModel;
+  const AM = mongoose.model("attachments");
   const user = await UserModel.findOnly({uid});
   if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
   const ext = await func.getFileExtension(file, ['png', 'jpg', 'jpeg']);
