@@ -1,5 +1,4 @@
 const path = require("path");
-const UsersPersonalModel = require("../../../dataModels/UsersPersonalModel");
 const Router = require('koa-router');
 
 const verifyRouter = new Router();
@@ -8,7 +7,7 @@ verifyRouter
     const {db, data} = ctx;
     data.selected = "verify";
     const {user} = data;
-    const userPersonal = await UsersPersonalModel.findOnly({uid: user.uid});
+    const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
     data.boundMobile = !!userPersonal.mobile;
     const authenticate = userPersonal.authenticate;
     if(authenticate.card.status === "passed" && authenticate.card.expiryDate.getTime() < Date.now()) {
@@ -32,7 +31,7 @@ verifyRouter
     const { user } = data;
     const { files } = body;
     const { surfaceA, surfaceB } = files;
-    const userPersonal = await UsersPersonalModel.findOne({ uid: user.uid });
+    const userPersonal = await db.UsersPersonalModel.findOne({ uid: user.uid });
     if(await userPersonal.getAuthLevel() < 1) {
 			ctx.throw("身份认证1、2、3需要按顺序依次通过认证，请先完成身份认证1");
 		}
@@ -49,7 +48,7 @@ verifyRouter
     const file = files.video;
     const code = fields.code;
     // 生成验证信息记录，状态置为审核中
-    const userPersonal = await UsersPersonalModel.findOne({ uid: user.uid });
+    const userPersonal = await db.UsersPersonalModel.findOne({ uid: user.uid });
     if(await userPersonal.getAuthLevel() < 2) {
 			ctx.throw("身份认证1、2、3需要按顺序依次通过认证，请先完成身份认证2");
 		}
