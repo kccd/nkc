@@ -306,7 +306,7 @@ router
         data.visitSelfLogs.push(log);
       }
     }
-    data.code = await targetUser.getCode();
+    data.code = await db.UserModel.getCode(targetUser.uid);
     data.code = data.code.pop();
     // data.numberOfOtherUserOperation = await db.UserModel.getNumberOfOtherUserOperation(targetUser.uid);
     await next();

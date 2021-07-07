@@ -14,6 +14,7 @@ const profileRouter = require("./profile");
 const transferRouter = require("./transfer");
 const myProblemsRouter = require("./myProblems");
 const destroyRouter = require("./destroy");
+const codeRouter = require('./code');
 // 违规记录
 const violationRouter = require("./violationRecord");
 const userRouter = new Router();
@@ -88,9 +89,6 @@ userRouter
     const targetUser = await db.UserModel.findById(uid);
     await targetUser.extendGrade();
     data.targetUser = targetUser;
-    if(ctx.permission('viewUserCode')) {
-      data.targetUserCodes = await targetUser.getCode();
-    }
 
     // 用户积分
     if(ctx.permission('viewUserScores')) {
@@ -550,5 +548,6 @@ userRouter
   .use("/:uid/forum", forumRouter.routes(), forumRouter.allowedMethods())
   .use("/:uid/phoneVerify", phoneVerifyRouter.routes(), phoneVerifyRouter.allowedMethods())
   .use("/:uid/alt", altRouter.routes(), altRouter.allowedMethods())
+  .use("/:uid/code", codeRouter.routes(), codeRouter.allowedMethods())
   .use("/:uid/verifiedAssets", verifiedAssets.routes(), verifiedAssets.allowedMethods());
 module.exports = userRouter;

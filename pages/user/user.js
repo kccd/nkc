@@ -1,3 +1,5 @@
+const data = NKC.methods.getDataById('data');
+
 window.checkbox = undefined;
 window.checkboxBody = undefined;
 window.SubscribeTypes = undefined;
@@ -96,8 +98,22 @@ function hideUserHome(isHidden, uid) {
     .then(function() {location.reload()});
 }
 
+function checkUserCode() {
+  return sweetPrompt('请输入验证码')
+    .then(code => {
+      return nkcAPI(`/u/${data.uid}/code`, 'POST', {code})
+    })
+    .then(() => {
+      sweetSuccess('验证通过');
+    })
+    .catch(err => {
+      sweetError(err);
+    });
+}
+
 Object.assign(window, {
   managementPosts,
+  checkUserCode,
   selectAll,
   toColumn,
   clearUserInfo,

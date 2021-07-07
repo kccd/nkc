@@ -5,6 +5,7 @@ block title
   title=`${data.targetUser.username || data.targetUser.uid}的主页 - ${state.serverSettings.websiteName}`
   +includeCSS("/user/user.css")
 block content
+  #data.hidden=objToStr({uid: data.targetUser.uid})
   .container-fluid.max-width
     include ../publicModules/mobile_drawer/mobile_drawer
     .row
@@ -108,10 +109,6 @@ block content
             else
               span!=markdown_safe(data.targetUser.description || "")
           .user-register.p-b-1=`${format("YYYY/MM/DD", data.targetUser.toc)}注册，${fromNow(data.targetUser.tlv)}活动`
-        if data.targetUserCodes && data.targetUserCodes.length
-          .m-b-1
-            .panel-header 动态码
-            .user-code=data.targetUserCodes
         if data.targetUser.column
           .user-column.m-b-1
             .panel-header 专栏
@@ -128,14 +125,18 @@ block content
               -const forumsItem = data.targetUserSubForums;
               .user-card-sub-div
                 include ../publicModules/forums_nav/forums_item
-          if permissionsOr(["visitUserTransaction", 'getUserOtherAccount'])
+          if permissionsOr(['violationRecord', "visitUserTransaction", 'getUserOtherAccount', 'viewUserCode'])
             .panel-header 管理
             .m-b-2
               .user-card-sub-div
-                a(href=`/u/${data.targetUser.uid}/transaction` target="_blank").btn.btn-default.btn-sm 查看地址
-                button.btn.btn-default.btn-sm(onclick=`NKC.modules.violationRecord.open({uid:'${data.targetUser.uid}'})`) 违规信息
+                if permission('visitUserTransaction')
+                  a(href=`/u/${data.targetUser.uid}/transaction` target="_blank").btn.btn-default.btn-sm.m-b-05 查看地址
+                if permission('violationRecord')
+                  button.m-b-05.btn.btn-default.btn-sm(onclick=`NKC.modules.violationRecord.open({uid:'${data.targetUser.uid}'})`) 违规信息
                 if permission('getUserOtherAccount')
-                  a(href=`/u/${data.targetUser.uid}/alt` target="_blank").btn.btn-default.btn-sm 查马甲
+                  a(href=`/u/${data.targetUser.uid}/alt` target="_blank").btn.btn-default.btn-sm.m-b-05 查马甲
+                if permission('viewUserCode')
+                  button.m-b-05.btn.btn-default.btn-sm(onclick=`checkUserCode()`) 验证动态码
           .m-b-1.row
             include ../publicModules/share/user-card
           if data.user &&  data.user.uid !== data.targetUser.uid

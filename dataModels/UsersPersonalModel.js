@@ -361,8 +361,8 @@ const usersPersonalSchema = new Schema({
       default: null,
     },
     c: { // 动态码的内容
-      type: String,
-      default: ''
+      type: [String],
+      default: []
     }
   }
 },
@@ -787,33 +787,8 @@ usersPersonalSchema.methods.rejectVerify3 = async function(message) {
 	});
 }
 
-/*
-* 更新动态码 并获取最新的动态码
-* */
-usersPersonalSchema.methods.getCode = async function() {
-  const {getRandomString} = require('../nkcModules/apiFunction');
-  const now = new Date();
-  let {t, c} = this.code;
-  t = t || new Date(0);
-  c = c.split('-').filter(i => !!i);
-  if( // 动态码有效时间为 1 个小时
-    (now.getTime() - new Date(t).getTime()) > 60 * 60 * 1000
-  ) {
-    t = now;
-    const newCode = getRandomString(`0`, 6);
-    c.push(newCode);
-    c = c.slice(-2);
-    await this.updateOne({
-      $set: {
-        code: {
-          t,
-          c: c.join('-')
-        }
-      }
-    });
-  }
-  return c;
-};
+
+
 
 /*
 * 获取上一个动态码
