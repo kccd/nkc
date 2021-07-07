@@ -17,11 +17,8 @@ const vm = new Vue({
 			if(this.IDCardAInputFile) {
 				return URL.createObjectURL(this.IDCardAInputFile);
 			}
-			if(this.authenticate.card.status === "fail") {
-				return DEFAULT_IMAGE;
-			}
 			const vid = this.authenticate.card.attachments[0];
-			return vid && ["in_review", "passed"].includes(this.authenticate.card.status)
+			return vid && ["in_review", "passed", "fail"].includes(this.authenticate.card.status)
 				? `/u/${UID}/verifiedAssets/${vid}`
 				: DEFAULT_IMAGE;
 		},
@@ -29,11 +26,8 @@ const vm = new Vue({
 			if(this.IDCardBInputFile) {
 				return URL.createObjectURL(this.IDCardBInputFile);
 			}
-			if(this.authenticate.card.status === "fail") {
-				return DEFAULT_IMAGE;
-			}
 			const vid = this.authenticate.card.attachments[1];
-			return vid && ["in_review", "passed"].includes(this.authenticate.card.status)
+			return vid && ["in_review", "passed", "fail"].includes(this.authenticate.card.status)
 				? `/u/${UID}/verifiedAssets/${vid}`
 				: DEFAULT_IMAGE;
 		},
@@ -47,7 +41,7 @@ const vm = new Vue({
 				return URL.createObjectURL(videoInputFile);
 			}
 			const vid = this.authenticate.video.attachments[0];
-			return vid && ["in_review", "passed"].includes(this.authenticate.video.status)
+			return vid && ["in_review", "passed", "fail"].includes(this.authenticate.video.status)
 				? `/u/${UID}/verifiedAssets/${vid}`
 				: DEFAULT_IMAGE;
 		},
