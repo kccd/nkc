@@ -9,7 +9,7 @@ const func = {};
 func.getPrivateKey = async () => {
   const privateKeyPath = wechatPayConfigs.certFilePath;
   if(await FILE.access(privateKeyPath)) {
-    return await fs.promises.readFile(privateKeyPath).toString();
+    return (await fs.promises.readFile(privateKeyPath)).toString();
   } else {
     throwErr(500, `微信证书不存在`);
   }
@@ -76,6 +76,7 @@ func.getHeaderAuthInfo = async (url, method, data) => {
   const sign = crypto.createSign('RSA-SHA256');
   sign.update(Buffer.from(content, 'utf-8'));
   const privateKey = await func.getPrivateKey();
+  console.log(privateKey);
   const signBase64 = sign.sign(privateKey, 'base64');
 
   return (`WECHATPAY2-SHA256-RSA2048 mchid="${wechatPayConfigs.mchId}"` +

@@ -384,7 +384,10 @@ module.exports = {
 		},
 		emailcode: {
 			GET: "viewEmailcodeRecord"
-		}
+		},
+		userCode: {
+		  GET: 'experimentalUserCodeLog'
+    }
 	},
   console: {
 	  GET: 'visitExperimentalConsole'

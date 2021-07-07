@@ -1,0 +1,47 @@
+extends ../experimental
+
+block eTitle
+  title 用户动态码
+  style.
+    .user-sm-avatar{
+      height: 1.6rem;
+      width: 1.6rem;
+      border-radius: 50%;
+      margin-right: 0.2rem;
+    }
+block eContent
+  #data.hidden=objToStr({usersCodeLogs: data.usersCodeLogs})
+  .container-fluid.max-width.orders
+    .row
+      .col-xs-12.col-md-12#app(v-cloak)
+        .table-responsive
+          include ../../publicModules/paging/paging
+          table.table.table-bordered
+            thead
+              tr
+                th 时间
+                th 操作者
+                th 待验证动态码
+                th 目标用户
+                th 目标用户动态码
+                th 结果
+            tbody
+              tr(v-for='log in usersCodeLogs')
+                th {{detailedTime(log.toc)}}
+                th
+                  div(v-if='log.mUser')
+                    img.user-sm-avatar(:src='getUrl("userAvatar", log.mUser.avatar)')
+                    a(:href='getUrl("userHome", log.mUid)') {{log.mUser.username}}
+                th {{log.mCode}}
+                th
+                  div(v-if='log.user')
+                    img.user-sm-avatar(:src='getUrl("userAvatar", log.user.avatar)')
+                    a(:href='getUrl("userHome", log.uid)') {{log.user.username}}
+                th {{log.code.join(', ')}}
+                th
+                  span.text-danger(v-if='!log.status') 无效
+                  span.text-success(v-else) 有效
+          include ../../publicModules/paging/paging_input
+          .text-center.p-t-1.p-b-1(v-if='usersCodeLogs.length === 0') 空空如也~
+block scripts
+  +includeJS('/experimental/log/userCode.js')

@@ -75,7 +75,7 @@ const Wrapper = styled.div`
       margin-bottom: 12px;
     }
     .info {
-      white-space: pre;
+      white-space: pre-wrap;
     }
   }
   .actions {

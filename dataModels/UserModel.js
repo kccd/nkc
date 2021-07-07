@@ -2551,15 +2551,46 @@ userSchema.statics.getMessageBeep = async (uid, type) => {
   return beep;
 };
 
-
 /*
 * 获取用户动态码
 * @return {String} code
 * */
-userSchema.methods.getCode = async function() {
+userSchema.statics.getCode = async (uid) => {
   const UsersPersonalModel = mongoose.model('usersPersonal');
-  const usersPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
-  return await usersPersonal.getCode();
+  const {getRandomString} = require('../nkcModules/apiFunction');
+  const usersPersonal = await UsersPersonalModel.findOne({uid}, {code: 1});
+  const now = new Date();
+  let {t, c = []} = usersPersonal.code;
+  t = t || new Date(0);
+  if( // 动态码有效时间为 12 个小时
+    (now.getTime() - new Date(t).getTime()) > 12 * 60 * 60 * 1000
+  ) {
+    t = now;
+    const newCode = getRandomString(`0`, 6);
+    c.push(newCode);
+    c = c.slice(-4);
+    await UsersPersonalModel.updateOne({uid}, {
+      $set: {
+        code: {
+          t,
+          c
+        }
+      }
+    });
+  }
+  return c;
+};
+
+
+/*
+* 验证用户的验证码
+* @param {String} code
+* @return {Boolean} 是否有效
+* */
+userSchema.statics.checkCode = async (uid, code) => {
+  const UserModel = mongoose.model('users');
+  const codes = await UserModel.getCode(uid);
+  return codes.includes(code);
 }
 
 module.exports = mongoose.model('users', userSchema);
