@@ -99,7 +99,7 @@ function hideUserHome(isHidden, uid) {
 }
 
 function checkUserCode() {
-  return sweetPrompt('请输入验证码')
+  return sweetPrompt('请输入动态码')
     .then(code => {
       return nkcAPI(`/u/${data.uid}/code`, 'POST', {code})
     })
