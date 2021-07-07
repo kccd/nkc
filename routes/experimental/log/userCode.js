@@ -4,7 +4,7 @@ router
     const {nkcModules, query, db, data} = ctx;
     const {page = 0} = query;
     const count = await db.UsersCodeLogModel.countDocuments({});
-    const paging = nkcModules.apiFunction.paging(page, count, 2);
+    const paging = nkcModules.apiFunction.paging(page, count);
     const usersCodeLogs = await db.UsersCodeLogModel.find({}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     const usersId = [];
     for(const log of usersCodeLogs) {
