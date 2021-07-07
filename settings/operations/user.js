@@ -240,6 +240,9 @@ module.exports = {
 		},
 		alt: {
 			GET: 'getUserOtherAccount'
-		}
+		},
+    code: {
+		  POST: 'viewUserCode'
+    }
 	}
 };

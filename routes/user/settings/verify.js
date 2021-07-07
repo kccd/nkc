@@ -27,7 +27,7 @@ verifyRouter
     await next();
   })
   .post("/verify2_form", async (ctx, next) => {
-    const { data, body } = ctx;
+    const { data, body, db} = ctx;
     const { user } = data;
     const { files } = body;
     const { surfaceA, surfaceB } = files;
@@ -42,7 +42,7 @@ verifyRouter
     return next();
   })
   .post("/verify3_form", async (ctx, next) => {
-    const { data, body } = ctx;
+    const { data, body, db} = ctx;
     const { user } = data;
     const { files, fields } = body;
     const file = files.video;
