@@ -139,6 +139,9 @@ var Tools = function() {
       case 'messageTone': {
         return "/default/message.wav";
       }
+      case 'fundHome': {
+        return "/fund/list/" + id
+      }
     }
   };
   self.getAnonymousInfo = function() {

@@ -1,0 +1,48 @@
+extends ../../bootstrap_base
+block title
+  title 基金设置
+block content
+  #data.hidden=objToStr({fund: data.fund})
+  .container-fluid.max-width
+    .row#app(v-cloak)
+      .col-xs-12.col-md-3.box-shadow-panel
+        div 基金列表
+      .col-xs-12.col-md-9.box-shadow-panel
+        .form.form-horizontal
+          h3.m-b-2 基本信息
+          .form-group
+            label.control-label.col-sm-2 编号
+            .col-sm-8
+              input.form-control(type='text' v-model.trim='fund._id')
+          .form-group
+            label.control-label.col-sm-2 名称
+            .col-sm-8
+              input.form-control(type='text' v-model.trim='fund.name')
+          .form-group
+            label.control-label.col-sm-2 金额
+            .col-sm-8
+              .radio
+                label.m-r-1
+                  input(type='radio' value='')
+              input.form-control(type='text' v-model.trim='fund.name')
+          .form-group
+            label.control-label.col-sm-2 简介
+            .col-sm-8
+              textarea.form-control(v-model.trim='fund.description.brief' rows=8)
+          .form-group
+            label.control-label.col-sm-2 说明
+            .col-sm-8
+              textarea.form-control(v-model.trim='fund.description.detailed' rows=8)
+          .form-group
+            label.control-label.col-sm-2 条款
+            .col-sm-8
+              textarea.form-control(v-model.trim='fund.description.terms' rows=8)
+
+          h3.m-b-2
+
+          .form-group
+            label.control-label.col-sm-2 条款
+            .col-sm-8
+              textarea.form-control(v-model.trim='fund.description.terms' rows=8)
+block scripts
+  +includeJS('/fund/list/settings.js')

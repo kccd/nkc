@@ -3,10 +3,6 @@ module.exports = {
 	add: {
 		GET: 'visitAddFund'
 	},
-	settings: {
-		GET: 'visitFundSettings',
-		PUT: 'modifyFundSettings'
-	},
 	info: {
 		GET: 'visitFundInfo'
 	},

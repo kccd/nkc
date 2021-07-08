@@ -2,66 +2,89 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundSchema = new Schema({
+  // 基金编号
   _id: String,
+  // 创建时间
   toc: {
     type: Date,
     default: Date.now,
     index: 1 
   },
+  // 最后操作时间
   tlm: {
     type: Date,
     index: 1
   },
+  // 基金名称
   name: {
     type: String,
-    default: '科创基金',
+    required: true,
     index: 1
   },
+  // 基金头像
+  avatar: {
+    type: String,
+    default: '',
+  },
+  // 基金背景
+  banner: {
+    type: String,
+    default: '',
+  },
+  /*// 基金图片
 	image: {
+    // 小图
   	logo: {
-		  type: Number,
-		  default: null,
+		  type: String,
+		  default: '',
 		  index: 1
 	  },
+    // 大图
 		banner: {
-			type: Number,
-			default: null,
+			type: String,
+			default: '',
 			index: 1
 		}
-	},
+	},*/
+  // 颜色
 	color: {
 		type: String,
 		default: '#7f9eb2'
 	},
+  // 基金金额
 	money: {
-  	/*initial: {
-  		type: Number,
-		  required: true
-	  },*/
-		fixed: {
-  		type: Number,
-			default: null
-		},
-		max: {
-			type: Number,
-			default: null
-		}
+    // 是否为固定金额
+    fixed: {
+      type: Boolean,
+      default: false,
+    },
+    // 固定金额时此字段表示固定的金额值
+    // 非固定金额时此字段表示允许金额的最大值
+    value: {
+      type: Number,
+      default: 0
+    }
 	},
+  // 介绍相关
   description: {
+    // 基金简介
     brief: {
     	type: String,
 	    required: true,
 	    maxlength: [100, '基金简介字数不能大于100']
     },
+    // 基金说明
 	  detailed: {
     	type: String,
 		  required: true
 	  },
+    // 基金协议
 	  terms: {
     	type: String,
 		  required: true
 	  }
   },
+  //
   reminder: {
     inputUserInfo: {
       type: String,
@@ -72,27 +95,31 @@ const fundSchema = new Schema({
       default: ""
     }
   },
+  // 是否基金显示入口
 	display: {
     type: Boolean,
     default: true,
 		index: 1
   },
+  // 是否允许申请
 	canApply: {
 		type: Boolean,
 		default: true,
 		index: 1
 	},
+  // 审核方式 person: 人工审核, system: 系统审核
 	auditType: {
 		type: String, // person, system
 		default: 'person',
 		index: 1
 	},
-	//设为历史基金
+	// 是否被设为了历史基金
 	history: {
 		type: Boolean,
 		default: false,
 		index: 1
 	},
+  // 是否被屏蔽
 	disabled: {
   	type: Boolean,
 		default: false,
@@ -170,50 +197,69 @@ const fundSchema = new Schema({
 			index: 1
 		}
 	},
+  // 申请时需附带的文章
 	thread: {
+    // 文章最少篇数
 		count: {
 			type: Number,
 			default: 0
 		},
 	},
+  // 申请时需附带的论文数（暂无论文系统，此字段未使用）
 	paper: {
+    // 论文是否通过
 		passed: {
 			type: Boolean,
 			default: false
 		},
+    // 论文最少篇数
 		count: {
 			type: Number,
 			default: 0
 		}
 	},
+  // 与申请人相关的设置
   applicant: {
+    // 申请人最小用户等级
     userLevel: {
       type: Number,
       default: 0
     },
+    // 最小回复数
     postCount: {
       type: Number,
       default: 0
     },
+    // 最小文章数
     threadCount: {
       type: Number,
       default: 0
     },
+    // 最小注册天数
     timeToRegister: {
       type: Number,
       default: 0
     },
+    // 申请人最小身份认证等级
 	  authLevel: {
     	type: Number,
 		  default: 1
 	  }
   },
+  // 组员设置
 	member: {
+    // 组员最小身份认证等级
 		authLevel: {
 			type: Number,
 			default: 1
 		}
 	},
+  // 申请方式
+  applicantType: {
+    type: [String],
+    default: ['personal', 'team'], // personal: 个人申请, team: 团队申请
+  },
+  /* 申请方式（此字段已废弃）
 	applicationMethod: {
   	personal: {
   		type: Boolean,
@@ -225,7 +271,7 @@ const fundSchema = new Schema({
 			default: null,
 			index: 1
 		}
-	},
+	},*/
 	detailedProject: {// 详细的项目内容
 		type: Boolean,
 		default: true
@@ -234,33 +280,35 @@ const fundSchema = new Schema({
 		type: Number,
 		default: 10
 	},
+  // 好友支持数，满足之后才能进入审核流程
 	supportCount: {
 		type: Number,
 		default: 0
 	},
+  // 示众天数 暂时未启用
   timeOfPublicity: {
     type: Number,
     default: 0
   },
+  // 允许修改的最大次数
   modifyCount: {
     type: Number,
     default: 5
   },
+  // 基金互斥相关
 	conflict: {
+    // 是否与自己互斥
+    // 如果此字段为 true，且用户申请的此基金尚未结题，则用户不能再申请当前基金
   	self: {
   		type: Boolean,
 		  default: false
 	  },
+    // 是否与其他互斥
+    // 如果此字段为 true，且用户申请了此字段也为 true 的其他基金并且尚未结题，则用户不能再申请当前基金
 		other: {
   		type: Boolean,
 			default: false
 		}
-  	// all: 与所有conflict=all的互斥,
-		// self: 仅仅与自己互斥,
-		// null: 不存在互斥
-		// type: String,
-		// required: true,
-		// index: 1
 	}
 }, {
 	toObject: {

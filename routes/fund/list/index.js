@@ -28,6 +28,12 @@ listRouter
 		data.fund = newFund;
 		await next();
 	})
+  .use('/:fundId', async (ctx, next) => {
+    const {params, db, data} = ctx;
+    const {fundId} = params;
+    data.fund = await db.FundModel.findOnly({_id: fundId.toUpperCase()});
+    await next();
+  })
 	// 修改基金项目
 	.put('/:fundId', async (ctx, next) => {
 		const {data, db} = ctx;

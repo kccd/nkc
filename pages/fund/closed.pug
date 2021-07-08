@@ -1,0 +1,19 @@
+extends ../bootstrap_base
+block title
+  title=data.fundSettings.fundName
+  style.
+    .content-container{
+      margin: auto;
+      width: 60rem;
+      max-width: 100%;
+      font-size: 15px;
+      min-height: 50rem;
+      line-height: 24px;
+    }
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.box-shadow-panel
+        .content-container
+          h2.title.text-center.m-b-2=`${data.fundSettings.fundName}临时关闭`
+          div!=markdown_safe(data.fundSettings.closed.reason)

@@ -5,57 +5,29 @@ const listRouter = require('./list/index');
 const meRouter = require('./me');
 const disabledRouter = require('./disabled');
 const infoRouter = require('./info');
-const settingsRouter = require('./settings');
 const billsRouter = require('./bills');
 const billRouter = require('./bill');
 const donationRouter = require('./donation');
 const historyRouter = require('./history');
 const unSubmitRouter = require('./unSubmit');
 const giveUpRouter = require('./giveUp');
+const path = require('path');
 fundRouter
 	//检测科创基金是否开放
 	.use('/', async (ctx, next) => {
-		const {data, db} = ctx;
-		const fundSettings = await db.SettingModel.findOne({_id: 'fund'});
-		data.fundSettings = fundSettings.c;
-		if(!fundSettings) {
-			const newSettings = db.SettingModel({
-				type: 'fund',
-				description: '这是基金介绍',
-				terms: '这是科创基金总条款',
-				money: 0,
-				readOnly: false,
-				closed: {
-					status: false,
-					reason: '这是关闭原因',
-					openingHours: Date.now(),
-					closingTime: Date.now(),
-					uid: '10',
-					username: '虎哥'
-				}
-			});
-			await newSettings.save();
-			await next();
-		} else {
-			if(ctx.url === '/fund/settings') {
-				await next();
-			} else {
-				if(fundSettings.c.closed.status) {
-					ctx.template = 'interface_fund_closed.pug';
-					data.fundSettings = fundSettings.c;
-					data.error = '抱歉！科创基金已被临时关闭。';
-					const body = require('../../middlewares/body');
-					await body(ctx, ()=>{});
-				} else if(fundSettings.c.readOnly) {
-					if(ctx.method !== 'GET') {
-						ctx.throw(403,'抱歉！科创基金现在处于只读模式。');
-					}
-					await next();
-				} else {
-					await next();
-				}
-			}
-		}
+		const {data, db, nkcModules, state} = ctx;
+		const fundSettings = await db.SettingModel.getSettings('fund');
+    data.fundSettings = fundSettings;
+		if(!fundSettings.enableFund) { // 已关闭
+		  ctx.throw(403, `${fundSettings.fundName}已关闭`);
+    } else if(fundSettings.closed.status) { // 临时关闭
+      return ctx.body = nkcModules.render(path.resolve(__dirname, '../../pages/fund/closed.pug'), data, state);
+    } else if(fundSettings.readOnly) { // 只读模式
+      if(ctx.method !== 'GET') {
+        ctx.throw(403, `${fundSettings.fundName}现已开启只读模式`);
+      }
+    }
+    await next();
 	})
 
 	//加载基金申请邀请通知数
@@ -73,7 +45,6 @@ fundRouter
 			}));
 		}
 		data.fundNotify = newNotify;
-		data.navbar_highlight = 'fund';
     await next();
 	})
   .get('/', async (ctx, next) => {
@@ -176,7 +147,8 @@ fundRouter
 			donationUsers = donationUsers.slice(0, 6);
 		}
 		data.donationUsers = donationUsers;
-    ctx.template = 'interface_fund.pug';
+		// ctx.template = 'fund/fundHome.pug';
+    ctx.template = 'fund/home.pug';
     await next();
   })
 	// 新建基金
@@ -199,7 +171,6 @@ fundRouter
   .use('/a', applicationRouter.routes(), applicationRouter.allowedMethods())
 	.use('/me', meRouter.routes(), meRouter.allowedMethods())
 	.use('/info', infoRouter.routes(), infoRouter.allowedMethods())
-	.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
 	.use('/bills', billsRouter.routes(), billsRouter.allowedMethods())
 	.use('/bill', billRouter.routes(), billRouter.allowedMethods())
 	.use('/donation', donationRouter.routes(), donationRouter.allowedMethods())

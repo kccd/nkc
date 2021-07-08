@@ -9,11 +9,9 @@ module.exports = {
     readOnly: false,
     closed: {
       status: false,
-      openingHours: Date.now(),
       reason: '关闭原因',
       uid: '',
-      username: '',
-      closingTime: Date.now()
+      closingTime: new Date()
     },
     donationDescription: '赞助说明',
     fundPoolDescription: '资金池介绍'

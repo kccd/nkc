@@ -307,7 +307,11 @@ module.exports = {
 		},
 		sensitiveWords: {
 			GET: "sensitiveWords"
-		}
+		},
+    fund: {
+	    GET: 'experimentalFundSettings',
+      PUT: 'experimentalFundSettings'
+    }
 	},
 	systemInfo: {
 		GET: 'visitSystemInfo',
