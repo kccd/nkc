@@ -55,19 +55,19 @@ new Vue({
 	computed: {
 		IDCardA() {
 			const vid = this.authenticate.card.attachments[0];
-			return vid && ["in_review", "passed"].includes(this.authenticate.card.status)
+			return vid && ["in_review", "passed", "fail"].includes(this.authenticate.card.status)
 				? `/u/${UID}/verifiedAssets/${vid}`
 				: DEFAULT_IMAGE;
 		},
 		IDCardB() {
 			const vid = this.authenticate.card.attachments[1];
-			return vid && ["in_review", "passed"].includes(this.authenticate.card.status)
+			return vid && ["in_review", "passed", "fail"].includes(this.authenticate.card.status)
 				? `/u/${UID}/verifiedAssets/${vid}`
 				: DEFAULT_IMAGE;
 		},
 		video() {
 			const vid = this.authenticate.video.attachments[0];
-			return vid && ["in_review", "passed"].includes(this.authenticate.video.status)
+			return vid && ["in_review", "passed", "fail"].includes(this.authenticate.video.status)
 				? `/u/${UID}/verifiedAssets/${vid}`
 				: DEFAULT_IMAGE;
 		}

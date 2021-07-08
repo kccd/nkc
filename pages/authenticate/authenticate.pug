@@ -52,6 +52,8 @@ block content
               span(v-if="authenticate.card.status === 'unsubmit'") 未提交
               span.text-danger(v-if="authenticate.card.status === 'fail'") 未通过
               button.btn.btn-link(v-if="!authenticate.card.isExpired && authenticate.card.status === 'passed'" @click="revokeVerify(2)") 撤销认证
+            h5(v-if="authenticate.card.status === 'fail'") 理由：
+              span {{authenticate.card.message}}
             .row
               .col-xs-12.col-md-6.text-center
                 h5 身份证正面
@@ -103,12 +105,14 @@ block content
               span(v-if="authenticate.video.status === 'unsubmit'") 未提交
               span.text-danger(v-if="authenticate.video.status === 'fail'") 未通过
               button.btn.btn-link(v-if="!authenticate.video.isExpired && authenticate.video.status === 'passed'" @click="revokeVerify(3)") 撤销认证
+            h5(v-if="authenticate.video.status === 'fail'") 理由：
+              span {{authenticate.video.message}}
             .row
               .col-xs-12.text-center
                 h5 手持身份证视频
-                  span(v-if="['unsubmit', 'fail'].indexOf(authenticate.video.status) < 0") (代码：{{authenticate.video.code}})
+                  span(v-if="authenticate.video.status !== 'unsubmit'") (代码：{{authenticate.video.code}})
                 .idcard-video
-                  video(:src="video" controls v-if="['unsubmit', 'fail'].indexOf(authenticate.video.status) < 0")
+                  video(:src="video" controls v-if="authenticate.video.status !== 'unsubmit'")
               .col-xs-12.col-md-12.text-center(v-if="authenticate.video.status === 'in_review'")
                 br
                 br
