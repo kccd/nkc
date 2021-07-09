@@ -1,103 +1,247 @@
 extends ../../bootstrap_base
 block title
   title 基金设置
-  style.
-    .fund-images>div{
-      border: 1px solid #c8c8c8;
-      position: relative;
-      min-height: 12rem;
-      cursor: pointer;
-    }
-    .fund-images>div>img{
-      width: 100%;
-    }
-    .fund-images>div:after{
-      content: '+';
-      color: #c8c8c8;
-      height: 12rem;
-      line-height: 12rem;
-      text-align: center;
-      font-size: 2rem;
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-    }
-    .image-avatar{
-      width: 20rem;
-    }
-    .image-banner{
-      width: 50rem;
-      max-width: 100%;
-    }
+  +includeCSS('/fund/list/settings.css')
 block content
-  #data.hidden=objToStr({fund: data.fund})
+  #data.hidden=objToStr({fund: data.fund, roles: data.roles, users: data.users})
   .container-fluid.max-width
     .row#app(v-cloak)
-      .col-xs-12.col-md-3.box-shadow-panel
-        div 基金列表
-      .col-xs-12.col-md-9.box-shadow-panel
-        .form.form-horizontal
-          h4.m-b-2 基本信息
-          .form-group
-            label.control-label.col-sm-2 编号
-            .col-sm-8.form-inline
-              input.form-control(type='text' v-model.trim='fund._id')
-          .form-group
-            label.control-label.col-sm-2 名称
-            .col-sm-8.form-inline
-              input.form-control(type='text' v-model.trim='fund.name')
-          .form-group
-            label.control-label.col-sm-2 金额
-            .col-sm-8
-              h5 固定金额
-              .radio
-                label.m-r-1
-                  input(type='radio' :value='true' v-model='fund.money.fixed')
-                  span 是
-                label
-                  input(type='radio' :value='false' v-model='fund.money.fixed')
-                  span 否
-              h5 {{fund.money.fixed? '固定': '最大'}}金额值（元，精确到 0.01）
-              .form-inline
-                input.form-control(type='text' v-model.number='fund.money.value')
-          .form-group
-            label.control-label.col-sm-2 颜色
-            .col-sm-8.form-inline
-              input.form-control(ref='colorInput' type='text' v-model='fund.color')
-          .form-group
-            label.control-label.col-sm-2 背景图
-            .col-sm-8.form-inline.fund-images
-              .image-banner.m-b-1(@click='selectImage("banner")')
-                img(v-if="image.banner" :src='image.banner')
-              .image-avatar(@click='selectImage("avatar")')
-                img(v-if="image.avatar" :src='image.avatar')
-          .form-group
-            label.control-label.col-sm-2 简介
-            .col-sm-8
-              textarea.form-control(v-model.trim='fund.description.brief' rows=8)
-          .form-group
-            label.control-label.col-sm-2 说明
-            .col-sm-8
-              textarea.form-control(v-model.trim='fund.description.detailed' rows=8)
-          .form-group
-            label.control-label.col-sm-2 条款
-            .col-sm-8
-              textarea.form-control(v-model.trim='fund.description.terms' rows=8)
+      .col-xs-12.col-md-3
+        .panel.panel-default
+          .panel-heading
+            span 基金列表
+          .panel-body
+            for f in data.funds
+              a.m-r-1.m-b-1(
+                class=data.fund._id === f._id?'h4':''
+                href=tools.getUrl('singleFundSettings', f._id)
+                )=f.name
+      .col-xs-12.col-md-9
+        .panel.panel-default
+          .panel-heading
+            span 基本信息
+          .panel-body
+            .form.form-horizontal
+              .form-group
+                label.control-label.col-sm-2 屏蔽
+                .col-sm-8
+                  .radio
+                    label.m-r-1
+                      input(type='radio' :value='true' v-model='fund.disabled')
+                      span 是
+                    label
+                      input(type='radio' :value='false' v-model='fund.disabled')
+                      span 否
+              .form-group
+                label.control-label.col-sm-2 显示入口
+                .col-sm-8
+                  .radio
+                    label.m-r-1
+                      input(type='radio' :value='true' v-model='fund.display')
+                      span 是
+                    label
+                      input(type='radio' :value='false' v-model='fund.display')
+                      span 否
+              .form-group
+                label.control-label.col-sm-2 审核方式
+                .col-sm-8
+                  .radio
+                    label.m-r-1
+                      input(type='radio' value='person' v-model='fund.auditType')
+                      span 人工
+                    label
+                      input(type='radio' value='system' v-model='fund.auditType')
+                      span 系统
+              .form-group
+                label.control-label.col-sm-2 允许申请
+                .col-sm-8
+                  .radio
+                    label.m-r-1
+                      input(type='radio' :value='true' v-model='fund.canApply')
+                      span 是
+                    label
+                      input(type='radio' :value='false' v-model='fund.canApply')
+                      span 否
+              .form-group
+                label.control-label.col-sm-2 设为历史基金
+                .col-sm-8
+                  .radio
+                    label.m-r-1
+                      input(type='radio' :value='true' v-model='fund.history')
+                      span 是
+                    label
+                      input(type='radio' :value='false' v-model='fund.history')
+                      span 否
+              .form-group
+                label.control-label.col-sm-2 编号
+                .col-sm-8.form-inline
+                  input.form-control(type='text' v-model.trim='fund._id' disabled='disabled')
+              .form-group
+                label.control-label.col-sm-2 名称
+                .col-sm-8.form-inline
+                  input.form-control(type='text' v-model.trim='fund.name')
+              .form-group
+                label.control-label.col-sm-2 金额
+                .col-sm-8
+                  h5 固定金额
+                  .radio
+                    label.m-r-1
+                      input(type='radio' :value='true' v-model='fund.money.fixed')
+                      span 是
+                    label
+                      input(type='radio' :value='false' v-model='fund.money.fixed')
+                      span 否
+                  h5 {{fund.money.fixed? '固定': '最大'}}金额值（元，精确到 0.01）
+                  .form-inline
+                    input.form-control(type='text' v-model.number='fund.money.value')
+              .form-group
+                label.control-label.col-sm-2 颜色
+                .col-sm-8.form-inline
+                  input.form-control(ref='colorInput' type='text' v-model='fund.color')
+              .form-group
+                label.control-label.col-sm-2 背景图
+                .col-sm-8.form-inline.fund-images
+                  .image-banner.m-b-1(@click='selectImage("banner")')
+                    img(v-if="image.banner" :src='image.banner')
+                  .image-avatar(@click='selectImage("avatar")')
+                    img(v-if="image.avatar" :src='image.avatar')
+              .form-group
+                label.control-label.col-sm-2 简介
+                .col-sm-8
+                  textarea.form-control(v-model.trim='fund.description.brief' rows=8)
+              .form-group
+                label.control-label.col-sm-2 说明
+                .col-sm-8
+                  textarea.form-control(v-model.trim='fund.description.detailed' rows=8)
+              .form-group
+                label.control-label.col-sm-2 条款
+                .col-sm-8
+                  textarea.form-control(v-model.trim='fund.description.terms' rows=8)
+        .panel.panel-default
+          .panel-heading
+            span 申请人资格
+          .panel-body
+            .form.form-horizontal
+              .form-group
+                label.control-label.col-sm-2 用户等级
+                .col-sm-8.form-inline
+                  input.form-control(type='text' v-model.number='fund.applicant.userLevel')
+              .form-group
+                label.control-label.col-sm-2 文章数
+                .col-sm-8.form-inline
+                  input.form-control(type='text' v-model.number='fund.applicant.threadCount')
+              .form-group
+                label.control-label.col-sm-2 回复数
+                .col-sm-8.form-inline
+                  input.form-control(type='text' v-model.number='fund.applicant.postCount')
+              .form-group
+                label.control-label.col-sm-2 注册天数
+                .col-sm-8.form-inline
+                  input.form-control(type='text' v-model.number='fund.applicant.timeToRegister')
+              .form-group
+                label.control-label.col-sm-2 申请人身份认证等级
+                .col-sm-8.form-inline
+                  input.form-control(type='text' v-model.number='fund.applicant.authLevel')
+              .form-group
+                label.control-label.col-sm-2 组员身份认证等级
+                .col-sm-8.form-inline
+                  input.form-control(type='text' v-model.number='fund.member.authLevel')
+        .panel.panel-default
+          .panel-heading
+            span 项目设置
+          .panel-body
+            .form.form-horizontal
+              .form-group
+                label.control-label.col-sm-2 项目内容
+                .col-sm-8
+                  .radio
+                    label.m-r-1
+                      input(type='radio' :value='true' v-model='fund.detailedProject')
+                      span 详细
+                    label
+                      input(type='radio' :value='false' v-model='fund.detailedProject')
+                      span 简单
+              .form-group
+                label.control-label.col-sm-2 申请方式
+                .col-sm-8
+                  .checkbox
+                    label.m-r-1
+                      input(type='checkbox' value='personal' v-model='fund.applicantType')
+                      span 个人
+                    label.m-r-1
+                      input(type='checkbox' value='team' v-model='fund.applicantType')
+                      span 团队
+              .form-group
+                label.control-label.col-sm-2 附带文章数
+                .col-sm-8.form-inline
+                  input.form-control(type='text' v-model.number='fund.thread.count')
+              .form-group
+                label.control-label.col-sm-2 最大退修次数
+                .col-sm-8.form-inline
+                  input.form-control(type='text' v-model.number='fund.modifyCount')
+              .form-group
+                label.control-label.col-sm-2 好友支持数
+                .col-sm-8.form-inline
+                  input.form-control(type='text' v-model.number='fund.supportCount')
+              .form-group
+                label.control-label.col-sm-2 示众天数
+                .col-sm-8.form-inline
+                  input.form-control(type='text' v-model.number='fund.timeOfPublicity')
+              .form-group
+                label.control-label.col-sm-2 年最大申请次数
+                .col-sm-8.form-inline
+                  input.form-control(type='text' v-model.number='fund.applicationCountLimit')
+              .form-group
+                label.control-label.col-sm-2 互斥
+                .col-sm-8
+                  .checkbox
+                    label
+                      input(type='checkbox' :value='true' v-model='fund.conflict.self')
+                      span 与自己互斥：如果用户申请过当前基金并且尚未结题，则用户不能再申请当前基金
+                  .checkbox
+                    label
+                      input(type='checkbox' :value='true' v-model='fund.conflict.other')
+                      span 与勾选此项的基金互斥：如果用户申请了勾选此项的其他基金并且尚未结题，则用户不能再申请当前基金
+              .form-group
+                label.control-label.col-sm-2 自我介绍提示
+                .col-sm-8
+                  textarea.form-control(v-model='fund.reminder.inputUserInfo' rows=8)
+              .form-group
+                label.control-label.col-sm-2 项目内容提示
+                .col-sm-8
+                  textarea.form-control(v-model='fund.reminder.inputProject' rows=8)
+        .panel.panel-default
+          .panel-heading
+            span 权限设置
+          .panel-body
+            .form.form-horizontal
+              mixin permissionSetting(key, name)
+                -var checkBoxKey = `fund.${key}.certs`;
+                -var vFor = `uid in fund.${key}.appointed`;
+                .form-group
+                  label.control-label.col-sm-2=name
+                  .col-sm-8
+                    .checkbox
+                      label.m-r-1(v-for='role in roles')
+                        input(type='checkbox' :value='role._id' v-model=checkBoxKey)
+                        span {{role.displayName}}
+                    h5 指定用户 UID：
+                    .fund-settings-users
+                      .fund-settings-user(v-for=vFor)
+                        .avatar
+                          img(:src="getUrl('userAvatar', usersObj[uid].avatar)")
+                        .name {{usersObj[uid].username}}
+                        .option
+                          .fa.fa-remove
+                    input.form-control(type='text' v-model=inputKey placeholder='请输入用户 UID')
+              +permissionSetting('admin', '管理员')
+              +permissionSetting('censor', '检查员')
+              +permissionSetting('financialStaff', '财务')
+              +permissionSetting('expert', '专家')
+              +permissionSetting('voter', '投票人员')
+        .m-b-1
+          button.btn.btn-primary.btn-block(@click='save') 保存
 
-          h4.m-b-2 基本权限
-
-          .form-group
-            label.control-label.col-sm-2 屏蔽
-            .col-sm-8
-              .radio
-                label.m-r-1
-                  input(type='radio' :value='true' v-model='fund.disabled')
-                  span 是
-                label
-                  input(type='radio' :value='false' v-model='fund.disabled')
-                  span 否
 
 block scripts
   include ../../publicModules/crop/crop_new

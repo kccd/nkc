@@ -139,8 +139,11 @@ var Tools = function() {
       case 'messageTone': {
         return "/default/message.wav";
       }
-      case 'fundHome': {
+      case 'singleFundHome': {
         return "/fund/list/" + id
+      }
+      case 'singleFundSettings': {
+        return "/fund/list/" + id + '/settings'
       }
     }
   };

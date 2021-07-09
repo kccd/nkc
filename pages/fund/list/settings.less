@@ -1,0 +1,68 @@
+.fund-images>div{
+  border: 1px solid #c8c8c8;
+  position: relative;
+  min-height: 12rem;
+  cursor: pointer;
+}
+.fund-images>div>img{
+  width: 100%;
+}
+.fund-images>div:after{
+  content: '+';
+  color: #c8c8c8;
+  height: 12rem;
+  line-height: 12rem;
+  text-align: center;
+  font-size: 2rem;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+.image-avatar{
+  width: 20rem;
+}
+.image-banner{
+  width: 50rem;
+  max-width: 100%;
+}
+.fund-settings-users{
+  @height: 2.6rem;
+  .fund-settings-user{
+    height: @height;
+    display: inline-block;
+    position: relative;
+    padding-left: @height;
+    padding-right: @height;
+    background-color: #f4f4f4;
+    box-shadow: rgba(0, 0, 0, 0.14) 0 1px 6px;
+    border-radius: @height / 2;
+    overflow: hidden;
+    .avatar{
+      position: absolute;
+      border-radius: 50%;
+      top: 0;
+      left: 0;
+      height: @height;
+      width: @height;
+      img{
+        height: 100%;
+        width: 100%;
+      }
+    }
+    .name{
+      height: @height;
+      line-height: @height;
+    }
+    .option{
+      position: absolute;
+      text-align: center;
+      line-height: @height;
+      top: 0;
+      right: 0;
+      height: @height;
+      width: @height;
+    }
+  }
+}

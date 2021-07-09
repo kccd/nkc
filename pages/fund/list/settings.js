@@ -1,9 +1,12 @@
 const data = NKC.methods.getDataById('data');
 const selectImage = new NKC.methods.selectImage();
-const app = new Vue({
+
+window.app = new Vue({
   el: '#app',
   data: {
     fund: data.fund,
+    roles: data.roles,
+    users: data.users,
     avatarFile: null,
     avatarUrl: null,
     bannerFile: null,
@@ -12,6 +15,8 @@ const app = new Vue({
   computed: {
     image() {
       let {avatar, banner} = this.fund;
+      if(avatar) avatar = this.getUrl('attach', avatar);
+      if(banner) banner = this.getUrl('attach', banner);
       const {avatarUrl, bannerUrl} = this;
       avatar = avatarUrl || avatar;
       banner = bannerUrl || banner;
@@ -19,6 +24,13 @@ const app = new Vue({
         avatar,
         banner
       };
+    },
+    usersObj() {
+      const obj = {};
+      for(const u of this.users) {
+        obj[u.uid] = u;
+      }
+      return obj;
     }
   },
   mounted() {
@@ -29,6 +41,7 @@ const app = new Vue({
   },
   methods: {
     //colorInput
+    getUrl: NKC.methods.tools.getUrl,
     selectImage(type) {
       const isAvatar = type === 'avatar';
       const options = {
@@ -47,6 +60,14 @@ const app = new Vue({
             selectImage.close();
           });
       }, options);
+    },
+    save() {
+      const {fund} = this;
+      nkcAPI(`/fund/list/${fund._id}/settings`, 'PUT', {fund})
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
+        .catch(sweetError);
     }
   }
 });

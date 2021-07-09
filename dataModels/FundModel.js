@@ -84,12 +84,14 @@ const fundSchema = new Schema({
 		  required: true
 	  }
   },
-  //
+  // 申请基金时的相关提示
   reminder: {
+	  // 填写申请人信息时的提示
     inputUserInfo: {
       type: String,
       default: ""
     },
+    // 填写项目信息时的提示
     inputProject: {
       type: String,
       default: ""
@@ -137,7 +139,7 @@ const fundSchema = new Schema({
 		  index: 1
 	  }
   },
-	//评论人员
+	// 评论人员（暂时无用，由于基金项目内容会生成对应的文章，文章是否能评论由论坛那边决定，与基金无关）
 	commentator: {
 		certs: {
 			type: [String],

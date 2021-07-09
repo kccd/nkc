@@ -9,7 +9,7 @@ block fundContent
           for fund in data.funds
             .col-xs-12.col-sm-6.col-md-3.box-shadow-panel
               .fund-item.m-b-2
-                a(href=tools.getUrl('fundHome', fund._id))
+                a(href=tools.getUrl('singleFundHome', fund._id))
                   name=fund.name
       .col-xs-12.col-md-8.box-shadow-panel.p-r-0
         .m-b-1 申请表列表

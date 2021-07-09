@@ -26,10 +26,10 @@ module.exports = {
 		POST: 'addFund',
 		PARAMETER: {
 			DELETE: 'deleteFundObject',
-			PUT: 'modifyFundObject',
 			GET: 'visitFundObjectHome',
 			settings: {
-				GET: 'visitFundObjectSettings'
+				GET: 'singleFundSettings',
+        PUT: 'singleFundSettings'
 			},
 			add: {
 				GET: 'agreeFundTerms',
