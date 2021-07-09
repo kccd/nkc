@@ -1,14 +1,14 @@
-extends ../bootstrap_base
-block title
+extends ../../experimental
+block eTitle
   title 用户身份审核
-  +includeCSS("/authenticate/authenticate.css")
-block content
+  +includeCSS("/experimental/auth/[uid]/index.css")
+block eContent
   #data.hidden= JSON.stringify(data)
   #app.container-fluid.max-width(v-cloak)
     .row
       .col-xs-12.col-md-12
         h4
-          a.btn.btn-default.btn-sm(href='/auth') <<返回申请列表
+          a.btn.btn-default.btn-sm(@click="goBack()") <<返回申请列表
         .panel.panel-primary
           .panel-heading
             span 申请人信息
@@ -52,6 +52,8 @@ block content
               span(v-if="authenticate.card.status === 'unsubmit'") 未提交
               span.text-danger(v-if="authenticate.card.status === 'fail'") 未通过
               button.btn.btn-link(v-if="!authenticate.card.isExpired && authenticate.card.status === 'passed'" @click="revokeVerify(2)") 撤销认证
+            h5(v-if="authenticate.card.status === 'fail'") 理由：
+              span {{authenticate.card.message}}
             .row
               .col-xs-12.col-md-6.text-center
                 h5 身份证正面
@@ -103,12 +105,14 @@ block content
               span(v-if="authenticate.video.status === 'unsubmit'") 未提交
               span.text-danger(v-if="authenticate.video.status === 'fail'") 未通过
               button.btn.btn-link(v-if="!authenticate.video.isExpired && authenticate.video.status === 'passed'" @click="revokeVerify(3)") 撤销认证
+            h5(v-if="authenticate.video.status === 'fail'") 理由：
+              span {{authenticate.video.message}}
             .row
               .col-xs-12.text-center
                 h5 手持身份证视频
-                  span(v-if="['unsubmit', 'fail'].indexOf(authenticate.video.status) < 0") (代码：{{authenticate.video.code}})
+                  span(v-if="authenticate.video.status !== 'unsubmit'") (代码：{{authenticate.video.code}})
                 .idcard-video
-                  video(:src="video" controls v-if="['unsubmit', 'fail'].indexOf(authenticate.video.status) < 0")
+                  video(:src="video" controls v-if="authenticate.video.status !== 'unsubmit'")
               .col-xs-12.col-md-12.text-center(v-if="authenticate.video.status === 'in_review'")
                 br
                 br
@@ -140,4 +144,4 @@ block content
                 br
                 button.btn.btn-primary(@click="verify3Submit()") 提交
 block scripts
-  +includeJS('/authenticate/authenticate.js')
+  +includeJS("/experimental/auth/[uid]/index.js")

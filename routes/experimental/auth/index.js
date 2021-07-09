@@ -1,5 +1,7 @@
 const Router = require('koa-router');
+const authDetailRouter = require("./[uid]");
 const authRouter = new Router();
+
 authRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
@@ -24,7 +26,8 @@ authRouter
 				targetUser
 			}
 		}));
-		ctx.template = 'interface_auth.pug';
+		ctx.template = '/experimental/auth/index.pug';
 		await next();
-	});
+	})
+	.use("/:uid", authDetailRouter.routes(), authDetailRouter.allowedMethods());
 module.exports = authRouter;
