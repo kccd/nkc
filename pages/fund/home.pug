@@ -4,11 +4,11 @@ block fundTitle
 block fundContent
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-12.m-b-1.m-t-1
+      .col-xs-12.col-md-12.m-t-1
         .row
           for fund in data.funds
             .col-xs-12.col-sm-6.col-md-3.box-shadow-panel
-              .fund-item.m-b-1
+              .fund-item.m-b-2
                 a(href=tools.getUrl('fundHome', fund._id))
                   name=fund.name
       .col-xs-12.col-md-8.box-shadow-panel.p-r-0

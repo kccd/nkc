@@ -1,6 +1,36 @@
 extends ../../bootstrap_base
 block title
   title 基金设置
+  style.
+    .fund-images>div{
+      border: 1px solid #c8c8c8;
+      position: relative;
+      min-height: 12rem;
+      cursor: pointer;
+    }
+    .fund-images>div>img{
+      width: 100%;
+    }
+    .fund-images>div:after{
+      content: '+';
+      color: #c8c8c8;
+      height: 12rem;
+      line-height: 12rem;
+      text-align: center;
+      font-size: 2rem;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+    .image-avatar{
+      width: 20rem;
+    }
+    .image-banner{
+      width: 50rem;
+      max-width: 100%;
+    }
 block content
   #data.hidden=objToStr({fund: data.fund})
   .container-fluid.max-width
@@ -9,22 +39,40 @@ block content
         div 基金列表
       .col-xs-12.col-md-9.box-shadow-panel
         .form.form-horizontal
-          h3.m-b-2 基本信息
+          h4.m-b-2 基本信息
           .form-group
             label.control-label.col-sm-2 编号
-            .col-sm-8
+            .col-sm-8.form-inline
               input.form-control(type='text' v-model.trim='fund._id')
           .form-group
             label.control-label.col-sm-2 名称
-            .col-sm-8
+            .col-sm-8.form-inline
               input.form-control(type='text' v-model.trim='fund.name')
           .form-group
             label.control-label.col-sm-2 金额
             .col-sm-8
+              h5 固定金额
               .radio
                 label.m-r-1
-                  input(type='radio' value='')
-              input.form-control(type='text' v-model.trim='fund.name')
+                  input(type='radio' :value='true' v-model='fund.money.fixed')
+                  span 是
+                label
+                  input(type='radio' :value='false' v-model='fund.money.fixed')
+                  span 否
+              h5 {{fund.money.fixed? '固定': '最大'}}金额值（元，精确到 0.01）
+              .form-inline
+                input.form-control(type='text' v-model.number='fund.money.value')
+          .form-group
+            label.control-label.col-sm-2 颜色
+            .col-sm-8.form-inline
+              input.form-control(ref='colorInput' type='text' v-model='fund.color')
+          .form-group
+            label.control-label.col-sm-2 背景图
+            .col-sm-8.form-inline.fund-images
+              .image-banner.m-b-1(@click='selectImage("banner")')
+                img(v-if="image.banner" :src='image.banner')
+              .image-avatar(@click='selectImage("avatar")')
+                img(v-if="image.avatar" :src='image.avatar')
           .form-group
             label.control-label.col-sm-2 简介
             .col-sm-8
@@ -38,11 +86,20 @@ block content
             .col-sm-8
               textarea.form-control(v-model.trim='fund.description.terms' rows=8)
 
-          h3.m-b-2
+          h4.m-b-2 基本权限
 
           .form-group
-            label.control-label.col-sm-2 条款
+            label.control-label.col-sm-2 屏蔽
             .col-sm-8
-              textarea.form-control(v-model.trim='fund.description.terms' rows=8)
+              .radio
+                label.m-r-1
+                  input(type='radio' :value='true' v-model='fund.disabled')
+                  span 是
+                label
+                  input(type='radio' :value='false' v-model='fund.disabled')
+                  span 否
+
 block scripts
+  include ../../publicModules/crop/crop_new
+  include ../../publicModules/selectColor
   +includeJS('/fund/list/settings.js')

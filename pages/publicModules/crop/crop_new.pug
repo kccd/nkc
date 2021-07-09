@@ -1,24 +1,25 @@
-+includeCSS("/publicModules/crop/dist/cropper.css")
-+includeCSS("/publicModules/crop/crop.css")
+if !isIncluded('crop')
+  +includeCSS("/publicModules/crop/dist/cropper.css")
+  +includeCSS("/publicModules/crop/crop.css")
 
-.modal.fade#moduleCrop(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
-  .modal-dialog(role="document")
-    .modal-content
-      .modal-header
-        button.close(data-dismiss="modal" aria-label="Close")
-          span(aria-hidden="true") &times;
-        h4.modal-title 图片选择
-      .modal-body
-        input(type="file" accept="image/png, image/jpeg" id="module_crop_input")
-        .m-t-1(style="max-height: 50rem;")
-          img(id="module_crop_image" style="max-width: 100%;max-height: 30rem;")
-      .modal-footer
-        #module_crop_info.display-i-b(style="font-size: 1rem;")
-        button(type="button" class="btn btn-default btn-sm" id="module_crop_rotate_left") 左旋
-        button(type="button" class="btn btn-default btn-sm" id="module_crop_rotate_right") 右旋
-        button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭
-        button(type="button" class="btn btn-primary btn-sm" id="module_crop_button") 确定
+  .modal.fade#moduleCrop(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          button.close(data-dismiss="modal" aria-label="Close")
+            span(aria-hidden="true") &times;
+          h4.modal-title 图片选择
+        .modal-body
+          input(type="file" accept="image/png, image/jpeg" id="module_crop_input")
+          .m-t-1(style="max-height: 50rem;")
+            img(id="module_crop_image" style="max-width: 100%;max-height: 30rem;")
+        .modal-footer
+          #module_crop_info.display-i-b(style="font-size: 1rem;")
+          button(type="button" class="btn btn-default btn-sm" id="module_crop_rotate_left") 左旋
+          button(type="button" class="btn btn-default btn-sm" id="module_crop_rotate_right") 右旋
+          button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭
+          button(type="button" class="btn btn-primary btn-sm" id="module_crop_button") 确定
 
-+includeJS("/publicModules/crop/dist/cropper.js")
-+includeJS("/publicModules/crop/dist/jquery-cropper.js")
-+includeJS("/publicModules/crop/crop_new.js")
+  +includeJS("/publicModules/crop/dist/cropper.js")
+  +includeJS("/publicModules/crop/dist/jquery-cropper.js")
+  +includeJS("/publicModules/crop/crop_new.js")
