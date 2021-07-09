@@ -127,16 +127,6 @@ module.exports = {
         POST: 'userBindBankAccounts'
       }
 		},
-		auth: {
-			GET: 'visitUserAuth',
-			DELETE: 'cancelSubmitVerify',
-			verify2: {
-				POST: "modifyUserVerifyStatus"
-			},
-			verify3: {
-				POST: "modifyUserVerifyStatus"
-			}
-		},
 		drafts: {
 			GET: 'visitDraftList',
 			POST: 'addDraft',

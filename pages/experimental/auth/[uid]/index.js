@@ -56,26 +56,26 @@ new Vue({
 		IDCardA() {
 			const vid = this.authenticate.card.attachments[0];
 			return vid && ["in_review", "passed", "fail"].includes(this.authenticate.card.status)
-				? `/u/${UID}/verifiedAssets/${vid}`
+				? `/e/auth/${UID}/a/${vid}`
 				: DEFAULT_IMAGE;
 		},
 		IDCardB() {
 			const vid = this.authenticate.card.attachments[1];
 			return vid && ["in_review", "passed", "fail"].includes(this.authenticate.card.status)
-				? `/u/${UID}/verifiedAssets/${vid}`
+				? `/e/auth/${UID}/a/${vid}`
 				: DEFAULT_IMAGE;
 		},
 		video() {
 			const vid = this.authenticate.video.attachments[0];
 			return vid && ["in_review", "passed", "fail"].includes(this.authenticate.video.status)
-				? `/u/${UID}/verifiedAssets/${vid}`
+				? `/e/auth/${UID}/a/${vid}`
 				: DEFAULT_IMAGE;
 		}
 	},
 	methods: {
 		async verify2Submit() {
 			try {
-				await nkcAPI("./auth/verify2", "POST", this.verify2form);
+				await nkcAPI(location.pathname + "/verify2", "POST", this.verify2form);
 				await sweetSuccess("执行成功");
 			} catch (error) {
 				return sweetError(error);
@@ -84,7 +84,7 @@ new Vue({
 		},
 		async verify3Submit() {
 			try {
-				await nkcAPI("./auth/verify3", "POST", this.verify3form);
+				await nkcAPI(location.pathname + "/verify3", "POST", this.verify3form);
 				await sweetSuccess("执行成功");
 			} catch (error) {
 				return sweetError(error);
@@ -94,12 +94,15 @@ new Vue({
 		async revokeVerify(level) {
 			try {
 				await sweetConfirm("你确定要撤销认证？");
-				await nkcAPI(`./auth?level=${level}`, "DELETE");
+				await nkcAPI(`?level=${level}`, "DELETE");
 				await sweetSuccess("执行成功");
 			} catch (error) {
 				return sweetError(error);
 			}
 			location.reload();
+		},
+		goBack() {
+			history.back();
 		}
 	},
 	components: {

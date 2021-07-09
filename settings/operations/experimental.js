@@ -390,9 +390,27 @@ module.exports = {
     }
 	},
   console: {
-	  GET: 'visitExperimentalConsole'
+		GET: 'visitExperimentalConsole'
 	},
 	tools: {
 		GET: "visitToolsManager"
+	},
+	auth: {
+		GET: 'visitAuthList',
+		PARAMETER: {
+			GET: 'visitUserAuth',
+			DELETE: 'cancelSubmitVerify',
+			verify2: {
+				POST: "modifyUserVerifyStatus"
+			},
+			verify3: {
+				POST: "modifyUserVerifyStatus"
+			},
+			a: {
+				PARAMETER: {
+					GET: "auditorVisitVerifiedUpload"
+				}
+			}
+		}
 	}
 };
