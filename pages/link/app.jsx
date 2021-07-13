@@ -73,6 +73,7 @@ const Wrapper = styled.div`
     .link {
       cursor: pointer;
       margin-bottom: 12px;
+      word-break: break-all;
     }
     .info {
       white-space: pre-wrap;
