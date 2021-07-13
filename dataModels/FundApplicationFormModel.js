@@ -77,22 +77,39 @@ const fundApplicationFormSchema = new Schema({
     required: true,
     index: 1
   },
+  // 申请者输入的预算 不一定是最终打款的金额
   budgetMoney: { // 预算
     type: Schema.Types.Mixed,
     default: []
     /*
     {
-      purpose: String,
-      money: Number,
-      count: Number,
-			total: Number
+      purpose: String, // 物品名称
+      money: Number,   // 单价
+      count: Number,   // 数量
+			suggest: Number, // 专家建议
+			fact: Number     // 管理员最后批准
     }
     */
   },
+  // 结题时填写的各个物品的实际花费
 	actualMoney: {
   	type: [Schema.Types.mixed],
-		default: null
+		default: null,
+    /*{
+      purpose: String, // 物品名称
+      money: Number,   // 单价
+      count: Number,   // 数量
+    }*/
 	},
+
+  // 若基金项目为固定金额，则此字段为fund.money.value
+  // 若基金项目为非固定金额，根据实际批准的预算统计得到
+  money: {
+    type: Number,
+    default: 0
+  },
+
+
   projectCycle: { // 预计周期
 	  type: Number,
 	  default: null,
@@ -280,13 +297,6 @@ fundApplicationFormSchema.virtual('user')
 		this._user = user
 	});
 
-fundApplicationFormSchema.virtual('money')
-	.get(function() {
-		return this._money;
-	})
-	.set(function(money) {
-		this._money = money
-	});
 
 fundApplicationFormSchema.virtual('fund')
 	.get(function() {
@@ -771,6 +781,102 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
     await formPost.save();
   }
 
+};
+
+fundApplicationFormSchema.statics.extendAsApplicationFormList = async (applicationForms) => {
+  const FundModel = mongoose.model('funds');
+  const UserModel = mongoose.model('users');
+  const FundDocumentModel = mongoose.model('fundDocuments');
+  const FundApplicationUserModel = mongoose.model('fundApplicationUsers');
+  const fundsId = [];
+  const applicationFormId = [];
+  const usersId = [];
+  const projectsId = [];
+  applicationForms.map(a => {
+    const {fundId, _id, projectId} = a;
+    fundsId.push(fundId);
+    applicationFormId.push(_id);
+    projectsId.push(projectId);
+  });
+  const projects = await FundDocumentModel.find({_id: {$in: projectsId}}, {
+    t: 1, _id: 1
+  });
+  const projectsObj = {};
+  projects.map(p => projectsObj[p._id] = p);
+  const funds = await FundModel.find({_id: {$in: fundsId}}, {_id: 1, name: 1});
+  const fundsObj = {};
+  funds.map(f => fundsObj[f._id] = f);
+  const members = await FundApplicationUserModel.find({
+    applicationFormId: {$in: applicationFormId},
+    removed: false
+  }, {
+    uid: 1,
+    applicationFormId: 1
+  }).sort({toc: 1});
+  const applicationFormToUser = {};
+  members.map(m => {
+    const {uid, applicationFormId} = m;
+    if(!applicationFormToUser[applicationFormId]) applicationFormToUser[applicationFormId] = [];
+    applicationFormToUser[applicationFormId].push(uid);
+    usersId.push(uid);
+  });
+  const users = await UserModel.find({uid: {$in: usersId}}, {
+    uid: 1,
+    avatar: 1,
+    username: 1
+  });
+  const usersObj = {};
+  users.map(u => usersObj[u.uid] = u);
+  const results = [];
+  for(const a of applicationForms) {
+    const fund = fundsObj[a.fundId];
+    if(!fund) continue;
+    const usersId = applicationFormToUser[a._id] || [];
+    const users = [];
+    for(const uid of usersId) {
+      const u = usersObj[uid];
+      if(!u) continue;
+      users.push(u);
+    }
+    const project = projectsObj[a.projectId];
+    const result = {
+      _id: a._id,
+      code: a.code,
+      fundName: fund.name,
+      fundId: fund._id,
+      money: a.money,
+      time: a.toc,
+      title: project? project.t: '暂未填写项目名称',
+      users
+    };
+    results.push(result);
+  }
+  return results;
+};
+
+/*
+* 获取申请表的显示金额
+* @param {[Object]} 申请表上的资金预算字段
+* @param {Object} fundMoney 基金项目上的金额设置
+* @return {Number} 计算所得金额
+* */
+fundApplicationFormSchema.statics.getApplicationFormMoney = (budgetMoney = [], fundMoney) => {
+  let result = 0;
+  if(fundMoney.fixed) {
+    result = fundMoney.value
+  } else {
+    for(const b of budgetMoney) {
+      const {suggest, fact, money, count} = b;
+      if(fact) {
+        result = fact;
+      } else if(suggest) {
+        result = suggest;
+      } else {
+        result = money * count;
+      }
+    }
+  }
+  return result;
 };
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);

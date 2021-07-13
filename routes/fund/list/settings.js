@@ -23,12 +23,11 @@ settingsRouter
 	})
   .put('/', async (ctx, next) => {
     const {data, db, body, nkcModules} = ctx;
+    const newFund = JSON.parse(body.fields.fund);
+    const files = body.files;
     const {
       fund: oldFund
     } = data;
-    const {
-      fund: newFund
-    } = body;
     const {checkString, checkNumber} = nkcModules.checkData;
     if(newFund._id !== oldFund._id) ctx.throw(400, `数据错误，请刷新后再试`);
     checkString(newFund.name, {
@@ -37,7 +36,7 @@ settingsRouter
       maxLength: 100
     });
     checkNumber(newFund.money.value, {
-      name: '金额数值',
+      name: '金额',
       min: 0.01,
       fractionDigits: 2,
     });
@@ -124,6 +123,70 @@ settingsRouter
         const users = await db.UserModel.find({uid: {$in: appointed}}, {uid: 1});
         newFund[po[0]].appointed = users.map(u => u.uid);
       }
+    }
+    await db.FundModel.updateOne({_id: oldFund._id}, {
+      $set: {
+        disabled: !!newFund.disabled,
+        display: !!newFund.display,
+        auditType: !!newFund.auditType,
+        canApply: !!newFund.canApply,
+        history: !!newFund.history,
+        name: newFund.name,
+        money: {
+          fixed: !!newFund.money.fixed,
+          value: newFund.money.value
+        },
+        color: newFund.color,
+        description: {
+          brief: newFund.description.brief,
+          detailed: newFund.description.detailed,
+          terms: newFund.description.terms
+        },
+        applicant: {
+          userLevel: newFund.applicant.userLevel,
+          threadCount: newFund.applicant.threadCount,
+          postCount: newFund.applicant.postCount,
+          timeToRegister: newFund.applicant.timeToRegister,
+          authLevel: newFund.applicant.authLevel,
+        },
+        member: {
+          authLevel: newFund.member.authLevel
+        },
+        detailedProject: !!newFund.detailedProject,
+        applicantType: newFund.applicantType,
+        thread: {
+          count: newFund.thread.count,
+        },
+        modifyCount: newFund.modifyCount,
+        supportCount: newFund.supportCount,
+        timeOfPublicity: newFund.timeOfPublicity,
+        applicationCountLimit: newFund.applicationCountLimit,
+        conflict: {
+          self: newFund.conflict.self,
+          other: newFund.conflict.other
+        },
+        reminder: {
+          inputUserInfo: newFund.reminder.inputUserInfo,
+          inputProject: newFund.reminder.inputProject
+        },
+        admin: newFund.admin,
+        censor: newFund.censor,
+        financialStaff: newFund.financialStaff,
+        expert: newFund.expert,
+        voter: newFund.voter
+      }
+    });
+    const newImage = {};
+    if(files.avatar) {
+      newImage.avatar = await db.AttachmentModel.saveFundImage(files.avatar.path, 'fundBanner');
+    }
+    if(files.banner) {
+      newImage.banner = await db.AttachmentModel.saveFundImage(files.banner.path, 'fundBanner');
+    }
+    if(newImage.avatar || newImage.banner) {
+      await db.FundModel.updateOne({_id: oldFund._id}, {
+        $set: newImage
+      })
     }
     await next();
   })

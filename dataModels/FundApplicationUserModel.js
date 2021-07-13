@@ -104,5 +104,41 @@ fundApplicationUserSchema.methods.extendLifePhotos = async function() {
 	return this.lifePhotos = lifePhotos;
 };
 
+/*
+* 获取基金申请表中的申请人和组员们的信息
+* @param {Number} applicationFormId 基金申请表 ID
+* @return {[Object]} 用户信息数组
+* */
+fundApplicationUserSchema.statics.getMemberUsersByApplicationFromId = async applicationFormId => {
+  const FundApplicationUserModel = mongoose.model('fundApplicationUsers');
+  const membersUid = await FundApplicationUserModel.getMembersUidByApplicationFromId(applicationFormId);
+  const UserModel = mongoose.model('users');
+  const users = await UserModel.find({uid: membersUid}, {uid: 1, username: 1, avatar: 1});
+  const usersObj = {};
+  users.map(u => usersObj[u.uid] = u);
+  const arr = [];
+  for(const uid of membersUid) {
+    const u = usersObj[uid];
+    if(u) arr.push(u);
+  }
+  return arr;
+};
+
+/*
+* 获取基金申请表中的申请人和组员们的UID
+* @param {Number} applicationFormId 基金申请表 ID
+* @return {String} 用户 UID 数组
+* */
+fundApplicationUserSchema.statics.getMembersUidByApplicationFromId = async (applicationFormId) => {
+  const FundApplicationUserModel = mongoose.model('fundApplicationUsers');
+  const applicationUsers = await FundApplicationUserModel.find({
+    applicationFormId,
+    removed: false
+  }, {
+    uid: 1
+  }).sort({toc: 1});
+  return applicationUsers.map(a => a.uid);
+};
+
 const FundApplicationUserModel = mongoose.model('fundApplicationUsers', fundApplicationUserSchema);
 module.exports = FundApplicationUserModel;

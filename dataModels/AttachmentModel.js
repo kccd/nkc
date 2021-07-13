@@ -657,5 +657,41 @@ schema.statics.saveVerifiedUpload = async ({ size, hash, name, path, uid, toc })
   return _id;
 }
 
+/*
+* 保存基金项目的图片
+* @param {String} filePath 图片的路径
+* @param {String} type 图片的类型 fundAvatar, fundBanner
+* @return {String} 附件ID
+* */
+schema.statics.saveFundImage = async (filePath, type) => {
+  const AttachmentModel = mongoose.model('attachments');
+  const FILE = require('../nkcModules/file');
+  if(!['fundAvatar', 'fundBanner'].includes(type)) throw new Error(`fund image type error`);
+  const {size, name, hash} = await FILE.getFileObjectByFilePath(filePath);
+  const aid = await AttachmentModel.getNewId();
+  const toc = new Date();
+  const fileFolder = await FILE.getPath(type, toc);
+  const ext = 'jpg';
+  const targetFilePath = PATH.resolve(fileFolder, `./${aid}.${ext}`);
+  const imageSize = type === 'fundAvatar'? [600, 400]: [1600, 400]
+  const attach = AttachmentModel({
+    _id: aid,
+    toc,
+    size,
+    hash,
+    name,
+    type,
+    ext
+  });
+  await ei.resize({
+    src: filePath,
+    dst: targetFilePath,
+    height: imageSize[0],
+    width: imageSize[1],
+    quality: 90
+  });
+  await attach.save();
+  return attach._id;
+}
 
 module.exports = mongoose.model('attachments', schema);

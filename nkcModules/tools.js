@@ -145,6 +145,9 @@ var Tools = function() {
       case 'singleFundSettings': {
         return "/fund/list/" + id + '/settings'
       }
+      case 'fundAvatar': {
+        return "/a/" + id + t
+      }
     }
   };
   self.getAnonymousInfo = function() {

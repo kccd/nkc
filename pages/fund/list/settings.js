@@ -1,6 +1,6 @@
 const data = NKC.methods.getDataById('data');
 const selectImage = new NKC.methods.selectImage();
-
+const selectUser = new NKC.modules.SelectUser();
 window.app = new Vue({
   el: '#app',
   data: {
@@ -10,7 +10,9 @@ window.app = new Vue({
     avatarFile: null,
     avatarUrl: null,
     bannerFile: null,
-    bannerUrl: null
+    bannerUrl: null,
+    submitting: false,
+    progress: 0,
   },
   computed: {
     image() {
@@ -61,13 +63,36 @@ window.app = new Vue({
           });
       }, options);
     },
+    addUser(key) {
+      const {appointed} = this.fund[key];
+      const self = this;
+      selectUser.open(({usersId = [], users = []}) => {
+        self.users = self.users.concat(users);
+        self.fund[key].appointed = [...new Set([...appointed, ...usersId])];
+      });
+    },
+    removeFromArr(arr, index) {
+      arr.splice(index, 1);
+    },
     save() {
-      const {fund} = this;
-      nkcAPI(`/fund/list/${fund._id}/settings`, 'PUT', {fund})
+      const self = this;
+      const {fund, avatarFile, bannerFile} = this;
+      const formData = new FormData();
+      formData.append('fund', JSON.stringify(fund));
+      if(avatarFile) formData.append('avatar', avatarFile);
+      if(bannerFile) formData.append('banner', bannerFile);
+      self.submitting = true;
+      nkcUploadFile(`/fund/list/${fund._id}/settings`, 'PUT', formData, (e, num) => {
+        self.progress = num;
+      })
         .then(() => {
+          self.submitting = false;
           sweetSuccess('保存成功');
         })
-        .catch(sweetError);
+        .catch(err => {
+          self.submitting = false;
+          sweetError(err);
+        });
     }
   }
 });

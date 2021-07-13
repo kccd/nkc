@@ -1,8 +1,49 @@
+@import '../publicModules/base';
 .fund-item{
   display: block;
   width: 100%;
   height: 16rem;
+  background-size: cover;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  border-radius: 3px;
+  //border: 1px solid #aaa;
   a{
-
+    display: block;
+    position: relative;
+    height: 100%;
+    text-decoration: none;
+    overflow: hidden;
+    color: #fff;
+    padding-top: 2.5rem;
+    .name{
+      height: 4rem;
+      line-height: 4rem;
+      font-size: 2rem;
+      text-align: center;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+    .money{
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+      height: 2rem;
+      line-height: 2rem;
+      text-align: center;
+    }
+    .description{
+      height: 5rem;
+      position: absolute;
+      width: 100%;
+      left: 0;
+      padding: 1rem;
+      bottom: 0;
+      color: #333;
+      background-color: #fff;
+      span{
+        display: block;
+        overflow: hidden;
+        .hideText(@line: 2);
+        letter-spacing: 1px;
+      }
+    }
   }
 }

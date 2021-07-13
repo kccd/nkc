@@ -1,18 +1,30 @@
 extends ./fundContainer.pug
 block fundTitle
   +includeCSS('/fund/home.css')
+  include ./applicationFormItem
 block fundContent
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12.m-t-1
         .row
           for fund in data.funds
-            .col-xs-12.col-sm-6.col-md-3.box-shadow-panel
-              .fund-item.m-b-2
+            .col-xs-12.col-sm-6.col-md-3
+              -var style = `background-color: ${fund.color};`;
+              if fund.avatar
+                -style += `background-image: url(${tools.getUrl('fundAvatar', fund.avatar)})`;
+              .fund-item.m-b-2(
+                style=style
+                )
                 a(href=tools.getUrl('singleFundHome', fund._id))
-                  name=fund.name
+                  .name=fund.name
+                  .money=fund.money.fixed? `单笔 ${fund.money.value} 元`: `单笔最高 ${fund.money.value} 元`
+                  .description
+                    span=fund.description.brief
+
       .col-xs-12.col-md-8.box-shadow-panel.p-r-0
         .m-b-1 申请表列表
+          for form in data.applying
+            +applicationFormItem(form)
       .col-xs-12.col-md-4.box-shadow-panel
         .m-b-1 基金介绍
         .m-b-1 捐款列表

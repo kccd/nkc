@@ -70,51 +70,18 @@ fundRouter
 			useless: null
 		};
     const applying = await db.FundApplicationFormModel.find(queryOfApplying).sort({toc: -1}).limit(10);
-    data.applying = await Promise.all(applying.map(async a => {
-			await a.extendFund();
-			if(a.fund) {
-				await a.extendApplicant({
-					extendSecretInfo: false
-				});
-				await a.extendProject();
-				return a;
-			}
-    }));
+    data.applying = await db.FundApplicationFormModel.extendAsApplicationFormList(applying);
     const funding = await db.FundApplicationFormModel.find(queryOfFunding).sort({toc: -1}).limit(10);
-	  data.funding = await Promise.all(funding.map(async a => {
-		  await a.extendFund();
-		  if(a.fund) {
-			  await a.extendApplicant({
-				  extendSecretInfo: false
-			  });
-			  await a.extendProject();
-			  return a;
-		  }
-	  }));
+    data.funding = await db.FundApplicationFormModel.extendAsApplicationFormList(funding);
     const excellent = await db.FundApplicationFormModel.find(queryOfExcellent).sort({toc: 1});
-	  data.excellent = await Promise.all(excellent.map(async a => {
-		  await a.extendFund();
-		  if(a.fund) {
-			  await a.extendApplicant({
-				  extendSecretInfo: false
-			  });
-			  await a.extendProject();
-			  return a;
-		  }
-	  }));
+    data.excellent = await db.FundApplicationFormModel.extendAsApplicationFormList(excellent);
 	  const completed = await db.FundApplicationFormModel.find(queryOfCompleted).sort({timeOfCompleted: -1});
-	  data.completed = await Promise.all(completed.map(async a => {
-		  await a.extendFund();
-		  if(a.fund) {
-			  await a.extendApplicant({
-				  extendSecretInfo: false
-			  });
-			  await a.extendProject();
-			  return a;
-		  }
-	  }));
-		data.home = true;
-    data.funds = await db.FundModel.find({display: true, disabled: false, history: false}).sort({toc: 1});
+    data.completed = await db.FundApplicationFormModel.extendAsApplicationFormList(completed);
+    data.funds = await db.FundModel.find({
+      display: true,
+      disabled: false,
+      history: false
+    }).sort({toc: 1});
     const donationBills = await db.FundBillModel.find({
 	    'from.type': 'user',
 	    'from.anonymous': false,

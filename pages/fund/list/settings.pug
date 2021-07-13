@@ -1,12 +1,12 @@
 extends ../../bootstrap_base
 block title
-  title 基金设置
+  title=`${data.fundSettings.fundName} - ${data.fund.name} - 设置`
   +includeCSS('/fund/list/settings.css')
 block content
   #data.hidden=objToStr({fund: data.fund, roles: data.roles, users: data.users})
   .container-fluid.max-width
     .row#app(v-cloak)
-      .col-xs-12.col-md-3
+      .col-xs-12.col-md-2
         .panel.panel-default
           .panel-heading
             span 基金列表
@@ -16,7 +16,7 @@ block content
                 class=data.fund._id === f._id?'h4':''
                 href=tools.getUrl('singleFundSettings', f._id)
                 )=f.name
-      .col-xs-12.col-md-9
+      .col-xs-12.col-md-10
         .panel.panel-default
           .panel-heading
             span 基本信息
@@ -217,7 +217,8 @@ block content
             .form.form-horizontal
               mixin permissionSetting(key, name)
                 -var checkBoxKey = `fund.${key}.certs`;
-                -var vFor = `uid in fund.${key}.appointed`;
+                -var vFor = `uid, index in fund.${key}.appointed`;
+                -var optionClick = `removeFromArr(fund.${key}.appointed, index)`
                 .form-group
                   label.control-label.col-sm-2=name
                   .col-sm-8
@@ -225,25 +226,28 @@ block content
                       label.m-r-1(v-for='role in roles')
                         input(type='checkbox' :value='role._id' v-model=checkBoxKey)
                         span {{role.displayName}}
-                    h5 指定用户 UID：
-                    .fund-settings-users
+                    .fund-settings-users.m-t-1
+                      span 指定用户：
                       .fund-settings-user(v-for=vFor)
                         .avatar
                           img(:src="getUrl('userAvatar', usersObj[uid].avatar)")
-                        .name {{usersObj[uid].username}}
-                        .option
+                        a(:href='getUrl("userHome", uid)' target="_blank").name {{usersObj[uid].username}}
+                        .option(@click=optionClick)
                           .fa.fa-remove
-                    input.form-control(type='text' v-model=inputKey placeholder='请输入用户 UID')
+                      button.btn.btn-default.btn-sm(@click=`addUser("${key}")`) 添加用户
               +permissionSetting('admin', '管理员')
               +permissionSetting('censor', '检查员')
               +permissionSetting('financialStaff', '财务')
               +permissionSetting('expert', '专家')
               +permissionSetting('voter', '投票人员')
         .m-b-1
-          button.btn.btn-primary.btn-block(@click='save') 保存
+          button.btn.btn-primary.btn-block(v-if='submitting && progress !== 100' disabled) 提交中...{{progress}}%
+          button.btn.btn-primary.btn-block(v-else-if='submitting && progress === 100' disabled) 提交成功，正在处理...
+          button.btn.btn-primary.btn-block(v-else @click='save') 保存
 
 
 block scripts
   include ../../publicModules/crop/crop_new
   include ../../publicModules/selectColor
+  include ../../publicModules/selectUser/selectUser
   +includeJS('/fund/list/settings.js')
