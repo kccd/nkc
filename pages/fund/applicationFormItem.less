@@ -1,3 +1,68 @@
+@import "../publicModules/base";
 .application-form-item{
+  .application-form-header{
+    @height: 3rem;
+    @paddingRight: 10rem;
+    position: relative;
+    padding-right: @paddingRight;
+    height: @height;
+    line-height: @height;
+    .fund-name{
+      //font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .application-form-status{
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: @paddingRight;
+      height: @height;
+      text-align: right;
 
+    }
+  }
+  .application-form-title{
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: #333;
+  }
+  .application-form-footer{
+    position: relative;
+    @height: 2.6rem;
+    @padding-left: 5rem;
+    text-align: right;
+    .application-form-money{
+      position: absolute;
+      text-align: left;
+      top: 0;
+      left: 0;
+      line-height: @height;
+      height: @height;
+      width: @padding-left;
+      span{
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #ff4400;
+      }
+      &>span:first-child{
+        font-size: 1rem;
+        margin-right: 0.3rem;
+      }
+    }
+    .applicant-users{
+      height: @height;
+      .applicant-user{
+        display: inline-block;
+        border-radius: 50%;
+        border: 1px solid #f4f4f4;
+        overflow: hidden;
+        margin-left: -1.5rem;
+        img{
+          height: 2.4rem;
+          width: 2.4rem;
+        }
+      }
+    }
+  }
 }

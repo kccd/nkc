@@ -148,6 +148,9 @@ var Tools = function() {
       case 'fundAvatar': {
         return "/a/" + id + t
       }
+      case 'fundApplicationForm': {
+        return "/fund/a/" + id
+      }
     }
   };
   self.getAnonymousInfo = function() {

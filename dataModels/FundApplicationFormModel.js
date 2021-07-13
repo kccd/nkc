@@ -831,6 +831,7 @@ fundApplicationFormSchema.statics.extendAsApplicationFormList = async (applicati
   for(const a of applicationForms) {
     const fund = fundsObj[a.fundId];
     if(!fund) continue;
+    const status = await a.getStatus();
     const usersId = applicationFormToUser[a._id] || [];
     const users = [];
     for(const uid of usersId) {
@@ -847,6 +848,7 @@ fundApplicationFormSchema.statics.extendAsApplicationFormList = async (applicati
       money: a.money,
       time: a.toc,
       title: project? project.t: '暂未填写项目名称',
+      status: status.description,
       users
     };
     results.push(result);
@@ -855,28 +857,166 @@ fundApplicationFormSchema.statics.extendAsApplicationFormList = async (applicati
 };
 
 /*
+* 获取基金申请表的状态
+* @param {Object} applicationForm 基金申请表对象
+* */
+fundApplicationFormSchema.methods.extendFormStatus = async function() {
+  const formStatus = {
+    general: null,
+    detail: null,
+    breif: null,
+  };
+  const {useless, submittedReport, status, completedAudit, lock} = this;
+  const {submitted, projectPassed, adminSupport, remittance, completed, excellent, successful, usersSupport} = status;
+  let needRemittance = false;
+  for(let r of this.remittance) {
+    if(r.passed && !r.status) {
+      needRemittance = true;
+      break;
+    }
+  }
+  if(this.disabled) {
+    formStatus.general = 1;
+    formStatus.detail = 1;
+    formStatus.breif = `已被屏蔽`
+  }
+};
+
+/*
+* 获取基金申请表状态
+* @return {Object}
+*   @param {Number} general 总状态
+*     1. 申请表无效
+*     2. 申请表未提交，可能是因为用户未提交或审核未通过
+*     3. 申请表正在等待支持或审核
+*     4. 申请项目正在执行中
+*     5. 申请项目已结题
+*   @param {Number} detail 总状态下的子状态 详细说明见此方法末尾
+*   @param {String} 当前申请表的相关说明
+* */
+fundApplicationFormSchema.methods.getStatus = async function() {
+  let formStatus = [];
+  const {useless, submittedReport, status, completedAudit, lock} = this;
+  const {submitted, projectPassed, adminSupport, remittance, completed, successful, usersSupport} = status;
+  let needRemittance = false;
+  for(let r of this.remittance) {
+    if(r.passed && !r.status) {
+      needRemittance = true;
+      break;
+    }
+  }
+  if(this.disabled) {
+    formStatus = [1, 1, '已被屏蔽'];
+  } else if(useless === 'giveUp') {
+    formStatus = [1, 2, '已被申请人放弃'];
+  } else if(useless === 'delete') {
+    formStatus = [1, 3, '已被申请人删除'];
+  } else if(useless === 'exceededModifyCount') {
+    formStatus = [1, 4, '退休次数超过限制'];
+  } else if(useless === 'refuse') {
+    formStatus = [1, 5, '已被彻底拒绝'];
+  } else if(!submitted || !lock.submitted) {
+    if(projectPassed === false) {
+      formStatus = [2, 2, '未通过专家审核'];
+    } else if(adminSupport === false) {
+      formStatus = [2, 3, '未通过管理员复核'];
+    } else {
+      formStatus = [2, 1, '未提交'];
+    }
+  } else if(!usersSupport) {
+    formStatus = [3, 1, '等待网友支持'];
+  } else if(projectPassed === null) {
+    formStatus = [3, 2, '等待专家审核'];
+  } else if(projectPassed === false) {
+    formStatus = [2, 2, '未通过专家审核'];
+  } else if(adminSupport === null) {
+    formStatus = [3, 3, '等待管理员复核'];
+  } else if(adminSupport === false) {
+    formStatus = [2, 3, '未通过管理员复核'];
+  } else if(remittance === null) {
+    formStatus = [4, 2, '等待拨款'];
+  } else if(remittance === false) {
+    formStatus = [4, 3, '拨款出错'];
+  } else if(submittedReport) {
+    formStatus = [4, 4, '等待报告审核'];
+  } else if(needRemittance) {
+    formStatus = [4, 2, '等待拨款'];
+  } else if(completedAudit) {
+    formStatus = [4, 6, '等待结题审核'];
+  } else if(completed === null) {
+    formStatus = [4, 1, '项目执行中'];
+  } else if(completed === false) {
+    formStatus = [4, 7, '未通过结题审核'];
+  } else if(successful) {
+    formStatus = [5, 2, '成功结题'];
+  } else if(!successful) {
+    formStatus = [5, 1, '正常结题'];
+  }
+
+  const descriptions = {
+    '1-1': '已被屏蔽',
+    '1-2': '已被申请人放弃',
+    '1-3': '已被申请人删除',
+    '1-4': '退休次数超过限制',
+    '1-5': '已被彻底拒绝',
+
+    '2-1': '未提交',
+    '2-2': '未通过专家审核',
+    '2-3': '未通过管理员复核',
+
+    '3-1': '等待网友支持',
+    '3-2': '等待专家审核',
+    '3-3': '等待管理员复核',
+
+    '4-1': '项目进行中',
+    '4-2': '等待拨款',
+    '4-3': '拨款出错',
+    '4-4': '等待报告审核',
+    '4-5': '未通过报告审核',
+    '4-6': '等待结题审核',
+    '4-7': '未通过结题审核',
+    '5-1': '正常结题',
+    '5-2': '成功结题'
+  };
+
+  return {
+    general: formStatus[0],
+    detail: formStatus[1],
+    description: descriptions[`${formStatus[0]}-${formStatus[1]}`]
+  };
+};
+
+/*
 * 获取申请表的显示金额
 * @param {[Object]} 申请表上的资金预算字段
 * @param {Object} fundMoney 基金项目上的金额设置
 * @return {Number} 计算所得金额
 * */
-fundApplicationFormSchema.statics.getApplicationFormMoney = (budgetMoney = [], fundMoney) => {
+
+fundApplicationFormSchema.methods.updateMoney = async function() {
+  const {fixedMoney, budgetMoney} = this;
+  if(fixedMoney) return;
+  const {
+    general,
+  } = await this.getStatus();
   let result = 0;
-  if(fundMoney.fixed) {
-    result = fundMoney.value
-  } else {
-    for(const b of budgetMoney) {
-      const {suggest, fact, money, count} = b;
-      if(fact) {
-        result = fact;
-      } else if(suggest) {
-        result = suggest;
-      } else {
-        result = money * count;
-      }
+  for(const b of budgetMoney) {
+    const {fact, money, count} = b;
+    if(general < 4) {
+      result += money * count * 100;
+    } else {
+      result += fact * 100;
     }
   }
-  return result;
+  const money = result / 100;
+  await this.updateOne({$set: {money}});
+  return money;
+};
+
+fundApplicationFormSchema.statics.updateMoneyByApplicationFormId = async (applicationFormId) => {
+  const FundApplicationFormModel = mongoose.model('fundApplicationForms');
+  const applicationForm = await FundApplicationFormModel.findOnly({_id: applicationFormId});
+  return await applicationForm.updateMoney();
 };
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);

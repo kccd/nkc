@@ -21,10 +21,18 @@ block fundContent
                   .description
                     span=fund.description.brief
 
-      .col-xs-12.col-md-8.box-shadow-panel.p-r-0
-        .m-b-1 申请表列表
-          for form in data.applying
-            +applicationFormItem(form)
+      .col-xs-12.col-md-8.box-shadow-panel
+        mixin applicationFormList(arr, name)
+          if arr && arr.length
+            .application-forms.m-b-1
+              .panel-header=name
+              for form in arr
+                +applicationFormItem(form)
+        +applicationFormList(data.excellent, '优秀项目')
+        +applicationFormList(data.applying, '正在申请')
+        +applicationFormList(data.funding, '资助中')
+        +applicationFormList(data.completed, '已完成')
+
       .col-xs-12.col-md-4.box-shadow-panel
         .m-b-1 基金介绍
         .m-b-1 捐款列表
