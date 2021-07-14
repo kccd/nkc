@@ -75,6 +75,7 @@ mixin displayPageCount
 -if (styleType !== 'abstract') {
   -threadPanelClass += ' p-b-0';
 -}
+-var threadTitle = tools.removeLink(thread.firstPost.t);
 
 .thread-panel(class=threadPanelClass data-tid=thread.tid)
   if !thread.reviewed
@@ -95,7 +96,7 @@ mixin displayPageCount
               img(src=anonymousInfo.avatar)
           .thread-panel-minimalist-title
             +checkBox
-            a.thread-panel-minimalist-title-a.thread-panel-url(href=`/t/${thread.tid}` title=thread.firstPost.t class=thread.digest ? "digest" : ""  target=aTarget)=thread.firstPost.t
+            a.thread-panel-minimalist-title-a.thread-panel-url(href=`/t/${thread.tid}` title=threadTitle class=thread.digest ? "digest" : ""  target=aTarget)=threadTitle
             +displayPageCount
           .absolute-count
             -const toc = tools.briefTime(thread.firstPost.toc);
@@ -130,7 +131,7 @@ mixin displayPageCount
           +checkBox
           //- 文章标题
           .thread-panel-title
-            a.title-content.thread-panel-url(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=thread.firstPost.t target=aTarget)= thread.firstPost.t
+            a.title-content.thread-panel-url(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
             +displayPageCount
           if !thread.firstPost.anonymous
             .thread-panel-author(data-float-uid=thread.uid)
@@ -229,7 +230,7 @@ mixin displayPageCount
 
         //- 文章标题
         .thread-panel-title
-          a.title-content.thread-panel-url(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=thread.firstPost.t target=aTarget)= thread.firstPost.t
+          a.title-content.thread-panel-url(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
           -const pageCount = thread.count / state.pageSettings.threadPostList
           -let ellipsis = false;
           -for(let i = 1; i < pageCount; i++)
