@@ -6,6 +6,11 @@ const fundBillSchema = new Schema({
 		type: String,
 		default: Date.now
 	},
+  type: {
+    type: String, // donation: 赞助, 基金拨款, 退款,
+    required: true,
+    index: 1,
+  },
 	from: {
 		type: {// user, fund, fundPool
 			type: String,
@@ -258,6 +263,13 @@ fundBillSchema.statics.getBalance = async function(type, id) {
 		}
 	});
 	return total;
+};
+
+fundBillSchema.statics.getDonationBills = async () => {
+  const FundBillModel = mongoose.model('fundBills');
+  const bills = await FundBillModel.find({
+
+  });
 };
 
 const FundBillModel = mongoose.model('fundBills', fundBillSchema);

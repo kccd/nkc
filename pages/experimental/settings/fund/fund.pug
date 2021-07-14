@@ -6,8 +6,8 @@ block eContent
   .container-fluid.max-width#app(v-cloak)
     .row
       .col-xs-12.col-md-12
-        h4 基金设置
         .form.form-horizontal
+          h3 基金设置
           .form-group
             label.control-label.col-sm-2 总控制
             .col-sm-6
@@ -62,6 +62,54 @@ block eContent
             label.control-label.col-sm-2 资金池介绍
             .col-sm-6
               textarea.form-control(v-model.trim='fundSettings.fundPoolDescription' rows=10)
+          h3.m-t-2 基金赞助
+          .form-group
+            label.control-label.col-sm-2 状态
+            .col-sm-6
+              .radio
+                label.m-r-1
+                  input(type='radio' :value='true' v-model='fundSettings.donation.enabled')
+                  span 开启
+                label
+                  input(type='radio' :value='false' v-model='fundSettings.donation.enabled')
+                  span 关闭
+          .form-group
+            label.control-label.col-sm-2 金额
+            .col-sm-6
+              .form-inline
+                h5 单笔赞助最小金额（元）
+                input.form-control(type='text' v-model.number='fundSettings.donation.min')
+                h5 单笔赞助最大金额（元）
+                input.form-control(type='text' v-model.number='fundSettings.donation.max')
+              h5 预设金额（逗号分隔）
+              textarea.form-control(rows=2 v-model='defaultMoney')
+          .form-group
+            label.control-label.col-sm-2 支付方式
+            .col-sm-6
+              table.table.table-bordered
+                thead
+                  tr
+                    th 平台
+                    th 手续费(%)
+                    th 启用
+                tbody
+                  tr
+                    th 支付宝
+                    th
+                      input.form-control(type='text' v-model.number='fundSettings.donation.payment.alipay._fee')
+                    th
+                      .checkbox
+                        label
+                          input(type='checkbox' :value='true' v-model='fundSettings.donation.payment.alipay.enabled')
+                  tr
+
+                    th 微信支付
+                    th
+                      input.form-control(type='text' v-model.number='fundSettings.donation.payment.wechat._fee')
+                    th
+                      .checkbox
+                        label
+                          input(type='checkbox' :value='true' v-model='fundSettings.donation.payment.wechat.enabled')
           .form-group
             label.control-label.col-sm-2
             .col-sm-6

@@ -1,12 +1,15 @@
 if !isIncluded('applicationFormItem')
   +includeCSS('/fund/applicationFormItem.css')
   mixin applicationFormItem(form)
-    -var {fundName, code, money, users, status} = form;
+    -var {fundName, code, money, users, status, fundId} = form;
     -var {_id, money, title, url, time} = form;
     -users = users.reverse();
     .application-form-item
       .application-form-header
-        .fund-name=`${code} ${fundName}`
+        .fund-name
+          span=`${time} `
+          a(href=tools.getUrl('singleFundHome', fundId))=fundName
+          span=` ${code}`
         .application-form-status= status
       a(href=tools.getUrl('fundApplicationForm', _id)).application-form-title=title
       .application-form-footer
@@ -15,6 +18,11 @@ if !isIncluded('applicationFormItem')
           span=money
         .applicant-users
           for u in users
-            -var {username, avatar, uid} = u
-            .applicant-user(data-float-uid=uid)
+            -var {username, avatar, uid} = u;
+            a.applicant-user(href=tools.getUrl('userHome', uid) data-float-uid=uid target='_blank')
               img(src=tools.getUrl('userAvatar', avatar))
+  mixin applicationFormList(arr)
+    if arr && arr.length
+      .application-form-list
+        for a in arr
+          +applicationFormItem(a)

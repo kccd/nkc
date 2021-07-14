@@ -1,4 +1,5 @@
 const settings = require('../settings');
+const moment = require('moment');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundApplicationFormSchema = new Schema({
@@ -846,7 +847,7 @@ fundApplicationFormSchema.statics.extendAsApplicationFormList = async (applicati
       fundName: fund.name,
       fundId: fund._id,
       money: a.money,
-      time: a.toc,
+      time: moment(a.toc).format(`YYYY/MM/DD`),
       title: project? project.t: '暂未填写项目名称',
       status: status.description,
       users
@@ -856,31 +857,6 @@ fundApplicationFormSchema.statics.extendAsApplicationFormList = async (applicati
   return results;
 };
 
-/*
-* 获取基金申请表的状态
-* @param {Object} applicationForm 基金申请表对象
-* */
-fundApplicationFormSchema.methods.extendFormStatus = async function() {
-  const formStatus = {
-    general: null,
-    detail: null,
-    breif: null,
-  };
-  const {useless, submittedReport, status, completedAudit, lock} = this;
-  const {submitted, projectPassed, adminSupport, remittance, completed, excellent, successful, usersSupport} = status;
-  let needRemittance = false;
-  for(let r of this.remittance) {
-    if(r.passed && !r.status) {
-      needRemittance = true;
-      break;
-    }
-  }
-  if(this.disabled) {
-    formStatus.general = 1;
-    formStatus.detail = 1;
-    formStatus.breif = `已被屏蔽`
-  }
-};
 
 /*
 * 获取基金申请表状态

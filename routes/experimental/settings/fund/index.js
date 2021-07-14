@@ -9,7 +9,7 @@ router
   .put('/', async (ctx, next) => {
     const {data, db, nkcModules} = ctx;
     const {user} = data;
-    const {checkString} = nkcModules.checkData;
+    const {checkString, checkNumber} = nkcModules.checkData;
     const originFundSettings = await db.SettingModel.getSettings('fund');
     const {fundSettings} = ctx.body;
     const {
@@ -20,7 +20,8 @@ router
       terms,
       readOnly,
       donationDescription,
-      fundPoolDescription
+      fundPoolDescription,
+      donation
     } = fundSettings;
     const {status, reason} = closed;
     if(status) {
@@ -61,6 +62,42 @@ router
       closedUid = user.uid;
       closingTime = new Date();
     }
+
+    const {enabled, min, max, defaultMoney, payment} = donation;
+    const {alipay, wechat} = payment;
+    checkNumber(min, {
+      name: '单笔赞助最小金额',
+      min: 1,
+      max: 5000,
+    });
+    checkNumber(max, {
+      name: '单笔赞助最大金额',
+      min: 1,
+      max: 5000,
+    });
+    if(min > max) {
+      ctx.throw(400, `单笔赞助最小金额不能大于最大金额`);
+    }
+
+    for(const m of defaultMoney) {
+      if(m < min || m > max) ctx.throw(400, `预设金额不在赞助金额范围内`);
+    }
+
+    checkNumber(alipay.fee, {
+      name: '支付宝支付手续费',
+      min: 0,
+      fractionDigits: 5,
+    });
+    checkNumber(wechat.fee, {
+      name: '微信支付手续费',
+      min: 0,
+      fractionDigits: 5,
+    });
+
+    if(enabled && !alipay.enabled && !wechat.enabled) {
+      ctx.throw(400, `请至少启用一种支付方式`);
+    }
+
     await db.SettingModel.updateOne({_id: 'fund'}, {
       $set: {
         'c.enableFund': !!enableFund,
@@ -75,7 +112,23 @@ router
           closingTime: closingTime
         },
         'c.donationDescription': donationDescription,
-        'c.fundPoolDescription': fundPoolDescription
+        'c.fundPoolDescription': fundPoolDescription,
+        'c.donation': {
+          enabled: !!enabled,
+          min,
+          max,
+          defaultMoney,
+          payment: {
+            alipay: {
+              enabled: !!alipay.enabled,
+              fee: alipay.fee
+            },
+            wechat: {
+              enabled: !!wechat.enabled,
+              fee: wechat.fee
+            }
+          }
+        }
       }
     });
     await db.SettingModel.saveSettingsToRedis('fund');
