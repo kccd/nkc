@@ -95,7 +95,7 @@ func.transfer = async (o) => {
   if(!account) throwErr('收款方支付宝账号不能为空');
   if(!id) throwErr('支付宝转账ID不能为空');
   if(!name) throwErr('收款方真实姓名不能为空');
-  if(!money || money <= 0.1) throwErr('支付宝转账金额不能小于0.1');
+  if(!money || money < 0.1) throwErr('支付宝转账金额不能小于0.1');
   if(!notes) throwErr('转账备注不能为空');
   const params = {
     trans_amount: money,
