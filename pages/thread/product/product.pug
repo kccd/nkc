@@ -93,10 +93,13 @@ style.
     height: 300px;
   }
 .row
-  if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('banSaleProductParams'))
+  if permission('banSaleProductParams')
     if !product.adminBan
       .col-xs-12.col-sm-12.col-md-12.col-lg-12(style="text-align:right")
-        button.btn.btn-sm.btn-danger(style="padding:0" onclick=`banSale(${product.productId})`) 禁售
+        button.btn.btn-sm.btn-danger(style="padding: 0.2rem;" onclick=`banSale(${product.productId}, true)`) 禁售
+    else
+      .col-xs-12.col-sm-12.col-md-12.col-lg-12(style="text-align:right")
+        button.btn.btn-sm.btn-success(style="padding:0.2rem;" onclick=`banSale(${product.productId}, false)`) 恢复销售
   .col-xs-12.col-sm-12.col-md-12.col-lg-6.pcSlide(style="padding-top:15px")#productImageDom
     ul#etalage
       -for(let rid of product.imgIntroductions)
