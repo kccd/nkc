@@ -252,7 +252,8 @@ var Tools = function() {
     }
   };
   // 去除文本中的链接
-  self.removeLink = function(content = '') {
+  self.removeLink = function(content) {
+    content = content || ''
     var reg = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/ig;
     return content.replace(reg, '');
   }
