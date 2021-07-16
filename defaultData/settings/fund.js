@@ -18,15 +18,15 @@ module.exports = {
 
     donation: {
       enabled: false,
-      min: 1,
-      max: 5000,
-      defaultMoney: [5, 10, 50, 100, 500, 1000, 5000],
+      min: 100, // 分
+      max: 500000,
+      defaultMoney: [500, 1000, 5000, 10000, 50000, 100000, 500000],
       payment: {
-        alipay: {
+        aliPay: {
           enabled: false,
           fee: 0
         },
-        wechat: {
+        wechatPay: {
           enabled: false,
           fee: 0
         }

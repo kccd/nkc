@@ -52,13 +52,15 @@ router
       };
     } else {
       // 微信支付
-      if(!['native', 'H5'].includes(apiType)) ctx.throw(400, `微信支付apiType error`);
-      const weChatPaymentRecord = await db.WeChatPaymentModel.getPaymentRecord({
+      const weChatPaymentRecord = await db.WechatPayRecordModel.getPaymentRecord({
         apiType,
         description,
         money: totalPrice,
+        fee,
+        effectiveMoney: finalPrice,
         uid: state.uid,
         attach: {},
+        from: 'score',
         clientIp: ctx.address,
         clientPort: ctx.port,
       });
@@ -79,7 +81,7 @@ router
         description,
       });
     }
-    data.weChatPaymentInfo = weChatPaymentInfo;
+    data.wechatPaymentInfo = weChatPaymentInfo;
     data.aliPaymentInfo = aliPaymentInfo;
     await next();
   })

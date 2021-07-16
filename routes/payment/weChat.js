@@ -2,7 +2,7 @@ const router = require('koa-router')();
 router
   .post('/', async (ctx, next) => {
     const {db, body} = ctx;
-    const paymentRecord = await db.WeChatPaymentModel.setRecordStatusByNotificationInfo(body);
+    const paymentRecord = await db.WechatPayRecordModel.setRecordStatusByNotificationInfo(body);
     if(paymentRecord.status === 'success') {
 
     }
@@ -14,7 +14,7 @@ router
   .get('/:_id', async (ctx, next) => {
     const {db, params, data} = ctx;
     const {_id} = params;
-    const weChatPayRecord = await db.WeChatPaymentModel.findOne({_id});
+    const weChatPayRecord = await db.WechatPayRecordModel.findOne({_id});
     data.record = {
       status: weChatPayRecord.status,
       apiType:weChatPayRecord.apiType,

@@ -47,10 +47,10 @@ table.table.table-bordered
             span 系统
         +loadInfo(b.fromInfo)
         +loadInfo(b.toInfo)
-        th= b.money.toFixed(1)
+        th= b.money.toFixed(2)
         th= b.notes
         if displayBalance
-          th= b.balance.toFixed(1)
+          th= b.balance.toFixed(2)
         if data.userOperationsId.includes("modifyFundBill") || ((b.fund || data.fund) && ensureFundOperatorPermission('financialStaff', data.user, data.fund || b.fund))
           th
             a(href=`/fund/bills/${b._id}`) 修改

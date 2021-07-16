@@ -89,15 +89,6 @@ window.rechargeApp = new Vue({
     toPay: function() {
       const {payment, finalPrice, totalPrice, rechargeSettings} = this;
       const {min, max} = rechargeSettings;
-      const self = this;
-      let appType;
-      if(NKC.configs.platform === 'reactNative') {
-        appType = 'app';
-      } else if(NKC.methods.isMobilePhoneBrowser()) {
-        appType = 'mobilePhoneBrowser';
-      } else {
-        appType = 'pcBrowser';
-      }
       let newWindow;
       return Promise.resolve()
         .then(() => {
@@ -107,19 +98,27 @@ window.rechargeApp = new Vue({
           if(totalPrice > max) {
             throw new Error(`充值金额不能大于${max / 100}元`);
           }
-          if(['pcBrowser', 'mobilePhoneBrowser'].includes(appType)) {
+          if(
+            NKC.methods.isPcBrowser() ||
+            NKC.methods.isMobilePhoneBrowser()
+          ) {
             newWindow = window.open();
           }
           return nkcAPI('/account/finance/recharge/payment', 'POST', {
-            apiType: appType === 'pcBrowser'? 'native': 'H5',
+            apiType: NKC.methods.isPcBrowser()? 'native': 'H5',
             paymentType: payment,
             totalPrice,
             finalPrice
           });
         })
         .then(res => {
-          const {weChatPaymentInfo, aliPaymentInfo} = res;
-          if(weChatPaymentInfo) {
+          const {wechatPaymentInfo, aliPaymentInfo} = res;
+          if(wechatPaymentInfo) {
+            NKC.methods.toPay('wechatPay', wechatPaymentInfo, newWindow);
+          } else if(aliPaymentInfo) {
+            NKC.methods.toPay('aliPay', aliPaymentInfo, newWindow);
+          }
+          /*if(weChatPaymentInfo) {
             const url = `/payment/wechat/${weChatPaymentInfo.paymentId}`;
             if(payment === 'weChat') {
               if(appType === 'pcBrowser') {
@@ -141,7 +140,7 @@ window.rechargeApp = new Vue({
             } else {
               newWindow.location = aliPaymentInfo.url;
             }
-          }
+          }*/
           sweetInfo('请在浏览器新打开的窗口完成支付！若没有新窗口打开，请检查新窗口是否已被浏览器拦截。');
         })
         .catch(err => {

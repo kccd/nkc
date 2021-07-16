@@ -214,7 +214,7 @@ function sweetError(text) {
     Swal.close();
   });
   console.log(text);
-  text = text.error || text;
+  text = text.error || text.message || text;
   text = text + "";
   return Swal({
     type: "error",

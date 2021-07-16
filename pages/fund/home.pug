@@ -3,7 +3,7 @@ block fundTitle
   +includeCSS('/fund/home.css')
   include ./applicationFormItem
 block fundContent
-  #data.hidden=objToStr({funds: data.funds, donation: data.fundSettings.donation})
+  #data.hidden=objToStr({donationEnabled: data.fundSettings.donation.enabled, funds: data.funds, donation: data.fundSettings.donation, donationBills: data.donationBills})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12.m-t-1
@@ -33,8 +33,8 @@ block fundContent
         +afl(data.funding, '资助中')
         +afl(data.completed, '已完成')
 
-      .col-xs-12.col-md-4.box-shadow-panel.p-l-0
-        .m-b-1#donationApp(v-cloak)
+      .col-xs-12.col-md-4.box-shadow-panel.p-l-0#donationApp(v-cloak)
+        .m-b-1
           .panel-header 赞助
           .donation
             h5 赞助对象
@@ -44,11 +44,11 @@ block fundContent
             h5 赞助金额
             .donation-list
               .donation-money(v-for='m in donation.defaultMoney')
-                span(:class="{'active': money === m}" @click='selectMoney(m)') {{m}} 元
+                span(:class="{'active': money === m}" @click='selectMoney(m)') {{m / 100}} 元
               .donation-money
                 span(:class="{'active': !!inputMoney}" @click='toInputNumber') 自定义
             .m-t-05.m-b-1(v-if='!!inputMoney')
-              h5 请输入赞助金额 （{{donation.min}} 元 到 {{donation.max}} 元之间）：
+              h5 请输入赞助金额 （{{donation.min / 100}} 元 到 {{donation.max / 100}} 元之间）：
               input.form-control(type='text' v-model.number='customMoney' placeholder='请输入赞助金额' @change='formatInputMoney')
             h5 付款方式
             .donation-list
@@ -60,10 +60,29 @@ block fundContent
                 input(type='checkbox' :value='true' v-model='anonymous')
                 span 匿名赞助
             .payment-info {{paymentInfo}}
-            .m-t-1
-              button.payment-button(v-if='submitting' disabled) 提交中
+            .m-t-1.m-b-1
+              button.payment-button(v-if='!donationEnabled' disabled) 赞助功能已关闭
+              button.payment-button(v-else-if='submitting' disabled) 提交中
               button.payment-button(v-else @click='submit') 提交
-        .m-b-1 赞助人列表
+            .payment-info=data.fundSettings.donationDescription
+        .m-b-1(v-if='donationBills.length > 0')
+          .panel-header.m-b-0 赞助人
+          .donation-bills.p-t-05
+            .donation-bill(v-for='b in donationBills')
+              .user-avatar
+                img(:src='b.user.avatarUrl')
+              .user-info
+                .username
+                  span(v-if='!b.user.uid') {{b.user.username}}
+                  a(v-else :data-float-uid='b.user.uid' :href='getUrl("userHome", b.user.uid)' target="_blank") {{b.user.username}}
+                .time {{b.time}}
+                .fund 赞助&nbsp;
+                  span(v-if='!b.fund.fundId') {{b.fund.name}}
+                  a(v-else :href='getUrl("singleFundHome", b.fund.fundId)' target='_blank') {{b.fund.name}}
+                .money
+                  //.fa.fa-jpy
+                  span {{b.money}} 元
+            a(href=`/fund/bills?type=donation` target="_blank").other-info 查看更多
 block fundScripts
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
   +includeJS('/fund/home.js')

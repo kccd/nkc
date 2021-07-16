@@ -12,6 +12,9 @@ window.donationApp = new Vue({
     customMoney: null,
     submitting: false,
     anonymous: false,
+    donationEnabled: data.donationEnabled,
+
+    donationBills: data.donationBills,
   },
   computed: {
     targets() {
@@ -19,7 +22,7 @@ window.donationApp = new Vue({
       const arr = [
         {
           name: '资金池',
-          type: 'pool'
+          type: 'fundPool'
         }
       ];
       for(const f of funds) {
@@ -31,27 +34,46 @@ window.donationApp = new Vue({
       return arr;
     },
     payment() {
-      const {alipay, wechat} = this.donation.payment;
+      const {aliPay, wechatPay} = this.donation.payment;
       const arr = [];
-      if (alipay.enabled) {
+      if (aliPay.enabled) {
         arr.push({
-          type: 'alipay',
+          type: 'aliPay',
           name: '支付宝'
         });
       }
-      if(wechat.enabled) {
+      if(wechatPay.enabled) {
         arr.push({
-          type: 'wechat',
+          type: 'wechatPay',
           name: '微信'
         });
       }
       return arr;
     },
-    paymentInfo() {
+    fee() {
       const {payment} = this.donation;
       const {paymentType} = this;
-      const {fee} = payment[paymentType];
-      return `服务商（非本站）将收取 ${fee * 100}% 的手续费`;
+      const paymentData = payment[paymentType];
+      if(!paymentData) return null;
+      return paymentData.fee;
+    },
+    realMoney() {
+      const {money, inputMoney, customMoney} = this;
+      if(inputMoney) {
+        return Math.ceil(customMoney * 100);
+      } else {
+        return money;
+      }
+    },
+    totalMoney() {
+      const {realMoney, fee} = this;
+      if(fee === null) return null;
+      return Math.ceil(realMoney * (1 + fee));
+    },
+    paymentInfo() {
+      const {totalMoney, fee} = this;
+      if(totalMoney === null) return '';
+      return `服务商（非本站）将收取 ${fee * 100}% 的手续费，实际支付金额为 ${totalMoney / 100} 元`;
     }
   },
   mounted() {
@@ -60,6 +82,7 @@ window.donationApp = new Vue({
     this.selectPaymentType(this.payment[0].type);
   },
   methods: {
+    getUrl: NKC.methods.tools.getUrl,
     selectFund(fundId) {
       this.fundId = fundId;
     },
@@ -75,12 +98,56 @@ window.donationApp = new Vue({
       this.inputMoney = true;
     },
     formatInputMoney() {
-      let customMoney = parseInt(this.customMoney);
+      let customMoney = Number(this.customMoney.toFixed(2));
       if(isNaN(customMoney)) customMoney = 0;
       this.customMoney = customMoney;
     },
     submit() {
       this.submitting = true;
+      const self = this;
+      const {
+        realMoney,
+        paymentType,
+        fee,
+        totalMoney,
+        donation,
+        anonymous,
+        fundId
+      } = this;
+      let newWindow = null;
+      return Promise.resolve()
+        .then(() => {
+          if(totalMoney < donation.min) {
+            throw new Error(`赞助金额不能小于 ${donation.min / 100} 元`);
+          }
+          if(totalMoney > donation.max) {
+            throw new Error(`赞助金额不能大于 ${donation.min / 100} 元`);
+          }
+          newWindow = window.open();
+          return nkcAPI('/fund/donation', 'POST', {
+            money: realMoney,
+            fee,
+            apiType: NKC.methods.isPcBrowser()? 'native': 'H5',
+            paymentType,
+            fundId,
+            anonymous,
+          });
+        })
+        .then(res => {
+          const {aliPaymentInfo, wechatPaymentInfo} = res;
+          console.log(res);
+          if(wechatPaymentInfo) {
+            NKC.methods.toPay('wechatPay', wechatPaymentInfo, newWindow);
+          } else if(aliPaymentInfo) {
+            NKC.methods.toPay('aliPay', aliPaymentInfo, newWindow);
+          }
+          self.submitting = false;
+        })
+        .catch(error => {
+          self.submitting = false;
+          if(newWindow && newWindow.close) newWindow.close();
+          sweetError(error);
+        });
     }
   }
 });

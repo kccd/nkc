@@ -106,9 +106,10 @@ const kcbsRecordSchema = new Schema({
 
   // 支付平台
   paymentType: {
-    type: String,
-    enum: ['weChat', 'aliPay', ''],
-    default: ''
+    type: String, // wechatPay, aliPay, ''
+    // enum: ['weChat', 'aliPay', ''], weChat 已被废弃，当前微信支付用 wechatPay 表示
+    default: '',
+    index: 1,
   },
   // 支付记录ID
   paymentId: {

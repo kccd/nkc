@@ -42,6 +42,7 @@ module.exports = {
 	},
 	donation: {
 		GET: 'fundDonation',
+    POST: 'fundDonation',
 		return: {
 			GET: 'fundDonation'
 		},

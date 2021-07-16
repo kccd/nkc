@@ -64,37 +64,37 @@ router
     }
 
     const {enabled, min, max, defaultMoney, payment} = donation;
-    const {alipay, wechat} = payment;
+    const {aliPay, wechatPay} = payment;
     checkNumber(min, {
       name: '单笔赞助最小金额',
       min: 1,
-      max: 5000,
+      max: 500000,
     });
     checkNumber(max, {
       name: '单笔赞助最大金额',
       min: 1,
-      max: 5000,
+      max: 500000,
     });
     if(min > max) {
       ctx.throw(400, `单笔赞助最小金额不能大于最大金额`);
     }
 
-    for(const m of defaultMoney) {
+    for(let m of defaultMoney) {
       if(m < min || m > max) ctx.throw(400, `预设金额不在赞助金额范围内`);
     }
 
-    checkNumber(alipay.fee, {
+    checkNumber(aliPay.fee, {
       name: '支付宝支付手续费',
       min: 0,
       fractionDigits: 5,
     });
-    checkNumber(wechat.fee, {
+    checkNumber(wechatPay.fee, {
       name: '微信支付手续费',
       min: 0,
       fractionDigits: 5,
     });
 
-    if(enabled && !alipay.enabled && !wechat.enabled) {
+    if(enabled && !aliPay.enabled && !wechatPay.enabled) {
       ctx.throw(400, `请至少启用一种支付方式`);
     }
 
@@ -119,13 +119,13 @@ router
           max,
           defaultMoney,
           payment: {
-            alipay: {
-              enabled: !!alipay.enabled,
-              fee: alipay.fee
+            aliPay: {
+              enabled: !!aliPay.enabled,
+              fee: aliPay.fee
             },
-            wechat: {
-              enabled: !!wechat.enabled,
-              fee: wechat.fee
+            wechatPay: {
+              enabled: !!wechatPay.enabled,
+              fee: wechatPay.fee
             }
           }
         }

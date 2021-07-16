@@ -82,39 +82,7 @@ fundRouter
       disabled: false,
       history: false
     }).sort({toc: 1});
-    const donationBills = await db.FundBillModel.find({
-	    'from.type': 'user',
-	    'from.anonymous': false,
-	    'from.id': {$ne: ''},
-	    abstract: '赞助',
-	    verify: true
-    }).sort({toc: -1}).limit(12);
-
-    //查询赞助人 统计赞助总金额
-		let donationUsers = [];
-		for(let b of donationBills) {
-			const uid = b.from.id;
-			let flag = false;
-			for(let d of donationUsers) {
-				if(d.uid === uid) {
-					d.money += b.money;
-					flag = true;
-					break;
-				}
-			}
-			if(!flag) {
-				donationUsers.push({
-					uid,
-					money: b.money,
-					user: await db.UserModel.findOnly({uid})
-				});
-			}
-		}
-		if(donationUsers.length < 10) {
-			donationUsers = donationUsers.slice(0, 6);
-		}
-		data.donationUsers = donationUsers;
-		// ctx.template = 'fund/fundHome.pug';
+    data.donationBills = await db.FundBillModel.getDonationBills();
     ctx.template = 'fund/home.pug';
     await next();
   })

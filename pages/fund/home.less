@@ -52,9 +52,6 @@
     margin: 0 -0.5rem;
     font-size: 0;
   }
-  .donation-money-list{
-
-  }
   @height: 3rem;
   .donation-money, .donation-fund, .donation-pay{
     width: 25%;
@@ -64,8 +61,9 @@
     display: inline-block;
     margin-bottom: 1rem;
     span{
+      height: 100%;
+      .hideText(@line: 1);
       font-size: 1.2rem;
-      display: block;
       border: 1px solid #ddd;
       border-radius: 3px;
       text-align: center;
@@ -80,7 +78,8 @@
   }
   .payment-info{
     margin: 0.5rem 0 ;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    white-space: pre-wrap;
     color: #555;
   }
   .payment-button{
@@ -95,6 +94,85 @@
     }
     &[disabled] {
       cursor: not-allowed;
+    }
+  }
+}
+.donation-bills{
+  &>.donation-bill:first-child{
+    margin-top: 0.5rem;
+  }
+  .other-info{
+    height: 2.6rem;
+    line-height: 2.6rem;
+    text-align: center;
+    display: block;
+    //background-color: @gray;
+    font-size: 1rem;
+    color: #555;
+    border-radius: 3px;
+    text-decoration: none;
+    &:hover, &:active{
+      opacity: 0.7;
+    }
+  }
+  .donation-bill{
+    @height: 3.2rem;
+    padding-left: @height + 0.5rem;
+    position: relative;
+    margin: 1rem 0;
+    .user-avatar{
+      top: 0;
+      left: 0;
+      position: absolute;
+      height: @height;
+      width: @height;
+      img{
+        border-radius: 3px;
+        height: @height;
+        width: @height;
+      }
+    }
+    .user-info{
+      position: relative;
+      padding-right: 2 * @height;
+      .username{
+        height: 1.6rem;
+        .hideText(@line: 1);
+        font-size: 1.25rem;
+      }
+      .time{
+        font-size: 1rem;
+        color: #555;
+        display: inline-block;
+      }
+      .fund{
+        display: inline-block;
+        color: #555;
+        font-size: 1rem;
+        span{
+
+        }
+        a{
+
+        }
+      }
+      .money{
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: @height;
+        line-height: @height;
+        width: 2 * @height;
+        text-align: right;
+        color: #ff4400;
+        .unit{
+          font-size: 1rem;
+          margin-right: 0.2rem;
+        }
+        span{
+          font-size: 1.3rem;
+        }
+      }
     }
   }
 }

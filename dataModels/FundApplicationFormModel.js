@@ -882,51 +882,51 @@ fundApplicationFormSchema.methods.getStatus = async function() {
     }
   }
   if(this.disabled) {
-    formStatus = [1, 1, '已被屏蔽'];
+    formStatus = [1, 1];
   } else if(useless === 'giveUp') {
-    formStatus = [1, 2, '已被申请人放弃'];
+    formStatus = [1, 2];
   } else if(useless === 'delete') {
-    formStatus = [1, 3, '已被申请人删除'];
+    formStatus = [1, 3];
   } else if(useless === 'exceededModifyCount') {
-    formStatus = [1, 4, '退休次数超过限制'];
+    formStatus = [1, 4];
   } else if(useless === 'refuse') {
-    formStatus = [1, 5, '已被彻底拒绝'];
+    formStatus = [1, 5];
   } else if(!submitted || !lock.submitted) {
     if(projectPassed === false) {
-      formStatus = [2, 2, '未通过专家审核'];
+      formStatus = [2, 2];
     } else if(adminSupport === false) {
-      formStatus = [2, 3, '未通过管理员复核'];
+      formStatus = [2, 3];
     } else {
-      formStatus = [2, 1, '未提交'];
+      formStatus = [2, 1];
     }
   } else if(!usersSupport) {
-    formStatus = [3, 1, '等待网友支持'];
+    formStatus = [3, 1];
   } else if(projectPassed === null) {
-    formStatus = [3, 2, '等待专家审核'];
+    formStatus = [3, 2];
   } else if(projectPassed === false) {
-    formStatus = [2, 2, '未通过专家审核'];
+    formStatus = [2, 2];
   } else if(adminSupport === null) {
-    formStatus = [3, 3, '等待管理员复核'];
+    formStatus = [3, 3];
   } else if(adminSupport === false) {
-    formStatus = [2, 3, '未通过管理员复核'];
+    formStatus = [2, 3];
   } else if(remittance === null) {
-    formStatus = [4, 2, '等待拨款'];
+    formStatus = [4, 2];
   } else if(remittance === false) {
-    formStatus = [4, 3, '拨款出错'];
+    formStatus = [4, 3];
   } else if(submittedReport) {
-    formStatus = [4, 4, '等待报告审核'];
+    formStatus = [4, 4];
   } else if(needRemittance) {
-    formStatus = [4, 2, '等待拨款'];
+    formStatus = [4, 2];
   } else if(completedAudit) {
-    formStatus = [4, 6, '等待结题审核'];
+    formStatus = [4, 6];
   } else if(completed === null) {
-    formStatus = [4, 1, '项目执行中'];
+    formStatus = [4, 1];
   } else if(completed === false) {
-    formStatus = [4, 7, '未通过结题审核'];
+    formStatus = [4, 7];
   } else if(successful) {
-    formStatus = [5, 2, '成功结题'];
+    formStatus = [5, 2];
   } else if(!successful) {
-    formStatus = [5, 1, '正常结题'];
+    formStatus = [5, 1];
   }
 
   const descriptions = {
@@ -937,8 +937,8 @@ fundApplicationFormSchema.methods.getStatus = async function() {
     '1-5': '已被彻底拒绝',
 
     '2-1': '未提交',
-    '2-2': '未通过专家审核',
-    '2-3': '未通过管理员复核',
+    '2-2': '未通过专家审核，等待申请人修改',
+    '2-3': '未通过管理员复核，等待申请人修改',
 
     '3-1': '等待网友支持',
     '3-2': '等待专家审核',
@@ -948,9 +948,9 @@ fundApplicationFormSchema.methods.getStatus = async function() {
     '4-2': '等待拨款',
     '4-3': '拨款出错',
     '4-4': '等待报告审核',
-    '4-5': '未通过报告审核',
+    '4-5': '未通过报告审核，等待申请人修改',
     '4-6': '等待结题审核',
-    '4-7': '未通过结题审核',
+    '4-7': '未通过结题审核，等待申请人修改',
     '5-1': '正常结题',
     '5-2': '成功结题'
   };
