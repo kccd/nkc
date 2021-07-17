@@ -142,7 +142,7 @@ var app = new Vue({
         method = 'PUT';
       }
       formData.append('question', JSON.stringify(q));
-      submitting = '提交中';
+      app.submitting = '提交中';
       uploadFilePromise(url, formData, function (e) {
         var num = ((e.loaded/e.total)*100).toFixed(2);
         if(num > 100) num = 100;
