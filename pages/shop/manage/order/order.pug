@@ -46,7 +46,7 @@ block shopContent
                   .order-info
                     .name 买家：
                     a.value(href=`/u/${order.buyUid}` data-float-uid=order.buyUid)=order.buyUser.username
-                    a.value.m-r-1(href=`/message?uid=${order.buyUid}` title=`联系买家(${order.buyUser.online ? "在线" : "离线"})` target="_blank")
+                    a.value.m-r-1(onclick=`NKC.methods.toChat("${order.buyUid}", '${order.buyUser.username}')` title=`联系买家(${order.buyUser.online ? "在线" : "离线"})`)
                       .fa.fa-commenting-o(class=order.buyUser.online ? "active" : "")
                     if order.orderStatus !== "unCost" && permission("transferKcbToUser") 
                       button.order-button(onclick=`transfer('${order.buyUid}')`) 转账

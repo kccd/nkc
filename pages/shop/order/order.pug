@@ -40,7 +40,7 @@ block shopContent
                   .order-info
                     .name 卖家：
                     a.value(href=`/u/${order.sellUid}` data-float-uid=order.sellUid)=order.sellUser.username
-                    a.value(href=`/message?uid=${order.sellUid}` title=`联系卖家(${order.sellUser.online?"在线":"离线"})` target="_blank")
+                    a.value(onclick=`NKC.methods.toChat("${order.sellUid}", '${order.sellUser.username}')` title=`联系卖家(${order.sellUser.online?"在线":"离线"})` target="_blank")
                       .fa.fa-commenting-o(class=order.sellUser.online?"active":"")
               for param,key in order.params
                 tr
