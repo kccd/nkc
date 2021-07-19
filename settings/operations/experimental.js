@@ -312,7 +312,11 @@ module.exports = {
 	systemInfo: {
 		GET: 'visitSystemInfo',
 		POST: 'sendSystemInfo',
-    PUT: "modifySystemInfo"
+    PUT: "modifySystemInfo",
+		DELETE: "deleteSystemInfo",
+		fuzzy_search_user: {
+			GET: "fuzzySearchUser"
+		}
 	},
 	log: {
     GET: 'visitPublicLogs',

@@ -1344,7 +1344,6 @@ messageSchema.statics.markAsRead = async (type, uid, tUid) => {
         await log.save();
       }
     }
-    console.log(`有努力清除标志`);
   } else if(type === 'STU'){
     await MessageModel.updateMany({ty: type, r: uid, vd: false}, {$set: {vd: true}});
   } else if(type === 'newFriends') {
