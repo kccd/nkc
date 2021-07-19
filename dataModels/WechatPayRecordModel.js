@@ -16,7 +16,7 @@ const schema = new mongoose.Schema({
   // 状态
   status: {
     type: String,
-    enum: ['waiting', 'success', 'fail', 'timeout'],
+    enum: ['waiting', 'success'],
     required: true,
     index: 1
   },
@@ -211,26 +211,41 @@ schema.statics.setRecordStatusByNotificationInfo = async (body) => {
   weChatPayRecord.note = note;
   weChatPayRecord.fullData = dataStr;
   await weChatPayRecord.save();
-  await weChatPayRecord.toUpdateRecord();
+  await WechatPayRecordModel.toUpdateRecord('wechatPay', weChatPayRecord._id);
   return weChatPayRecord;
 };
 
-
 /*
-* 更新与当前支付记录相关联的账单（积分账单、基金账单）
+* 更新与当前支付记录相关联的其他模块状态
+* 例如付款后去更新用户账单（kcbsRecord）或基金账单（fundBill）
+* @param {String} type 支付类型 aliPay, wechatPay
+* @param {String} id 支付记录 ID aliPayRecordId 或 wechatPayRecordId
 * */
-schema.methods.toUpdateRecord = async function() {
+schema.statics.toUpdateRecord = async (type, id) => {
   const KcbsRecordModel = mongoose.model('kcbsRecords');
   const FundBillModel = mongoose.model('fundBills');
-  const {_id, status, from} = this;
+  const WechatPayRecordModel = mongoose.model('wechatPayRecords');
+  const AliPayRecordModel = mongoose.model('aliPayRecords');
+  if(!['aliPay', 'wechatPay'].includes(type)) throwErr(500, `payment type error`);
+  let model;
+  if(type === 'aliPay') {
+    model = AliPayRecordModel;
+  } else {
+    model = WechatPayRecordModel;
+  }
+  const {status, from} = await model.findOnly({_id: id}, {status: 1, from: 1});
   if(status !== 'success') return;
+  const match = {
+    paymentId: id,
+    paymentType: type
+  };
   if(from === 'score') {
-    const kcbsRecord = await KcbsRecordModel.findOne({paymentId: _id, paymentType: 'wechatPay'});
+    const kcbsRecord = await KcbsRecordModel.findOne(match);
     if(kcbsRecord) await kcbsRecord.verifyPass();
   } else if(from === 'fund') {
-    const fundBill = await FundBillModel.findOne({paymentId: _id, paymentType: 'wechatPay'});
+    const fundBill = await FundBillModel.findOne(match);
     if(fundBill) await fundBill.verifyPass();
   }
-}
+};
 
 module.exports = mongoose.model('wechatPayRecords', schema);

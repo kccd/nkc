@@ -118,36 +118,11 @@ window.rechargeApp = new Vue({
           } else if(aliPaymentInfo) {
             NKC.methods.toPay('aliPay', aliPaymentInfo, newWindow);
           }
-          /*if(weChatPaymentInfo) {
-            const url = `/payment/wechat/${weChatPaymentInfo.paymentId}`;
-            if(payment === 'weChat') {
-              if(appType === 'pcBrowser') {
-                newWindow.location = url;
-              } else if(appType === 'mobilePhoneBrowser') {
-                newWindow.location = weChatPaymentInfo.url;
-              } else {
-                NKC.methods.rn.emit('weChatPay', {
-                  url: window.location.origin + url,
-                  H5Url: weChatPaymentInfo.url,
-                  referer: window.location.origin
-                  // referer: 'https://www.kechuang.org'
-                });
-              }
-            }
-          } else {
-            if(appType === 'app') {
-              NKC.methods.visitUrl(aliPaymentInfo.url, true);
-            } else {
-              newWindow.location = aliPaymentInfo.url;
-            }
-          }*/
           sweetInfo('请在浏览器新打开的窗口完成支付！若没有新窗口打开，请检查新窗口是否已被浏览器拦截。');
         })
         .catch(err => {
+          if(newWindow && newWindow.close) newWindow.close();
           sweetError(err);
-          if(newWindow) {
-            newWindow.document.body.innerHTML = err.error || err;
-          }
         })
     },
     pay: function() {

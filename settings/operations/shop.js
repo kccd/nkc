@@ -205,7 +205,7 @@ module.exports = {
     GET: 'visitShopPay',
     POST: 'kcbPay',
     alipay: {
-      GET: 'getAlipayUrl'
+      POST: 'getAlipayUrl'
     }
   },
   refund: {

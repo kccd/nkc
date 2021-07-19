@@ -4,18 +4,20 @@ router
     const {db, body} = ctx;
     const paymentRecord = await db.WechatPayRecordModel.setRecordStatusByNotificationInfo(body);
     if(paymentRecord.status === 'success') {
-
+      return ctx.body = {
+        code: 'SUCCESS',
+        message: '成功'
+      };
     }
-    return ctx.body = {
-      code: 'SUCCESS',
-      message: '成功'
-    };
+    await next();
   })
   .get('/:_id', async (ctx, next) => {
     const {db, params, data} = ctx;
     const {_id} = params;
     const weChatPayRecord = await db.WechatPayRecordModel.findOne({_id});
     data.record = {
+      type: 'wechatPay',
+      from: weChatPayRecord.from,
       status: weChatPayRecord.status,
       apiType:weChatPayRecord.apiType,
       url: weChatPayRecord.url,

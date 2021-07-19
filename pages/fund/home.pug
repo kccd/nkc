@@ -75,7 +75,8 @@ block fundContent
                 .username
                   span(v-if='!b.user.uid') {{b.user.username}}
                   a(v-else :data-float-uid='b.user.uid' :href='getUrl("userHome", b.user.uid)' target="_blank") {{b.user.username}}
-                .time {{b.time}}
+                .time
+                  from-now(:time='b.time')
                 .fund 赞助&nbsp;
                   span(v-if='!b.fund.fundId') {{b.fund.name}}
                   a(v-else :href='getUrl("singleFundHome", b.fund.fundId)' target='_blank') {{b.fund.name}}

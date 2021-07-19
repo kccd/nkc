@@ -1,5 +1,7 @@
 const data = NKC.methods.getDataById('data');
 
+import FromNow from '../lib/vue/FromNow.vue';
+
 window.donationApp = new Vue({
   el: '#donationApp',
   data: {
@@ -15,6 +17,9 @@ window.donationApp = new Vue({
     donationEnabled: data.donationEnabled,
 
     donationBills: data.donationBills,
+  },
+  components: {
+    'from-now': FromNow
   },
   computed: {
     targets() {
@@ -123,7 +128,12 @@ window.donationApp = new Vue({
           if(totalMoney > donation.max) {
             throw new Error(`赞助金额不能大于 ${donation.min / 100} 元`);
           }
-          newWindow = window.open();
+          if(
+            NKC.methods.isPcBrowser() ||
+            NKC.methods.isMobilePhoneBrowser()
+          ) {
+            newWindow = window.open();
+          }
           return nkcAPI('/fund/donation', 'POST', {
             money: realMoney,
             fee,
@@ -135,13 +145,13 @@ window.donationApp = new Vue({
         })
         .then(res => {
           const {aliPaymentInfo, wechatPaymentInfo} = res;
-          console.log(res);
           if(wechatPaymentInfo) {
             NKC.methods.toPay('wechatPay', wechatPaymentInfo, newWindow);
           } else if(aliPaymentInfo) {
             NKC.methods.toPay('aliPay', aliPaymentInfo, newWindow);
           }
           self.submitting = false;
+          sweetInfo('请在浏览器新打开的窗口完成支付！若没有新窗口打开，请检查新窗口是否已被浏览器拦截。');
         })
         .catch(error => {
           self.submitting = false;

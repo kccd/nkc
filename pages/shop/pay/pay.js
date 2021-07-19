@@ -1,5 +1,5 @@
 const data = NKC.methods.getDataById('data');
-
+const {aliPay, weChat} = data.rechargeSettings;
 const app = new Vue({
   el: '#app',
   data: {
@@ -9,23 +9,22 @@ const app = new Vue({
     totalMoney: data.totalMoney,
     ordersId: data.ordersId,
     payment: 'mainScore',
+    aliPay,
+    weChat,
     password: '',
+
+    submitting: false,
   },
   computed: {
-    aliPay() {
-      const a = this.rechargeSettings.aliPay;
-      let totalPrice = this.totalMoney / (1 - a.fee);
-      let feePrice = totalPrice - this.totalMoney;
-      return {
-        enabled: a.enabled,
-        fee: a.fee,
-        _fee: Number((a.fee * 100).toFixed(4)),
-        totalPrice: Number((totalPrice.toFixed(2))),
-        feePrice: Number(feePrice.toFixed(2))
-      };
+    fee() {
+      const {payment} = this;
+      if(payment === 'mainScore') return 0;
+      const {fee} = this.rechargeSettings[payment];
+      return fee;
     },
-    weChat() {
-      return this.rechargeSettings.weChat;
+    // 总金额 分（包含手续费）
+    totalPrice() {
+      return Math.ceil(this.totalMoney * (1 + this.fee));
     },
     needRecharge() {
       const {userMainScore, totalMoney} = this;
@@ -59,38 +58,41 @@ const app = new Vue({
         .catch(sweetError);
     },
     useAliPay() {
-      const {ordersId, aliPay} = this;
-      const {totalPrice, feePrice} = aliPay;
-      let url = `/shop/pay/alipay?ordersId=${ordersId}&money=${totalPrice}`;
-      const isPhone = NKC.methods.isPhone();
-      let newWindow;
-      if(NKC.configs.platform !== 'reactNative') {
-        if(isPhone) {
-          url += '&redirect=true';
-          screenTopAlert('正在前往支付宝...');
-          return window.location.href = url;
-        } else {
-          newWindow = window.open();
-        }
-      }
-      Promise.resolve()
+      const {payment, ordersId, totalPrice, totalMoney} = this;
+      let newWindow = null;
+      const self = this;
+      return Promise.resolve()
         .then(() => {
-          return nkcAPI(url, 'GET')
-            .then(data => {
-              if(NKC.configs.platform === 'reactNative') {
-                NKC.methods.visitUrl(data.alipayUrl, true);
-              } else {
-                newWindow.location = data.alipayUrl;
-              }
-              sweetInfo('请在浏览器新打开的窗口完成支付！若没有新窗口打开，请检查新窗口是否已被浏览器拦截。');
-            })
-            .catch(err => {
-              sweetError(err);
-              if(newWindow) {
-                newWindow.document.body.innerHTML = err.error || err;
-              }
-            });
+          self.submitting = true;
+          if(
+            NKC.methods.isPcBrowser() ||
+            NKC.methods.isMobilePhoneBrowser()
+          ) {
+            newWindow = window.open();
+          }
+          return nkcAPI(`/account/finance/recharge/payment`, 'POST', {
+            apiType: NKC.methods.isPcBrowser()? 'native': 'H5',
+            ordersId,
+            paymentType: payment,
+            finalPrice: totalMoney,
+            totalPrice,
+          });
         })
+        .then((res) => {
+          const {aliPaymentInfo, wechatPaymentInfo} = res;
+          if(wechatPaymentInfo) {
+            NKC.methods.toPay('wechatPay', wechatPaymentInfo, newWindow);
+          } else {
+            NKC.methods.toPay('aliPay', aliPaymentInfo, newWindow);
+          }
+          sweetInfo('请在浏览器新打开的窗口完成支付！若没有新窗口打开，请检查新窗口是否已被浏览器拦截。');
+          self.submitting = false;
+        })
+        .catch(err => {
+          self.submitting = false;
+          if(newWindow && newWindow.close) newWindow.close();
+          sweetError(err);
+        });
     }
   }
 });

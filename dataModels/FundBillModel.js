@@ -340,7 +340,7 @@ fundBillSchema.statics.getDonationBills = async (count = 12) => {
     results.push({
       user,
       fund,
-      time: tools.fromNow(b.toc),
+      time: b.toc,
       money: b.money,
     });
   }
