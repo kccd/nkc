@@ -8,9 +8,8 @@ router
     if(method === 'POST') {
       ordersId = body.ordersId;
     } else {
-      ordersId = query.ordersId;
+      ordersId = query.ordersId.split('-');
     }
-    ordersId = ordersId.split('-');
     const orders = [];
     for(const orderId of ordersId) {
       const order = await db.ShopOrdersModel.findOne({orderId});

@@ -790,5 +790,6 @@
   "viewUserCode": "验证用户动态码",
   "experimentalUserCodeLog": "后台管理 - 用户动态码验证记录",
   "experimentalFundSettings": "后台管理 - 基金设置",
+  "experimentalPayment": "后台管理 - 查看支付记录",
   "singleFundSettings": "基金项目设置"
 }

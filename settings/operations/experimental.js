@@ -391,6 +391,9 @@ module.exports = {
 		},
 		userCode: {
 		  GET: 'experimentalUserCodeLog'
+    },
+    payment: {
+		  GET: 'experimentalPayment'
     }
 	},
   console: {

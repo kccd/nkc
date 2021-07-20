@@ -28,7 +28,7 @@ const app = new Vue({
     },
     needRecharge() {
       const {userMainScore, totalMoney} = this;
-      return userMainScore / 100 < totalMoney;
+      return userMainScore < totalMoney;
     },
   },
   methods: {
@@ -53,7 +53,7 @@ const app = new Vue({
           self.password = '';
           setTimeout(() => {
             NKC.methods.visitUrl('/shop/order');
-          }, 3000);
+          }, 2000);
         })
         .catch(sweetError);
     },

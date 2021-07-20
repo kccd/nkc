@@ -21,6 +21,7 @@ const emailcodeRouter = require("./emailcode");
 const blacklistRouter = require("./blacklist");
 const resourceRouter = require('./resource');
 const userCodeRouter = require('./userCode');
+const paymentRouter = require('./payment');
 logRouter
   .get('/', async (ctx, next) => {
     const {nkcModules} =ctx;
@@ -47,4 +48,5 @@ logRouter
   .use("/blacklist", blacklistRouter.routes(), blacklistRouter.allowedMethods())
   .use("/userCode", userCodeRouter.routes(), userCodeRouter.allowedMethods())
   .use('/resource', resourceRouter.routes(), resourceRouter.allowedMethods())
+  .use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods())
 module.exports = logRouter;

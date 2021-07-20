@@ -56,9 +56,9 @@ block content
         .col-xs-12.col-md-12(v-if='payment === "mainScore"')
           .m-t-1
             //- 积分余额不足
-            .text-danger(v-if='needRecharge') 当前{{mainScore.name}}不足，请
+            .text-danger(v-if='needRecharge') 当前{{mainScore.name}}不足，请&nbsp;
               a(href='/account/finance/recharge' target="_blank") 充值
-              | 或选择其他支付方式。
+              | &nbsp;或选择其他支付方式。
             div(v-else)
               .m-t-2
                 h4 需支付：{{mainScore.name}}
