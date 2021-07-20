@@ -23,6 +23,10 @@ const linkReg = new RegExp(`^` +
     .replace(/\./g, "\\.")
   + "|^\/"
   , "i");
+
+const kcLinkReg = new RegExp(`^(https?:\/\/)?${serverConfig.domain.replace(/^https?:\/\//ig, '').replace(/\//g, "\\/").replace(/\./g, "\\.")}`, 'i');
+
+
 class NKCRender {
   constructor() {
     this.htmlFilter = htmlFilter;
@@ -103,10 +107,34 @@ class NKCRender {
       }
     }
 
+    // 处理所有的文本外链
+    const replaceLinkInfo = function(node) {
+      if(!node.children || node.children.length === 0) return;
+      for(let i = 0; i < node.children.length; i++) {
+        const c = node.children[i];
+        if(c.type === 'text') {
+          // 替换外链
+          c.data = c.data.replace(/(https?:\/\/)?([-0-9a-zA-Z]{1,256}\.)+[a-zA-Z]{2,6}/ig, (c) => {
+            if(kcLinkReg.test(c)) {
+              return c;
+            } else {
+              const arr = Array(c.length).fill('X');
+              return arr.join('');
+            }
+          });
+        } else if(c.type === 'tag') {
+          if(['code', 'pre'].includes(c.name)) continue;
+          if(c.attribs['data-tag'] === 'nkcsource') continue;
+          replaceLinkInfo(c);
+        }
+      }
+    }
+
     const body = $('body');
 
     if(type === 'article') {
       replaceATInfo(body[0], atUsers);
+      replaceLinkInfo(body[0]);
     }
     html = body.html();
     // html = body.safeHtml();
@@ -135,12 +163,14 @@ class NKCRender {
       });
     }
 
+
     // 过滤标签及样式
     html = htmlFilter(html);
     let id;
     if(post.pid) {
       id = `${post.pid}`;
     }
+
     if(html) {
       return `<div class="render-content math-jax" data-type="nkc-render-content" data-id="${id}">${html}</div>`;
     } else {
