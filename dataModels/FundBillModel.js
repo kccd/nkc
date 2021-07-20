@@ -382,7 +382,7 @@ fundBillSchema.statics.createDonationBill = async (props) => {
     from: {
       type: 'user',
       id: uid,
-      anonymous
+      anonymous: !!uid? anonymous: true,
     },
     to: {
       type: fundId === 'fundPool'? 'fundPool': 'fund',

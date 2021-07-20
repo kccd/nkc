@@ -21,14 +21,14 @@ const schema = new mongoose.Schema({
   // 当前记录的状态 waiting
   status: {
     type: String,
-    enum: ['waiting', 'success'],
+    enum: ['waiting', 'success', 'failed'],
     required: true,
     index: 1
   },
   // 支付页面链接
   url: {
     type: String,
-    required: true,
+    default: '',
   },
   // 最后操作数据的时间
   tlm: {
@@ -58,6 +58,11 @@ const schema = new mongoose.Schema({
   },
   // 用户的支付宝账号
   aliPayAccount: {
+    type: String,
+    default: ''
+  },
+  // 支付宝账号对应的用户姓名
+  aliPayAccountName: {
     type: String,
     default: ''
   },
@@ -103,6 +108,19 @@ const schema = new mongoose.Schema({
   collection: 'aliPayRecords'
 });
 
+/*
+* 生成支付支付记录并获取支付页面的链接
+* @param {Object} props
+*   @param {String} title 标题
+*   @param {String} description 简介
+*   @param {Number} money 需要支付的金额 分 支付金额 = 有效金额 * ( 1 + 手续费 )
+*   @param {Number} effectiveMoney 有效金额 分
+*   @param {Number} fee 支付平台收取的手续费 百分比
+*   @param {String} uid 支付者，当为游客时此字段为空字符串
+*   @param {String} from 上级模块 score: 用户积分, fund: 基金系统
+*   @param {String} clientIp
+*   @param {String} clientPort
+* */
 schema.statics.getPaymentRecord = async (props) => {
   const alipay2 = require('../nkcModules/alipay2');
   const checkData = require('../nkcModules/checkData');
@@ -184,6 +202,85 @@ schema.statics.setRecordStatusByNotificationInfo = async (body) => {
   await aliPayRecord.save();
   await WechatPayRecordModel.toUpdateRecord('aliPay', aliPayRecord._id);
   return aliPayRecord;
+};
+
+/*
+* 生成支付记录并转账
+* @param {Object} props
+*   @param {uid} 收款人 UID
+*   @param {Number} money 系统付款金额 分 付款金额 = 有效金额 * ( 1 + 手续费)
+*   @param {Number} effectiveMoney 有效金额
+*   @param {Number} fee 平台手续费 百分比
+*   @param {String} aliPayAccount 支付宝收款账号
+*   @param {String} aliPayAccountName 支付宝收款账号对应的用户姓名
+*   @param {String} clientIp
+*   @param {String} clientPort
+*   @param {String} from 调用支付的模块 score: 用户积分, fund: 基金
+*   @param {String} description 有关支付的说明，会显示在支付平台的订单中
+* */
+schema.statics.transfer = async (props) => {
+  const AliPayRecordModel = mongoose.model('aliPayRecords');
+  const SettingModel = mongoose.model('settings');
+  const alipay2 = require('../nkcModules/alipay2');
+  const {
+    uid,
+    money,
+    effectiveMoney,
+    fee,
+    aliPayAccount,
+    aliPayAccountName,
+    clientIp,
+    clientPort,
+    from,
+    description = ''
+  } = props;
+  const recordId = await SettingModel.getNewId();
+  const now = new Date();
+  const record = AliPayRecordModel({
+    _id: recordId,
+    type: 'transfer',
+    toc: now,
+    tlm: now,
+    uid,
+    status: 'waiting',
+    money,
+    effectiveMoney,
+    fee,
+    aliPayAccount,
+    ip: clientIp,
+    port: clientPort,
+    from,
+  });
+  await record.save();
+  try{
+    const data = await alipay2.transfer({
+      account: aliPayAccount,
+      name: aliPayAccountName,
+      money: money / 100,
+      id: recordId,
+      notes: description
+    });
+    const {code} = data;
+    const tlm = new Date();
+    if(code === '10000') {
+      // 执行成功
+      record.status = 'success';
+    } else {
+      const {msg, subCode, subMsg} = data;
+      // 执行失败
+      record.status = 'failed';
+      record.note = `${msg} | ${subCode} | ${subMsg}`;
+    }
+    record.tlm = tlm;
+    record.fullData = JSON.stringify(data);
+  } catch(err) {
+    record.status = 'failed';
+    record.fullData = JSON.stringify({error: err.toString()});
+  }
+  await record.save();
+  if(record.status === 'failed') {
+    throwErr(500, record.note);
+  }
 };
 
 module.exports = mongoose.model('aliPayRecords',  schema);

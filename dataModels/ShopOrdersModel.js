@@ -819,6 +819,19 @@ shopOrdersSchema.statics.createRecordByOrdersId = async (props) => {
   await UserModel.updateUserScore(uid, mainScore.type);
 };
 
+/*
+* 验证订单号是否有效
+* @param {[String]} ordersId 订单 ID 组成的数组
+* @param {String} uid 用户 ID
+* @param {Number} money 金额
+* */
+shopOrdersSchema.statics.verifyUserOrdersId = async (ordersId, uid, money) => {
+  const ShopOrdersModel = mongoose.model('shopOrders');
+  const orders = await ShopOrdersModel.find({orderId: {$in: ordersId}});
+  const {totalMoney} = await ShopOrdersModel.getOrdersInfo(orders);
+  if(totalMoney !== money) throwErr(400, `需支付的金额与订单金额不一致，请刷新后再试`);
+};
+
 const ShopOrdersModel = mongoose.model('shopOrders', shopOrdersSchema);
 
 module.exports = ShopOrdersModel;

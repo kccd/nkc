@@ -27,8 +27,14 @@ router
     if(!paymentEnabled) ctx.throw(403, `支付方式已关闭，请刷新`);
     const _totalPrice = Math.ceil(finalPrice * (1 + fee));
     if(_totalPrice !== totalPrice) ctx.throw(400, `充值金额错误，请刷新后重试`);
-    if(totalPrice < minRecharge) ctx.throw(400, `充值金额不能小于${minRecharge / 100}元`);
-    if(totalPrice > maxRecharge) ctx.throw(400, `充值金额不能大于${maxRecharge / 100}元`);
+    if(ordersId && ordersId.length > 0) {
+      // 充值并付款 验证订单是否有效
+      await db.ShopOrdersModel.verifyUserOrdersId(ordersId, state.uid, finalPrice);
+    } else {
+      // 仅充值 需验证充值金额范围
+      if(totalPrice < minRecharge) ctx.throw(400, `充值金额不能小于${minRecharge / 100}元`);
+      if(totalPrice > maxRecharge) ctx.throw(400, `充值金额不能大于${maxRecharge / 100}元`);
+    }
     const mainScore = await db.SettingModel.getMainScore();
     const description = `${mainScore.name}充值`
     let paymentId;

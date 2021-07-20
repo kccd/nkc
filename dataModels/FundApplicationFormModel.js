@@ -850,6 +850,7 @@ fundApplicationFormSchema.statics.extendAsApplicationFormList = async (applicati
       time: moment(a.toc).format(`YYYY/MM/DD`),
       title: project? project.t: '暂未填写项目名称',
       status: status.description,
+      statusColor: status.color,
       users
     };
     results.push(result);
@@ -955,10 +956,20 @@ fundApplicationFormSchema.methods.getStatus = async function() {
     '5-2': '成功结题'
   };
 
+
+  const key = `${formStatus[0]}-${formStatus[1]}`;
+
+  const color = [
+    '3-1', '3-2', '3-3', '4-1', '4-2', '4-4', '4-6', '5-1', '5-2'
+  ].includes(key)? '#333': 'red';
+
+  const description = descriptions[key];
+
   return {
     general: formStatus[0],
     detail: formStatus[1],
-    description: descriptions[`${formStatus[0]}-${formStatus[1]}`]
+    description,
+    color,
   };
 };
 

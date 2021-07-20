@@ -17,8 +17,6 @@ let appCertPublicKey = '';
 const {
   privateKeyPath,
   publicKeyPath,
-} = alipayConfig.receipt;
-const {
   alipayCertPublicKeyPath,
   alipayRootCertPath,
   appCertPublicKeyPath
@@ -66,11 +64,6 @@ async function transfer(o) {
   });
 
   const {account, name, id, money, notes} = o;
-  if(!account) throwErr('收款方支付宝账号不能为空');
-  if(!id) throwErr('支付宝转账ID不能为空');
-  if(!name) throwErr('收款方真实姓名不能为空');
-  if(!money || money <= 0.1) throwErr('支付宝转账金额不能小于0.1');
-  if(!notes) throwErr('转账备注不能为空');
   const params = {
     trans_amount: money,
     product_code: 'TRANS_ACCOUNT_NO_PWD',
@@ -110,11 +103,13 @@ async function transfer(o) {
           transDate: '2021-01-19 17:36:14'
         }
         */
-        const {code, msg, subCode, subMsg} = data;
-        if(code === '10000') {
+        resolve(data);
+        if(data.code === '10000') {
           resolve(data);
         } else {
-          reject(new Error(`${msg} | ${subCode} | ${subMsg}`));
+          const {msg, subCode, subMsg} = data;
+          console.log(new Error(`${msg} | ${subCode} | ${subMsg}`));
+          reject(data);
         }
       })
       .catch(err => {

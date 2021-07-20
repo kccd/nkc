@@ -1,7 +1,7 @@
 if !isIncluded('applicationFormItem')
   +includeCSS('/fund/applicationFormItem.css')
   mixin applicationFormItem(form)
-    -var {fundName, code, money, users, status, fundId} = form;
+    -var {fundName, code, money, users, status, statusColor, fundId} = form;
     -var {_id, money, title, url, time} = form;
     -users = users.reverse();
     .application-form-item
@@ -15,7 +15,7 @@ if !isIncluded('applicationFormItem')
           span=money
       a(href=tools.getUrl('fundApplicationForm', _id)).application-form-title=title
       .application-form-footer
-        .application-form-status= status
+        .application-form-status(style=`color: ${statusColor}`)= status
         .applicant-users
           for u in users
             -var {username, avatar, uid} = u;

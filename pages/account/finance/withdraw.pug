@@ -79,12 +79,12 @@ block content
                   .col-xs-12.col-md-12
                     .row
                       .col-xs-12.col-md-4
-                        input.form-control(type="text" v-model.number="money")
+                        input.form-control(type="text" v-model.number="money" @change='onInputMoney')
                       .col-xs-12.col-md-12
                         h5.fee-info(v-if="money && payment") 手续费
-                          strong.text-danger &nbsp;{{fee}}&nbsp;
+                          strong.text-danger &nbsp;{{(paymentMoney - effectiveMoney) / 100}}&nbsp;
                           |元，你的账户实际将到账
-                          strong.text-danger &nbsp;{{totalPrice}}&nbsp;
+                          strong.text-danger &nbsp;{{effectiveMoney / 100}}&nbsp;
                           |元
               .m-t-1
                 h4 输入短信验证码
