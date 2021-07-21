@@ -104,13 +104,15 @@
                 // 检测链接文本是否为空
             } */
             obj.textValue = text.value || "";
+            /*
             var href = obj.href;
+
             var host = window.location.host.replace(".", "\\.");
             var textValue = obj.textValue;
             var reg = new RegExp("^http[s]?:\\/\\/" + host);
             if(!reg.test(href)) {
                 obj.textValue = href;
-            }
+            }*/
             if(orgText){
                 link[browser.ie ? 'innerText' : 'textContent'] =  obj.textValue || "";
                 range.selectNode(link).select()
