@@ -16,15 +16,8 @@ for(const filename of files) {
   const name = filename.split(".")[0];
   sources[name] = require(filePath + `/${name}`);
 }
-const serverConfig = require("../../config/server");
-const linkReg = new RegExp(`^` +
-  serverConfig.domain
-    .replace(/\//g, "\\/")
-    .replace(/\./g, "\\.")
-  + "|^\/"
-  , "i");
 
-const kcLinkReg = new RegExp(`^(https?:\/\/)?${serverConfig.domain.replace(/^https?:\/\//ig, '').replace(/\//g, "\\/").replace(/\./g, "\\.")}`, 'i');
+const {domainWhitelistReg} = require('../../nkcModules/regExp');
 
 
 class NKCRender {
@@ -61,7 +54,7 @@ class NKCRender {
         const a = links.eq(i);
         const href = a.attr("href");
         // 外链在新标签页打开
-        if(href && !linkReg.test(href)) {
+        if(href && !domainWhitelistReg.test(href)) {
           a.attr("target", "_blank");
           // 通过提示页代理外链的访问
           const byteArray = new Uint8Array(href.split("").map(char => char.charCodeAt(0)));
@@ -115,7 +108,7 @@ class NKCRender {
         if(c.type === 'text') {
           // 替换外链
           c.data = c.data.replace(/(https?:\/\/)?([-0-9a-zA-Z]{1,256}\.)+[a-zA-Z]{2,6}/ig, (c) => {
-            if(kcLinkReg.test(c)) {
+            if(domainWhitelistReg.test(c)) {
               return c;
             } else {
               const arr = Array(c.length).fill('X');
