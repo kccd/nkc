@@ -455,7 +455,8 @@ router
 
 		threads = await db.ThreadModel.extendThreads(threads, {
 			category: true,
-			htmlToText: true
+			htmlToText: true,
+      removeLink: true,
 		});
 
 		const superModerator = ctx.permission("superModerator");
