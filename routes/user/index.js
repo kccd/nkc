@@ -191,7 +191,8 @@ userRouter
       lastPostUser: false,
       firstPostResource: false,
       htmlToText: false,
-      excludeAnonymousPost: true
+      excludeAnonymousPost: true,
+      removeLink: true,
     });
 
     data.recommendThreads = await db.ThreadModel.getRecommendThreads(accessibleFid);
@@ -297,6 +298,7 @@ userRouter
         lastPostUser: false,
         firstPostResource: true,
         htmlToText: true,
+        removeLink: true,
       });
       threads.map(thread => {
         threadsObj[thread.tid] = thread;

@@ -15596,7 +15596,8 @@ UE.plugins['list'] = function () {
     });
 
     // 粘贴内容中的超链接，它们各自之前的位置插入一个链接url
-    me.addListener("beforepaste", function(type, box) {
+    // 添加外链中转页之后，注销以下事件
+    /*me.addListener("beforepaste", function(type, box) {
         var div = document.createElement("div");
         div.innerHTML = box.html;
         var links = [].slice.call(div.getElementsByTagName("a"));
@@ -15610,7 +15611,7 @@ UE.plugins['list'] = function () {
             link.insertBefore(span, link.firstChild);
         });
         box.html = div.innerHTML;
-    });
+    });*/
 
     function adjustListStyle(doc,ignore){
         utils.each(domUtils.getElementsByTagName(doc,'ol ul'),function(node){
