@@ -11,7 +11,23 @@
           placement="right"
           width="400"
           trigger="click">
-          <div>{{msg}}</div>
+          <div v-if="msg.mode === 'broadcast'">
+            <el-tag type="danger">全局广播</el-tag>
+            <p>所有会员均会收到此通知</p>
+          </div>
+          <div v-if="msg.mode === 'filter'">
+            <el-tag type="warning">过滤用户</el-tag>
+            <p>符合条件的用户将会收到通知</p>
+          </div>
+          <div v-if="msg.mode === 'user'">
+            <el-tag>指定用户</el-tag>
+            <p>指定的用户将会收到通知</p>
+            <ul>
+              <li class="pop-user-item" v-for="uid in msg.uids" :key="uid">
+                <user :uid="uid"></user>
+              </li>
+            </ul>
+          </div>
           <el-card shadow="never" class="message" slot="reference">{{msg.content}}</el-card>
         </el-popover>
         <el-row class="clearfix">
@@ -135,8 +151,10 @@
 <script>
 import moment from "moment";
 import data from "../../lib/data";
+import User from "./user.vue";
 console.log(data);
 export default {
+  components: { User },
   data: () => ({
     list: [],
     form: {
@@ -328,5 +346,8 @@ export default {
   }
   .message-control + .message-control {
     margin-right: 12px;
+  }
+  .pop-user-item + .pop-user-item {
+    margin-top: 6px;
   }
 </style>

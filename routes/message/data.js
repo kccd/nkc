@@ -75,42 +75,7 @@ router
           $lt: firstMessageId
         };
       }
-      await user.extendRoles();
-      await user.extendGrade();
-      // 查出所有的系统消息
-      let messages = await db.MessageModel.find(queryDoc).sort({tc: 1}).limit(30);
-      // 根据当前用户过滤掉不需要的系统消息
-      messages = messages.filter(msg => {
-        const conf = msg.c;
-        // 全局广播
-        if(conf.mode === "broadcast") {
-          return true;
-        }
-        // 过滤指定用户
-        if(conf.mode === "user" && conf.uids.includes(user.uid)) {
-          return true;
-        }
-        // 过滤条件筛选用户
-        if(conf.mode === "filter") {
-          const userCerts = user.roles.map(role => role._id);
-          const userGrade = user.grade._id;
-          const tlv = user.tlv;
-          const conditionA = (() => {
-            for(cert of userCerts) {
-              if(conf.roles.includes(cert)) return true;
-            }
-          })();
-          const conditionB = conf.grades.includes(userGrade);
-          const conditionC = (() => {
-            const [start, end] = conf.lastVisit;
-            const startDate = start ? new Date(start) : new Date(null);
-            const endDate = end ? new Date(end) : new Date();
-            if(tlv >= startDate && tlv < endDate) return true;
-          })();
-          if(conditionA && conditionB && conditionC) return true;
-        }
-        return false;
-      });
+      const messages = await db.MessageModel.getMySystemInfoMessage(user.uid, queryDoc);
       // 取纯文本返回给前端
       messages.forEach(msg => msg.c = msg.c.content);
       data.messages = messages;

@@ -1324,26 +1324,18 @@ messageSchema.statics.markAsRead = async (type, uid, tUid) => {
     });
     await CreatedChatModel.updateMany({uid, tUid}, {$set: {unread: 0}});
   } else if(type === 'STE') {
-    const allInfo = await MessageModel.find({ty: 'STE'}, {_id: 1});
-    const allInfoLog = await SystemInfoLogModel.find({uid}, {mid: 1});
-    const allInfoId = [];
-    const allInfoLogId = [];
-
-    for(const o of allInfo) {
-      allInfoId.push(o._id);
-    }
-    for(const o of allInfoLog) {
-      allInfoLogId.push(o.mid);
-    }
-    for(const id of allInfoId) {
-      if(!allInfoLogId.includes(id)) {
-        const log = SystemInfoLogModel({
+    const messages = await MessageModel.find({ty: 'STE'});
+    const myMessage = await MessageModel.mySystemInfoMessageFilter(uid, messages);
+    const systemInfoIdList = myMessage.map(({ _id }) => _id);
+    const readedIdList = (await SystemInfoLogModel.find({uid}, {mid: true})).map(({ mid }) => mid);
+    systemInfoIdList
+      .filter(id => !readedIdList.includes(id))
+      .forEach(async mid => {
+        await SystemInfoLogModel({
           uid,
-          mid: id
-        });
-        await log.save();
-      }
-    }
+          mid
+        }).save();
+      });
   } else if(type === 'STU'){
     await MessageModel.updateMany({ty: type, r: uid, vd: false}, {$set: {vd: true}});
   } else if(type === 'newFriends') {
@@ -1441,6 +1433,58 @@ messageSchema.statics.getStatusOfSendingMessage = async (uid, tUid, canSendToEve
     warningContent: null
   };
 };
+
+/**
+ * 获取特定用户的系统消息
+ */
+messageSchema.statics.getMySystemInfoMessage = async (uid, query) => {
+  const MessageModel = mongoose.model('messages');
+  // 查出所有的系统消息
+  let messages = await MessageModel.find({...query, ty: "STE"}).sort({tc: 1}).limit(30);
+  return await MessageModel.mySystemInfoMessageFilter(uid, messages);
+}
+
+/**
+ * 过滤出指定用户可查看的系统消息
+ */
+messageSchema.statics.mySystemInfoMessageFilter = async (uid, messages) => {
+  const UserModel = mongoose.model('users');
+  const user = await UserModel.findOne({ uid });
+  await user.extendRoles();
+  await user.extendGrade();
+  // 根据当前用户过滤掉不需要的系统消息
+  return messages.filter(msg => {
+    const conf = msg.c;
+    // 全局广播
+    if(conf.mode === "broadcast") {
+      return true;
+    }
+    // 过滤指定用户
+    if(conf.mode === "user" && conf.uids.includes(uid)) {
+      return true;
+    }
+    // 过滤条件筛选用户
+    if(conf.mode === "filter") {
+      const userCerts = user.roles.map(role => role._id);
+      const userGrade = user.grade._id;
+      const tlv = user.tlv;
+      const conditionA = (() => {
+        for(cert of userCerts) {
+          if(conf.roles.includes(cert)) return true;
+        }
+      })();
+      const conditionB = conf.grades.includes(userGrade);
+      const conditionC = (() => {
+        const [start, end] = conf.lastVisit;
+        const startDate = start ? new Date(start) : new Date(null);
+        const endDate = end ? new Date(end) : new Date();
+        if(tlv >= startDate && tlv < endDate) return true;
+      })();
+      if(conditionA && conditionB && conditionC) return true;
+    }
+    return false;
+  });
+}
 
 const MessageModel = mongoose.model('messages', messageSchema);
 module.exports = MessageModel;
