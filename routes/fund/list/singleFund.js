@@ -29,13 +29,13 @@ router
     const {data, db} = ctx;
     const {user} = data;
     const {fundId} = ctx.params;
-    const {type, sort, token} = ctx.query;
+    const {t: type, s: sort, token} = ctx.query;
     const {FundApplicationFormModel} = db;
     let page = ctx.query.page;
     page = page? parseInt(page): 0;
-    data.type = type;
+    data.t = type;
     data.page = page;
-    data.sort = sort;
+    data.s = sort;
 
     // 权限判断
     if(token){
@@ -79,10 +79,10 @@ router
       query['status.excellent'] = true;
     } else if(type === 'completed'){ // 已完成
       query['status.completed'] = true;
-    } else if(type === 'funding') { // 资助中
+    } else if(type === 'normal') { // 资助中
       query['status.completed'] = {$ne: true};
       query['status.adminSupport'] = true;
-    } else if(type === 'auditing') { // 审核中
+    } else if(type === 'audited') { // 审核中
       query['status.adminSupport'] = {$ne: true};
       query.useless = null;
     } else { // 全部
@@ -91,20 +91,14 @@ router
     const length = await FundApplicationFormModel.countDocuments(query);
     const paging = apiFn.paging(page, length);
     const applicationForms = await FundApplicationFormModel.find(query).sort(sortObj).skip(paging.start).limit(paging.perpage);
-    data.applicationForms = await Promise.all(applicationForms.map(async a => {
-      await a.extendApplicant();
-      await a.extendMembers();
-      await a.extendProject();
-      return a;
-    }));
+    data.applicationForms = await db.FundApplicationFormModel.extendAsApplicationFormList(applicationForms);
     data.paging = paging;
     //改由前端判断
     if(data.user) {
-      data.message = await fund.getConflictingByUser(user);
-      const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-      data.authLevel = await userPersonal.getAuthLevel();
+      data.conditions = await db.FundModel.getConditionsOfApplication(user.uid, fund._id);
     }
     ctx.template = 'interface_fund_home.pug';
+    ctx.template = 'fund/list/singleFund.pug';
     await next();
   })
   .use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())

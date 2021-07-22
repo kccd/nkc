@@ -1,0 +1,59 @@
+.fund-banner{
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  min-height: 20%;
+  font-size: 0;
+  img{
+    width: 100%;
+  }
+  .fund-avatar-img{
+    display: none;
+  }
+  @fundNameHeight: 2rem;
+  .fund-name{
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    font-size: 3rem;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  }
+  .fund-description{
+    color: #fff;
+    width: 100%;
+    text-align: center;
+    padding: 0 1rem;
+    font-size: 1.3rem;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  }
+  .fund-name-description{
+    height: 8rem;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    display: inline-block;
+    margin: auto;
+  }
+}
+@media (max-width: 844px) {
+  .fund-avatar-img{
+    display: block!important;
+  }
+  .fund-banner-img{
+    display: none;
+  }
+  .fund-banner{
+    min-height: 10rem;
+    .fund-name{
+      font-size: 2rem;
+    }
+    .fund-description{
+      font-size: 1rem;
+    }
+  }
+}

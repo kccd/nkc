@@ -952,6 +952,7 @@ fundApplicationFormSchema.methods.getStatus = async function() {
     '4-5': '未通过报告审核，等待申请人修改',
     '4-6': '等待结题审核',
     '4-7': '未通过结题审核，等待申请人修改',
+
     '5-1': '正常结题',
     '5-2': '成功结题'
   };

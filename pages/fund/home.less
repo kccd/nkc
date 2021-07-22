@@ -47,59 +47,7 @@
     }
   }
 }
-.donation{
-  .donation-list{
-    margin: 0 -0.5rem;
-    font-size: 0;
-  }
-  @height: 3rem;
-  .donation-money, .donation-fund, .donation-pay{
-    width: 25%;
-    height: @height;
-    line-height: @height;
-    padding: 0 0.5rem;
-    display: inline-block;
-    margin-bottom: 1rem;
-    span{
-      height: 100%;
-      .hideText(@line: 1);
-      font-size: 1.2rem;
-      border: 1px solid #ddd;
-      border-radius: 3px;
-      text-align: center;
-      cursor: pointer;
-      user-select: none;
-      &.active{
-        color: #fff;
-        background-color: @primary;
-        border-color: #f4f4f4;
-      }
-    }
-  }
-  .payment-info{
-    margin: 0.5rem 0 ;
-    font-size: 1rem;
-    color: #555;
-  }
-  .payment-description{
-    white-space: pre-wrap;
-    color: #555;
-  }
-  .payment-button{
-    height: 3rem;
-    width: 100%;
-    border: 1px solid @primary;
-    background-color: @primary;
-    color: #fff;
-    border-radius: 3px;
-    &:hover, &:active, &[disabled]{
-      opacity: 0.7;
-    }
-    &[disabled] {
-      cursor: not-allowed;
-    }
-  }
-}
+
 .donation-bills{
   &>.donation-bill:first-child{
     margin-top: 0.5rem;

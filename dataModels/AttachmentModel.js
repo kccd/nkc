@@ -673,7 +673,7 @@ schema.statics.saveFundImage = async (filePath, type) => {
   const fileFolder = await FILE.getPath(type, toc);
   const ext = 'jpg';
   const targetFilePath = PATH.resolve(fileFolder, `./${aid}.${ext}`);
-  const imageSize = type === 'fundAvatar'? [600, 400]: [1600, 400]
+  const imageSize = type === 'fundAvatar'? [600, 300]: [1500, 250]
   const attach = AttachmentModel({
     _id: aid,
     toc,
@@ -686,8 +686,8 @@ schema.statics.saveFundImage = async (filePath, type) => {
   await ei.resize({
     src: filePath,
     dst: targetFilePath,
-    height: imageSize[0],
-    width: imageSize[1],
+    height: imageSize[1],
+    width: imageSize[0],
     quality: 90
   });
   await attach.save();

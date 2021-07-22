@@ -218,14 +218,26 @@ applicationRouter
 			const {from} = body;
 			if(status.submitted) ctx.throw(400, '修改失败！申请方式一旦选择将无法更改,如需更改请放弃本次申请重新填写申请表。');
 			if(from === 'personal') {
-				if(!fund.applicationMethod.personal) ctx.throw(400, '抱歉！该基金暂不允许个人申请。');
+				if(!fund.applicantType.includes('personal')) ctx.throw(400, '抱歉！该基金暂不允许个人申请。');
 				for (let aUser of members) {
 				  await db.FundApplicationUserModel.updateMany({uid: aUser.uid}, {$set: {removed: true}});
 				}
 				updateObj.from = 'personal';
 				await applicationForm.updateOne(updateObj);
 			} else if(from === 'team') {
-				if(!fund.applicationMethod.team) ctx.throw(400, '抱歉！该基金暂不允许团队申请。');
+				if(!fund.applicantType.includes('team')) ctx.throw(400, '抱歉！该基金暂不允许团队申请。');
+
+				// 判断组员有没有申请其他基金项目
+        const applicationForms = await db.FundApplicationModel.find({uid: {$in: newMembers.map(m => m.uid)}});
+        const usersId = newMembers.map(m => m.uid);
+        const users = await db.UserModel.find({uid: {$in: usersId}});
+        const usersObj = {};
+        users.map(u => usersObj[u.uid] = u);
+        for(const a of applicationForms) {
+          const status = await a.getStatus();
+          const {username} = usersObj[a.uid];
+          if(![1, 5].includes(status.general)) ctx.throw(400, `用户「${username}」申报的项目暂未结题，不能担任新申请项目的组员`);
+        }
 				// 判断申请人的信息是否存在，不存在则写入
 				if(!applicant) {
 					newMembers.push({
@@ -235,6 +247,7 @@ applicationRouter
 				}
 				const membersUid = members.map(m => m.uid);
 				const selectedUserUid = newMembers.map(s => s.uid);
+
 				// 从数据库中标记未被选择的用户
 				for(let u of members) {
 					if(!selectedUserUid.includes(u.uid))

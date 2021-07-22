@@ -246,7 +246,12 @@ const fundSchema = new Schema({
 	  authLevel: {
     	type: Number,
 		  default: 1
-	  }
+	  },
+  },
+  // 申请时是否需要上传生活照
+  necessaryPhoto: {
+	  type: Boolean,
+    default: true,
   },
   // 组员设置
 	member: {
@@ -360,11 +365,17 @@ fundSchema.methods.ensureOperatorPermission = function(type, user) {
 	}
 };
 
-fundSchema.methods.getConflictingByUser = async function(user) {
-	const FundApplicationFormModel = require('./FundApplicationFormModel');
+/*
+* 判断用户是申请了与当前基金项目冲突的基金申请
+* @param {String} userId 用户 UID
+* @return {String} 如果存在冲突，则返回冲突的相关说明，否则返回空字符串
+* */
+fundSchema.methods.getConflictingByUser = async function(userId) {
+	const FundApplicationFormModel = mongoose.model('fundApplicationForms');
+	const FundApplicationUserModel = mongoose.model('fundApplicationUsers');
 	const {self, other} = this.conflict;
 	const q = {
-		uid: user.uid,
+		uid: userId,
 		disabled: false,
 		useless: null,
 		'status.completed': {$ne: true}
@@ -373,24 +384,91 @@ fundSchema.methods.getConflictingByUser = async function(user) {
 	if(self) {
 		q.fundId = this._id;
 		const selfCount = await FundApplicationFormModel.countDocuments(q);
-		if(selfCount !== 0) return '您之前申请的该基金项目尚未完成，请完成后再申请。';
+		if(selfCount !== 0) return '当前基金下存在尚未结题的申报，请结题之后再提交新的申报';
 	}
 	//与其他基金冲突
 	if(other) {
 		q['conflict.other'] = true;
 		const selfCount = await FundApplicationFormModel.countDocuments(q);
-		if(selfCount !== 0) return '您之前申请的与该基金冲突的基金项目尚未完成 ，请完成后再申请。';
+		if(selfCount !== 0) return '其他基金下存在尚未结题的申报，请结题之后再提交新的申报';
 	}
 	//年申请次数限制
 	const year = (new Date()).getFullYear();
 	const count = await FundApplicationFormModel.countDocuments({
-		uid: user.uid,
+		uid: userId,
 		fundId: this._id,
 		year,
 		useless: {$ne: 'delete'}
 	});
-	if(count >= this.applicationCountLimit) return '今年您申请该基金的次数已超过限制，欢迎明年再次申请！'
+	if(count >= this.applicationCountLimit) return '你今年申报当前基金的次数已用尽';
+
+  // 是否担任其他团队的组员
+  const applicationFormUsers = await FundApplicationUserModel.find({
+    uid: userId,
+    agree: true,
+    removed: false,
+  }, {
+    applicationFormId: 1,
+  });
+
+  const applicationForms = await FundApplicationFormModel.find({uid: {$ne: userId}, _id: {$in: applicationFormUsers.map(a => a.applicationFormId)}});
+  for(const a of applicationForms) {
+    const status = await a.getStatus();
+    if(![1, 5].includes(status.general)) {
+      return '尚未结题项目的团队成员不能提交新的申报';
+    }
+  }
+
+	return '';
 };
 
+/*
+* 获取基金申请条件以及用户的条件
+* @param {String} userId 用户 ID
+* @param {String} fundId 基金 ID
+* @return {Object}
+*   @param {[Array]} table 类型，最低要求，用户，是否满足
+*   @param {Boolean} status 是否可以申请当前基金项目
+*   @param {[String]} 无法申请的原因
+* */
+fundSchema.statics.getConditionsOfApplication = async (userId, fundId) => {
+  const UserModel = mongoose.model('users');
+  const FundModel = mongoose.model('funds');
+  const fund = await FundModel.findOnly({_id: fundId});
+  const info = await fund.getConflictingByUser(userId);
+  const user = await UserModel.findOnly({uid: userId});
+  const {
+    userLevel,
+    threadCount,
+    postCount,
+    timeToRegister,
+    authLevel
+  } = fund.applicant;
+  const userGrade = await user.extendGrade();
+  const userAuthLevel = await user.extendAuthLevel();
+  const userThreadCount = user.threadCount - user.disabledThreadsCount;
+  const userPostCount = user.postCount - user.disabledPostsCount;
+  const userTimeToRegister = Math.round((Date.now() - (new Date(user.toc)).getTime()) / (1000 * 60 * 60 * 24));
+  const userGradeId = userGrade._id;
+  const table = [
+    ['用户等级', userLevel, userGradeId, userGradeId >= userLevel],
+    ['文章数', threadCount, userThreadCount, userThreadCount >= threadCount],
+    ['回复数', postCount, userPostCount, userPostCount >= postCount],
+    ['注册时间', timeToRegister, userTimeToRegister, userTimeToRegister >= timeToRegister],
+    ['认证等级', authLevel, userAuthLevel, userAuthLevel >= authLevel]
+  ];
+  const infos = [];
+  if(info) infos.push(info);
+  for(const t of table) {
+    if(!t[3]) {
+      infos.push(`${t[0]}未满足要求`);
+    }
+  }
+  return {
+    status: infos.length === 0,
+    table,
+    infos
+  };
+};
 const FundModel = mongoose.model('funds', fundSchema);
 module.exports = FundModel;

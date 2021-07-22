@@ -15,7 +15,7 @@ addRouter
 		} catch(e) {
 			ctx.throw(403,e);
 		}
-		const message = await fund.getConflictingByUser(user);
+		const message = await fund.getConflictingByUser(user.uid);
 		if(message) ctx.throw(400, message);
 		data.fund = fund;
 		await next();

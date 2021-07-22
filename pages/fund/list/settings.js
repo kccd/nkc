@@ -47,7 +47,7 @@ window.app = new Vue({
     selectImage(type) {
       const isAvatar = type === 'avatar';
       const options = {
-        aspectRatio: isAvatar? 3/2: 4/1
+        aspectRatio: isAvatar? 2/1: 6/1
       };
       selectImage.show((data) => {
         NKC.methods.fileToUrl(data)

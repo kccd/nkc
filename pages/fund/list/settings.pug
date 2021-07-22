@@ -172,6 +172,17 @@ block content
                       input(type='checkbox' value='team' v-model='fund.applicantType')
                       span 团队
               .form-group
+                label.control-label.col-sm-2 必须上传生活照
+                .col-sm-8
+                  .radio
+                    label.m-r-1
+                      input(type='radio' :value='true' v-model='fund.necessaryPhoto')
+                      span 是
+                    label
+                      input(type='radio' :value='false' v-model='fund.necessaryPhoto')
+                      span 否
+
+              .form-group
                 label.control-label.col-sm-2 附带文章数
                 .col-sm-8.form-inline
                   input.form-control(type='text' v-model.number='fund.thread.count')

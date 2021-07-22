@@ -142,6 +142,7 @@ settingsRouter
           detailed: newFund.description.detailed,
           terms: newFund.description.terms
         },
+        necessaryPhoto: !!newFund.necessaryPhoto,
         applicant: {
           userLevel: newFund.applicant.userLevel,
           threadCount: newFund.applicant.threadCount,
@@ -178,7 +179,7 @@ settingsRouter
     });
     const newImage = {};
     if(files.avatar) {
-      newImage.avatar = await db.AttachmentModel.saveFundImage(files.avatar.path, 'fundBanner');
+      newImage.avatar = await db.AttachmentModel.saveFundImage(files.avatar.path, 'fundAvatar');
     }
     if(files.banner) {
       newImage.banner = await db.AttachmentModel.saveFundImage(files.banner.path, 'fundBanner');

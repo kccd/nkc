@@ -1,5 +1,18 @@
 const router = require('koa-router')();
 router
+  .get('/', async (ctx, next) => {
+    const {db, data} = ctx;
+    data.funds = await db.FundModel.find({
+      display: true,
+      disabled: false,
+      history: false
+    }, {name: 1, _id: 1}).sort({toc: 1});
+    data.donation = data.fundSettings.donation;
+    data.description = data.fundSettings.donationDescription;
+    data.fundName = data.fundSettings.fundName;
+    ctx.template = 'fund/donation/donation.pug';
+    await next();
+  })
   .post('/', async (ctx, next) => {
     const {db, data, body, state} = ctx;
     const {user} = data;
