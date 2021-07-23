@@ -295,6 +295,7 @@ schema.statics.getMinorCategories = async (columnId, cid, containChildCategoryPo
     category = category.toObject();
     minorCategoriesObj[category._id] = category;
     mcid.push(category._id);
+    category.count = 0;
     return category;
   });
   const match = {
