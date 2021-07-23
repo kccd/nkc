@@ -699,7 +699,7 @@ const defaultOptions = {
   count: 200,
   showAnonymousUser: false,
   excludeAnonymousPost: false,
-  removeLink: false,
+  removeLink: true,
 };
 threadSchema.statics.extendThreads = async (threads, options) => {
   const {removeLink} = require('../nkcModules/tools');

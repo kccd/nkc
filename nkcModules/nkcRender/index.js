@@ -107,14 +107,7 @@ class NKCRender {
         const c = node.children[i];
         if(c.type === 'text') {
           // 替换外链
-          c.data = c.data.replace(/(https?:\/\/)?([-0-9a-zA-Z]{1,256}\.)+[a-zA-Z]{2,6}/ig, (c) => {
-            if(domainWhitelistReg.test(c)) {
-              return c;
-            } else {
-              const arr = Array(c.length).fill('X');
-              return arr.join('');
-            }
-          });
+          c.data = self.replaceLink(c.data);
         } else if(c.type === 'tag') {
           if(['code', 'pre'].includes(c.name)) continue;
           if(c.attribs['data-tag'] === 'nkcsource') continue;
@@ -203,6 +196,16 @@ class NKCRender {
     text = text.slice(0, count);
     if(count < textLength) text += "...";
     return text;
+  }
+  replaceLink(data) {
+    return data.replace(/(https?:\/\/)?([-0-9a-zA-Z]{1,256}\.)+[a-zA-Z]{2,6}/ig, (c) => {
+      if(domainWhitelistReg.test(c)) {
+        return c;
+      } else {
+        const arr = Array(c.length).fill('X');
+        return arr.join('');
+      }
+    });
   }
 }
 

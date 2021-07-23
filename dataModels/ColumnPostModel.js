@@ -117,7 +117,8 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
     count: 150,
     forum: false,
     lastPost: false,
-    lastPostUser: false
+    lastPostUser: false,
+    removeLink: true,
   });
   threads.map(thread => {
     threadsObj[thread.tid] = thread;

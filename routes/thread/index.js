@@ -250,6 +250,7 @@ threadRouter
     let firstPost = await db.PostModel.findOne({pid: thread.oc});
 		if(!firstPost) ctx.throw(500, `文章数据错误，oc:${thread.oc}`);
     firstPost = await db.PostModel.extendPost(firstPost, extendPostOptions);
+    firstPost.t = nkcModules.nkcRender.replaceLink(firstPost.t);
 		thread.firstPost = firstPost;
 		// 设置匿名标志，前端页面会根据此标志，判断是否默认勾选匿名发表勾选框
     data.anonymous = firstPost.anonymous;
