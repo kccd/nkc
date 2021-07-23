@@ -176,6 +176,7 @@ applicationRouter
 			await r.extendResources();
     }));
 		data.auditComments = auditComments;
+		data.targetUserInFundBlacklist = await db.FundBlacklistModel.inBlacklist(applicationForm.uid);
 		await next();
 	})
 
@@ -201,7 +202,7 @@ applicationRouter
 		if(applicationForm.lock.submitted) ctx.throw(403,'抱歉！申请表已提交暂不能修改。');
 		const fund = applicationForm.fund;
 		try {
-			await fund.ensureUserPermission(user);
+			await db.FundModel.ensureUserPermission(user.uid, fund._id);
 		} catch(e) {
 			ctx.throw(403,e);
 		}

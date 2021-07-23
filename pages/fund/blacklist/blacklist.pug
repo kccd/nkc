@@ -1,0 +1,41 @@
+extends ../fundContainer
+block fundTitle
+  title 基金账单
+block fundContent
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12.box-shadow-panel
+        div
+          .table-responsive
+            table.table.nkc-table.table-bordered
+              thead
+                tr
+                  th 时间
+                  if permission('fundBlacklistPost')
+                    th 操作人
+                  th 用户
+                  th 相关项目
+                  th 原因
+                  th 其他
+              tbody
+                for l in data.list
+                  tr
+                    th
+                      +timeFormat(l.toc)
+                    if permission('fundBlacklistPost')
+                      th
+                        img.nkc-table-avatar(src=tools.getUrl('userAvatar', l.operator.avatar))
+                        a(href=tools.getUrl('userHome', l.operator.uid) target="_blank")=l.operator.username
+                    th
+                      img.nkc-table-avatar(src=tools.getUrl('userAvatar', l.user.avatar))
+                      a(href=tools.getUrl('userHome', l.user.uid) target="_blank")=l.user.username
+                    th
+                      if l.applicationForm
+                        a(href=tools.getUrl('fundApplicationForm', l.applicationForm._id) target="_blank")=l.applicationForm.code
+                    th.pre-wrap=l.reason
+                    th
+                      button.btn.btn-xs.btn-default(onclick=`removeUserFromFundBlacklist('${l.user.uid}')`) 移除
+            if !data.list.length
+              .p-t-1.p-b-1.text-center 空空如也~
+block fundScripts
+  +includeJS('/fund/blacklist/blacklist.js')

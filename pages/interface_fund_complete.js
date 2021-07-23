@@ -26,7 +26,7 @@ function getThreads(page, self) {
 	$('.unselectedThreads').html(html);
 	nkcAPI(url, 'GET', {})
 		.then(function(data) {
-			tempThreads = data.threads;
+			const tempThreads = data.threads;
 			var paging = data.paging;
 			displayPageList(paging, self);
 			if(tempThreads.length === 0) {

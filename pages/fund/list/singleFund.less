@@ -1,3 +1,4 @@
+@import "../../publicModules/base";
 .fund-banner{
   overflow: hidden;
   position: relative;
@@ -38,6 +39,21 @@
     width: 100%;
     display: inline-block;
     margin: auto;
+  }
+}
+.single-fund-nav{
+  a{
+    font-size: 1.2rem;
+    color: #555;
+  }
+}
+.single-fund-button{
+  background-color: @primary;
+  border-color: @primary;
+  &:hover{
+    background-color: @primary;
+    border-color: @primary;
+    opacity: 0.7;
   }
 }
 @media (max-width: 844px) {

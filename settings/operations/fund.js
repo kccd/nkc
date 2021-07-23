@@ -21,6 +21,11 @@ module.exports = {
 	me: {
 		GET: 'visitMyFund'
 	},
+  blacklist: {
+	  GET: 'visitFundBlacklist',
+    POST: 'fundBlacklistPost',
+    DELETE: 'fundBlacklistPost'
+  },
 	list: {
 		GET: 'visitFundObjectList',
 		POST: 'addFund',

@@ -645,6 +645,7 @@ threadRouter
           m.idCardNumber = null;
         }
       }
+      data.targetUserInFundBlacklist = await db.FundBlacklistModel.inBlacklist(applicationForm.uid);
     }
 
 		// 【待改】加载鼓励、学术分

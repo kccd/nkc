@@ -149,6 +149,11 @@ function disabledReport(applicationFormId, reportId, type) {
 		})
 }
 
+import {
+  addUserToFundBlacklist,
+  removeUserFromFundBlacklist
+} from "./fund/blacklist/lib";
+
 Object.assign(window, {
 	agree,
 	disagree,
@@ -161,4 +166,6 @@ Object.assign(window, {
 	disabledComment,
 	restoreApplicationForm,
 	disabledReport,
+  addUserToFundBlacklist,
+  removeUserFromFundBlacklist
 });

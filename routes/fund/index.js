@@ -11,6 +11,7 @@ const donationRouter = require('./donation');
 const historyRouter = require('./history');
 const unSubmitRouter = require('./unSubmit');
 const giveUpRouter = require('./giveUp');
+const blacklistRouter = require('./blacklist');
 const path = require('path');
 fundRouter
 	//检测科创基金是否开放
@@ -112,5 +113,6 @@ fundRouter
 	.use('/history', historyRouter.routes(), historyRouter.allowedMethods())
 	.use('/unsubmit', unSubmitRouter.routes(), unSubmitRouter.allowedMethods())
 	.use('/giveup', giveUpRouter.routes(), giveUpRouter.allowedMethods())
+  .use('/blacklist', blacklistRouter.routes(), blacklistRouter.allowedMethods())
 	.use('/disabled', disabledRouter.routes(), disabledRouter.allowedMethods());
 module.exports = fundRouter;

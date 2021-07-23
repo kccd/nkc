@@ -30,20 +30,20 @@ block fundContent
                         .radio
                           label.m-r-1
                             input(type="radio" value="personal" v-model="form.from"
-                              :disabled="!fund.applicationMethod.personal"
+                              :disabled="!fund.applicantType.includes('personal')"
                             )
                             | 个人
                           label
                             input(type="radio" value="team" v-model="form.from"
-                              :disabled="!fund.applicationMethod.team"
+                              :disabled="!fund.applicantType.includes('team')"
                             )
                             | 团队
                         .text-danger
                           small *申请方式选择后一旦提交将无法修改。
-                          if !data.fund.applicationMethod.personal
+                          if !data.fund.applicantType.includes('personal')
                             br
                             small *该基金暂不允许个人申请。
-                          if !data.fund.applicationMethod.team
+                          if !data.fund.applicantType.includes('team')
                             br
                             small *该基金暂不允许团队申请。
                     .form-group
@@ -56,17 +56,17 @@ block fundContent
                               img(:src="getUrl('userAvatar', u.avatar, 'sm')")
                               a(:href="'/u/' + u.uid" target="_blank" :title="'uid：' + u.uid") {{u.username}}
                               .fa.fa-remove(@click="removeMember(u)")
-                        .row
+                        //.row
                           .col-xs-8
                             input.form-control(placeholder="用户名、用户ID" type="text" v-model.trim="searchKeyword" :disabled="form.from==='personal'" @keyup.enter="searchUser")
                             h5.text-danger(v-if="searchError") {{searchError}}
                           .col-xs-4
                             button.btn.btn-primary(@click="searchUser" :disabled="form.from==='personal'") 搜索
-                        .m-t-05
+                        //.m-t-05
                           button.btn.btn-default.btn-sm(@click="infoMeUsers('follow')" :disabled="form.from==='personal'") 我的关注
                           button.btn.btn-default.btn-sm(@click="infoMeUsers('fans')" :disabled="form.from==='personal'") 我的粉丝
                           button.btn.btn-default.btn-sm(@click="clearSearchUsers" :disabled="form.from==='personal'") 清空
-                        .fund-user
+                        //.fund-user
                           .fund-user-panel(v-for="u in searchUsers")
                             img(:src="getUrl('userAvatar', u.avatar, 'sm')")
                             a(:href="'/u/' + u.uid" target="_blank" :title="'uid：' + u.uid") {{u.username}}

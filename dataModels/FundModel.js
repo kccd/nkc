@@ -330,19 +330,17 @@ fundSchema.pre('save', function(next){
   next();
 });
 
-fundSchema.methods.ensureUserPermission = async function(user) {
-	const UsersPersonalModel = require('./UsersPersonalModel');
-	const FundBillModel = require('./FundBillModel');
-	const userPersonal = await UsersPersonalModel.findOnly({uid: user.uid});
-	const userAuthLevel = await userPersonal.getAuthLevel();
-	const {authLevel, userLevel, postCount, threadCount, timeToRegister} = this.applicant;
-	if(user.grade._id < userLevel) throw '账号等级未满足条件';
-	if((user.postCount - user.disabledPostsCount) < postCount) throw '回帖量未满足条件';
-	if((user.threadCount - user.disabledThreadsCount) < threadCount) throw '发帖量未满足条件';
-	if(timeToRegister > Math.ceil((Date.now() - user.toc)/(1000*60*60*24))) throw '注册时间未满足条件';
-	if(authLevel > userAuthLevel) throw '身份认证等级未满足最低要求';
-	const balance = await FundBillModel.getBalance('fund', this._id);
-	if(balance <= 0) throw '基金余额不足。';
+/*
+* 判断用户是否有权申请基金
+* @param {String} uid 用户 ID
+* @param {String} fundId 基金 ID
+* */
+fundSchema.statics.ensureUserPermission = async function(userId, fundId) {
+  const FundModel = mongoose.model('funds');
+  const conditions = await FundModel.getConditionsOfApplication(userId, fundId);
+  if(!conditions.status) {
+    throwErr(403, conditions.infos.join(', '));
+  }
 };
 
 fundSchema.methods.ensureOperatorPermission = function(type, user) {
@@ -373,6 +371,8 @@ fundSchema.methods.ensureOperatorPermission = function(type, user) {
 fundSchema.methods.getConflictingByUser = async function(userId) {
 	const FundApplicationFormModel = mongoose.model('fundApplicationForms');
 	const FundApplicationUserModel = mongoose.model('fundApplicationUsers');
+	const FundBillModel = mongoose.model('fundBills');
+
 	const {self, other} = this.conflict;
 	const q = {
 		uid: userId,
@@ -418,6 +418,12 @@ fundSchema.methods.getConflictingByUser = async function(userId) {
       return '尚未结题项目的团队成员不能提交新的申报';
     }
   }
+
+  if(!this.canApply) return '基金暂不接受新的申请';
+  if(this.history) return '当前基金已被设为历史基金，不再接受新的申请';
+
+  const balance = await FundBillModel.getBalance('fund', this._id);
+  if(balance <= 0) return `基金余额不足`;
 
 	return '';
 };

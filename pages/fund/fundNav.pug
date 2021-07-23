@@ -5,11 +5,13 @@ if !isIncluded('fundNav')
       .fund-nav.m-b-1
         ul
           li
-            a(href='/fund') 基金首页
+            a(href='/fund') 首页
           li
             a(href='/fund/info') 基金介绍
           li
             a(href='/fund/bills') 财务公开
+          li
+            a(href='/fund/blacklist') 小黑屋
           if data.user
             li
               a(href=`/fund/me`) 我的申请

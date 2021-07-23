@@ -7,6 +7,12 @@ const fundApplicationUserSchema = new Schema({
 		default: Date.now,
 		index: 1
 	},
+  // 人员类型 applicant: 申请者 member: 组员
+  type: {
+	  type: String,
+    default: 'applicant',
+    index: 1
+  },
 	uid: {
 		type: String,
 		required: true,

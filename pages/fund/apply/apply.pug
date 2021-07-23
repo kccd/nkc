@@ -1,0 +1,29 @@
+extends ../fundContainer
+block fundTitle
+  title=`${data.fundSettings.fundName} - 填写申请表`
+block fundContent
+  #data.hidden=objToStr({applicationForm: data.applicationForm, fund: data.fund, fundSettings: data.fundSettings})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8.col-md-offset-2.box-shadow-panel#app(v-cloak)
+        .m-b-1
+          h5=`{{fundSettings.fundName}} - {{fund.name}} - {{form.code || form._id}}`
+
+          hr
+          .form.form-horizontal
+            .form-group
+              label.col-sm-3.control-label 申请方式
+              .col-sm-9
+                .radio
+                  label.m-r-1
+                    input(type='radio' value='personal' v-model='form.from')
+                    span 个人
+                  label
+                    input(type='radio' value='team' v-model='form.from')
+                    span 团队
+                .m-t-1(v-if='form.from === "team"')
+                  span 组员：
+                  button.btn.btn-xs.btn-default(@click='selectMember') 添加
+block fundScripts
+  include ../../publicModules/selectUser/selectUser
+  +includeJS('/fund/apply/apply.js')

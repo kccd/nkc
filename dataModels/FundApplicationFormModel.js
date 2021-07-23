@@ -1007,5 +1007,6 @@ fundApplicationFormSchema.statics.updateMoneyByApplicationFormId = async (applic
   return await applicationForm.updateMoney();
 };
 
+
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);
 module.exports = FundApplicationFormModel;

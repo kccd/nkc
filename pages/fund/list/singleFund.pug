@@ -1,8 +1,9 @@
 extends ../fundContainer.pug
 block fundTitle
   +includeCSS('/fund/list/singleFund.css')
-  include ../applicationFormItem
+  title=`${data.fundSettings.fundName} - ${data.fund.name}`
 block fundContent
+  include ../applicationFormItem
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12.m-b-2
@@ -39,10 +40,14 @@ block fundContent
           div
             include ../../publicModules/paging/paging_input
       .col-xs-12.col-md-4.p-l-0.box-shadow-panel
+        .m-b-1.single-fund-nav
+          if permission('singleFundSettings')
+            a.m-r-1(href=`/fund/list/${data.fund._id}/settings`) 基金设置
+          a(href=`/fund/list/${data.fund._id}/bills`) 基金账单
         if data.user
           .m-b-1
             .panel-header 申请条件
-            div.m-b-05
+            div.m-b-1
               table.table.nkc-table.m-b-0.table-bordered
                 thead
                   tr
@@ -65,9 +70,9 @@ block fundContent
               .text-danger.m-b-1= data.conditions.infos.join('，')
             div
               if data.conditions.status
-                a.btn.btn-block.btn-primary(href=`/fund/list/${data.fund._id}/add`) 申请基金
+                a.btn.btn-block.btn-primary.single-fund-button(href=`/fund/list/${data.fund._id}/add`) 申请基金
               else
-                button.btn.btn-block.btn-primary(disabled) 申请基金
+                button.btn.btn-block.btn-primary.single-fund-button(disabled) 申请基金
         .m-b-1
           .panel-header 补充说明
           .pre-wrap=data.fund.description.detailed
@@ -75,4 +80,5 @@ block fundContent
           donation(:fund=`'${data.fund._id}'`)
 
 block fundScripts
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
   +includeJS('/fund/list/singleFund.js')

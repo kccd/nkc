@@ -41,3 +41,8 @@ if applicationForm.status.submitted
             a(onclick=` disableApplicationForm(${applicationForm._id}, false)`).btn.btn-danger.btn-block 取消屏蔽
           else
             a(onclick=` disableApplicationForm(${applicationForm._id}, true)`).btn.btn-danger.btn-block 屏蔽
+        if permission('fundBlacklistPost')
+          if data.targetUserInFundBlacklist
+            button.btn.btn-danger.btn-block(onclick=`removeUserFromFundBlacklist("${applicationForm.uid}")`) 移出黑名单
+          else
+            button.btn.btn-danger.btn-block(onclick=`addUserToFundBlacklist("${applicationForm.uid}", ${applicationForm._id})`) 加入黑名单

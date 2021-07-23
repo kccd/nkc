@@ -51,6 +51,18 @@ settingsRouter
       data.applicationForm = applicationForm.toObject();
     }
 
+    if(ctx.query.new) {
+      ctx.template = 'fund/apply/apply.pug';
+      const {db, nkcModules, data, params, state} = ctx;
+      const applicationForm = await db.FundApplicationFormModel.findOnly({_id: params._id});
+      const fund = await db.FundModel.findOnly({_id: applicationForm.fundId});
+      data.applicationForm = applicationForm;
+      const members = await db.FundApplicationUserModel.find({
+        applicationFormId: applicationForm._id,
+        uid: {$ne: state.uid}
+      });
+      data.fund = fund;
+    }
 		await next();
 	});
 module.exports = settingsRouter;
