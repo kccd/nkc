@@ -263,12 +263,17 @@ module.exports = {
 			unverifiedPhone: {
 				GET: "unverifiedPhonePage"
       },
-      weakPasswordCheck: {
-        GET: "weakPasswordCheck",
-        result: {
-          GET: "weakPasswordCheckResult"
-        }
-      }
+			modifyPassword: {
+				POST: "modifyBackendPassword"
+			},
+			weak_password_check: {
+				PARAMETER: {
+					POST: "weakPasswordCheck"
+				}
+			},
+			weak_password_check_worker_script: {
+				GET: "weakPasswordCheckWorkerScript"
+			}
     },
     auth: {
       GET: "experimentalUserAuth",

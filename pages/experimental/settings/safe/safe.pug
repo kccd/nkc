@@ -2,7 +2,9 @@ extends ../../experimental
 block eTitle
   title 安全设置
 block eContent
-  .container-fluid.max-width
+  #app
+  script#__VUE_DATA(type="application/json")!= JSON.stringify({safeSettings: data.safeSettings})
+  //- .container-fluid.max-width
     .row
       .hidden#data= objToStr({safeSettings: data.safeSettings})
       .col-xs-12.col-md-12#app(v-cloak)
@@ -78,4 +80,4 @@ block eContent
             button.btn.btn-primary.btn-block(@click='save') 保存
 
 block scripts
-  +includeJS('/experimental/settings/safe/safe.js')
+  +includeJS('/experimental/settings/safe/app.js')
