@@ -53,7 +53,7 @@ if data.user
           span 请定期验证手机号
           .pull-right
             a(href=`/u/${data.user.uid}/settings/security` target="_self") 去验证
-        script
+        //-script
           include ./lib/verifyPhoneNumber.js
 
 
