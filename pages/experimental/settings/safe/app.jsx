@@ -6,7 +6,6 @@ import {
   Button, Row, Col, Tabs, TabPane, Switch, Input, Tooltip
 } from "element-ui";
 import ModifyPasswordDialog from "./components/ModifyPasswordDialog";
-import WeakPasswordCheck from "./components/WeakPasswordCheck";
 
 // @vue/component
 const App = {
@@ -14,7 +13,8 @@ const App = {
     form: { ...data.safeSettings },
     isSmallScreen: false,
     inModifyPassword: false,
-    inWeakPasswordCheck: false
+    inWeakPasswordCheck: false,
+    weakPasswordChecking: data.weakPasswordChecking
   }),
   render() {
     return (
@@ -64,8 +64,8 @@ const App = {
 
           <TabPane label="安全工具">
             <SettingItem title="弱密码检测">
-              <Button size="small" onClick={() => this.inWeakPasswordCheck = true}>打开工具</Button>
-              <WeakPasswordCheck visible={this.inWeakPasswordCheck} onClose={() => this.inWeakPasswordCheck = false} />
+              <Button size="small" onClick={() => this.runWeakPasswordCheck()}>{this.weakPasswordChecking ? "后台检测尚未结束" : "运行弱密码检测"}</Button>
+              <h5 class="text-danger"> 将对所有用户的密码进行检测，<a href="/e/settings/safe/weakPasswordCheck/result" target="_blank">这里</a>可以查看最近次的检测结果</h5>
             </SettingItem>
           </TabPane>
         </Tabs>

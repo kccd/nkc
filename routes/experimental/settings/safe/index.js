@@ -10,6 +10,7 @@ router
     data.safeSettings = (await db.SettingModel.findById("safe")).c;
     data.safeSettings.hasPassword = !!data.safeSettings.experimentalPassword.hash;
     delete data.safeSettings.experimentalPassword;
+    data.weakPasswordChecking = db.WeakPasswordResultModel.isChecking();
     ctx.template = "experimental/settings/safe/safe.pug";
     await next();
   })
@@ -86,70 +87,41 @@ router
     });
     return next();
   })
-  .post("/weak_password_check/:action", async (ctx, next) => {
-    const { data } = ctx;
-    const { action } = ctx.params;
-    const { code, slice, handleUsers } = ctx.body;
-    // 保存弱密码检测脚本
-    if(action === "save_code") {
-      console.log("> 保存脚本");
-      await SettingModel.updateOne({ _id: "safe" }, {
-        $set: {
-          "c.tools.weakPasswordCheck.sourceCode": code
-        }
-      });
-      await SettingModel.saveSettingsToRedis("safe");
-    // 获取弱密码检测脚本
-    } else if(action === "get_code") {
-      console.log("> 获取脚本");
-      const settings = await SettingModel.getSettings("safe");
-      data.sourceCode = settings.tools.weakPasswordCheck.sourceCode;
-    // 获取待检测密码的总数
-    } else if(action === "data_count") {
-      console.log("> 获取待检测密码总条数");
-      data.count = await UsersPersonalModel.countDocuments();
-    // 获取给定区间的待检测数据
-    } else if(action === "get_data_slice") {
-      const { start, length } = slice;
-      console.log(`> 获取给定区间的待检测密码 start: ${start}  length: ${length}`);
-      data.sliceData = await UsersPersonalModel.find({}, { uid: true, password: true }).skip(start).limit(length);
-    // 处理用户(发送消息、封禁账号)
-    } else if(action === "handle_user") {
-      console.log(handleUsers);
-      
+  .get("/weakPasswordCheck", async (ctx, next) => {
+    const { db } = ctx;
+    if(db.WeakPasswordResultModel.isChecking()) {
+      ctx.throw(403, "检测尚未结束，请稍后直接查看结果");
     }
+    db.WeakPasswordResultModel.weakPasswordCheck();
     return next();
   })
-  .get("/weak_password_check_worker_script", async (ctx, next) => {
-    const settings = await SettingModel.getSettings("safe");
-    ctx.set("Content-Type", "application/javascript; charset=utf-8");
-    ctx.body = workerSouceCode.replace("//// user code inject here", settings.tools.weakPasswordCheck.sourceCode);
-    return;
+  .get("/weakPasswordCheck/result", async (ctx, next) => {
+    ctx.template = "experimental/settings/safe/weakPasswordCheck/weakPasswordCheck.pug";
+    const { data, db, nkcModules, query } = ctx;
+    const { page = 0, type, content } = query;
+    const count = await db.WeakPasswordResultModel.countDocuments();
+    const paging = nkcModules.apiFunction.paging(page, count);
+    data.paging = paging;
+    data.list = await db.WeakPasswordResultModel.aggregate([
+      { $match: {} },
+      { $skip: paging.start },
+      { $limit: paging.perpage },
+      { $lookup: {
+          from: "users",
+          localField: "uid",
+          foreignField: "uid",
+          as: "userinfo"
+      } },
+      { $unwind: "$userinfo" },
+      { $project: {
+          uid: 1,
+          password: 1,
+          toc: 1,
+          _id: 0,
+          "userinfo.username": 1,
+          "userinfo.avatar": 1
+      } }
+    ]);
+    return next();
   });
 module.exports = router;
-
-const workerSouceCode = `// weak password check worker
-importScripts("/experimental/settings/safe/crypto-worker-lib.js");
-//// user code inject here;
-self.__WEAK_PASSWORD_CHECKER = true;
-self.addEventListener("message", function (event) {
-  var data = event.data;
-  if (Object.prototype.toString.call(data) !== "[object Array]") {
-    return self.postMessage({ isError: true, message: "worker only accepts a pure array" });
-  }
-  console.log("[Worker] starting tasks: ", data);
-  var hits = [];
-  for(var i in data) {
-    var detail = data[i];
-    if(!detail.password) {
-      continue
-    }
-    if($check(detail.password)) {
-      hits.push(detail)
-      console.log("[Worker] hit: ", detail);
-    }
-  }
-  console.log("[Worker] ended");
-  self.postMessage(hits);
-});
-`;

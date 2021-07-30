@@ -266,14 +266,12 @@ module.exports = {
 			modifyPassword: {
 				POST: "modifyBackendPassword"
 			},
-			weak_password_check: {
-				PARAMETER: {
-					POST: "weakPasswordCheck"
-				}
-			},
-			weak_password_check_worker_script: {
-				GET: "weakPasswordCheckWorkerScript"
-			}
+			weakPasswordCheck: {
+        GET: "weakPasswordCheck",
+        result: {
+          GET: "weakPasswordCheckResult"
+        }
+      }
     },
     auth: {
       GET: "experimentalUserAuth",
