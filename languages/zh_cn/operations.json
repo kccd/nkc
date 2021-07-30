@@ -156,7 +156,9 @@
   "visitScoreSettings": "访问分值加减设置",
   "modifyScoreSettings": "修改分值加减设置",
   "visitSystemInfo": "查看系统通知",
+  "deleteSystemInfo": "删除系统通知",
   "sendSystemInfo": "发送系统通知",
+  "fuzzySearchUser": "模糊查询用户",
   "visitFundHome": "访问基金首页",
   "visitAddFund": "访问添加基金项目页面",
   "visitFundSettings": "访问基金总设置",
@@ -545,6 +547,7 @@
   "viewUserAllFansAndFollowers": "可任意查看用户所有的关注和粉丝",
   "experimentalLogin": "后台管理登录",
   "experimentalSafeSettings": "后台安全设置",
+  "modifyBackendPassword": "修改后台密码",
   "modifySystemInfo": "修改系统通知",
   "getOriginId": "[VI]获取原图ID",
   "modifyReasonThreadReturn": "修改文章被退回的原因",
@@ -774,8 +777,7 @@
   "forumReviewSettings": "专业审核设置",
 
   "weakPasswordCheck": "弱密码检测",
-  "weakPasswordCheckResult": "查看弱密码检测结果",
-
+  "weakPasswordCheckWorkerScript": "请求弱密码检测浏览器端worker脚本",
   "postCommentControl": "回复中评论的控制",
 
   "sensitiveWords": "敏感词设置",

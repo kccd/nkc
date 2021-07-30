@@ -837,9 +837,10 @@ userSchema.methods.getNewMessagesCount = async function() {
   let newApplicationsCount = 0;
   let newReminderCount = 0;
   if(systemInfo) {
-    const allSystemInfoCount = await MessageModel.countDocuments({ty: 'STE'});
+    const allMySystemInfoMessageCount = (await MessageModel.getMySystemInfoMessage(this.uid)).length;
+    // const allSystemInfoCount = await MessageModel.countDocuments({ty: 'STE'});
     const viewedSystemInfoCount = await SystemInfoLogModel.countDocuments({uid: this.uid});
-    newSystemInfoCount = allSystemInfoCount - viewedSystemInfoCount;
+    newSystemInfoCount = allMySystemInfoMessageCount - viewedSystemInfoCount;
     // 可能会生成多条相同的阅读记录 以下判断用于消除重复的数据
     if(newSystemInfoCount < 0) {
       const systemInfoLog = await SystemInfoLogModel.aggregate([
@@ -2355,6 +2356,7 @@ userSchema.statics.getModifyPostTimeLimitMS = async (uid) => {
 userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
+  const UsersPersonalModel = mongoose.model('usersPersonal');
   const ForumModel = mongoose.model('forums');
   const PostModel = mongoose.model('posts');
   let result = {
@@ -2463,6 +2465,11 @@ userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
         warning: `<div>${err.message}</div>`
       }
     }
+  }
+  const shouldVerifyPhoneNumber = await UsersPersonalModel.shouldVerifyPhoneNumber(uid);
+  if(shouldVerifyPhoneNumber) {
+    result.warning = result.warning || '';
+    result.warning += `<div>你需要验证手机号，验证前你所发表的内容需通过审核后才能显示。<a href="/u/${uid}/settings/security" target="_blank">去验证</a></div>`;
   }
   return result;
 };

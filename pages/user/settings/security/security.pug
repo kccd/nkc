@@ -48,7 +48,7 @@ block content
                 .col-sm-4
                   button.btn.btn-primary(@click="formType = 'changeMobile'") 更换手机
                   if data.needPhoneVerify
-                    button.btn.btn-primary(@click="formType = 'phoneVerify'") 验证
+                    button.btn.btn-primary(@click="toPhoneVerify()") 验证
                   button.btn.btn-default(@click="formType = 'unbindMobile'") 解绑  
             .form-horizontal(v-if="formType === 'bind'")
               .form-group

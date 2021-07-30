@@ -512,6 +512,14 @@ userRouter
         }
       }
     }
+
+    // 排除封禁用户和名片被屏蔽的用户
+    if(data.users && data.users.length) {
+      data.users = data.users.filter(u => {
+        return !u.certs.includes('banned') && !u.hidden;
+      });
+    }
+
     const behavior = {
       operationId: data.operationId,
       uid: data.user? data.user.uid: "",

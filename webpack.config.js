@@ -6,9 +6,9 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const DIST_DIR = "dist";
 const LIB_DIR_PATTERN = "!pages/**/lib";
-const SCRIPTS_PATTERNS = ["./pages/**/*{.js,.jsx}", LIB_DIR_PATTERN];
-// const SCRIPTS_PATTERNS = ["./pages/test/*.js", LIB_DIR_PATTERN];
-const STYLES_PATTERNS = ["./pages/**/*.less", LIB_DIR_PATTERN];
+const COMPONENTS_DIR_PATTERN = "!pages/**/components";
+const SCRIPTS_PATTERNS = ["./pages/**/*{.js,.jsx}", LIB_DIR_PATTERN, COMPONENTS_DIR_PATTERN];
+const STYLES_PATTERNS = ["./pages/**/*.less", LIB_DIR_PATTERN, COMPONENTS_DIR_PATTERN];
 
 const scriptFiles = globby.sync(SCRIPTS_PATTERNS);
 const styleFiles = globby.sync(STYLES_PATTERNS);
