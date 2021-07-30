@@ -50,8 +50,10 @@ if data.user
       if data.needVerifyPhoneNumber
         .improve-info
           .fa.fa-exclamation-circle
-          span 验证手机号码使发表的内容跳过审核阶段
+          span 请定期验证手机号
           .pull-right
             a(href=`/u/${data.user.uid}/settings/security` target="_self") 去验证
+        script
+          include ./lib/verifyPhoneNumber.js
 
 
