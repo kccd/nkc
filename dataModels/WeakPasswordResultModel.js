@@ -38,7 +38,7 @@ schema.statics.weakPasswordCheck = async function() {
     }
   }
   const WeakPasswordResultModel = mongoose.model("weakPasswordResult");
-  await WeakPasswordResultModel.deleteOne({});
+  await WeakPasswordResultModel.remove({});
   const {
     encryptInMD5WithSalt,
     encryptInSHA256HMACWithSalt,

@@ -5,6 +5,8 @@ import {setAsDraggableElement} from "../lib/js/draggable";
 import {getFromLocalStorage, updateInLocalStorage, saveToLocalStorage} from "../lib/js/localStorage";
 import {debounce} from "../lib/js/execution";
 import {sleep} from "../lib/js/timeout";
+import FastClick from "fastclick";
+FastClick.attach(document.body);
 
 const messageAppId = '#messageApp';
 const socketContainer = '#socketContainer';

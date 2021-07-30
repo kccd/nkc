@@ -263,7 +263,10 @@ module.exports = {
 			unverifiedPhone: {
 				GET: "unverifiedPhonePage"
       },
-      weakPasswordCheck: {
+			modifyPassword: {
+				POST: "modifyBackendPassword"
+			},
+			weakPasswordCheck: {
         GET: "weakPasswordCheck",
         result: {
           GET: "weakPasswordCheckResult"
@@ -312,7 +315,11 @@ module.exports = {
 	systemInfo: {
 		GET: 'visitSystemInfo',
 		POST: 'sendSystemInfo',
-    PUT: "modifySystemInfo"
+    PUT: "modifySystemInfo",
+		DELETE: "deleteSystemInfo",
+		fuzzy_search_user: {
+			GET: "fuzzySearchUser"
+		}
 	},
 	log: {
     GET: 'visitPublicLogs',
