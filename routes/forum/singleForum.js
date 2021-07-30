@@ -211,8 +211,11 @@ router
 		const behaviors = await db.UsersBehaviorModel.find({
 			timeStamp: {$gt: today()},
 			fid: {$in: childForumsId},
-			operationId: {$in: ['visitForumLatest', 'visitThread', 'visitForumFollowers', 'visitForumVisitors']}
-		}).sort({timeStamp: -1});
+			operationId: {$in: ['visitForumLatest', 'visitThread', 'viewForumFollowers', 'viewForumVisitors']}
+		}, {
+		  uid: 1, timeStamp: 1
+    }).sort({timeStamp: -1});
+
 		const usersId = [];
 		// 过滤掉重复的用户
 		behaviors.map(b => {

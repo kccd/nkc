@@ -174,6 +174,7 @@ threadRouter
     const thread = await db.ThreadModel.findOnly({tid});
     // 拓展文章所属专业
     const forums = await thread.extendForums(['mainForums', 'minorForums']);
+    if(forums.length) data.forum = forums[0];
 		// 验证权限 - new
 		// 如果是分享出去的连接，含有token，则允许直接访问
     // 【待改】判断用户是否是通过分享链接阅读文章，如果是则越过权限
