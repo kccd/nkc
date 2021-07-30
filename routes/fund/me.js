@@ -40,6 +40,7 @@ meRouter
 				await a.extendMembers();
 				await a.extendApplicant();
 				await a.extendProject();
+				a.statusString = (await a.getStatus()).description;
 				return a;
 			}
 		}));

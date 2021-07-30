@@ -892,6 +892,12 @@ fundApplicationFormSchema.methods.getStatus = async function() {
     formStatus = [1, 4];
   } else if(useless === 'refuse') {
     formStatus = [1, 5];
+  } else if(completed === true) {
+    if(successful) {
+      formStatus = [5, 2];
+    } else {
+      formStatus = [5, 1];
+    }
   } else if(!submitted || !lock.submitted) {
     if(projectPassed === false) {
       formStatus = [2, 2];

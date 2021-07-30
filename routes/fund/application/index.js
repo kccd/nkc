@@ -202,7 +202,8 @@ applicationRouter
 		if(applicationForm.lock.submitted) ctx.throw(403,'抱歉！申请表已提交暂不能修改。');
 		const fund = applicationForm.fund;
 		try {
-			await db.FundModel.ensureUserPermission(user.uid, fund._id);
+		  // 临时屏蔽 修改申请表应该无需验证基金冲突
+			// await db.FundModel.ensureUserPermission(user.uid, fund._id);
 		} catch(e) {
 			ctx.throw(403,e);
 		}

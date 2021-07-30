@@ -154,6 +154,12 @@ var Tools = function() {
       case 'fundApplicationForm': {
         return "/fund/a/" + id
       }
+      case 'lifePhotoSM': {
+        return '/photo_small/' + id
+      }
+      case 'lifePhoto': {
+        return '/photo/' + id
+      }
     }
   };
   self.getAnonymousInfo = function() {

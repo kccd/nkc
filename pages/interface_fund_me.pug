@@ -88,7 +88,7 @@ block content
                                     span=`基金名：${a.fund.name}`
                                     br
                                     span= `状态：`
-                                    span= applicationFormStatus(a).str
+                                    span= a.statusString
                                   .col-xs-12.col-md-1
                                     a(href=`/fund/a/${a._id}`) 查看
                                     br

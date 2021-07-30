@@ -88,7 +88,11 @@ module.exports = {
 				}
 			},
 			settings: {
-				GET: 'visitFundApplicationFormSettings'
+				GET: 'visitFundApplicationFormSettings',
+        member: {
+				  POST: 'visitFundApplicationFormSettings',
+          DELETE: 'visitFundApplicationFormSettings'
+        }
 			},
 			/*comment: {
 				POST: 'addFundApplicationComment',

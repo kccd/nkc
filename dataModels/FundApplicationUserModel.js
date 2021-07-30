@@ -146,5 +146,22 @@ fundApplicationUserSchema.statics.getMembersUidByApplicationFromId = async (appl
   return applicationUsers.map(a => a.uid);
 };
 
+/*
+* 判断用户是否作为未结题项目的负责人，如果是，则用户不能成为其他申请组员
+* @param {String} uid 用户 ID
+* */
+fundApplicationUserSchema.statics.checkPermissionToBeAMember = async (uid) => {
+  const FundApplicationFormModel = mongoose.model('fundApplicationForms');
+  const UserModel = mongoose.model('users');
+  const user = await UserModel.findOnly({uid}, {username: 1});
+  const forms = await FundApplicationFormModel.find({uid});
+  for(const f of forms) {
+    const status = await f.getStatus();
+    if([2, 3, 4].includes(status.general)) {
+      throwErr(403, `用户「${user.username}」申请的项目尚未结题，不能担任新申请项目的组员`);
+    }
+  }
+}
+
 const FundApplicationUserModel = mongoose.model('fundApplicationUsers', fundApplicationUserSchema);
 module.exports = FundApplicationUserModel;

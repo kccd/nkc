@@ -1,8 +1,9 @@
 extends ../fundContainer
 block fundTitle
   title=`${data.fundSettings.fundName} - 填写申请表`
+  +includeCSS('/fund/apply/apply.css')
 block fundContent
-  #data.hidden=objToStr({applicationForm: data.applicationForm, fund: data.fund, fundSettings: data.fundSettings})
+  #data.hidden=objToStr({settingsData: data.settingsData, fundSettings: data.fundSettings})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-8.col-md-offset-2.box-shadow-panel#app(v-cloak)
@@ -12,7 +13,65 @@ block fundContent
           hr
           .form.form-horizontal
             .form-group
-              label.col-sm-3.control-label 申请方式
+              label.col-sm-2.control-label 真实姓名：
+              .col-sm-8.form-inline
+                input.form-control(type="text" placeholder="请输入真实姓名" v-model="applicant.name")
+                div.text-danger *将会公开展示。
+            .form-group
+              label.col-sm-2.control-label 身份证号码：
+              .col-sm-8.form-inline
+                input.form-control(type="text" placeholder="请输入18位身份证号码" v-model="applicant.idCardNumber")
+                div.text-danger *仅自己和审查员可见。
+            .form-group
+              label.col-sm-2.control-label 联系电话：
+              .col-sm-8.form-inline
+                input.form-control(type="text" placeholder="请输入联系电话" v-model="applicant.mobile")
+                div.text-danger *仅自己和审查员可见。
+            .form-group
+              label.col-sm-2.control-label 付款方式：
+              .col-sm-8
+                .radio
+                  label.m-r-1
+                    input(type="radio" value="alipay" v-model="form.account.paymentType")
+                    | 支付宝
+                  label
+                    input(type="radio" value="bankCard" v-model="form.account.paymentType")
+                    | 银行卡
+            .form-group(v-if="form.account.paymentType === 'bankCard'")
+              label.col-sm-2.control-label 银行全称：
+              .col-sm-8.form-inline
+                input.form-control(type="text" placeholder="请输入银行全称" v-model="form.account.bankName")
+                div.text-danger *仅自己和审查员可见。
+            .form-group
+              label.col-sm-2.control-label 户名：
+              .col-sm-8.form-inline
+                input.form-control(type="text" placeholder="请输入户名" v-model="form.account.name")
+                div.text-danger *必须与收款账号对应，仅自己和审查员可见。
+            .form-group
+              label.col-sm-2.control-label 收款账号：
+              .col-sm-8.form-inline
+                input.form-control(type="text" placeholder="请输入收款账号" v-model="form.account.number")
+                div.text-danger *仅自己和审查员可见。
+            .form-group
+              label.col-sm-2.control-label 自我介绍：
+              .col-sm-8
+                textarea.form-control(placeholder="请输入自我介绍" v-model="applicant.description" rows=6)
+                .text-danger.m-t-1 {{fund.reminder.inputUserInfo}}
+            .form-group
+              label.col-sm-2.control-label 生活照：
+              .col-sm-8
+                h5(v-if='!applicant.lifePhotosId.length') 暂未选择
+                div(v-else)
+                  h5 已选择的生活照：
+                  .form-photos
+                    .form-photo(v-for='id in applicant.lifePhotosId')
+                      a(:href='getUrl("lifePhoto", id)' target="_blank")
+                        img(:src='getUrl("lifePhotoSM", id)')
+
+                button.m-b-05.btn.btn-default.btn-sm 展开相册
+                life-photo-panel(:userId='form.uid')
+            .form-group
+              label.col-sm-2.control-label 申请方式：
               .col-sm-9
                 .radio
                   label.m-r-1
@@ -21,9 +80,26 @@ block fundContent
                   label
                     input(type='radio' value='team' v-model='form.from')
                     span 团队
+                span.text-danger 邀请组员后将无法更改申请方式
                 .m-t-1(v-if='form.from === "team"')
-                  span 组员：
-                  button.btn.btn-xs.btn-default(@click='selectMember') 添加
+                  table.table.table-bordered.m-b-05
+                    thead
+                      tr
+                        th 组员名
+                        th 状态
+                        th 其他
+                    tbody
+                      tr(v-for='u in formMembers')
+                        th {{u.username}}
+                        th
+                          span(v-if='u.agree === null') 已邀请，等待处理
+                          span(v-else-if='u.agree === false').text-danger 已拒绝
+                          span(v-else).text-success 已同意
+                        th
+                          button(v-if='u.agree === false') 重新邀请
+                          button(@click='removeMember(u.uid)') 移除
+                  button.btn.btn-xs.btn-default(@click='selectMember') 添加组员
 block fundScripts
   include ../../publicModules/selectUser/selectUser
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
   +includeJS('/fund/apply/apply.js')

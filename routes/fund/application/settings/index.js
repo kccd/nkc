@@ -1,6 +1,13 @@
 const Router = require('koa-router');
 const settingsRouter = new Router();
+const memberRouter = require('./member');
 settingsRouter
+  .use('/', async (ctx, next) => {
+    const {data, state} = ctx;
+    const {applicationForm} = data;
+    if(applicationForm.uid !== state.uid) ctx.throw(403, `权限不足`);
+    await next();
+  })
 	.get('/', async (ctx, next) => {
 		const {data, db, nkcModules} = ctx;
 		data.nav = '填写申请表';
@@ -56,13 +63,23 @@ settingsRouter
       const {db, nkcModules, data, params, state} = ctx;
       const applicationForm = await db.FundApplicationFormModel.findOnly({_id: params._id});
       const fund = await db.FundModel.findOnly({_id: applicationForm.fundId});
-      data.applicationForm = applicationForm;
+      const applicant = await applicationForm.extendApplicant();
       const members = await db.FundApplicationUserModel.find({
         applicationFormId: applicationForm._id,
-        uid: {$ne: state.uid}
-      });
-      data.fund = fund;
+        uid: {$ne: state.uid},
+        removed: false
+      }).sort({toc: 1});
+      const usersId = members.map(m => m.uid);
+      const users = await db.UserModel.find({uid: {$in: usersId}}, {uid: 1, avatar: 1, username: 1});
+      data.settingsData = {
+        applicationForm,
+        applicant,
+        fund,
+        users,
+        members
+      };
     }
 		await next();
-	});
+	})
+  .use('/member', memberRouter.routes(), memberRouter.allowedMethods());
 module.exports = settingsRouter;

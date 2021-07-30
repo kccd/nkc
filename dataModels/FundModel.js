@@ -372,7 +372,10 @@ fundSchema.methods.getConflictingByUser = async function(userId) {
 	const FundApplicationFormModel = mongoose.model('fundApplicationForms');
 	const FundApplicationUserModel = mongoose.model('fundApplicationUsers');
 	const FundBillModel = mongoose.model('fundBills');
-
+  const FundBlacklistModel = mongoose.model('fundBlacklist');
+  if(await FundBlacklistModel.inBlacklist(userId)) {
+    return '基金黑名单内的用户不能提交新的申请';
+  }
 	const {self, other} = this.conflict;
 	const q = {
 		uid: userId,
@@ -380,6 +383,9 @@ fundSchema.methods.getConflictingByUser = async function(userId) {
 		useless: null,
 		'status.completed': {$ne: true}
 	};
+
+
+
 	// 与自己冲突
 	if(self) {
 		q.fundId = this._id;
