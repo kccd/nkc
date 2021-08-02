@@ -110,6 +110,7 @@ const App = {
         .then(() => {
           this.inModifyPassword = false;
           this.$message.success("修改成功");
+          location.reload();
         })
         .catch(err => this.$message.error(err.error || err.message || err));
     },
