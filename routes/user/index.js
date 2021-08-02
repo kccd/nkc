@@ -191,7 +191,8 @@ userRouter
       lastPostUser: false,
       firstPostResource: false,
       htmlToText: false,
-      excludeAnonymousPost: true
+      excludeAnonymousPost: true,
+      removeLink: true,
     });
 
     data.recommendThreads = await db.ThreadModel.getRecommendThreads(accessibleFid);
@@ -297,6 +298,7 @@ userRouter
         lastPostUser: false,
         firstPostResource: true,
         htmlToText: true,
+        removeLink: true,
       });
       threads.map(thread => {
         threadsObj[thread.tid] = thread;
@@ -348,9 +350,9 @@ userRouter
           time: post.toc,
           pid: post.pid,
           anonymous: post.anonymous,
-          abstract: post.abstract,
-          content: post.c,
-          title: firstPost.t,
+          abstract: nkcModules.tools.removeLink(post.abstract),
+          content: nkcModules.tools.removeLink(post.c),
+          title: nkcModules.tools.removeLink(firstPost.t),
           link,
           reviewed: post.reviewed
         };
@@ -452,9 +454,9 @@ userRouter
           cover: thread.firstPost.cover,
           time: thread.toc,
           pid: thread.oc,
-          abstract: thread.firstPost.abstract,
-          title: thread.firstPost.t,
-          content: thread.firstPost.c,
+          abstract: nkcModules.tools.removeLink(thread.firstPost.abstract),
+          title: nkcModules.tools.removeLink(thread.firstPost.t),
+          content: nkcModules.tools.removeLink(thread.firstPost.c),
           anonymous: thread.firstPost.anonymous,
           link: `/t/${thread.tid}`,
           reviewed: thread.reviewed
@@ -510,6 +512,14 @@ userRouter
         }
       }
     }
+
+    // 排除封禁用户和名片被屏蔽的用户
+    if(data.users && data.users.length) {
+      data.users = data.users.filter(u => {
+        return !u.certs.includes('banned') && !u.hidden;
+      });
+    }
+
     const behavior = {
       operationId: data.operationId,
       uid: data.user? data.user.uid: "",

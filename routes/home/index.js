@@ -422,7 +422,8 @@ router
         disabled: 1, recycleMark: 1
       }).skip(paging.start).limit(paging.perpage).sort(sort);
       threads = await db.ThreadModel.extendThreads(threads, {
-        htmlToText: true
+        htmlToText: true,
+        removeLink: true
       });
     }
     const superModerator = ctx.permission("superModerator");

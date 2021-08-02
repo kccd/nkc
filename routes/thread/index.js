@@ -174,6 +174,7 @@ threadRouter
     const thread = await db.ThreadModel.findOnly({tid});
     // 拓展文章所属专业
     const forums = await thread.extendForums(['mainForums', 'minorForums']);
+    if(forums.length) data.forum = forums[0];
 		// 验证权限 - new
 		// 如果是分享出去的连接，含有token，则允许直接访问
     // 【待改】判断用户是否是通过分享链接阅读文章，如果是则越过权限
@@ -250,6 +251,7 @@ threadRouter
     let firstPost = await db.PostModel.findOne({pid: thread.oc});
 		if(!firstPost) ctx.throw(500, `文章数据错误，oc:${thread.oc}`);
     firstPost = await db.PostModel.extendPost(firstPost, extendPostOptions);
+    firstPost.t = nkcModules.nkcRender.replaceLink(firstPost.t);
 		thread.firstPost = firstPost;
 		// 设置匿名标志，前端页面会根据此标志，判断是否默认勾选匿名发表勾选框
     data.anonymous = firstPost.anonymous;

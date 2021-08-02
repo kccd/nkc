@@ -2,7 +2,9 @@
 include ./xss
 script.
   NKC.methods.mdToHtml = function (md){
-    return window.markdownit().render(md);
+    return window.markdownit({
+      html: true
+    }).render(md);
   };
   NKC.methods.mdToHtmlSafe = function(md) {
     return NKC.methods.custom_xss_process(NKC.methods.mdToHtml(md));

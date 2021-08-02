@@ -505,17 +505,14 @@ usersPersonalSchema.methods.ensurePassword = async function(passwordString) {
  * @param {string} uid 用户id
  */
 usersPersonalSchema.statics.shouldVerifyPhoneNumber = async function(uid) {
-	const UserModel = mongoose.model("users");
 	const SettingModel = mongoose.model("settings");
 	const UsersPersonalModel = mongoose.model("usersPersonal");
-	const user = await UserModel.findOne({ uid });
-	if(!user) return false;
+  const userPersonal = await UsersPersonalModel.findOne({uid}, { lastVerifyPhoneNumberTime: 1 });
+	if(!userPersonal) return false;
 	const safeSettings = await SettingModel.getSettings("safe");
 	const phoneVerify = safeSettings.phoneVerify;
 	// 如果需要进行手机号验证，验证是否已经过期
 	if(!phoneVerify.enable) return false;
-	const userPersonal = await UsersPersonalModel.findOne({uid: user.uid}, { lastVerifyPhoneNumberTime: 1 });
-	if(!userPersonal) return false;
 	if(!userPersonal.lastVerifyPhoneNumberTime) return true;
 	const lastVerifyPhoneNumberTime = userPersonal.lastVerifyPhoneNumberTime
 	const interval = phoneVerify.interval * 60 * 60 * 1000;

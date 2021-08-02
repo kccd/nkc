@@ -230,5 +230,4 @@ block content
                           ul.pagination.pagination-sm.pageList
                         button.btn.btn-default(style='float: right;' onclick=`submit(${applicationForm._id})`) 提交
 block scripts
-  script(src='/interface_common.js')
-  script(src='/interface_fund_complete.js')
+  +includeJS('/interface_fund_complete.js')

@@ -26,6 +26,12 @@ followerRouter
     if(data.user) {
       data.userSubUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
     }
+    // 排除封禁用户和名片被屏蔽的用户
+    if(data.followers && data.followers.length) {
+      data.followers = data.followers.filter(u => {
+        return !u.certs.includes('banned') && !u.hidden;
+      });
+    }
 		data.type = 'followers';
 		await next();
 	});

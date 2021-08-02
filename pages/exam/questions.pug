@@ -67,7 +67,7 @@ block content
             if question.auth === false || question.disabled
               h5.text-danger 原因：
                 span= question.reason    
-            div.question-content!=`${markdown('问：' + question.content)}`
+            div.question-content!=`${markdown_safe('问：' + question.content)}`
             if question.hasImage
               img(src=`/exam/question/${question._id}/image` style='max-width: 100%;')
             for a, index in question.answer

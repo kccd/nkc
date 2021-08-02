@@ -568,7 +568,7 @@
   "experimentalReviewSettings": "后台管理-审核设置",
   "review": "审核发表的内容",
   "experimentalReviewLog": "后台管理-查看审核记录",
-  "banSaleProductParams": "禁售商品",
+  "banSaleProductParams": "禁售/恢复出售商品",
   "column_apply": "专栏申请",
   "column_get": "专栏列表",
   "column_single_get": "访问专栏首页",

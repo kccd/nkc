@@ -73,7 +73,10 @@ router
       data.categoryPostCount = await db.ColumnPostModel.countDocuments({columnId: column._id, cid: category._id});
       data.categoriesNav = await db.ColumnPostCategoryModel.getCategoryNav(category._id);
       const minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id, data.category._id, true);
-      data.minorCategories = minorCategories.filter(mc => mc.count > 0);
+      data.minorCategories = minorCategories.filter(mc => {
+        data.categoryPostCount += mc.count;
+        return mc.count > 0
+      });
       const childCategoryId = await db.ColumnPostCategoryModel.getChildCategoryId(cid);
       childCategoryId.push(cid);
       let minorCategory;

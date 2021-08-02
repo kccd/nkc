@@ -209,16 +209,15 @@ function numToNumberTwo(str) {
 /**
  * 管理员禁售商品
  */
-function banSale(productId) {
-  var sureban = confirm("确定禁售该商品吗？");
+function banSale(productId, disabled) {
+  var sureban = confirm(`确定要执行当前操作吗？`);
   if(sureban) {
-    nkcAPI("/shop/product/"+productId+"/banSale", "PUT", {productId:productId})
+    nkcAPI("/shop/product/"+productId+"/banSale", "PUT", {productId: productId, disabled: !!disabled})
     .then(function(data) {
-      screenTopAlert("禁售成功");
-      window.location.reload();
+      sweetSuccess(`操作成功`);
     })
     .catch(function(data) {
-      screenTopWarning(data.error || data)
+      sweetError(data);
     })
   }
 }

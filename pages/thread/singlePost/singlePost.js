@@ -251,6 +251,7 @@ class SinglePostModule {
   }
   // 显示、隐藏评论
   switchPostComment(pid, fixPosition, page) {
+    if(!window.UE) return screenTopWarning(`别着急，页面还在加载中...`);
     const container = this.getCommentContainer(pid);
     if(container.attr('data-hide') === 'false') {
       if(fixPosition) {

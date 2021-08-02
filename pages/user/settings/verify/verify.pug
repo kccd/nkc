@@ -50,7 +50,7 @@ block content
               .col-xs-12.col-md-12.text-center
                 br
                 br
-                button.btn.btn-primary(v-if="authenticate.card.status === 'unsubmit'" @click="submitVerify2()") 申请审核
+                button.btn.btn-primary(v-if="authenticate.card.status === 'unsubmit'" @click="submitVerify2()") 提交审核
                 button.btn.btn-primary(v-if="authenticate.card.status === 'in_review'" disabled) 审核中
                 p.verify--passed(v-if="authenticate.card.status === 'passed'") 已认证
                   span.fa.fa-check
@@ -59,7 +59,7 @@ block content
                   p
                     span 原因：
                     span.text-danger {{authenticate.card.message}}
-                  button.btn.btn-primary(@click="submitVerify2()") 重新申请审核
+                  button.btn.btn-primary(@click="submitVerify2()") 提交审核
         .panel.panel-default
           .panel-heading
             span 身份认证3
@@ -79,7 +79,7 @@ block content
                 div(v-if="authenticate.video.status === 'unsubmit'")
                   input.hidden(type='file' accept="video/mp4" ref="videoInput" @change="videoInputFile = $event.target.files[0]")
                   button.btn.btn-primary#pickVerify3Video(@click="$refs.videoInput.click()") 选择视频
-                  button.btn.btn-primary#submiteAuth(@click="submiteVerify3()") 申请审核
+                  button.btn.btn-primary#submiteAuth(@click="submiteVerify3()") 提交审核
                 p.verify--passed(v-if="authenticate.video.status === 'passed'") 已认证
                   span.fa.fa-check
                 div(v-if="authenticate.video.status === 'fail'")
@@ -89,7 +89,7 @@ block content
                     span 原因：
                     span.text-danger {{authenticate.video.message}}
                   button.btn.btn-primary#pickVerify3Video(@click="$refs.videoInput.click()") 选择视频
-                  button.btn.btn-primary#submiteAuth(@click="submiteVerify3()") 重新申请审核
+                  button.btn.btn-primary#submiteAuth(@click="submiteVerify3()") 提交审核
                 div(v-if="authenticate.video.status === 'in_review'")
                   button.btn.btn-primary#submiteAuth(disabled) 审核中
 

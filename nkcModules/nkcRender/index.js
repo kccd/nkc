@@ -16,13 +16,10 @@ for(const filename of files) {
   const name = filename.split(".")[0];
   sources[name] = require(filePath + `/${name}`);
 }
-const serverConfig = require("../../config/server");
-const linkReg = new RegExp(`^` +
-  serverConfig.domain
-    .replace(/\//g, "\\/")
-    .replace(/\./g, "\\.")
-  + "|^\/"
-  , "i");
+
+const {domainWhitelistReg} = require('../../nkcModules/regExp');
+
+
 class NKCRender {
   constructor() {
     this.htmlFilter = htmlFilter;
@@ -57,7 +54,7 @@ class NKCRender {
         const a = links.eq(i);
         const href = a.attr("href");
         // 外链在新标签页打开
-        if(href && !linkReg.test(href)) {
+        if(href && !domainWhitelistReg.test(href)) {
           a.attr("target", "_blank");
           // 通过提示页代理外链的访问
           const byteArray = new Uint8Array(href.split("").map(char => char.charCodeAt(0)));
@@ -103,10 +100,27 @@ class NKCRender {
       }
     }
 
+    // 处理所有的文本外链
+    const replaceLinkInfo = function(node) {
+      if(!node.children || node.children.length === 0) return;
+      for(let i = 0; i < node.children.length; i++) {
+        const c = node.children[i];
+        if(c.type === 'text') {
+          // 替换外链
+          c.data = self.replaceLink(c.data);
+        } else if(c.type === 'tag') {
+          if(['code', 'pre'].includes(c.name)) continue;
+          if(c.attribs['data-tag'] === 'nkcsource') continue;
+          replaceLinkInfo(c);
+        }
+      }
+    }
+
     const body = $('body');
 
     if(type === 'article') {
       replaceATInfo(body[0], atUsers);
+      replaceLinkInfo(body[0]);
     }
     html = body.html();
     // html = body.safeHtml();
@@ -135,12 +149,14 @@ class NKCRender {
       });
     }
 
+
     // 过滤标签及样式
     html = htmlFilter(html);
     let id;
     if(post.pid) {
       id = `${post.pid}`;
     }
+
     if(html) {
       return `<div class="render-content math-jax" data-type="nkc-render-content" data-id="${id}">${html}</div>`;
     } else {
@@ -180,6 +196,16 @@ class NKCRender {
     text = text.slice(0, count);
     if(count < textLength) text += "...";
     return text;
+  }
+  replaceLink(data) {
+    return data.replace(/(https?:\/\/)?([-0-9a-zA-Z]{1,256}\.)+[a-zA-Z]{2,6}/ig, (c) => {
+      if(domainWhitelistReg.test(c)) {
+        return c;
+      } else {
+        const arr = Array(c.length).fill('X');
+        return arr.join('');
+      }
+    });
   }
 }
 
