@@ -6,7 +6,6 @@ import {getFromLocalStorage, updateInLocalStorage, saveToLocalStorage} from "../
 import {debounce} from "../lib/js/execution";
 import {sleep} from "../lib/js/timeout";
 import FastClick from "fastclick";
-FastClick.attach(document.body);
 
 const messageAppId = '#messageApp';
 const socketContainer = '#socketContainer';
@@ -103,6 +102,7 @@ const messageApp = new Vue({
     });
     const newMessageCount = this.getNewMessageCountFromNKC();
     this.updateNewMessageCount(newMessageCount);
+    FastClick.attach($(messageAppId)[0]);
   },
   watch: {
     async showPanel() {

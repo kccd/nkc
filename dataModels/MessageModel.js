@@ -1480,7 +1480,7 @@ messageSchema.statics.mySystemInfoMessageFilter = async (uid, messages) => {
         const endDate = end ? new Date(end) : new Date();
         if(tlv >= startDate && tlv < endDate) return true;
       })();
-      if(conditionA && conditionB && conditionC) return true;
+      if(conditionC && (conditionA || conditionB)) return true;
     }
     return false;
   });
