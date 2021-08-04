@@ -1,17 +1,17 @@
 <template lang="pug">
   .life-photo-panel
     .header
-      span 我的照片
+      span 我的照片 {{lifePhotos.length}} / 16
       input.hidden(type='file' ref="fileInput" @change="selectedFile" multiple="multiple")
-      button.btn.btn-xs.btn-default.m-r-05(@click="selectFile") 上传
-      button.btn.btn-xs.btn-default(@click="changeStatus") 编辑
       .pull-right
-        button.btn.btn-xs.btn-danger 关闭
+        button.btn.btn-xs.btn-default.m-r-05(@click="changeStatus") 编辑
+        button.btn.btn-xs.btn-default(@click="selectFile") 上传
 
     .photos
       .photo(v-for="p in lifePhotos" @click="selectPhoto(p)")
         .btn-remove(@click="removePhoto(p)" title="删除照片" v-if='editPhoto') 删除
         img(:src="getUrl('lifePhotoSM', p._id)")
+      .info.p-t-2.p-b-2.text-center(v-if="lifePhotos.length === 0") 空空如也~
 </template>
 
 <style lang="less" scoped>
@@ -31,20 +31,36 @@
   }
   .photos{
     font-size: 0;
+    padding: 0.5rem;
+    .info{
+      font-size: 1.25rem;
+    }
     .photo{
+      background-color: rgba(0, 0, 0, 1);
+      vertical-align:  top;
+      cursor: pointer;
       margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
       display: inline-block;
-      height: 10rem;
-      width: 14rem;
+      height: 7rem;
+      width: 10rem;
       position: relative;
+      z-index: 10;
       img{
         max-height: 100%;
         max-width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
       }
       .btn-remove{
         position: absolute;
         top: 0;
         right: 0;
+        z-index: 20;
         height: 100%;
         width: 100%;
         line-height: 100%;
@@ -75,12 +91,12 @@
         const self = this;
         nkcAPI(`/me/life_photos`, 'GET')
         .then(data => {
-          console.log(data);
           self.lifePhotos = data.lifePhotos;
         })
         .catch(sweetError)
       },
       selectFile() {
+        this.editPhoto = false;
         this.$refs.fileInput.click();
       },
       selectedFile() {
@@ -104,7 +120,10 @@
           .then(() => {
             self.uploadFile(files, index + 1)
           })
-          .catch(sweetError);
+          .catch(err => {
+            sweetError(err);
+            self.uploadFile(files, index + 1)
+          });
       },
       removePhoto(photo) {
         const self = this;
@@ -122,7 +141,7 @@
         this.editPhoto = !this.editPhoto;
       },
       selectPhoto(photo) {
-
+        this.$emit('selectphoto', photo);
       }
     }
   }

@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const settingsRouter = new Router();
 const memberRouter = require('./member');
+const postRouter = require('./post');
 settingsRouter
   .use('/', async (ctx, next) => {
     const {data, state} = ctx;
@@ -71,15 +72,25 @@ settingsRouter
       }).sort({toc: 1});
       const usersId = members.map(m => m.uid);
       const users = await db.UserModel.find({uid: {$in: usersId}}, {uid: 1, avatar: 1, username: 1});
+      const posts = await db.PostModel.find({type: 'thread', tid: {$in: applicationForm.threadsId.applying}});
+      const forums = await db.ForumModel.find({fid: applicationForm.category}, {fid: 1, displayName: 1});
+      const project = await applicationForm.extendProject();
       data.settingsData = {
         applicationForm,
         applicant,
         fund,
         users,
-        members
+        posts,
+        members,
+        forums,
+        project,
       };
     }
 		await next();
 	})
+  .post('/', async (ctx, next) => {
+    await next();
+  })
+  .use('/post', postRouter.routes(), postRouter.allowedMethods())
   .use('/member', memberRouter.routes(), memberRouter.allowedMethods());
 module.exports = settingsRouter;

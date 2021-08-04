@@ -3,32 +3,43 @@ block fundTitle
   title=`${data.fundSettings.fundName} - 填写申请表`
   +includeCSS('/fund/apply/apply.css')
 block fundContent
+  mixin icon
+    span.text-danger *&nbsp;
   #data.hidden=objToStr({settingsData: data.settingsData, fundSettings: data.fundSettings})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-8.col-md-offset-2.box-shadow-panel#app(v-cloak)
         .m-b-1
-          h5=`{{fundSettings.fundName}} - {{fund.name}} - {{form.code || form._id}}`
+          //h5=`{{fundSettings.fundName}} - {{fund.name}} - {{form.code || form._id}}`
 
+          h4 基本信息
           hr
           .form.form-horizontal
             .form-group
-              label.col-sm-2.control-label 真实姓名：
+              label.col-sm-2.control-label
+                +icon
+                | 真实姓名
               .col-sm-8.form-inline
                 input.form-control(type="text" placeholder="请输入真实姓名" v-model="applicant.name")
-                div.text-danger *将会公开展示。
+                .warning-info.text-danger 将会公开展示
             .form-group
-              label.col-sm-2.control-label 身份证号码：
+              label.col-sm-2.control-label
+                +icon
+                | 身份证号码
               .col-sm-8.form-inline
                 input.form-control(type="text" placeholder="请输入18位身份证号码" v-model="applicant.idCardNumber")
-                div.text-danger *仅自己和审查员可见。
+                .warning-info.text-danger 仅自己和审查员可见
             .form-group
-              label.col-sm-2.control-label 联系电话：
+              label.col-sm-2.control-label
+                +icon
+                | 联系电话
               .col-sm-8.form-inline
                 input.form-control(type="text" placeholder="请输入联系电话" v-model="applicant.mobile")
-                div.text-danger *仅自己和审查员可见。
+                .warning-info.text-danger 仅自己和审查员可见
             .form-group
-              label.col-sm-2.control-label 付款方式：
+              label.col-sm-2.control-label
+                +icon
+                | 付款方式
               .col-sm-8
                 .radio
                   label.m-r-1
@@ -38,40 +49,53 @@ block fundContent
                     input(type="radio" value="bankCard" v-model="form.account.paymentType")
                     | 银行卡
             .form-group(v-if="form.account.paymentType === 'bankCard'")
-              label.col-sm-2.control-label 银行全称：
+              label.col-sm-2.control-label
+                +icon
+                | 银行全称
               .col-sm-8.form-inline
                 input.form-control(type="text" placeholder="请输入银行全称" v-model="form.account.bankName")
-                div.text-danger *仅自己和审查员可见。
+                .warning-info.text-danger 仅自己和审查员可见
             .form-group
-              label.col-sm-2.control-label 户名：
+              label.col-sm-2.control-label
+                +icon
+                | 户名
               .col-sm-8.form-inline
                 input.form-control(type="text" placeholder="请输入户名" v-model="form.account.name")
-                div.text-danger *必须与收款账号对应，仅自己和审查员可见。
+                .warning-info.text-danger 必须与收款账号对应，仅自己和审查员可见
             .form-group
-              label.col-sm-2.control-label 收款账号：
+              label.col-sm-2.control-label
+                +icon
+                | 收款账号
               .col-sm-8.form-inline
                 input.form-control(type="text" placeholder="请输入收款账号" v-model="form.account.number")
-                div.text-danger *仅自己和审查员可见。
+                .warning-info.text-danger 仅自己和审查员可见
             .form-group
-              label.col-sm-2.control-label 自我介绍：
+              label.col-sm-2.control-label
+                +icon
+                | 自我介绍
               .col-sm-8
                 textarea.form-control(placeholder="请输入自我介绍" v-model="applicant.description" rows=6)
-                .text-danger.m-t-1 {{fund.reminder.inputUserInfo}}
+                .warning-info.text-danger {{fund.reminder.inputUserInfo}}
             .form-group
-              label.col-sm-2.control-label 生活照：
+              label.col-sm-2.control-label
+                span(v-if='fund.necessaryPhoto')
+                  +icon
+                | 生活照
               .col-sm-8
                 h5(v-if='!applicant.lifePhotosId.length') 暂未选择
                 div(v-else)
-                  h5 已选择的生活照：
+                  h5 已选择的生活照
                   .form-photos
-                    .form-photo(v-for='id in applicant.lifePhotosId')
-                      a(:href='getUrl("lifePhoto", id)' target="_blank")
-                        img(:src='getUrl("lifePhotoSM", id)')
+                    .form-photo(v-for='(id, index) in applicant.lifePhotosId')
+                      .option-remove(@click='removeFromArr(applicant.lifePhotosId, index)') 删除
+                      img(:src='getUrl("lifePhotoSM", id)')
 
-                button.m-b-05.btn.btn-default.btn-sm 展开相册
-                life-photo-panel(:userId='form.uid')
+                button.m-b-05.btn.btn-default.btn-xs(@click='switchPhotoPanel') {{showPhotoPanel? '收起相册': '展开相册'}}
+                life-photo-panel(:userId='form.uid' @selectphoto='selectPhoto' v-if='showPhotoPanel')
             .form-group
-              label.col-sm-2.control-label 申请方式：
+              label.col-sm-2.control-label
+                +icon
+                | 申请方式
               .col-sm-9
                 .radio
                   label.m-r-1
@@ -80,9 +104,9 @@ block fundContent
                   label
                     input(type='radio' value='team' v-model='form.from')
                     span 团队
-                span.text-danger 邀请组员后将无法更改申请方式
+                .warning-info.text-danger 邀请组员后将无法更改申请方式
                 .m-t-1(v-if='form.from === "team"')
-                  table.table.table-bordered.m-b-05
+                  table.table.table-bordered.m-b-05.nkc-table
                     thead
                       tr
                         th 组员名
@@ -99,7 +123,102 @@ block fundContent
                           button(v-if='u.agree === false') 重新邀请
                           button(@click='removeMember(u.uid)') 移除
                   button.btn.btn-xs.btn-default(@click='selectMember') 添加组员
+            .form-group
+              label.col-sm-2.control-label
+                + icon
+                | 研究周期
+              .col-sm-9.form-inline
+                input.form-control(type="text" v-model.number="form.projectCycle" placeholder='请输入研究周期')
+                .warning-info.text-danger 单位：天
+            .form-group
+              label.col-sm-2.control-label
+                + icon
+                | 资金预算
+              .col-sm-9
+                h5 总计：{{totalMoney}} 元
+                .table-responsive
+                  table.table.table-bordered.m-b-05.nkc-table
+                    thead
+                      tr
+                        th.budget-purpose 用途
+                        th.budget-count 数量
+                        th.budget-money 单价（元）
+                        th.text-center.budget-money 合计（元）
+                        th.text-center.budget-count 其他
+                    tbody
+                      tr(v-for='(b, index) in form.budgetMoney')
+                        th.budget-purpose
+                          input.form-control(type='text' v-model='b.purpose')
+                        th.budget-count
+                          input.form-control(type='text' v-model.number='b.count')
+                        th.budget-money
+                          input.form-control(type='text' v-model.number='b.money' @change='formatMoney(index)')
+                        th.text-center.budget-money {{calculateMoney(b.count, b.money).toFixed(2)}}
+                        th.text-center
+                          button.btn.btn-xs.btn-default(@click='removeFromArr(form.budgetMoney, index)') 删除
+                button.btn.btn-xs.btn-default(@click='addBudgetMoney') 添加
+            .form-group
+              label.col-sm-2.control-label
+                span(v-if='fund.thread.count > 0')
+                  +icon
+                | 技术文章
+              .col-sm-9
+                h5(v-if='!form.threadsId.applying.length') 暂未选择
+                .m-t-05(v-else)
+                  div.m-b-05(v-for='(t, index) in formThreads')
+                    button.m-r-05.btn.btn-xs.btn-default(@click='removeFromArr(form.threadsId.applying, index)') 删除
+                    a(:href='getUrl("thread", t.tid)' target="_blank") {{t.t}}
+                h5.warning-info.text-danger 申请人（或组员）曾经的技术文章，从论坛发文中选择
+                  span(v-if='fund.thread.count > 0') ，至少 {{fund.thread.count}} 篇
+                button.m-b-05.btn.btn-default.btn-xs(@click='switchPostPanel') 选择文章
+                post-panel(:aid='form._id' v-if='showPostPanel' @selectpost='selectPost')
+            .form-group
+              label.col-sm-2.control-label
+                +icon
+                | 学科分类
+              .col-sm-9
+                h5(v-if='!formForum') 暂未选择
+                h5(v-else)
+                  a(:href='getUrl("forumHome", formForum.fid)' target="_blank") {{formForum.displayName}}
+                button.m-b-05.btn.btn-default.btn-xs(@click='selectForum') 选择专业
+        div
+          h4 项目信息
+          hr
+          .form
+            .form-group
+              label
+                +icon
+                | 项目名称
+              input.form-control(placeholder='请输入项目名称' v-model.trim='project.t')
+            .form-group
+              label 摘要
+              .row
+                .col-xs-12.col-sm-6.col-md-6
+                  textarea.form-control(rows=4 placeholder='中文摘要' v-model.trim='project.abstractCn')
+                .col-xs-12.col-sm-6.col-md-6
+                  textarea.form-control(rows=4 placeholder='英文摘要' v-model.trim='project.abstractEn')
+            .form-group
+              label 关键词
+              .keywords
+                div(v-for='(k, index) in project.keyWordsCn')
+                  span {{k}}
+                  .pointer.fa.fa-remove(@click='removeFromArr(project.keyWordsCn, index)' title='删除')
+                div(v-for='(k, index) in project.keyWordsEn')
+                  span {{k}}
+                  .pointer.fa.fa-remove(@click='removeFromArr(project.keyWordsEn, index)' title='删除')
+              div
+                button.m-b-05.btn.btn-default.btn-xs(@click='selectKeyword') 添加
+            .form-group.m-t-1
+              label
+                +icon
+                | 项目内容
+              .editor-notice.pre-wrap {{fund.reminder.inputProject}}
+              #fundEditor
+
 block fundScripts
   include ../../publicModules/selectUser/selectUser
   include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../../publicModules/forumSelector/forumSelector
+  include ../../ueditor/ueditorBase
+  include ../../publicModules/commonModal/commonModal
   +includeJS('/fund/apply/apply.js')
