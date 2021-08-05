@@ -96,6 +96,12 @@ module.exports = {
         },
         post: {
 				  GET: 'visitFundApplicationFormSettings'
+        },
+        delete: {
+				  POST: 'visitFundApplicationFormSettings'
+        },
+        giveup: {
+				  POST: 'visitFundApplicationFormSettings'
         }
 			},
 			/*comment: {

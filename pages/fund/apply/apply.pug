@@ -11,7 +11,6 @@ block fundContent
       .col-xs-12.col-md-8.col-md-offset-2.box-shadow-panel#app(v-cloak)
         .m-b-1
           //h5=`{{fundSettings.fundName}} - {{fund.name}} - {{form.code || form._id}}`
-
           h4 基本信息
           hr
           .form.form-horizontal
@@ -39,7 +38,7 @@ block fundContent
             .form-group
               label.col-sm-2.control-label
                 +icon
-                | 付款方式
+                | 收款方式
               .col-sm-8
                 .radio
                   label.m-r-1
@@ -99,10 +98,10 @@ block fundContent
               .col-sm-9
                 .radio
                   label.m-r-1
-                    input(type='radio' value='personal' v-model='form.from')
+                    input(type='radio' value='personal' v-model='form.from' :disabled="fund.applicantType.indexOf('personal') === -1")
                     span 个人
                   label
-                    input(type='radio' value='team' v-model='form.from')
+                    input(type='radio' value='team' v-model='form.from' :disabled="fund.applicantType.indexOf('team') === -1")
                     span 团队
                 .warning-info.text-danger 邀请组员后将无法更改申请方式
                 .m-t-1(v-if='form.from === "team"')
@@ -141,16 +140,18 @@ block fundContent
                     thead
                       tr
                         th.budget-purpose 用途
-                        th.budget-count 数量
+                        th.budget-purpost 规格型号
                         th.budget-money 单价（元）
+                        th.budget-count 数量
+                        th.budget-money 单位
                         th.text-center.budget-money 合计（元）
                         th.text-center.budget-count 其他
                     tbody
                       tr(v-for='(b, index) in form.budgetMoney')
                         th.budget-purpose
-                          input.form-control(type='text' v-model='b.purpose')
+                          input(type='text' v-model='b.purpose')
                         th.budget-count
-                          input.form-control(type='text' v-model.number='b.count')
+                          input(type='text' v-model.number='b.count')
                         th.budget-money
                           input.form-control(type='text' v-model.number='b.money' @change='formatMoney(index)')
                         th.text-center.budget-money {{calculateMoney(b.count, b.money).toFixed(2)}}
@@ -193,9 +194,9 @@ block fundContent
             .form-group
               label 摘要
               .row
-                .col-xs-12.col-sm-6.col-md-6
+                .col-xs-12.col-sm-6.col-md-6.m-b-1
                   textarea.form-control(rows=4 placeholder='中文摘要' v-model.trim='project.abstractCn')
-                .col-xs-12.col-sm-6.col-md-6
+                .col-xs-12.col-sm-6.col-md-6.m-b-1
                   textarea.form-control(rows=4 placeholder='英文摘要' v-model.trim='project.abstractEn')
             .form-group
               label 关键词
@@ -214,6 +215,18 @@ block fundContent
                 | 项目内容
               .editor-notice.pre-wrap {{fund.reminder.inputProject}}
               #fundEditor
+            .m-t-1
+              .time-auto-save(v-if='timeAutoSave').text-success
+                .fa.fa-check-circle
+                | 数据已保存&nbsp;
+                span {{timeAutoSave}}
+              button.btn.btn-primary(disabled v-if='submitting') 提交中...
+              button.btn.btn-primary(@click="submitForm" v-else) 提交
+
+              button.btn.btn-default(disabled v-if='saving') 保存中...
+              button.btn.btn-default(@click='saveForm' v-else) 保存
+              .pull-right
+                button.btn.btn-danger(@click='giveUp') 放弃
 
 block fundScripts
   include ../../publicModules/selectUser/selectUser

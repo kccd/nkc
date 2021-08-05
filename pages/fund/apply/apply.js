@@ -1,5 +1,7 @@
 import LifePhotoPanel from '../../publicModules/lifePhotoPanel.vue';
 import PostPanel from '../postPanel.vue';
+import {timeFormat} from '../../lib/js/time';
+import {debounce} from '../../lib/js/execution';
 const forumSelector = new NKC.modules.ForumSelector();
 const commonModal = new NKC.modules.CommonModal();
 const data = NKC.methods.getDataById('data');
@@ -32,14 +34,10 @@ const app = new Vue({
     showPostPanel: false,
     forums,
     editor: null,
-    project: project || {
-      t: '',
-      c: '',
-      abstractEn: '',
-      abstractCn: '',
-      keyWordsCn: [],
-      keyWordsEn: [],
-    }
+    project,
+    timeAutoSave: null,
+    submitting: false,
+    saving: false,
   },
   components: {
     'life-photo-panel': LifePhotoPanel,
@@ -111,12 +109,20 @@ const app = new Vue({
     }
   },
   mounted() {
+    const self = this;
     setTimeout(() => {
-      this.initEditor();
+      self.initEditor();
+      self.autoSaveForm();
+
     }, 1000);
   },
+  watch: {
+
+  },
+
   methods: {
     getUrl: NKC.methods.tools.getUrl,
+    timeFormat: NKC.methods.tools.timeFormat,
     selectMember() {
       const self = this;
       selectUser.open(data => {
@@ -211,6 +217,7 @@ const app = new Vue({
       this.editor = UE.getEditor('fundEditor', NKC.configs.ueditor.fundConfigs)
       this.editor.addListener('ready', () => {
         self.editor.setContent(self.project.c);
+        console.log(self.project.c)
       });
     },
     // 添加关键词
@@ -250,14 +257,59 @@ const app = new Vue({
       this.project.c = this.getContent();
     },
 
-
-    // 暂存
-    saveForm() {
-      const {form, project, applicant} = this;
+    // 自动保存
+    autoSaveForm() {
+      const self = this;
+      setTimeout(() => {
+        self.saveForm()
+          .then(self.autoSaveForm)
+      }, 30000);
     },
+    giveUp() {
+
+    },
+    saveForm() {
+      const self = this;
+      const {form, project, applicant} = this;
+      self.saving = true;
+      this.setProjectContent();
+      return nkcAPI(`/fund/a/${form._id}/settings`, 'POST', {
+        form,
+        project,
+        applicant
+      })
+        .then(data => {
+          self.saving = false;
+          self.timeAutoSave = `${timeFormat("HH:mm:ss", new Date())}`
+        })
+        .catch(err => {
+          self.saving = false;
+          sweetError(err);
+        });
+    },
+    // 暂存
+    saveFormTimeout: debounce(function() {
+      this.saveForm();
+    }, 1000),
     // 提交
     submitForm() {
-
+      const self = this;
+      const {form, project, applicant} = this;
+      self.submitting = true;
+      this.setProjectContent();
+      return nkcAPI(`/fund/a/${form._id}/settings`, 'POST', {
+        type: 'submit',
+        form,
+        project,
+        applicant
+      })
+        .then(data => {
+          self.submitting = false;
+        })
+        .catch(err => {
+          self.submitting = false;
+          sweetError(err);
+        })
     }
   }
 });

@@ -85,8 +85,9 @@ const fundApplicationFormSchema = new Schema({
     /*
     {
       purpose: String, // 物品名称
-      money: Number,   // 单价
+      money: Number,   // 单价 0.01
       count: Number,   // 数量
+      total: Number, // 总计 0.01 单价 * 数量
 			suggest: Number, // 专家建议
 			fact: Number     // 管理员最后批准
     }
@@ -109,9 +110,14 @@ const fundApplicationFormSchema = new Schema({
     type: Number,
     default: 0
   },
-
-
-  projectCycle: { // 预计周期
+  // 审核方式
+  // person: 人工, system: 系统
+  auditType: {
+    type: String,
+    default: 'person'
+  },
+  // 预计周期
+  projectCycle: {
 	  type: Number,
 	  default: null,
 	  index: 1,
@@ -1012,7 +1018,6 @@ fundApplicationFormSchema.statics.updateMoneyByApplicationFormId = async (applic
   const applicationForm = await FundApplicationFormModel.findOnly({_id: applicationFormId});
   return await applicationForm.updateMoney();
 };
-
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);
 module.exports = FundApplicationFormModel;

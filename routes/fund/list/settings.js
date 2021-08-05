@@ -30,6 +30,7 @@ settingsRouter
     } = data;
     const {checkString, checkNumber} = nkcModules.checkData;
     if(newFund._id !== oldFund._id) ctx.throw(400, `数据错误，请刷新后再试`);
+    if(!['system', 'person'].includes(newFund.auditType)) ctx.throw(400, `请选择审核方式`);
     checkString(newFund.name, {
       name: '基金名称',
       minLength: 1,
@@ -128,7 +129,7 @@ settingsRouter
       $set: {
         disabled: !!newFund.disabled,
         display: !!newFund.display,
-        auditType: !!newFund.auditType,
+        auditType: newFund.auditType,
         canApply: !!newFund.canApply,
         history: !!newFund.history,
         name: newFund.name,

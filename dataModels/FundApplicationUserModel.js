@@ -163,5 +163,23 @@ fundApplicationUserSchema.statics.checkPermissionToBeAMember = async (uid) => {
   }
 }
 
+/*
+* 获取同意组队的用户 ID
+* @parma {Number} applicationFormId 申请表 ID
+* @return {[String]} 用户 UID 组成的数组
+* */
+fundApplicationUserSchema.statics.getAgreeMembersId = async (applicationFormId) => {
+  const FundApplicationUserModel = mongoose.model('fundApplicationUsers');
+  const members = await FundApplicationUserModel.find({
+    type: 'member',
+    applicationFormId,
+    removed: false,
+    agree: true
+  }, {
+    uid: 1
+  });
+  return members.map(m => m.uid);
+};
+
 const FundApplicationUserModel = mongoose.model('fundApplicationUsers', fundApplicationUserSchema);
 module.exports = FundApplicationUserModel;
