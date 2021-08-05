@@ -31,7 +31,7 @@ router
       messages.map(m => {
         delete m.ip;
         delete m.port;
-        if(m.withdrawn) m.c = '';
+        // if(m.withdrawn) m.c = '';
       });
       data.messages = messages.reverse();
       data.targetUser = targetUser;

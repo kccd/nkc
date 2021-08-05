@@ -422,14 +422,16 @@ func.sendEventWithdrawn = async (uid, tUid, messageId) => {
     eventName: 'withdrawn',
     roomName: getRoomName('user', uid),
     data: {
-      messageId
+      messageId,
+      reEdit: true,
     }
   });
   socketClient.sendMessage(socketServiceName, {
     eventName: 'withdrawn',
     roomName: getRoomName('user', tUid),
     data: {
-      messageId
+      messageId,
+      reEdit: false
     }
   });
 };

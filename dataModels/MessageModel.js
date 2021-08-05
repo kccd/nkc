@@ -1213,7 +1213,11 @@ messageSchema.statics.extendMessages = async (messages) => {
       // 用户
       if(withdrawn) {
         message.contentType = 'withdrawn';
-        message.content = null;
+        if(typeof c === 'string' && (Date.now() - tc.getTime()) < 2 * 60 * 1000) {
+          message.content = c;
+        } else {
+          message.conetnt = null;
+        }
       } else {
         if(typeof c === 'string') {
           message.contentType = 'html';

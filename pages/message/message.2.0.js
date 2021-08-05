@@ -68,11 +68,11 @@ export function withdrawn(messageId) {
   return nkcAPI('/message/withdrawn', 'PUT', {messageId});
 }
 
-export function onWithdrawn(originMessages, messageId) {
+export function onWithdrawn(originMessages, messageId, reEdit) {
   for(const message of originMessages) {
     if(message._id === messageId) {
       message.contentType = 'withdrawn';
-      message.content = null;
+      if(!reEdit) message.content = null;
       break;
     }
   }
