@@ -254,7 +254,7 @@ var Tools = function() {
   // 去除文本中的链接
   self.removeLink = function(content) {
     content = content || ''
-    var reg = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/ig;
+    var reg = /(https?:\/\/)?([-0-9a-zA-Z]{1,256}\.)+[a-zA-Z]{2,6}/ig
     return content.replace(reg, '');
   };
 };

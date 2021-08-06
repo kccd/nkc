@@ -17,7 +17,7 @@ for(const filename of files) {
   sources[name] = require(filePath + `/${name}`);
 }
 
-const {domainWhitelistReg} = require('../../nkcModules/regExp');
+const {domainWhitelistReg, urlReg} = require('../../nkcModules/regExp');
 
 
 class NKCRender {
@@ -197,8 +197,8 @@ class NKCRender {
     if(count < textLength) text += "...";
     return text;
   }
-  replaceLink(data) {
-    return data.replace(/(https?:\/\/)?([-0-9a-zA-Z]{1,256}\.)+[a-zA-Z]{2,6}/ig, (c) => {
+  replaceLink(data = '') {
+    return data.replace(urlReg, (c) => {
       if(domainWhitelistReg.test(c)) {
         return c;
       } else {

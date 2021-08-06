@@ -350,9 +350,9 @@ userRouter
           time: post.toc,
           pid: post.pid,
           anonymous: post.anonymous,
-          abstract: nkcModules.tools.removeLink(post.abstract),
-          content: nkcModules.tools.removeLink(post.c),
-          title: nkcModules.tools.removeLink(firstPost.t),
+          abstract: nkcModules.nkcRender.replaceLink(post.abstract),
+          content: nkcModules.nkcRender.replaceLink(post.c),
+          title: nkcModules.nkcRender.replaceLink(firstPost.t),
           link,
           reviewed: post.reviewed
         };
@@ -454,9 +454,9 @@ userRouter
           cover: thread.firstPost.cover,
           time: thread.toc,
           pid: thread.oc,
-          abstract: nkcModules.tools.removeLink(thread.firstPost.abstract),
-          title: nkcModules.tools.removeLink(thread.firstPost.t),
-          content: nkcModules.tools.removeLink(thread.firstPost.c),
+          abstract: nkcModules.nkcRender.replaceLink(thread.firstPost.abstract),
+          title: nkcModules.nkcRender.replaceLink(thread.firstPost.t),
+          content: nkcModules.nkcRender.replaceLink(thread.firstPost.c),
           anonymous: thread.firstPost.anonymous,
           link: `/t/${thread.tid}`,
           reviewed: thread.reviewed
