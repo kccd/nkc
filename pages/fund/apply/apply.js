@@ -280,7 +280,8 @@ const app = new Vue({
       })
         .then(data => {
           self.saving = false;
-          self.timeAutoSave = `${timeFormat("HH:mm:ss", new Date())}`
+          self.timeAutoSave = `${timeFormat("HH:mm:ss", new Date())}`;
+          self.applicant.lifePhotosId = data.applicantLifePhotosId;
         })
         .catch(err => {
           self.saving = false;
@@ -305,6 +306,7 @@ const app = new Vue({
       })
         .then(data => {
           self.submitting = false;
+          NKC.methods.visitUrl(`/fund/a/${form._id}`);
         })
         .catch(err => {
           self.submitting = false;

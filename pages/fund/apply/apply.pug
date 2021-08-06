@@ -45,7 +45,9 @@ block fundContent
                     input(type="radio" value="alipay" v-model="form.account.paymentType")
                     | 支付宝
                   label
-                    input(type="radio" value="bankCard" v-model="form.account.paymentType")
+                    input(type="radio" value="bankCard" v-model="form.account.paymentType"
+                      :disabled='fund.auditType === "system"'
+                      )
                     | 银行卡
             .form-group(v-if="form.account.paymentType === 'bankCard'")
               label.col-sm-2.control-label
@@ -129,7 +131,7 @@ block fundContent
               .col-sm-9.form-inline
                 input.form-control(type="text" v-model.number="form.projectCycle" placeholder='请输入研究周期')
                 .warning-info.text-danger 单位：天
-            .form-group
+            .form-group(v-if='!form.fixedMoney')
               label.col-sm-2.control-label
                 + icon
                 | 资金预算

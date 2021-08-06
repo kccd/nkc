@@ -8,95 +8,57 @@ const cheerio = require('cheerio');
 settingsRouter
   .use('/', async (ctx, next) => {
     const {data, state} = ctx;
-    const {applicationForm} = data;
+    const {applicationForm, fund} = data;
     if(applicationForm.uid !== state.uid) ctx.throw(403, `权限不足`);
+    if(applicationForm.disabled) ctx.throw(403,'申请表已被屏蔽');
+    if(applicationForm.useless === 'refuse') {
+      ctx.throw(403,'申请表已被彻底拒绝');
+    } else if(applicationForm.useless === 'giveUp') {
+      ctx.throw(403,'申请人已放弃申报');
+    }
+    const reg = /^\/fund\/a\/[0-9]+\/settings$/;
+    if(reg.test(ctx.url)) {
+      // 编辑申请表
+      if(applicationForm.modifyCount >= fund.modifyCount) {
+        applicationForm.useless = 'exceededModifyCount';
+        await applicationForm.updateOne({useless: applicationForm.useless});
+      }
+      if(applicationForm.useless === 'exceededModifyCount') {
+        ctx.throw(403, `申请表的修改次数已超过限制，已无法修改`);
+      }
+      if(applicationForm.lock.submitted) {
+        ctx.throw(403, `申请表已提交，暂无法修改`);
+      }
+    }
     await next();
   })
 	.get('/', async (ctx, next) => {
-		const {data, db, nkcModules} = ctx;
-		data.nav = '填写申请表';
-		const {user, applicationForm} = data;
-		const {fund} = applicationForm;
-		if(applicationForm.disabled) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
-		if(applicationForm.useless !== null) ctx.throw(403,'申请表已失效，无法完成该操作。');
-		if(applicationForm.modifyCount >= fund.modifyCount) {
-			await applicationForm.updateOne({useless: 'exceededModifyCount'});
-			throw '抱歉！申请表的修改次数已超过限制，无法提交修改。';
-		}
-		const {lock} = applicationForm;
-		if(user.uid !== applicationForm.uid) ctx.throw(403,'权限不足');
-		if(lock.submitted) ctx.throw(400, '申请表已提交，无法修改。');
-		let {s} = ctx.query;
-		if(s) {
-			s = parseInt(s);
-		} else {
-			s = 1;
-		}
-		if(applicationForm.status.submitted && s === 1) s = 2;
-		if(s === 3) {
-			await applicationForm.extendProject();
-		}
-		if(s === 4) {
-      data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
-      data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
-		}
-
-		if(s === 5) {
-			const project = await data.applicationForm.extendProject();
-			project.c = nkcModules.nkcRender.renderHTML({
-				type: "article",
-				post: {
-					c: project.c,
-					resources: await db.ResourceModel.getResourcesByReference(`fund-${project._id}`)
-				},
-				user: data.user
-			});
-		}
-		if(s > 5) ctx.throw(404, 'not found');
-		data.s = s;
-		const userPersonal = await db.UsersPersonalModel.findOnly({uid: applicationForm.uid});
-		data.lifePhotos = await userPersonal.extendLifePhotos();
-		ctx.template = 'fund/apply/editForm.pug';
-		await applicationForm.updateOne({'lock.submitted': false});
-		if(applicationForm.toObject) {
-      data.applicationForm = applicationForm.toObject();
-    }
-
-    if(ctx.query.new) {
-      ctx.template = 'fund/apply/apply.pug';
-      const {db, nkcModules, data, params, state} = ctx;
-      const applicationForm = await db.FundApplicationFormModel.findOnly({_id: params._id});
-      const fund = await db.FundModel.findOnly({_id: applicationForm.fundId});
-      const applicant = await applicationForm.extendApplicant();
-      const members = await db.FundApplicationUserModel.find({
-        applicationFormId: applicationForm._id,
-        uid: {$ne: state.uid},
-        removed: false
-      }).sort({toc: 1});
-      const usersId = members.map(m => m.uid);
-      const users = await db.UserModel.find({uid: {$in: usersId}}, {uid: 1, avatar: 1, username: 1});
-      const posts = await db.PostModel.find({type: 'thread', tid: {$in: applicationForm.threadsId.applying}});
-      const forums = await db.ForumModel.find({fid: applicationForm.category}, {fid: 1, displayName: 1});
-      const project = await applicationForm.extendProject();
-      data.settingsData = {
-        applicationForm,
-        applicant,
-        fund,
-        users,
-        posts,
-        members,
-        forums,
-        project: project || {
-          t: '',
-          c: '',
-          abstractEn: '',
-          abstractCn: '',
-          keyWordsCn: [],
-          keyWordsEn: [],
-        },
-      };
-    }
-		await next();
+    const {db, data, params, state} = ctx;
+    const applicationForm = await db.FundApplicationFormModel.findOnly({_id: params._id});
+    const fund = await db.FundModel.findOnly({_id: applicationForm.fundId});
+    const applicant = await applicationForm.extendApplicant();
+    const members = await db.FundApplicationUserModel.find({
+      applicationFormId: applicationForm._id,
+      uid: {$ne: state.uid},
+      removed: false
+    }).sort({toc: 1});
+    const usersId = members.map(m => m.uid);
+    const users = await db.UserModel.find({uid: {$in: usersId}}, {uid: 1, avatar: 1, username: 1});
+    const posts = await db.PostModel.find({type: 'thread', tid: {$in: applicationForm.threadsId.applying}});
+    const forums = await db.ForumModel.find({fid: applicationForm.category}, {fid: 1, displayName: 1});
+    const project = await applicationForm.extendProject();
+    data.settingsData = {
+      applicationForm,
+      applicant,
+      fund,
+      users,
+      posts,
+      members,
+      forums,
+      project,
+    };
+    ctx.template = 'fund/apply/apply.pug';
+    await next();
 	})
   .post('/', async (ctx, next) => {
     const {db, data, body, nkcModules} = ctx;
@@ -104,7 +66,13 @@ settingsRouter
       fund, applicationForm
     } = data;
     const {form, applicant, project, type} = body;
+    const isSubmit = type === 'submit';
     const {checkString, checkNumber} = nkcModules.checkData;
+
+    let {lifePhotosId} = applicant;
+
+    const _applicant = await applicationForm.extendApplicant();
+
     const {
       account,
       from,
@@ -118,7 +86,6 @@ settingsRouter
       idCardNumber,
       mobile,
       description,
-      lifePhotosId,
     } = applicant;
     const {
       t,
@@ -156,7 +123,13 @@ settingsRouter
       });
     }
 
-    if(type === 'submit') {
+    // 找出被移除的照片 ID
+    const {lifePhotosId: oldLifePhotosId} = _applicant;
+    const deletedLifePhotosId = oldLifePhotosId.filter(id => !lifePhotosId.includes(id));
+    // 将生活照复制一份到基金申请
+    lifePhotosId = await db.PhotoModel.copyLifePhotosToFund(applicationForm.uid, applicationForm._id, lifePhotosId);
+
+    if(isSubmit) {
       checkString(name, {
         name: '真实姓名',
         minLength: 1,
@@ -172,6 +145,9 @@ settingsRouter
         minLength: 5,
         maxLength: 30
       });
+      if(fund.auditType === 'system' && paymentType === 'bankCard') {
+        ctx.throw(400, `当前基金仅支持支付宝收款`);
+      }
       if(paymentType === 'bankCard') {
         checkString(bankName, {
           name: '银行全称',
@@ -306,7 +282,6 @@ settingsRouter
       if(count > 100000) ctx.throw(400, `项目内容不能超过 10 万字`);
 
       // 组员
-
       const members = await db.FundApplicationUserModel.countDocuments({
         applicationFormId: applicationForm._id,
         uid: {$ne: applicationForm.uid},
@@ -314,54 +289,18 @@ settingsRouter
         agree: null,
         removed: false,
       });
-      if(members.length > 0) ctx.throw(400, `还有组员未上车，请等一等`);
+      if(members.length > 0) ctx.throw(400, `等一等，还有组员没有上车~`);
       if(from === 'team' && agreeMembersId.length === 0) {
         ctx.throw(400, `请至少添加一个组员`);
       }
+      // 删除被移除的基金生活照
+      await db.PhotoModel.removeApplicationFormPhotosById(applicationForm.uid, applicationForm._id, deletedLifePhotosId);
     }
-
-    const formObj = {
-      account: {
-        paymentType,
-        bankName,
-        name: accountName,
-        number
-      },
-      from,
-      projectCycle,
-      budgetMoney: _budgetMoney,
-      'threadsId.applying': threadsId.applying,
-      category
-    };
-
-    if(this.projectId) {
-      const document = await db.FundDocumentModel.findOnly({_id: this.projectId});
-      document.t = t;
-      document.c = c;
-      document.abstractEn = abstractEn;
-      document.abstractCn = abstractCn;
-      document.keyWordsCn = keyWordsCn;
-      document.keyWordsEn = keyWordsEn;
-      await document.save();
-    } else {
-      const documentId = await db.SettingModel.operateSystemID('fundDocuments', 1);
-      const newDocument = db.FundDocumentModel({
-        _id: documentId,
-        uid: applicationForm.uid,
-        applicationFormId: applicationForm._id,
-        type: 'project',
-        t,
-        abstractCn,
-        abstractEn,
-        keyWordsCn,
-        keyWordsEn,
-        c
-      });
-      await newDocument.save();
-      formObj.projectId = documentId;
-    }
-
-    let _applicant = await applicationForm.extendApplicant();
+    // 更新项目信息
+    await applicationForm.updateProject({
+      t, c, abstractEn, abstractCn, keyWordsCn, keyWordsEn
+    });
+    // 更新申请人信息
     await _applicant.updateOne({
       $set: {
         name,
@@ -371,20 +310,36 @@ settingsRouter
         lifePhotosId
       }
     });
+    // 更新申请表
     await db.FundApplicationFormModel.updateOne({_id: applicationForm._id}, {
-      $set: formObj
+      $set: {
+        account: {
+          paymentType,
+          bankName,
+          name: accountName,
+          number
+        },
+        from,
+        projectCycle,
+        budgetMoney: _budgetMoney,
+        'threadsId.applying': threadsId.applying,
+        category
+      }
     });
-    await db.FundApplicationFormModel.updateMoneyByApplicationFormId(applicationForm._id);
+
+    if(isSubmit) {
+      // 更新申请表总金额
+      await db.FundApplicationFormModel.updateMoneyByApplicationFormId(applicationForm._id);
+      // 发布申请
+      await db.FundApplicationFormModel.publishByApplicationFormId(applicationForm._id);
+    } else {
+      data.applicantLifePhotosId = lifePhotosId;
+    }
+
     await next();
   })
   .use('/post', postRouter.routes(), postRouter.allowedMethods())
   .use('/member', memberRouter.routes(), memberRouter.allowedMethods())
-  .use(['/delete', '/giveup'], async (ctx, next) => {
-    if(ctx.data.applicationForm.useless !== null) {
-      ctx.throw(400, `申请表已失效，无法完成该操作`);
-    }
-    await next();
-  })
   .use('/delete', deleteRouter.routes(), deleteRouter.allowedMethods())
   .use('/giveup', giveUpRouter.routes(), giveUpRouter.allowedMethods());
 module.exports = settingsRouter;

@@ -1,8 +1,9 @@
-const settings = require('../settings');
 const fs = require('fs');
+const fsPromises = fs.promises;
 const {promisify} = require('util');
 const unlink = promisify(fs.unlink);
-const mongoose = settings.database;
+const mongoose = require('../settings/database');
+const {generateFolderName, photoPath, photoSmallPath} = require("../settings/upload");
 const Schema = mongoose.Schema;
 const photoSchema = new Schema({
   _id: Number,
@@ -158,6 +159,89 @@ photoSchema.post('remove', async function(photo) {
 	await unlink(photoPath + this.path);
 	await unlink(photoSmallPath + this.path);
 });
+
+
+/*
+* 复制图片到基金申请
+* 如果图片本来就属于基金申请则不作任何处理且返回图片 ID
+* 如果图片不属于基金申请则生成图片数据并将文件复制一份保存成基金申请图片，最后返回基金申请图片 ID
+* @param {String} uid 申请人 ID
+* @param {[Number]} photosId 图片 ID 组成的数组
+* @param {Number} applicationFormId 基金申请表 ID
+* @return {「Number」} 基金申请图片 ID 组成的数组
+* */
+photoSchema.statics.copyLifePhotosToFund = async (uid, applicationFormId, photosId) => {
+  const PhotoModel = mongoose.model('photos');
+  const SettingModel = mongoose.model('settings');
+  const photos = await PhotoModel.find({
+    _id: {$in: photosId},
+    uid,
+    status: {
+      $nin: ['disabled', 'deleted'],
+    }
+  });
+  const photosObj = {};
+  for(const p of photos) {
+    photosObj[p._id] = p;
+  }
+
+  const newPhotosId = [];
+
+  for(const id of photosId) {
+    const photo = photosObj[id];
+    if(!photo) continue;
+    // 如果本来就是基金申请中的图片则不作任何处理
+    if(photo.type === 'fund') {
+      newPhotosId.push(id);
+      continue;
+    }
+    const {photoPath, photoSmallPath, generateFolderName} = require('../settings/upload');
+    const newId = await SettingModel.operateSystemID('photos', 1);
+    const {size, uid, fileName, description} = photo;
+    const photoDir = generateFolderName(photoPath);
+    const photoSmallDir = generateFolderName(photoSmallPath);
+    const filePath = newId + '.jpg';
+    const targetPath = photoPath + photoDir + filePath;
+    const smallTargetPath = photoSmallPath + photoSmallDir+ filePath;
+    await fsPromises.copyFile(photoPath + photo.path, targetPath);
+    await fsPromises.copyFile(photoSmallPath + photo.path, smallTargetPath);
+    const newPhoto = new PhotoModel({
+      _id: newId,
+      type: 'fund',
+      path: photoDir + filePath,
+      applicationFormId,
+      uid,
+      size,
+      fileName,
+      description
+    });
+    await newPhoto.save();
+    newPhotosId.push(newId);
+  }
+
+  return newPhotosId;
+};
+
+/*
+* 删除基金申请的图片
+* @param {Number} applicationFormId 基金申请表 ID
+* @param {[Number]} 基金申请表图片 ID 组成的数组
+* */
+photoSchema.statics.removeApplicationFormPhotosById = async (uid, applicationFormId, photosId) => {
+  const PhotoModel = mongoose.model('photos');
+  await PhotoModel.updateMany({
+    uid,
+    type: 'fund',
+    applicationFormId,
+    _id: {
+      $in: photosId
+    }
+  }, {
+    $set: {
+      status: 'deleted'
+    }
+  });
+};
 
 const PhotoModel = mongoose.model('photos', photoSchema);
 module.exports = PhotoModel;

@@ -34,18 +34,10 @@ addRouter
 			ctx.throw(403,'该基金设置中未勾选个人申请和团队申请！');
 		}
 		applicationForm.auditType = fund.auditType;
-		const newApplicationForm = db.FundApplicationFormModel(applicationForm);
-		await newApplicationForm.save();
-		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-		const authLevel = await userPersonal.getAuthLevel();
-		const newApplicationUser = db.FundApplicationUserModel({
-			applicationFormId: applicationForm._id,
-			mobile: userPersonal.mobile,
-			uid: user.uid,
-      type: 'applicant',
-			authLevel,
-		});
-		await newApplicationUser.save();
+    const newApplicationForm = db.FundApplicationFormModel(applicationForm);
+    await newApplicationForm.save();
+    await newApplicationForm.initApplicant();
+    await newApplicationForm.initProject();
 		data.applicationFormId = newApplicationForm._id;
 		await next();
 	});
