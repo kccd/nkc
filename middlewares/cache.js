@@ -11,18 +11,19 @@ module.exports = async (ctx, next) => {
   ) return await next();
   const {redisClient} = settings;
   // 缓存时间的键名
-  let tocKey = `page:${url}:toc`;
+  const {web, reactNative, apiCloud} = nkcModules.cache.getRedisPageKeyByUrl(url);
+  let tocKey = web[0];
   // 缓存内容的键名
-  let dataKey = `page:${url}:data`;
+  let dataKey = web[1];
 
   // 同上，但由于APP需要排除页面头尾，所以缓存和web端不公用。
   if(state.isApp) {
     if(state.platform === 'reactNative') {
-      tocKey = `app:RN:page:${url}:toc`;
-      dataKey = `app:RN:page:${url}:data`;
+      tocKey = reactNative[0];
+      dataKey = reactNative[1];
     } else {
-      tocKey = `app:AC:page:${url}:toc`;
-      dataKey = `app:AC:page:${url}:data`;
+      tocKey = apiCloud[0];
+      dataKey = apiCloud[1];
     }
   }
 
