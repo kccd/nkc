@@ -1694,7 +1694,7 @@ forumSchema.methods.saveLatestThreadToRedisAsync = async function(count) {
 forumSchema.methods.saveLatestThreadToRedis = async function(count = 3) {
   const fid = this.fid;
   const ThreadModel = mongoose.model('threads');
-  const {removeLink} = require('../nkcModules/tools');
+  const nkcRender = require('../nkcModules/nkcRender');
   const PostModel = mongoose.model('posts');
   const UserModel = mongoose.model('users');
   const threads = await ThreadModel.find({
@@ -1725,7 +1725,7 @@ forumSchema.methods.saveLatestThreadToRedis = async function(count = 3) {
       user.username = '匿名用户';
       user.uid = '';
     }
-    post.t = removeLink(post.t);
+    post.t = nkcRender.replaceLink(post.t);
     results.push({
       tid,
       digest,

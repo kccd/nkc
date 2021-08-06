@@ -702,7 +702,7 @@ const defaultOptions = {
   removeLink: true,
 };
 threadSchema.statics.extendThreads = async (threads, options) => {
-  const {removeLink} = require('../nkcModules/tools');
+  const nkcRender = require('../nkcModules/nkcRender');
   const o = Object.assign({}, defaultOptions);
   Object.assign(o, options);
   let PostModel, UserModel, ForumModel, ThreadTypeModel;
@@ -766,10 +766,10 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         usersId.add(post.uid);
       }
       if(o.removeLink) {
-        post.c = removeLink(post.c);
-        post.t = removeLink(post.t);
-        post.abstractCn = removeLink(post.abstractCn);
-        post.abstractEn = removeLink(post.abstractEn);
+        post.c = nkcRender.replaceLink(post.c);
+        post.t = nkcRender.replaceLink(post.t);
+        post.abstractCn = nkcRender.replaceLink(post.abstractCn);
+        post.abstractEn = nkcRender.replaceLink(post.abstractEn);
       }
     });
 

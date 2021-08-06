@@ -250,6 +250,8 @@ block fundContent
               h4.text-center 常见问题
 
 block fundScripts
+  if data.s === 3
+    +includeJS('/message/connectSocket.js')
   if data.s === 5
     include ../../publicModules/lazySizes
     include ../../publicModules/imageViewer
@@ -265,7 +267,6 @@ block fundScripts
     +includeJS("/media/media_index.js")
   include ../../ueditor/ueditorBase
   +includeJS("/fund/apply/editForm.js")
-
   if data.s === 5
     include ../../publicModules/plyr/plyr.js.pug
     include  ../../publicModules/sticker/sticker

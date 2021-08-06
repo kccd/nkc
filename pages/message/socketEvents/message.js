@@ -17,9 +17,9 @@ export function markAsRead(data) {
 }
 
 export function withdrawn(data) {
-  const {messageId} = data;
+  const {messageId, reEdit} = data;
   const PageChat = this.$refs[this.pageId.PageChat];
   if(PageChat && PageChat.onWithdrawn) {
-    PageChat.onWithdrawn(messageId);
+    PageChat.onWithdrawn(messageId, reEdit);
   }
 }

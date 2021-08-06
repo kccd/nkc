@@ -75,8 +75,8 @@ mixin displayPageCount
 -if (styleType !== 'abstract') {
   -threadPanelClass += ' p-b-0';
 -}
--var threadTitle = tools.removeLink(thread.firstPost.t);
-
+//- -var threadTitle = tools.removeLink(thread.firstPost.t);
+-var threadTitle = thread.firstPost.t;
 .thread-panel(class=threadPanelClass data-tid=thread.tid)
   if !thread.reviewed
     include ../module_review

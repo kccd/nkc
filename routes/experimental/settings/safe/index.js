@@ -18,13 +18,12 @@ router
     const {db, body, nkcModules} = ctx;
     const {safeSettings} = body;
     const { phoneVerify } = safeSettings;
-    safeSettings.experimentalVerifyPassword = !!safeSettings.experimentalVerifyPassword;
     if(safeSettings.experimentalTimeout >= 5) {}
     else {
       ctx.throw(400, "后台密码过期时间不能小于5分钟");
     }
     const _ss = await db.SettingModel.getSettings('safe');
-    if(!_ss.experimentalPassword.hash && safeSettings.experimentalVerifyPassword) ctx.throw(400, '请设置后台密码');
+    if((!_ss.experimentalPassword || !_ss.experimentalPassword.hash) && safeSettings.experimentalVerifyPassword) ctx.throw(400, '请先设置后台密码');
     await db.SettingModel.updateOne({_id: "safe"}, {
       $set: {
         "c.experimentalVerifyPassword": safeSettings.experimentalVerifyPassword,
@@ -85,6 +84,7 @@ router
         }
       }
     });
+    await SettingModel.saveSettingsToRedis("safe");
     return next();
   })
   .get("/weakPasswordCheck", async (ctx, next) => {

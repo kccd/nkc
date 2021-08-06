@@ -8,8 +8,8 @@
         placement="top"
         :color="msg.mode === 'broadcast' ? '#ef5350' : msg.mode === 'filter' ? '#ffc107' : msg.mode === 'user' ? '#2196f3' : 'black'">
         <el-popover
-          placement="right"
-          width="400"
+          :placement="isSmallScreen? 'bottom' : 'right'"
+          :width="isSmallScreen ? '100%' : '400'"
           trigger="click">
           <div v-if="msg.mode === 'broadcast'">
             <el-tag type="danger">全局广播</el-tag>
@@ -72,14 +72,17 @@
         <div v-if="form.mode === 'filter'">
           <el-form-item label="最后访问时间">
             <el-date-picker
-              v-model="form.lastVisit"
-              type="datetimerange"
-              :picker-options="lastVisitOptions"
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              align="left">
+              v-model="form.lastVisit[0]"
+              type="date"
+              placeholder="开始日期">
             </el-date-picker>
+            <el-date-picker
+              v-model="form.lastVisit[1]"
+              type="date"
+              placeholder="结束日期">
+            </el-date-picker>
+            <p>默认为全部时间段</p>
+<!--            <p>时间不填将匹配在此刻之前访问过网站的用户</p>-->
           </el-form-item>
           <el-form-item label="角色">
             <el-checkbox-group v-model="form.roles">
@@ -90,6 +93,9 @@
             <el-checkbox-group v-model="form.grades">
               <el-checkbox v-for="grade in grades" :label="grade._id" :key="grade.displayName">{{grade.displayName}}</el-checkbox>
             </el-checkbox-group>
+          </el-form-item>
+          <el-form-item label=" ">
+            <p>匹配模式: 访问时间 and (角色 or 等级)</p>
           </el-form-item>
         </div>
         <div v-if="form.mode === 'user'">
@@ -103,7 +109,7 @@
               placeholder="用户ID / 用户名 / 文章ID / 评论ID / 专栏ID"
               :remote-method="searchUser"
               :loading="selectUser.loading"
-              style="width: 400px">
+              style="width: 100%">
               <el-option
                 v-for="user in selectUser.list"
                 :key="user.label"
@@ -122,7 +128,8 @@
 
     <el-dialog
       title="编辑内容"
-      :visible.sync="showEditor">
+      :visible.sync="showEditor"
+      :width="formDialogWidth + 'px'">
       <el-form :model="editForm">
         <el-form-item label="通知内容">
           <el-input
@@ -152,7 +159,6 @@
 import moment from "moment";
 import data from "../../lib/data";
 import User from "./user.vue";
-console.log(data);
 export default {
   components: { User },
   data: () => ({
@@ -208,7 +214,8 @@ export default {
     },
     submitting: false,
     updating: false,
-    formDialogWidth: 0
+    formDialogWidth: 0,
+    isSmallScreen: false,
   }),
   created() {
     this.list = data.systemMessages.map(msg => ({
@@ -218,6 +225,11 @@ export default {
     }));
     this.calculationFormDialogWidth();
     window.addEventListener("resize", this.calculationFormDialogWidth.bind(this));
+    window.addEventListener("resize", () => {
+      this.isSmallScreen = document.body.clientWidth < 765;
+      console.log(this.isSmallScreen);
+    });
+    window.dispatchEvent(new Event("resize"));
   },
   methods: {
     async searchUser(query) {

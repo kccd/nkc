@@ -2469,7 +2469,7 @@ userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
   const shouldVerifyPhoneNumber = await UsersPersonalModel.shouldVerifyPhoneNumber(uid);
   if(shouldVerifyPhoneNumber) {
     result.warning = result.warning || '';
-    result.warning += `<div>你需要验证手机号，验证前你所发表的内容需通过审核后才能显示。<a href="/u/${uid}/settings/security" target="_blank">去验证</a></div>`;
+    result.warning += `<div>请参与定期验证手机号，验证前你所发表的内容需通过审核后才能显示。<a href="/u/${uid}/settings/security" target="_blank">去验证</a></div>`;
   }
   return result;
 };

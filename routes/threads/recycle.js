@@ -2,8 +2,9 @@ const Router = require("koa-router");
 const router = new Router();
 router
   .post("/", async (ctx, next) => {
-    const {data, db, body} = ctx;
+    const {data, db, body, nkcModules, settings} = ctx;
     const {user} = data;
+    const redis = settings.redis();
     const {postsId, reason, remindUser, violation} = body;
     const results = [];
     const threads = [], threadsId = [];
@@ -160,6 +161,23 @@ router
         }
         if(!post.reviewed) await db.ReviewModel.newReview("disabledPost", post, targetUser, reason);
       }
+      // 清除 redis 中的页面缓存
+
+      const postKey = nkcModules.cache.getRedisPageKeyByUrl(`/p/${post.pid}*`);
+      const threadKey = nkcModules.cache.getRedisPageKeyByUrl(`/t/${post.tid}*`);
+      const keys = postKey.web.concat(
+        postKey.reactNative,
+        postKey.apiCloud,
+        threadKey.web,
+        threadKey.reactNative,
+        threadKey.apiCloud
+      );
+      let redisKeys = [];
+      for(const k of keys) {
+        const arr = await redis.keysAsync(k);
+        redisKeys = redisKeys.concat(arr);
+      }
+      await redis.delAsync(redisKeys);
     }
     // 屏蔽回复后，需要更新文章
     if(threads.length) {
