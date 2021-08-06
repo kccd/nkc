@@ -81,7 +81,8 @@
               type="date"
               placeholder="结束日期">
             </el-date-picker>
-            <p>时间不填将匹配在此刻之前访问过网站的用户</p>
+            <p>默认为全部时间段</p>
+<!--            <p>时间不填将匹配在此刻之前访问过网站的用户</p>-->
           </el-form-item>
           <el-form-item label="角色">
             <el-checkbox-group v-model="form.roles">

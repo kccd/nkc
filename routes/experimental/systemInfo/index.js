@@ -98,7 +98,7 @@ sysInfoRouter
     const user = await UserModel.findOne({ uid: query }, { uid: true, username: true });
     if(user) {
       result.push({
-        label: `uid为${query}的用户: ${user.username}`,
+        label: `UID 为 ${query} 的用户：${user.username}`,
         uid: user.uid
       });
     }
@@ -106,7 +106,7 @@ sysInfoRouter
     const userByUsername = await UserModel.findOne({ username: query }, { uid: true, username: true });
     if(userByUsername) {
       result.push({
-        label: `用户: ${userByUsername.username}`,
+        label: `用户：${userByUsername.username}`,
         uid: userByUsername.uid
       });
     }
@@ -116,7 +116,7 @@ sysInfoRouter
       const userByPid = await UserModel.findOne({ uid: post.uid }, { username: true });
       if(userByPid) {
         result.push({
-          label: `评论${post.pid}的作者: ${userByPid.username}`,
+          label: `PID 为 ${post.pid} 的作者：${userByPid.username}`,
           uid: post.uid
         });
       }
@@ -130,7 +130,7 @@ sysInfoRouter
         const userByThread = await UserModel.findOne({ uid: mainPost.uid }, { username: true });
         if(userByThread) {
           result.push({
-            label: `文章《${title}》的作者: ${userByThread.username}`,
+            label: `文章《${title}》的作者：${userByThread.username}`,
             uid: mainPost.uid
           });
         }
@@ -144,7 +144,7 @@ sysInfoRouter
         const userByColumn = await UserModel.findOne({ uid: column.uid }, { username: true });
         if(userByColumn) {
           result.push({
-            label: `专栏《${column.name}》的创建者: ${userByColumn.username}`,
+            label: `专栏《${column.name}》的创建者：${userByColumn.username}`,
             uid: column.uid
           });
         }
