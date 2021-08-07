@@ -197,7 +197,8 @@ class NKCRender {
     if(count < textLength) text += "...";
     return text;
   }
-  replaceLink(data = '') {
+  replaceLink() {
+    data = data || '';
     return data.replace(urlReg, (c) => {
       if(domainWhitelistReg.test(c)) {
         return c;
