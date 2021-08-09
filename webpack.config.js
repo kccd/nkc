@@ -172,6 +172,6 @@ module.exports = {
     vue: "Vue"
   },
   resolve: {
-    extensions: [".js", ".jsx", ".json", ".less", ".css"]
+    extensions: [".js", ".jsx", ".vue", ".json", ".less", ".css"]
   }
 };
