@@ -210,6 +210,8 @@ if data.reports && data.reports.length && data.reports.length > 0
           if r.type === 'remittance'
             if !r.support
               -r.c = `拨款失败：${r.c}`;
+          if r.type === 'refuse'
+            -r.c = `被彻底拒绝。理由：${r.c}`;
           .applicationForm-report-content
             // -r.c = r.c.replace(/\n/g, '<br/>');
             // -r.c = r.c.replace(/\s/g, '&nbsp;');

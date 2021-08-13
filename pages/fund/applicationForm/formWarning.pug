@@ -1,0 +1,10 @@
+if !isIncluded('formWarning')
+  style.
+    .form-warning-info{
+      background-color: #f2dede!important;
+    }
+  mixin formWarning(comment)
+    if comment
+      -var {support, c} = comment;
+      if !support
+        .pre-wrap.p-a-1.form-warning-info.text-danger.m-b-1=c

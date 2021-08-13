@@ -47,7 +47,7 @@ router
       };
     }
     const count = await db.PostModel.countDocuments(match);
-    const paging = nkcModules.apiFunction.paging(page, count, 2);
+    const paging = nkcModules.apiFunction.paging(page, count);
     const posts = await db.PostModel.find(match, filter).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.paging = paging;
     data.posts = posts;

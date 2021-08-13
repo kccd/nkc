@@ -1,5 +1,5 @@
-import LifePhotoPanel from '../../publicModules/lifePhotoPanel.vue';
-import PostPanel from '../postPanel.vue';
+import LifePhotoPanel from '../../publicModules/lifePhotoPanel';
+import PostPanel from '../postPanel';
 import {timeFormat} from '../../lib/js/time';
 import {debounce} from '../../lib/js/execution';
 const forumSelector = new NKC.modules.ForumSelector();
@@ -38,6 +38,8 @@ const app = new Vue({
     timeAutoSave: null,
     submitting: false,
     saving: false,
+
+    giveUpReason: '',
   },
   components: {
     'life-photo-panel': LifePhotoPanel,
@@ -188,7 +190,9 @@ const app = new Vue({
       this.form.budgetMoney.push({
         purpose: `用途 ${this.form.budgetMoney.length + 1}`,
         count: 1,
-        money: 1
+        money: 1,
+        unit: '',
+        model: ''
       });
     },
     // 格式化金额，保留小数点后两位
@@ -217,14 +221,12 @@ const app = new Vue({
       this.editor = UE.getEditor('fundEditor', NKC.configs.ueditor.fundConfigs)
       this.editor.addListener('ready', () => {
         self.editor.setContent(self.project.c);
-        console.log(self.project.c)
       });
     },
     // 添加关键词
     selectKeyword() {
       const self = this;
       commonModal.open(data => {
-        console.log(data);
         let keywordsCn = data[0].value;
         let keywordsEn = data[1].value;
         keywordsCn = keywordsCn.replace(/，/g, ',').replace(/\s/g, '').split(',').filter(k => !!k);
@@ -265,8 +267,35 @@ const app = new Vue({
           .then(self.autoSaveForm)
       }, 30000);
     },
-    giveUp() {
-
+    giveUpForm() {
+      const {form} = this;
+      const self = this;
+      return sweetPrompt(`请输入放弃的理由`, this.giveUpReason)
+        .then(reason => {
+          self.reason = self;
+          return nkcAPI(`/fund/a/${form._id}/settings/giveup`, 'POST', {reason});
+        })
+        .then(() => {
+          self.reason = '';
+          NKC.methods.visitUrl(`/fund/me`);
+        })
+        .catch(err => {
+          sweetError(err);
+        });
+    },
+    // 删除当前申请表，仅允许删除未提交过的申请表
+    deleteForm() {
+      const {form} = this;
+      return sweetQuestion(`确定要删除申请表？`)
+        .then(() => {
+          return nkcAPI(`/fund/a/${form._id}/settings/delete`, 'POST', {});
+        })
+        .then(() => {
+          NKC.methods.visitUrl(`/fund/me`);
+        })
+        .catch((err) => {
+          sweetError(err);
+        });
     },
     saveForm() {
       const self = this;

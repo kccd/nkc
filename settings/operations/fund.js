@@ -104,6 +104,24 @@ module.exports = {
 				  POST: 'visitFundApplicationFormSettings'
         }
 			},
+      manage: {
+			  audit: {
+			    project: {
+            GET: 'visitFundApplicationAudit',
+            POST: 'submitFundApplicationAudit'
+          },
+          info: {
+            GET: 'visitFundApplicationAudit',
+            POST: 'submitFundApplicationAudit'
+          }
+        },
+        refuse: {
+			    POST: 'submitFundApplicationAudit'
+        },
+        restore: {
+			    POST: 'restoreFundApplicationForm'
+        }
+      },
 			/*comment: {
 				POST: 'addFundApplicationComment',
 				PARAMETER: {

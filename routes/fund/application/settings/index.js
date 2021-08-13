@@ -4,6 +4,7 @@ const memberRouter = require('./member');
 const postRouter = require('./post');
 const giveUpRouter = require('./giveUp');
 const deleteRouter = require('./delete');
+const withdrawRouter = require('./withdraw');
 const cheerio = require('cheerio');
 settingsRouter
   .use('/', async (ctx, next) => {
@@ -109,14 +110,16 @@ settingsRouter
         count,
         money,
         purpose,
-        suggest,
-        fact
+        unit,
+        model,
       } = budgetMoney[i];
 
       _budgetMoney.push({
         count,
         money,
         purpose,
+        unit,
+        model
         /*total: Math.round(money * 100) * count / 100,
         suggest: suggest || null,
         fact: fact || null*/
@@ -190,7 +193,9 @@ settingsRouter
             money,
             purpose,
             suggest,
-            fact
+            fact,
+            model,
+            unit
           } = _budgetMoney[i];
           const baseName = `资金预算第 ${i + 1} 项 - `;
           checkString(purpose, {
@@ -198,14 +203,24 @@ settingsRouter
             minLength: 1,
             maxLength: 50
           });
-          checkNumber(count, {
-            name: baseName + '数量',
-            min: 1,
+          checkString(model, {
+            name: baseName + '规格型号',
+            minLength: 0,
+            maxLength: 50
           });
           checkNumber(money, {
             name: baseName + '单价',
             min: 0.01,
             fractionDigits: 2
+          });
+          checkNumber(count, {
+            name: baseName + '数量',
+            min: 1,
+          });
+          checkString(unit, {
+            name: baseName + '单位',
+            minLength: 0,
+            maxLength: 50
           });
           _budgetMoney[i].total = Math.round(money * 100) * count / 100;
           _budgetMoney[i].suggest = suggest || null;
@@ -341,5 +356,6 @@ settingsRouter
   .use('/post', postRouter.routes(), postRouter.allowedMethods())
   .use('/member', memberRouter.routes(), memberRouter.allowedMethods())
   .use('/delete', deleteRouter.routes(), deleteRouter.allowedMethods())
+  .use('/withdraw', withdrawRouter.routes(), withdrawRouter.allowedMethods())
   .use('/giveup', giveUpRouter.routes(), giveUpRouter.allowedMethods());
 module.exports = settingsRouter;

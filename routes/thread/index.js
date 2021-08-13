@@ -616,7 +616,7 @@ threadRouter
         data.report = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'report', disabled: false}).sort({toc: -1});
       }
       const q_ = {
-        type: {$in: ['report', 'completedReport', 'system', 'completedAudit', 'adminAudit', 'userInfoAudit', 'projectAudit', 'moneyAudit', 'remittance']},
+        type: {$in: ['refuse', 'report', 'completedReport', 'system', 'completedAudit', 'adminAudit', 'userInfoAudit', 'projectAudit', 'moneyAudit', 'remittance']},
         applicationFormId: applicationForm._id
       };
       if(!applicationForm.fund.ensureOperatorPermission('admin', user)) {

@@ -1,0 +1,97 @@
+extends ../fundContainer
+block fundTitle
+  title 申请拨款 / 确认拨款
+block fundContent
+  -var form = data.applicationForm;
+  -var {remittance, lock, submittedReport, fund} = form;
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-6.box-shadow-panel
+        div
+          .panel-header 拨款详情
+          .table-responsive
+            table.table.table-bordered.table-striped.nkc-table
+              thead
+                tr
+                  th 序号
+                  th 金额
+                  th 状态
+                  th 操作
+              tbody
+                for r, i in remittance
+                  tr
+                    th= `第 ${i + 1} 期`
+                    th= `${r.money} 元`
+                    if r.status
+                      th.greenFontColor= `已拨款`
+                    else if r.status === null
+                      if r.apply
+                        th= `已申请拨款，请等待`
+                      else
+                        th= `未拨款`
+                    else
+                      th.text-danger= r.description
+                    th
+                      if r.status === null
+                        if i === 0 && !r.apply
+                          button(onclick=`applyRemittance(${i}, ${applicationForm._id})`) 申请拨款
+                      else if r.status === false
+                        if ['PAYEE_USER_INFO_ERROR', 'PAYEE_NOT_EXIST'].includes(r.subCode) && !lock.submitted
+                          button(onclick=`openToEditFundApply("/fund/a/${applicationForm._id}/settings?s=1")`) 去修改
+                        else
+                          span 等待财务人员处理
+                      else
+                        if !r.verify
+                          button(onclick=`verifyRemittance(${i}, ${form._id})`) 确认收款
+                          span &nbsp;
+                          if fund.auditType === 'system'
+                            if fund.admin.appointed.length === 0
+                              span.text-danger 未收到款？请通过报告问题告知管理员
+                            else
+                              a.pointer(onclick=`NKC.methods.toChat("${fund.admin.appointed[0]}")`) 未收到款？联系拨款人
+                          else
+                            a.pointer(onclick=`NKC.methods.toChat("${r.uid}")`) 未收到款？联系拨款人
+                        else
+                          span 已确认收款
+
+        p#info
+      -var needRemittance = false;
+      -var number;
+      for r, i in remittance
+        if i === 0 && !r.status
+          -break;
+        if !r.status && i !== 0 && remittance[i-1].verify
+          -needRemittance = true;
+          -number = i;
+          -break;
+      if needRemittance
+        .col-xs-12.col-md-6.box-shadow-panel
+          div
+            .panel-header=`申请第 ${number + 1} 期拨款`
+            if remittance[number].passed === true
+              .p-t-1.p-b-1.text-center 已通过审核，等待打款。
+            else if submittedReport && remittance[number].passed === null
+              .p-t-1.p-b-1.text-center 已提交申请，请等待专家审核。
+            else if submittedReport === false
+              if remittance[number].passed === false
+                h5 申请拨款未通过审核：
+                .bg-danger.p-a-1.text-danger.pre-wrap=data.reportAudit.c
+              .hidden#data=objToStr({form, number})
+              #applyApp(v-cloak)
+                .form
+                  .form-group
+                    h5 请提交阶段性报告，提交的内容将会在最新进展中展示。
+                    textarea.form-control(rows=10 placeholder='项目的进展情况（建议200字左右）' v-model='content')
+                  .form-group(v-if='form.reportNeedThreads')
+                    h5 管理员要求提交拨款申请必须要附带代表中期报告的文章
+                    h5 已选择的文章：
+                    .m-b-1
+                      div.m-b-05(v-for='(post, index) in selectedPosts')
+                        button.m-r-05.btn.btn-xs.btn-default(@click='removeFromArr(selectedPosts, index)') 删除
+                        a(:href='getUrl("thread", post.tid)' target="_blank") {{post.t}}
+                    button.m-b-05.btn.btn-default.btn-xs(@click='switchPostPanel') 选择文章
+                    post-panel(v-if='showPostPanel' :aid="form._id" @selectpost='selectPost')
+                  .form-group.m-b-0
+                    button.btn.btn-default(@click=`applyRemittance`) 提交
+block scripts
+  script(src='/fund/remittance/apply.js')

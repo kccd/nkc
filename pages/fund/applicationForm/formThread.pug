@@ -1,0 +1,17 @@
+if !isIncluded('formThread')
+  style.
+    .form-thread {
+      padding: 0.5rem;
+      background-color: #eee;
+      margin-bottom: 0.5rem;
+    }
+  mixin formThread(thread)
+    -var {firstPost} = thread;
+    .form-thread
+      span 文号：
+      span.m-r-05=firstPost.pid
+      a.m-r-05(href=`/u/${firstPost.uid}` target='_blank')=firstPost.user.username
+      span 发表于：
+      span=tools.timeFormat(firstPost.toc)
+      br
+      a(href=`/t/${thread.tid}` target="_blank")=firstPost.t

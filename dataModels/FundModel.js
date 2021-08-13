@@ -343,6 +343,64 @@ fundSchema.statics.ensureUserPermission = async function(userId, fundId) {
   }
 };
 
+/*
+* 判断用户是否具有专业上的某个身份
+* @param {String} uid 用户 ID
+* @return {[String]} 可能的取值有：expert, censor, financialStaff, admin, commentator voter
+* */
+fundSchema.methods.getUserFundRoles = async function(uid) {
+  const UserModel = mongoose.model('users');
+  const user = await UserModel.findOnly({uid});
+  const roles = await user.extendRoles();
+  const certs = roles.map(r => r._id);
+  const {expert, censor, financialStaff, admin, commentator, voter} = this;
+  const fundRolesId = [];
+  const defaultFundRoles = {
+    expert,
+    censor,
+    financialStaff,
+    admin,
+    voter
+  };
+  for(const roleId in defaultFundRoles) {
+    if(!defaultFundRoles.hasOwnProperty(roleId)) continue;
+    const role = defaultFundRoles[roleId];
+    if(role.appointed.includes(uid)) {
+      fundRolesId.push(roleId);
+      continue;
+    }
+    const newCerts = new Set(certs.concat(role.certs));
+    if(newCerts.size < role.certs.length + certs.length) {
+      fundRolesId.push(roleId);
+    }
+  }
+  return fundRolesId;
+}
+
+/*
+* 检测用户是否拥有某个基金角色
+* @param {String} uid 用户 ID
+* @param {String} roleId 基金角色 ID
+* @return {Boolean}
+* */
+fundSchema.methods.isFundRole = async function(uid, roleId) {
+  const fundRolesId = await this.getUserFundRoles(uid);
+  return fundRolesId.includes(roleId);
+}
+fundSchema.methods.checkFundRole = async function(uid, roleId) {
+  const obj = {
+    admin: '基金管理员',
+    voter: '基金投票人员',
+    expert: '基金专家',
+    censor: '基金检查员',
+    financialStaff: '基金财务',
+  };
+  const fundRolesId = await this.getUserFundRoles(uid);
+  if(!fundRolesId.includes(roleId)) {
+    throwErr(403, `你不是${obj[roleId]}，没有权限执行当前操作`);
+  }
+}
+
 fundSchema.methods.ensureOperatorPermission = function(type, user) {
 	const {expert, censor, financialStaff, admin, commentator, voter} = this;
 	const fn = (obj, user) => {

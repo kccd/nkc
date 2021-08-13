@@ -78,12 +78,20 @@ const fundApplicationUserSchema = new Schema({
 });
 
 fundApplicationUserSchema.virtual('user')
-	.get(function() {
-		return this._user;
-	})
-	.set(function(u) {
-		this._user = u;
-	});
+  .get(function() {
+    return this._user;
+  })
+  .set(function(u) {
+    this._user = u;
+  });
+
+fundApplicationUserSchema.virtual('inFundBlacklist')
+  .get(function() {
+    return this._inFundBlacklist;
+  })
+  .set(function(inFundBlacklist) {
+    this._inFundBlacklist = inFundBlacklist;
+  });
 
 fundApplicationUserSchema.virtual('lifePhotos')
 	.get(function() {

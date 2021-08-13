@@ -77,7 +77,7 @@
 
 <script>
   export default {
-    props: ['userId'],
+    props: ['uid'],
     data: () => ({
       lifePhotos: [],
       editPhoto: false,

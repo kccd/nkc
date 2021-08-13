@@ -92,7 +92,7 @@ block fundContent
                       img(:src='getUrl("lifePhotoSM", id)')
 
                 button.m-b-05.btn.btn-default.btn-xs(@click='switchPhotoPanel') {{showPhotoPanel? '收起相册': '展开相册'}}
-                life-photo-panel(:userId='form.uid' @selectphoto='selectPhoto' v-if='showPhotoPanel')
+                life-photo-panel(:uid='form.uid' @selectphoto='selectPhoto' v-if='showPhotoPanel')
             .form-group
               label.col-sm-2.control-label
                 +icon
@@ -143,19 +143,23 @@ block fundContent
                       tr
                         th.budget-purpose 用途
                         th.budget-purpost 规格型号
-                        th.budget-money 单价（元）
+                        th.budget-money 单价(元)
                         th.budget-count 数量
                         th.budget-money 单位
-                        th.text-center.budget-money 合计（元）
+                        th.text-center.budget-money 合计(元)
                         th.text-center.budget-count 其他
                     tbody
                       tr(v-for='(b, index) in form.budgetMoney')
                         th.budget-purpose
-                          input(type='text' v-model='b.purpose')
+                          input.form-control(type='text' v-model='b.purpose')
+                        th.budget-purpose
+                          input.form-control(type='text' v-model='b.model')
                         th.budget-count
-                          input(type='text' v-model.number='b.count')
+                          input.form-control(type='text' v-model.number='b.count')
                         th.budget-money
                           input.form-control(type='text' v-model.number='b.money' @change='formatMoney(index)')
+                        th.budget-money
+                          input.form-control(type='text' v-model='b.unit')
                         th.text-center.budget-money {{calculateMoney(b.count, b.money).toFixed(2)}}
                         th.text-center
                           button.btn.btn-xs.btn-default(@click='removeFromArr(form.budgetMoney, index)') 删除
@@ -228,7 +232,8 @@ block fundContent
               button.btn.btn-default(disabled v-if='saving') 保存中...
               button.btn.btn-default(@click='saveForm' v-else) 保存
               .pull-right
-                button.btn.btn-danger(@click='giveUp') 放弃
+                button.btn.btn-danger(@click='deleteForm' v-if='!form.status.submitted') 删除
+                button.btn.btn-danger(@click='giveUpForm' v-else) 放弃
 
 block fundScripts
   include ../../publicModules/selectUser/selectUser

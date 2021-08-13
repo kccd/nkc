@@ -1,0 +1,55 @@
+if !isIncluded('formStatus')
+  style.
+    .form-status-icon{
+      display: inline-block;
+      height: 2rem;
+      line-height: 2rem;
+      padding: 0 0.5rem;
+      color: #777;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    .form-status-name{
+      display: inline-block;
+      height: 2rem;
+      line-height: 2rem;
+      border-radius: 2px;
+      padding: 0 0.5rem;
+      background-color: #ddd;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+    .form-status-name.active{
+      background-color: #2b90d9;
+      color: #fff;
+    }
+  mixin formStatus(form)
+    -var status = [];
+    -status.push(['提交申请', form.formStatus.general > 2]);
+    if form.auditType === 'person'
+      -status.push(['专家审核', form.status.projectPassed]);
+      -status.push(['管理员复核', form.status.adminSupport]);
+    for r, index in form.remittance
+      -var info;
+      -var s = false;
+      if r.verify
+        -info = '';
+        -var s = true;
+      else if r.status
+        -info = '未确认';
+      else if r.passed
+        -info = '已申请';
+      else if r.passed === false
+        -info = '未通过';
+      else if r.apply
+        -info = '已申请';
+      else
+        -info = '未申请';
+      -status.push([`第 ${index + 1} 期拨款 ${r.money} 元${info?`（${info}）`:''}`, s]);
+    -status.push(['结题', form.status.completed])
+    .m-b-1
+      .panel-header 项目状态
+      for s, index in status
+        if index > 0
+          .form-status-icon.fa.fa-chevron-right
+        .form-status-name(class=s[1]?'active': '')=s[0]

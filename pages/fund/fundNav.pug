@@ -20,6 +20,6 @@ if !isIncluded('fundNav')
               a(href=`/fund/list/${data.fund._id}`)=data.fund.name
           if data.fund && data.applicationForm
             li
-              a(href=`/fund/a${data.applicationForm._id}`)=data.applicationForm.code || data.applicationForm._id
+              a(href=`/fund/a/${data.applicationForm._id}`)=data.applicationForm.code || data.applicationForm._id
       if data.fundSettings.readOnly
         .p-t-1.p-b-1=`${data.fundSettings.fundName}已开启只读模式`

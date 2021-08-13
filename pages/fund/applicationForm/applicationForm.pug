@@ -1,0 +1,31 @@
+extends ../fundContainer
+block fundTitle
+  title=data.applicationForm.code || data.applicationForm._id
+block fundContent
+  include ./applicant
+  include ./project
+  include ./formStatus
+  include ./budgetMoney
+  include ./remittance
+  include ./report
+  include ./operationCenter
+  include ./formVote
+  include ./formWarning
+  -var form = data.applicationForm;
+  -var applicationForm = form;
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-9.box-shadow-panel
+        +formWarning(form.auditComments.adminAudit)
+        +applicant(form)
+        +project(form)
+        +budgetMoney(form)
+        +remittance(form)
+        +formStatus(form)
+        +report(form, data.userFundRoles)
+      .col-xs-12.col-md-3.box-shadow-panel
+        +applicantOperationCenter(form, data.user?data.user.uid:'')
+        +managerOperationCenter(form, data.userFundRoles)
+        +formVote(form, data.userFundRoles)
+block fundScripts
+  include ../../publicModules/nkcSource

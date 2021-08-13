@@ -1,0 +1,228 @@
+extends ../../fundContainer
+block fundTitle
+  title= data.type === 'project'? `基金项目审核`: '基金管理员复核'
+  style.
+    .applicant-thread-item{
+      background-color: #f4f4f4;
+      padding: 0.5rem;
+    }
+    .project-content{
+      background-color: #f4f4f4;
+      padding: 0.5rem;
+    }
+    th.suggest{
+      width: 8rem;
+    }
+block fundContent
+  -var applicationForm = data.applicationForm;
+  -var {applicant, fixedMoney, project} = applicationForm;
+  -var fund = applicationForm.fund;
+  -var type = data.type;
+
+  //- 上一次未通过审核的原因
+  -var oldReason = {};
+  if data.expertAudit && data.expertAudit.length !== 0
+    for r in data.expertAudit
+      if !r.support
+        -oldReason[r.type] = r.c;
+  if data.adminAudit
+    -oldReason['adminAudit'] = data.adminAudit.c;
+  mixin reasonForm(type)
+    .form(data-type=type)
+      if oldReason[type]
+        h5 上一次未通过审核的原因：
+        p.text-danger.pre-wrap= oldReason[type]
+      textarea.form-control(rows='12' placeholder='审核评语')
+      .radio
+        label.m-r-1
+          input(type='radio' name=type checked=false)
+          span 合格
+        label
+          input(type='radio' name=type checked=true)
+          span 不合格
+  mixin applicantInfo
+    .form
+      h3 申请人信息
+      hr
+      .form-group
+        label.control-label 用户：
+        span
+          a(href=tools.getUrl('userHome', applicant.uid) target="_blank" data-float-uid=applicant.uid)= applicant.user.username
+      .form-group
+        label.control-label 真实姓名：
+        span= applicant.name
+      .form-group
+        label.control-label 联系电话：
+        span= applicant.mobile
+      .form-group
+        label.control-label 身份证号码：
+        span= applicant.idCardNumber
+      .form-group
+        label.control-label 收款方式：
+        span= ({'alipay': '支付宝', 'bankCard': '银行卡'})[applicationForm.account.paymentType]
+      if applicationForm.account.paymentType === 'bankCard'
+        .form-group
+          label.control-label 银行全称：
+          span= applicationForm.account.bankName
+      .form-group
+        label.control-label 户名：
+        span= applicationForm.account.name
+      .form-group
+        label.control-label 收款账号：
+        span= applicationForm.account.number
+      .form-group
+        label.control-label 申请方式：
+        span= applicationForm.from === 'team'? '团队': '个人'
+      if applicationForm.from === 'team'
+        .form-group
+          label.control-label 组员ID：
+          span
+            for m in applicationForm.members
+              if m.agree
+                a.m-r-05(href=tools.getUrl('userHome', m.uid) target='_blank')= m.user.username
+      .form-group
+        label.control-label 生活照：
+        span
+          for photo in applicant.lifePhotos
+            a(href=tools.getUrl('lifePhoto', photo._id) target="_blank")
+              img(src=tools.getUrl('lifePhotoSM', photo._id) style='width: 50%; padding: 0.5rem')
+  mixin projectInfo
+    div
+      h3 项目信息
+      hr
+      .form
+        .form-group
+          label 项目标题：
+          span= project.t
+        .form-group
+          label 中文摘要：
+          span= project.abstractCn || '无'
+        .form-group
+          label 英文摘要：
+          span= project.abstractEn || '无'
+        .form-group
+          label 中文关键词：
+          span= project.keyWordsCn.length ? project.keyWordsCn.join(', ') : '无'
+        .form-group
+          label 英文关键词：
+          span= project.keyWordsEn.length ? project.keyWordsEn.join(', ') : '无'
+        .form-group
+          label 学科分类：
+          a(href=tools.getUrl('forumHome', applicationForm.forum.fid) target="_blank" data-float-fid=applicationForm.category)=applicationForm.forum.displayName
+        .form-group
+          label 研究周期：
+          span=`${applicationForm.projectCycle} 天`
+        .form-group
+          label 技术文章：
+          if applicationForm.threads.applying.length > 0
+            .applicant-threads
+              for thread in applicationForm.threads.applying
+                -var {firstPost} = thread;
+                .applicant-thread-item
+                  span 文号：
+                  span.m-r-05= `${firstPost.pid}`
+                  a.m-r-05(href=`/u/${firstPost.uid}` target="_blank")= firstPost.user.username
+                  span= `发表于 ${tools.timeFormat(firstPost.toc)}`
+                  br
+                  a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
+          else
+            span 无
+        .form-group.m-t-1
+          label 项目内容：
+          .project-content!=project.c
+  mixin budgetMoneyInfo
+    #data.hidden=objToStr({applicationForm, type: data.type})
+    div
+      h3 资金预算
+      hr
+      #app(v-cloak)
+        if applicationForm.fixedMoney
+          span=`固定金额：${applicationForm.money} 元`
+        else
+          .table-responsive
+            table.table.table-bordered.nkc-table.m-b-05
+              thead
+                tr
+                  th 用途
+                  th 规格型号
+                  th 单价(元)
+                  th 数量
+                  th 单位
+                  th 合计(元)
+                  th 专家建议(元)
+                  th(v-if='type === "info"') 实际(元)
+              tbody
+                tr(v-for='(b, index) in budgetMoney')
+                  th {{b.purpose}}
+                  th {{b.model}}
+                  th {{b.money}}
+                  th {{b.count}}
+                  th {{b.unit}}
+                  th {{b.total}}
+                  th.suggest
+                    input.form-control(type='text' v-model.number='b.suggest' @change='formatMoney(index)' :disabled="type === 'info'")
+                  th.suggest(v-if='type === "info"')
+                    input.form-control(type='text' v-model.number='b.fact' @change='formatMoney(index)')
+          .m-b-1
+            .h4 预算总计：{{total}} 元
+            .h4 专家建议：{{suggestTotal}} 元
+            .h4(v-if='type === "info"') 实际批准：{{factTotal}} 元
+            .h4.text-danger(v-if='fixedMoneyRadio') {{fixedMoneyRadio}}
+        div(v-if='type === "info"')
+          .m-b-1
+            .form
+              .form-group.form-inline
+                label 分期：
+                select.form-control(type='text' v-model='times' @change='setRemittance')
+                  option(v-for='i in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]' :value='i') 分为 {{i}} 期
+          .m-b-1
+            .form
+              .m-b-05(v-for='(r, index) in applicationForm.remittance')
+                label 第 {{index + 1}} 期：
+                input(type='text' v-model.number="r.money")
+                span &nbsp;元
+              .h4.text-danger(v-if='remittanceInfo') {{remittanceInfo}}
+          .m-b-1
+            .checkbox
+              label
+                input(type='checkbox' :value='true' v-model='applicationForm.reportNeedThreads')
+                span 申请拨款需附带文章
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        .row.m-b-2
+          // 身份审核
+          .col-xs-12.col-md-8.box-shadow-panel
+            +applicantInfo
+          if type === 'project'
+            .col-xs-12.col-md-4.box-shadow-panel
+              +reasonForm('userInfoAudit')
+        .row.m-b-2
+          //项目信息审核
+          .col-xs-12.col-md-8.box-shadow-panel
+            +projectInfo
+
+          if type === 'project'
+            .col-xs-12.col-md-4.box-shadow-panel
+              +reasonForm('projectAudit')
+        .row
+          .col-xs-12.col-md-8.box-shadow-panel
+            +budgetMoneyInfo
+          .col-xs-12.col-md-4.box-shadow-panel
+            if type === 'project'
+              +reasonForm('moneyAudit')
+            else
+              +reasonForm('adminAudit')
+          .col-xs-12.col-md-12.text-center.m-t-1
+            button.btn.btn-info(onclick=`app.submit()`) 提交
+            button.btn.btn-danger(onclick=`app.refuse()`) 彻底拒绝
+
+block fundScripts
+  include ../../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../../../publicModules/floatForumPanel/floatForumPanel
+  include ../../../publicModules/lazySizes
+  include ../../../publicModules/plyr/plyr.js.pug
+  include ../../../publicModules/imageViewer
+  include  ../../../publicModules/sticker/sticker
+  +includeJS('/interface_fund_audit.js')
+  +includeJS('/fund/manage/audit/audit.js')

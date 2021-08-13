@@ -6,6 +6,7 @@ const completeRouter = require('./complete');
 const voteRouter = require('./vote');
 const commentRouter = require('./comment');
 const settingsRouter = require('./settings');
+const managementRouter = require('./manage');
 const memberRouter = require('./member');
 const excellentRouter = require('./excellent');
 const disabledRouter = require('./disabled');
@@ -47,85 +48,66 @@ applicationRouter
 		await next();
 	})
 	.use('/:_id', async (ctx, next) => {
-		const {data, db} = ctx;
-		const {_id} = ctx.params;
-		let applicationForm = await db.FundApplicationFormModel.findOne({code: _id});
-		if(!applicationForm) {
-			applicationForm = await db.FundApplicationFormModel.findOne({_id: _id});
-			if(!applicationForm) ctx.throw(400, '未找到指定申请表。');
-		}
-		await applicationForm.extendFund();
-		const {fund, budgetMoney} = applicationForm;
+		const {params, data, db, state} = ctx;
+		const {_id} = params;
+		const applicationForm = await db.FundApplicationFormModel.findOne({
+      $or: [
+        {
+          code: _id
+        },
+        {
+          _id
+        }
+      ]
+    });
+		if(!applicationForm) ctx.throw(400, '未找到指定申请表。');
+		const fund = await applicationForm.extendFund();
 		if(fund.history && ctx.method !== 'GET') {
 			ctx.throw(400, '申请表所在基金已被设置为历史基金，申请表只供浏览。');
 		}
 		await applicationForm.extendMembers();
 		await applicationForm.extendApplicant().then(u => u.extendLifePhotos());
 		await applicationForm.extendProject();
-		if(applicationForm.project) {
-			if(applicationForm.tid) {
-				const thread = await db.ThreadModel.findOnly({tid: applicationForm.tid});
-				let firstPost= await db.PostModel.findOnly({pid: thread.oc});
-				firstPost = await db.PostModel.extendPost(firstPost, {
-					uid: data.user? data.user.uid: "",
-					user: data.user
-				});
-				// applicationForm.project = firstPost;
-				applicationForm.project.c = firstPost.c;
-			} else {
-				applicationForm.project.c = ctx.nkcModules.nkcRender.renderHTML({
-					type: "article",
-					post: {
-						c: applicationForm.project.c,
-						resources: await db.ResourceModel.getResourcesByReference(`fund-${applicationForm.project._id}`)
-					},
-					user: data.user
-				});
-			}
-		}
+		await applicationForm.extendProjectPost();
 		await applicationForm.extendThreads();
 		await applicationForm.extendForum();
-		if(fund.money.fixed) {
-			applicationForm.money = fund.money.fixed;
-			applicationForm.factMoney = fund.money.fixed;
-		} else {
-			let money = 0;
-			let factMoney = 0;
-			if(budgetMoney !== null && budgetMoney.length !== 0 && typeof budgetMoney !== 'string'){
-				for (let b of applicationForm.budgetMoney) {
-					money += (b.count*b.money);
-					factMoney += b.fact;
-				}
-			}
-			applicationForm.money = money;
-			applicationForm.factMoney = factMoney;
-		}
 		data.applicationForm = applicationForm;
 		data.fund = applicationForm.fund;
+		data.userFundRoles = await fund.getUserFundRoles(state.uid);
 		await next();
 	})
 
 	// 申请表展示页
 	.get('/:_id', async (ctx, next) => {
-/*    const {tid} = ctx.data.applicationForm;
-    return ctx.redirect(`/t/${tid}`);*/
-		const {data, query, db} = ctx;
-		const {user, applicationForm} = data;
-		if(applicationForm.disabled && !applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
-		const {applicant, members, fund} = applicationForm;
+		const {data, db, state} = ctx;
+		const {applicationForm, fund} = data;
+		if(
+		  applicationForm.disabled &&
+      !await fund.isFundRole(state.uid, 'admin')
+    ) ctx.throw(403, `申请表已被屏蔽`);
+		const {applicant, members} = applicationForm;
 		const membersId = members.map(m => m.uid);
 		// 未提交时仅自己和全部组员可见
-		if(!applicationForm.fund.ensureOperatorPermission('admin', user) && applicationForm.status.submitted !== true && user.uid !== applicant.uid && !membersId.includes(user.uid)) ctx.throw(403,'权限不足');
-		ctx.template = 'fund/applicationForm.pug';
-		const page = query.page? parseInt(query.page): 0;
-		// 已发表的申请，项目内容从文章读取
+    if(
+      !await fund.isFundRole(state.uid, 'admin') &&
+      applicationForm.status.submitted !== true &&
+      state.uid !== applicant.uid &&
+      !membersId.includes(state.uid)
+    ) ctx.throw(403, `权限不足`);
+		if(1) {
+      ctx.template = 'fund/applicationForm/applicationForm.pug';
+    } else {
+      ctx.template = 'fund/applicationForm.pug';
+    }
+    /*const page = query.page? parseInt(query.page): 0;
+    // 已发表的申请，项目内容从文章读取
     if(applicationForm.tid) {
       const thread = await db.ThreadModel.findOnly({tid: applicationForm.tid});
       let firstPost= await db.PostModel.findOnly({pid: thread.oc});
       firstPost = await db.PostModel.extendPost(firstPost, {
-      	uid: data.user? data.user.uid: "",
-				user: data.user
-			});
+        uid: data.user? data.user.uid: "",
+        user: data.user
+      });
       applicationForm.project = firstPost;
       const q = {
         tid: applicationForm.tid,
@@ -140,43 +122,20 @@ applicationRouter
       data.paging = paging;
       const comments = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
       data.comments = await db.PostModel.extendPosts(comments, {
-      	visitor: data.user,
-				uid: data.user?data.user.uid: ""
-			});
-    }
+        visitor: data.user,
+        uid: data.user?data.user.uid: ""
+      });
+    }*/
 
 		await applicationForm.extendSupporters();
 		await applicationForm.extendObjectors();
 		await applicationForm.extendReportThreads();
-		const auditComments = {};
-		if(!applicationForm.status.projectPassed) {
-			auditComments.userInfoAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'userInfoAudit', disabled: false}).sort({toc: -1});
-			auditComments.projectAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'projectAudit', disabled: false}).sort({toc: -1});
-			auditComments.moneyAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'moneyAudit', disabled: false}).sort({toc: -1});
-		}
-		if(!applicationForm.status.adminSupport) {
-			auditComments.adminAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'adminAudit', disabled: false}).sort({toc: -1});
-		}
-		if(applicationForm.status.completed === false) {
-			auditComments.completedAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'completedAudit', disabled: false}).sort({toc: -1});
-		}
-		if(applicationForm.useless === 'giveUp') {
-			data.report = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'report', disabled: false}).sort({toc: -1});
-		}
-    const q_ = {
-			type: {$in: ['report', 'completedReport', 'system', 'completedAudit', 'adminAudit', 'userInfoAudit', 'projectAudit', 'moneyAudit', 'remittance']},
-			applicationFormId: applicationForm._id
-		};
-		if(!applicationForm.fund.ensureOperatorPermission('admin', user)) {
-			q_.disabled = false;
-		}
-		data.reports = await db.FundDocumentModel.find(q_).sort({toc: 1});
-		await Promise.all(data.reports.map(async r => {
-			await r.extendUser();
-			await r.extendResources();
-    }));
-		data.auditComments = auditComments;
-		data.targetUserInFundBlacklist = await db.FundBlacklistModel.inBlacklist(applicationForm.uid);
+		await applicationForm.extendAuditComments();
+		await applicationForm.extendReports();
+    await applicationForm.getStatus();
+
+    data.targetUserInFundBlacklist = await db.FundBlacklistModel.inBlacklist(applicationForm.uid);
+
 		await next();
 	})
 
@@ -476,6 +435,7 @@ applicationRouter
 	.use('/:_id/vote', voteRouter.routes(), voteRouter.allowedMethods())
 	.use('/:_id/comment', commentRouter.routes(), commentRouter.allowedMethods())
 	.use('/:_id/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
+  .use('/:_id/manage', managementRouter.routes(), managementRouter.allowedMethods())
 	.use('/:_id/member', memberRouter.routes(), memberRouter.allowedMethods())
 	.use('/:_id/excellent', excellentRouter.routes(), excellentRouter.allowedMethods())
 	.use('/:_id/disabled', disabledRouter.routes(), disabledRouter.allowedMethods())

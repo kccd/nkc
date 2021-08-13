@@ -69,17 +69,21 @@ function against(_id) {
 		})
 }
 
+let giveUpReason = '';
+
 function revoked(type, _id) {
 	if(type === 'giveUp') {
-		var content = prompt('请输入放弃的原因。', '');
-		if(!content) return;
-		nkcAPI('/fund/a/'+_id+'?type='+type+'&c='+content, 'DELETE', {})
-			.then(function(){
-				screenTopAlert('操作成功！');
-			})
-			.catch(function(data){
-				screenTopWarning(data.error);
-			})
+	  return sweetPrompt(`请输入放弃的原因`, giveUpReason)
+      .then((reason) => {
+        giveUpReason = reason;
+        return nkcAPI(`/fund/a/${_id}/settings/giveup`, 'POST', {reason});
+      })
+      .then(function(){
+        sweetSuccess(`操作成功`);
+      })
+      .catch(function(data){
+        sweetError(data);
+      });
 	}
 }
 
@@ -131,12 +135,12 @@ function disabledComment(applicationFormId, commentId, type) {
 }
 
 function restoreApplicationForm(id) {
-	nkcAPI('/fund/a/'+id, 'POST', {operation: 'restore'})
+	nkcAPI('/fund/a/'+id + '/manage/restore', 'POST', {})
 		.then(function() {
-			window.location.reload();
+			sweetSuccess('执行成功');
 		})
 		.catch(function(data) {
-			screenTopWarning(data.error||data);
+		  sweetError(data);
 		})
 }
 function disabledReport(applicationFormId, reportId, type) {

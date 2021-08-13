@@ -92,7 +92,6 @@
           'GET'
         )
         .then(data => {
-          console.log(data.paging);
           self.posts = data.posts;
           self.paging = data.paging;
           self.loading = false;
