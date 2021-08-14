@@ -177,7 +177,7 @@ router
         const arr = await redis.keysAsync(k);
         redisKeys = redisKeys.concat(arr);
       }
-      await redis.delAsync(redisKeys);
+      if(redisKeys.length > 0) await redis.delAsync(redisKeys);
     }
     // 屏蔽回复后，需要更新文章
     if(threads.length) {

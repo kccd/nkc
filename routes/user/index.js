@@ -77,6 +77,7 @@ userRouter
   .get("/:uid", async (ctx, next) => {
     const {params, state, db, data, query, nkcModules} = ctx;
     const {uid} = params;
+    const {nkcRender} = nkcModules;
     const {pageSettings} = state;
     const {user} = data;
 
@@ -89,6 +90,9 @@ userRouter
     await targetUser.extendGrade();
     data.targetUser = targetUser;
 
+    if(state.uid !== targetUser.uid) {
+      targetUser.description = nkcRender.replaceLink(targetUser.description);
+    }
     // 用户积分
     if(ctx.permission('viewUserScores')) {
       data.targetUserScores = await db.UserModel.getUserScores(targetUser.uid);
