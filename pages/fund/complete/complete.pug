@@ -1,0 +1,11 @@
+extends ../fundContainer
+block fundTitle
+  title 结题
+block fundContent
+  -var form = data.applicationForm;
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8.box-shadow-panel
+        div
+          .panel-header 申请结题
+            h5=`项目名称：${}`
