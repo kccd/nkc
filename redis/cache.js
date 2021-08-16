@@ -30,4 +30,6 @@ module.exports = async () => {
   await db.OperationModel.saveAllOperationsToRedisAsync();
   // 积分操作相关配置
   await db.ScoreOperationModel.saveAllScoreOperationToRedis();
+  // IP 黑名单
+  await db.IPBlacklistModel.saveIPBlacklistToRedis();
 }

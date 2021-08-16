@@ -840,7 +840,6 @@ userSchema.methods.getNewMessagesCount = async function() {
     const allMySystemInfoMessageCount = (await MessageModel.getMySystemInfoMessage(this.uid)).length;
     // const allSystemInfoCount = await MessageModel.countDocuments({ty: 'STE'});
     const viewedSystemInfoCount = await SystemInfoLogModel.countDocuments({uid: this.uid});
-    console.log(allMySystemInfoMessageCount, viewedSystemInfoCount);
     newSystemInfoCount = allMySystemInfoMessageCount - viewedSystemInfoCount;
     // 可能会生成多条相同的阅读记录 以下判断用于消除重复的数据
     if(newSystemInfoCount < 0) {

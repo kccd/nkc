@@ -26,7 +26,17 @@ app.on('error', err => {
 });
 const favicon = require('koa-favicon');
 
-const {rateLimit, stayLogin, init, body, urlRewrite, permission, logger, cache} = require('./middlewares');
+const {
+  rateLimit,
+  stayLogin,
+  init,
+  body,
+  urlRewrite,
+  permission,
+  logger,
+  cache,
+  IPLimit
+} = require('./middlewares');
 
 const cookieConfig = require("./config/cookie");
 
@@ -50,8 +60,9 @@ app
   .use(etag())
   .use(urlRewrite)
   .use(init)
+  // IP 黑名单
+  .use(IPLimit)
   // 全局 频次限制 文件
-
   .use(rateLimit.totalFile)
   .use(rateLimit.totalHtml)
 

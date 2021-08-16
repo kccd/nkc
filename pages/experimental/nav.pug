@@ -144,6 +144,9 @@
           if permission('experimentalVisitSettings')
             li
               a(href='/e/settings/visit') 访问
+          if permission('experimentalIPSettings')
+            li
+              a(href='/e/settings/ip') IP 黑名单
           <li role="separator" class="divider"></li>
           if permission('visitRoleSettings')
             li
