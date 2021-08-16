@@ -793,5 +793,6 @@
   "linkToTarget": "尝试访问目标外链",
   "reportLinkToTarget": "用户确认访问目标外链",
   "viewUserCode": "验证用户动态码",
-  "experimentalUserCodeLog": "后台管理 - 用户动态码验证记录"
+  "experimentalUserCodeLog": "后台管理 - 用户动态码验证记录",
+  "modifyQuestionAuthStatus": "修改题库试题审核状态"
 }
