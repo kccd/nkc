@@ -603,6 +603,7 @@ resourceSchema.methods.updateForumsId = async function() {
   }
   forumsId = [...new Set(forumsId)];
   this.forumsId = forumsId;
+  this.tou = new Date();
   await this.save();
 };
 
