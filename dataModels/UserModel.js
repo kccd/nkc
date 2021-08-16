@@ -765,14 +765,14 @@ userSchema.statics.createUser = async (option) => {
 		  await sub.save();
     }
 		// 创建默认数据 查看系统通知的记录
-    const systemInfo = await MessageModel.find({ty: 'STE'}, {_id: 1});
+    /*const systemInfo = await MessageModel.find({ty: 'STE'}, {_id: 1});
 		for(const s of systemInfo) {
       const log = SystemInfoLogModel({
         mid: s._id,
         uid
       });
       await log.save();
-    }
+    }*/
 	} catch (error) {
 		await UserModel.deleteOne({uid});
 		await UsersPersonalModel.deleteOne({uid});
@@ -840,6 +840,7 @@ userSchema.methods.getNewMessagesCount = async function() {
     const allMySystemInfoMessageCount = (await MessageModel.getMySystemInfoMessage(this.uid)).length;
     // const allSystemInfoCount = await MessageModel.countDocuments({ty: 'STE'});
     const viewedSystemInfoCount = await SystemInfoLogModel.countDocuments({uid: this.uid});
+    console.log(allMySystemInfoMessageCount, viewedSystemInfoCount);
     newSystemInfoCount = allMySystemInfoMessageCount - viewedSystemInfoCount;
     // 可能会生成多条相同的阅读记录 以下判断用于消除重复的数据
     if(newSystemInfoCount < 0) {
