@@ -23,7 +23,8 @@ router
       nationCode,
       mobile: number,
       code,
-      type: 'verifyPhoneNumber'
+      type: 'verifyPhoneNumber',
+      ip: ctx.address,
     };
     const smsCode = await db.SmsCodeModel.ensureCode(smsObj);
     // 标记验证码为已使用

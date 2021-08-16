@@ -20,6 +20,7 @@ registerRouter
 	  const {db, body} = ctx;
 	  let user;
 		const {mobile, nationCode, code, username, password} = body;
+		delete body.password;
 		await db.UserModel.checkNewUsername(username);
 		await db.UserModel.checkNewPassword(password);
 	  if(!nationCode) ctx.throw(400, '请选择国家区号');
@@ -33,7 +34,8 @@ registerRouter
 		  type: 'register',
 		  mobile,
 		  code,
-		  nationCode
+		  nationCode,
+      ip: ctx.address
 	  };
 	  const smsCode = await db.SmsCodeModel.ensureCode(option);
 	  await smsCode.updateOne({used: true});

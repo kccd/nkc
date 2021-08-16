@@ -72,7 +72,8 @@ router
         type: "withdraw",
         code,
         mobile: usersPersonal.mobile,
-        nationCode: usersPersonal.nationCode
+        nationCode: usersPersonal.nationCode,
+        ip: ctx.address,
       };
       const smsCode = await db.SmsCodeModel.ensureCode(smsObj);
       await smsCode.updateOne({used: true});

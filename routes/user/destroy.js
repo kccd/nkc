@@ -59,7 +59,8 @@ router
         type: "destroy",
         mobile: usersPersonal.mobile,
         nationCode: usersPersonal.nationCode,
-        code: mobileCode
+        code: mobileCode,
+        ip: ctx.address,
       });
     }
     if(verifyEmail) {
