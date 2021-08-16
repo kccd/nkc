@@ -41,9 +41,18 @@ smsCodeSchema = new Schema({
 });
 
 
-// 验证短信验证码是否有效
-smsCodeSchema.statics.ensureCode = async (obj) => {
-	const {nationCode, mobile, code, type} = obj;
+/*
+* 验证短信验证码是否有效
+* @param {Object} props
+*   @param {String} nationCode 国际区号
+*   @param {String} mobile 手机号
+*   @param {String} code 短信验证码内容
+*   @param {String} type 短信类型
+*   @param {String} ip 提交短信验证码客户端 IP
+* @return {Object} smsCode 对象
+* */
+smsCodeSchema.statics.ensureCode = async (props) => {
+	const {nationCode, mobile, code, type, ip} = props;
 	const SmsCodeModel = mongoose.model('smsCodes');
 	const SettingModel = mongoose.model('settings');
 	let smsSettings = await SettingModel.findOnly({_id: 'sms'});
@@ -61,13 +70,14 @@ smsCodeSchema.statics.ensureCode = async (obj) => {
 		throw err;
 	}
 	const smsCode = await SmsCodeModel.findOne({nationCode, mobile, code, type, used: false});
-	if(smsCode && (smsCode.toc > (Date.now() - (setting.validityPeriod*60*1000)))) {
-		return smsCode;
-	} else {
-		const err = new Error('短信验证码无效或已过期。');
-		err.status = 400;
-		throw err;
-	}
+	if(!smsCode) {
+	  throwErr(400, '短信验证码无效');
+  } else if(smsCode.ip !== ip) {
+	  throwErr(400, `验证码无效`);
+  } else if(smsCode.toc < (Date.now() - (setting.validityPeriod*60*1000))) {
+	  throwErr(400, `验证码已过期`);
+  }
+  return smsCode;
 };
 
 // 验证是否有权限发送短信

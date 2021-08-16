@@ -472,6 +472,7 @@ threadRouter
 		// 判断文章是否匿名 加载作者的其他文章
 		if(!data.anonymous) {
       data.targetUser = await thread.extendUser();
+      data.targetUser.description = nkcModules.nkcRender.replaceLink(data.targetUser.description);
       await data.targetUser.extendGrade();
       await db.UserModel.extendUserInfo(data.targetUser);
       data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);

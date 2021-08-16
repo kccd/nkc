@@ -56,6 +56,8 @@ block content
                 span.text-success.m-r-1 审核已通过
               else 
                 span.text-danger.m-r-1 审核未通过
+                if permission('modifyQuestionStatus')
+                  a.m-r-1(v-if='question.auth === false' onclick=`modifyQuestionStatus('${question._id}', null)`) 设为待审
                 if permission('removeAllQuestion')
                   a.m-r-1(onclick=`deleteQuestion('${question._id}')`) 删除
             a(href=`/exam/editor?qid=${question._id}`).m-r-1 编辑

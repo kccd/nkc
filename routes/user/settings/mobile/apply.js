@@ -50,7 +50,8 @@ router
       nationCode,
       mobile: phoneNumber,
       code,
-      type
+      type,
+      ip: ctx.address,
     };
     const smsCode = await db.SmsCodeModel.ensureCode(smsObj);
     // 标记验证码为已使用

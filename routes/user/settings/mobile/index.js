@@ -31,7 +31,8 @@ mobileRouter
 				mobile: userPersonal.mobile,
 				nationCode: userPersonal.nationCode,
 				code: oldCode,
-				type: 'changeMobile'
+				type: 'changeMobile',
+        ip: ctx.address,
 			});
 		} catch(err) {
 			ctx.throw(400, `旧手机${err.message}`);
@@ -41,7 +42,8 @@ mobileRouter
 				mobile,
 				nationCode,
 				code,
-				type: 'bindMobile'
+				type: 'bindMobile',
+        ip: ctx.address,
 			});
 		} catch(err) {
 			ctx.throw(400, `新手机${err.message}`);
@@ -74,7 +76,8 @@ mobileRouter
 			mobile,
 			code,
 			nationCode,
-			type: 'bindMobile'
+			type: 'bindMobile',
+      ip: ctx.address,
 		});
 		await smsCode.updateOne({used: true});
 		await db.SettingModel.checkMobile(nationCode, mobile, user.uid);
@@ -104,7 +107,8 @@ mobileRouter
 			mobile,
 			code,
 			nationCode,
-			type: "unbindMobile"
+			type: "unbindMobile",
+      ip: ctx.address,
 		});
 		const behavior = db.SecretBehaviorModel({
 			uid: user.uid,

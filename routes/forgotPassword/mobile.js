@@ -38,7 +38,8 @@ router
         nationCode,
         mobile,
         code,
-        type
+        type,
+        ip: ctx.address,
       });
     } catch(err) {
       await db.AccountBehaviorModel.insertBehavior(behaviorOptions);

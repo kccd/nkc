@@ -114,7 +114,17 @@ const resourceSchema = new Schema({
     type: String,
     index: 1,
     default: 'inProcess'
-  }
+  },
+  // 所在专业 根据 references 字段统计而来
+  forumsId: {
+	  type: [String],
+    default: []
+  },
+  // 上一次更新所在专业的时间
+  tou: {
+    type: Date,
+    default: null
+  },
 },
 {
   toObject: {
@@ -579,6 +589,39 @@ resourceSchema.methods.checkUserScore = async function(user) {
     enough,
     userScores: userScores
   };
+};
+
+/*
+* 更新附件所在的专业
+* */
+resourceSchema.methods.updateForumsId = async function() {
+  const PostModel = mongoose.model('posts');
+  const posts = await PostModel.find({pid: {$in: this.references}}, {mainForumsId: 1});
+  let forumsId = [];
+  for(const post of posts) {
+    forumsId = forumsId.concat(post.mainForumsId);
+  }
+  forumsId = [...new Set(forumsId)];
+  this.forumsId = forumsId;
+  this.tou = new Date();
+  await this.save();
+};
+
+/*
+* 判断用户是否有权限访问资源
+* */
+resourceSchema.methods.checkAccessPermission = async function(accessibleForumsId) {
+  const {tou} = this;
+  const now = Date.now();
+  if(tou === null || tou.getTime() < (now - 24 * 60 * 60 * 1000)) {
+    // 需要更新 所在专业字段
+    await this.updateForumsId();
+  }
+  const {forumsId} = this;
+  const arr = new Set(forumsId.concat(accessibleForumsId));
+  if(arr.size === (accessibleForumsId.length + forumsId.length)) {
+    throwErr(403, `权限不足`);
+  }
 };
 
 module.exports = mongoose.model('resources', resourceSchema);

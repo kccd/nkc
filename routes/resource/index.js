@@ -25,12 +25,16 @@ resourceRouter
     await next();
   })
   .get('/:rid', async (ctx, next) => {
-    const {query, data, db, fs, settings, nkcModules} = ctx;
+    const {state, query, data, db, fs, settings, nkcModules} = ctx;
     const {t, c, d} = query;
     const {cache} = settings;
-    const {resource} = data;
+    const {resource, user} = data;
+    if(resource.uid !== state.uid) {
+      // 不是自己的附件
+      const accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
+      await resource.checkAccessPermission(accessibleForumsId);
+    }
     const {mediaType, ext} = resource;
-    const {user} = data;
     let filePath = await resource.getFilePath(t);
     let speed;
     data.resource = resource;

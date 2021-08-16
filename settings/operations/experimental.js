@@ -5,6 +5,11 @@ module.exports = {
     POST: "experimentalLogin"
   },
 	settings: {
+	  ip: {
+	    GET: 'experimentalIPSettings',
+      POST: 'experimentalIPSettings',
+      DELETE: 'experimentalIPSettings'
+    },
 	  visit: {
 	    GET: 'experimentalVisitSettings',
       PUT: 'experimentalVisitSettings'

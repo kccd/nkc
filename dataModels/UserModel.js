@@ -765,14 +765,14 @@ userSchema.statics.createUser = async (option) => {
 		  await sub.save();
     }
 		// 创建默认数据 查看系统通知的记录
-    const systemInfo = await MessageModel.find({ty: 'STE'}, {_id: 1});
+    /*const systemInfo = await MessageModel.find({ty: 'STE'}, {_id: 1});
 		for(const s of systemInfo) {
       const log = SystemInfoLogModel({
         mid: s._id,
         uid
       });
       await log.save();
-    }
+    }*/
 	} catch (error) {
 		await UserModel.deleteOne({uid});
 		await UsersPersonalModel.deleteOne({uid});

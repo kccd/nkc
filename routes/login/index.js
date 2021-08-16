@@ -109,7 +109,8 @@ loginRouter
 				nationCode,
 				mobile,
 				code,
-				type: 'login'
+				type: 'login',
+        ip: ctx.address,
 			};
 
       // 验证短信验证码

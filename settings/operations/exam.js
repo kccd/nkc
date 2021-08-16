@@ -41,6 +41,9 @@ module.exports = {
       },
 	    image: {
 	      GET: 'getQuestionImage'
+      },
+      auth: {
+        PUT: 'modifyQuestionAuthStatus'
       }
     }
   },
