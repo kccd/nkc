@@ -25,7 +25,7 @@ visitorRouter
 				data.visitors.push(user);
 			}
     }
-    await db.UserModel.extendUsersInfo(data.visitors);
+    data.visitors = await db.UserModel.extendUsersInfo(data.visitors);
     if(data.user) {
       data.userSubUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
     }

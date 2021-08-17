@@ -22,7 +22,7 @@ followerRouter
 		const sub = await db.SubscribeModel.find(q, {uid: 1}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
 		const uid = sub.map(s => s.uid);
     data.followers = await db.UserModel.find({uid: {$in: uid}}).sort({tlv: -1});
-    await db.UserModel.extendUsersInfo(data.followers);
+    data.followers = await db.UserModel.extendUsersInfo(data.followers);
     if(data.user) {
       data.userSubUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
     }
