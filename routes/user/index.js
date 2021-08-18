@@ -520,6 +520,7 @@ userRouter
     // 排除封禁用户和名片被屏蔽的用户
     if(data.users && data.users.length) {
       data.users = data.users.filter(u => {
+        u.description = nkcModules.nkcRender.replaceLink(u.description);
         return !u.certs.includes('banned') && !u.hidden;
       });
     }

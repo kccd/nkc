@@ -975,6 +975,7 @@ userSchema.statics.extendUsersInfo = async (users) => {
   const RoleModel = mongoose.model('roles');
   const ColumnModel = mongoose.model('columns');
   const UsersPersonalModel = mongoose.model('usersPersonal');
+  const nkcRender = require('../nkcModules/nkcRender');
   const uid = new Set(), personalObj = {};
   for(const user of users) {
     uid.add(user.uid);
@@ -1036,6 +1037,7 @@ userSchema.statics.extendUsersInfo = async (users) => {
       await user.extendGrade();
     }
     const _user = user.toObject? user.toObject(): user;
+    _user.description = nkcRender.replaceLink(_user.description);
     users_.push(_user);
   }
   return users_;
