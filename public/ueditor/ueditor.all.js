@@ -17579,10 +17579,13 @@ UE.plugin.register('autolink',function(){
                             range.setStart(start, offset - 1);
                             charCode = range.toString().charCodeAt(0);
                         } while (charCode != 160 && charCode != 32);
-
-                        if (range.toString().replace(new RegExp(domUtils.fillChar, 'g'), '').match(/(?:https?:\/\/|ssh:\/\/|ftp:\/\/|file:\/|www\.)/i)) {
+                        // old RegExp: /(?:https?:\/\/|ssh:\/\/|ftp:\/\/|file:\/|www\.)/i
+                        // old RegExp test: /^(?:https?:\/\/|ssh:\/\/|ftp:\/\/|file:\/|www\.)/i
+                        var newUrlReg = /(https?:\/\/)?([-0-9a-zA-Z]{1,256}\.)+([a-z]{2,6})/i;
+                        var newUrlRegTest = /^(https?:\/\/)?([-0-9a-zA-Z]{1,256}\.)+([a-z]{2,6})/i;
+                        if (range.toString().replace(new RegExp(domUtils.fillChar, 'g'), '').match(newUrlReg)) {
                             while(range.toString().length){
-                                if(/^(?:https?:\/\/|ssh:\/\/|ftp:\/\/|file:\/|www\.)/i.test(range.toString())){
+                                if(newUrlRegTest.test(range.toString())){
                                     break;
                                 }
                                 try{
