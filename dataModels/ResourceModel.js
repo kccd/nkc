@@ -612,6 +612,12 @@ resourceSchema.methods.updateForumsId = async function() {
 * */
 resourceSchema.methods.checkAccessPermission = async function(accessibleForumsId) {
   const {tou} = this;
+  for(const id of this.references) {
+    // 非 post 引用的资源 直接放行
+    if(id.includes('-')) {
+      return;
+    }
+  }
   const now = Date.now();
   if(tou === null || tou.getTime() < (now - 24 * 60 * 60 * 1000)) {
     // 需要更新 所在专业字段

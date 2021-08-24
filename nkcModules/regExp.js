@@ -16,6 +16,7 @@ for(let d of domainWhitelist) {
 
 const domainWhitelistReg = new RegExp(`^(https?:\/\/)?(${regString.join('|')})`, 'i');
 const urlReg = new RegExp(`(https?:\\/\\/)?([-0-9a-zA-Z]{1,256}\\.)+(${topLevelDomain.join('|')})`, 'ig');
+// const urlReg = new RegExp(`(https?:\\/\\/)?([-0-9a-zA-Z]{1,256}\\.)+(${topLevelDomain.join('|')})((\\/[^?#<>\\/\\\\*":]*)+(\\?[^#]*)?(#.*)?)?$`, 'ig');
 
 module.exports = {
   domainReg,

@@ -9,7 +9,6 @@ const fs = require("fs");
 const path = require("path");
 const filePath = path.resolve(__dirname, "./sources");
 const files = fs.readdirSync(filePath);
-const base64js = require("base64-js");
 
 const sources = {};
 for(const filename of files) {
@@ -57,9 +56,10 @@ class NKCRender {
         if(href && !domainWhitelistReg.test(href)) {
           a.attr("target", "_blank");
           // 通过提示页代理外链的访问
-          const byteArray = new Uint8Array(href.split("").map(char => char.charCodeAt(0)));
-          const url = base64js.fromByteArray(byteArray);
+          const url = Buffer.from(encodeURIComponent(href)).toString('base64')
           a.attr("href", "/l?t=" + url);
+          // a.attr('data-type', 'nkc-url');
+          // a.attr('data-url', url);
         }
       }
     }
@@ -107,7 +107,17 @@ class NKCRender {
         const c = node.children[i];
         if(c.type === 'text') {
           // 替换外链
-          c.data = self.replaceLink(c.data);
+          let oldData = c.data;
+          const newData = self.replaceLink(c.data);
+          if(oldData !== newData) {
+            // 已经替换掉了链接
+            /*if(!/^https?:\/\//.test(oldData)) {
+              oldData = `http://` + oldData;
+            }*/
+            oldData = Buffer.from(encodeURIComponent(oldData)).toString('base64');
+            $(c).replaceWith(`<span data-type="nkc-url" data-url="${oldData}">${newData}</span>`);
+          }
+          // c.data = self.replaceLink(c.data);
         } else if(c.type === 'tag') {
           if(['code', 'pre'].includes(c.name)) continue;
           if(c.attribs['data-tag'] === 'nkcsource') continue;

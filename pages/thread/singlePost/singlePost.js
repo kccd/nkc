@@ -208,6 +208,7 @@ class SinglePostModule {
     NKC.methods.initPostOption();
     NKC.methods.initStickerViewer();
     if(!NKC.configs.isApp) NKC.methods.initImageViewer();
+    NKC.methods.replaceNKCUrl();
     NKC.methods.initVideo();
   }
   // 移除所有评论框和定时事件
