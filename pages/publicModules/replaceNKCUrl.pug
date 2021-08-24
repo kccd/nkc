@@ -1,0 +1,21 @@
+//-
+  解析文本中的外链
+if !isIncluded('replaceNKCUrl')
+  script.
+    NKC.methods.replaceNKCUrl = function(selector) {
+      selector = selector || 'div.render-content span[data-type="nkc-url"]';
+      var elements = document.querySelectorAll(selector);
+      for(var i = 0; i < elements.length; i++) {
+        var element = elements[i];
+        var url = element.getAttribute('data-url') || '';
+        if(!url) continue;
+        url = NKC.methods.base64ToStr(url);
+        element.innerText = url;
+        element.removeAttribute('data-type');
+        element.removeAttribute('data-url');
+      }
+    }
+
+    $(function() {
+      NKC.methods.replaceNKCUrl();
+    });
