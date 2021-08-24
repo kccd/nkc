@@ -28,7 +28,7 @@ const app = new Vue({
         selectedThreads: selectedPosts.map(s => s.tid)
       })
         .then(() => {
-          sweetSuccess(`提交成功`);
+          window.location.reload();
         })
         .catch(sweetError);
     },
@@ -55,4 +55,14 @@ window.verifyRemittance = (number, formId) => {
       window.location.reload();
     })
     .catch(sweetError)
+}
+
+window.applyRemittance = (number, formId) => {
+  nkcAPI(`/fund/a/${formId}/remittance/apply`, 'POST', {
+    number
+  })
+    .then(() => {
+      window.location.reload();
+    })
+    .catch(sweetError);
 }

@@ -217,7 +217,12 @@ const fundApplicationFormSchema = new Schema({
       index: 1
     }
   },
-	useless: { //giveUp: 放弃申请，exceededModifyCount: 超过修改次数， null: 数据有效， refuse：永久拒绝
+	useless: {
+    //giveUp: 放弃申请，
+    // exceededModifyCount: 超过修改次数，
+    // null: 数据有效,
+    // refuse：永久拒绝,
+    // stop: 中止
   	type: String,
 		default: null,
 		index: 1
@@ -299,6 +304,9 @@ const fundApplicationFormSchema = new Schema({
         passed: null,
         verify: false,
         apply: false,
+        threads: [String] 附带的文章
+        uid: String, 拨款人
+        time: Date, 拨款时间
       }*/
   	type: [Schema.Types.Mixed],
 		default: []
@@ -867,10 +875,10 @@ fundApplicationFormSchema.statics.publishByApplicationFormId = async (applicatio
       {
         money: form.money,
         status: null,
-        report: null,
-        passed: null,
-        verify: false,
-        apply: false,
+        report: null, // 提交报告
+        passed: null, // 通过审核
+        verify: false, // 确认收款
+        apply: false, // 已申请
       }
     ]
   } else {
@@ -883,7 +891,7 @@ fundApplicationFormSchema.statics.publishByApplicationFormId = async (applicatio
   form.modifyCount += 1;
   form.submittedReport = false;
   form.tlm = now;
-
+  form.timeToSubmit = now;
   oldForm.applicationFormId = oldForm._id;
   oldForm._id = undefined;
   oldForm.applicant = await form.extendApplicant();
@@ -1054,6 +1062,8 @@ fundApplicationFormSchema.methods.getStatus = async function() {
     formStatus = [1, 4];
   } else if(useless === 'refuse') {
     formStatus = [1, 5];
+  } else if (useless === 'stop') {
+    formStatus = [1, 6];
   } else if(completed === true) {
     if(excellent) {
       formStatus = [5, 3]
@@ -1080,6 +1090,8 @@ fundApplicationFormSchema.methods.getStatus = async function() {
     formStatus = [3, 3];
   } else if(adminSupport === false) {
     formStatus = [2, 3];
+  } else if(completedAudit) {
+    formStatus = [4, 6];
   } else if(remittance === null) {
     formStatus = [4, 2];
   } else if(remittance === false) {
@@ -1088,8 +1100,6 @@ fundApplicationFormSchema.methods.getStatus = async function() {
     formStatus = [4, 4];
   } else if(needRemittance) {
     formStatus = [4, 2];
-  } else if(completedAudit) {
-    formStatus = [4, 6];
   } else if(completed === null) {
     formStatus = [4, 1];
   } else if(completed === false) {
@@ -1102,10 +1112,11 @@ fundApplicationFormSchema.methods.getStatus = async function() {
 
   const descriptions = {
     '1-1': '已被屏蔽',
-    '1-2': '已被申请人放弃',
+    '1-2': '申请人已放弃申报',
     '1-3': '已被申请人删除',
-    '1-4': '退休次数超过限制',
-    '1-5': '已被彻底拒绝',
+    '1-4': '修改次数超过限制',
+    '1-5': '已被永久拒绝',
+    '1-6': '已终止',
 
     '2-1': '未提交',
     '2-2': '未通过专家审核，等待申请人修改',
@@ -1128,11 +1139,10 @@ fundApplicationFormSchema.methods.getStatus = async function() {
     '5-3': '优秀项目'
   };
 
-
   const key = `${formStatus[0]}-${formStatus[1]}`;
 
   const color = [
-    '3-1', '3-2', '3-3', '4-1', '4-2', '4-4', '4-6', '5-1', '5-2'
+    '3-1', '3-2', '3-3', '4-1', '4-2', '4-4', '4-6', '5-1', '5-2', '5-3'
   ].includes(key)? '#333': 'red';
 
   const description = descriptions[key];
@@ -1400,6 +1410,86 @@ fundApplicationFormSchema.methods.extendProjectPost = async function() {
     this.projectPost = project;
   }
 };
+
+/*
+* 检查拨款期号是否正确
+* @param {Number} number 拨款期号
+* */
+fundApplicationFormSchema.methods.checkRemittanceNumber = async function(number) {
+  const FundApplicationFormModel = mongoose.model('fundApplicationForms');
+  const form = await FundApplicationFormModel.findOnly({_id: this._id}, {remittance: 1});
+  const {remittance} = form;
+  for(let i = 0; i < remittance.length; i++) {
+    const {passed, verify, status} = remittance[i];
+    if(i < number) {
+      if(!status) throwErr(403, `第 ${i + 1} 期拨款尚未完成`);
+      if(!verify) throwErr(403, `第 ${i + 1} 期拨款尚未确认`);
+    } else if (i === number){
+      if(status) throwErr(403, `拨款已完成`);
+    }
+  }
+}
+
+/*
+* 拨款
+* @param {Object} props
+*   @param {Number} number 拨款期号
+*   @param {clientIp} 操作者 IP
+*   @param {clientPort} 操作者 port
+*   @param {String} operatorId 操作者 ID
+* */
+fundApplicationFormSchema.methods.transfer = async function(props) {
+  const {number, clientIp, clientPort, operatorId} = props;
+  const {disabled, useless, remittance, status} = this;
+  if(disabled) throwErr(403, `申请表已被封禁`);
+  if(useless !== null) throwErr(403, `申请表已失效`);
+  if(status.completed) throwErr(403, `项目已结题`);
+  if(!status.adminSupport) throwErr(403, `未通过管理员符合`);
+  const redLock = require('../nkcModules/redLock');
+  const FundApplicationFormModel = mongoose.model('fundApplicationForms');
+  const AliPayRecordModel = mongoose.model('aliPayRecords');
+  const FundBillModel = mongoose.model('fundBills');
+  const lock = await redLock.lock(`fundTransfer:${this._id}`, 6000);
+  try{
+    await this.checkRemittanceNumber(number);
+    const money = remittance[number].money * 100;
+    const balance = await FundBillModel.getBalance('fund', this.fundId);
+    if(balance * 100 < money) throwErr(500, `基金余额不足`);
+    const record = await AliPayRecordModel.transfer({
+      uid: this._id,
+      money,
+      effectiveMoney: money,
+      fee: 0,
+      aliPayAccount: this.applicant.number,
+      aliPayAccountName: this.applicant.name,
+      clientIp,
+      clientPort,
+      from: 'fund',
+      description: '基金拨款'
+    });
+    await FundBillModel.createRemittanceBill({
+      fundId: this.fundId,
+      uid: this.uid,
+      applicationFormId: this._id,
+      money: money / 100,
+      number,
+      applicationFormCode: this.code,
+      operatorId: operatorId || this.uid,
+      paymentType: 'aliPay',
+      paymentId: record._id
+    });
+    remittance[number].status = true;
+    this.remittance = remittance;
+    await this.updateOne({
+      $set: {
+        remittance: remittance
+      }
+    });
+  } catch(err) {
+    await lock.unlock();
+    throw(err);
+  }
+}
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);
 module.exports = FundApplicationFormModel;

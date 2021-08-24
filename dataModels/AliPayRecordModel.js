@@ -281,6 +281,7 @@ schema.statics.transfer = async (props) => {
   if(record.status === 'failed') {
     throwErr(500, record.note);
   }
+  return record;
 };
 
 module.exports = mongoose.model('aliPayRecords',  schema);

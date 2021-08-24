@@ -41,7 +41,9 @@ if !isIncluded('applicant')
           if from === 'team'
             .h5=`申请方式：团队`
             .h5=`组员ID：`
-              for m in members
+              for m, index in members
+                if index !== 0
+                  span ，
                 a(
                   href=tools.getUrl('userHome', m.uid)
                   target='_blank'

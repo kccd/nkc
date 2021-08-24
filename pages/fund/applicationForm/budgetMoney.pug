@@ -1,13 +1,14 @@
 if !isIncluded('budgetMoney')
   include ./formWarning
   mixin budgetMoney(form)
-    -var {budgetMoney, status, fixedMoney, money, auditComments} = form;
+    -var {auditType, budgetMoney, status, fixedMoney, money, auditComments} = form;
     -var total = 0;
     -var suggestTotal = 0;
     -var factTotal = 0;
     .m-b-1
       .panel-header 资金预算
-      +formWarning(auditComments.moneyAudit)
+      if auditComments
+        +formWarning(auditComments.moneyAudit)
       if !fixedMoney
         .table-responsive
           table.table.table-bordered.m-b-05.nkc-table
@@ -19,10 +20,11 @@ if !isIncluded('budgetMoney')
                 th 数量
                 th 单位
                 th 合计(元)
-                if status.projectPassed
-                  th 专家建议(元)
-                if status.adminSupport
-                  th 实际批准(元)
+                if auditType === 'person'
+                  if status.projectPassed
+                    th 专家建议(元)
+                  if status.adminSupport
+                    th 实际批准(元)
             tbody
               for b in budgetMoney
                 -total += b.total * 100;
@@ -33,28 +35,30 @@ if !isIncluded('budgetMoney')
                 tr
                   th=b.purpose
                   th=b.model
-                  th=b.count
                   th=b.money
+                  th=b.count
                   th=b.unit
                   th=b.total
-                  if status.projectPassed
-                    th=b.suggest
-                  if status.adminSupport
-                    th=b.fact
+                  if auditType === 'person'
+                    if status.projectPassed
+                      th=b.suggest
+                    if status.adminSupport
+                      th=b.fact
           if budgetMoney.length === 0
             .p-t-1.p-b-1.text-center 空空如也~
         .text-right
           span 申请金额&nbsp;
           strong.text-danger=total / 100
           span &nbsp;元
-          if status.projectPassed
-            span ，专家建议&nbsp;
-            strong.text-danger=suggestTotal / 100
-            span &nbsp;元
-          if status.adminSupport
-            span ，实际批准&nbsp;
-            strong.text-danger=factTotal / 100
-            span &nbsp;元
+          if auditType === 'person'
+            if status.projectPassed
+              span ，专家建议&nbsp;
+              strong.text-danger=suggestTotal / 100
+              span &nbsp;元
+            if status.adminSupport
+              span ，实际批准&nbsp;
+              strong.text-danger=factTotal / 100
+              span &nbsp;元
       else
         .text-right
           span 固定金额&nbsp;

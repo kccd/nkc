@@ -24,9 +24,10 @@ if !isIncluded('formStatus')
       color: #fff;
     }
   mixin formStatus(form)
+
     -var status = [];
-    -status.push(['提交申请', form.formStatus.general > 2]);
-    if form.auditType === 'person'
+    -status.push(['提交申请', form.status.submitted]);
+    if form.auditType !== 'system'
       -status.push(['专家审核', form.status.projectPassed]);
       -status.push(['管理员复核', form.status.adminSupport]);
     for r, index in form.remittance
@@ -53,3 +54,26 @@ if !isIncluded('formStatus')
         if index > 0
           .form-status-icon.fa.fa-chevron-right
         .form-status-name(class=s[1]?'active': '')=s[0]
+
+    if form.status.excellent
+      .m-b-1.p-t-2.p-b-2.text-success.text-center
+        strong.h3 优秀项目
+
+    if form.disabled
+      .m-b-1.p-t-2.p-b-2.text-danger.text-center
+        strong.h3 已被屏蔽
+
+    if form.useless === 'giveUp'
+      .m-b-1.p-t-2.p-b-2.text-danger.text-center
+        strong.h3 申请人已放弃申报
+
+    else if form.useless === 'exceededModifyCount'
+      .m-b-1.p-t-2.p-b-2.text-danger.text-center
+        strong.h3 修改次数超过限制
+
+    else if form.useless === 'refuse'
+      .m-b-1.p-t-2.p-b-2.text-danger.text-center
+        strong.h3 已被永久拒绝
+    else if form.useless === 'stop'
+      .m-b-1.p-t-2.p-b-2.text-danger.text-center
+        strong.h3 已终止

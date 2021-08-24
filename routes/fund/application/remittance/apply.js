@@ -1,20 +1,22 @@
 const router = require('koa-router')();
 router
-  .get('/', async (ctx, next) => {
-    const {data, db, state} = ctx;
+  .use('/', async (ctx, next) => {
+    const {state, data} = ctx;
     const {applicationForm} = data;
-    if(applicationForm.uid !== state.uid) ctx.throw(403,'权限不足');
+    if(state.uid !== applicationForm.uid) ctx.throw(403, `权限不足`);
+    if(applicationForm.completedAudit) ctx.throw(400, '你已经申请结题，不能再申请拨款');
+    await next();
+  })
+  .get('/', async (ctx, next) => {
+    const {data, db} = ctx;
     data.reportAudit = await db.FundDocumentModel.findOne({type: 'reportAudit'}).sort({toc: -1});
     ctx.template = 'fund/remittance/apply.pug';
     await next();
   })
   .post('/', async (ctx, next) => {
     const {data, db, body} = ctx;
-    const {applicationForm, user} = data;
-    const {money, account, fund, remittance, timeToPassed, reportNeedThreads} = applicationForm;
-    if(!applicationForm.lock.submitted) ctx.throw(400, '抱歉！该申请表暂未提交。');
-    if(applicationForm.uid !== user.uid) ctx.throw(403,'权限不足');
-    if(applicationForm.completedAudit) ctx.throw(400, '您已经申请结题，不能再申请拨款。');
+    const {applicationForm} = data;
+    const {account, fund, timeToPassed, reportNeedThreads} = applicationForm;
     const {number, c, selectedThreads} = body;
 
     // 系统审核
@@ -22,100 +24,84 @@ router
     // 若分期不正确则修复分期
     // 自动拨款只支持支付宝账号
     // 当自动拨款出错，若是用户输入的用户名或账号错误则直接更改申请表为未提交的状态，用户可编辑后再提交，否则等待财务人员处理
+
+    const insertReportStart = async () => {
+      await applicationForm.createReport(
+        'system',
+        `申请第 ${number + 1} 期拨款`,
+        applicationForm.uid,
+        null
+      );
+    };
+
     if(fund.auditType === 'system') {
-      if(remittance.length !== 1) {
-        const remittance = [{
-          money: applicationForm.money,
-          status: null
-        }];
-        await applicationForm.updateOne({remittance});
-      }
-      if(remittance[0].status) ctx.throw(400, '拨款已成功，请勿重复提交。');
-      if(account.paymentType !== 'alipay') ctx.throw(400, '系统审核只支持支付宝账号。');
-      const balance = await db.FundBillModel.getBalance('fund', fund._id);
-      if(remittance[0].money > balance) ctx.throw(400, '该基金余额不足。');
-      const {number, name} = account;
-      const {alipay2} = ctx.nkcModules;
-      let alipayData;
-      const _id = Date.now();
-      const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
-      const newReport = db.FundDocumentModel({
-        _id: newId,
-        uid: user.uid,
-        applicationFormId: applicationForm._id,
-        type: 'system',
-        c: `申请第 1 期拨款`,
-        support: true
-      });
-      await newReport.save();
-      try {
-        alipayData = await alipay2.transfer({
-          account: number,
-          name,
-          money,
-          id: _id,
-          notes: `${applicationForm.code}第1期拨款`
+      if(account.paymentType !== 'alipay') ctx.throw(400, '系统审核只支持支付宝收款');
+      await insertReportStart();
+      try{
+        await applicationForm.transfer({
+          number,
+          operatorId: applicationForm.uid,
+          clientIp: ctx.address,
+          clientPort: ctx.port
         });
-        const newBill = db.FundBillModel({
-          _id,
-          money,
-          from: {
-            type: 'fund',
-            id: fund._id
-          },
-          to: {
-            type: 'user',
-            id: user.uid,
-            anonymous: false
-          },
-          verify: true,
-          applicationFormId: applicationForm._id,
-          abstract: '拨款',
-          notes: `${applicationForm.code}第1期拨款`,
-          uid: fund.admin.appointed[0],
-          otherInfo: {
-            paymentType: 'alipay',
-            transactionNumber: alipayData.orderId,
-            name,
-            account: number
-          }
-        });
-        await newBill.save();
-        remittance[0].status = true;
-        await applicationForm.updateOne({'status.remittance': true, remittance});
-        const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
-        const newReport = db.FundDocumentModel({
-          _id: newId,
-          uid: fund.admin.appointed[0],
-          applicationFormId: applicationForm._id,
-          type: 'system',
-          c: `第 1 期拨款 ${money}元 完成`,
-          support: true
-        });
-        await newReport.save();
-      } catch (err) {
-        const errorInfo = err.message;
-        const updateObj = {};
-        const documentId = await db.SettingModel.operateSystemID('fundDocuments', 1);
-        let description = errorInfo;
-        remittance[0].status = false;
-        remittance[0].subCode = description;
-        remittance[0].description = description;
-        updateObj.remittance = remittance;
-        const newDocument = db.FundDocumentModel({
-          _id: documentId,
-          type: 'remittance',
-          uid: fund.admin.appointed[0],
-          applicationFormId: applicationForm._id,
-          c: description,
-          support: false
-        });
-        await applicationForm.updateOne(updateObj);
-        await newDocument.save();
+        await applicationForm.createReport(
+          'system',
+          `第 ${number + 1} 期拨款成功`,
+          applicationForm.uid,
+          true
+        );
+      } catch(err) {
+        await applicationForm.createReport(
+          'system',
+          `第 ${number + 1} 期拨款失败: ${err.message || err.toString()}`,
+          applicationForm.uid,
+          false
+        );
+        throw err;
       }
       await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
     } else {
-      // 人工审核
+      await applicationForm.checkRemittanceNumber(number);
+      const r = applicationForm.remittance[number];
+      const membersId = await db.FundApplicationUserModel.getMembersUidByApplicationFromId(applicationForm._id);
+      membersId.push(applicationForm.uid);
+      if(number !== 0 && reportNeedThreads) {
+        const threads = await db.ThreadModel.find({
+          tid: {
+            $in: selectedThreads
+          },
+          uid: {
+            $in: membersId
+          }
+        }, {
+          toc: 1,
+          tid: 1
+        });
+        if(threads.length === 0) ctx.throw(400, `申请拨款必须附带代表中期报告的文章`);
+        for(const thread of threads) {
+          if(thread.toc < timeToPassed) {
+            ctx.throw(400, `请选择申请项目之后所发表的文章`);
+          }
+        }
+        r.threads = threads.map(t => t.tid);
+      }
+      await insertReportStart();
+      const report = await applicationForm.createReport(
+        'report',
+        c,
+        applicationForm.uid,
+        null
+      );
+      r.report = report._id;
+      r.passed = null;
+      r.apply = true;
+      await applicationForm.updateOne({
+        $set: {
+          remittance: applicationForm.remittance,
+          submittedReport: number !== 0
+        }
+      });
+      /*// 人工审核
       // 申请第一期拨款不需要附带文章
       // 附带文章的发表时间必须晚于申请表申请时间
       for(let i = 0; i < remittance.length; i++) {
@@ -149,8 +135,8 @@ router
                 ctx.throw(400, '申请拨款必须要附带代表中期报告的文章。');
               }
               //验证附带文章的发表时间
-              await Promise.all(selectedThreads.map(async t => {
-                const thread = await db.ThreadModel.findOnly({tid: t.tid});
+              await Promise.all(selectedThreads.map(async tid => {
+                const thread = await db.ThreadModel.findOnly({tid});
                 if(thread.toc < timeToPassed) ctx.throw(400, '请选择申请项目之后所发的文章。')
               }));
               const reportId_1 = await db.SettingModel.operateSystemID('fundDocuments', 1);
@@ -171,7 +157,7 @@ router
               await report_1.save(); // 提交的报告
               await report_2.save(); // 自动生成的报告
               r.report = reportId_1;
-              r.threads = selectedThreads.map(t => t.tid.toString());
+              r.threads = selectedThreads.map(tid => tid.toString());
               r.passed = null;
               r.apply = true;
             }
@@ -179,7 +165,7 @@ router
           }
           break;
         }
-      }
+      }*/
       await db.MessageModel.sendFundMessage(applicationForm._id, "financialStaff");
     }
     await next();

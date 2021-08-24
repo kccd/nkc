@@ -53,11 +53,14 @@ if !isIncluded('project')
       .project-title=projectPost.t
       .project-forum
         span 学科分类：
-        a.m-r-05(
-          href=tools.getUrl('forumHome', forum.fid)
-          target="_blank"
-          data-float-fid=forum.fid
-          )=forum.displayName
+        if forum
+          a.m-r-05(
+            href=tools.getUrl('forumHome', forum.fid)
+            target="_blank"
+            data-float-fid=forum.fid
+            )=forum.displayName
+        else
+          span 暂未选择
         span=`研究周期：${projectCycle} 天`
       if projectPost.abstractCn
         .project-header 摘要

@@ -6,7 +6,7 @@ remittanceRouter
 	.use('/', async (ctx, next) => {
 		const {applicationForm} = ctx.data;
 		if(applicationForm.disabled) ctx.throw(400, '申请表已被屏蔽');
-		if(applicationForm.useless) ctx.throw(400, '申请表已失效，无法完成该操作。');
+		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
 		const {adminSupport, completed} = applicationForm.status;
 		if(!adminSupport) ctx.throw(400, '管理员复核暂未通过无法进行拨款操作');
 		if(completed) ctx.throw(400, '申请已经结题，无法执行拨款操作');
@@ -16,24 +16,69 @@ remittanceRouter
 		const {db, data} = ctx;
 		const {user, applicationForm} = data;
 		const {remittance, fund} = applicationForm;
-		if(!fund.ensureOperatorPermission('financialStaff', user)) ctx.throw(403,'抱歉！您没有资格进行拨款。');
-		ctx.template = 'interface_fund_remittance.pug';
-		await Promise.all(remittance.map(async r => {
-			if(r.uid) {
-				r.user = await db.UserModel.findOnly({uid: r.uid});
-			}
-		}));
-		data.nav = '拨款';
+    await fund.checkFundRole(user.uid, 'financialStaff');
+    data.isAdmin = await fund.isFundRole(user.uid, 'admin');
+		const usersId = [];
+		for(const r of remittance) {
+		  if(!r.uid) continue;
+		  usersId.push(r.uid);
+    }
+		const users = await db.UserModel.find({uid: {$in: usersId}}, {uid: 1, avatar: 1, username: 1});
+		const usersObj = {};
+		users.map(u => usersObj[u.uid] = u);
+		for(const r of remittance) {
+		  if(r.uid) r.user = usersObj[r.uid];
+    }
+    ctx.template = 'fund/remittance/audit.pug';
 		await next();
 	})
 	.post('/', async (ctx, next) => {
 		const {data, body, db} = ctx;
 		const {applicationForm, user} = data;
 		const {number} = body;
-		const {account, fund, remittance} = applicationForm;
-		if(!applicationForm.lock.submitted) ctx.throw(400, '抱歉！该申请表暂未提交。');
-		if(!fund.ensureOperatorPermission('financialStaff', user)) ctx.throw(403,'抱歉！您没有资格进行拨款。');
-		for(let i = 0; i < remittance.length; i++) {
+		const {fund, remittance} = applicationForm;
+    await fund.checkFundRole(user.uid, 'financialStaff');
+    try{
+      await applicationForm.transfer({
+        number,
+        operatorId: applicationForm.uid,
+        clientIp: ctx.address,
+        clientPort: ctx.port
+      });
+      await applicationForm.createReport(
+        'system',
+        `第 ${number + 1} 期拨款成功`,
+        applicationForm.uid,
+        true
+      );
+    } catch(err) {
+      await applicationForm.createReport(
+        'system',
+        `第 ${number + 1} 期拨款失败: ${err.message || err.toString()}`,
+        applicationForm.uid,
+        false
+      );
+      throw err;
+    }
+
+    const r = remittance[number];
+
+    r.status = true;
+    r.uid = user.uid;
+    r.time = new Date();
+    r.apply = false;
+
+    await applicationForm.updateOne({
+      $set: {
+        'status.remittance': true,
+        submittedReport: false,
+        remittance: remittance
+      }
+    });
+
+    await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
+
+		/*for(let i = 0; i < remittance.length; i++) {
 			const r = remittance[i];
 			if(i < number && !r.status) ctx.throw(400, '请依次拨款！');
 			if(i === number) {
@@ -130,7 +175,7 @@ remittanceRouter
 			obj.submittedReport = false;
 		}
 		await applicationForm.updateOne(obj);
-    await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
+    await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");*/
 
     await next();
 	})

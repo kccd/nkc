@@ -106,15 +106,15 @@ block content
                   .image-avatar(@click='selectImage("avatar")')
                     img(v-if="image.avatar" :src='image.avatar')
               .form-group
-                label.control-label.col-sm-2 简介
+                label.control-label.col-sm-2 基金简介
                 .col-sm-8
                   textarea.form-control(v-model.trim='fund.description.brief' rows=8)
               .form-group
-                label.control-label.col-sm-2 说明
+                label.control-label.col-sm-2 基金说明
                 .col-sm-8
                   textarea.form-control(v-model.trim='fund.description.detailed' rows=8)
               .form-group
-                label.control-label.col-sm-2 条款
+                label.control-label.col-sm-2 基金条款
                 .col-sm-8
                   textarea.form-control(v-model.trim='fund.description.terms' rows=8)
         .panel.panel-default

@@ -398,8 +398,65 @@ fundBillSchema.statics.createDonationBill = async (props) => {
     verify: false
   });
   await bill.save();
+  return bill;
 };
 
+/*
+* @param {Object} props
+*   @param {String} fundId 基金项目 ID
+*   @param {String} uid 收款用户 ID
+*   @param {Number} applicationFormId 申请表 ID
+*   @param {Number} money 拨款金额 元
+*   @param {Number} number 拨款期号 从 0 开始
+*   @param {String} applicationFormCode 申请表代号
+*   @param {String} operatorId 操作人 ID
+*   @param {String} paymentType 支付方式
+*   @param {String} paymentId 支付平台对应的记录 ID
+*
+* */
+fundBillSchema.statics.createRemittanceBill = async (props) => {
+  const {
+    fundId,
+    uid,
+    applicationFormId,
+    money,
+    number,
+    applicationFormCode,
+    operatorId,
+    paymentId,
+    paymentType
+  } = props;
+  const FundBillModel = mongoose.model('fundBills');
+  const _id = Date.now();
+  const newBill = FundBillModel({
+    _id,
+    money,
+    from: {
+      type: 'fund',
+      id: fundId
+    },
+    to: {
+      type: 'user',
+      id: uid,
+      anonymous: false
+    },
+    verify: true,
+    applicationFormId: applicationFormId,
+    abstract: '拨款',
+    notes: `${applicationFormCode} 第 ${number + 1} 期拨款`,
+    uid: operatorId,
+    paymentId,
+    paymentType,
+    /*otherInfo: {
+      paymentType: 'alipay',
+      transactionNumber: alipayData.orderId,
+      name,
+      account: number
+    }*/
+  });
+  await newBill.save();
+  return newBill;
+}
 
 /*
 * 更改当前记录为已验证

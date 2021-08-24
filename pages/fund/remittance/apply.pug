@@ -34,7 +34,7 @@ block fundContent
                     th
                       if r.status === null
                         if i === 0 && !r.apply
-                          button(onclick=`applyRemittance(${i}, ${applicationForm._id})`) 申请拨款
+                          button(onclick=`applyRemittance(${i}, ${form._id})`) 申请拨款
                       else if r.status === false
                         if ['PAYEE_USER_INFO_ERROR', 'PAYEE_NOT_EXIST'].includes(r.subCode) && !lock.submitted
                           button(onclick=`openToEditFundApply("/fund/a/${applicationForm._id}/settings?s=1")`) 去修改

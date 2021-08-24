@@ -3,7 +3,8 @@ router
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
     const {applicationForm, user} = data;
-    ctx.template = 'interface_fund_complete.pug';
+    ctx.template = 'fund/complete/audit.pug';
+
     data.type = 'reportAudit';
     //结项审核  审查员权限判断
     const {fund, completedAudit} = applicationForm;
@@ -16,7 +17,7 @@ router
   .post('/', async (ctx, next) => {
     const {data, db, body} = ctx;
     const {applicationForm, user} = data;
-    const {c, type} = body;
+    const {c, passed} = body;
     //结项审核  审查员权限判断
     const {fund, completedAudit} = applicationForm;
     if(!completedAudit) ctx.throw(403,'抱歉！申请人暂未提交结题申请。');
@@ -27,12 +28,12 @@ router
       _id: newId,
       c: c,
       type: 'completedAudit',
-      support: (type === 'pass'),
+      support: passed,
       applicationFormId: applicationForm._id,
       uid: user.uid
     });
     await newDocument.save();
-    if(type === 'pass') {
+    if(passed) {
       await applicationForm.updateOne({'status.completed': true, completedAudit: false, tlm: Date.now()});
     } else {
       await applicationForm.updateOne({'status.completed': false, completedAudit: false});

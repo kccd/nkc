@@ -15,6 +15,9 @@ if !isIncluded('fundNav')
           if data.user
             li
               a(href=`/fund/me`) 我的申请
+          if data.newNotify > 0
+            li
+              a(href=`/fund/me?type=notify`)=`组队邀请 ${data.newNotify}`
           if data.fund
             li
               a(href=`/fund/list/${data.fund._id}`)=data.fund.name

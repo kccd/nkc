@@ -4,7 +4,13 @@ if !isIncluded('formWarning')
       background-color: #f2dede!important;
     }
   mixin formWarning(comment)
+    -var content = '';
     if comment
-      -var {support, c} = comment;
-      if !support
-        .pre-wrap.p-a-1.form-warning-info.text-danger.m-b-1=c
+      if typeof comment !== 'string'
+        -var {support, c} = comment;
+        if !support
+          -content = c;
+      else
+        -content = comment;
+      if content
+        .pre-wrap.p-a-1.form-warning-info.text-danger.m-b-1=content

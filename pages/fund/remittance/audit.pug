@@ -1,0 +1,81 @@
+extends ../fundContainer
+block fundTitle
+  title 拨款
+block fundContent
+  -var {applicationForm} = data;
+  -var {remittance} = applicationForm;
+  include ../applicationForm/formBriefInfo
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8.box-shadow-panel
+        div
+          +formBriefInfo(applicationForm)
+          if applicationForm.account.paymentType === 'alipay'
+            h5 收款方式：支付宝
+          else if applicationForm.account.paymentType === 'bankCard'
+            h5 收款方式：银行卡
+          h5= `户名：${applicationForm.account.name}`
+          h5= `收款账号：${applicationForm.account.number}`
+
+          hr
+          h4 总共&nbsp;
+            strong.text-danger=remittance.length
+            | &nbsp;期，总金额&nbsp;
+            strong.text-danger=applicationForm.money
+            | &nbsp;元
+          table.table
+            thead
+              tr
+                th #
+                th 金额
+                th 状态
+                th 拨款人ID
+                th 拨款时间
+                th 报告
+                th 操作
+
+            tbody
+              for r, i in remittance
+                tr
+                  th= `第 ${i + 1} 期`
+                  th= r.money + ' 元'
+                  if r.status
+                    th= `已拨款`
+                  else if r.status === false
+                    th.text-danger= r.description
+                  else
+                    th= '未拨款'
+                  th
+                    if r.user
+                      a(
+                        href=tools.getUrl('userHome', r.user.uid)
+                        target='_blank'
+                        data-float-uid=r.user.uid
+                        )= r.user.username
+
+                  th
+                    if r.time
+                      +timeFormat(r.time)
+                  th
+                    if i !== 0
+                      span=r.passed? '已通过': '未通过'
+                  th
+                    if r.status
+                      span 已确认拨款
+                    else if r.status === null
+                      if applicationForm.account.paymentType === 'alipay'
+                        button#remittance(onclick=`ensureRemittance(${applicationForm._id},${i})`)= r.status ? '' : '拨款（支付宝）'
+                      else
+                        button(onclick=`ensureRemittance(${applicationForm._id},${i})`)= r.status ? '' : '确认已拨款'
+                    else if applicationForm.lock.submitted
+                      if applicationForm.account.paymentType === 'alipay'
+                        button(onclick=`ensureRemittance(${applicationForm._id},${i})`)= r.status ? '' : '重试'
+                        if data.isAdmin
+                          if i === 0
+                            button(onclick=`withdrawApplicationForm(${applicationForm._id})`)= r.status ? '' : '撤回申请表'
+                          button(onclick=`refuseApplicationForm(${applicationForm._id})`)= r.status ? '' : '永久撤回申请表'
+                    else
+                      span 暂未提交申请表
+
+block fundScripts
+  +includeJS('/fund/remittance/audit.js')

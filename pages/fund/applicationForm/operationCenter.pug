@@ -41,13 +41,14 @@ if !isIncluded('operationCenter')
             button.btn.btn-default.btn-block(onclick=`excellent(${form._id}, true)`) 设为优秀项目
         if isAdmin
           if general === 1
-            if [1, 2, 5].includes(detail)
+            if [1, 2, 5, 6].includes(detail)
               button.btn.btn-default.btn-block(onclick=`restoreApplicationForm(${form._id})`) 恢复申请表
           if general === 1 && detail === 1
             button.btn.btn-default.btn-block(onclick=`disableApplicationForm(${form._id}, false)`) 解除屏蔽
           else
             button.btn.btn-default.btn-block(onclick=`disableApplicationForm(${form._id}, true)`) 屏蔽
-
+          if general === 4
+            button.btn.btn-default.btn-block(onclick=`applicationFormStop(${form._id})`) 强制终止
           if permission('fundBlacklistPost')
             if applicant.inFundBlacklist
               button.btn.btn-default.btn-block(onclick=`removeUserFromFundBlacklist("${form.uid}")`) 移出黑名单
@@ -100,4 +101,14 @@ if !isIncluded('operationCenter')
         .catch(function (data) {
           screenTopWarning(data.error);
         })
+    }
+    function applicationFormStop(formId) {
+      return sweetPrompt(`请输入原因`, '')
+      .then(function(reason) {
+        return nkcAPI('/fund/a/' + formId + '/manage/stop', 'POST', {reason: reason})
+      })
+      .then(function() {
+        sweetSuccess('操作成功');
+      })
+      .catch(sweetError)
     }

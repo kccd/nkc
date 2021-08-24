@@ -154,21 +154,25 @@ router
     data.passed = support;
     let total = 0;
     let factTotal = 0;
-    for(let i = 0; i < applicationForm.budgetMoney.length; i++) {
-      const b = applicationForm.budgetMoney[i];
-      checkNumber(fact[i], {
-        name: `${b.purpose} - 专家建议金额`,
-        min: 0,
-        fractionDigits: 2,
-      });
-      total += b.total * 100;
-      factTotal += fact[i] * 100;
 
-      b.fact = fact[i];
-    }
+    if(applicationForm.fixedMoney) {
+      factTotal = applicationForm.money;
+    } else {
+      for(let i = 0; i < applicationForm.budgetMoney.length; i++) {
+        const b = applicationForm.budgetMoney[i];
+        checkNumber(fact[i], {
+          name: `${b.purpose} - 专家建议金额`,
+          min: 0,
+          fractionDigits: 2,
+        });
+        total += b.total * 100;
+        factTotal += fact[i] * 100;
 
-    if((factTotal < total * 0.8) && support) {
-      ctx.throw(400, `实际批准金额低于预算 80% 时，资金预算审核只能选择不合格`);
+        b.fact = fact[i];
+      }
+      if((factTotal < total * 0.8) && support) {
+        ctx.throw(400, `实际批准金额低于预算 80% 时，资金预算审核只能选择不合格`);
+      }
     }
 
     const formRemittance = [];
@@ -187,7 +191,7 @@ router
         passed: null
       });
     }
-    if(remittanceTotal !== factTotal) {
+    if(remittanceTotal !== factTotal * 100) {
       ctx.throw(400, `分期总金额不等于实际批准金额`);
     }
 

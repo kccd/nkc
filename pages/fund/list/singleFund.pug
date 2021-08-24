@@ -6,7 +6,7 @@ block fundContent
   include ../applicationFormItem
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-12.m-b-2
+      .col-xs-12.col-md-12.m-b-1
         -var style = `background-color: ${data.fund.color};`;
         if !data.fund.banner
           -style += 'height: 18rem;';
@@ -17,6 +17,8 @@ block fundContent
           .fund-name-description
             .fund-name=data.fund.name
             .fund-description=data.fund.description.brief
+      .col-xs-12.col-md-12.box-shadow-panel.m-b-1
+        .pre-wrap=data.fund.description.detailed
       .col-xs-12.col-md-8.box-shadow-panel
         div
           .paging-button
@@ -73,7 +75,7 @@ block fundContent
                 a.btn.btn-block.btn-primary.single-fund-button(href=`/fund/list/${data.fund._id}/add`) 申请基金
               else
                 button.btn.btn-block.btn-primary.single-fund-button(disabled) 申请基金
-        .m-b-1
+        //-.m-b-1
           .panel-header 补充说明
           .pre-wrap=data.fund.description.detailed
         .m-b-1#donationApp

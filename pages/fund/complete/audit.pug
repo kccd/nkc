@@ -1,0 +1,56 @@
+extends ../fundContainer
+block fundTitle
+  title 结题审核
+block fundContent
+  include ../applicationForm/budgetMoney
+  include ../applicationForm/formBriefInfo
+  include ../applicationForm/actualMoney
+  include ../applicationForm/formThread
+  -var form = data.applicationForm;
+  -var {project} = form;
+  .hidden#data=objToStr({form})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8.box-shadow-panel
+        div#app(v-cloak)
+          .panel-header 结题审核
+          +formBriefInfo(form)
+          .form.m-t-1
+            if !form.fixedMoney
+              .form-group
+                +budgetMoney(form)
+              .form-group
+                +actualMoney(form)
+            .form-group
+              .radio
+                span 总体情况：
+                if form.status.successful === true
+                  strong.text-success 研究完成
+                else
+                  strong.text-danger 未完成
+            .form-group
+              h5 结题报告：
+              for t in form.threads.completed
+                +formThread(t)
+            .form-group.m-b-2
+              h5 项目完成情况简介：
+              .bg-info.p-a-1.pre-wrap=data.report.c
+            .form-group
+              .radio
+                span 审核：
+                label.m-r-1
+                  input(type='radio' :value='true' v-model='passed')
+                  span 通过
+                label
+                  input(type='radio' :value='false' v-model='passed')
+                  span 不通过
+
+            .form-group
+              h5 理由：
+              textarea.form-control(rows=8 placeholder='建议 500 字左右' v-model='content')
+            .form-group
+              button.btn.btn-default(@click='submit') 提交
+
+
+block fundScripts
+  +includeJS('/fund/complete/audit.js')

@@ -16,6 +16,8 @@ settingsRouter
       ctx.throw(403,'申请表已被彻底拒绝');
     } else if(applicationForm.useless === 'giveUp') {
       ctx.throw(403,'申请人已放弃申报');
+    } else if(applicationForm.useless === 'stop') {
+      ctx.throw(403, `申请已终止`);
     }
     const reg = /^\/fund\/a\/[0-9]+\/settings$/;
     if(reg.test(ctx.url)) {

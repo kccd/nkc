@@ -2,10 +2,17 @@ const router = require('koa-router')();
 router
   .post('/', async (ctx, next) => {
     const {db, body, data, state} = ctx;
-    const {applicationForm} = data;
+    const {fund, applicationForm} = data;
     const usersId = new Set(body.usersId);
     usersId.delete(state.uid);
     const now = new Date();
+    // 判断组员权限
+    const {authLevel} = fund.member;
+    let users = await db.UserModel.find({uid: {$in: [...usersId]}});
+    for(const user of users) {
+      const userAuthLevel = await user.extendAuthLevel();
+      if(userAuthLevel < authLevel) ctx.throw(403, `组员身份认证等级未满足要求`);
+    }
     for(const uid of usersId) {
       let member = await db.FundApplicationUserModel.findOne({
         applicationFormId: applicationForm._id,

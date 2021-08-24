@@ -1,0 +1,20 @@
+if !isIncluded('formBriefInfo')
+  mixin formBriefInfo(form)
+    h5=`项目名称：${form.project.t}`
+    h5=`项目ID：${form.code}`
+    h5 申请人：
+      a(
+        href=tools.getUrl('userHome', form.applicant.user.uid)
+        target="_blank"
+        data-float-uid=form.applicant.uid
+        )=form.applicant.user.username
+    if form.members && form.members.length > 0
+      h5=`组员：`
+        for u, index in form.members
+          if index !== 0
+            span ，
+          a(
+            href=tools.getUrl('userHome', u.user.uid)
+            target="_blank"
+            data-float-uid=u.user.uid
+          )=u.user.username

@@ -120,6 +120,9 @@ module.exports = {
         },
         restore: {
 			    POST: 'restoreFundApplicationForm'
+        },
+        stop: {
+			    POST: 'stopFundApplicationForm'
         }
       },
 			/*comment: {

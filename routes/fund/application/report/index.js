@@ -3,7 +3,8 @@ const auditRouter = require('./audit');
 const reportRouter = new Router();
 reportRouter
 	.use('/', async (ctx, next) => {
-		const {applicationForm, fund, state} = ctx.data;
+		const {applicationForm} = ctx.data;
+    if(applicationForm.disabled) ctx.throw(400, '申请表已被屏蔽');
 		if(!applicationForm.status.adminSupport) ctx.throw(400, '暂未通过管理员复核，请通过后再试');
 		if(applicationForm.useless !== null) ctx.throw(403,'申请表已被失效');
 		await next();

@@ -86,18 +86,6 @@ if !isIncluded('report')
       .m-b-1
         for report in form.reports
           +singleReport(report, form, userFundRoles)
-      if form.reportThreads && form.reportThreads.length > 0
-        div
-          .panel-header 与项目有关的最新文章
-          .form-threads
-            for thread in form.reportThreads
-              +formThread(thread)
-      if form.threads && form.threads.completed && form.threads.completed.length > 0
-        div
-          .panel-header 结题报告
-          .form-threads
-            for thread in form.threads.completed
-              +formThread(thread)
   script.
     function disabledReport(applicationFormId, reportId, type) {
       nkcAPI('/fund/a/' + applicationFormId + '/report/' + reportId + '?type=' + type, 'DELETE', {})
