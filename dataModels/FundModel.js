@@ -70,18 +70,17 @@ const fundSchema = new Schema({
     // 基金简介
     brief: {
     	type: String,
-	    required: true,
-	    maxlength: [100, '基金简介字数不能大于100']
+      default: '',
     },
     // 基金说明
 	  detailed: {
     	type: String,
-		  required: true
+      default: '',
 	  },
     // 基金协议
 	  terms: {
     	type: String,
-		  required: true
+      default: '',
 	  }
   },
   // 申请基金时的相关提示
@@ -100,13 +99,13 @@ const fundSchema = new Schema({
   // 是否基金显示入口
 	display: {
     type: Boolean,
-    default: true,
+    default: false,
 		index: 1
   },
   // 是否允许申请
 	canApply: {
 		type: Boolean,
-		default: true,
+		default: false,
 		index: 1
 	},
   // 审核方式 person: 人工审核, system: 系统审核

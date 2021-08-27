@@ -12,17 +12,31 @@ listRouter
 	// 添加基金项目
 	.post('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		const {fundObj} = ctx.body;
-		fundObj.name = fundObj.name || '科创基金';
-		const fund = await db.FundModel.findOne({_id: fundObj._id});
-		if(fund) ctx.throw(400, '该基金编号已经存在，请更换');
-		if(!fundObj.applicationMethod.personal && !fundObj.applicationMethod.team) ctx.throw(400, '必须勾选申请方式。');
-		if(fundObj.auditType === 'system' && fundObj.admin.appointed.length === 0) {
-			ctx.throw(400, '系统审核必须指定管理员UID。');
-		}
-		const newFund = db.FundModel(fundObj);
-		await newFund.save();
-		data.fund = newFund;
+		let {fundName, fundId} = ctx.body;
+		fundId = fundId.toLocaleString();
+		const sameFund = await db.FundModel.findOne({
+      $or: [
+        {
+          name: fundName
+        },
+        {
+          _id: fundId
+        }
+      ]
+    });
+		if(sameFund) {
+		  if(sameFund.name === fundName) {
+		    ctx.throw(400, `基金名已存在`);
+      } else {
+		    ctx.throw(400, `基金代号已存在`);
+      }
+    }
+		const fund = db.FundModel({
+      _id: fundId,
+      name: fundName
+    });
+		await fund.save();
+		data.fundId = fund._id;
 		await next();
 	})
   .use('/:fundId', singleFundRouter.routes(), singleFundRouter.allowedMethods());

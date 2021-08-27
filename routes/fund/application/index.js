@@ -61,81 +61,27 @@ applicationRouter
       ]
     });
 		if(!applicationForm) ctx.throw(400, '未找到指定申请表。');
-		const fund = await applicationForm.extendFund();
+		await applicationForm.extendApplicationFormBaseInfo(state.uid);
+		const fund = applicationForm.fund;
 		if(fund.history && ctx.method !== 'GET') {
 			ctx.throw(400, '申请表所在基金已被设置为历史基金，申请表只供浏览。');
 		}
-		await applicationForm.extendMembers();
-		await applicationForm.extendApplicant().then(u => u.extendLifePhotos());
-		await applicationForm.extendProject();
-		await applicationForm.extendProjectPost();
-		await applicationForm.extendThreads();
-		await applicationForm.extendForum();
 		data.applicationForm = applicationForm;
-		data.fund = applicationForm.fund;
-		data.userFundRoles = await fund.getUserFundRoles(state.uid);
+		data.fund = fund;
+		data.userFundRoles = await applicationForm.fund.getUserFundRoles(state.uid);
 		await next();
 	})
 
 	// 申请表展示页
 	.get('/:_id', async (ctx, next) => {
 		const {data, db, state} = ctx;
-		const {applicationForm, fund} = data;
-		if(
-		  applicationForm.disabled &&
-      !await fund.isFundRole(state.uid, 'admin')
-    ) ctx.throw(403, `申请表已被屏蔽`);
-		const {applicant, members} = applicationForm;
-		const membersId = members.map(m => m.uid);
-		// 未提交时仅自己和全部组员可见
-    if(
-      !await fund.isFundRole(state.uid, 'admin') &&
-      applicationForm.status.submitted !== true &&
-      state.uid !== applicant.uid &&
-      !membersId.includes(state.uid)
-    ) ctx.throw(403, `权限不足`);
-		if(1) {
-      ctx.template = 'fund/applicationForm/applicationForm.pug';
-    } else {
-      ctx.template = 'fund/applicationForm.pug';
-    }
-    /*const page = query.page? parseInt(query.page): 0;
-    // 已发表的申请，项目内容从文章读取
-    if(applicationForm.tid) {
-      const thread = await db.ThreadModel.findOnly({tid: applicationForm.tid});
-      let firstPost= await db.PostModel.findOnly({pid: thread.oc});
-      firstPost = await db.PostModel.extendPost(firstPost, {
-        uid: data.user? data.user.uid: "",
-        user: data.user
-      });
-      applicationForm.project = firstPost;
-      const q = {
-        tid: applicationForm.tid,
-        pid: {$ne: thread.oc},
-        disabled: false,
-        reviewed: true,
-        toDraft: {$ne: true}
-      };
-      // if(!fund.ensureOperatorPermission('admin', user)) q.disabled = false;
-      const length = await db.PostModel.countDocuments(q);
-      const paging = apiFn.paging(page, length);
-      data.paging = paging;
-      const comments = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
-      data.comments = await db.PostModel.extendPosts(comments, {
-        visitor: data.user,
-        uid: data.user?data.user.uid: ""
-      });
-    }*/
-
-		await applicationForm.extendSupporters();
-		await applicationForm.extendObjectors();
-		await applicationForm.extendReportThreads();
-		await applicationForm.extendAuditComments();
-		await applicationForm.extendReports();
-    await applicationForm.getStatus();
-
+		const {applicationForm} = data;
+		const accessForumsId = await db.ForumModel.getAccessibleForumsId(
+		  data.userRoles, data.userGrade, data.user
+    );
+		await applicationForm.extendApplicationFormInfo(state.uid, accessForumsId);
     data.targetUserInFundBlacklist = await db.FundBlacklistModel.inBlacklist(applicationForm.uid);
-
+    ctx.template = 'fund/applicationForm/applicationForm.pug';
 		await next();
 	})
 

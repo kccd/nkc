@@ -12,7 +12,7 @@ block fundContent
   include ../applicationForm/budgetMoney
   include ../applicationForm/formBriefInfo
   -var form = data.applicationForm;
-  -var {project} = form;
+  -var {project, fund} = form;
   .hidden#data=objToStr({form})
   .container-fluid.max-width
     .row
@@ -45,6 +45,7 @@ block fundContent
                           th 数量
                           th 单位
                           th 合计(元)
+                          th 其他
                       tbody
                         tr(v-for='(m, index) in form.actualMoney')
                           th.budget-purpose
@@ -58,15 +59,19 @@ block fundContent
                           th.budget-count
                             input.form-control(type='text' v-model='m.unit')
                           th {{calculateMoney(m.count, m.money).toFixed(2)}}
-                .text-right
-                  span 实际花费&nbsp;
-                  strong.text-danger {{totalMoney}}
-                  span &nbsp;元，应退金额&nbsp;
-                  strong.text-danger {{returnMoney}}
-                  span &nbsp;元
-                  span(v-if='returnMoney > 0')
-                    span ，
-                    a() 去退款
+                          th
+                            button.btn.btn-xs.btn-default(@click='removeFromArr(form.actualMoney, index)') 删除
+                  .pull-left
+                    button.btn.btn-xs.btn-default(@click='addItem') 添加
+                  .text-right
+                    span 实际花费&nbsp;
+                    strong.text-danger {{totalMoney}}
+                    span &nbsp;元，应退金额&nbsp;
+                    strong.text-danger {{returnMoney}}
+                    span &nbsp;元
+                    span(v-if='returnMoney > 0')
+                      span ，
+                      a(:href='"/fund/donation?fundId=" + form.fundId + "&money=" + returnMoney + "&refund=true"' target='_blank') 去退款
               .form-group
                 .radio
                   span 总体情况：

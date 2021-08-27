@@ -14,6 +14,7 @@ block fundContent
   include ./actualMoney
   include ./formRelatedThreads
   include ./formReportThreads
+  include ./formPost
   -var form = data.applicationForm;
   -var applicationForm = form;
   .container-fluid.max-width
@@ -27,11 +28,13 @@ block fundContent
         +remittance(form)
         +formRelatedThreads(form)
         +formReportThreads(form)
+        +formPost(form)
       .col-xs-12.col-md-4.box-shadow-panel
         +applicantOperationCenter(form, data.user ? data.user.uid: '')
         +managerOperationCenter(form, data.userFundRoles)
         +formStatus(form)
         +report(form, data.userFundRoles)
         +formVote(form, data.userFundRoles)
+
 block fundScripts
   include ../../publicModules/nkcSource

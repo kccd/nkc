@@ -1,7 +1,9 @@
 const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
-    const {db, data} = ctx;
+    const {db, data, query, state} = ctx;
+    let {fundId, money, refund} = query;
+    const {uid} = state;
     data.funds = await db.FundModel.find({
       display: true,
       disabled: false,
@@ -10,6 +12,17 @@ router
     data.donation = data.fundSettings.donation;
     data.description = data.fundSettings.donationDescription;
     data.fundName = data.fundSettings.fundName;
+    if(fundId) {
+      const fund = await db.FundModel.findOne({_id: fundId}, {_id: 1});
+      if(fund) data.fundId = fundId;
+    }
+    if(money) {
+      money = Number(money);
+      if(typeof money === 'number') {
+        data.money = Math.round(money * 100) / 100;
+      }
+    }
+    data.refund = refund === 'true';
     ctx.template = 'fund/donation/donation.pug';
     await next();
   })
@@ -22,7 +35,8 @@ router
       apiType,
       paymentType,
       fundId,
-      anonymous
+      anonymous,
+      refund
     } = body;
     const fundSettings = await db.SettingModel.getSettings('fund');
     const {min, max, enabled, payment} = fundSettings.donation;
@@ -37,11 +51,12 @@ router
       await db.FundModel.findOnly({_id: fundId});
     }
     let paymentId;
+    const description = refund? '基金退款': '基金赞助';
     if(paymentType === 'wechatPay') {
       if(!payment.wechatPay.enabled) ctx.throw(400, `微信支付已关闭`);
       const wechatPayRecord = await db.WechatPayRecordModel.getPaymentRecord({
         apiType,
-        description: `基金赞助`,
+        description,
         money: totalMoney,
         fee,
         effectiveMoney: money,
@@ -59,7 +74,7 @@ router
     } else if(paymentType === 'aliPay') {
       if(!payment.aliPay.enabled) ctx.throw(400, `支付宝支付已关闭`);
       const aliPayRecord = await db.AliPayRecordModel.getPaymentRecord({
-        title: '基金赞助',
+        title: description,
         money: totalMoney,
         fee,
         effectiveMoney: money,
@@ -81,6 +96,7 @@ router
       fundId,
       paymentId,
       paymentType,
+      refund,
     });
     await next();
   });

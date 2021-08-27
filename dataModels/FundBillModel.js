@@ -376,7 +376,9 @@ fundBillSchema.statics.createDonationBill = async (props) => {
     fundId,
     paymentId,
     paymentType,
+    refund,
   } = props;
+  const abstract = refund? '退款': '赞助';
   const bill = FundBillModel({
     _id: await FundBillModel.getNewId(),
     from: {
@@ -391,8 +393,8 @@ fundBillSchema.statics.createDonationBill = async (props) => {
     },
     uid,
     money,
-    abstract: '赞助',
-    notes: `赞助 ${money} 元`,
+    abstract,
+    notes: `${abstract} ${money} 元`,
     paymentId,
     paymentType,
     verify: false

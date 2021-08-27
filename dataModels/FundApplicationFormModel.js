@@ -441,6 +441,14 @@ fundApplicationFormSchema.virtual('projectPost')
     this._projectPost = projectPost;
   });
 
+fundApplicationFormSchema.virtual('posts')
+  .get(function() {
+    return this._posts;
+  })
+  .set(function(posts) {
+    this._posts = posts;
+  });
+
 fundApplicationFormSchema.pre('save', function(next) {
   this.tlm = Date.now();
   next();
@@ -880,7 +888,11 @@ fundApplicationFormSchema.statics.publishByApplicationFormId = async (applicatio
         verify: false, // 确认收款
         apply: false, // 已申请
       }
-    ]
+    ];
+    form.budgetMoney.map(b => {
+      b.suggest = b.total;
+      b.fact = b.total;
+    });
   } else {
     // 人工审核
     form.status.projectPassed = null;
@@ -950,6 +962,11 @@ fundApplicationFormSchema.statics.publishByApplicationFormId = async (applicatio
     await formPost.save();
   }
   await form.save();
+  await form.updateOne({
+    $set: {
+      budgetMoney: form.budgetMoney
+    }
+  });
   await newHistory.save();
 
   await form.createReport('system', '提交申请表');
@@ -1490,6 +1507,65 @@ fundApplicationFormSchema.methods.transfer = async function(props) {
     throw(err);
   }
 }
+
+/*
+* 拓展回复
+* */
+fundApplicationFormSchema.methods.extendPosts = async function(accessForumsId) {
+  const PostModel = mongoose.model('posts');
+  let posts = [];
+  if(this.tid) {
+    posts = await PostModel.find({
+      mainForumsId: {$in: accessForumsId},
+      tid: this.tid,
+      type: 'post',
+      parentPostId: '',
+      disabled: false,
+      reviewed: true,
+      toDraft: {$ne: true}
+    }).sort({toc: -1}).limit(10);
+    posts = await PostModel.extendPosts(posts);
+    posts = await PostModel.filterPostsInfo(posts);
+    posts = posts.reverse();
+  }
+  return this.posts = posts;
+};
+
+/*
+* 拓展申请表信息
+* */
+fundApplicationFormSchema.methods.extendApplicationFormBaseInfo = async function() {
+  await this.extendFund();
+  await this.extendMembers();
+  await this.extendApplicant().then(u => u.extendLifePhotos());
+  await this.extendProject();
+  await this.extendProjectPost();
+  await this.extendThreads();
+  await this.extendForum();
+};
+fundApplicationFormSchema.methods.extendApplicationFormInfo = async function(uid, accessForumsId = []) {
+  const {fund} = this;
+  if(
+    this.disabled &&
+    !await fund.isFundRole(uid, 'admin')
+  ) throwErr(403, `申请表已被屏蔽`);
+  const {applicant, members} = this;
+  const membersId = members.map(m => m.uid);
+  // 未提交时仅自己和全部组员可见
+  if(
+    !await fund.isFundRole(uid, 'admin') &&
+    this.status.submitted !== true &&
+    uid !== applicant.uid &&
+    !membersId.includes(state.uid)
+  ) throwErr(403, `权限不足`);
+  await this.extendSupporters();
+  await this.extendObjectors();
+  await this.extendReportThreads();
+  await this.extendAuditComments();
+  await this.extendReports();
+  await this.extendPosts(accessForumsId);
+  await this.getStatus();
+};
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);
 module.exports = FundApplicationFormModel;

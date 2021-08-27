@@ -89,7 +89,7 @@
 
 <script>
   export default {
-    props: ['fund'],
+    props: ['fund', 'inimoney', 'refund'],
     data: () => ({
       donation: null,
       funds: [],
@@ -185,7 +185,12 @@
           })
           .then(() => {
             self.selectFund(self.fund || self.targets[0].type);
-            self.selectMoney(self.donation.defaultMoney[0]);
+            if(self.inimoney) {
+              self.inputMoney = true;
+              self.customMoney = self.inimoney;
+            } else {
+              self.selectMoney(self.donation.defaultMoney[0]);
+            }
             self.selectPaymentType(self.payment[0].type);
           })
           .catch(data => {
@@ -221,7 +226,8 @@
           totalMoney,
           donation,
           anonymous,
-          fundId
+          fundId,
+          refund
         } = this;
         let newWindow = null;
         return Promise.resolve()
@@ -245,6 +251,7 @@
               paymentType,
               fundId,
               anonymous,
+              refund
             });
           })
           .then(res => {

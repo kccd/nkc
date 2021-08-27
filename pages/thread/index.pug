@@ -6,9 +6,6 @@ block title
   title= `${thread.firstPost.t} - ${state.serverSettings.websiteName}`
   meta#replytarget(value=`${data.replyTarget}`)
 
-  //- 用于回复时间戳的显示
-  -let hidePostTimeCount = 0;
-
   -const disablePost = permissionsOr(["movePostsToRecycle", "movePostsToDraft"]) && data.isModerator;
   -const unblockPosts = permission("unblockPosts") && data.isModerator;
 
@@ -257,9 +254,36 @@ block content
                           div.thread-content.ThreadPostBody
                             include ./product/product.pug
                         else if data.thread.type === "fund"
-                          include ../fund/initData
-                          div.thread-content.ThreadPostBody#thread-content
-                            include ./fund/fund.pug
+                          //-
+                            include ../fund/initData
+                            div.thread-content.ThreadPostBody#thread-content
+                              include ./fund/fund.pug
+                          include ../fund/applicationForm/applicant
+                          include ../fund/applicationForm/project
+                          include ../fund/applicationForm/formStatus
+                          include ../fund/applicationForm/budgetMoney
+                          include ../fund/applicationForm/remittance
+                          include ../fund/applicationForm/report
+                          include ../fund/applicationForm/operationCenter
+                          include ../fund/applicationForm/formVote
+                          include ../fund/applicationForm/formWarning
+                          include ../fund/applicationForm/actualMoney
+                          include ../fund/applicationForm/formRelatedThreads
+                          include ../fund/applicationForm/formReportThreads
+                          -var form = data.applicationForm;
+                          -var applicationForm = form;
+                          +formWarning(form.auditComments.adminAudit)
+                          +applicant(form)
+                          +project(form)
+                          +formStatus(form)
+                          +budgetMoney(form)
+                          +actualMoney(form)
+                          +remittance(form)
+                          +formRelatedThreads(form)
+                          +formReportThreads(form)
+                          +report(form, data.userFundRoles)
+                          +formVote(form, data.userFundRoles)
+
                         +postEditTime(post.toc, post.tlm)
                         -const creditPost = data.thread.firstPost;
                         include ./postCredits
@@ -447,8 +471,9 @@ block content
 
         .col-xs-12.col-md-3.box-shadow-panel#rightDom
           if data.thread.type === "fund"
-            include ../fund/initData
-            include ../fund/options
+            -var form = data.applicationForm;
+            +applicantOperationCenter(form, data.user? data.user.uid:'')
+            +managerOperationCenter(form, data.userFundRoles)
           if data.targetUser
             .m-b-1
               //- .panel-header 作者
@@ -500,10 +525,10 @@ block content
 
 block scripts
   include ../publicModules/plyr/plyr.js.pug
-  script(src='/commonmark/dist/commonmark.js')
-  script(src='/plainEscaper.js')
-  script(src='/xbbcode-parser/xbbcode.js')
-  script(src='/xss/dist/xss.js')
+  +includeJS('/commonmark/dist/commonmark.js', true)
+  +includeJS('/plainEscaper.js', true)
+  +includeJS('/xbbcode-parser/xbbcode.js', true)
+  +includeJS('/xss/dist/xss.js', true)
 
   +includeJS("/interface_editor_reply.js")
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')

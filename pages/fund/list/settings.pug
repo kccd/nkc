@@ -1,26 +1,23 @@
-extends ../../bootstrap_base
-block title
+extends ../fundContainer
+block fundTitle
   title=`${data.fundSettings.fundName} - ${data.fund.name} - 设置`
   +includeCSS('/fund/list/settings.css')
-block content
+block fundContent
   #data.hidden=objToStr({fund: data.fund, roles: data.roles, users: data.users})
   .container-fluid.max-width
     .row#app(v-cloak)
-      .col-xs-12.col-md-2
-        .panel.panel-default
-          .panel-heading
-            span 基金列表
-          .panel-body
+      .col-xs-12.col-md-10.box-shadow-panel
+        .m-b-1
+          .panel-header 基金列表
+          div
             for f in data.funds
               a.m-r-1.m-b-1(
-                class=data.fund._id === f._id?'h4':''
+                class=data.fund._id === f._id ? 'h4' : ''
                 href=tools.getUrl('singleFundSettings', f._id)
-                )=f.name
-      .col-xs-12.col-md-10
-        .panel.panel-default
-          .panel-heading
-            span 基本信息
-          .panel-body
+              )=f.name
+        .m-b-1
+          .panel-header 基本信息
+          div
             .form.form-horizontal
               .form-group
                 label.control-label.col-sm-2 屏蔽
@@ -101,9 +98,11 @@ block content
               .form-group
                 label.control-label.col-sm-2 背景图
                 .col-sm-8.form-inline.fund-images
-                  .image-banner.m-b-1(@click='selectImage("banner")')
+                  button.m-b-1.btn.btn-default.btn-sm(@click='selectImage("banner")') 选择大图
+                  .image-banner.m-b-1
                     img(v-if="image.banner" :src='image.banner')
-                  .image-avatar(@click='selectImage("avatar")')
+                  button.m-b-1.btn.btn-default.btn-sm(@click='selectImage("avatar")') 选择小图
+                  .image-avatar.m-b-1
                     img(v-if="image.avatar" :src='image.avatar')
               .form-group
                 label.control-label.col-sm-2 基金简介
@@ -117,10 +116,9 @@ block content
                 label.control-label.col-sm-2 基金条款
                 .col-sm-8
                   textarea.form-control(v-model.trim='fund.description.terms' rows=8)
-        .panel.panel-default
-          .panel-heading
-            span 申请人资格
-          .panel-body
+        .m-b-1
+          .panel-header 申请人资格
+          div
             .form.form-horizontal
               .form-group
                 label.control-label.col-sm-2 用户等级
@@ -146,10 +144,9 @@ block content
                 label.control-label.col-sm-2 组员身份认证等级
                 .col-sm-8.form-inline
                   input.form-control(type='text' v-model.number='fund.member.authLevel')
-        .panel.panel-default
-          .panel-heading
-            span 项目设置
-          .panel-body
+        .m-b-1
+          .panel-header 项目设置
+          div
             .form.form-horizontal
               .form-group
                 label.control-label.col-sm-2 项目内容
@@ -221,10 +218,9 @@ block content
                 label.control-label.col-sm-2 项目内容提示
                 .col-sm-8
                   textarea.form-control(v-model='fund.reminder.inputProject' rows=8)
-        .panel.panel-default
-          .panel-heading
-            span 权限设置
-          .panel-body
+        .m-b-1
+          .panel-header 权限设置
+          div
             .form.form-horizontal
               mixin permissionSetting(key, name)
                 -var checkBoxKey = `fund.${key}.certs`;
@@ -251,13 +247,13 @@ block content
               +permissionSetting('financialStaff', '财务')
               +permissionSetting('expert', '专家')
               +permissionSetting('voter', '投票人员')
-        .m-b-1
+        span.m-b-1
           button.btn.btn-primary.btn-block(v-if='submitting && progress !== 100' disabled) 提交中...{{progress}}%
           button.btn.btn-primary.btn-block(v-else-if='submitting && progress === 100' disabled) 提交成功，正在处理...
           button.btn.btn-primary.btn-block(v-else @click='save') 保存
 
 
-block scripts
+block fundScripts
   include ../../publicModules/crop/crop_new
   include ../../publicModules/selectColor
   include ../../publicModules/selectUser/selectUser

@@ -43,12 +43,14 @@ const app = new Vue({
     factMoney() {
       let factTotal = 0;
       for(const b of this.form.budgetMoney) {
+        console.log(b.fact)
         factTotal += b.fact * 100;
       }
       return factTotal / 100;
     },
     returnMoney() {
       const {factMoney, totalMoney} = this;
+      console.log(factMoney, totalMoney)
       if(factMoney > totalMoney) {
         return (factMoney * 100 - totalMoney * 100) / 100;
       } else {
@@ -76,6 +78,15 @@ const app = new Vue({
       const postsId = this.selectedPosts.map(s => s.pid);
       if(postsId.includes(post.pid)) return;
       this.selectedPosts.push(post);
+    },
+    addItem() {
+      this.form.actualMoney.push({
+        purpose: '',
+        model: '',
+        money: 0,
+        count: 0,
+        unit: ''
+      });
     },
     refund(money) {
       var obj = {
