@@ -2,39 +2,39 @@ module.exports = {
   _id: 'share',
   c: {
     forum: {
-      status: false,
-      countLimit: 1,
-      timeLimit: 1,
+      status: true,
+      countLimit: 10,
+      timeLimit: 12,
     },
     post: {
-      status: false,
-      countLimit: 1,
-      timeLimit: 1,
+      status: true,
+      countLimit: 10,
+      timeLimit: 12,
     },
     user: {
-      status: false,
-      countLimit: 1,
-      timeLimit: 1,
+      status: true,
+      countLimit: 10,
+      timeLimit: 12,
     },
     column: {
-      status: false,
-      countLimit: 1,
-      timeLimit: 1
+      status: true,
+      countLimit: 10,
+      timeLimit: 12
     },
     activity: {
-      status: false,
-      countLimit: 1,
-      timeLimit: 1,
+      status: true,
+      countLimit: 10,
+      timeLimit: 12,
     },
     fund: {
-      status: false,
-      countLimit: 1,
-      timeLimit: 1,
+      status: true,
+      countLimit: 10,
+      timeLimit: 12,
     },
     fundForm: {
-      status: false,
-      countLimit: 1,
-      timeLimit: 1,
+      status: true,
+      countLimit: 10,
+      timeLimit: 12,
     }
   }
 };
