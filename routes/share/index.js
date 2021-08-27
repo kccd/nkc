@@ -37,12 +37,14 @@ shareRouter
     });
     await shareLogs.save();
 
-    let shareUrl;
+    const shareUrl = await share.getShareUrl();
+
+  /*  let shareUrl;
     if(share.shareUrl.includes("?")) {
       shareUrl = share.shareUrl + '&token=' + token;
     } else {
       shareUrl = share.shareUrl + '?token=' + token;
-    }
+    }*/
     await share.updateOne({$inc: {hits: 1}});
     let shareAccessLog = await db.SharesAccessLogModel.findOne({token, ip: ctx.address});
     if(shareAccessLog) {
@@ -96,7 +98,7 @@ shareRouter
   })
   .get('/', async (ctx, next) => {
     const {query, db, data, nkcModules} = ctx;
-    const {type, id} = query;
+    let {type, id} = query;
     const {user} = data;
     const uid = user? user.uid: 'visitor';
     const lock = await nkcModules.redLock.lock(`getShareToken:${uid}`, 6000);
@@ -126,6 +128,8 @@ shareRouter
       if(result.cover) {
         result.cover = nkcModules.tools.getUrl('postCover', result.cover);
       }
+      type = 'post';
+      id = thread.oc;
     } else if(type === 'forum') {
       const forum = await db.ForumModel.findOnly({fid: id});
       await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
@@ -136,6 +140,16 @@ shareRouter
         result.cover = nkcModules.tools.getUrl('forumLogo', result.cover);
       }
     }
+    const shareSettingsInfo = await db.SettingModel.getSettings('share');
+    let setting = shareSettingsInfo[type];
+    if(type === 'post') {
+      setting = await db.ShareModel.getShareSettingsByPostId(id);
+    }
+
+    if(!setting.status) {
+      ctx.throw(403, `暂不允许分享`);
+    }
+
     const referer = ctx.get('referer');
     // 加载奖励设置，判断当天分享次数是否达到上限
     const redEnvelopeSettings = await db.SettingModel.getSettings('redEnvelope');

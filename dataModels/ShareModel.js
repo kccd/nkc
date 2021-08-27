@@ -11,18 +11,19 @@ const shareSchema = new Schema({
     type: String,
     default: null
   },
+  // 创建时间
   toc: {
     type: Date,
     default: Date.now,
     index: 1
   },
-  uid: {
-    type: String,
-    required: true
-  },
   hits: {
     type: Number,
     default: 0
+  },
+  uid: {
+    type: String,
+    required: true
   },
   // token的状态
   // invalid 失效
@@ -82,29 +83,128 @@ const throwErr = (status, err) => {
   throw e;
 };
 
+/*
+* 访问具体页面时判断分享 token 是否有效，如果有效则访问次数 +1
+* @param {String} token
+* @param {String} 分享类型对应的 ID，若 shareType = post, ID 为 postId
+* @return {Boolean} 此 token 是否有权绕过权限
+* */
+shareSchema.statics.hasPermission = async (token, id) => {
+  const ShareModel = mongoose.model('share');
+  try{
+    const share = await ShareModel.ensureEffective(token, id);
+    await share.hit();
+    return true;
+  } catch(err) {
+    return false;
+  }
+};
+
+/*
+* 增加访问次数
+* */
+shareSchema.methods.hit = async function() {
+  this.hits ++;
+  await this.updateOne({
+    $set: {
+      hits: this.hits
+    }
+  });
+  return this.hits;
+};
+
+
+shareSchema.statics.getShareSettingsByPostId = async (pid) => {
+  // 如果是分享 post 则需要判断 post 所在专业上的分享设置
+  // 如果 post 所在专业一个或多个开启了分享设置则忽略全局 post 分享设置
+  const PostModel = mongoose.model('posts');
+  const SettingModel = mongoose.model('settings');
+  const ForumModel = mongoose.model('forums');
+  let {
+    status,
+    countLimit,
+    timeLimit
+  } = (await SettingModel.getSettings('share')).post;
+  const post = await PostModel.findOnly({pid}, {mainForumsId: 1});
+  const {mainForumsId} = post;
+  const forums = await ForumModel.find({
+    fid: {$in: mainForumsId}
+  }, {
+    shareLimitTime: 1,
+    shareLimitCount: 1,
+    shareLimitStatus: 1
+  });
+  let shareLimitStatus = true;
+  let shareLimitCount;
+  let shareLimitTime;
+  for(const forum of forums) {
+    let forumLimitStatus;
+    let forumCountLimit;
+    let forumTimeLimit;
+    if(forum.shareLimitStatus === 'inherit') {
+      forumLimitStatus = status;
+      forumCountLimit = countLimit;
+      forumTimeLimit = timeLimit;
+    } else {
+      forumLimitStatus = forum.shareLimitStatus === 'on';
+      forumCountLimit = forum.shareLimitCount;
+      forumTimeLimit = forum.shareLimitTime;
+    }
+
+    if(!forumLimitStatus) {
+      shareLimitStatus = false;
+    }
+
+    if(
+      shareLimitCount === undefined ||
+      shareLimitCount > forumCountLimit
+    ) {
+      shareLimitCount = forumCountLimit;
+    }
+    if(
+      shareLimitTime === undefined ||
+      shareLimitTime > forumTimeLimit
+    ) {
+      shareLimitTime = forumTimeLimit;
+    }
+  }
+  if(
+    shareLimitTime !== undefined &&
+    shareLimitCount !== undefined
+  ) {
+    countLimit = shareLimitCount;
+    timeLimit = shareLimitTime;
+    status = shareLimitStatus;
+  }
+  return {
+    status,
+    countLimit,
+    timeLimit
+  };
+}
+
 // 根据share的类型判断是否有效
 shareSchema.statics.ensureEffective = async function(token, id) {
   const ForumModel = mongoose.model('forums');
   const PostModel = mongoose.model('posts');
-  const UserModel = mongoose.model('users');
-  const ActivityModel = mongoose.model('activity');
-  const ShareLimitModel = mongoose.model('shareLimit');
   const ShareModel = mongoose.model('share');
-  const FundModel = mongoose.model('funds');
-  const ThreadModel = mongoose.model('threads');
-  const FundApplicationForumModel = mongoose.model('fundApplicationForms');
+  const SettingModel = mongoose.model('settings');
+  if(!token) {
+    throwErr(403, 'token 无效');
+  }
   const share = await ShareModel.findOne({token});
   if(!share) { // 通过该token取数据库查不到数据
-    throwErr(403, 'token无效');
+    throwErr(403, 'token 无效');
   }
   const {
     tokenType,
     tokenLife,
     toc,
-    shareUrl
+    shareUrl,
+    hits
   } = share;
   let {targetId} = share;
-  if(tokenLife === 'invalid') throwErr(403, 'token无效');
+  if(tokenLife === 'invalid') throwErr(403, 'token 无效');
   // 历史上存在部分share未记录相应ID值，该部分数据的ID从shareUrl上获得
   if(!targetId) {
     let reg;
@@ -114,65 +214,50 @@ shareSchema.statics.ensureEffective = async function(token, id) {
       case 'post': reg = RegExp(/\/p\/([0-9a-zA-Z]*)/ig);break;
       case 'activity': reg = RegExp(/\/activity\/single\/([0-9a-zA-Z]*)/ig);break;
       case 'user': reg = RegExp(/\/u\/([0-9a-zA-Z]*)/ig);break;
-      case 'fundlist': reg = RegExp(/\/fund\/list\/([0-9a-zA-Z]*)/ig);break;
-      case 'fundapply': reg = RegExp(/\/fund\/a\/([0-9a-zA-Z]*)/ig);break;
+      case 'fund': reg = RegExp(/\/fund\/list\/([0-9a-zA-Z]*)/ig);break;
+      case 'fundForm': reg = RegExp(/\/fund\/a\/([0-9a-zA-Z]*)/ig);break;
+      default: throwErr(500, `分享类型错误`);
     }
     const arr = reg.exec(shareUrl);
     if(!arr || arr[1]) { // 从shareUrl中无法提取出相应的ID
       await share.updateOne({tokenLife: 'invalid'});
-      throwErr(500,'url数据错误');
+      throwErr(500,'分享数据 ID 缺失');
     }
     targetId = arr[1];
   }
   if(id !== undefined && targetId !== id) { // 记录的ID与传入的ID不匹配
     await share.updateOne({tokenLife: 'invalid'});
-    throwErr(403, 'token无效');
+    throwErr(403, '分享 ID 不匹配');
   }
-  let defaultLimit = await ShareLimitModel.findOne({type: 'all'});
-  if(!defaultLimit) {
-    defaultLimit = ShareLimitModel({});
-    await defaultLimit.save();
+  const shareSettings = await SettingModel.getSettings('share');
+
+  let settings = shareSettings[tokenType];
+
+  if(tokenType === 'post') {
+    // 如果是分享 post 则需要判断 post 所在专业上的分享设置
+    // 如果 post 所在专业一个或多个开启了分享设置则忽略全局 post 分享设置
+    settings = await ShareModel.getShareSettingsByPostId(targetId);
   }
-  let shareLimitTime = defaultLimit.shareLimitTime;
-  if(tokenType === 'forum') {
-    const forum = await ForumModel.findOnly({fid: targetId});
-    shareLimitTime = forum.shareLimitTime;
-  } else if(tokenType === 'thread') {
-    const thread = await ThreadModel.findOnly({tid: targetId});
-    const forums = await ForumModel.find({fid: {$in: thread.mainForumsId}});
-    let shareLimitTime = 0;
-    for(const forum of forums) {
-      if(shareLimitTime > forum.shareLimitTime) shareLimitTime = forum.shareLimitTime;
-    }
-  } else if(tokenType === 'post') {
-    const post = await PostModel.findOnly({tid: targetId});
-    const forums = await ForumModel.find({fid: {$in: post.mainForumsId}});
-    let shareLimitTime = 0;
-    for(const forum of forums) {
-      if(shareLimitTime > forum.shareLimitTime) shareLimitTime = forum.shareLimitTime;
-    }
-  } else if(tokenType === 'user') {
-    await UserModel.findOnly({uid: targetId});
-    const shareLimit = await ShareLimitModel.findOne({shareType: 'user'});
-    if(shareLimit) shareLimitTime = shareLimit.shareLimitTime;
-  } else if(tokenType === 'activity') {
-    await ActivityModel.findOnly({acid: targetId});
-    const shareLimit = await ShareLimitModel.findOne({shareType: 'activity'});
-    if(shareLimit) shareLimitTime = shareLimit.shareLimitTime;
-  } else if(tokenType === 'fundlist') {
-    await FundModel.findOnly({_id: targetId});
-    const shareLimit = await ShareLimitModel.findOne({shareType: 'fundlist'});
-    if(shareLimit) shareLimitTime = shareLimit.shareLimitTime;
-  } else if(tokenType === 'fundapply') {
-    await FundApplicationForumModel.findOnly({_id: targetId});
-    const shareLimit = await ShareLimitModel.findOne({shareType: 'fundapply'});
-    if(shareLimit) shareLimitTime = shareLimit.shareLimitTime;
-  }
+
+  const {status, countLimit, timeLimit} = settings;
+
+  if(!status) throwErr(403, `相关类型分享已关闭`);
+
+  // 判断时间
   const difference = Date.now() - new Date(toc).getTime();
-  if(difference > 1000*60*60*shareLimitTime) { // token过期
+  if(difference > 1000 * 60 * 60 * timeLimit) { // token过期
     await share.updateOne({tokenLife: 'invalid'});
-    throwErr('token无效');
+    throwErr(403, 'token 过期');
   }
+
+  // 判断访问次数
+  if(hits >= countLimit) {
+    await share.updateOne({tokenLife: 'invalid'});
+    throwErr(403, `token 访问次数超出限制`);
+  }
+
+  return share;
+
 };
 /*
 * 计算分享奖励，生成科创币账单，设置分享奖励状态
@@ -295,5 +380,31 @@ shareSchema.statics.getNewToken = async () => {
   } while(1);
   return token;
 };
+
+shareSchema.methods.getShareUrl = async function() {
+  const {targetId, tokenType, token} = this;
+  const PostModel = mongoose.model('posts');
+  const t = `?token=${token}`;
+  if(tokenType === 'post') {
+    const post = await PostModel.findOne({pid: targetId}, {type: 1, tid: 1, pid: 1});
+    if(post.type === 'thread') {
+      return `/t/${post.tid}${t}`;
+    } else {
+      return `/p/${post.pid}${t}`;
+    }
+  } else if(tokenType === 'forum') {
+    return `/f/${targetId}${t}`;
+  } else if(tokenType === 'user') {
+    return `/u/${targetId}${t}`;
+  } else if(tokenType === 'column') {
+    return `/m/${targetId}${t}`;
+  } else if(tokenType === 'fund') {
+    return `/fund/list/${targetId}${t}`;
+  } else if(tokenType === 'fundForm') {
+    return `/fund/a/${targetId}${t}`;
+  } else {
+    return `/activity/single/${targetId}${t}`;
+  }
+}
 
 module.exports = mongoose.model('share', shareSchema, 'share');

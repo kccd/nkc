@@ -315,8 +315,6 @@
   "modifyMessageSettings": "聊天信息设置修改",
   "visitEMessageSettings": "访问后台聊天设置页面",
   "modifyEMessageSettings": "后台修改聊天设置",
-  "visitEShareSettings": "访问后台分享设置页面",
-  "modifyEShareSettings": "后台修改分享设置",
   "modifyMessageStatus": "标记信息为已读",
   "userWithdrawnMessage": "用户撤回聊天信息",
   "visitEPostSettings": "访问后台发表限制设置页面",
@@ -795,5 +793,6 @@
   "viewUserCode": "验证用户动态码",
   "experimentalUserCodeLog": "后台管理 - 用户动态码验证记录",
   "modifyQuestionAuthStatus": "修改题库试题审核状态",
-  "experimentalIPSettings": "后台管理 - IP 黑名单"
+  "experimentalIPSettings": "后台管理 - IP 黑名单",
+  "experimentalShareSettings": "后台管理 - 分享设置"
 }

@@ -75,43 +75,9 @@ router
 	    user
     };
     await db.SettingModel.restrictAccess(post.toc, data.userRoles.map(role => role._id), data.userGrade._id);
-    // 权限判断
-    if(!token){
-      // 权限判断
+    if(!await db.ShareModel.hasPermission(token, pid)) {
       await post.ensurePermission(options);
-		}else{
-			let share = await db.ShareModel.findOne({"token":token});
-			if(!share) ctx.throw(403, "无效的token");
-      // if(share.tokenLife === "invalid") ctx.throw(403, "链接已失效");
-      if(share.tokenLife === "invalid") {
-        await post.ensurePermission(options);
-      }
-      // 获取分享限制时间
-      let allShareLimit = await db.ShareLimitModel.findOne({"shareType":"all"});
-			if(!allShareLimit){
-				allShareLimit = new db.ShareLimitModel({});
-				await allShareLimit.save();
-      }
-
-      let shareLimitTime;
-      for(const f of forums) {
-        const timeLimit = Number(f.shareLimitTime);
-        if(shareLimitTime === undefined || shareLimitTime > timeLimit) {
-          shareLimitTime = timeLimit;
-        }
-      }
-
-      if(shareLimitTime === undefined){
-        shareLimitTime = allShareLimit.shareLimitTime;
-      }
-			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
-			let nowTimeStamp = parseInt(new Date().getTime());
-			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
-				await db.ShareModel.updateOne({"token": token}, {$set: {tokenLife: "invalid"}});
-        await post.ensurePermission(options);
-			}
-			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
-		}
+    }
 	  // await post.ensurePermissionNew(options);
 		// 拓展其他信息
     // await post.extendUser();
