@@ -239,6 +239,8 @@ shareRouter
     if(type === "thread") {
       const thread = await db.ThreadModel.findOnly({tid: targetId});
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
+      type = 'post';
+      targetId = thread.oc;
     } else if(type === "post") {
       const post = await db.PostModel.findOnly({pid: targetId});
       const thread = await post.extendThread();
@@ -251,6 +253,17 @@ shareRouter
       await lock.unlock();
       return await next();
     }
+
+    const shareSettingsInfo = await db.SettingModel.getSettings('share');
+    let setting = shareSettingsInfo[type];
+    if(type === 'post') {
+      setting = await db.ShareModel.getShareSettingsByPostId(targetId);
+    }
+
+    if(!setting.status) {
+      ctx.throw(403, `暂不允许分享`);
+    }
+
     // 加载奖励设置，判断当天分享次数是否达到上限
     const redEnvelopeSettings = await db.SettingModel.getSettings("redEnvelope");
     const shareSettings = redEnvelopeSettings.share;
