@@ -140,13 +140,25 @@ block content
           .panel-body
             .form.form-horizontal
               .form-group
-                label.col-sm-3.control-label 分享链接访问次数限制
+                label.col-sm-3.control-label 分享文章、回复或评论
                 .col-sm-7
-                  input.form-control(type='text' v-model.number='forum.shareLimitCount')
-              .form-group
-                label.col-sm-3.control-label 分享链接有效时间(小时)
-                .col-sm-7
-                  input.form-control(type='text' v-model.number='forum.shareLimitTime')
+                  h5.m-b-0 状态
+                  .radio
+                    label.m-r-1
+                      input(type='radio' value='off' v-model='forum.shareLimitStatus')
+                      span 关闭
+                    label.m-r-1
+                      input(type='radio' value='on' v-model='forum.shareLimitStatus')
+                      span 开启
+                    label
+                      input(type='radio' value='inherit' v-model='forum.shareLimitStatus')
+                      span 继承于后台设置
+                  span.text-danger 当状态为关闭时，不允许分享专业下的文章、回复或评论
+                  .form-inline
+                    h5 访问次数限制
+                    input.form-control(type='text' v-model.number='forum.shareLimitCount')
+                    h5 访问时间限制
+                    input.form-control(type='text' v-model.number='forum.shareLimitTime')
               .form-group
                 label.col-sm-3.control-label 关注类型
                 .col-sm-7

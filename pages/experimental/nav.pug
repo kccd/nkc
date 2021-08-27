@@ -193,6 +193,9 @@
           if permission("experimentalVerificationSettings")
             li
               a(href=`/e/settings/verification`) 图形验证码
+          if permission("experimentalShareSettings")
+            li
+              a(href='/e/settings/share') 分享
           <li role="separator" class="divider"></li>
           li
             a(href='/e/settings/home/notice') 网站首页
@@ -210,8 +213,6 @@
             a(href='/e/settings/exam') 考试设置
           li
             a(href='/e/settings/message') 聊天设置
-          //li
-            a(href='/e/settings/share') 分享设置
           li
             a(href='/e/settings/red-envelope') 奖励设置
           li

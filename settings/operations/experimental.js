@@ -247,8 +247,8 @@ module.exports = {
 			PUT: 'modifyEMessageSettings'
 		},
 		share: {
-			GET: 'visitEShareSettings',
-			PUT: 'modifyEShareSettings'
+			GET: 'experimentalShareSettings',
+			PUT: 'experimentalShareSettings'
 		},
 		post: {
 			GET: 'visitEPostSettings',

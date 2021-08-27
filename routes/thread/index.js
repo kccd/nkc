@@ -179,38 +179,8 @@ threadRouter
 		// 如果是分享出去的连接，含有token，则允许直接访问
     // 【待改】判断用户是否是通过分享链接阅读文章，如果是则越过权限
     await db.SettingModel.restrictAccess(thread.toc, data.userRoles.map(role => role._id), data.userGrade._id);
-		if(!token){
+    if(!await db.ShareModel.hasPermission(token, thread.oc)) {
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-		}else{
-			let share = await db.ShareModel.findOne({"token":token});
-			if(!share) ctx.throw(403, "无效的token");
-			// if(share.tokenLife === "invalid") ctx.throw(403, "链接已失效");
-			if(share.tokenLife === "invalid"){
-				await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-			}
-			// 获取分享限制时间
-			let allShareLimit = await db.ShareLimitModel.findOne({"shareType":"all"});
-			if(!allShareLimit){
-				allShareLimit = new db.ShareLimitModel({});
-				await allShareLimit.save();
-			}
-			let shareLimitTime;
-      for(const forum of forums) {
-        const timeLimit = Number(forum.shareLimitTime);
-        if(shareLimitTime === undefined || shareLimitTime > timeLimit) {
-          shareLimitTime = timeLimit;
-        }
-      }
-			if(shareLimitTime === undefined) {
-        shareLimitTime = allShareLimit.shareLimitTime;
-      }
-			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
-			let nowTimeStamp = parseInt(new Date().getTime());
-			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
-				await db.ShareModel.updateOne({"token": token}, {$set: {tokenLife: "invalid"}});
-				await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-			}
-			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
     }
     // 获取当前用户有权查看文章的专业ID
     const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);

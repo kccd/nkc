@@ -247,14 +247,20 @@ const forumSchema = new Schema({
     default: 'tlm', // tlm: 复序, toc: 贴序
   },
 
-  shareLimitTime: {
-	  type: String,
-    default: '720' // 小时
-  },
-
-  shareLimitCount: {
+  // 是否允许分享专业下的文章，
+  shareLimitStatus: {
     type: String,
-    default: '0' // 次数
+    default: 'inherit', // inherit: 继承后台, off: 关闭，on: 开启
+  },
+  // 分享链接的时间限制
+  shareLimitTime: {
+	  type: Number,
+    default: 1 // 小时
+  },
+  // 分享链接的访问次数限制
+  shareLimitCount: {
+    type: Number,
+    default: 1 // 次数
   },
   fid: {
     type: String,
