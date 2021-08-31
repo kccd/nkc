@@ -110,7 +110,7 @@ block eContent
             .row
               .col-xs-12.text-center
                 h5 手持身份证视频
-                  span(v-if="authenticate.video.status !== 'unsubmit'") (代码：{{authenticate.video.code}})
+                p(v-if="authenticate.video.status !== 'unsubmit'") 提示语：{{verifyDescription}}
                 .idcard-video
                   video(:src="video" controls v-if="authenticate.video.status !== 'unsubmit'")
               .col-xs-12.col-md-12.text-center(v-if="authenticate.video.status === 'in_review'")

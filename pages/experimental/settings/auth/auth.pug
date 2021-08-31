@@ -7,11 +7,18 @@ block eContent
     #data.hidden=objToStr({certs: data.certs, authSettings: data.authSettings})
     #app.row(v-cloak)
       .col-xs-12.col-md-8
-        h5 提交身份认证申请时，给拥有相应证书的用户发送通知。
+        h4 身份认证审核员
+        span 提交身份认证申请时，给拥有相应证书的用户发送通知。
         .form-horizontal
           .form-group
-            label.col-sm-2.control-label 指定证书
-            .col-sm-10
+            label.col-sm-3.control-label 身份认证 3 提示语：
+            .col-sm-9
+              h5.text-danger 其中 {code} 为 6 位随机数
+              textarea.form-control(rows=4 v-model='authSettings.auth3Content')
+          .form-group
+            label.col-sm-3.control-label 身份认证审核员
+            .col-sm-9
+              h5 指定证书
               .cert-panel
                 span(title="点击移除该证书" :style="'background-color: '+cert.color + ';'" v-for="cert in selectedCerts" @click="removeCert(cert._id)") {{cert.displayName}}
                   .fa.fa-remove
@@ -19,14 +26,12 @@ block eContent
                   select.form-control(v-model="selectCertId")
                     option(v-for="cert in certs" :value="cert._id") {{cert.displayName}}
                   button.btn.btn-default.btn-sm(@click="addCert") 添加
-          .form-group
-            label.col-sm-2.control-label 指定UID
-            .col-sm-10
+              h5 指定UID
               h5.text-danger 英文逗号“ , ”分隔
               textarea.form-control(v-model="auditorIdStr")
           .form-group
-            label.col-sm-2.control-label
-            .col-sm-10
+            label.col-sm-3.control-label
+            .col-sm-9
               h5.text-danger(v-if="error") {{error}}
               h5.text-success(v-if="info") {{info}}
               button.btn.btn-block.btn-primary(@click="save") 保存

@@ -13,6 +13,10 @@ const vm = new Vue({
 		videoCode: Math.floor(Math.random()*(9999-1000))+1000
 	},
 	computed: {
+	  verifyDescription() {
+	    let {videoCode, auth3Content = ''} = this;
+	    return auth3Content.replace(/{code}/ig, videoCode);
+    },
 		IDCardA() {
 			if(this.IDCardAInputFile) {
 				return URL.createObjectURL(this.IDCardAInputFile);

@@ -22,6 +22,8 @@ verifyRouter
         $set: { "authenticate.video.status": "unsubmit" }
       });
     }
+    const authSettings = await db.SettingModel.getSettings('auth');
+    data.auth3Content = authSettings.auth3Content;
     data.authenticate = userPersonal.authenticate;
     ctx.template = "/user/settings/verify/verify.pug";
     await next();

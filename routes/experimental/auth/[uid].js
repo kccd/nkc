@@ -17,6 +17,8 @@ authRouter
 		data.nationCode = userPersonal.nationCode;
 		data.mobile = userPersonal.mobile;
 		data.authLevel = await userPersonal.getAuthLevel();
+    const {auth3Content} = await db.SettingModel.getSettings('auth');
+    data.auth3Content = auth3Content;
 		ctx.template = '/experimental/auth/[uid]/index.pug';
 		await next();
 	})

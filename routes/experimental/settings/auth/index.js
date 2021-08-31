@@ -10,10 +10,16 @@ router
     await next();
   })
   .put("/", async (ctx, next) => {
-    const {db, body} = ctx;
-    const {auditorId, auditorCerts} = body.authSettings;
+    const {db, body, nkcModules} = ctx;
+    const {checkString} = nkcModules.checkData;
+    const {auditorId, auditorCerts, auth3Content} = body.authSettings;
     const uidArr = [];
     const certsId = [];
+    checkString(auth3Content, {
+      name: '身份认证 3 提示语',
+      minLength: 1,
+      maxLength: 5000
+    });
     for(const uid of auditorId) {
       const u = await db.UserModel.findOne({uid}, {_id: 1});
       if(u) uidArr.push(uid);
@@ -26,6 +32,7 @@ router
       _id: "auth"
     }, {
       $set: {
+        "c.auth3Content": auth3Content,
         "c.auditorId": uidArr,
         "c.auditorCerts": certsId
       }

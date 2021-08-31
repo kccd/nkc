@@ -53,7 +53,6 @@ block content
                 button.btn.btn-primary(v-if="authenticate.card.status === 'unsubmit'" @click="submitVerify2()") 提交审核
                 button.btn.btn-primary(v-if="authenticate.card.status === 'in_review'" disabled) 审核中
                 p.verify--passed(v-if="authenticate.card.status === 'passed'") 已认证
-                  span.fa.fa-check
                 div(v-if="authenticate.card.status === 'fail'")
                   p.verify--fail 认证失败
                   p
@@ -65,14 +64,14 @@ block content
             span 身份认证3
           .panel-body
             p 认证说明：
-              span.text-info 拍摄手持身份证视频并在视频中清晰地念出给定代码完成认证
+              //span.text-info 拍摄手持身份证视频并在视频中清晰地念出给定代码完成认证
+              span.text-info {{verifyDescription}}
             p 注意：
               span.text-danger 请使用手机拍摄，保留周围背景，且保证身份证上的内容清晰可见，大小不超过300M，并且只能为.mp4格式。
             h5.text-danger(v-if="authenticate.video.status === 'passed' && authenticate.video.isExpired") 已过期
             h5(v-if="authenticate.video.status === 'passed' && !authenticate.video.isExpired") 过期时间：{{verify3ExpiryDate}}
             .row
               .col-xs-12.col-md-6.text-center
-                h5(v-if="authenticate.video.status === 'unsubmit'") 代码：{{videoCode}}
                 .center-block.idcard-video
                   video(:src="video" controls v-if="videoInputFile || (authenticate.video.attachments.length && ['in_review', 'passed', 'fail'].includes(authenticate.video.status))")
                 br
@@ -81,7 +80,6 @@ block content
                   button.btn.btn-primary#pickVerify3Video(@click="$refs.videoInput.click()") 选择视频
                   button.btn.btn-primary#submiteAuth(@click="submiteVerify3()") 提交审核
                 p.verify--passed(v-if="authenticate.video.status === 'passed'") 已认证
-                  span.fa.fa-check
                 div(v-if="authenticate.video.status === 'fail'")
                   input.hidden(type='file' accept="video/mp4" ref="videoInput" @change="videoInputFile = $event.target.files[0]")
                   p.verify--fail 认证失败
