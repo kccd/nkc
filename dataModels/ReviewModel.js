@@ -274,11 +274,10 @@ schema.statics.autoPushToReview = async function(post) {
         useKeywordGroups = forumKeywordSettings.rule.reply.useGroups;
       }
       const {wordGroup} = reviewSettings.keyword;
-      const wordGroupsId = wordGroup.map(wg => wg.id);
-      useKeywordGroups = useKeywordGroups.filter(g => wordGroupsId.includes(g.id));
+      useKeywordGroups = wordGroup.filter(g => useKeywordGroups.includes(g.id));
       const matchedKeywords = await ReviewModel.matchKeywords(post.t + post.c, useKeywordGroups);
       if(matchedKeywords.length > 0) {
-        await ReviewModel.newReview("includesKeyword", post, user, `内容中包含敏感词 ${MatchedKeyword.result.join("、")}`);
+        await ReviewModel.newReview("includesKeyword", post, user, `内容中包含敏感词 ${matchedKeywords.join("、")}`);
         return true;
       }
       /*if(await ReviewModel.includesKeyword({   content: post.t + post.c,   useGroups: useKeywordGroups })) {
