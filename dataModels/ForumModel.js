@@ -2062,7 +2062,7 @@ forumSchema.statics.checkGlobalPostPermission = async (uid, type) => {
     postTimeLimit = postToForumTimeLimit;
   }
   if(todayCount >= postCountLimit) throwErr(400, `你当前的账号等级每天最多只能发表${postCountLimit}篇${settingsType.name}，请明天再试。`);
-  const latestPost = await PostModel.findOne({uid: user.uid, toc: {$gte: (Date.now() - postTimeLimit * 60 * 1000)}}, {pid: 1});
+  const latestPost = await PostModel.findOne({type, uid: user.uid, toc: {$gte: (Date.now() - postTimeLimit * 60 * 1000)}}, {pid: 1});
   if(latestPost) throwErr(400, `你当前的账号等级限定发表${settingsType.name}间隔时间不能小于${postTimeLimit}分钟，请稍后再试。`);
 };
 
