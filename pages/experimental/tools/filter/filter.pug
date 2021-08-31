@@ -69,6 +69,7 @@ block eContent
             label.col-sm-2
             .col-sm-6
               button.btn.btn-default(disabled v-if='submitting') 提交中...
+              button.btn.btn-default(disabled v-else-if='timeNumber') 重新提交({{timeNumber}})
               button.btn.btn-default(@click='submit' v-else) 提交
           .form-group
             label.col-sm-2

@@ -16,8 +16,17 @@ const app = new Vue({
     },
     markAsUnReviewed: false,
     submitting: false,
+    timeNumber: 0,
   },
   methods: {
+    timeout(newTime) {
+      if(newTime) this.timeNumber = newTime;
+      const self = this;
+      if(this.timeNumber > 0) {
+        this.timeNumber --;
+        setTimeout(self.timeout, 1000);
+      }
+    },
     submit() {
       const {
         groupsId,
@@ -48,6 +57,7 @@ const app = new Vue({
         .then(() => {
           self.submitting = false;
           sweetSuccess('提交成功，后台处理中');
+          self.timeout(10);
         })
         .catch(err => {
           self.submitting = false;
