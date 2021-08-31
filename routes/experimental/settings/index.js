@@ -36,6 +36,7 @@ const safeRouter = require('./safe');
 const cacheRouter = require("./cache");
 const protocolRouter = require('./protocol');
 const toppingRouter = require("./topping");
+const toolsRouter = require('./tools');
 const transferRouter = require("./transfer");
 const libraryRouter = require("./library");
 const stickerRouter = require("./sticker");
@@ -100,5 +101,6 @@ settingRouter
 	.use('/userScores', userScoresRouter.routes(), userScoresRouter.allowedMethods())
   .use('/visit', visitRouter.routes(), visitRouter.allowedMethods())
   .use('/ip', ipRouter.routes(), ipRouter.allowedMethods())
+  .use('/tools', toolsRouter.routes(), toolsRouter.allowedMethods())
 	.use('/sensitiveWords', sensitiveWordsRouter.routes(), sensitiveWordsRouter.allowedMethods());
 module.exports = settingRouter;

@@ -20,6 +20,7 @@ const smscodeRouter = require("./smscode");
 const emailcodeRouter = require("./emailcode");
 const blacklistRouter = require("./blacklist");
 const resourceRouter = require('./resource');
+const filterRouter = require('./filter');
 const userCodeRouter = require('./userCode');
 logRouter
   .get('/', async (ctx, next) => {
@@ -47,4 +48,5 @@ logRouter
   .use("/blacklist", blacklistRouter.routes(), blacklistRouter.allowedMethods())
   .use("/userCode", userCodeRouter.routes(), userCodeRouter.allowedMethods())
   .use('/resource', resourceRouter.routes(), resourceRouter.allowedMethods())
+  .use('/filter', filterRouter.routes(), filterRouter.allowedMethods())
 module.exports = logRouter;

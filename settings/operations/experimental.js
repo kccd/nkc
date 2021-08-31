@@ -5,6 +5,9 @@ module.exports = {
     POST: "experimentalLogin"
   },
 	settings: {
+    tools: {
+      GET: "visitToolsManager"
+    },
 	  ip: {
 	    GET: 'experimentalIPSettings',
       POST: 'experimentalIPSettings',
@@ -328,6 +331,10 @@ module.exports = {
 	},
 	log: {
     GET: 'visitPublicLogs',
+    filter: {
+      GET: 'experimentalFilterLogs',
+      POST: 'experimentalFilterLogs'
+    },
 		resource: {
     	GET: 'experimentalResourceLogs'
 		},
@@ -404,9 +411,6 @@ module.exports = {
   console: {
 		GET: 'visitExperimentalConsole'
 	},
-	tools: {
-		GET: "visitToolsManager"
-	},
 	auth: {
 		GET: 'visitAuthList',
 		PARAMETER: {
@@ -424,5 +428,11 @@ module.exports = {
 				}
 			}
 		}
-	}
+	},
+  tools: {
+	  filter: {
+	    GET: 'experimentalToolsFilter',
+      POST: 'experimentalToolsFilter'
+    }
+  }
 };

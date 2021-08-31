@@ -378,6 +378,8 @@ threadRouter
       if(voteUpPostSettings.status === 'show') {
         let voteUpPostsId = await db.PostModel.find({
           tid,
+          type: 'post',
+          parentPostId: '',
           voteUp: {
             $gte: voteUpCount
           }

@@ -15,6 +15,7 @@ new Vue({
 	el: "#app",
 	data: {
 		authenticate: _data.authenticate,
+    auth3Content: _data.auth3Content,
 		verify2form: {
 			status: "passed",
 			expiredDate: "",
@@ -53,7 +54,12 @@ new Vue({
 		},
 	},
 	computed: {
-		IDCardA() {
+	  verifyDescription() {
+	    const {auth3Content = '', authenticate} = this;
+	    const {code} = authenticate.video;
+      return auth3Content.replace(/{code}/ig, code);
+    },
+    IDCardA() {
 			const vid = this.authenticate.card.attachments[0];
 			return vid && ["in_review", "passed", "fail"].includes(this.authenticate.card.status)
 				? `/e/auth/${UID}/a/${vid}`

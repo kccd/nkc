@@ -1,0 +1,80 @@
+extends ../../experimental
+block eTitle
+  title 敏感词过滤
+  style.
+    .number-input{
+      width: 5rem!important;
+    }
+block eContent
+  #data.hidden=objToStr({groups: data.groups})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        h4 敏感词过滤
+        .form.form-horizontal#app(v-cloak)
+          .form-group
+            label.col-sm-2.control-label 敏感词组
+            .col-sm-6
+              .checkbox(v-for='g in groups')
+                label
+                  input(type='checkbox' :value='g.id' v-model='groupsId')
+                  span {{g.name}}
+              .checkbox
+                label
+                  input(type='checkbox' :value='true' v-model='inputKeywords')
+                  span 自定义
+              div(v-if='inputKeywords')
+                .m-t-1
+                  textarea.form-control(rows=5 placeholder='请输入关键词，以逗号分隔' v-model='content')
+                .m-t-1
+                  span 命中至少
+                  input.number-input(type='text' v-model.number='condition.count')
+                  span 个敏感词
+                  select(v-model='condition.logic')
+                    option(value='or') 或
+                    option(value='and') 且
+                  span 至少
+                  input.number-input(type='text' v-model.number='condition.times')
+                  span 次敏感词
+          .form-group
+            label.col-sm-2.control-label 时间范围
+            .col-sm-6
+              .radio
+                label
+                  input(type='radio' value='all' v-model='timeLimit')
+                  span 所有
+              .radio
+                label
+                  input(type='radio' value='custom' v-model='timeLimit')
+                  span 自定义
+              div(v-if='timeLimit === "custom"')
+                .m-t-05
+                  span 起始时间：
+                  input(type='date' v-model='time[0]')
+                .m-t-05
+                  span 结束时间：
+                  input(type='date' v-model='time[1]')
+          .form-group
+            label.col-sm-2.control-label 标记为待审
+            .col-sm-6
+              .radio
+                label.m-r-1
+                  input(type='radio' :value='true' v-model='markAsUnReviewed')
+                  span 是
+                label
+                  input(type='radio' :value='false' v-model='markAsUnReviewed')
+                  span 否
+              span.text-danger 是否将匹配到的 POST 修改为待审状态
+          .form-group
+            label.col-sm-2
+            .col-sm-6
+              button.btn.btn-default(disabled v-if='submitting') 提交中...
+              button.btn.btn-default(disabled v-else-if='timeNumber') 重新提交({{timeNumber}})
+              button.btn.btn-default(@click='submit' v-else) 提交
+          .form-group
+            label.col-sm-2
+            .col-sm-6
+              a(href=`/e/log/filter` target='_blank') 查看处理结果
+
+block scripts
+  +includeJS('/experimental/tools/filter/filter.js')
