@@ -794,5 +794,7 @@
   "experimentalUserCodeLog": "后台管理 - 用户动态码验证记录",
   "modifyQuestionAuthStatus": "修改题库试题审核状态",
   "experimentalIPSettings": "后台管理 - IP 黑名单",
-  "experimentalShareSettings": "后台管理 - 分享设置"
+  "experimentalShareSettings": "后台管理 - 分享设置",
+  "experimentalToolsFilter": "后台管理 - 工具 - 敏感词检测",
+  "experimentalFilterLogs": "查看后台敏感词过滤记录"
 }

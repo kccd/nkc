@@ -4,8 +4,8 @@ const logRouter = require('./log');
 const sysInfoRouter = require('./systemInfo');
 const consoleRouter = require('./console');
 const loginRouter = require("./login");
-const toolsRouter = require("./tools");
 const authRouter = require("./auth");
+const toolsRouter = require('./tools');
 
 const experimentalRouter = new Router();
 experimentalRouter
@@ -45,8 +45,7 @@ experimentalRouter
   .use('/systemInfo', sysInfoRouter.routes(), sysInfoRouter.allowedMethods())
   .use("/login", loginRouter.routes(), loginRouter.allowedMethods())
   .use('/log', logRouter.routes(), logRouter.allowedMethods())
-  .use('/tools', toolsRouter.routes(), toolsRouter.allowedMethods())
   .use('/auth', authRouter.routes(), authRouter.allowedMethods())
-
+  .use('/tools', toolsRouter.routes(), toolsRouter.allowedMethods())
 
 module.exports = experimentalRouter;

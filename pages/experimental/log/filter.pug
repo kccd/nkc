@@ -1,0 +1,75 @@
+extends ../experimental
+block eTitle
+  title 敏感词检测记录
+  style.
+    .avatar{
+      height: 1.4rem;
+      width: 1.4rem;
+    }
+block eContent
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        include ../../publicModules/paging/paging
+        .table-responsive
+          table.table-bordered.table.nkc-table
+            thead
+              tr
+                th 时间
+                th 操作人
+                th 状态
+                th 条件
+                th 结果
+            tbody
+              for filterLog in data.filterLogs
+                tr
+                  th
+                    +timeFormat(filterLog.toc)
+                  th
+                    img.avatar(src=tools.getUrl('userAvatar', filterLog.operator.avatar))
+                    a(
+                      href=tools.getUrl('userHome', filterLog.operator.uid)
+                      target="_blank"
+                      data-float-uid=filterLog.operator.uid
+                      )=filterLog.operator.username
+                  th
+                    if filterLog.status === 'waiting'
+                      span 等待处理
+                    else if filterLog.status === 'processing'
+                      -var {progress, total} = filterLog.result;
+                      -var progress = Math.round((progress / total) * 1000) / 10;
+                      span=`处理中... ${progress}%`
+                    else
+                      span 处理完成
+                    .m-t-05=`最近更新时间：${format('YYYY/MM/DD HH:mm:ss', filterLog.tlm)}`
+                  th
+                    .m-b-05
+                      span 时间范围：
+                      if filterLog.timeLimit.type === 'all'
+                        span 全部
+                      else
+                        span=format('YYYY/MM/DD', filterLog.timeLimit.start)
+                        span &nbsp;到&nbsp;
+                        span=format('YYYY/MM/DD', filterLog.timeLimit.end)
+                    .m-b-05
+                      span 敏感词组：
+                      if filterLog.groups.length === 0
+                        span 无
+                      else
+                        span=filterLog.groups.join(', ')
+                    .m-b-05
+                      span 自定义词组：
+                      if filterLog.keywords.content.length === 0
+                        span 无
+                      else
+                        span=filterLog.keywords.content.join(', ')
+                  th
+                    .m-b-05=`内容总数：${filterLog.result.total}`
+                    .m-b-05=`触发敏感词：${filterLog.result.targetId.length}`
+                    .m-b-05=`标记待审：${filterLog.markUnReview? '已标记': '未标记'}`
+                    if filterLog.errorInfo
+                      .m-b-05.text-danger=`错误信息：${errorInfo}`
+        include ../../publicModules/paging/paging_input
+
+block scripts
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug

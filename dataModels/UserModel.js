@@ -2602,5 +2602,19 @@ userSchema.statics.checkCode = async (uid, code) => {
   return codes.includes(code);
 }
 
+/*
+* 获取以用户 ID 为键，以用户对象为值得对象
+* @param {[String]} 用户 ID 组成的数组
+* */
+userSchema.statics.getUsersObjectByUsersId = async (usersId) => {
+  const UserModel = mongoose.model('users');
+  const users = await UserModel.find({uid: {$in: usersId}}, {uid: 1, avatar: 1, username: 1});
+  const usersObj = {};
+  for(let i = 0; i < users.length; i++) {
+    usersObj[users[i].uid] = users[i];
+  }
+  return usersObj;
+}
+
 module.exports = mongoose.model('users', userSchema);
 

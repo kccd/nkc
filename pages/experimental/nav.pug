@@ -98,6 +98,8 @@
             a(href="/e/settings/safe/unverifiedPhone") 未验证的手机号
           li
             a(href="/e/log/userCode") 用户动态码验证记录
+          li
+            a(href="/e/log/filter") 敏感词过滤记录
 
       li.dropdown(role='presentation')
         a.dropdown-toggle(data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false')
@@ -235,8 +237,15 @@
             a(href='/e/settings/app') APP
           li 
             a(href='/e/settings/sensitiveWords') 敏感词
+          li
+            a(href=`/e/settings/tools`) 网页工具
+      li.dropdown(role='presentation')
+        a.dropdown-toggle(data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false')
+          span=`工具 `
+          span.fa.fa-caret-down
+        ul.dropdown-menu
+          li
+            a(href="/e/tools/filter") 敏感词检测
       li
         a(href='/e/settings/shop') 商城设置
 
-      li
-        a(href="/e/tools") 网站工具
