@@ -20,6 +20,7 @@ block eContent
                 th 状态
                 th 条件
                 th 结果
+                th 其他
             tbody
               for filterLog in data.filterLogs
                 tr
@@ -69,7 +70,25 @@ block eContent
                     .m-b-05=`标记待审：${filterLog.markUnReview? '已标记': '未标记'}`
                     if filterLog.errorInfo
                       .m-b-05.text-danger=`错误信息：${errorInfo}`
+                  th
+                    .m-b-05
+                      button.btn.btn-danger.btn-xs(onclick=`markUnReviewed('${filterLog._id}', true)`) 标为待审
+                    button.btn.btn-success.btn-xs(onclick=`markUnReviewed('${filterLog._id}', false)`) 取消待审
         include ../../publicModules/paging/paging_input
 
 block scripts
   include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  script.
+    window.markUnReviewed = function(id, type) {
+      return sweetQuestion("确定要执行此操作吗？")
+      .then(function() {
+        return nkcAPI('/e/log/filter', 'POST', {
+          markUnReview: !!type,
+          filterLogId: id
+        });
+      })
+      .then(function() {
+        window.location.reload();
+      })
+      .catch(sweetError);
+    }

@@ -31,4 +31,32 @@ router
     ctx.template = 'experimental/log/filter.pug';
     await next();
   })
+  .post('/', async (ctx, next) => {
+    const {body, db} = ctx;
+    const {filterLogId, markUnReview} = body;
+    const filterLog = await db.FilterLogModel.findOnly({_id: filterLogId});
+    const {targetId} = filterLog.result;
+    await db.PostModel.updateMany({
+      pid: {$in: targetId},
+      reviewed: markUnReview
+    }, {
+      $set: {
+        reviewed: !markUnReview
+      }
+    });
+    await db.ThreadModel.updateMany({
+      oc: {$in: targetId},
+      reviewed: markUnReview
+    }, {
+      $set: {
+        reviewed: !markUnReview
+      }
+    });
+    await filterLog.updateOne({
+      $set: {
+        markUnReview
+      }
+    });
+    await next();
+  });
 module.exports = router;

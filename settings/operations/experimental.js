@@ -332,7 +332,8 @@ module.exports = {
 	log: {
     GET: 'visitPublicLogs',
     filter: {
-      GET: 'experimentalFilterLogs'
+      GET: 'experimentalFilterLogs',
+      POST: 'experimentalFilterLogs'
     },
 		resource: {
     	GET: 'experimentalResourceLogs'
