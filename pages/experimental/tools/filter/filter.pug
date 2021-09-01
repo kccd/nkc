@@ -15,10 +15,21 @@ block eContent
           .form-group
             label.col-sm-2.control-label 敏感词组
             .col-sm-6
-              .checkbox(v-for='g in groups')
-                label
-                  input(type='checkbox' :value='g.id' v-model='groupsId')
-                  span {{g.name}}
+              div(v-for='g in groups')
+                .checkbox
+                  label
+                    input(type='checkbox' :value='g.id' v-model='groupsId')
+                    span {{g.name}}
+                .m-t-1(v-if='groupsId.includes(g.id)')
+                  span 命中至少
+                  input.number-input(type='text' v-model.number='g.conditions.count')
+                  span 个敏感词
+                  select(v-model='g.conditions.logic')
+                    option(value='or') 或
+                    option(value='and') 且
+                  span 至少
+                  input.number-input(type='text' v-model.number='g.conditions.times')
+                  span 次敏感词
               .checkbox
                 label
                   input(type='checkbox' :value='true' v-model='inputKeywords')
@@ -28,13 +39,13 @@ block eContent
                   textarea.form-control(rows=5 placeholder='请输入关键词，以逗号分隔' v-model='content')
                 .m-t-1
                   span 命中至少
-                  input.number-input(type='text' v-model.number='condition.count')
+                  input.number-input(type='text' v-model.number='conditions.count')
                   span 个敏感词
-                  select(v-model='condition.logic')
+                  select(v-model='conditions.logic')
                     option(value='or') 或
                     option(value='and') 且
                   span 至少
-                  input.number-input(type='text' v-model.number='condition.times')
+                  input.number-input(type='text' v-model.number='conditions.times')
                   span 次敏感词
           .form-group
             label.col-sm-2.control-label 时间范围

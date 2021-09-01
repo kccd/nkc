@@ -9,7 +9,7 @@ const app = new Vue({
     content: '',
     timeLimit: 'all', // all, custom
     time: [null, null],
-    condition: {
+    conditions: {
       count: 1,
       times: 1,
       logic: 'or'
@@ -17,6 +17,12 @@ const app = new Vue({
     markAsUnReviewed: false,
     submitting: false,
     timeNumber: 0,
+  },
+  computed: {
+    selectedGroups() {
+      const {groupsId, groups} = this;
+      return groups.filter(g => groupsId.includes(g.id));
+    }
   },
   methods: {
     timeout(newTime) {
@@ -29,19 +35,19 @@ const app = new Vue({
     },
     submit() {
       const {
-        groupsId,
         inputKeywords,
         content,
         timeLimit,
         time,
-        condition,
+        conditions,
         markAsUnReviewed,
+        selectedGroups,
       } = this;
       const body = {
-        groupsId,
+        groups: selectedGroups,
         markAsUnReviewed,
         timeLimit,
-        time
+        time,
       };
       if(inputKeywords) {
         body.keywords = content
@@ -49,7 +55,7 @@ const app = new Vue({
           .split(',')
           .map(keyword => keyword.trim())
           .filter(keyword => !!keyword);
-        body.condition = condition;
+        body.conditions = conditions;
       }
       const self = this;
       self.submitting = true;
