@@ -54,16 +54,26 @@ block eContent
                         span=format('YYYY/MM/DD', filterLog.timeLimit.end)
                     .m-b-05
                       span 敏感词组：
-                      if filterLog.groups.length === 0
+                      -var hasGroup = false;
+                      for g in filterLog.groups
+                        if g.id !== 'custom'
+                          -hasGroup = true;
+                          -var {count, times, logic} = g.conditions;
+                          span.m-r-05=`${g.name}（${count}个${logic==='and'?'且':'或'}${times} 次）`
+                      if !hasGroup
                         span 无
-                      else
-                        span=filterLog.groups.join(', ')
                     .m-b-05
                       span 自定义词组：
-                      if filterLog.keywords.content.length === 0
+                      -var hasCustom = false;
+                      for g in filterLog.groups
+                        if g.id === 'custom'
+                          -hasCustom = true;
+                          -var {count, times, logic} = g.conditions;
+                          span.m-r-05=`（${count}个${logic==='and'?'且':'或'}${times} 次）`
+                          .bg-info.p-a-05.text-info
+                            span.m-r-05=g.keywords.join(', ')
+                      if !hasCustom
                         span 无
-                      else
-                        span=filterLog.keywords.content.join(', ')
                   th
                     .m-b-05=`内容总数：${filterLog.result.total}`
                     .m-b-05=`触发敏感词：${filterLog.result.targetId.length}`

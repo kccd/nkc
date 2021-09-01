@@ -9,21 +9,17 @@ router
       .sort({toc: -1})
       .skip(paging.start)
       .limit(paging.perpage);
-    const reviewSettings = await db.SettingModel.getSettings('review');
-    const {wordGroup} = reviewSettings.keyword;
-    const groupsObj = {};
-    for(const g of wordGroup) {
-      groupsObj[g.id] = g;
-    }
     const usersId = filterLogs.map(f => f.operatorId);
     const usersObj = await db.UserModel.getUsersObjectByUsersId(usersId);
     data.filterLogs = [];
     for(let filterLog of filterLogs) {
       filterLog = filterLog.toObject();
       filterLog.operator = usersObj[filterLog.operatorId];
-      filterLog.groups = filterLog.groupsId.map(id => {
-        const group = groupsObj[id];
-        return group? group.name: `${id}(已删除)`;
+      filterLog.groups = filterLog.groups.map(group => {
+        if(group.id !== 'custom') {
+          group.keywords = [];
+        }
+        return group;
       });
       data.filterLogs.push(filterLog);
     }

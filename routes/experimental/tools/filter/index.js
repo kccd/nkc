@@ -4,7 +4,10 @@ router
   .get('/', async (ctx, next) => {
     const {db, data} = ctx;
     const reviewSettings = await db.SettingModel.getSettings("review");
-    data.groups = reviewSettings.keyword.wordGroup;
+    data.groups = reviewSettings.keyword.wordGroup.map(w => {
+      delete w.keywords;
+      return w;
+    });
     ctx.template = `experimental/tools/filter/filter.pug`;
     await next();
   })
@@ -12,24 +15,50 @@ router
     const {state, body, data, db, nkcModules} = ctx;
     const {checkNumber} = nkcModules.checkData;
     const {
-      groupsId,
+      groups,
       markAsUnReviewed,
       timeLimit,
-      condition,
+      conditions,
       time,
       keywords = []
     } = body;
     const reviewSettings = await db.SettingModel.getSettings('review');
-    const groups = reviewSettings.keyword.wordGroup;
-    const selectGroupsId = [];
-    const selectGroups = groups.filter(g => {
-      if(groupsId.includes(g.id)) {
-        selectGroupsId.push(g.id);
-        return true;
-      } else {
-        return false;
+    const wordGroup = reviewSettings.keyword.wordGroup;
+    const wordGroupObj = {};
+    for(const wg of wordGroup) {
+      wordGroupObj[wg.id] = wg;
+    }
+
+    const selectGroups = [];
+
+    for(const g of groups) {
+      const {count, times, logic} = g.conditions;
+      const wg = wordGroupObj[g.id];
+      if(!wg) ctx.throw(400, `分组 ID ${g.id} 不存在`);
+      checkNumber(count, {
+        name: `词组命中个数`,
+        min: 1,
+      });
+      checkNumber(times, {
+        name: `词组命中次数`,
+        min: 1
+      });
+      if(!['and', 'or'].includes(logic)) {
+        ctx.throw(400, `词组命中关系设置错误`);
       }
-    });
+      selectGroups.push({
+        id: wg.id,
+        name: wg.name,
+        keywords: wg.keywords,
+        conditions: {
+          count,
+          times,
+          logic
+        }
+      });
+    }
+
+
     let startingTime;
     let endTime;
     if(timeLimit === 'custom') {
@@ -37,22 +66,26 @@ router
       endTime = new Date(`${time[1]} 00:00:00`);
     }
     if(keywords.length > 0) {
-      checkNumber(condition.count, {
+      checkNumber(conditions.count, {
         name: `自定义词组命中个数`,
         min: 1,
       });
-      checkNumber(condition.times, {
+      checkNumber(conditions.times, {
         name: `自定义词组命中次数`,
         min: 1
       });
-      if(!['and', 'or'].includes(condition.logic)) {
+      if(!['and', 'or'].includes(conditions.logic)) {
         ctx.throw(400, `自定义词组命中关系设置错误`);
       }
       selectGroups.push({
         id: 'custom',
         name: 'custom',
         keywords,
-        conditions: condition
+        conditions: {
+          count: conditions.count,
+          times: conditions.times,
+          logic: conditions.logic
+        }
       });
     }
 
@@ -62,20 +95,12 @@ router
     const filterLog = db.FilterLogModel({
       type: 'post',
       operatorId: state.uid,
-      groupsId: selectGroupsId,
-      keywords: {
-        content: keywords
-      },
+      groups: selectGroups,
       markUnReview: markAsUnReviewed,
       timeLimit: {
         type: timeLimit
       }
     });
-    if(filterLog.keywords.content.length > 0) {
-      filterLog.keywords.count = condition.count;
-      filterLog.keywords.times = condition.times;
-      filterLog.keywords.logic = condition.logic;
-    }
     if(filterLog.timeLimit.type === 'custom') {
       filterLog.timeLimit.start = startingTime;
       filterLog.timeLimit.end = endTime;

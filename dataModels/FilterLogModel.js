@@ -21,29 +21,19 @@ const schema = new mongoose.Schema({
     type: String,
     default: 'waiting', // waiting, processing, completed
   },
-  // 选择的敏感词组
-  groupsId: {
-    type: [String],
+  // 敏感词组
+  groups: {
+    type: [{
+      id: String,  // group, custom
+      name: String,
+      keywords: [String],
+      conditions: {
+        count: Number,
+        times: Number,
+        logic: String, // or, and
+      }
+    }],
     default: []
-  },
-  // 自定义词组
-  keywords: {
-    content: {
-      type: [String],
-      default: []
-    },
-    count: {
-      type: Number,
-      default: 1
-    },
-    times: {
-      type: Number,
-      default: 1
-    },
-    logic: {
-      type: String,
-      default: 'or'
-    }
   },
   // 是否标记为待审核
   markUnReview: {
