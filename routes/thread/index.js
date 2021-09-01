@@ -569,6 +569,7 @@ threadRouter
         data.fund = applicationForm.fund;
         data.userFundRoles = await data.fund.getUserFundRoles(state.uid);
         data.targetUserInFundBlacklist = await db.FundBlacklistModel.inBlacklist(applicationForm.uid);
+        await data.applicationForm.hideApplicationFormInfoByUserId(state.uid, ctx.permission('displayFundApplicationFormSecretInfo'));
       }
     }
 

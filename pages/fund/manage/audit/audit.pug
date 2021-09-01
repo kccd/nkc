@@ -15,7 +15,7 @@ block fundTitle
     }
 block fundContent
   -var applicationForm = data.applicationForm;
-  -var {applicant, fixedMoney, project} = applicationForm;
+  -var {applicant, fixedMoney, projectPost} = applicationForm;
   -var fund = applicationForm.fund;
   -var type = data.type;
 
@@ -93,19 +93,19 @@ block fundContent
       .form
         .form-group
           label 项目标题：
-          span= project.t
+          span= projectPost.t
         .form-group
           label 中文摘要：
-          span= project.abstractCn || '无'
+          span= projectPost.abstractCn || '无'
         .form-group
           label 英文摘要：
-          span= project.abstractEn || '无'
+          span= projectPost.abstractEn || '无'
         .form-group
           label 中文关键词：
-          span= project.keyWordsCn.length ? project.keyWordsCn.join(', ') : '无'
+          span= projectPost.keyWordsCn.length ? projectPost.keyWordsCn.join(', ') : '无'
         .form-group
           label 英文关键词：
-          span= project.keyWordsEn.length ? project.keyWordsEn.join(', ') : '无'
+          span= projectPost.keyWordsEn.length ? projectPost.keyWordsEn.join(', ') : '无'
         .form-group
           label 学科分类：
           a(href=tools.getUrl('forumHome', applicationForm.forum.fid) target="_blank" data-float-fid=applicationForm.category)=applicationForm.forum.displayName
@@ -129,7 +129,7 @@ block fundContent
             span 无
         .form-group.m-t-1
           label 项目内容：
-          .project-content!=project.c
+          .project-content!=projectPost.c
   mixin budgetMoneyInfo
     #data.hidden=objToStr({applicationForm, type: data.type})
     div
@@ -224,5 +224,5 @@ block fundScripts
   include ../../../publicModules/plyr/plyr.js.pug
   include ../../../publicModules/imageViewer
   include  ../../../publicModules/sticker/sticker
-  +includeJS('/interface_fund_audit.js')
+  include ../../../publicModules/nkcSource
   +includeJS('/fund/manage/audit/audit.js')

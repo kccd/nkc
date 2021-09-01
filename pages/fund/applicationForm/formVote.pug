@@ -16,6 +16,26 @@ if !isIncluded('formVote')
             textarea.form-control(rows=3 placeholder='请输入理由')
           .form-group.m-b-0
             button.btn-block.btn.btn-primary(onclick=`formVote(${form._id})`) 提交
+      if form.supporters && form.supporters.length > 0
+        .m-b-1
+          .panel-header 支持者
+          div
+            for u in form.supporters
+              a.m-r-05(
+                href=tools.getUrl('userHome', u.uid)
+                target="_blank"
+                data-float-uid=u.uid
+                )=u.username
+      if form.objectors && form.objectors.length > 0
+        .m-b-1
+          .panel-header 反对者
+          div
+            for u in form.objectors
+              a.m-r-05(
+                href=tools.getUrl('userHome', u.uid)
+                target="_blank"
+                data-float-uid=u.uid
+              )=u.username
   script.
     function formVote(formId) {
       var support = $('div[data-type="formVote"] input').eq(0).prop('checked');

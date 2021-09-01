@@ -52,7 +52,7 @@ billsRouter
 		data.fund = fund;
 		data.nav = '基金账单';
 		data.paging = paging;
-		ctx.template = 'interface_fund_bills.pug';
+		ctx.template = 'fund/bills/fundBills.pug';
 		await next();
 	})
 	.post('/', async (ctx, next) => {
@@ -99,7 +99,7 @@ billsRouter
 		await next();
 	})
 	.get('/:billId', async (ctx, next) => {
-		ctx.template = 'interface_fund_bill.pug';
+		ctx.template = 'fund/bills/bill.pug';
 		await next();
 	})
 	.del('/:billId', async (ctx, next) => {

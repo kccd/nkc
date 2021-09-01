@@ -3,13 +3,15 @@ if !isIncluded('formPost')
   mixin formSinglePost(post)
     +singlePost(Object.assign(post, {hidePostBottom: true}))
   mixin formPost(form)
-    if form.posts && form.posts.length
-      -var {posts} = form;
-      .p-b-0
-        .panel-header.m-b-0 最新回复
-      div
-        .m-b-1
+    -var {posts} = form;
+    .p-b-0
+      .panel-header.m-b-0 最新回复
+    div
+      .m-b-1
+        if !posts || posts.length === 0
+          span 空空如也~
+        else
           for post in posts
             +formSinglePost(post)
-        div
-          a(href=`/t/${form.tid}#container`).btn.btn-default 去评论
+      div
+        a(href=`/t/${form.tid}#container`).btn.btn-default 去评论

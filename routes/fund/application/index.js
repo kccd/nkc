@@ -13,40 +13,6 @@ const disabledRouter = require('./disabled');
 const applicationRouter = new Router();
 const apiFn = require('../../../nkcModules/apiFunction');
 applicationRouter
-	.get('/', async (ctx, next) => {
-		const {data, db, query} = ctx;
-		const {page = 0, type} = query;
-		const q = {
-			disabled: false,
-			'status.submitted': true
-		};
-		if(type === 'excellent') { // 优秀项目
-			q['status.excellent'] = true;
-		} else if(type === 'completed') { // 已完成
-			q['status.complete'] = true;
-		} else if(type === 'funding') { // 资助中
-			q['status.complete'] = {$ne: true};
-			q['status.adminSupport'] = true;
-		} else if(type === 'auditing') { // 审核中
-			q['status.remittance'] = {$ne: true};
-			q.useless = null
-		} else { //所有
-			
-		}
-		const length = await db.FundApplicationFormModel.countDocuments(q);
-		const paging = apiFn.paging(page, length);
-		data.paging = paging;
-		const applicationForms = await db.FundApplicationFormModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-		data.applicationForms = await Promise.all(applicationForms.map(async a => {
-			await a.extendProject();
-			await a.extendMembers();
-			await a.extendApplicant();
-			await a.extendFund();
-			return a;
-    }));
-		ctx.template = 'interface_fund_applicationForm_list.pug';
-		await next();
-	})
 	.use('/:_id', async (ctx, next) => {
 		const {params, data, db, state} = ctx;
 		const {_id} = params;
@@ -387,29 +353,9 @@ applicationRouter
 	.use('/:_id/disabled', disabledRouter.routes(), disabledRouter.allowedMethods())
 	//屏蔽敏感信息
 	.use('/', async (ctx, next) => {
-		const {data} = ctx;
-		const {user} = data;
-		const {applicationForm, fund} = data;
-		let hasPermission = false;
-		if(user) {
-			hasPermission = fund.ensureOperatorPermission('admin', user) || fund.ensureOperatorPermission('censor', user);
-		}
-		//拦截申请表敏感信息
-		if(!user || (applicationForm && !data.userOperationsId.includes('displayFundApplicationFormSecretInfo') && applicationForm.uid !== user.uid && !hasPermission)) {
-			const {applicant, members} = applicationForm;
-			applicant.mobile = null;
-			applicant.idCardNumber = null;
-			applicationForm.account.paymentType = null;
-			applicationForm.account.number = null;
-			for(let m of members) {
-				m.mobile = null;
-				m.idCardNumber = null;
-			}
-		}
-		//拦截表示反对的用户
-		if(!hasPermission) {
-			applicationForm.objectors = [];
-		}
+		const {data, state} = ctx;
+		const {applicationForm} = data;
+		await applicationForm.hideApplicationFormInfoByUserId(state.uid, ctx.permission('displayFundApplicationFormSecretInfo'));
 		await next();
 	});
 module.exports = applicationRouter;

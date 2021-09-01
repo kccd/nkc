@@ -39,12 +39,14 @@ remittanceRouter
 		const {fund, remittance} = applicationForm;
     await fund.checkFundRole(user.uid, 'financialStaff');
     try{
-      await applicationForm.transfer({
-        number,
-        operatorId: applicationForm.uid,
-        clientIp: ctx.address,
-        clientPort: ctx.port
-      });
+      if(applicationForm.account.paymentType === 'alipay') {
+        await applicationForm.transfer({
+          number,
+          operatorId: applicationForm.uid,
+          clientIp: ctx.address,
+          clientPort: ctx.port
+        });
+      }
       await applicationForm.createReport(
         'system',
         `第 ${number + 1} 期拨款成功`,

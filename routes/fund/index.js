@@ -35,12 +35,15 @@ fundRouter
 	.use('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user} = data;
-    data.newNotify = await db.FundApplicationUserModel.countDocuments({
-      type: 'member',
-      uid: user.uid,
-      agree: null,
-      removed: false,
-    });
+		data.newNotify = 0;
+		if(user) {
+      data.newNotify = await db.FundApplicationUserModel.countDocuments({
+        type: 'member',
+        uid: user.uid,
+        agree: null,
+        removed: false,
+      });
+    }
     await next();
 	})
   .get('/', async (ctx, next) => {

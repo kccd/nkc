@@ -44,6 +44,8 @@ block fundContent
                 .donation-bill
                   .user-avatar
                     img(src=b.user.avatarUrl)
+                    if b.money >= 5000
+                      span.donation-rich 豪
                   .user-info
                     .username
                       if !b.user.uid
@@ -53,7 +55,7 @@ block fundContent
                     .time
                       +fromNow(b.time)
                     .fund 赞助&nbsp;
-                      if b.fund.fundId
+                      if !b.fund.fundId
                         span=b.fund.name
                       else
                         a(href=tools.getUrl("singleFundHome", b.fund.fundId) target='_blank')=b.fund.name

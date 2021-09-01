@@ -6,7 +6,7 @@ listRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		data.funds = await db.FundModel.find({display: true, disabled: false, history: false}).sort({toc: 1});
-		ctx.template = 'interface_fund_list.pug';
+		ctx.template = 'fund/list/fundList.pug';
 		await next();
 	})
 	// 添加基金项目

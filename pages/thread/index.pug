@@ -264,7 +264,6 @@ block content
                           include ../fund/applicationForm/budgetMoney
                           include ../fund/applicationForm/remittance
                           include ../fund/applicationForm/report
-                          include ../fund/applicationForm/operationCenter
                           include ../fund/applicationForm/formVote
                           include ../fund/applicationForm/formWarning
                           include ../fund/applicationForm/actualMoney
@@ -471,6 +470,7 @@ block content
 
         .col-xs-12.col-md-3.box-shadow-panel#rightDom
           if data.thread.type === "fund"
+            include ../fund/applicationForm/operationCenter
             -var form = data.applicationForm;
             +applicantOperationCenter(form, data.user? data.user.uid:'')
             +managerOperationCenter(form, data.userFundRoles)

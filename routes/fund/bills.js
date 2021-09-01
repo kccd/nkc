@@ -60,7 +60,7 @@ billsRouter
 			await b.extendFromInfo();
 			return b;
 		}));
-		ctx.template = 'interface_fund_general_bills.pug';
+		ctx.template = 'fund/bills/bills.pug';
 		await next();
 	})
 	.post('/', async (ctx, next) => {
@@ -119,7 +119,7 @@ billsRouter
 		await next();
 	})
 	.get('/:billId', async (ctx, next) => {
-		ctx.template = 'interface_fund_bill.pug';
+		ctx.template = 'fund/bills/bill.pug';
 		ctx.data.funds = await ctx.db.FundModel.find({disabled: false, history: false}).sort({toc: 1});
 		await next();
 	})

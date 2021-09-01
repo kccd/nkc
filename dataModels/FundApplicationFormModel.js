@@ -1063,8 +1063,9 @@ fundApplicationFormSchema.methods.getStatus = async function() {
   const {useless, submittedReport, status, completedAudit, lock} = this;
   const {submitted, projectPassed, adminSupport, remittance, completed, successful, usersSupport, excellent} = status;
   let needRemittance = false;
-  for(let r of this.remittance) {
-    if(r.passed && !r.status) {
+  for(let i = 0; i < this.remittance.length; i++) {
+    const r = this.remittance[i];
+    if(!r.status && r.apply && (i === 0 || r.passed)) {
       needRemittance = true;
       break;
     }
@@ -1109,8 +1110,8 @@ fundApplicationFormSchema.methods.getStatus = async function() {
     formStatus = [2, 3];
   } else if(completedAudit) {
     formStatus = [4, 6];
-  } else if(remittance === null) {
-    formStatus = [4, 2];
+  /*} else if(remittance === null) {
+    formStatus = [4, 2];*/
   } else if(remittance === false) {
     formStatus = [4, 3];
   } else if(submittedReport) {
@@ -1566,6 +1567,52 @@ fundApplicationFormSchema.methods.extendApplicationFormInfo = async function(uid
   await this.extendPosts(accessForumsId);
   await this.getStatus();
 };
+
+/*
+* 隐藏申请表的敏感信息
+* */
+fundApplicationFormSchema.methods.hideSecretInfo = async function() {
+  this.applicant.mobile = null;
+  this.applicant.idCardNumber = null;
+  this.account.paymentType = null;
+  this.account.number = null;
+  for(let m of this.members) {
+    m.mobile = null;
+    m.idCardNumber = null;
+  }
+  //拦截表示反对的用户
+  this.objectors = [];
+};
+
+/*
+* 隐藏反对用户
+* */
+fundApplicationFormSchema.methods.hideObjectors = async function() {
+  this.objectors = [];
+};
+
+/*
+* 隐藏用户无权查看的信息
+* @param {String} uid 访问者 ID
+* @param {Boolean} hasPermission 是否拥有特殊权限
+* */
+fundApplicationFormSchema.methods.hideApplicationFormInfoByUserId = async function(uid, hasPermission) {
+  const {fund} = this;
+  const isAdmin =
+    hasPermission ||
+    await fund.isFundRole(uid, 'admin') ||
+    await fund.isFundRole(uid, 'censor');
+  const isApplicant = uid && uid === this.uid;
+
+  if(!isAdmin) {
+    // 非管理员无法查看反对用户
+    await this.hideObjectors();
+    if(!isApplicant) {
+      // 非管理员非申请者无法查看敏感信息
+      await this.hideSecretInfo();
+    }
+  }
+}
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);
 module.exports = FundApplicationFormModel;

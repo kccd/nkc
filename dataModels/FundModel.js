@@ -348,6 +348,7 @@ fundSchema.statics.ensureUserPermission = async function(userId, fundId) {
 * @return {[String]} 可能的取值有：expert, censor, financialStaff, admin, commentator voter
 * */
 fundSchema.methods.getUserFundRoles = async function(uid) {
+  if(!uid) return [];
   const UserModel = mongoose.model('users');
   const user = await UserModel.findOnly({uid});
   const roles = await user.extendRoles();

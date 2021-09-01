@@ -1,11 +1,10 @@
-extends bootstrap_base
-block title
+extends ../fundContainer
+block fundTitle
   link(rel='stylesheet', href='/fund.css')
   title 基金列表 - 科创基金
-block content
+block fundContent
   -var mainContainer1400 = true
   .container-fluid.max-width
-    include interface_fund_nav
     .row
       .col-xs-12.col-md-12
         if data.type === 'history'
@@ -15,7 +14,7 @@ block content
         .row
           -for (let fund of data.funds)
             -const {id, name, color, money} = fund;
-            include interface_fund_singlefund
+            include ./fundItem
           //if data.userLevel >= 6 && data.type !== 'history'
           //  .col-xs-6.col-sm-4.col-md-3.fund-list
           //    a(href=`/fund/add`)

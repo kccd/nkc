@@ -156,7 +156,7 @@ router
     let factTotal = 0;
 
     if(applicationForm.fixedMoney) {
-      factTotal = applicationForm.money;
+      factTotal = applicationForm.money * 100;
     } else {
       for(let i = 0; i < applicationForm.budgetMoney.length; i++) {
         const b = applicationForm.budgetMoney[i];
@@ -191,7 +191,7 @@ router
         passed: null
       });
     }
-    if(remittanceTotal !== factTotal * 100) {
+    if(remittanceTotal !== factTotal) {
       ctx.throw(400, `分期总金额不等于实际批准金额`);
     }
 
@@ -234,7 +234,7 @@ router
       } else {
         await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
       }
-    } else if(type === "admin") {
+    } else if(type === "info") {
       await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
     }
 

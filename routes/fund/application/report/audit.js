@@ -73,6 +73,13 @@ router
         break;
       }
     }
+    if(!support) {
+      // 报告为通过审核 通知申请人
+      await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
+    } else {
+      // 报告通过审核 通知财务拨款
+      await db.MessageModel.sendFundMessage(applicationForm._id, "financialStaff");
+    }
     await next();
   });
 module.exports = router;
