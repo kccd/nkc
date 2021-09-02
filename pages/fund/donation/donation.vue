@@ -191,7 +191,9 @@
             } else {
               self.selectMoney(self.donation.defaultMoney[0]);
             }
-            self.selectPaymentType(self.payment[0].type);
+            if(self.payment.length > 0) {
+              self.selectPaymentType(self.payment[0].type);
+            }
           })
           .catch(data => {
             sweetError(data);
