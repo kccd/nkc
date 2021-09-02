@@ -5,10 +5,9 @@ completeRouter
 	.use('/', async (ctx, next) => {
 		const {data} = ctx;
 		const {applicationForm} = data;
-		const {status, useless, disabled} = applicationForm;
+		const {useless, disabled} = applicationForm;
 		if(disabled) ctx.throw(403,'申请表已被屏蔽');
 		if(useless !== null) ctx.throw('申请表已失效，无法完成该操作');
-		if(status.completed) ctx.throw('该项目已结题');
 		await next();
 	})
 	.get('/', async (ctx, next) => {
@@ -34,8 +33,9 @@ completeRouter
 		const {checkString, checkNumber} = nkcModules.checkData;
 		const {applicationForm, user} = data;
 		const {actualMoney, c, selectedThreads, successful} = body;
-		const {fixedMoney, timeToPassed, remittance} = applicationForm;
-		for(let r of remittance) {
+		const {status, fixedMoney, timeToPassed, remittance} = applicationForm;
+    if(status.completed) ctx.throw('该项目已结题');
+    for(let r of remittance) {
 			if(r.status === true && !r.verify) {
 				ctx.throw(400, '请先确认收款后再申请结题。');
 			}

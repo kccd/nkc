@@ -1,5 +1,10 @@
 const router = require('koa-router')();
 router
+  .use('/', async (ctx, next) => {
+    const {status} = ctx.data.applicationForm;
+    if(status.completed) ctx.throw('该项目已结题');
+    await next();
+  })
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
     const {applicationForm, user} = data;
