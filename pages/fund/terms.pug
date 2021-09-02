@@ -12,6 +12,9 @@ block fundContent
         div
           h2.text-center=`${data.fundSettings.fundName}条款`
           .fund-terms.m-b-4!=markdown_safe(data.fundSettings.terms)
+          hr
+          h2.text-center=`${data.fund.name}条款`
+          .fund-terms.m-b-4!=markdown_safe(data.fund.description.terms)
           .checkbox
             label
               input.fund-terms-input(type='checkbox' onclick='setStatus()')
