@@ -1,6 +1,7 @@
 extends ./fundContainer.pug
 block fundTitle
   +includeCSS('/fund/home.css')
+  title=data.fundSettings.fundName
   include ./applicationFormItem
 block fundContent
   #data.hidden=objToStr({donationEnabled: data.fundSettings.donation.enabled, funds: data.funds, donation: data.fundSettings.donation, donationBills: data.donationBills})
