@@ -1,0 +1,6 @@
+if !isIncluded('formProtocol')
+  mixin formProtocol(form)
+    if form.protocol
+      div
+        .panel-header 开源协议
+        .pre-wrap=form.protocol

@@ -15,6 +15,7 @@ block fundContent
   include ./formRelatedThreads
   include ./formReportThreads
   include ./formPost
+  include ./formProtocol
   -var form = data.applicationForm;
   -var applicationForm = form;
   .container-fluid.max-width
@@ -23,6 +24,7 @@ block fundContent
         +formWarning(form.auditComments.adminAudit)
         +applicant(form)
         +project(form)
+        +formProtocol(form)
         +budgetMoney(form)
         +actualMoney(form)
         +remittance(form)

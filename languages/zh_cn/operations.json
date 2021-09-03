@@ -795,7 +795,7 @@
   "experimentalPayment": "后台管理 - 查看支付记录",
   "singleFundSettings": "基金项目设置",
   "visitFundBlacklist": "访问基金黑名单",
-  "fundBlacklistPost": "将用户加入基金黑名单/将用户从基金黑名单中移除"
+  "fundBlacklistPost": "将用户加入基金黑名单/将用户从基金黑名单中移除",
   "experimentalUserCodeLog": "后台管理 - 用户动态码验证记录",
   "modifyQuestionAuthStatus": "修改题库试题审核状态",
   "experimentalIPSettings": "后台管理 - IP 黑名单",

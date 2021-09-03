@@ -269,11 +269,13 @@ block content
                           include ../fund/applicationForm/actualMoney
                           include ../fund/applicationForm/formRelatedThreads
                           include ../fund/applicationForm/formReportThreads
+                          include ../fund/applicationForm/formProtocol
                           -var form = data.applicationForm;
                           -var applicationForm = form;
                           +formWarning(form.auditComments.adminAudit)
                           +applicant(form)
                           +project(form)
+                          +formProtocol(form)
                           +formStatus(form)
                           +budgetMoney(form)
                           +actualMoney(form)
