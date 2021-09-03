@@ -28,7 +28,7 @@ permissionRouter
     let {
       accessible, displayOnParent, visibility, isVisibleForNCC,
       displayOnSearch, threadListStyle,
-      shareLimitCount, shareLimitTime, allowedAnonymousPost,
+      shareLimitStatus, shareLimitCount, shareLimitTime, allowedAnonymousPost,
       moderators, subType, openReduceVisits, permission, orderBy,
       voteUpPost
     } = body.forum;
@@ -36,14 +36,17 @@ permissionRouter
     const {read, write, writePost} = permission;
     shareLimitCount = Number(shareLimitCount);
     shareLimitTime = Number(shareLimitTime);
+    if(!['inherit', 'off', 'on'].includes(shareLimitStatus)) {
+      ctx.throw(400, `分享文章、回复或评论状态设置错误`);
+    }
     checkNumber(shareLimitCount, {
       name: '分享链接访问次数限制',
-      min: 0
+      min: 1
     });
     checkNumber(shareLimitTime, {
       name: '分享链接有效时间',
       fractionDigits: 2,
-      min: 0
+      min: 0.01
     });
     for(const uid of moderators) {
       const u = await db.UserModel.findOne({uid});
@@ -95,6 +98,7 @@ permissionRouter
         shareLimitTime,
         orderBy,
         shareLimitCount,
+        shareLimitStatus,
         subType,
         permission,
         voteUpPost: {

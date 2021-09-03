@@ -5,7 +5,6 @@ const productionRouter = require('./production');
 const bannedRouter = require('./banned');
 const draftsRouter = require('./drafts');
 const settingRouter = require('./settings');
-const authRouter = require('./auth');
 const transactionRouter = require('./transaction');
 // const bannerRouter = require('./banner');
 const clearRouter = require("./clear");
@@ -78,6 +77,7 @@ userRouter
   .get("/:uid", async (ctx, next) => {
     const {params, state, db, data, query, nkcModules} = ctx;
     const {uid} = params;
+    const {nkcRender} = nkcModules;
     const {pageSettings} = state;
     const {user} = data;
 
@@ -90,6 +90,9 @@ userRouter
     await targetUser.extendGrade();
     data.targetUser = targetUser;
 
+    if(state.uid !== targetUser.uid) {
+      targetUser.description = nkcRender.replaceLink(targetUser.description);
+    }
     // 用户积分
     if(ctx.permission('viewUserScores')) {
       data.targetUserScores = await db.UserModel.getUserScores(targetUser.uid);
@@ -192,7 +195,8 @@ userRouter
       lastPostUser: false,
       firstPostResource: false,
       htmlToText: false,
-      excludeAnonymousPost: true
+      excludeAnonymousPost: true,
+      removeLink: true,
     });
 
     data.recommendThreads = await db.ThreadModel.getRecommendThreads(accessibleFid);
@@ -298,6 +302,7 @@ userRouter
         lastPostUser: false,
         firstPostResource: true,
         htmlToText: true,
+        removeLink: true,
       });
       threads.map(thread => {
         threadsObj[thread.tid] = thread;
@@ -349,9 +354,9 @@ userRouter
           time: post.toc,
           pid: post.pid,
           anonymous: post.anonymous,
-          abstract: post.abstract,
-          content: post.c,
-          title: firstPost.t,
+          abstract: nkcModules.nkcRender.replaceLink(post.abstract),
+          content: nkcModules.nkcRender.replaceLink(post.c),
+          title: nkcModules.nkcRender.replaceLink(firstPost.t),
           link,
           reviewed: post.reviewed
         };
@@ -453,9 +458,9 @@ userRouter
           cover: thread.firstPost.cover,
           time: thread.toc,
           pid: thread.oc,
-          abstract: thread.firstPost.abstract,
-          title: thread.firstPost.t,
-          content: thread.firstPost.c,
+          abstract: nkcModules.nkcRender.replaceLink(thread.firstPost.abstract),
+          title: nkcModules.nkcRender.replaceLink(thread.firstPost.t),
+          content: nkcModules.nkcRender.replaceLink(thread.firstPost.c),
           anonymous: thread.firstPost.anonymous,
           link: `/t/${thread.tid}`,
           reviewed: thread.reviewed
@@ -511,6 +516,15 @@ userRouter
         }
       }
     }
+
+    // 排除封禁用户和名片被屏蔽的用户
+    if(data.users && data.users.length) {
+      data.users = data.users.filter(u => {
+        u.description = nkcModules.nkcRender.replaceLink(u.description);
+        return !u.certs.includes('banned') && !u.hidden;
+      });
+    }
+
     const behavior = {
       operationId: data.operationId,
       uid: data.user? data.user.uid: "",
@@ -531,7 +545,6 @@ userRouter
 	.use('/:uid/transaction', transactionRouter.routes(), transactionRouter.allowedMethods())
   .use('/:uid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
 	.use('/:uid/bills', billRouter.routes(), billRouter.allowedMethods())
-	.use('/:uid/auth', authRouter.routes(), authRouter.allowedMethods())
 	// .use('/:uid/banner', bannerRouter.routes(), bannerRouter.allowedMethods())
 	.use('/:uid/banned', bannedRouter.routes(), bannedRouter.allowedMethods())
 	.use('/:uid/drafts', draftsRouter.routes(), draftsRouter.allowedMethods())

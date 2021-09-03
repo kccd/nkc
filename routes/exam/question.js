@@ -181,5 +181,20 @@ router
     const question = await db.QuestionModel.findOnly({_id});
     await question.updateOne({disabled: false});
     await next();
+  })
+  .put('/:_id/auth', async (ctx, next) => {
+    const {db, body, params} = ctx;
+    const {_id} = params;
+    const {auth} = body;
+    if(auth === null) {
+      const data = await db.QuestionModel.updateOne({
+        _id,
+      }, {
+        $set: {
+          auth: null,
+        }
+      });
+    }
+    await next();
   });
 module.exports = router;

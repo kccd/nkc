@@ -6,8 +6,9 @@ import { nkcAPI } from "../lib/request";
 
 const app = createApp({
   setup() {
-    const byteArray = base64js.toByteArray(data.target);
-    const url = String.fromCharCode(...byteArray);
+    const url = NKC.methods.base64ToStr(data.target);
+    // const byteArray = base64js.toByteArray(data.target);
+    // const url = String.fromCharCode(...byteArray);
     return {
       target: url,
       id: data.id,
@@ -73,6 +74,7 @@ const Wrapper = styled.div`
     .link {
       cursor: pointer;
       margin-bottom: 12px;
+      word-break: break-all;
     }
     .info {
       white-space: pre-wrap;

@@ -24,7 +24,6 @@ const {
 	logo,
 } = resourceObj;
 
-const auth = require('./auth');
 const editor = require('./editor');
 const edit = require('./edit');
 const exam = require('./exam');
@@ -177,8 +176,6 @@ operationObj.operationTree = {
 
 		photo,// 照片
 		photo_small,
-
-		auth,// 身份认证审核
 
 		editor,// 编辑器
     edit,

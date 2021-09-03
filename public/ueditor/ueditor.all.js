@@ -15596,7 +15596,8 @@ UE.plugins['list'] = function () {
     });
 
     // 粘贴内容中的超链接，它们各自之前的位置插入一个链接url
-    me.addListener("beforepaste", function(type, box) {
+    // 添加外链中转页之后，注销以下事件
+    /*me.addListener("beforepaste", function(type, box) {
         var div = document.createElement("div");
         div.innerHTML = box.html;
         var links = [].slice.call(div.getElementsByTagName("a"));
@@ -15610,7 +15611,7 @@ UE.plugins['list'] = function () {
             link.insertBefore(span, link.firstChild);
         });
         box.html = div.innerHTML;
-    });
+    });*/
 
     function adjustListStyle(doc,ignore){
         utils.each(domUtils.getElementsByTagName(doc,'ol ul'),function(node){
@@ -17578,10 +17579,13 @@ UE.plugin.register('autolink',function(){
                             range.setStart(start, offset - 1);
                             charCode = range.toString().charCodeAt(0);
                         } while (charCode != 160 && charCode != 32);
-
-                        if (range.toString().replace(new RegExp(domUtils.fillChar, 'g'), '').match(/(?:https?:\/\/|ssh:\/\/|ftp:\/\/|file:\/|www\.)/i)) {
+                        // old RegExp: /(?:https?:\/\/|ssh:\/\/|ftp:\/\/|file:\/|www\.)/i
+                        // old RegExp test: /^(?:https?:\/\/|ssh:\/\/|ftp:\/\/|file:\/|www\.)/i
+                        var newUrlReg = /(https?:\/\/)?([-0-9a-zA-Z]{1,256}\.)+([a-z]{2,6})/i;
+                        var newUrlRegTest = /^(https?:\/\/)?([-0-9a-zA-Z]{1,256}\.)+([a-z]{2,6})/i;
+                        if (range.toString().replace(new RegExp(domUtils.fillChar, 'g'), '').match(newUrlReg)) {
                             while(range.toString().length){
-                                if(/^(?:https?:\/\/|ssh:\/\/|ftp:\/\/|file:\/|www\.)/i.test(range.toString())){
+                                if(newUrlRegTest.test(range.toString())){
                                     break;
                                 }
                                 try{

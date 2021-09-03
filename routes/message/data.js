@@ -31,7 +31,7 @@ router
       messages.map(m => {
         delete m.ip;
         delete m.port;
-        if(m.withdrawn) m.c = '';
+        // if(m.withdrawn) m.c = '';
       });
       data.messages = messages.reverse();
       data.targetUser = targetUser;
@@ -67,16 +67,18 @@ router
       await db.CreatedChatModel.createChat(user.uid, uid);
 
     } else if(type === "STE") {
-      const q = {
+      const queryDoc = {
         ty: 'STE'
       };
       if(firstMessageId) {
-        q._id = {
+        queryDoc._id = {
           $lt: firstMessageId
         };
       }
-      const messages = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
-      data.messages = messages.reverse();
+      const messages = await db.MessageModel.getMySystemInfoMessage(user.uid, queryDoc);
+      // 取纯文本返回给前端
+      messages.forEach(msg => msg.c = msg.c.content);
+      data.messages = messages;
       data.tUser = {
         icon: '/statics/message_type/STE.jpg',
         name: '系统通知',

@@ -1,0 +1,33 @@
+extends ../../experimental
+block eTitle
+  title IP 黑名单
+block eContent
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8
+        .m-b-05
+          button.btn.btn-sm.btn-default(onclick='addIP()') 添加
+        .table-responsive
+          table.table.table-bordered.nkc-table
+            thead
+              tr
+                th 添加时间
+                th IP
+                th 说明
+                th.text-center 其他
+            tbody
+              for ip in data.ips
+                tr
+                  th
+                    +timeFormat(ip.toc)
+                  th
+                    strong.text-primary.pointer(onclick=`viewIP("${ip._id}")`)=ip._id
+                  th
+                    .pre-wrap=ip.description
+                  th.text-center
+                    button.btn.btn-danger.btn-xs(onclick=`removeIP("${ip._id}")`) 删除
+        if data.ips.length === 0
+          .p-t-05.p-b-05.text-center 空空如也~
+block scripts
+  include ../../../publicModules/commonModal/commonModal
+  +includeJS('/experimental/settings/ip/ip.js')

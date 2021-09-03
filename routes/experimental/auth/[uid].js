@@ -1,5 +1,6 @@
 const Router = require('koa-router');
-const UsersPersonalModel = require("../../dataModels/UsersPersonalModel");
+const UsersPersonalModel = require("../../../dataModels/UsersPersonalModel");
+const VerifiedUploadModel = require("../../../dataModels/VerifiedUploadModel");
 
 const authRouter = new Router();
 authRouter
@@ -16,7 +17,9 @@ authRouter
 		data.nationCode = userPersonal.nationCode;
 		data.mobile = userPersonal.mobile;
 		data.authLevel = await userPersonal.getAuthLevel();
-		ctx.template = '/authenticate/authenticate.pug';
+    const {auth3Content} = await db.SettingModel.getSettings('auth');
+    data.auth3Content = auth3Content;
+		ctx.template = '/experimental/auth/[uid]/index.pug';
 		await next();
 	})
 	.del('/', async (ctx, next) => {
@@ -71,6 +74,20 @@ authRouter
 			await userPersonal.rejectVerify3(message);
 		}
 		return next();
+	})
+	.get("/a/:vid", async (ctx, next) => {
+		const {params, data, db} = ctx;
+    const {vid} = params;
+    const asset = await VerifiedUploadModel.findOne({ _id: vid });
+    if(!asset) {
+      return ctx.throw(404, "未找到附件");
+    }
+    if(!ctx.permission("visitUserAuth")) {
+      return ctx.throw(403, "你无权查看此附件");
+    }
+    ctx.filePath = await asset.getFilePath();
+    ctx.type = asset.ext;
+    return next();
 	});
 
 module.exports = authRouter;

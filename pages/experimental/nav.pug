@@ -15,7 +15,7 @@
           a(href='/e/systemInfo')=lang('ex', 'sendSystemNotification')
       if permission('visitAuthList')
         li
-          a(href='/auth')=lang('ex', 'identityReview')
+          a(href='/e/auth')=lang('ex', 'identityReview')
       if permission('visitProblemList')
         li
           a(href='/problem/list')=lang('ex', 'problems')
@@ -100,6 +100,8 @@
             a(href="/e/log/userCode") 用户动态码验证记录
           li
             a(href="/e/log/payment") 支付记录
+          li
+            a(href="/e/log/filter") 敏感词过滤记录
 
       li.dropdown(role='presentation')
         a.dropdown-toggle(data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false')
@@ -149,6 +151,9 @@
           if permission('experimentalFundSettings')
             li
               a(href='/e/settings/fund') 基金
+          if permission('experimentalIPSettings')
+            li
+              a(href='/e/settings/ip') IP 黑名单
           <li role="separator" class="divider"></li>
           if permission('visitRoleSettings')
             li
@@ -195,6 +200,9 @@
           if permission("experimentalVerificationSettings")
             li
               a(href=`/e/settings/verification`) 图形验证码
+          if permission("experimentalShareSettings")
+            li
+              a(href='/e/settings/share') 分享
           <li role="separator" class="divider"></li>
           li
             a(href='/e/settings/home/notice') 网站首页
@@ -212,8 +220,6 @@
             a(href='/e/settings/exam') 考试设置
           li
             a(href='/e/settings/message') 聊天设置
-          //li
-            a(href='/e/settings/share') 分享设置
           li
             a(href='/e/settings/red-envelope') 奖励设置
           li
@@ -236,8 +242,15 @@
             a(href='/e/settings/app') APP
           li 
             a(href='/e/settings/sensitiveWords') 敏感词
+          li
+            a(href=`/e/settings/tools`) 网页工具
+      li.dropdown(role='presentation')
+        a.dropdown-toggle(data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false')
+          span=`工具 `
+          span.fa.fa-caret-down
+        ul.dropdown-menu
+          li
+            a(href="/e/tools/filter") 敏感词检测
       li
         a(href='/e/settings/shop') 商城设置
 
-      li
-        a(href="/e/tools") 网站工具

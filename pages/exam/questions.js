@@ -48,10 +48,28 @@ function deleteQuestion(qid) {
       screenTopWarning(data);
     });
 }   
+/*
+* 修改题库试题的状态
+* @param {String} qid 试题 ID
+* @param {String} status 状态类型
+* */
+function modifyQuestionStatus(qid, auth) {
+  return sweetQuestion('确定要执行当前操作？')
+    .then(() => {
+      return nkcAPI(`/exam/question/${qid}/auth`, 'PUT', {
+        auth
+      });
+    })
+    .then(() => {
+      sweetSuccess('执行成功');
+    })
+    .catch(sweetError);
+}
 
 Object.assign(window, {
   disabledQuestion,
   enabledQuestion,
   auth,
   deleteQuestion,
+  modifyQuestionStatus,
 });

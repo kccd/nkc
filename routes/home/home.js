@@ -41,6 +41,7 @@ module.exports = async (options) => {
     lastPostUser: false,
     htmlToText: true,
     count: 200,
+    removeLink: true,
   });
   // 置顶文章轮播图
   data.ads = await db.ThreadModel.getHomeRecommendThreads(fidOfCanGetThreads);

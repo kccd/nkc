@@ -1,55 +1,7 @@
-window.app = undefined;
-$(function() {
-  window.app = new Vue({
-    el: '#app',
-    data: {
-      text: '',
-      submitted: false,
-      systemInfo: []
-    },
-    mounted: function() {
-      var data = NKC.methods.getDataById("data");
-      for(var i = 0; i < data.systemInfo.length; i++) {
-        data.systemInfo[i].modify = false;
-      }
-      this.systemInfo = data.systemInfo;
-    },
-    methods: {
-      format: NKC.methods.format,
-      strToHTML: NKC.methods.strToHTML,
-      save: function(l) {
-        nkcAPI("/e/systemInfo", "PUT", {
-          _id: l._id,
-          c: l.c
-        })
-          .then(function() {
-            l.modify = false;
-            screenTopAlert("保存成功");
-          })
-          .catch(function(data){
-            screenTopWarning(data);
-          })
-      },
-      submit: function() {
-        if(app.submitted) return;
-        app.submitted = true;
-        if(app.text === '') {
-          return screenTopWarning('内容不能为空');
-        }
-        var obj = {
-          content: app.text
-        };
-        nkcAPI('/e/systemInfo', 'POST', obj)
-          .then(function() {
-            app.text = '';
-            app.submitted = false;
-            screenTopAlert('发送成功');
-          })
-          .catch(function(data) {
-            app.submitted = false;
-            screenTopWarning(data.error || data);
-          })
-      }
-    }
-  })
-});
+import { createApp } from "@vue/composition-api";
+import Vue from "vue";
+import ElementUI from "element-ui";
+import "element-ui/lib/theme-chalk/index.css";
+import App from "./app.vue";
+Vue.use(ElementUI);
+createApp(App).mount("#app");

@@ -363,13 +363,7 @@ chatSchema.statics.getCreatedChat = async (uid) => {
   };
 
   if(chat.systemInfo) {
-    const message = await MessageModel.findOne({
-      ty: 'STE'
-    }, {
-      ip: 0,
-      port: 0
-    })
-      .sort({tc: -1});
+    const [message] = (await MessageModel.getMySystemInfoMessage(uid)).reverse();
     if(message) {
       insertChat(chatList, {
         time: message.tc,
@@ -379,7 +373,7 @@ chatSchema.statics.getCreatedChat = async (uid) => {
         count: newSystemInfoCount,
         name: '系统通知',
         icon: '/statics/message_type/STE.jpg',
-        abstract: message.c,
+        abstract: message.c.content,
       });
     }
   }

@@ -21,11 +21,11 @@ visitorRouter
 		data.visitors = [];
 		for(const u of uid) {
 			const user = await db.UserModel.findOne({uid: u});
-			if(user) {
+			if(user && !user.certs.includes('banned') && !user.hidden) {
 				data.visitors.push(user);
 			}
     }
-    await db.UserModel.extendUsersInfo(data.visitors);
+    data.visitors = await db.UserModel.extendUsersInfo(data.visitors);
     if(data.user) {
       data.userSubUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
     }

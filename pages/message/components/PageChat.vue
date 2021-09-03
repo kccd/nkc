@@ -31,6 +31,7 @@
             span(v-if="message.position === 'left'") 对方撤回了一条消息
             //- 自己撤回
             span(v-else) 你撤回了一条消息
+              span.re-edit(v-if="message.content" @click="reEdit(message.content)") 重新编辑
           //- 消息内容容器
           .message(v-else :class='message.position')
 
@@ -120,6 +121,14 @@
   @bgColor: #eee;
   @bubbleBgColor: #fff;
   @bubbleBgColorRight: @primary;
+  .re-edit{
+    color: @primary!important;
+    user-select: none;
+    cursor: pointer;
+    &:hover{
+      opacity: 0.7;
+    }
+  }
   .chat-message-info{
     height: 2rem;
     line-height: 2rem;
@@ -767,8 +776,8 @@
         withdrawn(messageId)
           .catch(sweetError);
       },
-      onWithdrawn(messageId) {
-        onWithdrawn(this.originMessages, messageId);
+      onWithdrawn(messageId, reEdit) {
+        onWithdrawn(this.originMessages, messageId, reEdit);
       },
       onReceiveMessage(localId, message) {
         const {r, messageType, s} = message;
@@ -943,6 +952,9 @@
       reconnect() {
         const {type, uid} = this;
         this.init({type, uid});
+      },
+      reEdit(content) {
+        this.content += content;
       }
     }
   }

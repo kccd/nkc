@@ -131,7 +131,7 @@ async function compressedDir(dirPath, zipFilePath) {
 
 function getDataFolderByDate(t) {
   t = moment(t);
-  const folderPath =  PATH.resolve(folder, `./${dbName}/${t.format('YYYY')}/${t.format('MM')}/cache`);
+  const folderPath =  PATH.resolve(folder, `./${dbName}/${t.format('YYYY')}/${t.format('MM')}/${dbName}_${t.format(`YYYYMMDD`)}_cache`);
   fs.mkdirSync(folderPath, {
     recursive: true
   });

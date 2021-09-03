@@ -165,30 +165,9 @@ router
 		const forum = await db.ForumModel.findOnly({fid});
 		data.forumNav = await forum.getForumNav(query.cat);
 		// 专业权限判断: 若不是该专业的专家，走正常的权限判断
-		if(!token){
-			await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
-		}else{
-			let share = await db.ShareModel.findOne({"token":token});
-			if(!share) ctx.throw(403, "无效的token");
-			// if(share.tokenLife === "invalid") ctx.throw(403, "链接已失效");
-			if(share.tokenLife === "invalid"){
-				await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
-			}
-			let shareLimitTime;
-			let allShareLimit = await db.ShareLimitModel.findOne({"shareType":"all"});
-			if(forum.shareLimitTime){
-				shareLimitTime = forum.shareLimitTime;
-			}else{
-				shareLimitTime = allShareLimit.shareLimitTime;
-			}
-			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
-			let nowTimeStamp = parseInt(new Date().getTime());
-			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
-				await db.ShareModel.updateOne({"token": token}, {$set: {tokenLife: "invalid"}});
-				await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
-			}
-			// if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
-		}
+    if(!await db.ShareModel.hasPermission(token, fid)) {
+      await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
+    }
 		// await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
     data.isModerator = (await forum.isModerator(data.user)) || ctx.permission('superModerator');
 		data.forum = forum;
@@ -211,8 +190,11 @@ router
 		const behaviors = await db.UsersBehaviorModel.find({
 			timeStamp: {$gt: today()},
 			fid: {$in: childForumsId},
-			operationId: {$in: ['visitForumLatest', 'visitThread', 'visitForumFollowers', 'visitForumVisitors']}
-		}).sort({timeStamp: -1});
+			operationId: {$in: ['visitForumLatest', 'visitThread', 'viewForumFollowers', 'viewForumVisitors']}
+		}, {
+		  uid: 1, timeStamp: 1
+    }).sort({timeStamp: -1});
+
 		const usersId = [];
 		// 过滤掉重复的用户
 		behaviors.map(b => {
@@ -455,7 +437,8 @@ router
 
 		threads = await db.ThreadModel.extendThreads(threads, {
 			category: true,
-			htmlToText: true
+			htmlToText: true,
+      removeLink: true,
 		});
 
 		const superModerator = ctx.permission("superModerator");

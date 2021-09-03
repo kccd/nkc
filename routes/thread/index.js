@@ -174,42 +174,13 @@ threadRouter
     const thread = await db.ThreadModel.findOnly({tid});
     // 拓展文章所属专业
     const forums = await thread.extendForums(['mainForums', 'minorForums']);
+    if(forums.length) data.forum = forums[0];
 		// 验证权限 - new
 		// 如果是分享出去的连接，含有token，则允许直接访问
     // 【待改】判断用户是否是通过分享链接阅读文章，如果是则越过权限
     await db.SettingModel.restrictAccess(thread.toc, data.userRoles.map(role => role._id), data.userGrade._id);
-		if(!token){
+    if(!await db.ShareModel.hasPermission(token, thread.oc)) {
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-		}else{
-			let share = await db.ShareModel.findOne({"token":token});
-			if(!share) ctx.throw(403, "无效的token");
-			// if(share.tokenLife === "invalid") ctx.throw(403, "链接已失效");
-			if(share.tokenLife === "invalid"){
-				await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-			}
-			// 获取分享限制时间
-			let allShareLimit = await db.ShareLimitModel.findOne({"shareType":"all"});
-			if(!allShareLimit){
-				allShareLimit = new db.ShareLimitModel({});
-				await allShareLimit.save();
-			}
-			let shareLimitTime;
-      for(const forum of forums) {
-        const timeLimit = Number(forum.shareLimitTime);
-        if(shareLimitTime === undefined || shareLimitTime > timeLimit) {
-          shareLimitTime = timeLimit;
-        }
-      }
-			if(shareLimitTime === undefined) {
-        shareLimitTime = allShareLimit.shareLimitTime;
-      }
-			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
-			let nowTimeStamp = parseInt(new Date().getTime());
-			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
-				await db.ShareModel.updateOne({"token": token}, {$set: {tokenLife: "invalid"}});
-				await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-			}
-			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
     }
     // 获取当前用户有权查看文章的专业ID
     const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
@@ -250,6 +221,7 @@ threadRouter
     let firstPost = await db.PostModel.findOne({pid: thread.oc});
 		if(!firstPost) ctx.throw(500, `文章数据错误，oc:${thread.oc}`);
     firstPost = await db.PostModel.extendPost(firstPost, extendPostOptions);
+    firstPost.t = nkcModules.nkcRender.replaceLink(firstPost.t);
 		thread.firstPost = firstPost;
 		// 设置匿名标志，前端页面会根据此标志，判断是否默认勾选匿名发表勾选框
     data.anonymous = firstPost.anonymous;
@@ -406,6 +378,8 @@ threadRouter
       if(voteUpPostSettings.status === 'show') {
         let voteUpPostsId = await db.PostModel.find({
           tid,
+          type: 'post',
+          parentPostId: '',
           voteUp: {
             $gte: voteUpCount
           }
@@ -470,6 +444,7 @@ threadRouter
 		// 判断文章是否匿名 加载作者的其他文章
 		if(!data.anonymous) {
       data.targetUser = await thread.extendUser();
+      data.targetUser.description = nkcModules.nkcRender.replaceLink(data.targetUser.description);
       await data.targetUser.extendGrade();
       await db.UserModel.extendUserInfo(data.targetUser);
       data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);

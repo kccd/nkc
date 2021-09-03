@@ -440,6 +440,10 @@ var mobileApp = new Vue({
           location.reload();
         })
         .catch(sweetError)
+    },
+    toPhoneVerify: function() {
+      this.formType = "phoneVerify";
+      this.sendPhoneVerifySmsCode();
     }
   }
 });

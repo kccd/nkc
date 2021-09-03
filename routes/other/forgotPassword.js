@@ -35,7 +35,7 @@ forgotPasswordRouter
 	}
 	if(!mcode) ctx.throw(400, '请输入短信验证码。');
 	const type = 'getback';
-	await db.SmsCodeModel.ensureCode({nationCode, mobile, type, code: mcode});
+	await db.SmsCodeModel.ensureCode({nationCode, mobile, type, code: mcode, ip: ctx.address});
 	data.mobile = mobile;
 	data.mcode = mcode;
 	data.nationCode = nationCode;
@@ -46,7 +46,7 @@ forgotPasswordRouter
 	const {password, mcode, mobile, nationCode} = body;
 	if(!mobile || !nationCode || !mcode) ctx.throw(400, '参数错误，请刷新页面后重新提交。');
 	const type = 'getback';
-	const smsCode = await db.SmsCodeModel.ensureCode({nationCode, mobile, code: mcode, type});
+	const smsCode = await db.SmsCodeModel.ensureCode({nationCode, mobile, code: mcode, type, ip: ctx.address});
 	if(!password) ctx.throw(400, '请输入密码。');
 	const {contentLength, checkPass} = ctx.tools.checkString;
 	if(contentLength(password) < 8) ctx.throw(400, '密码长度不能小于8位。');

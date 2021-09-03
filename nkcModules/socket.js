@@ -422,14 +422,16 @@ func.sendEventWithdrawn = async (uid, tUid, messageId) => {
     eventName: 'withdrawn',
     roomName: getRoomName('user', uid),
     data: {
-      messageId
+      messageId,
+      reEdit: true,
     }
   });
   socketClient.sendMessage(socketServiceName, {
     eventName: 'withdrawn',
     roomName: getRoomName('user', tUid),
     data: {
-      messageId
+      messageId,
+      reEdit: false
     }
   });
 };
@@ -507,6 +509,7 @@ func.sendSystemInfoToUser = async (messageId) => {
   let message = await db.MessageModel.findOne({_id: messageId});
   if(!message) return;
   message = await db.MessageModel.extendMessage(message);
+  // 获取能够接收此消息的用户
   const users = await db.UserModel.find({online: {$ne: ''}}, {uid: 1}).sort({toc: 1});
   const socketClient = communication.getCommunicationClient();
   for(const u of users) {

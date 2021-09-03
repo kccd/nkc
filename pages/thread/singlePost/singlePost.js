@@ -208,6 +208,7 @@ class SinglePostModule {
     NKC.methods.initPostOption();
     NKC.methods.initStickerViewer();
     if(!NKC.configs.isApp) NKC.methods.initImageViewer();
+    NKC.methods.replaceNKCUrl();
     NKC.methods.initVideo();
   }
   // 移除所有评论框和定时事件
@@ -251,6 +252,7 @@ class SinglePostModule {
   }
   // 显示、隐藏评论
   switchPostComment(pid, fixPosition, page) {
+    if(!window.UE) return screenTopWarning(`别着急，页面还在加载中...`);
     const container = this.getCommentContainer(pid);
     if(container.attr('data-hide') === 'false') {
       if(fixPosition) {

@@ -25,12 +25,61 @@ resourceRouter
     await next();
   })
   .get('/:rid', async (ctx, next) => {
-    const {query, data, db, fs, settings, nkcModules} = ctx;
+    const {state, query, data, db, fs, settings, nkcModules} = ctx;
+    // 分享的 post 时，浏览器会将 token、pid 添加到 资源链接后
     const {t, c, d} = query;
     const {cache} = settings;
-    const {resource} = data;
+    const {resource, user} = data;
+    if(resource.uid !== state.uid) {
+      // 不是自己的附件需判断权限
+      const accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
+      const refererString = ctx.get('referer') || '';
+      const referer = new URL(refererString);
+      let hasPermission = false;
+      const token = referer.searchParams.get('token');
+      if(token) {
+        // 存在 token，判断来源
+        const tidReg = /\/t\/([0-9a-zA-Z]+)/i;
+        const pidReg = /\/p\/([0-9a-zA-Z]+)/i;
+        let tid = refererString.match(tidReg);
+        let pid = refererString.match(pidReg);
+        tid = tid? tid[1]: '';
+        pid = pid? pid[1]: '';
+        // 根据来源判断与来源相关的 post
+        let postsId = [];
+        if(pid) {
+          const post = await db.PostModel.findOne({pid}, {type: 1, tid: 1});
+          if(post.type === 'thread') {
+            tid = post.tid;
+          } else {
+            const childPosts = await db.PostModel.find({parentPostsId: pid}, {pid: 1});
+            postsId = childPosts.map(post => post.pid);
+            postsId.push(pid);
+          }
+        }
+        if(tid) {
+          const posts = await db.PostModel.find({tid}, {pid: 1});
+          postsId = postsId.concat(posts.map(post => post.pid));
+        }
+        postsId = [...new Set(postsId)];
+        const total = postsId.length + resource.references.length;
+        const filterTotal = (new Set(postsId.concat(resource.references))).size;
+        if(filterTotal < total) {
+          // 当前资源与 token 分享的 post 有交集
+          // 判断 token 是否有效
+          try{
+            // 判断 token 是否有效
+            await db.ShareModel.ensureEffective(token);
+            hasPermission = true;
+          } catch(err) {}
+        }
+      }
+      // token 无效，，判断用户是否有权访问资源所在 post
+      if(!hasPermission) {
+        await resource.checkAccessPermission(accessibleForumsId);
+      }
+    }
     const {mediaType, ext} = resource;
-    const {user} = data;
     let filePath = await resource.getFilePath(t);
     let speed;
     data.resource = resource;

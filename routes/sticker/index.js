@@ -1,6 +1,8 @@
 const twemoji = require("twemoji");
 const router = require("koa-router")();
 const statics = require("../../settings/statics");
+const fs = require("fs").promises;
+
 router
   .get("/", async (ctx, next) => {
     const {query, state, data, db, nkcModules} = ctx;
@@ -105,7 +107,14 @@ router
         return next();
       }
       const resource = await db.ResourceModel.findOnly({rid, type: "sticker", mediaType: "mediaPicture"});
-      ctx.filePath = await resource.getFilePath();
+      const filePath = await resource.getFilePath();
+      await fs.access(filePath)
+        .then(() => {
+          ctx.filePath = filePath;
+        })
+        .catch(() => {
+          ctx.filePath = statics.defaultStickerImage;
+        })
       ctx.resource = resource;
       ctx.type = resource.ext;
     }

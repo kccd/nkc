@@ -23,8 +23,8 @@ defaultWL.img = ["src", "alt", "class", "data-src", "data-type", "dataimg", "sty
 defaultWL.video = ["src", "class", "preload", "controls", "poster", "data-rid", "data-plyr-title", "data-tag", "data-type", "data-id"];
 defaultWL.audio = ["src", "class", "preload", "controls", "data-rid", "data-tag", "data-type", "data-id", 'data-size'];
 defaultWL.source = ["src", "type", 'size'];
-defaultWL.span = ["class", "style", 'data-type', 'data-id', "_rendered", "style", "data-tag", 'title'];
-defaultWL.a = ["class", "href", "target", "title", "style", "data-type", "data-tag", "data-id"];
+defaultWL.span = ["class", "style", 'data-type', 'data-id', "_rendered", "style", "data-tag", 'title', 'data-url'];
+defaultWL.a = ["class", "href", "target", "title", "style", "data-type", "data-tag", "data-id", 'data-url'];
 defaultWL.pre = ['class', "data-tag", "data-type", "data-id"];
 defaultWL.em = ['class', 'style', 'note-tag', 'note-id', 'tag-type', 'contenteditable'];
 

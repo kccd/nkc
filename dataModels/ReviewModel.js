@@ -63,6 +63,45 @@ schema.statics.newReview = async (type, post, user, reason) => {
 
 const pureWordRegExp = /([^\u4e00-\u9fa5a-zA-Z0-9])/gi;
 const MatchedKeyword = { result: [] };
+schema.statics.matchKeywords = async (content, groups) => {
+  const SettingModel = mongoose.model('settings');
+  const reviewSettings = await SettingModel.getSettings('review');
+  const keywordSettings = reviewSettings.keyword;
+  if(!keywordSettings) return [];
+  if(!keywordSettings.enable) return [];
+  const {wordGroup} = keywordSettings;
+  if(!wordGroup || wordGroup.length === 0) return [];
+  content = content.replace(pureWordRegExp, '').toLowerCase();
+  let results = [];
+  for(const group of groups) {
+    let {keywords} = group;
+    keywords = keywords.map(keyword => keyword.replace(pureWordRegExp, '').toLowerCase());
+    const { times: leastKeywordTimes, count: leastKeywordCount, logic: relationship } = group.conditions;
+    const mint = new Mint(keywords);
+    const contentFilterValue = await mint.filter(content, { replace: false });
+    // 保存结果
+    const matchedKeywords = [].concat(contentFilterValue.words);
+    // 开始分析检测结果
+    if(contentFilterValue.pass) continue;   // 代表没有命中任何关键词
+    // 命中敏感词个数
+    const hitWordsCount = contentFilterValue.words.length;
+    // 总命中次数
+    let hitCount = 0;
+    contentFilterValue.words.forEach(word => {
+      hitCount += (content.match(new RegExp(word, "g")) || []).length;
+    });
+    if(relationship === "or") {
+      if(hitWordsCount >= leastKeywordCount || hitCount >= leastKeywordTimes) {
+        results = results.concat(matchedKeywords);
+      }
+    } else if(relationship === "and") {
+      if(hitWordsCount >= leastKeywordCount && hitCount >= leastKeywordTimes) {
+        results = results.concat(matchedKeywords);
+      }
+    }
+  }
+  return [...new Set(results)];
+}
 // 文章内容是否触发了敏感词送审条件
 schema.statics.includesKeyword = async ({content, useGroups}) => {
   // 拿到全局的敏感词设置
@@ -76,6 +115,9 @@ schema.statics.includesKeyword = async ({content, useGroups}) => {
   // 把待检测文本聚合起来并提取纯文字（无标点符号和空格）
   let pure_content = content.replace(pureWordRegExp, "").toLowerCase();
   // 循环采用每一个设置的敏感词组做一遍检测
+  const groupsId = wordGroup.map(g => g.id);
+  useGroups = useGroups.filter(g => groupsId.includes(g.id));
+
   for(const group of wordGroup) {
     const { id } = group;
     if(!useGroups.includes(id)) continue;
@@ -121,7 +163,7 @@ schema.statics.autoPushToReview = async function(post) {
 
   const user = await UserModel.findOne({uid});
   if(!user) throwErr(500, "在判断内容是否需要审核的时候，发现未知的uid");
-  const reviewSettings = (await SettingModel.findById("review")).c;
+  const reviewSettings = await SettingModel.getSettings('review');
   const review = reviewSettings[type];
 
   const needReview = await (async () => {
@@ -231,10 +273,17 @@ schema.statics.autoPushToReview = async function(post) {
       if(currentPostType === "post") {
         useKeywordGroups = forumKeywordSettings.rule.reply.useGroups;
       }
-      if(await ReviewModel.includesKeyword({   content: post.t + post.c,   useGroups: useKeywordGroups })) {
-        await ReviewModel.newReview("includesKeyword", post, user, `内容中包含敏感词 ${MatchedKeyword.result.join("、")}`);
+      const {wordGroup} = reviewSettings.keyword;
+      useKeywordGroups = wordGroup.filter(g => useKeywordGroups.includes(g.id));
+      const matchedKeywords = await ReviewModel.matchKeywords(post.t + post.c, useKeywordGroups);
+      if(matchedKeywords.length > 0) {
+        await ReviewModel.newReview("includesKeyword", post, user, `内容中包含敏感词 ${matchedKeywords.join("、")}`);
         return true;
       }
+      /*if(await ReviewModel.includesKeyword({   content: post.t + post.c,   useGroups: useKeywordGroups })) {
+        await ReviewModel.newReview("includesKeyword", post, user, `内容中包含敏感词 ${MatchedKeyword.result.join("、")}`);
+        return true;
+      }*/
     }
     
     // 六、专业审核设置了送审规则（按角色和等级的关系送审）

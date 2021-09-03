@@ -69,10 +69,10 @@ productRouter
   // 商品禁售,权限分配给管理员
   .put('/:productId/banSale', async (ctx, next) => {
 		const {db, body} = ctx;
-		const {productId} = body;
+		const {productId, disabled} = body;
 		const product = await db.ShopGoodsModel.findOne({productId: productId});
 		if(product) {
-			await product.updateOne({$set: {adminBan:true}});
+			await product.updateOne({$set: {adminBan: !!disabled}});
 		}
 		await next();
   })

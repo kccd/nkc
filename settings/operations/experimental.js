@@ -5,6 +5,14 @@ module.exports = {
     POST: "experimentalLogin"
   },
 	settings: {
+    tools: {
+      GET: "visitToolsManager"
+    },
+	  ip: {
+	    GET: 'experimentalIPSettings',
+      POST: 'experimentalIPSettings',
+      DELETE: 'experimentalIPSettings'
+    },
 	  visit: {
 	    GET: 'experimentalVisitSettings',
       PUT: 'experimentalVisitSettings'
@@ -242,8 +250,8 @@ module.exports = {
 			PUT: 'modifyEMessageSettings'
 		},
 		share: {
-			GET: 'visitEShareSettings',
-			PUT: 'modifyEShareSettings'
+			GET: 'experimentalShareSettings',
+			PUT: 'experimentalShareSettings'
 		},
 		post: {
 			GET: 'visitEPostSettings',
@@ -263,7 +271,10 @@ module.exports = {
 			unverifiedPhone: {
 				GET: "unverifiedPhonePage"
       },
-      weakPasswordCheck: {
+			modifyPassword: {
+				POST: "modifyBackendPassword"
+			},
+			weakPasswordCheck: {
         GET: "weakPasswordCheck",
         result: {
           GET: "weakPasswordCheckResult"
@@ -316,10 +327,18 @@ module.exports = {
 	systemInfo: {
 		GET: 'visitSystemInfo',
 		POST: 'sendSystemInfo',
-    PUT: "modifySystemInfo"
+    PUT: "modifySystemInfo",
+		DELETE: "deleteSystemInfo",
+		fuzzy_search_user: {
+			GET: "fuzzySearchUser"
+		}
 	},
 	log: {
     GET: 'visitPublicLogs',
+    filter: {
+      GET: 'experimentalFilterLogs',
+      POST: 'experimentalFilterLogs'
+    },
 		resource: {
     	GET: 'experimentalResourceLogs'
 		},
@@ -397,9 +416,30 @@ module.exports = {
     }
 	},
   console: {
-	  GET: 'visitExperimentalConsole'
+		GET: 'visitExperimentalConsole'
 	},
-	tools: {
-		GET: "visitToolsManager"
-	}
+	auth: {
+		GET: 'visitAuthList',
+		PARAMETER: {
+			GET: 'visitUserAuth',
+			DELETE: 'cancelSubmitVerify',
+			verify2: {
+				POST: "modifyUserVerifyStatus"
+			},
+			verify3: {
+				POST: "modifyUserVerifyStatus"
+			},
+			a: {
+				PARAMETER: {
+					GET: "auditorVisitVerifiedUpload"
+				}
+			}
+		}
+	},
+  tools: {
+	  filter: {
+	    GET: 'experimentalToolsFilter',
+      POST: 'experimentalToolsFilter'
+    }
+  }
 };

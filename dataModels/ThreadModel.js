@@ -699,8 +699,10 @@ const defaultOptions = {
   count: 200,
   showAnonymousUser: false,
   excludeAnonymousPost: false,
+  removeLink: true,
 };
 threadSchema.statics.extendThreads = async (threads, options) => {
+  const nkcRender = require('../nkcModules/nkcRender');
   const o = Object.assign({}, defaultOptions);
   Object.assign(o, options);
   let PostModel, UserModel, ForumModel, ThreadTypeModel;
@@ -762,6 +764,12 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       postsObj[post.pid] = post;
       if(o.firstPostUser || o.lastPostUser) {
         usersId.add(post.uid);
+      }
+      if(o.removeLink) {
+        post.c = nkcRender.replaceLink(post.c);
+        post.t = nkcRender.replaceLink(post.t);
+        post.abstractCn = nkcRender.replaceLink(post.abstractCn);
+        post.abstractEn = nkcRender.replaceLink(post.abstractEn);
       }
     });
 

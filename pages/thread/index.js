@@ -1313,6 +1313,8 @@ function insertRenderedPost(renderedPost) {
 	NKC.methods.initPostOption();
 	// 图片预览
 	if(!NKC.configs.isApp) NKC.methods.initImageViewer();
+	// 外链复原
+  NKC.methods.replaceNKCUrl();
 	// 划词笔记
   const elements = document.querySelectorAll(`[data-type="nkc-render-content"][data-id="${renderedPost.postId}"]`);
   for(let i = 0; i < elements.length; i++) {

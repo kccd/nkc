@@ -56,6 +56,8 @@ block content
                 span.text-success.m-r-1 审核已通过
               else 
                 span.text-danger.m-r-1 审核未通过
+                if permission('modifyQuestionAuthStatus')
+                  a.m-r-1(v-if='question.auth === false' onclick=`modifyQuestionStatus('${question._id}', null)`) 设为待审
                 if permission('removeAllQuestion')
                   a.m-r-1(onclick=`deleteQuestion('${question._id}')`) 删除
             a(href=`/exam/editor?qid=${question._id}`).m-r-1 编辑
@@ -67,7 +69,7 @@ block content
             if question.auth === false || question.disabled
               h5.text-danger 原因：
                 span= question.reason    
-            div.question-content!=`${markdown('问：' + question.content)}`
+            div.question-content!=`${markdown_safe('问：' + question.content)}`
             if question.hasImage
               img(src=`/exam/question/${question._id}/image` style='max-width: 100%;')
             for a, index in question.answer

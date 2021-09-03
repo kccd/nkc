@@ -765,14 +765,14 @@ userSchema.statics.createUser = async (option) => {
 		  await sub.save();
     }
 		// 创建默认数据 查看系统通知的记录
-    const systemInfo = await MessageModel.find({ty: 'STE'}, {_id: 1});
+    /*const systemInfo = await MessageModel.find({ty: 'STE'}, {_id: 1});
 		for(const s of systemInfo) {
       const log = SystemInfoLogModel({
         mid: s._id,
         uid
       });
       await log.save();
-    }
+    }*/
 	} catch (error) {
 		await UserModel.deleteOne({uid});
 		await UsersPersonalModel.deleteOne({uid});
@@ -837,9 +837,10 @@ userSchema.methods.getNewMessagesCount = async function() {
   let newApplicationsCount = 0;
   let newReminderCount = 0;
   if(systemInfo) {
-    const allSystemInfoCount = await MessageModel.countDocuments({ty: 'STE'});
+    const allMySystemInfoMessageCount = (await MessageModel.getMySystemInfoMessage(this.uid)).length;
+    // const allSystemInfoCount = await MessageModel.countDocuments({ty: 'STE'});
     const viewedSystemInfoCount = await SystemInfoLogModel.countDocuments({uid: this.uid});
-    newSystemInfoCount = allSystemInfoCount - viewedSystemInfoCount;
+    newSystemInfoCount = allMySystemInfoMessageCount - viewedSystemInfoCount;
     // 可能会生成多条相同的阅读记录 以下判断用于消除重复的数据
     if(newSystemInfoCount < 0) {
       const systemInfoLog = await SystemInfoLogModel.aggregate([
@@ -974,6 +975,7 @@ userSchema.statics.extendUsersInfo = async (users) => {
   const RoleModel = mongoose.model('roles');
   const ColumnModel = mongoose.model('columns');
   const UsersPersonalModel = mongoose.model('usersPersonal');
+  const nkcRender = require('../nkcModules/nkcRender');
   const uid = new Set(), personalObj = {};
   for(const user of users) {
     uid.add(user.uid);
@@ -1035,6 +1037,7 @@ userSchema.statics.extendUsersInfo = async (users) => {
       await user.extendGrade();
     }
     const _user = user.toObject? user.toObject(): user;
+    _user.description = nkcRender.replaceLink(_user.description);
     users_.push(_user);
   }
   return users_;
@@ -2355,6 +2358,7 @@ userSchema.statics.getModifyPostTimeLimitMS = async (uid) => {
 userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
+  const UsersPersonalModel = mongoose.model('usersPersonal');
   const ForumModel = mongoose.model('forums');
   const PostModel = mongoose.model('posts');
   let result = {
@@ -2463,6 +2467,11 @@ userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
         warning: `<div>${err.message}</div>`
       }
     }
+  }
+  const shouldVerifyPhoneNumber = await UsersPersonalModel.shouldVerifyPhoneNumber(uid);
+  if(shouldVerifyPhoneNumber) {
+    result.warning = result.warning || '';
+    result.warning += `<div>请参与定期验证手机号，验证前你所发表的内容需通过审核后才能显示。<a href="/u/${uid}/settings/security" target="_blank">去验证</a></div>`;
   }
   return result;
 };
@@ -2591,6 +2600,20 @@ userSchema.statics.checkCode = async (uid, code) => {
   const UserModel = mongoose.model('users');
   const codes = await UserModel.getCode(uid);
   return codes.includes(code);
+}
+
+/*
+* 获取以用户 ID 为键，以用户对象为值得对象
+* @param {[String]} 用户 ID 组成的数组
+* */
+userSchema.statics.getUsersObjectByUsersId = async (usersId) => {
+  const UserModel = mongoose.model('users');
+  const users = await UserModel.find({uid: {$in: usersId}}, {uid: 1, avatar: 1, username: 1});
+  const usersObj = {};
+  for(let i = 0; i < users.length; i++) {
+    usersObj[users[i].uid] = users[i];
+  }
+  return usersObj;
 }
 
 module.exports = mongoose.model('users', userSchema);

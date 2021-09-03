@@ -5,6 +5,7 @@ import {setAsDraggableElement} from "../lib/js/draggable";
 import {getFromLocalStorage, updateInLocalStorage, saveToLocalStorage} from "../lib/js/localStorage";
 import {debounce} from "../lib/js/execution";
 import {sleep} from "../lib/js/timeout";
+import FastClick from "fastclick";
 
 const messageAppId = '#messageApp';
 const socketContainer = '#socketContainer';
@@ -101,6 +102,7 @@ const messageApp = new Vue({
     });
     const newMessageCount = this.getNewMessageCountFromNKC();
     this.updateNewMessageCount(newMessageCount);
+    FastClick.attach($(messageAppId)[0]);
   },
   watch: {
     async showPanel() {
