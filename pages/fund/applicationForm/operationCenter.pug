@@ -1,0 +1,126 @@
+if !isIncluded('operationCenter')
+  mixin applicantOperationCenter(form, uid)
+    -var isApplicant = form.uid === uid;
+    -var {general, detail} = form.formStatus;
+    if isApplicant && [2, 4].includes(general)
+      .m-b-1
+        .panel-header 操作中心
+        if general === 2
+          a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/settings`) 修改申请表信息
+          button.btn.btn-danger.btn-block(onclick=`revoked("giveUp", ${form._id})`) 放弃申请
+        if general === 4
+          a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/report`) 报告进度
+          a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/remittance/apply`) 申请拨款、确认拨款
+          a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/complete`) 结题
+
+  mixin managerOperationCenter(form, userFundRoles)
+    -var {applicant} = form;
+    -var {general, detail} = form.formStatus;
+    -var isAdmin = userFundRoles.includes('admin');
+    -var isCensor = userFundRoles.includes('censor');
+    -var isFinancialStaff = userFundRoles.includes('financialStaff');
+    -var isExpert = userFundRoles.includes('expert');
+    -var isVoter = userFundRoles.includes('voter');
+    if isAdmin || isFinancialStaff || isExpert
+      .m-b-1
+        .panel-header 管理中心
+        if general === 3 && detail === 2 && isExpert
+          a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/manage/audit/project`) 专家审核
+        if general === 3 && detail === 3 && isAdmin
+          a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/manage/audit/info`) 管理员复核
+        if general === 4 && detail === 2 && isFinancialStaff
+          a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/remittance`) 拨款
+        if general === 4 && detail === 4 && isExpert
+          a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/report/audit`) 报告审核
+        if general === 4 && detail === 6 && isExpert
+          a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/complete/audit`) 结题审核
+        if general === 5 && isAdmin
+          if detail === 3
+            button.btn.btn-default.btn-block(onclick=`excellent(${form._id}, false)`) 取消设为优秀项目
+          else
+            button.btn.btn-default.btn-block(onclick=`excellent(${form._id}, true)`) 设为优秀项目
+        if isAdmin
+          if general === 1
+            if [1, 2, 5, 6].includes(detail)
+              button.btn.btn-default.btn-block(onclick=`restoreApplicationForm(${form._id})`) 恢复申请表
+          if general === 1 && detail === 1
+            button.btn.btn-default.btn-block(onclick=`disableApplicationForm(${form._id}, false)`) 解除屏蔽
+          else
+            button.btn.btn-default.btn-block(onclick=`disableApplicationForm(${form._id}, true)`) 屏蔽
+          if general === 4
+            button.btn.btn-default.btn-block(onclick=`applicationFormStop(${form._id})`) 强制终止
+          if general === 2 && [2, 3].includes(detail)
+            button.btn.btn-default.btn-block(onclick=`applicationFormTimeout(${form._id})`) 设为修改超时
+          if permission('fundBlacklistPost')
+            if applicant.inFundBlacklist
+              button.btn.btn-default.btn-block(onclick=`removeUserFromFundBlacklist("${form.uid}")`) 移出黑名单
+            else
+              button.btn.btn-default.btn-block(onclick=`addUserToFundBlacklist("${form.uid}", ${form._id})`) 加入黑名单
+
+
+  +includeJS('/fund/blacklist/blacklist.js')
+  script.
+    var giveUpReason = '';
+    function revoked(type, _id) {
+      if (type === 'giveUp') {
+        return sweetPrompt('请输入放弃的原因', giveUpReason)
+          .then(function(reason) {
+            giveUpReason = reason;
+            return nkcAPI('/fund/a/' + _id + '/settings/giveup', 'POST', {reason: reason});
+          })
+          .then(function () {
+            sweetSuccess('操作成功');
+          })
+          .catch(function (data) {
+            sweetError(data);
+          });
+      }
+    }
+    function excellent(id, type) {
+      nkcAPI('/fund/a/' + id + '/excellent', 'PUT', {type: type})
+        .then(function () {
+          sweetSuccess('操作成功');
+        })
+        .catch(function (data) {
+          sweetError(data);
+        })
+    }
+    function restoreApplicationForm(id) {
+      nkcAPI('/fund/a/' + id + '/manage/restore', 'POST', {})
+        .then(function () {
+          sweetSuccess('执行成功');
+        })
+        .catch(function (data) {
+          sweetError(data);
+        })
+    }
+    function disableApplicationForm(id, type) {
+      if (type === true && confirm('确定要封禁该基金申请？') === false) return;
+      nkcAPI('/fund/a/' + id + '/disabled', 'PUT', {type: type})
+        .then(function () {
+          window.location.reload();
+        })
+        .catch(function (data) {
+          screenTopWarning(data.error);
+        })
+    }
+    function applicationFormStop(formId) {
+      return sweetPrompt('请输入原因', '')
+      .then(function(reason) {
+        return nkcAPI('/fund/a/' + formId + '/manage/stop', 'POST', {reason: reason})
+      })
+      .then(function() {
+        sweetSuccess('操作成功');
+      })
+      .catch(sweetError)
+    }
+    function applicationFormTimeout(formId) {
+      return sweetQuestion('确定要执行当前操作？')
+      .then(function() {
+        return nkcAPI('/fund/a/' + formId + '/manage/timeout', 'POST', {});
+      })
+      .then(function() {
+        sweetSuccess('操作成功');
+      })
+      .catch(sweetError);
+    }

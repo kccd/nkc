@@ -63,6 +63,14 @@ html(lang='zh-CN')
               .name.col-sm-3.control-label 数据库名
               .col-sm-8
                 input.form-control(type='text' v-model.trim='mongodb.databaseName')
+                .radio
+                  span 存在同名数据库时：
+                  label.m-r-1
+                    input(type='radio' :value='false' v-model='mongodb.drop')
+                    span 阻止安装
+                  label
+                    input(type='radio' :value='true' v-model='mongodb.drop')
+                    span 清空后安装
             .form-group
               .name.col-sm-3.control-label 用户名
               .col-sm-8
@@ -127,7 +135,7 @@ html(lang='zh-CN')
                   .fa.fa-spinner.fa-spin
                   | &nbsp;&nbsp;安装中...
     script(src=`/vue/dist/vue.js?t=${data.time}`)
-    script(src=`/jquery/jquery-1.11.1.js?t=${data.time}`)
+    script(src=`/jquery/dist/jquery.min.js?t=${data.time}`)
     script(src=`/Promise/promise.min.js?t=${data.time}`)
     script(src=`/interface_common.js?t=${data.time}`)
     script(src=`/index.js?t=${data.time}`)

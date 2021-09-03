@@ -46,3 +46,9 @@ pre{
 .form-horizontal{
   margin-bottom: 3rem;
 }
+.m-r-1{
+  margin-right: 1rem!important;
+}
+.p-t-0{
+  padding-top: 0!important;
+}

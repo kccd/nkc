@@ -3,10 +3,6 @@ module.exports = {
 	add: {
 		GET: 'visitAddFund'
 	},
-	settings: {
-		GET: 'visitFundSettings',
-		PUT: 'modifyFundSettings'
-	},
 	info: {
 		GET: 'visitFundInfo'
 	},
@@ -25,15 +21,20 @@ module.exports = {
 	me: {
 		GET: 'visitMyFund'
 	},
+  blacklist: {
+	  GET: 'visitFundBlacklist',
+    POST: 'fundBlacklistPost',
+    DELETE: 'fundBlacklistPost'
+  },
 	list: {
 		GET: 'visitFundObjectList',
 		POST: 'addFund',
 		PARAMETER: {
 			DELETE: 'deleteFundObject',
-			PUT: 'modifyFundObject',
 			GET: 'visitFundObjectHome',
 			settings: {
-				GET: 'visitFundObjectSettings'
+				GET: 'singleFundSettings',
+        PUT: 'singleFundSettings'
 			},
 			add: {
 				GET: 'agreeFundTerms',
@@ -46,6 +47,7 @@ module.exports = {
 	},
 	donation: {
 		GET: 'fundDonation',
+    POST: 'fundDonation',
 		return: {
 			GET: 'fundDonation'
 		},
@@ -86,8 +88,46 @@ module.exports = {
 				}
 			},
 			settings: {
-				GET: 'visitFundApplicationFormSettings'
+				GET: 'visitFundApplicationFormSettings',
+        POST: 'visitFundApplicationFormSettings',
+        member: {
+				  POST: 'visitFundApplicationFormSettings',
+          DELETE: 'visitFundApplicationFormSettings'
+        },
+        post: {
+				  GET: 'visitFundApplicationFormSettings'
+        },
+        delete: {
+				  POST: 'visitFundApplicationFormSettings'
+        },
+        giveup: {
+				  POST: 'visitFundApplicationFormSettings'
+        }
 			},
+      manage: {
+			  audit: {
+			    project: {
+            GET: 'visitFundApplicationAudit',
+            POST: 'submitFundApplicationAudit'
+          },
+          info: {
+            GET: 'visitFundApplicationAudit',
+            POST: 'submitFundApplicationAudit'
+          }
+        },
+        refuse: {
+			    POST: 'submitFundApplicationAudit'
+        },
+        restore: {
+			    POST: 'restoreFundApplicationForm'
+        },
+        stop: {
+			    POST: 'stopFundApplicationForm'
+        },
+        timeout: {
+			    POST: 'timeoutFundApplicationForm'
+        }
+      },
 			/*comment: {
 				POST: 'addFundApplicationComment',
 				PARAMETER: {

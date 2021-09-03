@@ -1,0 +1,19 @@
+{
+  "serverHost": "127.0.0.1",
+  "serverPort": 8976,
+  "socketServerOptions": {
+    "transports": [
+      "websocket"
+    ]
+  },
+  "socketClientOptions": {
+    "transports": [
+      "websocket"
+    ]
+  },
+  "messageEventName": "message",
+  "servicesName": {
+    "nkc": "nkc",
+    "socket": "socket"
+  }
+}

@@ -1,0 +1,54 @@
+extends ../fundContainer
+block fundTitle
+  title 报告审核
+block fundContent
+  include ../applicationForm/formThread
+  -var form = data.applicationForm;
+  -var {project, code, applicant, remittance, reportNeedThreads} = form;
+  -var number;
+  -var needRemittance;
+  for r, i in remittance
+    if !r.status
+      -needRemittance = true;
+      -number = i;
+      -break;
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-6.box-shadow-panel
+        div
+          .panel-header 报告审核
+          h5=`项目名称：${project.t}`
+          h5=`项目ID：${code}`
+          h5 申请人：
+            a(
+              href=tools.getUrl('userHome', applicant.uid)
+              target="_blank"
+              data-float-uid=applicant.uid
+              )=applicant.user.username
+          h5=`申请人申请第 ${number + 1} 期拨款`
+          if number !== 0
+            h5 提交的报告：
+            .bg-info.p-a-1.pre-wrap=data.report.c
+            if reportNeedThreads
+              h5 附带的文章：
+              div
+                for thread in data.threads
+                  +formThread(thread)
+          hr
+          .hidden#data=objToStr({form, number})
+          .form#app(v-cloak)
+            .form-group
+              .radio
+                label.m-r-1
+                  input(type='radio' :value='true' v-model='passed')
+                  span 通过
+                label
+                  input(type='radio' :value='false' v-model='passed')
+                  span 不通过
+            .form-group
+              h5 审核意见
+              textarea.form-control(rows=5 v-model='content')
+            .form-group
+              button.btn.btn-default(@click='submit') 提交
+block fundScripts
+  +includeJS('/fund/report/audit.js')

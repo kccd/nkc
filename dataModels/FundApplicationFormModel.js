@@ -1,4 +1,9 @@
 const settings = require('../settings');
+const moment = require('moment');
+const FundDocumentModel = require("./FundDocumentModel");
+const FundApplicationFormHistoryModel = require("./FundApplicationHistoryModel");
+const elasticSearch = require("../nkcModules/elasticSearch");
+const nkcRender = require("../nkcModules/nkcRender");
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundApplicationFormSchema = new Schema({
@@ -24,7 +29,7 @@ const fundApplicationFormSchema = new Schema({
     required: true,
     index: 1
   },
-	// 是否未固定金额
+	// 是否固定金额
 	fixedMoney: {
   	type: Boolean,
 		required: true
@@ -77,23 +82,49 @@ const fundApplicationFormSchema = new Schema({
     required: true,
     index: 1
   },
+  // 申请者输入的预算 不一定是最终打款的金额
   budgetMoney: { // 预算
     type: Schema.Types.Mixed,
     default: []
     /*
     {
-      purpose: String,
-      money: Number,
-      count: Number,
-			total: Number
+      purpose: String, // 物品名称
+      money: Number,   // 单价 0.01
+      count: Number,   // 数量
+      total: Number, // 总计 0.01 单价 * 数量
+			suggest: Number, // 专家建议
+			fact: Number     // 管理员最后批准
+
+			unit: String, // 单位
+      model: String, // 型号
     }
     */
   },
+  // 结题时填写的各个物品的实际花费
 	actualMoney: {
   	type: [Schema.Types.mixed],
-		default: null
+		default: null,
+    /*{
+      purpose: String, // 物品名称
+      money: Number,   // 单价
+      count: Number,   // 数量
+    }*/
 	},
-  projectCycle: { // 预计周期
+
+  // 若基金项目为固定金额，则此字段为fund.money.value
+  // 若基金项目为非固定金额，根据实际批准的预算统计得到
+  money: {
+    type: Number,
+    default: 0
+  },
+  // 审核方式
+  // person: 人工, system: 系统
+  auditType: {
+    type: String,
+    default: 'person'
+  },
+  // 预计周期
+  projectCycle: {
 	  type: Number,
 	  default: null,
 	  index: 1,
@@ -186,7 +217,12 @@ const fundApplicationFormSchema = new Schema({
       index: 1
     }
   },
-	useless: { //giveUp: 放弃申请，exceededModifyCount: 超过修改次数， null: 数据有效， refuse：永久拒绝
+	useless: {
+    //giveUp: 放弃申请，
+    // exceededModifyCount: 超过修改次数，
+    // null: 数据有效,
+    // refuse：永久拒绝,
+    // stop: 中止
   	type: String,
 		default: null,
 		index: 1
@@ -261,9 +297,25 @@ const fundApplicationFormSchema = new Schema({
   	* money: number
   	* article: id 阶段性报告
   	* */
+    /*{
+        money: form.money,
+        status: null,
+        report: null,
+        passed: null,
+        verify: false,
+        apply: false,
+        threads: [String] 附带的文章
+        uid: String, 拨款人
+        time: Date, 拨款时间
+      }*/
   	type: [Schema.Types.Mixed],
 		default: []
-	}
+	},
+  // 开源协议
+  protocol: {
+    type: String,
+    default: ''
+  }
 }, {
   collection: 'fundApplicationForms',
 	toObject: {
@@ -280,13 +332,6 @@ fundApplicationFormSchema.virtual('user')
 		this._user = user
 	});
 
-fundApplicationFormSchema.virtual('money')
-	.get(function() {
-		return this._money;
-	})
-	.set(function(money) {
-		this._money = money
-	});
 
 fundApplicationFormSchema.virtual('fund')
 	.get(function() {
@@ -361,13 +406,53 @@ fundApplicationFormSchema.virtual('objectors')
 	});
 
 fundApplicationFormSchema.virtual('reportThreads')
-	.get(function() {
-		return this._reportThreads;
-	})
-	.set(function(reportThreads) {
-		this._reportThreads = reportThreads;
-	});
+  .get(function() {
+    return this._reportThreads;
+  })
+  .set(function(reportThreads) {
+    this._reportThreads = reportThreads;
+  });
 
+fundApplicationFormSchema.virtual('formStatus')
+  .get(function() {
+    return this._formStatus;
+  })
+  .set(function(formStatus) {
+    this._formStatus = formStatus;
+  });
+
+fundApplicationFormSchema.virtual('auditComments')
+  .get(function() {
+    return this._auditComments;
+  })
+  .set(function(auditComments) {
+    this._auditComments = auditComments;
+  });
+
+
+fundApplicationFormSchema.virtual('reports')
+  .get(function() {
+    return this._reports;
+  })
+  .set(function(reports) {
+    this._reports = reports;
+  });
+
+fundApplicationFormSchema.virtual('projectPost')
+  .get(function() {
+    return this._projectPost;
+  })
+  .set(function(projectPost) {
+    this._projectPost = projectPost;
+  });
+
+fundApplicationFormSchema.virtual('posts')
+  .get(function() {
+    return this._posts;
+  })
+  .set(function(posts) {
+    this._posts = posts;
+  });
 
 fundApplicationFormSchema.pre('save', function(next) {
   this.tlm = Date.now();
@@ -407,7 +492,8 @@ fundApplicationFormSchema.pre('save', async function(next) {
 
 fundApplicationFormSchema.methods.extendApplicant = async function(options={}) {
 	const {extendSecretInfo = true} = options;
-	const FundApplicationUserModel = require('./FundApplicationUserModel');
+	const FundApplicationUserModel = mongoose.model('fundApplicationUsers');
+	const FundBlacklistModel = mongoose.model('fundBlacklist');
 	const applicant= await FundApplicationUserModel.findOne({applicationFormId: this._id, uid: this.uid});
 	if(applicant) {
 		await applicant.extendUser();
@@ -415,12 +501,13 @@ fundApplicationFormSchema.methods.extendApplicant = async function(options={}) {
 			applicant.mobile = null;
 			applicant.idCardNumber = null;
 		}
+    applicant.inFundBlacklist = await FundBlacklistModel.inBlacklist(applicant.uid);
 	}
 	return this.applicant = applicant;
 };
 
 fundApplicationFormSchema.methods.extendMembers = async function() {
-	const FundApplicationUserModel = require('./FundApplicationUserModel');
+  const FundApplicationUserModel = mongoose.model('fundApplicationUsers');
 	const applicationUsers = await FundApplicationUserModel.find({applicationFormId: this._id, uid: {$ne: this.uid}, removed: false}).sort({toc: 1});
 
 	return this.members = await Promise.all(applicationUsers.map(async aUser => {
@@ -432,28 +519,26 @@ fundApplicationFormSchema.methods.extendMembers = async function() {
 fundApplicationFormSchema.methods.extendForum = async function() {
 	let forum;
 	if(this.category) {
-		const ForumModel = require('./ForumModel');
+	  const ForumModel = mongoose.model('forums');
 		forum = await ForumModel.findOne({fid: this.category});
 	}
 	return this.forum = forum;
 };
 
 fundApplicationFormSchema.methods.extendFund = async function() {
-	const FundModel = require('./FundModel');
+  const FundModel = mongoose.model('funds');
 	const fund = await FundModel.findOne({_id: this.fundId, disabled: false});
 	// if(!fund) throw '抱歉！该基金项目已被屏蔽，所有基金申请表暂不能查看。';
 	return this.fund = fund;
 };
 
 fundApplicationFormSchema.methods.extendProject = async function() {
-	const FundDocumentModel = require('./FundDocumentModel');
-	if(this.projectId === null) return null;
-	const project = await FundDocumentModel.findOne({_id: this.projectId});
-	return this.project = project;
+  const project =  await this.initProject();
+  return this.project = project;
 };
 
 fundApplicationFormSchema.methods.extendThreads = async function() {
-	const ThreadModel = require('./ThreadModel');
+  const ThreadModel = mongoose.model('threads');
 	const {threadsId} = this;
 	const threads = {};
 	threads.applying = await Promise.all(threadsId.applying.map(async tid => {
@@ -484,7 +569,7 @@ fundApplicationFormSchema.methods.extendThreads = async function() {
 };
 
 fundApplicationFormSchema.methods.extendSupporters = async function() {
-	const UserModel = require('./UserModel');
+	const UserModel = mongoose.model('users');
 	const supporters = [];
 	for(let uid of this.supportersId) {
 		const user = await UserModel.findOnly({uid});
@@ -494,7 +579,7 @@ fundApplicationFormSchema.methods.extendSupporters = async function() {
 };
 
 fundApplicationFormSchema.methods.extendObjectors = async function() {
-	const UserModel = require('./UserModel');
+	const UserModel = mongoose.model('users');
 	const objectors = [];
 	for(let uid of this.objectorsId) {
 		const user = await UserModel.findOnly({uid});
@@ -504,7 +589,7 @@ fundApplicationFormSchema.methods.extendObjectors = async function() {
 };
 
 fundApplicationFormSchema.methods.extendReportThreads = async function() {
-	const ThreadModel = require('./ThreadModel');
+	const ThreadModel = mongoose.model('threads');
 	const threadsId = [];
 	for(let r of this.remittance) {
 		if(r.threads && r.threads.length !== 0) {
@@ -537,6 +622,7 @@ fundApplicationFormSchema.methods.extendReportThreads = async function() {
 	return this.reportThreads = reportThreads;
 };
 
+/*
 fundApplicationFormSchema.methods.ensureInformation = async function() {
 	const PhotoModel = require('./PhotoModel');
 	const ForumModel = mongoose.model("forums");
@@ -771,6 +857,781 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
     await formPost.save();
   }
 
+};
+*/
+
+// 提交申请表 进入审核流程
+fundApplicationFormSchema.statics.publishByApplicationFormId = async (applicationFormId) => {
+  const FundModel = mongoose.model('funds');
+  const FundApplicationFormModel = mongoose.model('fundApplicationForms');
+  const MessageModel = mongoose.model('messages');
+  const SettingModel = mongoose.model('settings');
+  const ForumModel = mongoose.model('forums');
+  const PostModel = mongoose.model('posts');
+  const ThreadModel = mongoose.model('threads');
+  const FundApplicationFormHistoryModel = mongoose.model('fundApplicationHistories');
+  const FundDocumentModel = mongoose.model('fundDocuments');
+  const elasticSearch = require('../nkcModules/elasticSearch');
+  const form = await FundApplicationFormModel.findOnly({_id: applicationFormId});
+  const oldForm = form.toObject();
+  const fund = await FundModel.findOnly({_id: form.fundId});
+  const now = new Date();
+  if(!form.timeToPassed) {
+    form.timeToPassed = now;
+  }
+  if(form.auditType === 'system') {
+    // 系统审核 自动审核
+    form.status.projectPassed = true;
+    form.status.adminSupport = true;
+    // 自动分为一期打款
+    form.remittance = [
+      {
+        money: form.money,
+        status: null,
+        report: null, // 提交报告
+        passed: null, // 通过审核
+        verify: false, // 确认收款
+        apply: false, // 已申请
+      }
+    ];
+    form.budgetMoney.map(b => {
+      b.suggest = b.total;
+      b.fact = b.total;
+    });
+  } else {
+    // 人工审核
+    form.status.projectPassed = null;
+    form.status.adminSupport = null;
+  }
+  form.status.submitted = true;
+  form.lock.submitted = true;
+  form.modifyCount += 1;
+  form.submittedReport = false;
+  form.tlm = now;
+  form.timeToSubmit = now;
+  oldForm.applicationFormId = oldForm._id;
+  oldForm._id = undefined;
+  oldForm.applicant = await form.extendApplicant();
+  oldForm.members = await form.extendMembers();
+  oldForm.project = await form.extendProject();
+  oldForm.comments = await FundDocumentModel.find({applicationFormId: form._id, type: 'comment'});
+  oldForm.adminAudit = await FundDocumentModel.findOne({applicationFormId: form._id, type: 'adminAudit'}).sort({toc: -1});
+  oldForm.userInfoAudit = await FundDocumentModel.findOne({applicationFormId: form._id, type: 'userInfo'}).sort({toc: -1});
+  oldForm.projectAudit = await FundDocumentModel.findOne({applicationFormId: form._id, type: 'projectAudit'}).sort({toc: -1});
+  oldForm.moneyAudit = await FundDocumentModel.findOne({applicationFormId: form._id, type: 'moneyAudit'}).sort({toc: -1});
+  const newHistory = new FundApplicationFormHistoryModel(oldForm);
+  // 网友支持
+  if(fund.supportCount <= form.supportersId.length) {
+    form.status.usersSupport = true;
+    if(form.auditType === "person") {
+      await MessageModel.sendFundMessage(form._id, "expert");
+    }
+  }
+  const fundForums = await ForumModel.find({kindName: "fund"}, {fid: 1});
+  let fundForumsId = fundForums.map(f => f.fid);
+  if(!fundForumsId.includes(form.category)) fundForumsId.unshift(form.category);
+  // 生成文章
+  let formThread;
+  if(form.tid) {
+    formThread = await ThreadModel.findOne({tid: form.tid});
+  }
+  if(!formThread) {
+    const formPost = await ForumModel.createNewThread({
+      fids: fundForumsId,
+      uid: form.uid,
+      type: "fund",
+      c: form.project.c,
+      t: form.project.t,
+      abstractEn: form.project.abstractEn,
+      abstractCn: form.project.abstractCn,
+      keyWordsEn: form.project.keyWordsEn,
+      keyWordsCn: form.project.keyWordsCn,
+      l: "html"
+    });
+    form.tid = formPost.tid;
+    await elasticSearch.save("thread", formPost);
+    await ThreadModel.updateOne({tid: formPost.tid}, {$set: {reviewed: true}});
+    await PostModel.updateOne({pid: formPost.pid}, {$set: {reviewed: true}});
+  } else {
+    await formThread.updateOne({mainForumsId: fundForumsId});
+    const formPost = await PostModel.findOnly({pid: formThread.oc});
+    formPost.c = form.project.c;
+    formPost.t = form.project.t;
+    formPost.abstractEn = form.project.abstractEn;
+    formPost.abstractCn = form.project.abstractCn;
+    formPost.keyWordsEn = form.project.keyWordsEn;
+    formPost.keyWordsCn = form.project.keyWordsCn;
+    formPost.l = "html";
+    formPost.mainForumsId = fundForumsId;
+    formPost.uid = form.uid;
+    await formPost.save();
+  }
+  await form.save();
+  await form.updateOne({
+    $set: {
+      budgetMoney: form.budgetMoney
+    }
+  });
+  await newHistory.save();
+
+  await form.createReport('system', '提交申请表');
+};
+fundApplicationFormSchema.statics.extendAsApplicationFormList = async (applicationForms) => {
+  const FundModel = mongoose.model('funds');
+  const UserModel = mongoose.model('users');
+  const FundDocumentModel = mongoose.model('fundDocuments');
+  const FundApplicationUserModel = mongoose.model('fundApplicationUsers');
+  const fundsId = [];
+  const applicationFormId = [];
+  const usersId = [];
+  const projectsId = [];
+  applicationForms.map(a => {
+    const {fundId, _id, projectId} = a;
+    fundsId.push(fundId);
+    applicationFormId.push(_id);
+    projectsId.push(projectId);
+  });
+  const projects = await FundDocumentModel.find({_id: {$in: projectsId}}, {
+    t: 1, _id: 1
+  });
+  const projectsObj = {};
+  projects.map(p => projectsObj[p._id] = p);
+  const funds = await FundModel.find({_id: {$in: fundsId}}, {_id: 1, name: 1});
+  const fundsObj = {};
+  funds.map(f => fundsObj[f._id] = f);
+  const members = await FundApplicationUserModel.find({
+    applicationFormId: {$in: applicationFormId},
+    removed: false
+  }, {
+    uid: 1,
+    applicationFormId: 1
+  }).sort({toc: 1});
+  const applicationFormToUser = {};
+  members.map(m => {
+    const {uid, applicationFormId} = m;
+    if(!applicationFormToUser[applicationFormId]) applicationFormToUser[applicationFormId] = [];
+    applicationFormToUser[applicationFormId].push(uid);
+    usersId.push(uid);
+  });
+  const users = await UserModel.find({uid: {$in: usersId}}, {
+    uid: 1,
+    avatar: 1,
+    username: 1
+  });
+  const usersObj = {};
+  users.map(u => usersObj[u.uid] = u);
+  const results = [];
+  for(const a of applicationForms) {
+    const fund = fundsObj[a.fundId];
+    if(!fund) continue;
+    const status = await a.getStatus();
+    const usersId = applicationFormToUser[a._id] || [];
+    const users = [];
+    for(const uid of usersId) {
+      const u = usersObj[uid];
+      if(!u) continue;
+      users.push(u);
+    }
+    const project = projectsObj[a.projectId];
+    const result = {
+      _id: a._id,
+      code: a.code,
+      fundName: fund.name,
+      fundId: fund._id,
+      money: a.money,
+      time: moment(a.toc).format(`YYYY/MM/DD`),
+      title: project? project.t: '暂未填写项目名称',
+      status: status.description,
+      statusColor: status.color,
+      users
+    };
+    results.push(result);
+  }
+  return results;
+};
+
+
+/*
+* 获取基金申请表状态
+* @return {Object}
+*   @param {Number} general 总状态
+*     1. 申请表无效
+*     2. 申请表未提交，可能是因为用户未提交或审核未通过
+*     3. 申请表正在等待支持或审核
+*     4. 申请项目正在执行中
+*     5. 申请项目已结题
+*   @param {Number} detail 总状态下的子状态 详细说明见此方法末尾
+*   @param {String} 当前申请表的相关说明
+* */
+fundApplicationFormSchema.methods.getStatus = async function() {
+  let formStatus = [];
+  const {useless, submittedReport, status, completedAudit, lock} = this;
+  const {submitted, projectPassed, adminSupport, remittance, completed, successful, usersSupport, excellent} = status;
+  let needRemittance = false;
+  for(let i = 0; i < this.remittance.length; i++) {
+    const r = this.remittance[i];
+    if(!r.status && r.apply && (i === 0 || r.passed)) {
+      needRemittance = true;
+      break;
+    }
+  }
+  if(this.disabled) {
+    formStatus = [1, 1];
+  } else if(useless === 'giveUp') {
+    formStatus = [1, 2];
+  } else if(useless === 'delete') {
+    formStatus = [1, 3];
+  } else if(useless === 'exceededModifyCount') {
+    formStatus = [1, 4];
+  } else if(useless === 'refuse') {
+    formStatus = [1, 5];
+  } else if (useless === 'stop') {
+    formStatus = [1, 6];
+  } else if(useless === 'timeout') {
+    formStatus = [1, 7];
+  } else if(completed === true) {
+    if(excellent) {
+      formStatus = [5, 3]
+    } else if(successful) {
+      formStatus = [5, 2];
+    } else {
+      formStatus = [5, 1];
+    }
+  } else if(!submitted || !lock.submitted) {
+    if(projectPassed === false) {
+      formStatus = [2, 2];
+    } else if(adminSupport === false) {
+      formStatus = [2, 3];
+    } else {
+      formStatus = [2, 1];
+    }
+  } else if(!usersSupport) {
+    formStatus = [3, 1];
+  } else if(projectPassed === null) {
+    formStatus = [3, 2];
+  } else if(projectPassed === false) {
+    formStatus = [2, 2];
+  } else if(adminSupport === null) {
+    formStatus = [3, 3];
+  } else if(adminSupport === false) {
+    formStatus = [2, 3];
+  } else if(completedAudit) {
+    formStatus = [4, 6];
+  /*} else if(remittance === null) {
+    formStatus = [4, 2];*/
+  } else if(remittance === false) {
+    formStatus = [4, 3];
+  } else if(submittedReport) {
+    formStatus = [4, 4];
+  } else if(needRemittance) {
+    formStatus = [4, 2];
+  } else if(completed === null) {
+    formStatus = [4, 1];
+  } else if(completed === false) {
+    formStatus = [4, 7];
+  } else if(successful) {
+    formStatus = [5, 2];
+  } else if(!successful) {
+    formStatus = [5, 1];
+  }
+
+  const descriptions = {
+    '1-1': '已被屏蔽',
+    '1-2': '申请人已放弃申报',
+    '1-3': '已被申请人删除',
+    '1-4': '修改次数超过限制',
+    '1-5': '已被永久拒绝',
+    '1-6': '已终止',
+    '1-7': '申请人修改超时，已视为放弃',
+
+    '2-1': '未提交',
+    '2-2': '未通过专家审核，等待申请人修改',
+    '2-3': '未通过管理员复核，等待申请人修改',
+
+    '3-1': '等待网友支持',
+    '3-2': '等待专家审核',
+    '3-3': '等待管理员复核',
+
+    '4-1': '项目进行中',
+    '4-2': '等待拨款',
+    '4-3': '拨款出错',
+    '4-4': '等待报告审核',
+    '4-5': '未通过报告审核，等待申请人修改',
+    '4-6': '等待结题审核',
+    '4-7': '未通过结题审核，等待申请人修改',
+
+    '5-1': '正常结题',
+    '5-2': '成功结题',
+    '5-3': '优秀项目'
+  };
+
+  const key = `${formStatus[0]}-${formStatus[1]}`;
+
+  const color = [
+    '3-1', '3-2', '3-3', '4-1', '4-2', '4-4', '4-6', '5-1', '5-2', '5-3'
+  ].includes(key)? '#333': 'red';
+
+  const description = descriptions[key];
+
+  return this.formStatus = {
+    general: formStatus[0],
+    detail: formStatus[1],
+    description,
+    color,
+  };
+};
+
+/*
+* 获取申请表的显示金额
+* @param {[Object]} 申请表上的资金预算字段
+* @param {Object} fundMoney 基金项目上的金额设置
+* @return {Number} 计算所得金额
+* */
+
+fundApplicationFormSchema.methods.updateMoney = async function() {
+  const FundModel = mongoose.model('funds');
+  const {fixedMoney, budgetMoney} = this;
+  let money;
+  if(fixedMoney) {
+    const fund = await FundModel.findOne({_id: this.fundId});
+    money = fund.money.value;
+  } else {
+    const {
+      general,
+    } = await this.getStatus();
+    let result = 0;
+    for(const b of budgetMoney) {
+      const {fact, total} = b;
+      if(general < 4) {
+        result += total * 100;
+      } else {
+        result += fact * 100;
+      }
+    }
+    money = result / 100;
+  }
+  this.money = money;
+  await this.updateOne({$set: {money}});
+  return money;
+};
+
+fundApplicationFormSchema.statics.updateMoneyByApplicationFormId = async (applicationFormId) => {
+  const FundApplicationFormModel = mongoose.model('fundApplicationForms');
+  const applicationForm = await FundApplicationFormModel.findOnly({_id: applicationFormId});
+  return await applicationForm.updateMoney();
+};
+
+/*
+fundApplicationFormSchema.statics.syncLifePhotos = await () => {
+
+};*/
+
+
+/*
+* 初始化申请人数据
+* */
+fundApplicationFormSchema.methods.initApplicant = async function() {
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const FundApplicationUserModel = mongoose.model('fundApplicationUsers');
+  let applicant = await FundApplicationUserModel.findOne({
+    applicationFormId: this._id,
+    uid: this.uid
+  });
+  if(!applicant) {
+    const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
+    const authLevel = await userPersonal.getAuthLevel();
+    applicant = FundApplicationUserModel({
+      applicationFormId: this._id,
+      mobile: userPersonal.mobile,
+      uid: this.uid,
+      type: 'applicant',
+      authLevel,
+    });
+    await applicant.save();
+  }
+  return applicant;
+}
+/*
+* 初始化项目内容数据
+* */
+fundApplicationFormSchema.methods.initProject = async function() {
+  const SettingModel = mongoose.model('settings');
+  const FundDocumentModel = mongoose.model('fundDocuments');
+  let project;
+  if(this.projectId) {
+    project = await FundDocumentModel.findOnly({_id: this.projectId});
+  } else {
+    const documentId = await SettingModel.operateSystemID('fundDocuments', 1);
+    project = FundDocumentModel({
+      _id: documentId,
+      uid: this.uid,
+      applicationFormId: this._id,
+      type: 'project',
+    });
+    await project.save();
+    this.projectId = documentId;
+    await this.save();
+  }
+  return project;
+}
+
+/*
+* 更新项目信息
+* */
+fundApplicationFormSchema.methods.updateProject = async function(props) {
+  const {
+    t, c, abstractEn, abstractCn, keyWordsCn, keyWordsEn
+  } = props;
+  const FundDocumentModel = mongoose.model('fundDocuments');
+  if(!this.projectId) {
+    // 初始化项目信息
+    await this.initProject();
+  }
+  // 更新项目信息
+  const document = await FundDocumentModel.findOnly({_id: this.projectId});
+  document.t = t;
+  document.c = c;
+  document.abstractEn = abstractEn;
+  document.abstractCn = abstractCn;
+  document.keyWordsCn = keyWordsCn;
+  document.keyWordsEn = keyWordsEn;
+  await document.save();
+};
+/*
+* 创建一条报告
+* @param {String} type 报告类型 system: 系统报告, report: 用户报告
+* @param {String} content 报告内容
+* @param {String} operatorId 操作者 ID 默认为申请人
+* */
+fundApplicationFormSchema.methods.createReport = async function(type, content, operatorId, support = null) {
+  const SettingModel = mongoose.model('settings');
+  const FundDocumentModel = mongoose.model('fundDocuments');
+  const newId = await SettingModel.operateSystemID('fundDocuments', 1);
+  const newReport = FundDocumentModel({
+    type,
+    uid: operatorId || this.uid,
+    applicationFormId: this._id,
+    _id: newId,
+    c: content,
+    support
+  });
+  await newReport.save();
+  return newReport;
+}
+
+/*
+* 移除申请表上的所有组员
+* */
+fundApplicationFormSchema.methods.removeAllMembers = async function() {
+  const FundApplicationUserModel = mongoose.model('fundApplicationUsers');
+  await FundApplicationUserModel.updateMany({
+    applicationFormId: this._id,
+    type: 'member',
+    uid: {$ne: this.uid},
+    removed: false,
+  }, {
+    $set: {
+      removed: true
+    }
+  });
+}
+
+
+/*
+* 获取申请表页面所需的申请人信息
+* */
+fundApplicationFormSchema.methods.getApplicantPageInfo = async function() {
+  const applicant = await this.extendApplicant();
+  const threads = await this.extendThreads();
+
+};
+
+/*
+* 拓展申请表信息
+* */
+fundApplicationFormSchema.methods.extendApplicationForm = async function() {
+  await this.extendProject();
+  await this.extendMembers();
+  await this.extendApplicant();
+  await this.extendFund();
+  await this.extendThreads();
+  await this.extendForum();
+};
+/*
+* 根据申请表状态获取审核评语
+* */
+fundApplicationFormSchema.methods.extendAuditComments = async function() {
+  const FundDocumentModel = mongoose.model('fundDocuments');
+  const auditComments = {};
+  const form = this;
+  const getReport = async (type) => {
+    return await FundDocumentModel.findOne({
+      type,
+      applicationFormId: form._id,
+      disabled: false,
+    }, {
+      support: 1,
+      c: 1,
+    }).sort({toc: -1});
+  };
+
+  if(this.status.projectPassed === false) {
+    auditComments.userInfoAudit = await getReport('userInfoAudit');
+    auditComments.projectAudit = await getReport('projectAudit');
+    auditComments.moneyAudit = await getReport('moneyAudit');
+  }
+  if(this.status.adminSupport === false) {
+    auditComments.adminAudit = await getReport('adminAudit');
+  }
+  if(this.status.completed === false) {
+    auditComments.completedAudit = await getReport('completedAudit');
+  }
+  return this.auditComments = auditComments;
+};
+
+
+
+/*
+* 拓展最新进展
+* @param {Boolean} isAdmin 是否为管理人员 管理人员可加载封禁的信息
+* */
+fundApplicationFormSchema.methods.extendReports = async function(isAdmin = false) {
+  const FundDocumentModel = mongoose.model('fundDocuments');
+  const match = {
+    applicationFormId: this._id,
+    type: {$in: ['refuse', 'report', 'completedReport', 'system', 'completedAudit', 'adminAudit', 'userInfoAudit', 'projectAudit', 'moneyAudit', 'remittance']},
+  };
+  if(!isAdmin) {
+    match.disabled = false;
+  }
+  return this.reports = await FundDocumentModel.find(match).sort({toc: 1});
+}
+
+/*
+* 拓展项目内容，提交过则从posts获取，未提交则从fundDocuments获取
+* */
+fundApplicationFormSchema.methods.extendProjectPost = async function() {
+  const PostModel = mongoose.model('posts');
+  const ResourceModel = mongoose.model('resources');
+  const nkcRender = require('../nkcModules/nkcRender');
+  if(this.tid) {
+    const firstPost = await PostModel.findOnly({tid: this.tid, type: 'thread'});
+    firstPost.c = nkcRender.renderHTML({
+      type: 'article',
+      post: {
+        c: firstPost.c,
+        resources: await ResourceModel.getResourcesByReference(firstPost.pid)
+      }
+    });
+    this.projectPost = firstPost;
+  } else {
+    const project = this.project? this.project: await this.extendProject();
+    project.c = nkcRender.renderHTML({
+      type: 'article',
+      post: {
+        c: project.c,
+        resources: await ResourceModel.getResourcesByReference(`fund-${project._id}`)
+      }
+    });
+    this.projectPost = project;
+  }
+};
+
+/*
+* 检查拨款期号是否正确
+* @param {Number} number 拨款期号
+* */
+fundApplicationFormSchema.methods.checkRemittanceNumber = async function(number) {
+  const FundApplicationFormModel = mongoose.model('fundApplicationForms');
+  const form = await FundApplicationFormModel.findOnly({_id: this._id}, {remittance: 1});
+  const {remittance} = form;
+  for(let i = 0; i < remittance.length; i++) {
+    const {passed, verify, status} = remittance[i];
+    if(i < number) {
+      if(!status) throwErr(403, `第 ${i + 1} 期拨款尚未完成`);
+      if(!verify) throwErr(403, `第 ${i + 1} 期拨款尚未确认`);
+    } else if (i === number){
+      if(status) throwErr(403, `拨款已完成`);
+    }
+  }
+}
+
+/*
+* 拨款
+* @param {Object} props
+*   @param {Number} number 拨款期号
+*   @param {clientIp} 操作者 IP
+*   @param {clientPort} 操作者 port
+*   @param {String} operatorId 操作者 ID
+* */
+fundApplicationFormSchema.methods.transfer = async function(props) {
+  const {number, clientIp, clientPort, operatorId} = props;
+  const {disabled, useless, remittance, status} = this;
+  if(disabled) throwErr(403, `申请表已被封禁`);
+  if(useless !== null) throwErr(403, `申请表已失效`);
+  if(status.completed) throwErr(403, `项目已结题`);
+  if(!status.adminSupport) throwErr(403, `未通过管理员符合`);
+  const redLock = require('../nkcModules/redLock');
+  const FundApplicationFormModel = mongoose.model('fundApplicationForms');
+  const AliPayRecordModel = mongoose.model('aliPayRecords');
+  const FundBillModel = mongoose.model('fundBills');
+  const lock = await redLock.lock(`fundTransfer:${this._id}`, 6000);
+  try{
+    await this.checkRemittanceNumber(number);
+    const money = remittance[number].money * 100;
+    const balance = await FundBillModel.getBalance('fund', this.fundId);
+    if(balance * 100 < money) throwErr(500, `基金余额不足`);
+    const record = await AliPayRecordModel.transfer({
+      uid: this._id,
+      money,
+      effectiveMoney: money,
+      fee: 0,
+      aliPayAccount: this.applicant.number,
+      aliPayAccountName: this.applicant.name,
+      clientIp,
+      clientPort,
+      from: 'fund',
+      description: '基金拨款'
+    });
+    await FundBillModel.createRemittanceBill({
+      fundId: this.fundId,
+      uid: this.uid,
+      applicationFormId: this._id,
+      money: money / 100,
+      number,
+      applicationFormCode: this.code,
+      operatorId: operatorId || this.uid,
+      paymentType: 'aliPay',
+      paymentId: record._id
+    });
+    remittance[number].status = true;
+    this.remittance = remittance;
+    await this.updateOne({
+      $set: {
+        remittance: remittance
+      }
+    });
+  } catch(err) {
+    await lock.unlock();
+    throw(err);
+  }
+}
+
+/*
+* 拓展回复
+* */
+fundApplicationFormSchema.methods.extendPosts = async function(accessForumsId) {
+  const PostModel = mongoose.model('posts');
+  let posts = [];
+  if(this.tid) {
+    posts = await PostModel.find({
+      mainForumsId: {$in: accessForumsId},
+      tid: this.tid,
+      type: 'post',
+      parentPostId: '',
+      disabled: false,
+      reviewed: true,
+      toDraft: {$ne: true}
+    }).sort({toc: -1}).limit(10);
+    posts = await PostModel.extendPosts(posts);
+    posts = await PostModel.filterPostsInfo(posts);
+    posts = posts.reverse();
+  }
+  return this.posts = posts;
+};
+
+/*
+* 拓展申请表信息
+* */
+fundApplicationFormSchema.methods.extendApplicationFormBaseInfo = async function() {
+  await this.extendFund();
+  await this.extendMembers();
+  await this.extendApplicant().then(u => u.extendLifePhotos());
+  await this.extendProject();
+  await this.extendProjectPost();
+  await this.extendThreads();
+  await this.extendForum();
+};
+fundApplicationFormSchema.methods.extendApplicationFormInfo = async function(uid, accessForumsId = []) {
+  const {fund} = this;
+  if(
+    this.disabled &&
+    !await fund.isFundRole(uid, 'admin')
+  ) throwErr(403, `申请表已被屏蔽`);
+  const {applicant, members} = this;
+  const membersId = members.map(m => m.uid);
+  // 未提交时仅自己和全部组员可见
+  if(
+    !await fund.isFundRole(uid, 'admin') &&
+    this.status.submitted !== true &&
+    uid !== applicant.uid &&
+    !membersId.includes(state.uid)
+  ) throwErr(403, `权限不足`);
+  await this.extendSupporters();
+  await this.extendObjectors();
+  await this.extendReportThreads();
+  await this.extendAuditComments();
+  await this.extendReports();
+  await this.extendPosts(accessForumsId);
+  await this.getStatus();
+};
+
+/*
+* 隐藏申请表的敏感信息
+* */
+fundApplicationFormSchema.methods.hideSecretInfo = async function() {
+  this.applicant.mobile = null;
+  this.applicant.idCardNumber = null;
+  this.account.paymentType = null;
+  this.account.number = null;
+  for(let m of this.members) {
+    m.mobile = null;
+    m.idCardNumber = null;
+  }
+  //拦截表示反对的用户
+  this.objectors = [];
+};
+
+/*
+* 隐藏反对用户
+* */
+fundApplicationFormSchema.methods.hideObjectors = async function() {
+  this.objectors = [];
+};
+
+/*
+* 隐藏用户无权查看的信息
+* @param {String} uid 访问者 ID
+* @param {Boolean} hasPermission 是否拥有特殊权限
+* */
+fundApplicationFormSchema.methods.hideApplicationFormInfoByUserId = async function(uid, hasPermission) {
+  const {fund} = this;
+  const isAdmin =
+    hasPermission ||
+    await fund.isFundRole(uid, 'admin') ||
+    await fund.isFundRole(uid, 'censor');
+  const isApplicant = uid && uid === this.uid;
+
+  if(!isAdmin) {
+    // 非管理员无法查看反对用户
+    await this.hideObjectors();
+    if(!isApplicant) {
+      // 非管理员非申请者无法查看敏感信息
+      await this.hideSecretInfo();
+    }
+  }
+}
+
+/*
+* 设置申请表的状态为申请人修改超时，已视为放弃
+* */
+fundApplicationFormSchema.methods.setUselessAsTimeout = async function(operatorId) {
+  await this.createReport('system', `申请人修改超时，已视为放弃`, operatorId, false);
+  await this.updateOne({
+    $set: {
+      useless: 'timeout'
+    }
+  });
 };
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);

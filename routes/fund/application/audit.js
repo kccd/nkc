@@ -177,9 +177,9 @@ auditRouter
 				applicationForm.useless = 'exceededModifyCount';
 			}
 			applicationForm.lock.submitted = false;
-		} else {
-			applicationForm.tlm = Date.now();
 		}
+
+    applicationForm.tlm = Date.now();
 		
 		// 彻底拒绝
 		if(refuse) {

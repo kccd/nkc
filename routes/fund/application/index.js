@@ -6,176 +6,48 @@ const completeRouter = require('./complete');
 const voteRouter = require('./vote');
 const commentRouter = require('./comment');
 const settingsRouter = require('./settings');
+const managementRouter = require('./manage');
 const memberRouter = require('./member');
 const excellentRouter = require('./excellent');
 const disabledRouter = require('./disabled');
 const applicationRouter = new Router();
 const apiFn = require('../../../nkcModules/apiFunction');
 applicationRouter
-	.get('/', async (ctx, next) => {
-		const {data, db, query} = ctx;
-		const {page = 0, type} = query;
-		const q = {
-			disabled: false,
-			'status.submitted': true
-		};
-		if(type === 'excellent') { // 优秀项目
-			q['status.excellent'] = true;
-		} else if(type === 'completed') { // 已完成
-			q['status.complete'] = true;
-		} else if(type === 'funding') { // 资助中
-			q['status.complete'] = {$ne: true};
-			q['status.adminSupport'] = true;
-		} else if(type === 'auditing') { // 审核中
-			q['status.remittance'] = {$ne: true};
-			q.useless = null
-		} else { //所有
-			
-		}
-		const length = await db.FundApplicationFormModel.countDocuments(q);
-		const paging = apiFn.paging(page, length);
-		data.paging = paging;
-		const applicationForms = await db.FundApplicationFormModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-		data.applicationForms = await Promise.all(applicationForms.map(async a => {
-			await a.extendProject();
-			await a.extendMembers();
-			await a.extendApplicant();
-			await a.extendFund();
-			return a;
-    }));
-		ctx.template = 'interface_fund_applicationForm_list.pug';
-		await next();
-	})
 	.use('/:_id', async (ctx, next) => {
-		const {data, db} = ctx;
-		const {_id} = ctx.params;
-		let applicationForm = await db.FundApplicationFormModel.findOne({code: _id});
-		if(!applicationForm) {
-			applicationForm = await db.FundApplicationFormModel.findOne({_id: _id});
-			if(!applicationForm) ctx.throw(400, '未找到指定申请表。');
-		}
-		await applicationForm.extendFund();
-		const {fund, budgetMoney} = applicationForm;
-		if(fund.history && ctx.method !== 'GET') {
+		const {params, data, db, state} = ctx;
+		const {_id} = params;
+		const applicationForm = await db.FundApplicationFormModel.findOne({
+      $or: [
+        {
+          code: _id
+        },
+        {
+          _id
+        }
+      ]
+    });
+		if(!applicationForm) ctx.throw(400, '未找到指定申请表。');
+		await applicationForm.extendApplicationFormBaseInfo(state.uid);
+		const fund = applicationForm.fund;
+		/*if(fund.history && ctx.method !== 'GET') {
 			ctx.throw(400, '申请表所在基金已被设置为历史基金，申请表只供浏览。');
-		}
-		await applicationForm.extendMembers();
-		await applicationForm.extendApplicant().then(u => u.extendLifePhotos());
-		await applicationForm.extendProject();
-		if(applicationForm.project) {
-			if(applicationForm.tid) {
-				const thread = await db.ThreadModel.findOnly({tid: applicationForm.tid});
-				let firstPost= await db.PostModel.findOnly({pid: thread.oc});
-				firstPost = await db.PostModel.extendPost(firstPost, {
-					uid: data.user? data.user.uid: "",
-					user: data.user
-				});
-				// applicationForm.project = firstPost;
-				applicationForm.project.c = firstPost.c;
-			} else {
-				applicationForm.project.c = ctx.nkcModules.nkcRender.renderHTML({
-					type: "article",
-					post: {
-						c: applicationForm.project.c,
-						resources: await db.ResourceModel.getResourcesByReference(`fund-${applicationForm.project._id}`)
-					},
-					user: data.user
-				});
-			}
-		}
-		await applicationForm.extendThreads();
-		await applicationForm.extendForum();
-		if(fund.money.fixed) {
-			applicationForm.money = fund.money.fixed;
-			applicationForm.factMoney = fund.money.fixed;
-		} else {
-			let money = 0;
-			let factMoney = 0;
-			if(budgetMoney !== null && budgetMoney.length !== 0 && typeof budgetMoney !== 'string'){
-				for (let b of applicationForm.budgetMoney) {
-					money += (b.count*b.money);
-					factMoney += b.fact;
-				}
-			}
-			applicationForm.money = money;
-			applicationForm.factMoney = factMoney;
-		}
+		}*/
 		data.applicationForm = applicationForm;
-		data.fund = applicationForm.fund;
+		data.fund = fund;
+		data.userFundRoles = await applicationForm.fund.getUserFundRoles(state.uid);
 		await next();
 	})
 
 	// 申请表展示页
 	.get('/:_id', async (ctx, next) => {
-/*    const {tid} = ctx.data.applicationForm;
-    return ctx.redirect(`/t/${tid}`);*/
-		const {data, query, db} = ctx;
-		const {user, applicationForm} = data;
-		if(applicationForm.disabled && !applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
-		const {applicant, members, fund} = applicationForm;
-		const membersId = members.map(m => m.uid);
-		// 未提交时仅自己和全部组员可见
-		if(!applicationForm.fund.ensureOperatorPermission('admin', user) && applicationForm.status.submitted !== true && user.uid !== applicant.uid && !membersId.includes(user.uid)) ctx.throw(403,'权限不足');
-		ctx.template = 'fund/applicationForm.pug';
-		const page = query.page? parseInt(query.page): 0;
-		// 已发表的申请，项目内容从文章读取
-    if(applicationForm.tid) {
-      const thread = await db.ThreadModel.findOnly({tid: applicationForm.tid});
-      let firstPost= await db.PostModel.findOnly({pid: thread.oc});
-      firstPost = await db.PostModel.extendPost(firstPost, {
-      	uid: data.user? data.user.uid: "",
-				user: data.user
-			});
-      applicationForm.project = firstPost;
-      const q = {
-        tid: applicationForm.tid,
-        pid: {$ne: thread.oc},
-        disabled: false,
-        reviewed: true,
-        toDraft: {$ne: true}
-      };
-      // if(!fund.ensureOperatorPermission('admin', user)) q.disabled = false;
-      const length = await db.PostModel.countDocuments(q);
-      const paging = apiFn.paging(page, length);
-      data.paging = paging;
-      const comments = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
-      data.comments = await db.PostModel.extendPosts(comments, {
-      	visitor: data.user,
-				uid: data.user?data.user.uid: ""
-			});
-    }
-
-		await applicationForm.extendSupporters();
-		await applicationForm.extendObjectors();
-		await applicationForm.extendReportThreads();
-		const auditComments = {};
-		if(!applicationForm.status.projectPassed) {
-			auditComments.userInfoAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'userInfoAudit', disabled: false}).sort({toc: -1});
-			auditComments.projectAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'projectAudit', disabled: false}).sort({toc: -1});
-			auditComments.moneyAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'moneyAudit', disabled: false}).sort({toc: -1});
-		}
-		if(!applicationForm.status.adminSupport) {
-			auditComments.adminAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'adminAudit', disabled: false}).sort({toc: -1});
-		}
-		if(applicationForm.status.completed === false) {
-			auditComments.completedAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'completedAudit', disabled: false}).sort({toc: -1});
-		}
-		if(applicationForm.useless === 'giveUp') {
-			data.report = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'report', disabled: false}).sort({toc: -1});
-		}
-    const q_ = {
-			type: {$in: ['report', 'completedReport', 'system', 'completedAudit', 'adminAudit', 'userInfoAudit', 'projectAudit', 'moneyAudit', 'remittance']},
-			applicationFormId: applicationForm._id
-		};
-		if(!applicationForm.fund.ensureOperatorPermission('admin', user)) {
-			q_.disabled = false;
-		}
-		data.reports = await db.FundDocumentModel.find(q_).sort({toc: 1});
-		await Promise.all(data.reports.map(async r => {
-			await r.extendUser();
-			await r.extendResources();
-    }));
-		data.auditComments = auditComments;
+		const {data, db, state} = ctx;
+		const {applicationForm} = data;
+		const accessForumsId = await db.ForumModel.getAccessibleForumsId(
+		  data.userRoles, data.userGrade, data.user
+    );
+		await applicationForm.extendApplicationFormInfo(state.uid, accessForumsId);
+    data.targetUserInFundBlacklist = await db.FundBlacklistModel.inBlacklist(applicationForm.uid);
+    ctx.template = 'fund/applicationForm/applicationForm.pug';
 		await next();
 	})
 
@@ -201,7 +73,8 @@ applicationRouter
 		if(applicationForm.lock.submitted) ctx.throw(403,'抱歉！申请表已提交暂不能修改。');
 		const fund = applicationForm.fund;
 		try {
-			await fund.ensureUserPermission(user);
+		  // 临时屏蔽 修改申请表应该无需验证基金冲突
+			// await db.FundModel.ensureUserPermission(user.uid, fund._id);
 		} catch(e) {
 			ctx.throw(403,e);
 		}
@@ -218,14 +91,26 @@ applicationRouter
 			const {from} = body;
 			if(status.submitted) ctx.throw(400, '修改失败！申请方式一旦选择将无法更改,如需更改请放弃本次申请重新填写申请表。');
 			if(from === 'personal') {
-				if(!fund.applicationMethod.personal) ctx.throw(400, '抱歉！该基金暂不允许个人申请。');
+				if(!fund.applicantType.includes('personal')) ctx.throw(400, '抱歉！该基金暂不允许个人申请。');
 				for (let aUser of members) {
 				  await db.FundApplicationUserModel.updateMany({uid: aUser.uid}, {$set: {removed: true}});
 				}
 				updateObj.from = 'personal';
 				await applicationForm.updateOne(updateObj);
 			} else if(from === 'team') {
-				if(!fund.applicationMethod.team) ctx.throw(400, '抱歉！该基金暂不允许团队申请。');
+				if(!fund.applicantType.includes('team')) ctx.throw(400, '抱歉！该基金暂不允许团队申请。');
+
+				// 判断组员有没有申请其他基金项目
+        const applicationForms = await db.FundApplicationModel.find({uid: {$in: newMembers.map(m => m.uid)}});
+        const usersId = newMembers.map(m => m.uid);
+        const users = await db.UserModel.find({uid: {$in: usersId}});
+        const usersObj = {};
+        users.map(u => usersObj[u.uid] = u);
+        for(const a of applicationForms) {
+          const status = await a.getStatus();
+          const {username} = usersObj[a.uid];
+          if(![1, 5].includes(status.general)) ctx.throw(400, `用户「${username}」申报的项目暂未结题，不能担任新申请项目的组员`);
+        }
 				// 判断申请人的信息是否存在，不存在则写入
 				if(!applicant) {
 					newMembers.push({
@@ -235,6 +120,7 @@ applicationRouter
 				}
 				const membersUid = members.map(m => m.uid);
 				const selectedUserUid = newMembers.map(s => s.uid);
+
 				// 从数据库中标记未被选择的用户
 				for(let u of members) {
 					if(!selectedUserUid.includes(u.uid))
@@ -461,34 +347,15 @@ applicationRouter
 	.use('/:_id/vote', voteRouter.routes(), voteRouter.allowedMethods())
 	.use('/:_id/comment', commentRouter.routes(), commentRouter.allowedMethods())
 	.use('/:_id/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
+  .use('/:_id/manage', managementRouter.routes(), managementRouter.allowedMethods())
 	.use('/:_id/member', memberRouter.routes(), memberRouter.allowedMethods())
 	.use('/:_id/excellent', excellentRouter.routes(), excellentRouter.allowedMethods())
 	.use('/:_id/disabled', disabledRouter.routes(), disabledRouter.allowedMethods())
 	//屏蔽敏感信息
 	.use('/', async (ctx, next) => {
-		const {data} = ctx;
-		const {user} = data;
-		const {applicationForm, fund} = data;
-		let hasPermission = false;
-		if(user) {
-			hasPermission = fund.ensureOperatorPermission('admin', user) || fund.ensureOperatorPermission('censor', user);
-		}
-		//拦截申请表敏感信息
-		if(!user || (applicationForm && !data.userOperationsId.includes('displayFundApplicationFormSecretInfo') && applicationForm.uid !== user.uid && !hasPermission)) {
-			const {applicant, members} = applicationForm;
-			applicant.mobile = null;
-			applicant.idCardNumber = null;
-			applicationForm.account.paymentType = null;
-			applicationForm.account.number = null;
-			for(let m of members) {
-				m.mobile = null;
-				m.idCardNumber = null;
-			}
-		}
-		//拦截表示反对的用户
-		if(!hasPermission) {
-			applicationForm.objectors = [];
-		}
+		const {data, state} = ctx;
+		const {applicationForm} = data;
+		await applicationForm.hideApplicationFormInfoByUserId(state.uid, ctx.permission('displayFundApplicationFormSecretInfo'));
 		await next();
 	});
 module.exports = applicationRouter;

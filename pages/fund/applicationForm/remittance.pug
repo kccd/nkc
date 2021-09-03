@@ -1,0 +1,29 @@
+if !isIncluded('remittance')
+  mixin remittance(form)
+    -var {remittance} = form;
+    if form.status.adminSupport
+      .m-b-1
+        .panel-header 拨款详情
+        if form.auditType === 'system'
+          +formWarning(`该资助项目由系统自动放款，未经过人工审查`)
+        .table-responsive
+          table.table.table-bordered.nkc-table.table-striped
+            thead
+              tr
+                th 序号
+                th 金额
+                th 状态
+            tbody
+              for r, index in remittance
+                tr
+                  th=`第 ${index + 1} 期`
+                  th=`${r.money} 元`
+                  th
+                    if r.status === null
+                      span 未拨款
+                    else if r.status === true
+                      span.text-success 已拨款
+                    else
+                      span.text-danger 拨款失败
+          if remittance.length === 0
+            .p-t-1.p-b-1.text-center 空空如也~

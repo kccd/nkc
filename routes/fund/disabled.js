@@ -4,7 +4,7 @@ disabledRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		data.funds = await db.FundModel.find({disabled: true});
-		ctx.template = 'interface_fund_disabled.pug';
+		ctx.template = 'fund/list/disabledFund.pug';
 		await next();
 	});
 module.exports = disabledRouter;

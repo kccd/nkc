@@ -14,7 +14,7 @@ billRouter
 		data.tid = tid;
 		data.id = id;
 		data.funds = await db.FundModel.find({disabled: false, history: false}).sort({toc: 1});
-		ctx.template = 'interface_fund_bill.pug';
+		ctx.template = 'fund/bills/bill.pug';
 		await next();
 	});
 module.exports = billRouter;

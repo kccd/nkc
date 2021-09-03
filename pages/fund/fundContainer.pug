@@ -1,0 +1,11 @@
+extends ../bootstrap_base
+block title
+  block fundTitle
+    title=data.fundSettings.fundName
+block content
+  include ./fundNav
+  block fundNav
+    +fundNav
+  block fundContent
+block scripts
+  block fundScripts

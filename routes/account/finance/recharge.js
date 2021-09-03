@@ -12,13 +12,14 @@ router
     } = rechargeSettings.recharge;
     if(!rechargeEnabled) ctx.throw(403, `充值功能已关闭，请刷新`);
     const {
-      paymentType,
+      paymentType: queryPaymentType,
       finalPrice,
       totalPrice,
       apiType,
+      ordersId = [],
     } = body;
-    if(!['aliPay', 'weChat'].includes(paymentType)) ctx.throw(400, `支付方式错误，请刷新后重试`);
-    const paymentSettings = rechargeSettings.recharge[paymentType];
+    if(!['aliPay', 'weChat'].includes(queryPaymentType)) ctx.throw(400, `支付方式错误，请刷新后重试`);
+    const paymentSettings = rechargeSettings.recharge[queryPaymentType];
     const {
       fee,
       enabled: paymentEnabled
@@ -26,61 +27,68 @@ router
     if(!paymentEnabled) ctx.throw(403, `支付方式已关闭，请刷新`);
     const _totalPrice = Math.ceil(finalPrice * (1 + fee));
     if(_totalPrice !== totalPrice) ctx.throw(400, `充值金额错误，请刷新后重试`);
-    if(totalPrice < minRecharge) ctx.throw(400, `充值金额不能小于${minRecharge / 100}元`);
-    if(totalPrice > maxRecharge) ctx.throw(400, `充值金额不能大于${maxRecharge / 100}元`);
+    if(ordersId && ordersId.length > 0) {
+      // 充值并付款 验证订单是否有效
+      await db.ShopOrdersModel.verifyUserOrdersId(ordersId, state.uid, finalPrice);
+    } else {
+      // 仅充值 需验证充值金额范围
+      if(totalPrice < minRecharge) ctx.throw(400, `充值金额不能小于${minRecharge / 100}元`);
+      if(totalPrice > maxRecharge) ctx.throw(400, `充值金额不能大于${maxRecharge / 100}元`);
+    }
     const mainScore = await db.SettingModel.getMainScore();
     const description = `${mainScore.name}充值`
     let paymentId;
-    let weChatPaymentInfo;
-    let aliPaymentInfo;
-    if(paymentType === 'aliPay') {
-      const aliPaymentUrl = await db.KcbsRecordModel.getAlipayUrl({
-        uid,
-        money: totalPrice / 100,
-        score: finalPrice,
-        ip: ctx.address,
-        port: ctx.port,
-        title: '充值',
+    let paymentType;
+    if(queryPaymentType === 'aliPay') {
+      const aliPayRecord = await db.AliPayRecordModel.getPaymentRecord({
+        title: description,
+        money: totalPrice,
         fee,
-        notes: description,
-        backParams: {
-          type: 'recharge'
-        }
+        effectiveMoney: finalPrice,
+        uid: state.uid,
+        from: 'score',
+        clientIp: ctx.address,
+        clientPort: ctx.port
       });
-      aliPaymentInfo = {
-        url: aliPaymentUrl
+      paymentId = aliPayRecord._id;
+      paymentType = 'aliPay';
+      data.aliPaymentInfo = {
+        paymentId,
+        url: aliPayRecord.url
       };
     } else {
       // 微信支付
-      if(!['native', 'H5'].includes(apiType)) ctx.throw(400, `微信支付apiType error`);
-      const weChatPaymentRecord = await db.WeChatPaymentModel.getPaymentRecord({
+      const wechatPaymentRecord = await db.WechatPayRecordModel.getPaymentRecord({
         apiType,
         description,
         money: totalPrice,
+        fee,
+        effectiveMoney: finalPrice,
         uid: state.uid,
         attach: {},
+        from: 'score',
         clientIp: ctx.address,
         clientPort: ctx.port,
       });
-      paymentId = weChatPaymentRecord._id;
-      weChatPaymentInfo = {
+      paymentId = wechatPaymentRecord._id;
+      paymentType = 'wechatPay';
+      data.wechatPaymentInfo = {
         paymentId,
-        url: weChatPaymentRecord.url
+        url: wechatPaymentRecord.url
       }
-      await db.KcbsRecordModel.createRechargeRecord({
-        paymentType,
-        paymentId,
-        uid,
-        ip: ctx.address,
-        port: ctx.port,
-        num: finalPrice,
-        fee: (totalPrice - finalPrice) / 100,
-        paymentNum: totalPrice / 100,
-        description,
-      });
     }
-    data.weChatPaymentInfo = weChatPaymentInfo;
-    data.aliPaymentInfo = aliPaymentInfo;
+    await db.KcbsRecordModel.createKcbsRecord({
+      paymentType,
+      paymentId,
+      uid,
+      ip: ctx.address,
+      port: ctx.port,
+      num: finalPrice,
+      fee: (totalPrice - finalPrice) / 100,
+      paymentNum: totalPrice / 100,
+      description,
+      ordersId
+    });
     await next();
   })
   .get('/', async (ctx, next) => {

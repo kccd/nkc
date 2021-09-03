@@ -164,15 +164,16 @@ function sweetAlert(text) {
   .then(backState)
 }
 
-function sweetPrompt(title) {
+function sweetPrompt(title, content = '') {
   return new Promise(resolve => {
     Swal.fire({
       title,
       input: 'textarea',
       inputAttributes: {
-        autocapitalize: 'off'
+        autocapitalize: 'off',
       },
-      allowOutsideClick: false,
+      inputValue: content,
+      allowOutsideClick: true,
       showCancelButton: true,
       confirmButtonText: '确定',
       cancelButtonText: '取消',
@@ -214,7 +215,7 @@ function sweetError(text) {
     Swal.close();
   });
   console.log(text);
-  text = text.error || text;
+  text = text.error || text.message || text;
   text = text + "";
   return Swal({
     type: "error",

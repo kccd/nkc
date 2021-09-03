@@ -1,0 +1,87 @@
+extends ../experimental
+block eTitle
+  title 支付
+  style.
+    .avatar-sm{
+      height: 1.3rem;
+      width: 1.3rem;
+      border-radius: 50%;
+      margin-right: 0.2rem;
+    }
+    table tr.tr-waiting{
+      background-color: rgba(255,237,197,0.35);
+    }
+    table tr.tr-success{
+      background-color: #d2ffd3;
+    }
+    table tr.tr-failed{
+      background-color: #ffe8eb;
+    }
+    .table-th-sm{
+      /*max-width: 6rem!important;*/
+    }
+block eContent
+  .container-fluid.max-width
+    .row
+      .col-xs-12.m-b-1
+        ul.nav.nav-tabs
+          li(class=!data.t || data.t === 'aliPay' ? 'active' : '')
+            a(href=`/e/log/payment?t=aliPay`) 支付宝支付
+          li(class=data.t === 'wechatPay' ? 'active' : '')
+            a(href=`/e/log/payment?t=wechatPay`) 微信支付
+      .col-xs-12
+        include ../../publicModules/paging/paging
+        .table-responsive
+          table.table.nkc-table.table-bordered
+            thead
+              tr
+                th 时间
+                th 用户
+                th 类型
+                th 金额
+                th 来源
+                th 状态
+                th IP
+                th 其他
+            tbody
+              for r in data.records
+                tr(class=`tr-${r.status}`)
+                  th.table-th-sm
+                    +timeFormat(r.toc)
+                  th.table-th-sm
+                    if !r.user
+                      span 游客
+                    else
+                      img.avatar-sm(src=tools.getUrl('userAvatar', r.user.avatar))
+                      a(href=tools.getUrl('userHome', r.user.uid) target="_blank" data-float-uid=r.user.uid)=r.user.username
+                  th.table-th-sm
+                    if r.type === 'transfer'
+                      span 收款
+                    else
+                      span 付款
+                  th.table-th-sm
+                    div=`支付金额：${r.money / 100} 元`
+                    div=`有效金额：${r.effectiveMoney / 100} 元`
+                    div=`手续费：${r.fee * 100} %`
+                  th.table-th-sm=r.from
+                  th.table-th-sm
+                    if r.status === 'success'
+                      span 支付完成
+                    else if r.status === 'failed'
+                      span 支付失败
+                    else if r.status === 'waiting'
+                      span 等待支付
+                  th.table-th-sm=`${r.ip}:${r.port}`
+                  th
+                    if r.fullData
+                      button(onclick=`viewFullData("${objToStr({data: r.fullData})}")`) 查看回调
+
+        include ../../publicModules/paging/paging_input
+block scripts
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  script.
+    function viewFullData(data) {
+      data = NKC.methods.strToObj(data).data;
+      data = JSON.stringify(JSON.parse(data), '', 2);
+      asyncSweetCustom(`<h4>支付平台回调数据</h4><pre style="text-align: left">${data}</pre>`)
+    }

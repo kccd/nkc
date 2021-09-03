@@ -1,10 +1,10 @@
 module.exports = [
   {
     fid: '1',
-    displayName: '系统',
-    abbr: '系统',
-    description: '此专业仅提供系统信息的展示',
-    brief: '此专业仅提供系统信息的展示',
+    displayName: '管理',
+    abbr: '管理',
+    description: '系统管理',
+    brief: '系统管理',
     accessible: true,
     displayOnParent: true,
     visibility: true,
@@ -21,7 +21,7 @@ module.exports = [
   },
   {
     fid: '2',
-    displayName: '系统通知',
+    displayName: '通知',
     abbr: '通知',
     description: '系统通知',
     brief: '系统通知',
@@ -45,17 +45,17 @@ module.exports = [
     displayName: '回收站',
     abbr: '回收站',
     description: '系统回收站',
-    brief: '回收站',
+    brief: '系统回收站',
     accessible: true,
     displayOnParent: true,
     visibility: true,
-    isVisibleForNCC: true,
+    isVisibleForNCC: false,
     permission: {
       write: {
-        rolesId: ['dev', 'default', 'visitor'],
+        rolesId: ['dev'],
       },
       read: {
-        rolesId: ['dev', 'default', 'visitor'],
+        rolesId: ['dev'],
       }
     },
     type: 'forum',

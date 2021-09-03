@@ -4,7 +4,7 @@ historyRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		data.funds = await db.FundModel.find({history: true, disabled: false});
-		ctx.template = 'interface_fund_list.pug';
+		ctx.template = 'fund/list/fundList.pug';
 		data.type = 'history';
 		await next();
 	});

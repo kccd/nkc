@@ -1,0 +1,46 @@
+extends ./fundContainer
+block fundTitle
+  title=`${data.fundSettings.fundName} - ${data.fund.name} - 条款`
+  style.
+    .fund-terms p{
+      font-size: 1.25rem;
+    }
+block fundContent
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8.col-md-offset-2.box-shadow-panel
+        div
+          h2.text-center=`${data.fundSettings.fundName}条款`
+          .fund-terms.m-b-4!=markdown_safe(data.fundSettings.terms)
+          hr
+          h2.text-center=`${data.fund.name}条款`
+          .fund-terms.m-b-4!=markdown_safe(data.fund.description.terms)
+          .checkbox
+            label
+              input.fund-terms-input(type='checkbox' onclick='setStatus()')
+              span 我已阅读并同意以上全部条款
+          .m-t-1.text-center
+            button.btn.btn-default.fund-terms-button(onclick=`submit("${data.fund._id}")` disabled="disabled") 确定
+block fundScripts
+  script.
+    var dom = $('input.fund-terms-input');
+    function getStatus() {
+      return dom.prop('checked');
+    }
+    function setStatus() {
+      var status = getStatus();
+      if(!status) {
+        $('button.fund-terms-button').attr('disabled', 'disabled');
+      } else {
+        $('button.fund-terms-button').removeAttr('disabled');
+      }
+    }
+    function submit(fundId) {
+      nkcAPI('/fund/list/' + fundId + '/add', 'POST', {})
+        .then(function(data) {
+          NKC.methods.visitUrl('/fund/a/' + data.applicationFormId + '/settings');
+        })
+        .catch(function(data) {
+          sweetError(data);
+        });
+    }

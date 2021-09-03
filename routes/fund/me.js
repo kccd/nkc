@@ -5,28 +5,34 @@ meRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, query} = ctx;
 		const {user} = data;
-		const {type} = query;
-		const page = query.page? parseInt(query.page): 0;
-		ctx.template = 'interface_fund_me.pug';
-		data.me = true;
+		const {type = 'created', page = 0} = query;
 		data.type = type;
-		let newNotify = 0;
-		const aUsers = await db.FundApplicationUserModel.find({uid: user.uid});
-		const idArr = aUsers.map(a => a.applicationFormId);
-		await Promise.all(aUsers.map(async a => {
-			if(a.agree === null) {
-				const applicationForm = await db.FundApplicationFormModel.findOnly({_id: a.applicationFormId});
-				if(user.uid !== applicationForm.uid && applicationForm.disabled === false && applicationForm.useless === null) newNotify++;
-			}
-		}));
-		let q = {};
-		if(type === 'created' || type === undefined) {
+		const q = {};
+		if(type === 'created') {
 			q.uid = user.uid;
 		} else if(type === 'join') {
-			q._id = {$in: idArr};
+      const members = await db.FundApplicationUserModel.find({
+        type: 'member',
+        agree: true,
+        uid: user.uid,
+        removed: false
+      }, {
+        applicationFormId: 1
+      });
+      const applicationFormsId = members.map(m => m.applicationFormId);
+			q._id = {$in: applicationFormsId};
 			q.uid = {$ne: user.uid};
 		} else if(type === 'notify') {
-			q._id = {$in: idArr};
+      const members = await db.FundApplicationUserModel.find({
+        type: 'member',
+        agree: null,
+        uid: user.uid,
+        removed: false
+      }, {
+        applicationFormId: 1
+      });
+      const applicationFormsId = members.map(m => m.applicationFormId);
+			q._id = {$in: applicationFormsId};
 			q.uid = {$ne: user.uid};
 			q.disabled = false;
 			q.useless = null;
@@ -40,11 +46,12 @@ meRouter
 				await a.extendMembers();
 				await a.extendApplicant();
 				await a.extendProject();
+				a.statusString = (await a.getStatus()).description;
 				return a;
 			}
 		}));
-		data.newNotify = newNotify;
 		data.paging = paging;
+		ctx.template = 'fund/me.pug';
 		await next();
 	});
 module.exports = meRouter;

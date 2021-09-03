@@ -28,6 +28,7 @@ const run = async () => {
   await timedTasks.clearResourceState();
   await timedTasks.updateAllForumLatestThread();
   await timedTasks.updateForumsMessage();
+  await timedTasks.modifyTimeoutApplicationForm();
   if(process.connected) process.send('ready');
   process.on('message', function(msg) {
     if (msg === 'shutdown') {

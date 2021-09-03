@@ -99,5 +99,8 @@ module.exports = {
     'receiveAliPayPaymentInfo',
     'receiveWeChatPaymentInfo',
     'fundDonation'
+  ],
+  whitelistOfClosedFund: [
+
   ]
 }

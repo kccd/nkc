@@ -1,0 +1,98 @@
+if !isIncluded('report')
+  style.
+    .user-info img{
+      height: 1.8rem;
+      width: 1.8rem;
+      vertical-align: top;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+    .report-content{
+      border-left: 1px solid #ddd;
+      padding: 0.4rem 1rem;
+      margin: 0.3rem 1rem;
+    }
+    .report-time{
+      color: #888;
+    }
+  mixin singleReport(report, form, userFundRoles)
+    -var {applicant} = form;
+    .form-single-report
+      .user-info
+        if !['completedReport', 'report'].includes(report.type)
+          span 系统
+        else
+          img(
+            src=tools.getUrl('userAvatar', applicant.user.avatar)
+            data-float-uid=applicant.uid
+            )
+          a(
+            href=tools.getUrl('userHome', applicant.user.uid)
+            target="_blank"
+            data-float-uid=applicant.uid
+            )=applicant.user.username
+        span.m-l-05.report-time
+          +fromNow(report.toc)
+        if userFundRoles.includes('admin')
+          if report.disabled
+            a.m-l-05(onclick=`disabledReport(${form._id},${report._id},false)`) 解除屏蔽
+          else
+            a.m-l-05(onclick=`disabledReport(${form._id},${report._id},true)`) 屏蔽
+      .report-content
+        if report.type === 'userInfoAudit'
+          if report.support
+            -report.c = `用户信息通过审核${report.c ? `。\n审核评语：${report.c}` : ''}`;
+          else
+            -report.c = `用户信息未通过审核，等待申请人修改。\n审核意见：${report.c}`;
+        if report.type === 'projectAudit'
+          if report.support
+            -report.c = `项目信息通过审核${report.c ? `。\n审核评语：${report.c}` : ''}`;
+          else
+            -report.c = `项目信息未通过审核，等待申请人修改。\n审核意见：${report.c}`;
+        if report.type === 'moneyAudit'
+          if report.support
+            -report.c = `资金预算通过审核${report.c ? `。\n审核评语：${report.c}` : ''}`;
+          else
+            -report.c = `资金预算未通过审核，等待申请人修改。\n审核意见：${report.c}`;
+        if report.type === 'adminAudit'
+          if report.support
+            -report.c = `管理员复核通过，开始项目${report.c ? `。\n审核评语：${report.c}` : ''}`;
+          else
+            -report.c = `管理员复核未通过，等待申请人修改。\n审核意见：${report.c}`;
+        if report.type === 'completedAudit'
+          if report.support
+            -report.c = `结题报告审核通过${report.c ? `。\n审核评语：${report.c}` : ''}`;
+          else
+            -report.c = `结题报告审核未通过，等待申请人修改。\n审核意见：${report.c}`;
+        if report.type === 'vote'
+          if report.support
+            -report.c = `网友 ${report.user.username} 表示的支持${report.c ? `。并说：${report.c}` : ''}`;
+          else
+            -report.c = `网友 ${report.user.username} 表示反对。并说：${report.c}`;
+        if report.type === 'remittance'
+          if !report.support
+            -report.c = `拨款失败：${report.c}`;
+        if report.type === 'refuse'
+          -report.c = `被彻底拒绝。理由：${report.c}`;
+        -let klass = '';
+        if report.support === false
+          -klass = 'text-danger';
+        else if report.support === true
+          -klass = 'text-success';
+        .pre-wrap(class=klass)=report.c
+  mixin report(form, userFundRoles)
+    .m-b-1
+      .panel-header 最新进展
+      .m-b-1
+        for report in form.reports
+          +singleReport(report, form, userFundRoles)
+  script.
+    function disabledReport(applicationFormId, reportId, type) {
+      nkcAPI('/fund/a/' + applicationFormId + '/report/' + reportId + '?type=' + type, 'DELETE', {})
+        .then(function () {
+          window.location.reload();
+        })
+        .catch(function (data) {
+          screenTopWarning(data.error);
+        })
+    }

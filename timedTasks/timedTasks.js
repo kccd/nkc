@@ -149,4 +149,22 @@ func.updateForumsMessage = async () => {
     }
   }, 30 * 60 * 1000);
 };
+
+/*
+* 定期更改基金修改超时的申请表的状态
+* */
+func.modifyTimeoutApplicationForm = async () => {
+  setTimeout(async () => {
+    try{
+      console.log(`正在更改基金修改超时的申请表状态...`);
+      await db.FundModel.modifyTimeoutApplicationForm();
+    } catch(err) {
+      console.log(err);
+    } finally {
+      console.log(`更改基金修改超时的申请表状态完成`);
+      await func.modifyTimeoutApplicationForm();
+    }
+  }, 60 * 60 * 1000);
+}
+
 module.exports = func;

@@ -753,6 +753,85 @@ shopOrdersSchema.methods.getParamById = async function(id) {
   return (await ShopCostRecordModel.orderExtendRecord([param]))[0];
 };
 
+/*
+* 创建有关购买商品的账单
+* @parma {[String]} ordersId 订单号组成的数组
+* @param {Number} totalMoney 支付的金额（分），用于验证支付的金额和订单总金额是否相等
+* @Parma {String} uid 购买者
+* */
+shopOrdersSchema.statics.createRecordByOrdersId = async (props) => {
+  const {
+    ordersId,
+    totalMoney,
+    uid,
+  } = props
+  const ShopOrdersModel = mongoose.model('shopOrders');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const MessageModel = mongoose.model('messages');
+  const SettingModel = mongoose.model('settings');
+  const UserModel = mongoose.model('users');
+  const ShopProductsParamModel = mongoose.model('shopProductsParams');
+  if(ordersId.length === 0) throwErr(500, `ordersId 不能为空`);
+  const mainScore = await SettingModel.getMainScore();
+  let orders = [];
+  for(const orderId of ordersId) {
+    const order = await ShopOrdersModel.findOne({orderId});
+    if(!order) throwErr(400, `未找到ID为【${orderId}】的订单`);
+    if(order.buyUid !== uid) throwErr(403, `订单【${orderId}】错误`);
+    if(order.closeStatus) throwErr(400, "订单已关闭");
+    if(order.orderStatus !== 'unCost') throwErr(400, `订单【${orderId}】暂不需要付款，请勿重复提交`);
+    orders.push(order);
+  }
+  const ordersInfo = await ShopOrdersModel.getOrdersInfo(orders);
+  if(totalMoney !== ordersInfo.totalMoney) throwErr(400, `需支付的金额与订单金额不一致，请刷新后再试`);
+  orders = await ShopOrdersModel.userExtendOrdersInfo(orders);
+  for(let i = 0; i < orders.length; i++) {
+    const order = orders[i];
+    const kcbsRecordId = await SettingModel.operateSystemID('kcbsRecords', 1);
+    const record = KcbsRecordModel({
+      _id: kcbsRecordId,
+      from: uid,
+      to: 'bank',
+      scoreType: mainScore.type,
+      type: 'pay',
+      ordersId: [order.orderId],
+      num: order.orderPrice + order.orderFreightPrice,
+      description: ordersInfo.description[i],
+      verify: true,
+    });
+    await record.save();
+    // 更改订单状态为已付款，添加付款时间。
+    await ShopOrdersModel.updateOne({orderId: order.orderId}, {
+      $set: {
+        orderStatus: 'unShip',
+        payToc: record.toc
+      }
+    });
+    // 给卖家发送付款成功消息
+    await MessageModel.sendShopMessage({
+      type: "shopBuyerPay",
+      r: order.sellUid,
+      orderId: order.orderId
+    });
+  }
+  // 库存相关
+  await ShopProductsParamModel.productParamReduceStock(orders, 'payReduceStock');
+  await UserModel.updateUserScore(uid, mainScore.type);
+};
+
+/*
+* 验证订单号是否有效
+* @param {[String]} ordersId 订单 ID 组成的数组
+* @param {String} uid 用户 ID
+* @param {Number} money 金额
+* */
+shopOrdersSchema.statics.verifyUserOrdersId = async (ordersId, uid, money) => {
+  const ShopOrdersModel = mongoose.model('shopOrders');
+  const orders = await ShopOrdersModel.find({orderId: {$in: ordersId}});
+  const {totalMoney} = await ShopOrdersModel.getOrdersInfo(orders);
+  if(totalMoney !== money) throwErr(400, `需支付的金额与订单金额不一致，请刷新后再试`);
+};
+
 const ShopOrdersModel = mongoose.model('shopOrders', shopOrdersSchema);
 
 module.exports = ShopOrdersModel;

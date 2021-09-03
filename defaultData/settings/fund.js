@@ -9,13 +9,28 @@ module.exports = {
     readOnly: false,
     closed: {
       status: false,
-      openingHours: Date.now(),
       reason: '关闭原因',
       uid: '',
-      username: '',
-      closingTime: Date.now()
+      closingTime: new Date()
     },
     donationDescription: '赞助说明',
-    fundPoolDescription: '资金池介绍'
+    fundPoolDescription: '资金池介绍',
+
+    donation: {
+      enabled: false,
+      min: 100, // 分
+      max: 500000,
+      defaultMoney: [500, 1000, 5000, 10000, 50000, 100000, 500000],
+      payment: {
+        aliPay: {
+          enabled: false,
+          fee: 0
+        },
+        wechatPay: {
+          enabled: false,
+          fee: 0
+        }
+      }
+    }
   }
 };

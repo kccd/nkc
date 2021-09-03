@@ -10,7 +10,7 @@ var app = new Vue({
     submitted: false,
     timeLimit: 0,
 
-    payment: '',
+    payment: 'aliPay',
 
     info: "",
 
@@ -27,11 +27,23 @@ var app = new Vue({
     bankAccounts: data.bankAccounts,
     money: "",
     selectedAccount: "",
-    to: "alipay" // alipay, bank
   },
   computed: {
-    realMoney: function() {
-      return (this.money*(1-this.withdrawSettings.withdrawFee)).toFixed(2)
+    // 用户选择的提现平台对应的设置
+    paymentSettings() {
+      return this.withdrawSettings[this.payment]
+    },
+    // 用户需要提现的科创币金额 分
+    paymentMoney() {
+      return Math.ceil(this.money * 100);
+    },
+    // 用户实际到账金额 到账金额 = 支付金额 * （ 1 - 手续费 ）
+    effectiveMoney() {
+      return Math.floor(this.paymentMoney * (1 - this.fee));
+    },
+    // 用户选择的提现平台提现时收取的手续费
+    fee() {
+      return this.paymentSettings.fee;
     },
     timeBegin: function() {
       var timeBegin = this.getHMS(this.withdrawSettings.startingTime, "string");
@@ -65,28 +77,11 @@ var app = new Vue({
       return arr;
     },
     payInfo() {
-      const {payment, withdrawSettings} = this;
-      if(!payment) return;
-      const pay = withdrawSettings[payment];
-      if(pay.enabled && pay.fee > 0) {
-        const fee = Number((pay.fee * 100).toFixed(4));
-        return `服务商（非本站）将收取 ${fee}% 的手续费`
+      const {fee} = this;
+      if(fee > 0) {
+        return `服务商（非本站）将收取 ${fee * 100}% 的手续费`
       }
     },
-    fee() {
-      const {totalPrice, money} = this;
-      return Number((money - totalPrice).toFixed(2));
-    },
-    totalPrice() {
-      let {withdrawSettings, money, payment} = this;
-      const fee = withdrawSettings[payment].fee;
-      if(fee) {
-        money = money * (1 - fee);
-      } else {
-        money;
-      }
-      return Number(money.toFixed(2));
-    }
   },
   mounted: function() {
     for(var i = 0; i < this.alipayAccounts.length; i++) {
@@ -101,6 +96,12 @@ var app = new Vue({
     }
   },
   methods: {
+    // 处理用户输入的金额数，精确到分
+    onInputMoney() {
+      let money = Math.ceil(this.money * 100) / 100;
+      if(isNaN(money)) money = 0;
+      this.money = money;
+    },
     selectAccount: function(account) {
       this.selectedAccount = account;
     },
@@ -144,24 +145,33 @@ var app = new Vue({
       this.error = "";
       this.info = "";
       const self = this;
-      const {money, password,totalPrice, code, payment, selectedAccount} = this;
+      const {
+        paymentMoney,
+        effectiveMoney,
+        fee,
+        password,
+        code,
+        payment,
+        selectedAccount,
+        withdrawSettings
+      } = this;
       Promise.resolve()
         .then(() => {
-          if(money > 0) {}
-          else{
-            throw '提现金额不正确';
-          }
-          if(!['aliPay', 'weChat'].includes(payment)) throw '请选择付款方式';
-          if(!code) throw '请输入短信验证码';
-          if(!password) throw '请输入登录密码';
+          const {min, max} = withdrawSettings;
+          if(effectiveMoney < min) throw new Error(`提现金额不能小于 ${min / 100} 元`);
+          if(effectiveMoney > max) throw new Error(`提现金额不能大于 ${max / 100} 元`);
+          if(!['aliPay', 'weChat'].includes(payment)) throw new Error('请选择付款方式');
+          if(!code) throw new Error('请输入短信验证码');
+          if(!password) throw new Error('请输入登录密码');
           self.submitted = true;
           return nkcAPI(`/account/finance/withdraw`, 'POST', {
-            money: totalPrice,
-            score: money,
+            money: paymentMoney,
+            effectiveMoney,
+            fee,
             password,
             code,
             account: selectedAccount,
-            to: payment
+            payment
           })
 
         })

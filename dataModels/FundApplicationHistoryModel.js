@@ -56,6 +56,10 @@ const fundApplicationHistorySchema = new Schema({
 		type: String,
 		required: true
 	},
+  auditType: {
+	  type: String,
+    default: ''
+  },
 	publicity: { // 示众
 		timeOfBegin: {
 			type: Date,

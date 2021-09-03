@@ -99,6 +99,8 @@
           li
             a(href="/e/log/userCode") 用户动态码验证记录
           li
+            a(href="/e/log/payment") 支付记录
+          li
             a(href="/e/log/filter") 敏感词过滤记录
 
       li.dropdown(role='presentation')
@@ -146,6 +148,9 @@
           if permission('experimentalVisitSettings')
             li
               a(href='/e/settings/visit') 访问
+          if permission('experimentalFundSettings')
+            li
+              a(href='/e/settings/fund') 基金
           if permission('experimentalIPSettings')
             li
               a(href='/e/settings/ip') IP 黑名单

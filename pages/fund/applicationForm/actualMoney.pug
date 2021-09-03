@@ -1,0 +1,40 @@
+if !isIncluded('actualMoney')
+  mixin actualMoney(form)
+    -var {actualMoney, fixedMoney, budgetMoney} = form;
+    -var actualTotal = 0;
+    -var budgetTotal = 0;
+    if !fixedMoney && (form.status.completed || form.completedAudit)
+      for b in budgetMoney
+        -budgetTotal += b.fact * 100;
+      .m-b-1
+        .panel-header 实际花费
+        .table-responsive
+          table.table.table-bordered.m-b-05.nkc-table
+            thead
+              tr
+                th 用途
+                th 规格型号
+                th 单价(元)
+                th 数量
+                th 单位
+                th 合计(元)
+            tbody
+              for b in actualMoney
+                -actualTotal += b.total * 100;
+                tr
+                  th=b.purpose
+                  th=b.model
+                  th=b.money
+                  th=b.count
+                  th=b.unit
+                  th=b.total
+        .text-right
+          -var returnMoney = budgetTotal > actualTotal? (budgetTotal - actualTotal) / 100: 0;
+          span 实际花费&nbsp;
+          strong.text-danger=actualTotal / 100
+          span &nbsp;元，应退金额&nbsp;
+          strong.text-danger=returnMoney
+          span &nbsp;元
+          if returnMoney > 0
+            span ，
+            a(href=`'/u/${form.uid}/bills?fundId=${form._id}` target="_blank") 查看基金账单

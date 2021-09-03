@@ -1,0 +1,119 @@
+extends ../../experimental
+block eTitle
+  title 基金设置
+block eContent
+  #data.hidden=objToStr({fundSettings: data.fundSettings})
+  .container-fluid.max-width#app(v-cloak)
+    .row
+      .col-xs-12.col-md-12
+        .form.form-horizontal
+          h3 基金设置
+          .form-group
+            label.control-label.col-sm-2 总控制
+            .col-sm-6
+              .radio
+                label.m-r-1
+                  input(type='radio' :value="true" v-model='fundSettings.enableFund')
+                  span 开启
+                label
+                  input(type='radio' :value="false" v-model='fundSettings.enableFund')
+                  span 关闭
+          .form-group
+            label.control-label.col-sm-2 临时关闭
+            .col-sm-6
+              .radio
+                label.m-r-1
+                  input(type='radio' :value="true" v-model='fundSettings.closed.status')
+                  span 开启
+                label
+                  input(type='radio' :value="false" v-model='fundSettings.closed.status')
+                  span 关闭
+              .m-t-1(v-if='fundSettings.closed.status')
+                h5 临时页面提示内容：
+                textarea.form-control(v-model='fundSettings.closed.reason' rows=10)
+
+          .form-group
+            label.control-label.col-sm-2 只读模式
+            .col-sm-6
+              .radio
+                label.m-r-1
+                  input(type='radio' :value="true" v-model='fundSettings.readOnly')
+                  span 开启
+                label
+                  input(type='radio' :value="false" v-model='fundSettings.readOnly')
+                  span 关闭
+          .form-group
+            label.control-label.col-sm-2 基金名称
+            .col-sm-6
+              input.form-control(type='text' v-model.trim='fundSettings.fundName')
+          .form-group
+            label.control-label.col-sm-2 基金介绍
+            .col-sm-6
+              textarea.form-control(v-model.trim='fundSettings.description' rows=10)
+          .form-group
+            label.control-label.col-sm-2 基金条款
+            .col-sm-6
+              textarea.form-control(v-model.trim='fundSettings.terms' rows=10)
+          .form-group
+            label.control-label.col-sm-2 赞助说明
+            .col-sm-6
+              textarea.form-control(v-model.trim='fundSettings.donationDescription' rows=10)
+          .form-group
+            label.control-label.col-sm-2 资金池介绍
+            .col-sm-6
+              textarea.form-control(v-model.trim='fundSettings.fundPoolDescription' rows=10)
+          h3.m-t-2 基金赞助
+          .form-group
+            label.control-label.col-sm-2 状态
+            .col-sm-6
+              .radio
+                label.m-r-1
+                  input(type='radio' :value='true' v-model='fundSettings.donation.enabled')
+                  span 开启
+                label
+                  input(type='radio' :value='false' v-model='fundSettings.donation.enabled')
+                  span 关闭
+          .form-group
+            label.control-label.col-sm-2 金额
+            .col-sm-6
+              .form-inline
+                h5 单笔赞助最小金额（元，精确到 0.01，不超过 5000）
+                input.form-control(type='text' v-model.number='fundSettings.donation.min')
+                h5 单笔赞助最大金额（元，精确到 0.01，不超过 5000）
+                input.form-control(type='text' v-model.number='fundSettings.donation.max')
+              h5 预设金额（逗号分隔，元，精确到 0.01，不超过 5000）
+              textarea.form-control(rows=2 v-model='defaultMoney')
+          .form-group
+            label.control-label.col-sm-2 支付方式
+            .col-sm-6
+              table.table.table-bordered
+                thead
+                  tr
+                    th 平台
+                    th 手续费(%)
+                    th 启用
+                tbody
+                  tr
+                    th 支付宝
+                    th
+                      input.form-control(type='text' v-model.number='fundSettings.donation.payment.aliPay._fee')
+                    th
+                      .checkbox
+                        label
+                          input(type='checkbox' :value='true' v-model='fundSettings.donation.payment.aliPay.enabled')
+                  tr
+
+                    th 微信支付
+                    th
+                      input.form-control(type='text' v-model.number='fundSettings.donation.payment.wechatPay._fee')
+                    th
+                      .checkbox
+                        label
+                          input(type='checkbox' :value='true' v-model='fundSettings.donation.payment.wechatPay.enabled')
+          .form-group
+            label.control-label.col-sm-2
+            .col-sm-6
+              button.btn.btn-primary(@click='save') 提交
+
+block scripts
+  +includeJS('/experimental/settings/fund/fund.js')

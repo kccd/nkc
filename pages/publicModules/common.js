@@ -962,7 +962,32 @@ NKC.methods.isMobilePhoneBrowser = function() {
 * 判断是否为电脑浏览器
 * */
 NKC.methods.isPcBrowser = function() {
-  return !NKC.methods.isMobilePhoneBrowser();
+  return NKC.configs.platform !== 'reactNative' && !NKC.methods.isMobilePhoneBrowser();
+}
+
+NKC.methods.toPay = function(paymentType, info, newWindow) {
+  if(paymentType === 'aliPay') {
+    const {url} = info;
+    if(NKC.configs.isApp) {
+      NKC.methods.visitUrl(url, true);
+    } else {
+      newWindow.location = url;
+    }
+  } else if(paymentType === 'wechatPay') {
+    const {paymentId} = info;
+    const url = `/payment/wechat/${paymentId}`;
+    if(NKC.methods.isPcBrowser()) {
+      newWindow.location = url;
+    } else if(NKC.methods.isMobilePhoneBrowser()) {
+      newWindow.location = url;
+    } else {
+      NKC.methods.rn.emit('weChatPay', {
+        url: window.location.origin + url,
+        H5Url: url,
+        referer: window.location.origin
+      });
+    }
+  }
 }
 
 

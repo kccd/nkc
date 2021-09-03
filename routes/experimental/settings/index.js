@@ -48,6 +48,7 @@ const verificationRouter = require('./verification');
 const sensitiveWordsRouter = require('./sensitiveWords');
 const visitRouter = require('./visit');
 const ipRouter = require('./ip');
+const fundRouter = require('./fund');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -100,6 +101,7 @@ settingRouter
 	.use('/verification', verificationRouter.routes(), verificationRouter.allowedMethods())
 	.use('/userScores', userScoresRouter.routes(), userScoresRouter.allowedMethods())
   .use('/visit', visitRouter.routes(), visitRouter.allowedMethods())
+  .use('/fund', fundRouter.routes(), fundRouter.allowedMethods())
   .use('/ip', ipRouter.routes(), ipRouter.allowedMethods())
   .use('/tools', toolsRouter.routes(), toolsRouter.allowedMethods())
 	.use('/sensitiveWords', sensitiveWordsRouter.routes(), sensitiveWordsRouter.allowedMethods());

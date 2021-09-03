@@ -1,0 +1,89 @@
+@import "../publicModules/base";
+.application-form-list{
+  .application-form-item{
+    border-bottom: 1px solid #f4f4f4;
+    padding: 1rem 0;
+  }
+  .application-form-item:last-child{
+    border-bottom: none;
+  }
+}
+.application-form-item{
+  .application-form-header{
+    @height: 2.4rem;
+    @paddingRight: 6rem;
+    position: relative;
+    padding-right: @paddingRight;
+    height: @height;
+    line-height: @height;
+    color: #333;
+    .fund-name{
+      font-size: 1.2rem;
+      a{
+        text-decoration: none;
+        color: #333;
+      }
+    }
+    .application-form-money{
+      position: absolute;
+      text-align: right;
+      top: 0;
+      right: 0;
+      width: @paddingRight;
+      height: @height;
+      span{
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #ff4400;
+      }
+      &>span:first-child{
+        font-size: 1rem;
+        margin-right: 0.3rem;
+      }
+    }
+  }
+  .application-form-title{
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-decoration: none;
+    color: #333;
+  }
+  .application-form-footer{
+    position: relative;
+    @height: 2.6rem;
+    @padding-left: 20rem;
+    text-align: right;
+    .application-form-status{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: @padding-left;
+      height: @height;
+      line-height: @height;
+      text-align: left;
+
+    }
+    .applicant-users{
+      height: @height;
+      .applicant-user{
+        display: inline-block;
+        border-radius: 50%;
+        border: 1px solid #f4f4f4;
+        overflow: hidden;
+        margin-right: -1rem;
+        transition: margin-right 200ms;
+        img{
+          height: 2.4rem;
+          width: 2.4rem;
+        }
+        &:hover{
+          margin-right: 0;
+        }
+      }
+      &>.applicant-user:last-child{
+        margin-right: 0;
+      }
+    }
+  }
+}

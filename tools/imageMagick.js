@@ -358,7 +358,6 @@ const userBannerify = (options) => {
 	return spawnProcess('magick', arr);
 };
 
-
 const gitify = () => {
   return spawnProcess('git', ['pull'], {
     cwd: __projectRoot
@@ -374,10 +373,11 @@ const photoify = (filePath, targetPath) => {
 
 const photoSmallify = (filePath, targetPath) => {
 	const {height, width} = sizeLimit.photoSmall;
+	// 空白部分填充白色 -extent
 	if(linux) {
-		return spawnProcess('convert', [filePath, '-resize', `${width}x${height}`, '-gravity', 'center', '-extent', `${width}x${height}`, targetPath])
+		return spawnProcess('convert', [filePath, '-resize', `${width}x${height}^`, targetPath])
 	}
-	return spawnProcess('magick', ['convert', filePath, '-resize', `${width}x${height}`, '-gravity', 'center', '-extent', `${width}x${height}`, targetPath])
+	return spawnProcess('magick', ['convert', filePath, '-resize', `${width}x${height}^`, targetPath])
 };
 
 const fundBannerify = (filePath, targetPath) => {

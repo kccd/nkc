@@ -90,7 +90,8 @@ const kcbsRecordSchema = new Schema({
     index: 1
   },
   ordersId: {
-    type: [String]
+    type: [String],
+    default: [],
   },
   // 涉及的资源的资源id(下载资源操作 attachmentDownload)
   rid: {
@@ -106,9 +107,10 @@ const kcbsRecordSchema = new Schema({
 
   // 支付平台
   paymentType: {
-    type: String,
-    enum: ['weChat', 'aliPay', ''],
-    default: ''
+    type: String, // wechatPay, aliPay, ''
+    // enum: ['weChat', 'aliPay', ''], weChat 已被废弃，当前微信支付用 wechatPay 表示
+    default: '',
+    index: 1,
   },
   // 支付记录ID
   paymentId: {
@@ -511,7 +513,7 @@ kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
   return await alipay2.receipt(o);
 };
 /*
-* 微信支付 生成账单
+* 微信支付、支付宝支付 生成账单
 * @param {Object} props
 *   @param {String} paymentType 支付平台 weChat/aliPay
 *   @param {String} paymentId 支付ID
@@ -519,10 +521,13 @@ kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
 *   @param {String} ip
 *   @param {String} port
 *   @param {Number} fee 手续费 元
+*   @parma {Number} num 有效金额 分
 *   @param {Number} paymentNum 总付款数额 元
 *   @param {String} description 有关当前记录的简介
+*   @param {Boolean} fromShop 是否来自商城购买商品
+*   @param {[String]} ordersId 订单 ID，非商品付款时此字段为空数组
 * */
-kcbsRecordSchema.statics.createRechargeRecord = async (props) => {
+kcbsRecordSchema.statics.createKcbsRecord = async (props) => {
   const KcbsRecordModel = mongoose.model('kcbsRecords');
   const SettingModel = mongoose.model('settings');
   const {
@@ -535,8 +540,10 @@ kcbsRecordSchema.statics.createRechargeRecord = async (props) => {
     num,
     paymentNum,
     description,
+    ordersId = [],
   } = props;
   const mainScore = await SettingModel.getMainScore();
+  // 仅充值
   const kcbsRecordId = await SettingModel.operateSystemID('kcbsRecords', 1);
   const record = KcbsRecordModel({
     _id: kcbsRecordId,
@@ -552,10 +559,10 @@ kcbsRecordSchema.statics.createRechargeRecord = async (props) => {
     ip,
     port,
     verify: false,
-    description
+    description,
+    ordersId
   });
   await record.save();
-  return record;
 }
 
 kcbsRecordSchema.statics.hideSecretInfo = async (records) => {
@@ -570,14 +577,27 @@ kcbsRecordSchema.statics.hideSecretInfo = async (records) => {
 * */
 kcbsRecordSchema.methods.verifyPass = async function() {
   const UserModel = mongoose.model('users');
+  const ShopOrdersModel = mongoose.model('shopOrders');
   const {
-    verify: _verify
+    verify: _verify,
+    ordersId,
+    num,
+    to,
   } = this;
   if(_verify) return;
   if(!_verify) {
     this.verify = true;
     await this.save();
-    await UserModel.updateUserScore(this.to, this.scoreType);
+    if(ordersId && ordersId.length) {
+      // 创建商品购买账单并更新商品状态等
+      await ShopOrdersModel.createRecordByOrdersId({
+        ordersId,
+        totalMoney: num,
+        uid: to
+      });
+    } else {
+      await UserModel.updateUserScore(this.to, this.scoreType);
+    }
   }
   // 修改订单信息等等..
 }

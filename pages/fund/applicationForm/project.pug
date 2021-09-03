@@ -1,0 +1,79 @@
+if !isIncluded('project')
+  style.
+    .project-title{
+      font-size: 1.6rem;
+      text-align: center;
+      font-weight: 700;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    .project-abstract{
+      display: block;
+      padding: 0.8rem;
+    }
+    .project-header{
+      display: block;
+      background-color: #f5f5f5;
+      border-left: 0.5rem solid #ddd;
+      padding-left: 0.5rem;
+      height: 2rem;
+      line-height: 2rem;
+      content: '摘要';
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .project-keywords{
+      padding: 0.5rem 0.8rem;
+    }
+    .project-keywords a{
+      display: inline-block;
+      height: 1.6rem;
+      line-height: 1.6rem;
+      font-size: 1rem;
+      padding: 0 0.5rem;
+      background-color: #2b90d9;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 3px;
+      margin: 0 0.5rem 0.5rem 0;
+    }
+    .project-keywords a.en{
+      background-color: #b6c828;
+    }
+    .project-forum{
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+  include ./formWarning
+  mixin project(form)
+    -var {projectPost, forum, projectCycle, auditComments} = form;
+    .m-b-1
+      .panel-header 项目信息
+      +formWarning(auditComments.projectAudit)
+      .project-title=projectPost.t
+      .project-forum
+        span 学科分类：
+        if forum
+          a.m-r-05(
+            href=tools.getUrl('forumHome', forum.fid)
+            target="_blank"
+            data-float-fid=forum.fid
+            )=forum.displayName
+        else
+          span 暂未选择
+        span=`研究周期：${projectCycle} 天`
+      if projectPost.abstractCn
+        .project-header 摘要
+        .project-abstract=projectPost.abstractCn
+      if projectPost.abstractEn
+        .project-header Abstract
+        .project-abstract=projectPost.abstractEn
+      if projectPost.keyWordsCn.length + projectPost.keyWordsEn.length > 0
+        .project-header 关键词
+        .project-keywords
+          for key in projectPost.keyWordsCn
+            a(href=`/search?c=${key}` target="_blank")=key
+          for key in projectPost.keyWordsEn
+            a.en(href=`/search?c=${key}` target="_blank")=key
+      .project-content!=projectPost.c
+

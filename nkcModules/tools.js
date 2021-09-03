@@ -139,6 +139,27 @@ var Tools = function() {
       case 'messageTone': {
         return "/default/message.wav";
       }
+      case 'singleFundHome': {
+        return "/fund/list/" + id
+      }
+      case 'singleFundSettings': {
+        return "/fund/list/" + id + '/settings'
+      }
+      case 'fundAvatar': {
+        return "/a/" + id + t
+      }
+      case 'fundBanner': {
+        return "/a/" + id + t
+      }
+      case 'fundApplicationForm': {
+        return "/fund/a/" + id
+      }
+      case 'lifePhotoSM': {
+        return '/photo_small/' + id
+      }
+      case 'lifePhoto': {
+        return '/photo/' + id
+      }
     }
   };
   self.getAnonymousInfo = function() {

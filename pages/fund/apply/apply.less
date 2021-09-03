@@ -1,0 +1,78 @@
+@import "../../publicModules/base";
+.form-photos{
+  font-size: 0;
+ .form-photo{
+   @height: 7rem;
+   display: inline-block;
+   height: @height;
+   width: 10rem;
+   position: relative;
+   margin: 0 0.5rem 0.5rem 0;
+   .option-remove {
+     font-size: 1.25rem;
+     cursor: pointer;
+     height: @height;
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     z-index: 20;
+     background-color: rgba(0, 0, 0, 0.5);
+     color: #f0f0f0;
+     text-align: center;
+     line-height: @height;
+   }
+   img{
+     max-height: 100%;
+     max-width: 100%;
+     position: absolute;
+     top: 0;
+     bottom: 0;
+     left: 0;
+     right: 0;
+     margin: auto;
+   }
+ }
+}
+.warning-info{
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+.budget-purpose{
+  min-width: 10rem;
+}
+.budget-count{
+  min-width: 7rem;
+}
+.budget-money{
+  min-width: 7rem;
+}
+.editor-notice{
+  padding: 0.5rem;
+  background-color: #ffe2e2;
+  border-radius: 3px;
+  margin-bottom: 1rem;
+}
+.keywords{
+  &>div{
+    display: inline-block;
+    height: 2rem;
+    line-height: 2rem;
+    margin: 0 0.5rem 0.5rem 0;
+    padding: 0 0.5rem;
+    background-color: @primary;
+    color: #fff;
+    border-radius: 3px;
+  }
+}
+.time-auto-save{
+  font-size: 1.2rem;
+  //color: green;
+  margin-bottom: 0.5rem;
+  .fa{
+    margin-right: 0.5rem;
+  }
+  span{
+    color: #777;
+  }
+}

@@ -27,5 +27,6 @@
 /test/config.js
 
 /dist
+/.vscode
 
 /pages/demo

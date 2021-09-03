@@ -1,0 +1,8 @@
+if !isIncluded('formRelatedThreads')
+  mixin formRelatedThreads(form)
+    if form.reportThreads && form.reportThreads.length > 0
+      .m-b-1
+        .panel-header 与项目有关的最新文章
+        .form-threads
+          for thread in form.reportThreads
+            +formThread(thread)

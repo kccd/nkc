@@ -1,0 +1,80 @@
+extends ./fundContainer
+block fundTitle
+  title 与我有关的基金申请
+block fundContent
+  -var {applicationForms} = data;
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8.box-shadow-panel
+        div
+          .panel-header 与我有关的基金申请
+          .m-b-1
+            ul.nav.nav-tabs
+              -const {type} = data;
+              li(role="presentation" class=type === undefined || type === 'created' ? 'active' : '')
+                a(href="/fund/me") 我创建的
+              li(role="presentation" class=type === 'join' ? 'active' : '')
+                a(href="/fund/me?type=join") 我加入的
+              li(role="presentation" class=type === 'notify' ? 'active' : '')
+                a(href="/fund/me?type=notify") 组队邀请
+                  if data.newNotify > 0
+                    span.text-danger= ` ${data.newNotify}`
+          .m-b-1
+            if applicationForms.length === 0
+              .text-center.p-t-1.p-b-1 空空如也~
+            else
+              include ../publicModules/paging/paging
+              .fund-ul
+                for a in applicationForms
+                  .m-b-1
+                    -var {toc, _id, members, applicant, fund} = a;
+                    if type === 'notify'
+                      span
+                        +timeFormat(toc)
+                      span=` 来自 `
+                      a(
+                        href=tools.getUrl('userHome', applicant.uid)
+                        target="_blank"
+                        data-float-uid=applicant.uid
+                        )= applicant.user.username
+                      span=` 的组队邀请`
+                      br
+                      button.btn.btn-xs.btn-success(onclick=`applicationMember(${a._id}, true)`) 同意
+                      button.m-r-05.btn.btn-xs.btn-danger(onclick=`applicationMember(${a._id}, false)`) 拒绝
+                      a.btn.btn-xs.btn-default(href=tools.getUrl('fundApplicationForm', a._id) target="_blank") 查看申请表
+                    else
+                      .fund-li
+                        .row
+                          .col-xs-12.col-md-12
+                            span.fund-li-time
+                              +timeFormat(toc)
+                          .col-xs-12.col-md-11
+                            span= `申请人：`
+                              a(href=`/u/${a.uid}`)= a.applicant.user.username
+                            span &nbsp;&nbsp;
+                            if a.from !== 'personal'
+                              span= `组员：`
+                                for u in a.members
+                                  a(
+                                    href=tools.getUrl('userHome', u.uid)
+                                    target='_blank'
+                                    data-float-uid=u.uid
+                                    )= `${u.user.username} `
+                            br
+                            span=`申请表ID：${a._id}`
+                            br
+                            span=`项目名称：${a.project ? a.project.t : '暂未填写'}`
+                            br
+                            span=`基金名：${a.fund.name}`
+                            br
+                            span= `状态：`
+                            span= a.statusString
+                          .col-xs-12.col-md-1
+                            a(href=`/fund/a/${a._id}`) 查看
+                            br
+                            if a.uid === data.user.uid &&  !a.lock.submitted && !a.disabled && a.useless === null
+                              a(href=`/fund/a/${a._id}/settings`) 编辑
+              include ../publicModules/paging/paging
+block fundScripts
+  include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  +includeJS('/fund/me.js')

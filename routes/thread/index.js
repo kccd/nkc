@@ -533,92 +533,18 @@ threadRouter
         data.closeSaleDescription = err.message || err.stack || err;
       }
 		} else if(thread.type === "fund") { // 基金文章
-		  const user = data.user;
-      let applicationForm = await db.FundApplicationFormModel.findOne({tid: thread.tid});
-      if(!applicationForm) {
-        applicationForm = await db.FundApplicationFormModel.findOne({_id: _id});
-        if(!applicationForm) ctx.throw(400, '未找到指定申请表。');
-      }
-      await applicationForm.extendFund();
-      const {fund, budgetMoney} = applicationForm;
-      if(fund.history && ctx.method !== 'GET') {
-        ctx.throw(400, '申请表所在基金已被设置为历史基金，申请表只供浏览。');
-      }
-      await applicationForm.extendMembers();
-      await applicationForm.extendApplicant().then(u => u.extendLifePhotos());
-      applicationForm.project = thread.firstPost;
-      await applicationForm.extendThreads();
-      await applicationForm.extendForum();
-      if(fund.money.fixed) {
-        applicationForm.money = fund.money.fixed;
-        applicationForm.factMoney = fund.money.fixed;
-      } else {
-        let money = 0;
-        let factMoney = 0;
-        if(budgetMoney !== null && budgetMoney.length !== 0 && typeof budgetMoney !== 'string'){
-          for (let b of applicationForm.budgetMoney) {
-            money += (b.count*b.money);
-            factMoney += b.fact;
-          }
-        }
-        applicationForm.money = money;
-        applicationForm.factMoney = factMoney;
-      }
-      data.applicationForm = applicationForm;
-      data.fund = applicationForm.fund;
-
-      if(applicationForm.disabled && !applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
-      const {applicant, members} = applicationForm;
-      const membersId = members.map(m => m.uid);
-      // 未提交时仅自己和全部组员可见
-      if(!applicationForm.fund.ensureOperatorPermission('admin', user) && applicationForm.status.submitted !== true && user.uid !== applicant.uid && !membersId.includes(user.uid)) ctx.throw(403,'权限不足');
-      await applicationForm.extendSupporters();
-      await applicationForm.extendObjectors();
-      await applicationForm.extendReportThreads();
-      const auditComments = {};
-      if(!applicationForm.status.projectPassed) {
-        auditComments.userInfoAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'userInfoAudit', disabled: false}).sort({toc: -1});
-        auditComments.projectAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'projectAudit', disabled: false}).sort({toc: -1});
-        auditComments.moneyAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'moneyAudit', disabled: false}).sort({toc: -1});
-      }
-      if(!applicationForm.status.adminSupport) {
-        auditComments.adminAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'adminAudit', disabled: false}).sort({toc: -1});
-      }
-      if(applicationForm.status.completed === false) {
-        auditComments.completedAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'completedAudit', disabled: false}).sort({toc: -1});
-      }
-      if(applicationForm.useless === 'giveUp') {
-        data.report = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'report', disabled: false}).sort({toc: -1});
-      }
-      const q_ = {
-        type: {$in: ['report', 'completedReport', 'system', 'completedAudit', 'adminAudit', 'userInfoAudit', 'projectAudit', 'moneyAudit', 'remittance']},
-        applicationFormId: applicationForm._id
-      };
-      if(!applicationForm.fund.ensureOperatorPermission('admin', user)) {
-        q_.disabled = false;
-      }
-      data.reports = await db.FundDocumentModel.find(q_).sort({toc: 1});
-      await Promise.all(data.reports.map(async r => {
-        await r.extendUser();
-        await r.extendResources();
-      }));
-      data.auditComments = auditComments;
-      let hasPermission = false;
-      if(user) {
-        // hasPermission = fund.ensureOperatorPermission('admin', user) || fund.ensureOperatorPermission('expert', user) || fund.ensureOperatorPermission('censor', user);
-        hasPermission = fund.ensureOperatorPermission('admin', user) || fund.ensureOperatorPermission('censor', user);
-      }
-      //拦截申请表敏感信息
-      if(!user || (applicationForm && !data.userOperationsId.includes('displayFundApplicationFormSecretInfo') && applicationForm.uid !== user.uid && !hasPermission)) {
-        const {applicant, members} = applicationForm;
-        applicant.mobile = null;
-        applicant.idCardNumber = null;
-        applicationForm.account.paymentType = null;
-        applicationForm.account.number = null;
-        for(let m of members) {
-          m.mobile = null;
-          m.idCardNumber = null;
-        }
+      const applicationForm = await db.FundApplicationFormModel.findOne({tid: thread.tid});
+      if(applicationForm) {
+        const accessForumsId = await db.ForumModel.getAccessibleForumsId(
+          data.userRoles, data.userGrade, data.user
+        );
+        await applicationForm.extendApplicationFormBaseInfo(state.uid);
+        await applicationForm.extendApplicationFormInfo(state.uid, accessForumsId);
+        data.applicationForm = applicationForm;
+        data.fund = applicationForm.fund;
+        data.userFundRoles = await data.fund.getUserFundRoles(state.uid);
+        data.targetUserInFundBlacklist = await db.FundBlacklistModel.inBlacklist(applicationForm.uid);
+        await data.applicationForm.hideApplicationFormInfoByUserId(state.uid, ctx.permission('displayFundApplicationFormSecretInfo'));
       }
     }
 

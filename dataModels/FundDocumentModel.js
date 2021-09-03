@@ -73,7 +73,7 @@ const documentSchema = new Schema({
   },
 	c: {
 		type: String,
-		default: null,
+		default: '',
 		maxlength: [100000, '内容不能超过2万字。']
 	},
 	disabled: {
@@ -178,7 +178,6 @@ documentSchema.pre('save', async function(next) {
 		return next(err);
 	}*/
 });
-
 
 const FundDocumentModel = mongoose.model('fundDocuments', documentSchema);
 module.exports = FundDocumentModel;

@@ -1,8 +1,17 @@
 require('./global');
 require('colors');
 const fs = require('fs');
-if(!fs.existsSync('./install/install.lock')) {
-  return require('./install/server.js')
-} else {
-  console.log(`程序已安装，若要重新安装请先移除文件install/install.lock`.red);
+const path = require('path');
+const lockFilePath = path.resolve(__dirname, `./install/install.lock`);
+
+if(fs.existsSync(lockFilePath)) {
+  const [, , reInstall] = process.argv;
+  if(reInstall === '-r') {
+    fs.unlinkSync(lockFilePath);
+  } else {
+    console.error(`The file install.lock already exists, if you need to reinstall, please execute 'npm run install -r'.\n\n`.red);
+    process.exit(0);
+  }
 }
+
+require('./install/server.js')

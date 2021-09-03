@@ -1,9 +1,11 @@
-var data = NKC.methods.getDataById('data');
+const data = NKC.methods.getDataById('data');
 
-var app = new Vue({
+const app = new Vue({
   el: '#app',
   data: {
     uid: NKC.configs.uid,
+    from: data.record.from,
+    type: data.record.type,
     apiType: data.record.apiType,
     recordId: data.record.recordId,
     recordStatus: data.record.status,
@@ -22,8 +24,9 @@ var app = new Vue({
   },
   methods: {
     getRecordStatus: function() {
-      var self = this;
-      return nkcAPI('/payment/wechat/' + this.recordId, 'GET')
+      const self = this;
+      const url = this.type === 'aliPay'? `/payment/alipay/${this.recordId}`: `/payment/wechat/${this.recordId}`;
+      return nkcAPI(url, 'GET')
         .then(function(data) {
           self.recordStatus = data.record.status;
         })
@@ -46,14 +49,10 @@ var app = new Vue({
             self.setRecordTimeout();
           });
       }, t);
-    },
-    toPay: function() {
-      var apiType = this.apiType;
     }
   },
   mounted: function() {
     this.setRecordTimeout();
-    if(this.recordStatus === 'waiting') this.toPay();
   }
 });
 

@@ -1,0 +1,29 @@
+extends ../fundContainer
+block fundTitle
+block fundContent
+  -var {fundSettings} = data;
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-9.box-shadow-panel
+        .m-b-1
+          .panel-header 基金介绍
+          div!= markdown_safe(fundSettings.description)
+        .m-b-1
+          .panel-header 基金条款
+          div!= markdown_safe(fundSettings.terms)
+      .col-xs-12.col-md-3.box-shadow-panel
+        if data.user && data.userOperationsId.includes("experimentalFundSettings")
+          div.m-b-1
+            .panel-header 控制台
+            a.btn.btn-default.btn-block(href='/e/settings/fund') 基金设置
+            button.btn.btn-default.btn-block(onclick='addFund()') 新建基金
+            a.btn.btn-default.btn-block(href='/fund/bill') 添加账单
+        div
+          .panel-header 其他
+          a.btn.btn-default.btn-block(href='/fund/history') 已过期的基金资助行动
+          a.btn.btn-default.btn-block(href='/fund/donation') 赞助
+
+
+block fundScripts
+  include ../../publicModules/commonModal/commonModal
+  +includeJS('/fund/info/info.js')

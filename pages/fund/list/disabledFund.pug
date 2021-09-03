@@ -1,0 +1,14 @@
+extends ../fundContainer
+block fundTitle
+  title= `被屏蔽的基金`
+  +includeCSS('/fund.css')
+block fundContent
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-4.box-shadow-panel
+        div
+          h3.text-center 被屏蔽的基金
+          -for(let fund of data.funds)
+            h4= fund.name
+              span &nbsp;&nbsp;&nbsp;
+              a(href=`/fund/list/${fund._id.toLowerCase()}/settings`) 设置

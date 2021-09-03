@@ -11,6 +11,10 @@ module.exports = {
   forumLogo: './attachment/avatar',
   // 专业背景
   forumBanner: './attachment/avatar',
+  // 基金头像
+  fundAvatar: './attachment/avatar',
+  // 基金背景
+  fundBanner: './attachment/avatar',
   // 水印
   watermark: './attachment/website',
   // 首页logo

@@ -5,7 +5,7 @@ module.exports = {
       GET: 'postWeChatPayInfo'
     }
   },
-  aliPay: {
+  alipay: {
     POST: 'receiveAliPayPaymentInfo',
     PARAMETER: {
       GET: 'postAliPayInfo'

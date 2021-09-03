@@ -1,0 +1,57 @@
+if !isIncluded('formVote')
+  mixin formVote(form, userFundRoles)
+    if userFundRoles.includes('voter') && [2, 3, 4].includes(form.formStatus.general)
+      .m-b-1
+        .panel-header 投票
+        .form(data-type='formVote')
+          .form-group
+            .radio
+              label.m-r-1
+                input(type='radio' name='vote' checked=true)
+                span 支持
+              label
+                input(type='radio' name='vote')
+                span 反对
+          .form-group
+            textarea.form-control(rows=3 placeholder='请输入理由')
+          .form-group.m-b-0
+            button.btn-block.btn.btn-primary(onclick=`formVote(${form._id})`) 提交
+      if form.supporters && form.supporters.length > 0
+        .m-b-1
+          .panel-header 支持者
+          div
+            for u in form.supporters
+              a.m-r-05(
+                href=tools.getUrl('userHome', u.uid)
+                target="_blank"
+                data-float-uid=u.uid
+                )=u.username
+      if form.objectors && form.objectors.length > 0
+        .m-b-1
+          .panel-header 反对者
+          div
+            for u in form.objectors
+              a.m-r-05(
+                href=tools.getUrl('userHome', u.uid)
+                target="_blank"
+                data-float-uid=u.uid
+              )=u.username
+  script.
+    function formVote(formId) {
+      var support = $('div[data-type="formVote"] input').eq(0).prop('checked');
+      var reason = $('div[data-type="formVote"] textarea').val();
+      return Promise.resolve()
+        .then(function() {
+          if(!support && reason.length === 0) {
+            throw new Error('反对理由不能为空');
+          }
+          return nkcAPI('/fund/a/' + formId + '/vote', 'POST', {
+            type: support? 'support': 'against',
+            c: reason
+          })
+        })
+        .then(function() {
+          sweetSuccess('提交成功');
+        })
+        .catch(sweetError)
+    }

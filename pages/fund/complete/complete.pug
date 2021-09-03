@@ -1,0 +1,104 @@
+extends ../fundContainer
+block fundTitle
+  title 结题
+  style.
+    .budget-purpose {
+      max-width: 10rem;
+    }
+    .budget-count {
+      max-width: 7rem;
+    }
+block fundContent
+  include ../applicationForm/budgetMoney
+  include ../applicationForm/formBriefInfo
+  -var form = data.applicationForm;
+  -var {project, fund} = form;
+  .hidden#data=objToStr({form})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8.box-shadow-panel
+        div#app(v-cloak)
+          .panel-header 申请结题
+          +formBriefInfo(form)
+          if form.status.completed
+            .bg-success.text-success.p-a-1 项目已结题
+          else if form.completedAudit
+            .bg-warning.text-warning.p-a-1 结题申请已提交，等待专家审核
+          else
+            if form.status.completed === false
+              .bg-danger.text-danger.p-a-05
+                h5 结题审核未通过，请修改后重新提交
+                .pre-wrap=data.auditComments.completedAudit.c
+            .form.m-t-1
+              if !form.fixedMoney
+                .form-group
+                  +budgetMoney(form)
+                .form-group
+                  .panel-header 实际花费
+                  .table-responsive
+                    table.table.table-bordered.nkc-table.m-b-05
+                      thead
+                        tr
+                          th 用途
+                          th 规格型号
+                          th 单价(元)
+                          th 数量
+                          th 单位
+                          th 合计(元)
+                          th 其他
+                      tbody
+                        tr(v-for='(m, index) in form.actualMoney')
+                          th.budget-purpose
+                            input.form-control(type='text' v-model='m.purpose')
+                          th.budget-count
+                            input.form-control(type='text' v-model='m.model')
+                          th.budget-count
+                            input.form-control(type='text' v-model.number='m.money' @change='formatMoney(index)')
+                          th.budget-count
+                            input.form-control(type='text' v-model.number='m.count')
+                          th.budget-count
+                            input.form-control(type='text' v-model='m.unit')
+                          th {{calculateMoney(m.count, m.money).toFixed(2)}}
+                          th
+                            button.btn.btn-xs.btn-default(@click='removeFromArr(form.actualMoney, index)') 删除
+                  .pull-left
+                    button.btn.btn-xs.btn-default(@click='addItem') 添加
+                  .text-right
+                    span 实际花费&nbsp;
+                    strong.text-danger {{totalMoney}}
+                    span &nbsp;元，应退金额&nbsp;
+                    strong.text-danger {{returnMoney}}
+                    span &nbsp;元
+                    span(v-if='returnMoney > 0')
+                      span ，
+                      a(:href='"/fund/donation?fundId=" + form.fundId + "&money=" + returnMoney + "&refund=true"' target='_blank') 去退款
+              .form-group
+                .radio
+                  span 总体情况：
+                  label.m-r-1
+                    input(type='radio' :value='true' v-model='successful')
+                    span 成功完成
+                  label
+                    input(type='radio' :value='false' v-model='successful')
+                    span 未完成
+
+              .form-group
+                h5 结题报告（请先发表文章，然后添加在下面）：
+
+                div.m-b-05(v-for='(t, index) in selectedPosts')
+                  button.m-r-05.btn.btn-xs.btn-default(@click='removeFromArr(selectedPosts, index)') 删除
+                  a(:href='getUrl("thread", t.tid)' target="_blank") {{t.t}}
+                button.m-b-05.btn.btn-xs.btn-default(@click='switchPostPanelStatus') 选择文章
+                post-panel(:aid='form._id' v-if='showPostPanel' @selectpost='selectPost')
+              .form-group
+                h5 项目完成情况简介：
+                .bg-info.p-a-05.m-b-1
+                  p 请详细说明每个组员在团队中所做出的贡献。
+                  p 我们会根据所有网友的评论和项目的所有报告来进行评优，优秀的项目将会展示在科创基金首页。
+                textarea.form-control(rows=8 placeholder='建议 500 字左右' v-model='content')
+              .form-group
+                button.btn.btn-default(@click='submit') 提交
+
+
+block fundScripts
+  +includeJS('/fund/complete/complete.js')

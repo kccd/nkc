@@ -1,0 +1,86 @@
+extends ../fundContainer.pug
+block fundTitle
+  +includeCSS('/fund/list/singleFund.css')
+  title=`${data.fundSettings.fundName} - ${data.fund.name}`
+block fundContent
+  include ../applicationFormItem
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12.m-b-1
+        -var style = `background-color: ${data.fund.color};`;
+        if !data.fund.banner
+          -style += 'height: 18rem;';
+        .fund-banner(style=style)
+          if data.fund.banner
+            img.fund-banner-img(src=tools.getUrl('fundBanner', data.fund.banner))
+            img.fund-avatar-img(src=tools.getUrl('fundAvatar', data.fund.avatar))
+          .fund-name-description
+            .fund-name=data.fund.name
+            .fund-description=data.fund.description.brief
+      .col-xs-12.col-md-12.box-shadow-panel.m-b-1
+        .pre-wrap=data.fund.description.detailed
+      .col-xs-12.col-md-8.box-shadow-panel
+        div
+          .paging-button
+            -var sort = data.s? `&s=${data.s}`: ''
+            mixin navItem(t, name, klass)
+              if data.t === t || (!data.t && !t)
+                -klass += ' active'
+              a(href=`/fund/list/${data.fund._id}?${t?`t=${t}`:''}${sort}` class=klass)=name
+            +navItem('', '全部', 'radius-left')
+            +navItem('excellent', '优秀项目', '')
+            +navItem('completed', '已完成', '')
+            +navItem('normal', '资助中', '')
+            +navItem('audited', '审核中', 'radius-right')
+          .paging-button
+            -var type = data.t? `&t=${data.t}`: '';
+            a.radius-left(class=!data.s || data.s === 'toc'? 'active':'' href=`/fund/list/${data.fund._id}?s=toc${type}`) 按申请时间排序
+            a.radius-right(class=data.s === 'tlm'? 'active': '' href=`/fund/list/${data.fund._id}?s=tlm${type}`) 按活动时间排序
+          div
+            include ../../publicModules/paging/paging
+          +applicationFormList(data.applicationForms)
+          div
+            include ../../publicModules/paging/paging_input
+      .col-xs-12.col-md-4.p-l-0.box-shadow-panel
+        .m-b-1.single-fund-nav
+          if permission('singleFundSettings')
+            a.m-r-1(href=`/fund/list/${data.fund._id}/settings`) 基金设置
+          a(href=`/fund/list/${data.fund._id}/bills`) 基金账单
+        if data.user
+          .m-b-1
+            .panel-header 申请条件
+            div.m-b-1
+              table.table.nkc-table.m-b-0.table-bordered
+                thead
+                  tr
+                    th 类型
+                    th 最低要求
+                    th 当前
+                    th 状态
+                tbody
+                  for t in data.conditions.table
+                    tr
+                      th=t[0]
+                      th=t[1]
+                      th=t[2]
+                      th
+                        if t[3]
+                          span.text-success 满足
+                        else
+                          span.text-danger 未满足
+            if data.conditions.infos.length
+              .text-danger.m-b-1= data.conditions.infos.join('，')
+            div
+              if data.conditions.status
+                a.btn.btn-block.btn-primary.single-fund-button(href=`/fund/list/${data.fund._id}/add`) 申请基金
+              else
+                button.btn.btn-block.btn-primary.single-fund-button(disabled) 申请基金
+        //-.m-b-1
+          .panel-header 补充说明
+          .pre-wrap=data.fund.description.detailed
+        .m-b-1#donationApp
+          donation(:fund=`'${data.fund._id}'`)
+
+block fundScripts
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  +includeJS('/fund/list/singleFund.js')

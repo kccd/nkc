@@ -1,0 +1,32 @@
+extends ../fundContainer
+block fundTitle
+  -const applicationForm = data.applicationForm;
+  -const {remittance, project, code, submittedReport, reportNeedThreads, applicant, status} = applicationForm;
+  -const fund = applicationForm.fund;
+  title= `${fund.name}-${applicationForm.project.t}`
+  //link(rel='stylesheet' href='/fund.css')
+block fundContent
+  include ../applicationForm/report
+  include ../applicationForm/remittance
+  -var form = data.applicationForm;
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-6.box-shadow-panel
+        if !form.status.completed
+          .m-b-1
+            .panel-header 报告进度
+            div
+              h5=`项目名称：${project.t}`
+              h5=`项目ID：${code}`
+              p 此处仅用于简要说明项目进展情况，分享项目成果请前往论坛发帖。
+              textarea.form-control#content(rows=10 placeholder='项目的进展情况')
+              .m-t-05
+                button.btn.btn-default(onclick=`submitReport(${applicationForm._id})`) 提交
+        +remittance(form)
+      .col-xs-12.col-md-6.box-shadow-panel
+        +report(form, data.userFundRoles)
+block fundScripts
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  script(src="/fund/report/report.js")
+
+

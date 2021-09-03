@@ -1,0 +1,9 @@
+{
+  "address": "127.0.0.1",
+  "port": 9200,
+  "username": "",
+  "password": "",
+  "indexName": "nkc",
+  "analyzer": "standard",
+  "searchAnalyzer": "standard"
+}

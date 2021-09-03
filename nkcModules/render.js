@@ -182,78 +182,6 @@ function hideContentByUser(content, user={xsf: 0}, from) {
   	// <div class="nkcHiddenBox"><div class="nkcHiddenNotes" contenteditable="false">浏览这段内容需要500学术分</div><div class="nkcHiddenContent">阿三大苏打萨达萨达</div></div>
 }
 
-function applicationFormStatus(a) {
-	let str, color = '#888';
-	const {submittedReport, status, completedAudit} = a;
-	const {submitted, projectPassed, adminSupport, remittance, completed, excellent, successful, usersSupport} = status;
-	let needRemittance = false;
-	for(let r of a.remittance) {
-		if(r.passed && !r.status) {
-			needRemittance = true;
-			break;
-		}
-	}
-	if(a.disabled) {
-		str = '已被屏蔽';
-		color = 'red';
-	} else if(a.useless === 'giveUp') {
-		str = '已被申请人放弃';
-		color = 'red';
-	} else if(a.useless === 'delete') {
-		str = '已被申请人删除';
-		color = 'red';
-	} else if(a.useless === 'exceededModifyCount') {
-		str = '退修次数超过限制';
-		color = 'red';
-	} else if(a.useless === 'refuse') {
-		str = '已被彻底拒绝';
-		color = 'red';
-	} else if(!submitted || !a.lock.submitted) {
-		if(projectPassed === false) {
-			str = '未通过专家审核，等待申请人修改';
-			color = 'red';
-		} else if(adminSupport === false) {
-			str = '未通过管理员复核，等待申请人修改';
-			color = 'red';
-		} else {
-			str = '暂未提交';
-		}
-	} else if(!usersSupport) {
-		str = '等待网友支持';
-	} else if(projectPassed === null) {
-		str = '等待专家审核';
-	} else if(projectPassed === false) {
-		str = '未通过专家审核，等待申请人修改';
-		color = 'red';
-	} else if(adminSupport === null) {
-		str = '等待管理员复核';
-	} else if(adminSupport === false) {
-		str = '未通过管理员复核，等待申请人修改';
-		color = 'red';
-	} else if(remittance === null) {
-		str = '等待拨款';
-	} else if(remittance === false) {
-		str = '拨款出现问题，等待管理员处理';
-		color = 'red';
-	} else if(submittedReport) {
-		str = '等待报告审核';
-	} else if(needRemittance) {
-    str = '等待拨款';
-  } else if(completedAudit) {
-    str = '结题报告已提交，等待结题审核'
-	} else if(completed === null) {
-    str = '项目执行中';
-	} else if(completed === false) {
-		str = '未通过结题审核，等待申请人修改'
-	} else if(excellent) {
-		str = '优秀项目';
-	} else if(successful) {
-		str = '成功结题';
-	} else if(!successful) {
-		str = '正常结题';
-	}
-	return {str, color};
-}
 
 function ensureFundOperatorPermission(type, user, fund) {
 	if(!fund) return false;
@@ -401,7 +329,6 @@ let pugRender = (template, data, state) => {
     filterQuote,
 		hideContentByUser,
 		delCodeAddShrink,
-	  applicationFormStatus,
 		ensureFundOperatorPermission,
 		startTime: global.NKC.startTime,
     NODE_ENV: global.NKC.NODE_ENV,

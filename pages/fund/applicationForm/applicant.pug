@@ -1,0 +1,63 @@
+if !isIncluded('applicant')
+  style.
+    .form-secret-info{
+      padding: 0.5rem;
+      background-color: #eee;
+    }
+    .form-life-photos img{
+      max-width: 100%;
+      margin-bottom: 0.5rem;
+    }
+  include ./formThread
+  include ./formWarning
+  mixin applicant(form)
+    -var {applicant, account, from, members, auditComments} = form;
+    -var {applying} = form.threads;
+    .m-b-1
+      .panel-header 申请人信息
+      .row
+        .col-xs-12
+          +formWarning(auditComments.userInfoAudit)
+        .col-xs-12.col-sm-6.col-md-6
+          .h5 申请人ID：
+            a(
+              href=tools.getUrl('userHome', applicant.uid)
+              target='_blank'
+              data-float-uid=applicant.uid
+              )=applicant.user.username
+          .h5=`真实姓名：${applicant.name}`
+          if applicant.idCardNumber
+            .form-secret-info
+              .h5=`身份证号码：${applicant.idCardNumber}`
+              .h5=`联系方式：${applicant.mobile}`
+              if account.paymentType === 'alipay'
+                .h5=`收款方式：支付宝`
+              else
+                .h5=`收款方式：银行卡`
+                .h5=`银行全称：${account.bankName}`
+              .h5=`户名：${account.name}`
+              .h5=`收款账号：${account.number}`
+          .h5=`自我介绍：${applicant.description}`
+          if from === 'team'
+            .h5=`申请方式：团队`
+            .h5=`组员ID：`
+              for m, index in members
+                if index !== 0
+                  span ，
+                a(
+                  href=tools.getUrl('userHome', m.uid)
+                  target='_blank'
+                  data-float-uid=m.uid
+                  )=m.user.username
+          else
+            .h5=`申请方式：个人`
+        .col-xs-12.col-sm-6.col-md-6
+          .h5 申请人照片
+          .form-life-photos
+            for p in applicant.lifePhotos
+              img(src=tools.getUrl('lifePhoto', p._id))
+        .col-xs-12.col-md-12
+          .h5 申请人曾经发表的技术文章：
+          .form-threads
+            for thread in form.threads.applying
+              +formThread(thread)

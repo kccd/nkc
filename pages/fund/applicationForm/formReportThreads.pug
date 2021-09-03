@@ -1,0 +1,8 @@
+if !isIncluded('formReportThreads')
+  mixin formReportThreads(form)
+    if form.threads && form.threads.completed && form.threads.completed.length > 0
+      .m-b-1
+        .panel-header 结题报告
+        .form-threads
+          for thread in form.threads.completed
+            +formThread(thread)

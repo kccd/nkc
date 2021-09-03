@@ -20,9 +20,9 @@ if applicationForm.status.submitted
       .panel-body.applicationForm
         h5.text-center 管理
         if displayExpertAudit
-          a(href=`/fund/a/${applicationForm._id}/audit?type=project`).btn.btn-info.btn-block 专家审核
+          a(href=`/fund/a/${applicationForm._id}/manage/audit/project`).btn.btn-info.btn-block 专家审核
         if displayAdminAudit
-          a(href=`/fund/a/${applicationForm._id}/audit?type=admin`).btn.btn-info.btn-block 管理员复核
+          a(href=`/fund/a/${applicationForm._id}/manage/audit/info`).btn.btn-info.btn-block 管理员复核
         if displayRemittance
           a(href=`/fund/a/${applicationForm._id}/remittance`).btn.btn-info.btn-block 拨款
         if needReportAudit
@@ -41,3 +41,8 @@ if applicationForm.status.submitted
             a(onclick=` disableApplicationForm(${applicationForm._id}, false)`).btn.btn-danger.btn-block 取消屏蔽
           else
             a(onclick=` disableApplicationForm(${applicationForm._id}, true)`).btn.btn-danger.btn-block 屏蔽
+        if permission('fundBlacklistPost')
+          if data.targetUserInFundBlacklist
+            button.btn.btn-danger.btn-block(onclick=`removeUserFromFundBlacklist("${applicationForm.uid}")`) 移出黑名单
+          else
+            button.btn.btn-danger.btn-block(onclick=`addUserToFundBlacklist("${applicationForm.uid}", ${applicationForm._id})`) 加入黑名单

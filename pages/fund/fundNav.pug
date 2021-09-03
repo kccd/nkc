@@ -1,0 +1,32 @@
+if !isIncluded('fundNav')
+  +includeCSS('/fund/fundNav.css')
+  mixin fundNav
+    .container-fluid.max-width
+      .fund-nav.m-b-1
+        ul
+          if !data.fund
+            li
+              a(href='/fund') 首页
+          else
+            span.fund-nav-breadcrumb.bg-info
+              li
+                a(href='/fund') 首页
+              li
+                a(href=`/fund/list/${data.fund._id}`)=data.fund.name
+              if data.applicationForm
+                li
+                  a(href=`/fund/a/${data.applicationForm._id}`)=data.applicationForm.code || data.applicationForm._id
+          li
+            a(href='/fund/info') 基金介绍
+          li
+            a(href='/fund/bills') 财务公开
+          li
+            a(href='/fund/blacklist') 小黑屋
+          if data.user
+            li
+              a(href=`/fund/me`) 我的申请
+          if data.newNotify > 0
+            li
+              a(href=`/fund/me?type=notify`)=`组队邀请 ${data.newNotify}`
+      if data.fundSettings.readOnly
+        .p-t-1.p-b-1=`${data.fundSettings.fundName}已开启只读模式`

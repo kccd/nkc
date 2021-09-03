@@ -91,16 +91,11 @@ block fundContent
                 input(type="text", id=`copyLink${applicationForm._id}`, name=`copyLink${applicationForm._id}` style="width:inherit")
                 button(onclick=`copyLink('${applicationForm._id}')` id=`copyButton${applicationForm._id}`) 复制
               canvas.qrcode#fundapplyQrcode(style="display:none")
-                //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundapply', 'qq', window.location.origin+window.location.pathname, '${applicationForm.project.t} - ${fund.name} - 科创基金')`)
-                //-   img(src="/default/QQ.png" style="width:100%")
-                //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundapply', 'qzone', window.location.origin+window.location.pathname, '${applicationForm.project.t} - ${fund.name} - 科创基金')`)
-                //-   img(src="/default/qzone.png" style="width:100%")
-                //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundapply', 'weibo', window.location.origin+window.location.pathname, '${applicationForm.project.t} - ${fund.name} - 科创基金')`)
-                //-   img(src="/default/weibo.png" style="width:100%")
+
 
 block fundScripts
   include ../publicModules/mathFormula
   include ../publicModules/plyr/plyr.js.pug
   include ../publicModules/lazySizes
   include ../publicModules/imageViewer
-    include ../publicModules/sticker/sticker
+  include ../publicModules/sticker/sticker

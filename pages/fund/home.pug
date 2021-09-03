@@ -1,0 +1,68 @@
+extends ./fundContainer.pug
+block fundTitle
+  +includeCSS('/fund/home.css')
+  include ./applicationFormItem
+block fundContent
+  #data.hidden=objToStr({donationEnabled: data.fundSettings.donation.enabled, funds: data.funds, donation: data.fundSettings.donation, donationBills: data.donationBills})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        .row
+          for fund in data.funds
+            .col-xs-12.col-sm-6.col-md-3
+              -var style = `background-color: ${fund.color};`;
+              if fund.avatar
+                -style += `background-image: url(${tools.getUrl('fundAvatar', fund.avatar)})`;
+              .fund-item.m-b-2(
+                style=style
+                )
+                a(href=tools.getUrl('singleFundHome', fund._id))
+                  .name=fund.name
+                  .money=fund.money.fixed? `单笔 ${fund.money.value} 元`: `单笔最高 ${fund.money.value} 元`
+                  .description
+                    span=fund.description.brief
+
+      .col-xs-12.col-md-8.box-shadow-panel
+        mixin afl(arr, name)
+          if arr && arr.length
+            .m-b-1.p-b-0
+              .panel-header.m-b-0=name
+              +applicationFormList(arr)
+        +afl(data.excellent, '优秀项目')
+        +afl(data.applying, '正在申请')
+        +afl(data.funding, '资助中')
+        +afl(data.completed, '已完成')
+
+      .col-xs-12.col-md-4.box-shadow-panel.p-l-0
+        .m-b-1#donationApp(v-cloak)
+          donation
+        if data.donationBills && data.donationBills.length
+          .m-b-1
+            .panel-header.m-b-0 赞助人
+            .donation-bills.p-t-05
+              for b in data.donationBills
+                .donation-bill
+                  .user-avatar
+                    img(src=b.user.avatarUrl)
+                    if b.money >= 5000
+                      span.donation-rich 豪
+                  .user-info
+                    .username
+                      if !b.user.uid
+                        span=b.user.username
+                      else
+                        a(data-float-uid=b.user.uid href=tools.getUrl("userHome", b.user.uid) target="_blank")=b.user.username
+                    .time
+                      +fromNow(b.time)
+                    .fund 赞助&nbsp;
+                      if !b.fund.fundId
+                        span=b.fund.name
+                      else
+                        a(href=tools.getUrl("singleFundHome", b.fund.fundId) target='_blank')=b.fund.name
+                    .money
+                      //.fa.fa-jpy
+                      span=`${b.money} 元`
+              a(href=`/fund/bills?type=donation` target="_blank").other-info 查看更多
+block fundScripts
+  include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  +includeJS('/fund/home.js')
