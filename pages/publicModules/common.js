@@ -956,7 +956,7 @@ NKC.methods.removeLocalStorageByKey = function(key) {
 * */
 NKC.methods.isMobilePhoneBrowser = function() {
   var reg = /(iPhone|iPad|iPod|iOS|Android)/i;
-  return reg.test(window.navigator.userAgent);
+  return reg.test(window.navigator.userAgent) && NKC.configs.platform !== 'reactNative';
 }
 /*
 * 判断是否为电脑浏览器
