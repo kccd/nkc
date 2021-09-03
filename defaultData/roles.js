@@ -22,6 +22,8 @@ module.exports = [
     defaultRole: true,
     type: 'system',
     operationsId: [
+      "linkToTarget",
+      "reportLinkToTarget",
       "getVerifications",
       "getAttachment",
       "APPGetNav",
@@ -376,6 +378,8 @@ module.exports = [
     modifyPostTimeLimit: 0,
     type: 'system',
     operationsId: [
+      "linkToTarget",
+      "reportLinkToTarget",
       "getVerifications",
       "getAttachment",
       "APPGetNav",
@@ -480,6 +484,8 @@ module.exports = [
     defaultRole: true,
     type: 'system',
     operationsId: [
+      "linkToTarget",
+      "reportLinkToTarget",
       "getAttachment",
       "getVerifications",
       "APPcheckout",

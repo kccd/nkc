@@ -19,6 +19,7 @@ var app = new Vue({
       databaseName: 'nkc',
       username: '',
       password: '',
+      drop: false,
     },
     redis: {
       address: '127.0.0.1',

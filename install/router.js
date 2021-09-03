@@ -4,15 +4,16 @@ const path = require('path');
 const config = require('./config');
 const router = new Router();
 const fs = require('fs');
+const fsPromises = fs.promises;
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 const ElasticSearch = require('elasticsearch');
 const apiFunction = require('../nkcModules/apiFunction');
 const redis = require('redis');
 const checkString = require('../tools/checkString');
-const configPath = path.resolve('./config');
-const defaultConfig = require('./defaultConfig');
-const createFile = global.NKC.createFile;
+const defaultData = require("../defaultData");
+const configPath = path.resolve(__dirname, '../config');
+const defaultConfigPath = path.resolve(__dirname, `../defaultData/config`);
 
 router
   .use('/', async (ctx, next) => {
@@ -59,106 +60,61 @@ router
     } catch(err) {
       ctx.throw(500, `Redis：${err}`);
     }
-    // 用户填写的信息验证通过
-    // 开始生成各个数据库的配置文件，为下一步创建管理员账号做准备
-    // socket
-    defaultConfig.push({
-      name: 'server',
-      data: {
-        address: server.address,
-        port: server.port,
-        domain: `http://127.0.0.1`
-      }
-    });
-    // redis
-    defaultConfig.push({
-      name: 'redis',
-      data: {
-        address: redis.address,
-        port: redis.port,
-        password: redis.password
-      }
-    });
-    // mongodb
-    defaultConfig.push({
-      name: 'mongodb',
-      data: {
-        address: mongodb.address,
-        port: mongodb.port,
-        username: mongodb.username || '',
-        password: mongodb.password || '',
-        database: mongodb.databaseName,
-        backupDir: '',
-        backupTime: ''
-      }
-    });
-    // elasticsearch
-    defaultConfig.push({
-      name: 'elasticSearch',
-      data: {
-        address: elasticSearch.address,
-        port: elasticSearch.port,
-        username: elasticSearch.username || '',
-        password: elasticSearch.password || '',
-        indexName: elasticSearch.indexName,
-        analyzer: "standard",
-        searchAnalyzer: "standard"
-      }
+
+    const {
+      initConfig,
+      initSettings,
+      initAccount,
+      init
+    } = require('../defaultData');
+
+    await initConfig();
+
+    await updateConfig('server', {
+      address: server.address,
+      port: server.port
     });
 
-    for(const c of defaultConfig) {
-      createFile(configPath + `/${c.name}.json`, c.data);
-    }
-
-    // 连接数据库，生成默认数据
-    const db = require('../dataModels');
-
-    const defaultData = require('../defaultData');
-    await defaultData.init();
-
-    // 创建管理员账号
-    console.log(`creating the admin account ...`);
-    const user = await db.UserModel.createUser({});
-    await user.updateOne({
-      certs: ['dev'],
-      username,
-      usernameLowerCase: username.toLowerCase(),
-      volumeA: true,
-      volumeB: true,
+    await updateConfig('redis', {
+      address: redis.address,
+      port: redis.port,
+      password: redis.password
     });
-    const passwordObj = apiFunction.newPasswordObject(password);
-    await db.UsersPersonalModel.updateOne({password: passwordObj.password, hashType: passwordObj.hashType});
-    console.log(`done`);
-    const article = require('../defaultData/articles');
-    const forum = await db.ForumModel.findOne({parentId: {$ne: ''}}).sort({toc: 1});
-    const thread = db.ThreadModel({
-      tid: await db.SettingModel.operateSystemID('threads', 1),
-      uid: user.uid,
-      mainForumsId: [forum.fid],
-      mid: user.uid,
-      count: 1,
-      remain: 1,
-      reviewed: true,
+
+    await updateConfig('mongodb', {
+      address: mongodb.address,
+      port: mongodb.port,
+      username: mongodb.username || '',
+      password: mongodb.password || '',
+      database: mongodb.databaseName,
     });
-    const post = db.PostModel({
-      t: article.title,
-      c: article.content,
-      uid: user.uid,
-      mainForumsId: [forum.fid],
-      type: 'thread',
-      pid: await db.SettingModel.operateSystemID('posts', 1),
-      tid: thread.tid,
-      l: 'html',
-      reviewed: true,
+
+    await updateConfig('elasticsearch', {
+      address: elasticSearch.address,
+      port: elasticSearch.port,
+      username: elasticSearch.username || '',
+      password: elasticSearch.password || '',
+      indexName: elasticSearch.indexName,
+      analyzer: "standard",
+      searchAnalyzer: "standard"
     });
-    thread.oc = post.pid;
-    await thread.save();
-    await post.save();
+
+    await updateConfig('cookie', {
+      secret: apiFunction.getRandomString('a0', 256),
+      experimentalSecret: apiFunction.getRandomString('a0', 256),
+    });
+
+    await initSettings();
+    await initAccount(username, password);
+    await init();
+
     // 添加install.lock文件，若要重新安装则需要先删掉此文件
     fs.writeFileSync(path.resolve(__dirname, './install.lock'), new Date());
-
-    console.log(`\nThe installation is complete`);
-    console.log(`\nrun 'pm2 start pm2.config.js' to start the server.`);
+    setImmediate(() => {
+      console.log(`\nthe installation is complete\n`);
+      console.log(`\nrun 'pm2 start pm2.config.js' to start the server.\n\n\n`);
+      process.exit(0);
+    });
     await next();
   });
 module.exports = router;
@@ -166,7 +122,7 @@ module.exports = router;
 
 
 function checkMongodb(data) {
-  const {address, port, username, password, databaseName} = data;
+  const {address, port, username, password, databaseName, drop} = data;
   let url, accountStr = '';
   return Promise.resolve()
     .then(() => {
@@ -183,12 +139,17 @@ function checkMongodb(data) {
           autoIndex: true,
           poolSize: 50,
           keepAlive: 120,
-          useMongoClient: true
+          useNewUrlParser: true,
+          useUnifiedTopology: true
         }, async (err) => {
           if(err) return reject(err);
           const collections = await mongoose.connections[0].db.collections();
           if(collections.length !== 0) {
-            return reject(new Error(`数据库 "${databaseName}" 已存在，请更换数据库名。`));
+            if(drop) {
+              await mongoose.connections[0].db.dropDatabase();
+            } else {
+              return reject(new Error(`数据库 "${databaseName}" 已存在，请更换数据库名。`));
+            }
           }
           resolve();
         });
@@ -250,4 +211,30 @@ function checkServer(data) {
     .then(() => {
       if(!data.address || !data.port) throw '地址或端口不能为空';
     })
+}
+
+
+async function updateConfig(type, data) {
+  const config = await getConfig(type);
+  Object.assign(config, data);
+  await modifyConfig(type, config);
+}
+
+async function modifyConfig(type, data) {
+  const targetFilePath = path.resolve(configPath, `./${type}.json`);
+  await fsPromises.writeFile(targetFilePath, JSON.stringify(data, '', 2));
+}
+
+async function getConfig(type) {
+  const targetFilePath = path.resolve(configPath, `./${type}.json`);
+  return JSON.parse((await fsPromises.readFile(targetFilePath)).toString());
+}
+
+async function access(targetPath) {
+  try{
+    await fsPromises.access(targetPath);
+    return true;
+  } catch(err) {
+    return false;
+  }
 }

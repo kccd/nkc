@@ -1,4 +1,3 @@
-const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const upload = require("../settings/upload");
@@ -12,27 +11,8 @@ global.NKC.createFile = (p, data) => {
   ));
 };
 
-function installModules() {
-  console.log(`Installing dependencies...`);
-  const command = 'npm install';
-  try {
-    execSync(command, {
-      cwd: path.join(__dirname, '../'),
-      stdio: [0, 1, 2],
-    });
-  } catch (e) {
-    console.log('Error installing dependencies!');
-    console.log('message: ' + e.message);
-    console.log('stdout: ' + e.stdout);
-    console.log('stderr: ' + e.stderr);
-    throw e;
-  }
-}
-
 
 function createServer() {
-  console.log(`Creating installer server...`);
-  const open = require('open');
   const Koa = require('koa');
   const http = require('http');
   const koaBody = require('koa-body');
@@ -45,7 +25,7 @@ function createServer() {
     try{
       await next();
     } catch(err) {
-      console.log(err.message || err);
+      console.log(err);
       ctx.status = err.status || 500;
       ctx.body = {
         error: err.message || err
@@ -63,20 +43,20 @@ function createServer() {
     await next();
   });
   app.use(koaStatic(path.resolve('./install/public')));
+  app.use(koaStatic(path.resolve('./public')));
   app.use(koaStatic(path.resolve('./pages')));
   app.use(koaStatic(path.resolve('./node_modules')));
   app.use(koaStatic(path.resolve('./statics/site')));
   app.use(router.routes(), router.allowedMethods());
   http.createServer(app.callback()).listen(9000, () => {
-    console.log('server is running http://127.0.0.1:9000');
-    open('http://127.0.0.1:9000');
+    console.log('NKC installer is running at port 9000');
+    console.log(`Please open your browser and visit localhost:9000\n`);
   });
 }
 
 
 
 try{
-  installModules();
   upload.initFolders();
   createServer();
 } catch(err) {

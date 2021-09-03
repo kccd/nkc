@@ -17,8 +17,14 @@ const {
   port: dbPort
 } = require('../../config/mongodb.json');
 
+if(folder && time) {
+  schedule.scheduleJob(time, backupDatabase);
+  console.log(`数据库自动备份服务已启动`);
+} else {
+  console.error(`未启用数据库自动备份`.red);
+}
 
-schedule.scheduleJob(time, backupDatabase);
+
 
 
 async function backupDatabase() {
@@ -143,5 +149,3 @@ function getTimestamp(t) {
   t = moment(t);
   return t.format('YYYY-MM-DD HH:mm:ss') + ' backup';
 }
-
-console.log(`数据库自动备份服务已启动`);

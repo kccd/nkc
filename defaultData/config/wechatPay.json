@@ -1,0 +1,11 @@
+{
+  "appId": "",
+  "mchId": "",
+  "orderTimeout": 1800000,
+  "certFilePath": "",
+  "certNumber": "",
+  "nativeUrl": "",
+  "H5Url": "",
+  "APIv3": "",
+  "notifyUrl": ""
+}

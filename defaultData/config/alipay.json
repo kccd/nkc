@@ -1,0 +1,18 @@
+{
+  "transfer": {
+    "app_id": "",
+    "url": "",
+    "alipayCertPublicKeyPath": "",
+    "alipayRootCertPath": "",
+    "appCertPublicKeyPath": "",
+    "privateKeyPath": "",
+    "publicKeyPath": ""
+  },
+  "receipt": {
+    "url": "",
+    "seller_id": "",
+    "seller_email": "",
+    "key": "",
+    "notifyUrl": ""
+  }
+}

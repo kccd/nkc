@@ -5,6 +5,8 @@
   "homepage": "https://kechuang.org",
   "private": true,
   "scripts": {
+    "install": "node install.js",
+    "reinstall": "node install.js -r",
     "start": "cross-env NODE_ENV=production node server.js ",
     "serve": "node ./server.js",
     "test": "mocha -t 10000",
@@ -102,7 +104,6 @@
     "node-threads-pool": "^2.0.2",
     "nodemailer": "^6.6.0",
     "on-finished": "^2.3.0",
-    "open": "^6.3.0",
     "pdf-lib": "^1.11.2",
     "photoswipe": "^4.1.2",
     "pinyin": "^2.9.0",
