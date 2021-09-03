@@ -86,6 +86,7 @@ settingsRouter
     });
     const projectOptions = [
       ['modifyCount', '最大退修次数'],
+      ['modifyTime', '修改超时天数'],
       ['supportCount', '好友支持数'],
       ['timeOfPublicity', '示众天数'],
       ['applicationCountLimit', '年最大申请次数']
@@ -160,6 +161,7 @@ settingsRouter
           count: newFund.thread.count,
         },
         modifyCount: newFund.modifyCount,
+        modifyTime: newFund.modifyTime,
         supportCount: newFund.supportCount,
         timeOfPublicity: newFund.timeOfPublicity,
         applicationCountLimit: newFund.applicationCountLimit,

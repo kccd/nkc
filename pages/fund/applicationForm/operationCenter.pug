@@ -49,6 +49,8 @@ if !isIncluded('operationCenter')
             button.btn.btn-default.btn-block(onclick=`disableApplicationForm(${form._id}, true)`) 屏蔽
           if general === 4
             button.btn.btn-default.btn-block(onclick=`applicationFormStop(${form._id})`) 强制终止
+          if general === 2 && [2, 3].includes(detail)
+            button.btn.btn-default.btn-block(onclick=`applicationFormTimeout(${form._id})`) 设为修改超时
           if permission('fundBlacklistPost')
             if applicant.inFundBlacklist
               button.btn.btn-default.btn-block(onclick=`removeUserFromFundBlacklist("${form.uid}")`) 移出黑名单
@@ -61,13 +63,13 @@ if !isIncluded('operationCenter')
     var giveUpReason = '';
     function revoked(type, _id) {
       if (type === 'giveUp') {
-        return sweetPrompt(`请输入放弃的原因`, giveUpReason)
+        return sweetPrompt('请输入放弃的原因', giveUpReason)
           .then(function(reason) {
             giveUpReason = reason;
             return nkcAPI('/fund/a/' + _id + '/settings/giveup', 'POST', {reason: reason});
           })
           .then(function () {
-            sweetSuccess(`操作成功`);
+            sweetSuccess('操作成功');
           })
           .catch(function (data) {
             sweetError(data);
@@ -77,7 +79,7 @@ if !isIncluded('operationCenter')
     function excellent(id, type) {
       nkcAPI('/fund/a/' + id + '/excellent', 'PUT', {type: type})
         .then(function () {
-          sweetSuccess(`操作成功`);
+          sweetSuccess('操作成功');
         })
         .catch(function (data) {
           sweetError(data);
@@ -103,7 +105,7 @@ if !isIncluded('operationCenter')
         })
     }
     function applicationFormStop(formId) {
-      return sweetPrompt(`请输入原因`, '')
+      return sweetPrompt('请输入原因', '')
       .then(function(reason) {
         return nkcAPI('/fund/a/' + formId + '/manage/stop', 'POST', {reason: reason})
       })
@@ -111,4 +113,14 @@ if !isIncluded('operationCenter')
         sweetSuccess('操作成功');
       })
       .catch(sweetError)
+    }
+    function applicationFormTimeout(formId) {
+      return sweetQuestion('确定要执行当前操作？')
+      .then(function() {
+        return nkcAPI('/fund/a/' + formId + '/manage/timeout', 'POST', {});
+      })
+      .then(function() {
+        sweetSuccess('操作成功');
+      })
+      .catch(sweetError);
     }

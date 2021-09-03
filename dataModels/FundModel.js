@@ -301,6 +301,12 @@ const fundSchema = new Schema({
     type: Number,
     default: 5
   },
+  // 未通过专家和管理员审核，等待申请人修改的最大时间（超时将会更改申请表的状态为‘超时未修改’）
+  // 天
+  modifyTime: {
+    type: Number,
+    default: 7,
+  },
   // 基金互斥相关
 	conflict: {
     // 是否与自己互斥
@@ -540,5 +546,52 @@ fundSchema.statics.getConditionsOfApplication = async (userId, fundId) => {
     infos
   };
 };
+
+/*
+* 更改修改超时的申请表状态
+* */
+fundSchema.statics.modifyTimeoutApplicationForm = async () => {
+  const FundApplicationFormModel = mongoose.model('fundApplicationForms');
+  const FundModel = mongoose.model('funds');
+  const funds = await FundModel.find({}, {_id: 1, modifyTime: 1});
+  const timeCondition = [];
+  const statusCondition = [
+    {
+      'status.projectPassed': false
+    },
+    {
+      'status.adminSupport': false,
+    }
+  ];
+  const now = Date.now();
+  for(const f of funds) {
+    const {_id, modifyTime} = f;
+    // 专业为 _id 且 最后操作时间小于 现在 - 超时时间
+    timeCondition.push({
+      fundId: _id,
+      tlm: {
+        $lt: now - modifyTime * 24 * 60 * 60 * 1000
+      }
+    });
+  }
+
+  const match = {
+    useless: null,
+    $and: [
+      {
+        $or: statusCondition
+      },
+      {
+        $or: timeCondition
+      }
+    ]
+  };
+
+  const applicationForms = await FundApplicationFormModel.find(match);
+  for(const form of applicationForms) {
+    await form.setUselessAsTimeout();
+  }
+};
+
 const FundModel = mongoose.model('funds', fundSchema);
 module.exports = FundModel;

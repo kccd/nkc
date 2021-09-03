@@ -222,9 +222,9 @@ router
         applicationForm.useless = 'exceededModifyCount';
       }
       applicationForm.lock.submitted = false;
-    } else {
-      applicationForm.tlm = new Date();
     }
+
+    applicationForm.tlm = new Date();
 
     await applicationForm.save();
 

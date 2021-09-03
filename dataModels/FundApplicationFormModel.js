@@ -1087,6 +1087,8 @@ fundApplicationFormSchema.methods.getStatus = async function() {
     formStatus = [1, 5];
   } else if (useless === 'stop') {
     formStatus = [1, 6];
+  } else if(useless === 'timeout') {
+    formStatus = [1, 7];
   } else if(completed === true) {
     if(excellent) {
       formStatus = [5, 3]
@@ -1140,6 +1142,7 @@ fundApplicationFormSchema.methods.getStatus = async function() {
     '1-4': '修改次数超过限制',
     '1-5': '已被永久拒绝',
     '1-6': '已终止',
+    '1-7': '申请人修改超时，已视为放弃',
 
     '2-1': '未提交',
     '2-2': '未通过专家审核，等待申请人修改',
@@ -1618,6 +1621,18 @@ fundApplicationFormSchema.methods.hideApplicationFormInfoByUserId = async functi
     }
   }
 }
+
+/*
+* 设置申请表的状态为申请人修改超时，已视为放弃
+* */
+fundApplicationFormSchema.methods.setUselessAsTimeout = async function(operatorId) {
+  await this.createReport('system', `申请人修改超时，已视为放弃`, operatorId, false);
+  await this.updateOne({
+    $set: {
+      useless: 'timeout'
+    }
+  });
+};
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);
 module.exports = FundApplicationFormModel;

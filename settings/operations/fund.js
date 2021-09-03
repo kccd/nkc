@@ -123,6 +123,9 @@ module.exports = {
         },
         stop: {
 			    POST: 'stopFundApplicationForm'
+        },
+        timeout: {
+			    POST: 'timeoutFundApplicationForm'
         }
       },
 			/*comment: {

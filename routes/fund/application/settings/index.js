@@ -18,6 +18,8 @@ settingsRouter
       ctx.throw(403,'申请人已放弃申报');
     } else if(applicationForm.useless === 'stop') {
       ctx.throw(403, `申请已终止`);
+    } else if(applicationForm.useless === 'timeout') {
+      ctx.throw(403, `申请人修改超时，已视为放弃`);
     }
     const reg = /^\/fund\/a\/[0-9]+\/settings$/;
     if(reg.test(ctx.url)) {

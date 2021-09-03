@@ -77,3 +77,6 @@ if !isIncluded('formStatus')
     else if form.useless === 'stop'
       .m-b-1.p-t-2.p-b-2.text-danger.text-center
         strong.h3 已终止
+    else if form.useless === 'timeout'
+      .m-b-1.p-t-2.p-b-2.text-danger.text-center
+        strong.h3 申请人修改超时，已视为放弃
