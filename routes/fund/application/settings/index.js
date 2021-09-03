@@ -82,7 +82,8 @@ settingsRouter
       projectCycle,
       budgetMoney,
       threadsId,
-      category
+      category,
+      protocol,
     } = form;
     const {
       name,
@@ -258,6 +259,13 @@ settingsRouter
       if(!category) ctx.throw(400, `请选择学科分类`);
       const formForum = await db.ForumModel.findOne({fid: category}, {fid: 1});
       if(!formForum) ctx.throw(400, `学科分类错误，请重新选择`);
+
+      // 开源协议
+      checkString(protocol, {
+        name: '开源协议',
+        minLength: 0,
+        maxLength: 10000,
+      });
 
       // 项目信息
       checkString(t, {

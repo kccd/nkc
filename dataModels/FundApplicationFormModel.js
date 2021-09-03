@@ -310,7 +310,12 @@ const fundApplicationFormSchema = new Schema({
       }*/
   	type: [Schema.Types.Mixed],
 		default: []
-	}
+	},
+  // 开源协议
+  protocol: {
+    type: String,
+    default: ''
+  }
 }, {
   collection: 'fundApplicationForms',
 	toObject: {

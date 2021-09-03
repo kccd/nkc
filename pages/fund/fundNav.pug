@@ -4,8 +4,18 @@ if !isIncluded('fundNav')
     .container-fluid.max-width
       .fund-nav.m-b-1
         ul
-          li
-            a(href='/fund') 首页
+          if !data.fund
+            li
+              a(href='/fund') 首页
+          else
+            span.fund-nav-breadcrumb.bg-info
+              li
+                a(href='/fund') 首页
+              li
+                a(href=`/fund/list/${data.fund._id}`)=data.fund.name
+              if data.applicationForm
+                li
+                  a(href=`/fund/a/${data.applicationForm._id}`)=data.applicationForm.code || data.applicationForm._id
           li
             a(href='/fund/info') 基金介绍
           li
@@ -18,11 +28,5 @@ if !isIncluded('fundNav')
           if data.newNotify > 0
             li
               a(href=`/fund/me?type=notify`)=`组队邀请 ${data.newNotify}`
-          if data.fund
-            li
-              a(href=`/fund/list/${data.fund._id}`)=data.fund.name
-          if data.fund && data.applicationForm
-            li
-              a(href=`/fund/a/${data.applicationForm._id}`)=data.applicationForm.code || data.applicationForm._id
       if data.fundSettings.readOnly
         .p-t-1.p-b-1=`${data.fundSettings.fundName}已开启只读模式`

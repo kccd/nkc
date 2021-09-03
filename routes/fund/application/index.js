@@ -29,9 +29,9 @@ applicationRouter
 		if(!applicationForm) ctx.throw(400, '未找到指定申请表。');
 		await applicationForm.extendApplicationFormBaseInfo(state.uid);
 		const fund = applicationForm.fund;
-		if(fund.history && ctx.method !== 'GET') {
+		/*if(fund.history && ctx.method !== 'GET') {
 			ctx.throw(400, '申请表所在基金已被设置为历史基金，申请表只供浏览。');
-		}
+		}*/
 		data.applicationForm = applicationForm;
 		data.fund = fund;
 		data.userFundRoles = await applicationForm.fund.getUserFundRoles(state.uid);

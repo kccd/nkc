@@ -188,6 +188,10 @@ block fundContent
                 h5(v-else)
                   a(:href='getUrl("forumHome", formForum.fid)' target="_blank") {{formForum.displayName}}
                 button.m-b-05.btn.btn-default.btn-xs(@click='selectForum') 选择专业
+            .form-group
+              label.col-sm-2.control-label 开源协议
+              .col-sm-8
+                textarea.form-control(rows=4 v-model='form.protocol')
         div
           h4 项目信息
           hr
