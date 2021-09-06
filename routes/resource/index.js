@@ -33,10 +33,13 @@ resourceRouter
     if(resource.uid !== state.uid) {
       // 不是自己的附件需判断权限
       const accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
-      const refererString = ctx.get('referer') || '';
-      const referer = new URL(refererString);
+      const refererString = ctx.get('referer');
+      let token;
       let hasPermission = false;
-      const token = referer.searchParams.get('token');
+      try{
+        const referer = new URL(refererString);
+        token = referer.searchParams.get('token');
+      } catch(err){}
       if(token) {
         // 存在 token，判断来源
         const tidReg = /\/t\/([0-9a-zA-Z]+)/i;
