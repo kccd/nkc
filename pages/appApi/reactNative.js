@@ -123,16 +123,7 @@ document.addEventListener('click', (e)  => {
     const aDataTitle = $a.getAttribute('data-title');
     if(aDataType === 'download') {
       e.preventDefault();
-      const targetUrl = urlPathEval(location.href, href);
-      const filename = aDataTitle || (Date.now()+ '_' + Math.floor(Math.random() * 1000) + '.file');
-      return sweetQuestion(`确定要下载「${filename}」?`)
-        .then(() => {
-          NKC.methods.rn.emit('downloadFile', {
-            url: targetUrl,
-            filename
-          });
-        })
-
+      NKC.methods.rn.downloadFile(aDataTitle, href);
     } else if(aDataType !== 'reload') {
       e.preventDefault();
       const targetUrl = urlPathEval(location.href, href);
@@ -152,4 +143,21 @@ NKC.methods.rn.alert = function(msg) {
   NKC.methods.rn.emit('alert_message', {
     message: msg
   });
+}
+
+/*
+* 通知 ReactNative 下载文件
+* @param {String} filename 文件名
+* @param {String} 下载链接
+* */
+NKC.methods.rn.downloadFile = function(filename, url) {
+  url = urlPathEval(location.href, url);
+  filename = filename || (Date.now()+ '_' + Math.floor(Math.random() * 1000) + '.file');
+  return sweetQuestion(`确定要下载文件「${filename}」至 Download 目录?`)
+    .then(() => {
+      NKC.methods.rn.emit('downloadFile', {
+        url,
+        filename
+      });
+    })
 }

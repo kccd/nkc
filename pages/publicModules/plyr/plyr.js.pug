@@ -12,6 +12,12 @@ if !isIncluded('plyr')
       // 切换视频分辨率之后重新设置视频的下载链接
       var setPlayerDownloadUrl = function(player, dom) {
         player.download = dom.attr('src') + '&d=attachment';
+        var title = dom.attr('data-plyr-title');
+        var nkcsource = dom.parents('span[data-type="video"][data-tag="nkcsource"]');
+        var downloadElement = nkcsource.find('a[data-plyr="download"]');
+        downloadElement
+          .attr('data-type', 'download')
+          .attr('data-title', title)
       };
       var addEvents = function(player, dom) {
         player.on('qualitychange', function () {
@@ -19,6 +25,7 @@ if !isIncluded('plyr')
         });
         player.on('ready', function(d) {
           setPlayerDownloadUrl(player, dom);
+          NKC.methods.initPlyrMask(player);
         });
       }
 
@@ -89,7 +96,6 @@ if !isIncluded('plyr')
           });
           addEvents(player, plyrDom);
           player.speed = 1;
-          NKC.methods.initPlyrMask(player);
           players.push(player);
         }
       }
@@ -101,4 +107,6 @@ if !isIncluded('plyr')
       }
       NKC.methods.initVideo();
     }());
-
+    window.onerror = function(err) {
+      NKC.methods.appConsoleLog(err.toString())
+    }
