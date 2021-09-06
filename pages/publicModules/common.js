@@ -974,16 +974,16 @@ NKC.methods.toPay = function(paymentType, info, newWindow) {
       newWindow.location = url;
     }
   } else if(paymentType === 'wechatPay') {
-    const {paymentId} = info;
+    const {paymentId, url: h5Url} = info;
     const url = `/payment/wechat/${paymentId}`;
     if(NKC.methods.isPcBrowser()) {
       newWindow.location = url;
     } else if(NKC.methods.isMobilePhoneBrowser()) {
-      newWindow.location = url;
+      newWindow.location = h5Url;
     } else {
       NKC.methods.rn.emit('weChatPay', {
         url: window.location.origin + url,
-        H5Url: url,
+        H5Url: h5Url,
         referer: window.location.origin
       });
     }
