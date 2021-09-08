@@ -89,7 +89,7 @@ router
       database: mongodb.databaseName,
     });
 
-    await updateConfig('elasticsearch', {
+    await updateConfig('elasticSearch', {
       address: elasticSearch.address,
       port: elasticSearch.port,
       username: elasticSearch.username || '',
