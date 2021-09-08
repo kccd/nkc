@@ -11,9 +11,7 @@ const ElasticSearch = require('elasticsearch');
 const apiFunction = require('../nkcModules/apiFunction');
 const redis = require('redis');
 const checkString = require('../tools/checkString');
-const defaultData = require("../defaultData");
 const configPath = path.resolve(__dirname, '../config');
-const defaultConfigPath = path.resolve(__dirname, `../defaultData/config`);
 
 router
   .use('/', async (ctx, next) => {
@@ -60,6 +58,8 @@ router
     } catch(err) {
       ctx.throw(500, `Redis：${err}`);
     }
+
+    console.log(`Installing ...`);
 
     const {
       initConfig,
@@ -228,13 +228,4 @@ async function modifyConfig(type, data) {
 async function getConfig(type) {
   const targetFilePath = path.resolve(configPath, `./${type}.json`);
   return JSON.parse((await fsPromises.readFile(targetFilePath)).toString());
-}
-
-async function access(targetPath) {
-  try{
-    await fsPromises.access(targetPath);
-    return true;
-  } catch(err) {
-    return false;
-  }
 }

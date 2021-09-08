@@ -50,7 +50,7 @@ function createServer() {
   app.use(router.routes(), router.allowedMethods());
   http.createServer(app.callback()).listen(9000, () => {
     console.log('NKC installer is running at port 9000');
-    console.log(`Please open your browser and visit localhost:9000\n`);
+    console.log(`Please open browser and visit localhost:9000\n`);
   });
 }
 
