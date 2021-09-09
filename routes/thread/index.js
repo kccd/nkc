@@ -178,7 +178,7 @@ threadRouter
 		// 验证权限 - new
 		// 如果是分享出去的连接，含有token，则允许直接访问
     // 【待改】判断用户是否是通过分享链接阅读文章，如果是则越过权限
-    await db.SettingModel.restrictAccess(thread.toc, data.userRoles.map(role => role._id), data.userGrade._id, state.uid === thread.uid);
+    await db.SettingModel.restrictAccess(thread.toc, data.userRoles.map(role => role._id), data.userGrade._id, state.uid && state.uid === thread.uid);
     if(!await db.ShareModel.hasPermission(token, thread.oc)) {
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
     }

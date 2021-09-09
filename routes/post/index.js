@@ -74,7 +74,7 @@ router
 	    userOperationsId: data.userOperationsId,
 	    user
     };
-    await db.SettingModel.restrictAccess(post.toc, data.userRoles.map(role => role._id), data.userGrade._id, state.uid === post.uid);
+    await db.SettingModel.restrictAccess(post.toc, data.userRoles.map(role => role._id), data.userGrade._id, state.uid && state.uid === post.uid);
     if(!await db.ShareModel.hasPermission(token, pid)) {
       await post.ensurePermission(options);
     }
