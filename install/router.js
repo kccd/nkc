@@ -99,6 +99,28 @@ router
       searchAnalyzer: "standard"
     });
 
+    await updateConfig('proxy', {
+      servers: [
+        {
+          name: 'nkc',
+          type: 'proxy',
+          domains: [
+            '127.0.0.1'
+          ],
+          https: false,
+          httpBalanceType: "random",
+          socketBalanceType: "ipHash",
+          target: [
+            `http://127.0.0.1:${server.port}`
+          ],
+          socketTarget: [
+            `http://127.0.0.1:${server.port}`
+          ],
+          disabled: false
+        }
+      ]
+    });
+
     await updateConfig('cookie', {
       secret: apiFunction.getRandomString('a0', 256),
       experimentalSecret: apiFunction.getRandomString('a0', 256),

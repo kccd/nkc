@@ -1,0 +1,34 @@
+{
+  "ports": {
+    "httpPort": 80,
+    "httpsPort": 443
+  },
+  "httpAgent": {
+    "keepAlive": true,
+    "maxFreeSockets": 64,
+    "keepAliveMsecs": 8000,
+    "maxSockets": 500,
+    "maxTotalSockets": 5000,
+    "timeout": 30000
+  },
+  "timeout": 10000,
+  "servers": [
+    {
+      "name": "nkc",
+      "type": "proxy",
+      "domains": [
+        "127.0.0.1"
+      ],
+      "https": false,
+      "target": [
+        "http://127.0.0.1:9000"
+      ],
+      "httpBalanceType": "random",
+      "socketBalanceType": "ipHash",
+      "socketTarget": [
+        "http://127.0.0.1:9000"
+      ],
+      "disabled": false
+    }
+  ]
+}
