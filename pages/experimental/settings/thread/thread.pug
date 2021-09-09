@@ -75,6 +75,17 @@ block eContent
                   input(type='checkbox' :value="g._id" v-model='settings.disablePost.gradesId')
                   span {{g.displayName}}
               h5.text-danger 满足已勾选等级之一的用户不受限制
+          .form-group
+            label.col-sm-2.control-label 作者访问
+            .col-sm-6
+              .radio
+                label.m-r-1
+                  input(type='radio' :value='true' v-model='settings.disablePost.allowAuthor')
+                  span 允许
+                label
+                  input(type='radio' :value='false' v-model='settings.disablePost.allowAuthor')
+                  span 禁止
+              h5.text-danger 是否允许作者本人访问自己被限制的内容
 
           h4 站外链接访问
           .form-group

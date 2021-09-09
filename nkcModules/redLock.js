@@ -1,5 +1,5 @@
 const redisClient = require("../settings/redisClient");
-const RedLock = require("redLock");
+const RedLock = require("redlock");
 const redLock = new RedLock([redisClient], {
   driftFactor: 0.01,
   retryCount:  150,
