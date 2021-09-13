@@ -27,7 +27,7 @@ const schema = new Schema({
 
 /*
 * 添加类型到投诉类型列表中
-* @return {Object} complaintType 添加的投诉类型
+* @return {Object} type 添加的投诉类型
 * @author panbing 2020/09/13
 * */
 schema.statics.insertCom = async (props) => {
