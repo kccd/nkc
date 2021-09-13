@@ -27,6 +27,8 @@ var moduleComplaint = new Vue({
       })
     }
     this.reasons = reasons;
+    console.log(this.reasons);
+    console.log(data);
   },
   methods: {
     selectReason: function(r) {

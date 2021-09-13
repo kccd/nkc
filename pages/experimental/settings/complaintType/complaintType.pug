@@ -1,0 +1,34 @@
+extends ../../experimental
+block eTitle
+  title 添加投诉类型
+block eContent
+  .container-fluid.max-width#app
+    .row
+      .hidden#data= objToStr({complaintTypes: data.complaintTypes})
+      .col-xs-12.col-md-8
+        .m-b-05
+          button.btn.btn-sm.btn-default(onclick='addType()') 添加
+        .table-responsive
+          table.table.table-bordered.nkc-table
+            thead
+              tr
+                th.text-center 添加时间
+                th.text-center 投诉类型
+                th.text-center 说明
+                th.text-center 操作
+            tbody
+              for i in data.complaintTypes
+                tr
+                  th.text-center
+                    +timeFormat(i.toc)
+                  th.text-center=i.type[0]
+                    
+                  th.text-center=i.description
+                  th.text-center
+                    button.btn.btn-danger.btn-xs(onclick=`removeType("${i._id}")`) 删除
+        if data.complaintTypes.length === 0
+          .p-t-05.p-b-05.text-center 空空如也~
+block scripts
+  include ../../../publicModules/commonModal/commonModal
+  +includeJS('/experimental/settings/complaintType/complaintType.js')
+    
