@@ -3,10 +3,11 @@ const commonModal = new NKC.modules.CommonModal();
 function addType() {
   commonModal.open(data => {
     let type = data[0].value;
-    const description = data[1].value.trim();
+    let description = data[1].value.trim();
     return Promise.resolve()
       .then(() => {
         if(!type.length) throw new Error('投诉类型不能为空');
+        if(!description.length) throw new Error('投诉类型不能为空');
         return nkcAPI('/e/settings/complaintType', 'POST', {
           type,
           description
@@ -28,7 +29,7 @@ function addType() {
       },
       {
         dom: 'textarea',
-        label: '说明',
+        label: '请填写类型说明，全英文小写',
         value: '',
         rows: 3
       }

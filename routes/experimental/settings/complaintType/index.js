@@ -18,8 +18,12 @@ router
     });
     const now = new Date();
     const oldComs = await db.ComplaintTypeModel.find({type: {$in: type}}, {_id: 1});
+    const olddescs = await db.ComplaintTypeModel.find({description: {$in: description}}, {_id: 1});
     if(oldComs.length !== 0) {
       ctx.throw(400, `类型 「${type}」 已存在`);
+    }
+    if(olddescs.length !== 0) {
+      ctx.throw(400, `说明 「${description}」 已存在`);
     }
     await db.ComplaintTypeModel.insertCom({
       toc: now,

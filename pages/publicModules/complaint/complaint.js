@@ -17,20 +17,38 @@ var moduleComplaint = new Vue({
     reasons: []
   },
   mounted: function() {
-    var data = NKC.methods.strToObj(this.$refs.reasons.innerHTML);
-    var reasons = [];
-    for(var reason in data.reasons) {
-      if(!data.reasons.hasOwnProperty(reason)) continue;
-      reasons.push({
-        type: reason,
-        description: data.reasons[reason]
-      })
-    }
-    this.reasons = reasons;
-    console.log(this.reasons);
-    console.log(data);
+    // var data = NKC.methods.strToObj(this.$refs.reasons.innerHTML);
+    // var reasons = [];
+    // for(var reason in data.reasons) {
+    //   if(!data.reasons.hasOwnProperty(reason)) continue;
+    //   reasons.push({
+    //     type: reason,
+    //     description: data.reasons[reason]
+    //   })
+    // }
+    // this.reasons = reasons;
+    // console.log(this.reasons);
+    // console.log(data);
   },
   methods: {
+    getList: function() {
+      var _this=this
+          nkcAPI('/e/settings/complaintType', 'get', {
+      })
+        .then(function(data) {
+          var reasons = [];
+          for(var i in data.complaintTypes) {
+            if(!data.complaintTypes.hasOwnProperty(i)) continue;
+            reasons.push({
+              type:data.complaintTypes[i].description,
+              description:data.complaintTypes[i].type,
+            })
+          }
+          _this.reasons = reasons;
+        })
+        .catch(function(data) {
+        })
+    },
     selectReason: function(r) {
       this.reasonType = r.type;
     },
@@ -50,6 +68,7 @@ var moduleComplaint = new Vue({
       this.type = type;
       this.id = id;
       this.show();
+      this.getList();
     },
     submit: function() {
       nkcAPI("/complaint", "POST", {
