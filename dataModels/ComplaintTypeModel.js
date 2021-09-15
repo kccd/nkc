@@ -4,7 +4,13 @@ const schema = new Schema({
   _id: String,
   type: {
     type: String,
-    default: ''
+    required: true,
+    index: 1,
+  },
+  disabled:{
+    type: Boolean,
+    required: true,
+    default: true
   },
   uid: {
     type: String,
@@ -32,26 +38,26 @@ const schema = new Schema({
 * */
 schema.statics.insertCom = async (props) => {
   const SettingModel = mongoose.model('settings');
-  const {uid, type, description, toc} = props;
-  const recordId = await SettingModel.getNewId();
+  const {uid, type, description, toc, disabled} = props;
+  const recordId = await SettingModel.operateSystemID("complaintTypes",1);
   const list = mongoose.model('complaintTypes');
   await list({
     _id: recordId,
     uid,
     type,
     description,
-    toc
+    toc,
+    disabled
   }).save();
 };
+// schema.statics.updataCom = async (props) => {
+//   const SettingModel = mongoose.model('settings');
+//   const {_id, disabled} = props;
+//   const list = mongoose.model('complaintTypes');
+//   await list({
+//     _id,
+//     disabled
+//   }).save();
+// };
 
-schema.statics.saveComplaintTypelistToRedis = async () => {
-  const redis = require('../settings/redis');
-  const getRedisKeys = require('../nkcModules/getRedisKeys');
-  const complaintTypeListModel = mongoose.model('complaintTypes');
-  let id = await complaintTypeListModel.find({}, {_id: 1});
-  id = id.map(id => !!id);
-  const redisClient = redis();
-  const key = getRedisKeys('complaintTypes');
-  await redisClient.resetSetAsync(key, id);
-};
 module.exports = mongoose.model("complaintTypes", schema);

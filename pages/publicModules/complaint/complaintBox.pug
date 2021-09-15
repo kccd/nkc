@@ -1,0 +1,47 @@
+if !isIncluded('chat')
+  +includeCSS('/complaint/complaint.css')
+  #messageApp(v-cloak)
+    #minimizeContainer.theme-primary(v-if='containerMode === "minimize"' @click='unsetMinimize')
+      .fa.fa-comments
+      span(v-if='boxContent') {{boxContent}}
+    #displaySocketContainer(v-show='containerMode !== "minimize"')
+      #socketContainer(
+        v-if='showPanel'
+        :style='containerStyle'
+        ref='socketContainer'
+      )
+        .common-socket-header.draggable-handle.theme-primary
+          span.m-r-05.fa.fa-comments
+          span.m-r-1.app-name {{appName}}
+          span(v-if='containerMode !== "maximize"')
+            button.options-switch(
+              @click='changeSize'
+              @mouseover='onRepeatOver'
+              @mouseleave='onRepeatLeave'
+            ) {{modeName}}
+            button.options-repeat.options(
+              @click='setSocketContainerAsDefault'
+              @mouseover='onRepeatOver'
+              @mouseleave='onRepeatLeave'
+              title='重置面板'
+            )
+              .fa.fa-repeat
+            button.options-link.options(@click='toMessagePage' title='消息独立页')
+              .fa.fa-external-link
+            button.options-minimize.options(@click='setMinimize' title='最小化')
+              .fa.fa-window-minimize
+            button.options-remove.options(
+              @click='hideMessagePanel'
+              title='关闭'
+              )
+              .fa.fa-remove
+
+        #messageContainer
+          Message(
+            :mode='mode'
+            ref='message'
+            :socket='socket'
+            @update-new-message-count='updateNewMessageCount'
+          )
+  +includeJS('/message/chat.js')
+  include ../publicModules/imageViewer

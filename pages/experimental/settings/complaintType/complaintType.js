@@ -1,4 +1,5 @@
 const commonModal = new NKC.modules.CommonModal();
+var data = NKC.methods.getDataById("data");
 
 function addType() {
   commonModal.open(data => {
@@ -7,7 +8,6 @@ function addType() {
     return Promise.resolve()
       .then(() => {
         if(!type.length) throw new Error('投诉类型不能为空');
-        if(!description.length) throw new Error('投诉类型不能为空');
         return nkcAPI('/e/settings/complaintType', 'POST', {
           type,
           description
@@ -23,46 +23,136 @@ function addType() {
     data: [
       {
         dom: 'input',
-        label: '请填写投诉类型，不能为已存在的类型',
+        label: '请填写投诉类型',
         value: '',
         rows: 1
       },
       {
         dom: 'textarea',
-        label: '请填写类型说明，全英文小写',
+        label: '请填写类型说明',
         value: '',
         rows: 3
       }
     ]
   })
 }
-function removeType(id) {
-  return sweetQuestion(`确定要执行当前操作？`)
-    .then(() => {
-      return nkcAPI(`/e/settings/complaintType?id=${id}`, 'DELETE')
-    })
-    .then(() => {
-      sweetSuccess('删除成功');
-    })
-    .catch(sweetError);
-}
+// function removeType(id) {
+//   return sweetQuestion(`确定要执行当前操作？`)
+//     .then(() => {
+//       return nkcAPI(`/e/settings/complaintType?id=${id}`, 'DELETE')
+//     })
+//     .then(() => {
+//       sweetSuccess('删除成功');
+//     })
+//     .catch(sweetError);
+// }
 
 
 
 Object.assign(window, {
   addType,
-  removeType
 });
 
 var app = new Vue({
   el: '#app',
   data: {
-    type:""
+    type:data.complaintTypes || []
+
   },
   mounted () {
     this.getList();
+    console.log(this.type);
   },
   methods: {
+    timeFormat(time) {
+      var fixTime = function(number) {
+        return number < 10? '0' + number: number;
+      }
+      time = new Date(time);
+      var year = time.getFullYear();
+      var month = fixTime(time.getMonth() + 1);
+      var day = fixTime(time.getDate());
+      var hour = fixTime(time.getHours());
+      var minute = fixTime(time.getMinutes());
+      var second = fixTime(time.getSeconds());
+      return year + '/' + month + '/' + day + ' ' + hour + ':' + minute + ':' + second;
+    },
+    viewDes(val){
+      if(val){
+      return asyncSweetCustom("<p style='font-weight: normal;'>类型说明: <span style='color:#337ab7'>"+ val +"</span></p>")
+    }else {
+      return asyncSweetCustom("<p style='font-weight: normal;'>未添加类型说明</p>")
+    }
+    },
+    initiate(_id, disabled){
+      sweetQuestion(`确定要执行当前操作？`)
+      .then(() => {
+        nkcAPI('/e/settings/complaintType', 'put', {
+          operation: "modifyDisabled",
+          _id,
+          disabled: !!disabled
+        }).then(()=>{
+          sweetSuccess('启用成功');
+        }).catch((err)=>{
+          sweetError('启用失败');
+        });
+      })
+      .catch(sweetError);
+    },
+    forbidden(_id, disabled){
+      sweetQuestion(`确定要执行当前操作？`)
+      .then(() => {
+        nkcAPI('/e/settings/complaintType', 'put', {
+          operation: "modifyDisabled",
+          _id,
+          disabled: !!disabled
+        }).then(()=>{
+          sweetSuccess('禁用成功');
+        }).catch((err)=>{
+          sweetError('禁用失败');
+        });
+      })
+      .catch(sweetError);
+    },
+    edit(val){
+      var oldType=val.type;
+      var oldDes=val.description;
+      commonModal.open(data => {
+        let type = data[0].value;
+        let description = data[1].value.trim();
+        return Promise.resolve()
+          .then(() => {
+            if(!type.length) throw new Error('投诉类型不能为空');
+            return nkcAPI('/e/settings/complaintType', 'put', {
+              operation: "modifyEdit",
+              _id:val._id,
+              type,
+              description
+            });
+          })
+          .then(() => {
+            commonModal.close();
+            sweetSuccess('修改成功');
+          })
+          .catch(sweetError);
+      }, {
+        title: '修改投诉类型',
+        data: [
+          {
+            dom: 'input',
+            label: '请填写投诉类型',
+            value: oldType,
+            rows: 1
+          },
+          {
+            dom: 'textarea',
+            label: '请填写类型说明',
+            value: oldDes,
+            rows: 3
+          }
+        ]
+      })
+    },
     getList: function() {
       nkcAPI('/e/settings/complaintType', 'get', {
       })

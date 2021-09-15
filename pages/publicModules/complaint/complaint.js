@@ -9,7 +9,7 @@
 var moduleComplaint = new Vue({
   el: "#moduleComplaint",
   data: {
-    reasonType: "",
+    reasonTypeId: "",
     reasonDescription: "",
     submitted: false,
     type: "",
@@ -40,8 +40,10 @@ var moduleComplaint = new Vue({
           for(var i in data.complaintTypes) {
             if(!data.complaintTypes.hasOwnProperty(i)) continue;
             reasons.push({
-              type:data.complaintTypes[i].description,
-              description:data.complaintTypes[i].type,
+              _id:data.complaintTypes[i]._id,
+              type:data.complaintTypes[i].type,
+              disabled:data.complaintTypes[i].disabled,
+              description:data.complaintTypes[i].description,
             })
           }
           _this.reasons = reasons;
@@ -50,7 +52,7 @@ var moduleComplaint = new Vue({
         })
     },
     selectReason: function(r) {
-      this.reasonType = r.type;
+      this.reasonTypeId = r._id;
     },
     hide: function() {
       $("#moduleComplaint").hide();
@@ -61,7 +63,7 @@ var moduleComplaint = new Vue({
       $("#moduleComplaint").show();
       this.submitted = false;
       this.reasonDescription = "";
-      this.reasonType = "";
+      this.reasonTypeId = "";
       stopBodyScroll(true);
     },
     open: function(type, id) {
@@ -74,7 +76,7 @@ var moduleComplaint = new Vue({
       nkcAPI("/complaint", "POST", {
         type: this.type,
         id: this.id,
-        reasonType: this.reasonType,
+        reasonTypeId: this.reasonTypeId,
         reasonDescription: this.reasonDescription
       })
         .then(function() {

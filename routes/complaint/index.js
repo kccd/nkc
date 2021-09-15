@@ -29,7 +29,7 @@ router
       } else {
         c.type_ = "文章"
       }
-      c.reasonType_ = ctx.state.lang("complaintTypes", c.reasonType);
+      c.reasonTypeId_ = ctx.state.lang("complaintTypes", c.reasonTypeId);
     });
     data.paging = paging;
     ctx.template = "complaint/complaints.pug";
@@ -45,17 +45,17 @@ router
       }
     });
     if(complaintCount >= 50) ctx.throw(400, "你今天的发起的投诉实在是太多啦~");
-    const {type, id, reasonType, reasonDescription} = body;
+    const {type, id, reasonTypeId, reasonDescription} = body;
     if(!id) ctx.throw(400, "出现了一个错误，因为服务器不明白投诉内容的ID是什么~");
     if(!type) ctx.throw(500, "出现了一个错误，因为服务器不明白投诉的类型~");
-    if(!reasonType) ctx.throw(400, "请选择投诉类型");
+    if(!reasonTypeId) ctx.throw(400, "请选择投诉类型");
     if(tools.checkString.contentLength(reasonDescription) > 500) ctx.throw(400, "投诉原因太长了，请精简一下~");
     await db.ComplaintModel({
       _id: await db.SettingModel.operateSystemID("complaints", 1),
       uid: user.uid,
       type,
       reasonDescription,
-      reasonType,
+      reasonTypeId,
       contentId: id
     }).save();
     await next();

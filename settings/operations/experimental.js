@@ -11,7 +11,7 @@ module.exports = {
 		complaintType:{
 			GET:"experimentalcomplaintTypeSettings",
 			POST:"experimentalcomplaintTypeSettings",
-			DELETE:"experimentalcomplaintTypeSettings"
+			PUT:"experimentalcomplaintTypeSettings"
 		},
 	  ip: {
 	    GET: 'experimentalIPSettings',

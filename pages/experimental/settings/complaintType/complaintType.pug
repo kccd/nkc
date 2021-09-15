@@ -1,6 +1,11 @@
 extends ../../experimental
 block eTitle
   title 添加投诉类型
+  style.
+    .hander{
+      cursor:pointer;
+      color:#337ab7;
+    }
 block eContent
   .container-fluid.max-width#app
     .row
@@ -13,21 +18,24 @@ block eContent
             thead
               tr
                 th.text-center 添加时间
-                th.text-center 投诉类型
-                th.text-center 说明
+                th.text-center 添加用户
+                th.text-center 投诉类型名称
+                th.text-center 类型说明
                 th.text-center 操作
             tbody
-              for i in data.complaintTypes
-                tr
+                tr(v-for="item in type")
+                  th.text-center {{timeFormat(item.toc)}}
+                  th.text-center 管理员
+                  th.text-center {{item.type}}
+                  th.text-center.hander(@click="viewDes(item.description)") 查看说明
                   th.text-center
-                    +timeFormat(i.toc)
-                  th.text-center=i.type
-                    
-                  th.text-center=i.description
-                  th.text-center
-                    button.btn.btn-danger.btn-xs(onclick=`removeType("${i._id}")`) 删除
+                    button(v-if='item.disabled').btn.btn-danger.btn-xs(@click="forbidden(item._id, false)") 禁用
+                    button(v-else).btn.btn-success.btn-xs(@click="initiate(item._id, true)") 启用
+                    button.btn.btn-warning.btn-xs(@click="edit(item)") 编辑
         if data.complaintTypes.length === 0
           .p-t-05.p-b-05.text-center 空空如也~
+  #data.hidden= JSON.stringify({type: data.complaintTypes})
+
 block scripts
   include ../../../publicModules/commonModal/commonModal
   +includeJS('/experimental/settings/complaintType/complaintType.js')

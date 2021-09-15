@@ -9,7 +9,7 @@ router
   })
   .post('/', async (ctx, next) => {
     const {state, db, body, nkcModules} = ctx;
-    let {type,description} = body;
+    let {type, description, disabled, _id, uid} = body;
     const {checkString} = nkcModules.checkData;
     checkString(description, {
       name: '说明',
@@ -18,25 +18,39 @@ router
     });
     const now = new Date();
     const oldComs = await db.ComplaintTypeModel.find({type: {$in: type}}, {_id: 1});
-    const olddescs = await db.ComplaintTypeModel.find({description: {$in: description}}, {_id: 1});
     if(oldComs.length !== 0) {
       ctx.throw(400, `类型 「${type}」 已存在`);
-    }
-    if(olddescs.length !== 0) {
-      ctx.throw(400, `说明 「${description}」 已存在`);
     }
     await db.ComplaintTypeModel.insertCom({
       toc: now,
       uid: state.uid,
       type,
-      description
+      description,
+      disabled
     });
     await next();
   })
-  .del('/', async (ctx, next) => {
-    const {query, db, data} = ctx;
-    const {id} = query;
-    await db.ComplaintTypeModel.deleteOne({_id: id});
-    await next();
-  });
+  .put('/', async (ctx, next) => {
+    console.log("111111111111111111111");
+     const {state, db, body, nkcModules} = ctx;
+     let {type, description, disabled, _id, uid, operation} = body;
+     const id = await db.ComplaintTypeModel.findOne({_id});
+		if(!id) ctx.throw(400, "未找到相关数据，请刷新页面后重试");
+		if(operation === "modifyDisabled") {
+			await id.updateOne({
+				disabled: !!disabled
+			});
+		} else if(operation === "modifyEdit") {
+			if(!!type) {
+				await id.updateOne({description: description, type: type});
+			}
+		} 
+    })
+
+  // .del('/', async (ctx, next) => {
+  //   const {query, db, data} = ctx;
+  //   const {id} = query;
+  //   await db.ComplaintTypeModel.deleteOne({_id: id});
+  //   await next();
+  // });
 module.exports = router;
