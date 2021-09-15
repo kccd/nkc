@@ -22,6 +22,7 @@ const run = async () => {
   jobs.clearVerificationData();
   // 以下任务定时执行
   await timedTasks.cacheActiveUsers();
+  await timedTasks.cacheNewUsers();
   await timedTasks.clearTimeoutPageCache();
   await timedTasks.updateRecommendThreads();
   await timedTasks.updateHomeHotColumns();

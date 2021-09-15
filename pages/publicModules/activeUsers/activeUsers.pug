@@ -1,0 +1,26 @@
+if !isIncluded('activeUsers')
+  +includeCSS('/publicModules/activeUsers/activeUsers.css')
+  mixin activeUsersSmall(users, name)
+    .active-users.active-users-small.m-b-1
+      .panel-header=name || '最近活跃用户'
+      div
+        for u in users
+          .active-user-avatar(data-float-uid=u.uid)
+            a(href=`/u/${u.uid}` target="_blank")
+              img(src=tools.getUrl('userAvatar', u.avatar))
+
+  mixin activeUsers(users, name)
+    .m-b-1
+      .panel-header=name || '最近活跃用户'
+      .active-users
+        for u in users
+          a(href=`/u/${u.uid}` data-float-uid=u.uid target="_blank").active-user
+            .active-user-avatar
+              img(src=tools.getUrl("userAvatar", u.avatar))
+            .active-user-name=u.username
+
+
+  mixin newUsersSmall(users)
+    +activeUsersSmall(users, '新同学')
+  mixin newUsers(users)
+    +activeUsers(users, '新同学')

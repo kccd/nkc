@@ -445,15 +445,9 @@ block content
                     a(href=`/f/${thread.forums[0].fid}` target="_blank" data-float-fid=thread.forums[0].fid).home-thread-forum=thread.forums[0].displayName
 
         //- 活跃用户
-        .home-forums-other.m-b-1
-          .panel-header 活跃用户
-            //.header-description 关注最新学科，足不出户便能游遍世界~
-          .home-users
-            for u in data.activeUsers
-              a(href=`/u/${u.uid}` data-float-uid=u.uid target="_blank").home-user
-                .home-user-avatar
-                  img(src=tools.getUrl("userAvatar", u.avatar))
-                .home-user-name=u.username
+        include ../publicModules/activeUsers/activeUsers
+        +newUsers(data.newUsers)
+
 block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatForumPanel/floatForumPanel

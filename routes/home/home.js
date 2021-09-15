@@ -56,7 +56,9 @@ module.exports = async (options) => {
   // 置顶专栏
   data.toppedColumns = await db.ColumnModel.getHomeToppedColumns();
   // 一周活跃用户
-  data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
+  // data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
+  // 新用户
+  data.newUsers = await db.ActiveUserModel.getNewUsersFromCache();
   // 热销商品
   data.showShopGoods = homeSettings.showShopGoods;
   data.goodsForums = await db.ForumModel.find({kindName: "shop"});

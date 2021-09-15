@@ -121,7 +121,9 @@ router
 
     data.noticeThreads = await db.ThreadModel.getNotice(fidOfCanGetThreads);
     // 一周活跃用户
-    data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
+    // data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
+    // 新用户
+    data.newUsers = await db.ActiveUserModel.getNewUsersFromCache();
     // 全站精选
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
 

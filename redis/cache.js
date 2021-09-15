@@ -19,6 +19,8 @@ module.exports = async () => {
   await db.RoleModel.saveRolesToRedis();
   // 一周活跃用户
   await db.ActiveUserModel.saveActiveUsersToCache();
+  // 最新注册用户
+  await db.ActiveUserModel.saveNewUsersToCache();
   // 专业分类
   await db.ForumCategoryModel.saveCategoryToRedis();
   // 专业最新文章

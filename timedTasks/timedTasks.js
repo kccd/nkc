@@ -15,7 +15,20 @@ func.cacheActiveUsers = async () => {
     }
   }, 10 * 60 * 1000);
 };
-
+/*
+* 定时更新最新注册用户
+* */
+func.cacheNewUsers = async () => {
+  setTimeout(async () => {
+    try{
+      await tasks.saveNewUsersToCache();
+    } catch(err) {
+      console.log(err);
+    } finally {
+      await func.cacheNewUsers();
+    }
+  }, 10 * 60 * 1000);
+};
 func.clearTimeoutPageCache = async () => {
   setTimeout(async () => {
     try{
