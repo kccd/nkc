@@ -266,7 +266,7 @@ class ForumSelector extends NKC.modules.DraggablePanel {
     })
   }
   open(props, options) {
-    this.app.open(props, options);
+          this.app.open(props, options);
   }
 }
 NKC.modules.ForumSelector = ForumSelector;

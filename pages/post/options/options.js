@@ -271,9 +271,16 @@ window.PostOption = new Vue({
         window.commentControl = new NKC.modules.CommentControl();
       }
       window.commentControl.open(pid);
+    },
+    complaintSelector(){
+      var self = this;
+        if(!window.complaintSelector)
+          window.complaintSelector = new NKC.modules.ComplaintSelector();
+        complaintSelector.open()
     }
   }
 });
+
 
 NKC.methods.initPostOption = () => {
   const options = $('[data-type="postOption"]');
