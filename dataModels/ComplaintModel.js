@@ -37,6 +37,11 @@ const schema = new Schema({
     type: String,
     default: ""
   },
+  // 投诉类型名称
+  reasonType: {
+    type: String,
+    default: ""
+  },
   // 是否处理
   resolved: {
     type: Boolean,

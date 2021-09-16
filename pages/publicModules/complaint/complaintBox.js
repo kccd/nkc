@@ -11,6 +11,7 @@ class ComplaintSelector extends NKC.modules.DraggablePanel {
         reasonTypeId: "",
         reasonDescription: "",
         submitted: false,
+        reasonType: "",
         type: "",
         id: "",
         reasons: []
@@ -36,7 +37,7 @@ class ComplaintSelector extends NKC.modules.DraggablePanel {
         },
         getList() {
           var _this=this
-              nkcAPI('/e/settings/complaintType', 'get', {
+              nkcAPI('/complaint', 'get', {
           })
             .then(function(data) {
               var reasons = [];
@@ -57,6 +58,7 @@ class ComplaintSelector extends NKC.modules.DraggablePanel {
         },
         selectReason(r) {
           this.reasonTypeId = r._id;
+          this.reasonType = r.type;
         },
         hide() {
           $("#moduleComplaint").hide();
@@ -82,6 +84,7 @@ class ComplaintSelector extends NKC.modules.DraggablePanel {
             type: this.type,
             id: this.id,
             reasonTypeId: this.reasonTypeId,
+            reasonType: this.reasonType,
             reasonDescription: this.reasonDescription
           })
             .then(function() {

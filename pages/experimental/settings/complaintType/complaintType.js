@@ -56,12 +56,10 @@ Object.assign(window, {
 var app = new Vue({
   el: '#app',
   data: {
-    type:data.complaintTypes || []
-
+    type:data.complaintTypes || [],
   },
   mounted () {
     this.getList();
-    console.log(this.type);
   },
   methods: {
     timeFormat(time) {

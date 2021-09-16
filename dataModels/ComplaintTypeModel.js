@@ -14,7 +14,7 @@ const schema = new Schema({
   },
   uid: {
     type: String,
-    required: true,
+    default: '',
     index: 1,
   },
   //添加时间
@@ -50,6 +50,21 @@ schema.statics.insertCom = async (props) => {
     disabled
   }).save();
 };
+
+// schema.statics.defaultCom = async (props) => {
+//   const SettingModel = mongoose.model('settings');
+//   const {uid, type, description, toc, disabled} = props;
+//   const recordId = await SettingModel.operateSystemID("complaintTypes",1);
+//   const list = mongoose.model('complaintTypes');
+//   await list({
+//     _id: recordId,
+//     uid,
+//     type,
+//     description,
+//     toc,
+//     disabled
+//   }).save();
+// };
 // schema.statics.updataCom = async (props) => {
 //   const SettingModel = mongoose.model('settings');
 //   const {_id, disabled} = props;

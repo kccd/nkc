@@ -1,6 +1,13 @@
 const Router = require("koa-router");
 const router = new Router();
 router
+  // //获取投诉类型
+  // .get("/getType", async (ctx, next) => {
+  //   const {db, data}=ctx;
+  //   data.complaintTypes=await db.ComplaintTypeModel.find().sort({toc:-1})
+  //   await next();
+  // })
+  //获取投诉列表和类型
   .get("/", async (ctx, next) => {
     const {query, db, data, nkcModules} = ctx;
     const {page=0, t} = query;
@@ -17,6 +24,7 @@ router
       q = {}
     }
     data.t = t;
+    data.complaintTypes=await db.ComplaintTypeModel.find({"disabled": true}).sort({toc:1})
     const count = await db.ComplaintModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const complaints = await db.ComplaintModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
@@ -45,7 +53,7 @@ router
       }
     });
     if(complaintCount >= 50) ctx.throw(400, "你今天的发起的投诉实在是太多啦~");
-    const {type, id, reasonTypeId, reasonDescription} = body;
+    const {type, id, reasonTypeId, reasonDescription, reasonType} = body;
     if(!id) ctx.throw(400, "出现了一个错误，因为服务器不明白投诉内容的ID是什么~");
     if(!type) ctx.throw(500, "出现了一个错误，因为服务器不明白投诉的类型~");
     if(!reasonTypeId) ctx.throw(400, "请选择投诉类型");
@@ -56,6 +64,7 @@ router
       type,
       reasonDescription,
       reasonTypeId,
+      reasonType,
       contentId: id
     }).save();
     await next();
