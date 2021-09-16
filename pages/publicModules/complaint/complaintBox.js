@@ -21,10 +21,12 @@ class ComplaintSelector extends NKC.modules.DraggablePanel {
       },
       methods: {
         getUrl: NKC.methods.tools.getUrl,
-        open(callback, options = {}) {
-          self.callback = callback;
-          // this.type = type;
-          // this.id = id;
+        open(type, id) {
+          this.submitted = false;
+          this.reasonTypeId = "";
+          this.reasonDescription = "";
+          this.type = type;
+          this.id = id;
           this.getList();
           self.showPanel();
           this.loading = false;
@@ -48,7 +50,6 @@ class ComplaintSelector extends NKC.modules.DraggablePanel {
                 })
               }
               _this.reasons = reasons;
-              debugger
           console.log(this.reasons);
         })
             .catch(function(data) {
@@ -76,6 +77,7 @@ class ComplaintSelector extends NKC.modules.DraggablePanel {
         //   this.getList();
         // },
         submit() {
+          var _this = this;
           nkcAPI("/complaint", "POST", {
             type: this.type,
             id: this.id,
@@ -83,7 +85,7 @@ class ComplaintSelector extends NKC.modules.DraggablePanel {
             reasonDescription: this.reasonDescription
           })
             .then(function() {
-              moduleComplaint.submitted = true;
+              _this.submitted = true;
             })
             .catch(function(data) {
               screenTopWarning(data);
@@ -92,8 +94,8 @@ class ComplaintSelector extends NKC.modules.DraggablePanel {
       }
     })
   }
-  open(props, options) {
-    this.app.open(props, options);
+  open(type, id) {
+    this.app.open(type, id);
   }
 }
 NKC.modules.ComplaintSelector = ComplaintSelector;
