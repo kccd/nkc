@@ -13,7 +13,7 @@ include ../draggablePanel/draggablePanel
             .complaint-body(v-if="!submitted")
               h5 请选择违规类型：
               div
-                span(v-if="reason.disabled" title="").complaint-reason(
+                span(v-if="reason.disabled" :title="reason.description").complaint-reason(
                   v-for="reason in reasons"
                   :class="{'active': reasonTypeId===reason._id}"
                   @click="selectReason(reason)"
