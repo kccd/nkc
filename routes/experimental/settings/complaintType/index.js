@@ -36,7 +36,7 @@ router
      const id = await db.ComplaintTypeModel.findOne({_id});
 		if(!id) ctx.throw(400, "未找到相关数据，请刷新页面后重试");
     const oldComs = await db.ComplaintTypeModel.find({type: {$in: type}}, {_id: 1});
-    if(oldComs.length !== 0) {
+    if(oldComs.length > 1) {
       ctx.throw(400, `类型 「${type}」 已存在`);
     }
 		if(operation === "modifyDisabled") {
