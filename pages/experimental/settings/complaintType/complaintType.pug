@@ -25,7 +25,7 @@ block eContent
             tbody
                 tr(v-for="item in type")
                   th.text-center {{timeFormat(item.toc)}}
-                  th.text-center 管理员
+                  th.text-center {{item.uid?"管理员"+item.uid:"默认管理员"}}
                   th.text-center {{item.type}}
                   th.text-center.hander(@click="viewDes(item.description)") 查看说明
                   th.text-center
