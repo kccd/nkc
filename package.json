@@ -5,10 +5,12 @@
   "homepage": "https://kechuang.org",
   "private": true,
   "scripts": {
+    "install": "node install.js",
+    "reinstall": "node install.js -r",
     "start": "cross-env NODE_ENV=production node server.js ",
     "serve": "node ./server.js",
     "test": "mocha -t 10000",
-    "watch-node": "nodemon --ignore resources/ --ignore tmp/ --ignore scripts/ --ignore node_modules/ --ignore pages/ --ignore dist/ --ignore lib/ --delay 1000ms server.js",
+    "watch-node": "nodemon server.js",
     "watch-pages": "npm run build-pages -- -w",
     "watch": "concurrently -p \"[{name}]\" -n \"node,pages\" -c \"green,cyan\" \"npm run watch-node\" \"npm run watch-pages\"",
     "build-pages": "webpack",
@@ -26,6 +28,20 @@
   ],
   "author": "nkc",
   "license": "ISC",
+  "nodemonConfig": {
+    "delay": 1000,
+    "ignore": [
+      "node_modules",
+      "resources",
+      "tmp",
+      "scripts",
+      "pages",
+      "dist",
+      "lib",
+      "public",
+      "test"
+    ]
+  },
   "dependencies": {
     "@alicloud/pop-core": "^1.7.9",
     "@babel/runtime": "^7.14.6",

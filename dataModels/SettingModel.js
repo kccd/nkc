@@ -701,14 +701,15 @@ settingSchema.statics.getWatermarkInfoByUid = async (uid) => {
 * @param {Date} toc 内容发表时间
 * @param {[String]} userRolesId 用户拥有的证书
 * @param {[Number]} userGradeId 用户的等级
+* @param {Boolean} isAuthor 是否为内容作者
 * @author pengxiguaa 2021-4-26
 * */
-settingSchema.statics.restrictAccess = async (toc, userRolesId, userGradeId) => {
+settingSchema.statics.restrictAccess = async (toc, userRolesId, userGradeId, isAuthor = false) => {
   const throwError = require('../nkcModules/throwError');
   const nkcRender = require('../nkcModules/nkcRender');
   const SettingModel = mongoose.model('settings');
   const threadSettings = await SettingModel.getSettings('thread');
-  const {status, errorInfo, time, rolesId, gradesId} = threadSettings.disablePost;
+  const {status, errorInfo, time, rolesId, gradesId, allowAuthor} = threadSettings.disablePost;
   if(!status) return; // 未开启
   const settingTime = new Date(`${time} 00:00:00`).getTime();
   const inputTime = toc.getTime();
@@ -716,6 +717,7 @@ settingSchema.statics.restrictAccess = async (toc, userRolesId, userGradeId) => 
   if(gradesId.includes(userGradeId)) return;
   const existRolesId = userRolesId.filter(userRoleId => rolesId.includes(userRoleId));
   if(existRolesId.length > 0) return;
+  if(isAuthor && allowAuthor) return;
   throwError(451, {errorInfo: nkcRender.plainEscape(errorInfo), errorStatus: '451 Unavailable For Legal Reasons'}, 'simpleErrorPage');
 }
 
