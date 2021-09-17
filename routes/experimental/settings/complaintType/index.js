@@ -36,18 +36,21 @@ router
      const id = await db.ComplaintTypeModel.findOne({_id});
 		if(!id) ctx.throw(400, "未找到相关数据，请刷新页面后重试");
     const oldComs = await db.ComplaintTypeModel.find({type: {$in: type}}, {_id: 1});
-    if(oldComs.length >= 1) {
-      ctx.throw(400, `类型 「${type}」 已存在`);
+    if(oldComs.length = 1) {
+      if(operation === "modifyDisabled") {
+        await id.updateOne({
+          disabled: !!disabled
+        });
+      } else if(operation === "modifyEdit") {
+        if(!!type) {
+          await id.updateOne({description: description, type: type});
+        }
+      } 
+    }else if(oldComs.length = 0){
+      ctx.throw(400, `类型 「${type}」 不存在`);
+    }else {
+      ctx.throw(400, `类型 「${type}」 存在多个，请联系管理员`);
     }
-		if(operation === "modifyDisabled") {
-			await id.updateOne({
-				disabled: !!disabled
-			});
-		} else if(operation === "modifyEdit") {
-			if(!!type) {
-				await id.updateOne({description: description, type: type});
-			}
-		} 
     })
 
   // .del('/', async (ctx, next) => {
