@@ -89,7 +89,9 @@ const vm = new Vue({
 			form.append("video", videoInputFile);
 			form.append("code", videoCode);
 			try {
-				await nkcUploadFile("verify/verify3_form", "POST", form);
+				await nkcUploadFile("verify/verify3_form", "POST", form).then(()=>{
+					return sweetSuccess("提交成功，请等待审核！");
+				});
 			} catch (error) {
 				return sweetError(error);
 			}

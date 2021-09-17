@@ -56,9 +56,10 @@ verifyRouter
     if(await userPersonal.getAuthLevel() < 2) {
 			ctx.throw("身份认证1、2、3需要按顺序依次通过认证，请先完成身份认证2");
 		}
+    // 获取视频文件的后缀名
     const ext = path.extname(file.name);
-    if(ext !== ".mp4") {
-      return ctx.throw(400, '视频格式只能为.mp4');
+    if(![".mp4" , ".mov" , ".3gp" , ".avi"].includes(ext)) {
+      return ctx.throw(400, '视频格式只能为.mp4, .mov, .3gp, .avi 您上传的格式为'+ext);
     }
     if(file.size > 314572800 /* 300 *1024 *1024 */) ctx.throw(400, "视频大小不能超过300M！");
     await userPersonal.generateAuthenticateVerify3(file, code);

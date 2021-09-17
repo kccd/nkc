@@ -76,12 +76,12 @@ block content
                   video(:src="video" controls v-if="videoInputFile || (authenticate.video.attachments.length && ['in_review', 'passed', 'fail'].includes(authenticate.video.status))")
                 br
                 div(v-if="authenticate.video.status === 'unsubmit'")
-                  input.hidden(type='file' accept="video/mp4" ref="videoInput" @change="videoInputFile = $event.target.files[0]")
+                  input.hidden(type='file' accept="video/mp4,video/mov,video/3gp,video/avi" ref="videoInput" @change="videoInputFile = $event.target.files[0]")
                   button.btn.btn-primary#pickVerify3Video(@click="$refs.videoInput.click()") 选择视频
                   button.btn.btn-primary#submiteAuth(@click="submiteVerify3()") 提交审核
                 p.verify--passed(v-if="authenticate.video.status === 'passed'") 已认证
                 div(v-if="authenticate.video.status === 'fail'")
-                  input.hidden(type='file' accept="video/mp4" ref="videoInput" @change="videoInputFile = $event.target.files[0]")
+                  input.hidden(type='file' accept="video/mp4,video/mov,video/3gp,video/avi" ref="videoInput" @change="videoInputFile = $event.target.files[0]")
                   p.verify--fail 认证失败
                   p
                     span 原因：
