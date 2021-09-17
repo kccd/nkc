@@ -1935,7 +1935,7 @@ span.thread-title-page{
 
 .forum-block{
   width: 100%;
-  margin: 0.5rem 0;
+  margin: 0 0;
   display: block;
   overflow: hidden;
   position: relative;
@@ -1989,6 +1989,11 @@ span.thread-title-page{
   vertical-align: top;
   transition: color 100ms;
 }
+.forum-inline-name{
+  display: inline;
+  padding: 0;
+  margin-right: 0.5rem;
+}
 .forum-block-name.child{
   font-size: 1.2rem;
   font-style: normal;
@@ -2001,7 +2006,7 @@ span.thread-title-page{
 }
 .forum-block-name.parent{
   font-size: 1.25rem;
-  font-style: oblique;
+  //font-style: oblique;
 }
 .forum-simple{
   margin-bottom: 0.3rem;
@@ -2045,7 +2050,7 @@ span.thread-title-page{
   border-right: none;
 }
 .navbar-search{
-  width: 11rem;
+  width: 7rem;
   position: relative;
   padding-top: 6px;
 }
@@ -2073,7 +2078,7 @@ span.thread-title-page{
 }
 @media (max-width: 346px) {
   .navbar-search{
-    width: 8.8rem;
+    width: 6rem;
     /*padding-top:8px;*/
   }
   .navbar-search input{
@@ -2082,7 +2087,7 @@ span.thread-title-page{
 }
 @media (min-width: 420px) {
   .navbar-search{
-    width: 17rem;
+    width: 13rem;
     /*padding-top:8px;*/
   }
   .navbar-search input{

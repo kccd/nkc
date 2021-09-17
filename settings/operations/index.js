@@ -78,6 +78,7 @@ const attachment = require("./attachment");
 const verifications = require('./verifications');
 const payment = require('./payment');
 const link = require('./link');
+const community = require('./community');
 const operationObj = {};
 
 
@@ -269,6 +270,7 @@ operationObj.operationTree = {
 		verifications, // 图形验证码相关
 		payment, // 支付相关
 		l: link, // 外链跳转
+    c: community, // 社区
     test,
 	}
 };
