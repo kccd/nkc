@@ -18,6 +18,8 @@ block content
   .container-fluid.max-width.editor
     .row
       .col-xs-12.col-md-9.box-shadow-panel.m-b-2
+        if data.postPermission && data.postPermission.warning
+          .m-b-1.text-danger.p-a-1!=data.postPermission.warning
         div
           #notes.m-b-1.m-t-1.m-l-05.m-r-05(v-cloak)
             if data.type === "newPost"
