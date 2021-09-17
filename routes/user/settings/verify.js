@@ -34,12 +34,14 @@ verifyRouter
     const { files } = body;
     const { surfaceA, surfaceB } = files;
     const userPersonal = await db.UsersPersonalModel.findOne({ uid: user.uid });
+    //判断身份认证等级
     if(await userPersonal.getAuthLevel() < 1) {
 			ctx.throw("身份认证1、2、3需要按顺序依次通过认证，请先完成身份认证1");
 		}
     if(!surfaceA || !surfaceB) {
       return ctx.throw("请上传身份证正反面2张照片");
     }
+    //生成身份认证2
     await userPersonal.generateAuthenticateVerify2([surfaceA, surfaceB]);
     return next();
   })

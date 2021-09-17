@@ -12,6 +12,8 @@ const vm = new Vue({
 		videoInputFile: null,
 		videoCode: Math.floor(Math.random()*(9999-1000))+1000
 	},
+	mounted () {
+	},
 	computed: {
 	  verifyDescription() {
 	    let {videoCode, auth3Content = ''} = this;
