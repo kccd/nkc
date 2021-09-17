@@ -84,13 +84,14 @@ if data.visitedForums && data.visitedForums.length
     .forum-block
       .forum-block-info
         a(href=`/?t=latest`).forum-block-name 最新文章
-for fc in state.categoryForums
-  if fc.forums.length
-    .m-b-1
-      .panel-header(title=fc.description)=fc.name
-      if fc.displayStyle === 'simple'
-        +renderSimpleForums(fc.forums)
-      else
-        +renderForums(fc.forums)
+if state.categoryForums
+  for fc in state.categoryForums
+    if fc.forums.length
+      .m-b-1
+        .panel-header(title=fc.description)=fc.name
+        if fc.displayStyle === 'simple'
+          +renderSimpleForums(fc.forums)
+        else
+          +renderForums(fc.forums)
 
 

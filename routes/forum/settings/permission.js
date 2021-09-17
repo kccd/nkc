@@ -30,12 +30,17 @@ permissionRouter
       displayOnSearch, threadListStyle,
       shareLimitStatus, shareLimitCount, shareLimitTime, allowedAnonymousPost,
       moderators, subType, openReduceVisits, permission, orderBy,
-      voteUpPost
+      voteUpPost, disablePost
     } = body.forum;
     const oldModerators = forum.moderators;
     const {read, write, writePost} = permission;
     shareLimitCount = Number(shareLimitCount);
     shareLimitTime = Number(shareLimitTime);
+
+    if(!['off', 'on', 'inherit'].includes(disablePost.status)) {
+      ctx.throw(400, `文章限制状态设置错误`);
+    }
+
     if(!['inherit', 'off', 'on'].includes(shareLimitStatus)) {
       ctx.throw(400, `分享文章、回复或评论状态设置错误`);
     }
@@ -106,6 +111,14 @@ permissionRouter
           voteUpCount: voteUpPost.voteUpCount,
           postCount: voteUpPost.postCount,
           selectedPostCount: voteUpPost.selectedPostCount
+        },
+        disablePost: {
+          status: disablePost.status,
+          time: (disablePost.time || '2000-01-01').trim(),
+          errorInfo: (disablePost.errorInfo || ''),
+          rolesId: disablePost.rolesId.filter(id => rolesId.includes(id)),
+          gradesId: disablePost.gradesId.filter(id => gradesId.includes(id)),
+          allowAuthor: !!disablePost.allowAuthor
         }
       }
     });

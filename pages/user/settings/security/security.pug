@@ -73,13 +73,15 @@ block content
             .form-horizontal(v-else-if="formType === 'changeMobile'")
               .form-group
                 label.col-sm-2.control-label 旧手机验证码：
-                .col-sm-2
-                  input.form-control(type='text' placeholder='请输入验证码' v-model="oldCode")
-                  .m-t-05
-                    a(href=`/u/${data.user.uid}/settings/mobile/apply` target='_blank') 无法接收短信验证码？
-                .col-sm-5
-                  button.btn.btn-primary(@click=`sendMessage(false)` v-if="oldTime <= 0") 获取验证码
-                  button.btn.btn-primary(v-else disabled) 获取验证码({{oldTime}})
+                .col-sm-10
+                  .row
+                    .col-sm-2
+                      input.form-control(type='text' placeholder='请输入验证码' v-model="oldCode")
+                    .col-sm-5
+                      button.btn.btn-primary(@click=`sendMessage(false)` v-if="oldTime <= 0") 获取验证码
+                      button.btn.btn-primary(v-else disabled) 获取验证码({{oldTime}})
+                    .col-sm-12.m-t-05
+                      a(href=`/u/${data.user.uid}/settings/mobile/apply` target='_blank') 如果旧手机号已作废，请点击这里申诉
               .form-group
                 label.col-sm-2.control-label 新手机国际区号：
                 .col-sm-4
