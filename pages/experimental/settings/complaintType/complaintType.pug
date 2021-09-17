@@ -7,7 +7,7 @@ block eTitle
       color:#337ab7;
     }
 block eContent
-  .container-fluid.max-width#app
+  .container-fluid.max-width#app(v-cloak)
     .row
       .hidden#data= objToStr({complaintTypes: data.complaintTypes})
       .col-xs-12.col-md-8
