@@ -671,15 +671,15 @@ usersPersonalSchema.methods.generateAuthenticateVerify3 = async function(file, c
   const _id = await VerifiedUploadModel.getNewId();
   const ext = path.extname(file.name).substring(1);
   const date = new Date();
-	if(ext == "mp4"){
-		var newFile = file;
-	}else {
+	// if(ext == "mp4"){
+	// 	var newFile = file;
+	// }else {
   	const dir = await folderTools.getPath("verifiedUpload", date);
 		const targetFilePath = path.resolve(dir, `./${_id}.mp4`);
 		await ffmpeg.videoTransMP4(file.path, targetFilePath);
 		var newFile = await FILE.getFileObjectByFilePath(targetFilePath);
 		console.log(newFile)
-	};
+	// };
 	const aid = await AttachmentModel.saveVerifiedUpload({
 		_id,
 		size: newFile.size,
