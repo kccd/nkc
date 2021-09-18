@@ -666,20 +666,16 @@ usersPersonalSchema.methods.generateAuthenticateVerify3 = async function(file, c
 	}
 	// if ext = mp4 不做任何处理
 	// if ext !== mp4 转格式 
-	// nkcModules.file.getFileObjectBy
+	// nkcModules.file.getFileObjectBy获取转换格式后文件的file属性
 	const VerifiedUploadModel = mongoose.model("verifiedUpload");
   const _id = await VerifiedUploadModel.getNewId();
   const ext = path.extname(file.name).substring(1);
   const date = new Date();
-	// if(ext == "mp4"){
-	// 	var newFile = file;
-	// }else {
-  	const dir = await folderTools.getPath("verifiedUpload", date);
-		const targetFilePath = path.resolve(dir, `./${_id}.mp4`);
-		await ffmpeg.videoTransMP4(file.path, targetFilePath);
-		var newFile = await FILE.getFileObjectByFilePath(targetFilePath);
-		console.log(newFile)
-	// };
+	const dir = await folderTools.getPath("verifiedUpload", date);
+	const targetFilePath = path.resolve(dir, `./${_id}.mp4`);
+	await ffmpeg.videoTransMP4(file.path, targetFilePath);
+	var newFile = await FILE.getFileObjectByFilePath(targetFilePath);
+	console.log(newFile)
 	const aid = await AttachmentModel.saveVerifiedUpload3({
 		_id,
 		size: newFile.size,
