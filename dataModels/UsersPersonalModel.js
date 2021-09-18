@@ -680,7 +680,7 @@ usersPersonalSchema.methods.generateAuthenticateVerify3 = async function(file, c
 		var newFile = await FILE.getFileObjectByFilePath(targetFilePath);
 		console.log(newFile)
 	// };
-	const aid = await AttachmentModel.saveVerifiedUpload({
+	const aid = await AttachmentModel.saveVerifiedUpload3({
 		_id,
 		size: newFile.size,
 		hash: newFile.hash,

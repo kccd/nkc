@@ -636,7 +636,33 @@ schema.statics.saveProblemImages = async (_id, files = []) => {
  * 身份认证材料存储
  * @returns {string} 附件id
  */
-schema.statics.saveVerifiedUpload = async ({ size, hash, name, path, uid, toc, _id, ext }) => {
+ schema.statics.saveVerifiedUpload = async ({ size, hash, name, path, uid, toc }) => {
+  const VerifiedUploadModel = mongoose.model("verifiedUpload");
+  const _id = await VerifiedUploadModel.getNewId();
+  const ext = PATH.extname(name).substring(1);
+  const date = toc || new Date();
+  const attachment = VerifiedUploadModel({
+    _id,
+    toc: date,
+    size,
+    hash,
+    name,
+    ext,
+    uid,
+    type: "verifiedUpload"
+  });
+  await attachment.save();
+  const dir = await folderTools.getPath("verifiedUpload", date);
+  const savePath = PATH.join(dir, `${_id}${PATH.extname(name)}`);
+  await fs.promises.copyFile(path, savePath);
+  return _id;
+}
+
+/**
+ * 身份认证材料存储3
+ * @returns {string} 附件id
+ */
+schema.statics.saveVerifiedUpload3 = async ({ size, hash, name, path, uid, toc, _id, ext }) => {
 	const VerifiedUploadModel = mongoose.model("verifiedUpload");
   const attachment = VerifiedUploadModel({
     _id,
