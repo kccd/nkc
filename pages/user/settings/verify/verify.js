@@ -81,7 +81,9 @@ const vm = new Vue({
 			form.append("surfaceA", IDCardAInputFile);
 			form.append("surfaceB", IDCardBInputFile);
 			try {
-				await nkcUploadFile("verify/verify2_form", "POST", form);
+				await nkcUploadFile("verify/verify2_form", "POST", form).then(()=>{
+				return sweetSuccess("图片提交成功，请等待审核！");
+				});
 			} catch (error) {
 				return sweetError(error);
 			}
@@ -100,7 +102,7 @@ const vm = new Vue({
 			await nkcUploadFile("verify/verify3_form", "POST", form).then(()=>{
 			this.authenticate.video.status = "in_review";
 			this.loading = false;
-			return sweetSuccess("提交成功，请等待审核！");
+			return sweetSuccess("视频提交成功，请等待审核！");
 				});
 			} catch (error) {
 			this.loading = false;
