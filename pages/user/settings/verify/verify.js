@@ -10,7 +10,8 @@ const vm = new Vue({
 		IDCardAInputFile: null,
 		IDCardBInputFile: null,
 		videoInputFile: null,
-		videoCode: Math.floor(Math.random()*(9999-1000))+1000
+		videoCode: Math.floor(Math.random()*(9999-1000))+1000,
+		loading:false
 	},
 	mounted () {
 	},
@@ -57,6 +58,12 @@ const vm = new Vue({
 		},
 	},
 	methods: {
+		videoUpdate(file){
+			this.videoInputFile = file;
+			if(file.type != "video/mp4"){
+				return sweetSuccess("视频上传成功！只有.mp4格式的文件才能预览")
+			}
+		},
 		IDCardAInputFileChange(file) {
 			this.IDCardAInputFile = file;
 			console.log(file);
@@ -89,13 +96,16 @@ const vm = new Vue({
 			form.append("video", videoInputFile);
 			form.append("code", videoCode);
 			try {
-				await nkcUploadFile("verify/verify3_form", "POST", form).then(()=>{
-					return sweetSuccess("提交成功，请等待审核！");
+			this.loading = true;
+			await nkcUploadFile("verify/verify3_form", "POST", form).then(()=>{
+			this.authenticate.video.status = "in_review";
+			this.loading = false;
+			return sweetSuccess("提交成功，请等待审核！");
 				});
 			} catch (error) {
-				return sweetError(error);
+			this.loading = false;
+			return sweetError(error);
 			}
-			this.authenticate.video.status = "in_review";
 		}
 	}
 });
