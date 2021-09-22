@@ -318,7 +318,8 @@ const usersPersonalSchema = new Schema({
 		card: {
 			status: {
 				type: String,
-				default: "unsubmit"
+				default: "unsubmit",
+				index: 1
 			},
 			message: {
 			  type: String,
@@ -336,7 +337,8 @@ const usersPersonalSchema = new Schema({
 		video: {
 			status: {
 				type: String,
-				default: "unsubmit"
+				default: "unsubmit",
+				index: 1
 			},
 			message: {
 			  type: String,
