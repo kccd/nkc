@@ -483,7 +483,6 @@ shopGoodsSchema.statics.computeSellCount = async (productId) => {
 shopGoodsSchema.methods.updateResources = async function(resourcesId) {
   const ResourceModel = mongoose.model('resources');
   const {imgIntroductions, productId} = this;
-  console.log(this);
   if(imgIntroductions.length > 0) {
     await ResourceModel.updateMany({
       rid: {$in: imgIntroductions},
