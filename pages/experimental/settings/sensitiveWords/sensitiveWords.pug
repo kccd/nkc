@@ -68,11 +68,12 @@ block eContent
                           span.conditions-times(contenteditable="true" @focus="startEdit($event.target)" @blur="endEdit($event.target, group, 'times')") {{group.conditions.times}}
                           |次敏感词
                       th
-                        button.btn.btn-danger.btn-xs(href="javascript:void(0);" @click="deleteWordGroup(groupIndex)") 删除
-                        button.btn.btn-default.btn-xs(href="javascript:void(0);" @click="group.rename = !group.rename") {{group.rename ? "取消重命名" : "重命名"}}
-                        button.btn.btn-default.btn-xs(href="javascript:void(0);" @click="addKeyword(groupIndex)") 添加
-                        button.btn.btn-default.btn-xs(href="javascript:void(0);" @click="exportWordGroup(groupIndex)") 导出
-                        button.btn.btn-primary.btn-xs(href="javascript:void(0);" @click="applyAllForums(groupIndex)") 应用到所有专业
+                        button.m-b-05.btn.btn-default.btn-xs(@click="group.rename = !group.rename") {{group.rename ? "取消重命名" : "重命名"}}
+                        button.m-b-05.btn.btn-default.btn-xs(@click="addKeyword(groupIndex)") 添加
+                        button.m-b-05.btn.btn-default.btn-xs(@click="exportWordGroup(groupIndex)") 导出
+                        button.m-b-05.btn.btn-default.btn-xs(@click="applyAllForums(groupIndex)") 应用到所有专业
+                        button.m-b-05.btn.btn-danger.btn-xs(@click="cancelApplyAllForums(groupIndex)") 取消应用到所有专业
+                        button.m-b-05.btn.btn-danger.btn-xs(@click="deleteWordGroup(groupIndex)") 删除
                     tr(v-show="group.keywordView")
                       th(colspan="4")
                         .keyword-search
