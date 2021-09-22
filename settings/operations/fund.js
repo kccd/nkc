@@ -126,6 +126,9 @@ module.exports = {
         },
         timeout: {
 			    POST: 'timeoutFundApplicationForm'
+        },
+        withdraw: {
+          POST: 'withdrawFundApplicationForm'
         }
       },
 			/*comment: {

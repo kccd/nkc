@@ -16,6 +16,11 @@ block fundContent
             h5 收款方式：银行卡
           h5= `户名：${applicationForm.account.name}`
           h5= `收款账号：${applicationForm.account.number}`
+          if applicationForm.remittance[0].status !== true
+            .bg-danger.p-a-1.text-danger
+              button.btn.btn-sm.btn-danger(onclick=`withdrawApplicationForm(${applicationForm._id})`) 强制撤回
+              .m-t-05 强制撤回后，申请表可再次编辑，提交后可正常进入审核流程。
+
 
           hr
           h4 总共&nbsp;

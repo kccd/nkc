@@ -596,10 +596,25 @@ resourceSchema.methods.checkUserScore = async function(user) {
 * */
 resourceSchema.methods.updateForumsId = async function() {
   const PostModel = mongoose.model('posts');
+  const LibraryModel = mongoose.model('libraries');
+  const ForumModel = mongoose.model('forums');
   const posts = await PostModel.find({pid: {$in: this.references}}, {mainForumsId: 1});
   let forumsId = [];
   for(const post of posts) {
     forumsId = forumsId.concat(post.mainForumsId);
+  }
+  const files = await LibraryModel.find({
+    type: 'file',
+    rid: this.rid,
+  });
+  if(files.length > 0) {
+    const foldersId = [];
+    for(const file of files) {
+      const nav = await file.getNav();
+      foldersId.push(nav[0]);
+    }
+    const forums = await ForumModel.find({lid: {$in: foldersId}}, {fid: 1});
+    forumsId = forumsId.concat(forums.map(f => f.fid));
   }
   forumsId = [...new Set(forumsId)];
   this.forumsId = forumsId;

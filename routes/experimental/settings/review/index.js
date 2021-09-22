@@ -224,6 +224,13 @@ router
           "reviewSettings.keyword.rule.reply.useGroups": value
         }
       });
+    } else if(type === "cancelApplyAllForums") {
+      await db.ForumModel.updateMany({}, {
+        $pull: {
+          "reviewSettings.keyword.rule.thread.useGroups": value,
+          "reviewSettings.keyword.rule.reply.useGroups": value
+        }
+      });
     } else {
       ctx.throw(403, "参数不正确");
     }
