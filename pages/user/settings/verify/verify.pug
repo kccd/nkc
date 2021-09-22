@@ -78,7 +78,8 @@ block content
                 div(v-if="authenticate.video.status === 'unsubmit'")
                   input.hidden(type='file' accept="video/mp4,video/mov,video/3gp,video/avi" ref="videoInput" @change="videoUpdate($event.target.files[0])")
                   button.btn.btn-primary#pickVerify3Video(@click="$refs.videoInput.click()" :disabled="loading") 选择视频
-                  button.btn.btn-primary#submiteAuth(@click="submiteVerify3()" :disabled="loading") 提交审核
+                  button.btn.btn-primary#submiteAuth(v-if="loading" :disabled="loading") 提交中...
+                  button.btn.btn-primary#submiteAuth(@click="submiteVerify3()" v-else :disabled="loading") 提交审核
                 p.verify--passed(v-if="authenticate.video.status === 'passed'") 已认证
                 div(v-if="authenticate.video.status === 'fail'")
                   input.hidden(type='file' accept="video/mp4,video/mov,video/3gp,video/avi" ref="videoInput" @change="videoUpdate($event.target.files[0])")
@@ -87,7 +88,8 @@ block content
                     span 原因：
                     span.text-danger {{authenticate.video.message}}
                   button.btn.btn-primary#pickVerify3Video(@click="$refs.videoInput.click()" :disabled="loading") 选择视频
-                  button.btn.btn-primary#submiteAuth(@click="submiteVerify3()" :disabled="loading") 提交审核
+                  button.btn.btn-primary#submiteAuth(v-if="loading" :disabled="loading") 提交中...
+                  button.btn.btn-primary#submiteAuth(@click="submiteVerify3()" v-else :disabled="loading") 提交审核
                 div(v-if="authenticate.video.status === 'in_review'")
                   button.btn.btn-primary#submiteAuth(disabled) 审核中
 
