@@ -435,6 +435,13 @@ module.exports = {
             ],
           type: 'violation',
           content: '你的文章[url=threadUrl(threadTitle)]由于[text=reason]的原因违规。'
+        },
+        {
+            parameters: [
+                'threadTitle'
+            ],
+          type: '项目结题超时提醒',
+          content: '你的基金申请[url=threadUrl(threadTitle)]已经超过规定的项目周期。'
         }
     ]
 };
