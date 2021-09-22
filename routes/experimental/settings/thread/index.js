@@ -58,6 +58,7 @@ router
           errorInfo: (disablePost.errorInfo || ''),
           rolesId: disablePostRoles.map(r => r._id),
           gradesId: disablePostGrades.map(g => g._id),
+          allowAuthor: !!disablePost.allowAuthor
         },
         "c.offsiteLink": {
           confirm

@@ -701,22 +701,45 @@ settingSchema.statics.getWatermarkInfoByUid = async (uid) => {
 * @param {Date} toc 内容发表时间
 * @param {[String]} userRolesId 用户拥有的证书
 * @param {[Number]} userGradeId 用户的等级
+* @param {Boolean} isAuthor 是否为内容作者
 * @author pengxiguaa 2021-4-26
 * */
-settingSchema.statics.restrictAccess = async (toc, userRolesId, userGradeId) => {
+settingSchema.statics.restrictAccess = async (props) => {
+  const {
+    toc,
+    isAuthor = false,
+    forums = [],
+    userRolesId,
+    userGradeId,
+  } = props;
   const throwError = require('../nkcModules/throwError');
   const nkcRender = require('../nkcModules/nkcRender');
   const SettingModel = mongoose.model('settings');
   const threadSettings = await SettingModel.getSettings('thread');
-  const {status, errorInfo, time, rolesId, gradesId} = threadSettings.disablePost;
-  if(!status) return; // 未开启
-  const settingTime = new Date(`${time} 00:00:00`).getTime();
-  const inputTime = toc.getTime();
-  if(inputTime >= settingTime) return;
-  if(gradesId.includes(userGradeId)) return;
-  const existRolesId = userRolesId.filter(userRoleId => rolesId.includes(userRoleId));
-  if(existRolesId.length > 0) return;
-  throwError(451, {errorInfo: nkcRender.plainEscape(errorInfo), errorStatus: '451 Unavailable For Legal Reasons'}, 'simpleErrorPage');
+  const disablePostData = [];
+  if(forums.length === 0) {
+    disablePostData.push(threadSettings.disablePost);
+  }
+  for(const forum of forums) {
+    const {status} = forum.disablePost;
+    const disablePost = status === 'inherit'? threadSettings.disablePost: forum.disablePost;
+    if(!disablePostData.includes(disablePost)) {
+      disablePostData.push(disablePost);
+    }
+  }
+
+  for(const disablePost of disablePostData) {
+    const {status, errorInfo, time, rolesId, gradesId, allowAuthor} = disablePost;
+    if(status === false || status === 'off') continue; // 未开启
+    const settingTime = new Date(`${time} 00:00:00`).getTime();
+    const inputTime = toc.getTime();
+    if(inputTime >= settingTime) continue;
+    if(gradesId.includes(userGradeId)) continue;
+    const existRolesId = userRolesId.filter(userRoleId => rolesId.includes(userRoleId));
+    if(existRolesId.length > 0) continue;
+    if(isAuthor && allowAuthor) continue;
+    throwError(451, {errorInfo: nkcRender.plainEscape(errorInfo), errorStatus: '451 Unavailable For Legal Reasons'}, 'simpleErrorPage');
+  }
 }
 
 module.exports = mongoose.model('settings', settingSchema);

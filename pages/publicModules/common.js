@@ -663,6 +663,63 @@ NKC.methods.addXsfDataMessage = function(content) {
   return parser.innerHTML;
 };
 
+// 将指定 dom 中的文本节点中链接替换为 a 标签
+// 输入空格或换行识别链接的代码在 /public/ueditor/ueditor.all.js 的 17905 行
+NKC.methods.replaceDomTextUrl = function(dom) {
+  if(dom.tagName.toLowerCase() === 'a') return;
+  for(let i = 0; i < dom.childNodes.length; i++) {
+    const node = dom.childNodes[i];
+    if(node.nodeType === 1) {
+      NKC.methods.replaceDomTextUrl(node);
+    } else {
+      NKC.methods.replaceTextNodeUrl(node);
+    }
+  }
+};
+// 将文本节点中链接替换为 a 标签
+NKC.methods.replaceTextNodeUrl = function(textNode) {
+  const urlReg = /(https?:\/\/)?([-0-9a-zA-Z]{1,256}\.)+([a-zA-Z]{2,6})\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/i;
+  const parentNode = textNode.parentNode;
+
+  const findAElement = function(node, tagName) {
+    if(!node) {
+      return false;
+    } else if(node.tagName && node.tagName.toLocaleString() === tagName) {
+      return true;
+    } else {
+      return findAElement(node.parentNode)
+    }
+  };
+
+  const matchUrl = function(node) {
+    const textContent = node.textContent;
+    var result = textContent.match(urlReg);
+    if(result === null) return;
+    var url = result[0];
+    var domText = url;
+    var index = result.index;
+
+    var targetNode = node.splitText(index);
+    var nextNode;
+    if(targetNode.length > url.length) {
+      nextNode = targetNode.splitText(url.length);
+    }
+    var urlDom = document.createElement('a');
+    if(!/^https?:\/\//ig.test(url)) {
+      url = 'http://' + url;
+    }
+    urlDom.setAttribute('href', url);
+    urlDom.setAttribute('data-text', domText);
+    urlDom.innerText = domText;
+    parentNode.replaceChild(urlDom, targetNode);
+    if(nextNode) {
+      matchUrl(nextNode);
+    }
+  }
+
+  matchUrl(textNode);
+}
+
 /**
  * ueditor设置内容和获取内容
  */
@@ -685,6 +742,8 @@ NKC.methods.ueditor = {
       "background-color": "",
       "border-bottom": ""
     }).removeClass("nkc-hl");
+    // 将文本节点中的链接替换成 a 标签
+    NKC.methods.replaceDomTextUrl(html[0]);
     html = html.html();
     return html;
   }
