@@ -312,6 +312,7 @@ shelfRouter
         await db.ShopProductsParamModel(param).save();
       }
       await product.save();
+      await product.updateResources(imgIntroductions);
       if(productStatus === "insale") {
         await product.onshelf();
       }
@@ -319,8 +320,6 @@ shelfRouter
       // 修改已上架的商品
       await product.updateOne({
         purchaseLimitCount,
-        imgIntroductions,
-        imgMaster,
         stockCostMethod,
         uploadCert,
         uploadCertDescription,
@@ -330,6 +329,7 @@ shelfRouter
         vipDisGroup,
         productSettings
       });
+      await product.updateResources(imgIntroductions);
       for(let i = 0; i < productParams.length; i++) {
         const param = productParams[i];
         const {

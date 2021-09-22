@@ -477,5 +477,39 @@ shopGoodsSchema.statics.computeSellCount = async (productId) => {
   }
 };
 
+/*
+* 更新商品图
+* */
+shopGoodsSchema.methods.updateResources = async function(resourcesId) {
+  const ResourceModel = mongoose.model('resources');
+  const {imgIntroductions, productId} = this;
+  console.log(this);
+  if(imgIntroductions.length > 0) {
+    await ResourceModel.updateMany({
+      rid: {$in: imgIntroductions},
+      references: `shop-${productId}`
+    }, {
+      $pull: {
+        references: `shop-${productId}`
+      }
+    });
+  }
+  this.imgIntroductions = resourcesId;
+  this.imgMaster = resourcesId[0];
+  await this.updateOne({
+    $set: {
+      imgIntroductions: this.imgIntroductions,
+      imgMaster: this.imgMaster
+    }
+  });
+  await  ResourceModel.updateMany({
+    rid: {$in: resourcesId}
+  }, {
+    $addToSet: {
+      references: `shop-${productId}`
+    }
+  });
+}
+
 const ShopGoodsModel = mongoose.model('shopGoods', shopGoodsSchema);
 module.exports = ShopGoodsModel;
