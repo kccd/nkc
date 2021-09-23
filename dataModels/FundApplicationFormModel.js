@@ -577,10 +577,17 @@ fundApplicationFormSchema.methods.extendThreads = async function() {
 fundApplicationFormSchema.methods.extendSupporters = async function() {
 	const UserModel = mongoose.model('users');
 	const supporters = [];
-	for(let uid of this.supportersId) {
-		const user = await UserModel.findOnly({uid});
-		supporters.push(user);
-	}
+  const users = await UserModel.find({uid: {$in: this.supportersId}});
+  const usersObj = {};
+  for(const user of users) {
+    usersObj[user.uid] = user;
+  }
+  for(const uid of this.supportersId) {
+    const user = usersObj[uid];
+    if(user && !supporters.includes(user)) {
+      supporters.push(user);
+    }
+  }
 	return this.supporters = supporters;
 };
 

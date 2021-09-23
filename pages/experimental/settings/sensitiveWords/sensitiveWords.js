@@ -184,14 +184,19 @@ var app = new Vue({
       var group = this.keywordSetting.wordGroup[groupIndex];
       var content = group.keywords.join("\n");
       var downloader = document.createElement("a");
-      downloader.setAttribute("href", "data:text/plain;charset=utf-8," + content);
+      downloader.style.display = 'none';
+      var blob = new Blob([content]);
+      // downloader.setAttribute("href", "data:text/plain;charset=utf-8," + content);
+      downloader.setAttribute("href", URL.createObjectURL(blob));
       downloader.setAttribute("download", "敏感词组_" + group.name + ".txt");
+      document.body.appendChild(downloader);
       downloader.click();
+      document.body.removeChild(downloader);
     },
     // 应用到所有专业
     applyAllForums: function(groupIndex) {
       var id = self.keywordSetting.wordGroup[groupIndex].id;
-      sweetConfirm("确定要将这个词组应用到所有专业吗?")
+      sweetQuestion("确定要将这个词组应用到所有专业吗?")
       .then(function() {
         return nkcAPI("/e/settings/review/keyword", "PUT", {
           type: "applyAllForums",
@@ -199,9 +204,23 @@ var app = new Vue({
         })
       })
       .then(function() {
-        sweetAlert("成功");
+        sweetSuccess("执行成功");
       })
       .catch(sweetError);
+    },
+    cancelApplyAllForums: function(groupIndex) {
+      const id = self.keywordSetting.wordGroup[groupIndex].id;
+      sweetQuestion(`确定要取消应用到所有专业吗？`)
+        .then(function() {
+          return nkcAPI(`/e/settings/review/keyword`, 'PUT', {
+            type: 'cancelApplyAllForums',
+            value: id
+          })
+        })
+        .then(function() {
+          sweetSuccess('执行成功');
+        })
+        .catch(sweetError);
     },
     // 关键字搜索框
     searchWordInputChange: function(el, groupIndex) {

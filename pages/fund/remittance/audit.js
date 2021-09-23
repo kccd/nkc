@@ -14,13 +14,14 @@ function ensureRemittance(id, number) {
 }
 
 function withdrawApplicationForm(id) {
-  return sweetQuestion(`确定要执行此操作？`)
-    .then(() => {
-      return nkcAPI('/fund/a/'+id+'?type=withdraw', 'DELETE', {})
+  return sweetPrompt(`请输入撤回原因`, '')
+    .then((reason) => {
+      return nkcAPI(`/fund/a/${id}/manage/withdraw`, 'POST', {
+        reason
+      })
     })
     .then(function(data) {
-      // window.location.href = '/fund/a/'+data.applicationForm._id;
-      openToNewLocation('/fund/a/'+data.applicationForm._id);
+      sweetSuccess(`执行成功`);
     })
     .catch(function(data) {
       sweetError(data);
