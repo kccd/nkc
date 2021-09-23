@@ -12,6 +12,8 @@ if !isIncluded('operationCenter')
           a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/report`) 报告进度
           a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/remittance/apply`) 申请拨款、确认拨款
           a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/complete`) 结题
+          if form.remittance[0].status !== true
+            button.btn.btn-default.btn-block(onclick=`withdrawApplicationForm(${form._id})`) 撤回申请
 
   mixin managerOperationCenter(form, userFundRoles)
     -var {applicant} = form;
@@ -48,6 +50,8 @@ if !isIncluded('operationCenter')
           else
             button.btn.btn-default.btn-block(onclick=`disableApplicationForm(${form._id}, true)`) 屏蔽
           if general === 4
+            if form.remittance[0].status !== true
+              button.btn.btn-default.btn-block(onclick=`withdrawApplicationForm(${form._id})`) 强制撤回申请
             button.btn.btn-default.btn-block(onclick=`applicationFormStop(${form._id})`) 强制终止
           if general === 2 && [2, 3].includes(detail)
             button.btn.btn-default.btn-block(onclick=`applicationFormTimeout(${form._id})`) 设为修改超时
@@ -123,4 +127,14 @@ if !isIncluded('operationCenter')
         sweetSuccess('操作成功');
       })
       .catch(sweetError);
+    }
+    function withdrawApplicationForm(formId) {
+      return sweetPrompt('请输入撤回原因')
+      .then(function(reason) {
+        return nkcAPI('/fund/a/' + formId + '/settings/withdraw', 'POST', {reason: reason})
+      })
+      .then(function() {
+        window.location.reload();
+      })
+      .catch(sweetError)
     }

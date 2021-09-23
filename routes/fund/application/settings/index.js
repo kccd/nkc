@@ -350,7 +350,8 @@ settingsRouter
         projectCycle,
         budgetMoney: _budgetMoney,
         'threadsId.applying': threadsId.applying,
-        category
+        category,
+        protocol
       }
     });
 

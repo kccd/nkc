@@ -1,4 +1,5 @@
 if !isIncluded('remittance')
+  include ./formWarning
   mixin remittance(form)
     -var {remittance} = form;
     if form.status.adminSupport

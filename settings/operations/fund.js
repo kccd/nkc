@@ -102,6 +102,9 @@ module.exports = {
         },
         giveup: {
 				  POST: 'visitFundApplicationFormSettings'
+        },
+        withdraw: {
+          POST: 'visitFundApplicationFormSettings'
         }
 			},
       manage: {
