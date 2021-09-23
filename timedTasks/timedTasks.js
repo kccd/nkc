@@ -168,45 +168,20 @@ func.modifyTimeoutApplicationForm = async () => {
 }
 
 /*
-* 定期判断基金申请是否未结题但已经超过项目周期
+* 定期判断基金申请是否未结题但已经超过项目周期,每12小时判断一次
 * */
 func.modifyProjectCycle = async () =>{
   setTimeout(async () =>{
     try{
-    var unsent = await db.FundApplicationFormModel.find({finishProject: false, "status.adminSupport": true });
-    for(var i of unsent){
-      var finishTime = i.timeToSubmit.valueOf() + i.projectCycle * 24 * 60 * 60 *1000;
-      var date = new Date();
-      var nowTime = date.valueOf();
-      if(nowTime >= finishTime){
-        //向该用户发送系统消息通知该用户申请的项目已经结题
-        console.log("用户id",i.uid);
-        // try {
-        //   message = db.MessageModel({
-        //     _id: await db.SettingModel.operateSystemID('messages', 1),
-        //     ty: 'STE', STU,
-              //  r:
-        //     c: {
-                //  type,
-                //  applicationFormId,
-        //       content: "阿萨大大",
-        //       mode: "user",
-        //       uids: i.uid
-        //     }
-        //   });
-        //   await message.save();
-        // } catch (error) {
-        // }
-        //将消息保存到数据库
-        
-      }
-    }
-    console.log("正在给未结题用户发送消息。。。");
-  } catch(err) {
+    console.log("正在给超过结题时间的用户发送系统提示...")
+    await db.MessageModel.sendFinishProejct();
+    } catch(err) {
+      console.log(err)
     } finally {
-      // await func.modifyProjectCycle();
+      console.log("发送结题超时成功")
+      await func.modifyProjectCycle();
     }
-  },5000)
+  },12 * 60 * 60 *1000)
 }
 
 module.exports = func;

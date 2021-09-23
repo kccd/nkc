@@ -655,7 +655,7 @@ messageSchema.statics.getParametersData = async (message) => {
     parameters = {
       reviewLink: await PostModel.getUrl(post)
     };
-  } else if(["fundAdmin", "fundApplicant", "fundMember"].includes(type)) {
+  } else if(["fundAdmin", "fundApplicant", "fundMember", "fundFinishProject"].includes(type)) {
     const {applicationFormId} = message.c;
     let applicationForm = await FundApplicationFormModel.findOne({_id: applicationFormId});
     if(!applicationForm) return null;
@@ -670,7 +670,7 @@ messageSchema.statics.getParametersData = async (message) => {
     if(type === 'fundMember') {
       parameters.username = user.username;
       parameters.userURL = getUrl('userHome', user.uid);
-    }
+    };
   } else if([
     "newColumnContribute", "columnContributeChange",
     "disabledColumn", "disabledColumnInfo",
@@ -1080,6 +1080,45 @@ messageSchema.statics.sendReviewMessage = async (pid) => {
     await socket.sendMessageToUser(message._id);
   }
 };
+
+/*
+* 给申请基金的用户超出项目周期的发送系统消息，判断现在的时间和用户约定的县厚木周期是否 已经超过，超时就发送系统提醒
+* */
+messageSchema.statics.sendFinishProejct = async () =>{
+  const SettingModel = mongoose.model("settings");
+  const FundApplicationFormModel = mongoose.model("fundApplicationForms");
+  const MessageModel = mongoose.model("messages");
+  const socket = require('../nkcModules/socket');
+  //获取审核成功并且超时未发送过结题提醒的数据
+  var unsents = await FundApplicationFormModel.find({reminded: false, "status.adminSupport": true });
+  for(var i of unsents){
+    var finishTime = i.timeToSubmit.valueOf() + i.projectCycle * 24 * 60 * 60 *1000;
+    var date = new Date();
+    var nowTime = date.valueOf();
+    if(nowTime >= finishTime){
+      //向该用户发送系统消息通知该用户申请的项目已经结题
+      console.log("用户id",i.uid);
+      const message = MessageModel({
+        _id: await SettingModel.operateSystemID('messages', 1),
+        ty: 'STU',
+        r: i.uid,
+        c: {
+          type: "fundFinishProject",
+          applicationFormId: i._id,
+        }
+      });
+      //将是否已经发送结题置为true
+      const result = await FundApplicationFormModel.updateOne({_id: i._id,}, {$set: {reminded: true}});
+      if(i._id ==1){
+        console.log(result)
+      }
+      //将消息保存到数据库
+      await message.save();
+      console.log("基金id",i._id)
+      await socket.sendMessageToUser(message._id);
+    }
+  }
+}
 
 /*
 * 基金通知

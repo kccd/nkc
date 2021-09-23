@@ -438,10 +438,11 @@ module.exports = {
         },
         {
             parameters: [
-                'threadTitle'
+                'applicationFormURL',
+                'applicationFormCode'
             ],
-          type: '项目结题超时提醒',
-          content: '你的基金申请[url=threadUrl(threadTitle)]已经超过规定的项目周期。'
+          type: 'fundFinishProject',
+          content: '【科创基金】你的申报项目[text=applicationFormCode]超时未结题，请及时处理。[url=applicationFormURL(立即查看)]'
         }
     ]
 };
