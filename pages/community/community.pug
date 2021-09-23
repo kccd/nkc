@@ -1,21 +1,12 @@
 extends ../bootstrap_base
 block title
-  title 社区
+  title=`社区 - ${state.serverSettings.websiteName} - ${state.serverSettings.brief}`
   +includeCSS('/community/community.css')
 block content
   include ./homeForumList
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-8.box-shadow-panel
-        if data.toppedThreads.length
-          .home-forums-list.m-b-1
-            .panel-header.m-b-0 社区置顶
-            //-.home-header
-              //-.fa.fa-tags
-              .header-name 置顶
-            .home-threads
-              for thread in data.toppedThreads
-                include ../publicModules/thread_panel/thread_panel
         for cf in data.categoryForums
           .home-forums-list.m-b-1.category-forums
             .panel-header=cf.name

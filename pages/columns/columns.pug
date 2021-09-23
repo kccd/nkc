@@ -1,6 +1,6 @@
 extends ../bootstrap_base
 block title
-  title 专栏列表
+  title=`专栏列表 - ${state.serverSettings.websiteName} - ${state.serverSettings.brief}`
   +includeCSS('/columns/columns.css')
 block content
   .container-fluid.max-width
