@@ -24,7 +24,7 @@ router
       q = {}
     }
     data.t = t;
-    data.complaintTypes=await db.ComplaintTypeModel.find({"disabled": true}).sort({toc:1})
+    data.complaintTypes=await db.ComplaintTypeModel.find({"disabled": false}).sort({toc:1})
     const count = await db.ComplaintModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const complaints = await db.ComplaintModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
