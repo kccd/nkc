@@ -3,7 +3,8 @@ router
   .get("/", async (ctx, next) => {
     const {db, data, query, params} = ctx;
     const {pid} = params;
-    const {t} = query;
+    let {t, d} = query;
+    t = t || d;
     if(!await db.PostModel.ensureAttachmentPermission(data.user?data.user.uid: ""))
       ctx.throw(400, "权限不足");
     const q = {};

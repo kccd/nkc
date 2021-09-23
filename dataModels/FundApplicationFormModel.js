@@ -1641,5 +1641,38 @@ fundApplicationFormSchema.methods.setUselessAsTimeout = async function(operatorI
   });
 };
 
+/*
+* 撤回申请
+* @param {String} uid 操作人
+* @param {String} reason 撤回的原因
+* */
+fundApplicationFormSchema.methods.withdraw = async function(uid, reason, applicant) {
+  const {checkString} = require('../nkcModules/checkData');
+  const {fund, uid: formUid} = this;
+  checkString(reason, {
+    name: '原因',
+    minLength: 1,
+    maxLength: 5000
+  });
+  if(
+    uid !== formUid &&
+    !await fund.isFundRole(state.uid, 'admin') &&
+    !await fund.isFundRole(state.uid, 'financialStaff')
+  ) throwErr(403, `权限不足`);
+  if(this.remittance[0].status === true) throwErr(400, '无法撤回已拨款的基金申请');
+  this.remittance.map(r => {
+    r.apply = false;
+  });
+  await this.updateOne({
+    'lock.submitted': false,
+    'status.usersSupport': null,
+    'status.projectPassed': null,
+    'status.adminSupport': null,
+    remittance: this.remittance
+  });
+  const name = applicant? '申请人': '管理员';
+  await this.createReport('system', `申请已被${name}撤回\n原因：${reason}`, uid, false);
+};
+
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);
 module.exports = FundApplicationFormModel;
