@@ -26,14 +26,19 @@ const schema = new Schema({
     required: true,
     index: 1
   },
-  // 投诉的原因类型
-  reasonType: {
+  // 投诉的原因类型id
+  reasonTypeId: {
     type: String,
     required: true,
     index: 1
   },
   // 投诉补充说明
   reasonDescription: {
+    type: String,
+    default: ""
+  },
+  // 投诉类型名称
+  reasonType: {
     type: String,
     default: ""
   },

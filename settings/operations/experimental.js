@@ -8,6 +8,11 @@ module.exports = {
     tools: {
       GET: "visitToolsManager"
     },
+		complaintType:{
+			GET:"experimentalcomplaintTypeSettings",
+			POST:"experimentalcomplaintTypeSettings",
+			PUT:"experimentalcomplaintTypeSettings"
+		},
 	  ip: {
 	    GET: 'experimentalIPSettings',
       POST: 'experimentalIPSettings',

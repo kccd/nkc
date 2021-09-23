@@ -1,4 +1,4 @@
-const mongoose = require('../settings/database');
+const mongoose = require('mongoose');
 const schema = new mongoose.Schema({
   _id: String,
   toc: {

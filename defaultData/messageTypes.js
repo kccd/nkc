@@ -435,6 +435,14 @@ module.exports = {
             ],
           type: 'violation',
           content: '你的文章[url=threadUrl(threadTitle)]由于[text=reason]的原因违规。'
+        },
+        {
+            parameters: [
+                'applicationFormURL',
+                'applicationFormCode'
+            ],
+          type: 'fundFinishProject',
+          content: '【科创基金】你的申报项目[text=applicationFormCode]超时未结题，请及时处理。[url=applicationFormURL(立即查看)]'
         }
     ]
 };

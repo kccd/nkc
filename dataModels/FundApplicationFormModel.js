@@ -315,6 +315,12 @@ const fundApplicationFormSchema = new Schema({
   protocol: {
     type: String,
     default: ''
+  },
+  // 是否发送过结题超时的应用通知
+  reminded: {
+    type: Boolean,
+    default: false,
+    index: 1
   }
 }, {
   collection: 'fundApplicationForms',

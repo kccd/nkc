@@ -5,12 +5,18 @@ const authRouter = new Router();
 authRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
+		const count = await db.UsersPersonalModel.countDocuments({
+			$or: [
+				{"authenticate.card.status": "in_review"},
+				{"authenticate.video.status": "in_review"}
+			]
+		});
 		const userPersonalArr = await db.UsersPersonalModel.find({
 			$or: [
 				{"authenticate.card.status": "in_review"},
 				{"authenticate.video.status": "in_review"}
 			]
-		}).sort({toc: 1});
+		}).sort({_id: 1});
 		
 		data.usersAuth = await Promise.all(userPersonalArr.map(async user => {
 			let authLevel = 2;

@@ -9,6 +9,7 @@ const statics = require('../settings/statics');
 const FileType = require('file-type');
 const PATH = require('path');
 const folderTools = require("../nkcModules/file");
+const ffmpeg = require("../tools/ffmpeg") 
 
 const schema = new Schema({
   // 附件ID mongoose.Types.ObjectId().toString()
@@ -635,7 +636,7 @@ schema.statics.saveProblemImages = async (_id, files = []) => {
  * 身份认证材料存储
  * @returns {string} 附件id
  */
-schema.statics.saveVerifiedUpload = async ({ size, hash, name, path, uid, toc }) => {
+ schema.statics.saveVerifiedUpload = async ({ size, hash, name, path, uid, toc }) => {
   const VerifiedUploadModel = mongoose.model("verifiedUpload");
   const _id = await VerifiedUploadModel.getNewId();
   const ext = PATH.extname(name).substring(1);
@@ -656,6 +657,31 @@ schema.statics.saveVerifiedUpload = async ({ size, hash, name, path, uid, toc })
   await fs.promises.copyFile(path, savePath);
   return _id;
 }
+
+/**
+ * 身份认证材料存储3
+ * @returns {string} 附件id
+ */
+schema.statics.saveVerifiedUpload3 = async ({ size, hash, name, path, uid, toc, _id, ext }) => {
+	const VerifiedUploadModel = mongoose.model("verifiedUpload");
+  const attachment = VerifiedUploadModel({
+    _id,
+    toc,
+    size,
+    hash,
+    name,
+    ext,
+    uid,
+    type: "verifiedUpload"
+  });
+  await attachment.save();
+   //根据类型和时间获取文件父级路径
+  // const dir = await folderTools.getPath("verifiedUpload", date);
+  // const savePath = PATH.join(dir, `${_id}${PATH.extname(name)}`);
+  // await fs.promises.copyFile(path, savePath);
+  return _id;
+}
+
 
 /*
 * 保存基金项目的图片

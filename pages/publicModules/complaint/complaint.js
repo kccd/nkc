@@ -9,7 +9,7 @@
 var moduleComplaint = new Vue({
   el: "#moduleComplaint",
   data: {
-    reasonType: "",
+    reasonTypeId: "",
     reasonDescription: "",
     submitted: false,
     type: "",
@@ -17,20 +17,42 @@ var moduleComplaint = new Vue({
     reasons: []
   },
   mounted: function() {
-    var data = NKC.methods.strToObj(this.$refs.reasons.innerHTML);
-    var reasons = [];
-    for(var reason in data.reasons) {
-      if(!data.reasons.hasOwnProperty(reason)) continue;
-      reasons.push({
-        type: reason,
-        description: data.reasons[reason]
-      })
-    }
-    this.reasons = reasons;
+    // var data = NKC.methods.strToObj(this.$refs.reasons.innerHTML);
+    // var reasons = [];
+    // for(var reason in data.reasons) {
+    //   if(!data.reasons.hasOwnProperty(reason)) continue;
+    //   reasons.push({
+    //     type: reason,
+    //     description: data.reasons[reason]
+    //   })
+    // }
+    // this.reasons = reasons;
+    // console.log(this.reasons);
+    // console.log(data);
   },
   methods: {
+    getList: function() {
+      var _this=this
+          nkcAPI('/e/settings/complaintType', 'get', {
+      })
+        .then(function(data) {
+          var reasons = [];
+          for(var i in data.complaintTypes) {
+            if(!data.complaintTypes.hasOwnProperty(i)) continue;
+            reasons.push({
+              _id:data.complaintTypes[i]._id,
+              type:data.complaintTypes[i].type,
+              disabled:data.complaintTypes[i].disabled,
+              description:data.complaintTypes[i].description,
+            })
+          }
+          _this.reasons = reasons;
+        })
+        .catch(function(data) {
+        })
+    },
     selectReason: function(r) {
-      this.reasonType = r.type;
+      this.reasonTypeId = r._id;
     },
     hide: function() {
       $("#moduleComplaint").hide();
@@ -41,19 +63,20 @@ var moduleComplaint = new Vue({
       $("#moduleComplaint").show();
       this.submitted = false;
       this.reasonDescription = "";
-      this.reasonType = "";
+      this.reasonTypeId = "";
       stopBodyScroll(true);
     },
     open: function(type, id) {
       this.type = type;
       this.id = id;
       this.show();
+      this.getList();
     },
     submit: function() {
       nkcAPI("/complaint", "POST", {
         type: this.type,
         id: this.id,
-        reasonType: this.reasonType,
+        reasonTypeId: this.reasonTypeId,
         reasonDescription: this.reasonDescription
       })
         .then(function() {
