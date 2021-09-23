@@ -44,6 +44,8 @@ module.exports = async (options) => {
   // 最新原创文章显示模式
   data.originalThreadDisplayMode = homeSettings.originalThreadDisplayMode;
   data.columnListPosition = homeSettings.columnListPosition;
+  // 首页置顶
+  data.toppedThreads = await db.ThreadModel.getHomeToppedThreads(fidOfCanGetThreads);
   // 浏览过的专业
   /*if(data.user) {
     const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 5);

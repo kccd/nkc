@@ -590,6 +590,7 @@ threadRouter
 		data.homeAd = ads.map(a => a.tid).includes(tid);
 		data.homeTopped = data.homeSettings.toppedThreadsId.includes(tid);
 		data.latestTopped = data.homeSettings.latestToppedThreadsId.includes(tid);
+    data.communityTopped = data.homeSettings.communityToppedThreadsId.includes(tid);
 		if(thread.type === "product" && ctx.permission("pushGoodsToHome")) {
 		  data.goodsHomeTopped = data.homeSettings.shopGoodsId.includes(data.product.productId);
     }

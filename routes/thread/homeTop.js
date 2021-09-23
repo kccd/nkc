@@ -3,8 +3,14 @@ const homeTopRouter = new Router();
 homeTopRouter
 	.use('/', async (ctx, next) => {
 		const {body, query, data} = ctx;
-		const latest = body.latest || query.latest;
-		data.valueName = latest? 'latestToppedThreadsId': 'toppedThreadsId';
+    const type = body.type || query.type;
+    if(type === 'latest') {
+      data.valueName = 'latestToppedThreadsId';
+    } else if(type === 'community') {
+      data.valueName = 'communityToppedThreadsId';
+    } else {
+      data.valueName = 'toppedThreadsId';
+    }
 		await next();
 	})
 	.post('/', async (ctx, next) => {

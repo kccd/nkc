@@ -70,8 +70,6 @@ router
         data.subForums.push(forum);
       }
     }
-    // 首页置顶
-    data.toppedThreads = await db.ThreadModel.getHomeToppedThreads(fidOfCanGetThreads);
     // 最新原创文章
     data.originalThreads = await db.ThreadModel.getOriginalThreads(fidOfCanGetThreads);
     /*// 最新文章

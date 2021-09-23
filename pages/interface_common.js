@@ -1284,8 +1284,9 @@ if($('input[data-control="hue"]').length !== 0 && $('input[data-control="hue"]')
 
 // 首页置顶
 function homeTop(tid, latest) {
-  var body = latest? {latest: true}: {};
-	nkcAPI('/t/'+tid+'/hometop', 'POST', body)
+	nkcAPI('/t/'+tid+'/hometop', 'POST', {
+    type: latest
+  })
 		.then(function() {
 			window.location.reload();
 		})
@@ -1297,7 +1298,7 @@ function homeTop(tid, latest) {
 function unHomeTop(tid, latest) {
   var url = '/t/' + tid + '/hometop';
   if(latest) {
-    url += '?latest=true';
+    url += `?type=${latest}`;
   }
 	nkcAPI(url, 'DELETE', {})
 		.then(function() {
@@ -1323,6 +1324,16 @@ function unHomeAd(tid) {
     })
     .catch(sweetError);
 }
+
+// 社区置顶
+function communityTop(tid, topped) {
+  if(topped) {
+    homeTop(tid, 'community');
+  } else {
+    unHomeTop(tid, 'community');
+  }
+}
+
 // 打开主题
 function openThread(tid) {
 	nkcAPI('/t/'+tid+'/close', 'DELETE', {})
@@ -2164,6 +2175,7 @@ Object.assign(window, {
   toggleNKCDrawer,
   stopBodyScroll,
   openLeftDrawer,
+  communityTop,
   openRightDrawer,
   closeDrawer,
   openVideo,

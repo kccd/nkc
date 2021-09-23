@@ -103,11 +103,16 @@ block content
                                   button.btn.btn-default.btn-sm(onclick=`unHomeAd('${data.thread.tid}')`) 取消首页推荐
                                 else
                                   a.btn.btn-default.btn-sm(href=`/t/${data.thread.tid}/ad`).m-l-05 首页推荐
+
                               if data.userOperationsId.includes("homeTop")
                                 if data.homeTopped
-                                  button.btn.btn-default.btn-sm(onclick=`unHomeTop('${data.thread.tid}')`) 取消社区置顶
+                                  button.btn.btn-default.btn-sm(onclick=`unHomeTop('${data.thread.tid}')`) 取消首页置顶
                                 else
-                                  button.btn.btn-default.btn-sm(onclick=`homeTop('${data.thread.tid}')`) 社区置顶
+                                  button.btn.btn-default.btn-sm(onclick=`homeTop('${data.thread.tid}')`) 首页置顶
+                                if data.communityTopped
+                                  button.btn.btn-default.btn-sm(onclick=`communityTop('${data.thread.tid}', false)`) 取消社区置顶
+                                else
+                                  button.btn.btn-default.btn-sm(onclick=`communityTop('${data.thread.tid}', true)`) 社区置顶
                                 if data.latestTopped
                                   button.btn.btn-default.btn-sm(onclick=`unLatestTop('${data.thread.tid}')`) 取消最新页置顶
                                 else

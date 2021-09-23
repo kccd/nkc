@@ -52,6 +52,15 @@ block content
       //-include ../publicModules/checkDefaultUsername
       //- 专业地图
       .col-xs-12.col-md-6.home-forums.box-shadow-panel
+        if data.toppedThreads.length
+          .home-forums-list.m-b-1
+            .panel-header.m-b-0 首页置顶
+            //-.home-header
+              //-.fa.fa-tags
+              .header-name 置顶
+            .home-threads
+              for thread in data.toppedThreads
+                include ../publicModules/thread_panel/thread_panel
         mixin columnPanel(column, klass)
           .home-main-column.row
             .col-xs-12.col-md-6
