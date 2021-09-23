@@ -6,7 +6,7 @@
 * @author pengxiguaa 2019-5-14
 * */
 
-var moduleComplaint = new Vue({
+const moduleComplaint = new Vue({
   el: "#moduleComplaint",
   data: {
     reasonTypeId: "",
@@ -17,27 +17,15 @@ var moduleComplaint = new Vue({
     reasons: []
   },
   mounted: function() {
-    // var data = NKC.methods.strToObj(this.$refs.reasons.innerHTML);
-    // var reasons = [];
-    // for(var reason in data.reasons) {
-    //   if(!data.reasons.hasOwnProperty(reason)) continue;
-    //   reasons.push({
-    //     type: reason,
-    //     description: data.reasons[reason]
-    //   })
-    // }
-    // this.reasons = reasons;
-    // console.log(this.reasons);
-    // console.log(data);
   },
   methods: {
     getList: function() {
-      var _this=this
+      const _this=this
           nkcAPI('/e/settings/complaintType', 'get', {
       })
         .then(function(data) {
-          var reasons = [];
-          for(var i in data.complaintTypes) {
+          const reasons = [];
+          for(const i in data.complaintTypes) {
             if(!data.complaintTypes.hasOwnProperty(i)) continue;
             reasons.push({
               _id:data.complaintTypes[i]._id,
