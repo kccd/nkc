@@ -131,7 +131,7 @@ schema.statics.extendComplaints = async (complaints) => {
     htmlToText: false,
     count: 200
   });
-  librarys = await LibraryModel.
+  // librarys = await LibraryModel.
 
   users.map(user => {
     userObj[user.uid] = user;

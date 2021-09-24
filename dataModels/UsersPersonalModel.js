@@ -672,9 +672,10 @@ usersPersonalSchema.methods.generateAuthenticateVerify3 = async function(file, c
 	const VerifiedUploadModel = mongoose.model("verifiedUpload");
 	const _id = await VerifiedUploadModel.getNewId();
 	const date = new Date();
-	const targetFilePath = file.path + '_tmp';
-	await ffmpeg.videoTransMP4(file.path, targetFilePath);
-	const newFile = await FILE.getFileObjectByFilePath(targetFilePath);
+	const targetFilePath = path.dirname(file.path);
+	const newTargetFilePath = path.join(targetFilePath, `${_id}_tmp.mp4`)
+	await ffmpeg.videoTransMP4(file.path, newTargetFilePath);
+	const newFile = await FILE.getFileObjectByFilePath(newTargetFilePath);
 	const aid = await AttachmentModel.saveVerifiedUpload({
 		_id,
 		size: newFile.size,
