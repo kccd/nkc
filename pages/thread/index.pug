@@ -270,8 +270,10 @@ block content
                           include ../fund/applicationForm/formRelatedThreads
                           include ../fund/applicationForm/formReportThreads
                           include ../fund/applicationForm/formProtocol
+                          include ../fund/applicationForm/formNav
                           -var form = data.applicationForm;
                           -var applicationForm = form;
+                          +formNav(form, data.fundName)
                           +formWarning(form.auditComments.adminAudit)
                           +applicant(form)
                           +project(form)
