@@ -433,5 +433,14 @@ schema.statics.saveAllLibraryFileToElasticSearch = async () => {
   console.log(`【同步LibraryFile到ES】完成`);
 };
 
+/*
+* 拓展文库举报信息
+* @author panbing 2020/924/8
+* */
+
+schema.statics.extendLibrarys = async (librarys, option) => {
+
+}
+
 module.exports = mongoose.model("libraries", schema);
 

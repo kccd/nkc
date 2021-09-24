@@ -37,6 +37,8 @@ block content
               a.complaint-author(v-else :href="'/u/' + c.content.uid" target="_blank") {{c.content.firstPost.user.username}}
               .complaint-info 所发表的文章
               a.complaint-link(:href="'/t/' + c.contentId" target="_blank") {{c.content.firstPost.t}}
+            span(v-else-if="c.type === 'library'")
+              .complaint-info 投诉了用户
             .complaint-content {{c.reasonDescription || "未填写违规详细信息"}}
             .complaint-button(v-if="c.resolved")
               span(@click="c.open = !c.open") 查看详情

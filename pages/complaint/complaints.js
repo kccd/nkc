@@ -11,6 +11,7 @@ window.app = new Vue({
       data.complaints[i].open = false;
     }
     this.complaints = data.complaints;
+    debugger
   },
   methods: {
     format: NKC.methods.format,

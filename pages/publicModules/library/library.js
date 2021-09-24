@@ -158,6 +158,11 @@ NKC.modules.Library = class {
         getSize: NKC.methods.tools.getSize,
         checkString: NKC.methods.checkData.checkString,
         scrollTo: NKC.methods.scrollTop,
+        complain(id){
+          if(!window.complaintSelector)
+            window.complaintSelector = new NKC.modules.ComplaintSelector();
+            complaintSelector.open("library", id)
+        },
         addFileByRid() {
           const {uploadResourcesId} = this;
           if(!uploadResourcesId || uploadResourcesId.length <= 0) return;

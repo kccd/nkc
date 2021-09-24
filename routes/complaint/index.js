@@ -34,8 +34,10 @@ router
         c.type_ = "用户"
       } else if(c.type === "post") {
         c.type_ = "回复"
-      } else {
+      } else if(c.type === "thread"){
         c.type_ = "文章"
+      } else if(c.type === "library"){
+        c.type_ = "文库"
       }
       c.reasonTypeId_ = ctx.state.lang("complaintTypes", c.reasonTypeId);
     });

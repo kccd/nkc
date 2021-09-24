@@ -658,31 +658,6 @@ schema.statics.saveProblemImages = async (_id, files = []) => {
   return _id;
 }
 
-/**
- * 身份认证材料存储3
- * @returns {string} 附件id
- */
-schema.statics.saveVerifiedUpload3 = async ({ size, hash, name, path, uid, toc, _id, ext }) => {
-	const VerifiedUploadModel = mongoose.model("verifiedUpload");
-  const attachment = VerifiedUploadModel({
-    _id,
-    toc,
-    size,
-    hash,
-    name,
-    ext,
-    uid,
-    type: "verifiedUpload"
-  });
-  await attachment.save();
-   //根据类型和时间获取文件父级路径
-  // const dir = await folderTools.getPath("verifiedUpload", date);
-  // const savePath = PATH.join(dir, `${_id}${PATH.extname(name)}`);
-  // await fs.promises.copyFile(path, savePath);
-  return _id;
-}
-
-
 /*
 * 保存基金项目的图片
 * @param {String} filePath 图片的路径
