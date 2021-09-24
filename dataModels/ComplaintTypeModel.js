@@ -10,7 +10,7 @@ const schema = new Schema({
   disabled:{
     type: Boolean,
     required: true,
-    default: true
+    default: false
   },
   uid: {
     type: String,
