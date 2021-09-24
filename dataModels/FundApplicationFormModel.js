@@ -1572,7 +1572,7 @@ fundApplicationFormSchema.methods.extendApplicationFormInfo = async function(uid
     !await fund.isFundRole(uid, 'admin') &&
     this.status.submitted !== true &&
     uid !== applicant.uid &&
-    !membersId.includes(state.uid)
+    !membersId.includes(uid)
   ) throwErr(403, `权限不足`);
   await this.extendSupporters();
   await this.extendObjectors();
@@ -1656,8 +1656,8 @@ fundApplicationFormSchema.methods.withdraw = async function(uid, reason, applica
   });
   if(
     uid !== formUid &&
-    !await fund.isFundRole(state.uid, 'admin') &&
-    !await fund.isFundRole(state.uid, 'financialStaff')
+    !await fund.isFundRole(uid, 'admin') &&
+    !await fund.isFundRole(uid, 'financialStaff')
   ) throwErr(403, `权限不足`);
   if(this.remittance[0].status === true) throwErr(400, '无法撤回已拨款的基金申请');
   this.remittance.map(r => {
