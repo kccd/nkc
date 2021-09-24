@@ -38,6 +38,7 @@ block body
     +includeJS("/external_pkgs/vue.min.js", true)
   else
     +includeJS("/external_pkgs/vue.js", true)
+  +includeJS('/external_pkgs/polyfill/dist/polyfill.min.js', true)
   +includeJS("/publicModules/common.js")
   +includeJS('/bootstrap/js/bootstrap.min.js')
   if state.isApp && state.platform === 'apiCloud'

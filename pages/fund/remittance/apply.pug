@@ -44,13 +44,15 @@ block fundContent
                         if !r.verify
                           button(onclick=`verifyRemittance(${i}, ${form._id})`) 确认收款
                           span &nbsp;
-                          if fund.auditType === 'system'
-                            if fund.admin.appointed.length === 0
-                              span.text-danger 未收到款？请通过报告问题告知管理员
+                          a(href='/problem/add' target='_blank') 未收到款？点击这里去报告问题
+                          //-
+                            if fund.auditType === 'system'
+                              if fund.admin.appointed.length === 0
+                                span.text-danger 未收到款？请通过报告问题告知管理员
+                              else
+                                a.pointer(onclick=`NKC.methods.toChat("${fund.admin.appointed[0]}")`) 未收到款？联系拨款人
                             else
-                              a.pointer(onclick=`NKC.methods.toChat("${fund.admin.appointed[0]}")`) 未收到款？联系拨款人
-                          else
-                            a.pointer(onclick=`NKC.methods.toChat("${r.uid}")`) 未收到款？联系拨款人
+                              a.pointer(onclick=`NKC.methods.toChat("${r.uid}")`) 未收到款？联系拨款人
                         else
                           span 已确认收款
 
