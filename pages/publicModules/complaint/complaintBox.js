@@ -51,7 +51,6 @@ class ComplaintSelector extends NKC.modules.DraggablePanel {
                 })
               }
               _this.reasons = reasons;
-          console.log(this.reasons);
         })
             .catch(function(data) {
             })
