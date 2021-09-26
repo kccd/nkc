@@ -174,7 +174,11 @@ module.exports = {
 			},
 			disabled: {
 				PUT: 'modifyFundApplicationFormStatus'
-			}
+			},
+      refund: {
+        GET: 'fundApplicationFormRefund',
+        POST: 'fundApplicationFormRefund'
+      }
 		}
 	}
 };

@@ -48,6 +48,8 @@ if !isIncluded('formStatus')
         -info = '未申请';
       -status.push([`第 ${index + 1} 期拨款 ${r.money} 元${info?`（${info}）`:''}`, s]);
     -status.push(['结题', form.status.completed])
+    if form.status.refund !== null
+      -status.push([`退款 ${form.refundMoney} 元`, form.status.refund])
     .m-b-1
       .panel-header 项目状态
       for s, index in status

@@ -1,0 +1,39 @@
+extends ../fundContainer
+block fundTitle
+  title 基金退款
+block fundContent
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12.box-shadow-panel
+        #data.hidden=objToStr({donation: data.donation, applicationFormId: data.applicationForm._id, refundMoney: data.applicationForm.refundMoney, refundStatus: data.applicationForm.status.refund})
+        #app(v-cloak)
+          h4 基金退款
+          h4.text-danger(v-if='refundStatus !== false') 当前基金申请不需要退款
+          .form.form-horizontal(v-else-if='donation.enabled')
+            .form-group
+              label.col-sm-2.control-label 退款金额：
+              .col-sm-10
+                .h4.m-t-05.text-danger {{refundMoney}} 元
+            .form-group
+              label.col-sm-2.control-label 支付方式：
+              .col-sm-10
+                .radio
+                  label.m-r-1
+                    input(type='radio' value='aliPay' v-model='paymentType' :disabled='disableAliPay')
+                    span 支付宝
+                    span(v-if='disableAliPay') （已关闭）
+                  label
+                    input(type='radio' value='wechatPay' v-model='paymentType' :disabled='disableWechatPay')
+                    span 微信
+                    span(v-if='disableWechatPay') （已关闭）
+            .form-group
+              label.col-sm-2
+              .col-sm-10
+                button.btn.btn-primary(disabled v-if='submitting') 提交中...
+                button.btn.btn-primary(@click='submit' v-else) 提交
+                .m-t-05.text-danger(v-if='fee') {{paymentInfo}}
+          div(v-else)
+            h4.text-danger 退款功能已关闭
+
+block fundScripts
+  +includeJS('/fund/refund/refund.js')

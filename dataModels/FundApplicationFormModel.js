@@ -102,7 +102,7 @@ const fundApplicationFormSchema = new Schema({
   },
   // 结题时填写的各个物品的实际花费
 	actualMoney: {
-  	type: [Schema.Types.mixed],
+  	type: [Schema.Types.Mixed],
 		default: null,
     /*{
       purpose: String, // 物品名称
@@ -206,6 +206,11 @@ const fundApplicationFormSchema = new Schema({
       default: null,
       index: 1
     },
+    refund: { // 退款相关
+      type: Boolean,
+      default: null, // null: 不需要退款，false: 未退款， true: 已退款
+      index: 1
+    },
     successful: { // 项目研究是否成功
       type: Boolean,
       default: null,
@@ -232,16 +237,29 @@ const fundApplicationFormSchema = new Schema({
 		default: false,
 		index: 1
 	},
+  // 是否需要报告审核（申请拨款时提交的报告）
 	submittedReport: {
 		type: Boolean,
 		default: false,
 		index: 1
 	},
+  // 是否提交了结题申请
 	completedAudit: {
 		type: Boolean,
 		default: false,
 		index: 1
 	},
+  // 如果需要退款此字段表示退款账单（bills）的 ID
+  refundBillId: {
+    type: String,
+    default: '',
+    index: 1
+  },
+  // 退款金额，元，精确到 0.01
+  refundMoney: {
+    type: Number,
+    default: 0
+  },
 	reportNeedThreads: {
 		type: Boolean,
 		default: false
@@ -1073,7 +1091,17 @@ fundApplicationFormSchema.statics.extendAsApplicationFormList = async (applicati
 fundApplicationFormSchema.methods.getStatus = async function() {
   let formStatus = [];
   const {useless, submittedReport, status, completedAudit, lock} = this;
-  const {submitted, projectPassed, adminSupport, remittance, completed, successful, usersSupport, excellent} = status;
+  const {
+    submitted,
+    projectPassed,
+    adminSupport,
+    remittance,
+    completed,
+    successful,
+    usersSupport,
+    excellent,
+    refund
+  } = status;
   let needRemittance = false;
   for(let i = 0; i < this.remittance.length; i++) {
     const r = this.remittance[i];
@@ -1097,7 +1125,9 @@ fundApplicationFormSchema.methods.getStatus = async function() {
   } else if(useless === 'timeout') {
     formStatus = [1, 7];
   } else if(completed === true) {
-    if(excellent) {
+    if(refund === false) {
+      formStatus = [6, 1];
+    } else if(excellent) {
       formStatus = [5, 3]
     } else if(successful) {
       formStatus = [5, 2];
@@ -1169,13 +1199,15 @@ fundApplicationFormSchema.methods.getStatus = async function() {
 
     '5-1': '正常结题',
     '5-2': '成功结题',
-    '5-3': '优秀项目'
+    '5-3': '优秀项目',
+
+    '6-1': '等待申请人退款'
   };
 
   const key = `${formStatus[0]}-${formStatus[1]}`;
 
   const color = [
-    '3-1', '3-2', '3-3', '4-1', '4-2', '4-4', '4-6', '5-1', '5-2', '5-3'
+    '3-1', '3-2', '3-3', '4-1', '4-2', '4-4', '4-6', '5-1', '5-2', '5-3', '6-1'
   ].includes(key)? '#333': 'red';
 
   const description = descriptions[key];
@@ -1673,6 +1705,55 @@ fundApplicationFormSchema.methods.withdraw = async function(uid, reason, applica
   const name = applicant? '申请人': '管理员';
   await this.createReport('system', `申请已被${name}撤回\n原因：${reason}`, uid, false);
 };
+
+/*
+* 获取基金申请需要退款的金额
+* @return {Number} 退款金额，元，精确到 0.01
+* */
+fundApplicationFormSchema.methods.getRefundMoney = async function() {
+  const {budgetMoney, actualMoney} = this;
+  let money = 0;
+  let usedMoney = 0;
+  for(const b of budgetMoney) {
+    money += b.fact * 100;
+  }
+  for(const a of actualMoney) {
+    if(a.total) {
+      usedMoney += a.total * 100;
+    } else {
+      usedMoney += a.money * 100 * a.count;
+    }
+
+  }
+  return usedMoney >= money? 0: money - usedMoney;
+};
+
+/*
+* 更新基金申请的退款状态
+* @param {String} billId 基金账单 ID
+* */
+fundApplicationFormSchema.statics.updateRefundStatusByBillId = async (billId) => {
+  const FundApplicationFormModel = mongoose.model('fundApplicationForms');
+  const form = await FundApplicationFormModel.findOne({
+    'status.refund': false,
+    refundBillId: billId
+  });
+  if(!form) return;
+  await form.updateOne({
+    $set: {
+      'status.refund': true
+    }
+  });
+  await form.createReport('system', `申请人已退款 ${form.refundMoney} 元`, form.uid, null);
+}
+/*
+* 记录基金申请退款账单ID
+* @param {String} billId 基金退款账单ID
+* */
+fundApplicationFormSchema.methods.saveRefundBillId = async function(billId) {
+  this.refundBillId = billId;
+  await this.save();
+}
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);
 module.exports = FundApplicationFormModel;
