@@ -2,7 +2,7 @@ if !isIncluded('operationCenter')
   mixin applicantOperationCenter(form, uid)
     -var isApplicant = form.uid === uid;
     -var {general, detail} = form.formStatus;
-    if isApplicant && [2, 4].includes(general)
+    if isApplicant && [2, 4, 6].includes(general)
       .m-b-1
         .panel-header 操作中心
         if general === 2
@@ -14,6 +14,8 @@ if !isIncluded('operationCenter')
           a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/complete`) 结题
           if form.remittance[0].status !== true
             button.btn.btn-default.btn-block(onclick=`withdrawApplicationForm(${form._id}, 'applicant')`) 撤回申请
+        if general === 6
+          a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/refund`)=`去退款 ${form.refundMoney} 元`
 
   mixin managerOperationCenter(form, userFundRoles)
     -var {applicant} = form;
@@ -36,7 +38,7 @@ if !isIncluded('operationCenter')
           a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/report/audit`) 报告审核
         if general === 4 && detail === 6 && isExpert
           a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/complete/audit`) 结题审核
-        if general === 5 && isAdmin
+        if general >= 5 && isAdmin
           if detail === 3
             button.btn.btn-default.btn-block(onclick=`excellent(${form._id}, false)`) 取消设为优秀项目
           else

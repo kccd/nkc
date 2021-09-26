@@ -802,5 +802,6 @@
   "experimentalIPSettings": "后台管理 - IP 黑名单",
   "experimentalShareSettings": "后台管理 - 分享设置",
   "experimentalToolsFilter": "后台管理 - 工具 - 敏感词检测",
-  "experimentalFilterLogs": "查看后台敏感词过滤记录"
+  "experimentalFilterLogs": "查看后台敏感词过滤记录",
+  "fundApplicationFormRefund": "基金退款"
 }

@@ -39,7 +39,15 @@ router
     });
     await newDocument.save();
     if(passed) {
-      await applicationForm.updateOne({'status.completed': true, completedAudit: false, tlm: Date.now()});
+      // 判断是否需要退款
+      const refundMoney = await applicationForm.getRefundMoney();
+      await applicationForm.updateOne({
+        refundMoney,
+        'status.completed': true,
+        'status.refund': refundMoney > 0? false: null,
+        completedAudit: false,
+        tlm: Date.now()
+      });
     } else {
       await applicationForm.updateOne({'status.completed': false, completedAudit: false});
     }

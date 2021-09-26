@@ -43,14 +43,12 @@ const app = new Vue({
     factMoney() {
       let factTotal = 0;
       for(const b of this.form.budgetMoney) {
-        console.log(b.fact)
         factTotal += b.fact * 100;
       }
       return factTotal / 100;
     },
     returnMoney() {
       const {factMoney, totalMoney} = this;
-      console.log(factMoney, totalMoney)
       if(factMoney > totalMoney) {
         return (factMoney * 100 - totalMoney * 100) / 100;
       } else {

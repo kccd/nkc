@@ -105,7 +105,8 @@ const schema = new mongoose.Schema({
 * 获取H5支付链接
 * @param {Object} props
 *   @param {String} description 简介 1-127(不知是字节还是字符个数)
-*   @param {String} money 待付款金额（分）
+*   @param {Number} money 待付款金额（分）
+*   @param {Number} effectiveMoney 有效金额（分）
 *   @param {String} uid 付款者ID
 *   @param {String} apiType 接口类型 H5或native
 *   @param {Object} attach 自定义数据
