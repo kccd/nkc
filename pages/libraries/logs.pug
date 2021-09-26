@@ -84,7 +84,7 @@ block scripts
   include ../publicModules/floatUserPanel/floatUserPanel
   include ../publicModules/resourceInfo/resourceInfo
   script.
-    var ResourceInfo = new NKC.modules.ResourceInfo;
+    const ResourceInfo = new NKC.modules.ResourceInfo;
     function showResource(lid) {
       ResourceInfo.open({lid: lid});
     }

@@ -111,7 +111,7 @@ schema.statics.extendComplaints = async (complaints) => {
   const users = await UserModel.find({uid: {$in: [...uid]}});
   let posts = await PostModel.find({pid: {$in: [...pid]}});
   let threads = await ThreadModel.find({tid: {$in: [...tid]}});
-  let librarys = await LibraryModel.find({lid: {$in: [...lid]}});
+  let libraries = await LibraryModel.find({_id: {$in: [...lid]}});
   posts = await PostModel.extendPosts(posts, {
     user: true,
     userGrade: false,
@@ -131,8 +131,8 @@ schema.statics.extendComplaints = async (complaints) => {
     htmlToText: false,
     count: 200
   });
-  // librarys = await LibraryModel.
-
+  libraries = await LibraryModel.extendLibraries(libraries)
+  console.log(libraries)
   users.map(user => {
     userObj[user.uid] = user;
   });
@@ -142,6 +142,10 @@ schema.statics.extendComplaints = async (complaints) => {
   }
   threads.map(thread => {
     threadObj[thread.tid] = thread;
+  });
+
+  libraries.map(library => {
+    libraryObj[library._id] = library;
   });
 
   const results = [];

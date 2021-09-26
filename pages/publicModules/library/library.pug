@@ -78,7 +78,7 @@
             //:href="getUrl('pdf', resource.rid)" v-if="resource.ext === 'pdf'" target="_blank"
             .list-options-link(
               title="举报"
-              @click="complain(f.rid)"
+              @click="complain(f._id)"
             )
               .fa.fa-thumbs-down
             .list-options-link(

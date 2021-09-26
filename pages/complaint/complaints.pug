@@ -3,6 +3,7 @@ block title
   title 投诉列表
   +includeCSS("/complaint/complaint.css")
 block content
+  include ../publicModules/downloadResource/downloadResource
   .container-fluid.max-width
     #data.hidden=objToStr({complaints: data.complaints})
     .row#app(v-cloak)
@@ -39,6 +40,9 @@ block content
               a.complaint-link(:href="'/t/' + c.contentId" target="_blank") {{c.content.firstPost.t}}
             span(v-else-if="c.type === 'library'")
               .complaint-info 投诉了用户
+              a.complaint-author(:href="'/u/' + c.content.uid" target="_blank") {{c.content.user.username}}
+              .complaint-info 所上传的文库文件
+              a.complaint-link(@click='showResource(c.contentId)') 查看
             .complaint-content {{c.reasonDescription || "未填写违规详细信息"}}
             .complaint-button(v-if="c.resolved")
               span(@click="c.open = !c.open") 查看详情
@@ -66,4 +70,7 @@ block content
           include ../publicModules/paging/paging_input
 block scripts
   include ../publicModules/moment
+  include ../publicModules/resourceInfo/resourceInfo
   +includeJS("/complaint/complaints.js")
+  +includeJS("../publicModules/resourceInfo/resourceInfo.js")
+

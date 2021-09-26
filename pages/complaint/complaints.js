@@ -15,6 +15,10 @@ window.app = new Vue({
   methods: {
     format: NKC.methods.format,
     fromNow: NKC.methods.fromNow,
+    showResource(id){
+      const ResourceInfo = new NKC.modules.ResourceInfo;
+      ResourceInfo.open({lid: id});
+    },
     save: function(c) {
       nkcAPI("/complaint/resolve", "POST", {
         result: c.result,
