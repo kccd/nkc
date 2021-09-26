@@ -10,11 +10,16 @@ router
   })
   .put("/", async (ctx, next) => {
     const {db, body} = ctx;
-    const {roles, grades} = body;
+    const {roles, grades, libraryTip} = body;
     await db.SettingModel.updateOne({_id: "library"}, {$set: {
       "c.permission": {
-        roles, grades
-      }
+        roles,
+        grades
+      },
+     "c.libraryTip": {
+        tip1: libraryTip.tip1,
+        tip2: libraryTip.tip2
+     }
     }});
     await db.SettingModel.saveSettingsToRedis("library");
     await next();

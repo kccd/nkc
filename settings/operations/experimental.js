@@ -5,9 +5,9 @@ module.exports = {
     POST: "experimentalLogin"
   },
 	settings: {
-    tools: {
-      GET: "visitToolsManager"
-    },
+		tools: {
+		  GET: "visitToolsManager"
+		},
 		complaintType:{
 			GET:"experimentalcomplaintTypeSettings",
 			POST:"experimentalcomplaintTypeSettings",

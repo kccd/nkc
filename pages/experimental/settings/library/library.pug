@@ -1,6 +1,7 @@
 extends ../../experimental
 block eTitle
   title 文库设置
+  +includeCSS("/experimental/settings/library/library.css")
 block eContent
   .container-fluid.max-width
     .row
@@ -74,7 +75,13 @@ block eContent
               th
                 input(type="checkbox" value="deleteFile" v-model="r.operations")          
               th  
-                button.btn.btn-sm.btn-default(@click="selectAll(r)") 全选  
+                button.btn.btn-sm.btn-default(@click="selectAll(r)") 全选
+        div.input-group
+          .input-group-addon#sizing-addon1 文库上传提示1
+          input.form-control(placeholder="请输入提示1" aria-describedby="sizing-addon2" v-model="libraryTip.tip1")
+        div.input-group
+          .input-group-addon#sizing-addon2 文库上传提示2
+          input.form-control(placeholder="请输入提示2" aria-describedby="sizing-addon2" v-model="libraryTip.tip2")
         .m-t-1
           button.btn.btn-primary(@click="submit") 提交          
 block scripts

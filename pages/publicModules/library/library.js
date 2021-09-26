@@ -12,6 +12,7 @@ NKC.modules.Library = class {
         folders: [],
         files: [],
         lid,
+        libraryTips:"",
         tLid,
         sort: "time",
         histories: [],
@@ -55,6 +56,7 @@ NKC.modules.Library = class {
         }
       },
       mounted() {
+        this.getTips();
         if(folderId) {
           this.saveToLocalStorage(folderId);
         }
@@ -158,6 +160,15 @@ NKC.modules.Library = class {
         getSize: NKC.methods.tools.getSize,
         checkString: NKC.methods.checkData.checkString,
         scrollTo: NKC.methods.scrollTop,
+        getTips(){
+          const _this = this;
+          nkcAPI(`/e/settings/library`, "GET")
+            .then((data) => {
+              self.app.libraryTips = data.librarySettings.libraryTip;
+            })
+            .catch((err) => {
+          });
+        },
         complain(id){
           if(!window.complaintSelector)
             window.complaintSelector = new NKC.modules.ComplaintSelector();
