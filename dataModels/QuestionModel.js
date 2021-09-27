@@ -111,8 +111,10 @@ schema.statics.extendQuestions = async (questions) => {
 * @param {Number} qid 试题 ID
 * */
 schema.methods.updateImage = async function(file) {
+  const FILE = require('../nkcModules/file');
   const {path} = file;
   const {_id} = this;
+  await FILE.getFileExtension(file, ['jpg', 'jpeg', 'png']);
   const {questionImagePath} = require('../settings/upload');
   const {questionImageify} = require('../tools/imageMagick');
   const targetPath = questionImagePath + '/' + _id + '.jpg';
