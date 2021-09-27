@@ -86,8 +86,11 @@ module.exports = async (options) => {
       // 计算名称长度
       const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
       let usernameWidth = usernameLength * 12;
-      const waterSmallPath = await db.AttachmentModel.getWatermarkFilePath('small');
-      const waterBigPath = await db.AttachmentModel.getWatermarkFilePath('normal');
+      //获取小水印图
+      let waterSmallPath = await db.AttachmentModel.getWatermarkFilePath('small');
+      console.log(waterSmallPath)
+      //获取大水印图
+      let waterBigPath = await db.AttachmentModel.getWatermarkFilePath('normal');
       const watermarkSettings = await db.SettingModel.getWatermarkSettings();
       const watermarkPictureInfo = await imageMagick.info(waterSmallPath);
       const siteLogoWidth = parseInt(watermarkPictureInfo.width);

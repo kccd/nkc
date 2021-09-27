@@ -270,10 +270,15 @@ schema.statics.getWatermarkFilePath = async (c) => {
   const SM = mongoose.model('settings');
   const uploadSettings = await SM.getSettings('upload');
   const id = uploadSettings.watermark[`${c}AttachId`];
+  //判断如果用户未上传水印图片就换未默认图片
   if(!id) {
     return statics[`${c}Watermark`];
   }
-  const water = await AP.findById(id);
+  let water = await AP.findById(id);
+ //判断如果用户上传了图片找不到图片就替换为默认图片
+  if(water == null){
+    return statics[`${c}Watermark`];
+  }
   return await water.getFilePath();
 }
 

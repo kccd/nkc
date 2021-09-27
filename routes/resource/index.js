@@ -276,6 +276,8 @@ resourceRouter
     await r.save();
     ctx.data.r = r;
 
+    //处理上传的资源文件
+
     setImmediate(async () => {
       try{
         await mediaMethods[mediaType]({
