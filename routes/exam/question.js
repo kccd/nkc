@@ -110,7 +110,6 @@ router
       public: publicQuestion,
       content,
       answer,
-      hasImage: false
     };
     if(auth === false) {
       // 提交自己审核不通过的试题时，试题会再次变为"待审核"状态。
