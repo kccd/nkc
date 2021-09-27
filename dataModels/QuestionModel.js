@@ -105,4 +105,23 @@ schema.statics.extendQuestions = async (questions) => {
   }));
 };
 
+/*
+* 保存试题的图片
+* @param {File} file 图片对象
+* @param {Number} qid 试题 ID
+* */
+schema.methods.updateImage = async function(file) {
+  const {path} = file;
+  const {_id} = this;
+  const {questionImagePath} = require('../settings/upload');
+  const {questionImageify} = require('../tools/imageMagick');
+  const targetPath = questionImagePath + '/' + _id + '.jpg';
+  await questionImageify(path, targetPath);
+  await this.updateOne({
+    $set: {
+      hasImage: true
+    }
+  });
+};
+
 module.exports = mongoose.model('questions', schema);
