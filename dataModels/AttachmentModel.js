@@ -275,11 +275,16 @@ schema.statics.getWatermarkFilePath = async (c) => {
     return statics[`${c}Watermark`];
   }
   let water = await AP.findById(id);
- //判断如果用户上传了图片找不到图片就替换为默认图片
+ //判断如果用户上传了图片根据id找不到图片就替换为默认图片
   if(water == null){
     return statics[`${c}Watermark`];
   }
-  return await water.getFilePath();
+  let filePath =  await water.getFilePath();
+  //判断如果用户上传了图片找不到图片路径就替换为默认图片
+  if(!filePath){
+    return statics[`${c}Watermark`];
+  }
+  return filePath;
 }
 
 /**
