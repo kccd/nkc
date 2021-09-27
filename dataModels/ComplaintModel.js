@@ -132,7 +132,6 @@ schema.statics.extendComplaints = async (complaints) => {
     count: 200
   });
   libraries = await LibraryModel.extendLibraries(libraries)
-  console.log(libraries)
   users.map(user => {
     userObj[user.uid] = user;
   });

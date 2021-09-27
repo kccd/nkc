@@ -1,0 +1,114 @@
+#moduleComplaint{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: none;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 10000;
+}
+#moduleComplaintSelector.draggable-panel{
+  height: auto!important;
+}
+.complaint-header{
+  color: #e85a71;
+  text-align: center;
+  font-weight: 700;
+  height: 5rem;
+  line-height: 5rem;
+  font-size: 1.8rem;
+  position: relative;
+}
+.complaint-close{
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  height: 2.5rem;
+  width: 2.5rem;
+  line-height: 2.5rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #9baec8;
+}
+.complaint-close:hover{
+  background-color: #282c37;
+  color: #fff;
+}
+.complaint-content{
+  width: 34rem;
+  max-width: 100%;
+  height: auto;
+  max-height: 40rem;
+  border-radius: 0 0 3px 3px;
+  border-top: 2px solid #2b90d9;
+  position: absolute;
+  background-color: #fff;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+.complaint-body{
+  padding: 1rem;
+}
+.complaint-body h5{
+  margin-top: 0;
+}
+.complaint-reason{
+  height: 3rem;
+  border-radius: 3px;
+  margin: 0.5rem 0.5rem;
+  display: inline-block;
+  cursor: pointer;
+  color: #282c37;
+  font-weight: 700;
+  line-height: 3rem;
+  padding: 0 1rem;
+  border: 1px solid #2b90d9;
+  transition: background-color 100ms, color 100ms;
+}
+.complaint-reason.active{
+  border: 1px solid #2b90d9;
+  color: #fff;
+  background-color: #2b90d9;
+}
+.complaint-input{
+  margin-top: 1rem;
+  height: 10rem!important;
+}
+.complaint-button{
+  margin: 1rem 0;
+}
+.complaint-button button{
+  background-color: #2b90d9;
+  border-color: #2b90d9;
+}
+.complaint-title{
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  height: 3rem;
+  line-height: 3rem;
+}
+.complaint-title .fa{
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  height: 2.5rem;
+  width: 2.5rem;
+  text-align: center;
+  line-height: 2.5rem;
+  background-color: #33c333;
+  color: #fff;
+  font-size: 1.6rem;
+  border-radius: 50%;
+}
+.complaint-description{
+  color: #282c37;
+  font-size: 1.3rem;
+  line-height: 2rem;
+  margin-top: 4rem;
+}
