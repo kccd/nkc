@@ -17,8 +17,8 @@ router
         grades
       },
      "c.libraryTip": {
-        tip1: libraryTip.tip1,
-        tip2: libraryTip.tip2
+        tipShow: libraryTip.tipShow,
+        tipUpload: libraryTip.tipUpload
      }
     }});
     await db.SettingModel.saveSettingsToRedis("library");

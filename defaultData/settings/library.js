@@ -20,8 +20,8 @@ module.exports = {
       grades: []
     },
     libraryTip: {
-      tip1: "",
-      tip2: ""
+      tipShow: "",
+      tipUpload: ""
     }
   }
 };

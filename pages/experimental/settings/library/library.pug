@@ -78,10 +78,10 @@ block eContent
                 button.btn.btn-sm.btn-default(@click="selectAll(r)") 全选
         div.input-group
           .input-group-addon#sizing-addon1 文库上传提示1
-          input.form-control(placeholder="请输入提示1" aria-describedby="sizing-addon2" v-model="libraryTip.tip1")
+          input.form-control(placeholder="请输入提示1" aria-describedby="sizing-addon2" v-model="libraryTip.tipShow")
         div.input-group
           .input-group-addon#sizing-addon2 文库上传提示2
-          input.form-control(placeholder="请输入提示2" aria-describedby="sizing-addon2" v-model="libraryTip.tip2")
+          input.form-control(placeholder="请输入提示2" aria-describedby="sizing-addon2" v-model="libraryTip.tipUpload")
         .m-t-1
           button.btn.btn-primary(@click="submit") 提交          
 block scripts

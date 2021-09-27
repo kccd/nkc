@@ -329,7 +329,7 @@ async function addImageTextWaterMask(op) {
  * 图片添加图文水印
  * @param {object} op 配置
  * 配置项：
- *  input 输入路径， output 输出路径， image 图片路径， text 文字, flex 水印占整个图片高度的百度比, position 水印位置
+ *  input 输入路径， output 输出路径， image 图片路径， text 文字, flex 水印占整个图片高度的百分比, position 水印位置
  */
 async function addImageTextWaterMaskForImage(op) {
   let {

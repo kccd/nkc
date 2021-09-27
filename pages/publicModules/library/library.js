@@ -12,7 +12,7 @@ NKC.modules.Library = class {
         folders: [],
         files: [],
         lid,
-        libraryTips:"",
+        libraryTip:"",
         tLid,
         sort: "time",
         histories: [],
@@ -164,7 +164,7 @@ NKC.modules.Library = class {
           const _this = this;
           nkcAPI(`/e/settings/library`, "GET")
             .then((data) => {
-              self.app.libraryTips = data.librarySettings.libraryTip;
+              self.app.libraryTip = data.librarySettings.libraryTip;
             })
             .catch((err) => {
           });

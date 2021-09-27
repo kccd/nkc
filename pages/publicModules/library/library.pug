@@ -12,7 +12,7 @@
           )
       .lib-nav-description {{folder.description || "暂无简介"}}
     div(v-if="pageType === 'list'")
-      div.updateTip {{libraryTips.tip1}}
+      div.updateTip {{libraryTip.tipShow}}
       .options-button
         a(@click="back" :class="{'disabled': !lastFolder || mark}")
           .fa.fa-arrow-left &nbsp;
@@ -125,7 +125,7 @@
                   | &nbsp;删除
 
   div(v-else)
-    div.updateTip2 {{libraryTips.tip2}}
+    div.updateTip2 {{libraryTip.tipUpload}}
     .lib-uploader
       .options-button
         a(@click="toList")
