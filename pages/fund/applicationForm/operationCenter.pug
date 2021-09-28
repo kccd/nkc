@@ -38,6 +38,8 @@ if !isIncluded('operationCenter')
           a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/report/audit`) 报告审核
         if general === 4 && detail === 6 && isExpert
           a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/complete/audit`) 结题审核
+        if general === 6 && detail === 1 && (isAdmin || isFinancialStaff)
+          button.btn.btn-default.btn-block(onclick=`confirmRefund(${form._id}, ${form.refundMoney})`)=`确认退款`
         if general >= 5 && isAdmin
           if detail === 3
             button.btn.btn-default.btn-block(onclick=`excellent(${form._id}, false)`) 取消设为优秀项目
@@ -138,6 +140,16 @@ if !isIncluded('operationCenter')
       })
       .then(function() {
         window.location.reload();
+      })
+      .catch(sweetError)
+    }
+    function confirmRefund(formId, refundMoney) {
+      return sweetQuestion('当前操作将会更改基金申请表的退款状态并且不可撤销，确定要继续吗？')
+      .then(function() {
+        return nkcAPI('/fund/a/' + formId + '/manage/refund', 'POST', {})
+      })
+      .then(function() {
+        sweetSuccess('操作成功');
       })
       .catch(sweetError)
     }

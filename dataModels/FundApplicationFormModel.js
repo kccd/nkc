@@ -1747,6 +1747,28 @@ fundApplicationFormSchema.statics.updateRefundStatusByBillId = async (billId) =>
   await form.createReport('system', `申请人已退款 ${form.refundMoney} 元`, form.uid, null);
 }
 /*
+* 人工设置基金申请退款状态
+* */
+fundApplicationFormSchema.methods.adminUpdateRefundStatus = async function(operatorId) {
+  if(this.status.refund !== false)  return;
+  const FundBillModel = mongoose.model('fundBills');
+  const bill = await FundBillModel.createRefundBill({
+    money: this.refundMoney,
+    uid: this.uid,
+    fundId: this.fundId,
+    formId: this._id,
+    paymentId: '',
+    operatorId,
+    paymentType: ''
+  });
+  await this.updateOne({
+    $set: {
+      refundBillId: bill._id,
+    }
+  });
+  await bill.verifyPass();
+};
+/*
 * 记录基金申请退款账单ID
 * @param {String} billId 基金退款账单ID
 * */
