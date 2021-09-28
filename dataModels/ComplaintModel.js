@@ -37,7 +37,7 @@ const schema = new Schema({
     type: String,
     default: ""
   },
-  // 投诉类型名称
+  // 投诉类型名称 废弃
   reasonType: {
     type: String,
     default: ""

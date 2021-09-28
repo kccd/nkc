@@ -56,12 +56,14 @@ Object.assign(window, {
 var app = new Vue({
   el: '#app',
   data: {
-    type:data.complaintTypes || [],
+    type: data.complaintTypes || [],
+    complaintSettings: data.complaintSettings,
   },
   mounted () {
-    this.getList();
+    floatUserPanel.initPanel();
   },
   methods: {
+    getUrl: NKC.methods.tools.getUrl,
     timeFormat(time) {
       var fixTime = function(number) {
         return number < 10? '0' + number: number;
@@ -85,7 +87,7 @@ var app = new Vue({
     initiate(_id, disabled){
       sweetQuestion(`确定要执行当前操作？`)
       .then(() => {
-        nkcAPI('/e/settings/complaintType', 'put', {
+        nkcAPI('/e/settings/complaint/type', 'PUT', {
           operation: "modifyDisabled",
           _id,
           disabled: !!disabled
@@ -100,7 +102,7 @@ var app = new Vue({
     forbidden(_id, disabled){
       sweetQuestion(`确定要执行当前操作？`)
       .then(() => {
-        nkcAPI('/e/settings/complaintType', 'put', {
+        nkcAPI('/e/settings/complaint/type', 'PUT', {
           operation: "modifyDisabled",
           _id,
           disabled: !!disabled
@@ -121,7 +123,7 @@ var app = new Vue({
         return Promise.resolve()
           .then(() => {
             if(!type.length) throw new Error('投诉类型不能为空');
-            return nkcAPI('/e/settings/complaintType', 'put', {
+            return nkcAPI('/e/settings/complaint/type', 'PUT', {
               operation: "modifyEdit",
               _id:val._id,
               type,
@@ -151,15 +153,17 @@ var app = new Vue({
         ]
       })
     },
-    getList: function() {
-      nkcAPI('/e/settings/complaintType', 'get', {
+
+    submit() {
+      const {complaintSettings} = this;
+      nkcAPI(`/e/settings/complaint`, 'PUT', {
+        complaintSettings
       })
-        .then(function(data) {
-          this.type=data.complaintTypes
+        .then(() => {
+          sweetSuccess(`保存成功`);
         })
-        .catch(function(data) {
-        })
-    },
+        .catch(sweetError);
+    }
   }
 });
 

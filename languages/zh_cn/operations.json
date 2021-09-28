@@ -803,5 +803,5 @@
   "experimentalShareSettings": "后台管理 - 分享设置",
   "experimentalToolsFilter": "后台管理 - 工具 - 敏感词检测",
   "experimentalFilterLogs": "查看后台敏感词过滤记录",
-  "experimentalcomplaintTypeSettings": "后台管理 - 工具 -添加投诉信息"
+  "experimentalComplaintSettings": "后台管理 - 设置 - 投诉"
 }

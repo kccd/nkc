@@ -20,7 +20,7 @@ block content
           include ../publicModules/paging/paging
           .complaint-single(v-for="c in complaints")
             .complaint-reason-type.success(v-if="c.resolved") 已处理
-            .complaint-reason-type {{c.reasonType_}}
+            .complaint-reason-type {{c.reasonType}}
             .complaint-time(:title='format("YYYY-MM-DD HH:mm:ss", c.toc)') {{fromNow(c.toc)}}
             a.complaint-author(:href="'/u/' + c.uid" target="_blank") {{c.user.username}}
             span(v-if="c.type === 'user'")

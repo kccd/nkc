@@ -49,7 +49,7 @@ const sensitiveWordsRouter = require('./sensitiveWords');
 const visitRouter = require('./visit');
 const ipRouter = require('./ip');
 const fundRouter = require('./fund');
-const complaintTypeRouter = require('./complaintType');
+const complaintRouter = require('./complaint');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -106,5 +106,5 @@ settingRouter
   .use('/ip', ipRouter.routes(), ipRouter.allowedMethods())
   .use('/tools', toolsRouter.routes(), toolsRouter.allowedMethods())
 	.use('/sensitiveWords', sensitiveWordsRouter.routes(), sensitiveWordsRouter.allowedMethods())
-	.use('/complaintType', complaintTypeRouter.routes(), complaintTypeRouter.allowedMethods())
+	.use('/complaint', complaintRouter.routes(), complaintRouter.allowedMethods())
 module.exports = settingRouter;

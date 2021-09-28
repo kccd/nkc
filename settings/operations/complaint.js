@@ -3,5 +3,8 @@ module.exports = {
   POST: 'complaintPost',
   resolve: {
     POST: "complaintResolvePost"
+  },
+  type: {
+    GET: 'complaintPost'
   }
 };

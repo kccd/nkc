@@ -7,33 +7,30 @@ include ../draggablePanel/draggablePanel
       .draggable-panel-right-button(@click='close')
         .fa.fa-remove
     .draggable-panel-body
-      .draggable-panel-loading(v-if='loading') 加载中...
+      .draggable-panel-loading(v-if='loading').m-b-3 加载中...
       .draggable-panel-content(v-else)
             .complaint-body(v-if="!submitted")
+              .p-a-1.m-b-1.bg-warning.text-warning.pre-wrap(v-if='tip') {{tip}}
               h5 请选择违规类型：
               div
-                span(:title="reason.description").complaint-reason(
+                span.complaint-reason(
+                  :title="reason.description"
                   v-for="reason in reasons"
                   :class="{'active': reasonTypeId===reason._id}"
                   @click="selectReason(reason)"
                 ) {{reason.type}}
                 div(v-if="!reasons.length")
-                  .p-t-5.p-b-5.text-center
+                  .p-t-3.p-b-3.text-center
                     h4
-                      b 空空如也~
+                      b 空空如也
               textarea.form-control.complaint-input(placeholder="请清晰描述投诉或举报的理由" v-model='reasonDescription')
               .complaint-button
                 button.btn.btn-block.btn-primary(v-if="reasonTypeId" @click="submit") 提交
                 button.btn.btn-block.btn-primary(v-else disabled) 提交
             .complaint-body(v-else)
-              .complaint-submitted
+              .complaint-submitted.p-t-5.p-b-5
                 .complaint-title
                   .fa.fa-check
                   span 提交成功！
-                .complaint-description 感谢您的反馈！我们会第一时间查看和处理。
-                  br
-                  | 如果小编认为不需要处理，就不会处理。建议您继续观察，如果情况恶化，可以再次投诉或举报。
-                  br
-                  | 请确保您的提交的内容是真实的、客观的，并对此负责。恶意投诉或举报将受到处罚。
 
 +includeJS('/publicModules/complaint/complaintBox.js')

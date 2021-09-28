@@ -9,7 +9,6 @@ const schema = new Schema({
   },
   disabled:{
     type: Boolean,
-    required: true,
     default: false
   },
   uid: {
@@ -38,41 +37,15 @@ const schema = new Schema({
 * */
 schema.statics.insertCom = async (props) => {
   const SettingModel = mongoose.model('settings');
-  const {uid, type, description, toc, disabled} = props;
+  const {uid, type, description} = props;
   const recordId = await SettingModel.operateSystemID("complaintTypes",1);
-  const list = mongoose.model('complaintTypes');
-  await list({
+  const ComplainTypeModel = mongoose.model('complaintTypes');
+  await ComplainTypeModel({
     _id: recordId,
     uid,
     type,
     description,
-    toc,
-    disabled
   }).save();
 };
-
-// schema.statics.defaultCom = async (props) => {
-//   const SettingModel = mongoose.model('settings');
-//   const {uid, type, description, toc, disabled} = props;
-//   const recordId = await SettingModel.operateSystemID("complaintTypes",1);
-//   const list = mongoose.model('complaintTypes');
-//   await list({
-//     _id: recordId,
-//     uid,
-//     type,
-//     description,
-//     toc,
-//     disabled
-//   }).save();
-// };
-// schema.statics.updataCom = async (props) => {
-//   const SettingModel = mongoose.model('settings');
-//   const {_id, disabled} = props;
-//   const list = mongoose.model('complaintTypes');
-//   await list({
-//     _id,
-//     disabled
-//   }).save();
-// };
 
 module.exports = mongoose.model("complaintTypes", schema);
