@@ -407,6 +407,7 @@ fundBillSchema.statics.createDonationBill = async (props) => {
 * 创建基金退款账单
 *   @parma {Number} money 金额 (元)
 *   @param {String} uid 退款人 ID 游客为 ’‘
+*   @param {String} operatorId 操作人 ID
 *   @param {String} fundId 退款给基金项目时的基金项目 ID 或 fundPool
 *   @param {String} paymentType 支付平台 wechatPay, aliPay
 *   @param {Number} formId 基金申请 ID
@@ -417,6 +418,7 @@ fundBillSchema.statics.createRefundBill = async (props) => {
   const {
     money,
     uid = '',
+    operatorId = '',
     fundId,
     formId,
     paymentId,
@@ -435,7 +437,7 @@ fundBillSchema.statics.createRefundBill = async (props) => {
       id: fundId,
       anonymous: false
     },
-    uid,
+    uid: operatorId || uid,
     money,
     abstract,
     applicationFormId: formId,

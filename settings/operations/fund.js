@@ -132,6 +132,9 @@ module.exports = {
         },
         withdraw: {
           POST: 'withdrawFundApplicationForm'
+        },
+        refund: {
+          POST: 'refundFundApplicationForm'
         }
       },
 			/*comment: {

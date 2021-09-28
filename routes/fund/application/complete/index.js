@@ -90,7 +90,7 @@ completeRouter
         });
       }
 
-      if(actualMoney.length === 0) ctx.throw(400, '请输入实际使用金额。');
+      // if(actualMoney.length === 0) ctx.throw(400, '请输入实际使用金额。');
 
       await applicationForm.updateOne({actualMoney: _actualMoney});
     }
