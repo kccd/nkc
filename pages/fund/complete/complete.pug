@@ -70,8 +70,7 @@ block fundContent
                     strong.text-danger {{returnMoney}}
                     span &nbsp;元
                     span(v-if='returnMoney > 0')
-                      span ，
-                      a(:href='"/fund/donation?fundId=" + form.fundId + "&money=" + returnMoney + "&refund=true"' target='_blank') 去退款
+                      span （结题审核通过后可申请退款）
               .form-group
                 .radio
                   span 总体情况：

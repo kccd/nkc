@@ -1725,7 +1725,7 @@ fundApplicationFormSchema.methods.getRefundMoney = async function() {
     }
 
   }
-  return usedMoney >= money? 0: money - usedMoney;
+  return usedMoney >= money? 0: (Math.round(money - usedMoney) / 100);
 };
 
 /*
