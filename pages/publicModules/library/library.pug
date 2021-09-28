@@ -75,13 +75,13 @@
           .size {{(f.ext||"未知").toUpperCase()}} {{getSize(f.size)}}
         //-.list-description {{f.description || "暂无简介"}}
         .list-options(@click.stop)
+          .list-options-link(
+            title="举报"
+            @click="complain(f._id)"
+          )
+            .fa.fa-minus-circle
           span(v-if="per('modifyOtherLibrary') || (uid && f.uid === uid)")
             //:href="getUrl('pdf', resource.rid)" v-if="resource.ext === 'pdf'" target="_blank"
-            .list-options-link(
-              title="举报"
-              @click="complain(f._id)"
-            )
-              .fa.fa-thumbs-down
             .list-options-link(
               v-if="f.ext === 'pdf'"
               title="预览"

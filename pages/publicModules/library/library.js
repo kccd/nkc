@@ -57,11 +57,14 @@ NKC.modules.Library = class {
       },
       mounted() {
         //测试从消息弹框查看投诉处理跳转
-        const queryID = window.location.hash.split("#").pop();
+        /*let queryID = window.location.hash.split("#").pop();
         if(queryID) {
-          this.saveToLocalStorage(queryID);
-          this.lid = queryID;
-        }
+          queryID = Number(queryID);
+          if(!isNaN(queryID)) {
+            this.saveToLocalStorage(queryID);
+            this.lid = queryID;
+          }
+        }*/
         if(folderId) {
           this.saveToLocalStorage(folderId);
         }

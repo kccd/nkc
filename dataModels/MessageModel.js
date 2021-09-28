@@ -796,7 +796,7 @@ messageSchema.statics.getParametersData = async (message) => {
       CRTarget = `/f/${forum.fid}/library#${folderId}`;
       // CRTarget = tools.getUrl("library", contentId);
       // 投诉目标描述
-      CRTargetDesc = "点击查看";
+      CRTargetDesc = library.name;
     } else {
       return null;
     }
