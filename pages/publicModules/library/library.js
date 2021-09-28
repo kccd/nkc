@@ -56,7 +56,9 @@ NKC.modules.Library = class {
         }
       },
       mounted() {
-        this.getTips();
+        //测试从消息弹框跳转
+        const queryID = window.location.hash.split("#").pop();
+        this.saveToLocalStorage(queryID);
         if(folderId) {
           this.saveToLocalStorage(folderId);
         }
@@ -160,15 +162,15 @@ NKC.modules.Library = class {
         getSize: NKC.methods.tools.getSize,
         checkString: NKC.methods.checkData.checkString,
         scrollTo: NKC.methods.scrollTop,
-        getTips(){
-          const _this = this;
-          nkcAPI(`/e/settings/library`, "GET")
-            .then((data) => {
-              self.app.libraryTip = data.librarySettings.libraryTip;
-            })
-            .catch((err) => {
-          });
-        },
+        // getTips(){
+        //   const _this = this;
+        //   nkcAPI(`/e/settings/library`, "GET")
+        //     .then((data) => {
+        //       self.app.libraryTip = data.librarySettings.libraryTip;
+        //     })
+        //     .catch((err) => {
+        //   });
+        // },
         complain(id){
           if(!window.complaintSelector)
             window.complaintSelector = new NKC.modules.ComplaintSelector();
@@ -493,6 +495,7 @@ NKC.modules.Library = class {
           const url = `/library/${id}?file=true&nav=true&folder=true&permission=true&t=${Date.now()}`;
           return nkcAPI(url, "GET")
             .then(function(data) {
+              self.app.libraryTip = data.librarySettings.libraryTip
               self.app.nav = data.nav;
               self.app.folders = data.folders;
               self.app.files = data.files;

@@ -27,7 +27,8 @@ router
     const {data, query, db} = ctx;
     const {folder, file, nav, path, info, permission} = query;
     const {library} = data;
-    if(folder) data.folders = await library.getFolders(); 
+    data.librarySettings = await db.SettingModel.getSettings("library");
+    if(folder) data.folders = await library.getFolders();
     if(file) data.files = await library.getFiles();
     // if(nav) data.nav = await library.getNav();
     if(path) {

@@ -9,8 +9,19 @@ router
     await next();
   })
   .put("/", async (ctx, next) => {
-    const {db, body} = ctx;
+    const {db, body, nkcModules} = ctx;
     const {roles, grades, libraryTip} = body;
+    const {checkString} = nkcModules.checkData;
+    checkString(libraryTip.tipShow, {
+      name: '文库说明',
+      minLength: 0,
+      maxLength: 5000
+    });
+    checkString(libraryTip.tipUpload, {
+      name: '文库上传说明',
+      minLength: 0,
+      maxLength: 5000
+    });
     await db.SettingModel.updateOne({_id: "library"}, {$set: {
       "c.permission": {
         roles,

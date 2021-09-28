@@ -11,7 +11,7 @@ if !isIncluded('selectResource')
           a.button.radius-right(title="下一页" @click="changePage('next')")
             .fa.fa-angle-right
         .paging-button(v-if="screenType !== 'sm'")
-          span(v-for="b, index in paging.buttonValue")
+          span(v-for="(b, index) in paging.buttonValue")
             span(v-if="b.type === 'active'")
               a.button.active(@click="getResources(b.num)"
                 :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"

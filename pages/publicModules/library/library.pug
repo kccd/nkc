@@ -12,7 +12,8 @@
           )
       .lib-nav-description {{folder.description || "暂无简介"}}
     div(v-if="pageType === 'list'")
-      div.updateTip {{libraryTip.tipShow}}
+      .m-b-05.p-a-05.bg-warning.text-warning(v-if='libraryTip.tipShow') {{libraryTip.tipShow}}
+      //div.updateTip {{libraryTip.tipShow}}
       .options-button
         a(@click="back" :class="{'disabled': !lastFolder || mark}")
           .fa.fa-arrow-left &nbsp;
@@ -125,7 +126,7 @@
                   | &nbsp;删除
 
   div(v-else)
-    div.updateTip2 {{libraryTip.tipUpload}}
+    .m-b-05.p-a-05.bg-warning.text-warning(v-if='libraryTip.tipUpload') {{libraryTip.tipUpload}}
     .lib-uploader
       .options-button
         a(@click="toList")

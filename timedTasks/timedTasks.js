@@ -173,12 +173,12 @@ func.modifyTimeoutApplicationForm = async () => {
 func.modifyProjectCycle = async () =>{
   setTimeout(async () =>{
     try{
-    console.log("正在给超过结题时间的用户发送系统提示...")
+    console.log("正在处理超时未结题的基金申请...")
     await db.MessageModel.sendFinishProejct();
     } catch(err) {
       console.log(err)
     } finally {
-      console.log("发送结题超时成功")
+      console.log("处理完成");
       await func.modifyProjectCycle();
     }
   },12 * 60 * 60 *1000)

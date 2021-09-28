@@ -323,6 +323,7 @@ messageSchema.statics.getParametersData = async (message) => {
   const FundApplicationFormModel = mongoose.model("fundApplicationForms");
   const ShopOrdersModel = mongoose.model("shopOrders");
   const ColumnModel = mongoose.model("columns");
+  const LibraryModel = mongoose.model('libraries');
   const ShopRefundModel = mongoose.model("shopRefunds");
   const ActivityModel = mongoose.model("activity");
   const ComplaintModel = mongoose.model('complaints');
@@ -779,6 +780,21 @@ messageSchema.statics.getParametersData = async (message) => {
       CRType = "回复";
       // 投诉目标链接
       CRTarget = tools.getUrl("post", contentId);
+      // 投诉目标描述
+      CRTargetDesc = "点击查看";
+    }else if(complaintType === "library"){
+      CRType = "文库文件";
+      // 投诉目标链接
+      const library = await LibraryModel.findOne({_id: contentId});
+      if(!library) return null;
+      const nav = await library.getNav();
+      const topFolderId = nav[0]._id;
+      const forum = await ForumModel.findOne({lid: topFolderId});
+      if(!forum) return null;
+      let folderId;
+      folderId = nav.slice(-1)[0].lid;
+      CRTarget = `/f/${forum.fid}/library#${folderId}`;
+      // CRTarget = tools.getUrl("library", contentId);
       // 投诉目标描述
       CRTargetDesc = "点击查看";
     } else {
@@ -1278,6 +1294,9 @@ messageSchema.statics.extendMessages = async (messages) => {
     } else if(ty === 'STU') {
       message.contentType = 'html';
       message.content = await MessageModel.getSTUMessageContent(m);
+      if(_id === 115953) {
+        console.log(`content: `, message.content);
+      }
       if(message.content === null) continue;
     } else if(ty === 'newFriends') {
       // 新朋友
