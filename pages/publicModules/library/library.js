@@ -56,9 +56,12 @@ NKC.modules.Library = class {
         }
       },
       mounted() {
-        //测试从消息弹框跳转
+        //测试从消息弹框查看投诉处理跳转
         const queryID = window.location.hash.split("#").pop();
-        this.saveToLocalStorage(queryID);
+        if(queryID) {
+          this.saveToLocalStorage(queryID);
+          this.lid = queryID;
+        }
         if(folderId) {
           this.saveToLocalStorage(folderId);
         }
