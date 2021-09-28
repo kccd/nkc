@@ -48,7 +48,6 @@ router
         completedAudit: false,
         tlm: Date.now()
       });
-      await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
     } else {
       await applicationForm.updateOne({'status.completed': false, completedAudit: false});
     }
