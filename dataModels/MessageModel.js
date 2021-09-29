@@ -1098,19 +1098,24 @@ messageSchema.statics.sendReviewMessage = async (pid) => {
 };
 
 /*
-* 给申请基金的用户超出项目周期的发送系统消息，判断现在的时间和用户约定的县厚木周期是否 已经超过，超时就发送系统提醒
+* 给基金申请超时未结题的用户发送应用提醒，利用通过审核的时间、项目周期以及当前时间判断是否需要发送应用提醒
 * */
-messageSchema.statics.sendFinishProejct = async () =>{
+messageSchema.statics.sendFinishProject = async () =>{
   const SettingModel = mongoose.model("settings");
   const FundApplicationFormModel = mongoose.model("fundApplicationForms");
   const MessageModel = mongoose.model("messages");
   const socket = require('../nkcModules/socket');
   //获取审核成功并且超时未发送过结题提醒的数据
-  const unsents = await FundApplicationFormModel.find({reminded: false, "status.adminSupport": true });
-  for(const i of unsents){
-    const finishTime = i.timeToSubmit.valueOf() + i.projectCycle * 24 * 60 * 60 *1000;
-    const date = new Date();
-    const nowTime = date.valueOf();
+  const forms = await FundApplicationFormModel.find({
+    reminded: false,
+    "status.adminSupport": true,
+    "status.completed": {$ne: true},
+    useless: null,
+    disabled: false
+  });
+  for(const i of forms){
+    const finishTime = i.timeToPassed.valueOf() + i.projectCycle * 24 * 60 * 60 *1000;
+    const nowTime = Date.now();
     if(nowTime >= finishTime){
       //向该用户发送系统消息通知该用户申请的项目已经结题
       const message = MessageModel({
