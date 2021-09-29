@@ -222,6 +222,8 @@ router
         applicationForm.useless = 'exceededModifyCount';
       }
       applicationForm.lock.submitted = false;
+    } else {
+      applicationForm.timeToPassed = new Date();
     }
 
     applicationForm.tlm = new Date();

@@ -2,7 +2,7 @@ if !isIncluded('operationCenter')
   mixin applicantOperationCenter(form, uid)
     -var isApplicant = form.uid === uid;
     -var {general, detail} = form.formStatus;
-    if isApplicant && [2, 4].includes(general)
+    if isApplicant && [2, 4, 6].includes(general)
       .m-b-1
         .panel-header 操作中心
         if general === 2
@@ -13,7 +13,9 @@ if !isIncluded('operationCenter')
           a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/remittance/apply`) 申请拨款、确认拨款
           a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/complete`) 结题
           if form.remittance[0].status !== true
-            button.btn.btn-default.btn-block(onclick=`withdrawApplicationForm(${form._id})`) 撤回申请
+            button.btn.btn-default.btn-block(onclick=`withdrawApplicationForm(${form._id}, 'applicant')`) 撤回申请
+        if general === 6
+          a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/refund`)=`去退款 ${form.refundMoney} 元`
 
   mixin managerOperationCenter(form, userFundRoles)
     -var {applicant} = form;
@@ -36,7 +38,9 @@ if !isIncluded('operationCenter')
           a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/report/audit`) 报告审核
         if general === 4 && detail === 6 && isExpert
           a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/complete/audit`) 结题审核
-        if general === 5 && isAdmin
+        if general === 6 && detail === 1 && (isAdmin || isFinancialStaff)
+          button.btn.btn-default.btn-block(onclick=`confirmRefund(${form._id}, ${form.refundMoney})`)=`确认退款`
+        if general >= 5 && isAdmin
           if detail === 3
             button.btn.btn-default.btn-block(onclick=`excellent(${form._id}, false)`) 取消设为优秀项目
           else
@@ -51,7 +55,7 @@ if !isIncluded('operationCenter')
             button.btn.btn-default.btn-block(onclick=`disableApplicationForm(${form._id}, true)`) 屏蔽
           if general === 4
             if form.remittance[0].status !== true
-              button.btn.btn-default.btn-block(onclick=`withdrawApplicationForm(${form._id})`) 强制撤回申请
+              button.btn.btn-default.btn-block(onclick=`withdrawApplicationForm(${form._id}, 'admin')`) 强制撤回申请
             button.btn.btn-default.btn-block(onclick=`applicationFormStop(${form._id})`) 强制终止
           if general === 2 && [2, 3].includes(detail)
             button.btn.btn-default.btn-block(onclick=`applicationFormTimeout(${form._id})`) 设为修改超时
@@ -128,13 +132,24 @@ if !isIncluded('operationCenter')
       })
       .catch(sweetError);
     }
-    function withdrawApplicationForm(formId) {
+    function withdrawApplicationForm(formId, type) {
       return sweetPrompt('请输入撤回原因')
       .then(function(reason) {
-        return nkcAPI('/fund/a/' + formId + '/settings/withdraw', 'POST', {reason: reason})
+        type = type === 'applicant'? 'settings': 'manage';
+        return nkcAPI('/fund/a/' + formId + '/'+ type +'/withdraw', 'POST', {reason: reason})
       })
       .then(function() {
         window.location.reload();
+      })
+      .catch(sweetError)
+    }
+    function confirmRefund(formId, refundMoney) {
+      return sweetQuestion('当前操作将会更改基金申请表的退款状态并且不可撤销，确定要继续吗？')
+      .then(function() {
+        return nkcAPI('/fund/a/' + formId + '/manage/refund', 'POST', {})
+      })
+      .then(function() {
+        sweetSuccess('操作成功');
       })
       .catch(sweetError)
     }

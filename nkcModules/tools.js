@@ -151,6 +151,9 @@ var Tools = function() {
       case 'fundAvatar': {
         return "/a/" + id + t
       }
+      case 'fundHome': {
+        return "/fund";
+      }
       case 'fundBanner': {
         return "/a/" + id + t
       }
