@@ -872,6 +872,67 @@ function initVueApp() {
       anonymous: data.post?data.post.anonymous: false,
       autoSaveInfo: ""
     },
+    created() {
+      this.setFloatDom();
+      window.onresize = this.setFloatDom;
+    },
+    methods: {
+      setFloatDom() {
+        const oldDom = $("#submit-scroll-sm");
+        const scrollWidth = oldDom.width();
+        const {left, top} = oldDom.offset();
+        $("#submit-scroll").css({
+          'width': scrollWidth + 30,
+          display: "block",
+          left,
+          top
+        });
+      },
+      checkAnonymous: function() {
+        var selectedForumsId = PostInfo.selectedForumsId;
+        var havePermission = false;
+        for(var i = 0; i < selectedForumsId.length; i++) {
+          var fid = selectedForumsId[i];
+          if(this.allowedAnonymousForumsId.indexOf(fid) !== -1) {
+            havePermission = true;
+            break;
+          }
+        }
+        if(!havePermission) {
+          this.anonymous = false;
+          this.allowedAnonymous = false;
+        } else {
+          this.allowedAnonymous = true;
+        }
+      },
+      format: NKC.methods.format,
+      saveToDraftSuccess: function() {
+        var time = new Date();
+        this.autoSaveInfo = "草稿已保存 " + this.format("HH:mm:ss", time);
+      },
+      autoSaveToDraft: PostInfo.autoSaveToDraft,
+      saveToDraft: PostInfo.saveToDraft,
+      submit: function() {
+        PostInfo.submit();
+      },
+    }
+  })
+  window.PostButton = new Vue({
+    el: "#postButton-sm",
+    data: {
+      disabledSubmit: false, // 锁定提交按钮
+      checkProtocol: true, // 是否勾选协议
+      // 当前用户是否有权限发表匿名内容
+      havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost || false,
+      // 允许发表匿名内容的专业ID
+      allowedAnonymousForumsId: data.allowedAnonymousForumsId || [],
+      // 根据当前所选专业判断用户是否有权限勾选匿名，若无权则此处无需将匿名标志提交到服务器。（新发表时不匿名，修改时无法需改匿名标志）
+      allowedAnonymous: false,
+      // 是否匿名
+      anonymous: data.post?data.post.anonymous: false,
+      autoSaveInfo: ""
+    },
+
     methods: {
       checkAnonymous: function() {
         var selectedForumsId = PostInfo.selectedForumsId;
@@ -1115,6 +1176,8 @@ function appUpdateImage() {
 // 监听页面变化，调整工具栏位置
 window.onresize=function(){
   resetBodyPaddingTop();
+  const scrollWidth = $("#submit-scroll-sm.col-md-3").width()
+  $("#submit-scroll.col-md-3").css('width',scrollWidth + 30)
 };
 // 监听页面关闭，提示保存草稿
 window.onbeforeunload = function() {

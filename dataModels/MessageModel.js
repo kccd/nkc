@@ -1100,7 +1100,7 @@ messageSchema.statics.sendReviewMessage = async (pid) => {
 /*
 * 给申请基金的用户超出项目周期的发送系统消息，判断现在的时间和用户约定的县厚木周期是否 已经超过，超时就发送系统提醒
 * */
-messageSchema.statics.sendFinishProejct = async () =>{
+messageSchema.statics.sendFinishProject = async () =>{
   const SettingModel = mongoose.model("settings");
   const FundApplicationFormModel = mongoose.model("fundApplicationForms");
   const MessageModel = mongoose.model("messages");
@@ -1108,7 +1108,7 @@ messageSchema.statics.sendFinishProejct = async () =>{
   //获取审核成功并且超时未发送过结题提醒的数据
   const unsents = await FundApplicationFormModel.find({reminded: false, "status.adminSupport": true });
   for(const i of unsents){
-    const finishTime = i.timeToSubmit.valueOf() + i.projectCycle * 24 * 60 * 60 *1000;
+    const finishTime = i.timeToSubmit.valueOf() + i.projectCycle * 24 * 60 * 60 * 1000;
     const date = new Date();
     const nowTime = date.valueOf();
     if(nowTime >= finishTime){

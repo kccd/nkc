@@ -174,7 +174,7 @@ func.modifyProjectCycle = async () =>{
   setTimeout(async () =>{
     try{
     console.log("正在处理超时未结题的基金申请...")
-    await db.MessageModel.sendFinishProejct();
+    await db.MessageModel.sendFinishProject();
     } catch(err) {
       console.log(err)
     } finally {
