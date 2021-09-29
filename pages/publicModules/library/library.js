@@ -56,27 +56,27 @@ NKC.modules.Library = class {
         }
       },
       mounted() {
-        //测试从消息弹框查看投诉处理跳转
-        /*let queryID = window.location.hash.split("#").pop();
-        if(queryID) {
-          queryID = Number(queryID);
-          if(!isNaN(queryID)) {
-            this.saveToLocalStorage(queryID);
-            this.lid = queryID;
-          }
-        }*/
         if(folderId) {
           this.saveToLocalStorage(folderId);
         }
         this.getCategoriesFromLocalStorage();
-        const libraryVisitFolderLogs = NKC.methods.getFromLocalStorage("libraryVisitFolderLogs");
-        const childFolderId = libraryVisitFolderLogs[this.lid];
+
+        // 判断链接中是否包含文件夹 ID
+        let queryId = window.location.hash.split("#").pop();
+        queryId = queryId? Number(queryId): queryId;
+
+        // 如果链接里不包含文件夹 ID，则判断是否存在历史记录，如果存在则跳转到上次打开的文件夹
+        if(typeof queryId !== 'number') {
+          const libraryVisitFolderLogs = NKC.methods.getFromLocalStorage("libraryVisitFolderLogs");
+          queryId = libraryVisitFolderLogs[this.lid];
+        }
+
         const this_ = this;
-        if(childFolderId !== undefined && childFolderId !== this.lid) {
-          // 如果浏览器本地存有访问记录，则先确定该记录中的文件夹是否存在，存在则访问，不存在则打开顶层文件夹。
-          this.getList(childFolderId)
+        if(queryId !== undefined && queryId !== this.lid) {
+          // 如果链接中包含文件夹 ID 或浏览器本地存有访问记录，则先确定该记录中的文件夹是否存在，存在则访问，不存在则打开顶层文件夹。
+          this.getList(queryId)
             .then(() => {
-              this_.addHistory(this_.lid);
+              this_.addHistory(queryId);
               this_.addFileByRid();
             })
             .catch ((err) => {
