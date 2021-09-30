@@ -2,7 +2,16 @@
   @param {[Object]} state.subForums 用户关注的专业对象所组成的数组
   @param {[Object]} state.forumsTree 专业树状结构数组 通过方法ForumModel.getForumsTree获取
   @author pengxiguaa 2019-7-8
+style.
+    #parentForums>.panel-header{
+      background: #9baec8;
+      color: #fff;
+    }
 
+    #sameLevelForums > .panel-header {
+        background: #9baec8;
+        color: #fff;
+    }
 
 mixin renderForums(forums)
   for forum in forums
@@ -46,6 +55,29 @@ if data.forum && data.forum.childrenForums && data.forum.childrenForums.length
     .panel-header 细分专业
     .home-topic-item-div
       for forum in data.forum.childrenForums
+        .forum-block
+          .forum-block-info
+            a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
+
+if data.parentForums && data.parentForums.length
+  .m-b-1#parentForums
+    .panel-header 上级专业
+    .home-topic-item-div
+      for forum in data.parentForums
+        .forum-block
+          .forum-block-info()
+            //-
+              if forum.iconFileName
+                img.forum-block-icon(src=`/forum_avatar/${forum.fid}`)
+              else
+                .forum-block-icon(style=`background-color: ${forum.color}`)
+            a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
+
+if data.sameLevelForums && data.sameLevelForums.length
+  .m-b-1#sameLevelForums
+    .panel-header 同级专业
+    .home-topic-item-div
+      for forum in data.sameLevelForums
         .forum-block
           .forum-block-info
             a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName

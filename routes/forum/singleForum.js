@@ -118,6 +118,7 @@ router
     const {fid} = params;
     const {ThreadModel, ForumModel} = db;
     const forum = await ForumModel.findOnly({fid});
+		//获取专业的所有子专业
     const allChildrenFid = await db.ForumModel.getAllChildrenForums(forum.fid);
 		if(allChildrenFid.length !== 0) {
 			ctx.throw(400, `该专业下仍有${allChildrenFid.length}个专业, 请转移后再删除该专业`);
@@ -264,8 +265,10 @@ router
     latestFid.push(forum.fid);
     data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads.filter(fid => !latestFid.includes(fid)));
 
-		 // 加载同级的专业
+		// 加载同级的专业
+			//获取父级专业
     const parentForums = await forum.extendParentForums();
+		data.parentForums = parentForums;
     let parentForum;
     if(parentForums.length !== 0) parentForum = parentForums[0];
 		if(parentForum) {
