@@ -1,6 +1,8 @@
 const path = require("path");
 const fs = require('fs');
 const apiFunction = require("../nkcModules/apiFunction");
+const complaintTypes = require("./complaintTpyes");
+const db = require("../dataModels");
 const fsPromises = fs.promises;
 const defaultConfigPath = path.resolve(__dirname, './config');
 const configPath = path.resolve(__dirname, `../config`);
@@ -243,14 +245,29 @@ async function initMessages() {
 async function initComplaintType() {
   const db = require('../dataModels');
   const complaintTypes = require('./complaintTpyes');
-  const complaintTypesDB = await db.ComplaintTypeModel.find({});
-  const types = complaintTypesDB.map(c => c.type);
-  for(const c of complaintTypes) {
-    if(types.includes(c.type)) continue;
-    await db.ComplaintTypeModel.insertCom({
-      type: c.type,
-      description: c.description
-    });
+  const count = await db.ComplaintTypeModel.countDocuments();
+  if(count === 0) {
+    for(const c of complaintTypes) {
+      await db.ComplaintTypeModel.insertCom({
+        type: c.type,
+        description: c.description
+      });
+    }
+  }
+}
+
+async function initThreadCategory() {
+  const db = require('../dataModels');
+  const threadCategories = require('./threadCategories');
+  const count = await db.ThreadCategoryModel.countDocuments();
+  if(count === 0) {
+    for(const t of threadCategories) {
+      const {main, node} = t;
+      const category = await db.ThreadCategoryModel.newCategory(main.name, main.description);
+      for(const n of node) {
+        await db.ThreadCategoryModel.newCategory(n.name, n.description, category._id);
+      }
+    }
   }
 }
 
@@ -266,6 +283,7 @@ async function init() {
   await initForum();
   await initThreads();
   await initComplaintType();
+  await initThreadCategory();
 }
 
 module.exports = {

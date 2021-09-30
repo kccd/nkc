@@ -1,0 +1,26 @@
+extends ../../experimental
+block eTitle
+  title 多维分类
+  +includeCSS('/experimental/settings/threadCategory/threadCategory.css')
+block eContent
+  .container-fluid.max-width
+    .row
+      #data.hidden=objToStr({categoryTree: data.categoryTree})
+      .col-xs-12.col-md-6.box-shadow-panel#app(v-cloak)
+
+        .m-b-1
+          button.btn.btn-default(@click='newCategory') 新建分类
+        .m-b-1
+          .thread-categories
+            .thread-category-master(v-for='c in categoryTree' :data-cid='c._id')
+              .thread-category-item
+                .fa.fa-bars.m-r-1.thread-category-master-handle
+                span {{c.name}}
+              .thread-category-nodes
+                .thread-category-node(v-for='n in c.nodes' :data-cid='c._id')
+                  .thread-category-item
+                    .fa.fa-bars.m-r-1.thread-category-node-handle
+                    span {{n.name}}
+block scripts
+  include ../../../publicModules/commonModal/commonModal
+  +includeJS('/experimental/settings/threadCategory/threadCategory.js')
