@@ -276,17 +276,21 @@ router
 			const visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user, parentForum.fid);
 			// 拿到parentForum专业下一级能看到入口的专业
 			data.sameLevelForums = await parentForum.extendChildrenForums({fid: {$in: visibleFidArr}});
+			//排除当前专业
+			if(data.sameLevelForums && data.sameLevelForums.length){
+				data.sameLevelForums = data.sameLevelForums.filter(c => c.fid !== forum.fid)
+			}
 		} else {
 			// 拿到能看到入口的所有专业id
 			let visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
       visibleFidArr = visibleFidArr.filter(f => f !== forum.fid);
 			// 拿到能看到入口的顶级专业
-			data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
+			// data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
 		}
-		//排除当前专业
-		if(data.sameLevelForums && data.sameLevelForums.length){
-			data.sameLevelForums = data.sameLevelForums.filter(c => c.fid !== forum.fid)
-		}
+		// //排除当前专业
+		// if(data.sameLevelForums && data.sameLevelForums.length){
+		// 	data.sameLevelForums = data.sameLevelForums.filter(c => c.fid !== forum.fid)
+		// }
 
 
 		data.subUsersCount = await db.SubscribeModel.countDocuments({cancel: false, fid, type: "forum"});
