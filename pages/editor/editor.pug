@@ -11,7 +11,7 @@ block title
     }
 block content
   mixin modifySubmit(id)
-    div(id = id)(v-cloak)
+    div(id = id v-cloak)
       hr
       .checkbox(v-if="havePermissionToSendAnonymousPost")
         label(v-if="allowedAnonymous")
@@ -245,14 +245,14 @@ block content
                     id="disabledSurveyButton"
                   ) 创建
                 include ../publicModules/survey/edit
-          +modifySubmit("postButton-sm")
+          +modifySubmit("postButton")
 
 
       .col-xs-12.col-md-3.box-shadow-panel#submit-scroll-sm
         div
           h5.text-danger 温馨提示：
           div!=nkcRender.plainEscape(state.editorSettings.notes)
-      .col-xs-12.col-md-3.box-shadow-panel#submit-scroll
+      //-.col-xs-12.col-md-3.box-shadow-panel#submit-scroll
         include ../module_scrollTo
         div
           h5.text-danger 温馨提示：

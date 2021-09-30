@@ -858,7 +858,8 @@ function initVueApp() {
     }
   });
   window.PostButton = new Vue({
-    el: $('body').width() >= 991?'#postButton':'#postButton-sm',
+    // el: $('body').width() >= 991?'#postButton':'#postButton-sm',
+    el: '#postButton',
     data: {
       disabledSubmit: false, // 锁定提交按钮
       checkProtocol: true, // 是否勾选协议
@@ -873,7 +874,7 @@ function initVueApp() {
       autoSaveInfo: ""
     },
     created() {
-      this.setFloatDom();
+      // this.setFloatDom();
     },
     methods: {
       setFloatDom() {
@@ -1129,7 +1130,7 @@ function appUpdateImage() {
 // 监听页面变化，调整工具栏位置
 window.onresize=function(){
   resetBodyPaddingTop();
-  window.PostButton.setFloatDom();
+  // window.PostButton.setFloatDom();
 };
 // 监听页面关闭，提示保存草稿
 window.onbeforeunload = function() {
