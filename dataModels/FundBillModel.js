@@ -404,6 +404,53 @@ fundBillSchema.statics.createDonationBill = async (props) => {
 };
 
 /*
+* 创建基金退款账单
+*   @parma {Number} money 金额 (元)
+*   @param {String} uid 退款人 ID 游客为 ’‘
+*   @param {String} operatorId 操作人 ID
+*   @param {String} fundId 退款给基金项目时的基金项目 ID 或 fundPool
+*   @param {String} paymentType 支付平台 wechatPay, aliPay
+*   @param {Number} formId 基金申请 ID
+*   @param {String} paymentId 支付平台对应的记录 ID
+* */
+fundBillSchema.statics.createRefundBill = async (props) => {
+  const FundBillModel = mongoose.model('fundBills');
+  const {
+    money,
+    uid = '',
+    operatorId = '',
+    fundId,
+    formId,
+    paymentId,
+    paymentType,
+  } = props;
+  const abstract = '退款';
+  const bill = FundBillModel({
+    _id: await FundBillModel.getNewId(),
+    from: {
+      type: 'user',
+      id: uid,
+      anonymous: false,
+    },
+    to: {
+      type: 'fund',
+      id: fundId,
+      anonymous: false
+    },
+    uid: operatorId || uid,
+    money,
+    abstract,
+    applicationFormId: formId,
+    notes: `${abstract} ${money} 元`,
+    paymentId,
+    paymentType,
+    verify: false
+  });
+  await bill.save();
+  return bill;
+}
+
+/*
 * @param {Object} props
 *   @param {String} fundId 基金项目 ID
 *   @param {String} uid 收款用户 ID
@@ -464,9 +511,11 @@ fundBillSchema.statics.createRemittanceBill = async (props) => {
 * 更改当前记录为已验证
 * */
 fundBillSchema.methods.verifyPass = async function() {
+  const FundApplicationFormModel = mongoose.model('fundApplicationForms');
   if(this.verify) return;
   this.verify = true;
   await this.save();
+  await FundApplicationFormModel.updateRefundStatusByBillId(this._id);
 };
 
 const FundBillModel = mongoose.model('fundBills', fundBillSchema);

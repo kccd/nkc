@@ -181,7 +181,7 @@ func.modifyProjectCycle = async () =>{
       console.log("处理完成");
       await func.modifyProjectCycle();
     }
-  },12 * 60 * 60 *1000)
+  },12 * 60 * 60 * 1000)
 }
 
 module.exports = func;

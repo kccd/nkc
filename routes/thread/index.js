@@ -548,6 +548,8 @@ threadRouter
         await applicationForm.extendApplicationFormInfo(state.uid, accessForumsId);
         data.applicationForm = applicationForm;
         data.fund = applicationForm.fund;
+        const fundSettings = await db.SettingModel.getSettings('fund');
+        data.fundName = fundSettings.fundName;
         data.userFundRoles = await data.fund.getUserFundRoles(state.uid);
         data.targetUserInFundBlacklist = await db.FundBlacklistModel.inBlacklist(applicationForm.uid);
         await data.applicationForm.hideApplicationFormInfoByUserId(state.uid, ctx.permission('displayFundApplicationFormSecretInfo'));

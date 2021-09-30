@@ -1,9 +1,8 @@
 const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
-    const {db, data, query, state} = ctx;
-    let {fundId, money, refund} = query;
-    const {uid} = state;
+    const {db, data, query} = ctx;
+    let {fundId, money} = query;
     data.funds = await db.FundModel.find({
       display: true,
       disabled: false,
@@ -22,7 +21,6 @@ router
         data.money = Math.round(money * 100) / 100;
       }
     }
-    data.refund = refund === 'true';
     ctx.template = 'fund/donation/donation.pug';
     await next();
   })
@@ -51,7 +49,7 @@ router
       await db.FundModel.findOnly({_id: fundId});
     }
     let paymentId;
-    const description = refund? '基金退款': '基金赞助';
+    const description = '基金赞助';
     if(paymentType === 'wechatPay') {
       if(!payment.wechatPay.enabled) ctx.throw(400, `微信支付已关闭`);
       const wechatPayRecord = await db.WechatPayRecordModel.getPaymentRecord({

@@ -11,7 +11,7 @@ router
     question = JSON.parse(question);
     let {
       type,
-      public,
+      public: publik,
       volume,
       content,
       answer,
@@ -19,7 +19,7 @@ router
     } = question;
     if(!type) ctx.throw(400, '答题方式不能为空');
     if(!volume) ctx.throw(400, '试题难度不能为空');
-    if(!public) {
+    if(!publik) {
       const forum = await db.ForumModel.findOne({fid});
       if(!forum) ctx.throw(404, '专业领域不存在');
     }
@@ -42,22 +42,17 @@ router
       _id,
       fid,
       type,
-      public,
+      public: publik,
       volume,
       content,
       answer,
       uid: user.uid,
       hasImage: false
     });
-    if(file) {
-      const {path} = file;
-      const questionPath = settings.upload.questionImagePath;
-      const targetPath = questionPath + '/' + q._id + '.jpg';
-      await tools.imageMagick.questionImageify(path, targetPath);
-      await fs.unlink(path);
-      q.hasImage = true;
-    }
     await q.save();
+    if(file) {
+      await q.updateImage(file);
+    }
     data.question = (await db.QuestionModel.extendQuestions([q]))[0];
     await next();
   })
@@ -115,7 +110,6 @@ router
       public: publicQuestion,
       content,
       answer,
-      hasImage: false
     };
     if(auth === false) {
       // 提交自己审核不通过的试题时，试题会再次变为"待审核"状态。
@@ -133,16 +127,11 @@ router
         if(q.auth === false) q.reason = reason;
       }
     }
-
-    if(file) {
-      const {path} = file;
-      const questionPath = settings.upload.questionImagePath;
-      const targetPath = questionPath + '/' + _id + '.jpg';
-      await tools.imageMagick.questionImageify(path, targetPath);
-      await fs.unlink(path);
-      q.hasImage = true;
-    }
     await questionDB.updateOne(q);
+    if(file) {
+      await questionDB.updateImage(file);
+    }
+
     await next();
   })
   .get('/:_id/image', async (ctx, next) => {
