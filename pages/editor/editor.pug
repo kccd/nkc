@@ -10,6 +10,35 @@ block title
       padding-top: 120px;
     }
 block content
+  mixin modifySubmit(id)
+    div(id = id v-cloak)
+      hr
+      .checkbox(v-if="havePermissionToSendAnonymousPost")
+        label(v-if="allowedAnonymous")
+          input(type="checkbox" v-model="anonymous" :value="true")
+          span
+            | 匿名发表
+        label(v-else)
+          input(type="checkbox" v-model="anonymous" :value="true" disabled)
+          span
+            | 匿名发表
+            span.text-danger （所选专业分类不支持匿名发表）
+      .checkbox
+        label
+          input(type="checkbox" v-model="checkProtocol" :value="true")
+          span
+            | 我已阅读并同意遵守与本次发表相关的全部协议。
+            a(href=`/protocol` target="_blank") 查看协议
+      .checkbox
+        .editor-auto-save(v-if="autoSaveInfo")
+          .fa.fa-check-circle &nbsp;{{autoSaveInfo}}
+      button.btn.btn-theme(@click="submit" v-if="checkProtocol && !disabledSubmit") 提交
+      button.btn.btn-theme(v-else disabled :title="!checkProtocol?'请先勾选同意遵守全部协议':''")
+        span(v-if="disabledSubmit")
+          span 提交中...&nbsp;
+          .fa.fa-spinner.fa-spin
+        span(v-else) 提交
+      button.btn.btn-default(@click="saveToDraft") 存草稿
   mixin modifyNotice
     .on-edit-notes
       .on-edit-label 您正在修改已经发表的内容，以下提示非常重要，请务必详读。
@@ -216,40 +245,19 @@ block content
                     id="disabledSurveyButton"
                   ) 创建
                 include ../publicModules/survey/edit
-          #postButton(v-cloak)
-            hr
-            .checkbox(v-if="havePermissionToSendAnonymousPost")
-              label(v-if="allowedAnonymous")
-                input(type="checkbox" v-model="anonymous" :value="true")
-                span
-                  | 匿名发表
-              label(v-else)
-                input(type="checkbox" v-model="anonymous" :value="true" disabled)
-                span
-                  | 匿名发表
-                  span.text-danger （所选专业分类不支持匿名发表）
-            .checkbox
-              label
-                input(type="checkbox" v-model="checkProtocol" :value="true")
-                span
-                  | 我已阅读并同意遵守与本次发表相关的全部协议。
-                  a(href=`/protocol` target="_blank") 查看协议
-            .checkbox
-              .editor-auto-save(v-if="autoSaveInfo")
-                .fa.fa-check-circle &nbsp;{{autoSaveInfo}}
-            button.btn.btn-theme(@click="submit" v-if="checkProtocol && !disabledSubmit") 提交
-            button.btn.btn-theme(v-else disabled :title="!checkProtocol?'请先勾选同意遵守全部协议':''")
-              span(v-if="disabledSubmit")
-                span 提交中...&nbsp;
-                .fa.fa-spinner.fa-spin
-              span(v-else) 提交
-            button.btn.btn-default(@click="saveToDraft") 存草稿
+          +modifySubmit("postButton")
 
 
-      .col-xs-12.col-md-3.box-shadow-panel
+      .col-xs-12.col-md-3.box-shadow-panel#submit-scroll-sm
         div
           h5.text-danger 温馨提示：
           div!=nkcRender.plainEscape(state.editorSettings.notes)
+      //-.col-xs-12.col-md-3.box-shadow-panel#submit-scroll
+        include ../module_scrollTo
+        div
+          h5.text-danger 温馨提示：
+          div!=nkcRender.plainEscape(state.editorSettings.notes)
+          +modifySubmit("postButton")
   .hidden#data=objToStr({minorForumCount: data.minorForumCount, originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft, websiteCode: data.websiteCode, toColumn: !!data.toColumn})
 block scripts
   include ../ueditor/ueditorBase

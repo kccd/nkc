@@ -167,4 +167,21 @@ func.modifyTimeoutApplicationForm = async () => {
   }, 60 * 60 * 1000);
 }
 
+/*
+* 定期判断基金申请是否未结题但已经超过项目周期,每12小时判断一次
+* */
+func.modifyProjectCycle = async () =>{
+  setTimeout(async () =>{
+    try{
+    console.log("正在处理超时未结题的基金申请...")
+    await db.MessageModel.sendFinishProject();
+    } catch(err) {
+      console.log(err)
+    } finally {
+      console.log("处理完成");
+      await func.modifyProjectCycle();
+    }
+  },12 * 60 * 60 * 1000)
+}
+
 module.exports = func;

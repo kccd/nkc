@@ -78,7 +78,6 @@ schema.methods.getFilePath = async function(t) {
   const fileFolderPath = await file.getPath(type, toc);
   const normalFilePath = PATH.resolve(fileFolderPath, `./${_id}.${ext}`);
   const filePath = PATH.resolve(fileFolderPath, `./${_id}${t?'_'+t:''}.${ext}`);
-
   if(await file.access(filePath)) {
     return filePath;
   } else if(await file.access(normalFilePath)) {

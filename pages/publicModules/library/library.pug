@@ -3,7 +3,7 @@
   .lib-tools
     .lib-nav
       .lib-nav-body
-        .lib-nav-li(v-for="s, index in nav" @click="selectNavFolder(s)")
+        .lib-nav-li(v-for="(s, index) in nav" @click="selectNavFolder(s)")
           img(:src="getUrl('fileCover', 'folder')")
           | {{s.name}}
           .fa.fa-pencil(
@@ -12,6 +12,8 @@
           )
       .lib-nav-description {{folder.description || "暂无简介"}}
     div(v-if="pageType === 'list'")
+      .m-b-05.p-a-05.bg-warning.text-warning(v-if='libraryTip.tipShow') {{libraryTip.tipShow}}
+      //div.updateTip {{libraryTip.tipShow}}
       .options-button
         a(@click="back" :class="{'disabled': !lastFolder || mark}")
           .fa.fa-arrow-left &nbsp;
@@ -73,6 +75,11 @@
           .size {{(f.ext||"未知").toUpperCase()}} {{getSize(f.size)}}
         //-.list-description {{f.description || "暂无简介"}}
         .list-options(@click.stop)
+          .list-options-link(
+            title="举报"
+            @click="complain(f._id)"
+          )
+            .fa.fa-minus-circle
           span(v-if="per('modifyOtherLibrary') || (uid && f.uid === uid)")
             //:href="getUrl('pdf', resource.rid)" v-if="resource.ext === 'pdf'" target="_blank"
             .list-options-link(
@@ -119,6 +126,7 @@
                   | &nbsp;删除
 
   div(v-else)
+    .m-b-05.p-a-05.bg-warning.text-warning(v-if='libraryTip.tipUpload') {{libraryTip.tipUpload}}
     .lib-uploader
       .options-button
         a(@click="toList")
@@ -155,7 +163,7 @@
       .lib-files(v-if="!selectedFiles.length")
         .null 空空如也~
       .lib-files(v-else)
-        .lib-file(v-for="f, index in selectedFiles" :class="{'disabled': f.disabled, 'error': f.error || !f.category, 'success': f.status === 'uploaded'}")
+        .lib-file(v-for="(f, index) in selectedFiles" :class="{'disabled': f.disabled, 'error': f.error || !f.category, 'success': f.status === 'uploaded'}")
           .lib-file-index {{index + 1}}
           .lib-file-close.fa.fa-remove(@click="removeFile(index)")
           .lib-file-name {{f.name}}
@@ -217,3 +225,5 @@
             a.active.m-r-05(@click="startUpload" :class="{'disabled': !protocol}") 立即上传
             span.uploading-status(v-if="uploading") 文件上传中...
               .fa.fa-spinner.fa-spin
+include ../complaint/complaintBox
+

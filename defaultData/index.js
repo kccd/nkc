@@ -237,6 +237,24 @@ async function initMessages() {
   }
 }
 
+/*
+* 初始化投诉类型
+* */
+async function initComplaintType() {
+  const db = require('../dataModels');
+  const complaintTypes = require('./complaintTpyes');
+  const count = await db.ComplaintTypeModel.countDocuments();
+  if(count === 0) {
+    for(const c of complaintTypes) {
+      await db.ComplaintTypeModel.insertCom({
+        type: c.type,
+        description: c.description,
+        order: c.order
+      });
+    }
+  }
+}
+
 async function init() {
   await initConfig();
   await initSettings();
@@ -248,6 +266,7 @@ async function init() {
   await initOperations();
   await initForum();
   await initThreads();
+  await initComplaintType();
 }
 
 module.exports = {
@@ -262,5 +281,6 @@ module.exports = {
   initMessages,
   initOperations,
   initAccount,
-  initThreads
+  initThreads,
+  initComplaintType,
 };

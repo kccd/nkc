@@ -53,7 +53,7 @@ block content
                     div
                       button.btn.btn-default.btn-sm(@click="sf") 选择专业
                     .library-fs.p-t-05
-                      .library-f(v-for="forum, index in forums" :style="'background-color:' + forum.color + ';'")
+                      .library-f(v-for="(forum, index) in forums" :style="'background-color:' + forum.color + ';'")
                         | {{forum.displayName}}
                         .fa.fa-remove(@click="removeForum(index)")
                 .form-group

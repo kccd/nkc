@@ -323,6 +323,7 @@ messageSchema.statics.getParametersData = async (message) => {
   const FundApplicationFormModel = mongoose.model("fundApplicationForms");
   const ShopOrdersModel = mongoose.model("shopOrders");
   const ColumnModel = mongoose.model("columns");
+  const LibraryModel = mongoose.model('libraries');
   const ShopRefundModel = mongoose.model("shopRefunds");
   const ActivityModel = mongoose.model("activity");
   const ComplaintModel = mongoose.model('complaints');
@@ -655,7 +656,7 @@ messageSchema.statics.getParametersData = async (message) => {
     parameters = {
       reviewLink: await PostModel.getUrl(post)
     };
-  } else if(["fundAdmin", "fundApplicant", "fundMember"].includes(type)) {
+  } else if(["fundAdmin", "fundApplicant", "fundMember", "fundFinishProject"].includes(type)) {
     const {applicationFormId} = message.c;
     let applicationForm = await FundApplicationFormModel.findOne({_id: applicationFormId});
     if(!applicationForm) return null;
@@ -670,7 +671,7 @@ messageSchema.statics.getParametersData = async (message) => {
     if(type === 'fundMember') {
       parameters.username = user.username;
       parameters.userURL = getUrl('userHome', user.uid);
-    }
+    };
   } else if([
     "newColumnContribute", "columnContributeChange",
     "disabledColumn", "disabledColumnInfo",
@@ -781,6 +782,21 @@ messageSchema.statics.getParametersData = async (message) => {
       CRTarget = tools.getUrl("post", contentId);
       // 投诉目标描述
       CRTargetDesc = "点击查看";
+    }else if(complaintType === "library"){
+      CRType = "文库文件";
+      // 投诉目标链接
+      const library = await LibraryModel.findOne({_id: contentId});
+      if(!library) return null;
+      const nav = await library.getNav();
+      const topFolderId = nav[0]._id;
+      const forum = await ForumModel.findOne({lid: topFolderId});
+      if(!forum) return null;
+      let folderId;
+      folderId = nav.slice(-1)[0].lid;
+      CRTarget = `/f/${forum.fid}/library#${folderId}`;
+      // CRTarget = tools.getUrl("library", contentId);
+      // 投诉目标描述
+      CRTargetDesc = library.name;
     } else {
       return null;
     }
@@ -1080,6 +1096,45 @@ messageSchema.statics.sendReviewMessage = async (pid) => {
     await socket.sendMessageToUser(message._id);
   }
 };
+
+/*
+* 给基金申请超时未结题的用户发送应用提醒，利用通过审核的时间、项目周期以及当前时间判断是否需要发送应用提醒
+* */
+messageSchema.statics.sendFinishProject = async () =>{
+  const SettingModel = mongoose.model("settings");
+  const FundApplicationFormModel = mongoose.model("fundApplicationForms");
+  const MessageModel = mongoose.model("messages");
+  const socket = require('../nkcModules/socket');
+  //获取审核成功并且超时未发送过结题提醒的数据
+  const forms = await FundApplicationFormModel.find({
+    reminded: false,
+    "status.adminSupport": true,
+    "status.completed": {$ne: true},
+    useless: null,
+    disabled: false
+  });
+  for(const i of forms){
+    const finishTime = i.timeToPassed.valueOf() + i.projectCycle * 24 * 60 * 60 *1000;
+    const nowTime = Date.now();
+    if(nowTime >= finishTime){
+      //向该用户发送系统消息通知该用户申请的项目已经结题
+      const message = MessageModel({
+        _id: await SettingModel.operateSystemID('messages', 1),
+        ty: 'STU',
+        r: i.uid,
+        c: {
+          type: "fundFinishProject",
+          applicationFormId: i._id,
+        }
+      });
+      //将是否已经发送结题置为true
+      await FundApplicationFormModel.updateOne({_id: i._id,}, {$set: {reminded: true}});
+      //将消息保存到数据库
+      await message.save();
+      await socket.sendMessageToUser(message._id);
+    }
+  }
+}
 
 /*
 * 基金通知

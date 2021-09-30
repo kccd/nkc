@@ -858,7 +858,8 @@ function initVueApp() {
     }
   });
   window.PostButton = new Vue({
-    el: "#postButton",
+    // el: $('body').width() >= 991?'#postButton':'#postButton-sm',
+    el: '#postButton',
     data: {
       disabledSubmit: false, // 锁定提交按钮
       checkProtocol: true, // 是否勾选协议
@@ -872,7 +873,21 @@ function initVueApp() {
       anonymous: data.post?data.post.anonymous: false,
       autoSaveInfo: ""
     },
+    created() {
+      // this.setFloatDom();
+    },
     methods: {
+      setFloatDom() {
+        const oldDom = $("#submit-scroll-sm");
+        const scrollWidth = oldDom.width();
+        const {left, top} = oldDom.offset();
+        $("#submit-scroll").css({
+          'width': scrollWidth + 30,
+          display: "block",
+          left,
+          top
+        });
+      },
       checkAnonymous: function() {
         var selectedForumsId = PostInfo.selectedForumsId;
         var havePermission = false;
@@ -1115,6 +1130,7 @@ function appUpdateImage() {
 // 监听页面变化，调整工具栏位置
 window.onresize=function(){
   resetBodyPaddingTop();
+  // window.PostButton.setFloatDom();
 };
 // 监听页面关闭，提示保存草稿
 window.onbeforeunload = function() {

@@ -105,5 +105,6 @@
   "BFFUrl": "专业主页链接",
   "BFFMessage": "变更信息",
   "securityApplicationResolved": "手机号申诉通过审核",
-  "securityApplicationRejected": "手机号申诉未通过审核"
+  "securityApplicationRejected": "手机号申诉未通过审核",
+  "fundFinishProject": "【基金系统】研究超时"
 }

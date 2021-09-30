@@ -470,6 +470,7 @@ block content
             if f[0] && !floatParentForumsId.includes(f[0].fid)
               -floatParentForums.push({fid: f[0].fid, displayName: f[0].displayName});
               -floatParentForumsId.push(f[0].fid);
+              //所属专业 所属分类 上级专业 同级专业
           +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 
         .col-xs-12.col-md-3.box-shadow-panel#rightDom
@@ -548,7 +549,7 @@ block scripts
   include ../publicModules/insertHideContent/insertHideContent
   //-include ../publicModules/highlight/highlight_editor
   include ../publicModules/highlight/highlight
-  include ../publicModules/complaint/complaint
+  include ../publicModules/complaint/complaintBox
   include ../publicModules/crop/crop
   include ../publicModules/moment
   include ../publicModules/hidePost/hidePost

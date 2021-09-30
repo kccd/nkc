@@ -154,6 +154,9 @@
           if permission('experimentalIPSettings')
             li
               a(href='/e/settings/ip') IP 黑名单
+          if permission('experimentalComplaintSettings')
+            li
+              a(href='/e/settings/complaint') 投诉
           <li role="separator" class="divider"></li>
           if permission('visitRoleSettings')
             li

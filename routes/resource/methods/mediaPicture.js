@@ -86,11 +86,17 @@ module.exports = async (options) => {
       // 计算名称长度
       const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
       let usernameWidth = usernameLength * 12;
-      const waterSmallPath = await db.AttachmentModel.getWatermarkFilePath('small');
-      const waterBigPath = await db.AttachmentModel.getWatermarkFilePath('normal');
+      //获取小水印图
+      let waterSmallPath = await db.AttachmentModel.getWatermarkFilePath('small');
+      //获取大水印图
+      let waterBigPath = await db.AttachmentModel.getWatermarkFilePath('normal');
+      //获取水印透明度
       const watermarkSettings = await db.SettingModel.getWatermarkSettings();
+      //获取图片水印尺寸
       const watermarkPictureInfo = await imageMagick.info(waterSmallPath);
+      //水印长度
       const siteLogoWidth = parseInt(watermarkPictureInfo.width);
+      //水印高度
       const siteLogoHeight = parseInt(watermarkPictureInfo.height);
       usernameWidth += siteLogoWidth * 0.1; /* logo和文字之间的间隙 */
 
@@ -98,9 +104,13 @@ module.exports = async (options) => {
       const positions = {
         // 正中心
         center: [`-${parseInt(usernameWidth / 2 + 23)}+0`, `+0+0`],
+        //右下
         southeast: [`+${parseInt(usernameWidth + 10)}+10`, `+10+${parseInt((siteLogoHeight - 24) / 2 + 10)}`],
+        //右上
         southwest: [`+10+10`, `+${parseInt(siteLogoWidth + 10)}+${parseInt((siteLogoHeight - 24) / 2 + 10)}`],
+        //左下
         northeast: [`+${parseInt(usernameWidth+10)}+10`, `+10+${parseInt((siteLogoHeight - 24) / 2 + 10)}`],
+        //左上
         northwest: [`+10+10`, `+${parseInt(siteLogoWidth+10)}+${parseInt((siteLogoHeight - 24) / 2 + 10)}`],
       };
       const [logoCoor, userCoor] = positions[waterSetting.waterGravity] || [`+0+0`, `+0+0`];
@@ -160,6 +170,7 @@ module.exports = async (options) => {
 
           let ffmpegTransparency = (watermarkSettings.transparency / 100).toFixed(2);
           outputPath = path + `.ffmpeg.${ext}`;
+          //调用ffmpge给图片打水印
           await addImageTextWaterMaskForImage({
             input: path,
             output: outputPath,

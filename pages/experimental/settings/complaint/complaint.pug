@@ -1,0 +1,72 @@
+extends ../../experimental
+block eTitle
+  title 投诉设置
+  style.
+    .hander{
+      cursor:pointer;
+      color:#337ab7;
+    }
+    .avatar-sm{
+      height: 1.2rem;
+      width: 1.2rem;
+      border-radius: 50%;
+      margin-right: 0.2rem;
+    }
+    tr.disabled{
+      background-color: #aaa;
+    }
+    .complaint-type-order{
+      width: 5rem;
+    }
+block eContent
+  .hidden#data= objToStr({complaintTypes: data.complaintTypes, complaintSettings: data.complaintSettings})
+  .container-fluid.max-width#app(v-cloak)
+    .row
+      .col-xs-12.col-md-8
+        .m-b-2
+          h4 投诉类型
+          .table-responsive
+            table.table.table-bordered.nkc-table.m-b-05
+              thead
+                tr
+                  th.text-center 排序
+                  th.text-center 时间
+                  th.text-center 创建者
+                  th.text-center 名称
+                  th.text-center 说明
+                  th.text-center 操作
+              tbody
+                  tr(v-for="item in type" :class='{"disabled": item.disabled}')
+                    th.text-center.complaint-type-order
+                      input.form-control(v-model.number='item.order' type='text')
+                    th.text-center {{timeFormat(item.toc)}}
+                    th.text-center
+                      span(v-if='!item.user') 默认
+                      div(v-else)
+                        img.avatar-sm(:src='getUrl("userAvatar", item.user.avatar)')
+                        a(
+                          :href='getUrl("userHome", item.user.uid)'
+                          target="_blank"
+                          :data-float-uid='item.user.uid'
+                          ) {{item.user.username}}
+                    th.text-center {{item.type}}
+                    th.text-center {{item.description}}
+                    th.text-center
+                      button.btn.btn-success.btn-xs(@click="initiate(item._id, false)" v-if='item.disabled') 启用
+                      button.btn.btn-danger.btn-xs(@click="forbidden(item._id, true)" v-else) 禁用
+                      button.btn.btn-warning.btn-xs(@click="edit(item)") 编辑
+          if data.complaintTypes.length === 0
+            .p-t-05.p-b-05.text-center 空空如也~
+          .m-b-05
+            button.btn.btn-sm.btn-default(onclick='addType()') 添加
+        .m-b-1
+          h4 投诉提示
+          textarea.form-control(rows=5 v-model='complaintSettings.tip')
+        .m-b-2
+          button.btn.btn-primary(@click='submit') 保存
+
+block scripts
+  include ../../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../../../publicModules/commonModal/commonModal
+  +includeJS('/experimental/settings/complaint/complaint.js')
+    

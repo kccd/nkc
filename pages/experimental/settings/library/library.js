@@ -44,6 +44,7 @@ var app = new Vue({
     libSettings: data.librarySettings,
     grades: permissionGrades,
     roles: permissionRoles,
+    libraryTip: data.librarySettings.libraryTip
   },
   methods: {
     getNameById: function(type, id) {
@@ -69,7 +70,8 @@ var app = new Vue({
     submit: function() {
       nkcAPI("/e/settings/library", "PUT", {
         roles: this.roles,
-        grades: this.grades
+        grades: this.grades,
+        libraryTip: this.libraryTip
       })
         .then(function() {
           sweetSuccess("提交成功");

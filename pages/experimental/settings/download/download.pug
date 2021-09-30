@@ -35,7 +35,7 @@ block eContent
                 //-th.select
                   input.form-control(type='text' v-model.number='t.fileCount')
                 th
-                  .m-b-05(v-for='s, index in t.data').form-inline
+                  .m-b-05(v-for='(s, index) in t.data').form-inline
                     span.h5 配置{{index+ 1}}：
                     select(v-model='s.startingTime')
                       option(v-for='h in hours' :value='h') {{h}}
@@ -54,7 +54,7 @@ block eContent
                   select.form-control(disabled)
                     option 其他
                 th
-                  .m-b-05(v-for='s, index in settings.speed.default.data').form-inline
+                  .m-b-05(v-for='(s, index) in settings.speed.default.data').form-inline
                     span.h5 配置{{index+ 1}}：
                     select(v-model='s.startingTime')
                       option(v-for='h in hours' :value='h') {{h}}
@@ -79,12 +79,12 @@ block eContent
                 th 个数限制（时间必须覆盖0-24）
                 th 其他
             tbody
-              tr(v-for='f, index in settings.fileCountLimit.others')
+              tr(v-for='(f, index) in settings.fileCountLimit.others')
                 th.select
                   select.form-control(v-model='f.type')
                     option(v-for='c in gradeList' :value='c.type') {{c.name}}
                 th
-                  .m-b-05(v-for='s, index in f.data').form-inline
+                  .m-b-05(v-for='(s, index) in f.data').form-inline
                     span.h5 配置{{index+ 1}}：
                     select(v-model='s.startingTime')
                       option(v-for='h in hours' :value='h') {{h}}
@@ -103,7 +103,7 @@ block eContent
                   select.form-control(disabled)
                     option 其他
                 th
-                  .m-b-05(v-for='s, index in settings.fileCountLimit.default.data').form-inline
+                  .m-b-05(v-for='(s, index) in settings.fileCountLimit.default.data').form-inline
                     span.h5 配置{{index+ 1}}：
                     select(v-model='s.startingTime')
                       option(v-for='h in hours' :value='h') {{h}}
@@ -129,7 +129,7 @@ block eContent
                 th 个数限制
                 th 其他
             tbody
-              tr(v-for='f, index in settings.fileCountLimit.roles')
+              tr(v-for='(f, index) in settings.fileCountLimit.roles')
                 th.select
                   select.form-control(v-model='f.type')
                     option(v-for='c in roleList' :value='c.type') {{c.name}}
