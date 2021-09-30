@@ -284,9 +284,9 @@ router
 			data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
 		}
 		if(data.sameLevelForums){
-			for(let fourms of data.sameLevelForums){
-				if(forum.displayName === fourms.displayName){
-					data.sameLevelForums.splice(forum ,1)
+			for(let i in data.sameLevelForums){
+				if(forum.displayName === data.sameLevelForums[i].displayName){
+					data.sameLevelForums.splice(i, 1)
 				}
 			}
 		}
