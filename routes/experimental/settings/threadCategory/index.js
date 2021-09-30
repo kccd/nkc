@@ -34,7 +34,6 @@ router
   .put('/', async (ctx, next) => {
     const {db, body, data} = ctx;
     const {categories} = body;
-    console.log(categories)
     for(const c of categories) {
       const {cid, order} = c;
       await db.ThreadCategoryModel.updateOne({_id: cid}, {
@@ -70,5 +69,34 @@ router
         description,
       }
     });
+    await next();
+  })
+  .del('/:cid', async (ctx, next) => {
+    const {params, db} = ctx;
+    const {cid} = params;
+    const category = await db.ThreadCategoryModel.findOnly({_id: cid});
+    const nodes = await db.ThreadCategoryModel.find({cid});
+    const categoriesId = [category._id];
+    nodes.map(n => categoriesId.push(n._id));
+    await db.ThreadModel.updateMany({
+      tcId: {$in: categoriesId}
+    }, {
+      $pull: {
+        tcId: {
+          $in: categoriesId
+        }
+      }
+    });
+    await db.PostModel.updateMany({
+      tcId: {$in: categoriesId}
+    }, {
+      $pull: {
+        tcId: {
+          $in: categoriesId
+        }
+      }
+    });
+    await db.ThreadCategoryModel.deleteMany({_id: {$in: categoriesId}});
+
     await next();
   });

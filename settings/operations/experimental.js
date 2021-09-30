@@ -10,7 +10,8 @@ module.exports = {
       POST: 'experimentalThreadCategorySettings',
       PUT: 'experimentalThreadCategorySettings',
       PARAMETER: {
-        PUT: 'experimentalThreadCategorySettings'
+        PUT: 'experimentalThreadCategorySettings',
+        DELETE: 'experimentalThreadCategorySettings'
       }
     },
 		tools: {

@@ -6,7 +6,7 @@ block eContent
   .container-fluid.max-width
     .row
       #data.hidden=objToStr({categoryTree: data.categoryTree})
-      .col-xs-12.col-md-6.box-shadow-panel#app(v-cloak)
+      .col-xs-12.col-md-6#app(v-cloak)
 
         .m-b-1
           button.btn.btn-default(@click='newCategory') 新建分类
@@ -16,11 +16,16 @@ block eContent
               .thread-category-item
                 .fa.fa-bars.m-r-1.thread-category-master-handle
                 span {{c.name}}
+                button.btn.btn-default.btn-xs 编辑
+                button.btn.btn-success.btn-xs(v-if='c.disabled' @click='disableCategory(c._id, false)') 启用
+                button.btn.btn-default.btn-xs(v-else @click='disableCategory(c._id, true)') 禁用
+                button.btn.btn-danger.btn-xs(@click='removeCategory(c._id)') 删除
               .thread-category-nodes
                 .thread-category-node(v-for='n in c.nodes' :data-cid='c._id')
-                  .thread-category-item
-                    .fa.fa-bars.m-r-1.thread-category-node-handle
-                    span {{n.name}}
+                  span {{n.name}}
+                  .fa.fa-edit
+                  .fa.fa-trash(@click='removeCategory(n._id)')
+
 block scripts
   include ../../../publicModules/commonModal/commonModal
   +includeJS('/experimental/settings/threadCategory/threadCategory.js')

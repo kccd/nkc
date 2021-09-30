@@ -33,47 +33,12 @@ const app = new Vue({
         new Sortable(node, {
           group: `node_${i}`,
           invertSwap: true,
-          handle: '.thread-category-node-handle',
+          handle: '.thread-category-node',
           animation: 150,
           fallbackOnBody: true,
           swapThreshold: 0.65,
           onEnd: this.saveOrder
         });
-      }
-    },
-    initSort() {
-      const master = $('.thread-category-master');
-      for(let i = 0; i < master.length; i++) {
-        const m = master.eq(i);
-        const masterId = m.attr('data-cid');
-        if(m.attr('data-init') !== 'true') {
-          new Sortable(m[0], {
-            group: 'master',
-            invertSwap: true,
-            handle: '.thread-category-master-handle',
-            animation: 150,
-            fallbackOnBody: true,
-            swapThreshold: 0.65,
-            onEnd: this.saveOrder
-          });
-          m.attr('data-init', 'true');
-        }
-        const nodes = m.find('.thread-category-node');
-        for(let j = 0; j < nodes.length; j++) {
-          const n = nodes.eq(j);
-          if(n.attr('data-init') !== 'true') {
-            new Sortable(n[0], {
-              group: `master_${masterId}`,
-              invertSwap: true,
-              handle: '.thread-category-node-handle',
-              animation: 150,
-              fallbackOnBody: true,
-              swapThreshold: 0.65,
-              onEnd: this.saveOrder
-            });
-            n.attr('data-init', 'true');
-          }
-        }
       }
     },
     saveOrder() {
@@ -131,6 +96,29 @@ const app = new Vue({
           }
         ]
       })
+    },
+    removeCategory(cid) {
+      return sweetQuestion('确定要执行当前操作？')
+        .then(() => {
+          return nkcAPI(`/e/settings/threadCategory/${cid}`, 'DELETE')
+        })
+        .then(() => {
+          window.location.reload();
+        })
+        .catch(sweetError)
+    },
+    disableCategory(cid, disabled) {
+      return sweetQuestion('确定要执行当前操作？')
+        .then(() => {
+          return nkcAPI(`/e/settings/threadCategory/${cid}`, 'PUT', {
+            type: 'modifyDisable',
+            disabled
+          })
+        })
+        .then(() => {
+          window.location.reload();
+        })
+        .catch(sweetError)
     }
   }
-});
+})

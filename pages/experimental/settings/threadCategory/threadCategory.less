@@ -1,15 +1,28 @@
 @import '../../../publicModules/base';
-.thread-category-node{
-  padding-left: 2rem;
+.thread-categories{
+  user-select: none;
 }
 .thread-category-item{
   height: 4rem;
   line-height: 4rem;
   //border: 1px solid #333;
 }
+.thread-category-nodes{
+  .thread-category-node{
+    display: inline-block;
+    height: 3rem;
+    line-height: 3rem;
+    padding: 0 1rem;
+    color: #fff;
+    background-color: @primary;
+    border-radius: 3px;
+    margin: 0 0.5rem 0.5rem 0;
+  }
+}
 .thread-category-master{
+  background-color: #f4f4f4;
+  padding: 0 1rem 1rem 1rem;
   margin-bottom: 1rem;
-  margin-top: 1rem;
 }
 .thread-category-handle{
   padding-left: 1rem;
