@@ -283,6 +283,13 @@ router
 			// 拿到能看到入口的顶级专业
 			data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
 		}
+		if(data.sameLevelForums){
+			for(let fourms of data.sameLevelForums){
+				if(forum.displayName === fourms.displayName){
+					data.sameLevelForums.splice(forum ,1)
+				}
+			}
+		}
 
 		data.subUsersCount = await db.SubscribeModel.countDocuments({cancel: false, fid, type: "forum"});
 		if(data.user) {
