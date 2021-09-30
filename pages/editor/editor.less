@@ -2,7 +2,7 @@ body{
   /*background-color: #f0f0f0;*/
     @media (max-width: 991px) {
       #submit-scroll {
-        display: none;
+        display: none!important;
       }
       #submit-scroll-sm {
       }
@@ -11,6 +11,7 @@ body{
       #submit-scroll {
         position: fixed;
         display: none;
+        z-index: 9999;
       }
       #postButton-sm {
         display: none;

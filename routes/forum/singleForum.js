@@ -283,13 +283,11 @@ router
 			// 拿到能看到入口的顶级专业
 			data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
 		}
-		if(data.sameLevelForums){
-			for(let i in data.sameLevelForums){
-				if(forum.displayName === data.sameLevelForums[i].displayName){
-					data.sameLevelForums.splice(i, 1)
-				}
-			}
+		//排除当前专业
+		if(data.sameLevelForums && data.sameLevelForums.length){
+			data.sameLevelForums = data.sameLevelForums.filter(c => c.fid !== forum.fid)
 		}
+
 
 		data.subUsersCount = await db.SubscribeModel.countDocuments({cancel: false, fid, type: "forum"});
 		if(data.user) {
