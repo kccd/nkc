@@ -3,7 +3,7 @@ const router = new Router();
 router
   .get("/", async (ctx, next) => {
     const {db, data}=ctx;
-    const complaintTypes = await db.ComplaintTypeModel.find().sort({toc: 1});
+    const complaintTypes = await db.ComplaintTypeModel.find().sort({order: 1});
     const usersId = [];
     for(const c of complaintTypes) {
       if(!c.uid) continue;
@@ -29,7 +29,7 @@ router
   })
   .put('/', async (ctx, next) => {
     const {db, body, nkcModules} = ctx;
-    const {complaintSettings} = body;
+    const {complaintSettings, complaintTypesId} = body;
     const {checkString} = nkcModules.checkData;
     checkString(complaintSettings.tip, {
       name: '投诉提示',
@@ -41,6 +41,13 @@ router
         'c.tip': complaintSettings.tip
       }
     });
+    for(let i = 0; i < complaintTypesId.length; i++) {
+      await db.ComplaintTypeModel.updateOne({_id: complaintTypesId[i]}, {
+        $set: {
+          order: i + 1
+        }
+      });
+    }
     await db.SettingModel.saveSettingsToRedis('complaint');
     await next();
   })

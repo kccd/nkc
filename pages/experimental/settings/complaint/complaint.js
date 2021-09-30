@@ -155,9 +155,15 @@ var app = new Vue({
     },
 
     submit() {
-      const {complaintSettings} = this;
+      const {complaintSettings, type} = this;
+      let complaintTypesId = new Array(type.length);
+      for(const t of type) {
+        complaintTypesId.splice(t.order, 0, t._id);
+      }
+      complaintTypesId = complaintTypesId.filter(c => !!c);
       nkcAPI(`/e/settings/complaint`, 'PUT', {
-        complaintSettings
+        complaintSettings,
+        complaintTypesId
       })
         .then(() => {
           sweetSuccess(`保存成功`);

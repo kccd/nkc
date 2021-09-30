@@ -24,7 +24,7 @@ router
       q = {}
     }
     data.t = t;
-    const complaintTypes = await db.ComplaintTypeModel.find().sort({toc:1});
+    const complaintTypes = await db.ComplaintTypeModel.find().sort({order: 1});
     const typesObj = {};
     complaintTypes.map(c => typesObj[c._id] = c.type);
     const count = await db.ComplaintModel.countDocuments(q);
@@ -127,7 +127,7 @@ router
   })
   .get('/type', async (ctx, next) => {
     const {db, data} = ctx;
-    data.complaintTypes = await db.ComplaintTypeModel.find({disabled: false}).sort({toc:1});
+    data.complaintTypes = await db.ComplaintTypeModel.find({disabled: false}).sort({order: 1});
     data.complaintTip = (await db.SettingModel.getSettings('complaint')).tip;
     await next();
   });

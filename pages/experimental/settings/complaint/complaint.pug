@@ -15,6 +15,9 @@ block eTitle
     tr.disabled{
       background-color: #aaa;
     }
+    .complaint-type-order{
+      width: 5rem;
+    }
 block eContent
   .hidden#data= objToStr({complaintTypes: data.complaintTypes, complaintSettings: data.complaintSettings})
   .container-fluid.max-width#app(v-cloak)
@@ -26,6 +29,7 @@ block eContent
             table.table.table-bordered.nkc-table.m-b-05
               thead
                 tr
+                  th.text-center 排序
                   th.text-center 时间
                   th.text-center 创建者
                   th.text-center 名称
@@ -33,6 +37,8 @@ block eContent
                   th.text-center 操作
               tbody
                   tr(v-for="item in type" :class='{"disabled": item.disabled}')
+                    th.text-center.complaint-type-order
+                      input.form-control(v-model.number='item.order' type='text')
                     th.text-center {{timeFormat(item.toc)}}
                     th.text-center
                       span(v-if='!item.user') 默认
