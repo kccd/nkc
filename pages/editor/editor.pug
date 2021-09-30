@@ -11,7 +11,7 @@ block title
     }
 block content
   mixin modifySubmit(id)
-    div(id = id)(v-cloak)
+    div(id = id v-cloak)
       hr
       .checkbox(v-if="havePermissionToSendAnonymousPost")
         label(v-if="allowedAnonymous")
