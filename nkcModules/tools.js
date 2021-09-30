@@ -85,9 +85,6 @@ var Tools = function() {
       case "thread": {
         return "/t/" + id;
       }
-      case "library": {
-
-      }
       case "editThread": {
         return "/editor?"
       }
