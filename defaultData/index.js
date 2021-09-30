@@ -248,7 +248,8 @@ async function initComplaintType() {
     for(const c of complaintTypes) {
       await db.ComplaintTypeModel.insertCom({
         type: c.type,
-        description: c.description
+        description: c.description,
+        order: c.order
       });
     }
   }
