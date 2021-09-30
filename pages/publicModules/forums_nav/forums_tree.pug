@@ -58,29 +58,29 @@ if data.forum && data.forum.childrenForums && data.forum.childrenForums.length
         .forum-block
           .forum-block-info
             a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
+//-
+  if data.parentForums && data.parentForums.length
+    .m-b-1#parentForums
+      .panel-header 上级专业
+      .home-topic-item-div
+        for forum in data.parentForums
+          .forum-block
+            .forum-block-info()
+              //-
+                if forum.iconFileName
+                  img.forum-block-icon(src=`/forum_avatar/${forum.fid}`)
+                else
+                  .forum-block-icon(style=`background-color: ${forum.color}`)
+              a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
 
-if data.parentForums && data.parentForums.length
-  .m-b-1#parentForums
-    .panel-header 上级专业
-    .home-topic-item-div
-      for forum in data.parentForums
-        .forum-block
-          .forum-block-info()
-            //-
-              if forum.iconFileName
-                img.forum-block-icon(src=`/forum_avatar/${forum.fid}`)
-              else
-                .forum-block-icon(style=`background-color: ${forum.color}`)
-            a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
-
-if data.sameLevelForums && data.sameLevelForums.length
-  .m-b-1#sameLevelForums
-    .panel-header 同级专业
-    .home-topic-item-div
-      for forum in data.sameLevelForums
-        .forum-block
-          .forum-block-info
-            a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
+  if data.sameLevelForums && data.sameLevelForums.length
+    .m-b-1#sameLevelForums
+      .panel-header 同级专业
+      .home-topic-item-div
+        for forum in data.sameLevelForums
+          .forum-block
+            .forum-block-info
+              a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
 
 if data.user && data.forum && state.subForums && state.subForums.length >0
   .m-b-1
