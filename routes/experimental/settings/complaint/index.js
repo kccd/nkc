@@ -46,47 +46,64 @@ router
   })
   .post('/type', async (ctx, next) => {
     const {state, db, body, nkcModules} = ctx;
-    let {type, description, disabled, _id, uid} = body;
+    let {type, description} = body;
     const {checkString} = nkcModules.checkData;
+    checkString(type, {
+      name: '投诉类型名称',
+      minLength: 0,
+      maxLength: 20
+    });
     checkString(description, {
-      name: '说明',
+      name: '投诉类型说明',
       minLength: 0,
       maxLength: 5000
     });
-    const now = new Date();
-    const oldComs = await db.ComplaintTypeModel.find({type: {$in: type}}, {_id: 1});
-    if(oldComs.length !== 0) {
+    const count = await db.ComplaintTypeModel.countDocuments({type});
+    if(count > 0) {
       ctx.throw(400, `类型 「${type}」 已存在`);
     }
     await db.ComplaintTypeModel.insertCom({
-      toc: now,
       uid: state.uid,
       type,
       description,
-      disabled
     });
     await next();
   })
   .put('/type', async (ctx, next) => {
     const {state, db, body, nkcModules} = ctx;
-    let {type, description, disabled, _id, uid, operation} = body;
-    const id = await db.ComplaintTypeModel.findOne({_id});
-		if(!id) ctx.throw(400, "未找到相关数据，请刷新页面后重试");
-    const oldComs = await db.ComplaintTypeModel.find({type: {$in: type}}, {_id: 1});
-    if(oldComs.length === 1) {
-      if(operation === "modifyDisabled") {
-        await id.updateOne({
+    const {checkString} = nkcModules.checkData;
+    let {type, description, disabled, _id, operation} = body;
+    const complaintType = await db.ComplaintTypeModel.findOne({_id});
+		if(!complaintType) ctx.throw(400, "未找到相关数据，请刷新页面后重试");
+    if(operation === 'modifyDisabled') {
+      await complaintType.updateOne({
+        $set: {
           disabled: !!disabled
-        });
-      } else if(operation === "modifyEdit") {
-        if(!!type) {
-          await id.updateOne({description: description, type: type});
         }
-      } 
-    } else if(oldComs.length === 0){
-      ctx.throw(400, `类型 「${type}」 不存在`);
+      });
+    } else if(operation === 'modifyEdit') {
+      checkString(type, {
+        name: '投诉类型名称',
+        minLength: 0,
+        maxLength: 20
+      });
+      checkString(description, {
+        name: '投诉类型说明',
+        minLength: 0,
+        maxLength: 5000
+      });
+      const sameTypeCount = await db.ComplaintTypeModel.countDocuments({_id: {$ne: _id}, type});
+      if(sameTypeCount > 0) {
+        ctx.throw(400, `投诉类型名称已存在`);
+      }
+      await complaintType.updateOne({
+        $set: {
+          type,
+          description
+        }
+      });
     } else {
-      ctx.throw(400, `类型 「${type}」 存在多个，请联系管理员`);
+      ctx.throw(400, `数据错误 operation: ${operation}`);
     }
     await next();
   });

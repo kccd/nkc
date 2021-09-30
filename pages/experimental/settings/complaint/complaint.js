@@ -8,7 +8,7 @@ function addType() {
     return Promise.resolve()
       .then(() => {
         if(!type.length) throw new Error('投诉类型不能为空');
-        return nkcAPI('/e/settings/complaintType', 'POST', {
+        return nkcAPI('/e/settings/complaint/type', 'POST', {
           type,
           description
         });
