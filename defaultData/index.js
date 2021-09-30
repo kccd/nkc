@@ -243,14 +243,14 @@ async function initMessages() {
 async function initComplaintType() {
   const db = require('../dataModels');
   const complaintTypes = require('./complaintTpyes');
-  const complaintTypesDB = await db.ComplaintTypeModel.find({});
-  const types = complaintTypesDB.map(c => c.type);
-  for(const c of complaintTypes) {
-    if(types.includes(c.type)) continue;
-    await db.ComplaintTypeModel.insertCom({
-      type: c.type,
-      description: c.description
-    });
+  const count = await db.ComplaintTypeModel.countDocuments();
+  if(count === 0) {
+    for(const c of complaintTypes) {
+      await db.ComplaintTypeModel.insertCom({
+        type: c.type,
+        description: c.description
+      });
+    }
   }
 }
 
