@@ -60,8 +60,8 @@ const vm = new Vue({
 	methods: {
 		videoUpdate(file){
 			this.videoInputFile = file;
-			if(file.type != "video/mp4"){
-				return sweetSuccess("视频上传成功！只有.mp4格式的文件才能预览")
+			if(file.type !== "video/mp4"){
+				return sweetSuccess("视频上传成功")
 			}
 		},
 		IDCardAInputFileChange(file) {
@@ -82,7 +82,7 @@ const vm = new Vue({
 			form.append("surfaceB", IDCardBInputFile);
 			try {
 				await nkcUploadFile("verify/verify2_form", "POST", form).then(()=>{
-				return sweetSuccess("图片提交成功，请等待审核！");
+				return sweetSuccess("图片提交成功，请等待审核");
 				});
 			} catch (error) {
 				return sweetError(error);
@@ -102,7 +102,7 @@ const vm = new Vue({
 			await nkcUploadFile("verify/verify3_form", "POST", form).then(()=>{
 			this.authenticate.video.status = "in_review";
 			this.loading = false;
-			return sweetSuccess("视频提交成功，请等待审核！");
+			return sweetSuccess("视频提交成功，请等待审核");
 				});
 			} catch (error) {
 			this.loading = false;
@@ -134,7 +134,7 @@ function initEvent(elementId) {
 function submitAuth(uid, number) {
 	nkcAPI('/u/'+uid+'/auth/'+number, 'POST', {})
 		.then(function(data) {
-			screenTopAlert('提交成功，请耐心等待审核。');
+			screenTopAlert('提交成功，请耐心等待审核');
 			setTimeout(function(){window.location.reload()}, 2000)
 		})
 		.catch(function(data) {
@@ -146,7 +146,7 @@ function submitAuth(uid, number) {
 function unSubmitAuth(uid, number) {
 	nkcAPI('/u/'+uid+'/auth?number='+number, 'DELETE',{})
 		.then(function() {
-			screenTopAlert('撤销成功！');
+			screenTopAlert('撤销成功');
 			window.location.reload();
 		})
 		.catch(function(data) {
