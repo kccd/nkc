@@ -50,10 +50,10 @@ completeRouter
       for(let i = 0; i < actualMoney.length; i++) {
         const {
           purpose,
-          model,
+          model = '',
           money,
           count,
-          unit,
+          unit = '',
         } = actualMoney[i];
         const baseName = `资金预算第 ${i + 1} 项 - `;
         checkString(purpose, {
