@@ -115,8 +115,8 @@ settingsRouter
         count,
         money,
         purpose,
-        unit,
-        model,
+        unit = '',
+        model = '',
       } = budgetMoney[i];
 
       _budgetMoney.push({
@@ -199,8 +199,8 @@ settingsRouter
             purpose,
             suggest,
             fact,
-            model,
-            unit
+            model = '',
+            unit = ''
           } = _budgetMoney[i];
           const baseName = `资金预算第 ${i + 1} 项 - `;
           checkString(purpose, {
