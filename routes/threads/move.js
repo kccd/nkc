@@ -9,9 +9,12 @@ router
       threadsId,
       forums,
       violation,
-      violationReason,
+      reason,
       remindUser
     } = body;
+
+    if(remindUser && !reason) ctx.throw(400, `请输入原因`);
+
     const forumsObj = {};
     const forumsId = new Set();
     const threadTypesId = new Set();
@@ -73,8 +76,6 @@ router
         thread.categoriesId = [...threadTypesId];
       }
 
-
-      // 处理违规
       if(violation) {
         const u = usersObj[thread.uid];
         if(!u) continue;
@@ -87,24 +88,26 @@ router
           ip: ctx.address,
           key: 'violationCount',
           tid: thread.tid,
-          description: violationReason || '移动文章并标记为违规'
+          description: reason || '移动文章并标记为违规'
         });
-        if(remindUser) {
-          const mId = await db.SettingModel.operateSystemID('messages', 1);
-          const message = db.MessageModel({
-            _id: mId,
-            ty: 'STU',
-            r: thread.uid,
-            c: {
-              type: 'violation',
-              tid: thread.tid,
-              rea: violationReason
-            }
-          });
-          await message.save();
-          await ctx.nkcModules.socket.sendMessageToUser(message._id);
-        }
+      }
 
+      if(remindUser) {
+        const newThread = await db.ThreadModel.findOnly({tid: thread.tid}, {mainForumsId: 1});
+        const mId = await db.SettingModel.operateSystemID('messages', 1);
+        const message = db.MessageModel({
+          _id: mId,
+          ty: 'STU',
+          r: thread.uid,
+          c: {
+            type: 'moveThread',
+            tid: thread.tid,
+            rea: reason,
+            forumsId: newThread.mainForumsId
+          }
+        });
+        await message.save();
+        await ctx.nkcModules.socket.sendMessageToUser(message._id);
       }
     }
 

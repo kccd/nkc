@@ -441,9 +441,9 @@ messageSchema.statics.getParametersData = async (message) => {
   } else if(type === 'postWasReturned') {
     const {pid, rea} = message.c;
     const post = await PostModel.findOne({pid});
-    if(!post) return null;
+    if (!post) return null;
     const thread = await ThreadModel.findOne({tid: post.tid});
-    if(!thread) return null;
+    if (!thread) return null;
     const firstPost = await thread.extendFirstPost();
     parameters = {
       threadTitle: firstPost.t,
@@ -452,6 +452,25 @@ messageSchema.statics.getParametersData = async (message) => {
       reason: rea,
       deadline: moment(Date.now() + timeout).format("YYYY-MM-DD HH:mm:ss")
     };
+  } else if(type === 'moveThread') {
+    const {tid, rea, forumsId} = message.c;
+    const thread = await ThreadModel.findOne({tid});
+    if(!thread) return null;
+    const firstPost = await thread.extendFirstPost();
+    let forumsName = '';
+    if(forumsId && forumsId.length > 0) {
+      const forums = await ForumModel.find({fid: {$in: forumsId}}, {
+        displayName: 1,
+        fid: 1
+      });
+      forumsName = forums.map(f => f.displayName).join('、');
+    }
+    parameters = {
+      threadTitle: firstPost.t,
+      threadURL: getUrl('thread', thread.tid),
+      reason: rea,
+      forumsName
+    }
   } else if(type === 'replyPost') {
     const {targetPid} = message.c;
     const post = await PostModel.findOne({pid: targetPid});

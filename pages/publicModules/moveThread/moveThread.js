@@ -25,7 +25,7 @@ NKC.modules.MoveThread = function() {
 
       violation: false,
       remindUser: true,
-      violationReason: ''
+      reason: ''
     },
     computed: {
 
@@ -132,7 +132,7 @@ NKC.modules.MoveThread = function() {
           moveType: this.moveType,
           originForums: this.selectedForums,
           violation: this.violation,
-          violationReason: this.violationReason,
+          reason: this.reason,
           remindUser: this.remindUser,
         });
       },

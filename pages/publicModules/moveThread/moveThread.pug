@@ -65,13 +65,13 @@
           .move-thread-options
             .checkbox
               label
-                input(type='checkbox' :value='true' v-model='violation')
-                span 标记为违规
-            .checkbox(v-if='violation')
-              label
                 input(type='checkbox' :value='true' v-model='remindUser')
                 span 通知用户
-            textarea.form-control(placeholder='请输入违规原因' rows=3 v-model='violationReason' v-if='violation')
+            textarea.form-control(placeholder='请输入原因' rows=3 v-model='reason' v-if='remindUser')
+            .checkbox
+              label
+                input(type='checkbox' :value='true' v-model='violation')
+                span 标记为违规
       .modal-footer
         .display-i-b(v-if="submitting") 处理中，请稍候...
         button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭
