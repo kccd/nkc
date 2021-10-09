@@ -96,7 +96,7 @@ function moveSelectedThreads() {
     var moveType = data.moveType;
     var {
       violation,
-      violationReason,
+      reason,
       remindUser
     } = data;
     MoveThread.lock();
@@ -106,7 +106,7 @@ function moveSelectedThreads() {
       threadsId: threadsId,
       violation,
       remindUser,
-      violationReason
+      reason
     })
       .then(function() {
         screenTopAlert("操作成功");

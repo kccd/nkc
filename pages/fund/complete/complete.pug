@@ -2,11 +2,12 @@ extends ../fundContainer
 block fundTitle
   title 结题
   style.
-    .budget-purpose {
-      max-width: 10rem;
+    .budget-purpose input{
+      min-width: 10rem;
     }
-    .budget-count {
-      max-width: 7rem;
+    .budget-count input, .budget-count span{
+      display: block;
+      min-width: 6rem;
     }
 block fundContent
   include ../applicationForm/budgetMoney
@@ -58,7 +59,8 @@ block fundContent
                             input.form-control(type='text' v-model.number='m.count')
                           th.budget-count
                             input.form-control(type='text' v-model='m.unit')
-                          th {{calculateMoney(m.count, m.money).toFixed(2)}}
+                          th.budget-count
+                            span {{calculateMoney(m.count, m.money).toFixed(2)}}
                           th
                             button.btn.btn-xs.btn-default(@click='removeFromArr(form.actualMoney, index)') 删除
                   .pull-left

@@ -1098,7 +1098,7 @@ function moveThread() {
 	window.MoveThread.open(function(data) {
 		var forums = data.forums;
 		var moveType = data.moveType;
-		const {violation, violationReason, remindUser} = data;
+		const {violation, reason, remindUser} = data;
 		window.MoveThread.lock();
 		nkcAPI("/threads/move", "POST", {
 			forums: forums,
@@ -1106,7 +1106,7 @@ function moveThread() {
 			threadsId: [threadData.tid],
       violation,
       remindUser,
-      violationReason
+      reason
 		})
 			.then(function() {
 				screenTopAlert("操作成功");

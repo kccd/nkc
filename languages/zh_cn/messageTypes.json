@@ -36,6 +36,7 @@
   "postWasReturned": "回复被退修",
   "bannedThread": "文章被移动到回收站",
   "bannedPost": "回复被屏蔽",
+  "moveThread": "文章被移动",
   "digestPost": "回复被列入精选",
   "digestThread": "文章被列入精选",
   "at": "at信息",
@@ -106,5 +107,6 @@
   "BFFMessage": "变更信息",
   "securityApplicationResolved": "手机号申诉通过审核",
   "securityApplicationRejected": "手机号申诉未通过审核",
-  "fundFinishProject": "【基金系统】研究超时"
+  "fundFinishProject": "【基金系统】研究超时",
+  "forumsName": "专业名称"
 }

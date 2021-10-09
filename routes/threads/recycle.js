@@ -36,10 +36,10 @@ router
     for(const r of results) {
       const {type, thread, post} = r;
       ctx.state._scoreOperationForumsId = [].concat(thread.mainForumsId);
+      let targetUser;
       if(type === "thread") {
-
         // 将文章移动至回收站
-        const targetUser = await thread.extendUser();
+        targetUser = await thread.extendUser();
         // 获取文章所在专业 文章专业更新后需重新计算相关专业内的文章数量
         const forumsId = thread.mainForumsId;
         forumsId.push(recycleId);
@@ -57,21 +57,6 @@ router
         data.post = post;
         // 根据后台科创币设置扣除作者的科创币
         await db.KcbsRecordModel.insertSystemRecord('threadBlocked', targetUser, ctx);
-        // 如果标记为违规 则生成违规记录且扣除相应科创币
-        if(violation) {
-          await db.UsersScoreLogModel.insertLog({
-            user: targetUser,
-            type: 'score',
-            typeIdOfScoreChange: 'violation',
-            port: ctx.port,
-            delType: "toRecycle",
-            ip: ctx.address,
-            key: 'violationCount',
-            tid: thread.tid,
-            description: reason || '屏蔽文章并标记为违规'
-          });
-          await db.KcbsRecordModel.insertSystemRecord('violation', targetUser, ctx);
-        }
         // 添加日志
         const posts = await db.PostModel.find({tid: thread.tid}, {uid: 1});
         const uidArr = new Set();
@@ -89,28 +74,12 @@ router
           noticeType: remindUser
         });
         await delLog.save();
-        // 如果需要通知用户，则生成短消息
-        if(remindUser) {
-          const mId = await db.SettingModel.operateSystemID('messages', 1);
-          const message = db.MessageModel({
-            _id: mId,
-            ty: 'STU',
-            r: targetUser.uid,
-            c: {
-              type: 'bannedThread',
-              tid: thread.tid,
-              rea: reason || ''
-            }
-          });
-          await message.save();
-          await ctx.nkcModules.socket.sendMessageToUser(message._id);
-        }
         // 如果文章之前未审核 则生成审核记录
         if(!thread.reviewed) await db.ReviewModel.newReview("disabledThread", post, user, reason);
       } else {
         // 批量屏蔽回复
         if(post.disabled) continue;
-        const targetUser = await db.UserModel.findOnly({uid: post.uid});
+        targetUser = await db.UserModel.findOnly({uid: post.uid});
         if(!threadsId.includes(thread.tid)) {
           threads.push(thread);
           threadsId.push(thread.tid);
@@ -130,39 +99,52 @@ router
           noticeType: remindUser
         });
         await delLog.save();
-        if(remindUser) {
-          const mId = await db.SettingModel.operateSystemID("messages", 1);
-          const message = db.MessageModel({
-            _id: mId,
-            ty: "STU",
-            r: targetUser.uid,
-            c: {
-              type: "bannedPost",
-              pid: post.pid,
-              rea: reason
-            }
-          });
-          await message.save();
-          await ctx.nkcModules.socket.sendMessageToUser(message._id);
-        }
-        if(violation) {
-          await db.KcbsRecordModel.insertSystemRecord('violation', targetUser, ctx);
-          await db.UsersScoreLogModel.insertLog({
-            user: targetUser,
-            type: 'score',
-            typeIdOfScoreChange: 'violation',
-            port: ctx.port,
-            ip: ctx.address,
-            key: 'violationCount',
-            tid: post.tid,
-            pid: post.pid,
-            description: reason || '屏蔽回复并标记为违规'
-          });
-        }
         if(!post.reviewed) await db.ReviewModel.newReview("disabledPost", post, targetUser, reason);
       }
-      // 清除 redis 中的页面缓存
+      // 标记为违规
+      if(violation) {
+        await db.UsersScoreLogModel.insertLog({
+          user: targetUser,
+          type: 'score',
+          typeIdOfScoreChange: 'violation',
+          port: ctx.port,
+          delType: "toRecycle",
+          ip: ctx.address,
+          key: 'violationCount',
+          tid: thread.tid,
+          pid: post.pid,
+          description: reason || `屏蔽${type === 'thread'? '文章': '回复'}并标记为违规`
+        });
+        await db.KcbsRecordModel.insertSystemRecord('violation', targetUser, ctx);
+      }
 
+      // 通知用户文章或回复被屏蔽
+      if(remindUser) {
+        const mId = await db.SettingModel.operateSystemID('messages', 1);
+        const messageObj = {
+          _id: mId,
+          ty: 'STU',
+          r: targetUser.uid,
+          c: {
+            rea: reason
+          }
+        };
+        if(type === 'thread') {
+          messageObj.c.tid = thread.tid;
+          messageObj.c.type = 'bannedThread';
+        } else if(type === 'post') {
+          messageObj.c.pid = post.pid;
+          messageObj.c.type = 'bannedPost';
+        } else {
+          ctx.throw(500, `post type error. pid: ${post.pid} type: ${type}`);
+        }
+        const message = db.MessageModel(messageObj);
+        await message.save();
+        await ctx.nkcModules.socket.sendMessageToUser(message._id);
+      }
+
+
+      // 清除 redis 中的页面缓存
       const postKey = nkcModules.cache.getRedisPageKeyByUrl(`/p/${post.pid}*`);
       const threadKey = nkcModules.cache.getRedisPageKeyByUrl(`/t/${post.tid}*`);
       const keys = postKey.web.concat(
