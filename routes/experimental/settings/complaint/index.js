@@ -10,6 +10,7 @@ router
       usersId.push(c.uid);
     }
     data.complaintTypes = [];
+    //获取以用户 ID 为键，以用户对象为值得对象
     const usersObj = await db.UserModel.getUsersObjectByUsersId(usersId);
     for(let type of complaintTypes) {
       type = type.toObject();
@@ -72,21 +73,20 @@ router
     let {type, description, disabled, _id, uid, operation} = body;
     const id = await db.ComplaintTypeModel.findOne({_id});
 		if(!id) ctx.throw(400, "未找到相关数据，请刷新页面后重试");
-    const oldComs = await db.ComplaintTypeModel.find({type: {$in: type}}, {_id: 1});
+    //查找符合内容的id
+    const oldComs = await db.ComplaintTypeModel.find({_id: {$in: _id}}, {_id: 1});
     if(oldComs.length === 1) {
       if(operation === "modifyDisabled") {
         await id.updateOne({
           disabled: !!disabled
         });
       } else if(operation === "modifyEdit") {
-        if(!!type) {
           await id.updateOne({description: description, type: type});
-        }
-      } 
+      }
     } else if(oldComs.length === 0){
-      ctx.throw(400, `类型 「${type}」 不存在`);
+      ctx.throw(400, `类型 「${id.type}」 不存在`);
     } else {
-      ctx.throw(400, `类型 「${type}」 存在多个，请联系管理员`);
+      ctx.throw(400, `类型 「${id.type}」 存在多个，请联系管理员`);
     }
     await next();
   });
