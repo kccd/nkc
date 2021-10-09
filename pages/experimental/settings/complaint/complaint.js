@@ -8,7 +8,7 @@ function addType() {
     return Promise.resolve()
       .then(() => {
         if(!type.length) throw new Error('投诉类型不能为空');
-        return nkcAPI('/e/settings/complaintType/type', 'POST', {
+        return nkcAPI('/e/settings/complaint/type', 'POST', {
           type,
           description
         });
@@ -155,9 +155,15 @@ var app = new Vue({
     },
 
     submit() {
-      const {complaintSettings} = this;
+      const {complaintSettings, type} = this;
+      let complaintTypesId = new Array(type.length);
+      for(const t of type) {
+        complaintTypesId.splice(t.order, 0, t._id);
+      }
+      complaintTypesId = complaintTypesId.filter(c => !!c);
       nkcAPI(`/e/settings/complaint`, 'PUT', {
-        complaintSettings
+        complaintSettings,
+        complaintTypesId
       })
         .then(() => {
           sweetSuccess(`保存成功`);

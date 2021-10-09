@@ -1299,9 +1299,6 @@ messageSchema.statics.extendMessages = async (messages) => {
     } else if(ty === 'STU') {
       message.contentType = 'html';
       message.content = await MessageModel.getSTUMessageContent(m);
-      if(_id === 115953) {
-        console.log(`content: `, message.content);
-      }
       if(message.content === null) continue;
     } else if(ty === 'newFriends') {
       // 新朋友

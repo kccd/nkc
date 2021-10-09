@@ -12,6 +12,12 @@ block eTitle
       border-radius: 50%;
       margin-right: 0.2rem;
     }
+    tr.disabled{
+      background-color: #aaa;
+    }
+    .complaint-type-order{
+      width: 5rem;
+    }
 block eContent
   .hidden#data= objToStr({complaintTypes: data.complaintTypes, complaintSettings: data.complaintSettings})
   .container-fluid.max-width#app(v-cloak)
@@ -23,13 +29,16 @@ block eContent
             table.table.table-bordered.nkc-table.m-b-05
               thead
                 tr
+                  th.text-center 排序
                   th.text-center 时间
                   th.text-center 创建者
                   th.text-center 名称
                   th.text-center 说明
                   th.text-center 操作
               tbody
-                  tr(v-for="item in type")
+                  tr(v-for="item in type" :class='{"disabled": item.disabled}')
+                    th.text-center.complaint-type-order
+                      input.form-control(v-model.number='item.order' type='text')
                     th.text-center {{timeFormat(item.toc)}}
                     th.text-center
                       span(v-if='!item.user') 默认
@@ -43,8 +52,8 @@ block eContent
                     th.text-center {{item.type}}
                     th.text-center {{item.description}}
                     th.text-center
-                      button(v-if='item.disabled' @click="initiate(item._id, false)").btn.btn-success.btn-xs 启用
-                      button(v-else @click="forbidden(item._id, true)").btn.btn-danger.btn-xs 禁用
+                      button.btn.btn-success.btn-xs(@click="initiate(item._id, false)" v-if='item.disabled') 启用
+                      button.btn.btn-danger.btn-xs(@click="forbidden(item._id, true)" v-else) 禁用
                       button.btn.btn-warning.btn-xs(@click="edit(item)") 编辑
           if data.complaintTypes.length === 0
             .p-t-05.p-b-05.text-center 空空如也~

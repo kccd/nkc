@@ -22,6 +22,11 @@ const schema = new Schema({
     default: Date.now,
     index: 1
   },
+  order: {
+    type: Number,
+    default: 99,
+    index: 1
+  },
   description: {
     type: String,
     default: ''
@@ -37,13 +42,14 @@ const schema = new Schema({
 * */
 schema.statics.insertCom = async (props) => {
   const SettingModel = mongoose.model('settings');
-  const {uid, type, description} = props;
+  const {uid, type, description, order} = props;
   const recordId = await SettingModel.operateSystemID("complaintTypes",1);
   const ComplainTypeModel = mongoose.model('complaintTypes');
   await ComplainTypeModel({
     _id: recordId,
     uid,
     type,
+    order,
     description,
   }).save();
 };

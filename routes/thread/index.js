@@ -255,11 +255,11 @@ threadRouter
 				const $or = [
 					{
 						disabled: false
-					},
+					}/* ,
 					{
 						disabled: true,
 						toDraft: {$ne: true}
-					}
+					} */
 				];
 				// 用户能查看自己被退回的回复
 				if(data.user) {
@@ -275,11 +275,11 @@ threadRouter
 				const $or = [
 					{
 						disabled: false
-					},
+					}/* ,
 					{
 						disabled: true,
 						toDraft: {$ne: false}
-					}
+					} */
 				];
 				$and.push({$or});
 			}

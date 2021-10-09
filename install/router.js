@@ -131,7 +131,7 @@ router
     await init();
 
     // 添加install.lock文件，若要重新安装则需要先删掉此文件
-    fs.writeFileSync(path.resolve(__dirname, './install.lock'), new Date());
+    fs.writeFileSync(path.resolve(__dirname, './install.lock'), Date.now().toString());
     setImmediate(() => {
       console.log(`\nthe installation is complete\n`);
       console.log(`\nrun 'pm2 start pm2.config.js' to start the server.\n\n\n`);

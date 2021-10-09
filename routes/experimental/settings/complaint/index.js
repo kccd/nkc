@@ -3,14 +3,13 @@ const router = new Router();
 router
   .get("/", async (ctx, next) => {
     const {db, data}=ctx;
-    const complaintTypes = await db.ComplaintTypeModel.find().sort({toc: 1});
+    const complaintTypes = await db.ComplaintTypeModel.find().sort({order: 1});
     const usersId = [];
     for(const c of complaintTypes) {
       if(!c.uid) continue;
       usersId.push(c.uid);
     }
     data.complaintTypes = [];
-    //获取以用户 ID 为键，以用户对象为值得对象
     const usersObj = await db.UserModel.getUsersObjectByUsersId(usersId);
     for(let type of complaintTypes) {
       type = type.toObject();
@@ -30,7 +29,7 @@ router
   })
   .put('/', async (ctx, next) => {
     const {db, body, nkcModules} = ctx;
-    const {complaintSettings} = body;
+    const {complaintSettings, complaintTypesId} = body;
     const {checkString} = nkcModules.checkData;
     checkString(complaintSettings.tip, {
       name: '投诉提示',
@@ -42,51 +41,76 @@ router
         'c.tip': complaintSettings.tip
       }
     });
+    for(let i = 0; i < complaintTypesId.length; i++) {
+      await db.ComplaintTypeModel.updateOne({_id: complaintTypesId[i]}, {
+        $set: {
+          order: i + 1
+        }
+      });
+    }
     await db.SettingModel.saveSettingsToRedis('complaint');
     await next();
   })
   .post('/type', async (ctx, next) => {
     const {state, db, body, nkcModules} = ctx;
-    let {type, description, disabled, _id, uid} = body;
+    let {type, description} = body;
     const {checkString} = nkcModules.checkData;
+    checkString(type, {
+      name: '投诉类型名称',
+      minLength: 0,
+      maxLength: 20
+    });
     checkString(description, {
-      name: '说明',
+      name: '投诉类型说明',
       minLength: 0,
       maxLength: 5000
     });
-    const now = new Date();
-    const oldComs = await db.ComplaintTypeModel.find({type: {$in: type}}, {_id: 1});
-    if(oldComs.length !== 0) {
+    const count = await db.ComplaintTypeModel.countDocuments({type});
+    if(count > 0) {
       ctx.throw(400, `类型 「${type}」 已存在`);
     }
     await db.ComplaintTypeModel.insertCom({
-      toc: now,
       uid: state.uid,
       type,
       description,
-      disabled
     });
     await next();
   })
   .put('/type', async (ctx, next) => {
     const {state, db, body, nkcModules} = ctx;
-    let {type, description, disabled, _id, uid, operation} = body;
-    const id = await db.ComplaintTypeModel.findOne({_id});
-		if(!id) ctx.throw(400, "未找到相关数据，请刷新页面后重试");
-    //查找符合内容的id
-    const oldComs = await db.ComplaintTypeModel.find({_id: {$in: _id}}, {_id: 1});
-    if(oldComs.length === 1) {
-      if(operation === "modifyDisabled") {
-        await id.updateOne({
+    const {checkString} = nkcModules.checkData;
+    let {type, description, disabled, _id, operation} = body;
+    const complaintType = await db.ComplaintTypeModel.findOne({_id});
+		if(!complaintType) ctx.throw(400, "未找到相关数据，请刷新页面后重试");
+    if(operation === 'modifyDisabled') {
+      await complaintType.updateOne({
+        $set: {
           disabled: !!disabled
-        });
-      } else if(operation === "modifyEdit") {
-          await id.updateOne({description: description, type: type});
+        }
+      });
+    } else if(operation === 'modifyEdit') {
+      checkString(type, {
+        name: '投诉类型名称',
+        minLength: 0,
+        maxLength: 20
+      });
+      checkString(description, {
+        name: '投诉类型说明',
+        minLength: 0,
+        maxLength: 5000
+      });
+      const sameTypeCount = await db.ComplaintTypeModel.countDocuments({_id: {$ne: _id}, type});
+      if(sameTypeCount > 0) {
+        ctx.throw(400, `投诉类型名称已存在`);
       }
-    } else if(oldComs.length === 0){
-      ctx.throw(400, `类型 「${id.type}」 不存在`);
+      await complaintType.updateOne({
+        $set: {
+          type,
+          description
+        }
+      });
     } else {
-      ctx.throw(400, `类型 「${id.type}」 存在多个，请联系管理员`);
+      ctx.throw(400, `数据错误 operation: ${operation}`);
     }
     await next();
   });
