@@ -10,13 +10,13 @@ NKC.modules.DisabledPost = function() {
       submitting: false,
       type: "toDraft", // toDraft, toRecycle
       reason: "",
-      remindUser: [true],
-      violation: [true]
+      remindUser: true,
+      violation: true
     },
     watch: {
       type: function() {
         if(this.type === "toDraft") {
-          this.remindUser = [true];
+          this.remindUser = true;
         }
       }
     },
@@ -26,8 +26,8 @@ NKC.modules.DisabledPost = function() {
         this_.callback({
           type: this.type,
           reason: this.reason,
-          remindUser: this.remindUser.length > 0,
-          violation: this.violation.length > 0
+          remindUser: this.remindUser,
+          violation: this.violation
         });
       }
     }
