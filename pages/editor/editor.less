@@ -1,26 +1,44 @@
 body{
-  /*background-color: #f0f0f0;*/
-    @media (max-width: 991px) {
-      #submit-scroll {
-        display: none!important;
-      }
-      #submit-scroll-sm {
-      }
-    }
-    @media (min-width: 992px) {
-      #submit-scroll {
-        position: fixed;
-        display: none;
-        z-index: 1050;
-      }
-      #postButton-sm {
-        display: none;
-      }
-      #submit-scroll-sm{
-        visibility: hidden;
-      }
+  #PostButton{
+    display: none;
+    &[v-cloak]{
+      display: none;
     }
   }
+  #FloatPostButton{
+    display: block;
+    &[v-cloak]{
+      display: none;
+    }
+  }
+  #FloatPostButtonContainer{
+    position: fixed;
+    z-index: 1000;
+    display: none;
+  }
+  #FloatPostButtonContainerTemplate{
+    visibility: hidden;
+    height: 1px;
+    overflow: hidden;
+  }
+  @media (max-width: 991px) {
+    #PostButton {
+      display: block;
+    }
+    #FloatPostButton{
+      display: none;
+    }
+    #FloatPostButtonContainer{
+      position: fixed;
+      display: none;
+    }
+    #FloatPostButtonContainerTemplate{
+      visibility: inherit;
+      height: inherit;
+      overflow: inherit;
+    }
+  }
+}
 
 .box-shadow-panel>div{
   border: 1px solid #dbdbdb;

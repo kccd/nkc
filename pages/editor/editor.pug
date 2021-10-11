@@ -14,15 +14,11 @@ block content
     div(id = id v-cloak)
       hr
       .checkbox(v-if="havePermissionToSendAnonymousPost")
-        label(v-if="allowedAnonymous")
-          input(type="checkbox" v-model="anonymous" :value="true")
+        label
+          input(type="checkbox" v-model="anonymous" :value="true" :disabled="!allowedAnonymous")
           span
             | 匿名发表
-        label(v-else)
-          input(type="checkbox" v-model="anonymous" :value="true" disabled)
-          span
-            | 匿名发表
-            span.text-danger （所选专业分类不支持匿名发表）
+            span.text-danger(v-if='!allowedAnonymous') (所选专业分类不支持匿名发表)
       .checkbox
         label
           input(type="checkbox" v-model="checkProtocol" :value="true")
@@ -245,19 +241,17 @@ block content
                     id="disabledSurveyButton"
                   ) 创建
                 include ../publicModules/survey/edit
-          +modifySubmit("postButton")
-
-
-      .col-xs-12.col-md-3.box-shadow-panel#submit-scroll-sm
+          +modifySubmit("PostButton")
+      mixin editorInto
+        h5.text-danger 温馨提示：
+        div!=nkcRender.plainEscape(state.editorSettings.notes)
+      .col-xs-12.col-md-3.box-shadow-panel#FloatPostButtonContainerTemplate
         div
-          h5.text-danger 温馨提示：
-          div!=nkcRender.plainEscape(state.editorSettings.notes)
-      //-.col-xs-12.col-md-3.box-shadow-panel#submit-scroll
-        include ../module_scrollTo
+          +editorInto
+      .col-xs-12.col-md-3.box-shadow-panel#FloatPostButtonContainer
         div
-          h5.text-danger 温馨提示：
-          div!=nkcRender.plainEscape(state.editorSettings.notes)
-          +modifySubmit("postButton")
+          +editorInto
+          +modifySubmit("FloatPostButton")
   .hidden#data=objToStr({minorForumCount: data.minorForumCount, originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft, websiteCode: data.websiteCode, toColumn: !!data.toColumn})
 block scripts
   include ../ueditor/ueditorBase
