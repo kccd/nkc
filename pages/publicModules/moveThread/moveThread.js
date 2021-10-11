@@ -10,7 +10,7 @@ NKC.modules.MoveThread = function() {
       forums: [],
       selectedForums: [],
       loading: true,
-      moveType: "add", // replace, add
+      moveType: "replace", // replace, add
       forumType: "", // discipline, topic
       forum: "",
       hideMoveType: false,
