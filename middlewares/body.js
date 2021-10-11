@@ -6,6 +6,7 @@ const {ThrottleGroup} = require("stream-throttle");
 const onFinished = require('on-finished');
 const destroy = require('destroy');
 const FILE = require('../nkcModules/file');
+//获取指定文件的格式
 const pictureExtensions = FILE.getExtensionByType('mediaPicture');
 const breakpointExtensions = FILE.getExtensionByType('breakpoint');
 let allSpeedLimit;

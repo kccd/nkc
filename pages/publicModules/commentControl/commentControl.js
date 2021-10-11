@@ -17,8 +17,8 @@ class CommentControl extends NKC.modules.DraggablePanel {
             comment: this.comment
           })
             .then(() => {
-              self.close();
               sweetSuccess('保存成功');
+              self.close();
             })
             .catch(err => {
               sweetError(err);
