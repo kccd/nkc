@@ -1,0 +1,40 @@
+@import '../../../publicModules/base';
+.thread-categories{
+  user-select: none;
+}
+.thread-category-item{
+  height: 4rem;
+  line-height: 4rem;
+  //border: 1px solid #333;
+}
+.thread-category-nodes{
+  .thread-category-node-list{
+    display: inline-block;
+  }
+  .thread-category-node{
+    display: inline-block;
+    height: 3rem;
+    line-height: 3rem;
+    padding: 0 1rem;
+    color: #fff;
+    background-color: @primary;
+    border-radius: 3px;
+    margin: 0 0.5rem 0.5rem 0;
+    &.default-node{
+      background-color: @darkGray;
+    }
+  }
+}
+.thread-category-master{
+  background-color: #e5e5e5;
+  padding: 0 1rem 1rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 3px;
+  &.disabled{
+    background-color: #a6a6a6;
+    opacity: 0.9;
+  }
+}
+.move-handle{
+  cursor: move;
+}

@@ -1,3 +1,4 @@
+@import "../publicModules/base";
 body{
   #PostButton{
     display: none;
@@ -55,7 +56,7 @@ body{
   /*background-color: #f4f4f4!important;*/
 }
 .editor-main-forum-note{
-  background-color: #f4f4f4;
+  //background-color: #f4f4f4;
   padding: 0.5rem;
   border-radius: 3px;
   margin-bottom: 0.5rem;
@@ -265,5 +266,30 @@ body{
   }
   .on-edit-note-content{
     color: #414141;
+  }
+}
+.editor-thread-category-nodes{
+  @nodeHeight: 2.6rem;
+  user-select: none;
+  .editor-thread-category-warning{
+    border-radius: 3px;
+  }
+  .editor-thread-category-node{
+    display: inline-block;
+    box-sizing: border-box;
+    height: @nodeHeight;
+    line-height: @nodeHeight;
+    padding: 0 1rem;
+    background-color: #fff;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    color: #555;
+    margin: 0 0.8rem 0.8rem 0;
+    cursor: pointer;
+    &.active{
+      color: #fff;
+      background-color: @primary;
+      border-color: @primary;
+    }
   }
 }

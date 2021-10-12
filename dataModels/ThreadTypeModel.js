@@ -1,3 +1,6 @@
+/*
+* 专业下的文章分类
+* */
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;

@@ -29,6 +29,7 @@ window.data = undefined;
 
 $(function() {
   window.data = NKC.methods.getDataById("data");
+  window.data.threadCategories.map(c => c.selectedNode = null);
   window.editor = UE.getEditor("content", NKC.configs.ueditor.editorConfigs);
   editor.methods = {};
   editor.addListener( 'ready', function( statu ) {
@@ -125,7 +126,9 @@ function initVueApp() {
 
       showCloseInfo: false,
 
-      websiteUserId: data.websiteCode + "ID"
+      websiteUserId: data.websiteCode + "ID",
+
+      threadCategories: data.threadCategories
     },
     mounted: function() {
       var this_ = this;
@@ -243,6 +246,10 @@ function initVueApp() {
       fromNow: NKC.methods.fromNow,
       format: NKC.methods.format,
       getUrl: NKC.methods.tools.getUrl,
+      selectThreadCategory(c, n) {
+        c.selectedNode = n;
+        console.log(n.warning)
+      },
       insertDraftInfo: function(draft) {
         // 从草稿箱插入草稿后的回调
         /* console.log(draft);
@@ -399,6 +406,23 @@ function initVueApp() {
         this.keyWordsEn = post.keyWordsEn;
         this.authorInfos = post.authorInfos;
         this.surveyId = post.surveyId;
+        this.initThreadCategory(post.tcId);
+      },
+      initThreadCategory(tcId) {
+        for(const tc of this.threadCategories) {
+          for(const n of tc.nodes) {
+            if(!tcId.includes(n._id)) continue;
+            tc.selectedNode = n;
+            break;
+          }
+        }
+      },
+      getThreadCategoriesId() {
+        const tcId = [];
+        for(const tc of this.threadCategories) {
+          if(tc.selectedNode) tcId.push(tc.selectedNode._id);
+        }
+        return tcId;
       },
       // 获取标题输入框的内容
       getTitle: function() {
@@ -712,6 +736,7 @@ function initVueApp() {
           var survey = PostSurvey.getSurvey();
           if(survey) post.survey = survey;
         }
+        post.tcId = self.getThreadCategoriesId();
         return post;
       },
       disablePostButton() {

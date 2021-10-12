@@ -1,0 +1,36 @@
+extends ../../experimental
+block eTitle
+  title 多维分类
+  +includeCSS('/experimental/settings/threadCategory/threadCategory.css')
+block eContent
+  .container-fluid.max-width
+    .row
+      #data.hidden=objToStr({categoryTree: data.categoryTree})
+      .col-xs-12.col-md-6#app(v-cloak)
+
+        .m-b-1
+          button.btn.btn-default(@click='newCategory(null)') 新建分类
+        .m-b-1
+          .thread-categories
+            .thread-category-master(v-for='c in categoryTree' :data-cid='c._id' :class='{"disabled": c.disabled}')
+              .thread-category-item
+                .fa.fa-bars.m-r-1.move-handle.thread-category-master-handle
+                span {{c.name}}
+                button.btn.btn-default.btn-xs(@click='editCategory(c)') 编辑
+                button.btn.btn-success.btn-xs(v-if='c.disabled' @click='disableCategory(c._id, false)') 启用
+                button.btn.btn-danger.btn-xs(v-else @click='disableCategory(c._id, true)') 禁用
+                button.btn.btn-danger.btn-xs(@click='removeCategory(c._id)') 删除
+                button.btn.btn-default.btn-xs(@click='newCategory(c._id)') 添加子类
+              .thread-category-nodes
+                .thread-category-node.default-node {{c.nodeName}}
+                  .fa.fa-edit.pointer(@click='editDefaultCategory(c)')
+                .thread-category-node-list
+                  .thread-category-node(v-for='n in c.nodes' :data-cid='n._id').move-handle
+                    //.fa.fa-bars.m-r-05.move-handle
+                    span {{n.name}}
+                    .fa.fa-edit.pointer(@click='editCategory(n)')
+                    .fa.fa-trash.pointer(@click='removeCategory(n._id)')
+
+block scripts
+  include ../../../publicModules/commonModal/commonModal
+  +includeJS('/experimental/settings/threadCategory/threadCategory.js')

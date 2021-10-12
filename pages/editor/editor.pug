@@ -97,7 +97,7 @@ block content
             hr
             .m-b-2(v-if="['newThread'].indexOf(type) !== -1")
               .editor-header 专业分类
-              div
+              .m-b-1
                 .editor-main-forums
                   h5 主分类（必选）
                   .editor-main-forum(v-if="mainForum")
@@ -112,8 +112,8 @@ block content
                         option(:value='""') 不分类
                       //span(v-if="mainForum.cName") ：{{mainForum.cName}}
                   button.btn.btn-default.btn-sm(@click='selectForumsByType("mainForum")') {{mainForum? '修改': '选择'}}
-                  .editor-main-forum-note(v-if='mainForum && mainForum.forum.noteOfPost') 注意事项：{{mainForum.forum.noteOfPost}}
-              div(v-if='minorForumCount.max > 0')
+                  .editor-main-forum-note.bg-warning.text-warning.p-a-05.bg-border(v-if='mainForum && mainForum.forum.noteOfPost') 注意事项：{{mainForum.forum.noteOfPost}}
+              .m-b-1(v-if='minorForumCount.max > 0')
                 .editor-main-forums
                   h5 辅分类
                     |&nbsp;(
@@ -133,10 +133,27 @@ block content
                           option(:value='""') 不分类
                         //span(v-if="mf.cName") ：{{mf.cName}}
                       .fa.fa-trash-o(@click="removeSelectedForums(index + 1)" title="移除")
-                    .editor-main-forum-note(v-if='mf && mf.forum.noteOfPost') 注意事项：{{mf.forum.noteOfPost}}
+                    .editor-main-forum-note.bg-warning.text-warning.p-a-05.bg-border(v-if='mf && mf.forum.noteOfPost') 注意事项：{{mf.forum.noteOfPost}}
                   button.btn.btn-default.btn-sm(v-if='!mainForum' disabled title='请先选择主分类') 添加
                   button.btn.btn-default.btn-sm(v-else-if='minorForums.length >= minorForumCount.max' disabled title='辅分类数量已达上限') 添加
                   button.btn.btn-default.btn-sm(v-else @click='selectForumsByType("minorForum")') 添加
+              div(v-if='threadCategories.length > 0')
+                .form-inline.editor-thread-category(v-for='c in threadCategories' v-if='c.nodes.length > 0')
+                  .editor-header(:title='c.description') {{c.name}}
+                  .editor-thread-category-nodes
+                    .editor-thread-category-node(
+                      @click='selectThreadCategory(c, null)'
+                      :class='{"active": c.selectedNode === null}'
+                    )
+                      span {{c.nodeName}}
+                    .editor-thread-category-node(
+                      v-for='n in c.nodes'
+                      @click='selectThreadCategory(c, n)'
+                      :class='{"active": c.selectedNode === n}'
+                      :title='n.description'
+                      )
+                      span {{n.name}}
+                  .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(v-if='c.selectedNode && c.selectedNode.warning') 注意事项：{{c.selectedNode.warning}}
             .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
               .editor-header 封面图
                 small （如未指定，默认从内容中选取）
