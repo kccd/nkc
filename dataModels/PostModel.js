@@ -273,6 +273,12 @@ const postSchema = new Schema({
   comment: {
     type: String, // 'r': 可查看, 'rw': 可看看可评论, 'n': 不可看不可评论
     default: 'rw',
+  },
+  // 多维分类ID
+  tcId: {
+    type: [Number],
+    default: [],
+    index: 1
   }
 }, {toObject: {
   getters: true,

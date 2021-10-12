@@ -1,11 +1,7 @@
 const data = NKC.methods.getDataById('data');
 const commonModel = new NKC.modules.CommonModal();
 import Sortable from 'sortablejs';
-data.categoryTree.map(c => {
-  for(const n of c.nodes) {
-    console.log(`${n.name} - ${n.order}`);
-  }
-})
+
 const app = new Vue({
   el: '#app',
   data: {
@@ -14,6 +10,19 @@ const app = new Vue({
   mounted() {
     // this.initSort();
     this.initSortable();
+  },
+  computed: {
+    categories() {
+      const obj = {};
+      const {categoryTree} = this;
+      for(const c of categoryTree) {
+        obj[c._id] = c;
+        for(const n of c.nodes) {
+          obj[c._id] = n;
+        }
+      }
+      return obj;
+    }
   },
   methods: {
     initSortable() {
@@ -27,7 +36,7 @@ const app = new Vue({
         swapThreshold: 0.65,
         onEnd: this.saveOrder
       });
-      const nodeContainer = document.getElementsByClassName('thread-category-nodes');
+      const nodeContainer = document.getElementsByClassName('thread-category-node-list');
       for(let i = 0; i < nodeContainer.length; i ++) {
         const node = nodeContainer[i];
         new Sortable(node, {
@@ -56,7 +65,7 @@ const app = new Vue({
       for(let i = 0; i < nodes.length; i++) {
         const n = nodes.eq(i);
         categories.push({
-          cid: n.attr('data-cid'),
+          cid: Number(n.attr('data-cid')),
           order: i
         });
       }
@@ -68,19 +77,22 @@ const app = new Vue({
         })
         .catch(sweetError);
     },
-    newCategory() {
+    newCategory(cid) {
       const self = this;
       commonModel.open(data => {
         const name = data[0].value;
         const description = data[1].value;
+        const warning = data[2].value;
         nkcAPI(`/e/settings/threadCategory`, 'POST', {
           name,
           description,
+          warning,
+          cid,
         })
           .then(data => {
             commonModel.close();
-            sweetSuccess('添加成功');
             window.location.reload();
+            sweetSuccess('添加成功');
           })
           .catch(sweetError);
       }, {
@@ -88,11 +100,80 @@ const app = new Vue({
         data: [
           {
             dom: 'input',
-            label: '分类名'
+            label: '名称',
+            value: ''
           },
           {
             dom: 'textarea',
-            label: '分类介绍'
+            label: '介绍',
+            value: ''
+          },
+          {
+            dom: 'textarea',
+            label: '注意事项',
+            value: ''
+          }
+        ]
+      })
+    },
+    editDefaultCategory(category) {
+      commonModel.open(data => {
+        const nodeName = data[0].value;
+        nkcAPI(`/e/settings/threadCategory/${category._id}`, 'PUT', {
+          type: 'modifyNodeName',
+          nodeName,
+        })
+          .then(data => {
+            category.nodeName = nodeName;
+            commonModel.close();
+          })
+          .catch(sweetError);
+      }, {
+        title: '修改默认分类名',
+        data: [
+          {
+            dom: 'input',
+            label: '默认名称',
+            value: category.nodeName
+          }
+        ]
+      })
+    },
+    editCategory(category) {
+      commonModel.open(data => {
+        const name = data[0].value;
+        const description = data[1].value;
+        const warning = data[2].value;
+        nkcAPI(`/e/settings/threadCategory/${category._id}`, 'PUT', {
+          type: 'modifyInfo',
+          name,
+          description,
+          warning
+        })
+          .then(data => {
+            commonModel.close();
+            category.name = name;
+            category.description = description;
+            category.warning = warning;
+          })
+          .catch(sweetError);
+      }, {
+        title: '新建分类',
+        data: [
+          {
+            dom: 'input',
+            label: '名称',
+            value: category.name
+          },
+          {
+            dom: 'textarea',
+            label: '介绍',
+            value: category.description
+          },
+          {
+            dom: 'textarea',
+            label: '注意事项',
+            value: category.warning
           }
         ]
       })

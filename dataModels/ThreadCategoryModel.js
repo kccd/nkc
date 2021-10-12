@@ -21,6 +21,16 @@ const schema = new mongoose.Schema({
     required: true,
     index: 1
   },
+  // 默认子分类名称
+  nodeName: {
+    type: String,
+    default: '默认',
+  },
+  // 警告 显示在编辑器页
+  warning: {
+    type: String,
+    default: ''
+  },
   // 维度介绍或维度下的分类介绍
   description: {
     type: String,
@@ -47,9 +57,9 @@ const schema = new mongoose.Schema({
   collection: 'threadCategories'
 });
 
-schema.statics.getCategoryTree = async () => {
+schema.statics.getCategoryTree = async (match = {}) => {
   const ThreadCategoryModel = mongoose.model('threadCategories');
-  const categories = await ThreadCategoryModel.find({}).sort({order: 1});
+  const categories = await ThreadCategoryModel.find(match).sort({order: 1});
   const master = [];
   const nodes = {};
   for(let c of categories) {
@@ -72,18 +82,45 @@ schema.statics.getCategoryTree = async () => {
   return master;
 };
 
-schema.statics.newCategory = async (name, description, cid = null) => {
+schema.statics.newCategory = async (name, description, warning, cid = null) => {
   const ThreadCategoryModel = mongoose.model('threadCategories');
   const SettingModel = mongoose.model('settings');
   const tc = ThreadCategoryModel({
     _id: await SettingModel.operateSystemID('threadCategories', 1),
     name,
+    warning,
     description,
     cid
   });
   await tc.save();
   return tc;
 };
+
+/*
+* 检查选择的分类是否全为子分类并且判断任意两个子分类是否属于相同的主分类
+* @param {[Number]} tcId 分类 ID
+* */
+schema.statics.checkCategoriesId = async (tcId) => {
+  const ThreadCategoryModel = mongoose.model('threadCategories');
+  const categories = await ThreadCategoryModel.find({
+    _id: {$in: tcId},
+    cid: {$ne: null}
+  });
+  if(categories.length !== tcId.length) {
+    const _tcId = [];
+    const parentCategoriesId = [];
+    for(const c of categories) {
+      _tcId.push(c._id);
+      if(parentCategoriesId.includes(c.cid)) {
+        throwErr(400, `同一分类下只能选择一个子分类`);
+      } else {
+        parentCategoriesId.push(c.cid);
+      }
+    }
+    const errorTcId = tcId.filter(id => !_tcId.includes(id));
+    throwErr(400, `文章多维分类 ${errorTcId.join(', ')} 错误`);
+  }
+}
 
 module.exports = mongoose.model('threadCategories', schema);
 

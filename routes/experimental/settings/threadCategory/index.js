@@ -10,7 +10,7 @@ router
   .post('/', async (ctx, next) => {
     const {db, body, data, nkcModules} = ctx;
     const {checkString} = nkcModules.checkData;
-    const {name, description, cid} = body;
+    const {name, description, warning, cid} = body;
     checkString(name, {
       name: '分类名',
       minLength: 0,
@@ -21,13 +21,18 @@ router
     checkString(description, {
       name: '分类介绍',
       minLength: 0,
-      maxLength: 1000
+      maxLength: 2000
+    });
+    checkString(warning, {
+      name: '分类注意事项',
+      minLength: 0,
+      maxLength: 2000
     });
     if(cid) {
       const category = await db.ThreadCategoryModel.findOne({_id: cid});
       if(!category) ctx.throw(400, `上级分类不存在 cid: ${cid}`);
     }
-    await db.ThreadCategoryModel.newCategory(name, description, cid);
+    await db.ThreadCategoryModel.newCategory(name, description, warning, cid);
     data.categoryTree = await db.ThreadCategoryModel.getCategoryTree();
     await next();
   })
@@ -48,27 +53,52 @@ router
   .put('/:cid', async (ctx, next) => {
     const {db, body, nkcModules, params} = ctx;
     const {cid} = params;
-    const {name, description} = body;
-    const {checkString} = nkcModules.checkData;
-    checkString(name, {
-      name: '分类名',
-      minLength: 0,
-      maxLength: 20
-    });
-    const saveName = await db.ThreadCategoryModel.countDocuments({name, _id: cid});
-    if(saveName) ctx.throw(400, `分类名已存在`);
-    checkString(description, {
-      name: '分类介绍',
-      minLength: 0,
-      maxLength: 1000
-    });
+    const {name, nodeName, description, warning, type, disabled} = body;
     const category = await db.ThreadCategoryModel.findOnly({_id: cid});
-    await category.updateOne({
-      $set: {
-        name,
-        description,
-      }
-    });
+    const {checkString} = nkcModules.checkData;
+    if(type === 'modifyInfo') {
+      checkString(name, {
+        name: '分类名',
+        minLength: 0,
+        maxLength: 20
+      });
+      const saveName = await db.ThreadCategoryModel.countDocuments({name, _id: {$ne: cid}});
+      if (saveName) ctx.throw(400, `分类名已存在`);
+      checkString(description, {
+        name: '分类介绍',
+        minLength: 0,
+        maxLength: 2000
+      });
+      checkString(warning, {
+        name: '分类注意事项',
+        minLength: 0,
+        maxLength: 2000
+      });
+      await category.updateOne({
+        $set: {
+          name,
+          description,
+          warning
+        }
+      });
+    } else if(type === 'modifyNodeName') {
+      checkString(nodeName, {
+        name: '默认分类名',
+        minLength: 0,
+        maxLength: 20
+      });
+      await category.updateOne({
+        $set: {
+          nodeName
+        }
+      });
+    } else {
+      await category.updateOne({
+        $set: {
+          disabled
+        }
+      });
+    }
     await next();
   })
   .del('/:cid', async (ctx, next) => {
@@ -88,6 +118,15 @@ router
       }
     });
     await db.PostModel.updateMany({
+      tcId: {$in: categoriesId}
+    }, {
+      $pull: {
+        tcId: {
+          $in: categoriesId
+        }
+      }
+    });
+    await db.DraftModel.updateMany({
       tcId: {$in: categoriesId}
     }, {
       $pull: {

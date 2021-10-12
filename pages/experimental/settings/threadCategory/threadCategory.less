@@ -8,6 +8,9 @@
   //border: 1px solid #333;
 }
 .thread-category-nodes{
+  .thread-category-node-list{
+    display: inline-block;
+  }
   .thread-category-node{
     display: inline-block;
     height: 3rem;
@@ -17,13 +20,21 @@
     background-color: @primary;
     border-radius: 3px;
     margin: 0 0.5rem 0.5rem 0;
+    &.default-node{
+      background-color: @darkGray;
+    }
   }
 }
 .thread-category-master{
-  background-color: #f4f4f4;
+  background-color: #e5e5e5;
   padding: 0 1rem 1rem 1rem;
   margin-bottom: 1rem;
+  border-radius: 3px;
+  &.disabled{
+    background-color: #a6a6a6;
+    opacity: 0.9;
+  }
 }
-.thread-category-handle{
-  padding-left: 1rem;
+.move-handle{
+  cursor: move;
 }

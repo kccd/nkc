@@ -300,6 +300,9 @@ router
     }
 
     state.editorSettings = await db.SettingModel.getSettings("editor");
+
+    // 多维分类
+    data.threadCategories = await db.ThreadCategoryModel.getCategoryTree({disabled: false});
     await next();
   });
 

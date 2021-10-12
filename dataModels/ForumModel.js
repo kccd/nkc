@@ -1586,7 +1586,8 @@ forumSchema.statics.createNewThread = async function(options) {
     mainForumsId: options.fids,
     // mid: options.uid,
     uid: options.uid,
-    type: options.type
+    type: options.type,
+    tcId: options.tcId,
   };
   // 专栏相关，暂时保留，并不启用
   // --------

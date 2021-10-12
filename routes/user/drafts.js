@@ -99,7 +99,7 @@ draftsRouter
       t = "", c = "", l = "html", abstractEn = "", abstractCn = "",
       keyWordsEn = [], keyWordsCn = [], fids = [], cids = [],
       authorInfos = [], originState = 0, anonymous = false, cover = "",
-      survey, parentPostId = ""
+      survey, parentPostId = "", tcId = []
     } = post;
     const {user} = data;
     const draftCount = await db.DraftModel.countDocuments({uid: user.uid});
@@ -110,6 +110,7 @@ draftsRouter
     }
     const draftObj = {
       t, c, l, abstractEn, abstractCn, keyWordsEn, keyWordsCn,
+      tcId,
       mainForumsId: fids,
       categoriesId: cids,
       cover,

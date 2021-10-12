@@ -112,6 +112,11 @@ const draftSchema = new Schema({
   parentPostId: {
     type: String,
     default: ""
+  },
+  // 多维分类Id
+  tcId: {
+    type: [Number],
+    default: []
   }
 });
 

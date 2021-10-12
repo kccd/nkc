@@ -25,12 +25,22 @@ router
     } catch(err) {
       ctx.throw(403, `因为缺少必要的账户信息，无法完成该操作。具体信息：${err.message}`);
     }
-		const {c, t, fids, cids, cat, mid, columnMainCategoriesId = [], columnMinorCategoriesId = [], anonymous = false, survey} = post;
+		const {
+      c,
+      t,
+      fids,
+      columnMainCategoriesId = [],
+      columnMinorCategoriesId = [],
+      anonymous = false,
+      survey,
+      tcId = []
+    } = post;
 		if(t.length < 3) ctx.throw(400, `标题不能少于3个字`);
 		if(t.length > 100) ctx.throw(400, `标题不能超过100个字`);
 		const content = customCheerio.load(c).text();
 		if(content.length < 2) ctx.throw(400, `内容不能少于2个字`);
 		if(content.length > 100000) ctx.throw(400, `内容不能超过10万字`);
+    await db.ThreadCategoryModel.checkCategoriesId(tcId);
     nkcModules.checkData.checkString(c, {
       name: "内容",
       minLength: 1,
