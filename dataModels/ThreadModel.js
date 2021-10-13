@@ -212,8 +212,13 @@ const threadSchema = new Schema({
   toppedPostsId: {
     type: [String],
     default: []
+  },
+  // 多维分类ID
+  tcId: {
+    type: [Number],
+    default: [],
+    index: 1
   }
-
 }, {toObject: {
   getters: true,
   virtuals: true
@@ -536,7 +541,12 @@ threadSchema.methods.updateThreadMessage = async function(toSearch = true) {
       threadPostCount: updateObj.count
     }
   });
-  await PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId: thread.mainForumsId}});
+  await PostModel.updateMany({tid: thread.tid}, {
+    $set: {
+      mainForumsId: thread.mainForumsId,
+      tcId: thread.tcId,
+    }
+  });
   // 更新搜索引擎中帖子的专业信息
   if(toSearch) await elasticSearch.updateThreadForums(thread);
 };
@@ -1610,7 +1620,20 @@ threadSchema.methods.createNewPost = async function(post) {
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {postType, cover = "", c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = post;
+  const {
+    postType,
+    cover = "",
+    c,
+    t,
+    l,
+    abstractCn,
+    abstractEn,
+    keyWordsCn,
+    keyWordsEn,
+    authorInfos=[],
+    originState,
+    tcId,
+  } = post;
   let newAuthInfos = [];
   if(authorInfos) {
     for(let a = 0;a < authorInfos.length;a++) {
@@ -1653,6 +1676,7 @@ threadSchema.methods.createNewPost = async function(post) {
     ipoc: ipToken,
     iplm: ipToken,
     l,
+    tcId,
     mainForumsId: this.mainForumsId,
     minorForumsId: this.minorForumsId,
     tid: this.tid,

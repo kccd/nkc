@@ -22,6 +22,7 @@ resourceRouter
     const {data, db, params} = ctx;
     const {rid} = params;
     data.resource = await db.ResourceModel.findOnly({rid, type: "resource"});
+    await data.resource.filenameFilter();
     await next();
   })
   .get('/:rid', async (ctx, next) => {
@@ -169,6 +170,22 @@ resourceRouter
           rid: resource.rid
         });
         await downloadLog.save();
+      }
+    }
+    await next();
+  })
+  .use('/:rid', async (ctx, next) => {
+    const {db, data, settings} = ctx;
+    // 游客限制
+    const {user, resource} = data;
+    if(!user) {
+      const {visitorAccess} = await db.SettingModel.getSettings('download');
+      if(!visitorAccess[resource.mediaType]) {
+        if(resource.mediaType === 'mediaPicture') {
+          ctx.filePath = settings.statics.defaultNoAccessImagePath;
+        } else {
+          ctx.throw(403, `权限不足，请登录或注册`);
+        }
       }
     }
     await next();

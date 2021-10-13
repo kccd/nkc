@@ -10,7 +10,8 @@ router
       forums,
       violation,
       reason,
-      remindUser
+      remindUser,
+      threadCategoriesId,
     } = body;
 
     if(remindUser && !reason) ctx.throw(400, `请输入原因`);
@@ -48,7 +49,39 @@ router
     const users = await db.UserModel.find({uid: {$in: usersId}});
     const usersObj = {};
     users.map(u => usersObj[u.uid] = u);
+
+    const categoryTree = await db.ThreadCategoryModel.getCategoryTree();
+    const categoryObj = {};
+    for(const c of categoryTree) {
+      categoryObj[c._id] = c.nodes.map(n => n._id);
+      for(const n of c.nodes) {
+        categoryObj[n._id] = [];
+      }
+    }
+    let oldNodesId = [];
+    let newNodesId = [];
+    for(const c of threadCategoriesId) {
+      const nodesId = categoryObj[c.cid];
+      if(!nodesId) {
+        ctx.throw(500, `文章属性错误 cid: ${c.cid}`);
+      }
+      oldNodesId = oldNodesId.concat(nodesId);
+      if(c.nodeId === 'default') continue;
+      const node = categoryObj[c.nodeId];
+      if(!node) {
+        ctx.throw(500, `文章属性错误 cid: ${c.nodeId}`);
+      }
+      newNodesId.push(c.nodeId);
+    }
     for(const thread of threads) {
+
+      // 处理文章属性
+      let {tcId} = thread;
+      tcId = tcId.filter(id => !oldNodesId.includes(id));
+      tcId = tcId.concat(newNodesId);
+      tcId = [...new Set(tcId)];
+      thread.tcId = tcId;
+
       if(moveType === 'add') {
         let {mainForumsId, categoriesId} = thread;
         if(mainForumsId.includes(recycleId)) ctx.throw(403, `无法给回收站中的文章添加专业`);
@@ -60,7 +93,8 @@ router
         const newCategoriesId = [...new Set(categoriesId)];
         await thread.updateOne({
           mainForumsId: newMainForumsId,
-          categoriesId: newCategoriesId
+          categoriesId: newCategoriesId,
+          tcId
         });
         await thread.updateThreadMessage();
         thread.mainForumsId = newMainForumsId;
@@ -69,7 +103,8 @@ router
         await thread.updateOne({
           mainForumsId: [...forumsId],
           categoriesId: [...threadTypesId],
-          disabled: false
+          disabled: false,
+          tcId
         });
         await thread.updateThreadMessage();
         thread.mainForumsId = [...forumsId];

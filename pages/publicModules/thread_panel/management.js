@@ -97,13 +97,15 @@ function moveSelectedThreads() {
     var {
       violation,
       reason,
-      remindUser
+      remindUser,
+      threadCategoriesId,
     } = data;
     MoveThread.lock();
     nkcAPI("/threads/move", "POST", {
       forums: forums,
       moveType: moveType,
       threadsId: threadsId,
+      threadCategoriesId,
       violation,
       remindUser,
       reason

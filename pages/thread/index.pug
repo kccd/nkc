@@ -41,7 +41,7 @@ block content
   -const {exactPost} = data
     .container-fluid.max-width
       .hidden#threadId= data.thread.tid
-      .hidden#threadForumsId=objToStr({isLastPage: (data.paging.page + 1) === data.paging.pageCount, notes: data.notes, pid: data.thread.oc, tid: data.thread.tid, mainForumsId: data.thread.mainForumsId, categoriesId: data.thread.categoriesId})
+      .hidden#threadForumsId=objToStr({isLastPage: (data.paging.page + 1) === data.paging.pageCount, notes: data.notes, pid: data.thread.oc, tid: data.thread.tid, mainForumsId: data.thread.mainForumsId, categoriesId: data.thread.categoriesId, tcId: data.thread.tcId})
       if data.step
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
       include ../module_credit

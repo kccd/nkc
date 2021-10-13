@@ -557,6 +557,13 @@ resourceSchema.methods.checkDownloadCost = async function(user) {
   }
 };
 
+/*
+* 过滤文件名
+* */
+resourceSchema.methods.filenameFilter = async function() {
+  const nkcRender = require('../nkcModules/nkcRender');
+  this.oname = nkcRender.replaceLink(this.oname);
+}
 
 /*
 * 判断用户下载所需的积分是否足够

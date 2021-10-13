@@ -805,5 +805,6 @@
   "experimentalComplaintSettings": "后台管理 - 设置 - 投诉",
   "experimentalFilterLogs": "查看后台敏感词过滤记录",
   "fundApplicationFormRefund": "基金退款",
-  "refundFundApplicationForm": "基金管理员确认退款"
+  "refundFundApplicationForm": "基金管理员确认退款",
+  "experimentalThreadCategorySettings": "后台管理 - 设置 - 文章多维分类"
 }

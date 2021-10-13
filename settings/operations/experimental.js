@@ -5,6 +5,15 @@ module.exports = {
     POST: "experimentalLogin"
   },
 	settings: {
+    threadCategory: {
+      GET: 'experimentalThreadCategorySettings',
+      POST: 'experimentalThreadCategorySettings',
+      PUT: 'experimentalThreadCategorySettings',
+      PARAMETER: {
+        PUT: 'experimentalThreadCategorySettings',
+        DELETE: 'experimentalThreadCategorySettings'
+      }
+    },
 		tools: {
 		  GET: "visitToolsManager"
 		},

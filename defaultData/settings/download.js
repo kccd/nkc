@@ -1,6 +1,12 @@
 module.exports = {
   _id: 'download',
   c: {
+    visitorAccess: {
+      mediaPicture: true,
+      mediaVideo: true,
+      mediaAudio: true,
+      mediaAttachment: true
+    },
     allSpeed: 100 * 1024, //总下载速度 KB
     speed: {
       default: {

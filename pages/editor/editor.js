@@ -18,6 +18,7 @@
 window.editor = undefined;
 window.PostInfo = undefined;
 window.PostButton = undefined;
+window.FloatPostButton = undefined;
 window.PostToColumn = undefined;
 window.PostSurvey = undefined;
 window.ForumSelector = undefined;
@@ -25,8 +26,10 @@ window.CommonModal = undefined;
 // 标志：编辑器是否已初始化
 var EditorReady = false;
 window.data = undefined;
+
 $(function() {
   window.data = NKC.methods.getDataById("data");
+  window.data.threadCategories.map(c => c.selectedNode = null);
   window.editor = UE.getEditor("content", NKC.configs.ueditor.editorConfigs);
   editor.methods = {};
   editor.addListener( 'ready', function( statu ) {
@@ -36,6 +39,7 @@ $(function() {
     resetBodyPaddingTop();
     EditorReady = true;
     initVueApp();
+    initPostButton();
   });
   // 实例化专栏模块，如果不存在构造函数则用户没有权限转发。
   // 在提交数据前，读取专栏分类的时候，注意判断是否存在实例PostToColumn。
@@ -122,7 +126,9 @@ function initVueApp() {
 
       showCloseInfo: false,
 
-      websiteUserId: data.websiteCode + "ID"
+      websiteUserId: data.websiteCode + "ID",
+
+      threadCategories: data.threadCategories
     },
     mounted: function() {
       var this_ = this;
@@ -179,8 +185,9 @@ function initVueApp() {
         setTimeout(function() {
           floatForumPanel.initPanel();
         }, 100)
-        if(PostButton) { // 检测是否可以勾选匿名
-          PostButton.checkAnonymous();
+        const postButton = getPostButton();
+        if(postButton) { // 检测是否可以勾选匿名
+          postButton.checkAnonymous();
         }
       }
     },
@@ -239,6 +246,9 @@ function initVueApp() {
       fromNow: NKC.methods.fromNow,
       format: NKC.methods.format,
       getUrl: NKC.methods.tools.getUrl,
+      selectThreadCategory(c, n) {
+        c.selectedNode = n;
+      },
       insertDraftInfo: function(draft) {
         // 从草稿箱插入草稿后的回调
         /* console.log(draft);
@@ -351,7 +361,8 @@ function initVueApp() {
         setTimeout(function() {
           self.saveToDraftBase()
             .then(function() {
-              PostButton.saveToDraftSuccess();
+              const postButton = getPostButton();
+              postButton.saveToDraftSuccess();
               self.autoSaveToDraft();
             })
             .catch(function(data) {
@@ -365,7 +376,8 @@ function initVueApp() {
         var self = this;
         self.saveToDraftBase()
           .then(function() {
-            PostButton.saveToDraftSuccess();
+            const postButton = getPostButton();
+            postButton.saveToDraftSuccess();
             sweetSuccess("草稿已保存");
           })
           .catch(function(data) {
@@ -393,6 +405,23 @@ function initVueApp() {
         this.keyWordsEn = post.keyWordsEn;
         this.authorInfos = post.authorInfos;
         this.surveyId = post.surveyId;
+        this.initThreadCategory(post.tcId);
+      },
+      initThreadCategory(tcId) {
+        for(const tc of this.threadCategories) {
+          for(const n of tc.nodes) {
+            if(!tcId.includes(n._id)) continue;
+            tc.selectedNode = n;
+            break;
+          }
+        }
+      },
+      getThreadCategoriesId() {
+        const tcId = [];
+        for(const tc of this.threadCategories) {
+          if(tc.selectedNode) tcId.push(tc.selectedNode._id);
+        }
+        return tcId;
       },
       // 获取标题输入框的内容
       getTitle: function() {
@@ -688,8 +717,9 @@ function initVueApp() {
         post.originState = self.originState;
         post.did = self.draftId;
         // 仅当用户有权发表匿名内容且当前专业允许发表匿名内容时，才将匿名标志提交到服务器。
-        if(PostButton.havePermissionToSendAnonymousPost && PostButton.allowedAnonymous) {
-          post.anonymous = !!PostButton.anonymous;
+        const postButton = getPostButton();
+        if(postButton.havePermissionToSendAnonymousPost && postButton.allowedAnonymous) {
+          post.anonymous = !!postButton.anonymous;
         }
         // 判断用户有没有勾选"同时转发到专栏，勾选则获取专业分类"
         if(PostToColumn && PostToColumn.getStatus) {
@@ -705,7 +735,16 @@ function initVueApp() {
           var survey = PostSurvey.getSurvey();
           if(survey) post.survey = survey;
         }
+        post.tcId = self.getThreadCategoriesId();
         return post;
+      },
+      disablePostButton() {
+        if(window.PostButton) window.PostButton.disabledSubmit = true;
+        if(window.FloatPostButton) window.FloatPostButton.disabledSubmit = true;
+      },
+      enablePostButton() {
+        if(window.PostButton) window.PostButton.disabledSubmit = false;
+        if(window.FloatPostButton) window.FloatPostButton.disabledSubmit = false;
       },
       // 提交内容
       submit: function() {
@@ -714,7 +753,7 @@ function initVueApp() {
         Promise.resolve()
           .then(function() {
             // 锁住发表按钮
-            PostButton.disabledSubmit = true;
+            self.disablePostButton();
             type = self.type;
             post = self.getPost();
           })
@@ -801,8 +840,7 @@ function initVueApp() {
           })
           .catch(function(data) {
             // 解锁发表按钮
-            PostButton.disabledSubmit = false;
-            console.log(data);
+            self.enablePostButton();
             sweetError(data);
           })
       },
@@ -857,9 +895,16 @@ function initVueApp() {
       },
     }
   });
-  window.PostButton = new Vue({
-    // el: $('body').width() >= 991?'#postButton':'#postButton-sm',
-    el: '#postButton',
+}
+
+
+/*
+* 实例化提交按钮
+* */
+function initPostButtonVueApp(postButtonType) {
+  const data = NKC.methods.getDataById("data");
+  window[postButtonType] = new Vue({
+    el: `#${postButtonType}`,
     data: {
       disabledSubmit: false, // 锁定提交按钮
       checkProtocol: true, // 是否勾选协议
@@ -870,7 +915,7 @@ function initVueApp() {
       // 根据当前所选专业判断用户是否有权限勾选匿名，若无权则此处无需将匿名标志提交到服务器。（新发表时不匿名，修改时无法需改匿名标志）
       allowedAnonymous: false,
       // 是否匿名
-      anonymous: data.post?data.post.anonymous: false,
+      anonymous: data.post? data.post.anonymous: false,
       autoSaveInfo: ""
     },
     created() {
@@ -889,7 +934,7 @@ function initVueApp() {
         });
       },
       checkAnonymous: function() {
-        var selectedForumsId = PostInfo.selectedForumsId;
+        var selectedForumsId = window.PostInfo.selectedForumsId;
         var havePermission = false;
         for(var i = 0; i < selectedForumsId.length; i++) {
           var fid = selectedForumsId[i];
@@ -910,13 +955,63 @@ function initVueApp() {
         var time = new Date();
         this.autoSaveInfo = "草稿已保存 " + this.format("HH:mm:ss", time);
       },
-      autoSaveToDraft: PostInfo.autoSaveToDraft,
-      saveToDraft: PostInfo.saveToDraft,
+      autoSaveToDraft: window.PostInfo.autoSaveToDraft,
+      saveToDraft: window.PostInfo.saveToDraft,
       submit: function() {
-        PostInfo.submit();
+        window.PostInfo.submit();
       },
     }
   })
+}
+
+/*
+* 根据屏幕宽度获取按钮类型
+* */
+function getPostButtonTypeByWindowWidth() {
+  const width = $(window).width();
+  return width < 992? 'PostButton': 'FloatPostButton';
+}
+
+/*
+* 根据屏幕宽度实例化对应的 vue 实例
+* */
+function initPostButton() {
+  initFloatPostButtonContainer();
+  const postButtonType = getPostButtonTypeByWindowWidth();
+  // 判断当前是否需要重新实例化按钮
+  if(window[postButtonType]) return;
+  initPostButtonVueApp(postButtonType);
+}
+/*
+* 设置浮动面板的位置和大小
+* */
+function initFloatPostButtonContainer() {
+  const postButtonType = getPostButtonTypeByWindowWidth();
+  const container = $('#FloatPostButtonContainer');
+  const containerTemplate = $('#FloatPostButtonContainerTemplate');
+  if(postButtonType !== 'FloatPostButton') {
+    container.css({
+      display: 'none'
+    })
+  } else {
+    const offset = containerTemplate.offset();
+    const width = containerTemplate.width();
+    const paddingLeft = containerTemplate.css('padding-left');
+    container.css({
+      width: width + 2 * parseFloat(paddingLeft),
+      top: offset.top,
+      left: offset.left,
+      display: 'block'
+    });
+  }
+
+}
+/*
+* 根据屏幕宽度获取对应的 vue 实例
+* */
+function getPostButton() {
+  const postButtonType = getPostButtonTypeByWindowWidth();
+  return window[postButtonType];
 }
 
 new Vue({
@@ -1128,9 +1223,9 @@ function appUpdateImage() {
 }
 
 // 监听页面变化，调整工具栏位置
-window.onresize=function(){
+window.onresize = function(){
   resetBodyPaddingTop();
-  // window.PostButton.setFloatDom();
+  initPostButton();
 };
 // 监听页面关闭，提示保存草稿
 window.onbeforeunload = function() {
