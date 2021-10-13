@@ -6,10 +6,12 @@ window.moveThread = function(pid) {
   window.MoveThread.open(function(data) {
     var forums = data.forums;
     var moveType = data.moveType;
+    const threadCategoriesId = data.threadCategoriesId;
     MoveThread.lock();
     nkcAPI("/threads/move", "POST", {
       forums: forums,
       moveType: moveType,
+      threadCategoriesId,
       threadsId: [postData.tid]
     })
       .then(function() {
@@ -22,7 +24,8 @@ window.moveThread = function(pid) {
       })
   }, {
     selectedCategoriesId: postData.categoriesId,
-    selectedForumsId: postData.mainForumsId
+    selectedForumsId: postData.mainForumsId,
+    selectedThreadCategoriesId: postData.tcId
   })
 }
 

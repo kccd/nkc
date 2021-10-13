@@ -142,6 +142,7 @@ router
         keyWordsCn: post.keyWordsCn,
         keyWordsEn: post.keyWordsEn,
         url: post.url,
+        tcId: post.tcId,
         mainForumsId: post.mainForumsId,
         categoriesId: post.categoriesId,
         status,
@@ -150,8 +151,6 @@ router
 
       results.push(result);
     }
-
-
 
     data.posts = results;
     data.paging = paging;

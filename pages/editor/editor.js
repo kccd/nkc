@@ -248,7 +248,6 @@ function initVueApp() {
       getUrl: NKC.methods.tools.getUrl,
       selectThreadCategory(c, n) {
         c.selectedNode = n;
-        console.log(n.warning)
       },
       insertDraftInfo: function(draft) {
         // 从草稿箱插入草稿后的回调

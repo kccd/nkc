@@ -138,7 +138,7 @@ block content
                   button.btn.btn-default.btn-sm(v-else-if='minorForums.length >= minorForumCount.max' disabled title='辅分类数量已达上限') 添加
                   button.btn.btn-default.btn-sm(v-else @click='selectForumsByType("minorForum")') 添加
               div(v-if='threadCategories.length > 0')
-                .form-inline.editor-thread-category(v-for='c in threadCategories' v-if='c.nodes.length > 0')
+                .editor-thread-category(v-for='c in threadCategories' v-if='c.nodes.length > 0')
                   .editor-header(:title='c.description') {{c.name}}
                   .editor-thread-category-nodes
                     .editor-thread-category-node(
@@ -269,7 +269,7 @@ block content
         div
           +editorInto
           +modifySubmit("FloatPostButton")
-  .hidden#data=objToStr({minorForumCount: data.minorForumCount, originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft, websiteCode: data.websiteCode, toColumn: !!data.toColumn})
+  .hidden#data=objToStr({minorForumCount: data.minorForumCount, originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft, websiteCode: data.websiteCode, toColumn: !!data.toColumn, threadCategories: data.threadCategories})
 block scripts
   include ../ueditor/ueditorBase
   include ../publicModules/moment

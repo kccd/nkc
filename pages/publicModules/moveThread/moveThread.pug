@@ -23,7 +23,7 @@
               .move-thread-thread-type(@click="resetThreadType") 不分类
               .move-thread-thread-type(v-for="t in forum.threadTypes" @click="selectThreadType(t)") {{t.name}}
             .m-t-05(v-if="!hideMoveType")
-              span
+              div
                 b 移动方式：
                 .radio.inline-block.m-t-0
                   label.m-r-1
@@ -31,7 +31,7 @@
                     | 添加专业
                   label
                     input(type="radio" value="replace" v-model="moveType")
-                    | 删除原有专业（慎重！！）
+                    | 删除原有专业
             .m-t-05(v-if="showAnonymousCheckbox")
               span
                 b 只显示允许匿名发表的专业：
@@ -62,6 +62,13 @@
                   //img(:src='getUrl("forumLogo", f.logo)')
                   | {{f.displayName}}
                   .fa.fa-plus
+          .move-thread-category
+            strong 更改属性
+            thread-category-list(
+              :categories='threadCategories'
+              :tcid='selectedThreadCategoriesId'
+              ref='threadCategoryList'
+              )
           .move-thread-options
             .checkbox
               label

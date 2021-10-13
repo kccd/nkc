@@ -541,7 +541,12 @@ threadSchema.methods.updateThreadMessage = async function(toSearch = true) {
       threadPostCount: updateObj.count
     }
   });
-  await PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId: thread.mainForumsId}});
+  await PostModel.updateMany({tid: thread.tid}, {
+    $set: {
+      mainForumsId: thread.mainForumsId,
+      tcId: thread.tcId,
+    }
+  });
   // 更新搜索引擎中帖子的专业信息
   if(toSearch) await elasticSearch.updateThreadForums(thread);
 };
