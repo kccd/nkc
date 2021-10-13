@@ -928,7 +928,10 @@ postSchema.statics.extendPosts = async (posts, options) => {
   if(o.resource) {
     resources = await ResourceModel.find({references: {$in: [...pid]}});
     await Promise.all(
-      resources.map(async resource => await resource.setFileExist())
+      resources.map(async resource => {
+        await resource.setFileExist();
+        await resource.filenameFilter();
+      })
     )
     resources.map(resource => {
       resource.uid = "";
@@ -1043,7 +1046,8 @@ postSchema.statics.extendPosts = async (posts, options) => {
           username = user.username;
           uid = quotePost.uid;
         }
-        const c = nkcRender.htmlToPlain(quoteContent, 50);
+        let c = nkcRender.htmlToPlain(quoteContent, 50);
+        c = nkcRender.replaceLink(c);
         post.quotePost = {
           pid: quotePost.pid,
           username,

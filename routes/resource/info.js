@@ -5,6 +5,7 @@ router
     const {rid} = params;
     const resource = await db.ResourceModel.findOne({rid});
     if(!resource) ctx.throw(404, `resource not found, rid: ${rid}`);
+    await resource.filenameFilter();
     data.resource = resource;
     await next();
   })

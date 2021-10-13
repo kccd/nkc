@@ -22,6 +22,7 @@ resourceRouter
     const {data, db, params} = ctx;
     const {rid} = params;
     data.resource = await db.ResourceModel.findOnly({rid, type: "resource"});
+    await data.resource.filenameFilter();
     await next();
   })
   .get('/:rid', async (ctx, next) => {
