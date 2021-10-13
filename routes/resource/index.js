@@ -174,6 +174,22 @@ resourceRouter
     }
     await next();
   })
+  .use('/:rid', async (ctx, next) => {
+    const {db, data, settings} = ctx;
+    // 游客限制
+    const {user, resource} = data;
+    if(!user) {
+      const {visitorAccess} = await db.SettingModel.getSettings('download');
+      if(!visitorAccess[resource.mediaType]) {
+        if(resource.mediaType === 'mediaPicture') {
+          ctx.filePath = settings.statics.defaultNoAccessImagePath;
+        } else {
+          ctx.throw(403, `权限不足，请登录或注册`);
+        }
+      }
+    }
+    await next();
+  })
   .post('/', async (ctx, next) => {
     const {db, data, nkcModules} = ctx;
     const {user} = data;

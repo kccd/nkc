@@ -12,6 +12,46 @@ block eContent
   .hidden#data=objToStr({downloadSettings: data.downloadSettings, certList: data.certList})
   .container-fluid.max-width#app(v-cloak)
     .row
+      .col-xs-12.col-md-12.m-b-2
+        span.h4 游客下载权限
+        .form
+          .form-group
+            .radio
+              span 图片：
+              label.m-r-1
+                input(type='radio' :value='true' v-model='settings.visitorAccess.mediaPicture')
+                span 允许
+              label
+                input(type='radio' :value='false' v-model='settings.visitorAccess.mediaPicture')
+                span 禁止
+          .form-group
+            .radio
+              span 音频：
+              label.m-r-1
+                input(type='radio' :value='true' v-model='settings.visitorAccess.mediaAudio')
+                span 允许
+              label
+                input(type='radio' :value='false' v-model='settings.visitorAccess.mediaAudio')
+                span 禁止
+          .form-group
+            .radio
+              span 视频：
+              label.m-r-1
+                input(type='radio' :value='true' v-model='settings.visitorAccess.mediaVideo')
+                span 允许
+              label
+                input(type='radio' :value='false' v-model='settings.visitorAccess.mediaVideo')
+                span 禁止
+          .form-group
+            .radio
+              span 附件：
+              label.m-r-1
+                input(type='radio' :value='true' v-model='settings.visitorAccess.mediaAttachment')
+                span 允许
+              label
+                input(type='radio' :value='false' v-model='settings.visitorAccess.mediaAttachment')
+                span 禁止
+
       .col-xs-12.col-md-12.form-inline.m-b-2
         span.h4 总下载速度：
         input.form-control(type='text' v-model.number='settings.allSpeed').m-r-05
