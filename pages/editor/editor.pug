@@ -154,17 +154,17 @@ block content
                   .editor-header(:title='c.description') {{c.name}}
                   .editor-thread-category-nodes
                     .editor-thread-category-node(
-                      @click='selectThreadCategory(c, null)'
-                      :class='{"active": c.selectedNode === null}'
-                    )
-                      span {{c.nodeName}}
-                    .editor-thread-category-node(
                       v-for='n in c.nodes'
                       @click='selectThreadCategory(c, n)'
                       :class='{"active": c.selectedNode === n}'
                       :title='n.description'
                       )
                       span {{n.name}}
+                    .editor-thread-category-node(
+                      @click='selectThreadCategory(c, "default")'
+                      :class='{"active": c.selectedNode === "default"}'
+                      )
+                      span {{c.nodeName}}
                   .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(v-if='c.selectedNode && c.selectedNode.warning') 注意事项：{{c.selectedNode.warning}}
             .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
               .editor-header 封面图
