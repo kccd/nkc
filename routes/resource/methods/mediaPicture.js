@@ -31,6 +31,7 @@ module.exports = async (options) => {
     const originPath = PATH.resolve(originFolder, `./${originId}.${ext}`);
 
     // 识别图片方向信息并自动旋转
+    // 去掉图片的元信息
     await imageMagick.allInfo(path);
 
     // 获取图片尺寸

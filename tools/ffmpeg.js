@@ -19,13 +19,14 @@ const tempImageForFFmpeg = settings.statics.deletedPhotoPath;
 
 // ffmpeg 码率和帧率控制命令行参数 默认值
 const bitrateAndFPSControlParameter = [
+  '-map_metadata',
+  '-1',
   '-c:v', 'libx264',                                            /* 指定编码器 */
   '-r', '24',                                                   /* 帧率 */
   '-maxrate', '5M',                                             /* 最大码率 */
   '-minrate', '1M',                                             /* 最小码率 */
   '-b:v', '1.16M',                                              /* 平均码率 */
 ];
-
 
 
 const spawnProcess = (pathName, args, options = {}) => {
@@ -379,6 +380,10 @@ async function createOtherSizeVideo(inputFile, outputFile, props) {
       .fps(fps)
       .size(`?x${height}`)
       .videoBitrate(bitrate + 'k')
+      .outputOptions([
+        '-map_metadata',
+        '-1'
+      ])
       .output(outputFile)
       .on('end', resolve)
       .on('error', reject)
@@ -461,6 +466,10 @@ async function addWaterMask(options) {
         `[o]scale=-2:${scalaByHeight}`
       ])
       .videoBitrate(bitRate)
+      .outputOptions([
+        '-map_metadata',
+        '-1'
+      ])
       .output(output)
       .on("end", resolve)
       .on("error", reject)
