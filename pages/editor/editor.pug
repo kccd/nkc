@@ -10,7 +10,7 @@ block title
       padding-top: 120px;
     }
 block content
-  mixin modifySubmit(id, blockButton)
+  mixin modifySubmit(id)
     div(id = id v-cloak)
       hr
       .checkbox(v-if="havePermissionToSendAnonymousPost")
@@ -28,25 +28,13 @@ block content
       .checkbox
         .editor-auto-save(v-if="autoSaveInfo")
           .fa.fa-check-circle &nbsp;{{autoSaveInfo}}
-      if blockButton
-        .row
-          .col-xs-6.p-r-05
-            button.btn.btn-theme.btn-block(@click="submit" v-if="checkProtocol && !disabledSubmit") 提交
-            button.btn.btn-theme.btn-block(v-else disabled :title="!checkProtocol?'请先勾选同意遵守全部协议':''")
-              span(v-if="disabledSubmit")
-                span 提交中...&nbsp;
-                .fa.fa-spinner.fa-spin
-              span(v-else) 提交
-          .col-xs-6.p-l-05
-            button.btn.btn-default.btn-block(@click="saveToDraft") 存草稿
-      else
-        button.btn.btn-theme(@click="submit" v-if="checkProtocol && !disabledSubmit") 提交
-        button.btn.btn-theme(v-else disabled :title="!checkProtocol?'请先勾选同意遵守全部协议':''")
-          span(v-if="disabledSubmit")
-            span 提交中...&nbsp;
-            .fa.fa-spinner.fa-spin
-          span(v-else) 提交
-        button.btn.btn-default(@click="saveToDraft") 存草稿
+      button.btn.btn-theme(@click="submit" v-if="checkProtocol && !disabledSubmit") 提交
+      button.btn.btn-theme(v-else disabled :title="!checkProtocol?'请先勾选同意遵守全部协议':''")
+        span(v-if="disabledSubmit")
+          span 提交中...&nbsp;
+          .fa.fa-spinner.fa-spin
+        span(v-else) 提交
+      button.btn.btn-default(@click="saveToDraft") 存草稿
   mixin modifyNotice
     .on-edit-notes
       .on-edit-label 您正在修改已经发表的内容，以下提示非常重要，请务必详读。
@@ -154,17 +142,17 @@ block content
                   .editor-header(:title='c.description') {{c.name}}
                   .editor-thread-category-nodes
                     .editor-thread-category-node(
+                      @click='selectThreadCategory(c, null)'
+                      :class='{"active": c.selectedNode === null}'
+                    )
+                      span {{c.nodeName}}
+                    .editor-thread-category-node(
                       v-for='n in c.nodes'
                       @click='selectThreadCategory(c, n)'
                       :class='{"active": c.selectedNode === n}'
                       :title='n.description'
                       )
                       span {{n.name}}
-                    .editor-thread-category-node(
-                      @click='selectThreadCategory(c, "default")'
-                      :class='{"active": c.selectedNode === "default"}'
-                      )
-                      span {{c.nodeName}}
                   .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(v-if='c.selectedNode && c.selectedNode.warning') 注意事项：{{c.selectedNode.warning}}
             .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
               .editor-header 封面图
@@ -280,7 +268,7 @@ block content
       .col-xs-12.col-md-3.box-shadow-panel#FloatPostButtonContainer
         div
           +editorInto
-          +modifySubmit("FloatPostButton", true)
+          +modifySubmit("FloatPostButton")
   .hidden#data=objToStr({minorForumCount: data.minorForumCount, originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft, websiteCode: data.websiteCode, toColumn: !!data.toColumn, threadCategories: data.threadCategories})
 block scripts
   include ../ueditor/ueditorBase

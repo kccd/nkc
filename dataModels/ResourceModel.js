@@ -562,17 +562,7 @@ resourceSchema.methods.checkDownloadCost = async function(user) {
 * */
 resourceSchema.methods.filenameFilter = async function() {
   const nkcRender = require('../nkcModules/nkcRender');
-  let filename = this.oname || '';
-  filename = filename.split('.');
-  if(filename.length >= 2) {
-    const ext = filename.pop();
-    filename = filename.join('.');
-    filename = nkcRender.replaceLink(filename);
-    filename += `.${ext}`;
-  } else {
-    filename = nkcRender.replaceLink(filename);
-  }
-  this.oname = filename;
+  this.oname = nkcRender.replaceLink(this.oname);
 }
 
 /*
