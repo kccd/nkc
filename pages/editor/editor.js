@@ -409,7 +409,6 @@ function initVueApp() {
       },
       initThreadCategory(tcId) {
         for(const tc of this.threadCategories) {
-          tc.selectedNode = null;
           for(const n of tc.nodes) {
             if(!tcId.includes(n._id)) continue;
             tc.selectedNode = n;
@@ -420,17 +419,9 @@ function initVueApp() {
       getThreadCategoriesId() {
         const tcId = [];
         for(const tc of this.threadCategories) {
-          if([null, 'default'].includes(tc.selectedNode)) continue;
-          tcId.push(tc.selectedNode._id);
+          if(tc.selectedNode) tcId.push(tc.selectedNode._id);
         }
         return tcId;
-      },
-      checkThreadCategory() {
-        for(const tc of this.threadCategories) {
-          if(tc.selectedNode === null) {
-            throw new Error(`请选择${tc.name}`);
-          }
-        }
       },
       // 获取标题输入框的内容
       getTitle: function() {
@@ -772,7 +763,6 @@ function initVueApp() {
               self.checkContent();
               self.checkAbstract();
               self.checkForums();
-              self.checkThreadCategory();
               self.checkKeywords();
               self.checkAuthorInfos();
               var formData = new FormData();

@@ -94,9 +94,9 @@ const watermarkifyFont = (trans, dpi, font, position, path, temporaryPath) =>{
 const allInfo = async path => {
 
   if(linux) {
-    await spawnProcess('convert', [path, '-strip', '-auto-orient', path]);
+    await spawnProcess('convert', [path,'-auto-orient', path]);
   } else {
-    await spawnProcess('magick', ['convert', path, '-strip', '-auto-orient', path]);
+    await spawnProcess('magick', ['convert', path,'-auto-orient', path]);
   }
 
   /*
@@ -517,9 +517,9 @@ const stickerify = async (path, size = 100) => {
   const {width, height} = await info(path);
   if(width > size || height > size) {
     if(linux) {
-      return spawnProcess('convert', [path, '-strip', '-coalesce', '-resize', `${size}x${size}`, path])
+      return spawnProcess('convert', [path, '-coalesce', '-resize', `${size}x${size}`, path])
     }
-    return spawnProcess('magick', ['convert', path, '-strip', '-coalesce', '-resize', `${size}x${size}`, path]);
+    return spawnProcess('magick', ['convert', path, '-coalesce', '-resize', `${size}x${size}`, path]);
   }
 };
 

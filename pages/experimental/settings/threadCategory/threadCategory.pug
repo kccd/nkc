@@ -22,14 +22,15 @@ block eContent
                 button.btn.btn-danger.btn-xs(@click='removeCategory(c._id)') 删除
                 button.btn.btn-default.btn-xs(@click='newCategory(c._id)') 添加子类
               .thread-category-nodes
+                .thread-category-node.default-node {{c.nodeName}}
+                  .fa.fa-edit.pointer(@click='editDefaultCategory(c)')
                 .thread-category-node-list
                   .thread-category-node(v-for='n in c.nodes' :data-cid='n._id').move-handle
                     //.fa.fa-bars.m-r-05.move-handle
                     span {{n.name}}
                     .fa.fa-edit.pointer(@click='editCategory(n)')
                     .fa.fa-trash.pointer(@click='removeCategory(n._id)')
-                .thread-category-node.default-node {{c.nodeName}}
-                  .fa.fa-edit.pointer(@click='editDefaultCategory(c)')
+
 block scripts
   include ../../../publicModules/commonModal/commonModal
   +includeJS('/experimental/settings/threadCategory/threadCategory.js')
