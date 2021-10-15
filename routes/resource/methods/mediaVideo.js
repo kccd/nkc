@@ -88,6 +88,8 @@ module.exports = async (options) => {
       await ffmpeg.videoAVITransMP4(path, outputVideoPath);
     } else if(['webm'].includes(extension.toLowerCase())) {
       await ffmpeg.videoWEBMTransMP4(path, outputVideoPath);
+    } else {
+      await ffmpeg.videoTransMP4(path, outputVideoPath, extension);
     }
   }
 
