@@ -570,6 +570,7 @@ resourceSchema.methods.filenameFilter = async function() {
     filename = nkcRender.replaceLink(filename);
     filename += `.${ext}`;
   } else {
+    filename = filename.join('.');
     filename = nkcRender.replaceLink(filename);
   }
   this.oname = filename;
@@ -636,7 +637,13 @@ resourceSchema.methods.updateForumsId = async function() {
   forumsId = [...new Set(forumsId)];
   this.forumsId = forumsId;
   this.tou = new Date();
-  await this.save();
+  await this.updateOne({
+    $set: {
+      forumsId: this.forumsId,
+      tou: this.tou
+    }
+  });
+  // await this.save();
 };
 
 /*
