@@ -13,6 +13,7 @@ router
     let resource = data.resource.toObject();
     resource.user = await db.UserModel.findOne({uid: resource.uid});
     data.resource = resource;
+    data.hasPermission = ctx.permission('modifyResources');
     const libraries = await db.LibraryModel.find({rid: resource.rid, closed: false, deleted: false});
     data.path = [];
     for(let l of libraries) {

@@ -303,6 +303,27 @@ resourceRouter
     });
     await next();
   })
+  .put('/:rid', async (ctx, next) => {
+    const {db, data, nkcModules, body} = ctx;
+    const {resource} = data;
+    const {disabled} = body;
+    data.resource = resource;
+    if(resource.disabled) {
+      if(disabled) {
+        ctx.throw(400, `资源已被屏蔽`);
+      }
+    } else {
+      if(!disabled) {
+        ctx.throw(400, `资源未被屏蔽`);
+      }
+    }
+    await resource.updateOne({
+      $set: {
+        disabled: !!disabled
+      }
+    })
+    await next();
+  })
   .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods())
   .use('/:rid/pay', payRouter.routes(), payRouter.allowedMethods())
   .use('/:rid/detail', detailRouter.routes(), detailRouter.allowedMethods())

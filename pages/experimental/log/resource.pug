@@ -5,9 +5,13 @@ block eTitle
     .normal-width{
       width: 12rem;
     }
-    .disabled{
+    .disabled {
+        background-color: #ccc;
+    }
+    .isFileExist {
       background-color: #ffcece;
     }
+
 block eContent
   #data.hidden=objToStr({searchType: data.searchType, searchContent: data.searchContent, t: data.t})
   .container-fluid.max-width
@@ -41,9 +45,15 @@ block eContent
                 th 用户名
                 th 文件信息
                 th 引用
+                th 操作
             tbody
               for r in data.resources
-                tr(class=!r.isFileExist? 'disabled': '')
+                -var klass = '';
+                if (r.disabled)
+                  -klass += 'disabled ';
+                if !r.isFileExist
+                  -klass += 'isFileExist';
+                tr(class=klass)
                   th.normal-width=format(`YYYY-MM-DD HH:mm:ss`, r.toc)
                   th.normal-width
                     a(href=tools.getUrl('resource', r.rid) target="_blank")=r.rid
@@ -72,6 +82,11 @@ block eContent
                               a(href=t.url target='_blank')=t.title
                               |》
                               span 下的回复
+                  th
+                    if r.disabled
+                      button.btn.btn-success.btn-xs(onclick=`initiate(${r.rid}, ${false})`) 解封
+                    else
+                      button.btn.btn-danger.btn-xs(onclick=`initiate(${r.rid}, ${true})`) 屏蔽
         include ../../publicModules/paging/paging_input
 block scripts
   include ../../publicModules/subscribeTypes/subscribeTypes

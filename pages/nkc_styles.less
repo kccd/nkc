@@ -3872,6 +3872,43 @@ span[data-tag="nkcsource"][data-type="sticker"]>img{
 }
 
 /*文章中的emoji */
+span[data-tag="nkcsource"][data-type="picture-is-disable"]{
+  display: table;
+  height: 20rem;
+  text-align: center;
+  width: 40rem;
+  margin: auto;
+  max-width: 100%;
+  background-color: #b9b9b9;
+  color: #919191;
+  border-radius: 2px;
+  font-size: 1.4rem;
+  position: relative;
+  //&:hover{
+  //  .fa{
+  //    display: block;
+  //    cursor: pointer;
+  //  }
+  //}
+}
+span[data-tag="nkcsource"][data-type="picture-is-disable"]>span{
+  display: table-cell;
+  vertical-align: middle;
+}
+span[data-tag="nkcsource"][data-type="picture-is-disable"]>.fa{
+  display: none;
+  height: 3rem;
+  width: 3rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #fff;
+  color: red;
+  font-size: 3rem;
+  margin: 0;
+}
+
+/*文章中的emoji */
 span[data-tag="nkcsource"][data-type="twemoji"]>img{
   max-width: 26px;
   max-height: 26px;
@@ -3886,7 +3923,7 @@ span[data-tag="nkcsource"][data-type="video-not-found"]{
   background-color: #b9b9b9;
   color: #919191;
   border-radius: 2px;
-  font-size: 1.4rem;
+  font-size: 32px;
   padding: 1rem;
 }
 span[data-tag="nkcsource"][data-type="video-not-found"]>span{
@@ -4035,6 +4072,17 @@ span[data-tag="nkcsource"][data-type="video"] video{
   margin-left: 0.5rem;
 }
 /*文章中的音频 新*/
+span[data-tag="nkcsource"][data-type="audio-not-found"]{
+  display: block;
+  padding: 1rem;
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
+  border-radius: 2px;
+  border: 1px solid #d6d6d6;
+  max-width: 414px;
+  background-color: #CCC;
+  text-align: center;
+  color: #919191;
+}
 span[data-tag="nkcsource"][data-type="audio"]{
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
   border-radius: 2px;
@@ -4086,6 +4134,10 @@ span[data-tag="nkcsource"][data-type="audio"]{
   vertical-align: top;
   width: 3.3rem;
 }
+.attachment-disabled{
+  background-color: #ccc;
+  color: #919191;
+}
 .article-attachment-icon img{
   width: 3.3rem;
   max-width: none;
@@ -4131,6 +4183,16 @@ span[data-tag="nkcsource"][data-type="audio"]{
   font-weight: 700;
 }
 /* 文章中的附件 新*/
+span[data-tag="nkcsource"][data-type="attachment-disabled"]{
+  display: block;
+  padding: 1rem;
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
+  border-radius: 2px;
+  border: 1px solid #d6d6d6;
+  max-width: 414px;
+  background-color: #CCC;
+  text-align: center;
+}
 span[data-tag="nkcsource"][data-type="attachment"]{
   display: block;
   padding: 0.5rem;

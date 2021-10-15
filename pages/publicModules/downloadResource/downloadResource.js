@@ -155,5 +155,72 @@ NKC.modules.downloadResource = class {
       dr.open(rid);
       return false;
     }
+    // if(type === "disabled") {
+    //   let rid = $(e.target).attr("data-id");
+    //   const id = rid.split("-")[0];
+    //   var disableType = (rid.split("-")[1]);
+    //   alert(id);
+    //   if(disableType === 'true'){
+    //     disableType = false;
+    //   }else {
+    //     disableType = true;
+    //   }
+    //   nkcAPI('/r/' + id + '/info', "get", {
+    //   }).then((data) => {
+    //     const commonModal = new NKC.modules.CommonModal();
+    //     if(data.hasPermission){
+    //       commonModal.open(data => {
+    //         let type = data[0].value;
+    //         let description = data[1].value.trim();
+    //         return Promise.resolve()
+    //           .then(() => {
+    //             if(!type.length) throw new Error('投诉类型不能为空');
+    //             return nkcAPI('/e/settings/complaint/type', 'POST', {
+    //               type,
+    //               description
+    //             });
+    //           })
+    //           .then(() => {
+    //             commonModal.close();
+    //             sweetSuccess('添加成功');
+    //           })
+    //           .catch(sweetError);
+    //       }, {
+    //         title: '编辑文件信息',
+    //         data: [
+    //           {
+    //             dom: 'input',
+    //             label: '请填写文件名',
+    //             value: '',
+    //             rows: 1
+    //           },
+    //           {
+    //             dom: 'radio',
+    //             label: '是否屏蔽',
+    //             radios: [{name: "是", value: true},{name: "否", value: false}],
+    //             value: '',
+    //             rows: 3
+    //           }
+    //         ]
+    //       })
+    //     }else {
+    //       commonModal.open(data => {
+    //         return Promise.resolve()
+    //           .then(() => {
+    //             commonModal.close();
+    //           })
+    //           .catch(sweetError);
+    //       }, {
+    //         title: '查看文件信息',
+    //         data: [
+    //
+    //         ]
+    //       })
+    //     }
+    //   }).catch(
+    //     sweetError
+    //   )
+    //   return false;
+    // }
   });
 }());

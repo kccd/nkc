@@ -31,7 +31,8 @@ module.exports = {
     POST: 'uploadResources',
 		PARAMETER: {
 			GET: 'getResources',
-      info: {
+			PUT: "modifyResources",
+			info: {
 			  GET: "getResourceInfo"
 			},
 			pay: {
