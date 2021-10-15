@@ -30,18 +30,15 @@ module.exports = async (options) => {
     const originFolder = await FILE.getPath('mediaOrigin', toc);
     const originPath = PATH.resolve(originFolder, `./${originId}.${ext}`);
 
-    // 识别图片方向信息并自动旋转
-    await imageMagick.allInfo(path);
-
-    // 获取图片尺寸
-    const {width, height} = await imageMagick.info(path);
-
-    // 保存原图
+    /*// 保存原图
     if(ext !== 'gif' && (width > 3840 || size > 5242880)) {
       await imageMagick.originify(path, originPath);
     } else {
       await fsPromise.copyFile(path, originPath);
-    }
+    }*/
+
+    await fsPromise.copyFile(path, originPath);
+
     const origin = db.OriginImageModel({
       originId,
       ext,
@@ -49,6 +46,12 @@ module.exports = async (options) => {
       uid: user.uid
     });
     await origin.save();
+
+    // 识别图片方向信息并自动旋转、去掉图片的元信息
+    await imageMagick.allInfo(path);
+
+    // 获取图片尺寸
+    const {width, height} = await imageMagick.info(path);
 
     // 保存缩略图
     if((width > 150 || size > 51200) && ext !== 'gif') {
