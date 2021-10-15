@@ -826,6 +826,7 @@ const defaultOptions = {
   quote: true, // 仅支持同一篇文章
   toDraftReason: false
 };
+//拓展文章评论
 postSchema.statics.extendPost = async (post, options) => {
   const PostModel = mongoose.model("posts");
   const posts = await PostModel.extendPosts([post], options);

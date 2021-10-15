@@ -14,6 +14,12 @@ const resourceSchema = new Schema({
     unique: true,
     required: true
   },
+  //是否屏蔽
+  disabled: {
+    type: Boolean,
+    default: "false",
+    index: 1
+  },
   // 针对图片 原图ID
   originId: {
     type: String,
@@ -153,7 +159,7 @@ resourceSchema.virtual('videoSize')
 /**
  * 文件是否存在
  */
-resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['mediaPicture', 'mediaAudio']) {
+resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['mediaPicture']) {
   if(excludedMediaTypes.includes(this.mediaType)) return;
   const FILE = require('../nkcModules/file');
   if(this.mediaType === 'mediaVideo') {
