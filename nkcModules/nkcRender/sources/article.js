@@ -74,7 +74,6 @@ module.exports = {
     //<span class="nkcsource-video-title">${resource.oname}</span>
   },
   audio(html = "", id, resource = {}) {
-    console.log(resource.isFileExist);
     const {
       oname = "未知",
       rid = id,
