@@ -331,6 +331,7 @@ messageSchema.statics.getParametersData = async (message) => {
   const ProblemModel = mongoose.model("problems");
   const PostsVoteModel = mongoose.model('postsVotes');
   const SecurityApplicationModel = mongoose.model('securityApplications');
+  const ThreadCategoryModel = mongoose.model('threadCategories');
   const ForumModel = mongoose.model('forums');
   const PreparationForumModel = mongoose.model('pForum');
   const apiFunction = require("../nkcModules/apiFunction");
@@ -453,9 +454,10 @@ messageSchema.statics.getParametersData = async (message) => {
       deadline: moment(Date.now() + timeout).format("YYYY-MM-DD HH:mm:ss")
     };
   } else if(type === 'moveThread') {
-    const {tid, rea, forumsId} = message.c;
+    const {tid, rea, forumsId, threadCategoriesId = []} = message.c;
     const thread = await ThreadModel.findOne({tid});
     if(!thread) return null;
+    const threadCategories = await ThreadCategoryModel.getCategoriesById(threadCategoriesId);
     const firstPost = await thread.extendFirstPost();
     let forumsName = '';
     if(forumsId && forumsId.length > 0) {
@@ -465,11 +467,15 @@ messageSchema.statics.getParametersData = async (message) => {
       });
       forumsName = forums.map(f => f.displayName).join('、');
     }
+    let threadCategoriesName = threadCategories.map(tc => {
+      return `${tc.categoryName}：${tc.nodeName}`
+    });
     parameters = {
       threadTitle: firstPost.t,
       threadURL: getUrl('thread', thread.tid),
       reason: rea,
-      forumsName
+      forumsName,
+      threadCategoriesName: threadCategoriesName.join(` `) || '空'
     }
   } else if(type === 'replyPost') {
     const {targetPid} = message.c;
@@ -690,7 +696,7 @@ messageSchema.statics.getParametersData = async (message) => {
     if(type === 'fundMember') {
       parameters.username = user.username;
       parameters.userURL = getUrl('userHome', user.uid);
-    };
+    }
   } else if([
     "newColumnContribute", "columnContributeChange",
     "disabledColumn", "disabledColumnInfo",

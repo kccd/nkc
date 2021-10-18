@@ -108,5 +108,6 @@
   "securityApplicationResolved": "手机号申诉通过审核",
   "securityApplicationRejected": "手机号申诉未通过审核",
   "fundFinishProject": "【基金系统】研究超时",
-  "forumsName": "专业名称"
+  "forumsName": "专业名称",
+  "threadCategoriesName": "文章属性"
 }

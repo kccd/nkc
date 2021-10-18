@@ -31,6 +31,11 @@ const schema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  // 文章页顶部公告
+  threadWarning: {
+    type: String,
+    default: ''
+  },
   // 维度介绍或维度下的分类介绍
   description: {
     type: String,
@@ -82,7 +87,14 @@ schema.statics.getCategoryTree = async (match = {}) => {
   return master;
 };
 
-schema.statics.newCategory = async (name, description, warning, cid = null) => {
+schema.statics.newCategory = async (props) => {
+  const {
+    name,
+    description,
+    warning,
+    cid,
+    threadWarning
+  } = props;
   const ThreadCategoryModel = mongoose.model('threadCategories');
   const SettingModel = mongoose.model('settings');
   const tc = ThreadCategoryModel({
@@ -90,6 +102,7 @@ schema.statics.newCategory = async (name, description, warning, cid = null) => {
     name,
     warning,
     description,
+    threadWarning,
     cid
   });
   await tc.save();
@@ -121,6 +134,45 @@ schema.statics.checkCategoriesId = async (tcId) => {
     throwErr(400, `文章多维分类 ${errorTcId.join(', ')} 错误`);
   }
 }
+
+/*
+* 获取属性
+* @param {[String]} tcId 属性 ID 组成的数组
+* @return {Object} 属性对象组成的数组
+*   @param {Number} _id 属性 ID
+*   @param {String} name 属性名称
+*   @param {String} description 属性介绍
+*   @param {String} threadWarning 文章页顶部公告
+* */
+schema.statics.getCategoriesById = async (tcId = []) => {
+  const ThreadCategoryModel = mongoose.model('threadCategories');
+  if(tcId.length === 0) return [];
+  const categories = await ThreadCategoryModel.find({}, {
+    _id: 1,
+    name: 1,
+    description: 1,
+    threadWarning: 1,
+    cid: 1
+  });
+  const categoriesObj = {};
+  for(const category of categories) {
+    categoriesObj[category._id] = category;
+  }
+  const threadCategories = [];
+  for(const id of tcId) {
+    const node = categoriesObj[id];
+    if(!node) continue;
+    const category = categoriesObj[node.cid];
+    if(!category) continue;
+    threadCategories.push({
+      categoryName: category.name,
+      categoryThreadWarning: category.threadWarning,
+      nodeName: node.name,
+      nodeThreadWarning: node.threadWarning
+    });
+  }
+  return threadCategories;
+};
 
 module.exports = mongoose.model('threadCategories', schema);
 

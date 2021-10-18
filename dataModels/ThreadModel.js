@@ -238,6 +238,22 @@ threadSchema.virtual('firstPost')
     this._firstPost = p
   });
 
+threadSchema.virtual('threadCategories')
+  .get(function() {
+    return this._threadCategories;
+  })
+  .set(function(threadCategories) {
+    this._threadCategories = threadCategories;
+  })
+
+threadSchema.virtual('threadCategoriesWarning')
+  .get(function() {
+    return this._threadCategoriesWarning;
+  })
+  .set(function(threadCategoriesWarning) {
+    this._threadCategoriesWarning = threadCategoriesWarning;
+  })
+
 threadSchema.virtual('lastPost')
   .get(function() {
     return this._lastPost
@@ -2069,6 +2085,25 @@ threadSchema.statics.getCollectedCountByTid = async (tid) => {
     cancel: false,
     tid
   });
+};
+
+/*
+* 拓展文章属性
+* */
+threadSchema.methods.extendThreadCategories = async function() {
+  const ThreadCategoryModel = mongoose.model('threadCategories');
+  const threadCategories = await ThreadCategoryModel.getCategoriesById(this.tcId);
+  const threadCategoriesWarning = [];
+  for(const tc of threadCategories) {
+    if(tc.categoryThreadWarning) {
+      threadCategoriesWarning.push(tc.categoryThreadWarning);
+    }
+    if(tc.nodeThreadWarning) {
+      threadCategoriesWarning.push(tc.nodeThreadWarning);
+    }
+  }
+  this.threadCategoriesWarning = threadCategoriesWarning;
+  return this.threadCategories = threadCategories;
 };
 
 module.exports = mongoose.model('threads', threadSchema);

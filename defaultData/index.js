@@ -262,9 +262,18 @@ async function initThreadCategory() {
   if(count === 0) {
     for(const t of threadCategories) {
       const {main, node} = t;
-      const category = await db.ThreadCategoryModel.newCategory(main.name, main.description, main.warning);
+      const category = await db.ThreadCategoryModel.newCategory({
+        name: main.name,
+        description: main.description,
+        warning: main.warning
+      });
       for(const n of node) {
-        await db.ThreadCategoryModel.newCategory(n.name, n.description, n.warning, category._id);
+        await db.ThreadCategoryModel.newCategory({
+          name: n.name,
+          description: n.description,
+          warning: n.warning,
+          cid: category._id
+        });
       }
     }
   }

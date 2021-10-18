@@ -172,6 +172,8 @@ threadRouter
 		data.complaintTypes = ctx.state.language.complaintTypes;
 		// 加载文章，如果文章不存在，此处会抛出404
     const thread = await db.ThreadModel.findOnly({tid});
+    // 拓展文章属性
+    await thread.extendThreadCategories();
     // 拓展文章所属专业
     const forums = await thread.extendForums(['mainForums', 'minorForums']);
     if(forums.length) data.forum = forums[0];
@@ -699,6 +701,7 @@ threadRouter
     data.threadSettings = await db.SettingModel.getSettings("thread");
     data.postHeight = hidePostSettings.postHeight;
     data.postPermission = await db.UserModel.getPostPermission(state.uid, 'post', thread.mainForumsId);
+    // 加载文章属性
 		data.pid = pid;
 		data.step = step;
 		await next();

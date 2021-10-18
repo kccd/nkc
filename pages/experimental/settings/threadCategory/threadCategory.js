@@ -83,10 +83,12 @@ const app = new Vue({
         const name = data[0].value;
         const description = data[1].value;
         const warning = data[2].value;
+        const threadWarning = data[3].value;
         nkcAPI(`/e/settings/threadCategory`, 'POST', {
           name,
           description,
           warning,
+          threadWarning,
           cid,
         })
           .then(data => {
@@ -111,6 +113,11 @@ const app = new Vue({
           {
             dom: 'textarea',
             label: '注意事项',
+            value: ''
+          },
+          {
+            dom: 'textarea',
+            label: '文章公告',
             value: ''
           }
         ]
@@ -144,17 +151,20 @@ const app = new Vue({
         const name = data[0].value;
         const description = data[1].value;
         const warning = data[2].value;
+        const threadWarning = data[3].value;
         nkcAPI(`/e/settings/threadCategory/${category._id}`, 'PUT', {
           type: 'modifyInfo',
           name,
           description,
-          warning
+          warning,
+          threadWarning
         })
           .then(data => {
             commonModel.close();
             category.name = name;
             category.description = description;
             category.warning = warning;
+            category.threadWarning = threadWarning;
           })
           .catch(sweetError);
       }, {
@@ -174,6 +184,11 @@ const app = new Vue({
             dom: 'textarea',
             label: '注意事项',
             value: category.warning
+          },
+          {
+            dom: 'textarea',
+            label: '文章公告',
+            value: category.threadWarning
           }
         ]
       })
