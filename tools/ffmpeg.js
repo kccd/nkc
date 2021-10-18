@@ -18,6 +18,7 @@ const fontFilePathForFFmpeg = fontFilePath.replace(/\\/g, "/").replace(":", "\\:
 const tempImageForFFmpeg = settings.statics.deletedPhotoPath;
 
 // ffmpeg 码率和帧率控制命令行参数 默认值
+// 处理视频
 const bitrateAndFPSControlParameter = [
   '-map_metadata',
   '-1',
@@ -26,6 +27,17 @@ const bitrateAndFPSControlParameter = [
   '-maxrate', '5M',                                             /* 最大码率 */
   '-minrate', '1M',                                             /* 最小码率 */
   '-b:v', '1.16M',                                              /* 平均码率 */
+];
+
+/*
+* 处理音频
+* */
+const bitrateAndMetadataControlParameter = [
+  '-map_metadata',
+  '-1',
+  '-maxrate', '5M',
+  '-minrate', '1M',
+  '-b:v', '1.16M'
 ];
 
 
@@ -116,30 +128,30 @@ const videoWEBMTransMP4 = async (inputPath, outputPath) => {
 
 // AMR转码为MP3
 const audioAMRTransMP3 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndMetadataControlParameter, outputPath])
 }
 
 const audioAACTransMP3 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndMetadataControlParameter, outputPath])
 }
 
 // WAV转码为MP3
 const audioWAVTransMP3 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndMetadataControlParameter, outputPath])
 }
 
 // WMA转码为MP3
 const audioWMATransMP3 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndMetadataControlParameter, outputPath])
 }
 
 const audioFLACTransMP3 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath]);
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndMetadataControlParameter, outputPath]);
 }
 
 const audioTransMP3 = async (inputPath, outputPath, ext) => {
   let func = async (inputPath, outputPath) => {
-    return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath]);
+    return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndMetadataControlParameter, outputPath]);
   }
   if(ext === 'amr') {
     func = audioAMRTransMP3;
