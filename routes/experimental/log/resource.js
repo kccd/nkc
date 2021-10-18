@@ -15,10 +15,24 @@ router
       match.uid = targetUser? targetUser.uid: '';
     } else if(searchType === 'rid') {
       match.rid = searchContent;
+    } else if(searchType === 'pid') {
+      match.references = searchContent;
+    }else if(searchType === 'tid') {
+      let pids = [];
+      const posts =  await db.PostModel.find({tid: searchContent});
+      for(const post of posts){
+        pids.push(post.pid);
+      }
+      match.references = pids;
     }
     const count = await db.ResourceModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count);
-    const resources_ = await db.ResourceModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    let resources_;
+    if(searchType === 'tid'){
+      resources_ = await db.ResourceModel.find({references:{$in: match.references}}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    }else {
+      resources_ = await db.ResourceModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    }
     const resources = [];
     let postsId = [];
     const usersId = [];
