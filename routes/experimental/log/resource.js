@@ -101,7 +101,7 @@ router
     //获取文件信息
     const filePath = await resource.getFilePath(resource);
     //判断路劲文件是否存在,如果不存在就返回错误
-    if(!await FILE.access(filePath)) return ctx.throw(404, `文件已丢失`);
+    if(!await FILE.access(filePath)) return ctx.throw(400, `文件已丢失`);
     await resource.removeResourceInfo(resource);
     await next();
   });
