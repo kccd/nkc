@@ -6,6 +6,9 @@ const app = new Vue({
     searchType: data.searchType || 'rid',
     searchContent: data.searchContent || '',
   },
+  mounted() {
+    nkcAPI('/e/log/resource', 'GET', {})
+  },
   methods: {
     search() {
       const {searchType, searchContent, t} = this;

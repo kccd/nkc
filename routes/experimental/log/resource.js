@@ -1,5 +1,6 @@
 const router = require('koa-router')();
 const ffmpeg = require('../../../tools/ffmpeg');
+const FILE = require("../../../nkcModules/file");
 router
   .get('/', async (ctx, next) => {
     const {query, db, data, nkcModules} = ctx;
@@ -97,6 +98,10 @@ router
     const {query, db, data, nkcModules, body} = ctx;
     const {rid} = body;
     const resource = await db.ResourceModel.findOne({rid: rid});
+    //获取文件信息
+    const filePath = await resource.getFilePath(resource);
+    //判断路劲文件是否存在,如果不存在就返回错误
+    if(!await FILE.access(filePath)) return ctx.throw(404, `文件已丢失`);
     await resource.removeResourceInfo(resource);
     await next();
   });

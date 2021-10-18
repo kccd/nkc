@@ -10,7 +10,6 @@ const fs = require("fs");
 const fsPromise = fs.promises;
 const ffmpeg = require('../tools/ffmpeg');
 const db = require("../dataModels");
-const FILE = require("../nkcModules/file");
 const {urlReg} = require('../nkcModules/regExp');
 const ff = require("fluent-ffmpeg");
 const resourceSchema = new Schema({
@@ -198,6 +197,8 @@ resourceSchema.methods.setMetadata = async function(resource, excludedMediaTypes
   const FILE = require('../nkcModules/file');
   //获取文件信息
   const filePath = await resource.getFilePath(resource);
+  //判断路劲文件是否存在,如果不存在就返回错误
+  if(!await FILE.access(filePath)) return false;
   //获取文件信息
   const data = await ffmpeg.getFileInfo(filePath);
   //文件标题信息
@@ -708,8 +709,6 @@ resourceSchema.methods.checkAccessPermission = async function(accessibleForumsId
 resourceSchema.methods.removeResourceInfo = async function(resource) {
   //获取文件信息
   const filePath = await resource.getFilePath(resource);
-  //判断路劲文件是否存在,如果不存在就返回错误
-  if(!await FILE.access(filePath)) return false;
   //获取文件信息
   const data = await ffmpeg.getFileInfo(filePath);
   //文件标题信息
