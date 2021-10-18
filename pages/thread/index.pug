@@ -212,7 +212,7 @@ block content
                           else
                             img(src=anonymousInfo.avatar style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
                             span.anonymous-name= ` ${anonymousInfo.username}`
-                          span(style='color: #555555;margin-right:5px')= ` ${thread.toc.toLocaleDateString()}`
+                          span(style='color: #555555;margin-right:5px' title=format(`YYYY-MM-DD HH:mm:ss`, thread.toc))= ` ${thread.toc.toLocaleDateString()}`
                           if thread.firstPost.originState && thread.firstPost.originState !== "0"
                             -var levelText = getOriginLevel(thread.firstPost.originState);
                             if thread.firstPost.originState == "3" || thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
