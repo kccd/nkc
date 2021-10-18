@@ -449,7 +449,8 @@ module.exports = {
         "reason",
         "threadTitle",
         "threadURL",
-        "forumsName"
+        "forumsName",
+        "threadCategoriesName"
       ],
       content: "您的标题为[url=threadURL(threadTitle)]的文章由于[text=reason]等原因，已被移动到[text=forumsName]。",
       type: "moveThread"
