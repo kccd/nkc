@@ -10,7 +10,13 @@ router
   .post('/', async (ctx, next) => {
     const {db, body, data, nkcModules} = ctx;
     const {checkString} = nkcModules.checkData;
-    const {name, description, warning, cid} = body;
+    const {
+      name,
+      description,
+      warning,
+      cid,
+      threadWarning
+    } = body;
     checkString(name, {
       name: '分类名',
       minLength: 0,
@@ -28,11 +34,22 @@ router
       minLength: 0,
       maxLength: 2000
     });
+    checkString(threadWarning, {
+      name: '分类文章公告',
+      minLength: 0,
+      maxLength: 5000
+    })
     if(cid) {
       const category = await db.ThreadCategoryModel.findOne({_id: cid});
       if(!category) ctx.throw(400, `上级分类不存在 cid: ${cid}`);
     }
-    await db.ThreadCategoryModel.newCategory(name, description, warning, cid);
+    await db.ThreadCategoryModel.newCategory({
+      name,
+      description,
+      warning,
+      cid,
+      threadWarning
+    });
     data.categoryTree = await db.ThreadCategoryModel.getCategoryTree();
     await next();
   })
@@ -53,7 +70,15 @@ router
   .put('/:cid', async (ctx, next) => {
     const {db, body, nkcModules, params} = ctx;
     const {cid} = params;
-    const {name, nodeName, description, warning, type, disabled} = body;
+    const {
+      name,
+      nodeName,
+      description,
+      warning,
+      threadWarning,
+      type,
+      disabled
+    } = body;
     const category = await db.ThreadCategoryModel.findOnly({_id: cid});
     const {checkString} = nkcModules.checkData;
     if(type === 'modifyInfo') {
@@ -74,11 +99,17 @@ router
         minLength: 0,
         maxLength: 2000
       });
+      checkString(threadWarning, {
+        name: '分类文章公告',
+        minLength: 0,
+        maxLength: 5000
+      })
       await category.updateOne({
         $set: {
           name,
           description,
-          warning
+          warning,
+          threadWarning
         }
       });
     } else if(type === 'modifyNodeName') {

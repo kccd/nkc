@@ -91,7 +91,7 @@ block content
                     .thread-management
                       .title
                         if data.user
-                          div.managementDiv(style='display: none;margin-top: 1rem;')
+                          div.managementDiv.m-b-1(style='display: none;margin-top: 1rem;')
                             .form-inline
                               //- 设置置顶
                               if data.isModerator && data.userOperationsId.includes('toppedThread') && !thread.topped
@@ -129,6 +129,13 @@ block content
                                 button.btn-sm.btn.btn-danger(onclick="deleteThread()") 退修/删除
                             if data.thread.type === "fund"
                               h5.text-danger 基金类文章无法退修
+                //- 显示文章属性文章页公告
+                -var threadWarning = [];
+                if data.thread.threadCategoriesWarning && data.thread.threadCategoriesWarning.length
+                 .col-xs-12.col-md-12.m-b-2
+                  .bg-warning.text-warning.p-a-1.bg-border
+                    for tcw in data.thread.threadCategoriesWarning
+                      div=tcw
                 .col-xs-12.col-md-12
                   .row
                     if !thread.reviewed
@@ -311,6 +318,10 @@ block content
                             if index !== 0
                               span &nbsp;/&nbsp;
                             a(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+                        span.m-r-1
+                        //- 文章属性
+                        for tc in data.thread.threadCategories
+                          span.m-r-1=`${tc.categoryName}：${tc.nodeName}`
                         .pull-right.text-right
                           if thread.firstPost.digest
                             .inline-block
