@@ -1,4 +1,5 @@
 const router = require('koa-router')();
+const ffmpeg = require('../../../tools/ffmpeg');
 router
   .get('/', async (ctx, next) => {
     const {query, db, data, nkcModules} = ctx;
@@ -38,6 +39,7 @@ router
     const usersId = [];
     for(const r of resources_) {
       await r.setFileExist([]);
+      await r.setMetadata(r);
       let filePath;
       try{
         filePath = await r.getFilePath();
@@ -89,6 +91,13 @@ router
     data.searchType = searchType;
     data.searchContent = searchContent;
     ctx.template = 'experimental/log/resource.pug';
+    await next();
+  })
+  .put('/', async (ctx, next) => {
+    const {query, db, data, nkcModules, body} = ctx;
+    const {rid} = body;
+    const resource = await db.ResourceModel.findOne({rid: rid});
+    await resource.removeResourceInfo(resource);
     await next();
   });
 module.exports = router;

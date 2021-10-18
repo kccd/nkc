@@ -23,7 +23,17 @@ function initiate(rid, disabled){
     sweetError(err);
   });
 }
+function removeInfo(rid){
+  nkcAPI('/e/log/resource', 'PUT', {
+    rid
+  }).then(() => {
+    sweetSuccess('执行成功');
+  }).catch((err) => {
+    sweetError(err);
+  });
+};
 Object.assign(window, {
-  initiate
+  initiate,
+  removeInfo,
 });
 

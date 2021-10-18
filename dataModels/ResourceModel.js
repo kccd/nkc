@@ -8,6 +8,11 @@ const fsSync = require('../tools/fsSync');
 const { existsSync, exists } = require('fs');
 const fs = require("fs");
 const fsPromise = fs.promises;
+const ffmpeg = require('../tools/ffmpeg');
+const db = require("../dataModels");
+const FILE = require("../nkcModules/file");
+const {urlReg} = require('../nkcModules/regExp');
+const ff = require("fluent-ffmpeg");
 const resourceSchema = new Schema({
 	rid: {
     type: String,
@@ -139,6 +144,13 @@ const resourceSchema = new Schema({
   }
 });
 
+resourceSchema.virtual('metadata')
+  .get(function() {
+    return this._metadata;
+  })
+  .set(function(val) {
+    return this._metadata = val
+  });
 
 resourceSchema.virtual('isFileExist')
   .get(function() {
@@ -156,7 +168,7 @@ resourceSchema.virtual('videoSize')
     return this._videoSize = val
   });
 
-/**
+/*
  * 文件是否存在
  */
 resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['mediaPicture']) {
@@ -176,6 +188,21 @@ resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['medi
     const path = await this.getFilePath();
     this.isFileExist = await FILE.access(path);
   }
+}
+
+/*
+* 获取文件元信息
+* */
+resourceSchema.methods.setMetadata = async function(resource, excludedMediaTypes = ['mediaPicture', 'mediaAttachment']){
+  if(excludedMediaTypes.includes(this.mediaType)) return;
+  const FILE = require('../nkcModules/file');
+  //获取文件信息
+  const filePath = await resource.getFilePath(resource);
+  //获取文件信息
+  const data = await ffmpeg.getFileInfo(filePath);
+  //文件标题信息
+  let tags = data.format.tags || {};
+  this.metadata = tags;
 }
 
 /*
@@ -674,5 +701,31 @@ resourceSchema.methods.checkAccessPermission = async function(accessibleForumsId
     throwErr(403, `权限不足`);
   }
 };
+
+/*
+* 清除文件信息
+* */
+resourceSchema.methods.removeResourceInfo = async function(resource) {
+  //获取文件信息
+  const filePath = await resource.getFilePath(resource);
+  //判断路劲文件是否存在,如果不存在就返回错误
+  if(!await FILE.access(filePath)) return false;
+  //获取文件信息
+  const data = await ffmpeg.getFileInfo(filePath);
+  //文件标题信息
+  const tags = data.format.tags || {};
+  for(const key in tags) {
+    if(!tags.hasOwnProperty(key)) continue;
+      const outputFilePath = filePath + '_out' + `.${resource.ext}`;
+      await ffmpeg.clearMetadata(filePath, outputFilePath);
+      //删除文件
+      fs.unlinkSync(filePath);
+      //重命名文件
+      fs.renameSync(outputFilePath, filePath);
+      break;
+  }
+  return;
+}
+
 
 module.exports = mongoose.model('resources', resourceSchema);

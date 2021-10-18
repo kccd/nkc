@@ -477,6 +477,42 @@ async function addWaterMask(options) {
   });
 }
 
+/*
+*清除视频或者音频文件元信息
+* */
+async function clearMetadata(filePath, outputFilePath) {
+  return new Promise((resolve, reject) => {
+    ff(filePath)
+      .outputOptions([
+        '-map_metadata',
+        '-1',
+        '-c:a',
+        'copy',
+        '-c:v',
+        'copy'
+      ])
+      .output(outputFilePath)
+      .on("end", resolve)
+      .on("error", reject)
+      .run();
+  })
+}
+
+/*
+*获取元文件信息
+* */
+async function getFileInfo(filePath) {
+  return new Promise((resolve, reject) => {
+    ff.ffprobe(filePath, (err, data) => {
+      if(err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
 module.exports = {
   getVideoInfo,
   createOtherSizeVideo,
@@ -507,5 +543,7 @@ module.exports = {
   addImageTextWaterMask,
   addImageTextWaterMaskForImage,
   addWaterMask,
-  getAudioDuration
+  getAudioDuration,
+  getFileInfo,
+  clearMetadata,
 };
