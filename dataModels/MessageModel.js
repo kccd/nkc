@@ -468,7 +468,7 @@ messageSchema.statics.getParametersData = async (message) => {
       forumsName = forums.map(f => f.displayName).join('、');
     }
     let threadCategoriesName = threadCategories.map(tc => {
-      return `${tc.categoryName}-${tc.nodeName}`
+      return `${tc.categoryName} - ${tc.nodeName}`
     });
     parameters = {
       threadTitle: firstPost.t,
