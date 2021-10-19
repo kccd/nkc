@@ -131,7 +131,7 @@ NKC.modules.MoveThread = function() {
             color: f.color
           });
         }
-        if(forums.length === 0) return screenTopWarning("请至少选择一个专业");
+        if(forums.length === 0 && this.moveType === 'replace') return screenTopWarning("请至少选择一个专业");
         const selectedThreadCategoriesId = this.getSelectedThreadCategoriesId();
         this_.callback({
           forumsId: this.selectedForumsId,
