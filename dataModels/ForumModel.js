@@ -415,6 +415,38 @@ const forumSchema = new Schema({
       type: Number,
       default: 1
     },
+  },
+  // 限制访问
+  disablePost: {
+    status: {
+      type: String,
+      default: 'inherit', // 'enabled', 'disabled', 'inherit'
+    },
+    // 受限截止时间
+    time: {
+      type: String,
+      default: ''
+    },
+    // 受限时的提示信息
+    errorInfo: {
+      type: String,
+      default: '根据相关法律法规和政策，内容不予显示。'
+    },
+    // 证书白名单
+    rolesId: {
+      type: [String],
+      default: []
+    },
+    // 用户等级白名单
+    gradesId: {
+      type: [Number],
+      default: []
+    },
+    // 是否允许作者本人访问自己发表的受限的内容
+    allowAuthor: {
+      type: Boolean,
+      default: true
+    }
   }
 }, {toObject: {
 		getters: true,
@@ -1555,7 +1587,8 @@ forumSchema.statics.createNewThread = async function(options) {
     mainForumsId: options.fids,
     // mid: options.uid,
     uid: options.uid,
-    type: options.type
+    type: options.type,
+    tcId: options.tcId,
   };
   // 专栏相关，暂时保留，并不启用
   // --------

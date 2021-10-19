@@ -15,7 +15,7 @@ router
       console.log(e);
       ctx.throw(404, '资源不见了 :(')
     }
-
+    await resource.filenameFilter();
     const freeTime = 24 * 60 * 60 * 1000;
     const {needScore, reason} = await resource.checkDownloadCost(user, freeTime);
     if(needScore) {

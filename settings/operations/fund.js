@@ -102,6 +102,9 @@ module.exports = {
         },
         giveup: {
 				  POST: 'visitFundApplicationFormSettings'
+        },
+        withdraw: {
+          POST: 'visitFundApplicationFormSettings'
         }
 			},
       manage: {
@@ -126,6 +129,12 @@ module.exports = {
         },
         timeout: {
 			    POST: 'timeoutFundApplicationForm'
+        },
+        withdraw: {
+          POST: 'withdrawFundApplicationForm'
+        },
+        refund: {
+          POST: 'refundFundApplicationForm'
         }
       },
 			/*comment: {
@@ -168,7 +177,11 @@ module.exports = {
 			},
 			disabled: {
 				PUT: 'modifyFundApplicationFormStatus'
-			}
+			},
+      refund: {
+        GET: 'fundApplicationFormRefund',
+        POST: 'fundApplicationFormRefund'
+      }
 		}
 	}
 };

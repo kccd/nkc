@@ -25,12 +25,22 @@ router
     } catch(err) {
       ctx.throw(403, `因为缺少必要的账户信息，无法完成该操作。具体信息：${err.message}`);
     }
-		const {c, t, fids, cids, cat, mid, columnMainCategoriesId = [], columnMinorCategoriesId = [], anonymous = false, survey} = post;
+		const {
+      c,
+      t,
+      fids,
+      columnMainCategoriesId = [],
+      columnMinorCategoriesId = [],
+      anonymous = false,
+      survey,
+      tcId = []
+    } = post;
 		if(t.length < 3) ctx.throw(400, `标题不能少于3个字`);
 		if(t.length > 100) ctx.throw(400, `标题不能超过100个字`);
 		const content = customCheerio.load(c).text();
 		if(content.length < 2) ctx.throw(400, `内容不能少于2个字`);
 		if(content.length > 100000) ctx.throw(400, `内容不能超过10万字`);
+    await db.ThreadCategoryModel.checkCategoriesId(tcId);
     nkcModules.checkData.checkString(c, {
       name: "内容",
       minLength: 1,
@@ -118,6 +128,7 @@ router
     const {fid} = params;
     const {ThreadModel, ForumModel} = db;
     const forum = await ForumModel.findOnly({fid});
+		//获取专业的所有子专业
     const allChildrenFid = await db.ForumModel.getAllChildrenForums(forum.fid);
 		if(allChildrenFid.length !== 0) {
 			ctx.throw(400, `该专业下仍有${allChildrenFid.length}个专业, 请转移后再删除该专业`);
@@ -264,8 +275,10 @@ router
     latestFid.push(forum.fid);
     data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads.filter(fid => !latestFid.includes(fid)));
 
-		 // 加载同级的专业
+		// 加载同级的专业
+			//获取父级专业
     const parentForums = await forum.extendParentForums();
+		data.parentForums = parentForums;
     let parentForum;
     if(parentForums.length !== 0) parentForum = parentForums[0];
 		if(parentForum) {
@@ -273,13 +286,22 @@ router
 			const visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user, parentForum.fid);
 			// 拿到parentForum专业下一级能看到入口的专业
 			data.sameLevelForums = await parentForum.extendChildrenForums({fid: {$in: visibleFidArr}});
+			//排除当前专业
+			if(data.sameLevelForums && data.sameLevelForums.length){
+				data.sameLevelForums = data.sameLevelForums.filter(c => c.fid !== forum.fid)
+			}
 		} else {
 			// 拿到能看到入口的所有专业id
 			let visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
       visibleFidArr = visibleFidArr.filter(f => f !== forum.fid);
 			// 拿到能看到入口的顶级专业
-			data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
+			// data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
 		}
+		// //排除当前专业
+		// if(data.sameLevelForums && data.sameLevelForums.length){
+		// 	data.sameLevelForums = data.sameLevelForums.filter(c => c.fid !== forum.fid)
+		// }
+
 
 		data.subUsersCount = await db.SubscribeModel.countDocuments({cancel: false, fid, type: "forum"});
 		if(data.user) {

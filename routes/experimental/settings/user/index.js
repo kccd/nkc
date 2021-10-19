@@ -129,7 +129,7 @@ userRouter
       username = `${serverSettings.websiteCode}-${targetUser.uid}`;
     }
     // 邮箱检测
-    if(targetUsersPersonal.email !== email) {
+    if(targetUsersPersonal.email !== email && !!email) {
       const sameEmailUser = await db.UsersPersonalModel.findOne({uid: {$ne: uid}, email: email.toLowerCase()});
       if(sameEmailUser) ctx.throw(400, "邮箱已存在，请更换");
     }

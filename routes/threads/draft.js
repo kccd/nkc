@@ -34,8 +34,11 @@ router
 
     for(const r of results) {
       const {type, thread, post} = r;
+      let targetUser;
       if(type === "thread") {
-        data.targetUser = await thread.extendUser();
+        // 退修文章
+        targetUser = await thread.extendUser();
+        data.targetUser = targetUser;
         data.thread = thread;
         data.post = post;
         await thread.updateOne({recycleMark: true});
@@ -51,38 +54,11 @@ router
           noticeType: remindUser
         });
         await delLog.save();
-        if(violation) {
-          await db.UsersScoreLogModel.insertLog({
-            user: data.targetUser,
-            type: 'score',
-            typeIdOfScoreChange: 'violation',
-            port: ctx.port,
-            ip: ctx.address,
-            key: 'violationCount',
-            description: reason || '退回文章并标记为违规'
-          });
-          await db.KcbsRecordModel.insertSystemRecord('violation', data.targetUser, ctx);
-        }
-        if(remindUser) {
-          const mId = await db.SettingModel.operateSystemID('messages', 1);
-          const message = db.MessageModel({
-            _id: mId,
-            ty: 'STU',
-            r: thread.uid,
-            c: {
-              type: 'threadWasReturned',
-              tid: thread.tid,
-              rea: reason
-            }
-          });
-          await message.save();
-          await ctx.nkcModules.socket.sendMessageToUser(message._id);
-        }
         if(!thread.reviewed) await db.ReviewModel.newReview("returnThread", post, user, reason);
       } else {
         // 退修回复
         if(post.disabled) continue;
-        const targetUser = await db.UserModel.findOnly({uid: post.uid});
+        targetUser = await db.UserModel.findOnly({uid: post.uid});
         if(!threadsId.includes(thread.tid)) {
           threads.push(thread);
           threadsId.push(thread.tid);
@@ -102,33 +78,43 @@ router
           noticeType: remindUser
         });
         await delLog.save();
-        if(remindUser) {
-          const mId = await db.SettingModel.operateSystemID("messages", 1);
-          const message = db.MessageModel({
-            _id: mId,
-            r: post.uid,
-            ty: "STU",
-            c: {
-              type: "postWasReturned",
-              pid: post.pid,
-              rea: reason
-            }
-          });
-          await message.save();
-          await ctx.nkcModules.socket.sendMessageToUser(message._id);
+      }
+      // 标记为违规
+      if(violation) {
+        await db.UsersScoreLogModel.insertLog({
+          user: targetUser,
+          type: 'score',
+          typeIdOfScoreChange: 'violation',
+          port: ctx.port,
+          ip: ctx.address,
+          key: 'violationCount',
+          description: reason || (type === 'thread'? '退回文章并标记为违规': '退回回复并标记为违规')
+        });
+        await db.KcbsRecordModel.insertSystemRecord('violation', targetUser, ctx);
+      }
+      // 发送退修或回复通知给用户
+      if(remindUser) {
+        const mId = await db.SettingModel.operateSystemID("messages", 1);
+        const messageObj = {
+          _id: mId,
+          r: post.uid,
+          ty: 'STU',
+          c: {
+            rea: reason
+          }
+        };
+        if(type === 'thread') {
+          messageObj.c.type = 'threadWasReturned';
+          messageObj.c.tid = thread.tid;
+        } else if(type === 'post') {
+          messageObj.c.type = 'postWasReturned';
+          messageObj.c.pid = post.pid;
+        } else {
+          ctx.throw(500, `post type error. pid: ${post.pid} type: ${type}`);
         }
-        if(violation) {
-          await db.UsersScoreLogModel.insertLog({
-            user: targetUser,
-            type: 'score',
-            typeIdOfScoreChange: 'violation',
-            port: ctx.port,
-            ip: ctx.address,
-            key: 'violationCount',
-            description: reason || '退回回复并标记为违规'
-          });
-          await db.KcbsRecordModel.insertSystemRecord('violation', targetUser, ctx);
-        }
+        const message = db.MessageModel(messageObj);
+        await message.save();
+        await ctx.nkcModules.socket.sendMessageToUser(message._id);
       }
     }
     // 退修回复后，需要更新文章

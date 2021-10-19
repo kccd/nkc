@@ -5,9 +5,26 @@ module.exports = {
     POST: "experimentalLogin"
   },
 	settings: {
-    tools: {
-      GET: "visitToolsManager"
+    threadCategory: {
+      GET: 'experimentalThreadCategorySettings',
+      POST: 'experimentalThreadCategorySettings',
+      PUT: 'experimentalThreadCategorySettings',
+      PARAMETER: {
+        PUT: 'experimentalThreadCategorySettings',
+        DELETE: 'experimentalThreadCategorySettings'
+      }
     },
+		tools: {
+		  GET: "visitToolsManager"
+		},
+		complaint:{
+      GET:"experimentalComplaintSettings",
+      PUT: "experimentalComplaintSettings",
+      type: {
+        POST:"experimentalComplaintSettings",
+        PUT:"experimentalComplaintSettings"
+      },
+		},
 	  ip: {
 	    GET: 'experimentalIPSettings',
       POST: 'experimentalIPSettings',

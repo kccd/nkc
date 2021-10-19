@@ -117,6 +117,7 @@ func.sendPostMessage = async (pid) => {
 async function sendMessageToUser(channel, message) {
   const socketClient = communication.getCommunicationClient();
   // let {io} = global.NKC;
+  //获取用户房间名
   let userRoom = uid => getRoomName("user", uid);
   let userMessage = "message";
 
@@ -125,6 +126,7 @@ async function sendMessageToUser(channel, message) {
 
   try{
     message = JSON.parse(message);
+    //判断消息类型
     const _message = await db.MessageModel.extendMessage(undefined, message);
     message._message = _message;
 

@@ -46,9 +46,11 @@ const userSensitiveRouter = require("./userSensitive");
 const userScoresRouter = require("./userScores");
 const verificationRouter = require('./verification');
 const sensitiveWordsRouter = require('./sensitiveWords');
+const threadCategoryRouter = require('./threadCategory');
 const visitRouter = require('./visit');
 const ipRouter = require('./ip');
 const fundRouter = require('./fund');
+const complaintRouter = require('./complaint');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -104,5 +106,7 @@ settingRouter
   .use('/fund', fundRouter.routes(), fundRouter.allowedMethods())
   .use('/ip', ipRouter.routes(), ipRouter.allowedMethods())
   .use('/tools', toolsRouter.routes(), toolsRouter.allowedMethods())
-	.use('/sensitiveWords', sensitiveWordsRouter.routes(), sensitiveWordsRouter.allowedMethods());
+	.use('/sensitiveWords', sensitiveWordsRouter.routes(), sensitiveWordsRouter.allowedMethods())
+	.use('/complaint', complaintRouter.routes(), complaintRouter.allowedMethods())
+  .use('/threadCategory', threadCategoryRouter.routes(), threadCategoryRouter.allowedMethods())
 module.exports = settingRouter;

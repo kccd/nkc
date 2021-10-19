@@ -33,6 +33,7 @@ const defaultHomeBigLogo = siteSpecificPath + '/kclogo_misaka1.png';
 const deletedPhotoPath = defaultPath + '/deleted_photo.jpg';
 const disabledPhotoPath = defaultPath + '/disabled_photo.jpg';
 const defaultSiteIconPath = siteSpecificPath + '/favicon.ico';
+const defaultNoAccessImagePath = defaultPath + '/no_access.jpg';
 // 默认表情图
 const defaultStickerImage = defaultPath + '/default_avatar.gif';
 const defaultScoreIconPath = defaultPath + '/kcb.png';
@@ -73,5 +74,6 @@ module.exports = {
   defaultColumnBannerPath,
   defaultPosterPath,
   defaultHomeBigLogo,
-  defaultStickerImage
+  defaultStickerImage,
+  defaultNoAccessImagePath
 };

@@ -9,6 +9,7 @@ const statics = require('../settings/statics');
 const FileType = require('file-type');
 const PATH = require('path');
 const folderTools = require("../nkcModules/file");
+const ffmpeg = require("../tools/ffmpeg") 
 
 const schema = new Schema({
   // 附件ID mongoose.Types.ObjectId().toString()
@@ -269,11 +270,21 @@ schema.statics.getWatermarkFilePath = async (c) => {
   const SM = mongoose.model('settings');
   const uploadSettings = await SM.getSettings('upload');
   const id = uploadSettings.watermark[`${c}AttachId`];
+  //判断如果用户未上传水印图片就换未默认图片
   if(!id) {
     return statics[`${c}Watermark`];
   }
-  const water = await AP.findById(id);
-  return await water.getFilePath();
+  let water = await AP.findById(id);
+ //判断如果用户上传了图片根据id找不到图片就替换为默认图片
+  if(water == null){
+    return statics[`${c}Watermark`];
+  }
+  let filePath =  await water.getFilePath();
+  //判断如果用户上传了图片找不到图片路径就替换为默认图片
+  if(!filePath){
+    return statics[`${c}Watermark`];
+  }
+  return filePath;
 }
 
 /**
@@ -635,7 +646,7 @@ schema.statics.saveProblemImages = async (_id, files = []) => {
  * 身份认证材料存储
  * @returns {string} 附件id
  */
-schema.statics.saveVerifiedUpload = async ({ size, hash, name, path, uid, toc }) => {
+ schema.statics.saveVerifiedUpload = async ({ size, hash, name, path, uid, toc }) => {
   const VerifiedUploadModel = mongoose.model("verifiedUpload");
   const _id = await VerifiedUploadModel.getNewId();
   const ext = PATH.extname(name).substring(1);

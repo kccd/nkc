@@ -276,6 +276,7 @@ schema.statics.transfer = async (props) => {
   } catch(err) {
     record.status = 'failed';
     record.fullData = JSON.stringify({error: err.toString()});
+    record.note = err.toString();
   }
   await record.save();
   if(record.status === 'failed') {

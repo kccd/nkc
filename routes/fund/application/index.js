@@ -10,6 +10,7 @@ const managementRouter = require('./manage');
 const memberRouter = require('./member');
 const excellentRouter = require('./excellent');
 const disabledRouter = require('./disabled');
+const refundRouter = require('./refund');
 const applicationRouter = new Router();
 const apiFn = require('../../../nkcModules/apiFunction');
 applicationRouter
@@ -350,6 +351,7 @@ applicationRouter
   .use('/:_id/manage', managementRouter.routes(), managementRouter.allowedMethods())
 	.use('/:_id/member', memberRouter.routes(), memberRouter.allowedMethods())
 	.use('/:_id/excellent', excellentRouter.routes(), excellentRouter.allowedMethods())
+  .use('/:_id/refund', refundRouter.routes(), refundRouter.allowedMethods())
 	.use('/:_id/disabled', disabledRouter.routes(), disabledRouter.allowedMethods())
 	//屏蔽敏感信息
 	.use('/', async (ctx, next) => {

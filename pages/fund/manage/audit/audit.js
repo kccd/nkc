@@ -74,7 +74,6 @@ window.app = new Vue({
         }
         total += r.money * 100;
       }
-      console.log(total, this.factMoney)
       if(total !== this.factMoney * 100) {
         return `分期金额不等于实际批准金额`
       }

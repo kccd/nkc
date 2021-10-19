@@ -28,7 +28,7 @@ module.exports = async (options) => {
   } else if(['flac'].includes(extension.toLocaleString())) {
     await ffmpeg.audioFLACTransMP3(path, outputVideoPath)
   } else {
-    await fsPromise.copyFile(path, outputVideoPath);
+    await ffmpeg.audioTransMP3(path, outputVideoPath);
   }
 
   oname = oname.split('.');

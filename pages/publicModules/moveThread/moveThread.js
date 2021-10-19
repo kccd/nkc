@@ -1,3 +1,4 @@
+import List from '../threadCategory/list';
 NKC.modules.MoveThread = function() {
   var this_ = this;
   this_.dom = $("#moduleMoveThread");
@@ -20,12 +21,17 @@ NKC.modules.MoveThread = function() {
       forumCountLimit: 20,
       submitting: false,
       showRecycle: false,
+      threadCategories: [],
+      selectedThreadCategoriesId: [],
 
       recycleId: '',
 
       violation: false,
       remindUser: true,
-      violationReason: ''
+      reason: ''
+    },
+    components: {
+      'thread-category-list': List
     },
     computed: {
 
@@ -126,15 +132,20 @@ NKC.modules.MoveThread = function() {
           });
         }
         if(forums.length === 0) return screenTopWarning("请至少选择一个专业");
+        const selectedThreadCategoriesId = this.getSelectedThreadCategoriesId();
         this_.callback({
           forumsId: this.selectedForumsId,
           forums: forums,
           moveType: this.moveType,
           originForums: this.selectedForums,
           violation: this.violation,
-          violationReason: this.violationReason,
+          reason: this.reason,
           remindUser: this.remindUser,
+          threadCategoriesId: selectedThreadCategoriesId
         });
+      },
+      getSelectedThreadCategoriesId() {
+        return this.$refs.threadCategoryList.getSelectedCategoriesId();
       },
       showThreadType: function(forum) {
         this.forum = forum;
@@ -162,6 +173,8 @@ NKC.modules.MoveThread = function() {
         this_.app.forums = data.forums;
         this_.app.loading = false;
         this_.app.forumCategories = data.forumCategories;
+        this_.app.threadCategories = data.threadCategories;
+        this_.app.selectedThreadCategoriesId = options.selectedThreadCategoriesId || [];
         if(!this_.app.forumType) this_.app.forumType = this_.app.forumCategories[0]._id;
         this_.app.forumCountLimit = 20;
         if(options) {

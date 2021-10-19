@@ -96,17 +96,19 @@ function moveSelectedThreads() {
     var moveType = data.moveType;
     var {
       violation,
-      violationReason,
-      remindUser
+      reason,
+      remindUser,
+      threadCategoriesId,
     } = data;
     MoveThread.lock();
     nkcAPI("/threads/move", "POST", {
       forums: forums,
       moveType: moveType,
       threadsId: threadsId,
+      threadCategoriesId,
       violation,
       remindUser,
-      violationReason
+      reason
     })
       .then(function() {
         screenTopAlert("操作成功");

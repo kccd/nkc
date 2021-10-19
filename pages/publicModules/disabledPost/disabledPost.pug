@@ -18,9 +18,9 @@
             label 原因
             textarea.form-control(rows=5 placeholder="请输入原因..." v-model="reason")
           .form-group.m-b-0
-            .checkbox(v-if="type !== 'toDraft'")
+            .checkbox
               label
-                input(type="checkbox" :value="true" v-model="remindUser")
+                input(type="checkbox" :value="true" v-model="remindUser" :disabled='type === "toDraft"')
                 span 通知用户
             .checkbox.m-b-0
               label

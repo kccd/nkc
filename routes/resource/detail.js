@@ -34,6 +34,7 @@ router
     detail.description = description;
 
     await resource.setFileExist();
+    await resource.filenameFilter();
     detail.resource = resource.toObject();
     return next();
   })

@@ -20,20 +20,25 @@ const schema = new Schema({
     default: Date.now,
     index: 1
   },
-  // 投诉对象类型 文章、用户、回复
+  // 投诉对象类型 文章、用户、回复、文库文件
   type: {
-    type: String, // thread, user, post
+    type: String, // thread, user, post, library
     required: true,
     index: 1
   },
-  // 投诉的原因类型
-  reasonType: {
+  // 投诉的原因类型id
+  reasonTypeId: {
     type: String,
     required: true,
     index: 1
   },
   // 投诉补充说明
   reasonDescription: {
+    type: String,
+    default: ""
+  },
+  // 投诉类型名称 废弃
+  reasonType: {
     type: String,
     default: ""
   },
@@ -79,8 +84,15 @@ schema.statics.extendComplaints = async (complaints) => {
   const UserModel = mongoose.model("users");
   const PostModel = mongoose.model("posts");
   const ThreadModel = mongoose.model("threads");
-  const uid = new Set(), pid = new Set(), tid = new Set();
-  const userObj = {}, postObj = {}, threadObj = {};
+  const LibraryModel = mongoose.model("libraries");
+  const uid = new Set();
+  const pid = new Set();
+  const tid = new Set();
+  const lid = new Set();
+  const userObj = {};
+  const postObj = {};
+  const threadObj = {};
+  const libraryObj = {};
   complaints.map(c => {
     const {type} = c;
     uid.add(c.uid);
@@ -90,6 +102,8 @@ schema.statics.extendComplaints = async (complaints) => {
       tid.add(c.contentId);
     } else if(type === "post") {
       pid.add(c.contentId);
+    } else if(type === "library") {
+      lid.add(c.contentId);
     }
     if(c.handlerId) uid.add(c.handlerId);
   });
@@ -97,6 +111,7 @@ schema.statics.extendComplaints = async (complaints) => {
   const users = await UserModel.find({uid: {$in: [...uid]}});
   let posts = await PostModel.find({pid: {$in: [...pid]}});
   let threads = await ThreadModel.find({tid: {$in: [...tid]}});
+  let libraries = await LibraryModel.find({_id: {$in: [...lid]}});
   posts = await PostModel.extendPosts(posts, {
     user: true,
     userGrade: false,
@@ -116,7 +131,7 @@ schema.statics.extendComplaints = async (complaints) => {
     htmlToText: false,
     count: 200
   });
-
+  libraries = await LibraryModel.extendLibraries(libraries)
   users.map(user => {
     userObj[user.uid] = user;
   });
@@ -126,6 +141,10 @@ schema.statics.extendComplaints = async (complaints) => {
   }
   threads.map(thread => {
     threadObj[thread.tid] = thread;
+  });
+
+  libraries.map(library => {
+    libraryObj[library._id] = library;
   });
 
   const results = [];
@@ -140,6 +159,8 @@ schema.statics.extendComplaints = async (complaints) => {
       r.content = postObj[c.contentId];
     } else if(type === "thread"){
       r.content = threadObj[c.contentId];
+    } else if(type === "library"){
+      r.content = libraryObj[c.contentId];
     }
     if(r.handlerId) {
       r.handler = userObj[c.handlerId];

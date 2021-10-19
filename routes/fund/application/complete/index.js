@@ -50,10 +50,10 @@ completeRouter
       for(let i = 0; i < actualMoney.length; i++) {
         const {
           purpose,
-          model,
+          model = '',
           money,
           count,
-          unit,
+          unit = '',
         } = actualMoney[i];
         const baseName = `资金预算第 ${i + 1} 项 - `;
         checkString(purpose, {
@@ -90,7 +90,7 @@ completeRouter
         });
       }
 
-      if(actualMoney.length === 0) ctx.throw(400, '请输入实际使用金额。');
+      // if(actualMoney.length === 0) ctx.throw(400, '请输入实际使用金额。');
 
       await applicationForm.updateOne({actualMoney: _actualMoney});
     }

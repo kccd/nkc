@@ -9,9 +9,13 @@ router
       threadsId,
       forums,
       violation,
-      violationReason,
-      remindUser
+      reason,
+      remindUser,
+      threadCategoriesId,
     } = body;
+
+    if(remindUser && !reason) ctx.throw(400, `请输入原因`);
+
     const forumsObj = {};
     const forumsId = new Set();
     const threadTypesId = new Set();
@@ -45,7 +49,39 @@ router
     const users = await db.UserModel.find({uid: {$in: usersId}});
     const usersObj = {};
     users.map(u => usersObj[u.uid] = u);
+
+    const categoryTree = await db.ThreadCategoryModel.getCategoryTree();
+    const categoryObj = {};
+    for(const c of categoryTree) {
+      categoryObj[c._id] = c.nodes.map(n => n._id);
+      for(const n of c.nodes) {
+        categoryObj[n._id] = [];
+      }
+    }
+    let oldNodesId = [];
+    let newNodesId = [];
+    for(const c of threadCategoriesId) {
+      const nodesId = categoryObj[c.cid];
+      if(!nodesId) {
+        ctx.throw(500, `文章属性错误 cid: ${c.cid}`);
+      }
+      oldNodesId = oldNodesId.concat(nodesId);
+      if(c.nodeId === 'default') continue;
+      const node = categoryObj[c.nodeId];
+      if(!node) {
+        ctx.throw(500, `文章属性错误 cid: ${c.nodeId}`);
+      }
+      newNodesId.push(c.nodeId);
+    }
     for(const thread of threads) {
+
+      // 处理文章属性
+      let {tcId} = thread;
+      tcId = tcId.filter(id => !oldNodesId.includes(id));
+      tcId = tcId.concat(newNodesId);
+      tcId = [...new Set(tcId)];
+      thread.tcId = tcId;
+
       if(moveType === 'add') {
         let {mainForumsId, categoriesId} = thread;
         if(mainForumsId.includes(recycleId)) ctx.throw(403, `无法给回收站中的文章添加专业`);
@@ -57,7 +93,8 @@ router
         const newCategoriesId = [...new Set(categoriesId)];
         await thread.updateOne({
           mainForumsId: newMainForumsId,
-          categoriesId: newCategoriesId
+          categoriesId: newCategoriesId,
+          tcId
         });
         await thread.updateThreadMessage();
         thread.mainForumsId = newMainForumsId;
@@ -66,15 +103,14 @@ router
         await thread.updateOne({
           mainForumsId: [...forumsId],
           categoriesId: [...threadTypesId],
-          disabled: false
+          disabled: false,
+          tcId
         });
         await thread.updateThreadMessage();
         thread.mainForumsId = [...forumsId];
         thread.categoriesId = [...threadTypesId];
       }
 
-
-      // 处理违规
       if(violation) {
         const u = usersObj[thread.uid];
         if(!u) continue;
@@ -87,24 +123,26 @@ router
           ip: ctx.address,
           key: 'violationCount',
           tid: thread.tid,
-          description: violationReason || '移动文章并标记为违规'
+          description: reason || '移动文章并标记为违规'
         });
-        if(remindUser) {
-          const mId = await db.SettingModel.operateSystemID('messages', 1);
-          const message = db.MessageModel({
-            _id: mId,
-            ty: 'STU',
-            r: thread.uid,
-            c: {
-              type: 'violation',
-              tid: thread.tid,
-              rea: violationReason
-            }
-          });
-          await message.save();
-          await ctx.nkcModules.socket.sendMessageToUser(message._id);
-        }
+      }
 
+      if(remindUser) {
+        const newThread = await db.ThreadModel.findOnly({tid: thread.tid}, {mainForumsId: 1});
+        const mId = await db.SettingModel.operateSystemID('messages', 1);
+        const message = db.MessageModel({
+          _id: mId,
+          ty: 'STU',
+          r: thread.uid,
+          c: {
+            type: 'moveThread',
+            tid: thread.tid,
+            rea: reason,
+            forumsId: newThread.mainForumsId
+          }
+        });
+        await message.save();
+        await ctx.nkcModules.socket.sendMessageToUser(message._id);
       }
     }
 

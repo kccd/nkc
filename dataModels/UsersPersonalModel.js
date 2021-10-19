@@ -4,6 +4,8 @@ const settings = require('../settings');
 const folderTools = require("../nkcModules/file");
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
+const ffmpeg = require("../tools/ffmpeg");
+const FILE = require("../nkcModules/file")
 
 const usersPersonalSchema = new Schema({
   uid: {
@@ -316,7 +318,8 @@ const usersPersonalSchema = new Schema({
 		card: {
 			status: {
 				type: String,
-				default: "unsubmit"
+				default: "unsubmit",
+				index: 1
 			},
 			message: {
 			  type: String,
@@ -334,7 +337,8 @@ const usersPersonalSchema = new Schema({
 		video: {
 			status: {
 				type: String,
-				default: "unsubmit"
+				default: "unsubmit",
+				index: 1
 			},
 			message: {
 			  type: String,
@@ -662,12 +666,25 @@ usersPersonalSchema.methods.generateAuthenticateVerify3 = async function(file, c
 	if(!file) {
 		throw new Error("must get a video file.");
 	}
+	// if ext = mp4 不做任何处理
+	// if ext !== mp4 转格式 
+	// nkcModules.file.getFileObjectBy获取转换格式后文件的file属性
+	const VerifiedUploadModel = mongoose.model("verifiedUpload");
+	const _id = await VerifiedUploadModel.getNewId();
+	const date = new Date();
+	const targetFilePath = path.dirname(file.path);
+	const newTargetFilePath = path.join(targetFilePath, `${_id}_tmp.mp4`)
+	await ffmpeg.videoTransMP4(file.path, newTargetFilePath);
+	const newFile = await FILE.getFileObjectByFilePath(newTargetFilePath);
 	const aid = await AttachmentModel.saveVerifiedUpload({
-		size: file.size,
-		hash: file.hash,
-		name: file.name,
-		path: file.path,
-		uid: this.uid
+		_id,
+		size: newFile.size,
+		hash: newFile.hash,
+		ext: "mp4",
+		name: newFile.name,
+		path: newFile.path,
+		uid: this.uid,
+		toc:date,
 	});
 	await this.updateOne({
 		$set: {

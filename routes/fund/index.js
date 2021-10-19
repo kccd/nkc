@@ -52,6 +52,7 @@ fundRouter
     	disabled: false,
 	    useless: null,
 			'status.submitted': true,
+      'lock.submitted': true,
 	    'status.adminSupport': {$ne: true}
     };
     const queryOfFunding = {

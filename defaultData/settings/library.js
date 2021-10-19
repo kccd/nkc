@@ -18,6 +18,10 @@ module.exports = {
         operations: ["createFolder", ...]
       } */
       grades: []
+    },
+    libraryTip: {
+      tipShow: "",
+      tipUpload: ""
     }
   }
 };

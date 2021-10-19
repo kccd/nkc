@@ -1098,7 +1098,8 @@ function moveThread() {
 	window.MoveThread.open(function(data) {
 		var forums = data.forums;
 		var moveType = data.moveType;
-		const {violation, violationReason, remindUser} = data;
+    const threadCategoriesId = data.threadCategoriesId;
+		const {violation, reason, remindUser} = data;
 		window.MoveThread.lock();
 		nkcAPI("/threads/move", "POST", {
 			forums: forums,
@@ -1106,7 +1107,8 @@ function moveThread() {
 			threadsId: [threadData.tid],
       violation,
       remindUser,
-      violationReason
+      threadCategoriesId,
+      reason
 		})
 			.then(function() {
 				screenTopAlert("操作成功");
@@ -1118,8 +1120,9 @@ function moveThread() {
 			})
 	}, {
 		selectedCategoriesId: threadData.categoriesId,
-		selectedForumsId: threadData.mainForumsId
-	})
+		selectedForumsId: threadData.mainForumsId,
+    selectedThreadCategoriesId: threadData.tcId
+	});
 }
 
 function deleteThread() {

@@ -15,7 +15,7 @@ router
   .put('/', async (ctx, next) => {
     const {db, data, body, nkcModules} = ctx;
     const {downloadSettings} = body;
-    const {speed, allSpeed, fileCountLimit, freeTime} = downloadSettings;
+    const {speed, allSpeed, fileCountLimit, freeTime, visitorAccess} = downloadSettings;
     const {checkNumber} = nkcModules.checkData;
     const {certList} = data;
     const certListObj = {};
@@ -129,12 +129,25 @@ router
       fractionDigits: 2,
     });
 
+    const {
+      mediaPicture = true,
+      mediaAudio = true,
+      mediaVideo = true,
+      mediaAttachment = true
+    } = visitorAccess;
+
     await db.SettingModel.updateOne({_id: 'download'}, {
       $set: {
         'c.speed': speed,
         'c.allSpeed': allSpeed,
         'c.fileCountLimit': fileCountLimit,
-        'c.freeTime': freeTime
+        'c.freeTime': freeTime,
+        'c.visitorAccess': {
+          mediaAudio,
+          mediaVideo,
+          mediaAttachment,
+          mediaPicture
+        }
       }
     });
     await db.SettingModel.saveSettingsToRedis('download');

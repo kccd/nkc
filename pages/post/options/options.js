@@ -271,9 +271,21 @@ window.PostOption = new Vue({
         window.commentControl = new NKC.modules.CommentControl();
       }
       window.commentControl.open(pid);
+    },
+    complaintSelector(){
+      var self = this;
+      if(!window.complaintSelector)
+          window.complaintSelector = new NKC.modules.ComplaintSelector();
+      if(this.postType === 'thread') {
+        complaintSelector.open("thread", this.tid)
+      } else {
+        complaintSelector.open("post", this.pid)
+      }
+      self.close();
     }
   }
 });
+
 
 NKC.methods.initPostOption = () => {
   const options = $('[data-type="postOption"]');

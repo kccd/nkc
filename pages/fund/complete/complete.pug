@@ -2,11 +2,12 @@ extends ../fundContainer
 block fundTitle
   title 结题
   style.
-    .budget-purpose {
-      max-width: 10rem;
+    .budget-purpose input{
+      min-width: 10rem;
     }
-    .budget-count {
-      max-width: 7rem;
+    .budget-count input, .budget-count span{
+      display: block;
+      min-width: 6rem;
     }
 block fundContent
   include ../applicationForm/budgetMoney
@@ -58,7 +59,8 @@ block fundContent
                             input.form-control(type='text' v-model.number='m.count')
                           th.budget-count
                             input.form-control(type='text' v-model='m.unit')
-                          th {{calculateMoney(m.count, m.money).toFixed(2)}}
+                          th.budget-count
+                            span {{calculateMoney(m.count, m.money).toFixed(2)}}
                           th
                             button.btn.btn-xs.btn-default(@click='removeFromArr(form.actualMoney, index)') 删除
                   .pull-left
@@ -70,8 +72,7 @@ block fundContent
                     strong.text-danger {{returnMoney}}
                     span &nbsp;元
                     span(v-if='returnMoney > 0')
-                      span ，
-                      a(:href='"/fund/donation?fundId=" + form.fundId + "&money=" + returnMoney + "&refund=true"' target='_blank') 去退款
+                      span （结题审核通过后可申请退款）
               .form-group
                 .radio
                   span 总体情况：

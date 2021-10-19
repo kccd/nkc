@@ -10,6 +10,43 @@ block title
       padding-top: 120px;
     }
 block content
+  mixin modifySubmit(id, blockButton)
+    div(id = id v-cloak)
+      hr
+      .checkbox(v-if="havePermissionToSendAnonymousPost")
+        label
+          input(type="checkbox" v-model="anonymous" :value="true" :disabled="!allowedAnonymous")
+          span
+            | 匿名发表
+            span.text-danger(v-if='!allowedAnonymous') (所选专业分类不支持匿名发表)
+      .checkbox
+        label
+          input(type="checkbox" v-model="checkProtocol" :value="true")
+          span
+            | 我已阅读并同意遵守与本次发表相关的全部协议。
+            a(href=`/protocol` target="_blank") 查看协议
+      .checkbox
+        .editor-auto-save(v-if="autoSaveInfo")
+          .fa.fa-check-circle &nbsp;{{autoSaveInfo}}
+      if blockButton
+        .row
+          .col-xs-6.p-r-05
+            button.btn.btn-theme.btn-block(@click="submit" v-if="checkProtocol && !disabledSubmit") 提交
+            button.btn.btn-theme.btn-block(v-else disabled :title="!checkProtocol?'请先勾选同意遵守全部协议':''")
+              span(v-if="disabledSubmit")
+                span 提交中...&nbsp;
+                .fa.fa-spinner.fa-spin
+              span(v-else) 提交
+          .col-xs-6.p-l-05
+            button.btn.btn-default.btn-block(@click="saveToDraft") 存草稿
+      else
+        button.btn.btn-theme(@click="submit" v-if="checkProtocol && !disabledSubmit") 提交
+        button.btn.btn-theme(v-else disabled :title="!checkProtocol?'请先勾选同意遵守全部协议':''")
+          span(v-if="disabledSubmit")
+            span 提交中...&nbsp;
+            .fa.fa-spinner.fa-spin
+          span(v-else) 提交
+        button.btn.btn-default(@click="saveToDraft") 存草稿
   mixin modifyNotice
     .on-edit-notes
       .on-edit-label 您正在修改已经发表的内容，以下提示非常重要，请务必详读。
@@ -18,6 +55,8 @@ block content
   .container-fluid.max-width.editor
     .row
       .col-xs-12.col-md-9.box-shadow-panel.m-b-2
+        if data.postPermission && data.postPermission.warning
+          .m-b-1.text-danger.p-a-1!=data.postPermission.warning
         div
           #notes.m-b-1.m-t-1.m-l-05.m-r-05(v-cloak)
             if data.type === "newPost"
@@ -70,7 +109,7 @@ block content
             hr
             .m-b-2(v-if="['newThread'].indexOf(type) !== -1")
               .editor-header 专业分类
-              div
+              .m-b-1
                 .editor-main-forums
                   h5 主分类（必选）
                   .editor-main-forum(v-if="mainForum")
@@ -85,8 +124,8 @@ block content
                         option(:value='""') 不分类
                       //span(v-if="mainForum.cName") ：{{mainForum.cName}}
                   button.btn.btn-default.btn-sm(@click='selectForumsByType("mainForum")') {{mainForum? '修改': '选择'}}
-                  .editor-main-forum-note(v-if='mainForum && mainForum.forum.noteOfPost') 注意事项：{{mainForum.forum.noteOfPost}}
-              div(v-if='minorForumCount.max > 0')
+                  .editor-main-forum-note.bg-warning.text-warning.p-a-05.bg-border(v-if='mainForum && mainForum.forum.noteOfPost') 注意事项：{{mainForum.forum.noteOfPost}}
+              .m-b-1(v-if='minorForumCount.max > 0')
                 .editor-main-forums
                   h5 辅分类
                     |&nbsp;(
@@ -106,10 +145,27 @@ block content
                           option(:value='""') 不分类
                         //span(v-if="mf.cName") ：{{mf.cName}}
                       .fa.fa-trash-o(@click="removeSelectedForums(index + 1)" title="移除")
-                    .editor-main-forum-note(v-if='mf && mf.forum.noteOfPost') 注意事项：{{mf.forum.noteOfPost}}
+                    .editor-main-forum-note.bg-warning.text-warning.p-a-05.bg-border(v-if='mf && mf.forum.noteOfPost') 注意事项：{{mf.forum.noteOfPost}}
                   button.btn.btn-default.btn-sm(v-if='!mainForum' disabled title='请先选择主分类') 添加
                   button.btn.btn-default.btn-sm(v-else-if='minorForums.length >= minorForumCount.max' disabled title='辅分类数量已达上限') 添加
                   button.btn.btn-default.btn-sm(v-else @click='selectForumsByType("minorForum")') 添加
+              div(v-if='threadCategories.length > 0')
+                .editor-thread-category(v-for='c in threadCategories' v-if='c.nodes.length > 0')
+                  .editor-header(:title='c.description') {{c.name}}
+                  .editor-thread-category-nodes
+                    .editor-thread-category-node(
+                      v-for='n in c.nodes'
+                      @click='selectThreadCategory(c, n)'
+                      :class='{"active": c.selectedNode === n}'
+                      :title='n.description'
+                      )
+                      span {{n.name}}
+                    .editor-thread-category-node(
+                      @click='selectThreadCategory(c, "default")'
+                      :class='{"active": c.selectedNode === "default"}'
+                      )
+                      span {{c.nodeName}}
+                  .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(v-if='c.selectedNode && c.selectedNode.warning') 注意事项：{{c.selectedNode.warning}}
             .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
               .editor-header 封面图
                 small （如未指定，默认从内容中选取）
@@ -214,41 +270,18 @@ block content
                     id="disabledSurveyButton"
                   ) 创建
                 include ../publicModules/survey/edit
-          #postButton(v-cloak)
-            hr
-            .checkbox(v-if="havePermissionToSendAnonymousPost")
-              label(v-if="allowedAnonymous")
-                input(type="checkbox" v-model="anonymous" :value="true")
-                span
-                  | 匿名发表
-              label(v-else)
-                input(type="checkbox" v-model="anonymous" :value="true" disabled)
-                span
-                  | 匿名发表
-                  span.text-danger （所选专业分类不支持匿名发表）
-            .checkbox
-              label
-                input(type="checkbox" v-model="checkProtocol" :value="true")
-                span
-                  | 我已阅读并同意遵守与本次发表相关的全部协议。
-                  a(href=`/protocol` target="_blank") 查看协议
-            .checkbox
-              .editor-auto-save(v-if="autoSaveInfo")
-                .fa.fa-check-circle &nbsp;{{autoSaveInfo}}
-            button.btn.btn-theme(@click="submit" v-if="checkProtocol && !disabledSubmit") 提交
-            button.btn.btn-theme(v-else disabled :title="!checkProtocol?'请先勾选同意遵守全部协议':''")
-              span(v-if="disabledSubmit")
-                span 提交中...&nbsp;
-                .fa.fa-spinner.fa-spin
-              span(v-else) 提交
-            button.btn.btn-default(@click="saveToDraft") 存草稿
-
-
-      .col-xs-12.col-md-3.box-shadow-panel
+          +modifySubmit("PostButton")
+      mixin editorInto
+        h5.text-danger 温馨提示：
+        div!=nkcRender.plainEscape(state.editorSettings.notes)
+      .col-xs-12.col-md-3.box-shadow-panel#FloatPostButtonContainerTemplate
         div
-          h5.text-danger 温馨提示：
-          div!=nkcRender.plainEscape(state.editorSettings.notes)
-  .hidden#data=objToStr({minorForumCount: data.minorForumCount, originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft, websiteCode: data.websiteCode, toColumn: !!data.toColumn})
+          +editorInto
+      .col-xs-12.col-md-3.box-shadow-panel#FloatPostButtonContainer
+        div
+          +editorInto
+          +modifySubmit("FloatPostButton", true)
+  .hidden#data=objToStr({minorForumCount: data.minorForumCount, originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft, websiteCode: data.websiteCode, toColumn: !!data.toColumn, threadCategories: data.threadCategories})
 block scripts
   include ../ueditor/ueditorBase
   include ../publicModules/moment

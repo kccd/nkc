@@ -44,7 +44,7 @@ block nkcContent
                 a(href=`/f/${f.fid}` target='_blank' data-float-fid=f.fid)=f.displayName
 
             .post-options
-              .hidden(id=`data_${post.pid}`)=objToStr({tid: post.thread.tid, pid: post.pid, mainForumsId: post.mainForumsId, categoriesId: post.categoriesId})
+              .hidden(id=`data_${post.pid}`)=objToStr({tid: post.thread.tid, pid: post.pid, mainForumsId: post.mainForumsId, categoriesId: post.categoriesId, tcId: post.tcId})
               if post.status === 'disabled'
                 span.status 已被屏蔽
               else if post.status === 'toDraft'

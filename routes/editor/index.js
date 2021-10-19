@@ -291,7 +291,18 @@ router
         data.permissionInfo = `你暂无法发表内容，因为${err.message}。`;
       }
     }
+
+    // 编辑器上边有关权限的提示
+    if(data.type === 'newPost') {
+      data.postPermission = await db.UserModel.getPostPermission(state.uid, 'post', selectedForumsId);
+    } else if(data.type === 'newThread') {
+      data.postPermission = await db.UserModel.getPostPermission(state.uid, 'thread', []);
+    }
+
     state.editorSettings = await db.SettingModel.getSettings("editor");
+
+    // 多维分类
+    data.threadCategories = await db.ThreadCategoryModel.getCategoryTree({disabled: false});
     await next();
   });
 

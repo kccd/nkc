@@ -1,0 +1,19 @@
+if !isIncluded('formNav')
+  style.
+    .fund-form-nav>*{
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #333;
+      margin: 0 0.3rem;
+    }
+    .fund-form-nav>*:hover, .fund-form-nav>*:active{
+      color: #333;
+    }
+  mixin formNav(form, fundName)
+    -var {fund, code, _id} = form;
+    .fund-form-nav.text-center
+      a(href=tools.getUrl('fundHome'))=fundName || '基金'
+      | /
+      a(href=tools.getUrl('singleFundHome', fund._id))=fund.name
+      | /
+      a(href=tools.getUrl('fundApplicationForm', _id))=code

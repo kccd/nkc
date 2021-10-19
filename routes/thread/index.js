@@ -172,13 +172,21 @@ threadRouter
 		data.complaintTypes = ctx.state.language.complaintTypes;
 		// 加载文章，如果文章不存在，此处会抛出404
     const thread = await db.ThreadModel.findOnly({tid});
+    // 拓展文章属性
+    await thread.extendThreadCategories();
     // 拓展文章所属专业
     const forums = await thread.extendForums(['mainForums', 'minorForums']);
     if(forums.length) data.forum = forums[0];
 		// 验证权限 - new
 		// 如果是分享出去的连接，含有token，则允许直接访问
     // 【待改】判断用户是否是通过分享链接阅读文章，如果是则越过权限
-    await db.SettingModel.restrictAccess(thread.toc, data.userRoles.map(role => role._id), data.userGrade._id, state.uid && state.uid === thread.uid);
+    await db.SettingModel.restrictAccess({
+      toc: thread.toc,
+      forums: forums,
+      isAuthor: state.uid && state.uid === thread.uid,
+      userRolesId: data.userRoles.map(role => role._id),
+      userGradeId: data.userGrade._id
+    });
     if(!await db.ShareModel.hasPermission(token, thread.oc)) {
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
     }
@@ -249,11 +257,11 @@ threadRouter
 				const $or = [
 					{
 						disabled: false
-					},
+					}/* ,
 					{
 						disabled: true,
 						toDraft: {$ne: true}
-					}
+					} */
 				];
 				// 用户能查看自己被退回的回复
 				if(data.user) {
@@ -269,11 +277,11 @@ threadRouter
 				const $or = [
 					{
 						disabled: false
-					},
+					}/* ,
 					{
 						disabled: true,
 						toDraft: {$ne: false}
-					}
+					} */
 				];
 				$and.push({$or});
 			}
@@ -542,6 +550,8 @@ threadRouter
         await applicationForm.extendApplicationFormInfo(state.uid, accessForumsId);
         data.applicationForm = applicationForm;
         data.fund = applicationForm.fund;
+        const fundSettings = await db.SettingModel.getSettings('fund');
+        data.fundName = fundSettings.fundName;
         data.userFundRoles = await data.fund.getUserFundRoles(state.uid);
         data.targetUserInFundBlacklist = await db.FundBlacklistModel.inBlacklist(applicationForm.uid);
         await data.applicationForm.hideApplicationFormInfoByUserId(state.uid, ctx.permission('displayFundApplicationFormSecretInfo'));
@@ -692,6 +702,7 @@ threadRouter
     data.threadSettings = await db.SettingModel.getSettings("thread");
     data.postHeight = hidePostSettings.postHeight;
     data.postPermission = await db.UserModel.getPostPermission(state.uid, 'post', thread.mainForumsId);
+    // 加载文章属性
 		data.pid = pid;
 		data.step = step;
 		await next();

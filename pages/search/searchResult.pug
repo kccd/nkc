@@ -56,7 +56,8 @@
             .display-i-b
               .search-result-time
                 div=`注册时间：${targetUser.toc.toLocaleString()}`
-                div(title=targetUser.toc.toLocaleString())=`最后活动：${fromNow(targetUser.tlv)}`
+                div=`最后活动：`
+                  +fromNow(targetUser.tlv)
               .search-result-description!=result.description
   else if result.docType === "column"
     .search-result-user-panel

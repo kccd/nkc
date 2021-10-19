@@ -10,7 +10,10 @@ const vm = new Vue({
 		IDCardAInputFile: null,
 		IDCardBInputFile: null,
 		videoInputFile: null,
-		videoCode: Math.floor(Math.random()*(9999-1000))+1000
+		videoCode: Math.floor(Math.random()*(9999-1000))+1000,
+		loading:false
+	},
+	mounted () {
 	},
 	computed: {
 	  verifyDescription() {
@@ -55,6 +58,12 @@ const vm = new Vue({
 		},
 	},
 	methods: {
+		videoUpdate(file){
+			this.videoInputFile = file;
+			if(file.type !== "video/mp4"){
+				return sweetSuccess("视频上传成功")
+			}
+		},
 		IDCardAInputFileChange(file) {
 			this.IDCardAInputFile = file;
 			console.log(file);
@@ -72,7 +81,9 @@ const vm = new Vue({
 			form.append("surfaceA", IDCardAInputFile);
 			form.append("surfaceB", IDCardBInputFile);
 			try {
-				await nkcUploadFile("verify/verify2_form", "POST", form);
+				await nkcUploadFile("verify/verify2_form", "POST", form).then(()=>{
+				return sweetSuccess("图片提交成功，请等待审核");
+				});
 			} catch (error) {
 				return sweetError(error);
 			}
@@ -87,11 +98,16 @@ const vm = new Vue({
 			form.append("video", videoInputFile);
 			form.append("code", videoCode);
 			try {
-				await nkcUploadFile("verify/verify3_form", "POST", form);
-			} catch (error) {
-				return sweetError(error);
-			}
+			this.loading = true;
+			await nkcUploadFile("verify/verify3_form", "POST", form).then(()=>{
 			this.authenticate.video.status = "in_review";
+			this.loading = false;
+			return sweetSuccess("视频提交成功，请等待审核");
+				});
+			} catch (error) {
+			this.loading = false;
+			return sweetError(error);
+			}
 		}
 	}
 });
@@ -118,7 +134,7 @@ function initEvent(elementId) {
 function submitAuth(uid, number) {
 	nkcAPI('/u/'+uid+'/auth/'+number, 'POST', {})
 		.then(function(data) {
-			screenTopAlert('提交成功，请耐心等待审核。');
+			screenTopAlert('提交成功，请耐心等待审核');
 			setTimeout(function(){window.location.reload()}, 2000)
 		})
 		.catch(function(data) {
@@ -130,7 +146,7 @@ function submitAuth(uid, number) {
 function unSubmitAuth(uid, number) {
 	nkcAPI('/u/'+uid+'/auth?number='+number, 'DELETE',{})
 		.then(function() {
-			screenTopAlert('撤销成功！');
+			screenTopAlert('撤销成功');
 			window.location.reload();
 		})
 		.catch(function(data) {

@@ -18,7 +18,10 @@ const fontFilePathForFFmpeg = fontFilePath.replace(/\\/g, "/").replace(":", "\\:
 const tempImageForFFmpeg = settings.statics.deletedPhotoPath;
 
 // ffmpeg 码率和帧率控制命令行参数 默认值
+// 处理视频
 const bitrateAndFPSControlParameter = [
+  '-map_metadata',
+  '-1',
   '-c:v', 'libx264',                                            /* 指定编码器 */
   '-r', '24',                                                   /* 帧率 */
   '-maxrate', '5M',                                             /* 最大码率 */
@@ -26,6 +29,16 @@ const bitrateAndFPSControlParameter = [
   '-b:v', '1.16M',                                              /* 平均码率 */
 ];
 
+/*
+* 处理音频
+* */
+const bitrateAndMetadataControlParameter = [
+  '-map_metadata',
+  '-1',
+  '-maxrate', '5M',
+  '-minrate', '1M',
+  '-b:v', '1.16M'
+];
 
 
 const spawnProcess = (pathName, args, options = {}) => {
@@ -115,30 +128,30 @@ const videoWEBMTransMP4 = async (inputPath, outputPath) => {
 
 // AMR转码为MP3
 const audioAMRTransMP3 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndMetadataControlParameter, outputPath])
 }
 
 const audioAACTransMP3 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndMetadataControlParameter, outputPath])
 }
 
 // WAV转码为MP3
 const audioWAVTransMP3 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndMetadataControlParameter, outputPath])
 }
 
 // WMA转码为MP3
 const audioWMATransMP3 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndMetadataControlParameter, outputPath])
 }
 
 const audioFLACTransMP3 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath]);
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndMetadataControlParameter, outputPath]);
 }
 
 const audioTransMP3 = async (inputPath, outputPath, ext) => {
   let func = async (inputPath, outputPath) => {
-    return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath]);
+    return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndMetadataControlParameter, outputPath]);
   }
   if(ext === 'amr') {
     func = audioAMRTransMP3;
@@ -329,7 +342,7 @@ async function addImageTextWaterMask(op) {
  * 图片添加图文水印
  * @param {object} op 配置
  * 配置项：
- *  input 输入路径， output 输出路径， image 图片路径， text 文字, flex 水印占整个图片高度的百度比, position 水印位置
+ *  input 输入路径， output 输出路径， image 图片路径， text 文字, flex 水印占整个图片高度的百分比, position 水印位置
  */
 async function addImageTextWaterMaskForImage(op) {
   let {
@@ -379,6 +392,10 @@ async function createOtherSizeVideo(inputFile, outputFile, props) {
       .fps(fps)
       .size(`?x${height}`)
       .videoBitrate(bitrate + 'k')
+      .outputOptions([
+        '-map_metadata',
+        '-1'
+      ])
       .output(outputFile)
       .on('end', resolve)
       .on('error', reject)
@@ -461,6 +478,10 @@ async function addWaterMask(options) {
         `[o]scale=-2:${scalaByHeight}`
       ])
       .videoBitrate(bitRate)
+      .outputOptions([
+        '-map_metadata',
+        '-1'
+      ])
       .output(output)
       .on("end", resolve)
       .on("error", reject)

@@ -68,6 +68,9 @@ func.init = async () => {
               mainForumsId: {
                 type: "keyword"
               },
+              tcId: {
+                type: "keyword"
+              },
               digest: {
                 type: "boolean"
               },
@@ -123,7 +126,8 @@ func.save = async (docType, document) => {
     authorInfos = [],
     voteUp = 0, voteDown = 0,
     description = "",
-    username = ""
+    username = "",
+    tcId = [],
 
   } = document;
 
@@ -164,6 +168,7 @@ func.save = async (docType, document) => {
       aid,
       digest,
       mainForumsId,
+      tcId,
       title: t,
       content: apiFunction.obtainPureText(c),
       abstractCN: abstractCn,

@@ -154,6 +154,9 @@
           if permission('experimentalIPSettings')
             li
               a(href='/e/settings/ip') IP 黑名单
+          if permission('experimentalComplaintSettings')
+            li
+              a(href='/e/settings/complaint') 投诉
           <li role="separator" class="divider"></li>
           if permission('visitRoleSettings')
             li
@@ -216,6 +219,8 @@
             a(href='/e/settings/grade') 用户等级
           li
             a(href='/e/settings/forum') 专业管理
+          li
+            a(href='/e/settings/threadCategory') 多维分类
           li
             a(href='/e/settings/exam') 考试设置
           li

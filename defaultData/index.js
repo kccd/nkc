@@ -237,6 +237,48 @@ async function initMessages() {
   }
 }
 
+/*
+* 初始化投诉类型
+* */
+async function initComplaintType() {
+  const db = require('../dataModels');
+  const complaintTypes = require('./complaintTpyes');
+  const count = await db.ComplaintTypeModel.countDocuments();
+  if(count === 0) {
+    for(const c of complaintTypes) {
+      await db.ComplaintTypeModel.insertCom({
+        type: c.type,
+        description: c.description,
+        order: c.order
+      });
+    }
+  }
+}
+
+async function initThreadCategory() {
+  const db = require('../dataModels');
+  const threadCategories = require('./threadCategories');
+  const count = await db.ThreadCategoryModel.countDocuments();
+  if(count === 0) {
+    for(const t of threadCategories) {
+      const {main, node} = t;
+      const category = await db.ThreadCategoryModel.newCategory({
+        name: main.name,
+        description: main.description,
+        warning: main.warning
+      });
+      for(const n of node) {
+        await db.ThreadCategoryModel.newCategory({
+          name: n.name,
+          description: n.description,
+          warning: n.warning,
+          cid: category._id
+        });
+      }
+    }
+  }
+}
+
 async function init() {
   await initConfig();
   await initSettings();
@@ -248,6 +290,8 @@ async function init() {
   await initOperations();
   await initForum();
   await initThreads();
+  await initComplaintType();
+  await initThreadCategory();
 }
 
 module.exports = {
@@ -262,5 +306,6 @@ module.exports = {
   initMessages,
   initOperations,
   initAccount,
-  initThreads
+  initThreads,
+  initComplaintType,
 };

@@ -12,6 +12,46 @@ block eContent
   .hidden#data=objToStr({downloadSettings: data.downloadSettings, certList: data.certList})
   .container-fluid.max-width#app(v-cloak)
     .row
+      .col-xs-12.col-md-12.m-b-2
+        span.h4 游客下载权限
+        .form
+          .form-group
+            .radio
+              span 图片：
+              label.m-r-1
+                input(type='radio' :value='true' v-model='settings.visitorAccess.mediaPicture')
+                span 允许
+              label
+                input(type='radio' :value='false' v-model='settings.visitorAccess.mediaPicture')
+                span 禁止
+          .form-group
+            .radio
+              span 音频：
+              label.m-r-1
+                input(type='radio' :value='true' v-model='settings.visitorAccess.mediaAudio')
+                span 允许
+              label
+                input(type='radio' :value='false' v-model='settings.visitorAccess.mediaAudio')
+                span 禁止
+          .form-group
+            .radio
+              span 视频：
+              label.m-r-1
+                input(type='radio' :value='true' v-model='settings.visitorAccess.mediaVideo')
+                span 允许
+              label
+                input(type='radio' :value='false' v-model='settings.visitorAccess.mediaVideo')
+                span 禁止
+          .form-group
+            .radio
+              span 附件：
+              label.m-r-1
+                input(type='radio' :value='true' v-model='settings.visitorAccess.mediaAttachment')
+                span 允许
+              label
+                input(type='radio' :value='false' v-model='settings.visitorAccess.mediaAttachment')
+                span 禁止
+
       .col-xs-12.col-md-12.form-inline.m-b-2
         span.h4 总下载速度：
         input.form-control(type='text' v-model.number='settings.allSpeed').m-r-05
@@ -35,7 +75,7 @@ block eContent
                 //-th.select
                   input.form-control(type='text' v-model.number='t.fileCount')
                 th
-                  .m-b-05(v-for='s, index in t.data').form-inline
+                  .m-b-05(v-for='(s, index) in t.data').form-inline
                     span.h5 配置{{index+ 1}}：
                     select(v-model='s.startingTime')
                       option(v-for='h in hours' :value='h') {{h}}
@@ -54,7 +94,7 @@ block eContent
                   select.form-control(disabled)
                     option 其他
                 th
-                  .m-b-05(v-for='s, index in settings.speed.default.data').form-inline
+                  .m-b-05(v-for='(s, index) in settings.speed.default.data').form-inline
                     span.h5 配置{{index+ 1}}：
                     select(v-model='s.startingTime')
                       option(v-for='h in hours' :value='h') {{h}}
@@ -79,12 +119,12 @@ block eContent
                 th 个数限制（时间必须覆盖0-24）
                 th 其他
             tbody
-              tr(v-for='f, index in settings.fileCountLimit.others')
+              tr(v-for='(f, index) in settings.fileCountLimit.others')
                 th.select
                   select.form-control(v-model='f.type')
                     option(v-for='c in gradeList' :value='c.type') {{c.name}}
                 th
-                  .m-b-05(v-for='s, index in f.data').form-inline
+                  .m-b-05(v-for='(s, index) in f.data').form-inline
                     span.h5 配置{{index+ 1}}：
                     select(v-model='s.startingTime')
                       option(v-for='h in hours' :value='h') {{h}}
@@ -103,7 +143,7 @@ block eContent
                   select.form-control(disabled)
                     option 其他
                 th
-                  .m-b-05(v-for='s, index in settings.fileCountLimit.default.data').form-inline
+                  .m-b-05(v-for='(s, index) in settings.fileCountLimit.default.data').form-inline
                     span.h5 配置{{index+ 1}}：
                     select(v-model='s.startingTime')
                       option(v-for='h in hours' :value='h') {{h}}
@@ -129,7 +169,7 @@ block eContent
                 th 个数限制
                 th 其他
             tbody
-              tr(v-for='f, index in settings.fileCountLimit.roles')
+              tr(v-for='(f, index) in settings.fileCountLimit.roles')
                 th.select
                   select.form-control(v-model='f.type')
                     option(v-for='c in roleList' :value='c.type') {{c.name}}

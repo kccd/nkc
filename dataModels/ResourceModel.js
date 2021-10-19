@@ -557,6 +557,24 @@ resourceSchema.methods.checkDownloadCost = async function(user) {
   }
 };
 
+/*
+* 过滤文件名
+* */
+resourceSchema.methods.filenameFilter = async function() {
+  const nkcRender = require('../nkcModules/nkcRender');
+  let filename = this.oname || '';
+  filename = filename.split('.');
+  if(filename.length >= 2) {
+    const ext = filename.pop();
+    filename = filename.join('.');
+    filename = nkcRender.replaceLink(filename);
+    filename += `.${ext}`;
+  } else {
+    filename = filename.join('.');
+    filename = nkcRender.replaceLink(filename);
+  }
+  this.oname = filename;
+}
 
 /*
 * 判断用户下载所需的积分是否足够
@@ -596,15 +614,36 @@ resourceSchema.methods.checkUserScore = async function(user) {
 * */
 resourceSchema.methods.updateForumsId = async function() {
   const PostModel = mongoose.model('posts');
+  const LibraryModel = mongoose.model('libraries');
+  const ForumModel = mongoose.model('forums');
   const posts = await PostModel.find({pid: {$in: this.references}}, {mainForumsId: 1});
   let forumsId = [];
   for(const post of posts) {
     forumsId = forumsId.concat(post.mainForumsId);
   }
+  const files = await LibraryModel.find({
+    type: 'file',
+    rid: this.rid,
+  });
+  if(files.length > 0) {
+    const foldersId = [];
+    for(const file of files) {
+      const nav = await file.getNav();
+      foldersId.push(nav[0]);
+    }
+    const forums = await ForumModel.find({lid: {$in: foldersId}}, {fid: 1});
+    forumsId = forumsId.concat(forums.map(f => f.fid));
+  }
   forumsId = [...new Set(forumsId)];
   this.forumsId = forumsId;
   this.tou = new Date();
-  await this.save();
+  await this.updateOne({
+    $set: {
+      forumsId: this.forumsId,
+      tou: this.tou
+    }
+  });
+  // await this.save();
 };
 
 /*
