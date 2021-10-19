@@ -23,6 +23,9 @@ resourceRouter
     const {rid} = params;
     data.resource = await db.ResourceModel.findOnly({rid, type: "resource"});
     await data.resource.filenameFilter();
+    if(ctx.url !== `/r/${rid}` || ctx.method !== 'PUT') {
+      if(data.resource.disabled) ctx.throw(404, `资源已被屏蔽`);
+    }
     await next();
   })
   .get('/:rid', async (ctx, next) => {

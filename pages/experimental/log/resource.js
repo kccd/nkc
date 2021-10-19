@@ -14,7 +14,7 @@ const app = new Vue({
     }
   }
 });
-function  initiate(rid, disabled){
+function initiate(rid, disabled){
   nkcAPI('/r/' + rid, 'PUT', {
     disabled: !!disabled
   }).then(()=>{
@@ -23,7 +23,20 @@ function  initiate(rid, disabled){
     sweetError(err);
   });
 }
+function removeInfo(rid){
+  return sweetQuestion(`确定要执行当前操作？`)
+    .then(() => {
+      return nkcAPI('/e/log/resource', 'PUT', {rid})
+    })
+    .then(() => {
+      sweetSuccess('执行成功');
+    })
+    .catch((err) => {
+      sweetError(err);
+    });
+}
 Object.assign(window, {
-  initiate
+  initiate,
+  removeInfo,
 });
 

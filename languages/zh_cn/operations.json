@@ -8,6 +8,7 @@
   "getResources": "获取资源文件",
   "getResourceSmallImage": "获取资源文件缩略图",
   "modifyResources": "修改资源文件信息",
+  "removeResourceInfo": "清除文件信息",
   "getThreadCover": "获取文章封面",
   "getVideoImg": "获取视频封面",
   "getSiteSpecific": "获取网站logo",
