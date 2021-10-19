@@ -7,9 +7,18 @@ module.exports = {
     const {
       width, height,
       oname = "未知",
-      rid = id
+      rid = id,
+      disabled
     } = resource || {};
     const url = getUrl("resource", rid);
+    if(resource.disabled) {
+      return `
+         <span data-tag="nkcsource" data-type="picture-is-disable" data-id="${id}" style="text-align: center">
+<!--           <span class="fa fa-ban" data-type="disabled" data-id="${id}-${disabled}" title="屏蔽"></span>-->
+           <span data-type="view" style="font-size: 32px;width: 100%">图片已被屏蔽</span>
+         </span>
+        `.trim();
+    }
     if(!width || !height) {
       return `
         <span data-tag="nkcsource" data-type="picture" data-id="${id}">
@@ -40,6 +49,9 @@ module.exports = {
       rid = id
     } = resource;
     const poster = getUrl("videoCover", rid);
+    if(resource.disabled){
+      return `<span data-tag="nkcsource" data-type="video-not-found"><span>视频已被屏蔽</span></span>`
+    }
     if(resource.isFileExist) {
       let sourceHtml = '';
       for(const s of resource.videoSize) {
@@ -62,15 +74,25 @@ module.exports = {
     //<span class="nkcsource-video-title">${resource.oname}</span>
   },
   audio(html = "", id, resource = {}) {
+    const {
+      oname = "未知",
+      rid = id,
+    } = resource;
     const url = getUrl("resource", id);
+    if(resource.disabled){
+      return `<span data-tag="nkcsource" data-type="audio-not-found"><span>音频已被屏蔽</span></span>`
+    }
+    if(!resource.isFileExist){
+      return `<span data-tag="nkcsource" data-type="audio-not-found"><span>音频已丢失</span></br><span>${oname}</span></span>`
+    }
     return `
-      <span data-tag="nkcsource" data-type="audio" data-id="${id}">
-        <audio class="plyr-dom" preload="none" controls data-rid="${id}" data-size="${resource.size}">
-          <source src="${url}" type="audio/mp3"/>
-          你的浏览器不支持audio标签，请升级。
-        </audio>
-        <span class="nkcsource-audio-title">${resource.oname} <span class="display-i-b text-danger" style="font-weight: 700">${getSize(resource.size)}</span></span>
-      </span>
+        <span data-tag="nkcsource" data-type="audio" data-id="${id}">
+          <audio class="plyr-dom" preload="none" controls data-rid="${id}" data-size="${resource.size}">
+            <source src="${url}" type="audio/mp3"/>
+            你的浏览器不支持audio标签，请升级。
+          </audio>
+          <span class="nkcsource-audio-title">${resource.oname} <span class="display-i-b text-danger" style="font-weight: 700">${getSize(resource.size)}</span></span>
+        </span>
     `.trim();
   },
   attachment(html = "", id, resource = {}) {
@@ -94,20 +116,28 @@ module.exports = {
       `.trim();
     }
     return `
-      <span data-tag="nkcsource" data-type="attachment" data-id="${id}">
-        <span class="article-attachment-icon">
-          <img src="${fileCover}" alt="attachment icon">
-        </span>
-        <span class="article-attachment-content">
-          ${resource.isFileExist? `<span class="article-attachment-name" title="${oname}" data-type="clickAttachmentTitle" data-id="${id}">${oname}</span>`:
-            `<span class="article-attachment-name" title="${oname}" title="${oname}（附件已丢失）">${oname}</span>`}
-          <span class="article-attachment-info">
-            <span class="article-attachment-size">${getSize(size)}</span>
-            <span class="article-attachment-ext">${ext.toUpperCase()}</span>
-            <span class="article-attachment-hits">${hits}次下载</span>
-            ${resource.isFileExist?pdfHTML:`<span class="article-attachment-ext">附件已丢失</span>`}
+      ${resource.disabled? `
+      <span data-tag="nkcsource" data-type="attachment-disabled">
+          <span class="attachment-disabled">
+              <span>附件已被屏蔽</span>
           </span>
+      </span>
+      `:`
+      <span data-tag="nkcsource" data-type="attachment">
+        <span class="article-attachment-icon">
+            <img src="${fileCover}" alt="attachment icon">
+          </span>
+          <span class="article-attachment-content">
+            ${resource.isFileExist? `<span class="article-attachment-name" title="${oname}" data-type="clickAttachmentTitle" data-id="${id}">${oname}</span>`:
+        `<span class="article-attachment-name" title="${oname}" title="${oname}（附件已丢失）">${oname}</span>`}
+            <span class="article-attachment-info">
+              <span class="article-attachment-size">${getSize(size)}</span>
+              <span class="article-attachment-ext">${ext.toUpperCase()}</span>
+              <span class="article-attachment-hits">${hits}次下载</span>
+              ${resource.isFileExist?pdfHTML:`<span class="article-attachment-ext">附件已丢失</span>`}
+            </span>
         </span>
+      `}
       </span>  
     `.trim();
   },

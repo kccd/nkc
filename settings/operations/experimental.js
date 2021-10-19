@@ -357,7 +357,8 @@ module.exports = {
       POST: 'experimentalFilterLogs'
     },
 		resource: {
-    	GET: 'experimentalResourceLogs'
+    	GET: 'experimentalResourceLogs',
+			PUT: 'removeResourceInfo',
 		},
 		blacklist: {
     	GET: 'visitExperimentalBlacklist'

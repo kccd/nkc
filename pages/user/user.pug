@@ -4,6 +4,14 @@ block title
   meta(name='description' content=`${description}`)
   title=`${data.targetUser.username || data.targetUser.uid}的主页 - ${state.serverSettings.websiteName}`
   +includeCSS("/user/user.css")
+  if state.isApp
+    style.
+      .btn-ban {
+        display: block;
+        font-size: 3rem;
+        width: 3rem;
+        height: 3rem;
+      }
 block content
   #data.hidden=objToStr({uid: data.targetUser.uid})
   .container-fluid.max-width

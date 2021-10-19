@@ -4,8 +4,6 @@ const cheerio = require('../nkcModules/nkcRender/customCheerio');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const PATH = require('path');
-const fsSync = require('../tools/fsSync');
-const { existsSync, exists } = require('fs');
 const fs = require("fs");
 const fsPromise = fs.promises;
 const resourceSchema = new Schema({
@@ -13,6 +11,12 @@ const resourceSchema = new Schema({
     type: String,
     unique: true,
     required: true
+  },
+  //是否屏蔽
+  disabled: {
+    type: Boolean,
+    default: false,
+    index: 1
   },
   // 针对图片 原图ID
   originId: {
@@ -133,6 +137,13 @@ const resourceSchema = new Schema({
   }
 });
 
+resourceSchema.virtual('metadata')
+  .get(function() {
+    return this._metadata;
+  })
+  .set(function(val) {
+    return this._metadata = val
+  });
 
 resourceSchema.virtual('isFileExist')
   .get(function() {
@@ -150,10 +161,10 @@ resourceSchema.virtual('videoSize')
     return this._videoSize = val
   });
 
-/**
+/*
  * 文件是否存在
  */
-resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['mediaPicture', 'mediaAudio']) {
+resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['mediaPicture']) {
   if(excludedMediaTypes.includes(this.mediaType)) return;
   const FILE = require('../nkcModules/file');
   if(this.mediaType === 'mediaVideo') {
@@ -170,6 +181,23 @@ resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['medi
     const path = await this.getFilePath();
     this.isFileExist = await FILE.access(path);
   }
+}
+
+/*
+* 获取文件元信息
+* */
+resourceSchema.methods.setMetadata = async function(resource, excludedMediaTypes = ['mediaPicture', 'mediaAttachment']){
+  const ffmpeg = require('../tools/ffmpeg');
+  if(excludedMediaTypes.includes(this.mediaType)) return;
+  const FILE = require('../nkcModules/file');
+  //获取文件信息
+  const filePath = await resource.getFilePath();
+  //判断路劲文件是否存在,如果不存在就返回错误
+  if(!await FILE.access(filePath)) return;
+  //获取文件信息
+  const data = await ffmpeg.getFileInfo(filePath);
+  //文件标题信息
+  this.metadata = data.format.tags || {};
 }
 
 /*
@@ -668,5 +696,19 @@ resourceSchema.methods.checkAccessPermission = async function(accessibleForumsId
     throwErr(403, `权限不足`);
   }
 };
+
+/*
+* 清除文件信息
+* */
+resourceSchema.methods.removeResourceInfo = async function() {
+  const ffmpeg = require('../tools/ffmpeg');
+  //获取文件信息
+  const filePath = await this.getFilePath();
+  const outputFilePath = filePath + '_out' + `.${this.ext}`;
+  await ffmpeg.clearMetadata(filePath, outputFilePath);
+  //重命名文件
+  await fsPromise.rename(outputFilePath, filePath);
+}
+
 
 module.exports = mongoose.model('resources', resourceSchema);
