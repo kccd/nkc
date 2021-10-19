@@ -23,6 +23,9 @@ resourceRouter
     const {rid} = params;
     data.resource = await db.ResourceModel.findOnly({rid, type: "resource"});
     await data.resource.filenameFilter();
+    if(ctx.url !== `/r/${rid}` || ctx.method !== 'PUT') {
+      if(data.resource.disabled) ctx.throw(404, `资源已被屏蔽`);
+    }
     await next();
   })
   .get('/:rid', async (ctx, next) => {
@@ -318,6 +321,27 @@ resourceRouter
         await r.updateOne({state: 'useless'});
       }
     });
+    await next();
+  })
+  .put('/:rid', async (ctx, next) => {
+    const {db, data, nkcModules, body} = ctx;
+    const {resource} = data;
+    const {disabled} = body;
+    data.resource = resource;
+    if(resource.disabled) {
+      if(disabled) {
+        ctx.throw(400, `资源已被屏蔽`);
+      }
+    } else {
+      if(!disabled) {
+        ctx.throw(400, `资源未被屏蔽`);
+      }
+    }
+    await resource.updateOne({
+      $set: {
+        disabled: !!disabled
+      }
+    })
     await next();
   })
   .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods())

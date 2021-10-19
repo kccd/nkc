@@ -15,15 +15,30 @@ router
       match.uid = targetUser? targetUser.uid: '';
     } else if(searchType === 'rid') {
       match.rid = searchContent;
+    } else if(searchType === 'pid') {
+      match.references = searchContent;
+    }else if(searchType === 'tid') {
+      let pids = [];
+      const posts =  await db.PostModel.find({tid: searchContent});
+      for(const post of posts){
+        pids.push(post.pid);
+      }
+      match.references = pids;
     }
     const count = await db.ResourceModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count);
-    const resources_ = await db.ResourceModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    let resources_;
+    if(searchType === 'tid'){
+      resources_ = await db.ResourceModel.find({references:{$in: match.references}}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    }else {
+      resources_ = await db.ResourceModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    }
     const resources = [];
     let postsId = [];
     const usersId = [];
     for(const r of resources_) {
       await r.setFileExist([]);
+      await r.setMetadata(r);
       let filePath;
       try{
         filePath = await r.getFilePath();
@@ -75,6 +90,21 @@ router
     data.searchType = searchType;
     data.searchContent = searchContent;
     ctx.template = 'experimental/log/resource.pug';
+    await next();
+  })
+  .put('/', async (ctx, next) => {
+    const {db, nkcModules, body} = ctx;
+    const {file: FILE} = nkcModules;
+    const {rid} = body;
+    const resource = await db.ResourceModel.findOnly({rid: rid});
+    if(!['mediaAudio', 'mediaVideo'].includes(resource.mediaType)) {
+      ctx.throw(400, `仅支持清除音视频元信息`);
+    }
+    //获取文件信息
+    const filePath = await resource.getFilePath(resource);
+    //判断路劲文件是否存在,如果不存在就返回错误
+    if(!await FILE.access(filePath)) return ctx.throw(500, `文件已丢失`);
+    await resource.removeResourceInfo();
     await next();
   });
 module.exports = router;

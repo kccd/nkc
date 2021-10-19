@@ -42,6 +42,7 @@ window.floatUserPanel = new Vue({
         const dom = doms.eq(i);
         if(dom.attr("data-float-init") === "true") continue;
         let position = dom.attr("data-float-position");
+        if(NKC.configs.isApp) return;
         this.initEvent(doms.eq(i), position);
       }
     },
