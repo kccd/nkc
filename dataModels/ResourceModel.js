@@ -706,8 +706,6 @@ resourceSchema.methods.removeResourceInfo = async function() {
   const filePath = await this.getFilePath();
   const outputFilePath = filePath + '_out' + `.${this.ext}`;
   await ffmpeg.clearMetadata(filePath, outputFilePath);
-  //删除文件
-  await fsPromise.unlink(filePath);
   //重命名文件
   await fsPromise.rename(outputFilePath, filePath);
 }
