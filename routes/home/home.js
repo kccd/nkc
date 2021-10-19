@@ -5,7 +5,6 @@ module.exports = async (options) => {
 
   const homeSettings = await db.SettingModel.getSettings("home");
 
-
   // 最新文章
   const threads = await db.ThreadModel.find({
     mainForumsId: {$in: fidOfCanGetThreads},
@@ -35,6 +34,7 @@ module.exports = async (options) => {
   } else {
     data.columns = [];
   }
+
   // 置顶专栏
   data.toppedColumns = await db.ColumnModel.getHomeToppedColumns();
   // 热销商品
