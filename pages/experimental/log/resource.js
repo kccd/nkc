@@ -14,4 +14,16 @@ const app = new Vue({
     }
   }
 });
+function  initiate(rid, disabled){
+  nkcAPI('/r/' + rid, 'PUT', {
+    disabled: !!disabled
+  }).then(()=>{
+    sweetSuccess('执行成功');
+  }).catch((err)=>{
+    sweetError(err);
+  });
+}
+Object.assign(window, {
+  initiate
+});
 
