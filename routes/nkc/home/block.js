@@ -23,7 +23,15 @@ router
   .put('/', async (ctx, next) => {
     const {body, db} = ctx;
     const {left, right} = body.homeBlocksId;
-    const defaultBlocksId = ['recommendThreadsMovable', 'toppedThreads', 'goods', 'recommendThreadsFixed', 'forums', 'toppedColumns']
+    const defaultBlocksId = [
+      'recommendThreadsMovable',
+      'toppedThreads',
+      'goods',
+      'recommendThreadsFixed',
+      'forums',
+      'toppedColumns',
+      'hotColumns'
+    ]
     let blocksId = left.concat(right);
     blocksId = blocksId.filter(id => !defaultBlocksId.includes(id));
     const blocks = await db.HomeBlockModel.find({_id: {$in: blocksId}});
@@ -70,7 +78,8 @@ router
       coverPosition,
       threadCount,
       disabled,
-      threadSource,
+      fixedThreadCount,
+      autoThreadCount,
     } = block;
     await db.HomeBlockModel.checkBlockValue(block);
     const sameName = await db.HomeBlockModel.findOne({_id: {$ne: homeBlock._id, name}});
@@ -93,7 +102,8 @@ router
         coverPosition,
         threadCount,
         disabled,
-        threadSource,
+        fixedThreadCount,
+        autoThreadCount,
       }
     });
     await next();

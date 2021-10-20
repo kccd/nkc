@@ -114,7 +114,7 @@ module.exports = {
     toppedColumnsId: [],
     // 首页自定义文章列表
     homeBlocksId: {
-      left: ['recommendThreadsMovable', 'toppedThreads', 'goods'],
+      left: ['recommendThreadsMovable', 'toppedThreads', 'hotColumns', 'goods'],
       right: ['recommendThreadsFixed', 'forums', 'toppedColumns']
     }
   }
