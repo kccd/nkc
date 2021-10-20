@@ -3,186 +3,231 @@ block title
   include ../publicModules/web_header
   +includeCSS("/home/home_all.css")
   +includeCSS("/swiper/swiper-bundle.min.css")
+  if !permission("unBannedUser") || !permission("bannedUser") || !permission("clearUserInfo")
+    style.
+      .move-handle {
+          display: none;
+      }
 block content
-  .container-fluid.max-width
-    .row
-      .col-xs-12.col-md-12.box-shadow-panel
-        //- 只有封面图的文章入口 轮播
-        .home-top(style=state.isApp?'margin-top: 0':'')
-          .home-covers
-            .row
-              .col-xs-12.col-md-6.home-covers-md
-                .swiper-container.swiper-home
-                  .swiper-wrapper
-                    for thread in data.ads.movable
-                      a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
-                        'background-image': `url(${tools.getUrl('recommendThreadCover', thread.cover)})`
-                      })
-                        .swiper-title= `${thread.title}`
-                  .swiper-pagination
-                  .swiper-button-next.swiper-button(style='background-image: none;')
-                    .fa.fa-angle-right
-                  .swiper-button-prev.swiper-button(style='background-image: none;')
-                    .fa.fa-angle-left
-              .col-xs-12.col-md-6.hidden-xs.hidden-sm
-                .row.home-covers-sm
-                  for thread, index in data.ads.fixed
-                    .home-cover-sm
-                      a(href=`/t/${thread.tid}` target="_blank" title=thread.title
-                        class=index > 2? 'm-b-0':''
-                        )
-                        .home-covers-sm-img(style=`background-image:url(${tools.getUrl('recommendThreadCover', thread.cover)})`)
-                        .home-covers-sm-title=thread.title
-            if !state.isApp
-              .hidden-md.hidden-lg.hidden-sm.home-buttons.m-t-1
-                .col-xs-4
-                  a(href=`/?t=latest`) 最新
-                .col-xs-4
-                  if data.user
-                    a(href=`/?t=subscribe`) 关注
-                  else
-                    a(onclick=`NKC.methods.toLogin()`) 关注
-                .col-xs-4
-                  if data.user
-                    a(href=`/u/${data.user.uid}/profile`) 我的
-                  else
-                    a(onclick=`NKC.methods.toLogin()`) 我的
+  .container-fluid.max-width#home_all
+    .row(style=state.isApp?'margin-top: 0':'margin-top: 56px')
+      //.col-xs-12.col-md-12.box-shadow-panel
+      //  //- 只有封面图的文章入口 轮播
+      //  .home-top(style=state.isApp?'margin-top: 0':'')
+      //    .home-covers
+      //      .row
+      //        .col-xs-12.col-md-6.home-covers-md
+      //          .swiper-container.swiper-home
+      //            .swiper-wrapper
+      //              for thread in data.ads.movable
+      //                a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
+      //                  'background-image': `url(${tools.getUrl('recommendThreadCover', thread.cover)})`
+      //                })
+      //                  .swiper-title= `${thread.title}`
+      //            .swiper-pagination
+      //            .swiper-button-next.swiper-button(style='background-image: none;')
+      //              .fa.fa-angle-right
+      //            .swiper-button-prev.swiper-button(style='background-image: none;')
+      //              .fa.fa-angle-left
+      //        .col-xs-12.col-md-6.hidden-xs.hidden-sm
+      //          .row.home-covers-sm
+      //            for thread, index in data.ads.fixed
+      //              .home-cover-sm
+      //                a(href=`/t/${thread.tid}` target="_blank" title=thread.title
+      //                  class=index > 2? 'm-b-0':''
+      //                  )
+      //                  .home-covers-sm-img(style=`background-image:url(${tools.getUrl('recommendThreadCover', thread.cover)})`)
+      //                  .home-covers-sm-title=thread.title
+      //      if !state.isApp
+      //        .hidden-md.hidden-lg.hidden-sm.home-buttons.m-t-1
+      //          .col-xs-4
+      //            a(href=`/?t=latest`) 最新
+      //          .col-xs-4
+      //            if data.user
+      //              a(href=`/?t=subscribe`) 关注
+      //            else
+      //              a(onclick=`NKC.methods.toLogin()`) 关注
+      //          .col-xs-4
+      //            if data.user
+      //              a(href=`/u/${data.user.uid}/profile`) 我的
+      //            else
+      //              a(onclick=`NKC.methods.toLogin()`) 我的
 
       //-修改默认用户名
       //-include ../publicModules/checkDefaultUsername
       //- 专业地图
-      .col-xs-12.col-md-6.home-forums.box-shadow-panel
-        if data.toppedThreads.length
-          .home-forums-list.m-b-1
-            .panel-header.m-b-0 首页置顶
-            //-.home-header
-              //-.fa.fa-tags
-              .header-name 置顶
-            .home-threads
-              for thread in data.toppedThreads
-                include ../publicModules/thread_panel/thread_panel
-        mixin columnPanel(column, klass)
-          .home-main-column.row
-            .col-xs-12.col-md-6
-              .home-main-column-left
-                .home-main-column-avatar
-                  img(src=tools.getUrl('columnAvatar', column.avatar))
-                .home-main-column-info
-                  a(href=tools.getUrl('columnHome', column._id) target="_blank").home-main-column-name=column.name
-                  .home-main-column-desc(title=column.abbr)=column.abbr || '暂无简介'
-            .col-xs-12.col-md-6
-              .home-main-column-right(class=klass || '')
-                .home-main-column-posts(style=`border-left: 3px solid ${0 || '#ccc'};`)
-                  for p, index in column.posts
-                    .home-main-column-post
-                      .latest-thread-point
-                      a(href=`/t/${p.tid}` target="_blank" title=p.t)=p.t
-                      .home-main-column-post-time
-                        +fromNow(p.toc)
-        //- 置顶专栏
-        if data.toppedColumns && data.toppedColumns.length > 0
-          .home-forums-list.m-b-1
-            .panel-header 置顶专栏
-            .home-main-columns
-              for column, index in data.toppedColumns
-                -var klass = index === data.toppedColumns.length - 1? 'm-b-0': ''
-                +columnPanel(column, klass)
-        //- 热门专栏
-        if data.columnListPosition === 'main' && data.columns && data.columns.length > 0
 
-          .home-forums-list.m-b-1
-            .panel-header 热门专栏
-            .home-main-columns
-              for column in data.columns
-                +columnPanel(column)
+      .col-xs-12.col-md-6.home-forums
+        .home-categories-left
+          .home-forums-list.m-b-1.home-category-master-handle(data-cid = '1')
+            .home-title-box
+              .home-title-l
+                span.fa.fa-bars.move-handle.m-r-1
+            .home-swipers(style='height:220px')
+              .swiper-container.swiper-home
+                .swiper-wrapper
+                  for thread in data.ads.movable
+                    a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
+                      'background-image': `url(${tools.getUrl('recommendThreadCover', thread.cover)})`
+                    })
+                      .swiper-title= `${thread.title}`
+                .swiper-pagination
+                .swiper-button-next.swiper-button(style='background-image: none;')
+                  .fa.fa-angle-right
+                .swiper-button-prev.swiper-button(style='background-image: none;')
+                  .fa.fa-angle-left
+          if data.toppedThreads.length
+            .home-forums-list.m-b-1.home-category-master-handle(data-cid = '1')
+              .home-title-box
+                .home-title-l
+                  span.fa.fa-bars.move-handle.m-r-1
+                  span.panel-header.m-b-0.home-title 首页置顶
+                if permission("unBannedUser") || permission("bannedUser") || permission("clearUserInfo")
+                  button.home-title-r.btn-warning.btn.btn-xs(@click='editorForum()') 编辑
+                //-.home-header
+                  //-.fa.fa-tags
+                  .header-name 置顶
+              .home-threads
+                for thread in data.toppedThreads
+                  include ../publicModules/thread_panel/thread_panel
+          mixin columnPanel(column, klass)
+            .home-main-column.row
+              .col-xs-12.col-md-6
+                .home-main-column-left
+                  .home-main-column-avatar
+                    img(src=tools.getUrl('columnAvatar', column.avatar))
+                  .home-main-column-info
+                    a(href=tools.getUrl('columnHome', column._id) target="_blank").home-main-column-name=column.name
+                    .home-main-column-desc(title=column.abbr)=column.abbr || '暂无简介'
+              .col-xs-12.col-md-6
+                .home-main-column-right(class=klass || '')
+                  .home-main-column-posts(style=`border-left: 3px solid ${0 || '#ccc'};`)
+                    for p, index in column.posts
+                      .home-main-column-post
+                        .latest-thread-point
+                        a(href=`/t/${p.tid}` target="_blank" title=p.t)=p.t
+                        .home-main-column-post-time
+                          +fromNow(p.toc)
+          //- 置顶专栏
+          if data.toppedColumns && data.toppedColumns.length > 0
+            .home-forums-list.m-b-1
+              span.fa.fa-bars.move-handle.m-r-1
+              span.panel-header.m-b-0.home-title 置顶专栏
+              .home-main-columns
+                for column, index in data.toppedColumns
+                  -var klass = index === data.toppedColumns.length - 1? 'm-b-0': ''
+                  +columnPanel(column, klass)
+          //- 热门专栏
+          if data.columnListPosition === 'main' && data.columns && data.columns.length > 0
+
+            .home-forums-list.m-b-1
+              .fa.fa-bars.panel-header.move-handle 热门专栏
+              .home-main-columns
+                for column in data.columns
+                  +columnPanel(column)
 
 
-            //-.home-columns
-              for column in data.columns
-                a(href=`/m/${column._id}` target="_blank").home-column
-                  .home-column-avatar
-                    img(src=tools.getUrl("columnAvatar", column.avatar))
-                  .home-column-info
-                    .home-column-title= column.name
-                    .home-column-description= column.abbr || "无简介"
-                    .home-column-statics
-                      if column.latestThreadToc
-                        span=tools.briefTime(column.latestThreadToc) + "更新 "
-                      span= "共" + column.threadsCount + "篇文章"
-            .m-t-05
-              a.home-threads-more-link(href=`/m` target="_blank") 查看更多
+              //-.home-columns
+                for column in data.columns
+                  a(href=`/m/${column._id}` target="_blank").home-column
+                    .home-column-avatar
+                      img(src=tools.getUrl("columnAvatar", column.avatar))
+                    .home-column-info
+                      .home-column-title= column.name
+                      .home-column-description= column.abbr || "无简介"
+                      .home-column-statics
+                        if column.latestThreadToc
+                          span=tools.briefTime(column.latestThreadToc) + "更新 "
+                        span= "共" + column.threadsCount + "篇文章"
+              .m-t-05
+                a.home-threads-more-link(href=`/m` target="_blank") 查看更多
 
 
-        if data.goodsForums.length && data.showShopGoods
-          .home-forum-list.m-b-1
-            .panel-header 热销商品
-            .home-goods
-              for goods in data.goods
-                .home-goods-content
-                  .home-goods-avatar
-                    div(style=`background-image: url(/r/${goods.imgMaster})`)
-                  .home-goods-info
-                    a(href=`/t/${goods.tid}` title=goods.name).home-goods-name=goods.name
-                    .home-goods-description=goods.abstract
-                    .home-goods-other
-                      a.home-goods-user(href=`/u/${goods.user.uid}`)
-                        img(src=tools.getUrl("userAvatar", goods.user.avatar) data-float-uid=goods.user.uid)
-                        span=goods.user.username
-                      .home-goods-price
-                      if !goods.productSettings.priceShowToVisit && !data.user
-                        .home-goods-price 登录可见
-                      else
-                        -let minPrice, maxPrice;
-                        for p in goods.productParams
-                          -const price = p.price;
-                          if minPrice === undefined || minPrice > price
-                            -minPrice = price;
-                          if maxPrice === undefined || maxPrice < price
-                            -maxPrice = price;
-                        if minPrice === maxPrice
-                          .home-goods-price=`￥${minPrice/100}`
+          if data.goodsForums.length && data.showShopGoods
+            .home-forums-list.m-b-1.home-category-master-handle(data-cid = '2')
+              span.fa.fa-bars.move-handle.m-r-1
+              span.panel-header.m-b-0.home-title 热销商品
+              .home-goods
+                for goods in data.goods
+                  .home-goods-content
+                    .home-goods-avatar
+                      div(style=`background-image: url(/r/${goods.imgMaster})`)
+                    .home-goods-info
+                      a(href=`/t/${goods.tid}` title=goods.name).home-goods-name=goods.name
+                      .home-goods-description=goods.abstract
+                      .home-goods-other
+                        a.home-goods-user(href=`/u/${goods.user.uid}`)
+                          img(src=tools.getUrl("userAvatar", goods.user.avatar) data-float-uid=goods.user.uid)
+                          span=goods.user.username
+                        .home-goods-price
+                        if !goods.productSettings.priceShowToVisit && !data.user
+                          .home-goods-price 登录可见
                         else
-                          .home-goods-price=`￥${minPrice/100} - ￥${maxPrice/100}`
-            .home-goods-forums 更多请访问：
-              for f in data.goodsForums
-                a(href=`/f/${f.fid}` data-float-fid=f.fid)
-                  if f.logo
-                    img.home-goods-forum-icon(src=tools.getUrl("forumLogo", f.logo))
-                  else
-                    .home-goods-forum-icon(style=`background-color: ${f.color}`)
-                  span=f.displayName
-      .col-xs-12.col-md-6.box-shadow-panel.p-l-0
+                          -let minPrice, maxPrice;
+                          for p in goods.productParams
+                            -const price = p.price;
+                            if minPrice === undefined || minPrice > price
+                              -minPrice = price;
+                            if maxPrice === undefined || maxPrice < price
+                              -maxPrice = price;
+                          if minPrice === maxPrice
+                            .home-goods-price=`￥${minPrice/100}`
+                          else
+                            .home-goods-price=`￥${minPrice/100} - ￥${maxPrice/100}`
+              .home-goods-forums 更多请访问：
+                for f in data.goodsForums
+                  a(href=`/f/${f.fid}` data-float-fid=f.fid)
+                    if f.logo
+                      img.home-goods-forum-icon(src=tools.getUrl("forumLogo", f.logo))
+                    else
+                      .home-goods-forum-icon(style=`background-color: ${f.color}`)
+                    span=f.displayName
+      .col-xs-12.col-md-6.p-l-0
         if data.columnListPosition === 'side' && data.columns && data.columns.length > 0
-          .home-forums-list.m-b-1
-            .panel-header 热门专栏
-            //-.home-header
-              //- fa.fa-flask
-              .header-name 热门专栏
-              //.header-description 关注最新学科，足不出户便能游遍世界~
-            .home-columns
-              for column in data.columns
-                a(href=`/m/${column._id}` target="_blank").home-column
-                  .home-column-avatar
-                    img(src=tools.getUrl("columnAvatar", column.avatar))
-                  .home-column-info
-                    .home-column-title= column.name
-                    .home-column-description= column.abbr || "无简介"
-                    .home-column-statics
-                      span=tools.briefTime(column.tlm) + "更新 "
-                      span= "共" + column.postCount + "篇文章"
-            .m-t-05
-              a.home-threads-more-link(href=`/m`) 查看更多
-          if !state.userColumn && data.user && state.columnPermission
-            .home-columns-link.m-b-1
-              a(href=`/column/apply` target="_blank") 开设专栏
-              .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
-
-
+          .home-categories-right
+            .home-forums-list.m-b-1.home-category-master-handle(data-cid = '1')
+              .home-title-box
+                .home-title-l
+                  span.fa.fa-bars.move-handle.m-r-1
+              .home-swipers(style='height:auto')
+                .home-covers-sm
+                  for thread, index in data.ads.fixed
+                    .home-cover-sm
+                      a(href=`/t/${thread.tid}` target="_blank" title=thread.title
+                        class=index > 2 ? 'm-b-0' : ''
+                      )
+                        .home-covers-sm-img(style=`background-image:url(${tools.getUrl('recommendThreadCover', thread.cover)})`)
+                        .home-covers-sm-title=thread.title
+            .home-forums-list.m-b-1.home-category-master-handle(data-cid = '3')
+              span.fa.fa-bars.move-handle.m-r-1
+              span.panel-header.m-b-0.home-title 热门专栏
+              //-.home-header
+                //- fa.fa-flask
+                .header-name 热门专栏
+                //.header-description 关注最新学科，足不出户便能游遍世界~
+              .home-columns
+                for column in data.columns
+                  a(href=`/m/${column._id}` target="_blank").home-column
+                    .home-column-avatar
+                      img(src=tools.getUrl("columnAvatar", column.avatar))
+                    .home-column-info
+                      .home-column-title= column.name
+                      .home-column-description= column.abbr || "无简介"
+                      .home-column-statics
+                        span=tools.briefTime(column.tlm) + "更新 "
+                        span= "共" + column.postCount + "篇文章"
+              .m-t-05
+                a.home-threads-more-link(href=`/m`) 查看更多
+            if !state.userColumn && data.user && state.columnPermission
+              .home-columns-link.m-b-1
+                a(href=`/column/apply` target="_blank") 开设专栏
+                .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
 
 block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatForumPanel/floatForumPanel
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../publicModules/homeModal/homeModal
   // 23
   +includeJS("/swiper/swiper-bundle.js")
   +includeJS("/home/home_all.js")

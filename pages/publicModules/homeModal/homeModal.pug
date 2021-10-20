@@ -1,0 +1,34 @@
+include ../draggablePanel/draggablePanel
+#moduleComplaintSelector.draggable-panel
+if !isIncluded('homeModal')
+  +includeCSS("/publicModules/homeModal/homeModal.css")
+  .modal.fade#moduleHomeModal(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+    .modal-dialog.modal-sm(role="document")#moduleHomeModalApp
+      .modal-content
+        .modal-header
+          .fa.fa-remove(data-dismiss="modal" aria-label="Close")
+          .modal-title {{title}}
+          .quote-content(v-if="quote") {{quote}}
+        .modal-body
+          .form
+            .form-group(v-for="(d, index) in data")
+              h5(v-if="d.label") {{d.label}}
+              //- 数字input
+              input.form-control(v-if="d.dom === 'input' && d.type === 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model.number="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
+              //- 非数字input
+              input.form-control(v-if="d.dom === 'input' && d.type !== 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
+              //- 文件input
+              input.form-control(v-if="d.dom === 'input' && d.type === 'file'" type="file" @change="pickedFile(index)" @keyup.enter="submit" :ref="'input' + index" :accept="d.accept")
+              //- 文本框
+              textarea.form-control(v-if="d.dom === 'textarea'" v-model="d.value" :placeholder="d.placeholder || ''" :rows="d.rows || 4" @keyup.enter="!d.disabledKeyup?submit:';'" )
+              //- 单选
+              .radio(v-if="d.dom === 'radio'")
+                label.m-r-05(v-for="r in d.radios")
+                  input(type="radio" :value="r.value" v-model="d.value")
+                  span {{r.name}}
+        .modal-footer
+          .options-button
+            a(data-dismiss="modal") 关闭
+            a.active(@click="submit") 确定
+
+  +includeJS("/publicModules/homeModal/homeModal.js")
