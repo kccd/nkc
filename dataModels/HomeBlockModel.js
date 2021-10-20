@@ -155,7 +155,7 @@ schema.statics.checkBlockValue = async (block) => {
     updateInterval,
     timeOfPostMin,
     timeOfPostMax,
-    listStyle,
+    threadStyle,
     coverPosition,
     threadCount,
     fixedThreadCount,
@@ -213,7 +213,7 @@ schema.statics.checkBlockValue = async (block) => {
     min: 0,
     fractionDigits: 2
   });
-  if(!['abstract', 'brief', 'minimalist'].includes(listStyle)) {
+  if(!['abstract', 'brief', 'minimalist'].includes(threadStyle)) {
     throwErr(400, `文章列表风格设置错误`);
   }
   if(!['left', 'right'].includes(coverPosition)) {
@@ -281,6 +281,7 @@ schema.statics.getHomeBlockData = async (props) => {
   const ShopGoodsModel = mongoose.model('shopGoods');
   const {
     fidOfCanGetThreads = [],
+    showDisabledBlock = false
   } = props;
   let {homeBlocksId, showShopGoods} = await SettingModel.getSettings('home');
   const {movable, fixed} = await ThreadModel.getHomeRecommendThreads(fidOfCanGetThreads);
@@ -311,7 +312,7 @@ schema.statics.getHomeBlockData = async (props) => {
       }
       let data;
       const homeBlock = await HomeBlockModel.findOne({_id: id});
-      if(!homeBlock) continue;
+      if(!homeBlock || (homeBlock.disabled && !showDisabledBlock)) continue;
       data = await homeBlock.extendThreads(fidOfCanGetThreads);
       blocksData.push({
         type: id,
@@ -330,7 +331,7 @@ schema.statics.getHomeBlockData = async (props) => {
 * 更新自动推送的文章
 * */
 schema.methods.updateThreadsId = async function() {
-  const PostModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
   const {
     forumsId,
     tcId,
@@ -347,9 +348,7 @@ schema.methods.updateThreadsId = async function() {
   const match = {
     type: 'thread',
     disabled: false,
-    toRecycle: {$ne: true},
-    mainForumsId: {$in: forumsId},
-    tcId: {$in: tcId},
+    toDraft: {$ne: true},
     toc: {
       $gte: new Date(Date.now() - (timeOfPostMax * 24 * 60 * 60 * 1000)),
       $lte: new Date(Date.now() - (timeOfPostMin * 24 * 60 * 60 * 1000)),
@@ -361,6 +360,12 @@ schema.methods.updateThreadsId = async function() {
     voteUp: voteUpMin,
     voteDown: {$lte: voteDownMax}
   };
+  if(forumsId.length > 0) {
+    match.mainForumsId = {$in: forumsId};
+  }
+  if(tcId.length > 0) {
+    match.tcId = {$in: tcId};
+  }
   if(digest) {
     match.digest = true;
   }

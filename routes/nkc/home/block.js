@@ -7,7 +7,7 @@ router
       name,
     } = block;
     await db.HomeBlockModel.checkBlockValue(block);
-    const sameName = await HomeBlockModel.findOne({name}, {_id: 1});
+    const sameName = await db.HomeBlockModel.findOne({name}, {_id: 1});
     if(sameName) ctx.throw(400, `模块名已存在`);
     block._id = await db.SettingModel.operateSystemID('homeBlock', 1);
     const homeBlock = db.HomeBlockModel(block);
@@ -74,7 +74,7 @@ router
       updateInterval,
       timeOfPostMin,
       timeOfPostMax,
-      listStyle,
+      threadStyle,
       coverPosition,
       threadCount,
       disabled,
@@ -98,7 +98,7 @@ router
         updateInterval,
         timeOfPostMin,
         timeOfPostMax,
-        listStyle,
+        threadStyle,
         coverPosition,
         threadCount,
         disabled,

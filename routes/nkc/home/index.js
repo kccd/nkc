@@ -1,4 +1,5 @@
 const router = require("koa-router")();
+const blockRouter = require('./block');
 router
   .get("/", async (ctx, next) => {
     const {db, data} = ctx;
@@ -345,5 +346,6 @@ router
     await db.SettingModel.saveSettingsToRedis("home");
     data.showActivityEnter = showActivityEnter;
     return next();
-  });
+  })
+  .use('/block', blockRouter.routes(), blockRouter.allowedMethods());
 module.exports = router;
