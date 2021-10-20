@@ -9,8 +9,12 @@ block title
           display: none;
       }
 block content
-  .container-fluid.max-width#home_all
-    .row(style=state.isApp?'margin-top: 0':'margin-top: 56px')
+  .container-fluid.max-width
+    .row(style=state.isApp ? 'margin-top: 0':'margin-top: 56px')
+      if permission("unBannedUser") || permission("bannedUser") || permission("clearUserInfo")
+        .admin-opreator
+          button.home-title-r.btn-primary.btn.btn-xs(onclick=`editor`) 编辑
+          button.home-title-r.btn-danger.btn.btn-xs(onclick=`finished`) 完成
       //.col-xs-12.col-md-12.box-shadow-panel
       //  //- 只有封面图的文章入口 轮播
       //  .home-top(style=state.isApp?'margin-top: 0':'')
@@ -59,7 +63,7 @@ block content
 
       .col-xs-12.col-md-6.home-forums
         .home-categories-left
-          .home-forums-list.m-b-1.home-category-master-handle(data-cid = '1')
+          .home-forums-list.m-b-1.home-category-master-handle
             .home-title-box
               .home-title-l
                 span.fa.fa-bars.move-handle.m-r-1
@@ -83,11 +87,14 @@ block content
                   span.fa.fa-bars.move-handle.m-r-1
                   span.panel-header.m-b-0.home-title 首页置顶
                 if permission("unBannedUser") || permission("bannedUser") || permission("clearUserInfo")
-                  button.home-title-r.btn-warning.btn.btn-xs(@click='editorForum()') 编辑
+                  .opreator
+                    button.home-title-r.btn-primary.btn.btn-xs(@click=`editorForum('1')`) 编辑
+                    button.home-title-r.btn-danger.btn.btn-xs(@click=`del('1')`) 删除
+                    button.home-title-r.btn-warning.btn.btn-xs(@click='disabled(cid)') 屏蔽
                 //-.home-header
                   //-.fa.fa-tags
                   .header-name 置顶
-              .home-threads
+              .home-threads(v-if='!domHidden')
                 for thread in data.toppedThreads
                   include ../publicModules/thread_panel/thread_panel
           mixin columnPanel(column, klass)
@@ -185,7 +192,7 @@ block content
       .col-xs-12.col-md-6.p-l-0
         if data.columnListPosition === 'side' && data.columns && data.columns.length > 0
           .home-categories-right
-            .home-forums-list.m-b-1.home-category-master-handle(data-cid = '1')
+            .home-forums-list.m-b-1.home-category-master-handle
               .home-title-box
                 .home-title-l
                   span.fa.fa-bars.move-handle.m-r-1
@@ -227,7 +234,6 @@ block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatForumPanel/floatForumPanel
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
-  include ../publicModules/homeModal/homeModal
   // 23
   +includeJS("/swiper/swiper-bundle.js")
   +includeJS("/home/home_all.js")
