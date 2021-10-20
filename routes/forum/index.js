@@ -7,7 +7,7 @@ forumRouter
     const {data, query, db, nkcModules} = ctx;
     const {user} = data;
     const {t = 'map', f = 'writable'} = query;
-		data.forumCategories = await db.ForumCategoryModel.getCategories();
+    data.threadCategories = await db.ThreadCategoryModel.getCategoryTree();
 		if(t === 'selector') {
 			if(!['writable', 'readable'].includes(f)) ctx.throw(400, `专业类型错误 from: ${f}`);
 			data.forums = await db.ForumModel.getForumSelectorForums(user? user.uid: '', f);
