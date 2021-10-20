@@ -463,7 +463,7 @@ async function addWaterMask(options) {
     imageStream,
     output,
     position = {x: 10, y: 10},
-    flex = 0.4,
+    flex = 0.2,
     bitRate,
     scalaByHeight
   } = options;
