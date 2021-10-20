@@ -31,6 +31,7 @@ const run = async () => {
   await timedTasks.updateForumsMessage();
   await timedTasks.modifyTimeoutApplicationForm();
   await timedTasks.modifyProjectCycle();
+  await timedTasks.initHomeBlocksTimeout();
   if(process.connected) process.send('ready');
   process.on('message', function(msg) {
     if (msg === 'shutdown') {
