@@ -56,5 +56,12 @@ module.exports = async (options) => {
   
   // 是否需要进行手机号验证
   data.needVerifyPhoneNumber = await db.UsersPersonalModel.shouldVerifyPhoneNumber(state.uid);
+
+  data.homeBlockData = await db.HomeBlockModel.getHomeBlockData({
+    fidOfCanGetThreads
+  });
+
+  console.log(data.homeBlockData);
+
   ctx.template = "home/home_all.pug";
 };

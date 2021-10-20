@@ -1,7 +1,7 @@
 const router = require('koa-router')();
 router
   .post('/', async (ctx, next) =>{
-    const {db, body, data} = ctx;
+    const {db, body} = ctx;
     const {block} = body;
     const {
       name,
@@ -12,13 +12,20 @@ router
     block._id = await db.SettingModel.operateSystemID('homeBlock', 1);
     const homeBlock = db.HomeBlockModel(block);
     await homeBlock.save();
+    await db.SettingModel.updateOne({_id: 'home'}, {
+      $addToSet: {
+        'c.homeBlocksId.left': homeBlock._id
+      }
+    });
+    await db.SettingModel.saveSettingsToRedis('home');
     await next();
   })
   .put('/', async (ctx, next) => {
     const {body, db} = ctx;
-    const {homeBlocksId} = body;
-    const defaultBlocksId = ['toppedThreads', 'column', 'shop'];
-    const blocksId = homeBlocksId.filter(id => !defaultBlocksId.includes(id));
+    const {left, right} = body.homeBlocksId;
+    const defaultBlocksId = ['recommendThreadsMovable', 'toppedThreads', 'goods', 'recommendThreadsFixed', 'forums', 'toppedColumns']
+    let blocksId = left.concat(right);
+    blocksId = blocksId.filter(id => !defaultBlocksId.includes(id));
     const blocks = await db.HomeBlockModel.find({_id: {$in: blocksId}});
     const blocksObj = {};
     blocks.map(b => blocksObj[b._id]);
@@ -27,7 +34,10 @@ router
     }
     await db.SettingModel.updateOne({_id: 'home'}, {
       $set: {
-        'c.homeBlocksId': homeBlocksId
+        'c.homeBlocksId': {
+          left,
+          right
+        }
       }
     });
     await db.SettingModel.saveSettingsToRedis('home');
@@ -94,7 +104,8 @@ router
     await homeBlock.deleteOne();
     await db.SettingModel.updateOne({_id: 'home'}, {
       $pull: {
-        'c.homeBlocksId': homeBlock._id,
+        'c.homeBlocksId.left': homeBlock._id,
+        'c.homeBlocksId.right': homeBlock._id
       }
     });
     await db.SettingModel.saveSettingsToRedis('home');

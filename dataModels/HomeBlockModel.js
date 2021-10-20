@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const apiFunction = require("../nkcModules/apiFunction");
 const schema = new mongoose.Schema({
   _id: Number,
   // 模块名称
@@ -124,6 +125,11 @@ const schema = new mongoose.Schema({
   fixedThreadsId: {
     type: [String],
     default: []
+  },
+  // 显示时的排序
+  sort: {
+    type: String,
+    default: 'random', // random, toc, postCount, voteUpCount
   }
 }, {
   collection: 'homeBlocks'
@@ -215,51 +221,97 @@ schema.statics.checkBlockValue = async (block) => {
     throwErr(400, `文章来源设置错误`);
   }
 }
+/*
+* @param {[String]} fidOfCanGetThreads 可访问的专业 ID
+* @param {[Object]} 文章对象组成的数组
+* */
+schema.methods.extendThreads = async function(fidOfCanGetThreads) {
+  const ThreadModel = mongoose.model('threads');
+  const apiFunction = require('../nkcModules/apiFunction');
+  const {
+    autoThreadsId,
+    fixedThreadsId,
+    fixedThreadCount,
+    threadCount,
+  } = this;
+  if(threadCount <= 0) {
+    return [];
+  }
+  const _fixedThreadsId = apiFunction.arrayShuffle(fixedThreadsId);
+  let selectedThreadsId = _fixedThreadsId.slice(0, fixedThreadCount);
+  const autoThreadsCount = threadCount - selectedThreadsId.length;
+  const _autoThreadsId = apiFunction.arrayShuffle(autoThreadsId);
+  selectedThreadsId = selectedThreadsId.concat(_autoThreadsId.slice(0, autoThreadsCount));
+  if(selectedThreadsId.length === 0) {
+    return [];
+  }
+  let threads = await ThreadModel.find({
+    tid: {
+      $in: selectedThreadsId
+    },
+    disabled: false,
+    mainForumsId: {
+      $in: fidOfCanGetThreads
+    }
+  });
+  threads = await ThreadModel.extendThreads(threads, {
+    category: true,
+    htmlToText: true,
+    removeLink: true,
+  });
+  return threads;
+}
 
 schema.statics.getHomeBlockData = async (props) => {
   const SettingModel = mongoose.model('settings');
   const ThreadModel = mongoose.model('threads');
   const ColumnModel = mongoose.model('columns');
   const HomeBlockModel = mongoose.model('homeBlocks');
+  const ShopGoodsModel = mongoose.model('shopGoods');
   const {
     fidOfCanGetThreads = [],
   } = props;
-  const {homeBlocksId, showShopGoods} = await SettingModel.getSettings('home');
+  let {homeBlocksId, showShopGoods} = await SettingModel.getSettings('home');
+  const {movable, fixed} = await ThreadModel.getHomeRecommendThreads(fidOfCanGetThreads);
   // 置顶专栏
   const defaultData = {
     toppedThreads: await ThreadModel.getHomeToppedThreads(fidOfCanGetThreads),
     toppedColumns: await ColumnModel.getHomeToppedColumns(),
+    recommendThreadsMovable: movable,
+    recommendThreadsFixed: fixed,
     goods: [],
     forums: []
   };
+  const defaultTypes = Object.keys(defaultData);
   // 热销商品
   if(showShopGoods) {
-    defaultData.goods = await db.ShopGoodsModel.getHomeGoods();
+    defaultData.goods = await ShopGoodsModel.getHomeGoods();
   }
-  const homeBlockData = [];
-  for(const id of homeBlocksId) {
-    if(['toppedThreads', 'goods', 'toppedColumns', 'forums'].includes(id)) {
-      homeBlockData.push({
+  const getData = async (ids) => {
+    const blocksData = [];
+    for(const id of ids) {
+      if(defaultTypes.includes(id)) {
+        blocksData.push({
+          type: id,
+          data: defaultData[id]
+        });
+        continue;
+      }
+      let data;
+      const homeBlock = await HomeBlockModel.findOne({_id: id});
+      if(!homeBlock) continue;
+      data = await homeBlock.extendThreads(fidOfCanGetThreads);
+      blocksData.push({
         type: id,
-        data: defaultData[id]
+        data
       });
-      continue;
     }
-    let data;
-    const homeBlock = await HomeBlockModel.findOne({_id: id});
-    if(!homeBlock) continue;
-    const {
-      autoThreadsId,
-      fixedThreadsId,
-      fixedThreadCount,
-      threadCount,
-    } = homeBlock;
-    if(threadCount <= 0) {
-      data = [];
-    } else {
-
-    }
-  }
+    return blocksData;
+  };
+  return {
+    left: await getData(homeBlocksId.left),
+    right: await getData(homeBlocksId.right)
+  };
 };
 
 module.exports = mongoose.model('homeBlocks', schema);

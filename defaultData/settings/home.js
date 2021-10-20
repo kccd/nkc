@@ -113,6 +113,9 @@ module.exports = {
     },
     toppedColumnsId: [],
     // 首页自定义文章列表
-    homeBlocksId: ['toppedThreads', 'goods', 'toppedColumns', 'forums']
+    homeBlocksId: {
+      left: ['recommendThreadsMovable', 'toppedThreads', 'goods'],
+      right: ['recommendThreadsFixed', 'forums', 'toppedColumns']
+    }
   }
 };
