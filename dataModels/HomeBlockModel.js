@@ -111,8 +111,13 @@ const schema = new mongoose.Schema({
     default: false,
     index: 1
   },
-  // 文章来源 auto: 自动, fixed: 固定, mixed: 混合
+  // 手动推送文章显示条数
   fixedThreadCount: {
+    type: Number,
+    default: 0,
+  },
+  // 自动推送文章入选条数
+  autoThreadCount: {
     type: Number,
     default: 0,
   },
@@ -153,7 +158,8 @@ schema.statics.checkBlockValue = async (block) => {
     listStyle,
     coverPosition,
     threadCount,
-    threadSource,
+    fixedThreadCount,
+    autoThreadCount,
   } = block;
   checkString(name, {
     name: '模块名',
@@ -217,9 +223,14 @@ schema.statics.checkBlockValue = async (block) => {
     name: '文章数目',
     min: 1
   });
-  if(!['auto', 'fixed', 'mixed'].includes(threadSource)) {
-    throwErr(400, `文章来源设置错误`);
-  }
+  checkNumber(fixedThreadCount, {
+    name: '手动推选文章显示条数',
+    min: 0,
+  });
+  checkNumber(autoThreadCount, {
+    name: '自动推送文章入选条数',
+    min: 0
+  });
 }
 /*
 * @param {[String]} fidOfCanGetThreads 可访问的专业 ID
@@ -277,6 +288,7 @@ schema.statics.getHomeBlockData = async (props) => {
   const defaultData = {
     toppedThreads: await ThreadModel.getHomeToppedThreads(fidOfCanGetThreads),
     toppedColumns: await ColumnModel.getHomeToppedColumns(),
+    hotColumns: await ColumnModel.getHomeHotColumns(),
     recommendThreadsMovable: movable,
     recommendThreadsFixed: fixed,
     goods: [],
@@ -313,5 +325,74 @@ schema.statics.getHomeBlockData = async (props) => {
     right: await getData(homeBlocksId.right)
   };
 };
+
+/*
+* 更新自动推送的文章
+* */
+schema.methods.updateThreadsId = async function() {
+  const PostModel = mongoose.model('threads');
+  const {
+    forumsId,
+    tcId,
+    digest,
+    origin,
+    postCountMin,
+    voteUpMin,
+    voteUpTotalMin,
+    voteDownMax,
+    timeOfPostMin,
+    timeOfPostMax,
+    autoThreadCount,
+  } = this;
+  const match = {
+    type: 'thread',
+    disabled: false,
+    toRecycle: {$ne: true},
+    mainForumsId: {$in: forumsId},
+    tcId: {$in: tcId},
+    toc: {
+      $gte: new Date(Date.now() - (timeOfPostMax * 24 * 60 * 60 * 1000)),
+      $lte: new Date(Date.now() - (timeOfPostMin * 24 * 60 * 60 * 1000)),
+    },
+    threadPostCount: {
+      $gte: postCountMin
+    },
+    voteUpTotal: voteUpTotalMin,
+    voteUp: voteUpMin,
+    voteDown: {$lte: voteDownMax}
+  };
+  if(digest) {
+    match.digest = true;
+  }
+  if(origin) {
+    match.originStatus = {
+      $in: ['4', '5', '6']
+    };
+  }
+  let posts = await PostModel.aggregate([
+    {
+      $match: match
+    },
+    {
+      $project: {
+        pid: 1,
+        tid: 1
+      }
+    },
+    {
+      $sample: {
+        size: autoThreadCount
+      }
+    }
+  ]);
+  posts = posts || [];
+  const threadsId = posts.map(post => post.tid);
+  await this.updateOne({
+    $set: {
+      autoThreadsId: threadsId
+    }
+  });
+}
+
 
 module.exports = mongoose.model('homeBlocks', schema);

@@ -73,15 +73,7 @@ function modifyForum(){
 
 };
 //编辑
-function editorForum(cid){
-  const domBlock = $('.home-forums-list');
-  for(let i = 0;i<domBlock.length;i++){
-    const n = domBlock.eq(i);
-    const id = Number(n.attr('data-cid'));
-    if(id === Number(cid)){
-      this.domHidden = cid;
-    }
-  }
+function editorBlock(cid){
 
 };
 //删除
@@ -91,7 +83,47 @@ function disabled(){};
 function clickEditor(){
 
 };
+//进入编辑模式
 function editor(){
-  $('.home-title-r').css.visibility = 'initial';
+  const homeTitle = $('.home-title-r');
+  const moveHandle = $('.move-handle');
+  const adminEditor = document.getElementsByClassName('admin-editor');
+  const homeFinished = document.getElementsByClassName('admin-finished');
+  for(let i = 0; i < homeTitle.length; i++) {
+    const element = homeTitle[i];
+    element.style.visibility = 'initial';
+  }
+  for(let i = 0; i < moveHandle.length; i++) {
+    const element = moveHandle[i];
+    element.style.display = 'initial';
+  }
+  adminEditor[0].style.display = 'none';
+  homeFinished[0].style.display = 'initial';
 };
-function finished(){};
+function finished(){
+  const homeTitle = $('.home-title-r');
+  const moveHandle = $('.move-handle');
+  const adminEditor = document.getElementsByClassName('admin-editor');
+  const homeFinished = document.getElementsByClassName('admin-finished');
+  for(let i = 0; i < homeTitle.length; i++) {
+    const element = homeTitle[i];
+    element.style.visibility = 'hidden';
+  }
+  for(let i = 0; i < moveHandle.length; i++) {
+    const element = moveHandle[i];
+    element.style.display = 'none';
+  }
+  adminEditor[0].style.display = 'initial';
+  homeFinished[0].style.display = 'none';
+};
+
+Object.assign(window, {
+  changeOrder,
+  finished,
+  clickEditor,
+  disabled,
+  del,
+  editorBlock,
+  modifyForum,
+  editor,
+});

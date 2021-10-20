@@ -23,8 +23,16 @@ router
   .put('/', async (ctx, next) => {
     const {body, db} = ctx;
     const {left, right} = body.homeBlocksId;
-    //大轮播 置顶文章 商品 右侧小图 专业导航 热门专栏
-    const defaultBlocksId = ['recommendThreadsMovable', 'toppedThreads', 'goods', 'recommendThreadsFixed', 'forums', 'toppedColumns']
+    //大轮播 首页置顶 商品 右侧小图 专业导航 置顶专栏 热门专栏
+    const defaultBlocksId = [
+      'recommendThreadsMovable',
+      'toppedThreads',
+      'goods',
+      'recommendThreadsFixed',
+      'forums',
+      'toppedColumns',
+      'hotColumns'
+    ]
     let blocksId = left.concat(right);
     blocksId = blocksId.filter(id => !defaultBlocksId.includes(id));
     const blocks = await db.HomeBlockModel.find({_id: {$in: blocksId}});

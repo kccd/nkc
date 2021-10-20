@@ -60,8 +60,5 @@ module.exports = async (options) => {
   data.homeBlockData = await db.HomeBlockModel.getHomeBlockData({
     fidOfCanGetThreads
   });
-
-  console.log(data.homeBlockData);
-
   ctx.template = "home/home_all.pug";
 };

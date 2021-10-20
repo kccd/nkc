@@ -1,21 +1,15 @@
-extend ../bootstrap_base
-block title
-  include ../publicModules/web_header
-  +includeCSS("/home/home_all.css")
-  +includeCSS("/swiper/swiper-bundle.min.css")
-  if !permission("unBannedUser") || !permission("bannedUser") || !permission("clearUserInfo")
-    style.
-        .move-handle {
-            display: none;
-        }
-block content
-  mixin renderHTML(data, type)
+mixin renderHome(data)
+  //轮播图
+  if data.type === 'recommendThreadsMovable'
     //轮播图
-    if type === swiper
-      .col-xs-12.col-md-6.home-covers-md
+    .home-forums-list.m-b-1.home-category-master-handle
+      .home-title-box
+        .home-title-l
+          span.fa.fa-bars.move-handle.m-r-1
+      .home-swipers(style='height:220px')
         .swiper-container.swiper-home
           .swiper-wrapper
-            for thread in data.ads.movable
+            for thread in data.data
               a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
                 'background-image': `url(${tools.getUrl('recommendThreadCover', thread.cover)})`
               })
@@ -25,39 +19,49 @@ block content
             .fa.fa-angle-right
           .swiper-button-prev.swiper-button(style='background-image: none;')
             .fa.fa-angle-left
-    //小图部分
-    else if type === ''
-      .col-xs-12.col-md-6.hidden-xs.hidden-sm
-        .row.home-covers-sm
-          for thread, index in data.ads.fixed
+  //小图部分
+  if data.type === 'recommendThreadsFixed'
+    //右侧小图
+    .home-forums-list.m-b-1.home-category-master-handle
+      .home-title-box
+        .home-title-l
+          span.fa.fa-bars.move-handle.m-r-1
+      .home-swipers(style='height:auto')
+        .home-covers-sm
+          for thread, index in data.data
             .home-cover-sm
               a(href=`/t/${thread.tid}` target="_blank" title=thread.title
                 class=index > 2 ? 'm-b-0' : ''
               )
                 .home-covers-sm-img(style=`background-image:url(${tools.getUrl('recommendThreadCover', thread.cover)})`)
                 .home-covers-sm-title=thread.title
-    //首页顶置
-    else if type === ''
-      .home-forums-list.m-b-1.home-category-master-handle(data-cid = '')
+  //首页顶置
+  if data.type === 'toppedThreads'
+    if data.data.length
+      .home-forums-list.m-b-1.home-category-master-handle(data-cid = '1')
         .home-title-box
           .home-title-l
             span.fa.fa-bars.move-handle.m-r-1
             span.panel-header.m-b-0.home-title 首页置顶
           if permission("unBannedUser") || permission("bannedUser") || permission("clearUserInfo")
-            button.home-title-r.btn-warning.btn.btn-xs(@click='editorForum()') 编辑
+            .opreator
+              button.home-title-r.btn-primary.btn.btn-xs(onclick=`editorBlock()`) 编辑
+              button.home-title-r.btn-danger.btn.btn-xs(onclick=`del()`) 删除
+              button.home-title-r.btn-warning.btn.btn-xs(onclick='disabled()') 屏蔽
           //-.home-header
             //-.fa.fa-tags
             .header-name 置顶
-        .home-threads
-          for thread in data.toppedThreads
+        .home-threads(v-if='!domHidden')
+          for thread in data.data
             include ../publicModules/thread_panel/thread_panel
-    //热销商品
-    else if type === ''
-      .home-forum-list.m-b-1.home-category-master-handle(data-cid = '')
+  //热销商品
+  if data.type === 'goods'
+    if data.data.length
+      .home-forums-list.m-b-1.home-category-master-handle(data-cid = '2')
         span.fa.fa-bars.move-handle.m-r-1
         span.panel-header.m-b-0.home-title 热销商品
         .home-goods
-          for goods in data.goods
+          for goods in data.data
             .home-goods-content
               .home-goods-avatar
                 div(style=`background-image: url(/r/${goods.imgMaster})`)
@@ -84,37 +88,47 @@ block content
                     else
                       .home-goods-price=`￥${minPrice / 100} - ￥${maxPrice / 100}`
         .home-goods-forums 更多请访问：
-          for f in data.goodsForums
+          for f in data.data
             a(href=`/f/${f.fid}` data-float-fid=f.fid)
               if f.logo
                 img.home-goods-forum-icon(src=tools.getUrl("forumLogo", f.logo))
               else
                 .home-goods-forum-icon(style=`background-color: ${f.color}`)
               span=f.displayName
-    //热门专栏
-    else if type === ''
-      .home-forums-list.m-b-1.home-category-master-handle(data-cid = '')
-        span.fa.fa-bars.move-handle.m-r-1
-        span.panel-header.m-b-0.home-title 热门专栏
-        //-.home-header
-          //- fa.fa-flask
-          .header-name 热门专栏
-          //.header-description 关注最新学科，足不出户便能游遍世界~
-        .home-columns
-          for column in data.columns
-            a(href=`/m/${column._id}` target="_blank").home-column
-              .home-column-avatar
-                img(src=tools.getUrl("columnAvatar", column.avatar))
-              .home-column-info
-                .home-column-title= column.name
-                .home-column-description= column.abbr || "无简介"
-                .home-column-statics
-                  span=tools.briefTime(column.tlm) + "更新 "
-                  span= "共" + column.postCount + "篇文章"
-        .m-t-05
-          a.home-threads-more-link(href=`/m`) 查看更多
-      if !state.userColumn && data.user && state.columnPermission
-        .home-columns-link.m-b-1
-          a(href=`/column/apply` target="_blank") 开设专栏
-          .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
-
+  //热门专栏
+  if data.type === 'hotColumns'
+    .home-forums-list.m-b-1.home-category-master-handle(data-cid = '3')
+      span.fa.fa-bars.move-handle.m-r-1
+      span.panel-header.m-b-0.home-title 热门专栏
+      //-.home-header
+        //- fa.fa-flask
+        .header-name 热门专栏
+        //.header-description 关注最新学科，足不出户便能游遍世界~
+      .home-columns
+        for column in data.data
+          a(href=`/m/${column._id}` target="_blank").home-column
+            .home-column-avatar
+              img(src=tools.getUrl("columnAvatar", column.avatar))
+            .home-column-info
+              .home-column-title= column.name
+              .home-column-description= column.abbr || "无简介"
+              .home-column-statics
+                span=tools.briefTime(column.tlm) + "更新 "
+                span= "共" + column.postCount + "篇文章"
+      .m-t-05
+        a.home-threads-more-link(href=`/m`) 查看更多
+    if !state.userColumn && data.user && state.columnPermission
+      .home-columns-link.m-b-1
+        a(href=`/column/apply` target="_blank") 开设专栏
+        .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
+  ////置顶专栏
+  //if data.type === 'toppedColumns'
+  //  if data.toppedColumns && data.toppedColumns.length > 0
+  //    .home-forums-list.m-b-1
+  //      span.fa.fa-bars.move-handle.m-r-1
+  //      span.panel-header.m-b-0.home-title 置顶专栏
+  //      .home-main-columns
+  //        for column, index in data.toppedColumns
+  //          -var klass = index === data.toppedColumns.length - 1 ? 'm-b-0' : ''
+  //          +columnPanel(column, klass)
+  //
