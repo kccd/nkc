@@ -152,6 +152,8 @@ block content
               div(v-if='threadCategories.length > 0')
                 .editor-thread-category(v-for='c in threadCategories' v-if='c.nodes.length > 0')
                   .editor-header(:title='c.description') {{c.name}}
+                  .editor-thread-category-description(v-if='c.description') {{c.description}}
+                  .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border.m-b-05(v-if='c.warning') 注意事项：{{c.warning}}
                   .editor-thread-category-nodes
                     .editor-thread-category-node(
                       v-for='n in c.nodes'
