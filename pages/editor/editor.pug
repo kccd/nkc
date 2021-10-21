@@ -260,9 +260,7 @@ block content
                 select.form-control(v-model="originState" :disabled="!allowedOriginal" :title="!allowedOriginal?'字数小于'+originalWordLimit+'的文章不可申明原创': ''")
                   for text, index in getOriginLevel()
                     option(:value=index)=text
-          .m-b-2
-            .editor-header 专栏
-            include ../editor/toColumn
+
           if data.createSurveyPermission
             if data.type === "newThread" || (data.type === "modifyThread" && data.post.surveyId)
               .m-b-2
@@ -272,6 +270,9 @@ block content
                     id="disabledSurveyButton"
                   ) 创建
                 include ../publicModules/survey/edit
+          .m-b-2
+            .editor-header 专栏
+            include ../editor/toColumn
           +modifySubmit("PostButton")
       mixin editorInto
         h5.text-danger 温馨提示：
