@@ -29,9 +29,12 @@ router
     if(d) {
       try{
         options = JSON.parse(decodeURIComponent(Buffer.from(d, "base64").toString()));
-        const {fid} = options;
+        const {fid, excludedFid} = options;
         if(fid && fid.length > 0) {
           data.selectedForums = await db.ForumModel.find({fid: {$in: fid}});
+        }
+        if(excludedFid &&excludedFid.length > 0) {
+          data.excludedForums = await db.ForumModel.find({fid: {$in: excludedFid}});
         }
         searchUserFromMongodb = !options.author;
       } catch(err) {
@@ -71,6 +74,9 @@ router
       options.fid = (allFid).filter(id => fidOfCanGetThreads.includes(id));
     } else {
       options.fid = fidOfCanGetThreads;
+    }
+    if(options.excludedFid && options.excludedFid.length) {
+      options.fid = options.fid.filter(id => !options.excludedFid.includes(id));
     }
 
     // 加载分页设置

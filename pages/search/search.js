@@ -5,6 +5,7 @@ var app = new Vue({
   el: "#app",
   data: {
     selectedForums: [],
+    excludedForums: [],
     author: "",
     digest: false,
     timeStart: {
@@ -32,12 +33,9 @@ var app = new Vue({
       return NKC.methods.getDayCountByYearMonth(this.timeEnd.year, this.timeEnd.month);
     },
     options: function() {
-      var fid = [];
-      for(var i = 0; i < this.selectedForums.length; i++) {
-        fid.push(this.selectedForums[i].fid);
-      }
       var o = {
-        fid: fid,
+        fid: this.selectedForumsId,
+        excludedFid: this.excludedForumsId,
         timeStart: this.timeStart,
         timeEnd: this.timeEnd,
         sort: this.sort,
@@ -54,6 +52,9 @@ var app = new Vue({
         arr.push(this.selectedForums[i].fid);
       }
       return arr;
+    },
+    excludedForumsId: function() {
+      return this.excludedForums.map(forum => forum.fid);
     }
   },
   methods: {
@@ -63,26 +64,22 @@ var app = new Vue({
     base64ToStr: function(base64) {
       return decodeURIComponent(window.atob(base64))
     },
-    addForum: function(data) {
-      for(var i = 0; i < this.selectedForums.length; i++) {
-        if(this.selectedForums[i].fid === data.fid) return;
-      }
-      this.selectedForums.push(data);
-    },
-    selectForum: function() {
+    selectForum: function(type) {
       var self = this;
+      const forumsId = this.selectedForumsId.concat(this.excludedForumsId);
+      const forums = type === 'selected'? this.selectedForums: this.excludedForums;
       if(!window.ForumSelector) window.ForumSelector = new NKC.modules.ForumSelector();
       window.ForumSelector.open(function(data) {
-        self.selectedForums.push(data.forum)
+        if(forumsId.includes(data.forum.fid)) return;
+        forums.push(data.forum)
       }, {
         from: 'readable',
-        selectedForumsId: self.selectedForumsId,
+        // selectedForumsId: self.selectedForumsId,
         needThreadType: false,
       });
     },
-    removeForum: function(f) {
-      var index = this.selectedForums.indexOf(f);
-      this.selectedForums.splice(index, 1);
+    removeFromArr(arr, index) {
+      arr.splice(index, 1);
     },
     clickNav: function(type) {
       var t;
@@ -98,6 +95,12 @@ var app = new Vue({
     // 搜索
     search: function() {
       if(!this.c) return screenTopWarning("请输入关键词");
+      if(this.selectedForumsId.length > 0) {
+        const forumsId = this.selectedForumsId.filter(fid => !this.excludedForumsId.includes(fid));
+        if(forumsId.length === 0) {
+          return screenTopWarning('专业筛选和专业排除冲突');
+        }
+      }
       NKC.methods.visitUrl("/search?c=" + this.strToBase64(this.c || "") + (this.t?"&t="+this.t:"") +"&d=" + this.options)
       // window.location.href = "/search?c=" + this.strToBase64(this.c || "") + (this.t?"&t="+this.t:"") +"&d=" + this.options;
     },
@@ -107,6 +110,7 @@ var app = new Vue({
       if(isOpen) {
         this.complexOptions = false;
         this.selectedForums.length = 0;
+        this.excludedForums.length = 0;
         this.author = "";
         this.digest = false;
         this.timeStart = {
@@ -141,6 +145,7 @@ var app = new Vue({
 
     this.t = data.t || "";
     this.selectedForums = data.selectedForums || [];
+    this.excludedForums = data.excludedForums || [];
     var options = data.d;
     if(options) {
       try{
