@@ -104,14 +104,16 @@ block content
         .col-xs-12.col-md-7.search-results
           if data.total > 0
             mixin buttons
-              if permission("superModerator") && data.t === "thread"
+              if permission("superModerator") && ['thread', 'post'].includes(data.t)
                 .display-i-b(style="margin-bottom: -2rem;")
                   .paging-button
                     a.button.radius-left.radius-right(onclick="managementThreads()") 管理
                   .paging-button.management-thread-panel
                     a.button.radius-left(onclick="selectAll()") 全选
-                    a.button(onclick="moveSelectedThreads()") 移动
+                    if data.t === "thread"
+                      a.button(onclick="moveSelectedThreads()") 移动
                     a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
+
             h5=`约找到 ${data.total} 条结果，耗时 ${data.time/1000} 秒`
             +buttons()
             for result in data.results

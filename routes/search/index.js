@@ -298,6 +298,7 @@ router
           r = {
             docType,
             link,
+            pid: post.pid,
             oc: thread.oc,
             title: highlightObj[`${pid}_title`] || post.t || thread.firstPost.t,
             abstract:
