@@ -1,18 +1,15 @@
 const threadSettings = NKC.methods.getDataById("threadSettings");
-if(!threadSettings.isDisplay) {
-  NKC.methods.initPlyrMask = () => {};
-} else {
-  NKC.methods.initPlyrMask = function(player) {
-    if(player.type === 'video') {
-      setVideoMask(player);
-    } else {
-      const nkcSource = getNkcSource(player.elements.container);
-      setVisitorAccessCommonMask(nkcSource);
-    }
-  }
-  NKC.methods.initAttachmentMask = function(nkcSource) {
+NKC.methods.initPlyrMask = function(player) {
+  if(player.type === 'video') {
+    setVideoMask(player);
+  } else {
+    const nkcSource = getNkcSource(player.elements.container);
     setVisitorAccessCommonMask(nkcSource);
   }
+}
+
+NKC.methods.initAttachmentMask = function(nkcSource) {
+  setVisitorAccessCommonMask(nkcSource);
 }
 
 function getNkcSource(container) {
@@ -89,10 +86,10 @@ function setVideoMask(player) {
   if(!visitorAccess && !NKC.configs.uid) {
     // 显示游客访问受限的遮罩
     mask = getVideoVisitorAccessMask(player);
-  } else {
+  } else if(threadSettings.isDisplay) {
     mask = getVideoPreviewMask(player);
   }
-  nkcSource.find('.plyr').append(mask);
+  if(mask) nkcSource.find('.plyr').append(mask);
 }
 
 function setAudioMask(player) {
