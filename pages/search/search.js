@@ -6,6 +6,7 @@ var app = new Vue({
   data: {
     selectedForums: [],
     excludedForums: [],
+    onlyTitle: false,
     author: "",
     digest: false,
     timeStart: {
@@ -42,7 +43,8 @@ var app = new Vue({
         author: this.author,
         digest: this.digest,
         sortType: this.sortType,
-        relation: this.relation
+        relation: this.relation,
+        onlyTitle: this.onlyTitle,
       };
       return this.strToBase64(JSON.stringify(o));
     },
@@ -111,6 +113,7 @@ var app = new Vue({
         this.complexOptions = false;
         this.selectedForums.length = 0;
         this.excludedForums.length = 0;
+        this.onlyTitle = false;
         this.author = "";
         this.digest = false;
         this.timeStart = {
@@ -158,6 +161,8 @@ var app = new Vue({
         if(options.author) this.author = options.author;
         if(options.digest) this.digest = options.digest;
         if(options.fid) this.fid = options.fid;
+        if(options.excludedFid) this.excludedFid = options.excludedFid;
+        if(options.onlyTitle) this.onlyTitle = options.onlyTitle;
       } catch(err) {}
     }
     if(NKC.modules.SubscribeTypes) {

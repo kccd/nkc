@@ -15,10 +15,18 @@ block content
           .search-form.form-inline(v-show="complexOptions")
             .form-group
               label 多检索词关系：
-              span.h5 或
+              span.h5.m-r-1 或
                 input(type="radio" value="or" v-model="relation")
               span.h5 与
                 input(type="radio" value="" v-model="relation")
+          if data.t === 'thread'
+            .search-form.form-inline(v-show="complexOptions")
+              .form-group
+                label 仅搜标题：
+                span.h5.m-r-1 是
+                  input(type="radio" :value="true" v-model="onlyTitle")
+                span.h5 否
+                  input(type="radio" :value="false" v-model="onlyTitle")
           .search-form.form-inline(v-if="t !== 'user' && t !== 'column'" v-show="complexOptions")
             .form-group(v-if="t !== 'user'")
               label 作者筛选：

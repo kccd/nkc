@@ -50,7 +50,6 @@ router
       };
     }
 
-
     let results = [];
     data.results = [];
 
