@@ -152,6 +152,8 @@ block content
               div(v-if='threadCategories.length > 0')
                 .editor-thread-category(v-for='c in threadCategories' v-if='c.nodes.length > 0')
                   .editor-header(:title='c.description') {{c.name}}
+                  .editor-thread-category-description(v-if='c.description') {{c.description}}
+                  .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border.m-b-05(v-if='c.warning') 注意事项：{{c.warning}}
                   .editor-thread-category-nodes
                     .editor-thread-category-node(
                       v-for='n in c.nodes'
@@ -258,9 +260,7 @@ block content
                 select.form-control(v-model="originState" :disabled="!allowedOriginal" :title="!allowedOriginal?'字数小于'+originalWordLimit+'的文章不可申明原创': ''")
                   for text, index in getOriginLevel()
                     option(:value=index)=text
-          .m-b-2
-            .editor-header 专栏
-            include ../editor/toColumn
+
           if data.createSurveyPermission
             if data.type === "newThread" || (data.type === "modifyThread" && data.post.surveyId)
               .m-b-2
@@ -270,6 +270,9 @@ block content
                     id="disabledSurveyButton"
                   ) 创建
                 include ../publicModules/survey/edit
+          .m-b-2
+            .editor-header 专栏
+            include ../editor/toColumn
           +modifySubmit("PostButton")
       mixin editorInto
         h5.text-danger 温馨提示：

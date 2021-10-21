@@ -15,7 +15,7 @@ const fsPromises = fs.promises;
 module.exports = async (options) => {
   let {file, resource, user} = options;
   let {path} = file;
-  let {rid, toc, ext} = resource;
+  let {rid, toc, ext, oname} = resource;
   let {generalSettings} = user;
   let {waterSetting} = generalSettings;
 
@@ -143,10 +143,15 @@ module.exports = async (options) => {
     await Promise.all(tasks);
   }
 
+  oname = oname.split('.');
+  oname[oname.length - 1] = 'mp4';
+  oname = oname.join('.');
+
   // 更新数据库记录 inProcess改为 usable
   await resource.updateOne({
     state: 'usable',
     ext: 'mp4',
+    oname,
     height,
     width,
   })

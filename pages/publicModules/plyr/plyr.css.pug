@@ -1,6 +1,2 @@
-+includeCSS("/external_pkgs/plyr/plyr.css")
-
-style.
-  .plyr-dom{
-    
-  }
+if !isIncluded('plyrCss')
+  +includeCSS("/external_pkgs/plyr/plyr.css")

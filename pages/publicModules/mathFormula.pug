@@ -4,11 +4,11 @@
   * 异步获取内容渲染dom，需要手动执行该函数渲染公式
   * @author pengxiguaa 2019/7/26
   * */
-
-include ../MathJax
-script.
-  NKC.methods.renderFormula = function() {
-    if (window.MathJax) {
-      window.MathJax.typeset();
+if !isIncluded('mathFormula')
+  include ../MathJax
+  script.
+    NKC.methods.renderFormula = function() {
+      if (window.MathJax) {
+        window.MathJax.typeset();
+      }
     }
-  }

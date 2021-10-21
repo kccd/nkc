@@ -1,27 +1,28 @@
-+includeCSS("/publicModules/sticker/sticker.css")
-.modal.fade#moduleStickerViewer(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
-  .modal-dialog(role="document")#moduleStickerViewerApp
-    .modal-content
-      .modal-header
-        .title 表情图片
-        .fa.fa-remove(@click="close")
-      .modal-body(v-if="loading")
-        .loading 加载中...
-      .modal-body(v-else-if="sticker")
-        .sticker-image
-          img(:src="getUrl('sticker', sticker.rid)")
-        .sticker-info.m-t-05
-          img.user-avatar(:src="getUrl('userAvatar', sticker.targetUser.avatar)")
-          a(:href="'/u/' + sticker.tUid" target="_blank") {{sticker.targetUser.username}}
-          | &nbsp;{{sticker.shared?"分享":"上传"}}于 {{fromNow(sticker.toc)}}
-        .sticker-option(v-if="sticker.collected")
-          .sticker-info(v-if="uid !== sticker.tUid") 已添加到表情
-          .sticker-info(v-if="management").m-t-05
-            button.btn.btn-sm.btn-primary(@click="shareSticker" v-if="!sticker.shared && sticker.reviewed && uid === sticker.tUid") 设为共享
-            button.btn.btn-sm.btn-primary(@click="moveSticker") 移到最前
-            button.btn.btn-sm.btn-danger(@click="removeSticker") 删除
-        .sticker-option(v-else-if="sticker.shared")
-          button.btn.btn-sm.btn-theme(@click="collection") 添加到表情
-        .sticker-warning(v-if="sticker.shared")!=nkcRender.plainEscape(state.stickerSettings.notesAboutUsing)
-include ../../publicModules/moment
-+includeJS("/publicModules/sticker/sticker.js")
+if !isIncluded('sticker')
+  +includeCSS("/publicModules/sticker/sticker.css")
+  .modal.fade#moduleStickerViewer(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+    .modal-dialog(role="document")#moduleStickerViewerApp
+      .modal-content
+        .modal-header
+          .title 表情图片
+          .fa.fa-remove(@click="close")
+        .modal-body(v-if="loading")
+          .loading 加载中...
+        .modal-body(v-else-if="sticker")
+          .sticker-image
+            img(:src="getUrl('sticker', sticker.rid)")
+          .sticker-info.m-t-05
+            img.user-avatar(:src="getUrl('userAvatar', sticker.targetUser.avatar)")
+            a(:href="'/u/' + sticker.tUid" target="_blank") {{sticker.targetUser.username}}
+            | &nbsp;{{sticker.shared?"分享":"上传"}}于 {{fromNow(sticker.toc)}}
+          .sticker-option(v-if="sticker.collected")
+            .sticker-info(v-if="uid !== sticker.tUid") 已添加到表情
+            .sticker-info(v-if="management").m-t-05
+              button.btn.btn-sm.btn-primary(@click="shareSticker" v-if="!sticker.shared && sticker.reviewed && uid === sticker.tUid") 设为共享
+              button.btn.btn-sm.btn-primary(@click="moveSticker") 移到最前
+              button.btn.btn-sm.btn-danger(@click="removeSticker") 删除
+          .sticker-option(v-else-if="sticker.shared")
+            button.btn.btn-sm.btn-theme(@click="collection") 添加到表情
+          .sticker-warning(v-if="sticker.shared")!=nkcRender.plainEscape(state.stickerSettings.notesAboutUsing)
+  include ../../publicModules/moment
+  +includeJS("/publicModules/sticker/sticker.js")
