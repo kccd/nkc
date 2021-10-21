@@ -189,7 +189,7 @@ func.search = async (t, c, options) => {
   let {
     page=0, sortType,
     timeStart, timeEnd,
-    fid, relation, sort,
+    fid, relation, sort, excludedFid,
     author, digest, onlyTitle = false
   } = options;
 
@@ -454,6 +454,23 @@ func.search = async (t, c, options) => {
       body.query.bool.must[0].bool.should[0].bool.must.push(fidMatch);
       body.query.bool.must[0].bool.should[1].bool.must.push(fidMatch);
     }
+
+    if(excludedFid && excludedFid.length > 0) {
+      const excludedFidMatch = {
+        bool: {
+          must_not: excludedFid.map(id => {
+            return {
+              match: {
+                mainForumsId: id
+              }
+            }
+          })
+        }
+      };
+      body.query.bool.must[0].bool.should[0].bool.must.push(excludedFidMatch);
+      body.query.bool.must[0].bool.should[1].bool.must.push(excludedFidMatch);
+    }
+
 
     if(author) {
       let uid = "";

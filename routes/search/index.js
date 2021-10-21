@@ -74,9 +74,9 @@ router
     } else {
       options.fid = fidOfCanGetThreads;
     }
-    if(options.excludedFid && options.excludedFid.length) {
+    /*if(options.excludedFid && options.excludedFid.length) {
       options.fid = options.fid.filter(id => !options.excludedFid.includes(id));
-    }
+    }*/
 
     // 加载分页设置
     const {searchThreadList, searchAllList, searchPostList, searchUserList,
