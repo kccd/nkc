@@ -100,10 +100,21 @@ if !isIncluded('plyr')
         }
       }
 
+      NKC.methods.initAttachment = function() {
+        var attachments = $('span[data-tag="nkcsource"][data-type="attachment"]');
+        for(var i = 0 ; i < attachments.length; i++) {
+          var attachment = attachments.eq(i);
+          var mask = attachment.find('.plyr-mask-common');
+          if(mask.length > 0) continue;
+          NKC.methods.initAttachmentMask(attachment);
+        }
+      }
+
       NKC.methods.initVideo = function() {
         NKC.methods.initNKCAudio();
         NKC.methods.initNKCVideo();
         NKC.methods.initPlayerControls(players);
+        NKC.methods.initAttachment();
       }
       NKC.methods.initVideo();
     }());

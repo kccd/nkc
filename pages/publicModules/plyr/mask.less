@@ -1,6 +1,6 @@
 @import '../../publicModules/base';
 .plyr {
-  .plyr-mask {
+  .plyr-mask-video {
     position: absolute;
     top: 0;
     left: 0;
@@ -21,6 +21,7 @@
         // background-color: red;
         .player-tip-content {
           text-align: center;
+          margin-bottom: 0.5rem;
         }
         .player-tip-button {
           text-align: center;
@@ -72,6 +73,49 @@
             }
           }*/
         }
+      }
+    }
+  }
+}
+.plyr-mask-common{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.726);
+  z-index: 10;
+  display: table;
+  text-align: center;
+  .plyr-mask-fix{
+    display: table-cell;
+    vertical-align: middle;
+  }
+  .player-tip-content{
+    color: #fff;
+    font-size: 1.2rem;
+  }
+  .player-tip-button{
+    a{
+      cursor: pointer;
+      font-size: 1.2rem;
+      border-radius: 2px;
+      display: inline-block;
+      color: #fff;
+      background-color: rgba(0, 179, 255, 0.7);
+      height: 2.2rem;
+      line-height: 2.2rem;
+      padding: 0 0.5rem;
+      .fa{
+        margin-right: 0.3rem;
+      }
+      text-decoration: none;
+      &:hover{
+        text-decoration: none;
+        opacity: 0.8;
+      }
+      &:active{
+        text-decoration: none;
       }
     }
   }

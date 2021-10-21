@@ -46,6 +46,7 @@ module.exports = {
   video(html = "", id, resource = {}) {
     const {
       oname = "未知",
+      visitorAccess = true,
       rid = id
     } = resource;
     const poster = getUrl("videoCover", rid);
@@ -60,7 +61,7 @@ module.exports = {
         sourceHtml += `<source src="${url}" type="video/mp4" size="${height}"> 你的浏览器不支持video标签，请升级。`;
       }
       return `
-      <span data-tag="nkcsource" data-type="video" data-id="${id}">
+      <span data-tag="nkcsource" data-type="video" data-id="${id}" data-visitor-access="${visitorAccess}">
         <video class="plyr-dom" preload="none" controls="controls" poster="${poster}" data-rid="${rid}" data-plyr-title="${oname}">
           ${sourceHtml}
         </video>
@@ -77,6 +78,7 @@ module.exports = {
     const {
       oname = "未知",
       rid = id,
+      visitorAccess = true,
     } = resource;
     const url = getUrl("resource", id);
     if(resource.disabled){
@@ -86,7 +88,7 @@ module.exports = {
       return `<span data-tag="nkcsource" data-type="audio-not-found"><span>音频已丢失</span></br><span>${oname}</span></span>`
     }
     return `
-        <span data-tag="nkcsource" data-type="audio" data-id="${id}">
+        <span data-tag="nkcsource" data-type="audio" data-id="${id}" data-visitor-access="${visitorAccess}">
           <audio class="plyr-dom" preload="none" controls data-rid="${id}" data-size="${resource.size}">
             <source src="${url}" type="audio/mp3"/>
             你的浏览器不支持audio标签，请升级。
@@ -102,6 +104,7 @@ module.exports = {
       ext = "",
       hits = 0,
       rid = id,
+      visitorAccess = true,
     } = resource;
     const fileCover = getUrl("fileCover", ext);
     let url = getUrl("resource", rid);
@@ -123,7 +126,7 @@ module.exports = {
           </span>
       </span>
       `:`
-      <span data-tag="nkcsource" data-type="attachment">
+      <span data-tag="nkcsource" data-type="attachment" data-visitor-access="${visitorAccess}">
         <span class="article-attachment-icon">
             <img src="${fileCover}" alt="attachment icon">
           </span>
