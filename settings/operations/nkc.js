@@ -14,6 +14,9 @@ module.exports = {
       PARAMETER: {
         PUT: 'nkcManagementHome',
         DELETE: 'nkcManagementHome',
+        disabled: {
+          PUT: 'nkcManagementHome',
+        }
       }
     }
   },

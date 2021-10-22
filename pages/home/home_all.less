@@ -82,7 +82,7 @@ body{
     }
   }
 }
-.home-top{
+/*.home-top{
   background-color: #fff;
   padding: 0.5rem 0 0.5rem 0;
   //box-shadow: 0 0 3px rgba(0,0,0,0.1);
@@ -92,92 +92,9 @@ body{
     padding: 0;
     background-color: #fff;
     overflow: hidden;
-    .home-covers-md{
-      position: relative;
-      height: 21.3rem;
-      overflow: hidden;
-      .swiper-container{
-        height: 100%;
-        border-radius: 2px;
-        box-sizing: border-box;
-        //border: 3px solid #eee;
-      }
-      .swiper-wrapper{
-        height: 100%;
-        a.swiper-slide{
-          height: 100%;
-          border-radius: 2px;
-          overflow: hidden;
-          position: relative;
-        }
-      }
-    }
-    .home-covers-sm{
-      font-size: 0;
-      //padding-right: 0.3rem;
-      .home-cover-sm{
-        width: 33%;
-        display: inline-block;
-        padding-right: 0.6rem;
-        a{
-          display: block;
-          margin-bottom: 0.6rem;
-          position: relative;
-          box-sizing: border-box;
-          //border: 2px solid #eee;
-          border-radius: 5px;
-          overflow: hidden;
-          .home-covers-sm-img{
-            background-size: cover;
-            height: 10.34rem;
-          }
-          .home-covers-sm-title{
-            background-color: rgba(0,0,0,0.4);
-            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 80%);
-            color: #fff;
-            position: absolute;
-            bottom: 0;
-            font-size: 1rem;
-            line-height: 2rem;
-            .hideText(@line: 1);
-            padding: 0 0.5rem;
-            left: 0;
-            width: 100%;
-            height: 2rem;
-          }
-        }
-      }
-    }
-    /*.home-covers-sm{
-      height: 10rem;
-      position: relative;
-      display: block;
-      overflow: hidden;
-      border-radius: 2px;
-      border: 3px solid #eee;
-      box-sizing: border-box;
-      &>div{
-        height: 100%;
-        border-radius: 2px;
-        background-size: cover;
-      }
-      .home-covers-sm-title{
-        background-color: rgba(0,0,0,0.4);
-        background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 40%);
-        color: #fff;
-        position: absolute;
-        bottom: 0;
-        font-size: 1rem;
-        line-height: 2rem;
-        .hideText(@line: 1);
-        padding: 0 0.5rem;
-        left: 0;
-        width: 100%;
-        height: 2rem;
-      }
-    }*/
+
   }
-}
+}*/
 
 .home-active-users{
   margin-top: 0.5rem;
@@ -433,31 +350,6 @@ footer.footer{
 
 
 
-@media (max-width: 500px) {
-  .home-goods .home-goods-content .home-goods-avatar > div{
-    width: 10rem;
-    height: 7rem;
-  }
-  .home-top .home-covers .home-covers-md{
-    height: 12rem;
-  }
-  .home-forums .home-forums-list .home-forum-parent{
-    display: block;
-  }
-  .home-forums .home-forums-list .home-forum-child{
-    display: block;
-    padding: 0.5rem 0 0.5rem 1rem;
-  }
-  .home-forums .home-forum-panel .home-forum-panel-name{
-    width: inherit;
-  }
-  .home-forums .home-forum-panel{
-    width: inherit;
-  }
-  .home-subscribe-forum{
-    width: 5.7rem;
-  }
-}
 
 
 
@@ -777,4 +669,90 @@ footer.footer{
 }
 .move-handle{
   display: none;
+}
+.home-swiper{
+  //height: 21.3rem;
+}
+.home-covers-md{
+  position: relative;
+  height: 21.3rem;
+  overflow: hidden;
+  .swiper-container{
+    height: 100%;
+    border-radius: 2px;
+    box-sizing: border-box;
+    //border: 3px solid #eee;
+  }
+  .swiper-wrapper{
+    height: 100%;
+    a.swiper-slide{
+      height: 100%;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+  }
+}
+.home-covers-sm{
+  font-size: 0;
+  //padding-right: 0.3rem;
+  .home-cover-sm{
+    width: 33%;
+    display: inline-block;
+    padding-right: 0.6rem;
+    a{
+      display: block;
+      margin-bottom: 0.6rem;
+      position: relative;
+      box-sizing: border-box;
+      //border: 2px solid #eee;
+      border-radius: 5px;
+      overflow: hidden;
+      .home-covers-sm-img{
+        background-size: cover;
+        height: 10.34rem;
+      }
+      .home-covers-sm-title{
+        background-color: rgba(0,0,0,0.4);
+        background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 80%);
+        color: #fff;
+        position: absolute;
+        bottom: 0;
+        font-size: 1rem;
+        line-height: 2rem;
+        .hideText(@line: 1);
+        padding: 0 0.5rem;
+        left: 0;
+        width: 100%;
+        height: 2rem;
+      }
+    }
+  }
+}
+
+
+@media (max-width: 500px) {
+  .home-goods .home-goods-content .home-goods-avatar > div{
+    width: 10rem;
+    height: 7rem;
+  }
+  .home-covers-md.home-covers-movable{
+    height: 12rem;
+  }
+  .home-forums .home-forums-list .home-forum-parent{
+    display: block;
+  }
+  .home-forums .home-forums-list .home-forum-child{
+    display: block;
+    padding: 0.5rem 0 0.5rem 1rem;
+  }
+  .home-forums .home-forum-panel .home-forum-panel-name{
+    width: inherit;
+  }
+  .home-forums .home-forum-panel{
+    width: inherit;
+  }
+  .home-subscribe-forum{
+    width: 5.7rem;
+  }
 }

@@ -76,6 +76,10 @@ const schema = new mongoose.Schema({
   },
   // 文章列表 css 样式
   blockStyle: {
+    headerTitleColor: {
+      type: String,
+      default: '#000000'
+    },
     backgroundColor: {
       type: String,
       default: '#ffffff'
@@ -337,12 +341,25 @@ schema.statics.getHomeBlockData = async (props) => {
     right: []
   };
   for(const homeBlock of homeBlocks) {
-    const {_id, defaultBlock, name, position} = homeBlock;
-
-    let homeBlockData = {
+    const {
       _id,
       defaultBlock,
       name,
+      position,
+      coverPosition,
+      threadStyle,
+      disabled,
+      blockStyle
+    } = homeBlock;
+
+    let homeBlockData = {
+      _id,
+      disabled,
+      blockStyle,
+      defaultBlock,
+      name,
+      coverPosition,
+      threadStyle,
     };
 
     if(defaultBlock) {

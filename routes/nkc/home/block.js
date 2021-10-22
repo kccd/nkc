@@ -23,7 +23,7 @@ router
       right.map(_id => ({_id, position: 'right'}))
     );
     const blocks = await db.HomeBlockModel.find({}, {_id: 1});
-    if(blocks.length !== blocksId) ctx.throw(400, `模块数量错误，请刷新后重试`);
+    if(blocks.length !== blocksId.length) ctx.throw(400, `模块数量错误，请刷新后重试`);
     const blocksObj = {};
     blocks.map(b => blocksObj[b._id]);
     for(const {id} of blocksId) {
@@ -91,6 +91,17 @@ router
         threadCount,
         disabled,
         threadSource,
+      }
+    });
+    await next();
+  })
+  .put(':/bid/disabled', async (ctx, next) => {
+    const {data, body} = ctx;
+    const {homeBlock} = data;
+    const {disabled} = body;
+    await homeBlock.updateOne({
+      $set: {
+        disabled
       }
     });
     await next();
