@@ -4,11 +4,6 @@ block title
   include ./homeMixin
   +includeCSS("/home/home_all.css")
   +includeCSS("/swiper/swiper-bundle.min.css")
-  if !permission("unBannedUser") || !permission("bannedUser") || !permission("clearUserInfo")
-    style.
-      .move-handle {
-          display: none;
-      }
 block content
   .hidden#data=objToStr({data})
   .container-fluid.max-width
@@ -18,19 +13,17 @@ block content
           button.admin-editor.btn-warning.btn.btn-xs(onclick=`editor()`) 编辑
           button.admin-finished.btn-success.btn.btn-xs(onclick=`finished()`) 完成
           button.admin-create.btn-primary.btn.btn-xs(onclick=`create()`) 新建
-      .col-xs-12.col-md-6.home-forums
+      .col-xs-12.col-md-6.home-forums.box-shadow-panel.home-categories-left
         //左侧菜单栏
-        .home-categories-left
-           for i in data.homeBlockData.left
-             if i.type === 'goods'
-             +renderHome(i)
+        //.home-categories-left
+        for homeBlock in data.homeBlockData.left
+          +renderHome(homeBlock)
 
-      .col-xs-12.col-md-6.p-l-0
+      .col-xs-12.col-md-6.p-l-0.box-shadow-pane.home-categories-right
         if data.columnListPosition === 'side' && data.columns && data.columns.length > 0
           //右侧菜单栏
-          .home-categories-right
-            for n in data.homeBlockData.right
-              +renderHome(n)
+          for homeBlock in data.homeBlockData.right
+            +renderHome(homeBlock)
       +hidForm
 
 block scripts

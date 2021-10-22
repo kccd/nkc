@@ -111,11 +111,6 @@ module.exports = {
       postCount: 0,
       minSubscriptionCount: 0,
     },
-    toppedColumnsId: [],
-    // 首页自定义文章列表
-    homeBlocksId: {
-      left: ['recommendThreadsMovable', 'toppedThreads', 'hotColumns', 'goods'],
-      right: ['recommendThreadsFixed', 'forums', 'toppedColumns']
-    }
+    toppedColumnsId: []
   }
 };

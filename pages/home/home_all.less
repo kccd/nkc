@@ -634,11 +634,6 @@ footer.footer{
     }
   }
 }
-.move-handle {
-  display: none;
-  cursor: move;
-  font-size: 1.5rem;
-}
 .home-title-box{
   display: flex;
   justify-content: space-between;
@@ -749,4 +744,37 @@ footer.footer{
       border-color: @primary;
     }
   }
+}
+
+.home-forums-brief{
+  display: inline-block;
+  font-size: 1.3rem;
+  margin: 0 0.3rem 0.5rem 0;
+  .home-forums-parent{
+    color: #000;
+    font-weight: 700;
+  }
+  .home-forums-child{
+    color: #000;
+    margin: 0 0.3rem;
+    //background-color: #dbeef3;
+  }
+  .home-forums-parent-name{
+    font-size: 1.3rem;
+    color: #000;
+  }
+}
+
+.home-forums-list-options{
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 13.5rem;
+}
+.home-forums-list-icon{
+  display: inline-block;
+}
+.move-handle{
+  display: none;
 }

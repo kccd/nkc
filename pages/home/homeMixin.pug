@@ -1,14 +1,23 @@
-mixin renderHome(data)
-  if data.type === 'recommendThreadsMovable'
+mixin renderHome(homeBlock)
+  -var hasPermission = permission('nkcManagementHome');
+  mixin homeBlockHeader(name, _id, hideHeader, showOptions)
+    .panel-header(class=hideHeader? 'move-handle': '')
+      if hasPermission
+        span.home-forums-list-icon.fa.fa-bars.move-handle.m-r-1
+      span=name
+      if hasPermission && showOptions
+        .home-forums-list-options.move-handle
+          button.home-title-r.btn-primary.btn.btn-xs(onclick=`editorBlock()`) 编辑
+          button.home-title-r.btn-danger.btn.btn-xs(onclick=`del()`) 删除
+          button.home-title-r.btn-warning.btn.btn-xs(onclick='disabled()') 屏蔽
+  if homeBlock._id === 'recommendThreadsMovable'
     //轮播图
-    .home-forums-list.m-b-1.home-category-master-handle(id=`dom-${data.type}` data-cid=`${data.type}`)
-      .home-title-box
-        .home-title-l
-          span.fa.fa-bars.move-handle.m-r-1
+    .home-forums-list.m-b-1.home-category-master-handle(id=`dom-${homeBlock._id}` data-cid=`${homeBlock._id}`)
+      +homeBlockHeader('轮播图', homeBlock._id, true)
       .home-swipers(style='height:220px')
         .swiper-container.swiper-home
           .swiper-wrapper
-            for thread in data.data
+            for thread in homeBlock.data
               a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
                 'background-image': `url(${tools.getUrl('recommendThreadCover', thread.cover)})`
               })
@@ -18,48 +27,37 @@ mixin renderHome(data)
             .fa.fa-angle-right
           .swiper-button-prev.swiper-button(style='background-image: none;')
             .fa.fa-angle-left
-  else if data.type === 'recommendThreadsFixed'
+  else if homeBlock._id === 'recommendThreadsFixed'
     //右侧小图
-    .home-forums-list.m-b-1.home-category-master-handle(id=`dom-${data.type}` data-cid=`${data.type}`)
+    .home-forums-list.m-b-1.home-category-master-handle(id=`dom-${homeBlock._id}` data-cid=`${homeBlock._id}`)
       .home-title-box
         .home-title-l
           span.fa.fa-bars.move-handle.m-r-1
       .home-swipers(style='height:auto')
         .home-covers-sm
-          for thread, index in data.data
+          for thread, index in homeBlock.data
             .home-cover-sm
               a(href=`/t/${thread.tid}` target="_blank" title=thread.title
                 class=index > 2 ? 'm-b-0' : ''
               )
                 .home-covers-sm-img(style=`background-image:url(${tools.getUrl('recommendThreadCover', thread.cover)})`)
                 .home-covers-sm-title=thread.title
-  else if data.type === 'toppedThreads'
+  else if homeBlock._id === 'toppedThreads'
     //首页顶置
-    if data.data.length
-      .home-forums-list.m-b-1.home-category-master-handle(id=`dom-${data.type}` data-cid=`${data.type}`)
-        .home-title-box
-          .home-title-l
-            span.fa.fa-bars.move-handle.m-r-1
-            span.panel-header.m-b-0.home-title 首页置顶
-          if permission("unBannedUser") || permission("bannedUser") || permission("clearUserInfo")
-            .operate
-              button.home-title-r.btn-primary.btn.btn-xs(onclick=`editorBlock()`) 编辑
-              button.home-title-r.btn-danger.btn.btn-xs(onclick=`del()`) 删除
-              button.home-title-r.btn-warning.btn.btn-xs(onclick='disabled()') 屏蔽
-          //-.home-header
-            //-.fa.fa-tags
-            .header-name 置顶
+    if homeBlock.data.length
+      .home-forums-list.m-b-1.home-category-master-handle(id=`dom-${homeBlock._id}` data-cid=`${homeBlock._id}`)
+        +homeBlockHeader('首页置顶', homeBlock._id)
         .home-threads
-          for thread in data.data
+          for thread in homeBlock.data
             include ../publicModules/thread_panel/thread_panel
-  else if data.type === 'goods'
+  else if homeBlock._id === 'goods'
     //热销商品
-    if data.data.length
-      .home-forums-list.m-b-1.home-category-master-handle(id=`dom-${data.type}` data-cid=`${data.type}`)
+    if homeBlock.data.length
+      .home-forums-list.m-b-1.home-category-master-handle(id=`dom-${homeBlock._id}` data-cid=`${homeBlock._id}`)
         span.fa.fa-bars.move-handle.m-r-1
         span.panel-header.m-b-0.home-title 热销商品
         .home-goods
-          for goods in data.data
+          for goods in homeBlock.data
             .home-goods-content
               .home-goods-avatar
                 div(style=`background-image: url(/r/${goods.imgMaster})`)
@@ -86,16 +84,16 @@ mixin renderHome(data)
                     else
                       .home-goods-price=`￥${minPrice / 100} - ￥${maxPrice / 100}`
         .home-goods-forums 更多请访问：
-          for f in data.data
+          for f in data.goodsForums
             a(href=`/f/${f.fid}` data-float-fid=f.fid)
               if f.logo
                 img.home-goods-forum-icon(src=tools.getUrl("forumLogo", f.logo))
               else
                 .home-goods-forum-icon(style=`background-color: ${f.color}`)
               span=f.displayName
-  else if data.type === 'hotColumns'
+  else if homeBlock._id === 'hotColumns'
     //热门专栏
-    .home-forums-list.m-b-1.home-category-master-handle(id=`dom-${data.type}` data-cid=`${data.type}`)
+    .home-forums-list.m-b-1.home-category-master-handle(id=`dom-${homeBlock._id}` data-cid=`${homeBlock._id}`)
       span.fa.fa-bars.move-handle.m-r-1
       span.panel-header.m-b-0.home-title 热门专栏
       //-.home-header
@@ -103,7 +101,7 @@ mixin renderHome(data)
         .header-name 热门专栏
         //.header-description 关注最新学科，足不出户便能游遍世界~
       .home-columns
-        for column in data.data
+        for column in homeBlock.data
           a(href=`/m/${column._id}` target="_blank").home-column
             .home-column-avatar
               img(src=tools.getUrl("columnAvatar", column.avatar))
@@ -119,16 +117,52 @@ mixin renderHome(data)
       .home-columns-link.m-b-1
         a(href=`/column/apply` target="_blank") 开设专栏
         .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
-  else if data.type === 'toppedColumns'
+  else if homeBlock._id === 'toppedColumns'
     //置顶专栏
-    if data.data && data.data.length > 0
-      .home-forums-list.m-b-1.home-category-master-handle(id=`dom-${data.type}` data-cid=`${data.type}`)
+    if homeBlock.data && homeBlock.data.length > 0
+      mixin columnPanel(column, klass)
+        .home-main-column.row
+          .col-xs-12.col-md-6
+            .home-main-column-left
+              .home-main-column-avatar
+                img(src=tools.getUrl('columnAvatar', column.avatar))
+              .home-main-column-info
+                a(href=tools.getUrl('columnHome', column._id) target="_blank").home-main-column-name=column.name
+                .home-main-column-desc(title=column.abbr)=column.abbr || '暂无简介'
+          .col-xs-12.col-md-6
+            .home-main-column-right(class=klass || '')
+              .home-main-column-posts(style=`border-left: 3px solid ${0 || '#ccc'};`)
+                for p, index in column.posts
+                  .home-main-column-post
+                    .latest-thread-point
+                    a(href=`/t/${p.tid}` target="_blank" title=p.t)=p.t
+                    .home-main-column-post-time
+                      +fromNow(p.toc)
+      .home-forums-list.m-b-1.home-category-master-handle(id=`dom-${homeBlock._id}` data-cid=`${homeBlock._id}`)
         span.fa.fa-bars.move-handle.m-r-1
         span.panel-header.m-b-0.home-title 置顶专栏
         .home-main-columns
-          for column, index in data.data
+          for column, index in homeBlock.data
             -var klass = index === data.toppedColumns.length - 1 ? 'm-b-0' : ''
             +columnPanel(column, klass)
+  else if homeBlock._id === 'forums'
+    .home-forums-list.m-b-1.home-category-master-handle(id=`dom-${homeBlock._id}` data-cid=`${homeBlock._id}`)
+      span.panel-header.m-b-0.home-title 专业导航
+      for cf in data.categoryForums
+        .m-b-1.category-forums
+          .home-forums-parent-name=cf.name
+          for f in cf.forums
+            .home-forums-brief
+              a.home-forums-parent(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+              if f.childrenForums && f.childrenForums.length
+                span ：
+                for cf, index in f.childrenForums
+                  if index !== 0
+                    span |
+                  a.home-forums-child(href=`/f/${cf.fid}` data-float-fid=cf.fid style=`background-color: ${hexToRgba(f.color, 0.1)}`)=cf.displayName
+  else if homeBlock._id === 'management'
+    .home-forums-list.m-b-1.home-category-master-handle(id=`dom-${homeBlock._id}` data-cid=`${homeBlock._id}`)
+      include ../publicModules/management/management
 mixin hidForm
   div.hidden#hiddenForm
     form.newBlock.form-horizontal(:model="form")
