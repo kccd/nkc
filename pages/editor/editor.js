@@ -32,7 +32,7 @@ $(function() {
   window.data.threadCategories.map(c => c.selectedNode = null);
   window.editor = UE.getEditor("content", NKC.configs.ueditor.editorConfigs);
   editor.methods = {};
-  editor.addListener( 'ready', function( statu ) {
+  editor.addListener( 'ready', function( status ) {
     // 编辑器准备就绪
     // 计算工具栏上边距
     // 开始初始化vue
