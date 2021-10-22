@@ -15,7 +15,6 @@ block content
           button.admin-create.btn-primary.btn.btn-xs(onclick=`create()`) 新建
       .col-xs-12.col-md-6.home-forums.box-shadow-panel.home-categories-left
         //左侧菜单栏
-        //.home-categories-left
         for homeBlock in data.homeBlockData.left
           +renderHome(homeBlock)
 
@@ -31,6 +30,7 @@ block scripts
   include ../publicModules/floatForumPanel/floatForumPanel
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../publicModules/forumSelector/forumSelector
+  include ../publicModules/commonModal/commonModal
 
   // 23
   +includeJS("/swiper/swiper-bundle.js")

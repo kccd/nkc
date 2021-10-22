@@ -1,5 +1,6 @@
 window.ForumSelector = undefined;
 window.data = NKC.methods.getDataById("data");
+const commonModel = new NKC.modules.CommonModal();
 import Sortable from "sortablejs";
 
 $(function() {
@@ -106,8 +107,9 @@ function changeOrder(){
 //新建
 function create(){
   const date = new Date();
+  console.log('创建模块');
   const id = 'block_'+date.getTime();
-  const leftModel = $('.home-forums>.home-categories-left');
+  const leftModel = $('.home-categories-left');
   const hiddenForm = $('#hiddenForm>form').clone();
   leftModel.prepend(`<div id='${id}' class='home-forums-list m-b-1 home-category-master-handle' data-cid=${id}>
     <div class="home-title-box">
@@ -140,6 +142,32 @@ function initVue(cid){
       //已选择的专业
       selectedForums: [],
       form: {
+        name:'',
+        forumsId:'',
+        tcId:'',
+        digest:'',
+        origin:'',
+        postCountMin:'',
+        voteUpMin:'',
+        voteUpTotalMin:'',
+        voteDownMax:'',
+        updateInterval:'',
+        timeOfPostMin:'',
+        timeOfPostMax:'',
+        threadStyle:'',
+        blockStyle:'',
+        usernameColor:'',
+        forumColor:'',
+        titleColor:'',
+        abstractColor:'',
+        infoColor:'',
+        coverPosition:'',
+        threadCount:'',
+        disabled:'',
+        fixedThreadCount:'',
+        autoThreadsId:'',
+        fixedThreadsId:'',
+        sort:'',
       },
       threadCategories: data.data.threadCategories,
       selectedHomeCategoriesId: [],
@@ -150,6 +178,52 @@ function initVue(cid){
     mounted() {
     },
     methods: {
+      //选择文章列表样式
+      selectBlockStyle(){
+        const self = this;
+        commonModel.open(data => {
+          const backgroundColor = data[0].value;
+          const usernameColor = data[1].value;
+          const forumColor = data[2].value;
+          const titleColor = data[3].value;
+          const abstractColor = data[4].value;
+          const infoColor = data[5].value;
+        }, {
+          title: '文章列表样式',
+          data: [
+            {
+              dom: 'input',
+              label: '背景颜色',
+              value: this.form.blockStyle.backgroundColor || ''
+            },
+            {
+              dom: 'input',
+              label: '用户名颜色',
+              value: this.form.blockStyle.usernameColor || ''
+            },
+            {
+              dom: 'input',
+              label: '专业颜色',
+              value: this.form.blockStyle.forumColor || ''
+            },
+            {
+              dom: 'input',
+              label: '标题颜色',
+              value: this.form.blockStyle.titleColor || ''
+            },
+            {
+              dom: 'input',
+              label: '摘要颜色',
+              value: this.form.blockStyle.abstractColor || ''
+            },
+            {
+              dom: 'input',
+              label: '信息颜色',
+              value: this.form.blockStyle.infoColor || ''
+            }
+          ]
+        })
+      },
       getSelectedHomeCategoriesId() {
         return this.$refs.homeCategoryList.getSelectedCategoriesId();
       },
@@ -163,7 +237,6 @@ function initVue(cid){
       },
       //删除模块
       delBlock(cid){
-        console.log(cid);
         const delDom = $(`#${cid}`);
         delDom.remove();
       },

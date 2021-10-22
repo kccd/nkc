@@ -171,7 +171,7 @@ mixin hidForm
         .col-sm-9
           input.form-control(placeholder="请输入模块名称" value="" v-model="form.name")
       .form-group
-        label.col-sm-3.control-label 专业分类：
+        label.col-sm-3.control-label 专业分类
         .col-sm-9
           button(type="button" @click="selectForums()") 选择专业
           div.selectedForums(v-if="selectedForums.length")
@@ -179,7 +179,7 @@ mixin hidForm
             span(v-for="(forum) in selectedForums" :style=`'background-color:'+forum.color`) {{forum.fName}}
               span.fa.fa-close.removeF(@click="removeForum(forum.fid)")
       .form-group
-        label.col-sm-3.control-label 文章属性：
+        label.col-sm-3.control-label 文章属性
         .col-sm-9
           thread-category-list(:categories="threadCategories" :tcid='selectedHomeCategoriesId' ref='homeCategoryList')
       .form-group
@@ -211,9 +211,9 @@ mixin hidForm
         .col-sm-9
           input.form-control(placeholder="请输入点赞最小数值" v-model="form.voteUpMin")
       .form-group
-        label.col-sm-3.control-label 文章加所有回复的点赞数的最小值
+        label.col-sm-3.control-label 文章加所有回复的点赞数的最小值：
         .col-sm-9
-          input.form-control(placeholder="请输入文章点赞数的最小值" v-model="form.voteUpTotalMin")
+          input.form-control(placeholder="请输入文章所有点赞数的最小值" v-model="form.voteUpTotalMin")
       .form-group
         label.col-sm-3.control-label 最大点踩数
         .col-sm-9
@@ -225,19 +225,28 @@ mixin hidForm
       .form-group
         label.col-sm-3.control-label 发表时间距离当前最小值/天
         .col-sm-9
-          input.form-control(placeholder="请输入发表时间距离" v-model="form.timeOfPostMin")
+          input.form-control(placeholder="请输入发表时间距离当前最小值" v-model="form.timeOfPostMin")
       .form-group
         label.col-sm-3.control-label 发表时间距离当前最大值/天
         .col-sm-9
-          input.form-control(placeholder="请输入发表时间距离" v-model="form.timeOfPostMax")
+          input.form-control(placeholder="请输入发表时间距离当前最大值" v-model="form.timeOfPostMax")
       .form-group
         label.col-sm-3.control-label 文章列表风格
         .col-sm-9
-          input.form-control(placeholder="请输入发表时间距离" v-model="form.threadStyle")
+          .radio
+            label.radio-inline
+              input(type="radio" v-model="form.threadStyle" name="threadStyle" value="abstract")
+              | 摘要模式
+            label.radio-inline
+              input(type="radio" v-model="form.threadStyle" name="threadStyle" value="brief")
+              | 简略模式
+            label.radio-inline
+              input(type="radio" v-model="form.threadStyle" name="threadStyle" value="minimalist")
+              | minimalist
       .form-group
         label.col-sm-3.control-label 文章列表css样式
         .col-sm-9
-          input.form-control(placeholder="请输入发表时间距离" v-model="form.blockStyle")
+          button(type="button" @click="selectBlockStyle()") 选择样式
       .form-group
         label.col-sm-3.control-label 文章封面图位置
         .col-sm-9
@@ -253,7 +262,7 @@ mixin hidForm
         .col-sm-9
           input.form-control(placeholder="请输入文章篇数" v-model="form.threadCount")
       .form-group
-        label.col-sm-3.control-label 屏蔽
+        label.col-sm-3.control-label 是否屏蔽
         .col-sm-9
           .radio
             label.radio-inline
@@ -282,3 +291,17 @@ mixin hidForm
         label.col-sm-3.control-label 显示时的排序
         .col-sm-9
           input.form-control(placeholder="请输入显示时的排序" v-model="form.sort")
+      .form-group
+        label.col-sm-3.control-label 在页面中的位置
+        .col-sm-9
+          .radio
+            label.radio-inline
+              input(type="radio" v-model="form.position" name="position" value="left")
+              | 左
+            label.radio-inline
+              input(type="radio" v-model="form.position" name="position" value="right")
+              | 右
+      .form-group
+        label.col-sm-3.control-label 模块排序
+        .col-sm-9
+          input.form-control(placeholder="请输入模块的排序" v-model="form.order")
