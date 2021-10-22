@@ -13,11 +13,11 @@ block content
           button.admin-editor.btn-warning.btn.btn-xs(onclick=`editor()`) 编辑
           button.admin-finished.btn-success.btn.btn-xs(onclick=`finished()`) 完成
           button.admin-create.btn-primary.btn.btn-xs(onclick=`create()`) 新建
-      .col-xs-12.col-md-6.box-shadow-panel.home-categories-left
+      .col-xs-12.col-md-6.box-shadow-panel.home-categories-left.p-r-05
         for homeBlock in data.homeBlockData.left
           +renderHome(homeBlock)
 
-      .col-xs-12.col-md-6.box-shadow-panel.home-categories-right
+      .col-xs-12.col-md-6.box-shadow-panel.home-categories-right.p-l-05
         for homeBlock in data.homeBlockData.right
           +renderHome(homeBlock)
       +hidForm
@@ -27,6 +27,7 @@ block scripts
   include ../publicModules/floatForumPanel/floatForumPanel
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../publicModules/forumSelector/forumSelector
+  include ../publicModules/commonModal/commonModal
 
   // 23
   +includeJS("/swiper/swiper-bundle.js")

@@ -25,9 +25,9 @@ router
     const blocks = await db.HomeBlockModel.find({}, {_id: 1});
     if(blocks.length !== blocksId.length) ctx.throw(400, `模块数量错误，请刷新后重试`);
     const blocksObj = {};
-    blocks.map(b => blocksObj[b._id]);
-    for(const {id} of blocksId) {
-      if(!blocksObj[id]) ctx.throw(400, `模块 ID 错误，bid: ${id}`);
+    blocks.map(b => blocksObj[b._id] = b);
+    for(const {_id} of blocksId) {
+      if(!blocksObj[_id]) ctx.throw(400, `模块 ID 错误，bid: ${_id}`);
     }
     for(let i = 0; i < blocksId.length; i++) {
       const {_id, position} = blocksId[i];
@@ -68,6 +68,7 @@ router
       threadCount,
       disabled,
       threadSource,
+      blockStyle,
     } = block;
     await db.HomeBlockModel.checkBlockValue(block);
     const sameName = await db.HomeBlockModel.findOne({_id: {$ne: homeBlock._id, name}});
@@ -91,6 +92,7 @@ router
         threadCount,
         disabled,
         threadSource,
+        blockStyle,
       }
     });
     await next();
