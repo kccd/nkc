@@ -129,27 +129,35 @@ function initVue(cid){
       selectedForums: [],
       form: {
         name:'',
-        forumsId:'',
-        tcId:'',
-        digest:'',
-        origin:'',
-        postCountMin:'',
-        voteUpMin:'',
-        voteUpTotalMin:'',
-        voteDownMax:'',
-        updateInterval:'',
-        timeOfPostMin:'',
-        timeOfPostMax:'',
-        threadStyle:'',
-        blockStyle: '',
-        coverPosition:'',
-        threadCount:'',
-        disabled:'',
-        fixedThreadCount:'',
-        autoThreadCount:'',
-        autoThreadsId:'',
-        fixedThreadsId:'',
-        sort:'',
+        forumsId: [],
+        tcId: [],
+        digest: false ,
+        origin: false,
+        postCountMin: 0,
+        voteUpMin: 0,
+        voteUpTotalMin: 0,
+        voteDownMax: 0,
+        updateInterval: 1,
+        timeOfPostMin: 0,
+        timeOfPostMax: 365,
+        threadStyle: 'brief',
+        blockStyle: {
+          headerTitleColor: '#000',
+          backgroundColor: '#fff',
+          usernameColor: '',
+          forumColor: '',
+          titleColor: '',
+          abstractColor: '',
+          infoColor: '',
+        },
+        coverPosition: 'left',
+        threadCount: 10,
+        disabled: false,
+        fixedThreadCount: 0,
+        autoThreadCount: 50,
+        autoThreadsId: [],
+        fixedThreadsId: [],
+        sort: 'random',
       },
       threadCategories: data.data.threadCategories,
       selectedHomeCategoriesId: [],
@@ -166,43 +174,49 @@ function initVue(cid){
         commonModel.open(data => {
           this.form.blockStyle.backgroundColor = data[0].value;
           this.form.blockStyle.usernameColor = data[1].value;
-          this.form.blockStyle.forumColor = data[2].value;
+          /*this.form.blockStyle.forumColor = data[2].value;
           this.form.blockStyle.titleColor = data[3].value;
           this.form.blockStyle.abstractColor = data[4].value;
-          this.form.blockStyle.infoColor = data[5].value;
+          this.form.blockStyle.infoColor = data[5].value;*/
+          commonModel.close();
         }, {
           title: '文章列表样式',
           data: [
             {
               dom: 'input',
-              label: '背景颜色',
-              value: this.form.blockStyle.backgroundColor || ''
+              label: '模块名称颜色',
+              value: this.form.blockStyle.headerTitleColor
             },
             {
+              dom: 'input',
+              label: '模块背景颜色',
+              value: this.form.blockStyle.backgroundColor
+            },
+            /*{
               dom: 'input',
               label: '用户名颜色',
-              value: this.form.blockStyle.usernameColor || ''
+              value: this.form.blockStyle.usernameColor
             },
             {
               dom: 'input',
-              label: '专业颜色',
-              value: this.form.blockStyle.forumColor || ''
+              label: '专业名颜色',
+              value: this.form.blockStyle.forumColor
             },
             {
               dom: 'input',
-              label: '标题颜色',
-              value: this.form.blockStyle.titleColor || ''
+              label: '文章标题颜色',
+              value: this.form.blockStyle.titleColor
             },
             {
               dom: 'input',
-              label: '摘要颜色',
-              value: this.form.blockStyle.abstractColor || ''
+              label: '文章摘要颜色',
+              value: this.form.blockStyle.abstractColor
             },
             {
               dom: 'input',
-              label: '信息颜色',
-              value: this.form.blockStyle.infoColor || ''
-            }
+              label: '时间等其他信息颜色',
+              value: this.form.blockStyle.infoColor
+            }*/
           ]
         })
       },
@@ -216,6 +230,16 @@ function initVue(cid){
         this.selectedHomeCategoriesId = this.getSelectedHomeCategoriesId();
         this.form.tcId = this.selectedHomeCategoriesId;
         console.log(this.form);
+        nkcAPI('/nkc/home/block', 'POST', {
+          block: this.form
+        })
+          .then((data) => {
+            sweetSuccess('提交成功');
+            window.location.reload();
+          })
+          .catch(err => {
+            sweetError(err)
+          })
       },
       //删除模块
       delBlock(cid){

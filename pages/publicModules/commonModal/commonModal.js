@@ -16,7 +16,6 @@ NKC.modules.CommonModal = function() {
     methods: {
       submit: function() {
         this_.callback(this.data);
-        this_.dom.modal("hide");
       },
       pickedFile: function(index) {
         var dom = this.$refs['input'+index][0];
