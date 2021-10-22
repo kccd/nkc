@@ -247,10 +247,7 @@ function editor(){
     const element = homeTitle[i];
     element.style.visibility = 'initial';
   }
-  for(let i = 0; i < moveHandle.length; i++) {
-    const element = moveHandle[i];
-    element.style.display = 'initial';
-  }
+  moveHandle.show();
   adminEditor[0].style.display = 'none';
   homeFinished[0].style.display = 'initial';
   homeCreate[0].style.display = 'initial';
@@ -266,10 +263,7 @@ function finished(){
     const element = homeTitle[i];
     element.style.visibility = 'hidden';
   }
-  for(let i = 0; i < moveHandle.length; i++) {
-    const element = moveHandle[i];
-    element.style.display = 'none';
-  }
+  moveHandle.hide();
   adminEditor[0].style.display = 'initial';
   homeFinished[0].style.display = 'none';
   homeCreate[0].style.display = 'none';
