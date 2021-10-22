@@ -60,36 +60,22 @@ function initSortable() {
   });
 }
 function changeOrder(){
-  const defaultBlocksId = [
-    'recommendThreadsMovable',
-    'toppedThreads',
-    'goods',
-    'recommendThreadsFixed',
-    'forums',
-    'toppedColumns',
-    'hotColumns'
-  ];
-  console.log('拖拽完成');
-  const leftDom = $('.home-categories-left>.home-category-master-handle');
-  const rightDom = $('.home-categories-right>.home-category-master-handle');
+  const leftDom = $('.home-categories-left>.home-forums-list');
+  const rightDom = $('.home-categories-right>.home-forums-list');
   const left = [];
   const right = [];
   for(let i = 0; i < leftDom.length; i++) {
     const m = leftDom.eq(i);
-    let cid = m.attr('data-cid');
-    if(cid.indexOf('block_') === 0) continue;
-    if(!defaultBlocksId.includes(cid)){
-      cid = Number(cid);
-    }
+    let cid = m.attr('id');
+    if(cid.indexOf('new_') === 0) continue;
+    cid = cid.split('_').pop();
     left.push(cid);
   }
   for(let i = 0; i < rightDom.length; i++) {
     const m = rightDom.eq(i);
-    let cid = m.attr('data-cid');
-    if(cid.indexOf('block_') === 0) continue;
-    if(!defaultBlocksId.includes(cid)){
-      cid = Number(cid);
-    }
+    let cid = m.attr('id');
+    if(cid.indexOf('new_') === 0) continue;
+    cid = cid.split('_').pop();
     right.push(cid);
   }
   nkcAPI(`/nkc/home/block`, 'PUT', {
@@ -108,10 +94,10 @@ function changeOrder(){
 function create(){
   const date = new Date();
   console.log('创建模块');
-  const id = 'block_'+date.getTime();
+  const id = 'new_'+date.getTime();
   const leftModel = $('.home-categories-left');
   const hiddenForm = $('#hiddenForm>form').clone();
-  leftModel.prepend(`<div id='${id}' class='home-forums-list m-b-1 home-category-master-handle' data-cid=${id}>
+  leftModel.prepend(`<div id='${id}' class='home-forums-list m-b-1 home-category-master-handle'>
     <div class="home-title-box">
       <div class="home-title-l">
         <span class="fa fa-bars move-handle m-r-1"></span>
@@ -305,38 +291,42 @@ function disabled(){}
 function clickEditor(){
 
 }
+
+const defaultButtonStatus = {
+  editor: true,
+  finished: false,
+  create: false,
+  handle: false
+};
+
+const editorButtonStatus = {
+  editor: false,
+  finished: true,
+  create: true,
+  handle: true
+};
+
+function renderButtons(status) {
+  const editor = $('.admin-editor');
+  const finished = $('.admin-finished');
+  const create = $('.admin-create');
+  const moveHandle = $('.move-handle');
+  status.editor? editor.show(): editor.hide();
+  status.finished? finished.show(): finished.hide();
+  status.create? create.show(): create.hide();
+  status.handle? moveHandle.show(): moveHandle.hide()
+}
+
+renderButtons(defaultButtonStatus);
+
 //进入编辑模式
 function editor(){
-  const homeTitle = $('.home-title-r');
-  const moveHandle = $('.move-handle');
-  const adminEditor = document.getElementsByClassName('admin-editor');
-  const homeFinished = document.getElementsByClassName('admin-finished');
-  const homeCreate = document.getElementsByClassName('admin-create');
-  for(let i = 0; i < homeTitle.length; i++) {
-    const element = homeTitle[i];
-    element.style.visibility = 'initial';
-  }
-  moveHandle.show();
-  adminEditor[0].style.display = 'none';
-  homeFinished[0].style.display = 'initial';
-  homeCreate[0].style.display = 'initial';
+  renderButtons(editorButtonStatus);
   initSortable();
-};
+}
 function finished(){
-  const homeTitle = $('.home-title-r');
-  const moveHandle = $('.move-handle');
-  const adminEditor = document.getElementsByClassName('admin-editor');
-  const homeFinished = document.getElementsByClassName('admin-finished');
-  const homeCreate = document.getElementsByClassName('admin-create');
-  for(let i = 0; i < homeTitle.length; i++) {
-    const element = homeTitle[i];
-    element.style.visibility = 'hidden';
-  }
-  moveHandle.hide();
-  adminEditor[0].style.display = 'initial';
-  homeFinished[0].style.display = 'none';
-  homeCreate[0].style.display = 'none';
-};
+  renderButtons(defaultButtonStatus);
+}
 
 Object.assign(window, {
   changeOrder,

@@ -74,7 +74,8 @@ module.exports = async (options) => {
   data.needVerifyPhoneNumber = await db.UsersPersonalModel.shouldVerifyPhoneNumber(state.uid);
 
   data.homeBlockData = await db.HomeBlockModel.getHomeBlockData({
-    fidOfCanGetThreads
+    fidOfCanGetThreads,
+    showDisabledBlock: ctx.permission('nkcManagementHome')
   });
   // 多维分类
   data.threadCategories = await db.ThreadCategoryModel.getCategoryTree({disabled: false});

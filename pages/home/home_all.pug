@@ -8,21 +8,18 @@ block content
   .hidden#data=objToStr({data})
   .container-fluid.max-width
     .row(style=state.isApp ? 'margin-top: 0':'margin-top: 56px')
-      if permission("unBannedUser") || permission("bannedUser") || permission("clearUserInfo")
+      if permission("nkcManagementHome")
         .admin-operate
           button.admin-editor.btn-warning.btn.btn-xs(onclick=`editor()`) 编辑
           button.admin-finished.btn-success.btn.btn-xs(onclick=`finished()`) 完成
           button.admin-create.btn-primary.btn.btn-xs(onclick=`create()`) 新建
-      .col-xs-12.col-md-6.home-forums.box-shadow-panel.home-categories-left
-        //左侧菜单栏
+      .col-xs-12.col-md-6.box-shadow-panel.home-categories-left.p-r-05
         for homeBlock in data.homeBlockData.left
           +renderHome(homeBlock)
 
-      .col-xs-12.col-md-6.p-l-0.box-shadow-pane.home-categories-right
-        if data.columnListPosition === 'side' && data.columns && data.columns.length > 0
-          //右侧菜单栏
-          for homeBlock in data.homeBlockData.right
-            +renderHome(homeBlock)
+      .col-xs-12.col-md-6.box-shadow-panel.home-categories-right.p-l-05
+        for homeBlock in data.homeBlockData.right
+          +renderHome(homeBlock)
       +hidForm
 
 block scripts

@@ -1,5 +1,6 @@
 const mongoose = require('../settings/database');
 const apiFunction = require("../nkcModules/apiFunction");
+const {checkString} = require("../nkcModules/checkData");
 const schema = new mongoose.Schema({
   _id: String,
   // 是否为默认分类
@@ -76,6 +77,10 @@ const schema = new mongoose.Schema({
   },
   // 文章列表 css 样式
   blockStyle: {
+    headerTitleColor: {
+      type: String,
+      default: '#000000'
+    },
     backgroundColor: {
       type: String,
       default: '#ffffff'
@@ -187,6 +192,7 @@ schema.statics.checkBlockValue = async (block) => {
     threadCount,
     fixedThreadCount,
     autoThreadCount,
+    blockStyle,
   } = block;
   checkString(name, {
     name: '模块名',
@@ -257,6 +263,41 @@ schema.statics.checkBlockValue = async (block) => {
   checkNumber(autoThreadCount, {
     name: '自动推送文章入选条数',
     min: 0
+  });
+  checkString(blockStyle.headerTitleColor, {
+    name: '模块标题颜色',
+    minLength: 0,
+    maxLength: 20
+  });
+  checkString(blockStyle.backgroundColor, {
+    name: '模块背景颜色',
+    minLength: 0,
+    maxLength: 20
+  });
+  checkString(blockStyle.usernameColor, {
+    name: '用户名颜色',
+    minLength: 0,
+    maxLength: 20
+  });
+  checkString(blockStyle.forumColor, {
+    name: '专业名颜色',
+    minLength: 0,
+    maxLength: 20
+  });
+  checkString(blockStyle.titleColor, {
+    name: '文章标题颜色',
+    minLength: 0,
+    maxLength: 20
+  });
+  checkString(blockStyle.abstractColor, {
+    name: '文章摘要颜色',
+    minLength: 0,
+    maxLength: 20
+  });
+  checkString(blockStyle.infoColor, {
+    name: '时间等信息颜色',
+    minLength: 0,
+    maxLength: 20
   });
 }
 /*
@@ -337,12 +378,25 @@ schema.statics.getHomeBlockData = async (props) => {
     right: []
   };
   for(const homeBlock of homeBlocks) {
-    const {_id, defaultBlock, name, position} = homeBlock;
-
-    let homeBlockData = {
+    const {
       _id,
       defaultBlock,
       name,
+      position,
+      coverPosition,
+      threadStyle,
+      disabled,
+      blockStyle
+    } = homeBlock;
+
+    let homeBlockData = {
+      _id,
+      disabled,
+      blockStyle,
+      defaultBlock,
+      name,
+      coverPosition,
+      threadStyle,
     };
 
     if(defaultBlock) {
