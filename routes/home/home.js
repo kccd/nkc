@@ -35,6 +35,22 @@ module.exports = async (options) => {
     data.columns = [];
   }
 
+  // 专业导航
+  const forumsTree = await db.ForumModel.getForumsTreeLevel2(data.userRoles, data.userGrade, data.user);
+  const forumsObj = {};
+  forumsTree.map(f => {
+    const {categoryId} = f;
+    if(!forumsObj[categoryId]) forumsObj[categoryId] = [];
+    forumsObj[categoryId].push(f);
+  });
+  data.categoryForums = [];
+  ctx.state.forumCategories.map(fc => {
+    const _fc = Object.assign({}, fc);
+    const {_id} = _fc;
+    _fc.forums = forumsObj[_id] || [];
+    if(_fc.forums.length) data.categoryForums.push(_fc);
+  });
+
   // 置顶专栏
   data.toppedColumns = await db.ColumnModel.getHomeToppedColumns();
   // 热销商品

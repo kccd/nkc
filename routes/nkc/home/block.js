@@ -12,46 +12,32 @@ router
     block._id = await db.SettingModel.operateSystemID('homeBlock', 1);
     const homeBlock = db.HomeBlockModel(block);
     await homeBlock.save();
-    await db.SettingModel.updateOne({_id: 'home'}, {
-      $addToSet: {
-        'c.homeBlocksId.left': homeBlock._id
-      }
-    });
-    await db.SettingModel.saveSettingsToRedis('home');
     await next();
   })
   //改变主页模块顺序
   .put('/', async (ctx, next) => {
     const {body, db} = ctx;
     const {left, right} = body.homeBlocksId;
-    //大轮播 首页置顶 商品 右侧小图 专业导航 置顶专栏 热门专栏
-    const defaultBlocksId = [
-      'recommendThreadsMovable',
-      'toppedThreads',
-      'goods',
-      'recommendThreadsFixed',
-      'forums',
-      'toppedColumns',
-      'hotColumns'
-    ]
-    let blocksId = left.concat(right);
-    console.log(blocksId)
-    blocksId = blocksId.filter(id => !defaultBlocksId.includes(id));
-    const blocks = await db.HomeBlockModel.find({_id: {$in: blocksId}});
+    const blocksId = [].concat(
+      left.map(_id => ({_id, position: 'left'})),
+      right.map(_id => ({_id, position: 'right'}))
+    );
+    const blocks = await db.HomeBlockModel.find({}, {_id: 1});
+    if(blocks.length !== blocksId) ctx.throw(400, `模块数量错误，请刷新后重试`);
     const blocksObj = {};
     blocks.map(b => blocksObj[b._id]);
-    for(const id of blocksId) {
+    for(const {id} of blocksId) {
       if(!blocksObj[id]) ctx.throw(400, `模块 ID 错误，bid: ${id}`);
     }
-    await db.SettingModel.updateOne({_id: 'home'}, {
-      $set: {
-        'c.homeBlocksId': {
-          left,
-          right
+    for(let i = 0; i < blocksId.length; i++) {
+      const {_id, position} = blocksId[i];
+      await db.HomeBlockModel.updateOne({_id}, {
+        $set: {
+          position,
+          order: i + 1
         }
-      }
-    });
-    await db.SettingModel.saveSettingsToRedis('home');
+      });
+    }
     await next();
   })
   .use('/:bid', async (ctx, next) => {
@@ -113,13 +99,6 @@ router
     const {data} = ctx;
     const {homeBlock} = data;
     await homeBlock.deleteOne();
-    await db.SettingModel.updateOne({_id: 'home'}, {
-      $pull: {
-        'c.homeBlocksId.left': homeBlock._id,
-        'c.homeBlocksId.right': homeBlock._id
-      }
-    });
-    await db.SettingModel.saveSettingsToRedis('home');
     await next();
   })
 module.exports = router;

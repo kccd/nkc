@@ -1,4 +1,4 @@
-mixin renderHome(data)
+mixin renderHome(homeBlock)
   if data.type === 'recommendThreadsMovable'
     //轮播图
     .home-forums-list.m-b-1.home-category-master-handle(id=`dom-${data.type}` data-cid=`${data.type}`)
@@ -129,6 +129,24 @@ mixin renderHome(data)
           for column, index in data.data
             -var klass = index === data.toppedColumns.length - 1 ? 'm-b-0' : ''
             +columnPanel(column, klass)
+  else if homeBlock._id === 'forums'
+    .home-forums-list.m-b-1.home-category-master-handle
+      span.panel-header.m-b-0.home-title 专业导航
+      for cf in data.categoryForums
+        .m-b-1.category-forums
+          .home-forums-parent-name=cf.name
+          for f in cf.forums
+            .home-forums-brief
+              a.home-forums-parent(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+              if f.childrenForums && f.childrenForums.length
+                span ：
+                for cf, index in f.childrenForums
+                  if index !== 0
+                    span |
+                  a.home-forums-child(href=`/f/${cf.fid}` data-float-fid=cf.fid style=`background-color: ${hexToRgba(f.color, 0.1)}`)=cf.displayName
+  else if homeBlock._id === 'management'
+    .home-forums-list.m-b-1.home-category-master-handle
+      include ../publicModules/management/management
 mixin hidForm
   div.hidden#hiddenForm
     form.newBlock.form-horizontal(:model="form")

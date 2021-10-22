@@ -1,7 +1,13 @@
 const mongoose = require('../settings/database');
 const apiFunction = require("../nkcModules/apiFunction");
 const schema = new mongoose.Schema({
-  _id: Number,
+  _id: String,
+  // 是否为默认分类
+  defaultBlock: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
   // 模块名称
   name: {
     type: String,
@@ -135,10 +141,31 @@ const schema = new mongoose.Schema({
   sort: {
     type: String,
     default: 'random', // random, toc, postCount, voteUpCount
+  },
+  // 在页面中的位置
+  position: {
+    type: String,
+    default: 'left',  // left, right
+  },
+  // 模块排序
+  order: {
+    type: Number,
+    default: 1,
+    index: 1
   }
 }, {
   collection: 'homeBlocks'
 });
+
+/*
+* 获取默认模块的 ID
+* @return {[String]}
+* */
+schema.statics.getDefaultHomeBlocksId = async () => {
+  const HomeBlockModel = mongoose.model('homeBlocks');
+  const blocks = await HomeBlockModel.find({defaultBlock: true}, {_id: 1});
+  return blocks.map(b => b._id);
+};
 
 schema.statics.checkBlockValue = async (block) => {
   const {checkString, checkNumber} = require('../nkcModules/checkData');
@@ -236,7 +263,7 @@ schema.statics.checkBlockValue = async (block) => {
 * @param {[String]} fidOfCanGetThreads 可访问的专业 ID
 * @param {[Object]} 文章对象组成的数组
 * */
-schema.methods.extendThreads = async function(fidOfCanGetThreads) {
+schema.methods.extendData = async function(fidOfCanGetThreads) {
   const ThreadModel = mongoose.model('threads');
   const apiFunction = require('../nkcModules/apiFunction');
   const {
@@ -283,8 +310,13 @@ schema.statics.getHomeBlockData = async (props) => {
     fidOfCanGetThreads = [],
     showDisabledBlock = false
   } = props;
-  let {homeBlocksId, showShopGoods} = await SettingModel.getSettings('home');
+  let {showShopGoods} = await SettingModel.getSettings('home');
   const {movable, fixed} = await ThreadModel.getHomeRecommendThreads(fidOfCanGetThreads);
+  const match = {};
+  if(!showDisabledBlock) {
+    match.disabled = false;
+  }
+  const homeBlocks = await HomeBlockModel.find(match).sort({order: 1});
   // 置顶专栏
   const defaultData = {
     toppedThreads: await ThreadModel.getHomeToppedThreads(fidOfCanGetThreads),
@@ -292,39 +324,35 @@ schema.statics.getHomeBlockData = async (props) => {
     hotColumns: await ColumnModel.getHomeHotColumns(),
     recommendThreadsMovable: movable,
     recommendThreadsFixed: fixed,
+    management: [],
     goods: [],
     forums: []
   };
-  const defaultTypes = Object.keys(defaultData);
   // 热销商品
   if(showShopGoods) {
     defaultData.goods = await ShopGoodsModel.getHomeGoods();
   }
-  const getData = async (ids) => {
-    const blocksData = [];
-    for(const id of ids) {
-      if(defaultTypes.includes(id)) {
-        blocksData.push({
-          type: id,
-          data: defaultData[id]
-        });
-        continue;
-      }
-      let data;
-      const homeBlock = await HomeBlockModel.findOne({_id: id});
-      if(!homeBlock || (homeBlock.disabled && !showDisabledBlock)) continue;
-      data = await homeBlock.extendThreads(fidOfCanGetThreads);
-      blocksData.push({
-        type: id,
-        data
-      });
+  const homeBlocksData = {
+    left: [],
+    right: []
+  };
+  for(const homeBlock of homeBlocks) {
+    const {_id, defaultBlock, name, position} = homeBlock;
+
+    let homeBlockData = {
+      _id,
+      defaultBlock,
+      name,
+    };
+
+    if(defaultBlock) {
+      homeBlockData.data = defaultData[_id];
+    } else {
+      homeBlockData.data = await homeBlock.extendData(fidOfCanGetThreads);
     }
-    return blocksData;
-  };
-  return {
-    left: await getData(homeBlocksId.left),
-    right: await getData(homeBlocksId.right)
-  };
+    homeBlocksData[position].push(homeBlockData);
+  }
+  return homeBlocksData;
 };
 
 /*
