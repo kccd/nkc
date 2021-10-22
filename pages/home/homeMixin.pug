@@ -290,18 +290,16 @@ mixin hidForm
       .form-group
         label.col-sm-3.control-label 显示时的排序
         .col-sm-9
-          input.form-control(placeholder="请输入显示时的排序" v-model="form.sort")
-      .form-group
-        label.col-sm-3.control-label 在页面中的位置
-        .col-sm-9
           .radio
             label.radio-inline
-              input(type="radio" v-model="form.position" name="position" value="left")
-              | 左
+              input(type="radio" v-model="form.sort" name="sort" value="random")
+              | random
             label.radio-inline
-              input(type="radio" v-model="form.position" name="position" value="right")
-              | 右
-      .form-group
-        label.col-sm-3.control-label 模块排序
-        .col-sm-9
-          input.form-control(placeholder="请输入模块的排序" v-model="form.order")
+              input(type="radio" v-model="form.sort" name="sort" value="toc")
+              | toc
+            label.radio-inline
+              input(type="radio" v-model="form.sort" name="sort" value="postCount")
+              | postCount
+            label.radio-inline
+              input(type="radio" v-model="form.sort" name="sort" value="voteUpCount")
+              | voteUpCount

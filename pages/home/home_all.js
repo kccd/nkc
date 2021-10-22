@@ -155,16 +155,12 @@ function initVue(cid){
         timeOfPostMin:'',
         timeOfPostMax:'',
         threadStyle:'',
-        blockStyle:'',
-        usernameColor:'',
-        forumColor:'',
-        titleColor:'',
-        abstractColor:'',
-        infoColor:'',
+        blockStyle: '',
         coverPosition:'',
         threadCount:'',
         disabled:'',
         fixedThreadCount:'',
+        autoThreadCount:'',
         autoThreadsId:'',
         fixedThreadsId:'',
         sort:'',
@@ -182,12 +178,12 @@ function initVue(cid){
       selectBlockStyle(){
         const self = this;
         commonModel.open(data => {
-          const backgroundColor = data[0].value;
-          const usernameColor = data[1].value;
-          const forumColor = data[2].value;
-          const titleColor = data[3].value;
-          const abstractColor = data[4].value;
-          const infoColor = data[5].value;
+          this.form.blockStyle.backgroundColor = data[0].value;
+          this.form.blockStyle.usernameColor = data[1].value;
+          this.form.blockStyle.forumColor = data[2].value;
+          this.form.blockStyle.titleColor = data[3].value;
+          this.form.blockStyle.abstractColor = data[4].value;
+          this.form.blockStyle.infoColor = data[5].value;
         }, {
           title: '文章列表样式',
           data: [
