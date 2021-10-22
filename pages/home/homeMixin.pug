@@ -189,7 +189,7 @@ mixin hidForm
           button(type="button" @click="selectForums()") 选择专业
           div.selectedForums(v-if="selectedForums.length")
             span 已选专业：
-            span(v-for="(forum) in selectedForums" :style=`'background-color:'+forum.color`) {{forum.fName}}
+            span(v-for="(forum) in selectedForums" :style=`'background-color:'+forum.color`) {{forum.displayName}}
               span.fa.fa-close.removeF(@click="removeForum(forum.fid)")
       .form-group
         label.col-sm-3.control-label 文章属性

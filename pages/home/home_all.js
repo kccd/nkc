@@ -121,12 +121,13 @@ function getVueAppId(cid) {
 import ThreadCategoryList from '../publicModules/threadCategory/list';
 //创建vue实例
 function initVue(cid){
-  const app = new Vue({
+  window.app = new Vue({
     el: `#${cid}`,
     data: {
       show: false,
       //已选择的专业
-      selectedForums: [],
+      forums: [],
+      // selectedForums: [],
       form: {
         name:'',
         forumsId: [],
@@ -159,11 +160,31 @@ function initVue(cid){
         fixedThreadsId: [],
         sort: 'random',
       },
-      threadCategories: data.data.threadCategories,
+      threadCategories: data.threadCategories,
       selectedHomeCategoriesId: [],
     },
     components: {
       'thread-category-list': ThreadCategoryList
+    },
+    computed: {
+      forumsObj() {
+        const {forums} = this;
+        const obj = {};
+        for(const forum of forums) {
+          obj[forum.fid] = forum;
+        }
+        return obj;
+      },
+      selectedForums() {
+        const {forumsObj, form} = this;
+        const arr = [];
+        for(const fid of form.forumsId) {
+          const forum = forumsObj[fid];
+          if(!forum) continue;
+          arr.push(forum);
+        }
+        return arr;
+      }
     },
     mounted() {
     },
@@ -225,10 +246,12 @@ function initVue(cid){
       },
       //保存创建的模块
       save(cid){
-        let selectId = [].concat(this.selectedForumsId());
-        this.form.forumsId = selectId;
-        this.selectedHomeCategoriesId = this.getSelectedHomeCategoriesId();
-        this.form.tcId = this.selectedHomeCategoriesId;
+        const selectedThreadCategories = this.getSelectedHomeCategoriesId();
+        this.form.tcId = [];
+        for(const tc of selectedThreadCategories) {
+          if(tc.nodeId === 'default') continue;
+          this.form.tcId.push(tc.nodeId);
+        }
         console.log(this.form);
         nkcAPI('/nkc/home/block', 'POST', {
           block: this.form
@@ -246,23 +269,9 @@ function initVue(cid){
         const delDom = $(`#${cid}`);
         delDom.remove();
       },
-      //返回专业
-      forums(){
-
-      },
       //移除选中的专业
       removeForum(fid){
         this.selectedForums = this.selectedForums.filter((c => c.fid !== fid))
-      },
-      // 获取已选择专业ID组成的数组
-      selectedForumsId() {
-        var arr = [];
-        var selectedForums = this.selectedForums;
-        for(var i = 0; i < selectedForums.length; i++) {
-          var forum = selectedForums[i];
-          if(forum.fid) arr.push(forum.fid);
-        }
-        return arr;
       },
       // 获取已选择文章分类ID组成的数组
       selectedCategoriesId() {
@@ -279,17 +288,14 @@ function initVue(cid){
         var self = this;
         if(!window.ForumSelector)
           window.ForumSelector = new NKC.modules.ForumSelector();
-        var selectedForumsId = [].concat(self.selectedForumsId());
         window.ForumSelector.open(function(r) {
-          r.logo = r.forum.logo;
-          r.color = r.forum.color;
-          r.fName = r.forum.displayName;
-          r.cName = r.threadType? r.threadType.name: '';
-          self.selectedForums.push(r);
+          self.forums.push(r.forum);
+          if(self.form.forumsId.includes(r.forum.fid)) return;
+          self.form.forumsId.push(r.forum.fid);
         }, {
           highlightForumId: [],
           selectedForumsId: [],
-          disabledForumsId: selectedForumsId
+          disabledForumsId: self.form.forumsId
         });
       },
     },

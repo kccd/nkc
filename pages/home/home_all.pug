@@ -5,7 +5,7 @@ block title
   +includeCSS("/home/home_all.css")
   +includeCSS("/swiper/swiper-bundle.min.css")
 block content
-  .hidden#data=objToStr({data})
+  .hidden#data=objToStr({threadCategories: data.threadCategories})
   .container-fluid.max-width
     .row(style=state.isApp ? 'margin-top: 0':'margin-top: 56px')
       if permission("nkcManagementHome")

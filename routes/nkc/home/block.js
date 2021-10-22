@@ -5,13 +5,49 @@ router
     const {block} = body;
     const {
       name,
+      forumsId,
+      tcId,
+      digest,
+      origin,
+      postCountMin,
+      voteUpMin,
+      voteUpTotalMin,
+      voteDownMax,
+      updateInterval,
+      timeOfPostMin,
+      timeOfPostMax,
+      threadStyle,
+      coverPosition,
+      threadCount,
+      disabled,
+      blockStyle,
     } = block;
     await db.HomeBlockModel.checkBlockValue(block);
     const sameName = await db.HomeBlockModel.findOne({name}, {_id: 1});
     if(sameName) ctx.throw(400, `模块名已存在`);
-    block._id = await db.SettingModel.operateSystemID('homeBlock', 1);
-    const homeBlock = db.HomeBlockModel(block);
+
+    const homeBlock = db.HomeBlockModel({
+      _id: await db.SettingModel.operateSystemID('homeBlock', 1),
+      name,
+      forumsId,
+      tcId,
+      digest,
+      origin,
+      postCountMin,
+      voteUpMin,
+      voteUpTotalMin,
+      voteDownMax,
+      updateInterval,
+      timeOfPostMin,
+      timeOfPostMax,
+      threadStyle,
+      coverPosition,
+      threadCount,
+      disabled,
+      blockStyle,
+    });
     await homeBlock.save();
+    await homeBlock.updateThreadsId();
     await next();
   })
   //改变主页模块顺序
@@ -67,7 +103,6 @@ router
       coverPosition,
       threadCount,
       disabled,
-      threadSource,
       blockStyle,
     } = block;
     await db.HomeBlockModel.checkBlockValue(block);
@@ -91,7 +126,6 @@ router
         coverPosition,
         threadCount,
         disabled,
-        threadSource,
         blockStyle,
       }
     });
