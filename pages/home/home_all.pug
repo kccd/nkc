@@ -10,18 +10,19 @@ block title
           display: none;
       }
 block content
+  .hidden#data=objToStr({data})
   .container-fluid.max-width
     .row(style=state.isApp ? 'margin-top: 0':'margin-top: 56px')
       if permission("unBannedUser") || permission("bannedUser") || permission("clearUserInfo")
-        .admin-opreator
-          button.admin-editor.btn-primary.btn.btn-xs(onclick=`editor()`) 编辑
-          button.admin-finished.btn-warning.btn.btn-xs(onclick=`finished()`) 完成
+        .admin-operate
+          button.admin-editor.btn-warning.btn.btn-xs(onclick=`editor()`) 编辑
+          button.admin-finished.btn-success.btn.btn-xs(onclick=`finished()`) 完成
+          button.admin-create.btn-primary.btn.btn-xs(onclick=`create()`) 新建
       .col-xs-12.col-md-6.home-forums
         //左侧菜单栏
         .home-categories-left
            for i in data.homeBlockData.left
              if i.type === 'goods'
-               -console.log(i)
              +renderHome(i)
 
       .col-xs-12.col-md-6.p-l-0
@@ -30,11 +31,14 @@ block content
           .home-categories-right
             for n in data.homeBlockData.right
               +renderHome(n)
+      +hidForm
 
 block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatForumPanel/floatForumPanel
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../publicModules/forumSelector/forumSelector
+
   // 23
   +includeJS("/swiper/swiper-bundle.js")
   +includeJS("/home/home_all.js")

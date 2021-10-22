@@ -20,6 +20,7 @@ router
     await db.SettingModel.saveSettingsToRedis('home');
     await next();
   })
+  //改变主页模块顺序
   .put('/', async (ctx, next) => {
     const {body, db} = ctx;
     const {left, right} = body.homeBlocksId;
@@ -34,6 +35,7 @@ router
       'hotColumns'
     ]
     let blocksId = left.concat(right);
+    console.log(blocksId)
     blocksId = blocksId.filter(id => !defaultBlocksId.includes(id));
     const blocks = await db.HomeBlockModel.find({_id: {$in: blocksId}});
     const blocksObj = {};

@@ -60,5 +60,7 @@ module.exports = async (options) => {
   data.homeBlockData = await db.HomeBlockModel.getHomeBlockData({
     fidOfCanGetThreads
   });
+  // 多维分类
+  data.threadCategories = await db.ThreadCategoryModel.getCategoryTree({disabled: false});
   ctx.template = "home/home_all.pug";
 };

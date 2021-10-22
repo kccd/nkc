@@ -659,8 +659,35 @@ footer.footer{
 .admin-finished{
   display: none;
 }
-.admin-opreator{
+.admin-create{
+  display: none;
+}
+.admin-operate{
   padding: 15px;
+}
+.operate{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  button{
+    margin-left: 0.5rem;
+  }
+}
+.newBlock{
+  div{
+    margin-bottom: 0.5rem;
+  }
+}
+.selectedForums{
+  padding: 0.3rem;
+  span{
+    padding: 0.2rem;
+    margin: 0.2rem;
+    border-radius: 5px;
+    .removeF{
+      cursor: pointer;
+    }
+  }
 }
 .home-covers-sm{
   font-size: 0;
@@ -695,6 +722,31 @@ footer.footer{
         width: 100%;
         height: 2rem;
       }
+    }
+  }
+}
+.editor-thread-category-nodes{
+  @nodeHeight: 2.6rem;
+  user-select: none;
+  .editor-thread-category-warning{
+    border-radius: 3px;
+  }
+  .editor-thread-category-node{
+    display: inline-block;
+    box-sizing: border-box;
+    height: @nodeHeight;
+    line-height: @nodeHeight;
+    padding: 0 1rem;
+    background-color: #fff;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    color: #555;
+    margin: 0 0.8rem 0.8rem 0;
+    cursor: pointer;
+    &.active{
+      color: #fff;
+      background-color: @primary;
+      border-color: @primary;
     }
   }
 }
