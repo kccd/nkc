@@ -1,7 +1,7 @@
 mixin renderHome(homeBlock)
   -var hasPermission = permission('nkcManagementHome');
   -var disabled = homeBlock.disabled? 'disabled': '';
-  mixin homeBlockHeader(hideHeader, showOptions)
+  mixin homeBlockHeader(hideHeader, showOptions, blockData)
     -var {_id, blockStyle, name} = homeBlock;
     -var color = blockStyle.headerTitleColor || '#000';
     .home-category-master-handle.panel-header(
@@ -13,7 +13,7 @@ mixin renderHome(homeBlock)
       span=name
       if hasPermission && showOptions
         .home-forums-list-options.move-handle
-          button.btn-primary.btn.btn-xs(onclick=`editorBlock()`) 编辑
+          button.btn-primary.btn.btn-xs(onclick=`editorBlock(${blockData._id})`) 编辑
           button.btn-danger.btn.btn-xs(onclick=`del()`) 删除
           button.btn-warning.btn.btn-xs(onclick='disabled()') 屏蔽
   if homeBlock._id === 'recommendThreadsMovable'
@@ -168,7 +168,7 @@ mixin renderHome(homeBlock)
       data-cid=`${homeBlock._id}`
       style=`background-color: ${bgColor}`
       )
-      +homeBlockHeader(false, true)
+      +homeBlockHeader(false, true, homeBlock)
       if homeBlock.disabled
         .m-b-1.bg-danger.text-danger.p-a-1.bg-border 当前列表已被屏蔽
       .home-threads

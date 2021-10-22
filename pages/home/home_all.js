@@ -118,6 +118,12 @@ const apps = {};
 function getVueAppId(cid) {
   return `vue_app_${cid}`;
 }
+function editorBlock(bid){
+  const hiddenForm = $('#hiddenForm>form').clone();
+  const blockContainer = $(`#block_${bid}>.home-threads`)
+  blockContainer.append(hiddenForm);
+  initVue(bid);
+}
 import ThreadCategoryList from '../publicModules/threadCategory/list';
 //创建vue实例
 function initVue(cid){
@@ -368,4 +374,5 @@ Object.assign(window, {
   create,
   editor,
   initSortable,
+  editorBlock
 });
