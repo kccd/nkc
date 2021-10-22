@@ -13,7 +13,8 @@ mixin renderHome(homeBlock)
       span=name
       if hasPermission && showOptions
         .home-forums-list-options.move-handle
-          button.btn-primary.btn.btn-xs(onclick=`editorBlock(${blockData._id})`) 编辑
+          button.btn-primary#btn-editorBlock.btn.btn-xs(onclick=`editorBlock(${blockData._id})`) 编辑
+          button.btn-success.btn-saveEditor.btn.btn-xs(@click=`saveEditor(${blockData._id})`) 保存
           button.btn-danger.btn.btn-xs(onclick=`del()`) 删除
           button.btn-warning.btn.btn-xs(onclick='disabled()') 屏蔽
   if homeBlock._id === 'recommendThreadsMovable'

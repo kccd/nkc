@@ -120,9 +120,22 @@ function getVueAppId(cid) {
 }
 function editorBlock(bid){
   const hiddenForm = $('#hiddenForm>form').clone();
-  const blockContainer = $(`#block_${bid}>.home-threads`)
+  const blockContainer = $(`#block_${bid}>.home-threads`);
+  const oldContainer = $(`#block_${bid}>.home-threads>div`);
+  const editorBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>#btn-editorBlock`);
+  const saveBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-saveEditor`);
+  saveBlockDom.show();
+  editorBlockDom.hide();
+  oldContainer.hide();
   blockContainer.append(hiddenForm);
-  initVue(bid);
+  const vueAppId = getVueAppId(bid);
+  let app = apps[vueAppId];
+  if(!app) {
+    //创建vue实例
+    app = initVue('block_'+bid);
+    apps[vueAppId] = app;
+  }
+  app.show = true;
 }
 import ThreadCategoryList from '../publicModules/threadCategory/list';
 //创建vue实例
@@ -193,8 +206,23 @@ function initVue(cid){
       }
     },
     mounted() {
+      if(!cid.indexOf('new_')){
+        nkcAPI('', 'GET', {
+          cid
+        })
+          .then(data => {
+
+          })
+          .catch(err => {sweetError(err)});
+      }
     },
     methods: {
+      //保存编辑
+      saveEditor(bid){
+        // const saveEditorDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>#btn-saveEditor`);
+        // saveEditorDom.hide();
+        window.location.reload();
+      },
       //选择文章列表样式
       selectBlockStyle(){
         const self = this;
@@ -310,7 +338,6 @@ function initVue(cid){
 }
 //编辑
 function initBlock(cid){
-  console.log(cid);
   const vueAppId = getVueAppId(cid);
   let app = apps[vueAppId];
   if(!app) {
@@ -332,14 +359,16 @@ const defaultButtonStatus = {
   editor: true,
   finished: false,
   create: false,
-  handle: false
+  handle: false,
+  saveEditor: false,
 };
 
 const editorButtonStatus = {
   editor: false,
   finished: true,
   create: true,
-  handle: true
+  handle: true,
+  saveEditor: false,
 };
 
 function renderButtons(status) {
@@ -347,10 +376,12 @@ function renderButtons(status) {
   const finished = $('.admin-finished');
   const create = $('.admin-create');
   const moveHandle = $('.move-handle');
+  const saveEditor = $('.btn-saveEditor');
   status.editor? editor.show(): editor.hide();
   status.finished? finished.show(): finished.hide();
   status.create? create.show(): create.hide();
   status.handle? moveHandle.show(): moveHandle.hide()
+  status.saveEditor? saveEditor.show(): saveEditor.hide()
 }
 
 renderButtons(defaultButtonStatus);
