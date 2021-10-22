@@ -130,6 +130,7 @@ const apps = {};
 function getVueAppId(cid) {
   return `vue_app_${cid}`;
 }
+import ThreadCategoryList from '../publicModules/threadCategory/list';
 //创建vue实例
 function initVue(cid){
   const app = new Vue({
@@ -139,22 +140,26 @@ function initVue(cid){
       //已选择的专业
       selectedForums: [],
       form: {
-
       },
-      threadCategories: data.data.threadCategories
+      threadCategories: data.data.threadCategories,
+      selectedHomeCategoriesId: [],
+    },
+    components: {
+      'thread-category-list': ThreadCategoryList
     },
     mounted() {
-      console.log('页面数据', data);
     },
     methods: {
-      selectThreadCategory(c, n) {
-        c.selectedNode = n;
+      getSelectedHomeCategoriesId() {
+        return this.$refs.homeCategoryList.getSelectedCategoriesId();
       },
       //保存创建的模块
       save(cid){
-        var selectId = [].concat(this.selectedForumsId());
+        let selectId = [].concat(this.selectedForumsId());
         this.form.forumsId = selectId;
-        console.log(selectId);
+        this.selectedHomeCategoriesId = this.getSelectedHomeCategoriesId();
+        this.form.tcId = this.selectedHomeCategoriesId;
+        console.log(this.form);
       },
       //删除模块
       delBlock(cid){

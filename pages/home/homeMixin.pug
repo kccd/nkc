@@ -151,115 +151,112 @@ mixin hidForm
   div.hidden#hiddenForm
     form.newBlock.form-horizontal(:model="form")
       .form-group
-        label.col-sm-2.control-label 模块名称
-        .col-sm-10
+        label.col-sm-3.control-label 模块名称
+        .col-sm-9
           input.form-control(placeholder="请输入模块名称" value="" v-model="form.name")
       .form-group
-        label.col-sm-2.control-label 专业分类：
-        .col-sm-10
+        label.col-sm-3.control-label 专业分类：
+        .col-sm-9
           button(type="button" @click="selectForums()") 选择专业
           div.selectedForums(v-if="selectedForums.length")
             span 已选专业：
             span(v-for="(forum) in selectedForums" :style=`'background-color:'+forum.color`) {{forum.fName}}
               span.fa.fa-close.removeF(@click="removeForum(forum.fid)")
       .form-group
-        label.col-sm-2.control-label 文章属性：
-        .col-sm-10
-          div(v-if='threadCategories.length > 0')
-            .editor-thread-category(v-for='c in threadCategories' v-if='c.nodes.length > 0')
-              .editor-header(:title='c.description') {{c.name}}
-              .editor-thread-category-nodes
-                .editor-thread-category-node(
-                  v-for='n in c.nodes'
-                  @click='selectThreadCategory(c, n)'
-                  :class='{"active": c.selectedNode === n}'
-                  :title='n.description'
-                )
-                  span {{n.name}}
-                .editor-thread-category-node(
-                  @click='selectThreadCategory(c, "default")'
-                  :class='{"active": c.selectedNode === "default"}'
-                )
-                  span {{c.nodeName}}
+        label.col-sm-3.control-label 文章属性：
+        .col-sm-9
+          thread-category-list(:categories="threadCategories" :tcid='selectedHomeCategoriesId' ref='homeCategoryList')
       .form-group
-        label.col-sm-2.control-label 是否为精选文章
-        .col-sm-10
-          input(type="radio" v-model="form.digest" value='0' checked name="digest")
-          | 是
-          input(type="radio" v-model="form.digest" value='0' name="digest")
-          | 否
+        label.col-sm-3.control-label 是否为精选文章
+        .col-sm-9
+          .radio
+            label.radio-inline
+              input(type="radio" v-model="form.digest" name="digest" value="0")
+              | 是
+            label.radio-inline
+              input(type="radio" v-model="form.digest" name="digest" value="1")
+              | 否
       .form-group
-        label.col-sm-2.control-label 是否为原创文章
-        .col-sm-10
-          input(type="radio" v-model="form.origin" value='0' checked name="origin")
-          | 是
-          input(type="radio" v-model="form.origin" value='0' name="origin")
-          | 否
+        label.col-sm-3.control-label 是否为原创文章
+        .col-sm-9
+          .radio
+            label.radio-inline
+              input(type="radio" v-model="form.origin" name="origin" value="0")
+              | 是
+            label.radio-inline
+              input(type="radio" v-model="form.origin" name="origin" value="1")
+              | 否
       .form-group
-        label.col-sm-2.control-label 回复数最小值
-        .col-sm-10
-          input(placeholder="请输入回复数最小值" v-model="form.postCountMin")
+        label.col-sm-3.control-label 回复数最小值
+        .col-sm-9
+          input.form-control(placeholder="请输入回复数最小值" v-model="form.postCountMin")
       .form-group
-        label.col-sm-2.control-label 点赞最小数值
-        .col-sm-10
-          input(placeholder="请输入点赞最小数值" v-model="form.voteUpMin")
+        label.col-sm-3.control-label 点赞最小数值
+        .col-sm-9
+          input.form-control(placeholder="请输入点赞最小数值" v-model="form.voteUpMin")
       .form-group
-        label.col-sm-2.control-label 文章加所有回复的点赞数的最小值
-        .col-sm-10
-          input(placeholder="请输入文章点赞数的最小值" v-model="form.voteUpTotalMin")
+        label.col-sm-3.control-label 文章加所有回复的点赞数的最小值
+        .col-sm-9
+          input.form-control(placeholder="请输入文章点赞数的最小值" v-model="form.voteUpTotalMin")
       .form-group
-        label.col-sm-2.control-label 最大点踩数
-        .col-sm-10
-          input(placeholder="请输入最大点踩数" v-model="form.voteDownMax")
+        label.col-sm-3.control-label 最大点踩数
+        .col-sm-9
+          input.form-control(placeholder="请输入最大点踩数" v-model="form.voteDownMax")
       .form-group
-        label.col-sm-2.control-label 更新间隔时间/小时
-        .col-sm-10
-          input(placeholder="请输入更新间隔时间" v-model="form.updateInterval")
+        label.col-sm-3.control-label 更新间隔时间/小时
+        .col-sm-9
+          input.form-control(placeholder="请输入更新间隔时间" v-model="form.updateInterval")
       .form-group
-        label.col-sm-2.control-label 发表时间距离当前最小值/天
-        .col-sm-10
-          input(placeholder="请输入发表时间距离" v-model="form.timeOfPostMin")
+        label.col-sm-3.control-label 发表时间距离当前最小值/天
+        .col-sm-9
+          input.form-control(placeholder="请输入发表时间距离" v-model="form.timeOfPostMin")
       .form-group
-        label.col-sm-2.control-label 发表时间距离当前最大值/天
-        .col-sm-10
-          input(placeholder="请输入发表时间距离" v-model="form.timeOfPostMax")
+        label.col-sm-3.control-label 发表时间距离当前最大值/天
+        .col-sm-9
+          input.form-control(placeholder="请输入发表时间距离" v-model="form.timeOfPostMax")
       .form-group
-        label.col-sm-2.control-label 文章列表风格
-        .col-sm-10
-          input(placeholder="请输入发表时间距离" v-model="form.threadStyle")
+        label.col-sm-3.control-label 文章列表风格
+        .col-sm-9
+          input.form-control(placeholder="请输入发表时间距离" v-model="form.threadStyle")
       .form-group
-        label.col-sm-2.control-label 文章列表css样式
-        .col-sm-10
-          input(placeholder="请输入发表时间距离" v-model="form.blockStyle")
+        label.col-sm-3.control-label 文章列表css样式
+        .col-sm-9
+          input.form-control(placeholder="请输入发表时间距离" v-model="form.blockStyle")
       .form-group
-        label.col-sm-2.control-label 文章封面图位置
-        .col-sm-10
-          input(placeholder="请输入发表时间距离" v-model="form.coverPosition")
+        label.col-sm-3.control-label 文章封面图位置
+        .col-sm-9
+          input.form-control(placeholder="请输入发表时间距离" v-model="form.coverPosition")
       .form-group
-        label.col-sm-2.control-label 文章篇数
-        .col-sm-10
-          input(placeholder="请输入发表时间距离" v-model="form.threadCount")
+        label.col-sm-3.control-label 文章篇数
+        .col-sm-9
+          input.form-control(placeholder="请输入文章篇数" v-model="form.threadCount")
       .form-group
-        label.col-sm-2.control-label 屏蔽
-        .col-sm-10
-          input(placeholder="请输入发表时间距离" v-model="form.disabled")
+        label.col-sm-3.control-label 屏蔽
+        .col-sm-9
+          .radio
+            label.radio-inline
+              input(type="radio" v-model="form.disabled" name="disabled" value="0")
+              | 是
+            label.radio-inline
+              input(type="radio" v-model="form.disabled" name="disabled" value="1")
+              | 否
       .form-group
-        label.col-sm-2.control-label 手动推送文章显示条数
-        .col-sm-10
-          input(placeholder="请输入发表时间距离" v-model="form.fixedThreadCount")
+        label.col-sm-3.control-label 手动推送文章显示条数
+        .col-sm-9
+          input.form-control(placeholder="请输入手动推送文章显示条数" v-model="form.fixedThreadCount")
       .form-group
-        label.col-sm-2.control-label 自动推送文章入选条数
-        .col-sm-10
-          input(placeholder="请输入发表时间距离" v-model="form.autoThreadCount")
+        label.col-sm-3.control-label 自动推送文章入选条数
+        .col-sm-9
+          input.form-control(placeholder="请输入自动推送文章入选条数" v-model="form.autoThreadCount")
       .form-group
-        label.col-sm-2.control-label 自动选择的文章 ID
-        .col-sm-10
-          input(placeholder="请输入发表时间距离" v-model="form.autoThreadsId")
+        label.col-sm-3.control-label 自动选择的文章 ID
+        .col-sm-9
+          input.form-control(placeholder="请输入自动选择的文章 ID" v-model="form.autoThreadsId")
       .form-group
-        label.col-sm-2.control-label 手动选择的文章 ID
-        .col-sm-10
-          input(placeholder="请输入发表时间距离" v-model="form.fixedThreadsId")
+        label.col-sm-3.control-label 手动选择的文章 ID
+        .col-sm-9
+          input.form-control(placeholder="请输入手动选择的文章 ID" v-model="form.fixedThreadsId")
       .form-group
-        label.col-sm-2.control-label 显示时的排序
-        .col-sm-10
-          input(placeholder="请输入发表时间距离" v-model="form.sort")
+        label.col-sm-3.control-label 显示时的排序
+        .col-sm-9
+          input.form-control(placeholder="请输入显示时的排序" v-model="form.sort")
