@@ -17,10 +17,14 @@ router
       timeOfPostMin,
       timeOfPostMax,
       threadStyle,
+      blockStyle,
       coverPosition,
       threadCount,
       disabled,
-      blockStyle,
+      fixedThreadCount,
+      autoThreadCount,
+      fixedThreadsId,
+      sort
     } = block;
     await db.HomeBlockModel.checkBlockValue(block);
     const sameName = await db.HomeBlockModel.findOne({name}, {_id: 1});
@@ -45,6 +49,10 @@ router
       threadCount,
       disabled,
       blockStyle,
+      fixedThreadCount,
+      autoThreadCount,
+      fixedThreadsId,
+      sort
     });
     await homeBlock.save();
     await homeBlock.updateThreadsId();
@@ -104,6 +112,10 @@ router
       threadCount,
       disabled,
       blockStyle,
+      fixedThreadCount,
+      autoThreadCount,
+      fixedThreadsId,
+      sort
     } = block;
     await db.HomeBlockModel.checkBlockValue(block);
     const sameName = await db.HomeBlockModel.findOne({_id: {$ne: homeBlock._id, name}});
@@ -127,6 +139,10 @@ router
         threadCount,
         disabled,
         blockStyle,
+        fixedThreadCount,
+        autoThreadCount,
+        fixedThreadsId,
+        sort
       }
     });
     await next();

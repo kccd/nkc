@@ -190,9 +190,10 @@ schema.statics.checkBlockValue = async (block) => {
     threadStyle,
     coverPosition,
     threadCount,
+    blockStyle,
     fixedThreadCount,
     autoThreadCount,
-    blockStyle,
+    sort
   } = block;
   checkString(name, {
     name: '模块名',
@@ -251,6 +252,9 @@ schema.statics.checkBlockValue = async (block) => {
   }
   if(!['left', 'right'].includes(coverPosition)) {
     throwErr(400, `文章封面图位置设置错误`);
+  }
+  if(!['random', 'toc', 'postCount', 'voteUpCount'].includes(sort)) {
+    throwErr(400, `显示时的排序设置错误`);
   }
   checkNumber(threadCount, {
     name: '文章数目',
@@ -438,8 +442,8 @@ schema.methods.updateThreadsId = async function() {
     threadPostCount: {
       $gte: postCountMin
     },
-    voteUpTotal: voteUpTotalMin,
-    voteUp: voteUpMin,
+    voteUpTotal: {$gte: voteUpTotalMin},
+    voteUp: {$gte: voteUpMin},
     voteDown: {$lte: voteDownMax}
   };
   if(forumsId.length > 0) {
