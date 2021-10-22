@@ -87,7 +87,17 @@ router
   .use('/:bid', async (ctx, next) => {
     const {params, db, data} = ctx;
     const {bid} = params;
-    data.homeBlock = await db.HomeBlockModel.findOnly({_id: Number(bid)});
+    data.homeBlock = await db.HomeBlockModel.findOnly({_id: bid});
+    await next();
+  })
+  .get('/:bid', async (ctx, next) => {
+    const {data} = ctx;
+    const {homeBlock} = data;
+    data.threadCategories = await db.ThreadCategoryModel.getCategoryTree();
+    data.forums = [];
+    if(homeBlock.forumsId.length !== 0) {
+      data.forums = await db.ForumModel.find({fid: {$in: homeBlock.forumsId}});
+    }
     await next();
   })
   .put('/:bid', async (ctx, next) => {
@@ -147,7 +157,7 @@ router
     });
     await next();
   })
-  .put(':/bid/disabled', async (ctx, next) => {
+  .put('/:bid/disabled', async (ctx, next) => {
     const {data, body} = ctx;
     const {homeBlock} = data;
     const {disabled} = body;
@@ -158,7 +168,7 @@ router
     });
     await next();
   })
-  .del(':/bid', async (ctx, next) => {
+  .del('/:bid', async (ctx, next) => {
     const {data} = ctx;
     const {homeBlock} = data;
     await homeBlock.deleteOne();

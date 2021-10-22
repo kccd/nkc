@@ -315,9 +315,26 @@ function initBlock(cid){
   app.show = true;
 }
 //删除
-function del(){}
+function deleteHomeBlock(homeBlockId){
+  return sweetQuestion(`确定要删除当前模块吗？`)
+    .then(() => {
+      return nkcAPI(`/nkc/home/block/${homeBlockId}`, 'DELETE', {});
+    })
+    .then(() => {
+      window.location.reload();
+    })
+    .catch(sweetError);
+}
 //屏蔽
-function disabled(){}
+function disabledHomeBlock(homeBlockId, disabled){
+  nkcAPI(`/nkc/home/block/${homeBlockId}/disabled`, 'PUT', {
+    disabled
+  })
+    .then(() => {
+      sweetSuccess(`执行成功`);
+    })
+    .catch(sweetError)
+}
 function clickEditor(){
 
 }
@@ -362,10 +379,10 @@ Object.assign(window, {
   changeOrder,
   finished,
   clickEditor,
-  disabled,
-  del,
   initBlock,
   create,
   editor,
   initSortable,
+  deleteHomeBlock,
+  disabledHomeBlock
 });

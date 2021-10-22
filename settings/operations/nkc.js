@@ -12,6 +12,7 @@ module.exports = {
       POST: 'nkcManagementHome',
       PUT: 'nkcManagementHome',
       PARAMETER: {
+        GET: 'nkcManagementHome',
         PUT: 'nkcManagementHome',
         DELETE: 'nkcManagementHome',
         disabled: {

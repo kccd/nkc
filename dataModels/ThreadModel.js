@@ -1056,10 +1056,17 @@ threadSchema.statics.publishArticle = async (options) => {
 /*
 * 获取首页置顶文章
 * */
-threadSchema.statics.getHomeToppedThreads = async (fid = [], latest) => {
+threadSchema.statics.getHomeToppedThreads = async (fid = [], type) => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
   const ThreadModel = mongoose.model("threads");
-  const toppedThreadsId = latest? homeSettings.latestToppedThreadsId: homeSettings.toppedThreadsId;
+  let toppedThreadsId;
+  if(type === 'latest') {
+    toppedThreadsId = homeSettings.latestToppedThreadsId;
+  } else if(type === 'community') {
+    toppedThreadsId = homeSettings.communityToppedThreadsId;
+  } else {
+    toppedThreadsId = homeSettings.toppedThreadsId;
+  }
   let threads = await ThreadModel.find({
     tid: {$in: toppedThreadsId},
     mainForumsId: {$in: fid},
@@ -1087,7 +1094,13 @@ threadSchema.statics.getHomeToppedThreads = async (fid = [], latest) => {
 * 获取最新页置顶的文章
 * */
 threadSchema.statics.getLatestToppedThreads = async (fid) => {
-  return await mongoose.model('threads').getHomeToppedThreads(fid, true);
+  return await mongoose.model('threads').getHomeToppedThreads(fid, 'latest');
+}
+/*
+* 获取社区置顶
+* */
+threadSchema.statics.getCommunityToppedThreads = async (fid) => {
+  return await mongoose.model('threads').getHomeToppedThreads(fid, 'community');
 }
 /*
 * 加载首页轮播图
