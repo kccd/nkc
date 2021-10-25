@@ -17,6 +17,9 @@ module.exports = {
         DELETE: 'nkcManagementHome',
         disabled: {
           PUT: 'nkcManagementHome',
+        },
+        refresh: {
+          POST: 'nkcManagementHome'
         }
       }
     }

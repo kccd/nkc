@@ -403,11 +403,20 @@ function finished(){
   fixAllBlockHeight(false);
 }
 
+function refresh(homeBlockId) {
+  nkcAPI(`/nkc/home/block/${homeBlockId}/refresh`, 'POST', {})
+    .then(() => {
+      sweetSuccess(`执行成功`);
+    })
+    .catch(sweetError);
+}
+
 Object.assign(window, {
   changeOrder,
   finished,
   clickEditor,
   initBlock,
+  refresh,
   create,
   editor,
   initSortable,

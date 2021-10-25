@@ -13,6 +13,8 @@ mixin renderHome(homeBlock)
       span=name
       .home-forums-list-options.move-handle
         button.btn-default.btn.btn-xs.icon-expand(onclick=`expandList('${homeBlock._id}')`) 折叠
+        if !homeBlock.defaultBlock
+          button.btn-default.btn.btn-xs.icon-expand(onclick=`refresh('${homeBlock._id}')`) 刷新
         if hasPermission && showOptions
           button.btn-primary.btn.btn-xs(onclick=`editorBlock()`) 编辑
           button.btn-danger.btn.btn-xs(onclick=`deleteHomeBlock('${homeBlock._id}')`) 删除
@@ -164,10 +166,11 @@ mixin renderHome(homeBlock)
                       span |
                     a.home-forums-child(href=`/f/${cf.fid}` data-float-fid=cf.fid style=`background-color: ${hexToRgba(f.color, 0.1)}`)=cf.displayName
   else if homeBlock._id === 'management'
-    .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
-      +homeBlockHeader(false, false)
-      -var hidePanelHeader = true;
-      include ../publicModules/management/management
+    if permissionsOr(["nkcManagement", "visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs"])
+      .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
+        +homeBlockHeader(false, false)
+        -var hidePanelHeader = true;
+        include ../publicModules/management/management
   else
     -var bgColor = homeBlock.blockStyle.backgroundColor || '#fff';
     .home-forums-list.m-b-1(

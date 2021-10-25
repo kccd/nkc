@@ -157,6 +157,18 @@ router
     });
     await next();
   })
+  .del('/:bid', async (ctx, next) => {
+    const {data} = ctx;
+    const {homeBlock} = data;
+    await homeBlock.deleteOne();
+    await next();
+  })
+  .post('/:bid/refresh', async (ctx, next) => {
+    const {data} = ctx;
+    const {homeBlock} = data;
+    await homeBlock.updateThreadsId();
+    await next();
+  })
   .put('/:bid/disabled', async (ctx, next) => {
     const {data, body} = ctx;
     const {homeBlock} = data;
@@ -166,12 +178,6 @@ router
         disabled
       }
     });
-    await next();
-  })
-  .del('/:bid', async (ctx, next) => {
-    const {data} = ctx;
-    const {homeBlock} = data;
-    await homeBlock.deleteOne();
     await next();
   })
 module.exports = router;

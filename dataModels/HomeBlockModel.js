@@ -332,6 +332,7 @@ schema.methods.extendData = async function(fidOfCanGetThreads) {
     tid: {
       $in: selectedThreadsId
     },
+    reviewed: true,
     disabled: false,
     mainForumsId: {
       $in: fidOfCanGetThreads
@@ -433,6 +434,7 @@ schema.methods.updateThreadsId = async function() {
   } = this;
   const match = {
     type: 'thread',
+    reviewed: true,
     disabled: false,
     toDraft: {$ne: true},
     toc: {
