@@ -607,7 +607,7 @@ footer.footer{
       position: relative;
       box-sizing: border-box;
       //border: 2px solid #eee;
-      border-radius: 5px;
+      //border-radius: 5px;
       overflow: hidden;
       .home-covers-sm-img{
         background-size: cover;
@@ -699,7 +699,7 @@ footer.footer{
   overflow: hidden;
   .swiper-container{
     height: 100%;
-    border-radius: 2px;
+    //border-radius: 2px;
     box-sizing: border-box;
     //border: 3px solid #eee;
   }
@@ -725,7 +725,7 @@ footer.footer{
       position: relative;
       box-sizing: border-box;
       //border: 2px solid #eee;
-      border-radius: 5px;
+      //border-radius: 5px;
       overflow: hidden;
       .home-covers-sm-img{
         background-size: cover;
@@ -753,7 +753,18 @@ footer.footer{
 }
 
 
+.home-categories-left{
+  padding-right: 0.5rem;
+}
+.home-categories-right{
+  padding-left: 0.5rem;
+}
+
 .home-categories-left, .home-categories-right{
+  @media (max-width: 991px){
+    padding-left: 0;
+    padding-right: 0;
+  }
   .home-forums-list.fix-block-height{
     max-height: 20rem;
     overflow: hidden;
