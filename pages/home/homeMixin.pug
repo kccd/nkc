@@ -17,7 +17,7 @@ mixin renderHome(homeBlock)
           if !homeBlock.defaultBlock
             button.btn-default.btn.btn-xs(onclick=`refresh('${homeBlock._id}')`) 刷新
           button.btn-primary#btn-editorBlock.btn.btn-xs(onclick=`editorBlock('${homeBlock._id}')`) 编辑
-          button.btn-success.btn-saveEditor.btn.btn-xs(@click=`saveEditor('${homeBlock._id}')`) 保存
+          button.btn-success.btn-saveEditor.btn.btn-xs(@click=`saveForm`) 保存
           button.btn-danger.btn.btn-xs(onclick=`deleteHomeBlock('${homeBlock._id}')`) 删除
           button.btn-warning.btn.btn-xs(onclick=`disabledHomeBlock('${homeBlock._id}', ${!homeBlock.disabled})`)=homeBlock.disabled? '恢复': '屏蔽'
   if homeBlock._id === 'recommendThreadsMovable'
@@ -197,51 +197,52 @@ mixin hiddenForm
         .col-sm-9
           input.form-control(type='text' placeholder="请输入模块名称" value="" v-model="form.name")
       .form-group
-        label.col-sm-3.control-label 专业分类
+        label.col-sm-3.control-label 专业筛选
         .col-sm-9
-          button(type="button" @click="selectForums()") 选择专业
-          div.selectedForums(v-if="selectedForums.length")
-            span 已选专业：
-            span.selectForum(v-for="(forum) in forums" :style=`'background-color:'+forum.color`) {{forum.displayName}}
-              span.fa.fa-close.removeF(@click="removeForum(forum.fid)")
+          span.selected-forums(v-if="selectedForums.length")
+            span.selected-forum(v-for="(forum) in forums" :style=`'background-color:'+forum.color`) {{forum.displayName}}
+              span.fa.fa-close.remove-forum(@click="removeForum(forum.fid)")
+          span(v-else) 空空如也
+          button.btn.btn-default.btn-sm(type="button" @click="selectForums()") 选择
+
       .form-group
         label.col-sm-3.control-label 文章属性
         .col-sm-9
           thread-category-list(:categories="threadCategories" :tcid="selectedHomeCategoriesId" ref='homeCategoryList')
       .form-group
-        label.col-sm-3.control-label 是否为精选文章
+        label.col-sm-3.control-label 必须精选
         .col-sm-9
           .radio
-            label.radio-inline
+            label.m-r-1
               input(type="radio" v-model="form.digest" name="digest" :value="true")
               | 是
-            label.radio-inline
+            label
               input(type="radio" v-model="form.digest" name="digest" :value="false")
               | 否
       .form-group
-        label.col-sm-3.control-label 是否为原创文章
+        label.col-sm-3.control-label 必须原创
         .col-sm-9
           .radio
-            label.radio-inline
+            label.m-r-1
               input(type="radio" v-model="form.origin" name="origin" :value="true")
               | 是
-            label.radio-inline
+            label
               input(type="radio" v-model="form.origin" name="origin" :value="false")
               | 否
       .form-group
-        label.col-sm-3.control-label 回复数最小值
+        label.col-sm-3.control-label 回复最少
         .col-sm-9
           input.form-control(type='text' placeholder="请输入回复数最小值" v-model.number="form.postCountMin")
       .form-group
-        label.col-sm-3.control-label 点赞最小数值
+        label.col-sm-3.control-label 点赞最少
         .col-sm-9
           input.form-control(type='text' placeholder="请输入点赞最小数值" v-model.number="form.voteUpMin")
       .form-group
-        label.col-sm-3.control-label 文章加所有回复的点赞数的最小值：
+        label.col-sm-3.control-label 总点赞最少
         .col-sm-9
           input.form-control(type='text' placeholder="请输入文章所有点赞数的最小值" v-model.number="form.voteUpTotalMin")
       .form-group
-        label.col-sm-3.control-label 最大点踩数
+        label.col-sm-3.control-label 点踩最大
         .col-sm-9
           input.form-control(type='text' placeholder="请输入最大点踩数" v-model.number="form.voteDownMax")
       .form-group
@@ -249,60 +250,60 @@ mixin hiddenForm
         .col-sm-9
           input.form-control(type='text' placeholder="请输入更新间隔时间" v-model.number="form.updateInterval")
       .form-group
-        label.col-sm-3.control-label 发表时间距离当前最小值/天
+        label.col-sm-3.control-label 发表距当前最小/天
         .col-sm-9
           input.form-control(type='text' placeholder="请输入发表时间距离当前最小值" v-model.number="form.timeOfPostMin")
       .form-group
-        label.col-sm-3.control-label 发表时间距离当前最大值/天
+        label.col-sm-3.control-label 发表距当前最大/天
         .col-sm-9
           input.form-control(type='text' placeholder="请输入发表时间距离当前最大值" v-model.number="form.timeOfPostMax")
       .form-group
         label.col-sm-3.control-label 文章列表风格
         .col-sm-9
           .radio
-            label.radio-inline
+            label.m-r-1
               input(type="radio" v-model="form.threadStyle" name="threadStyle" value="abstract")
               | 摘要模式
-            label.radio-inline
+            label.m-r-1
               input(type="radio" v-model="form.threadStyle" name="threadStyle" value="brief")
               | 简略模式
-            label.radio-inline
+            label
               input(type="radio" v-model="form.threadStyle" name="threadStyle" value="minimalist")
               | 极简模式
       .form-group
-        label.col-sm-3.control-label 文章列表css样式
-        .col-sm-9
-          button(type="button" @click="selectBlockStyle()") 选择样式
-      .form-group
-        label.col-sm-3.control-label 文章封面图位置
+        label.col-sm-3.control-label 文章封面位置
         .col-sm-9
           .radio
-            label.radio-inline
+            label.m-r-1
               input(type="radio" v-model="form.coverPosition" name="coverPosition" value="left")
               | 左
-            label.radio-inline
+            label
               input(type="radio" v-model="form.coverPosition" name="coverPosition" value="right")
               | 右
       .form-group
-        label.col-sm-3.control-label 文章篇数
+        label.col-sm-3.control-label 文章列表样式
         .col-sm-9
-          input.form-control(type='text' placeholder="请输入文章篇数" v-model="form.threadCount")
+          button.btn.btn-default.btn-sm(type="button" @click="selectBlockStyle()") 选择样式
+      .form-group
+        label.col-sm-3.control-label 文章显示篇数
+        .col-sm-9
+          input.form-control(type='text' placeholder="请输入文章显示篇数" v-model="form.threadCount")
       .form-group
         label.col-sm-3.control-label 是否屏蔽
         .col-sm-9
           .radio
-            label.radio-inline
+            label.m-r-1
               input(type="radio" v-model="form.disabled" name="disabled" :value="true")
               | 是
-            label.radio-inline
+            label
               input(type="radio" v-model="form.disabled" name="disabled" :value="false")
               | 否
       .form-group
-        label.col-sm-3.control-label 手动推送文章显示条数
+        label.col-sm-3.control-label 手动推送显示条数
         .col-sm-9
           input.form-control(type='text' placeholder="请输入手动推送文章显示条数" v-model.number="form.fixedThreadCount")
       .form-group
-        label.col-sm-3.control-label 自动推送文章入选条数
+        label.col-sm-3.control-label 自动推送入选条数
         .col-sm-9
           input.form-control(type='text' placeholder="请输入自动推送文章入选条数" v-model.number="form.autoThreadCount")
       .form-group
@@ -318,15 +319,20 @@ mixin hiddenForm
         label.col-sm-3.control-label 显示时的排序
         .col-sm-9
           .radio
-            label.radio-inline
+            label.m-r-1
               input(type="radio" v-model="form.sort" name="sort" value="random")
               | 随机
-            label.radio-inline
+            label.m-r-1
               input(type="radio" v-model="form.sort" name="sort" value="toc")
               | 发表时间
-            label.radio-inline
+            label.m-r-1
               input(type="radio" v-model="form.sort" name="sort" value="postCount")
               | 回复数
-            label.radio-inline
+            label
               input(type="radio" v-model="form.sort" name="sort" value="voteUpCount")
               | 点赞数
+      .form-group
+        label.col-sm-3.control-label
+        .col-sm-9
+          button.btn.btn-primary(@click='saveForm') 保存
+          button.btn.btn-danger(@click='hideForm') 取消

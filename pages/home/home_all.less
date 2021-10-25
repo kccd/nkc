@@ -583,14 +583,19 @@ footer.footer{
     margin-bottom: 0.5rem;
   }
 }
-.selectedForums{
+.selected-forums{
   padding: 0.3rem;
-  span{
-    padding: 0.2rem;
-    margin: 0.2rem;
-    border-radius: 5px;
-    .removeF{
+  .selected-forum{
+    display: inline-block;
+    height: 2.2rem;
+    padding: 0 0.5rem;
+    margin: 0 0.5rem 0.5rem 0;
+    line-height: 2.2rem;
+    border-radius: 2px;
+    color: #fff;
+    .remove-forum{
       cursor: pointer;
+      margin-left: 0.5rem;
     }
   }
   .selectForum{
@@ -793,7 +798,9 @@ footer.footer{
 .home-category-master-handle{
   cursor: move;
 }
-
+#hiddenForm{
+  display: none;
+}
 
 @media (max-width: 500px) {
   .home-goods .home-goods-content .home-goods-avatar > div{

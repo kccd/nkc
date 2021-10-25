@@ -13,6 +13,11 @@ block content
           button.admin-create(onclick=`create()`) 新建
           button.admin-editor(onclick=`editor()`) 编辑
           button.admin-finished(onclick=`finished()`) 完成
+      .col-xs-12.box-shadow-panel.col-md-6.col-md-offset-3
+        #new_blockForm.m-b-1(v-cloak v-if='show')
+          h4 新建模块
+          +hiddenForm
+
       .col-xs-12.col-md-6.box-shadow-panel.home-categories-left
         for homeBlock in data.homeBlockData.left
           +renderHome(homeBlock)
@@ -20,8 +25,6 @@ block content
       .col-xs-12.col-md-6.box-shadow-panel.home-categories-right
         for homeBlock in data.homeBlockData.right
           +renderHome(homeBlock)
-        #hiddenForm
-          +hiddenForm
 
 block scripts
   include ../publicModules/subscribeTypes/subscribeTypes

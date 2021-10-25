@@ -91,67 +91,44 @@ function changeOrder(){
     .catch(sweetError);
 }
 
-//新建
-function create(){
-  const date = new Date();
-  const id = 'new_'+date.getTime();
-  const leftModel = $('.home-categories-left');
-  const hiddenForm = $('#hiddenForm>.home-threads-editor').eq(0).clone();
-  leftModel.prepend(`<div id='${id}' class='home-forums-list m-b-1 home-category-master-handle'>
-    <div class="home-title-box">
-      <div class="home-title-l">
-        <span class="fa fa-bars move-handle m-r-1"></span>
-        <span class="panel-header m-b-0 home-title">新建模块<span>
-      </div>
-      <div class="operate">
-          <button class="home-title-r btn-success btn btn-xs" style="visibility: initial" @click=save('${id}')>保存</button>
-          <button class="home-title-r btn-danger btn btn-xs" style="visibility: initial" @click=delBlock('${id}')>删除</button>
-        </div>
-    </div>
-    <div class="home-threads"></div>
-  </div>`);
-  const form = $(`#${id}>.home-threads`)
-  form.append(hiddenForm);
-  const vueAppId = getVueAppId(id);
+function create() {
+  const vueAppId = getVueAppId('new_blockForm');
   let app = apps[vueAppId];
   if(!app) {
-    //创建vue实例
-    app = initVue(id);
+    app = initVue(`blockForm`, 'new');
     apps[vueAppId] = app;
   }
-  app.show = true;
-  app.loading = false;
-  setTimeout(() => {
-    app.$refs.homeCategoryList.initCategories();
-  });
+  app.showForm();
 }
+
 const apps = {};
 function getVueAppId(cid) {
   return `vue_app_${cid}`;
 }
 function editorBlock(bid){
-  const oldContainer = $(`#block_${bid}>.home-threads`);
-  const editorBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>#btn-editorBlock`);
-  const saveBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-saveEditor`);
-  saveBlockDom.show();
-  editorBlockDom.hide();
-  oldContainer.hide();
   const vueAppId = getVueAppId(bid);
   let app = apps[vueAppId];
   if(!app) {
     //创建vue实例
-    app = initVue('block_'+bid);
+    app = initVue(bid, 'edit');
     apps[vueAppId] = app;
   }
-  app.show = true;
-  app.getData();
+  app.showForm();
 }
 import ThreadCategoryList from '../publicModules/threadCategory/list';
 //创建vue实例
-function initVue(cid){
-  window.app = new Vue({
+function initVue(bid, type){
+  let cid;
+  if(type === 'new') {
+    cid = `new_${bid}`;
+  } else {
+    cid = `block_${bid}`;
+  }
+  const app = new Vue({
     el: `#${cid}`,
     data: {
+      bid,
+      type,
       show: false,
       loading: true,
       //已选择的专业
@@ -196,6 +173,9 @@ function initVue(cid){
       'thread-category-list': ThreadCategoryList
     },
     computed: {
+      isNewForm() {
+        return this.type === 'new';
+      },
       categoriesId(){
         const {selectedHomeCategoriesId} = this;
         for(const tc of selectedHomeCategoriesId) {
@@ -223,53 +203,86 @@ function initVue(cid){
         return arr;
       }
     },
-    mounted() {
-
-    },
     methods: {
-      getData(){
-        if(cid.indexOf('new_') !== 0){
-          const id = cid.split('_').pop();
-          nkcAPI('nkc/home/block/'+id, 'GET', {
-          })
-            .then(data => {
-              this.form = data.homeBlock;
-              this.forums = data.forums;
-              this.selectedHomeCategoriesId = data.homeBlock.tcId;
-              this.threadCategories = data.threadCategories;
-              this.loading = false;
-              const _this = this;
-              setTimeout(() => {
-                _this.$refs.homeCategoryList.initCategories();
-              });
-            })
-            .catch(err => {sweetError(err)});
+      showForm() {
+        const {bid} = this;
+        this.loading = true;
+        this.show = true;
+        if(this.isNewForm) {
+          this.loading = false;
+        } else {
+          const oldContainer = $(`#block_${bid}>.home-threads`);
+          const editorBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>#btn-editorBlock`);
+          const saveBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-saveEditor`);
+          saveBlockDom.show();
+          editorBlockDom.hide();
+          oldContainer.hide();
+          this.getData();
         }
       },
-      //保存编辑
-      saveEditor(bid){
-        const id = bid.split('_').pop();
+      hideForm() {
+        const {bid} = this;
+        this.show = false;
+        if(!this.isNewForm) {
+          const oldContainer = $(`#block_${bid}>.home-threads`);
+          const editorBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>#btn-editorBlock`);
+          const saveBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-saveEditor`);
+          saveBlockDom.hide();
+          editorBlockDom.show();
+          oldContainer.show();
+        }
+      },
+      saveForm() {
+        const {form, isNewForm, bid} = this;
         const selectedThreadCategories = this.getSelectedHomeCategoriesId();
-        this.form.tcId = [];
+        form.tcId = [];
         for(const tc of selectedThreadCategories) {
           if(tc.nodeId === 'default') continue;
-          this.form.tcId.push(tc.nodeId);
+          form.tcId.push(tc.nodeId);
         }
-        const editorBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>#btn-editorBlock`);
-        const saveEditorDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-saveEditor`);
-        const oldContainer = $(`#block_${bid}>.home-threads`);
-        nkcAPI('/nkc/home/block/'+ id, 'PUT', {
-          block: this.form
+        let url = `/nkc/home/block/${bid}`;
+        let method = `PUT`;
+
+        if(isNewForm) {
+          url = `/nkc/home/block`;
+          method = 'POST';
+        }
+
+        const _this = this;
+
+        nkcAPI(url, method, {
+          block: form
         })
           .then((data) => {
-            editorBlockDom.show();
-            oldContainer.show();
-            saveEditorDom.hide();
-            this.show = false;
+            if(isNewForm) {
+              screenTopAlert(`保存成功`);
+              setTimeout(() => {
+                window.location.reload();
+              }, 1000);
+            } else {
+              sweetSuccess(`保存成功`);
+              _this.hideForm();
+            }
           })
           .catch(err => {
             sweetError(err)
           })
+      },
+      getData(){
+        const {bid} = this;
+        nkcAPI('nkc/home/block/' + bid, 'GET', {})
+          .then(data => {
+            this.form = data.homeBlock;
+            this.forums = data.forums;
+            this.selectedHomeCategoriesId = data.homeBlock.tcId;
+            this.threadCategories = data.threadCategories;
+            this.loading = false;
+            const _this = this;
+            setTimeout(() => {
+              _this.$refs.homeCategoryList.initCategories();
+            });
+          })
+          .catch(err => {sweetError(err)});
       },
       //选择文章列表样式
       selectBlockStyle(){
@@ -326,29 +339,6 @@ function initVue(cid){
       getSelectedHomeCategoriesId() {
         return this.$refs.homeCategoryList.getSelectedCategoriesId();
       },
-      //保存创建的模块
-      save(cid){
-        const selectedThreadCategories = this.getSelectedHomeCategoriesId();
-        this.form.tcId = [];
-        for(const tc of selectedThreadCategories) {
-          if(tc.nodeId === 'default') continue;
-          this.form.tcId.push(tc.nodeId);
-        }
-        nkcAPI('/nkc/home/block', 'POST', {
-          block: this.form
-        })
-          .then((data) => {
-            window.location.reload();
-          })
-          .catch(err => {
-            sweetError(err)
-          })
-      },
-      //删除模块
-      delBlock(cid){
-        const delDom = $(`#${cid}`);
-        delDom.remove();
-      },
       //移除选中的专业
       removeForum(fid){
         this.forums = this.forums.filter((c => c.fid !== fid))
@@ -375,23 +365,13 @@ function initVue(cid){
         }, {
           highlightForumId: [],
           selectedForumsId: [],
-          disabledForumsId: self.form.forumsId
+          disabledForumsId: self.form.forumsId,
+          needThreadType: false
         });
       },
     },
   });
   return app;
-}
-//编辑
-function initBlock(cid){
-  const vueAppId = getVueAppId(cid);
-  let app = apps[vueAppId];
-  if(!app) {
-    //创建vue实例
-    app = initVue(cid);
-    apps[vueAppId] = app;
-  }
-  app.show = true;
 }
 //删除
 function deleteHomeBlock(homeBlockId){
@@ -414,16 +394,13 @@ function disabledHomeBlock(homeBlockId, disabled){
     })
     .catch(sweetError)
 }
-function clickEditor(){
-
-}
 
 const defaultButtonStatus = {
   editor: true,
   finished: false,
   create: false,
   handle: false,
-  saveEditor: false,
+  // saveEditor: false,
 };
 
 const editorButtonStatus = {
@@ -431,7 +408,7 @@ const editorButtonStatus = {
   finished: true,
   create: true,
   handle: true,
-  saveEditor: false,
+  // saveEditor: false,
 };
 
 function renderButtons(status) {
@@ -444,7 +421,7 @@ function renderButtons(status) {
   status.finished? finished.show(): finished.hide();
   status.create? create.show(): create.hide();
   status.handle? moveHandle.show(): moveHandle.hide()
-  status.saveEditor? saveEditor.show(): saveEditor.hide()
+  // status.saveEditor? saveEditor.show(): saveEditor.hide()
 }
 
 renderButtons(defaultButtonStatus);
@@ -483,6 +460,10 @@ function fixAllBlockHeight(fixed) {
 function finished(){
   renderButtons(defaultButtonStatus);
   fixAllBlockHeight(false);
+  for(const id in apps) {
+    if(!apps.hasOwnProperty(id)) continue;
+    apps[id].hideForm();
+  }
 }
 
 function refresh(homeBlockId) {
@@ -496,8 +477,6 @@ function refresh(homeBlockId) {
 Object.assign(window, {
   changeOrder,
   finished,
-  clickEditor,
-  initBlock,
   refresh,
   create,
   editor,
