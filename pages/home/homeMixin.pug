@@ -12,7 +12,7 @@ mixin renderHome(homeBlock)
         span.home-forums-list-icon.fa.fa-bars.move-handle.m-r-1
       span=name
       .home-forums-list-options.move-handle
-        button.btn-default.btn.btn-xs.icon-expand(onclick=`expandList('${homeBlock._id}')`) 展开
+        button.btn-default.btn.btn-xs.icon-expand(onclick=`expandList('${homeBlock._id}')`) 折叠
         if hasPermission && showOptions
           button.btn-primary.btn.btn-xs(onclick=`editorBlock()`) 编辑
           button.btn-danger.btn.btn-xs(onclick=`deleteHomeBlock('${homeBlock._id}')`) 删除

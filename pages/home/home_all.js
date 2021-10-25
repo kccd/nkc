@@ -371,7 +371,6 @@ renderButtons(defaultButtonStatus);
 function editor(){
   renderButtons(editorButtonStatus);
   initSortable();
-  fixAllBlockHeight(true);
 }
 
 function expandList(homeBlockId) {
