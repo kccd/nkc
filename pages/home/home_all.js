@@ -1,6 +1,7 @@
 window.ForumSelector = undefined;
 window.data = NKC.methods.getDataById("data");
 const commonModel = new NKC.modules.CommonModal();
+const fixBlockHeightClass = 'fix-block-height';
 import Sortable from "sortablejs";
 
 $(function() {
@@ -370,9 +371,37 @@ renderButtons(defaultButtonStatus);
 function editor(){
   renderButtons(editorButtonStatus);
   initSortable();
+  fixAllBlockHeight(true);
 }
+
+function expandList(homeBlockId) {
+  const blockDom = $(`.home-forums-list[id="block_${homeBlockId}"]`);
+  fixBlockHeight(blockDom);
+}
+
+function fixBlockHeight(blockDom) {
+  const fixed = blockDom.hasClass(fixBlockHeightClass);
+  if(!fixed) {
+    blockDom.addClass(fixBlockHeightClass);
+    blockDom.find('.icon-expand').text('展开');
+  } else {
+    blockDom.removeClass(fixBlockHeightClass);
+    blockDom.find('.icon-expand').text('折叠');
+  }
+}
+
+function fixAllBlockHeight(fixed) {
+  const blocks = $('.home-categories-left>.home-forums-list, .home-categories-right>.home-forums-list');
+  if(fixed) {
+    blocks.addClass(fixBlockHeightClass);
+  } else {
+    blocks.removeClass(fixBlockHeightClass);
+  }
+}
+
 function finished(){
   renderButtons(defaultButtonStatus);
+  fixAllBlockHeight(false);
 }
 
 Object.assign(window, {
@@ -384,5 +413,6 @@ Object.assign(window, {
   editor,
   initSortable,
   deleteHomeBlock,
-  disabledHomeBlock
+  disabledHomeBlock,
+  expandList
 });

@@ -11,11 +11,13 @@ mixin renderHome(homeBlock)
       if hasPermission
         span.home-forums-list-icon.fa.fa-bars.move-handle.m-r-1
       span=name
-      if hasPermission && showOptions
-        .home-forums-list-options.move-handle
+      .home-forums-list-options.move-handle
+        button.btn-default.btn.btn-xs.icon-expand(onclick=`expandList('${homeBlock._id}')`) 展开
+        if hasPermission && showOptions
           button.btn-primary.btn.btn-xs(onclick=`editorBlock()`) 编辑
           button.btn-danger.btn.btn-xs(onclick=`deleteHomeBlock('${homeBlock._id}')`) 删除
           button.btn-warning.btn.btn-xs(onclick=`disabledHomeBlock('${homeBlock._id}', ${!homeBlock.disabled})`)=homeBlock.disabled? '恢复': '屏蔽'
+
   if homeBlock._id === 'recommendThreadsMovable'
     //轮播图
     .home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
