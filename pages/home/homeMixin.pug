@@ -20,8 +20,9 @@ mixin renderHome(homeBlock)
 
   if homeBlock._id === 'recommendThreadsMovable'
     //轮播图
-    .home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
-      +homeBlockHeader(true, false)
+    .home-forums-list.m-b-1(id=`block_${homeBlock._id}`).p-a-0
+      .p-l-1.p-r-1
+        +homeBlockHeader(true, false)
       .home-swiper.home-covers-md.home-covers-movable
         .swiper-container.swiper-home
           .swiper-wrapper
@@ -37,8 +38,9 @@ mixin renderHome(homeBlock)
             .fa.fa-angle-left
   else if homeBlock._id === 'recommendThreadsFixed'
     //右侧小图
-    .home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
-      +homeBlockHeader(true, false)
+    .home-forums-list.m-b-1(id=`block_${homeBlock._id}`).p-a-0
+      .p-l-1.p-r-1
+        +homeBlockHeader(true, false)
       .home-swiper.home-covers-md
         .home-covers-sm
           for thread, index in homeBlock.data
@@ -51,7 +53,7 @@ mixin renderHome(homeBlock)
   else if homeBlock._id === 'toppedThreads'
     //首页顶置
     if homeBlock.data.length
-      .home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
+      .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
         +homeBlockHeader(false, false)
         .home-threads
           for thread in homeBlock.data
@@ -59,7 +61,7 @@ mixin renderHome(homeBlock)
   else if homeBlock._id === 'goods'
     //热销商品
     if homeBlock.data.length > 0
-      .home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
+      .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
         +homeBlockHeader(false, false)
         .home-goods
           for goods in homeBlock.data
@@ -99,7 +101,7 @@ mixin renderHome(homeBlock)
   else if homeBlock._id === 'hotColumns'
     //热门专栏
     if homeBlock.data.length > 0
-      .home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
+      .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
         +homeBlockHeader(false, false)
         .home-columns
           for column in homeBlock.data
@@ -139,14 +141,14 @@ mixin renderHome(homeBlock)
                     a(href=`/t/${p.tid}` target="_blank" title=p.t)=p.t
                     .home-main-column-post-time
                       +fromNow(p.toc)
-      .home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
+      .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
         +homeBlockHeader(false, false)
         .home-main-columns
           for column, index in homeBlock.data
             -var klass = index === data.toppedColumns.length - 1 ? 'm-b-0' : ''
             +columnPanel(column, klass)
   else if homeBlock._id === 'forums'
-    .home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
+    .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
       +homeBlockHeader(false, false)
       .home-forums
         for cf in data.categoryForums
@@ -162,7 +164,7 @@ mixin renderHome(homeBlock)
                       span |
                     a.home-forums-child(href=`/f/${cf.fid}` data-float-fid=cf.fid style=`background-color: ${hexToRgba(f.color, 0.1)}`)=cf.displayName
   else if homeBlock._id === 'management'
-    .home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
+    .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
       +homeBlockHeader(false, false)
       -var hidePanelHeader = true;
       include ../publicModules/management/management

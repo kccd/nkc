@@ -596,7 +596,7 @@ footer.footer{
 }
 .home-covers-sm{
   font-size: 0;
-  padding-right: 0.3rem;
+  //padding-right: 0.3rem;
   .home-cover-sm{
     width: 33.3%;
     display: inline-block;
@@ -715,11 +715,10 @@ footer.footer{
 }
 .home-covers-sm{
   font-size: 0;
-  //padding-right: 0.3rem;
   .home-cover-sm{
-    width: 33%;
+    width: 33.33%;
     display: inline-block;
-    padding-right: 0.6rem;
+    padding-right: 0.5rem;
     a{
       display: block;
       margin-bottom: 0.6rem;
@@ -748,6 +747,9 @@ footer.footer{
       }
     }
   }
+  & .home-cover-sm:nth-child(3n){
+    padding-right: 0;
+  }
 }
 
 
@@ -766,6 +768,10 @@ footer.footer{
       height: 5rem;
       background-image: linear-gradient(to top, #ffbea1 0%, rgba(255, 255, 255, 0) 50%);
     }
+  }
+  .home-forums-list{
+    box-shadow: none;
+    background-color: transparent;
   }
 }
 

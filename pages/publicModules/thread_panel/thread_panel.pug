@@ -64,9 +64,10 @@ mixin displayPageCount
       -ellipsis = true;
 
 mixin threadCategories
-  if thread.threadCategories && thread.threadCategories.length
-    for tc in thread.threadCategories
-      span.thread-category=tc.nodeName
+  //-
+    if thread.threadCategories && thread.threadCategories.length
+      for tc in thread.threadCategories
+        span.thread-category=tc.nodeName
 
 -const lastPostUrl = `/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`;
 -const hasReply = thread.firstPost.pid !== thread.lastPost.pid;
@@ -139,6 +140,9 @@ mixin threadCategories
           .thread-panel-title
             a.title-content.thread-panel-url(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
             +displayPageCount
+
+          +threadCategories
+
           if !thread.firstPost.anonymous
             .thread-panel-author(data-float-uid=thread.uid)
               a(
@@ -177,10 +181,11 @@ mixin threadCategories
             if thread.count
               .fa.fa-comment=` ${thread.count}`
 
-          +threadCategories
+
 
           if hasReply
             .thread-panel-brief-replay
+              span.fa.fa-commenting-o
               if !thread.lastPost.anonymous
                 a(href=`/u/${thread.lastPost.uid}` target="_blank" data-float-uid=thread.lastPost.uid)=thread.lastPost.user.username
               else
