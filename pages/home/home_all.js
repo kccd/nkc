@@ -96,7 +96,7 @@ function create(){
   const date = new Date();
   const id = 'new_'+date.getTime();
   const leftModel = $('.home-categories-left');
-  const hiddenForm = $('.home-threads-editor').eq(0).clone();
+  const hiddenForm = $('#hiddenForm>.home-threads-editor').eq(0).clone();
   leftModel.prepend(`<div id='${id}' class='home-forums-list m-b-1 home-category-master-handle'>
     <div class="home-title-box">
       <div class="home-title-l">
