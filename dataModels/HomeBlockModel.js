@@ -197,7 +197,7 @@ schema.statics.checkBlockValue = async (block) => {
   } = block;
   checkString(name, {
     name: '模块名',
-    minLength: 0,
+    minLength: 1,
     maxLength: 100
   });
   if(forumsId.length > 0) {

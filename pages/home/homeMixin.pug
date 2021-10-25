@@ -13,13 +13,13 @@ mixin renderHome(homeBlock)
       span=name
       .home-forums-list-options.move-handle
         button.btn-default.btn.btn-xs.icon-expand(onclick=`expandList('${homeBlock._id}')`) 折叠
-        if !homeBlock.defaultBlock
-          button.btn-default.btn.btn-xs.icon-expand(onclick=`refresh('${homeBlock._id}')`) 刷新
         if hasPermission && showOptions
-          button.btn-primary.btn.btn-xs(onclick=`editorBlock()`) 编辑
+          if !homeBlock.defaultBlock
+            button.btn-default.btn.btn-xs(onclick=`refresh('${homeBlock._id}')`) 刷新
+          button.btn-primary#btn-editorBlock.btn.btn-xs(onclick=`editorBlock('${homeBlock._id}')`) 编辑
+          button.btn-success.btn-saveEditor.btn.btn-xs(@click=`saveEditor('${homeBlock._id}')`) 保存
           button.btn-danger.btn.btn-xs(onclick=`deleteHomeBlock('${homeBlock._id}')`) 删除
           button.btn-warning.btn.btn-xs(onclick=`disabledHomeBlock('${homeBlock._id}', ${!homeBlock.disabled})`)=homeBlock.disabled? '恢复': '屏蔽'
-
   if homeBlock._id === 'recommendThreadsMovable'
     //轮播图
     .home-forums-list.m-b-1(id=`block_${homeBlock._id}`).p-a-0
@@ -187,9 +187,11 @@ mixin renderHome(homeBlock)
           -var defaultThreadListStyle = {type: homeBlock.threadStyle, cover: homeBlock.coverPosition}
           -var threadPanelATarget = '_blank';
           include ../publicModules/thread_panel/thread_panel
-mixin hidForm
-  div.hidden#hiddenForm
-    form.newBlock.form-horizontal(:model="form")
+      +hiddenForm
+mixin hiddenForm
+  .home-threads-editor(v-if="show" v-cloak)
+    .p-t-3.p-b-3.text-center(v-if='loading') 加载中...
+    form.newBlock.form-horizontal(v-else :model="form")
       .form-group
         label.col-sm-3.control-label 模块名称
         .col-sm-9
@@ -200,12 +202,12 @@ mixin hidForm
           button(type="button" @click="selectForums()") 选择专业
           div.selectedForums(v-if="selectedForums.length")
             span 已选专业：
-            span(v-for="(forum) in selectedForums" :style=`'background-color:'+forum.color`) {{forum.displayName}}
+            span.selectForum(v-for="(forum) in forums" :style=`'background-color:'+forum.color`) {{forum.displayName}}
               span.fa.fa-close.removeF(@click="removeForum(forum.fid)")
       .form-group
         label.col-sm-3.control-label 文章属性
         .col-sm-9
-          thread-category-list(:categories="threadCategories" :tcid='selectedHomeCategoriesId' ref='homeCategoryList')
+          thread-category-list(:categories="threadCategories" :tcid="selectedHomeCategoriesId" ref='homeCategoryList')
       .form-group
         label.col-sm-3.control-label 是否为精选文章
         .col-sm-9

@@ -20,7 +20,8 @@ block content
       .col-xs-12.col-md-6.box-shadow-panel.home-categories-right
         for homeBlock in data.homeBlockData.right
           +renderHome(homeBlock)
-      +hidForm
+        #hiddenForm
+          +hiddenForm
 
 block scripts
   include ../publicModules/subscribeTypes/subscribeTypes

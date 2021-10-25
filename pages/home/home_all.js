@@ -94,10 +94,9 @@ function changeOrder(){
 //新建
 function create(){
   const date = new Date();
-  console.log('创建模块');
   const id = 'new_'+date.getTime();
   const leftModel = $('.home-categories-left');
-  const hiddenForm = $('#hiddenForm>form').clone();
+  const hiddenForm = $('.home-threads-editor').eq(0).clone();
   leftModel.prepend(`<div id='${id}' class='home-forums-list m-b-1 home-category-master-handle'>
     <div class="home-title-box">
       <div class="home-title-l">
@@ -113,11 +112,39 @@ function create(){
   </div>`);
   const form = $(`#${id}>.home-threads`)
   form.append(hiddenForm);
-  initBlock(id);
-};
+  const vueAppId = getVueAppId(id);
+  let app = apps[vueAppId];
+  if(!app) {
+    //创建vue实例
+    app = initVue(id);
+    apps[vueAppId] = app;
+  }
+  app.show = true;
+  app.loading = false;
+  setTimeout(() => {
+    app.$refs.homeCategoryList.initCategories();
+  });
+}
 const apps = {};
 function getVueAppId(cid) {
   return `vue_app_${cid}`;
+}
+function editorBlock(bid){
+  const oldContainer = $(`#block_${bid}>.home-threads`);
+  const editorBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>#btn-editorBlock`);
+  const saveBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-saveEditor`);
+  saveBlockDom.show();
+  editorBlockDom.hide();
+  oldContainer.hide();
+  const vueAppId = getVueAppId(bid);
+  let app = apps[vueAppId];
+  if(!app) {
+    //创建vue实例
+    app = initVue('block_'+bid);
+    apps[vueAppId] = app;
+  }
+  app.show = true;
+  app.getData();
 }
 import ThreadCategoryList from '../publicModules/threadCategory/list';
 //创建vue实例
@@ -126,6 +153,7 @@ function initVue(cid){
     el: `#${cid}`,
     data: {
       show: false,
+      loading: true,
       //已选择的专业
       forums: [],
       // selectedForums: [],
@@ -161,13 +189,21 @@ function initVue(cid){
         fixedThreadsId: [],
         sort: 'random',
       },
-      threadCategories: data.threadCategories,
+      threadCategories: data.threadCategories || [],
       selectedHomeCategoriesId: [],
     },
     components: {
       'thread-category-list': ThreadCategoryList
     },
     computed: {
+      categoriesId(){
+        const {selectedHomeCategoriesId} = this;
+        for(const tc of selectedHomeCategoriesId) {
+          if(tc.nodeId === 'default') continue;
+          this.form.tcId.push(tc.nodeId);
+        }
+        return arr;
+      },
       forumsObj() {
         const {forums} = this;
         const obj = {};
@@ -188,8 +224,53 @@ function initVue(cid){
       }
     },
     mounted() {
+
     },
     methods: {
+      getData(){
+        if(cid.indexOf('new_') !== 0){
+          const id = cid.split('_').pop();
+          nkcAPI('nkc/home/block/'+id, 'GET', {
+          })
+            .then(data => {
+              this.form = data.homeBlock;
+              this.forums = data.forums;
+              this.selectedHomeCategoriesId = data.homeBlock.tcId;
+              this.threadCategories = data.threadCategories;
+              this.loading = false;
+              const _this = this;
+              setTimeout(() => {
+                _this.$refs.homeCategoryList.initCategories();
+              });
+            })
+            .catch(err => {sweetError(err)});
+        }
+      },
+      //保存编辑
+      saveEditor(bid){
+        const id = bid.split('_').pop();
+        const selectedThreadCategories = this.getSelectedHomeCategoriesId();
+        this.form.tcId = [];
+        for(const tc of selectedThreadCategories) {
+          if(tc.nodeId === 'default') continue;
+          this.form.tcId.push(tc.nodeId);
+        }
+        const editorBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>#btn-editorBlock`);
+        const saveEditorDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-saveEditor`);
+        const oldContainer = $(`#block_${bid}>.home-threads`);
+        nkcAPI('/nkc/home/block/'+ id, 'PUT', {
+          block: this.form
+        })
+          .then((data) => {
+            editorBlockDom.show();
+            oldContainer.show();
+            saveEditorDom.hide();
+            this.show = false;
+          })
+          .catch(err => {
+            sweetError(err)
+          })
+      },
       //选择文章列表样式
       selectBlockStyle(){
         const self = this;
@@ -253,12 +334,10 @@ function initVue(cid){
           if(tc.nodeId === 'default') continue;
           this.form.tcId.push(tc.nodeId);
         }
-        console.log(this.form);
         nkcAPI('/nkc/home/block', 'POST', {
           block: this.form
         })
           .then((data) => {
-            sweetSuccess('提交成功');
             window.location.reload();
           })
           .catch(err => {
@@ -272,7 +351,7 @@ function initVue(cid){
       },
       //移除选中的专业
       removeForum(fid){
-        this.selectedForums = this.selectedForums.filter((c => c.fid !== fid))
+        this.forums = this.forums.filter((c => c.fid !== fid))
       },
       // 获取已选择文章分类ID组成的数组
       selectedCategoriesId() {
@@ -305,7 +384,6 @@ function initVue(cid){
 }
 //编辑
 function initBlock(cid){
-  console.log(cid);
   const vueAppId = getVueAppId(cid);
   let app = apps[vueAppId];
   if(!app) {
@@ -344,14 +422,16 @@ const defaultButtonStatus = {
   editor: true,
   finished: false,
   create: false,
-  handle: false
+  handle: false,
+  saveEditor: false,
 };
 
 const editorButtonStatus = {
   editor: false,
   finished: true,
   create: true,
-  handle: true
+  handle: true,
+  saveEditor: false,
 };
 
 function renderButtons(status) {
@@ -359,10 +439,12 @@ function renderButtons(status) {
   const finished = $('.admin-finished');
   const create = $('.admin-create');
   const moveHandle = $('.move-handle');
+  const saveEditor = $('.btn-saveEditor');
   status.editor? editor.show(): editor.hide();
   status.finished? finished.show(): finished.hide();
   status.create? create.show(): create.hide();
   status.handle? moveHandle.show(): moveHandle.hide()
+  status.saveEditor? saveEditor.show(): saveEditor.hide()
 }
 
 renderButtons(defaultButtonStatus);
@@ -421,6 +503,7 @@ Object.assign(window, {
   editor,
   initSortable,
   deleteHomeBlock,
+  editorBlock,
   disabledHomeBlock,
   expandList
 });

@@ -1,8 +1,10 @@
 const router = require('koa-router')();
 router
+  //新建模块
   .post('/', async (ctx, next) =>{
-    const {db, body} = ctx;
+    const {db, body, nkcModules} = ctx;
     const {block} = body;
+    const {checkString, checkNumber} = nkcModules.checkData;
     const {
       name,
       forumsId,
@@ -26,6 +28,106 @@ router
       fixedThreadsId,
       sort
     } = block;
+    checkString(name, {
+      name: '模块名',
+      minLength: 2,
+      maxLength: 20
+    });
+    checkString(threadStyle, {
+      name: '文章列表风格',
+      minLength: 1,
+      maxLength: 20
+    });
+    checkString(blockStyle.headerTitleColor, {
+      name: '模块名称颜色',
+      minLength: 1,
+      maxLength: 20
+    });
+    checkString(blockStyle.backgroundColor, {
+      name: '模块背景颜色',
+      minLength: 1,
+      maxLength: 20
+    });
+    // checkString(blockStyle.usernameColor, {
+    //   name: '用户名颜色',
+    //   minLength: 0,
+    //   maxLength: 20
+    // });
+    // checkString(blockStyle.forumColor, {
+    //   name: '专业名颜色',
+    //   minLength: 0,
+    //   maxLength: 20
+    // });
+    // checkString(blockStyle.titleColor, {
+    //   name: '文章标题颜色',
+    //   minLength: 0,
+    //   maxLength: 20
+    // });
+    // checkString(blockStyle.abstractColor, {
+    //   name: '文章摘要颜色',
+    //   minLength: 0,
+    //   maxLength: 20
+    // });
+    // checkString(blockStyle.infoColor, {
+    //   name: '时间等其他信息颜色',
+    //   minLength: 1,
+    //   maxLength: 20
+    // });
+    checkString(coverPosition, {
+      name: '文章封面图位置',
+      minLength: 1,
+      maxLength: 20
+    });
+    checkString(sort, {
+      name: '显示时的排序',
+      minLength: 1,
+      maxLength: 20
+    });
+    checkNumber(postCountMin, {
+      name: '回复数最小值',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(voteUpMin, {
+      name: '点赞数最小值',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(voteUpTotalMin, {
+      name: '文章加所有回复的点赞数最小值',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(voteDownMax, {
+      name: '最大点踩数',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(updateInterval, {
+      name: '更新的间隔时间',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(timeOfPostMin, {
+      name: '发表时间距离当前最小值',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(timeOfPostMax, {
+      name: '发表时间距离当前最大值',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(fixedThreadCount, {
+      name: '手动推送文章显示条数',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(autoThreadCount, {
+      name: '自动推送文章入选条数',
+      min: 0,
+      max: 5000
+    });
     await db.HomeBlockModel.checkBlockValue(block);
     const sameName = await db.HomeBlockModel.findOne({name}, {_id: 1});
     if(sameName) ctx.throw(400, `模块名已存在`);
@@ -91,7 +193,7 @@ router
     await next();
   })
   .get('/:bid', async (ctx, next) => {
-    const {data} = ctx;
+    const {data, db} = ctx;
     const {homeBlock} = data;
     data.threadCategories = await db.ThreadCategoryModel.getCategoryTree();
     data.forums = [];
@@ -100,10 +202,12 @@ router
     }
     await next();
   })
+  //编辑模块
   .put('/:bid', async (ctx, next) => {
-    const {data, db, body} = ctx;
+    const {data, db, body, nkcModules} = ctx;
     const {homeBlock} = data;
     const {block} = body;
+    const {checkString, checkNumber} = nkcModules.checkData;
     const {
       name,
       forumsId,
@@ -127,8 +231,108 @@ router
       fixedThreadsId,
       sort
     } = block;
+    checkString(name, {
+      name: '模块名',
+      minLength: 2,
+      maxLength: 20
+    });
+    checkString(threadStyle, {
+      name: '文章列表风格',
+      minLength: 1,
+      maxLength: 20
+    });
+    checkString(blockStyle.headerTitleColor, {
+      name: '模块名称颜色',
+      minLength: 1,
+      maxLength: 20
+    });
+    checkString(blockStyle.backgroundColor, {
+      name: '模块背景颜色',
+      minLength: 1,
+      maxLength: 20
+    });
+    // checkString(blockStyle.usernameColor, {
+    //   name: '用户名颜色',
+    //   minLength: 0,
+    //   maxLength: 20
+    // });
+    // checkString(blockStyle.forumColor, {
+    //   name: '专业名颜色',
+    //   minLength: 0,
+    //   maxLength: 20
+    // });
+    // checkString(blockStyle.titleColor, {
+    //   name: '文章标题颜色',
+    //   minLength: 0,
+    //   maxLength: 20
+    // });
+    // checkString(blockStyle.abstractColor, {
+    //   name: '文章摘要颜色',
+    //   minLength: 0,
+    //   maxLength: 20
+    // });
+    // checkString(blockStyle.infoColor, {
+    //   name: '时间等其他信息颜色',
+    //   minLength: 1,
+    //   maxLength: 20
+    // });
+    checkString(coverPosition, {
+      name: '文章封面图位置',
+      minLength: 1,
+      maxLength: 20
+    });
+    checkString(sort, {
+      name: '显示时的排序',
+      minLength: 1,
+      maxLength: 20
+    });
+    checkNumber(postCountMin, {
+      name: '回复数最小值',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(voteUpMin, {
+      name: '点赞数最小值',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(voteUpTotalMin, {
+      name: '文章加所有回复的点赞数最小值',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(voteDownMax, {
+      name: '最大点踩数',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(updateInterval, {
+      name: '更新的间隔时间',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(timeOfPostMin, {
+      name: '发表时间距离当前最小值',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(timeOfPostMax, {
+      name: '发表时间距离当前最大值',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(fixedThreadCount, {
+      name: '手动推送文章显示条数',
+      min: 0,
+      max: 5000
+    });
+    checkNumber(autoThreadCount, {
+      name: '自动推送文章入选条数',
+      min: 0,
+      max: 5000
+    });
     await db.HomeBlockModel.checkBlockValue(block);
-    const sameName = await db.HomeBlockModel.findOne({_id: {$ne: homeBlock._id, name}});
+    const sameName = await db.HomeBlockModel.findOne({_id: {$ne: homeBlock._id}, name});
     if(sameName) ctx.throw(400, `模块名已存在`);
     await homeBlock.updateOne({
       $set: {
