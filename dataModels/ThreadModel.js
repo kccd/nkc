@@ -726,6 +726,7 @@ const defaultOptions = {
   showAnonymousUser: false,
   excludeAnonymousPost: false,
   removeLink: true,
+  threadCategory: true
 };
 threadSchema.statics.extendThreads = async (threads, options) => {
   const nkcRender = require('../nkcModules/nkcRender');
@@ -745,13 +746,21 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     ThreadTypeModel = mongoose.model('threadTypes');
   }
 
-  let forumsId = [], postsId = new Set(), postsObj = {}, usersId = new Set(), usersObj = {}, cid = [];
+  let forumsId = [];
+  let postsId = new Set();
+  let postsObj = {};
+  let usersId = new Set();
+  let usersObj = {};
+  let cid = [];
+  let tcId = [];
+  const threadCategoryObj = {};
   const parentForumsId = new Set(), forumsObj = {}, categoryObj = {};
 
   threads = threads.filter(thread => !!thread);
 
   threads.map(thread => {
     if(!thread) return;
+    thread.tcId = thread.tcId || [];
     if(o.firstPost) {
       postsId.add(thread.oc);
     }
@@ -762,7 +771,19 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     if(thread.categoriesId && thread.categoriesId.length !== 0) {
       cid = cid.concat(thread.categoriesId);
     }
+    if(o.threadCategory) {
+      tcId = tcId.concat(thread.tcId || []);
+    }
   });
+
+  if(o.threadCategory) {
+    const ThreadCategoryModel = mongoose.model('threadCategories');
+    const threadCategories = await ThreadCategoryModel.getCategoriesById([...new Set(tcId)]);
+    for(let i = 0; i < threadCategories.length; i++) {
+      const {nodeId} = threadCategories[i];
+      threadCategoryObj[nodeId] = threadCategories[i];
+    }
+  }
 
   if(o.firstPost || o.lastPost) {
     const posts = await PostModel.find({pid: {$in: [...postsId]}}, {
@@ -914,6 +935,15 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         for(const cid of thread.categoriesId) {
           if(categoryObj[cid]) thread.categories.push(categoryObj[cid]);
         }
+      }
+    }
+    if(o.threadCategory) {
+      thread.threadCategories = [];
+      for(let i = 0; i < thread.tcId.length; i++) {
+        const id = thread.tcId[i];
+        const category = threadCategoryObj[id];
+        if(!category) continue;
+        thread.threadCategories.push(category);
       }
     }
     results.push(thread.toObject?thread.toObject():thread);

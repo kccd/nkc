@@ -165,8 +165,10 @@ schema.statics.getCategoriesById = async (tcId = []) => {
     const category = categoriesObj[node.cid];
     if(!category) continue;
     threadCategories.push({
+      categoryId: category._id,
       categoryName: category.name,
       categoryThreadWarning: category.threadWarning,
+      nodeId: node._id,
       nodeName: node.name,
       nodeThreadWarning: node.threadWarning
     });

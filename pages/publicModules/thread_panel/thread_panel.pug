@@ -62,6 +62,12 @@ mixin displayPageCount
     else if !ellipsis
       span.thread-title-page ...
       -ellipsis = true;
+
+mixin threadCategories
+  if thread.threadCategories && thread.threadCategories.length
+    for tc in thread.threadCategories
+      span.thread-category=tc.nodeName
+
 -const lastPostUrl = `/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`;
 -const hasReply = thread.firstPost.pid !== thread.lastPost.pid;
 -const threadListStyle = defaultThreadListStyle || state.threadListStyle;
@@ -170,6 +176,9 @@ mixin displayPageCount
               .fa.fa-eye=` ${thread.hits}`
             if thread.count
               .fa.fa-comment=` ${thread.count}`
+
+          +threadCategories
+
           if hasReply
             .thread-panel-brief-replay
               if !thread.lastPost.anonymous
@@ -180,6 +189,7 @@ mixin displayPageCount
               a(href=lastPostUrl target=aTarget)
                 +fromNow(thread.lastPost.toc)
                 //-span(title=format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc))=`${fromNow(thread.lastPost.toc)}`
+
 
     else
       if postCoverPosition === 'left'
@@ -227,6 +237,7 @@ mixin displayPageCount
               else if thread.from === "collection"
                   span 收藏
 
+          +threadCategories
 
         //- 文章标题
         .thread-panel-title
