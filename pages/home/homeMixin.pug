@@ -16,8 +16,8 @@ mixin renderHome(homeBlock)
         if hasPermission && showOptions
           if !homeBlock.defaultBlock
             button.btn-default.btn.btn-xs(onclick=`refresh('${homeBlock._id}')`) 刷新
-          button.btn-primary#btn-editorBlock.btn.btn-xs(onclick=`editorBlock('${homeBlock._id}')`) 编辑
-          button.btn-success.btn-saveEditor.btn.btn-xs(@click=`saveForm`) 保存
+          button.btn-primary.btn-editor-block.btn.btn-xs(onclick=`editorBlock('${homeBlock._id}')`) 编辑
+          button.btn-success.btn-save-editor.btn.btn-xs(@click=`saveForm`) 保存
           button.btn-danger.btn.btn-xs(onclick=`deleteHomeBlock('${homeBlock._id}')`) 删除
           button.btn-warning.btn.btn-xs(onclick=`disabledHomeBlock('${homeBlock._id}', ${!homeBlock.disabled})`)=homeBlock.disabled? '恢复': '屏蔽'
   if homeBlock._id === 'recommendThreadsMovable'

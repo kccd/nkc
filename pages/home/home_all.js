@@ -212,8 +212,8 @@ function initVue(bid, type){
           this.loading = false;
         } else {
           const oldContainer = $(`#block_${bid}>.home-threads`);
-          const editorBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>#btn-editorBlock`);
-          const saveBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-saveEditor`);
+          const editorBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-editor-block`);
+          const saveBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-save-editor`);
           saveBlockDom.show();
           editorBlockDom.hide();
           oldContainer.hide();
@@ -225,8 +225,8 @@ function initVue(bid, type){
         this.show = false;
         if(!this.isNewForm) {
           const oldContainer = $(`#block_${bid}>.home-threads`);
-          const editorBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>#btn-editorBlock`);
-          const saveBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-saveEditor`);
+          const editorBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-editor-block`);
+          const saveBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-save-editor`);
           saveBlockDom.hide();
           editorBlockDom.show();
           oldContainer.show();
