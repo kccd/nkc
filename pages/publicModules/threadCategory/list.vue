@@ -78,6 +78,8 @@
         return categoriesId;
       }
     },
+    watch: {
+    },
     methods: {
       initCategories() {
         let {tcid = [], categories = []} = this;
@@ -85,9 +87,14 @@
         for(const c of categories) {
           c.selectedNode = null; // null: 未选择, 'default': 默认, {Number}: 具体的属性 ID
           for(const n of c.nodes) {
-            if(!tcid.includes(n._id)) continue;
-            c.selectedNode = n;
-            break;
+            const category = {
+              id:n._id,
+              boolean:tcid.includes(n._id,)
+            }
+            if(tcid.includes(n._id)){
+              c.selectedNode = n;
+              break;
+            }
           }
         }
         this.threadCategories = categories;

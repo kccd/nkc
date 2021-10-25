@@ -7,6 +7,12 @@ block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-8.box-shadow-panel
+        if data.communityToppedThreads && data.communityToppedThreads.length
+          .m-b-1
+            .panel-header 社区置顶
+            .home-threads
+              for thread in data.communityToppedThreads
+                include ../publicModules/thread_panel/thread_panel
         for cf in data.categoryForums
           .home-forums-list.m-b-1.category-forums
             .panel-header=cf.name

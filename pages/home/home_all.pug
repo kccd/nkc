@@ -20,7 +20,8 @@ block content
       .col-xs-12.col-md-6.box-shadow-panel.home-categories-right.p-l-05
         for homeBlock in data.homeBlockData.right
           +renderHome(homeBlock)
-      +hidForm
+        #hiddenForm
+          +hiddenForm
 
 block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
@@ -29,6 +30,5 @@ block scripts
   include ../publicModules/forumSelector/forumSelector
   include ../publicModules/commonModal/commonModal
 
-  // 23
   +includeJS("/swiper/swiper-bundle.js")
   +includeJS("/home/home_all.js")
