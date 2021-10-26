@@ -287,7 +287,7 @@ mixin hiddenForm
       .form-group
         label.col-sm-3.control-label 文章显示篇数
         .col-sm-9
-          input.form-control(type='text' placeholder="请输入文章显示篇数" v-model="form.threadCount")
+          input.form-control(type='text' placeholder="请输入文章显示篇数" v-model.Number="form.threadCount")
       .form-group
         label.col-sm-3.control-label 是否屏蔽
         .col-sm-9
@@ -309,8 +309,7 @@ mixin hiddenForm
       .form-group
         label.col-sm-3.control-label 自动选择的文章 ID
         .col-sm-9
-
-          input.form-control(type='text' placeholder="请输入自动选择的文章 ID" v-model="form.autoThreadsId")
+          textarea.form-control(type='text' placeholder="请输入自动选择的文章 ID" v-model="form.autoThreadsId")
       .form-group
         label.col-sm-3.control-label 手动选择的文章 ID
         .col-sm-9

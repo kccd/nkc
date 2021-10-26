@@ -30,8 +30,8 @@ router
     } = block;
     checkString(name, {
       name: '模块名',
-      minLength: 2,
-      maxLength: 20
+      minLength: 1,
+      maxLength: 100
     });
     checkString(threadStyle, {
       name: '文章列表风格',
@@ -86,47 +86,45 @@ router
     checkNumber(postCountMin, {
       name: '回复数最小值',
       min: 0,
-      max: 5000
     });
     checkNumber(voteUpMin, {
       name: '点赞数最小值',
       min: 0,
-      max: 5000
     });
     checkNumber(voteUpTotalMin, {
       name: '文章加所有回复的点赞数最小值',
       min: 0,
-      max: 5000
     });
     checkNumber(voteDownMax, {
       name: '最大点踩数',
       min: 0,
-      max: 5000
     });
     checkNumber(updateInterval, {
       name: '更新的间隔时间',
-      min: 0,
-      max: 5000
+      min: 0.01,
+      fractionDigits: 2
     });
     checkNumber(timeOfPostMin, {
       name: '发表时间距离当前最小值',
       min: 0,
-      max: 5000
+      fractionDigits: 2
     });
     checkNumber(timeOfPostMax, {
       name: '发表时间距离当前最大值',
       min: 0,
-      max: 5000
+      fractionDigits: 2
     });
     checkNumber(fixedThreadCount, {
       name: '手动推送文章显示条数',
       min: 0,
-      max: 5000
     });
     checkNumber(autoThreadCount, {
       name: '自动推送文章入选条数',
       min: 0,
-      max: 5000
+    });
+    checkNumber(threadCount, {
+      name: '文章数目',
+      min: 1
     });
     await db.HomeBlockModel.checkBlockValue(block);
     const sameName = await db.HomeBlockModel.findOne({name}, {_id: 1});
@@ -169,7 +167,7 @@ router
       right.map(_id => ({_id, position: 'right'}))
     );
     const blocks = await db.HomeBlockModel.find({}, {_id: 1});
-    if(blocks.length !== blocksId.length) ctx.throw(400, `模块数量错误，请刷新后重试`);
+    // if(blocks.length !== blocksId.length) ctx.throw(400, `模块数量错误，请刷新后重试`);
     const blocksObj = {};
     blocks.map(b => blocksObj[b._id] = b);
     for(const {_id} of blocksId) {
@@ -233,8 +231,8 @@ router
     } = block;
     checkString(name, {
       name: '模块名',
-      minLength: 2,
-      maxLength: 20
+      minLength: 1,
+      maxLength: 100
     });
     checkString(threadStyle, {
       name: '文章列表风格',
@@ -289,47 +287,45 @@ router
     checkNumber(postCountMin, {
       name: '回复数最小值',
       min: 0,
-      max: 5000
     });
     checkNumber(voteUpMin, {
       name: '点赞数最小值',
       min: 0,
-      max: 5000
     });
     checkNumber(voteUpTotalMin, {
       name: '文章加所有回复的点赞数最小值',
       min: 0,
-      max: 5000
     });
     checkNumber(voteDownMax, {
       name: '最大点踩数',
       min: 0,
-      max: 5000
     });
     checkNumber(updateInterval, {
       name: '更新的间隔时间',
-      min: 0,
-      max: 5000
+      min: 0.01,
+      fractionDigits: 2
     });
     checkNumber(timeOfPostMin, {
       name: '发表时间距离当前最小值',
       min: 0,
-      max: 5000
+      fractionDigits: 2
     });
     checkNumber(timeOfPostMax, {
       name: '发表时间距离当前最大值',
       min: 0,
-      max: 5000
+      fractionDigits: 2
     });
     checkNumber(fixedThreadCount, {
       name: '手动推送文章显示条数',
       min: 0,
-      max: 5000
     });
     checkNumber(autoThreadCount, {
       name: '自动推送文章入选条数',
       min: 0,
-      max: 5000
+    });
+    checkNumber(threadCount, {
+      name: '文章数目',
+      min: 1
     });
     await db.HomeBlockModel.checkBlockValue(block);
     const sameName = await db.HomeBlockModel.findOne({_id: {$ne: homeBlock._id}, name});
