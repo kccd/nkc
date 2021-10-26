@@ -185,6 +185,7 @@ block content
                   a.home-fund-name(href=`/fund/a/${form._id}` target="_blank")=form.project.t
                   .home-fund-info
                     .home-fund-code=form.code
+                    .home-fund-money=form.money + ' 元'
                     a(href=`/fund/list/${form.fund._id}` target="_blank").home-fund-link.fund-name=form.fund.name
                     a(href=`/u/${form.uid}` target="_blank").home-fund-user
                       img(src=tools.getUrl("userAvatar", form.applicant.user.avatar) data-float-uid=form.uid)
