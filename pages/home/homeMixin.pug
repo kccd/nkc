@@ -305,14 +305,22 @@ mixin hiddenForm
         label.col-sm-3.control-label 自动推送入选条数
         .col-sm-9
           input.form-control(type='text' placeholder="请输入自动推送文章入选条数" v-model.number="form.autoThreadCount")
-      .form-group
+      .form-group(v-if="showTid")
         label.col-sm-3.control-label 自动选择的文章 ID
         .col-sm-9
-          textarea.form-control(type='text' placeholder="请输入自动选择的文章 ID" v-model="form.autoThreadsId")
-      .form-group
+          .table-height
+            .p-t-2.p-b-2.text-center(v-if="selectedAutoThreads.length === 0") 空空如也
+            div(v-for='item in selectedAutoThreads')
+              button.m-r-1.btn.btn-danger.btn-xs(@click=`delThreadId(item.tid, form.autoThreadsId)`) 删除
+              a(:href="getUrl('thread',item.tid)" target="_blank") {{item.t}}
+      .form-group(v-if="showTid")
         label.col-sm-3.control-label 手动选择的文章 ID
         .col-sm-9
-          textarea.form-control(placeholder="请输入手动选择的文章 ID" v-model="form.fixedThreadsId")
+          .table-height
+            .p-t-2.p-b-2.text-center(v-if="selectedFixThreads.length === 0") 空空如也
+            div(v-for='item in selectedFixThreads')
+              button.m-r-1.btn.btn-danger.btn-xs(@click=`delThreadId(item.tid, form.fixedThreadsId)`) 删除
+              a(:href="getUrl('thread',item.tid)" target="_blank") {{item.t}}
       .form-group
         label.col-sm-3.control-label 显示时的排序
         .col-sm-9

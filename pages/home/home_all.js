@@ -130,9 +130,11 @@ function initVue(bid, type){
       bid,
       type,
       show: false,
+      showTid: true,
       loading: true,
       //已选择的专业
       forums: [],
+      threads:[],
       form: {
         name:'',
         forumsId: [],
@@ -200,15 +202,49 @@ function initVue(bid, type){
           arr.push(forum);
         }
         return arr;
+      },
+      threadObj() {
+        const {threads} = this;
+        const obj = {};
+        for(const thread of threads) {
+          obj[thread.tid] = thread;
+        }
+        return obj;
+      },
+      selectedFixThreads() {
+        const {threadObj, form} = this;
+        const arr = [];
+        for(const tid of form.fixedThreadsId) {
+          const thread = threadObj[tid];
+          if(!thread) continue;
+          arr.push(thread);
+        }
+        return arr;
+      },
+      selectedAutoThreads() {
+        const {threadObj, form} = this;
+        const arr = [];
+        for(const tid of form.autoThreadsId) {
+          const thread = threadObj[tid];
+          if(!thread) continue;
+          arr.push(thread);
+        }
+        return arr;
       }
     },
     methods: {
+      delThreadId(tid, threadsId){
+        const index = threadsId.indexOf(tid);
+        threadsId.splice(index,1)
+      },
+      getUrl: NKC.methods.tools.getUrl,
       showForm() {
         const {bid} = this;
         this.loading = true;
         this.show = true;
         if(this.isNewForm) {
           this.loading = false;
+          this.showTid = false;
         } else {
           const oldContainer = $(`#block_${bid}>.home-threads`);
           const editorBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-editor-block`);
@@ -277,6 +313,7 @@ function initVue(bid, type){
             this.selectedHomeCategoriesId = data.homeBlock.tcId;
             this.threadCategories = data.threadCategories;
             this.loading = false;
+            this.threads = data.threads;
             const _this = this;
             setTimeout(() => {
               _this.$refs.homeCategoryList.initCategories();
