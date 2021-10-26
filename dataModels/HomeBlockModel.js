@@ -331,11 +331,11 @@ schema.methods.extendData = async function(fidOfCanGetThreads) {
   }
   const sortObj = {};
   if(sort === 'toc') {
-    sortObj.toc = -1
+    sortObj.toc = -1;
   } else  if (sort === 'postCount') {
-    sortObj.count = 1
+    sortObj.count = -1;
   } else if(sort === 'voteUpCount') {
-    sortObj.voteUp = 1
+    sortObj.voteUp = -1;
   }
   let threads = await ThreadModel.find({
     tid: {
@@ -428,6 +428,8 @@ schema.statics.getHomeBlockData = async (props) => {
 * */
 schema.methods.updateThreadsId = async function() {
   const PostModel = mongoose.model('posts');
+  const HomeBlock = mongoose.model('homeBlocks');
+  const homeBlock = await HomeBlock.findOnly({_id: this._id});
   const {
     forumsId,
     tcId,
@@ -440,7 +442,7 @@ schema.methods.updateThreadsId = async function() {
     timeOfPostMin,
     timeOfPostMax,
     autoThreadCount,
-  } = this;
+  } = homeBlock;
   const match = {
     type: 'thread',
     reviewed: true,
@@ -467,7 +469,7 @@ schema.methods.updateThreadsId = async function() {
     match.digest = true;
   }
   if(origin) {
-    match.originStatus = {
+    match.originState = {
       $in: ['4', '5', '6']
     };
   }
@@ -489,7 +491,7 @@ schema.methods.updateThreadsId = async function() {
   ]);
   posts = posts || [];
   const threadsId = posts.map(post => post.tid);
-  await this.updateOne({
+  await homeBlock.updateOne({
     $set: {
       autoThreadsId: threadsId
     }
