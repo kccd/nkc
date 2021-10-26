@@ -316,6 +316,7 @@ schema.methods.extendData = async function(fidOfCanGetThreads) {
     fixedThreadsId,
     fixedThreadCount,
     threadCount,
+    sort
   } = this;
   if(threadCount <= 0) {
     return [];
@@ -328,6 +329,14 @@ schema.methods.extendData = async function(fidOfCanGetThreads) {
   if(selectedThreadsId.length === 0) {
     return [];
   }
+  const sortObj = {};
+  if(sort === 'toc') {
+    sortObj.toc = -1
+  } else  if (sort === 'postCount') {
+    sortObj.count = 1
+  } else if(sort === 'voteUpCount') {
+    sortObj.voteUp = 1
+  }
   let threads = await ThreadModel.find({
     tid: {
       $in: selectedThreadsId
@@ -337,7 +346,7 @@ schema.methods.extendData = async function(fidOfCanGetThreads) {
     mainForumsId: {
       $in: fidOfCanGetThreads
     }
-  });
+  }).sort(sortObj);
   threads = await ThreadModel.extendThreads(threads, {
     category: true,
     htmlToText: true,

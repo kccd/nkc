@@ -133,7 +133,6 @@ function initVue(bid, type){
       loading: true,
       //已选择的专业
       forums: [],
-      // selectedForums: [],
       form: {
         name:'',
         forumsId: [],
@@ -235,11 +234,13 @@ function initVue(bid, type){
       saveForm() {
         const {form, isNewForm, bid} = this;
         const selectedThreadCategories = this.getSelectedHomeCategoriesId();
+        const selectedCategoriesId = this.selectedCategoriesId();
         form.tcId = [];
         for(const tc of selectedThreadCategories) {
           if(tc.nodeId === 'default') continue;
           form.tcId.push(tc.nodeId);
         }
+        form.forumsId = selectedCategoriesId;
         let url = `/nkc/home/block/${bid}`;
         let method = `PUT`;
 
@@ -247,7 +248,6 @@ function initVue(bid, type){
           url = `/nkc/home/block`;
           method = 'POST';
         }
-
         const _this = this;
 
         nkcAPI(url, method, {
@@ -288,8 +288,8 @@ function initVue(bid, type){
       selectBlockStyle(){
         const self = this;
         commonModel.open(data => {
-          this.form.blockStyle.backgroundColor = data[0].value;
-          this.form.blockStyle.usernameColor = data[1].value;
+          this.form.blockStyle.headerTitleColor = data[0].value;
+          this.form.blockStyle.backgroundColor = data[1].value;
           /*this.form.blockStyle.forumColor = data[2].value;
           this.form.blockStyle.titleColor = data[3].value;
           this.form.blockStyle.abstractColor = data[4].value;
@@ -349,7 +349,7 @@ function initVue(bid, type){
         var selectedForums = this.selectedForums;
         for(var i = 0; i < selectedForums.length; i++) {
           var forum = selectedForums[i];
-          if(forum.cid) arr.push(forum.cid);
+          if(forum.fid) arr.push(forum.fid);
         }
         return arr;
       },

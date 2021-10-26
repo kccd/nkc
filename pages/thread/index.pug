@@ -51,6 +51,7 @@ block content
           .m-b-1
             .row
               .thread-div
+                -var hasPermission = permission('nkcManagementHome');
                 -const showManagement = data.user && data.isModerator && permissionsOr(['moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']);
                 .col-xs-12.col-md-12.thread-nav.p-t-1.p-b-2
                   .thread-nav-left.hidden-xs
@@ -86,6 +87,9 @@ block content
                     if showManagement
                       .nav-count
                         .fa.fa-cog(onclick="displayManagement()")
+                    if hasPermission
+                      .nav-count
+                        button.btn-primary.btn.btn-xs(onclick=`push('${data.thread.tid}')`) 推送
                 if showManagement
                   .col-xs-12.col-md-12
                     .thread-management

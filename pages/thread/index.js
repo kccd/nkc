@@ -1,4 +1,5 @@
 var SubscribeTypes, surveyForms = [], draftId = "", author = {};
+const commonModel = new NKC.modules.CommonModal();
 window.Attachments = undefined;
 window.quotePostApp = undefined;
 $(document).ready(function(){
@@ -1355,6 +1356,24 @@ ue.ready(function() {
 	})
 });
 
+function push(tid){
+	const self = this;
+	commonModel.open(data => {
+		this.form.blockStyle.headerTitleColor = data[0].value;
+		this.form.blockStyle.backgroundColor = data[1].value;
+		commonModel.close();
+	}, {
+		title: '文章列表样式',
+		data: [
+			{
+				dom: 'input',
+				label: '推送到',
+				value: this.form.blockStyle.headerTitleColor
+			}
+		]
+	})
+}
+
 
 Object.assign(window, {
 	addToColumn,
@@ -1418,5 +1437,6 @@ Object.assign(window, {
 	disabledMarkedPosts,
 	joinPostRoom,
 	insertRenderedPost,
-	insertRenderedComment
+	insertRenderedComment,
+	push
 });
