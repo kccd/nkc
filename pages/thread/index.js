@@ -1359,9 +1359,9 @@ function getBlockId(val){
 	return val;
 }
 
-function pushHomeBlockId(tid, pushTid){
+function pushHomeBlockId(tid, blocksId){
 	nkcAPI(`/t/${tid}/block`, 'post', {
-		pushTid
+		blocksId
 	})
 		.then(data => {
 			sweetSuccess('提交成功');
