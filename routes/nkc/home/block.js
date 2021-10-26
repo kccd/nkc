@@ -109,10 +109,20 @@ router
   .get('/:bid', async (ctx, next) => {
     const {data, db} = ctx;
     const {homeBlock} = data;
+    const {forumsId, fixedThreadsId, autoThreadsId} = homeBlock;
     data.threadCategories = await db.ThreadCategoryModel.getCategoryTree();
     data.forums = [];
-    if(homeBlock.forumsId.length !== 0) {
-      data.forums = await db.ForumModel.find({fid: {$in: homeBlock.forumsId}});
+    data.threads = [];
+    if(forumsId.length !== 0) {
+      data.forums = await db.ForumModel.find({fid: {$in: forumsId}});
+    }
+    const threadsId = fixedThreadsId.concat(autoThreadsId);
+    if(threadsId.length !== 0) {
+      data.threads = await db.PostModel.find({type: 'thread', tid: {$in: threadsId}}, {
+        tid: 1,
+        t: 1,
+        pid: 1
+      });
     }
     await next();
   })
