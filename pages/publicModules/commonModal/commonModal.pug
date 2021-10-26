@@ -25,8 +25,8 @@ if !isIncluded('commonModal')
                   input(type="radio" :value="r.value" v-model="d.value")
                   span {{r.name}}
               .checkbox(v-if="d.dom === 'checkbox'")
-                label.m-r-05(v-for="r in d.checkboxs")
-                  input(type="checkbox" :value="r.value" v-model="d.value")
+                label.m-r-05(v-for="r in d.checkboxes")
+                  input(type="checkbox" :value="r._id" name='checkboxes' v-model="d.value")
                   span {{r.name}}
         .modal-footer
           .options-button

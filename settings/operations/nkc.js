@@ -11,6 +11,7 @@ module.exports = {
     block: {
       POST: 'nkcManagementHome',
       PUT: 'nkcManagementHome',
+      GET: 'nkcManagementHome',
       PARAMETER: {
         GET: 'nkcManagementHome',
         PUT: 'nkcManagementHome',

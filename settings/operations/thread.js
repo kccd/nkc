@@ -19,6 +19,9 @@ module.exports = {
 			POST: 'toppedThread',
 			DELETE: 'unToppedThread'
 		},
+		block: {
+			POST: 'pushThread',
+		},
 		hometop: {
 			GET: "homeTop",
 			POST: 'homeTop',

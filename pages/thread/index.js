@@ -1355,23 +1355,52 @@ ue.ready(function() {
     }
 	})
 });
+function getBlockId(val){
+	return val;
+}
 
-function push(tid){
-	const self = this;
-	commonModel.open(data => {
-		this.form.blockStyle.headerTitleColor = data[0].value;
-		this.form.blockStyle.backgroundColor = data[1].value;
-		commonModel.close();
-	}, {
-		title: '文章列表样式',
-		data: [
-			{
-				dom: 'input',
-				label: '推送到',
-				value: this.form.blockStyle.headerTitleColor
-			}
-		]
+function pushHomeBlockId(tid, pushTid){
+	nkcAPI(`/t/${tid}/block`, 'post', {
+		pushTid
 	})
+		.then(data => {
+			sweetSuccess('提交成功');
+		})
+		.catch(err => {
+			sweetError(err);
+		})
+}
+
+function pushBlock(tid){
+	nkcAPI('/nkc/home/block', 'get', {
+	})
+		.then(data => {
+			let pushTid=[];
+			commonModel.open(data => {
+				let id = [];
+				for(const d of data){
+					if(d){
+						id.push(...d.value)
+					}
+				}
+				pushHomeBlockId(tid, id);
+				commonModel.close();
+			}, {
+				title: '推送文章到模块：',
+				data: [
+					{
+						dom: 'checkbox',
+						label: '推送到的模块',
+						value: pushTid,
+						checkboxes: data.homeBlocks
+					}
+				]
+			})
+		})
+		.catch(err =>  {
+			sweetError(err)
+		});
+
 }
 
 
@@ -1438,5 +1467,6 @@ Object.assign(window, {
 	joinPostRoom,
 	insertRenderedPost,
 	insertRenderedComment,
-	push
+	pushBlock,
+	pushHomeBlockId
 });

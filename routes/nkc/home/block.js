@@ -190,6 +190,21 @@ router
     data.homeBlock = await db.HomeBlockModel.findOnly({_id: bid});
     await next();
   })
+  .get('/', async (ctx, next) => {
+    const {db, data} = ctx;
+    const homeBlock =  await db.HomeBlockModel.find({});
+    const homeBlockId = [];
+    for(const block of homeBlock){
+      if(block.defaultBlock) continue;
+      const obj = {
+        name: block.name,
+        _id: block._id,
+      };
+      homeBlockId.push(obj);
+    }
+    data.homeBlocks = homeBlockId;
+    await next();
+  })
   .get('/:bid', async (ctx, next) => {
     const {data, db} = ctx;
     const {homeBlock} = data;
