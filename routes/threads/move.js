@@ -138,7 +138,8 @@ router
             type: 'moveThread',
             tid: thread.tid,
             rea: reason,
-            forumsId: newThread.mainForumsId
+            forumsId: newThread.mainForumsId,
+            threadCategoriesId: tcId,
           }
         });
         await message.save();

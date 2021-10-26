@@ -468,14 +468,14 @@ messageSchema.statics.getParametersData = async (message) => {
       forumsName = forums.map(f => f.displayName).join('、');
     }
     let threadCategoriesName = threadCategories.map(tc => {
-      return `${tc.categoryName}：${tc.nodeName}`
+      return `${tc.categoryName} - ${tc.nodeName}`
     });
     parameters = {
       threadTitle: firstPost.t,
       threadURL: getUrl('thread', thread.tid),
       reason: rea,
-      forumsName,
-      threadCategoriesName: threadCategoriesName.join(` `) || '空'
+      forumsName: forumsName || '空',
+      threadCategoriesName: threadCategoriesName.join(`、`) || '空'
     }
   } else if(type === 'replyPost') {
     const {targetPid} = message.c;

@@ -161,12 +161,23 @@ resourceSchema.virtual('videoSize')
     return this._videoSize = val
   });
 
+resourceSchema.virtual('visitorAccess')
+  .get(function() {
+    return this._visitorAccess;
+  })
+  .set(function(visitorAccess) {
+    return this._visitorAccess = visitorAccess;
+  })
+
 /*
  * 文件是否存在
  */
 resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['mediaPicture']) {
   if(excludedMediaTypes.includes(this.mediaType)) return;
+  const SettingModel = mongoose.model('settings');
+  const {visitorAccess} = await SettingModel.getSettings('download');
   const FILE = require('../nkcModules/file');
+  this.visitorAccess = visitorAccess[this.mediaType];
   if(this.mediaType === 'mediaVideo') {
     const sdVideoPath = await this.getFilePath('sd');
     const hdVideoPath = await this.getFilePath('hd');

@@ -189,8 +189,8 @@ func.search = async (t, c, options) => {
   let {
     page=0, sortType,
     timeStart, timeEnd,
-    fid, relation, sort,
-    author, digest
+    fid, relation, sort, excludedFid,
+    author, digest, onlyTitle = false
   } = options;
 
   // 若只有一个关键词则默认or
@@ -249,6 +249,23 @@ func.search = async (t, c, options) => {
       }
     }
   };
+
+  // 只搜标题
+  const threadConditions = [
+    createMatch("title", c, 5, relation),
+    createMatch("content", c, 2, relation),
+    createMatch("pid", c, 100, relation),
+    createMatch("aid", c, 100, relation),
+    createMatch("authors", c, 80, relation),
+    createMatch("abstractEN", c, 50, relation),
+    createMatch("abstractCN", c, 50, relation),
+    createMatch("keywordsEN", c, 80, relation),
+    createMatch("keywordsCN", c, 80, relation),
+  ];
+  if(t === 'thread' && onlyTitle) {
+    threadConditions.length = 1;
+  }
+
   body.query = {
     bool: {
       must: [ // 最后一个元素用于docType筛选
@@ -265,17 +282,7 @@ func.search = async (t, c, options) => {
                     },
                     {
                       bool: {
-                        should: [
-                          createMatch("title", c, 5, relation),
-                          createMatch("content", c, 2, relation),
-                          createMatch("pid", c, 100, relation),
-                          createMatch("aid", c, 100, relation),
-                          createMatch("authors", c, 80, relation),
-                          createMatch("abstractEN", c, 50, relation),
-                          createMatch("abstractCN", c, 50, relation),
-                          createMatch("keywordsEN", c, 80, relation),
-                          createMatch("keywordsCN", c, 80, relation),
-                        ]
+                        should: threadConditions
                       }
                     }
                   ]
@@ -447,6 +454,23 @@ func.search = async (t, c, options) => {
       body.query.bool.must[0].bool.should[0].bool.must.push(fidMatch);
       body.query.bool.must[0].bool.should[1].bool.must.push(fidMatch);
     }
+
+    if(excludedFid && excludedFid.length > 0) {
+      const excludedFidMatch = {
+        bool: {
+          must_not: excludedFid.map(id => {
+            return {
+              match: {
+                mainForumsId: id
+              }
+            }
+          })
+        }
+      };
+      body.query.bool.must[0].bool.should[0].bool.must.push(excludedFidMatch);
+      body.query.bool.must[0].bool.should[1].bool.must.push(excludedFidMatch);
+    }
+
 
     if(author) {
       let uid = "";

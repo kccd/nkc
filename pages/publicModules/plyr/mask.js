@@ -1,26 +1,106 @@
 const threadSettings = NKC.methods.getDataById("threadSettings");
-if(!threadSettings.isDisplay) {
-  NKC.methods.initPlyrMask = () => {};
-} else {
-  NKC.methods.initPlyrMask = function(player) {
-    if(player.type === "audio") return;
-    const container = player.elements.container;
-    $(container).find(".plyr__control.plyr__control--overlaid").remove();
-    let maskDom = $("#plyrMask .plyr-mask").clone(false);
-    let maskPlayButton = maskDom.find(".player-tip-button .play");
-    let maskDownloadButton = maskDom.find(".player-tip-button .download");
-    const downloadButton = $(container).find('a[data-plyr="download"]');
-    const title = downloadButton.attr('data-title');
-    const src = downloadButton.attr('href');
-    maskDownloadButton
-      .attr('href', src)
-      .attr('data-type', 'download')
-      .attr('data-title', title);
-    maskPlayButton.on("click", () => {
-      maskDom.remove();
-      player.play();
-    });
-    // maskDownloadButton.on("click", () => NKC.methods.visitUrl(player.download, "_blank"));
-    $(container).append(maskDom);
+NKC.methods.initPlyrMask = function(player) {
+  if(player.type === 'video') {
+    setVideoMask(player);
+  } else {
+    const nkcSource = getNkcSource(player.elements.container);
+    setVisitorAccessCommonMask(nkcSource);
   }
+}
+
+NKC.methods.initAttachmentMask = function(nkcSource) {
+  setVisitorAccessCommonMask(nkcSource);
+}
+
+function getNkcSource(container) {
+  return $(container).parent('[data-tag="nkcsource"]');
+}
+
+function getVisitorAccess(nkcSource) {
+  return nkcSource.attr('data-visitor-access') === 'true';
+}
+
+function getVideoVisitorAccessMask(player) {
+  const nkcSource = getNkcSource(player.elements.container);
+  nkcSource.find(".plyr__control.plyr__control--overlaid").remove();
+  const mask = $("#plyrMask .plyr-mask-video-visitor-access").clone(false);
+  mask.find('.player-tip-content').text(getVisitorAccessInfo('video'));
+  return mask;
+}
+
+function getVideoPreviewMask(player) {
+  const nkcSource = getNkcSource(player.elements.container);
+  nkcSource.find(".plyr__control.plyr__control--overlaid").remove();
+  const mask = $("#plyrMask .plyr-mask-video-preview").clone(false);
+  const maskPlayButton = mask.find(".player-tip-button .play");
+  const maskDownloadButton = mask.find(".player-tip-button .download");
+  const source = nkcSource.find('video source');
+  const sourceObj = {};
+  // 获取附件名称
+  const downloadButton = nkcSource.find('a[data-plyr="download"]');
+  const title = downloadButton.attr('data-title');
+  // 获取视频可下载的视频尺寸和下载链接
+  for(let i = 0; i < source.length; i++) {
+    const element = source.eq(i);
+    const size = element.attr('size');
+    sourceObj[size] = element.attr('src') + '&d=attachment';
+  }
+  // 修改遮罩上的下载按钮
+  for(let i = 0; i < maskDownloadButton.length; i++) {
+    const element = maskDownloadButton.eq(i);
+    const size = element.attr('data-video-size');
+    const url = sourceObj[size];
+    if(!url) continue;
+    element
+      .attr('href', url)
+      .attr('data-title', title)
+      .attr('title', `点击下载 ${title}`)
+      .attr('data-type', 'download')
+      .removeClass('hidden')
+  }
+  maskPlayButton.on("click", () => {
+    mask.remove();
+    player.play();
+  });
+  return mask;
+}
+
+function getVisitorAccessInfo(type) {
+  return {
+    video: '视频',
+    audio: '音频',
+    attachment: '附件'
+  }[type] + '暂不能访问，请登录试试';
+}
+
+function getCommonMask(type) {
+  const mask = $("#plyrMask .plyr-mask-common").clone(false);
+  mask.find('.player-tip-content').text(getVisitorAccessInfo(type));
+  return mask;
+}
+
+function setVideoMask(player) {
+  const nkcSource = getNkcSource(player.elements.container);
+  const visitorAccess = getVisitorAccess(nkcSource);
+  let mask;
+  if(!visitorAccess && !NKC.configs.uid) {
+    // 显示游客访问受限的遮罩
+    mask = getVideoVisitorAccessMask(player);
+  } else if(threadSettings.isDisplay) {
+    mask = getVideoPreviewMask(player);
+  }
+  if(mask) nkcSource.find('.plyr').append(mask);
+}
+
+function setAudioMask(player) {
+  const nkcSource = getNkcSource(player.elements.container);
+  setVisitorAccessCommonMask(nkcSource);
+}
+
+function setVisitorAccessCommonMask(nkcSource) {
+  const type = nkcSource.attr('data-type');
+  const visitorAccess = getVisitorAccess(nkcSource);
+  if(visitorAccess || NKC.configs.uid) return;
+  const mask = getCommonMask(type);
+  nkcSource.append(mask);
 }

@@ -125,7 +125,7 @@ func.clearResourceState = async() => {
       console.log(`异常资源上传状态处理完成`);
       await func.clearResourceState();
     }
-  }, 55 * 60 * 1000);
+  }, 3 * 60 * 60 * 1000);
 }
 
 /*

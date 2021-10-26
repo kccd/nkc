@@ -3,7 +3,7 @@ block title
   title=`搜索 - ${state.serverSettings.websiteName}`
   +includeCSS("/search/search.css")
 block content
-  #data.hidden=objToStr({c: data.c, t: data.t, d: data.d, selectedForums: data.selectedForums})
+  #data.hidden=objToStr({c: data.c, t: data.t, d: data.d, selectedForums: data.selectedForums, excludedForums: data.excludedForums})
   .container-fluid.max-width
     .row#app(v-cloak)
       .col-xs-12.col-md-9
@@ -15,10 +15,18 @@ block content
           .search-form.form-inline(v-show="complexOptions")
             .form-group
               label 多检索词关系：
-              span.h5 或
+              span.h5.m-r-1 或
                 input(type="radio" value="or" v-model="relation")
               span.h5 与
                 input(type="radio" value="" v-model="relation")
+          if data.t === 'thread'
+            .search-form.form-inline(v-show="complexOptions")
+              .form-group
+                label 仅搜标题：
+                span.h5.m-r-1 是
+                  input(type="radio" :value="true" v-model="onlyTitle")
+                span.h5 否
+                  input(type="radio" :value="false" v-model="onlyTitle")
           .search-form.form-inline(v-if="t !== 'user' && t !== 'column'" v-show="complexOptions")
             .form-group(v-if="t !== 'user'")
               label 作者筛选：
@@ -26,13 +34,23 @@ block content
             .form-group(v-if="t !== 'resource'")
               label 专业筛选：
               .search-forum-div
-                .search-forum(v-for="forum in selectedForums" :style="'background-color: ' + forum.color + ';'") {{forum.displayName}}
+                .search-forum(v-for="(forum, index) in selectedForums" :style="'background-color: ' + forum.color + ';'") {{forum.displayName}}
                   //-|:
                     select(v-model='forum.cid')
                       option(v-for='c in forum.threadTypes' :value='c.cid') {{c.name}}
                       option(:value='""') 不分类
-                  .fa.fa-remove(@click="removeForum(forum)")
-                button.btn.btn-default.btn-sm(@click="selectForum") 添加
+                  .fa.fa-remove(@click="removeFromArr(selectedForums, index)")
+                button.btn.btn-default.btn-sm(@click="selectForum('selected')") 添加
+            .form-group(v-if="t !== 'resource'")
+              label 专业排除：
+              .search-forum-div
+                .search-forum(v-for="(forum, index) in excludedForums" :style="'background-color: ' + forum.color + ';'") {{forum.displayName}}
+                  //-|:
+                    select(v-model='forum.cid')
+                      option(v-for='c in forum.threadTypes' :value='c.cid') {{c.name}}
+                      option(:value='""') 不分类
+                  .fa.fa-remove(@click="removeFromArr(excludedForums, index)")
+                button.btn.btn-default.btn-sm(@click="selectForum('excluded')") 添加
           .search-form.form-inline(v-if="['post', 'thread', ''].indexOf(t) !== -1" v-show="complexOptions")
             .form-group
               label 精选：
@@ -104,14 +122,16 @@ block content
         .col-xs-12.col-md-7.search-results
           if data.total > 0
             mixin buttons
-              if permission("superModerator") && data.t === "thread"
+              if permission("superModerator") && ['thread', 'post'].includes(data.t)
                 .display-i-b(style="margin-bottom: -2rem;")
                   .paging-button
                     a.button.radius-left.radius-right(onclick="managementThreads()") 管理
                   .paging-button.management-thread-panel
                     a.button.radius-left(onclick="selectAll()") 全选
-                    a.button(onclick="moveSelectedThreads()") 移动
+                    if data.t === "thread"
+                      a.button(onclick="moveSelectedThreads()") 移动
                     a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
+
             h5=`约找到 ${data.total} 条结果，耗时 ${data.time/1000} 秒`
             +buttons()
             for result in data.results
