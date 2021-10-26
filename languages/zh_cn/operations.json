@@ -55,6 +55,7 @@
   "delCollectThread": "取消文章收藏",
   "digestThread": "将文章设为精选文章",
   "toppedThread": "专业置顶",
+  "pushThread": "推送文章到模块",
   "switchInPersonalForum": "在专栏加精、置顶、隐藏",
   "visitUserCard": "访问用户名片",
   "bannedUser": "封禁用户",

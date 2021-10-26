@@ -87,9 +87,7 @@ block content
                     if showManagement
                       .nav-count
                         .fa.fa-cog(onclick="displayManagement()")
-                    if hasPermission
-                      .nav-count
-                        button.btn-primary.btn.btn-xs(onclick=`push('${data.thread.tid}')`) 推送
+
                 if showManagement
                   .col-xs-12.col-md-12
                     .thread-management
@@ -98,6 +96,8 @@ block content
                           div.managementDiv.m-b-1(style='display: none;margin-top: 1rem;')
                             .form-inline
                               //- 设置置顶
+                              if hasPermission
+                                button.btn.btn-default.btn-sm(onclick=`pushBlock('${data.thread.tid}')`) 推送到模块
                               if data.isModerator && data.userOperationsId.includes('toppedThread') && !thread.topped
                                 button.btn.btn-default.btn-sm#threadTop(onclick=`setTopped('${data.thread.tid}')`) 专业置顶
                               if data.isModerator && data.userOperationsId.includes('unToppedThread') && thread.topped
@@ -582,6 +582,8 @@ block scripts
   include ../publicModules/commentControl/commentControl
   include ../publicModules/replaceNKCUrl
   include ../post/options/options
+  include ../publicModules/commonModal/commonModal
+
   //- 通用socket
   if data.user
     +includeJS('/message/connectSocket.js')
