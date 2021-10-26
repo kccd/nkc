@@ -80,70 +80,14 @@ class NKCRender {
       });
     }
 
-    // 处理文本中的@信息，将@+用户名改为#nkcat{uid}用于后边插入a标签
-    const replaceATInfo = function(node, atUsers) {
-      if(!node.children || node.children.length === 0) return;
-      for(let i = 0; i < node.children.length; i++) {
-        const c = node.children[i];
-        if(c.type === 'text') {
-          for(const atUser of atUsers) {
-            const str = `@${atUser.username}`;
-            const strLowerCase = str.toLowerCase();
-            c.data = c.data.replace(new RegExp(str, 'ig'), `#nkcat{${atUser.uid}}`);
-            c.data = c.data.replace(new RegExp(strLowerCase, 'ig'), `#nkcat{${atUser.uid}}`);
-          }
-        } else if(c.type === 'tag') {
-          if(['a', 'blockquote', 'code', 'pre'].includes(c.name)) continue;
-          if(c.attribs['data-tag'] === 'nkcsource') continue;
-          replaceATInfo(c, atUsers);
-        }
-      }
-    }
-
-    // 处理所有的文本外链
-    const replaceLinkInfo = function(node) {
-      if(!node.children || node.children.length === 0) return;
-      for(let i = 0; i < node.children.length; i++) {
-        const c = node.children[i];
-        if(c.type === 'text') {
-          // 替换外链
-          let oldData = c.data;
-          const newData = self.replaceLink(c.data);
-          if(oldData !== newData) {
-            // 已经替换掉了链接
-            /*if(!/^https?:\/\//.test(oldData)) {
-              oldData = `http://` + oldData;
-            }*/
-            oldData = Buffer.from(encodeURIComponent(oldData)).toString('base64');
-            $(c).replaceWith(`<span data-type="nkc-url" data-url="${oldData}">${newData}</span>`);
-          }
-          // c.data = self.replaceLink(c.data);
-        } else if(c.type === 'tag') {
-          if(['code', 'pre'].includes(c.name)) continue;
-          if(c.attribs['data-tag'] === 'nkcsource') continue;
-          replaceLinkInfo(c);
-        }
-      }
-    }
-
     const body = $('body');
 
     if(type === 'article') {
-      replaceATInfo(body[0], atUsers);
-      replaceLinkInfo(body[0]);
+      this.replaceATInfo($, body[0], atUsers);
+      this.replaceLinkInfo($, body[0]);
     }
     html = body.html();
-    // html = body.safeHtml();
     if(type === "article") {
-      // 将#nkcat{uid}替换成a标签
-      if(atUsers && atUsers.length) {
-        for(const u of atUsers) {
-          html = html.replace(
-            new RegExp(`#nkcat\\{${u.uid}}`, 'ig'),
-            `<a href="/u/${u.uid}" target="_blank" data-tag="nkcsource" data-type="at">@${u.username}</a>`
-          );
-        }
-      }
       // twemoji本地化
       html = twemoji.parse(html, {
         folder: '/2/svg',
@@ -173,6 +117,139 @@ class NKCRender {
       return '';
     }
   }
+
+  /* 解析字符串中的@信息
+     例如: 这是前面的内容@username这是后面的内容
+     输出：
+     [
+      {
+        type: 'text',
+        content: '这是前面的内容'
+      },
+      {
+        type: 'tag',
+        content: '<a href="/u/:uid" target="_blank">@username</a>'
+      },
+      {
+        type: 'text',
+        content: '这是后面的内容'
+      }
+    ]
+  */
+  extendAtByText(text, atUsers) {
+    const nodes = [];
+    const usersObj = {};
+    const usersName = [];
+    for(let i = 0; i < atUsers.length; i++) {
+      const u = atUsers[i];
+      let username = u.username? u.username.toLowerCase(): '';
+      if(!username) continue;
+      usersObj[username] = u;
+      usersName.push(`@${username}`);
+    }
+    if(usersName.length === 0 || !text) {
+      nodes.push({
+        type: 'text',
+        content: text
+      });
+    } else {
+      const atReg = new RegExp(`(${usersName.join('|')})`, 'i');
+      const extendNode = function(text) {
+        if(!text) return;
+        const result = text.match(atReg);
+        if(result === null) {
+          return nodes.push({
+            type: 'text',
+            content: text
+          });
+        }
+        const {index} = result;
+        const [targetText] = result;
+        if(index > 0) {
+          const beforeText = text.slice(0, index);
+          nodes.push({
+            type: 'text',
+            content: beforeText
+          });
+        }
+        const username = targetText.slice(1, targetText.length);
+        const u = usersObj[username.toLowerCase()];
+        if(!u) {
+          nodes.push({
+            type: 'text',
+            content: targetText
+          });
+        } else {
+          nodes.push({
+            type: 'tag',
+            content: `<a href="/u/${u.uid}" target="_blank">${targetText}</a>`
+          });
+        }
+        const afterText = text.slice(index + targetText.length, text.length);
+        extendNode(afterText);
+      };
+      extendNode(text);
+    }
+
+    if(nodes.length === 0 || (nodes.length === 1 && nodes[0].type === 'text')) {
+      return [];
+    } else {
+      return nodes;
+    }
+  }
+
+  // 处理文本中的@信息，将@+用户名改为#nkcat{uid}用于后边插入a标签
+  replaceATInfo($, node, atUsers) {
+    if(atUsers.length === 0 || !node.children || node.children.length === 0) return;
+    for(let i = 0; i < node.children.length; i++) {
+      const c = node.children[i];
+      if(c.type === 'text') {
+        const nodes = this.extendAtByText(c.data, atUsers);
+        if(nodes.length === 0) continue;
+        const container = $('<span></span>');
+        for(const node of nodes) {
+          const {content, type} = node;
+          let nodeDom;
+          if(type === 'text') {
+            nodeDom = $('<span></span>');
+            nodeDom.text(content);
+          } else {
+            nodeDom = $(content);
+          }
+          container.append(nodeDom);
+        }
+        $(c).replaceWith(container);
+      } else if(c.type === 'tag') {
+        if(['a', 'blockquote', 'code', 'pre'].includes(c.name)) continue;
+        if(c.attribs['data-tag'] === 'nkcsource') continue;
+        this.replaceATInfo($, c, atUsers);
+      }
+    }
+  }
+
+  // 处理所有的文本外链
+  replaceLinkInfo($, node) {
+    if(!node.children || node.children.length === 0) return;
+    for(let i = 0; i < node.children.length; i++) {
+      const c = node.children[i];
+      if(c.type === 'text') {
+        // 替换外链
+        let oldData = c.data;
+        const newData = this.replaceLink(c.data);
+        if(oldData !== newData) {
+          oldData = Buffer.from(encodeURIComponent(oldData)).toString('base64');
+          const nodeDom = $(`<span data-type="nkc-url" data-url="${oldData}"></span>`);
+          nodeDom.text(newData);
+          $(c).replaceWith(nodeDom);
+        }
+      } else if(c.type === 'tag') {
+        if(['code', 'pre'].includes(c.name)) continue;
+        if(c.attribs['data-tag'] === 'nkcsource') continue;
+        this.replaceLinkInfo($, c);
+      }
+    }
+  }
+
   encodeRFC5987ValueChars(str) {
     return encodeURIComponent(str).
       // 注意，仅管 RFC3986 保留 "!"，但 RFC5987 并没有
