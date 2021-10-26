@@ -279,6 +279,25 @@ async function initThreadCategory() {
   }
 }
 
+async function initDefaultHomeBlocks() {
+  const db = require('../dataModels');
+  const defaultHomeBlocks = require('./defaultHomeBlocks');
+  const defaultHomeBlocksDB = await db.HomeBlockModel.find({defaultBlock: true}, {_id: 1});
+  const defaultHomeBlocksIdDB = defaultHomeBlocksDB.map(hb => hb._id);
+  for(const block of defaultHomeBlocks) {
+    const [_id, position, order, name] = block;
+    if(defaultHomeBlocksIdDB.includes(_id)) continue;
+    const homeBlock = db.HomeBlockModel({
+      _id,
+      name,
+      position,
+      order,
+      defaultBlock: true
+    });
+    await homeBlock.save();
+  }
+}
+
 async function init() {
   await initConfig();
   await initSettings();
@@ -292,6 +311,7 @@ async function init() {
   await initThreads();
   await initComplaintType();
   await initThreadCategory();
+  await initDefaultHomeBlocks();
 }
 
 module.exports = {

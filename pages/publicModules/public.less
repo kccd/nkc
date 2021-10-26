@@ -582,29 +582,6 @@ table{
 .canvas-logo img{
   width: 100%;
 }
-
-.active-users{
-  border-radius: 5px;
-}
-.active-users-header{
-  padding: 0.5rem 0;
-  color: #888888;
-  font-size: 1.2rem;
-}
-.active-user-avatar img{
-  height: 4rem;
-  width: 4rem;
-  border-radius: 5px;
-}
-.active-user-avatar{
-  display: inline-block;
-  padding: 0 0.6rem 1rem 0.6rem;
-  text-align: center;
-}
-.active-user-avatar a{
-  text-decoration: none;
-  color: #555555;
-}
 .notice{
   border-radius: 5px;
 }
@@ -1454,7 +1431,7 @@ footer.footer ul li{
 }
 .thread-panel-author {
   display: inline-block;
-  /*margin-right: 0.5rem;*/
+  margin-right: 0.5rem;
 }
 .thread-checkbox{
   display: inline;
@@ -1474,6 +1451,17 @@ footer.footer ul li{
   width: 100%;
   padding-bottom: 0.2rem;
   font-size: 1rem;
+  color: #000;
+  .thread-category{
+    height: 1.4rem;
+    line-height: 1.4rem;
+    padding: 0 0.3rem;
+    border-radius: 2px;
+    background-color: #e85a71;
+    color: #fff;
+    margin-right: 0.5rem;
+    display: inline-block;
+  }
 }
 .thread-panel-author a{
   color: #3494da;
@@ -1489,15 +1477,17 @@ footer.footer ul li{
 }
 .thread-panel-time{
   display: inline-block;
-  color: #aaa;
+  color: #7b7b7b;
+  margin-right: 0.5rem;
 }
 .thread-panel-forum{
   display: inline-block;
 }
 .thread-panel-forum a{
-  color: #7e8da0;
-  font-weight: 700;
+  color: #000;
+  //font-weight: 700;
   /*margin-right: 0.5rem;*/
+  margin-right: 0.5rem;
 }
 .thread-panel-forum a:hover, .thread-panel-forum a:active, .thread-panel-forum a:visited,.thread-panel-forum a:link{
   text-decoration: none;
@@ -1513,41 +1503,47 @@ footer.footer ul li{
   transition: border-bottom 200ms;
 }
 .thread-panel-brief-replay{
-  float: right;
+  //float: right;
   display: inline-block;
-  color: #aaa;
+  color: #000;
   font-size: 1rem;
 }
 .thread-panel-body.brief{
-  padding: 0.5rem 0;
+  padding: 0.7rem 0;
   /*margin: 0.1rem 0;*/
   color: #888;
   border-bottom: 1px solid #f0f0f0;
 }
-.thread-panel-brief-replay a, .thread-panel-brief-replay span{
-  color: #aaa;
+.thread-panel-brief-replay a{
+  color: #000;
+}
+.thread-panel-brief-replay span{
+  color: #7d7d7d;
+}
+.thread-panel-brief-replay span.fa{
+  margin-right: 0.2rem;
+  color: #000;
 }
 
 .thread-panel-body.brief:hover{
   background-color: #f4f4f4;
 }
 .thread-panel-body.brief .thread-panel-title{
-  /*padding-left: 2rem;*/
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.6rem;
 }
 .thread-panel-body.brief .thread-panel-from{
   color: #aaa;
 }
 .thread-panel-body.brief .thread-panel-author img{
-  height: 3.2rem;
-  margin-top: 0px;
-  width: 3.2rem;
+  height: 3.5rem;
+  margin-top: 0;
+  width: 3.5rem;
   border-radius: 3px;
 }
 .thread-panel-body.brief .thread-panel-content{
   position: relative;
   width: 100%;
-  padding-left: 3.8rem;
+  padding-left: 4.2rem;
   display: block;
 }
 .thread-panel-body.brief .thread-panel-author-avatar{
@@ -1560,7 +1556,7 @@ footer.footer ul li{
 }
 .thread-panel-body.brief .thread-panel-author a, .thread-panel-body.brief .thread-panel-forum a{
   font-weight: normal;
-  color: #aaa;
+  color: #000;
 }
 .thread-panel-body.brief .thread-panel-title .title-content{
   font-size: 1.5rem;
@@ -1831,10 +1827,12 @@ span.thread-title-page{
   display: inline-block;
   font-size: 1rem;
   color: #777;
+  margin-right: 0.5rem;
+  float: right;
 }
 .thread-panel-button .fa{
   margin-right: 0;
-  color: #aaa;
+  color: #555;
 }
 .thread-panel-reply{
   float: right;
@@ -1847,7 +1845,7 @@ span.thread-title-page{
   text-decoration: none;
 }
 .thread-panel-reply span{
-  color: #878787;
+  color: #333;
   margin-left: 0.5rem;
 }
 .clear-a-style{
@@ -1958,7 +1956,7 @@ span.thread-title-page{
 
 .forum-block{
   width: 100%;
-  margin: 0.5rem 0;
+  margin: 0 0;
   display: block;
   overflow: hidden;
   position: relative;
@@ -2012,6 +2010,11 @@ span.thread-title-page{
   vertical-align: top;
   transition: color 100ms;
 }
+.forum-inline-name{
+  display: inline;
+  padding: 0;
+  margin-right: 0.5rem;
+}
 .forum-block-name.child{
   font-size: 1.2rem;
   font-style: normal;
@@ -2024,7 +2027,7 @@ span.thread-title-page{
 }
 .forum-block-name.parent{
   font-size: 1.25rem;
-  font-style: oblique;
+  //font-style: oblique;
 }
 .forum-simple{
   margin-bottom: 0.3rem;
@@ -2507,7 +2510,7 @@ div.user-banned{
   z-index: 1989101400!important;
 }
 .bg-color-ffffff{
-  background-color: #fff;
+  background-color: #fff!important;
 }
 
 .thread-nav {

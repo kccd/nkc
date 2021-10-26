@@ -89,7 +89,8 @@ if data.user && data.forum && state.subForums && state.subForums.length >0
         a(href=`/u/${data.user.uid}/profile/subscribe/forum` target="_blank") 管理
     .home-topic-item-div
       for forum in state.subForums
-        .forum-block
+        a.forum-inline-name.forum-block-name(href=`/f/${forum.fid}` data-float-fid=forum.fid)=forum.displayName
+        //-.forum-block
           .forum-block-info()
             //-
               if forum.iconFileName
@@ -102,7 +103,8 @@ if data.visitedForums && data.visitedForums.length
     .panel-header 最近访问
     .home-topic-item-div
       for forum in data.visitedForums
-        .forum-block
+        a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-inline-name.forum-block-name=forum.displayName
+        //-.forum-block
           .forum-block-info()
             //-
               if forum.iconFileName
@@ -110,7 +112,7 @@ if data.visitedForums && data.visitedForums.length
               else
                 .forum-block-icon(style=`background-color: ${forum.color}`)
             a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
-.m-b-1
+//-.m-b-1
   .panel-header 文章汇总
   .home-topic-item-div
     .forum-block
@@ -121,7 +123,7 @@ if state.categoryForums
     if fc.forums.length
       .m-b-1
         .panel-header(title=fc.description)=fc.name
-        if fc.displayStyle === 'simple'
+        if 1 || fc.displayStyle === 'simple'
           +renderSimpleForums(fc.forums)
         else
           +renderForums(fc.forums)

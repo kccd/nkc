@@ -22,6 +22,7 @@ const run = async () => {
   jobs.clearVerificationData();
   // 以下任务定时执行
   await timedTasks.cacheActiveUsers();
+  await timedTasks.cacheNewUsers();
   await timedTasks.clearTimeoutPageCache();
   await timedTasks.updateRecommendThreads();
   await timedTasks.updateHomeHotColumns();
@@ -30,6 +31,7 @@ const run = async () => {
   await timedTasks.updateForumsMessage();
   await timedTasks.modifyTimeoutApplicationForm();
   await timedTasks.modifyProjectCycle();
+  await timedTasks.initHomeBlocksTimeout();
   if(process.connected) process.send('ready');
   process.on('message', function(msg) {
     if (msg === 'shutdown') {

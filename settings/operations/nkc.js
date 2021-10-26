@@ -7,6 +7,22 @@ module.exports = {
     PUT: "nkcManagementHome",
     showActivityEnter: {
       PUT: "showActivityEnter"
+    },
+    block: {
+      POST: 'nkcManagementHome',
+      PUT: 'nkcManagementHome',
+      GET: 'nkcManagementHome',
+      PARAMETER: {
+        GET: 'nkcManagementHome',
+        PUT: 'nkcManagementHome',
+        DELETE: 'nkcManagementHome',
+        disabled: {
+          PUT: 'nkcManagementHome',
+        },
+        refresh: {
+          POST: 'nkcManagementHome'
+        }
+      }
     }
   },
   sticker: {

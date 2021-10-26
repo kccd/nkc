@@ -15,7 +15,20 @@ func.cacheActiveUsers = async () => {
     }
   }, 10 * 60 * 1000);
 };
-
+/*
+* 定时更新最新注册用户
+* */
+func.cacheNewUsers = async () => {
+  setTimeout(async () => {
+    try{
+      await tasks.saveNewUsersToCache();
+    } catch(err) {
+      console.log(err);
+    } finally {
+      await func.cacheNewUsers();
+    }
+  }, 10 * 60 * 1000);
+};
 func.clearTimeoutPageCache = async () => {
   setTimeout(async () => {
     try{
@@ -183,5 +196,47 @@ func.modifyProjectCycle = async () =>{
     }
   },12 * 60 * 60 * 1000)
 }
+
+/*
+* 定时更新首页自定模块中的文章列表
+* */
+const initHomeBlocksId = [];
+func.initHomeBlocksTimeout = async () => {
+  setTimeout(async () => {
+    try{
+      console.log(`正在处理首页自定义文章列表...`);
+      const blocks = await db.HomeBlockModel.find({
+        _id: {
+          $nin: initHomeBlocksId
+        }
+      }, {_id: 1});
+      for(const block of blocks) {
+        await func.initHomeBlockTimeout(block._id);
+        initHomeBlocksId.push(block._id);
+      }
+    } catch(err) {
+      console.log(err);
+    } finally {
+      console.log(`首页自定义文章列表处理完成`);
+      await func.initHomeBlocksTimeout();
+    }
+  }, 60 * 1000);
+};
+
+func.initHomeBlockTimeout = async (blockId) => {
+  const block = await db.HomeBlockModel.findOne({_id: blockId});
+  if(!block) return;
+  setTimeout(async () => {
+    try{
+      console.log(`正在更新首页自定义文章列表...`);
+      await block.updateThreadsId();
+    } catch(err) {
+      console.log(err);
+    } finally {
+      console.log(`首页自定义文章列表更新完成`);
+      await func.initHomeBlockTimeout(blockId);
+    }
+  }, block.updateInterval * 60 * 60 * 1000)
+};
 
 module.exports = func;

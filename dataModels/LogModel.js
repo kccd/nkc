@@ -20,12 +20,12 @@ const logSchema = new Schema({
   },
   ip: {
     type: String,
-    required: true,
+    default: '',
 	  index: 1
   },
   port: {
     type: String,
-    required: true,
+    default: '',
 	  index: 1
   },
   operationId: {

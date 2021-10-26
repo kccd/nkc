@@ -726,6 +726,7 @@ const defaultOptions = {
   showAnonymousUser: false,
   excludeAnonymousPost: false,
   removeLink: true,
+  threadCategory: true
 };
 threadSchema.statics.extendThreads = async (threads, options) => {
   const nkcRender = require('../nkcModules/nkcRender');
@@ -745,13 +746,21 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     ThreadTypeModel = mongoose.model('threadTypes');
   }
 
-  let forumsId = [], postsId = new Set(), postsObj = {}, usersId = new Set(), usersObj = {}, cid = [];
+  let forumsId = [];
+  let postsId = new Set();
+  let postsObj = {};
+  let usersId = new Set();
+  let usersObj = {};
+  let cid = [];
+  let tcId = [];
+  const threadCategoryObj = {};
   const parentForumsId = new Set(), forumsObj = {}, categoryObj = {};
 
   threads = threads.filter(thread => !!thread);
 
   threads.map(thread => {
     if(!thread) return;
+    thread.tcId = thread.tcId || [];
     if(o.firstPost) {
       postsId.add(thread.oc);
     }
@@ -762,7 +771,19 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     if(thread.categoriesId && thread.categoriesId.length !== 0) {
       cid = cid.concat(thread.categoriesId);
     }
+    if(o.threadCategory) {
+      tcId = tcId.concat(thread.tcId || []);
+    }
   });
+
+  if(o.threadCategory) {
+    const ThreadCategoryModel = mongoose.model('threadCategories');
+    const threadCategories = await ThreadCategoryModel.getCategoriesById([...new Set(tcId)]);
+    for(let i = 0; i < threadCategories.length; i++) {
+      const {nodeId} = threadCategories[i];
+      threadCategoryObj[nodeId] = threadCategories[i];
+    }
+  }
 
   if(o.firstPost || o.lastPost) {
     const posts = await PostModel.find({pid: {$in: [...postsId]}}, {
@@ -916,6 +937,15 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         }
       }
     }
+    if(o.threadCategory) {
+      thread.threadCategories = [];
+      for(let i = 0; i < thread.tcId.length; i++) {
+        const id = thread.tcId[i];
+        const category = threadCategoryObj[id];
+        if(!category) continue;
+        thread.threadCategories.push(category);
+      }
+    }
     results.push(thread.toObject?thread.toObject():thread);
   }
   return results;
@@ -1056,10 +1086,17 @@ threadSchema.statics.publishArticle = async (options) => {
 /*
 * 获取首页置顶文章
 * */
-threadSchema.statics.getHomeToppedThreads = async (fid = [], latest) => {
+threadSchema.statics.getHomeToppedThreads = async (fid = [], type) => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
   const ThreadModel = mongoose.model("threads");
-  const toppedThreadsId = latest? homeSettings.latestToppedThreadsId: homeSettings.toppedThreadsId;
+  let toppedThreadsId;
+  if(type === 'latest') {
+    toppedThreadsId = homeSettings.latestToppedThreadsId;
+  } else if(type === 'community') {
+    toppedThreadsId = homeSettings.communityToppedThreadsId;
+  } else {
+    toppedThreadsId = homeSettings.toppedThreadsId;
+  }
   let threads = await ThreadModel.find({
     tid: {$in: toppedThreadsId},
     mainForumsId: {$in: fid},
@@ -1087,7 +1124,13 @@ threadSchema.statics.getHomeToppedThreads = async (fid = [], latest) => {
 * 获取最新页置顶的文章
 * */
 threadSchema.statics.getLatestToppedThreads = async (fid) => {
-  return await mongoose.model('threads').getHomeToppedThreads(fid, true);
+  return await mongoose.model('threads').getHomeToppedThreads(fid, 'latest');
+}
+/*
+* 获取社区置顶
+* */
+threadSchema.statics.getCommunityToppedThreads = async (fid) => {
+  return await mongoose.model('threads').getHomeToppedThreads(fid, 'community');
 }
 /*
 * 加载首页轮播图

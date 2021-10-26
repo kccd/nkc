@@ -1,0 +1,51 @@
+@import "../base";
+.active-users{
+  .active-user{
+    width: 6.5rem;
+    display: inline-block;
+    text-align: center;
+    margin: 0 0.7rem;
+    &:hover, &:focus{
+      text-decoration: none;
+    }
+    &:hover{
+      color: @dark;
+    }
+    .active-user-avatar{
+      img{
+        height: 6rem;
+        width: 6rem;
+        border-radius: 50%;
+        box-sizing: border-box;
+        border: 3px solid #eee;
+      }
+    }
+    .active-user-name{
+      margin-top: 0.5rem;
+      font-size: 1.2rem;
+      height: 1.6rem;
+      .hideText(@line: 1);
+    }
+  }
+  &.active-users-small{
+    .active-users-header{
+      padding: 0.5rem 0;
+      color: #888888;
+      font-size: 1.2rem;
+    }
+    .active-user-avatar img{
+      height: 4rem;
+      width: 4rem;
+      border-radius: 5px;
+    }
+    .active-user-avatar{
+      display: inline-block;
+      padding: 0 0.6rem 1rem 0.6rem;
+      text-align: center;
+    }
+    .active-user-avatar a{
+      text-decoration: none;
+      color: #555555;
+    }
+  }
+}

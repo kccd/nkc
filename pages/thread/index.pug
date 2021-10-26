@@ -51,7 +51,7 @@ block content
           .m-b-1
             .row
               .thread-div
-                -const showManagement = data.user && data.isModerator && permissionsOr(['moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']);
+                -const showManagement = data.user && data.isModerator && permissionsOr(['pushThread', 'moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']);
                 .col-xs-12.col-md-12.thread-nav.p-t-1.p-b-2
                   .thread-nav-left.hidden-xs
                     a.nav-link(href='/?t=home' title=state.serverSettings.brief) 主页
@@ -86,6 +86,7 @@ block content
                     if showManagement
                       .nav-count
                         .fa.fa-cog(onclick="displayManagement()")
+
                 if showManagement
                   .col-xs-12.col-md-12
                     .thread-management
@@ -94,6 +95,8 @@ block content
                           div.managementDiv.m-b-1(style='display: none;margin-top: 1rem;')
                             .form-inline
                               //- 设置置顶
+                              if permission('pushThread')
+                                button.btn.btn-default.btn-sm(onclick=`pushBlock('${data.thread.tid}')`) 推送到模块
                               if data.isModerator && data.userOperationsId.includes('toppedThread') && !thread.topped
                                 button.btn.btn-default.btn-sm#threadTop(onclick=`setTopped('${data.thread.tid}')`) 专业置顶
                               if data.isModerator && data.userOperationsId.includes('unToppedThread') && thread.topped
@@ -103,11 +106,16 @@ block content
                                   button.btn.btn-default.btn-sm(onclick=`unHomeAd('${data.thread.tid}')`) 取消首页推荐
                                 else
                                   a.btn.btn-default.btn-sm(href=`/t/${data.thread.tid}/ad`).m-l-05 首页推荐
+
                               if data.userOperationsId.includes("homeTop")
                                 if data.homeTopped
                                   button.btn.btn-default.btn-sm(onclick=`unHomeTop('${data.thread.tid}')`) 取消首页置顶
                                 else
                                   button.btn.btn-default.btn-sm(onclick=`homeTop('${data.thread.tid}')`) 首页置顶
+                                if data.communityTopped
+                                  button.btn.btn-default.btn-sm(onclick=`communityTop('${data.thread.tid}', false)`) 取消社区置顶
+                                else
+                                  button.btn.btn-default.btn-sm(onclick=`communityTop('${data.thread.tid}', true)`) 社区置顶
                                 if data.latestTopped
                                   button.btn.btn-default.btn-sm(onclick=`unLatestTop('${data.thread.tid}')`) 取消最新页置顶
                                 else
@@ -573,6 +581,8 @@ block scripts
   include ../publicModules/commentControl/commentControl
   include ../publicModules/replaceNKCUrl
   include ../post/options/options
+  include ../publicModules/commonModal/commonModal
+
   //- 通用socket
   if data.user
     +includeJS('/message/connectSocket.js')

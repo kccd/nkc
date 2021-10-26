@@ -6,4 +6,5 @@ methods.clearResourceState = db.ResourceModel.clearResourceState;
 methods.updateHomeRecommendThreadsByType = db.ThreadModel.updateHomeRecommendThreadsByType;
 methods.clearTimeoutPageCache = db.CacheModel.clearTimeoutPageCache;
 methods.saveActiveUsersToCache = db.ActiveUserModel.saveActiveUsersToCache;
+methods.saveNewUsersToCache = db.ActiveUserModel.saveNewUsersToCache;
 module.exports = methods;

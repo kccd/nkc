@@ -1,4 +1,5 @@
 var SubscribeTypes, surveyForms = [], draftId = "", author = {};
+const commonModel = new NKC.modules.CommonModal();
 window.Attachments = undefined;
 window.quotePostApp = undefined;
 $(document).ready(function(){
@@ -1354,6 +1355,53 @@ ue.ready(function() {
     }
 	})
 });
+function getBlockId(val){
+	return val;
+}
+
+function pushHomeBlockId(tid, blocksId){
+	nkcAPI(`/t/${tid}/block`, 'post', {
+		blocksId
+	})
+		.then(data => {
+			sweetSuccess('提交成功');
+		})
+		.catch(err => {
+			sweetError(err);
+		})
+}
+
+function pushBlock(tid){
+	nkcAPI('/nkc/home/block', 'get', {
+	})
+		.then(data => {
+			let pushTid=[];
+			commonModel.open(data => {
+				let id = [];
+				for(const d of data){
+					if(d){
+						id.push(...d.value)
+					}
+				}
+				pushHomeBlockId(tid, id);
+				commonModel.close();
+			}, {
+				title: '推送文章到模块：',
+				data: [
+					{
+						dom: 'checkbox',
+						label: '推送到的模块',
+						value: pushTid,
+						checkboxes: data.homeBlocks
+					}
+				]
+			})
+		})
+		.catch(err =>  {
+			sweetError(err)
+		});
+
+}
 
 
 Object.assign(window, {
@@ -1418,5 +1466,7 @@ Object.assign(window, {
 	disabledMarkedPosts,
 	joinPostRoom,
 	insertRenderedPost,
-	insertRenderedComment
+	insertRenderedComment,
+	pushBlock,
+	pushHomeBlockId
 });

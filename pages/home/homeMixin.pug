@@ -1,0 +1,344 @@
+mixin renderHome(homeBlock)
+  -var hasPermission = permission('nkcManagementHome');
+  -var disabled = homeBlock.disabled? 'disabled': '';
+  mixin homeBlockHeader(hideHeader, showOptions)
+    -var {_id, blockStyle, name} = homeBlock;
+    -var color = blockStyle.headerTitleColor || '#000';
+    .home-category-master-handle.panel-header(
+      class=hideHeader? 'move-handle': ''
+      style=`color: ${color}`
+      )
+      if hasPermission
+        span.home-forums-list-icon.fa.fa-bars.move-handle.m-r-1
+      span=name
+      .home-forums-list-options.move-handle
+        button.btn-default.btn.btn-xs.icon-expand(onclick=`expandList('${homeBlock._id}')`) 折叠
+        if hasPermission && showOptions
+          if !homeBlock.defaultBlock
+            button.btn-default.btn.btn-xs(onclick=`refresh('${homeBlock._id}')`) 刷新
+          button.btn-primary.btn-editor-block.btn.btn-xs(onclick=`editorBlock('${homeBlock._id}')`) 编辑
+          button.btn-success.btn-save-editor.btn.btn-xs(@click=`saveForm`) 保存
+          button.btn-danger.btn.btn-xs(onclick=`deleteHomeBlock('${homeBlock._id}')`) 删除
+          button.btn-warning.btn.btn-xs(onclick=`disabledHomeBlock('${homeBlock._id}', ${!homeBlock.disabled})`)=homeBlock.disabled? '恢复': '屏蔽'
+  if homeBlock._id === 'recommendThreadsMovable'
+    //轮播图
+    .home-forums-list.m-b-1.home-covers-movable-container(id=`block_${homeBlock._id}`).p-a-0
+      .p-l-1.p-r-1
+        +homeBlockHeader(true, false)
+      .home-swiper.home-covers-md.home-covers-movable
+        .swiper-container.swiper-home
+          .swiper-wrapper
+            for thread in homeBlock.data
+              a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
+                'background-image': `url(${tools.getUrl('recommendThreadCover', thread.cover)})`
+              })
+                .swiper-title= `${thread.title}`
+          .swiper-pagination
+          .swiper-button-next.swiper-button(style='background-image: none;')
+            .fa.fa-angle-right
+          .swiper-button-prev.swiper-button(style='background-image: none;')
+            .fa.fa-angle-left
+  else if homeBlock._id === 'recommendThreadsFixed'
+    //右侧小图
+    .home-forums-list.m-b-1(id=`block_${homeBlock._id}`).p-a-0
+      .p-l-1.p-r-1
+        +homeBlockHeader(true, false)
+      .home-swiper.home-covers-sm
+        for thread, index in homeBlock.data
+          .home-cover-sm
+            a(href=`/t/${thread.tid}` target="_blank" title=thread.title
+              class=index > 2 ? 'm-b-0' : ''
+            )
+              .home-covers-sm-img(style=`background-image:url(${tools.getUrl('recommendThreadCover', thread.cover)})`)
+              .home-covers-sm-title=thread.title
+  else if homeBlock._id === 'toppedThreads'
+    //首页顶置
+    if homeBlock.data.length
+      .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
+        +homeBlockHeader(false, false)
+        .home-threads
+          for thread in homeBlock.data
+            include ../publicModules/thread_panel/thread_panel
+  else if homeBlock._id === 'goods'
+    //热销商品
+    if homeBlock.data.length > 0
+      .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
+        +homeBlockHeader(false, false)
+        .home-goods
+          for goods in homeBlock.data
+            .home-goods-content
+              .home-goods-avatar
+                div(style=`background-image: url(/r/${goods.imgMaster})`)
+              .home-goods-info
+                a(href=`/t/${goods.tid}` title=goods.name).home-goods-name=goods.name
+                .home-goods-description=goods.abstract
+                .home-goods-other
+                  a.home-goods-user(href=`/u/${goods.user.uid}`)
+                    img(src=tools.getUrl("userAvatar", goods.user.avatar) data-float-uid=goods.user.uid)
+                    span=goods.user.username
+                  .home-goods-price
+                  if !goods.productSettings.priceShowToVisit && !data.user
+                    .home-goods-price 登录可见
+                  else
+                    -var minPrice, maxPrice;
+                    for p in goods.productParams
+                      -var price = p.price;
+                      if minPrice === undefined || minPrice > price
+                        -minPrice = price;
+                      if maxPrice === undefined || maxPrice < price
+                        -maxPrice = price;
+                    if minPrice === maxPrice
+                      .home-goods-price=`￥${minPrice / 100}`
+                    else
+                      .home-goods-price=`￥${minPrice / 100} - ￥${maxPrice / 100}`
+        .home-goods-forums 更多请访问：
+          for f in data.goodsForums
+            a(href=`/f/${f.fid}` data-float-fid=f.fid)
+              if f.logo
+                img.home-goods-forum-icon(src=tools.getUrl("forumLogo", f.logo))
+              else
+                .home-goods-forum-icon(style=`background-color: ${f.color}`)
+              span=f.displayName
+  else if homeBlock._id === 'hotColumns'
+    //热门专栏
+    if homeBlock.data.length > 0
+      .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
+        +homeBlockHeader(false, false)
+        .home-columns
+          for column in homeBlock.data
+            a(href=`/m/${column._id}` target="_blank").home-column
+              .home-column-avatar
+                img(src=tools.getUrl("columnAvatar", column.avatar))
+              .home-column-info
+                .home-column-title= column.name
+                .home-column-description= column.abbr || "无简介"
+                .home-column-statics
+                  span=tools.briefTime(column.tlm) + "更新 "
+                  span= "共" + column.postCount + "篇文章"
+        .m-t-05
+          a.home-threads-more-link(href=`/m`) 查看更多
+      if !state.userColumn && data.user && state.columnPermission
+        .home-columns-link.m-b-1
+          a(href=`/column/apply` target="_blank") 开设专栏
+          .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
+  else if homeBlock._id === 'toppedColumns'
+    //置顶专栏
+    if homeBlock.data.length > 0
+      mixin columnPanel(column, klass)
+        .home-main-column.row
+          .col-xs-12.col-md-6
+            .home-main-column-left
+              .home-main-column-avatar
+                img(src=tools.getUrl('columnAvatar', column.avatar))
+              .home-main-column-info
+                a(href=tools.getUrl('columnHome', column._id) target="_blank").home-main-column-name=column.name
+                .home-main-column-desc(title=column.abbr)=column.abbr || '暂无简介'
+          .col-xs-12.col-md-6
+            .home-main-column-right(class=klass || '')
+              .home-main-column-posts(style=`border-left: 3px solid ${0 || '#ccc'};`)
+                for p, index in column.posts
+                  .home-main-column-post
+                    .latest-thread-point
+                    a(href=`/t/${p.tid}` target="_blank" title=p.t)=p.t
+                    .home-main-column-post-time
+                      +fromNow(p.toc)
+      .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
+        +homeBlockHeader(false, false)
+        .home-main-columns
+          for column, index in homeBlock.data
+            -var klass = index === homeBlock.data.length - 1 ? 'm-b-0' : ''
+            +columnPanel(column, klass)
+  else if homeBlock._id === 'forums'
+    .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
+      +homeBlockHeader(false, false)
+      .home-forums
+        for cf in data.categoryForums
+          .m-b-1.category-forums
+            .home-forums-parent-name=cf.name
+            for f in cf.forums
+              .home-forums-brief
+                a.home-forums-parent(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+                if f.childrenForums && f.childrenForums.length
+                  span ：
+                  for cf, index in f.childrenForums
+                    if index !== 0
+                      span |
+                    a.home-forums-child(href=`/f/${cf.fid}` data-float-fid=cf.fid style=`background-color: ${hexToRgba(f.color, 0.1)}`)=cf.displayName
+  else if homeBlock._id === 'management'
+    if permissionsOr(["nkcManagement", "visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs"])
+      .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
+        +homeBlockHeader(false, false)
+        -var hidePanelHeader = true;
+        include ../publicModules/management/management
+  else
+    -var bgColor = homeBlock.blockStyle.backgroundColor || '#fff';
+    .home-forums-list.m-b-1(
+      id=`block_${homeBlock._id}`
+      data-cid=`${homeBlock._id}`
+      style=`background-color: ${bgColor}`
+      )
+      +homeBlockHeader(false, true)
+      if homeBlock.disabled
+        .m-b-1.bg-danger.text-danger.p-a-1.bg-border 当前列表已被屏蔽
+          button.btn-warning.btn.btn-xs(onclick=`disabledHomeBlock('${homeBlock._id}', false)`)='恢复'
+      .home-threads
+        for thread in homeBlock.data
+          -var defaultThreadListStyle = {type: homeBlock.threadStyle, cover: homeBlock.coverPosition}
+          -var threadPanelATarget = '_blank';
+          include ../publicModules/thread_panel/thread_panel
+      +hiddenForm
+mixin hiddenForm
+  .home-threads-editor(v-if="show" v-cloak)
+    .p-t-3.p-b-3.text-center(v-if='loading') 加载中...
+    form.newBlock.form-horizontal(v-else :model="form")
+      .form-group
+        label.col-sm-3.control-label 模块名称
+        .col-sm-9
+          input.form-control(type='text' placeholder="请输入模块名称" value="" v-model="form.name")
+      .form-group
+        label.col-sm-3.control-label 专业筛选
+        .col-sm-9
+          span.selected-forums(v-if="selectedForums.length")
+            span.selected-forum(v-for="(forum) in forums" :style=`'background-color:'+forum.color`) {{forum.displayName}}
+              span.fa.fa-close.remove-forum(@click="removeForum(forum.fid)")
+          span(v-else) 空空如也
+          button.btn.btn-default.btn-sm(type="button" @click="selectForums()") 选择
+
+      .form-group
+        label.col-sm-3.control-label 文章属性
+        .col-sm-9
+          thread-category-list(:categories="threadCategories" :tcid="selectedHomeCategoriesId" ref='homeCategoryList')
+      .form-group
+        label.col-sm-3.control-label 必须精选
+        .col-sm-9
+          .radio
+            label.m-r-1
+              input(type="radio" v-model="form.digest" name="digest" :value="true")
+              | 是
+            label
+              input(type="radio" v-model="form.digest" name="digest" :value="false")
+              | 否
+      .form-group
+        label.col-sm-3.control-label 必须原创
+        .col-sm-9
+          .radio
+            label.m-r-1
+              input(type="radio" v-model="form.origin" name="origin" :value="true")
+              | 是
+            label
+              input(type="radio" v-model="form.origin" name="origin" :value="false")
+              | 否
+      .form-group
+        label.col-sm-3.control-label 回复最少
+        .col-sm-9
+          input.form-control(type='text' placeholder="请输入回复数最小值" v-model.number="form.postCountMin")
+      .form-group
+        label.col-sm-3.control-label 点赞最少
+        .col-sm-9
+          input.form-control(type='text' placeholder="请输入点赞最小数值" v-model.number="form.voteUpMin")
+      .form-group
+        label.col-sm-3.control-label 总点赞最少
+        .col-sm-9
+          input.form-control(type='text' placeholder="请输入文章所有点赞数的最小值" v-model.number="form.voteUpTotalMin")
+      .form-group
+        label.col-sm-3.control-label 点踩最大
+        .col-sm-9
+          input.form-control(type='text' placeholder="请输入最大点踩数" v-model.number="form.voteDownMax")
+      .form-group
+        label.col-sm-3.control-label 更新间隔时间/小时
+        .col-sm-9
+          input.form-control(type='text' placeholder="请输入更新间隔时间" v-model.number="form.updateInterval")
+      .form-group
+        label.col-sm-3.control-label 发表距当前最小/天
+        .col-sm-9
+          input.form-control(type='text' placeholder="请输入发表时间距离当前最小值" v-model.number="form.timeOfPostMin")
+      .form-group
+        label.col-sm-3.control-label 发表距当前最大/天
+        .col-sm-9
+          input.form-control(type='text' placeholder="请输入发表时间距离当前最大值" v-model.number="form.timeOfPostMax")
+      .form-group
+        label.col-sm-3.control-label 文章列表风格
+        .col-sm-9
+          .radio
+            label.m-r-1
+              input(type="radio" v-model="form.threadStyle" name="threadStyle" value="abstract")
+              | 摘要模式
+            label.m-r-1
+              input(type="radio" v-model="form.threadStyle" name="threadStyle" value="brief")
+              | 简略模式
+            label
+              input(type="radio" v-model="form.threadStyle" name="threadStyle" value="minimalist")
+              | 极简模式
+      .form-group
+        label.col-sm-3.control-label 文章封面位置
+        .col-sm-9
+          .radio
+            label.m-r-1
+              input(type="radio" v-model="form.coverPosition" name="coverPosition" value="left")
+              | 左
+            label
+              input(type="radio" v-model="form.coverPosition" name="coverPosition" value="right")
+              | 右
+      .form-group
+        label.col-sm-3.control-label 文章列表样式
+        .col-sm-9
+          button.btn.btn-default.btn-sm(type="button" @click="selectBlockStyle()") 选择样式
+      .form-group
+        label.col-sm-3.control-label 文章显示篇数
+        .col-sm-9
+          input.form-control(type='text' placeholder="请输入文章显示篇数" v-model.Number="form.threadCount")
+      .form-group
+        label.col-sm-3.control-label 是否屏蔽
+        .col-sm-9
+          .radio
+            label.m-r-1
+              input(type="radio" v-model="form.disabled" name="disabled" :value="true")
+              | 是
+            label
+              input(type="radio" v-model="form.disabled" name="disabled" :value="false")
+              | 否
+      .form-group
+        label.col-sm-3.control-label 手动推送显示条数
+        .col-sm-9
+          input.form-control(type='text' placeholder="请输入手动推送文章显示条数" v-model.number="form.fixedThreadCount")
+      .form-group
+        label.col-sm-3.control-label 自动推送入选条数
+        .col-sm-9
+          input.form-control(type='text' placeholder="请输入自动推送文章入选条数" v-model.number="form.autoThreadCount")
+      .form-group(v-if="showTid")
+        label.col-sm-3.control-label 自动选择的文章 ID
+        .col-sm-9
+          .table-height
+            .p-t-2.p-b-2.text-center(v-if="selectedAutoThreads.length === 0") 空空如也
+            div(v-for='item in selectedAutoThreads')
+              button.m-r-1.btn.btn-danger.btn-xs(@click=`delThreadId(item.tid, form.autoThreadsId)`) 删除
+              a(:href="getUrl('thread',item.tid)" target="_blank") {{item.t}}
+      .form-group(v-if="showTid")
+        label.col-sm-3.control-label 手动选择的文章 ID
+        .col-sm-9
+          .table-height
+            .p-t-2.p-b-2.text-center(v-if="selectedFixThreads.length === 0") 空空如也
+            div(v-for='item in selectedFixThreads')
+              button.m-r-1.btn.btn-danger.btn-xs(@click=`delThreadId(item.tid, form.fixedThreadsId)`) 删除
+              a(:href="getUrl('thread',item.tid)" target="_blank") {{item.t}}
+      .form-group
+        label.col-sm-3.control-label 显示时的排序
+        .col-sm-9
+          .radio
+            label.m-r-1
+              input(type="radio" v-model="form.sort" name="sort" value="random")
+              | 随机
+            label.m-r-1
+              input(type="radio" v-model="form.sort" name="sort" value="toc")
+              | 发表时间
+            label.m-r-1
+              input(type="radio" v-model="form.sort" name="sort" value="postCount")
+              | 回复数
+            label
+              input(type="radio" v-model="form.sort" name="sort" value="voteUpCount")
+              | 点赞数
+      .form-group
+        label.col-sm-3.control-label
+        .col-sm-9
+          button.btn.btn-primary(@click='saveForm') 保存
+          button.btn.btn-danger(@click='hideForm') 取消

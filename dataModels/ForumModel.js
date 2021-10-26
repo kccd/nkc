@@ -1352,6 +1352,7 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     countPosts: 1,
     countThreads: 1,
     iconFileName: 1,
+    countPostsToday: 1,
     categoryId: 1,
     description: 1,
     logo: 1,

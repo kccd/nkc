@@ -219,7 +219,7 @@ block content
                         th 机构名称(选填)
                         th 机构地址(选填)
                         th 通信作者
-                    tbody.editor-author(v-for="a, index in authorInfos")
+                    tbody.editor-author(v-for="(a, index) in authorInfos")
                       tr
                         th
                           .fa.fa-trash(@click="removeAuthor(index, authorInfos)" title="删除")

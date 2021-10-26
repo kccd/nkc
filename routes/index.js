@@ -59,6 +59,8 @@ const attachmentRouter = routers.attachment;
 const paymentRouter = routers.payment;
 // 外链跳转
 const linkRouter = routers.link;
+// 社区
+const communityRouter = routers.community;
 
 const path = require('path');
 
@@ -130,5 +132,6 @@ router.use('/blacklist', blacklistRouter.routes(), blacklistRouter.allowedMethod
 router.use('/a', attachmentRouter.routes(), attachmentRouter.allowedMethods());
 router.use('/verifications', verificationsRouter.routes(), verificationsRouter.allowedMethods());
 router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods())
+router.use('/c', communityRouter.routes(), communityRouter.allowedMethods())
 router.use("/l", linkRouter.routes(), linkRouter.allowedMethods());
 module.exports = router;

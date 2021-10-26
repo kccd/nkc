@@ -1,7 +1,9 @@
-if !isIncluded('commonModal')
-  +includeCSS("/publicModules/commonModal/commonModal.css")
-  .modal.fade#moduleCommonModal(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
-    .modal-dialog.modal-sm(role="document")#moduleCommonModalApp
+include ../draggablePanel/draggablePanel
+#moduleComplaintSelector.draggable-panel
+if !isIncluded('homeModal')
+  +includeCSS("/publicModules/homeModal/homeModal.css")
+  .modal.fade#moduleHomeModal(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+    .modal-dialog.modal-sm(role="document")#moduleHomeModalApp
       .modal-content
         .modal-header
           .fa.fa-remove(data-dismiss="modal" aria-label="Close")
@@ -24,13 +26,9 @@ if !isIncluded('commonModal')
                 label.m-r-05(v-for="r in d.radios")
                   input(type="radio" :value="r.value" v-model="d.value")
                   span {{r.name}}
-              .checkbox(v-if="d.dom === 'checkbox'")
-                label.m-r-05(v-for="r in d.checkboxes")
-                  input(type="checkbox" :value="r._id" name='checkboxes' v-model="d.value")
-                  span {{r.name}}
         .modal-footer
           .options-button
             a(data-dismiss="modal") 关闭
             a.active(@click="submit") 确定
 
-  +includeJS("/publicModules/commonModal/commonModal.js")
+  +includeJS("/publicModules/homeModal/homeModal.js")

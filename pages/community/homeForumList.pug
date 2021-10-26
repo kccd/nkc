@@ -1,0 +1,78 @@
+if !isIncluded('homeForumList')
+  +includeCSS('/community/homeForumList.css')
+  mixin forumList(f)
+    .home-forums-brief
+      a.home-forums-parent(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+      if f.childrenForums && f.childrenForums.length
+        span ：
+        for cf, index in f.childrenForums
+          if index !== 0
+            span |
+          //-style=`background-color: ${f.color}`
+          a.home-forums-child(href=`/f/${cf.fid}` data-float-fid=cf.fid style=`background-color: ${hexToRgba(f.color, 0.1)}`)=cf.displayName
+  mixin detailedForumList(f, disableChild)
+    -f.childrenForums = f.childrenForums || [];
+    .detailed-forums-body
+      .detailed-forum
+        .row.detailed-forum-body(class=disableChild?'':'m-b-1')
+          div(class=f.childrenForums.length ? 'col-md-12': 'col-md-6').col-xs-12
+            .detailed-forum-panel
+              if disableChild
+                if f.logo
+                  img.detailed-forum-panel-icon(src=tools.getUrl('forumLogo', f.logo) data-float-fid=f.fid)
+                else
+                  .detailed-forum-panel-icon(style=`background-color: ${f.color}` data-float-fid=f.fid)
+              .detailed-forum-panel-info(class=disableChild?'':'p-l-0')
+                .detailed-forum-panel-name
+                  a(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+                  if disableChild
+                    | &nbsp;
+                    span(title=`更新/文章/回复`)
+                      | (
+                      span.text-danger=f.countPostsToday
+                      | /
+                      span=f.countThreads
+                      | /
+                      span=f.countPosts
+                      | )
+                .detailed-forum-panel-description(title=f.description class=disableChild? '':'parent')
+                  span=f.description || '暂无简介'
+          if f.latestThreads && f.latestThreads.length
+            .col-xs-12.col-md-6
+              .detailed-forum-latest-threads(style=`border-left-color: ${f.color}`)
+                for thread, index in f.latestThreads
+                  .detailed-forum-latest-thread
+                    .latest-thread-point
+                    a(href=`/t/${thread.tid}` title=thread.post.t)=thread.post.t
+                    span.time
+                      //-=fromNow(thread.tlm)
+                      +fromNow(thread.tlm)
+          if f.childrenForums.length && !disableChild
+            .col-xs-12.col-md-12.detailed-forums-padding-left
+              for ff in f.childrenForums
+                +detailedForumList(ff, true)
+  mixin normalForumList(f, disableChild)
+    -f.childrenForums = f.childrenForums || [];
+    .detailed-forums-body
+      .detailed-forum
+        .row.detailed-forum-body(class=disableChild?'':'m-b-1')
+          div.col-xs-12.col-md-12
+            .detailed-forum-panel
+              if disableChild
+                if f.logo
+                  img.detailed-forum-panel-icon(src=tools.getUrl('forumLogo', f.logo) data-float-fid=f.fid)
+                else
+                  .detailed-forum-panel-icon(style=`background-color: ${f.color}` data-float-fid=f.fid)
+              .detailed-forum-panel-info(class=disableChild?'':'p-l-0')
+                .detailed-forum-panel-name
+                  a(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+                  if disableChild
+                    | &nbsp;
+                    span(title=`文章/回复`)=`(${f.countThreads}/${f.countPosts})`
+                .detailed-forum-panel-description(title=f.description class=disableChild? '':'parent')
+                  span=f.description || '暂无简介'
+          if f.childrenForums.length && !disableChild
+            //.detailed-forums-padding-left
+            for ff in f.childrenForums
+              .col-xs-12.col-md-6.detailed-forums-padding-left
+                +normalForumList(ff, true)
