@@ -92,14 +92,16 @@ router
     await next();
   })
   .get('/', async (ctx, next) => {
-    const {db, data} = ctx;
+    const {db, data, body, query} = ctx;
     const homeBlock =  await db.HomeBlockModel.find({});
+    const {tid} = query;
     const homeBlockId = [];
     for(const block of homeBlock){
       if(block.defaultBlock) continue;
       const obj = {
         name: block.name,
         _id: block._id,
+        hasId: block.fixedThreadsId.includes(tid)?true:false
       };
       homeBlockId.push(obj);
     }

@@ -1372,10 +1372,16 @@ function pushHomeBlockId(tid, blocksId){
 }
 
 function pushBlock(tid){
-	nkcAPI('/nkc/home/block', 'get', {
+	nkcAPI('/nkc/home/block?tid='+tid, 'get', {
+		tid
 	})
 		.then(data => {
-			let pushTid=[];
+			let pushTid = [];
+			for(const d of data.homeBlocks){
+				if(d.hasId){
+					pushTid.push(d._id)
+				}
+			}
 			commonModel.open(data => {
 				let id = [];
 				for(const d of data){
