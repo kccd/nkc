@@ -52,16 +52,16 @@ module.exports = async (options) => {
   });
 
   // 置顶专栏
-  data.toppedColumns = await db.ColumnModel.getHomeToppedColumns();
+  // data.toppedColumns = await db.ColumnModel.getHomeToppedColumns();
   // 热销商品
-  data.showShopGoods = homeSettings.showShopGoods;
+  // data.showShopGoods = homeSettings.showShopGoods;
   data.goodsForums = await db.ForumModel.find({kindName: "shop"});
-  data.goods = await db.ShopGoodsModel.getHomeGoods();
+  // data.goods = await db.ShopGoodsModel.getHomeGoods();
   // 最新原创文章显示模式
   data.originalThreadDisplayMode = homeSettings.originalThreadDisplayMode;
   data.columnListPosition = homeSettings.columnListPosition;
   // 首页置顶
-  data.toppedThreads = await db.ThreadModel.getHomeToppedThreads(fidOfCanGetThreads);
+  // data.toppedThreads = await db.ThreadModel.getHomeToppedThreads(fidOfCanGetThreads);
   // 浏览过的专业
   /*if(data.user) {
     const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 5);

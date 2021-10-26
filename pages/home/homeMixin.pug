@@ -146,7 +146,7 @@ mixin renderHome(homeBlock)
         +homeBlockHeader(false, false)
         .home-main-columns
           for column, index in homeBlock.data
-            -var klass = index === data.toppedColumns.length - 1 ? 'm-b-0' : ''
+            -var klass = index === homeBlock.data.length - 1 ? 'm-b-0' : ''
             +columnPanel(column, klass)
   else if homeBlock._id === 'forums'
     .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)

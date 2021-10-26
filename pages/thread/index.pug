@@ -51,8 +51,7 @@ block content
           .m-b-1
             .row
               .thread-div
-                -var hasPermission = permission('nkcManagementHome');
-                -const showManagement = data.user && data.isModerator && permissionsOr(['moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']);
+                -const showManagement = data.user && data.isModerator && permissionsOr(['pushThread', 'moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']);
                 .col-xs-12.col-md-12.thread-nav.p-t-1.p-b-2
                   .thread-nav-left.hidden-xs
                     a.nav-link(href='/?t=home' title=state.serverSettings.brief) 主页
@@ -96,7 +95,7 @@ block content
                           div.managementDiv.m-b-1(style='display: none;margin-top: 1rem;')
                             .form-inline
                               //- 设置置顶
-                              if hasPermission
+                              if permission('pushThread')
                                 button.btn.btn-default.btn-sm(onclick=`pushBlock('${data.thread.tid}')`) 推送到模块
                               if data.isModerator && data.userOperationsId.includes('toppedThread') && !thread.topped
                                 button.btn.btn-default.btn-sm#threadTop(onclick=`setTopped('${data.thread.tid}')`) 专业置顶
