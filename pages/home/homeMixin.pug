@@ -22,7 +22,7 @@ mixin renderHome(homeBlock)
           button.btn-warning.btn.btn-xs(onclick=`disabledHomeBlock('${homeBlock._id}', ${!homeBlock.disabled})`)=homeBlock.disabled? '恢复': '屏蔽'
   if homeBlock._id === 'recommendThreadsMovable'
     //轮播图
-    .home-forums-list.m-b-1(id=`block_${homeBlock._id}`).p-a-0
+    .home-forums-list.m-b-1.home-covers-movable-container(id=`block_${homeBlock._id}`).p-a-0
       .p-l-1.p-r-1
         +homeBlockHeader(true, false)
       .home-swiper.home-covers-md.home-covers-movable
@@ -43,15 +43,14 @@ mixin renderHome(homeBlock)
     .home-forums-list.m-b-1(id=`block_${homeBlock._id}`).p-a-0
       .p-l-1.p-r-1
         +homeBlockHeader(true, false)
-      .home-swiper.home-covers-md
-        .home-covers-sm
-          for thread, index in homeBlock.data
-            .home-cover-sm
-              a(href=`/t/${thread.tid}` target="_blank" title=thread.title
-                class=index > 2 ? 'm-b-0' : ''
-              )
-                .home-covers-sm-img(style=`background-image:url(${tools.getUrl('recommendThreadCover', thread.cover)})`)
-                .home-covers-sm-title=thread.title
+      .home-swiper.home-covers-sm
+        for thread, index in homeBlock.data
+          .home-cover-sm
+            a(href=`/t/${thread.tid}` target="_blank" title=thread.title
+              class=index > 2 ? 'm-b-0' : ''
+            )
+              .home-covers-sm-img(style=`background-image:url(${tools.getUrl('recommendThreadCover', thread.cover)})`)
+              .home-covers-sm-title=thread.title
   else if homeBlock._id === 'toppedThreads'
     //首页顶置
     if homeBlock.data.length

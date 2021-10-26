@@ -696,7 +696,6 @@ footer.footer{
   display: inline-block;
 }
 .move-handle{
-  cursor: move;
   display: none;
 }
 .home-swiper{
@@ -716,7 +715,7 @@ footer.footer{
     height: 100%;
     a.swiper-slide{
       height: 100%;
-      border-radius: 2px;
+      //border-radius: 2px;
       overflow: hidden;
       position: relative;
     }
@@ -795,7 +794,7 @@ footer.footer{
   }
 }
 
-.home-category-master-handle{
+.home-category-master-handle.move{
   cursor: move;
 }
 #hiddenForm{
@@ -806,13 +805,23 @@ footer.footer{
   display: none;
 }
 
+.home-covers-movable-container{
+  border-radius: 0!important;
+}
+
 @media (max-width: 500px) {
   .home-goods .home-goods-content .home-goods-avatar > div{
     width: 10rem;
     height: 7rem;
   }
   .home-covers-md.home-covers-movable{
-    height: 12rem;
+    height: 15rem;
+  }
+  .home-covers-sm .home-cover-sm a .home-covers-sm-img{
+    height: 7rem;
+  }
+  .home-covers-sm{
+    height: auto;
   }
   .home-forums .home-forums-list .home-forum-parent{
     display: block;

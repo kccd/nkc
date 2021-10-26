@@ -421,6 +421,13 @@ function renderButtons(status) {
   status.finished? finished.show(): finished.hide();
   status.create? create.show(): create.hide();
   status.handle? moveHandle.show(): moveHandle.hide()
+
+  if(status.editor) {
+    $('.home-forums-list .home-category-master-handle').removeClass('move');
+  } else {
+    $('.home-forums-list .home-category-master-handle').addClass('move');
+  }
+
   // status.saveEditor? saveEditor.show(): saveEditor.hide()
 }
 
