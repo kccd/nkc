@@ -179,7 +179,8 @@ mixin threadCategories
             if thread.hits
               .fa.fa-eye=` ${thread.hits}`
             if thread.count
-              .fa.fa-comment=` ${thread.count}`
+              a.a-jump(href=`/t/${thread.tid}#container` target="_blank")
+                .fa.fa-comment=` ${thread.count}`
 
 
 
