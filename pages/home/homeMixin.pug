@@ -190,7 +190,7 @@ mixin renderHome(homeBlock)
 mixin hiddenForm
   .home-threads-editor(v-if="show" v-cloak)
     .p-t-3.p-b-3.text-center(v-if='loading') 加载中...
-    form.newBlock.form-horizontal(v-else :model="form")
+    .form.new-block.form-horizontal(v-else :model="form")
       .form-group
         label.col-sm-3.control-label 模块名称
         .col-sm-9
