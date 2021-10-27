@@ -22,7 +22,7 @@ const schema = new mongoose.Schema({
   },
   // 文章属性 ID
   tcId: {
-    type: [Number],
+    type: [String],
     default: []
   },
   // 是否必须为精选文章
@@ -209,10 +209,17 @@ schema.statics.checkBlockValue = async (block) => {
     }
   }
   if(tcId.length > 0) {
-    const categories = await ThreadCategoryModel.find({_id: {$in: tcId}}, {_id: 1});
+    let categoriesId = new Set();
+    for(const id of tcId) {
+      const [categoryId, nodeId] = id.split('-');
+      categoriesId.add(categoryId);
+      if(nodeId !== 'default') categoriesId.add(nodeId);
+    }
+    categoriesId = [...categoriesId];
+    const categories = await ThreadCategoryModel.find({_id: {$in: categoriesId}}, {_id: 1});
     const categoriesObj = {};
     categories.map(c => categoriesObj[c._id] = true);
-    for(const id of tcId) {
+    for(const id of categoriesId) {
       if(!categoriesObj[id]) throwErr(400, `文章属性 ID 错误，cid: ${id}`);
     }
   }
@@ -429,6 +436,7 @@ schema.statics.getHomeBlockData = async (props) => {
 schema.methods.updateThreadsId = async function() {
   const PostModel = mongoose.model('posts');
   const HomeBlock = mongoose.model('homeBlocks');
+  const ThreadCategoryModel = mongoose.model('threadCategories');
   const homeBlock = await HomeBlock.findOnly({_id: this._id});
   const {
     forumsId,
@@ -463,7 +471,50 @@ schema.methods.updateThreadsId = async function() {
     match.mainForumsId = {$in: forumsId};
   }
   if(tcId.length > 0) {
-    match.tcId = {$in: tcId};
+    const categoryTree = await ThreadCategoryModel.getCategoryTree();
+    const categoryTreeObj = {};
+    for(const c of categoryTree) {
+      categoryTreeObj[c._id] = c.nodes.map(n => n._id);
+    }
+    const categoryObj = {};
+    for(const id of tcId) {
+      let [categoryId, nodeId] = id.split('-');
+      if(!categoryObj[categoryId]) {
+        categoryObj[categoryId] = new Set();
+      }
+      if(categoryObj[categoryId].has(nodeId)) continue;
+      categoryObj[categoryId].add(nodeId);
+    }
+    for(let categoryId in categoryObj) {
+      if(!categoryObj.hasOwnProperty(categoryId)) continue;
+      if(!match.$and) {
+        match.$and = [];
+      }
+      let nodesId = categoryObj[categoryId];
+      categoryId = Number(categoryId);
+      const hasDefault = nodesId.has('default');
+      nodesId.delete('default');
+      nodesId = [...nodesId].map(n => Number(n));
+      if(hasDefault) {
+        const $or = [
+          {
+            tcId: {$nin: categoryTreeObj[categoryId]}
+          }
+        ];
+        if(nodesId.length > 0) {
+          $or.push({
+            tcId: {
+              $in: nodesId
+            }
+          })
+        }
+        match.$and.push({$or});
+      } else {
+        match.$and.push({
+          tcId: {$in: nodesId}
+        });
+      }
+    }
   }
   if(digest) {
     match.digest = true;

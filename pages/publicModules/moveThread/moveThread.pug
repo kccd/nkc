@@ -6,7 +6,7 @@
       .modal-header
         button.close(data-dismiss="modal" aria-label="Close")
           span(aria-hidden="true") &times;
-        h4.modal-title {{hideMoveType? '选择专业': '移动文章'}}
+        h4.modal-title {{mode === 'selector'? '选择专业': '移动文章'}}
       .modal-body
         .text-center.m-t-1.m-b-1(v-if="loading") 加载专业列表中...
         div(v-else)
@@ -19,10 +19,10 @@
               span(@click="showThreadType(forum)") {{forum.displayName}}
                 span(v-if="forum.selectedThreadType") ：{{forum.selectedThreadType.name}}
               .fa.fa-remove(@click="removeForum(index)")
-            .move-thread-thread-types(v-if="forum && forum.threadTypes && forum.threadTypes.length")
+            .move-thread-thread-types(v-if="forum && forum.threadTypes && forum.threadTypes.length && selectForumCategory")
               .move-thread-thread-type(@click="resetThreadType") 不分类
               .move-thread-thread-type(v-for="t in forum.threadTypes" @click="selectThreadType(t)") {{t.name}}
-            .m-t-05(v-if="!hideMoveType")
+            .m-t-05(v-if="mode === 'move'")
               div
                 b 移动方式：
                 .radio.inline-block.m-t-0
@@ -62,14 +62,14 @@
                   //img(:src='getUrl("forumLogo", f.logo)')
                   | {{f.displayName}}
                   .fa.fa-plus
-          .move-thread-category
+          .move-thread-category(v-if='mode === "move"')
             strong 更改属性
             thread-category-list(
               :categories='threadCategories'
               :tcid='selectedThreadCategoriesId'
               ref='threadCategoryList'
               )
-          .move-thread-options
+          .move-thread-options(v-if='mode === "move"')
             .checkbox
               label
                 input(type='checkbox' :value='true' v-model='remindUser')

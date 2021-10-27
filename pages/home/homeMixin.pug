@@ -197,17 +197,26 @@ mixin hiddenForm
           input.form-control(type='text' placeholder="请输入模块名称" value="" v-model="form.name")
       .form-group
         label.col-sm-3.control-label 专业筛选
-        .col-sm-9
+        .col-sm-9.p-t-05
           span.selected-forums(v-if="selectedForums.length")
-            span.selected-forum(v-for="(forum) in forums" :style=`'background-color:'+forum.color`) {{forum.displayName}}
-              span.fa.fa-close.remove-forum(@click="removeForum(forum.fid)")
-          span(v-else) 空空如也
+            span.selected-forum(v-for="(forum) in selectedForums" :style=`'background-color:'+forum.color`) {{forum.displayName}}
+              span.fa.fa-close.remove-forum(@click=`removeForum(forum.fid)`)
+          span(v-else) 默认选择全部专业
           button.btn.btn-default.btn-sm(type="button" @click="selectForums()") 选择
 
       .form-group
         label.col-sm-3.control-label 文章属性
         .col-sm-9
-          thread-category-list(:categories="threadCategories" :tcid="selectedHomeCategoriesId" ref='homeCategoryList')
+          .thread-categories
+            .thread-category(v-for='tc in threadCategories')
+              .h5.m-b-0 {{tc.name}}
+              .checkbox
+                label.m-r-1(v-for='node in tc.nodes')
+                  input(type='checkbox' :value='tc._id + "-" + node._id' v-model='form.tcId')
+                  span {{node.name}}
+                label
+                  input(type='checkbox' :value='tc._id + "-default"' v-model='form.tcId')
+                  span {{tc.nodeName}}
       .form-group
         label.col-sm-3.control-label 必须精选
         .col-sm-9
