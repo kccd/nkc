@@ -55,17 +55,22 @@ module.exports = {
     }
     if(resource.isFileExist) {
       let sourceHtml = '';
-      for(const s of resource.videoSize) {
-        const {height} = videoSize[s];
-        const url = getUrl('resource', rid, s);
-        sourceHtml += `<source src="${url}" type="video/mp4" size="${height}"> 你的浏览器不支持video标签，请升级。`;
+      let downloadHtml = '';
+      for(const {size, dataSize} of resource.videoSize) {
+        const {height} = videoSize[size];
+        const url = getUrl('resource', rid, size);
+        const downloadUrl = getUrl('resourceDownload', rid, size);
+        sourceHtml += `<source src="${url}" type="video/mp4" size="${height}" data-size="${dataSize}"> 你的浏览器不支持video标签，请升级。`;
+        downloadHtml += `<a href="${downloadUrl}" data-type="download" data-title="${oname}" target="_blank">${height}p(${dataSize})</a> `;
       }
       return `
       <span data-tag="nkcsource" data-type="video" data-id="${id}" data-visitor-access="${visitorAccess}">
-        <video class="plyr-dom" preload="none" controls="controls" poster="${poster}" data-rid="${rid}" data-plyr-title="${oname}">
-          ${sourceHtml}
-        </video>
-        <span class="nkcsource-video-title">${resource.oname} <span class="display-i-b text-danger" style="font-weight: 700">${getSize(resource.size)}</span></span>
+        <span>
+          <video class="plyr-dom" preload="none" controls="controls" poster="${poster}" data-rid="${rid}" data-plyr-title="${oname}">
+            ${sourceHtml}
+          </video>
+        </span>
+        <span class="nkcsource-video-title"><span>文件名：${resource.oname}&nbsp;</span><span>下载链接：${downloadHtml}</span></span>
       </span>
     `.trim();
     } else {

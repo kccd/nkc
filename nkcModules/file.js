@@ -479,6 +479,11 @@ exports.getFileExtension = async (file, extensions = []) => {
   return extension;
 }
 
+exports.getFileSizeByFilePath = async (filePath) => {
+  const stats = await fsPromise.stat(filePath);
+  return stats.size;
+}
+
 /*
 * 手动构建File对象
 * @param {String} filePath 文件路径

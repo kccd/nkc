@@ -95,6 +95,10 @@ var Tools = function() {
       case "resource": {
         return "/r/" + id + t
       }
+      // 用户上传的附件的下载链接
+      case "resourceDownload": {
+        return "/r/" + id + t + '&d=attachment'
+      }
       // 其他资源，包含avatar, banner等等
       case "attach": {
         return "/a/" + id
