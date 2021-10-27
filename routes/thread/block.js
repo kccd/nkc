@@ -5,11 +5,25 @@ router
     const {data, db, params, body} = ctx;
     const {tid} = params;
     const {blocksId} = body;
-    await db.HomeBlockModel.updateMany({_id: {$in: blocksId}}, {
-      $addToSet: {
-        fixedThreadsId: tid
+    const homeBlock = await db.HomeBlockModel.find({defaultBlock: false});
+    for(const block of homeBlock){
+      if(!block) break;
+      if(block.fixedThreadsId.includes(tid) && blocksId.includes(block._id)){
+        continue;
+      } else if (!block.fixedThreadsId.includes(tid) && blocksId.includes(block._id)){
+        await db.HomeBlockModel.updateOne({_id: block._id}, {
+          $addToSet: {
+            fixedThreadsId: tid
+          }
+        });
+      } else if(block.fixedThreadsId.includes(tid) && !blocksId.includes(block._id)) {
+        await db.HomeBlockModel.updateOne({_id: block._id}, {
+          $pull: {
+            fixedThreadsId: tid
+          }
+        });
       }
-    });
+    }
     await next();
   })
 module.exports = router;

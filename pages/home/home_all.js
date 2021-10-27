@@ -99,6 +99,7 @@ function create() {
     apps[vueAppId] = app;
   }
   app.showForm();
+  $('html, body').animate({scrollTop: $('#new_blockForm').offset().top - 56}, 500)
 }
 
 const apps = {};

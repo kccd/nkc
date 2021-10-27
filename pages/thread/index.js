@@ -1392,11 +1392,11 @@ function pushBlock(tid){
 				pushHomeBlockId(tid, id);
 				commonModel.close();
 			}, {
-				title: '推送文章到模块：',
+				title: '推送文章到模块',
 				data: [
 					{
 						dom: 'checkbox',
-						label: '推送到的模块',
+						label: '推送到的模块：',
 						value: pushTid,
 						checkboxes: data.homeBlocks
 					}
