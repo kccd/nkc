@@ -27,7 +27,7 @@ if !isIncluded('commonModal')
               .checkbox(v-if="d.dom === 'checkbox'")
                 label.m-r-05(v-for="r in d.checkboxes")
                   input(type="checkbox" :value="r._id" name="checkboxes" v-model="d.value")
-                  span {{r.name, r.hasId}}
+                  span {{r.name}}
         .modal-footer
           .options-button
             a(data-dismiss="modal") 关闭

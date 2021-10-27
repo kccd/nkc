@@ -5,7 +5,6 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const PATH = require('path');
 const fs = require("fs");
-const {getSize} = require("../nkcModules/tools");
 const fsPromises = fs.promises;
 const resourceSchema = new Schema({
 	rid: {

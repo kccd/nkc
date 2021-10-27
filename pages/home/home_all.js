@@ -384,10 +384,11 @@ function initVue(bid, type){
         window.MoveThread.open(function(res) {
           const {originForums, forumsId} = res;
           self.forums.push(...originForums);
-          for(const fid of forumsId) {
+          self.form.forumsId = forumsId;
+          /*for(const fid of forumsId) {
             if(self.form.forumsId.includes(fid)) continue;
             self.form.forumsId.push(fid);
-          }
+          }*/
           window.MoveThread.close();
         }, {
           hideMoveType: true,

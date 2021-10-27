@@ -87,7 +87,6 @@ function getCommonMask(type) {
 }
 
 function setVideoMask(player) {
-  console.log(player.elements.container)
   const nkcSource = getNkcSource(player.elements.container);
   const visitorAccess = getVisitorAccess(nkcSource);
   let mask;
