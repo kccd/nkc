@@ -4027,12 +4027,15 @@ span[data-tag="nkcsource"][data-type="picture"]>span>img.lazyloaded{
 
 /* 文章中的视频 新*/
 span[data-tag="nkcsource"][data-type="video"]{
+  //display: block;
+}
+span[data-tag="nkcsource"][data-type="video"]>span:first-child{
   width: 100%;
   padding-top: 75%;
   position: relative;
   display: block;
 }
-span[data-tag="nkcsource"][data-type="video"]>div{
+span[data-tag="nkcsource"][data-type="video"]>span:first-child>div{
   height: 100%;
   width: 100%;
   display: block;
@@ -4097,13 +4100,17 @@ span[data-tag="nkcsource"][data-type="audio"]{
   position: relative;
 }
 .nkcsource-video-title{
-  position: absolute;
-  display: block;
+  display: inline-block;
   left: 0;
   text-align: center;
-  height: 2rem;
   width: 100%;
   font-size: 1.2rem;
+  a{
+    text-decoration: underline;
+  }
+  span, a{
+    display: inline-block;
+  }
 }
 .nkcsource-audio-title{
   display: block;

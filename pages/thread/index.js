@@ -1372,10 +1372,16 @@ function pushHomeBlockId(tid, blocksId){
 }
 
 function pushBlock(tid){
-	nkcAPI('/nkc/home/block', 'get', {
+	nkcAPI('/nkc/home/block?tid='+tid, 'get', {
+		tid
 	})
 		.then(data => {
-			let pushTid=[];
+			let pushTid = [];
+			for(const d of data.homeBlocks){
+				if(d.hasId){
+					pushTid.push(d._id)
+				}
+			}
 			commonModel.open(data => {
 				let id = [];
 				for(const d of data){
@@ -1386,11 +1392,11 @@ function pushBlock(tid){
 				pushHomeBlockId(tid, id);
 				commonModel.close();
 			}, {
-				title: '推送文章到模块：',
+				title: '推送文章到模块',
 				data: [
 					{
 						dom: 'checkbox',
-						label: '推送到的模块',
+						label: '推送到的模块：',
 						value: pushTid,
 						checkboxes: data.homeBlocks
 					}

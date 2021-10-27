@@ -73,8 +73,12 @@ module.exports = async (options) => {
   // 是否需要进行手机号验证
   data.needVerifyPhoneNumber = await db.UsersPersonalModel.shouldVerifyPhoneNumber(state.uid);
 
+  //openReduceVisits
+  let forumsId = await db.ForumModel.getReadableForumsIdByUid(state.uid);
+  const forums = await db.ForumModel.find({openReduceVisits: false, fid: {$in: forumsId}}, {fid: 1});
+  forumsId = forums.map(f => f.fid);
   data.homeBlockData = await db.HomeBlockModel.getHomeBlockData({
-    fidOfCanGetThreads,
+    fidOfCanGetThreads: forumsId,
     showDisabledBlock: ctx.permission('nkcManagementHome')
   });
   // 多维分类

@@ -190,24 +190,33 @@ mixin renderHome(homeBlock)
 mixin hiddenForm
   .home-threads-editor(v-if="show" v-cloak)
     .p-t-3.p-b-3.text-center(v-if='loading') 加载中...
-    form.newBlock.form-horizontal(v-else :model="form")
+    .form.new-block.form-horizontal(v-else :model="form")
       .form-group
         label.col-sm-3.control-label 模块名称
         .col-sm-9
           input.form-control(type='text' placeholder="请输入模块名称" value="" v-model="form.name")
       .form-group
         label.col-sm-3.control-label 专业筛选
-        .col-sm-9
+        .col-sm-9.p-t-05
           span.selected-forums(v-if="selectedForums.length")
-            span.selected-forum(v-for="(forum) in forums" :style=`'background-color:'+forum.color`) {{forum.displayName}}
-              span.fa.fa-close.remove-forum(@click="removeForum(forum.fid)")
-          span(v-else) 空空如也
+            span.selected-forum(v-for="(forum) in selectedForums" :style=`'background-color:'+forum.color`) {{forum.displayName}}
+              span.fa.fa-close.remove-forum(@click=`removeForum(forum.fid)`)
+          span(v-else) 默认选择全部专业
           button.btn.btn-default.btn-sm(type="button" @click="selectForums()") 选择
 
       .form-group
         label.col-sm-3.control-label 文章属性
         .col-sm-9
-          thread-category-list(:categories="threadCategories" :tcid="selectedHomeCategoriesId" ref='homeCategoryList')
+          .thread-categories
+            .thread-category(v-for='tc in threadCategories')
+              .h5.m-b-0 {{tc.name}}
+              .checkbox
+                label.m-r-1(v-for='node in tc.nodes')
+                  input(type='checkbox' :value='tc._id + "-" + node._id' v-model='form.tcId')
+                  span {{node.name}}
+                label
+                  input(type='checkbox' :value='tc._id + "-default"' v-model='form.tcId')
+                  span {{tc.nodeName}}
       .form-group
         label.col-sm-3.control-label 必须精选
         .col-sm-9
@@ -306,7 +315,7 @@ mixin hiddenForm
         .col-sm-9
           input.form-control(type='text' placeholder="请输入自动推送文章入选条数" v-model.number="form.autoThreadCount")
       .form-group(v-if="showTid")
-        label.col-sm-3.control-label 自动选择的文章 ID
+        label.col-sm-3.control-label 自动选择的文章
         .col-sm-9
           .table-height
             .p-t-2.p-b-2.text-center(v-if="selectedAutoThreads.length === 0") 空空如也
@@ -314,7 +323,7 @@ mixin hiddenForm
               button.m-r-1.btn.btn-danger.btn-xs(@click=`delThreadId(item.tid, form.autoThreadsId)`) 删除
               a(:href="getUrl('thread',item.tid)" target="_blank") {{item.t}}
       .form-group(v-if="showTid")
-        label.col-sm-3.control-label 手动选择的文章 ID
+        label.col-sm-3.control-label 手动选择的文章
         .col-sm-9
           .table-height
             .p-t-2.p-b-2.text-center(v-if="selectedFixThreads.length === 0") 空空如也

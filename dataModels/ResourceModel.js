@@ -5,7 +5,7 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const PATH = require('path');
 const fs = require("fs");
-const fsPromise = fs.promises;
+const fsPromises = fs.promises;
 const resourceSchema = new Schema({
 	rid: {
     type: String,
@@ -175,6 +175,7 @@ resourceSchema.virtual('visitorAccess')
 resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['mediaPicture']) {
   if(excludedMediaTypes.includes(this.mediaType)) return;
   const SettingModel = mongoose.model('settings');
+  const {getSize} = require('../nkcModules/tools');
   const {visitorAccess} = await SettingModel.getSettings('download');
   const FILE = require('../nkcModules/file');
   this.visitorAccess = visitorAccess[this.mediaType];
@@ -183,9 +184,27 @@ resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['medi
     const hdVideoPath = await this.getFilePath('hd');
     const fhdVideoPath = await this.getFilePath('fhd');
     const videoSize = [];
-    if(await FILE.access(sdVideoPath)) videoSize.push('sd');
-    if(await FILE.access(hdVideoPath)) videoSize.push('hd');
-    if(await FILE.access(fhdVideoPath)) videoSize.push('fhd');
+    try{
+      const {size} = await fsPromises.stat(sdVideoPath);
+      videoSize.push({
+        size: 'sd',
+        dataSize: getSize(size, 1),
+      });
+    } catch(err) {}
+    try{
+      const {size} = await fsPromises.stat(hdVideoPath);
+      videoSize.push({
+        size: 'hd',
+        dataSize: getSize(size, 1),
+      });
+    } catch(err) {}
+    try{
+      const {size} = await fsPromises.stat(fhdVideoPath);
+      videoSize.push({
+        size: 'fhd',
+        dataSize: getSize(size, 1),
+      });
+    } catch(err) {}
     this.isFileExist = videoSize.length !== 0;
     this.videoSize = videoSize;
   } else {
@@ -718,7 +737,7 @@ resourceSchema.methods.removeResourceInfo = async function() {
   const outputFilePath = filePath + '_out' + `.${this.ext}`;
   await ffmpeg.clearMetadata(filePath, outputFilePath);
   //重命名文件
-  await fsPromise.rename(outputFilePath, filePath);
+  await fsPromises.rename(outputFilePath, filePath);
 }
 
 

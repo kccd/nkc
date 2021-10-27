@@ -29,8 +29,9 @@ if !isIncluded('homeForumList')
                     | &nbsp;
                     span(title=`更新/文章/回复`)
                       | (
-                      span.text-danger=f.countPostsToday
-                      | /
+                      if f.countPostsToday !== 0
+                        span.text-danger=f.countPostsToday
+                        | /
                       span=f.countThreads
                       | /
                       span=f.countPosts
@@ -68,7 +69,15 @@ if !isIncluded('homeForumList')
                   a(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
                   if disableChild
                     | &nbsp;
-                    span(title=`文章/回复`)=`(${f.countThreads}/${f.countPosts})`
+                    span(title=`文章/回复`)
+                      | (
+                      if f.countPostsToday !== 0
+                        span.text-danger=f.countPostsToday
+                        | /
+                      span=f.countThreads
+                      | /
+                      span=f.countPosts
+                      | )
                 .detailed-forum-panel-description(title=f.description class=disableChild? '':'parent')
                   span=f.description || '暂无简介'
           if f.childrenForums.length && !disableChild

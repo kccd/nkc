@@ -8,7 +8,9 @@ NKC.modules.MoveThread = function() {
   this_.app = new Vue({
     el: "#moduleMoveThreadApp",
     data: {
+      mode: 'move', // move, selector
       forums: [],
+      selectForumCategory: true,
       selectedForums: [],
       loading: true,
       moveType: "replace", // replace, add
@@ -132,7 +134,10 @@ NKC.modules.MoveThread = function() {
           });
         }
         if(forums.length === 0 && this.moveType === 'replace') return screenTopWarning("请至少选择一个专业");
-        const selectedThreadCategoriesId = this.getSelectedThreadCategoriesId();
+        let selectedThreadCategoriesId = [];
+        if(this.mode === 'move') {
+          selectedThreadCategoriesId = this.getSelectedThreadCategoriesId();
+        }
         this_.callback({
           forumsId: this.selectedForumsId,
           forums: forums,
@@ -160,7 +165,7 @@ NKC.modules.MoveThread = function() {
       }
     }
   });
-  this_.open = function(callback, options) {
+  this_.open = function(callback, options = {}) {
     this_.callback = callback;
     this_.dom.modal("show");
     nkcAPI("/f", "GET")
@@ -174,7 +179,9 @@ NKC.modules.MoveThread = function() {
         this_.app.loading = false;
         this_.app.forumCategories = data.forumCategories;
         this_.app.threadCategories = data.threadCategories;
+        this_.app.selectForumCategory = options.selectForumCategory;
         this_.app.selectedThreadCategoriesId = options.selectedThreadCategoriesId || [];
+        this_.app.mode = options.mode || 'move';
         if(!this_.app.forumType) this_.app.forumType = this_.app.forumCategories[0]._id;
         this_.app.forumCountLimit = 20;
         if(options) {
@@ -195,6 +202,7 @@ NKC.modules.MoveThread = function() {
           }
           if(options.hideMoveType) {
             this_.app.hideMoveType = true;
+            this_.app.mode = 'selector';
           }
           this_.app.showAnonymousCheckbox = options.showAnonymousCheckbox || false;
           if(options.forumCountLimit) this_.app.forumCountLimit = options.forumCountLimit;

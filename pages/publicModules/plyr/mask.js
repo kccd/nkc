@@ -13,7 +13,7 @@ NKC.methods.initAttachmentMask = function(nkcSource) {
 }
 
 function getNkcSource(container) {
-  return $(container).parent('[data-tag="nkcsource"]');
+  return $(container).parents('[data-tag="nkcsource"]');
 }
 
 function getVisitorAccess(nkcSource) {
@@ -43,20 +43,27 @@ function getVideoPreviewMask(player) {
   for(let i = 0; i < source.length; i++) {
     const element = source.eq(i);
     const size = element.attr('size');
-    sourceObj[size] = element.attr('src') + '&d=attachment';
+    const dataSize = element.attr('data-size');
+    sourceObj[size] = {
+      dataSize,
+      url: element.attr('src') + '&d=attachment'
+    };
   }
   // 修改遮罩上的下载按钮
   for(let i = 0; i < maskDownloadButton.length; i++) {
     const element = maskDownloadButton.eq(i);
     const size = element.attr('data-video-size');
-    const url = sourceObj[size];
+    const {url, dataSize} = sourceObj[size];
     if(!url) continue;
+    // const dataSizeDom = $("<span></span>");
+    // dataSizeDom.text(' ' + dataSize);
     element
       .attr('href', url)
       .attr('data-title', title)
       .attr('title', `点击下载 ${title}`)
       .attr('data-type', 'download')
       .removeClass('hidden')
+      // .append(dataSizeDom);
   }
   maskPlayButton.on("click", () => {
     mask.remove();
