@@ -315,7 +315,7 @@ mixin hiddenForm
         .col-sm-9
           input.form-control(type='text' placeholder="请输入自动推送文章入选条数" v-model.number="form.autoThreadCount")
       .form-group(v-if="showTid")
-        label.col-sm-3.control-label 自动选择的文章 ID
+        label.col-sm-3.control-label 自动选择的文章
         .col-sm-9
           .table-height
             .p-t-2.p-b-2.text-center(v-if="selectedAutoThreads.length === 0") 空空如也
@@ -323,7 +323,7 @@ mixin hiddenForm
               button.m-r-1.btn.btn-danger.btn-xs(@click=`delThreadId(item.tid, form.autoThreadsId)`) 删除
               a(:href="getUrl('thread',item.tid)" target="_blank") {{item.t}}
       .form-group(v-if="showTid")
-        label.col-sm-3.control-label 手动选择的文章 ID
+        label.col-sm-3.control-label 手动选择的文章
         .col-sm-9
           .table-height
             .p-t-2.p-b-2.text-center(v-if="selectedFixThreads.length === 0") 空空如也
