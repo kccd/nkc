@@ -355,12 +355,11 @@ schema.methods.extendData = async function(fidOfCanGetThreads) {
     sortObj.voteUp = -1;
   }
   let threads;
-  let firstThreads = ThreadModel.find(findObj);
   if(sort === 'random'){
-    threads = await firstThreads;
-    apiFunction.arrayShuffle(threads);
+    threads = await ThreadModel.find(findObj);
+    threads = apiFunction.arrayShuffle(threads);
   } else {
-    threads = await firstThreads.sort(sortObj);
+    threads = await ThreadModel.find(findObj).sort(sortObj);
   }
   threads = await ThreadModel.extendThreads(threads, {
     category: true,

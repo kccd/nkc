@@ -92,7 +92,7 @@ function changeOrder(){
 }
 
 function create() {
-  $('html, body').animate({scrollTop: $('body').offset().top - 56}, 500)
+  scrollToTop();
   const vueAppId = getVueAppId('new_blockForm');
   let app = apps[vueAppId];
   if(!app) {
