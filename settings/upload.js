@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const {mkdirSync} = fs;
-
+const uploadConfig = require('../config/upload.json');
 const paths = {
   configDir: 'config',
   keyDir: 'key',
@@ -95,7 +95,7 @@ const uploadSettings = {
     multipart: true,
     formidable: {
       maxFields: 20,
-	    maxFileSize: 1024*1024*1024,
+	    maxFileSize: uploadConfig.maxFileSize,
       uploadDir: pathsObj.uploadDir,
       hash: 'md5',
       keepExtensions: true
