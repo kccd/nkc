@@ -60,7 +60,7 @@ router
     let q = {};
     let threadListType;
     if(t) {
-      if(!["latest", "recommend", "subscribe", "column", "home"].includes(t)) t = '';
+      if(!["latest", "recommend", "subscribe", "column", "home", "post"].includes(t)) t = '';
       if(t === "subscribe" && !user) t = '';
       threadListType =  t;
     }
@@ -443,6 +443,8 @@ router
         reviewed: true,
         inColumn: true
       }
+    } else if(threadListType === "post") {
+
     }
     data.threads = [];
     let threads = [];
