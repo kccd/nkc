@@ -28,4 +28,23 @@ router
     });
     await next();
   })
+  .get('/', async (ctx, next) => {
+    const {db, data, params} = ctx;
+    const homeBlock =  await db.HomeBlockModel.find({});
+    const {tid} = params;
+    let homeBlockId = [];
+    for(const block of homeBlock){
+      if(block.defaultBlock) continue;
+      let obj = {
+        name: block.name,
+        _id: block._id,
+        hasId: block.fixedThreadsId.includes(tid)
+      };
+      homeBlockId.push(obj);
+    }
+    console.log(tid);
+    console.log(homeBlockId);
+    data.homeBlocks = homeBlockId;
+    await next();
+  })
 module.exports = router;

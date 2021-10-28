@@ -21,6 +21,7 @@ module.exports = {
 		},
 		block: {
 			POST: 'pushThread',
+			GET:	'pushThread'
 		},
 		hometop: {
 			GET: "homeTop",
