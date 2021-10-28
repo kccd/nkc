@@ -39,6 +39,7 @@ $(function() {
   });
 });
 function initSortable() {
+  if(NKC.configs.isApp) return;
   const masterContainerL = document.getElementsByClassName('home-categories-left')[0];
   new Sortable(masterContainerL, {
     group: 'master',
