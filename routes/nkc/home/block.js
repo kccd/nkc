@@ -23,7 +23,7 @@ router
       threadCount,
       disabled,
       fixedThreadCount,
-      autoThreadCount,
+      autoThread,
       fixedThreadsId,
       sort
     } = block;
@@ -51,7 +51,7 @@ router
       disabled,
       blockStyle,
       fixedThreadCount,
-      autoThreadCount,
+      autoThread,
       fixedThreadsId,
       sort
     });
@@ -101,7 +101,7 @@ router
       const obj = {
         name: block.name,
         _id: block._id,
-        hasId: block.fixedThreadsId.includes(tid)?true:false
+        hasId: block.fixedThreadsId.includes(tid)
       };
       homeBlockId.push(obj);
     }
@@ -152,7 +152,7 @@ router
       disabled,
       blockStyle,
       fixedThreadCount,
-      autoThreadCount,
+      autoThread,
       fixedThreadsId,
       sort
     } = block;
@@ -179,7 +179,7 @@ router
         disabled,
         blockStyle,
         fixedThreadCount,
-        autoThreadCount,
+        autoThread,
         fixedThreadsId,
         sort
       }

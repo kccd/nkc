@@ -163,6 +163,12 @@ function initVue(bid, type){
         disabled: false,
         fixedThreadCount: 0,
         autoThreadCount: 50,
+        autoThread: [
+          {
+            sort: 'random',
+            count: 20
+          }
+        ],
         autoThreadsId: [],
         fixedThreadsId: [],
         sort: 'random',
@@ -358,6 +364,15 @@ function initVue(bid, type){
             }*/
           ]
         })
+      },
+      addAutoThreadItem() {
+        this.form.autoThread.push({
+          sort: 'random',
+          count: 20
+        });
+      },
+      removeFromArray(arr, index) {
+        arr.splice(index, 1);
       },
       //移除选中的专业
       removeForum(fid){
