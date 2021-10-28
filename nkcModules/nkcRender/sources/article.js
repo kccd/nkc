@@ -70,7 +70,7 @@ module.exports = {
             ${sourceHtml}
           </video>
         </span>
-        <span class="nkcsource-video-title"><span>文件名：${resource.oname}&nbsp;</span><span>下载链接：${downloadHtml}</span></span>
+        <span class="nkcsource-video-title" data-title="${resource.oname}"><span>文件名：${resource.oname}&nbsp;</span><span>下载链接：${downloadHtml}</span></span>
       </span>
     `.trim();
     } else {
