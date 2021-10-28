@@ -188,21 +188,21 @@ resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['medi
       const {size} = await fsPromises.stat(sdVideoPath);
       videoSize.push({
         size: 'sd',
-        dataSize: getSize(size, 1),
+        dataSize: getSize(size, 0),
       });
     } catch(err) {}
     try{
       const {size} = await fsPromises.stat(hdVideoPath);
       videoSize.push({
         size: 'hd',
-        dataSize: getSize(size, 1),
+        dataSize: getSize(size, 0),
       });
     } catch(err) {}
     try{
       const {size} = await fsPromises.stat(fhdVideoPath);
       videoSize.push({
         size: 'fhd',
-        dataSize: getSize(size, 1),
+        dataSize: getSize(size, 0),
       });
     } catch(err) {}
     this.isFileExist = videoSize.length !== 0;

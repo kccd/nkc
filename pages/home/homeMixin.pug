@@ -311,9 +311,28 @@ mixin hiddenForm
         .col-sm-9
           input.form-control(type='text' placeholder="请输入手动推送文章显示条数" v-model.number="form.fixedThreadCount")
       .form-group
-        label.col-sm-3.control-label 自动推送入选条数
+        label.col-sm-3.control-label 自动推送入选条件
         .col-sm-9
-          input.form-control(type='text' placeholder="请输入自动推送文章入选条数" v-model.number="form.autoThreadCount")
+          .p-a-05.bg-info(v-for='(a, index) in form.autoThread')
+            h5.m-t-0.m-b-05 \#{{index + 1}}
+              button.pull-right.btn.btn-danger.btn-xs(v-if='index !== 0' @click='removeFromArray(form.autoThread, index)') 删除
+            span 入选排序：
+            .m-b-1
+              .radio
+                label.m-r-1
+                  input(type="radio" v-model="a.sort" value="random")
+                  | 随机
+                label.m-r-1
+                  input(type="radio" v-model="a.sort" value="toc")
+                  | 发表时间
+                label
+                  input(type="radio" v-model="a.sort" value="voteUpCount")
+                  | 点赞数
+            .m-b-05
+              span 入选条数：
+            input.form-control(type='text' placeholder="请输入入选条数" v-model.number="a.count")
+          .m-t-05
+            button.btn.btn-default.btn-xs(@click='addAutoThreadItem') 添加
       .form-group(v-if="showTid")
         label.col-sm-3.control-label 自动选择的文章
         .col-sm-9
@@ -340,6 +359,9 @@ mixin hiddenForm
             label.m-r-1
               input(type="radio" v-model="form.sort" name="sort" value="toc")
               | 发表时间
+            label.m-r-1
+              input(type="radio" v-model="form.sort" name="sort" value="tlm")
+              | 回复时间
             label.m-r-1
               input(type="radio" v-model="form.sort" name="sort" value="postCount")
               | 回复数

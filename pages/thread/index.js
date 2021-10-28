@@ -1372,8 +1372,7 @@ function pushHomeBlockId(tid, blocksId){
 }
 
 function pushBlock(tid){
-	nkcAPI('/nkc/home/block?tid='+tid, 'get', {
-		tid
+	nkcAPI(`/t/${tid}/block`, 'get', {
 	})
 		.then(data => {
 			let pushTid = [];
