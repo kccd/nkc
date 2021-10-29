@@ -567,7 +567,9 @@ schema.methods.updateThreadsId = async function() {
       {
         $project: {
           pid: 1,
-          tid: 1
+          tid: 1,
+          toc: 1,
+          voteUp: 1
         }
       }
     ];
