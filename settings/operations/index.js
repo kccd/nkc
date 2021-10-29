@@ -79,6 +79,7 @@ const verifications = require('./verifications');
 const payment = require('./payment');
 const link = require('./link');
 const community = require('./community');
+const pim = require('./pim');
 const operationObj = {};
 
 
@@ -271,6 +272,7 @@ operationObj.operationTree = {
 		payment, // 支付相关
 		l: link, // 外链跳转
     c: community, // 社区
+    pim, // 产品管理系统
     test,
 	}
 };
