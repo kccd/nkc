@@ -10,6 +10,8 @@ if !isIncluded('homeForumList')
             span |
           //-style=`background-color: ${f.color}`
           a.home-forums-child(href=`/f/${cf.fid}` data-float-fid=cf.fid style=`background-color: ${hexToRgba(f.color, 0.1)}`)=cf.displayName
+            if cf.countPostsToday && cf.countPostsToday > 0
+              sup=cf.countPostsToday
   mixin detailedForumList(f, disableChild)
     -f.childrenForums = f.childrenForums || [];
     .detailed-forums-body

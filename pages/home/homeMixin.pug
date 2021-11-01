@@ -164,6 +164,8 @@ mixin renderHome(homeBlock)
                     if index !== 0
                       span |
                     a.home-forums-child(href=`/f/${cf.fid}` data-float-fid=cf.fid style=`background-color: ${hexToRgba(f.color, 0.1)}`)=cf.displayName
+                      if cf.countPostsToday && cf.countPostsToday > 0
+                        sup=cf.countPostsToday
   else if homeBlock._id === 'management'
     if permissionsOr(["nkcManagement", "visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs"])
       .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
