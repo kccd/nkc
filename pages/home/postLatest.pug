@@ -1,0 +1,75 @@
+if !isIncluded('postActivity')
+  +includeCSS('/home/postActivity.css')
+  mixin postlatest(props)
+    -var {from, user, quote, title, content, toc, cover, url, type, parentPostId, parentPost} = props;
+    mixin postActivityHeader(headerData)
+      -var {toc, type} = headerData;
+      .post-activity-header(class=headerData.from?'post-activity-main-header':'')
+        .post-activity-avatar
+          if headerData.user.avatar
+            img(src=headerData.user.avatar)
+          else
+            div(style=`background-color: ${headerData.user.color}`)
+        .post-activity-user
+          if headerData.user.homeUrl
+            a(
+              href=headerData.user.homeUrl target="_blank"
+              data-float-uid=headerData.user.dataFloatUid || undefined
+              data-float-fid=headerData.user.dataFloatFid || undefined
+            ).post-activity-username=headerData.user.name
+          else
+            .post-activity-username=headerData.user.name
+          if !headerData.from
+            +fromNow(toc)
+            span &nbsp;
+          if headerData.from
+            span.post-activity-from=`${headerData.from}`
+          if headerData.from
+            .post-activity-time-sm
+              +fromNow(toc)
+    mixin postActivityContent(contentData)
+      -var {cover, title, content, url} = contentData;
+      .post-activity-content
+        if title
+          a(href=url target="_blank").post-activity-title=title
+        .post-activity-content-container(class=cover? 'cover':'')
+          if content
+            a(href=url target="_blank").post-activity-abstract=content
+          if cover
+            .post-activity-cover(style=`background-image: url(${cover})`)
+    mixin postPostsContent(contentData, parentPost)
+      -var {cover, title, content, url} = contentData;
+      -var {postUrl} = parentPost;
+      .post-activity-content
+        .post-activity-content-container
+          if postUrl
+            div
+              a(href=postUrl target="_blank").post-post-abstract=parentPost.c
+          else
+            div
+              a(href=url target="_blank").post-post-abstract=parentPost.c
+          if title
+            div
+              a(href=url target="_blank").post-post-title=`发表于《${title}》`
+          //if cover
+          //  .post-activity-cover(style=`background-image: url(${cover})`)
+    if parentPostId === ''
+      .post-activity
+        .post-activity-content
+          +postActivityHeader({from, user, toc, type})
+          +postActivityContent({title, content, cover, url})
+        if quote
+          .post-activity-content.post-activity-quote
+            +postActivityHeader(quote)
+            +postPostsContent(quote, '')
+    else
+      .post-activity
+        .post-activity-content
+          +postActivityHeader({from, user, toc, type})
+          -console.log(url);
+          +postActivityContent({title, content, cover, url})
+        if quote
+          .post-activity-content.post-activity-quote
+            +postActivityHeader({user: parentPost.user, toc: parentPost.toc})
+            +postPostsContent(quote, parentPost)
+

@@ -111,6 +111,7 @@ module.exports = {
       postCount: 0,
       minSubscriptionCount: 0,
     },
-    toppedColumnsId: []
+    toppedColumnsId: [],
+    latestOrder: 'releasePost' //首页最新排序方式
   }
 };

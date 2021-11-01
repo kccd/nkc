@@ -74,7 +74,26 @@
     color: #000;
     .hideText(@line: 3);
   }
-  .post-activity-title{
+  .post-post-abstract {
+    max-height: @coverHeight;
+    font-size: 1.25rem;
+    overflow: hidden;
+    text-decoration: none;
+    color: #000;
+    .hideText(@line: 3);
+  }
+  .post-post-title {
+    margin-top: 1rem;
+    font-weight: 700;
+    color: #000;
+    text-decoration: none;
+    transition: border-bottom 200ms;
+    border-bottom: 1px solid transparent;
+    &:hover{
+      border-bottom: 1px solid #000;
+    }
+  }
+    .post-activity-title{
     font-size: 1.5rem;
     font-weight: 700;
     color: #000;

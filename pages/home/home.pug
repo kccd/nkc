@@ -72,7 +72,7 @@ block content
             if !(state.isApp && state.platform === 'reactNative')
               include ../publicModules/mobile_drawer/right_drawer
 
-            -let showPagingSortButton = true;
+            -let showPagingSortButton = false;
             if canManagement
               .paging-button
                 a.button.radius-left.radius-right(onclick="managementThreads()") 管理
@@ -83,10 +83,12 @@ block content
             if (data.t === "latest" || data.t === "column" || data.t === "recommend") && state.platform !== 'reactNative'
               .paging-button
                 a.radius-left.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "" data-type="reload") 回复
+                a.button(href=`/?t=appLatest` class=data.t === "appLatest" ? "active" : "" data-type="reload") app回复
                 a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "" data-type="reload") 文章
                 a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "" data-type="reload") 专栏
 
             if data.t === "subscribe"
+              -console.log(data.activity[0].quote)
               if !data.activity || data.activity.length === 0
                 .p-t-5.p-b-5.text-center
                   h4
@@ -97,6 +99,18 @@ block content
                 include ./postActivity
                   for a in data.activity
                     +postActivity(a)
+                include ../publicModules/paging/paging_input
+            else if data.t === "appLatest"
+              if !data.posts || data.posts.length === 0
+                .p-t-5.p-b-5.text-center
+                  h4
+                    b 空空如也~
+              else
+                -showPagingSortButton = false;
+                include ../publicModules/paging/paging
+                include ./postlatest
+                  for a in data.posts
+                    +postlatest(a)
                 include ../publicModules/paging/paging_input
             else
               if !data.threads.length && !data.latestToppedThreads.length

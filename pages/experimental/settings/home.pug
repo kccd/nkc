@@ -36,23 +36,14 @@ block eContent
             .col-xs-12.col-md-12
               .form
                 .form-group
-                  h4.setting-block-title 首页可显示文章的专业类型
-                  .checkbox
-                    span 话题
-                    label
-                      input(type='checkbox' value="topic" v-model="list")
-                    span 学科
-                    label
-                      input(type='checkbox' value="discipline" v-model="list")
-                .form-group
-                  h4.setting-block-title 游客首页
+                  h4.setting-block-title 首页最新排序
                   .radioBox
-                    span 最新
+                    span 文章发布时间
                     label
-                      input(type='radio' value="latest" v-model="homeSettings.visitorThreadList")
-                    span.m-l-1 主页
+                      input(type='radio' value="releaseToc" v-model="homeSettings.latestOrder")
+                    span.m-l-1 最新回复
                     label
-                      input(type='radio' value="home" v-model="homeSettings.visitorThreadList")
+                      input(type='radio' value="releasePost" v-model="homeSettings.latestOrder")
                 .form-group.form-inline
                   h4.setting-block-title 热门文章
                   h5 回复数不低于：

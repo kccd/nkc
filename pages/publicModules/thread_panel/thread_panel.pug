@@ -257,6 +257,11 @@ mixin threadCategories
             else if !ellipsis
               span.thread-title-page ...
               -ellipsis = true;
+        if thread.columns && thread.columns.length !== 0
+          div.thread-columns
+            | 专栏：
+            for column in thread.columns
+              a(href=`/m/${column._id}` target="_blank")=column.name
         .thread-panel-abstract
           if postCoverPosition === 'left'
             +minThreadCover('p-r-1')

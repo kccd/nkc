@@ -302,6 +302,30 @@ postSchema.virtual('reason')
     this._reason = reason
   });
 
+postSchema.virtual('parentPost')
+  .get(function() {
+    return this._parentPost
+  })
+  .set(function(parentPost) {
+    this._parentPost = parentPost
+  });
+
+postSchema.virtual('thread')
+  .get(function() {
+    return this._thread
+  })
+  .set(function(thread) {
+    this._thread = thread
+  });
+
+postSchema.virtual('lastPost')
+  .get(function() {
+    return this._lastPost
+  })
+  .set(function(lastPost) {
+    this._lastPost = lastPost
+  });
+
 postSchema.virtual('url')
   .get(function() {
     return this._url
@@ -342,13 +366,14 @@ postSchema.virtual('resources')
     this._resources = rs
   });
 
-postSchema.virtual('thread')
+postSchema.virtual('from')
   .get(function() {
-    return this._thread
+    return this._from
   })
   .set(function(t) {
-    this._thread = t
+    this._from = t
   });
+
 postSchema.virtual('usersVote')
   .get(function() {
     return this._usersVote
@@ -1771,7 +1796,8 @@ postSchema.statics.extendActivityPosts = async (posts) => {
     c: 1,
     anonymous: 1,
     toc: 1,
-    cover: 1
+    cover: 1,
+    parentPostId: 1,
   });
   for(const fp of firstPosts) {
     usersId.add(fp.uid);
@@ -1800,6 +1826,7 @@ postSchema.statics.extendActivityPosts = async (posts) => {
       anonymous,
       cover,
       mainForumsId,
+      parentPostId
     } = post;
     let user;
     if(anonymous) {
@@ -1840,7 +1867,8 @@ postSchema.statics.extendActivityPosts = async (posts) => {
       content: nkcRender.htmlToPlain(c, 200),
       cover: cover? tools.getUrl('postCover', cover):null,
       forumsId: mainForumsId,
-      quote
+      quote,
+      parentPostId: parentPostId,
     });
   }
   return results;
@@ -1867,5 +1895,67 @@ postSchema.statics.checkPostCommentPermission = async (pid, type) => {
     return ['rw'].includes(post.comment);
   }
 };
+
+/*
+* 拓展评论的上级评论
+* */
+
+postSchema.statics.extendPostParent = async (posts) => {
+  const PostMode = mongoose.model('posts');
+  const parentPostIds = new Set();
+  const postObj = {};
+  for(const post of posts){
+    if(post.parentPostId !== ''){
+      parentPostIds.add(post.parentPostId)
+    }
+  }
+  const parentPosts = await PostMode.find({pid:{$in:[...parentPostIds]}});
+  for(const post of parentPosts){
+    postObj[post.pid] = post;
+  }
+  for(const post of posts){
+    if(post.parentPostId !== ''){
+      post.parentPost = postObj[post.parentPostId];
+    }
+  }
+  return posts;
+};
+
+/*
+*  拓展父级评论的user
+* */
+
+postSchema.statics.extendPostParentUser = async (posts) => {
+  const tools = require('../nkcModules/tools');
+  const UserModel = mongoose.model('users');
+  const postsId =new Set();
+  const usersObj = {};
+  for(const post of posts){
+    if(post.parentPost){
+      postsId.add(post.parentPost.uid);
+    }
+  }
+  const postUsers = await UserModel.find({uid: {$in: [...postsId]}});
+  for(const user of postUsers){
+    const {uid, avatar, username, certs} = user;
+    usersObj[user.uid] = {
+      uid,
+      avatar: tools.getUrl('userAvatar', avatar),
+      name: username,
+      banned: certs.includes("banned")
+    };
+  }
+  for(const post of posts){
+    if(post.parentPostId !== ''){
+      if(post.parentPost){
+        post.parentPost.user = usersObj[post.parentPost.uid];
+        post.parentPost.user.homeUrl = tools.getUrl('userHome', post.parentPost.user.uid);
+        post.parentPost.user.dataFloatUid = post.parentPost.user.uid;
+        post.parentPost.postUrl = tools.getUrl('post', post.parentPost.pid);
+      }
+    }
+  }
+  return posts;
+}
 
 module.exports = mongoose.model('posts', postSchema);

@@ -60,7 +60,7 @@ router
     let q = {};
     let threadListType;
     if(t) {
-      if(!["latest", "recommend", "subscribe", "column", "home"].includes(t)) t = '';
+      if(!["latest", "recommend", "subscribe", "column", "home", "appLatest"].includes(t)) t = '';
       if(t === "subscribe" && !user) t = '';
       threadListType =  t;
     }
@@ -183,6 +183,7 @@ router
         },
         disabled: false*/
       };
+
       if(user) {
         if(!ctx.permission("superModerator")) {
           const canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
@@ -205,10 +206,87 @@ router
       } else {
         q.reviewed = true;
       }
-
       // 最新页置顶文章
       data.latestToppedThreads = await db.ThreadModel.getLatestToppedThreads(fidOfCanGetThreads);
 
+    } else if(threadListType === "appLatest") {
+      let threadsObj = {};
+      q = {
+        mainForumsId: {
+          $in: fidOfCanGetThreads
+        },
+        disabled: false
+      };
+      const count = await db.PostModel.countDocuments(q);
+      paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
+      let posts = await db.PostModel.find({type: "post"}).sort({toc: -1})
+        .sort({toc: -1})
+        .skip(paging.start)
+        .limit(paging.perpage);
+      let threads = await db.ThreadModel.find({tid: {$in: posts.map(post => post.tid)}});
+      threads = await db.ThreadModel.extendThreads(threads, {
+        htmlToText: true,
+        removeLink: true,
+      });
+      threads.map(thread => {
+        threadsObj[thread.tid] = thread;
+      });
+      posts = await db.PostModel.extendActivityPosts(posts);
+      posts = await db.PostModel.extendPostParent(posts);
+      posts = await db.PostModel.extendPostParentUser(posts);
+      data.posts = [];
+      for(let post of posts){
+        const p = threadsObj[post.tid];
+        post.thread = p;
+        post.lastPost = p.lastPost;
+        // post.from = post.parentPostId === ''?'发表回复':'发表评论'
+        let {
+          pid,
+          tid,
+          user,
+          parentPostId,
+          toc,
+          url,
+          title,
+          content,
+          cover,
+          forumsId,
+          quote,
+          parentPost
+        } = post;
+        if(parentPost) {
+          let {c, uid} = parentPost;
+          c = nkcModules.nkcRender.htmlToPlain(c, 100);
+          parentPost.c = c;
+          parentPost.homeUrl = nkcModules.tools.getUrl('userHome', uid);
+        }
+        if(user.uid !== null) user.homeUrl = nkcModules.tools.getUrl('userHome', user.uid);
+        user.name = user.username;
+        user.id = user.uid;
+        user.dataFloatUid = user.uid;
+        if(quote !== null) {
+          if(quote.user.uid !== null) quote.user.homeUrl = nkcModules.tools.getUrl('userHome', quote.user.uid);
+          quote.user.id = quote.user.uid;
+          quote.user.name = quote.user.username;
+          quote.user.dataFloatUid = quote.user.uid;
+        }
+
+        let a;
+        let postType = parentPostId === ''? '回复': '评论'
+          a = {
+            toc,
+            parentPostId,
+            from: `发表${postType}`,
+            title,
+            content,
+            url,
+            cover,
+            user,
+            quote,
+            parentPost
+          }
+        data.posts.push(a);
+      }
     } else if(threadListType === "subscribe") {
       const columnsObj = {};
       const columnPostsObj = {};
@@ -448,9 +526,11 @@ router
     let threads = [];
     if(threadListType !== 'subscribe') {
       const count = await db.ThreadModel.countDocuments(q);
+      const homeLatestOrder = await db.SettingModel.findOne({_id: 'home'});
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
       let sort = {tlm: -1};
       if(s === "toc") sort = {toc: -1};
+      if(homeLatestOrder.c.latestOrder === 'releaseToc') sort = {toc: -1};
       threads = await db.ThreadModel.find(q, {
         uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
         tlm: 1, fid: 1, hasCover: 1,
@@ -462,7 +542,8 @@ router
       }).skip(paging.start).limit(paging.perpage).sort(sort);
       threads = await db.ThreadModel.extendThreads(threads, {
         htmlToText: true,
-        removeLink: true
+        removeLink: true,
+        extendColumns: t === 'column'?true:false
       });
     }
     const superModerator = ctx.permission("superModerator");
@@ -489,6 +570,7 @@ router
           continue;
         }
       }
+
       if(threadListType === "subscribe") {
         if(data.user.uid === thread.uid) {
           thread.from = "own";
