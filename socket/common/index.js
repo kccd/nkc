@@ -30,7 +30,7 @@ module.exports = async (io) => {
 
   // 启动时修改所有用户的状态为离线
   if(global.NKC.processId === 0) {
-    await db.UserModel.updateMany({online: true}, {
+    await db.UserModel.updateMany({online: {$ne: ''}}, {
       $set: {
         online: ''
       }

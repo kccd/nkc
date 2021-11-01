@@ -194,7 +194,6 @@ schema.statics.checkBlockValue = async (block) => {
   const {
     name,
     forumsId,
-    tcId,
     postCountMin,
     voteUpMin,
     voteUpTotalMin,
@@ -223,20 +222,20 @@ schema.statics.checkBlockValue = async (block) => {
       if(!forumsObj[fid]) throwErr(400, `专业 ID 错误，fid: ${fid}`);
     }
   }
-  if(tcId.length > 0) {
-    let categoriesId = new Set();
-    for(const id of tcId) {
-      const [categoryId, nodeId] = id.split('-');
-      categoriesId.add(categoryId);
-      if(nodeId !== 'default') categoriesId.add(nodeId);
-    }
-    categoriesId = [...categoriesId];
-    const categories = await ThreadCategoryModel.find({_id: {$in: categoriesId}}, {_id: 1});
+  if(block.tcId.length > 0) {
+    const tcId = [];
+    const categories = await ThreadCategoryModel.find({}, {_id: 1});
     const categoriesObj = {};
     categories.map(c => categoriesObj[c._id] = true);
-    for(const id of categoriesId) {
-      if(!categoriesObj[id]) throwErr(400, `文章属性 ID 错误，cid: ${id}`);
+    for(const id of block.tcId) {
+      const [categoryId, nodeId] = id.split('-');
+      if(
+        categoriesObj[categoryId]
+        && (nodeId === 'default' || categoriesObj[nodeId])
+      ) tcId.push(id);
     }
+    block.tcId.length = 0;
+    block.tcId.push(...tcId);
   }
   checkNumber(postCountMin, {
     name: '最小回复数',

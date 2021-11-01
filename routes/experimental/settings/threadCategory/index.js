@@ -136,37 +136,6 @@ router
     const {params, db} = ctx;
     const {cid} = params;
     const category = await db.ThreadCategoryModel.findOnly({_id: cid});
-    const nodes = await db.ThreadCategoryModel.find({cid});
-    const categoriesId = [category._id];
-    nodes.map(n => categoriesId.push(n._id));
-    await db.ThreadModel.updateMany({
-      tcId: {$in: categoriesId}
-    }, {
-      $pull: {
-        tcId: {
-          $in: categoriesId
-        }
-      }
-    });
-    await db.PostModel.updateMany({
-      tcId: {$in: categoriesId}
-    }, {
-      $pull: {
-        tcId: {
-          $in: categoriesId
-        }
-      }
-    });
-    await db.DraftModel.updateMany({
-      tcId: {$in: categoriesId}
-    }, {
-      $pull: {
-        tcId: {
-          $in: categoriesId
-        }
-      }
-    });
-    await db.ThreadCategoryModel.deleteMany({_id: {$in: categoriesId}});
-
+    await category.deleteAndClearReference();
     await next();
   });

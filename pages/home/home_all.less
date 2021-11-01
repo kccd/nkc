@@ -676,6 +676,15 @@ footer.footer{
     color: #000;
     margin: 0 0.3rem;
     //background-color: #dbeef3;
+    @countHeight: 1.2rem;
+    sup{
+      font-size: 1.2rem;
+      margin-left: 0.3rem;
+      color: @accent;
+      &:before{
+        content: '+';
+      }
+    }
   }
   .home-forums-parent-name{
     font-size: 1.3rem;

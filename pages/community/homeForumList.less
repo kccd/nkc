@@ -12,6 +12,16 @@
     color: #000;
     margin: 0 0.3rem;
     //background-color: #dbeef3;
+    position: relative;
+    @countHeight: 1.2rem;
+    sup{
+      font-size: 1.2rem;
+      margin-left: 0.3rem;
+      color: @accent;
+      &:before{
+        content: '+';
+      }
+    }
   }
 }
 .home-forums-body{
