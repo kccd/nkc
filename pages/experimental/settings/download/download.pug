@@ -187,7 +187,9 @@ block eContent
           span 免费下载附件：
           input.form-control.m-r-05(type='text' v-model.number="settings.freeTime")
           span 小时内重复下载附件免费
-      .col-xs-12.col-md-12
+      .col-xs-12.col-md-6.m-b-2
+        .h4 下载注意事项：
+        textarea.form-control.m-r-05(v-model.number="settings.warning" rows=6)
         .m-t-1
           button.btn.btn-primary(@click='save') 保存
 block scripts

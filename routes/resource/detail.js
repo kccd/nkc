@@ -2,40 +2,37 @@ const router = require("koa-router")();
 router
   // 附件详情
   .get("/", async (ctx, next) => {
-    const {data, db, params} = ctx;
+    const {data, db} = ctx;
     const {user} = data;
-    const detail = {};
-    data.detail = detail;
+    const {resource} = data;
     // 附件对象
-    const {rid} = params;
-    const resource = await db.ResourceModel.findOne({rid, type: "resource"});
     // 文件下载限制信息
-    detail.fileCountLimitInfo = await db.SettingModel.getDownloadFileCountLimitInfoByUser(user);
+    data.fileCountLimitInfo = await db.SettingModel.getDownloadFileCountLimitInfoByUser(user);
     // 租期时长
-    const leaseDuration = 24 * 60 * 60 * 1000;
+    const {freeTime} = await db.SettingModel.getSettings('download');
+    data.freeTime = freeTime;
     // 是否免费
-    const {needScore, reason, description} = await resource.checkDownloadCost(user, leaseDuration);
+    const {needScore, reason, description} = await resource.checkDownloadCost(user);
     if(reason !== 'repeat') {
       await resource.checkDownloadPermission(user, ctx.address);
     }
-    // 附件所需积分信息和用户持有积分信息
-    if(user) {
+    data.needScore = needScore;
+    data.freeReason = reason;
+    data.description = description;
+    if(data.needScore && user) {
       const {enough, userScores} = await resource.checkUserScore(user);
-      detail.costScores = userScores;
-      detail.enough = enough;
+      data.userScores = userScores;
+      data.enough = enough;
     }
-    // 积分是否足够
-    detail.leaseDuration = leaseDuration;
-    detail.free = !needScore && reason === "setting";
-    // 此用户是否在租期内(支付过，没到期)
-    detail.paid = !needScore && reason === "repeat";
-
-    detail.needScore = needScore;
-    detail.description = description;
-
     await resource.setFileExist();
-    await resource.filenameFilter();
-    detail.resource = resource.toObject();
+    data.resource = resource.toObject();
+    const downloadSettings = await db.SettingModel.getSettings('download');
+    data.downloadWarning = downloadSettings.warning;
+    data.uploader = await db.UserModel.findOnly({uid: resource.uid}, {
+      uid: 1,
+      username: 1,
+      avatar: 1,
+    });
     return next();
   })
 module.exports = router;

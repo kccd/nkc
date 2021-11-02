@@ -160,3 +160,5 @@ window.floatForumPanel = new Vue({
 
   }
 });
+
+NKC.instance.floatForumPanel = window.floatForumPanel;

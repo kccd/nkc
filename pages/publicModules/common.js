@@ -6,6 +6,7 @@ window.jQuery = JQuery;
 var NKC = {
   methods: {},
   modules: {},
+  instance: {},
   configs: {
     imageExt: ["jpg", "jpeg", "png", "svg", "gif", "webp"],
     audioExt: ["mp3"],

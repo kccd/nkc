@@ -1,0 +1,42 @@
+if !isIncluded('downloadPanel')
+  include ../draggablePanel/draggablePanel
+  +includeCSS('/publicModules/downloadPanel/downloadPanel.css')
+  #moduleDownloadPanel.draggable-panel
+    #moduleDownloadPanelApp
+      .draggable-panel-header
+        .draggable-panel-title 文件下载
+        .draggable-panel-right-button(@click='close')
+          .fa.fa-remove
+      .draggable-panel-body
+        .draggable-panel-loading.p-t-2.p-b-3(v-if='loading') 加载中...
+        .draggable-panel-loading.p-t-2.p-b-3(v-else-if='error')
+          button.btn.btn-default.btn-md(@click='reload') 点击重试
+        .draggable-panel-content(v-else-if='resource')
+          .download-panel
+            .m-b-1.bg-warning.text-warning.p-a-05.bg-border.download-warning(v-if='downloadWarning') {{downloadWarning}}
+            .file-base-info.m-b-1
+              .file-name.m-b-05 文件名称：
+                strong {{resource.oname}}
+              .file-size.m-b-05 下载次数：{{resource.hits}}
+              .file-user.m-b-05 上传用户：
+                img.user-avatar(:src='getUrl("userAvatar", uploader.avatar)')
+                a(:href='getUrl("userHome", uploader.uid)' target="_blank") {{uploader.username}}
+              .m-b-05(v-if='resource.isFileExist')
+                .file-score.m-b-05 所需积分：
+                  span(v-if='needScore') {{costScores}}，{{holdScores}}
+                  span(v-else-if='freeReason === "setting"') 下载当前附件免费
+                  span(v-else) {{description}}
+                .m-b-05(v-if='!needScore || enough')
+                  .m-b-05.file-links(v-if='links.length')
+                    span 下载地址：
+                    a.file-link(v-for='l in links' @click='visitUrl(l)') {{l.name}}
+                .m-b-05.bg-danger.p-a-05.text-center.bg-border.text-danger(v-else)
+                  | 积分不足，
+                  a(href='/account/finance/recharge' target='_blank') 去充值
+              div.bg-danger.p-a-05.text-center.bg-border.text-danger(v-else) 文件已丢失
+
+            .download-count-limit
+              hr
+              include ../fileCountLimitInfo
+
+  +includeJS('/publicModules/downloadPanel/downloadPanel.js')

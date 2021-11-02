@@ -1,10 +1,12 @@
-include ../publicModules/plyr/plyr.css.pug
-include ../publicModules/plyr/plyr.js.pug
-include ../publicModules/lazySizes
-include ../publicModules/imageViewer
-include ../publicModules/mathFormula
-include ../publicModules/sticker/sticker
-include ../publicModules/highlight/highlight
-include ../publicModules/replaceNKCUrl
-script.
-  NKC.methods.highlightNKCSource();
+if !isIncluded('nkcSource')
+  include ../publicModules/plyr/plyr.css.pug
+  include ../publicModules/plyr/plyr.js.pug
+  include ../publicModules/lazySizes
+  include ../publicModules/imageViewer
+  include ../publicModules/mathFormula
+  include ../publicModules/sticker/sticker
+  include ../publicModules/highlight/highlight
+  include ../publicModules/replaceNKCUrl
+  include ../publicModules/downloadPanel/downloadPanel
+  script.
+    NKC.methods.highlightNKCSource();
