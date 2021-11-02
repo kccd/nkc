@@ -50,7 +50,7 @@ function getVideoPreviewMask(player) {
     };
   }
   // 修改遮罩上的下载按钮
-  for(let i = 0; i < maskDownloadButton.length; i++) {
+  /*for(let i = 0; i < maskDownloadButton.length; i++) {
     const element = maskDownloadButton.eq(i);
     const size = element.attr('data-video-size');
     const {url, dataSize} = sourceObj[size];
@@ -64,7 +64,10 @@ function getVideoPreviewMask(player) {
       .attr('data-type', 'download')
       .removeClass('hidden')
       // .append(dataSizeDom);
-  }
+  }*/
+  const rid = nkcSource.attr('data-id');
+  maskDownloadButton.attr('data-id', rid);
+  maskDownloadButton.removeClass('hidden');
   maskPlayButton.on("click", () => {
     mask.remove();
     player.play();

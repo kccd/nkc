@@ -8,7 +8,7 @@ if !isIncluded('plyr')
     ;(function(){
       var players = [];
       var videoControls = ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'];
-      var audioControls = ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'download', 'captions', 'pip', 'airplay', 'fullscreen'];
+      var audioControls = ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'pip', 'airplay', 'fullscreen'];
       // 切换视频分辨率之后重新设置视频的下载链接
       var setPlayerDownloadUrl = function(player, dom) {
         player.download = dom.attr('src') + '&d=attachment';
@@ -48,13 +48,13 @@ if !isIncluded('plyr')
               size = 0;
             }
             size = NKC.methods.tools.getSize(size);
-            var url = "/r/" + rid + "?d=attachment";
+            const url = audio.find('audio source').attr('src');
+            // var url = "/r/" + rid + "?d=attachment";
             var appAudio = $('<div class="app-audio"><div class="fa fa-play app-audio-icon" onclick="NKC.methods.rn.updateMusicListAndPlay(\'' + rid
-              + '\')"></div><div class="app-audio-container"><a class="app-audio-title" href="' + url
-              + '" target="_blank" data-type="download" data-title="' + title
+              + '\')"></div><div class="app-audio-container"><a class="app-audio-title" data-url="'+url+'" data-type="downloadPanel" data-id="' + rid
               + '">' + title
               + '</a><div class="app-audio-info"><span class="m-r-05">' + size
-              + '</span><a href="' + url + '" target="_blank" data-type="download" data-title="' + title + '">下载</a></div></div></div>')
+              + '</span><a data-type="downloadPanel" data-id="' + rid + '">下载</a></div></div></div>')
             audio.html(appAudio);
             audio.attr('data-init', 'true')
           } else {

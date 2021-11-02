@@ -15,8 +15,8 @@ router
   .put('/', async (ctx, next) => {
     const {db, data, body, nkcModules} = ctx;
     const {downloadSettings} = body;
-    const {speed, allSpeed, fileCountLimit, freeTime, visitorAccess} = downloadSettings;
-    const {checkNumber} = nkcModules.checkData;
+    const {speed, allSpeed, fileCountLimit, freeTime, visitorAccess, warning} = downloadSettings;
+    const {checkNumber, checkString} = nkcModules.checkData;
     const {certList} = data;
     const certListObj = {};
     for(const c of certList) {
@@ -129,6 +129,12 @@ router
       fractionDigits: 2,
     });
 
+    checkString(warning, {
+      name: '下载注意事项',
+      minLength: 0,
+      maxLength: 2000,
+    });
+
     const {
       mediaPicture = true,
       mediaAudio = true,
@@ -142,6 +148,7 @@ router
         'c.allSpeed': allSpeed,
         'c.fileCountLimit': fileCountLimit,
         'c.freeTime': freeTime,
+        'c.warning': warning,
         'c.visitorAccess': {
           mediaAudio,
           mediaVideo,

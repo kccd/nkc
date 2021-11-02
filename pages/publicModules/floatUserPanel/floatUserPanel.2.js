@@ -159,3 +159,4 @@ window.floatUserPanel = new Vue({
     }
   }
 });
+NKC.instance.floatUserPanel = window.floatUserPanel;

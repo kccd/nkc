@@ -161,13 +161,29 @@ resourceSchema.virtual('videoSize')
     return this._videoSize = val
   });
 
+resourceSchema.virtual('fileSize')
+  .get(function() {
+    return this._fileSize;
+  })
+  .set(function(fileSize) {
+    return this._fileSize = fileSize;
+  });
+
 resourceSchema.virtual('visitorAccess')
   .get(function() {
     return this._visitorAccess;
   })
   .set(function(visitorAccess) {
     return this._visitorAccess = visitorAccess;
+  });
+
+resourceSchema.virtual('token')
+  .get(function() {
+    return this._token;
   })
+  .set(function(token) {
+    return this._token = token;
+  });
 
 /*
  * 文件是否存在
@@ -177,39 +193,56 @@ resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['medi
   const SettingModel = mongoose.model('settings');
   const {getSize} = require('../nkcModules/tools');
   const {visitorAccess} = await SettingModel.getSettings('download');
-  const FILE = require('../nkcModules/file');
   this.visitorAccess = visitorAccess[this.mediaType];
+
+  // 拓展预览token
+  if(['mediaVideo', 'mediaAudio'].includes(this.mediaType)) {
+    await this.extendToken();
+  }
   if(this.mediaType === 'mediaVideo') {
-    const sdVideoPath = await this.getFilePath('sd');
-    const hdVideoPath = await this.getFilePath('hd');
-    const fhdVideoPath = await this.getFilePath('fhd');
+    const videoSettings = require('../settings/video');
+    const sdSize = 'sd';
+    const hdSize = 'hd';
+    const fhdSize = 'fhd';
+    const sdVideoPath = await this.getFilePath(sdSize);
+    const hdVideoPath = await this.getFilePath(hdSize);
+    const fhdVideoPath = await this.getFilePath(fhdSize);
     const videoSize = [];
     try{
       const {size} = await fsPromises.stat(sdVideoPath);
       videoSize.push({
-        size: 'sd',
-        dataSize: getSize(size, 0),
+        size: sdSize,
+        dataSize: getSize(size, 1),
+        height: videoSettings[sdSize].height
       });
     } catch(err) {}
     try{
       const {size} = await fsPromises.stat(hdVideoPath);
       videoSize.push({
-        size: 'hd',
-        dataSize: getSize(size, 0),
+        size: hdSize,
+        dataSize: getSize(size, 1),
+        height: videoSettings[hdSize].height
       });
     } catch(err) {}
     try{
       const {size} = await fsPromises.stat(fhdVideoPath);
       videoSize.push({
-        size: 'fhd',
-        dataSize: getSize(size, 0),
+        size: fhdSize,
+        dataSize: getSize(size, 1),
+        height: videoSettings[fhdSize].height
       });
     } catch(err) {}
     this.isFileExist = videoSize.length !== 0;
     this.videoSize = videoSize;
   } else {
     const path = await this.getFilePath();
-    this.isFileExist = await FILE.access(path);
+    try{
+      const {size} = await fsPromises.stat(path);
+      this.fileSize = getSize(size, 1);
+      this.isFileExist = true;
+    } catch(err) {
+      this.isFileExist = false;
+    }
   }
 }
 
@@ -739,6 +772,28 @@ resourceSchema.methods.removeResourceInfo = async function() {
   //重命名文件
   await fsPromises.rename(outputFilePath, filePath);
 }
+
+resourceSchema.methods.extendToken = async function() {
+  const redisClient = require('../settings/redisClient');
+  const apiFunction = require('../nkcModules/apiFunction');
+  const getRedisKeys = require('../nkcModules/getRedisKeys');
+  const {rid} = this;
+  // token过期时间 秒
+  const expiration = 2 * 60 * 60;
+  const token = apiFunction.getRandomString(`a0`, 8);
+  const key = getRedisKeys('resourceToken', rid, token);
+  await redisClient.setexAsync(key, expiration, 0);
+  return this.token = token;
+};
+
+resourceSchema.methods.checkToken = async function(token) {
+  const redisClient = require('../settings/redisClient');
+  const getRedisKeys = require('../nkcModules/getRedisKeys');
+  const {rid} = this;
+  const key = getRedisKeys('resourceToken', rid, token);
+  const count = await redisClient.getAsync(key);
+  return count !== null;
+};
 
 
 module.exports = mongoose.model('resources', resourceSchema);

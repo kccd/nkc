@@ -106,7 +106,7 @@
               @click="editFolder(f)"
             )
               .fa.fa-edit
-          .list-options-link(v-if="f.type === 'file'" :onclick="'NKC.methods.openFilePanel(\"'+f.rid+'\")'"  :title="'点击下载（共被下载' + f.resource.hits + '次）'")
+          .list-options-link(v-if="f.type === 'file'" :onclick="'NKC.instance.downloadPanel.open(\"'+f.rid+'\")'"  :title="'点击下载（共被下载' + f.resource.hits + '次）'")
             .fa.fa-cloud-download
 
           //-.folder-info.fa.fa-ellipsis-v

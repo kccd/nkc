@@ -86,4 +86,6 @@ module.exports = redisClient;
 * user:${uid}:numberOfOtherUserOperation = jsonString {read: Number, voteUp: Number, post: Number}
 * user:${uid}:timeToSetOtherUserOperationNumber 缓存被阅读、被回复等数量的时间
 *
+* 资源 视频预览token
+* resource:${rid}:${token} = count（验证此token的次数）
 */

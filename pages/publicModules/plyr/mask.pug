@@ -14,15 +14,19 @@
       .plyr-mask-wrap.preview
         .player-tip-content= state.threadSettings.playerTips.tipContent
         .player-tip-button
-          a.download.m-r-05.hidden(data-video-size='480')
+          //-
+            a.download.m-r-05.hidden(data-video-size='480')
+              i.fa.fa-cloud-download(aria-hidden="true")
+              | 480p
+            a.download.m-r-05.hidden(data-video-size='720')
+              i.fa.fa-cloud-download(aria-hidden="true")
+              | 720p
+            a.download.m-r-05.hidden(data-video-size='1080')
+              i.fa.fa-cloud-download(aria-hidden="true")
+              | 1080p
+          a.download.m-r-05.hidden(data-type='downloadPanel')
             i.fa.fa-cloud-download(aria-hidden="true")
-            | 480p
-          a.download.m-r-05.hidden(data-video-size='720')
-            i.fa.fa-cloud-download(aria-hidden="true")
-            | 720p
-          a.download.m-r-05.hidden(data-video-size='1080')
-            i.fa.fa-cloud-download(aria-hidden="true")
-            | 1080p
+            | 点击下载
           span.play
             i.fa.fa-play-circle(aria-hidden="true")
             | 预览
