@@ -80,6 +80,7 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
               }
             })
             .then(() => {
+              this.getResourceInfo();
               if(NKC.configs.isApp) {
                 NKC.methods.rn.downloadFile(resource.oname, url);
               } else {
