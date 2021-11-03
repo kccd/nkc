@@ -44,6 +44,8 @@ router
       }
     }
     const homeSettings = await db.SettingModel.getSettings("home");
+    const latestStyle = homeSettings.latestStyle;
+    data.latestStyle = latestStyle;
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,
@@ -60,7 +62,7 @@ router
     let q = {};
     let threadListType;
     if(t) {
-      if(!["latest", "recommend", "subscribe", "column", "home", "appLatest"].includes(t)) t = '';
+      if(!["latest", "recommend", "subscribe", "column", "home"].includes(t)) t = '';
       if(t === "subscribe" && !user) t = '';
       threadListType =  t;
     }
@@ -173,43 +175,7 @@ router
     let subTid = [], subUid = [], subColumnId = [], subForumsId = [], subColumnPostsId = [];
     let paging;
 
-    if(threadListType === "latest") {
-      q = {
-        mainForumsId: {
-          $in: fidOfCanGetThreads
-        },
-        /*recycleMark: {
-          $ne: true
-        },
-        disabled: false*/
-      };
-
-      if(user) {
-        if(!ctx.permission("superModerator")) {
-          const canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
-          q.$or = [
-            {
-              reviewed: true
-            },/*
-            {
-              reviewed: false,
-              uid: user.uid
-            },*/
-            {
-              reviewed: false,
-              mainForumsId: {
-                $in: canManageFid
-              }
-            }
-          ]
-        }
-      } else {
-        q.reviewed = true;
-      }
-      // 最新页置顶文章
-      data.latestToppedThreads = await db.ThreadModel.getLatestToppedThreads(fidOfCanGetThreads);
-
-    } else if(threadListType === "appLatest") {
+  if(latestStyle === "appLatest") {
       let threadsObj = {};
       q = {
         mainForumsId: {
@@ -252,7 +218,8 @@ router
           cover,
           forumsId,
           quote,
-          parentPost
+          parentPost,
+          voteUp,
         } = post;
         if(parentPost) {
           let {c, uid} = parentPost;
@@ -273,21 +240,59 @@ router
 
         let a;
         let postType = parentPostId === ''? '回复': '评论'
-          a = {
-            toc,
-            parentPostId,
-            from: `发表${postType}`,
-            title,
-            content,
-            url,
-            cover,
-            user,
-            quote,
-            parentPost
-          }
+        a = {
+          toc,
+          parentPostId,
+          from: `发表${postType}`,
+          title,
+          content,
+          url,
+          cover,
+          user,
+          quote,
+          parentPost
+        }
         data.posts.push(a);
       }
-    } else if(threadListType === "subscribe") {
+    }
+
+    if(threadListType === "latest") {
+      q = {
+        mainForumsId: {
+          $in: fidOfCanGetThreads
+        },
+        /*recycleMark: {
+          $ne: true
+        },
+        disabled: false*/
+      };
+
+      if(user) {
+        if(!ctx.permission("superModerator")) {
+          const canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
+          q.$or = [
+            {
+              reviewed: true
+            },/*
+            {
+              reviewed: false,
+              uid: user.uid
+            },*/
+            {
+              reviewed: false,
+              mainForumsId: {
+                $in: canManageFid
+              }
+            }
+          ]
+        }
+      } else {
+        q.reviewed = true;
+      }
+      // 最新页置顶文章
+      data.latestToppedThreads = await db.ThreadModel.getLatestToppedThreads(fidOfCanGetThreads);
+
+    }else if(threadListType === "subscribe") {
       const columnsObj = {};
       const columnPostsObj = {};
       const forumsObj = {};
@@ -524,13 +529,14 @@ router
     }
     data.threads = [];
     let threads = [];
-    if(threadListType !== 'subscribe') {
+    if(threadListType !== 'subscribe' || latestStyle !== 'appLatest') {
       const count = await db.ThreadModel.countDocuments(q);
       const homeLatestOrder = await db.SettingModel.findOne({_id: 'home'});
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
       let sort = {tlm: -1};
       if(s === "toc") sort = {toc: -1};
       if(homeLatestOrder.c.latestOrder === 'releaseToc') sort = {toc: -1};
+      if(threadListType === "recommend") sort= {toc : -1};
       threads = await db.ThreadModel.find(q, {
         uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
         tlm: 1, fid: 1, hasCover: 1,

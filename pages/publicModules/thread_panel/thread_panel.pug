@@ -116,7 +116,7 @@ mixin threadCategories
               if thread.count
                 if toc
                   span.thread-panel-minimalist-line /
-                span.count(title=`回复数${thread.count}`)
+                span.count(title=`回复数${thread.count}` onclick=`window.location.href='#container'`)
                   //.fa.fa-comment
                   span=thread.count
               if tlm

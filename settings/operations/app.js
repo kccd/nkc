@@ -9,6 +9,9 @@ module.exports = {
 	nav: {
 		GET: "APPGetNav"
 	},
+	my: {
+		GET: "APPGetMy"
+	},
 	scoreChange: {
 		PARAMETER: {
 			GET: 'APPgetScoreChange'

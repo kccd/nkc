@@ -1,6 +1,7 @@
 if !isIncluded('postActivity')
   +includeCSS('/home/postActivity.css')
   mixin postlatest(props)
+    -console.log(props)
     -var {from, user, quote, title, content, toc, cover, url, type, parentPostId, parentPost} = props;
     mixin postActivityHeader(headerData)
       -var {toc, type} = headerData;
@@ -27,6 +28,15 @@ if !isIncluded('postActivity')
           if headerData.from
             .post-activity-time-sm
               +fromNow(toc)
+        //.thread-panel-button
+        //  if thread.firstPost.voteUp
+        //    .fa.fa-thumbs-up=` ${thread.firstPost.voteUp || ''}`
+        //  if thread.hits
+        //    .fa.fa-eye=` ${thread.hits}`
+        //  if thread.count
+        //    .fa
+        //      a.a-jump(href=`/t/${thread.tid}#container` target="_blank")
+        //        span.fa.fa-comment=` ${thread.count}`
     mixin postActivityContent(contentData)
       -var {cover, title, content, url} = contentData;
       .post-activity-content
@@ -66,7 +76,6 @@ if !isIncluded('postActivity')
       .post-activity
         .post-activity-content
           +postActivityHeader({from, user, toc, type})
-          -console.log(url);
           +postActivityContent({title, content, cover, url})
         if quote
           .post-activity-content.post-activity-quote

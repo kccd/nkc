@@ -28,6 +28,7 @@ block head
   if state.isApp && state.platform === 'apiCloud'
     +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
+  +includeCSS('/iconfont/iconfont.css')
   +includeCSS('/font-awesome/css/font-awesome.css')
   style=`body{background-color: ${state.serverSettings.backgroundColor}}`
   +includeCSS('/nkc_styles.css')

@@ -1,0 +1,100 @@
+extends ../../bootstrap_base
+block title
+  +includeCSS("/app/my/my.css")
+  +includeCSS("/swiper/swiper-bundle.min.css")
+block content
+  .app-my
+    .my-nav-swiper
+      .swiper-container
+        .swiper-wrapper
+          .swiper-slide
+            .my-links
+              .my-link
+                a.nav-box(href=`/u/${data.user.uid}/profile/thread`)
+                  .icon-left
+                    .iconfont.icon-wenzhang1
+                  span 我的文章
+              .my-link
+                a.nav-box(href=`/u/${data.user.uid}/profile/post`)
+                  .icon-left
+                    .iconfont.icon-pinglunhuifu
+                  span 我的回复
+              .my-link
+                a.nav-box(href=`/u/${data.user.uid}/profile/draft`)
+                  .icon-left
+                    .iconfont.icon-caogao
+                  span 我的草稿
+              .my-link
+                a.nav-box(href=`/u/${data.user.uid}/profile/note`)
+                  .icon-left
+                    .iconfont.icon-biji
+                  span 我的笔记
+              .my-link
+                a.nav-box(href=`/u/${data.user.uid}/profile/subscribe/user`)
+                  .icon-left
+                    .iconfont.icon-guanzhuxuanzhong
+                  span 关注的用户
+              .my-link
+                a.nav-box(href=`/u/${data.user.uid}/profile/subscribe/discipline`)
+                  .icon-left
+                    .iconfont.icon-zhuanye
+                  span 关注的专业
+              .my-link
+                a.nav-box(href=`/u/${data.user.uid}/profile/subscribe/column`)
+                  .icon-left
+                    .iconfont.icon-zhuanlan
+                  span 关注的专栏
+              .my-link
+                a.nav-box(href=`/u/${data.user.uid}/profile/subscribe/thread`)
+                  .icon-left
+                    .iconfont.icon-suoyouwenzhang
+                  span 关注的文章
+          .swiper-slide
+            .my-links
+              .my-link
+                a.nav-box(href=`/u/${data.user.uid}/profile/subscribe/collection`)
+                  .icon-left
+                      .iconfont.icon-shoucang
+                  span 收藏的文章
+              .my-link
+                a.nav-box(href=`/u/${data.user.uid}/profile/finance`)
+                  .icon-left
+                    .iconfont.icon-yingshouzhangdanguanli
+                  span 我的账单
+              .my-link
+                a.nav-box(href=`/u/${data.user.uid}/profile/follower`)
+                  .icon-left
+                      .iconfont.icon-wodefensisvg
+                  span 我的粉丝
+              .my-link
+                a.nav-box(href=`/u/${data.user.uid}/profile`)
+                  .icon-left
+                    .iconfont.icon-gongzuotai-gerenmingpian
+                  span 我的名片
+              if data.user.column
+                .my-link
+                  a.nav-box(href=`/m/${data.user.column._id}`)
+                    .icon-left
+                        .iconfont.icon-zhuanlan1
+                    span 我的专栏
+              .my-link
+                a.nav-box(href=`/sticker`)
+                  .icon-left
+                    .iconfont.icon-biaoqing
+                  span 我的表情
+        .swiper-pagination
+    .nav-numbers
+      a.nav-number(href=`/u/${data.user.uid}/profile/thread`)
+        .name 文章
+        .value(id="userThreadCount")=data.user.threadCount - data.user.disabledThreadsCount
+      a.nav-number(href=`/u/${data.user.uid}/profile/post`)
+        .name 回复
+        .value(id="userPostCount")=data.user.postCount - data.user.disabledPostsCount
+      a.nav-number
+        .name 学术分
+        .value(id="userXSF")=data.user.xsf
+
+    .my-footer
+block scripts
+  +includeJS("/app/my/my.js")
+  +includeJS("/swiper/swiper-bundle.js")

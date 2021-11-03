@@ -36,14 +36,23 @@ block eContent
             .col-xs-12.col-md-12
               .form
                 .form-group
-                  h4.setting-block-title 首页最新排序
+                  h4.setting-block-title 首页最新回复排序
                   .radioBox
-                    span 文章发布时间
                     label
+                      span 文章发布时间
                       input(type='radio' value="releaseToc" v-model="homeSettings.latestOrder")
-                    span.m-l-1 最新回复
                     label
+                      span.m-l-1 最新回复
                       input(type='radio' value="releasePost" v-model="homeSettings.latestOrder")
+                .form-group
+                  h4.setting-block-title 首页最新回复显示风格
+                  .radioBox
+                    label
+                      span 以文章为单位显示
+                      input(type='radio' value="latest" v-model="homeSettings.latestStyle")
+                    label
+                      span.m-l-1 以回复为单位显示
+                      input(type='radio' value="appLatest" v-model="homeSettings.latestStyle")
                 .form-group.form-inline
                   h4.setting-block-title 热门文章
                   h5 回复数不低于：
@@ -54,12 +63,12 @@ block eContent
                 .form-group.form-inline
                   h4.setting-block-title 推荐条件
                   h5
-                    span 精选文章
                     label
+                      span 精选文章
                       input(type='checkbox' value="featuredThreads" v-model="recommend")
                   h5
-                    span 热门文章
                     label
+                      span 热门文章
                       input(type='checkbox' value="hotThreads" v-model="recommend")
                   h5
                     span 点赞总数不低于

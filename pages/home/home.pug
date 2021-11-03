@@ -40,6 +40,22 @@ block content
             -threadPanelATarget = '_blank';
             .subscribe-lists.m-b-1
               .subscribe-list
+                a(data-type="reload" href=`/?t=subscribe&d=user${data.c ? `&c=${data.c}` : ""}`
+                  class=data.d === "user" ? "active" : ""
+                ) 用户
+              .subscribe-list
+                a(data-type="reload" href=`/?t=subscribe&d=forum${data.c ? `&c=${data.c}` : ""}`
+                  class=data.d === "forum" ? "active" : ""
+                ) 专业
+              .subscribe-list
+                a(data-type="reload" href=`/?t=subscribe&d=column${data.c ?`&c=${data.c}`:""}`
+                    class=data.d==="column"? "active" : ""
+                ) 专栏
+              .subscribe-list
+                a(data-type="reload" href=`/?t=subscribe&d=thread${data.c ? `&c=${data.c}` : ""}`
+                  class=data.d === "thread" ? "active" : ""
+                ) 文章
+              .subscribe-list
                 a(data-type="reload" href=`/?t=subscribe&d=all${data.c ? `&c=${data.c}` : ""}`
                   class=!data.d || data.d === 'all' ? "active" : ""
                 ) 全部
@@ -47,26 +63,10 @@ block content
                 a(data-type="reload" href=`/?t=subscribe&d=own${data.c ? `&c=${data.c}` : ""}`
                   class=data.d === "own" ? "active" : ""
                 ) 我的文章
-              .subscribe-list
-                a(data-type="reload" href=`/?t=subscribe&d=thread${data.c ? `&c=${data.c}` : ""}`
-                  class=data.d === "thread" ? "active" : ""
-                ) 文章
               //-.subscribe-list
                 a(data-type="reload" href=`/?t=subscribe&d=reply${data.c ? `&c=${data.c}` : ""}`
                   class=data.d === "reply" ? "active" : ""
                 ) 参与过的文章
-              .subscribe-list
-                a(data-type="reload" href=`/?t=subscribe&d=user${data.c ? `&c=${data.c}` : ""}`
-                  class=data.d === "user" ? "active" : ""
-                ) 用户
-              .subscribe-list
-                a(data-type="reload" href=`/?t=subscribe&d=column${data.c ?`&c=${data.c}`:""}`
-                    class=data.d==="column"? "active" : ""
-                ) 专栏
-              .subscribe-list
-                a(data-type="reload" href=`/?t=subscribe&d=forum${data.c ? `&c=${data.c}` : ""}`
-                  class=data.d === "forum" ? "active" : ""
-                ) 专业
           .m-b-0
 
             if !(state.isApp && state.platform === 'reactNative')
@@ -80,15 +80,13 @@ block content
                 a.button.radius-left(onclick="selectAll()") 全选
                 a.button(onclick="moveSelectedThreads()") 移动
                 a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
-            if (data.t === "latest" || data.t === "column" || data.t === "recommend") && state.platform !== 'reactNative'
+            if (data.t === "latest" || data.t === "column" || data.t === "recommend" || data.t === "appLatest") && state.platform !== 'reactNative'
               .paging-button
                 a.radius-left.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "" data-type="reload") 回复
-                a.button(href=`/?t=appLatest` class=data.t === "appLatest" ? "active" : "" data-type="reload") app回复
                 a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "" data-type="reload") 文章
                 a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "" data-type="reload") 专栏
 
             if data.t === "subscribe"
-              -console.log(data.activity[0].quote)
               if !data.activity || data.activity.length === 0
                 .p-t-5.p-b-5.text-center
                   h4
@@ -100,44 +98,45 @@ block content
                   for a in data.activity
                     +postActivity(a)
                 include ../publicModules/paging/paging_input
-            else if data.t === "appLatest"
-              if !data.posts || data.posts.length === 0
-                .p-t-5.p-b-5.text-center
-                  h4
-                    b 空空如也~
-              else
-                -showPagingSortButton = false;
-                include ../publicModules/paging/paging
-                include ./postlatest
-                  for a in data.posts
-                    +postlatest(a)
-                include ../publicModules/paging/paging_input
             else
-              if !data.threads.length && !data.latestToppedThreads.length
-                .p-t-5.p-b-5.text-center
-                  h4
-                    b 空空如也~
+              if data.t === "latest" && data.latestStyle === "appLatest"
+                if !data.posts || data.posts.length === 0
+                  .p-t-5.p-b-5.text-center
+                    h4
+                      b 空空如也~
+                else
+                  -showPagingSortButton = false;
+                  include ../publicModules/paging/paging
+                  include ./postlatest
+                    for a in data.posts
+                      +postlatest(a)
+                  include ../publicModules/paging/paging_input
               else
-                include ../publicModules/paging/paging
+                if !data.threads.length && !data.latestToppedThreads.length
+                  .p-t-5.p-b-5.text-center
+                    h4
+                      b 空空如也~
+                else
+                  include ../publicModules/paging/paging
 
-                if data.t === 'latest' && data.paging.page === 0 && data.latestToppedThreads.length > 0
-                  -const defaultThreadListStyle = {type: 'minimalist'}
-                  for thread in data.latestToppedThreads
+                  if data.t === 'latest' && data.paging.page === 0 && data.latestToppedThreads.length > 0
+                    -const defaultThreadListStyle = {type: 'minimalist'}
+                    for thread in data.latestToppedThreads
+                      include ../publicModules/thread_panel/thread_panel
+                    div.topped-thread-header - 以上是置顶 -
+
+                  for thread in data.threads
                     include ../publicModules/thread_panel/thread_panel
-                  div.topped-thread-header - 以上是置顶 -
-
-                for thread in data.threads
-                  include ../publicModules/thread_panel/thread_panel
-                -showPagingSortButton = false;
-                -showHomeButton = false;
-                if canManagement
-                  .paging-button
-                    a.button.radius-left.radius-right(onclick="managementThreads()") 管理
-                  .paging-button.management-thread-panel
-                    a.button.radius-left(onclick="selectAll()") 全选
-                    a.button(onclick="moveSelectedThreads()") 移动
-                    a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
-                include ../publicModules/paging/paging_input
+                  -showPagingSortButton = false;
+                  -showHomeButton = false;
+                  if canManagement
+                    .paging-button
+                      a.button.radius-left.radius-right(onclick="managementThreads()") 管理
+                    .paging-button.management-thread-panel
+                      a.button.radius-left(onclick="selectAll()") 全选
+                      a.button(onclick="moveSelectedThreads()") 移动
+                      a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
+                  include ../publicModules/paging/paging_input
       .col-xs-12.col-md-3
         .hidden-xs.hidden-sm#rightDom.box-shadow-panel
           .hidden-xs.hidden-sm.m-b-1

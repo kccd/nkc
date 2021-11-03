@@ -214,7 +214,8 @@ if(vueDom) {
           hotThreads: homeSettings.hotThreads,
 					recommend: homeSettings.recommend,
 					subscribesDisplayMode: homeSettings.subscribesDisplayMode,
-					latestOrder: homeSettings.latestOrder
+					latestOrder: homeSettings.latestOrder,
+					latestStyle: homeSettings.latestStyle
         })
           .then(function() {
           	sweetSuccess('保存成功');

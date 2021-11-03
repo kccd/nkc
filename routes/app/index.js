@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const appRouter = new Router();
 const checkRouter = require('./check');
 const navRouter = require("./nav");
+const myRouter = require("./my");
 const { upload } = require('../../settings');
 const { androidSavePath, iosSavePath } = upload;
 appRouter
@@ -63,5 +64,6 @@ appRouter
     await next();
   })
   .use("/nav", navRouter.routes(), navRouter.allowedMethods())
-  .use('/check', checkRouter.routes(), checkRouter.allowedMethods());
+  .use('/check', checkRouter.routes(), checkRouter.allowedMethods())
+  .use('/my', myRouter.routes(), myRouter.allowedMethods());
 module.exports = appRouter;
