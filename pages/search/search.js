@@ -1,9 +1,10 @@
 window.SubscribeTypes = undefined;
 var initComplexOptions = !!localStorage.getItem("search_complexOptions");
-
+const data = NKC.methods.getDataById('data');
 var app = new Vue({
   el: "#app",
   data: {
+    threadCategories: data.threadCategories,
     selectedForums: [],
     excludedForums: [],
     onlyTitle: false,
@@ -19,6 +20,7 @@ var app = new Vue({
       month: new Date().getMonth() + 1,
       day: new Date().getDate()
     },
+    tcId: [],
     sortType: "", // time, 默认相关度
     sort: "", // asc, 默认降序
     relation: "", // and, 默认or
@@ -35,6 +37,7 @@ var app = new Vue({
     },
     options: function() {
       var o = {
+        tcId: this.tcId,
         fid: this.selectedForumsId,
         excludedFid: this.excludedForumsId,
         timeStart: this.timeStart,
@@ -113,6 +116,7 @@ var app = new Vue({
         this.complexOptions = false;
         this.selectedForums.length = 0;
         this.excludedForums.length = 0;
+        this.tcId.length = 0;
         this.onlyTitle = false;
         this.author = "";
         this.digest = false;
@@ -161,6 +165,7 @@ var app = new Vue({
         if(options.author) this.author = options.author;
         if(options.digest) this.digest = options.digest;
         if(options.fid) this.fid = options.fid;
+        if(options.tcId) this.tcId = options.tcId;
         if(options.excludedFid) this.excludedFid = options.excludedFid;
         if(options.onlyTitle) this.onlyTitle = options.onlyTitle;
       } catch(err) {}
