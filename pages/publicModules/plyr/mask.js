@@ -37,8 +37,8 @@ function getVideoPreviewMask(player) {
   const source = nkcSource.find('video source');
   const sourceObj = {};
   // 获取附件名称
-  const downloadButton = nkcSource.find('a[data-plyr="download"]');
-  const title = downloadButton.attr('data-title');
+  const fileTitleDom = nkcSource.find('span.nkcsource-video-title');
+  const title = fileTitleDom.attr('data-title');
   // 获取视频可下载的视频尺寸和下载链接
   for(let i = 0; i < source.length; i++) {
     const element = source.eq(i);
@@ -50,7 +50,7 @@ function getVideoPreviewMask(player) {
     };
   }
   // 修改遮罩上的下载按钮
-  for(let i = 0; i < maskDownloadButton.length; i++) {
+  /*for(let i = 0; i < maskDownloadButton.length; i++) {
     const element = maskDownloadButton.eq(i);
     const size = element.attr('data-video-size');
     const {url, dataSize} = sourceObj[size];
@@ -64,7 +64,10 @@ function getVideoPreviewMask(player) {
       .attr('data-type', 'download')
       .removeClass('hidden')
       // .append(dataSizeDom);
-  }
+  }*/
+  const rid = nkcSource.attr('data-id');
+  maskDownloadButton.attr('data-id', rid);
+  maskDownloadButton.removeClass('hidden');
   maskPlayButton.on("click", () => {
     mask.remove();
     player.play();

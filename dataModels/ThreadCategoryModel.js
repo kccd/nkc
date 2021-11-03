@@ -176,5 +176,64 @@ schema.statics.getCategoriesById = async (tcId = []) => {
   return threadCategories;
 };
 
+/*
+* 删除文章属性并清除相关引用
+* */
+schema.methods.deleteAndClearReference = async function() {
+  const ThreadCategoryModel = mongoose.model('threadCategories');
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const DraftModel = mongoose.model('draft');
+  const HomeBlockModel = mongoose.model('homeBlocks');
+  const nodes = await ThreadCategoryModel.find({cid: this._id});
+  const categoriesId = [this._id];
+  const homeBlockTcId = [];
+  nodes.map(n => {
+    categoriesId.push(n._id);
+    homeBlockTcId.push(`${this._id}-${n._id}`);
+  });
+  await ThreadModel.updateMany({
+    tcId: {$in: categoriesId}
+  }, {
+    $pull: {
+      tcId: {
+        $in: categoriesId
+      }
+    }
+  });
+  await PostModel.updateMany({
+    tcId: {$in: categoriesId}
+  }, {
+    $pull: {
+      tcId: {
+        $in: categoriesId
+      }
+    }
+  });
+  await DraftModel.updateMany({
+    tcId: {$in: categoriesId}
+  }, {
+    $pull: {
+      tcId: {
+        $in: categoriesId
+      }
+    }
+  });
+  if(this.cid) {
+    const parentNode = await ThreadCategoryModel.findOnly({_id: this.cid});
+    homeBlockTcId.push(`${parentNode._id}-${this._id}`);
+  } else {
+    homeBlockTcId.push(`${this._id}-default`);
+  }
+  await HomeBlockModel.updateMany({tcId: {$in: homeBlockTcId}},{
+    $pull: {
+      tcId: {
+        $in: homeBlockTcId
+      }
+    }
+  });
+  await ThreadCategoryModel.deleteMany({_id: {$in: categoriesId}});
+};
+
 module.exports = mongoose.model('threadCategories', schema);
 

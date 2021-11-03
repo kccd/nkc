@@ -1,6 +1,5 @@
 const Router = require('koa-router');
 const resourceRouter = new Router();
-const pathModule = require('path');
 const infoRouter = require("./info");
 const payRouter = require("./pay");
 const detailRouter = require("./detail");
@@ -31,7 +30,7 @@ resourceRouter
   .get('/:rid', async (ctx, next) => {
     const {state, query, data, db, fs, settings, nkcModules} = ctx;
     // 分享的 post 时，浏览器会将 token、pid 添加到 资源链接后
-    const {t, c, d} = query;
+    const {t, c, d, w} = query;
     const {cache} = settings;
     const {resource, user} = data;
     if(resource.uid !== state.uid) {
@@ -92,7 +91,18 @@ resourceRouter
     data.resource = resource;
     data.rid = resource.rid;
     let isPreviewPDF = false;
-    if(mediaType === "mediaAttachment") {
+    let checkScore = false;
+    if(mediaType === 'mediaAttachment') {
+      checkScore = true;
+    } else if(['mediaVideo', 'mediaAudio'].includes(mediaType)) {
+      if(
+        (!user || user.uid !== resource.uid)
+        && (!w || !await resource.checkToken(w))
+      ) {
+        checkScore = true;
+      }
+    }
+    if(checkScore) {
       // 获取用户有关下载的时段和数量信息，用户前端展示给用户
       data.fileCountLimitInfo = await db.SettingModel.getDownloadFileCountLimitInfoByUser(data.user);
       const downloadOptions = await db.SettingModel.getDownloadSettingsByUser(data.user);
@@ -148,7 +158,7 @@ resourceRouter
     ctx.type = ext;
 
     // 限速
-    if(resource.mediaType === "mediaAttachment") {
+    if(checkScore) {
       let key;
       if(data.user) {
         key = `user_${data.user.uid}`;

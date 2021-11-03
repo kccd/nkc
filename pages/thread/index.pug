@@ -18,7 +18,7 @@ block title
     +includeCSS("/external_pkgs/imageToBig/preview.css")
     +includeCSS("/jquery-ui-1.10.4.custom.css")
     +includeJS("/external_pkgs/imageToBig/preview.js")
-    include ../publicModules/plyr/plyr.css.pug
+    //include ../publicModules/plyr/plyr.css.pug
   if !state.isApp
     style=`body{background-color: ${(data.user?data.user.color:null) || state.serverSettings.backgroundColor}!important;`
 
@@ -551,7 +551,7 @@ block content
       include ../publicModules/toColumn/toColumn
 
 block scripts
-  include ../publicModules/plyr/plyr.js.pug
+  //include ../publicModules/plyr/plyr.js.pug
   +includeJS('/commonmark/dist/commonmark.js', true)
   +includeJS('/plainEscaper.js', true)
   +includeJS('/xbbcode-parser/xbbcode.js', true)
@@ -561,8 +561,8 @@ block scripts
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
   +includeJS('/shop/shop.js')
   +includeJS("/publicModules/survey/form.js")
-  include ../publicModules/subscribeTypes/subscribeTypes
-  include ../publicModules/sticker/sticker
+  include ../publicModules/nkcSource
+  //include ../publicModules/sticker/sticker
   include ../publicModules/selectResource/selectResource
   include ../publicModules/sticker/selectSticker
   include ../publicModules/selectDraft/selectDraft
@@ -570,19 +570,19 @@ block scripts
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../publicModules/insertHideContent/insertHideContent
   //-include ../publicModules/highlight/highlight_editor
-  include ../publicModules/highlight/highlight
+  //include ../publicModules/highlight/highlight
   include ../publicModules/complaint/complaintBox
   include ../publicModules/crop/crop
   include ../publicModules/moment
   include ../publicModules/hidePost/hidePost
-  include ../publicModules/lazySizes
+  //include ../publicModules/lazySizes
   include ../publicModules/moveThread/moveThread
   include ../publicModules/disabledPost/disabledPost
   include ../ueditor/dialogs/mathformulaV2/mathformula
   include ../publicModules/bulletComments/bulletComments
   include ../publicModules/share/sharePanel
   include ../publicModules/commentControl/commentControl
-  include ../publicModules/replaceNKCUrl
+  //include ../publicModules/replaceNKCUrl
   include ../post/options/options
   include ../publicModules/commonModal/commonModal
 
@@ -591,7 +591,7 @@ block scripts
     +includeJS('/message/connectSocket.js')
   //- 下载资料询问框
   //if state.downloadNeedScore
-  include ../publicModules/downloadResource/downloadResource
+  //include ../publicModules/downloadResource/downloadResource
   //- 违规记录模块 NKC.modules.violationRecord
   if permission("violationRecord")
     include ../publicModules/violationRecord/violationRecord.pug
@@ -618,6 +618,6 @@ block scripts
   +includeJS("/thread/comments.js")
   if permission("getPostAuthor")
     include ../publicModules/floatUserPanel/userInfo
-  include ../publicModules/imageViewer
+  //include ../publicModules/imageViewer
   +includeJS("/thread/index.js")
   +includeJS("/thread/deletePost.js")

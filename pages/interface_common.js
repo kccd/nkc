@@ -137,6 +137,7 @@ function jwarning(obj){
 
 // 将页面移动到弹窗打开的状态，返回一个函数，执行此函数以回到之前的状态
 function toAlertOpenState(onBack) {
+  return onBack;
   var complete = false;
   var handler = function(event) {
     onBack();

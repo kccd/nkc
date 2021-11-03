@@ -1,6 +1,4 @@
 const mongoose = require('../settings/database');
-const apiFunction = require("../nkcModules/apiFunction");
-const {checkString} = require("../nkcModules/checkData");
 const schema = new mongoose.Schema({
   _id: String,
   // 是否为默认分类
@@ -127,10 +125,27 @@ const schema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  // 自动推送文章入选条数
+  // 自动推送文章入选条数 已废弃的字段
   autoThreadCount: {
     type: Number,
     default: 0,
+  },
+  // 入选条数和排序
+  autoThread: {
+    type: [{
+      sort: { // random, toc, voteUpCount
+        type: String,
+        default: 'random'
+      },
+      count: {
+        type: Number,
+        default: 20
+      }
+    }],
+    default: [{
+      sort: 'random',
+      count:  20
+    }],
   },
   // 自动选择的文章 ID
   autoThreadsId: {
@@ -145,7 +160,7 @@ const schema = new mongoose.Schema({
   // 显示时的排序
   sort: {
     type: String,
-    default: 'random', // random, toc, postCount, voteUpCount
+    default: 'random', // random, toc, postCount, voteUpCount, tlm
   },
   // 在页面中的位置
   position: {
@@ -179,7 +194,6 @@ schema.statics.checkBlockValue = async (block) => {
   const {
     name,
     forumsId,
-    tcId,
     postCountMin,
     voteUpMin,
     voteUpTotalMin,
@@ -192,7 +206,7 @@ schema.statics.checkBlockValue = async (block) => {
     threadCount,
     blockStyle,
     fixedThreadCount,
-    autoThreadCount,
+    autoThread,
     sort
   } = block;
   checkString(name, {
@@ -208,20 +222,20 @@ schema.statics.checkBlockValue = async (block) => {
       if(!forumsObj[fid]) throwErr(400, `专业 ID 错误，fid: ${fid}`);
     }
   }
-  if(tcId.length > 0) {
-    let categoriesId = new Set();
-    for(const id of tcId) {
-      const [categoryId, nodeId] = id.split('-');
-      categoriesId.add(categoryId);
-      if(nodeId !== 'default') categoriesId.add(nodeId);
-    }
-    categoriesId = [...categoriesId];
-    const categories = await ThreadCategoryModel.find({_id: {$in: categoriesId}}, {_id: 1});
+  if(block.tcId.length > 0) {
+    const tcId = [];
+    const categories = await ThreadCategoryModel.find({}, {_id: 1});
     const categoriesObj = {};
     categories.map(c => categoriesObj[c._id] = true);
-    for(const id of categoriesId) {
-      if(!categoriesObj[id]) throwErr(400, `文章属性 ID 错误，cid: ${id}`);
+    for(const id of block.tcId) {
+      const [categoryId, nodeId] = id.split('-');
+      if(
+        categoriesObj[categoryId]
+        && (nodeId === 'default' || categoriesObj[nodeId])
+      ) tcId.push(id);
     }
+    block.tcId.length = 0;
+    block.tcId.push(...tcId);
   }
   checkNumber(postCountMin, {
     name: '最小回复数',
@@ -260,7 +274,7 @@ schema.statics.checkBlockValue = async (block) => {
   if(!['left', 'right'].includes(coverPosition)) {
     throwErr(400, `文章封面图位置设置错误`);
   }
-  if(!['random', 'toc', 'postCount', 'voteUpCount'].includes(sort)) {
+  if(!['random', 'toc', 'postCount', 'voteUpCount', 'tlm'].includes(sort)) {
     throwErr(400, `显示时的排序设置错误`);
   }
   checkNumber(threadCount, {
@@ -271,10 +285,16 @@ schema.statics.checkBlockValue = async (block) => {
     name: '手动推选文章显示条数',
     min: 0,
   });
-  checkNumber(autoThreadCount, {
-    name: '自动推送文章入选条数',
-    min: 0
-  });
+  if(autoThread.length === 0) throwErr(400, `入选排序和入选条数不能为空`);
+  for(const a of autoThread) {
+    if(!['random', 'toc', 'voteUpCount'].includes(a.sort)) {
+      throwErr(400, `自动推送文章入选排序设置错误`);
+    }
+    checkNumber(a.count, {
+      name: '自动推送文章入选条数',
+      min: 0
+    });
+  }
   checkString(blockStyle.headerTitleColor, {
     name: '模块标题颜色',
     minLength: 0,
@@ -353,6 +373,8 @@ schema.methods.extendData = async function(fidOfCanGetThreads) {
     sortObj.count = -1;
   } else if(sort === 'voteUpCount') {
     sortObj.voteUp = -1;
+  } else if(sort === 'tlm') {
+    sortObj.tlm = -1;
   }
   let threads;
   if(sort === 'random'){
@@ -456,7 +478,7 @@ schema.methods.updateThreadsId = async function() {
     voteDownMax,
     timeOfPostMin,
     timeOfPostMax,
-    autoThreadCount,
+    autoThread,
   } = homeBlock;
   const match = {
     type: 'thread',
@@ -531,23 +553,59 @@ schema.methods.updateThreadsId = async function() {
       $in: ['4', '5', '6']
     };
   }
-  let posts = await PostModel.aggregate([
-    {
-      $match: match
-    },
-    {
-      $project: {
-        pid: 1,
-        tid: 1
+
+  let posts = [];
+  let postsId = [];
+
+  for(const a of autoThread) {
+    const {sort, count} = a;
+    const arr = [
+      {
+        $match: Object.assign({}, match, {pid: {$nin: postsId}})
+      },
+      {
+        $project: {
+          pid: 1,
+          tid: 1,
+          toc: 1,
+          voteUp: 1
+        }
       }
-    },
-    {
-      $sample: {
-        size: autoThreadCount
-      }
+    ];
+    if(sort === 'random') {
+      arr.push({
+        $sample: {
+          size: count
+        }
+      });
+    } else if(sort === 'toc') {
+      arr.push(
+        {
+          $sort: {
+            toc: -1
+          }
+        },
+        {
+          $limit: count
+        }
+      );
+    } else {
+      arr.push(
+        {
+          $sort: {
+            voteUp: -1
+          }
+        },
+        {
+          $limit: count
+        }
+      )
     }
-  ]);
-  posts = posts || [];
+    let _posts = await PostModel.aggregate(arr);
+    _posts = _posts || [];
+    posts = posts.concat(_posts);
+    postsId = postsId.concat(_posts.map(p => p.pid));
+  }
   const threadsId = posts.map(post => post.tid);
   await homeBlock.updateOne({
     $set: {

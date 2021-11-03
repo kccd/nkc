@@ -23,7 +23,7 @@ router
       threadCount,
       disabled,
       fixedThreadCount,
-      autoThreadCount,
+      autoThread,
       fixedThreadsId,
       sort
     } = block;
@@ -51,7 +51,7 @@ router
       disabled,
       blockStyle,
       fixedThreadCount,
-      autoThreadCount,
+      autoThread,
       fixedThreadsId,
       sort
     });
@@ -89,23 +89,6 @@ router
     const {params, db, data} = ctx;
     const {bid} = params;
     data.homeBlock = await db.HomeBlockModel.findOnly({_id: bid});
-    await next();
-  })
-  .get('/', async (ctx, next) => {
-    const {db, data, body, query} = ctx;
-    const homeBlock =  await db.HomeBlockModel.find({});
-    const {tid} = query;
-    const homeBlockId = [];
-    for(const block of homeBlock){
-      if(block.defaultBlock) continue;
-      const obj = {
-        name: block.name,
-        _id: block._id,
-        hasId: block.fixedThreadsId.includes(tid)?true:false
-      };
-      homeBlockId.push(obj);
-    }
-    data.homeBlocks = homeBlockId;
     await next();
   })
   .get('/:bid', async (ctx, next) => {
@@ -152,7 +135,7 @@ router
       disabled,
       blockStyle,
       fixedThreadCount,
-      autoThreadCount,
+      autoThread,
       fixedThreadsId,
       sort
     } = block;
@@ -179,7 +162,7 @@ router
         disabled,
         blockStyle,
         fixedThreadCount,
-        autoThreadCount,
+        autoThread,
         fixedThreadsId,
         sort
       }

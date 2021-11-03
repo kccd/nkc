@@ -3,7 +3,7 @@ block title
   title 投诉列表
   +includeCSS("/complaint/complaint.css")
 block content
-  include ../publicModules/downloadResource/downloadResource
+  //include ../publicModules/downloadResource/downloadResource
   .container-fluid.max-width
     #data.hidden=objToStr({complaints: data.complaints})
     .row#app(v-cloak)
@@ -71,5 +71,6 @@ block content
 block scripts
   include ../publicModules/moment
   include ../publicModules/resourceInfo/resourceInfo
+  include ../publicModules/downloadPanel/downloadPanel
   +includeJS("/complaint/complaints.js")
 

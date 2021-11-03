@@ -151,15 +151,17 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
       include ../post_button
 
     .navbar-link
-      .col-xs-4
-        a(href='/?t=home') 最新
-      .col-xs-4
+      .col-xs-3
+        a(href='/?t=latest') 最新
+      .col-xs-3
         if data.user
           a(href='/?t=subscribe') 关注
         else
           a(onclick="Login.open()") 关注
-      .col-xs-4
+      .col-xs-3
         a(href=`/m`) 专栏
+      .col-xs-3
+        a(href=`/c`) 社区
     .m-a-1#navbar_custom_dom
 
     .m-a-1
