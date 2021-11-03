@@ -68,7 +68,10 @@ mixin renderHome(homeBlock)
           for goods in homeBlock.data
             .home-goods-content
               .home-goods-avatar
-                div(style=`background-image: url(/r/${goods.imgMaster})`)
+                if goods.post && goods.post.cover
+                  div(style=`background-image: url(${tools.getUrl('postCover', goods.post.cover)})`)
+                else
+                  div(style=`background-image: url(/r/${goods.imgMaster})`)
               .home-goods-info
                 a(href=`/t/${goods.tid}` title=goods.name).home-goods-name=goods.name
                 .home-goods-description=goods.abstract

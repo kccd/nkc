@@ -20,6 +20,10 @@
       span=result.docType==="thread"?"发表于":"回复于"
       for forum in result.forums
         a.clear-a-style.search-result-forum(href=`/f/${forum.fid}`)=forum.displayName
+      if result.docType === 'thread' && result.threadCategories && result.threadCategories.length > 0
+        -var tc = result.threadCategories.map(t => `${t.categoryName}: ${t.nodeName}`);
+        span=tc.join(`，`)
+
 
     .search-result-abstract!= result.abstract
   else if result.docType === "user"

@@ -3,7 +3,7 @@ block title
   title=`搜索 - ${state.serverSettings.websiteName}`
   +includeCSS("/search/search.css")
 block content
-  #data.hidden=objToStr({c: data.c, t: data.t, d: data.d, selectedForums: data.selectedForums, excludedForums: data.excludedForums})
+  #data.hidden=objToStr({c: data.c, t: data.t, d: data.d, selectedForums: data.selectedForums, excludedForums: data.excludedForums, threadCategories: data.threadCategories})
   .container-fluid.max-width
     .row#app(v-cloak)
       .col-xs-12.col-md-9
@@ -51,6 +51,18 @@ block content
                       option(:value='""') 不分类
                   .fa.fa-remove(@click="removeFromArr(excludedForums, index)")
                 button.btn.btn-default.btn-sm(@click="selectForum('excluded')") 添加
+          .search-form.form-inline(v-if="['thread'].indexOf(t) !== -1" v-show="complexOptions")
+            .form-group
+              .search-thread-categories
+                .search-thread-category.m-b-05(v-for='c in threadCategories')
+                  label {{c.name}}：
+                  .checkbox-inline
+                    label.m-r-3(v-for='n in c.nodes')
+                      input(type='checkbox' :value='c._id + "-" + n._id' v-model='tcId')
+                      span {{n.name}}
+                    label
+                      input(type='checkbox' :value='c._id + "-default"' v-model='tcId')
+                      span {{c.nodeName}}
           .search-form.form-inline(v-if="['post', 'thread', ''].indexOf(t) !== -1" v-show="complexOptions")
             .form-group
               label 精选：

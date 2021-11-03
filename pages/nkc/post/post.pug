@@ -26,13 +26,14 @@ block nkcContent
           .post-header
             .post-time=format("YYYY/MM/DD HH:mm:ss", post.toc)
 
-            .post-type
-              if post.type === "thread"
-                span 文章
-              else if post.type === 'post'
-                span 回复
-              else
-                span 评论
+            -var type = '';
+            if post.type === 'thread'
+              -type = '文章';
+            else if post.type === 'post'
+              -type = '回复';
+            else
+              -type = '评论';
+            .post-type(class=`post-type-` + post.type)=type
             a(href=`/u/${post.user.uid}` target="_blank" data-float-uid=post.user.uid).post-user
               img(src=tools.getUrl("userAvatar", post.user.avatar))
               span= post.user.username
@@ -56,11 +57,6 @@ block nkcContent
           .post-body
             .row
               .col-xs-12.col-md-6
-                .post-title=`文章标题：`
-                  a(href=`/t/${post.thread.tid}` target='_blank')=post.thread.t
-              .col-xs-12.col-md-6
-                .post-title=`内容标题：${post.t || '无'}`
-              .col-xs-12.col-md-6
                 .post-title=`中文摘要：${post.abstractCn || '无'}`
               .col-xs-12.col-md-6
                 .post-title=`英文摘要：${post.abstractEn || '无'}`
@@ -68,7 +64,16 @@ block nkcContent
                 .post-title=`中文关键词：${post.keyWordsCn.join(', ') || '无'}`
               .col-xs-12.col-md-6
                 .post-title=`英文关键词：${post.keyWordsEn.join(', ') || '无'}`
-            .post-content!=post.c
+            .row
+              .col-xs-12
+                .bg-danger.p-a-05
+                  .row
+                    .col-xs-12.col-md-6
+                      .post-title=`文章标题：`
+                        a(href=`/t/${post.thread.tid}` target='_blank')=post.thread.t
+                    .col-xs-12.col-md-6
+                      .post-title=`内容标题：${post.t || '无'}`
+            .post-content.bg-danger.p-a-05!=post.c
     include ../../publicModules/paging/paging_input
 
 block nkcScripts

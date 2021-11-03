@@ -1,8 +1,5 @@
 const func = {};
 
-func.UserModel = {};
-func.PostModel = {};
-
 const elasticSearch = require('../settings/elasticSearch');
 const client = elasticSearch();
 
@@ -186,9 +183,10 @@ func.save = async (docType, document) => {
 func.search = async (t, c, options) => {
   const SettingModel = require("../dataModels/SettingModel");
   const UserModel = require("../dataModels/UserModel");
+  const ThreadCategoryModel = require('../dataModels/ThreadCategoryModel');
   let {
     page=0, sortType,
-    timeStart, timeEnd,
+    timeStart, timeEnd, tcId = [],
     fid, relation, sort, excludedFid,
     author, digest, onlyTitle = false
   } = options;
@@ -210,7 +208,7 @@ func.search = async (t, c, options) => {
   const {
     searchThreadList, searchPostList, searchAllList, searchUserList,
     searchColumnList, searchResourceList
-  } = (await SettingModel.findById("page")).c;
+  } = await SettingModel.getSettings('page');
 
   let size;
   if(t === "user") {
@@ -470,6 +468,59 @@ func.search = async (t, c, options) => {
       body.query.bool.must[0].bool.should[0].bool.must.push(excludedFidMatch);
       body.query.bool.must[0].bool.should[1].bool.must.push(excludedFidMatch);
     }
+
+    if(t === 'thread' && tcId && tcId.length) {
+      const must = [];
+      const categoryTree = await ThreadCategoryModel.getCategoryTree();
+      const categoryTreeObj = {};
+      for(const c of categoryTree) {
+        categoryTreeObj[c._id] = c.nodes.map(n => n._id);
+      }
+      const categoryObj = {};
+      for(const id of tcId) {
+        let [categoryId, nodeId] = id.split('-');
+        if(!categoryObj[categoryId]) {
+          categoryObj[categoryId] = new Set();
+        }
+        if(categoryObj[categoryId].has(nodeId)) continue;
+        categoryObj[categoryId].add(nodeId);
+      }
+      for(let categoryId in categoryObj) {
+        if(!categoryObj.hasOwnProperty(categoryId)) continue;
+        let nodesId = categoryObj[categoryId];
+        categoryId = Number(categoryId);
+        const hasDefault = nodesId.has('default');
+        nodesId.delete('default');
+        nodesId = [...nodesId].map(n => Number(n));
+        const should = nodesId.map(nodeId => {
+          return {
+            match: {
+              tcId: nodeId
+            }
+          }
+        });
+        if(hasDefault) {
+          should.push({
+            bool: {
+              must_not: categoryTreeObj[categoryId].map(id => {
+                return {
+                  match: {
+                    tcId: id
+                  }
+                }
+              })
+            }
+          });
+        }
+        must.push({
+          bool: {
+            should
+          }
+        });
+      }
+      body.query.bool.must[0].bool.should[0].bool.must.push(...must);
+    }
+
 
 
     if(author) {
