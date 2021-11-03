@@ -16,7 +16,7 @@ if data.cat
 if showPagingDigestButton
   .paging-button
     a.radius-left.button(href=`${state.url}` class=!data.d?"active": "" data-type="reload") 全部
-    a.radius-right.button(href=`${state.url}?d=true` class=data.d?"active": "" data-type="reload") 精选
+    a.radius-right.button(href=`${state.url}?d=true${query}` class=data.d?"active": "" data-type="reload") 精选
 if showPagingSortButton
   .paging-button
     a.radius-left.button(href=`?page=${page}${query}&s=tlm` class=data.s!=='toc'? "active": '' data-type="reload") 复序
