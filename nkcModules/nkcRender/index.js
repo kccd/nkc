@@ -62,6 +62,17 @@ class NKCRender {
           // a.attr('data-url', url);
         }
       }
+
+      // 文章中的图片
+      const images = $('img');
+      for(let i = 0; i < images.length; i++) {
+        const image = images.eq(i);
+        const src = image.attr('src');
+        const reg = /^(http(s)?:\/\/|ftp:\/\/)/i;
+        if(!src || !reg.test(src)) continue;
+        if(domainWhitelistReg.test(src)) continue;
+        image.replaceWith(`<span data-tag="nkcsource" data-type="externalImage">外链图片已失效，请作者重新上传</span>`);
+      }
     }
     const sourceMethods = sources[type];
     for(const name in sourceMethods) {
