@@ -1,9 +1,11 @@
 import router from './router';
 import App from './App';
-import Vue from 'vue';
-import Vuetify from './plugins/vuetify';
 new Vue({
   router,
-  vuetify: Vuetify,
+  vuetify: new Vuetify({
+    icons: {
+      iconfont: 'mdi'
+    }
+  }),
   render: h => h(App)
 }).$mount('#app');

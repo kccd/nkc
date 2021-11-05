@@ -14,14 +14,13 @@ const schema = new mongoose.Schema({
     default: '',
     index: 1
   },
-  // 团队名称
-  name: {
-    type: String,
-    required: true,
+  membersId: {
+    type: [String],
+    default: [],
     index: 1
   },
-  // 团队名称 小写
-  nameLowerCase: {
+  // 团队名称
+  name: {
     type: String,
     required: true,
     index: 1
@@ -31,9 +30,41 @@ const schema = new mongoose.Schema({
     type: String,
     default: ''
   },
-
+  // 是否被封禁
+  disabled: {
+    type: Boolean,
+    default: false,
+    index: 1
+  }
 }, {
   collection: 'PIMTeams'
 });
+
+schema.statics.getTeamsByUserId = async uid => {
+  const PIMTeamModel = mongoose.model('PIMTeams');
+  return PIMTeamModel.find({membersId: uid, disabled: false}, {
+    _id: 1,
+    toc: 1,
+    uid: 1,
+    membersId: 1,
+    name: 1,
+    description: 1
+  }).sort({toc: 1});
+};
+
+schema.statics.checkTeamInfo = async team => {
+  const {name, description} = team;
+  const {checkString} = require('../nkcModules/checkData');
+  checkString(name, {
+    name: '团队名称',
+    minLength: 1,
+    maxLength: 30
+  });
+  checkString(description, {
+    name: '团队介绍',
+    minLength: 0,
+    maxLength: 1000
+  });
+}
 
 module.exports = mongoose.model('PIMTeams', schema);

@@ -2,13 +2,17 @@ include ../publicModules/mixin
 
 html
   head
+    +includeCSS('vuetify/dist/vuetify.min.css', true)
+    +includeCSS('@mdi/font/css/materialdesignicons.min.css', true)
+    +includeCSS('/pim/index.css', true)
     meta(name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no")
   body
 
     #app
 
-    if process.env.NODE_ENV === "production"
-      +includeJS("/external_pkgs/vue.min.js", true)
-    else
-      +includeJS("/external_pkgs/vue.js", true)
+    +includeJS('/external_pkgs/polyfill/dist/polyfill.min.js', true)
+    +includeJS("/sweetalert2/dist/sweetalert2.all.min.js", true)
+    +includeJS("/external_pkgs/vue.min.js", true)
+    +includeJS("/vuetify/dist/vuetify.min.js", true)
+    +includeJS("/vue-router/dist/vue-router.min.js", true)
     +includeJS('/pim/index.js')

@@ -1,8 +1,3 @@
-/**
- * 请求封装
- * @description interface_common.js复制过来的
- */
-
 /*
 * 发起请求/上传文件
 * @param {String} type 普通请求："post", 上传文件："upload"
