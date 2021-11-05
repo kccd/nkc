@@ -1088,6 +1088,7 @@ if(windowDataDom) {
   NKC.configs.selectTypesWhenSubscribe = windowData.selectTypesWhenSubscribe;
   NKC.configs.refererOperationId = windowData.refererOperationId;
   NKC.configs.newMessageCount = windowData.newMessageCount || 0;
+  NKC.configs.fileDomain = windowData.fileDomain;
 }
 
 window.NKC = NKC;

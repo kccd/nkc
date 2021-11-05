@@ -1,6 +1,17 @@
+var isNode = typeof window === 'undefined';
+
 var Tools = function() {
   var self = this;
   self.getUrl = function(type, id, size) {
+    var fileDomain;
+    if(['resource', 'resourceDownload', 'pdf'].indexOf(type) !== -1) {
+      if(isNode) {
+        fileDomain = require('../config/server').fileDomain;
+      } else {
+        fileDomain = NKC.configs.fileDomain;
+      }
+    }
+    fileDomain = fileDomain || '';
     if(['', undefined, null].includes(id)) {
       id = 'default';
     }
@@ -62,7 +73,7 @@ var Tools = function() {
         return '/a/' + id + t
       }
       case "pdf": {
-        return "/r/" + id + '?c=preview_pdf';
+        return fileDomain + "/r/" + id + '?c=preview_pdf';
       }
       case "sticker": {
         return "/sticker/" + id;
@@ -93,11 +104,11 @@ var Tools = function() {
       }
       // 用户上传的附件
       case "resource": {
-        return "/r/" + id + t
+        return fileDomain + "/r/" + id + t
       }
       // 用户上传的附件的下载链接
       case "resourceDownload": {
-        return "/r/" + id + t + '&d=attachment'
+        return fileDomain + "/r/" + id + t + '&d=attachment'
       }
       // 其他资源，包含avatar, banner等等
       case "attach": {
@@ -289,7 +300,8 @@ var Tools = function() {
 
 var elementIdChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-if(typeof window === "undefined") {
+
+if(isNode) {
   module.exports = new Tools();
 } else {
   NKC.methods.tools = new Tools();

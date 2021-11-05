@@ -60,12 +60,12 @@ registerRouter
 	  try{
 	    await db.ShareModel.ensureEffective(shareToken);
     } catch(err) {
-      ctx.setCookie('share-token', '');
+      ctx.clearCookie('share-token');
       return await next();
     }
     const share = await db.ShareModel.findOnly({token: shareToken});
     await share.computeReword("register", ctx.address, ctx.port);
-    ctx.setCookie('share-token', '');
+    ctx.clearCookie('share-token');
 
 	  await next();
   })
