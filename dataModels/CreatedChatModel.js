@@ -110,6 +110,23 @@ chatSchema.statics.createChat = async (uid, targetUid, both) => {
 };
 
 /*
+* 创建默认对话
+* @param {String} type systemInfo，reminder, newFriends
+* @param {String} uid 用户 ID
+* */
+chatSchema.statics.createDefaultChat = async (type, uid) => {
+  if(!['systemInfo', 'reminder', 'newFriends'].includes(type)) {
+    throwErr(500, `消息类型错误 type: ${type}`);
+  }
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const obj = {};
+  obj[`messageSettings.chat.${type}`] = true;
+  await UsersGeneralModel.updateOne({uid}, {
+    $set: obj
+  });
+};
+
+/*
 * 获取单个对话
 * @param {String} 对话类型  UTU, STE, STU, newFriends
 * @param {String} uid 当前用户UID
