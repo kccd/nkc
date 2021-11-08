@@ -80,12 +80,15 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
               }
             })
             .then(() => {
-              this.getResourceInfo();
               if(NKC.configs.isApp) {
                 NKC.methods.rn.downloadFile(resource.oname, url);
               } else {
                 window.location.href = url;
               }
+              const self = this;
+              setTimeout(() => {
+                self.getResourceInfo();
+              }, 1000);
             })
             .catch(sweetError);
         },
@@ -96,7 +99,7 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
         },
         getResourceInfo() {
           const {rid} = this;
-          nkcAPI(`/r/${rid}/detail`, 'GET')
+          nkcAPI(`/r/${rid}/detail`, 'GET', {})
             .then(res => {
               const {
                 needScore,
@@ -123,6 +126,7 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
               this.loading = false;
             })
             .catch(err => {
+              console.log(err);
               this.loading = false;
               this.error = true;
               sweetError(err);
