@@ -5,7 +5,12 @@ const fsPromises = fs.promises;
 module.exports = async (ctx, next) => {
   const {data, filePath} = ctx;
   if(filePath) {
-    const stat = await fsPromises.stat(filePath);
+    let stat;
+    try{
+      stat = await fsPromises.stat(filePath);
+    } catch(err) {
+      ctx.throw(404, `文件不存在`);
+    }
     const {size, mtime} = stat;
     const lastModified = (new Date(mtime)).getTime();
     ctx.set('ETag', lastModified);
