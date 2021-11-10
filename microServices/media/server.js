@@ -15,26 +15,19 @@ try{
 
 const {
   port,
-  attachment
-} = require('../../config/store');
+} = require('../../config/media');
 
 const body = require('./middlewares/body');
 const error = require('./middlewares/error');
 const init = require('./middlewares/init');
 
-if(!attachment || attachment.length === 0) throw new Error(`未指定文件目录`);
-
 const app = new koa();
-
-app.on('error', err => {
-  // console.log(`koa error:`, err);
-});
 
 app.use(koaBody({
   multipart: true,
   formidable: {
     maxFields: 20,
-    maxFileSize: 1024 * 1024 * 1024 * 1024 * 1024,
+    maxFileSize: 1024 * 1024 * 1024 * 1024,
     uploadDir: tempPath,
     hash: 'md5',
     keepExtensions: true
@@ -48,5 +41,5 @@ app.use(body);
 const server = http.createServer(app.callback());
 
 server.listen(port, () => {
-  console.log(`Store server is running at ${port}`.green);
+  console.log(`Media server is running at ${port}`.green);
 });

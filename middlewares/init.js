@@ -232,6 +232,7 @@ module.exports = async (ctx, next) => {
 	  ctx.data.url = ctx.url;
 		ctx.type = ctx.type || 'application/json';
 		if(ctx.filePath) ctx.filePath = "";
+    if(ctx.remoteFile) ctx.remoteFile = null;
 	  await body(ctx, () => {});
   }
   finally {

@@ -1,6 +1,6 @@
 const tools = require('../tools');
 module.exports = async (ctx, next) => {
-  const {time, destination} = ctx.query;
-  ctx.filePath = await tools.getTargetFilePath(time, destination);
+  const {time, path} = ctx.query;
+  ctx.filePath = await tools.getTargetFilePath(time, path);
   await next();
 }

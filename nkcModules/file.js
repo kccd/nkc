@@ -26,6 +26,66 @@ exports.folders = {
 }
 
 /*
+* resource 文件目录的组成如下：
+* diskPath + mediaPath + timePath + filenamePath
+* */
+
+/*
+* 根据时间获取顶层目录
+* */
+exports.getDiskPath = async (t) => {
+  let now;
+  if(t) {
+    now = new Date(t).getTime();
+  } else {
+    now = Date.now();
+  }
+  if(!attachmentConfig.length) {
+    return PATH.resolve(__dirname, '../resources');
+  }
+  let basePath;
+  for(const a of attachmentConfig) {
+    let {path, url, startingTime, endTime} = a;
+    if(path) {
+      path = PATH.resolve(path);
+      if(!await func.access(path)) throwErr(500, `指定的目录 ${path} 不存在`);
+    }
+    // if(!fs.existsSync(path)) throwErr `指定的目录 ${path} 不存在`;
+    const sTime = new Date(startingTime + ' 00:00:00').getTime();
+    const eTime = new Date(endTime + ' 00:00:00').getTime();
+    if(now >= sTime && now < eTime) {
+      if(path) {
+        basePath = path;
+      } else {
+        basePath = url;
+      }
+      break;
+    }
+  }
+  if(!basePath) throwErr `未找到与时间匹配的目录，请检查目录配置是否正确`;
+  return basePath;
+};
+
+/*
+* 根据文件类型获取文件类型所在目录
+* */
+exports.getMediaPath = async (type) => {
+  const fileFolder = require('../settings/fileFolder');
+  return fileFolder[type];
+};
+/*
+* 根据时间获取年月组成的目录
+* */
+exports.getTimePath = async (t) => {
+  return moment(t).format(`YYYY/MM`);
+};
+
+exports.isUrl = (str) => {
+  const reg = /^https?:\/\//i;
+  return reg.test(str);
+};
+
+/*
 * 根据时间和配置文件获取资源所磁盘位置
 * 配置文件数据格式:
 * [
@@ -44,35 +104,14 @@ exports.folders = {
 * @return {String} 路径
 * */
 exports.getBasePath = async (t) => {
-  let now;
-  if(t) {
-    now = new Date(t).getTime();
-  } else {
-    now = Date.now();
-  }
-  if(!attachmentConfig.length) {
-    return PATH.resolve(__dirname, '../resources');
-  }
-  let basePath;
-  for(const a of attachmentConfig) {
-    const {path, startingTime, endTime} = a;
-    const _path = PATH.resolve(path);
-    if(!await func.access(path)) throwErr(500, `指定的目录 ${path} 不存在`);
-    // if(!fs.existsSync(path)) throwErr `指定的目录 ${path} 不存在`;
-    const sTime = new Date(startingTime + ' 00:00:00').getTime();
-    const eTime = new Date(endTime + ' 00:00:00').getTime();
-    if(now >= sTime && now < eTime) {
-      basePath = _path;
-      break;
-    }
-  }
-  if(!basePath) throwErr `未找到指定的目录，请检查目录配置是否正确`;
-  return basePath;
+  return await func.getDiskPath(t);
 }
 
 exports.getFullPath = async (p, t) => {
   const path = PATH.resolve(await func.getBasePath(t), p);
-  await mkdirp(path);
+  if(path.indexOf('http') !== 0) {
+    await mkdirp(path);
+  }
   return path;
 };
 
@@ -97,8 +136,7 @@ exports.getPath = async (type, time) => {
 * @author pengxiguaa 2020/7/20
 * */
 exports.getFileFolderPathByFileType = async (type) => {
-  const fileFolder = require('../settings/fileFolder');
-  return fileFolder[type];
+  return await func.getMediaPath(type);
 }
 
 /*

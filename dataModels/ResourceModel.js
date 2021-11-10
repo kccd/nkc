@@ -276,11 +276,29 @@ resourceSchema.methods.getFilePath = async function(size) {
     if(!parentResource) throwErr(500, `附件丢失 rid:${prid}`);
     return await parentResource.getFilePath(size);
   }
-  const fileFolder = await ResourceModel.getMediaPath(this.mediaType, toc);
+
+  const diskPath = await FILE.getDiskPath(toc);
+  const mediaPath = await FILE.getMediaPath(this.mediaType);
+  const timePath = await FILE.getTimePath(toc);
+  let filenamePath;
+  if(size) {
+    filenamePath = `${rid}_${size}.${ext}`;
+  } else {
+    filenamePath = `${rid}.${ext}`;
+  }
   let filePath;
+  if(FILE.isUrl(diskPath)) {
+    filePath = `${diskPath}?time=${toc.getTime()}&path=${mediaPath}/${timePath}/${filenamePath}`;
+  } else {
+    filePath = `${diskPath}/${mediaPath}/${timePath}/${filenamePath}`;
+  }
+  return filePath;
+  /*const fileFolder = await ResourceModel.getMediaPath(this.mediaType, toc);
+  let filenamePath;
+
   if(this.mediaType === 'mediaVideo') {
     if(!Object.keys(videoSize).includes(size)) {
-      filePath = `./${rid}_sd.${ext}`;
+      filenamePath = `${rid}_sd.${ext}`;
       for(const s of Object.keys(videoSize)) {
         const _filePath = `./${rid}_${s}.${ext}`;
         const targetPath = PATH.resolve(fileFolder, _filePath)
@@ -294,7 +312,7 @@ resourceSchema.methods.getFilePath = async function(size) {
   } else {
     filePath = `./${rid}.${ext}`;
   }
-  return PATH.resolve(fileFolder, filePath);
+  return PATH.resolve(fileFolder, filePath);*/
 };
 /*
 *  获取PDF预览文件

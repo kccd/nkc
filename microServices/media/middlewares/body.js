@@ -15,6 +15,10 @@ module.exports = async (ctx, next) => {
     const lastModified = (new Date(mtime)).getTime();
     ctx.set('ETag', lastModified);
     ctx.set('Cache-Control', 'public, max-age=604800');
+    if(ctx.fresh) {
+      ctx.status = 304;
+      return;
+    }
     const basename = path.basename(filePath);
     let ext = path.extname(filePath);
     ext = ext.replace('.', '');
@@ -24,14 +28,14 @@ module.exports = async (ctx, next) => {
     ctx.set("Accept-Ranges", "bytes");
     let headerRange = ctx.request.headers['range'];
     if(headerRange) {
-      const range = await tools.parseRange(headerRange, size);
+      const range = tools.parseRange(headerRange, size);
       if(range) {
         contentLength = range.end - range.start + 1;
         readStreamRange = {
           start: range.start,
           end: range.end
         };
-        ctx.set(`Content-Range`, `bytes ${range.start}-${range.end}/${size}`);
+        ctx.set(`Content-Range`, `bytes ${range.start}-${range.end}/${stats.size}`);
         ctx.status = 206;
       }
     }

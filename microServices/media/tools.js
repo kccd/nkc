@@ -38,9 +38,9 @@ async function getDiskPath(time) {
 * @param {String} destination 文件的相对目录
 * @return {String}
 * */
-async function getTargetFilePath(time, path) {
+async function getTargetFilePath(time, destination) {
   const diskPath = await getDiskPath(time);
-  return Path.resolve(diskPath, path);
+  return Path.resolve(diskPath, destination);
 }
 
 /*
