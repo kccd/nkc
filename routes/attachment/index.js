@@ -8,8 +8,9 @@ router
     const {id} = params;
     const {t, c} = query;
     if(t && !['sm', 'lg', 'md', 'ico'].includes(t)) ctx.throw(400, '未知的文件尺寸');
-    const a = await db.AttachmentModel.findOne({_id: id});
-    if(a) {
+    const a = await db.AttachmentModel.findOnly({_id: id});
+    ctx.remoteFile = await a.getRemoteFile(t);
+    /*if(a) {
       if(c === 'siteIcon') {
         ctx.filePath = await db.AttachmentModel.getSiteIconFilePath(t);
       } else {
@@ -36,7 +37,7 @@ router
         default: ctx.filePath = statics.defaultAvatarPath;
         // default: ctx.throw(400, '数据未找到');
       }
-    }
+    }*/
     await next();
   })
 module.exports = router;

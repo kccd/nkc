@@ -858,6 +858,7 @@ resourceSchema.methods.getMediaServiceDataAudio = async function() {
 resourceSchema.statics.updateResourceStatus = async (props) => {
   const {rid, status, error, info = {}} = props;
   const ResourceModel = mongoose.model('resources');
+  const {sendDataMessage} = require('../nkcModules/socket');
   const resource = await ResourceModel.findOnly({rid});
   if(resource.mediaType === 'mediaAudio') {
     let filename = resource.oname;
@@ -875,6 +876,41 @@ resourceSchema.statics.updateResourceStatus = async (props) => {
       $set: updateObj
     });
   }
+  let state = status? 'fileProcessFinish': 'fileProcessFailed';
+  sendDataMessage(resource.uid, {
+    event: "fileTransformProcess",
+    data: {rid: resource.rid, state, err: error}
+  });
 };
+
+resourceSchema.methods.getRemoteFile = async function(size) {
+  const FILE = require('../nkcModules/file');
+  const ResourceModel = mongoose.model('resources');
+  const {toc, ext, rid, prid, mediaType, oname} = this;
+  if(prid) {
+    const parentResource = await ResourceModel.findOne({rid: prid});
+    if(!parentResource) throwErr(500, `附件丢失 rid:${prid}`);
+    return await parentResource.getFilePath(size);
+  }
+  const diskPath = await FILE.getDiskPath(toc);
+  const mediaPath = await FILE.getMediaPath(mediaType);
+  const timePath = await FILE.getTimePath(toc);
+  let filenamePath;
+  if(size) {
+    filenamePath = `${rid}_${size}.${ext}`;
+  } else {
+    filenamePath = `${rid}.${ext}`;
+  }
+  const path = PATH.join(mediaPath, timePath, filenamePath);
+  const time = (new Date(toc)).getTime();
+  return {
+    url: diskPath,
+    query: {
+      path,
+      time
+    },
+    filename: oname
+  }
+}
 
 module.exports = mongoose.model('resources', resourceSchema);

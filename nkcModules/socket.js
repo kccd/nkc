@@ -9,10 +9,11 @@ const socketServiceName = communicationConfig.servicesName.socket;
 
 const communicationClient = communication.getCommunicationClient();
 communicationClient.onMessage((req) => {
+  const ResourceModel = require('../dataModels/ResourceModel');
   const {from, content} = req;
   const {type, data} = content;
   if(type === 'resourceStatus') {
-    db.ResourceModel.updateResourceStatus(data);
+    ResourceModel.updateResourceStatus(data);
   }
 });
 
@@ -47,20 +48,22 @@ func.sendDataMessage = (uid, options) => {
 }
 
 func.sendForumMessage = async (data) => {
+  const ThreadModel = require('../dataModels/ThreadModel');
+  const ForumModel = require('../dataModels/ForumModel');
   const socketClient = communication.getCommunicationClient();
   const render = require('./render');
   const {tid, state, pid} = data;
-  let thread = await db.ThreadModel.findOne({tid});
+  let thread = await ThreadModel.findOne({tid});
   if(!thread) return;
   const contentType = thread.oc === pid? 'thread': 'post';
-  thread = (await db.ThreadModel.extendThreads([thread], {
+  thread = (await ThreadModel.extendThreads([thread], {
     htmlToText: true,
     count: 200,
   }))[0];
   const template = PATH.resolve(__dirname, `../pages/publicModules/thread_panel/thread_panel.pug`);
   let usedForumsId = [];
   for(const fid of thread.mainForumsId) {
-    const forums = await db.ForumModel.getForumNav(fid);
+    const forums = await ForumModel.getForumNav(fid);
     for(const forum of forums) {
       if(usedForumsId.includes(forum.fid)) continue;
       const html = render(template, {singleThread: thread}, {...state, threadListStyle: forum.threadListStyle});
@@ -89,8 +92,10 @@ func.sendForumMessage = async (data) => {
 };
 
 func.sendPostMessage = async (pid) => {
+  const PostModel = require('../dataModels/PostModel');
+  const ThreadModel = require('../dataModels/ThreadModel');
   const socketClient = communication.getCommunicationClient();
-  const singlePostData = await db.PostModel.getSocketSinglePostData(pid);
+  const singlePostData = await PostModel.getSocketSinglePostData(pid);
   const {
     parentCommentId,
     parentPostId,
@@ -98,8 +103,8 @@ func.sendPostMessage = async (pid) => {
     html,
     post,
   } = singlePostData;
-  const eventName = await db.PostModel.getSocketEventName(pid);
-  const thread = await db.ThreadModel.findOnly({tid: post.tid});
+  const eventName = await PostModel.getSocketEventName(pid);
+  const thread = await ThreadModel.findOnly({tid: post.tid});
   const roomName = getRoomName('post', thread.oc);
   socketClient.sendMessage(socketServiceName, {
     roomName,
@@ -124,6 +129,8 @@ func.sendPostMessage = async (pid) => {
 
 // 发送消息到用户
 async function sendMessageToUser(channel, message) {
+  const MessageModel = require('../dataModels/MessageModel');
+  const UserModel = require('../dataModels/UserModel');
   const socketClient = communication.getCommunicationClient();
   // let {io} = global.NKC;
   //获取用户房间名
@@ -136,7 +143,7 @@ async function sendMessageToUser(channel, message) {
   try{
     message = JSON.parse(message);
     //判断消息类型
-    const _message = await db.MessageModel.extendMessage(undefined, message);
+    const _message = await MessageModel.extendMessage(undefined, message);
     message._message = _message;
 
 
@@ -188,8 +195,8 @@ async function sendMessageToUser(channel, message) {
             message
           });*/
       } else if(ty === 'UTU') {                            // 用户间的私信
-        const sUser = await db.UserModel.findOne({uid: s});
-        const rUser = await db.UserModel.findOne({uid: r});
+        const sUser = await UserModel.findOne({uid: s});
+        const rUser = await UserModel.findOne({uid: r});
         if(!sUser || !rUser) return;
         const sc = {
           eventName: userMessage,
@@ -232,8 +239,8 @@ async function sendMessageToUser(channel, message) {
           });*/
       } else if(ty === 'friendsApplication') {           // 好友申请
         const {respondentId, applicantId} = message;
-        const respondent = await db.UserModel.findOne({uid: respondentId});
-        const applicant = await db.UserModel.findOne({uid: applicantId});
+        const respondent = await UserModel.findOne({uid: respondentId});
+        const applicant = await UserModel.findOne({uid: applicantId});
         if(!respondent || !applicant) return;
         const data = {
           message: {
@@ -384,7 +391,8 @@ func.sendEventRemoveCategory = async (uid, cid) => {
 * 更新分组列表
 * */
 func.sendEventUpdateCategoryList = async (uid) => {
-  const categoryList = await db.FriendsCategoryModel.getCategories(uid);
+  const FriendsCategoryModel = require('../dataModels/FriendsCategoryModel');
+  const categoryList = await FriendsCategoryModel.getCategories(uid);
   const socketClient = communication.getCommunicationClient();
   socketClient.sendMessage(socketServiceName, {
     eventName: 'updateCategoryList',
@@ -398,7 +406,8 @@ func.sendEventUpdateCategoryList = async (uid) => {
 * 更新用户好友列表
 * */
 func.sendEventUpdateUserList = async (uid) => {
-  const userList = await db.FriendModel.getFriends(uid);
+  const FriendModel = require('../dataModels/FriendModel');
+  const userList = await FriendModel.getFriends(uid);
   const socketClient = communication.getCommunicationClient();
   socketClient.sendMessage(socketServiceName, {
     eventName: 'updateUserList',
@@ -413,7 +422,8 @@ func.sendEventUpdateUserList = async (uid) => {
 * 更新用户对话列表
 * */
 func.sendEventUpdateChatList = async (uid) => {
-  const chatList = await db.CreatedChatModel.getCreatedChat(uid);
+  const CreatedChatModel = require('../dataModels/CreatedChatModel');
+  const chatList = await CreatedChatModel.getCreatedChat(uid);
   const socketClient = communication.getCommunicationClient();
   socketClient.sendMessage(socketServiceName, {
     eventName: 'updateChatList',
@@ -469,7 +479,8 @@ func.sendEventMarkAsRead = async (type, uid, tUid) => {
 * @param {String} tUid 对方
 * */
 func.sendEventUpdateChat = async (type, uid, tUid) => {
-  const chat = await db.CreatedChatModel.getSingleChat(type, uid, tUid);
+  const CreatedChatModel = require('../dataModels/CreatedChatModel');
+  const chat = await CreatedChatModel.getSingleChat(type, uid, tUid);
   const socketClient = communication.getCommunicationClient();
   socketClient.sendMessage(socketServiceName, {
     eventName: 'updateChat',
@@ -484,14 +495,17 @@ func.sendEventUpdateChat = async (type, uid, tUid) => {
 * 发送普通消息
 * */
 func.sendMessageToUser = async (messageId, localId) => {
-  let message = await db.MessageModel.findOne({_id: messageId});
+  const MessageModel = require('../dataModels/MessageModel');
+  const UserModel = require('../dataModels/UserModel');
+  const CreatedChatModel = require('../dataModels/CreatedChatModel');
+  let message = await MessageModel.findOne({_id: messageId});
   if(!message) return;
   const {ty, s, r} = message;
-  message = await db.MessageModel.extendMessage(message);
+  message = await MessageModel.extendMessage(message);
   const socketClient = communication.getCommunicationClient();
-  const rChat = await db.CreatedChatModel.getSingleChat(ty, r, s);
+  const rChat = await CreatedChatModel.getSingleChat(ty, r, s);
   if(ty === 'UTU') {
-    const sChat = await db.CreatedChatModel.getSingleChat(ty, s, r);
+    const sChat = await CreatedChatModel.getSingleChat(ty, s, r);
     socketClient.sendMessage(socketServiceName, {
       eventName: 'receiveMessage',
       roomName: getRoomName('user', s),
@@ -508,7 +522,7 @@ func.sendMessageToUser = async (messageId, localId) => {
     data: {
       message,
       chat: rChat,
-      beep: await db.UserModel.getMessageBeep(r, 'UTU'),
+      beep: await UserModel.getMessageBeep(r, 'UTU'),
     }
   });
 };
@@ -517,21 +531,24 @@ func.sendMessageToUser = async (messageId, localId) => {
 * 向在线用户推送系统通知
 * */
 func.sendSystemInfoToUser = async (messageId) => {
-  let message = await db.MessageModel.findOne({_id: messageId});
+  const MessageModel = require('../dataModels/MessageModel');
+  const UserModel = require('../dataModels/UserModel');
+  const CreatedChatModel = require('../dataModels/CreatedChatModel');
+  let message = await MessageModel.findOne({_id: messageId});
   if(!message) return;
-  message = await db.MessageModel.extendMessage(message);
+  message = await MessageModel.extendMessage(message);
   // 获取能够接收此消息的用户
-  const users = await db.UserModel.find({online: {$ne: ''}}, {uid: 1}).sort({toc: 1});
+  const users = await UserModel.find({online: {$ne: ''}}, {uid: 1}).sort({toc: 1});
   const socketClient = communication.getCommunicationClient();
   for(const u of users) {
-    const rChat = await db.CreatedChatModel.getSingleChat('STE', u.uid);
+    const rChat = await CreatedChatModel.getSingleChat('STE', u.uid);
     socketClient.sendMessage(socketServiceName, {
       eventName: 'receiveMessage',
       roomName: getRoomName('user', u.uid),
       data: {
         message,
         chat: rChat,
-        beep: await db.UserModel.getMessageBeep(u.uid, 'STE'),
+        beep: await UserModel.getMessageBeep(u.uid, 'STE'),
       }
     })
   }
@@ -541,9 +558,13 @@ func.sendSystemInfoToUser = async (messageId) => {
 * 发送新朋友添加请求
 * */
 func.sendNewFriendApplication = async (applicationId) => {
-  const applicationMessage = await db.FriendsApplicationModel.getApplicationMessage(applicationId);
-  const message = await db.MessageModel.extendMessage(applicationMessage);
-  const chat = await db.CreatedChatModel.getSingleChat('newFriends', applicationMessage.tUid);
+  const FriendsApplicationModel = require('../dataModels/FriendsApplicationModel');
+  const MessageModel = require('../dataModels/MessageModel');
+  const UserModel = require('../dataModels/UserModel');
+  const CreatedChatModel = require('../dataModels/CreatedChatModel');
+  const applicationMessage = await FriendsApplicationModel.getApplicationMessage(applicationId);
+  const message = await MessageModel.extendMessage(applicationMessage);
+  const chat = await CreatedChatModel.getSingleChat('newFriends', applicationMessage.tUid);
   const socketClient = communication.getCommunicationClient();
   socketClient.sendMessage(socketServiceName, {
     eventName: 'receiveMessage',
@@ -552,7 +573,7 @@ func.sendNewFriendApplication = async (applicationId) => {
       localId: applicationId,
       message,
       chat,
-      beep: await db.UserModel.getMessageBeep(applicationMessage.tUid, 'newFriends'),
+      beep: await UserModel.getMessageBeep(applicationMessage.tUid, 'newFriends'),
     }
   })
 };

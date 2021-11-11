@@ -12,7 +12,7 @@ const breakpointExtensions = FILE.getExtensionByType('breakpoint');
 let allSpeedLimit;
 
 module.exports = async (ctx, next) => {
-  const {filePath, fileType, fileName, resource, fs, tg, db} = ctx;
+  const {filePath, isAttachment, fileName, resource, fs, tg, db} = ctx;
   const {encodeRFC5987ValueChars} = ctx.nkcModules.nkcRender;
   let stats;
   try {
@@ -50,7 +50,7 @@ module.exports = async (ctx, next) => {
 
   let createdStream, contentLength, contentDisposition;
 
-  if (fileType === 'attachment' || (!extArr.includes(ext) && (!rangeExt.includes(ext)))) {
+  if (isAttachment === 'attachment' || (!extArr.includes(ext) && (!rangeExt.includes(ext)))) {
     contentDisposition = `attachment; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`;
   } else {
     contentDisposition = `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`;

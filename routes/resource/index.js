@@ -86,7 +86,8 @@ resourceRouter
       }
     }
     const {mediaType, ext} = resource;
-    let filePath = await resource.getFilePath(t);
+    // let filePath = await resource.getFilePath(t);
+    ctx.remoteFile = await resource.getRemoteFile(t);
     let speed;
     data.resource = resource;
     data.rid = resource.rid;
@@ -127,27 +128,28 @@ resourceRouter
         } else {
           const pdfPath = await resource.getPDFPreviewFilePath();
           if(!await nkcModules.file.access(pdfPath)) nkcModules.throwError(403, `当前文档暂不能预览`, 'previewPDF');
-          filePath = pdfPath;
+          ctx.filePath = pdfPath;
         }
       }
       // 不要把这次的响应结果缓存下来
       ctx.dontCacheFile = true;
     }
-    if (mediaType === "mediaPicture") {
+    /*if (mediaType === "mediaPicture") {
       try {
         await fs.access(filePath);
       } catch (e) {
         filePath = ctx.settings.statics.defaultImageResourcePath;
       }
       ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`)
-    }
+    }*/
     // 在resource中添加点击次数
     if(!ctx.request.headers['range']){
       await resource.updateOne({$inc:{hits:1}});
     }
-    ctx.filePath = filePath;
+    // ctx.filePath = filePath;
     // 表明客户端希望以附件的形式加载资源
     if(d === "attachment") {
+      ctx.isAttachment = true;
       ctx.fileType = "attachment";
     } else if(d === "object") {
       // 返回数据对象

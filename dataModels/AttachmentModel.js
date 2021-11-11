@@ -9,7 +9,7 @@ const statics = require('../settings/statics');
 const FileType = require('file-type');
 const PATH = require('path');
 const folderTools = require("../nkcModules/file");
-const ffmpeg = require("../tools/ffmpeg") 
+const ffmpeg = require("../tools/ffmpeg")
 
 const schema = new Schema({
   // 附件ID mongoose.Types.ObjectId().toString()
@@ -703,6 +703,30 @@ schema.statics.saveFundImage = async (filePath, type) => {
   });
   await attach.save();
   return attach._id;
+}
+
+schema.methods.getRemoteFile = async function(size) {
+  const FILE = require('../nkcModules/file');
+  const {_id, ext, toc, type, name} = this;
+  const diskPath = await FILE.getDiskPath(toc);
+  const mediaPath = await FILE.getMediaPath(type);
+  const timePath = await FILE.getTimePath(toc);
+  let filenamePath;
+  if(size) {
+    filenamePath = `${_id}_${size}.${ext}`;
+  } else {
+    filenamePath = `${_id}.${ext}`;
+  }
+  const path = PATH.join(mediaPath, timePath, filenamePath);
+  const time = (new Date(toc)).getTime();
+  return {
+    url: diskPath,
+    query: {
+      path,
+      time
+    },
+    filename: name
+  }
 }
 
 module.exports = mongoose.model('attachments', schema);

@@ -4,12 +4,11 @@ const pictureExtensions = FILE.getExtensionByType('mediaPicture');
 const breakpointExtensions = FILE.getExtensionByType('breakpoint');
 
 module.exports = async (ctx, next) => {
-  const {remoteFile} = ctx;
+  const {remoteFile, isAttachment} = ctx;
   const {encodeRFC5987ValueChars} = ctx.nkcModules.nkcRender;
   const {
     url,
     query,
-    isAttachment = false,
     filename = '',
   } = remoteFile;
   const fileUrl = new URL(url);
