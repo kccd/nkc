@@ -306,6 +306,11 @@ resourceRouter
     await r.save();
     ctx.data.r = r;
 
+    await r.pushToMediaService(file);
+
+    await next();
+    return;
+
     //处理上传的资源文件
 
     setImmediate(async () => {

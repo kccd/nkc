@@ -48,5 +48,5 @@ app.use(body);
 const server = http.createServer(app.callback());
 
 server.listen(port, () => {
-  console.log(`Store server is running at ${port}`.green);
+  console.log(`store service is running at ${port}`.green);
 });

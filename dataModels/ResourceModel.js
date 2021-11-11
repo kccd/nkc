@@ -813,5 +813,68 @@ resourceSchema.methods.checkToken = async function(token) {
   return count !== null;
 };
 
+/*
+* 推送文件到文件处理服务
+* */
+resourceSchema.methods.pushToMediaService = async function(file) {
+  const FILE = require('../nkcModules/file');
+  const socket = require('../nkcModules/socket');
+  const mediaClient = require('../tools/mediaClient');
+  const {toc, mediaType} = this;
+  const storeServiceUrl = await FILE.getBasePath(toc);
+  const mediaServiceUrl = await socket.getMediaServiceUrl();
+  const data = await this.getMediaServiceData();
+  await mediaClient(mediaServiceUrl, {
+    type: mediaType,
+    filePath: file.path,
+    storeUrl: storeServiceUrl,
+    data
+  });
+};
+/*
+* 获取文件的存储目录等必要信息
+* */
+resourceSchema.methods.getMediaServiceData = async function() {
+  // mediaAudio, mediaVideo, mediaAttachment, mediaPicture
+  const {mediaType} = this;
+  const type = mediaType.replace('media', '');
+  return await this[`getMediaServiceData${type}`]();
+};
+
+resourceSchema.methods.getMediaServiceDataAudio = async function() {
+  const {rid, toc, mediaType} = this;
+  const FILE = require('../nkcModules/file');
+  const timePath = await FILE.getTimePath(toc);
+  const mediaPath = await FILE.getMediaPath(mediaType);
+  const filenamePath = `${rid}.mp3`;
+  const path = PATH.join(mediaPath, timePath, filenamePath);
+  return {
+    rid,
+    time: (new Date(toc)).getTime(),
+    path
+  };
+};
+
+resourceSchema.statics.updateResourceStatus = async (props) => {
+  const {rid, status, error, info = {}} = props;
+  const ResourceModel = mongoose.model('resources');
+  const resource = await ResourceModel.findOnly({rid});
+  if(resource.mediaType === 'mediaAudio') {
+    let filename = resource.oname;
+    filename = filename.split('.');
+    filename.pop();
+    filename.push('mp3');
+    filename = filename.join('.');
+    const updateObj = {
+      oname: filename,
+      state: status? 'usable': 'useless'
+    };
+    if(info.size) updateObj.size = info.size;
+    if(info.ext) updateObj.ext = info.ext;
+    await resource.updateOne({
+      $set: updateObj
+    });
+  }
+};
 
 module.exports = mongoose.model('resources', resourceSchema);

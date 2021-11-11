@@ -29,6 +29,8 @@ const common = require('./common');
 module.exports = async (server) => {
   const existed = !!server;
   if(!existed) {
+    global.NKC.port = socketConfig.port + Number(global.NKC.processId);
+    global.NKC.address = socketConfig.address;
     server = http.createServer();
   }
   const io = socketIo(server, socketConfig.options);
@@ -47,9 +49,8 @@ module.exports = async (server) => {
   await common(namespace);
 
   if(!existed) {
-    const port = socketConfig.port + Number(global.NKC.processId);
-    server.listen(port, socketConfig.address, () => {
-      console.log(`socket service ${global.NKC.processId} is running at ${socketConfig.address}:${port}`.green);
+    server.listen(global.NKC.port, global.NKC.address, () => {
+      console.log(`socket service ${global.NKC.processId} is running at ${global.NKC.address}:${global.NKC.port}`.green);
       if(process.connected) process.send('ready');
     });
     process.on('message', async function(msg) {

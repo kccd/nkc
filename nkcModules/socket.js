@@ -7,6 +7,15 @@ const func = {};
 
 const socketServiceName = communicationConfig.servicesName.socket;
 
+const communicationClient = communication.getCommunicationClient();
+communicationClient.onMessage((req) => {
+  const {from, content} = req;
+  const {type, data} = content;
+  if(type === 'resourceStatus') {
+    db.ResourceModel.updateResourceStatus(data);
+  }
+});
+
 func.sendConsoleMessage = async (data) => {
   const roomName = getRoomName('console');
   const socketClient = await communication.getCommunicationClient();
@@ -547,5 +556,21 @@ func.sendNewFriendApplication = async (applicationId) => {
     }
   })
 };
+
+/*
+* 获取媒体文件处理服务的信息
+* */
+func.getMediaServiceInfo = async () => {
+  const socketClient = communication.getCommunicationClient();
+  return await socketClient.getServiceInfoPromise(communicationConfig.servicesName.media);
+};
+
+/*
+* 随机获取一个在线的媒体处理服务的链接
+* */
+func.getMediaServiceUrl = async () => {
+  const mediaServiceInfo = await func.getMediaServiceInfo();
+  return `http://${mediaServiceInfo.serviceAddress}:${mediaServiceInfo.servicePort}`;
+}
 
 module.exports = func;

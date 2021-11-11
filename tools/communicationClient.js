@@ -4,7 +4,12 @@ const communicationConfig = require('../config/communication');
 
 class CommunicationClient {
   constructor(props) {
-    const {serviceName, serviceId} = props;
+    const {
+      serviceName,
+      serviceId,
+      servicePort,
+      serviceAddress
+    } = props;
     const serviceTag = `communication client ${serviceName}:${serviceId}`;
     const options = Object.assign(
       {},
@@ -12,7 +17,9 @@ class CommunicationClient {
       {
         auth: {
           serviceName,
-          serviceId
+          serviceId,
+          servicePort,
+          serviceAddress
         }
       }
     );
@@ -51,7 +58,7 @@ class CommunicationClient {
       socket.connect();
     });
   }
-  async sendMessagePromise(targetServiceName, content) {
+  async post(targetServiceName, eventName, content) {
     const {socket} = this;
     await this.connect();
     return new Promise((resolve, reject) => {
@@ -60,7 +67,7 @@ class CommunicationClient {
         error.status = 500;
         return reject(error);
       }
-      socket.emit(communicationConfig.messageEventName, {
+      socket.emit(eventName, {
         to: targetServiceName,
         content
       }, res => {
@@ -75,9 +82,15 @@ class CommunicationClient {
       });
     });
   }
+  async sendMessagePromise(targetServiceName, content) {
+    return this.post(targetServiceName, communicationConfig.messageEventName, content);
+  }
   sendMessage(targetServiceName, content) {
     this.sendMessagePromise(targetServiceName, content)
       .catch(console.error);
+  }
+  async getServiceInfoPromise(targetServiceName, content) {
+    return this.post(targetServiceName, communicationConfig.searchEventName, content);
   }
   onMessage(callback) {
     this.socket.on(communicationConfig.messageEventName, async (data, _callback) => {

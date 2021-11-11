@@ -15,7 +15,7 @@ async function moveFile(path, targetPath) {
 
 /*
 * 获取磁盘目录
-* @param {Date} time 附件上传日期
+* @param {Number} time 附件上传日期时间戳
 * @return {String}
 * */
 async function getDiskPath(time) {
@@ -34,7 +34,7 @@ async function getDiskPath(time) {
 
 /*
 * 获取最终文件存储目录
-* @param {Date} time 文件上传时间
+* @param {Number} time 文件上传时间戳
 * @param {String} destination 文件的相对目录
 * @return {String}
 * */

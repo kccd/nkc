@@ -1,3 +1,16 @@
+const {
+  port,
+  address,
+} = require('../../config/media');
+
+const processId =  Number(process.env.PROCESS_ID) || 0;
+
+global.Media = {
+  processId,
+  port: Number(port) + processId,
+  address
+};
+
 require('colors');
 const http = require('http')
 const koa = require('koa');
@@ -13,10 +26,6 @@ try{
   fs.mkdirSync(tempPath);
 }
 
-const {
-  port,
-} = require('../../config/media');
-
 const body = require('./middlewares/body');
 const error = require('./middlewares/error');
 const init = require('./middlewares/init');
@@ -27,7 +36,7 @@ app.use(koaBody({
   multipart: true,
   formidable: {
     maxFields: 20,
-    maxFileSize: 1024 * 1024 * 1024 * 1024,
+    maxFileSize: 1024 * 1024 * 1024 * 1024 * 1024,
     uploadDir: tempPath,
     hash: 'md5',
     keepExtensions: true
@@ -40,6 +49,7 @@ app.use(body);
 
 const server = http.createServer(app.callback());
 
-server.listen(port, () => {
-  console.log(`Media server is running at ${port}`.green);
+server.listen(global.Media.port, () => {
+  require('./socket');
+  console.log(`media service is running at ${global.Media.port}`.green);
 });

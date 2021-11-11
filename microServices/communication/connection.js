@@ -48,6 +48,23 @@ module.exports = async (socketIO) => {
     socket.on('disconnect', () => {
       console.log(`${tag} disconnect`.blue);
     });
+    socket.on(communicationConfig.searchEventName, async (req, callback) => {
+      const {to, content} = req;
+      const targetSocket = await getTargetSocketByServiceName(socketIO, to);
+      if(!targetSocket) {
+        callback({
+          status: 500,
+          content: {
+            message: 'Target service not found'
+          }
+        });
+      } else {
+        callback({
+          status: 200,
+          content: targetSocket.state
+        });
+      }
+    });
     socket.on(communicationConfig.messageEventName, async (req, callback) => {
       const {to, content} = req;
       const targetSocket = await getTargetSocketByServiceName(socketIO, to);

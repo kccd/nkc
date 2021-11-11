@@ -55,6 +55,15 @@ async function deleteFile(filePath) {
 }
 
 /*
+* 获取文件大小
+* @param {String} 文件路径
+* */
+async function getFileSize(filePath) {
+  const stat = await fsPromises.stat(filePath);
+  return stat.size;
+}
+
+/*
 * 解析 header range
 * */
 async function parseRange(str, size) {
@@ -92,5 +101,6 @@ module.exports = {
   moveFile,
   getTargetFilePath,
   getDiskPath,
+  getFileSize,
   parseRange
 }
