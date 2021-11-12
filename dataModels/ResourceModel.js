@@ -135,54 +135,58 @@ const resourceSchema = new Schema({
     type: Date,
     default: null
   },
-  // 文件信息
-  files: [
+
+  // 处理之后的文件信息
+  // 图片：default, sm, md
+  // 视频：sd, hd, fhd, cover
+  // 音频：default
+  // 附件：default, preview
+  files: {
+    default: {
+      type: Schema.Types.Mixed,
+      default: null,
+    },
+    sm: {
+      type: Schema.Types.Mixed,
+      default: null,
+    },
+    md: {
+      type: Schema.Types.Mixed,
+      default: null,
+    },
+    sd: {
+      type: Schema.Types.Mixed,
+      default: null,
+    },
+    hd: {
+      type: Schema.Types.Mixed,
+      default: null,
+    },
+    fhd: {
+      type: Schema.Types.Mixed,
+      default: null,
+    },
+    cover: {
+      type: Schema.Types.Mixed,
+      default: null,
+    },
+    preview: {
+      type: Schema.Types.Mixed,
+      default: null,
+    },
+    /*
     {
-      // default 默认文件 size、hash等信息同上
-      // preview 预览文件
-
-      // 图片：sm, md, default
-      // 视频：sd, hd, fhd, cover
-      // 音频：default
-      // 附件：default, preview
-
-      _id: {
-        type: String,
-        required: true,
-      },
-      ext: {
-        type: String,
-        default: ''
-      },
-      // 是否已丢失
-      lost: {
-        type: Boolean,
-        default: false,
-      },
-      hash: {
-        type: String,
-        default: '',
-      },
-      // 文件大小
-      size: {
-        type: Number,
-        default: 0
-      },
-      height: {
-        type: Number,
-        default: 0,
-      },
-      width: {
-        type: Number,
-        default: 0
-      },
-      // 在存储服务磁盘上的文件名
-      filename: {
-        type: String,
-        default: ''
-      }
+      _id: String,
+      ext: String,
+      lost: String, // 是否已丢失
+      hash: String, // 文件 md5
+      size: Number, // 文件大小
+      height: Number, // 图片、视频高
+      width: Number,  // 图片、视频宽
+      filename: String, // 在存储服务磁盘上的文件名
     }
-  ]
+    */
+  },
 },
 {
   toObject: {
@@ -961,7 +965,7 @@ resourceSchema.methods.getMediaServiceDataAudio = async function() {
 *     @param {String} 在 store service 磁盘上的文件名
 * */
 resourceSchema.statics.updateResourceStatus = async (props) => {
-  const {rid, status, error, filesInfo = []} = props;
+  const {rid, status, error, filesInfo = {}} = props;
   const ResourceModel = mongoose.model('resources');
   const {sendDataMessage} = require('../nkcModules/socket');
   const resource = await ResourceModel.findOnly({rid});
@@ -1034,7 +1038,7 @@ resourceSchema.statics.updateResourceStatus = async (props) => {
 resourceSchema.methods.getRemoteFile = async function(size) {
   const FILE = require('../nkcModules/file');
   const ResourceModel = mongoose.model('resources');
-  const {toc, ext, rid, prid, mediaType, oname} = this;
+  const {files = {}, toc, ext, rid, prid, mediaType, oname} = this;
   if(prid) {
     const parentResource = await ResourceModel.findOne({rid: prid});
     if(!parentResource) throwErr(500, `附件丢失 rid:${prid}`);
@@ -1043,12 +1047,32 @@ resourceSchema.methods.getRemoteFile = async function(size) {
   const diskPath = await FILE.getDiskPath(toc);
   const mediaPath = await FILE.getMediaPath(mediaType);
   const timePath = await FILE.getTimePath(toc);
-  let filenamePath;
-  if(size) {
-    filenamePath = `${rid}_${size}.${ext}`;
-  } else {
-    filenamePath = `${rid}.${ext}`;
+
+  if(!size) {
+    if(mediaType === 'mediaVideo') {
+      size = 'sd';
+    } else if(mediaType === 'mediaPicture') {
+      size = 'default'
+    } else if(mediaType === 'mediaAudio') {
+      size = 'default'
+    } else {
+      size = 'default'
+    }
   }
+
+  const defaultSizeFile = files['default'];
+  let targetSizeFile;
+  if(!files[size]) {
+    targetSizeFile = defaultSizeFile;
+  } else {
+    targetSizeFile = files[size];
+  }
+
+  if(!targetSizeFile || targetSizeFile.lost || !targetSizeFile.filename) {
+    throw new Error(`resource 数据错误 rid: ${rid}`);
+  }
+
+  const filenamePath = targetSizeFile.filename;
   const path = PATH.join(mediaPath, timePath, filenamePath);
   const time = (new Date(toc)).getTime();
   return {

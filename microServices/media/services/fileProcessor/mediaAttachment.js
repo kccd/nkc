@@ -40,7 +40,7 @@ module.exports = async (props) => {
     time
   }];
 
-  const filesInfo = [];
+  const filesInfo = {};
 
   Promise.resolve()
     .then(() => {
@@ -105,24 +105,22 @@ module.exports = async (props) => {
     })
     .then(fileInfo => {
       const {size, ext, hash} = fileInfo;
-      filesInfo.push({
-        _id: 'default',
+      filesInfo.default = {
         ext,
         size,
         hash,
         filename: filenamePath
-      });
+      };
       return getFileInfo(pdfTargetFilePath);
     })
     .then(pdfFileInfo => {
       const {size, ext, hash} = pdfFileInfo;
-      filesInfo.push({
-        _id: 'preview',
+      filesInfo.preview = {
         ext,
         size,
         hash,
         filename: previewFilenamePath
-      });
+      };
     })
     .then(() => {
       // 发送文件处理的状态

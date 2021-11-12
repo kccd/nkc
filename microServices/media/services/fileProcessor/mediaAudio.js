@@ -31,15 +31,14 @@ module.exports = async (props) => {
       return sendResourceStatusToNKC({
         rid,
         status: true,
-        filesInfo: [
-          {
-            _id: 'default',
+        filesInfo: {
+          default: {
             ext,
             size,
             hash,
             filename: filenamePath
           }
-        ]
+        }
       });
     })
     .catch(err => {

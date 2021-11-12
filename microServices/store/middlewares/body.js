@@ -9,7 +9,7 @@ module.exports = async (ctx, next) => {
     try{
       stat = await fsPromises.stat(filePath);
     } catch(err) {
-      ctx.throw(404, `文件不存在`);
+      ctx.throw(404, `文件不存在 ${filePath}`);
     }
     const {size, mtime} = stat;
     const lastModified = (new Date(mtime)).getTime();
