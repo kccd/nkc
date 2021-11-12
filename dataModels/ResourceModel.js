@@ -5,6 +5,7 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const PATH = require('path');
 const fs = require("fs");
+const FILE = require("../nkcModules/file");
 const fsPromises = fs.promises;
 const resourceSchema = new Schema({
 	rid: {
@@ -841,17 +842,31 @@ resourceSchema.methods.getMediaServiceData = async function() {
   return await this[`getMediaServiceData${type}`]();
 };
 
-resourceSchema.methods.getMediaServiceDataAudio = async function() {
-  const {rid, toc, mediaType} = this;
+resourceSchema.methods.getMediaServiceDataAttachment = async function() {
+  const {rid, toc, mediaType, ext} = this;
   const FILE = require('../nkcModules/file');
   const timePath = await FILE.getTimePath(toc);
   const mediaPath = await FILE.getMediaPath(mediaType);
-  const filenamePath = `${rid}.mp3`;
-  const path = PATH.join(mediaPath, timePath, filenamePath);
   return {
     rid,
-    time: (new Date(toc)).getTime(),
-    path
+    timePath,
+    mediaPath,
+    ext,
+    toc
+  };
+};
+
+resourceSchema.methods.getMediaServiceDataAudio = async function() {
+  const {rid, toc, mediaType, ext} = this;
+  const FILE = require('../nkcModules/file');
+  const timePath = await FILE.getTimePath(toc);
+  const mediaPath = await FILE.getMediaPath(mediaType);
+  return {
+    rid,
+    timePath,
+    mediaPath,
+    ext,
+    toc
   };
 };
 

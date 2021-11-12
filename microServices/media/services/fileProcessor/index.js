@@ -1,3 +1,4 @@
 module.exports = {
-  mediaAudio: require('./mediaAudio')
+  mediaAudio: require('./mediaAudio'),
+  mediaAttachment: require('./mediaAttachment')
 };

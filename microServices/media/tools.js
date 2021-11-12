@@ -99,6 +99,7 @@ async function parseRange(str, size) {
 
 module.exports = {
   moveFile,
+  deleteFile,
   getTargetFilePath,
   getDiskPath,
   getFileSize,
