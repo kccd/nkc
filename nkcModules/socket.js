@@ -515,6 +515,13 @@ func.sendMessageToUser = async (messageId, localId) => {
         chat: sChat
       }
     });
+  } else {
+    const messageTypes = {
+      'STU': 'reminder',
+      'STE': 'systemInfo',
+      'newFriends': 'newFriends'
+    };
+    await db.CreatedChatModel.createDefaultChat(messageTypes[ty], r);
   }
   socketClient.sendMessage(socketServiceName, {
     eventName: 'receiveMessage',

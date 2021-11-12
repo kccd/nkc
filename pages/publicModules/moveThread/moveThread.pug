@@ -19,7 +19,7 @@
               span(@click="showThreadType(forum)") {{forum.displayName}}
                 span(v-if="forum.selectedThreadType") ：{{forum.selectedThreadType.name}}
               .fa.fa-remove(@click="removeForum(index)")
-            .move-thread-thread-types(v-if="forum && forum.threadTypes && forum.threadTypes.length && selectForumCategory")
+            .move-thread-thread-types(v-if="forum && forum.threadTypes && forum.threadTypes.length && mode === 'move'")
               .move-thread-thread-type(@click="resetThreadType") 不分类
               .move-thread-thread-type(v-for="t in forum.threadTypes" @click="selectThreadType(t)") {{t.name}}
             .m-t-05(v-if="mode === 'move'")
