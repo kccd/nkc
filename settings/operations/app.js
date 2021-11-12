@@ -12,6 +12,9 @@ module.exports = {
 	my: {
 		GET: "APPGetMy"
 	},
+	download: {
+		GET: "appGetDownload"
+	},
 	scoreChange: {
 		PARAMETER: {
 			GET: 'APPgetScoreChange'

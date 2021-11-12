@@ -242,6 +242,30 @@ var Tools = function() {
     }
     return Math.floor(month / 12) + '年'+ (month % 12) +'个月前';
   };
+  self.fromNowTwo = function(time) {
+    var now = Math.floor(Date.now() / 1000);
+    time = new Date(time);
+    time = Math.floor(time.getTime() / 1000);
+    // 分
+    const m = Math.floor((now - time) / 60);
+    if(m < 60) {
+      return '刚刚';
+    }
+    // 时
+    const h = Math.floor(m / 60 );
+    if(h < 24) {
+      return h + '时前';
+    }
+    const d = Math.floor(h / 24);
+    if(d < 30) {
+      return d + '天前';
+    }
+    const month = Math.floor(d / 30);
+    if(month < 12) {
+      return month + '个月'+ (d % 30) +'天前';
+    }
+    return Math.floor(month / 12) + '年'+ (month % 12) +'个月前';
+  };
   self.timeFormat = function(time) {
     var fixTime = function(number) {
       return number < 10? '0' + number: number;

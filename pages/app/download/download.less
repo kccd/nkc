@@ -1,0 +1,84 @@
+.app-download{
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  .download-list{
+    height: 100%;
+    width: 100%;
+    .null{
+      margin-top: 10rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .download-file{
+      display: flex;
+      justify-content: space-between;
+      width: 90%;
+      margin: 1rem auto;
+      border-radius: 4px;
+      box-shadow: 0 0 3px rgba(0,0,0,0.1);
+      .file-img{
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem;
+        width: 25%;
+        border-right: 1px #f1f1f1 solid;
+        .iconfont{
+          font-size: 5rem;
+        }
+      }
+      .file-content{
+        display: inline-block;
+        padding: 1rem;
+        width: 75%;
+        .file-name{
+          width: 100%;
+          word-break: break-word;
+          display: -webkit-box;
+          overflow: hidden;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 1;
+          color: #337ab7;
+        }
+        .file-path{
+          width: 100%;
+          word-break: break-word;
+          display: -webkit-box;
+          overflow: hidden;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 1;
+          color: #337ab7;
+        }
+        .file-url{
+          width: 100%;
+          word-break: break-word;
+          display: -webkit-box;
+          overflow: hidden;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 1;
+        }
+        .file-do-box{
+          display: flex;
+          justify-content: space-between;
+          .file-progress-box{
+            display: flex;
+            align-items: flex-end;
+            .file-progress{
+            }
+            .finished{
+              color: green;
+            }
+            .failed{
+              color: red;
+            }
+          }
+          .file-do-box{
+          }
+        }
+      }
+    }
+  }
+}

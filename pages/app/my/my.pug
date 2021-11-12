@@ -4,6 +4,37 @@ block title
   +includeCSS("/swiper/swiper-bundle.min.css")
 block content
   .app-my
+    .nav-user-content-box
+      .nav-user-body
+        -console.log(data.user);
+        if data.user
+          -console.log(data.user);
+          .nav-user-avatar
+            img(src=tools.getUrl('userAvatar', data.user.avatar))
+          .nav-user-username= data.user.username
+          .nav-user-certs= data.user.info.certsName
+          div
+            -const targetUserScores = state.userScores;
+            include ../../publicModules/userScores
+        else
+          .nkc-drawer-header
+          .nkc-drawer-visitor
+            .col-xs-12
+              .fa.fa-user-circle
+            .col-xs-4.col-xs-offset-2
+              a(onclick="Login.open()") 登录
+            .col-xs-4
+              a(onlick="Login.open('register')") 注册
+    .nav-numbers
+      a.nav-number(href=`/u/${data.user.uid}/profile/thread`)
+        .name 文章
+        .value(id="userThreadCount")=data.user.threadCount - data.user.disabledThreadsCount
+      a.nav-number(href=`/u/${data.user.uid}/profile/post`)
+        .name 回复
+        .value(id="userPostCount")=data.user.postCount - data.user.disabledPostsCount
+      a.nav-number
+        .name 学术分
+        .value(id="userXSF")=data.user.xsf
     .my-nav-swiper
       .swiper-container
         .swiper-wrapper
@@ -83,16 +114,6 @@ block content
                     .iconfont.icon-biaoqing
                   span 我的表情
         .swiper-pagination
-    .nav-numbers
-      a.nav-number(href=`/u/${data.user.uid}/profile/thread`)
-        .name 文章
-        .value(id="userThreadCount")=data.user.threadCount - data.user.disabledThreadsCount
-      a.nav-number(href=`/u/${data.user.uid}/profile/post`)
-        .name 回复
-        .value(id="userPostCount")=data.user.postCount - data.user.disabledPostsCount
-      a.nav-number
-        .name 学术分
-        .value(id="userXSF")=data.user.xsf
 
     .my-footer
 block scripts

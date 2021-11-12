@@ -1,5 +1,6 @@
 if !isIncluded('postActivity')
   +includeCSS('/home/postActivity.css')
+  +includeCSS('/home/postLatest.css')
   mixin postlatest(props)
     -console.log(props)
     -var {from, user, quote, title, content, toc, cover, url, type, parentPostId, parentPost} = props;
@@ -44,7 +45,7 @@ if !isIncluded('postActivity')
           a(href=url target="_blank").post-activity-title=title
         .post-activity-content-container(class=cover? 'cover':'')
           if content
-            a(href=url target="_blank").post-activity-abstract=content
+            a(href=url target="_blank").post-post-abstract=content
           if cover
             .post-activity-cover(style=`background-image: url(${cover})`)
     mixin postPostsContent(contentData, parentPost)

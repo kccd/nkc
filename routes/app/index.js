@@ -3,6 +3,7 @@ const appRouter = new Router();
 const checkRouter = require('./check');
 const navRouter = require("./nav");
 const myRouter = require("./my");
+const downloadRouter = require("./download");
 const { upload } = require('../../settings');
 const { androidSavePath, iosSavePath } = upload;
 appRouter
@@ -65,5 +66,6 @@ appRouter
   })
   .use("/nav", navRouter.routes(), navRouter.allowedMethods())
   .use('/check', checkRouter.routes(), checkRouter.allowedMethods())
-  .use('/my', myRouter.routes(), myRouter.allowedMethods());
+  .use('/my', myRouter.routes(), myRouter.allowedMethods())
+  .use('/download', downloadRouter.routes(), downloadRouter.allowedMethods())
 module.exports = appRouter;

@@ -6,6 +6,48 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "3545440",
+      "name": "安装包",
+      "font_class": "anzhuangbao",
+      "unicode": "e638",
+      "unicode_decimal": 58936
+    },
+    {
+      "icon_id": "9067091",
+      "name": "未知文件",
+      "font_class": "weizhiwenjian",
+      "unicode": "e65b",
+      "unicode_decimal": 58971
+    },
+    {
+      "icon_id": "21479102",
+      "name": "音频文件",
+      "font_class": "016-file",
+      "unicode": "e6f1",
+      "unicode_decimal": 59121
+    },
+    {
+      "icon_id": "4893435",
+      "name": "视频",
+      "font_class": "shipin",
+      "unicode": "e662",
+      "unicode_decimal": 58978
+    },
+    {
+      "icon_id": "10114209",
+      "name": "压缩包",
+      "font_class": "yasuobao",
+      "unicode": "e616",
+      "unicode_decimal": 58902
+    },
+    {
+      "icon_id": "23257741",
+      "name": "图片",
+      "font_class": "tupian",
+      "unicode": "f896",
+      "unicode_decimal": 63638
+    },
+    {
       "icon_id": "17402938",
       "name": "所有文章",
       "font_class": "suoyouwenzhang",

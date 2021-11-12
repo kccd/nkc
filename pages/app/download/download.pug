@@ -1,0 +1,34 @@
+extends ../../bootstrap_base
+block title
+  title 下载管理
+  +includeCSS("/app/download/download.css")
+block content
+  include ../../publicModules/mixin
+  .app-download#app(v-cloak)
+    .download-list(v-if="files.length !== 0" v-for="(item, index) in files")
+      .download-file
+        .file-img
+          .iconfont(v-if="item.ext === 'mp4' || item.ext === 'mov' || item.ext === '3gp' || item.ext === 'avi'").icon-shipin
+          .iconfont(v-else-if="item.ext === 'zip'").icon-yasuobao
+          .iconfont(v-else-if="item.ext === 'png' || item.ext === 'jpg' || item.ext === 'jpeg' || item.ext === 'bmp' ||item.ext === 'svg' || item.ext === 'gif'").icon-icon-tupian
+          .iconfont(v-else-if="item.ext === 'amr' || item.ext === 'mp3' || item.ext === 'aac'").icon-016-file
+          .iconfont(v-else-if="item.ext === 'apk'").icon-anzhuangbao
+          .iconfont(v-else).icon-weizhiwenjian
+        .file-content
+          .file-name(@click="openFile(item)") {{item.name}}
+          .file-time {{fromNow(item.id)}}
+          a(:href="item.url" data-type="download" :data-title="item.name").file-url {{item.url}}
+          .file-do-box
+            .file-progress-box
+              span.file-progress(v-if="item.progress !== '100' && item.progress !== 'failed'") {{item.progress}}%
+              span.file-progress.finished(v-else-if="item.progress === '100'") 已完成
+              span.file-progress.failed(v-else-if="item.progress === 'failed'") 下载失败
+            .file-do-box
+              a(:href="item.url" data-type="download" :data-title="item.name")
+                button.file-del.btn.btn-sm.btn-primary.m-r-1(v-if="item.progress === 'failed' || item.progress === '100'") 重新下载
+              button.file-del.btn.btn-sm.btn-danger.m-r-1(v-if="item.progress === '100'" @click="delFile(item)") 删除
+    .download-list(v-if="Object.keys(files).length === 0")
+      .null 空空如也~
+block scripts
+  +includeJS("/app/download/download.js")
+
