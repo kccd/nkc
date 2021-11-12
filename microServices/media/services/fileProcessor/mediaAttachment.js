@@ -1,37 +1,89 @@
 const PATH = require('path');
-const {deleteFile} = require('../../tools');
+const {
+  deleteFile,
+  getFileInfo,
+  spawnProcess,
+  getFileSize,
+} = require('../../tools');
 const {sendResourceStatusToNKC} = require('../../socket');
 const storeClient = require('../../../../tools/storeClient');
 const fs = require('fs');
 const fsPromises = fs.promises;
 const {PDFDocument} = require("pdf-lib");
+const path = require("path");
+const {platform} = require("os");
+const os = platform();
+const linux = (os === 'linux');
 const {maxGetPageScale, maxGetPageCount} = require("../../../../config/media.json").pdfPreview;
-const footerJPG = fs.readFileSync(PATH.resolve(__dirname, `../../public/preview_footer.jpg`));
+const footerJPGBytes = fs.readFileSync(PATH.resolve(__dirname, `../../public/preview_footer.jpg`));
+
 module.exports = async (props) => {
   const {
     file,
     data,
     storeUrl
   } = props;
+
   const {mediaPath, timePath, rid, ext, toc} = data;
-  const filePath = file.path;
-  const filenamePath = `${rid}.${ext}`;
-  const path = PATH.join(mediaPath, timePath, filenamePath);
-  const time = (new Date(toc)).getTime();
+  const filePath = file.path; // 文件被推送到 media service 后的临时存储目录
+  const filenamePath = `${rid}.${ext}`; // 文件在 store service 磁盘上的文件名
+  const path = PATH.join(mediaPath, timePath, filenamePath); // 文件在 store service 磁盘上的路径
+  const time = (new Date(toc)).getTime(); // 发送给 store service，由于区分文件所在磁盘目录
+
   let pdfTargetFilePath;
+  let previewFilenamePath;
   let hasPreviewPDF = false;
+
   const storeData = [{
     filePath: filePath,
     path,
     time
   }];
+
+  const filesInfo = [];
+
   Promise.resolve()
     .then(() => {
       if(ext === 'pdf') {
+        return hasPassword(filePath);
+      }
+    })
+    .then(hasPassword => {
+      if(ext === 'pdf' && hasPassword) {
+        throw new Error(`无法上传已加密的 PDF 文件`);
+      }
+    })
+    .then(() => {
+      if(ext === 'pdf') {
         pdfTargetFilePath = filePath + `.temp_preview.${ext}`;
-        const previewFilenamePath = `${rid}_preview.${ext}`;
+        previewFilenamePath = `${rid}_preview.${ext}`;
+        let miniPdfTargetFilePath = filePath + `.temp_preview_m.${ext}`;
+        let previewFileSize;
+        let miniPreviewFileSize;
         const previewPath = PATH.join(mediaPath, timePath, previewFilenamePath);
-        return createPreviewFDF(filePath, pdfTargetFilePath, footerJPG)
+        return createPreviewFDF(filePath, pdfTargetFilePath) // 创建 PDF 预览文件
+          .then(() => {
+            return compressPDF(pdfTargetFilePath, miniPdfTargetFilePath); // 压缩 PDF 预览文件
+          })
+          .then(() => {
+            return getFileSize(pdfTargetFilePath); // 获取压缩前的文件体积
+          })
+          .then(size => {
+            previewFileSize = size;
+            return getFileSize(miniPdfTargetFilePath); // 获取压缩后的文件体积
+          })
+          .then(size => {
+            miniPreviewFileSize = size;
+            if(miniPreviewFileSize >= previewFileSize) {
+              // 压缩后文件体积反而更大
+              return deleteFile(miniPdfTargetFilePath);
+            } else {
+              // 压缩后的文件体积更小，则删除压缩前的文件
+              const oldPdfTargetFilePath = pdfTargetFilePath;
+              pdfTargetFilePath = miniPdfTargetFilePath;
+              return deleteFile(oldPdfTargetFilePath);
+            }
+          })
           .then(() => {
             hasPreviewPDF = true;
             storeData.push({
@@ -44,18 +96,44 @@ module.exports = async (props) => {
       }
     })
     .then(() => {
+      // 推送到 store service
       return storeClient(storeUrl, storeData);
     })
     .then(() => {
+      // 获取文件信息，发送给 nkc service
+      return getFileInfo(filePath);
+    })
+    .then(fileInfo => {
+      const {size, ext, hash} = fileInfo;
+      filesInfo.push({
+        _id: 'default',
+        ext,
+        size,
+        hash,
+        filename: filenamePath
+      });
+      return getFileInfo(pdfTargetFilePath);
+    })
+    .then(pdfFileInfo => {
+      const {size, ext, hash} = pdfFileInfo;
+      filesInfo.push({
+        _id: 'preview',
+        ext,
+        size,
+        hash,
+        filename: previewFilenamePath
+      });
+    })
+    .then(() => {
+      // 发送文件处理的状态
       return sendResourceStatusToNKC({
         rid,
         status: true,
-        info: {
-          hasPreviewPDF
-        }
+        filesInfo
       });
     })
-    .catch(() => {
+    .catch((err) => {
+      console.error(err);
       return sendResourceStatusToNKC({
         rid,
         status: false,
@@ -66,23 +144,17 @@ module.exports = async (props) => {
       return deleteFile(filePath);
     })
     .then(() => {
-      if(pdfTargetFilePath) return deleteFile(pdfTargetFilePath);
+      return deleteFile(pdfTargetFilePath);
     })
     .catch(console.error);
 };
 
-function audioToMP3(filePath, outputPath) {
-  return new Promise((resolve, reject) => {
-    ff(filePath)
-      .output(outputPath)
-      .on('end', resolve)
-      .on('error', reject)
-      .run()
-  });
-}
-
-async function createPreviewFDF(path, outputPath, footerJPG) {
-  const footerJPGBytes =  await fsPromises.readFile(footerJPG);
+/*
+* 创建预览版 PDF
+* @param {String} path 原 PDF 文件路径
+* @param {String} outputPath 预览版 PDF 文件路径
+* */
+async function createPreviewFDF(path, outputPath) {
   const fileBuffer =      await fsPromises.readFile(path);
   const pdfDoc =          await PDFDocument.load(fileBuffer, {ignoreEncryption: true});
   const pageCount =       pdfDoc.getPageCount();
@@ -125,4 +197,38 @@ async function createPreviewFDF(path, outputPath, footerJPG) {
   // 保存新的pdf
   const newPdfBytes = await newPdf.save();
   await fsPromises.writeFile(outputPath, newPdfBytes);
+}
+
+
+/*
+* 判断 PDF 文件是否加密
+* @param {String} filePath PDF 文件的路径
+* @return {Boolean}
+* */
+async function hasPassword(filePath) {
+  try {
+    await spawnProcess(`qpdf`, [
+      '--show-encryption',
+      filePath.split(path.sep).join("/")
+    ]);
+  } catch (error) {
+    const message = error.toString().trim();
+    if(message.endsWith("No such file or directory")) {
+      throw error;
+    }
+    return message.endsWith("invalid password");
+  }
+  return false;
+}
+/*
+* 压缩 PDF 文件
+* @param {String} filePath 原 PDF 文件路径
+* @param {String} outputFilePath 压缩后的 PDF 文件路径
+* */
+async function compressPDF(filePath, outputFilePath) {
+  const args = ['convert', '-colorspace', 'RGB', '-resize', '800x', '-density', '100', '-compress', 'jpeg', '-quality', '20', filePath, outputFilePath];
+  if(!linux) {
+    return spawnProcess('magick', args);
+  }
+  return spawnProcess(args.pop(), args);
 }

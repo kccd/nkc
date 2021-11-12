@@ -14,7 +14,7 @@ function getCommunicationClient() {
 }
 
 function sendResourceStatusToNKC(props) {
-  const {rid, status, error, info} = props;
+  const {rid, status, error, filesInfo} = props;
   const communicationClient = getCommunicationClient();
   communicationClient.sendMessage(communicationConfig.servicesName.nkc, {
     type: 'resourceStatus',
@@ -22,7 +22,7 @@ function sendResourceStatusToNKC(props) {
       rid,
       status,
       error,
-      info
+      filesInfo
     }
   });
 }

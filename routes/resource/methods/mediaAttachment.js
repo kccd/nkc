@@ -1,7 +1,8 @@
 /*
+/!*
 * @param {File} file 文件对象
 * @param {Object} resource 资源对象
-* */
+* *!/
 const FILE = require("../../../nkcModules/file");
 const PATH = require('path');
 const fs = require('fs');
@@ -52,3 +53,4 @@ module.exports = async (options) => {
     }
   }
 }
+*/

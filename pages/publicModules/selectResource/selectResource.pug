@@ -100,6 +100,7 @@ if !isIncluded('selectResource')
               span(v-else)
                 .resource-in-process
                   span 处理失败
+                  .fa.fa-exclamation-circle.pointer(v-if='r.errorInfo' :title='r.errorInfo' @click='showErrorInfo(r)')
           .module-sr-footer
             .pull-left
               input.hidden#moduleSelectResourceInput(type="file" multiple="true" @change="selectedFiles")

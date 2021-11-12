@@ -106,6 +106,9 @@ NKC.modules.SelectResource = function() {
     methods: {
       getUrl: NKC.methods.tools.getUrl,
       getSize: NKC.methods.tools.getSize,
+      showErrorInfo(r) {
+        sweetInfo(r.errorInfo);
+      },
       checkFileSize: function(filename, size) {
         var sizeLimit = this.sizeLimit;
         if(!sizeLimit) return;

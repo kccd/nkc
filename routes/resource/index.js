@@ -212,6 +212,10 @@ resourceRouter
     const {file} = files;
     const {type, fileName, md5, share} = fields;
     if(type === "checkMD5") {
+
+      data.uploaded = false;
+      return await next();
+
       // 前端提交待上传文件的md5，用于查找resources里是否与此md5匹配的resource
       // 若不匹配，则返回“未匹配”给前端，前端收到请求后会再次向服务器发起请求，并将待上传的文件上传到服务器。
       // 若匹配，则读取目标resource上的相关信息，并写入到新的resource中。封面图、
@@ -225,8 +229,9 @@ resourceRouter
       }).sort({toc: -1});
       let existed = false;
       if(resource) {
-        const filePath = await resource.getFilePath();
-        existed = await nkcModules.file.access(filePath);
+        // 判断文件是否丢失
+        /*const filePath = await resource.getFilePath();
+        existed = await nkcModules.file.access(filePath);*/
       }
       if(
         !resource || // 未上传过
@@ -308,36 +313,8 @@ resourceRouter
     await r.save();
     ctx.data.r = r;
 
-    await r.pushToMediaService(file);
-
-    await next();
-    return;
-
-    //处理上传的资源文件
-
-    setImmediate(async () => {
-      try{
-        await mediaMethods[mediaType]({
-          file,
-          user,
-          resource: r,
-          pictureType: resourceType,
-        });
-        // 通知前端转换完成了
-        ctx.nkcModules.socket.sendDataMessage(user.uid, {
-          event: "fileTransformProcess",
-          data: {rid: r.rid, state: "fileProcessFinish"}
-        });
-      } catch(err) {
-        console.log(err);
-        // 通知前端转换失败了
-        ctx.nkcModules.socket.sendDataMessage(user.uid, {
-          event: "fileTransformProcess",
-          data: {err: err.message, state: "fileProcessFailed"}
-        });
-        await r.updateOne({state: 'useless'});
-      }
-    });
+    // 将文件推送到 media service
+    await r.pushToMediaService(file.path);
     await next();
   })
   .put('/:rid', async (ctx, next) => {
