@@ -30,10 +30,12 @@ router
     const uploadSettings = await db.SettingModel.getSettings('upload');
     // 去水印功能需要的积分数
     let needSocre = uploadSettings.watermark.buyNoWatermark;
-    const {minWidth, minHeight, smallAttachId, normalAttachId, transparency} = uploadSettings.watermark;
+    const {picture, video, smallAttachId, normalAttachId, transparency} = uploadSettings.watermark;
     // 去水印功能使用的积分
     let scoreObject = await db.SettingModel.getScoreByOperationType("watermarkScore");
-    data.noWatermark = {...scoreObject, number: needSocre, size: {minWidth, minHeight}, file: {smallAttachId, normalAttachId, transparency}};
+    data.noWatermark = {...scoreObject, number: needSocre, size:
+        {pictureMinWidth: picture.minWidth, pictureMinHeight: picture.minHeight, videoMinWidth: video.minWidth, videoMinHeight: video.minHeight},
+      file: {smallAttachId, normalAttachId, transparency}};
     // 判断用户是否有专栏
     const column = await db.ColumnModel.findOne({uid: user.uid});
     data.hasColumn = !!column;

@@ -3,19 +3,19 @@ $(document).ready(function(){
   // 如果不添加水印，则不可选中其他select
   $('input[type=radio][name=isWater]').change(function() {
     if (this.value == 'no') {
-      $('#waterStyle').attr("disabled", "disabled");
-      $('#waterGravity').attr("disabled", "disabled");
+      $('#pictureWaterStyle').attr("disabled", "disabled");
+      $('#pictureWaterGravity').attr("disabled", "disabled");
     }
     else{
-      $('#waterStyle').removeAttr("disabled");
-      $('#waterGravity').removeAttr("disabled");
+      $('#pictureWaterStyle').removeAttr("disabled");
+      $('#pictureWaterGravity').removeAttr("disabled");
     }
   });
 
   var isWaterVal = $('input:radio[name="isWater"]:checked').val();
   if(isWaterVal == "no"){
-    $('#waterStyle').attr("disabled", "disabled");
-    $('#waterGravity').attr("disabled", "disabled");
+    $('#pictureWaterStyle').attr("disabled", "disabled");
+    $('#pictureWaterGravity').attr("disabled", "disabled");
   };
 
   // var isPay = $("#isPay").attr("data");
@@ -30,13 +30,13 @@ $(document).ready(function(){
 
 // 改变添加水印方式，更换示例图片
 function changeWaterStyle(para){
-  console.log($("#waterStyle option:selected").attr("data"))
+  console.log($("#pictureWaterStyle option:selected").attr("data"))
 }
 
 
 // 改变水印位置，更换示例图片
 function changeWaterPosition(){
-  console.log($("#waterGravity option:selected").attr("data"))
+  console.log($("#pictureWaterGravity option:selected").attr("data"))
 }
 
 
@@ -50,13 +50,17 @@ function submit(uid) {
   }else{
     isWaterBool = false;
   }
-  var waterStyleValue = $("#waterStyle option:selected").attr("data");
-  var waterGravityValue = $("#waterGravity option:selected").attr("data")
+  var pictureWaterStyleValue = $("#pictureWaterStyle option:selected").attr("data");
+  var pictureWaterGravityValue = $("#pictureWaterGravity option:selected").attr("data")
+  var videoWaterStyleValue = $("#videoWaterStyle option:selected").attr("data");
+  var videoWaterGravityValue = $("#videoWaterGravity option:selected").attr("data")
   optionArr = {
     type: "save",
     waterAdd: isWaterBool,
-    waterStyle: waterStyleValue,
-    waterGravity: waterGravityValue
+    pictureWaterStyle: pictureWaterStyleValue,
+    pictureWaterGravity: pictureWaterGravityValue,
+    videoWaterStyle: videoWaterStyleValue,
+    videoWaterGravity: videoWaterGravityValue
   }
   nkcAPI('/u/'+uid+'/settings/water', 'PUT', optionArr)
     .then(function(){
@@ -107,14 +111,25 @@ function noPayForWater(){
   $("#radio1").attr("checked",true)
 }
 
-// 切换示例图片
-function turnImg(){
-  // console.log($("#waterGravity").val())
-  // var newImg = "< img src='/default/"+$("#waterGravity").val()+".jpg' style='width: 100%;'>"
+// 切换图片水印示例图片
+function turnPictureImg(){
+  // console.log($("#pictureWaterGravity").val())
+  // var newImg = "< img src='/default/"+$("#pictureWaterGravity").val()+".jpg' style='width: 100%;'>"
   // $("#exampleImg").html(newImg)
-  $("#newImg").attr("src","/default/"+$("#waterStyle").val()+$("#waterGravity").val()+".jpg");
-  app.waterSetting.waterStyle = $("#waterStyle").val();
-  app.waterSetting.waterGravity = $("#waterGravity").val();
+  $("#newImg").attr("src","/default/"+$("#pictureWaterStyle").val()+$("#pictureWaterGravity").val()+".jpg");
+  app.waterSetting.picture.waterStyle = $("#pictureWaterStyle").val();
+  app.waterSetting.picture.waterGravity = $("#pictureWaterGravity").val();
+  console.log(app.waterSetting.picture.waterStyle);
+}
+
+// 切换视频水印示例图片
+function turnVideoImg(){
+  // console.log($("#pictureWaterGravity").val())
+  // var newImg = "< img src='/default/"+$("#pictureWaterGravity").val()+".jpg' style='width: 100%;'>"
+  // $("#exampleImg").html(newImg)
+  $("#newImg").attr("src","/default/"+$("#videoWaterStyle").val()+$("#videoWaterGravity").val()+".jpg");
+  app.waterSetting.video.waterStyle = $("#videoWaterStyle").val();
+  app.waterSetting.video.waterGravity = $("#videoWaterGravity").val();
 }
 
 var data = NKC.methods.getDataById("data");
@@ -162,9 +177,9 @@ var app = new Vue({
     getUrl: NKC.methods.tools.getUrl,
   },
   computed: {
-    watermarkFile: function() {
+    pictureWatermarkFile: function() {
       var file = {};
-      if(this.waterSetting.waterStyle === 'siteLogo') {
+      if(this.waterSetting.picture.waterStyle === 'siteLogo') {
         var normalAttachId = this.noWatermark.file.normalAttachId;
         if(normalAttachId) {
           file.url = this.getUrl('watermark', normalAttachId);
@@ -183,10 +198,38 @@ var app = new Vue({
       }
       return file;
     },
-    watermarkName: function() {
-      if(this.waterSetting.waterStyle === 'userLogo') {
+    videoWatermarkFile: function() {
+      var file = {};
+      if(this.waterSetting.video.waterStyle === 'siteLogo') {
+        var normalAttachId = this.noWatermark.file.normalAttachId;
+        if(normalAttachId) {
+          file.url = this.getUrl('watermark', normalAttachId);
+        } else {
+          file.url = this.getUrl('defaultFile', 'watermark_normal.png')
+        }
+        file.size = 'normal';
+      } else {
+        var smallAttachId = this.noWatermark.file.smallAttachId;
+        if(smallAttachId) {
+          file.url = this.getUrl('watermark', smallAttachId);
+        } else {
+          file.url = this.getUrl('defaultFile', 'watermark_small.png');
+        }
+        file.size = 'small';
+      }
+      return file;
+    },
+    pictureWatermarkName: function() {
+      if(this.waterSetting.picture.waterStyle === 'userLogo') {
         return this.username;
-      } else if(this.waterSetting.waterStyle === 'coluLogo') {
+      } else if(this.waterSetting.picture.waterStyle === 'coluLogo') {
+        return this.columnName;
+      }
+    },
+    videoWatermarkName: function() {
+      if(this.waterSetting.video.waterStyle === 'userLogo') {
+        return this.username;
+      } else if(this.waterSetting.video.waterStyle === 'coluLogo') {
         return this.columnName;
       }
     }
@@ -202,7 +245,8 @@ Object.assign(window, {
   hideButton,
   yesPayForWater,
   noPayForWater,
-  turnImg,
+  turnPictureImg,
+  turnVideoImg,
   saveAppInfo,
   app,
 });

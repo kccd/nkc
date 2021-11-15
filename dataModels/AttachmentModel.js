@@ -96,43 +96,43 @@ schema.statics.getNewId = () => {
 };
 
 /*
-* 保存水印图片
+* 保存水印图片 //转到settingModel中
 * @param {File} file 水印图片
 * @return {Object} 附件对象
 * @author pengxiguaa 2020/6/12
 * */
-schema.statics.saveWatermark = async (file, c = 'normal') => {
-  if(!['normal', 'small'].includes(c)) throwErr(400, '未知的水印类型');
-  const FILE = require("../nkcModules/file");
-  const ext = await FILE.getFileExtension(file, ['jpg', 'png', 'jpeg']);
-  const AM = mongoose.model('attachments');
-  const SM = mongoose.model('settings');
-  const toc = new Date();
-  const fileFolder = await FILE.getPath('watermark', toc);
-  const aid = AM.getNewId();
-  const fileName = `${aid}.${ext}`;
-  const realPath = PATH.resolve(fileFolder, `./${fileName}`);
-  const {path, size, name, hash} = file;
-  await fsPromise.copyFile(path, realPath);
-  const attachment = AM({
-    _id: aid,
-    toc,
-    size,
-    hash,
-    name,
-    ext,
-    c,
-    type: 'watermark',
-  });
-  await attachment.save();
-  const obj = {};
-  obj[`c.watermark.${c}AttachId`] = aid;
-  await SM.updateOne({_id: 'upload'}, {
-    $set: obj
-  });
-  await SM.saveSettingsToRedis('upload');
-  return attachment;
-}
+// schema.statics.saveWatermark = async (file, c = 'normal') => {
+//   if(!['normal', 'small'].includes(c)) throwErr(400, '未知的水印类型');
+//   const FILE = require("../nkcModules/file");
+//   const ext = await FILE.getFileExtension(file, ['jpg', 'png', 'jpeg']);
+//   const AM = mongoose.model('attachments');
+//   const SM = mongoose.model('settings');
+//   const toc = new Date();
+//   const fileFolder = await FILE.getPath('watermark', toc);
+//   const aid = AM.getNewId();
+//   const fileName = `${aid}.${ext}`;
+//   const realPath = PATH.resolve(fileFolder, `./${fileName}`);
+//   const {path, size, name, hash} = file;
+//   await fsPromise.copyFile(path, realPath);
+//   const attachment = AM({
+//     _id: aid,
+//     toc,
+//     size,
+//     hash,
+//     name,
+//     ext,
+//     c,
+//     type: 'watermark',
+//   });
+//   await attachment.save();
+//   const obj = {};
+//   obj[`c.watermark.${c}AttachId`] = aid;
+//   await SM.updateOne({_id: 'upload'}, {
+//     $set: obj
+//   });
+//   await SM.saveSettingsToRedis('upload');
+//   return attachment;
+// }
 
 /**
  * 保存首页大Logo
@@ -264,28 +264,28 @@ schema.methods.getFilePath = async function(t) {
 * @return {String} 磁盘路径
 * @author pengxiguaa 2020/6/12
 * */
-schema.statics.getWatermarkFilePath = async (c) => {
-  if(!['normal', 'small'].includes(c)) throwErr(400, '未知的水印类型');
-  const AP = mongoose.model("attachments");
-  const SM = mongoose.model('settings');
-  const uploadSettings = await SM.getSettings('upload');
-  const id = uploadSettings.watermark[`${c}AttachId`];
-  //判断如果用户未上传水印图片就换未默认图片
-  if(!id) {
-    return statics[`${c}Watermark`];
-  }
-  let water = await AP.findById(id);
- //判断如果用户上传了图片根据id找不到图片就替换为默认图片
-  if(water == null){
-    return statics[`${c}Watermark`];
-  }
-  let filePath =  await water.getFilePath();
-  //判断如果用户上传了图片找不到图片路径就替换为默认图片
-  if(!filePath){
-    return statics[`${c}Watermark`];
-  }
-  return filePath;
-}
+// schema.statics.getWatermarkFilePath = async (c) => {
+//   if(!['normal', 'small'].includes(c)) throwErr(400, '未知的水印类型');
+//   const AP = mongoose.model("attachments");
+//   const SM = mongoose.model('settings');
+//   const uploadSettings = await SM.getSettings('upload');
+//   const id = uploadSettings.watermark[`${c}AttachId`];
+//   //判断如果用户未上传水印图片就换未默认图片
+//   if(!id) {
+//     return statics[`${c}Watermark`];
+//   }
+//   let water = await AP.findById(id);
+//  //判断如果用户上传了图片根据id找不到图片就替换为默认图片
+//   if(water == null){
+//     return statics[`${c}Watermark`];
+//   }
+//   let filePath =  await water.getFilePath();
+//   //判断如果用户上传了图片找不到图片路径就替换为默认图片
+//   if(!filePath){
+//     return statics[`${c}Watermark`];
+//   }
+//   return filePath;
+// }
 
 /**
  * 获取首页大Logo

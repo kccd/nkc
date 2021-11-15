@@ -2,6 +2,11 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const redisClient = require('../settings/redisClient');
+const FILE = require("../nkcModules/file");
+const PATH = require("path");
+const fs = require("fs");
+const statics = require("../settings/statics");
+const fsPromise = fs.promises;
 
 const settingSchema = new Schema({
   _id: String,
@@ -345,11 +350,79 @@ settingSchema.statics.getDownloadFileCountLimitInfoByUser = async (user) => {
 };
 
 /*
+* 保存用户水印
+* */
+settingSchema.statics.saveWatermark = async (file, c = 'normal') => {
+  if(!['normal', 'small'].includes(c)) throwErr(400, '未知的水印类型');
+  const FILE = require("../nkcModules/file");
+  const ext = await FILE.getFileExtension(file, ['jpg', 'png', 'jpeg']);
+  const attachmentsModel = mongoose.model('attachments');
+  const settingsModel = mongoose.model('settings');
+  const toc = new Date();
+  const fileFolder = await FILE.getPath('watermark', toc);
+  const aid = attachmentsModel.getNewId();
+  const fileName = `${aid}.${ext}`;
+  const realPath = PATH.resolve(fileFolder, `./${fileName}`);
+  const {path, size, name, hash} = file;
+  await fsPromise.copyFile(path, realPath);
+  const attachment = attachmentsModel({
+    _id: aid,
+    toc,
+    size,
+    hash,
+    name,
+    ext,
+    c,
+    type: 'watermark',
+  });
+  await attachment.save();
+  const obj = {};
+  obj[`c.watermark.${c}AttachId`] = aid;
+  await settingsModel.updateOne({_id: 'upload'}, {
+    $set: obj
+  });
+  await settingsModel.saveSettingsToRedis('upload');
+  return attachment;
+}
+
+/*
+* 获取水印图片路径
+* @return {String} 磁盘路径
+* */
+settingSchema.statics.getWatermarkFilePath = (c, type) => {
+  if(!['normal', 'small'].includes(c)) throwErr(400, '未知的水印类型');
+  if(type === 'picture') {
+    if(!FILE.access(statics[`${c}PictureWatermark`])) {
+      return statics[`${c}Watermark`];
+    }
+    return statics[`${c}PictureWatermark`];
+  } else {
+    if(!FILE.access(statics[`${c}VideoWatermark`])) {
+      return statics[`${c}Watermark`];
+    }
+    return statics[`${c}VideoWatermark`];
+  }
+  //判断如果用户未上传水印图片就换未默认图片
+  /*if(!id) {
+    return statics[`${c}Watermark`];
+  }
+  //判断如果用户上传了图片根据id找不到图片就替换为默认图片
+  if(water == null){
+    return statics[`${c}Watermark`];
+  }
+  //判断如果用户上传了图片找不到图片路径就替换为默认图片
+  if(!filePath){
+    return statics[`${c}Watermark`];
+  }
+  return filePath;*/
+}
+
+/*
 * 获取水印透明度
 * @return {Number} 水印透明度
 * @author pengxiguaa 2020/6/17
 * */
-settingSchema.statics.getWatermarkSettings = async () => {
+settingSchema.statics.getWatermarkSettings = async (type) => {
   const SettingModel = mongoose.model('settings');
   const uploadSettings = await SettingModel.getSettings('upload');
   return {
@@ -669,20 +742,19 @@ settingSchema.statics.getWatermarkInfoByUid = async (uid) => {
   const UserModel = mongoose.model('users');
   const {waterSetting} = await UsersGeneralModel.findOnly({uid}, {waterSettings: 1});
   const SettingModel = mongoose.model('settings');
-  const AttachmentModel = mongoose.model('attachments');
   const createWatermark = require('../nkcModules/createWatermark');
-  const watermarkSettings = await SettingModel.getWatermarkSettings();
+  const watermarkSettings = await SettingModel.getWatermarkSettings('video');
   const {
     waterGravity, waterStyle, waterAdd
   } = waterSetting;
   if(!waterAdd || !watermarkSettings.enabled) return null;
   let imagePath = '', text = '';
   if(waterStyle === 'siteLogo') {
-    imagePath = await AttachmentModel.getWatermarkFilePath('normal');
+    imagePath = await SettingModel.getWatermarkFilePath('normal', 'video');
   } else if(waterStyle === 'singleLogo') {
-    imagePath = await AttachmentModel.getWatermarkFilePath('small');
+    imagePath = await SettingModel.getWatermarkFilePath('small', 'video');
   } else {
-    imagePath = await AttachmentModel.getWatermarkFilePath('small');
+    imagePath = await SettingModel.getWatermarkFilePath('small', 'video');
     const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
     text = user.username === ''? `KCID:${user.uid}`:user.username;
   }

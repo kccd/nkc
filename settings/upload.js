@@ -33,7 +33,8 @@ const paths = {
   posterPath: 'resources/poster',
   questionImagePath: 'resources/question_image',
   shopCertsPath: 'resources/shop_certs',
-  toolsPath: "resources/tools"
+  toolsPath: "resources/tools",
+  watermark: "resources/watermark"
 };
 
 const pathsObj = {};

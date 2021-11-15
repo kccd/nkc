@@ -82,10 +82,10 @@ function audioToMP3(filePath, outputPath) {
 }
 
 async function createPreviewFDF(path, outputPath, footerJPG) {
-  const footerJPGBytes =  await fsPromises.readFile(footerJPG);
-  const fileBuffer =      await fsPromises.readFile(path);
-  const pdfDoc =          await PDFDocument.load(fileBuffer, {ignoreEncryption: true});
-  const pageCount =       pdfDoc.getPageCount();
+  const footerJPGBytes = await fsPromises.readFile(footerJPG);
+  const fileBuffer = await fsPromises.readFile(path);
+  const pdfDoc = await PDFDocument.load(fileBuffer, {ignoreEncryption: true});
+  const pageCount = pdfDoc.getPageCount();
 
   // 新建一个pdf
   const newPdf = await PDFDocument.create();

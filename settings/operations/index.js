@@ -79,6 +79,7 @@ const verifications = require('./verifications');
 const payment = require('./payment');
 const link = require('./link');
 const community = require('./community');
+const watermark = require('./watermark');
 const operationObj = {};
 
 
@@ -271,6 +272,7 @@ operationObj.operationTree = {
 		payment, // 支付相关
 		l: link, // 外链跳转
     c: community, // 社区
+		wm: watermark, //水印
     test,
 	}
 };

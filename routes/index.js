@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 const routers = require('../requireFolder')(__dirname);
 const userRouter = routers.user;
+const watermarkRouter = routers.watermark;
 const meRouter = routers.me;
 const threadRouter = routers.thread;
 const postRouter = routers.post;
@@ -134,4 +135,5 @@ router.use('/verifications', verificationsRouter.routes(), verificationsRouter.a
 router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods())
 router.use('/c', communityRouter.routes(), communityRouter.allowedMethods())
 router.use("/l", linkRouter.routes(), linkRouter.allowedMethods());
+router.use("/wm", watermarkRouter.routes(), watermarkRouter.allowedMethods());
 module.exports = router;

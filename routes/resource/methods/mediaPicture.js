@@ -90,11 +90,11 @@ module.exports = async (options) => {
       const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
       let usernameWidth = usernameLength * 12;
       //获取小水印图
-      let waterSmallPath = await db.AttachmentModel.getWatermarkFilePath('small');
+      let waterSmallPath = await db.SettingModel.getWatermarkFilePath('small', 'picture');
       //获取大水印图
-      let waterBigPath = await db.AttachmentModel.getWatermarkFilePath('normal');
+      let waterBigPath = await db.SettingModel.getWatermarkFilePath('normal', 'picture');
       //获取水印透明度
-      const watermarkSettings = await db.SettingModel.getWatermarkSettings();
+      const watermarkSettings = await db.SettingModel.getWatermarkSettings('picture');
       //获取图片水印尺寸
       const watermarkPictureInfo = await imageMagick.info(waterSmallPath);
       //水印长度

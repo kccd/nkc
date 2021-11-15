@@ -1,10 +1,16 @@
 const path = require('path');
 const defaultPath = path.resolve(__dirname, '../public/default');
+const resourcesPath = path.resolve(__dirname, '../resources');
 const staticPath = path.resolve(__dirname, '../public/statics');
 const siteSpecificPath = path.resolve(staticPath, './site');
 const attachIconPath = path.resolve(staticPath, './file_cover');
 const normalWatermark = path.resolve(defaultPath, './watermark_normal.png');
-const smallWatermark = path.resolve(defaultPath, './watermark_small.png')
+const smallWatermark = path.resolve(defaultPath, './watermark_small.png');
+const watermarkPath = path.resolve(resourcesPath, './watermark')
+const normalPictureWatermark = path.resolve(watermarkPath, './picture_watermark_normal.png')
+const smallPictureWatermark = path.resolve(watermarkPath, './picture_watermark_small.png')
+const normalVideoWatermark = path.resolve(watermarkPath, './video_watermark_normal.png')
+const smallVideoWatermark = path.resolve(watermarkPath, './video_watermark_small.png')
 const fontTtf = path.resolve(defaultPath, './simsun.ttc');
 const fontNotoSansHansMedium = path.resolve(defaultPath, './NotoSansHans-Medium.otf');
 // const fontTtf = fontNotoSansHansMedium;
@@ -75,5 +81,9 @@ module.exports = {
   defaultPosterPath,
   defaultHomeBigLogo,
   defaultStickerImage,
-  defaultNoAccessImagePath
+  defaultNoAccessImagePath,
+  normalPictureWatermark,
+  smallPictureWatermark,
+  normalVideoWatermark,
+  smallVideoWatermark,
 };

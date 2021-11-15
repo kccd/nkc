@@ -67,7 +67,7 @@ var Tools = function() {
         return "/a/" + id + t
       }
       case "watermark": {
-        return "/a/" + id + t
+        return "/wm?type=" + id + "&status=" + size;
       }
       case "recommendThreadCover": {
         return '/a/' + id + t
