@@ -5,7 +5,7 @@ module.exports = async (ctx, next) => {
   const {file, cover} = files;
   let {type, storeUrl, data} = fields;
   data = JSON.parse(data);
-  await fileProcessor[type]({
+  ctx.data.files = await fileProcessor[type]({
     file,
     cover,
     data,

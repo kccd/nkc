@@ -1028,15 +1028,15 @@ resourceSchema.methods.getRemoteFile = async function(size) {
     if(mediaType === 'mediaVideo') {
       size = 'sd';
     } else if(mediaType === 'mediaPicture') {
-      size = 'default'
+      size = 'def'
     } else if(mediaType === 'mediaAudio') {
-      size = 'default'
+      size = 'def'
     } else {
-      size = 'default'
+      size = 'def'
     }
   }
 
-  const defaultSizeFile = files['default'];
+  const defaultSizeFile = files['def'];
   let targetSizeFile;
   if(!files[size]) {
     targetSizeFile = defaultSizeFile;
