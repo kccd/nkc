@@ -11,7 +11,7 @@ const pictureExtensions = FILE.getExtensionByType('mediaPicture');
 const breakpointExtensions = FILE.getExtensionByType('breakpoint');
 let allSpeedLimit;
 
-module.exports = async (ctx, next) => {
+module.exports = async (ctx) => {
   const {filePath, isAttachment, fileName, resource, fs, tg, db} = ctx;
   const {encodeRFC5987ValueChars} = ctx.nkcModules.nkcRender;
   let stats;

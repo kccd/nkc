@@ -105,7 +105,7 @@ module.exports = async (props) => {
     })
     .then(fileInfo => {
       const {size, ext, hash} = fileInfo;
-      filesInfo.default = {
+      filesInfo.def = {
         ext,
         size,
         hash,

@@ -2,15 +2,16 @@ const http = require('http');
 const FILE = require("../../nkcModules/file");
 const pictureExtensions = FILE.getExtensionByType('mediaPicture');
 const breakpointExtensions = FILE.getExtensionByType('breakpoint');
-
-module.exports = async (ctx, next) => {
-  const {remoteFile, isAttachment} = ctx;
+const fileBody = require('./file');
+module.exports = async (ctx) => {
+  const {remoteFile, isAttachment, settings} = ctx;
   const {encodeRFC5987ValueChars} = ctx.nkcModules.nkcRender;
   const {
     url,
     query,
     filename = '',
   } = remoteFile;
+  // 组装 store service 链接
   const fileUrl = new URL(url);
   for(const key in query) {
     fileUrl.searchParams.set(key, query[key]);
@@ -19,7 +20,16 @@ module.exports = async (ctx, next) => {
   ext = ext.pop() || '';
   ext = ext.toLowerCase();
   if(!ext) ctx.throw(500, `远程文件格式不能为空`);
-  const fileRes = await getRemoteFileRes(fileUrl.toString(), ctx);
+  let fileRes;
+  try{
+    fileRes = await getRemoteFileRes(fileUrl.toString(), ctx);
+  } catch(err) {
+    // store service 报错时返回一张默认图片
+    const {defaultAvatarPath} = settings.statics;
+    ctx.filePath = defaultAvatarPath;
+    return await fileBody(ctx);
+  }
+
   let contentDisposition;
   const filenameEncode = encodeRFC5987ValueChars(filename);
   if (isAttachment || (!pictureExtensions.includes(ext) && (!breakpointExtensions.includes(ext)))) {
@@ -69,7 +79,23 @@ function getRemoteFileRes(url, ctx) {
   return new Promise((resolve, reject) => {
     const req = http.request(url, options, res => {
       res.on('error', reject);
-      resolve(res);
+      if(res.statusCode >= 400) {
+        res.setEncoding('utf8');
+        let resData = '';
+        res.on('data', d => {
+          resData += d;
+        });
+        res.on('end', () => {
+          try{
+            const parsedData = JSON.parse(resData);
+            reject(parsedData);
+          } catch(err) {
+            reject(err)
+          }
+        });
+      } else {
+        resolve(res);
+      }
     });
     req.on('error', reject);
     req.end();

@@ -142,38 +142,14 @@ const resourceSchema = new Schema({
   // 音频：default
   // 附件：default, preview
   files: {
-    default: {
-      type: Schema.Types.Mixed,
-      default: null,
-    },
-    sm: {
-      type: Schema.Types.Mixed,
-      default: null,
-    },
-    md: {
-      type: Schema.Types.Mixed,
-      default: null,
-    },
-    sd: {
-      type: Schema.Types.Mixed,
-      default: null,
-    },
-    hd: {
-      type: Schema.Types.Mixed,
-      default: null,
-    },
-    fhd: {
-      type: Schema.Types.Mixed,
-      default: null,
-    },
-    cover: {
-      type: Schema.Types.Mixed,
-      default: null,
-    },
-    preview: {
-      type: Schema.Types.Mixed,
-      default: null,
-    },
+    def: Schema.Types.Mixed,
+    sm: Schema.Types.Mixed,
+    md: Schema.Types.Mixed,
+    sd: Schema.Types.Mixed,
+    hd: Schema.Types.Mixed,
+    fhd: Schema.Types.Mixed,
+    cover: Schema.Types.Mixed,
+    preview: Schema.Types.Mixed,
     /*
     {
       _id: String,

@@ -1,4 +1,4 @@
-module.exports = async (ctx, next) => {
+module.exports = async (ctx) => {
   if(ctx.data.user) ctx.data.user = ctx.data.user.toObject();
   delete ctx.data.userGrade;
   delete ctx.data.userOperationsId;

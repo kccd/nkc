@@ -32,7 +32,7 @@ module.exports = async (props) => {
         rid,
         status: true,
         filesInfo: {
-          default: {
+          def: {
             ext,
             size,
             hash,
