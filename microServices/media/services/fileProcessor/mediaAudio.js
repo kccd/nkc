@@ -1,6 +1,6 @@
 const ff = require("fluent-ffmpeg");
 const PATH = require('path');
-const {getFileSize, deleteFile} = require('../../tools');
+const {getFileInfo, deleteFile} = require('../../tools');
 const {sendResourceStatusToNKC} = require('../../socket');
 const storeClient = require('../../../../tools/storeClient');
 module.exports = async (props) => {
@@ -24,15 +24,20 @@ module.exports = async (props) => {
       });
     })
     .then(() => {
-      return getFileSize(targetFilePath);
+      return getFileInfo(targetFilePath);
     })
-    .then(fileSize => {
+    .then(fileInfo => {
+      const {size, hash, ext} = fileInfo;
       return sendResourceStatusToNKC({
         rid,
         status: true,
-        info: {
-          ext: 'mp3',
-          size: fileSize
+        filesInfo: {
+          def: {
+            ext,
+            size,
+            hash,
+            filename: filenamePath
+          }
         }
       });
     })
@@ -52,6 +57,11 @@ module.exports = async (props) => {
     .catch(console.error);
 };
 
+/*
+* 将音频文件转换为 MP3 格式
+* @param {String} filePath 原音频文件
+* @param {String} outputPath 输出音频文件格式
+* */
 function audioToMP3(filePath, outputPath) {
   return new Promise((resolve, reject) => {
     ff(filePath)

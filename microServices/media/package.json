@@ -9,7 +9,9 @@
   "author": "pengxiguaa",
   "dependencies": {
     "fluent-ffmpeg": "^2.1.2",
-    "pdf-lib": "^1.11.2"
+    "pdf-lib": "^1.11.2",
+    "easyimage": "^3.1.1",
+    "axios": "^0.21.1"
   },
   "license": "ISC"
 }

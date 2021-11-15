@@ -32,6 +32,15 @@ async function getDiskPath(time) {
   return diskPath;
 }
 
+async function accessFile(targetPath) {
+  try{
+    await fsPromises.access(targetPath);
+    return true;
+  } catch(err) {
+    return false;
+  }
+}
+
 /*
 * 获取最终文件存储目录
 * @param {Number} time 文件上传时间戳
@@ -92,5 +101,6 @@ module.exports = {
   moveFile,
   getTargetFilePath,
   getDiskPath,
+  accessFile,
   parseRange
 }

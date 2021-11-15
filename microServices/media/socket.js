@@ -13,16 +13,16 @@ function getCommunicationClient() {
   return communicationClient;
 }
 
-function sendResourceStatusToNKC(props) {
-  const {rid, status, error, info} = props;
+function sendResourceStatusToNKC(type = 'resourceStatus', props) {
+  const {rid, status, error, filesInfo} = props;
   const communicationClient = getCommunicationClient();
   communicationClient.sendMessage(communicationConfig.servicesName.nkc, {
-    type: 'resourceStatus',
+    type,
     data: {
       rid,
       status,
       error,
-      info
+      filesInfo
     }
   });
 }

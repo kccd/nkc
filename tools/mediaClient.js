@@ -40,7 +40,9 @@ module.exports = async (url, props) => {
       data: formData,
       headers: formData.getHeaders()
     })
-      .then(resolve)
+      .then(res => {
+        resolve(res.data || res);
+      })
       .catch(reject);
   });
 }

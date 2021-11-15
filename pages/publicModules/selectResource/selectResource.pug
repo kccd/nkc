@@ -75,7 +75,7 @@ if !isIncluded('selectResource')
               span(v-if='r.state === "usable"')
                 .resource-picture(v-if="r.mediaType === 'uploading'" :style="'background-image:url(/rt/' + r.rid + ')'")
                 .resource-picture.media-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(' + getUrl('resource', r.rid, 'sm') + ')'")
-                .resource-picture.media-picture(v-if="r.mediaType === 'mediaVideo'" :style="'background-image:url(/frameImg/' + r.rid + ')'")
+                .resource-picture.media-picture(v-if="r.mediaType === 'mediaVideo'" :style="'background-image:url(' + getUrl('resource', r.rid, 'cover') + ')'")
                 .resource-picture.icon(v-if="r.mediaType === 'mediaAudio'" :style="'background-image:url(/attachIcon/mp3.png)'")
                 .resource-picture.icon(v-if="r.mediaType === 'mediaAttachment'" :style="'background-image:url(/attachIcon/'+r.ext+'.png)'")
               span(v-else)
@@ -100,6 +100,7 @@ if !isIncluded('selectResource')
               span(v-else)
                 .resource-in-process
                   span 处理失败
+                  .fa.fa-exclamation-circle.pointer(v-if='r.errorInfo' :title='r.errorInfo' @click='showErrorInfo(r)')
           .module-sr-footer
             .pull-left
               input.hidden#moduleSelectResourceInput(type="file" multiple="true" @change="selectedFiles")

@@ -1,6 +1,39 @@
-const fsPromises = require('fs').promises;
+const fs = require("fs");
+const fsPromises = fs.promises;
 const Path = require('path');
 const storeConfigs = require('../../config/store');
+const PATH = require("path");
+const crypto = require("crypto");
+const {spawn} = require("child_process");
+/*
+  获取文件的md5
+  @param {String} path 文件路径
+  @return {String} md5
+  @author pengxiguaa 2019-10-31
+*/
+async function getFileMD5(filePath) {
+  return new Promise((resolve, reject) => {
+    fs.access(filePath, err => {
+      try{
+        if(err) return reject(err);
+        const stream = fs.createReadStream(filePath);
+        const hmac = crypto.createHash("md5");
+        stream.on("data", (chunk) => {
+          hmac.update(chunk);
+        });
+        stream.on("end", () => {
+          resolve(hmac.digest("hex"));
+        });
+        stream.on("error", err => {
+          reject(err);
+        });
+      } catch(err) {
+        reject(err);
+      }
+    });
+  });
+}
+
 /*
 * 移动文件
 * @param {String} path 源文件路径
@@ -48,6 +81,7 @@ async function getTargetFilePath(time, destination) {
 * @param {String} 文件路径
 * */
 async function deleteFile(filePath) {
+  if(!await accessFile(filePath)) return;
   const stat = await fsPromises.stat(filePath);
   if(stat.isFile()) {
     await fsPromises.unlink(filePath);
@@ -61,6 +95,34 @@ async function deleteFile(filePath) {
 async function getFileSize(filePath) {
   const stat = await fsPromises.stat(filePath);
   return stat.size;
+}
+
+/*
+* 获取文件信息
+* */
+async function getFileInfo(filePath) {
+  const name = PATH.basename(filePath);
+  const ext = PATH.extname(filePath).replace('.', '');
+  const hash = await getFileMD5(filePath);
+  const stats = await fsPromises.stat(filePath);
+  const size = stats.size;
+  return {
+    path: filePath,
+    name,
+    ext,
+    stats,
+    hash,
+    size,
+  };
+}
+
+async function accessFile(targetPath) {
+  try{
+    await fsPromises.access(targetPath);
+    return true;
+  } catch(err) {
+    return false;
+  }
 }
 
 /*
@@ -96,12 +158,37 @@ async function parseRange(str, size) {
   };
 }
 
+async function spawnProcess(pathName, args, options = {}) {
+  return new Promise((resolve, reject) => {
+    const bat = spawn(pathName, args, options);
+    let data = '';
+    let err = '';
+    bat.stdout.on('data', (d) => {
+      data += `${d}\n`;
+    });
+    bat.stderr.on('data', (e) => {
+      err += `${e}\n`;
+    });
+    bat.on('close', (code) => {
+      if(code !== 0) {
+        reject(new Error(err));
+      }
+      resolve(data);
+    });
+    bat.on('error', (e) => {
+      reject(e);
+    })
+  })
+}
 
 module.exports = {
   moveFile,
   deleteFile,
+  accessFile,
   getTargetFilePath,
   getDiskPath,
+  getFileInfo,
   getFileSize,
+  spawnProcess,
   parseRange
 }

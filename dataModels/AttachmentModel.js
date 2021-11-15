@@ -9,13 +9,15 @@ const statics = require('../settings/statics');
 const FileType = require('file-type');
 const PATH = require('path');
 const folderTools = require("../nkcModules/file");
-const ffmpeg = require("../tools/ffmpeg")
 
 const schema = new Schema({
   // 附件ID mongoose.Types.ObjectId().toString()
   _id: String,
   // 附件类型
   type: {
+    // columnAvatar, columnBanner, homeBigLogo
+    // postCover, problemImage, recommendThreadCover,
+    // userAvatar, userBanner, forumBanner, forumLogo
     type: String,
     required: true,
     index: 1
@@ -65,7 +67,25 @@ const schema = new Schema({
     type: String,
     default: '',
     index: 1
-  }
+  },
+  files: {
+    def: Schema.Types.Mixed,
+    sm: Schema.Types.Mixed,
+    lg: Schema.Types.Mixed,
+    md: Schema.Types.Mixed,
+    /*
+    {
+      _id: String,
+      ext: String,
+      lost: String, // 是否已丢失
+      hash: String, // 文件 md5
+      size: Number, // 文件大小
+      height: Number, // 图片、视频高
+      width: Number,  // 图片、视频宽
+      filename: String, // 在存储服务磁盘上的文件名
+    }
+    */
+  },
 }, {
   collection: 'attachments'
 });
@@ -338,73 +358,63 @@ schema.statics.getSiteIconFilePath = async (t) => {
 * */
 schema.statics.saveForumImage = async (fid, type, file) => {
   if(!['forumLogo', 'forumBanner'].includes(type)) throwErr(400, '未知的图片类型');
-  const AM = mongoose.model("attachments");
+  const AttachmentModel = mongoose.model('attachments');
   const ForumModel = mongoose.model('forums');
   const FILE = require('../nkcModules/file');
   const ext = await FILE.getFileExtension(file, ['jpg', 'jpeg', 'png']);
-  const toc = new Date();
-  const fileFolder = await FILE.getPath(type, toc)
-  const {fullPath, timePath} = await AM.getAttachmentPath();
-  const aid = AM.getNewId();
-  const fileName = `${aid}.${ext}`;
-  const targetFilePath = PATH.resolve(fileFolder, `./${fileName}`);
-  const {size, name, hash} = file;
-  const attachment = AM({
-    _id: aid,
-    toc,
-    size,
-    hash,
-    name,
-    type,
-    ext,
-  });
-  await attachment.save();
+  const time = new Date();
+  const aid = await AttachmentModel.getNewId();
+  let images;
+  const updateObj = {};
   if(type === 'forumLogo') {
-    // 正常
-    await ei.resize({
-      src: file.path,
-      dst: targetFilePath,
-      height: 192,
-      width: 192,
-      quality: 90
-    });
-    // 大图
-    const targetFilePathLG = PATH.resolve(fileFolder, `./${aid}_lg.${ext}`);
-    await ei.resize({
-      src: file.path,
-      dst: targetFilePathLG,
-      height: 600,
-      width: 600,
-      quality: 90
-    });
-    // 小图
-    const targetFilePathSM = PATH.resolve(fileFolder, `./${aid}_sm.${ext}`);
-    await ei.resize({
-      src: file.path,
-      dst: targetFilePathSM,
-      height: 48,
-      width: 48,
-      quality: 90
-    });
-    await ForumModel.updateOne({fid}, {
-      $set: {
-        logo: aid
+    updateObj.logo = aid;
+    images = [
+      {
+        type: 'def',
+        filename: `${aid}.${ext}`,
+        height: 192,
+        width: 192,
+        quality: 90
+      },
+      {
+        type: 'lg',
+        filename: `${aid}_lg.${ext}`,
+        height: 600,
+        width: 600,
+        quality: 90
+      },
+      {
+        type: 'sm',
+        filename: `${aid}_sm.${ext}`,
+        height: 48,
+        width: 48,
+        quality: 90
       }
-    });
+    ];
   } else {
-    await ei.resize({
-      src: file.path,
-      dst: targetFilePath,
-      height: 300,
-      width: 1200,
-      quality: 90
-    });
-    await ForumModel.updateOne({fid}, {
-      $set: {
-        banner: aid
+    updateObj.banner = aid;
+    images = [
+      {
+        type: 'def',
+        filename: `${aid}.${ext}`,
+        height: 300,
+        width: 1200,
+        quality: 90
       }
-    })
+    ];
   }
+  const attachment = await AttachmentModel.createAttachmentAndPushFile({
+    aid,
+    file,
+    ext,
+    sizeLimit: 20 * 1024 * 1024,
+    time,
+    type: 'forumLogo',
+    images
+  });
+  await ForumModel.updateOne({fid}, {
+    $set: updateObj
+  });
   return attachment;
 };
 /*
@@ -705,18 +715,208 @@ schema.statics.saveFundImage = async (filePath, type) => {
   return attach._id;
 }
 
-schema.methods.getRemoteFile = async function(size) {
+/*
+* 更新用户的背景
+* @param {String} uid 用户 ID
+* @param {File} file
+* @return {Object} attachment 对象
+* */
+schema.statics.saveUserAvatar = async (uid, file) => {
+  const AttachmentModel = mongoose.model('attachments');
+  const UserModel = mongoose.model('users');
+  const time = new Date();
   const FILE = require('../nkcModules/file');
-  const {_id, ext, toc, type, name} = this;
+  const aid = await AttachmentModel.getNewId();
+  const ext = await FILE.getFileExtension(file, ['jpg', 'png', 'jpeg']);
+  const attachment = await AttachmentModel.createAttachmentAndPushFile({
+    aid,
+    file,
+    uid,
+    ext,
+    sizeLimit: 20 * 1024 * 1024,
+    time,
+    type: 'userAvatar',
+    images: [
+      {
+        type: 'def',
+        filename: `${aid}.${ext}`,
+        height: 192,
+        width: 192,
+        quality: 90
+      },
+      {
+        type: 'sm',
+        filename: `${aid}_sm.${ext}`,
+        height: 48,
+        width: 48,
+        quality: 90
+      },
+      {
+        type: 'lg',
+        filename: `${aid}_lg.${ext}`,
+        height: 600,
+        width: 600,
+        quality: 90
+      }
+    ]
+  });
+  await UserModel.updateOne({uid}, {
+    $set: {
+      avatar: attachment._id
+    }
+  });
+  return attachment;
+};
+
+/*
+* 更新用户的背景
+* @param {String} uid 用户 ID
+* @param {File} file
+* @return {Object} attachment 对象
+* */
+schema.statics.saveUserBanner = async (uid, file) => {
+  const AttachmentModel = mongoose.model('attachments');
+  const UserModel = mongoose.model('users');
+  const time = new Date();
+  const aid = await AttachmentModel.getNewId();
+  const FILE = require('../nkcModules/file');
+  const ext = await FILE.getFileExtension(file, ['jpeg', 'png', 'jpg']);
+  const attachment = await AttachmentModel.createAttachmentAndPushFile({
+    aid,
+    file,
+    ext,
+    uid,
+    sizeLimit: 20 * 1024 * 1024,
+    time,
+    type: 'userBanner',
+    images: [
+      {
+        type: 'def',
+        filename: `${aid}.${ext}`,
+        height: 400,
+        width: 800,
+        quality: 95
+      }
+    ]
+  });
+  await UserModel.updateOne({uid}, {
+    $set: {
+      banner: attachment._id
+    }
+  });
+  return attachment;
+};
+
+/*
+* 创建 attachment 记录并推送文件到 media service 处理
+* @param {String} aid attachment ID
+* @param {File} file 文件对象
+* @param {String} ext 文件格式
+* @param {String} uid 上传者 ID
+* @param {Number} sizeLimit 图片尺寸限制 字节
+* @param {Date} time 上传时间
+* @param {String} type attachment 类型 例如：userAvatar, userBanner 等等
+* @param {[Object]} images 待生成的图片信息
+*   @param {String} type 同一图片的类型 例如：def, sm, lg
+*   @param {String} filename 文件在 store service 上的文件名
+*   @param {Number} height 压缩后的图片高
+*   @param {Number} width 压缩后的图片宽
+*   @param {Number} quality 压缩后的图片质量 1 - 100
+* */
+schema.statics.createAttachmentAndPushFile = async (props) => {
+  const {
+    aid,
+    file,
+    ext,
+    uid,
+    sizeLimit = 0,
+    time,
+    type,
+    images = []
+  } = props;
+  const AttachmentModel = mongoose.model('attachments');
+  const {getSize} = require('../nkcModules/tools');
+  if(file.size > sizeLimit) throwErr(400, `图片不能超过 ${getSize(sizeLimit, 0)}`);
+  const attachment = AttachmentModel({
+    _id: aid,
+    toc: time,
+    size: file.size,
+    name: file.name,
+    hash: file.hash,
+    ext,
+    type,
+    uid
+  });
+  attachment.files = await attachment.pushToMediaService(file.path, images);
+  await attachment.save();
+  return attachment;
+};
+
+
+
+/*
+* 推送文件到 media service 处理
+* @param {String} filePath 待处理文件路径
+* @param {[Object]} images 需要处理并生成的图片的信息
+*   @param {String} type 同一图片的类型 例如：def, sm, lg
+*   @param {String} filename 文件在 store service 上的文件名
+*   @param {Number} height 压缩后的图片高
+*   @param {Number} width 压缩后的图片宽
+*   @param {Number} quality 压缩后的图片质量 1 - 100
+* @return {Object} media service 处理之后生成的文件信息
+* */
+schema.methods.pushToMediaService = async function(filePath, images) {
+  const FILE = require('../nkcModules/file');
+  const socket = require('../nkcModules/socket');
+  const mediaClient = require('../tools/mediaClient');
+  const {toc, type, _id} = this;
+  const storeServiceUrl = await FILE.getBasePath(toc);
+  const mediaServiceUrl = await socket.getMediaServiceUrl();
+  const timePath = await FILE.getTimePath(toc);
+  const mediaPath = await FILE.getMediaPath(type);
+  const data = {
+    aid: _id,
+    timePath,
+    mediaPath,
+    toc,
+    images
+  };
+  const res = await mediaClient(mediaServiceUrl, {
+    type: 'attachment',
+    filePath,
+    storeUrl: storeServiceUrl,
+    data
+  });
+  return res.files;
+}
+
+/*
+* 加载从 store service 取文件需要的数据
+* @param {String} size 同一文件的不同类型
+* @return {Object}
+*   @param {String} url store service 链接
+*   @param {String} filename 下载时的文件名称，设置在 response header 中
+*   @param {Object} query
+*     @param {String} path 文件在 store service 上的路径
+*     @param {Number} time 文件的上传时间
+* */
+schema.methods.getRemoteFile = async function(size = 'def') {
+  const FILE = require('../nkcModules/file');
+  const {_id, toc, type, name, files} = this;
   const diskPath = await FILE.getDiskPath(toc);
   const mediaPath = await FILE.getMediaPath(type);
   const timePath = await FILE.getTimePath(toc);
-  let filenamePath;
-  if(size) {
-    filenamePath = `${_id}_${size}.${ext}`;
+  const defaultSizeFile = files['def'];
+  let targetSizeFile;
+  if(!files[size]) {
+    targetSizeFile = defaultSizeFile;
   } else {
-    filenamePath = `${_id}.${ext}`;
+    targetSizeFile = files[size];
   }
+  if(!targetSizeFile || targetSizeFile.lost || !targetSizeFile.filename) {
+    throw new Error(`attachment 数据错误 aid: ${_id}`);
+  }
+  const filenamePath = targetSizeFile.filename;
   const path = PATH.join(mediaPath, timePath, filenamePath);
   const time = (new Date(toc)).getTime();
   return {

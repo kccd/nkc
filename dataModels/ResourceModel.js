@@ -120,6 +120,11 @@ const resourceSchema = new Schema({
     index: 1,
     default: 'inProcess'
   },
+  // 文件处理错误时的错误信息
+  errorInfo: {
+    type: String,
+    default: ''
+  },
   // 所在专业 根据 references 字段统计而来
   forumsId: {
 	  type: [String],
@@ -129,6 +134,34 @@ const resourceSchema = new Schema({
   tou: {
     type: Date,
     default: null
+  },
+
+  // 处理之后的文件信息
+  // 图片：default, sm, md
+  // 视频：sd, hd, fhd, cover
+  // 音频：default
+  // 附件：default, preview
+  files: {
+    def: Schema.Types.Mixed,
+    sm: Schema.Types.Mixed,
+    md: Schema.Types.Mixed,
+    sd: Schema.Types.Mixed,
+    hd: Schema.Types.Mixed,
+    fhd: Schema.Types.Mixed,
+    cover: Schema.Types.Mixed,
+    preview: Schema.Types.Mixed,
+    /*
+    {
+      _id: String,
+      ext: String,
+      lost: String, // 是否已丢失
+      hash: String, // 文件 md5
+      size: Number, // 文件大小
+      height: Number, // 图片、视频高
+      width: Number,  // 图片、视频宽
+      filename: String, // 在存储服务磁盘上的文件名
+    }
+    */
   },
 },
 {
@@ -815,9 +848,10 @@ resourceSchema.methods.checkToken = async function(token) {
 };
 
 /*
-* 推送文件到文件处理服务
+* 推送文件到 media service 处理
+* @param {String} filePath 待处理文件的路径
 * */
-resourceSchema.methods.pushToMediaService = async function(file) {
+resourceSchema.methods.pushToMediaService = async function(filePath) {
   const FILE = require('../nkcModules/file');
   const socket = require('../nkcModules/socket');
   const mediaClient = require('../tools/mediaClient');
@@ -827,13 +861,13 @@ resourceSchema.methods.pushToMediaService = async function(file) {
   const data = await this.getMediaServiceData();
   await mediaClient(mediaServiceUrl, {
     type: mediaType,
-    filePath: file.path,
+    filePath,
     storeUrl: storeServiceUrl,
     data
   });
 };
 /*
-* 获取文件的存储目录等必要信息
+* 获取 media service 需要的信息，推送前获取
 * */
 resourceSchema.methods.getMediaServiceData = async function() {
   // mediaAudio, mediaVideo, mediaAttachment, mediaPicture
@@ -842,6 +876,15 @@ resourceSchema.methods.getMediaServiceData = async function() {
   return await this[`getMediaServiceData${type}`]();
 };
 
+/*
+* 获取 media service 处理附件时所需要的必要信息
+* @return {Object}
+*   @param {String} rid 资源 ID
+*   @param {String} timePath 由年月组成的目录
+*   @param {String} mediaPath 文件类型所对应的目录
+*   @param {String} ext 文件格式
+*   @param {String} toc 文件的上传时间
+* */
 resourceSchema.methods.getMediaServiceDataAttachment = async function() {
   const {rid, toc, mediaType, ext} = this;
   const FILE = require('../nkcModules/file');
@@ -856,6 +899,15 @@ resourceSchema.methods.getMediaServiceDataAttachment = async function() {
   };
 };
 
+/*
+* 获取 media service 处理音频时所需要的必要信息
+* @return {Object}
+*   @param {String} rid 资源 ID
+*   @param {String} timePath 由年月组成的目录
+*   @param {String} mediaPath 文件类型所对应的目录
+*   @param {String} ext 文件格式
+*   @param {String} toc 文件的上传时间
+* */
 resourceSchema.methods.getMediaServiceDataAudio = async function() {
   const {rid, toc, mediaType, ext} = this;
   const FILE = require('../nkcModules/file');
@@ -870,38 +922,99 @@ resourceSchema.methods.getMediaServiceDataAudio = async function() {
   };
 };
 
+
+/*
+* media service 处理好附件之后推送到 nkc service 的消息
+* 更新附件的处理状态等信息
+* @param {Object} props
+*   @param {String} rid 附件 ID
+*   @param {Boolean} status 处理状态 true：处理成功, false: 处理失败
+*   @param {String} errorInfo 处理失败时的错误信息
+*   @param {[Object]} filesInfo 处理之后生成的所有文件的信息
+*     @param {String} _id 文件类型 default, sm, md, sd, hd, fhd, cover, preview
+*     @param {String} ext 文件格式
+*     @param {Boolean} lost 文件是否丢失
+*     @param {String} hash 文件 md5
+*     @param {Number} size 文件体积
+*     @param {Number} height 图片、视频的高
+*     @param {Number} width 图片、视频的宽
+*     @param {String} 在 store service 磁盘上的文件名
+* */
 resourceSchema.statics.updateResourceStatus = async (props) => {
-  const {rid, status, error, info = {}} = props;
+  const {rid, status, error, filesInfo = {}} = props;
   const ResourceModel = mongoose.model('resources');
   const {sendDataMessage} = require('../nkcModules/socket');
   const resource = await ResourceModel.findOnly({rid});
-  if(resource.mediaType === 'mediaAudio') {
-    let filename = resource.oname;
-    filename = filename.split('.');
-    filename.pop();
-    filename.push('mp3');
-    filename = filename.join('.');
-    const updateObj = {
-      oname: filename,
-      state: status? 'usable': 'useless'
-    };
-    if(info.size) updateObj.size = info.size;
-    if(info.ext) updateObj.ext = info.ext;
-    await resource.updateOne({
-      $set: updateObj
-    });
+
+  let resourceState;
+  let errorInfo;
+  let fileProcessState;
+
+  if(status) {
+    // 文件处理成功
+    resourceState = 'usable';
+    errorInfo = '';
+    fileProcessState = 'fileProcessFinish';
+  } else {
+    // 文件处理失败
+    resourceState = 'useless';
+    errorInfo = error;
+    fileProcessState = 'fileProcessFailed';
   }
-  let state = status? 'fileProcessFinish': 'fileProcessFailed';
+
+  const updateObj = {
+    errorInfo,
+    state: resourceState,
+    files: filesInfo
+  };
+
+  if(resource.mediaType === 'mediaPicture') {
+    // 图片
+  } else if(resource.mediaType === 'mediaAudio') {
+    // 音频
+    let oname = resource.oname.split('.');
+    oname.pop();
+    oname.push('mp3');
+    oname = oname.join('.');
+    updateObj.oname = oname;
+    updateObj.ext = 'mp3';
+  } else if(resource.mediaType === 'mediaVideo') {
+    // 视频
+    let oname = resource.oname.split('.');
+    oname.pop();
+    oname.push('mp4');
+    oname = oname.join('.');
+    updateObj.oname = oname;
+    updateObj.ext = 'mp4';
+  } else {
+    // 附件
+  }
+
+  await resource.updateOne({
+    $set: updateObj
+  });
+
+  // 通过 socket 服务通知浏览器
   sendDataMessage(resource.uid, {
     event: "fileTransformProcess",
-    data: {rid: resource.rid, state, err: error}
+    data: {rid: resource.rid, state: fileProcessState, err: error}
   });
 };
 
+/*
+* 获取远程文件信息
+* @param {String} size 文件类型
+* @return {Object}
+*   @param {String} url store service 链接
+*   @param {String} filename 下载时的文件名称，设置在 response header 中
+*   @param {Object} query
+*     @param {String} path 文件在 store service 上的路径
+*     @param {Number} time 文件的上传时间
+* */
 resourceSchema.methods.getRemoteFile = async function(size) {
   const FILE = require('../nkcModules/file');
   const ResourceModel = mongoose.model('resources');
-  const {toc, ext, rid, prid, mediaType, oname} = this;
+  const {files = {}, toc, ext, rid, prid, mediaType, oname} = this;
   if(prid) {
     const parentResource = await ResourceModel.findOne({rid: prid});
     if(!parentResource) throwErr(500, `附件丢失 rid:${prid}`);
@@ -910,12 +1023,32 @@ resourceSchema.methods.getRemoteFile = async function(size) {
   const diskPath = await FILE.getDiskPath(toc);
   const mediaPath = await FILE.getMediaPath(mediaType);
   const timePath = await FILE.getTimePath(toc);
-  let filenamePath;
-  if(size) {
-    filenamePath = `${rid}_${size}.${ext}`;
-  } else {
-    filenamePath = `${rid}.${ext}`;
+
+  if(!size) {
+    if(mediaType === 'mediaVideo') {
+      size = 'sd';
+    } else if(mediaType === 'mediaPicture') {
+      size = 'def'
+    } else if(mediaType === 'mediaAudio') {
+      size = 'def'
+    } else {
+      size = 'def'
+    }
   }
+
+  const defaultSizeFile = files['def'];
+  let targetSizeFile;
+  if(!files[size]) {
+    targetSizeFile = defaultSizeFile;
+  } else {
+    targetSizeFile = files[size];
+  }
+
+  if(!targetSizeFile || targetSizeFile.lost || !targetSizeFile.filename) {
+    throw new Error(`resource 数据错误 rid: ${rid}`);
+  }
+
+  const filenamePath = targetSizeFile.filename;
   const path = PATH.join(mediaPath, timePath, filenamePath);
   const time = (new Date(toc)).getTime();
   return {
