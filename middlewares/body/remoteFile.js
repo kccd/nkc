@@ -7,15 +7,9 @@ module.exports = async (ctx) => {
   const {remoteFile, isAttachment, settings} = ctx;
   const {encodeRFC5987ValueChars} = ctx.nkcModules.nkcRender;
   const {
-    url,
-    query,
+    url: fileUrl,
     filename = '',
   } = remoteFile;
-  // 组装 store service 链接
-  const fileUrl = new URL(url);
-  for(const key in query) {
-    fileUrl.searchParams.set(key, query[key]);
-  }
   let ext = filename.split('.');
   ext = ext.pop() || '';
   ext = ext.toLowerCase();

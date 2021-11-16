@@ -3,6 +3,7 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const folderTools = require("../nkcModules/file");
 const PATH = require('path');
+const fs = require("fs");
 
 const schema = new Schema({
   // 附件ID mongoose.Types.ObjectId().toString()
@@ -94,5 +95,32 @@ schema.methods.getFilePath = async function(t) {
 schema.statics.getNewId = () => {
   return mongoose.Types.ObjectId().toString();
 };
+
+
+/**
+ * 身份认证材料存储
+ * @returns {string} 附件id
+ */
+schema.statics.saveVerifiedUpload = async ({ size, hash, name, path, uid, toc }) => {
+  const VerifiedUploadModel = mongoose.model("verifiedUpload");
+  const _id = await VerifiedUploadModel.getNewId();
+  const ext = PATH.extname(name).substring(1);
+  const date = toc || new Date();
+  const attachment = VerifiedUploadModel({
+    _id,
+    toc: date,
+    size,
+    hash,
+    name,
+    ext,
+    uid,
+    type: "verifiedUpload"
+  });
+  await attachment.save();
+  const dir = await folderTools.getPath("verifiedUpload", date);
+  const savePath = PATH.join(dir, `${_id}${PATH.extname(name)}`);
+  await fs.promises.copyFile(path, savePath);
+  return _id;
+}
 
 module.exports = mongoose.model('verifiedUpload', schema);

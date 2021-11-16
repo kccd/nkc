@@ -28,6 +28,9 @@ var Tools = function() {
         return "/a/"+ id + t
       }
       case "scoreIcon": {
+        if(id === 'default') {
+          return "/default/kcb.png"
+        }
         return "/a/" + id + t
       }
       case "postCover": {

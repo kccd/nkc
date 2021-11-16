@@ -62,7 +62,6 @@ const rs = require("./resources");
 const protocol = require('./protocol');
 const review = require("./review");
 const threads = require("./threads");
-const newResource = require("./newResource");
 const library = require("./library");
 const libraries = require("./libraries");
 const nkc = require("./nkc");
@@ -251,8 +250,6 @@ operationObj.operationTree = {
     threads, // 文章批量管理
 
     survey, // 投票、调查问卷、打分
-
-    nr: newResource, // 新的资源路由
 
     library, // 文库
     libraries, // 文库

@@ -36,7 +36,7 @@ module.exports = async (ctx, next) => {
       }
     }
     ctx.body = fs.createReadStream(filePath, readStreamRange);
-    ctx.set(`Content-Disposition`, `attachment; filename=${basename}`);
+    ctx.set(`Content-Disposition`, `attachment; filename=${basename};`);
     ctx.set(`Content-Length`, contentLength);
     ctx.type = ext;
   } else {

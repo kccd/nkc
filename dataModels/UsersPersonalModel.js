@@ -633,14 +633,14 @@ usersPersonalSchema.statics.modifyVerifyPhoneNumberTime = async (uid) => {
  * 生成身份认证2记录
  */
 usersPersonalSchema.methods.generateAuthenticateVerify2 = async function(files) {
-	const AttachmentModel = mongoose.model("attachments");
+  const VerifiedUploadModel = mongoose.model('verifiedUpload');
 	const [ imageA, imageB ] = files;
 	if(!imageA || !imageB) {
 		throw new Error("must get A and B surface of IDCard.");
 	}
 	const aids = await Promise.all(
 		[ imageA, imageB ].map(async (file) => {
-			return await AttachmentModel.saveVerifiedUpload({
+			return await VerifiedUploadModel.saveVerifiedUpload({
 				size: file.size,
 				hash: file.hash,
 				name: file.name,
@@ -662,7 +662,6 @@ usersPersonalSchema.methods.generateAuthenticateVerify2 = async function(files) 
  * 生成身份认证3记录
  */
 usersPersonalSchema.methods.generateAuthenticateVerify3 = async function(file, code) {
-	const AttachmentModel = mongoose.model("attachments");
 	if(!file) {
 		throw new Error("must get a video file.");
 	}
@@ -676,7 +675,7 @@ usersPersonalSchema.methods.generateAuthenticateVerify3 = async function(file, c
 	const newTargetFilePath = path.join(targetFilePath, `${_id}_tmp.mp4`)
 	await ffmpeg.videoTransMP4(file.path, newTargetFilePath);
 	const newFile = await FILE.getFileObjectByFilePath(newTargetFilePath);
-	const aid = await AttachmentModel.saveVerifiedUpload({
+	const aid = await VerifiedUploadModel.saveVerifiedUpload({
 		_id,
 		size: newFile.size,
 		hash: newFile.hash,

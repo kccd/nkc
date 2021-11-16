@@ -24,7 +24,8 @@ module.exports = async (props) => {
       filename,
       height,
       width,
-      quality
+      quality,
+      background = 'transparent'
     } = image;
     const path = PATH.join(mediaPath, timePath, filename);
     const targetFilePath = filePath + '.temp.' + filename;
@@ -33,7 +34,8 @@ module.exports = async (props) => {
       dst: targetFilePath,
       height,
       width,
-      quality
+      quality,
+      background
     });
     storeFiles.push({
       filePath: targetFilePath,

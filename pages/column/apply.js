@@ -72,8 +72,8 @@ var app = new Vue({
       if(!column.abbr) return this.error = "请输入专栏简介";
       // if(!column.description) return this.error = "请输入专栏介绍";
       var formData = new FormData();
-      formData.append("avatar", this.avatar);
-      formData.append("banner", this.banner);
+      formData.append("avatar", this.avatar, 'avatar.png');
+      formData.append("banner", this.banner, 'banner.png');
       formData.append("name", column.name);
       formData.append("abbr", column.abbr);
       formData.append("description", column.description);

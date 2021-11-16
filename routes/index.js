@@ -84,7 +84,6 @@ router.use('/', async (ctx, next) => {
 });
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
-router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
 router.use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
 router.use("/libraries", librariesRouter.routes(), librariesRouter.allowedMethods());
 router.use("/editor", editorRouter.routes(), editorRouter.allowedMethods());

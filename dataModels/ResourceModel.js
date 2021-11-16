@@ -311,7 +311,7 @@ resourceSchema.methods.getFilePath = async function(size) {
     return await parentResource.getFilePath(size);
   }
 
-  const diskPath = await FILE.getDiskPath(toc);
+  const storeUrl = await FILE.getStoreUrl(toc);
   const mediaPath = await FILE.getMediaPath(this.mediaType);
   const timePath = await FILE.getTimePath(toc);
   let filenamePath;
@@ -321,10 +321,10 @@ resourceSchema.methods.getFilePath = async function(size) {
     filenamePath = `${rid}.${ext}`;
   }
   let filePath;
-  if(FILE.isUrl(diskPath)) {
-    filePath = `${diskPath}?time=${toc.getTime()}&path=${mediaPath}/${timePath}/${filenamePath}`;
+  if(FILE.isUrl(storeUrl)) {
+    filePath = `${storeUrl}?time=${toc.getTime()}&path=${mediaPath}/${timePath}/${filenamePath}`;
   } else {
-    filePath = `${diskPath}/${mediaPath}/${timePath}/${filenamePath}`;
+    filePath = `${storeUrl}/${mediaPath}/${timePath}/${filenamePath}`;
   }
   return filePath;
   /*const fileFolder = await ResourceModel.getMediaPath(this.mediaType, toc);
@@ -856,7 +856,7 @@ resourceSchema.methods.pushToMediaService = async function(filePath) {
   const socket = require('../nkcModules/socket');
   const mediaClient = require('../tools/mediaClient');
   const {toc, mediaType} = this;
-  const storeServiceUrl = await FILE.getBasePath(toc);
+  const storeServiceUrl = await FILE.getStoreUrl(toc);
   const mediaServiceUrl = await socket.getMediaServiceUrl();
   const data = await this.getMediaServiceData();
   await mediaClient(mediaServiceUrl, {
@@ -1020,7 +1020,7 @@ resourceSchema.methods.getRemoteFile = async function(size) {
     if(!parentResource) throwErr(500, `附件丢失 rid:${prid}`);
     return await parentResource.getFilePath(size);
   }
-  const diskPath = await FILE.getDiskPath(toc);
+  const storeUrl = await FILE.getStoreUrl(toc);
   const mediaPath = await FILE.getMediaPath(mediaType);
   const timePath = await FILE.getTimePath(toc);
 
@@ -1052,11 +1052,7 @@ resourceSchema.methods.getRemoteFile = async function(size) {
   const path = PATH.join(mediaPath, timePath, filenamePath);
   const time = (new Date(toc)).getTime();
   return {
-    url: diskPath,
-    query: {
-      path,
-      time
-    },
+    url: await FILE.createStoreQueryUrl(storeUrl, time, path),
     filename: oname
   }
 }

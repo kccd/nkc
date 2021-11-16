@@ -778,7 +778,7 @@ function initVueApp() {
               var formData = new FormData();
               formData.append("body", JSON.stringify({post: post}));
               if(self.coverData) {
-                formData.append("postCover", NKC.methods.blobToFile(self.coverData));
+                formData.append("postCover", NKC.methods.blobToFile(self.coverData), 'cover.png');
               }
               return nkcUploadFile("/f/" + post.fids[0], "POST", formData)
             } else if(type === "newPost") { // 发表回复：从文章页点"去编辑器"、草稿箱
@@ -799,7 +799,7 @@ function initVueApp() {
               var formData = new FormData();
               formData.append("body", JSON.stringify({post: post}));
               if(self.coverData) {
-                formData.append("postCover", NKC.methods.blobToFile(self.coverData));
+                formData.append("postCover", NKC.methods.blobToFile(self.coverData), 'cover.png');
               }
               return nkcUploadFile("/p/" + self.post.pid, "PUT", formData);
             } else if(type === "modifyThread") { // 修改thread
@@ -811,7 +811,7 @@ function initVueApp() {
               var formData = new FormData();
               formData.append("body", JSON.stringify({post: post}));
               if(self.coverData) {
-                formData.append("postCover", NKC.methods.blobToFile(self.coverData));
+                formData.append("postCover", NKC.methods.blobToFile(self.coverData), 'cover.png');
               }
               return nkcUploadFile("/p/" + self.post.pid, "PUT", formData);
             } else if(type === "modifyForumDeclare") { // 修改专业详情
@@ -889,7 +889,7 @@ function initVueApp() {
               desTypeId: desTypeId
             }));
             if(self.coverData) {
-              formData.append("postCover", NKC.methods.blobToFile(self.coverData));
+              formData.append("postCover", NKC.methods.blobToFile(self.coverData), 'cover.png');
             }
             return nkcUploadFile("/u/" + NKC.configs.uid + "/drafts", "POST", formData);
           })

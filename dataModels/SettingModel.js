@@ -814,4 +814,17 @@ settingSchema.statics.restrictAccess = async (props) => {
   }
 }
 
+/**
+ * 获取首页大Logo
+ */
+settingSchema.statics.getHomeBigLogo = async () => {
+  const SettingModel = mongoose.model('settings');
+  const homeSettings = await SettingModel.getSettings('home');
+  if(!homeSettings.homeBigLogo || !(homeSettings.homeBigLogo.length)) {
+    return [];
+  } else {
+    return homeSettings.homeBigLogo;
+  }
+}
+
 module.exports = mongoose.model('settings', settingSchema);
