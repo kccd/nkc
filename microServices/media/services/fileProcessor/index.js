@@ -5,4 +5,8 @@ module.exports = {
   mediaPicture: require('./mediaPicture'),
 
   attachment: require('./attachment'),
+
+  identityPictureA: require('./identityPicture'),
+  identityPictureB: require('./identityPicture'),
+  identityVideo: require('./identityVideo')
 };

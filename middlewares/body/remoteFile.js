@@ -1,7 +1,6 @@
 const http = require('http');
 const FILE = require("../../nkcModules/file");
-const pictureExtensions = FILE.getExtensionByType('mediaPicture');
-const breakpointExtensions = FILE.getExtensionByType('breakpoint');
+const {pictureExtensions, breakpointExtensions} = FILE;
 const fileBody = require('./file');
 module.exports = async (ctx) => {
   const {remoteFile, isAttachment, settings} = ctx;

@@ -6,6 +6,7 @@ const Schema = mongoose.Schema;
 const PATH = require('path');
 const fs = require("fs");
 const FILE = require("../nkcModules/file");
+const {pictureExtensions} = require("../nkcModules/file");
 const fsPromises = fs.promises;
 const resourceSchema = new Schema({
 	rid: {
@@ -160,6 +161,7 @@ const resourceSchema = new Schema({
       height: Number, // 图片、视频高
       width: Number,  // 图片、视频宽
       filename: String, // 在存储服务磁盘上的文件名
+      disposition: String, // 下载时的文件名
     }
     */
   },
@@ -847,6 +849,23 @@ resourceSchema.methods.checkToken = async function(token) {
   return count !== null;
 };
 
+resourceSchema.statics.getMediaTypeByExtension = (extension) => {
+  const {
+    pictureExtensions,
+    videoExtensions,
+    audioExtensions
+  } = require('../nkcModules/file');
+  if(pictureExtensions.includes(extension)) {
+    return 'mediaPicture'
+  } else if(videoExtensions.includes(extension)) {
+    return 'mediaVideo'
+  } else if(audioExtensions.includes(extension)) {
+    return 'mediaAudio'
+  } else {
+    return 'mediaAttachment'
+  }
+};
+
 /*
 * 推送文件到 media service 处理
 * @param {String} filePath 待处理文件的路径
@@ -886,13 +905,14 @@ resourceSchema.methods.getMediaServiceData = async function() {
 *   @param {String} toc 文件的上传时间
 * */
 resourceSchema.methods.getMediaServiceDataAttachment = async function() {
-  const {rid, toc, mediaType, ext} = this;
+  const {rid, toc, mediaType, ext, oname} = this;
   const FILE = require('../nkcModules/file');
   const timePath = await FILE.getTimePath(toc);
   const mediaPath = await FILE.getMediaPath(mediaType);
   return {
     rid,
     timePath,
+    disposition: oname,
     mediaPath,
     ext,
     toc
@@ -909,13 +929,14 @@ resourceSchema.methods.getMediaServiceDataAttachment = async function() {
 *   @param {String} toc 文件的上传时间
 * */
 resourceSchema.methods.getMediaServiceDataAudio = async function() {
-  const {rid, toc, mediaType, ext} = this;
+  const {rid, toc, mediaType, ext, oname} = this;
   const FILE = require('../nkcModules/file');
   const timePath = await FILE.getTimePath(toc);
   const mediaPath = await FILE.getMediaPath(mediaType);
   return {
     rid,
     timePath,
+    disposition: oname,
     mediaPath,
     ext,
     toc
@@ -962,36 +983,12 @@ resourceSchema.statics.updateResourceStatus = async (props) => {
     fileProcessState = 'fileProcessFailed';
   }
 
-  const updateObj = {
-    errorInfo,
-    state: resourceState,
-    files: filesInfo
-  };
-
-  if(resource.mediaType === 'mediaPicture') {
-    // 图片
-  } else if(resource.mediaType === 'mediaAudio') {
-    // 音频
-    let oname = resource.oname.split('.');
-    oname.pop();
-    oname.push('mp3');
-    oname = oname.join('.');
-    updateObj.oname = oname;
-    updateObj.ext = 'mp3';
-  } else if(resource.mediaType === 'mediaVideo') {
-    // 视频
-    let oname = resource.oname.split('.');
-    oname.pop();
-    oname.push('mp4');
-    oname = oname.join('.');
-    updateObj.oname = oname;
-    updateObj.ext = 'mp4';
-  } else {
-    // 附件
-  }
-
   await resource.updateOne({
-    $set: updateObj
+    $set: {
+      errorInfo,
+      state: resourceState,
+      files: filesInfo
+    }
   });
 
   // 通过 socket 服务通知浏览器
@@ -1037,11 +1034,9 @@ resourceSchema.methods.getRemoteFile = async function(size) {
   }
 
   const defaultSizeFile = files['def'];
-  let targetSizeFile;
-  if(!files[size]) {
+  let targetSizeFile = files[size];
+  if(!targetSizeFile || targetSizeFile.lost || !targetSizeFile.filename) {
     targetSizeFile = defaultSizeFile;
-  } else {
-    targetSizeFile = files[size];
   }
 
   if(!targetSizeFile || targetSizeFile.lost || !targetSizeFile.filename) {
@@ -1053,7 +1048,7 @@ resourceSchema.methods.getRemoteFile = async function(size) {
   const time = (new Date(toc)).getTime();
   return {
     url: await FILE.createStoreQueryUrl(storeUrl, time, path),
-    filename: oname
+    filename: targetSizeFile.disposition || oname
   }
 }
 

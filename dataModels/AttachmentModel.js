@@ -80,6 +80,7 @@ const schema = new Schema({
       height: Number, // 图片、视频高
       width: Number,  // 图片、视频宽
       filename: String, // 在存储服务磁盘上的文件名
+      disposition: String, // 下载时显示的名称
     }
     */
   },
@@ -121,6 +122,7 @@ schema.statics.saveHomeBigLogo = async file => {
       {
         type: 'def',
         filename: `${aid}.${ext}`,
+        disposition: file.name,
         height: 107,
         width: 388,
         quality: 95
@@ -160,6 +162,7 @@ schema.statics.saveForumImage = async (fid, type, file) => {
       {
         type: 'def',
         filename: `${aid}.${ext}`,
+        disposition: file.name,
         height: 192,
         width: 192,
         quality: 90
@@ -167,6 +170,7 @@ schema.statics.saveForumImage = async (fid, type, file) => {
       {
         type: 'lg',
         filename: `${aid}_lg.${ext}`,
+        disposition: file.name,
         height: 600,
         width: 600,
         quality: 90
@@ -174,6 +178,7 @@ schema.statics.saveForumImage = async (fid, type, file) => {
       {
         type: 'sm',
         filename: `${aid}_sm.${ext}`,
+        disposition: file.name,
         height: 48,
         width: 48,
         quality: 90
@@ -185,6 +190,7 @@ schema.statics.saveForumImage = async (fid, type, file) => {
       {
         type: 'def',
         filename: `${aid}.${ext}`,
+        disposition: file.name,
         height: 300,
         width: 1200,
         quality: 90
@@ -230,6 +236,7 @@ schema.statics.saveScoreIcon = async (file, scoreType) => {
       {
         type: 'def',
         filename: `${aid}.${ext}`,
+        disposition: file.name,
         height: 128,
         width: 128,
         quality: 90
@@ -237,6 +244,7 @@ schema.statics.saveScoreIcon = async (file, scoreType) => {
       {
         type: 'sm',
         filename: `${aid}_sm.${ext}`,
+        disposition: file.name,
         height: 48,
         width: 48,
         quality: 90
@@ -298,6 +306,7 @@ schema.statics.savePostCover = async (pid, file) => {
     images: [
       {
         type: 'def',
+        disposition: file.name,
         filename: `${aid}.${ext}`,
         height: 400,
         width: 800,
@@ -341,6 +350,7 @@ schema.statics.saveRecommendThreadCover = async (file, type) => {
     images: [
       {
         type: 'def',
+        disposition: file.name,
         filename: `${aid}.${ext}`,
         height,
         width,
@@ -377,6 +387,7 @@ schema.statics.saveDraftCover = async (did, file) => {
       {
         type: 'def',
         filename: `${aid}.${ext}`,
+        disposition: file.name,
         height: 400,
         width: 800,
         background: '#ffffff',
@@ -419,6 +430,7 @@ schema.statics.saveProblemImages = async (_id, files = []) => {
         {
           type: 'def',
           filename: `${aid}.${ext}`,
+          disposition: file.name,
           height: 1080,
           width: 1920,
           quality: 95
@@ -426,6 +438,7 @@ schema.statics.saveProblemImages = async (_id, files = []) => {
         {
           type: 'sm',
           filename: `${aid}_sm.${ext}`,
+          disposition: file.name,
           height: 200,
           width: 200,
           background: '#ffffff',
@@ -465,6 +478,7 @@ schema.statics.saveFundImage = async (file, type) => {
       {
         type: 'def',
         filename: `${aid}.${ext}`,
+        disposition: file.name,
         height: imageSize[1],
         width: imageSize[0],
         quality: 90
@@ -499,6 +513,7 @@ schema.statics.saveUserAvatar = async (uid, file) => {
       {
         type: 'def',
         filename: `${aid}.${ext}`,
+        disposition: file.name,
         height: 192,
         width: 192,
         quality: 90
@@ -506,6 +521,7 @@ schema.statics.saveUserAvatar = async (uid, file) => {
       {
         type: 'sm',
         filename: `${aid}_sm.${ext}`,
+        disposition: file.name,
         height: 48,
         width: 48,
         quality: 90
@@ -513,6 +529,7 @@ schema.statics.saveUserAvatar = async (uid, file) => {
       {
         type: 'lg',
         filename: `${aid}_lg.${ext}`,
+        disposition: file.name,
         height: 600,
         width: 600,
         quality: 90
@@ -552,6 +569,7 @@ schema.statics.saveUserBanner = async (uid, file) => {
       {
         type: 'def',
         filename: `${aid}.${ext}`,
+        disposition: file.name,
         height: 400,
         width: 800,
         quality: 95
@@ -592,6 +610,7 @@ schema.statics.saveColumnAvatar = async (columnId, file) => {
       {
         type: 'sm',
         filename: `${aid}_sm.${ext}`,
+        disposition: file.name,
         height: 100,
         width: 100,
         quality: 90
@@ -599,6 +618,7 @@ schema.statics.saveColumnAvatar = async (columnId, file) => {
       {
         type: 'def',
         filename: `${aid}.${ext}`,
+        disposition: file.name,
         height: 250,
         width: 250,
         quality: 90
@@ -606,6 +626,7 @@ schema.statics.saveColumnAvatar = async (columnId, file) => {
       {
         type: 'lg',
         filename: `${aid}_lg.${ext}`,
+        disposition: file.name,
         height: 500,
         width: 500,
         quality: 90
@@ -657,6 +678,7 @@ schema.statics.saveColumnBanner = async (columnId, file) => {
       {
         type: 'sm',
         filename: `${aid}_sm.${ext}`,
+        disposition: file.name,
         height: 720,
         width: 1280,
         quality: 90
@@ -664,6 +686,7 @@ schema.statics.saveColumnBanner = async (columnId, file) => {
       {
         type: 'def',
         filename: `${aid}.${ext}`,
+        disposition: file.name,
         height: 480,
         width: 1920,
         quality: 90
@@ -718,7 +741,7 @@ schema.statics.createAttachmentAndPushFile = async (props) => {
   } = props;
   const AttachmentModel = mongoose.model('attachments');
   const {getSize} = require('../nkcModules/tools');
-  if(file.size > sizeLimit) throwErr(400, `图片不能超过 ${getSize(sizeLimit, 0)}`);
+  if(file.size > sizeLimit) throwErr(400, `文件不能超过 ${getSize(sizeLimit, 0)}`);
   const attachment = AttachmentModel({
     _id: aid,
     toc: time,
@@ -789,11 +812,9 @@ schema.methods.getRemoteFile = async function(size = 'def') {
   const mediaPath = await FILE.getMediaPath(type);
   const timePath = await FILE.getTimePath(toc);
   const defaultSizeFile = files['def'];
-  let targetSizeFile;
-  if(!files[size]) {
+  let targetSizeFile = files[size];
+  if(!targetSizeFile || targetSizeFile.lost || !targetSizeFile.filename) {
     targetSizeFile = defaultSizeFile;
-  } else {
-    targetSizeFile = files[size];
   }
   if(!targetSizeFile || targetSizeFile.lost || !targetSizeFile.filename) {
     throw new Error(`attachment 数据错误 aid: ${_id}`);
@@ -803,7 +824,7 @@ schema.methods.getRemoteFile = async function(size = 'def') {
   const time = (new Date(toc)).getTime();
   return {
     url: await FILE.createStoreQueryUrl(storeUrl, time, path),
-    filename: name
+    filename: targetSizeFile.disposition || name
   }
 }
 

@@ -206,7 +206,7 @@ resourceRouter
     await next();
   })
   .post('/', async (ctx, next) => {
-    const {db, data, nkcModules} = ctx;
+    const {db, data, nkcModules, state} = ctx;
     const {user} = data;
     const {files, fields} = ctx.body;
     const {file} = files;
@@ -280,20 +280,23 @@ resourceRouter
     }
     // 验证上传权限
     await db.ResourceModel.checkUploadPermission(user, file);
-    const extension = await nkcModules.file.getFileExtension(file);
-    const rid = await ctx.db.SettingModel.operateSystemID('resources', 1);
 
-    const mediaType = nkcModules.file.getMediaTypeByExtension(extension);
+    const extension = await nkcModules.file.getFileExtension(file);
+
+    const rid = await db.SettingModel.operateSystemID('resources', 1);
+
+    const mediaType = db.ResourceModel.getMediaTypeByExtension(extension);
 
     const resourceType = mediaType === 'mediaPicture' && type === 'sticker'? 'sticker': 'resource';
-    const r = ctx.db.ResourceModel({
+
+    const r = db.ResourceModel({
       rid,
       type: resourceType,
       oname: name,
       ext: extension,
       size,
       hash,
-      uid: ctx.data.user.uid,
+      uid: state.uid,
       toc: Date.now(),
       mediaType,
       state: 'inProcess'
@@ -310,8 +313,10 @@ resourceRouter
         share: !!share
       });
     }
+
     await r.save();
-    ctx.data.r = r;
+
+    data.r = r;
 
     // 将文件推送到 media service
     await r.pushToMediaService(file.path);

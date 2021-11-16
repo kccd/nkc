@@ -4,9 +4,9 @@ const {
   getFileInfo,
   spawnProcess,
   getFileSize,
+  storeClient
 } = require('../../tools');
 const {sendResourceStatusToNKC} = require('../../socket');
-const storeClient = require('../../../../tools/storeClient');
 const fs = require('fs');
 const fsPromises = fs.promises;
 const {PDFDocument} = require("pdf-lib");
@@ -24,7 +24,7 @@ module.exports = async (props) => {
     storeUrl
   } = props;
 
-  const {mediaPath, timePath, rid, ext, toc} = data;
+  const {mediaPath, timePath, rid, ext, toc, disposition} = data;
   const filePath = file.path; // 文件被推送到 media service 后的临时存储目录
   const filenamePath = `${rid}.${ext}`; // 文件在 store service 磁盘上的文件名
   const path = PATH.join(mediaPath, timePath, filenamePath); // 文件在 store service 磁盘上的路径
@@ -91,6 +91,17 @@ module.exports = async (props) => {
               path: previewPath,
               time
             });
+            return getFileInfo(pdfTargetFilePath);
+          })
+          .then(pdfFileInfo => {
+            const {size, ext, hash} = pdfFileInfo;
+            filesInfo.preview = {
+              ext,
+              size,
+              hash,
+              disposition,
+              filename: previewFilenamePath
+            };
           })
           .catch(console.error);
       }
@@ -109,17 +120,8 @@ module.exports = async (props) => {
         ext,
         size,
         hash,
+        disposition,
         filename: filenamePath
-      };
-      return getFileInfo(pdfTargetFilePath);
-    })
-    .then(pdfFileInfo => {
-      const {size, ext, hash} = pdfFileInfo;
-      filesInfo.preview = {
-        ext,
-        size,
-        hash,
-        filename: previewFilenamePath
       };
     })
     .then(() => {
@@ -131,7 +133,6 @@ module.exports = async (props) => {
       });
     })
     .catch((err) => {
-      console.error(err);
       return sendResourceStatusToNKC({
         rid,
         status: false,

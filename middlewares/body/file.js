@@ -7,8 +7,10 @@ const fs = require('fs');
 const fsPromises = fs.promises;
 const FILE = require("../../nkcModules/file");
 //获取指定文件的格式
-const pictureExtensions = FILE.getExtensionByType('mediaPicture');
-const breakpointExtensions = FILE.getExtensionByType('breakpoint');
+const {
+  pictureExtensions,
+  breakpointExtensions
+} = FILE;
 let allSpeedLimit;
 
 module.exports = async (ctx) => {

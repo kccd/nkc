@@ -1,15 +1,19 @@
 const ff = require("fluent-ffmpeg");
 const PATH = require('path');
-const {getFileInfo, deleteFile} = require('../../tools');
+const {
+  getFileInfo,
+  deleteFile,
+  storeClient,
+  replaceFileExtension
+} = require('../../tools');
 const {sendResourceStatusToNKC} = require('../../socket');
-const storeClient = require('../../../../tools/storeClient');
 module.exports = async (props) => {
   const {
     file,
     data,
     storeUrl
   } = props;
-  const {mediaPath, timePath, rid, toc} = data;
+  const {mediaPath, timePath, rid, toc, disposition} = data;
   const filePath = file.path;
   const targetFilePath = filePath + `.temp.mp3`;
   const filenamePath = `${rid}.mp3`;
@@ -36,7 +40,8 @@ module.exports = async (props) => {
             ext,
             size,
             hash,
-            filename: filenamePath
+            filename: filenamePath,
+            disposition: replaceFileExtension(disposition, 'mp3')
           }
         }
       });

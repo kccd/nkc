@@ -1,4 +1,7 @@
 module.exports = {
+
+  // AttachmentModel
+
   // 用户头像
   userAvatar: 'attachment/avatar',
   // 用户背景
@@ -15,11 +18,11 @@ module.exports = {
   fundAvatar: 'attachment/avatar',
   // 基金背景
   fundBanner: 'attachment/avatar',
-  // 水印
+  // 水印     废弃
   watermark: 'attachment/website',
   // 首页logo
   homeBigLogo: 'attachment/website',
-  // 网站图标
+  // 网站图标  废弃
   siteIcon: 'attachment/website',
   // 积分图标
   scoreIcon: 'attachment/website',
@@ -27,8 +30,26 @@ module.exports = {
   postCover: 'attachment/cover',
   // 首页推荐文章的封面（轮播图、固定图）
   recommendThreadCover: 'attachment/cover',
+  // 上报问题 图片
+  problemImage: 'attachment/problem',
+
+
+
+  // VerifiedUploadModel
+
   // 用户实名身份认证上传的身份证、视频
-  verifiedUpload: 'identity/authenticate',
+  verifiedUpload: 'identity/authenticate', // 旧 废弃
+  // 身份证 A面
+  identityPictureA: 'identity/authenticate',
+  // 身份证 B面
+  identityPictureB: 'identity/authenticate',
+  // 手持身份证视频
+  identityVideo: 'identity/authenticate',
+
+
+
+  // MessageFileModel
+
   // 聊天中的视频文件
   messageVideo: 'message/video',
   // 聊天中的图片文件
@@ -40,6 +61,9 @@ module.exports = {
   // 聊天中的音频文件
   messageAudio: 'message/audio',
 
+
+  // ResourceModel
+
   // 上传附件 图片
   mediaPicture: 'resource/picture',
   // 上传附件 图片原图
@@ -50,6 +74,4 @@ module.exports = {
   mediaAudio: 'resource/audio',
   // 上传附件 附件
   mediaAttachment: 'resource/attachment',
-  // 上报问题 图片
-  problemImage: 'attachment/problem'
 };

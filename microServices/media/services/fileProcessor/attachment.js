@@ -1,7 +1,11 @@
 const ei = require("easyimage");
 const PATH = require('path');
-const {getFileInfo, deleteFile} = require('../../tools');
-const storeClient = require('../../../../tools/storeClient');
+const {
+  getFileInfo,
+  deleteFile,
+  getPictureSize,
+  storeClient
+} = require('../../tools');
 module.exports = async (props) => {
   const {
     file,
@@ -25,6 +29,7 @@ module.exports = async (props) => {
       height,
       width,
       quality,
+      disposition,
       background = 'transparent'
     } = image;
     const path = PATH.join(mediaPath, timePath, filename);
@@ -43,13 +48,15 @@ module.exports = async (props) => {
       time
     });
     const {size, hash, ext} = await getFileInfo(targetFilePath);
+    const pictureSize = await getPictureSize(targetFilePath);
     filesInfo[type] = {
       ext,
       size,
       hash,
       filename,
-      height,
-      width,
+      disposition,
+      height: pictureSize.height,
+      width: pictureSize.width
     };
   }
   await storeClient(storeUrl, storeFiles);

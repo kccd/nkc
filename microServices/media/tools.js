@@ -5,6 +5,14 @@ const storeConfigs = require('../../config/store');
 const PATH = require("path");
 const crypto = require("crypto");
 const {spawn} = require("child_process");
+const FormData = require("form-data");
+const axios = require("axios");
+
+const {platform} = require("os");
+const ff = require("fluent-ffmpeg");
+const os = platform();
+const linux = (os === 'linux');
+
 /*
   获取文件的md5
   @param {String} path 文件路径
@@ -181,14 +189,121 @@ async function spawnProcess(pathName, args, options = {}) {
   })
 }
 
+
+/*
+* 推送文件到存储服务
+* @param {String} url 存储服务的链接
+* @param {[Object]} files 待推送的文件信息
+*   @param {String} filePath 文件磁盘路径
+*   @param {String} path 文件在存储服务上的目录
+*   @param {Number} time 文件上传时间戳
+* */
+async function storeClient(url, files = []) {
+  if(!Array.isArray(files)) {
+    files = [files];
+  }
+  const formData = new FormData();
+  const filesInfo = {};
+  for(let i = 0; i < files.length; i++) {
+    const {filePath, path, time} = files[i];
+    const key = `file_${i}`;
+    filesInfo[key] = {
+      path,
+      time
+    };
+    formData.append(key, fs.createReadStream(filePath));
+  }
+  formData.append('filesInfo', JSON.stringify(filesInfo));
+  return new Promise((resolve, reject) => {
+    axios({
+      url,
+      method: 'POST',
+      maxBodyLength: Infinity,
+      data: formData,
+      headers: formData.getHeaders()
+    })
+      .then(resolve)
+      .catch(reject);
+  });
+}
+
+/*
+* 获取图片宽高
+* */
+async function getPictureSize(pictureFilePath) {
+  const args = ['identify', '-format', '%wx%h', pictureFilePath + `[0]`];
+  let result;
+  if(!linux) {
+    result = await spawnProcess('magick', args);
+  } else {
+    result = await spawnProcess(args.shift(), args);
+  }
+  result = result.replace('\n', '');
+  result = result.trim();
+  const [width, height] = result.split('x');
+  return {
+    height: Number(height),
+    width: Number(width)
+  };
+}
+
+function replaceFileExtension(filename, newExtension) {
+  if(!filename) throw new Error(`文件名不能为空`);
+  if(!newExtension) throw new Error(`新的文件格式不能为空`);
+  filename = filename.split('.');
+  if(filename.length > 1) {
+    filename.pop();
+  }
+  filename.push(newExtension);
+  filename = filename.join('.');
+  return filename;
+}
+
+/*
+* 获取视频信息
+* @param {String} inputFilePath 视频路径
+* @return {Object}
+*   @param {Object} format
+*     @param {}
+* */
+async function getVideoInfo(inputFilePath) {
+  return new Promise((resolve, reject) => {
+    ff.ffprobe(inputFilePath, (err, metadata) => {
+      if(err) return reject(err);
+      const {streams} = metadata;
+      const videoInfo = streams.filter(stream => stream["codec_type"] === "video").shift();
+      if(!videoInfo) {
+        return reject(new Error("cannot get video stream detail"));
+      }
+      const {
+        width, height, r_frame_rate, duration, bit_rate, display_aspect_ratio
+      } = videoInfo;
+      const arr = r_frame_rate.split('/');
+      resolve({
+        width,
+        height,
+        duration,
+        bitRate: bit_rate,
+        displayAspectRatio: display_aspect_ratio,
+        fps: Number((arr[0] / arr[1]).toFixed(1))
+      });
+    });
+  })
+}
+
+
 module.exports = {
   moveFile,
+  replaceFileExtension,
   deleteFile,
   accessFile,
+  getVideoInfo,
   getTargetFilePath,
   getDiskPath,
   getFileInfo,
   getFileSize,
   spawnProcess,
-  parseRange
+  parseRange,
+  storeClient,
+  getPictureSize
 }
