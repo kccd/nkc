@@ -109,5 +109,50 @@ messageFileSchema.statics.getFileTypeByExtension = async (extension, isVoice = f
   return 'file';
 }
 
-const messageFileModel = mongoose.model('messageFiles', messageFileSchema);
-module.exports = messageFileModel;
+messageFileSchema.statics.createMessageFileDataAndPushFile = async (props) => {
+  const {
+    file,
+    isVoice,
+    uid,
+  } = props
+  const MessageModel = mongoose.model('messages');
+  const SettingModel = mongoose.model('settings');
+  const FILE = require('../nkcModules/file');
+  await MessageModel.checkFileSize(file);
+  const ext = await FILE.getFileExtension(file);
+  if(['exe', 'bat'].includes(ext)) ctx.throw(403, `暂不支持上传该类型的文件`);
+  const type = await MessageFileModel.getFileTypeByExtension(ext, isVoice);
+  const mfId = await SettingModel.operateSystemID('messageFiles', 1);
+  const time = new Date();
+
+};
+
+messageFileSchema.methods.pushToMediaService = async function(filePath) {
+  const FILE = require('../nkcModules/file');
+  const socket = require('../nkcModules/socket');
+  const mediaClient = require('../tools/mediaClient');
+  const {toc, type, _id, oname} = this;
+  let messageFileType = type.split('');
+  messageFileType[0] = messageFileType[0].toUpperCase();
+  messageFileType = `message` + messageFileType.join('');
+  const storeServiceUrl = await FILE.getStoreUrl(toc);
+  const mediaServiceUrl = await socket.getMediaServiceUrl();
+  const timePath = await FILE.getTimePath(toc);
+  const mediaPath = await FILE.getMediaPath(messageFileType);
+  const data = {
+    mfId: _id,
+    timePath,
+    mediaPath,
+    toc,
+    disposition: oname,
+  };
+  const res = await mediaClient(mediaServiceUrl, {
+    type: messageFileType,
+    filePath,
+    storeUrl: storeServiceUrl,
+    data
+  });
+  return res.files;
+}
+
+module.exports = mongoose.model('messageFiles', messageFileSchema);

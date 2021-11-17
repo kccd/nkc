@@ -162,6 +162,7 @@ const resourceSchema = new Schema({
       width: Number,  // 图片、视频宽
       filename: String, // 在存储服务磁盘上的文件名
       disposition: String, // 下载时的文件名
+      duration: Number, // 音视频时间 秒
     }
     */
   },

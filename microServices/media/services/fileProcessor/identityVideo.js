@@ -26,7 +26,7 @@ module.exports = async (props) => {
     path,
     time
   });
-  const {width, height} = await getVideoInfo(targetFilePath);
+  const {width, height, duration} = await getVideoInfo(targetFilePath);
   const {size, hash} = await getFileInfo(targetFilePath);
   const filesInfo = {
     def: {
@@ -35,6 +35,7 @@ module.exports = async (props) => {
       hash,
       height,
       width,
+      duration,
       filename: filenamePath,
       disposition: await replaceFileExtension(disposition, ext),
     }

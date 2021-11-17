@@ -282,13 +282,32 @@ async function getVideoInfo(inputFilePath) {
       resolve({
         width,
         height,
-        duration,
+        duration: Math.round(duration),
         bitRate: bit_rate,
         displayAspectRatio: display_aspect_ratio,
         fps: Number((arr[0] / arr[1]).toFixed(1))
       });
     });
   })
+}
+
+async function getAudioInfo(filePath) {
+  return new Promise((resolve, reject) => {
+    ff.ffprobe(filePath, (err, metadata) => {
+      if(err) return reject(err);
+      const {streams} = metadata;
+      const audioInfo = streams.filter(stream => stream['codec_type'] === 'audio').shift();
+      if(!audioInfo) {
+        return reject(new Error('Cannot get audio stream detail'));
+      }
+      const {
+        duration
+      } = audioInfo;
+      resolve({
+        duration: Math.round(duration)
+      });
+    })
+  });
 }
 
 
@@ -298,6 +317,7 @@ module.exports = {
   deleteFile,
   accessFile,
   getVideoInfo,
+  getAudioInfo,
   getTargetFilePath,
   getDiskPath,
   getFileInfo,
