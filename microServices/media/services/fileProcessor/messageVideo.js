@@ -1,7 +1,6 @@
 const PATH = require('path');
 const {
   storeClient,
-  getVideoInfo,
   getFileInfo,
   deleteFile,
   spawnProcess,
@@ -49,9 +48,7 @@ module.exports = async (props) => {
   ];
   await storeClient(storeUrl, storeData);
   const videoFileInfo = await getFileInfo(targetFilePath);
-  const videoInfo = await getVideoInfo(targetFilePath);
   const coverFileInfo = await getFileInfo(coverFilePath);
-  const coverInfo = await getPictureSize(coverFilePath);
   await deleteFile(filePath);
   await deleteFile(targetFilePath);
   await deleteFile(coverFilePath);
@@ -60,20 +57,20 @@ module.exports = async (props) => {
       ext,
       size: videoFileInfo.size,
       hash: videoFileInfo.hash,
-      duration: videoInfo.duration,
+      duration: videoFileInfo.duration,
       filename: filenamePath,
-      height: videoInfo.height,
-      width: videoInfo.width,
+      height: videoFileInfo.height,
+      width: videoFileInfo.width,
       disposition: replaceFileExtension(disposition, ext)
     },
     cover: {
       ext: coverExt,
       size: coverFileInfo.size,
       hash: coverFileInfo.hash,
-      duration: coverInfo.duration,
+      duration: coverFileInfo.duration,
       filename: coverFilenamePath,
-      height: coverInfo.height,
-      width: coverInfo.width,
+      height: coverFileInfo.height,
+      width: coverFileInfo.width,
       disposition: replaceFileExtension(disposition, coverExt)
     }
   };

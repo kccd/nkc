@@ -3,7 +3,6 @@ const {
   storeClient,
   getFileInfo,
   deleteFile,
-  getAudioInfo,
   replaceFileExtension
 } = require('../../tools');
 const ff = require("fluent-ffmpeg");
@@ -34,8 +33,7 @@ module.exports = async (props) => {
     time,
     filePath: targetFilePath
   });
-  const {size, hash} = await getFileInfo(targetFilePath);
-  const {duration} = await getAudioInfo(targetFilePath);
+  const {size, hash, duration} = await getFileInfo(targetFilePath);
   await deleteFile(filePath);
   await deleteFile(targetFilePath);
   return {

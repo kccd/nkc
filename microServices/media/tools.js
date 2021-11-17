@@ -12,6 +12,10 @@ const ff = require("fluent-ffmpeg");
 const os = platform();
 const linux = (os === 'linux');
 
+const imageExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif", "webp"];
+const videoExtensions = ["mp4", "mov", "3gp", "avi", 'webm'];
+const audioExtensions = ["wav", "amr", "mp3", "aac", 'flac'];
+
 /*
   获取文件的md5
   @param {String} path 文件路径
@@ -76,23 +80,69 @@ async function getFileSize(filePath) {
   return stat.size;
 }
 
+
 /*
 * 获取文件信息
+* @param {String} filePath 文件路径
+* @return {Object}
+*   @param {String} path 文件路径
+*   @param {String} name 文件名
+*   @param {String} ext 文件格式
+*   @param {Object} stats
+*   @param {String} hash
+*   @param {Number} size
+*   @param {Date} atime
+*   @param {Date} mtime
+*   @param {Date} ctime
+*   @param {Date} birthtime
+*
+*   @param {Number} height 视频、图片高
+*   @param {Number} width 视频、图片宽
+*   @param {Number} duration 音视频时长 秒
 * */
 async function getFileInfo(filePath) {
   const name = PATH.basename(filePath);
   const ext = PATH.extname(filePath).replace('.', '');
   const hash = await getFileMD5(filePath);
-  const stats = await fsPromises.stat(filePath);
-  const size = stats.size;
-  return {
+  const {
+    size,
+    atime,
+    mtime,
+    ctime,
+    birthtime
+  } = await fsPromises.stat(filePath);
+
+  const fileInfo = {
     path: filePath,
     name,
     ext,
-    stats,
     hash,
     size,
+    atime,
+    mtime,
+    ctime,
+    birthtime
   };
+
+  if(imageExtensions.includes(ext)) {
+    const {height, width} = await getImageInfo(filePath);
+    fileInfo.height = height;
+    fileInfo.width = width;
+  } else if(videoExtensions.includes(ext)) {
+    const {
+      height,
+      width,
+      duration
+    } = await getVideoInfo(filePath);
+    fileInfo.height = height;
+    fileInfo.width = width;
+    fileInfo.duration = duration;
+  } else if(audioExtensions.includes(ext)) {
+    const {duration} = await getAudioInfo(filePath);
+    fileInfo.duration = duration;
+  }
+
+  return fileInfo;
 }
 
 async function accessFile(targetPath) {
@@ -169,7 +219,7 @@ async function storeClient(url, files = []) {
 /*
 * 获取图片宽高
 * */
-async function getPictureSize(pictureFilePath) {
+async function getImageInfo(pictureFilePath) {
   const args = ['identify', '-format', '%wx%h', pictureFilePath + `[0]`];
   let result;
   if(!linux) {
@@ -270,5 +320,5 @@ module.exports = {
   getFileSize,
   spawnProcess,
   storeClient,
-  getPictureSize
+  getImageInfo
 }

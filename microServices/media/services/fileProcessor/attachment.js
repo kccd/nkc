@@ -3,7 +3,6 @@ const PATH = require('path');
 const {
   getFileInfo,
   deleteFile,
-  getPictureSize,
   storeClient
 } = require('../../tools');
 module.exports = async (props) => {
@@ -47,16 +46,15 @@ module.exports = async (props) => {
       path,
       time
     });
-    const {size, hash, ext} = await getFileInfo(targetFilePath);
-    const pictureSize = await getPictureSize(targetFilePath);
+    const {size, hash, ext, height: newHeight, width: newWidth} = await getFileInfo(targetFilePath);
     filesInfo[type] = {
       ext,
       size,
       hash,
       filename,
       disposition,
-      height: pictureSize.height,
-      width: pictureSize.width
+      height: newHeight,
+      width: newWidth
     };
   }
   await storeClient(storeUrl, storeFiles);

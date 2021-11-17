@@ -4,7 +4,6 @@ const {
   getFileInfo,
   deleteFile,
   storeClient,
-  getAudioInfo,
   replaceFileExtension
 } = require('../../tools');
 const {sendResourceStatusToNKC} = require('../../socket');
@@ -33,19 +32,15 @@ module.exports = async (props) => {
       return getFileInfo(targetFilePath);
     })
     .then(fileInfo => {
-      const {size, hash, ext} = fileInfo;
+      const {size, hash, ext, duration} = fileInfo;
       filesInfo.def = {
         ext,
         size,
         hash,
+        duration,
         filename: filenamePath,
         disposition: replaceFileExtension(disposition, 'mp3')
       };
-      return getAudioInfo(targetFilePath);
-    })
-    .then(audioInfo => {
-      const {duration} = audioInfo;
-      filesInfo.def.duration = duration;
       return sendResourceStatusToNKC({
         rid,
         status: true,

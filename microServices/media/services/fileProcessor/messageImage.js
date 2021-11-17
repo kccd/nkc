@@ -2,7 +2,6 @@ const ei = require("easyimage");
 const PATH = require('path');
 const {
   storeClient,
-  getPictureSize,
   deleteFile,
   getFileInfo
 } = require("../../tools");
@@ -46,17 +45,15 @@ module.exports = async (props) => {
     quality: 90,
   });
   await storeClient(storeUrl, storeData);
-  const fileInfoSize = await getPictureSize(filePath);
   const fileInfo = await getFileInfo(filePath);
-  const smFileInfoSize = await getPictureSize(targetSMFilePath);
   const smFileInfo = await getFileInfo(targetSMFilePath);
   const filesInfo = {
     def: {
       ext: fileInfo.ext,
       size: fileInfo.size,
       hash: fileInfo.hash,
-      height: fileInfoSize.height,
-      width: fileInfoSize.width,
+      height: fileInfo.height,
+      width: fileInfo.width,
       filename: filenamePath,
       disposition
     },
@@ -64,8 +61,8 @@ module.exports = async (props) => {
       ext: smFileInfo.ext,
       size: smFileInfo.size,
       hash: smFileInfo.hash,
-      height: smFileInfoSize.height,
-      width: smFileInfoSize.width,
+      height: smFileInfo.height,
+      width: smFileInfo.width,
       filename: smFilenamePath,
       disposition
     }
