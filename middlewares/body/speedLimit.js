@@ -15,21 +15,23 @@ module.exports = async (ctx) => {
     };
   }
 
-  if (tg) {
-    const tgThrottle = tg.throttle();
-    const globalTgThrottle = allSpeedLimit.tg.throttle();
-    ctx.body = ctx.body.pipe(tgThrottle).pipe(globalTgThrottle);
-    onFinished(ctx.res, (err) => {
-      destroy(globalTgThrottle);
-      destroy(tgThrottle);
-      destroy(ctx.body);
-    });
-  } else {
-    const globalTgThrottle = allSpeedLimit.tg.throttle();
-    ctx.body = ctx.body.pipe(allSpeedLimit.tg.throttle());
-    onFinished(ctx.res, (err) => {
-      destroy(globalTgThrottle);
-      destroy(ctx.body);
-    });
+  if(ctx.body && ctx.body.pipe) {
+    if (tg) {
+      const tgThrottle = tg.throttle();
+      const globalTgThrottle = allSpeedLimit.tg.throttle();
+      ctx.body = ctx.body.pipe(tgThrottle).pipe(globalTgThrottle);
+      onFinished(ctx.res, (err) => {
+        destroy(globalTgThrottle);
+        destroy(tgThrottle);
+        destroy(ctx.body);
+      });
+    } else {
+      const globalTgThrottle = allSpeedLimit.tg.throttle();
+      ctx.body = ctx.body.pipe(allSpeedLimit.tg.throttle());
+      onFinished(ctx.res, (err) => {
+        destroy(globalTgThrottle);
+        destroy(ctx.body);
+      });
+    }
   }
 };

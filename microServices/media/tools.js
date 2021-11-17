@@ -3,7 +3,7 @@ const fsPromises = fs.promises;
 const Path = require('path');
 const PATH = require("path");
 const crypto = require("crypto");
-const {spawn, exec} = require("child_process");
+const {spawn} = require("child_process");
 const FormData = require("form-data");
 const axios = require("axios");
 
@@ -11,6 +11,10 @@ const {platform} = require("os");
 const ff = require("fluent-ffmpeg");
 const os = platform();
 const linux = (os === 'linux');
+
+const imageExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif", "webp"];
+const videoExtensions = ["mp4", "mov", "3gp", "avi", 'webm'];
+const audioExtensions = ["wav", "amr", "mp3", "aac", 'flac'];
 
 /*
   获取文件的md5
@@ -53,31 +57,9 @@ async function moveFile(path, targetPath) {
   await deleteFile(path);
 }
 
-/*
-* 获取图片的高宽
-* */
-const info = async path => {
-  const args = ['identify', '-format', '%wx%h', path + `[0]`];
-  let result;
-  if(!linux) {
-    result = await spawnProcess('magick', args);
-  } else {
-    result = await spawnProcess(args.shift(), args);
-  }
-  result = result.replace('\n', '');
-  result = result.trim();
-  const [width, height] = result.split('x');
-  return {
-    height: Number(height),
-    width: Number(width)
-  };
-  // return imageSize(path);
-};
-
 // 手机图片上传自动旋转
 // 或采用 -auto-orient 参数
-const allInfo = async path => {
-
+async function imageAutoOrient(path) {
   if (linux) {
     await spawnProcess('convert', [path, '-strip', '-auto-orient', path]);
   } else {
@@ -110,21 +92,54 @@ async function getFileSize(filePath) {
 
 /*
 * 获取文件信息
+* @param {String} filePath 文件路径
+* @return {Object}
+*   @param {String} path 文件路径
+*   @param {String} name 文件名
+*   @param {String} ext 文件格式
+*   @param {String} hash
+*   @param {Number} size
+*   @param {Date} mtime
+*   @param {Number} height 视频、图片高
+*   @param {Number} width 视频、图片宽
+*   @param {Number} duration 音视频时长 秒
 * */
 async function getFileInfo(filePath) {
   const name = PATH.basename(filePath);
   const ext = PATH.extname(filePath).replace('.', '');
   const hash = await getFileMD5(filePath);
-  const stats = await fsPromises.stat(filePath);
-  const size = stats.size;
-  return {
+  const {
+    size,
+    mtime,
+  } = await fsPromises.stat(filePath);
+
+  const fileInfo = {
     path: filePath,
     name,
     ext,
-    stats,
     hash,
     size,
+    mtime,
   };
+
+  if(imageExtensions.includes(ext)) {
+    const {height, width} = await getImageInfo(filePath);
+    fileInfo.height = height;
+    fileInfo.width = width;
+  } else if(videoExtensions.includes(ext)) {
+    const {
+      height,
+      width,
+      duration
+    } = await getVideoInfo(filePath);
+    fileInfo.height = height;
+    fileInfo.width = width;
+    fileInfo.duration = duration;
+  } else if(audioExtensions.includes(ext)) {
+    const {duration} = await getAudioInfo(filePath);
+    fileInfo.duration = duration;
+  }
+  return fileInfo;
 }
 
 /*
@@ -202,26 +217,6 @@ async function storeClient(url, files = []) {
 }
 
 /*
-* 获取图片宽高
-* */
-async function getPictureSize(pictureFilePath) {
-  const args = ['identify', '-format', '%wx%h', pictureFilePath + `[0]`];
-  let result;
-  if(!linux) {
-    result = await spawnProcess('magick', args);
-  } else {
-    result = await spawnProcess(args.shift(), args);
-  }
-  result = result.replace('\n', '');
-  result = result.trim();
-  const [width, height] = result.split('x');
-  return {
-    height: Number(height),
-    width: Number(width)
-  };
-}
-
-/*
 * 替换文件名格式
 * */
 function replaceFileExtension(filename, newExtension) {
@@ -293,152 +288,25 @@ async function getAudioInfo(filePath) {
   });
 }
 
-// 图片缩小
-const imageNarrow = path => {
-  return spawnProcess('magick', ['convert', path, '-resize', `1920>`,path])
-}
-//图片打大logo水印
-const watermarkify = (trans, position, bigWater,path) => {
-  if(linux) {
-    return spawnProcess('composite', ['-dissolve', trans, '-gravity', position, bigWater, path, path]);
-  }
-  return spawnProcess('magick', ['composite', '-dissolve', trans, '-gravity', position, '-geometry', '+10+10', bigWater, path, path]);
-};
 
 /*
-* 图片打水印
+* 获取图片宽高
 * */
-async function addWaterMask(options) {
-  let {
-    videoPath,
-    imageStream,
-    output,
-    position = {x: 10, y: 10},
-    flex = 0.2,
-    bitRate,
-    scalaByHeight
-  } = options;
-  const { width, height } = await getVideoInfo(videoPath);
-  return await new Promise((resolve, reject) => {
-    const imageWidth = Math.min(width, height) * flex;
-    ff(videoPath)
-      .input(imageStream)
-      .complexFilter([
-        `[1:v]scale=${imageWidth}:-2[logo]`,
-        `[0:v][logo]overlay=${position.x}:${position.y}[o]`,
-        `[o]scale=-2:${scalaByHeight}`
-      ])
-      .videoBitrate(bitRate)
-      .outputOptions([
-        '-map_metadata',
-        '-1'
-      ])
-      .output(output)
-      .on("end", resolve)
-      .on("error", reject)
-      .run();
-  });
-}
-
-/**
- * ffmpeg图片滤镜处理
- * @param {string} inputPath 输入文件路径
- * @param {array} filters 滤镜指令（数组，一层滤镜一个元素）
- */
-const ffmpegImageFilter = async (inputPath, outputPath, filters) => {
-  return spawnProcess('ffmpeg',
-    [
-      ...['-i', inputPath],                                              /* 输入 */
-      ...['-filter_complex', filters.join(";")],                         /* 滤镜表达式 */
-      '-y',                                                              /* 覆盖输出 */
-      outputPath                                                         /* 输出 */
-    ]);
-}
-
-/**
- * 图片添加图文水印
- * @param {object} op 配置
- * 配置项：
- *  input 输入路径， output 输出路径， image 图片路径， text 文字, flex 水印占整个图片高度的百分比, position 水印位置
- */
-async function addImageTextWaterMaskForImage(op) {
-  let {
-    input,
-    output,
-    image,
-    text,
-    flex = 0.08,
-    position = {x: 10, y: 10},
-    transparency = 0.5,
-    additionOptions
-  } = op;
-  const {height: imageHeight, width: imageWidth} = await getImageSize(input);
-  const logoSize = await getImageSize(image);
-  let padHeight = ~~((imageHeight > imageWidth? imageWidth: imageHeight) * flex);
-  let logoHeight = padHeight - 1;
-  let logoWidth = ~~(logoSize.width * (logoHeight / logoSize.height)) - 1;
-  const fontSize = padHeight - 10;
-  const {height: textHeight, width: textWidth} = await getDrawTextSize(text, fontSize);
-  const gap = ~~(logoWidth * 0.1); /* logo和文字之间和间隔 */
-  let padWidth = logoWidth + textWidth + gap;
-
-  image = image.replace(/\\/g, "/").replace(":", "\\:");
-
-  return ffmpegImageFilter(input, output, [
-    `movie='${image}'[logo]`,
-    `[logo]scale=${logoWidth}:${logoHeight}[image]`,
-    `[image]pad=${padWidth}:${padHeight}:0:0:white@0, drawtext=x=${logoWidth + gap}:y=${logoHeight-textHeight}/2:text='${text}':fontsize=${fontSize}:fontcolor=fcfcfc:fontfile='${fontFilePathForFFmpeg}:shadowcolor=b1b1b1:shadowx=1:shadowy=1', lut=a=val*${transparency}[watermask]`,
-    `[0:v][watermask]overlay=${position.x}:${position.y}`
-  ], additionOptions)
-}
-
-/**
-* 获取图片的尺寸
-* @param {string} inputPath 视频路径
-*/
-const getImageSize = async (inputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath])
-    .catch(data => {
-      console.log('data', data);
-      let results = data.match(/[0-9]+x[0-9]+/)[0].split("x");
-      return Promise.resolve({
-        width: parseInt(results[0]),
-        height: parseInt(results[1])
-      });
-    })
-}
-
-/**
- * 获取ffmpeg滤镜绘制出的文本的高宽
- */
-async function getDrawTextSize(text, fontsize) {
-  return new Promise((resolve, reject) => {
-    exec(`ffmpeg -i ${tempImageForFFmpeg} -vf "drawtext=fontfile='${fontFilePathForFFmpeg}':fontsize=${fontsize}:text='${text}':x=0+0*print(tw):y=0+0*print(th)" -vframes 1 -f null -`,
-      function(err, stdout, stderr ) {
-        let results = stderr.trim().split("\n").reverse();
-        resolve({
-          width: parseFloat(results[8]),
-          height: parseFloat(results[9])
-        });
-      });
-  });
-}
-
-//保存缩略图
-const thumbnailify = (path, dest) => {
-  if(linux) {
-    return spawnProcess('convert', [path, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+async function getImageInfo(pictureFilePath) {
+  const args = ['identify', '-format', '%wx%h', pictureFilePath + `[0]`];
+  let result;
+  if(!linux) {
+    result = await spawnProcess('magick', args);
+  } else {
+    result = await spawnProcess(args.shift(), args);
   }
-  return spawnProcess('magick', ['convert', path, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
-};
-
-
-//保存中图
-const mediumify = (path, dest) => {
-  if(linux) {
-    return spawnProcess('convert', [path, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
-  }
-  return spawnProcess('magick', ['convert', path, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', dest]);
+  result = result.replace('\n', '');
+  result = result.trim();
+  const [width, height] = result.split('x');
+  return {
+    height: Number(height),
+    width: Number(width)
+  };
 }
 
 
@@ -453,16 +321,6 @@ module.exports = {
   getFileSize,
   spawnProcess,
   storeClient,
-  getPictureSize,
-  info,
-  allInfo,
-  imageNarrow,
-  watermarkify,
-  addWaterMask,
-  ffmpegImageFilter,
-  addImageTextWaterMaskForImage,
-  thumbnailify,
-  mediumify,
-  getImageSize,
-  getDrawTextSize,
+  imageAutoOrient,
+  getImageInfo
 }

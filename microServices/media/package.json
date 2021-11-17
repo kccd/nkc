@@ -11,7 +11,12 @@
     "fluent-ffmpeg": "^2.1.2",
     "pdf-lib": "^1.11.2",
     "easyimage": "^3.1.1",
-    "axios": "^0.21.1"
+    "axios": "^0.21.1",
+    "koa": "^2.4.1",
+    "koa-body": "^2.5.0",
+    "koa-router": "^7.3.0",
+    "koa-static": "^4.0.2",
+    "colors": "^1.4.0"
   },
   "license": "ISC"
 }
