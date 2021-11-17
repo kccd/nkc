@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('../settings/database');
 const PATH = require('path');
 const Schema = mongoose.Schema;
 const messageFileSchema = new Schema({
@@ -54,38 +54,9 @@ const messageFileSchema = new Schema({
     index: 1
   }
 }, {
-  collection: 'messageFiles',
-  toObject: {
-    getters: true,
-    virtuals: true
-  }
+  collection: 'messageFiles'
 });
 
-/*
-* 获取附件磁盘路径
-* */
-messageFileSchema.methods.getFilePath = async function(t) {
-  const MessageFileModel = mongoose.model('messageFiles');
-  const fileFolder = await MessageFileModel.getFileFolder(this.type, this.toc);
-  const FILE = require('../nkcModules/file');
-  const normalPath = PATH.resolve(fileFolder, `./${this._id}.${this.ext}`);
-  if(t) {
-    const _path = PATH.resolve(fileFolder, `./${this._id}${t?('_' + t):''}.${this.ext}`);
-    if(await FILE.access(_path)) return _path;
-  }
-  return normalPath;
-}
-
-/*
-* 获取文件目录
-* */
-messageFileSchema.statics.getFileFolder = async (fileType, toc) => {
-  const FILE = require('../nkcModules/file');
-  fileType = fileType.split('');
-  fileType[0] = fileType[0].toUpperCase();
-  fileType = `message` + fileType.join('');
-  return await FILE.getPath(fileType, toc);
-}
 
 /*
 * 根据格式判断文件类型
@@ -114,8 +85,10 @@ messageFileSchema.statics.createMessageFileDataAndPushFile = async (props) => {
     file,
     isVoice,
     uid,
+    targetUid,
   } = props
   const MessageModel = mongoose.model('messages');
+  const MessageFileModel = mongoose.model('messageFiles');
   const SettingModel = mongoose.model('settings');
   const FILE = require('../nkcModules/file');
   await MessageModel.checkFileSize(file);
@@ -124,14 +97,26 @@ messageFileSchema.statics.createMessageFileDataAndPushFile = async (props) => {
   const type = await MessageFileModel.getFileTypeByExtension(ext, isVoice);
   const mfId = await SettingModel.operateSystemID('messageFiles', 1);
   const time = new Date();
-
+  const messageFile = MessageFileModel({
+    _id: mfId,
+    toc: time,
+    oname: file.name,
+    size: file.size,
+    type,
+    ext,
+    uid,
+    targetUid,
+  });
+  messageFile.files = await messageFile.pushToMediaService(file.path);
+  await messageFile.save();
+  return messageFile;
 };
 
 messageFileSchema.methods.pushToMediaService = async function(filePath) {
   const FILE = require('../nkcModules/file');
   const socket = require('../nkcModules/socket');
   const mediaClient = require('../tools/mediaClient');
-  const {toc, type, _id, oname} = this;
+  const {ext, toc, type, _id, oname} = this;
   let messageFileType = type.split('');
   messageFileType[0] = messageFileType[0].toUpperCase();
   messageFileType = `message` + messageFileType.join('');
@@ -144,6 +129,7 @@ messageFileSchema.methods.pushToMediaService = async function(filePath) {
     timePath,
     mediaPath,
     toc,
+    ext,
     disposition: oname,
   };
   const res = await mediaClient(mediaServiceUrl, {
@@ -154,5 +140,28 @@ messageFileSchema.methods.pushToMediaService = async function(filePath) {
   });
   return res.files;
 }
+
+messageFileSchema.methods.getRemoteFile = async function(size) {
+  const FILE = require('../nkcModules/file');
+  const {_id, toc, type, oname, files} = this;
+  const storeUrl = await FILE.getStoreUrl(toc);
+  const mediaPath = await FILE.getMediaPath(type);
+  const timePath = await FILE.getTimePath(toc);
+  const defaultSizeFile = files['def'];
+  let targetSizeFile = files[size];
+  if(!targetSizeFile || targetSizeFile.lost || !targetSizeFile.filename) {
+    targetSizeFile = defaultSizeFile;
+  }
+  if(!targetSizeFile || targetSizeFile.lost || !targetSizeFile.filename) {
+    throw new Error(`message file 数据错误 mfId: ${_id}`);
+  }
+  const filenamePath = targetSizeFile.filename;
+  const path = PATH.join(mediaPath, timePath, filenamePath);
+  const time = (new Date(toc)).getTime();
+  return {
+    url: await FILE.createStoreQueryUrl(storeUrl, time, path),
+    filename: targetSizeFile.disposition || oname
+  }
+};
 
 module.exports = mongoose.model('messageFiles', messageFileSchema);

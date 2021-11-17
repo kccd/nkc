@@ -44,7 +44,6 @@ module.exports = async (url, props) => {
         resolve(res.data || res);
       })
       .catch(err => {
-        console.log(err);
         reject(err);
       });
   });
