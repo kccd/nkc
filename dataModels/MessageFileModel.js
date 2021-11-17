@@ -52,7 +52,24 @@ const messageFileSchema = new Schema({
     type: Date,
     default: Date.now,
     index: 1
-  }
+  },
+  files: {
+    def: Schema.Types.Mixed,
+    cover: Schema.Types.Mixed,
+    sm: Schema.Types.Mixed,
+    /*
+    {
+      ext: String,
+      lost: String, // 是否已丢失
+      hash: String, // 文件 md5
+      size: Number, // 文件大小
+      height: Number, // 图片、视频高
+      width: Number,  // 图片、视频宽
+      filename: String, // 在存储服务磁盘上的文件名
+      disposition: String, // 下载时显示的名称
+    }
+    */
+  },
 }, {
   collection: 'messageFiles'
 });
@@ -68,7 +85,7 @@ const messageFileSchema = new Schema({
 messageFileSchema.statics.getFileTypeByExtension = async (extension, isVoice = false) => {
   const imageExt = ['jpg', 'jpeg', 'bmp', 'svg', 'png', 'gif'];
   const voiceExt = ['amr', 'mp3', 'aac'];
-  const audioExt = ['mp3', 'aac', 'wav'];
+  const audioExt = ['mp3', 'aac', 'wav', 'flac'];
   const videoExt = ["mp4", "mov", "3gp", "avi"];
   if(isVoice) {
     if(voiceExt.includes(extension)) return 'voice';
@@ -78,6 +95,17 @@ messageFileSchema.statics.getFileTypeByExtension = async (extension, isVoice = f
     if(videoExt.includes(extension)) return 'video';
   }
   return 'file';
+}
+
+/*
+* 根据文件类型获取文件夹类型
+* @param {String} type 文件类型
+* @return {String}
+* */
+messageFileSchema.statics.getFolderTypeByType = (type) => {
+  let messageFileType = type.split('');
+  messageFileType[0] = messageFileType[0].toUpperCase();
+  return `message` + messageFileType.join('');
 }
 
 messageFileSchema.statics.createMessageFileDataAndPushFile = async (props) => {
@@ -116,14 +144,13 @@ messageFileSchema.methods.pushToMediaService = async function(filePath) {
   const FILE = require('../nkcModules/file');
   const socket = require('../nkcModules/socket');
   const mediaClient = require('../tools/mediaClient');
+  const MessageFileModel = mongoose.model('messageFiles');
   const {ext, toc, type, _id, oname} = this;
-  let messageFileType = type.split('');
-  messageFileType[0] = messageFileType[0].toUpperCase();
-  messageFileType = `message` + messageFileType.join('');
+  const folderType = await MessageFileModel.getFolderTypeByType(type);
   const storeServiceUrl = await FILE.getStoreUrl(toc);
   const mediaServiceUrl = await socket.getMediaServiceUrl();
   const timePath = await FILE.getTimePath(toc);
-  const mediaPath = await FILE.getMediaPath(messageFileType);
+  const mediaPath = await FILE.getMediaPath(folderType);
   const data = {
     mfId: _id,
     timePath,
@@ -133,7 +160,7 @@ messageFileSchema.methods.pushToMediaService = async function(filePath) {
     disposition: oname,
   };
   const res = await mediaClient(mediaServiceUrl, {
-    type: messageFileType,
+    type: folderType,
     filePath,
     storeUrl: storeServiceUrl,
     data
@@ -144,8 +171,10 @@ messageFileSchema.methods.pushToMediaService = async function(filePath) {
 messageFileSchema.methods.getRemoteFile = async function(size) {
   const FILE = require('../nkcModules/file');
   const {_id, toc, type, oname, files} = this;
+  const MessageFileModel = mongoose.model('messageFiles');
+  const folderType = await MessageFileModel.getFolderTypeByType(type);
   const storeUrl = await FILE.getStoreUrl(toc);
-  const mediaPath = await FILE.getMediaPath(type);
+  const mediaPath = await FILE.getMediaPath(folderType);
   const timePath = await FILE.getTimePath(toc);
   const defaultSizeFile = files['def'];
   let targetSizeFile = files[size];

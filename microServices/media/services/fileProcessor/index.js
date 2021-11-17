@@ -6,12 +6,12 @@ module.exports = {
 
   attachment: require('./attachment'),
 
-  identityPictureA: require('./identityPicture'),
-  identityPictureB: require('./identityPicture'),
+  identityPictureA: require('./identityPictureA'),
+  identityPictureB: require('./identityPictureB'),
   identityVideo: require('./identityVideo'),
 
   messageAudio: require('./messageAudio'),
-  messagePicture: require('./messagePicture'),
+  messageImage: require('./messageImage'),
   messageVideo: require('./messageVideo'),
   messageVoice: require('./messageVoice'),
   messageFile: require('./messageFile')

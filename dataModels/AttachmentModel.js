@@ -72,7 +72,6 @@ const schema = new Schema({
     md: Schema.Types.Mixed,
     /*
     {
-      _id: String,
       ext: String,
       lost: String, // 是否已丢失
       hash: String, // 文件 md5

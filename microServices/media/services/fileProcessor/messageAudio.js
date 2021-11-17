@@ -1,5 +1,11 @@
 const PATH = require('path');
-const {storeClient, getFileInfo, deleteFile} = require('../../tools');
+const {
+  storeClient,
+  getFileInfo,
+  deleteFile,
+  getAudioInfo,
+  replaceFileExtension
+} = require('../../tools');
 const ff = require("fluent-ffmpeg");
 module.exports = async (props) => {
   const {
@@ -14,27 +20,32 @@ module.exports = async (props) => {
     mediaPath,
     toc,
     disposition,
-    ext
   } = data;
 
   const filePath = file.path;
+  const ext = 'mp3';
+  const targetFilePath = filePath + `.temp.${ext}`;
   const filenamePath = `${mfId}.${ext}`;
   const path = PATH.join(mediaPath, timePath, filenamePath);
   const time = (new Date(toc)).getTime();
+  await audioToMP3(filePath, targetFilePath);
   await storeClient(storeUrl, {
     path,
     time,
-    filePath
+    filePath: targetFilePath
   });
-  const {size, hash} = await getFileInfo(filePath);
+  const {size, hash} = await getFileInfo(targetFilePath);
+  const {duration} = await getAudioInfo(targetFilePath);
   await deleteFile(filePath);
+  await deleteFile(targetFilePath);
   return {
     def: {
       ext,
       size,
       hash,
+      duration,
       filename: filenamePath,
-      disposition
+      disposition: replaceFileExtension(disposition, 'mp3')
     }
   };
 };

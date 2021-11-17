@@ -1,3 +1,1 @@
-module.exports = async () => {
-
-};
+module.exports = require('./messageAudio');
