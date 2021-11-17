@@ -57,6 +57,16 @@ async function moveFile(path, targetPath) {
   await deleteFile(path);
 }
 
+// 手机图片上传自动旋转
+// 或采用 -auto-orient 参数
+async function imageAutoOrient(path) {
+  if (linux) {
+    await spawnProcess('convert', [path, '-strip', '-auto-orient', path]);
+  } else {
+    await spawnProcess('magick', ['convert', path, '-strip', '-auto-orient', path]);
+  }
+}
+
 
 
 /*
@@ -80,7 +90,6 @@ async function getFileSize(filePath) {
   return stat.size;
 }
 
-
 /*
 * 获取文件信息
 * @param {String} filePath 文件路径
@@ -88,14 +97,9 @@ async function getFileSize(filePath) {
 *   @param {String} path 文件路径
 *   @param {String} name 文件名
 *   @param {String} ext 文件格式
-*   @param {Object} stats
 *   @param {String} hash
 *   @param {Number} size
-*   @param {Date} atime
 *   @param {Date} mtime
-*   @param {Date} ctime
-*   @param {Date} birthtime
-*
 *   @param {Number} height 视频、图片高
 *   @param {Number} width 视频、图片宽
 *   @param {Number} duration 音视频时长 秒
@@ -106,10 +110,7 @@ async function getFileInfo(filePath) {
   const hash = await getFileMD5(filePath);
   const {
     size,
-    atime,
     mtime,
-    ctime,
-    birthtime
   } = await fsPromises.stat(filePath);
 
   const fileInfo = {
@@ -118,10 +119,7 @@ async function getFileInfo(filePath) {
     ext,
     hash,
     size,
-    atime,
     mtime,
-    ctime,
-    birthtime
   };
 
   if(imageExtensions.includes(ext)) {
@@ -141,10 +139,12 @@ async function getFileInfo(filePath) {
     const {duration} = await getAudioInfo(filePath);
     fileInfo.duration = duration;
   }
-
   return fileInfo;
 }
 
+/*
+* 判断文件是否存在
+* */
 async function accessFile(targetPath) {
   try{
     await fsPromises.access(targetPath);
@@ -214,26 +214,6 @@ async function storeClient(url, files = []) {
       .then(resolve)
       .catch(reject);
   });
-}
-
-/*
-* 获取图片宽高
-* */
-async function getImageInfo(pictureFilePath) {
-  const args = ['identify', '-format', '%wx%h', pictureFilePath + `[0]`];
-  let result;
-  if(!linux) {
-    result = await spawnProcess('magick', args);
-  } else {
-    result = await spawnProcess(args.shift(), args);
-  }
-  result = result.replace('\n', '');
-  result = result.trim();
-  const [width, height] = result.split('x');
-  return {
-    height: Number(height),
-    width: Number(width)
-  };
 }
 
 /*
@@ -309,6 +289,27 @@ async function getAudioInfo(filePath) {
 }
 
 
+/*
+* 获取图片宽高
+* */
+async function getImageInfo(pictureFilePath) {
+  const args = ['identify', '-format', '%wx%h', pictureFilePath + `[0]`];
+  let result;
+  if(!linux) {
+    result = await spawnProcess('magick', args);
+  } else {
+    result = await spawnProcess(args.shift(), args);
+  }
+  result = result.replace('\n', '');
+  result = result.trim();
+  const [width, height] = result.split('x');
+  return {
+    height: Number(height),
+    width: Number(width)
+  };
+}
+
+
 module.exports = {
   moveFile,
   replaceFileExtension,
@@ -320,5 +321,6 @@ module.exports = {
   getFileSize,
   spawnProcess,
   storeClient,
+  imageAutoOrient,
   getImageInfo
 }

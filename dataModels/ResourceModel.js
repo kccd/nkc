@@ -5,6 +5,7 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const PATH = require('path');
 const fs = require("fs");
+const FILE = require('../nkcModules/file')
 const fsPromises = fs.promises;
 const resourceSchema = new Schema({
 	rid: {
@@ -880,6 +881,7 @@ resourceSchema.methods.pushToMediaService = async function(filePath) {
     cover =  watermarkStream;
   }
   data.waterGravity = waterGravity;
+  data.waterAdd = waterAdd;
   await mediaClient(mediaServiceUrl, {
     cover: cover,
     type: mediaType,
@@ -902,6 +904,25 @@ resourceSchema.methods.getMediaServiceData = async function() {
 * 获取 处理图片需要的信息
 * */
 resourceSchema.methods.getMediaServiceDataPicture = async function() {
+  const {rid, toc, mediaType, ext, oname} = this;
+  const FILE = require('../nkcModules/file');
+  const timePath = await FILE.getTimePath(toc);
+  const mediaPath = await FILE.getMediaPath(mediaType);
+  return {
+    rid,
+    timePath,
+    disposition: oname,
+    mediaPath,
+    ext,
+    toc
+  }
+}
+
+
+/*
+* 获取 处理视频需要的信息
+* */
+resourceSchema.methods.getMediaServiceDataVideo = async function() {
   const {rid, toc, mediaType, ext, oname} = this;
   const FILE = require('../nkcModules/file');
   const timePath = await FILE.getTimePath(toc);
@@ -944,37 +965,66 @@ resourceSchema.methods.getMediaServiceDataAttachment = async function() {
 * 获取用户图片水印设置信息
 * */
 resourceSchema.methods.getWatermarkInfo = async function() {
-  const {uid, size} = this;
+  const {uid, size, mediaType} = this;
+  console.log('mediaType', mediaType);
   const createWatermark = require('../nkcModules/createWatermark')
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
   const UsersGeneralModel = mongoose.model('usersGeneral');
   const waterSetting = await UsersGeneralModel.findOnly({uid: uid}, {waterSetting: 1});
   const {
-    picture, waterAdd
+    picture, waterAdd, video
   } = waterSetting.waterSetting;
-  const watermarkSettings = await  SettingModel.getWatermarkSettings('picture');
-  if(!waterAdd || !watermarkSettings.enabled) return null;
-  let imagePath = '', text = '';
-  if(picture.waterStyle === 'siteLogo') {
-    imagePath = await SettingModel.getWatermarkFilePath('normal', 'picture');
-  } else if(picture.waterStyle === 'singleLogo') {
-    imagePath = await SettingModel.getWatermarkFilePath('small', 'picture');
-  } else {
-    imagePath = await SettingModel.getWatermarkFilePath('small', 'picture');
-    const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
-    text = user.username === ''? `KCID:${user.uid}`:user.username;
+  if(mediaType === 'mediaPicture') {
+    const watermarkSettings = await  SettingModel.getWatermarkSettings('picture');
+    if(!waterAdd || !watermarkSettings.enabled) return null;
+    let imagePath = '', text = '';
+    if(picture.waterStyle === 'siteLogo') {
+      imagePath = await SettingModel.getWatermarkFilePath('normal', 'picture');
+    } else if(picture.waterStyle === 'singleLogo') {
+      imagePath = await SettingModel.getWatermarkFilePath('small', 'picture');
+    } else {
+      imagePath = await SettingModel.getWatermarkFilePath('small', 'picture');
+      const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
+      text = user.username === ''? `KCID:${user.uid}`:user.username;
+    }
+    const watermarkStream = await createWatermark(
+      imagePath,
+      text,
+      watermarkSettings.transparency / 100
+    );
+    return {
+      waterAdd: waterAdd,
+      waterGravity: picture.waterGravity,
+      watermarkStream: watermarkStream,
+    };
+  } else{
+    const watermarkSettings = await  SettingModel.getWatermarkSettings('video');
+    if(!waterAdd || !watermarkSettings.enabled) return null;
+    let imagePath = '', text = '';
+    if(video.waterStyle === 'siteLogo') {
+      imagePath = await SettingModel.getWatermarkFilePath('normal', 'video');
+    } else if(video.waterStyle === 'singleLogo') {
+      imagePath = await SettingModel.getWatermarkFilePath('small', 'video');
+    } else {
+      imagePath = await SettingModel.getWatermarkFilePath('small', 'video');
+      const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
+      text = user.username === ''? `KCID:${user.uid}`:user.username;
+    }
+    const watermarkStream = await createWatermark(
+      imagePath,
+      text,
+      watermarkSettings.transparency / 100
+    );
+    return {
+      waterAdd: waterAdd,
+      waterGravity: video.waterGravity,
+      watermarkStream: watermarkStream,
+    };
   }
-  const watermarkStream = await createWatermark(
-    imagePath,
-    text,
-    watermarkSettings.transparency / 100
-  );
-  return {
-    waterAdd: waterAdd,
-    waterGravity: picture.waterGravity,
-    watermarkStream: watermarkStream,
-  };
+
+
+
 }
 
 
