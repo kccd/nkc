@@ -53,6 +53,38 @@ async function moveFile(path, targetPath) {
   await deleteFile(path);
 }
 
+/*
+* 获取图片的高宽
+* */
+const info = async path => {
+  const args = ['identify', '-format', '%wx%h', path + `[0]`];
+  let result;
+  if(!linux) {
+    result = await spawnProcess('magick', args);
+  } else {
+    result = await spawnProcess(args.shift(), args);
+  }
+  result = result.replace('\n', '');
+  result = result.trim();
+  const [width, height] = result.split('x');
+  return {
+    height: Number(height),
+    width: Number(width)
+  };
+  // return imageSize(path);
+};
+
+// 手机图片上传自动旋转
+// 或采用 -auto-orient 参数
+const allInfo = async path => {
+
+  if (linux) {
+    await spawnProcess('convert', [path, '-strip', '-auto-orient', path]);
+  } else {
+    await spawnProcess('magick', ['convert', path, '-strip', '-auto-orient', path]);
+  }
+}
+
 
 
 /*
@@ -95,6 +127,9 @@ async function getFileInfo(filePath) {
   };
 }
 
+/*
+* 判断文件是否存在
+* */
 async function accessFile(targetPath) {
   try{
     await fsPromises.access(targetPath);
@@ -258,6 +293,11 @@ async function getAudioInfo(filePath) {
   });
 }
 
+// 图片缩小
+const imageNarrow = path => {
+  return spawnProcess('magick', ['convert', path, '-resize', `${www}>`,path])
+}
+
 
 module.exports = {
   moveFile,
@@ -270,5 +310,8 @@ module.exports = {
   getFileSize,
   spawnProcess,
   storeClient,
-  getPictureSize
+  getPictureSize,
+  info,
+  allInfo,
+  imageNarrow,
 }
