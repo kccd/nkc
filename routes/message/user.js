@@ -105,7 +105,16 @@ userRouter
     if(!file) {
       if(content === '') ctx.throw(400, '内容不能为空');
     } else {
-      const {name, path} = file;
+      const messageFile = await db.MessageFileModel.createMessageFileDataAndPushFile({
+        file,
+        isVoice,
+        uid,
+        targetUid: targetUser.uid
+      });
+      content = {
+        fileId: messageFile._id
+      }
+      /*const {name, path} = file;
 
       // 附件尺寸限制
       await db.MessageModel.checkFileSize(file);
@@ -177,7 +186,7 @@ userRouter
         fileId: _id
       };
 
-      await messageFile.save();
+      await messageFile.save();*/
     }
 
     const _id = await db.SettingModel.operateSystemID('messages', 1);

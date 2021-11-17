@@ -35,7 +35,7 @@ module.exports = async (props) => {
   let hasPreviewPDF = false;
 
   const storeData = [{
-    filePath: filePath,
+    filePath,
     path,
     time
   }];

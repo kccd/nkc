@@ -1,7 +1,6 @@
 const ff = require("fluent-ffmpeg");
 const PATH = require('path');
 const {getFileInfo, deleteFile, storeClient} = require('../../tools');
-const imageMagick = require('../../tools/imageMagick');
 module.exports = async (props) => {
   const {
     file,

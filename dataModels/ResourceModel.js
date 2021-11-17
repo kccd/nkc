@@ -320,13 +320,7 @@ resourceSchema.methods.getFilePath = async function(size) {
   } else {
     filenamePath = `${rid}.${ext}`;
   }
-  let filePath;
-  if(FILE.isUrl(storeUrl)) {
-    filePath = `${storeUrl}?time=${toc.getTime()}&path=${mediaPath}/${timePath}/${filenamePath}`;
-  } else {
-    filePath = `${storeUrl}/${mediaPath}/${timePath}/${filenamePath}`;
-  }
-  return filePath;
+  return `${storeUrl}/${mediaPath}/${timePath}/${filenamePath}`;
   /*const fileFolder = await ResourceModel.getMediaPath(this.mediaType, toc);
   let filenamePath;
 

@@ -8,5 +8,11 @@ module.exports = {
 
   identityPictureA: require('./identityPicture'),
   identityPictureB: require('./identityPicture'),
-  identityVideo: require('./identityVideo')
+  identityVideo: require('./identityVideo'),
+
+  messageAudio: require('./messageAudio'),
+  messagePicture: require('./messagePicture'),
+  messageVideo: require('./messageVideo'),
+  messageVoice: require('./messageVoice'),
+  messageFile: require('./messageFile')
 };
