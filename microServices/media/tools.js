@@ -1,7 +1,6 @@
 const fs = require("fs");
 const fsPromises = fs.promises;
 const Path = require('path');
-const storeConfigs = require('../../config/store');
 const PATH = require("path");
 const crypto = require("crypto");
 const {spawn} = require("child_process");
@@ -54,35 +53,7 @@ async function moveFile(path, targetPath) {
   await deleteFile(path);
 }
 
-/*
-* 获取磁盘目录
-* @param {Date} time 附件上传日期
-* @return {String}
-* */
-async function getDiskPath(time) {
-  let diskPath;
-  for(const a of storeConfigs.attachment) {
-    const startingTime = new Date(`${a.startingTime} 00:00:00`);
-    const endTime = new Date(`${a.endTime} 00:00:00`);
-    time = new Date(time);
-    if(time < startingTime || time >= endTime) continue;
-    diskPath = a.path;
-    break;
-  }
-  if(!diskPath) throw new Error(`未找到匹配的文件目录`);
-  return diskPath;
-}
 
-/*
-* 获取最终文件存储目录
-* @param {Date} time 文件上传时间
-* @param {String} destination 文件的相对目录
-* @return {String}
-* */
-async function getTargetFilePath(time, destination) {
-  const diskPath = await getDiskPath(time);
-  return Path.resolve(diskPath, destination);
-}
 
 /*
 * 删除文件
@@ -133,38 +104,6 @@ async function accessFile(targetPath) {
   }
 }
 
-/*
-* 解析 header range
-* */
-async function parseRange(str, size) {
-  if (str.indexOf(",") !== -1) {
-    return;
-  }
-  if(str.indexOf("=") !== -1){
-    str = str.substr(6, str.length)
-  }
-  const range = str.split("-");
-  let start = parseInt(range[0], 10)
-  let end = parseInt(range[1], 10) || size - 1
-
-  // Case: -100
-  if (isNaN(start)) {
-    start = size - end;
-    end = size - 1;
-    // Case: 100-
-  } else if (isNaN(end)) {
-    end = size - 1;
-  }
-
-  // Invalid
-  if (isNaN(start) || isNaN(end) || start > end || end > size) {
-    return;
-  }
-  return {
-    start: start,
-    end: end
-  };
-}
 
 async function spawnProcess(pathName, args, options = {}) {
   return new Promise((resolve, reject) => {
@@ -247,6 +186,9 @@ async function getPictureSize(pictureFilePath) {
   };
 }
 
+/*
+* 替换文件名格式
+* */
 function replaceFileExtension(filename, newExtension) {
   if(!filename) throw new Error(`文件名不能为空`);
   if(!newExtension) throw new Error(`新的文件格式不能为空`);
@@ -291,6 +233,12 @@ async function getVideoInfo(inputFilePath) {
   })
 }
 
+/*
+* 获取音频信息
+* @param {String} filePath 音频路径
+* @return {Object}
+*   @Param {Number} duration 音频时长 秒
+* */
 async function getAudioInfo(filePath) {
   return new Promise((resolve, reject) => {
     ff.ffprobe(filePath, (err, metadata) => {
@@ -318,12 +266,9 @@ module.exports = {
   accessFile,
   getVideoInfo,
   getAudioInfo,
-  getTargetFilePath,
-  getDiskPath,
   getFileInfo,
   getFileSize,
   spawnProcess,
-  parseRange,
   storeClient,
   getPictureSize
 }

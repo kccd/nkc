@@ -5,8 +5,6 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const PATH = require('path');
 const fs = require("fs");
-const FILE = require("../nkcModules/file");
-const {pictureExtensions} = require("../nkcModules/file");
 const fsPromises = fs.promises;
 const resourceSchema = new Schema({
 	rid: {
@@ -153,7 +151,6 @@ const resourceSchema = new Schema({
     preview: Schema.Types.Mixed,
     /*
     {
-      _id: String,
       ext: String,
       lost: String, // 是否已丢失
       hash: String, // 文件 md5
@@ -872,14 +869,25 @@ resourceSchema.statics.getMediaTypeByExtension = (extension) => {
 * @param {String} filePath 待处理文件的路径
 * */
 resourceSchema.methods.pushToMediaService = async function(filePath) {
+  const {uid} = this;
+  const usersGeneralModel = mongoose.model('usersGeneral');
+  const usersGeneral = await usersGeneralModel.findOnly({uid: uid});
   const FILE = require('../nkcModules/file');
   const socket = require('../nkcModules/socket');
   const mediaClient = require('../tools/mediaClient');
   const {toc, mediaType} = this;
   const storeServiceUrl = await FILE.getStoreUrl(toc);
   const mediaServiceUrl = await socket.getMediaServiceUrl();
-  const data = await this.getMediaServiceData();
+  let data = await this.getMediaServiceData(filePath);
+  let cover;
+  //获取水印信息
+  const {waterAdd, waterGravity, watermarkStream} = await this.getWatermarkInfo();
+  if(waterAdd) {
+    cover =  watermarkStream;
+  }
+  data.waterGravity = waterGravity;
   await mediaClient(mediaServiceUrl, {
+    cover: cover,
     type: mediaType,
     filePath,
     storeUrl: storeServiceUrl,
@@ -895,6 +903,24 @@ resourceSchema.methods.getMediaServiceData = async function() {
   const type = mediaType.replace('media', '');
   return await this[`getMediaServiceData${type}`]();
 };
+
+/*
+* 获取 处理图片需要的信息
+* */
+resourceSchema.methods.getMediaServiceDataPicture = async function() {
+  const {rid, toc, mediaType, ext, oname} = this;
+  const FILE = require('../nkcModules/file');
+  const timePath = await FILE.getTimePath(toc);
+  const mediaPath = await FILE.getMediaPath(mediaType);
+  return {
+    rid,
+    timePath,
+    disposition: oname,
+    mediaPath,
+    ext,
+    toc
+  }
+}
 
 /*
 * 获取 media service 处理附件时所需要的必要信息
@@ -919,6 +945,44 @@ resourceSchema.methods.getMediaServiceDataAttachment = async function() {
     toc
   };
 };
+
+/*
+* 获取用户图片水印设置信息
+* */
+resourceSchema.methods.getWatermarkInfo = async function() {
+  const {uid, size} = this;
+  const createWatermark = require('../nkcModules/createWatermark')
+  const SettingModel = mongoose.model('settings');
+  const UserModel = mongoose.model('users');
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const waterSetting = await UsersGeneralModel.findOnly({uid: uid}, {waterSetting: 1});
+  const {
+    picture, waterAdd
+  } = waterSetting.waterSetting;
+  const watermarkSettings = await  SettingModel.getWatermarkSettings('picture');
+  if(!waterAdd || !watermarkSettings.enabled) return null;
+  let imagePath = '', text = '';
+  if(picture.waterStyle === 'siteLogo') {
+    imagePath = await SettingModel.getWatermarkFilePath('normal', 'picture');
+  } else if(picture.waterStyle === 'singleLogo') {
+    imagePath = await SettingModel.getWatermarkFilePath('small', 'picture');
+  } else {
+    imagePath = await SettingModel.getWatermarkFilePath('small', 'picture');
+    const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
+    text = user.username === ''? `KCID:${user.uid}`:user.username;
+  }
+  const watermarkStream = await createWatermark(
+    imagePath,
+    text,
+    watermarkSettings.transparency / 100
+  );
+  return {
+    waterAdd: waterAdd,
+    waterGravity: picture.waterGravity,
+    watermarkStream: watermarkStream,
+  };
+}
+
 
 /*
 * 获取 media service 处理音频时所需要的必要信息
