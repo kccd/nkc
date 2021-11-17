@@ -12,7 +12,6 @@ module.exports = async (props) => {
     timePath,
     mediaPath,
     toc,
-    disposition,
     ext
   } = data;
 
@@ -25,15 +24,10 @@ module.exports = async (props) => {
     time,
     filePath
   });
-  const {size, hash} = await getFileInfo(filePath);
+  const fileInfo = await getFileInfo(filePath);
+  fileInfo.name = filenamePath;
   await deleteFile(filePath);
   return {
-    def: {
-      ext,
-      size,
-      hash,
-      filename: filenamePath,
-      disposition
-    }
+    def: fileInfo
   };
 };

@@ -5,7 +5,6 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const PATH = require('path');
 const fs = require("fs");
-const FILE = require('../nkcModules/file')
 const fsPromises = fs.promises;
 const resourceSchema = new Schema({
 	rid: {
@@ -153,14 +152,13 @@ const resourceSchema = new Schema({
     /*
     {
       ext: String,
-      lost: String, // 是否已丢失
       hash: String, // 文件 md5
       size: Number, // 文件大小
       height: Number, // 图片、视频高
       width: Number,  // 图片、视频宽
-      filename: String, // 在存储服务磁盘上的文件名
-      disposition: String, // 下载时的文件名
+      name: String, // 在存储服务磁盘上的文件名
       duration: Number, // 音视频时间 秒
+      mtime: Date, // 最后修改时间
     }
     */
   },
@@ -1073,6 +1071,7 @@ resourceSchema.methods.getMediaServiceDataAudio = async function() {
 resourceSchema.statics.updateResourceStatus = async (props) => {
   const {rid, status, error, filesInfo = {}} = props;
   const ResourceModel = mongoose.model('resources');
+  const FILE = require('../nkcModules/file');
   const {sendDataMessage} = require('../nkcModules/socket');
   const resource = await ResourceModel.findOnly({rid});
 
@@ -1096,7 +1095,7 @@ resourceSchema.statics.updateResourceStatus = async (props) => {
     $set: {
       errorInfo,
       state: resourceState,
-      files: filesInfo
+      files: FILE.filterFilesInfo(filesInfo)
     }
   });
 
@@ -1126,9 +1125,6 @@ resourceSchema.methods.getRemoteFile = async function(size) {
     if(!parentResource) throwErr(500, `附件丢失 rid:${prid}`);
     return await parentResource.getFilePath(size);
   }
-  const storeUrl = await FILE.getStoreUrl(toc);
-  const mediaPath = await FILE.getMediaPath(mediaType);
-  const timePath = await FILE.getTimePath(toc);
 
   if(!size) {
     if(mediaType === 'mediaVideo') {
@@ -1142,24 +1138,14 @@ resourceSchema.methods.getRemoteFile = async function(size) {
     }
   }
 
-  const defaultSizeFile = files['def'];
-  let targetSizeFile = files[size];
-  if(!targetSizeFile || targetSizeFile.lost || !targetSizeFile.filename) {
-    targetSizeFile = defaultSizeFile;
-  }
-
-  if(!targetSizeFile || targetSizeFile.lost || !targetSizeFile.filename) {
-    throw new Error(`resource 数据错误 rid: ${rid}`);
-  }
-
-  const filenamePath = targetSizeFile.filename;
-  const path = PATH.join(mediaPath, timePath, filenamePath);
-  const time = (new Date(toc)).getTime();
-  const filename = FILE.replaceFileExtension(oname, targetSizeFile.ext);
-  return {
-    url: await FILE.createStoreQueryUrl(storeUrl, time, path),
-    filename
-  }
+  return await FILE.getRemoteFile({
+    id: rid,
+    toc,
+    type: mediaType,
+    ext,
+    name: oname,
+    file: files[size] || files['def']
+  });
 }
 
 /*
@@ -1168,7 +1154,7 @@ resourceSchema.methods.getRemoteFile = async function(size) {
 
 resourceSchema.methods.updateFilesInfo = async function() {
   const FILE = require('../nkcModules/file');
-  const {toc, mediaType, oname, rid, ext} = this;
+  const {toc, mediaType, rid, ext} = this;
   let filenames;
   if(mediaType === 'mediaPicture') {
      filenames = {
@@ -1191,8 +1177,12 @@ resourceSchema.methods.updateFilesInfo = async function() {
       preview: `${rid}_preview.pdf`
     }
   }
-  const filesInfo = await FILE.getStoreFilesInfo(toc, mediaType, filenames);
-  console.log(JSON.stringify(data, '', 2));
+  const files = await FILE.getStoreFilesInfoObj(toc, mediaType, filenames);
+  await this.updateOne({
+    $set: {
+      files
+    }
+  });
 };
 
 module.exports = mongoose.model('resources', resourceSchema);

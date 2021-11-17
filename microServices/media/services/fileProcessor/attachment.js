@@ -24,15 +24,14 @@ module.exports = async (props) => {
   for(const image of images) {
     const {
       type,
-      filename,
+      name,
       height,
       width,
       quality,
-      disposition,
       background = 'transparent'
     } = image;
-    const path = PATH.join(mediaPath, timePath, filename);
-    const targetFilePath = filePath + '.temp.' + filename;
+    const path = PATH.join(mediaPath, timePath, name);
+    const targetFilePath = filePath + '.temp.' + name;
     await ei.resize({
       src: filePath,
       dst: targetFilePath,
@@ -46,16 +45,9 @@ module.exports = async (props) => {
       path,
       time
     });
-    const {size, hash, ext, height: newHeight, width: newWidth} = await getFileInfo(targetFilePath);
-    filesInfo[type] = {
-      ext,
-      size,
-      hash,
-      filename,
-      disposition,
-      height: newHeight,
-      width: newWidth
-    };
+    const fileInfo = await getFileInfo(targetFilePath);
+    fileInfo.name = name;
+    filesInfo[type] = fileInfo;
   }
   await storeClient(storeUrl, storeFiles);
   for(const s of storeFiles) {

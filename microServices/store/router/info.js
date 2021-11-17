@@ -6,20 +6,22 @@ const {
 module.exports = async (ctx, next) => {
   const {query, data} = ctx;
   const files = JSON.parse(query.files);
-  const filesInfo = {};
-  for(const type in files) {
-    const {time, path} = files[type];
+  data.files = [];
+  for(const file of files) {
+    const {type, time, path} = file;
     const filePath = await getTargetFilePath(Number(time), path);
-    const fileLost = !await accessFile(filePath);
-    let fileInfo = null;
-    if(!fileLost) {
-      fileInfo = await getFileInfo(filePath);
+    const lost = !await accessFile(filePath);
+    let info = null;
+    if(!lost) {
+      info = await getFileInfo(filePath);
     }
-    filesInfo[type] = {
-      fileLost,
-      fileInfo
-    };
+    data.files.push({
+      type,
+      time,
+      path,
+      lost,
+      info
+    });
   }
-  data.filesInfo = filesInfo;
   await next();
 };

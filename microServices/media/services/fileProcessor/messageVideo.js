@@ -4,7 +4,6 @@ const {
   getFileInfo,
   deleteFile,
   spawnProcess,
-  replaceFileExtension, getPictureSize
 } = require('../../tools');
 const ff = require("fluent-ffmpeg");
 module.exports = async (props) => {
@@ -19,7 +18,6 @@ module.exports = async (props) => {
     timePath,
     mediaPath,
     toc,
-    disposition,
   } = data;
 
   const filePath = file.path;
@@ -48,31 +46,15 @@ module.exports = async (props) => {
   ];
   await storeClient(storeUrl, storeData);
   const videoFileInfo = await getFileInfo(targetFilePath);
+  videoFileInfo.name = filenamePath;
   const coverFileInfo = await getFileInfo(coverFilePath);
+  coverFileInfo.name = coverFilenamePath;
   await deleteFile(filePath);
   await deleteFile(targetFilePath);
   await deleteFile(coverFilePath);
   return {
-    def: {
-      ext,
-      size: videoFileInfo.size,
-      hash: videoFileInfo.hash,
-      duration: videoFileInfo.duration,
-      filename: filenamePath,
-      height: videoFileInfo.height,
-      width: videoFileInfo.width,
-      disposition: replaceFileExtension(disposition, ext)
-    },
-    cover: {
-      ext: coverExt,
-      size: coverFileInfo.size,
-      hash: coverFileInfo.hash,
-      duration: coverFileInfo.duration,
-      filename: coverFilenamePath,
-      height: coverFileInfo.height,
-      width: coverFileInfo.width,
-      disposition: replaceFileExtension(disposition, coverExt)
-    }
+    def: videoFileInfo,
+    cover: coverFileInfo
   };
 };
 

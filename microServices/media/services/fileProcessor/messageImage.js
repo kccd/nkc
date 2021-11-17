@@ -17,7 +17,6 @@ module.exports = async (props) => {
     timePath,
     mediaPath,
     toc,
-    disposition,
     ext
   } = data;
   const filePath = file.path;
@@ -46,26 +45,12 @@ module.exports = async (props) => {
   });
   await storeClient(storeUrl, storeData);
   const fileInfo = await getFileInfo(filePath);
+  fileInfo.name = filenamePath;
   const smFileInfo = await getFileInfo(targetSMFilePath);
+  smFileInfo.name = smFilenamePath;
   const filesInfo = {
-    def: {
-      ext: fileInfo.ext,
-      size: fileInfo.size,
-      hash: fileInfo.hash,
-      height: fileInfo.height,
-      width: fileInfo.width,
-      filename: filenamePath,
-      disposition
-    },
-    sm: {
-      ext: smFileInfo.ext,
-      size: smFileInfo.size,
-      hash: smFileInfo.hash,
-      height: smFileInfo.height,
-      width: smFileInfo.width,
-      filename: smFilenamePath,
-      disposition
-    }
+    def: fileInfo,
+    sm: smFileInfo
   };
   await deleteFile(filePath);
   await deleteFile(targetSMFilePath);
