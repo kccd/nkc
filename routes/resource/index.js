@@ -208,6 +208,7 @@ resourceRouter
   .post('/', async (ctx, next) => {
     const {db, data, nkcModules} = ctx;
     const {user} = data;
+    const {uid} =user;
     const {files, fields} = ctx.body;
     const {file} = files;
     const {type, fileName, md5, share} = fields;
@@ -312,7 +313,6 @@ resourceRouter
     }
     await r.save();
     ctx.data.r = r;
-
     // 将文件推送到 media service
     await r.pushToMediaService(file.path);
     await next();

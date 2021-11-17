@@ -427,10 +427,10 @@ settingSchema.statics.getWatermarkSettings = async (type) => {
   const uploadSettings = await SettingModel.getSettings('upload');
   return {
     // transparency: 255 * (1 - uploadSettings.watermark.transparency / 100),
-    transparency: 100 - uploadSettings.watermark.transparency,
-    enabled: uploadSettings.watermark.enabled,
-    minHeight: uploadSettings.watermark.minHeight,
-    minWidth: uploadSettings.watermark.minWidth
+    transparency: type === 'video'? 100 - uploadSettings.watermark.video.transparency: 100 - uploadSettings.watermark.picture.transparency,
+    enabled: type === 'video'? uploadSettings.watermark.video.enabled:uploadSettings.watermark.picture.enabled,
+    minHeight: type === 'video'?uploadSettings.watermark.video.minHeight:uploadSettings.watermark.picture.minHeight,
+    minWidth: type === 'video'?uploadSettings.watermark.video.minWidth:uploadSettings.watermark.picture.minWidth,
   }
 };
 
