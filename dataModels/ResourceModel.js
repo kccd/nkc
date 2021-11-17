@@ -1105,10 +1105,44 @@ resourceSchema.methods.getRemoteFile = async function(size) {
   const filenamePath = targetSizeFile.filename;
   const path = PATH.join(mediaPath, timePath, filenamePath);
   const time = (new Date(toc)).getTime();
+  const filename = FILE.replaceFileExtension(oname, targetSizeFile.ext);
   return {
     url: await FILE.createStoreQueryUrl(storeUrl, time, path),
-    filename: targetSizeFile.disposition || oname
+    filename
   }
 }
+
+/*
+* 获取 store service 上的文件信息
+* */
+
+resourceSchema.methods.updateFilesInfo = async function() {
+  const FILE = require('../nkcModules/file');
+  const {toc, mediaType, oname, rid, ext} = this;
+  let filenames;
+  if(mediaType === 'mediaPicture') {
+     filenames = {
+      def: `${rid}.${ext}`,
+      sm: `${rid}_sm.${ext}`,
+      md: `${rid}_md.${ext}`
+    }
+  } else if(mediaType === 'mediaAudio') {
+    filenames = {
+      def: `${rid}.mp3`,
+    }
+  } else if(mediaType === 'mediaVideo') {
+    filenames = {
+      def: `${rid}.mp4`,
+      cover: `${rid}_cover.jpg`
+    }
+  } else {
+    filenames = {
+      def: `${rid}.${ext}`,
+      preview: `${rid}_preview.pdf`
+    }
+  }
+  const filesInfo = await FILE.getStoreFilesInfo(toc, mediaType, filenames);
+  console.log(JSON.stringify(data, '', 2));
+};
 
 module.exports = mongoose.model('resources', resourceSchema);

@@ -2,6 +2,7 @@ const fs = require("fs");
 const fsPromise = fs.promises;
 const moment = require('moment');
 const PATH = require('path');
+const axios = require("axios");
 const attachmentConfig = require("../config/attachment.json");
 
 const pictureExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif", "webp"];
@@ -148,7 +149,7 @@ async function createStoreQueryUrl(storeUrl, time, path) {
 * 替换文件格式
 * */
 
-async function replaceFileExtension(filename, newExtension) {
+function replaceFileExtension(filename, newExtension) {
   if(!filename) throw new Error(`文件名不能为空`);
   if(!newExtension) throw new Error(`新的文件格式不能为空`);
   filename = filename.split('.');
@@ -158,6 +159,36 @@ async function replaceFileExtension(filename, newExtension) {
   filename.push(newExtension);
   filename = filename.join('.');
   return filename;
+}
+
+async function getStoreFilesInfo(toc, folderType, filenames) {
+  const storeUrl = await getStoreUrl(toc) + '/info';
+  const mediaPath = await getMediaPath(folderType);
+  const time = (new Date(toc)).getTime();
+  const timePath = await getTimePath(toc);
+  const files = {};
+  for(const f of filenames) {
+    const {type, filename} = f;
+    files[type] = {
+      time,
+      path: PATH.join(mediaPath, timePath, filename)
+    };
+  }
+  return new Promise((resolve, reject) => {
+    axios({
+      url: storeUrl,
+      method: 'GET',
+      params: {
+        files: JSON.stringify(files)
+      }
+    })
+      .then(res => {
+        resolve(res.data || res);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
 }
 
 module.exports = {
@@ -173,5 +204,6 @@ module.exports = {
   getFileObjectByFilePath,
   access,
   createStoreQueryUrl,
+  getStoreFilesInfo,
   replaceFileExtension,
 }
