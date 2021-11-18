@@ -268,21 +268,19 @@ async function getRemoteFile(props) {
   const mediaPath = await getMediaPath(type);
   const timePath = await getTimePath(toc);
   const time = (new Date(toc)).getTime();
-  let filenamePath;
-  let filename;
-  const defaultFilenamePath = `${id}.${ext}`;
-  if(file) {
-    filenamePath = file.name || defaultFilenamePath;
-    filename = replaceFileExtension(name, file.ext);
-  } else {
-    filenamePath = defaultFilenamePath;
-    filename = name;
-  }
-  const path = PATH.join(mediaPath, timePath, filenamePath);
+  const defaultFile = {
+    ext,
+    name: `${id}.${ext}`
+  };
+  const targetFile = file || defaultFile;
+  targetFile.name = targetFile.name || defaultFile.name;
+  const filename = replaceFileExtension(name, targetFile.ext);
+  const path = PATH.join(mediaPath, timePath, targetFile.name);
   const storeQueryUrl = await createStoreQueryUrl(storeUrl, time, path);
   return {
     url: storeQueryUrl,
-    filename
+    filename,
+    info: file
   }
 }
 

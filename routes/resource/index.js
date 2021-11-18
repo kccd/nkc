@@ -3,7 +3,6 @@ const resourceRouter = new Router();
 const infoRouter = require("./info");
 const payRouter = require("./pay");
 const detailRouter = require("./detail");
-const mediaMethods = require("./methods");
 const {ThrottleGroup} = require("stream-throttle");
 
 // 存放用户设置
@@ -85,9 +84,8 @@ resourceRouter
         await resource.checkAccessPermission(accessibleForumsId);
       }
     }
-    const {mediaType, ext} = resource;
-    // let filePath = await resource.getFilePath(t);
-    ctx.remoteFile = await resource.getRemoteFile(t);
+    const {mediaType} = resource;
+    let remoteFile = await resource.getRemoteFile(t);
     let speed;
     data.resource = resource;
     data.rid = resource.rid;
@@ -126,39 +124,26 @@ resourceRouter
         if(resource.ext !== 'pdf') {
           nkcModules.throwError(403, `当前附件需支付积分后才可下载`);
         } else {
-          const pdfPath = await resource.getPDFPreviewFilePath();
-          if(!await nkcModules.file.access(pdfPath)) nkcModules.throwError(403, `当前文档暂不能预览`, 'previewPDF');
-          ctx.filePath = pdfPath;
+          remoteFile = await resource.getRemoteFile('preview');
         }
       }
       // 不要把这次的响应结果缓存下来
       ctx.dontCacheFile = true;
     }
-    /*if (mediaType === "mediaPicture") {
-      try {
-        await fs.access(filePath);
-      } catch (e) {
-        filePath = ctx.settings.statics.defaultImageResourcePath;
-      }
+    if (mediaType === "mediaPicture") {
       ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`)
-    }*/
+    }
     // 在resource中添加点击次数
     if(!ctx.request.headers['range']){
       await resource.updateOne({$inc:{hits:1}});
     }
-    // ctx.filePath = filePath;
     // 表明客户端希望以附件的形式加载资源
     if(d === "attachment") {
       ctx.isAttachment = true;
       ctx.fileType = "attachment";
-    } else if(d === "object") {
-      // 返回数据对象
-      data.resource = resource;
-      ctx.filePath = undefined;
     }
     ctx.resource = resource;
-    ctx.type = ext;
-
+    ctx.remoteFile = remoteFile;
     // 限速
     if(checkScore) {
       let key;
@@ -210,74 +195,11 @@ resourceRouter
     const {user} = data;
     const {files, fields} = ctx.body;
     const {file} = files;
-    const {type, fileName, md5, share} = fields;
-    if(type === "checkMD5") {
-
-      data.uploaded = false;
-      return await next();
-
-      // 前端提交待上传文件的md5，用于查找resources里是否与此md5匹配的resource
-      // 若不匹配，则返回“未匹配”给前端，前端收到请求后会再次向服务器发起请求，并将待上传的文件上传到服务器。
-      // 若匹配，则读取目标resource上的相关信息，并写入到新的resource中。封面图、
-      if(!md5) ctx.throw(400, "md5不能为空");
-      if(!fileName) ctx.throw(400, "文件名不能为空");
-      const resource = await db.ResourceModel.findOne({
-        prid: '',
-        hash: md5,
-        mediaType: "mediaAttachment",
-        state: 'usable'
-      }).sort({toc: -1});
-      let existed = false;
-      if(resource) {
-        // 判断文件是否丢失
-        /*const filePath = await resource.getFilePath();
-        existed = await nkcModules.file.access(filePath);*/
-      }
-      if(
-        !resource || // 未上传过
-        !existed || // 源文件不存在
-        !resource.ext // 上传过，但格式丢失
-      ) {
-        data.uploaded = false;
-        return await next();
-      }
-      // 检测用户上传相关权限
-      const _file = {
-        size: resource.size,
-        ext: resource.ext
-      };
-      await db.ResourceModel.checkUploadPermission(user, _file);
-      // 在此处复制原resource的信息
-      const newResource = resource.toObject();
-      delete newResource.__v;
-      delete newResource._id;
-      delete newResource.references;
-      delete newResource.tlm;
-      delete newResource.originId;
-      delete newResource.toc;
-      delete newResource.hits;
-
-      newResource.rid = await db.SettingModel.operateSystemID("resources", 1);
-      newResource.prid = resource.rid;
-      newResource.uid = user.uid;
-      newResource.hash = md5;
-      newResource.oname = fileName;
-
-      const r = db.ResourceModel(newResource);
-      await r.save();
-      data.r = r;
-      data.uploaded = true;
-      return await next();
-    }
+    const {type, share} = fields;
     if(!file) {
       ctx.throw(400, 'no file uploaded');
     }
-    let { name, size, hash} = file;
-    // 检查上传权限
-    if(name === "blob" && fileName) {
-      name = fileName;
-      file.name = fileName;
-    }
+    const { name, size, hash} = file;
     // 验证上传权限
     await db.ResourceModel.checkUploadPermission(user, file);
 
@@ -323,10 +245,9 @@ resourceRouter
     await next();
   })
   .put('/:rid', async (ctx, next) => {
-    const {db, data, nkcModules, body} = ctx;
+    const {data, body} = ctx;
     const {resource} = data;
     const {disabled} = body;
-    data.resource = resource;
     if(resource.disabled) {
       if(disabled) {
         ctx.throw(400, `资源已被屏蔽`);
@@ -336,9 +257,10 @@ resourceRouter
         ctx.throw(400, `资源未被屏蔽`);
       }
     }
+    resource.disabled = !!disabled;
     await resource.updateOne({
       $set: {
-        disabled: !!disabled
+        disabled: resource.disabled
       }
     })
     await next();

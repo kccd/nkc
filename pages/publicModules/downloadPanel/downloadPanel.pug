@@ -16,7 +16,7 @@ if !isIncluded('downloadPanel')
             .m-b-1.bg-warning.text-warning.p-a-05.bg-border.download-warning(v-if='downloadWarning') {{downloadWarning}}
             .file-base-info.m-b-1
               .file-name.m-b-05 文件名称：
-                strong {{resource.oname}}
+                strong {{resource.defaultFile.name}}
               .file-size.m-b-05 下载次数：{{resource.hits}}
               .file-user.m-b-05 上传用户：
                 img.user-avatar(:src='getUrl("userAvatar", uploader.avatar)')
