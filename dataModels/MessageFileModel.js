@@ -73,6 +73,13 @@ const messageFileSchema = new Schema({
   collection: 'messageFiles'
 });
 
+messageFileSchema.virtual('defaultFile')
+  .get(function() {
+    return this._defaultFile;
+  })
+  .set(function(val) {
+    return this._defaultFile = val
+  });
 
 /*
 * 根据格式判断文件类型
@@ -218,5 +225,19 @@ messageFileSchema.methods.updateFilesInfo = async function() {
     }
   });
 };
+
+messageFileSchema.methods.extendDefaultFile = function() {
+  const FILE = require('../nkcModules/file');
+  const {duration, ext, size, oname: name, files = {}} = this;
+  let defaultFile = {
+    ext,
+    size,
+    name,
+    duration
+  };
+  defaultFile = files.def || defaultFile;
+  defaultFile.name = FILE.replaceFileExtension(name, defaultFile.ext);
+  return this.defaultFile = defaultFile;
+}
 
 module.exports = mongoose.model('messageFiles', messageFileSchema);
