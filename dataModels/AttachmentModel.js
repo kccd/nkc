@@ -806,7 +806,6 @@ schema.methods.updateFilesInfo = async function() {
     lg: `${_id}_lg.${ext}`,
     md: `${_id}_md.${ext}`,
   });
-  console.log(JSON.stringify(files, '', 2));
   await this.updateOne({
     $set: {
       files
