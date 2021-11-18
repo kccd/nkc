@@ -62,6 +62,8 @@ const paymentRouter = routers.payment;
 const linkRouter = routers.link;
 // 社区
 const communityRouter = routers.community;
+// 网站 logo
+const logoRouter = routers.logo;
 
 const path = require('path');
 
@@ -135,4 +137,5 @@ router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods())
 router.use('/c', communityRouter.routes(), communityRouter.allowedMethods())
 router.use("/l", linkRouter.routes(), linkRouter.allowedMethods());
 router.use("/wm", watermarkRouter.routes(), watermarkRouter.allowedMethods());
+router.use('/logo', logoRouter.routes(), logoRouter.allowedMethods());
 module.exports = router;

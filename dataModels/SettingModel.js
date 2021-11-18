@@ -2,6 +2,7 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const redisClient = require('../settings/redisClient');
+const ei = require('easyimage');
 const FILE = require("../nkcModules/file");
 const PATH = require("path");
 const fs = require("fs");
@@ -825,6 +826,47 @@ settingSchema.statics.getHomeBigLogo = async () => {
   } else {
     return homeSettings.homeBigLogo;
   }
+}
+
+
+/*
+* 更换网站 logo
+* */
+settingSchema.statics.saveSiteLog = async (filePath) => {
+  const {
+    logoICO,
+    logoSM,
+    logoMD,
+    logoLG
+  } = require('../settings/statics');
+  // 生成ico图标
+  await ei.resize({
+    src: filePath,
+    dst: logoICO,
+    height: 96,
+    width: 96,
+  });
+  // 生成小logo
+  await ei.resize({
+    src: filePath,
+    dst: logoSM,
+    height: 128,
+    width: 128
+  });
+  // 生成中等logo
+  await ei.resize({
+    src: filePath,
+    dst: logoMD,
+    height: 256,
+    width: 256,
+  });
+  // 生成中等logo
+  await ei.resize({
+    src: filePath,
+    dst: logoLG,
+    height: 512,
+    width: 512,
+  });
 }
 
 module.exports = mongoose.model('settings', settingSchema);

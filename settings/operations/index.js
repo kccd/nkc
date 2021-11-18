@@ -21,7 +21,6 @@ const {
 	fundBanner,
 	photo,
 	photo_small,
-	logo,
 } = resourceObj;
 
 const editor = require('./editor');
@@ -79,6 +78,7 @@ const payment = require('./payment');
 const link = require('./link');
 const community = require('./community');
 const watermark = require('./watermark');
+const logo = require('./logo');
 const operationObj = {};
 
 
@@ -141,8 +141,6 @@ operationObj.operationTree = {
 		'home.php': {
 			GET: 'discuz'
 		},
-
-		logo, // 网站logo
 
 		poster, //活动海报
 		avatar,// 用户头像
@@ -270,6 +268,7 @@ operationObj.operationTree = {
 		l: link, // 外链跳转
     c: community, // 社区
 		wm: watermark, //水印
+    logo, // 网站 logo
     test,
 	}
 };

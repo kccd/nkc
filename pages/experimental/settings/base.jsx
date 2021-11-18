@@ -116,9 +116,11 @@ const vueApp = createApp({
             <Image
               style="width: 150px; height: 150px"
               fit="cover"
-              src={this.tempSiteIcon? this.tempSiteIcon : tools.getUrl("siteIcon", this.settings.siteIcon, "sm")}
+              src={this.tempSiteIcon? this.tempSiteIcon : tools.getUrl("siteIcon", "sm")}
               onClick={() => this.$refs.selectSiteIconInput.click()}>
             </Image>
+            <br/>
+            <button class="btn btn-default btn-sm" onClick={() => this.$refs.selectSiteIconInput.click()}>更换</button>
             <input
               class="hide"
               type="file"

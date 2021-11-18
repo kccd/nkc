@@ -7,25 +7,10 @@ const paths = {
   keyDir: 'key',
   uploadDir: 'tmp',
   resourcesPath: 'resources',
-  uploadPath: 'resources/upload',
-  mediaPath: 'resources/media',
-  coverPath: 'resources/cover',
   shopLogoPath: 'resources/shopLogo',
-  thumbnailPath: 'resources/thumbnails',
-  mediumPath: 'resources/mediums',
-  adPath: 'resources/ad_posts',
   siteSpecificPath: 'resources/site_specific',
-  qrCodePath: 'resources/qr',
   photoPath: 'resources/photo',
   photoSmallPath: 'resources/photo_small',
-  fundBannerPath: 'resources/fundBanner',
-  fundLogoPath: 'resources/fundLogo',
-  messageVideoFramePath: 'resources/message',
-  messageFilePath: 'resources/message',
-  messageImageSMPath: 'resources/message/sm',
-  messageVoiceBrowser: 'resources/message/vb',
-  messageVideoBrowser: 'resources/message/vd',
-  frameImgPath: 'resources/frameImage',
   appPath: 'resources/app',
   androidSavePath: 'resources/app/android',
   iosSavePath: 'resources/app/ios',
@@ -34,7 +19,8 @@ const paths = {
   questionImagePath: 'resources/question_image',
   shopCertsPath: 'resources/shop_certs',
   toolsPath: "resources/tools",
-  watermark: "resources/watermark"
+  watermark: "resources/watermark",
+  logoPath: "resources/logo"
 };
 
 const pathsObj = {};

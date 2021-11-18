@@ -20,7 +20,7 @@ block head
   meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
   meta(name='window-data' content=objToStr(windowData))
 
-  link(rel='shortcut icon' href=tools.getUrl('siteIcon', state.serverSettings.siteIcon, 'ico'))
+  link(rel='shortcut icon' href=tools.getUrl('siteIcon', 'ico'))
   if process.env.NODE_ENV === "production"
     +includeJS("/external_pkgs/vue.min.js", true)
   else

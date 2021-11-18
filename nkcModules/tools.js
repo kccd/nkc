@@ -146,7 +146,7 @@ var Tools = function() {
         return "/reader/pdf/web/viewer?file=%2fr%2f" + id;
       }
       case 'siteIcon': {
-        return "/a/" + id + t
+        return "/logo/" + id;
       }
       case 'columnPost': {
         return "/m/" + id + '/post/' + size;

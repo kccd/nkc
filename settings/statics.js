@@ -44,6 +44,17 @@ const defaultNoAccessImagePath = defaultPath + '/no_access.jpg';
 const defaultStickerImage = defaultPath + '/default_avatar.gif';
 const defaultScoreIconPath = defaultPath + '/kcb.png';
 const defaultPreviewJPG = defaultPath + '/preview_footer.jpg';
+// 网站 logo
+const defaultLogoICO = path.resolve(siteSpecificPath, './favicon.ico');
+const defaultLogoSM = path.resolve(siteSpecificPath, './logo.png');
+const defaultLogoMD = defaultLogoSM;
+const defaultLogoLG = defaultLogoSM;
+const resourceLogoPath = path.resolve(resourcesPath, './logo');
+const logoICO = path.resolve(resourceLogoPath, './favicon.ico');
+const logoSM = path.resolve(resourceLogoPath, './logo_sm.png');
+const logoMD = path.resolve(resourceLogoPath, './logo_md.png');
+const logoLG = path.resolve(resourceLogoPath, './logo_lg.png');
+
 module.exports = {
   defaultPreviewJPG,
   deletedPhotoPath,
@@ -86,4 +97,13 @@ module.exports = {
   smallPictureWatermark,
   normalVideoWatermark,
   smallVideoWatermark,
+
+  defaultLogoICO,
+  defaultLogoLG,
+  defaultLogoMD,
+  defaultLogoSM,
+  logoICO,
+  logoSM,
+  logoMD,
+  logoLG
 };
