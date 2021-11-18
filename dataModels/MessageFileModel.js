@@ -209,7 +209,9 @@ messageFileSchema.methods.updateFilesInfo = async function() {
       def: `${_id}.${ext}`
     }
   }
-  const files = await FILE.getStoreFilesInfoObj(toc, type, filenames);
+  const MessageFileModel = mongoose.model('messageFiles');
+  const folderType = await MessageFileModel.getFolderTypeByType(type);
+  const files = await FILE.getStoreFilesInfoObj(toc, folderType, filenames);
   await this.updateOne({
     $set: {
       files
