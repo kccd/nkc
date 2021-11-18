@@ -876,12 +876,18 @@ resourceSchema.methods.pushToMediaService = async function(filePath) {
   let data = await this.getMediaServiceData(filePath);
   let cover;
   //获取水印信息
-  const {waterAdd, waterGravity, watermarkStream} = await this.getWatermarkInfo();
+  const {waterAdd, waterGravity, watermarkStream, defaultBV, configs} = await this.getWatermarkInfo();
   if(waterAdd) {
     cover =  watermarkStream;
   }
   data.waterGravity = waterGravity;
   data.waterAdd = waterAdd;
+  if(defaultBV) {
+    data.defaultBV = defaultBV;
+  }
+  if(configs) {
+    data.configs = configs;
+  }
   await mediaClient(mediaServiceUrl, {
     cover: cover,
     type: mediaType,
@@ -966,7 +972,6 @@ resourceSchema.methods.getMediaServiceDataAttachment = async function() {
 * */
 resourceSchema.methods.getWatermarkInfo = async function() {
   const {uid, size, mediaType} = this;
-  console.log('mediaType', mediaType);
   const createWatermark = require('../nkcModules/createWatermark')
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
@@ -998,7 +1003,9 @@ resourceSchema.methods.getWatermarkInfo = async function() {
       waterGravity: picture.waterGravity,
       watermarkStream: watermarkStream,
     };
-  } else{
+  } else if (mediaType === 'mediaVideo') {
+    const uploadSettings = await SettingModel.getSettings('upload');
+    const {configs, defaultBV} = uploadSettings.videoVBRControl;
     const watermarkSettings = await  SettingModel.getWatermarkSettings('video');
     if(!waterAdd || !watermarkSettings.enabled) return null;
     let imagePath = '', text = '';
@@ -1020,6 +1027,8 @@ resourceSchema.methods.getWatermarkInfo = async function() {
       waterAdd: waterAdd,
       waterGravity: video.waterGravity,
       watermarkStream: watermarkStream,
+      configs,
+      defaultBV,
     };
   }
 
@@ -1192,7 +1201,6 @@ resourceSchema.methods.updateFilesInfo = async function() {
     }
   }
   const filesInfo = await FILE.getStoreFilesInfo(toc, mediaType, filenames);
-  console.log(JSON.stringify(data, '', 2));
 };
 
 module.exports = mongoose.model('resources', resourceSchema);

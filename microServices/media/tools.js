@@ -309,6 +309,34 @@ async function getImageInfo(pictureFilePath) {
   };
 }
 
+/*
+* 生成指定分辨率的视频
+* @param {String} inputFile 原视频磁盘路径
+* @param {String} outputFile 生成视频的磁盘路径
+* @param {Object} props
+*   @param {Number} height 目标视频高
+*   @param {Number} fps
+*   @param {Number} bitrate 单位Kbps
+* @author pengxiguaa 2021-01-22
+* */
+async function createOtherSizeVideo(inputFile, outputFile, props) {
+  const {height, bitrate, fps} = props;
+  return new Promise((resolve, reject) => {
+    ff(inputFile)
+      .fps(fps)
+      .size(`?x${height}`)
+      .videoBitrate(bitrate + 'k')
+      .outputOptions([
+        '-map_metadata',
+        '-1'
+      ])
+      .output(outputFile)
+      .on('end', resolve)
+      .on('error', reject)
+      .run()
+  });
+}
+
 
 module.exports = {
   moveFile,
@@ -322,5 +350,6 @@ module.exports = {
   spawnProcess,
   storeClient,
   imageAutoOrient,
-  getImageInfo
+  getImageInfo,
+  createOtherSizeVideo
 }
