@@ -81,7 +81,6 @@ router
         }
       }
     });
-    console.log('files', files);
     //将水印保存在默认文件夹
     if(files.normalPictureWatermark) {
       await fsPromise.copyFile(files.normalPictureWatermark.path, statics.normalPictureWatermark);

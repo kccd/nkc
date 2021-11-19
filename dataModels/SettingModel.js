@@ -818,6 +818,30 @@ settingSchema.statics.getWatermarkInfoByUid = async (uid, type) => {
     );
   }
 }
+
+settingSchema.statics.getWatermarkPath = async (magePath, text = '', transparent = 1) => {
+  const {getFileMD5, getTextMD5} = require('../nkcModules/hash');
+  const FILE = require('../nkcModules/file');
+  const createWatermark = require('../nkcModules/createWatermark');
+  const {watermarkCache} = require("../settings/upload");
+  const md5 = await getFileMD5(magePath) + await getTextMD5(text + transparent);
+  const watermarkPath = PATH.resolve(watermarkCache, `${md5}.png`);
+  if(await FILE.access(watermarkPath)) {
+    return watermarkPath;
+  }
+  const watermarkStream = await createWatermark(magePath, text, transparent);
+  const file = fs.createWriteStream(watermarkPath);
+  return new Promise((resolve, reject) => {
+    const func = () => {
+      resolve(watermarkPath);
+    };
+    file.on('end', func);
+    file.on('finish', func);
+    file.on('error', reject);
+    watermarkStream.pipe(file);
+  });
+}
+
 /*
 * 判断用户阅读指定时间的内容时是否受到限制
 * @param {Date} toc 内容发表时间

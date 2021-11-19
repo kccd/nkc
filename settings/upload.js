@@ -20,6 +20,7 @@ const paths = {
   shopCertsPath: 'resources/shop_certs',
   toolsPath: "resources/tools",
   watermark: "resources/watermark",
+  watermarkCache: "resources/watermarkCache",
   logoPath: "resources/logo"
 };
 

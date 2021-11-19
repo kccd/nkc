@@ -120,23 +120,23 @@ module.exports = async (props) => {
       filesInfo
     });
   }
-    func()
-      .catch(err => {
-        return sendResourceStatusToNKC({
-          rid,
-          status: false,
-          error: err.message || err.toString()
-        });
-      })
-      .finally(() => {
-        return Promise.all([
-          tools.deleteFile(thumbnailPath),
-          tools.deleteFile(mediumPath),
-          tools.deleteFile(filePath),
-          tools.deleteFile(cover.path),
-          tools.deleteFile(outputPath),
+  func()
+    .catch(err => {
+      return sendResourceStatusToNKC({
+        rid,
+        status: false,
+        error: err.message || err.toString()
+      });
+    })
+    .finally(() => {
+      return Promise.all([
+        tools.deleteFile(thumbnailPath),
+        tools.deleteFile(mediumPath),
+        tools.deleteFile(filePath),
+        tools.deleteFile(cover.path),
+        tools.deleteFile(outputPath),
       ]);
-      })
+    })
 }
 
 //图片打水印
