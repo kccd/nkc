@@ -2,7 +2,7 @@ module.exports = async (ctx, next) => {
   try{
     await next();
   } catch(err) {
-    console.log(err);
+    console.log(err.message);
     ctx.status = err.status || 500;
     ctx.body = {
       status: ctx.status,

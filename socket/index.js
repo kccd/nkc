@@ -6,7 +6,6 @@ const socketConfig = require('../config/socket');
 const redisConfig = require("../config/redis");
 const socketIoRedis = require('socket.io-redis');
 const {init, auth, logger, permission} = require("./middlewares");
-const common = require('./common');
 
 /*module.exports = async (server) => {
   const io = socketIo(server, socketConfig.options);
@@ -46,6 +45,7 @@ module.exports = async (server) => {
   await namespace.use(auth);
   await namespace.use(permission);
   await namespace.use(logger);
+  const common = require('./common');
   await common(namespace);
 
   if(!existed) {

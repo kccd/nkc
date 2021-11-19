@@ -7,18 +7,6 @@ const func = {};
 
 const socketServiceName = communicationConfig.servicesName.socket;
 
-const communicationClient = communication.getCommunicationClient();
-
-communicationClient.onMessage((req) => {
-  const ResourceModel = require('../dataModels/ResourceModel');
-  const {from, content} = req;
-  const {type, data} = content;
-  if(type === 'resourceStatus') {
-    // 接收到来自 media service 有关附件处理状态的消息
-    ResourceModel.updateResourceStatus(data);
-  }
-});
-
 func.sendConsoleMessage = async (data) => {
   const roomName = getRoomName('console');
   const socketClient = await communication.getCommunicationClient();

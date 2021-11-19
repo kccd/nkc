@@ -1,5 +1,4 @@
 const fsPromises = require('fs').promises;
-const Path = require('path');
 const storeConfigs = require('../../config/store');
 const PATH = require("path");
 const fs = require("fs");
@@ -121,7 +120,7 @@ async function getAudioInfo(filePath) {
 * @param {String} targetPath 目标路径
 * */
 async function moveFile(path, targetPath) {
-  const dirname = Path.dirname(targetPath);
+  const dirname = PATH.dirname(targetPath);
   await fsPromises.mkdir(dirname, {recursive: true});
   await fsPromises.copyFile(path, targetPath);
   await deleteFile(path);
@@ -163,7 +162,7 @@ async function accessFile(targetPath) {
 * */
 async function getTargetFilePath(time, path) {
   const diskPath = await getDiskPath(time);
-  return Path.resolve(diskPath, path);
+  return PATH.resolve(diskPath, path);
 }
 
 /*
@@ -274,30 +273,84 @@ async function getFileInfo(filePath) {
   return fileInfo;
 }
 
+async function getFilePathByTime(year, month) {
+  const {attachment} = storeConfigs;
+  const monthStr = month < 10? month + '0': month + '';
+  const yearStr = year + '';
+  const getChildFolder = async (folderPath) => {
+    const arr = [];
+    const folders = await fsPromises.readdir(folderPath);
+    for(const folderName of folders) {
+      const childFolderPath = PATH.resolve(folderPath, `./${folderName}`);
+      const stat = await fsPromises.stat(childFolderPath);
+      if(!stat.isDirectory()) continue;
+      arr.push({
+        name: folderName,
+        path: childFolderPath
+      });
+    }
+    return arr;
+  };
+  const filesPath = [];
+  for(const a of attachment) {
+    const startTime = (new Date(a.startingTime + ' 00:00:00')).getTime();
+    const disk = a.path;
+    const diskPath = PATH.resolve(disk);
+    const mediaTypeTopFolders = await getChildFolder(diskPath);
+    for(const mediaTypeTopFolder of mediaTypeTopFolders) {
+      const {
+        name: mediaTypeTopFolderName,
+        path: mediaTypeTopFolderPath
+      } = mediaTypeTopFolder;
+      const mediaTypeBottomFolders = await getChildFolder(mediaTypeTopFolderPath);
+      for(const mediaTypeBottomFolder of mediaTypeBottomFolders) {
+        const {
+          name: mediaTypeBottomFolderName,
+          path: mediaTypeBottomFolderPath
+        } = mediaTypeBottomFolder;
+        const dateFolderPath = PATH.resolve(mediaTypeBottomFolderPath, `./${yearStr}/${monthStr}`);
+        try{
+          await fsPromises.access(dateFolderPath);
+          const files = await fsPromises.readdir(dateFolderPath);
+          if(files.length === 0) continue;
+          for(const file of files) {
+            const filePath = PATH.resolve(dateFolderPath, file);
+            const stat = await fsPromises.stat(filePath);
+            if(stat.isDirectory()) continue;
+            const ext = PATH.extname(file);
+            if(!ext) continue;
+            filesPath.push(
+              [
+                stat.size,
+                PATH.join(mediaTypeTopFolderName, mediaTypeBottomFolderName, yearStr, monthStr, file),
+                startTime
+              ]
+            );
+          }
+        } catch(err) {}
+      }
+    }
+  }
+  return filesPath;
+}
+
 /*
 * 解析 header range
 * */
 async function parseRange(str, size) {
-  if (str.indexOf(",") !== -1) {
-    return;
-  }
-  if(str.indexOf("=") !== -1){
-    str = str.substr(6, str.length)
+  if(str.includes(',')) return;
+  if(str.includes('=')) {
+    str = str.substr(6, str.length);
   }
   const range = str.split("-");
   let start = parseInt(range[0], 10)
-  let end = parseInt(range[1], 10) || size - 1
-
-  // Case: -100
+  let end = parseInt(range[1], 10) || size - 1;
   if (isNaN(start)) {
     start = size - end;
     end = size - 1;
-    // Case: 100-
   } else if (isNaN(end)) {
     end = size - 1;
   }
-
-  // Invalid
   if (isNaN(start) || isNaN(end) || start > end || end > size) {
     return;
   }
@@ -311,6 +364,7 @@ async function parseRange(str, size) {
 module.exports = {
   moveFile,
   getTargetFilePath,
+  getFilePathByTime,
   getDiskPath,
   accessFile,
   getVideoInfo,
