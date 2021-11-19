@@ -1071,7 +1071,7 @@ resourceSchema.methods.getRemoteFile = async function(size) {
   const {files = {}, toc, ext, rid, prid, mediaType, oname} = this;
   if(prid) {
     const parentResource = await ResourceModel.findOne({rid: prid});
-    if(parentResource) return await parentResource.getFilePath(size);
+    if(parentResource) return await parentResource.getRemoteFile(size);
   }
 
   if(!size) {

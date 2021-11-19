@@ -390,15 +390,15 @@ settingSchema.statics.saveWatermark = async (file, c = 'normal') => {
 * 获取水印图片路径
 * @return {String} 磁盘路径
 * */
-settingSchema.statics.getWatermarkFilePath = (c, type) => {
+settingSchema.statics.getWatermarkFilePath = async (c, type) => {
   if(!['normal', 'small'].includes(c)) throwErr(400, '未知的水印类型');
   if(type === 'picture') {
-    if(!FILE.access(statics[`${c}PictureWatermark`])) {
+    if(!await FILE.access(statics[`${c}PictureWatermark`])) {
       return statics[`${c}Watermark`];
     }
     return statics[`${c}PictureWatermark`];
   } else {
-    if(!FILE.access(statics[`${c}VideoWatermark`])) {
+    if(!await FILE.access(statics[`${c}VideoWatermark`])) {
       return statics[`${c}Watermark`];
     }
     return statics[`${c}VideoWatermark`];
@@ -788,12 +788,11 @@ settingSchema.statics.getWatermarkInfoByUid = async (uid, type) => {
       const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
       text = user.username === ''? `KCID:${user.uid}`:user.username;
     }
-    const watermarkStream = await createWatermark(
+    return await createWatermark(
       imagePath,
       text,
       watermarkSettings.transparency / 100
     );
-    return watermarkStream;
   } else if (type === 'video') {
     const watermarkSettings = await  SettingModel.getWatermarkSettings('video');
     if(!waterAdd || !watermarkSettings.enabled) return null;
@@ -812,13 +811,11 @@ settingSchema.statics.getWatermarkInfoByUid = async (uid, type) => {
       const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
       text = user.username === ''? `KCID:${user.uid}`:user.username;
     }
-    const watermarkStream = await createWatermark(
+    return await createWatermark(
       imagePath,
       text,
       watermarkSettings.transparency / 100
     );
-
-    return watermarkStream;
   }
 }
 /*

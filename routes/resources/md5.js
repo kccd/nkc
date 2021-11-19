@@ -26,13 +26,14 @@ router
       await db.ResourceModel.checkUploadPermission(user, _file);
       // 在此处复制原resource的信息
       const {
-        rid, size, ext, mediaType, files, state, type, hash
+        rid, size, ext, mediaType, files, state, type, hash, originId
       } = resource;
       const newId = await db.SettingModel.operateSystemID('resources', 1);
       const newResource = db.ResourceModel({
         rid: newId,
         prid: rid,
         oname: filename,
+        originId,
         ext,
         size,
         hash,

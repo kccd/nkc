@@ -31,7 +31,7 @@ module.exports = async (props) => {
   //构建视频文件在存储服务中的路径
   const sdFilenamePath = `${rid}_sd.mp4`;
   const hdFilenamePath = `${rid}_hd.mp4`;
-  const fhdFilenamePath = `${rid}_fhd.mp4}`;
+  const fhdFilenamePath = `${rid}_fhd.mp4`;
   const videoCoverFilenamePath = `${rid}_cover.jpg`;
   const sdStorePath = PATH.join(mediaPath, timePath, sdFilenamePath);
   const hdStorePath = PATH.join(mediaPath, timePath, hdFilenamePath);
@@ -39,6 +39,7 @@ module.exports = async (props) => {
   const videoCoverStorePath = PATH.join(mediaPath, timePath, videoCoverFilenamePath);
   //获取原视频尺寸
   const {width: videoWidth, height: videoHeight} = await tools.getFileInfo(filePath);
+  let hasWatermark = false;
   const func = async () => {
     if(videoWidth >= minWidth &&
       videoHeight >= minHeight &&
@@ -77,7 +78,8 @@ module.exports = async (props) => {
             : isReachSD
               ? bitrateSD
               : getBitrateBySize(videoWidth, videoHeight)
-      })
+      });
+      hasWatermark = true;
     } else {
       // 视频转码
       if(['3gp'].indexOf(extension.toLowerCase()) > -1){
@@ -124,20 +126,30 @@ module.exports = async (props) => {
       });
     } else {
       // 原视频大于等于1080，则将其设置为1080并生成720和480的视频
-      const newOutputVideoPath = fhdVideoPath;
-      await fsPromises.rename(outputVideoPath, newOutputVideoPath);
-      const tasks = [
-        await tools.createOtherSizeVideo(newOutputVideoPath, sdVideoPath, {
+      const tasks = [];
+      if(hasWatermark === true) {
+        await fsPromises.copyFile(outputVideoPath, fhdVideoPath);
+      } else {
+        tasks.push(
+          tools.createOtherSizeVideo(outputVideoPath, fhdVideoPath, {
+            height: fhd.height,
+            bitrate: bitrateFHD,
+            fps: fhd.fps
+          })
+        )
+      }
+      tasks.push(
+        tools.createOtherSizeVideo(outputVideoPath, sdVideoPath, {
           height: sd.height,
           bitrate: bitrateSD,
           fps: sd.fps
         }),
-        await tools.createOtherSizeVideo(newOutputVideoPath, hdVideoPath, {
+        tools.createOtherSizeVideo(outputVideoPath, hdVideoPath, {
           height: hd.height,
           bitrate: bitrateHD,
           fps: hd.fps
         })
-      ];
+      );
       await Promise.all(tasks);
     }
     if(await tools.accessFile(sdVideoPath)) {
@@ -208,6 +220,7 @@ module.exports = async (props) => {
         tools.deleteFile(filePath),
         tools.deleteFile(cover.path),
         tools.deleteFile(aviTempPath),
+        tools.deleteFile(outputVideoPath)
       ]);
     })
 }
