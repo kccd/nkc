@@ -724,6 +724,28 @@ settingSchema.statics.getBitrateBySize = async (width, height) => {
   }
   return rate * 1024;
 }
+
+/*
+* 获取视频尺寸信息
+* */
+settingSchema.statics.getVideoSize = async function() {
+  const videoSize = {
+    sd: {
+      height: 480,
+      fps: 30,
+    },
+    hd: {
+      height: 720,
+      fps: 30,
+    },
+    fhd: {
+      height: 1080,
+      fps: 30,
+    }
+  };
+  return videoSize;
+}
+
 /*
 * 获取用户水印图片
 * @param {String} uid

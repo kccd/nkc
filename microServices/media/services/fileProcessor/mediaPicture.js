@@ -79,36 +79,40 @@ module.exports = async (props) => {
     if((width > 640 || size > 102400) && ext !== 'gif') {
       await mediumify(filePath, mediumPath);
     }
-    storeData.push({
-      filePath: outputPath,
-      path: outputStorePath,
-      time,
-    });
 
-    storeData.push({
-      filePath: thumbnailPath,
-      path: smStorePath,
-      time,
-    });
+    if(await tools.accessFile(outputPath)) {
+      storeData.push({
+        filePath: outputPath,
+        path: outputStorePath,
+        time,
+      });
+      const defInfo = await tools.getFileInfo(outputPath);
+      defInfo.name = outputFileName;
+      filesInfo.def = defInfo;
+    }
 
-    storeData.push({
-      filePath: mediumPath,
-      path: mdStorePath,
-      time,
-    });
+    if(await tools.accessFile(thumbnailPath)) {
+      storeData.push({
+        filePath: thumbnailPath,
+        path: smStorePath,
+        time,
+      });
+      const smInfo = await tools.getFileInfo(thumbnailPath);
+      smInfo.name = smFileName;
+      filesInfo.sm = smInfo;
+    }
 
-    const smInfo = await tools.getFileInfo(thumbnailPath);
-    smInfo.name = smFileName;
-    const mdInfo = await tools.getFileInfo(mediumPath);
-    smInfo.name = mdFileName;
-    const defInfo = await tools.getFileInfo(outputPath);
-    defInfo.name = outputFileName;
+    if(await tools.accessFile(mediumPath)) {
+      storeData.push({
+        filePath: mediumPath,
+        path: mdStorePath,
+        time,
+      });
+      const mdInfo = await tools.getFileInfo(mediumPath);
+      mdInfo.name = mdFileName;
+      filesInfo.md = mdInfo;
+    }
 
-    filesInfo.sm = smInfo;
-
-    filesInfo.md = mdInfo;
-
-    filesInfo.def = defInfo;
     await storeClient(storeUrl, storeData);
     await sendResourceStatusToNKC({
       rid,

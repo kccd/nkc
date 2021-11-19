@@ -141,7 +141,7 @@ schema.methods.pushToMediaService = async function(filePath) {
 
 schema.methods.getRemoteFile = async function(size = 'def') {
   const FILE = require('../nkcModules/file');
-  const {_id, toc, type, name, files} = this;
+  const {_id, toc, type, name, files, ext} = this;
   return await FILE.getRemoteFile({
     id: _id,
     ext,

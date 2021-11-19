@@ -12,26 +12,13 @@ module.exports = async (props) => {
     data,
     storeUrl
   } = props;
-  const {waterGravity, mediaPath, timePath, rid, toc, ext, waterAdd, configs, defaultBV, enabled, minWidth, minHeight} = data;
+  const {waterGravity, mediaPath, timePath, videoSize, rid, toc, ext, waterAdd, configs, defaultBV, enabled, minWidth, minHeight} = data;
   const extension = ext;
   const filePath = file.path;//临时目录
+  const aviTempPath = filePath + 'temp.avi';
   const time = (new Date(toc)).getTime();
   const storeData = [];
   const filesInfo = {};//用于存储在数据库的文件类型
-  const videoSize = {
-    sd: {
-      height: 480,
-      fps: 30,
-    },
-    hd: {
-      height: 720,
-      fps: 30,
-    },
-    fhd: {
-      height: 1080,
-      fps: 30,
-    }
-  };
   const {sd, hd, fhd} = videoSize;
   // 各个尺寸视频路径
   const sdVideoPath = filePath + `_sd.mp4`;
@@ -42,9 +29,9 @@ module.exports = async (props) => {
   //输出视频路径
   const outputVideoPath = filePath + `_ffmpeg.mp4`;
   //构建视频文件在存储服务中的路径
-  const sdFilenamePath = `${rid}_sd.${ext}`;
-  const hdFilenamePath = `${rid}_hd.${ext}`;
-  const fhdFilenamePath = `${rid}_fhd.${ext}`;
+  const sdFilenamePath = `${rid}_sd.mp4`;
+  const hdFilenamePath = `${rid}_hd.mp4`;
+  const fhdFilenamePath = `${rid}_fhd.mp4}`;
   const videoCoverFilenamePath = `${rid}_cover.jpg`;
   const sdStorePath = PATH.join(mediaPath, timePath, sdFilenamePath);
   const hdStorePath = PATH.join(mediaPath, timePath, hdFilenamePath);
@@ -52,7 +39,6 @@ module.exports = async (props) => {
   const videoCoverStorePath = PATH.join(mediaPath, timePath, videoCoverFilenamePath);
   //获取原视频尺寸
   const {width: videoWidth, height: videoHeight} = await tools.getFileInfo(filePath);
-
   const func = async () => {
     if(videoWidth >= minWidth &&
       videoHeight >= minHeight &&
@@ -101,8 +87,8 @@ module.exports = async (props) => {
       }else if(['mov'].indexOf(extension.toLowerCase()) > -1) {
         await videoMOVTransMP4(filePath, outputVideoPath);
       }else if(['avi'].indexOf(extension.toLowerCase()) > -1) {
-        await videoAviTransAvi(filePath, filePath);
-        await videoAVITransMP4(filePath, outputVideoPath);
+        await videoAviTransAvi(filePath, aviTempPath);
+        await videoAVITransMP4(aviTempPath, outputVideoPath);
       } else if(['webm'].includes(extension.toLowerCase())) {
         await videoWEBMTransMP4(filePath, outputVideoPath);
       } else {
@@ -154,46 +140,48 @@ module.exports = async (props) => {
       ];
       await Promise.all(tasks);
     }
+    if(await tools.accessFile(sdVideoPath)) {
+      storeData.push({
+        filePath: sdVideoPath,
+        path: sdStorePath,
+        time,
+      });
+      const sdInfo = await tools.getFileInfo(sdVideoPath);
+      sdInfo.name = sdFilenamePath;
+      filesInfo.sd = sdInfo;
+    }
 
-    storeData.push({
-      filePath: sdVideoPath,
-      path: sdStorePath,
-      time,
-    });
-
-    storeData.push({
-      filePath: hdVideoPath,
-      path: hdStorePath,
-      time,
-    });
-
-    storeData.push({
-      filePath: fhdVideoPath,
-      path: fhdStorePath,
-      time,
-    });
-
-    storeData.push({
-      filePath: videoCoverPath,
-      path: videoCoverStorePath,
-      time
-    });
-
+    if(await tools.accessFile(hdVideoPath)) {
+      storeData.push({
+        filePath: hdVideoPath,
+        path: hdStorePath,
+        time,
+      });
+      const hdInfo = await tools.getFileInfo(hdVideoPath);
+      hdInfo.name = hdFilenamePath;
+      filesInfo.hd = hdInfo;
+    }
+    if(await tools.accessFile(fhdVideoPath)) {
+      storeData.push({
+        filePath: fhdVideoPath,
+        path: fhdStorePath,
+        time,
+      });
+      const fhdInfo = await tools.getFileInfo(fhdVideoPath);
+      fhdInfo.name = fhdFilenamePath;
+      filesInfo.fhd = fhdInfo;
+    }
+    if(await tools.accessFile(videoCoverPath)) {
+      storeData.push({
+        filePath: videoCoverPath,
+        path: videoCoverStorePath,
+        time
+      });
+      const coverInfo = await tools.getFileInfo(videoCoverPath);
+      coverInfo.name = videoCoverFilenamePath;
+      filesInfo.cover = coverInfo;
+    }
     await tools.storeClient(storeUrl, storeData);
-
-    const sdInfo = await tools.getFileInfo(sdVideoPath);
-    sdInfo.name = sdFilenamePath;
-    const hdInfo = await tools.getFileInfo(hdVideoPath);
-    hdInfo.name = hdFilenamePath;
-    const fhdInfo = await tools.getFileInfo(fhdVideoPath);
-    fhdInfo.name = fhdFilenamePath;
-    const coverInfo = await tools.getFileInfo(videoCoverPath);
-    coverInfo.name = videoCoverFilenamePath;
-
-    filesInfo.sd = sdInfo;
-    filesInfo.hd = hdInfo;
-    filesInfo.fhd = fhdInfo;
-    filesInfo.cover = coverInfo;
 
     await sendResourceStatusToNKC({
       rid,
@@ -204,6 +192,7 @@ module.exports = async (props) => {
 
   func()
     .catch((err) => {
+      console.log(err);
       return sendResourceStatusToNKC({
         rid,
         status: false,
@@ -218,6 +207,7 @@ module.exports = async (props) => {
         tools.deleteFile(videoCoverPath),
         tools.deleteFile(filePath),
         tools.deleteFile(cover.path),
+        tools.deleteFile(aviTempPath),
       ]);
     })
 }

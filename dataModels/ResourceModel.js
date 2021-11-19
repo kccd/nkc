@@ -928,9 +928,11 @@ resourceSchema.methods.getMediaServiceDataVideo = async function() {
   const FILE = require('../nkcModules/file');
   const timePath = await FILE.getTimePath(toc);
   const mediaPath = await FILE.getMediaPath(mediaType);
+  const videoSize = await SettingModel.getVideoSize();
   const {video, waterAdd} = waterSetting.waterSetting;
   const watermarkSettings = await  SettingModel.getWatermarkSettings('video');
   return {
+    videoSize,
     minWidth: watermarkSettings.minWidth,
     minHeight: watermarkSettings.minHeight,
     enabled: watermarkSettings.enabled,
