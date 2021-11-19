@@ -844,13 +844,13 @@ resourceSchema.methods.pushToMediaService = async function(filePath) {
   const storeServiceUrl = await FILE.getStoreUrl(toc);
   const mediaServiceUrl = await socket.getMediaServiceUrl();
   let data = await this.getMediaServiceData(filePath);
-  let cover;
+  let coverPath;
   //获取水印信息
   if(data.waterAdd) {
-    cover = await SettingModel.getWatermarkInfoByUid(uid, data.waterType);
+    coverPath = await SettingModel.getWatermarkInfoByUid(uid, data.waterType);
   }
   await mediaClient(mediaServiceUrl, {
-    cover: cover,
+    coverPath,
     type: mediaType,
     filePath,
     storeUrl: storeServiceUrl,

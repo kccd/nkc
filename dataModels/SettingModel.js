@@ -7,6 +7,8 @@ const FILE = require("../nkcModules/file");
 const PATH = require("path");
 const fs = require("fs");
 const statics = require("../settings/statics");
+const onFinished = require("on-finished");
+const destroy = require("destroy");
 const fsPromise = fs.promises;
 
 const settingSchema = new Schema({
@@ -761,62 +763,37 @@ settingSchema.statics.getVideoSize = async function() {
 * @author pengxiguaa 2021-01-22
 * */
 settingSchema.statics.getWatermarkInfoByUid = async (uid, type) => {
-  const createWatermark = require('../nkcModules/createWatermark')
   const SettingModel = mongoose.model('settings');
   const ColumnsModel = mongoose.model('columns');
   const UserModel = mongoose.model('users');
   const UsersGeneralModel = mongoose.model('usersGeneral');
+  if(!['picture', 'video'].includes(type)) throwErr(500, `watermark type error`);
   const waterSetting = await UsersGeneralModel.findOnly({uid: uid}, {waterSetting: 1});
   const {
-    picture, waterAdd, video
+    waterAdd
   } = waterSetting.waterSetting;
-  if(type === 'picture') {
-    const watermarkSettings = await  SettingModel.getWatermarkSettings('picture');
-    if(!waterAdd || !watermarkSettings.enabled) return null;
-    let imagePath = '', text = '';
-    if(picture.waterStyle === 'siteLogo') {
-      imagePath = await SettingModel.getWatermarkFilePath('normal', 'picture');
-    } else if(picture.waterStyle === 'singleLogo') {
-      imagePath = await SettingModel.getWatermarkFilePath('small', 'picture');
-    } else if (picture.waterStyle === 'coluLogo') {
-      imagePath = await SettingModel.getWatermarkFilePath('small', 'picture');
-      const column = await ColumnsModel.findOne({uid: uid}, {name: 1, uid: 1})
-      const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
-      text = column.name === ''? user.username:column.name;
-    } else {
-      imagePath = await SettingModel.getWatermarkFilePath('small', 'picture');
-      const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
-      text = user.username === ''? `KCID:${user.uid}`:user.username;
-    }
-    return await createWatermark(
-      imagePath,
-      text,
-      watermarkSettings.transparency / 100
-    );
-  } else if (type === 'video') {
-    const watermarkSettings = await  SettingModel.getWatermarkSettings('video');
-    if(!waterAdd || !watermarkSettings.enabled) return null;
-    let imagePath = '', text = '';
-    if(video.waterStyle === 'siteLogo') {
-      imagePath = await SettingModel.getWatermarkFilePath('normal', 'video');
-    } else if(video.waterStyle === 'singleLogo') {
-      imagePath = await SettingModel.getWatermarkFilePath('small', 'video');
-    } else if (picture.waterStyle === 'coluLogo') {
-      imagePath = await SettingModel.getWatermarkFilePath('small', 'picture');
-      const column = await ColumnsModel.findOne({uid: uid}, {name: 1, uid: 1})
-      const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
-      text = column.name === ''? user.username:column.name;
-    } else {
-      imagePath = await SettingModel.getWatermarkFilePath('small', 'video');
-      const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
-      text = user.username === ''? `KCID:${user.uid}`:user.username;
-    }
-    return await createWatermark(
-      imagePath,
-      text,
-      watermarkSettings.transparency / 100
-    );
+  const watermarkSettings = await  SettingModel.getWatermarkSettings(type);
+  if(!waterAdd || !watermarkSettings.enabled) return null;
+  let imagePath = '', text = '';
+  if(waterSetting.waterSetting[type].waterStyle === 'siteLogo') {
+    imagePath = await SettingModel.getWatermarkFilePath('normal', type);
+  } else if(waterSetting.waterSetting[type].waterStyle === 'singleLogo') {
+    imagePath = await SettingModel.getWatermarkFilePath('small', type);
+  } else if (waterSetting.waterSetting[type].waterStyle === 'coluLogo') {
+    imagePath = await SettingModel.getWatermarkFilePath('small', type);
+    const column = await ColumnsModel.findOne({uid: uid}, {name: 1, uid: 1})
+    const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
+    text = column.name === ''? user.username:column.name;
+  } else {
+    imagePath = await SettingModel.getWatermarkFilePath('small', type);
+    const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
+    text = user.username === ''? `KCID:${user.uid}`:user.username;
   }
+  return await SettingModel.getWatermarkPath(
+    imagePath,
+    text,
+    watermarkSettings.transparency / 100
+  );
 }
 
 settingSchema.statics.getWatermarkPath = async (magePath, text = '', transparent = 1) => {
@@ -831,15 +808,26 @@ settingSchema.statics.getWatermarkPath = async (magePath, text = '', transparent
   }
   const watermarkStream = await createWatermark(magePath, text, transparent);
   const file = fs.createWriteStream(watermarkPath);
-  return new Promise((resolve, reject) => {
-    const func = () => {
-      resolve(watermarkPath);
-    };
-    file.on('end', func);
-    file.on('finish', func);
-    file.on('error', reject);
-    watermarkStream.pipe(file);
-  });
+  const func = () => {
+    return new Promise((resolve, reject) => {
+      file.on('end', () => {
+        resolve(watermarkPath);
+      });
+      file.on('error', err => {
+        reject(err);
+      })
+      /*onFinished(file, (err) => {
+        if(err) {
+          reject(err);
+        } else {
+          resolve(watermarkPath);
+        }
+        destroy(file);
+      });*/
+      watermarkStream.pipe(file);
+    });
+  };
+  return await func();
 }
 
 /*

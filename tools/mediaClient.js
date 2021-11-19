@@ -14,7 +14,7 @@ module.exports = async (url, props) => {
   const {
     type,
     filePath,
-    cover,
+    coverPath,
     storeUrl,
     data
   } = props;
@@ -26,8 +26,8 @@ module.exports = async (url, props) => {
     throw new Error(`mediaClient: path 不能为空`);
   }
   formData.append('file', fs.createReadStream(filePath));
-  if(cover) {
-    formData.append('cover', cover, 'cover.png');
+  if(coverPath) {
+    formData.append('cover', fs.createReadStream(coverPath), 'cover.png');
   }
   formData.append('type', type);
   formData.append('storeUrl', storeUrl);
