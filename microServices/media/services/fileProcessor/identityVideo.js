@@ -4,7 +4,6 @@ const {
   getFileInfo,
   storeClient,
   deleteFile,
-  replaceFileExtension,
 } = require('../../tools');
 module.exports = async (props) => {
   const {
@@ -12,7 +11,7 @@ module.exports = async (props) => {
     data,
     storeUrl
   } = props;
-  const {mediaPath, timePath, vid, toc, disposition} = data;
+  const {mediaPath, timePath, vid, toc} = data;
   const filePath = file.path;
   const ext = 'mp4';
   const targetFilePath = file.path + `.temp.${ext}`;
@@ -25,18 +24,10 @@ module.exports = async (props) => {
     path,
     time
   });
-  const {size, hash, width, height, duration} = await getFileInfo(targetFilePath);
+  const fileInfo = await getFileInfo(targetFilePath);
+  fileInfo.name = filenamePath;
   const filesInfo = {
-    def: {
-      ext,
-      size,
-      hash,
-      height,
-      width,
-      duration,
-      filename: filenamePath,
-      disposition: await replaceFileExtension(disposition, ext),
-    }
+    def: fileInfo
   };
   await deleteFile(filePath);
   await deleteFile(targetFilePath);

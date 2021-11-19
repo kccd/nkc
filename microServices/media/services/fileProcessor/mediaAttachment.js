@@ -24,7 +24,7 @@ module.exports = async (props) => {
     storeUrl
   } = props;
 
-  const {mediaPath, timePath, rid, ext, toc, disposition} = data;
+  const {mediaPath, timePath, rid, ext, toc} = data;
   const filePath = file.path; // 文件被推送到 media service 后的临时存储目录
   const filenamePath = `${rid}.${ext}`; // 文件在 store service 磁盘上的文件名
   const path = PATH.join(mediaPath, timePath, filenamePath); // 文件在 store service 磁盘上的路径
@@ -94,14 +94,8 @@ module.exports = async (props) => {
             return getFileInfo(pdfTargetFilePath);
           })
           .then(pdfFileInfo => {
-            const {size, ext, hash} = pdfFileInfo;
-            filesInfo.preview = {
-              ext,
-              size,
-              hash,
-              disposition,
-              filename: previewFilenamePath
-            };
+            pdfFileInfo.name = previewFilenamePath;
+            filesInfo.preview = pdfFileInfo;
           })
           .catch(console.error);
       }
@@ -115,14 +109,8 @@ module.exports = async (props) => {
       return getFileInfo(filePath);
     })
     .then(fileInfo => {
-      const {size, ext, hash} = fileInfo;
-      filesInfo.def = {
-        ext,
-        size,
-        hash,
-        disposition,
-        filename: filenamePath
-      };
+      fileInfo.name = filenamePath;
+      filesInfo.def = fileInfo;
     })
     .then(() => {
       // 发送文件处理的状态

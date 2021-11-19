@@ -122,23 +122,34 @@ async function getFileInfo(filePath) {
     mtime,
   };
 
+  let height = 0;
+  let width = 0;
+  let duration = 0;
+
   if(imageExtensions.includes(ext)) {
-    const {height, width} = await getImageInfo(filePath);
-    fileInfo.height = height;
-    fileInfo.width = width;
+    try{
+      const imageInfo = await getImageInfo(filePath);
+      height = imageInfo.height;
+      width = imageInfo.width;
+    } catch(err) {}
   } else if(videoExtensions.includes(ext)) {
-    const {
-      height,
-      width,
-      duration
-    } = await getVideoInfo(filePath);
-    fileInfo.height = height;
-    fileInfo.width = width;
-    fileInfo.duration = duration;
+    try{
+      const videoInfo = await getVideoInfo(filePath);
+      height = videoInfo.height;
+      width = videoInfo.width;
+      duration = videoInfo.duration;
+    } catch(err) {}
   } else if(audioExtensions.includes(ext)) {
-    const {duration} = await getAudioInfo(filePath);
-    fileInfo.duration = duration;
+    try {
+      const audioInfo = await getAudioInfo(filePath);
+      duration = audioInfo.duration;
+    } catch(err) {}
   }
+
+  fileInfo.height = height;
+  fileInfo.width = width;
+  fileInfo.duration = duration;
+
   return fileInfo;
 }
 

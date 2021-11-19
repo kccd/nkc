@@ -1,5 +1,4 @@
 const mongoose = require('../settings/database');
-const PATH = require('path');
 const Schema = mongoose.Schema;
 const messageFileSchema = new Schema({
   _id: Number,
@@ -74,6 +73,13 @@ const messageFileSchema = new Schema({
   collection: 'messageFiles'
 });
 
+messageFileSchema.virtual('defaultFile')
+  .get(function() {
+    return this._defaultFile;
+  })
+  .set(function(val) {
+    return this._defaultFile = val
+  });
 
 /*
 * 根据格式判断文件类型
@@ -168,29 +174,70 @@ messageFileSchema.methods.pushToMediaService = async function(filePath) {
   return res.files;
 }
 
-messageFileSchema.methods.getRemoteFile = async function(size) {
+messageFileSchema.methods.getRemoteFile = async function(size = 'def') {
   const FILE = require('../nkcModules/file');
-  const {_id, toc, type, oname, files} = this;
+  const {_id, ext, toc, type, oname, files = {}} = this;
   const MessageFileModel = mongoose.model('messageFiles');
   const folderType = await MessageFileModel.getFolderTypeByType(type);
-  const storeUrl = await FILE.getStoreUrl(toc);
-  const mediaPath = await FILE.getMediaPath(folderType);
-  const timePath = await FILE.getTimePath(toc);
-  const defaultSizeFile = files['def'];
-  let targetSizeFile = files[size];
-  if(!targetSizeFile || targetSizeFile.lost || !targetSizeFile.filename) {
-    targetSizeFile = defaultSizeFile;
-  }
-  if(!targetSizeFile || targetSizeFile.lost || !targetSizeFile.filename) {
-    throw new Error(`message file 数据错误 mfId: ${_id}`);
-  }
-  const filenamePath = targetSizeFile.filename;
-  const path = PATH.join(mediaPath, timePath, filenamePath);
-  const time = (new Date(toc)).getTime();
-  return {
-    url: await FILE.createStoreQueryUrl(storeUrl, time, path),
-    filename: targetSizeFile.disposition || oname
-  }
+  return await FILE.getRemoteFile({
+    id: _id,
+    toc,
+    ext,
+    type: folderType,
+    name: oname,
+    file: files[size] || files['def']
+  });
 };
+
+messageFileSchema.methods.updateFilesInfo = async function() {
+  const FILE = require('../nkcModules/file');
+  const {toc, type, _id, ext} = this;
+  let filenames;
+  if(type === 'image') {
+    filenames = {
+      def: `${_id}.${ext}`,
+      sm: `${_id}_sm.${ext}`
+    };
+  } else if(type === 'audio') {
+    filenames = {
+      def: `${_id}.mp3`
+    };
+  } else if(type === 'voice') {
+    filenames = {
+      def: `${_id}.mp3`
+    };
+  } else if(type === 'video') {
+    filenames = {
+      def: `${_id}.mp4`,
+      cover: `${_id}_cover.jpg`
+    };
+  } else {
+    filenames = {
+      def: `${_id}.${ext}`
+    }
+  }
+  const MessageFileModel = mongoose.model('messageFiles');
+  const folderType = await MessageFileModel.getFolderTypeByType(type);
+  const files = await FILE.getStoreFilesInfoObj(toc, folderType, filenames);
+  await this.updateOne({
+    $set: {
+      files
+    }
+  });
+};
+
+messageFileSchema.methods.extendDefaultFile = function() {
+  const FILE = require('../nkcModules/file');
+  const {duration, ext, size, oname: name, files = {}} = this;
+  let defaultFile = {
+    ext,
+    size,
+    name,
+    duration
+  };
+  defaultFile = files.def || defaultFile;
+  defaultFile.name = FILE.replaceFileExtension(name, defaultFile.ext);
+  return this.defaultFile = defaultFile;
+}
 
 module.exports = mongoose.model('messageFiles', messageFileSchema);

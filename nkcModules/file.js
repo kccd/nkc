@@ -161,19 +161,22 @@ function replaceFileExtension(filename, newExtension) {
   return filename;
 }
 
-async function getStoreFilesInfo(toc, folderType, filenames) {
-  const storeUrl = await getStoreUrl(toc) + '/info';
-  const mediaPath = await getMediaPath(folderType);
-  const time = (new Date(toc)).getTime();
-  const timePath = await getTimePath(toc);
-  const files = {};
-  for(const f of filenames) {
-    const {type, filename} = f;
-    files[type] = {
-      time,
-      path: PATH.join(mediaPath, timePath, filename)
-    };
-  }
+/*
+* 从 store service 获取附件信息
+* @param {String} storeUrl store service 链接
+* @param {[Object]} files
+*   @param {String} type 自定义属性
+*   @param {Number} time 文件上传时间
+*   @param {String} path 文件在 store service 上的相对目录
+* @return {[Object]}
+*   @param {String} type 自定义属性
+*   @param {Number} time 文件上传时间
+*   @param {String} path 文件在 store service 上的相对目录
+*
+*   @param {Boolean} lost 文件是否丢失
+*   @param {Object} info 文件信息 来自 store service tools.getFileInfo
+* */
+async function getStoreFilesInfo(storeUrl, files) {
   return new Promise((resolve, reject) => {
     axios({
       url: storeUrl,
@@ -191,6 +194,96 @@ async function getStoreFilesInfo(toc, folderType, filenames) {
   });
 }
 
+/*
+* 过滤 files 对象上的字段
+* resource attachment verifiedUpload messageFile 适用
+* */
+function filterFilesInfo(files) {
+  const newFiles = {};
+  for(const type in files) {
+    const {
+      name,
+      ext,
+      hash,
+      size,
+      mtime,
+      height,
+      width,
+      duration
+    } = files[type];
+    newFiles[type] = {
+      name,
+      ext,
+      hash,
+      size,
+      mtime,
+      height,
+      width,
+      duration
+    }
+  }
+  return newFiles;
+}
+
+/*
+* 获取 store service 上的文件信息
+* @param {Date} 文件上传时间
+* @param {String} folderType 文件夹类型
+* @param {Object} filenames 键为文件类型，值为 store service 上的文件名
+* */
+async function getStoreFilesInfoObj(toc, folderType, filenames) {
+  const storeUrl = await getStoreUrl(toc) + '/info';
+  const mediaPath = await getMediaPath(folderType);
+  const time = (new Date(toc)).getTime();
+  const timePath = await getTimePath(toc);
+  const files = [];
+  for(const type in filenames) {
+    const filename = filenames[type];
+    files.push({
+      type,
+      time,
+      path: PATH.join(mediaPath, timePath, filename)
+    });
+  }
+  const res = await getStoreFilesInfo(storeUrl, files);
+  const filesObj = {};
+  for(const file of res.files) {
+    const {lost, info, type} = file;
+    if(lost) continue;
+    filesObj[type] = info;
+  }
+  return filterFilesInfo(filesObj);
+}
+
+async function getRemoteFile(props) {
+  const {
+    id,
+    toc,
+    type,
+    ext,
+    name,
+    file
+  } = props;
+  const storeUrl = await getStoreUrl(toc);
+  const mediaPath = await getMediaPath(type);
+  const timePath = await getTimePath(toc);
+  const time = (new Date(toc)).getTime();
+  const defaultFile = {
+    ext,
+    name: `${id}.${ext}`
+  };
+  const targetFile = file || defaultFile;
+  targetFile.name = targetFile.name || defaultFile.name;
+  const filename = replaceFileExtension(name, targetFile.ext);
+  const path = PATH.join(mediaPath, timePath, targetFile.name);
+  const storeQueryUrl = await createStoreQueryUrl(storeUrl, time, path);
+  return {
+    url: storeQueryUrl,
+    filename,
+    info: file
+  }
+}
+
 module.exports = {
   videoExtensions,
   pictureExtensions,
@@ -199,10 +292,13 @@ module.exports = {
   getStoreUrl,
   getMediaPath,
   getTimePath,
+  getStoreFilesInfoObj,
   getFileExtension,
   getFileSizeByFilePath,
   getFileObjectByFilePath,
   access,
+  getRemoteFile,
+  filterFilesInfo,
   createStoreQueryUrl,
   getStoreFilesInfo,
   replaceFileExtension,

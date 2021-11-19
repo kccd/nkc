@@ -18,9 +18,8 @@ module.exports = async (props) => {
     data,
     storeUrl
   } = props;
-  const {waterGravity, mediaPath, timePath, rid, toc, disposition} = data;
+  const {waterGravity, mediaPath, originPath, originId, timePath, rid, toc, disposition, waterAdd, enabled, minWidth, minHeight} = data;
   const filePath = file.path;//临时目录
-  const targetFilePath = filePath + `.temp.jpg`;
   const time = (new Date(toc)).getTime();
 
 
@@ -28,116 +27,112 @@ module.exports = async (props) => {
   await tools.imageAutoOrient(filePath);
   //获取文件所在目录
   //获取图片尺寸
-  const {width, size, ext, hash} = await tools.getFileInfo(filePath);
-  const filenamePath = `${rid}.${ext}`;
-  const filesInfo = {
-    def: {
-      ext,
-      size,
-      hash,
-      disposition,
-      filename: filenamePath
-    }
-  };//用于存储在数据库的文件类型
-  const path = PATH.join(mediaPath, timePath, filenamePath);
+  const {width, size, ext, hash, height} = await tools.getFileInfo(filePath);
+  const filenamePath = `${originId}.${ext}`;
+  const filesInfo = {};//用于存储在数据库的文件类型
+  //构建原图存储地址
+  const path = PATH.join(originPath, timePath, filenamePath);
   const storeData = [{
     filePath: filePath,
     path,
     time,
   }];
-  if(ext !== 'gif') {
-    //缩略图
-    let thumbnailPath = filePath + `_sm.${ext}`;
-    //中图
-    let  mediumPath = filePath + `_md.${ext}`;
-    //保存水印输出图
-    const output = filePath + `_ffmpeg.${ext}`;
-    //小图在存储服务中的 路径
-    const smStorePath = PATH.join(mediaPath, timePath, `${rid}_sm.${ext}`);
-    //中图在存储服务中的路径
-    const mdStorePath = PATH.join(mediaPath, timePath, `${rid}_md.${ext}`);
+  //缩略图
+  let thumbnailPath = filePath + `_sm.${ext}`;
+  //中图
+  let  mediumPath = filePath + `_md.${ext}`;
+  //保存水印输出图
+  let outputPath = filePath + `_ffmpeg.${ext}`;
+  //小图名
+  const smFileName = `${rid}_sm.${ext}`;
+  //中图名
+  const mdFileName = `${rid}_md.${ext}`;
+  //大图名
+  const outputFileName = `${rid}.${ext}`;
+  //小图在存储服务中的 路径
+  const smStorePath = PATH.join(mediaPath, timePath, smFileName);
+  //中图在存储服务中的路径
+  const mdStorePath = PATH.join(mediaPath, timePath, mdFileName);
+  //水印大图在存储服务中的路径
+  const outputStorePath = PATH.join(mediaPath, timePath, outputFileName);
 
-    //如果图片的尺寸达到限定值将图片压缩
-    if(size > 500000 || width > 1920) {
-      await imageNarrow(filePath);
+  //如果图片的尺寸达到限定值将图片压缩
+  if(size > 500000 || width > 1920) {
+    await imageNarrow(filePath);
+  }
+  const func = async () => {
+    if(width >= minWidth &&
+      height >= minHeight
+      && waterAdd && enabled) {
+      if(ext !== 'gif') {
+        //原图打水印保存
+        await saveffmpeg(filePath, cover, waterGravity, outputPath)
+      }
+    } else {
+      outputPath = filePath;
     }
-    Promise.resolve()
-      .then(() => {
-        //保存小图和大图并打水印
-        return saveffmpeg(filePath, cover, waterGravity, output, thumbnailPath, mediumPath, width, size)
-          .then(() => {
-            storeData.push({
-              filePath: thumbnailPath,
-              path: smStorePath,
-              time,
-            })
-          })
-          .then((() => {
-            storeData.push({
-              filePath: mediumPath,
-              path: mdStorePath,
-              time,
-            })
-          }))
-          .then(() => {
-            const smInfo = tools.getFileInfo(thumbnailPath);
-            const mdInfo = tools.getFileInfo(mediumPath);
-            filesInfo.sm = {
-              ext: smInfo.ext,
-              size: smInfo.size,
-              hash: smInfo.hash,
-              disposition,
-              filename: smStorePath
-            };
-            filesInfo.md = {
-              ext: mdInfo.ext,
-              size: mdInfo.size,
-              hash: mdInfo.hash,
-              disposition,
-              filename: mdStorePath
-            }
-          })
-      })
-      .then(() => {
-        //将图片推送到存储服务
-        return storeClient(storeUrl, storeData);
-      })
-      .then(() => {
-        // 发送文件处理的状态
-        return sendResourceStatusToNKC({
-          rid,
-          status: true,
-          filesInfo
-        });
-      })
+    if((width > 150 || size > 51200) && ext !== 'gif') {
+      //保存缩略图
+      await thumbnailify(filePath, thumbnailPath)
+    }
+    // 保存中号图
+    if((width > 640 || size > 102400) && ext !== 'gif') {
+      await mediumify(filePath, mediumPath);
+    }
+    storeData.push({
+      filePath: outputPath,
+      path: outputStorePath,
+      time,
+    });
+
+    storeData.push({
+      filePath: thumbnailPath,
+      path: smStorePath,
+      time,
+    });
+
+    storeData.push({
+      filePath: mediumPath,
+      path: mdStorePath,
+      time,
+    });
+
+    const smInfo = await tools.getFileInfo(thumbnailPath);
+    smInfo.name = smFileName;
+    const mdInfo = await tools.getFileInfo(mediumPath);
+    smInfo.name = mdFileName;
+    const defInfo = await tools.getFileInfo(outputPath);
+    defInfo.name = outputFileName;
+
+    filesInfo.sm = smInfo;
+
+    filesInfo.md = mdInfo;
+
+    filesInfo.def = defInfo;
+    await storeClient(storeUrl, storeData);
+    await sendResourceStatusToNKC({
+      rid,
+      status: true,
+      filesInfo
+    });
+  }
+    func()
       .catch(err => {
-        console.log(err);
         return sendResourceStatusToNKC({
           rid,
           status: false,
           error: err.message || err.toString()
         });
       })
-      .then(() => {
-        return deleteFile(thumbnailPath);
+      .finally(() => {
+        return Promise.all([
+          tools.deleteFile(thumbnailPath),
+          tools.deleteFile(mediumPath),
+          tools.deleteFile(filePath),
+          tools.deleteFile(cover.path),
+          tools.deleteFile(outputPath),
+      ]);
       })
-      .then(() => {
-        return deleteFile(mediumPath);
-      })
-      .then(() => {
-        return deleteFile(filePath);
-      })
-      .then(() => {
-        return deleteFile(cover.path);
-      })
-      .then(() => {
-        return deleteFile(output);
-        console.log(storeData, filesInfo);
-      })
-      .catch(err => {
-        console.log(err);
-      })
-  }
 }
 
 //图片打水印
@@ -161,31 +156,28 @@ async function ffmpegWaterMark(filePath, cover, waterGravity, output){
     });
 }
 
+//保存缩略图
+function thumbnailify(output, thumbnailPath){
+  if(linux) {
+    return spawnProcess('convert', [output, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', thumbnailPath]);
+  } else {
+    return spawnProcess('magick', ['convert', output, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', thumbnailPath]);
+  }
+}
+
+//保存中号图
+function mediumify(output, mediumPath){
+  if(linux) {
+    return spawnProcess('convert', [output, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', mediumPath]);
+  } else {
+    return spawnProcess('magick', ['convert', output, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', mediumPath]);
+  }
+}
+
 
 //保存缩略图
-function saveffmpeg (filePath, cover, waterGravity, output, thumbnailPath, mediumPath, width, size) {
+function saveffmpeg (filePath, cover, waterGravity, output) {
   return ffmpegWaterMark(filePath, cover, waterGravity, output)
-    .then(() => {
-      if(width > 150 || size > 51200){
-        //保存缩略图
-        if(linux) {
-          return spawnProcess('convert', [output, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', thumbnailPath]);
-        } else {
-          return spawnProcess('magick', ['convert', output, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', thumbnailPath]);
-        }
-      }
-      // return getFileInfo(targetFilePath);
-    })
-    .then(() => {
-      if (width > 640 || size > 102400) {
-        //保存中图
-        if(linux) {
-          return spawnProcess('convert', [output, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', mediumPath]);
-        } else {
-          return spawnProcess('magick', ['convert', output, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', mediumPath]);
-        }
-      }
-    })
     .catch((err) => {
       console.log(err);
     });

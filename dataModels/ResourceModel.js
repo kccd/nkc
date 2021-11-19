@@ -5,7 +5,6 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const PATH = require('path');
 const fs = require("fs");
-const FILE = require('../nkcModules/file')
 const fsPromises = fs.promises;
 const resourceSchema = new Schema({
 	rid: {
@@ -153,14 +152,13 @@ const resourceSchema = new Schema({
     /*
     {
       ext: String,
-      lost: String, // 是否已丢失
       hash: String, // 文件 md5
       size: Number, // 文件大小
       height: Number, // 图片、视频高
       width: Number,  // 图片、视频宽
-      filename: String, // 在存储服务磁盘上的文件名
-      disposition: String, // 下载时的文件名
+      name: String, // 在存储服务磁盘上的文件名
       duration: Number, // 音视频时间 秒
+      mtime: Date, // 最后修改时间
     }
     */
   },
@@ -171,7 +169,13 @@ const resourceSchema = new Schema({
     virtuals: true
   }
 });
-
+resourceSchema.virtual('defaultFile')
+  .get(function() {
+    return this._defaultFile;
+  })
+  .set(function(val) {
+    return this._defaultFile = val
+  });
 resourceSchema.virtual('metadata')
   .get(function() {
     return this._metadata;
@@ -223,62 +227,74 @@ resourceSchema.virtual('token')
 /*
  * 文件是否存在
  */
-resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['mediaPicture']) {
-  if(excludedMediaTypes.includes(this.mediaType)) return;
+resourceSchema.methods.setFileExist = async function(excludedMediaTypes = []) {
+  const {files = {}, mediaType} = this;
+  if(excludedMediaTypes.includes(mediaType)) return;
   const SettingModel = mongoose.model('settings');
   const {getSize} = require('../nkcModules/tools');
-  const {visitorAccess} = await SettingModel.getSettings('download');
-  this.visitorAccess = visitorAccess[this.mediaType];
+  const FILE = require('../nkcModules/file');
 
-  // 拓展预览token
+
+  // 判断游客是否允许访问指定类型的资源
+  if(['mediaVideo', 'mediaAudio', 'mediaAttachment'].includes(this.mediaType)) {
+    const {visitorAccess} = await SettingModel.getSettings('download');
+    this.visitorAccess = visitorAccess[this.mediaType];
+  }
+
+  // 拓展预览音视频的 token
   if(['mediaVideo', 'mediaAudio'].includes(this.mediaType)) {
     await this.extendToken();
   }
+
+  let defaultFile = {
+    size: this.size,
+    ext: this.ext,
+    name: this.oname,
+    height: this.height,
+    width: this.width
+  };
+
   if(this.mediaType === 'mediaVideo') {
     const videoSettings = require('../settings/video');
     const sdSize = 'sd';
     const hdSize = 'hd';
     const fhdSize = 'fhd';
-    const sdVideoPath = await this.getFilePath(sdSize);
-    const hdVideoPath = await this.getFilePath(hdSize);
-    const fhdVideoPath = await this.getFilePath(fhdSize);
+    const sdFile = files[sdSize];
+    const hdFile = files[hdSize];
+    const fhdFile = files[fhdSize];
     const videoSize = [];
-    try{
-      const {size} = await fsPromises.stat(sdVideoPath);
+    if(sdFile) {
       videoSize.push({
         size: sdSize,
-        dataSize: getSize(size, 1),
+        dataSize: getSize(sdFile.size, 1),
         height: videoSettings[sdSize].height
       });
-    } catch(err) {}
-    try{
-      const {size} = await fsPromises.stat(hdVideoPath);
+    }
+    if(hdFile) {
       videoSize.push({
         size: hdSize,
-        dataSize: getSize(size, 1),
+        dataSize: getSize(hdFile.size, 1),
         height: videoSettings[hdSize].height
       });
-    } catch(err) {}
-    try{
-      const {size} = await fsPromises.stat(fhdVideoPath);
+    }
+    if(fhdFile) {
       videoSize.push({
         size: fhdSize,
-        dataSize: getSize(size, 1),
+        dataSize: getSize(fhdFile.size, 1),
         height: videoSettings[fhdSize].height
       });
-    } catch(err) {}
+    }
+    defaultFile = sdFile || hdFile || fhdFile || defaultFile;
     this.isFileExist = videoSize.length !== 0;
     this.videoSize = videoSize;
   } else {
-    const path = await this.getFilePath();
-    try{
-      const {size} = await fsPromises.stat(path);
-      this.fileSize = getSize(size, 1);
-      this.isFileExist = true;
-    } catch(err) {
-      this.isFileExist = false;
-    }
+    const defFile = files.def;
+    this.isFileExist = !!defFile;
+    defaultFile = defFile || defaultFile;
   }
+  defaultFile.name = FILE.replaceFileExtension(this.oname, defaultFile.ext);
+  this.defaultFile = defaultFile;
+  this.fileSize = getSize(defaultFile.size, 1);
 }
 
 /*
@@ -298,51 +314,6 @@ resourceSchema.methods.setMetadata = async function(resource, excludedMediaTypes
   this.metadata = data.format.tags || {};
 }
 
-/*
-  获取文件路径
-*/
-resourceSchema.methods.getFilePath = async function(size) {
-  const videoSize = require('../settings/video');
-  const FILE = require('../nkcModules/file');
-  const ResourceModel = mongoose.model('resources');
-  const {toc, ext, rid, prid} = this;
-  if(prid) {
-    const parentResource = await ResourceModel.findOne({rid: prid});
-    if(!parentResource) throwErr(500, `附件丢失 rid:${prid}`);
-    return await parentResource.getFilePath(size);
-  }
-
-  const storeUrl = await FILE.getStoreUrl(toc);
-  const mediaPath = await FILE.getMediaPath(this.mediaType);
-  const timePath = await FILE.getTimePath(toc);
-  let filenamePath;
-  if(size) {
-    filenamePath = `${rid}_${size}.${ext}`;
-  } else {
-    filenamePath = `${rid}.${ext}`;
-  }
-  return `${storeUrl}/${mediaPath}/${timePath}/${filenamePath}`;
-  /*const fileFolder = await ResourceModel.getMediaPath(this.mediaType, toc);
-  let filenamePath;
-
-  if(this.mediaType === 'mediaVideo') {
-    if(!Object.keys(videoSize).includes(size)) {
-      filenamePath = `${rid}_sd.${ext}`;
-      for(const s of Object.keys(videoSize)) {
-        const _filePath = `./${rid}_${s}.${ext}`;
-        const targetPath = PATH.resolve(fileFolder, _filePath)
-        if(!await FILE.access(targetPath)) continue;
-        filePath = _filePath;
-        break;
-      }
-    } else {
-      filePath = `./${rid}_${size}.${ext}`;
-    }
-  } else {
-    filePath = `./${rid}.${ext}`;
-  }
-  return PATH.resolve(fileFolder, filePath);*/
-};
 /*
 *  获取PDF预览文件
 * */
@@ -865,8 +836,7 @@ resourceSchema.statics.getMediaTypeByExtension = (extension) => {
 * */
 resourceSchema.methods.pushToMediaService = async function(filePath) {
   const {uid} = this;
-  const usersGeneralModel = mongoose.model('usersGeneral');
-  const usersGeneral = await usersGeneralModel.findOnly({uid: uid});
+  const SettingModel = mongoose.model('settings');
   const FILE = require('../nkcModules/file');
   const socket = require('../nkcModules/socket');
   const mediaClient = require('../tools/mediaClient');
@@ -876,17 +846,9 @@ resourceSchema.methods.pushToMediaService = async function(filePath) {
   let data = await this.getMediaServiceData(filePath);
   let cover;
   //获取水印信息
-  const {waterAdd, waterGravity, watermarkStream, defaultBV, configs} = await this.getWatermarkInfo();
-  if(waterAdd) {
+  const watermarkStream = await SettingModel.getWatermarkInfoByUid(uid, data.waterType);
+  if(data.waterAdd) {
     cover =  watermarkStream;
-  }
-  data.waterGravity = waterGravity;
-  data.waterAdd = waterAdd;
-  if(defaultBV) {
-    data.defaultBV = defaultBV;
-  }
-  if(configs) {
-    data.configs = configs;
   }
   await mediaClient(mediaServiceUrl, {
     cover: cover,
@@ -901,24 +863,52 @@ resourceSchema.methods.pushToMediaService = async function(filePath) {
 * */
 resourceSchema.methods.getMediaServiceData = async function() {
   // mediaAudio, mediaVideo, mediaAttachment, mediaPicture
-  const {mediaType} = this;
+  const {mediaType, uid} = this;
   const type = mediaType.replace('media', '');
-  return await this[`getMediaServiceData${type}`]();
+  return await this[`getMediaServiceData${type}`](uid);
 };
 
 /*
 * 获取 处理图片需要的信息
 * */
 resourceSchema.methods.getMediaServiceDataPicture = async function() {
-  const {rid, toc, mediaType, ext, oname} = this;
+  const {rid, toc, mediaType, ext, oname, uid} = this;
+  const SettingModel = mongoose.model('settings');
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const OriginImageModel = mongoose.model('originImage');
+  const waterSetting = await UsersGeneralModel.findOnly({uid: uid}, {waterSetting: 1});
   const FILE = require('../nkcModules/file');
   const timePath = await FILE.getTimePath(toc);
   const mediaPath = await FILE.getMediaPath(mediaType);
+  const originPath = await FILE.getMediaPath('mediaOrigin');
+  const {picture, waterAdd} = waterSetting.waterSetting;
+  const watermarkSettings = await  SettingModel.getWatermarkSettings('picture');
+  const originId = await SettingModel.operateSystemID('originImg', 1);
+  const origin  = OriginImageModel({
+    originId,
+    ext,
+    toc,
+    uid,
+  });
+  await origin.save();
+  await this.updateOne({
+    $set: {
+      originId
+    }
+  });
   return {
+    minWidth: watermarkSettings.minWidth,
+    minHeight: watermarkSettings.minHeight,
+    enabled: watermarkSettings.enabled,
+    waterType: 'picture',
+    waterAdd,
+    waterGravity: picture.waterGravity,
     rid,
     timePath,
     disposition: oname,
     mediaPath,
+    originPath,
+    originId,
     ext,
     toc
   }
@@ -929,11 +919,26 @@ resourceSchema.methods.getMediaServiceDataPicture = async function() {
 * 获取 处理视频需要的信息
 * */
 resourceSchema.methods.getMediaServiceDataVideo = async function() {
-  const {rid, toc, mediaType, ext, oname} = this;
+  const {rid, toc, mediaType, ext, oname, uid} = this;
+  const SettingModel = mongoose.model('settings');
+  const uploadSettings = await SettingModel.getSettings('upload');
+  const {configs, defaultBV} = uploadSettings.videoVBRControl;
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const waterSetting = await UsersGeneralModel.findOnly({uid: uid}, {waterSetting: 1});
   const FILE = require('../nkcModules/file');
   const timePath = await FILE.getTimePath(toc);
   const mediaPath = await FILE.getMediaPath(mediaType);
+  const {video, waterAdd} = waterSetting.waterSetting;
+  const watermarkSettings = await  SettingModel.getWatermarkSettings('video');
   return {
+    minWidth: watermarkSettings.minWidth,
+    minHeight: watermarkSettings.minHeight,
+    enabled: watermarkSettings.enabled,
+    waterType: 'video',
+    defaultBV,
+    configs,
+    waterAdd,
+    waterGravity: video.waterGravity,
     rid,
     timePath,
     disposition: oname,
@@ -966,76 +971,6 @@ resourceSchema.methods.getMediaServiceDataAttachment = async function() {
     toc
   };
 };
-
-/*
-* 获取用户图片水印设置信息
-* */
-resourceSchema.methods.getWatermarkInfo = async function() {
-  const {uid, size, mediaType} = this;
-  const createWatermark = require('../nkcModules/createWatermark')
-  const SettingModel = mongoose.model('settings');
-  const UserModel = mongoose.model('users');
-  const UsersGeneralModel = mongoose.model('usersGeneral');
-  const waterSetting = await UsersGeneralModel.findOnly({uid: uid}, {waterSetting: 1});
-  const {
-    picture, waterAdd, video
-  } = waterSetting.waterSetting;
-  if(mediaType === 'mediaPicture') {
-    const watermarkSettings = await  SettingModel.getWatermarkSettings('picture');
-    if(!waterAdd || !watermarkSettings.enabled) return null;
-    let imagePath = '', text = '';
-    if(picture.waterStyle === 'siteLogo') {
-      imagePath = await SettingModel.getWatermarkFilePath('normal', 'picture');
-    } else if(picture.waterStyle === 'singleLogo') {
-      imagePath = await SettingModel.getWatermarkFilePath('small', 'picture');
-    } else {
-      imagePath = await SettingModel.getWatermarkFilePath('small', 'picture');
-      const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
-      text = user.username === ''? `KCID:${user.uid}`:user.username;
-    }
-    const watermarkStream = await createWatermark(
-      imagePath,
-      text,
-      watermarkSettings.transparency / 100
-    );
-    return {
-      waterAdd: waterAdd,
-      waterGravity: picture.waterGravity,
-      watermarkStream: watermarkStream,
-    };
-  } else if (mediaType === 'mediaVideo') {
-    const uploadSettings = await SettingModel.getSettings('upload');
-    const {configs, defaultBV} = uploadSettings.videoVBRControl;
-    const watermarkSettings = await  SettingModel.getWatermarkSettings('video');
-    if(!waterAdd || !watermarkSettings.enabled) return null;
-    let imagePath = '', text = '';
-    if(video.waterStyle === 'siteLogo') {
-      imagePath = await SettingModel.getWatermarkFilePath('normal', 'video');
-    } else if(video.waterStyle === 'singleLogo') {
-      imagePath = await SettingModel.getWatermarkFilePath('small', 'video');
-    } else {
-      imagePath = await SettingModel.getWatermarkFilePath('small', 'video');
-      const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
-      text = user.username === ''? `KCID:${user.uid}`:user.username;
-    }
-    const watermarkStream = await createWatermark(
-      imagePath,
-      text,
-      watermarkSettings.transparency / 100
-    );
-    return {
-      waterAdd: waterAdd,
-      waterGravity: video.waterGravity,
-      watermarkStream: watermarkStream,
-      configs,
-      defaultBV,
-    };
-  }
-
-
-
-}
-
 
 /*
 * 获取 media service 处理音频时所需要的必要信息
@@ -1082,6 +1017,7 @@ resourceSchema.methods.getMediaServiceDataAudio = async function() {
 resourceSchema.statics.updateResourceStatus = async (props) => {
   const {rid, status, error, filesInfo = {}} = props;
   const ResourceModel = mongoose.model('resources');
+  const FILE = require('../nkcModules/file');
   const {sendDataMessage} = require('../nkcModules/socket');
   const resource = await ResourceModel.findOnly({rid});
 
@@ -1105,7 +1041,7 @@ resourceSchema.statics.updateResourceStatus = async (props) => {
     $set: {
       errorInfo,
       state: resourceState,
-      files: filesInfo
+      files: FILE.filterFilesInfo(filesInfo)
     }
   });
 
@@ -1129,15 +1065,12 @@ resourceSchema.statics.updateResourceStatus = async (props) => {
 resourceSchema.methods.getRemoteFile = async function(size) {
   const FILE = require('../nkcModules/file');
   const ResourceModel = mongoose.model('resources');
+  const throwError = require('../nkcModules/throwError');
   const {files = {}, toc, ext, rid, prid, mediaType, oname} = this;
   if(prid) {
     const parentResource = await ResourceModel.findOne({rid: prid});
-    if(!parentResource) throwErr(500, `附件丢失 rid:${prid}`);
-    return await parentResource.getFilePath(size);
+    if(parentResource) return await parentResource.getFilePath(size);
   }
-  const storeUrl = await FILE.getStoreUrl(toc);
-  const mediaPath = await FILE.getMediaPath(mediaType);
-  const timePath = await FILE.getTimePath(toc);
 
   if(!size) {
     if(mediaType === 'mediaVideo') {
@@ -1151,24 +1084,18 @@ resourceSchema.methods.getRemoteFile = async function(size) {
     }
   }
 
-  const defaultSizeFile = files['def'];
-  let targetSizeFile = files[size];
-  if(!targetSizeFile || targetSizeFile.lost || !targetSizeFile.filename) {
-    targetSizeFile = defaultSizeFile;
+  if(mediaType === 'mediaAttachment' && size === 'preview' && !files[size]) {
+    throwError(403, `当前文档暂不能预览`, 'previewPDF');
   }
 
-  if(!targetSizeFile || targetSizeFile.lost || !targetSizeFile.filename) {
-    throw new Error(`resource 数据错误 rid: ${rid}`);
-  }
-
-  const filenamePath = targetSizeFile.filename;
-  const path = PATH.join(mediaPath, timePath, filenamePath);
-  const time = (new Date(toc)).getTime();
-  const filename = FILE.replaceFileExtension(oname, targetSizeFile.ext);
-  return {
-    url: await FILE.createStoreQueryUrl(storeUrl, time, path),
-    filename
-  }
+  return await FILE.getRemoteFile({
+    id: rid,
+    toc,
+    type: mediaType,
+    ext,
+    name: oname,
+    file: files[size] || files['def']
+  });
 }
 
 /*
@@ -1177,30 +1104,47 @@ resourceSchema.methods.getRemoteFile = async function(size) {
 
 resourceSchema.methods.updateFilesInfo = async function() {
   const FILE = require('../nkcModules/file');
-  const {toc, mediaType, oname, rid, ext} = this;
-  let filenames;
-  if(mediaType === 'mediaPicture') {
-     filenames = {
-      def: `${rid}.${ext}`,
-      sm: `${rid}_sm.${ext}`,
-      md: `${rid}_md.${ext}`
-    }
-  } else if(mediaType === 'mediaAudio') {
-    filenames = {
-      def: `${rid}.mp3`,
-    }
-  } else if(mediaType === 'mediaVideo') {
-    filenames = {
-      def: `${rid}.mp4`,
-      cover: `${rid}_cover.jpg`
+  const ResourceModel = mongoose.model('resources');
+  const {toc, mediaType, rid, ext, prid} = this;
+  let files = {};
+  if(prid) {
+    const parentResource = await ResourceModel.findOne({rid: prid});
+    if(parentResource) {
+      files = await parentResource.updateFilesInfo();
     }
   } else {
-    filenames = {
-      def: `${rid}.${ext}`,
-      preview: `${rid}_preview.pdf`
+    let filenames;
+    if(mediaType === 'mediaPicture') {
+      filenames = {
+        def: `${rid}.${ext}`,
+        sm: `${rid}_sm.${ext}`,
+        md: `${rid}_md.${ext}`
+      }
+    } else if(mediaType === 'mediaAudio') {
+      filenames = {
+        def: `${rid}.mp3`,
+      }
+    } else if(mediaType === 'mediaVideo') {
+      filenames = {
+        sd: `${rid}_sd.mp4`,
+        hd: `${rid}_hd.mp4`,
+        fhd: `${rid}_fhd.mp4`,
+        cover: `${rid}_cover.jpg`
+      }
+    } else {
+      filenames = {
+        def: `${rid}.${ext}`,
+        preview: `${rid}_preview.pdf`
+      }
     }
+    files = await FILE.getStoreFilesInfoObj(toc, mediaType, filenames);
   }
-  const filesInfo = await FILE.getStoreFilesInfo(toc, mediaType, filenames);
+  await this.updateOne({
+    $set: {
+      files
+    }
+  });
+  return files;
 };
 
 module.exports = mongoose.model('resources', resourceSchema);

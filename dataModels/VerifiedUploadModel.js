@@ -1,6 +1,5 @@
 const mongoose = require('../settings/database');
 const Schema = mongoose.Schema;
-const PATH = require('path');
 const schema = new Schema({
   // 附件ID mongoose.Types.ObjectId().toString()
   _id: String,
@@ -140,23 +139,38 @@ schema.methods.pushToMediaService = async function(filePath) {
   return res.files;
 };
 
-schema.methods.getRemoteFile = async function() {
+schema.methods.getRemoteFile = async function(size = 'def') {
   const FILE = require('../nkcModules/file');
   const {_id, toc, type, name, files} = this;
-  const storeUrl = await FILE.getStoreUrl(toc);
-  const mediaPath = await FILE.getMediaPath(type);
-  const timePath = await FILE.getTimePath(toc);
-  const defaultSizeFile = files['def'];
-  if(!defaultSizeFile || defaultSizeFile.lost || !defaultSizeFile.filename) {
-    throw new Error(`identity 数据错误 vid:${_id}`);
-  }
-  const filenamePath = defaultSizeFile.filename;
-  const path = PATH.join(mediaPath, timePath, filenamePath);
-  const time = (new Date(toc)).getTime();
-  return {
-    url: await FILE.createStoreQueryUrl(storeUrl, time, path),
-    filename: defaultSizeFile.disposition || name
-  }
+  return await FILE.getRemoteFile({
+    id: _id,
+    ext,
+    toc,
+    type,
+    name,
+    file: files[size] || files['def']
+  });
 }
+
+schema.methods.updateFilesInfo = async function() {
+  const FILE = require('../nkcModules/file');
+  const {toc, type, _id, ext} = this;
+  let filenames;
+  if(type === 'identityVideo') {
+    filenames = {
+      def: `${_id}.mp4`
+    };
+  } else {
+    filenames = {
+      def: `${_id}.${ext}`
+    }
+  }
+  const files = await FILE.getStoreFilesInfoObj(toc, type, filenames);
+  await this.updateOne({
+    $set: {
+      files
+    }
+  });
+};
 
 module.exports = mongoose.model('verifiedUpload', schema);

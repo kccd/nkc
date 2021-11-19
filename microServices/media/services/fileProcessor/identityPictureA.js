@@ -10,7 +10,7 @@ module.exports = async (props) => {
     data,
     storeUrl
   } = props;
-  const {mediaPath, timePath, vid, toc, ext, disposition} = data;
+  const {mediaPath, timePath, vid, toc, ext} = data;
   const filePath = file.path;
   const filenamePath = `${vid}.${ext}`;
   const path = PATH.join(mediaPath, timePath, filenamePath);
@@ -20,17 +20,10 @@ module.exports = async (props) => {
     path,
     time
   });
-  const {size, hash, height, width} = await getFileInfo(filePath);
+  const fileInfo = await getFileInfo(filePath);
+  fileInfo.name = filenamePath;
   const filesInfo = {
-    def: {
-      ext,
-      size,
-      hash,
-      height,
-      width,
-      filename: filenamePath,
-      disposition,
-    }
+    def: fileInfo
   };
   await deleteFile(filePath);
   return filesInfo;

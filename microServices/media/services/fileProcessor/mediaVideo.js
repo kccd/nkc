@@ -1,9 +1,9 @@
 const PATH = require('path')
 const tools = require('../../tools')
 const ff = require('fluent-ffmpeg')
-const Path = require('path')
 const fs = require('fs')
 const fsPromises = fs.promises;
+const {sendResourceStatusToNKC} = require('../../socket')
 
 module.exports = async (props) => {
   const {
@@ -12,20 +12,12 @@ module.exports = async (props) => {
     data,
     storeUrl
   } = props;
-  const {waterGravity, mediaPath, timePath, rid, toc, ext, waterAdd, configs, defaultBV} = data;
+  const {waterGravity, mediaPath, timePath, rid, toc, ext, waterAdd, configs, defaultBV, enabled, minWidth, minHeight} = data;
   const extension = ext;
   const filePath = file.path;//临时目录
-  const {size} = file;
-  const filenamePath = `${rid}.${ext}`;
-  const path = PATH.join(mediaPath, timePath, filenamePath);
   const time = (new Date(toc)).getTime();
-  const storeData = [{
-    filePath: filePath,
-    path,
-    time,
-  }];
-  const filesInfo = {
-  };//用于存储在数据库的文件类型
+  const storeData = [];
+  const filesInfo = {};//用于存储在数据库的文件类型
   const videoSize = {
     sd: {
       height: 480,
@@ -50,15 +42,22 @@ module.exports = async (props) => {
   //输出视频路径
   const outputVideoPath = filePath + `_ffmpeg.mp4`;
   //构建视频文件在存储服务中的路径
-  const sdStorePath = PATH.join(mediaPath, timePath, `${rid}_sd.${ext}`);
-  const hdStorePath = PATH.join(mediaPath, timePath, `${rid}_hd.${ext}`);
-  const fhdStorePath = PATH.join(mediaPath, timePath, `${rid}_fhd.${ext}`);
-  //生成多种清晰度的视频
-  Promise.resolve()
-    .then(async () => {
-    if(waterAdd) {
-      //获取原视频尺寸
-      const {width: videoWidth, height: videoHeight} = await tools.getFileInfo(filePath);
+  const sdFilenamePath = `${rid}_sd.${ext}`;
+  const hdFilenamePath = `${rid}_hd.${ext}`;
+  const fhdFilenamePath = `${rid}_fhd.${ext}`;
+  const videoCoverFilenamePath = `${rid}_cover.jpg`;
+  const sdStorePath = PATH.join(mediaPath, timePath, sdFilenamePath);
+  const hdStorePath = PATH.join(mediaPath, timePath, hdFilenamePath);
+  const fhdStorePath = PATH.join(mediaPath, timePath, fhdFilenamePath);
+  const videoCoverStorePath = PATH.join(mediaPath, timePath, videoCoverFilenamePath);
+  //获取原视频尺寸
+  const {width: videoWidth, height: videoHeight} = await tools.getFileInfo(filePath);
+
+  const func = async () => {
+    if(videoWidth >= minWidth &&
+      videoHeight >= minHeight &&
+      waterAdd && enabled) {
+
       //各个视频尺寸的宽度
       const widthSD = sd.height * videoWidth / videoHeight;
       const widthHD = hd.height * videoWidth / videoHeight;
@@ -71,35 +70,28 @@ module.exports = async (props) => {
       const isReachFHD = videoHeight >= fhd.height;
       const isReachHD  = !isReachFHD && videoHeight >= hd.height;
       const isReachSD  = !isReachHD  && videoHeight >= sd.height;
-        //视频打水印
-        // return ffmpegWaterMark(filePath, cover, waterGravity, outputVideoPath)
-        return ffmpegWaterMark({
-          filePath,
-          output: outputVideoPath,
-          imageStream: cover.path,
-          position: gravityToPositionMap[waterGravity],
-          scalaByHeight: isReachFHD
-            ? fhd.height
-            : isReachHD
-              ? hd.height
-              : isReachSD
-                ? sd.height
-                : videoHeight,
-          bitRate: isReachFHD
-            ? bitrateFHD
-            : isReachHD
-              ? bitrateHD
-              : isReachSD
-                ? bitrateSD
-                : getBitrateBySize(videoWidth, videoHeight)
-        })
-          .then(() => {
-            // return getFileInfo(targetFilePath);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-
+      //视频打水印
+      // return ffmpegWaterMark(filePath, cover, waterGravity, outputVideoPath)
+      await ffmpegWaterMark({
+        filePath,
+        output: outputVideoPath,
+        imageStream: cover.path,
+        position: gravityToPositionMap[waterGravity],
+        scalaByHeight: isReachFHD
+          ? fhd.height
+          : isReachHD
+            ? hd.height
+            : isReachSD
+              ? sd.height
+              : videoHeight,
+        bitRate: isReachFHD
+          ? bitrateFHD
+          : isReachHD
+            ? bitrateHD
+            : isReachSD
+              ? bitrateSD
+              : getBitrateBySize(videoWidth, videoHeight)
+      })
     } else {
       // 视频转码
       if(['3gp'].indexOf(extension.toLowerCase()) > -1){
@@ -114,92 +106,119 @@ module.exports = async (props) => {
       } else if(['webm'].includes(extension.toLowerCase())) {
         await videoWEBMTransMP4(filePath, outputVideoPath);
       } else {
-        videoTransMP4(filePath, outputVideoPath, extension);
+        await videoTransMP4(filePath, outputVideoPath, extension);
       }
     }
-    })
-    .then(async () => {
-      //生成视频封面图
-      await videoFirstThumbTaker(filePath, videoCoverPath);
-      // 获取封面图的高宽
-      const videoCoverInfo = await tools.getFileInfo(videoCoverPath);
-      let height = videoCoverInfo.height;
-      let width = videoCoverInfo.width;
 
-      // 获取输出视频尺寸
-      const {width: originWidth, height: originHeight} = await tools.getFileInfo(outputVideoPath);
-      // 各个尺寸视频的宽度
-      const widthSD = sd.height * originWidth / originHeight;
-      const widthHD = hd.height * originWidth / originHeight;
-      const widthFHD = fhd.height * originWidth / originHeight;
-      // 各个视频的比特率
-      const bitrateSD = await getBitrateBySize(widthSD, sd.height, configs, defaultBV);
-      const bitrateHD = await getBitrateBySize(widthHD, hd.height, configs, defaultBV);
-      const bitrateFHD = await getBitrateBySize(widthFHD, fhd.height, configs, defaultBV);
-      // 生成其他尺寸的视频文件
-      if(originHeight < hd.height) {
-        // 原视频小于720，则将其设置为480
-        await fsPromises.rename(outputVideoPath, sdVideoPath);
-      } else if(originHeight < fhd.height) {
-        // 原视频大于等于720且小于1080，则将其设置为720并生成480的视频
-        const newOutputVideoPath = hdVideoPath;
-        await fsPromises.rename(outputVideoPath, newOutputVideoPath);
+    //生成视频封面图
+    await videoFirstThumbTaker(filePath, videoCoverPath);
+
+    // 获取输出视频尺寸
+    const {width: originWidth, height: originHeight} = await tools.getFileInfo(outputVideoPath);
+    // 各个尺寸视频的宽度
+    const widthSD = sd.height * originWidth / originHeight;
+    const widthHD = hd.height * originWidth / originHeight;
+    const widthFHD = fhd.height * originWidth / originHeight;
+    // 各个视频的比特率
+    const bitrateSD = await getBitrateBySize(widthSD, sd.height, configs, defaultBV);
+    const bitrateHD = await getBitrateBySize(widthHD, hd.height, configs, defaultBV);
+    const bitrateFHD = await getBitrateBySize(widthFHD, fhd.height, configs, defaultBV);
+    // 生成其他尺寸的视频文件
+    if(originHeight < hd.height) {
+      // 原视频小于720，则将其设置为480
+      await fsPromises.rename(outputVideoPath, sdVideoPath);
+    } else if(originHeight < fhd.height) {
+      // 原视频大于等于720且小于1080，则将其设置为720并生成480的视频
+      const newOutputVideoPath = hdVideoPath;
+      await fsPromises.rename(outputVideoPath, newOutputVideoPath);
+      await tools.createOtherSizeVideo(newOutputVideoPath, sdVideoPath, {
+        height: sd.height,
+        bitrate: bitrateSD,
+        fps: sd.fps
+      });
+    } else {
+      // 原视频大于等于1080，则将其设置为1080并生成720和480的视频
+      const newOutputVideoPath = fhdVideoPath;
+      await fsPromises.rename(outputVideoPath, newOutputVideoPath);
+      const tasks = [
         await tools.createOtherSizeVideo(newOutputVideoPath, sdVideoPath, {
           height: sd.height,
           bitrate: bitrateSD,
           fps: sd.fps
-        });
-      } else {
-        // 原视频大于等于1080，则将其设置为1080并生成720和480的视频
-        const newOutputVideoPath = fhdVideoPath;
-        await fsPromises.rename(outputVideoPath, newOutputVideoPath);
-        const tasks = [
-          await tools.createOtherSizeVideo(newOutputVideoPath, sdVideoPath, {
-            height: sd.height,
-            bitrate: bitrateSD,
-            fps: sd.fps
-          }),
-          await tools.createOtherSizeVideo(newOutputVideoPath, hdVideoPath, {
-            height: hd.height,
-            bitrate: bitrateHD,
-            fps: hd.fps
-          })
-        ];
-        await Promise.all(tasks);
-      }
+        }),
+        await tools.createOtherSizeVideo(newOutputVideoPath, hdVideoPath, {
+          height: hd.height,
+          bitrate: bitrateHD,
+          fps: hd.fps
+        })
+      ];
+      await Promise.all(tasks);
+    }
+
+    storeData.push({
+      filePath: sdVideoPath,
+      path: sdStorePath,
+      time,
+    });
+
+    storeData.push({
+      filePath: hdVideoPath,
+      path: hdStorePath,
+      time,
+    });
+
+    storeData.push({
+      filePath: fhdVideoPath,
+      path: fhdStorePath,
+      time,
+    });
+
+    storeData.push({
+      filePath: videoCoverPath,
+      path: videoCoverStorePath,
+      time
+    });
+
+    await tools.storeClient(storeUrl, storeData);
+
+    const sdInfo = await tools.getFileInfo(sdVideoPath);
+    sdInfo.name = sdFilenamePath;
+    const hdInfo = await tools.getFileInfo(hdVideoPath);
+    hdInfo.name = hdFilenamePath;
+    const fhdInfo = await tools.getFileInfo(fhdVideoPath);
+    fhdInfo.name = fhdFilenamePath;
+    const coverInfo = await tools.getFileInfo(videoCoverPath);
+    coverInfo.name = videoCoverFilenamePath;
+
+    filesInfo.sd = sdInfo;
+    filesInfo.hd = hdInfo;
+    filesInfo.fhd = fhdInfo;
+    filesInfo.cover = coverInfo;
+
+    await sendResourceStatusToNKC({
+      rid,
+      status: true,
+      filesInfo
+    });
+  };
+
+  func()
+    .catch((err) => {
+      return sendResourceStatusToNKC({
+        rid,
+        status: false,
+        error: err.message || err.toString()
+      });
     })
-    .then(() => {
-      storeData.push({
-        filePath: sdVideoPath,
-        path: sdStorePath,
-        time,
-      })
-    })
-    .then(() => {
-      storeData.push({
-        filePath: hdVideoPath,
-        path: hdStorePath,
-        time,
-      })
-    })
-    .then(() => {
-      storeData.push({
-        filePath: fhdVideoPath,
-        path: fhdStorePath,
-        time,
-      })
-    })
-    .then(() => {
-      const sdInfo = tools.getFileInfo(sdVideoPath);
-      const hdInfo = tools.getFileInfo(hdVideoPath);
-      const fhdInfo = tools.getFileInfo(fhdVideoPath);
-      filesInfo.sd = {
-        ext: sdInfo.ext,
-        size: sdInfo.size,
-        hash: sdInfo.hash,
-        disposition,
-        filename: sdStorePath
-      };
+    .finally(() => {
+      return Promise.all([
+        tools.deleteFile(sdVideoPath),
+        tools.deleteFile(hdVideoPath),
+        tools.deleteFile(fhdVideoPath),
+        tools.deleteFile(videoCoverPath),
+        tools.deleteFile(filePath),
+        tools.deleteFile(cover.path),
+      ]);
     })
 }
 
