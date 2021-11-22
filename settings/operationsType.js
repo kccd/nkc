@@ -102,5 +102,12 @@ module.exports = {
   ],
   whitelistOfClosedFund: [
 
+  ],
+  fileDownload: [
+    'getResources',
+    'getAttachment',
+    'visitVerifiedUpload',
+    'auditorVisitVerifiedUpload',
+    'getMessageFile'
   ]
 }
