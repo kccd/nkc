@@ -847,7 +847,7 @@ resourceSchema.methods.pushToMediaService = async function(filePath) {
   let coverPath;
   //获取水印信息
   if(data.waterAdd) {
-    coverPath = await SettingModel.getWatermarkInfoByUid(uid, data.waterType);
+    coverPath = await SettingModel.getWatermarkCoverPathByUid(uid, data.waterType);
   }
   await mediaClient(mediaServiceUrl, {
     coverPath,

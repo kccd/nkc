@@ -7,7 +7,6 @@ const FILE = require("../nkcModules/file");
 const PATH = require("path");
 const fs = require("fs");
 const statics = require("../settings/statics");
-const onFinished = require("on-finished");
 const destroy = require("destroy");
 const fsPromise = fs.promises;
 
@@ -762,7 +761,7 @@ settingSchema.statics.getVideoSize = async function() {
 *   @param {Stream} watermarkStream 水印数据流
 * @author pengxiguaa 2021-01-22
 * */
-settingSchema.statics.getWatermarkInfoByUid = async (uid, type) => {
+settingSchema.statics.getWatermarkCoverPathByUid = async (uid, type) => {
   const SettingModel = mongoose.model('settings');
   const ColumnsModel = mongoose.model('columns');
   const UserModel = mongoose.model('users');
@@ -789,14 +788,14 @@ settingSchema.statics.getWatermarkInfoByUid = async (uid, type) => {
     const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
     text = user.username === ''? `KCID:${user.uid}`:user.username;
   }
-  return await SettingModel.getWatermarkPath(
+  return await SettingModel.getWatermarkCoverPath(
     imagePath,
     text,
     watermarkSettings.transparency / 100
   );
 }
 
-settingSchema.statics.getWatermarkPath = async (magePath, text = '', transparent = 1) => {
+settingSchema.statics.getWatermarkCoverPath = async (magePath, text = '', transparent = 1) => {
   const {getFileMD5, getTextMD5} = require('../nkcModules/hash');
   const FILE = require('../nkcModules/file');
   const createWatermark = require('../nkcModules/createWatermark');
@@ -804,26 +803,27 @@ settingSchema.statics.getWatermarkPath = async (magePath, text = '', transparent
   const md5 = await getFileMD5(magePath) + await getTextMD5(text + transparent);
   const watermarkPath = PATH.resolve(watermarkCache, `${md5}.png`);
   if(await FILE.access(watermarkPath)) {
+    console.log(`存在水印`);
     return watermarkPath;
   }
+  console.log(`开始生成水印...`);
   const watermarkStream = await createWatermark(magePath, text, transparent);
+  console.log(`水印已生成`);
   const file = fs.createWriteStream(watermarkPath);
   const func = () => {
     return new Promise((resolve, reject) => {
-      file.on('end', () => {
+      const destroyStream = () => {
+        destroy(watermarkStream);
+        destroy(file);
+      };
+      file.on('finish', () => {
         resolve(watermarkPath);
+        destroyStream();
       });
       file.on('error', err => {
         reject(err);
-      })
-      /*onFinished(file, (err) => {
-        if(err) {
-          reject(err);
-        } else {
-          resolve(watermarkPath);
-        }
-        destroy(file);
-      });*/
+        destroyStream();
+      });
       watermarkStream.pipe(file);
     });
   };

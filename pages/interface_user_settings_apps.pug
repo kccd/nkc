@@ -239,7 +239,6 @@ block content
                       img.wt(:src="videoWatermarkFile.url")
                       span(v-if='videoWatermarkName') {{videoWatermarkName}}
                 .col-sm-12.col-md-10.col-md-offset-2
-                  -console.log(data.noWatermark);
                   h5.text-info=`宽度小于${data.noWatermark.size.videoMinWidth}px或高度小于${data.noWatermark.size.videoMinHeight}px的图片不会添加水印`
               .form-group
                 label.col-sm-2.control-label
