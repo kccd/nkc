@@ -6,8 +6,10 @@ waterRouter
     const {user} = data;
     data.waterSetting = {
       waterAdd: true,
-      waterStyle: "siteLogo",
-      waterGravity: "southeast",
+      pictureWaterStyle: "siteLogo",
+      pictureWaterGravity: "southeast",
+      videoWaterStyle: "siteLogo",
+      videoWaterGravity: "southeast",
       waterPayTime: "",
       waterPayInfo: false
     };
@@ -40,9 +42,8 @@ waterRouter
 	})
 	.put('/', async (ctx, next) => {
     const {body, data, db, port, ip} = ctx;
-    const {type, waterAdd, waterGravity, waterStyle} = body;
+    const {type, waterAdd, pictureWaterStyle, pictureWaterGravity, videoWaterStyle, videoWaterGravity} = body;
     const {user} = data;
-
     if(type === "pay"){
       // 检测是否已经购买了水印服务
       const waterAlreadyPay = await db.UsersGeneralModel.findOne({uid: user.uid});
@@ -90,7 +91,7 @@ waterRouter
     if(type === "save"){
       const userWaterSetting = await db.UsersGeneralModel.findOne({uid: user.uid});
       if(userWaterSetting){
-        await db.UsersGeneralModel.updateOne({uid:user.uid},{$set: {'waterSetting.waterAdd':waterAdd,'waterSetting.waterGravity':waterGravity,'waterSetting.waterStyle':waterStyle,}})
+        await db.UsersGeneralModel.updateOne({uid:user.uid},{$set: {'waterSetting.waterAdd':waterAdd,'waterSetting.picture.waterGravity':pictureWaterGravity,'waterSetting.picture.waterStyle':pictureWaterStyle, 'waterSetting.video.waterGravity':videoWaterGravity,'waterSetting.video.waterStyle':videoWaterStyle,}})
       }else{
         await new db.UsersGeneralModel({uid:user.uid}).save()
       }

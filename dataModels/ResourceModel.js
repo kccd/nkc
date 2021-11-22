@@ -119,6 +119,11 @@ const resourceSchema = new Schema({
     index: 1,
     default: 'inProcess'
   },
+  // 文件处理错误时的错误信息
+  errorInfo: {
+    type: String,
+    default: ''
+  },
   // 所在专业 根据 references 字段统计而来
   forumsId: {
 	  type: [String],
@@ -129,6 +134,34 @@ const resourceSchema = new Schema({
     type: Date,
     default: null
   },
+
+  // 处理之后的文件信息
+  // 图片：default, sm, md
+  // 视频：sd, hd, fhd, cover
+  // 音频：default
+  // 附件：default, preview
+  files: {
+    def: Schema.Types.Mixed,
+    sm: Schema.Types.Mixed,
+    md: Schema.Types.Mixed,
+    sd: Schema.Types.Mixed,
+    hd: Schema.Types.Mixed,
+    fhd: Schema.Types.Mixed,
+    cover: Schema.Types.Mixed,
+    preview: Schema.Types.Mixed,
+    /*
+    {
+      ext: String,
+      hash: String, // 文件 md5
+      size: Number, // 文件大小
+      height: Number, // 图片、视频高
+      width: Number,  // 图片、视频宽
+      name: String, // 在存储服务磁盘上的文件名
+      duration: Number, // 音视频时间 秒
+      mtime: Date, // 最后修改时间
+    }
+    */
+  },
 },
 {
   toObject: {
@@ -136,7 +169,13 @@ const resourceSchema = new Schema({
     virtuals: true
   }
 });
-
+resourceSchema.virtual('defaultFile')
+  .get(function() {
+    return this._defaultFile;
+  })
+  .set(function(val) {
+    return this._defaultFile = val
+  });
 resourceSchema.virtual('metadata')
   .get(function() {
     return this._metadata;
@@ -188,62 +227,74 @@ resourceSchema.virtual('token')
 /*
  * 文件是否存在
  */
-resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['mediaPicture']) {
-  if(excludedMediaTypes.includes(this.mediaType)) return;
+resourceSchema.methods.setFileExist = async function(excludedMediaTypes = []) {
+  const {files = {}, mediaType} = this;
+  if(excludedMediaTypes.includes(mediaType)) return;
   const SettingModel = mongoose.model('settings');
   const {getSize} = require('../nkcModules/tools');
-  const {visitorAccess} = await SettingModel.getSettings('download');
-  this.visitorAccess = visitorAccess[this.mediaType];
+  const FILE = require('../nkcModules/file');
 
-  // 拓展预览token
+
+  // 判断游客是否允许访问指定类型的资源
+  if(['mediaVideo', 'mediaAudio', 'mediaAttachment'].includes(this.mediaType)) {
+    const {visitorAccess} = await SettingModel.getSettings('download');
+    this.visitorAccess = visitorAccess[this.mediaType];
+  }
+
+  // 拓展预览音视频的 token
   if(['mediaVideo', 'mediaAudio'].includes(this.mediaType)) {
     await this.extendToken();
   }
+
+  let defaultFile = {
+    size: this.size,
+    ext: this.ext,
+    name: this.oname,
+    height: this.height,
+    width: this.width
+  };
+
   if(this.mediaType === 'mediaVideo') {
     const videoSettings = require('../settings/video');
     const sdSize = 'sd';
     const hdSize = 'hd';
     const fhdSize = 'fhd';
-    const sdVideoPath = await this.getFilePath(sdSize);
-    const hdVideoPath = await this.getFilePath(hdSize);
-    const fhdVideoPath = await this.getFilePath(fhdSize);
+    const sdFile = files[sdSize];
+    const hdFile = files[hdSize];
+    const fhdFile = files[fhdSize];
     const videoSize = [];
-    try{
-      const {size} = await fsPromises.stat(sdVideoPath);
+    if(sdFile) {
       videoSize.push({
         size: sdSize,
-        dataSize: getSize(size, 1),
+        dataSize: getSize(sdFile.size, 1),
         height: videoSettings[sdSize].height
       });
-    } catch(err) {}
-    try{
-      const {size} = await fsPromises.stat(hdVideoPath);
+    }
+    if(hdFile) {
       videoSize.push({
         size: hdSize,
-        dataSize: getSize(size, 1),
+        dataSize: getSize(hdFile.size, 1),
         height: videoSettings[hdSize].height
       });
-    } catch(err) {}
-    try{
-      const {size} = await fsPromises.stat(fhdVideoPath);
+    }
+    if(fhdFile) {
       videoSize.push({
         size: fhdSize,
-        dataSize: getSize(size, 1),
+        dataSize: getSize(fhdFile.size, 1),
         height: videoSettings[fhdSize].height
       });
-    } catch(err) {}
+    }
+    defaultFile = sdFile || hdFile || fhdFile || defaultFile;
     this.isFileExist = videoSize.length !== 0;
     this.videoSize = videoSize;
   } else {
-    const path = await this.getFilePath();
-    try{
-      const {size} = await fsPromises.stat(path);
-      this.fileSize = getSize(size, 1);
-      this.isFileExist = true;
-    } catch(err) {
-      this.isFileExist = false;
-    }
+    const defFile = files.def;
+    this.isFileExist = !!defFile;
+    defaultFile = defFile || defaultFile;
   }
+  defaultFile.name = FILE.replaceFileExtension(this.oname, defaultFile.ext);
+  this.defaultFile = defaultFile;
+  this.fileSize = getSize(defaultFile.size, 1);
 }
 
 /*
@@ -263,39 +314,6 @@ resourceSchema.methods.setMetadata = async function(resource, excludedMediaTypes
   this.metadata = data.format.tags || {};
 }
 
-/*
-  获取文件路径
-*/
-resourceSchema.methods.getFilePath = async function(size) {
-  const videoSize = require('../settings/video');
-  const FILE = require('../nkcModules/file');
-  const ResourceModel = mongoose.model('resources');
-  const {toc, ext, rid, prid} = this;
-  if(prid) {
-    const parentResource = await ResourceModel.findOne({rid: prid});
-    if(!parentResource) throwErr(500, `附件丢失 rid:${prid}`);
-    return await parentResource.getFilePath(size);
-  }
-  const fileFolder = await ResourceModel.getMediaPath(this.mediaType, toc);
-  let filePath;
-  if(this.mediaType === 'mediaVideo') {
-    if(!Object.keys(videoSize).includes(size)) {
-      filePath = `./${rid}_sd.${ext}`;
-      for(const s of Object.keys(videoSize)) {
-        const _filePath = `./${rid}_${s}.${ext}`;
-        const targetPath = PATH.resolve(fileFolder, _filePath)
-        if(!await FILE.access(targetPath)) continue;
-        filePath = _filePath;
-        break;
-      }
-    } else {
-      filePath = `./${rid}_${size}.${ext}`;
-    }
-  } else {
-    filePath = `./${rid}.${ext}`;
-  }
-  return PATH.resolve(fileFolder, filePath);
-};
 /*
 *  获取PDF预览文件
 * */
@@ -795,5 +813,339 @@ resourceSchema.methods.checkToken = async function(token) {
   return count !== null;
 };
 
+resourceSchema.statics.getMediaTypeByExtension = (extension) => {
+  const {
+    pictureExtensions,
+    videoExtensions,
+    audioExtensions
+  } = require('../nkcModules/file');
+  if(pictureExtensions.includes(extension)) {
+    return 'mediaPicture'
+  } else if(videoExtensions.includes(extension)) {
+    return 'mediaVideo'
+  } else if(audioExtensions.includes(extension)) {
+    return 'mediaAudio'
+  } else {
+    return 'mediaAttachment'
+  }
+};
+
+/*
+* 推送文件到 media service 处理
+* @param {String} filePath 待处理文件的路径
+* */
+resourceSchema.methods.pushToMediaService = async function(filePath) {
+  const {uid} = this;
+  const SettingModel = mongoose.model('settings');
+  const FILE = require('../nkcModules/file');
+  const socket = require('../nkcModules/socket');
+  const mediaClient = require('../tools/mediaClient');
+  const {toc, mediaType} = this;
+  const storeServiceUrl = await FILE.getStoreUrl(toc);
+  const mediaServiceUrl = await socket.getMediaServiceUrl();
+  let data = await this.getMediaServiceData(filePath);
+  let coverPath;
+  //获取水印信息
+  if(data.waterAdd) {
+    coverPath = await SettingModel.getWatermarkCoverPathByUid(uid, data.waterType);
+  }
+  await mediaClient(mediaServiceUrl, {
+    coverPath,
+    type: mediaType,
+    filePath,
+    storeUrl: storeServiceUrl,
+    data
+  });
+};
+/*
+* 获取 media service 需要的信息，推送前获取
+* */
+resourceSchema.methods.getMediaServiceData = async function() {
+  // mediaAudio, mediaVideo, mediaAttachment, mediaPicture
+  const {mediaType, uid} = this;
+  const type = mediaType.replace('media', '');
+  return await this[`getMediaServiceData${type}`](uid);
+};
+
+/*
+* 获取 处理图片需要的信息
+* */
+resourceSchema.methods.getMediaServiceDataPicture = async function() {
+  const {rid, toc, mediaType, ext, oname, uid} = this;
+  const SettingModel = mongoose.model('settings');
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const OriginImageModel = mongoose.model('originImage');
+  const waterSetting = await UsersGeneralModel.findOnly({uid: uid}, {waterSetting: 1});
+  const FILE = require('../nkcModules/file');
+  const timePath = await FILE.getTimePath(toc);
+  const mediaPath = await FILE.getMediaPath(mediaType);
+  const originPath = await FILE.getMediaPath('mediaOrigin');
+  const {picture, waterAdd} = waterSetting.waterSetting;
+  const watermarkSettings = await  SettingModel.getWatermarkSettings('picture');
+  const originId = await SettingModel.operateSystemID('originImg', 1);
+  const origin  = OriginImageModel({
+    originId,
+    ext,
+    toc,
+    uid,
+  });
+  await origin.save();
+  await this.updateOne({
+    $set: {
+      originId
+    }
+  });
+  return {
+    minWidth: watermarkSettings.minWidth,
+    minHeight: watermarkSettings.minHeight,
+    enabled: watermarkSettings.enabled,
+    waterType: 'picture',
+    waterAdd,
+    waterGravity: picture.waterGravity,
+    rid,
+    timePath,
+    disposition: oname,
+    mediaPath,
+    originPath,
+    originId,
+    ext,
+    toc
+  }
+}
+
+
+/*
+* 获取 处理视频需要的信息
+* */
+resourceSchema.methods.getMediaServiceDataVideo = async function() {
+  const {rid, toc, mediaType, ext, oname, uid} = this;
+  const SettingModel = mongoose.model('settings');
+  const uploadSettings = await SettingModel.getSettings('upload');
+  const {configs, defaultBV} = uploadSettings.videoVBRControl;
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const waterSetting = await UsersGeneralModel.findOnly({uid: uid}, {waterSetting: 1});
+  const FILE = require('../nkcModules/file');
+  const timePath = await FILE.getTimePath(toc);
+  const mediaPath = await FILE.getMediaPath(mediaType);
+  const videoSize = await SettingModel.getVideoSize();
+  const {video, waterAdd} = waterSetting.waterSetting;
+  const watermarkSettings = await  SettingModel.getWatermarkSettings('video');
+  return {
+    videoSize,
+    minWidth: watermarkSettings.minWidth,
+    minHeight: watermarkSettings.minHeight,
+    enabled: watermarkSettings.enabled,
+    waterType: 'video',
+    defaultBV,
+    configs,
+    waterAdd,
+    waterGravity: video.waterGravity,
+    rid,
+    timePath,
+    disposition: oname,
+    mediaPath,
+    ext,
+    toc
+  }
+}
+
+/*
+* 获取 media service 处理附件时所需要的必要信息
+* @return {Object}
+*   @param {String} rid 资源 ID
+*   @param {String} timePath 由年月组成的目录
+*   @param {String} mediaPath 文件类型所对应的目录
+*   @param {String} ext 文件格式
+*   @param {String} toc 文件的上传时间
+* */
+resourceSchema.methods.getMediaServiceDataAttachment = async function() {
+  const {rid, toc, mediaType, ext, oname} = this;
+  const FILE = require('../nkcModules/file');
+  const timePath = await FILE.getTimePath(toc);
+  const mediaPath = await FILE.getMediaPath(mediaType);
+  return {
+    rid,
+    timePath,
+    disposition: oname,
+    mediaPath,
+    ext,
+    toc
+  };
+};
+
+/*
+* 获取 media service 处理音频时所需要的必要信息
+* @return {Object}
+*   @param {String} rid 资源 ID
+*   @param {String} timePath 由年月组成的目录
+*   @param {String} mediaPath 文件类型所对应的目录
+*   @param {String} ext 文件格式
+*   @param {String} toc 文件的上传时间
+* */
+resourceSchema.methods.getMediaServiceDataAudio = async function() {
+  const {rid, toc, mediaType, ext, oname} = this;
+  const FILE = require('../nkcModules/file');
+  const timePath = await FILE.getTimePath(toc);
+  const mediaPath = await FILE.getMediaPath(mediaType);
+  return {
+    rid,
+    timePath,
+    disposition: oname,
+    mediaPath,
+    ext,
+    toc
+  };
+};
+
+
+/*
+* media service 处理好附件之后推送到 nkc service 的消息
+* 更新附件的处理状态等信息
+* @param {Object} props
+*   @param {String} rid 附件 ID
+*   @param {Boolean} status 处理状态 true：处理成功, false: 处理失败
+*   @param {String} errorInfo 处理失败时的错误信息
+*   @param {[Object]} filesInfo 处理之后生成的所有文件的信息
+*     @param {String} _id 文件类型 default, sm, md, sd, hd, fhd, cover, preview
+*     @param {String} ext 文件格式
+*     @param {Boolean} lost 文件是否丢失
+*     @param {String} hash 文件 md5
+*     @param {Number} size 文件体积
+*     @param {Number} height 图片、视频的高
+*     @param {Number} width 图片、视频的宽
+*     @param {String} 在 store service 磁盘上的文件名
+* */
+resourceSchema.statics.updateResourceStatus = async (props) => {
+  const {rid, status, error, filesInfo = {}} = props;
+  const ResourceModel = mongoose.model('resources');
+  const FILE = require('../nkcModules/file');
+  const {sendDataMessage} = require('../nkcModules/socket');
+  const resource = await ResourceModel.findOnly({rid});
+
+  let resourceState;
+  let errorInfo;
+  let fileProcessState;
+
+  if(status) {
+    // 文件处理成功
+    resourceState = 'usable';
+    errorInfo = '';
+    fileProcessState = 'fileProcessFinish';
+  } else {
+    // 文件处理失败
+    resourceState = 'useless';
+    errorInfo = error;
+    fileProcessState = 'fileProcessFailed';
+  }
+
+  await resource.updateOne({
+    $set: {
+      errorInfo,
+      state: resourceState,
+      files: FILE.filterFilesInfo(filesInfo)
+    }
+  });
+
+  // 通过 socket 服务通知浏览器
+  sendDataMessage(resource.uid, {
+    event: "fileTransformProcess",
+    data: {rid: resource.rid, state: fileProcessState, err: error}
+  });
+};
+
+/*
+* 获取远程文件信息
+* @param {String} size 文件类型
+* @return {Object}
+*   @param {String} url store service 链接
+*   @param {String} filename 下载时的文件名称，设置在 response header 中
+*   @param {Object} query
+*     @param {String} path 文件在 store service 上的路径
+*     @param {Number} time 文件的上传时间
+* */
+resourceSchema.methods.getRemoteFile = async function(size) {
+  const FILE = require('../nkcModules/file');
+  const ResourceModel = mongoose.model('resources');
+  const throwError = require('../nkcModules/throwError');
+  const {files = {}, toc, ext, rid, prid, mediaType, oname} = this;
+  if(prid) {
+    const parentResource = await ResourceModel.findOne({rid: prid});
+    if(parentResource) return await parentResource.getRemoteFile(size);
+  }
+
+  if(!size) {
+    if(mediaType === 'mediaVideo') {
+      size = 'sd';
+    } else if(mediaType === 'mediaPicture') {
+      size = 'def'
+    } else if(mediaType === 'mediaAudio') {
+      size = 'def'
+    } else {
+      size = 'def'
+    }
+  }
+
+  if(mediaType === 'mediaAttachment' && size === 'preview' && !files[size]) {
+    throwError(403, `当前文档暂不能预览`, 'previewPDF');
+  }
+
+  return await FILE.getRemoteFile({
+    id: rid,
+    toc,
+    type: mediaType,
+    ext,
+    name: oname,
+    file: files[size] || files['def']
+  });
+}
+
+/*
+* 获取 store service 上的文件信息
+* */
+
+resourceSchema.methods.updateFilesInfo = async function() {
+  const FILE = require('../nkcModules/file');
+  const ResourceModel = mongoose.model('resources');
+  const {toc, mediaType, rid, ext, prid} = this;
+  let files = {};
+  if(prid) {
+    const parentResource = await ResourceModel.findOne({rid: prid});
+    if(parentResource) {
+      files = await parentResource.updateFilesInfo();
+    }
+  } else {
+    let filenames;
+    if(mediaType === 'mediaPicture') {
+      filenames = {
+        def: `${rid}.${ext}`,
+        sm: `${rid}_sm.${ext}`,
+        md: `${rid}_md.${ext}`
+      }
+    } else if(mediaType === 'mediaAudio') {
+      filenames = {
+        def: `${rid}.mp3`,
+      }
+    } else if(mediaType === 'mediaVideo') {
+      filenames = {
+        sd: `${rid}_sd.mp4`,
+        hd: `${rid}_hd.mp4`,
+        fhd: `${rid}_fhd.mp4`,
+        cover: `${rid}_cover.jpg`
+      }
+    } else {
+      filenames = {
+        def: `${rid}.${ext}`,
+        preview: `${rid}_preview.pdf`
+      }
+    }
+    files = await FILE.getStoreFilesInfoObj(toc, mediaType, filenames);
+  }
+  await this.updateOne({
+    $set: {
+      files
+    }
+  });
+  return files;
+};
 
 module.exports = mongoose.model('resources', resourceSchema);

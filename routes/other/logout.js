@@ -3,7 +3,7 @@ const logoutRouter = new Router();
 logoutRouter
   .get('/', async (ctx, next) => {
     if(ctx.data.user) {
-      ctx.setCookie("userInfo", "");
+      ctx.clearCookie('userInfo');
       ctx.data.user = undefined;
     }
     ctx.data.logout = true;

@@ -1,7 +1,6 @@
 const db = require("../../dataModels");
-const nkcModules = require('../../nkcModules');
+const getRealIP = require('../../nkcModules/getRealIP');
 const settings = require("../../settings");
-const serverConfigs = require('../../config/server.json');
 const tools = require("../../tools");
 const util = require('../util');
 const func = async (socket, next) => {
@@ -14,7 +13,7 @@ const func = async (socket, next) => {
     query: {},
   };
 
-  const {ip} = nkcModules.getRealIP({
+  const {ip} = getRealIP({
     remoteIp: socket.handshake.address,
     xForwardedFor: socket.handshake.headers['x-forwarded-for'],
   });

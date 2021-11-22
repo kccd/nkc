@@ -79,8 +79,8 @@ window.app = new Vue({
       const {fund, avatarFile, bannerFile} = this;
       const formData = new FormData();
       formData.append('fund', JSON.stringify(fund));
-      if(avatarFile) formData.append('avatar', avatarFile);
-      if(bannerFile) formData.append('banner', bannerFile);
+      if(avatarFile) formData.append('avatar', avatarFile, 'avatar.png');
+      if(bannerFile) formData.append('banner', bannerFile, 'avatar.png');
       self.submitting = true;
       nkcUploadFile(`/fund/list/${fund._id}/settings`, 'PUT', formData, (e, num) => {
         self.progress = num;

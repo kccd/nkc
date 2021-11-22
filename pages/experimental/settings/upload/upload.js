@@ -13,18 +13,31 @@ window.app = new Vue({
   data: {
     us: data.uploadSettings,
     certList: data.certList,
-    normalWatermarkData: '',
-    normalWatermarkFile: '',
-    smallWatermarkData: '',
-    smallWatermarkFile: '',
+    normalPictureWatermarkData: '',
+    normalPictureWatermarkFile: '',
+    smallPictureWatermarkData: '',
+    smallPictureWatermarkFile: '',
+    normalVideoWatermarkData: '',
+    normalVideoWatermarkFile: '',
+    smallVideoWatermarkData: '',
+    smallVideoWatermarkFile: '',
+  },
+  computed: {
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
+    getWatermark(val, type, status) {
+      return this.getUrl(val, type, status) + '&date=' + Date.now();
+    },
     resetFile() {
-      this.normalWatermarkData = '';
-      this.normalWatermarkFile = '';
-      this.smallWatermarkData = '';
-      this.smallWatermarkFile = '';
+      this.normalPictureWatermarkData = '';
+      this.normalPictureWatermarkFile = '';
+      this.smallPictureWatermarkData = '';
+      this.smallPictureWatermarkFile = '';
+      this.normalVideoWatermarkData = '';
+      this.normalVideoWatermarkFile = '';
+      this.smallVideoWatermarkData = '';
+      this.smallVideoWatermarkFile = '';
     },
     addSizeLimit() {
       this.us.sizeLimit.others.push({
@@ -51,16 +64,30 @@ window.app = new Vue({
     removeFromArr(arr, index) {
       arr.splice(index, 1)
     },
-    selectedWatermark(c = 'normal') {
-      const input = this.$refs[`${c}WatermarkInput`];
+    //选择图片水印图片
+    selectedPictureWatermark(c = 'normal') {
+      const input = this.$refs[`${c}PictureWatermarkInput`];
       const files = input.files;
       if(!files || !files.length) return;
       const file = files[0];
       const self = this;
       NKC.methods.fileToUrl(file)
         .then(data => {
-          self[`${c}WatermarkData`] = data;
-          self[`${c}WatermarkFile`] = file;
+          self[`${c}PictureWatermarkData`] = data;
+          self[`${c}PictureWatermarkFile`] = file;
+        })
+    },
+    //选择视频水印图片
+    selectedVideoWatermark(c = 'normal') {
+      const input = this.$refs[`${c}VideoWatermarkInput`];
+      const files = input.files;
+      if(!files || !files.length) return;
+      const file = files[0];
+      const self = this;
+      NKC.methods.fileToUrl(file)
+        .then(data => {
+          self[`${c}VideoWatermarkData`] = data;
+          self[`${c}VideoWatermarkFile`] = file;
         })
     },
     // 新增一条视频码率控制配置
@@ -79,10 +106,12 @@ window.app = new Vue({
     submit: function() {
       const us = JSON.parse(JSON.stringify(this.us));
       const {extensionLimit} = us;
-      const {normalWatermarkFile, smallWatermarkFile} = this;
+      const {normalPictureWatermarkFile, smallPictureWatermarkFile, normalVideoWatermarkFile, smallVideoWatermarkFile} = this;
       const self = this;
-      const normalWatermarkInput = this.$refs.normalWatermarkInput;
-      const smallWatermarkInput = this.$refs.smallWatermarkInput;
+      const normalPictureWatermarkInput = this.$refs.normalPictureWatermarkInput;
+      const normalVideoWatermarkInput = this.$refs.normalVideoWatermarkInput;
+      const smallPictureWatermarkInput = this.$refs.smallPictureWatermarkInput;
+      const smallVideoWatermarkInput = this.$refs.smallVideoWatermarkInput;
       extensionLimit.defaultBlacklist = extensionLimit._defaultBlacklist.split(',').map(e => e.trim());
       extensionLimit.defaultWhitelist = extensionLimit._defaultWhitelist.split(',').map(e => e.trim());
       extensionLimit.others.map(o => {
@@ -104,21 +133,28 @@ window.app = new Vue({
       return Promise.resolve()
         .then(() => {
           formData.append('uploadSettings', JSON.stringify(us));
-          if(normalWatermarkFile) {
-            formData.append('normalWatermark', normalWatermarkFile);
+          if(normalPictureWatermarkFile) {
+            formData.append('normalPictureWatermark', normalPictureWatermarkFile);
           }
-          if(smallWatermarkFile) {
-            formData.append('smallWatermark', smallWatermarkFile);
+          if(smallPictureWatermarkFile) {
+            formData.append('smallPictureWatermark', smallPictureWatermarkFile);
           }
+          if(normalVideoWatermarkFile) {
+            formData.append('normalVideoWatermark', normalVideoWatermarkFile);
+          }
+          if(smallVideoWatermarkFile) {
+            formData.append('smallVideoWatermark', smallVideoWatermarkFile);
+          }
+          console.log('formData', formData);
           return nkcUploadFile('/e/settings/upload', 'PUT', formData);
         })
         .then(data => {
+          console.log(formData);
           sweetSuccess('保存成功');
-          normalWatermarkInput.value = null;
-          smallWatermarkInput.value = null;
-          const {normalAttachId, smallAttachId} = data.uploadSettings.watermark;
-          self.us.watermark.normalAttachId = normalAttachId;
-          self.us.watermark.smallAttachId = smallAttachId;
+          normalPictureWatermarkInput.value = null;
+          normalVideoWatermarkInput.value = null;
+          smallPictureWatermarkInput.value = null;
+          smallVideoWatermarkInput.value = null;
           self.resetFile();
         })
         .catch(sweetError);

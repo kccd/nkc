@@ -111,8 +111,9 @@ for(const s of servers) {
       httpBalanceType,
     }
     if(https) {
-      const cert = getCert(domain);
-      secureContext[domain] = tls.createSecureContext({
+      const _domain = domain.split(':')[0];
+      const cert = getCert(_domain);
+      secureContext[_domain] = tls.createSecureContext({
         key: cert.key,
         cert: cert.cert,
       });

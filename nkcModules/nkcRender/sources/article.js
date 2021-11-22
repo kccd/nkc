@@ -5,11 +5,12 @@ const videoSize = require('../../../settings/video');
 module.exports = {
   picture(html = "", id, resource = {}) {
     const {
-      width, height,
-      oname = "未知",
       rid = id,
-      disabled
+      disabled,
+      defaultFile
     } = resource || {};
+    const oname = defaultFile.name || '未知';
+    const {width, height} = defaultFile;
     const url = getUrl("resource", rid);
     if(resource.disabled) {
       return `
@@ -45,13 +46,14 @@ module.exports = {
   },
   video(html = "", id, resource = {}) {
     const {
-      oname = "未知",
       visitorAccess = true,
-      rid = id
+      rid = id,
+      defaultFile
     } = resource;
-    const poster = getUrl("videoCover", rid);
+    const oname = defaultFile.name || '未知';
+    const poster = getUrl("resource", rid, 'cover');
     if(resource.disabled){
-      return `<span data-tag="nkcsource" data-type="video-not-found"><span>视频已被屏蔽</span></span>`
+      return `<span data-tag="nkcsource" data-type="video-not-found" data-id="${id}"><span>视频已被屏蔽</span></span>`
     }
     if(resource.isFileExist) {
       let sourceHtml = '';
@@ -71,11 +73,11 @@ module.exports = {
             ${sourceHtml}
           </video>
         </span>
-        <span class="nkcsource-video-title" data-title="${resource.oname}"><span>${resource.oname}&nbsp;</span><span>${downloadHtml}</span></span>
+        <span class="nkcsource-video-title" data-title="${oname}"><span>${oname}&nbsp;</span><span>${downloadHtml}</span></span>
       </span>
     `.trim();
     } else {
-      return `<span data-tag="nkcsource" data-type="video-not-found"><span>视频已丢失（${oname}）</span></span>`
+      return `<span data-tag="nkcsource" data-type="video-not-found" data-id="${id}"><span>视频已丢失（${oname}）</span></span>`
     }
 
     //<span class="nkcsource-video-title">${resource.oname}</span>
@@ -85,34 +87,36 @@ module.exports = {
       oname = "未知",
       rid = id,
       visitorAccess = true,
+      defaultFile
     } = resource;
     const url = getUrl("resource", id) + '&w=' + resource.token;
     if(resource.disabled){
-      return `<span data-tag="nkcsource" data-type="audio-not-found"><span>音频已被屏蔽</span></span>`
+      return `<span data-tag="nkcsource" data-type="audio-not-found" data-id="${id}"><span>音频已被屏蔽</span></span>`
     }
     if(!resource.isFileExist){
-      return `<span data-tag="nkcsource" data-type="audio-not-found"><span>音频已丢失</span></br><span>${oname}</span></span>`
+      return `<span data-tag="nkcsource" data-type="audio-not-found" data-id="${id}"><span>音频已丢失</span></br><span>${oname}</span></span>`
     }
     const downloadHtml = `<a data-type='downloadPanel' data-id="${resource.rid}">立即下载</a>`
     return `
         <span data-tag="nkcsource" data-type="audio" data-id="${id}" data-visitor-access="${visitorAccess}">
-          <audio class="plyr-dom" preload="none" controls data-rid="${id}" data-size="${resource.size}">
+          <audio class="plyr-dom" preload="none" controls data-rid="${id}" data-size="${defaultFile.size}">
             <source src="${url}" type="audio/mp3"/>
             你的浏览器不支持audio标签，请升级。
           </audio>
-          <span class="nkcsource-audio-title">${resource.oname} <span class="display-i-b text-danger" style="font-weight: 700">${getSize(resource.size)}</span>${downloadHtml}</span>
+          <span class="nkcsource-audio-title">${defaultFile.name} <span class="display-i-b text-danger" style="font-weight: 700">${getSize(defaultFile.size)}</span>${downloadHtml}</span>
         </span>
     `.trim();
   },
   attachment(html = "", id, resource = {}) {
     const {
-      oname = "未知",
-      size = 0,
       ext = "",
       hits = 0,
       rid = id,
       visitorAccess = true,
+      defaultFile
     } = resource;
+    const oname = defaultFile.name || '未知';
+    const size = defaultFile.size;
     const fileCover = getUrl("fileCover", ext);
     let url = getUrl("resource", rid);
     let pdfHTML = "";

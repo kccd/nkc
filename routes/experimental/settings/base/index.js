@@ -9,7 +9,6 @@ baseRouter
 	})
 	.put('/', async (ctx, next) => {
 		const {db, body} = ctx;
-		let {AttachmentModel} = db;
 		let {fields, files} = body;
 		let {siteIcon, links,websiteCode ,websiteName, websiteAbbr, github, backgroundColor, copyright, record, description, keywords, brief, telephone, statement} = JSON.parse(fields['settings']);
 		let {siteicon} = files;
@@ -36,8 +35,7 @@ baseRouter
 			}
 		};
 		if(siteicon) {
-			const attachment = await AttachmentModel.saveSiteIcon(siteicon);
-			obj.c.siteIcon = attachment._id;
+      await db.SettingModel.saveSiteLog(siteicon.path);
 		}
 		await serverSettings.updateOne(obj);
 		await db.SettingModel.saveSettingsToRedis("server");

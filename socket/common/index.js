@@ -6,7 +6,9 @@ const communicationConfig = require('../../config/communication');
 
 const socketClient = new CommunicationClient({
   serviceName: communicationConfig.servicesName.socket,
-  serviceId: global.NKC.processId
+  serviceId: global.NKC.processId,
+  servicePort: global.NKC.port,
+  serviceAddress: global.NKC.address
 });
 
 module.exports = async (io) => {

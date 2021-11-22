@@ -5,19 +5,10 @@ const {defaultOriginPath} = statics;
 const PATH = require("path");
 RoRouter
   .get('/:originId', async (ctx, next) => {
-    const {originId} = ctx.params;
-    const {db, fs, settings, nkcModules} = ctx;
-    const targetResource = await db.OriginImageModel.findOnly({originId});
-    const extension = targetResource.ext;
-    const fileFolder = await nkcModules.file.getPath('mediaOrigin', targetResource.toc);
-    let url = PATH.resolve(fileFolder, `./${targetResource.originId}.${extension}`);
-    try{
-      await fs.access(url);
-    } catch (e) {
-      url = defaultOriginPath;
-    }
-    ctx.filePath = url;
-    ctx.type = extension;
+    const {db, params} = ctx;
+    const {originId} = params;
+    const originImage = await db.OriginImageModel.findOnly({originId});
+    ctx.remoteFile = await originImage.getRemoteFile();
     await next();
   });
 module.exports = RoRouter;

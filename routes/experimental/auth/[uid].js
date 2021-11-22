@@ -85,7 +85,7 @@ authRouter
     if(!ctx.permission("visitUserAuth")) {
       return ctx.throw(403, "你无权查看此附件");
     }
-    ctx.filePath = await asset.getFilePath();
+    ctx.remoteFile = await asset.getRemoteFile();
     ctx.type = asset.ext;
     return next();
 	});

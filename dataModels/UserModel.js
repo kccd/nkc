@@ -1,5 +1,4 @@
 const settings = require('../settings');
-const {existsSync} = require("../tools/fsSync");
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const getRedisKeys = require('../nkcModules/getRedisKeys');
@@ -1280,13 +1279,14 @@ userSchema.statics.uploadedAvatar = async (attachId) => {
   const FILE = require('../nkcModules/file');
   const attachment = await AM.findOne({_id: attachId});
   if(!attachment) return false;
-  try{
+  return true;
+  /*try{
     const filePath = await attachment.getFilePath();
     return await FILE.access(filePath);
     // existsSync(filePath);
   } catch(err) {
     return false;
-  }
+  }*/
 };
 
 /**

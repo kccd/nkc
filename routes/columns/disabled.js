@@ -22,9 +22,17 @@ router
         if(!column.abbr) ctx.throw(400, "专栏简介已被删除，请刷新");
         obj.abbr = "";
       } else if(type === "logo") {
-        await nkcModules.file.deleteColumnAvatar(column._id);
+        await db.ColumnModel.updateOne({_id: column._id}, {
+          $set: {
+            avatar: ''
+          }
+        });
       } else if(type === "banner") {
-        await nkcModules.file.deleteColumnBanner(column._id);
+        await db.ColumnModel.updateOne({_id: column._id}, {
+          $set: {
+            banner: ''
+          }
+        });
       } else if(type === "notice") {
         if(column.noticeDisabled && disabled) ctx.throw(400, "公告通知已被屏蔽，请刷新");
         obj.noticeDisabled = disabled;

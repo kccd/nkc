@@ -2,6 +2,13 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const redisClient = require('../settings/redisClient');
+const ei = require('easyimage');
+const FILE = require("../nkcModules/file");
+const PATH = require("path");
+const fs = require("fs");
+const statics = require("../settings/statics");
+const destroy = require("destroy");
+const fsPromise = fs.promises;
 
 const settingSchema = new Schema({
   _id: String,
@@ -345,19 +352,87 @@ settingSchema.statics.getDownloadFileCountLimitInfoByUser = async (user) => {
 };
 
 /*
+* 保存用户水印
+* */
+settingSchema.statics.saveWatermark = async (file, c = 'normal') => {
+  if(!['normal', 'small'].includes(c)) throwErr(400, '未知的水印类型');
+  const FILE = require("../nkcModules/file");
+  const ext = await FILE.getFileExtension(file, ['jpg', 'png', 'jpeg']);
+  const attachmentsModel = mongoose.model('attachments');
+  const settingsModel = mongoose.model('settings');
+  const toc = new Date();
+  const fileFolder = await FILE.getPath('watermark', toc);
+  const aid = attachmentsModel.getNewId();
+  const fileName = `${aid}.${ext}`;
+  const realPath = PATH.resolve(fileFolder, `./${fileName}`);
+  const {path, size, name, hash} = file;
+  await fsPromise.copyFile(path, realPath);
+  const attachment = attachmentsModel({
+    _id: aid,
+    toc,
+    size,
+    hash,
+    name,
+    ext,
+    c,
+    type: 'watermark',
+  });
+  await attachment.save();
+  const obj = {};
+  obj[`c.watermark.${c}AttachId`] = aid;
+  await settingsModel.updateOne({_id: 'upload'}, {
+    $set: obj
+  });
+  await settingsModel.saveSettingsToRedis('upload');
+  return attachment;
+}
+
+/*
+* 获取水印图片路径
+* @return {String} 磁盘路径
+* */
+settingSchema.statics.getWatermarkFilePath = async (c, type) => {
+  if(!['normal', 'small'].includes(c)) throwErr(400, '未知的水印类型');
+  if(type === 'picture') {
+    if(!await FILE.access(statics[`${c}PictureWatermark`])) {
+      return statics[`${c}Watermark`];
+    }
+    return statics[`${c}PictureWatermark`];
+  } else {
+    if(!await FILE.access(statics[`${c}VideoWatermark`])) {
+      return statics[`${c}Watermark`];
+    }
+    return statics[`${c}VideoWatermark`];
+  }
+  //判断如果用户未上传水印图片就换未默认图片
+  /*if(!id) {
+    return statics[`${c}Watermark`];
+  }
+  //判断如果用户上传了图片根据id找不到图片就替换为默认图片
+  if(water == null){
+    return statics[`${c}Watermark`];
+  }
+  //判断如果用户上传了图片找不到图片路径就替换为默认图片
+  if(!filePath){
+    return statics[`${c}Watermark`];
+  }
+  return filePath;*/
+}
+
+/*
 * 获取水印透明度
 * @return {Number} 水印透明度
 * @author pengxiguaa 2020/6/17
 * */
-settingSchema.statics.getWatermarkSettings = async () => {
+settingSchema.statics.getWatermarkSettings = async (type) => {
   const SettingModel = mongoose.model('settings');
   const uploadSettings = await SettingModel.getSettings('upload');
   return {
     // transparency: 255 * (1 - uploadSettings.watermark.transparency / 100),
-    transparency: 100 - uploadSettings.watermark.transparency,
-    enabled: uploadSettings.watermark.enabled,
-    minHeight: uploadSettings.watermark.minHeight,
-    minWidth: uploadSettings.watermark.minWidth
+    transparency: type === 'video'? 100 - uploadSettings.watermark.video.transparency: 100 - uploadSettings.watermark.picture.transparency,
+    enabled: type === 'video'? uploadSettings.watermark.video.enabled:uploadSettings.watermark.picture.enabled,
+    minHeight: type === 'video'?uploadSettings.watermark.video.minHeight:uploadSettings.watermark.picture.minHeight,
+    minWidth: type === 'video'?uploadSettings.watermark.video.minWidth:uploadSettings.watermark.picture.minWidth,
   }
 };
 
@@ -651,6 +726,28 @@ settingSchema.statics.getBitrateBySize = async (width, height) => {
   }
   return rate * 1024;
 }
+
+/*
+* 获取视频尺寸信息
+* */
+settingSchema.statics.getVideoSize = async function() {
+  const videoSize = {
+    sd: {
+      height: 480,
+      fps: 30,
+    },
+    hd: {
+      height: 720,
+      fps: 30,
+    },
+    fhd: {
+      height: 1080,
+      fps: 30,
+    }
+  };
+  return videoSize;
+}
+
 /*
 * 获取用户水印图片
 * @param {String} uid
@@ -664,38 +761,75 @@ settingSchema.statics.getBitrateBySize = async (width, height) => {
 *   @param {Stream} watermarkStream 水印数据流
 * @author pengxiguaa 2021-01-22
 * */
-settingSchema.statics.getWatermarkInfoByUid = async (uid) => {
-  const UsersGeneralModel = mongoose.model('usersGeneral');
-  const UserModel = mongoose.model('users');
-  const {waterSetting} = await UsersGeneralModel.findOnly({uid}, {waterSettings: 1});
+settingSchema.statics.getWatermarkCoverPathByUid = async (uid, type) => {
   const SettingModel = mongoose.model('settings');
-  const AttachmentModel = mongoose.model('attachments');
-  const createWatermark = require('../nkcModules/createWatermark');
-  const watermarkSettings = await SettingModel.getWatermarkSettings();
+  const ColumnsModel = mongoose.model('columns');
+  const UserModel = mongoose.model('users');
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  if(!['picture', 'video'].includes(type)) throwErr(500, `watermark type error`);
+  const waterSetting = await UsersGeneralModel.findOnly({uid: uid}, {waterSetting: 1});
   const {
-    waterGravity, waterStyle, waterAdd
-  } = waterSetting;
+    waterAdd
+  } = waterSetting.waterSetting;
+  const watermarkSettings = await  SettingModel.getWatermarkSettings(type);
   if(!waterAdd || !watermarkSettings.enabled) return null;
   let imagePath = '', text = '';
-  if(waterStyle === 'siteLogo') {
-    imagePath = await AttachmentModel.getWatermarkFilePath('normal');
-  } else if(waterStyle === 'singleLogo') {
-    imagePath = await AttachmentModel.getWatermarkFilePath('small');
+  if(waterSetting.waterSetting[type].waterStyle === 'siteLogo') {
+    imagePath = await SettingModel.getWatermarkFilePath('normal', type);
+  } else if(waterSetting.waterSetting[type].waterStyle === 'singleLogo') {
+    imagePath = await SettingModel.getWatermarkFilePath('small', type);
+  } else if (waterSetting.waterSetting[type].waterStyle === 'coluLogo') {
+    imagePath = await SettingModel.getWatermarkFilePath('small', type);
+    const column = await ColumnsModel.findOne({uid: uid}, {name: 1, uid: 1})
+    const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
+    text = column.name === ''? user.username:column.name;
   } else {
-    imagePath = await AttachmentModel.getWatermarkFilePath('small');
+    imagePath = await SettingModel.getWatermarkFilePath('small', type);
     const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
     text = user.username === ''? `KCID:${user.uid}`:user.username;
   }
-  const watermarkStream = await createWatermark(
+  return await SettingModel.getWatermarkCoverPath(
     imagePath,
     text,
     watermarkSettings.transparency / 100
   );
-  return {
-    waterGravity,
-    watermarkStream,
-  };
 }
+
+settingSchema.statics.getWatermarkCoverPath = async (magePath, text = '', transparent = 1) => {
+  const {getFileMD5, getTextMD5} = require('../nkcModules/hash');
+  const FILE = require('../nkcModules/file');
+  const createWatermark = require('../nkcModules/createWatermark');
+  const {watermarkCache} = require("../settings/upload");
+  const md5 = await getFileMD5(magePath) + await getTextMD5(text + transparent);
+  const watermarkPath = PATH.resolve(watermarkCache, `${md5}.png`);
+  if(await FILE.access(watermarkPath)) {
+    console.log(`存在水印`);
+    return watermarkPath;
+  }
+  console.log(`开始生成水印...`);
+  const watermarkStream = await createWatermark(magePath, text, transparent);
+  console.log(`水印已生成`);
+  const file = fs.createWriteStream(watermarkPath);
+  const func = () => {
+    return new Promise((resolve, reject) => {
+      const destroyStream = () => {
+        destroy(watermarkStream);
+        destroy(file);
+      };
+      file.on('finish', () => {
+        resolve(watermarkPath);
+        destroyStream();
+      });
+      file.on('error', err => {
+        reject(err);
+        destroyStream();
+      });
+      watermarkStream.pipe(file);
+    });
+  };
+  return await func();
+}
+
 /*
 * 判断用户阅读指定时间的内容时是否受到限制
 * @param {Date} toc 内容发表时间
@@ -740,6 +874,60 @@ settingSchema.statics.restrictAccess = async (props) => {
     if(isAuthor && allowAuthor) continue;
     throwError(451, {errorInfo: nkcRender.plainEscape(errorInfo), errorStatus: '451 Unavailable For Legal Reasons'}, 'simpleErrorPage');
   }
+}
+
+/**
+ * 获取首页大Logo
+ */
+settingSchema.statics.getHomeBigLogo = async () => {
+  const SettingModel = mongoose.model('settings');
+  const homeSettings = await SettingModel.getSettings('home');
+  if(!homeSettings.homeBigLogo || !(homeSettings.homeBigLogo.length)) {
+    return [];
+  } else {
+    return homeSettings.homeBigLogo;
+  }
+}
+
+
+/*
+* 更换网站 logo
+* */
+settingSchema.statics.saveSiteLog = async (filePath) => {
+  const {
+    logoICO,
+    logoSM,
+    logoMD,
+    logoLG
+  } = require('../settings/statics');
+  // 生成ico图标
+  await ei.resize({
+    src: filePath,
+    dst: logoICO,
+    height: 96,
+    width: 96,
+  });
+  // 生成小logo
+  await ei.resize({
+    src: filePath,
+    dst: logoSM,
+    height: 128,
+    width: 128
+  });
+  // 生成中等logo
+  await ei.resize({
+    src: filePath,
+    dst: logoMD,
+    height: 256,
+    width: 256,
+  });
+  // 生成中等logo
+  await ei.resize({
+    src: filePath,
+    dst: logoLG,
+    height: 512,
+    width: 512,
+  });
 }
 
 module.exports = mongoose.model('settings', settingSchema);

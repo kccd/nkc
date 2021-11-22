@@ -17,17 +17,17 @@ block eContent
     #data.hidden=objToStr({uploadSettings: data.uploadSettings, certList: data.certList})
     .row#app(v-cloak)
       .col-xs-12.col-md-12
-        h4 水印设置
+        h4 图片水印设置
         .form.form-horizontal.m-b-4
           .form-group
             label.col-sm-2.control-label 状态
             .col-sm-10
               .radio
                 label.m-r-1
-                  input(type='radio' :value='true' v-model="us.watermark.enabled")
+                  input(type='radio' :value='true' v-model="us.watermark.picture.enabled")
                   span 开启
                 label
-                  input(type='radio' :value='false' v-model="us.watermark.enabled")
+                  input(type='radio' :value='false' v-model="us.watermark.picture.enabled")
                   span 关闭
           .form-group
             label.col-sm-2.control-label 尺寸限制
@@ -35,37 +35,82 @@ block eContent
               h5 仅给尺寸满足以下条件的图片添加水印
               .form-inline.m-b-1
                 span 最小宽度：
-                input.form-control.form-inline(type='text' v-model.number="us.watermark.minWidth")
+                input.form-control.form-inline(type='text' v-model.number="us.watermark.picture.minWidth")
                 span &nbsp;px
               .form-inline
                 span 最小高度：
-                input.form-control.form-inline(type='text' v-model.number="us.watermark.minHeight")
+                input.form-control.form-inline(type='text' v-model.number="us.watermark.picture.minHeight")
                 span &nbsp;px
           .form-group
             label.col-sm-2.control-label 透明度
             .col-sm-5
-              h5 {{us.watermark.transparency}}%
-              input(type="range" min="0" max="100" v-model.number="us.watermark.transparency")
+              h5 {{us.watermark.picture.transparency}}%
+              input(type="range" min="0" max="100" v-model.number="us.watermark.picture.transparency")
           .form-group
             label.col-sm-2.control-label 图片
             .col-sm-3
               h5 正常
               .us.watermark.m-r-05
-                div(:style="'opacity:' +  (1 - (us.watermark.transparency / 100))")
-                  img(:src="normalWatermarkData" v-if="normalWatermarkData")
-                  img(src=tools.getUrl('defaultFile', 'watermark_normal.png') v-else-if="!us.watermark.normalAttachId")
-                  img(:src="getUrl('watermark', us.watermark.normalAttachId)" v-else)
+                div(:style="'opacity:' +  (1 - (us.watermark.picture.transparency / 100))")
+                  img(:src="normalPictureWatermarkData" v-if="normalPictureWatermarkData")
+                  img(:src="getWatermark('watermark', 'PWN', 'normal')" v-else)
               .p-t-05.m-b-05
-                input(type='file' accept="image/*" ref='normalWatermarkInput' @change='selectedWatermark("normal")').m-b-05
+                input(type='file' accept="image/*" ref='normalPictureWatermarkInput' @change='selectedPictureWatermark("normal")').m-b-05
             .col-sm-3
               h5 小
               .us.watermark.m-r-05
-                div(:style="'opacity:' +  (1 - (us.watermark.transparency / 100))")
-                  img(:src="smallWatermarkData" v-if="smallWatermarkData")
-                  img(src=tools.getUrl('defaultFile', 'watermark_small.png') v-else-if="!us.watermark.smallAttachId")
-                  img(:src="getUrl('watermark', us.watermark.smallAttachId)" v-else)
+                div(:style="'opacity:' +  (1 - (us.watermark.picture.transparency / 100))")
+                  img(:src="smallPictureWatermarkData" v-if="smallPictureWatermarkData")
+                  img(:src="getWatermark('watermark', 'PWS', 'small')" v-else)
               .p-t-05.m-b-05
-                input(type='file' accept="image/*" ref='smallWatermarkInput' @change='selectedWatermark("small")').m-b-05
+                input(type='file' accept="image/*" ref='smallPictureWatermarkInput' @change='selectedPictureWatermark("small")').m-b-05
+        h4 视频水印设置
+        .form.form-horizontal.m-b-4
+          .form-group
+            label.col-sm-2.control-label 状态
+            .col-sm-10
+              .radio
+                label.m-r-1
+                  input(type='radio' :value='true' v-model="us.watermark.video.enabled")
+                  span 开启
+                label
+                  input(type='radio' :value='false' v-model="us.watermark.video.enabled")
+                  span 关闭
+          .form-group
+            label.col-sm-2.control-label 尺寸限制
+            .col-sm-4
+              h5 仅给尺寸满足以下条件的视频添加水印
+              .form-inline.m-b-1
+                span 最小宽度：
+                input.form-control.form-inline(type='text' v-model.number="us.watermark.video.minWidth")
+                span &nbsp;px
+              .form-inline
+                span 最小高度：
+                input.form-control.form-inline(type='text' v-model.number="us.watermark.video.minHeight")
+                span &nbsp;px
+          .form-group
+            label.col-sm-2.control-label 透明度
+            .col-sm-5
+              h5 {{us.watermark.video.transparency}}%
+              input(type="range" min="0" max="100" v-model.number="us.watermark.video.transparency")
+          .form-group
+            label.col-sm-2.control-label 图片
+            .col-sm-3
+              h5 正常
+              .us.watermark.m-r-05
+                div(:style="'opacity:' +  (1 - (us.watermark.video.transparency / 100))")
+                  img(:src="normalVideoWatermarkData" v-if="normalVideoWatermarkData")
+                  img(:src="getWatermark('watermark', 'VWN', 'normal')" v-else)
+              .p-t-05.m-b-05
+                input(type='file' accept="image/*" ref='normalVideoWatermarkInput' @change='selectedVideoWatermark("normal")').m-b-05
+            .col-sm-3
+              h5 小
+              .us.watermark.m-r-05
+                div(:style="'opacity:' +  (1 - (us.watermark.video.transparency / 100))")
+                  img(:src="smallVideoWatermarkData" v-if="smallVideoWatermarkData")
+                  img(:src="getWatermark('watermark', 'VWS', 'small')" v-else)
+              .p-t-05.m-b-05
+                input(type='file' accept="image/*" ref='smallVideoWatermarkInput' @change='selectedVideoWatermark("small")').m-b-05
           .form-group
             label.col-sm-2.control-label=`去水印花费积分（${data.watermarkScore.name}/${data.watermarkScore.unit}）`
             .col-sm-10.form-inline

@@ -1,0 +1,20 @@
+{
+  "name": "@nkc/store",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "pengxiguaa",
+  "license": "ISC",
+  "dependencies": {
+    "koa": "^2.4.1",
+    "koa-body": "^2.5.0",
+    "koa-router": "^7.3.0",
+    "koa-static": "^4.0.2",
+    "colors": "^1.4.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "easyimage": "^3.1.1"
+  }
+}

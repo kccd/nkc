@@ -12,6 +12,9 @@ const serverConfig = require('./config/server');
 const permission = require('./nkcModules/permission');
 let server;
 
+global.NKC.port = Number(serverConfig.port) + global.NKC.processId;
+global.NKC.address = serverConfig.address;
+
 const dataInit = async () => {
   const defaultData = require('./defaultData');
   await defaultData.init();
@@ -50,14 +53,11 @@ const start = async () => {
 
     communication.getCommunicationClient();
 
-    const port = Number(serverConfig.port) + global.NKC.processId;
-    const address = serverConfig.address;
-
     const app = require('./app');
     server = http.createServer(app);
     server.keepAliveTimeout = 10 * 1000;
-    server.listen(port, address, async () => {
-      console.log(`nkc service ${global.NKC.processId} is running at ${address}:${port}`.green);
+    server.listen(global.NKC.port, async () => {
+      console.log(`nkc service ${global.NKC.processId} is running at ${global.NKC.address}:${global.NKC.port}`.green);
       if(process.connected) process.send('ready');
     });
 
@@ -65,6 +65,8 @@ const start = async () => {
     if(global.NKC.isDevelopment) {
       require('./microServices/communication/server');
       require('./microServices/proxy/server');
+      require('./microServices/media/server');
+      require('./microServices/store/server');
       const socket = require('./socket/index');
       await socket(server);
       require('./timedTask');

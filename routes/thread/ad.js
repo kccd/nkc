@@ -50,7 +50,6 @@ homeTopRouter
       maxLength: 500
     });
     const aid = await db.AttachmentModel.saveRecommendThreadCover(cover, topType);
-    // await nkcModules.file.saveHomeAdCover(cover, topType);
     const newTop = {
       title,
       tid,

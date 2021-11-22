@@ -155,28 +155,29 @@ block content
                 .col-sm-9
                   button.btn.btn-primary.btn-sm(onclick=`yesPayForWater(${data.user.uid})`) 继续
                   button.btn.btn-default.btn-sm(onclick=`hideButton()`) 取消
+              h4 图片水印
               .form-group
                 label.col-sm-2.control-label 水印类型：
                 .col-sm-9(style='margin-bottom: 0.5rem;')
                   .row
                     .col-sm-4
-                      select.form-control#waterStyle(onChange=`turnImg()`)
-                        option(selected=(data.waterSetting.waterStyle === "siteLogo") data="siteLogo" value="siteLogo") 网站LOGO
-                        option(selected=(data.waterSetting.waterStyle === "singleLogo") data="singleLogo" value="singleLogo") LOGO(小)
-                        option(selected=(data.waterSetting.waterStyle === "userLogo") data="userLogo" value="userLogo") LOGO(小)+用户名
+                      select.form-control#pictureWaterStyle(onChange=`turnPictureImg()`)
+                        option(selected=(data.waterSetting.picture.waterStyle === "siteLogo") data="siteLogo" value="siteLogo") 网站LOGO
+                        option(selected=(data.waterSetting.picture.waterStyle === "singleLogo") data="singleLogo" value="singleLogo") LOGO(小)
+                        option(selected=(data.waterSetting.picture.waterStyle === "userLogo") data="userLogo" value="userLogo") LOGO(小)+用户名
                         if data.hasColumn
-                          option(selected=(data.waterSetting.waterStyle === "coluLogo") data="coluLogo" value="coluLogo") LOGO(小)+专栏名
+                          option(selected=(data.waterSetting.picture.waterStyle === "coluLogo") data="coluLogo" value="coluLogo") LOGO(小)+专栏名
               .form-group
                 label.col-sm-2.control-label 水印位置：
                 .col-sm-9(style='margin-bottom: 0.5rem;')
                   .row
                     .col-sm-4
-                      select.form-control#waterGravity(onChange="turnImg()")
-                        option(selected=(data.waterSetting.waterGravity === "southeast") data="southeast" value="southeast") Southeast(右下角)
-                        option(selected=(data.waterSetting.waterGravity === "northeast") data="northeast" value="northeast") Northeast(右上角)
-                        option(selected=(data.waterSetting.waterGravity === "southwest") data="southwest" value="southwest") Southwest(左下角)
-                        option(selected=(data.waterSetting.waterGravity === "northwest") data="northwest" value="northwest") Northwest(左上角)
-                        option(selected=(data.waterSetting.waterGravity === "center") data="center" value="center") Center(正中间)
+                      select.form-control#pictureWaterGravity(onChange="turnPictureImg()")
+                        option(selected=(data.waterSetting.picture.waterGravity === "southeast") data="southeast" value="southeast") Southeast(右下角)
+                        option(selected=(data.waterSetting.picture.waterGravity === "northeast") data="northeast" value="northeast") Northeast(右上角)
+                        option(selected=(data.waterSetting.picture.waterGravity === "southwest") data="southwest" value="southwest") Southwest(左下角)
+                        option(selected=(data.waterSetting.picture.waterGravity === "northwest") data="northwest" value="northwest") Northwest(左上角)
+                        option(selected=(data.waterSetting.picture.waterGravity === "center") data="center" value="center") Center(正中间)
               //-.form-group
                 label.col-sm-2.control-label 参考：
                 .col-sm-9.col-md-5
@@ -191,11 +192,54 @@ block content
                 .col-sm-12.col-md-5
                   .watermark-body
                     img.bg(src=tools.getUrl('defaultFile', 'watermark_background.jpg'))
-                    .watermark(:class="waterSetting.waterGravity + ' ' + watermarkFile.size" style=`opacity: ${1-(data.noWatermark.file.transparency/100)}`)
-                      img.wt(:src="watermarkFile.url")
-                      span(v-if='watermarkName') {{watermarkName}}
+                    .watermark(:class="waterSetting.picture.waterGravity + ' ' + pictureWatermarkFile.size" style=`opacity: ${1-(data.noWatermark.file.transparency/100)}`)
+                      img.wt(:src="pictureWatermarkFile.url")
+                      span(v-if='pictureWatermarkName') {{pictureWatermarkName}}
                 .col-sm-12.col-md-10.col-md-offset-2
-                  h5.text-info=`宽度小于${data.noWatermark.size.minWidth}px或高度小于${data.noWatermark.size.minHeight}px的图片不会添加水印`
+                  h5.text-info=`宽度小于${data.noWatermark.size.pictureMinWidth}px或高度小于${data.noWatermark.size.pictureMinHeight}px的图片不会添加水印`
+
+              h4 视频水印
+              .form-group
+                label.col-sm-2.control-label 水印类型：
+                .col-sm-9(style='margin-bottom: 0.5rem;')
+                  .row
+                    .col-sm-4
+                      select.form-control#videoWaterStyle(onChange=`turnVideoImg()`)
+                        option(selected=(data.waterSetting.video.waterStyle === "siteLogo") data="siteLogo" value="siteLogo") 网站LOGO
+                        option(selected=(data.waterSetting.video.waterStyle === "singleLogo") data="singleLogo" value="singleLogo") LOGO(小)
+                        option(selected=(data.waterSetting.video.waterStyle === "userLogo") data="userLogo" value="userLogo") LOGO(小)+用户名
+                        if data.hasColumn
+                          option(selected=(data.waterSetting.video.waterStyle === "coluLogo") data="coluLogo" value="coluLogo") LOGO(小)+专栏名
+              .form-group
+                label.col-sm-2.control-label 水印位置：
+                .col-sm-9(style='margin-bottom: 0.5rem;')
+                  .row
+                    .col-sm-4
+                      select.form-control#videoWaterGravity(onChange="turnVideoImg()")
+                        option(selected=(data.waterSetting.video.waterGravity === "southeast") data="southeast" value="southeast") Southeast(右下角)
+                        option(selected=(data.waterSetting.video.waterGravity === "northeast") data="northeast" value="northeast") Northeast(右上角)
+                        option(selected=(data.waterSetting.video.waterGravity === "southwest") data="southwest" value="southwest") Southwest(左下角)
+                        option(selected=(data.waterSetting.video.waterGravity === "northwest") data="northwest" value="northwest") Northwest(左上角)
+                        option(selected=(data.waterSetting.video.waterGravity === "center") data="center" value="center") Center(正中间)
+              //-.form-group
+                label.col-sm-2.control-label 参考：
+                .col-sm-9.col-md-5
+                  .row
+                    .col-xs-12.col-md-12.user-settings-img-dev#exampleImg
+                      -var sty = data.waterSetting.waterStyle?data.waterSetting.waterStyle:"siteLogo";
+                      -var gra = data.waterSetting.waterGravity?data.waterSetting.waterGravity:"southeast";
+                      -var imageName = sty + gra;
+                      img#newImg(src=`/default/${imageName}.jpg` style='width: 100%;')
+              .form-group
+                label.col-sm-2.control-label 参考：
+                .col-sm-12.col-md-5
+                  .watermark-body
+                    img.bg(src=tools.getUrl('defaultFile', 'watermark_background.jpg'))
+                    .watermark(:class="waterSetting.video.waterGravity + ' ' + videoWatermarkFile.size" style=`opacity: ${1 - (data.noWatermark.file.transparency / 100)}`)
+                      img.wt(:src="videoWatermarkFile.url")
+                      span(v-if='videoWatermarkName') {{videoWatermarkName}}
+                .col-sm-12.col-md-10.col-md-offset-2
+                  h5.text-info=`宽度小于${data.noWatermark.size.videoMinWidth}px或高度小于${data.noWatermark.size.videoMinHeight}px的图片不会添加水印`
               .form-group
                 label.col-sm-2.control-label
                 .col-sm-5

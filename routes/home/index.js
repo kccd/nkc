@@ -150,7 +150,7 @@ router
       fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !disciplinesId.includes(fid));
     }
     data.homeSettings = homeSettings;
-    data.homeBigLogo = await db.AttachmentModel.getHomeBigLogo();
+    data.homeBigLogo = await db.SettingModel.getHomeBigLogo();
     // 置顶文章轮播图
     data.ads = (await db.ThreadModel.getHomeRecommendThreads(fidOfCanGetThreads)).movable;
 

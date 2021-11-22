@@ -1,12 +1,21 @@
 module.exports = async (socket, next) => {
-  const {serviceName, serviceId} = socket.handshake.auth;
+  const {
+    serviceName,
+    serviceId,
+    serviceAddress,
+    servicePort
+  } = socket.handshake.auth;
   if(
     serviceName === undefined ||
-    serviceId === undefined
+    serviceId === undefined ||
+    serviceAddress === undefined ||
+    servicePort === undefined
   ) return socket.disconnect(true);
   socket.state = {
     serviceName,
-    serviceId
+    serviceId,
+    serviceAddress,
+    servicePort
   };
   await next();
 }
