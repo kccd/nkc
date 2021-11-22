@@ -4,12 +4,10 @@ var Tools = function() {
   var self = this;
   self.getUrl = function(type, id, size) {
     var fileDomain;
-    if(['resource', 'resourceDownload', 'pdf'].indexOf(type) !== -1) {
-      if(isNode) {
-        fileDomain = require('../config/server').fileDomain;
-      } else {
-        fileDomain = NKC.configs.fileDomain;
-      }
+    if(isNode) {
+      fileDomain = require('../config/server').fileDomain;
+    } else {
+      fileDomain = NKC.configs.fileDomain;
     }
     fileDomain = fileDomain || '';
     if(['', undefined, null].includes(id)) {
@@ -22,70 +20,70 @@ var Tools = function() {
         return "/f/" + id
       }
       case "userAvatar": {
-        return "/a/" + id + t
+        return fileDomain + "/a/" + id + t
       }
       case "userBanner": {
-        return "/a/"+ id + t
+        return fileDomain + "/a/"+ id + t
       }
       case "scoreIcon": {
         if(id === 'default') {
-          return "/default/kcb.png"
+          return fileDomain + "/default/kcb.png"
         }
-        return "/a/" + id + t
+        return fileDomain + "/a/" + id + t
       }
       case "postCover": {
-        return '/a/' + id + t;
+        return fileDomain + '/a/' + id + t;
       }
       case 'problemImage': {
-        return '/a/' + id + t;
+        return fileDomain + '/a/' + id + t;
       }
       case "cover": {
-        return "/nr/cover/" + id + t
+        return fileDomain + "/nr/cover/" + id + t
       }
       case "anonymousUserAvatar": {
-        return "/default/default_anonymous_user_avatar.jpg";
+        return fileDomain + "/default/default_anonymous_user_avatar.jpg";
       }
       case "fileCover": {
-        return "/attachIcon/" + (id||"").toLowerCase() + ".png";
+        return fileDomain + "/attachIcon/" + (id||"").toLowerCase() + ".png";
       }
       case "gradeIcon": {
-        return "/statics/grade_icon/v" + id + "l.png";
+        return fileDomain + "/statics/grade_icon/v" + id + "l.png";
       }
       case "forumLogo": {
-        return "/a/" + id + t;
+        return fileDomain + "/a/" + id + t;
       }
       case "forumBanner": {
-        return "/a/" + id + t
+        return fileDomain + "/a/" + id + t
       }
       case "columnAvatar": {
-        return "/a/" + id + t
+        return fileDomain + "/a/" + id + t
       }
       case "columnBanner": {
-        return "/a/" + id + t
+        return fileDomain + "/a/" + id + t
       }
       case "columnHome": {
         return "/m/" + id
       }
       case "homeBigLogo": {
-        return "/a/" + id + t
+        return fileDomain + "/a/" + id + t
       }
       case "watermark": {
-        return "/wm?type=" + id + "&status=" + size;
+        return fileDomain + "/wm?type=" + id + "&status=" + size;
       }
       case "recommendThreadCover": {
-        return '/a/' + id + t
+        return fileDomain + '/a/' + id + t
       }
       case "pdf": {
         return fileDomain + "/r/" + id + '?c=preview_pdf';
       }
       case "sticker": {
-        return "/sticker/" + id;
+        return fileDomain + "/sticker/" + id;
       }
       case "emoji": {
-        return "/twemoji/2/svg/" + id + ".svg"
+        return fileDomain + "/twemoji/2/svg/" + id + ".svg"
       }
       case "twemoji": {
-        return "/twemoji/2/svg/" + id + ".svg"
+        return fileDomain + "/twemoji/2/svg/" + id + ".svg"
       }
       case "post": {
         if(t) {
@@ -103,7 +101,7 @@ var Tools = function() {
         return "/editor?"
       }
       case 'mediaPicture': {
-        return "/r/" + id + t;
+        return fileDomain + "/r/" + id + t;
       }
       // 用户上传的附件
       case "resource": {
@@ -115,38 +113,38 @@ var Tools = function() {
       }
       // 其他资源，包含avatar, banner等等
       case "attach": {
-        return "/a/" + id
+        return fileDomain + "/a/" + id
       }
       case "messageFriendImage": {
-        return "/friend/" + id + "/image";
+        return fileDomain + "/friend/" + id + "/image";
       }
       case "videoCover": {
-        return "/frameImg/" + id
+        return fileDomain + "/frameImg/" + id
       }
       case "messageResource": {
-        return "/message/resource/" + id + t;
+        return fileDomain + "/message/resource/" + id + t;
       }
       case "userHome": {
         if(id === 'default') return false
         return "/u/" + id
       }
       case "messageCover": {
-        return "/message/frame/" + id
+        return fileDomain + "/message/frame/" + id
       }
       case "messageUserDetail": {
         return "/u/" + id + "?from=message"
       }
       case 'siteFile': {
-        return "/statics/site/" + id;
+        return fileDomain + "/statics/site/" + id;
       }
       case 'defaultFile': {
-        return "/default/" + id;
+        return fileDomain + "/default/" + id;
       }
       case 'previewPDF': {
         return "/reader/pdf/web/viewer?file=%2fr%2f" + id;
       }
       case 'siteIcon': {
-        return "/logo/" + id;
+        return fileDomain + "/logo/" + id;
       }
       case 'columnPost': {
         return "/m/" + id + '/post/' + size;
@@ -155,7 +153,7 @@ var Tools = function() {
         return "/m/" + id + '?c=' + size;
       }
       case 'messageTone': {
-        return "/default/message.wav";
+        return fileDomain + "/default/message.wav";
       }
       case 'singleFundHome': {
         return "/fund/list/" + id
@@ -164,22 +162,22 @@ var Tools = function() {
         return "/fund/list/" + id + '/settings'
       }
       case 'fundAvatar': {
-        return "/a/" + id + t
+        return fileDomain + "/a/" + id + t
       }
       case 'fundHome': {
         return "/fund";
       }
       case 'fundBanner': {
-        return "/a/" + id + t
+        return fileDomain + "/a/" + id + t
       }
       case 'fundApplicationForm': {
         return "/fund/a/" + id
       }
       case 'lifePhotoSM': {
-        return '/photo_small/' + id
+        return fileDomain + '/photo_small/' + id
       }
       case 'lifePhoto': {
-        return '/photo/' + id
+        return fileDomain + '/photo/' + id
       }
     }
   };
