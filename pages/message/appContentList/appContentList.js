@@ -123,7 +123,11 @@ window.app = new Vue({
       }
       // urls.reverse();
       const index = urls.map(u => u.url).indexOf(url);
-      urls.map(u => u.url = location.origin + u.url);
+      urls.map(u => {
+        if(u.url.indexOf('http') !== 0) {
+          u.url = window.location.origin + u.url;
+        }
+      });
       NKC.methods.rn.emit('viewImage', {
         index,
         urls
