@@ -3,6 +3,7 @@ const resourceRouter = new Router();
 const infoRouter = require("./info");
 const payRouter = require("./pay");
 const detailRouter = require("./detail");
+const coverRouter = require('./cover');
 const {ThrottleGroup} = require("stream-throttle");
 
 // 存放用户设置
@@ -241,7 +242,14 @@ resourceRouter
     data.r = r;
 
     // 将文件推送到 media service
-    await r.pushToMediaService(file.path);
+    r.pushToMediaService(file.path)
+      .catch(async err => {
+        await db.ResourceModel.updateResourceStatus({
+          rid,
+          status: false,
+          error: err.message
+        });
+      });
     await next();
   })
   .put('/:rid', async (ctx, next) => {
@@ -268,4 +276,5 @@ resourceRouter
   .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods())
   .use('/:rid/pay', payRouter.routes(), payRouter.allowedMethods())
   .use('/:rid/detail', detailRouter.routes(), detailRouter.allowedMethods())
+  .use('/:rid/cover', coverRouter.routes(), coverRouter.allowedMethods())
 module.exports = resourceRouter;

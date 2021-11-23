@@ -35,7 +35,8 @@ const {
   permission,
   logger,
   cache,
-  IPLimit
+  IPLimit,
+  filterDomain,
 } = require('./middlewares');
 
 const cookieConfig = require("./config/cookie");
@@ -60,6 +61,7 @@ app
   .use(etag())
   .use(urlRewrite)
   .use(init)
+  .use(filterDomain)
   // IP 黑名单
   .use(IPLimit)
   // 全局 频次限制 文件
