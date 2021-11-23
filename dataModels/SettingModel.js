@@ -803,12 +803,9 @@ settingSchema.statics.getWatermarkCoverPath = async (magePath, text = '', transp
   const md5 = await getFileMD5(magePath) + await getTextMD5(text + transparent);
   const watermarkPath = PATH.resolve(watermarkCache, `${md5}.png`);
   if(await FILE.access(watermarkPath)) {
-    console.log(`存在水印`);
     return watermarkPath;
   }
-  console.log(`开始生成水印...`);
   const watermarkStream = await createWatermark(magePath, text, transparent);
-  console.log(`水印已生成`);
   const file = fs.createWriteStream(watermarkPath);
   const func = () => {
     return new Promise((resolve, reject) => {
