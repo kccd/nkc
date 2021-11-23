@@ -27,7 +27,7 @@ var Tools = function() {
       }
       case "scoreIcon": {
         if(id === 'default') {
-          return fileDomain + "/default/kcb.png"
+          return "/default/kcb.png"
         }
         return fileDomain + "/a/" + id + t
       }
@@ -38,16 +38,16 @@ var Tools = function() {
         return fileDomain + '/a/' + id + t;
       }
       case "cover": {
-        return fileDomain + "/nr/cover/" + id + t
+        return "/nr/cover/" + id + t
       }
       case "anonymousUserAvatar": {
-        return fileDomain + "/default/default_anonymous_user_avatar.jpg";
+        return "/default/default_anonymous_user_avatar.jpg";
       }
       case "fileCover": {
-        return fileDomain + "/attachIcon/" + (id||"").toLowerCase() + ".png";
+        return "/attachIcon/" + (id||"").toLowerCase() + ".png";
       }
       case "gradeIcon": {
-        return fileDomain + "/statics/grade_icon/v" + id + "l.png";
+        return "/statics/grade_icon/v" + id + "l.png";
       }
       case "forumLogo": {
         return fileDomain + "/a/" + id + t;
@@ -68,7 +68,7 @@ var Tools = function() {
         return fileDomain + "/a/" + id + t
       }
       case "watermark": {
-        return fileDomain + "/wm?type=" + id + "&status=" + size;
+        return "/wm?type=" + id + "&status=" + size;
       }
       case "recommendThreadCover": {
         return fileDomain + '/a/' + id + t
@@ -80,10 +80,10 @@ var Tools = function() {
         return fileDomain + "/sticker/" + id;
       }
       case "emoji": {
-        return fileDomain + "/twemoji/2/svg/" + id + ".svg"
+        return "/twemoji/2/svg/" + id + ".svg"
       }
       case "twemoji": {
-        return fileDomain + "/twemoji/2/svg/" + id + ".svg"
+        return "/twemoji/2/svg/" + id + ".svg"
       }
       case "post": {
         if(t) {
@@ -116,10 +116,10 @@ var Tools = function() {
         return fileDomain + "/a/" + id
       }
       case "messageFriendImage": {
-        return fileDomain + "/friend/" + id + "/image";
+        return "/friend/" + id + "/image";
       }
       case "videoCover": {
-        return fileDomain + "/frameImg/" + id
+        return "/frameImg/" + id
       }
       case "messageResource": {
         return fileDomain + "/message/resource/" + id + t;
@@ -129,22 +129,22 @@ var Tools = function() {
         return "/u/" + id
       }
       case "messageCover": {
-        return fileDomain + "/message/frame/" + id
+        return "/message/frame/" + id
       }
       case "messageUserDetail": {
         return "/u/" + id + "?from=message"
       }
       case 'siteFile': {
-        return fileDomain + "/statics/site/" + id;
+        return "/statics/site/" + id;
       }
       case 'defaultFile': {
-        return fileDomain + "/default/" + id;
+        return "/default/" + id;
       }
       case 'previewPDF': {
         return "/reader/pdf/web/viewer?file=%2fr%2f" + id;
       }
       case 'siteIcon': {
-        return fileDomain + "/logo/" + id;
+        return "/logo/" + id;
       }
       case 'columnPost': {
         return "/m/" + id + '/post/' + size;
@@ -153,7 +153,7 @@ var Tools = function() {
         return "/m/" + id + '?c=' + size;
       }
       case 'messageTone': {
-        return fileDomain + "/default/message.wav";
+        return "/default/message.wav";
       }
       case 'singleFundHome': {
         return "/fund/list/" + id
@@ -174,10 +174,10 @@ var Tools = function() {
         return "/fund/a/" + id
       }
       case 'lifePhotoSM': {
-        return fileDomain + '/photo_small/' + id
+        return '/photo_small/' + id
       }
       case 'lifePhoto': {
-        return fileDomain + '/photo/' + id
+        return '/photo/' + id
       }
     }
   };
