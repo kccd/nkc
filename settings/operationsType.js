@@ -108,6 +108,7 @@ module.exports = {
     'getAttachment',
     'visitVerifiedUpload',
     'auditorVisitVerifiedUpload',
-    'getMessageFile'
+    'getMessageFile',
+    'getSticker'
   ]
 }
