@@ -111,6 +111,10 @@ var Tools = function() {
       case "resourceDownload": {
         return fileDomain + "/r/" + id + t + '&d=attachment'
       }
+      // 资源封面 图片、视频
+      case "resourceCover": {
+        return fileDomain + "/r/" + id + '/cover'
+      }
       // 其他资源，包含avatar, banner等等
       case "attach": {
         return fileDomain + "/a/" + id

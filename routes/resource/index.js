@@ -3,6 +3,7 @@ const resourceRouter = new Router();
 const infoRouter = require("./info");
 const payRouter = require("./pay");
 const detailRouter = require("./detail");
+const coverRouter = require('./cover');
 const {ThrottleGroup} = require("stream-throttle");
 
 // 存放用户设置
@@ -268,4 +269,5 @@ resourceRouter
   .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods())
   .use('/:rid/pay', payRouter.routes(), payRouter.allowedMethods())
   .use('/:rid/detail', detailRouter.routes(), detailRouter.allowedMethods())
+  .use('/:rid/cover', coverRouter.routes(), coverRouter.allowedMethods())
 module.exports = resourceRouter;

@@ -40,7 +40,10 @@ module.exports = {
 			},
 			detail: {
 				GET: "resourceDetail"
-			}
+			},
+      cover: {
+        GET: 'getResourceCover'
+      }
 		}
 	},
 	rm: {

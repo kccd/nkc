@@ -109,6 +109,7 @@ module.exports = {
     'visitVerifiedUpload',
     'auditorVisitVerifiedUpload',
     'getMessageFile',
+    'getResourceCover',
     'getSticker'
   ]
 }
