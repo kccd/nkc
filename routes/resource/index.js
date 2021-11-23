@@ -242,7 +242,14 @@ resourceRouter
     data.r = r;
 
     // 将文件推送到 media service
-    await r.pushToMediaService(file.path);
+    r.pushToMediaService(file.path)
+      .catch(async err => {
+        await db.ResourceModel.updateResourceStatus({
+          rid,
+          status: false,
+          error: err.message
+        });
+      });
     await next();
   })
   .put('/:rid', async (ctx, next) => {
