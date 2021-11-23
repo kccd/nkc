@@ -61,7 +61,6 @@ verifyRouter
     if(![".mp4" , ".mov" , ".3gp" , ".avi"].includes(ext)) {
       return ctx.throw(400, '视频格式只能为.mp4, .mov, .3gp, .avi 您上传的格式为'+ext);
     }
-    if(file.size > 314572800 /* 300 *1024 *1024 */) ctx.throw(400, "视频大小不能超过300M！");
     await userPersonal.generateAuthenticateVerify3(file, code);
     return next();
   });

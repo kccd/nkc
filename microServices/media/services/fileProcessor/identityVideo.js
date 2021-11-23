@@ -18,22 +18,35 @@ module.exports = async (props) => {
   const filenamePath = `${vid}.${ext}`;
   const path = PATH.join(mediaPath, timePath, filenamePath);
   const time = (new Date(toc)).getTime();
-  await videoToMP4(filePath, targetFilePath);
-  await storeClient(storeUrl, {
-    filePath: targetFilePath,
-    path,
-    time
-  });
-  const fileInfo = await getFileInfo(targetFilePath);
-  fileInfo.name = filenamePath;
-  const filesInfo = {
-    def: fileInfo
-  };
-  await deleteFile(filePath);
-  await deleteFile(targetFilePath);
-  return filesInfo;
-};
+  const func = async () => {
+    await videoToMP4(filePath, targetFilePath);
+    await storeClient(storeUrl, {
+      filePath: targetFilePath,
+      path,
+      time
+    });
+    const fileInfo = await getFileInfo(targetFilePath);
+    fileInfo.name = filenamePath;
+    return {
+      def: fileInfo
+    };
+  }
 
+  func()
+    .then(res => {
+      console.log('res', res);
+      return res;
+    })
+    .catch(err => {
+      return err;
+    })
+    .finally(() => {
+      return Promise.all([
+        deleteFile(targetFilePath),
+        deleteFile(filePath),
+      ]);
+    })
+};
 
 async function videoToMP4(filePath, outputPath) {
   return new Promise((resolve, reject) => {

@@ -21,6 +21,13 @@ const schema = new Schema({
     default: Date.now,
     index: 1
   },
+  //文件处理状态
+  // usable: 正常, useless: 处理失败，不可用, inProcess: 处理中
+  state: {
+    type: String,
+    index: 1,
+    default: 'inProcess'
+  },
   // 附件大小
   size: {
     type: Number,
@@ -78,7 +85,7 @@ schema.statics.saveIdentityInfo = async (uid, file, type) => {
     ext,
     file,
     uid,
-    sizeLimit: 200 * 1024 * 1024,
+    sizeLimit: 300 * 1024 * 1024,
     type,
   });
   return data._id;
@@ -96,7 +103,7 @@ schema.statics.createDataAndPushFile = async props => {
   } = props;
   const VerifiedUploadModel = mongoose.model('verifiedUpload');
   const {getSize} = require('../nkcModules/tools');
-  if(file.size > sizeLimit) throwErr(400, `文件不能超过 ${getSize(sizeLimit, 0)}`);
+  // if(file.size > sizeLimit) throwErr(400, `文件不能超过 ${getSize(sizeLimit, 0)}`);
   const verifiedUpload = VerifiedUploadModel({
     _id: vid,
     toc: time,
