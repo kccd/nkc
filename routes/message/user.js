@@ -108,7 +108,7 @@ userRouter
       const messageFile = await db.MessageFileModel.createMessageFileDataAndPushFile({
         file,
         isVoice,
-        uid,
+        uid: user.uid,
         targetUid: targetUser.uid
       });
       content = {
