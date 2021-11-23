@@ -254,7 +254,7 @@
             editor.execCommand("inserthtml", formula)
           });
         } else {
-          return sweetError("未初始化");
+          return sweetError("未初始化公式组件");
         }
       }
     })
