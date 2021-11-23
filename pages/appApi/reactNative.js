@@ -54,8 +54,12 @@ NKC.methods.rn.updateMusicListAndPlay = function(targetRid) {
   }
   var list = [];
   for(let i = 0; i < audiosId.length; i ++) {
+    var url = urls[i];
+    if(url.indexOf('http') !== 0) {
+      url = window.location.origin + url;
+    }
     list.push({
-      url: window.location.origin + urls[i],
+      url,
       name: audiosTitle[i],
       from: window.location.href,
     });
