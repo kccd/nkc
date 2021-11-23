@@ -12,8 +12,11 @@
     ]
   },
   "messageEventName": "message",
+  "searchEventName": "searchEventName",
   "servicesName": {
     "nkc": "nkc",
-    "socket": "socket"
+    "socket": "socket",
+    "store": "store",
+    "media": "media"
   }
 }
