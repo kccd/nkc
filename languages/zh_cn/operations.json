@@ -10,7 +10,7 @@
   "modifyResources": "修改资源文件信息",
   "removeResourceInfo": "清除文件信息",
   "getThreadCover": "获取文章封面",
-  "getVideoImg": "获取视频封面",
+  "getResourceCover": "获取资源封面",
   "getSiteSpecific": "获取网站logo",
   "getDefaultImage": "获取网站默认图片",
   "getPersonalForumAvatar": "获取专栏logo",

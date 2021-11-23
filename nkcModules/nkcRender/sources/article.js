@@ -51,7 +51,7 @@ module.exports = {
       defaultFile
     } = resource;
     const oname = defaultFile.name || '未知';
-    const poster = getUrl("resource", rid, 'cover');
+    const poster = getUrl("resourceCover", rid);
     if(resource.disabled){
       return `<span data-tag="nkcsource" data-type="video-not-found" data-id="${id}"><span>视频已被屏蔽</span></span>`
     }
