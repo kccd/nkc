@@ -72,6 +72,9 @@ block eContent
               .p-t-05.m-b-05
                 input(type='file' accept="image/*" ref='smallPictureWatermarkInput' @change='selectedPictureWatermark("small")').m-b-05
           .form-group
+            label.col-sm-2.control-label
+              h4 图片水印参考
+          .form-group
             label.col-sm-2.control-label 水印类型：
             .col-sm-9(style='margin-bottom: 0.5rem;')
               .row
@@ -155,7 +158,9 @@ block eContent
                   img(:src="getWatermark('watermark', 'VWS', 'small')" v-else)
               .p-t-05.m-b-05
                 input(type='file' accept="image/*" ref='smallVideoWatermarkInput' @change='selectedVideoWatermark("small")').m-b-05
-
+          .form-group
+            label.col-sm-2.control-label
+              h4 视频水印参考
           .form-group
             label.col-sm-2.control-label 水印类型：
             .col-sm-9(style='margin-bottom: 0.5rem;')

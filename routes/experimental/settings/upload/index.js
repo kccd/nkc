@@ -83,15 +83,19 @@ router
     });
     //将水印保存在默认文件夹
     if(files.normalPictureWatermark) {
+      if (files.normalPictureWatermark.size > 900 * 1000) ctx.throw(400, '图片默认水印大小不能超过1M!');
       await fsPromise.copyFile(files.normalPictureWatermark.path, statics.normalPictureWatermark);
     }
     if(files.smallPictureWatermark) {
+      if (files.smallPictureWatermark.size > 900 * 1000) ctx.throw(400, '图片小水印大小不能超过1M!');
       await fsPromise.copyFile(files.smallPictureWatermark.path, statics.smallPictureWatermark);
     }
     if(files.normalVideoWatermark) {
+      if (files.normalVideoWatermark.size > 900 * 1000) ctx.throw(400, '视频默认水印大小不能超过1M!');
       await fsPromise.copyFile(files.normalVideoWatermark.path, statics.normalVideoWatermark);
     }
     if(files.smallVideoWatermark) {
+      if (files.smallVideoWatermark.size > 900 * 1000) ctx.throw(400, '视频小水印大小不能超过1M!');
       await fsPromise.copyFile(files.smallVideoWatermark.path, statics.smallVideoWatermark);
     }
     await db.SettingModel.saveSettingsToRedis('upload');

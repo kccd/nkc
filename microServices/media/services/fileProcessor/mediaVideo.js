@@ -37,10 +37,11 @@ module.exports = async (props) => {
   const hdStorePath = PATH.join(mediaPath, timePath, hdFilenamePath);
   const fhdStorePath = PATH.join(mediaPath, timePath, fhdFilenamePath);
   const videoCoverStorePath = PATH.join(mediaPath, timePath, videoCoverFilenamePath);
-  //获取原视频尺寸
-  const {width: videoWidth, height: videoHeight} = await tools.getFileInfo(filePath);
+
   let hasWatermark = false;
   const func = async () => {
+    //获取原视频尺寸
+    const {width: videoWidth, height: videoHeight} = await tools.getFileInfo(filePath);
     if(videoWidth >= minWidth &&
       videoHeight >= minHeight &&
       waterAdd && enabled) {

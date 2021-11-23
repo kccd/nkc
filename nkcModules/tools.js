@@ -143,7 +143,7 @@ var Tools = function() {
         return "/default/" + id;
       }
       case 'previewPDF': {
-        return "/reader/pdf/web/viewer?file=%2fr%2f" + id;
+        return "/reader/pdf/web/viewer?file=%2fr%2f" + id + "?time=" + Date.now();
       }
       case 'siteIcon': {
         return "/logo/" + id;

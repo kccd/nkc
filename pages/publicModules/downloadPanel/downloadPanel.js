@@ -72,11 +72,12 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
       methods: {
         getUrl: NKC.methods.tools.getUrl,
         visitUrl({name, url}) {
+          url = url + `&time=${Date.now()}`
           const {needScore, rid, resource} = this;
           return Promise.resolve()
             .then(() => {
               if(needScore) {
-                return nkcAPI(`/r/${rid}/pay`, 'POST', {})
+                return nkcAPI(`/r/${rid}/pay?time=${Date.now()}`, 'POST', {})
               }
             })
             .then(() => {

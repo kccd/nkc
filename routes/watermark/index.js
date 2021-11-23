@@ -7,11 +7,8 @@ router
     const {db, data, params, query, state} = ctx;
     const {type, style} = query;
     const {uid} = params;
-    let coverPath;
-    if(uid !== state.uid) ctx.throw(4003, "你没有权限访问");
-    coverPath = await db.SettingModel.getAppsWatermarkPath(state.uid, type, style);
-    console.log(coverPath);
-    ctx.filePath = coverPath;
+    if(uid !== state.uid) ctx.throw(403, "你没有权限访问");
+    ctx.filePath = await db.SettingModel.getWatermarkCoverPathByTypeStyle(state.uid, type, style);
     await next();
   })
   .get('/', async (ctx, next) => {

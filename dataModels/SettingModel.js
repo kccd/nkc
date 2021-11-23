@@ -762,7 +762,7 @@ settingSchema.statics.getVideoSize = async function() {
 *   @param {Stream} watermarkStream 水印数据流
 * @author pengxiguaa 2021-01-22
 * */
-settingSchema.statics.getWatermarkCoverPathByUid = async (uid, type, style) => {
+settingSchema.statics.getWatermarkCoverPathByUid = async (uid, type) => {
   const SettingModel = mongoose.model('settings');
   const ColumnsModel = mongoose.model('columns');
   const UserModel = mongoose.model('users');
@@ -775,11 +775,11 @@ settingSchema.statics.getWatermarkCoverPathByUid = async (uid, type, style) => {
   const watermarkSettings = await  SettingModel.getWatermarkSettings(type);
   if(!waterAdd || !watermarkSettings.enabled) return null;
   let imagePath = '', text = '';
-  if(style === 'siteLogo' || waterSetting.waterSetting[type].waterStyle === 'siteLogo') {
+  if(waterSetting.waterSetting[type].waterStyle === 'siteLogo') {
     imagePath = await SettingModel.getWatermarkFilePath('normal', type);
-  } else if(style === 'singleLogo' || waterSetting.waterSetting[type].waterStyle === 'singleLogo') {
+  } else if(waterSetting.waterSetting[type].waterStyle === 'singleLogo') {
     imagePath = await SettingModel.getWatermarkFilePath('small', type);
-  } else if (style === 'coluLogo' || waterSetting.waterSetting[type].waterStyle === 'coluLogo') {
+  } else if (waterSetting.waterSetting[type].waterStyle === 'coluLogo') {
     imagePath = await SettingModel.getWatermarkFilePath('small', type);
     const column = await ColumnsModel.findOne({uid: uid}, {name: 1, uid: 1})
     const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
@@ -796,16 +796,35 @@ settingSchema.statics.getWatermarkCoverPathByUid = async (uid, type, style) => {
   );
 }
 
-/*
-* 用户偏好设置获取水印
-* */
-settingSchema.statics.getAppsWatermarkPath = async (uid, type, style) => {
+//用户偏好设置获取水印
+settingSchema.statics.getWatermarkCoverPathByTypeStyle = async (uid, type, style) => {
+  const UserModel = mongoose.model('users');
+  const ColumnsModel = mongoose.model('columns');
   const SettingModel = mongoose.model('settings');
-  const watermarkPath = await SettingModel.getWatermarkCoverPathByUid(uid, type, style);
-  return watermarkPath;
+  let imagePath = '', text = '';
+  const watermarkSettings = await  SettingModel.getWatermarkSettings(type);
+  if(style === 'siteLogo') {
+    imagePath = await SettingModel.getWatermarkFilePath('normal', type);
+  } else if (style === 'singleLogo') {
+    imagePath = await SettingModel.getWatermarkFilePath('small', type);
+  } else if (style === 'coluLogo') {
+    imagePath = await SettingModel.getWatermarkFilePath('small', type);
+    const column = await ColumnsModel.findOne({uid: uid}, {name: 1, uid: 1})
+    const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
+    text = column.name === ''? user.username:column.name;
+  } else {
+    imagePath = await SettingModel.getWatermarkFilePath('small', type);
+    const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
+    text = user.username === ''? `KCID:${user.uid}`:user.username;
+  }
+  return await SettingModel.getWatermarkCoverPath(
+    imagePath,
+    text,
+    watermarkSettings.transparency / 100
+  );
 }
 
-settingSchema.statics.getWatermarkCoverPath = async (magePath, text = '', transparent = 1) => {
+settingSchema.statics.getWatermarkCoverPath = async (magePath, text, transparent = 1) => {
   const {getFileMD5, getTextMD5} = require('../nkcModules/hash');
   const FILE = require('../nkcModules/file');
   const createWatermark = require('../nkcModules/createWatermark');
@@ -813,12 +832,9 @@ settingSchema.statics.getWatermarkCoverPath = async (magePath, text = '', transp
   const md5 = await getFileMD5(magePath) + await getTextMD5(text + transparent);
   const watermarkPath = PATH.resolve(watermarkCache, `${md5}.png`);
   if(await FILE.access(watermarkPath)) {
-    console.log(`存在水印`);
     return watermarkPath;
   }
-  console.log(`开始生成水印...`);
   const watermarkStream = await createWatermark(magePath, text, transparent);
-  console.log(`水印已生成`);
   const file = fs.createWriteStream(watermarkPath);
   const func = () => {
     return new Promise((resolve, reject) => {
