@@ -896,6 +896,7 @@ resourceSchema.methods.getMediaServiceDataPicture = async function() {
     }
   });
   return {
+    flex: watermarkSettings.flex,
     minWidth: watermarkSettings.minWidth,
     minHeight: watermarkSettings.minHeight,
     enabled: watermarkSettings.enabled,
@@ -931,6 +932,7 @@ resourceSchema.methods.getMediaServiceDataVideo = async function() {
   const {video, waterAdd} = waterSetting.waterSetting;
   const watermarkSettings = await  SettingModel.getWatermarkSettings('video');
   return {
+    flex: watermarkSettings.flex,
     videoSize,
     minWidth: watermarkSettings.minWidth,
     minHeight: watermarkSettings.minHeight,

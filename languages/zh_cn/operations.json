@@ -812,5 +812,6 @@
   "fundApplicationFormRefund": "基金退款",
   "refundFundApplicationForm": "基金管理员确认退款",
   "experimentalThreadCategorySettings": "后台管理 - 设置 - 文章多维分类",
-  "getWatermark": "获取水印图片(所有人)"
+  "getWatermark": "获取水印图片",
+  "getAppsWatermark": "获取用户偏好设置水印"
 }

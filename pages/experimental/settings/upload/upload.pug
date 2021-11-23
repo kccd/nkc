@@ -30,6 +30,13 @@ block eContent
                   input(type='radio' :value='false' v-model="us.watermark.picture.enabled")
                   span 关闭
           .form-group
+            label.col-sm-2.control-label 图片水印比例
+            .col-sm-4
+              h5 水印比例为要打水印的图片和水印图片的比例
+              .form-inline.m-b-1
+                span 比例：
+                input.form-control.form-inline(type='text' v-model.number="us.watermark.picture.flex")
+          .form-group
             label.col-sm-2.control-label 尺寸限制
             .col-sm-4
               h5 仅给尺寸满足以下条件的图片添加水印
@@ -64,6 +71,36 @@ block eContent
                   img(:src="getWatermark('watermark', 'PWS', 'small')" v-else)
               .p-t-05.m-b-05
                 input(type='file' accept="image/*" ref='smallPictureWatermarkInput' @change='selectedPictureWatermark("small")').m-b-05
+          .form-group
+            label.col-sm-2.control-label 水印类型：
+            .col-sm-9(style='margin-bottom: 0.5rem;')
+              .row
+                .col-sm-4
+                  select.form-control#pictureWaterStyle(@click=`turnPictureImg()`)
+                    option(selected=(pictureWaterStyle === "siteLogo") data="siteLogo" value="siteLogo") 网站LOGO
+                    option(selected=(pictureWaterStyle === "singleLogo") data="singleLogo" value="singleLogo") LOGO(小)
+                    option(selected=(pictureWaterStyle === "userLogo") data="userLogo" value="userLogo") LOGO(小)+用户名
+                    option(selected=(pictureWaterStyle === "coluLogo") data="coluLogo" value="coluLogo") LOGO(小)+专栏名
+          .form-group
+            label.col-sm-2.control-label 水印位置：
+            .col-sm-9(style='margin-bottom: 0.5rem;')
+              .row
+                .col-sm-4
+                  select.form-control#pictureWaterGravity(@click="turnPictureImg()")
+                    option(selected=(pictureWaterGravity === "southeast") data="southeast" value="southeast") Southeast(右下角)
+                    option(selected=(pictureWaterGravity === "northeast") data="northeast" value="northeast") Northeast(右上角)
+                    option(selected=(pictureWaterGravity === "southwest") data="southwest" value="southwest") Southwest(左下角)
+                    option(selected=(pictureWaterGravity === "northwest") data="northwest" value="northwest") Northwest(左上角)
+                    option(selected=(pictureWaterGravity === "center") data="center" value="center") Center(正中间)
+          .form-group
+            label.col-sm-2.control-label 参考：
+            .col-sm-12.col-md-5
+              .watermark-body
+                img.bg(src=tools.getUrl('defaultFile', 'watermark_background.jpg'))
+                .watermark(:class="pictureWaterGravity + ' ' + pictureWatermarkFile.size" :style="'opacity:' +  (1 - (us.watermark.picture.transparency / 100))")
+                  img.wt(:src="pictureWatermarkFile.url")
+                  span(v-if="pictureWaterStyle === 'coluLogo'") 我的专栏
+                  span(v-if="pictureWaterStyle === 'userLogo'") 我的用户名
         h4 视频水印设置
         .form.form-horizontal.m-b-4
           .form-group
@@ -76,6 +113,13 @@ block eContent
                 label
                   input(type='radio' :value='false' v-model="us.watermark.video.enabled")
                   span 关闭
+          .form-group
+            label.col-sm-2.control-label 视频水印比例
+            .col-sm-4
+              h5 水印比例为要打水印的图片和水印图片的比例
+              .form-inline.m-b-1
+                span 比例：
+                input.form-control.form-inline(type='text' v-model.number="us.watermark.video.flex")
           .form-group
             label.col-sm-2.control-label 尺寸限制
             .col-sm-4
@@ -111,6 +155,37 @@ block eContent
                   img(:src="getWatermark('watermark', 'VWS', 'small')" v-else)
               .p-t-05.m-b-05
                 input(type='file' accept="image/*" ref='smallVideoWatermarkInput' @change='selectedVideoWatermark("small")').m-b-05
+
+          .form-group
+            label.col-sm-2.control-label 水印类型：
+            .col-sm-9(style='margin-bottom: 0.5rem;')
+              .row
+                .col-sm-4
+                  select.form-control#videoWaterStyle(@click=`turnVideoImg()`)
+                    option(selected=(videoWaterStyle === "siteLogo") data="siteLogo" value="siteLogo") 网站LOGO
+                    option(selected=(videoWaterStyle === "singleLogo") data="singleLogo" value="singleLogo") LOGO(小)
+                    option(selected=(videoWaterStyle === "userLogo") data="userLogo" value="userLogo") LOGO(小)+用户名
+                    option(selected=(videoWaterStyle === "coluLogo") data="coluLogo" value="coluLogo") LOGO(小)+专栏名
+          .form-group
+            label.col-sm-2.control-label 水印位置：
+            .col-sm-9(style='margin-bottom: 0.5rem;')
+              .row
+                .col-sm-4
+                  select.form-control#videoWaterGravity(@click="turnVideoImg()")
+                    option(selected=(videoWaterGravity === "southeast") data="southeast" value="southeast") Southeast(右下角)
+                    option(selected=(videoWaterGravity === "northeast") data="northeast" value="northeast") Northeast(右上角)
+                    option(selected=(videoWaterGravity === "southwest") data="southwest" value="southwest") Southwest(左下角)
+                    option(selected=(videoWaterGravity === "northwest") data="northwest" value="northwest") Northwest(左上角)
+                    option(selected=(videoWaterGravity === "center") data="center" value="center") Center(正中间)
+          .form-group
+            label.col-sm-2.control-label 参考：
+            .col-sm-12.col-md-5
+              .watermark-body
+                img.bg(src=tools.getUrl('defaultFile', 'watermark_background.jpg'))
+                .watermark(:class="videoWaterGravity + ' ' + videoWatermarkFile.size" :style="'opacity:' +  (1 - (us.watermark.video.transparency / 100))")
+                  img.wt(:src="videoWatermarkFile.url")
+                  span(v-if="videoWaterStyle === 'coluLogo'") 我的专栏
+                  span(v-if="videoWaterStyle === 'userLogo'") 我的用户名
           .form-group
             label.col-sm-2.control-label=`去水印花费积分（${data.watermarkScore.name}/${data.watermarkScore.unit}）`
             .col-sm-10.form-inline

@@ -18,10 +18,9 @@ module.exports = async (props) => {
     data,
     storeUrl
   } = props;
-  const {waterGravity, mediaPath, originPath, originId, timePath, rid, toc, disposition, waterAdd, enabled, minWidth, minHeight} = data;
+  const {waterGravity, mediaPath, originPath, originId, timePath, flex, rid, toc, disposition, waterAdd, enabled, minWidth, minHeight} = data;
   const filePath = file.path;//临时目录
   const time = (new Date(toc)).getTime();
-
 
   //识别图片信息并自动旋转，去掉图片的元信息
   await tools.imageAutoOrient(filePath);
@@ -66,7 +65,7 @@ module.exports = async (props) => {
       && waterAdd && enabled) {
       if(ext !== 'gif') {
         //原图打水印保存
-        await saveffmpeg(filePath, cover, waterGravity, outputPath)
+        await saveffmpeg(filePath, cover, waterGravity, outputPath, flex)
       }
     } else {
       outputPath = filePath;
@@ -140,7 +139,7 @@ module.exports = async (props) => {
 }
 
 //图片打水印
-async function ffmpegWaterMark(filePath, cover, waterGravity, output){
+async function ffmpegWaterMark(filePath, cover, waterGravity, output, flex){
   return Promise.resolve()
     .then(() => {
        return addImageTextWaterMaskForImage({
@@ -150,6 +149,7 @@ async function ffmpegWaterMark(filePath, cover, waterGravity, output){
         text: '',
         transparency: 100,
         position: gravityToPositionMap[waterGravity],
+        flex,
       })
     })
     .then(() => {
@@ -180,8 +180,8 @@ function mediumify(output, mediumPath){
 
 
 //保存缩略图
-function saveffmpeg (filePath, cover, waterGravity, output) {
-  return ffmpegWaterMark(filePath, cover, waterGravity, output)
+function saveffmpeg (filePath, cover, waterGravity, output, flex) {
+  return ffmpegWaterMark(filePath, cover, waterGravity, output, flex)
     .catch((err) => {
       console.log(err);
     });
@@ -221,7 +221,7 @@ async function addImageTextWaterMaskForImage(op) {
     flex = 0.08,
     position,
     transparency = 100,
-    additionOptions
+    additionOptions,
   } = op;
   const {height: imageHeight, width: imageWidth} = await tools.getFileInfo(input);
   const {size} = await tools.getFileInfo(image);

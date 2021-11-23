@@ -2,7 +2,6 @@
 
 
 .watermark{
-  border: 1px solid #aaa;
   display: inline-block;
   img{
     max-width: 16rem;
@@ -11,4 +10,55 @@
 
 .file-count{
   width: 5rem;
+}
+
+.watermark-body{
+  overflow: hidden;
+  position: relative;
+}
+.watermark-body .bg{
+  width: 100%;
+}
+.watermark-body .watermark{
+  z-index: 100;
+  position: absolute;
+  height: 3rem;
+  line-height: 3rem;
+}
+.watermark-body .wt{
+  max-height: 100%;
+}
+.watermark-body .watermark.small{
+  height: 1.4rem;
+  line-height: 1.4rem;
+}
+.watermark span{
+  color: #fff;
+  vertical-align: middle;
+  margin-left: 0.2rem;
+}
+
+.southeast{
+  right: 1rem;
+  bottom: 1rem;
+}
+.northeast{
+  right: 1rem;
+  top: 1rem;
+}
+.southwest{
+  bottom: 1rem;
+  left: 1rem;
+}
+.northwest{
+  top: 1rem;
+  left: 1rem;
+}
+.center{
+  top: 0;
+  left: 0;
+  right:0;
+  bottom: 0;
+  margin: auto;
+  text-align: center;
 }

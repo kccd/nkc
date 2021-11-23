@@ -11,6 +11,10 @@ data.uploadSettings.watermark.buyNoWatermark /= 100;
 window.app = new Vue({
   el: "#app",
   data: {
+    pictureWaterStyle: 'siteLogo',
+    videoWaterStyle: 'siteLogo',
+    pictureWaterGravity: 'southeast',
+    videoWaterGravity: 'southeast',
     us: data.uploadSettings,
     certList: data.certList,
     normalPictureWatermarkData: '',
@@ -22,10 +26,59 @@ window.app = new Vue({
     smallVideoWatermarkData: '',
     smallVideoWatermarkFile: '',
   },
+  mounted(){},
   computed: {
+    pictureWatermarkFile: function() {
+      var file = {};
+      if(this.pictureWaterStyle === 'siteLogo') {
+        if (this.normalPictureWatermarkData) {
+          file.url = this.normalPictureWatermarkData;
+        } else {
+          file.url = this.getUrl('defaultFile', 'watermark_normal.png')
+        }
+        file.size = 'normal';
+      } else {
+        if(this.smallPictureWatermarkData) {
+          file.url = this.smallPictureWatermarkData
+        } else {
+          file.url = this.getUrl('defaultFile', 'watermark_small.png');
+        }
+        file.size = 'small';
+      }
+      return file;
+    },
+    videoWatermarkFile: function() {
+      var file = {};
+      if(this.videoWaterStyle === 'siteLogo') {
+        if(this.normalVideoWatermarkData) {
+          file.url = this.normalVideoWatermarkData;
+        } else {
+          file.url = this.getUrl('defaultFile', 'watermark_normal.png')
+        }
+        file.size = 'normal';
+      } else {
+        if(this.smallVideoWatermarkData) {
+          file.url = this.smallVideoWatermarkData;
+        } else {
+          file.url = this.getUrl('defaultFile', 'watermark_small.png');
+        }
+        file.size = 'small';
+      }
+      return file;
+    },
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
+    // 切换图片水印示例图片
+    turnPictureImg(){
+      this.pictureWaterStyle = $("#pictureWaterStyle").val();
+      this.pictureWaterGravity = $("#pictureWaterGravity").val();
+    },
+    // 切换视频水印示例图片
+    turnVideoImg(){
+      this.videoWaterStyle = $("#videoWaterStyle").val();
+      this.videoWaterGravity = $("#videoWaterGravity").val();
+    },
     getWatermark(val, type, status) {
       return this.getUrl(val, type, status) + '&date=' + Date.now();
     },

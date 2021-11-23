@@ -433,6 +433,7 @@ settingSchema.statics.getWatermarkSettings = async (type) => {
     enabled: type === 'video'? uploadSettings.watermark.video.enabled:uploadSettings.watermark.picture.enabled,
     minHeight: type === 'video'?uploadSettings.watermark.video.minHeight:uploadSettings.watermark.picture.minHeight,
     minWidth: type === 'video'?uploadSettings.watermark.video.minWidth:uploadSettings.watermark.picture.minWidth,
+    flex: type === 'video'?uploadSettings.watermark.video.flex:uploadSettings.watermark.picture.flex,
   }
 };
 
@@ -761,7 +762,7 @@ settingSchema.statics.getVideoSize = async function() {
 *   @param {Stream} watermarkStream 水印数据流
 * @author pengxiguaa 2021-01-22
 * */
-settingSchema.statics.getWatermarkCoverPathByUid = async (uid, type) => {
+settingSchema.statics.getWatermarkCoverPathByUid = async (uid, type, style) => {
   const SettingModel = mongoose.model('settings');
   const ColumnsModel = mongoose.model('columns');
   const UserModel = mongoose.model('users');
@@ -774,11 +775,11 @@ settingSchema.statics.getWatermarkCoverPathByUid = async (uid, type) => {
   const watermarkSettings = await  SettingModel.getWatermarkSettings(type);
   if(!waterAdd || !watermarkSettings.enabled) return null;
   let imagePath = '', text = '';
-  if(waterSetting.waterSetting[type].waterStyle === 'siteLogo') {
+  if(style === 'siteLogo' || waterSetting.waterSetting[type].waterStyle === 'siteLogo') {
     imagePath = await SettingModel.getWatermarkFilePath('normal', type);
-  } else if(waterSetting.waterSetting[type].waterStyle === 'singleLogo') {
+  } else if(style === 'singleLogo' || waterSetting.waterSetting[type].waterStyle === 'singleLogo') {
     imagePath = await SettingModel.getWatermarkFilePath('small', type);
-  } else if (waterSetting.waterSetting[type].waterStyle === 'coluLogo') {
+  } else if (style === 'coluLogo' || waterSetting.waterSetting[type].waterStyle === 'coluLogo') {
     imagePath = await SettingModel.getWatermarkFilePath('small', type);
     const column = await ColumnsModel.findOne({uid: uid}, {name: 1, uid: 1})
     const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
@@ -793,6 +794,15 @@ settingSchema.statics.getWatermarkCoverPathByUid = async (uid, type) => {
     text,
     watermarkSettings.transparency / 100
   );
+}
+
+/*
+* 用户偏好设置获取水印
+* */
+settingSchema.statics.getAppsWatermarkPath = async (uid, type, style) => {
+  const SettingModel = mongoose.model('settings');
+  const watermarkPath = await SettingModel.getWatermarkCoverPathByUid(uid, type, style);
+  return watermarkPath;
 }
 
 settingSchema.statics.getWatermarkCoverPath = async (magePath, text = '', transparent = 1) => {
