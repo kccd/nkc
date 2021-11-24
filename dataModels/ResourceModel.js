@@ -301,6 +301,7 @@ resourceSchema.methods.setFileExist = async function(excludedMediaTypes = []) {
 * 获取文件元信息
 * */
 resourceSchema.methods.setMetadata = async function(resource, excludedMediaTypes = ['mediaPicture', 'mediaAttachment']){
+  return;
   const ffmpeg = require('../tools/ffmpeg');
   if(excludedMediaTypes.includes(this.mediaType)) return;
   const FILE = require('../nkcModules/file');

@@ -7,7 +7,7 @@ module.exports = {
     const {
       rid = id,
       disabled,
-      defaultFile
+      defaultFile = {}
     } = resource || {};
     const oname = defaultFile.name || '未知';
     const {width, height} = defaultFile;
@@ -48,7 +48,7 @@ module.exports = {
     const {
       visitorAccess = true,
       rid = id,
-      defaultFile
+      defaultFile = {}
     } = resource;
     const oname = defaultFile.name || '未知';
     const poster = getUrl("resourceCover", rid);
@@ -87,7 +87,7 @@ module.exports = {
       oname = "未知",
       rid = id,
       visitorAccess = true,
-      defaultFile
+      defaultFile = {}
     } = resource;
     const url = getUrl("resource", id) + '&w=' + resource.token;
     if(resource.disabled){
@@ -113,7 +113,7 @@ module.exports = {
       hits = 0,
       rid = id,
       visitorAccess = true,
-      defaultFile
+      defaultFile = {}
     } = resource;
     const oname = defaultFile.name || '未知';
     const size = defaultFile.size;
