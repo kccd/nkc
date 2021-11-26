@@ -60,7 +60,7 @@ block eContent
               .col-sm-5
                 h5 正常
                 .us.watermark.m-r-05
-                  div(:style="'opacity:' +  (1 - (us.watermark.picture.transparency / 100))")
+                  div
                     img(:src="normalPictureWatermarkData" v-if="normalPictureWatermarkData")
                     img(:src="getWatermark('watermark', 'PWN', 'normal')" v-else)
                 .p-t-05.m-b-05
@@ -68,7 +68,7 @@ block eContent
               .col-sm-5
                 h5 小
                 .us.watermark.m-r-05
-                  div(:style="'opacity:' +  (1 - (us.watermark.picture.transparency / 100))")
+                  div
                     img(:src="smallPictureWatermarkData" v-if="smallPictureWatermarkData")
                     img(:src="getWatermark('watermark', 'PWS', 'small')" v-else)
                 .p-t-05.m-b-05
@@ -151,7 +151,7 @@ block eContent
               .col-sm-5
                 h5 正常
                 .us.watermark.m-r-05
-                  div(:style="'opacity:' +  (1 - (us.watermark.video.transparency / 100))")
+                  div
                     img(:src="normalVideoWatermarkData" v-if="normalVideoWatermarkData")
                     img(:src="getWatermark('watermark', 'VWN', 'normal')" v-else)
                 .p-t-05.m-b-05
@@ -159,7 +159,7 @@ block eContent
               .col-sm-5
                 h5 小
                 .us.watermark.m-r-05
-                  div(:style="'opacity:' +  (1 - (us.watermark.video.transparency / 100))")
+                  div
                     img(:src="smallVideoWatermarkData" v-if="smallVideoWatermarkData")
                     img(:src="getWatermark('watermark', 'VWS', 'small')" v-else)
                 .p-t-05.m-b-05
