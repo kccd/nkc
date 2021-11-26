@@ -172,6 +172,10 @@ var app = new Vue({
     columnName: data.columnName,
     username: data.user.username,
     user: data.user,
+    pictureFlex: data.pictureFlex,
+    videoFlex: data.videoFlex,
+    defaultPictureImgWidth: '',
+    defaultVideoImgWidth: '',
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
@@ -181,7 +185,15 @@ var app = new Vue({
       } else {
         return `/wm/${this.user.uid}?type=` + type + '&style=' + this.waterSetting.video.waterStyle + '&time=' + Date.now();
       }
-    }
+    },
+    getDefaultPictureImg() {
+      const defaultPictureImg = $('#defaultPictureImg');
+      this.defaultPictureImgWidth = defaultPictureImg.height();
+    },
+    getDefaultVideoImg() {
+      const defaultVideoImg = $('#defaultVideoImg');
+      this.defaultVideoImgWidth = defaultVideoImg.height();
+    },
   },
   computed: {
     pictureWatermarkFile: function() {
@@ -239,7 +251,17 @@ var app = new Vue({
       } else if(this.waterSetting.video.waterStyle === 'coluLogo') {
         return this.columnName;
       }
-    }
+    },
+    //改变图片水印比例
+    getPictureWatermarkHeight(){
+      const H = this.defaultPictureImgWidth * (this.pictureFlex/100);
+      return `height: ${H}px;`;
+    },
+    //改变视频水印比例
+    getVideoWatermarkHeight(){
+      const H = this.defaultVideoImgWidth * (this.videoFlex/100);
+      return `height: ${H}px`;
+    },
   }
 });
 

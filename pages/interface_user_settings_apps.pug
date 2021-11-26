@@ -12,15 +12,16 @@ block title
     .watermark-body .watermark{
       z-index: 100;
       position: absolute;
-      height: 3rem;
-      line-height: 3rem;
+      height: 100%;
+      width: 100%;
+      text-align-last: end;
+      right: 0;
+      bottom: 0;
     }
     .watermark-body .wt{
-      max-height: 100%;
+      position: absolute;
     }
-    .watermark-body .watermark.small{
-      height: 1.4rem;
-      line-height: 1.4rem;
+    .watermark-body .watermark .small{
     }
     .watermark span{
       color: #fff;
@@ -28,20 +29,20 @@ block title
       margin-left: 0.2rem;
     }
     .southeast{
-      right: 1rem;
-      bottom: 1rem;
+      right: 10px;
+      bottom: 10px;
     }
     .northeast{
-      right: 1rem;
-      top: 1rem;
+      right: 10px;
+      top: 10px;
     }
     .southwest{
-      bottom: 1rem;
-      left: 1rem;
+      bottom: 10px;
+      left: 10px;
     }
     .northwest{
-      top: 1rem;
-      left: 1rem;
+      top: 10px;
+      left: 10px;
     }
     .center{
       top: 0;
@@ -52,7 +53,7 @@ block title
       text-align: center;
     }
 block content
-  #data.hidden=objToStr({columnName: data.columnName, user: data.user, waterSetting: data.waterSetting, noWatermark: data.noWatermark})
+  #data.hidden=objToStr({columnName: data.columnName, user: data.user, waterSetting: data.waterSetting, noWatermark: data.noWatermark, videoFlex: data.videoFlex, pictureFlex: data.pictureFlex,})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
@@ -191,9 +192,9 @@ block content
                 label.col-sm-2.control-label 参考：
                 .col-sm-12.col-md-5
                   .watermark-body
-                    img.bg(src=tools.getUrl('defaultFile', 'watermark_background.jpg'))
-                    .watermark(:class="waterSetting.picture.waterGravity + ' ' + pictureWatermarkFile.size" style=`opacity: ${1-(data.noWatermark.file.transparency/100)}`)
-                      img.wt(:src="getAppsWatermark('picture')")
+                    img.bg#defaultPictureImg(src=tools.getUrl('defaultFile', 'watermark_background.jpg') @load="getDefaultPictureImg")
+                    .watermark(:class="pictureWatermarkFile.size" style=`opacity: ${1-(data.noWatermark.file.transparency/100)}`)
+                      img.wt(:src="getAppsWatermark('picture')" :class="waterSetting.picture.waterGravity" :style="getPictureWatermarkHeight")
                       //img.wt(:src="pictureWatermarkFile.url")
                       //span(v-if='pictureWatermarkName') {{pictureWatermarkName}}
                 .col-sm-12.col-md-10.col-md-offset-2
@@ -235,9 +236,9 @@ block content
                 label.col-sm-2.control-label 参考：
                 .col-sm-12.col-md-5
                   .watermark-body
-                    img.bg(src=tools.getUrl('defaultFile', 'watermark_background.jpg'))
-                    .watermark(:class="waterSetting.video.waterGravity + ' ' + videoWatermarkFile.size" style=`opacity: ${1 - (data.noWatermark.file.transparency / 100)}`)
-                      img.wt(:src="getAppsWatermark('video')")
+                    img.bg#defaultVideoImg(src=tools.getUrl('defaultFile', 'watermark_background.jpg') @load="getDefaultVideoImg")
+                    .watermark(:class="videoWatermarkFile.size" style=`opacity: ${1 - (data.noWatermark.file.transparency / 100)}`)
+                      img.wt(:src="getAppsWatermark('video')" :class="waterSetting.video.waterGravity" :style="getVideoWatermarkHeight")
                       //img.wt(:src="videoWatermarkFile.url")
                       //span(v-if='videoWatermarkName') {{videoWatermarkName}}
                 .col-sm-12.col-md-10.col-md-offset-2
