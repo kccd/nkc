@@ -417,7 +417,8 @@ schema.statics.getHomeBlockData = async (props) => {
     recommendThreadsFixed: fixed,
     management: [],
     goods: [],
-    forums: []
+    forums: [],
+    webApply: [],
   };
   // 热销商品
   if(showShopGoods) {

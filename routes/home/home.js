@@ -77,6 +77,20 @@ module.exports = async (options) => {
   let forumsId = await db.ForumModel.getReadableForumsIdByUid(state.uid);
   const forums = await db.ForumModel.find({openReduceVisits: false, fid: {$in: forumsId}}, {fid: 1});
   forumsId = forums.map(f => f.fid);
+  // 是否启用了基金
+  const fundSettings = await db.SettingModel.getSettings('fund');
+  // const fundSettings = await db.SettingModel.findOne({_id: 'fund'});
+  let enableFund = fundSettings.enableFund;
+  if(enableFund) {
+    // 基金名称
+    data.fundName = fundSettings.fundName;
+  }
+  data.enableFund = enableFund;
+  // 是否启用了网站工具
+  const toolSettings = await db.SettingModel.getSettings("tools");
+  data.siteToolEnabled = toolSettings.enabled;
+  // 是否显示“活动”入口
+  data.showActivityEnter = homeSettings.showActivityEnter;
   data.homeBlockData = await db.HomeBlockModel.getHomeBlockData({
     fidOfCanGetThreads: forumsId,
     showDisabledBlock: ctx.permission('nkcManagementHome')

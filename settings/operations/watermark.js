@@ -1,3 +1,6 @@
 module.exports = {
-  GET: 'getWatermark'
+  GET: 'getWatermark',
+  PARAMETER: {
+    GET: "getAppsWatermark"
+  }
 }

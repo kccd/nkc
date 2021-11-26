@@ -38,6 +38,8 @@ router
       file: {smallAttachId, normalAttachId, transparency}};
     // 判断用户是否有专栏
     const column = await db.ColumnModel.findOne({uid: user.uid});
+    data.pictureFlex = uploadSettings.watermark.picture.flex;
+    data.videoFlex = uploadSettings.watermark.video.flex;
     data.hasColumn = !!column;
     data.columnName = column?column.name:"";
     ctx.template = "interface_user_settings_apps.pug";

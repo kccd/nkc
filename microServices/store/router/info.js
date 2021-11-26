@@ -1,7 +1,7 @@
 const {
   getTargetFilePath,
   getFileInfo,
-  accessFile
+  accessFile,
 } = require("../tools");
 module.exports = async (ctx, next) => {
   const {query, data} = ctx;
@@ -20,7 +20,7 @@ module.exports = async (ctx, next) => {
       time,
       path,
       lost,
-      info
+      info,
     });
   }
   await next();

@@ -124,7 +124,7 @@ module.exports = {
       const pdfUrl = getUrl("pdf", rid);
       pdfHTML = `
         <span class="article-attachment-reader">
-          <a href="/reader/pdf/web/viewer?file=%2fr%2f${rid}" target="_blank">预览</a>
+          <a href="/reader/pdf/web/viewer?file=%2fr%2f${rid}?time=${Date.now()}" target="_blank">预览</a>
           <span class="fa fa-question-circle" title="预览文件已被压缩处理，并不代表真实文件质量"></span>
         </span>
       `.trim();

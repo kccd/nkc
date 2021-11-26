@@ -1,7 +1,7 @@
 const {createCanvas, loadImage} = require('canvas');
 module.exports = async (imagePath, text = '', transparent = 1) => {
   // 输出的水印图片高度为100px
-  const canvasPadding = 10;
+  const canvasPadding = 0;
   const logo = await loadImage(imagePath);
   const logoHeight = logo.height;
   const canvas = createCanvas(logo.width, logoHeight + 2 * canvasPadding);
@@ -11,7 +11,7 @@ module.exports = async (imagePath, text = '', transparent = 1) => {
   const fontInfo = `${logoHeight}px sans`;
   ctx.font = fontInfo;
   const textSize = ctx.measureText(text);
-  const gap = text? logoHeight / 4: 0;
+  const gap = text? logoHeight / 6: 0;
   canvas.width = textSize.width + logoWidth + gap + 2 * canvasPadding;
   ctx.globalAlpha = transparent;
   ctx.shadowOffsetX = 1;

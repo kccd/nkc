@@ -11,7 +11,8 @@ const vm = new Vue({
 		IDCardBInputFile: null,
 		videoInputFile: null,
 		videoCode: Math.floor(Math.random()*(9999-1000))+1000,
-		loading:false
+		loading:false,
+		uploadProgress: '',
 	},
 	mounted () {
 	},
@@ -90,7 +91,8 @@ const vm = new Vue({
 			this.authenticate.card.status = "in_review";
 		},
 		async submiteVerify3() {
-			const { videoInputFile, videoCode } = this;
+			const self = this;
+			const { videoInputFile, videoCode } = self;
 			if(!videoInputFile) {
 				return sweetWarning("请先选择视频");
 			}
@@ -98,14 +100,18 @@ const vm = new Vue({
 			form.append("video", videoInputFile);
 			form.append("code", videoCode);
 			try {
-			this.loading = true;
-			await nkcUploadFile("verify/verify3_form", "POST", form).then(()=>{
-			this.authenticate.video.status = "in_review";
-			this.loading = false;
+				self.loading = true;
+			await nkcUploadFile("verify/verify3_form", "POST", form, function (e, progress){
+				console.log(typeof  progress);
+				self.uploadProgress = parseInt(progress);
+			}).then(() =>{
+				self.uploadProgress = 100;
+				self.authenticate.video.status = "in_review";
+				self.loading = false;
 			return sweetSuccess("视频提交成功，请等待审核");
 				});
 			} catch (error) {
-			this.loading = false;
+				self.loading = false;
 			return sweetError(error);
 			}
 		}

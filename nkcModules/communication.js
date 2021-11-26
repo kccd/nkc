@@ -15,11 +15,15 @@ function getCommunicationClient() {
 
   communicationClient.onMessage((req) => {
     const ResourceModel = require('../dataModels/ResourceModel');
+    const VerifiedUploadModel = require("../dataModels/VerifiedUploadModel");
     const {from, content} = req;
     const {type, data} = content;
     if(type === 'resourceStatus') {
       // 接收到来自 media service 有关附件处理状态的消息
       ResourceModel.updateResourceStatus(data);
+    } else if (type === "verifiedUploadState") {
+      //接受到来自媒体服务视频认证处理状态信息
+      VerifiedUploadModel.updateVerifiedState(data);
     }
   });
 }

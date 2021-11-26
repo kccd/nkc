@@ -1,3 +1,6 @@
+import Vue from 'vue'
+const data = NKC.methods.getDataById('data');
+
 var targetUid = $('.photoType').attr('targetUid');
 $(function(){
 	var radioName = [];
@@ -60,6 +63,25 @@ function submit(name){
 			})
 	});
 }
+
+new Vue({
+	el: "#app",
+	data: {
+		t: data.t,
+		searchType: data.searchType || 'username',
+		searchContent: data.searchContent || '',
+	},
+	methods: {
+		search() {
+			const {searchType, searchContent, t} = this;
+			if(!searchContent) return sweetError('请输入搜索内容');
+			window.location.href = `/e/auth?t=${t}&c=${searchType},${searchContent}`;
+		},
+		resetInput(){
+			this.searchContent = '';
+		}
+	}
+})
 
 Object.assign(window, {
 	targetUid,

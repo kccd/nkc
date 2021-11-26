@@ -150,8 +150,7 @@ async function createStoreQueryUrl(storeUrl, time, path) {
 * */
 
 function replaceFileExtension(filename, newExtension) {
-  if(!filename) throw new Error(`文件名不能为空`);
-  if(!newExtension) throw new Error(`新的文件格式不能为空`);
+  if(!filename || !newExtension) return filename;
   filename = filename.split('.');
   if(filename.length > 1) {
     filename.pop();
@@ -192,6 +191,54 @@ async function getStoreFilesInfo(storeUrl, files) {
         reject(err);
       });
   });
+}
+
+/*
+* 获取存储服务文件元信息
+* */
+async function getMetaInformation(toc, files, time, path) {
+  const storeUrl = await getStoreUrl(toc) + '/metaInformation';
+  return new Promise((resolve, reject) => {
+    axios({
+      url: storeUrl,
+      method: 'GET',
+      params: {
+        files: JSON.stringify(files) || '',
+        time,
+        path
+      }
+    })
+      .then(res => {
+        resolve(res.data || res);
+      })
+      .catch(err => {
+        console.log(err);
+        reject(err);
+      });
+  })
+}
+
+/*
+* 清除存储服务文件元信息
+* */
+async function removeResourceInfo(toc, files) {
+  const storeUrl = await getStoreUrl(toc) + '/removeInfo';
+  return new Promise((resolve, reject) => {
+    axios({
+      url: storeUrl,
+      method: 'PUT',
+      params: {
+        files: JSON.stringify(files) || '',
+      }
+    })
+      .then(res => {
+        resolve(res || res);
+      })
+      .catch(err => {
+        console.log(err);
+        reject(err);
+      });
+  })
 }
 
 /*
@@ -302,4 +349,6 @@ module.exports = {
   createStoreQueryUrl,
   getStoreFilesInfo,
   replaceFileExtension,
+  getMetaInformation,
+  removeResourceInfo
 }

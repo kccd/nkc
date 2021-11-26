@@ -22,6 +22,9 @@ var Tools = function() {
       case "userAvatar": {
         return fileDomain + "/a/" + id + t
       }
+      case "appUserAvatar": { // 临时兼容 APP
+        return "/a/" + id + t
+      }
       case "userBanner": {
         return fileDomain + "/a/"+ id + t
       }
@@ -145,7 +148,7 @@ var Tools = function() {
         return "/default/" + id;
       }
       case 'previewPDF': {
-        return "/reader/pdf/web/viewer?file=%2fr%2f" + id;
+        return "/reader/pdf/web/viewer?file=%2fr%2f" + id + "?time=" + Date.now();
       }
       case 'siteIcon': {
         return "/logo/" + id;

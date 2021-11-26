@@ -9,6 +9,7 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
       data: {
         loading: true,
         error: false,
+        errorInfo: '',
         rid: '',
         resource: null,
         fileCountLimitInfo: [],
@@ -72,11 +73,12 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
       methods: {
         getUrl: NKC.methods.tools.getUrl,
         visitUrl({name, url}) {
+          url = url + `&time=${Date.now()}`
           const {needScore, rid, resource} = this;
           return Promise.resolve()
             .then(() => {
               if(needScore) {
-                return nkcAPI(`/r/${rid}/pay`, 'POST', {})
+                return nkcAPI(`/r/${rid}/pay?time=${Date.now()}`, 'POST', {})
               }
             })
             .then(() => {
@@ -95,6 +97,7 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
         reload() {
           this.loading = true;
           this.error = false;
+          this.errorInfo = '';
           this.getResourceInfo();
         },
         getResourceInfo() {
@@ -129,7 +132,7 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
               console.log(err);
               this.loading = false;
               this.error = true;
-              sweetError(err);
+              this.errorInfo = err.error || err.message || err;
             })
         },
         open(rid) {

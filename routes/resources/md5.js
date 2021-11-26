@@ -1,7 +1,7 @@
 const router = require('koa-router')();
 router
   .post('/', async (ctx, next) => {
-    const {db, body, data} = ctx;
+    const {db, body, data, nkcModules} = ctx;
     const {user} = data;
     const {
       md5, filename
@@ -9,14 +9,19 @@ router
     if(!filename) ctx.throw(400, `文件名不能为空`);
     if(!md5) ctx.throw(400, `md5 不能为空`);
     let uploaded = false;
-    const resource = await db.ResourceModel.findOne({
-      prid: '',
-      hash: md5,
-      ext: {$ne: ''},
-      mediaType: "mediaAttachment",
-      state: 'usable',
-      files: {$ne: {}}
-    }).sort({toc: -1});
+    const ext = await nkcModules.file.getFileExtension({name: filename});
+    const mediaType = db.ResourceModel.getMediaTypeByExtension(ext);
+    let resource;
+    if(mediaType === 'mediaAttachment') {
+      resource = await db.ResourceModel.findOne({
+        prid: '',
+        hash: md5,
+        ext: {$ne: ''},
+        mediaType,
+        state: 'usable',
+        files: {$ne: {}}
+      }).sort({toc: -1});
+    }
     if(resource) {
       const _file = {
         size: resource.size,
