@@ -349,14 +349,13 @@ chatSchema.statics.getCreatedChat = async (uid) => {
       type: 'UTU', // 对话类型 UTU(用户间) STU(应用通知) STE(系统通知)
       name, // 显示的名称 昵称或者是用户填写的备注信息
       uid: targetUser.uid, // 对方ID
-      icon: getUrl('userAvatar', targetUser.avatar), // 显示的头像
+      icon: getUrl('appUserAvatar', targetUser.avatar), // 显示的头像
       status, // 在线状态
       abstract, // 摘要
       count: unread // 未读条数
     });
   }
   const usersGeneral = await UsersGeneralModel.findOne({uid});
-  const t = Date.now();
   const {
     newSystemInfoCount,
     newApplicationsCount,

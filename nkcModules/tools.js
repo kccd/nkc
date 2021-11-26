@@ -22,6 +22,9 @@ var Tools = function() {
       case "userAvatar": {
         return fileDomain + "/a/" + id + t
       }
+      case "appUserAvatar": { // 临时兼容 APP
+        return "/a/" + id + t
+      }
       case "userBanner": {
         return fileDomain + "/a/"+ id + t
       }
