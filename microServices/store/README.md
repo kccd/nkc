@@ -106,3 +106,59 @@ body: FormData // 其中的 file1、file2 可自定义，但必须保证 fields 
     ...  
   }
 ```
+
+
+#### 4、获取存储服务元文件信息
+```
+GET /metaInformation
+body: 
+  fields: {
+    file1: {
+      time: Number, 文件上传时间戳
+      path: String, 文件相对路径
+      type: String, 文件类型
+    },
+    file2: {
+      time: Number,
+      path: String,
+      type: String,
+    },
+    ...
+  }
+  files: {
+    file1: File,
+    file2: File,
+    ...  
+  }
+  
+ res: {
+    type: String, 文件类型，
+    metaInfo: Obj, 文件的元信息，参数不确定，文件不存在时信心为空
+```
+
+
+#### 5、清除存储服务元文件信息
+```
+PUT /removeInfo
+body: 
+  fields: {
+    file1: {
+      time: Number, 文件上传时间戳
+      path: String, 文件相对路径
+      type: String, 文件类型
+      ext: String, 文件格式
+    },
+    file2: {
+      time: Number,
+      path: String,
+      type: String,
+      ext: String, 文件格式
+    },
+    ...
+  }
+  files: {
+    file1: File,
+    file2: File,
+    ...  
+  }
+```
