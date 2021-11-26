@@ -116,10 +116,9 @@ function turnPictureImg(){
   // console.log($("#pictureWaterGravity").val())
   // var newImg = "< img src='/default/"+$("#pictureWaterGravity").val()+".jpg' style='width: 100%;'>"
   // $("#exampleImg").html(newImg)
-  $("#newImg").attr("src","/default/"+$("#pictureWaterStyle").val()+$("#pictureWaterGravity").val()+".jpg");
+  // $("#newImg").attr("src","/default/"+$("#pictureWaterStyle").val()+$("#pictureWaterGravity").val()+".jpg");
   app.waterSetting.picture.waterStyle = $("#pictureWaterStyle").val();
   app.waterSetting.picture.waterGravity = $("#pictureWaterGravity").val();
-  console.log(app.waterSetting.picture.waterStyle);
 }
 
 // 切换视频水印示例图片
@@ -127,7 +126,7 @@ function turnVideoImg(){
   // console.log($("#pictureWaterGravity").val())
   // var newImg = "< img src='/default/"+$("#pictureWaterGravity").val()+".jpg' style='width: 100%;'>"
   // $("#exampleImg").html(newImg)
-  $("#newImg").attr("src","/default/"+$("#videoWaterStyle").val()+$("#videoWaterGravity").val()+".jpg");
+  // $("#newImg").attr("src","/default/"+$("#videoWaterStyle").val()+$("#videoWaterGravity").val()+".jpg");
   app.waterSetting.video.waterStyle = $("#videoWaterStyle").val();
   app.waterSetting.video.waterGravity = $("#videoWaterGravity").val();
 }
@@ -172,9 +171,17 @@ var app = new Vue({
     noWatermark: data.noWatermark,
     columnName: data.columnName,
     username: data.user.username,
+    user: data.user,
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
+    getAppsWatermark(type){
+      if(type === 'picture') {
+        return `/wm/${this.user.uid}?type=` + type + '&style=' + this.waterSetting.picture.waterStyle + '&time=' + Date.now();
+      } else {
+        return `/wm/${this.user.uid}?type=` + type + '&style=' + this.waterSetting.video.waterStyle + '&time=' + Date.now();
+      }
+    }
   },
   computed: {
     pictureWatermarkFile: function() {

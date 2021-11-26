@@ -5,7 +5,7 @@ const {
   deleteFile,
   storeClient,
 } = require('../../tools');
-const {sendResourceStatusToNKC} = require('../../socket');
+const {sendMessageToNkc} = require('../../socket');
 module.exports = async (props) => {
   const {
     file,
@@ -33,14 +33,14 @@ module.exports = async (props) => {
     .then(fileInfo => {
       fileInfo.name = filenamePath;
       filesInfo.def = fileInfo;
-      return sendResourceStatusToNKC({
+      return sendMessageToNkc('resourceStatus', {
         rid,
         status: true,
         filesInfo
       });
     })
     .catch(err => {
-      return sendResourceStatusToNKC({
+      return sendMessageToNkc('resourceStatus', {
         rid,
         status: false,
         error: err.message || err.toString()

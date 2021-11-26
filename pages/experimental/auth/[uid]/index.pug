@@ -50,6 +50,7 @@ block eContent
               span.text-success(v-if="authenticate.card.status === 'passed'") 已通过
               span(v-if="authenticate.card.status === 'in_review'") 待审核
               span(v-if="authenticate.card.status === 'unsubmit'") 未提交
+              span.text-danger(v-if="authenticate.card.status === 'useless'") 图片处理失败
               span.text-danger(v-if="authenticate.card.status === 'fail'") 未通过
               button.btn.btn-link(v-if="!authenticate.card.isExpired && authenticate.card.status === 'passed'" @click="revokeVerify(2)") 撤销认证
             h5(v-if="authenticate.card.status === 'fail'") 理由：
@@ -63,37 +64,51 @@ block eContent
                 h5 身份证背面
                 a.verify2__img(href=srcB target='_blank')
                   img(:src="IDCardB" style='max-width: 100%;').center-block
-              .col-xs-12.col-md-12.text-center(v-if="authenticate.card.status === 'in_review'")
-                br
-                br
-                label.radio-inline
-                  input(type='radio' value="passed" v-model="verify2form.status")
-                  span 通过
-                label.radio-inline
-                  input(type='radio' value="fail" v-model="verify2form.status")
-                  span 不通过
-                br
-                br
-              .col-xs-12.col-md-4.col-md-offset-4.text-center(v-if="verify2form.status === 'passed'")
-                span(v-if="['unsubmit', 'fail'].indexOf(authenticate.card.status) < 0") 过期时间：
-                //- datetime(v-model="verify2form.expiredDate" v-if="authenticate.card.status === 'in_review'")
-                el-date-picker(
-                  v-if="authenticate.card.status === 'in_review'"
-                  v-model="verify2form.expiredDate"
-                  align="left"
-                  size="small"
-                  type="date"
-                  placeholder="选择日期"
-                  format="yyyy年MM月dd日"
-                  :picker-options="datePickerOptions"
-                )
-                span(v-else-if="authenticate.card.isExpired") 已过期
-                span(v-else-if="authenticate.card.status === 'passed'") {{authenticate.card.expiryDate}}
-              .col-xs-12.col-md-4.col-md-offset-4.text-center(v-if="authenticate.card.status === 'in_review' && verify2form.status === 'fail'")
-                textarea.form-control#idCardReason(rows=6 placeholder='请填写不通过的原因' v-model="verify2form.message")
-              .col-xs-12.col-md-12.text-center(v-if="authenticate.card.status === 'in_review'")
-                br
-                button.btn.btn-primary(@click="verify2Submit()") 提交
+              if (data.verifiedAState === 'inProcess' && data.verifiedBState === 'inProcess')
+                .col-xs-12.col-md-12.text-center
+                  span 图片处理中，请稍后再试
+              else if (data.verifiedAState === 'useless' && data.verifiedBState === 'useless')
+                .col-xs-12.col-md-12.text-center
+                  div
+                    span 图片处理失败
+                  div
+                    span 身份证正面错误信息：
+                    span=data.cardAErrorInfo
+                  div
+                    span 身份证正面错误信息：
+                    span=data.cardBErrorInfo
+              else
+                .col-xs-12.col-md-12.text-center(v-if="authenticate.card.status === 'in_review'")
+                  br
+                  br
+                  label.radio-inline
+                    input(type='radio' value="passed" v-model="verify2form.status")
+                    span 通过
+                  label.radio-inline
+                    input(type='radio' value="fail" v-model="verify2form.status")
+                    span 不通过
+                  br
+                  br
+                .col-xs-12.col-md-4.col-md-offset-4.text-center(v-if="verify2form.status === 'passed'")
+                  span(v-if="['unsubmit', 'fail'].indexOf(authenticate.card.status) < 0") 过期时间：
+                  //- datetime(v-model="verify2form.expiredDate" v-if="authenticate.card.status === 'in_review'")
+                  el-date-picker(
+                    v-if="authenticate.card.status === 'in_review'"
+                    v-model="verify2form.expiredDate"
+                    align="left"
+                    size="small"
+                    type="date"
+                    placeholder="选择日期"
+                    format="yyyy年MM月dd日"
+                    :picker-options="datePickerOptions"
+                  )
+                  span(v-else-if="authenticate.card.isExpired") 已过期
+                  span(v-else-if="authenticate.card.status === 'passed'") {{authenticate.card.expiryDate}}
+                .col-xs-12.col-md-4.col-md-offset-4.text-center(v-if="authenticate.card.status === 'in_review' && verify2form.status === 'fail'")
+                  textarea.form-control#idCardReason(rows=6 placeholder='请填写不通过的原因' v-model="verify2form.message")
+                .col-xs-12.col-md-12.text-center(v-if="authenticate.card.status === 'in_review'")
+                  br
+                  button.btn.btn-primary(@click="verify2Submit()") 提交
         .panel.panel-primary
           .panel-heading
             span 身份认证3
@@ -103,6 +118,7 @@ block eContent
               span.text-success(v-if="authenticate.video.status === 'passed'") 已通过
               span(v-if="authenticate.video.status === 'in_review'") 待审核
               span(v-if="authenticate.video.status === 'unsubmit'") 未提交
+              span.text-danger(v-if="authenticate.video.status === 'useless'") 视频处理失败
               span.text-danger(v-if="authenticate.video.status === 'fail'") 未通过
               button.btn.btn-link(v-if="!authenticate.video.isExpired && authenticate.video.status === 'passed'" @click="revokeVerify(3)") 撤销认证
             h5(v-if="authenticate.video.status === 'fail'") 理由：
@@ -112,36 +128,49 @@ block eContent
                 h5 手持身份证视频
                 p(v-if="authenticate.video.status !== 'unsubmit'") 提示语：{{verifyDescription}}
                 .idcard-video
-                  video(:src="video" controls v-if="authenticate.video.status !== 'unsubmit'")
-              .col-xs-12.col-md-12.text-center(v-if="authenticate.video.status === 'in_review'")
-                br
-                br
-                label.radio-inline
-                  input(type='radio' value="passed" v-model="verify3form.status")
-                  span 通过
-                label.radio-inline
-                  input(type='radio' value="fail" v-model="verify3form.status")
-                  span 不通过
-                br
-                br
-              .col-xs-12.col-md-4.col-md-offset-4.text-center(v-if="verify3form.status === 'passed'")
-                span(v-if="['unsubmit', 'fail'].indexOf(authenticate.video.status) < 0") 过期时间：
-                el-date-picker(
-                  v-if="authenticate.video.status === 'in_review'"
-                  v-model="verify3form.expiredDate"
-                  align="left"
-                  size="small"
-                  type="date"
-                  placeholder="选择日期"
-                  format="yyyy年MM月dd日"
-                  :picker-options="datePickerOptions"
-                )
-                span(v-else-if="authenticate.video.isExpired") 已过期
-                span(v-else-if="authenticate.video.status === 'passed'") {{authenticate.video.expiryDate}}
-              .col-xs-12.col-md-4.col-md-offset-4.text-center(v-if="authenticate.video.status === 'in_review' && verify3form.status === 'fail'")
-                textarea.form-control#idCardReason(rows=6 placeholder='请填写不通过的原因' v-model="verify3form.message")
-              .col-xs-12.col-md-12.text-center(v-if="authenticate.video.status === 'in_review'")
-                br
-                button.btn.btn-primary(@click="verify3Submit()") 提交
+                  if(data.verifiedVideoState === 'usable')
+                    video(:src="video" controls v-if="authenticate.video.status !== 'unsubmit'")
+              if(data.verifiedVideoState === 'usable')
+                .col-xs-12.col-md-12.text-center(v-if="authenticate.video.status === 'in_review'")
+                  br
+                  br
+                  label.radio-inline
+                    input(type='radio' value="passed" v-model="verify3form.status")
+                    span 通过
+                  label.radio-inline
+                    input(type='radio' value="fail" v-model="verify3form.status")
+                    span 不通过
+                  br
+                  br
+                .col-xs-12.col-md-4.col-md-offset-4.text-center(v-if="verify3form.status === 'passed'")
+                  span(v-if="['unsubmit', 'fail'].indexOf(authenticate.video.status) < 0") 过期时间：
+                  el-date-picker(
+                    v-if="authenticate.video.status === 'in_review'"
+                    v-model="verify3form.expiredDate"
+                    align="left"
+                    size="small"
+                    type="date"
+                    placeholder="选择日期"
+                    format="yyyy年MM月dd日"
+                    :picker-options="datePickerOptions"
+                  )
+                  span(v-else-if="authenticate.video.isExpired") 已过期
+                  span(v-else-if="authenticate.video.status === 'passed'") {{authenticate.video.expiryDate}}
+                .col-xs-12.col-md-4.col-md-offset-4.text-center(v-if="authenticate.video.status === 'in_review' && verify3form.status === 'fail'")
+                  textarea.form-control#idCardReason(rows=6 placeholder='请填写不通过的原因' v-model="verify3form.message")
+                .col-xs-12.col-md-12.text-center(v-if="authenticate.video.status === 'in_review'")
+                  br
+                  button.btn.btn-primary(@click="verify3Submit()") 提交
+              else if (data.verifiedVideoState === 'inProcess')
+                .col-xs-12.col-md-12.text-center
+                  span 视频处理中，请稍后再试
+              else if (data.verifiedVideoState === 'useless')
+                .col-xs-12.col-md-12.text-center
+                  div
+                    span 视频处理失败
+                  div
+                    span 错误信息：
+                    span=data.videoErrorInfo
+
 block scripts
   +includeJS("/experimental/auth/[uid]/index.js")

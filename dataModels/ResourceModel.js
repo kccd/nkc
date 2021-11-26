@@ -5,6 +5,7 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const PATH = require('path');
 const fs = require("fs");
+const FILE = require('../nkcModules/file')
 const fsPromises = fs.promises;
 const resourceSchema = new Schema({
 	rid: {
@@ -300,19 +301,48 @@ resourceSchema.methods.setFileExist = async function(excludedMediaTypes = []) {
 /*
 * 获取文件元信息
 * */
-resourceSchema.methods.setMetadata = async function(resource, excludedMediaTypes = ['mediaPicture', 'mediaAttachment']){
-  return;
-  const ffmpeg = require('../tools/ffmpeg');
+resourceSchema.methods.setMetadata = async function(excludedMediaTypes = ['mediaPicture', 'mediaAttachment']){
   if(excludedMediaTypes.includes(this.mediaType)) return;
   const FILE = require('../nkcModules/file');
-  //获取文件信息
-  const filePath = await resource.getFilePath();
-  //判断路劲文件是否存在,如果不存在就返回错误
-  if(!await FILE.access(filePath)) return;
-  //获取文件信息
-  const data = await ffmpeg.getFileInfo(filePath);
-  //文件标题信息
-  this.metadata = data.format.tags || {};
+  const {toc, mediaType} = this;
+  const time = (new Date(toc)).getTime();
+  const mediaPath = await FILE.getMediaPath(mediaType);
+  const timePath = await FILE.getTimePath(toc);
+  // const path = PATH.join(mediaPath, timePath);
+  const filenames = [];
+  const _resource = this.toObject();
+  for(const file in _resource.files) {
+    if(file === 'cover') continue;
+    const path = PATH.join(mediaPath, timePath, _resource.files[file].name);
+    filenames.push({
+      time,
+      type: file,
+      path,
+    });
+  }
+  // 获取元文件信息
+  const data = await FILE.getMetaInformation(toc, filenames);
+  // 文件标题信息
+  this.metadata = data.metaInfos || {};
+}
+//清除存储服务文件元信息
+resourceSchema.methods.clearResourceInfo = async function() {
+  const {toc, mediaType} = this;
+  const time = (new Date(toc)).getTime();
+  const mediaPath = await FILE.getMediaPath(mediaType);
+  const timePath = await FILE.getTimePath(toc);
+  const filenames = [];
+  const _resource = this.toObject();
+  for(const file in _resource.files) {
+    const path = PATH.join(mediaPath, timePath, _resource.files[file].name);
+    filenames.push({
+      time,
+      type: file,
+      path,
+      ext: _resource.files[file].ext,
+    });
+  }
+  await FILE.removeResourceInfo(toc, filenames)
 }
 
 /*
@@ -897,6 +927,7 @@ resourceSchema.methods.getMediaServiceDataPicture = async function() {
     }
   });
   return {
+    flex: watermarkSettings.flex,
     minWidth: watermarkSettings.minWidth,
     minHeight: watermarkSettings.minHeight,
     enabled: watermarkSettings.enabled,
@@ -932,6 +963,7 @@ resourceSchema.methods.getMediaServiceDataVideo = async function() {
   const {video, waterAdd} = waterSetting.waterSetting;
   const watermarkSettings = await  SettingModel.getWatermarkSettings('video');
   return {
+    flex: watermarkSettings.flex,
     videoSize,
     minWidth: watermarkSettings.minWidth,
     minHeight: watermarkSettings.minHeight,

@@ -433,6 +433,7 @@ settingSchema.statics.getWatermarkSettings = async (type) => {
     enabled: type === 'video'? uploadSettings.watermark.video.enabled:uploadSettings.watermark.picture.enabled,
     minHeight: type === 'video'?uploadSettings.watermark.video.minHeight:uploadSettings.watermark.picture.minHeight,
     minWidth: type === 'video'?uploadSettings.watermark.video.minWidth:uploadSettings.watermark.picture.minWidth,
+    flex: type === 'video'?uploadSettings.watermark.video.flex:uploadSettings.watermark.picture.flex,
   }
 };
 
@@ -795,7 +796,35 @@ settingSchema.statics.getWatermarkCoverPathByUid = async (uid, type) => {
   );
 }
 
-settingSchema.statics.getWatermarkCoverPath = async (magePath, text = '', transparent = 1) => {
+//用户偏好设置获取水印
+settingSchema.statics.getWatermarkCoverPathByTypeStyle = async (uid, type, style) => {
+  const UserModel = mongoose.model('users');
+  const ColumnsModel = mongoose.model('columns');
+  const SettingModel = mongoose.model('settings');
+  let imagePath = '', text = '';
+  const watermarkSettings = await  SettingModel.getWatermarkSettings(type);
+  if(style === 'siteLogo') {
+    imagePath = await SettingModel.getWatermarkFilePath('normal', type);
+  } else if (style === 'singleLogo') {
+    imagePath = await SettingModel.getWatermarkFilePath('small', type);
+  } else if (style === 'coluLogo') {
+    imagePath = await SettingModel.getWatermarkFilePath('small', type);
+    const column = await ColumnsModel.findOne({uid: uid}, {name: 1, uid: 1})
+    const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
+    text = column.name === ''? user.username:column.name;
+  } else {
+    imagePath = await SettingModel.getWatermarkFilePath('small', type);
+    const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
+    text = user.username === ''? `KCID:${user.uid}`:user.username;
+  }
+  return await SettingModel.getWatermarkCoverPath(
+    imagePath,
+    text,
+    watermarkSettings.transparency / 100
+  );
+}
+
+settingSchema.statics.getWatermarkCoverPath = async (magePath, text, transparent = 1) => {
   const {getFileMD5, getTextMD5} = require('../nkcModules/hash');
   const FILE = require('../nkcModules/file');
   const createWatermark = require('../nkcModules/createWatermark');

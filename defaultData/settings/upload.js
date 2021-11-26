@@ -42,12 +42,14 @@ module.exports = {
         transparency: 88,
         minHeight: 479,
         minWidth: 799,
+        flex: 0.08,
       },
       video: {
         enabled: true,
         transparency: 88,
         minHeight: 479,
         minWidth: 799,
+        flex: 0.2,
       },
       buyNoWatermark: 2000     // 购买去水印功能所需积分，默认2积分
     },

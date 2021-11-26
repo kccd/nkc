@@ -145,15 +145,6 @@ async function getDiskPath(time) {
   return diskPath;
 }
 
-async function accessFile(targetPath) {
-  try{
-    await fsPromises.access(targetPath);
-    return true;
-  } catch(err) {
-    return false;
-  }
-}
-
 /*
 * 获取最终文件存储目录
 * @param {Number} time 文件上传时间戳
@@ -175,6 +166,48 @@ async function deleteFile(filePath) {
     await fsPromises.unlink(filePath);
   }
 }
+
+/*
+*清除视频或者音频文件元信息
+* */
+async function clearMetadata(filePath, outputFilePath) {
+  return new Promise((resolve, reject) => {
+    ff(filePath)
+      .outputOptions([
+        '-map_metadata',
+        '-1',
+        '-c:a',
+        'copy',
+        '-c:v',
+        'copy'
+      ])
+      .output(outputFilePath)
+      .on("end", resolve)
+      .on("error", reject)
+      .run();
+  })
+}
+
+/*
+*获取元文件信息
+* */
+async function getFileMetaInfo(filePath) {
+  const stat = await accessFile(filePath);
+  if(stat) {
+    return new Promise((resolve, reject) => {
+      ff.ffprobe(filePath, (err, data) => {
+        if(err) {
+          reject(err);
+        } else {
+          resolve(data.format.tags);
+        }
+      });
+    });
+  } else {
+    return;
+  }
+}
+
 
 /*
   获取文件的md5
@@ -360,6 +393,18 @@ async function parseRange(str, size) {
   };
 }
 
+/*
+* 判断文件是否存在
+* */
+async function accessFile(targetPath) {
+  try{
+    await fsPromises.access(targetPath);
+    return true;
+  } catch(err) {
+    return false;
+  }
+}
+
 
 module.exports = {
   moveFile,
@@ -372,5 +417,7 @@ module.exports = {
   getAudioInfo,
   getFileInfo,
   getFileMD5,
-  parseRange
+  parseRange,
+  clearMetadata,
+  getFileMetaInfo
 }

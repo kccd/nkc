@@ -193,8 +193,9 @@ block content
                   .watermark-body
                     img.bg(src=tools.getUrl('defaultFile', 'watermark_background.jpg'))
                     .watermark(:class="waterSetting.picture.waterGravity + ' ' + pictureWatermarkFile.size" style=`opacity: ${1-(data.noWatermark.file.transparency/100)}`)
-                      img.wt(:src="pictureWatermarkFile.url")
-                      span(v-if='pictureWatermarkName') {{pictureWatermarkName}}
+                      img.wt(:src="getAppsWatermark('picture')")
+                      //img.wt(:src="pictureWatermarkFile.url")
+                      //span(v-if='pictureWatermarkName') {{pictureWatermarkName}}
                 .col-sm-12.col-md-10.col-md-offset-2
                   h5.text-info=`宽度小于${data.noWatermark.size.pictureMinWidth}px或高度小于${data.noWatermark.size.pictureMinHeight}px的图片不会添加水印`
 
@@ -236,8 +237,9 @@ block content
                   .watermark-body
                     img.bg(src=tools.getUrl('defaultFile', 'watermark_background.jpg'))
                     .watermark(:class="waterSetting.video.waterGravity + ' ' + videoWatermarkFile.size" style=`opacity: ${1 - (data.noWatermark.file.transparency / 100)}`)
-                      img.wt(:src="videoWatermarkFile.url")
-                      span(v-if='videoWatermarkName') {{videoWatermarkName}}
+                      img.wt(:src="getAppsWatermark('video')")
+                      //img.wt(:src="videoWatermarkFile.url")
+                      //span(v-if='videoWatermarkName') {{videoWatermarkName}}
                 .col-sm-12.col-md-10.col-md-offset-2
                   h5.text-info=`宽度小于${data.noWatermark.size.videoMinWidth}px或高度小于${data.noWatermark.size.videoMinHeight}px的图片不会添加水印`
               .form-group

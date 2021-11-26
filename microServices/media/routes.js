@@ -1,6 +1,6 @@
 const router = require('koa-router')();
 const upload = require('./router/upload');
 router
-  .post('/', upload);
+  .post('/', upload)
 
 module.exports = router;

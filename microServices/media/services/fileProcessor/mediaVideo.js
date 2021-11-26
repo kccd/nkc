@@ -3,7 +3,7 @@ const tools = require('../../tools')
 const ff = require('fluent-ffmpeg')
 const fs = require('fs')
 const fsPromises = fs.promises;
-const {sendResourceStatusToNKC} = require('../../socket')
+const {sendMessageToNkc} = require('../../socket')
 
 module.exports = async (props) => {
   const {
@@ -12,7 +12,7 @@ module.exports = async (props) => {
     data,
     storeUrl
   } = props;
-  const {waterGravity, mediaPath, timePath, videoSize, rid, toc, ext, waterAdd, configs, defaultBV, enabled, minWidth, minHeight} = data;
+  const {waterGravity, mediaPath, timePath, videoSize, rid, toc, flex, ext, waterAdd, configs, defaultBV, enabled, minWidth, minHeight} = data;
   const extension = ext;
   const filePath = file.path;//临时目录
   const aviTempPath = filePath + 'temp.avi';
@@ -37,10 +37,11 @@ module.exports = async (props) => {
   const hdStorePath = PATH.join(mediaPath, timePath, hdFilenamePath);
   const fhdStorePath = PATH.join(mediaPath, timePath, fhdFilenamePath);
   const videoCoverStorePath = PATH.join(mediaPath, timePath, videoCoverFilenamePath);
-  //获取原视频尺寸
-  const {width: videoWidth, height: videoHeight} = await tools.getFileInfo(filePath);
+
   let hasWatermark = false;
   const func = async () => {
+    //获取原视频尺寸
+    const {width: videoWidth, height: videoHeight} = await tools.getFileInfo(filePath);
     if(videoWidth >= minWidth &&
       videoHeight >= minHeight &&
       waterAdd && enabled) {
@@ -60,6 +61,7 @@ module.exports = async (props) => {
       //视频打水印
       // return ffmpegWaterMark(filePath, cover, waterGravity, outputVideoPath)
       await ffmpegWaterMark({
+        flex,
         filePath,
         output: outputVideoPath,
         imageStream: cover.path,
@@ -195,7 +197,7 @@ module.exports = async (props) => {
     }
     await tools.storeClient(storeUrl, storeData);
 
-    await sendResourceStatusToNKC({
+    await sendMessageToNkc('resourceStatus', {
       rid,
       status: true,
       filesInfo
@@ -205,7 +207,7 @@ module.exports = async (props) => {
   func()
     .catch((err) => {
       console.log(err);
-      return sendResourceStatusToNKC({
+      return sendMessageToNkc('resourceStatus', {
         rid,
         status: false,
         error: err.message || err.toString()
@@ -310,7 +312,7 @@ function getBitrateBySize(width, height, configs, defaultBV) {
 //视频打水印
 // function ffmpegWaterMark(filePath, cover, waterGravity, outputVideoPath){
 function ffmpegWaterMark(options){
-  const {filePath, output, imageStream, position, scalaByHeight, bitRate} = options;
+  const {filePath, output, imageStream, position, scalaByHeight, bitRate, flex} = options;
   return addWaterMask({
     videoPath: filePath,
     imageStream: imageStream,
@@ -318,6 +320,7 @@ function ffmpegWaterMark(options){
     position: position,
     scalaByHeight,
     bitRate,
+    flex
   });
 }
 /**
@@ -329,13 +332,13 @@ async function addWaterMask(options) {
     imageStream,
     output,
     position = {x: 10, y: 10},
-    flex = 0.2,
+    flex = 20,
     bitRate,
     scalaByHeight
   } = options;
   const { width, height} = await tools.getVideoInfo(videoPath);
   return await new Promise((resolve, reject) => {
-    const imageWidth = Math.min(width, height) * flex;
+    const imageWidth = Math.min(width, height) * (flex/100);
     ff(videoPath)
       .input(imageStream)
       .complexFilter([
