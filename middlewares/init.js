@@ -149,6 +149,10 @@ module.exports = async (ctx, next) => {
         maxAge: cookieConfig.maxAge,
         domain: cookieConfig.domain,
       };
+      // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
+      if(global.NKC.isDevelopment) {
+        delete options.domain;
+      }
 	    if(o) {
         options = Object.assign(options, o);
       }
@@ -165,6 +169,10 @@ module.exports = async (ctx, next) => {
         maxAge: 0,
         domain: cookieConfig.domain,
       };
+      // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
+      if(global.NKC.isDevelopment) {
+        delete options.domain;
+      }
       ctx.cookies.set(key, '', options);
     }
 
@@ -177,6 +185,10 @@ module.exports = async (ctx, next) => {
         signed: true,
         domain: cookieConfig.domain,
       };
+      // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
+      if(global.NKC.isDevelopment) {
+        delete options.domain;
+      }
       if(o) {
         options = Object.assign(options, o);
       }
