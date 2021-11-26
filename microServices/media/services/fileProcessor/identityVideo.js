@@ -5,6 +5,7 @@ const {
   storeClient,
   deleteFile,
 } = require('../../tools');
+const {sendMessageToNkc} = require('../../socket')
 module.exports = async (props) => {
   const {
     file,
@@ -27,18 +28,21 @@ module.exports = async (props) => {
     });
     const fileInfo = await getFileInfo(targetFilePath);
     fileInfo.name = filenamePath;
-    return {
-      def: fileInfo
-    };
+    await sendMessageToNkc('verifiedUploadState', {
+      vid,
+      status: true,
+      fileInfo,
+    });
   }
 
   func()
-    .then(res => {
-      console.log('res', res);
-      return res;
-    })
     .catch(err => {
-      return err;
+      //处理成功修改该条数据的处理状态
+      sendMessageToNkc('verifiedUploadState', {
+        vid,
+        status: false,
+        error: err.message || err.toString(),
+      });
     })
     .finally(() => {
       return Promise.all([

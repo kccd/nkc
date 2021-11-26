@@ -4,6 +4,7 @@ const {
   storeClient,
   deleteFile,
 } = require('../../tools');
+const {sendMessageToNkc} = require('../../socket')
 module.exports = async (props) => {
   const {
     file,
@@ -15,16 +16,33 @@ module.exports = async (props) => {
   const filenamePath = `${vid}.${ext}`;
   const path = PATH.join(mediaPath, timePath, filenamePath);
   const time = (new Date(toc)).getTime();
-  await storeClient(storeUrl, {
-    filePath: filePath,
-    path,
-    time
-  });
-  const fileInfo = await getFileInfo(filePath);
-  fileInfo.name = filenamePath;
-  const filesInfo = {
-    def: fileInfo
-  };
-  await deleteFile(filePath);
-  return filesInfo;
-};
+  const func = async () => {
+    await storeClient(storeUrl, {
+      filePath: filePath,
+      path,
+      time
+    });
+    const fileInfo = await getFileInfo(filePath);
+    fileInfo.name = filenamePath;
+    await sendMessageToNkc('verifiedUploadState', {
+      vid,
+      status: true,
+      fileInfo,
+    });
+  }
+
+  func()
+    .catch(err => {
+      //处理成功修改该条数据的处理状态
+      sendMessageToNkc('verifiedUploadState', {
+        vid,
+        status: false,
+        error: err.message || err.toString(),
+      });
+    })
+    .finally(() => {
+      return Promise.all([
+        deleteFile(filePath),
+      ]);
+    })
+ };

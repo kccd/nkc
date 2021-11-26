@@ -3,7 +3,7 @@ const fs = require("fs");
 const axios = require("axios");
 
 /*
-* 推送文件到存储服务
+* 推送文件到媒体服务
 * @param {String} url 存储服务的链接
 * @param {Object} fileInfo 待推送的文件信息
 *   @param {String} filePath 文件磁盘路径

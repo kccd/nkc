@@ -6,7 +6,7 @@ const {
   getFileSize,
   storeClient
 } = require('../../tools');
-const {sendResourceStatusToNKC} = require('../../socket');
+const {sendMessageToNkc} = require('../../socket');
 const fs = require('fs');
 const fsPromises = fs.promises;
 const {PDFDocument} = require("pdf-lib");
@@ -114,14 +114,14 @@ module.exports = async (props) => {
     })
     .then(() => {
       // 发送文件处理的状态
-      return sendResourceStatusToNKC({
+      return sendMessageToNkc('resourceStatus', {
         rid,
         status: true,
         filesInfo
       });
     })
     .catch((err) => {
-      return sendResourceStatusToNKC({
+      return sendMessageToNkc('resourceStatus', {
         rid,
         status: false,
         error: err.message || err.toString()

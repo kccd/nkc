@@ -6,6 +6,7 @@ module.exports = [
 
   ['recommendThreadsFixed', 'right', 5, '六宫格'],
   ['management', 'right', 6, '管理'],
-  ['forums', 'right', 7, '社区导航'],
-  ['hotColumns', 'right', 8, '热门专栏']
+  ['webApply', 'right', 7, '网站应用'],
+  ['forums', 'right', 8, '社区导航'],
+  ['hotColumns', 'right', 9, '热门专栏'],
 ];

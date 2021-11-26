@@ -26,7 +26,13 @@ const schema = new Schema({
   state: {
     type: String,
     index: 1,
-    default: 'inProcess'
+    default: 'usable'
+  },
+  // 文件处理错误时的错误信息
+  errorInfo: {
+    type: String,
+    index: 1,
+    default: ''
   },
   // 附件大小
   size: {
@@ -112,10 +118,18 @@ schema.statics.createDataAndPushFile = async props => {
     hash: file.hash,
     ext,
     type,
-    uid
+    uid,
+    state: 'inProcess',
   });
-  verifiedUpload.files = await verifiedUpload.pushToMediaService(file.path);
   await verifiedUpload.save();
+  verifiedUpload.pushToMediaService(file.path)
+    .catch(err => {
+      VerifiedUploadModel.updateResourceStatus({
+        rid,
+        status: false,
+        error: err.message
+      });
+    })
   return verifiedUpload;
 };
 
@@ -179,5 +193,45 @@ schema.methods.updateFilesInfo = async function() {
     }
   });
 };
+
+schema.statics.updateVerifiedState = async (props) => {
+  const {vid, status, error, fileInfo = {}} = props;
+  const VerifiedUploadModel = mongoose.model('verifiedUpload');
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const verifiedUpload = await VerifiedUploadModel.findOne({_id: vid}).sort({toc: -1});
+  const userPersonal = await UsersPersonalModel.findOne({uid: verifiedUpload.uid});
+  let verifiedUploadState;
+  let errorInfo;
+
+  if(status) {
+    // 文件处理成功
+    verifiedUploadState = 'usable';
+    errorInfo = '';
+  } else {
+    // 文件处理失败
+    verifiedUploadState = 'useless';
+    errorInfo = error;
+    if(verifiedUpload.type === 'identityVideo') {
+      await userPersonal.updateOne({
+        $set: {
+          'authenticate.video.status': 'useless',
+        }
+      });
+    } else {
+      await userPersonal.updateOne({
+        $set: {
+          'authenticate.card.status': 'useless',
+        }
+      });
+    }
+  }
+  await verifiedUpload.updateOne({
+    $set: {
+      errorInfo,
+      state: verifiedUploadState,
+      files: fileInfo,
+    }
+  });
+}
 
 module.exports = mongoose.model('verifiedUpload', schema);

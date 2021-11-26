@@ -53,11 +53,12 @@ block content
                 button.btn.btn-primary(v-if="authenticate.card.status === 'unsubmit'" @click="submitVerify2()") 提交审核
                 button.btn.btn-primary(v-if="authenticate.card.status === 'in_review'" disabled) 审核中
                 p.verify--passed(v-if="authenticate.card.status === 'passed'") 已认证
-                div(v-if="authenticate.card.status === 'fail'")
+                div(v-if="authenticate.card.status === 'fail' || authenticate.card.status === 'useless'")
                   p.verify--fail 认证失败
                   p
                     span 原因：
-                    span.text-danger {{authenticate.card.message}}
+                    span.text-danger(v-if="authenticate.card.status === 'fail'") {{authenticate.card.message}}
+                    span.text-danger(v-if="authenticate.card.status === 'useless'") 图片处理失败,请重新上传视频！
                   button.btn.btn-primary(@click="submitVerify2()") 提交审核
         .panel.panel-default
           .panel-heading
@@ -81,17 +82,22 @@ block content
                   button.btn.btn-primary#submiteAuth(v-if="loading" :disabled="loading") 提交中...
                   button.btn.btn-primary#submiteAuth(@click="submiteVerify3()" v-else :disabled="loading") 提交审核
                 p.verify--passed(v-if="authenticate.video.status === 'passed'") 已认证
-                div(v-if="authenticate.video.status === 'fail'")
+                div(v-if="authenticate.video.status === 'fail' || authenticate.video.status === 'useless'")
                   input.hidden(type='file' accept="video/mp4,video/mov,video/3gp,video/avi" ref="videoInput" @change="videoUpdate($event.target.files[0])")
                   p.verify--fail 认证失败
                   p
                     span 原因：
-                    span.text-danger {{authenticate.video.message}}
+                    span.text-danger(v-if="authenticate.video.status === 'fail'") {{authenticate.video.message}}
+                    span.text-danger(v-if="authenticate.video.status === 'useless'") 视频处理失败,请重新上传视频！
                   button.btn.btn-primary#pickVerify3Video(@click="$refs.videoInput.click()" :disabled="loading") 选择视频
-                  button.btn.btn-primary#submiteAuth(v-if="loading" :disabled="loading") 提交中...
+                  button.btn.btn-primary#submiteAuth(v-if="loading" :disabled="loading") 上传进度: {{uploadProgress}}%
                   button.btn.btn-primary#submiteAuth(@click="submiteVerify3()" v-else :disabled="loading") 提交审核
                 div(v-if="authenticate.video.status === 'in_review'")
-                  button.btn.btn-primary#submiteAuth(disabled) 审核中
+                  if(data.VerifiedVideoState === 'inProcess')
+                    span 视频处理中，请等待视频处理完成！
+                  else
+                    button.btn.btn-primary#submiteAuth(disabled) 审核中
+
 
 block scripts
   +includeJS("/user/settings/verify/verify.js")

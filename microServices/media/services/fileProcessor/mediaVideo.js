@@ -3,7 +3,7 @@ const tools = require('../../tools')
 const ff = require('fluent-ffmpeg')
 const fs = require('fs')
 const fsPromises = fs.promises;
-const {sendResourceStatusToNKC} = require('../../socket')
+const {sendMessageToNkc} = require('../../socket')
 
 module.exports = async (props) => {
   const {
@@ -197,7 +197,7 @@ module.exports = async (props) => {
     }
     await tools.storeClient(storeUrl, storeData);
 
-    await sendResourceStatusToNKC({
+    await sendMessageToNkc('resourceStatus', {
       rid,
       status: true,
       filesInfo
@@ -207,7 +207,7 @@ module.exports = async (props) => {
   func()
     .catch((err) => {
       console.log(err);
-      return sendResourceStatusToNKC({
+      return sendMessageToNkc('resourceStatus', {
         rid,
         status: false,
         error: err.message || err.toString()
@@ -332,13 +332,13 @@ async function addWaterMask(options) {
     imageStream,
     output,
     position = {x: 10, y: 10},
-    flex = 0.2,
+    flex = 20,
     bitRate,
     scalaByHeight
   } = options;
   const { width, height} = await tools.getVideoInfo(videoPath);
   return await new Promise((resolve, reject) => {
-    const imageWidth = Math.min(width, height) * flex;
+    const imageWidth = Math.min(width, height) * (flex/100);
     ff(videoPath)
       .input(imageStream)
       .complexFilter([

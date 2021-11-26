@@ -8,7 +8,7 @@ const {
 } = require('../../tools');
 const tools = require('../../tools');
 const {platform} = require("os");
-const {sendResourceStatusToNKC} = require('../../socket')
+const {sendMessageToNkc} = require('../../socket')
 const os = platform();
 const linux = (os === 'linux');
 module.exports = async (props) => {
@@ -18,7 +18,7 @@ module.exports = async (props) => {
     data,
     storeUrl
   } = props;
-  const {waterGravity, mediaPath, originPath, originId, timePath, flex, rid, toc, disposition, waterAdd, enabled, minWidth, minHeight} = data;
+  const {waterGravity, mediaPath, originPath, originId, timePath, flex, rid, ext, toc, waterAdd, enabled, minWidth, minHeight} = data;
   const filePath = file.path;//临时目录
   const time = (new Date(toc)).getTime();
 
@@ -26,7 +26,7 @@ module.exports = async (props) => {
   await tools.imageAutoOrient(filePath);
   //获取文件所在目录
   //获取图片尺寸
-  const {width, size, ext, hash, height} = await tools.getFileInfo(filePath);
+  const {width, size, height} = await tools.getFileInfo(filePath);
   const filenamePath = `${originId}.${ext}`;
   const filesInfo = {};//用于存储在数据库的文件类型
   //构建原图存储地址
@@ -113,7 +113,7 @@ module.exports = async (props) => {
     }
 
     await storeClient(storeUrl, storeData);
-    await sendResourceStatusToNKC({
+    await sendMessageToNkc('resourceStatus', {
       rid,
       status: true,
       filesInfo
@@ -121,7 +121,7 @@ module.exports = async (props) => {
   }
   func()
     .catch(err => {
-      return sendResourceStatusToNKC({
+      return sendMessageToNkc('resourceStatus', {
         rid,
         status: false,
         error: err.message || err.toString()
@@ -218,7 +218,7 @@ async function addImageTextWaterMaskForImage(op) {
     input,
     output,
     image,
-    flex = 0.08,
+    flex = 8,
     position,
     transparency = 100,
     additionOptions,
@@ -226,7 +226,7 @@ async function addImageTextWaterMaskForImage(op) {
   const {height: imageHeight, width: imageWidth} = await tools.getFileInfo(input);
   const {size} = await tools.getFileInfo(image);
   const logoSize = size;
-  let padHeight = ~~((imageHeight > imageWidth? imageWidth: imageHeight) * flex);
+  let padHeight = ~~((imageHeight > imageWidth? imageWidth: imageHeight) * (flex/100));
   let logoHeight = padHeight - 1;
   let logoWidth = ~~(logoSize.width * (logoHeight / logoSize.height)) - 1;
   const fontSize = padHeight - 10;

@@ -195,6 +195,54 @@ async function getStoreFilesInfo(storeUrl, files) {
 }
 
 /*
+* 获取存储服务文件元信息
+* */
+async function getMetaInformation(toc, files, time, path) {
+  const storeUrl = await getStoreUrl(toc) + '/metaInformation';
+  return new Promise((resolve, reject) => {
+    axios({
+      url: storeUrl,
+      method: 'GET',
+      params: {
+        files: JSON.stringify(files) || '',
+        time,
+        path
+      }
+    })
+      .then(res => {
+        resolve(res.data || res);
+      })
+      .catch(err => {
+        console.log(err);
+        reject(err);
+      });
+  })
+}
+
+/*
+* 清除存储服务文件元信息
+* */
+async function removeResourceInfo(toc, files) {
+  const storeUrl = await getStoreUrl(toc) + '/removeInfo';
+  return new Promise((resolve, reject) => {
+    axios({
+      url: storeUrl,
+      method: 'PUT',
+      params: {
+        files: JSON.stringify(files) || '',
+      }
+    })
+      .then(res => {
+        resolve(res || res);
+      })
+      .catch(err => {
+        console.log(err);
+        reject(err);
+      });
+  })
+}
+
+/*
 * 过滤 files 对象上的字段
 * resource attachment verifiedUpload messageFile 适用
 * */
@@ -302,4 +350,6 @@ module.exports = {
   createStoreQueryUrl,
   getStoreFilesInfo,
   replaceFileExtension,
+  getMetaInformation,
+  removeResourceInfo
 }

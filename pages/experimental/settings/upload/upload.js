@@ -25,6 +25,9 @@ window.app = new Vue({
     normalVideoWatermarkFile: '',
     smallVideoWatermarkData: '',
     smallVideoWatermarkFile: '',
+    defaultPictureImgWidth: '',
+    defaultVideoImgWidth: '',
+    resetImgTime: Date.now(),
   },
   mounted(){},
   computed: {
@@ -66,9 +69,27 @@ window.app = new Vue({
       }
       return file;
     },
+    //改变图片水印比例
+    getPictureWatermarkHeight(){
+      const H = this.defaultPictureImgWidth * (this.us.watermark.picture.flex/100);
+      return `height: ${H}px;`;
+    },
+    //改变视频水印比例
+    getVideoWatermarkHeight(){
+      const H = this.defaultVideoImgWidth * (this.us.watermark.video.flex/100);
+      return `height: ${H}px`;
+    },
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
+    getDefaultPictureImg() {
+      const defaultPictureImg = $('#defaultPictureImg');
+      this.defaultPictureImgWidth = defaultPictureImg.height();
+    },
+    getDefaultVideoImg() {
+      const defaultVideoImg = $('#defaultVideoImg');
+      this.defaultVideoImgWidth = defaultVideoImg.height();
+    },
     // 切换图片水印示例图片
     turnPictureImg(){
       this.pictureWaterStyle = $("#pictureWaterStyle").val();
@@ -80,7 +101,7 @@ window.app = new Vue({
       this.videoWaterGravity = $("#videoWaterGravity").val();
     },
     getWatermark(val, type, status) {
-      return this.getUrl(val, type, status) + '&date=' + Date.now();
+      return this.getUrl(val, type, status) + '&date=' + this.resetImgTime;
     },
     resetFile() {
       this.normalPictureWatermarkData = '';
@@ -198,11 +219,9 @@ window.app = new Vue({
           if(smallVideoWatermarkFile) {
             formData.append('smallVideoWatermark', smallVideoWatermarkFile);
           }
-          console.log('formData', formData);
           return nkcUploadFile('/e/settings/upload', 'PUT', formData);
         })
         .then(data => {
-          console.log(formData);
           sweetSuccess('保存成功');
           normalPictureWatermarkInput.value = null;
           normalVideoWatermarkInput.value = null;
