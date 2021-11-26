@@ -227,7 +227,8 @@ async function addImageTextWaterMaskForImage(op) {
   const {size} = await tools.getFileInfo(image);
   const logoSize = size;
   let padHeight = ~~((imageHeight > imageWidth? imageWidth: imageHeight) * (flex/100));
-  let logoHeight = padHeight - 1;
+  // let logoHeight = padHeight - 1;
+  let logoHeight = padHeight;
   let logoWidth = ~~(logoSize.width * (logoHeight / logoSize.height)) - 1;
   const fontSize = padHeight - 10;
   const gap = ~~(logoWidth * 0.1); /* logo和文字之间和间隔 */

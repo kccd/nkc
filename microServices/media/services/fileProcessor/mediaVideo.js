@@ -79,7 +79,7 @@ module.exports = async (props) => {
             ? bitrateHD
             : isReachSD
               ? bitrateSD
-              : getBitrateBySize(videoWidth, videoHeight)
+              : getBitrateBySize(videoWidth, videoHeight, configs, defaultBV)
       });
       hasWatermark = true;
     } else {
@@ -337,12 +337,14 @@ async function addWaterMask(options) {
     scalaByHeight
   } = options;
   const { width, height} = await tools.getVideoInfo(videoPath);
+  const {width: coverWidth, height: coverHeight} = await tools.getFileInfo(imageStream);
   return await new Promise((resolve, reject) => {
-    const imageWidth = Math.min(width, height) * (flex/100);
+    const imageHeight = ~~Math.min(width, height) * (flex/100);
+    const imageWidth = coverWidth * imageHeight / coverHeight;
     ff(videoPath)
       .input(imageStream)
       .complexFilter([
-        `[1:v]scale=${imageWidth}:-2[logo]`,
+        `[1:v]scale=${imageWidth}:${imageHeight}[logo]`,
         `[0:v][logo]overlay=${position.x}:${position.y}[o]`,
         `[o]scale=-2:${scalaByHeight}`
       ])

@@ -71,12 +71,14 @@ window.app = new Vue({
     },
     //改变图片水印比例
     getPictureWatermarkHeight(){
-      const H = this.defaultPictureImgWidth * (this.us.watermark.picture.flex/100);
+      let H = this.defaultPictureImgWidth * (this.us.watermark.picture.flex/100);
+      H = ~~H;
       return `height: ${H}px;`;
     },
     //改变视频水印比例
     getVideoWatermarkHeight(){
-      const H = this.defaultVideoImgWidth * (this.us.watermark.video.flex/100);
+      let H = this.defaultVideoImgWidth * (this.us.watermark.video.flex/100);
+      H = ~~H;
       return `height: ${H}px`;
     },
   },
