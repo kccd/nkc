@@ -150,8 +150,7 @@ async function createStoreQueryUrl(storeUrl, time, path) {
 * */
 
 function replaceFileExtension(filename, newExtension) {
-  if(!filename) throw new Error(`文件名不能为空`);
-  if(!newExtension) throw new Error(`新的文件格式不能为空`);
+  if(!filename || !newExtension) return filename;
   filename = filename.split('.');
   if(filename.length > 1) {
     filename.pop();
