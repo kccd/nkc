@@ -11,7 +11,7 @@ module.exports = async (imagePath, text = '', transparent = 1) => {
   const fontInfo = `${logoHeight}px sans`;
   ctx.font = fontInfo;
   const textSize = ctx.measureText(text);
-  const gap = text? logoHeight / 4: 0;
+  const gap = text? logoHeight / 6: 0;
   canvas.width = textSize.width + logoWidth + gap + 2 * canvasPadding;
   ctx.globalAlpha = transparent;
   ctx.shadowOffsetX = 1;
