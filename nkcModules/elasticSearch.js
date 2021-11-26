@@ -625,7 +625,7 @@ func.updateThreadForums = async (thread) => {
       },
       // 对匹配到的每一条数据执行此脚本
       script: {
-        source: "ctx._source.mainForumsId = "+ JSON.stringify(thread.mainForumsId)
+        source: "ctx._source.tcId = " + JSON.stringify(thread.tcId) + "; ctx._source.mainForumsId = "+ JSON.stringify(thread.mainForumsId)
       }
     }
   });
