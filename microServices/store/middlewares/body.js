@@ -2,6 +2,7 @@ const path = require("path");
 const tools = require("../tools");
 const fs = require("fs");
 const fsPromises = fs.promises;
+const ContentDisposition = require('content-disposition');
 module.exports = async (ctx, next) => {
   const {data, filePath} = ctx;
   if(filePath) {
@@ -36,7 +37,7 @@ module.exports = async (ctx, next) => {
       }
     }
     ctx.body = fs.createReadStream(filePath, readStreamRange);
-    ctx.set(`Content-Disposition`, `attachment; filename=${basename};`);
+    ctx.set(`Content-Disposition`, ContentDisposition(basename, {type: 'attachment'}));
     ctx.set(`Content-Length`, contentLength);
     ctx.type = ext;
   } else {

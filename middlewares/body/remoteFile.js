@@ -1,10 +1,10 @@
 const http = require('http');
 const FILE = require("../../nkcModules/file");
+const ContentDisposition = require('content-disposition');
 const {pictureExtensions, breakpointExtensions} = FILE;
 const fileBody = require('./file');
 module.exports = async (ctx) => {
   const {remoteFile, isAttachment, settings} = ctx;
-  const {encodeRFC5987ValueChars} = ctx.nkcModules.nkcRender;
   const {
     url: fileUrl,
     filename = '',
@@ -23,16 +23,15 @@ module.exports = async (ctx) => {
     return await fileBody(ctx);
   }
 
-  let contentDisposition;
-  const filenameEncode = encodeRFC5987ValueChars(filename);
+  let contentDispositionType;
   if (isAttachment || (!pictureExtensions.includes(ext) && (!breakpointExtensions.includes(ext)))) {
-    contentDisposition = `attachment; filename=${filenameEncode};`;
+    contentDispositionType = 'attachment';
   } else {
-    contentDisposition = `inline; filename=${filenameEncode};`;
+    contentDispositionType = 'inline';
   }
   ctx.type = ext;
   ctx.body = fileRes;
-  ctx.set('content-disposition', contentDisposition);
+  ctx.set('content-disposition', ContentDisposition(filename, {type: contentDispositionType}));
   const fileResContentLength = fileRes.headers[`content-length`];
   const fileResAcceptRanges = fileRes.headers[`accept-ranges`];
   const fileResCacheControl = fileRes.headers[`cache-control`];
