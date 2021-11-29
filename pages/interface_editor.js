@@ -45,6 +45,7 @@ $("document").ready(function(){
   });
 
   $("#content_test").on("paste", function(){
+    return;
     function test(){
       $("#text-elem img[srcs]").each(function(){
         // 获取当前图片url
@@ -72,7 +73,6 @@ $("document").ready(function(){
             loadsrc : newSrc
           }
           var newimgstr = $(this)
-          
           nkcAPI("/download", "POST", data)
           .then( function(data){
             newimgstr.attr("src","")

@@ -1,4 +1,5 @@
 var ue = UE.getEditor('container', NKC.configs.ueditor.postConfigs);
+NKC.methods.ueditor.initDownloadEvent(ue);
 window.ue = ue;
 
 /*

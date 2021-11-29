@@ -2,6 +2,7 @@ window.upLoadFile = undefined;
 
 // 初始化编辑器
 var ue = UE.getEditor("editor", NKC.configs.ueditor.activityConfigs);
+NKC.methods.ueditor.initDownloadEvent(ue);
 window.ue = ue;
 
 $.getJSON('../location.json',function(data){

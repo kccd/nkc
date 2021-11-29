@@ -41,6 +41,7 @@ $(function() {
     initVueApp();
     initPostButton();
   });
+  NKC.methods.ueditor.initDownloadEvent(editor);
   // 实例化专栏模块，如果不存在构造函数则用户没有权限转发。
   // 在提交数据前，读取专栏分类的时候，注意判断是否存在实例PostToColumn。
   if(NKC.modules.SelectColumnCategories) {

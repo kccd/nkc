@@ -126,6 +126,7 @@ window.app = new Vue({
       window.CommonModal = new NKC.modules.CommonModal();
       window.SelectForums = new NKC.modules.ForumSelector();
       window.editor = UE.getEditor('container', NKC.configs.ueditor.shopConfigs);
+      NKC.methods.ueditor.initDownloadEvent(window.editor);
       this.initTime();
       this.addParam();
     }
