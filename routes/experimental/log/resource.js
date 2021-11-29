@@ -36,11 +36,12 @@ router
     const resources = [];
     let postsId = [];
     const usersId = [];
+    const metaInfos = await db.ResourceModel.setMetadata(resources_);
     for(const r of resources_) {
-      if(r.mediaType === 'mediaVideo' || r.mediaType === 'mediaAudio') {
-        await r.setMetadata();
-      }
       await r.setFileExist([]);
+      if(r.mediaType === 'mediaAudio' || r.mediaType === 'mediaVideo') {
+        r.metadata = metaInfos[r.rid]
+      }
       let filePath;
       try{
         filePath = await r.getFilePath();
@@ -106,5 +107,12 @@ router
     //清除元文件信息
     await resource.clearResourceInfo();
     await next();
-  });
+  })
+  .put('/updateInfo', async (ctx, next) => {
+    const {db,body} = ctx;
+    const {rid} = body;
+    const r = await db.ResourceModel.findOnly({rid});
+    await r.updateFilesInfo();
+    await next();
+  })
 module.exports = router;

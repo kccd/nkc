@@ -196,16 +196,13 @@ async function getStoreFilesInfo(storeUrl, files) {
 /*
 * 获取存储服务文件元信息
 * */
-async function getMetaInformation(toc, files, time, path) {
-  const storeUrl = await getStoreUrl(toc) + '/metaInformation';
+async function getMetaInformation(storeUrl, files) {
   return new Promise((resolve, reject) => {
     axios({
-      url: storeUrl,
+      url: storeUrl + '/metaInfo',
       method: 'GET',
       params: {
         files: JSON.stringify(files) || '',
-        time,
-        path
       }
     })
       .then(res => {
