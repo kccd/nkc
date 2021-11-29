@@ -10,6 +10,7 @@ module.exports = {
       {
         "name" : "register",
         "id" : '',
+        "oid": [], // 特殊情况 {nationCode: "86", id: '23122'}
         "validityPeriod" : 60,
         "sameIpOneDay" : 10,
         "sameMobileOneDay" : 10,
@@ -18,6 +19,7 @@ module.exports = {
       {
         "name" : "reset",
         "id" : '',
+        "oid": [],
         "validityPeriod" : 15,
         "sameIpOneDay" : 10,
         "sameMobileOneDay" : 5,
@@ -26,6 +28,7 @@ module.exports = {
       {
         "name" : "getback",
         "id" : '',
+        "oid": [],
         "validityPeriod" : 15,
         "sameIpOneDay" : 10,
         "sameMobileOneDay" : 5,
@@ -34,6 +37,7 @@ module.exports = {
       {
         "name" : "bindMobile",
         "id" : '',
+        "oid": [],
         "validityPeriod" : 15,
         "sameIpOneDay" : 10,
         "sameMobileOneDay" : 5,
@@ -42,6 +46,7 @@ module.exports = {
       {
         "name" : "login",
         "id" : '',
+        "oid": [],
         "validityPeriod" : 15,
         "sameIpOneDay" : 10,
         "sameMobileOneDay" : 5,
@@ -50,6 +55,7 @@ module.exports = {
       {
         "name" : "changeMobile",
         "id" : '',
+        "oid": [],
         "validityPeriod" : 15,
         "sameIpOneDay" : 10,
         "sameMobileOneDay" : 5,
@@ -58,6 +64,7 @@ module.exports = {
       {
         "name" : "withdraw",
         "id" : '',
+        "oid": [],
         "validityPeriod" : 15,
         "sameIpOneDay" : 10,
         "sameMobileOneDay" : 5,
@@ -66,6 +73,7 @@ module.exports = {
       {
         "name" : "destroy",
         "id" : '',
+        "oid": [],
         "validityPeriod" : 15,
         "sameIpOneDay" : 10,
         "sameMobileOneDay" : 5,
@@ -74,6 +82,7 @@ module.exports = {
       {
         "name" : "unbindMobile",
         "id" : '',
+        "oid": [],
         "validityPeriod" : 15,
         "sameIpOneDay" : 10,
         "sameMobileOneDay" : 5,
@@ -82,6 +91,7 @@ module.exports = {
       {
         "name" : "changeUnusedPhoneNumber",
         "id" : '',
+        "oid": [],
         "validityPeriod" : 15,
         "sameIpOneDay" : 10,
         "sameMobileOneDay" : 5,
@@ -90,6 +100,7 @@ module.exports = {
       {
         "name" : "verifyPhoneNumber",
         "id" : '',
+        "oid": [],
         "validityPeriod" : 15,
         "sameIpOneDay" : 10,
         "sameMobileOneDay" : 5,
