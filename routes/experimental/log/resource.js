@@ -36,7 +36,7 @@ router
     const resources = [];
     let postsId = [];
     const usersId = [];
-    const metaInfos = await db.ResourceModel.setMetadata(resources_);
+    const metaInfos = await db.ResourceModel.getMetadata(resources_);
     for(const r of resources_) {
       await r.setFileExist([]);
       if(r.mediaType === 'mediaAudio' || r.mediaType === 'mediaVideo') {

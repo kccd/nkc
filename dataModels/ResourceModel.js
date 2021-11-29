@@ -301,7 +301,7 @@ resourceSchema.methods.setFileExist = async function(excludedMediaTypes = []) {
 /*
 * 获取文件元信息
 * */
-resourceSchema.statics.setMetadata = async function(resources){
+resourceSchema.statics.getMetadata = async function(resources){
   const FILE = require('../nkcModules/file');
   const requestFiles = [];
   const metaInfos = {};
@@ -310,29 +310,35 @@ resourceSchema.statics.setMetadata = async function(resources){
     if(mediaType === 'mediaAudio' || mediaType === 'mediaVideo') {
       const time = (new Date(toc)).getTime();
       const storeUrl = await FILE.getStoreUrl(toc);
-      if(!requestFiles[storeUrl]) requestFiles[storeUrl] = {};
+      if(!requestFiles[storeUrl]) requestFiles[storeUrl] = [];
       const mediaPath = await FILE.getMediaPath(mediaType);
       const timePath = await FILE.getTimePath(toc);
       const _files = files.toObject();
-      const typeFiles = {};
       for(const type in _files) {
         if(type === 'cover') continue;
         const {name} = _files[type];
         const storeFilePath = PATH.join(mediaPath, timePath, name);
-        typeFiles[type] = {
+        requestFiles[storeUrl].push({
           time,
           path: storeFilePath,
-          type: `${type}`
-        };
+          type: `${rid}_${type}`
+        });
       }
-      requestFiles[storeUrl][rid] = typeFiles;
     }
   }
   // 获取元文件信息
   for(const storeUrl in requestFiles) {
     const files = requestFiles[storeUrl];
-    const data = await FILE.getMetaInformation(storeUrl, files);
-    Object.assign(metaInfos, data.metaInfos)
+    const {files: storeFiles} = await FILE.getMetaInformation(storeUrl, files);
+    for(const file of storeFiles) {
+      const {metaInfo, type} = file;
+      const [rid, fileType] = type.split('_');
+      if(!metaInfos[rid]) metaInfos[rid] = [];
+      metaInfos[rid].push({
+        type: fileType,
+        metaInfo
+      });
+    }
   }
   return metaInfos;
 }
