@@ -350,13 +350,11 @@ resourceSchema.methods.clearResourceInfo = async function() {
   const timePath = await FILE.getTimePath(toc);
   const filenames = [];
   const _resource = this.toObject();
-  for(const file in _resource.files) {
-    const path = PATH.join(mediaPath, timePath, _resource.files[file].name);
+  for(const type in _resource.files) {
+    const path = PATH.join(mediaPath, timePath, _resource.files[type].name);
     filenames.push({
       time,
-      type: file,
-      path,
-      ext: _resource.files[file].ext,
+      path
     });
   }
   await FILE.removeResourceInfo(toc, filenames)
