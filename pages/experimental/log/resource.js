@@ -39,7 +39,7 @@ function removeInfo(rid){
 function update(rid) {
   nkcAPI('/e/log/resource/updateInfo', 'PUT', {rid})
     .then(() => {
-      sweetSuccess('更新成功!');
+      sweetSuccess('更新成功');
     })
 }
 Object.assign(window, {

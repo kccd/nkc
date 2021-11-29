@@ -5,19 +5,21 @@ const authRouter = new Router();
 authRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, query, params} = ctx;
-		const {t, c = ''} = query;
+		const {c = ''} = query;
 		const [searchType, searchContent] = c.split(',');
 		let userPersonalArr = '';
-		data.t = t;
 		data.searchType = searchType;
 		data.searchContent = searchContent;
 		if(c) {
 			//获取搜索内容
 			if(searchType === 'username') {
 				let user = '';
-				user = await db.UserModel.findOne({username: searchContent});
-				if(!user) ctx.throw(400, '用户名未找到');
-				userPersonalArr = await db.UsersPersonalModel.find({uid: user.uid});
+				user = await db.UserModel.findOne({usernameLowerCase: searchContent.toLowerCase()});
+				if(!user) {
+          userPersonalArr = [];
+        } else {
+          userPersonalArr = await db.UsersPersonalModel.find({uid: user.uid});
+        }
 			} else if(searchType === 'uid') {
 				userPersonalArr = await db.UsersPersonalModel.find({uid: searchContent});
 			}

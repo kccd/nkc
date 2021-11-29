@@ -358,7 +358,7 @@ module.exports = {
     },
 		resource: {
     	GET: 'experimentalResourceLogs',
-			PUT: 'removeResourceInfo',
+			PUT: 'updateResourceInfo',
 			updateInfo: {
 				PUT : 'updateResourceInfo'
 			}

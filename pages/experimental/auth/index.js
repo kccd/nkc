@@ -67,7 +67,6 @@ function submit(name){
 new Vue({
 	el: "#app",
 	data: {
-		t: data.t,
 		searchType: data.searchType || 'username',
 		searchContent: data.searchContent || '',
 	},
@@ -75,7 +74,7 @@ new Vue({
 		search() {
 			const {searchType, searchContent, t} = this;
 			if(!searchContent) return sweetError('请输入搜索内容');
-			window.location.href = `/e/auth?t=${t}&c=${searchType},${searchContent}`;
+			window.location.href = `/e/auth?c=${searchType},${searchContent}`;
 		},
 		resetInput(){
 			this.searchContent = '';
