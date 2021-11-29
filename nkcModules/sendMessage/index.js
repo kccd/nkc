@@ -8,12 +8,19 @@ const sendMessage = async (obj) => {
   }
   const SettingModel = require('../../dataModels/SettingModel');
   const smsSettings = await SettingModel.getSettings('sms');
-  const {type} = obj;
+  const {type, nationCode} = obj;
   const {templates} = smsSettings;
   let templateId, timeout, content;
   for(const template of templates) {
     if(template.name === type) {
       templateId = template.id;
+      for(const o of template.oid) {
+        const {nationCode: oNationCode, id} = o;
+        if(nationCode === oNationCode) {
+          templateId = id;
+          break;
+        }
+      }
       timeout = template.validityPeriod;
       content = template.content;
       break;

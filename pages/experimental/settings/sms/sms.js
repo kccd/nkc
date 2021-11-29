@@ -64,6 +64,15 @@ window.app = new Vue({
       }
       return false
     },
+    addTemplateId(index) {
+      this.smsSettings.templates[index].oid.push({
+        nationCode: '',
+        id: ''
+      });
+    },
+    removeFormArray(arr, index) {
+      arr.splice(index, 1);
+    },
     tran: function(name) {
       switch (name) {
         case 'register': return '注册';
@@ -126,6 +135,10 @@ window.app = new Vue({
             var template = smsSettings.templates[i];
             if(smsSettings.status) {
               if(template.id === '') throw(template.name + '的模板ID不能为空');
+              for(const o of template.oid) {
+                const {nationCode, id} = o;
+                if(!nationCode || !id) throw(template.name + '的模板ID不能为空');
+              }
               if(template.validityPeriod === '') throw(template.name + '的有效时间不能为空');
               if(template.validityPeriod <= 0) throw(template.name + '的有效时间必须大于0');
               if(template.sameIpOneDay === '') throw(template.name + '的IP次数限制不能为空');

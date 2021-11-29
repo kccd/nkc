@@ -4,6 +4,7 @@ $(function() {
   window.data = NKC.methods.getDataById("data");
 
   window.pageEditor = UE.getEditor("pageContent", NKC.configs.ueditor.columnPageConfigs);
+  NKC.methods.ueditor.initDownloadEvent(window.pageEditor);
 
   if(data.page) {
     $("#title").val(data.page.t);

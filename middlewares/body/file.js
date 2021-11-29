@@ -2,6 +2,7 @@ const path = require("path");
 const utils = require("../utils");
 const {ThrottleGroup} = require("stream-throttle");
 const onFinished = require("on-finished");
+const ContentDisposition = require('content-disposition');
 const destroy = require("destroy");
 const fs = require('fs');
 const fsPromises = fs.promises;
@@ -15,7 +16,6 @@ let allSpeedLimit;
 
 module.exports = async (ctx) => {
   const {filePath, isAttachment, fileName, resource, fs, tg, db} = ctx;
-  const {encodeRFC5987ValueChars} = ctx.nkcModules.nkcRender;
   let stats;
   try {
     stats = await fsPromises.stat(filePath);
@@ -50,12 +50,14 @@ module.exports = async (ctx) => {
   // 设置文件类型
   ctx.type = ext;
 
-  let createdStream, contentLength, contentDisposition;
+  let createdStream;
+  let contentLength;
+  let contentDispositionType;
 
   if (isAttachment === 'attachment' || (!extArr.includes(ext) && (!rangeExt.includes(ext)))) {
-    contentDisposition = `attachment; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`;
+    contentDispositionType = 'attachment';
   } else {
-    contentDisposition = `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`;
+    contentDispositionType = 'inline';
   }
   ctx.set("Accept-Ranges", "bytes");
   let headerRange = ctx.request.headers['range'];
@@ -105,7 +107,7 @@ module.exports = async (ctx) => {
       destroy(createdStream);
     });
   }
-  ctx.set('Content-Disposition', contentDisposition);
+  ctx.set('Content-Disposition', ContentDisposition(name, {type: contentDispositionType}));
   ctx.set(`Content-Length`, contentLength);
   ctx.fileContentLength = contentLength;
 };

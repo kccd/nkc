@@ -17,6 +17,9 @@ if !isIncluded('downloadPanel')
         .draggable-panel-content(v-else-if='resource')
           .download-panel
             .m-b-1.bg-warning.text-warning.p-a-05.bg-border.download-warning(v-if='downloadWarning') {{downloadWarning}}
+            .m-b-1.bg-info.text-info.p-a-05.bg-border.download-warning(v-if='downloadTime') 你在&nbsp;
+              strong {{downloadTime}}
+              | &nbsp;下载过当前文件。
             .file-base-info.m-b-1
               .file-name.m-b-05 文件名称：
                 strong {{resource.defaultFile.name}}

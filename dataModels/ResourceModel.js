@@ -301,29 +301,46 @@ resourceSchema.methods.setFileExist = async function(excludedMediaTypes = []) {
 /*
 * 获取文件元信息
 * */
-resourceSchema.methods.setMetadata = async function(excludedMediaTypes = ['mediaPicture', 'mediaAttachment']){
-  if(excludedMediaTypes.includes(this.mediaType)) return;
+resourceSchema.statics.getMetadata = async function(resources){
   const FILE = require('../nkcModules/file');
-  const {toc, mediaType} = this;
-  const time = (new Date(toc)).getTime();
-  const mediaPath = await FILE.getMediaPath(mediaType);
-  const timePath = await FILE.getTimePath(toc);
-  // const path = PATH.join(mediaPath, timePath);
-  const filenames = [];
-  const _resource = this.toObject();
-  for(const file in _resource.files) {
-    if(file === 'cover') continue;
-    const path = PATH.join(mediaPath, timePath, _resource.files[file].name);
-    filenames.push({
-      time,
-      type: file,
-      path,
-    });
+  const requestFiles = [];
+  const metaInfos = {};
+  for(const resource of resources) {
+    const {rid, mediaType, toc, files} = resource;
+    if(mediaType === 'mediaAudio' || mediaType === 'mediaVideo') {
+      const time = (new Date(toc)).getTime();
+      const storeUrl = await FILE.getStoreUrl(toc);
+      if(!requestFiles[storeUrl]) requestFiles[storeUrl] = [];
+      const mediaPath = await FILE.getMediaPath(mediaType);
+      const timePath = await FILE.getTimePath(toc);
+      const _files = files.toObject();
+      for(const type in _files) {
+        if(type === 'cover') continue;
+        const {name} = _files[type];
+        const storeFilePath = PATH.join(mediaPath, timePath, name);
+        requestFiles[storeUrl].push({
+          time,
+          path: storeFilePath,
+          type: `${rid}_${type}`
+        });
+      }
+    }
   }
   // 获取元文件信息
-  const data = await FILE.getMetaInformation(toc, filenames);
-  // 文件标题信息
-  this.metadata = data.metaInfos || {};
+  for(const storeUrl in requestFiles) {
+    const files = requestFiles[storeUrl];
+    const {files: storeFiles} = await FILE.getMetaInformation(storeUrl, files);
+    for(const file of storeFiles) {
+      const {metaInfo, type} = file;
+      const [rid, fileType] = type.split('_');
+      if(!metaInfos[rid]) metaInfos[rid] = [];
+      metaInfos[rid].push({
+        type: fileType,
+        metaInfo
+      });
+    }
+  }
+  return metaInfos;
 }
 //清除存储服务文件元信息
 resourceSchema.methods.clearResourceInfo = async function() {
@@ -333,13 +350,11 @@ resourceSchema.methods.clearResourceInfo = async function() {
   const timePath = await FILE.getTimePath(toc);
   const filenames = [];
   const _resource = this.toObject();
-  for(const file in _resource.files) {
-    const path = PATH.join(mediaPath, timePath, _resource.files[file].name);
+  for(const type in _resource.files) {
+    const path = PATH.join(mediaPath, timePath, _resource.files[type].name);
     filenames.push({
       time,
-      type: file,
-      path,
-      ext: _resource.files[file].ext,
+      path
     });
   }
   await FILE.removeResourceInfo(toc, filenames)

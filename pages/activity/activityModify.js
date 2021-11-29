@@ -11,6 +11,7 @@ $(document).ready(function(){
   // 初始化编辑器
   var replyCon = $("#replyxxx").text();
   window.ue = UE.getEditor("editor", NKC.configs.ueditor.activityConfigs);
+  NKC.methods.ueditor.initDownloadEvent(window.ue);
   ue.ready(function() {
     ue.setContent(replyCon);
   });

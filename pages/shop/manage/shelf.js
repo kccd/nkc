@@ -3,6 +3,7 @@
 */
 
 var ue = UE.getEditor('container', NKC.configs.ueditor.shopConfigs);
+NKC.methods.ueditor.initDownloadEvent(ue);
 window.ue = ue;
 window.testTh = undefined;
 if(NKC.modules.MoveThread) {
@@ -113,6 +114,7 @@ $(document).ready(function() {
   });
   // 编辑器上传粘贴图片
   $("#ReplyContent").on("paste", function(){
+    return;
     function test(){
       $("#text-elem img").each(function(){
         if(!$(this).attr("srcs")){

@@ -25,7 +25,10 @@ block eContent
               a(href="/e/auth") 重置
         .panel.panel-default
           .panel-heading
-            span 身份认证申请
+            if data.searchContent
+              span 搜索结果
+            else
+              span 待审核列表
           .panel-body
             table.table.table-striped
               thead
@@ -35,7 +38,7 @@ block eContent
                   th 认证类型
                   th 链接
               tbody
-                -for(let auth of data.usersAuth)
+                for auth in data.usersAuth
                   -const {targetUser, authLevel} = auth;
                   tr
                     th= targetUser.uid
@@ -44,7 +47,8 @@ block eContent
                     th= `身份认证${authLevel}`
                     th
                       a(href=`/e/auth/${targetUser.uid}`) 去处理
-
+            if data.usersAuth.length === 0
+              .p-t-2.p-b-2.text-center 空空如也~
 block scripts
   +includeJS('/interface_common.js')
   +includeJS('/experimental/auth/index.js')

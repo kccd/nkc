@@ -14,6 +14,7 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
         resource: null,
         fileCountLimitInfo: [],
         userScores: [],
+        downloadTime: '',
         needScore: false, // 是否需要积分
         freeReason: 'settings',
         description: '',
@@ -72,6 +73,7 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
       },
       methods: {
         getUrl: NKC.methods.tools.getUrl,
+        timeFormat: NKC.methods.tools.timeFormat,
         visitUrl({name, url}) {
           url = url + `&time=${Date.now()}`
           const {needScore, rid, resource} = this;
@@ -115,7 +117,9 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
                 fileCountLimitInfo,
                 downloadWarning,
                 freeTime,
+                downloadLog
               } = res;
+              this.downloadTime = downloadLog? this.timeFormat(downloadLog.toc): '';
               this.resource = resource;
               this.needScore = needScore;
               this.uploader = uploader;

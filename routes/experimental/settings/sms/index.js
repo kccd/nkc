@@ -40,6 +40,9 @@ smsRouter
 
     for(const template of templates) {
       if (template.id === '') ctx.throw(400, template.name + '的模板ID不能为空');
+      for(const o of template.oid) {
+        if(!o.nationCode || !o.id) ctx.throw(400, template.name + '的模板ID不能为空');
+      }
       if (template.validityPeriod === '') ctx.throw(400, template.name + '的有效时间不能为空');
       if (template.validityPeriod <= 0) ctx.throw(400, template.name + '的有效时间必须大于0');
       if (template.sameIpOneDay === '') ctx.throw(400, template.name + '的IP次数限制不能为空');

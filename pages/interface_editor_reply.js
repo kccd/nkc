@@ -1,6 +1,4 @@
-
-  
-  function dataURItoBlob (base64Data) {  
+function dataURItoBlob (base64Data) {
     var byteString;  
     if (base64Data.split(',')[0].indexOf('base64') >= 0)  
         byteString = atob(base64Data.split(',')[1]);  
@@ -25,6 +23,7 @@
     });
     
     $("#ReplyContent").on("paste", function(){
+      return;
       function test(){
         $("#text-elem img").each(function(){
           // 获取当前图片url

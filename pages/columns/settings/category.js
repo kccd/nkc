@@ -308,6 +308,7 @@ window.categoryForm = new Vue({
   },
   mounted() {
     this.categoryEditor = UE.getEditor("columnCategoryEditor", NKC.configs.ueditor.columnCategory);
+    NKC.methods.ueditor.initDownloadEvent(this.categoryEditor);
   },
   methods: {
     setDescription() {

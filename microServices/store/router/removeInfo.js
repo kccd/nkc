@@ -1,13 +1,13 @@
-const PATH = require('path');
 const fs = require("fs");
 const fsPromises = fs.promises;
-const {getTargetFilePath, clearMetadata, accessFile} = require('../tools')
+const {getTargetFilePath, clearMetadata, accessFile, getFileInfo} = require('../tools')
 module.exports = async (ctx, next) => {
-  const {query, data} = ctx;
+  const {query} = ctx;
   const files = JSON.parse(query.files);
   for(const file of files) {
-    const {path, type, time, ext} = file;
+    const {path, time} = file;
     const filePath = await getTargetFilePath(Number(time), path);
+    const {ext} = await getFileInfo(filePath);
     const tempPath = filePath + `_temp.${ext}`;
     if (!(await accessFile(filePath))) ctx.throw(400, '文件找不到');
     await clearMetadata(filePath, tempPath);
