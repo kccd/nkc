@@ -10,7 +10,7 @@ router
   .post('/', store)
   .get('/info', info)
   .get('/list', list)
-  .get('/metaInformation', metaInformation)
+  .get('/metaInfo', metaInformation)
   .put('/removeInfo', removeInfo)
 
 module.exports = router;

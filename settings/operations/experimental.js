@@ -359,6 +359,9 @@ module.exports = {
 		resource: {
     	GET: 'experimentalResourceLogs',
 			PUT: 'removeResourceInfo',
+			updateInfo: {
+				PUT : 'updateResourceInfo'
+			}
 		},
 		blacklist: {
     	GET: 'visitExperimentalBlacklist'

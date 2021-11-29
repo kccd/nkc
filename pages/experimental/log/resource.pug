@@ -108,6 +108,8 @@ block eContent
                       button.btn.btn-danger.btn-xs(onclick=`initiate(${r.rid}, ${true})`) 屏蔽
                     if r.isFileExist && (r.mediaType === "mediaVideo" || r.mediaType === "mediaAudio")
                       button.btn.btn-warning.btn-xs(onclick=`removeInfo(${r.rid})`) 清除文件信息
+                    button.btn.btn-success.btn-xs(onclick=`update(${r.rid})`) 更新
+
         include ../../publicModules/paging/paging_input
 block scripts
   include ../../publicModules/subscribeTypes/subscribeTypes

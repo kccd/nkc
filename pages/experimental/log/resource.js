@@ -35,8 +35,16 @@ function removeInfo(rid){
       sweetError(err);
     });
 }
+//更新存储服务文件信息
+function update(rid) {
+  nkcAPI('/e/log/resource/updateInfo', 'PUT', {rid})
+    .then(() => {
+      sweetSuccess('更新成功!');
+    })
+}
 Object.assign(window, {
   initiate,
   removeInfo,
+  update
 });
 

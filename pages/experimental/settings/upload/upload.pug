@@ -103,7 +103,8 @@ block eContent
                 .watermark-body
                   img.bg#defaultPictureImg(src=tools.getUrl('defaultFile', 'watermark_background.jpg') @load="getDefaultPictureImg")
                   .watermark(:class="pictureWaterGravity + ' ' + pictureWatermarkFile.size" :style="'opacity:' +  (1 - (us.watermark.picture.transparency / 100))")
-                    img.wt(:src="pictureWatermarkFile.url" :style="getPictureWatermarkHeight")
+                    img.wt(:src="normalPictureWatermarkData" v-if="normalPictureWatermarkData" :style="getPictureWatermarkHeight")
+                    img.wt(:src="getWatermark('watermark', 'PWN', 'normal')" :style="getPictureWatermarkHeight" v-else)
                   //.watermark(:class="pictureWaterGravity + ' ' + pictureWatermarkFile.size" :style="'opacity:' +  (1 - (us.watermark.picture.transparency / 100))")
                     //span(v-if="pictureWaterStyle === 'coluLogo'") 我的专栏
                     //span(v-if="pictureWaterStyle === 'userLogo'") 我的用户名
@@ -193,7 +194,8 @@ block eContent
               .watermark-body
                 img.bg#defaultVideoImg(src=tools.getUrl('defaultFile', 'watermark_background.jpg') @load="getDefaultVideoImg")
                 .watermark(:class="pictureWaterGravity + ' ' + pictureWatermarkFile.size" :style="'opacity:' +  (1 - (us.watermark.video.transparency / 100))")
-                  img.wt(:src="videoWatermarkFile.url" :style="getVideoWatermarkHeight")
+                  img.wt(:src="normalVideoWatermarkData" v-if="normalVideoWatermarkData" :style="getVideoWatermarkHeight")
+                  img.wt(:src="getWatermark('watermark', 'VWN', 'normal')" :style="getVideoWatermarkHeight" v-else)
                 //.watermark(:class="videoWaterGravity + ' ' + videoWatermarkFile.size" :style="'opacity:' +  (1 - (us.watermark.video.transparency / 100))")
                   //span(v-if="videoWaterStyle === 'coluLogo'") 我的专栏
                   //span(v-if="videoWaterStyle === 'userLogo'") 我的用户名
