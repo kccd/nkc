@@ -37,7 +37,7 @@ router
       match.ip = ctx.address;
       match.port = ctx.port;
     }
-    data.downloadLog = await db.DownloadLogModel.findOne(match, {toc: 1});
+    data.downloadLog = await db.DownloadLogModel.findOne(match, {toc: -1});
     data.uploader = await db.UserModel.findOnly({uid: resource.uid}, {
       uid: 1,
       username: 1,
