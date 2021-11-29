@@ -1603,36 +1603,51 @@ function postsVote(pid, type) {
   nkcAPI(url, 'POST', {})
     .then(function(data) {
       var number = data.post.voteUp;
-      var upIcon = document.querySelector('.posts-vote-up[data-pid="'+pid+'"]');
+      const upIcon = $(`.posts-vote-up[data-pid="${pid}"]`);
+      const downIcon = $(`.posts-vote-down[data-pid="${pid}"]`);
+      const numberIcon = $(`.posts-vote-number[data-pid="${pid}"]`);
+      const up = upIcon.hasClass('active');
+      const down = downIcon.hasClass('active');
+      /*var upIcon = document.querySelector('.posts-vote-up[data-pid="'+pid+'"]');
       var downIcon = document.querySelector('.posts-vote-down[data-pid="'+pid+'"]');
-      var numberIcon = document.querySelector('.posts-vote-number[data-pid="'+pid+'"]');
-      var up = upIcon.classList.contains('active');
-      var down = downIcon.classList.contains('active');
+      var numberIcon = document.querySelector('.posts-vote-number[data-pid="'+pid+'"]');*/
+      /*var up = upIcon.classList.contains('active');
+      var down = downIcon.classList.contains('active');*/
 
       if(type === 'up') { // 点赞
         if(up) { // 若已经点过赞则取消已点赞背景且数字减一
-          downIcon.classList.remove('active');
-          upIcon.classList.remove('active');
+          downIcon.removeClass('active');
+          upIcon.removeClass('active');
+          /*downIcon.classList.remove('active');
+          upIcon.classList.remove('active');*/
         } else { // 若没点过赞则添加已点赞背景且数字加一
-          downIcon.classList.remove('active');
-          upIcon.classList.add('active');
+          downIcon.removeClass('active');
+          upIcon.addClass('active');
+          /*downIcon.classList.remove('active');
+          upIcon.classList.add('active');*/
         }
       } else { // 点踩
         if(down) {
           // 若已经点过踩了则取消点踩背景
-          upIcon.classList.remove('active');
-          downIcon.classList.remove('active');
+          upIcon.removeClass('active');
+          downIcon.removeClass('active');
+          /*upIcon.classList.remove('active');
+          downIcon.classList.remove('active');*/
         } else { // 若没点过踩
           if(up) { // 若点过赞则取消点赞背景且数字减一并添加点踩背景
-            upIcon.classList.remove('active');
-            downIcon.classList.add('active');
+            upIcon.removeClass('active');
+            downIcon.addClass('active');
+            /*upIcon.classList.remove('active');
+            downIcon.classList.add('active');*/
           } else { // 若没点过赞则直接添加点踩背景
-            upIcon.classList.remove('active');
-            downIcon.classList.add('active');
+            upIcon.removeClass('active');
+            downIcon.addClass('active');
+            /*upIcon.classList.remove('active');
+            downIcon.classList.add('active');*/
           }
         }
       }
-      numberIcon.innerHTML = number || "";
+      numberIcon.text(number||"");
     })
     .catch(function(data) {
       screenTopWarning(data.error || data);
