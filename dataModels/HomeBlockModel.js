@@ -362,6 +362,7 @@ schema.methods.extendData = async function(fidOfCanGetThreads) {
     },
     reviewed: true,
     disabled: false,
+    recycleMark: {$ne: true},
     mainForumsId: {
       $in: fidOfCanGetThreads
     }
