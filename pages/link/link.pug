@@ -14,5 +14,6 @@ html(lang="zh-cn")
   body
     #app
   script(type="application/json" id="__VUE_DATA")!= JSON.stringify(data)
+  +includeJS('/jquery/2.2.4/dist/jquery.min.js')
   +includeJS('/publicModules/common.js')
   +includeJS("/link/app.js")

@@ -25,6 +25,7 @@ block head
     +includeJS("/external_pkgs/vue.min.js", true)
   else
     +includeJS("/external_pkgs/vue.js", true)
+  +includeJS('/jquery/2.2.4/dist/jquery.min.js')
   +includeJS('/publicModules/common.js')
   if state.isApp && state.platform === 'apiCloud'
     +includeJS("/appAPi/api.js")
