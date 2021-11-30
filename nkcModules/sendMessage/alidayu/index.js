@@ -1,7 +1,7 @@
 const TopClient = require('./topClient').TopClient;
 module.exports = async (smsSettings, obj) => {
   const {templateId, timeout, content, mobile, nationCode} = obj;
-  if(nationCode !== '86') throw '发送失败，暂未不支持国际短信';
+  // if(nationCode !== '86') throw '发送失败，暂未不支持国际短信';
   const {appId, appKey, smsSign} = smsSettings;
   const client = new TopClient({
     appkey: appId,
