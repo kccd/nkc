@@ -1253,7 +1253,7 @@ messageSchema.statics.getSTUMessageContent = async (message) => {
 /*
 * 拓展消息对象，用于reactNativeAPP，web端调整后公用
 * */
-messageSchema.statics.extendMessages = async (messages) => {
+messageSchema.statics.extendMessages = async (messages = []) => {
 
   // contentType: html, file, video, voice, img, time
   // status: sent, sending, error
