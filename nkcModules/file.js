@@ -305,9 +305,9 @@ async function getRemoteFile(props) {
     toc,
     type,
     ext,
-    name,
     file
   } = props;
+  const name = props.name || 'filename';
   const storeUrl = await getStoreUrl(toc);
   const mediaPath = await getMediaPath(type);
   const timePath = await getTimePath(toc);
