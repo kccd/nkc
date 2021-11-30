@@ -11,7 +11,6 @@ const chatRouter = require('./chat');
 const friendsApplicationRouter = require('./friendsApplication');
 const dataRouter = require("./data");
 const searchRouter = require('./search');
-const frameRouter = require('./frame');
 const addFriend = require("./addFriend");
 const categoryRouter = require('./category');
 const listRouter = require('./list');
@@ -32,7 +31,6 @@ messageRouter
   .use('/chat', chatRouter.routes(), chatRouter.allowedMethods())
   .use('/search', searchRouter.routes(), searchRouter.allowedMethods())
   .use('/systemInfo', systemInfoRouter.routes(), systemInfoRouter.allowedMethods())
-  .use("/frame", frameRouter.routes(), frameRouter.allowedMethods())
   .use("/addFriend", addFriend.routes(), addFriend.allowedMethods())
   .use('/category', categoryRouter.routes(), categoryRouter.allowedMethods())
   .use('/list', listRouter.routes(), listRouter.allowedMethods())

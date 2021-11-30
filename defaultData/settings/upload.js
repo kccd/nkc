@@ -37,12 +37,20 @@ module.exports = {
       ]
     },
     watermark: {
-      enabled: true,
-      transparency: 88,
-      normalAttachId: '',
-      smallAttachId: '',
-      minHeight: 479,
-      minWidth: 799,
+      picture: {
+        enabled: true,
+        transparency: 88,
+        minHeight: 479,
+        minWidth: 799,
+        flex: 8,
+      },
+      video: {
+        enabled: true,
+        transparency: 88,
+        minHeight: 479,
+        minWidth: 799,
+        flex: 8,
+      },
       buyNoWatermark: 2000     // 购买去水印功能所需积分，默认2积分
     },
     videoVBRControl : {

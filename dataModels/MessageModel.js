@@ -1273,7 +1273,10 @@ messageSchema.statics.extendMessages = async (messages) => {
   }
   const files = await MessageFileModel.find({_id: {$in: filesId}});
   const filesObj = {};
-  files.map(file => filesObj[file._id] = file);
+  files.map(file => {
+    file.extendDefaultFile();
+    filesObj[file._id] = file;
+  });
 
   for(let i = 0; i < messages.length; i++) {
 
@@ -1307,13 +1310,13 @@ messageSchema.statics.extendMessages = async (messages) => {
           const file = filesObj[fileId];
           message.contentType = file.type; // img, voice, file, video
           message.content = {
-            filename: file.oname,
+            filename: file.defaultFile.name,
             fileId: file._id,
             fileUrl: getUrl('messageResource', file._id),
             fileUrlSM: getUrl(`messageResource`, file._id, `sm`),
-            fileCover: getUrl('messageCover', file._id),
-            fileSize: file.size,
-            fileDuration: Math.round(file.duration / 1000)
+            fileCover: getUrl('messageResource', file._id, 'cover'),
+            fileSize: file.defaultFile.size,
+            fileDuration: file.defaultFile.duration
           }
         }
       }

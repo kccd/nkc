@@ -182,10 +182,10 @@ settingsRouter
     });
     const newImage = {};
     if(files.avatar) {
-      newImage.avatar = await db.AttachmentModel.saveFundImage(files.avatar.path, 'fundAvatar');
+      newImage.avatar = await db.AttachmentModel.saveFundImage(files.avatar, 'fundAvatar');
     }
     if(files.banner) {
-      newImage.banner = await db.AttachmentModel.saveFundImage(files.banner.path, 'fundBanner');
+      newImage.banner = await db.AttachmentModel.saveFundImage(files.banner, 'fundBanner');
     }
     if(newImage.avatar || newImage.banner) {
       await db.FundModel.updateOne({_id: oldFund._id}, {

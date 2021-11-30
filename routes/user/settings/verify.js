@@ -23,6 +23,12 @@ verifyRouter
       });
     }
     const authSettings = await db.SettingModel.getSettings('auth');
+    const verifiedUploadVideo = await db.VerifiedUploadModel.findOne({_id: userPersonal.authenticate.video.attachments[0]}, {state: 1, _id: 1}).sort({toc: -1});
+    const verifiedUploadCardA = await db.VerifiedUploadModel.findOne({_id: userPersonal.authenticate.card.attachments[0]}, {state: 1, _id: 1}).sort({toc: -1});
+    const verifiedUploadCardB = await db.VerifiedUploadModel.findOne({_id: userPersonal.authenticate.card.attachments[1]}, {state: 1, _id: 1}).sort({toc: -1});
+    data.VerifiedVideoState = verifiedUploadVideo.state;
+    data.VerifiedAState = verifiedUploadCardA.state;
+    data.VerifiedBState = verifiedUploadCardB.state;
     data.auth3Content = authSettings.auth3Content;
     data.authenticate = userPersonal.authenticate;
     ctx.template = "/user/settings/verify/verify.pug";
@@ -61,7 +67,6 @@ verifyRouter
     if(![".mp4" , ".mov" , ".3gp" , ".avi"].includes(ext)) {
       return ctx.throw(400, '视频格式只能为.mp4, .mov, .3gp, .avi 您上传的格式为'+ext);
     }
-    if(file.size > 314572800 /* 300 *1024 *1024 */) ctx.throw(400, "视频大小不能超过300M！");
     await userPersonal.generateAuthenticateVerify3(file, code);
     return next();
   });

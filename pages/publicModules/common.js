@@ -747,6 +747,16 @@ NKC.methods.ueditor = {
     NKC.methods.replaceDomTextUrl(html[0]);
     html = html.html();
     return html;
+  },
+  initDownloadEvent: function(editor) {
+    window.socket.on('fileTransformProcess', (data) => {
+      if(!editor || !editor.fireEvent) return;
+      editor.fireEvent('updateImageState', {
+        id: data.rid,
+        state: data.state === 'fileProcessFinish',
+        src: NKC.methods.tools.getUrl('resource', data.rid)
+      });
+    });
   }
 };
 
@@ -1088,6 +1098,7 @@ if(windowDataDom) {
   NKC.configs.selectTypesWhenSubscribe = windowData.selectTypesWhenSubscribe;
   NKC.configs.refererOperationId = windowData.refererOperationId;
   NKC.configs.newMessageCount = windowData.newMessageCount || 0;
+  NKC.configs.fileDomain = windowData.fileDomain;
 }
 
 window.NKC = NKC;

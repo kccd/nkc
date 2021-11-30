@@ -11,20 +11,109 @@ data.uploadSettings.watermark.buyNoWatermark /= 100;
 window.app = new Vue({
   el: "#app",
   data: {
+    pictureWaterStyle: 'siteLogo',
+    videoWaterStyle: 'siteLogo',
+    pictureWaterGravity: 'southeast',
+    videoWaterGravity: 'southeast',
     us: data.uploadSettings,
     certList: data.certList,
-    normalWatermarkData: '',
-    normalWatermarkFile: '',
-    smallWatermarkData: '',
-    smallWatermarkFile: '',
+    normalPictureWatermarkData: '',
+    normalPictureWatermarkFile: '',
+    smallPictureWatermarkData: '',
+    smallPictureWatermarkFile: '',
+    normalVideoWatermarkData: '',
+    normalVideoWatermarkFile: '',
+    smallVideoWatermarkData: '',
+    smallVideoWatermarkFile: '',
+    defaultPictureImgWidth: '',
+    defaultVideoImgWidth: '',
+    resetImgTime: Date.now(),
+  },
+  mounted(){},
+  computed: {
+    pictureWatermarkFile: function() {
+      var file = {};
+      if(this.pictureWaterStyle === 'siteLogo') {
+        if (this.normalPictureWatermarkData) {
+          file.url = this.normalPictureWatermarkData;
+        } else {
+          file.url = this.getUrl('defaultFile', 'watermark_normal.png')
+        }
+        file.size = 'normal';
+      } else {
+        if(this.smallPictureWatermarkData) {
+          file.url = this.smallPictureWatermarkData
+        } else {
+          file.url = this.getUrl('defaultFile', 'watermark_small.png');
+        }
+        file.size = 'small';
+      }
+      return file;
+    },
+    videoWatermarkFile: function() {
+      var file = {};
+      if(this.videoWaterStyle === 'siteLogo') {
+        if(this.normalVideoWatermarkData) {
+          file.url = this.normalVideoWatermarkData;
+        } else {
+          file.url = this.getUrl('defaultFile', 'watermark_normal.png')
+        }
+        file.size = 'normal';
+      } else {
+        if(this.smallVideoWatermarkData) {
+          file.url = this.smallVideoWatermarkData;
+        } else {
+          file.url = this.getUrl('defaultFile', 'watermark_small.png');
+        }
+        file.size = 'small';
+      }
+      return file;
+    },
+    //改变图片水印比例
+    getPictureWatermarkHeight(){
+      let H = this.defaultPictureImgWidth * (this.us.watermark.picture.flex/100);
+      H = ~~H;
+      return `height: ${H}px;`;
+    },
+    //改变视频水印比例
+    getVideoWatermarkHeight(){
+      let H = this.defaultVideoImgWidth * (this.us.watermark.video.flex/100);
+      H = ~~H;
+      return `height: ${H}px`;
+    },
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
+    getDefaultPictureImg() {
+      const defaultPictureImg = $('#defaultPictureImg');
+      this.defaultPictureImgWidth = defaultPictureImg.height();
+    },
+    getDefaultVideoImg() {
+      const defaultVideoImg = $('#defaultVideoImg');
+      this.defaultVideoImgWidth = defaultVideoImg.height();
+    },
+    // 切换图片水印示例图片
+    turnPictureImg(){
+      this.pictureWaterStyle = $("#pictureWaterStyle").val();
+      this.pictureWaterGravity = $("#pictureWaterGravity").val();
+    },
+    // 切换视频水印示例图片
+    turnVideoImg(){
+      this.videoWaterStyle = $("#videoWaterStyle").val();
+      this.videoWaterGravity = $("#videoWaterGravity").val();
+    },
+    getWatermark(val, type, status) {
+      return this.getUrl(val, type, status) + '&date=' + this.resetImgTime;
+    },
     resetFile() {
-      this.normalWatermarkData = '';
-      this.normalWatermarkFile = '';
-      this.smallWatermarkData = '';
-      this.smallWatermarkFile = '';
+      this.normalPictureWatermarkData = '';
+      this.normalPictureWatermarkFile = '';
+      this.smallPictureWatermarkData = '';
+      this.smallPictureWatermarkFile = '';
+      this.normalVideoWatermarkData = '';
+      this.normalVideoWatermarkFile = '';
+      this.smallVideoWatermarkData = '';
+      this.smallVideoWatermarkFile = '';
     },
     addSizeLimit() {
       this.us.sizeLimit.others.push({
@@ -51,16 +140,30 @@ window.app = new Vue({
     removeFromArr(arr, index) {
       arr.splice(index, 1)
     },
-    selectedWatermark(c = 'normal') {
-      const input = this.$refs[`${c}WatermarkInput`];
+    //选择图片水印图片
+    selectedPictureWatermark(c = 'normal') {
+      const input = this.$refs[`${c}PictureWatermarkInput`];
       const files = input.files;
       if(!files || !files.length) return;
       const file = files[0];
       const self = this;
       NKC.methods.fileToUrl(file)
         .then(data => {
-          self[`${c}WatermarkData`] = data;
-          self[`${c}WatermarkFile`] = file;
+          self[`${c}PictureWatermarkData`] = data;
+          self[`${c}PictureWatermarkFile`] = file;
+        })
+    },
+    //选择视频水印图片
+    selectedVideoWatermark(c = 'normal') {
+      const input = this.$refs[`${c}VideoWatermarkInput`];
+      const files = input.files;
+      if(!files || !files.length) return;
+      const file = files[0];
+      const self = this;
+      NKC.methods.fileToUrl(file)
+        .then(data => {
+          self[`${c}VideoWatermarkData`] = data;
+          self[`${c}VideoWatermarkFile`] = file;
         })
     },
     // 新增一条视频码率控制配置
@@ -79,10 +182,12 @@ window.app = new Vue({
     submit: function() {
       const us = JSON.parse(JSON.stringify(this.us));
       const {extensionLimit} = us;
-      const {normalWatermarkFile, smallWatermarkFile} = this;
+      const {normalPictureWatermarkFile, smallPictureWatermarkFile, normalVideoWatermarkFile, smallVideoWatermarkFile} = this;
       const self = this;
-      const normalWatermarkInput = this.$refs.normalWatermarkInput;
-      const smallWatermarkInput = this.$refs.smallWatermarkInput;
+      const normalPictureWatermarkInput = this.$refs.normalPictureWatermarkInput;
+      const normalVideoWatermarkInput = this.$refs.normalVideoWatermarkInput;
+      const smallPictureWatermarkInput = this.$refs.smallPictureWatermarkInput;
+      const smallVideoWatermarkInput = this.$refs.smallVideoWatermarkInput;
       extensionLimit.defaultBlacklist = extensionLimit._defaultBlacklist.split(',').map(e => e.trim());
       extensionLimit.defaultWhitelist = extensionLimit._defaultWhitelist.split(',').map(e => e.trim());
       extensionLimit.others.map(o => {
@@ -104,21 +209,26 @@ window.app = new Vue({
       return Promise.resolve()
         .then(() => {
           formData.append('uploadSettings', JSON.stringify(us));
-          if(normalWatermarkFile) {
-            formData.append('normalWatermark', normalWatermarkFile);
+          if(normalPictureWatermarkFile) {
+            formData.append('normalPictureWatermark', normalPictureWatermarkFile);
           }
-          if(smallWatermarkFile) {
-            formData.append('smallWatermark', smallWatermarkFile);
+          if(smallPictureWatermarkFile) {
+            formData.append('smallPictureWatermark', smallPictureWatermarkFile);
+          }
+          if(normalVideoWatermarkFile) {
+            formData.append('normalVideoWatermark', normalVideoWatermarkFile);
+          }
+          if(smallVideoWatermarkFile) {
+            formData.append('smallVideoWatermark', smallVideoWatermarkFile);
           }
           return nkcUploadFile('/e/settings/upload', 'PUT', formData);
         })
         .then(data => {
           sweetSuccess('保存成功');
-          normalWatermarkInput.value = null;
-          smallWatermarkInput.value = null;
-          const {normalAttachId, smallAttachId} = data.uploadSettings.watermark;
-          self.us.watermark.normalAttachId = normalAttachId;
-          self.us.watermark.smallAttachId = smallAttachId;
+          normalPictureWatermarkInput.value = null;
+          normalVideoWatermarkInput.value = null;
+          smallPictureWatermarkInput.value = null;
+          smallVideoWatermarkInput.value = null;
           self.resetFile();
         })
         .catch(sweetError);

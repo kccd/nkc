@@ -1,41 +1,15 @@
 const router = require('koa-router')();
-const fsPromise = require('fs').promises;
 router
   .get('/:id', async (ctx, next) => {
-    const {params, db, query, settings, data, nkcModules} = ctx;
-    const {user} = data;
-    const {statics} = settings;
+    const {params, db, query, settings} = ctx;
     const {id} = params;
-    const {t, c} = query;
+    const {t} = query;
     if(t && !['sm', 'lg', 'md', 'ico'].includes(t)) ctx.throw(400, '未知的文件尺寸');
-    const a = await db.AttachmentModel.findOne({_id: id});
-    if(a) {
-      if(c === 'siteIcon') {
-        ctx.filePath = await db.AttachmentModel.getSiteIconFilePath(t);
-      } else {
-        ctx.filePath = await a.getFilePath(t);
-      }
-      ctx.type = a.ext;
-    }
-    let notFoundFile;
-    if(!a || !ctx.filePath) {
-      notFoundFile = true;
+    const attachment = await db.AttachmentModel.findOne({_id: id});
+    if(attachment) {
+      ctx.remoteFile = await attachment.getRemoteFile(t);
     } else {
-      notFoundFile = !await nkcModules.file.access(ctx.filePath);
-    }
-    if(notFoundFile) {
-      switch(c) {
-        case 'userAvatar':
-          ctx.filePath = statics.defaultAvatarPath; break;
-        case 'userBanner':
-          ctx.filePath = statics.defaultUserBannerPath; break;
-        case 'scoreIcon':
-          ctx.filePath = statics.defaultScoreIconPath; break;
-        case 'siteIcon':
-          ctx.filePath = statics.defaultSiteIconPath; break;  
-        default: ctx.filePath = statics.defaultAvatarPath;
-        // default: ctx.throw(400, '数据未找到');
-      }
+      ctx.filePath = settings.statics.defaultAvatarPath;
     }
     await next();
   })

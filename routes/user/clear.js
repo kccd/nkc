@@ -9,9 +9,17 @@ router
     const {type} = body;
     const time = Date.now();
     if(type === "avatar") {
-      await nkcModules.file.deleteUserAvatar(targetUser.uid);
+      await db.UserModel.updateOne({uid: targetUser.uid}, {
+        $set: {
+          avatar: ''
+        }
+      });
     } else if(type === "banner") {
-      await nkcModules.file.deleteUserBanner(targetUser.uid);
+      await db.UserModel.updateOne({uid: targetUser.uid}, {
+        $set: {
+          banner: ''
+        }
+      });
     } else if(type === "username") {
       const newUsername = `${serverSettings.websiteCode}-${targetUser.uid}`;
       const newUsernameLowerCase = newUsername.toLowerCase();

@@ -94,6 +94,7 @@ function postComment(tid, pid, firstInput) {
     editor[pid].destroy();
   }
   editor[pid] = UE.getEditor('edit_' + pid, NKC.configs.ueditor.commentConfigs);
+  NKC.methods.ueditor.initDownloadEvent(editor[pid]);
 
   postContainer.show();
   autoSaveCommentDraft(tid, pid);

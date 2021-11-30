@@ -633,26 +633,16 @@ usersPersonalSchema.statics.modifyVerifyPhoneNumberTime = async (uid) => {
  * 生成身份认证2记录
  */
 usersPersonalSchema.methods.generateAuthenticateVerify2 = async function(files) {
-	const AttachmentModel = mongoose.model("attachments");
+  const VerifiedUploadModel = mongoose.model('verifiedUpload');
 	const [ imageA, imageB ] = files;
 	if(!imageA || !imageB) {
 		throw new Error("must get A and B surface of IDCard.");
 	}
-	const aids = await Promise.all(
-		[ imageA, imageB ].map(async (file) => {
-			return await AttachmentModel.saveVerifiedUpload({
-				size: file.size,
-				hash: file.hash,
-				name: file.name,
-				path: file.path,
-				uid: this.uid
-			})
-		})
-	);
-
+  const pictureAId = await VerifiedUploadModel.saveIdentityInfo(this.uid, imageA, 'identityPictureA');
+  const pictureBId = await VerifiedUploadModel.saveIdentityInfo(this.uid, imageB, 'identityPictureB');
 	await this.updateOne({
 		$set: {
-			"authenticate.card.attachments": aids,
+			"authenticate.card.attachments": [pictureAId, pictureBId],
 			"authenticate.card.status": "in_review"
 		}
 	});
@@ -662,30 +652,11 @@ usersPersonalSchema.methods.generateAuthenticateVerify2 = async function(files) 
  * 生成身份认证3记录
  */
 usersPersonalSchema.methods.generateAuthenticateVerify3 = async function(file, code) {
-	const AttachmentModel = mongoose.model("attachments");
 	if(!file) {
 		throw new Error("must get a video file.");
 	}
-	// if ext = mp4 不做任何处理
-	// if ext !== mp4 转格式 
-	// nkcModules.file.getFileObjectBy获取转换格式后文件的file属性
 	const VerifiedUploadModel = mongoose.model("verifiedUpload");
-	const _id = await VerifiedUploadModel.getNewId();
-	const date = new Date();
-	const targetFilePath = path.dirname(file.path);
-	const newTargetFilePath = path.join(targetFilePath, `${_id}_tmp.mp4`)
-	await ffmpeg.videoTransMP4(file.path, newTargetFilePath);
-	const newFile = await FILE.getFileObjectByFilePath(newTargetFilePath);
-	const aid = await AttachmentModel.saveVerifiedUpload({
-		_id,
-		size: newFile.size,
-		hash: newFile.hash,
-		ext: "mp4",
-		name: newFile.name,
-		path: newFile.path,
-		uid: this.uid,
-		toc:date,
-	});
+  const aid = await VerifiedUploadModel.saveIdentityInfo(this.uid, file, 'identityVideo');
 	await this.updateOne({
 		$set: {
 			"authenticate.video.attachments": [aid],

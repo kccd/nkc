@@ -79,7 +79,7 @@ router
     // 最近活跃用户
     data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
     // 首页大Logo
-    data.homeBigLogo = await db.AttachmentModel.getHomeBigLogo();
+    data.homeBigLogo = await db.SettingModel.getHomeBigLogo();
     // 公告通知
     data.notices = await db.ThreadModel.getNotice(fidOfCanGetThreads);
     // 是否启用了网站工具

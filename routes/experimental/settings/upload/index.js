@@ -1,4 +1,8 @@
 const router = require("koa-router")();
+const fs = require("fs");
+const path = require('path')
+const fsPromise = fs.promises;
+const statics = require("../../../../settings/statics");
 router
   .get('/', async (ctx, next) => {
     const {db, data} = ctx;
@@ -23,12 +27,20 @@ router
     countLimit.others = await db.RoleModel.filterSettings(countLimit.others, ['visitor']);
     extensionLimit.others = await db.RoleModel.filterSettings(extensionLimit.others, ['visitor']);
     // 水印尺寸限制
-    checkNumber(watermark.minHeight, {
-      name: '水印尺寸限制最小高度',
+    checkNumber(watermark.picture.minHeight, {
+      name: '图片水印尺寸限制最小高度',
       min: 0
     });
-    checkNumber(watermark.minWidth, {
-      name: '水印尺寸限制最小宽度',
+    checkNumber(watermark.picture.minWidth, {
+      name: '图片水印尺寸限制最小宽度',
+      min: 0
+    });
+    checkNumber(watermark.video.minHeight, {
+      name: '视频水印尺寸限制最小高度',
+      min: 0
+    });
+    checkNumber(watermark.video.minWidth, {
+      name: '视频水印尺寸限制最小宽度',
       min: 0
     });
     checkNumber(watermark.buyNoWatermark, {
@@ -69,11 +81,23 @@ router
         }
       }
     });
-    if(files.normalWatermark) {
-      await db.AttachmentModel.saveWatermark(files.normalWatermark, 'normal');
+    const watermarkSize = 1024 * 1024;
+    //将水印保存在默认文件夹
+    if(files.normalPictureWatermark) {
+      if (files.normalPictureWatermark.size > watermarkSize) ctx.throw(400, '图片默认水印大小不能超过1M!');
+      await fsPromise.copyFile(files.normalPictureWatermark.path, statics.normalPictureWatermark);
     }
-    if(files.smallWatermark) {
-      await db.AttachmentModel.saveWatermark(files.smallWatermark, 'small');
+    if(files.smallPictureWatermark) {
+      if (files.smallPictureWatermark.size > watermarkSize) ctx.throw(400, '图片小水印大小不能超过1M!');
+      await fsPromise.copyFile(files.smallPictureWatermark.path, statics.smallPictureWatermark);
+    }
+    if(files.normalVideoWatermark) {
+      if (files.normalVideoWatermark.size > watermarkSize) ctx.throw(400, '视频默认水印大小不能超过1M!');
+      await fsPromise.copyFile(files.normalVideoWatermark.path, statics.normalVideoWatermark);
+    }
+    if(files.smallVideoWatermark) {
+      if (files.smallVideoWatermark.size > watermarkSize) ctx.throw(400, '视频小水印大小不能超过1M!');
+      await fsPromise.copyFile(files.smallVideoWatermark.path, statics.smallVideoWatermark);
     }
     await db.SettingModel.saveSettingsToRedis('upload');
     data.uploadSettings = await db.SettingModel.getSettings('upload');

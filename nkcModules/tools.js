@@ -1,6 +1,15 @@
+var isNode = typeof window === 'undefined';
+
 var Tools = function() {
   var self = this;
   self.getUrl = function(type, id, size) {
+    var fileDomain;
+    if(isNode) {
+      fileDomain = require('../config/server').fileDomain;
+    } else {
+      fileDomain = NKC.configs.fileDomain;
+    }
+    fileDomain = fileDomain || '';
     if(['', undefined, null].includes(id)) {
       id = 'default';
     }
@@ -11,19 +20,25 @@ var Tools = function() {
         return "/f/" + id
       }
       case "userAvatar": {
+        return fileDomain + "/a/" + id + t
+      }
+      case "appUserAvatar": { // 临时兼容 APP
         return "/a/" + id + t
       }
       case "userBanner": {
-        return "/a/"+ id + t
+        return fileDomain + "/a/"+ id + t
       }
       case "scoreIcon": {
-        return "/a/" + id + t
+        if(id === 'default') {
+          return "/default/kcb.png"
+        }
+        return fileDomain + "/a/" + id + t
       }
       case "postCover": {
-        return '/a/' + id + t;
+        return fileDomain + '/a/' + id + t;
       }
       case 'problemImage': {
-        return '/a/' + id + t;
+        return fileDomain + '/a/' + id + t;
       }
       case "cover": {
         return "/nr/cover/" + id + t
@@ -38,34 +53,34 @@ var Tools = function() {
         return "/statics/grade_icon/v" + id + "l.png";
       }
       case "forumLogo": {
-        return "/a/" + id + t;
+        return fileDomain + "/a/" + id + t;
       }
       case "forumBanner": {
-        return "/a/" + id + t
+        return fileDomain + "/a/" + id + t
       }
       case "columnAvatar": {
-        return "/a/" + id + t
+        return fileDomain + "/a/" + id + t
       }
       case "columnBanner": {
-        return "/a/" + id + t
+        return fileDomain + "/a/" + id + t
       }
       case "columnHome": {
         return "/m/" + id
       }
       case "homeBigLogo": {
-        return "/a/" + id + t
+        return fileDomain + "/a/" + id + t
       }
       case "watermark": {
-        return "/a/" + id + t
+        return "/wm?type=" + id + "&status=" + size;
       }
       case "recommendThreadCover": {
-        return '/a/' + id + t
+        return fileDomain + '/a/' + id + t
       }
       case "pdf": {
-        return "/r/" + id + '?c=preview_pdf';
+        return fileDomain + "/r/" + id + '?c=preview_pdf';
       }
       case "sticker": {
-        return "/sticker/" + id;
+        return fileDomain + "/sticker/" + id;
       }
       case "emoji": {
         return "/twemoji/2/svg/" + id + ".svg"
@@ -89,19 +104,23 @@ var Tools = function() {
         return "/editor?"
       }
       case 'mediaPicture': {
-        return "/r/" + id + t;
+        return fileDomain + "/r/" + id + t;
       }
       // 用户上传的附件
       case "resource": {
-        return "/r/" + id + t
+        return fileDomain + "/r/" + id + t
       }
       // 用户上传的附件的下载链接
       case "resourceDownload": {
-        return "/r/" + id + t + '&d=attachment'
+        return fileDomain + "/r/" + id + t + '&d=attachment'
+      }
+      // 资源封面 图片、视频
+      case "resourceCover": {
+        return fileDomain + "/r/" + id + '/cover'
       }
       // 其他资源，包含avatar, banner等等
       case "attach": {
-        return "/a/" + id
+        return fileDomain + "/a/" + id
       }
       case "messageFriendImage": {
         return "/friend/" + id + "/image";
@@ -110,7 +129,7 @@ var Tools = function() {
         return "/frameImg/" + id
       }
       case "messageResource": {
-        return "/message/resource/" + id + t;
+        return fileDomain + "/message/resource/" + id + t;
       }
       case "userHome": {
         if(id === 'default') return false
@@ -129,10 +148,10 @@ var Tools = function() {
         return "/default/" + id;
       }
       case 'previewPDF': {
-        return "/reader/pdf/web/viewer?file=%2fr%2f" + id;
+        return "/reader/pdf/web/viewer?file=%2fr%2f" + id + "?time=" + Date.now();
       }
       case 'siteIcon': {
-        return "/a/" + id + t
+        return "/logo/" + id;
       }
       case 'columnPost': {
         return "/m/" + id + '/post/' + size;
@@ -150,13 +169,13 @@ var Tools = function() {
         return "/fund/list/" + id + '/settings'
       }
       case 'fundAvatar': {
-        return "/a/" + id + t
+        return fileDomain + "/a/" + id + t
       }
       case 'fundHome': {
         return "/fund";
       }
       case 'fundBanner': {
-        return "/a/" + id + t
+        return fileDomain + "/a/" + id + t
       }
       case 'fundApplicationForm': {
         return "/fund/a/" + id
@@ -313,7 +332,8 @@ var Tools = function() {
 
 var elementIdChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-if(typeof window === "undefined") {
+
+if(isNode) {
   module.exports = new Tools();
 } else {
   NKC.methods.tools = new Tools();

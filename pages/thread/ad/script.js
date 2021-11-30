@@ -81,7 +81,7 @@ var app = new Vue({
           });
           if(!self.cover) throw "请选择封面图";
           var formData = new FormData();
-          formData.append("cover", self.cover);
+          formData.append("cover", self.cover, 'cover.png');
           formData.append("title", self.title);
           formData.append("topType", self.topType);
           return nkcUploadFile("/t/" + self.tid + "/ad", "POST", formData)

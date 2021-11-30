@@ -106,6 +106,9 @@ NKC.modules.SelectResource = function() {
     methods: {
       getUrl: NKC.methods.tools.getUrl,
       getSize: NKC.methods.tools.getSize,
+      showErrorInfo(r) {
+        sweetInfo(r.errorInfo);
+      },
       checkFileSize: function(filename, size) {
         var sizeLimit = this.sizeLimit;
         if(!sizeLimit) return;
@@ -315,10 +318,8 @@ NKC.modules.SelectResource = function() {
       startUpload: function(f) {
         f.error = "";
         this.selectCategory("upload");
-        var fileId = null;
         return Promise.resolve()
           .then(function() {
-            // if(f.data.size>200*1024*1024) throw "文件大小不能超过200MB";
             self.app.checkFileSize(f.data.name, f.data.size);
             if(f.status === "uploading") throw "文件正在上传...";
             if(f.status === "uploaded") throw "文件已上传成功！";
@@ -328,12 +329,10 @@ NKC.modules.SelectResource = function() {
           })
           .then(function(md5) {
             // 将md5发送到后端检测文件是否已上传
-            var formData = new FormData();
-            formData.append("type", "checkMD5");
-            formData.append("fileName", f.name);
-            formData.append("md5", md5);
-            fileId = md5;
-            return nkcUploadFile("/r", "POST", formData);
+            return nkcAPI('/rs/md5', 'POST', {
+              md5,
+              filename: f.name
+            });
           })
           .then(function(data) {
             if(!data.uploaded) {

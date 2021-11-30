@@ -15,7 +15,7 @@ router
     if(asset.uid !== user.uid) {
       return ctx.throw(403, "你不是附件的上传者，所以无权查看此附件");
     }
-    ctx.filePath = await asset.getFilePath();
+    ctx.remoteFile = await asset.getRemoteFile();
     ctx.type = asset.ext;
     return next();
   })

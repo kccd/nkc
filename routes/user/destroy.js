@@ -78,7 +78,7 @@ router
         ip: ctx.address,
         port: ctx.port
       });
-      ctx.setCookie("userInfo", "");
+      ctx.clearCookie("userInfo");
     }
     await next();
   });

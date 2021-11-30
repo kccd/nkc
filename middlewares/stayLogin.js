@@ -43,9 +43,9 @@ module.exports = async (ctx, next) => {
           user = _user;
         }
       }
-      if(!user) ctx.setCookie('userInfo', '');
+      if(!user) ctx.clearCookie('userInfo');
     } catch(err) {
-      ctx.setCookie('userInfo', '');
+      ctx.clearCookie('userInfo');
     }
 
 	}

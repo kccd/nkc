@@ -78,8 +78,13 @@ block eContent
                     div=`真实路径：${r.filePath || '未知'}`
                   th
                     if r.metadata
-                      for value,key in r.metadata
-                        div=`${key}: ${value}`
+                      for meta in r.metadata
+                        h4=meta.type
+                          | :
+                        if(meta.metaInfo)
+                          for value,key in meta.metaInfo
+                            div=`${key}:${value}`
+
                   th
                     if !r.targets.length
                       span 未使用
@@ -103,6 +108,8 @@ block eContent
                       button.btn.btn-danger.btn-xs(onclick=`initiate(${r.rid}, ${true})`) 屏蔽
                     if r.isFileExist && (r.mediaType === "mediaVideo" || r.mediaType === "mediaAudio")
                       button.btn.btn-warning.btn-xs(onclick=`removeInfo(${r.rid})`) 清除文件信息
+                    button.btn.btn-success.btn-xs(onclick=`update(${r.rid})`) 更新
+
         include ../../publicModules/paging/paging_input
 block scripts
   include ../../publicModules/subscribeTypes/subscribeTypes

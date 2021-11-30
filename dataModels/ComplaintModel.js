@@ -115,7 +115,7 @@ schema.statics.extendComplaints = async (complaints) => {
   posts = await PostModel.extendPosts(posts, {
     user: true,
     userGrade: false,
-    resource: false,
+    resource: true,
     usersVote: false,
     credit: false
   });

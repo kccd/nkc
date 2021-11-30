@@ -23994,7 +23994,8 @@
             for (i = 0; ci = imgs[i++];) {
               oldSrc = ci.getAttribute("_src") || ci.src || "";
               if (oldSrc == info.source && info.state == "SUCCESS") {
-                newSrc = "/r/" + info.r.rid;
+                const targetSrc = "/r/" + info.r.rid;
+                newSrc = "/default/picloading.png";
                 domUtils.setAttributes(ci, {
                   "src": newSrc,
                   "_src": newSrc
@@ -24003,10 +24004,9 @@
                 // $(ci).wrap("<nkcsource data-type='picture' data-id='"+ info.r.rid +"'></nkcsource>")
                 // 添加属性
                 $(ci).attr({
-                  "data-tag": "nkcsource",
-                  "data-type": "picture",
-                  "data-id": info.r.rid
-                })
+                  "data-type": "downloadPicture",
+                  "data-id": info.r.rid,
+                });
                 break;
               }
               // for (j = 0; cj = list[j++];) {
@@ -29472,6 +29472,8 @@
         var editor = this.editor,
           me = this;
 
+
+
         editor.addListener('ready', function () {
           //提供getDialog方法
           editor.getDialog = function (name) {
@@ -29517,6 +29519,28 @@
           editor.fireEvent('selectionchange', false, true);
 
 
+        });
+
+        // 更新网图下载状态
+        editor.addListener('updateImageState', function(eventName, props) {
+          const {id, state, src} = props;
+          const imgs = domUtils.getElementsByTagName(editor.document, "img");
+          for(let i = 0; i < imgs.length; i++) {
+            const img = imgs[i];
+            if(
+              img.getAttribute('data-type') !== 'downloadPicture' ||
+              img.getAttribute('data-id') !== id
+            ) continue;
+            if(state) {
+              img.setAttribute('data-type', 'picture');
+              img.setAttribute('data-tag', 'nkcsource');
+              img.setAttribute('src', src);
+            } else {
+              img.removeAttribute('data-type');
+              img.removeAttribute('data-id');
+              img.setAttribute('src', 'default/picdefault.png')
+            }
+          }
         });
 
         editor.addListener('mousedown', function (t, evt) {

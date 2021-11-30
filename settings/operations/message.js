@@ -36,11 +36,6 @@ module.exports = {
       GET: 'getMessageFile'
     }
   },
-  frame: {
-    PARAMETER: {
-      GET: 'getMessageVideoFrame'
-    }
-  },
   settings: {
     GET: 'messageGetData',
     PUT: 'modifyMessageSettings',

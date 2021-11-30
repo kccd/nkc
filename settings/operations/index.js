@@ -21,7 +21,6 @@ const {
 	fundBanner,
 	photo,
 	photo_small,
-	logo,
 } = resourceObj;
 
 const editor = require('./editor');
@@ -62,7 +61,6 @@ const rs = require("./resources");
 const protocol = require('./protocol');
 const review = require("./review");
 const threads = require("./threads");
-const newResource = require("./newResource");
 const library = require("./library");
 const libraries = require("./libraries");
 const nkc = require("./nkc");
@@ -79,6 +77,8 @@ const verifications = require('./verifications');
 const payment = require('./payment');
 const link = require('./link');
 const community = require('./community');
+const watermark = require('./watermark');
+const logo = require('./logo');
 const operationObj = {};
 
 
@@ -141,8 +141,6 @@ operationObj.operationTree = {
 		'home.php': {
 			GET: 'discuz'
 		},
-
-		logo, // 网站logo
 
 		poster, //活动海报
 		avatar,// 用户头像
@@ -251,8 +249,6 @@ operationObj.operationTree = {
 
     survey, // 投票、调查问卷、打分
 
-    nr: newResource, // 新的资源路由
-
     library, // 文库
     libraries, // 文库
 
@@ -271,6 +267,8 @@ operationObj.operationTree = {
 		payment, // 支付相关
 		l: link, // 外链跳转
     c: community, // 社区
+		wm: watermark, //水印
+    logo, // 网站 logo
     test,
 	}
 };

@@ -74,9 +74,6 @@ router
     } else {
       options.fid = fidOfCanGetThreads;
     }
-    /*if(options.excludedFid && options.excludedFid.length) {
-      options.fid = options.fid.filter(id => !options.excludedFid.includes(id));
-    }*/
 
     // 加载分页设置
     const {searchThreadList, searchAllList, searchPostList, searchUserList,
@@ -142,10 +139,14 @@ router
       const columnId = new Set();
       const columnPageId = new Set();
       const resourceId = new Set();
+      let threadCategoriesId = [];
       const highlightObj = {};
       results.map(r => {
         pids.add(r.pid);
         uids.add(r.uid);
+        if(r.tcId && r.tcId.length > 0) {
+          threadCategoriesId = threadCategoriesId.concat(r.tcId);
+        }
         if(r.docType === "column") {
           columnId.add(r.tid);
         } else if(r.docType === "columnPage") {
@@ -264,11 +265,17 @@ router
       resources.map(r => {
         resourcesObj[r._id] = r;
       });
+      const threadCategories = await db.ThreadCategoryModel.getCategoriesById([...new Set(threadCategoriesId)]);
+      const threadCategoriesObj = {};
+      for(let i = 0; i < threadCategories.length; i++) {
+        const category = threadCategories[i];
+        threadCategoriesObj[category.nodeId] = category;
+      }
       // 根据文档类型，拓展数据
       loop1:
       for(const result of results) {
         let r;
-        const {docType, pid, uid, tid} = result;
+        const {docType, pid, uid, tid, tcId} = result;
         if(["thread", "post"].includes(docType)) {
           const post = postObj[pid];
           if(!post || post.disabled) continue;
@@ -299,6 +306,14 @@ router
               fid: forum.fid
             }
           });
+          let tc = [];
+          if(docType === 'thread') {
+            for(const id of tcId) {
+              const category = threadCategoriesObj[id];
+              if(!category) continue;
+              tc.push(category);
+            }
+          }
 
           r = {
             docType,
@@ -306,6 +321,7 @@ router
             pid: post.pid,
             oc: thread.oc,
             title: highlightObj[`${pid}_title`] || post.t || thread.firstPost.t,
+            threadCategories: tc,
             abstract:
               highlightObj[`${pid}_pid`] ||
               highlightObj[`${pid}_aid`] ||
@@ -399,6 +415,7 @@ router
     }
     data.time = Date.now() - time;
     data.forums = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
+    data.threadCategories = await db.ThreadCategoryModel.getCategoryTree({disabled: false});
     ctx.template = "search/search.pug";
     await next();
   });

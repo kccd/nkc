@@ -110,6 +110,23 @@ chatSchema.statics.createChat = async (uid, targetUid, both) => {
 };
 
 /*
+* 创建默认对话
+* @param {String} type systemInfo，reminder, newFriends
+* @param {String} uid 用户 ID
+* */
+chatSchema.statics.createDefaultChat = async (type, uid) => {
+  if(!['systemInfo', 'reminder', 'newFriends'].includes(type)) {
+    throwErr(500, `消息类型错误 type: ${type}`);
+  }
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const obj = {};
+  obj[`messageSettings.chat.${type}`] = true;
+  await UsersGeneralModel.updateOne({uid}, {
+    $set: obj
+  });
+};
+
+/*
 * 获取单个对话
 * @param {String} 对话类型  UTU, STE, STU, newFriends
 * @param {String} uid 当前用户UID
@@ -332,14 +349,13 @@ chatSchema.statics.getCreatedChat = async (uid) => {
       type: 'UTU', // 对话类型 UTU(用户间) STU(应用通知) STE(系统通知)
       name, // 显示的名称 昵称或者是用户填写的备注信息
       uid: targetUser.uid, // 对方ID
-      icon: getUrl('userAvatar', targetUser.avatar), // 显示的头像
+      icon: getUrl('appUserAvatar', targetUser.avatar), // 显示的头像
       status, // 在线状态
       abstract, // 摘要
       count: unread // 未读条数
     });
   }
   const usersGeneral = await UsersGeneralModel.findOne({uid});
-  const t = Date.now();
   const {
     newSystemInfoCount,
     newApplicationsCount,

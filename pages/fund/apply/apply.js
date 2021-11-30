@@ -219,6 +219,7 @@ const app = new Vue({
     initEditor() {
       const self = this;
       this.editor = UE.getEditor('fundEditor', NKC.configs.ueditor.fundConfigs)
+      NKC.methods.ueditor.initDownloadEvent(this.editor);
       this.editor.addListener('ready', () => {
         self.editor.setContent(self.project.c);
       });

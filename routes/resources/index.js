@@ -1,4 +1,5 @@
 const router = require("koa-router")();
+const md5Router = require('./md5');
 router
   .get("/", async (ctx, next) => {
     const {db, data, query} = ctx;
@@ -12,5 +13,6 @@ router
     }
     data.resources = await db.ResourceModel.find({rid: {$in: rid}});
     await next();
-  });
+  })
+  .use('/md5', md5Router.routes(), md5Router.allowedMethods());
 module.exports = router;

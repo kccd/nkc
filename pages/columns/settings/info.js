@@ -100,8 +100,8 @@ var app = new Vue({
         .then(function() {
           if(!column.name) throw new Error('请输入专栏名');
           if(!column.abbr) throw new Error('请输入专栏简介');
-          if(self.avatar) formData.append('avatar', self.avatar);
-          if(self.banner) formData.append('banner', self.banner);
+          if(self.avatar) formData.append('avatar', self.avatar, 'avatar.png');
+          if(self.banner) formData.append('banner', self.banner, 'banner.png');
           if(column.notice) formData.append('notice', column.notice);
           formData.append("links", JSON.stringify(column.links));
           formData.append("otherLinks", JSON.stringify(column.otherLinks));

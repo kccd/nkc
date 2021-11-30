@@ -107,16 +107,8 @@ router
         return next();
       }
       const resource = await db.ResourceModel.findOnly({rid, type: "sticker", mediaType: "mediaPicture"});
-      const filePath = await resource.getFilePath();
-      await fs.access(filePath)
-        .then(() => {
-          ctx.filePath = filePath;
-        })
-        .catch(() => {
-          ctx.filePath = statics.defaultStickerImage;
-        })
+      ctx.remoteFile = await resource.getRemoteFile();
       ctx.resource = resource;
-      ctx.type = resource.ext;
     }
     await next();
   });

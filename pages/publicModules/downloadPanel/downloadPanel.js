@@ -9,10 +9,12 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
       data: {
         loading: true,
         error: false,
+        errorInfo: '',
         rid: '',
         resource: null,
         fileCountLimitInfo: [],
         userScores: [],
+        downloadTime: '',
         needScore: false, // 是否需要积分
         freeReason: 'settings',
         description: '',
@@ -71,12 +73,14 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
       },
       methods: {
         getUrl: NKC.methods.tools.getUrl,
+        timeFormat: NKC.methods.tools.timeFormat,
         visitUrl({name, url}) {
+          url = url + `&time=${Date.now()}`
           const {needScore, rid, resource} = this;
           return Promise.resolve()
             .then(() => {
               if(needScore) {
-                return nkcAPI(`/r/${rid}/pay`, 'POST', {})
+                return nkcAPI(`/r/${rid}/pay?time=${Date.now()}`, 'POST', {})
               }
             })
             .then(() => {
@@ -85,17 +89,22 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
               } else {
                 window.location.href = url;
               }
+              const self = this;
+              setTimeout(() => {
+                self.getResourceInfo();
+              }, 1000);
             })
             .catch(sweetError);
         },
         reload() {
           this.loading = true;
           this.error = false;
+          this.errorInfo = '';
           this.getResourceInfo();
         },
         getResourceInfo() {
           const {rid} = this;
-          nkcAPI(`/r/${rid}/detail`, 'GET')
+          nkcAPI(`/r/${rid}/detail`, 'GET', {})
             .then(res => {
               const {
                 needScore,
@@ -108,7 +117,9 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
                 fileCountLimitInfo,
                 downloadWarning,
                 freeTime,
+                downloadLog
               } = res;
+              this.downloadTime = downloadLog? this.timeFormat(downloadLog.toc): '';
               this.resource = resource;
               this.needScore = needScore;
               this.uploader = uploader;
@@ -122,9 +133,10 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
               this.loading = false;
             })
             .catch(err => {
+              console.log(err);
               this.loading = false;
               this.error = true;
-              sweetError(err);
+              this.errorInfo = err.error || err.message || err;
             })
         },
         open(rid) {

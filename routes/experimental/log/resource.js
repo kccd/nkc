@@ -36,9 +36,12 @@ router
     const resources = [];
     let postsId = [];
     const usersId = [];
+    const metaInfos = await db.ResourceModel.getMetadata(resources_);
     for(const r of resources_) {
       await r.setFileExist([]);
-      await r.setMetadata(r);
+      if(r.mediaType === 'mediaAudio' || r.mediaType === 'mediaVideo') {
+        r.metadata = metaInfos[r.rid]
+      }
       let filePath;
       try{
         filePath = await r.getFilePath();
@@ -92,6 +95,7 @@ router
     ctx.template = 'experimental/log/resource.pug';
     await next();
   })
+  //清除文件元信息
   .put('/', async (ctx, next) => {
     const {db, nkcModules, body} = ctx;
     const {file: FILE} = nkcModules;
@@ -100,11 +104,15 @@ router
     if(!['mediaAudio', 'mediaVideo'].includes(resource.mediaType)) {
       ctx.throw(400, `仅支持清除音视频元信息`);
     }
-    //获取文件信息
-    const filePath = await resource.getFilePath(resource);
-    //判断路劲文件是否存在,如果不存在就返回错误
-    if(!await FILE.access(filePath)) return ctx.throw(500, `文件已丢失`);
-    await resource.removeResourceInfo();
+    //清除元文件信息
+    await resource.clearResourceInfo();
     await next();
-  });
+  })
+  .put('/updateInfo', async (ctx, next) => {
+    const {db,body} = ctx;
+    const {rid} = body;
+    const r = await db.ResourceModel.findOnly({rid});
+    await r.updateFilesInfo();
+    await next();
+  })
 module.exports = router;

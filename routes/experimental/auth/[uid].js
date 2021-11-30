@@ -18,6 +18,15 @@ authRouter
 		data.mobile = userPersonal.mobile;
 		data.authLevel = await userPersonal.getAuthLevel();
     const {auth3Content} = await db.SettingModel.getSettings('auth');
+		const verifiedUploadVideo = await db.VerifiedUploadModel.findOne({_id: userPersonal.authenticate.video.attachments[0]}, {state: 1, _id: 1, errorInfo: 1}).sort({toc: -1});
+		const verifiedUploadCardA = await db.VerifiedUploadModel.findOne({_id: userPersonal.authenticate.card.attachments[0]}, {state: 1, _id: 1, errorInfo: 1}).sort({toc: -1});
+		const verifiedUploadCardB = await db.VerifiedUploadModel.findOne({_id: userPersonal.authenticate.card.attachments[1]}, {state: 1, _id: 1, errorInfo: 1}).sort({toc: -1});
+		data.verifiedVideoState = verifiedUploadVideo.state;
+		data.verifiedAState = verifiedUploadCardA.state;
+		data.verifiedBState = verifiedUploadCardB.state;
+		data.videoErrorInfo = verifiedUploadVideo.errorInfo;
+		data.cardAErrorInfo = verifiedUploadCardA.errorInfo;
+		data.cardBErrorInfo = verifiedUploadCardB.errorInfo;
     data.auth3Content = auth3Content;
 		ctx.template = '/experimental/auth/[uid]/index.pug';
 		await next();
@@ -85,7 +94,7 @@ authRouter
     if(!ctx.permission("visitUserAuth")) {
       return ctx.throw(403, "你无权查看此附件");
     }
-    ctx.filePath = await asset.getFilePath();
+    ctx.remoteFile = await asset.getRemoteFile();
     ctx.type = asset.ext;
     return next();
 	});

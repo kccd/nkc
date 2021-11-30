@@ -34,6 +34,26 @@ const usersGeneralSchema = new Schema({
     waterPayInfo:{
       type: Boolean,
       default: false
+    },
+    picture:{
+      waterGravity: {
+        type: String,
+        default: "southeast"
+      },
+      waterStyle: {
+        type: String,
+        default: "siteLogo"
+      },
+    },
+    video:{
+      waterGravity: {
+        type: String,
+        default: "southeast"
+      },
+      waterStyle: {
+        type: String,
+        default: "siteLogo"
+      },
     }
   },
   messageSettings: {

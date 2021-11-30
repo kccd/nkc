@@ -370,11 +370,16 @@ NKC.modules.Library = class {
             .then(data => {
               // 上传本地文件
               if(file.type === "localFile") {
-                const formData = new FormData();
-                formData.append("fileName", file.data.name);
-                formData.append("type", "checkMD5");
-                formData.append("md5", data);
-                return nkcUploadFile("/r", "POST", formData);
+                let filename = '';
+                if(file.data && file.data.name) {
+                  filename = file.data.name;
+                } else {
+                  filename = file.name;
+                }
+                return nkcAPI("/rs/md5", "POST", {
+                  md5: data,
+                  filename,
+                });
               }
             })
             .then(data => {

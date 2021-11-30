@@ -28,6 +28,16 @@ router
     data.resource = resource.toObject();
     const downloadSettings = await db.SettingModel.getSettings('download');
     data.downloadWarning = downloadSettings.warning;
+    const match = {
+      rid: resource.rid
+    };
+    if(user) {
+      match.uid = user.uid;
+    } else {
+      match.ip = ctx.address;
+      match.port = ctx.port;
+    }
+    data.downloadLog = await db.DownloadLogModel.findOne(match, {toc: -1});
     data.uploader = await db.UserModel.findOnly({uid: resource.uid}, {
       uid: 1,
       username: 1,

@@ -6,7 +6,6 @@ const socketConfig = require('../config/socket');
 const redisConfig = require("../config/redis");
 const socketIoRedis = require('socket.io-redis');
 const {init, auth, logger, permission} = require("./middlewares");
-const common = require('./common');
 
 /*module.exports = async (server) => {
   const io = socketIo(server, socketConfig.options);
@@ -29,6 +28,8 @@ const common = require('./common');
 module.exports = async (server) => {
   const existed = !!server;
   if(!existed) {
+    global.NKC.port = socketConfig.port + Number(global.NKC.processId);
+    global.NKC.address = socketConfig.address;
     server = http.createServer();
   }
   const io = socketIo(server, socketConfig.options);
@@ -44,12 +45,12 @@ module.exports = async (server) => {
   await namespace.use(auth);
   await namespace.use(permission);
   await namespace.use(logger);
+  const common = require('./common');
   await common(namespace);
 
   if(!existed) {
-    const port = socketConfig.port + Number(global.NKC.processId);
-    server.listen(port, socketConfig.address, () => {
-      console.log(`socket service ${global.NKC.processId} is running at ${socketConfig.address}:${port}`.green);
+    server.listen(global.NKC.port, global.NKC.address, () => {
+      console.log(`socket service ${global.NKC.processId} is running at ${global.NKC.address}:${global.NKC.port}`.green);
       if(process.connected) process.send('ready');
     });
     process.on('message', async function(msg) {

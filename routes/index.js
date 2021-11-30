@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 const routers = require('../requireFolder')(__dirname);
 const userRouter = routers.user;
+const watermarkRouter = routers.watermark;
 const meRouter = routers.me;
 const threadRouter = routers.thread;
 const postRouter = routers.post;
@@ -61,6 +62,8 @@ const paymentRouter = routers.payment;
 const linkRouter = routers.link;
 // 社区
 const communityRouter = routers.community;
+// 网站 logo
+const logoRouter = routers.logo;
 
 const path = require('path');
 
@@ -83,7 +86,6 @@ router.use('/', async (ctx, next) => {
 });
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
-router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
 router.use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
 router.use("/libraries", librariesRouter.routes(), librariesRouter.allowedMethods());
 router.use("/editor", editorRouter.routes(), editorRouter.allowedMethods());
@@ -134,4 +136,6 @@ router.use('/verifications', verificationsRouter.routes(), verificationsRouter.a
 router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods())
 router.use('/c', communityRouter.routes(), communityRouter.allowedMethods())
 router.use("/l", linkRouter.routes(), linkRouter.allowedMethods());
+router.use("/wm", watermarkRouter.routes(), watermarkRouter.allowedMethods());
+router.use('/logo', logoRouter.routes(), logoRouter.allowedMethods());
 module.exports = router;

@@ -40,12 +40,10 @@ module.exports = {
 			},
 			detail: {
 				GET: "resourceDetail"
-			}
-		}
-	},
-	rt: {
-		PARAMETER: {
-			GET: 'getThumbs'
+			},
+      cover: {
+        GET: 'getResourceCover'
+      }
 		}
 	},
 	rm: {
@@ -56,16 +54,6 @@ module.exports = {
 	ro: {
 		PARAMETER: {
 			GET: 'getOrigins'
-		}
-	},
-	/*cover: {// 文章封面图
-		PARAMETER: {
-			GET: 'getThreadCover'
-		}
-	},*/
-	frameImg: {// 视频封面图
-		PARAMETER: {
-			GET: 'getVideoImg'
 		}
 	},
 	appDownload: {// 安装包下载
@@ -105,18 +93,6 @@ module.exports = {
 	pfb: {// 专栏banner
 		PARAMETER: {
 			GET: 'getPersonalForumBanner'
-		}
-	},
-	fundLogo: {// 基金项目logo
-		POST: 'updateFundLogo',
-		PARAMETER: {
-			GET: 'getFundLogo'
-		}
-	},
-	fundBanner: {// 基金项目banner
-		POST: 'updateFundBanner',
-		PARAMETER: {
-			GET: 'getFundBanner'
 		}
 	},
 	photo: {// 照片

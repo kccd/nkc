@@ -362,6 +362,7 @@ schema.methods.extendData = async function(fidOfCanGetThreads) {
     },
     reviewed: true,
     disabled: false,
+    recycleMark: {$ne: true},
     mainForumsId: {
       $in: fidOfCanGetThreads
     }
@@ -417,7 +418,8 @@ schema.statics.getHomeBlockData = async (props) => {
     recommendThreadsFixed: fixed,
     management: [],
     goods: [],
-    forums: []
+    forums: [],
+    webApply: [],
   };
   // 热销商品
   if(showShopGoods) {

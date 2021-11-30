@@ -513,7 +513,7 @@ async function clearMetadata(filePath, outputFilePath) {
 /*
 *获取元文件信息
 * */
-async function getFileInfo(filePath) {
+async function getFileMetaInfo(filePath) {
   return new Promise((resolve, reject) => {
     ff.ffprobe(filePath, (err, data) => {
       if(err) {
@@ -556,6 +556,6 @@ module.exports = {
   addImageTextWaterMaskForImage,
   addWaterMask,
   getAudioDuration,
-  getFileInfo,
+  getFileMetaInfo,
   clearMetadata,
 };
