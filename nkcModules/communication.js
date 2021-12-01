@@ -26,6 +26,7 @@ function getCommunicationClient() {
       VerifiedUploadModel.updateVerifiedState(data);
     }
   });
+  return communicationClient;
 }
 
 module.exports = {

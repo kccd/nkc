@@ -99,14 +99,19 @@ class CommunicationClient {
           return callback(data);
         })
         .then(res => {
-          if(res) {
-            _callback(res);
-          } else {
-            _callback({
-              status: 200,
-              content: {}
-            });
-          }
+          const content = res || {};
+          _callback({
+            status: 200,
+            content
+          });
+        })
+        .catch(err => {
+          _callback({
+            status: 500,
+            content: {
+              message: err.message
+            }
+          })
         })
     });
   }
