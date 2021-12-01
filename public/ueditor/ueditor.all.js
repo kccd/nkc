@@ -17911,7 +17911,7 @@
                 if(domUtils.findParentByTagName(node, 'a', true)) return;
                 if(domUtils.findParentByTagName(node, 'pre', true)) return;
                 if(domUtils.findParentByTagName(node, 'code', true)) return;
-                const textContent = node.textContent;
+                var textContent = node.textContent;
                 var result = textContent.match(urlReg);
                 if(result === null) return;
                 hasUrl = true;
