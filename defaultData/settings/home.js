@@ -112,6 +112,6 @@ module.exports = {
       minSubscriptionCount: 0,
     },
     toppedColumnsId: [],
-    latestOrder: 'releasePost' //首页最新排序方式
+    latestFirst: 'reply' //首页最新点击进入的项目
   }
 };

@@ -312,6 +312,29 @@ function asyncSweetCustom(html) {
   .then(backState);
 }
 
+// 删除文件html内容弹窗
+function asyncSweetSelf(text, html) {
+  var backState = toAlertOpenState(function() {
+    Swal.close();
+  });
+  return new Promise(function(resolve, reject) {
+    Swal({
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      html: html || '',
+      showCancelButton: true,
+      reverseButtons: true
+    })
+      .then(function(result) {
+        if(result.value === true) {
+          resolve();
+        } else {
+          backState();
+        }
+      })
+  });
+}
+
 // promise版本弹框
 function asyncSweetSuccess(text, options) {
   var backState = toAlertOpenState(function() {
@@ -2128,6 +2151,7 @@ Object.assign(window, {
   sweetWarning,
   sweetConfirm,
   sweetQuestion,
+  asyncSweetSelf,
   asyncSweetCustom,
   asyncSweetSuccess,
   asyncSweetError,

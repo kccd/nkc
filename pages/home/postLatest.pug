@@ -2,7 +2,6 @@ if !isIncluded('postActivity')
   +includeCSS('/home/postActivity.css')
   +includeCSS('/home/postLatest.css')
   mixin postlatest(props)
-    -console.log(props)
     -var {from, user, quote, title, content, toc, cover, url, type, parentPostId, parentPost} = props;
     mixin postActivityHeader(headerData)
       -var {toc, type} = headerData;

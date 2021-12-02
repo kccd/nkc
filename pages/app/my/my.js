@@ -51,10 +51,10 @@ const tabs = [
 
 $(function() {
   // 轮播图
-  var swiper = new Swiper('.swiper-container', {
-    pagination: {
-      el: '.swiper-pagination',
-      type: 'bullets',
-    },
-  });
+  // var swiper = new Swiper('.swiper-container', {
+  //   pagination: {
+  //     el: '.swiper-pagination',
+  //     type: 'bullets',
+  //   },
+  // });
 });

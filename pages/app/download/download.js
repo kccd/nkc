@@ -3,6 +3,11 @@ var app = new Vue({
   data() {
     return {
       files: {},
+      fileExt: {
+        video: ['mp4', 'mov', '3gp', 'avi'],
+        picture: ['png', 'jpg', 'jpeg', 'bmp', 'svg', 'gif'],
+      },
+      flag: false,
     }
   },
   mounted() {
@@ -15,6 +20,8 @@ var app = new Vue({
   computed: {
   },
   methods: {
+    getUrl: NKC.methods.tools.getUrl,
+    getSize: NKC.methods.tools.getSize,
     openFile(item){
       if(item){
         if(item.progress === '100'){
@@ -60,9 +67,10 @@ var app = new Vue({
     getDownloadFiles(){
       const _this = this;
       setInterval(function (){
-        this.files = NKC.methods.rn.emit('getFiles', [], function (res){
+        NKC.methods.rn.emit('getFiles', [], function (res){
           if(res.files === {}) return _this.file = null;
           _this.files = res.files.reverse();
+          _this.flag = true;
         })
       },1000)
     }
