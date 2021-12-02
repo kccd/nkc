@@ -4,20 +4,12 @@ block title
   title=data.toolInfo.name
 
 block content
-  .container-fluid.max-width
-    iframe.col-xs-12.col-md-12#toolContainer(src=`/tools/${data.toolInfo._id}${data.toolInfo.entry}`, frameborder="0",  onload="changeFrameHeight()")
+  .container-fluid.max-width.p-l-0.p-r-0
+    iframe.col-xs-12.col-md-12.p-l-0.p-r-0#toolContainer(src=`/tools/${data.toolInfo._id}${data.toolInfo.entry}`, frameborder="0",  onload="changeFrameHeight()")
     style.
       #toolContainer {
         min-height: 1024px;
         min-height: 100vh;
-      }
-      .container-fluid{
-        padding-left: 0;
-        padding-right: 0;
-      }
-      .col-xs-12.col-md-12{
-        padding-left: 0;
-        padding-right: 0;
       }
     //- .col-xs-12.col-md-12!= data.htmlcode
 

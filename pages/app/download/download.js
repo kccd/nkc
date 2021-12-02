@@ -59,20 +59,23 @@ var app = new Vue({
       }
     },
     //格式化时间
-    fromNow(time, files){
-      const toc = NKC.methods.tools.fromNowTwo(new Date(time));
-      return toc;
+    fromNow(time){
+      return NKC.methods.tools.fromNowTwo(new Date(time));
     },
     //获取下载信息
     getDownloadFiles(){
       const _this = this;
-      setInterval(function (){
-        NKC.methods.rn.emit('getFiles', [], function (res){
-          if(res.files === {}) return _this.file = null;
+      NKC.methods.rn.emit('getFiles', [], function (res){
+        if(res.files.length === 0) {
+          _this.file = null;
+        } else {
           _this.files = res.files.reverse();
           _this.flag = true;
-        })
-      },1000)
+        }
+        setTimeout(() => {
+          _this.getDownloadFiles();
+        }, 1000);
+      });
     }
   }
 });

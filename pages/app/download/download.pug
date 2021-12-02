@@ -22,7 +22,7 @@ block content
               a(:href="item.url" data-type="download" :data-title="item.name")
                 .fa.fa-undo.file-download.m-r-1(v-if="item.progress === 'failed' || item.progress === '100'")
               .fa.fa-trash.file-del.m-r-1(v-if="item.progress === '100' || item.progress === 'failed'" @click="delFile(item)")
-    .download-list(v-if="flag && Object.keys(files).length === 0")
+    .download-list(v-if="flag && files.length === 0")
       .null 空空如也~
     .download-list(v-if="!flag")
       .null
