@@ -17911,7 +17911,7 @@
                 if(domUtils.findParentByTagName(node, 'a', true)) return;
                 if(domUtils.findParentByTagName(node, 'pre', true)) return;
                 if(domUtils.findParentByTagName(node, 'code', true)) return;
-                const textContent = node.textContent;
+                var textContent = node.textContent;
                 var result = textContent.match(urlReg);
                 if(result === null) return;
                 hasUrl = true;
@@ -23994,7 +23994,6 @@
             for (i = 0; ci = imgs[i++];) {
               oldSrc = ci.getAttribute("_src") || ci.src || "";
               if (oldSrc == info.source && info.state == "SUCCESS") {
-                const targetSrc = "/r/" + info.r.rid;
                 newSrc = "/default/picloading.png";
                 domUtils.setAttributes(ci, {
                   "src": newSrc,
@@ -29523,10 +29522,12 @@
 
         // 更新网图下载状态
         editor.addListener('updateImageState', function(eventName, props) {
-          const {id, state, src} = props;
-          const imgs = domUtils.getElementsByTagName(editor.document, "img");
-          for(let i = 0; i < imgs.length; i++) {
-            const img = imgs[i];
+          var id = props.id;
+          var state = props.state;
+          var src = props.src;
+          var imgs = domUtils.getElementsByTagName(editor.document, "img");
+          for(var i = 0; i < imgs.length; i++) {
+            var img = imgs[i];
             if(
               img.getAttribute('data-type') !== 'downloadPicture' ||
               img.getAttribute('data-id') !== id
