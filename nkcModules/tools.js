@@ -16,6 +16,9 @@ var Tools = function() {
     var t = "?c=" + type;
     if(size) t += "&t=" + size;
     switch(type) {
+      case 'getIcons': {
+        return '/statics/icons/' + id;
+      }
       case 'forumHome': {
         return "/f/" + id
       }
