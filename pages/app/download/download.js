@@ -2,12 +2,15 @@ var app = new Vue({
   el: '#app',
   data() {
     return {
-      files: {},
+      files: [
+        // {status: 'success', "ext": "pdf", "id": 1638436152651, "name": "毛主席永远活在我们心中_1638436152657.pdf", "path": "/storage/emulated/0/Download/毛主席永远活在我们心中.pdf", "progress": 100, "size": 12019993, "url": "http://192.168.11.250/r/324768?c=resourceDownload&d=attachment&time=1638436151705"},
+        // {status: 'success', "ext": "pdf", "id": 1638436152651, "name": "毛主席永远活在我们心中_1638436152657.pdf", "path": "/storage/emulated/0/Download/毛主席永远活在我们心中.pdf", "progress": 100, "size": 12019993, "url": "http://192.168.11.250/r/324768?c=resourceDownload&d=attachment&time=1638436151705"}
+      ],
       fileExt: {
         video: ['mp4', 'mov', '3gp', 'avi'],
         picture: ['png', 'jpg', 'jpeg', 'bmp', 'svg', 'gif'],
       },
-      flag: false,
+      loading: true,
     }
   },
   mounted() {
@@ -22,6 +25,9 @@ var app = new Vue({
   methods: {
     getUrl: NKC.methods.tools.getUrl,
     getSize: NKC.methods.tools.getSize,
+    reloadFile(item) {
+      NKC.methods.rn.downloadFile(item.name, item.url);
+    },
     openFile(item){
       if(item){
         if(item.progress === '100'){
@@ -70,8 +76,8 @@ var app = new Vue({
           _this.file = null;
         } else {
           _this.files = res.files.reverse();
-          _this.flag = true;
         }
+        _this.loading = false;
         setTimeout(() => {
           _this.getDownloadFiles();
         }, 1000);

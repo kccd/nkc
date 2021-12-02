@@ -1,5 +1,7 @@
+body{
+  background-color: #f4f4f4;
+}
 .app-download{
-  box-sizing: border-box;
   height: 100%;
   width: 100%;
   .download-list{
@@ -7,36 +9,37 @@
     width: 100%;
     .null{
       margin-top: 10rem;
-      font-size: 2rem;
+      font-size: 1.2rem;
       display: flex;
       justify-content: center;
       align-items: center;
     }
+    @listHeight: 6rem;
     .download-file{
-      display: flex;
-      justify-content: space-between;
-      width: 90%;
-      margin: 1rem auto;
-      border-radius: 4px;
+      border-radius: 2px;
+      margin-bottom: 0.5rem;
+      background-color: #fff;
+      height: @listHeight;
       box-shadow: 0 0 3px rgba(0,0,0,0.1);
+      position: relative;
+      padding-left: @listHeight + 0.5rem;
+      padding-right: 0.5rem;
       .file-img{
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 25%;
-        padding: 1rem;
+        height: @listHeight;
+        width: @listHeight;
+        position: absolute;
+        left: 0;
+        top: 0;
         border-right: 1px #f1f1f1 solid;
         img{
-          height: 100%;
-          width: 100%;
+          height: @listHeight * 0.8;
+          width: @listHeight * 0.8;
+          padding-left: @listHeight * 0.2;
+          padding-top: @listHeight * 0.2;
         }
       }
       .file-content{
-        display: flex;
-        flex-direction: column;
-        padding: 1rem;
-        width: 75%;
+        height: 100%;
         .file-name{
           width: 100%;
           word-break: break-all;
@@ -44,7 +47,10 @@
           overflow: hidden;
           -webkit-box-orient: vertical;
           -webkit-line-clamp: 1;
-          color: #337ab7;
+          font-size: 1.3rem;
+          color: #000;
+          height: 3rem;
+          padding-top: 1rem;
         }
         //.file-path{
         //  width: 100%;
@@ -64,11 +70,29 @@
         //  -webkit-line-clamp: 1;
         //}
         .file-do-content{
-          align-items: flex-end;
-          flex: 1;
-          display: flex;
-          justify-content: space-between;
-          .file-download-box{
+          @iconWidth: 2rem;
+          height: 2rem;
+          position: relative;
+          line-height: 2rem;
+          .file-time{
+            display: inline-block;
+            color: #555;
+            font-size: 1rem;
+          }
+          .file-do-box{
+            float: right;
+            height: 100%;
+            margin-right: 0.6rem;
+            .fa{
+              color: #555;
+              line-height: @iconWidth;
+              height: @iconWidth;
+              text-align: center;
+              width: @iconWidth;
+              display: inline-block;
+            }
+          }
+          /*.file-download-box{
             display: flex;
             .file-progress-box{
               margin-left: 0.5rem;
@@ -93,7 +117,7 @@
             .fa{
               font-size: 2rem;
             }
-          }
+          }*/
         }
       }
     }
