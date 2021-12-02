@@ -239,6 +239,28 @@ async function removeResourceInfo(toc, files) {
 }
 
 /*
+* 获取文件真实路径
+* */
+async function getStorePath(storeUrl, files){
+  return new Promise((resolve, reject) => {
+    axios({
+      url: storeUrl + '/storePath',
+      method: 'GET',
+      params: {
+        files: JSON.stringify(files) || '',
+      }
+    })
+      .then(res => {
+        resolve(res.data || res);
+      })
+      .catch(err => {
+        console.log(err);
+        reject(err);
+      });
+  })
+}
+
+/*
 * 过滤 files 对象上的字段
 * resource attachment verifiedUpload messageFile 适用
 * */
@@ -347,5 +369,6 @@ module.exports = {
   getStoreFilesInfo,
   replaceFileExtension,
   getMetaInformation,
-  removeResourceInfo
+  removeResourceInfo,
+  getStorePath
 }

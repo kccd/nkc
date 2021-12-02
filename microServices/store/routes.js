@@ -4,6 +4,7 @@ const get = require('./router/get');
 const info = require('./router/info');
 const list = require('./router/list');
 const metaInformation = require('./router/metaInformation');
+const getStorePath = require('./router/getStorePath');
 const removeInfo = require('./router/removeInfo');
 router
   .get('/', get)
@@ -11,6 +12,7 @@ router
   .get('/info', info)
   .get('/list', list)
   .get('/metaInfo', metaInformation)
+  .get('/storePath', getStorePath)
   .put('/removeInfo', removeInfo)
 
 module.exports = router;

@@ -35,24 +35,27 @@ block eContent
           .row#app(v-cloak)
             .col-xs-12.col-md-12
               .form
+                //.form-group
+                //  h4.setting-block-title 首页最新回复排序
+                //  .radioBox
+                //    label
+                //      span 文章发布时间
+                //      input(type='radio' value="releaseToc" v-model="homeSettings.latestOrder")
+                //    label
+                //      span.m-l-1 最新回复
+                //      input(type='radio' value="releasePost" v-model="homeSettings.latestOrder")
                 .form-group
-                  h4.setting-block-title 首页最新回复排序
+                  h4.setting-block-title 首页点击最新进入的页面
                   .radioBox
                     label
-                      span 文章发布时间
-                      input(type='radio' value="releaseToc" v-model="homeSettings.latestOrder")
+                      span 回复
+                      input(type='radio' value="reply" v-model="homeSettings.latestFirst")
                     label
-                      span.m-l-1 最新回复
-                      input(type='radio' value="releasePost" v-model="homeSettings.latestOrder")
-                .form-group
-                  h4.setting-block-title 首页最新回复显示风格
-                  .radioBox
+                      span.m-l-1 文章
+                      input(type='radio' value="thread" v-model="homeSettings.latestFirst")
                     label
-                      span 以文章为单位显示
-                      input(type='radio' value="latest" v-model="homeSettings.latestStyle")
-                    label
-                      span.m-l-1 以回复为单位显示
-                      input(type='radio' value="appLatest" v-model="homeSettings.latestStyle")
+                      span.m-l-1 专栏
+                      input(type='radio' value="column" v-model="homeSettings.latestFirst")
                 .form-group.form-inline
                   h4.setting-block-title 热门文章
                   h5 回复数不低于：

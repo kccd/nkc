@@ -80,12 +80,11 @@ block content
                 a.button.radius-left(onclick="selectAll()") 全选
                 a.button(onclick="moveSelectedThreads()") 移动
                 a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
-            if (data.t === "latest" || data.t === "column" || data.t === "recommend" || data.t === "appLatest") && state.platform !== 'reactNative'
+            if (data.t === "thread" || data.t === "column" || data.t === "recommend" || data.t === "reply") && state.platform !== 'reactNative'
               .paging-button
-                a.radius-left.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "" data-type="reload") 回复
-                a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "" data-type="reload") 文章
+                a.radius-left.button(href=`/?t=reply` class=data.t === "reply" ? "active" : "" data-type="reload") 回复
+                a.button(href=`/?t=thread` class=data.t === "thread" ? "active" : "" data-type="reload") 文章
                 a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "" data-type="reload") 专栏
-
             if data.t === "subscribe"
               if !data.activity || data.activity.length === 0
                 .p-t-5.p-b-5.text-center
@@ -99,7 +98,8 @@ block content
                     +postActivity(a)
                 include ../publicModules/paging/paging_input
             else
-              if data.t === "latest" && data.latestStyle === "appLatest"
+              //最新回复
+              if data.t === "reply"
                 if !data.posts || data.posts.length === 0
                   .p-t-5.p-b-5.text-center
                     h4
@@ -117,9 +117,10 @@ block content
                     h4
                       b 空空如也~
                 else
+                  -showPagingSortButton = true;
                   include ../publicModules/paging/paging
 
-                  if data.t === 'latest' && data.paging.page === 0 && data.latestToppedThreads.length > 0
+                  if data.t === 'thread' && data.paging.page === 0 && data.latestToppedThreads.length > 0
                     -const defaultThreadListStyle = {type: 'minimalist'}
                     for thread in data.latestToppedThreads
                       include ../publicModules/thread_panel/thread_panel

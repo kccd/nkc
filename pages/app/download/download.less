@@ -7,6 +7,7 @@
     width: 100%;
     .null{
       margin-top: 10rem;
+      font-size: 2rem;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -23,59 +24,75 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 1rem;
         width: 25%;
+        padding: 1rem;
         border-right: 1px #f1f1f1 solid;
-        .iconfont{
-          font-size: 5rem;
+        img{
+          height: 100%;
+          width: 100%;
         }
       }
       .file-content{
-        display: inline-block;
+        display: flex;
+        flex-direction: column;
         padding: 1rem;
         width: 75%;
         .file-name{
           width: 100%;
-          word-break: break-word;
+          word-break: break-all;
           display: -webkit-box;
           overflow: hidden;
           -webkit-box-orient: vertical;
           -webkit-line-clamp: 1;
           color: #337ab7;
         }
-        .file-path{
-          width: 100%;
-          word-break: break-word;
-          display: -webkit-box;
-          overflow: hidden;
-          -webkit-box-orient: vertical;
-          -webkit-line-clamp: 1;
-          color: #337ab7;
-        }
-        .file-url{
-          width: 100%;
-          word-break: break-word;
-          display: -webkit-box;
-          overflow: hidden;
-          -webkit-box-orient: vertical;
-          -webkit-line-clamp: 1;
-        }
-        .file-do-box{
+        //.file-path{
+        //  width: 100%;
+        //  word-break: break-word;
+        //  display: -webkit-box;
+        //  overflow: hidden;
+        //  -webkit-box-orient: vertical;
+        //  -webkit-line-clamp: 1;
+        //  color: #337ab7;
+        //}
+        //.file-url{
+        //  width: 100%;
+        //  word-break: break-word;
+        //  display: -webkit-box;
+        //  overflow: hidden;
+        //  -webkit-box-orient: vertical;
+        //  -webkit-line-clamp: 1;
+        //}
+        .file-do-content{
+          align-items: flex-end;
+          flex: 1;
           display: flex;
           justify-content: space-between;
-          .file-progress-box{
+          .file-download-box{
             display: flex;
-            align-items: flex-end;
-            .file-progress{
-            }
-            .finished{
-              color: green;
-            }
-            .failed{
-              color: red;
+            .file-progress-box{
+              margin-left: 0.5rem;
+              .finished{
+              }
+              .failed{
+                color: #d9534f;
+              }
             }
           }
           .file-do-box{
+            display: flex;
+            a{
+              text-decoration: none;
+            }
+            .file-download{
+              margin-right: 2rem;
+            }
+            .file-del{
+              color: #d9534f;
+            }
+            .fa{
+              font-size: 2rem;
+            }
           }
         }
       }

@@ -44,8 +44,8 @@ router
       }
     }
     const homeSettings = await db.SettingModel.getSettings("home");
-    const latestStyle = homeSettings.latestStyle;
-    data.latestStyle = latestStyle;
+    const latestFirst = homeSettings.latestFirst;
+    data.latestFirst = latestFirst;
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,
@@ -62,7 +62,7 @@ router
     let q = {};
     let threadListType;
     if(t) {
-      if(!["latest", "recommend", "subscribe", "column", "home"].includes(t)) t = '';
+      if(!["reply", "recommend", "subscribe", "column", "home", "thread"].includes(t)) t = latestFirst;
       if(t === "subscribe" && !user) t = '';
       threadListType =  t;
     }
@@ -175,7 +175,7 @@ router
     let subTid = [], subUid = [], subColumnId = [], subForumsId = [], subColumnPostsId = [];
     let paging;
 
-  if(latestStyle === "appLatest") {
+  if(threadListType === "reply") {
       let threadsObj = {};
       q = {
         mainForumsId: {
@@ -256,7 +256,7 @@ router
       }
     }
 
-    if(threadListType === "latest") {
+    if(threadListType === "thread") {
       q = {
         mainForumsId: {
           $in: fidOfCanGetThreads
@@ -529,13 +529,11 @@ router
     }
     data.threads = [];
     let threads = [];
-    if(threadListType !== 'subscribe' || latestStyle !== 'appLatest') {
+    if(threadListType !== 'subscribe' || threadListType !== 'reply') {
       const count = await db.ThreadModel.countDocuments(q);
-      const homeLatestOrder = await db.SettingModel.findOne({_id: 'home'});
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
       let sort = {tlm: -1};
       if(s === "toc") sort = {toc: -1};
-      if(homeLatestOrder.c.latestOrder === 'releaseToc') sort = {toc: -1};
       if(threadListType === "recommend") sort= {toc : -1};
       threads = await db.ThreadModel.find(q, {
         uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
@@ -546,9 +544,16 @@ router
         categoriesId: 1,
         disabled: 1, recycleMark: 1
       }).skip(paging.start).limit(paging.perpage).sort(sort);
+      let forum;
+      if(threadListType === 'column') {
+        forum = false;
+      } else {
+        forum = true;
+      }
       threads = await db.ThreadModel.extendThreads(threads, {
         htmlToText: true,
         removeLink: true,
+        forum: forum,
         extendColumns: t === 'column'?true:false
       });
     }
@@ -601,8 +606,8 @@ router
     }
 
     if(!state.isApp) {
-      if(threadListType !== "latest") {
-        data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
+      if(threadListType !== "thread") {
+        data.articleThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
       }
 
       if(threadListType !== "recommend") {
