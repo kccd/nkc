@@ -7,10 +7,8 @@ const {files: fileOperations} = require('../settings/operationsType');
 module.exports = async (ctx, next) => {
 
   const isResourcePost = fileOperations.includes(ctx.data.operationId);
-  const {data, db, redis} = ctx;
-	// cookie
+  const {data, db, state} = ctx;
   let userInfo = ctx.getCookie("userInfo");
-	// let userInfo = ctx.cookies.get('userInfo', {signed: true});
 	if(!userInfo) {
 	  // 为了兼容app中的部分请求无法附带cookie，故将cookie放到了url中
 		try{
@@ -32,7 +30,11 @@ module.exports = async (ctx, next) => {
 		  if(global.NKC.NODE_ENV !== 'production') console.log(err);
 		}
 	}
-	let userOperationsId = [], userRoles = [], userGrade = {}, user, usersPersonal;
+	let userOperationsId = [];
+  let userRoles = [];
+  let userGrade = {};
+  let user;
+  let usersPersonal;
 	if(userInfo) {
 	  try {
 	    const {uid, lastLogin = ""} = userInfo;
@@ -47,7 +49,6 @@ module.exports = async (ctx, next) => {
     } catch(err) {
       ctx.clearCookie('userInfo');
     }
-
 	}
   let languageName = 'zh_cn';
 	if(!user) {
@@ -175,6 +176,7 @@ module.exports = async (ctx, next) => {
 	data.userRoles = userRoles;
 	data.userGrade = userGrade;
   data.user = user;
+  state.user = user;
   ctx.state.uid = user? user.uid: null;
 
   // 专业树状结构

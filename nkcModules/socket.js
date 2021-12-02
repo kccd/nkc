@@ -3,7 +3,6 @@ const communication = require("./communication");
 const communicationConfig = require('../config/communication');
 const PATH = require('path');
 const db = require('../dataModels');
-const func = {};
 
 const socketServiceName = communicationConfig.servicesName.socket;
 
@@ -594,10 +593,10 @@ async function getMediaServiceUrl() {
 /*
 * 调用 render 服务渲染 pug
 * */
-async function getPageFromRenderService(pugFilePath, state, data) {
+async function getPageFromRenderService(templatePath, state, data) {
   const communicationClient = communication.getCommunicationClient();
   return await communicationClient.sendMessagePromise(communicationConfig.servicesName.render, {
-    pugFilePath,
+    templatePath,
     state,
     data
   });

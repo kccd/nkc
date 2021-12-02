@@ -30,6 +30,10 @@ const {
   rateLimit,
   stayLogin,
   init,
+  initState,
+  initAddress,
+  initOperation,
+  initCtxMethods,
   body,
   urlRewrite,
   permission,
@@ -37,6 +41,7 @@ const {
   cache,
   IPLimit,
   filterDomain,
+  resFilter,
 } = require('./middlewares');
 
 const cookieConfig = require("./config/cookie");
@@ -61,6 +66,10 @@ app
   .use(etag())
   .use(urlRewrite)
   .use(init)
+  .use(initAddress)
+  .use(initOperation)
+  .use(initCtxMethods)
+  .use(initState)
   .use(filterDomain)
   // IP 黑名单
   .use(IPLimit)
@@ -76,5 +85,6 @@ app
   .use(permission)
   .use(logger)
   .use(mainRouter.routes())
+  .use(resFilter)
   .use(body);
 module.exports = app.callback();

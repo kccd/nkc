@@ -302,7 +302,7 @@ function getOriginLevel(index) {
 }
 
 
-let pugRender = (template, data, state) => {
+let pugRender = (template, data, state, remoteState) => {
 	data.userOperationsId = data.userOperationsId || [];
   const language = state && state.language? state.language: languages['zh_cn'];
   let options = {
@@ -358,6 +358,7 @@ let pugRender = (template, data, state) => {
       return true;
     },
     state,
+    remoteState,
 		_moduleState: {},
 		isIncluded: (name) => {
 			if(options._moduleState[name]) return true;

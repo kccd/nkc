@@ -2,16 +2,16 @@ extends scratch.pug
 block head
   //- 以下数据传递到浏览器环境
   -var windowData = {};
-  if data.user
-    -windowData.uid = data.user.uid;
-    -windowData.selectTypesWhenSubscribe = !!data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe;
-    -windowData.refererOperationId = data.operationId;
-    -windowData.newMessageCount = data.user.newMessage;
-  if state.isApp
+  if remoteState.uid
+    -windowData.uid = remoteState.uid;
+    -windowData.selectTypesWhenSubscribe = remoteState.selectTypesWhenSubscribe;
+    -windowData.refererOperationId = remoteState.operationId;
+    -windowData.newMessageCount = remoteState.newMessageCount;
+  if remoteState.isApp
     -windowData.isApp = true;
-    -windowData.appOS = state.appOS;
-    -windowData.platform = state.platform;
-  -windowData.fileDomain = state.fileDomain;
+    -windowData.appOS = remoteState.appOS;
+    -windowData.platform = remoteState.platform;
+  -windowData.fileDomain = remoteState.fileDomain;
 
   meta(charset='UTF-8')
   meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
@@ -20,19 +20,19 @@ block head
   meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
   meta(name='window-data' content=objToStr(windowData))
 
-  link(rel='shortcut icon' href=tools.getUrl('siteIcon', 'ico'))
+  link(rel='shortcut icon' href=remoteState.logoICO)
   if process.env.NODE_ENV === "production"
     +includeJS("/external_pkgs/vue.min.js", true)
   else
     +includeJS("/external_pkgs/vue.js", true)
   +includeJS('/publicModules/common.js')
-  if state.isApp && state.platform === 'apiCloud'
+  if remoteState.isApp && remoteState.platform === 'apiCloud'
     +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
   +includeCSS('/font-awesome/css/font-awesome.css')
-  style=`body{background-color: ${state.serverSettings.backgroundColor}}`
+  style=`body{background-color: ${remoteState.serverSettings.backgroundColor}}`
   +includeCSS('/nkc_styles.css')
-  if state.isApp
+  if remoteState.isApp
     style.
       body{
         padding-top: 0;
@@ -41,34 +41,32 @@ block head
   block title
     meta(name="description" content="倡导科学理性，发展科技爱好")
     title bootstrap_base
-  if state.isApp && state.platform === 'reactNative'
+  if remoteState.isApp && remoteState.platform === 'reactNative'
     +includeJS('/appApi/reactNative.js')
 
 block body
   block navbar
     div
-      if !state.isApp
+      if !remoteState.isApp
         include ./publicModules/navbar/navbar.pug
 
   block content
     h1 hello world!
-  if !state.isApp
+  if !remoteState.isApp
     block footer
       include ./publicModules/footer/footer
   if data.user
     if data.user.generalSettings.lotterySettings.status
       include module_lottery
-    -var {systemInfo, reminder, usersMessage} = data.user.generalSettings.messageSettings.beep;
-    audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
   +includeJS('/jquery/jquery-ui.1.11.4.min.js', true)
   //-app使用的js
-  if state.isApp && state.platform === 'apiCloud'
+  if remoteState.isApp && remoteState.platform === 'apiCloud'
     +includeJS("/appAPi/app.js")
   +includeJS('/bootstrap/js/bootstrap.min.js', true)
   +includeJS('/twemoji/2/twemoji.min.js', true)
   +includeJS('/Promise/promise.min.js', true)
   +includeJS('/external_pkgs/polyfill/dist/polyfill.min.js', true)
-  if NODE_ENV === "production"
+  if remoteState.isProduction
     script.
       Vue.config.productionTip = false;
   //- 弹窗模块
@@ -81,20 +79,20 @@ block body
   if data.user
     +includeJS('/socket.io-client/dist/socket.io.js', true)
     //- 通用socket
-    if !state.isApp
+    if !remoteState.isApp
       //- 接入即时通信
       +includeJS('/message/connectSocket.js')
       include ./message/chat
 
-  if (!state.isApp || state.platform === 'reactNative') && !data.user
+  if (!remoteState.isApp || remoteState.platform === 'reactNative') && !data.user
     include ./publicModules/login/login
   block scripts
-  if !state.isApp
+  if !remoteState.isApp
     //- 生成二维码 页脚
     include ./publicModules/qrcode/qrcode
     script.
       console.log('(c)2021 成都科创科学文化研究院')
       console.log('Project Repository: https://github.com/kccd/nkc')
-  if state.isApp && state.platform === 'reactNative'
+  if remoteState.isApp && remoteState.platform === 'reactNative'
     script.
       document.body.style.userSelect = window._userSelect || 'none';

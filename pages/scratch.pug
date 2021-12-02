@@ -3,7 +3,7 @@ include ./publicModules/mixin.pug
 html(lang='zh-CN')
   head
     block head
-  if !state.isApp
+  if !remoteState.isApp
     body(id='body').mdui-theme-primary-blue-grey.mdui-theme-accent-pink
       block body
   else

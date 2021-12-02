@@ -1,13 +1,9 @@
-//- input(type="text" name="_prevent_auto_complete_name" autocomplete="off" readonly="readonly" style="display: none !important;")
-//- input(type="password" name="_prevent_auto_complete_pass" autocomplete="new-password" readonly="readonly" style="display: none !important;")
-
 //- 链接背景高亮判断
 - var navbar = data.navbar || {}
 -var navbar_highlight = data.navbar_highlight||navbar.highlight
-if data.user
+if remoteState.uid
   //- 新信息条数
-  -var newMessage = data.user.newMessage;
-  -var messageSum = (newMessage.newReminderCount || 0) + (newMessage.newSystemInfoCount || 0) + (newMessage.newUsersMessagesCount || 0) + (newMessage.newApplicationsCount || 0);
+  -var messageSum = remoteState.newMessageCount;
 nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;margin-bottom: 15px;")
 
   .container-fluid.max-width
@@ -17,19 +13,19 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         span.icon-bar
         span.icon-bar
         span.icon-bar
-      a.navbar-brand.website-logo(href="/" )= state.serverSettings.websiteName
+      a.navbar-brand.website-logo(href="/" )= remoteState.serverSettings.websiteName
 
       .navbar-search.hidden-lg.hidden-md.hidden-sm.inline-block.form-inline
         input.inline-block.form-control(type='text' id="navSearchInputSM" placeholder='关键词 文号 用户')
         button.btn.btn-default(onclick=`NKC.methods.search("navSearchInputSM")`)
           .fa.fa-search
 
-      if data.user
+      if remoteState.uid
         //- 已登录状态 显示头像
         .navbar-brand.userInfo-m
           .userInfo-m-point.message-switch.message-count(class="hidden")
           img(
-            src=tools.getUrl('userAvatar', data.user.avatar)
+            src=remoteState.userInfo.avatar
             onclick="toggleNKCDrawer('right')"
           )
       else
@@ -38,18 +34,13 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           span &nbsp
           a(onclick="Login.open('register')" title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
 
-
-
-
-
-
     //- 电脑屏幕
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
       ul.nav.navbar-nav.navbar-md
         li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
           a(href='/?t=latest') 最新
         li(class=navbar_highlight === 'subscribe' ? 'active' : '')
-          if data.user
+          if remoteState.uid
             a(href='/?t=subscribe') 关注
           else
             a.pointer(onclick='NKC.methods.toLogin()') 关注
@@ -60,8 +51,8 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
 
 
       ul.nav.navbar-nav.navbar-right.nav-font-color.navbar-md
-        if data.user
-          - var title = `${data.user.username}\n`+`学术分 ${data.user.xsf}\n`+`${data.user.info.certsName}`;
+        if remoteState.uid
+          - var title = `${remoteState.userInfo.name}\n`+`学术分 ${remoteState.userInfo.xsf}\n`+`${remoteState.userInfo.certsName}`;
           li
             -let editorHref = "/editor";
             if data.forum
@@ -75,31 +66,30 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             .nav-user-content
               div
                 .nav-user-banner
-                  img(src=tools.getUrl('userBanner', data.user.banner))
+                  img(src=remoteState.userInfo.banner)
                 .nav-user-other
                   .nav-user-info
                     .nav-user-avatar
-                      img(src=tools.getUrl('userAvatar', data.user.avatar))
-                    .nav-user-name=data.user.username
+                      img(src=remoteState.userInfo.avatar)
+                    .nav-user-name=remoteState.userInfo.username
                     .nav-user-level
-                      span.user-grade(style=`color: ${data.user.grade.color};`)
-                        span= data.user.grade.displayName
-                        img.grade-icon(src=tools.getUrl("gradeIcon", data.user.grade._id) title=data.user.grade.displayName)
-                    .nav-user-certs=data.user.info.certsName
+                      span.user-grade(style=`color: ${remoteState.userInfo.gradeColor};`)
+                        span= remoteState.userInfo.gradeName
+                        img.grade-icon(src=remoteState.userInfo.gradeIcon title=remoteState.userInfo.gradeName)
+                    .nav-user-certs=remoteState.userInfo.certsName
                     .nav-user-count
-                      -const targetUserScores = state.userScores
-                      -const targetUserXSF = data.user.xsf;
                       include ../../publicModules/userScores
+                      +userScores(remoteState.userInfo.scores, remoteState.userInfo.xsf, true, remoteState.xsfIcon)
                   .nav-user-links
-                    a(href=`/u/${data.user.uid}/profile` target='_blank').col-xs-6.nav-user-link
+                    a(href=`/u/${remoteState.uid}/profile` target='_blank').col-xs-6.nav-user-link
                       .fa.fa-user-circle
                       | 我的主页
                     -let showColumnLink = true;
-                    if state.userColumn
-                      a(href=`/m/${state.userColumn._id}` target='_blank').col-xs-6.nav-user-link
+                    if remoteState.userInfo.columnId
+                      a(href=`/m/${remoteState.userInfo.columnId}` target='_blank').col-xs-6.nav-user-link
                         .fa.fa-columns
                         | 我的专栏
-                    else if data.user && state.columnPermission
+                    else if state.uid && state.columnPermission
                       a(href=`/column/apply` target='_blank').col-xs-6.nav-user-link
                         .fa.fa-columns
                         | 开设专栏
@@ -109,14 +99,14 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                       .fa.fa-envelope-o
                       | 消息中心
                       .count.message-switch.message-count(class="hidden")
-                    a(href=`/u/${data.user.uid}/profile/draft` target='_blank').col-xs-6.nav-user-link
+                    a(href=`/u/${remoteState.uid}/profile/draft` target='_blank').col-xs-6.nav-user-link
                       .fa.fa-inbox
                       | 我的草稿
-                      .count(class=data.user.draftCount?"":"hidden")=data.user.draftCount
-                    a(href=`/u/${data.user.uid}/settings` target='_blank').col-xs-6.nav-user-link
+                      .count(class=remoteState.userInfo.draftCount?"":"hidden")=remoteState.userInfo.draftCount
+                    a(href=`/u/${remoteState.uid}/settings` target='_blank').col-xs-6.nav-user-link
                       .fa.fa-cog
                       | 资料设置
-                    a(href=`/u/${data.user.uid}/profile/finance?t=all` target='_blank').col-xs-6.nav-user-link
+                    a(href=`/u/${remoteState.uid}/profile/finance?t=all` target='_blank').col-xs-6.nav-user-link
                       .fa.fa-file-text-o
                       | 我的账单
                     a(href=`/shop/order` target='_blank').col-xs-6.nav-user-link
@@ -131,7 +121,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                     a(onclick="NKC.methods.logout()" title='不，不要走！' class=showColumnLink?"col-xs-6":"col-xs-12").nav-user-link
                       .fa.fa-sign-out
                       | 退出登录
-            img.nav-user-avatar-sm(src=tools.getUrl('userAvatar', data.user.avatar))
+            img.nav-user-avatar-sm(src=remoteState.userInfo.avatar)
         else
           li.userInfo
             a(onclick="Login.open()" title='还记得密码吗？') 登录
@@ -144,7 +134,8 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           .fa.fa-search
 
 //- 侧滑抽屉
-.nkc-drawer-left
+//- nkc-drawer-left 暂时屏蔽
+//-.nkc-drawer-left
   .nkc-drawer-left-mask(onclick="closeNKCDrawer('left')")
   .nkc-drawer-left-body
     .m-a-1
@@ -164,23 +155,25 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         a(href=`/c`) 社区
     .m-a-1#navbar_custom_dom
 
-    .m-a-1
+    //-.m-a-1
       include ../management/management
       //-include ../subscribeTypes/subscribeTypesPanel
       include ../apps/apps
       include ../forums_nav/forums_tree
-.nkc-drawer-right
+
+//- nkc-drawer-right 暂时屏蔽
+//-.nkc-drawer-right
   .nkc-drawer-right-mask(onclick="closeNKCDrawer('right')")
   .nkc-drawer-right-body
-    if data.user
+    if remoteState.uid
       .nkc-drawer-header
       .nkc-drawer-avatar
-        img(src=tools.getUrl('userAvatar', data.user.avatar))
-      .nkc-drawer-username= data.user.username
-      .nkc-drawer-certs= data.user.info.certsName
+        img(src=remoteState.userInfo.avatar)
+      .nkc-drawer-username= remoteState.userInfo.name
+      .nkc-drawer-certs= remoteState.userInfo.certsName
       div
-        -const targetUserScores = state.userScores;
         include ../../publicModules/userScores
+        +userScores(remoteState.userInfo.scores, undefined, true)
       .nkc-drawer-count
         .col-xs-4
           .nkc-drawer-count-number=data.user.threadCount - data.user.disabledThreadsCount
@@ -201,7 +194,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         .col-xs-4
           a(onlick="Login.open('register')") 注册
     ul.nkc-drawer-list
-    if data.user
+    if remoteState.uid
       ul.nkc-drawer-list
         li
           a(href=`/u/${data.user.uid}/profile`)

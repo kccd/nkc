@@ -6,210 +6,37 @@ const db = require('../dataModels');
 const {logger} = nkcModules;
 const fs = require('fs');
 const fsPromise = fs.promises;
-const {promisify} = require('util');
 const redis = require('../redis');
-const cookieConfig = require("../config/cookie");
-const serverConfig = require('../config/server');
 
 const fsSync = {
-  access: promisify(fs.access),
-  unlink: promisify(fs.unlink),
-  rename: promisify(fs.rename),
-  writeFile: promisify(fs.writeFile),
-  mkdir: promisify(fs.mkdir),
-  exists: promisify(fs.exists),
+  access: fsPromise.access,
+  unlink: fsPromise.unlink,
+  rename: fsPromise.rename,
+  writeFile: fsPromise.writeFile,
+  mkdir: fsPromise.mkdir,
+  exists: fsPromise.exists,
   existsSync: fs.existsSync,
-  copyFile: promisify(fs.copyFile),
+  copyFile: fsPromise.copyFile,
   createReadStream: fs.createReadStream,
   createWriteStream: fs.createWriteStream,
-  stat: promisify(fs.stat)
+  stat: fsPromise.stat
 };
 
 module.exports = async (ctx, next) => {
   ctx.reqTime = new Date();
   ctx.data = Object.create(null);
   ctx.nkcModules = nkcModules;
-  const {ip, port} = nkcModules.getRealIP({
-    remoteIp: ctx.ip,
-    remotePort: ctx.req.connection.remotePort,
-    xForwardedFor: ctx.get('x-forwarded-for'),
-    xForwardedRemotePort: ctx.get(`x-forwarded-remote-port`)
-  });
-  ctx.address = ip;
-  ctx.port = port;
-  Object.defineProperty(ctx, 'template', {
-    get: function() {
-      return './pages/' + this.__templateFile
-    },
-    set: function(fileName) {
-      this.__templateFile = fileName
-    }
-  });
-  try{
-    ctx.data.operationId = nkcModules.permission.getOperationId(ctx.url, ctx.method);
-  } catch(err) {
-    if(err.status === 404) {
-      console.log(`未知请求：${ctx.address} ${ctx.method} ${ctx.url}`.bgRed);
-      ctx.template = "error/error.pug";
-      ctx.status = 404;
-      ctx.data.status = 404;
-      ctx.data.url = ctx.url;
-      await body(ctx, () => {});
-    } else {
-      console.log(err);
-    }
-    return;
-  }
+
   try {
     ctx.body = ctx.request.body;
-    const _body= Object.assign({}, ctx.query, ctx.body);
-    if(_body.password) {
-      _body.password = (_body.password || "").slice(0, 2);
-    }
-    if(_body.oldPassword) {
-      _body.oldPassword = (_body.oldPassword || "").slice(0, 2);
-    }
-    if(_body.newPassword) {
-      _body.newPassword = (_body.newPassword || "").slice(0, 2);
-    }
-    ctx._body = _body;
     ctx.db = db;
 	  ctx.tools = tools;
     ctx.redis = redis;
     ctx.settings = settings;
     ctx.fs = fsSync;
     ctx.fsPromise = fsPromise;
-    ctx.state = {
-      url: ctx.url.replace(/\?.*/ig, ""),
-      // app请求的标识
-      isApp: false,
-      // app所在系统:  android, ios
-      appOS: undefined,
-      // app平台: apiCloud, reactNative
-      platform: undefined,
-      // ReactNative
-      twemoji: settings.editor.twemoji,
-      // 当前操作
-      operation: await db.OperationModel.getOperationById(ctx.data.operationId),
-      // - 初始化网站设置
-      pageSettings: await db.SettingModel.getSettings("page"),
-      postSettings: await db.SettingModel.getSettings("post"),
-      serverSettings: await db.SettingModel.getSettings("server"),
-      stickerSettings: await db.SettingModel.getSettings("sticker"),
-      logSettings: await db.SettingModel.getSettings("log"),
-      threadSettings: await db.SettingModel.getSettings('thread'),
-      // 缓存相关
-      cachePage: false,
-      // 获取app稳定版本
-      appStableVersion: await db.AppVersionModel.findOne({
-        appPlatForm: "android",
-        stable: true,
-        disabled: false
-      }),
-      fileDomain: serverConfig.fileDomain || ''
-    };
-
-    // 下载附件是否需要积分
-    ctx.state.downloadNeedScore = await db.ScoreOperationModel.downloadNeedScore();
-    ctx.state.threadListStyle = Object.assign({}, ctx.state.pageSettings.threadListStyle);
-
-    // 判断是否为APP发起的请求
-    // apiCloud: NKC/APP/android
-    // ReactNative: rn-android、rn-ios
-    let userAgent = ctx.header["user-agent"] || "";
-    let reg = /NKC\/APP\/(.+)/;
-    userAgent = reg.exec(userAgent);
-    if(userAgent !== null && ['rn-android', 'rn-ios', 'android'].includes(userAgent[1])) {
-      const _userAgent = userAgent[1];
-      ctx.state.isApp = true;
-      ctx.state.appOS = _userAgent.replace('rn-', '');
-      if(_userAgent === 'android') {
-        // 兼容apiCloud
-        ctx.state.platform = 'apiCloud';
-      } else {
-        ctx.state.platform = 'reactNative';
-      }
-    }
-	  // 权限判断
-    // @param {String} o 操作名
-	  ctx.permission = (o) => {
-	    if(!ctx.data.userOperationsId) ctx.data.userOperationsId = [];
-	    return ctx.data.userOperationsId.includes(o);
-    };
-
-	  // 设置cookie
-    // @param {String} key cookie名
-    // @param {Object} value cookie值
-    // @param {Object} o 自定义参数
-	  ctx.setCookie = (key, value, o) => {
-	    let options = {
-        signed: true,
-        httpOnly: true,
-        overwrite: true,
-        maxAge: cookieConfig.maxAge,
-        domain: cookieConfig.domain,
-      };
-      // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
-      if(global.NKC.isDevelopment) {
-        delete options.domain;
-      }
-	    if(o) {
-        options = Object.assign(options, o);
-      }
-      let valueStr = JSON.stringify(value);
-      valueStr = Buffer.from(valueStr).toString("base64");
-      ctx.cookies.set(key, valueStr, options);
-    };
-
-    ctx.clearCookie = (key) => {
-      let options = {
-        signed: true,
-        httpOnly: true,
-        overwrite: true,
-        maxAge: 0,
-        domain: cookieConfig.domain,
-      };
-      // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
-      if(global.NKC.isDevelopment) {
-        delete options.domain;
-      }
-      ctx.cookies.set(key, '', options);
-    }
-
-    // 设置cookie
-    // @param {String} key cookie名
-    // @param {Object} o 自定义参数
-    // @return {Object} cookie值
-	  ctx.getCookie = (key, o) => {
-      let options = {
-        signed: true,
-        domain: cookieConfig.domain,
-      };
-      // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
-      if(global.NKC.isDevelopment) {
-        delete options.domain;
-      }
-      if(o) {
-        options = Object.assign(options, o);
-      }
-      let valueStr;
-      try {
-        valueStr = ctx.cookies.get(key, options);
-        valueStr = Buffer.from(valueStr, "base64").toString();
-        return JSON.parse(valueStr);
-      } catch(err) {
-        return valueStr;
-      }
-    };
-
-		const reqType = ctx.request.get('REQTYPE');
-		if(reqType === 'app') {
-			ctx.reqType = 'app';
-		}
-
 	  //error handling
     await next();
-
 		if(ctx.data && ctx.data.user && ctx.data.user.toObject) {
 			ctx.data.user = ctx.data.user.toObject();
 		}

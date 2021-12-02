@@ -1,3 +1,4 @@
+require('colors');
 const {renderPug} = require('./services');
 const Communication = require('../../tools/communicationClient');
 const communicationConfig = require('../../config/communication.json');
@@ -8,9 +9,10 @@ const communicationClient = new Communication({
   serviceId: process.pid,
   serviceName: communicationConfig.servicesName.render,
 });
-communicationClient.onMessage(message => {
+communicationClient.onMessage(async message => {
   const {from, content} = message;
-  console.log(`来自 ${from} 的渲染任务`);
-  const {pugFilePath, state, data} = content;
-  return renderPug(pugFilePath, state, data);
+  const {templatePath, state, data} = content;
+  return await renderPug(templatePath, state, data);
 });
+
+console.log(`render service is running at ${servicePort}`.green);

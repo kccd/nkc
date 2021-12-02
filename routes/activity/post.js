@@ -47,7 +47,7 @@ postRouter
       c:c,
       l:'html'
     }
-    if(ctx.reqType === "app"){
+    if(ctx.state.isApp){
       activity.description = ctx.nkcModules.APP_nkc_render.experimental_render(post1);
     }else{
       activity.description = ctx.nkcModules.nkc_render.experimental_render(post1);

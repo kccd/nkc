@@ -29,6 +29,7 @@ const exam = require('./exam');
 const e = require('./experimental');
 const f = require('./forum');
 const survey = require("./survey");
+const creation = require("./creation");
 const fund = require('./fund');
 const login = require('./login');
 const logout = require('./logout');
@@ -269,6 +270,7 @@ operationObj.operationTree = {
     c: community, // 社区
 		wm: watermark, //水印
     logo, // 网站 logo
+    creation, // 用户创作中心
     test,
 	}
 };

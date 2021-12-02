@@ -45,7 +45,7 @@ const verificationsRouter = routers.verifications;
 const libraryRouter = routers.library;
 const userAvatarRouter = routers.userAvatar;
 const userBannerRouter = routers.userBanner;
-const newResourceRouter = routers.newResource;
+const creationRouter = routers.creation;
 const librariesRouter = routers.libraries;
 const noteRouter = routers.note;
 // 网站工具
@@ -138,4 +138,5 @@ router.use('/c', communityRouter.routes(), communityRouter.allowedMethods())
 router.use("/l", linkRouter.routes(), linkRouter.allowedMethods());
 router.use("/wm", watermarkRouter.routes(), watermarkRouter.allowedMethods());
 router.use('/logo', logoRouter.routes(), logoRouter.allowedMethods());
+router.use('/creation', creationRouter.routes(), creationRouter.allowedMethods());
 module.exports = router;

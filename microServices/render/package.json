@@ -18,6 +18,7 @@
   "homepage": "https://github.com/kccd/nkc-pug-render#readme",
   "dependencies": {
     "pug": "^3.0.2",
+    "colors": "^1.4.0",
     "koa": "^2.4.1",
     "koa-body": "^2.5.0",
     "koa-router": "^7.3.0",
