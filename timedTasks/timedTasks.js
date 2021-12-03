@@ -253,7 +253,7 @@ func.initVerifiedUploadState = async() => {
       console.log(`异常身份认证状态状态处理完成`);
       await func.initVerifiedUploadState();
     }
-  }, 12 * 60 * 60 * 1000);
+  }, 3.5 * 60 * 60 * 1000);
 }
 
 module.exports = func;
