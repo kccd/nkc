@@ -43,12 +43,13 @@ function getCommunicationClient() {
 
 //媒体服务通知NKC服务
 function sendMessageToNkc(type, props) {
-  const {rid, status, error, filesInfo} = props;
+  const {rid, status, error, filesInfo, vid} = props;
   const communicationClient = getCommunicationClient();
   communicationClient.sendMessage(communicationConfig.servicesName.nkc, {
     type,
     data: {
       rid,
+      vid,
       status,
       error,
       filesInfo

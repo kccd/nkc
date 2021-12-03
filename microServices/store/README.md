@@ -110,8 +110,8 @@ body: FormData // 其中的 file1、file2 可自定义，但必须保证 fields 
 
 #### 4、获取存储服务元文件信息
 ```
-GET /metaInfo
-query: 
+POST /metaInfo
+body: 
   files: [
     {
       time: Number, 文件上传时间戳
@@ -147,4 +147,26 @@ body:
     },
     ...
   ]
+```
+
+#### 6、获取文件真实路径
+```
+POST /getStorePath
+body: 
+  files: [
+    {
+      time: Number, 文件上传时间戳
+      path: String, 文件相对路径
+    },
+    ...
+  ]
+
+res: 
+ files: [
+ {
+    time: Number, 文件上传时间
+    path: String, 文件相对路径
+    storePath: String, 文件真实路径
+ }
+ ]
 ```

@@ -15,7 +15,6 @@ var app = new Vue({
   },
   mounted() {
     this.getDownloadFiles();
-    // NKC.methods.appConsoleLog({files:this.files})
     window.onerror = function(err) {
       NKC.methods.appConsoleLog({err: err})
     };
@@ -45,7 +44,7 @@ var app = new Vue({
             <h4>确认要进行操作？</h4>
             </div>
           <div>
-            <input name="${delId}" type="radio" value="true"/>
+            <input name="${delId}" type="checkbox" value="true"/>
             <span>同时删除文件</span>
           </div>
           `)
@@ -57,6 +56,7 @@ var app = new Vue({
             }
             item.isDelSource = isDelSource;
             NKC.methods.rn.emit('delFile', {file: item}, function () {
+              this.getDownloadFiles();
             })
           })
           .then(() => {
@@ -66,7 +66,7 @@ var app = new Vue({
     },
     //格式化时间
     fromNow(time){
-      return NKC.methods.tools.fromNowTwo(new Date(time));
+      return NKC.methods.tools.fromNow(new Date(time), true);
     },
     //获取下载信息
     getDownloadFiles(){

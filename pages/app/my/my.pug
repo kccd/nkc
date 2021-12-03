@@ -7,17 +7,18 @@ block content
     .nav-user-content-box
       .nav-user-body
         if data.user
-          .nav-user-banner
-            img(src=tools.getUrl('userBanner', data.user.banner))
           .nav-user-other
+            .nav-banner-mask
+            .box-shadow(style=`background-image: url('${tools.getUrl('userBanner', data.user.banner)}')`)
             .nav-user-info
               .nav-user-avatar
                 img(src=tools.getUrl('userAvatar', data.user.avatar))
-              .nav-user-username= data.user.username
-              .nav-user-certs= data.user.info.certsName
-              div
-                -const targetUserScores = state.userScores;
-                include ../../publicModules/userScores
+              .nav-user-text
+                span.nav-user-username= data.user.username
+                span.nav-user-certs= data.user.info.certsName
+                .nav-user-scores
+                  -const targetUserScores = state.userScores;
+                  include ../../publicModules/userScores
         else
           .nkc-drawer-header
           .nkc-drawer-visitor
@@ -27,97 +28,104 @@ block content
               a(onclick="Login.open()") 登录
             .col-xs-4
               a(onlick="Login.open('register')") 注册
-    .nav-numbers
-      a.nav-number(href=`/u/${data.user.uid}/profile/thread`)
-        .name 文章
-        .value(id="userThreadCount")=data.user.threadCount - data.user.disabledThreadsCount
-      a.nav-number(href=`/u/${data.user.uid}/profile/post`)
-        .name 回复
-        .value(id="userPostCount")=data.user.postCount - data.user.disabledPostsCount
-      a.nav-number
-        .name 学术分
-        .value(id="userXSF")=data.user.xsf
-    .my-nav-swiper
-      .swiper-container
-        .swiper-wrapper
-          .swiper-slide
-            .my-links
-              .my-link
-                a.nav-box(href=`/u/${data.user.uid}/profile/thread`)
-                  .icon-left
-                    img(src=tools.getUrl('getIcons', 'bianji.png'))
-                  span 我的文章
-              .my-link
-                a.nav-box(href=`/u/${data.user.uid}/profile/post`)
-                  .icon-left
-                    img(src=tools.getUrl('getIcons', 'gouton.png'))
-                  span 我的回复
-              .my-link
-                a.nav-box(href=`/u/${data.user.uid}/profile/draft`)
-                  .icon-left
-                    img(src=tools.getUrl('getIcons', 'jishiben.png'))
-                  span 我的草稿
-              .my-link
-                a.nav-box(href=`/u/${data.user.uid}/profile/note`)
-                  .icon-left
-                    img(src=tools.getUrl('getIcons', 'biji.png'))
-                  span 我的笔记
-              .my-link
-                a.nav-box(href=`/u/${data.user.uid}/profile/subscribe/user`)
-                  .icon-left
-                    img(src=tools.getUrl('getIcons', 'like.png'))
-                  span 关注的用户
-              .my-link
-                a.nav-box(href=`/u/${data.user.uid}/profile/subscribe/discipline`)
-                  .icon-left
-                    img(src=tools.getUrl('getIcons', 'shoucang.png'))
-                  span 关注的专业
-              .my-link
-                a.nav-box(href=`/u/${data.user.uid}/profile/subscribe/column`)
-                  .icon-left
-                    img(src=tools.getUrl('getIcons', 'bianji.png'))
-                  span 关注的专栏
-              .my-link
-                a.nav-box(href=`/u/${data.user.uid}/profile/subscribe/thread`)
-                  .icon-left
-                    img(src=tools.getUrl('getIcons', 'xieyi.png'))
-                  span 关注的文章
-          .swiper-slide
-            .my-links
-              .my-link
-                a.nav-box(href=`/u/${data.user.uid}/profile/subscribe/collection`)
-                  .icon-left
-                    img(src=tools.getUrl('getIcons', 'shoucang.png'))
-                  span 收藏的文章
-              .my-link
-                a.nav-box(href=`/u/${data.user.uid}/profile/finance`)
-                  .icon-left
-                    img(src=tools.getUrl('getIcons', 'jishiben.png'))
-                  span 我的账单
-              .my-link
-                a.nav-box(href=`/u/${data.user.uid}/profile/follower`)
-                  .icon-left
-                    img(src=tools.getUrl('getIcons', 'like.png'))
-                  span 我的粉丝
-              .my-link
-                a.nav-box(href=`/u/${data.user.uid}/profile`)
-                  .icon-left
-                    img(src=tools.getUrl('getIcons', 'mingpian.png'))
-                  span 我的名片
-              if data.user.column
+    .my-content
+      .nav-numbers
+        a.nav-number(href=`/u/${data.user.uid}/profile/thread`)
+          .name 文章
+          .value(id="userThreadCount")=data.user.threadCount - data.user.disabledThreadsCount
+        a.nav-number(href=`/u/${data.user.uid}/profile/post`)
+          .name 回复
+          .value(id="userPostCount")=data.user.postCount - data.user.disabledPostsCount
+        a.nav-number
+          .name 学术分
+          .value(id="userXSF")=data.user.xsf
+      .my-nav-swiper
+        .swiper-container
+          .swiper-wrapper
+            .swiper-slide
+              .my-links
+                .my-class-title 我的文章
                 .my-link
-                  a.nav-box(href=`/m/${data.user.column._id}`)
+                  a.nav-box(href=`/u/${data.user.uid}/profile/thread`)
+                    .icon-left
+                      img(src=tools.getUrl('getIcons', 'thread.png'))
+                    span 我的文章
+                .my-link
+                  a.nav-box(href=`/u/${data.user.uid}/profile/post`)
+                    .icon-left
+                      img(src=tools.getUrl('getIcons', 'gouton.png'))
+                    span 我的回复
+                .my-link
+                  a.nav-box(href=`/u/${data.user.uid}/profile/draft`)
+                    .icon-left
+                      img(src=tools.getUrl('getIcons', 'jishiben.png'))
+                    span 我的草稿
+                .my-link
+                  a.nav-box(href=`/u/${data.user.uid}/profile/note`)
+                    .icon-left
+                      img(src=tools.getUrl('getIcons', 'biji.png'))
+                    span 我的笔记
+                .my-class-title 我的关注
+                .my-link
+                  a.nav-box(href=`/u/${data.user.uid}/profile/subscribe/user`)
+                    .icon-left
+                      img(src=tools.getUrl('getIcons', 'user.png'))
+                    span 关注的用户
+                .my-link
+                  a.nav-box(href=`/u/${data.user.uid}/profile/subscribe/discipline`)
+                    .icon-left
+                      img(src=tools.getUrl('getIcons', 'zhuanye.png'))
+                    span 关注的专业
+                .my-link
+                  a.nav-box(href=`/u/${data.user.uid}/profile/subscribe/column`)
                     .icon-left
                       img(src=tools.getUrl('getIcons', 'dinyue.png'))
-                    span 我的专栏
-              .my-link
-                a.nav-box(href=`/sticker`)
-                  .icon-left
-                    img(src=tools.getUrl('getIcons', 'xiaolian.png'))
-                  span 我的表情
-        .swiper-pagination
+                    span 关注的专栏
+                .my-link
+                  a.nav-box(href=`/u/${data.user.uid}/profile/subscribe/thread`)
+                    .icon-left
+                      img(src=tools.getUrl('getIcons', 'xieyi.png'))
+                    span 关注的文章
+                .my-link
+                  a.nav-box(href=`/u/${data.user.uid}/profile/subscribe/collection`)
+                    .icon-left
+                      img(src=tools.getUrl('getIcons', 'shoucang.png'))
+                    span 收藏的文章
+                .my-class-title 我的资料
+                .my-link
+                  a.nav-box(href=`/u/${data.user.uid}/profile/finance`)
+                    .icon-left
+                      img(src=tools.getUrl('getIcons', 'jishiben.png'))
+                    span 我的账单
+                .my-link
+                  a.nav-box(href=`/u/${data.user.uid}/profile/follower`)
+                    .icon-left
+                      img(src=tools.getUrl('getIcons', 'like.png'))
+                    span 我的粉丝
+                .my-link
+                  a.nav-box(href=`/u/${data.user.uid}/profile`)
+                    .icon-left
+                      img(src=tools.getUrl('getIcons', 'mingpian.png'))
+                    span 我的名片
+                if data.user.column
+                  .my-link
+                    a.nav-box(href=`/m/${data.user.column._id}`)
+                      .icon-left
+                        img(src=tools.getUrl('getIcons', 'zhuanlan.png'))
+                      span 我的专栏
+                .my-link
+                  a.nav-box(href=`/sticker`)
+                    .icon-left
+                      img(src=tools.getUrl('getIcons', 'xiaolian.png'))
+                    span 我的表情
+                .my-link
+                  a.nav-box(href=`/app/download`)
+                    .icon-left
+                      img(src=tools.getUrl('getIcons', 'download.png'))
+                    span 我的下载
+          .swiper-pagination
 
-    .my-footer
+      .my-footer
 block scripts
   +includeJS("/app/my/my.js")
   +includeJS("/swiper/swiper-bundle.js")

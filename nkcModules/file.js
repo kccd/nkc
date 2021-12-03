@@ -200,10 +200,10 @@ async function getMetaInformation(storeUrl, files) {
   return new Promise((resolve, reject) => {
     axios({
       url: storeUrl + '/metaInfo',
-      method: 'GET',
-      params: {
-        files: JSON.stringify(files) || '',
-      }
+      method: 'POST',
+      data: {
+        files
+      },
     })
       .then(res => {
         resolve(res.data || res);
@@ -245,9 +245,9 @@ async function getStorePath(storeUrl, files){
   return new Promise((resolve, reject) => {
     axios({
       url: storeUrl + '/storePath',
-      method: 'GET',
-      params: {
-        files: JSON.stringify(files) || '',
+      method: 'POST',
+      data: {
+        files
       }
     })
       .then(res => {

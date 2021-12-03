@@ -239,4 +239,21 @@ func.initHomeBlockTimeout = async (blockId) => {
   }, block.updateInterval * 60 * 60 * 1000)
 };
 
+/*
+* 修改身份认证上传状态，修改12小时之前上传且状态任然处于【处理中】的文件的状态为【处理失败】。
+* */
+func.initVerifiedUploadState = async() => {
+  setTimeout(async () => {
+    try{
+      console.log(`正在处理身份认证处理状态...`);
+      await tasks.updateVerifiedUpdateState();
+    } catch(err) {
+      console.log(err);
+    } finally {
+      console.log(`异常身份认证状态状态处理完成`);
+      await func.initVerifiedUploadState();
+    }
+  }, 12 * 60 * 60 * 1000);
+}
+
 module.exports = func;
