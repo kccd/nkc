@@ -14,7 +14,8 @@ var app = new Vue({
     }
   },
   mounted() {
-    this.getDownloadFiles();
+    this.setTimer();
+    // NKC.methods.appConsoleLog({files:this.files})
     window.onerror = function(err) {
       NKC.methods.appConsoleLog({err: err})
     };
@@ -24,8 +25,14 @@ var app = new Vue({
   methods: {
     getUrl: NKC.methods.tools.getUrl,
     getSize: NKC.methods.tools.getSize,
+    fromNow: NKC.methods.tools.fromNow,
     reloadFile(item) {
-      NKC.methods.rn.downloadFile(item.name, item.url);
+      const _this = this;
+      NKC.methods.rn.downloadFile(item.name, item.url, function() {
+        setTimeout(() => {
+          _this.getDownloadFiles();
+        }, 500)
+      });
     },
     openFile(item){
       if(item){
@@ -35,8 +42,14 @@ var app = new Vue({
         }
       }
     },
+    showFileInfo(file) {
+      NKC.methods.appConsoleLog(file)
+      const {path} = file;
+      sweetAlert(`保存路径：${path}`);
+    },
     // app删除文件
     delFile(item){
+      const _this = this;
       if(item){
         const delId = Date.now();
         return asyncSweetSelf('确定要执行当前操作？', `
@@ -56,17 +69,20 @@ var app = new Vue({
             }
             item.isDelSource = isDelSource;
             NKC.methods.rn.emit('delFile', {file: item}, function () {
-              this.getDownloadFiles();
-            })
+              _this.getDownloadFiles();
+            });
           })
           .then(() => {
           })
           .catch(sweetError)
       }
     },
-    //格式化时间
-    fromNow(time){
-      return NKC.methods.tools.fromNow(new Date(time), true);
+    setTimer() {
+      const _this = this;
+      _this.getDownloadFiles();
+      setTimeout(() => {
+        _this.setTimer();
+      }, 2000);
     },
     //获取下载信息
     getDownloadFiles(){
@@ -78,9 +94,6 @@ var app = new Vue({
           _this.files = res.files.reverse();
         }
         _this.loading = false;
-        setTimeout(() => {
-          _this.getDownloadFiles();
-        }, 1000);
       });
     }
   }

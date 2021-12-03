@@ -211,7 +211,7 @@ NKC.methods.rn.alert = function(msg) {
 * @param {String} filename 文件名
 * @param {String} 下载链接
 * */
-NKC.methods.rn.downloadFile = function(filename, url) {
+NKC.methods.rn.downloadFile = function(filename, url, callback) {
   url = urlPathEval(location.href, url);
   filename = filename || (Date.now()+ '_' + Math.floor(Math.random() * 1000) + '.file');
   return sweetQuestion(`确定要下载文件「${filename}」至 Download 目录?`)
@@ -219,6 +219,8 @@ NKC.methods.rn.downloadFile = function(filename, url) {
       NKC.methods.rn.emit('downloadFile', {
         url,
         filename
+      }, (res) => {
+        if(callback) callback(res);
       });
     })
 }
