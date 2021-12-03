@@ -1,3 +1,4 @@
+@import "../../publicModules/base";
 .app-my{
   height: 100%;
   width: 100%;
@@ -12,61 +13,70 @@
         }
       }
       .nav-user-other{
+        height: 16rem;
+        width: 100%;
+        position: relative;
         .box-shadow{
-          height: 16rem;
-          background-repeat: no-repeat;
-          background-size: 100% 100%;
-          position: relative;
+          height: 100%;
+          background-size: cover;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          z-index: 100;
         }
         .nav-banner-mask{
-          height: 16rem;
+          height: 100%;
+          width: 100%;
           position: absolute;
           top: 0;
           left: 0;
-          z-index: 99;
-          width: 100%;
-          background-color: #000;
-          opacity: 0.4;
+          z-index: 120;
+          background-color: rgba(0, 0, 0, 0.4);
         }
         .nav-user-info{
-          padding: 6rem 1rem 1rem 1rem;
-          height: 16rem;
+          height: 100%;
+          width: 100%;
           position: absolute;
           top: 0;
           left: 0;
-          right: 0;
-          bottom: 0;
-          display: flex;
-          z-index: 100;
+          z-index: 130;
+          @avatarHeight: 6rem;
+          @avatarTop: 7rem;
+          padding-left: @avatarHeight + 3rem;
+          padding-top: @avatarTop;
+          padding-right: 1rem;
           .nav-user-avatar{
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: absolute;
+            top: @avatarTop;
+            left: 1rem;
+            height: @avatarHeight;
+            width: @avatarHeight;
             img{
-              height: 8rem;
-              width: 8rem;
+              height: 100%;
+              width: 100%;
               border-radius: 50%;
               border: 3px solid #fff;
             }
           }
           .nav-user-text{
-            text-align: center;
-            //text-shadow: 1px 1px 1px #fff;
-            margin-left: 1rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
             .nav-user-username{
               color: #fff;
               border-radius: 1rem;
-              font-size: 1.2rem;
+              font-size: 1.6rem;
               font-weight: 700;
+              height: 2rem;
+              .hideText(@line: 1);
+              margin-bottom: 0.5rem;
             }
             .nav-user-certs{
               color: #e85a71;
               font-size: 1rem;
             }
             .nav-user-scores{
+              .nkc-scores{
+                text-align: left!important;
+              }
               span{
                 color: #fff;
               }
@@ -79,10 +89,12 @@
   .my-content{
     flex: 1;
     .nav-numbers{
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
       font-size: 0;
       background-color: #fff;
-      border-top: 1px solid #f4f4f4;
-      border-bottom: 1px solid #f4f4f4;
+      //border-top: 1px solid #f4f4f4;
+      //border-bottom: 1px solid #f4f4f4;
       .nav-number{
         text-align: center;
         color: #000;
@@ -97,12 +109,11 @@
         font-size: 1.2rem;
         .name{
           color: #555;
+          font-size: 1.1rem;
         }
         .value{
-          margin-top: 0.3rem;
           font-size: 1.5rem;
-          font-weight: 700;
-          font-style: oblique;
+          //font-weight: 700;
         }
       }
     }

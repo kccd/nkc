@@ -6,28 +6,18 @@ block content
   .app-my
     .nav-user-content-box
       .nav-user-body
-        if data.user
-          .nav-user-other
-            .nav-banner-mask
-            .box-shadow(style=`background-image: url('${tools.getUrl('userBanner', data.user.banner)}')`)
-            .nav-user-info
-              .nav-user-avatar
-                img(src=tools.getUrl('userAvatar', data.user.avatar))
-              .nav-user-text
-                span.nav-user-username= data.user.username
-                span.nav-user-certs= data.user.info.certsName
-                .nav-user-scores
-                  -const targetUserScores = state.userScores;
-                  include ../../publicModules/userScores
-        else
-          .nkc-drawer-header
-          .nkc-drawer-visitor
-            .col-xs-12
-              .fa.fa-user-circle
-            .col-xs-4.col-xs-offset-2
-              a(onclick="Login.open()") 登录
-            .col-xs-4
-              a(onlick="Login.open('register')") 注册
+        .nav-user-other
+          .nav-banner-mask
+          .box-shadow(style=`background-image: url('${tools.getUrl('userBanner', data.user.banner)}')`)
+          .nav-user-info
+            .nav-user-avatar
+              img(src=tools.getUrl('userAvatar', data.user.avatar))
+            .nav-user-text
+              .nav-user-username= data.user.username
+              .nav-user-certs= data.user.info.certsName
+              .nav-user-scores
+                -const targetUserScores = state.userScores;
+                include ../../publicModules/userScores
     .my-content
       .nav-numbers
         a.nav-number(href=`/u/${data.user.uid}/profile/thread`)
@@ -91,7 +81,7 @@ block content
                     .icon-left
                       img(src=tools.getUrl('getIcons', 'shoucang.png'))
                     span 收藏的文章
-                .my-class-title 我的资料
+                .my-class-title 其他
                 .my-link
                   a.nav-box(href=`/u/${data.user.uid}/profile/finance`)
                     .icon-left
