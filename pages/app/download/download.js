@@ -88,11 +88,7 @@ var app = new Vue({
     getDownloadFiles(){
       const _this = this;
       NKC.methods.rn.emit('getFiles', [], function (res){
-        if(res.files.length === 0) {
-          _this.file = null;
-        } else {
-          _this.files = res.files.reverse();
-        }
+        _this.files = res.files.reverse();
         _this.loading = false;
       });
     }
