@@ -15,14 +15,13 @@ block content
           .file-img
             img(:src="getUrl('fileCover', item.ext)")
           .file-content
-            .file-name {{item.name}}
+            .file-name(@click='showFileInfo(item)') {{item.name}}
             .file-do-content
-              .file-time(v-if='item.status === "success"') {{getSize(item.size, 1)}} {{fromNow(item.id)}}
-              .file-time(v-else-if='item.status === "downloading"') 正在下载...
+              .file-time(v-if='item.status === "success"') {{fromNow(item.id)}} {{getSize(item.size, 1)}}
+              .file-time(v-else-if='item.status === "downloading"') 正在下载&nbsp;
                 span {{item.progress}}%
               .file-time(v-else) 下载失败
               //.file-download-box
-
                 //-.file-progress-box
                   span.file-progress(v-if="item.progress !== '100' && item.progress !== 'failed'") {{item.progress}}%
                   span.file-progress.finished(v-else-if="item.progress === '100'") {{getSize(item.size, 1)}}
