@@ -1946,14 +1946,11 @@ postSchema.statics.extendPostParentUser = async (posts) => {
     };
   }
   for(const post of posts){
-    if(post.parentPostId !== ''){
-      if(post.parentPost){
-        post.parentPost.user = usersObj[post.parentPost.uid];
-        post.parentPost.user.homeUrl = tools.getUrl('userHome', post.parentPost.user.uid);
-        post.parentPost.user.dataFloatUid = post.parentPost.user.uid;
-        post.parentPost.postUrl = tools.getUrl('post', post.parentPost.pid);
-      }
-    }
+    if(!post.parentPostId || !post.parentPost) continue;
+    post.parentPost.user = usersObj[post.parentPost.uid];
+    post.parentPost.user.homeUrl = tools.getUrl('userHome', post.parentPost.user.uid);
+    post.parentPost.user.dataFloatUid = post.parentPost.user.uid;
+    post.parentPost.postUrl = tools.getUrl('post', post.parentPost.pid);
   }
   return posts;
 }
