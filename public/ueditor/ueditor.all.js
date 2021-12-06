@@ -23949,6 +23949,15 @@
           }
           return false;
         };
+      var remoteImgs = [];
+      for(var i = 0; i < imgs.length; i++) {
+        var img = imgs[i];
+        var dataTag = img.getAttribute('data-tag');
+        var dataType = img.getAttribute('data-type');
+        if(dataTag === 'nkcsource' && dataType === 'picture') continue;
+        remoteImgs.push(img);
+      }
+      imgs = remoteImgs;
       me.options.imgTotal = imgs.length;
       var isPc = IsPC();
       var imgWidth = {
