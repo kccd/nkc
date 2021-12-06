@@ -1,8 +1,7 @@
 if !isIncluded('postActivity')
   +includeCSS('/home/postActivity.css')
-  +includeCSS('/home/postLatest.css')
   mixin postlatest(props)
-    -var {from, user, quote, title, content, toc, cover, url, type, parentPostId, parentPost} = props;
+    -var {from, user, quote, title, content, toc, cover, url, type, parentPost} = props;
     mixin postActivityHeader(headerData)
       -var {toc, type} = headerData;
       .post-activity-header(class=headerData.from?'post-activity-main-header':'')
@@ -63,7 +62,7 @@ if !isIncluded('postActivity')
               a(href=url target="_blank").post-post-title=`发表于《${title}》`
           //if cover
           //  .post-activity-cover(style=`background-image: url(${cover})`)
-    if parentPostId === ''
+    if !parentPost
       .post-activity
         .post-activity-content
           +postActivityHeader({from, user, toc, type})

@@ -25,7 +25,7 @@ var app = new Vue({
   methods: {
     getUrl: NKC.methods.tools.getUrl,
     getSize: NKC.methods.tools.getSize,
-    fromNow: NKC.methods.tools.fromNow,
+    timeFormat: NKC.methods.tools.timeFormat,
     reloadFile(item) {
       const _this = this;
       NKC.methods.rn.downloadFile(item.name, item.url, function() {

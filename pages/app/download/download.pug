@@ -17,7 +17,7 @@ block content
           .file-content
             .file-name(@click='showFileInfo(item)') {{item.name}}
             .file-do-content
-              .file-time(v-if='item.status === "success"') {{fromNow(item.id, true)}} {{getSize(item.size, 1)}}
+              .file-time(v-if='item.status === "success"') {{getSize(item.size, 1)}} {{timeFormat(item.id)}}
               .file-time(v-else-if='item.status === "downloading"') 正在下载&nbsp;
                 span {{item.progress}}%
               .file-time(v-else) 下载失败

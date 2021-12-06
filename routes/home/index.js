@@ -1,6 +1,5 @@
 const router = require("koa-router")();
 const home = require("./home");
-const redisClient = require("../../settings/redisClient");
 router
   .get("/", async (ctx, next) => {
     const {data, nkcModules, db, query, state} = ctx;
@@ -175,85 +174,100 @@ router
     let subTid = [], subUid = [], subColumnId = [], subForumsId = [], subColumnPostsId = [];
     let paging;
 
-  if(threadListType === "reply") {
-      let threadsObj = {};
+    if(threadListType === "reply") {
       q = {
         mainForumsId: {
           $in: fidOfCanGetThreads
         },
-        disabled: false
+        disabled: false,
+        reviewed: true,
+        toDraft: {$ne: true}
       };
       const count = await db.PostModel.countDocuments(q);
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
       let posts = await db.PostModel.find({type: "post"}).sort({toc: -1})
-        .sort({toc: -1})
         .skip(paging.start)
         .limit(paging.perpage);
-      let threads = await db.ThreadModel.find({tid: {$in: posts.map(post => post.tid)}});
-      threads = await db.ThreadModel.extendThreads(threads, {
-        htmlToText: true,
-        removeLink: true,
-      });
-      threads.map(thread => {
-        threadsObj[thread.tid] = thread;
-      });
       posts = await db.PostModel.extendActivityPosts(posts);
-      posts = await db.PostModel.extendPostParent(posts);
-      posts = await db.PostModel.extendPostParentUser(posts);
-      data.posts = [];
-      for(let post of posts){
-        const p = threadsObj[post.tid];
-        post.thread = p;
-        post.lastPost = p.lastPost;
-        // post.from = post.parentPostId === ''?'发表回复':'发表评论'
-        let {
-          pid,
-          tid,
-          user,
-          parentPostId,
-          toc,
-          url,
-          title,
-          content,
-          cover,
-          forumsId,
-          quote,
-          parentPost,
-          voteUp,
-        } = post;
-        if(parentPost) {
-          let {c, uid} = parentPost;
-          c = nkcModules.nkcRender.htmlToPlain(c, 100);
-          parentPost.c = c;
-          parentPost.homeUrl = nkcModules.tools.getUrl('userHome', uid);
-        }
-        if(user.uid !== null) user.homeUrl = nkcModules.tools.getUrl('userHome', user.uid);
-        user.name = user.username;
-        user.id = user.uid;
-        user.dataFloatUid = user.uid;
-        if(quote !== null) {
-          if(quote.user.uid !== null) quote.user.homeUrl = nkcModules.tools.getUrl('userHome', quote.user.uid);
-          quote.user.id = quote.user.uid;
-          quote.user.name = quote.user.username;
-          quote.user.dataFloatUid = quote.user.uid;
-        }
-
-        let a;
-        let postType = parentPostId === ''? '回复': '评论'
-        a = {
-          toc,
-          parentPostId,
-          from: `发表${postType}`,
-          title,
-          content,
-          url,
-          cover,
-          user,
-          quote,
-          parentPost
-        }
-        data.posts.push(a);
+      const parentPostsId = [];
+      for(let i = 0; i < posts.length; i++) {
+        if(!posts[i].parentPostId) continue;
+        parentPostsId.push(posts[i].parentPostId);
       }
+      const parentPosts = await db.PostModel.find({pid: {$in: parentPostsId}}, {
+        pid: 1,
+        uid: 1,
+        toc: 1,
+        c: 1,
+        anonymous: 1
+      });
+      const parentPostsObj = {};
+      const usersObj = {};
+
+      const usersId = [];
+      for(let i = 0; i < parentPosts.length; i++) {
+        const {uid, pid, anonymous} = parentPosts[i];
+        parentPostsObj[pid] = parentPosts[i];
+        if(anonymous) continue;
+        usersId.push(uid);
+      }
+      const users = await db.UserModel.find({uid: {$in: usersId}}, {
+        username: 1,
+        uid: 1,
+        avatar: 1
+      });
+      for(let i = 0; i < users.lengt; i++) {
+        const {uid} = users[i];
+        usersObj[uid] = users[i];
+      }
+
+      let anonymousUser = nkcModules.tools.getAnonymousInfo();
+      anonymousUser = {
+        uid: null,
+        username: anonymousUser.username,
+        avatar: anonymousUser.avatarUrl,
+        banned: false,
+      };
+      for(let i = 0; i < posts.length; i ++) {
+        const post = posts[i];
+        const {parentPostId, quote} = post;
+        let parentPost = null;
+        if(quote) {
+          const {
+            user,
+            toc,
+            url,
+            content,
+          } = quote;
+          parentPost = {
+            toc,
+            url,
+            content,
+            user
+          };
+        } else {
+          if(!parentPostId) continue;
+          const originPost = parentPostsObj[parentPostId];
+          if(!originPost) continue;
+          let user = usersObj[originPost.uid];
+          user = user || anonymousUser;
+          parentPost = {
+            toc: originPost.toc,
+            url: nkcModules.tools.getUrl('post', originPost.pid),
+            content: nkcModules.nkcRender.htmlToPlain(originPost.c, 200),
+            user: {
+              uid: user.uid,
+              avatar: nkcModules.tools.getUrl('userAvatar', user.avatar),
+              username: user.username,
+            },
+          };
+        }
+        if(parentPost) {
+          parentPost.user.homeUrl = nkcModules.tools.getUrl('userHome', user.uid);
+        }
+        post.parentPost = parentPost;
+      }
+      data.posts = posts;
     }
 
     if(threadListType === "thread") {
