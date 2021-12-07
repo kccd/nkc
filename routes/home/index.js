@@ -176,24 +176,35 @@ router
 
     if(threadListType === "reply") {
       q = {
-        mainForumsId: {
-          $in: fidOfCanGetThreads
-        },
-        disabled: false,
-        reviewed: true,
-        toDraft: {$ne: true}
+        type: 'post',
       };
       const count = await db.PostModel.countDocuments(q);
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
-      let posts = await db.PostModel.find({type: "post"}).sort({toc: -1})
+      let posts = await db.PostModel.find(q).sort({toc: -1})
         .skip(paging.start)
         .limit(paging.perpage);
-      posts = await db.PostModel.extendActivityPosts(posts);
       const parentPostsId = [];
+      const newPosts = [];
       for(let i = 0; i < posts.length; i++) {
-        if(!posts[i].parentPostId) continue;
-        parentPostsId.push(posts[i].parentPostId);
+        const post = posts[i];
+        if(
+          post.reviewed === false ||
+          post.disabled === true ||
+          post.toDraft === true
+        ) continue;
+        const _fidOfCanGetThreads = new Set(fidOfCanGetThreads).size;
+        const _mainForumsId = new Set(post.mainForumsId).size;
+        const allForumsId = fidOfCanGetThreads.concat(post.mainForumsId);
+        const _allForumsId = new Set(allForumsId).size;
+        if(_fidOfCanGetThreads + _mainForumsId === _allForumsId) {
+          continue;
+        }
+        newPosts.push(post);
+        if(!post.parentPostId) continue;
+        parentPostsId.push(post.parentPostId);
       }
+      posts = newPosts;
+      posts = await db.PostModel.extendActivityPosts(posts);
       const parentPosts = await db.PostModel.find({pid: {$in: parentPostsId}}, {
         pid: 1,
         uid: 1,
@@ -268,9 +279,7 @@ router
         post.parentPost = parentPost;
       }
       data.posts = posts;
-    }
-
-    if(threadListType === "thread") {
+    } else if(threadListType === "thread") {
       q = {
         mainForumsId: {
           $in: fidOfCanGetThreads
@@ -306,7 +315,7 @@ router
       // 最新页置顶文章
       data.latestToppedThreads = await db.ThreadModel.getLatestToppedThreads(fidOfCanGetThreads);
 
-    }else if(threadListType === "subscribe") {
+    } else if(threadListType === "subscribe") {
       const columnsObj = {};
       const columnPostsObj = {};
       const forumsObj = {};
@@ -543,7 +552,7 @@ router
     }
     data.threads = [];
     let threads = [];
-    if(threadListType !== 'subscribe' || threadListType !== 'reply') {
+    if(threadListType !== 'subscribe' && threadListType !== 'reply') {
       const count = await db.ThreadModel.countDocuments(q);
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
       let sort = {tlm: -1};
