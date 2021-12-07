@@ -27,15 +27,7 @@ if !isIncluded('postActivity')
               span.post-activity-from=`发表评论`
               span &nbsp;
               +fromNow(toc)
-        //.thread-panel-button
-        //  if thread.firstPost.voteUp
-        //    .fa.fa-thumbs-up=` ${thread.firstPost.voteUp || ''}`
-        //  if thread.hits
-        //    .fa.fa-eye=` ${thread.hits}`
-        //  if thread.count
-        //    .fa
-        //      a.a-jump(href=`/t/${thread.tid}#container` target="_blank")
-        //        span.fa.fa-comment=` ${thread.count}`
+
     mixin postActivityContent(contentData)
       -var {cover, title, content, url} = contentData;
       .post-activity-content
@@ -48,15 +40,14 @@ if !isIncluded('postActivity')
             .post-activity-cover(style=`background-image: url(${cover})`)
     mixin postPostsContent(contentData, parentPost)
       -var {cover, title, content, url} = contentData;
-      -var {url} = parentPost;
       .post-activity-content
         .post-activity-content-container
-          if parentPost !== null
+          if parentPost
             div
-              a(href=url target="_blank").post-post-abstract=parentPost.content
+              a(href=parentPost.url target="_blank").post-post-abstract=parentPost.content
           if title
             div
-              a(href=url target="_blank").post-post-title=`发表于《${title}》`
+              a(href=url target="_blank").post-post-title=`《${title}》`
           //if cover
           //  .post-activity-cover(style=`background-image: url(${cover})`)
     .post-activity
