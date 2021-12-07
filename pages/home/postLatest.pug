@@ -69,5 +69,5 @@ if !isIncluded('postActivity')
             +postActivityHeader({user: parentPost.user, toc: parentPost.toc, parentPostId})
             +postPostsContent(quote, parentPost)
           else
-            +postActivityHeader({...quote, parentPostId})
+            //+postActivityHeader({...quote, parentPostId})
             +postPostsContent(quote, '')

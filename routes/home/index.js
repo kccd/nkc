@@ -242,6 +242,7 @@ router
       });
       for(let i = 0; i < users.length; i++) {
         const {uid} = users[i];
+        users[i].avatar = nkcModules.tools.getUrl('userAvatar', users[i].avatar);
         usersObj[uid] = users[i];
       }
 
@@ -262,8 +263,6 @@ router
           let user = usersObj[originPost.uid];
           if(!user) {
             user = anonymousUser;
-          } else {
-            user.avatar = nkcModules.tools.getUrl('userAvatar', user.avatar);
           }
           parentPost = {
             toc: originPost.toc,
