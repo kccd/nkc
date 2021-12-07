@@ -36,9 +36,8 @@ var app = new Vue({
     },
     openFile(item){
       if(item){
-        if(item.progress === '100'){
-          NKC.methods.rn.emit('openFile', {item: item}, function () {
-          })
+        if(item.status === 'success'){
+          NKC.methods.rn.emit('openFile', {path: item.path}, function () {})
         }
       }
     },

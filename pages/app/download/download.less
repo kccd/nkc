@@ -92,6 +92,12 @@ body{
               display: inline-block;
             }
           }
+          .file-options{
+            position: absolute;
+            padding-right: 0.5rem;
+            top: 0;
+            right: 0;
+          }
           /*.file-download-box{
             display: flex;
             .file-progress-box{
@@ -118,6 +124,17 @@ body{
               font-size: 2rem;
             }
           }*/
+        }
+      }
+      &.status-failed{
+        background-color: #f4f4f4;
+        border: 1px solid #ddd;
+        //opacity: 0.6;
+        .file-content{
+          .file-name{
+            //text-decoration:line-through;
+            color: #555;
+          }
         }
       }
     }
