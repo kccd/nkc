@@ -15,7 +15,7 @@ block content
           .file-img
             img(:src="getUrl('fileCover', item.ext)")
           .file-content
-            .file-name() {{item.name}}
+            .file-name {{item.name}}
             .file-do-content
               .file-time(v-if='item.status === "success"') {{getSize(item.size, 1)}} {{timeFormat(item.id)}}
               .file-time(v-else-if='item.status === "downloading"') 正在下载&nbsp;
@@ -27,8 +27,8 @@ block content
                   span.file-progress.finished(v-else-if="item.progress === '100'") {{getSize(item.size, 1)}}
                   span.file-progress.failed(v-else-if="item.progress === 'failed'") 下载失败
               .file-options
-                span(@click.stop='reloadFile(item)' v-if='item.status === "failed"') 重试
-                span(@click.stop='delFile(item)' v-if='item.status === "success"') 删除
+                span.m-r-1(@click.stop='reloadFile(item)' v-if='item.status === "failed"') 重试
+                span(@click.stop='delFile(item)' v-if='item.status === "success" || item.status === "failed"') 删除
               //-.file-do-box(v-if='item.status !== "downloading"')
                 //-a(:href="item.url" data-type="download" :data-title="item.name")
                   .fa.fa-undo.file-download.m-r-1(v-if="item.progress === 'failed' || item.progress === '100'")
