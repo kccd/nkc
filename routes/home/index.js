@@ -205,7 +205,13 @@ router
       }
       posts = newPosts;
       posts = await db.PostModel.extendActivityPosts(posts);
-      const parentPosts = await db.PostModel.find({pid: {$in: parentPostsId}}, {
+      const parentPosts = await db.PostModel.find({
+        mainForumsId: {$in: fidOfCanGetThreads},
+        reviewed: true,
+        toDraft: false,
+        disabled: false,
+        pid: {$in: parentPostsId}
+      }, {
         pid: 1,
         uid: 1,
         toc: 1,
