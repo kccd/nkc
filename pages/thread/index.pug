@@ -65,7 +65,7 @@ block content
                     .nav-count(title=`浏览数`)
                       .fa.fa-eye
                       span=data.thread.hits
-                    .nav-count(title=`回复数`)
+                    .nav-count(title=`回复数` onclick="window.location.href='#container'")
                       .fa.fa-comment
                       span=data.thread.count
                     //-.nav-count
@@ -331,6 +331,9 @@ block content
                         for tc in data.thread.threadCategories
                           span.m-r-1=`${tc.categoryName}：${tc.nodeName}`
                         .pull-right.text-right
+                          .inline-block.single-post-bottom-item(title=`回复数` onclick="window.location.href='#container'")
+                            .fa.fa-comment-o.reply-icon
+                            span=data.thread.count
                           if thread.firstPost.digest
                             .inline-block
                               span.fa.fa-star(style='color: #ffbf16;' title='精选')

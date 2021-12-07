@@ -302,6 +302,30 @@ postSchema.virtual('reason')
     this._reason = reason
   });
 
+postSchema.virtual('parentPost')
+  .get(function() {
+    return this._parentPost
+  })
+  .set(function(parentPost) {
+    this._parentPost = parentPost
+  });
+
+postSchema.virtual('thread')
+  .get(function() {
+    return this._thread
+  })
+  .set(function(thread) {
+    this._thread = thread
+  });
+
+postSchema.virtual('lastPost')
+  .get(function() {
+    return this._lastPost
+  })
+  .set(function(lastPost) {
+    this._lastPost = lastPost
+  });
+
 postSchema.virtual('url')
   .get(function() {
     return this._url
@@ -342,13 +366,14 @@ postSchema.virtual('resources')
     this._resources = rs
   });
 
-postSchema.virtual('thread')
+postSchema.virtual('from')
   .get(function() {
-    return this._thread
+    return this._from
   })
   .set(function(t) {
-    this._thread = t
+    this._from = t
   });
+
 postSchema.virtual('usersVote')
   .get(function() {
     return this._usersVote
@@ -1771,7 +1796,8 @@ postSchema.statics.extendActivityPosts = async (posts) => {
     c: 1,
     anonymous: 1,
     toc: 1,
-    cover: 1
+    cover: 1,
+    parentPostId: 1,
   });
   for(const fp of firstPosts) {
     usersId.add(fp.uid);
@@ -1800,6 +1826,7 @@ postSchema.statics.extendActivityPosts = async (posts) => {
       anonymous,
       cover,
       mainForumsId,
+      parentPostId,
     } = post;
     let user;
     if(anonymous) {
@@ -1840,7 +1867,8 @@ postSchema.statics.extendActivityPosts = async (posts) => {
       content: nkcRender.htmlToPlain(c, 200),
       cover: cover? tools.getUrl('postCover', cover):null,
       forumsId: mainForumsId,
-      quote
+      quote,
+      parentPostId: parentPostId,
     });
   }
   return results;

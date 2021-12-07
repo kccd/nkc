@@ -855,3 +855,28 @@ footer.footer{
     width: 5.7rem;
   }
 }
+.app-top{
+  display: none;
+}
+@media (max-width: 991px) {
+  .app-top {
+    display: inline-block;
+    width: 100%;
+    height: 3rem;
+    padding: 0.5rem 0;
+    z-index: 999;
+    background: #fff;
+
+    .navbar-link {
+      div {
+        text-align: center;
+        height: 2rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+        line-height: 2rem;
+        margin: 0;
+        border-right: 1px solid #ddd;
+      }
+    }
+  }
+}

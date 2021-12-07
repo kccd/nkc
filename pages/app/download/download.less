@@ -1,0 +1,142 @@
+body{
+  background-color: #f4f4f4;
+}
+.app-download{
+  height: 100%;
+  width: 100%;
+  .download-list{
+    height: 100%;
+    width: 100%;
+    .null{
+      margin-top: 10rem;
+      font-size: 1.2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    @listHeight: 6rem;
+    .download-file{
+      border-radius: 2px;
+      margin-bottom: 0.5rem;
+      background-color: #fff;
+      height: @listHeight;
+      box-shadow: 0 0 3px rgba(0,0,0,0.1);
+      position: relative;
+      padding-left: @listHeight + 0.5rem;
+      padding-right: 0.5rem;
+      .file-img{
+        height: @listHeight;
+        width: @listHeight;
+        position: absolute;
+        left: 0;
+        top: 0;
+        border-right: 1px #f1f1f1 solid;
+        img{
+          height: @listHeight * 0.8;
+          width: @listHeight * 0.8;
+          padding-left: @listHeight * 0.2;
+          padding-top: @listHeight * 0.2;
+        }
+      }
+      .file-content{
+        height: 100%;
+        .file-name{
+          width: 100%;
+          word-break: break-all;
+          display: -webkit-box;
+          overflow: hidden;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 1;
+          font-size: 1.3rem;
+          color: #2b90d9;
+          height: 3rem;
+          padding-top: 1rem;
+        }
+        //.file-path{
+        //  width: 100%;
+        //  word-break: break-word;
+        //  display: -webkit-box;
+        //  overflow: hidden;
+        //  -webkit-box-orient: vertical;
+        //  -webkit-line-clamp: 1;
+        //  color: #337ab7;
+        //}
+        //.file-url{
+        //  width: 100%;
+        //  word-break: break-word;
+        //  display: -webkit-box;
+        //  overflow: hidden;
+        //  -webkit-box-orient: vertical;
+        //  -webkit-line-clamp: 1;
+        //}
+        .file-do-content{
+          @iconWidth: 2rem;
+          height: 2rem;
+          position: relative;
+          line-height: 2rem;
+          .file-time{
+            display: inline-block;
+            color: #555;
+            font-size: 1rem;
+          }
+          .file-do-box{
+            float: right;
+            height: 100%;
+            margin-right: 0.6rem;
+            .fa{
+              color: #555;
+              line-height: @iconWidth;
+              height: @iconWidth;
+              text-align: center;
+              width: @iconWidth;
+              display: inline-block;
+            }
+          }
+          .file-options{
+            position: absolute;
+            padding-right: 0.5rem;
+            top: 0;
+            right: 0;
+          }
+          /*.file-download-box{
+            display: flex;
+            .file-progress-box{
+              margin-left: 0.5rem;
+              .finished{
+              }
+              .failed{
+                color: #d9534f;
+              }
+            }
+          }
+          .file-do-box{
+            display: flex;
+            a{
+              text-decoration: none;
+            }
+            .file-download{
+              margin-right: 2rem;
+            }
+            .file-del{
+              color: #d9534f;
+            }
+            .fa{
+              font-size: 2rem;
+            }
+          }*/
+        }
+      }
+      &.status-failed{
+        background-color: #f4f4f4;
+        border: 1px solid #ddd;
+        //opacity: 0.6;
+        .file-content{
+          .file-name{
+            //text-decoration:line-through;
+            color: #555;
+          }
+        }
+      }
+    }
+  }
+}

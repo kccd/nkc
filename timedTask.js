@@ -27,6 +27,7 @@ const run = async () => {
   await timedTasks.updateRecommendThreads();
   await timedTasks.updateHomeHotColumns();
   await timedTasks.clearResourceState();
+  await timedTasks.initVerifiedUploadState();
   await timedTasks.updateAllForumLatestThread();
   await timedTasks.updateForumsMessage();
   await timedTasks.modifyTimeoutApplicationForm();

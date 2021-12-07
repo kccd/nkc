@@ -8,6 +8,20 @@ block content
   .hidden#data=objToStr({threadCategories: data.threadCategories})
   .container-fluid.max-width
     .row(style=state.isApp ? 'margin-top: 0':'margin-top: 56px')
+      if !state.isApp
+        .app-top
+          .navbar-link
+            .col-xs-3
+              a(href='/?t=latest') 最新
+            .col-xs-3
+              if data.user
+                a(href='/?t=subscribe') 关注
+              else
+                a(onclick="Login.open()") 关注
+            .col-xs-3
+              a(href=`/m`) 专栏
+            .col-xs-3
+              a(href=`/c`) 社区
       if permission("nkcManagementHome")
         .admin-operate
           button.admin-create(onclick=`create()`) 新建

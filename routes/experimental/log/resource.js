@@ -37,11 +37,13 @@ router
     let postsId = [];
     const usersId = [];
     const metaInfos = await db.ResourceModel.getMetadata(resources_);
+    const storePaths = await db.ResourceModel.getStoreFilePath(resources_);
     for(const r of resources_) {
       await r.setFileExist([]);
       if(r.mediaType === 'mediaAudio' || r.mediaType === 'mediaVideo') {
         r.metadata = metaInfos[r.rid]
       }
+      r.storePath = storePaths[r.rid]
       let filePath;
       try{
         filePath = await r.getFilePath();

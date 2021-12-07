@@ -8,7 +8,7 @@
  * Date: 2018-04-01T06:20:13.168Z
  */
 
-import $ from 'jquery';
+// import $ from 'jquery';
 import Cropper from 'cropperjs';
 
 if ($.fn) {

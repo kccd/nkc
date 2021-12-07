@@ -26,9 +26,9 @@ verifyRouter
     const verifiedUploadVideo = await db.VerifiedUploadModel.findOne({_id: userPersonal.authenticate.video.attachments[0]}, {state: 1, _id: 1}).sort({toc: -1});
     const verifiedUploadCardA = await db.VerifiedUploadModel.findOne({_id: userPersonal.authenticate.card.attachments[0]}, {state: 1, _id: 1}).sort({toc: -1});
     const verifiedUploadCardB = await db.VerifiedUploadModel.findOne({_id: userPersonal.authenticate.card.attachments[1]}, {state: 1, _id: 1}).sort({toc: -1});
-    data.VerifiedVideoState = verifiedUploadVideo.state;
-    data.VerifiedAState = verifiedUploadCardA.state;
-    data.VerifiedBState = verifiedUploadCardB.state;
+    data.verifiedVideoState = verifiedUploadVideo?verifiedUploadVideo.state:'unUpload';
+    data.verifiedAState = verifiedUploadCardA?verifiedUploadCardA.state:'unUpload';
+    data.verifiedBState = verifiedUploadCardB?verifiedUploadCardB.state:'unUpload';
     data.auth3Content = authSettings.auth3Content;
     data.authenticate = userPersonal.authenticate;
     ctx.template = "/user/settings/verify/verify.pug";

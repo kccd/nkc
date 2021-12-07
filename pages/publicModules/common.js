@@ -1,8 +1,3 @@
-import JQuery from "jquery";
-
-window.$ = JQuery;
-window.jQuery = JQuery;
-
 var NKC = {
   methods: {},
   modules: {},

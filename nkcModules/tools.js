@@ -16,6 +16,9 @@ var Tools = function() {
     var t = "?c=" + type;
     if(size) t += "&t=" + size;
     switch(type) {
+      case 'getIcons': {
+        return '/statics/icons/' + id;
+      }
       case 'forumHome': {
         return "/f/" + id
       }
@@ -233,10 +236,18 @@ var Tools = function() {
   self.getIpUrl = function(ip) {
     return "http://www.ip138.com/ips138.asp?ip=" + ip + "&action=2";
   };
-  self.fromNow = function(time) {
+  self.fromNow = function(time, type) {
     var now = Math.floor(Date.now() / 1000);
     time = new Date(time);
     time = Math.floor(time.getTime() / 1000);
+    //type用于是否显示分秒，true显示分秒，false显示刚刚
+    if(type) {
+      // 分
+      const just = Math.floor((now - time) / 60);
+      if(just < 60) {
+        return '刚刚';
+      }
+    }
     // 秒
     if(now - time < 60) {
       return (now - time) + '秒前';
