@@ -1,9 +1,9 @@
 if !isIncluded('postActivity')
   +includeCSS('/home/postActivity.css')
   mixin postlatest(props)
-    -var {from, user, quote, title, content, toc, cover, url, type, parentPost} = props;
+    -var {from, user, quote, title, content, toc, cover, url, type, parentPost, parentPostId} = props;
     mixin postActivityHeader(headerData)
-      -var {toc, type} = headerData;
+      -var {toc, parentPost, showFrom, user} = headerData;
       .post-activity-header(class=headerData.from?'post-activity-main-header':'')
         .post-activity-avatar
           if headerData.user.avatar
@@ -11,21 +11,21 @@ if !isIncluded('postActivity')
           else
             div(style=`background-color: ${headerData.user.color}`)
         .post-activity-user
-          if headerData.user.homeUrl
+          if headerData.user.uid
             a(
-              href=headerData.user.homeUrl target="_blank"
-              data-float-uid=headerData.user.dataFloatUid || undefined
-              data-float-fid=headerData.user.dataFloatFid || undefined
-            ).post-activity-username=headerData.user.name
+              href=tools.getUrl('userHome', user.uid) target="_blank"
+              data-float-uid=headerData.user.uid || undefined
+            ).post-activity-username=headerData.user.username
           else
-            .post-activity-username=headerData.user.name
-          if !headerData.from
-            +fromNow(toc)
-            span &nbsp;
-          if headerData.from
-            span.post-activity-from=`${headerData.from}`
-          if headerData.from
-            .post-activity-time-sm
+            .post-activity-username=headerData.user.username
+          if showFrom
+            if !headerData.parentPostId
+              span.post-activity-from=`发表回复`
+              span &nbsp;
+              +fromNow(toc)
+            else
+              span.post-activity-from=`发表评论`
+              span &nbsp;
               +fromNow(toc)
         //.thread-panel-button
         //  if thread.firstPost.voteUp
@@ -48,36 +48,26 @@ if !isIncluded('postActivity')
             .post-activity-cover(style=`background-image: url(${cover})`)
     mixin postPostsContent(contentData, parentPost)
       -var {cover, title, content, url} = contentData;
-      -var {postUrl} = parentPost;
+      -var {url} = parentPost;
       .post-activity-content
         .post-activity-content-container
-          if postUrl
+          if parentPost !== null
             div
-              a(href=postUrl target="_blank").post-post-abstract=parentPost.c
-          else
-            div
-              a(href=url target="_blank").post-post-abstract=parentPost.c
+              a(href=url target="_blank").post-post-abstract=parentPost.content
           if title
             div
               a(href=url target="_blank").post-post-title=`发表于《${title}》`
           //if cover
           //  .post-activity-cover(style=`background-image: url(${cover})`)
-    if !parentPost
-      .post-activity
-        .post-activity-content
-          +postActivityHeader({from, user, toc, type})
-          +postActivityContent({title, content, cover, url})
-        if quote
-          .post-activity-content.post-activity-quote
-            +postActivityHeader(quote)
-            +postPostsContent(quote, '')
-    else
-      .post-activity
-        .post-activity-content
-          +postActivityHeader({from, user, toc, type})
-          +postActivityContent({title, content, cover, url})
-        if quote
-          .post-activity-content.post-activity-quote
-            +postActivityHeader({user: parentPost.user, toc: parentPost.toc})
+    .post-activity
+      .post-activity-content
+        +postActivityHeader({user, toc, parentPost, showFrom: true, parentPostId})
+        +postActivityContent({title, content, cover, url})
+      if quote
+        .post-activity-content.post-activity-quote
+          if parentPost
+            +postActivityHeader({user: parentPost.user, toc: parentPost.toc, parentPostId})
             +postPostsContent(quote, parentPost)
-
+          else
+            +postActivityHeader({...quote, parentPostId})
+            +postPostsContent(quote, '')

@@ -185,6 +185,7 @@ router
         .limit(paging.perpage);
       const parentPostsId = [];
       const newPosts = [];
+      const quotePostsIdObj = {};
       for(let i = 0; i < posts.length; i++) {
         const post = posts[i];
         if(
@@ -199,16 +200,22 @@ router
         if(_fidOfCanGetThreads + _mainForumsId === _allForumsId) {
           continue;
         }
+        if(post.parentPostId) {
+          parentPostsId.push(post.parentPostId);
+        }
+        if(post.quote) {
+          const [quotePostId] = post.quote.split(':');
+          quotePostsIdObj[post.pid] = quotePostId;
+          parentPostsId.push(quotePostId);
+        }
         newPosts.push(post);
-        if(!post.parentPostId) continue;
-        parentPostsId.push(post.parentPostId);
       }
       posts = newPosts;
       posts = await db.PostModel.extendActivityPosts(posts);
       const parentPosts = await db.PostModel.find({
         mainForumsId: {$in: fidOfCanGetThreads},
         reviewed: true,
-        toDraft: false,
+        toDraft: {$ne: true},
         disabled: false,
         pid: {$in: parentPostsId}
       }, {
@@ -233,7 +240,7 @@ router
         uid: 1,
         avatar: 1
       });
-      for(let i = 0; i < users.lengt; i++) {
+      for(let i = 0; i < users.length; i++) {
         const {uid} = users[i];
         usersObj[uid] = users[i];
       }
@@ -243,44 +250,34 @@ router
         uid: null,
         username: anonymousUser.username,
         avatar: anonymousUser.avatarUrl,
-        banned: false,
       };
       for(let i = 0; i < posts.length; i ++) {
         const post = posts[i];
-        const {parentPostId, quote} = post;
+        const quotePostId = quotePostsIdObj[post.pid];
+        const parentPostId = quotePostId || post.parentPostId;
         let parentPost = null;
-        if(quote) {
-          const {
-            user,
-            toc,
-            url,
-            content,
-          } = quote;
-          parentPost = {
-            toc,
-            url,
-            content,
-            user
-          };
-        } else {
-          if(!parentPostId) continue;
+        if(parentPostId) {
           const originPost = parentPostsObj[parentPostId];
           if(!originPost) continue;
           let user = usersObj[originPost.uid];
-          user = user || anonymousUser;
+          if(!user) {
+            user = anonymousUser;
+          } else {
+            user.avatar = nkcModules.tools.getUrl('userAvatar', user.avatar);
+          }
           parentPost = {
             toc: originPost.toc,
             url: nkcModules.tools.getUrl('post', originPost.pid),
             content: nkcModules.nkcRender.htmlToPlain(originPost.c, 200),
             user: {
               uid: user.uid,
-              avatar: nkcModules.tools.getUrl('userAvatar', user.avatar),
+              avatar: user.avatar,
               username: user.username,
             },
           };
         }
-        if(parentPost) {
-          parentPost.user.homeUrl = nkcModules.tools.getUrl('userHome', user.uid);
+        if(parentPost && parentPost.user.uid) {
+          parentPost.user.homeUrl = nkcModules.tools.getUrl('userHome', parentPost.user.uid);
         }
         post.parentPost = parentPost;
       }

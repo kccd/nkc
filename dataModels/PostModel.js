@@ -1826,7 +1826,7 @@ postSchema.statics.extendActivityPosts = async (posts) => {
       anonymous,
       cover,
       mainForumsId,
-      parentPostId
+      parentPostId,
     } = post;
     let user;
     if(anonymous) {
