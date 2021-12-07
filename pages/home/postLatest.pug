@@ -7,7 +7,7 @@ if !isIncluded('postActivity')
       .post-activity-header(class=headerData.from?'post-activity-main-header':'')
         .post-activity-avatar
           if headerData.user.avatar
-            img(src=headerData.user.avatar)
+            img(src=headerData.user.avatar data-float-uid=headerData.user.uid || undefined style="cursor: pointer")
           else
             div(style=`background-color: ${headerData.user.color}`)
         .post-activity-user
