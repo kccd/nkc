@@ -1,8 +1,5 @@
-const ff = require("fluent-ffmpeg");
 const PATH = require('path');
 const {
-  getFileInfo,
-  deleteFile,
   storeClient,
   spawnProcess
 } = require('../../tools');
@@ -18,15 +15,25 @@ module.exports = async (props) => {
     data,
     storeUrl
   } = props;
-  const {waterGravity, mediaPath, originPath, originId, timePath, flex, rid, ext, toc, waterAdd, enabled, minWidth, minHeight} = data;
+  const {
+    waterGravity,
+    mediaPath,
+    originPath,
+    originId,
+    timePath,
+    flex,
+    rid,
+    ext,
+    toc,
+    waterAdd,
+    enabled,
+    minWidth,
+    minHeight,
+    transparency,
+  } = data;
   const filePath = file.path;//临时目录
   const time = (new Date(toc)).getTime();
 
-  //识别图片信息并自动旋转，去掉图片的元信息
-  await tools.imageAutoOrient(filePath);
-  //获取文件所在目录
-  //获取图片尺寸
-  const {width, size, height} = await tools.getFileInfo(filePath);
   const filenamePath = `${originId}.${ext}`;
   const filesInfo = {};//用于存储在数据库的文件类型
   //构建原图存储地址
@@ -55,28 +62,36 @@ module.exports = async (props) => {
   //水印大图在存储服务中的路径
   const outputStorePath = PATH.join(mediaPath, timePath, outputFileName);
 
-  //如果图片的尺寸达到限定值将图片压缩
-  if(size > 500000 || width > 1920) {
-    await imageNarrow(filePath);
-  }
   const func = async () => {
-    if(width >= minWidth &&
-      height >= minHeight
-      && waterAdd && enabled) {
-      if(ext !== 'gif') {
-        //原图打水印保存
-        await saveffmpeg(filePath, cover, waterGravity, outputPath, flex)
-      }
+    //识别图片信息并自动旋转，去掉图片的元信息
+    await tools.imageAutoOrient(filePath);
+    //获取文件所在目录
+    //获取图片尺寸
+    const {width, size, height} = await tools.getFileInfo(filePath);
+
+    //如果图片的尺寸达到限定值将图片压缩
+    if(size > 500000 || width > 1920) {
+      await imageNarrow(filePath);
+    }
+
+    if(
+      width >= minWidth &&
+      height >= minHeight &&
+      waterAdd &&
+      enabled &&
+      ext !== 'gif'
+    ) {
+      await saveffmpeg(filePath, cover, waterGravity, outputPath, flex, transparency);
     } else {
       outputPath = filePath;
     }
-    if((width > 150 || size > 51200) && ext !== 'gif') {
+    if((width > 150 || size > 51200)) {
       //保存缩略图
       await thumbnailify(filePath, thumbnailPath)
     }
     // 保存中号图
-    if((width > 640 || size > 102400) && ext !== 'gif') {
-      await mediumify(filePath, mediumPath);
+    if((width > 640 || size > 102400)) {
+      await mediumify(outputPath, mediumPath);
     }
 
     if(await tools.accessFile(outputPath)) {
@@ -121,6 +136,7 @@ module.exports = async (props) => {
   }
   func()
     .catch(err => {
+      console.log(err);
       return sendMessageToNkc('resourceStatus', {
         rid,
         status: false,
@@ -139,52 +155,40 @@ module.exports = async (props) => {
 }
 
 //图片打水印
-async function ffmpegWaterMark(filePath, cover, waterGravity, output, flex){
-  return Promise.resolve()
-    .then(() => {
-       return addImageTextWaterMaskForImage({
-        input: filePath,
-        output: output,
-        image: cover.path,
-        text: '',
-        transparency: 100,
-        position: gravityToPositionMap[waterGravity],
-        flex,
-      })
-    })
-    .then(() => {
-
-    })
-    .catch(err => {
-      console.log(err);
-    });
+async function ffmpegWaterMark(filePath, cover, waterGravity, output, flex, transparency = 1){
+  return addImageTextWaterMaskForImage({
+    input: filePath,
+    output: output,
+    image: cover.path,
+    text: '',
+    transparency,
+    position: gravityToPositionMap[waterGravity],
+    flex,
+  })
 }
 
 //保存缩略图
-function thumbnailify(output, thumbnailPath){
+function thumbnailify(filePath, thumbnailPath){
   if(linux) {
-    return spawnProcess('convert', [output, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', thumbnailPath]);
+    return spawnProcess('convert', [`${filePath}[0]`, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', thumbnailPath]);
   } else {
-    return spawnProcess('magick', ['convert', output, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', thumbnailPath]);
+    return spawnProcess('magick', ['convert', `${filePath}[0]`, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', thumbnailPath]);
   }
 }
 
 //保存中号图
-function mediumify(output, mediumPath){
+function mediumify(filePath, mediumPath){
   if(linux) {
-    return spawnProcess('convert', [output, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', mediumPath]);
+    return spawnProcess('convert', [`${filePath}[0]`, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', mediumPath]);
   } else {
-    return spawnProcess('magick', ['convert', output, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', mediumPath]);
+    return spawnProcess('magick', ['convert', `${filePath}[0]`, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', mediumPath]);
   }
 }
 
 
 //保存缩略图
-function saveffmpeg (filePath, cover, waterGravity, output, flex) {
-  return ffmpegWaterMark(filePath, cover, waterGravity, output, flex)
-    .catch((err) => {
-      console.log(err);
-    });
+function saveffmpeg (filePath, cover, waterGravity, output, flex, transparency) {
+  return ffmpegWaterMark(filePath, cover, waterGravity, output, flex, transparency)
 }
 
 // 图片缩小
@@ -220,7 +224,7 @@ async function addImageTextWaterMaskForImage(op) {
     image,
     flex = 8,
     position,
-    transparency = 100,
+    transparency = 1,
     additionOptions,
   } = op;
   const {height: imageHeight, width: imageWidth} = await tools.getFileInfo(input);
@@ -237,7 +241,7 @@ async function addImageTextWaterMaskForImage(op) {
   return ffmpegImageFilter(input, output, [
     `movie='${image}'[logo]`,
     `[logo]scale=${logoWidth}:${logoHeight}[image]`,
-    `[image]drawtext=x=${logoWidth + gap}:y=${logoHeight}/2:text='':fontsize=${fontSize}:fontcolor=fcfcfc:fontfile=':shadowcolor=b1b1b1:shadowx=1:shadowy=1', lut=a=val*1[watermask]`,
+    `[image]drawtext=x=${logoWidth + gap}:y=${logoHeight}/2:text='':fontsize=${fontSize}:fontcolor=fcfcfc:fontfile=':shadowcolor=b1b1b1:shadowx=1:shadowy=1', lut=a=val*${transparency}[watermask]`,
     `[0:v][watermask]overlay=${position.x}:${position.y}`
   ], additionOptions)
 }

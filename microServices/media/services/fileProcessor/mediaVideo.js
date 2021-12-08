@@ -12,7 +12,23 @@ module.exports = async (props) => {
     data,
     storeUrl
   } = props;
-  const {waterGravity, mediaPath, timePath, videoSize, rid, toc, flex, ext, waterAdd, configs, defaultBV, enabled, minWidth, minHeight} = data;
+  const {
+    waterGravity,
+    mediaPath,
+    timePath,
+    videoSize,
+    rid,
+    toc,
+    flex,
+    ext,
+    waterAdd,
+    transparency,
+    configs,
+    defaultBV,
+    enabled,
+    minWidth,
+    minHeight
+  } = data;
   const extension = ext;
   const filePath = file.path;//临时目录
   const aviTempPath = filePath + 'temp.avi';
@@ -66,6 +82,7 @@ module.exports = async (props) => {
         output: outputVideoPath,
         imageStream: cover.path,
         position: gravityToPositionMap[waterGravity],
+        transparency,
         scalaByHeight: isReachFHD
           ? fhd.height
           : isReachHD
@@ -312,12 +329,13 @@ function getBitrateBySize(width, height, configs, defaultBV) {
 //视频打水印
 // function ffmpegWaterMark(filePath, cover, waterGravity, outputVideoPath){
 function ffmpegWaterMark(options){
-  const {filePath, output, imageStream, position, scalaByHeight, bitRate, flex} = options;
+  const {filePath, output, imageStream, position, scalaByHeight, bitRate, flex, transparency} = options;
   return addWaterMask({
     videoPath: filePath,
     imageStream: imageStream,
     output: output,
     position: position,
+    transparency,
     scalaByHeight,
     bitRate,
     flex
@@ -334,7 +352,8 @@ async function addWaterMask(options) {
     position = {x: 10, y: 10},
     flex = 8,
     bitRate,
-    scalaByHeight
+    scalaByHeight,
+    transparency = 1
   } = options;
   const { width, height} = await tools.getVideoInfo(videoPath);
   const {width: coverWidth, height: coverHeight} = await tools.getFileInfo(imageStream);
@@ -345,7 +364,8 @@ async function addWaterMask(options) {
       .input(imageStream)
       .complexFilter([
         `[1:v]scale=${imageWidth}:${imageHeight}[logo]`,
-        `[0:v][logo]overlay=${position.x}:${position.y}[o]`,
+        `[logo]lut=a=val*${transparency}[logo2]`,
+        `[0:v][logo2]overlay=${position.x}:${position.y}[o]`,
         `[o]scale=-2:${scalaByHeight}`
       ])
       .videoBitrate(bitRate)
