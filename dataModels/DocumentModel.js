@@ -80,18 +80,23 @@ schema.methods.pushToSearchDB = async function() {
 schema.methods.sendATMessage = async function() {
 
 };
+// 获取 html 内容中的笔记选区信息
 schema.methods.getNoteMarkInfo = async function() {
 
 };
+// 更新笔记选区信息
 schema.methods.updateNoteInfo = async function (note) {
 
 };
+// 更新内容
 schema.methods.updateContent = async function() {
 
 };
+// 保存历史
 schema.methods.saveHistory = async function() {
 
 };
+// 设置审核状态
 schema.methods.setReviewStatus = async function() {
 
 };

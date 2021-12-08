@@ -32,7 +32,6 @@ const {
   init,
   initState,
   initAddress,
-  initOperation,
   initCtxMethods,
   body,
   urlRewrite,
@@ -65,9 +64,8 @@ app
   .use(conditional())
   .use(etag())
   .use(urlRewrite)
-  .use(init)
   .use(initAddress)
-  .use(initOperation)
+  .use(init)
   .use(initCtxMethods)
   .use(initState)
   .use(filterDomain)

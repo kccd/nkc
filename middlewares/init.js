@@ -27,6 +27,17 @@ module.exports = async (ctx, next) => {
   ctx.data = Object.create(null);
   ctx.nkcModules = nkcModules;
 
+  try{
+    ctx.data.operationId = nkcModules.permission.getOperationId(ctx.url, ctx.method);
+  } catch(err) {
+    if(err.status === 404) {
+      console.log(`未知请求：${ctx.address} ${ctx.method} ${ctx.url}`.bgRed);
+      ctx.status = 404;
+      ctx.body = 'not found';
+      return
+    }
+  }
+
   try {
     ctx.body = ctx.request.body;
     ctx.db = db;
