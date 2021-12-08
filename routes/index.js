@@ -64,6 +64,8 @@ const linkRouter = routers.link;
 const communityRouter = routers.community;
 // 网站 logo
 const logoRouter = routers.logo;
+// 产品管理系统
+const pimRouter = routers.pim;
 
 const path = require('path');
 
@@ -133,8 +135,9 @@ router.use("/ipinfo", ipinfoRouter.routes(), ipinfoRouter.allowedMethods());
 router.use('/blacklist', blacklistRouter.routes(), blacklistRouter.allowedMethods());
 router.use('/a', attachmentRouter.routes(), attachmentRouter.allowedMethods());
 router.use('/verifications', verificationsRouter.routes(), verificationsRouter.allowedMethods());
-router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods())
-router.use('/c', communityRouter.routes(), communityRouter.allowedMethods())
+router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods());
+router.use('/c', communityRouter.routes(), communityRouter.allowedMethods());
+router.use('/pim', pimRouter.routes(), pimRouter.allowedMethods());
 router.use("/l", linkRouter.routes(), linkRouter.allowedMethods());
 router.use("/wm", watermarkRouter.routes(), watermarkRouter.allowedMethods());
 router.use('/logo', logoRouter.routes(), logoRouter.allowedMethods());

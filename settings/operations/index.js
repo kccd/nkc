@@ -79,6 +79,7 @@ const link = require('./link');
 const community = require('./community');
 const watermark = require('./watermark');
 const logo = require('./logo');
+const pim = require('./pim');
 const operationObj = {};
 
 
@@ -268,6 +269,7 @@ operationObj.operationTree = {
 		wm: watermark, //水印
     logo, // 网站 logo
     creation, // 用户创作中心
+    pim, // 产品管理系统
     test,
 	}
 };
