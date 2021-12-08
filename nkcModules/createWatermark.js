@@ -20,7 +20,7 @@ module.exports = async (imagePath, text = '') => {
   ctx.fillStyle = `#ffffff`;
   ctx.font = fontInfo;
   ctx.textBaseline = 'middle';
-  ctx.drawImage(logo, canvasPadding, canvasPadding, logoWidth, logoHeight, );
+  ctx.drawImage(logo, canvasPadding, canvasPadding, logoWidth, logoHeight);
   ctx.fillText(text, canvasPadding + logoWidth + gap, logoHeight / 2 + canvasPadding);
   return canvas.createPNGStream();
 };
