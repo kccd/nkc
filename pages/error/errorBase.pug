@@ -34,6 +34,7 @@ block body
           a(href="/") 网站首页
           | &nbsp;&nbsp;&nbsp;
           a(onclick="history.back(-1)") 返回上一页
+  +includeJS('/jquery/2.2.4/dist/jquery.min.js')
   if process.env.NODE_ENV === "production"
     +includeJS("/external_pkgs/vue.min.js", true)
   else

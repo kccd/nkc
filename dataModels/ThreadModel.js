@@ -269,6 +269,13 @@ threadSchema.virtual('forums')
   .set(function(f) {
     this._forums = f
   });
+threadSchema.virtual('columns')
+  .get(function() {
+    return this._columns
+  })
+  .set(function(f) {
+    this._columns = f
+  });
 threadSchema.virtual('categories')
   .get(function() {
     return this._categories
@@ -713,6 +720,7 @@ threadSchema.methods.getStep = async function(obj) {
   @author pengxiguaa 2019/1/24
  */
 const defaultOptions = {
+  extendColumns: false,
   forum: true,
   category: false,
   firstPost: true,
@@ -732,13 +740,18 @@ threadSchema.statics.extendThreads = async (threads, options) => {
   const nkcRender = require('../nkcModules/nkcRender');
   const o = Object.assign({}, defaultOptions);
   Object.assign(o, options);
-  let PostModel, UserModel, ForumModel, ThreadTypeModel;
+  let PostModel, UserModel, ForumModel, ThreadTypeModel, columnsModel;
   if(o.firstPost || o.lastPost) {
     PostModel = mongoose.model('posts');
     if(o.lastPostUser || o.firstPostUser) {
       UserModel = mongoose.model('users');
     }
   }
+
+  if(o.extendColumns){
+    columnsModel = mongoose.model('columns');
+  }
+
   if(o.forum) {
     ForumModel = mongoose.model('forums');
   }
@@ -753,8 +766,9 @@ threadSchema.statics.extendThreads = async (threads, options) => {
   let usersObj = {};
   let cid = [];
   let tcId = [];
+  let columnIds = [];
   const threadCategoryObj = {};
-  const parentForumsId = new Set(), forumsObj = {}, categoryObj = {};
+  const parentForumsId = new Set(), forumsObj = {}, categoryObj = {}, columnsObj = {};
 
   threads = threads.filter(thread => !!thread);
 
@@ -763,6 +777,12 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     thread.tcId = thread.tcId || [];
     if(o.firstPost) {
       postsId.add(thread.oc);
+    }
+    if(o.extendColumns){
+      thread.columns = [];
+      columnIds = columnIds.concat(thread.columnsId);
+      columnIds = [...new Set(columnIds)];
+
     }
     if(o.forum) {
       forumsId = forumsId.concat(thread.mainForumsId);
@@ -846,6 +866,13 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     }
   }
 
+  if(o.extendColumns) {
+    let columns = await columnsModel.find({_id: {$in:columnIds}});
+    columns.map( column => {
+      columnsObj[column._id] = column
+    });
+  }
+
   if(o.forum) {
     // let forums = await ForumModel.find({fid: {$in: [...new Set(forumsId)]}});
     let forums = await ForumModel.find({fid: {$in: [...new Set(forumsId)]}}, {
@@ -921,6 +948,17 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       }
 
     }
+
+    if(o.extendColumns) {
+      const columns = [];
+      for(const cid of thread.columnsId){
+        const c = columnsObj[cid];
+        if(c) columns.push(c);
+      }
+      thread.columns = columns;
+      // console.log(thread.columns?true:false,thread.columns,thread);
+    }
+
     if(o.forum) {
       const forums = [];
       for(const fid of thread.mainForumsId) {

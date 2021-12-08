@@ -1,6 +1,5 @@
 const router = require("koa-router")();
 const home = require("./home");
-const redisClient = require("../../settings/redisClient");
 router
   .get("/", async (ctx, next) => {
     const {data, nkcModules, db, query, state} = ctx;
@@ -44,6 +43,8 @@ router
       }
     }
     const homeSettings = await db.SettingModel.getSettings("home");
+    const latestFirst = homeSettings.latestFirst;
+    data.latestFirst = latestFirst;
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,
@@ -60,7 +61,7 @@ router
     let q = {};
     let threadListType;
     if(t) {
-      if(!["latest", "recommend", "subscribe", "column", "home"].includes(t)) t = '';
+      if(!["reply", "recommend", "subscribe", "column", "home", "thread"].includes(t)) t = latestFirst;
       if(t === "subscribe" && !user) t = '';
       threadListType =  t;
     }
@@ -173,7 +174,114 @@ router
     let subTid = [], subUid = [], subColumnId = [], subForumsId = [], subColumnPostsId = [];
     let paging;
 
-    if(threadListType === "latest") {
+    if(threadListType === "reply") {
+      q = {
+        type: 'post',
+      };
+      const count = await db.PostModel.countDocuments(q);
+      paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
+      let posts = await db.PostModel.find(q).sort({toc: -1})
+        .skip(paging.start)
+        .limit(paging.perpage);
+      const parentPostsId = [];
+      const newPosts = [];
+      const quotePostsIdObj = {};
+      for(let i = 0; i < posts.length; i++) {
+        const post = posts[i];
+        if(
+          post.reviewed === false ||
+          post.disabled === true ||
+          post.toDraft === true
+        ) continue;
+        const _fidOfCanGetThreads = new Set(fidOfCanGetThreads).size;
+        const _mainForumsId = new Set(post.mainForumsId).size;
+        const allForumsId = fidOfCanGetThreads.concat(post.mainForumsId);
+        const _allForumsId = new Set(allForumsId).size;
+        if(_fidOfCanGetThreads + _mainForumsId === _allForumsId) {
+          continue;
+        }
+        if(post.parentPostId) {
+          parentPostsId.push(post.parentPostId);
+        }
+        if(post.quote) {
+          const [quotePostId] = post.quote.split(':');
+          quotePostsIdObj[post.pid] = quotePostId;
+          parentPostsId.push(quotePostId);
+        }
+        newPosts.push(post);
+      }
+      posts = newPosts;
+      posts = await db.PostModel.extendActivityPosts(posts);
+      const parentPosts = await db.PostModel.find({
+        mainForumsId: {$in: fidOfCanGetThreads},
+        reviewed: true,
+        toDraft: {$ne: true},
+        disabled: false,
+        pid: {$in: parentPostsId}
+      }, {
+        pid: 1,
+        uid: 1,
+        toc: 1,
+        c: 1,
+        anonymous: 1
+      });
+      const parentPostsObj = {};
+      const usersObj = {};
+
+      const usersId = [];
+      for(let i = 0; i < parentPosts.length; i++) {
+        const {uid, pid, anonymous} = parentPosts[i];
+        parentPostsObj[pid] = parentPosts[i];
+        if(anonymous) continue;
+        usersId.push(uid);
+      }
+      const users = await db.UserModel.find({uid: {$in: usersId}}, {
+        username: 1,
+        uid: 1,
+        avatar: 1
+      });
+      for(let i = 0; i < users.length; i++) {
+        const {uid} = users[i];
+        users[i].avatar = nkcModules.tools.getUrl('userAvatar', users[i].avatar);
+        usersObj[uid] = users[i];
+      }
+
+      let anonymousUser = nkcModules.tools.getAnonymousInfo();
+      anonymousUser = {
+        uid: null,
+        username: anonymousUser.username,
+        avatar: anonymousUser.avatarUrl,
+      };
+      for(let i = 0; i < posts.length; i ++) {
+        const post = posts[i];
+        const quotePostId = quotePostsIdObj[post.pid];
+        const parentPostId = quotePostId || post.parentPostId;
+        let parentPost = null;
+        if(parentPostId) {
+          const originPost = parentPostsObj[parentPostId];
+          if(!originPost) continue;
+          let user = usersObj[originPost.uid];
+          if(!user) {
+            user = anonymousUser;
+          }
+          parentPost = {
+            toc: originPost.toc,
+            url: nkcModules.tools.getUrl('post', originPost.pid),
+            content: nkcModules.nkcRender.htmlToPlain(originPost.c, 200),
+            user: {
+              uid: user.uid,
+              avatar: user.avatar,
+              username: user.username,
+            },
+          };
+        }
+        if(parentPost && parentPost.user.uid) {
+          parentPost.user.homeUrl = nkcModules.tools.getUrl('userHome', parentPost.user.uid);
+        }
+        post.parentPost = parentPost;
+      }
+      data.posts = posts;
+    } else if(threadListType === "thread") {
       q = {
         mainForumsId: {
           $in: fidOfCanGetThreads
@@ -183,6 +291,7 @@ router
         },
         disabled: false*/
       };
+
       if(user) {
         if(!ctx.permission("superModerator")) {
           const canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
@@ -205,7 +314,6 @@ router
       } else {
         q.reviewed = true;
       }
-
       // 最新页置顶文章
       data.latestToppedThreads = await db.ThreadModel.getLatestToppedThreads(fidOfCanGetThreads);
 
@@ -446,11 +554,12 @@ router
     }
     data.threads = [];
     let threads = [];
-    if(threadListType !== 'subscribe') {
+    if(threadListType !== 'subscribe' && threadListType !== 'reply') {
       const count = await db.ThreadModel.countDocuments(q);
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
       let sort = {tlm: -1};
       if(s === "toc") sort = {toc: -1};
+      if(threadListType === "recommend") sort= {toc : -1};
       threads = await db.ThreadModel.find(q, {
         uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
         tlm: 1, fid: 1, hasCover: 1,
@@ -460,9 +569,17 @@ router
         categoriesId: 1,
         disabled: 1, recycleMark: 1
       }).skip(paging.start).limit(paging.perpage).sort(sort);
+      let forum;
+      if(threadListType === 'column') {
+        forum = false;
+      } else {
+        forum = true;
+      }
       threads = await db.ThreadModel.extendThreads(threads, {
         htmlToText: true,
-        removeLink: true
+        removeLink: true,
+        forum: forum,
+        extendColumns: t === 'column'?true:false
       });
     }
     const superModerator = ctx.permission("superModerator");
@@ -489,6 +606,7 @@ router
           continue;
         }
       }
+
       if(threadListType === "subscribe") {
         if(data.user.uid === thread.uid) {
           thread.from = "own";
@@ -513,8 +631,8 @@ router
     }
 
     if(!state.isApp) {
-      if(threadListType !== "latest") {
-        data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
+      if(threadListType !== "thread") {
+        data.articleThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
       }
 
       if(threadListType !== "recommend") {

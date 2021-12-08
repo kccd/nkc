@@ -824,6 +824,7 @@ settingSchema.statics.getWatermarkCoverPathByTypeStyle = async (uid, type, style
   );
 }
 
+//创建水印图片
 settingSchema.statics.getWatermarkCoverPath = async (magePath, text, transparent = 1) => {
   const {getFileMD5, getTextMD5} = require('../nkcModules/hash');
   const FILE = require('../nkcModules/file');

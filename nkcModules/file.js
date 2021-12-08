@@ -200,10 +200,10 @@ async function getMetaInformation(storeUrl, files) {
   return new Promise((resolve, reject) => {
     axios({
       url: storeUrl + '/metaInfo',
-      method: 'GET',
-      params: {
-        files: JSON.stringify(files) || '',
-      }
+      method: 'POST',
+      data: {
+        files
+      },
     })
       .then(res => {
         resolve(res.data || res);
@@ -230,6 +230,28 @@ async function removeResourceInfo(toc, files) {
     })
       .then(res => {
         resolve(res || res);
+      })
+      .catch(err => {
+        console.log(err);
+        reject(err);
+      });
+  })
+}
+
+/*
+* 获取文件真实路径
+* */
+async function getStorePath(storeUrl, files){
+  return new Promise((resolve, reject) => {
+    axios({
+      url: storeUrl + '/storePath',
+      method: 'POST',
+      data: {
+        files
+      }
+    })
+      .then(res => {
+        resolve(res.data || res);
       })
       .catch(err => {
         console.log(err);
@@ -305,9 +327,9 @@ async function getRemoteFile(props) {
     toc,
     type,
     ext,
-    name,
     file
   } = props;
+  const name = props.name || 'filename';
   const storeUrl = await getStoreUrl(toc);
   const mediaPath = await getMediaPath(type);
   const timePath = await getTimePath(toc);
@@ -347,5 +369,6 @@ module.exports = {
   getStoreFilesInfo,
   replaceFileExtension,
   getMetaInformation,
-  removeResourceInfo
+  removeResourceInfo,
+  getStorePath
 }

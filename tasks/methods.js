@@ -7,4 +7,5 @@ methods.updateHomeRecommendThreadsByType = db.ThreadModel.updateHomeRecommendThr
 methods.clearTimeoutPageCache = db.CacheModel.clearTimeoutPageCache;
 methods.saveActiveUsersToCache = db.ActiveUserModel.saveActiveUsersToCache;
 methods.saveNewUsersToCache = db.ActiveUserModel.saveNewUsersToCache;
+methods.updateVerifiedUpdateState = db.VerifiedUploadModel.updateVerifiedUpdateState;
 module.exports = methods;

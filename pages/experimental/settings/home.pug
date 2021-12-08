@@ -35,24 +35,27 @@ block eContent
           .row#app(v-cloak)
             .col-xs-12.col-md-12
               .form
+                //.form-group
+                //  h4.setting-block-title 首页最新回复排序
+                //  .radioBox
+                //    label
+                //      span 文章发布时间
+                //      input(type='radio' value="releaseToc" v-model="homeSettings.latestOrder")
+                //    label
+                //      span.m-l-1 最新回复
+                //      input(type='radio' value="releasePost" v-model="homeSettings.latestOrder")
                 .form-group
-                  h4.setting-block-title 首页可显示文章的专业类型
-                  .checkbox
-                    span 话题
-                    label
-                      input(type='checkbox' value="topic" v-model="list")
-                    span 学科
-                    label
-                      input(type='checkbox' value="discipline" v-model="list")
-                .form-group
-                  h4.setting-block-title 游客首页
+                  h4.setting-block-title 首页点击最新进入的页面
                   .radioBox
-                    span 最新
                     label
-                      input(type='radio' value="latest" v-model="homeSettings.visitorThreadList")
-                    span.m-l-1 主页
+                      span 回复
+                      input(type='radio' value="reply" v-model="homeSettings.latestFirst")
                     label
-                      input(type='radio' value="home" v-model="homeSettings.visitorThreadList")
+                      span.m-l-1 文章
+                      input(type='radio' value="thread" v-model="homeSettings.latestFirst")
+                    label
+                      span.m-l-1 专栏
+                      input(type='radio' value="column" v-model="homeSettings.latestFirst")
                 .form-group.form-inline
                   h4.setting-block-title 热门文章
                   h5 回复数不低于：
@@ -63,12 +66,12 @@ block eContent
                 .form-group.form-inline
                   h4.setting-block-title 推荐条件
                   h5
-                    span 精选文章
                     label
+                      span 精选文章
                       input(type='checkbox' value="featuredThreads" v-model="recommend")
                   h5
-                    span 热门文章
                     label
+                      span 热门文章
                       input(type='checkbox' value="hotThreads" v-model="recommend")
                   h5
                     span 点赞总数不低于

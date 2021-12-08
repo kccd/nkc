@@ -75,7 +75,12 @@ block eContent
                       span.text-danger=`${!r.isFileExist? '已丢失': '' }`
                     div=`文件大小：${tools.getSize(r.size, 1)}`
                     div=`文件类型：${r.mediaTypeName}`
-                    div=`真实路径：${r.filePath || '未知'}`
+                    div='真实路径：'
+                      if r.storePath
+                       for path in r.storePath
+                         h4=`${path.type}：`
+                         div=path.storePath
+
                   th
                     if r.metadata
                       for meta in r.metadata

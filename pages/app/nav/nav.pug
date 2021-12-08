@@ -31,6 +31,7 @@ block content
         a.nav-number
           .name 学术分
           .value(id="userXSF")=data.user.xsf
+      .account-code=`动态码：${data.code}`
       .nav-links
         a.nav-link(href=`/u/${data.user.uid}`)
           .icon-left

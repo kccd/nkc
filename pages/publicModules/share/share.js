@@ -35,7 +35,10 @@ function shareToOther(shareType, type, title, pid, description, avatar){
     };
     nkcAPI('/s', "POST", para)
       .then(function(data) {
-        var newUrl = origin + data.newUrl;
+        var newUrl = data.newUrl;
+        if(data.newUrl.indexOf('http') !== 0) {
+          newUrl = origin + newUrl;
+        }
         if(type === "qq") {
           newLink.location='http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+description;
         }

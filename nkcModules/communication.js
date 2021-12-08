@@ -4,6 +4,7 @@ const {port, address} = global.NKC;
 let communicationClient;
 
 
+
 function getCommunicationClient() {
   if(communicationClient) return communicationClient;
   communicationClient = new CommunicationClient({

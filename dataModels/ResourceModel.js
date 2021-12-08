@@ -185,6 +185,14 @@ resourceSchema.virtual('metadata')
     return this._metadata = val
   });
 
+resourceSchema.virtual('storePath')
+  .get(function() {
+    return this._storePath;
+  })
+  .set(function(val) {
+    return this._storePath = val
+  });
+
 resourceSchema.virtual('isFileExist')
   .get(function() {
     return this._isFileExist;
@@ -341,6 +349,47 @@ resourceSchema.statics.getMetadata = async function(resources){
     }
   }
   return metaInfos;
+}
+
+//获取存储服务文件真实路径
+resourceSchema.statics.getStoreFilePath = async function(resources){
+  const FILE = require('../nkcModules/file');
+  const requestFiles = [];
+  const storePaths = {};
+  for(const resource of resources) {
+  const {rid, mediaType, toc, files} = resource;
+    const time = (new Date(toc)).getTime();
+    const storeUrl = await FILE.getStoreUrl(toc);
+    if(!requestFiles[storeUrl]) requestFiles[storeUrl] = [];
+    const mediaPath = await FILE.getMediaPath(mediaType);
+    const timePath = await FILE.getTimePath(toc);
+    const _files = files.toObject();
+    for(const type in _files) {
+      if(type === 'cover') continue;
+      const {name} = _files[type];
+      const storeFilePath = PATH.join(mediaPath, timePath, name);
+      requestFiles[storeUrl].push({
+        time,
+        path: storeFilePath,
+        type: `${rid}_${type}`
+      });
+    }
+  }
+  // 获取文件真实路径
+  for(const storeUrl in requestFiles) {
+    const files = requestFiles[storeUrl];
+    const {files: storeFiles} = await FILE.getStorePath(storeUrl, files);
+    for(const file of storeFiles) {
+      const {storePath, type} = file;
+      const [rid, fileType] = type.split('_');
+      if(!storePaths[rid]) storePaths[rid] = [];
+      storePaths[rid].push({
+        type: fileType,
+        storePath
+      });
+    }
+  }
+  return storePaths;
 }
 //清除存储服务文件元信息
 resourceSchema.methods.clearResourceInfo = async function() {

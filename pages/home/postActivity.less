@@ -74,7 +74,24 @@
     color: #000;
     .hideText(@line: 3);
   }
-  .post-activity-title{
+  .post-post-abstract {
+    font-size: 1.25rem;
+    overflow: hidden;
+    color: #000;
+    .hideText(@line: 3);
+  }
+  .post-post-title {
+    margin-top: 1rem;
+    font-weight: 700;
+    color: #000;
+    text-decoration: none;
+    transition: border-bottom 200ms;
+    border-bottom: 1px solid transparent;
+    &:hover{
+      border-bottom: 1px solid #000;
+    }
+  }
+    .post-activity-title{
     font-size: 1.5rem;
     font-weight: 700;
     color: #000;
@@ -97,7 +114,7 @@
   .post-activity-quote{
     border-radius: 5px;
     background-color: #f6f2ee;
-    padding: 0.7rem 1.5rem 0.4rem 1.5rem;
+    padding: 0.7rem 1rem 0.4rem 1rem;
     border: 2px solid #eae6e2;
   }
 }

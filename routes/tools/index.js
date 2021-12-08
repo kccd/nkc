@@ -199,7 +199,7 @@ function checkToolInfo(data) {
 // 移动文件夹到新目录
 async function moveDir(sourcePath, toPath) {
   await deleteFolder(toPath); // 保证目标路径不存在同名文件夹
-  await fsPromises.copyFile(sourcePath, toPath);
+  await fsPromises.rename(sourcePath, toPath);
 }
 
 

@@ -213,7 +213,8 @@ if(vueDom) {
           visitorThreadList: homeSettings.visitorThreadList,
           hotThreads: homeSettings.hotThreads,
 					recommend: homeSettings.recommend,
-					subscribesDisplayMode: homeSettings.subscribesDisplayMode
+					subscribesDisplayMode: homeSettings.subscribesDisplayMode,
+					latestFirst: homeSettings.latestFirst
         })
           .then(function() {
           	sweetSuccess('保存成功');

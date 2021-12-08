@@ -12,47 +12,54 @@ const communicationClient = new CommunicationClient({
 function getCommunicationClient() {
   return communicationClient;
 }
-//通知修改资源文件状态
-function sendResourceStatusToNKC(props) {
-  const {rid, status, error, filesInfo} = props;
-  const communicationClient = getCommunicationClient();
-  communicationClient.sendMessage(communicationConfig.servicesName.nkc, {
-    type: 'resourceStatus',
-    data: {
-      rid,
-      status,
-      error,
-      filesInfo
-    }
-  });
-}
-//通知修改身份认证处理状态
-function sendVerifiedUploadStateToNKC(props) {
-  const {vid, status, error, fileInfo} = props;
-  const communicationClient = getCommunicationClient();
-  communicationClient.sendMessage(communicationConfig.servicesName.nkc, {
-    type: 'verifiedUploadState',
-    data: {
-      vid,
-      status,
-      error,
-      fileInfo
-    }
-  });
-}
+// //通知修改资源文件状态
+// function sendResourceStatusToNKC(props) {
+//   const {rid, status, error, filesInfo} = props;
+//   const communicationClient = getCommunicationClient();
+//   communicationClient.sendMessage(communicationConfig.servicesName.nkc, {
+//     type: 'resourceStatus',
+//     data: {
+//       rid,
+//       status,
+//       error,
+//       filesInfo
+//     }
+//   });
+// }
+// //通知修改身份认证处理状态
+// function sendVerifiedUploadStateToNKC(props) {
+//   const {vid, status, error, fileInfo} = props;
+//   const communicationClient = getCommunicationClient();
+//   communicationClient.sendMessage(communicationConfig.servicesName.nkc, {
+//     type: 'verifiedUploadState',
+//     data: {
+//       vid,
+//       status,
+//       error,
+//       fileInfo
+//     }
+//   });
+// }
 
 //媒体服务通知NKC服务
 function sendMessageToNkc(type, props) {
+  const {rid, status, error, filesInfo, vid} = props;
   const communicationClient = getCommunicationClient();
   communicationClient.sendMessage(communicationConfig.servicesName.nkc, {
     type,
-    data: props,
+    data: {
+      rid,
+      vid,
+      status,
+      error,
+      filesInfo
+    },
   });
 }
 
 module.exports = {
   getCommunicationClient,
-  sendResourceStatusToNKC,
-  sendVerifiedUploadStateToNKC,
+  // sendResourceStatusToNKC,
+  // sendVerifiedUploadStateToNKC,
   sendMessageToNkc
 };

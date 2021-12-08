@@ -68,6 +68,10 @@ mixin threadCategories
     if thread.threadCategories && thread.threadCategories.length
       for tc in thread.threadCategories
         span.thread-category=tc.nodeName
+mixin displayColumn(columns)
+  if columns
+    for column in columns
+      a.thread-column(href=`/m/${column._id}` target="_blank")=column.name
 
 -const lastPostUrl = `/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`;
 -const hasReply = thread.firstPost.pid !== thread.lastPost.pid;
@@ -116,7 +120,7 @@ mixin threadCategories
               if thread.count
                 if toc
                   span.thread-panel-minimalist-line /
-                span.count(title=`回复数${thread.count}`)
+                span.count(title=`回复数${thread.count}` onclick=`window.location.href='#container'`)
                   //.fa.fa-comment
                   span=thread.count
               if tlm
@@ -219,7 +223,7 @@ mixin threadCategories
               span.anonymous-name= anonymousInfo.username
 
           +displayForum
-
+          +displayColumn(thread.columns)
           .thread-panel-time
             // -=fromNow(thread.toc)
             +fromNow(thread.toc)
@@ -257,6 +261,10 @@ mixin threadCategories
             else if !ellipsis
               span.thread-title-page ...
               -ellipsis = true;
+        //if thread.columns && thread.columns.length !== 0
+        //  div.thread-columns
+        //    | 专栏：
+        //    +displayColumn(thread.columns)
         .thread-panel-abstract
           if postCoverPosition === 'left'
             +minThreadCover('p-r-1')

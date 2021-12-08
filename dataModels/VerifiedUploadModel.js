@@ -194,6 +194,26 @@ schema.methods.updateFilesInfo = async function() {
   });
 };
 
+/*
+* 更新身份认证文件处理超时状态
+* @author panbing 2021/12/03
+* */
+schema.statics.updateVerifiedUpdateState = async () => {
+  const VerifiedUpdate = mongoose.model('verifiedUpload');
+  const time = Date.now() - 12*60*60*1000;
+  await VerifiedUpdate.updateMany({
+    toc: {$lte: time},
+    state: 'inProcess'
+  }, {
+    $set: {
+      state: 'useless'
+    }
+  });
+}
+
+/*
+* 修改身份认证文件处理状态
+* */
 schema.statics.updateVerifiedState = async (props) => {
   const {vid, status, error, fileInfo = {}} = props;
   const VerifiedUploadModel = mongoose.model('verifiedUpload');
