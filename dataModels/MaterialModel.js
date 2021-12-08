@@ -16,7 +16,7 @@ const schema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['document'],
+    enum: ['document', 'resource'],
     index: 1
   },
   // 素材类型对应的 ID

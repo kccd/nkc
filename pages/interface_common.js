@@ -1723,7 +1723,6 @@ Object.assign(window, {
   disablePost,
   enablePost,
   disabledThread,
-  moveThread,
   numToFloatTwo,
   nkcDrawerBodyTop,
   openNKCDrawer,

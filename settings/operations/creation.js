@@ -1,3 +1,6 @@
 module.exports = {
-  GET: 'creationCenter'
+  GET: 'creationCenter',
+  material: {
+    GET: 'creationCenter'
+  }
 }

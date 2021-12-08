@@ -40,7 +40,6 @@ const {
   cache,
   IPLimit,
   filterDomain,
-  resFilter,
 } = require('./middlewares');
 
 const cookieConfig = require("./config/cookie");
@@ -83,6 +82,5 @@ app
   .use(permission)
   .use(logger)
   .use(mainRouter.routes())
-  .use(resFilter)
   .use(body);
 module.exports = app.callback();

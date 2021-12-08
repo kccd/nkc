@@ -1,6 +1,6 @@
-module.exports = async (ctx, next) => {
+module.exports = async (ctx) => {
   const {state, nkcModules, template, remoteTemplate} = ctx;
-  if(!template && !remoteTemplate) return await next();
+  if(!template && !remoteTemplate) return;
   const userInfo = !state.uid? null: {
     uid: state.uid,
     name: state.user.username,
@@ -39,5 +39,4 @@ module.exports = async (ctx, next) => {
     lotteryStatus: state.uid? state.user.generalSettings.lotterySettings.status: false,
     appStableVersion: state.appStableVersion
   };
-  await next();
-};
+}
