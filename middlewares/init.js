@@ -33,7 +33,7 @@ module.exports = async (ctx, next) => {
     if(err.status === 404) {
       console.log(`未知请求：${ctx.address} ${ctx.method} ${ctx.url}`.bgRed);
       ctx.status = 404;
-      ctx.body = 'Page not found';
+      ctx.body = 'not found';
       return
     }
   }

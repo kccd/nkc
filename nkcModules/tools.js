@@ -189,6 +189,9 @@ var Tools = function() {
       case 'lifePhoto': {
         return '/photo/' + id
       }
+      case 'bookCover': {
+        return '/a/' + id;
+      }
     }
   };
   self.getAnonymousInfo = function() {

@@ -1,0 +1,1 @@
+export const getUrl = NKC.methods.tools.getUrl;

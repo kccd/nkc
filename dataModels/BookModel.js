@@ -24,9 +24,9 @@ const schema = new mongoose.Schema({
     default: ''
   },
   // 目录列表
-  // 命名规则：type_id
-  // postId: post_pid
-  // articleId：article_aid
+  // 命名规则：type:id
+  // postId: post:pid
+  // articleId：article:aid
   list: {
     type: [String],
     default: []

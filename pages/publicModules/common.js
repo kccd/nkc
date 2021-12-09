@@ -1,3 +1,5 @@
+import {fileToBase64} from "../lib/js/file";
+
 var NKC = {
   methods: {},
   modules: {},
@@ -224,15 +226,7 @@ NKC.methods.base64ToFile = function(data, fileName) {
 * @param {String} URL
 * @author pengxiguaa 2019-7-26
 * */
-NKC.methods.fileToUrl = function(file) {
-  return new Promise(function(resolve, reject) {
-    var reads = new FileReader();
-    reads.readAsDataURL(file);
-    reads.onload = function (e) {
-      resolve(this.result);
-    };
-  });
-};
+NKC.methods.fileToUrl = fileToBase64;
 /*
 * 字符串转对象，对应pug渲染函数objToStr
 * @param {String} str 对象字符串
