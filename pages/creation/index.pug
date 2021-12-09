@@ -1,0 +1,10 @@
+extends ../bootstrap_base
+block title
+  +includeCSS('/creation/index.css', true)
+  title 创作中心
+block content
+  .container-fluid.max-width
+    #app
+block scripts
+  +includeJS("/vue-router/dist/vue-router.min.js", true)
+  +includeJS('/creation/index.js')
