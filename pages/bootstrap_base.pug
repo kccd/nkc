@@ -78,7 +78,7 @@ block body
   +includeJS("/checkData.js")
   //- 旧版common.js兼容旧的页面
   +includeJS('/interface_common.js')
-  if data.user
+  if remoteState.uid
     +includeJS('/socket.io-client/dist/socket.io.js', true)
     //- 通用socket
     if !remoteState.isApp

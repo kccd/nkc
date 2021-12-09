@@ -1,4 +1,3 @@
 <template lang="pug">
-  div
-    h1 Home
+  div single book
 </template>
