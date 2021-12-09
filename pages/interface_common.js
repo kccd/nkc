@@ -1164,7 +1164,64 @@ function closeNKCDrawer(type) {
   stopBodyScroll(false);
 }
 
-function toggleNKCDrawer(type) {
+const draws = {};
+function getVueDrawsId(uid) {
+  return `vue_draw_${uid}`;
+}
+
+function showLeftDrawVue(uid) {
+  const vueDrawId = getVueDrawsId(uid);
+  let draw = draws[vueDrawId];
+  if(!draw) {
+    //创建vue实例
+    draw = initVue(uid);
+    draws[vueDrawId] = draw;
+  }
+  draw.showDraw();
+};
+import Management from '../pages/publicModules/management/managementVue'
+import Apps from '../pages/publicModules/apps/appsVue'
+import Forums from '../pages/publicModules/forums_nav/forum_tree_vue'
+function initVue(uid) {
+  const draw = new Vue({
+    el: '#drawLeft',
+    data: {
+      loading: true,
+      show: false,
+      uid,
+      permission: {},
+      categoryForums: [],
+    },
+    mounted() {
+      this.getDrawData();
+    },
+    components: {
+      Management,
+      Apps,
+      Forums,
+    },
+    methods: {
+      getDrawData(){
+        const _this = this;
+        nkcAPI('/ld/' + uid, 'GET' , {})
+          .then(res => {
+            _this.categoryForums = res.categoryForums;
+            _this.permission = res.permission;
+            _this.loading = false;
+          })
+          .catch(err => {
+            console.log(err);
+          })
+      },
+      showDraw(){
+        this.show = true;
+      }
+    }
+  })
+  return draw;
+}
+
+function toggleNKCDrawer(type, uid) {
   var nkcDrawer = $(".nkc-drawer-"+type);
   if(nkcDrawer.hasClass('active')) {
     closeNKCDrawer(type);
@@ -1178,6 +1235,11 @@ function toggleNKCDrawer(type) {
       }
     }
     openNKCDrawer(type);
+    if(type === 'left') {
+      showLeftDrawVue(uid);
+    } else if (type === 'right') {
+
+    }
   }
 }
 
@@ -1454,4 +1516,6 @@ Object.assign(window, {
   openToNewLocation,
   addApptypeToUrl,
   sweetPrompt,
+  showLeftDrawVue,
+  initVue
 });

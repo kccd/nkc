@@ -8,7 +8,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
 
   .container-fluid.max-width
     .navbar-header
-      button.navbar-toggle.collapsed(onclick="toggleNKCDrawer('left')")
+      button.navbar-toggle.collapsed(onclick=`toggleNKCDrawer('left', ${data.user.uid})`)
         span.sr-only Toggle navigation
         span.icon-bar
         span.icon-bar
@@ -135,34 +135,42 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
 
 //- 侧滑抽屉
 //- nkc-drawer-left 暂时屏蔽
-//-.nkc-drawer-left
+.nkc-drawer-left
   .nkc-drawer-left-mask(onclick="closeNKCDrawer('left')")
-  .nkc-drawer-left-body
-    .m-a-1
-      include ../post_button
+  .nkc-drawer-left-body#drawLeft
+    .left-draw-container(v-if="show && !loading")
+      .m-a-1
+        include ../post_button
 
-    .navbar-link
-      .col-xs-3
-        a(href='/?t=latest') 最新
-      .col-xs-3
-        if data.user
-          a(href='/?t=subscribe') 关注
-        else
-          a(onclick="Login.open()") 关注
-      .col-xs-3
-        a(href=`/m`) 专栏
-      .col-xs-3
-        a(href=`/c`) 社区
-    .m-a-1#navbar_custom_dom
+      .navbar-link
+        .col-xs-3
+          a(href='/?t=latest') 最新
+        .col-xs-3
+          if data.user
+            a(href='/?t=subscribe') 关注
+          else
+            a(onclick="Login.open()") 关注
+        .col-xs-3
+          a(href=`/m`) 专栏
+        .col-xs-3
+          a(href=`/c`) 社区
+      .m-a-1#navbar_custom_dom
 
-    //-.m-a-1
-      include ../management/management
-      //-include ../subscribeTypes/subscribeTypesPanel
-      include ../apps/apps
-      include ../forums_nav/forums_tree
+      .m-a-1
+        Management(:permission="permission")
+        Apps(:permission="permission")
+        Forums(:forums="categoryForums")
+        //include ../management/management
+        //include ../subscribeTypes/subscribeTypesPanel
+        //include ../apps/apps
+        //include ../forums_nav/forums_tree
+    .left-draw-loading(v-else)
+      .loading
+        .fa.fa-spinner.fa-spin.fa-fw
+        .loading-text 加载中
 
 //- nkc-drawer-right 暂时屏蔽
-//-.nkc-drawer-right
+.nkc-drawer-right
   .nkc-drawer-right-mask(onclick="closeNKCDrawer('right')")
   .nkc-drawer-right-body
     if remoteState.uid
