@@ -58,6 +58,7 @@ module.exports = async (props) => {
   const func = async () => {
     //获取原视频尺寸
     const {width: videoWidth, height: videoHeight} = await tools.getFileInfo(filePath);
+
     if(videoWidth >= minWidth &&
       videoHeight >= minHeight &&
       waterAdd && enabled) {
@@ -74,6 +75,7 @@ module.exports = async (props) => {
       const isReachFHD = videoHeight >= fhd.height;
       const isReachHD  = !isReachFHD && videoHeight >= hd.height;
       const isReachSD  = !isReachHD  && videoHeight >= sd.height;
+
       //视频打水印
       // return ffmpegWaterMark(filePath, cover, waterGravity, outputVideoPath)
       await ffmpegWaterMark({
@@ -100,7 +102,36 @@ module.exports = async (props) => {
       });
       hasWatermark = true;
     } else {
-      // 视频转码
+
+      //各个视频尺寸的宽度
+      const widthSD = sd.height * videoWidth / videoHeight;
+      const widthHD = hd.height * videoWidth / videoHeight;
+      const widthFHD = fhd.height * videoWidth / videoHeight;
+      // 各个视频的比特率
+      const bitrateSD = await getBitrateBySize(widthSD, sd.height, configs, defaultBV);
+      const bitrateHD = await getBitrateBySize(widthHD, hd.height, configs, defaultBV);
+      const bitrateFHD = await getBitrateBySize(widthFHD, fhd.height, configs, defaultBV);
+      const isReachFHD = videoHeight >= fhd.height;
+      const isReachHD  = !isReachFHD && videoHeight >= hd.height;
+      const isReachSD  = !isReachHD  && videoHeight >= sd.height;
+      await modifyVideoBitRate(filePath, outputVideoPath, {
+        scalaByHeight: isReachFHD
+          ? fhd.height
+          : isReachHD
+            ? hd.height
+            : isReachSD
+              ? sd.height
+              : videoHeight,
+        bitRate: isReachFHD
+          ? bitrateFHD
+          : isReachHD
+            ? bitrateHD
+            : isReachSD
+              ? bitrateSD
+              : getBitrateBySize(videoWidth, videoHeight, configs, defaultBV)
+      });
+
+      /*// 视频转码
       if(['3gp'].indexOf(extension.toLowerCase()) > -1){
         await video3GPTransMP4(filePath, outputVideoPath);
       }else if(['mp4'].indexOf(extension.toLowerCase()) > -1) {
@@ -114,7 +145,7 @@ module.exports = async (props) => {
         await videoWEBMTransMP4(filePath, outputVideoPath);
       } else {
         await videoTransMP4(filePath, outputVideoPath, extension);
-      }
+      }*/
     }
 
     //生成视频封面图
@@ -378,6 +409,27 @@ async function addWaterMask(options) {
       .on("error", reject)
       .run();
   });
+}
+/*
+* 调整视频码率
+* */
+async function modifyVideoBitRate(filePath, output, options) {
+  const {scalaByHeight, bitRate} = options;
+  return await new Promise((resolve, reject) => {
+    ff(filePath)
+      .complexFilter([
+        `scale=-2:${scalaByHeight}`
+      ])
+      .videoBitrate(bitRate)
+      .outputOptions([
+        '-map_metadata',
+        '-1'
+      ])
+      .output(output)
+      .on("end", resolve)
+      .on("error", reject)
+      .run();
+  })
 }
 
 // 方位和position参数的映射关系
