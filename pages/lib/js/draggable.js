@@ -1,13 +1,13 @@
 /*
 * 将元素设为可拖动元素
 * @param {String} jQuery selector 需要设为可拖动元素的元素
-* @param {String} jQuery selector 拖动的手柄（鼠标按下该元素后移动）默认：.draggable-handle
+* @param {String} jQuery selector 拖动的手柄（鼠标按下该元素后移动）
 * */
-export function setAsDraggableElement(container, func) {
+export function setAsDraggableElement(container, handSelector, func) {
   const containerJQ = $(container);
   containerJQ.draggable({
     scroll: false,
-    handle: '.draggable-handle',
+    handle: $(handSelector),
     drag: function(event, ui) {
       if(ui.position.top < 0) ui.position.top = 0;
       var height = $(window).height();

@@ -1160,12 +1160,12 @@
         } else {
           doc.isReady && doReady(doc);
           if (browser.ie && browser.version != 11) {
-            (function () {
+            (function noname() {
               if (doc.isReady) return;
               try {
                 doc.documentElement.doScroll("left");
               } catch (error) {
-                setTimeout(arguments.callee, 0);
+                setTimeout(noname, 0);
                 return;
               }
               doReady(doc);
@@ -1174,8 +1174,8 @@
               doReady(doc)
             });
           } else {
-            doc.addEventListener("DOMContentLoaded", function () {
-              doc.removeEventListener("DOMContentLoaded", arguments.callee, false);
+            doc.addEventListener("DOMContentLoaded", function noname () {
+              doc.removeEventListener("DOMContentLoaded", noname, false);
               doReady(doc);
             }, false);
             win.addEventListener('load', function () {
@@ -13325,7 +13325,7 @@
         range = doParagraph(range, style, attrs, sourceCmdName);
         if (txt) {
           range.setStartBefore(txt).collapse(true);
-          pN = txt.parentNode;
+          var pN = txt.parentNode;
 
           domUtils.remove(txt);
 
@@ -29502,7 +29502,7 @@
           if (editor.options.wordCount) {
             function countFn() {
               setCount(editor, me);
-              domUtils.un(editor.document, "click", arguments.callee);
+              domUtils.un(editor.document, "click", countFn);
             }
 
             domUtils.on(editor.document, "click", countFn);

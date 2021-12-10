@@ -109,7 +109,7 @@ const messageApp = new Vue({
       const app = this;
       if(this.showPanel) {
         await sleep(100);
-        setAsDraggableElement(socketContainer, app.onContainerPositionChange);
+        setAsDraggableElement(socketContainer, '.draggable-handle', app.onContainerPositionChange);
         await sleep(100);
         app.initSocketContainerMouseEvent();
       }

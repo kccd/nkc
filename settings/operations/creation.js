@@ -13,7 +13,22 @@ module.exports = {
   book: {
     PARAMETER: {
       GET: 'creationCenter',
-      settings: {
+      edit: {
+        GET: 'creationCenter'
+      }
+    }
+  },
+  articles: {
+    GET: 'creationCenter',
+    creator: {
+      GET: 'creationCenter',
+      POST: 'creationCenter'
+    }
+  },
+  article: {
+    PARAMETER: {
+      GET: 'creationCenter',
+      edit: {
         GET: 'creationCenter'
       }
     }

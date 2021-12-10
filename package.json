@@ -71,6 +71,7 @@
     "cookie-signature": "^1.1.0",
     "cookies-string-parse": "^0.0.1",
     "core-js": "^2.6.12",
+    "cropperjs": "^1.5.12",
     "cross-env": "^5.2.0",
     "debug": "^2.6.9",
     "destroy": "^1.0.4",

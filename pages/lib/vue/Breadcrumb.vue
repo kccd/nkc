@@ -2,7 +2,7 @@
   .bread-crumb
     span.bread-crumb-item(v-for="(l, index) in list")
       span.bread-crumb-slash(v-if="index !== 0") /
-      span.bread-crumb-name(@click="navToPage(l.page)") {{l.name}}
+      span.bread-crumb-name(@click="navToPage(l.page)" :class="{'weight': !!l.page}") {{l.name}}
 </template>
 
 <style lang="less">
@@ -13,8 +13,10 @@
       padding: 0 0.5rem;
     }
     .bread-crumb-name{
-      cursor: pointer;
-      font-weight: 700;
+      &.weight{
+        font-weight: 700;
+        cursor: pointer;
+      }
     }
   }
 }

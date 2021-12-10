@@ -1,3 +1,5 @@
+import {getFileMD5} from "../../lib/js/file";
+
 NKC.modules.SelectResource = function() {
   var self = this;
   self.dom = $("#moduleSelectResource");
@@ -325,7 +327,7 @@ NKC.modules.SelectResource = function() {
             if(f.status === "uploaded") throw "文件已上传成功！";
             f.status = "uploading";
             // 获取文件md5
-            return NKC.methods.getFileMD5(f.data)
+            return getFileMD5(f.data)
           })
           .then(function(md5) {
             // 将md5发送到后端检测文件是否已上传
@@ -503,31 +505,6 @@ NKC.modules.SelectResource = function() {
           self.app.crash();
         });
       },
-      // 预览大图
-      /* viewPicture: function(e, resource) {
-        // console.log(e);
-        if(this.isTouchEmit) return;
-        if(resource.mediaType !== "mediaPicture") return;
-        clearTimeout(timer);
-        var rid = resource.rid;
-        $("#moduleSelectResourceViewPicture").css({
-          display: "block",
-          height: $(window).height(),
-          backgroundImage: "url(/r/"+ rid +")"
-        })
-      },
-      closePicture: function() {
-        // console.log(9879879);
-        var self = this;
-        timer = setTimeout(function() {
-          $("#moduleSelectResourceViewPicture").css({
-            display: "none"
-          });
-        }, 400);
-      },
-      onTouch: function() {
-        this.isTouchEmit = true;
-      } */
     }
   });
 

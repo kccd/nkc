@@ -7,13 +7,21 @@
             .creation-center-nav-item(@click="navToPage('material')") 素材箱
             .creation-center-nav-item(@click="navToPage('books')") 文档创作
       .col-xs-12.col-md-10
-        router-view
+        transition(:name="transitionName")
+          router-view
 </template>
 <script>
   export default {
     data: () => ({
-
+      transitionName: 'fade'
     }),
+    watch: {
+      $route (to, from) {
+        const toDepth = to.path.split('/').length
+        const fromDepth = from.path.split('/').length
+        this.transitionName = toDepth < fromDepth ? 'fade' : 'fade'
+      }
+    },
     methods: {
       navToPage(page) {
         this.$router.push({name: page});
@@ -21,8 +29,9 @@
     }
   }
 </script>
-<style lang="less">
+<style lang="less" scoped>
   @import '../publicModules/base';
+
   .creation-center{
     .creation-center-nav{
       // 创作中心名称高度

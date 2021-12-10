@@ -1,5 +1,6 @@
 <template lang="pug">
   .row
+    image-selector(ref="imageSelector")
     .col-xs-12.col-md-12
       bread-crumb(:list="navList")
     .col-xs-12.col-md-6.col-md-offset-3
@@ -14,8 +15,7 @@
           label.control-label 文档封面
           div
             img.book-cover(v-if="bookCover" :src="bookCover")
-            input.hidden(type="file" accept="image/*" ref="file" @change="selectedImage")
-            button.btn.btn-default.btn-sm(@click="toSelectImage") 选择封面
+            button.btn.btn-default.btn-sm(@click="openImageSelector") 选择封面
         .form-group
           button.btn.btn-default.btn-block(v-if="submitting" disabled) {{progress === 100? `处理中...`: `提交中...${progress}%`}}
           button.btn.btn-default.btn-block(v-else @click="submit") 提交
@@ -26,6 +26,7 @@
   import {fileToBase64} from "../../../lib/js/file";
   import {getUrl} from "../../../lib/js/tools";
   import {checkString} from "../../../lib/js/checkData";
+  import ImageSelector from '../../../lib/vue/ImageSelector';
 
   export default {
     data: () => ({
@@ -50,6 +51,9 @@
       progress: 0,
       submitting: false
     }),
+    components: {
+      'image-selector': ImageSelector
+    },
     computed: {
       bookCover() {
         const {book, fileBase64} = this;
@@ -84,16 +88,25 @@
           })
           .catch(sweetError)
       },
+      openImageSelector() {
+        const self = this;
+        let file;
+        this.$refs.imageSelector.open({
+          aspectRatio: 3
+        })
+          .then(image => {
+            file = image;
+            return fileToBase64(image)
+          })
+          .then(url => {
+            self.fileBase64 = url;
+            self.file = file;
+            self.$refs.imageSelector.close();
+          })
+          .catch(sweetError);
+      },
       toSelectImage() {
         this.$refs.file.click();
-      },
-      selectedImage() {
-        const file = this.$refs.file.files[0];
-        fileToBase64(file)
-          .then(url => {
-            this.fileBase64 = url;
-            this.file = file;
-          })
       },
       submit() {
         const {book, file} = this;
@@ -114,7 +127,7 @@
             if(!book.cover && !file) throw new Error(`请选择文档封面`);
             const formData = new FormData();
             if(file) {
-              formData.append('cover', file);
+              formData.append('cover', file, 'cover.png');
             }
             formData.append('book', JSON.stringify(book));
             return nkcUploadFile(`/creation/books/creator`, 'POST', formData, (e, p) => {
@@ -122,7 +135,9 @@
             });
           })
           .then(() => {
+            sweetSuccess('提交成功');
             self.submitting = false;
+            self.navToPage('books');
           })
           .catch(err => {
             self.submitting = false;
@@ -134,7 +149,7 @@
   }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
   .book-cover{
     max-width: 100%;
     margin-bottom: 1rem;
