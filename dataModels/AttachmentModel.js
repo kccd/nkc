@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const downloader = require("../tools/downloader");
 const Schema = mongoose.Schema;
 const schema = new Schema({
   // 附件ID mongoose.Types.ObjectId().toString()
@@ -279,12 +280,13 @@ schema.statics.savePostCover = async (pid, file) => {
     const extArr = ['jpg', 'jpeg', 'png'];
     resource = await ResourceModel.findOne({ext: {$in: extArr}, references: pid});
   }
-  if(!resource) return;
-  try{
-    const {url} = await resource.getRemoteFile();
-    file = await downloader(url);
-  } catch(err) {
-    return;
+  if(resource) {
+    try{
+      const {url} = await resource.getRemoteFile();
+      file = await downloader(url);
+    } catch(err) {
+      return;
+    }
   }
   const time = new Date();
   const aid = await AttachmentModel.getNewId();
