@@ -1,5 +1,4 @@
 const mongoose = require('../settings/database');
-const downloader = require("../tools/downloader");
 const Schema = mongoose.Schema;
 const schema = new Schema({
   // 附件ID mongoose.Types.ObjectId().toString()
