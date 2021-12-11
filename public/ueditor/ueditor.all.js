@@ -29542,13 +29542,30 @@
               img.getAttribute('data-id') !== id
             ) continue;
             if(state) {
+              domUtils.setAttributes(img, {
+                'data-type': 'picture',
+                'data-tag': 'nkcsource',
+                'src': src
+              });
+              /*
+              以下方法在 editor.getContent 时未生效
               img.setAttribute('data-type', 'picture');
               img.setAttribute('data-tag', 'nkcsource');
               img.setAttribute('src', src);
+              */
             } else {
+              domUtils.removeAttributes([
+                'data-type',
+                'data-id',
+              ]);
+              domUtils.setAttribute(img, {
+                'src': 'default/picdefault.png'
+              });
+              /*
               img.removeAttribute('data-type');
               img.removeAttribute('data-id');
               img.setAttribute('src', 'default/picdefault.png')
+              */
             }
           }
         });
