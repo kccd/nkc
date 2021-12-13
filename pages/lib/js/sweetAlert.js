@@ -166,3 +166,18 @@ export function asyncSweetError(text) {
     });
   });
 }
+
+export function asyncSweetSelf(text, html) {
+  return new Promise(function(resolve, reject) {
+    Swal({
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      html: html || '',
+      showCancelButton: true,
+      reverseButtons: true
+    })
+      .then(function() {
+        resolve();
+      })
+  });
+}

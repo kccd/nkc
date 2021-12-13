@@ -1,4 +1,9 @@
 import {getFileMD5} from "../../lib/js/file";
+import {
+  RNTakePictureAndUpload,
+  RNTakeVideoAndUpload,
+  RNTakeAudioAndUpload
+} from '../../lib/js/reactNative';
 
 NKC.modules.SelectResource = function() {
   var self = this;
@@ -491,17 +496,17 @@ NKC.modules.SelectResource = function() {
         this.getResources(0);
       },
       takePicture: function() {
-        NKC.methods.rn.emit("takePictureAndUpload", {}, function(data) {
+        RNTakePictureAndUpload({}, data => {
           self.app.crash();
         });
       },
       takeVideo: function() {
-        NKC.methods.rn.emit("takeVideoAndUpload", {}, function(data) {
+        RNTakeVideoAndUpload({}, data => {
           self.app.crash();
         });
       },
       recordAudio: function() {
-        NKC.methods.rn.emit("recordAudioAndUpload", {}, function(data) {
+        RNTakeAudioAndUpload({}, data => {
           self.app.crash();
         });
       },

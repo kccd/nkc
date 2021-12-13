@@ -109,6 +109,10 @@ var Tools = function() {
       case 'mediaPicture': {
         return fileDomain + "/r/" + id + t;
       }
+      // 原图
+      case "resourceOrigin": {
+        return "/ro/" + id + t;
+      }
       // 用户上传的附件
       case "resource": {
         return fileDomain + "/r/" + id + t

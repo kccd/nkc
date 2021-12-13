@@ -10,8 +10,16 @@ import {
   sweetSuccess,
   asyncSweetCustom,
   asyncSweetSuccess,
-  asyncSweetError
+  asyncSweetError,
+  asyncSweetSelf
 } from './lib/js/sweetAlert';
+
+import {
+  screenTopAlert,
+  screenTopWarning,
+  jalert,
+  jwarning
+} from "./lib/js/topAlert";
 
 // 定义最后光标对象
 window.lastEditRange = undefined;
@@ -39,156 +47,6 @@ if (!HTMLCanvasElement.prototype.toBlob) {
     }
   });
 }
-
-
-
-/***********************各种弹出框*******************************************/
-function jalert(obj){
-  if(screenTopAlert){
-    return screenTopAlert(JSON.stringify(obj))
-  }
-  else {
-    alert(JSON.stringify(obj))
-  }
-}
-
-function jwarning(obj){
-  if(screenTopWarning){
-    return screenTopWarning(JSON.stringify(obj))
-  }
-  else {
-    alert(JSON.stringify(obj))
-  }
-}
-
-// 将页面移动到弹窗打开的状态，返回一个函数，执行此函数以回到之前的状态
-function toAlertOpenState(onBack) {
-  var complete = false;
-  var handler = function(event) {
-    onBack();
-    window.removeEventListener("popstate", handler);
-    complete = true;
-  };
-  window.addEventListener("popstate", handler);
-  window.history.pushState({ sign: "swal" }, "alert", "" );
-  window.history.go(1);
-  return function() {
-    if(complete) return;
-    window.history.go(-1);
-  }
-}
-
-// 删除文件html内容弹窗
-function asyncSweetSelf(text, html) {
-  var backState = toAlertOpenState(function() {
-    Swal.close();
-  });
-  return new Promise(function(resolve, reject) {
-    Swal({
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-      html: html || '',
-      showCancelButton: true,
-      reverseButtons: true
-    })
-      .then(function(result) {
-        if(result.value === true) {
-          resolve();
-        } else {
-          backState();
-        }
-      })
-  });
-}
-
-function screenTopAlert(text){
-  return screenTopAlertOfStyle(text,'success')
-}
-
-function screenTopWarning(text){
-  text = text.error || text;
-  return screenTopAlertOfStyle(text,'warning')
-}
-
-var _alertcount = 0
-function screenTopAlertOfStyle(text,stylestring){
-  //rely on bootstrap styles
-
-  var objtext = $('<div/>').text(text).html();
-  var itemID = getID()
-
-  return new Promise(function(resolve,reject){
-    $('#alertOverlay').append(
-      '<div class="alert alert-'+ stylestring +'" id="' + itemID +
-      '" role="alert" style="opacity:0.9;text-align:center;display:block; pointer-events:none; position:relative;margin:auto; top:0;max-width:500px; width:100%; margin-bottom:3px">'
-      + objtext +'</div>'
-    );
-
-    var selector = '#'+itemID
-
-    setTimeout(function(){
-      $(selector).fadeOut('slow',function(){
-        $(selector).remove()
-        resolve(selector)
-      })
-    },2000)
-  })
-}
-
-function getID(){
-  _alertcount++;
-  var itemID = 'alert'+_alertcount.toString()
-  return itemID
-}
-
-function screenTopQuestion(title,choices){
-  title = $('<div/>').text(title).html();
-
-  var itemID = getID()
-  var selectID = getID()
-  var selector = '<select id="'+ selectID +'">'+choices.map(function(c){return '<option>'+c+'</option>'}).join('')+'</select>'
-
-  var buttonYesID = getID()
-  var buttonYes = '<button id="'+buttonYesID+'">确认</button>'
-
-  var buttonNoID = getID()
-  var buttonNo = '<button id="'+buttonNoID+'">取消</button>'
-
-  return new Promise(function(resolve,reject){
-    $('#alertOverlay').append(
-      '<div style="padding:10px;background-color:#cef;opacity:0.9;text-align:center;display:block;margin:auto;" id="'+itemID+'"><p>'+ title +'</p>'+
-      selector
-      +'<p>'+
-      buttonYes+buttonNo
-      +'</p>'
-      +'</div>'
-    )
-
-    function disappear(){
-      $('#'+itemID).remove()
-    }
-
-    $('#'+buttonYesID).click(function(){
-      resolve(geid(selectID).value)
-      disappear()
-    })
-
-    $('#'+buttonNoID).click(function(){
-      reject()
-      disappear()
-    })
-  })
-}
-
-function screenTopAlertInit(){
-  $("body").prepend(
-    '<div id="alertOverlay" style="z-index:10001; display:block; position:fixed; top:0; width:100%;">'
-    +'</div>'
-  );
-}
-
-screenTopAlertInit();
-/*******************************************************************************/
 
 function redirect(url){
   var urlnowpath = window.location.pathname
@@ -1387,7 +1245,6 @@ Object.assign(window, {
   nkcUploadFile,
   jalert,
   jwarning,
-  toAlertOpenState,
   sweetAlert,
   sweetSuccess,
   sweetError,
@@ -1401,10 +1258,6 @@ Object.assign(window, {
   asyncSweetError,
   screenTopAlert,
   screenTopWarning,
-  screenTopAlertOfStyle,
-  getID,
-  screenTopQuestion,
-  screenTopAlertInit,
   redirect,
   common,
   postUpload,

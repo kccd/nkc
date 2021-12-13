@@ -1,3 +1,6 @@
+import {RNUpdateLocalUser} from './lib/js/reactNative';
+import {getState} from './lib/js/state';
+const {isApp} = getState();
 function submit(id) {
 	var obj = {
 		description: $('#description').val(),
@@ -128,7 +131,7 @@ var app = new Vue({
 
 
 function emitEventToUpdateLocalUser(data) {
-  if(NKC.configs.isApp) NKC.methods.rn.emit("updateLocalUser", {});
+  if(isApp) RNUpdateLocalUser();
 }
 
 Object.assign(window, {

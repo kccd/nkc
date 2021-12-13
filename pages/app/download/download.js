@@ -1,3 +1,11 @@
+import {
+  RNDownloadFile,
+  RNOpenFile,
+  RNDeleteFile,
+  RNGetFiles,
+  RNConsoleLog,
+} from "../../lib/js/reactNative";
+
 var app = new Vue({
   el: '#app',
   data() {
@@ -17,7 +25,7 @@ var app = new Vue({
     this.setTimer();
     // NKC.methods.appConsoleLog({files:this.files})
     window.onerror = function(err) {
-      NKC.methods.appConsoleLog({err: err})
+      RNConsoleLog({err: err})
     };
   },
   computed: {
@@ -28,7 +36,7 @@ var app = new Vue({
     timeFormat: NKC.methods.tools.timeFormat,
     reloadFile(item) {
       const _this = this;
-      NKC.methods.rn.downloadFile(item.name, item.url, function() {
+      RNDownloadFile(item.name, item.url, function() {
         setTimeout(() => {
           _this.getDownloadFiles();
         }, 500)
@@ -37,14 +45,9 @@ var app = new Vue({
     openFile(item){
       if(item){
         if(item.status === 'success'){
-          NKC.methods.rn.emit('openFile', {path: item.path}, function () {})
+          RNOpenFile('openFile', {path: item.path}, function () {})
         }
       }
-    },
-    showFileInfo(file) {
-      NKC.methods.appConsoleLog(file)
-      const {path} = file;
-      sweetAlert(`保存路径：${path}`);
     },
     // app删除文件
     delFile(item){
@@ -67,7 +70,7 @@ var app = new Vue({
               isDelSource = true;
             }
             item.isDelSource = isDelSource;
-            NKC.methods.rn.emit('delFile', {file: item}, function () {
+            RNDeleteFile('delFile', {file: item}, function () {
               _this.getDownloadFiles();
             });
           })
@@ -86,7 +89,7 @@ var app = new Vue({
     //获取下载信息
     getDownloadFiles(){
       const _this = this;
-      NKC.methods.rn.emit('getFiles', [], function (res){
+      RNGetFiles('getFiles', [], function (res){
         _this.files = res.files.reverse();
         _this.loading = false;
       });

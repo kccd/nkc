@@ -1,4 +1,10 @@
 import SparkMD5 from '../../../public/external_pkgs/spark-md5/spark-md5.min';
+/*
+* 返回文件在本地的URL
+* @param {File} file 文件对象
+* @param {String} URL
+* @author pengxiguaa 2019-7-26
+* */
 export function fileToBase64(file) {
   return new Promise(function(resolve, reject) {
     var reads = new FileReader();
@@ -45,4 +51,17 @@ export function getFileMD5(file) {
     }
     loadNext();
   });
+}
+
+/*
+* 文件数据转文件
+* @param {Blob} blob 文件数据
+* @param {String} fileName 文件名
+* @return {File} 文件
+* @author pengxiguaa 2019-7-29
+* */
+export function blobToFile(blob, fileName) {
+  blob.lastModifiedDate = new Date();
+  blob.name = fileName || Date.now() + '.png';
+  return blob;
 }

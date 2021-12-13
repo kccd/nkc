@@ -24,4 +24,5 @@ export function setAsDraggableElement(container, handSelector, func) {
       }
     }
   });
+  return containerJQ;
 }

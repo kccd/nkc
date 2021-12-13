@@ -31,6 +31,10 @@
       file: null,
       root: null,
     }),
+    destroyed() {
+      this.destroyCropper();
+      this.destroyDraggable();
+    },
     methods: {
       initModal() {
         if(this.init === true) return;
@@ -45,6 +49,13 @@
         });
         this.root = root;
         this.init = true;
+      },
+      destroyDraggable() {
+        this.root.draggable('destroy');
+      },
+      destroyCropper() {
+        if(!this.cropper || !this.cropper.destroy) return;
+        this.cropper.destroy();
       },
       resetCropperImage() {
         this.cropper.replace(this.fileBase64);

@@ -588,35 +588,6 @@ function extractfid(){
 	return targetforum
 }
 
-function moveThreadTo(tid){
-	var fid = extractfid()
-	askCategoryOfForum(fid)
-		.then(function(cid){
-			return moveThread(tid,fid,cid)
-		})
-		.then(function(){
-			screenTopAlert('请刷新')
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error)
-		})
-}
-
-function askCategoryOfForum(fid){
-	fid = fid.toString()
-	return nkcAPI('/f/'+fid+'/category','GET',{})
-		.then(function(arr){
-			arr = arr.categorys;
-			if(!arr.length)return null
-			return screenTopQuestion('请选择一个分类：',['0:（无分类）'].concat(arr.map(function(i){return i.cid+':'+i.name})))
-		})
-		.then(function(str){
-			//console.log('selected:',str.split(':')[0]);
-			if(!str)return 0;
-			return str.split(':')[0]
-		})
-}
-
 function recycleThread(tid){
 	moveThread(tid,'recycle', 0)
 }
@@ -1433,8 +1404,6 @@ Object.assign(window, {
 	at,
 	goEditor,
 	extractfid,
-	moveThreadTo,
-	askCategoryOfForum,
 	recycleThread,
 	widerArea,
 	switchVInPersonalForum,

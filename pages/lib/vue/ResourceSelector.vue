@@ -67,7 +67,7 @@
           .resource-info(v-if="!resources.length") 空空如也~
           //- 资源显示
           .resource(v-else v-for="r, index in resources"
-            :title="'时间：'+ new Date(r.toc).toLocaleString()+'\\n文件名：' + r.oname")
+            :title="'时间：'+ timeFormat(r.toc)+'\\n文件名：' + r.oname")
             span(v-if='r.state === "usable"')
               .resource-picture(v-if="r.mediaType === 'uploading'" :style="'background-image:url(/rt/' + r.rid + ')'")
               .resource-picture.media-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
@@ -99,32 +99,33 @@
                 .fa.fa-exclamation-circle.pointer(v-if='r.errorInfo' :title='r.errorInfo' @click='showErrorInfo(r)')
         .module-sr-footer
           .pull-left
-            input.hidden#moduleSelectResourceInput(type="file" multiple="true" @change="selectedFiles")
+            input.hidden(ref='inputElement' type="file" multiple="true" @change="selectedFiles")
             button.btn.btn-default.btn-sm(@click="clickInput") 上传
-            button.btn.btn-default.btn-sm(v-if='isApp' @click="takePicture") 拍照
-            button.btn.btn-default.btn-sm(v-if='isApp' @click="takeVideo") 录像
-            button.btn.btn-default.btn-sm(v-if='isApp' @click="recordAudio") 录音
-            //-button.btn.btn-default.btn-sm(@click="crash") 刷新
-            #pasteContent.text-left.hidden-xs.hidden-sm(@click="readyPaste") 拖拽或粘贴文件到此处即可上传
+            button.btn.btn-default.btn-sm.m-r-05(v-if='isApp' @click="takePicture") 拍照
+            button.btn.btn-default.btn-sm.m-r-05(v-if='isApp' @click="takeVideo") 录像
+            button.btn.btn-default.btn-sm.m-r-05(v-if='isApp' @click="recordAudio") 录音
+            .text-left.hidden-xs.hidden-sm.paste-content(ref='pasteContent' @click="readyPaste") 拖拽或粘贴文件到此处即可上传
             span.size-limit.hidden-xs.hidden-sm(@click='showFileSizeLimit' :title='fileSizeLimit' v-if='fileSizeLimit') 大小限制
               .fa.fa-question-circle
-          //button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
           button(type="button" class="btn btn-primary btn-sm" v-if="!selectedResourcesId.length" disabled title="请先勾选图片") 确定
           button(type="button" class="btn btn-primary btn-sm" @click="done" v-else) 确定
       .edit-picture-body(v-else-if="pageType === 'editPicture'")
-        img#moduleSelectResourceEdit(style="max-width: 100%;height: 30rem;")
+        img.image(ref='imageElement')
         .module-sr-footer.m-t-1
           .pull-left
-            button.btn.btn-default.btn-sm(@click="rotate('left')") 左旋
+            button.btn.btn-default.btn-sm.m-r-05(@click="rotate('left')") 左旋
             button.btn.btn-default.btn-sm(@click="rotate('right')") 右旋
-          button(type="button" class="btn btn-default btn-sm" @click="cancelCropPicture") 取消
-          button(type="button" class="btn btn-primary btn-sm" disabled v-if="croppingPicture") 裁剪中..
+          button(type="button" class="m-r-05 btn btn-default btn-sm" @click="cancelCropPicture") 取消
+          button(type="button" class="m-r-05 btn btn-primary btn-sm" disabled v-if="croppingPicture") 裁剪中..
             .fa.fa-spinner.fa-spin.fa-fw
           button(type="button" class="btn btn-primary btn-sm" @click="cropPicture" v-else) 确定
-    #moduleSelectResourceViewPicture
 </template>
 
 <style lang="less" scoped>
+  img.image{
+    max-width: 100%;
+    height: 30rem;
+  }
   .resource-selector{
     display: none;
     position: fixed;
@@ -416,7 +417,7 @@
   .resource-selector  .resource-options .fa.active{
     color: #00ff04;
   }
-  .resource-selector  #pasteContent{
+  .resource-selector  .paste-content{
     display: inline-block;
     width: 20rem;
     height: 2.5rem;
@@ -449,47 +450,44 @@
     background-color: #dfdfdf;
   }
 
-  #moduleSelectResourceApp .resource-picture.media-picture {
+  .resource-picture.media-picture {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center center;
     background-color: black;
   }
 
-
-  /* 图片预览窗 */
-  #moduleSelectResourceViewPicture {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 460px;
-    /* background-color: #aaa; */
-    padding: 10px;
-    transition: all 0.4s;
-    pointer-events: none;
-    display: none;
-    background-size: contain;
-    background-position: center center;
-    background-repeat: no-repeat;
-  }
-  #moduleSelectResourceApp .size-limit{
+  .size-limit{
     margin-left: 0.5rem;
     font-size: 1rem;
   }
-  #moduleSelectResourceApp .size-limit .fa{
+  .size-limit .fa{
     color: #555;
   }
 
 </style>
 
 <script>
+  import 'cropperjs/dist/cropper.css';
+  import Cropper from 'cropperjs';
   import {setAsDraggableElement} from "../js/draggable";
-  import {getFileMD5} from "../js/file";
-  import {getSize} from "../js/tools";
+  import {getFileMD5, blobToFile} from "../js/file";
+  import {getSize, timeFormat, getUrl} from "../js/tools";
   import {debounce} from '../js/execution';
+  import {visitUrl} from "../js/pageSwitch";
+  import {nkcAPI, nkcUploadFile} from "../js/netAPI";
+  import {getState} from '../js/state';
+  import {screenTopWarning} from '../js/topAlert';
+  const {isApp} = getState();
+  import {
+    RNTakePictureAndUpload,
+    RNTakeAudioAndUpload,
+    RNTakeVideoAndUpload
+  } from '../js/reactNative';
+
   export default {
     data: () => ({
-      isApp: NKC.configs.isApp && NKC.configs.platform === 'reactNative',
+      isApp,
       uid: "",
       user: "",
       pageType: "list", // list: 资源列表, uploader: 上传
@@ -510,9 +508,15 @@
       isTouchEmit: false,
       sizeLimit: null,
       callback: null,
+
+      cropper: null,
+
+      draggableElement: null,
+      socketEventListener: null,
     }),
     mounted() {
-      this.initDom();
+      this.initDraggableElement();
+      this.initSocketEvent();
     },
     computed: {
       fileSizeLimit: function() {
@@ -576,22 +580,52 @@
         return arr;
       }
     },
+    destroyed() {
+      this.removeSocketEvent();
+      this.destroyCropper();
+      this.destroyDraggable();
+    },
     methods: {
-      getUrl: NKC.methods.tools.getUrl,
+      timeFormat: timeFormat,
+      getUrl: getUrl,
+      initCropper() {
+        if(this.cropper) return;
+        this.cropper = new Cropper(this.$refs.imageElement, {
+          aspectRatio: 1920/1080,
+          viewMode: 1,
+        });
+      },
+      destroyCropper() {
+        if(!this.cropper || !this.cropper.destroy) return;
+        this.cropper.destroy();
+        this.cropper = null;
+      },
+      destroyDraggable() {
+        if(!this.draggableElement) return;
+        this.draggableElement.draggable('destroy');
+      },
       showErrorInfo(r) {
         sweetInfo(r.errorInfo);
       },
-      initDom() {
-        setAsDraggableElement(this.$el, this.$refs.draggableHandle);
+      initDraggableElement() {
+        this.draggableElement = setAsDraggableElement(this.$el, this.$refs.draggableHandle);
       },
+      // 注册事件，当上传的文件处理成功后更新列表
       initSocketEvent() {
         const self = this;
-        window.socket.on("fileTransformProcess", function(data) {
+        this.socketEventListener = function(data) {
           if(data.state === "fileProcessFailed") {
             sweetError(`文件处理失败\n${data.err}`);
           }
           self.getResources(0);
-        })
+        }
+        window.socket.on("fileTransformProcess", this.socketEventListener);
+      },
+      // 销毁注册的 socket 事件
+      removeSocketEvent() {
+        if(!this.socketEventListener) return;
+        // 销毁事件
+        window.socket.off('fileTransformProcess', this.socketEventListener);
       },
       checkFileSize: function(filename, size) {
         var sizeLimit = this.sizeLimit;
@@ -617,63 +651,53 @@
         asyncSweetCustom(this.fileSizeLimit.replace(/\n/ig, '<br>'));
       },
       cancelCropPicture: function() {
-        this.resetCropper();
+        this.destroyCropper();
         this.changePageType("list");
       },
       rotate: function(type) {
+        const self = this;
         if(type === "left") {
           self.cropper.rotate(-90);
         } else {
           self.cropper.rotate(90);
         }
       },
-      resetCropper: function() {
-        if(self.cropper && self.cropper.destroy) {
-          self.cropper.destroy();
-        }
-      },
       editImage: function(r) {
+        const self = this;
         this.croppingPicture = false;
         this.changePageType("editPicture");
-        const self = this;
-        setTimeout(function(){
-          self.resetCropper();
-          var $image = $('#moduleSelectResourceEdit');
-
-          $image.cropper({
-            viewMode: 1
-          });
-
-          self.cropper = $image.data('cropper');
-          var src = "";
+        setTimeout(() => {
+          self.initCropper();
+          let src = '';
           if(r.originId) {
-            src = "/ro/" + r.originId;
+            src = getUrl('resourceOrigin', r.originId);
           } else {
-            src ="/r/" + r.rid;
+            src = getUrl('resource', r.rid);
           }
           self.cropper.replace(src);
-        }, 10);
+        });
       },
       cropPicture: function() {
-        self.app.croppingPicture = true;
+        const self = this;
+        self.croppingPicture = true;
         setTimeout(function() {
           try{
             self.cropper.getCroppedCanvas().toBlob(function(blob) {
-              var file = NKC.methods.blobToFile(blob, Date.now() + ".jpg");
-              self.app.uploadSelectFile(file);
-              self.app.changePageType("list");
-              self.app.resetCropper();
+              var file = blobToFile(blob, Date.now() + ".png");
+              self.uploadSelectFile(file);
+              self.changePageType("list");
+              self.destroyCropper();
             }, "image/jpeg");
           } catch(err) {
             console.log(err);
-            self.app.croppingPicture = false;
+            self.croppingPicture = false;
             sweetError(err);
           }
         }, 10);
       },
       readyPaste: function() {
         var self = this;
-        var dom = $("#pasteContent");
+        var dom = this.$refs.pasteContent;
         dom.off("paste");
         dom.one("paste", function(e) {
           var clipboardData = e.clipboardData || e.originalEvent && e.originalEvent.clipboardData || {};
@@ -688,16 +712,9 @@
           self.uploadSelectFile(_files);
         });
       },
-      pasteContent: function() {
-        // alert(this);
-      },
-      destroyModule: function() {
-        $(this.$el).draggable("destroy");
-      },
       close: function() {
         this.hideDom();
-        this.destroyModule();
-        this.resetCropper();
+        this.destroyCropper();
         const self = this;
         setTimeout(function() {
           self.selectedResources = [];
@@ -712,7 +729,7 @@
         $(this.$el).hide();
       },
       open: function(callback, options = {}) {
-        // this.resetCropper();
+        this.destroyCropper();
         const {
           countLimit = 50,
           allowedExt = ['all', 'audio', 'video', 'attachment', 'picture'],
@@ -764,7 +781,7 @@
       },
       clickInput: function() {
         if(this.files.length >= 20) sweetInfo("最多仅允许20个文件同时上传，请稍后再试。");
-        var input = document.getElementById("moduleSelectResourceInput");
+        var input = this.$refs.inputElement;
         if(input) input.click();
       },
       removeFile: function(index) {
@@ -873,7 +890,7 @@
       // 用户已选择待上传的文件
       selectedFiles: function() {
         var self = this;
-        var input = $("#moduleSelectResourceInput")[0];
+        var input = this.$refs.inputElement;
         // 这个数组中文件的顺序和用户选择的顺序相反，即先选的靠后，后选的靠前
         var files = [].slice.call(input.files);
         input.value = "";
@@ -892,13 +909,14 @@
         this.getResources(paging.page);
       },
       done: function() {
+        if(!this.callback) return;
         var selectedResources = this.selectedResources;
         var selectedResourcesId = this.selectedResourcesId;
-        self.callback({
+        this.callback({
           resources: selectedResources,
           resourcesId: selectedResourcesId
         });
-        self.close();
+        this.close();
       },
       fastSelectPage: function() {
         var pageNumber = this.pageNumber - 1;
@@ -919,14 +937,14 @@
         return index;
       },
       visitUrl: function(url) {
-        NKC.methods.visitUrl(url, true);
+        visitUrl(url, true);
       },
       removeSelectedResource: function(index) {
         this.selectedResources.splice(index, 1);
       },
       fastSelectResource: function(r) {
         if(this.fastSelect) {
-          self.callback(r);
+          if(this.callback) this.callback(r);
         } else {
           this.selectResource(r);
         }
@@ -945,18 +963,21 @@
         this.getResources(0);
       },
       takePicture: function() {
-        NKC.methods.rn.emit("takePictureAndUpload", {}, function(data) {
-          self.app.crash();
+        const self = this;
+        RNTakePictureAndUpload({}, () => {
+          self.crash();
         });
       },
       takeVideo: function() {
-        NKC.methods.rn.emit("takeVideoAndUpload", {}, function(data) {
-          self.app.crash();
+        const self = this;
+        RNTakeVideoAndUpload({}, () => {
+          self.crash();
         });
       },
       recordAudio: function() {
-        NKC.methods.rn.emit("recordAudioAndUpload", {}, function(data) {
-          self.app.crash();
+        const self = this;
+        RNTakeAudioAndUpload({}, () => {
+          self.crash();
         });
       },
     },
