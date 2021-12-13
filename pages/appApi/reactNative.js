@@ -97,7 +97,10 @@ function touchLong(e) {
   let src = target.getAttribute('data-src');
   if(!src) src = target.getAttribute('src');
   if(targetNodeName === 'img' && dataType === 'view' && src) {
-    src = window.location.origin + src;
+    if(src.indexOf('http') !== 0) {
+      src = window.location.origin + src;
+    }
+
     // 图片处理
     const images = document.querySelectorAll('img[data-type="view"]');
     const urls = [];
@@ -110,7 +113,9 @@ function touchLong(e) {
         _src = image.getAttribute('src');
       }
       if(!_src) return;
-      _src = window.location.origin + _src;
+      if(_src.indexOf('http') !== 0) {
+        _src = window.location.origin + _src;
+      }
       if(_src === src) {
         index = i;
       }
