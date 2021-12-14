@@ -1,4 +1,3 @@
-import {initLongPressEvent} from "./longPress";
 import {sweetQuestion} from "./sweetAlert";
 const reactNativeCallback = {};
 let reactNativeIndex = 0;
@@ -27,7 +26,7 @@ export function RNOnMessage(res) {
   }
 }
 
-export function urlPathEval(fromUrl, toUrl) {
+export function RNUrlPathEval(fromUrl, toUrl) {
   if (!toUrl) {
     toUrl = fromUrl;
     fromUrl = location.href;
@@ -36,103 +35,14 @@ export function urlPathEval(fromUrl, toUrl) {
   return new URL(toUrl, fullFromUrl).href;
 }
 
-export function RNInitLongPressEventToDownloadImage() {
-  initLongPressEvent(document, (e) => {
-    const target = e.target;
-    const targetNodeName = target.nodeName.toLowerCase();
-    const dataType = target.getAttribute('data-type');
-    let src = target.getAttribute('data-src');
-    if(!src) src = target.getAttribute('src');
-    if(targetNodeName === 'img' && dataType === 'view' && src) {
-      if(src.indexOf('http') !== 0) {
-        src = window.location.origin + src;
-      }
-      const name = target.getAttribute('alt') || '';
-      RNEmit('longViewImage', {
-        urls: [
-          {
-            url: src,
-            name
-          }
-        ],
-        index: 0,
-      });
-      e.preventDefault();
-    }
-  })
-}
 
-export function RNInitClientEvent() {
-  document.addEventListener('click', e => {
-    const target = e.target;
-    const targetNodeName = target.nodeName.toLowerCase();
-    const dataType = target.getAttribute('data-type');
-    let src = target.getAttribute('data-src');
-    if(!src) src = target.getAttribute('src');
-    if(targetNodeName === 'img' && dataType === 'view' && src) {
-      if(src.indexOf('http') !== 0) {
-        src = window.location.origin + src;
-      }
-      // 图片处理
-      const images = document.querySelectorAll('img[data-type="view"]');
-      const urls = [];
-      let index;
-      for(let i = 0; i < images.length; i++) {
-        const image = images[i];
-        const name = image.getAttribute('alt');
-        let _src = image.getAttribute('data-src');
-        if(!_src) {
-          _src = image.getAttribute('src');
-        }
-        if(!_src) return;
-        if(_src.indexOf('http') !== 0) {
-          _src = window.location.origin + _src;
-        }
-        if(_src === src) {
-          index = i;
-        }
-        urls.push({
-          url: _src,
-          name
-        });
-      }
-      RNViewImage(urls, index);
-      e.preventDefault();
-    } else {
-      // 链接处理
-      let $a;
-      if (targetNodeName === 'a') {
-        $a = target;
-      } else {
-        $a = $(target).parents('a');
-        if($a.length) $a = $a[0];
-      }
-      let href, title;
-      if($a && $a.getAttribute) {
-        href = $a.getAttribute('href');
-        title = $a.getAttribute('title');
-      }
-      if(!href) return;
-      const aDataType = $a.getAttribute('data-type');
-      const aDataTitle = $a.getAttribute('data-title');
-      if(aDataType === 'download') {
-        e.preventDefault();
-        RNDownloadFile(aDataTitle, href);
-      } else if(aDataType !== 'reload') {
-        e.preventDefault();
-        const targetUrl = urlPathEval(location.href, href);
-        RNOpenNewPage(targetUrl, title)
-      }
-    }
-  })
-}
 /*
 * 通知 ReactNative 下载文件
 * @param {String} filename 文件名
 * @param {String} 下载链接
 * */
 export function RNDownloadFile(filename, url, callback) {
-  url = urlPathEval(location.href, url);
+  url = RNUrlPathEval(location.href, url);
   filename = filename || (Date.now()+ '_' + Math.floor(Math.random() * 1000) + '.file');
   return sweetQuestion(`确定要下载文件「${filename}」至 Download 目录?`)
     .then(() => {
