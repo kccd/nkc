@@ -9,7 +9,8 @@ module.exports = async (ctx) => {
       {}
     );
   } else if(ctx.template) {
-    const templatePath = PATH.resolve(__dirname, '../../pages', ctx.template);
+    const pagesPath = PATH.resolve(__dirname, '../../pages');
+    const templatePath = PATH.resolve(pagesPath, ctx.template);
     if(!await ctx.nkcModules.file.access(templatePath)) {
       ctx.throw(500, `Pug 模板文件不存在 path: ${templatePath}`);
     }

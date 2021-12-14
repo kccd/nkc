@@ -66,6 +66,8 @@ const communityRouter = routers.community;
 const logoRouter = routers.logo;
 // 产品管理系统
 const pimRouter = routers.pim;
+//手机浏览器滑动框
+const drawDataRouter = routers.drawData;
 
 const path = require('path');
 
@@ -142,4 +144,5 @@ router.use("/l", linkRouter.routes(), linkRouter.allowedMethods());
 router.use("/wm", watermarkRouter.routes(), watermarkRouter.allowedMethods());
 router.use('/logo', logoRouter.routes(), logoRouter.allowedMethods());
 router.use('/creation', creationRouter.routes(), creationRouter.allowedMethods());
+router.use('/draw', drawDataRouter.routes(), drawDataRouter.allowedMethods());
 module.exports = router;

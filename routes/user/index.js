@@ -534,7 +534,7 @@ userRouter
     };
     await db.UsersBehaviorModel(behavior).save();
     data.paging = paging;
-    ctx.template = "/user/user.pug";
+    ctx.template = "user/user.pug";
     await next();
   })
   .post('/:uid/pop', async (ctx, next) => {

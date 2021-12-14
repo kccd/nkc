@@ -15,7 +15,7 @@ router
       if(u) blackListUsers.push(u);
     }
     data.blackListUsers = blackListUsers;
-    ctx.template = "/user/settings/message/message.pug";
+    ctx.template = "user/settings/message/message.pug";
     await next();
   });
 module.exports = router;
