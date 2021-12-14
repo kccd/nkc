@@ -24002,6 +24002,8 @@
             var i, j, ci, cj, oldSrc, newSrc;
             for (i = 0; ci = imgs[i++];) {
               oldSrc = ci.getAttribute("_src") || ci.src || "";
+              var dataType = ci.getAttribute('data-type');
+              if(['downloadFailed', 'nkcsource'].indexOf(dataType) !== -1) continue;
               if (oldSrc == info.source && info.state == "SUCCESS") {
                 newSrc = "/default/picloading.png";
                 domUtils.setAttributes(ci, {
@@ -29545,7 +29547,8 @@
               domUtils.setAttributes(img, {
                 'data-type': 'picture',
                 'data-tag': 'nkcsource',
-                'src': src
+                'src': src,
+                '_src': src,
               });
               /*
               img.setAttribute('data-type', 'picture');
@@ -29558,7 +29561,9 @@
                 'data-id',
               ]);
               domUtils.setAttribute(img, {
-                'src': 'default/picdefault.png'
+                'src': 'default/picdefault.png',
+                '_src': 'default/picdefault.png',
+                'data-type': 'downloadFailed'
               });
               /*
               img.removeAttribute('data-type');
