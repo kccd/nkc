@@ -51,7 +51,7 @@
         this.init = true;
       },
       destroyDraggable() {
-        this.root.draggable('destroy');
+        if(this.root && this.root.draggable) this.root.draggable('destroy');
       },
       destroyCropper() {
         if(!this.cropper || !this.cropper.destroy) return;
