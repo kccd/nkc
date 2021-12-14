@@ -3,6 +3,8 @@
     .bg-danger.text-danger.p-a-1.text-center(v-if="errorInfo") 编辑器初始化失败： {{errorInfo}}
     div(v-else)
       resource-selector(ref="resourceSelector")
+      draft-selector(ref="draftSelector")
+      sticker-selector(ref="stickerSelector")
       div(:id="domId")
 </template>
 
@@ -17,16 +19,26 @@
   import '../../../pages/ueditor/ueditor.config';
   import '../../../pages/ueditor/ueditor.all.js';
   import {getUrl} from "../js/tools";
-  import {getSocket} from "../js/socket";
+  import {resourceToHtml} from "../js/dataConversion";
   import ResourceSelector from './ResourceSelector';
+  import DraftSelector from './DraftSelector';
+  import StickerSelector from './StickerSelector';
   export default {
-    props: ['configs'],
+    props: ['configs', 'plugs'],
     components: {
-      'resource-selector': ResourceSelector
+      'resource-selector': ResourceSelector,
+      'draft-selector': DraftSelector,
+      'sticker-selector': StickerSelector
     },
     data: () => ({
       domId: '',
       errorInfo: '',
+      noticeFunc: null,
+      defaultPlugs: {
+        resourceSelector: true,
+        draftSelector: true,
+        stickerSelector: true,
+      },
       defaultConfigs: {
         toolbars: [
           [
@@ -39,7 +51,7 @@
             'inserttable', '|',
             'removeformat', 'pasteplain', '|',
             'justifyleft', 'justifycenter', 'justifyright', '|',
-            'insertcode'
+            'insertcode', '|',
           ]
         ],
         initialFrameHeight: 500, // 编辑器高度
@@ -56,20 +68,26 @@
         readonly: false, // 只读模式
         wordCount: false, // 是否开启字数统计
         maximumWords: 100, // 最大字符数
-        zIndex: 499
+        zIndex: 499,
       },
     }),
     async mounted () {
       try{
         await this.initDomId();
+        await this.initPlugs();
         await this.initEditor();
         await this.initSocketEvent();
-        this.$refs.resourceSelector.open();
+        await this.initNoticeEvent();
       } catch(err) {
         console.log(err);
         this.errorInfo = err.error || err.message || err.toString();
       }
-
+    },
+    destroyed() {
+      if(this.editor && this.editor.destroy) {
+        this.editor.destroy();
+      }
+      this.removeNoticeEvent();
     },
     methods: {
       initDomId() {
@@ -80,9 +98,25 @@
         const self = this;
         return new Promise((resolve, reject) => {
           const {domId, defaultConfigs, configs = {}} = self;
-          self.editor = UE.getEditor(domId, Object.assign(defaultConfigs, configs));
+          self.editor = UE.getEditor(domId, Object.assign({}, defaultConfigs, configs));
           self.editor.ready(resolve);
         });
+      },
+      initNoticeEvent() {
+        this.removeNoticeEvent();
+        this.noticeFunc = function(e) {
+          const info = '关闭页面会导致已输入的数据丢失，确定要继续？';
+          e = e || window.event;
+          if(e) {
+            e.returnValue = info;
+          }
+          return info;
+        };
+        window.onbeforeunload = this.noticeFunc;
+      },
+      removeNoticeEvent() {
+        if(!window.onbeforeunload || window.onbeforeunload !== this.noticeFunc) return;
+        window.onbeforeunload = null;
       },
       async initSocketEvent() {
         const self = this;
@@ -102,12 +136,84 @@
       },
       getContent() {
         this.editor.getContent();
-      }
+      },
+      initPlugsResourceSelector() {
+        const self = this;
+        UE.registerUI('resourceSelector',function(editor, uiName){
+          return new UE.ui.Button({
+            name: uiName,
+            title: '插入图片和附件',
+            className: 'edui-default edui-for-image-selector edui-icon',
+            onclick: function () {
+              self.$refs.resourceSelector.open(data => {
+                if(data.resources) {
+                  data = data.resources;
+                } else {
+                  data = [data];
+                }
+                for(var i = 0; i < data.length; i++) {
+                  var source = data[i];
+                  var type = source.mediaType;
+                  type = type.substring(5);
+                  type = type[0].toLowerCase() + type.substring(1);
+                  self.editor.execCommand('inserthtml', resourceToHtml(type, source.rid, source.oname));
+                }
+              }, {
+                fastSelect: true
+              });
+            }
+          })
+        });
+      },
+      initDraftSelector() {
+        const self = this;
+        UE.registerUI('draftSelector',function(editor, uiName){
+          return new UE.ui.Button({
+            name: uiName,
+            title: '草稿箱',
+            className: 'edui-default edui-for-draft edui-icon',
+            onclick:function () {
+              self.$refs.draftSelector.open(data => {
+                if(!data || !data.content) return;
+                self.editor.execCommand('inserthtml', data.content);
+              });
+            }
+          });
+        });
+      },
+      initStickerSelector() {
+        const self = this;
+        UE.registerUI('stickerSelector',function(editor, uiName){
+          return new UE.ui.Button({
+            name: uiName,
+            title:'插入表情',
+            className: 'edui-default edui-for-emotion edui-icon',
+            onclick:function () {
+              self.$refs.stickerSelector.open(res => {
+                if(!res) return;
+                if(res.type === "emoji") {
+                  editor.execCommand('inserthtml', resourceToHtml("twemoji", res.data));
+                }else if(res.type === "sticker") {
+                  editor.execCommand('inserthtml', resourceToHtml("sticker", res.data.rid));
+                }
+              });
+            }
+          })
+        });
+      },
+      initPlugs() {
+        const {plugs = {}, defaultPlugs} = this;
+        const _plugs = Object.assign({}, defaultPlugs, plugs);
+        if(_plugs.resourceSelector) {
+          this.initPlugsResourceSelector();
+        }
+        if(_plugs.draftSelector) {
+          this.initDraftSelector();
+        }
+        if(_plugs.stickerSelector) {
+          this.initStickerSelector();
+        }
+      },
     },
-    destroyed() {
-      if(this.editor && this.editor.destroy) {
-        this.editor.destroy();
-      }
-    }
   }
 </script>

@@ -133,10 +133,9 @@
     max-width: 100%;
     top: 100px;
     right: 0;
-    z-index: 1050;
     background-color: #fff;
     box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    border: 1px solid #ddd;
+    border: 1px solid #c7c7c7;
   }
   .module-sr-footer{
     text-align: right;
@@ -470,7 +469,7 @@
 <script>
   import 'cropperjs/dist/cropper.css';
   import Cropper from 'cropperjs';
-  import {setAsDraggableElement} from "../js/draggable";
+  import {DraggableElement} from "../js/draggable";
   import {getFileMD5, blobToFile} from "../js/file";
   import {getSize, timeFormat, getUrl} from "../js/tools";
   import {debounce} from '../js/execution';
@@ -518,6 +517,12 @@
       this.initDraggableElement();
       this.initSocketEvent();
       this.initDragUploadEvent();
+    },
+    destroyed() {
+      this.removeSocketEvent();
+      this.destroyCropper();
+      this.destroyDraggable();
+      this.disableDragUploadEvent();
     },
     computed: {
       fileSizeLimit: function() {
@@ -581,12 +586,6 @@
         return arr;
       }
     },
-    destroyed() {
-      this.removeSocketEvent();
-      this.destroyCropper();
-      this.destroyDraggable();
-      this.disableDragUploadEvent();
-    },
     methods: {
       timeFormat: timeFormat,
       getUrl: getUrl,
@@ -602,14 +601,13 @@
         this.cropper = null;
       },
       destroyDraggable() {
-        if(!this.draggableElement) return;
-        this.draggableElement.draggable('destroy');
+        this.draggableElement.destroy();
       },
       showErrorInfo(r) {
         sweetInfo(r.errorInfo);
       },
       initDraggableElement() {
-        this.draggableElement = setAsDraggableElement(this.$el, this.$refs.draggableHandle);
+        this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
       },
       // 注册事件，当上传的文件处理成功后更新列表
       initSocketEvent() {
@@ -757,10 +755,10 @@
         }, 500);
       },
       showDom() {
-        $(this.$el).show();
+        this.draggableElement.show();
       },
       hideDom() {
-        $(this.$el).hide();
+        this.draggableElement.hide();
       },
       open: function(callback, options = {}) {
         this.destroyCropper();

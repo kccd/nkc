@@ -1,7 +1,7 @@
 
 import Message from './message.2.0.vue';
 import {getScrollBarWidth, hasScrollBar} from "../lib/js/scrollBar";
-import {setAsDraggableElement} from "../lib/js/draggable";
+import {DraggableElement, setAsDraggableElement} from "../lib/js/draggable";
 import {getFromLocalStorage, updateInLocalStorage, saveToLocalStorage} from "../lib/js/localStorage";
 import {debounce} from "../lib/js/execution";
 import {sleep} from "../lib/js/timeout";
@@ -109,7 +109,8 @@ const messageApp = new Vue({
       const app = this;
       if(this.showPanel) {
         await sleep(100);
-        setAsDraggableElement(socketContainer, '.draggable-handle', app.onContainerPositionChange);
+        new DraggableElement(socketContainer, '.draggable-handle', app.onContainerPositionChange);
+        // setAsDraggableElement(socketContainer, '.draggable-handle', app.onContainerPositionChange);
         await sleep(100);
         app.initSocketContainerMouseEvent();
       }

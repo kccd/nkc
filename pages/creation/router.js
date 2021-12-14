@@ -15,7 +15,9 @@ const routes = [
   {name: 'articleEditor', path: '/creation/article/:aid/edit', component: ArticleEditor},
 ];
 
-export default new VueRouter({
+const router = new VueRouter({
   mode: 'history',
   routes
 });
+
+export default router;

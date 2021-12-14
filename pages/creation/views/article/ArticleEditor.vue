@@ -7,7 +7,7 @@
         .form-group
           input.form-control(type="text" v-model="article.title")
         .form-group
-          editor(:configs="editorConfigs" ref="editor")
+          editor(:configs="editorConfigs" ref="editor" :plugs="editorPlugs")
 
 </template>
 
@@ -17,6 +17,9 @@
   export default {
     components: {
       'editor': Editor
+    },
+    mounted() {
+
     },
     data: () => ({
       navList: [
@@ -34,6 +37,9 @@
       },
       editorConfigs: {
 
+      },
+      editorPlugs: {
+        resourceSelector: true
       }
     })
   }

@@ -14167,6 +14167,7 @@
 
 
     me.addListener('beforeinserthtml', function (evtName, html) {
+      html = NKC.methods.ueditor.setContent(html);
       var me = this,
         rng = me.selection.getRange(),
         pre = domUtils.findParentByTagName(rng.startContainer, 'pre', true);
