@@ -1,5 +1,5 @@
 <template lang="pug">
-  .m-b-1
+  .m-b-1(v-if="permission.nkcManagement || permission.visitExperimentalStatus || permission.review || permission.complaintGet || permission.visitProblemList || permission.getLibraryLogs")
     .panel-header 管理
     .module-managements
       a.module-management(v-if="permission.nkcManagement" href="/nkc" target='_blank')
@@ -11,18 +11,15 @@
       a.module-management(v-if="permission.review" href="/review" target='_blank')
         .fa.fa-shield
         span &nbsp;审核内容
-        //-if data.unReviewedCount
-          .management-count=data.unReviewedCount
+        .management-count(v-if="data.unReviewedCount") {{data.unReviewedCount}}
       a.module-management(v-if="permission.complaintGet" href="/complaint" target='_blank')
         .fa.fa-minus-circle
         span &nbsp;投诉列表
-        //-if data.unResolvedComplaintCount
-          .management-count=data.unResolvedComplaintCount
+        .management-count(v-if="data.unResolvedComplaintCount") {{data.unResolvedComplaintCount}}
       a.module-management(v-if="permission.visitProblemList" href="/problem/list" target='_blank')
         .fa.fa-exclamation-circle
         span &nbsp;问题列表
-        //-if data.unResolvedProblemCount
-          .management-count=data.unResolvedProblemCount
+        .management-count(v-if="data.unResolvedProblemCount") {{data.unResolvedProblemCount}}
       a.module-management(v-if="permission.getLibraryLogs" href="/libraries/logs" target='_blank')
         .fa.fa-book
         span &nbsp;文库记录
@@ -30,7 +27,7 @@
 
 <script>
 export default {
-  props: ['permission'],
+  props: ['permission', 'data'],
   data: () => ({
   }),
   mounted() {

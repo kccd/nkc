@@ -78,7 +78,7 @@ const payment = require('./payment');
 const link = require('./link');
 const community = require('./community');
 const watermark = require('./watermark');
-const leftDrawData = require('./leftDrawData');
+const drawData = require('./drawData');
 const logo = require('./logo');
 const pim = require('./pim');
 const operationObj = {};
@@ -272,7 +272,7 @@ operationObj.operationTree = {
     creation, // 用户创作中心
     pim, // 产品管理系统
     test,
-		ld: leftDrawData, //获取手机浏览器左侧滑动框
+		draw: drawData, //获取手机浏览器左侧滑动框
 	}
 };
 module.exports = operationObj;

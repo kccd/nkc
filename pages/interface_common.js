@@ -1164,36 +1164,158 @@ function closeNKCDrawer(type) {
   stopBodyScroll(false);
 }
 
-const draws = {};
-function getVueDrawsId(uid) {
-  return `vue_draw_${uid}`;
+//鼠标移入头像时显示用户操作导航
+function initUserNavVue(type, uid){
+  const vueDrawId = getVueDrawsId(type);
+  let userNavDraw = draws[vueDrawId];
+  if(!userNavDraw){
+    //创建vue实例
+    userNavDraw = initUserNav(uid);
+    draws[vueDrawId] = userNavDraw;
+  }
+  userNavDraw.showDraw();
 }
 
-function showLeftDrawVue(uid) {
-  const vueDrawId = getVueDrawsId(uid);
-  let draw = draws[vueDrawId];
-  if(!draw) {
+import userNav from "./publicModules/userNav/userNavBox";
+//创建用户导航栏vue实例
+function initUserNav(uid){
+  const draw = new Vue({
+    el: '#userNav',
+    data: {
+      uid,
+      show: false,
+      loading: true,
+      anvState: {}
+    },
+    mounted(){
+      this.getUserNavData();
+    },
+    components: {
+      "user-nav": userNav,
+    },
+    methods: {
+      //获取用户导航数据
+      getUserNavData(){
+        const _this = this;
+        nkcAPI(`/draw/${this.uid}/userNav`, 'GET', {})
+          .then(res => {
+            _this.anvState = res.anvState;
+            _this.loading = false;
+          })
+          .catch(err => {
+            console.log(err);
+          })
+      },
+      showDraw(){
+        this.show = true;
+      }
+    }
+  })
+  return draw;
+}
+
+//已经实例化的vue实例
+const draws = {};
+function getVueDrawsId(type) {
+  return `vue_draw_${type}`;
+}
+
+//左侧滑动框
+function showLeftDrawVue(type, uid) {
+  const vueDrawId = getVueDrawsId(type);
+  let leftDraw = draws[vueDrawId];
+  if(!leftDraw) {
     //创建vue实例
-    draw = initVue(uid);
-    draws[vueDrawId] = draw;
+    leftDraw = initLeftVue(uid);
+    draws[vueDrawId] = leftDraw;
   }
-  draw.showDraw();
+  leftDraw.showDraw();
 };
+//右侧滑动框
+function showRightDrawVue(type, uid){
+  const vueDrawId = getVueDrawsId(type);
+  let rightDraw = draws[vueDrawId];
+  if(!rightDraw) {
+    //创建vue实例
+    rightDraw = initRightVue(uid);
+    draws[vueDrawId] = rightDraw;
+  }
+  rightDraw.showDraw();
+}
+import userVue from "./user/userVue";
+import userDrawCount from "./user/userDrawCount";
+import userLogin from "./user/userLogin";
+import userList from "./user/userList";
+//创建右侧滑动框vue实例
+function initRightVue(uid) {
+  const draw = new Vue({
+    el: '#drawRight',
+    data: {
+      uid,
+      user: {},
+      show: false,
+      loading: true,
+      drawState: {},
+    },
+    components: {
+      "user-vue": userVue,
+      "user-draw-count": userDrawCount,
+      "user-login": userLogin,
+      "user-list": userList,
+    },
+    mounted() {
+      this.getRightDrawData();
+    },
+    methods: {
+      getRightDrawData(){
+        const _this = this;
+        nkcAPI('/draw/' + uid + '/userDraw', 'GET', {})
+          .then(res => {
+            _this.drawState = res.drawState;
+            _this.user = res.user;
+            _this.loading = false;
+          })
+          .catch(err => {
+
+          })
+      },
+      showDraw(){
+        this.show = true;
+      },
+    }
+  })
+  return draw;
+}
+
 import Management from '../pages/publicModules/management/managementVue'
 import Apps from '../pages/publicModules/apps/appsVue'
 import Forums from '../pages/publicModules/forums_nav/forum_tree_vue'
-function initVue(uid) {
+//创建左侧滑动框vue实例
+function initLeftVue(uid) {
   const draw = new Vue({
     el: '#drawLeft',
     data: {
       loading: true,
       show: false,
       uid,
-      permission: {},
+      permission: {
+        nkcManagement: false,
+        visitExperimentalStatus: false,
+        review: false,
+        complaintGet: false,
+        visitProblemList: false,
+        getLibraryLogs: false,
+        enableFund: false,
+      },
       categoryForums: [],
+      untreated: {
+        unResolvedComplaintCount: '',
+        unResolvedProblemCount: '',
+        unReviewedCount: '',
+      },
     },
     mounted() {
-      this.getDrawData();
+      this.getLeftDrawData();
     },
     components: {
       Management,
@@ -1201,10 +1323,13 @@ function initVue(uid) {
       Forums,
     },
     methods: {
-      getDrawData(){
+      getLeftDrawData(){
         const _this = this;
-        nkcAPI('/ld/' + uid, 'GET' , {})
+        nkcAPI('/draw/' + uid + '/leftDraw', 'GET' , {})
           .then(res => {
+            _this.untreated.unResolvedComplaintCount = res.unResolvedComplaintCount;
+            _this.untreated.unResolvedProblemCount = res.unResolvedProblemCount;
+            _this.untreated.unReviewedCount = res .unReviewedCount;
             _this.categoryForums = res.categoryForums;
             _this.permission = res.permission;
             _this.loading = false;
@@ -1236,9 +1361,9 @@ function toggleNKCDrawer(type, uid) {
     }
     openNKCDrawer(type);
     if(type === 'left') {
-      showLeftDrawVue(uid);
+      showLeftDrawVue(type, uid);
     } else if (type === 'right') {
-
+      showRightDrawVue(type, uid);
     }
   }
 }
@@ -1517,5 +1642,7 @@ Object.assign(window, {
   addApptypeToUrl,
   sweetPrompt,
   showLeftDrawVue,
-  initVue
+  initLeftVue,
+  initRightVue,
+  initUserNavVue,
 });

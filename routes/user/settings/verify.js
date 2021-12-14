@@ -31,7 +31,7 @@ verifyRouter
     data.verifiedBState = verifiedUploadCardB?verifiedUploadCardB.state:'unUpload';
     data.auth3Content = authSettings.auth3Content;
     data.authenticate = userPersonal.authenticate;
-    ctx.template = "/user/settings/verify/verify.pug";
+    ctx.template = "user/settings/verify/verify.pug";
     await next();
   })
   .post("/verify2_form", async (ctx, next) => {
