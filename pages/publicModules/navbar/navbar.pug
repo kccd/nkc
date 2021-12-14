@@ -62,7 +62,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             span 消息
             .nav-user-avatar-count.message-switch.message-count(class="hidden")
 
-          li.dropdown.userInfo.nav-user(onmouseover=`initUserNavVue('userNav', ${data.user.uid})`)
+          li.dropdown.userInfo.nav-user(onmouseover=`initUserNavVue('userNav', ${remoteState.uid})`)
             .nav-user-content
               div#userNav
                 .user-nav-container(v-if="show && !loading")
@@ -152,7 +152,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         .col-xs-3
           a(href='/?t=latest') 最新
         .col-xs-3
-          if data.user
+          if remoteState.uid
             a(href='/?t=subscribe') 关注
           else
             a(onclick="Login.open()") 关注
