@@ -517,6 +517,7 @@
     mounted() {
       this.initDraggableElement();
       this.initSocketEvent();
+      this.initDragUploadEvent();
     },
     computed: {
       fileSizeLimit: function() {
@@ -584,6 +585,7 @@
       this.removeSocketEvent();
       this.destroyCropper();
       this.destroyDraggable();
+      this.disableDragUploadEvent();
     },
     methods: {
       timeFormat: timeFormat,
@@ -591,7 +593,6 @@
       initCropper() {
         if(this.cropper) return;
         this.cropper = new Cropper(this.$refs.imageElement, {
-          aspectRatio: 1920/1080,
           viewMode: 1,
         });
       },
@@ -626,6 +627,39 @@
         if(!this.socketEventListener) return;
         // 销毁事件
         window.socket.off('fileTransformProcess', this.socketEventListener);
+      },
+      initDragUploadEvent() {
+        const $dragDom = $(this.$refs.pasteContent);
+        let originText = "";
+        const self = this;
+        $dragDom.on({
+          dragenter: function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            originText = $dragDom.text();
+            $dragDom.text("松开鼠标上传文件")
+          },
+          dragleave: function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            $dragDom.text(originText);
+          },
+          dragover: function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+          },
+          drop: function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $dragDom.text(originText);
+            var files = [].slice.call(e.originalEvent.dataTransfer.files);
+            if(!files.length) return;
+            self.uploadSelectFile(files);
+          }
+        });
+      },
+      disableDragUploadEvent() {
+        $(this.$refs.pasteContent).draggable('disable');
       },
       checkFileSize: function(filename, size) {
         var sizeLimit = this.sizeLimit;
@@ -697,7 +731,7 @@
       },
       readyPaste: function() {
         var self = this;
-        var dom = this.$refs.pasteContent;
+        var dom = $(this.$refs.pasteContent);
         dom.off("paste");
         dom.one("paste", function(e) {
           var clipboardData = e.clipboardData || e.originalEvent && e.originalEvent.clipboardData || {};
