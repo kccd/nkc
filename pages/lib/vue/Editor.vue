@@ -5,6 +5,7 @@
       resource-selector(ref="resourceSelector")
       draft-selector(ref="draftSelector")
       sticker-selector(ref="stickerSelector")
+      xsf-selector(ref="xsfSelector")
       div(:id="domId")
 </template>
 
@@ -23,12 +24,14 @@
   import ResourceSelector from './ResourceSelector';
   import DraftSelector from './DraftSelector';
   import StickerSelector from './StickerSelector';
+  import XsfSelector from './XsfSelector';
   export default {
     props: ['configs', 'plugs'],
     components: {
       'resource-selector': ResourceSelector,
       'draft-selector': DraftSelector,
-      'sticker-selector': StickerSelector
+      'sticker-selector': StickerSelector,
+      'xsf-selector': XsfSelector,
     },
     data: () => ({
       domId: '',
@@ -38,6 +41,7 @@
         resourceSelector: true,
         draftSelector: true,
         stickerSelector: true,
+        xsfSelector: true,
       },
       defaultConfigs: {
         toolbars: [
@@ -201,6 +205,44 @@
           })
         });
       },
+      initXsfSelector() {
+        const self = this;
+        UE.registerUI('xsfSelector',function(editor, uiName){
+          editor.ready(function() {
+            var editDoc = editor.document;
+            var handle = function(e) {
+              var target = e.target;
+              if(target.dataset.tag !== "nkcsource") return;
+              var type = target.dataset.type;
+              var score = target.dataset.id;
+              if(type !== "xsf") return;
+              self.$refs.xsfSelector.open(function(newscore) {
+                target.dataset.id = newscore;
+                target.dataset.message = "浏览这段内容需要"+newscore+"学术分(双击修改)";
+              }, parseFloat(score));
+            };
+            var count = 0;
+            editDoc.addEventListener("dblclick", handle);
+            editDoc.addEventListener("touchend", function(e) {   // 手机端模拟双击
+              ++count;
+              if(count == 2) return handle(e);
+              setTimeout(function(){ count = 0; }, 700);
+            });
+          });
+
+          return new UE.ui.Button({
+            name: uiName,
+            title:'学术分隐藏',
+            className: 'edui-default edui-for-hide-content edui-icon',
+            onclick:function () {
+              self.$refs.xsfSelector.open(res => {
+                if(!res) return;
+                editor.execCommand("inserthtml", resourceToHtml("xsf", res))
+              }, {});
+            }
+          })
+        });
+      },
       initPlugs() {
         const {plugs = {}, defaultPlugs} = this;
         const _plugs = Object.assign({}, defaultPlugs, plugs);
@@ -212,6 +254,9 @@
         }
         if(_plugs.stickerSelector) {
           this.initStickerSelector();
+        }
+        if(_plugs.xsfSelector) {
+          this.initXsfSelector();
         }
       },
     },
