@@ -37,6 +37,7 @@ module.exports = async (ctx) => {
     newMessageCount: state.uid? state.user.newMessage: 0,
     logoICO: state.logoICO,
     lotteryStatus: state.uid? state.user.generalSettings.lotterySettings.status: false,
-    appStableVersion: state.appStableVersion
+    appStableVersion: state.appStableVersion,
+    startTime: global.NKC.startTime,
   };
 }

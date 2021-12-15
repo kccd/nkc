@@ -22,7 +22,7 @@ const {
 	photo,
 	photo_small,
 } = resourceObj;
-
+const mathJax = require('./mathJax');
 const editor = require('./editor');
 const edit = require('./edit');
 const exam = require('./exam');
@@ -273,6 +273,7 @@ operationObj.operationTree = {
     pim, // 产品管理系统
     test,
 		draw: drawData, //获取手机浏览器左侧滑动框
+    mathJax, // 编辑器预览公式
 	}
 };
 module.exports = operationObj;

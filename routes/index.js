@@ -48,6 +48,8 @@ const userBannerRouter = routers.userBanner;
 const creationRouter = routers.creation;
 const librariesRouter = routers.libraries;
 const noteRouter = routers.note;
+// 编辑器公式展示
+const mathJaxRouter = routers.mathJax;
 // 网站工具
 const siteToolsRouter = routers.tools;
 // ip信息
@@ -145,4 +147,5 @@ router.use("/wm", watermarkRouter.routes(), watermarkRouter.allowedMethods());
 router.use('/logo', logoRouter.routes(), logoRouter.allowedMethods());
 router.use('/creation', creationRouter.routes(), creationRouter.allowedMethods());
 router.use('/draw', drawDataRouter.routes(), drawDataRouter.allowedMethods());
+router.use('/mathJax', mathJaxRouter.routes(), mathJaxRouter.allowedMethods());
 module.exports = router;

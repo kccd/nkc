@@ -5,6 +5,7 @@
       resource-selector(ref="resourceSelector")
       draft-selector(ref="draftSelector")
       sticker-selector(ref="stickerSelector")
+      math-jax-selector(ref="mathJaxSelector")
       div(:id="domId")
 </template>
 
@@ -23,12 +24,14 @@
   import ResourceSelector from './ResourceSelector';
   import DraftSelector from './DraftSelector';
   import StickerSelector from './StickerSelector';
+  import MathJaxSelector from "./MathJaxSelector";
   export default {
     props: ['configs', 'plugs'],
     components: {
       'resource-selector': ResourceSelector,
       'draft-selector': DraftSelector,
-      'sticker-selector': StickerSelector
+      'sticker-selector': StickerSelector,
+      'math-jax-selector': MathJaxSelector
     },
     data: () => ({
       domId: '',
@@ -38,6 +41,7 @@
         resourceSelector: true,
         draftSelector: true,
         stickerSelector: true,
+        mathJaxSelector: true,
       },
       defaultConfigs: {
         toolbars: [
@@ -156,7 +160,7 @@
                   var type = source.mediaType;
                   type = type.substring(5);
                   type = type[0].toLowerCase() + type.substring(1);
-                  self.editor.execCommand('inserthtml', resourceToHtml(type, source.rid, source.oname));
+                  editor.execCommand('inserthtml', resourceToHtml(type, source.rid, source.oname));
                 }
               }, {
                 fastSelect: true
@@ -175,7 +179,7 @@
             onclick:function () {
               self.$refs.draftSelector.open(data => {
                 if(!data || !data.content) return;
-                self.editor.execCommand('inserthtml', data.content);
+                editor.execCommand('inserthtml', data.content);
               });
             }
           });
@@ -201,6 +205,22 @@
           })
         });
       },
+      initMathJaxSelector() {
+        const self = this;
+        UE.registerUI('mathJaxSelector', function (editor, uiName) {
+          return new UE.ui.Button({
+            name: uiName,
+            title:'插入公式',
+            className: 'edui-default edui-for-mathformula edui-icon',
+            onclick: function () {
+              self.$refs.mathJaxSelector.open(content => {
+                if(!content) return;
+                editor.execCommand("inserthtml", content)
+              });
+            }
+          })
+        })
+      },
       initPlugs() {
         const {plugs = {}, defaultPlugs} = this;
         const _plugs = Object.assign({}, defaultPlugs, plugs);
@@ -212,6 +232,9 @@
         }
         if(_plugs.stickerSelector) {
           this.initStickerSelector();
+        }
+        if(_plugs.mathJaxSelector) {
+          this.initMathJaxSelector();
         }
       },
     },

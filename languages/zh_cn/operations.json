@@ -817,5 +817,6 @@
   "getWatermark": "获取水印图片",
   "getAppsWatermark": "获取用户偏好设置水印",
   "creationCenter": "访问创作中心",
-  "getDrawData": "获取滑动框数据"
+  "getDrawData": "获取滑动框数据",
+  "mathJax": "编辑器预览公式"
 }
