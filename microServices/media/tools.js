@@ -171,6 +171,16 @@ async function accessFile(targetPath) {
   }
 }
 
+async function hasAudioStream(videoFilePath) {
+  return new Promise((resolve, reject) => {
+    ff.ffprobe(videoFilePath, (err, metadata) => {
+      if(err) return reject(err);
+      const {streams} = metadata;
+      const audioInfo = streams.filter(stream => stream["codec_type"] === "audio").shift();
+      resolve(!!audioInfo);
+    });
+  })
+}
 
 async function spawnProcess(pathName, args, options = {}) {
   return new Promise((resolve, reject) => {
@@ -368,5 +378,6 @@ module.exports = {
   storeClient,
   imageAutoOrient,
   getImageInfo,
-  createOtherSizeVideo
+  createOtherSizeVideo,
+  hasAudioStream
 }

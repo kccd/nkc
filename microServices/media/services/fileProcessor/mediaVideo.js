@@ -31,7 +31,7 @@ module.exports = async (props) => {
   const filePath = file.path;//临时目录
   const time = (new Date(toc)).getTime();
 
-  const tempFilesPath = [filePath];
+  const tempFilesPath = [filePath, coverPath];
 
   const func = async () => {
     const {width: videoWidth, height: videoHeight} = await tools.getFileInfo(filePath);
@@ -192,7 +192,8 @@ async function videoProgress(props, useGPU) {
 
     const inputHwaccel = useGPU? ['-hwaccel', 'cuda']: [];
     const outputCodec = useGPU? ['-c:v', 'h264_nvenc']: ['-c:v', 'libx264'];
-
+    const hasAudioStream = await tools.hasAudioStream(videoPath);
+    const audioStream = hasAudioStream? ['-map', '0:a']: [];
     let task = ff();
     task.input(videoPath);
     task.inputOptions([
@@ -221,8 +222,7 @@ async function videoProgress(props, useGPU) {
       task.outputOptions([
         '-map',
         outputName,
-        '-map',
-        `0:a`,
+        ...audioStream,
         `-map_metadata`,
         `-1`,
         `-b:v`,
