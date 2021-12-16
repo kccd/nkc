@@ -259,7 +259,7 @@ async function getFileMD5(filePath) {
 * */
 async function getFileInfo(filePath) {
   const name = PATH.basename(filePath);
-  const ext = PATH.extname(filePath).replace('.', '');
+  const ext = PATH.extname(filePath).replace('.', '').toLowerCase();
   const hash = await getFileMD5(filePath);
   const {
     size,
