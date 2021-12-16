@@ -1,8 +1,6 @@
 const PATH = require('path')
 const tools = require('../../tools')
 const ff = require('fluent-ffmpeg')
-const fs = require('fs')
-const fsPromises = fs.promises;
 const {sendMessageToNkc} = require('../../socket')
 
 module.exports = async (props) => {
@@ -20,7 +18,6 @@ module.exports = async (props) => {
     rid,
     toc,
     flex,
-    ext,
     waterAdd,
     transparency,
     configs,
@@ -29,222 +26,97 @@ module.exports = async (props) => {
     minWidth,
     minHeight
   } = data;
-  const extension = ext;
+  const coverPath = cover? cover.path: '';
   const filePath = file.path;//临时目录
-  const aviTempPath = filePath + 'temp.avi';
   const time = (new Date(toc)).getTime();
-  const storeData = [];
-  const filesInfo = {};//用于存储在数据库的文件类型
-  const {sd, hd, fhd} = videoSize;
-  // 各个尺寸视频路径
-  const sdVideoPath = filePath + `_sd.mp4`;
-  const hdVideoPath = filePath + `_hd.mp4`;
-  const fhdVideoPath = filePath + `_fhd.mp4`;
-  // 视频封面图路径
-  let videoCoverPath = filePath + `_cover.jpg`;
-  //输出视频路径
-  const outputVideoPath = filePath + `_ffmpeg.mp4`;
-  //构建视频文件在存储服务中的路径
-  const sdFilenamePath = `${rid}_sd.mp4`;
-  const hdFilenamePath = `${rid}_hd.mp4`;
-  const fhdFilenamePath = `${rid}_fhd.mp4`;
-  const videoCoverFilenamePath = `${rid}_cover.jpg`;
-  const sdStorePath = PATH.join(mediaPath, timePath, sdFilenamePath);
-  const hdStorePath = PATH.join(mediaPath, timePath, hdFilenamePath);
-  const fhdStorePath = PATH.join(mediaPath, timePath, fhdFilenamePath);
-  const videoCoverStorePath = PATH.join(mediaPath, timePath, videoCoverFilenamePath);
 
-  let hasWatermark = false;
+  const tempFilesPath = [filePath];
+
   const func = async () => {
-    //获取原视频尺寸
     const {width: videoWidth, height: videoHeight} = await tools.getFileInfo(filePath);
-
-    if(videoWidth >= minWidth &&
-      videoHeight >= minHeight &&
-      waterAdd && enabled) {
-
-      //各个视频尺寸的宽度
-      const widthSD = sd.height * videoWidth / videoHeight;
-      const widthHD = hd.height * videoWidth / videoHeight;
-      const widthFHD = fhd.height * videoWidth / videoHeight;
-      // 各个视频的比特率
-      const bitrateSD = await getBitrateBySize(widthSD, sd.height, configs, defaultBV);
-      const bitrateHD = await getBitrateBySize(widthHD, hd.height, configs, defaultBV);
-      const bitrateFHD = await getBitrateBySize(widthFHD, fhd.height, configs, defaultBV);
-
-      const isReachFHD = videoHeight >= fhd.height;
-      const isReachHD  = !isReachFHD && videoHeight >= hd.height;
-      const isReachSD  = !isReachHD  && videoHeight >= sd.height;
-
-      //视频打水印
-      // return ffmpegWaterMark(filePath, cover, waterGravity, outputVideoPath)
-      await ffmpegWaterMark({
-        flex,
-        filePath,
-        output: outputVideoPath,
-        imageStream: cover.path,
-        position: gravityToPositionMap[waterGravity],
-        transparency,
-        scalaByHeight: isReachFHD
-          ? fhd.height
-          : isReachHD
-            ? hd.height
-            : isReachSD
-              ? sd.height
-              : videoHeight,
-        bitRate: isReachFHD
-          ? bitrateFHD
-          : isReachHD
-            ? bitrateHD
-            : isReachSD
-              ? bitrateSD
-              : getBitrateBySize(videoWidth, videoHeight, configs, defaultBV)
+    const watermarkHeight = ~~Math.min(videoWidth, videoHeight) * (flex/100);
+    const watermarkDisabled = (
+      !cover ||
+      videoWidth < minWidth ||
+      videoHeight < minHeight ||
+      !waterAdd ||
+      !enabled
+    );
+    const videos = [];
+    for(const type in videoSize) {
+      const {
+        height,
+        fps,
+      } = videoSize[type];
+      if(type !== 'sd' && videoHeight < height) continue;
+      const filename = `${rid}_${type}.mp4`;
+      const localPath = `${filePath}_${type}.mp4`;
+      videos.push({
+        type,
+        height,
+        fps,
+        filename,
+        localPath,
+        storePath: PATH.join(mediaPath, timePath, filename),
+        bitrate: (await getBitrateBySize(height * videoWidth / videoHeight, height, configs, defaultBV)) + 'K',
       });
-      hasWatermark = true;
-    } else {
-
-      //各个视频尺寸的宽度
-      const widthSD = sd.height * videoWidth / videoHeight;
-      const widthHD = hd.height * videoWidth / videoHeight;
-      const widthFHD = fhd.height * videoWidth / videoHeight;
-      // 各个视频的比特率
-      const bitrateSD = await getBitrateBySize(widthSD, sd.height, configs, defaultBV);
-      const bitrateHD = await getBitrateBySize(widthHD, hd.height, configs, defaultBV);
-      const bitrateFHD = await getBitrateBySize(widthFHD, fhd.height, configs, defaultBV);
-      const isReachFHD = videoHeight >= fhd.height;
-      const isReachHD  = !isReachFHD && videoHeight >= hd.height;
-      const isReachSD  = !isReachHD  && videoHeight >= sd.height;
-      await modifyVideoBitRate(filePath, outputVideoPath, {
-        scalaByHeight: isReachFHD
-          ? fhd.height
-          : isReachHD
-            ? hd.height
-            : isReachSD
-              ? sd.height
-              : videoHeight,
-        bitRate: isReachFHD
-          ? bitrateFHD
-          : isReachHD
-            ? bitrateHD
-            : isReachSD
-              ? bitrateSD
-              : getBitrateBySize(videoWidth, videoHeight, configs, defaultBV)
-      });
-
-      /*// 视频转码
-      if(['3gp'].indexOf(extension.toLowerCase()) > -1){
-        await video3GPTransMP4(filePath, outputVideoPath);
-      }else if(['mp4'].indexOf(extension.toLowerCase()) > -1) {
-        await videoMP4TransH264(filePath, outputVideoPath);
-      }else if(['mov'].indexOf(extension.toLowerCase()) > -1) {
-        await videoMOVTransMP4(filePath, outputVideoPath);
-      }else if(['avi'].indexOf(extension.toLowerCase()) > -1) {
-        await videoAviTransAvi(filePath, aviTempPath);
-        await videoAVITransMP4(aviTempPath, outputVideoPath);
-      } else if(['webm'].includes(extension.toLowerCase())) {
-        await videoWEBMTransMP4(filePath, outputVideoPath);
-      } else {
-        await videoTransMP4(filePath, outputVideoPath, extension);
-      }*/
+      tempFilesPath.push(localPath);
     }
-
-    //生成视频封面图
-    await videoFirstThumbTaker(filePath, videoCoverPath);
-
-    // 获取输出视频尺寸
-    const {width: originWidth, height: originHeight} = await tools.getFileInfo(outputVideoPath);
-    // 各个尺寸视频的宽度
-    const widthSD = sd.height * originWidth / originHeight;
-    const widthHD = hd.height * originWidth / originHeight;
-    const widthFHD = fhd.height * originWidth / originHeight;
-    // 各个视频的比特率
-    const bitrateSD = await getBitrateBySize(widthSD, sd.height, configs, defaultBV);
-    const bitrateHD = await getBitrateBySize(widthHD, hd.height, configs, defaultBV);
-    const bitrateFHD = await getBitrateBySize(widthFHD, fhd.height, configs, defaultBV);
-    // 生成其他尺寸的视频文件
-    if(originHeight < hd.height) {
-      // 原视频小于720，则将其设置为480
-      await fsPromises.rename(outputVideoPath, sdVideoPath);
-    } else if(originHeight < fhd.height) {
-      // 原视频大于等于720且小于1080，则将其设置为720并生成480的视频
-      const newOutputVideoPath = hdVideoPath;
-      await fsPromises.rename(outputVideoPath, newOutputVideoPath);
-      await tools.createOtherSizeVideo(newOutputVideoPath, sdVideoPath, {
-        height: sd.height,
-        bitrate: bitrateSD,
-        fps: sd.fps
-      });
-    } else {
-      // 原视频大于等于1080，则将其设置为1080并生成720和480的视频
-      const tasks = [];
-      if(hasWatermark === true) {
-        await fsPromises.copyFile(outputVideoPath, fhdVideoPath);
-      } else {
-        tasks.push(
-          tools.createOtherSizeVideo(outputVideoPath, fhdVideoPath, {
-            height: fhd.height,
-            bitrate: bitrateFHD,
-            fps: fhd.fps
-          })
-        )
+    const outputs = videos.map(v => {
+      const {height, fps, bitrate, localPath} = v;
+      return {
+        height,
+        fps,
+        bitrate,
+        path: localPath
       }
-      tasks.push(
-        tools.createOtherSizeVideo(outputVideoPath, sdVideoPath, {
-          height: sd.height,
-          bitrate: bitrateSD,
-          fps: sd.fps
-        }),
-        tools.createOtherSizeVideo(outputVideoPath, hdVideoPath, {
-          height: hd.height,
-          bitrate: bitrateHD,
-          fps: hd.fps
-        })
-      );
-      await Promise.all(tasks);
-    }
-    if(await tools.accessFile(sdVideoPath)) {
+    });
+
+    const {x, y} = gravityToPositionMap[waterGravity];
+    const props = {
+      videoPath: filePath,
+      watermark: {
+        disabled: watermarkDisabled,
+        path: coverPath,
+        height: watermarkHeight,
+        x,
+        y,
+        transparency
+      },
+      outputs
+    };
+    await videoProgress(props, true);
+    const storeData = [];
+    const filesInfo = {};
+    for(const video of videos) {
+      const {localPath, storePath, filename, type} = video;
       storeData.push({
-        filePath: sdVideoPath,
-        path: sdStorePath,
+        filePath: localPath,
+        path: storePath,
         time,
       });
-      const sdInfo = await tools.getFileInfo(sdVideoPath);
-      sdInfo.name = sdFilenamePath;
-      filesInfo.sd = sdInfo;
+      const fileInfo = await tools.getFileInfo(localPath);
+      fileInfo.name = filename;
+      filesInfo[type] = fileInfo;
     }
 
-    if(await tools.accessFile(hdVideoPath)) {
-      storeData.push({
-        filePath: hdVideoPath,
-        path: hdStorePath,
-        time,
-      });
-      const hdInfo = await tools.getFileInfo(hdVideoPath);
-      hdInfo.name = hdFilenamePath;
-      filesInfo.hd = hdInfo;
-    }
-    if(await tools.accessFile(fhdVideoPath)) {
-      storeData.push({
-        filePath: fhdVideoPath,
-        path: fhdStorePath,
-        time,
-      });
-      const fhdInfo = await tools.getFileInfo(fhdVideoPath);
-      fhdInfo.name = fhdFilenamePath;
-      filesInfo.fhd = fhdInfo;
-    }
-    if(await tools.accessFile(videoCoverPath)) {
-      storeData.push({
-        filePath: videoCoverPath,
-        path: videoCoverStorePath,
-        time
-      });
-      const coverInfo = await tools.getFileInfo(videoCoverPath);
-      coverInfo.name = videoCoverFilenamePath;
-      filesInfo.cover = coverInfo;
-    }
+    const coverType = 'cover';
+    const videoCoverLocalPath = `${filePath}_${coverType}.jpg`;
+    const videoCoverName = `${rid}_${coverType}.jpg`;
+    const videoCoverStorePath = PATH.join(mediaPath, timePath, videoCoverName);
+    tempFilesPath.push(videoCoverLocalPath);
+    await videoFirstThumbTaker(filePath, videoCoverLocalPath);
+
+    storeData.push({
+      filePath: videoCoverLocalPath,
+      path: videoCoverStorePath,
+      time,
+    });
+    const fileInfo = await tools.getFileInfo(videoCoverLocalPath);
+    fileInfo.name = videoCoverName;
+    filesInfo[coverType] = fileInfo;
+
     await tools.storeClient(storeUrl, storeData);
-
     await sendMessageToNkc('resourceStatus', {
       rid,
       status: true,
@@ -262,85 +134,19 @@ module.exports = async (props) => {
       });
     })
     .finally(() => {
-      return Promise.all([
-        tools.deleteFile(sdVideoPath),
-        tools.deleteFile(hdVideoPath),
-        tools.deleteFile(fhdVideoPath),
-        tools.deleteFile(videoCoverPath),
-        tools.deleteFile(filePath),
-        tools.deleteFile(cover.path),
-        tools.deleteFile(aviTempPath),
-        tools.deleteFile(outputVideoPath)
-      ]);
+      return Promise.all(tempFilesPath.map(filePath => {
+        return tools.deleteFile(filePath);
+      }));
     })
 }
-
-// ffmpeg 码率和帧率控制命令行参数 默认值
-// 处理视频
-const bitrateAndFPSControlParameter = [
-  '-map_metadata',
-  '-1',
-  '-c:v', 'libx264',                                            /* 指定编码器 */
-  '-r', '24',                                                   /* 帧率 */
-  '-maxrate', '5M',                                             /* 最大码率 */
-  '-minrate', '1M',                                             /* 最小码率 */
-  '-b:v', '1.16M',                                              /* 平均码率 */
-];
 
 // 获取视频的第一帧图片
 function videoFirstThumbTaker(videoPath,imgPath) {
   return tools.spawnProcess('ffmpeg',['-i',videoPath, '-ss', '1', '-vframes' ,'1', imgPath])
 }
 
-function videoTransMP4(inputPath, outputPath, ext) {
-  let func;
-  if(ext === '3gp') {
-    func = video3GPTransMP4;
-  } else if(ext === 'mp4') {
-    func = videoMP4TransH264;
-  } else if(ext === 'mov') {
-    func = videoMOVTransMP4;
-  } else if(ext === 'avi') {
-    func = videoAVITransMP4;
-  } else if(ext === 'webm') {
-    func = videoWEBMTransMP4;
-  } else {
-    func = videoMP4TransH264;
-  }
-  return func(inputPath, outputPath);
-}
-
-// webm转码为mp4
-function videoWEBMTransMP4(inputPath, outputPath) {
-  return tools.spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', '-y', ...bitrateAndFPSControlParameter, outputPath])
-}
-
-// AVI转码为MP4
-function videoAVITransMP4(inputPath, outputPath) {
-  return tools.spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', '-y', ...bitrateAndFPSControlParameter, outputPath])
-}
-
-// AVI格式视频转avi
-function videoAviTransAvi(inputPath, outputPath) {
-  return tools.spawnProcess('ffmpeg', ['-i', inputPath ,'-y', ...bitrateAndFPSControlParameter, outputPath])
-}
-
-// MOV转码为MP4
-function videoMOVTransMP4(inputPath, outputPath) {
-  return tools.spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-movflags', 'faststart', '-y', ...bitrateAndFPSControlParameter, outputPath])
-}
-
-// MP4转码为H264
-function videoMP4TransH264(inputPath, outputPath) {
-  return tools.spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-movflags', 'faststart', '-y', ...bitrateAndFPSControlParameter, outputPath]);
-}
-
-// 3GP转为MP4
-function video3GPTransMP4(inputPath, outputPath) {
-  return tools.spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', '-y', ...bitrateAndFPSControlParameter, outputPath]);
-}
-
 //获取视频的比特率
+// @return 比特率 Kbps
 function getBitrateBySize(width, height, configs, defaultBV) {
   const s =  width * height;
   let rate;
@@ -357,79 +163,74 @@ function getBitrateBySize(width, height, configs, defaultBV) {
   return rate * 1024;
 }
 
-//视频打水印
-// function ffmpegWaterMark(filePath, cover, waterGravity, outputVideoPath){
-function ffmpegWaterMark(options){
-  const {filePath, output, imageStream, position, scalaByHeight, bitRate, flex, transparency} = options;
-  return addWaterMask({
-    videoPath: filePath,
-    imageStream: imageStream,
-    output: output,
-    position: position,
-    transparency,
-    scalaByHeight,
-    bitRate,
-    flex
+async function videoProgress(props, useGPU) {
+  return new Promise(async (resolve, reject) => {
+    const {
+      videoPath,
+      watermark,
+      outputs
+    } = props;
+
+    const filterInputNames = [];
+    const filterOutputNames = [];
+    const filterModifyVideo = [];
+    for(let i = 0; i < outputs.length; i ++) {
+      const {
+        height,
+        fps,
+      } = outputs[i];
+      const inputName = `[video_${i}]`;
+      const outputName = `[out_${i}]`;
+      filterInputNames.push(inputName);
+      filterOutputNames.push(outputName);
+      filterModifyVideo.push(`${inputName}scale=-2:${height},fps=fps=${fps}${outputName}`);
+    }
+
+    const inputHwaccel = useGPU? ['-hwaccel', 'cuda']: [];
+    const outputCodec = useGPU? ['-c:v', 'h264_nvenc']: ['-c:v', 'libx264'];
+
+    let task = ff();
+    task.input(videoPath);
+    task.inputOptions([
+      ...inputHwaccel,
+    ]);
+    if(!watermark.disabled) {
+      // 打水印
+      task.input(watermark.path);
+      task.complexFilter([
+        `[1:v]scale=-2:${watermark.height},lut=a=val*${watermark.transparency}[watermark]`,
+        `[0:v][watermark]overlay=${watermark.x}:${watermark.y},split=${filterInputNames.length}${filterInputNames.join('')}`,
+        ...filterModifyVideo
+      ]);
+    } else {
+      // 不大水印
+      task.complexFilter([
+        `split=${filterInputNames.length}${filterInputNames.join('')}`,
+        ...filterModifyVideo
+      ]);
+    }
+    for(let i = 0; i < outputs.length; i ++) {
+      const outputName = filterOutputNames[i];
+      const {path, bitrate} = outputs[i];
+      task.output(path);
+      task.outputOptions([
+        '-map',
+        outputName,
+        '-map',
+        `0:a`,
+        `-map_metadata`,
+        `-1`,
+        `-b:v`,
+        bitrate,
+        '-c:a',
+        'copy',
+        ...outputCodec
+      ]);
+    }
+    task.on('end', resolve);
+    task.on('error', reject);
+    task.run();
   });
-}
-/**
- * 视频打水印
- */
-async function addWaterMask(options) {
-  let {
-    videoPath,
-    imageStream,
-    output,
-    position = {x: 10, y: 10},
-    flex = 8,
-    bitRate,
-    scalaByHeight,
-    transparency = 1
-  } = options;
-  const { width, height} = await tools.getVideoInfo(videoPath);
-  const {width: coverWidth, height: coverHeight} = await tools.getFileInfo(imageStream);
-  return await new Promise((resolve, reject) => {
-    const imageHeight = ~~Math.min(width, height) * (flex/100);
-    const imageWidth = coverWidth * imageHeight / coverHeight;
-    ff(videoPath)
-      .input(imageStream)
-      .complexFilter([
-        `[1:v]scale=${imageWidth}:${imageHeight}[logo]`,
-        `[logo]lut=a=val*${transparency}[logo2]`,
-        `[0:v][logo2]overlay=${position.x}:${position.y}[o]`,
-        `[o]scale=-2:${scalaByHeight}`
-      ])
-      .videoBitrate(bitRate)
-      .outputOptions([
-        '-map_metadata',
-        '-1'
-      ])
-      .output(output)
-      .on("end", resolve)
-      .on("error", reject)
-      .run();
-  });
-}
-/*
-* 调整视频码率
-* */
-async function modifyVideoBitRate(filePath, output, options) {
-  const {scalaByHeight, bitRate} = options;
-  return await new Promise((resolve, reject) => {
-    ff(filePath)
-      .complexFilter([
-        `scale=-2:${scalaByHeight}`
-      ])
-      .videoBitrate(bitRate)
-      .outputOptions([
-        '-map_metadata',
-        '-1'
-      ])
-      .output(output)
-      .on("end", resolve)
-      .on("error", reject)
-      .run();
-  })
 }
 
 // 方位和position参数的映射关系

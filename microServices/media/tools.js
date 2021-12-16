@@ -106,7 +106,7 @@ async function getFileSize(filePath) {
 * */
 async function getFileInfo(filePath) {
   const name = PATH.basename(filePath);
-  const ext = PATH.extname(filePath).replace('.', '');
+  const ext = PATH.extname(filePath).replace('.', '').toLowerCase();
   const hash = await getFileMD5(filePath);
   const {
     size,
@@ -131,19 +131,25 @@ async function getFileInfo(filePath) {
       const imageInfo = await getImageInfo(filePath);
       height = imageInfo.height;
       width = imageInfo.width;
-    } catch(err) {}
+    } catch(err) {
+      console.log(err);
+    }
   } else if(videoExtensions.includes(ext)) {
     try{
       const videoInfo = await getVideoInfo(filePath);
       height = videoInfo.height;
       width = videoInfo.width;
       duration = videoInfo.duration;
-    } catch(err) {}
+    } catch(err) {
+      console.log(err);
+    }
   } else if(audioExtensions.includes(ext)) {
     try {
       const audioInfo = await getAudioInfo(filePath);
       duration = audioInfo.duration;
-    } catch(err) {}
+    } catch(err) {
+      console.log(err);
+    }
   }
 
   fileInfo.height = height;
