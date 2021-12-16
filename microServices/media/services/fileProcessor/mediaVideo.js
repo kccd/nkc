@@ -2,6 +2,7 @@ const PATH = require('path')
 const tools = require('../../tools')
 const ff = require('fluent-ffmpeg')
 const {sendMessageToNkc} = require('../../socket')
+const {useGPU = false} = require("../../../../config/media.json");
 
 module.exports = async (props) => {
   const {
@@ -85,7 +86,10 @@ module.exports = async (props) => {
       },
       outputs
     };
-    await videoProgress(props, true);
+
+
+    await videoProgress(props, useGPU);
+
     const storeData = [];
     const filesInfo = {};
     for(const video of videos) {
@@ -192,6 +196,7 @@ async function videoProgress(props, useGPU) {
     let task = ff();
     task.input(videoPath);
     task.inputOptions([
+      '-y',
       ...inputHwaccel,
     ]);
     if(!watermark.disabled) {
