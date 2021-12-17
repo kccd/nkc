@@ -867,6 +867,7 @@ function initVueApp() {
             // }
           })
           .then(function(data) {
+            editor.removeNoticeEvent();
             self.showCloseInfo = false;
             if(NKC.configs.platform === 'reactNative') {
               NKC.methods.visitUrlAndClose(data.redirect);
