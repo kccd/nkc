@@ -1697,10 +1697,10 @@ postSchema.statics.renderSinglePostToHTML = async (pid) => {
   let html;
   if(!parentCommentId) {
     postData = (await PostModel.filterPostsInfo([postData]))[0];
-    html = render(PATH.resolve(__dirname, `../pages/thread/singlePost/singlePostPage.pug`), {postData});
+    html = render(PATH.resolve(__dirname, `../pages/thread/singlePost/singlePostPage.pug`), {postData}, {}, {startTime: global.NKC.startTime});
   } else {
     postData = (await PostModel.filterCommentsInfo([postData]))[0];
-    html = render(PATH.resolve(__dirname, `../pages/thread/singleComment/singleCommentPage.pug`), {postData});
+    html = render(PATH.resolve(__dirname, `../pages/thread/singleComment/singleCommentPage.pug`), {postData}, {}, {startTime: global.NKC.startTime});
   }
   return html;
 }

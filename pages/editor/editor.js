@@ -26,22 +26,57 @@ window.CommonModal = undefined;
 // 标志：编辑器是否已初始化
 var EditorReady = false;
 window.data = undefined;
-
+import Editor from "../lib/vue/Editor";
+import {getEditorConfigs} from "../lib/js/editor";
 $(function() {
   window.data = NKC.methods.getDataById("data");
   window.data.threadCategories.map(c => c.selectedNode = null);
-  window.editor = UE.getEditor("content", NKC.configs.ueditor.editorConfigs);
-  editor.methods = {};
-  editor.addListener( 'ready', function( status ) {
-    // 编辑器准备就绪
-    // 计算工具栏上边距
-    // 开始初始化vue
-    resetBodyPaddingTop();
-    EditorReady = true;
-    initVueApp();
-    initPostButton();
+  const editorContainer = new Vue({
+    el: "#content",
+    data: {
+      editorPlugs: {
+        resourceSelector: true,
+        draftSelector: true,
+        stickerSelector: true,
+        xsfSelector: true,
+        mathJaxSelector: true,
+      }
+    },
+    mounted() {},
+    computed: {
+      editorConfigs() {
+        return getEditorConfigs();
+      },
+    },
+    components: {
+      'editor': Editor,
+    },
+    methods: {
+      getRef(){
+        return this.$refs.threadEditor;
+      },
+      editorReady() {
+        //编辑器准备就绪
+        resetBodyPaddingTop();
+        EditorReady = true;
+        initVueApp();
+        initPostButton();
+      },
+    }
   });
-  NKC.methods.ueditor.initDownloadEvent(editor);
+  window.editor = editorContainer.getRef();
+  // window.editor = UE.getEditor("content", NKC.configs.ueditor.editorConfigs);
+  editor.methods = {};
+  // editor.addListener( 'ready', function( status ) {
+  //   // 编辑器准备就绪
+  //   // 计算工具栏上边距
+  //   // 开始初始化vue
+  //   resetBodyPaddingTop();
+  //   EditorReady = true;
+  //   initVueApp();
+  //   initPostButton();
+  // });
+  // NKC.methods.ueditor.initDownloadEvent(editor);
   // 实例化专栏模块，如果不存在构造函数则用户没有权限转发。
   // 在提交数据前，读取专栏分类的时候，注意判断是否存在实例PostToColumn。
   if(NKC.modules.SelectColumnCategories) {
@@ -59,7 +94,7 @@ $(function() {
       disabledSurveyForm();
     }
   }
-  window.editor = editor;
+  // window.editor = editor;
 });
 
 function initVueApp() {
@@ -133,7 +168,7 @@ function initVueApp() {
     },
     mounted: function() {
       var this_ = this;
-      editor.addListener("contentChange", function() {
+      editor.editorMethods("contentChange", function () {
         this_.watchContentChange();
       });
       data.mainForums = data.mainForums || [];
@@ -815,22 +850,24 @@ function initVueApp() {
                 formData.append("postCover", NKC.methods.blobToFile(self.coverData), 'cover.png');
               }
               return nkcUploadFile("/p/" + self.post.pid, "PUT", formData);
-            } else if(type === "modifyForumDeclare") { // 修改专业详情
-              self.checkContent();
-              return nkcAPI("/f/" + self.forum.fid + "/settings/info", "PUT", {
-                declare: post.c,
-                did: self.draftId,
-                operation: "updateDeclare"
-              });
-            } else if(type === "modifyForumLatestNotice") {
-              self.checkContent();
-              return nkcAPI("/f/" + self.forum.fid + "/settings/info", "PUT", {
-                content: post.c,
-                operation: "modifyForumLatestNotice"
-              });
             }
+            // else if(type === "modifyForumDeclare") { // 修改专业详情
+            //   self.checkContent();
+            //   return nkcAPI("/f/" + self.forum.fid + "/settings/info", "PUT", {
+            //     declare: post.c,
+            //     did: self.draftId,
+            //     operation: "updateDeclare"
+            //   });
+            // } else if(type === "modifyForumLatestNotice") {
+            //   self.checkContent();
+            //   return nkcAPI("/f/" + self.forum.fid + "/settings/info", "PUT", {
+            //     content: post.c,
+            //     operation: "modifyForumLatestNotice"
+            //   });
+            // }
           })
           .then(function(data) {
+            editor.removeNoticeEvent();
             self.showCloseInfo = false;
             if(NKC.configs.platform === 'reactNative') {
               NKC.methods.visitUrlAndClose(data.redirect);

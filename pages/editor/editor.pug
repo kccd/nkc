@@ -105,6 +105,7 @@ block content
               input.editor-title(placeholder="请输入标题..." id="title" onchange="PostInfo.getTitle(this)")
             hr
           div(id="content")
+            editor(:configs="editorConfigs" ref="threadEditor" @ready="editorReady" :plugs="editorPlugs")
           #postInfo(v-cloak)
             hr
             .m-b-2(v-if="['newThread'].indexOf(type) !== -1")
@@ -286,7 +287,6 @@ block content
           +modifySubmit("FloatPostButton", true)
   .hidden#data=objToStr({minorForumCount: data.minorForumCount, originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft, websiteCode: data.websiteCode, toColumn: !!data.toColumn, threadCategories: data.threadCategories})
 block scripts
-  include ../ueditor/ueditorBase
   include ../publicModules/moment
   include ../editor/modules/selectAuthorInfo
   include ../publicModules/commonModal/commonModal

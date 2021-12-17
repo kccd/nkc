@@ -1,3 +1,6 @@
+import {getCommentEditorConfigs} from '../../lib/js/editor';
+import Editor from '../../lib/vue/Editor';
+
 class SinglePostModule {
   constructor() {
     this.editors = {};
@@ -286,6 +289,7 @@ class SinglePostModule {
   getEditorAppData(pid) {
     return this.editors[pid];
   }
+
   // 获取编辑器dom
   getEditorApp(pid, parentDom, props = {}) {
     props.keepOpened = props.keepOpened || false;
@@ -305,7 +309,7 @@ class SinglePostModule {
         .append(warningDom)
       let editorDom, app;
       if(this.postPermission.permit) {
-        editorDom = $(`<div class="single-comment-editor" id="singlePostEditor_${pid}">`);
+        editorDom = $(`<div class="single-comment-editor" id="singlePostEditor_${pid}"><editor :configs="editorConfigs" ref="singleEditor_${pid}" @ready="removeEvent" :plugs="editorPlugs" /></div>`);
         const promptDom = $(`<div class="single-comment-prompt">200字以内，仅用于支线交流，主线讨论请采用回复功能。</div>`);
         const buttonDom = $(`<div class="single-comment-button" data-type="${pid}"></div>`);
         const onclick = `NKC.methods.${cancelEvent}("${pid}", true)`;
@@ -344,7 +348,38 @@ class SinglePostModule {
 
 
       if(editorDom) {
-        app = UE.getEditor(editorDom.attr('id'), NKC.configs.ueditor.commentConfigs);
+        const singleEditor = new Vue({
+          el: `#singlePostEditor_${pid}`,
+          data: {
+            editorPlugs: {
+              resourceSelector: true,
+              draftSelector: true,
+              stickerSelector: true,
+              xsfSelector: true,
+              mathJaxSelector: true,
+            }
+          },
+          mounted() {
+          },
+          computed: {
+            editorConfigs() {
+              return getCommentEditorConfigs();
+            },
+          },
+          components: {
+            'editor': Editor,
+          },
+          methods: {
+            removeEvent() {
+              this.$refs[`singleEditor_${pid}`].removeNoticeEvent();
+            },
+            getRef() {
+              return this.$refs[`singleEditor_${pid}`];
+            }
+          },
+        });
+        app = singleEditor.getRef();
+        // app = UE.getEditor(editorDom.attr('id'), NKC.configs.ueditor.commentConfigs);
       }
 
       editorContainer.hide();

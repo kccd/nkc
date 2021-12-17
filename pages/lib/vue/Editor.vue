@@ -5,6 +5,7 @@
       resource-selector(ref="resourceSelector")
       draft-selector(ref="draftSelector")
       sticker-selector(ref="stickerSelector")
+      xsf-selector(ref="xsfSelector")
       math-jax-selector(ref="mathJaxSelector")
       div(:id="domId")
 </template>
@@ -25,13 +26,15 @@
   import DraftSelector from './DraftSelector';
   import StickerSelector from './StickerSelector';
   import MathJaxSelector from "./MathJaxSelector";
+  import XsfSelector from './XsfSelector';
   export default {
     props: ['configs', 'plugs'],
     components: {
       'resource-selector': ResourceSelector,
       'draft-selector': DraftSelector,
       'sticker-selector': StickerSelector,
-      'math-jax-selector': MathJaxSelector
+      'math-jax-selector': MathJaxSelector,
+      'xsf-selector': XsfSelector,
     },
     data: () => ({
       domId: '',
@@ -41,6 +44,7 @@
         resourceSelector: true,
         draftSelector: true,
         stickerSelector: true,
+        xsfSelector: true,
         mathJaxSelector: true,
       },
       defaultConfigs: {
@@ -70,7 +74,7 @@
         contextMenu: [],
         focus: false, // 默认获得焦点
         readonly: false, // 只读模式
-        wordCount: false, // 是否开启字数统计
+        wordCount: true, // 是否开启字数统计
         maximumWords: 100, // 最大字符数
         zIndex: 499,
       },
@@ -94,6 +98,11 @@
       this.removeNoticeEvent();
     },
     methods: {
+      editorMethods(type, callback){
+        this.editor.execCommand(type, function () {
+        });
+        callback();
+      },
       initDomId() {
         if(this.domId) return;
         this.domId = `editor_id_${Date.now()}_${Math.round(Math.random() * 100000)}`;
@@ -104,7 +113,13 @@
           const {domId, defaultConfigs, configs = {}} = self;
           self.editor = UE.getEditor(domId, Object.assign({}, defaultConfigs, configs));
           self.editor.ready(resolve);
-        });
+
+        })
+          .then(() => {
+            setTimeout(() => {
+              self.$emit('ready');
+            }, 500)
+          });
       },
       initNoticeEvent() {
         this.removeNoticeEvent();
@@ -139,7 +154,15 @@
         this.editor.execCommand("inserthtml", content);
       },
       getContent() {
-        this.editor.getContent();
+        return this.editor.getContent();
+      },
+      //获取编辑器文本内容
+      getContentTxt() {
+        return this.editor.getContentTxt();
+      },
+      //获取编辑器纯文本内容
+      getPlainTxt() {
+        return this.editor.getPlainTxt();
       },
       initPlugsResourceSelector() {
         const self = this;
@@ -221,6 +244,44 @@
           })
         })
       },
+      initXsfSelector() {
+        const self = this;
+        UE.registerUI('xsfSelector',function(editor, uiName){
+          editor.ready(function() {
+            var editDoc = editor.document;
+            var handle = function(e) {
+              var target = e.target;
+              if(target.dataset.tag !== "nkcsource") return;
+              var type = target.dataset.type;
+              var score = target.dataset.id;
+              if(type !== "xsf") return;
+              self.$refs.xsfSelector.open(function(newscore) {
+                target.dataset.id = newscore;
+                target.dataset.message = "浏览这段内容需要"+newscore+"学术分(双击修改)";
+              }, parseFloat(score));
+            };
+            var count = 0;
+            editDoc.addEventListener("dblclick", handle);
+            editDoc.addEventListener("touchend", function(e) {   // 手机端模拟双击
+              ++count;
+              if(count == 2) return handle(e);
+              setTimeout(function(){ count = 0; }, 700);
+            });
+          });
+
+          return new UE.ui.Button({
+            name: uiName,
+            title:'学术分隐藏',
+            className: 'edui-default edui-for-hide-content edui-icon',
+            onclick:function () {
+              self.$refs.xsfSelector.open(res => {
+                if(!res) return;
+                editor.execCommand("inserthtml", resourceToHtml("xsf", res))
+              }, {});
+            }
+          })
+        });
+      },
       initPlugs() {
         const {plugs = {}, defaultPlugs} = this;
         const _plugs = Object.assign({}, defaultPlugs, plugs);
@@ -235,6 +296,9 @@
         }
         if(_plugs.mathJaxSelector) {
           this.initMathJaxSelector();
+        }
+        if(_plugs.xsfSelector) {
+          this.initXsfSelector();
         }
       },
     },

@@ -413,16 +413,7 @@ shopGoodsSchema.methods.onshelf = async function() {
   }});
   // 将thread的类型修改为“商品文章”
   // 将商品的主页图片复制裁剪到文章封面图文件夹
-  const resource = await ResourceModel.findOne({rid: imgMaster});
-  if(resource) {
-    const imgPath = await resource.getFilePath();
-    await AttachmentModel.savePostCover(post.pid, {
-      path: imgPath,
-      size: resource.size,
-      hash: resource.hash,
-      name: resource.name,
-    });
-  }
+  await AttachmentModel.savePostCover(post.pid, imgMaster);
 };
 
 /*

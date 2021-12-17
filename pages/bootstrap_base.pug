@@ -27,6 +27,7 @@ block head
     +includeJS("/external_pkgs/vue.js", true)
   +includeJS('/jquery/2.2.4/dist/jquery.min.js')
   +includeJS('/publicModules/common.js')
+  +includeJS('/tools.js')
   if remoteState.isApp && remoteState.platform === 'apiCloud'
     +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
@@ -73,7 +74,6 @@ block body
       Vue.config.productionTip = false;
   //- 弹窗模块
   +includeJS("/sweetalert2/dist/sweetalert2.all.min.js", true)
-  +includeJS('/tools.js')
   // 前后端公用 数据类型检查
   +includeJS("/checkData.js")
   //- 旧版common.js兼容旧的页面

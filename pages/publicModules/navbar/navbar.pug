@@ -130,57 +130,6 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         user-draw-count(:user="user")
         user-list(:user="user" :column="drawState.userInfo.userColumn" :permission="drawState.columnPermission")
         a(onclick="NKC.methods.logout()").nkc-drawer-exit 退出登录
-        //if remoteState.uidreote
-        //  ul.nkc-drawer-list
-        //    li
-        //      a(href=`/u/${data.user.uid}/profile`)
-        //        span.fa.fa-user-circle-o &nbsp;个人主页
-        //        span.pull-right.fa.fa-angle-right
-        //    if state.userColumn
-        //      li
-        //        a(href=`/m/${state.userColumn._id}`)
-        //          span.fa.fa-columns &nbsp;专栏
-        //          span.pull-right.fa.fa-angle-right
-        //    else if data.user && state.columnPermission
-        //      li
-        //        a(href=`/column/apply`)
-        //          span.fa.fa-columns &nbsp;开设专栏
-        //          span.pull-right.fa.fa-angle-right
-        //    li
-              a(onclick='messageApp.toChat()')
-        //        span.fa.fa-envelope-o &nbsp;消息中心
-        //          span.nkc-drawer-message.nkc-drawer-link.message-switch-div.message-count-container(class="hidden" )
-        //            span.message-switch.message-count(class="hidden")
-        //        span.pull-right.fa.fa-angle-right
-        //
-        //    li
-        //      a(href=`/u/${data.user.uid}/profile/draft`)
-        //        span.fa.fa-inbox &nbsp;我的草稿
-        //          if data.user && data.user.draftCount > 0
-        //            span=`(${data.user.draftCount})`
-        //        span.pull-right.fa.fa-angle-right
-        //    li
-        //      a(href=`/u/${data.user.uid}/profile/finance?t=all`)
-        //        span.fa.fa-file-text-o &nbsp;我的账单
-        //        span.pull-right.fa.fa-angle-right
-        //  ul.nkc-drawer-list
-        //    li
-        //      a(href=`/u/${data.user.uid}/settings`)
-        //        span.fa.fa-cog &nbsp;设置
-        //        span.pull-right.fa.fa-angle-right
-        //  ul.nkc-drawer-list
-        //    li
-        //      a(href=`/shop/order`)
-        //        span.fa.fa-file-text-o &nbsp;我的订单
-        //        span.pull-right.fa.fa-angle-right
-        //    li
-        //      a(href=`/shop/manage/order`)
-        //        span.fa.fa-archive &nbsp;我出售的
-        //        span.pull-right.fa.fa-angle-right
-        //    li
-        //      a(href=`/shop/cart`)
-        //        span.fa.fa-shopping-cart &nbsp;购物车
-        //        span.pull-right.fa.fa-angle-right
     .left-draw-loading(v-else)
       .loading
         .fa.fa-spinner.fa-spin.fa-fw

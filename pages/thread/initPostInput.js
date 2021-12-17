@@ -1,6 +1,43 @@
-var ue = UE.getEditor('container', NKC.configs.ueditor.postConfigs);
-NKC.methods.ueditor.initDownloadEvent(ue);
-window.ue = ue;
+import {getPostEditorConfigs} from '../lib/js/editor'
+import Editor from '../lib/vue/Editor'
+const container = $('#editorContainer');
+if(container.length > 0) {
+  const postEditor = new Vue({
+    el: '#editorContainer',
+    data: {
+      editorPlugs: {
+        resourceSelector: true,
+        draftSelector: true,
+        stickerSelector: true,
+        xsfSelector: true,
+        mathJaxSelector: true,
+      }
+    },
+    mounted() {
+    },
+    computed: {
+      editorConfigs() {
+        return getPostEditorConfigs();
+      },
+    },
+    components: {
+      'editor': Editor,
+    },
+    methods: {
+      removeEvent() {
+        this.$refs.postEditor.removeNoticeEvent();
+      },
+      getRef() {
+        return this.$refs.postEditor;
+      }
+    },
+  });
+  window.ue = postEditor.getRef();
+}
+
+// var ue = UE.getEditor('container', NKC.configs.ueditor.postConfigs);
+// NKC.methods.ueditor.initDownloadEvent(ue);
+// window.ue = ue;
 
 /*
 var ue = UE.getEditor('container', {

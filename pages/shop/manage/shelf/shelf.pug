@@ -38,13 +38,14 @@ block shopContent
           label.col-sm-2.control-label 商品关键词
           .col-sm-10
             .shelf-keywords
-              .shelf-keyword(v-for="k, index in keywords") {{k}}
+              .shelf-keyword(v-for="(k, index) in keywords") {{k}}
                 .fa.fa-remove(@click="removeKeyword(index)")
               button.btn.btn-default.btn-sm(@click="addKeywords") 添加
         .form-group
           label.col-sm-2.control-label 图文描述
           .col-sm-10
-            script#container(name='content', type='text/plain')
+            editor(:configs="editorConfigs" ref="shopEditor" :plugs="editorPlugs")
+            //script#container(name='content', type='text/plain')
 
     .shop-header 其他信息
     .form.form-horizontal.m-t-1
@@ -52,7 +53,7 @@ block shopContent
         label.col-sm-2.control-label 商品图片
         .col-sm-10
           .pictures
-            .picture(v-for="rid, index in imgIntroductions" @click="selectPictures(index)")
+            .picture(v-for="(rid, index) in imgIntroductions" @click="selectPictures(index)")
               img(:src="'/r/' + rid" v-if="rid")
               .fa.fa-plus.add(v-else)
               .buttons(v-if="rid")
@@ -69,7 +70,7 @@ block shopContent
             div
               h5 例：若属性1为“红色，蓝色”，属性2为“大，中”，则生成的组合规格为“红色 大”，“红色 中”，“蓝色 大”，“蓝色 中”。
               button.btn.btn-default.btn-sm(@click="addParamAttribute") 新建属性
-            div(v-for="p, index in params")
+            div(v-for="(p, index) in params")
               h5 属性{{index+1}}
                 .pull-right(v-if="index > 1")
                   button.order-button(@click="removeParamAttribute(index)") 删除
@@ -93,7 +94,7 @@ block shopContent
                   th 优惠价（元）
                   th 其他
               tbody
-                tr(v-for="p, index in selectedParams" :style="p._id && !p.isEnable?'background-color: #ccc':''")
+                tr(v-for="(p, index) in selectedParams" :style="p._id && !p.isEnable?'background-color: #ccc':''")
                   th
                     button.btn.btn-default.btn-xs(@click="changeArrIndex(selectedParams, index, 'left')") 上移
                     button.btn.btn-default.btn-xs(@click="changeArrIndex(selectedParams, index, 'right')") 下移
@@ -178,7 +179,7 @@ block shopContent
                   th 每增加一件的价格（元）
                   th
               tbody
-                tr(v-for="t, index in freightTemplates")
+                tr(v-for="(t, index) in freightTemplates")
                   th
                     input.form-control(type="text" v-model.number="t.name" placeholder="请输入物流名称")
                   th
@@ -274,7 +275,6 @@ block shopScripts
   include ../../../publicModules/sticker/selectSticker
   include ../../../ueditor/dialogs/mathformulaV2/mathformula
   include ../../../publicModules/insertHideContent/insertHideContent
-  include ../../../ueditor/ueditor
   +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
   +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
   +includeJS("/shop/manage/shelf/shelf.js")

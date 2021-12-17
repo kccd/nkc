@@ -9,21 +9,20 @@ block settingsContent
       a.btn.btn-default.btn-ms(href=`/m/${data.column._id}/settings/page`) << 返回自定义页列表
     .row
       #data.hidden=objToStr({column: data.column, page: data.page})
-      .col-xs-12.col-md-12
+      #app.col-xs-12.col-md-12
         .form
           .form-group
             label 页面标题（选填）
-            input.form-control(type="text" id="title")
+            input.form-control(type="text" v-model="title")
           .form-group
             label 页面内容（必填）
-            #pageContent
+            editor(:configs="editorConfigs" ref="editorPageEditor" @ready="setEditorContent" :plugs="editorPlugs")
           .form-group
-            button.btn.btn-primary(onclick="save()") 保存
+            button.btn.btn-primary(@click="save()") 保存
 block settingsScripts
   include ../../publicModules/crop/crop
   include ../../publicModules/selectResource/selectResource
   include ../../publicModules/sticker/selectSticker
   include ../../publicModules/selectDraft/selectDraft
-  include ../../ueditor/ueditorBase
   include ../../publicModules/socket/socket
   +includeJS("/columns/settings/editPage.js")
