@@ -112,4 +112,12 @@ schema.statics.getBooksByUserId = async (uid) => {
   })
 };
 
+schema.methods.bindArticle = async function(articleId) {
+  this.updateOne({
+    $addToSet: {
+      list: `document:${articleId}`
+    }
+  });
+}
+
 module.exports = mongoose.model('books', schema);

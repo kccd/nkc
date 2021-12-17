@@ -9,10 +9,8 @@ const routes = [
   {name: 'material', path: '/creation/material', component: Material},
   {name: 'books', path: '/creation/books', component: Books},
   {name: 'book', path: '/creation/book/:bid', component: Book},
-  {name: 'bookEditor', path: '/creation/book/:bid/edit', component: BookEditor},
-  {name: 'bookCreator', path: '/creation/books/creator', component: BookEditor},
-  {name: 'articleCreator', path: '/creation/articles/creator', component: ArticleEditor},
-  {name: 'articleEditor', path: '/creation/article/:aid/edit', component: ArticleEditor},
+  {name: 'bookEditor', path: '/creation/books/editor', component: BookEditor},
+  {name: 'articleEditor', path: '/creation/articles/editor', component: ArticleEditor},
 ];
 
 const router = new VueRouter({

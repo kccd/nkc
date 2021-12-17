@@ -5,7 +5,7 @@ module.exports = {
   },
   books: {
     GET: 'creationCenter',
-    creator: {
+    editor: {
       GET: 'creationCenter',
       POST: 'creationCenter'
     }
@@ -20,17 +20,14 @@ module.exports = {
   },
   articles: {
     GET: 'creationCenter',
-    creator: {
+    editor: {
       GET: 'creationCenter',
       POST: 'creationCenter'
     }
   },
   article: {
     PARAMETER: {
-      GET: 'creationCenter',
-      edit: {
-        GET: 'creationCenter'
-      }
+      GET: 'creationCenter'
     }
   }
 }

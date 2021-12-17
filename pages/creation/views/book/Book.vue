@@ -12,7 +12,8 @@
           .creation-center-book-list-item(v-for="l in list")
             .creation-center-book-list-item-name {{l.name}}
             .creation-center-book-list-item-time {{l.time}}
-        button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('articleCreator')") 添加文章
+        button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('articleEditor')") 添加文章
+        button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('bookEditor')") 设置
 
 </template>
 
@@ -117,8 +118,13 @@
       this.getBook();
     },
     methods: {
-      navToPage(name) {
-        this.$router.push({name});
+      navToPage(name, query) {
+        this.$router.push({
+          name,
+          query: {
+            bid: this.bid
+          }
+        });
       },
       getBook() {
         nkcAPI(`/creation/book/${this.bid}`, 'GET')

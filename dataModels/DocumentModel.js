@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const customCheerio = require("../nkcModules/nkcRender/customCheerio");
 const schema = new mongoose.Schema({
   // 文档 ID
   _id: Number,
@@ -12,6 +13,12 @@ const schema = new mongoose.Schema({
   toc: {
     type: Date,
     default: Date.now,
+    index: 1
+  },
+  // 最后修改时间
+  tlm: {
+    type: Date,
+    default: null,
     index: 1
   },
   // 封面
@@ -65,8 +72,62 @@ const schema = new mongoose.Schema({
     default: null
   },
   // 已发送过@通知的用户
+}, {
+  collection: 'documents'
 });
 
+schema.statics.createDocument = async (props) => {
+  const {
+    title,
+    content,
+    cover,
+    uid,
+    time
+  } = props;
+  const DocumentModel = mongoose.model('documents');
+  const SettingModel = mongoose.model('settings');
+  const AttachmentModel = mongoose.model('attachments');
+  const documentId = await SettingModel.operateSystemID('documents');
+  const wordCount = customCheerio.load(content).text();
+  const document = new DocumentModel({
+    _id: documentId,
+    title,
+    content,
+    wordCount,
+    uid,
+    toc: time
+  });
+  await document.save();
+  if(cover) {
+    await AttachmentModel.saveDocumentCover(documentId, cover);
+  }
+  return document;
+};
+
+schema.methods.updateDocument = async (props) => {
+  const {title, content, cover} = props;
+  const AttachmentModel = mongoose.model('attachments');
+  const wordCount = customCheerio.load(content).text();
+  await this.updateOne({
+    $set: {
+      title,
+      content,
+      wordCount,
+      tlm: new Date()
+    }
+  });
+  if(cover) {
+    await AttachmentModel.saveDocumentCover(this._id, cover);
+  }
+}
+
+schema.methods.setAsHistory = async function(newDocumentId) {
+  await this.updateOne({
+    $set: {
+      originId: newDocumentId
+    }
+  });
+}
 
 // 更新数据
 schema.methods.updateData = async function(newData) {

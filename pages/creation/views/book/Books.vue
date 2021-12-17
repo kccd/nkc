@@ -2,7 +2,7 @@
   .creation-center-books
     .creation-center-books-header
       span.h2.m-r-1 我的文档
-      button.btn.btn-default.btn-sm(@click="navToPage('bookCreator')") 新建文档
+      button.btn.btn-default.btn-sm(@click="navToPage('bookEditor')") 新建文档
     .creation-center-books-list
       .creation-center-book-item(v-for="book in books" @click="navToPage('book', {bid: book._id})")
         .creation-center-book-cover(:style="`background-image:url(${book.coverUrl})`")

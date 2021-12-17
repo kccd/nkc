@@ -5,21 +5,34 @@ router
     data.books = await db.BookModel.getBooksByUserId(state.uid);
     await next();
   })
-  .get('/creator', async (ctx, next) => {
+  .get('/editor', async (ctx, next) => {
     await next();
   })
-  .post('/creator', async (ctx, next) => {
+  .post('/editor', async (ctx, next) => {
     const {state, body, db} = ctx;
     const {files, fields} = body;
     const {cover} = files;
-    const {name, description} = JSON.parse(fields.book);
+    const {name, description, bookId} = JSON.parse(fields.book);
+    let book;
+    if(bookId) {
+      book = await db.BookModel.findOnly({_id: bookId});
+    }
     const bookInfo = {
       name,
       description,
       uid: state.uid
     };
     await db.BookModel.checkBookInfo(bookInfo);
-    const book = await db.BookModel.createBook(bookInfo);
+    if(!book) {
+      book = await db.BookModel.createBook(bookInfo);
+    } else {
+      await book.updateOne({
+        $set: {
+          name,
+          description
+        }
+      });
+    }
     if(cover) {
       await db.AttachmentModel.saveBookCover(book._id, cover);
     }

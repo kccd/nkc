@@ -1,7 +1,7 @@
 <template lang="pug">
   .row
     image-selector(ref="imageSelector")
-    .col-xs-12.col-md-12
+    .col-xs-12.col-md-12.m-b-3
       bread-crumb(:list="navList")
     .col-xs-12.col-md-6.col-md-offset-3
       .formm
@@ -30,17 +30,8 @@
 
   export default {
     data: () => ({
-      mode: 'create', // create: 新建文档, modify: 修改文档
-      navList: [
-        {
-          name: '文档创作',
-          page: 'books'
-        },
-        {
-          name: '新建文档',
-        }
-      ],
       bookId: '',
+      bookName: '',
       book: {
         name: '',
         description: '',
@@ -54,15 +45,52 @@
     components: {
       'image-selector': ImageSelector
     },
+    mounted() {
+      this.init();
+    },
     computed: {
       bookCover() {
         const {book, fileBase64} = this;
         if(fileBase64) {
           return fileBase64;
-        } else if(book.cover) {
-          return getUrl('bookCover', book.cover)
+        } else if(book.coverUrl) {
+          return book.coverUrl;
         }
         return '';
+      },
+      navList() {
+        if(!this.bookId) {
+          return [
+            {
+              name: '文档创作',
+              page: 'books'
+            },
+            {
+              name: '新建文档'
+            }
+          ]
+        } else {
+          return [
+            {
+              name: '文档创作',
+              page: 'books'
+            },
+            {
+              name: '我的文档',
+              page: 'books'
+            },
+            {
+              name: this.bookName,
+              page: 'book',
+              params: {
+                bid: this.bookId
+              }
+            },
+            {
+              name: '设置'
+            }
+          ]
+        }
       }
     },
     methods: {
@@ -70,7 +98,9 @@
         this.$router.push({name});
       },
       init() {
-        if(this.mode === 'modify') {
+        const bookId = this.$route.query.bid;
+        if(bookId) {
+          this.bookId = bookId;
           this.initBook();
         }
       },
@@ -79,11 +109,16 @@
         if(!bookId) return;
         nkcAPI(`/creation/book/${bookId}`, 'GET')
           .then(data => {
-            const {name, description, cover} = data.book;
+            const {
+              name,
+              description,
+              coverUrl,
+            } = data.book;
+            this.bookName = name;
             this.book = {
               name,
               description,
-              cover
+              coverUrl
             };
           })
           .catch(sweetError)
@@ -124,13 +159,17 @@
               minLength: 0,
               maxLength: 1000
             });
-            if(!book.cover && !file) throw new Error(`请选择文档封面`);
+            if(!self.bookId && !file) throw new Error(`请选择文档封面`);
             const formData = new FormData();
             if(file) {
               formData.append('cover', file, 'cover.png');
             }
-            formData.append('book', JSON.stringify(book));
-            return nkcUploadFile(`/creation/books/creator`, 'POST', formData, (e, p) => {
+            formData.append('book', JSON.stringify({
+              bookId: self.bookId,
+              name: book.name,
+              description: book.description
+            }));
+            return nkcUploadFile(`/creation/books/editor`, 'POST', formData, (e, p) => {
               self.progress = p;
             });
           })
