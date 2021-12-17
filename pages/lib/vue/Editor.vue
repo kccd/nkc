@@ -86,6 +86,7 @@
         await this.initEditor();
         await this.initSocketEvent();
         await this.initNoticeEvent();
+        await this.contentChange();
       } catch(err) {
         console.log(err);
         this.errorInfo = err.error || err.message || err.toString();
@@ -98,10 +99,12 @@
       this.removeNoticeEvent();
     },
     methods: {
-      editorMethods(type, callback){
-        this.editor.execCommand(type, function () {
+      contentChange(){
+        const  _this = this;
+        return this.editor.addListener("contentChange", function () {
+          _this.$emit("content-change");
+          console.log('1111');
         });
-        callback();
       },
       initDomId() {
         if(this.domId) return;

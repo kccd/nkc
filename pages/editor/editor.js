@@ -55,6 +55,10 @@ $(function() {
       getRef(){
         return this.$refs.threadEditor;
       },
+      onContentChange(){
+        debugger
+        window.PostInfo.watchContentChange();
+      },
       editorReady() {
         //编辑器准备就绪
         resetBodyPaddingTop();
@@ -168,9 +172,9 @@ function initVueApp() {
     },
     mounted: function() {
       var this_ = this;
-      editor.editorMethods("contentChange", function () {
-        this_.watchContentChange();
-      });
+      // editor.editorMethods("contentChange", function () {
+      //   this_.watchContentChange();
+      // });
       data.mainForums = data.mainForums || [];
       for(var i = 0; i < data.mainForums.length; i++) {
         this_.initForumCategory(data.mainForums[i]);
@@ -228,6 +232,26 @@ function initVueApp() {
       }
     },
     computed: {
+      getOriginLevel(index) {
+        let obj = {
+          "0": "不声明",
+          "1": "普通转载",
+          "2": "获授权转载",
+          "3": "受权发表(包括投稿)",
+          "4": "发表人参与原创(翻译)",
+          "5": "发表人是合作者之一",
+          "6": "发表人本人原创"
+        };
+        if(!index) {
+          return obj;
+        }else{
+          for(var i in obj) {
+            if(i == index) {
+              return obj[i]
+            }
+          }
+        }
+      },
       // 是否能够申明原创
       allowedOriginal: function() {
         var allowed = this.contentLength >= this.originalWordLimit;
@@ -310,6 +334,7 @@ function initVueApp() {
       },
       // 监听内容输入
       watchContentChange: function() {
+        debugger
         var content = editor.getContentTxt();
         this.contentLength = content.length;
       },
@@ -358,6 +383,7 @@ function initVueApp() {
             self.coverData = data;
             NKC.methods.fileToUrl(NKC.methods.blobToFile(data))
               .then(function(data) {
+                debugger
                 self.coverUrl = data;
                 SelectImage.close();
               })
