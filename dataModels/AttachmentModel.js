@@ -265,7 +265,7 @@ schema.statics.saveScoreIcon = async (file, scoreType) => {
 * @param {File} file 文件对象 可选 默认从post resources中选取图片
 * @author pengxiguaa 2020/7/21
 * */
-schema.statics.savePostCover = async (pid, file) => {
+schema.statics.savePostCover = async (pid, fileData) => {
   const PostModel = mongoose.model('posts');
   const ResourceModel = mongoose.model('resources');
   const AttachmentModel = mongoose.model('attachments');
@@ -273,17 +273,27 @@ schema.statics.savePostCover = async (pid, file) => {
   const FILE = require('../nkcModules/file');
   const post = await PostModel.findOne({pid});
   if(!post) return;
-  if(file === undefined) {
-    const extArr = ['jpg', 'jpeg', 'png'];
-    const cover = await ResourceModel.findOne({ext: {$in: extArr}, references: pid});
-    if(!cover) return;
-    try{
-      const {url} = await cover.getRemoteFile();
+  let file;
+  try{
+    if(typeof fileData === 'string') {
+      const resource = await ResourceModel.findOne({rid: fileData});
+      if(!resource) return;
+      const {url} = await resource.getRemoteFile();
       file = await downloader(url);
-    } catch(err) {
-      return;
+    } else if(typeof fileData === undefined) {
+      const extArr = ['jpg', 'jpeg', 'png'];
+      const resource = await ResourceModel.findOne({ext: {$in: extArr}, references: pid});
+      if(!resource) return;
+      const {url} = await resource.getRemoteFile();
+      file = await downloader(url);
+    } else {
+      file = fileData;
     }
+  } catch(err) {
+    return;
   }
+  if(!file) return;
+
   const time = new Date();
   const aid = await AttachmentModel.getNewId();
   const ext = await FILE.getFileExtension(file, ['jpeg', 'jpg', 'png']);

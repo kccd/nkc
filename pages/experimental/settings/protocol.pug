@@ -28,7 +28,7 @@ block eContent
                 .form-group
                   label.col-sm-2.control-label 协议名称
                   .col-sm-10
-                    input#protocolName.form-control( placeholder='请输入协议名称，50个字以内' value=`${data.protocol.protocolName}`)    
+                    input#protocolName.form-control( placeholder='请输入协议名称，50个字以内' value=`${data.protocol.protocolName}`)
                     h5.text-danger 请尽量精简明确。
                 .form-group
                   label.col-sm-2.control-label 协议类型ID
@@ -43,9 +43,9 @@ block eContent
                 .form-group
                   .hidden#protocolHide= data.protocol.protocolContent
                   label.col-sm-2.control-label 协议内容
-                  .col-sm-10
+                  .col-sm-10#protocolEditorContainer
                     // 加载编辑器的容器
-                    script#container(name='content', type='text/plain')
+                    editor#container(:configs="editorConfigs" ref="protocolEditor" @ready="setContent" :plugs="editorPlugs")
             .col-xs-12.col-md-12(style="text-align:end")
               button#updateEdit.btn.btn-warning.btn-sm(onclick=`updateProtocol('${data.protocol.protocolTypeId}')`) 保存修改
       else
@@ -57,7 +57,7 @@ block eContent
                   .form-group
                     label.col-sm-2.control-label 协议名称
                     .col-sm-10
-                      input#protocolName.form-control( placeholder='请输入协议名称，50个字以内' max-length)    
+                      input#protocolName.form-control( placeholder='请输入协议名称，50个字以内' max-length)
                       h5.text-danger 请尽量精简明确。
                   .form-group
                     label.col-sm-2.control-label 协议类型ID
@@ -71,9 +71,9 @@ block eContent
                       h5.text-danger 唯一，由中文组成，不可有空格。
                   .form-group
                     label.col-sm-2.control-label 协议内容
-                    .col-sm-10
+                    .col-sm-10#protocolEditorContainer
                       // 加载编辑器的容器
-                      script#container(name='content', type='text/plain')
+                      editor#container(:configs="editorConfigs" ref="protocolEditor" @ready="setContent" :plugs="editorPlugs")
               .col-xs-12.col-md-12(style="text-align:end")
                 button#updateAdd.btn.btn-primary.btn-sm(onclick="addProtocol()") 保存
         else
@@ -103,7 +103,7 @@ block scripts
   +includeJS("/interface_common.js")
   +includeJS("/nkc_render.js")
   include ../../ueditor/ueditorBase.pug
-  script.
-    var ue = UE.getEditor('container', NKC.configs.ueditor.experimentalProtocol);
+  //script.
+  //  var ue = UE.getEditor('container', NKC.configs.ueditor.experimentalProtocol);
   +includeJS("/experimental/settings/protocol.js")
 

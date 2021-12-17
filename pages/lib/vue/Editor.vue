@@ -6,6 +6,7 @@
       draft-selector(ref="draftSelector")
       sticker-selector(ref="stickerSelector")
       xsf-selector(ref="xsfSelector")
+      math-jax-selector(ref="mathJaxSelector")
       div(:id="domId")
 </template>
 
@@ -24,6 +25,7 @@
   import ResourceSelector from './ResourceSelector';
   import DraftSelector from './DraftSelector';
   import StickerSelector from './StickerSelector';
+  import MathJaxSelector from "./MathJaxSelector";
   import XsfSelector from './XsfSelector';
   export default {
     props: ['configs', 'plugs'],
@@ -31,6 +33,7 @@
       'resource-selector': ResourceSelector,
       'draft-selector': DraftSelector,
       'sticker-selector': StickerSelector,
+      'math-jax-selector': MathJaxSelector,
       'xsf-selector': XsfSelector,
     },
     data: () => ({
@@ -42,6 +45,7 @@
         draftSelector: true,
         stickerSelector: true,
         xsfSelector: true,
+        mathJaxSelector: true,
       },
       defaultConfigs: {
         toolbars: [
@@ -70,7 +74,7 @@
         contextMenu: [],
         focus: false, // 默认获得焦点
         readonly: false, // 只读模式
-        wordCount: false, // 是否开启字数统计
+        wordCount: true, // 是否开启字数统计
         maximumWords: 100, // 最大字符数
         zIndex: 499,
       },
@@ -94,6 +98,11 @@
       this.removeNoticeEvent();
     },
     methods: {
+      editorMethods(type, callback){
+        this.editor.execCommand(type, function () {
+        });
+        callback();
+      },
       initDomId() {
         if(this.domId) return;
         this.domId = `editor_id_${Date.now()}_${Math.round(Math.random() * 100000)}`;
@@ -104,7 +113,13 @@
           const {domId, defaultConfigs, configs = {}} = self;
           self.editor = UE.getEditor(domId, Object.assign({}, defaultConfigs, configs));
           self.editor.ready(resolve);
-        });
+
+        })
+          .then(() => {
+            setTimeout(() => {
+              self.$emit('ready');
+            }, 500)
+          });
       },
       initNoticeEvent() {
         this.removeNoticeEvent();
@@ -139,7 +154,15 @@
         this.editor.execCommand("inserthtml", content);
       },
       getContent() {
-        this.editor.getContent();
+        return this.editor.getContent();
+      },
+      //获取编辑器文本内容
+      getContentTxt() {
+        return this.editor.getContentTxt();
+      },
+      //获取编辑器纯文本内容
+      getPlainTxt() {
+        return this.editor.getPlainTxt();
       },
       initPlugsResourceSelector() {
         const self = this;
@@ -160,7 +183,7 @@
                   var type = source.mediaType;
                   type = type.substring(5);
                   type = type[0].toLowerCase() + type.substring(1);
-                  self.editor.execCommand('inserthtml', resourceToHtml(type, source.rid, source.oname));
+                  editor.execCommand('inserthtml', resourceToHtml(type, source.rid, source.oname));
                 }
               }, {
                 fastSelect: true
@@ -179,7 +202,7 @@
             onclick:function () {
               self.$refs.draftSelector.open(data => {
                 if(!data || !data.content) return;
-                self.editor.execCommand('inserthtml', data.content);
+                editor.execCommand('inserthtml', data.content);
               });
             }
           });
@@ -204,6 +227,22 @@
             }
           })
         });
+      },
+      initMathJaxSelector() {
+        const self = this;
+        UE.registerUI('mathJaxSelector', function (editor, uiName) {
+          return new UE.ui.Button({
+            name: uiName,
+            title:'插入公式',
+            className: 'edui-default edui-for-mathformula edui-icon',
+            onclick: function () {
+              self.$refs.mathJaxSelector.open(content => {
+                if(!content) return;
+                editor.execCommand("inserthtml", content)
+              });
+            }
+          })
+        })
       },
       initXsfSelector() {
         const self = this;
@@ -254,6 +293,9 @@
         }
         if(_plugs.stickerSelector) {
           this.initStickerSelector();
+        }
+        if(_plugs.mathJaxSelector) {
+          this.initMathJaxSelector();
         }
         if(_plugs.xsfSelector) {
           this.initXsfSelector();

@@ -21,7 +21,7 @@
       }
     });
   });
-  
+
   // 插入表情
   UE.registerUI('stickerSelector',function(editor,uiName){
     if(NKC.modules.SelectSticker && !window.SelectSticker) {
@@ -48,7 +48,7 @@
       }
     })
   });
-  
+
   // 插入图片
   UE.registerUI('imageSelector',function(editor,uiName){
     if(NKC.modules.SelectResource && !window.SelectResource) {
@@ -94,8 +94,8 @@
       }
     })
   });
-  
-  
+
+
   // 插入附件
   // UE.registerUI('resourceSelector',function(editor,uiName){
   //   // return sweetError("未引入资源选择模块");
@@ -112,7 +112,7 @@
   //       if(window.SelectResource) {
   //         window.SelectResource.open(function(data) {
   //           console.log(data);
-            
+
   //           if(data.resources) {
   //             data = data.resources;
   //           } else {
@@ -135,7 +135,7 @@
   //     }
   //   })
   // });
-  
+
   // 插入公式
   // UE.registerUI('mathFormula',function(editor,uiName){
   //   // 获取屏幕分辨率 根据分辨率调节公式输入框的宽度
@@ -160,10 +160,10 @@
   //     name:uiName,
   //     //dialog的标题
   //     title:"插入公式",
-  
+
   //     //指定dialog的外围样式
   //     cssRules: dialogCSS,
-  
+
   //     //如果给出了buttons就代表dialog有确定和取消
   //     buttons:[
   //       {
@@ -183,7 +183,7 @@
   //     ]
   //   });
   //   // 当点击编辑内容时，按钮要做的反射状态
-  
+
   //   //参考addCustomizeButton.js
   //   return new UE.ui.Button({
   //     name:'dialogbutton',
@@ -198,7 +198,7 @@
   //     }
   //   });
   // }/*index 指定添加到工具栏上的那个位置，默认时追加到最后,editorId 指定这个UI是那个编辑器实例上的，默认是页面上所有的编辑器都会添加这个按钮*/);
-  
+
   // 判断是否为pc
   function IsPC() {
     var userAgentInfo = navigator.userAgent;
@@ -221,7 +221,7 @@
     if(NKC.modules.insertMathformula && !window.insertMathformula) {
       window.insertMathformula = new NKC.modules.insertMathformula();
     }
-  
+
     // editor.ready(function() {
     //   var editDoc = editor.document;
     //   var handle = function(e) {
@@ -259,16 +259,16 @@
       }
     })
   });
-  
-  
-  
-  
+
+
+
+
   // 注册一个隐藏区域功能
   UE.registerUI('hideContent',function(editor,uiName){
     if(NKC.modules.insertHideContent && !window.insertHideContent) {
       window.insertHideContent = new NKC.modules.insertHideContent();
     }
-  
+
     editor.ready(function() {
       var editDoc = editor.document;
       var handle = function(e) {

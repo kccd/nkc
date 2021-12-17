@@ -60,7 +60,8 @@ block content
               .form-group
                 label.col-sm-2.control-label 专业说明
                 .col-sm-5
-                  button.btn.btn-default(@click=`toEditor`) 去编辑器
+                  editor(:configs="EditorConfigs" ref="forumExplainEditor" :plugs="editorPlugs")
+                  //-button.btn.btn-default(@click=`toEditor`) 去编辑器
               .form-group
                 label.col-sm-2.control-label 专业公告
                 .col-sm-5
@@ -68,7 +69,8 @@ block content
               .form-group
                 label.col-sm-2.control-label 专业最新页板块公告
                 .col-sm-5
-                  button.btn.btn-default(@click=`toLatestNoticeEditor`) 去编辑器
+                  editor(:configs="EditorConfigs" ref="forumNoticeEditor" @ready="editorReady" :plugs="editorPlugs")
+                  //button.btn.btn-default(@click=`toLatestNoticeEditor`) 去编辑器
               .form-group
                 label.col-sm-2.control-label 快速入门
                 .col-sm-5
