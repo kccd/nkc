@@ -149,7 +149,7 @@
   }
   .module-sr-title{
     cursor: move;
-    font-weight: 700;
+    //font-weight: 700;
     margin-left: 1rem;
   }
   .module-sr-header .fa{
@@ -187,7 +187,7 @@
     border-radius: 3px;
     display: inline-block;
     cursor: pointer;
-    font-weight: 700;
+    //font-weight: 700;
     color: #555;
     transition: background-color 100ms, color 100ms;
   }

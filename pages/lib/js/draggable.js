@@ -1,46 +1,34 @@
-/*
-* 将元素设为可拖动元素
-* @param {String} jQuery selector 需要设为可拖动元素的元素
-* @param {String} jQuery selector 拖动的手柄（鼠标按下该元素后移动）
-* */
-import {getFromLocalStorage, saveToLocalStorage, storageKeys} from "./localStorage";
-
+import {getFromSessionStorage, saveToSessionStorage, sessionStorageKeys} from "./sessionStorage";
 const defaultZIndex = 1050;
-
-export function getZIndex() {
-  let {zIndex} = getFromLocalStorage(storageKeys.draggableElement);
-  try{
-    if(!zIndex || typeof zIndex !== 'number') zIndex = defaultZIndex;
-    zIndex += 10;
-  } catch(err) {
+/*
+* 从 sessionStorage 中获取最大 zIndex
+* @param {Number} oldZIndex 旧的 zIndex，如果已经是最大了则直接返回
+* @return {Number}
+* */
+export function getZIndex(oldZIndex) {
+  let {zIndex} = getFromSessionStorage(sessionStorageKeys.draggableElement);
+  if(!zIndex || typeof zIndex !== 'number') {
     zIndex = defaultZIndex;
   }
-  saveToLocalStorage(storageKeys.draggableElement, {zIndex});
+  if(!oldZIndex || oldZIndex < zIndex) {
+    zIndex += 1;
+  }
+  saveToSessionStorage(sessionStorageKeys.draggableElement, {zIndex});
   return zIndex;
 }
-export function setAsDraggableElement(container, handSelector, func) {
-  const containerJQ = $(container);
-  containerJQ.draggable({
-    scroll: false,
-    handle: $(handSelector),
-    drag: function(event, ui) {
-      if(ui.position.top < 0) ui.position.top = 0;
-      var height = $(window).height();
-      if(ui.position.top > height - 30) ui.position.top = height - 30;
-      var width = containerJQ.width();
-      if(ui.position.left < 100 - width) ui.position.left = 50 - width;
-      var winWidth = $(window).width();
-      if(ui.position.left > winWidth - 100) ui.position.left = winWidth - 50;
-      if(func) {
-        func({
-          top: ui.position.top,
-          left: ui.position.left
-        });
-      }
-    }
-  });
-  return containerJQ;
+/*
+* 重置 zIndex
+* */
+export function resetZIndex() {
+  saveToSessionStorage(sessionStorageKeys.draggableElement, {zIndex: defaultZIndex});
 }
+/*
+* 可拖动元素
+* @param {String} jQuery selector 需要设为可拖动元素的元素
+* @param {String} jQuery selector 拖动的手柄（鼠标按下该元素后移动）
+* @param {Function} func 位置改变时的回调
+* @return {DraggableElement} 可拖动元素实例
+* */
 
 export class DraggableElement {
   constructor(element, handSelector, func) {
@@ -82,10 +70,15 @@ export class DraggableElement {
     this.JQRoot.hide();
   }
   updateZIndex() {
-    const zIndex = getZIndex();
-    this.JQRoot.css({
-      'z-index': zIndex
-    });
+    let oldZIndex = this.JQRoot.attr('data-z-index');
+    oldZIndex = Number(oldZIndex);
+    oldZIndex = isNaN(oldZIndex)? 0: oldZIndex;
+    const zIndex = getZIndex(oldZIndex);
+    this.JQRoot
+      .css({
+        'z-index': zIndex
+      })
+      .attr('data-z-index', zIndex);
   }
   destroy() {
     this.JQRoot.draggable('destroy');
