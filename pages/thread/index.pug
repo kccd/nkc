@@ -609,8 +609,6 @@ block scripts
         -fid = f.fid;
     if fid
       script=`NKC.configs.fid = '${fid}';`
-  if data.user
-    include ../ueditor/ueditorBase
   if data.user && showEditor
     +includeJS("/thread/initPostInput.js")
   if state.userColumn && !data.addedToColumn && showEditor
