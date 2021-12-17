@@ -80,6 +80,7 @@ const community = require('./community');
 const watermark = require('./watermark');
 const drawData = require('./drawData');
 const logo = require('./logo');
+const book = require('./book');
 const pim = require('./pim');
 const operationObj = {};
 
@@ -274,6 +275,7 @@ operationObj.operationTree = {
     test,
 		draw: drawData, //获取手机浏览器左侧滑动框
     mathJax, // 编辑器预览公式
+    book, // 书籍
 	}
 };
 module.exports = operationObj;
