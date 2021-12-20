@@ -56,7 +56,6 @@ $(function() {
         return this.$refs.threadEditor;
       },
       onContentChange(){
-        debugger
         window.PostInfo.watchContentChange();
       },
       editorReady() {
@@ -334,7 +333,6 @@ function initVueApp() {
       },
       // 监听内容输入
       watchContentChange: function() {
-        debugger
         var content = editor.getContentTxt();
         this.contentLength = content.length;
       },

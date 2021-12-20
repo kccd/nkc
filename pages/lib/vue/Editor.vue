@@ -103,7 +103,6 @@
         const  _this = this;
         return this.editor.addListener("contentChange", function () {
           _this.$emit("content-change");
-          console.log('1111');
         });
       },
       initDomId() {

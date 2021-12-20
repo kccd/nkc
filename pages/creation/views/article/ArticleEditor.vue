@@ -8,7 +8,7 @@
         .form-group
           input.form-control(type="text" v-model="article.title")
         .form-group
-          editor(:configs="editorConfigs" ref="editor" :plugs="editorPlugs")
+          editor(:configs="editorConfigs" ref="editor" @content-change="watchContentChange" :plugs="editorPlugs")
         .form-group
           .m-b-2(v-if="['newDocument', 'modifyDocument'].indexOf(type) !== -1")
             .editor-header 封面图
@@ -56,9 +56,12 @@
             .editor-header 原创
               small （字数小于{{originalWordLimit}}的文章无法声明原创）
             .editor-origin-state.form-inline
-              select.form-control(v-model="originState" :disabled="!allowedOriginal" :title="!allowedOriginal?'字数小于'+originalWordLimit+'的文章不可申明原创': ''")
-                for text, index in getOriginLevel()
-                  option(:value=index)=text
+              select.form-control(
+                v-model="originState"
+                :disabled="!allowedOriginal"
+                :title="!allowedOriginal?'字数小于' + originalWordLimit + '的文章不可申明原创': ''"
+                )
+                option(v-for="(text, index) in originLevel" :value="index") {{text}}
 
 </template>
 
@@ -147,6 +150,7 @@
   import {getUrl} from "../../../lib/js/tools";
   import {blobToFile, fileToBase64} from "../../../lib/js/file";
   import {getLength} from "../../../lib/js/checkData";
+  import {getDocumentEditorConfigs} from "../../../lib/js/editor";
   export default {
     data: () => ({
       navList: [
@@ -174,25 +178,39 @@
       keyWordsEn: [], // 英文关键词
       originalWordLimit: 500 || 0,
       originState: 0, // 原创声明
-      editorConfigs: {
-
-      },
+      contentLength: 0,
+      originLevel: [
+        "不声明",
+        "普通转载",
+        "获授权转载",
+        "受权发表(包括投稿)",
+        "发表人参与原创(翻译)",
+        "发表人是合作者之一",
+        "发表人本人原创"
+      ],
       editorPlugs: {
         resourceSelector: true
       }
     }),
     computed: {
       // 摘要的字节数
-      abstractCnLength: function() {
+      abstractCnLength() {
         return this.getLength(this.abstractCn);
       },
-      abstractEnLength: function() {
+      abstractEnLength() {
         return this.getLength(this.abstractEn);
       },
       // 关键词字数
-      keywordsLength: function() {
+      keywordsLength() {
         return this.keyWordsEn.length + this.keyWordsCn.length;
       },
+      // 是否能够申明原创
+      allowedOriginal() {
+        return this.contentLength >= this.originalWordLimit;
+      },
+      editorConfigs() {
+        return getDocumentEditorConfigs();
+      }
     },
     components: {
       'editor': Editor,
@@ -201,7 +219,6 @@
       'common-modal': CommonModal,
     },
     mounted() {
-
     },
     methods: {
       getLength: getLength,
@@ -287,6 +304,11 @@
         this.cover = "";
         this.coverData = "";
         this.coverUrl = "";
+      },
+      // 监听内容输入
+      watchContentChange: function() {
+        const content = this.$refs.editor.getContentTxt();
+        this.contentLength = content.length;
       },
     }
 
