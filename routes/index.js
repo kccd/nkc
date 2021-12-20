@@ -70,6 +70,8 @@ const logoRouter = routers.logo;
 const pimRouter = routers.pim;
 //手机浏览器滑动框
 const drawDataRouter = routers.drawData;
+// 书籍详细页
+const bookRouter = routers.book;
 
 const path = require('path');
 
@@ -148,4 +150,5 @@ router.use('/logo', logoRouter.routes(), logoRouter.allowedMethods());
 router.use('/creation', creationRouter.routes(), creationRouter.allowedMethods());
 router.use('/draw', drawDataRouter.routes(), drawDataRouter.allowedMethods());
 router.use('/mathJax', mathJaxRouter.routes(), mathJaxRouter.allowedMethods());
+router.use('/book', bookRouter.routes(), bookRouter.allowedMethods());
 module.exports = router;
