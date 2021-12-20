@@ -130,8 +130,9 @@
         if(!this.cropper || !this.cropper.destroy) return;
         this.cropper.destroy();
       },
-      resetCropperImage() {
-        this.cropper.replace(this.fileBase64);
+      resetCropperImage(url) {
+        url = url || this.fileBase64;
+        this.cropper.replace(url);
       },
       selectedFile() {
         const self = this;
@@ -147,7 +148,13 @@
         const self = this;
         return new Promise((resolve, reject) => {
           self.initModal();
-          const {aspectRatio = 1} = options;
+          const {
+            aspectRatio = 1,
+            url = ''
+          } = options;
+          if(url) {
+            self.resetCropperImage(url);
+          }
           self.cropper.setAspectRatio(aspectRatio);
           self.resolve = resolve;
           self.reject = reject;

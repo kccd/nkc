@@ -37,7 +37,7 @@ const schema = new mongoose.Schema({
     default: ''
   },
   // 文档关键词 英文
-  keywordsEn: {
+  keywordsEN: {
     type: [String],
     default: []
   },
@@ -47,7 +47,7 @@ const schema = new mongoose.Schema({
     default: []
   },
   // 文档摘要 英文
-  abstractEn: {
+  abstractEN: {
     type: String,
     default: ''
   },

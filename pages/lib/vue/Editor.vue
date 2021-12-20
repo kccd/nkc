@@ -86,6 +86,7 @@
         await this.initEditor();
         await this.initSocketEvent();
         await this.initNoticeEvent();
+        await this.contentChange();
       } catch(err) {
         console.log(err);
         this.errorInfo = err.error || err.message || err.toString();
@@ -98,10 +99,11 @@
       this.removeNoticeEvent();
     },
     methods: {
-      editorMethods(type, callback){
-        this.editor.execCommand(type, function () {
+      contentChange(){
+        const  _this = this;
+        return this.editor.addListener("contentChange", function () {
+          _this.$emit("content-change");
         });
-        callback();
       },
       initDomId() {
         if(this.domId) return;
@@ -258,7 +260,7 @@
               self.$refs.xsfSelector.open(function(newscore) {
                 target.dataset.id = newscore;
                 target.dataset.message = "浏览这段内容需要"+newscore+"学术分(双击修改)";
-              }, parseFloat(score));
+              }, parseInt(score));
             };
             var count = 0;
             editDoc.addEventListener("dblclick", handle);
