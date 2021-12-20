@@ -59,6 +59,7 @@ export class DraggableElement {
         }
       })
       .on('mousedown', this._mousedownEvent);
+    this.addClassAndInsertDraggableStyleToDocument();
     this.updateZIndex();
     this.setPositionCenter();
   }
@@ -90,13 +91,29 @@ export class DraggableElement {
     if(width < 700) {
       // 小屏幕
       JQRoot.css({
+        "height": "auto!important",
         "width": width * 0.8,
         "top": 0,
         "right": 0
       });
     } else {
       // 宽屏
-      JQRoot.css("left", (width - JQRoot.width()) * 0.5 - 20);
+      JQRoot.css({
+        'left':  (width - JQRoot.width()) * 0.5 - 20,
+        'height': 'auto!important'
+      });
     }
+  }
+  addClassAndInsertDraggableStyleToDocument() {
+    const className = 'draggable-element';
+    const dataType = 'draggableStyle';
+    let style = $(`style[data-type="${dataType}"]`);
+    if(style.length === 0) {
+      style = $('<style></style>');
+      style.attr('data-type', dataType);
+      style.text(`.${className}{height: auto!important;}`);
+      $(body).append(style);
+    }
+    this.JQRoot.addClass(className);
   }
 }

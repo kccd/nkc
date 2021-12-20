@@ -1,67 +1,33 @@
 <template lang="pug">
-  //.modal-container
-  //  .modal-sm(role="document" v-if="show")
-  //    .modal-content
-  //      .modal-header
-  //        .fa.fa-remove(@click="close")
-  //        .modal-title {{title}}
-  //        .quote-content(v-if="quote") {{quote}}
-  //      .modal-body
-  //        .form
-  //          .form-group(v-for="(d, index) in data")
-  //            h5(v-if="d.label") {{d.label}}
-  //            //- 数字input
-  //            input.form-control(v-if="d.dom === 'input' && d.type === 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model.number="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
-  //            //- 非数字input
-  //            input.form-control(v-if="d.dom === 'input' && d.type !== 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
-  //            //- 文件input
-  //            input.form-control(v-if="d.dom === 'input' && d.type === 'file'" type="file" @change="pickedFile(index)" @keyup.enter="submit" :ref="'input' + index" :accept="d.accept")
-  //            //- 文本框
-  //            textarea.form-control(v-if="d.dom === 'textarea'" v-model="d.value" :placeholder="d.placeholder || ''" :rows="d.rows || 4" @keyup.enter="!d.disabledKeyup?submit:';'" )
-  //            //- 单选
-  //            .radio(v-if="d.dom === 'radio'")
-  //              label.m-r-05(v-for="r in d.radios")
-  //                input(type="radio" :value="r.value" v-model="d.value")
-  //                span {{r.name}}
-  //            .checkbox(v-if="d.dom === 'checkbox'")
-  //              label.m-r-05(v-for="r in d.checkboxes")
-  //                input(type="checkbox" :value="r._id" name="checkboxes" v-model="d.value")
-  //                span {{r.name}}
-  //      .modal-footer
-  //        .options-button
-  //          a(@click="close") 关闭
-  //          a.active(@click="submit") 确定
   .module-dialog-body
     .module-dialog-header(ref="draggableHandle")
       .module-dialog-title {{title}}
       .module-dialog-close(@click="close")
         .fa.fa-remove
     .module-dialog-content
-      .container-fluid
-        .row
-          .form-group(v-for="(d, index) in data")
-            h5(v-if="d.label") {{d.label}}
-            //- 数字input
-            input.form-control(v-if="d.dom === 'input' && d.type === 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model.number="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
-            //- 非数字input
-            input.form-control(v-if="d.dom === 'input' && d.type !== 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
-            //- 文件input
-            input.form-control(v-if="d.dom === 'input' && d.type === 'file'" type="file" @change="pickedFile(index)" @keyup.enter="submit" :ref="'input' + index" :accept="d.accept")
-            //- 文本框
-            textarea.form-control(v-if="d.dom === 'textarea'" v-model="d.value" :placeholder="d.placeholder || ''" :rows="d.rows || 4" @keyup.enter="!d.disabledKeyup?submit:';'" )
-            //- 单选
-            .radio(v-if="d.dom === 'radio'")
-              label.m-r-05(v-for="r in d.radios")
-                input(type="radio" :value="r.value" v-model="d.value")
-                span {{r.name}}
-            .checkbox(v-if="d.dom === 'checkbox'")
-              label.m-r-05(v-for="r in d.checkboxes")
-                input(type="checkbox" :value="r._id" name="checkboxes" v-model="d.value")
-                span {{r.name}}
-        .row
-          .col-xs-5
-          button.btn.btn-default.col-xs-3(@click="close") 关闭
-          button.btn.btn-primary.col-xs-3.insert-hide-content-action(@click="submit") 确定
+      .form
+        .form-group(v-for="(d, index) in data")
+          h5(v-if="d.label") {{d.label}}
+          //- 数字input
+          input.form-control(v-if="d.dom === 'input' && d.type === 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model.number="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
+          //- 非数字input
+          input.form-control(v-if="d.dom === 'input' && d.type !== 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
+          //- 文件input
+          input.form-control(v-if="d.dom === 'input' && d.type === 'file'" type="file" @change="pickedFile(index)" @keyup.enter="submit" :ref="'input' + index" :accept="d.accept")
+          //- 文本框
+          textarea.form-control(v-if="d.dom === 'textarea'" v-model="d.value" :placeholder="d.placeholder || ''" :rows="d.rows || 4" @keyup.enter="!d.disabledKeyup?submit:';'" )
+          //- 单选
+          .radio(v-if="d.dom === 'radio'")
+            label.m-r-05(v-for="r in d.radios")
+              input(type="radio" :value="r.value" v-model="d.value")
+              span {{r.name}}
+          .checkbox(v-if="d.dom === 'checkbox'")
+            label.m-r-05(v-for="r in d.checkboxes")
+              input(type="checkbox" :value="r._id" name="checkboxes" v-model="d.value")
+              span {{r.name}}
+      .m-t-1.m-b-1.text-right
+        button.btn.btn-sm.btn-default.m-r-05(@click="close") 关闭
+        button.btn.btn-sm.btn-primary(@click="submit") 确定
 </template>
 
 <style lang="less" scoped>
@@ -69,7 +35,7 @@
 .module-dialog-body{
   display: none;
   position: fixed;
-  width: 252px;
+  width: 30rem;
   max-width: 100%;
   top: 100px;
   right: 0;
@@ -104,7 +70,7 @@
     }
   }
   .module-dialog-content{
-    padding: 1rem;
+    padding: 0 1rem;
     .container-fluid{
       .insert-hide-content-action{
         margin-left: 10px;

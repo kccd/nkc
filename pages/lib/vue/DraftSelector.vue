@@ -8,7 +8,7 @@
         .null 加载中...
       .module-content(v-else)
         .module-drafts
-          .module-draft-warning 此处只插入正文，如果要使用草稿中的其余内容，请点击继续创作。
+          .module-draft-warning.bg-warning.text-warning 此处只插入正文，如果要使用草稿中的其余内容，请点击继续创作。
           .paging-button
             a.button.m-r-05.radius-left.radius-right(@click="refresh") 刷新
             span(v-for="(b, index) in paging.buttonValue")
@@ -91,17 +91,8 @@
             border-bottom: none;
           }
           .module-draft-warning{
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            min-height: 2rem;
-            padding-top: 0.4rem;
-            padding-bottom: 0.2rem;
-            color: #888;
             font-size: 1rem;
-            padding-left: 1rem;
-            left: 0;
-            background-color: #f6f6f6;
+            padding: 0.5rem 1rem;
           }
           .module-draft{
             padding: 0.3rem 1rem;
@@ -154,6 +145,7 @@
               }
               .module-time{
                 color: @accent;
+                margin-right: 0.5rem;
               }
               .module-from{
                 color: #666;
