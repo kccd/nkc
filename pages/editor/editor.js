@@ -24,7 +24,7 @@ window.PostSurvey = undefined;
 window.ForumSelector = undefined;
 window.CommonModal = undefined;
 // 标志：编辑器是否已初始化
-var EditorReady = false;
+let EditorReady = false;
 window.data = undefined;
 import Editor from "../lib/vue/Editor";
 import {getEditorConfigs} from "../lib/js/editor";
@@ -170,12 +170,12 @@ function initVueApp() {
       threadCategories: data.threadCategories
     },
     mounted: function() {
-      var this_ = this;
+      let this_ = this;
       // editor.editorMethods("contentChange", function () {
       //   this_.watchContentChange();
       // });
       data.mainForums = data.mainForums || [];
-      for(var i = 0; i < data.mainForums.length; i++) {
+      for(const i = 0; i < data.mainForums.length; i++) {
         this_.initForumCategory(data.mainForums[i]);
       }
       this.selectedForums = data.mainForums || [];
@@ -186,14 +186,14 @@ function initVueApp() {
       this.draftId = data.draftId;
       this.oldDraft = data.oldDraft;
       this.initPost(data.post);
-      var self = this;
+      let self = this;
       editor.methods.selectedDraft = function(draft) {
         self.insertDraftInfo(draft);
       };
       // 判断草稿箱里是否存在该类型且未被删掉的草稿。
       // 若存在则此内容未发表。
       if(self.oldDraft) { // 存在未提交的草稿，提示用户是否加载草稿
-        var info = "是否加载 " + self.format("YYYY/MM/DD HH:ss:mm", self.oldDraft.tlm) + " 编辑但未提交的内容？";
+        let info = "是否加载 " + self.format("YYYY/MM/DD HH:ss:mm", self.oldDraft.tlm) + " 编辑但未提交的内容？";
         sweetQuestion(info)
           .then(function() { // 用户选择了加载，则跳转到相应的草稿页面
             if(NKC.configs.isApp) {
@@ -220,7 +220,7 @@ function initVueApp() {
     },
     watch: {
       selectedForums: function() {
-        var self = this;
+        let self = this;
         setTimeout(function() {
           floatForumPanel.initPanel();
         }, 100)
@@ -244,7 +244,7 @@ function initVueApp() {
         if(!index) {
           return obj;
         }else{
-          for(var i in obj) {
+          for(let i in obj) {
             if(i == index) {
               return obj[i]
             }
@@ -253,7 +253,7 @@ function initVueApp() {
       },
       // 是否能够申明原创
       allowedOriginal: function() {
-        var allowed = this.contentLength >= this.originalWordLimit;
+        let allowed = this.contentLength >= this.originalWordLimit;
         if(!allowed) this.originState = 0;
         return allowed;
       },
@@ -270,20 +270,20 @@ function initVueApp() {
       },
       // 获取已选择专业ID组成的数组
       selectedForumsId: function() {
-        var arr = [];
-        var selectedForums = this.selectedForums;
-        for(var i = 0; i < selectedForums.length; i++) {
-          var forum = selectedForums[i];
+        let arr = [];
+        let selectedForums = this.selectedForums;
+        for(let i = 0; i < selectedForums.length; i++) {
+          let forum = selectedForums[i];
           if(forum.fid) arr.push(forum.fid);
         }
         return arr;
       },
       // 获取已选择文章分类ID组成的数组
       selectedCategoriesId: function() {
-        var arr = [];
-        var selectedForums = this.selectedForums;
-        for(var i = 0; i < selectedForums.length; i++) {
-          var forum = selectedForums[i];
+        let arr = [];
+        let selectedForums = this.selectedForums;
+        for(let i = 0; i < selectedForums.length; i++) {
+          let forum = selectedForums[i];
           if(forum.cid) arr.push(forum.cid);
         }
         return arr;
@@ -292,7 +292,7 @@ function initVueApp() {
         return this.selectedForums[0];
       },
       minorForums: function() {
-        var arr = [].concat(this.selectedForums);
+        let arr = [].concat(this.selectedForums);
         arr.shift();
         return arr;
       }
@@ -311,7 +311,7 @@ function initVueApp() {
       insertDraftInfo: function(draft) {
         // 从草稿箱插入草稿后的回调
         /* console.log(draft);
-        var type = this.type;
+        let type = this.type;
         if(type === "newThread") {
           if(draft.mainForums && draft.mainForums.length) {
             this.selectedForums = draft.mainForums;
@@ -333,7 +333,7 @@ function initVueApp() {
       },
       // 监听内容输入
       watchContentChange: function() {
-        var content = editor.getContentTxt();
+        let content = editor.getContentTxt();
         this.contentLength = content.length;
       },
       // 判断发表权限
@@ -355,7 +355,7 @@ function initVueApp() {
         this.coverUrl = "";
       },
       selectCover: function() {
-        var self = this;
+        let self = this;
         if(!NKC.modules.SelectResource) {
           return sweetError("未引入资源选择模块");
         }
@@ -369,8 +369,8 @@ function initVueApp() {
           window.SelectImage = new NKC.methods.selectImage();
         }
         SelectResource.open(function(data) {
-          var r = data.resources[0];
-          var url;
+          let r = data.resources[0];
+          let url;
           if(r.originId) {
             url = "/ro/" + r.originId;
           } else {
@@ -396,8 +396,8 @@ function initVueApp() {
       },
       // 自动保存草稿
       autoSaveToDraft: function() {
-        var self = this;
-        var type = this.type;
+        let self = this;
+        let type = this.type;
         // 内容为空时不自动保存草稿
         if(type === "newThread") {
           if(
@@ -433,7 +433,7 @@ function initVueApp() {
       },
       // 手动保存草稿，相比自动保存草稿多了一个成功提示框。
       saveToDraft: function() {
-        var self = this;
+        let self = this;
         self.saveToDraftBase()
           .then(function() {
             const postButton = getPostButton();
@@ -449,8 +449,8 @@ function initVueApp() {
         if(!post) return;
         this.title = post.t;
         this.setTitle();
-        var reg = /<blockquote cite.+?blockquote>/;
-        var quoteHtml = post.c.match(reg);
+        let reg = /<blockquote cite.+?blockquote>/;
+        let quoteHtml = post.c.match(reg);
         if(quoteHtml && quoteHtml[0]) {
           this.quoteHtml = quoteHtml[0];
         }
@@ -518,7 +518,7 @@ function initVueApp() {
       },
       // 添加作者信息
       addAuthor: function() {
-        var authorInfos = this.authorInfos;
+        let authorInfos = this.authorInfos;
         authorInfos.push({
           name: "",
           kcid: "",
@@ -542,8 +542,8 @@ function initVueApp() {
       },
       // 上/下移动作者信息
       moveAuthor: function(index, type) {
-        var authorInfos = this.authorInfos;
-        var otherIndex;
+        let authorInfos = this.authorInfos;
+        let otherIndex;
         if(type === "up") {
           if(index === 0) return;
           otherIndex = index - 1;
@@ -551,7 +551,7 @@ function initVueApp() {
           if((index + 1) === authorInfos.length) return;
           otherIndex = index + 1;
         }
-        var info = authorInfos[index];
+        let info = authorInfos[index];
         authorInfos[index] = authorInfos[otherIndex];
         authorInfos[otherIndex] = info;
         Vue.set(authorInfos, 0, authorInfos[0]);
@@ -570,9 +570,9 @@ function initVueApp() {
       },
       // 通过fid找到forum对象
       getForumById: function(fid) {
-        var forums = this.forums;
-        for(var i = 0; i < forums.length; i++) {
-          var forum = forums[i];
+        let forums = this.forums;
+        for(let i = 0; i < forums.length; i++) {
+          let forum = forums[i];
           if(forum.fid === fid) return forum;
         }
       },
@@ -582,7 +582,7 @@ function initVueApp() {
       },
       // 添加关键词，借助commonModal模块
       addKeyword: function() {
-        var self = this;
+        let self = this;
         if(!NKC.modules.CommonModal) {
           return sweetError("未引入表单模块");
         }
@@ -592,21 +592,21 @@ function initVueApp() {
         CommonModal.open(function(data) {
           self.keyWordsEn = [];
           self.keyWordsCn = [];
-          var keywordCn = data[0].value;
-          var keywordEn = data[1].value;
+          let keywordCn = data[0].value;
+          let keywordEn = data[1].value;
           keywordCn = keywordCn.replace(/，/ig, ",");
           keywordEn = keywordEn.replace(/，/ig, ",");
-          var cnArr = keywordCn.split(",");
-          var enArr = keywordEn.split(",");
-          for(var i = 0; i < cnArr.length; i++) {
-            var cn = cnArr[i];
+          let cnArr = keywordCn.split(",");
+          let enArr = keywordEn.split(",");
+          for(let i = 0; i < cnArr.length; i++) {
+            let cn = cnArr[i];
             cn = cn.trim();
             if(cn && self.keyWordsCn.indexOf(cn) === -1) {
               self.keyWordsCn.push(cn);
             }
           }
-          for(var i = 0; i < enArr.length; i++) {
-            var en = enArr[i];
+          for(let i = 0; i < enArr.length; i++) {
+            let en = enArr[i];
             en = en.trim();
             if(en && self.keyWordsEn.indexOf(en) === -1) {
               self.keyWordsEn.push(en);
@@ -632,7 +632,7 @@ function initVueApp() {
       },
       // 选择专业，借助moveThread模块
       /*selectForums: function() {
-        var self = this;
+        let self = this;
         if(!NKC.modules.MoveThread) {
           return sweetError("未引入专业选择模块");
         }
@@ -650,11 +650,11 @@ function initVueApp() {
         });
       },*/
       selectForumsByType: function(type) {
-        var self = this;
+        let self = this;
         if(!window.ForumSelector)
           window.ForumSelector = new NKC.modules.ForumSelector();
-        var selectedForumsId = [].concat(self.selectedForumsId);
-        var highlightForumId = '';
+        let selectedForumsId = [].concat(self.selectedForumsId);
+        let highlightForumId = '';
         if(type === 'mainForum') {
           highlightForumId = selectedForumsId.shift();
         }
@@ -677,10 +677,10 @@ function initVueApp() {
       },
       // 检测作者信息
       checkAuthorInfos: function() {
-        var self = this;
-        var checkAuthorInfos = this.checkAuthorInfos;
-        for(var i = 0; i < checkAuthorInfos.length; i++) {
-          var info = checkAuthorInfos[i];
+        let self = this;
+        let checkAuthorInfos = this.checkAuthorInfos;
+        for(let i = 0; i < checkAuthorInfos.length; i++) {
+          let info = checkAuthorInfos[i];
           this.checkString(info.name, {
             name: "作者姓名",
             minLength: 1,
@@ -733,7 +733,7 @@ function initVueApp() {
       },
       // 检测内容
       checkContent: function() {
-        var contentText = $(this.content).text();
+        let contentText = $(this.content).text();
         if(contentText.length > 100000) {
           throw new Error('内容不能超过10万字');
         }
@@ -757,8 +757,8 @@ function initVueApp() {
       // 检测已选专业
       checkForums: function() {
         if(!this.selectedForumsId.length) throw "请至少选择一个专业";
-        for(var i = 0; i < this.selectedForums.length; i++) {
-          var f = this.selectedForums[i];
+        for(let i = 0; i < this.selectedForums.length; i++) {
+          let f = this.selectedForums[i];
           if(f.cid === null) throw "请选择完整的专业分类";
         }
       },
@@ -768,8 +768,8 @@ function initVueApp() {
       },
       // 根据用户已输入的信息组成post对象
       getPost: function() {
-        var post = {};
-        var self = this;
+        let post = {};
+        let self = this;
         self.getTitle();
         self.getContent();
         post.abstractCn = self.abstractCn;
@@ -792,7 +792,7 @@ function initVueApp() {
         }
         // 判断用户有没有勾选"同时转发到专栏，勾选则获取专业分类"
         if(PostToColumn && PostToColumn.getStatus) {
-          var status = PostToColumn.getStatus();
+          let status = PostToColumn.getStatus();
           if(status.checkbox) {
             // post.columnCategoriesId = status.selectedCategoriesId || [];
             post.columnMainCategoriesId = status.selectedMainCategoriesId || [];
@@ -801,7 +801,7 @@ function initVueApp() {
         }
         // 调查表单数据
         if(PostSurvey) {
-          var survey = PostSurvey.getSurvey();
+          let survey = PostSurvey.getSurvey();
           if(survey) post.survey = survey;
         }
         post.tcId = self.getThreadCategoriesId();
@@ -817,8 +817,8 @@ function initVueApp() {
       },
       // 提交内容
       submit: function() {
-        var self = this;
-        var post = {}, type;
+        let self = this;
+        let post = {}, type;
         Promise.resolve()
           .then(function() {
             // 锁住发表按钮
@@ -835,7 +835,7 @@ function initVueApp() {
               self.checkThreadCategory();
               self.checkKeywords();
               self.checkAuthorInfos();
-              var formData = new FormData();
+              let formData = new FormData();
               formData.append("body", JSON.stringify({post: post}));
               if(self.coverData) {
                 formData.append("postCover", NKC.methods.blobToFile(self.coverData), 'cover.png');
@@ -856,7 +856,7 @@ function initVueApp() {
                 maxLength: 200
               });
               self.checkContent();
-              var formData = new FormData();
+              let formData = new FormData();
               formData.append("body", JSON.stringify({post: post}));
               if(self.coverData) {
                 formData.append("postCover", NKC.methods.blobToFile(self.coverData), 'cover.png');
@@ -868,7 +868,7 @@ function initVueApp() {
               self.checkAbstract();
               self.checkKeywords();
               self.checkAuthorInfos();
-              var formData = new FormData();
+              let formData = new FormData();
               formData.append("body", JSON.stringify({post: post}));
               if(self.coverData) {
                 formData.append("postCover", NKC.methods.blobToFile(self.coverData), 'cover.png');
@@ -917,12 +917,12 @@ function initVueApp() {
           })
       },
       saveToDraftBase: function() {
-        var self = this;
+        let self = this;
         return Promise.resolve()
           .then(function() {
-            var post = self.getPost();
-            var desType, desTypeId;
-            var type = self.type;
+            let post = self.getPost();
+            let desType, desTypeId;
+            let type = self.type;
             if(type === "newThread") {
               desType = "forum";
             } else if(type === "newPost") {
@@ -943,7 +943,7 @@ function initVueApp() {
             } else {
               throw "未知的草稿类型";
             }
-            var formData = new FormData();
+            let formData = new FormData();
             formData.append("body", JSON.stringify({
               post: post,
               draftId: self.draftId,
@@ -1006,10 +1006,10 @@ function initPostButtonVueApp(postButtonType) {
         });
       },
       checkAnonymous: function() {
-        var selectedForumsId = window.PostInfo.selectedForumsId;
-        var havePermission = false;
-        for(var i = 0; i < selectedForumsId.length; i++) {
-          var fid = selectedForumsId[i];
+        let selectedForumsId = window.PostInfo.selectedForumsId;
+        let havePermission = false;
+        for(let i = 0; i < selectedForumsId.length; i++) {
+          let fid = selectedForumsId[i];
           if(this.allowedAnonymousForumsId.indexOf(fid) !== -1) {
             havePermission = true;
             break;
@@ -1024,7 +1024,7 @@ function initPostButtonVueApp(postButtonType) {
       },
       format: NKC.methods.format,
       saveToDraftSuccess: function() {
-        var time = new Date();
+        let time = new Date();
         this.autoSaveInfo = "草稿已保存 " + this.format("HH:mm:ss", time);
       },
       autoSaveToDraft: window.PostInfo.autoSaveToDraft,
@@ -1101,13 +1101,13 @@ new Vue({
 
 // 根据导航栏和工具栏的高度重置body的padding-top
 function resetBodyPaddingTop() {
-  var tools = $(".editor .edui-editor-toolbarbox.edui-default");
+  let tools = $(".editor .edui-editor-toolbarbox.edui-default");
   if(NKC.methods.getRunType() === "app") {
     tools.css("top", 0);
     $("body").css("padding-top", tools.height() + 40);
   } else {
-    var header = $(".navbar.navbar-default.navbar-fixed-top.nkcshade");
-    var height = header.height() + tools.height();
+    let header = $(".navbar.navbar-default.navbar-fixed-top.nkcshade");
+    let height = header.height() + tools.height();
     $("body").css("padding-top", height + 40);
   }
 }
@@ -1115,7 +1115,7 @@ function resetBodyPaddingTop() {
 // 若存在调查表则自动展开
 function disabledSurveyForm() {
   if(!PostSurvey) return;
-  var button = $("#disabledSurveyButton");
+  let button = $("#disabledSurveyButton");
   if(PostSurvey.app.disabled) {
     button.text("取消").removeClass("btn-success").addClass("btn-danger");
   } else {
@@ -1131,7 +1131,7 @@ function hideButton() {
 
 // 适配APP快捷插入图片、资源等
 function mediaInsertUE(rid, fileType, name, mediaType) {
-  var resource = {
+  let resource = {
     rid: rid,
     ext: fileType,
     oname: name,
@@ -1150,7 +1150,7 @@ function mediaInsertUE(rid, fileType, name, mediaType) {
 
 // 适配app，将编辑器内容存在app本地
 function saveUEContentToLocal() {
-  var content = editor.getContent();
+  let content = editor.getContent();
   api.setPrefs({
     key: "ueContent",
     value: content
@@ -1159,7 +1159,7 @@ function saveUEContentToLocal() {
 
 // 适配app，将编辑器内容存在app本地
 function setLocalContentToUE() {
-  var content = api.getPrefs({
+  let content = api.getPrefs({
     key: "ueContent",
     sync: true
   });
@@ -1172,9 +1172,9 @@ function setLocalContentToUE() {
  * app视频拍摄、上传、及插入
  */
 function appUpdateVideo() {
-  var protocol = window.location.protocol;
-  var host = window.location.host;
-  var url = protocol + "//" + host + "/r";
+  let protocol = window.location.protocol;
+  let host = window.location.host;
+  let url = protocol + "//" + host + "/r";
   $("#attach").css("display", "none");
   api.getPicture({
     sourceType: 'camera',
@@ -1235,9 +1235,9 @@ function appUpdateVideo() {
  * app图片拍摄、上传、及插入
  */
 function appUpdateImage() {
-  var protocol = window.location.protocol;
-  var host = window.location.host;
-  var url = protocol + "//" + host + "/r";
+  let protocol = window.location.protocol;
+  let host = window.location.host;
+  let url = protocol + "//" + host + "/r";
   $("#attach").css("display", "none");
   api.getPicture({
     sourceType: 'camera',

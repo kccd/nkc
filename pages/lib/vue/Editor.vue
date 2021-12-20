@@ -158,11 +158,11 @@
       getContent() {
         return this.editor.getContent();
       },
-      //获取编辑器文本内容
+      //获取编辑器纯文本内容
       getContentTxt() {
         return this.editor.getContentTxt();
       },
-      //获取编辑器纯文本内容
+      //获取编辑器文本内容
       getPlainTxt() {
         return this.editor.getPlainTxt();
       },
@@ -180,9 +180,9 @@
                 } else {
                   data = [data];
                 }
-                for(var i = 0; i < data.length; i++) {
-                  var source = data[i];
-                  var type = source.mediaType;
+                for(let i = 0; i < data.length; i++) {
+                  let source = data[i];
+                  let type = source.mediaType;
                   type = type.substring(5);
                   type = type[0].toLowerCase() + type.substring(1);
                   editor.execCommand('inserthtml', resourceToHtml(type, source.rid, source.oname));
@@ -250,19 +250,19 @@
         const self = this;
         UE.registerUI('xsfSelector',function(editor, uiName){
           editor.ready(function() {
-            var editDoc = editor.document;
-            var handle = function(e) {
-              var target = e.target;
+            let editDoc = editor.document;
+            let handle = function(e) {
+              let target = e.target;
               if(target.dataset.tag !== "nkcsource") return;
-              var type = target.dataset.type;
-              var score = target.dataset.id;
+              let type = target.dataset.type;
+              let score = target.dataset.id;
               if(type !== "xsf") return;
               self.$refs.xsfSelector.open(function(newscore) {
                 target.dataset.id = newscore;
                 target.dataset.message = "浏览这段内容需要"+newscore+"学术分(双击修改)";
               }, parseInt(score));
             };
-            var count = 0;
+            let count = 0;
             editDoc.addEventListener("dblclick", handle);
             editDoc.addEventListener("touchend", function(e) {   // 手机端模拟双击
               ++count;
