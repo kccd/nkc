@@ -6,7 +6,7 @@
         input.form-control(type="text" v-model="article.title")
       .form-group
         editor(:configs="editorConfigs" ref="editor" @content-change="watchContentChange" :plugs="editorPlugs")
-      .form-group
+      .form-group(v-if="formConfigs.cover")
         .m-b-2(v-if="['newDocument', 'modifyDocument'].indexOf(type) !== -1")
           .editor-header 封面图
             small （如未指定，默认从内容中选取）
@@ -22,18 +22,18 @@
               .m-t-05
                 button.btn.btn-default.btn-sm(@click="selectCover") 重新选择
                 button.btn.btn-default.btn-sm(@click="removeCover") 删除
-      .form-group
+      .form-group(v-if="formConfigs.abstract || formConfigs.abstractEN")
         .m-b-2(v-if="['newDocument', 'modifyDocument'].indexOf(type) !== -1")
           .editor-header 摘要
             small （选填）
           .row.editor-abstract
-            .col-xs-12.col-md-6
-              textarea(placeholder="中文摘要，最多可输入1000字符" rows=7 v-model.trim="abstractCn")
+            .col-xs-12.col-md-6(v-if="formConfigs.abstract")
+              textarea(placeholder="中文摘要，最多可输入1000字符" rows=7 v-model.trim="abstract")
               .editor-abstract-info(:class="{'warning': abstractCnLength > 1000}") {{abstractCnLength}} / 1000
-            .col-xs-12.col-md-6
-              textarea(placeholder="英文摘要，最多可输入1000字符" rows=7 v-model.trim="abstractEn")
+            .col-xs-12.col-md-6(v-if="formConfigs.abstractEN")
+              textarea(placeholder="英文摘要，最多可输入1000字符" rows=7 v-model.trim="abstractEN")
               .editor-abstract-info(:class="{'warning': abstractEnLength > 1000}") {{abstractEnLength}} / 1000
-      .form-group
+      .form-group(v-if="formConfigs.keywords || formConfigs.keywordsEN")
         .m-b-2(v-if="['newDocument', 'modifyDocument'].indexOf(type) !== -1")
           .editor-header 关键词
             small （选填，最多可添加50个，当前已添加
@@ -41,14 +41,14 @@
               b.warning(v-else) {{keywordsLength}}
               |个）
           .editor-keywords
-            .editor-keyword(v-for="(k, index) in keyWordsCn")
+            .editor-keyword(v-for="(k, index) in keywords" v-if="formConfigs.keywords")
               span {{k}}
-              .fa.fa-remove.p-l-05(@click="removeKeyword(index, keyWordsCn)")
-            .editor-keyword(v-for="(k, index) in keyWordsEn")
+              .fa.fa-remove.p-l-05(@click="removeKeyword(index, keywords)")
+            .editor-keyword(v-for="(k, index) in keywordsEN" v-if="formConfigs.keywordsEN")
               span {{k}}
-              .fa.fa-remove.p-l-05(@click="removeKeyword(index, keyWordsEn)")
+              .fa.fa-remove.p-l-05(@click="removeKeyword(index, keywordsEN)")
             button.btn.btn-default.btn-sm(@click="addKeyword") 添加
-      .form-group
+      .form-group(v-if="formConfigs.origin")
         .m-b-2(v-if="['newDocument', 'modifyDocument'].indexOf(type) !== -1")
           .editor-header 原创
             small （字数小于{{originalWordLimit}}的文章无法声明原创）
@@ -149,6 +149,7 @@ import {blobToFile, fileToBase64} from "../js/file";
 import {getLength} from "../js/checkData";
 import {getDocumentEditorConfigs} from "../js/editor";
 export default {
+  props: ['configs'],
   data: () => ({
     navList: [
       {
@@ -199,14 +200,14 @@ export default {
   computed: {
     // 摘要的字节数
     abstractCnLength() {
-      return this.getLength(this.abstractCn);
+      return this.getLength(this.abstract);
     },
     abstractEnLength() {
-      return this.getLength(this.abstractEn);
+      return this.getLength(this.abstractEN);
     },
     // 关键词字数
     keywordsLength() {
-      return this.keyWordsEn.length + this.keyWordsCn.length;
+      return this.keywordsEN.length + this.keywords.length;
     },
     // 是否能够申明原创
     allowedOriginal() {
@@ -223,6 +224,9 @@ export default {
     'common-modal': CommonModal,
   },
   mounted() {
+    if(this.configs) {
+      this.formConfigs = this.configs;
+    }
   },
   methods: {
     getLength: getLength,
@@ -233,54 +237,64 @@ export default {
     },
     // 添加关键词，借助commonModal模块
     addKeyword() {
-      var self = this;
+      let self = this;
+      let keywords, keywordsEN;
+      keywords = this.formConfigs.keywords?{
+          type: 'keywords',
+          label: "中文，添加多个请以逗号分隔",
+          dom: "textarea",
+          value: this.keywords.join("，")
+        }:null;
+      keywordsEN = this.formConfigs.keywordsEN?{
+          type: 'keywordsEN',
+          label: "英文，添加多个请以逗号分隔",
+          dom: "textarea",
+          value: this.keywordsEN.join(",")
+        }:null;
+      let data = [keywords, keywordsEN];
+      data = data.filter(n => n);
       this.$refs.commonModal.open(function(data) {
-        self.keyWordsEn = [];
-        self.keyWordsCn = [];
-        var keywordCn = data[0].value;
-        var keywordEn = data[1].value;
-        keywordCn = keywordCn.replace(/，/ig, ",");
-        keywordEn = keywordEn.replace(/，/ig, ",");
-        var cnArr = keywordCn.split(",");
-        var enArr = keywordEn.split(",");
-        for(var i = 0; i < cnArr.length; i++) {
-          var cn = cnArr[i];
-          cn = cn.trim();
-          if(cn && self.keyWordsCn.indexOf(cn) === -1) {
-            self.keyWordsCn.push(cn);
+        let cnArr,enArr;
+        for(const keyword of data) {
+          if(keyword.type === 'keywords') {
+            self.keywords = [];
+            let keywordCN = keyword.value;
+            keywordCN = keywordCN.replace(/，/ig, ",");
+            cnArr = keywordCN.split(",");
+            for(let i = 0; i < cnArr.length; i++) {
+              let cn = cnArr[i];
+              cn = cn.trim();
+              if(cn && self.keywords.indexOf(cn) === -1) {
+                self.keywords.push(cn);
+              }
+            }
+          }
+          if(keyword.type === 'keywordsEN') {
+            self.keywordsEN = [];
+            let keywordEn = keyword.value;
+            keywordEn = keywordEn.replace(/，/ig, ",");
+            enArr = keywordEn.split(",");
+            for(let i = 0; i < enArr.length; i++) {
+              let en = enArr[i];
+              en = en.trim();
+              if(en && self.keywordsEN.indexOf(en) === -1) {
+                self.keywordsEN.push(en);
+              }
+            }
           }
         }
-        for(var i = 0; i < enArr.length; i++) {
-          var en = enArr[i];
-          en = en.trim();
-          if(en && self.keyWordsEn.indexOf(en) === -1) {
-            self.keyWordsEn.push(en);
-          }
-        }
-        if(!cnArr.length && !enArr.length) return sweetError("请输入关键词");
         self.$refs.commonModal.close();
       }, {
-        data: [
-          {
-            label: "中文，添加多个请以逗号分隔",
-            dom: "textarea",
-            value: this.keyWordsCn.join("，")
-          },
-          {
-            label: "英文，添加多个请以逗号分隔",
-            dom: "textarea",
-            value: this.keyWordsEn.join(",")
-          }
-        ],
+        data,
         title: "添加关键词"
       });
     },
     //选择封面图
     selectCover() {
-      var self = this;
+      let self = this;
       self.$refs.resource.open(function(data) {
-        var r = data.resources[0];
-        var url;
+        let r = data.resources[0];
+        let url;
         if(r.originId) {
           url = "/ro/" + r.originId;
         } else {

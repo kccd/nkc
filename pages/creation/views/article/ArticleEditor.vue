@@ -3,7 +3,7 @@
     .col-xs-12.col-md-12.m-b-3
       bread-crumb(:list="navList")
     .col-xs-12.col-md-10.col-md-offset-1
-      document-editor(ref="documentEditor")
+      document-editor(ref="documentEditor" :configs="formConfigs")
 
 </template>
 
@@ -35,6 +35,14 @@
         content: '',
         coverUrl: '',
       },
+      formConfigs: {
+        keywords: true,
+        keywordsEN: true,
+        abstract: true,
+        abstractEN: true,
+        origin: true,
+        cover: true
+      }
     }),
     computed: {
       type() {
