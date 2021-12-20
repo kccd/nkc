@@ -1,9 +1,7 @@
 <template lang="pug">
   .row
     .col-xs-12.col-md-12
-      h2 我的素材
-      material-box(ref="material")
-
+      h2 文件夹内容
 </template>
 
 <script>

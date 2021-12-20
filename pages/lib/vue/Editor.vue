@@ -21,6 +21,7 @@
   import '../../../pages/ueditor/ueditor.config';
   import '../../../pages/ueditor/ueditor.all.js';
   import {getUrl} from "../js/tools";
+  import {initDblclick} from "../js/dblclick";
   import {resourceToHtml} from "../js/dataConversion";
   import ResourceSelector from './ResourceSelector';
   import DraftSelector from './DraftSelector';
@@ -264,10 +265,8 @@
             };
             let count = 0;
             editDoc.addEventListener("dblclick", handle);
-            editDoc.addEventListener("touchend", function(e) {   // 手机端模拟双击
-              ++count;
-              if(count == 2) return handle(e);
-              setTimeout(function(){ count = 0; }, 700);
+            initDblclick(editDoc, function (e){
+              return handle(e);
             });
           });
 
