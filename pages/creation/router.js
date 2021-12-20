@@ -6,7 +6,8 @@ import BookEditor from './views/book/BookEditor';
 import ArticleEditor from './views/article/ArticleEditor';
 const routes = [
   {name: 'home', path: '/creation', component: Home},
-  {name: 'material', path: '/creation/material', component: Material},
+  {name: 'materials', path: '/creation/materials', component: Material},
+  {name: 'material', path: '/creation/material/:mid', component: Material},
   {name: 'books', path: '/creation/books', component: Books},
   {name: 'book', path: '/creation/book/:bid', component: Book},
   {name: 'bookEditor', path: '/creation/books/editor', component: BookEditor},

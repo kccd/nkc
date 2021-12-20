@@ -1,6 +1,13 @@
 module.exports = {
   GET: 'creationCenter',
   material: {
+    PARAMETER: {
+      GET: 'creationCenter',
+      PUT: 'creationCenter',
+      DELETE: 'creationCenter'
+    }
+  },
+  materials: {
     GET: 'creationCenter'
   },
   books: {
