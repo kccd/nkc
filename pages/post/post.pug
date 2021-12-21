@@ -142,6 +142,10 @@ block scripts
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../thread/singlePost/singlePost
   include ../publicModules/bulletComments/bulletComments
+
+  if data.user
+    +includeJS('/message/connectSocket.js')
+
   //- 下载资料询问框
   //include ../publicModules/downloadResource/downloadResource.pug
   if permission("viewNote")
