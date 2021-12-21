@@ -3,7 +3,9 @@
     .col-xs-12.col-md-12.m-b-3
       bread-crumb(:list="navList")
     .col-xs-12.col-md-10.col-md-offset-1
-      document-editor(ref="documentEditor" :configs="formConfigs")
+      document-editor(ref="documentEditor" :configs="formConfigs" @content-change="watchContentChange")
+      .m-t-1.m-b-3
+        button.btn.btn-block.btn-primary(@click="publish") 发布
 
 </template>
 
@@ -17,30 +19,16 @@
       'document-editor': DocumentEditor
     },
     data: () => ({
-      navList: [
-        {
-          name: '文档创作',
-          page: 'books'
-        },
-        {
-          name: '编辑文章',
-        }
-      ],
-      coverBase64: '',
-      coverData: null,
+      coverFile: null,
       bookId: '',
       articleId: '',
+      book: null,
       article: {
         title: '',
         content: '',
-        coverUrl: '',
+        cover: null,
       },
       formConfigs: {
-        keywords: true,
-        keywordsEN: true,
-        abstract: true,
-        abstractEN: true,
-        origin: true,
         cover: true
       }
     }),
@@ -48,14 +36,36 @@
       type() {
         return this.articleId? 'modify': 'create'
       },
-      coverUrl() {
-        return this.coverBase64 || this.article.coverUrl || '';
+      navList() {
+        const {book, articleId} = this;
+        const list = [
+          {
+            name: '文档创作',
+            page: 'books'
+          }
+        ];
+        if(book) {
+          list.push({
+            name: book.name,
+            page: 'book',
+            params: {
+              bid: book._id,
+            }
+          },
+          {
+            name: articleId? '编辑文章': '添加文章'
+          });
+        } else {
+          list.push({
+            name: '加载中...'
+          });
+        }
+        return list;
       }
     },
     mounted() {
-      if(this.article) {
-        this.initArticle();
-      }
+      this.initId();
+      this.initData();
     },
     methods: {
       initId() {
@@ -65,32 +75,60 @@
           this.articleId = aid;
         }
       },
-      initArticle() {
+      initData() {
         const self = this;
-        if(!this.articleId) return;
-        nkcAPI(`/creation/article/${this.articleId}`, 'GET')
+        const {bookId, articleId} = this;
+        let url = `/creation/articles/editor?bid=${bookId}`;
+        if(articleId) url += `&aid=${articleId}`;
+        nkcAPI(url, 'GET')
           .then(data => {
-            const {title, content, coverUrl} = data.article;
-            self.article.title = title;
-            self.article.content = content;
-            self.article.coverUrl = coverUrl;
+            const {article, book} = data;
+            if(article) {
+              const {title, content, cover} = article;
+              self.article.title = title;
+              self.article.content = content;
+              self.article.cover = cover;
+            }
+            self.book = book;
+            self.articleId = articleId;
+            self.initDocumentForm();
           })
           .catch(sweetError);
+      },
+      initDocumentForm() {
+        const {article} = this;
+        const {title, content, cover} = article;
+        this.$refs.documentEditor.initDocumentForm({
+          title,
+          content,
+          cover
+        });
       },
       post(type) {
         const self = this;
         const formData = new FormData();
-        const {title, content, coverData} = this;
+        const {
+          coverFile,
+          bookId,
+          articleId,
+        } = this;
+        const {
+          title = '',
+          content = '',
+          cover = '',
+        } = this.article;
         const article = {
           title,
-          content
+          content,
+          cover,
         };
-        if(self.articleId) {
-          article.articleId = self.articleId;
+        if(articleId) {
+          formData.append('articleId', articleId);
         }
-        if(coverData) {
-          formData.append('cover', coverData);
+        if(cover) {
+          formData.append('coverFile', coverFile);
         }
+        formData.append('bookId', bookId);
         formData.append('article', JSON.stringify(article));
         formData.append('type', type);
         nkcUploadFile(`/creation/articles/editor`, 'POST', formData)
@@ -98,8 +136,33 @@
             const {articleId} = data;
             self.articleId = articleId;
           })
+          .then(() => {
+            if(type === 'publish') {
+              self.$router.replace({
+                name: 'bookContent',
+                params: {
+                  bid: self.bookId,
+                  aid: self.articleId
+                }
+              });
+            }
+          })
           .catch(sweetError);
-      }
+      },
+      saveArticle() {
+        this.post(this.type);
+      },
+      publish() {
+        this.post('publish');
+      },
+      watchContentChange(data) {
+        const {title, coverFile, cover, content} = data;
+        this.article.title = title;
+        this.article.content = content;
+        this.article.cover = cover;
+        this.coverFile = coverFile;
+        this.saveArticle();
+      },
     }
   }
 </script>

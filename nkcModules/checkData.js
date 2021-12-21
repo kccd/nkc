@@ -117,7 +117,7 @@ var CheckData = function () {
     }
   };*/
 
-  this.getHTMLTextLength = function(html) {
+  this.getHTMLTextLength = function(html = '') {
     if(inBrowser) {
       return $(html).text().length;
     } else {

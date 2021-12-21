@@ -113,11 +113,89 @@ schema.statics.getBooksByUserId = async (uid) => {
 };
 
 schema.methods.bindArticle = async function(articleId) {
-  this.updateOne({
+  await this.updateOne({
     $addToSet: {
-      list: `document:${articleId}`
+      list: `${articleId}`
     }
   });
 }
 
+schema.methods.getList = async function() {
+  const articles = await this.extendArticlesById(this.list);
+  const articlesObj = {};
+  for(const a of articles) {
+    articlesObj[a._id] = a;
+  }
+  const results = [];
+  for(const aid of this.list) {
+    const article = articlesObj[aid];
+    if(!article) continue;
+    results.push(article);
+  }
+  return results;
+}
+
+schema.methods.extendArticlesById = async function(articlesId) {
+  const ArticleModel = mongoose.model('articles');
+  const DocumentModel = mongoose.model('documents');
+  const {timeFormat, getUrl} = require('../nkcModules/tools');
+  const articles = await ArticleModel.find({_id: {$in: articlesId}});
+  const documentsId = [];
+  for(const article of articles) {
+    const {did, betaDid} = article;
+    if(did) documentsId.push(did);
+    if(betaDid) documentsId.push(betaDid);
+  }
+  const documentsObj = await DocumentModel.getDocumentsObjById(documentsId);
+  const results = [];
+  for(const article of articles) {
+    const {
+      _id,
+      toc,
+      uid,
+      did,
+      betaDid,
+      published,
+    } = article;
+    const documentId = did || betaDid;
+    const document = documentsObj[documentId];
+    if(!document) continue;
+    const {title} = document;
+    const result = {
+      _id,
+      uid,
+      published,
+      title: title || '未填写标题',
+      url: getUrl('creationBookContent', this._id, _id),
+      time: timeFormat(toc),
+      hasBeta: !!betaDid,
+    };
+    results.push(result);
+  }
+  return results;
+}
+
+schema.methods.getContentById = async function(aid) {
+  const {list} = this;
+  const ArticleModel = mongoose.model('articles');
+  const DocumentModel = mongoose.model('documents');
+  if(list.includes(aid)) {
+    const article = await ArticleModel.findOnly({_id: aid});
+    const {did, betaDid} = article;
+    const documentId = did || betaDid;
+    const document = await DocumentModel.findOnly({_id: documentId});
+    const {
+      time,
+      mTime,
+      title,
+      content,
+    } = await document.extendData();
+    return {
+      time,
+      mTime,
+      title,
+      content
+    }
+  }
+}
 module.exports = mongoose.model('books', schema);

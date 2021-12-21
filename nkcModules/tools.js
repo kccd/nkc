@@ -196,6 +196,9 @@ var Tools = function() {
       case 'bookCover': {
         return '/a/' + id;
       }
+      case 'creationBookContent': {
+        return '/creation/book/' + id + '?id=' + size
+      }
     }
   };
   self.getAnonymousInfo = function() {

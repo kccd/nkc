@@ -1,5 +1,4 @@
 const mongoose = require('../settings/database');
-const customCheerio = require("../nkcModules/nkcRender/customCheerio");
 const schema = new mongoose.Schema({
   // 文档 ID
   _id: Number,
@@ -76,19 +75,43 @@ const schema = new mongoose.Schema({
   collection: 'documents'
 });
 
+schema.statics.getDocumentsObjById = async (documentsId) => {
+  const DocumentModel = mongoose.model('documents');
+  const documents = await DocumentModel.find({
+    _id: {$in: documentsId}
+  });
+  const obj = {};
+  for(let i = 0; i < documents.length; i++) {
+    const document = documents[i];
+    obj[document._id] = document;
+  }
+  return obj;
+};
+
+/*
+* 创建 document
+* @param {Object} props
+*   @param {String} title 标题
+*   @param {String} content 富文本内容
+*   @param {File} coverFile 封面图
+*   @param {String} uid 作者
+*   @param {Date} time 创建时间
+* @return {Object} Document
+* */
 schema.statics.createDocument = async (props) => {
   const {
     title,
-    content,
-    cover,
+    content = '',
+    coverFile,
     uid,
     time
   } = props;
   const DocumentModel = mongoose.model('documents');
   const SettingModel = mongoose.model('settings');
   const AttachmentModel = mongoose.model('attachments');
-  const documentId = await SettingModel.operateSystemID('documents');
-  const wordCount = customCheerio.load(content).text();
+  const documentId = await SettingModel.operateSystemID('documents', 1);
+  const {getHTMLTextLength} = require('../nkcModules/checkData');
+  const wordCount = getHTMLTextLength(content);
   const document = new DocumentModel({
     _id: documentId,
     title,
@@ -98,29 +121,47 @@ schema.statics.createDocument = async (props) => {
     toc: time
   });
   await document.save();
-  if(cover) {
-    await AttachmentModel.saveDocumentCover(documentId, cover);
+  if(coverFile) {
+    await AttachmentModel.saveDocumentCover(documentId, coverFile);
   }
   return document;
 };
 
-schema.methods.updateDocument = async (props) => {
-  const {title, content, cover} = props;
+/*
+* 更新 document
+* @param {Object} props
+*   @param {String} title 标题
+*   @param {String} content 富文本内容
+*   @param {String} cover 原封面图 ID
+*   @param {File} coverFile 新的封面图文件对象
+* */
+schema.methods.updateDocument = async function(props) {
+  const {
+    title = '',
+    content = '',
+    cover = '',
+    coverFile,
+  } = props;
+  const {getHTMLTextLength} = require('../nkcModules/checkData');
   const AttachmentModel = mongoose.model('attachments');
-  const wordCount = customCheerio.load(content).text();
+  const wordCount = getHTMLTextLength(content);
   await this.updateOne({
     $set: {
       title,
       content,
       wordCount,
+      cover,
       tlm: new Date()
     }
   });
-  if(cover) {
-    await AttachmentModel.saveDocumentCover(this._id, cover);
+  if(coverFile) {
+    await AttachmentModel.saveDocumentCover(this._id, coverFile);
   }
 }
-
+/*
+* 将 document 设置为历史
+* @param {Number} newDocumentId 当前历史 document 所对应的新版本 document
+* */
 schema.methods.setAsHistory = async function(newDocumentId) {
   await this.updateOne({
     $set: {
@@ -128,6 +169,23 @@ schema.methods.setAsHistory = async function(newDocumentId) {
     }
   });
 }
+
+schema.methods.extendData = async function() {
+  const {timeFormat, fromNow} = require('../nkcModules/tools');
+  const nkcRender = require('../nkcModules/nkcRender');
+  const content = await nkcRender.renderHTML({
+    type: "article",
+    post: {
+      c: this.content
+    },
+  });
+  return {
+    time: timeFormat(this.toc),
+    mTime: this.tlm? fromNow(this.tlm): null,
+    title: this.title || '未填写标题',
+    content
+  }
+};
 
 // 更新数据
 schema.methods.updateData = async function(newData) {

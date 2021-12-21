@@ -1,14 +1,30 @@
 const router = require('koa-router')();
 router
-  .use('/:bid', async (ctx, next) => {
-    const {db, data, params} = ctx;
-    data.book = await db.BookModel.getBookById(params.bid);
-    await next();
-  })
   .get('/:bid', async (ctx, next) => {
+    const {data, params, db, nkcModules} = ctx;
+    const {bid} = params;
+    const {timeFormat, getUrl} = nkcModules.tools;
+    const book = await db.BookModel.findOnly({_id: bid});
+    data.bookList = await book.getList();
+    data.bookData = {
+      _id: book._id,
+      name: book.name,
+      description: book.description,
+      uid: book.uid,
+      time: timeFormat(book.toc),
+      coverUrl: getUrl('bookCover', book.cover)
+    };
     await next();
   })
-  .get('/:bid/settings', async (ctx, next) => {
+  .get('/:bid/:id', async (ctx, next) => {
+    const {data, params, db} = ctx;
+    const book = await db.BookModel.findOnly({_id: params.bid});
+    data.bookArticle = await book.getContentById(params.id);
+    data.bookList = await book.getList();
+    data.bookData = {
+      _id: book._id,
+      name: book.name,
+    };
     await next();
   });
 module.exports = router;

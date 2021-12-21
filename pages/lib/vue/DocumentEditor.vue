@@ -3,11 +3,11 @@
     common-modal(ref="commonModal")
     .form
       .form-group
-        input.form-control(type="text" v-model="article.title")
+        input.form-control.form-title(type="text" v-model="title" placeholder="请输入标题")
       .form-group
         editor(:configs="editorConfigs" ref="editor" @content-change="watchContentChange" :plugs="editorPlugs")
       .form-group(v-if="formConfigs.cover")
-        .m-b-2(v-if="['newDocument', 'modifyDocument'].indexOf(type) !== -1")
+        .m-b-2
           .editor-header 封面图
             small （如未指定，默认从内容中选取）
           .editor-cover
@@ -23,7 +23,7 @@
                 button.btn.btn-default.btn-sm(@click="selectCover") 重新选择
                 button.btn.btn-default.btn-sm(@click="removeCover") 删除
       .form-group(v-if="formConfigs.abstract || formConfigs.abstractEN")
-        .m-b-2(v-if="['newDocument', 'modifyDocument'].indexOf(type) !== -1")
+        .m-b-2
           .editor-header 摘要
             small （选填）
           .row.editor-abstract
@@ -34,7 +34,7 @@
               textarea(placeholder="英文摘要，最多可输入1000字符" rows=7 v-model.trim="abstractEN")
               .editor-abstract-info(:class="{'warning': abstractEnLength > 1000}") {{abstractEnLength}} / 1000
       .form-group(v-if="formConfigs.keywords || formConfigs.keywordsEN")
-        .m-b-2(v-if="['newDocument', 'modifyDocument'].indexOf(type) !== -1")
+        .m-b-2
           .editor-header 关键词
             small （选填，最多可添加50个，当前已添加
               span(v-if="keywordsLength <= 50") {{keywordsLength}}
@@ -49,7 +49,7 @@
               .fa.fa-remove.p-l-05(@click="removeKeyword(index, keywordsEN)")
             button.btn.btn-default.btn-sm(@click="addKeyword") 添加
       .form-group(v-if="formConfigs.origin")
-        .m-b-2(v-if="['newDocument', 'modifyDocument'].indexOf(type) !== -1")
+        .m-b-2
           .editor-header 原创
             small （字数小于{{originalWordLimit}}的文章无法声明原创）
           .editor-origin-state.form-inline
@@ -65,6 +65,17 @@
 <style lang="less" scoped>
 .document-editor {
   .form {
+    .form-title{
+      height: 5rem;
+      padding: 0;
+      font-size: 2rem;
+      box-shadow: none;
+      border: none;
+      border-bottom: 1px solid #f4f4f4;
+      &:focus{
+        outline: none;
+      }
+    }
     .form-group {
       .editor-header {
         font-size: 1.25rem;
@@ -148,27 +159,15 @@ import {getUrl} from "../js/tools";
 import {blobToFile, fileToBase64} from "../js/file";
 import {getLength} from "../js/checkData";
 import {getDocumentEditorConfigs} from "../js/editor";
+import {debounce} from '../js/execution';
 export default {
   props: ['configs'],
   data: () => ({
-    navList: [
-      {
-        name: '文档创作',
-        page: 'books'
-      },
-      {
-        name: '编辑文章',
-      }
-    ],
-    article: {
-      title: '',
-      content: ''
-    },
-    type: 'newDocument',
+    title: '',
     cover: "",
     // 新选择的封面图的本地路径
     coverUrl: "",
-    coverData: "",
+    coverFile: "",
     abstract: "", // 中文摘要
     abstractEN: "", // 英文摘要
     keywords: [], // 中文关键词
@@ -188,7 +187,7 @@ export default {
     editorPlugs: {
       resourceSelector: true
     },
-    formConfigs: {
+    defaultFormConfigs: {
       keywords: false,
       keywordsEN: false,
       abstract: false,
@@ -197,6 +196,29 @@ export default {
       cover: false
     }
   }),
+  watch: {
+    title() {
+      this.watchContentChange();
+    },
+    coverFile() {
+      this.watchContentChange();
+    },
+    abstract() {
+      this.watchContentChange();
+    },
+    abstractEN() {
+      this.watchContentChange();
+    },
+    keywords() {
+      this.watchContentChange();
+    },
+    keywordsEN() {
+      this.watchContentChange();
+    },
+    originState() {
+      this.watchContentChange();
+    },
+  },
   computed: {
     // 摘要的字节数
     abstractCnLength() {
@@ -215,18 +237,17 @@ export default {
     },
     editorConfigs() {
       return getDocumentEditorConfigs();
-    }
+    },
+    formConfigs() {
+      const {configs = {}, defaultFormConfigs} = this;
+      return Object.assign({}, defaultFormConfigs, configs);
+    },
   },
   components: {
     'editor': Editor,
     'resource-selector': ResourceSelector,
     'image-selector': ImageSelector,
     'common-modal': CommonModal,
-  },
-  mounted() {
-    if(this.configs) {
-      this.formConfigs = this.configs;
-    }
   },
   methods: {
     getLength: getLength,
@@ -305,7 +326,7 @@ export default {
             const file = blobToFile(res, 'cover.png');
             return fileToBase64(file)
               .then(base64 => {
-                self.coverData = file;
+                self.coverFile = file;
                 self.coverUrl = base64;
                 self.$refs.image.close();
               })
@@ -320,14 +341,55 @@ export default {
     },
     removeCover() {
       this.cover = "";
-      this.coverData = "";
+      this.coverFile = "";
       this.coverUrl = "";
     },
-    // 监听内容输入
-    watchContentChange: function() {
+    updateContentLength() {
       const content = this.$refs.editor.getContentTxt();
       this.contentLength = content.length;
     },
+    getDocumentForm() {
+      const {
+        title,
+        cover,
+        coverFile,
+        abstract,
+        abstractEN,
+        keywords,
+        keywordsEN,
+        originState,
+        formConfigs
+      } = this;
+      const data = {
+        title,
+        content: this.$refs.editor.getContent(),
+      };
+      if(formConfigs.cover) {
+        data.coverFile = coverFile || null;
+        data.cover = cover || null;
+      }
+      if(formConfigs.abstract) data.abstract = abstract;
+      if(formConfigs.abstractEN) data.abstractEN = abstractEN;
+      if(formConfigs.keywords) data.keywords = keywords;
+      if(formConfigs.keywordsEN) data.keywordsEN = keywordsEN;
+      if(formConfigs.originState) data.originState = originState;
+      return data;
+    },
+    initDocumentForm(data) {
+      const {title, content, cover} = data;
+      this.title = title;
+      this.$refs.editor.setContent(content);
+      this.cover = cover;
+    },
+    emitContentChangeEvent() {
+      const data = this.getDocumentForm();
+      this.$emit('content-change', data);
+    },
+    // 监听内容输入
+    watchContentChange: debounce(function() {
+      this.updateContentLength();
+      this.emitContentChangeEvent();
+    }, 500),
   }
 }
 </script>
