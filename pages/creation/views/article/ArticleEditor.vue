@@ -20,6 +20,7 @@
     },
     data: () => ({
       coverFile: null,
+      oldCoverFile: null,
       bookId: '',
       articleId: '',
       book: null,
@@ -82,6 +83,7 @@
         if(articleId) url += `&aid=${articleId}`;
         nkcAPI(url, 'GET')
           .then(data => {
+            console.log(data);
             const {article, book} = data;
             if(article) {
               const {title, content, cover} = article;
@@ -125,16 +127,19 @@
         if(articleId) {
           formData.append('articleId', articleId);
         }
-        if(cover) {
-          formData.append('coverFile', coverFile);
+        if(coverFile) {
+          formData.append('coverFile', coverFile, 'cover.png');
         }
         formData.append('bookId', bookId);
         formData.append('article', JSON.stringify(article));
         formData.append('type', type);
         nkcUploadFile(`/creation/articles/editor`, 'POST', formData)
           .then(data => {
-            const {articleId} = data;
+            self.oldCoverFile = self.coverFile;
+            self.coverFile = null;
+            const {articleId, articleCover} = data;
             self.articleId = articleId;
+            self.article.cover = articleCover;
           })
           .then(() => {
             if(type === 'publish') {
@@ -156,11 +161,12 @@
         this.post('publish');
       },
       watchContentChange(data) {
-        const {title, coverFile, cover, content} = data;
+        const {title, coverFile, content} = data;
         this.article.title = title;
         this.article.content = content;
-        this.article.cover = cover;
-        this.coverFile = coverFile;
+        if(this.oldCoverFile !== coverFile) {
+          this.coverFile = coverFile;
+        }
         this.saveArticle();
       },
     }

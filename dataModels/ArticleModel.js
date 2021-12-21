@@ -71,6 +71,14 @@ schema.statics.createArticle = async (props) => {
   return article;
 }
 
+schema.methods.getBetaDocumentCoverId = async function() {
+  const {betaDid} = this;
+  if(!betaDid) return '';
+  const DocumentModel = mongoose.model('documents');
+  const document = await DocumentModel.findOnly({_id: betaDid});
+  return document.cover;
+};
+
 /*
 * 修改 book 中的文章
 * @param {Object} props
@@ -90,6 +98,7 @@ schema.methods.modifyArticle = async function(props) {
       title,
       content,
       cover,
+      coverFile,
       tlm: time,
     });
   } else {
@@ -97,7 +106,7 @@ schema.methods.modifyArticle = async function(props) {
       uid,
       title,
       content,
-      cover
+      coverFile
     });
     await this.updateOne({
       $set: {

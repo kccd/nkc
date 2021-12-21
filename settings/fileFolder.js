@@ -34,6 +34,8 @@ module.exports = {
   problemImage: 'attachment/problem',
   // 文档封面
   bookCover: 'attachment/cover',
+  // documentCover
+  documentCover: 'attachment/cover',
 
 
   // VerifiedUploadModel

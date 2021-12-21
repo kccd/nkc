@@ -743,7 +743,7 @@ schema.statics.saveDocumentCover = async (documentId, file) => {
     ext,
     sizeLimit: 20 * 1024 * 1024,
     time,
-    type: 'articleCover',
+    type: 'documentCover',
     images: [
       {
         type: 'def',

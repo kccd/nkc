@@ -3,12 +3,13 @@
     .row
       .col-xs-12.col-md-12
         bread-crumb(:list="navList")
-      .col-xs-12.col-md-12(v-if="bookArticle")
+      .col-xs-12.col-md-9(v-if="bookArticle")
         h2.content-title {{bookArticle.title}}
         .content-info
           span.m-r-05 {{contentInfo}}
           button.btn.btn-xs.btn-default(@click="navToPage('articleEditor', {bid: bookId, aid: articleId})") 编辑
         .content-content(v-html="bookArticle.content")
+      .col-xs-12.col-md-3
 </template>
 
 <style lang="less" scoped>

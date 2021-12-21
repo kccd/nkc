@@ -60,6 +60,7 @@ router
         await article.publishArticle();
       }
     }
+    data.articleCover = await article.getBetaDocumentCoverId();
     data.articleId = article._id;
     await next();
   });
