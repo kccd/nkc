@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import MaterialBox from "../../lib/vue/MaterialBox";
+import MaterialBox from "./MaterialBox";
 export default {
   data: function (){
     return {

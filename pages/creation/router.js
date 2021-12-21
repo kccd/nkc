@@ -1,13 +1,14 @@
 import Home from './views/Home';
-import Material from './views/Material';
+import Materials from './views/Material';
+import Material from './views/MaterialFolder';
 import Books from './views/book/Books';
 import Book from './views/book/Book';
 import BookEditor from './views/book/BookEditor';
 import ArticleEditor from './views/article/ArticleEditor';
 const routes = [
   {name: 'home', path: '/creation', component: Home},
-  {name: 'materials', path: '/creation/materials', component: Material},
-  {name: 'material', path: '/creation/material/:mid', component: Material},
+  {name: 'materials', path: '/creation/materials', component: Materials},
+  {name: 'material', path: '/creation/materials/:mid', component: Material},
   {name: 'books', path: '/creation/books', component: Books},
   {name: 'book', path: '/creation/book/:bid', component: Book},
   {name: 'bookEditor', path: '/creation/books/editor', component: BookEditor},
