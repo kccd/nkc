@@ -25,11 +25,16 @@ block eContent
                 .thread-category-node-list
                   .thread-category-node(v-for='n in c.nodes' :data-cid='n._id').move-handle
                     //.fa.fa-bars.m-r-05.move-handle
-                    span {{n.name}}
-                    .fa.fa-edit.pointer(@click='editCategory(n)')
-                    .fa.fa-trash.pointer(@click='removeCategory(n._id)')
-                .thread-category-node.default-node {{c.nodeName}}
-                  .fa.fa-edit.pointer(@click='editDefaultCategory(c)')
+                    .node-name {{n.name}}
+                    .options
+                      span(@click='editCategory(n)') 编辑
+                      span(@click='setAsDefault(c, c.defaultNode !== n._id.toString(), n._id)') {{c.defaultNode === n._id.toString()? "取消默选":"设为默选"}}
+                      span(@click='removeCategory(n._id)') 删除
+                .thread-category-node
+                  .node-name {{c.nodeName}}
+                  .options
+                    span(@click='editDefaultCategory(c)') 编辑
+                    span(@click='setAsDefault(c, c.defaultNode !== "default", "default")') {{c.defaultNode === "default"? "取消默选":"设为默选"}}
 block scripts
   include ../../../publicModules/commonModal/commonModal
   +includeJS('/experimental/settings/threadCategory/threadCategory.js')

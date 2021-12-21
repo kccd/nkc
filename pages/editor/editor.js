@@ -29,7 +29,21 @@ window.data = undefined;
 
 $(function() {
   window.data = NKC.methods.getDataById("data");
-  window.data.threadCategories.map(c => c.selectedNode = null);
+  for(const c of window.data.threadCategories) {
+    c.selectedNode = null;
+    if(c.defaultNode === 'none') continue;
+    if(c.defaultNode === 'default') {
+      c.selectedNode = c.defaultNode;
+    } else {
+      const nodeId = Number(c.defaultNode);
+      if(isNaN(nodeId)) continue;
+      for(const node of c.nodes) {
+        if(node._id !== nodeId) continue;
+        c.selectedNode = node;
+      }
+    }
+  }
+
   window.editor = UE.getEditor("content", NKC.configs.ueditor.editorConfigs);
   editor.methods = {};
   editor.addListener( 'ready', function( status ) {
