@@ -36,7 +36,6 @@ router
     const type = fields.type;
     const bookId = fields.bookId;
     const articleId = fields.articleId;
-    console.log(body)
     if(!['modify', 'publish', 'create'].includes(type)) ctx.throw(400, `未知的提交类型 type: ${type}`);
     const {title, content, cover} = JSON.parse(fields.article);
     let article;
