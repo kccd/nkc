@@ -175,7 +175,7 @@ function initVueApp() {
       //   this_.watchContentChange();
       // });
       data.mainForums = data.mainForums || [];
-      for(const i = 0; i < data.mainForums.length; i++) {
+      for(let i = 0; i < data.mainForums.length;i++) {
         this_.initForumCategory(data.mainForums[i]);
       }
       this.selectedForums = data.mainForums || [];
