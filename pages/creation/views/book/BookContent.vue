@@ -10,6 +10,12 @@
           button.btn.btn-xs.btn-default(@click="navToPage('articleEditor', {bid: bookId, aid: articleId})") 编辑
         .content-content(v-html="bookArticle.content")
       .col-xs-12.col-md-3
+        .creation-center-book-list
+          .creation-center-book-list-item(v-for="l in bookList")
+            .creation-center-book-list-item-name(@click="navToPage('bookContent', {}, {bookId, aid: l._id})")
+              span(v-if="!l.published") [未发布]
+              span(v-else-if="l.hasBeta") [编辑中]
+              | {{l.title}}
 </template>
 
 <style lang="less" scoped>
@@ -34,6 +40,11 @@
       bookList: [],
       bookArticle: null,
     }),
+    watch: {
+      $router() {
+        console.log(`router`)
+      }
+    },
     computed: {
       contentInfo() {
         const {time, mTime} = this.bookArticle;

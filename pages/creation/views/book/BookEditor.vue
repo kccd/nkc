@@ -113,7 +113,7 @@
               name,
               description,
               coverUrl,
-            } = data.book;
+            } = data.bookData;
             this.bookName = name;
             this.book = {
               name,
