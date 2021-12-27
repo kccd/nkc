@@ -1,21 +1,28 @@
 <template lang="pug">
   .material-content
     .material-header
-      span.m-r-1 显示风格:
-      input.m-r-1(type="radio" naem="orderStyle" value="icon" v-model="orderStyle")
-      | 图标
-      input.m-r-1(type="radio" name="orderStyle" value="list" v-model="orderStyle")
-      | 列表
+      //span.m-r-1 显示风格:
+      //input.m-r-1(type="radio" naem="orderStyle" value="icon" v-model="orderStyle")
+      //| 图标
+      //input.m-r-1(type="radio" name="orderStyle" value="list" v-model="orderStyle")
+      //| 列表
+      option-button(ref="optionButton"
+        @create="createFolder"
+        @select="selectFolders"
+        @cancel="cancelSelect"
+        :mark="mark"
+        @all-selected="allSelected"
+        @del-folders="delFolders"
+        @all-unselected="allUnSelected"
+        @move-folders="moveFolders")
     .file-box-container
       // -大图标显示
-      .file-box-icon(v-if="orderStyle === 'icon'")
-        .row
-          .col-xs-12.col-md-12
-            .file-box(v-for="file in files" @click="openFile(file.rid)" v-if="orderStyle === 'icon'")
-              .file-img
-                img(:src="getUrl('fileCover', 'file')")
-              .folder-name
-                span {{file.name}}
+      .folder-box-content(v-for="folder in folders" @dblclick="openFolder(folder)")
+        .folder-box(:class="(selectFoldersId.includes(folder.mid) && mark)?'selected':''" @click="selected(folder.mid)")
+          .folder-img
+            img(:src="getUrl('fileCover', folder.type)")
+          .folder-name(:title="folder.decoration")
+            span(@click) {{folder.name}}
       //-列表显示
       .file-box-list
         .row
@@ -46,72 +53,48 @@
 <style lang="less" scoped>
 .material-content {
   .material-header {
-    margin: 1rem;
   }
   .file-box-container{
     margin: 1rem;
     width: 100%;
-    //.file-box-list {
-    //  user-select: none;
-    //  .file-list-li {
-    //    transition: background-color 100ms;
-    //    border-radius: 3px;
-    //    cursor: pointer;
-    //    margin: 5px 0;
-    //    padding: 2px;
-    //    .list-checkbox {
-    //      display: table-cell;
-    //      vertical-align: top;
-    //      .checkbox {
-    //        position: relative;
-    //        display: block;
-    //        margin-top: 10px;
-    //        margin-bottom: 10px;
-    //        label {
-    //          min-height: 20px;
-    //          padding-left: 20px;
-    //          margin-bottom: 0;
-    //          font-weight: normal;
-    //          cursor: pointer;
-    //        }
-    //      }
-    //    }
-    //    .list-cover {
-    //      display: table-cell;
-    //      border: 1px solid #eee;
-    //      background-color: #fff;
-    //      position: relative;
-    //      div {
-    //        img {
-    //          height: 2.88rem;
-    //          width: 2.88rem;
-    //          position: absolute;
-    //          top: 0;
-    //          left: 0;
-    //          right: 0;
-    //          bottom: 0;
-    //          margin: auto;
-    //        }
-    //      }
-    //    }
-    //    .list-body {
-    //      .list-name {
-    //
-    //      }
-    //      .list-info {
-    //        .time {
-    //
-    //        }
-    //        .size {
-    //
-    //        }
-    //      }
-    //      .list-options {
-    //
-    //      }
-    //    }
-    //  }
-    //}
+    .folder-box-content {
+      user-select: none;
+      cursor: pointer;
+      display: inline-block;
+      width: 10%;
+      padding: 0.5rem;
+      text-align: center;
+      vertical-align: top;
+      .selected {
+        background: #CCE8FF;
+        border: 1px #99D1FF solid;
+        margin: -1px;
+      }
+      .folder-box {
+        box-sizing: border-box;
+        display: inline-block;
+        padding: 0.5rem;
+        &:hover {
+          background: #D8EAF9;
+        }
+        .folder-img {
+          display: inline-block;
+          text-align: center;
+        }
+        .folder-name {
+          display: inline-block;
+          text-align: center;
+          span {
+            text-align: left;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            display:-webkit-box;
+            -webkit-line-clamp:3;
+            -webkit-box-orient:vertical;
+          }
+        }
+      }
+    }
     .file-box-icon {
       .file-box{
         display: inline-block;
@@ -158,35 +141,127 @@
 </style>
 
 <script>
+import OptionButton from './OptionButton'
 import {nkcAPI} from "../../lib/js/netAPI";
 import {getUrl, getSize} from '../../lib/js/tools';
 import {visitUrl} from "../../lib/js/pageSwitch";
 export default {
-  props: ['files'],
   data: function (){
     return {
       orderStyle: 'icon',//list 列表, icon 图标
       mark: false,
+      folders: [
+        {
+          name: 'sdqweqwe',
+          type: 'file',
+          mid: '34123',
+          decoration: ''
+        },
+        {
+          name: '测试文件夹',
+          type: 'folder',
+          mid: '32424',
+          decoration: ''
+        }
+      ],
+      mid: 0,
+      selectFoldersId: [],
     }
   },
   components: {
+    'option-button': OptionButton,
   },
   mounted() {
-    this.getFiles()
+    this.mid = this.$route.params.mid;
   },
   computed: {},
   methods: {
     getUrl: getUrl,
-    getSize: getSize,
-    visitUrl: visitUrl,
-    //获取文件夹的文件
-    getFiles() {
-
+    nkcAPI: nkcAPI,
+    getFolder() {
     },
-    selectFile(file, bool) {},
-    deleteFile() {},
-    moveFile() {},
-    editFile() {},
+    //如果是文件夹就进入文件夹，如果是文件就打开文件
+    openFolder(folder) {
+      if(folder.type === 'folder') {
+        this.$router.push({
+          name: 'material',
+          params: {
+            mid: folder.mid,
+          }
+        });
+      } else {
+        console.log('目标类型是文件');
+      }
+    },
+    //返回上一层文件夹
+    back() {
+      this.$router.go(-1);
+    },
+    //创建文件夹
+    createFolder(data) {
+      this.folders.push({
+        name: data[0].value,
+        type: 'folder',
+        mid: this.mid,
+        decoration: data[1].value
+      });
+      ++this.mid;
+    },
+    //多选
+    selectFolders() {
+      this.mark = true;
+    },
+    //选中文件夹
+    selected(mid) {
+      if(!this.mark) return;
+      if(this.selectFoldersId.includes(mid)) {
+        const index = this.selectFoldersId.indexOf(mid);
+        this.selectFoldersId.splice(index, 1);
+      } else {
+        this.selectFoldersId.push(mid);
+      }
+    },
+    //取消多选
+    cancelSelect() {
+      this.mark = false;
+      this.selectFoldersId = [];
+    },
+    //全选
+    allSelected() {
+      this.folders.map(folder => {
+        if(!this.selectFoldersId.includes(folder.mid)) {
+          this.selectFoldersId.push(folder.mid);
+        };
+      })
+    },
+    //取消全选
+    allUnSelected() {
+      this.selectFoldersId = [];
+    },
+    //删除选中文件夹
+    delFolders() {
+      return sweetQuestion(`确定要执行当前操作？`)
+        .then(() => {
+          const {folders} = this;
+          for(const i in folders) {
+            if(this.selectFoldersId.includes(folders[i].mid)) {
+              this.folders.splice(i, 1);
+            }
+          }
+          return;
+        })
+        // .then(() => {
+        //   sweetSuccess('执行成功');
+        // })
+        .catch((err) => {
+          sweetError(err);
+        });
+    },
+    //移动文件夹
+    moveFolders() {
+      if(this.selectFoldersId.length === 0) return sweetWarning('请先选择文件夹');
+      console.log(this.selectFoldersId);
+    }
   }
 }
 </script>

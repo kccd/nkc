@@ -17,7 +17,7 @@ router
     await next();
   })
   .use('/materials', materialsRouter.routes(), materialsRouter.allowedMethods())
-  .use('/material/:mid', materialRouter.routes(), materialRouter.allowedMethods())
+  .use('/material', materialRouter.routes(), materialRouter.allowedMethods())
   .use('/books', booksRouter.routes(), booksRouter.allowedMethods())
   .use('/book', bookRouter.routes(), bookRouter.allowedMethods())
   .use('/articles', articlesRouter.routes(), articlesRouter.allowedMethods())

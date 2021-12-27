@@ -2,7 +2,7 @@
   .document-editor
     common-modal(ref="commonModal")
     .form
-      .form-group
+      .form-group(v-if="formConfigs.title")
         input.form-control.form-title(type="text" v-model="title" placeholder="请输入标题")
       .form-group
         editor(:configs="editorConfigs" ref="editor" @content-change="watchContentChange" :plugs="editorPlugs")
@@ -193,7 +193,8 @@ export default {
       abstract: false,
       abstractEN: false,
       origin: false,
-      cover: false
+      cover: false,
+      title: false,
     }
   }),
   watch: {
@@ -344,6 +345,10 @@ export default {
       this.coverFile = "";
       this.coverUrl = "";
     },
+    //移除编辑器事件
+    removeNoticeEvent() {
+      this.$refs.editor.removeNoticeEvent();
+    },
     updateContentLength() {
       const content = this.$refs.editor.getContentTxt();
       this.contentLength = content.length;
@@ -361,7 +366,6 @@ export default {
         formConfigs
       } = this;
       const data = {
-        title,
         content: this.$refs.editor.getContent(),
       };
       if(formConfigs.cover) {
@@ -373,6 +377,7 @@ export default {
       if(formConfigs.keywords) data.keywords = keywords;
       if(formConfigs.keywordsEN) data.keywordsEN = keywordsEN;
       if(formConfigs.originState) data.originState = originState;
+      if(formConfigs.title) data.title = title;
       return data;
     },
     initDocumentForm(data) {

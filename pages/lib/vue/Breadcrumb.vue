@@ -2,7 +2,7 @@
   .bread-crumb
     span.bread-crumb-item(v-for="(l, index) in list")
       span.bread-crumb-slash(v-if="index !== 0") /
-      span.bread-crumb-name(@click="navToPage(l)" :class="{'link': !!l.page}") {{l.name}}
+      span.bread-crumb-name(@click="navToPage(l)" :class="{'link': !!l.page || !!l.path}") {{l.name}}
 </template>
 
 <style lang="less">
@@ -28,10 +28,11 @@ export default {
   props: ['list'],
   methods: {
     navToPage(l) {
-      const {page, query = {}, params = {}} = l;
-      if(!page) return;
+      const {page, path = '', query = {}, params = {}} = l;
+      if(!page && !path) return;
       this.$router.push({
         name: page,
+        path,
         query,
         params
       });

@@ -1,14 +1,35 @@
 module.exports = {
-  GET: 'creationCenter',
   material: {
     PARAMETER: {
       GET: 'creationCenter',
       PUT: 'creationCenter',
-      DELETE: 'creationCenter'
+      DELETE: 'creationCenter',
+      editor: {
+        POST: 'creationCenter'
+      }
     }
   },
   materials: {
-    GET: 'creationCenter'
+    GET: 'creationCenter',
+    POST: 'creationCenter',
+    DELETE: 'creationCenter',
+    PUT: 'creationCenter',
+    editor: {
+      POST: 'creationCenter',
+      GET: 'creationCenter',
+    },
+    document: {
+      GET: 'creationCenter',
+    },
+    material: {
+      POST: 'creationCenter',
+    },
+    del: {
+      POST: 'creationCenter'
+    },
+    drag: {
+      POST: 'creationCenter'
+    }
   },
   books: {
     GET: 'creationCenter',
