@@ -68,6 +68,10 @@ class NKCRender {
       for(let i = 0; i < images.length; i++) {
         const image = images.eq(i);
         const src = image.attr('src');
+        const dataTag = image.attr('data-tag');
+        const dataType = image.attr('data-type');
+        const dataId = image.attr('data-id');
+        if(dataTag === 'nkcsource' && dataType === 'picture' && dataId) continue;
         const reg = /^(http(s)?:\/\/|ftp:\/\/)/i;
         if(!src || !reg.test(src)) continue;
         if(domainWhitelistReg.test(src)) continue;
