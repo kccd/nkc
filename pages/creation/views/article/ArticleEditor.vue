@@ -32,7 +32,8 @@
       formConfigs: {
         cover: true,
         title: true,
-      }
+      },
+      lockPost: false,
     }),
     computed: {
       type() {
@@ -84,7 +85,6 @@
         if(articleId) url += `&aid=${articleId}`;
         nkcAPI(url, 'GET')
           .then(data => {
-            console.log(data);
             const {article, book} = data;
             if(article) {
               const {title, content, cover} = article;
@@ -108,6 +108,8 @@
         });
       },
       post(type) {
+        if(this.lockPost) return;
+        this.lockPost = true;
         const self = this;
         const formData = new FormData();
         const {
@@ -140,7 +142,7 @@
             self.coverFile = null;
             const {articleId, articleCover} = data;
             self.articleId = articleId;
-            self.article.cover = articleCover;
+            self.resetCoverFile(articleCover);
           })
           .then(() => {
             if(type === 'publish') {
@@ -151,9 +153,14 @@
                   aid: self.articleId
                 }
               });
+            } else {
+              self.lockPost = false;
             }
           })
-          .catch(sweetError);
+          .catch(err => {
+            self.lockPost = false;
+            sweetError(err);
+          });
       },
       saveArticle() {
         this.post(this.type);
@@ -161,13 +168,18 @@
       publish() {
         this.post('publish');
       },
+      resetCoverFile(cover) {
+        this.cover = cover;
+        this.coverFile = null;
+        this.$refs.documentEditor.resetCover(cover);
+      },
       watchContentChange(data) {
-        const {title, coverFile, content} = data;
+        if(this.lockContentChange) return;
+        const {title, coverFile, content, cover} = data;
         this.article.title = title;
         this.article.content = content;
-        if(this.oldCoverFile !== coverFile) {
-          this.coverFile = coverFile;
-        }
+        this.article.cover = cover;
+        this.coverFile = coverFile;
         this.saveArticle();
       },
     }

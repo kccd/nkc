@@ -8,17 +8,17 @@
         editor(:configs="editorConfigs" ref="editor" @content-change="watchContentChange" :plugs="editorPlugs")
       .form-group(v-if="formConfigs.cover")
         .m-b-2
+          span cover:{{cover}} coverLink:{{coverLink}}
           .editor-header 封面图
             small （如未指定，默认从内容中选取）
           .editor-cover
             resource-selector(ref="resource")
             image-selector(ref="image")
-            .editor-cover-default(v-if="!cover && !coverUrl" @click="selectCover")
+            .editor-cover-default(v-if="!coverLink" @click="selectCover")
               .fa.fa-plus
             div(v-else)
               .editor-cover-img
-                img(:src="coverUrl" v-if="coverUrl")
-                img(:src="getUrl('postCover', cover)" v-else-if="cover")
+                img(:src="coverLink")
               .m-t-05
                 button.btn.btn-default.btn-sm(@click="selectCover") 重新选择
                 button.btn.btn-default.btn-sm(@click="removeCover") 删除
@@ -195,8 +195,15 @@ export default {
       origin: false,
       cover: false,
       title: false,
-    }
+    },
+    // 是否允许触发contentChange
+    contentChangeEventFlag: false,
   }),
+  mounted() {
+    setInterval(() => {
+      console.log(`定时打印`, this.cover);
+    }, 1000);
+  },
   watch: {
     title() {
       this.watchContentChange();
@@ -221,6 +228,15 @@ export default {
     },
   },
   computed: {
+    coverLink() {
+      if(this.coverUrl) {
+        return this.coverUrl;
+      } else if(this.cover) {
+        return getUrl('documentCover', this.cover);
+      } else {
+        return '';
+      }
+    },
     // 摘要的字节数
     abstractCnLength() {
       return this.getLength(this.abstract);
@@ -345,6 +361,11 @@ export default {
       this.coverFile = "";
       this.coverUrl = "";
     },
+    resetCover(coverId) {
+      this.coverFile = '';
+      this.coverUrl = '';
+      this.cover = coverId;
+    },
     //移除编辑器事件
     removeNoticeEvent() {
       this.$refs.editor.removeNoticeEvent();
@@ -370,7 +391,7 @@ export default {
       };
       if(formConfigs.cover) {
         data.coverFile = coverFile || null;
-        data.cover = cover || null;
+        data.cover = cover || '';
       }
       if(formConfigs.abstract) data.abstract = abstract;
       if(formConfigs.abstractEN) data.abstractEN = abstractEN;
@@ -381,7 +402,11 @@ export default {
       return data;
     },
     initDocumentForm(data) {
-      const {title, content, cover} = data;
+      const {
+        title = '',
+        content = '',
+        cover = ''
+      } = data;
       this.title = title;
       this.$refs.editor.setContent(content);
       this.cover = cover;
@@ -392,6 +417,10 @@ export default {
     },
     // 监听内容输入
     watchContentChange: debounce(function() {
+      if(!this.contentChangeEventFlag) {
+        this.contentChangeEventFlag = true;
+        return;
+      }
       this.updateContentLength();
       this.emitContentChangeEvent();
     }, 500),
