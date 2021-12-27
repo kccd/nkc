@@ -31,6 +31,7 @@ const schema = new mongoose.Schema({
     default: [],
     index: 1
   },
+  //是否发布
   published: {
     type: Boolean,
     default: false,

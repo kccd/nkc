@@ -1,12 +1,19 @@
 <template lang="pug">
   .option-button
     common-modal(ref="commonModal")
-    a(@click="back" :class="{'disabled': mark}")
+    resource-selector(ref="resourceSelector")
+    a(@click="back" :class="{'disabled': (!canBack || mark)}")
       .fa.fa-arrow-left &nbsp;
-      | 后退
+      | 返回上一层
     a(@click="createFolder" :class="{'disabled': mark}")
       .fa.fa-plus &nbsp;
       | 新建文件夹
+    a(@click="addFiles" :class="{'disabled': mark}")
+      .fa.fa-plus &nbsp;
+      | 添加文件
+    a(@click="addDocument" :class="{'disabled': mark}")
+      .fa.fa-plus &nbsp;
+      | 添加文档
     .display-i-b
       a(@click="markSelect")
         .fa.fa-dot-circle-o &nbsp;
@@ -19,9 +26,9 @@
           span(v-if="!allSelect") 全选
           span(v-if="allSelect") 取消全选
         span
-          a(@click="moveFolders")
-            .fa.fa-arrows &nbsp;
-            | 移动
+          //a(@click="moveFolders")
+          //  .fa.fa-arrows &nbsp;
+          //  | 移动
           a(@click="delFolders")
             .fa.fa-trash &nbsp;
             | 删除
@@ -31,6 +38,11 @@
 .option-button {
   display: inline-block;
   padding-right: 1rem;
+  a.disabled, a.disabled:hover, a.disabled:focus{
+    background-color: #f7f7f7;
+    color: #ccc;
+    cursor: not-allowed;
+  }
   a {
     &:hover {
       text-decoration: none;
@@ -76,7 +88,8 @@
 </style>
 
 <script>
-import CommonModal from './CommonModal'
+import CommonModal from './CommonModal';
+import ResourceSelector from './ResourceSelector'
 export default {
   props: ['mark'],
   data: function (){
@@ -84,21 +97,36 @@ export default {
       folderName: "",
       decoration: "",
       allSelect: false,
+      canBack: true,
     }
   },
   components: {
     'common-modal': CommonModal,
+    'resource-selector': ResourceSelector,
   },
   mounted() {
+    if(this.$route.path === '/creation/materials') {
+      this.canBack =  false;
+    }
   },
   computed: {},
   methods: {
     //返回上一层
     back() {
-
+      if(!this.canBack) return;
+      this.$emit('back');
+    },
+    //添加文件
+    addFiles() {
+      const self = this;
+      this.$refs.resourceSelector.open(function(data) {
+        let r = data.resources[0];
+        self.$emit('add-files', r);
+      });
     },
     //新建文件夹
     createFolder() {
+      if(this.mark) return;
       const self = this;
       this.$refs.commonModal.open(function(data) {
         if(data) {
@@ -147,6 +175,10 @@ export default {
     //移动文件夹
     moveFolders() {
       this.$emit('move-folders');
+    },
+    //添加文档
+    addDocument() {
+      this.$emit('add-document');
     }
   }
 }

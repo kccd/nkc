@@ -29,7 +29,8 @@
         cover: null,
       },
       formConfigs: {
-        cover: true
+        cover: true,
+        title: true,
       }
     }),
     computed: {
