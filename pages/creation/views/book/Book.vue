@@ -11,11 +11,11 @@
           .creation-center-book-list
             .creation-center-book-list-item(v-for="l in bookList")
               .creation-center-book-list-item-name(@click="navToPage('bookContent', {}, {bid, aid: l._id})")
-                span(v-if="!l.published") [未发布]
+                span(v-if="!l.did") [未发布]
                 span(v-else-if="l.hasBeta") [编辑中]
                 | {{l.title}}
               .creation-center-book-list-item-time {{l.time}}
-          button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('articleEditor', {bid})") 添加文章
+          button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('articleEditor', {bid})") 撰写文章
           button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('bookEditor', {bid})") 设置
 
 </template>

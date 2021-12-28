@@ -31,12 +31,6 @@ const schema = new mongoose.Schema({
     default: [],
     index: 1
   },
-  //是否发布
-  published: {
-    type: Boolean,
-    default: false,
-    index: 1
-  }
 }, {
   collection: 'articles'
 });
@@ -110,18 +104,14 @@ schema.methods.modifyArticle = async function(props) {
       coverFile,
       cover
     });
-    console.log(document);
-    console.log(props)
     await this.updateOne({
       $set: {
         betaDid: document._id,
         tlm: time,
-        published: true,
       }
     });
     this.betaDid = document._id;
     this.tlm = time;
-    this.published = true;
   }
 }
 /*

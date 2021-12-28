@@ -158,7 +158,6 @@ schema.methods.extendArticlesById = async function(articlesId) {
       uid,
       did,
       betaDid,
-      published,
     } = article;
     const documentId = did || betaDid;
     const document = documentsObj[documentId];
@@ -167,7 +166,8 @@ schema.methods.extendArticlesById = async function(articlesId) {
     const result = {
       _id,
       uid,
-      published,
+      did,
+      betaDid,
       title: title || '未填写标题',
       url: getUrl('bookContent', this._id, _id),
       time: timeFormat(toc),
