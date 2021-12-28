@@ -260,4 +260,46 @@ schema.methods.getCrumbs = async function() {
   return crumbs;
 }
 
+/*
+*创建资源文件夹
+* */
+schema.statics.createMaterialFolder = async function(option) {
+  const MaterialModel = mongoose.model('materials');
+  const SettingModel = mongoose.model('settings');
+  const {name, mid, type, resource, uid} = option;
+  const material = await MaterialModel({
+    _id: await SettingModel.operateSystemID('materials', 1),
+    uid,
+    name,
+    mid,
+    type,
+  });
+  material.save();
+  const arr = [];
+  for(const r of resource) {
+    if(!r) return;
+    arr.push({
+      _id: await SettingModel.operateSystemID('materials', 1),
+      uid,
+      name: r.oname,
+      mid: material._id,
+      type: 'resource',
+      targetId: r.rid,
+    });
+  }
+  await MaterialModel.insertMany(arr);
+}
+
+/*
+* 合并素材文件分组
+* */
+schema.statics.mergeMaterials = async function(materials) {
+  const arr = [];
+  for(const material of materials) {
+    if(!material) return;
+    arr.push.apply(arr, material.data);
+  }
+  return arr;
+}
+
 module.exports = mongoose.model('materials', schema);

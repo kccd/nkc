@@ -240,7 +240,6 @@ resourceRouter
     await r.save();
 
     data.r = r;
-
     // 将文件推送到 media service
     r.pushToMediaService(file.path)
       .catch(async err => {
