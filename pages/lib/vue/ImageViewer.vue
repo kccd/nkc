@@ -1,47 +1,39 @@
 <template lang="pug">
-  viewer(ref="imageViewer" :images="images")
-    img(v-for="src in images" :src="src" :key="src" width="300")
+  viewer.viewer(:images="images"
+    @inited="inited"
+    ref="viewer")
+    template(#default="scope")
+      img(v-for="src in scope.images" :src="src" :key="src" width="0")
 </template>
-<style lang="less" scoped>
+<style lang="less">
+  .viewer {
+    width: 0;
+    height: 0!important;
+    img {
+      width: 0;
+    }
+  }
 </style>
 <script>
+import 'viewerjs/dist/viewer.css';
+import { component as Viewer } from "v-viewer";
 export default {
-  data: function (){
-    return {
-      images: [],
-      config: {
-        button: false, // 顶部关闭按钮
-        // navbar: true, // 底部图片缩略图 默认true
-        title: false, // 图片标题
-        toolbar: {
-          // zoomIn: true,
-          // zoomOut: true,
-          // oneToOne: false,
-          // reset: true,
-          // prev: true,
-          // play: {
-          //   show: true,
-          //   size: 'large'
-          // },
-          // next: true,
-          // rotateLeft: true,
-          // rotateRight: true,
-          // flipHorizontal: false,
-          // flipVertical: false
-        },
-        tooltip: true,
-      }
-    }
-  },
-  mounted() {
-  },
   components: {
+    Viewer
   },
-  computed: {},
+  data() {
+    return {
+      images: [
+      ],
+    };
+  },
   methods: {
-    show(img) {
-      debugger
-      this.list = img;
+    inited (viewer) {
+      this.$viewer = viewer
+    },
+    show (img) {
+      this.images = img;
+      this.$viewer.show()
     }
   }
 }

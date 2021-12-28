@@ -28,6 +28,10 @@ router
     let materials = await db.MaterialModel.find({mid: mid});
     //拓展资源信息和文档信息
     materials = await db.MaterialModel.extentMaterialsInfo(materials);
+    //按拼音首字母排序
+    materials = nkcModules.pinyin.getGroupsByFirstLetter(materials, 'name');
+    //合并分组
+    materials = await db.MaterialModel.mergeMaterials(materials);
     data.materials = materials;
     await next();
   })

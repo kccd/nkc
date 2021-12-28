@@ -215,7 +215,8 @@ export default {
       } else if (folder.type === 'resource') {
         if(!folder.resource) sweetError('未找到资源文件');
         if(folder.resource.mediaType === 'mediaPicture') {
-          this.viewer([`/r/${folder.resource.rid}`]);
+          this.viewer([`/r/${folder.resource.rid}`,
+          ]);
           // window.open( `/r/${folder.resource.rid}`);
         } else {
           this.$refs.resourceInfo.open({rid: folder.resource.rid, mediaType: folder.mediaType})
@@ -339,17 +340,28 @@ export default {
       if(this.selectFoldersId.length === 0) return sweetWarning('请先选择文件夹');
     },
     //添加文件
-    addFiles(r) {
+    addFiles(resource) {
       const self = this;
-      if(!r) return;
+      if(!resource) return sweetWarning('请选择资源文件');
+      let materialName = '文件夹';
+      if(resource.length === 1) materialName = '文件';
       self.$refs.editorModal.open(function(data) {
         if(!data) return sweetError('参数错误');
-        nkcAPI('/creation/materials', 'POST', {
+        let option = {
           name: data[0].value,
           type: 'resource',
           mid: self.mid?self.mid:'',
-          targetId: r.rid,
-        })
+          targetId: resource[0].rid
+        };
+        if(resource.length > 1) {
+          option = {
+            name: data[0].value,
+            resource: resource,
+            type: 'folder',
+            mid: self.mid?self.mid:'',
+          };
+        }
+        nkcAPI('/creation/materials', 'POST', option)
           .then(res => {
             self.$refs.editorModal.close();
             self.getFolders();
@@ -361,17 +373,17 @@ export default {
       }, {
         data: [
           {
-            label: "请输入文件名",
+            label: `请输入${materialName}名`,
             dom: "input",
-            value: r.oname
+            value: resource.length === 1?resource[0].oname:'',
           },
           {
-            label: "请输入文件描述信息",
+            label: `请输入${materialName}详情`,
             dom: "input",
-            value: r.decoration
+            value: ''
           }
         ],
-        title: "添加资源文件"
+        title: `添加资源${materialName}`
       })
     },
     //编辑文档
@@ -401,7 +413,6 @@ export default {
             mid: self.mid,
           })
             .then(res => {
-              sweetSuccess('操作成功');
               self.$refs.editorModal.close();
               self.getFolders();
             })

@@ -120,8 +120,8 @@ export default {
     addFiles() {
       const self = this;
       this.$refs.resourceSelector.open(function(data) {
-        let r = data.resources[0];
-        self.$emit('add-files', r);
+        // let r = data.resources[0];
+        self.$emit('add-files', data.resources);
       });
     },
     //新建文件夹
