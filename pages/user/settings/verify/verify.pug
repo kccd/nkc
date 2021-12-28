@@ -4,8 +4,8 @@ block title
   +includeCSS("/user/settings/verify/verify.css")
   -let defaultImg = '/default/photo_setting.jpg'
 block content
-  //- #data.hidden= JSON.stringify(data)
-  #data.hidden=objToStr({data})
+  //- #data.hidden= objToStr({data})
+  #data.hidden=objToStr({data:{auth1Content: data.auth1Content, auth2Content: data.auth2Content, auth3Content: data.auth3Content, level: data.level, boundMobile: data.boundMobile, user: data.user, authenticate: data.authenticate, loading: data.loading, VerifiedVideoState: data.VerifiedVideoState, videoInputFile: data.videoInputFile}})
   #app.container-fluid.max-width(v-cloak)
     .row
       .col-xs-12.col-md-2
@@ -15,15 +15,15 @@ block content
           .panel-heading
             span=`身份认证1`
           .panel-body
-              if data.level === 1
-              p 认证说明：
-                span.text-info {{phoneNumberDesc}}
-              h5 认证状态：
-                span.text-success(v-if="boundMobile") 已通过
-                span.text-danger(v-else) 未通过
-                  br
-                  br
-                  a.btn.btn-primary(href=`/u/${data.user.uid}/settings/security` target="_blank") 绑定手机号
+            if data.level === 1
+            p 认证说明：
+              span.text-info {{phoneNumberDesc}}
+            h5 认证状态：
+              span.text-success(v-if="boundMobile") 已通过
+              span.text-danger(v-else) 未通过
+                br
+                br
+                a.btn.btn-primary(href=`/u/${data.user.uid}/settings/security` target="_blank") 绑定手机号
         .panel.panel-default
           .panel-heading
             span 身份认证2
@@ -32,7 +32,7 @@ block content
               span.text-info {{identityAuthDesc}}
             //- p 注意：
             //-   span.text-danger 请横向摆放，使用手机拍摄，保留周围背景，不要使用扫描件，大小不超过20M，并且只能为.jpg、.jpeg、.png格式。
-            
+
             h5.text-danger(v-if="authenticate.card.status === 'passed' && authenticate.card.isExpired") 已过期
             h5(v-if="authenticate.card.status === 'passed' && !authenticate.card.isExpired") 过期时间：{{verify2ExpiryDate}}
             .row
