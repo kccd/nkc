@@ -31,7 +31,6 @@ router
       maxLength: 5000
     });
     for(const uid of auditorId) {
-      console.log(uid);
       const u = await db.UserModel.findOne({uid}, {_id: 1});
       if(u) uidArr.push(uid);
     }
