@@ -9,19 +9,21 @@
  
 - Image Processing: **[ImageMagick](https://www.imagemagick.org)** v7.0 or higher
 - Search: **[ElasticSearch 6](https://elastic.co)** with **[IK Analysis for Elasticsearch](https://github.com/medcl/elasticsearch-analysis-ik)**
-- video Processing: **[ffmpeg](https://www.ffmpeg.org/)** v4.0.2
+- Video Processing: **[ffmpeg](https://www.ffmpeg.org/)** v4.0.2
 
 ## Main Frameworks
 - Web Framework: **[Koa](http://koajs.com)**
 - Template Language: **[Pug](https://pugjs.org)**
 - ORM: **[Mongoose](https://www.mongoosejs.com)**
 
-## Install
+## Installation
 
 1. install all the requirements
 2. clone this repo
-3. run `npm install` in your console
-4. npm start and you are able to access via localhost:1086
+3. run `npm install` in your console to install dependicies and launch NKC Installer on port 9000.
+   1. You may need to install [node-gyp](https://github.com/nodejs/node-gyp#installation) globally.
+   2. You may need [GTK2](https://github.com/Automattic/node-canvas/wiki/Installation%3A-Windows) to build node-canvas.
+4. `npm start` and you are able to access via `localhost:1086`
 
 ## How to call an API
 - In browser
