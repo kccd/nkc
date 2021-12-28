@@ -11,6 +11,18 @@ block eContent
         span 提交身份认证申请时，给拥有相应证书的用户发送通知。
         .form-horizontal
           .form-group
+            label.col-sm-3.control-label 身份认证 1 提示语：
+            .col-sm-9
+              h5.text-danger 请输入用户手机号证验证提示语
+              textarea.form-control(rows=4 v-model='authSettings.auth1Content')
+          .form-group
+          .form-group
+            label.col-sm-3.control-label 身份认证 2 提示语：
+            .col-sm-9
+              h5.text-danger 请输入用户身份证验证提示语
+              textarea.form-control(rows=4 v-model='authSettings.auth2Content')
+          .form-group
+          .form-group
             label.col-sm-3.control-label 身份认证 3 提示语：
             .col-sm-9
               h5.text-danger 其中 {code} 为 6 位随机数
