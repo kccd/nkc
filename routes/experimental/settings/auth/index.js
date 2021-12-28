@@ -12,11 +12,21 @@ router
   .put("/", async (ctx, next) => {
     const {db, body, nkcModules} = ctx;
     const {checkString} = nkcModules.checkData;
-    const {auditorId, auditorCerts, auth3Content} = body.authSettings;
+    const {auditorId, auditorCerts, auth3Content,auth2Content,auth1Content} = body.authSettings;
     const uidArr = [];
     const certsId = [];
     checkString(auth3Content, {
       name: '身份认证 3 提示语',
+      minLength: 1,
+      maxLength: 5000
+    });
+    checkString(auth2Content, {
+      name: '身份认证 2 提示语',
+      minLength: 1,
+      maxLength: 5000
+    });
+    checkString(auth1Content, {
+      name: '身份认证 1 提示语',
       minLength: 1,
       maxLength: 5000
     });
@@ -33,6 +43,8 @@ router
     }, {
       $set: {
         "c.auth3Content": auth3Content,
+        "c.auth1Content":auth1Content,
+        "c.auth2Content":auth2Content,
         "c.auditorId": uidArr,
         "c.auditorCerts": certsId
       }

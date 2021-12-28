@@ -82,6 +82,12 @@ const schema = new Schema({
     }
     */
   },
+  // 附件是否被屏蔽
+  disabled: {
+    type: Boolean,
+    default: false,
+    index: 1
+  }
 }, {
   collection: 'attachments'
 });
@@ -820,5 +826,18 @@ schema.methods.updateFilesInfo = async function() {
     }
   });
 };
+/*
+* 屏蔽 attachment
+* @param {String} aid attachment ID
+* */
+schema.statics.disableAttachment = async (aid) => {
+  if(!aid) return;
+  const AttachmentModel = mongoose.model('attachments');
+  await AttachmentModel.updateOne({_id: aid}, {
+    $set: {
+      disabled: true
+    }
+  });
+}
 
 module.exports = mongoose.model('attachments', schema);
