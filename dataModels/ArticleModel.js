@@ -107,8 +107,11 @@ schema.methods.modifyArticle = async function(props) {
       uid,
       title,
       content,
-      coverFile
+      coverFile,
+      cover
     });
+    console.log(document);
+    console.log(props)
     await this.updateOne({
       $set: {
         betaDid: document._id,
@@ -116,6 +119,9 @@ schema.methods.modifyArticle = async function(props) {
         published: true,
       }
     });
+    this.betaDid = document._id;
+    this.tlm = time;
+    this.published = true;
   }
 }
 /*

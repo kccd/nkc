@@ -6,7 +6,7 @@ module.exports = async (ctx) => {
     ctx.body = await ctx.nkcModules.socket.getPageFromRenderService(
       ctx.remoteTemplate,
       ctx.remoteState,
-      {}
+      ctx.data
     );
   } else if(ctx.template) {
     const pagesPath = PATH.resolve(__dirname, '../../pages');

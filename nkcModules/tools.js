@@ -199,8 +199,11 @@ var Tools = function() {
       case 'documentCover': {
         return '/a/' + id;
       }
-      case 'creationBookContent': {
-        return '/creation/book/' + id + '?id=' + size
+      case 'bookContent': {
+        return '/book/' + id + '?aid=' + size
+      }
+      case 'editBookArticle': {
+        return '/creation/articles/editor?bid=' + id + '&aid=' + size;
       }
     }
   };

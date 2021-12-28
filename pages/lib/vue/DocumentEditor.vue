@@ -8,7 +8,6 @@
         editor(:configs="editorConfigs" ref="editor" @content-change="watchContentChange" :plugs="editorPlugs")
       .form-group(v-if="formConfigs.cover")
         .m-b-2
-          span cover:{{cover}} coverLink:{{coverLink}}
           .editor-header 封面图
             small （如未指定，默认从内容中选取）
           .editor-cover
@@ -199,11 +198,6 @@ export default {
     // 是否允许触发contentChange
     contentChangeEventFlag: false,
   }),
-  mounted() {
-    setInterval(() => {
-      console.log(`定时打印`, this.cover);
-    }, 1000);
-  },
   watch: {
     title() {
       this.watchContentChange();

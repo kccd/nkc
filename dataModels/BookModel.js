@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const {timeFormat, getUrl} = require("../nkcModules/tools");
 const schema = new mongoose.Schema({
   _id: String,
   uid: {
@@ -68,10 +69,7 @@ schema.statics.createBook = async (props) => {
   await book.save();
   return book;
 };
-
-schema.statics.getBookById = async (bid) => {
-  const BookModel = mongoose.model('books');
-  const book = await BookModel.findOnly({_id: bid});
+schema.methods.getBaseInfo = async function() {
   const {timeFormat, getUrl} = require('../nkcModules/tools');
   const {
     _id,
@@ -80,7 +78,7 @@ schema.statics.getBookById = async (bid) => {
     description,
     cover,
     toc
-  } = book;
+  } = this;
   return {
     _id,
     uid,
@@ -89,6 +87,11 @@ schema.statics.getBookById = async (bid) => {
     time: timeFormat(toc),
     coverUrl: getUrl('bookCover', cover)
   };
+};
+schema.statics.getBookById = async (bid) => {
+  const BookModel = mongoose.model('books');
+  const book = await BookModel.findOnly({_id: bid});
+  return await book.getBaseInfo();
 };
 schema.statics.getBooksByUserId = async (uid) => {
   const BookModel = mongoose.model('books');
@@ -166,7 +169,7 @@ schema.methods.extendArticlesById = async function(articlesId) {
       uid,
       published,
       title: title || '未填写标题',
-      url: getUrl('creationBookContent', this._id, _id),
+      url: getUrl('bookContent', this._id, _id),
       time: timeFormat(toc),
       hasBeta: !!betaDid,
     };
@@ -181,20 +184,26 @@ schema.methods.getContentById = async function(aid) {
   const DocumentModel = mongoose.model('documents');
   if(list.includes(aid)) {
     const article = await ArticleModel.findOnly({_id: aid});
-    const {did, betaDid} = article;
+    const {did, betaDid, uid} = article;
     const documentId = did || betaDid;
     const document = await DocumentModel.findOnly({_id: documentId});
     const {
+      _id,
       time,
       mTime,
       title,
       content,
+      coverUrl,
     } = await document.extendData();
     return {
+      aid: article._id,
+      did: _id,
+      coverUrl,
       time,
       mTime,
       title,
-      content
+      content,
+      uid
     }
   }
 }

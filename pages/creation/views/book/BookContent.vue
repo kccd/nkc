@@ -19,6 +19,7 @@
 </template>
 
 <style lang="less" scoped>
+  @import "../../../publicModules/base";
   .book-content{
     .content-title{
       //font-size: 2rem;
@@ -26,6 +27,22 @@
     .content-info{
       font-size: 1rem;
       color:#555;
+    }
+    .creation-center-book-list{
+    }
+    .creation-center-book-list-item{
+      padding: 0.3rem;
+      cursor: pointer;
+      &:hover{
+        background-color: #f7f7f7;
+      }
+    }
+    .creation-center-book-list-item-name{
+      span{
+        font-size: 1rem;
+        color: @primary;
+        margin-right: 0.5rem;
+      }
     }
   }
 </style>
@@ -41,8 +58,8 @@
       bookArticle: null,
     }),
     watch: {
-      $router() {
-        console.log(`router`)
+      $route() {
+        this.init();
       }
     },
     computed: {
@@ -81,10 +98,13 @@
       }
     },
     mounted() {
-      this.initId();
-      this.getBookContent();
+      this.init();
     },
     methods: {
+      init() {
+        this.initId();
+        this.getBookContent();
+      },
       initId() {
         const {bid, aid} = this.$route.params;
         this.bookId = bid;
@@ -103,7 +123,6 @@
             this.bookArticle = data.bookArticle;
             this.bookList = data.bookList;
             this.book = data.bookData;
-            console.log(data);
           })
           .catch(sweetError);
       }

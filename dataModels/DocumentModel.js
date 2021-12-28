@@ -101,6 +101,7 @@ schema.statics.getDocumentsObjById = async (documentsId) => {
 schema.statics.createDocument = async (props) => {
   const {
     title,
+    cover,
     content = '',
     coverFile,
     uid,
@@ -115,6 +116,7 @@ schema.statics.createDocument = async (props) => {
   const document = new DocumentModel({
     _id: documentId,
     title,
+    cover,
     content,
     wordCount,
     uid,
@@ -171,7 +173,7 @@ schema.methods.setAsHistory = async function(newDocumentId) {
 }
 
 schema.methods.extendData = async function() {
-  const {timeFormat, fromNow} = require('../nkcModules/tools');
+  const {timeFormat, fromNow, getUrl} = require('../nkcModules/tools');
   const nkcRender = require('../nkcModules/nkcRender');
   const content = await nkcRender.renderHTML({
     type: "article",
@@ -181,6 +183,7 @@ schema.methods.extendData = async function() {
   });
   return {
     time: timeFormat(this.toc),
+    coverUrl: this.cover? getUrl('documentCover', this.cover): '',
     mTime: this.tlm? fromNow(this.tlm): null,
     title: this.title || '未填写标题',
     content
