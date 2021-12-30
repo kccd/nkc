@@ -14,12 +14,14 @@ router
           avatar: ''
         }
       });
+      await db.AttachmentModel.disableAttachment(targetUser.avatar);
     } else if(type === "banner") {
       await db.UserModel.updateOne({uid: targetUser.uid}, {
         $set: {
           banner: ''
         }
       });
+      await db.AttachmentModel.disableAttachment(targetUser.banner);
     } else if(type === "username") {
       const newUsername = `${serverSettings.websiteCode}-${targetUser.uid}`;
       const newUsernameLowerCase = newUsername.toLowerCase();

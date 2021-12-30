@@ -6,7 +6,8 @@ authRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, query, params} = ctx;
 		const {c = ''} = query;
-		const [searchType, searchContent] = c.split(',');
+		//  中英文逗号都能分割
+		const [searchType, searchContent] = c.split(/[\n\s+,，]/g);
 		let userPersonalArr = '';
 		data.searchType = searchType;
 		data.searchContent = searchContent;
