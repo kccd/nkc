@@ -39,5 +39,9 @@ module.exports = async (ctx) => {
     lotteryStatus: state.uid? state.user.generalSettings.lotterySettings.status: false,
     appStableVersion: state.appStableVersion,
     startTime: global.NKC.startTime,
+    nkcSourceMask: {
+      isDisplay: state.threadSettings.playerTips.isDisplay,
+      tipContent: state.threadSettings.playerTips.tipContent
+    }
   };
 }

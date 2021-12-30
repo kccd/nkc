@@ -178,7 +178,8 @@ schema.methods.extendArticlesById = async function(articlesId) {
   return results;
 }
 
-schema.methods.getContentById = async function(aid) {
+schema.methods.getContentById = async function(props) {
+  const {aid, uid} = props;
   const {list} = this;
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
@@ -194,7 +195,7 @@ schema.methods.getContentById = async function(aid) {
       title,
       content,
       coverUrl,
-    } = await document.extendData();
+    } = await document.extendData(uid);
     return {
       aid: article._id,
       did: _id,

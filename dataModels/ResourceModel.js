@@ -91,7 +91,10 @@ const resourceSchema = new Schema({
     index: 1,
     default: "resource"
   },
-  // pid、"fund_" + applicationForumId, 表示哪些post引用了该资源
+  // 表示哪些post引用了该资源
+  // pid
+  // "fund_" + applicationForumId
+  // "document_" + documentId
   references: {
 	  type: [String],
     index: 1,
@@ -425,7 +428,7 @@ resourceSchema.methods.getPDFPreviewFilePath = async function() {
 };
 
 // 检测html内容中的资源并将指定id存入resource.reference
-resourceSchema.statics.toReferenceSource = async function(id, declare) {
+resourceSchema.statics.toReferenceSource = async function(id, declare = '') {
   const model = mongoose.model("resources");
 	const $ = cheerio.load(declare);
   const resourcesId = [];

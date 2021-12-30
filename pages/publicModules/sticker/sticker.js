@@ -11,7 +11,8 @@ class StickerViewer {
         sticker: "",
         uid: NKC.configs.uid,
         management: false,
-        loading: false
+        loading: false,
+        notesAboutUploading: ''
       },
       mounted() {
         this.init();
@@ -103,6 +104,7 @@ class StickerViewer {
             .then(data => {
               self.app.sticker = data.sticker;
               self.app.loading = false;
+              self.app.notesAboutUploading = data.notesAboutUploading;
             })
             .catch(data => {
               sweetError(data);
