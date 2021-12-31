@@ -50,7 +50,7 @@ const redisConfig = require('../config/redis');
 
 module.exports = () => {
   return Redis.createClient({
-    host: redisConfig.host,
+    host: redisConfig.address,
     port: redisConfig.port,
     db: redisConfig.db
   });
