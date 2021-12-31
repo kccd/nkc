@@ -304,8 +304,8 @@ async function initDefaultHomeBlocks() {
 
 async function init() {
   await initConfig();
-  await initAccount();
   await initSettings();
+  await initAccount();
   await initRoles();
   await initKcksRecordsTypes();
   await initScoreOperations();

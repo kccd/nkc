@@ -2,13 +2,13 @@
 
 ## 运行环境
 
-- 基于：[Node.js](https://nodejs.org) v12.14.0 
+- 基于：**[NodeJS](https://nodejs.org)** v12.14.0 
 - 数据库：
-    1. **[mongoDB](https://www.mongodb.com)** v4.4.5
+    1. **[MongoDB](https://www.mongodb.com)** v4.4.5
     2. **[Redis](https://redis.io/)** v3.2.100
     3. **[ElasticSearch](https://elastic.co)** v6.0.1
 - 图片处理：**[ImageMagick](https://www.imagemagick.org)** v7.0.10
-- 音视频处理：**[ffmpeg](https://www.ffmpeg.org/)** v4.0.2
+- 音视频处理：**[FFmpeg](https://www.ffmpeg.org/)** v4.0.2
 - PDF 文件处理：**[Ghostscript](https://www.ghostscript.com/)** v9.53.3, **[QPDF](https://qpdf.sourceforge.io/)** v10.3.2
 
 
