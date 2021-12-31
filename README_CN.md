@@ -18,5 +18,6 @@
 3. 拉取当前仓库到本地；
 4. 执行 `npm i` 安装依赖；
 5. 执行 `npm run build-pages-p` 编译前端文件；
-6. 执行 `pm2 start pm2.config.js` 启动当前项目；
-7. 浏览器访问 `localhost:9000`；
+6. 根据需要调整项目根目录 `config` 文件夹下的配置文件；
+7. 执行 `pm2 start pm2.config.js` 启动项目；
+8. 浏览器访问 `localhost:9000`；
