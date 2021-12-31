@@ -30,21 +30,4 @@ problemsTypeSchema.methods.updateProblemsCount = async function() {
 };
 const ProblemsTypeModel = mongoose.model('problemsTypes', problemsTypeSchema);
 
-const defaultData = {
-  _id: 0,
-  name: '未分类'
-};
-(async () => {
-  try{
-    let type = await ProblemsTypeModel.findOne({_id: defaultData._id});
-    if(type) return;
-    await mongoose.model('problems').updateMany({}, {$set: {typeId: 0}});
-    defaultData.count = await mongoose.model('problems').countDocuments();
-    type = ProblemsTypeModel(defaultData);
-    await type.save();
-  } catch(err) {
-    throw err;
-  }
-})();
-
 module.exports = ProblemsTypeModel;
