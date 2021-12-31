@@ -69,6 +69,19 @@ module.exports = {
         NODE_ENV: 'production',
         PROCESS_ID: 0,
       }
-    }
+    },
+    {
+      name: 'store',
+      script: 'server.js',
+      cwd: "./microServices/store/",
+      wait_ready: true,
+      shutdown_with_message: true,
+      restart_delay: 5000, // 崩溃后重启前的等待毫秒数
+      increment_var: 'PROCESS_ID',
+      env: {
+        NODE_ENV: 'production',
+        PROCESS_ID: 0,
+      }
+    },
   ]
 };
