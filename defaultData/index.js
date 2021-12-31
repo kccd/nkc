@@ -24,12 +24,12 @@ async function initConfig() {
 
 async function initAccount() {
   // 创建管理员账号
+  const accountConfig = require('../config/account.json');
   const db = require('../dataModels');
   const count = await db.UserModel.countDocuments();
   if(count !== 0) return;
   console.log(`creating the admin account`);
-  const username = 'admin';
-  const password = apiFunction.getRandomString('a0', 8);
+  const {username, password} = accountConfig;
   const user = await db.UserModel.createUser({});
   await user.updateOne({
     certs: ['dev'],

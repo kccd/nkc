@@ -33,6 +33,10 @@ async function install() {
     secret: apiFunction.getRandomString('a0', 256),
     experimentalSecret: apiFunction.getRandomString('a0', 256),
   });
+  await updateConfig('account', {
+    username: 'admin',
+    password: apiFunction.getRandomString('a0', 8)
+  });
   await fsPromises.writeFile(lockPath, ``);
   console.log(`\n\nthe installation is complete\n`);
   process.exit(0);
