@@ -43,6 +43,35 @@ block eContent
               h5.text-danger 英文逗号“ , ”分隔
               textarea.form-control(v-model="auditorIdStr")
           .form-group
+            label.col-sm-3.control-label 定期验证手机号
+            .col-sm-9
+              .radio
+                span 状态：
+                label.m-r-1
+                  input(type='radio' :value='true' v-model='authSettings.verifyPhoneNumber.enabled')
+                  | 开启
+                label
+                  input(type='radio' :value='false' v-model='authSettings.verifyPhoneNumber.enabled')
+                  | 关闭
+              .m-b-05.form-inline.m-t-05
+                span 间隔时间：
+                input.m-r-05.form-control(type='text' v-model.number='authSettings.verifyPhoneNumber.interval')
+                span 小时
+              .radio
+                span 未验证手机号时：
+                label.m-r-1
+                  input(type='radio' value='reviewPost' v-model='authSettings.verifyPhoneNumber.type')
+                  | 内容必审
+                label
+                  input(type='radio' value='disablePublish' v-model='authSettings.verifyPhoneNumber.type')
+                  | 禁止发表
+              .m-t-05
+                .m-b-05 内容必审时页面提示：
+                textarea.form-control(rows=2 v-model='authSettings.verifyPhoneNumber.reviewPostContent')
+              .m-t-05
+                .m-b-05 禁止发表时页面提示：
+                textarea.form-control(rows=2 v-model='authSettings.verifyPhoneNumber.disablePublishContent')
+          .form-group
             label.col-sm-3.control-label
             .col-sm-9
               h5.text-danger(v-if="error") {{error}}

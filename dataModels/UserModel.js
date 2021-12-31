@@ -1,4 +1,5 @@
 const settings = require('../settings');
+const cheerio = require("cheerio");
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const getRedisKeys = require('../nkcModules/getRedisKeys');
@@ -2470,8 +2471,22 @@ userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
   }
   const shouldVerifyPhoneNumber = await UsersPersonalModel.shouldVerifyPhoneNumber(uid);
   if(shouldVerifyPhoneNumber) {
-    result.warning = result.warning || '';
-    result.warning += `<div>请参与定期验证手机号，验证前你所发表的内容需通过审核后才能显示。<a href="/u/${uid}/settings/security" target="_blank">去验证</a></div>`;
+    const authSettings = await SettingModel.getSettings("auth");
+    const {
+      type: verifyPhoneNumberType,
+      reviewPostContent,
+    } = authSettings.verifyPhoneNumber;
+    if(verifyPhoneNumberType === 'reviewPost') {
+      result.warning = result.warning || '';
+      const $$ = cheerio.load(`<div></div>`);
+      $$('div').text(reviewPostContent);
+
+      const a = $$(`<span>请点击 <a href="/u/${uid}/settings/security" target="_blank">这里</a> 去验证手机号。</span>`);
+      $$('div').append(a);
+      result.warning += $$('body').html();
+    } else {
+      result.warning += `<div>请点击 <a href="/u/${uid}/settings/security" target="_blank">这里</a> 去验证手机号。</div>`
+    }
   }
   return result;
 };

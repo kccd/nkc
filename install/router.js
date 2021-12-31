@@ -234,20 +234,3 @@ function checkServer(data) {
       if(!data.address || !data.port) throw '地址或端口不能为空';
     })
 }
-
-
-async function updateConfig(type, data) {
-  const config = await getConfig(type);
-  Object.assign(config, data);
-  await modifyConfig(type, config);
-}
-
-async function modifyConfig(type, data) {
-  const targetFilePath = path.resolve(configPath, `./${type}.json`);
-  await fsPromises.writeFile(targetFilePath, JSON.stringify(data, '', 2));
-}
-
-async function getConfig(type) {
-  const targetFilePath = path.resolve(configPath, `./${type}.json`);
-  return JSON.parse((await fsPromises.readFile(targetFilePath)).toString());
-}
