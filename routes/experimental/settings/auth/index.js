@@ -11,8 +11,8 @@ router
   })
   .put("/", async (ctx, next) => {
     const {db, body, nkcModules} = ctx;
-    const {checkString} = nkcModules.checkData;
-    const {auditorId, auditorCerts, auth3Content,auth2Content,auth1Content} = body.authSettings;
+    const {checkString, checkNumber} = nkcModules.checkData;
+    const {auditorId, auditorCerts, auth3Content,auth2Content,auth1Content, verifyPhoneNumber} = body.authSettings;
     const uidArr = [];
     const certsId = [];
     checkString(auth3Content, {
@@ -38,6 +38,23 @@ router
       const cert = await db.RoleModel.findOne({_id, type: "management"}, {_id: 1});
       if(cert) certsId.push(_id);
     }
+    checkNumber(verifyPhoneNumber.interval, {
+      name: '间隔时间',
+      min: 1,
+    });
+    if(!['reviewPost', 'disablePublish'].includes(verifyPhoneNumber.type)) {
+      ctx.throw(400, `未验证手机号时的操作类型错误`);
+    }
+    checkString(verifyPhoneNumber.reviewPostContent, {
+      name: '内容必审时的页面提示',
+      minLength: 1,
+      maxLength: 1000
+    });
+    checkString(verifyPhoneNumber.disablePublishContent, {
+      name: '禁止发表时的页面提示',
+      minLength: 1,
+      maxLength: 1000
+    });
     await db.SettingModel.updateOne({
       _id: "auth"
     }, {
@@ -46,7 +63,14 @@ router
         "c.auth1Content":auth1Content,
         "c.auth2Content":auth2Content,
         "c.auditorId": uidArr,
-        "c.auditorCerts": certsId
+        "c.auditorCerts": certsId,
+        'c.verifyPhoneNumber': {
+          enabled: !!verifyPhoneNumber.enabled,
+          interval: verifyPhoneNumber.interval,
+          type: verifyPhoneNumber.type,
+          reviewPostContent: verifyPhoneNumber.reviewPostContent,
+          disablePublishContent: verifyPhoneNumber.disablePublishContent
+        }
       }
     });
     await db.SettingModel.saveSettingsToRedis("auth");

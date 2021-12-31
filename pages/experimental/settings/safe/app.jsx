@@ -45,7 +45,7 @@ const App = {
             </SettingItem>
           </TabPane>
 
-          <TabPane label="手机号验证">
+          {/*<TabPane label="手机号验证">
             <SettingItem title="定时手机号验证">
               <Switch vModel={this.form.phoneVerify.enable}></Switch>
             </SettingItem>
@@ -60,7 +60,7 @@ const App = {
                 </Input>
               </Tooltip>
             </SettingItem>
-          </TabPane>
+          </TabPane>*/}
 
           <TabPane label="安全工具">
             <SettingItem title="弱密码检测">

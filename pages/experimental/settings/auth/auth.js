@@ -60,10 +60,12 @@ var app = new Vue({
           authSettings: this.authSettings
         })
         .then(function () {
-          app.info = "保存成功";
+          // app.info = "保存成功";
+          sweetSuccess('保存成功');
         })
         .catch(function (data) {
-          app.error = data.error;
+          // app.error = data.error;
+          sweetError(data);
         })
     }
   }
