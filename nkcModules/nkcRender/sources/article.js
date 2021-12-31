@@ -44,6 +44,7 @@ module.exports = {
       </span>
     `.trim();
   },
+  
   video(html = "", id, resource = {}) {
     const {
       visitorAccess = true,
@@ -67,7 +68,7 @@ module.exports = {
       }
       downloadHtml = `<a data-type="downloadPanel" data-id="${resource.rid}">点击下载</a>`
       return `
-      <span data-tag="nkcsource" data-type="video" data-id="${id}" data-visitor-access="${visitorAccess}">
+      <span data-tag="nkcsource" data-type="video" data-id="${id}" data-visitor-access="${visitorAccess}" >
         <span>
           <video class="plyr-dom" preload="none" controls="controls" poster="${poster}" data-rid="${rid}" data-plyr-title="${oname}">
             ${sourceHtml}
@@ -79,7 +80,6 @@ module.exports = {
     } else {
       return `<span data-tag="nkcsource" data-type="video-not-found" data-id="${id}"><span>视频已丢失（${oname}）</span></span>`
     }
-
     //<span class="nkcsource-video-title">${resource.oname}</span>
   },
   audio(html = "", id, resource = {}) {

@@ -115,7 +115,6 @@ module.exports = async (props) => {
       smInfo.name = smFileName;
       filesInfo.sm = smInfo;
     }
-
     if(await tools.accessFile(mediumPath)) {
       storeData.push({
         filePath: mediumPath,
@@ -128,6 +127,7 @@ module.exports = async (props) => {
     }
 
     await storeClient(storeUrl, storeData);
+    // socket 发送给 主服务
     await sendMessageToNkc('resourceStatus', {
       rid,
       status: true,
@@ -156,7 +156,7 @@ module.exports = async (props) => {
 
 //图片打水印
 async function ffmpegWaterMark(filePath, cover, waterGravity, output, flex, transparency = 1){
-  return addImageTextWaterMaskForImage({
+  return await addImageTextWaterMaskForImage({
     input: filePath,
     output: output,
     image: cover.path,
@@ -168,32 +168,32 @@ async function ffmpegWaterMark(filePath, cover, waterGravity, output, flex, tran
 }
 
 //保存缩略图
-function thumbnailify(filePath, thumbnailPath){
+async function thumbnailify(filePath, thumbnailPath){
   if(linux) {
-    return spawnProcess('convert', [`${filePath}[0]`, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', thumbnailPath]);
+    return await spawnProcess('convert', [`${filePath}[0]`, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', thumbnailPath]);
   } else {
-    return spawnProcess('magick', ['convert', `${filePath}[0]`, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', thumbnailPath]);
+    return await spawnProcess('magick', ['convert', `${filePath}[0]`, '-thumbnail', '150x150', '-strip', '-background', 'wheat', '-alpha', 'remove', thumbnailPath]);
   }
 }
 
 //保存中号图
-function mediumify(filePath, mediumPath){
+async function mediumify(filePath, mediumPath){
   if(linux) {
-    return spawnProcess('convert', [`${filePath}[0]`, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', mediumPath]);
+    return await spawnProcess('convert', [`${filePath}[0]`, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', mediumPath]);
   } else {
-    return spawnProcess('magick', ['convert', `${filePath}[0]`, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', mediumPath]);
+    return await spawnProcess('magick', ['convert', `${filePath}[0]`, '-thumbnail', '640x640', '-strip', '-background', 'wheat', '-alpha', 'remove', mediumPath]);
   }
 }
 
 
 //保存缩略图
-function saveffmpeg (filePath, cover, waterGravity, output, flex, transparency) {
-  return ffmpegWaterMark(filePath, cover, waterGravity, output, flex, transparency)
+async function saveffmpeg (filePath, cover, waterGravity, output, flex, transparency) {
+  return await ffmpegWaterMark(filePath, cover, waterGravity, output, flex, transparency)
 }
 
 // 图片缩小
-const imageNarrow = path => {
-  return spawnProcess('magick', ['convert', path, '-resize', `1920>`,path])
+ const imageNarrow =async path => {
+  return await spawnProcess('magick', ['convert', path, '-resize', `1920>`,path])
 }
 
 /**
@@ -202,7 +202,7 @@ const imageNarrow = path => {
  * @param {array} filters 滤镜指令（数组，一层滤镜一个元素）
  */
 const ffmpegImageFilter = async (inputPath, outputPath, filters) => {
-  return spawnProcess('ffmpeg',
+  return await spawnProcess('ffmpeg',
     [
       ...['-i', inputPath],                                              /* 输入 */
       ...['-filter_complex', filters.join(";")],                         /* 滤镜表达式 */
@@ -238,7 +238,7 @@ async function addImageTextWaterMaskForImage(op) {
   const gap = ~~(logoWidth * 0.1); /* logo和文字之间和间隔 */
   let padWidth = logoWidth + gap;
   image = image.replace(/\\/g, "/").replace(":", "\\:");
-  return ffmpegImageFilter(input, output, [
+  return await ffmpegImageFilter(input, output, [
     `movie='${image}'[logo]`,
     `[logo]scale=${logoWidth}:${logoHeight}[image]`,
     `[image]drawtext=x=${logoWidth + gap}:y=${logoHeight}/2:text='':fontsize=${fontSize}:fontcolor=fcfcfc:fontfile=':shadowcolor=b1b1b1:shadowx=1:shadowy=1', lut=a=val*${transparency}[watermask]`,

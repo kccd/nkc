@@ -4,6 +4,7 @@ NKC.modules.SelectSticker = function() {
   self.app = new Vue({
     el: "#moduleSelectStickerApp",
     data: {
+      categories: ['http', 'socket'],
       type: "own",
       pageNumber: "",
       perpage: 20,
@@ -12,10 +13,17 @@ NKC.modules.SelectSticker = function() {
       share: false,
       localStickers: [],
       stickers: [],
-      paging: {}
+      paging: {},
+      r:'inProcess'
     },
     mounted: function () {
-    
+      socket.on('connect', function() {
+          // console.log('建立了socket链接');
+      });
+      socket.on('fileTransformProcess',(data)=>{
+        // this.type='own'
+        self.app.getStickers()
+      })
     },
     methods: {
       getUrl: NKC.methods.tools.getUrl,
@@ -54,9 +62,10 @@ NKC.modules.SelectSticker = function() {
           dom.css("left", (width - dom.width())*0.5 -  40);
         }
       },
-      selectType(type) {
+      //  getStickers 控制请求数据
+      selectType(type,getStickers=false) {
         this.type = type;
-        if(["own", "share"].includes(type)) {
+        if(["own", "share"].includes(type) && getStickers) {
           this.getStickers();
         }
       },
@@ -75,7 +84,6 @@ NKC.modules.SelectSticker = function() {
         if(type === "share") {
           url = `/stickers?page=${page}&perpage=${this.sharePerpage}`;
         }
-        
         nkcAPI(url, "GET")
           .then(data => {
             self.app.stickers = data.stickers;
@@ -106,6 +114,7 @@ NKC.modules.SelectSticker = function() {
           data: emojiCode
         });
       },
+      // 处理后的图片发送
       addLocalFile(file) {
         this.fileToSticker(file)
           .then(sticker => {
@@ -113,6 +122,7 @@ NKC.modules.SelectSticker = function() {
             self.app.uploadLocalSticker(sticker);
           })
       },
+      // 处理图片
       fileToSticker(file) {
         return new Promise((resolve, reject) => {
           const sticker = {file};
@@ -125,7 +135,6 @@ NKC.modules.SelectSticker = function() {
             })
             .catch(reject);
         });
-        
       },
       selectedLocalFile() {
         const input = $("#moduleSelectStickerInput");
@@ -149,14 +158,16 @@ NKC.modules.SelectSticker = function() {
             if(self.app.share) {
               formData.append("share", "true");
             }
+            // 上传图片后发送
             return nkcUploadFile("/r", "POST", formData, function(e, progress) {
               sticker.progress = progress;
             });
           })
-          .then(() => {
+          .then((data) => {
             sticker.status = "uploaded";
+            this.stickers=[data.r,...this.stickers.slice(0,this.stickers.length-1)]
             self.app.localStickers.splice(self.app.localStickers.indexOf(sticker), 1);
-            if(!self.app.localStickers.length) self.app.selectType("own");
+            // if(!self.app.localStickers.length) self.app.selectType("own",true);
           })
           .catch((data) => {
             screenTopWarning(data.error || data);

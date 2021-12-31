@@ -32,7 +32,7 @@ module.exports = async (url, props) => {
   formData.append('type', type);
   formData.append('storeUrl', storeUrl);
   formData.append('data', JSON.stringify(data));
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     axios({
       url,
       method: 'POST',

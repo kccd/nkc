@@ -48,7 +48,6 @@ app.use(router.routes());
 app.use(body);
 
 const server = http.createServer(app.callback());
-
 server.listen(global.Media.port, () => {
   require('./socket');
   console.log(`media service is running at ${global.Media.port}`.green);
