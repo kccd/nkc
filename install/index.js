@@ -6,9 +6,6 @@ const lockPath = path.resolve(__dirname, './install.lock');
 const configPath = path.resolve(__dirname, '../config');
 const {
   initConfig,
-  initSettings,
-  initAccount,
-  init
 } = require('../defaultData');
 
 const apiFunction = require("../nkcModules/apiFunction");
@@ -36,13 +33,8 @@ async function install() {
     secret: apiFunction.getRandomString('a0', 256),
     experimentalSecret: apiFunction.getRandomString('a0', 256),
   });
-  await initSettings();
-  const password = apiFunction.getRandomString('a0', 8);
-  await initAccount(`admin`, password);
-  await init();
   await fsPromises.writeFile(lockPath, ``);
-  console.log(`the installation is complete`);
-  console.log(`the default account is admin:${password}`);
+  console.log(`\n\nthe installation is complete\n`);
   process.exit(0);
 }
 

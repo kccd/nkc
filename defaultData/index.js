@@ -22,10 +22,14 @@ async function initConfig() {
   }
 }
 
-async function initAccount(username, password) {
+async function initAccount() {
   // 创建管理员账号
-  console.log(`creating the admin account`);
   const db = require('../dataModels');
+  const count = await db.UserModel.countDocuments();
+  if(count !== 0) return;
+  console.log(`creating the admin account`);
+  const username = 'admin';
+  const password = apiFunction.getRandomString('a0', 8);
   const user = await db.UserModel.createUser({});
   await user.updateOne({
     certs: ['dev'],
@@ -300,6 +304,7 @@ async function initDefaultHomeBlocks() {
 
 async function init() {
   await initConfig();
+  await initAccount();
   await initSettings();
   await initRoles();
   await initKcksRecordsTypes();

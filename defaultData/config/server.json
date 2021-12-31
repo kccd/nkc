@@ -1,7 +1,7 @@
 {
   "address": "0.0.0.0",
   "port": 9000,
-  "domain": "127.0.0.1:9000",
+  "domain": "http://127.0.0.1:9000",
   "maxIpsCount": 1,
   "proxy": false,
   "domainWhitelist": [
