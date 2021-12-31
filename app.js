@@ -40,6 +40,10 @@ const {
 } = require('./middlewares');
 
 const cookieConfig = require("./config/cookie");
+const uploadConfig = require('./config/upload');
+
+const koaBodySetting = settings.upload.koaBodySetting;
+koaBodySetting.formidable.maxFileSize = uploadConfig.maxFileSize;
 
 app.keys = [cookieConfig.secret];
 app
@@ -55,7 +59,7 @@ app
   .use(awesomeStatic("./resources/tools", {route: "/tools"}))
   // 请求头安全设置
   .use(helmet())
-  .use(koaBody(settings.upload.koaBodySetting))
+  .use(koaBody(koaBodySetting))
   // 视频段支持
   .use(conditional())
   .use(etag())

@@ -1,10 +1,11 @@
 {
   "address": "0.0.0.0",
   "port": 9000,
-  "domain": "http://nkc.test",
-  "maxIpsCount": 2,
+  "domain": "127.0.0.1:9000",
+  "maxIpsCount": 1,
   "proxy": false,
   "domainWhitelist": [
-    "http://nkc.test"
-  ]
+    "127.0.0.1:9000"
+  ],
+  "fileDomain": ""
 }

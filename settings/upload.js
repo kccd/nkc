@@ -1,10 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const {mkdirSync} = fs;
-const uploadConfig = require('../config/upload.json');
 const paths = {
-  configDir: 'config',
-  keyDir: 'key',
   uploadDir: 'tmp',
   resourcesPath: 'resources',
   shopLogoPath: 'resources/shopLogo',
@@ -23,7 +20,6 @@ const paths = {
   watermarkCache: "resources/watermarkCache",
   logoPath: "resources/logo"
 };
-
 const pathsObj = {};
 for(const key in paths) {
   if(!paths.hasOwnProperty(key)) continue;
@@ -83,7 +79,7 @@ const uploadSettings = {
     multipart: true,
     formidable: {
       maxFields: 20,
-	    maxFileSize: uploadConfig.maxFileSize,
+	    maxFileSize: 4 * 1024 * 1024 * 1024,
       uploadDir: pathsObj.uploadDir,
       hash: 'md5',
       keepExtensions: true

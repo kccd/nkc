@@ -16,7 +16,6 @@
   "servicesName": {
     "nkc": "nkc",
     "socket": "socket",
-    "store": "store",
-    "media": "media"
+    "store": "store"
   }
 }
