@@ -14,7 +14,7 @@ block content
           for item in data.list
             a.book-list-item(href=item.url target="_blank")
               .book-list-item-name
-                if !item.did
+                if !item.published
                   span.status [未发布]
                 else if item.hasBeta
                   span.status [编辑中]

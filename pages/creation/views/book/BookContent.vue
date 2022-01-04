@@ -13,7 +13,7 @@
         .creation-center-book-list
           .creation-center-book-list-item(v-for="l in bookList")
             .creation-center-book-list-item-name(@click="navToPage('bookContent', {}, {bookId, aid: l._id})")
-              span(v-if="!l.did") [未发布]
+              span(v-if="!l.published") [未发布]
               span(v-else-if="l.hasBeta") [编辑中]
               | {{l.title}}
 </template>

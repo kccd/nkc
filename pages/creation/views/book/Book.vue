@@ -10,8 +10,8 @@
           .creation-center-book-description {{book.description}}
           .creation-center-book-list
             .creation-center-book-list-item(v-for="l in bookList")
-              .creation-center-book-list-item-name(@click="navToPage('bookContent', {}, {bid, aid: l._id})")
-                span(v-if="!l.did") [未发布]
+              .creation-center-book-list-item-name(@click="clickArticleTitle(l)")
+                span(v-if="!l.published") [未发布]
                 span(v-else-if="l.hasBeta") [编辑中]
                 | {{l.title}}
               .creation-center-book-list-item-time {{l.time}}
@@ -115,6 +115,15 @@
           query,
           params,
         });
+      },
+      clickArticleTitle(l) {
+        const {bid} = this;
+        const aid = l._id;
+        if(!l.published) {
+          this.navToPage('articleEditor', {bid, aid})
+        } else {
+          this.navToPage('bookContent', {}, {bid, aid})
+        }
       },
       switchContent(id) {
         this.$router.push({

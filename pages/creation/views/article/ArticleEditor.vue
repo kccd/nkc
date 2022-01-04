@@ -2,10 +2,11 @@
   .row.creation-center-article-editor
     .col-xs-12.col-md-12.m-b-3
       bread-crumb(:list="navList")
-    .col-xs-12.col-md-10.col-md-offset-1
+    .col-xs-12.col-md-10
       document-editor(ref="documentEditor" :configs="formConfigs" @content-change="watchContentChange")
       .m-t-1.m-b-3
-        button.btn.btn-block.btn-primary(@click="publish") 发布
+        button.btn.btn-primary.m-r-05(@click="publish") 发布
+        button.btn.btn-default(@click="saveArticle") 保存
 
 </template>
 
@@ -13,6 +14,7 @@
   import DocumentEditor from "../../../lib/vue/DocumentEditor";
   import {nkcUploadFile, nkcAPI} from "../../../lib/js/netAPI";
   import {sweetError} from "../../../lib/js/sweetAlert";
+  import {screenTopWarning} from "../../../lib/js/topAlert";
 
   export default {
     components: {
@@ -136,7 +138,7 @@
         formData.append('bookId', bookId);
         formData.append('article', JSON.stringify(article));
         formData.append('type', type);
-        nkcUploadFile(`/creation/articles/editor`, 'POST', formData)
+        return nkcUploadFile(`/creation/articles/editor`, 'POST', formData)
           .then(data => {
             self.oldCoverFile = self.coverFile;
             self.coverFile = null;
@@ -145,28 +147,42 @@
             self.resetCoverFile(articleCover);
           })
           .then(() => {
-            if(type === 'publish') {
-              self.$router.replace({
-                name: 'bookContent',
-                params: {
-                  bid: self.bookId,
-                  aid: self.articleId
-                }
-              });
-            } else {
+            if(type !== 'publish') {
               self.lockPost = false;
             }
           })
           .catch(err => {
             self.lockPost = false;
-            sweetError(err);
+            throw err;
           });
       },
+      modifyArticle() {
+        const self = this;
+        this.post(this.type)
+        .catch(err => {
+          console.error(err);
+          screenTopWarning(err);
+        })
+      },
       saveArticle() {
-        this.post(this.type);
+        this.post('save')
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
       },
       publish() {
-        this.post('publish');
+        const self = this;
+        this.post('publish')
+        .then(() => {
+          self.$router.replace({
+            name: 'bookContent',
+            params: {
+              bid: self.bookId,
+              aid: self.articleId
+            }
+          });
+        })
+        .catch(sweetError);
       },
       resetCoverFile(cover) {
         this.cover = cover;
@@ -180,7 +196,7 @@
         this.article.content = content;
         this.article.cover = cover;
         this.coverFile = coverFile;
-        this.saveArticle();
+        this.modifyArticle();
       },
     }
   }

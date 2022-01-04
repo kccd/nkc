@@ -9,13 +9,11 @@ router
         ctx.throw(400, `文章 ID 错误`);
       }
       const article = await db.ArticleModel.findOnly({_id: aid});
-      const {did, betaDid} = article;
-      const documentId = betaDid || did;
       const {
         title,
         cover,
         content,
-      } = await db.DocumentModel.findOnly({_id: documentId});
+      } = await article.getBetaDocumentContent();
       data.article = {
         articleId: article._id,
         title,
@@ -36,7 +34,7 @@ router
     const type = fields.type;
     const bookId = fields.bookId;
     const articleId = fields.articleId;
-    if(!['modify', 'publish', 'create'].includes(type)) ctx.throw(400, `未知的提交类型 type: ${type}`);
+    if(!['modify', 'publish', 'create', 'save'].includes(type)) ctx.throw(400, `未知的提交类型 type: ${type}`);
     const {title, content, cover} = JSON.parse(fields.article);
     let article;
     if(type === 'create') {
@@ -58,6 +56,8 @@ router
       });
       if(type === 'publish') {
         await article.publishArticle();
+      } else if(type === 'save') {
+        await article.saveArticle();
       }
     }
     data.articleCover = await article.getBetaDocumentCoverId();

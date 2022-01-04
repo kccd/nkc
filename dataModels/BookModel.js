@@ -143,35 +143,46 @@ schema.methods.extendArticlesById = async function(articlesId) {
   const DocumentModel = mongoose.model('documents');
   const {timeFormat, getUrl} = require('../nkcModules/tools');
   const articles = await ArticleModel.find({_id: {$in: articlesId}});
-  const documentsId = [];
-  for(const article of articles) {
-    const {did, betaDid} = article;
-    if(did) documentsId.push(did);
-    if(betaDid) documentsId.push(betaDid);
+  const {article: documentSource} = await DocumentModel.getDocumentSources();
+  const documents = await DocumentModel.find({
+    type: {
+      $in: ['beta', 'stable']
+    },
+    source: documentSource,
+    sid: {
+      $in: articlesId
+    }
+  });
+  const articlesObj = {};
+  for(const d of documents) {
+    const {type, sid} = d;
+    if (!articlesObj[sid]) articlesObj[sid] = {};
+    articlesObj[sid][type] = d;
   }
-  const documentsObj = await DocumentModel.getDocumentsObjById(documentsId);
   const results = [];
   for(const article of articles) {
     const {
       _id,
       toc,
       uid,
-      did,
-      betaDid,
     } = article;
-    const documentId = did || betaDid;
-    const document = documentsObj[documentId];
-    if(!document) continue;
+    const articleObj = articlesObj[_id];
+    if(!articleObj) continue;
+    const betaDocument = articlesObj[_id].beta;
+    const stableDocument = articlesObj[_id].stable;
+    if(!stableDocument && !betaDocument) {
+      continue;
+    }
+    const document = stableDocument || betaDocument;
     const {title} = document;
     const result = {
       _id,
       uid,
-      did,
-      betaDid,
+      published: !!stableDocument,
+      hasBeta: !!betaDocument,
       title: title || '未填写标题',
       url: getUrl('bookContent', this._id, _id),
-      time: timeFormat(toc),
-      hasBeta: !!betaDid,
+      time: timeFormat(toc)
     };
     results.push(result);
   }
@@ -183,22 +194,21 @@ schema.methods.getContentById = async function(props) {
   const {list} = this;
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
+  const {article: documentSource} = await DocumentModel.getDocumentSources();
   if(list.includes(aid)) {
     const article = await ArticleModel.findOnly({_id: aid});
-    const {did, betaDid, uid} = article;
-    const documentId = did || betaDid;
-    const document = await DocumentModel.findOnly({_id: documentId});
+    const {_id} = article;
     const {
-      _id,
+      did,
       time,
       mTime,
       title,
       content,
       coverUrl,
-    } = await document.extendData(uid);
+    } = await DocumentModel.getStableDocumentRenderingContent(documentSource, _id, uid);
     return {
       aid: article._id,
-      did: _id,
+      did,
       coverUrl,
       time,
       mTime,
