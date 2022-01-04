@@ -136,13 +136,17 @@ NKC.modules.SelectSticker = function() {
             .catch(reject);
         });
       },
+      // 选择文件
       selectedLocalFile() {
         const input = $("#moduleSelectStickerInput");
         const files = input[0].files;
         for(let i = 0; i < files.length; i ++) {
           const file = files[i];
           self.app.addLocalFile(file);
+          
         }
+      // 解决相同文件上传不能触发change
+        moduleSelectStickerInput.value=''
       },
       selectLocalFile() {
         $("#moduleSelectStickerInput").click();

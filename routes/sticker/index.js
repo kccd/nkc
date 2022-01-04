@@ -30,17 +30,16 @@ router
         paging = nkcModules.apiFunction.paging(page, count, limit);
       }
       let arr=[];
-      const stickers =JSON.stringify(await db.StickerModel.find(q).sort({order: -1}).skip(paging.start).limit(paging.perpage)) ;
-      let newStickers=JSON.parse(stickers)
-      for (let i = 0; i < newStickers.length; i++) {
-        const model= await db.ResourceModel.find({rid:newStickers[i].rid})
-        arr.push(...model)
+      const stickers = await db.StickerModel.find(q).sort({order: -1}).skip(paging.start).limit(paging.perpage);      
+      let newStickers;
+      for (let i = 0; i < stickers.length; i++) {
+        newStickers = stickers[i].toObject();
+        const model= await db.ResourceModel.findOne({rid:newStickers.rid})
+        newStickers.reason = newStickers.reason.replace("\n", "");
+        newStickers.status=model.state ? model.state : 'useless'
+        arr.push(newStickers)
       }
-      newStickers.forEach((s,i) => {
-        s.reason = s.reason.replace("\n", "");
-        s.status=arr[i].state
-      });
-        data.stickers=newStickers
+      data.stickers=arr
       data.hotStickers = await db.StickerModel.find({
         from: "upload",
         shared: true,
