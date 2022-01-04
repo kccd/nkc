@@ -306,9 +306,14 @@ async function getFileInfo(filePath) {
   return fileInfo;
 }
 
+/*
+* 获取置顶年月文件夹中的文件目录
+* @param {Number} year 年
+* @param {Number} month 月
+* */
 async function getFilePathByTime(year, month) {
   const {attachment} = storeConfigs;
-  const monthStr = month < 10? month + '0': month + '';
+  const monthStr = month < 10? '0' + month: month + '';
   const yearStr = year + '';
   const getChildFolder = async (folderPath) => {
     const arr = [];
