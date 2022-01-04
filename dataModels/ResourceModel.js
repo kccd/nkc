@@ -944,7 +944,7 @@ resourceSchema.methods.pushToMediaService = async function(filePath) {
   if(data.waterAdd) {
     coverPath = await SettingModel.getWatermarkCoverPathByUid(uid, data.waterType);
   }
-  await mediaClient(mediaServiceUrl, {
+ return await mediaClient(mediaServiceUrl, {
     coverPath,
     type: mediaType,
     filePath,
@@ -1115,8 +1115,9 @@ resourceSchema.methods.getMediaServiceDataAudio = async function() {
 *     @param {String} 在 store service 磁盘上的文件名
 * */
 resourceSchema.statics.updateResourceStatus = async (props) => {
+  // console.log(props,'props');
   const {rid, status, error, filesInfo = {}} = props;
-  const ResourceModel = mongoose.model('resources');
+  const ResourceModel =await mongoose.model('resources');
   const FILE = require('../nkcModules/file');
   const {sendDataMessage} = require('../nkcModules/socket');
   const resource = await ResourceModel.findOnly({rid});
@@ -1144,11 +1145,16 @@ resourceSchema.statics.updateResourceStatus = async (props) => {
       files: FILE.filterFilesInfo(filesInfo)
     }
   });
-
-  // 通过 socket 服务通知浏览器
-  sendDataMessage(resource.uid, {
+  const page=0,perpage=20
+  const q = {
+    disabled: false,
+    deleted: false,
+    shared: true
+  };
+  // 通知浏览器表情已经处理完成
+ await sendDataMessage(resource.uid, {
     event: "fileTransformProcess",
-    data: {rid: resource.rid, state: fileProcessState, err: error}
+    data: {rid: resource.rid,stickers:{}, state: fileProcessState, err: error}
   });
 };
 
