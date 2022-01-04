@@ -2475,18 +2475,22 @@ userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
     const {
       type: verifyPhoneNumberType,
       reviewPostContent,
+      disablePublishContent
     } = authSettings.verifyPhoneNumber;
+    let content;
     if(verifyPhoneNumberType === 'reviewPost') {
-      result.warning = result.warning || '';
-      const $$ = cheerio.load(`<div></div>`);
-      $$('div').text(reviewPostContent);
-
-      const a = $$(`<span>请点击 <a href="/u/${uid}/settings/security" target="_blank">这里</a> 去验证手机号。</span>`);
-      $$('div').append(a);
-      result.warning += $$('body').html();
+      content = reviewPostContent;
     } else {
-      result.warning += `<div>请点击 <a href="/u/${uid}/settings/security" target="_blank">这里</a> 去验证手机号。</div>`
+      content = disablePublishContent;
     }
+    result.warning = result.warning || '';
+    const $$ = cheerio.load(`<div></div>`);
+    if(verifyPhoneNumberType === 'reviewPost' || !result.warning) {
+      $$('div').text(content);
+    }
+    const a = $$(`<span>请点击 <a href="/u/${uid}/settings/security" target="_blank">这里</a> 去验证手机号。</span>`);
+    $$('div').append(a);
+    result.warning += $$('body').html();
   }
   return result;
 };
