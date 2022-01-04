@@ -930,7 +930,6 @@ resourceSchema.statics.getMediaTypeByExtension = (extension) => {
 * @param {String} filePath 待处理文件的路径
 * */
 resourceSchema.methods.pushToMediaService = async function(filePath) {
-  console.log('2');
   const {uid} = this;
   const SettingModel = mongoose.model('settings');
   const FILE = require('../nkcModules/file');
