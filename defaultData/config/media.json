@@ -1,8 +1,0 @@
-{
-  "port": 10283,
-  "address": "127.0.0.1",
-  "pdfPreview": {
-    "maxGetPageScale": 0.5,
-    "maxGetPageCount": 8
-  }
-}

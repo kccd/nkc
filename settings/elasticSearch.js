@@ -5,7 +5,7 @@ const {address, port} = esConfig;
 
 module.exports = () => {
   return new ES.Client({
-    node: address + ":" + port,
+    host: address + ":" + port,
     requestTimeout: 90000,
     apiVersion: '6.8'
   });

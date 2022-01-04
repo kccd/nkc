@@ -3,7 +3,6 @@ const fsPromise = fs.promises;
 const moment = require('moment');
 const PATH = require('path');
 const axios = require("axios");
-const attachmentConfig = require("../config/attachment.json");
 
 const pictureExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif", "webp"];
 const videoExtensions = ["mp4", "mov", "3gp", "avi", 'webm'];
@@ -21,6 +20,7 @@ const breakpointExtensions = ['mp4', 'mp3', 'pdf'];
 * @reture {String} 存储服务的链接
 * */
 async function getStoreUrl(t) {
+  const attachmentConfig = require("../config/attachment.json");
   const now = t? (new Date(t)).getTime(): Date.now();
   let storeUrl;
   for(const a of attachmentConfig) {

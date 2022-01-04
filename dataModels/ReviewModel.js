@@ -250,8 +250,11 @@ schema.statics.autoPushToReview = async function(post) {
 
     // 四、未验证手机号码的用户发表文章要送审
     if(await UsersPersonalModel.shouldVerifyPhoneNumber(uid)) {
-      await ReviewModel.newReview("unverifiedPhone", post, user, "用户未验证手机号");
-      return true;
+      const authSettings = await SettingModel.getSettings('auth');
+      if(authSettings.verifyPhoneNumber.type === 'reviewPost') {
+        await ReviewModel.newReview("unverifiedPhone", post, user, "用户未验证手机号");
+        return true;
+      }
     }
 
     
