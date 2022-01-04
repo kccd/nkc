@@ -55,7 +55,7 @@ module.exports = async (socketIO) => {
         callback({
           status: 500,
           content: {
-            message: 'Target service not found'
+            message: `${to} service not found`
           }
         });
       } else {
@@ -72,7 +72,7 @@ module.exports = async (socketIO) => {
         callback({
           status: 500,
           content: {
-            message: 'Target service not found'
+            message: `${to} service not found`
           }
         });
       } else {
