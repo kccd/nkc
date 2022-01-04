@@ -33,7 +33,7 @@ function autoPlayNextAudio(players) {
       const currentPlayer = event.detail.plyr;
       let index = players.indexOf(currentPlayer);
       if(index < 0) return;
-      for(let i = index+1; i < players.length; i++) {
+      for(let i = index + 1; i < players.length; i++) {
         const nextPlayer = players[i];
         if(nextPlayer && nextPlayer.type === "audio") {
           return nextPlayer.play();

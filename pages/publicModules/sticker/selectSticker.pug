@@ -63,15 +63,15 @@ if !isIncluded('selectSticker')
                     span(v-else-if="s.status === 'uploading'")
                       span(v-if="s.progress !== 100") {{s.progress}}%
                       span(v-else) 处理中...
-                    span(v-else-if="s.status === 'uploaded'") 已上传,正在处理中
+                    span(v-else-if="s.status === 'uploaded'") 已上传，正在处理中
                   img(:src="s.url")
           div.null(v-else-if="!stickers.length") 空空如也~
           div(v-else )
             .sticker(v-for="s in stickers" @click="selectSticker(s)" :key="s._id" :class="{'share': type === 'share'}")
-              img(v-if='s.status === "usable"' :src=`getUrl('sticker', s.rid)`)
-              .mask(v-else-if = 's.tatus === "inProcess"')
+              img(v-if='s.state === "usable"' :src=`getUrl('sticker', s.rid)`)
+              .mask(v-else-if = 's.state === "inProcess"')
                  span 处理中...
-              .mask(v-else-if='s.stats === "useless"')
+              .mask(v-else-if='s.state === "useless"')
                  span 处理失败   
               .mask(v-else)
                  span 加载中...

@@ -944,7 +944,7 @@ resourceSchema.methods.pushToMediaService = async function(filePath) {
   if(data.waterAdd) {
     coverPath = await SettingModel.getWatermarkCoverPathByUid(uid, data.waterType);
   }
- return await mediaClient(mediaServiceUrl, {
+  return await mediaClient(mediaServiceUrl, {
     coverPath,
     type: mediaType,
     filePath,
@@ -1145,16 +1145,10 @@ resourceSchema.statics.updateResourceStatus = async (props) => {
       files: FILE.filterFilesInfo(filesInfo)
     }
   });
-  const page=0,perpage=20
-  const q = {
-    disabled: false,
-    deleted: false,
-    shared: true
-  };
-  // 通知浏览器表情已经处理完成
+  // 通知浏览器 resource 已经处理完成
  await sendDataMessage(resource.uid, {
     event: "fileTransformProcess",
-    data: {rid: resource.rid,stickers:{}, state: fileProcessState, err: error}
+    data: {rid: resource.rid, state: fileProcessState, err: error}
   });
 };
 

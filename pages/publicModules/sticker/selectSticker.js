@@ -4,7 +4,6 @@ NKC.modules.SelectSticker = function() {
   self.app = new Vue({
     el: "#moduleSelectStickerApp",
     data: {
-      categories: ['http', 'socket'],
       type: "own",
       pageNumber: "",
       perpage: 20,
@@ -14,7 +13,7 @@ NKC.modules.SelectSticker = function() {
       localStickers: [],
       stickers: [],
       paging: {},
-      r:'inProcess'
+      r: 'inProcess'
     },
     mounted: function () {
       socket.on('connect', function() {
@@ -63,7 +62,7 @@ NKC.modules.SelectSticker = function() {
         }
       },
       //  getStickers 控制请求数据
-      selectType(type,getStickers=false) {
+      selectType(type, getStickers = false) {
         this.type = type;
         if(["own", "share"].includes(type) && getStickers) {
           this.getStickers();
@@ -145,8 +144,8 @@ NKC.modules.SelectSticker = function() {
           self.app.addLocalFile(file);
           
         }
-      // 解决相同文件上传不能触发change
-        moduleSelectStickerInput.value=''
+        // 解决相同文件上传不能触发change
+        $('#moduleSelectStickerInput').val('');
       },
       selectLocalFile() {
         $("#moduleSelectStickerInput").click();
@@ -169,9 +168,9 @@ NKC.modules.SelectSticker = function() {
           })
           .then((data) => {
             sticker.status = "uploaded";
-            this.stickers=[data.r,...this.stickers.slice(0,this.stickers.length-1)]
+            this.stickers = [data.r,...this.stickers.slice(0,this.stickers.length-1)]
             self.app.localStickers.splice(self.app.localStickers.indexOf(sticker), 1);
-            // if(!self.app.localStickers.length) self.app.selectType("own",true);
+            if(!self.app.localStickers.length) self.app.selectType("own");
           })
           .catch((data) => {
             screenTopWarning(data.error || data);

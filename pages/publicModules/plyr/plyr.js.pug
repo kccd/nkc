@@ -59,9 +59,9 @@ if !isIncluded('plyr')
             audio.attr('data-init', 'true')
           } else {
             var plyrDom = audio.find('.plyr-dom');
-          //- 通过 查看  video标签上 data-videoInit 来判断 视频是否已经初始化 
-          //- true 代表已经初始化
-             const isAideoInit=plyrDom.attr('data-videoInit')
+            //- 通过 查看  video标签上 data-video-init 来判断 视频是否已经初始化
+            //- true 代表已经初始化
+            const isAideoInit = plyrDom.attr('data-video-init')
             if(plyrDom.length === 0 || isAideoInit === 'true') continue;
             var player = new Plyr(plyrDom, {
               ratio: '4:3',
@@ -76,7 +76,7 @@ if !isIncluded('plyr')
             player.speed = 1;
             NKC.methods.initPlyrMask(player);
             players.push(player);
-            plyrDom.attr('data-videoInit','true')
+            plyrDom.attr('data-video-init','true')
           }
         }
       }
@@ -87,9 +87,9 @@ if !isIncluded('plyr')
           var title = video.attr("data-plyr-title");
           var rid = video.attr("data-rid");
           var plyrDom = video.find('.plyr-dom');
-          //- 通过 查看  video标签上 data-videoInit 来判断 视频是否已经初始化 
+          //- 通过 查看  video标签上 data-video-init 来判断 视频是否已经初始化
           //- true 代表已经初始化
-          const isvideoInit=plyrDom.attr('data-videoInit')
+          const isvideoInit=plyrDom.attr('data-video-init')
           if (plyrDom.length === 0  || isvideoInit=== 'true') continue;
           var player = new Plyr(plyrDom, {
             ratio: '4:3',
@@ -103,7 +103,7 @@ if !isIncluded('plyr')
             addEvents(player, plyrDom);
             player.speed = 1;
             players.push(player);
-            plyrDom.attr('data-videoInit','true')
+            plyrDom.attr('data-video-init','true')
         }
       }
 
