@@ -55,6 +55,7 @@ $(function() {
     EditorReady = true;
     initVueApp();
     initPostButton();
+  });
   window.data.threadCategories.map(c => c.selectedNode = null);
   const editorContainer = new Vue({
     el: "#content",
