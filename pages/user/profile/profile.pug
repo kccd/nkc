@@ -34,9 +34,8 @@ block content
             .account-user-certs=data.targetUser.info.certsName
             .account-user-description!=markdown_safe(data.targetUser.description)
             .account-user-kcb
-              -const targetUserScores = data.targetUserScores;
-              -const targetUserXSF = data.targetUser.xsf;
               include ../../publicModules/userScores
+              +userScores(data.targetUserScores, data.targetUser.xsf)
             .account-user-toc= `注册于${format(`YYYY/MM/DD HH:mm:ss`, data.targetUser.toc)}`
             .account-code=`动态码：${data.code}`
             .account-user-links
@@ -65,6 +64,9 @@ block content
                 a(href=`/u/${data.targetUser.uid}/profile/finance?t=all`).col-xs-6.account-user-link
                   .fa.fa-file-text-o
                   | 我的账单
+                a(href=`/creation` target="_blank").col-xs-6.account-user-link
+                  .fa.fa-lightbulb-o
+                  | 创作中心
             for navLink in data.navLinks
               .account-ul
                 if navLink.name

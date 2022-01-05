@@ -64,7 +64,8 @@ const start = async () => {
     // 启动测试环境相关工具
     if(global.NKC.isDevelopment) {
       require('./microServices/communication/server');
-      require('./microServices/proxy/server');
+      // require('./microServices/proxy/server');
+      require('./microServices/render/server');
       require('./microServices/media/server');
       require('./microServices/store/server');
       const socket = require('./socket/index');

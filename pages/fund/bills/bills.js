@@ -22,4 +22,17 @@ function submit() {
 			screenTopWarning(data.error);
 		})
 }
+
+function deleteBill(id) {
+  if(confirm('确定要删除该条记录？') === false) return;
+  nkcAPI('/fund/bills/'+id, 'DELETE', {})
+    .then(function () {
+      window.location.reload();
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error);
+    })
+}
+
 window.submit = submit;
+window.deleteBill = deleteBill;

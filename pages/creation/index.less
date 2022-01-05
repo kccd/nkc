@@ -1,0 +1,16 @@
+body{
+  background-color: #fff;
+  overflow-y: scroll;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+
+.fade-leave-to{
+  display: none;
+}
+
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}

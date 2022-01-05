@@ -1,4 +1,5 @@
 const fileRes = require('./file');
+const remoteState = require('./remoteState');
 const remoteFileRes = require('./remoteFile');
 const htmlRes = require('./html');
 const jsonRes = require('./json');
@@ -18,6 +19,7 @@ module.exports = async (ctx, next) => {
     ) {
       await jsonRes(ctx);
     } else {
+      await remoteState(ctx);
       await htmlRes(ctx);
     }
   }

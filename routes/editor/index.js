@@ -58,12 +58,6 @@ router
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
       data.type = (thread.oc === data.post.pid)? "modifyThread": "modifyPost";
       const firstPost = await thread.extendFirstPost();
-      if(data.post.l !== "html") {
-        ctx.template = "interface_editor.pug";
-        data.content = data.post.c;
-        data.l = data.post.l;
-        data.title = data.post.t;
-      }
       let parentPostCount;
       if(data.post.parentPostId) {
         parentPostCount = await db.PostModel.countDocuments({pid: data.post.parentPostId});

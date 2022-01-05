@@ -815,5 +815,9 @@
   "refundFundApplicationForm": "基金管理员确认退款",
   "experimentalThreadCategorySettings": "后台管理 - 设置 - 文章多维分类",
   "getWatermark": "获取水印图片",
-  "getAppsWatermark": "获取用户偏好设置水印"
+  "getAppsWatermark": "获取用户偏好设置水印",
+  "creationCenter": "访问创作中心",
+  "getDrawData": "获取滑动框数据",
+  "mathJax": "编辑器预览公式",
+  "getBook": "查看书籍内容"
 }

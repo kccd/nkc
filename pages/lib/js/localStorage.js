@@ -3,6 +3,7 @@
 * @param {String} name 键名
 * @return {Object} 如果不存在键名所对应的数据，则返回空对象
 * */
+
 export function getFromLocalStorage(name) {
   const data = window.localStorage.getItem(name);
   if(!data) return {};

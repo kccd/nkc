@@ -433,8 +433,11 @@ block content
                       | 楼的内容
                     .quote-content {{c}}
                 //- 编辑器的编辑框
-                .m-b-1(style="background-color:#fff;")
-                  script#container(name='content', type='text/plain')
+                .m-b-1#editorContainer(style="background-color:#fff;")
+                  if data.user
+                    editor#container(:configs="editorConfigs" ref="postEditor" @ready="removeEvent" :plugs="editorPlugs")
+                  //script#container(name='content', type='text/plain')
+
                 div
                   //- 发表并添加到专栏
                   label(style="font-size:16px") 专栏
@@ -589,9 +592,6 @@ block scripts
   //- 通用socket
   if data.user
     +includeJS('/message/connectSocket.js')
-  //- 下载资料询问框
-  //if state.downloadNeedScore
-  //include ../publicModules/downloadResource/downloadResource
   //- 违规记录模块 NKC.modules.violationRecord
   if permission("violationRecord")
     include ../publicModules/violationRecord/violationRecord.pug
@@ -609,8 +609,6 @@ block scripts
         -fid = f.fid;
     if fid
       script=`NKC.configs.fid = '${fid}';`
-  if data.user
-    include ../ueditor/ueditorBase
   if data.user && showEditor
     +includeJS("/thread/initPostInput.js")
   if state.userColumn && !data.addedToColumn && showEditor

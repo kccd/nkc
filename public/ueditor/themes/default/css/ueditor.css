@@ -696,11 +696,22 @@ div.edui-box {
 }
 
 .edui-default  .edui-for-insertorderedlist .edui-icon {
-    background-position: -80px 0;
+    /*background-position: -80px 0;*/
+    background-image:url(../images/icon/orderedlist.png) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 .edui-default  .edui-for-insertunorderedlist .edui-icon {
-    background-position: -20px 0;
+    /*background-position: -20px 0;*/
+    background-image:url(../images/icon/unorderedlist.png) !important;
+    width: 20px !important;
+    height: 20px !important;
+}
+.edui-default .edui-for-insertunorderedlist .edui-menu-body .edui-icon,
+.edui-default .edui-for-insertorderedlist .edui-menu-body .edui-icon
+{
+  background-image: none!important;
 }
 
 .edui-default  .edui-for-lineheight .edui-icon {

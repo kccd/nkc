@@ -1,4 +1,12 @@
 var timeout, loginBehavior = [];
+import {getState} from '../../lib/js/state';
+import {
+  RNCloseWebview,
+  RNLogin,
+} from '../../lib/js/reactNative';
+import {nkcAPI} from "../../lib/js/netAPI";
+
+const {isApp} = getState();
 NKC.modules.Login = function() {
   if(!window.verifications) {
     window.verifications = new NKC.modules.Verifications();
@@ -114,8 +122,8 @@ NKC.modules.Login = function() {
           nkcAPI("/login", "POST", body)
           .then(function() {
             this_.succeed = true;
-            if(NKC.configs.isApp) {
-              NKC.methods.rn.emit("login")
+            if(isApp) {
+              RNLogin();
             } else {
               window.location.reload();
             }
@@ -141,8 +149,8 @@ NKC.modules.Login = function() {
           .then(function() {
             // window.location.reload();
             this_.succeed = true;
-            if(NKC.configs.isApp) {
-              NKC.methods.rn.emit("login")
+            if(isApp) {
+              RNLogin();
             } else {
               window.location.href = "/register/subscribe";
             }
@@ -205,8 +213,8 @@ NKC.modules.Login = function() {
       },
       close: function() {
         loginBehavior.length = 0;
-        if(NKC.configs.isApp) {
-          NKC.methods.rn.emit("closeWebView");
+        if(isApp) {
+          RNCloseWebview();
         } else {
           self.dom.modal("hide");
         }

@@ -1,7 +1,7 @@
 import { createApp } from "@vue/composition-api";
 import styled, { injectGlobal } from "vue-styled-components";
 import data from "./lib/data";
-import { nkcAPI } from "../lib/request";
+import { nkcAPI } from "../lib/js/netAPI";
 
 const app = createApp({
   setup() {

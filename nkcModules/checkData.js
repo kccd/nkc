@@ -58,21 +58,32 @@ var CheckData = function () {
   *   name: 变量名
   *   minLength: 最小字节长度
   *   maxLength: 最大字节长度
+  *   minTextLength: 最小字数 通过 $(content).text().length 获得的字数，可用于判断 html
+  *   maxTextLength: 最大字数 通过 $(content).text().length 获得的字数，可用于判断 html
   * @author pengxiguaa 2019-9-6
   * */
   this.checkString = function(data, options) {
     options = options || {};
     var name = options.name || "";
-    var minLength = options.minLength === undefined? 1: options.minLength;
-    var maxLength = options.maxLength === undefined? 5000: options.maxLength;
+    var minLength = options.minLength;
+    var maxLength = options.maxLength;
+    var minTextLength = options.minTextLength;
+    var maxTextLength = options.maxTextLength;
+
     if(typeof(data) !== "string") {
       self.te(400, name + "数据类型错误");
     }
-    if(self.getLength(data) < minLength) {
+    if(minLength !== undefined && self.getLength(data) < minLength) {
       self.te(400, name + "长度不能小于" + minLength + "个字节");
     }
-    if(self.getLength(data) > maxLength) {
+    if(maxLength !== undefined && self.getLength(data) > maxLength) {
       self.te(400, name + "长度不能大于" + maxLength + "个字节");
+    }
+    if(minTextLength !== undefined && self.getHTMLTextLength(data) < minTextLength) {
+      self.te(400, name + "字数不能小于" + minTextLength + "个字");
+    }
+    if(maxTextLength !== undefined && self.getHTMLTextLength(data) > maxTextLength) {
+      self.te(400, name + '字数不能大于' + maxTextLength + '个字');
     }
   };
 
@@ -105,6 +116,15 @@ var CheckData = function () {
       // console.log(name + "长度不能大于" + maxLength + "个字节");
     }
   };*/
+
+  this.getHTMLTextLength = function(html = '') {
+    if(inBrowser) {
+      return $(html).text().length;
+    } else {
+      const cheerio = require('cheerio');
+      return cheerio.load(html).text().length;
+    }
+  };
 
   /*
   * 检测邮箱格式

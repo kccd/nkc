@@ -18,7 +18,6 @@ permissionRouter
     }
     ctx.template = 'forum/settings/permission.pug';
     data.moderators = await db.UserModel.find({uid: {$in: forum.moderators}});
-    // ctx.template = 'interface_forum_settings_permission.pug'
 		await next();
 	})
   .put(`/`, async (ctx, next) => {

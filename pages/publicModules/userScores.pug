@@ -1,10 +1,22 @@
-if targetUserScores
-  .nkc-scores
-    for s in targetUserScores
-      .nkc-score(title=`${s.name}: ${s.number/100}`)
-        img(src=tools.getUrl('scoreIcon', s.icon))
-        span=s.number / 100
-    if targetUserXSF !== undefined
-      .nkc-score(title=`学术分：${targetUserXSF}`)
-        img(src=tools.getUrl('defaultFile', 'xsf.png'))
-        span=targetUserXSF
+if !isIncluded('publicModules/userScores.pug')
+  mixin userScores(targetUserScores, targetUserXSF, fullScoreIcon, xsfIcon)
+    if targetUserScores && targetUserScores.length || targetUserXSF
+      .nkc-scores
+        for s in targetUserScores
+          .nkc-score(title=`${s.name}: ${s.number / 100}`)
+            -var src;
+            if !fullScoreIcon
+              -src = tools.getUrl('scoreIcon', s.icon)
+            else
+              -src= s.icon
+            img(src=src)
+            span=s.number / 100
+        if targetUserXSF !== undefined
+          .nkc-score(title=`学术分：${targetUserXSF}`)
+            -var src;
+            if xsfIcon
+              -src = xsfIcon;
+            else
+              -src = tools.getUrl('defaultFile', 'xsf.png')
+            img(src=src)
+            span=targetUserXSF

@@ -13,7 +13,7 @@ const schema = new Schema({
     // problemImage,
     // recommendThreadCover,
     // fundAvatar, fundBanner
-    // scoreIcon
+    // scoreIcon, bookCover, articleCover
     type: String,
     required: true,
     index: 1
@@ -695,6 +695,68 @@ schema.statics.saveColumnBanner = async (columnId, file) => {
     await log.save();
   }
   return attachment;
+}
+
+schema.statics.saveBookCover = async (bookId, file) => {
+  const AttachmentModel = mongoose.model('attachments');
+  const BookModel = mongoose.model('books');
+  const FILE = require('../nkcModules/file');
+  const ext = await FILE.getFileExtension(file, ['jpg', 'png', 'jpeg']);
+  const aid = await AttachmentModel.getNewId();
+  const time = new Date();
+  const attachment = await AttachmentModel.createAttachmentAndPushFile({
+    aid,
+    file,
+    ext,
+    sizeLimit: 20 * 1024 * 1024,
+    time,
+    type: 'bookCover',
+    images: [
+      {
+        type: 'def',
+        name: `${aid}.${ext}`,
+        height: 300,
+        width: 600,
+        quality: 90
+      }
+    ]
+  });
+  await BookModel.updateOne({_id: bookId}, {
+    $set: {
+      cover: attachment._id
+    }
+  });
+}
+
+schema.statics.saveDocumentCover = async (documentId, file) => {
+  const AttachmentModel = mongoose.model('attachments');
+  const DocumentModel = mongoose.model('documents');
+  const FILE = require('../nkcModules/file');
+  const ext = await FILE.getFileExtension(file, ['jpg', 'png', 'jpeg']);
+  const aid = await AttachmentModel.getNewId();
+  const time = new Date();
+  const attachment = await AttachmentModel.createAttachmentAndPushFile({
+    aid,
+    file,
+    ext,
+    sizeLimit: 20 * 1024 * 1024,
+    time,
+    type: 'documentCover',
+    images: [
+      {
+        type: 'def',
+        name: `${aid}.${ext}`,
+        height: 300,
+        width: 600,
+        quality: 90
+      }
+    ]
+  });
+  await DocumentModel.updateOne({_id: documentId}, {
+    $set: {
+      cover: attachment._id
+    }
+  });
 }
 
 /*

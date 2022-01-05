@@ -1,68 +1,6 @@
 const Router = require('koa-router');
 const subscribeRouter = new Router();
 subscribeRouter
-	.get('/register', async (ctx, next) => {
-		const {data, db, params, query} = ctx;
-		const {uid} = params;
-		const {type} = query;
-		if(type === 'register') {
-			data.type = 'register';
-		}
-		data.targetUser = await db.UserModel.findOnly({uid});
-		const {dbFunction} = ctx.nkcModules;
-		const forums = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
-		data.forums = await dbFunction.forumsListSort(forums);
-		const subForums = await db.SubscribeModel.find({
-      uid: data.user.uid,
-      cancel: false,
-      type: "forum"
-    });
-		data.subFid = subForums.map(s => s.fid);
-		ctx.template = 'interface_user_subscribe.pug';
-		await next();
-	})
-	.post('/register', async (ctx, next) => {
-		const {data, db, params, body} = ctx;
-		const {user} = data;
-		const {uid} = params;
-		const targetUser = await db.UserModel.findOnly({uid});
-		if(!user || targetUser.uid !== user.uid) ctx.throw(403, '权限不足');
-		const {type} = body;
-		if(type === 'subscribeForums') {
-			const {subscribeForums} = body;
-			const subSettings = await db.SettingModel.findById("subscribe");
-			const {subForumCountLimit} = subSettings.c;
-
-			if(subscribeForums.length >= subForumCountLimit) ctx.throw(400, `关注专业不能超过${subForumCountLimit}个`);
-
-			for(let fid of subscribeForums) {
-				const forum = await db.ForumModel.findOne({fid});
-				if(forum) {
-					let sub = await db.SubscribeModel.findOne({
-            type: "forum",
-            cancel: false,
-            fid: forum.fid,
-            uid: user.uid
-          });
-					if(!sub) {
-            await db.SubscribeModel({
-              _id: await db.SettingModel.operateSystemID('subscribes', 1),
-              type: "forum",
-              fid: forum.fid,
-              uid: user.uid
-            }).save();
-          }
-				}
-			}
-		}
-    const urls = ctx.getCookie("visitedUrls") || [];
-    if(urls.length === 0) {
-      data.redirect = '/';
-    } else {
-      data.redirect = urls[0];
-    }
-		await next();
-	})
   // 关注该用户
   .post('/', async (ctx, next) => {
     let {uid} = ctx.params;

@@ -34,7 +34,7 @@ router
     data.orders = orders;
     data.paging = paging;
     data.t = t;
-    ctx.template = '/shop/order/order.pug';
+    ctx.template = 'shop/order/order.pug';
     await next();
   })
   /*.get('/', async (ctx, next) => {
@@ -118,7 +118,7 @@ router
     });
     const {user} = data;
     const gradeId = user.grade._id;
-    const orderArr = []; 
+    const orderArr = [];
     // 不同卖家 生成多个订单
     for(const p of params) {
       const {uid, products, buyMessage} = p;
@@ -272,7 +272,7 @@ router
     const {user} = data;
     let {post, receInfo, paramCert, tempArr} = body;
     const {receiveAddress, receiveName, receiveMobile} = receInfo;
-  
+
 
     // 检验凭证
     for(const paramId in paramCert) {

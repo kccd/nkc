@@ -109,6 +109,10 @@ var Tools = function() {
       case 'mediaPicture': {
         return fileDomain + "/r/" + id + t;
       }
+      // 原图
+      case "resourceOrigin": {
+        return "/ro/" + id + t;
+      }
       // 用户上传的附件
       case "resource": {
         return fileDomain + "/r/" + id + t
@@ -188,6 +192,18 @@ var Tools = function() {
       }
       case 'lifePhoto': {
         return '/photo/' + id
+      }
+      case 'bookCover': {
+        return '/a/' + id;
+      }
+      case 'documentCover': {
+        return '/a/' + id;
+      }
+      case 'bookContent': {
+        return '/book/' + id + '?aid=' + size
+      }
+      case 'editBookArticle': {
+        return '/creation/articles/editor?bid=' + id + '&aid=' + size;
       }
     }
   };

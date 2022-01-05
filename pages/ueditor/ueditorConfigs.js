@@ -211,6 +211,7 @@
       imgCount: 0,
       zIndex: 499
     },
+
     columnCategory: {
       toolbars: [
         [

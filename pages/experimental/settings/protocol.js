@@ -1,11 +1,51 @@
-$("document").ready(function() {
-  if($("#protocolHide").length > 0) {
-    var protocolHide = $("#protocolHide").text();
-    ue.ready(function(){
-      ue.setContent(protocolHide);
-    })
-  }
-})
+import {getExperimentalProtocolEditorConfigs} from '../../lib/js/editor'
+import Editor from '../../lib/vue/Editor'
+const  protocolEditor = $('#protocolEditorContainer');
+if(protocolEditor.length > 0) {
+  const editorContainer = new Vue({
+    el: '#protocolEditorContainer',
+    data: {
+      editorPlugs: {
+        resourceSelector: true,
+        draftSelector: true,
+        stickerSelector: true,
+        xsfSelector: true,
+        mathJaxSelector: true,
+      }
+    },
+    mounted() {
+    },
+    components: {
+      'editor': Editor,
+    },
+    computed: {
+      editorConfigs() {
+        return getExperimentalProtocolEditorConfigs();
+      },
+    },
+    methods: {
+      getRef() {
+        return this.$refs.protocolEditor;
+      },
+      setContent() {
+        if($("#protocolHide").length > 0) {
+          var protocolHide = $("#protocolHide").text();
+          this.$refs.protocolEditor.setContent(protocolHide);
+        }
+      },
+      removeEvent() {
+        this.$refs.protocolEditor.removeNoticeEvent();
+      },
+    }
+  });
+  var ue = editorContainer.getRef();
+}
+// $("document").ready(function() {
+//   if($("#protocolHide").length > 0) {
+//     var protocolHide = $("#protocolHide").text();
+//     ue.setContent(protocolHide);
+//   }
+// })
 
 function test() {
   var content = document.getElementById("text-elem").innerHTML;
@@ -22,6 +62,7 @@ function addProtocol() {
   document.getElementById("updateAdd").disabled = true;
   nkcAPI("/e/settings/protocol", "POST", post)
   .then(function(data) {
+    ue.removeNoticeEvent();
     screenTopAlert("保存成功");
     openToNewLocation('/e/settings/protocol/' + data.protocolTypeId);
   })
@@ -48,6 +89,7 @@ function updateProtocol(id) {
   document.getElementById("updateEdit").disabled = true;
   nkcAPI("/e/settings/protocol/"+id, "PUT", post)
   .then(function(data) {
+    ue.removeNoticeEvent();
     screenTopAlert("保存成功");
     openToNewLocation('/e/settings/protocol/' + data.protocolTypeId);
     // window.location.href = '/e/settings/protocol/' + data.protocolTypeId;

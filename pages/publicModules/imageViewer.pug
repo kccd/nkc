@@ -1,4 +1,4 @@
-if !state.isApp && !isIncluded('imageViewer')
+if !remoteState.isApp && !isIncluded('publicModules/imageViewer.pug')
   +includeCSS("/external_pkgs/viewer/viewer.css")
   +includeCSS("/external_pkgs/viewer/main.css")
   +includeJS("/external_pkgs/viewer/viewer.js")
@@ -8,7 +8,7 @@ if !state.isApp && !isIncluded('imageViewer')
       var options = {
         navbar: false,
         title: false,
-        toolbar: false,
+        toolbar: false
       }
       $("[data-tag='nkcsource'][data-type='picture']").viewer(options);
       // $(".article-img-body").viewer(options);

@@ -1,0 +1,25 @@
+extends ../bootstrap_base
+block title
+  title=data.book.name
+  +includeCSS('/book/book.css')
+block content
+  .container-fluid.max-width.book
+    .row
+      .col-xs-12.col-md-6.col-md-offset-3
+        .book-cover
+          img(src=data.book.coverUrl)
+        .book-name=data.book.name
+        .book-description=data.book.description
+        .book-list
+          for item in data.list
+            a.book-list-item(href=item.url target="_blank")
+              .book-list-item-name
+                if !item.published
+                  span.status [未发布]
+                else if item.hasBeta
+                  span.status [编辑中]
+                span=item.title
+              .book-list-item-time=item.time
+
+block scripts
+  +includeJS('/book/book.js')

@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 router
   .get('/', async (ctx, next) => {
-    ctx.template = '/exam/auth.pug';
+    ctx.template = 'exam/auth.pug';
     const {data, db} = ctx;
     const questions = await db.QuestionModel.find({
       disabled: false,
@@ -23,8 +23,8 @@ router
     if(!status && reason === '') ctx.throw(400, '原因不能为空');
     if(contentLength(reason) > 500) ctx.throw(400, '原因字数不能超过500');
     await question.updateOne({
-      auth: status, 
-      reason, 
+      auth: status,
+      reason,
       viewed: false,
       operatorId: data.user.uid,
       operationTime: Date.now()

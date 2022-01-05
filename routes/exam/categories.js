@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 router
   .get('/editor', async (ctx, next) => {
-    ctx.template = '/exam/editCategory.pug'
+    ctx.template = 'exam/editCategory.pug'
     const {data, db, query} = ctx;
     const {cid} = query;
     if(cid) {

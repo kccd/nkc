@@ -1,3 +1,6 @@
+import {getState} from '../lib/js/state';
+import {RNOpenEditorPage} from "../lib/js/reactNative";
+const {isApp} = getState();
 const forumInfo = NKC.methods.getDataById('forumInfo');
 const {fid, page, digest, sort} = forumInfo;
 
@@ -49,20 +52,8 @@ function setThreadUrlSwitchStatus(status) {
 
 window.openEditSite = function() {
   const url = window.location.origin + "/editor?type=forum&id=" + fid;
-
-  if(NKC.configs.platform === 'reactNative') {
-    NKC.methods.rn.emit("openEditorPage", {
-      url: url
-    })
-  } else if(NKC.configs.platform === 'apiCloud') {
-    api.openWin({
-      name: url,
-      url: 'widget://html/common/editorInfo.html',
-      pageParam: {
-        realUrl: url,
-        shareType: "common"
-      }
-    })
+  if(isApp) {
+    RNOpenEditorPage("openEditorPage", url);
   } else {
     NKC.methods.visitUrl(url, true);
   }

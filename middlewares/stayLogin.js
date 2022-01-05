@@ -7,10 +7,8 @@ const {files: fileOperations} = require('../settings/operationsType');
 module.exports = async (ctx, next) => {
 
   const isResourcePost = fileOperations.includes(ctx.data.operationId);
-  const {data, db, redis} = ctx;
-	// cookie
+  const {data, db, state} = ctx;
   let userInfo = ctx.getCookie("userInfo");
-	// let userInfo = ctx.cookies.get('userInfo', {signed: true});
 	if(!userInfo) {
 	  // 为了兼容app中的部分请求无法附带cookie，故将cookie放到了url中
 		try{
@@ -32,7 +30,11 @@ module.exports = async (ctx, next) => {
 		  if(global.NKC.NODE_ENV !== 'production') console.log(err);
 		}
 	}
-	let userOperationsId = [], userRoles = [], userGrade = {}, user, usersPersonal;
+	let userOperationsId = [];
+  let userRoles = [];
+  let userGrade = {};
+  let user;
+  let usersPersonal;
 	if(userInfo) {
 	  try {
 	    const {uid, lastLogin = ""} = userInfo;
@@ -47,7 +49,6 @@ module.exports = async (ctx, next) => {
     } catch(err) {
       ctx.clearCookie('userInfo');
     }
-
 	}
   let languageName = 'zh_cn';
 	if(!user) {
@@ -99,33 +100,34 @@ module.exports = async (ctx, next) => {
         await user.generalSettings.updateOne({'draftFeeSettings.kcb': 0});
       }
       // 获取新点赞数
-      const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: oldUser.tlv}, type: "up"}, {_id: 1, uid: 1, pid: 1});
-      // 按post分组
-      let postGroups = {};
-      // 哪个post 哪些人
-      for(let vote of votes) {
-        let {_id, pid} = vote;
-        if(!postGroups[pid]) {
-          postGroups[pid] = [];
-        }
-        postGroups[pid].push(_id.toString());
-      }
-      // 最新点赞中包含多少个post就会生成多少条消息
-      for(let pid in postGroups) {
-        const votesId = postGroups[pid];
-        // 发系统通知
-        await db.MessageModel({
-          _id: await db.SettingModel.operateSystemID('messages', 1),
-          r: user.uid,
-          ty: 'STU',
-          port: ctx.port,
-          ip: ctx.address,
-          c: {
-            type: 'latestVotes',
-            votesId
-          }
-        }).save();
-      }
+      // const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: oldUser.tlv}, type: "up"}, {_id: 1, uid: 1, pid: 1});
+      // // 按post分组
+      // let postGroups = {};
+      // // 哪个post 哪些人
+      // for(let vote of votes) {
+      //   let {_id, pid} = vote;
+      //   if(!postGroups[pid]) {
+      //     postGroups[pid] = [];
+      //   }
+      //   postGroups[pid].push(_id.toString());
+      // }
+      // // 最新点赞中包含多少个post就会生成多少条消息
+      // for(let pid in postGroups) {
+      //   const votesId = postGroups[pid];
+      //   console.log('生成点赞 消息！');
+      //   // 发系统通知
+      //   await db.MessageModel({
+      //     _id: await db.SettingModel.operateSystemID('messages', 1),
+      //     r: user.uid,
+      //     ty: 'STU',
+      //     port: ctx.port,
+      //     ip: ctx.address,
+      //     c: {
+      //       type: 'latestVotes',
+      //       votesId
+      //     }
+      //   }).save();
+      // }
     }
     userGrade = await user.extendGrade();
     // 判断用户是否被封禁
@@ -175,6 +177,7 @@ module.exports = async (ctx, next) => {
 	data.userRoles = userRoles;
 	data.userGrade = userGrade;
   data.user = user;
+  state.user = user;
   ctx.state.uid = user? user.uid: null;
 
   // 专业树状结构

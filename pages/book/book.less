@@ -1,0 +1,60 @@
+@import "../publicModules/base";
+body{
+  background-color: #fff;
+}
+.book{
+  .book-cover{
+    img{
+      width: 100%;
+    }
+    margin-bottom: 2rem;
+  }
+  .book-name{
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .book-description{
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .book-list{
+    margin-bottom: 2rem;
+    .book-list-item{
+      display: block;
+      text-decoration: none;
+      @itemHeight: 3rem;
+      @timeWidth: 11rem;
+      padding-right: @timeWidth + 1rem;
+      line-height: @itemHeight;
+      height: @itemHeight;
+      overflow: hidden;
+      position: relative;
+      background-color: #fff;
+      cursor: pointer;
+      transition: background-color 200ms;
+      color: #333;
+      &:hover{
+        background-color: #f4f4f4;
+      }
+      .book-list-item-name{
+        display: inline-block;
+        height: 100%;
+        .hideText(@line: 1);
+        font-size: 1.3rem;
+        span.status{
+          font-size: 1rem;
+          color: @primary;
+          margin-right: 0.5rem;
+        }
+      }
+      .book-list-item-time{
+        width: @timeWidth;
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: @itemHeight;
+      }
+    }
+  }
+}

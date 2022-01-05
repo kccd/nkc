@@ -6,12 +6,12 @@ if !isIncluded('baseMixin')
     if origin
       script(src=`${url}`)
     else
-      script(src=`${url}?v=${startTime}`)
+      script(src=`${url}?v=${remoteState.startTime}`)
   //- 引入css
     @param url: css地址
     @author pengxiguaa 2019/2/15
   mixin includeCSS(url)
-    link(rel="stylesheet", href=`${url}?v=${startTime}`)
+    link(rel="stylesheet", href=`${url}?v=${remoteState.startTime}`)
 
   //-  标题
   mixin listHeader(name)
@@ -42,4 +42,4 @@ if !isIncluded('baseMixin')
       title=tools.timeFormat(time)
       )
   mixin includeVueApp(url, selector)
-    script(src=`${url}?v=${startTime}` data-vue-app-selector=selector)
+    script(src=`${url}?v=${remoteState.startTime}` data-vue-app-selector=selector)

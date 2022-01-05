@@ -24,7 +24,7 @@ router
     data.target = t;
     data.confirm = threadSettings.offsiteLink.confirm
     data.siteName = serverSettings.websiteAbbr;
-    ctx.template = "/link/link.pug"
+    ctx.template = "link/link.pug"
     return next();
   })
   // 用户确认继续访问站外链接前，上报状态，或者下发访问控制

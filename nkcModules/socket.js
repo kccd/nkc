@@ -3,11 +3,10 @@ const communication = require("./communication");
 const communicationConfig = require('../config/communication');
 const PATH = require('path');
 const db = require('../dataModels');
-const func = {};
 
 const socketServiceName = communicationConfig.servicesName.socket;
 
-func.sendConsoleMessage = async (data) => {
+async function sendConsoleMessage(data) {
   const roomName = getRoomName('console');
   const socketClient = await communication.getCommunicationClient();
   socketClient.sendMessage(socketServiceName, {
@@ -16,13 +15,13 @@ func.sendConsoleMessage = async (data) => {
     data
   })
   // global.NKC.io.to(roomName).emit('consoleMessage', data);
-};
+}
 
-func.sendUserMessage = (channel, messageObject) => {
+async function sendUserMessage(channel, messageObject) {
   return sendMessageToUser(channel, messageObject);
-};
+}
 
-func.sendDataMessage = (uid, options) => {
+async function sendDataMessage(uid, options) {
   let {
     event = "dataMessage",
     data = {}
@@ -37,7 +36,7 @@ func.sendDataMessage = (uid, options) => {
   // global.NKC.io.to(roomName).emit(event, data);
 }
 
-func.sendForumMessage = async (data) => {
+async function sendForumMessage(data) {
   const ThreadModel = require('../dataModels/ThreadModel');
   const ForumModel = require('../dataModels/ForumModel');
   const socketClient = communication.getCommunicationClient();
@@ -79,9 +78,9 @@ func.sendForumMessage = async (data) => {
       usedForumsId.push(forum.fid);
     }
   }
-};
+}
 
-func.sendPostMessage = async (pid) => {
+async function sendPostMessage(pid) {
   const PostModel = require('../dataModels/PostModel');
   const ThreadModel = require('../dataModels/ThreadModel');
   const socketClient = communication.getCommunicationClient();
@@ -118,7 +117,7 @@ func.sendPostMessage = async (pid) => {
 
 
 // 发送消息到用户
-async function sendMessageToUser(channel, message) {
+/*async function sendMessageToUser(channel, message) {
   const MessageModel = require('../dataModels/MessageModel');
   const UserModel = require('../dataModels/UserModel');
   const socketClient = communication.getCommunicationClient();
@@ -148,13 +147,13 @@ async function sendMessageToUser(channel, message) {
         }
       };
       socketClient.sendMessage(socketServiceName, sc);
-      /*io
+      /!*io
         .to(userRoom(r))
         .to(userRoom(s))
         .emit(userMessage, {
           uid: s,
           messageId: _id
-        });*/
+        });*!/
     } else if(channel === 'message') {
       const {ty, s, r} = message;
       if(ty === 'STE') {                                  // 系统通知，通知给所有人
@@ -166,10 +165,10 @@ async function sendMessageToUser(channel, message) {
           }
         };
         socketClient.sendMessage(socketServiceName, sc);
-        /*io
+        /!*io
           .emit(userMessage, {
             message
-          });*/
+          });*!/
       } else if(ty === 'STU') {                           // 系统提醒，提醒某一个用户
         const sc = {
           eventName: userMessage,
@@ -179,11 +178,11 @@ async function sendMessageToUser(channel, message) {
           }
         };
         socketClient.sendMessage(socketServiceName, sc);
-        /*io
+        /!*io
           .to(userRoom(r))
           .emit(userMessage, {
             message
-          });*/
+          });*!/
       } else if(ty === 'UTU') {                            // 用户间的私信
         const sUser = await UserModel.findOne({uid: s});
         const rUser = await UserModel.findOne({uid: r});
@@ -199,14 +198,14 @@ async function sendMessageToUser(channel, message) {
           }
         };
         socketClient.sendMessage(socketServiceName, sc);
-        /*io
+        /!*io
           .to(userRoom(r))
           .emit(userMessage, {
             user: sUser,
             targetUser: rUser,
             myUid: r,
             message
-          });*/
+          });*!/
         message._message.position = 'right';
         const sc_s = {
           eventName: userMessage,
@@ -219,14 +218,14 @@ async function sendMessageToUser(channel, message) {
           }
         };
         socketClient.sendMessage(socketServiceName, sc_s);
-        /*io
+        /!*io
           .to(userRoom(s))
           .emit(userMessage, {
             user: sUser,
             targetUser: rUser,
             myUid: s,
             message
-          });*/
+          });*!/
       } else if(ty === 'friendsApplication') {           // 好友申请
         const {respondentId, applicantId} = message;
         const respondent = await UserModel.findOne({uid: respondentId});
@@ -249,9 +248,9 @@ async function sendMessageToUser(channel, message) {
           data
         };
         socketClient.sendMessage(socketServiceName, sc);
-        /*io
+        /!*io
           .to(userRoom(respondentId))
-          .emit(userMessage, data);*/
+          .emit(userMessage, data);*!/
         if(message.c === 'agree') {
           const sc = {
             eventName: userMessage,
@@ -259,9 +258,9 @@ async function sendMessageToUser(channel, message) {
             data
           };
           socketClient.sendMessage(socketServiceName, sc);
-          /*io
+          /!*io
             .to(userRoom(applicantId))
-            .emit(userMessage, data);*/
+            .emit(userMessage, data);*!/
         }
       } else if(ty === 'deleteFriend') {         // 删除好友
         const {deleterId, deletedId} = message;
@@ -271,10 +270,10 @@ async function sendMessageToUser(channel, message) {
           data: {message}
         };
         socketClient.sendMessage(socketServiceName, sc);
-        /*io
+        /!*io
           .to(userRoom(deleterId))
           .to(userRoom(deletedId))
-          .emit(userMessage, {message});*/
+          .emit(userMessage, {message});*!/
       } else if(ty === 'modifyFriend') {         // 修改好友设置
         const {friend} = message;
         const sc = {
@@ -283,9 +282,9 @@ async function sendMessageToUser(channel, message) {
           data: {message}
         };
         socketClient.sendMessage(socketServiceName, sc);
-        /*io
+        /!*io
           .to(userRoom(friend.uid))
-          .emit(userMessage, {message});*/
+          .emit(userMessage, {message});*!/
       } else if(ty === 'removeChat') {           // 删除与好友的聊天
         const {deleterId} = message;
         const sc = {
@@ -294,9 +293,9 @@ async function sendMessageToUser(channel, message) {
           data: {message}
         };
         socketClient.sendMessage(socketServiceName, sc);
-        /*io
+        /!*io
           .to(userRoom(deleterId))
-          .emit(userMessage, {message});*/
+          .emit(userMessage, {message});*!/
       } else if(ty === 'markAsRead') {           // 多终端同步信息，标记为已读
         const {uid} = message;
         const sc = {
@@ -305,9 +304,9 @@ async function sendMessageToUser(channel, message) {
           data: {message}
         };
         socketClient.sendMessage(socketServiceName, sc);
-        /*io
+        /!*io
           .to(userRoom(uid))
-          .emit(userMessage, {message});*/
+          .emit(userMessage, {message});*!/
       } else if(ty === 'editFriendCategory') {   // 编辑好友分组
         const {uid} = message.category;
         const sc = {
@@ -316,20 +315,20 @@ async function sendMessageToUser(channel, message) {
           data: {message}
         };
         socketClient.sendMessage(socketServiceName, sc);
-        /*io
+        /!*io
           .to(userRoom(uid))
-          .emit(userMessage, {message});*/
+          .emit(userMessage, {message});*!/
       }
     }
   } catch(err) {
     console.log(err);
   }
-}
+}*/
 
 /*
 * 移除对话
 * */
-func.sendEventRemoveChat = async (type, uid, tUid) => {
+async function sendEventRemoveChat(type, uid, tUid) {
   const socketClient = communication.getCommunicationClient();
   socketClient.sendMessage(socketServiceName, {
     eventName: 'removeChat',
@@ -339,11 +338,11 @@ func.sendEventRemoveChat = async (type, uid, tUid) => {
       uid: tUid
     }
   });
-};
+}
 /*
 * 移除好友
 * */
-func.sendEventRemoveFriend = async (uid, tUid) => {
+async function sendEventRemoveFriend(uid, tUid) {
   const socketClient = communication.getCommunicationClient();
   socketClient.sendMessage(socketServiceName, {
     eventName: 'removeFriend',
@@ -361,12 +360,12 @@ func.sendEventRemoveFriend = async (uid, tUid) => {
       uid: uid
     }
   });
-};
+}
 
 /*
 * 移除分组
 * */
-func.sendEventRemoveCategory = async (uid, cid) => {
+async function sendEventRemoveCategory(uid, cid) {
   const socketClient = communication.getCommunicationClient();
   socketClient.sendMessage(socketServiceName, {
     eventName: 'removeCategory',
@@ -375,12 +374,12 @@ func.sendEventRemoveCategory = async (uid, cid) => {
       cid
     }
   });
-};
+}
 
 /*
 * 更新分组列表
 * */
-func.sendEventUpdateCategoryList = async (uid) => {
+async function sendEventUpdateCategoryList(uid) {
   const FriendsCategoryModel = require('../dataModels/FriendsCategoryModel');
   const categoryList = await FriendsCategoryModel.getCategories(uid);
   const socketClient = communication.getCommunicationClient();
@@ -391,11 +390,11 @@ func.sendEventUpdateCategoryList = async (uid) => {
       categoryList
     }
   });
-};
+}
 /*
 * 更新用户好友列表
 * */
-func.sendEventUpdateUserList = async (uid) => {
+async function sendEventUpdateUserList(uid) {
   const FriendModel = require('../dataModels/FriendModel');
   const userList = await FriendModel.getFriends(uid);
   const socketClient = communication.getCommunicationClient();
@@ -406,12 +405,12 @@ func.sendEventUpdateUserList = async (uid) => {
       userList
     }
   });
-};
+}
 
 /*
 * 更新用户对话列表
 * */
-func.sendEventUpdateChatList = async (uid) => {
+async function sendEventUpdateChatList(uid) {
   const CreatedChatModel = require('../dataModels/CreatedChatModel');
   const chatList = await CreatedChatModel.getCreatedChat(uid);
   const socketClient = communication.getCommunicationClient();
@@ -422,12 +421,12 @@ func.sendEventUpdateChatList = async (uid) => {
       chatList
     }
   });
-};
+}
 
 /*
 * 撤回消息
 * */
-func.sendEventWithdrawn = async (uid, tUid, messageId) => {
+async function sendEventWithdrawn(uid, tUid, messageId) {
   const socketClient = communication.getCommunicationClient();
   socketClient.sendMessage(socketServiceName, {
     eventName: 'withdrawn',
@@ -445,12 +444,12 @@ func.sendEventWithdrawn = async (uid, tUid, messageId) => {
       reEdit: false
     }
   });
-};
+}
 
 /*
 * 标记为已读
 * */
-func.sendEventMarkAsRead = async (type, uid, tUid) => {
+async function sendEventMarkAsRead(type, uid, tUid) {
   const socketClient = communication.getCommunicationClient();
   socketClient.sendMessage(socketServiceName, {
     eventName: 'markAsRead',
@@ -460,7 +459,7 @@ func.sendEventMarkAsRead = async (type, uid, tUid) => {
       uid: tUid
     }
   });
-};
+}
 
 /*
 * 更新单个chat
@@ -468,7 +467,7 @@ func.sendEventMarkAsRead = async (type, uid, tUid) => {
 * @param {String} uid 当前
 * @param {String} tUid 对方
 * */
-func.sendEventUpdateChat = async (type, uid, tUid) => {
+async function sendEventUpdateChat(type, uid, tUid) {
   const CreatedChatModel = require('../dataModels/CreatedChatModel');
   const chat = await CreatedChatModel.getSingleChat(type, uid, tUid);
   const socketClient = communication.getCommunicationClient();
@@ -479,12 +478,12 @@ func.sendEventUpdateChat = async (type, uid, tUid) => {
       chat
     }
   });
-};
+}
 
 /*
 * 发送普通消息
 * */
-func.sendMessageToUser = async (messageId, localId) => {
+async function sendMessageToUser(messageId, localId) {
   const MessageModel = require('../dataModels/MessageModel');
   const UserModel = require('../dataModels/UserModel');
   const CreatedChatModel = require('../dataModels/CreatedChatModel');
@@ -522,12 +521,12 @@ func.sendMessageToUser = async (messageId, localId) => {
       beep: await UserModel.getMessageBeep(r, 'UTU'),
     }
   });
-};
+}
 
 /*
 * 向在线用户推送系统通知
 * */
-func.sendSystemInfoToUser = async (messageId) => {
+async function sendSystemInfoToUser(messageId) {
   const MessageModel = require('../dataModels/MessageModel');
   const UserModel = require('../dataModels/UserModel');
   const CreatedChatModel = require('../dataModels/CreatedChatModel');
@@ -549,12 +548,12 @@ func.sendSystemInfoToUser = async (messageId) => {
       }
     })
   }
-};
+}
 
 /*
 * 发送新朋友添加请求
 * */
-func.sendNewFriendApplication = async (applicationId) => {
+async function sendNewFriendApplication(applicationId) {
   const FriendsApplicationModel = require('../dataModels/FriendsApplicationModel');
   const MessageModel = require('../dataModels/MessageModel');
   const UserModel = require('../dataModels/UserModel');
@@ -573,22 +572,55 @@ func.sendNewFriendApplication = async (applicationId) => {
       beep: await UserModel.getMessageBeep(applicationMessage.tUid, 'newFriends'),
     }
   })
-};
+}
 
 /*
 * 获取媒体文件处理服务的信息
 * */
-func.getMediaServiceInfo = async () => {
+async function getMediaServiceInfo() {
   const socketClient = communication.getCommunicationClient();
   return await socketClient.getServiceInfoPromise(communicationConfig.servicesName.media);
-};
+}
 
 /*
 * 随机获取一个在线的媒体处理服务的链接
 * */
-func.getMediaServiceUrl = async () => {
-  const mediaServiceInfo = await func.getMediaServiceInfo();
+async function getMediaServiceUrl() {
+  const mediaServiceInfo = await getMediaServiceInfo();
   return `http://${mediaServiceInfo.serviceAddress}:${mediaServiceInfo.servicePort}`;
 }
 
-module.exports = func;
+/*
+* 调用 render 服务渲染 pug
+* */
+async function getPageFromRenderService(templatePath, state, data) {
+  const communicationClient = communication.getCommunicationClient();
+  return await communicationClient.sendMessagePromise(communicationConfig.servicesName.render, {
+    templatePath,
+    state,
+    data
+  });
+}
+
+module.exports = {
+  sendConsoleMessage,
+  sendUserMessage,
+  sendDataMessage,
+  sendForumMessage,
+  sendPostMessage,
+  sendMessageToUser,
+  sendEventRemoveChat,
+  sendEventRemoveFriend,
+  sendEventRemoveCategory,
+  sendEventUpdateCategoryList,
+  sendEventUpdateUserList,
+  sendEventUpdateChatList,
+  sendEventWithdrawn,
+  sendEventMarkAsRead,
+  sendEventUpdateChat,
+  sendSystemInfoToUser,
+  sendNewFriendApplication,
+  getMediaServiceInfo,
+  getMediaServiceUrl,
+  getPageFromRenderService
+};

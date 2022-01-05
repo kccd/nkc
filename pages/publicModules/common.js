@@ -1,3 +1,19 @@
+import {fileToBase64, blobToFile} from "../lib/js/file";
+import {resourceToHtml, strToObj} from "../lib/js/dataConversion";
+import {getState} from '../lib/js/state';
+import {
+  RNVisitUrlAndClose,
+  RNUpdateMusicListAndPlay,
+  RNToast,
+  RNConsoleLog,
+  RNReloadWebview,
+  RNSelectLocation, RNCloseWebview, RNWechatPay,
+} from "../lib/js/reactNative";
+import {visitUrl} from '../lib/js/pageSwitch';
+import {logout, toLogin} from "../lib/js/account";
+import {toChat} from "../lib/js/chat";
+import {sweetAlert} from "../lib/js/sweetAlert";
+
 var NKC = {
   methods: {},
   modules: {},
@@ -83,6 +99,9 @@ var NKC = {
   }
 };
 
+const state = getState();
+Object.assign(NKC.configs, state);
+
 NKC.methods.getLoginStatus = function() {
   if(NKC.configs.isApp) {
     if(NKC.configs.platform === "apiCloud") {
@@ -112,44 +131,12 @@ NKC.methods.getRunType = function() {
 * @param {Boolean} blank 是否在后台打开
 * @author pengxiguaa 2019-7-26
 * */
-NKC.methods.visitUrl = function(url, blank) {
-  if(!blank) {
-    return window.location.href = url;
-  } else {
-    if(NKC.configs.isApp) {
-      if(NKC.configs.platform === 'apiCloud') {
-        NKC.methods.openOnlinePage(url);
-      } else {
-        if(url.indexOf('http') !== 0) {
-          url = location.origin + url;
-        }
-        NKC.methods.rn.emit('openNewPage', {
-          href: url
-        });
-      }
-    } else {
-      window.open(url);
-    }
-  }
-};
+NKC.methods.visitUrl = visitUrl;
 /*
 * 打开一个新页面并关闭当前页面，用于app发表内容后的跳转，跳转到新页面并关闭编辑器页。
 * @param {String} url 链接
 * */
-NKC.methods.visitUrlAndClose = function(url) {
-  NKC.methods.rn.emit('openNewPageAndClose', {href: location.origin + url})
-};
-/*
-* app打开在线网页
-* */
-NKC.methods.openOnlinePage = function(url) {
-  url = url.replace(/\/f\/([0-9]+)[?#]?.*/ig, function(c, v1) {
-    return "/f/" + v1 + "/latest";
-  });
-  emitEvent("openOnlinePage", {
-    url: url
-  });
-};
+NKC.methods.visitUrlAndClose = RNVisitUrlAndClose;
 
 /*
 * 根据年份和月份计算出当月的天数
@@ -200,14 +187,7 @@ NKC.methods.base64ToBlob = function(data) {
 * @return {File} 文件
 * @author pengxiguaa 2019-7-29
 * */
-NKC.methods.blobToFile = function(blob, fileName) {
-  blob.lastModifiedDate = new Date();
-  blob.name = fileName || Date.now() + '.png';
-  return blob;
-  /*return new File([blob], fileName || Date.now() + '.png', {
-    lastModified: Date.now()
-  });*/
-};
+NKC.methods.blobToFile = blobToFile;
 /*
 * base64转文件对象
 * @param {Base64} data base64数据
@@ -218,30 +198,10 @@ NKC.methods.blobToFile = function(blob, fileName) {
 NKC.methods.base64ToFile = function(data, fileName) {
   return NKC.methods.blobToFile(NKC.methods.base64ToBlob(data), fileName);
 };
-/*
-* 返回文件在本地的URL
-* @param {File} file 文件对象
-* @param {String} URL
-* @author pengxiguaa 2019-7-26
-* */
-NKC.methods.fileToUrl = function(file) {
-  return new Promise(function(resolve, reject) {
-    var reads = new FileReader();
-    reads.readAsDataURL(file);
-    reads.onload = function (e) {
-      resolve(this.result);
-    };
-  });
-};
-/*
-* 字符串转对象，对应pug渲染函数objToStr
-* @param {String} str 对象字符串
-* @return {Object}
-* @author pengxiguaa 2019-7-26
-* */
-NKC.methods.strToObj = function(str) {
-  return JSON.parse(decodeURIComponent(str));
-};
+
+NKC.methods.fileToUrl = fileToBase64;
+
+NKC.methods.strToObj = strToObj;
 /*
 * 获取藏在指定dom中的数据 数据由pug渲染函数objToStr组装
 * @param {String} id dom元素的id
@@ -305,22 +265,7 @@ NKC.methods.base64ToStr = function(base64) {
 * 退出登录
 * 若游客有权限访问当前页面则退出后刷新当前页面，否则跳转到首页
 * */
-NKC.methods.logout = function() {
-  var href = window.location.href;
-  nkcAPI("/logout?t=" + Date.now(), "GET")
-    .then(function () {
-      return nkcAPI(href, "GET");
-    })
-    .then(function() {
-      if(NKC.configs.platform === 'reactNative') {
-        NKC.methods.rn.emit("logout");
-      }
-      window.location.reload();
-    })
-    .catch(function (data) {
-      window.location.href = "/";
-    })
-};
+NKC.methods.logout = logout;
 /* 返回查询IP信息的url
 * @param {String} ip 需要查询的IP地址
 * @return {String} 查询地址url
@@ -379,36 +324,7 @@ NKC.methods.appResourceToHtml = function(resource) {
     })
     .catch(sweetError);
 };
-NKC.methods.resourceToHtml = function(type, rid, name) {
-  var handles = {
-    "picture": function() {
-      return "<img data-tag='nkcsource' data-type='picture' data-id='"+ rid +"' src=\"/r/"+ rid +"\">";
-    },
-    "sticker": function() {
-      return "<img data-tag='nkcsource' data-type='sticker' data-id='"+ rid +"' src=\"/sticker/"+ rid +"\">";
-    },
-    "video": function() {
-      return '<p><br></p><p><video data-tag="nkcsource" data-type="video" data-id="'+ rid +'" src="/r/'+ rid +'" controls></video>'+ decodeURI("%E2%80%8E") +'</p>';
-    },
-    "audio": function() {
-      return '<p><br></p><p><audio data-tag="nkcsource" data-type="audio" data-id="'+ rid +'" src="/r/'+ rid +'" controls></audio>'+ decodeURI("%E2%80%8E") +'</p>';
-    },
-    "attachment": function() {
-      return '<p><a data-tag="nkcsource" data-type="attachment" data-id="'+ rid +'" href="/r/'+ rid +'" target="_blank" contenteditable="false">'+ name +'</a>&#8203;</p>'
-    },
-    "pre": function() {},
-    "xsf": function() {
-      return '<p><br></p><section data-tag="nkcsource" data-type="xsf" data-id="'+ rid +'" data-message="浏览这段内容需要'+ rid +'学术分(双击修改)"><p>&#8203;<br></p></section>';
-    },
-    "twemoji": function() {
-      var emojiChar = twemoji.convert.fromCodePoint(rid);
-      return "<img data-tag='nkcsource' data-type='twemoji' data-id='"+ rid +"' data-char='"+ emojiChar +"' src=\"/twemoji/2/svg/"+ rid +".svg\">";
-    },
-    "formula": function() {}
-  };
-  var hit = handles[type];
-  return hit? hit() : "";
-};
+NKC.methods.resourceToHtml = resourceToHtml;
 
 
 /*toAppLogin
@@ -416,20 +332,7 @@ NKC.methods.resourceToHtml = function(type, rid, name) {
 * @param {String} type register: 打开注册页, login: 打开登录页。仅针对网页端，app无效。
 * @author pengxiguaa 2019-9-25
 * */
-NKC.methods.toLogin = function(type) {
-  if(NKC.configs.isApp) {
-    if(NKC.configs.platform === 'apiCloud') {
-      emitEvent("openLoginPage", {
-        type: type
-      });
-    } else if(NKC.configs.platform === 'reactNative') {
-      NKC.methods.rn.emit("openLoginPage", {type: type});
-    }
-  } else {
-    Login.open(type === "register"? "register": "login");
-  }
-};
-
+NKC.methods.toLogin = toLogin;
 
 /*
   滚动页面
@@ -759,18 +662,7 @@ NKC.methods.ueditor = {
 * 打开聊天页面
 * */
 
-NKC.methods.toChat = function(uid, name, type) {
-  if(NKC.configs.platform === 'reactNative') {
-    NKC.methods.rn.emit('toChat', {
-      uid: uid,
-      name: name,
-      type: type || 'UTU'
-    });
-  } else {
-    messageApp.toChat(uid);
-    // NKC.methods.visitUrl("/message?uid=" + uid, true);
-  }
-}
+NKC.methods.toChat = toChat;
 
 
 /*
@@ -778,29 +670,24 @@ NKC.methods.toChat = function(uid, name, type) {
 * */
 
 NKC.methods.appToast = function(data) {
-  var content = data.message || data.error || data;
-  if(NKC.configs.platform === 'reactNative') {
-    NKC.methods.rn.emit('toast', {
-      content: content
-    });
+  const content = data.message || data.error || data;
+  const {isApp} = getState();
+  if(isApp) {
+    RNToast({content});
   } else {
-    screenTopAlert(content);
+    sweetAlert(content);
   }
 }
 /*
 * app console.log
 * */
-NKC.methods.appConsoleLog = function(data) {
-  NKC.methods.rn.emit('consoleLog', {
-    content: data
-  });
-}
+NKC.methods.appConsoleLog = RNConsoleLog;
 /*
 * app reload webView
 * */
 NKC.methods.appReloadPage = function() {
-  if(NKC.configs.platform === 'reactNative') {
-    NKC.methods.rn.emit('reloadWebView');
+  if(state.isApp) {
+    RNReloadWebview();
   } else {
     window.location.reload();
   }
@@ -809,23 +696,11 @@ NKC.methods.appReloadPage = function() {
 /*
 * app select location
 * */
-NKC.methods.appSelectLocation = function() {
-  if(NKC.configs.platform === 'reactNative') {
-    return new Promise(function(resolve, reject) {
-      NKC.methods.rn.emit('selectLocation', {}, function(data) {
-        resolve(data);
-      });
-    })
-  }
-}
+NKC.methods.appSelectLocation = RNSelectLocation;
 /*
 *  close webView
 * */
-NKC.methods.appClosePage = function() {
-  if(NKC.configs.platform === 'reactNative') {
-    NKC.methods.rn.emit('closeWebView');
-  }
-}
+NKC.methods.appClosePage = RNCloseWebview;
 
 /*
 * 添加用户到黑名单
@@ -1046,7 +921,7 @@ NKC.methods.toPay = function(paymentType, info, newWindow) {
     } else if(NKC.methods.isMobilePhoneBrowser()) {
       newWindow.location = h5Url;
     } else {
-      NKC.methods.rn.emit('weChatPay', {
+      RNWechatPay({
         url: window.location.origin + url,
         H5Url: h5Url,
         referer: window.location.origin
@@ -1056,44 +931,48 @@ NKC.methods.toPay = function(paymentType, info, newWindow) {
 }
 
 
-// service worker
-/*if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/serviceWorker/index.js')
-    .then(function(registration) {
-      return registration.update();
-    })
-    .then(function(registration) {
-      return new Promise(function(resolve, reject) {
-        if(registration.active) {
-          return resolve(registration.active);
-        } else {
-          registration.addEventListener("updatefound", function() {
-            if(registration.active) {
-              return resolve(registration.active);
-            }
-          });
-        }
-      });
-    })
-    .then(function(worker) {
-      NKC.modules.serviceWorker = worker;
-    })
-    .catch(function(error) {
-      console.log('Registration failed with ' + error);
-    })
-}*/
-
-const windowDataDom = document.querySelector('meta[name="window-data"]');
-if(windowDataDom) {
-  const windowData = NKC.methods.strToObj(windowDataDom.getAttribute('content'));
-  NKC.configs.uid = windowData.uid;
-  NKC.configs.isApp = windowData.isApp;
-  NKC.configs.appOS = windowData.appOS;
-  NKC.configs.platform = windowData.platform;
-  NKC.configs.selectTypesWhenSubscribe = windowData.selectTypesWhenSubscribe;
-  NKC.configs.refererOperationId = windowData.refererOperationId;
-  NKC.configs.newMessageCount = windowData.newMessageCount || 0;
-  NKC.configs.fileDomain = windowData.fileDomain;
+/*
+* 获取当前页面的音频链接去更新 APP 音乐列表并播放新列表中的音乐
+* @param {String} targetRid 待播放的音乐 rid
+* */
+NKC.methods.updateAppMusicListAndPlay = function(targetRid) {
+  var elements = $('span[data-tag="nkcsource"][data-type="audio"]');
+  var audiosId = [], audiosTitle = [];
+  var urls = [];
+  for(var i = 0; i < elements.length; i ++) {
+    var e = elements.eq(i);
+    var rid = e.attr('data-id');
+    var title = e.find('.app-audio-title');
+    var url = title.attr('data-url');
+    if(title.length) title = title.text();
+    if(audiosId.indexOf(rid) === -1) {
+      audiosId.push(rid);
+      audiosTitle.push(title);
+      urls.push(url);
+    }
+  }
+  var index = audiosId.indexOf(targetRid);
+  if(index > 0) {
+    var _audiosId = audiosId.splice(0, index);
+    var _audiosTitle = audiosTitle.splice(0, index);
+    var _urls = urls.splice(0, index);
+    audiosId = audiosId.concat(_audiosId);
+    audiosTitle = audiosTitle.concat(_audiosTitle);
+    urls = urls.concat(_urls);
+  }
+  var list = [];
+  for(let i = 0; i < audiosId.length; i ++) {
+    var url = urls[i];
+    if(url.indexOf('http') !== 0) {
+      url = window.location.origin + url;
+    }
+    list.push({
+      url,
+      name: audiosTitle[i],
+      from: window.location.href,
+    });
+  }
+  RNUpdateMusicListAndPlay(list);
 }
 
 window.NKC = NKC;

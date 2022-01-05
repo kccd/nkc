@@ -45,9 +45,11 @@ const verificationsRouter = routers.verifications;
 const libraryRouter = routers.library;
 const userAvatarRouter = routers.userAvatar;
 const userBannerRouter = routers.userBanner;
-const newResourceRouter = routers.newResource;
+const creationRouter = routers.creation;
 const librariesRouter = routers.libraries;
 const noteRouter = routers.note;
+// 编辑器公式展示
+const mathJaxRouter = routers.mathJax;
 // 网站工具
 const siteToolsRouter = routers.tools;
 // ip信息
@@ -64,6 +66,12 @@ const linkRouter = routers.link;
 const communityRouter = routers.community;
 // 网站 logo
 const logoRouter = routers.logo;
+// 产品管理系统
+const pimRouter = routers.pim;
+//手机浏览器滑动框
+const drawDataRouter = routers.drawData;
+// 书籍详细页
+const bookRouter = routers.book;
 
 const path = require('path');
 
@@ -133,9 +141,14 @@ router.use("/ipinfo", ipinfoRouter.routes(), ipinfoRouter.allowedMethods());
 router.use('/blacklist', blacklistRouter.routes(), blacklistRouter.allowedMethods());
 router.use('/a', attachmentRouter.routes(), attachmentRouter.allowedMethods());
 router.use('/verifications', verificationsRouter.routes(), verificationsRouter.allowedMethods());
-router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods())
-router.use('/c', communityRouter.routes(), communityRouter.allowedMethods())
+router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods());
+router.use('/c', communityRouter.routes(), communityRouter.allowedMethods());
+router.use('/pim', pimRouter.routes(), pimRouter.allowedMethods());
 router.use("/l", linkRouter.routes(), linkRouter.allowedMethods());
 router.use("/wm", watermarkRouter.routes(), watermarkRouter.allowedMethods());
 router.use('/logo', logoRouter.routes(), logoRouter.allowedMethods());
+router.use('/creation', creationRouter.routes(), creationRouter.allowedMethods());
+router.use('/draw', drawDataRouter.routes(), drawDataRouter.allowedMethods());
+router.use('/mathJax', mathJaxRouter.routes(), mathJaxRouter.allowedMethods());
+router.use('/book', bookRouter.routes(), bookRouter.allowedMethods());
 module.exports = router;

@@ -1,3 +1,5 @@
+import {RNToChat} from "../../lib/js/reactNative";
+
 const data = NKC.methods.getDataById("data");
 if(data.friend) {
   data.friend.info._phone = data.friend.info.phone.map(p => {
@@ -81,7 +83,7 @@ window.app = new Vue({
     sendToUser() {
       const uid = this.targetUser.uid;
       const targetUserName = this.targetUserName;
-      NKC.methods.rn.emit('toChat', {
+      RNToChat({
         uid: uid,
         type: 'UTU',
         username: targetUserName

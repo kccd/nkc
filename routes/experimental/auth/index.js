@@ -52,7 +52,7 @@ authRouter
 				targetUser
 			}
 		}));
-		ctx.template = '/experimental/auth/index.pug';
+		ctx.template = 'experimental/auth/index.pug';
 		await next();
 	})
 	.use("/:uid", authDetailRouter.routes(), authDetailRouter.allowedMethods());

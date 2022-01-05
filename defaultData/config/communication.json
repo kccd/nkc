@@ -17,6 +17,7 @@
     "nkc": "nkc",
     "socket": "socket",
     "store": "store",
-    "media": "media"
+    "media": "media",
+    "render": "render"
   }
 }

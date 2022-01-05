@@ -1,3 +1,6 @@
+import {getState} from '../../lib/js/state';
+import {RNDownloadFile} from "../../lib/js/reactNative";
+const {isApp} = getState();
 class DownloadPanel extends NKC.modules.DraggablePanel {
   constructor() {
     const domId = `#moduleDownloadPanel`;
@@ -84,8 +87,8 @@ class DownloadPanel extends NKC.modules.DraggablePanel {
               }
             })
             .then(() => {
-              if(NKC.configs.isApp) {
-                NKC.methods.rn.downloadFile(resource.oname, url);
+              if(isApp) {
+                RNDownloadFile(resource.oname, url);
               } else {
                 window.location.href = url;
               }
