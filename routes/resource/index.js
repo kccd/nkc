@@ -211,7 +211,6 @@ resourceRouter
     const mediaType = db.ResourceModel.getMediaTypeByExtension(extension);
 
     const resourceType = mediaType === 'mediaPicture' && type === 'sticker'? 'sticker': 'resource';
-
     const r = db.ResourceModel({
       rid,
       type: resourceType,
@@ -224,7 +223,6 @@ resourceRouter
       mediaType,
       state: 'inProcess'
     });
-
     // 创建表情数据
     if(type === "sticker") {
       if(mediaType !== "mediaPicture") {
@@ -238,9 +236,7 @@ resourceRouter
     }
 
     await r.save();
-
     data.r = r;
-
     // 将文件推送到 media service
     r.pushToMediaService(file.path)
       .catch(async err => {

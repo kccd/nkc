@@ -34,7 +34,7 @@ if !isIncluded('selectSticker')
           .fa.fa-remove
       .module-ss-body
         .module-ss-types
-          .module-ss-type(:class="{'active': type==='own'}" @click="selectType('own')") 我的表情
+          .module-ss-type(:class="{'active': type==='own'}" @click="selectType('own',true)") 我的表情
           .module-ss-type(:class="{'active': type==='share'}" @click="selectType('share')") 共享表情
           .module-ss-type(:class="{'active': type==='emoji'}" @click="selectType('emoji')") Emoji
           .module-ss-type.upload(:class="{'active': type==='upload'}" @click="selectType('upload')") 上传
@@ -52,7 +52,8 @@ if !isIncluded('selectSticker')
                     input(type="checkbox" :value="true" v-model="share")
                     span 分享
               .upload-content
-                .warning(v-if="!localStickers.length")
+                //- .warning(v-if="!localStickers.length")
+                .warning(v-if="false")
                   h5 注意事项
                   div!=nkcRender.plainEscape(state.stickerSettings.notesAboutUploading)
                 .upload-sticker(v-for="s in localStickers")
@@ -62,12 +63,18 @@ if !isIncluded('selectSticker')
                     span(v-else-if="s.status === 'uploading'")
                       span(v-if="s.progress !== 100") {{s.progress}}%
                       span(v-else) 处理中...
-                    span(v-else-if="s.status === 'uploaded'") 已上传
+                    span(v-else-if="s.status === 'uploaded'") 已上传，正在处理中
                   img(:src="s.url")
           div.null(v-else-if="!stickers.length") 空空如也~
-          div(v-else)
+          div(v-else )
             .sticker(v-for="s in stickers" @click="selectSticker(s)" :key="s._id" :class="{'share': type === 'share'}")
-              img(:src=`getUrl('sticker', s.rid)`)
+              img(v-if='s.state === "usable"' :src=`getUrl('sticker', s.rid)`)
+              .mask(v-else-if = 's.state === "inProcess"')
+                 span 处理中...
+              .mask(v-else-if='s.state === "useless"')
+                 span 处理失败   
+              .mask(v-else)
+                 span 加载中...
             .share-warning(v-if="type === 'share'")!=nkcRender.plainEscape(state.stickerSettings.notesAboutUsing)
 
 
