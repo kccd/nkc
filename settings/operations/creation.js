@@ -1,5 +1,11 @@
 module.exports = {
   GET: 'creationCenter',
+  category: {
+    GET: 'creationCenter',
+  },
+  categories: {
+    GET: 'creationCenter',
+  },
   material: {
     PARAMETER: {
       GET: 'creationCenter',

@@ -35,6 +35,9 @@ module.exports = {
 			info: {
 			  GET: "getResourceInfo"
 			},
+			del: {
+				POST: "modifyResources"
+			},
 			pay: {
 				POST: "buyResource"
 			},

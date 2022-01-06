@@ -135,7 +135,18 @@ const resourceSchema = new Schema({
     type: Date,
     default: null
   },
-
+  //分组id
+  cid: {
+    type: String,
+    default: '',
+    index: 1,
+  },
+  //是否删除
+  del: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
   // 处理之后的文件信息
   // 图片：default, sm, md
   // 视频：sd, hd, fhd, cover
@@ -704,6 +715,15 @@ resourceSchema.methods.checkDownloadCost = async function(user) {
       reason: 'setting',
       description: ''
     };
+  }
+  //如果存在用户并且资源是该用户上传的就可以免费下载
+  if(user && this.uid === user.uid) {
+    console.log('用户自己上传的资源', this.uid);
+    return {
+      needScore: false,
+      reason: 'self',
+      description: ''
+    }
   }
   // 获取已开启的积分
   const enabledScoreTypes = await SettingModel.getEnabledScoresType();

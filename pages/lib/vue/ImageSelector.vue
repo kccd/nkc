@@ -8,12 +8,17 @@
       input(type="file" accept="image/*" ref="file" @change="selectedFile")
       .image-container
         img(ref="image")
+        .loading(v-if="loading")
+          img(ref="image" v-show="false")
+          .fa.fa-spinner.fa-spin.fa-fw
+          .loading-text 加载中...
     .modal-is-footer
       .pull-left
-        button(type="button" class="btn btn-default btn-sm" @click="rotate('left')") 左旋
-        button(type="button" class="btn btn-default btn-sm" @click="rotate('right')") 右旋
+        button(type="button" class="btn btn-default btn-sm" @click="rotate('left')" :disabled="disabled") 左旋
+        button(type="button" class="btn btn-default btn-sm" @click="rotate('right')" :disabled="disabled") 右旋
+      span.doing-info.m-r-1(v-if="progress") 图片处理中...
       button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
-      button(type="button" class="btn btn-primary btn-sm" @click="submit") 确定
+      button(type="button" class="btn btn-primary btn-sm" @click="submit" :disabled="disabled") 确定
 </template>
 
 <style lang="less">
@@ -73,6 +78,16 @@
         max-height: 30rem;
       }
     }
+    .loading{
+      text-align: center;
+      .fa{
+        font-size: 1.7rem;
+        margin-bottom: 0.2rem;
+      }
+      .loading-text{
+        font-size: 1.2rem;
+      }
+    }
   }
   .modal-is-footer{
     text-align: right;
@@ -104,6 +119,9 @@
       reject: null,
       fileBase64: '',
       file: null,
+      disabled: true,
+      loading: false,
+      progress: false,
     }),
     mounted() {
       this.initDraggableElement();
@@ -135,6 +153,7 @@
         this.cropper.replace(url);
       },
       selectedFile() {
+        this.loading = true;
         const self = this;
         const file = this.$refs.file.files[0];
         fileToBase64(file)
@@ -142,6 +161,8 @@
             self.fileBase64 = fileBase64;
             self.file = file;
             self.resetCropperImage();
+            self.loading = false;
+            self.disabled = false;
           })
       },
       open(options = {}) {
@@ -158,6 +179,7 @@
           self.cropper.setAspectRatio(aspectRatio);
           self.resolve = resolve;
           self.reject = reject;
+          self.disabled = false;
           self.draggableElement.show();
         });
       },
@@ -174,9 +196,11 @@
       submit() {
         const {resolve, reject} = this;
         if(!resolve) return;
+        this.progress = true;
         try{
           this.cropper.getCroppedCanvas().toBlob(blob => {
             this.resolve(blob);
+            this.progress = false;
           });
         } catch(err) {
           reject(err);

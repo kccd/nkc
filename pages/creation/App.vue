@@ -4,7 +4,8 @@
         .creation-center-nav
           .creation-center-name(@click="navToPage('home')") 创作中心
           .creation-center-nav-list
-            .creation-center-nav-item(@click="navToPage('materials')") 素材箱
+            .creation-center-nav-item(@click="navToPage('categories')") 资源管理
+            .creation-center-nav-item(@click="navToPage('drafts')") 草稿箱
             .creation-center-nav-item(@click="navToPage('books')") 文档创作
       .col-xs-12.col-md-10
         transition(:name="transitionName")

@@ -9,6 +9,7 @@ NKC.methods.selectImage = function(o) {
     checkCrossOrigin: false,
     movable: false,
     canSelectNewImage: true,
+    disabled: true,
   };
   if(o) {
     for(var i in o) {
@@ -38,6 +39,7 @@ NKC.methods.selectImage = function(o) {
   });
 
   $("#module_crop_button").on("click", function() {
+    if(options.disabled) return;
     this_.complete();
   });
 
@@ -65,6 +67,7 @@ NKC.methods.selectImage = function(o) {
     var files = $("#module_crop_input").prop('files');
     NKC.methods.fileToUrl(files[0])
       .then(function(url) {
+        options.disabled = false;
         this_.cropper.replace(url);
       })
   };
@@ -86,6 +89,7 @@ NKC.methods.selectImage = function(o) {
     $('#moduleCrop').modal("hide");
   };
   this.rotate = function(type) {
+    if(options.disabled) return;
     if(type === "left") {
       this_.cropper.rotate(-90);
     } else {

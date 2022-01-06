@@ -82,6 +82,7 @@ const drawData = require('./drawData');
 const logo = require('./logo');
 const book = require('./book');
 const pim = require('./pim');
+const rc = require('./rc');
 const operationObj = {};
 
 
@@ -276,6 +277,7 @@ operationObj.operationTree = {
 		draw: drawData, //获取手机浏览器左侧滑动框
     mathJax, // 编辑器预览公式
     book, // 书籍
+		rc, //资源分组
 	}
 };
 module.exports = operationObj;

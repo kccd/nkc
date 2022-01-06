@@ -272,6 +272,27 @@ resourceRouter
     })
     await next();
   })
+  .post('/:rid/del', async (ctx, next) => {
+    const {db, data, state, params, query} = ctx;
+    const {rid} = params;
+    const {type} = query;
+    const resource = await db.ResourceModel.findOne({rid});
+    let isDel;
+    if(!resource) ctx.throw(404, '资源未找到');
+    if(resource.uid !== state.uid) ctx.throw(403, '只能修改自己的资源文件');
+    if(type === 'delete') {
+      isDel = true;
+    } else {
+      isDel = false;
+    }
+    await resource.updateOne({
+      $set: {
+        del: isDel,
+        tlm: new Date(),
+      }
+    });
+    await next();
+  })
   .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods())
   .use('/:rid/pay', payRouter.routes(), payRouter.allowedMethods())
   .use('/:rid/detail', detailRouter.routes(), detailRouter.allowedMethods())

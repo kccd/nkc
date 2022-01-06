@@ -44,12 +44,6 @@ const schema = new mongoose.Schema({
     type: Date,
     default: null
   },
-  //是否发布
-  published: {
-    type: Boolean,
-    default: false,
-    index: 1,
-  },
   //测试版文档id
   betaDid: {
     type: String,
@@ -179,7 +173,8 @@ schema.methods.modifyMaterial = async function(props) {
       $set: {
         name,
         tlm: time,
-        published: false,
+        targetId: '',
+        betaDId: betaDocument._id,
       }
     });
   } else {
@@ -192,7 +187,6 @@ schema.methods.modifyMaterial = async function(props) {
         name,
         betaDid: document._id,
         tlm: time,
-        published: false,
       }
     });
   }

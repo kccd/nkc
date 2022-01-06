@@ -11,12 +11,14 @@ meRouter
   })
   .get('/media', async (ctx, next) => {
     const {user} = ctx.data;
-    const {db, data, nkcModules} = ctx;
-    let {quota, skip, type, c} = ctx.query;
+    const {db, data, nkcModules, state} = ctx;
+    let {quota, skip, type, c, resourceCategories} = ctx.query;
+    console.log('resourceCategories', resourceCategories);
+    let queryMap;
+    const {uid} = state;
     if(!c) c = "all";
     quota = parseInt(quota);
     skip = parseInt(skip);
-    let queryMap;
     if(type === "all") {
       queryMap = {"uid": user.uid};
     }else if(type === "picture") {
@@ -34,8 +36,21 @@ meRouter
       queryMap["references.0"] = {$exists: true};
     }
     queryMap.type = "resource";
+    queryMap.del = false;
+    if(!resourceCategories) resourceCategories = 'all';
+    if(resourceCategories === 'default') {
+      queryMap.cid = '';
+    } else if(resourceCategories === 'all') {
+    } else if(resourceCategories === 'trash') {
+      queryMap.del = true;
+    } else {
+      queryMap.cid = resourceCategories;
+    }
     let newSkip = quota * skip;
     let mediaCount = await db.ResourceModel.find(queryMap).countDocuments();
+    //获取用户自定义资源分类
+    const categories = await db.ResourceCategoryModel.find({uid});
+    data.categories = categories.reverse();
     data.paging = nkcModules.apiFunction.paging(skip, mediaCount, quota);
     let maxSkip = Math.ceil(mediaCount / quota);
     if(maxSkip < 1) maxSkip = 1;

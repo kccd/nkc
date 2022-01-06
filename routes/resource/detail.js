@@ -2,7 +2,7 @@ const router = require("koa-router")();
 router
   // 附件详情
   .get("/", async (ctx, next) => {
-    const {data, db} = ctx;
+    const {data, db, state} = ctx;
     const {user} = data;
     const {resource} = data;
     // 附件对象
@@ -12,7 +12,7 @@ router
     const {freeTime} = await db.SettingModel.getSettings('download');
     data.freeTime = freeTime;
     // 是否免费
-    const {needScore, reason, description} = await resource.checkDownloadCost(user);
+    let {needScore, reason, description} = await resource.checkDownloadCost(user);
     if(reason !== 'repeat') {
       await resource.checkDownloadPermission(user, ctx.address);
     }

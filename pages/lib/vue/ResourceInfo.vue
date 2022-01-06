@@ -1,5 +1,6 @@
 <template lang="pug">
   .module-dialog-body
+    download-panel(ref="downloadPanel")
     .module-dialog-header(ref="draggableHandle")
       .module-dialog-title(v-if="!resource.type || resource.type === 'file'") 文件详情
       .module-dialog-title(v-else) 文件夹详情
@@ -153,8 +154,9 @@
 <script>
 import {getUrl, getSize, timeFormat} from '../js/tools';
 import {DraggableElement} from "../js/draggable";
-import {nkcAPI} from '../js/netAPI'
-import {visitUrl} from '../js/pageSwitch'
+import {nkcAPI} from '../js/netAPI';
+import {visitUrl} from '../js/pageSwitch';
+import DownloadPanel from "./DownloadPanel";
 export default {
   data: function (){
     return {
@@ -169,6 +171,7 @@ export default {
     }
   },
   components: {
+    'download-panel': DownloadPanel,
   },
   mounted() {
     this.initDraggableElement();
@@ -243,7 +246,7 @@ export default {
     },
     //积分下载文件
     downloadFile() {
-      this.$emit('download', this.resource.rid);
+      this.$refs.downloadPanel.open(this.resource.rid);
     }
   }
 }
