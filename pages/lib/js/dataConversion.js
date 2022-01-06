@@ -8,6 +8,15 @@ export function strToObj(str) {
   return JSON.parse(decodeURIComponent(str));
 }
 
+export function getDataById(id) {
+  const dom = document.getElementById(id);
+  if(dom) {
+    return strToObj(dom.innerHTML);
+  } else {
+    return {};
+  }
+}
+
 export function resourceToHtml(type, rid, name) {
   var handles = {
     "picture": function() {

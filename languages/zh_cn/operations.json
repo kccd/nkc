@@ -819,5 +819,6 @@
   "creationCenter": "访问创作中心",
   "getDrawData": "获取滑动框数据",
   "mathJax": "编辑器预览公式",
-  "getBook": "查看书籍内容"
+  "getBook": "查看书籍内容",
+  "experimentDocumentPostSettings": "后台管理 - 设置 - 内容发表"
 }

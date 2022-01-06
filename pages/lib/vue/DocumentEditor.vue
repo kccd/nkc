@@ -9,7 +9,7 @@
       .form-group(v-if="formConfigs.cover")
         .m-b-2
           .editor-header 封面图
-            small （如未指定，默认从内容中选取）
+            //small （如未指定，默认从内容中选取）
           .editor-cover
             resource-selector(ref="resource")
             image-selector(ref="image")

@@ -95,7 +95,7 @@ const schema = new mongoose.Schema({
     default: []
   },
   // 引用来源（文档所在的系统）
-  // comment, article, post
+  // comment, article
   source: {
     type: String,
     required: true,
@@ -123,7 +123,7 @@ const schema = new mongoose.Schema({
 });
 
 /*
-* 获取文档内容 ID
+* 获取文档的内容 ID，全表唯一
 * @return {String}
 * */
 schema.statics.getId = async () => {
@@ -132,7 +132,7 @@ schema.statics.getId = async () => {
 };
 
 /*
-* 获取文档被引用 ID
+* 获取文档的引用 ID，编辑版、正式版以及所有历史版的引用 ID 相同
 * @return {String}
 * */
 schema.statics.getDid = async () => {
@@ -146,9 +146,7 @@ schema.statics.getDid = async () => {
 * */
 schema.statics.getDocumentSources = async () => {
   return {
-    comment: 'comment',
-    article: 'article',
-    post: 'post'
+    article: 'article'
   }
 };
 
@@ -164,7 +162,21 @@ schema.statics.checkDocumentSource = async (source) => {
 };
 
 /*
-* 创建文档
+* 新建编辑版文档
+* @param {Object} props
+*   @param {String} title 标题
+*   @param {String} content 富文本内容
+*   @param {String} cover 封面图 ID
+*   @param {File} coverFile 封面图文件对象
+*   @param {[String]} keywords 关键词
+*   @param {[String]} keywordsEN 英文关键词
+*   @param {String} abstract 摘要
+*   @param {String} abstractEN 英文摘要
+*   @param {String} uid 发表人 ID
+*   @param {Date} toc 创建时间
+*   @param {String} source 来源 参考 DocumentModel.statics.getDocumentSources
+*   @param {String} sid 来源所对应的 ID
+* @return {Object} document schema 对象
 * */
 schema.statics.createBetaDocument = async (props) => {
   const {
@@ -215,7 +227,8 @@ schema.statics.createBetaDocument = async (props) => {
 };
 
 /*
-* 复制开发版内容生成历史版
+* 复制当前文档数据创建历史文档
+* @return {Object} history document schema
 * */
 schema.methods.copyToHistoryDocument = async function() {
   const DocumentModel = mongoose.model('documents');
@@ -228,14 +241,21 @@ schema.methods.copyToHistoryDocument = async function() {
   await document.save();
   return document;
 };
+
+/*
+* 根据来源加载编辑版，并复制编辑版内容生成历史版
+* @param {String} source 来源 参考 documentModel.statics.getDocumentSources
+* @param {String} sid 来源所对应的 ID
+* */
 schema.statics.copyBetaToHistoryBySource = async (source, sid) => {
   const DocumentModel = mongoose.model('documents');
   const betaDocument = await DocumentModel.getBetaDocumentBySource(source, sid);
   if(!betaDocument) throwErr(400, `不存在编辑版，无法保存历史`);
   await betaDocument.copyToHistoryDocument();
 };
+
 /*
-* 将正式版变为开发板
+* 将当前版本修改为历史版
 * */
 schema.methods.setAsHistoryDocument = async function() {
   await this.updateOne({
@@ -244,8 +264,11 @@ schema.methods.setAsHistoryDocument = async function() {
     }
   });
 };
+
 /*
 * 复制正式版内容生成编辑版
+* @param {Number} did 文档的引用 ID
+* @return {Object} document schema
 * */
 schema.statics.createBetaDocumentByStableDocument = async function(did) {
   const DocumentModel = mongoose.model('documents');
@@ -263,6 +286,7 @@ schema.statics.createBetaDocumentByStableDocument = async function(did) {
 
 /*
 * 将开发版更新为正式版，将正式版更新为历史版
+* @param {Number} did 文档的引用 ID
 * */
 schema.statics.publishDocumentByDid = async (did) => {
   const DocumentModel = mongoose.model('documents');
@@ -287,6 +311,17 @@ schema.statics.publishDocumentByDid = async (did) => {
 /*
 * 指定 did 更新文档内容
 * 如果没有编辑版则复制正式版内容生成编辑版，然后再更新编辑版内容
+* @param {Number} did 文档的应用 ID
+* @param {Object} props
+*   @param {String} title 标题
+*   @param {String} content 富文本内容
+*   @param {String} cover 封面图 ID
+*   @param {File} coverFile 封面图文件对象
+*   @param {String} abstract 摘要
+*   @param {String} abstractEN 英文摘要
+*   @param {[String]} keywords 关键词
+*   @param {[String]} keywordsEN 英文关键词
+*   @param {Date} tlm 最后更新时间
 * */
 schema.statics.updateDocumentByDid = async (did, props) => {
   const {
@@ -332,7 +367,10 @@ schema.statics.updateDocumentByDid = async (did, props) => {
 };
 
 /*
-* 获取正式版文档内容
+* 根据来源获取正式版
+* @param {String} source 来源 参考 DocumentModel.statics.getDocumentSources
+* @param {String} sid 来源多对应的 ID
+* @return {Object} stable document schema
 * */
 schema.statics.getStableDocumentBySource = async (source, sid) => {
   const DocumentModel = mongoose.model('documents');
@@ -344,6 +382,12 @@ schema.statics.getStableDocumentBySource = async (source, sid) => {
   });
 };
 
+/*
+* 根据来源获取编辑版
+* @param {String} source 来源 参考 DocumentModel.statics.getDocumentSources
+* @param {String} sid 来源多对应的 ID
+* @return {Object} beta document schema
+* */
 schema.statics.getBetaDocumentBySource = async (source, sid) => {
   const DocumentModel = mongoose.model('documents');
   await DocumentModel.checkDocumentSource(source);
@@ -354,6 +398,13 @@ schema.statics.getBetaDocumentBySource = async (source, sid) => {
   });
 };
 
+/*
+* 根据来源获取稳定版内容
+* 如果不存在稳定版，则返回清空内容后的编辑版
+* @param {String} source 来源 参考 DocumentModel.statics.getDocumentSources
+* @param {String} sid 来源所对应的 ID
+* @return {Object} stable document schema
+* */
 schema.statics.getStableDocumentContentBySource = async (source, sid) => {
   const DocumentModel = mongoose.model('documents');
   let stableDocument = await DocumentModel.getStableDocumentBySource(source, sid);
@@ -370,6 +421,13 @@ schema.statics.getStableDocumentContentBySource = async (source, sid) => {
   return stableDocument;
 }
 
+/*
+* 根据来源获取编辑版内容
+* 如果不存在编辑版，则返回正式版
+* @param {String} source 来源 参考 DocumentModel.statics.getDocumentSources
+* @param {String} sid 来源所对应的 ID
+* @return {Object} beta document schema
+* */
 schema.statics.getBetaDocumentContentBySource = async (source, sid) => {
   const DocumentModel = mongoose.model('documents');
   let betaDocument = await DocumentModel.getBetaDocumentBySource(source, sid);
@@ -379,11 +437,29 @@ schema.statics.getBetaDocumentContentBySource = async (source, sid) => {
   return betaDocument;
 };
 
+/*
+* 根据来源获取渲染富文本之后的稳定版
+* @param {String} source 来源 参考 DocumentModel.statics.getDocumentSources
+* @param {String} sid 来源所对应的 ID
+* @param {String} uid 访问者 ID（用于 nkcRender 中的权限判断）
+* @return {Object} DocumentModel.methods.getRenderingData @return
+* */
 schema.statics.getStableDocumentRenderingContent = async (source, sid, uid) => {
   const DocumentModel = mongoose.model('documents');
   const stableDocument = await DocumentModel.getStableDocumentContentBySource(source, sid);
   return stableDocument.getRenderingData(uid);
 };
+
+/*
+* 渲染当前文档的富文本内容并返回、
+* @param {String} 访问者 ID
+* @return {Object}
+*   @param {String} time 格式化后的时间
+*   @param {String} coverUrl 封面图链接
+*   @param {String|null} mTime 格式化后的最后修改时间
+*   @param {String} title 标题
+*   @param {String} content 渲染后的富文本内容
+* */
 schema.methods.getRenderingData = async function(uid) {
   const {timeFormat, fromNow, getUrl} = require('../nkcModules/tools');
   const nkcRender = require('../nkcModules/nkcRender');
@@ -411,48 +487,6 @@ schema.methods.getRenderingData = async function(uid) {
     content
   }
 }
-
-schema.statics.getDocumentsObjById = async (documentsId) => {
-  const DocumentModel = mongoose.model('documents');
-  const documents = await DocumentModel.find({
-    _id: {$in: documentsId}
-  });
-  const obj = {};
-  for(let i = 0; i < documents.length; i++) {
-    const document = documents[i];
-    obj[document._id] = document;
-  }
-  return obj;
-};
-
-
-schema.methods.extendData = async function(uid) {
-  const {timeFormat, fromNow, getUrl} = require('../nkcModules/tools');
-  const nkcRender = require('../nkcModules/nkcRender');
-  const ResourceModel = mongoose.model('resources');
-  const UserModel = mongoose.model('users');
-  let user;
-  if(uid) {
-    user = await UserModel.findOnly({uid});
-  }
-  const resourceReferenceId = await this.getResourceReferenceId();
-  const resources = await ResourceModel.getResourcesByReference(resourceReferenceId);
-  const content = await nkcRender.renderHTML({
-    type: "article",
-    post: {
-      c: this.content,
-      resources,
-      user
-    },
-  });
-  return {
-    time: timeFormat(this.toc),
-    coverUrl: this.cover? getUrl('documentCover', this.cover): '',
-    mTime: this.tlm? fromNow(this.tlm): null,
-    title: this.title || '未填写标题',
-    content
-  }
-};
 
 /*
 * 获取 document 在 resource 中的引用 ID
@@ -567,8 +601,7 @@ schema.methods.sendMessageToAtUsers = async function(from) {
       r: user.uid,
       c: {
         type: 'at',
-        documentId: this._id,
-        from: from
+        did: this._id
       }
     });
     await message.save();

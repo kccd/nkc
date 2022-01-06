@@ -1,0 +1,27 @@
+@import "../../../publicModules/base";
+.exam-count{
+  max-width: 100%;
+}
+.source-list{
+  @height: 2.6rem;
+  .source-item{
+    height: @height;
+    line-height: @height;
+    font-size: 1.4rem;
+    position: relative;
+    padding-right: @height + 0.5rem;
+    cursor: pointer;
+    &:hover, &.active{
+      background-color: #f4f4f4;
+    }
+    .fa{
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: @height;
+      height: @height;
+      text-align: center;
+      line-height: @height;
+    }
+  }
+}

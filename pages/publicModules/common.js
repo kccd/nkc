@@ -1,5 +1,5 @@
 import {fileToBase64, blobToFile} from "../lib/js/file";
-import {resourceToHtml, strToObj} from "../lib/js/dataConversion";
+import {getDataById, resourceToHtml, strToObj} from "../lib/js/dataConversion";
 import {getState} from '../lib/js/state';
 import {
   RNVisitUrlAndClose,
@@ -208,14 +208,7 @@ NKC.methods.strToObj = strToObj;
 * @return {Object} 数据对象
 * @author pengxiguaa 2019-7-29
 * */
-NKC.methods.getDataById = function(id) {
-  var dom = document.getElementById(id);
-  if(dom) {
-    return NKC.methods.strToObj(dom.innerHTML);
-  } else {
-    return {};
-  }
-};
+NKC.methods.getDataById = getDataById;
 /*
 * 滚动到指定元素
 * @param {Dom} dom jquery dom

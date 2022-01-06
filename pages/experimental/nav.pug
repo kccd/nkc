@@ -124,6 +124,9 @@
           if permission('visitEPostSettings')
             li
               a(href='/e/settings/post')=lang('ex', 'postSettings')
+          if permission('experimentalDocumentPostSettings')
+            li
+              a(href=`/e/settings/documentPost`) 内容发表
           if permission('visitExamSettings')
             li
               a(href='/e/settings/exam')=lang('ex', 'exam')

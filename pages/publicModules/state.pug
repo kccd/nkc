@@ -1,0 +1,14 @@
+//- 以下数据传递到浏览器环境
+-var windowData = {};
+if remoteState.uid
+  -windowData.uid = remoteState.uid;
+  -windowData.selectTypesWhenSubscribe = remoteState.selectTypesWhenSubscribe;
+  -windowData.refererOperationId = remoteState.operationId;
+  -windowData.newMessageCount = remoteState.newMessageCount;
+if remoteState.isApp
+  -windowData.isApp = true;
+  -windowData.appOS = remoteState.appOS;
+  -windowData.platform = remoteState.platform;
+-windowData.fileDomain = remoteState.fileDomain;
+
+meta(name='window-data' content=objToStr(windowData))

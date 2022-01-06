@@ -10,6 +10,7 @@ block head
   +includeCSS("/publicModules/public.css")
   +includeCSS("/nkc_styles.css")
   +includeCSS("/error/error.css")
+  include ../publicModules/state
   block errorTitle
     title= `${data.status}${data.error ? ':' + data.error : ''}`
 
@@ -41,6 +42,7 @@ block body
     +includeJS("/external_pkgs/vue.js", true)
   +includeJS('/external_pkgs/polyfill/dist/polyfill.min.js', true)
   +includeJS("/publicModules/common.js")
+  +includeJS('/tools.js')
   +includeJS('/bootstrap/js/bootstrap.min.js')
   if state.isApp && state.platform === 'apiCloud'
     script!=`NKC.configs.isApp = true;NKC.configs.appOS="${state.appOS}";`
