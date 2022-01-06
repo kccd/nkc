@@ -10,12 +10,12 @@
           .creation-center-book-description {{book.description}}
           .creation-center-book-list
             .creation-center-book-list-item(v-for="l in bookList")
-              .creation-center-book-list-item-name(@click="navToPage('bookContent', {}, {bid, aid: l._id})")
+              .creation-center-book-list-item-name(@click="clickArticleTitle(l)")
                 span(v-if="!l.published") [未发布]
                 span(v-else-if="l.hasBeta") [编辑中]
                 | {{l.title}}
               .creation-center-book-list-item-time {{l.time}}
-          button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('articleEditor', {bid})") 添加文章
+          button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('articleEditor', {bid})") 撰写文章
           button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('bookEditor', {bid})") 设置
 
 </template>
@@ -115,6 +115,15 @@
           query,
           params,
         });
+      },
+      clickArticleTitle(l) {
+        const {bid} = this;
+        const aid = l._id;
+        if(!l.published) {
+          this.navToPage('articleEditor', {bid, aid})
+        } else {
+          this.navToPage('bookContent', {}, {bid, aid})
+        }
       },
       switchContent(id) {
         this.$router.push({

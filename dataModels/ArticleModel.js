@@ -21,22 +21,11 @@ const schema = new mongoose.Schema({
     default: null,
     index: 1
   },
-  betaDid: {
-    type: Number,
-    default: null,
-    index: 1
-  },
   cid: {
     type: [String],
     default: [],
     index: 1
   },
-  //是否发布
-  published: {
-    type: Boolean,
-    default: false,
-    index: 1
-  }
 }, {
   collection: 'articles'
 });
@@ -51,33 +40,36 @@ const schema = new mongoose.Schema({
 * */
 schema.statics.createArticle = async (props) => {
   const {title, content, coverFile, uid} = props;
-  const time = new Date();
+  const toc = new Date();
   const ArticleModel = mongoose.model('articles');
   const SettingModel = mongoose.model('settings');
   const DocumentModel = mongoose.model('documents');
-  const document = await DocumentModel.createDocument({
+  const {article: documentSource} = await DocumentModel.getDocumentSources();
+  const aid = await SettingModel.getNewId();
+  const document = await DocumentModel.createBetaDocument({
     uid,
     coverFile,
     title,
     content,
-    time
+    toc,
+    source: documentSource,
+    sid: aid
   });
   const article = new ArticleModel({
-    _id: await SettingModel.getNewId(),
+    _id: aid,
     uid,
-    toc: time,
-    betaDid: document._id,
+    toc,
+    did: document.did,
   });
   await article.save();
   return article;
 }
 
 schema.methods.getBetaDocumentCoverId = async function() {
-  const {betaDid} = this;
-  if(!betaDid) return '';
   const DocumentModel = mongoose.model('documents');
-  const document = await DocumentModel.findOnly({_id: betaDid});
-  return document.cover;
+  const {article: documentSource} = await DocumentModel.getDocumentSources();
+  const betaDocument = await DocumentModel.getBetaDocumentBySource(documentSource, this._id);
+  return betaDocument? betaDocument.cover: '';
 };
 
 /*
@@ -91,38 +83,20 @@ schema.methods.getBetaDocumentCoverId = async function() {
 schema.methods.modifyArticle = async function(props) {
   const DocumentModel = mongoose.model('documents');
   const {title, content, cover, coverFile} = props;
-  const {betaDid, uid} = this;
-  const time = new Date();
-  if(betaDid) {
-    const betaDocument = await DocumentModel.findOnly({_id: betaDid});
-    await betaDocument.updateDocument({
-      title,
-      content,
-      cover,
-      coverFile,
-      tlm: time,
-    });
-  } else {
-    const document = await DocumentModel.createDocument({
-      uid,
-      title,
-      content,
-      coverFile,
-      cover
-    });
-    console.log(document);
-    console.log(props)
-    await this.updateOne({
-      $set: {
-        betaDid: document._id,
-        tlm: time,
-        published: true,
-      }
-    });
-    this.betaDid = document._id;
-    this.tlm = time;
-    this.published = true;
-  }
+  const {did} = this;
+  const toc = new Date();
+  await DocumentModel.updateDocumentByDid(did, {
+    title,
+    content,
+    cover,
+    coverFile,
+    tlm: toc,
+  });
+  this.updateOne({
+    $set: {
+      tlm: toc
+    }
+  });
 }
 /*
 * 发布 article
@@ -131,21 +105,15 @@ schema.methods.modifyArticle = async function(props) {
 * */
 schema.methods.publishArticle = async function() {
   const DocumentModel = mongoose.model('documents');
-  const {did, betaDid} = this;
-  const betaDocument = await DocumentModel.findOnly({_id: betaDid});
-  if(did) {
-    const document = await DocumentModel.findOnly({_id: did});
-    await document.setAsHistory(betaDocument._id);
-  }
-  await this.updateOne({
-    $set: {
-      betaDid: '',
-      did: betaDocument._id,
-      tlm: new Date(),
-    }
-  });
+  const {did} = this;
+  await DocumentModel.publishDocumentByDid(did);
 }
 
+schema.methods.saveArticle = async function() {
+  const DocumentModel = mongoose.model('documents');
+  const {article: documentSource} = await DocumentModel.getDocumentSources();
+  await DocumentModel.copyBetaToHistoryBySource(documentSource, this._id);
+}
 schema.statics.checkArticleInfo = async (article) => {
   const {title, content} = article;
   const {checkString} = require('../nkcModules/checkData');
@@ -162,4 +130,9 @@ schema.statics.checkArticleInfo = async (article) => {
   });
 }
 
+schema.methods.getBetaDocumentContent = async function() {
+  const DocumentModel = mongoose.model('documents');
+  const {article: documentSource} = await DocumentModel.getDocumentSources();
+  return DocumentModel.getBetaDocumentContentBySource(documentSource, this._id);
+};
 module.exports = mongoose.model('articles', schema);

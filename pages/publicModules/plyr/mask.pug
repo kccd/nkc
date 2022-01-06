@@ -1,4 +1,4 @@
-#threadSettings=objToStr({isDisplay: state.threadSettings.playerTips.isDisplay})
+#threadSettings=objToStr({isDisplay: remoteState.nkcSourceMask.isDisplay})
 #plyrMask
   .plyr-mask-video.plyr-mask-video-visitor-access
     .plyr-mask-fix
@@ -12,7 +12,7 @@
     .plyr-mask-fix
       // 预览提示
       .plyr-mask-wrap.preview
-        .player-tip-content= state.threadSettings.playerTips.tipContent
+        .player-tip-content= remoteState.nkcSourceMask.tipContent
         .player-tip-button
           //-
             a.download.m-r-05.hidden(data-video-size='480')

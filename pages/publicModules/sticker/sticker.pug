@@ -23,6 +23,6 @@ if !isIncluded('sticker')
               button.btn.btn-sm.btn-danger(@click="removeSticker") 删除
           .sticker-option(v-else-if="sticker.shared")
             button.btn.btn-sm.btn-theme(@click="collection") 添加到表情
-          .sticker-warning(v-if="sticker.shared")!=nkcRender.plainEscape(state.stickerSettings.notesAboutUsing)
+          .sticker-warning(v-if="sticker.shared").pre-wrap {{notesAboutUploading}}
   include ../../publicModules/moment
   +includeJS("/publicModules/sticker/sticker.js")

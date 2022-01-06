@@ -17,9 +17,9 @@ router
     await next();
   })
   .get('/:bid/:id', async (ctx, next) => {
-    const {data, params, db} = ctx;
+    const {data, params, db, state} = ctx;
     const book = await db.BookModel.findOnly({_id: params.bid});
-    data.bookArticle = await book.getContentById(params.id);
+    data.bookArticle = await book.getContentById({aid: params.id, uid: state.uid});
     data.bookList = await book.getList();
     data.bookData = {
       _id: book._id,
