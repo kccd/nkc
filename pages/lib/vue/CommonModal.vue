@@ -11,7 +11,7 @@
           //- 数字input
           input.form-control(v-if="d.dom === 'input' && d.type === 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model.number="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
           //- 非数字input
-          input.form-control(v-if="d.dom === 'input' && d.type !== 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
+          input.form-control(v-if="d.dom === 'input' && d.type !== 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model="d.value" :maxlength="d.max" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
           //- 文件input
           input.form-control(v-if="d.dom === 'input' && d.type === 'file'" type="file" @change="pickedFile(index)" @keyup.enter="submit" :ref="'input' + index" :accept="d.accept")
           //- 文本框
@@ -21,6 +21,7 @@
             label.m-r-05(v-for="r in d.radios")
               input(type="radio" :value="r.value" v-model="d.value")
               span {{r.name}}
+          //- 多选
           .checkbox(v-if="d.dom === 'checkbox'")
             label.m-r-05(v-for="r in d.checkboxes")
               input(type="checkbox" :value="r._id" name="checkboxes" v-model="d.value")

@@ -7,6 +7,7 @@
       sticker-selector(ref="stickerSelector")
       xsf-selector(ref="xsfSelector")
       math-jax-selector(ref="mathJaxSelector")
+      drafts-selector(ref="draft")
       div(:id="domId")
 </template>
 
@@ -23,11 +24,12 @@
   import {getUrl} from "../js/tools";
   import {initDblclick} from "../js/dblclick";
   import {resourceToHtml} from "../js/dataConversion";
-  import ResourceSelector from './ResourceSelector';
+  import ResourceSelector from './NewResourceSelector';
   import DraftSelector from './DraftSelector';
   import StickerSelector from './StickerSelector';
   import MathJaxSelector from "./MathJaxSelector";
   import XsfSelector from './XsfSelector';
+  import DraftsSelector from "./DraftsSelector";
   export default {
     props: ['configs', 'plugs'],
     components: {
@@ -36,6 +38,7 @@
       'sticker-selector': StickerSelector,
       'math-jax-selector': MathJaxSelector,
       'xsf-selector': XsfSelector,
+      'drafts-selector': DraftsSelector,
     },
     data: () => ({
       domId: '',

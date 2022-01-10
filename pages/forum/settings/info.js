@@ -6,6 +6,8 @@ forum._valuableThreadsId = (forum.valuableThreadsId || []).join(", ");
 const selectImage = new NKC.methods.selectImage()
 import Editor from '../../lib/vue/Editor'
 import {getForumEditorConfigs} from "../../lib/js/editor";
+import ImageSelector from "../../lib/vue/ImageSelector";
+import {blobToFile, fileToBase64} from "../../lib/js/file";
 const app = new Vue({
 	el: '#app',
 	data: {
@@ -38,6 +40,7 @@ const app = new Vue({
 	},
 	components: {
 		'editor': Editor,
+		'image-selector': ImageSelector
 	},
 	methods: {
 		getUrl: NKC.methods.tools.getUrl,
@@ -59,31 +62,64 @@ const app = new Vue({
 		},
 		selectLogo() {
 			const self = this;
-			selectImage.show(d => {
-				const file = NKC.methods.blobToFile(d);
-				NKC.methods.fileToUrl(file)
-					.then(d => {
-						self.logoData = d;
-						self.logoFile = file;
-						selectImage.close();
-					})
-			}, {
-				aspectRatio: 1
-			});
+			// selectImage.show(d => {
+			// 	const file = NKC.methods.blobToFile(d);
+			// 	NKC.methods.fileToUrl(file)
+			// 		.then(d => {
+			// 			self.logoData = d;
+			// 			self.logoFile = file;
+			// 			selectImage.close();
+			// 		})
+			// }, {
+			// 	aspectRatio: 1
+			// });
+			self.$refs.imageSelector.open({
+					aspectRatio: 1
+			})
+				.then(res => {
+					const file = blobToFile(res);
+					fileToBase64(file)
+						.then(res => {
+							self.logoData = res;
+						});
+					self.logoFile = res;
+					self.$refs.imageSelector.close();
+				})
+				.catch(err => {
+					console.log(err);
+					sweetError(err);
+				});
 		},
 		selectBanner() {
 			const self = this;
-			selectImage.show(d => {
-				const file = NKC.methods.blobToFile(d);
-				NKC.methods.fileToUrl(file)
-					.then(d => {
-						self.bannerData = d;
-						self.bannerFile = file;
-						selectImage.close();
-					})
-			}, {
+			// selectImage.show(d => {
+			// 	const file = NKC.methods.blobToFile(d);
+			// 	NKC.methods.fileToUrl(file)
+			// 		.then(d => {
+			// 			self.bannerData = d;
+			// 			self.bannerFile = file;
+			// 			debugger
+			// 			selectImage.close();
+			// 		})
+			// }, {
+			// 	aspectRatio: 4
+			// });
+			self.$refs.imageSelector.open({
 				aspectRatio: 4
-			});
+			})
+				.then(res => {
+					const file = blobToFile(res);
+					fileToBase64(file)
+						.then(res => {
+							self.bannerData = res;
+						});
+					self.bannerFile = res;
+					self.$refs.imageSelector.close();
+				})
+				.catch(err => {
+					console.log(err);
+					sweetError(err);
+				});
 		},
 		// toEditor() {
 		// 	NKC.methods.visitUrl('/editor?type=forum_declare&id='+this.forum.fid, true);

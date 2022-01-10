@@ -72,6 +72,8 @@ const pimRouter = routers.pim;
 const drawDataRouter = routers.drawData;
 // 书籍详细页
 const bookRouter = routers.book;
+//资源分组
+const resourceCategory = routers.resourceCategory;
 
 const path = require('path');
 
@@ -151,4 +153,5 @@ router.use('/creation', creationRouter.routes(), creationRouter.allowedMethods()
 router.use('/draw', drawDataRouter.routes(), drawDataRouter.allowedMethods());
 router.use('/mathJax', mathJaxRouter.routes(), mathJaxRouter.allowedMethods());
 router.use('/book', bookRouter.routes(), bookRouter.allowedMethods());
+router.use('/rc', resourceCategory.routes(), resourceCategory.allowedMethods());
 module.exports = router;

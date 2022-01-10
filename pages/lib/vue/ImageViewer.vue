@@ -6,13 +6,13 @@
       img(v-for="src in scope.images" :src="src" :key="src" width="0")
 </template>
 <style lang="less">
-  .viewer {
+.viewer {
+  width: 0;
+  height: 0!important;
+  img {
     width: 0;
-    height: 0!important;
-    img {
-      width: 0;
-    }
   }
+}
 </style>
 <script>
 import 'viewerjs/dist/viewer.css';

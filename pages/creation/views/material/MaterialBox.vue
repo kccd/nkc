@@ -36,7 +36,7 @@
                 img(:src="getUrl('fileCover', folder.resource.ext)" v-else-if="folder.type === 'resource' && folder.resource && (folder.resource.mediaType === 'mediaAttachment' || folder.resource.mediaType === 'mediaAudio')")
                 img(:src="getUrl('fileCover', '')" v-else)
               .folder-name(:title="folder.decoration")
-                span(v-if="folder.type === 'document' && folder.betaDid") [编辑中]
+                span(v-if="folder.type === 'document' && folder.betaDid && !folder.targetId") [编辑中]
                 span {{folder.name}}
         .material-folder(v-else)
           .null
@@ -198,6 +198,7 @@ export default {
       nkcAPI(url, 'GET', {})
       .then(res => {
         self.folders = res.materials;
+        console.log(self.folders);
         self.materialData = res.materialData || '';
         self.$emit('material-data', res.materialData?res.materialData.crumbs:[]);
         self.loading = false;
@@ -218,6 +219,8 @@ export default {
           this.viewer([`/r/${folder.resource.rid}`,
           ]);
           // window.open( `/r/${folder.resource.rid}`);
+        } else if(folder.resource.mediaType === 'mediaVideo') {
+          // this.$refs.videoPlayer.open();
         } else {
           this.$refs.resourceInfo.open({rid: folder.resource.rid, mediaType: folder.mediaType})
         }
@@ -440,13 +443,10 @@ export default {
     //打开菜单
     openMenu(e, item) {
       this.rightClickItem = item;
-
       let x = e.clientX;
       let y = e.clientY;
-
       this.top = y;
       this.left = x;
-
       this.visible = true;
     },
     //关闭菜单

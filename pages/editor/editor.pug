@@ -107,6 +107,7 @@ block content
           div(id="content")
             editor(:configs="editorConfigs" ref="threadEditor" @ready="editorReady" @content-change="onContentChange" :plugs="editorPlugs")
           #postInfo(v-cloak)
+            image-selector(ref="imageSelector")
             hr
             .m-b-2(v-if="['newThread'].indexOf(type) !== -1")
               .editor-header 专业分类

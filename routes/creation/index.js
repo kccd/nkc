@@ -4,6 +4,9 @@ const materialsRouter = require('./materials');
 const booksRouter = require('./books');
 const bookRouter = require('./book');
 const articlesRouter = require('./articles');
+const categoriesRouter = require('./categories');
+const categoryRouter = require('./category');
+const draftsRouter = require('./drafts');
 router
   .use('/', async (ctx, next) => {
     if(ctx.query.t) {
@@ -18,7 +21,10 @@ router
   })
   .use('/materials', materialsRouter.routes(), materialsRouter.allowedMethods())
   .use('/material', materialRouter.routes(), materialRouter.allowedMethods())
+  .use('/categories', categoriesRouter.routes(), categoriesRouter.allowedMethods())
+  .use('/category', categoryRouter.routes(), categoryRouter.allowedMethods())
   .use('/books', booksRouter.routes(), booksRouter.allowedMethods())
   .use('/book', bookRouter.routes(), bookRouter.allowedMethods())
   .use('/articles', articlesRouter.routes(), articlesRouter.allowedMethods())
+  .use('/drafts', draftsRouter.routes(), draftsRouter.allowedMethods())
 module.exports = router;

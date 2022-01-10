@@ -155,6 +155,7 @@
     "vue-contextmenu": "^1.5.11",
     "vue-router": "^3.5.3",
     "vue-simple-spinner": "^1.2.10",
+    "vue-video-player": "^5.0.2",
     "vuetify": "^2.5.10",
     "xbbcode-parser": "^0.1.2",
     "xss": "^1.0.3"

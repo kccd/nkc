@@ -146,7 +146,8 @@ schema.statics.getDid = async () => {
 * */
 schema.statics.getDocumentSources = async () => {
   return {
-    article: 'article'
+    article: 'article',
+    draft: 'draft'
   }
 };
 

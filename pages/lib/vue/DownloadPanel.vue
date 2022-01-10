@@ -27,6 +27,7 @@
             .m-b-05(v-if='resource.isFileExist')
               .file-score.m-b-05 所需积分：
                 span(v-if='needScore') {{costScores}}，{{holdScores}}
+                span(v-else-if='freeReason === "self"') 用户自己上传的资源下载免费
                 span(v-else-if='freeReason === "setting"') 下载当前附件免费
                 span(v-else) {{description}}
               .m-b-05(v-if='!needScore || enough')

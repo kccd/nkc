@@ -28,6 +28,8 @@ let EditorReady = false;
 window.data = undefined;
 import Editor from "../lib/vue/Editor";
 import {getEditorConfigs} from "../lib/js/editor";
+import ImageSelector from "../lib/vue/ImageSelector";
+import {blobToFile, fileToBase64} from "../lib/js/file";
 $(function() {
   window.data = NKC.methods.getDataById("data");
   window.data.threadCategories.map(c => c.selectedNode = null);
@@ -109,7 +111,7 @@ function initVueApp() {
     data: {
       // 辅助专业数量限制
       minorForumCount: data.minorForumCount || {},
-      // 自动保存草稿
+      // 自动保存草稿时间
       saveDraftTimeout: 60000,
       // 原创申明最小字数限制
       originalWordLimit: data.originalWordLimit || 0,
@@ -168,6 +170,9 @@ function initVueApp() {
       websiteUserId: data.websiteCode + "ID",
 
       threadCategories: data.threadCategories
+    },
+    components: {
+      'image-selector': ImageSelector,
     },
     mounted: function() {
       let this_ = this;
@@ -376,19 +381,36 @@ function initVueApp() {
           } else {
             url = "/r/" + r.rid;
           }
-
-          SelectImage.show(function(data) {
-            self.coverData = data;
-            NKC.methods.fileToUrl(NKC.methods.blobToFile(data))
-              .then(function(data) {
-                debugger
-                self.coverUrl = data;
-                SelectImage.close();
-              })
-          }, {
+          self.$refs.imageSelector.open({
             aspectRatio: 3/2,
-            url: url
-          });
+            url
+          })
+            .then(res => {
+              fileToBase64(res)
+                .then(res => {
+                  self.coverUrl = res;
+                })
+                .catch(err => {
+                  sweetError(err);
+                })
+              self.$refs.imageSelector.close();
+            })
+            .catch(err => {
+              console.log(err);
+              sweetError(err);
+            });
+          // SelectImage.show(function(data) {
+          //   self.coverData = data;
+          //   NKC.methods.fileToUrl(NKC.methods.blobToFile(data))
+          //     .then(function(data) {
+          //       debugger
+          //       self.coverUrl = data;
+          //       SelectImage.close();
+          //     })
+          // }, {
+          //   aspectRatio: 3/2,
+          //   url: url
+          // });
         }, {
           allowedExt: ["picture"],
           countLimit: 1
@@ -434,6 +456,7 @@ function initVueApp() {
       // 手动保存草稿，相比自动保存草稿多了一个成功提示框。
       saveToDraft: function() {
         let self = this;
+        if(!self.content) sweetWarning('请先输入内容');
         self.saveToDraftBase()
           .then(function() {
             const postButton = getPostButton();
@@ -916,8 +939,10 @@ function initVueApp() {
             sweetError(data);
           })
       },
+      //保存草稿
       saveToDraftBase: function() {
         let self = this;
+        if(!self.content) return;
         return Promise.resolve()
           .then(function() {
             let post = self.getPost();
@@ -1093,7 +1118,6 @@ new Vue({
   },
   watch: {
     openOnEditNotes: function(val) {
-      console.log(val);
       localStorage.setItem("open-on-edit-notes", val? "yes" : "no");
     }
   }
