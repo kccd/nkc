@@ -307,6 +307,8 @@ schema.statics.publishDocumentByDid = async (did) => {
       type: type[0]
     }
   });
+  const needReview = await documentsObj.beta.getReviewStatusAndCreateReviewLog();
+  await documentsObj.beta.setReviewStatus(needReview);
 };
 
 /*
@@ -833,9 +835,8 @@ schema.methods.getKeywordsReviewStatus = async function() {
     }
   }
 };
-
-// 设置审核状态，生成审核记录
-schema.methods.setReviewStatus = async function() {
+// 获取审核状态，生成审核记录
+schema.methods.getReviewStatusAndCreateReviewLog = async function() {
   const ReviewModel = mongoose.model('reviews');
   let reviewStatus = await this.getGlobalPostReviewStatus();
   if(!reviewStatus.needReview) {
@@ -844,15 +845,19 @@ schema.methods.setReviewStatus = async function() {
   if(!reviewStatus.needReview) {
     reviewStatus = await this.getKeywordsReviewStatus();
   }
-  const {needReviewed, reason, type} = reviewStatus;
-  const data = {
-    reviewed: needReviewed,
-  };
-  if(needReviewed) {
+  const {needReview, reason, type} = reviewStatus;
+  if(needReview) {
     await ReviewModel.newDocumentReview(type, this._id, this.uid, reason);
   }
+  return needReview;
+}
+
+// 设置审核状态，生成审核记录
+schema.methods.setReviewStatus = async function(reviewed) {
   await this.updateOne({
-    $set: data
+    $set: {
+      reviewed
+    }
   });
 };
 

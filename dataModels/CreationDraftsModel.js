@@ -68,6 +68,7 @@ schema.statics.createDraft = async (props) => {
     source: documentSource,
     sid: Did,
   });
+  await document.setReviewStatus(true);
   const draft = new CreationDraftsModel({
     _id: Did,
     uid,
