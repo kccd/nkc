@@ -47,7 +47,6 @@
     "@babel/runtime": "^7.14.6",
     "@nkc/backup": "./microServices/backup",
     "@nkc/communication": "./microServices/communication",
-    "@nkc/proxy": "./microServices/proxy",
     "@nkc/store": "./microServices/store",
     "@types/fs-extra": "^9.0.11",
     "@types/html-escaper": "^3.0.0",
