@@ -6,8 +6,14 @@ const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: Number,
   type: {
-    type: "String", // disabledPost, disabledThread, returnPost, returnThread, passPost, passThread
+    type: String, // disabledPost, disabledThread, returnPost, returnThread, passPost, passThread
     required: true,
+    index: 1
+  },
+  // 当审核对象为 document 时，此字段为 document innerId
+  docId: {
+    type: Number,
+    default: null,
     index: 1
   },
   pid: {
@@ -60,6 +66,20 @@ schema.statics.newReview = async (type, post, user, reason) => {
     handlerId: user.uid
   }).save();
 };
+
+schema.statics.newDocumentReview = async (type, innerId, uid, reason) => {
+  const ReviewModel = mongoose.model('reviews');
+  const SettingModel = mongoose.model('settings');
+  const review = ReviewModel({
+    _id: await SettingModel.operateSystemID('reviews', 1),
+    type,
+    reason,
+    docId: documentId,
+    uid,
+    handlerId: uid,
+  });
+  await review.save();
+}
 
 const pureWordRegExp = /([^\u4e00-\u9fa5a-zA-Z0-9])/gi;
 const MatchedKeyword = { result: [] };

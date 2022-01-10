@@ -4,6 +4,7 @@ NKC.modules.NotePanel = class {
     self.app = new Vue({
       el: "#moduleNotePanel",
       data: {
+        managementNote: false,
         uid: NKC.configs.uid,
         disableNoteContent: false,
         show: false,
@@ -78,6 +79,7 @@ NKC.modules.NotePanel = class {
               self.app.resetDom();
               self.callback(data.note);
               self.app.extendNoteContent(data.note);
+              self.app.managementNote = data.managementNote;
               self.app.note = data.note;
               self.app.submitting = false;
               setTimeout(() => {
@@ -137,10 +139,11 @@ NKC.modules.NotePanel = class {
               self.app.note = note;
               resolve();
             } else {
-              nkcAPI(`/note/${id}`, "GET")
+              return nkcAPI(`/note/${id}`, "GET")
                 .then(data => {
                   self.app.extendNoteContent(data.note);
                   self.app.note = data.note;
+                  self.app.managementNote = data.managementNote;
                   resolve();
                 })
                 .catch(reject)

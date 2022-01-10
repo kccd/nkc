@@ -478,6 +478,8 @@ schema.methods.getRenderingData = async function(uid) {
       resources,
       user
     },
+    source: 'document',
+    sid: this._id
   });
   return {
     time: timeFormat(this.toc),
@@ -615,11 +617,242 @@ schema.methods.sendMessageToAtUsers = async function(from) {
   });
 };
 
+/*
+* 检测用户是否有权发表指定来源的内容
+* @param {String} uid 发表人 ID
+* @param {String} source 来源 参考 DocumentModel.statics.getDocumentSources
+* @param {String} type 类型 默认 stable, 可选 stable, history, beta
+* */
+schema.statics.checkGlobalPostPermission = async (uid, source, type = 'stable') => {
+  const DocumentModel = mongoose.model('documents');
+  const SettingModel = mongoose.model('settings');
+  const UserModel = mongoose.model('users');
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const apiFunction = require('../nkcModules/apiFunction');
+  await DocumentModel.checkDocumentSource(source);
+  const documentPostSettings = await SettingModel.getSettings('documentPost');
+  const {postPermission} = documentPostSettings[source];
+  const user = await UserModel.findOnly({uid});
+  const usersPersonal = await UsersPersonalModel.findOnly({uid});
+  const authLevel = await usersPersonal.getAuthLevel();
+  const {
+    authLevelMin,
+    examVolumeA,
+    examVolumeB,
+    examNotPass,
+    defaultInterval,
+    defaultCount,
+    intervalLimit = []
+  } = postPermission;
 
+  // 身份认证判断
+  if(authLevel < authLevelMin) {
+    throwErr(403, `身份认证等级未达要求，请至少完成身份认证 ${authLevelMin}`);
+  }
+  // 获取今日发表数
+  const today = apiFunction.today();
+  const documentCountToday = await DocumentModel.countDocuments({
+    uid,
+    type,
+    source,
+    toc: {$gte: today}
+  });
+  // 考试判断
+  if((!examVolumeA || !user.volumeA) && (!examVolumeB || !user.volumeB)) {
+    if(!examNotPass.status) {
+      if(!examVolumeA && !examVolumeB) {
+        throwErr(403, `发表功能已关闭`);
+      } else {
+        throwErr(403, `请参加考试，通过后可获得发表权限`);
+      }
+    }
+    if(examNotPass.count <= documentCountToday) {
+      if(!examVolumeA && !examVolumeB) {
+        throwErr(403, `今日发表次数已达上限（${examNotPass} 次），请明天再试`);
+      } else {
+        throwErr(403, `今日发表次数已达上限（${examNotPass} 次），请参加考试，通过后可获取更多发表权限`);
+      }
+    }
+  }
+  // 发表间隔、数量限制
+  const roles = await user.extendRoles();
+  const grade = await user.extendGrade();
+  const rolesId = roles.map(r => `role-${r._id}`);
+  rolesId.push(`grade-${grade._id}`);
+  let intervalItem = null;
+  let countItem = null;
+  for(const item of intervalLimit) {
+    if(!rolesId.includes(item.id)) continue;
+    if(intervalItem && !intervalItem.limited) continue;
+    if(!intervalItem || !item.limited || item.interval > intervalItem.interval) {
+      intervalItem = item;
+    }
+  }
+  for(const item of countLimit) {
+    if(!rolesId.includes(item.id)) continue;
+    if(countItem && !countItem.limited) continue;
+    if(!countItem || !item.limited || item.count > countItem.count) {
+      countItem = item;
+    }
+  }
+  intervalItem = intervalItem || defaultInterval;
+  countItem = defaultCount;
+  if(intervalItem.limited) {
+    const latestDocument = await DocumentModel.countDocuments({
+      uid,
+      type,
+      source,
+      toc: {$gte: Date.now() - intervalItem.interval * 60 * 1000}
+    }).sort({toc: -1});
+    if(latestDocument) {
+      throwErr(403, `您当前的账号等级限定发表间隔时间不能小于 ${intervalItem.interval} 分钟，请稍候再试`);
+    }
+  }
+  if(
+    countItem.limited &&
+    documentCountToday >= countItem.count
+  ) {
+    throwErr(403, `您当前的账号等级限定每天发表次数不能超过 ${countItem.count} 次，请明天再试`);
+  }
+};
 
-// 设置审核状态（敏感词检测）
-schema.methods.setReviewStatus = async function(from) {
+/*
+* 根据后台发表内容设置，获取审核状态
+* */
+schema.methods.getGlobalPostReviewStatus = async function() {
+  const {source, uid} = this;
+  const SettingModel = mongoose.model('settings');
+  const UserModel = mongoose.model('users');
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const documentPostSettings = await SettingModel.getSettings('documentPost');
+  const {postReview} = documentPostSettings[this.source];
+  const user = await UserModel.findOnly({uid});
+  const {reviewedCount} = await UsersGeneralModel.findOnly({uid}, {reviewedCount: 1});
+  const {nationCode} = await UsersPersonalModel.getUserPhoneNumber(uid);
+  const {foreign, notPassVolumeA, whitelist, blacklist} = postReview;
 
+  const roles = await user.extendRoles();
+  const grade = await user.extendGrade();
+  const roleList = roles.map(r => `role-${r._id}`);
+  roleList.push(`grade-${grade._id}`);
+  // 白名单
+  for(const r of roleList) {
+    if(whitelist.includes(r)) {
+      return {
+        needReview: false,
+      }
+    }
+  }
+  // 海外手机号注册用户
+  if(
+    nationCode !== foreign.nationCode &&
+    (
+      foreign.type === 'all' ||
+      foreign.type === 'count' && reviewedCount[source] < foreign.count
+    )
+  ) {
+    return {
+      needReview: true,
+      type: 'foreign',
+      reason: '海外手机号用户，审核通过的文章数量不足'
+    };
+  }
+
+  // 未通过 A 卷考试
+  if(
+    !user.volumeA &&
+    (
+      notPassVolumeA.type === 'all' ||
+      notPassVolumeA.type === 'count' && reviewdCount[source] < notPassVolumeA.count
+    )
+  ) {
+    return {
+      needReview: true,
+      type: 'notPassedA',
+      reason: '用户没有通过A卷考试，审核通过的文章数量不足'
+    };
+  }
+
+  // 黑名单
+  for(const bl of blacklist) {
+    if(!roleList.includes(bl.id) || bl.type === 'none') continue;
+    if(
+      bl.type === 'all' ||
+      (bl.type === 'count' && reviewdCount[source] < bl.count)
+    ) {
+      return {
+        needReview: true,
+        type: 'grade',
+        reason: '因用户等级限制，审核通过的文章数量不足'
+      }
+    }
+  }
+}
+/*
+* 获取用户关于复验手机号的审核状态
+* */
+schema.methods.getVerifyPhoneNumberReviewStatus = async function() {
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  if(await UsersPersonalModel.shouldVerifyPhoneNumber(this.uid)) {
+    return {
+      needReview: true,
+      type: 'unverifiedPhone',
+      reason: '用户未验证手机号'
+    }
+  }
+};
+
+/*
+* 获取敏感词审核状态
+* */
+schema.methods.getKeywordsReviewStatus = async function() {
+  const SettingModel = mongoose.model('settings');
+  const ReviewModel = mongoose.model('reviews');
+  const documentPostSettings = await SettingModel.getSettings('documentPost');
+  const {keywordGroupId} = documentPostSettings[this.source].postReview;
+  const {
+    content = '',
+    title = '',
+    abstract = '',
+    abstractEN = '',
+    keywords = [],
+    keywordsEN = []
+  } = this;
+  const documentContent = content + title + abstract + abstractEN + keywords.concat(keywordsEN).join(' ');
+  const matchedKeywords = await ReviewModel.matchKeywords(documentContent, keywordGroupId);
+  if(matchedKeywords.length > 0) {
+    return {
+      needReview: true,
+      type: 'includesKeyword',
+      reason: `内容中包含敏感词 ${matchedKeywords.join("、")}`
+    }
+  } else {
+    return {
+      needReview: false
+    }
+  }
+};
+
+// 设置审核状态，生成审核记录
+schema.methods.setReviewStatus = async function() {
+  const ReviewModel = mongoose.model('reviews');
+  let reviewStatus = await this.getGlobalPostReviewStatus();
+  if(!reviewStatus.needReview) {
+    reviewStatus = await this.getVerifyPhoneNumberReviewStatus();
+  }
+  if(!reviewStatus.needReview) {
+    reviewStatus = await this.getKeywordsReviewStatus();
+  }
+  const {needReviewed, reason, type} = reviewStatus;
+  const data = {
+    reviewed: needReviewed,
+  };
+  if(needReviewed) {
+    await ReviewModel.newDocumentReview(type, this._id, this.uid, reason);
+  }
+  await this.updateOne({
+    $set: data
+  });
 };
 
 // 匿名发表相关
@@ -630,10 +863,6 @@ schema.methods.updateData = async function(newData) {
 };
 // 同步到搜索数据库
 schema.methods.pushToSearchDB = async function() {
-
-};
-// 获取其中的 @ 用户名称
-schema.methods.sendATMessage = async function() {
 
 };
 // 获取 html 内容中的笔记选区信息

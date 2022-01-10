@@ -14,12 +14,12 @@ include ../../publicModules/unfixedPanel/unfixedPanel
             img(:src="getUrl('userAvatar', n.user.avatar)")
           a(@click="visitUrl('/u/' + n.user.uid, true)").note-panel-username {{n.user.username}}
           .note-panel-time {{fromNow(n.toc)}} {{n.disabled?"已屏蔽":""}} {{n.deleted?"已删除":""}}
-          .note-panel-options(v-if=`n.user.uid === uid || ${permission('managementNote')}`)
+          .note-panel-options(v-if=`n.user.uid === uid || managementNote`)
             .fa.fa-ellipsis-v
             ul
               li(@click="modifyNoteContent(n)") 编辑
               li(@click="deleteNoteContent(n, 'delete')" v-if="n.user.uid === uid") 删除
-              li(@click="deleteNoteContent(n, 'disable')" v-if=`${permission('managementNote')}`) {{n.disabled?"解除屏蔽":"屏蔽"}}
+              li(@click="deleteNoteContent(n, 'disable')" v-if=`managementNote`) {{n.disabled?"解除屏蔽":"屏蔽"}}
         .note-panel-content-body
           .note-panel-content(v-if="!n.edit" v-html="n.html || '笔记内容已丢失'")
           .note-panel-content(v-else)

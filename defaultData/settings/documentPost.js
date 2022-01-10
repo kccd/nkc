@@ -6,26 +6,73 @@ module.exports = {
         authLevelMin: 0,
         examVolumeA: true,
         examVolumeB: true,
-        examNotPass: `true:false:0`, // 未通过考试是否允许发表:是否限制条数:限制的条数
-        defaultInterval: `false:0`, // 是否限制发表间隔:限制时的最小间隔
-        defaultCount: `false:0`, // 是否限制每天发表数量:限制时的最小条数
+        examNotPass: {
+          status: true,
+          limited: false,
+          count: 1
+        },
+        defaultInterval: {
+          limited: false,
+          interval: 1
+        },
+        defaultCount: {
+          limited: false,
+          count: 1
+        },
         intervalLimit: [
-          'role:dev:false:0',
-          'grade:0:true:100'
+          {
+            id: 'role-dev',
+            limited: false,
+            interval: 1
+          },
+          {
+            id: 'grade-0',
+            limited: true,
+            interval: 1
+          }
         ],
         countLimit: [
-          'role:dev:false:0',
-          'grade:0:true:100'
+          {
+            id: 'role-dev',
+            limited: false,
+            count: 1
+          },
+          {
+            id: 'grade-0',
+            limited: true,
+            count: 100
+          }
         ]
       },
       postReview: {
-        default: `none:0`, // 是否需要审核:是否限制审核条数:限制审核时的具体条数 none: 无需审核, all: 全审, count: 具体审核多少
-        list: [
-          'role:dev:none:1',
-          'role:eng:none:1',
-          'grade:1:count:10',
-          'grade:0:all:1'
-        ]
+        whitelist: ['role-dev'],
+        notPassVolumeA: {
+          type: 'none',
+          count: 1
+        },
+        foreign: {
+          nationCode: '86',
+          type: 'none',
+          count: 1
+        },
+        blacklist: [
+          {
+            id: 'role-dev',
+            type: 'none',
+            count: 1
+          },
+          {
+            id: 'grade-1',
+            type: 'count',
+            count: 10
+          },
+          {
+            id: 'grade-0',
+            type: 'all',
+            count: 1
+          }
+        ],
+        keywordGroupId: []
       }
     }
   }

@@ -14,6 +14,12 @@ const usersGeneralSchema = new Schema({
 	  type: Number,
     default: 0,
   },
+  reviewedCount: {
+    article: {
+      type: Number,
+      default: 0,
+    }
+  },
   waterSetting:{
     waterAdd: {
       type: Boolean,

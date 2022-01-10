@@ -66,13 +66,13 @@ NKC.modules.NKCHL = class {
               let node = hl.getNodes(range);
               const content = hl.getNodesContent(node);
               if($(window).width() < 768) {
-                NKC.methods.visitUrl(`/note?content=${content}&targetId=${self.id}&type=post&offset=${node.offset}&length=${node.length}`, true);
+                NKC.methods.visitUrl(`/note?content=${content}&targetId=${self.id}&type=${self.type}&offset=${node.offset}&length=${node.length}`, true);
               } else {
                 self.newNote({
                   id: "",
                   content,
                   targetId: self.id,
-                  type: "post",
+                  type: self.type,
                   notes: [],
                   node,
                 })
