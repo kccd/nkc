@@ -456,6 +456,7 @@ function initVueApp() {
       // 手动保存草稿，相比自动保存草稿多了一个成功提示框。
       saveToDraft: function() {
         let self = this;
+        if(!self.content) sweetWarning('请先输入内容');
         self.saveToDraftBase()
           .then(function() {
             const postButton = getPostButton();
@@ -941,6 +942,7 @@ function initVueApp() {
       //保存草稿
       saveToDraftBase: function() {
         let self = this;
+        if(!self.content) return;
         return Promise.resolve()
           .then(function() {
             let post = self.getPost();

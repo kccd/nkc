@@ -251,7 +251,7 @@ export default {
     draftsType: 'all',
     selectedDraftsId: [],
     loading: true,
-    quota: 2,
+    quota: 10,
     pageNumber: "",
   }),
   components: {
@@ -296,7 +296,9 @@ export default {
     getDrafts: debounce(function (skip = 0) {
       this.loading = true;
       const self = this;
-      nkcAPI(`/creation/drafts?quota=${this.quota}&skip=${skip}&type=${this.draftsType}&t=${Date.now()}`, 'GET', {})
+      let {quota} = self;
+      if(self.type) quota = 7;
+      nkcAPI(`/creation/drafts?quota=${quota}&skip=${skip}&type=${this.draftsType}&t=${Date.now()}`, 'GET', {})
         .then(res => {
           res.drafts.map(d => {
             d.delay = 0;
