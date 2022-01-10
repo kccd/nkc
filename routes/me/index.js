@@ -13,7 +13,6 @@ meRouter
     const {user} = ctx.data;
     const {db, data, nkcModules, state} = ctx;
     let {quota, skip, type, c, resourceCategories} = ctx.query;
-    console.log('resourceCategories', resourceCategories);
     let queryMap;
     const {uid} = state;
     if(!c) c = "all";

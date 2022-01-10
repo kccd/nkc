@@ -111,7 +111,6 @@
                 .fa.fa-check-square-o.active(@click="selectResource(r)")
               .resource-index {{selectedResourcesId.indexOf(r.rid) + 1}}
             .resource-options(v-else)
-              //-.resource-mask(@click="fastSelectResource(r)" @mouseenter="viewPicture($event, r)" @mouseleave="closePicture() @touchstart="onTouch"")
               .resource-mask(@click="fastSelectResource(r)")
               .resource-do
                 .fa.fa-edit(@click="editImage(r)" v-if="r.mediaType === 'mediaPicture'")
@@ -127,7 +126,7 @@
             .resource-in-process
               span 处理失败
               .fa.fa-exclamation-circle.pointer(v-if='r.errorInfo' :title='r.errorInfo' @click='showErrorInfo(r)')
-      .module-sr-footer(v-show="!loading")
+      .module-sr-footer
         .pull-left
           input.hidden(ref='inputElement' type="file" multiple="true" @change="selectedFiles")
           button.btn.btn-default.btn-sm(@click="clickInput") 上传
@@ -393,7 +392,7 @@
    }
    .resource-select {
      width: 23.5%;
-     height: 6.5rem;
+     height: 7.5rem;
    }
    .resource-category {
      width: 13.7rem;
@@ -958,6 +957,9 @@ export default {
           self.resources = data.resources;
           self.loading = false;
           self.categoryLoading = false;
+          if(self.watchType === 'select') {
+            self.callback();
+          }
         })
         .catch(function(data) {
           sweetError(data);
@@ -1156,8 +1158,8 @@ export default {
         } else {
           if(r.mediaType === "mediaPicture") {
             this.$refs.imageViewer.show([`/r/${r.rid}`]);
-          } else if (r.mediaType === "mediaVideo") {
-
+          } else if (r.mediaType === "mediaVideo" || r.mediaType === "mediaAudio" ) {
+            window.open(`/r/${r.rid}`);
           } else if(r.mediaType === "mediaAttachment") {
             this.$refs.resourceInfo.open({rid: r.rid});
           }

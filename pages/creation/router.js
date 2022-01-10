@@ -9,6 +9,8 @@ import BookEditor from './views/book/BookEditor';
 import ArticleEditor from './views/article/ArticleEditor';
 import Category from './views/category/Category';
 import Categories from './views/category/Categories';
+import Drafts from './views/drafts/drafts';
+import DraftEdit from "./views/drafts/DraftEdit";
 const routes = [
   {name: 'home', path: '/creation', component: Home},
   {name: 'materials', path: '/creation/materials', component: Materials},
@@ -21,6 +23,8 @@ const routes = [
   {name: 'articleEditor', path: '/creation/articles/editor', component: ArticleEditor},
   {name: 'category', path: '/creation/category', component: Category},
   {name: 'categories', path: '/creation/categories', component: Categories},
+  {name: 'drafts', path: '/creation/drafts', component: Drafts},
+  {name: 'draftEdit', path: '/creation/drafts/draftEdit', component: DraftEdit},
 ];
 
 

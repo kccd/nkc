@@ -721,7 +721,6 @@ resourceSchema.methods.checkDownloadCost = async function(user) {
   }
   //如果存在用户并且资源是该用户上传的就可以免费下载
   if(user && this.uid === user.uid) {
-    console.log('用户自己上传的资源', this.uid);
     return {
       needScore: false,
       reason: 'self',

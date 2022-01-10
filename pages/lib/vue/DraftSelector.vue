@@ -4,39 +4,21 @@
       .module-sd-title 草稿箱
       .module-sd-close.fa.fa-close(@click="close")
     .module-sd-body
-      .module-content(v-if="loading")
+      //-.module-content(v-if="loading")
         .null 加载中...
-      .module-content(v-else)
+      .module-content
         .module-drafts
           .module-draft-warning.bg-warning.text-warning 此处只插入正文，如果要使用草稿中的其余内容，请点击继续创作。
           .paging-button
-            a.button.m-r-05.radius-left.radius-right(@click="refresh") 刷新
-            span(v-for="(b, index) in paging.buttonValue")
-              span(v-if="b.type === 'active'")
-                a.button.active(@click="getDrafts(b.num)"
-                  :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
-                ) {{b.num+1}}
-              span(v-else-if="b.type === 'common'")
-                a.button(@click="getDrafts(b.num)"
-                  :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
-                ) {{b.num+1}}
-              span(v-else)
-                a.button ..
-          .module-draft(v-for="d in drafts")
-            .module-info
-              .module-time {{fromNow(d.toc)}}
-              .module-from {{getDraftInfo(d)}}
-            .module-article-title 标题：
-              span {{d.t}}
-            .module-article-content 内容：
-              span {{d.c}}
-            .module-buttons
-              div(title="继续创作" @click="loadDraft(d)")
-                span 继续创作
-              div
-                span(title="删除草稿" @click="removeDraft(d)").m-r-05 删除
-                span.disabled(title="已插入" v-if="d.delay !== 0") 插入
-                span(title="插入内容" @click="insert(d)" v-else) 插入
+            a(:class="{'active': draftType === 'auto'}" @click="selectDraftType('auto')")
+              .fa &nbsp;
+              | 自动保存草稿
+            a(:class="{'active': draftType === 'custom'}" @click="selectDraftType('custom')")
+              .fa &nbsp;
+              | 自定义草稿
+          auto-drafts-box(ref="autoDraftsBox" v-if="draftType === 'auto'" @callback-data="insert")
+          custom-drafts-box(ref="customDraftsBox" :type="true" v-else @callback-data="insert")
+
 </template>
 <style lang="less" scoped>
   .draft-selector{
@@ -181,22 +163,20 @@
   }
 </style>
 <script>
-  import {fromNow} from '../js/tools';
+  import AutoDraftsBox from "./drafts/AutoDraftsBox";
+  import CustomDraftsBox from "./drafts/CustomDraftsBox";
   import {DraggableElement} from "../js/draggable";
-  import {getState} from '../js/state';
-  import {sweetQuestion} from "../js/sweetAlert";
-
-  const {uid} = getState();
   export default {
     data: () => ({
-      uid,
-      paging: {},
-      perpage: 7,
+      draftType: 'auto',//选择草稿类型
       loading: true,
-      drafts: [],
       draggableElement: null,
       callback: null,
     }),
+    components: {
+      'auto-drafts-box': AutoDraftsBox,
+      'custom-drafts-box': CustomDraftsBox,
+    },
     mounted() {
       this.initDraggableElement();
     },
@@ -204,88 +184,21 @@
       this.destroyDraggableElement();
     },
     methods: {
-      fromNow: fromNow,
       initDraggableElement() {
         this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
       },
       destroyDraggableElement() {
         this.draggableElement.destroy();
       },
-      getDraftInfo(draft) {
-        const {type, thread, forum} = draft;
-        let info = "";
-        if(type === "newThread") {
-          info = `发表文章`;
-        } else if(type === "newPost") {
-          info = `在文章《${thread.title}》下发表回复`;
-        } else if(type === "modifyPost") {
-          info = `修改文章《${thread.title}》下的回复`;
-        } else if(type === "modifyThread") {
-          info = `修改文章《${thread.title}》`;
-        } else if(type === 'modifyForumLatestNotice') {
-          info = `修改专业《${forum.title}》最新页板块公告`;
-        } else {
-          info = `修改专业《${forum.title}》的专业说明`;
-        }
-        return info;
+      selectDraftType(type) {
+        this.draftType = type;
       },
       insert(data) {
-        if(!data) return;
-        this.callback({content: data.content});
-        data.delay = 3;
-        const func = () => {
-          setTimeout(() => {
-            data.delay --;
-            if(data.delay > 0) {
-              func();
-            }
-          }, 1000);
-        }
-        func();
-      },
-      removeDraft(draft) {
-        const self = this;
-        sweetQuestion("确定要删除草稿吗？")
-          .then(() => {
-            nkcAPI('/u/' + this.uid + "/drafts/" + draft.did, "DELETE")
-              .then(function() {
-                self.getDrafts(self.paging.page);
-              })
-              .catch(function(data) {
-                sweetError(data);
-              })
-          })
-      },
-      getDrafts(page = 0) {
-        const self = this;
-        nkcAPI(`/u/${this.uid}/profile/draft?page=${page}&perpage=${this.perpage}`, "GET")
-          .then(data => {
-            data.drafts.map(d => {
-              d.delay = 0;
-            });
-            self.drafts = data.drafts;
-            self.paging = data.paging;
-            self.loading = false;
-          })
-          .catch(sweetError);
-      },
-      loadDraft(d) {
-        sweetQuestion(`继续创作将会覆盖编辑器中全部内容，确定继续？`)
-          .then(() => {
-            if(window.PostInfo && window.PostInfo.showCloseInfo) {
-              window.PostInfo.showCloseInfo = false;
-            }
-            window.location.href = `/editor?type=redit&id=${d.did}`;
-          })
-          .catch(sweetError);
-      },
-      refresh() {
-        this.getDrafts(this.paging.page);
+        this.callback({content: data});
       },
       open(callback) {
-        this.draggableElement.show();
         this.callback = callback;
-        this.getDrafts();
+        this.draggableElement.show();
       },
       close() {
         this.draggableElement.hide();

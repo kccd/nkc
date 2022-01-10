@@ -17,7 +17,7 @@ router
       maxLength: 10
     });
     const oldCategory = await db.ResourceCategoryModel.findOne({uid: state.uid, name});
-    if(oldCategory) ctx.throw(403, '已存在相同分组名');
+    if(oldCategory || name === '默认') ctx.throw(403, '已存在相同分组名');
     if(type === 'create') {
       const count = await db.ResourceCategoryModel.countDocuments({uid: state.uid});
       if(count === 10) ctx.throw(403, '最多添加10个分组');

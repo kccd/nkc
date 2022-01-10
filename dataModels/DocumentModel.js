@@ -95,7 +95,7 @@ const schema = new mongoose.Schema({
     default: []
   },
   // 引用来源（文档所在的系统）
-  // comment, article, post
+  // comment, article, post,
   source: {
     type: String,
     required: true,
@@ -148,7 +148,8 @@ schema.statics.getDocumentSources = async () => {
   return {
     comment: 'comment',
     article: 'article',
-    post: 'post'
+    post: 'post',
+    draft: 'draft',
   }
 };
 
@@ -228,6 +229,7 @@ schema.methods.copyToHistoryDocument = async function() {
   await document.save();
   return document;
 };
+
 schema.statics.copyBetaToHistoryBySource = async (source, sid) => {
   const DocumentModel = mongoose.model('documents');
   const betaDocument = await DocumentModel.getBetaDocumentBySource(source, sid);
@@ -235,7 +237,7 @@ schema.statics.copyBetaToHistoryBySource = async (source, sid) => {
   await betaDocument.copyToHistoryDocument();
 };
 /*
-* 将正式版变为开发板
+* 设置文档为历史版
 * */
 schema.methods.setAsHistoryDocument = async function() {
   await this.updateOne({

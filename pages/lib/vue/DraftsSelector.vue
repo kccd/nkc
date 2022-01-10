@@ -5,7 +5,7 @@
       .module-dialog-close(@click="close")
         .fa.fa-remove
     .module-dialog-content
-      resource-category(ref="resourceCategory")
+      drafts-box(ref="draftsBox")
 </template>
 
 <style lang="less" scoped>
@@ -13,7 +13,7 @@
 .module-dialog-body{
   display: none;
   position: fixed;
-  width: 56rem;
+  width: 46rem;
   max-width: 100%;
   top: 100px;
   right: 0;
@@ -55,13 +55,13 @@
 
 <script>
 import {DraggableElement} from "../js/draggable";
-import ResourceCategory from "./ResourceCategory";
+import DraftsBox from "./drafts/CustomDraftsBox";
 export default {
   data: () => ({
     show: false,
   }),
   components: {
-    'resource-category': ResourceCategory,
+    'drafts-box': DraftsBox,
   },
   mounted() {
     this.initDraggableElement();
@@ -72,7 +72,7 @@ export default {
     },
     open(callback, options) {
       const self = this;
-      self.$refs.resourceCategory.open(function (res){
+      self.$refs.draftsBox.open(function (res){
         if(!res) {
           self.draggableElement.show();
           self.show = true;

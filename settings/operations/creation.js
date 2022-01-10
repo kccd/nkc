@@ -1,5 +1,14 @@
 module.exports = {
   GET: 'creationCenter',
+  drafts: {
+    GET: 'creationCenter',
+    POST: 'creationCenter',
+    DELETE: 'creationCenter',
+    draftEdit: {
+      GET: 'creationCenter',
+      POST: 'creationCenter',
+    }
+  },
   category: {
     GET: 'creationCenter',
   },

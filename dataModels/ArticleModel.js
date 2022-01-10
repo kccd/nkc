@@ -100,7 +100,7 @@ schema.methods.modifyArticle = async function(props) {
 }
 /*
 * 发布 article
-* 将正式版设为历史
+* 如果有正式版就将正式版设为历史
 * 将测试版设为正式版
 * */
 schema.methods.publishArticle = async function() {
@@ -109,6 +109,10 @@ schema.methods.publishArticle = async function() {
   await DocumentModel.publishDocumentByDid(did);
 }
 
+/*
+* 保存 article
+* 将测试版变为历史版
+* */
 schema.methods.saveArticle = async function() {
   const DocumentModel = mongoose.model('documents');
   const {article: documentSource} = await DocumentModel.getDocumentSources();
