@@ -78,6 +78,7 @@ const schema = new mongoose.Schema({
   reviewed: {
     type: Boolean,
     default: false,
+    index: 1
   },
   // 文档内容字数 排除了 html 标签
   wordCount: {
@@ -307,8 +308,9 @@ schema.statics.publishDocumentByDid = async (did) => {
       type: type[0]
     }
   });
+  //是否需要审核
   const needReview = await documentsObj.beta.getReviewStatusAndCreateReviewLog();
-  await documentsObj.beta.setReviewStatus(needReview);
+  await documentsObj.beta.setReviewStatus(!needReview);
 };
 
 /*
@@ -724,6 +726,7 @@ schema.statics.checkGlobalPostPermission = async (uid, source, type = 'stable') 
 * */
 schema.methods.getGlobalPostReviewStatus = async function() {
   const {source, uid} = this;
+  const UsersPersonalModel = mongoose.model('usersPersonal');
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
   const UsersGeneralModel = mongoose.model('usersGeneral');
@@ -796,7 +799,7 @@ schema.methods.getGlobalPostReviewStatus = async function() {
 * */
 schema.methods.getVerifyPhoneNumberReviewStatus = async function() {
   const UsersPersonalModel = mongoose.model('usersPersonal');
-  if(await UsersPersonalModel.shouldVerifyPhoneNumber(this.uid)) {
+  if(!await UsersPersonalModel.shouldVerifyPhoneNumber(this.uid)) {
     return {
       needReview: true,
       type: 'unverifiedPhone',
@@ -846,6 +849,7 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function() {
     reviewStatus = await this.getKeywordsReviewStatus();
   }
   const {needReview, reason, type} = reviewStatus;
+  //如果需要审核，就生成审核记录
   if(needReview) {
     await ReviewModel.newDocumentReview(type, this._id, this.uid, reason);
   }

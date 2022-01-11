@@ -67,7 +67,8 @@ schema.statics.newReview = async (type, post, user, reason) => {
   }).save();
 };
 
-schema.statics.newDocumentReview = async (type, innerId, uid, reason) => {
+//生成新的document审核
+schema.statics.newDocumentReview = async (type, documentId, uid, reason) => {
   const ReviewModel = mongoose.model('reviews');
   const SettingModel = mongoose.model('settings');
   const review = ReviewModel({
@@ -274,7 +275,7 @@ schema.statics.autoPushToReview = async function(post) {
       return true;
     }
 
-    
+
     const fid = post.mainForumsId[0];
     const forum = await ForumModel.findOne({ fid });
     const currentPostType = post.type;
@@ -305,7 +306,7 @@ schema.statics.autoPushToReview = async function(post) {
         return true;
       }*/
     }
-    
+
     // 六、专业审核设置了送审规则（按角色和等级的关系送审）
     const forumContentSettings = forumReviewSettings.content;
     if(forumContentSettings.range === "only_thread" && currentPostType === "thread"

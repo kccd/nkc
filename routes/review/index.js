@@ -12,6 +12,7 @@ router
       disabled: false,
       mainForumsId: {$ne: recycleId}
     };
+    //superModerator 专家权限
     if(!ctx.permission("superModerator")) {
       const forums = await db.ForumModel.find({moderators: user.uid});
       const fid = forums.map(f => f.fid);
@@ -19,6 +20,7 @@ router
         $in: fid
       }
     }
+    //查找出 未审核 未禁用的post和document
     const count = await db.PostModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, 100);
     let posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);

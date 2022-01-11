@@ -1161,6 +1161,7 @@ export default {
           } else if (r.mediaType === "mediaVideo" || r.mediaType === "mediaAudio" ) {
             window.open(`/r/${r.rid}`);
           } else if(r.mediaType === "mediaAttachment") {
+
             this.$refs.resourceInfo.open({rid: r.rid});
           }
         }
