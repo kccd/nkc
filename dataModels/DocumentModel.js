@@ -934,7 +934,7 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function() {
   return needReview;
 }
 
-// 设置审核状态，生成审核记录
+// 设置审核状态
 schema.methods.setReviewStatus = async function(reviewed) {
   await this.updateOne({
     $set: {
