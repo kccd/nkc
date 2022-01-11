@@ -10,6 +10,10 @@ block content
       .col-xs-12.col-md-9
         .p-b-1
           .paging-button.pointer
+            a.radius-left.button(@click="selectReviewType('post')" :class="{'active': reviewType === 'post'}") post表
+          .paging-button.pointer
+            a.radius-left.button(@click="selectReviewType('document')" :class="{'active': reviewType === 'document'}") document表
+          .paging-button.pointer
             a.radius-left.button(@click="selectAll") 全选
             a.button(@click="chooseAll(true)") 通过已选
             a.button(@click="chooseAll(false)") 不通过已选

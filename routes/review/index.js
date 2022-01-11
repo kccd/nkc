@@ -4,7 +4,7 @@ router
   .get("/", async (ctx, next) => {
     ctx.template = "review/review.pug";
     const {nkcModules, data, db, query} = ctx;
-    const {page=0} = query;
+    const {page=0, type = 'post'} = query;
     const {user} = data;
     const recycleId = await db.SettingModel.getRecycleId();
     const q = {
@@ -20,71 +20,122 @@ router
         $in: fid
       }
     }
-    //查找出 未审核 未禁用的post和document
-    const count = await db.PostModel.countDocuments(q);
-    const paging = nkcModules.apiFunction.paging(page, count, 100);
-    let posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-    posts = await db.PostModel.extendPosts(posts, {
-      uid: data.user?data.user.uid: '',
-      visitor: data.user
-    });
+    const m = {reviewed: false, status: 'normal', type: 'stable'};
+    //查找出 未审核 未禁用 未退修的post和document
+    const postCount = await db.PostModel.countDocuments(q);
+    const documentCount = await db.DocumentModel.countDocuments(m);
+    const paging = nkcModules.apiFunction.paging(page, type === 'post'?postCount:documentCount, 100);
     data.results = [];
-    const tid = new Set(), uid = new Set();
-    for(const post of posts) {
-      tid.add(post.tid);
-      uid.add(post.uid);
-    }
-    let threads = await db.ThreadModel.find({tid: {$in: [...tid]}, disabled: false});
-    threads = await db.ThreadModel.extendThreads(threads, {
-      lastPost: false,
-      lastPostUser: false,
-      forum: true,
-      category: false,
-      firstPostResource: false
-    });
-    const users = await db.UserModel.find({uid: {$in: [...uid]}});
-    const usersObj = {};
-    const threadsObj = {};
-    users.map(user => {
-      usersObj[user.uid] = user;
-    });
-    threads.map(thread => {
-      threadsObj[thread.tid] = thread;
-    });
-    for(const post of posts) {
-      const thread = threadsObj[post.tid];
-      if(!thread) continue;
-      let user;
-      if(post.anonymous) {
-        thread.uid = "";
-        post.uid = "";
-        post.uidlm = "";
-      } else {
-        user = usersObj[post.uid];
-        if(!user) continue;
-      }
-      let type, link;
-      if(thread.oc === post.pid) {
-        if(thread.recycleMark) {
-          continue;
-        }
-        type = "thread";
-        link = `/t/${thread.tid}`;
-      } else {
-        type = "post";
-        link = await db.PostModel.getUrl(post);
-      }
-      // 从reviews表中读出送审原因
-      const reviewRecord = await db.ReviewModel.findOne({ pid: post.pid }).sort({ toc: -1 }).limit(1);
-      data.results.push({
-        post,
-        user,
-        thread,
-        type,
-        link,
-        reason: reviewRecord? reviewRecord.reason : ""
+    if(type === 'post') {
+      let posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+      posts = await db.PostModel.extendPosts(posts, {
+        uid: data.user?data.user.uid: '',
+        visitor: data.user
       });
+      const tid = new Set(), uid = new Set();
+      for(const post of posts) {
+        tid.add(post.tid);
+        uid.add(post.uid);
+      }
+      let threads = await db.ThreadModel.find({tid: {$in: [...tid]}, disabled: false});
+      threads = await db.ThreadModel.extendThreads(threads, {
+        lastPost: false,
+        lastPostUser: false,
+        forum: true,
+        category: false,
+        firstPostResource: false
+      });
+      const users = await db.UserModel.find({uid: {$in: [...uid]}});
+      const usersObj = {};
+      const threadsObj = {};
+      users.map(user => {
+        usersObj[user.uid] = user;
+      });
+      threads.map(thread => {
+        threadsObj[thread.tid] = thread;
+      });
+      for(const post of posts) {
+        const thread = threadsObj[post.tid];
+        if(!thread) continue;
+        let user;
+        if(post.anonymous) {
+          thread.uid = "";
+          post.uid = "";
+          post.uidlm = "";
+        } else {
+          user = usersObj[post.uid];
+          if(!user) continue;
+        }
+        let type, link;
+        if(thread.oc === post.pid) {
+          if(thread.recycleMark) {
+            continue;
+          }
+          type = "thread";
+          link = `/t/${thread.tid}`;
+        } else {
+          type = "post";
+          link = await db.PostModel.getUrl(post);
+        }
+        // 从reviews表中读出送审原因
+        const reviewRecord = await db.ReviewModel.findOne({ pid: post.pid }).sort({ toc: -1 }).limit(1);
+        data.results.push({
+          post,
+          user,
+          thread,
+          type,
+          link,
+          reason: reviewRecord? reviewRecord.reason : "",
+          reviewType: 'post'
+        });
+      }
+    } else {
+      let documents = await db.DocumentModel.find(m, {
+        _id: 1,
+        uid: 1,
+        did: 1,
+        toc: 1,
+        title: 1,
+        content: 1,
+      }).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+      // documents = await db.DocumentModel.extendDocuments(documents, {
+      //   uid: data.user?data.user.uid:'',
+      //   visitor: data.user,
+      // });
+      const docId = new Set();
+      const uid = new Set();
+      for(const document of documents) {
+        docId.add(document.did);
+        uid.add(document.uid);
+      }
+      let articles = await db.ArticleModel.find({did: {$in: [...docId]}});
+      articles = await db.ArticleModel.extendArticles(articles);
+      const users = await db.UserModel.find({uid: {$in: [...uid]}});
+      const usersObj = {};
+      const articleObj = {};
+      users.map(user => {
+        usersObj[user.uid] = user;
+      })
+      articles.map(article => {
+        articleObj[article.did] = article;
+      })
+      for(const document of documents) {
+        const article =  articleObj[document.did];
+        if(!article) continue;
+        let user = usersObj[document.uid];
+        if(!user) continue;
+        //获取送审原因
+        const reviewRecord = await  db.ReviewModel.findOne({docId: document._id}).sort({toc: -1}).limit(1);
+        data.results.push({
+          document,
+          article,
+          user,
+          reason: reviewRecord?reviewRecord.reason : '',
+          reviewType: 'document'
+        })
+      }
     }
+    console.log('results', data.results);
     data.paging = paging;
     await next();
   })

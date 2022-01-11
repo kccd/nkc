@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const {getUrl, timeFormat} = require("../nkcModules/tools");
 const schema = new mongoose.Schema({
   _id: String,
   toc: {
@@ -138,5 +139,75 @@ schema.methods.getBetaDocumentContent = async function() {
   const DocumentModel = mongoose.model('documents');
   const {article: documentSource} = await DocumentModel.getDocumentSources();
   return DocumentModel.getBetaDocumentContentBySource(documentSource, this._id);
+
 };
+
+/*
+* 拓展articles
+* */
+schema.statics.extendArticles = async function(articles) {
+  const ArticleModel = mongoose.model('articles');
+  const DocumentModel = mongoose.model('documents');
+  const BooksModel = mongoose.model('books');
+  const {article: documentSource} = await DocumentModel.getDocumentSources();
+  const {timeFormat, getUrl} = require('../nkcModules/tools');
+  const articlesId = [];
+  for(const article of articles) {
+    articlesId.push(article._id);
+  }
+  const documents = await DocumentModel.find({
+    type: {
+      $in: ['beta', 'stable']
+    },
+    source: documentSource,
+    sid: {
+      $in: articlesId
+    }
+  });
+  const articlesObj = {};
+  for(const d of documents) {
+    const {type, sid} = d;
+    if (!articlesObj[sid]) articlesObj[sid] = {};
+    articlesObj[sid][type] = d;
+  }
+  const results = [];
+  const bookObj = {};
+  const books = await BooksModel.find({list: {$in: [articlesId]}});
+  for(const book of books) {
+    articlesId.map(id => {
+      if(book.list.includes(id)) {
+        bookObj[id] = book;
+        return;
+      }
+    })
+  }
+  for(const article of articles) {
+    const {
+      _id,
+      toc,
+      uid,
+    } = article;
+    const articleObj = articlesObj[_id];
+    if(!articleObj) continue;
+    const betaDocument = articlesObj[_id].beta;
+    const stableDocument = articlesObj[_id].stable;
+    if(!stableDocument && !betaDocument) {
+      continue;
+    }
+    const document = stableDocument || betaDocument;
+    const {title, did} = document;
+    const result = {
+      _id,
+      uid,
+      published: !!stableDocument,
+      hasBeta: !!betaDocument,
+      title: title || '未填写标题',
+      url: getUrl('book', bookObj[article._id]._id),
+      time: timeFormat(toc),
+      did
+    };
+    results.push(result);
+  }
+  return results;
+}
 module.exports = mongoose.model('articles', schema);

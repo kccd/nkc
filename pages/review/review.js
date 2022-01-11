@@ -24,7 +24,8 @@ var app = new Vue({
     selectedPid:[],
     showInputPid: [],
     pid: pid,
-    review: review
+    review: review,
+    reviewType: 'post',
   },
   methods: {
     selectAll: function() {
@@ -117,6 +118,11 @@ var app = new Vue({
         var reviewData = this.review[p];
         reviewData.pass = type;
       }
+    },
+    //选择审核类型
+    selectReviewType(type) {
+      this.reviewType = type;
+      window.location.href = `/review?type=${type}`;
     }
   }
 });

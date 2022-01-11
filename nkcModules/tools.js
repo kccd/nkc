@@ -205,6 +205,9 @@ var Tools = function() {
       case 'editBookArticle': {
         return '/creation/articles/editor?bid=' + id + '&aid=' + size;
       }
+      case 'book': {
+        return '/book/' + id;
+      }
     }
   };
   self.getAnonymousInfo = function() {

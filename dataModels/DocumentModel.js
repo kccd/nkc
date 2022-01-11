@@ -200,6 +200,7 @@ schema.statics.createBetaDocument = async (props) => {
     toc,
     source,
     sid,
+    reviewed = false,
   } = props;
   const DocumentModel = mongoose.model('documents');
   const AttachmentModel = mongoose.model('attachments');
@@ -225,6 +226,7 @@ schema.statics.createBetaDocument = async (props) => {
     type: 'beta',
     source,
     sid,
+    reviewed,
   });
   await document.save();
   await document.updateResourceReferences();
@@ -870,6 +872,13 @@ schema.methods.setReviewStatus = async function(reviewed) {
     }
   });
 };
+
+/*
+* 拓展document
+* */
+schema.statics.extendDocuments = async function(documents) {
+  return documents;
+}
 
 // 匿名发表相关
 
