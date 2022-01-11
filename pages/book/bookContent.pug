@@ -23,6 +23,7 @@ block content
         //-.book-content-cover
           img(src=data.bookContent.coverUrl)
         .book-content-content!=data.bookContent.content
+  .hidden#data=objToStr({note: data.bookContent.note})
 block scripts
   include ../publicModules/nkcSource
   include ../publicModules/NKCHighlighter/NKCHighlighter

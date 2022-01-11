@@ -69,18 +69,18 @@ const schema = new Schema({
   collection: 'notes'
 });
 
-schema.statics.getNotesBySource = async (source, sid, cv = null) => {
-  const NoteModel = mongoose.model('notes');
-  const notes = await NoteModel.find({
-    type: source,
-    targetId: sid,
-    cv,
-  }).sort({toc: 1});
-  return {
-    type: note.type,
-    targetId: note.targetId,
-    notes: notes
+schema.statics.getNotesByDocId = async (docId) => {
+  let notes = [];
+  if(docId) {
+    const NoteModel = mongoose.model('notes');
+    notes = await NoteModel.find({
+      type: 'document',
+      targetId: docId,
+      cv: null
+    }).sort({toc: 1});
   }
+
+  return notes;
 };
 
 schema.statics.getNotesByPost = async (post) => {

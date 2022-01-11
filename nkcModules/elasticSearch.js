@@ -110,7 +110,12 @@ func.init = async () => {
 func.save = async (docType, document) => {
   const apiFunction = require("../nkcModules/apiFunction");
   const FundApplicationFormModel = require("../dataModels/FundApplicationFormModel");
-  if(!["user", "post", "thread", "column", "columnPage", "resource"].includes(docType)) throwErr(500, "docType error");
+  if(
+    ![
+      "user", "post", "thread", "column", "columnPage", "resource",
+      "document_article"
+    ].includes(docType)
+  ) throwErr(500, "docType error");
 
   let aid = "";
   const {
@@ -148,6 +153,8 @@ func.save = async (docType, document) => {
     id = `columnPage_${tid}`;
   } else if(docType === "resource") {
     id = `resource_${tid}`;
+  } else if(docType === 'document_article') {
+    id = `document_${tid}`;
   }
 
   return await client.index({
@@ -291,7 +298,7 @@ func.search = async (t, c, options) => {
                   must: [
                     {
                       match: {
-                        docType: "post"
+                        docType: 'post'
                       }
                     },
                     {
@@ -386,7 +393,32 @@ func.search = async (t, c, options) => {
                     }
                   ]
                 }
-              }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: 'document_article'
+                      }
+                    },
+                    {
+                      bool: {
+                        should: [
+                          createMatch("title", c, 5, relation),
+                          createMatch("content", c, 2, relation),
+                          createMatch("pid", c, 100, relation),
+                          createMatch("authors", c, 80, relation),
+                          createMatch("abstractEN", c, 50, relation),
+                          createMatch("abstractCN", c, 50, relation),
+                          createMatch("keywordsEN", c, 80, relation),
+                          createMatch("keywordsCN", c, 80, relation),
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
             ]
           }
         }

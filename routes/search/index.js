@@ -139,6 +139,7 @@ router
       const columnId = new Set();
       const columnPageId = new Set();
       const resourceId = new Set();
+      const documentId = new Set();
       let threadCategoriesId = [];
       const highlightObj = {};
       results.map(r => {
@@ -153,10 +154,12 @@ router
           columnPageId.add(r.tid);
         } else if(r.docType === "resource") {
           resourceId.add(r.tid);
+        } else if(r.docType === 'document_article') {
+          documentId.add(r.tid);
         }
 
         if(r.highlight) {
-          if(r.docType === "post" || r.docType === "thread") {
+          if(r.docType === "post" || r.docType === "thread" || r.docType === 'document_article') {
             highlightObj[r.pid + "_title"] = r.highlight.title;
             if(r.highlight.content) {
               highlightObj[r.pid + "_content"] = "内容：" + r.highlight.content;
@@ -271,6 +274,16 @@ router
         const category = threadCategories[i];
         threadCategoriesObj[category.nodeId] = category;
       }
+
+      const documents = await db.DocumentModel.find({
+        _id: {$in: [...documentId]},
+        type: 'stable'
+      });
+      const documentsObj = {};
+      for(const d of documents) {
+        documentsObj[d.did] = d;
+      }
+
       // 根据文档类型，拓展数据
       loop1:
       for(const result of results) {
@@ -409,6 +422,9 @@ router
           };
           r.t = nkcRender.htmlFilter(r.t);
           r.c = nkcRender.htmlFilter(r.c);
+        } else if(docType === 'document_article') {
+          // 图书搜索
+          continue;
         }
         data.results.push(r);
       }
