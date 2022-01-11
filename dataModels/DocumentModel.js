@@ -15,6 +15,12 @@ const schema = new mongoose.Schema({
     required: true,
     index: 1
   },
+  // 当前文档的状态 normal: 正常, disabled: 被屏蔽, faulty: 退修
+  status: {
+    type: String,
+    default: 'normal',
+    index: 1
+  },
   // 文档的创建人
   uid: {
     type: String,
