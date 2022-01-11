@@ -1,149 +1,278 @@
 <template lang="pug">
-  .creation-center-book
-    bread-crumb(:list="navList")
-    .row(v-if="book")
-      .col-xs-12.col-md-6.col-md-offset-3
-        .creation-center-book-container
-          .creation-center-book-cover
-            img(:src="book.coverUrl")
-          .creation-center-book-name {{book.name}}
-          .creation-center-book-description {{book.description}}
-          .creation-center-book-list
-            .creation-center-book-list-item(v-for="l in bookList")
-              .creation-center-book-list-item-name(@click="clickArticleTitle(l)")
-                span(v-if="!l.published") [未发布]
-                span(v-else-if="l.hasBeta") [编辑中]
-                | {{l.title}}
-              .creation-center-book-list-item-time {{l.time}}
-          button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('articleEditor', {bid})") 撰写文章
-          button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('bookEditor', {bid})") 设置
-
+.creation-center-book
+  bread-crumb(:list="navList")
+  .row(v-if="book")
+    .col-xs-12.col-md-6.col-md-offset-3
+      .creation-center-book-container
+        .creation-center-book-cover
+          img(:src="book.coverUrl")
+        .creation-center-book-name {{ book.name }}
+        .creation-center-book-description {{ book.description }}
+        .creation-center-book-list
+          Tree(:data="extendedData")
+        button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
+          @click="navToPage('articleEditor', { bid })"
+        ) 撰写文章
+        button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
+          @click="navToPage('bookEditor', { bid })"
+        ) 设置
+  //- MoveDirectoryDialog(v-show="showMoveCharter", @close="cancel")
+  MoveDirectoryDialog(:data="data") 
 </template>
 
 <style lang="less" scoped>
-  @import '../../../publicModules/base';
-  .creation-center-book{
-    .creation-center-book-container{
-      .creation-center-book-cover{
-        img{
-          width: 100%;
+* {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.articleTitl {
+  cursor: pointer;
+  color: black !important;
+  font-size: 1.2rem !important;
+}
+@import "../../../publicModules/base";
+.creation-center-book {
+  .creation-center-book-container {
+    .creation-center-book-cover {
+      img {
+        width: 100%;
+      }
+      margin-bottom: 2rem;
+    }
+    .creation-center-book-name {
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .creation-center-book-description {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .creation-center-book-list-selector {
+    }
+    .creation-center-book-list {
+      margin-bottom: 2rem;
+      .creation-center-book-list-item {
+        @itemHeight: 3rem;
+        @timeWidth: 11rem;
+        padding-right: @timeWidth + 1rem;
+        line-height: @itemHeight;
+        // height: @itemHeight;
+        overflow: hidden;
+        position: relative;
+        background-color: #fff;
+        // cursor: pointer;
+        transition: all 200ms;
+        &:hover {
+          background-color: #f4f4f4;
         }
-        margin-bottom: 2rem;
-      }
-      .creation-center-book-name{
-        font-size: 2rem;
-        text-align: center;
-        margin-bottom: 1rem;
-      }
-      .creation-center-book-description{
-        text-align: center;
-        margin-bottom: 2rem;
-      }
-      .creation-center-book-list-selector{
-
-      }
-      .creation-center-book-list{
-        margin-bottom: 2rem;
-        .creation-center-book-list-item{
-          @itemHeight: 3rem;
-          @timeWidth: 11rem;
-          padding-right: @timeWidth + 1rem;
-          line-height: @itemHeight;
-          height: @itemHeight;
-          overflow: hidden;
-          position: relative;
-          background-color: #fff;
-          cursor: pointer;
-          transition: background-color 200ms;
-          &:hover{
-            background-color: #f4f4f4;
-          }
-          .creation-center-book-list-item-name{
+        .creation-center-book-list-item-name {
+          display: inline-block;
+          height: 100%;
+          .hideText(@line: 1);
+          font-size: 1.3rem;
+          span {
             display: inline-block;
-            height: 100%;
-            .hideText(@line: 1);
-            font-size: 1.3rem;
-            span{
-              font-size: 1rem;
-              color: @primary;
-              margin-right: 0.5rem;
-            }
+            font-size: 1rem;
+            color: @primary;
+            margin-right: 0.5rem;
           }
-          .creation-center-book-list-item-time{
-            width: @timeWidth;
-            position: absolute;
-            top: 0;
-            right: 0;
-            height: @itemHeight;
+          .creation-gt {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-left: 1rem;
+            font-size: 1rem;
+          }
+        }
+        .creation-center-book-list-item-time {
+          // width: 26rem;
+          text-align: right;
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: @itemHeight;
+          span {
+            cursor: pointer;
+            font-size: 1rem;
+            margin-left: 10px;
+            text-align: right;
+          }
+        }
+        .creation-add-list {
+          background-color: rgba(red, green, blue, 0.2);
+          width: 145%;
+          li {
+            text-align: center;
+            line-height: 2rem;
+            // height: 80%;
+            font-size: 1rem;
+          }
+          .add-chapter {
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+          }
+        }
+        .children {
+          display: flex;
+          .child {
+            display: flex;
+            justify-content: space-between;
           }
         }
       }
     }
   }
+}
 </style>
 
 <script>
-  import {nkcAPI} from "../../../lib/js/netAPI";
-  export default {
-    data: () => ({
-      bid: '',
-      book: null,
-      bookList: [],
-    }),
-    computed: {
-      navList() {
-        const {book, bid} = this;
-        return [
+import { nkcAPI } from "../../../lib/js/netAPI";
+import MoveDirectoryDialog from "../../component/MoveDirectoryDialog.vue";
+import Tree from "../../component/tree/Tree.vue";
+export default {
+  components: {
+    MoveDirectoryDialog,
+    Tree,
+  },
+  data: () => ({
+    data: [
+      {
+        type: "text",
+        value: "第一章，阿斯拉达激发",
+        published: false,
+        time: "2022/1/10 10:57",
+        child: [
           {
-            name: '文档创作',
-            page: 'books'
+            type: "article",
+            value: "articleId",
+            published: false,
+            time: "2022/1/10 10:57",
           },
           {
-            name: book? book.name: `加载中...`
-          }
-        ]
-      }
-    },
-    mounted() {
-      this.bid = this.$route.params.bid;
-      this.getBook();
-    },
-    methods: {
-      navToPage(name, query = {}, params = {}) {
-        this.$router.push({
-          name,
-          query,
-          params,
-        });
+            type: "post",
+            value: "postId",
+            published: false,
+            time: "2022/1/10 10:57",
+            child: [
+              {
+                type: "post",
+                value: "postId",
+                published: false,
+                time: "2022/1/10 10:57",
+              },
+            ],
+          },
+          {
+            type: "url",
+            value: "https://www.google.com",
+            published: false,
+            time: "2022/1/10 10:57",
+          },
+        ],
       },
-      clickArticleTitle(l) {
-        const {bid} = this;
-        const aid = l._id;
-        if(!l.published) {
-          this.navToPage('articleEditor', {bid, aid})
-        } else {
-          this.navToPage('bookContent', {}, {bid, aid})
+      {
+        type: "article",
+        value: "articleId",
+        published: false,
+        time: "2022/1/10 10:57",
+        child: [
+          {
+            type: "article",
+            value: "articleId",
+            published: false,
+            time: "2022/1/10 10:57",
+          },
+        ],
+      },
+    ],
+    showMoveCharter: false,
+    more: false,
+    bid: "",
+    book: null,
+    bookList: [],
+    chapters: [],
+    mouseEnter: [],
+    clientX: "",
+    clientY: "",
+  }),
+  computed: {
+    navList() {
+      const { book, bid } = this;
+      return [
+        {
+          name: "文档创作",
+          page: "books",
+        },
+        {
+          name: book ? book.name : `加载中...`,
+        },
+      ];
+    },
+    extendedData() {
+      function res(data) {
+        for (let i = 0; i < data.length; i++) {
+          data[i].isMove = false;
+          console.log(data[i]);
+          if (data[i].child?.length > 0) {
+            res(data[i].child);
+          }
         }
-      },
-      switchContent(id) {
-        this.$router.push({
-          name: 'bookContent',
-          params: {
-            bid: this.bid,
-            id,
-          }
-        })
-      },
-      getBook() {
-        let url = `/creation/book/${this.bid}`;
-        const self = this;
-        nkcAPI(url, 'GET')
-          .then(data => {
-            self.book = data.bookData;
-            self.bookList = data.bookList;
-          })
-          .catch(sweetError);
       }
-    }
-  }
+      res(this.data)
+      return this.data
+    },
+  },
+  provide() {
+    return {
+      datas: this.data,
+    };
+  },
+  mounted() {
+    // console.log(extendedData())
+    this.bid = this.$route.params.bid;
+    this.getBook();
+  },
+  methods: {
+    moveChapter(l) {
+      this.showMoveCharter = !this.showMoveCharter;
+    },
+    cancel() {
+      this.showMoveCharter = false;
+    },
+    navToPage(name, query = {}, params = {}) {
+      this.$router.push({
+        name,
+        query,
+        params,
+      });
+    },
+
+    switchContent(id) {
+      this.$router.push({
+        name: "bookContent",
+        params: {
+          bid: this.bid,
+          id,
+        },
+      });
+    },
+    getBook() {
+      let url = `/creation/book/${this.bid}`;
+      const self = this;
+      nkcAPI(url, "GET")
+        .then((data) => {
+          console.log(data);
+          self.book = data.bookData;
+          data.bookList.forEach((item) => {
+            self.mouseEnter.push({ hover: false, add: false, more: false });
+          });
+          self.bookList = data.bookList;
+          console.log(self.mouseEnter);
+        })
+        .catch(sweetError);
+    },
+  },
+};
 </script>

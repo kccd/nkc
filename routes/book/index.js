@@ -1,6 +1,7 @@
 const router = require('koa-router')();
 router
   .get('/:bid', async (ctx, next) => {
+    console.log(123131)
     const {query, params, data, db, nkcModules, state} = ctx;
     const {bid} = params;
     const {aid} = query;

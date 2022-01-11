@@ -65,9 +65,11 @@ schema.statics.createArticle = async (props) => {
   return article;
 }
 
-schema.methods.getBetaDocumentCoverId = async function() {
+schema.methods.getBetaDocumentCoverId = async function(options) {
+
   const DocumentModel = mongoose.model('documents');
   const {article: documentSource} = await DocumentModel.getDocumentSources();
+  console.log(' await DocumentModel.getDocumentSources()',await DocumentModel.getDocumentSources());
   const betaDocument = await DocumentModel.getBetaDocumentBySource(documentSource, this._id);
   return betaDocument? betaDocument.cover: '';
 };

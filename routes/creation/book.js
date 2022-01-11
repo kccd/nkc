@@ -5,7 +5,10 @@ router
     const {bid} = params;
     const {timeFormat, getUrl} = nkcModules.tools;
     const book = await db.BookModel.findOnly({_id: bid});
-    data.bookList = await book.getList();
+    // const document = await db.DocumentModel.findOnly({sid: bid});
+        // setUrl:undefined 使用内部默认 latestTitle =true 代表需要最新编辑的 title 
+    data.bookList = await book.getList({setUrl:'bookContent',latestTitle:true});
+    // data.bookList.document=document
     data.bookData = {
       _id: book._id,
       name: book.name,

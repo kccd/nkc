@@ -84,6 +84,23 @@ const schema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  chapters:{
+    type:[
+      {
+        name:String,
+        content:String,
+        creationTime:{
+          default:Date.now,
+          type:Date
+        },
+        lastModification:{
+          default:Date.now,
+          type:Date
+        }
+      }
+    ],
+    default:[]
+  },
   // 已经发送过 AT 消息的用户
   atUsers: {
     type: [

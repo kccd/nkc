@@ -1,3 +1,4 @@
+
 import router from './router';
 import App from './App';
 import Breadcrumb from '../lib/vue/Breadcrumb';

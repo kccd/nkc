@@ -13,18 +13,23 @@ router
         title,
         cover,
         content,
+        did,
+        _id
       } = await article.getBetaDocumentContent();
       data.article = {
         articleId: article._id,
         title,
         cover,
-        content
+        content,
+        did,
+        _id
       };
     }
     data.book = {
       _id: book._id,
       name: book.name
     };
+
     await next();
   })
   .post('/editor', async (ctx, next) => {
@@ -61,6 +66,8 @@ router
       }
     }
     data.articleCover = await article.getBetaDocumentCoverId();
+    // 写文章后返回信息
+    data.doucment = await db.DocumentModel.findOne({sid:article._id});
     data.articleId = article._id;
     await next();
   });

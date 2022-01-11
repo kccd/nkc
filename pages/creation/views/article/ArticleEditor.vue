@@ -7,7 +7,7 @@
       .m-t-1.m-b-3
         button.btn.btn-primary.m-r-05(@click="publish") 发布
         button.btn.btn-default(@click="saveArticle") 保存
-
+        button.btn.btn-default(@click="documentPreview") 预览
 </template>
 
 <script>
@@ -24,6 +24,9 @@
       coverFile: null,
       oldCoverFile: null,
       bookId: '',
+      id:'',
+      d_id:'',
+      notice:'',
       articleId: '',
       book: null,
       article: {
@@ -36,6 +39,7 @@
         title: true,
       },
       lockPost: false,
+      doucmentId:''
     }),
     computed: {
       type() {
@@ -73,26 +77,35 @@
       this.initData();
     },
     methods: {
+      documentPreview(){
+        const {doucmentId,bookId,articleId,id}=this
+        window.open(`/creation/document?_id=${id}&did=${doucmentId}&bid=${bookId}&aid=${articleId}`)
+      },
       initId() {
-        const {bid, aid} = this.$route.query;
+        const {bid, aid,notice} = this.$route.query;
         this.bookId = bid;
+        notice && (this.notice=notice)
         if(aid) {
           this.articleId = aid;
         }
       },
       initData() {
+        if(this.notice) return
         const self = this;
         const {bookId, articleId} = this;
         let url = `/creation/articles/editor?bid=${bookId}`;
         if(articleId) url += `&aid=${articleId}`;
         nkcAPI(url, 'GET')
           .then(data => {
+            console.log(data,'data')
             const {article, book} = data;
             if(article) {
-              const {title, content, cover} = article;
+              const {title, content, cover,did,_id} = article;
               self.article.title = title;
               self.article.content = content;
               self.article.cover = cover;
+              self.doucmentId=did
+              self.id=_id
             }
             self.book = book;
             self.articleId = articleId;
@@ -138,8 +151,15 @@
         formData.append('bookId', bookId);
         formData.append('article', JSON.stringify(article));
         formData.append('type', type);
-        return nkcUploadFile(`/creation/articles/editor`, 'POST', formData)
+        let url='/creation/articles/editor'
+        if(this.articleId){
+          url='/creation/addChapter'
+          formData.append('aid', this.articleId);
+        }
+        return nkcUploadFile(url, 'POST', formData)
           .then(data => {
+            console.log('data.document?._id',data.document?._id)
+            sessionStorage.document_id=data.document?._id
             self.oldCoverFile = self.coverFile;
             self.coverFile = null;
             const {articleId, articleCover} = data;

@@ -123,8 +123,9 @@ schema.methods.bindArticle = async function(articleId) {
   });
 }
 
-schema.methods.getList = async function() {
-  const articles = await this.extendArticlesById(this.list);
+schema.methods.getList = async function(options) {
+  let defaultOptions={setUrl:'bookContent', latestTitle:false}
+  const articles = await this.extendArticlesById(this.list, options || defaultOptions);
   const articlesObj = {};
   for(const a of articles) {
     articlesObj[a._id] = a;
@@ -137,8 +138,8 @@ schema.methods.getList = async function() {
   }
   return results;
 }
-
-schema.methods.extendArticlesById = async function(articlesId) {
+// 为了让预览能服用该方法，对该方法进行了传参，然后进行判断
+schema.methods.extendArticlesById = async function(articlesId,{setUrl='bookContent', latestTitle=false}) {
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
   const {timeFormat, getUrl} = require('../nkcModules/tools');
@@ -159,14 +160,36 @@ schema.methods.extendArticlesById = async function(articlesId) {
     if (!articlesObj[sid]) articlesObj[sid] = {};
     articlesObj[sid][type] = d;
   }
+// console.log(articlesObj,'articlesObj')
   const results = [];
   for(const article of articles) {
     const {
+      did,
       _id,
       toc,
       uid,
     } = article;
     const articleObj = articlesObj[_id];
+    // prevView 需要拿到最新编辑数据。根据 sid 进行查找，可能会出现多条 ，根据更改时间找到最新一条
+    let latestEditorResult;
+    if(latestTitle){
+      const documents = await DocumentModel.find({
+       sid:_id
+      });
+      let time
+      let latestEditor;
+      for (const obj of documents) {
+        if(!time){
+          time = obj.tlm;
+          latestEditor = obj
+        }else{
+          const objTimeToStr=obj.tlm.toString()
+          const timeToStr=time.toString()
+          new Date(objTimeToStr).getTime() > new Date(timeToStr).getTime() && (latestEditor = obj) && (time = obj.tlm)
+        }
+      }
+      latestEditorResult=latestEditor
+    }
     if(!articleObj) continue;
     const betaDocument = articlesObj[_id].beta;
     const stableDocument = articlesObj[_id].stable;
@@ -174,14 +197,15 @@ schema.methods.extendArticlesById = async function(articlesId) {
       continue;
     }
     const document = stableDocument || betaDocument;
-    const {title} = document;
+    const {title} = (latestTitle ? latestEditorResult : document);
+    // console.log('title',title);
     const result = {
       _id,
       uid,
       published: !!stableDocument,
       hasBeta: !!betaDocument,
       title: title || '未填写标题',
-      url: getUrl('bookContent', this._id, _id),
+      url: getUrl(setUrl, this._id, _id,did),
       time: timeFormat(toc)
     };
     results.push(result);

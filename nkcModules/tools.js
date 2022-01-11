@@ -2,7 +2,7 @@ var isNode = typeof window === 'undefined';
 
 var Tools = function() {
   var self = this;
-  self.getUrl = function(type, id, size) {
+  self.getUrl = function(type, id, size,did) {
     var fileDomain;
     if(isNode) {
       fileDomain = require('../config/server').fileDomain;
@@ -204,6 +204,9 @@ var Tools = function() {
       }
       case 'editBookArticle': {
         return '/creation/articles/editor?bid=' + id + '&aid=' + size;
+      }
+      case 'prevView': {
+        return `/creation/document?did=${did}&bid=${id}&aid=${size}`
       }
     }
   };
