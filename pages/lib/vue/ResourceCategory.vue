@@ -28,20 +28,19 @@
           input.input.radius-left(type="text" v-model.number="pageNumber")
           a.button.radius-right(@click="fastSelectPage") 确定
     .resource-container-header
-      .resource-uses
-        .resource-used(:class="{'active': resourceCategories === 'all'}" @click="selectUserCategory('all')") 全部
-        .resource-used(:class="{'active': resourceCategories === 'trash'}" v-if="watchType === 'category'" @click="selectUserCategory('trash')") 回收站
       .resource-categories
-        .categoryName(:class="{'active':resourceCategories === 'default'}" @click="selectUserCategory('default')") 默认
+        .categoryName(:class="{'active': resourceCategories === 'all'}" @click="selectUserCategory('all')") 全部
+        .categoryName(:class="{'active': resourceCategories === 'trash'}" v-if="watchType === 'category'" @click="selectUserCategory('trash')") 回收站
+        .categoryName(:class="{'active':resourceCategories === 'default'}" @click="selectUserCategory('default')") 未分组
       .fa.fa-spinner.fa-spin.fa-fw(v-if="categoryLoading")
-      .resource-categories(v-for="c in categories" v-else)
-        .categoryName(:class="{'active':resourceCategories === c._id}"
+      .resource-categories(v-else)
+        .categoryName(v-for="c in categories" :class="{'active':resourceCategories === c._id}"
           :title="'创建时间: ' + timeFormat(c.toc) + '\\n分组名: '+ c.name + '\\n描述: ' + c.description"
           @click="selectUserCategory(c._id)") {{c.name}}
-        .fa.fa-refresh(title="重命名" @click="editResourceCategory(c, 'modify')" v-if="editBtn")
-        .fa.fa-remove(title="删除" @click="editResourceCategory(c, 'delete')" v-if="editBtn")
-      .add-button(@click="editResourceCategory('', 'create')" v-if="watchType === 'category'") 添加
-      .add-button(@click="editCategory" v-if="!editBtn && watchType === 'category'") 编辑
+        //.fa.fa-refresh(title="重命名" @click="editResourceCategory(c, 'modify')" v-if="editBtn")
+        //.fa.fa-remove(title="删除" @click="editResourceCategory(c, 'delete')" v-if="editBtn")
+      button.m-r-05.btn.btn-default.btn-xs(@click="editResourceCategory('', 'create')" v-if="watchType === 'category'") 创建分组
+      button.btn.btn-default.btn-xs(@click="editCategory" v-if="!editBtn && watchType === 'category'") 管理分组
       .add-button(@click="editFinish" v-if="editBtn && watchType === 'category'") 完成
     .resource-category-content(v-if="pageType === 'list'")
       .resource-category-header
@@ -153,6 +152,7 @@
 
 </template>
 <style lang="less" scoped>
+  @import "../../publicModules/base";
   .resource-category-container {
     user-select: none;
     .resource-container-header {
@@ -167,32 +167,32 @@
           border: 1px #ccc solid;
           border-radius: 3px;
           margin: 0 0.2rem;
-          background: #9baec8;
+          //background: #9baec8;
           color: #fff;
           cursor: pointer;
           &:nth-of-type(1){
             margin-left: 0;
           }
           &:hover {
-            background: #2b90d9;
+            //background: #2b90d9;
           }
         }
         .active {
-          background: #2b90d9;
+          //background: #2b90d9;
+        }
+      }
+      .categoryName {
+        padding: 0 1rem 0 0;
+        display: inline-block;
+        &:hover {
+          color: @primary;
         }
       }
       .resource-categories {
         display: inline-block;
         padding: 0.2rem 0.2rem 0.2rem 0;
         cursor: pointer;
-        margin-right: 0.4rem;
-        .categoryName {
-          padding: 0.2rem;
-          display: inline-block;
-          &:hover {
-            color: #2b90d9;
-          }
-        }
+        //margin-right: 0.4rem;
         .fa {
           line-height: 50%;
           display: inline-block;
