@@ -1,5 +1,6 @@
 const mongoose = require('../settings/database');
 const cheerio = require('cheerio');
+const markNotes = require("../nkcModules/nkcRender/markNotes");
 const schema = new mongoose.Schema({
   // 当前文档的 ID，唯一
   _id: Number,
@@ -279,8 +280,11 @@ schema.methods.setAsHistoryDocument = async function() {
 * */
 schema.statics.createBetaDocumentByStableDocument = async function(did) {
   const DocumentModel = mongoose.model('documents');
+  const NoteModel = mongoose.model('notes');
+  const SettingModel = mongoose.model('settings');
   const stableDocument = await DocumentModel.findOne({did, type: 'stable'});
   if(!stableDocument) throwErr(500, `文档 ${did} 不存在正式版，无法生成编辑版`);
+  const stableNotes = await NoteModel.getNotesByDocId(stableDocument._id);
   const originDocument = stableDocument.toObject();
   delete originDocument._v;
   originDocument.type = 'beta';
@@ -288,6 +292,20 @@ schema.statics.createBetaDocumentByStableDocument = async function(did) {
   originDocument.toc = new Date();
   const betaDocument = DocumentModel(originDocument);
   await betaDocument.save();
+  // 复制笔记选择等信息
+  for(const note of stableNotes) {
+    let newNote = note.toObject();
+    delete newNote._id;
+    delete newNote.__v;
+    newNote._id = await SettingModel.operateSystemID('notes', 1);
+    newNote = NoteModel(newNote);
+    newNote.save();
+    await note.updateOne({
+      $set: {
+        targetId: betaDocument._id
+      }
+    });
+  }
   return betaDocument;
 };
 
@@ -315,6 +333,7 @@ schema.statics.publishDocumentByDid = async (did) => {
   });
   const needReview = await documentsObj.beta.getReviewStatusAndCreateReviewLog();
   await documentsObj.beta.setReviewStatus(needReview);
+  await documentsObj.beta.pushToSearchDB();
 };
 
 /*
@@ -355,10 +374,11 @@ schema.statics.updateDocumentByDid = async (did, props) => {
   if(!betaDocument) {
     betaDocument = await DocumentModel.createBetaDocumentByStableDocument(did);
   }
+  const html = await DocumentModel.updateNoteInfoAndClearNoteMark(content, betaDocument._id);
   await betaDocument.updateOne({
     $set: {
       title,
-      content,
+      content: html,
       cover,
       abstract,
       abstractEN,
@@ -445,6 +465,57 @@ schema.statics.getBetaDocumentContentBySource = async (source, sid) => {
   }
   return betaDocument;
 };
+
+
+/*
+* 获取编辑版内容
+* */
+schema.statics.getEditorBetaDocumentContentBySource = async (source, sid) => {
+  const DocumentModel = mongoose.model('documents');
+  const betaDocument = await DocumentModel.getBetaDocumentContentBySource(source, sid);
+  await betaDocument.insertNoteMarkToContent();
+  return betaDocument;
+}
+
+/*
+* 插入自定义笔记标签到 document content 中
+* */
+schema.methods.insertNoteMarkToContent = async function() {
+  const {_id} = this;
+  const NoteModel = mongoose.model('notes');
+  const notes = await NoteModel.getNotesByDocId(_id);
+  this.content = markNotes.setMark(this.content, notes.map(note => note.toObject()));
+}
+
+/*
+* 更新笔记选区信息并清除笔记标签
+* @param {String} content
+* @param {Number} docId
+* */
+schema.statics.updateNoteInfoAndClearNoteMark = async function(content, docId) {
+  const {html, notes} = markNotes.getMark(content);
+  const NoteModel = mongoose.model('notes');
+  const notesObj = {};
+  for(const n of notes) {
+    notesObj[n._id] = n;
+  }
+  const notesDB = await NoteModel.getNotesByDocId(docId);
+  for(const note of notesDB) {
+    const newNote = notesObj[note._id] || {
+      offset: 0,
+      length: 0,
+      content: note.content
+    };
+    await note.updateOne({
+      $set: {
+        'node.offset': newNote.offset,
+        'node.length': newNote.length,
+        newContent: newNote.content
+      }
+    });
+  }
+  return html;
+}
 
 /*
 * 根据来源获取渲染富文本之后的稳定版
@@ -732,6 +803,7 @@ schema.methods.getGlobalPostReviewStatus = async function() {
   const {source, uid} = this;
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
+  const UsersPersonalModel = mongoose.model('usersPersonal');
   const UsersGeneralModel = mongoose.model('usersGeneral');
   const documentPostSettings = await SettingModel.getSettings('documentPost');
   const {postReview} = documentPostSettings[this.source];
@@ -808,6 +880,10 @@ schema.methods.getVerifyPhoneNumberReviewStatus = async function() {
       type: 'unverifiedPhone',
       reason: '用户未验证手机号'
     }
+  } else {
+    return {
+      needReview: false
+    }
   }
 };
 
@@ -824,10 +900,10 @@ schema.methods.getKeywordsReviewStatus = async function() {
     title = '',
     abstract = '',
     abstractEN = '',
-    keywords = [],
-    keywordsEN = []
   } = this;
-  const documentContent = content + title + abstract + abstractEN + keywords.concat(keywordsEN).join(' ');
+  const keywords = this.keywords || [];
+  const keywordsEN = this.keywordsEN || [];
+  const documentContent = content + title + abstract + abstractEN + (keywords.concat(keywordsEN)).join(' ');
   const matchedKeywords = await ReviewModel.matchKeywords(documentContent, keywordGroupId);
   if(matchedKeywords.length > 0) {
     return {
@@ -869,25 +945,32 @@ schema.methods.setReviewStatus = async function(reviewed) {
 
 // 匿名发表相关
 
-// 更新数据
-schema.methods.updateData = async function(newData) {
-
-};
 // 同步到搜索数据库
 schema.methods.pushToSearchDB = async function() {
-
-};
-// 获取 html 内容中的笔记选区信息
-schema.methods.getNoteMarkInfo = async function() {
-
-};
-// 更新笔记选区信息
-schema.methods.updateNoteInfo = async function (note) {
-
-};
-// 更新内容
-schema.methods.updateContent = async function() {
-
+  const {
+    content,
+    title,
+    source,
+    toc,
+    uid,
+    did,
+    abstract,
+    abstractEN,
+    keywords,
+    keywordsEN
+  } = this;
+  const elasticSearch = require('../nkcModules/elasticSearch');
+  await elasticSearch.save(`document_${source}`, {
+    tid: did,
+    uid,
+    toc,
+    t: title,
+    c: content,
+    abstractEN: abstractEN,
+    abstractCN: abstract,
+    keywordsCN: keywords || [],
+    keywordsEN: keywordsEN || [],
+  });
 };
 
 module.exports = mongoose.model('documents', schema);

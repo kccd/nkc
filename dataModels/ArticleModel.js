@@ -109,6 +109,25 @@ schema.methods.publishArticle = async function() {
   await DocumentModel.publishDocumentByDid(did);
 }
 
+schema.methods.getStableDocId = async function () {
+  const {did} = this;
+  const DocumentModel = mongoose.model('documents');
+  const document = await DocumentModel.findOne({
+    did,
+    type: 'stable'
+  });
+  return document? document._id: null
+}
+
+schema.methods.getNote = async function() {
+  const NoteModel = mongoose.model('notes');
+  const stableDocId = await this.getStableDocId();
+  return {
+    type: 'document',
+    targetId: stableDocId,
+    notes: await NoteModel.getNotesByDocId(stableDocId)
+  }
+}
 /*
 * 保存 article
 * 将测试版变为历史版
@@ -134,9 +153,9 @@ schema.statics.checkArticleInfo = async (article) => {
   });
 }
 
-schema.methods.getBetaDocumentContent = async function() {
+schema.methods.getEditorBetaDocumentContent = async function() {
   const DocumentModel = mongoose.model('documents');
   const {article: documentSource} = await DocumentModel.getDocumentSources();
-  return DocumentModel.getBetaDocumentContentBySource(documentSource, this._id);
+  return DocumentModel.getEditorBetaDocumentContentBySource(documentSource, this._id);
 };
 module.exports = mongoose.model('articles', schema);

@@ -13,7 +13,7 @@ router
         title,
         cover,
         content,
-      } = await article.getBetaDocumentContent();
+      } = await article.getEditorBetaDocumentContent();
       data.article = {
         articleId: article._id,
         title,

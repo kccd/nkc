@@ -214,7 +214,8 @@ schema.methods.getContentById = async function(props) {
       mTime,
       title,
       content,
-      uid
+      uid,
+      note: await article.getNote()
     }
   }
 }
