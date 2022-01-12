@@ -1,6 +1,7 @@
 <template lang="pug">
   .creation-center-book
-    bread-crumb(:list="navList")
+    .m-b-2
+      bread-crumb(:list="navList")
     .row(v-if="book")
       .col-xs-12.col-md-6.col-md-offset-3
         .creation-center-book-container
@@ -23,13 +24,14 @@
 <style lang="less" scoped>
   @import '../../../publicModules/base';
   .creation-center-book{
-    .creation-center-book-container{
-      .creation-center-book-cover{
-        img{
-          width: 100%;
-        }
-        margin-bottom: 2rem;
+    .creation-center-book-cover{
+      width: 100%;
+      img{
+        width: 100%;
       }
+      margin-bottom: 2rem;
+    }
+    .creation-center-book-container{
       .creation-center-book-name{
         font-size: 2rem;
         text-align: center;
@@ -95,7 +97,7 @@
         const {book, bid} = this;
         return [
           {
-            name: '文档创作',
+            name: '图书创作',
             page: 'books'
           },
           {

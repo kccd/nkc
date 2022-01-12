@@ -4,9 +4,9 @@
         .creation-center-nav
           .creation-center-name(@click="navToPage('home')") 创作中心
           .creation-center-nav-list
-            .creation-center-nav-item(@click="navToPage('categories')") 资源管理
-            .creation-center-nav-item(@click="navToPage('drafts')") 草稿箱
-            .creation-center-nav-item(@click="navToPage('books')") 章回创作
+            .creation-center-nav-item(@click="navToPage('categories')") 媒体管理
+            .creation-center-nav-item(@click="navToPage('drafts')") 图文片段
+            .creation-center-nav-item(@click="navToPage('books')") 图书创作
       .col-xs-12.col-md-10
         transition(:name="transitionName")
           router-view

@@ -1,6 +1,20 @@
 const mongoose = require('../settings/database');
 const cheerio = require('cheerio');
 const markNotes = require("../nkcModules/nkcRender/markNotes");
+
+const documentStatus = {
+  disabled: "disabled",
+  normal: "normal",
+  faulty: "faulty",
+  unknown: "unknown"
+};
+
+const documentTypes = {
+  stable: "stable",
+  beta: "beta",
+  history: "history"
+};
+
 const schema = new mongoose.Schema({
   // 当前文档的 ID，唯一
   _id: Number,
@@ -16,10 +30,14 @@ const schema = new mongoose.Schema({
     required: true,
     index: 1
   },
-  // 当前文档的状态 normal: 正常, disabled: 被屏蔽, faulty: 退修
+  // 当前文档的状态
+  // normal: 正常
+  // disabled: 被屏蔽
+  // faulty: 被退修
+  // unknown: 未知（默认状态，需要审核才能确定）
   status: {
     type: String,
-    default: 'normal',
+    default: documentStatus.unknown,
     index: 1
   },
   // 文档的创建人
@@ -151,11 +169,22 @@ schema.statics.getDid = async () => {
 * 获取文档合法的来源类型
 * @return {Object}
 * */
-schema.statics.getDocumentSources = async () => {
+schema.statics.getDocumentSources = () => {
   return {
     article: 'article',
     draft: 'draft'
   }
+};
+
+/*
+* 获取文档所有的状态类型
+* */
+schema.statics.getDocumentStatus = () => {
+  return documentStatus;
+};
+
+schema.statics.getDocumentTypes = () => {
+  return documentTypes;
 };
 
 /*
@@ -222,7 +251,7 @@ schema.statics.createBetaDocument = async (props) => {
     abstractEN,
     toc,
     dt: toc,
-    type: 'beta',
+    type: DocumentModel.getDocumentTypes().beta,
     source,
     sid,
   });
@@ -243,7 +272,7 @@ schema.methods.copyToHistoryDocument = async function() {
   const NoteModel = mongoose.model('notes');
   const originDocument = this.toObject();
   delete originDocument._v;
-  originDocument.type = 'history';
+  originDocument.type = DocumentModel.getDocumentTypes().history;
   originDocument._id = await DocumentModel.getId();
   originDocument.toc = new Date();
   const document = DocumentModel(originDocument);
@@ -268,9 +297,10 @@ schema.statics.copyBetaToHistoryBySource = async (source, sid) => {
 * 将当前版本修改为历史版
 * */
 schema.methods.setAsHistoryDocument = async function() {
+  const DocumentModel = mongoose.model('documents');
   await this.updateOne({
     $set: {
-      type: 'history'
+      type: DocumentModel.getDocumentTypes().history
     }
   });
 };
@@ -287,7 +317,7 @@ schema.statics.createBetaDocumentByStableDocument = async function(did) {
   if(!stableDocument) throwErr(500, `文档 ${did} 不存在正式版，无法生成编辑版`);
   const originDocument = stableDocument.toObject();
   delete originDocument._v;
-  originDocument.type = 'beta';
+  originDocument.type = DocumentModel.getDocumentTypes.beta;
   originDocument._id = await DocumentModel.getId();
   originDocument.toc = new Date();
   const betaDocument = DocumentModel(originDocument);
@@ -302,7 +332,8 @@ schema.statics.createBetaDocumentByStableDocument = async function(did) {
 * */
 schema.statics.publishDocumentByDid = async (did) => {
   const DocumentModel = mongoose.model('documents');
-  const type = ['stable', 'beta'];
+  const {stable, beta} = DocumentModel.getDocumentTypes();
+  const type = [stable, beta];
   const documentsObj = {};
   const documents = await DocumentModel.find({
     did,
@@ -356,7 +387,7 @@ schema.statics.updateDocumentByDid = async (did, props) => {
   const wordCount = getHTMLTextLength(content);
   let betaDocument = await DocumentModel.findOne({
     did,
-    type: 'beta'
+    type: DocumentModel.getDocumentTypes().beta
   });
   if(!betaDocument) {
     betaDocument = await DocumentModel.createBetaDocumentByStableDocument(did);
@@ -392,7 +423,7 @@ schema.statics.getStableDocumentBySource = async (source, sid) => {
   const DocumentModel = mongoose.model('documents');
   await DocumentModel.checkDocumentSource(source);
   return DocumentModel.findOne({
-    type: 'stable',
+    type: DocumentModel.getDocumentTypes().stable,
     source,
     sid
   });
@@ -408,7 +439,7 @@ schema.statics.getBetaDocumentBySource = async (source, sid) => {
   const DocumentModel = mongoose.model('documents');
   await DocumentModel.checkDocumentSource(source);
   return DocumentModel.findOne({
-    type: 'beta',
+    type: DocumentModel.getDocumentTypes().beta,
     source,
     sid,
   });

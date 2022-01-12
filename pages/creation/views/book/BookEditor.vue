@@ -6,16 +6,41 @@
     .col-xs-12.col-md-6.col-md-offset-3
       .formm
         .form-group
-          label.control-label 文档名称
+          label.control-label 图书名称
           input.form-control(type="text" v-model="book.name")
         .form-group
-          label.control-label 文档介绍
+          label.control-label 图书介绍
           textarea.form-control(rows=5 v-model="book.description")
         .form-group
-          label.control-label 文档封面
-          div
+          label.control-label 图书封面
+          .m-r-05
             img.book-cover(v-if="bookCover" :src="bookCover")
+          div
             button.btn.btn-default.btn-sm(@click="openImageSelector") 选择封面
+        .form-group
+          label.control-label 谁可以阅读
+          .radio
+            label.m-r-1
+              input(type="radio" value="all")
+              span 所有人
+            label.m-r-1
+              input(type="radio" value="self")
+              span 仅自己
+            label.m-r-1
+              input(type="radio" value="fans")
+              span 仅粉丝
+        .form-group
+          label.control-label 谁可以撰写文章
+          .radio
+            label.m-r-1
+              input(type="radio" value="all")
+              span 所有人
+            label.m-r-1
+              input(type="radio" value="self")
+              span 仅自己
+            label.m-r-1
+              input(type="radio" value="fans")
+              span 仅粉丝
         .form-group
           button.btn.btn-default.btn-block(v-if="submitting" disabled) {{progress === 100? `处理中...`: `提交中...${progress}%`}}
           button.btn.btn-default.btn-block(v-else @click="submit") 提交
@@ -62,21 +87,17 @@
         if(!this.bookId) {
           return [
             {
-              name: '文档创作',
+              name: '图书创作',
               page: 'books'
             },
             {
-              name: '新建文档'
+              name: '创建新图书'
             }
           ]
         } else {
           return [
             {
-              name: '文档创作',
-              page: 'books'
-            },
-            {
-              name: '我的文档',
+              name: '图书创作',
               page: 'books'
             },
             {
@@ -191,6 +212,7 @@
 <style lang="less" scoped>
   .book-cover{
     max-width: 100%;
+    max-height: 20rem;
     margin-bottom: 1rem;
   }
 </style>

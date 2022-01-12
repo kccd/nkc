@@ -194,7 +194,7 @@ var Tools = function() {
         return '/photo/' + id
       }
       case 'bookCover': {
-        return '/a/' + id;
+        return '/a/' + id + t;
       }
       case 'documentCover': {
         return '/a/' + id;

@@ -45,7 +45,7 @@
         const {book, articleId} = this;
         const list = [
           {
-            name: '文档创作',
+            name: '图书创作',
             page: 'books'
           }
         ];
@@ -58,7 +58,7 @@
             }
           },
           {
-            name: articleId? '编辑文章': '添加文章'
+            name: articleId? '编辑文章': '撰写文章'
           });
         } else {
           list.push({

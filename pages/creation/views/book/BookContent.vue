@@ -75,7 +75,7 @@
         const {bookArticle, book} = this;
         const list = [
           {
-            name: '文档创作',
+            name: '图书创作',
             page: 'books'
           }
         ];
