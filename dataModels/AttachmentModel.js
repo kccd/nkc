@@ -718,7 +718,7 @@ schema.statics.saveBookCover = async (bookId, file) => {
         type: 'def',
         name: `${aid}.${ext}`,
         height: 300,
-        width: 600,
+        width: 900,
         quality: 90
       }
     ]
