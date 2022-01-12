@@ -189,12 +189,11 @@ schema.statics.extendArticles = async function(articles) {
   }
   const results = [];
   const bookObj = {};
-  const books = await BooksModel.find({list: {$in: [articlesId]}});
+  const books = await BooksModel.find({list: {$in: articlesId}});
   for(const book of books) {
     articlesId.map(id => {
       if(book.list.includes(id)) {
         bookObj[id] = book;
-        return;
       }
     })
   }

@@ -337,7 +337,6 @@ schema.statics.publishDocumentByDid = async (did) => {
   //是否需要审核
   const needReview = await documentsObj.beta.getReviewStatusAndCreateReviewLog();
   await documentsObj.beta.setReviewStatus(!needReview);
-  await documentsObj.beta.setReviewStatus(needReview);
   await documentsObj.beta.pushToSearchDB();
 };
 
@@ -849,7 +848,7 @@ schema.methods.getGlobalPostReviewStatus = async function() {
     !user.volumeA &&
     (
       notPassVolumeA.type === 'all' ||
-      notPassVolumeA.type === 'count' && reviewdCount[source] < notPassVolumeA.count
+      notPassVolumeA.type === 'count' && reviewedCount[source] < notPassVolumeA.count
     )
   ) {
     return {
@@ -864,7 +863,7 @@ schema.methods.getGlobalPostReviewStatus = async function() {
     if(!roleList.includes(bl.id) || bl.type === 'none') continue;
     if(
       bl.type === 'all' ||
-      (bl.type === 'count' && reviewdCount[source] < bl.count)
+      (bl.type === 'count' && reviewedCount[source] < bl.count)
     ) {
       return {
         needReview: true,
@@ -936,6 +935,8 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function() {
   //如果需要审核，就生成审核记录
   if(needReview) {
     await ReviewModel.newDocumentReview(type, this._id, this.uid, reason);
+  } else {
+    await this.setReviewStatus(true);
   }
   return needReview;
 }
