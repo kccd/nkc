@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: Number,
   type: {
-    type: String, // disabledPost, disabledThread, returnPost, returnThread, passPost, passThread
+    type: String, // disabledPost, disabledThread, returnPost, returnThread, passPost, passThread, disabledDocument, returnDocument, passDocument
     required: true,
     index: 1
   },
@@ -55,14 +55,15 @@ const schema = new Schema({
 * @param {Object} user 处理人ID
 * @author pengxiguaa 2019-6-3
 * */
-schema.statics.newReview = async (type, post, user, reason) => {
+schema.statics.newReview = async (type, post, user, reason, document) => {
   await mongoose.model("reviews")({
     _id: await mongoose.model("settings").operateSystemID("reviews", 1),
     type,
     reason,
-    pid: post.pid,
-    tid: post.tid,
-    uid: post.uid,
+    docId: document?document._id:'',
+    pid: post?post.pid:'',
+    tid: post?post.tid:'',
+    uid: post?post.uid:document.uid,
     handlerId: user.uid
   }).save();
 };

@@ -100,14 +100,14 @@ block content
             else if data.reviewType === 'document'
               .review-panel
                 .review-time
-                  input(type="checkbox" value=r.document.did v-model=`selectedDid`)
+                  input(type="checkbox" value=r.document._id v-model=`selectedDid`)
                 .review-info 时间：
                 .review-time=`${format("YYYY/MM/DD HH:mm:ss", r.document.toc)}`
                 .review-info 用户：
                 .review-user
                   a(href=`/u/${r.user.uid}` target="_blank")=r.user.username
                 .review-info 类型：
-                  .review-time 创作
+                  .review-time 章节创作
                 .review-info 标题：
                   .review-thread-title
                     a(href=`${r.article.url}` target="_blank")=r.article.title
@@ -115,26 +115,26 @@ block content
                   .review-info 理由：
                   span= r.reason
                 .review-post-content!=r.document.content
-                  .review-input-div(v-if=`1 || selectedDid.indexOf('${r.document.did}') !== -1`)
+                  .review-input-div(v-if=`1 || selectedDid.indexOf('${r.document._id}') !== -1`)
                     .m-b-1
-                      input(type="radio" :value="true" v-model=`review['${r.document.did}'].pass`)
+                      input(type="radio" :value="true" v-model=`review['${r.document._id}'].pass`)
                       span.m-r-1 通过
-                      input(type="radio" :value="false" v-model=`review['${r.document.did}'].pass`)
+                      input(type="radio" :value="false" v-model=`review['${r.document._id}'].pass`)
                       span 不通过
-                    div(v-if=`!review['${r.document.did}'].pass`)
-                      input(type="radio" value="toDraft" v-model=`review['${r.document.did}'].delType`)
+                    div(v-if=`!review['${r.document._id}'].pass`)
+                      input(type="radio" value="faulty" v-model=`review['${r.document._id}'].delType`)
                       span.m-r-1 退修
-                      input(type="radio" value="toRecycle" v-model=`review['${r.document.did}'].delType`)
-                      span 送回收站
+                      input(type="radio" value="disabled" v-model=`review['${r.document._id}'].delType`)
+                      span 屏蔽
                       .m-t-1
-                        input(type="checkbox" :value="true" v-model=`review['${r.document.did}'].noticeType`)
+                        input(type="checkbox" :value="true" v-model=`review['${r.document._id}'].noticeType`)
                         span.m-r-1 通知用户
-                        input(type="checkbox" :value="true" v-model=`review['${r.document.did}'].illegalType`)
+                        input(type="checkbox" :value="true" v-model=`review['${r.document._id}'].illegalType`)
                         span.m-r-1 标记为违规
                       .m-t-1
-                        textarea.form-control(rows=5 placeholder="请说明理由" v-model=`review['${r.document.did}'].reason`)
+                        textarea.form-control(rows=5 placeholder="请说明理由" v-model=`review['${r.document._id}'].reason`)
                     .m-t-1
-                      button.btn.btn-sm.btn-primary(@click=`submit('${r.document.did}')`) 提交
+                      button.btn.btn-sm.btn-primary(@click=`submit('${r.document._id}')`) 提交
         .p-t-1
           include ../publicModules/paging/paging_input
           .paging-button.pointer

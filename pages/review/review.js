@@ -21,15 +21,17 @@ if(data.reviewType === 'post') {
     };
   }
 } else {
-  for(var i = 0; i < data.results.length; i++) {
-    var d = data.results[i].document.did;
-    var aid = data.results[i].article._id;
-    did.push(d);
-    review[d] = {
+  for(let i = 0; i < data.results.length; i++) {
+    let d = data.results[i].document.did;
+    let documentId = data.results[i].document._id;
+    let aid = data.results[i].article._id;
+    did.push(documentId);
+    review[documentId] = {
+      documentId: documentId,
       did: d,
       pass: true,
       reason: "",
-      delType: "toDraft",
+      delType: "faulty",
       noticeType: [true],
       illegalType: [],
       articleId: aid
@@ -69,47 +71,56 @@ var app = new Vue({
     },
     //提交document审核
     document(arr, index) {
-      debugger
       let data = arr[index];
       if(!data) return;
       let d, url, method = "PUT";
       if(data.pass) {
         d = {
+          pass: data.pass,
+          documentId: data.documentId,
           did: data.did,
           type: 'document',
         };
         url = "/review";
       } else {
-        if(data.delType === "toRecycle") {
+        if(data.delType === "disabled") {
+          //屏蔽
           d = {
+            type: 'document',
+            pass: data.pass,
+            documentId: data.documentId,
             did: [data.did],
             reason: data.reason,
+            delType: data.delType,
             remindUser: data.noticeType,
             violation: data.illegalType
           };
-          method = "POST";
-          url = "/document/recycle";
+          method = "PUT";
+          url = "/review";
         } else {
           //退修
           d = {
+            type: 'document',
+            pass: data.pass,
+            documentId: data.documentId,
             did: [data.did],
             reason: data.reason,
+            delType: data.delType,
             remindUser: data.noticeType,
             violation: data.illegalType
           };
-          url = "/document/draft";
-          method = "POST";
+          url = "/review";
+          method = "PUT";
         }
       }
 
       nkcAPI(url, method, d)
         .then(function() {
-          screenTopAlert("DID: " + data.did + " 处理成功!");
+          screenTopAlert("DocumentId: " + data.documentId + " 处理成功!");
           app.document(arr, index+1);
         })
         .catch(function(data) {
-          screenTopWarning("DID: " + data.did + ' 处理失败! error: ' + data.error || data);
-          console.log(data);
+          screenTopWarning("DocumentId: " + data.documentId + ' 处理失败! error: ' + data.error || data);
           app.document(arr, index+1);
         });
     },
@@ -137,7 +148,7 @@ var app = new Vue({
             postsId: [data.postId],
             reason: data.reason,
             remindUser: data.noticeType,
-            violation: data.illegalType
+            violation: data.illegalType,//是否违规
           };
           method = "POST";
           // url = "/t/" + data.threadId + "/disabled";
@@ -195,7 +206,7 @@ var app = new Vue({
         this.post(arr, 0);
       } else {
         let didArr;
-        if(typeof id === "String") {//提交单个
+        if(typeof id === "string") {//提交单个
           didArr = [id];
         } else {
           didArr = this.selectedDid;
@@ -204,6 +215,7 @@ var app = new Vue({
         for(let i = 0; i < didArr.length; i++) {
           let reviewData = this.review[didArr[i]];
           arr.push({
+            documentId: reviewData.documentId,
             did: reviewData.did,
             pass: reviewData.pass,
             reason: reviewData.reason,

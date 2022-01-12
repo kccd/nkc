@@ -229,6 +229,23 @@ module.exports = {
     },
     {
       parameters: [
+        "reviewLink",
+        "title"
+      ],
+      content: "您发布的内容[title]已通过审核，[url=reviewLink(立即查看)]。",
+      type: "documentPassReview"
+    },
+    {
+      parameters: [
+        "reviewLink",
+        "title",
+        "reason",
+      ],
+      content: "您发布的内容[url=reviewLink(title)]审核未通过，可能包括但不限于下列原因：[text=reason]。",
+      type: "noDocumentPassReview"
+    },
+    {
+      parameters: [
         "applicationFormURL",
         "applicationFormID",
         "applicationFormCode"

@@ -293,6 +293,7 @@ schema.statics.createBetaDocumentByStableDocument = async function(did) {
   originDocument.type = 'beta';
   originDocument._id = await DocumentModel.getId();
   originDocument.toc = new Date();
+  originDocument.status = 'normal';
   const betaDocument = DocumentModel(originDocument);
   await betaDocument.save();
   await NoteModel.copyDocumentNoteAndUpdateOriginNoteTargetId(stableDocument._id, betaDocument._id);

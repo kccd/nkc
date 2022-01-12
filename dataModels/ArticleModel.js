@@ -215,10 +215,11 @@ schema.statics.extendArticles = async function(articles) {
     const result = {
       _id,
       uid,
+      bid: bookObj[article._id]._id,
       published: !!stableDocument,
       hasBeta: !!betaDocument,
       title: title || '未填写标题',
-      url: getUrl('book', bookObj[article._id]._id),
+      url: getUrl('bookContent', bookObj[article._id]._id, article._id),
       time: timeFormat(toc),
       did
     };

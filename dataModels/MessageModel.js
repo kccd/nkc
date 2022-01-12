@@ -317,6 +317,8 @@ messageSchema.statics.getSystemWarningInfo = async (uid, tUid) => {
 * */
 messageSchema.statics.getParametersData = async (message) => {
   const moment = require("moment");
+  const ArticlesModel = mongoose.model("articles");
+  const DocumentModel = mongoose.model("documents");
   const PostModel = mongoose.model("posts");
   const UserModel = mongoose.model("users");
   const ThreadModel = mongoose.model("threads");
@@ -680,6 +682,18 @@ messageSchema.statics.getParametersData = async (message) => {
     if(!post) return null;
     parameters = {
       reviewLink: await PostModel.getUrl(post)
+    };
+  } else if(["documentPassReview", "noDocumentPassReview"].includes(type)) {
+    const {docId, reason='暂未填写原因'} = message.c;
+    const document = await DocumentModel.findOne({_id: docId});
+    if(!document) return null;
+    let article = await ArticlesModel.findOne({did: document.did}).sort({toc: -1});
+    article = await ArticlesModel.extendArticles([article]);
+    parameters = {
+      //获取document所在article的url
+      reviewLink: type === 'documentPassReview'?article[0].url:`/creation/articles/editor?bid=${article[0].bid}&aid=${article[0]._id}`,
+      reason,
+      title: document.title,
     };
   } else if(["fundAdmin", "fundApplicant", "fundMember", "fundFinishProject"].includes(type)) {
     const {applicationFormId} = message.c;

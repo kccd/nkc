@@ -103,6 +103,7 @@ router
       }
       // 标记为违规
       if(violation) {
+        //新增违规记录
         await db.UsersScoreLogModel.insertLog({
           user: targetUser,
           type: 'score',
@@ -115,7 +116,8 @@ router
           pid: post.pid,
           description: reason || `屏蔽${type === 'thread'? '文章': '回复'}并标记为违规`
         });
-        await db.KcbsRecordModel.insertSystemRecord('violation', targetUser, ctx);
+        //扣除科创币
+        await db.KcbsRecordModel.insertSystemRecord('violation', targetUser, ctx, 10);
       }
 
       // 通知用户文章或回复被屏蔽

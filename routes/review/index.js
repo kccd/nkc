@@ -105,6 +105,7 @@ router
       const docId = new Set();
       const uid = new Set();
       for(const document of documents) {
+        document.content = await nkcModules.apiFunction.obtainPureText(document.content, true, 100);
         docId.add(document.did);
         uid.add(document.uid);
       }
@@ -140,9 +141,8 @@ router
   })
   .put("/", async (ctx, next) => {
     const {data, db, body} = ctx;
-    const {pid, type: reviewType, did} = body;
+    const {pid, type: reviewType, did, documentId, pass, reason, remindUser, violation, delType} = body;//remindUser 是否通知用户 violation 是否标记违规 delType 退修或禁用
     let message;
-    console.log('reviewType', reviewType);
     if(reviewType === 'post') {
       const post = await db.PostModel.findOne({pid});
 
@@ -150,6 +150,7 @@ router
       if(post.reviewed) ctx.throw(400, "内容已经被审核过了，请刷新");
 
       const forums = await db.ForumModel.find({fid: {$in: post.mainForumsId}});
+      //自己的专业自己可以审核
       let isModerator = ctx.permission('superModerator');
       if(!isModerator) {
         for(const f of forums) {
@@ -161,18 +162,21 @@ router
       if(!isModerator) ctx.throw(403, `您没有权限审核该内容，pid: ${pid}`);
 
       let type = "passPost";
+      //将post标记为已审核
       await post.updateOne({
         reviewed: true
       });
       const thread = await db.ThreadModel.findOnly({tid: post.tid});
       if(thread.oc === post.pid) {
+        //将文章标记为已审核
         await thread.updateOne({
           reviewed: true
         });
         type = "passThread";
       }
+      //更新文章信息
       await thread.updateThreadMessage(false);
-
+      //生成审核记录
       await db.ReviewModel.newReview(type, post, data.user);
 
       message = await db.MessageModel({
@@ -185,12 +189,67 @@ router
         }
       });
     } else {
-      console.log('did', did)
-      // const document = await db.DocumentModel.findOne({});
+      const document = await db.DocumentModel.findOne({_id: documentId});
+      if(!document) ctx.throw(404, `未找到_ID未 ${documentId}的文档`);
+      if(document.reviewed) ctx.throw(400, '内容已经审核, 请刷新后重试');
+      const targetUser = await db.UserModel.findOne({uid: document.uid});
+      //将document状态改为已审核状态
+      await document.updateOne({
+        reviewed: true,
+      });
+      if(pass) {
+        //生成审核记录
+        await db.ReviewModel.newReview('passDocument', '', data.user, reason, document);
+        message = await db.MessageModel({
+          _id: await db.SettingModel.operateSystemID("messages", 1),
+          r: document.uid,
+          ty: "STU",
+          c: {
+            type: "documentPassReview",
+            docId: document._id,
+          }
+        })
+      } else {
+        //生成审核记录
+        await db.ReviewModel.newReview('noPassDocument', '', data.user, reason, document);
+        //如果有禁用或退修就修改document的状态值
+        if(delType) {
+          await document.updateOne({
+            status: delType,
+          });
+        }
+        //如果标记用户违规了就将该用户的违规次数加一
+        if(violation) {
+          //新增违规记录
+          await db.UsersScoreLogModel.insertLog({
+            user: targetUser,
+            type: '',
+            typeIdOfScoreChange: 'violation',
+            port: ctx.port,
+            delType,
+            ip: ctx.address,
+            key: 'violationCount',
+            description: reason || '屏蔽文档并标记为违规',
+          });
+        }
+        if(!remindUser) return;
+        message = await db.MessageModel({
+          _id: await db.SettingModel.operateSystemID("messages", 1),
+          r: document.uid,
+          ty: "STU",
+          c: {
+            violation,//是否违规
+            type: "noDocumentPassReview",
+            docId: document._id,
+            reason,
+          }
+        });
+      }
     }
-
-    await message.save();
-    await ctx.nkcModules.socket.sendMessageToUser(message._id);
+    if(message) {
+      await message.save();
+      await ctx.nkcModules.socket.sendMessageToUser(message._id);
+    }
     await next();
   });
 module.exports = router;
