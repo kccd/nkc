@@ -354,6 +354,7 @@ export default {
       this.cover = "";
       this.coverFile = "";
       this.coverUrl = "";
+      this.emitContentChangeEvent();
     },
     resetCover(coverId) {
       this.coverFile = '';

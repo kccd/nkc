@@ -159,4 +159,38 @@ schema.statics.extendNotes = async (notes_, options = {}) => {
   });
 };
 
+schema.statics.copyDocumentNoteAndUpdateNewNoteTargetId = async (originDocId, newDocId) => {
+  const NoteModel = mongoose.model('notes');
+  const SettingModel = mongoose.model('settings');
+  const notes = await NoteModel.getNotesByDocId(originDocId);
+  for(const _note of notes) {
+    const note = _note.toObject();
+    delete note._id;
+    delete note.__v;
+    note.targetId = newDocId;
+    note._id = await SettingModel.operateSystemID('notes', 1);
+    await NoteModel(note).save();
+  }
+};
+
+schema.statics.copyDocumentNoteAndUpdateOriginNoteTargetId = async (originDocId, newDocId) => {
+  const NoteModel = mongoose.model('notes');
+  const SettingModel = mongoose.model('settings');
+  const notes = await NoteModel.getNotesByDocId(originDocId);
+  for(const _note of notes) {
+    const note = _note.toObject();
+    delete note._id;
+    delete note.__v;
+    note._id = await SettingModel.operateSystemID('notes', 1);
+    await NoteModel(note).save();
+    await _note.updateOne({
+      $set: {
+        targetId: newDocId
+      }
+    });
+  }
+};
+
+
+
 module.exports = mongoose.model('notes', schema);

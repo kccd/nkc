@@ -243,6 +243,7 @@ schema.statics.createBetaDocument = async (props) => {
 * */
 schema.methods.copyToHistoryDocument = async function() {
   const DocumentModel = mongoose.model('documents');
+  const NoteModel = mongoose.model('notes');
   const originDocument = this.toObject();
   delete originDocument._v;
   originDocument.type = 'history';
@@ -250,6 +251,7 @@ schema.methods.copyToHistoryDocument = async function() {
   originDocument.toc = new Date();
   const document = DocumentModel(originDocument);
   await document.save();
+  await NoteModel.copyDocumentNoteAndUpdateNewNoteTargetId(this._id, document._id);
   return document;
 };
 
@@ -284,10 +286,8 @@ schema.methods.setAsHistoryDocument = async function() {
 schema.statics.createBetaDocumentByStableDocument = async function(did) {
   const DocumentModel = mongoose.model('documents');
   const NoteModel = mongoose.model('notes');
-  const SettingModel = mongoose.model('settings');
   const stableDocument = await DocumentModel.findOne({did, type: 'stable'});
   if(!stableDocument) throwErr(500, `文档 ${did} 不存在正式版，无法生成编辑版`);
-  const stableNotes = await NoteModel.getNotesByDocId(stableDocument._id);
   const originDocument = stableDocument.toObject();
   delete originDocument._v;
   originDocument.type = 'beta';
@@ -295,20 +295,7 @@ schema.statics.createBetaDocumentByStableDocument = async function(did) {
   originDocument.toc = new Date();
   const betaDocument = DocumentModel(originDocument);
   await betaDocument.save();
-  // 复制笔记选择等信息
-  for(const note of stableNotes) {
-    let newNote = note.toObject();
-    delete newNote._id;
-    delete newNote.__v;
-    newNote._id = await SettingModel.operateSystemID('notes', 1);
-    newNote = NoteModel(newNote);
-    newNote.save();
-    await note.updateOne({
-      $set: {
-        targetId: betaDocument._id
-      }
-    });
-  }
+  await NoteModel.copyDocumentNoteAndUpdateOriginNoteTargetId(stableDocument._id, betaDocument._id);
   return betaDocument;
 };
 
@@ -941,7 +928,7 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function() {
   return needReview;
 }
 
-// 设置审核状态，生成审核记录
+// 设置审核状态
 schema.methods.setReviewStatus = async function(reviewed) {
   await this.updateOne({
     $set: {
