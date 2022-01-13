@@ -42,12 +42,13 @@
           margin-bottom: 1rem;
         }
         .creation-center-book-info{
+          padding: 0 0.5rem;
           .creation-center-book-name{
-            height: 3rem;
+            height: 2rem;
+            margin-bottom: 1rem;
             //background-color: red;
             font-size: 1.25rem;
             font-weight: 700;
-            margin-bottom: ;
             .hideText(@line: 2);
           }
           .creation-center-book-description{
@@ -59,6 +60,7 @@
           }
           .creation-center-book-time{
             font-size: 1rem;
+            margin-bottom: 0.5rem;
           }
         }
       }
