@@ -9,7 +9,7 @@
         .creation-center-book-name {{ book.name }}
         .creation-center-book-description {{ book.description }}
         .creation-center-book-list
-          Tree(:data="extendedData")
+          Tree(:data="extendedData", :bid="bid")
         button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
           @click="navToPage('articleEditor', { bid })"
         ) 撰写文章
@@ -128,9 +128,10 @@
 </style>
 
 <script>
-import { nkcAPI } from "../../../lib/js/netAPI";
+import { nkcAPI, nkcUploadFile } from "../../../lib/js/netAPI";
 import MoveDirectoryDialog from "../../component/MoveDirectoryDialog.vue";
 import Tree from "../../component/tree/Tree.vue";
+import { EventBus } from "../../eventBus";
 export default {
   components: {
     MoveDirectoryDialog,
@@ -196,7 +197,15 @@ export default {
     mouseEnter: [],
     clientX: "",
     clientY: "",
+    addDocument: "",
   }),
+  created() {
+    EventBus.$on("addGroup", (data) => {
+      // this.parentData.child ?? (this.parentData.child = []);
+      // this.parentData.child.unshift({ type: "article", value: data.title });
+      this.addGroup(data);
+    });
+  },
   computed: {
     navList() {
       const { book, bid } = this;
@@ -211,17 +220,18 @@ export default {
       ];
     },
     extendedData() {
+      const that = this;
       function res(data) {
         for (let i = 0; i < data.length; i++) {
-          data[i].isMove = false;
-          console.log(data[i]);
+          that.$set(data, i, { ...data[i], isMove: false });
+          that.$set(data, i, { ...data[i], isOPen: false });
           if (data[i].child?.length > 0) {
             res(data[i].child);
           }
         }
       }
-      res(this.data)
-      return this.data
+      res(this.bookList);
+      return this.bookList;
     },
   },
   provide() {
@@ -232,9 +242,25 @@ export default {
   mounted() {
     // console.log(extendedData())
     this.bid = this.$route.params.bid;
+    this.addDocument = this.$route.query.data;
     this.getBook();
   },
   methods: {
+    addGroup(data) {
+      let url = "/creation/articles/editor";
+      // '/creation/addChapter'
+
+      const { aid, articleType, value, type } = data;
+      let formData = new FormData();
+      formData.append("article", JSON.stringify({title:value}));
+      formData.append("bookId", this.bid);
+      formData.append("aid", aid);
+      formData.append("type", type);
+      formData.append("articleType", articleType);
+      nkcUploadFile(url, "POST", formData).then((data) => {
+        console.log(data, "data");
+      });
+    },
     moveChapter(l) {
       this.showMoveCharter = !this.showMoveCharter;
     },
@@ -265,11 +291,7 @@ export default {
         .then((data) => {
           console.log(data);
           self.book = data.bookData;
-          data.bookList.forEach((item) => {
-            self.mouseEnter.push({ hover: false, add: false, more: false });
-          });
           self.bookList = data.bookList;
-          console.log(self.mouseEnter);
         })
         .catch(sweetError);
     },

@@ -1,57 +1,62 @@
 <template>
-  <div class="child_tree" :class="{disable:disable.isMove}">
+  <div class="child_tree" :class="{ disable: data.isMove && !operations }">
+    <!--     :class="{ disable: (childrenDisable || childDisable) && !operations }" -->
     <div
       class="child_tree_row col-xs-12.col-md-12"
-      :class="{ active: isShowOperation}"
+      :class="{ active: isShowOperation }"
       @mouseenter="operations && mouseEnter()"
       @mouseleave="operations && mouseEnter()"
-      
     >
+      <!-- @click="!operations && moveIndication(data)" -->
       <!-- <div> -->
-        <span :style="{ width: level * 24 + 'px' }"></span>
-        <span
-          class="icon seat"
-          @click="toggle()"
-          v-if="data.child && data.child.length > 0"
-          :class="{ down: isOpen, right: !isOpen }"
-        >
-        </span>
-        <span class="seat" v-else></span>
-        <span v-if="operations">
-          <span class="status" v-if="!data.published">[未发布]</span>
-          <span class="status" v-else-if="data.hasBeta">[编辑中]</span>
-        </span>
-        <span
-          v-if="operations"
-          class="title"
-          @click="
-            data.type === 'text' && operations && clickArticleTitle(data)
-          "
-          >{{ data.value }}</span
-        >
-        <span
-          v-else
-          class="fill"
-          :class="{ ellipsis: showIndication }"
-          @click="moveIndication(data)"
-          >{{ data.value }}</span
-        >
-        <span class="click_block" v-if="operations" @click="toggle()"></span>
-        
+      <span :style="{ width: level * 24 + 'px' }"></span>
+      <span
+        class="icon seat"
+        @click.stop="toggle(childIndex)"
+        v-if="data.child && data.child.length > 0"
+        :class="{ down: isOpen.status, right: !isOpen.status }"
+      >
+      </span>
+      <span class="seat" v-else></span>
+      <span v-if="operations">
+        <span class="status" v-if="!data.published">[未发布]</span>
+        <span class="status" v-else-if="data.hasBeta">[编辑中]</span>
+      </span>
+      <span
+        v-if="operations"
+        class="title"
+        @click.stop="
+          data.type === 'text' && operations && clickArticleTitle(data)
+        "
+        >{{ data.value }}</span
+      >
+      <span
+        v-else
+        class="fill"
+        :class="{
+          ellipsis: data.showIndication && !data.isMove,
+        }"
+        @click.stop="moveIndication(data, childIndex)"
+        >{{ data.value }}</span
+      >
+      <span class="click_block" v-if="operations" @click="toggle()"></span>
+
       <!-- </div> -->
 
       <!-- <transition name="fade"> -->
       <div v-if="operations">
         <div class="operations" v-show="isShowOperation">
-          <span @click.stop="addGroup(data)">新建分组</span>
-          <span @click.stop="addDocument(data)">新建文档</span>
-          <span @click.stop="moveDirectory(data,childIndex)">移动</span>
-          <span @click.stop="deleteDirectory(data,childIndex)">删除</span>
+          <span @click.stop="addGroup(data,childIndex)">新建分组</span>
+          <span @click.stop="addDocument(data, childIndex, bid)">新建文档</span>
+          <span @click.stop="moveDirectory(data, childIndex, isOpen)"
+            >移动</span
+          >
+          <span @click.stop="deleteDirectory(data, childIndex)">删除</span>
         </div>
         <div class="time" v-show="!isShowOperation">{{ data.time }}</div>
       </div>
       <div
-        v-else-if="!operations && showIndication"
+        v-else-if="!operations && data.showIndication && !data.isMove"
         class="move_level col-xs-12.col-md-12"
       >
         <span>移动为</span>
@@ -70,12 +75,13 @@
         <!-- </div> -->
       </div>
     </div>
+    <!-- 可以把这个布局给放到 radio 中  -->
     <div
-      v-if="!operations && showIndication"
+      v-if="!operations && data.showIndication && !data.isMove"
       class="level-indication"
       :style="{
         marginLeft:
-          (level + (levelSelect === 'childLevel') ? 0 : -1) * 24 + 'px',
+          (level + (levelSelect === 'childLevel' ? 1 : -0.125)) * 24 + 'px',
       }"
     >
       <span class="glyphicon glyphicon-tag change_glyphicon"></span>
@@ -101,12 +107,14 @@
     <!-- <transition name="fade"> -->
     <template v-for="(child, j) in data.child">
       <Tree
-        v-show="isOpen"
+        v-show="isOpen.status"
         :key="j"
         :data="child"
         :level="level + 1"
         :childIndex="childIndex + j.toString()"
         :operations="operations"
+        :childrenDisable="childrenDisable"
+        :childDisable="child.isMove"
       ></Tree>
     </template>
     <!-- </transition> -->
@@ -114,7 +122,9 @@
   </div>
 </template>
 <script>
-import {EventBus} from '../../eventBus.js'
+let globalStatus = {};
+let i = 0;
+import { EventBus } from "../../eventBus.js";
 export default {
   name: "Tree",
   props: {
@@ -125,12 +135,31 @@ export default {
       default: true,
     },
     funcs: Object,
-    isMove:Boolean,
-    disable:{
-      type:Object,
-      default:()=>({})
+    isMove: Boolean,
+    // disable: {
+    //   type: Object,
+    //   default: () => ({}),
+    // },
+    childIndex: String,
+    childrenDisable: {
+      type: Boolean,
+      default: false,
     },
-    childIndex:String
+    childDisable: {
+      type: Boolean,
+      default: false,
+    },
+    bid: String,
+  },
+  data() {
+    return {
+      levelSelect: "childLevel",
+      isOpen: { status: false },
+      isShowOperation: false,
+      isShowAddGroup: false,
+      addGroupDefaultName: "新建分组",
+      showIndication: { status: false },
+    };
   },
   inject: ["datas"],
   directives: {
@@ -150,45 +179,44 @@ export default {
     //   };
     // },
   },
-  data() {
-    return {
-      // sameLevel:'sameLevel',
-      // Level:'sameLevel',
-      levelSelect: "childLevel",
-      isOpen: false,
-      isShowOperation: false,
-      isShowAddGroup: false,
-      addGroupDefaultName: "新建分组",
-      showIndication: false,
-    };
-  },
+  created() {},
+  mounted() {},
+  updated() {},
   watch: {
+    levelSelect() {
+      EventBus.$emit("levelSelect", this.levelSelect);
+    },
   },
   methods: {
-    sendMsg(data,childIndex) {
-      console.log(this.$props.disable,data,childIndex)
-      data.isMove =true
-      EventBus.$emit("moveDirectory", data,childIndex);
-    },
-    moveIndication(data) {
-      // this.listener("moveIndication");
-      // data.isShowAddGroup=true
-
-      this.isOpen = !this.isOpen;
-      this.showIndication = this.isOpen || false;
-      // case "hiddenIndication":
+    moveIndication(data, childIndex) {
+      // 如果为禁用状态就不显示指示
+      if (this.childDisable || this.childrenDisable) {
+        this.isOpen.status = !this.isOpen.status;
+        return;
+      } else if (this.isOpen.status) {
+        if (!this.showIndication.status) {
+          // this.showIndication.status = true;
+          EventBus.$emit("showIndication", childIndex, this.isOpen.status);
+          return;
+        } else {
+          this.isOpen.status = false;
+        }
+      }
+      this.isOpen.status = !this.isOpen.status;
+      // 当打开状态时 应该 应该先关闭其他指示，在当前下面打开指示。
+      EventBus.$emit("showIndication", childIndex, this.isOpen.status);
     },
     toggle(instruct) {
       switch (instruct) {
         //  打开新建分组
         case "on":
-          this.isOpen = true;
+          this.isOpen.status = true;
           break;
         case "off":
-          this.isOpen = false;
+          this.isOpen.status = false;
           break;
         default:
-          this.isOpen = !this.isOpen;
+          this.isOpen.status = !this.isOpen.status;
       }
     },
     // 编辑
@@ -200,44 +228,14 @@ export default {
     mouseEnter() {
       this.isShowOperation = !this.isShowOperation;
     },
-    addGroup(data) {
+    addGroup(data,childIndex) {
+      //
       this.isShowAddGroup = !this.isShowAddGroup;
       this.toggle("on");
-      this.listener("add-group-input");
-    },
-    addDocument(data) {
-      data.push({
-        type: "article",
-        value: "新建文章",
-        published: false,
-      });
-      // const { bid } = this;
-      this.navToPage("articleEditor", { bid, aid, notice: "添加章节" });
-    },
-    deleteDirectory(data,i) {
-      console.log(i)
-    },
-    moveDirectory(data,childIndex) {
-      this.sendMsg(data,childIndex)
-      console.log(this.$props)
-    },
-
-    // 新建分组使进行监听，如果点击除自己外的元素，就进行添加数据
-    listener(element) {
-      const handler = (e) => {
-        // 采用了 v-if 来显示 新增分组元素 ，原因是 如果 v-show ,页面将有多个元素有相同 ID
-        const contentWrap = document.getElementById(element);
-        if (contentWrap) {
-          if (!contentWrap.contains(e.target)) {
-            document.removeEventListener("click", handler);
-            this.addGroupDatas();
-          }
-        }
-      };
-      document.addEventListener("click", handler);
+      this.listener("add-group-input",data,childIndex);
     },
     // 新建分组后添加数据
-    addGroupDatas() {
+    addGroupDatas(data) {
       this.isShowAddGroup = false;
       // 违背了单选数据流，还没想到更好的方法先这样
       !this.$props?.data?.child && (this.$props.data.child = []);
@@ -246,7 +244,48 @@ export default {
         value: this.addGroupDefaultName,
         published: false,
       });
+      // 拿到 aid 给后端
+      EventBus.$emit("addGroup", {
+        type:'create',
+        aid:data._id,
+        articleType: "text",
+        value: this.addGroupDefaultName,
+
+      });
       this.addGroupDefaultName = "新建分组";
+    },
+    addDocument(data, i, bid) {
+      // data.push({
+      //   type: "article",
+      //   value: "新建文章",
+      //   published: false,
+      // });
+      // 拿到aid 过后 传入给新增页面，新增页面再拿着aid 去找后端向 aid 里面添加数据
+      const aid = data?._id;
+      this.navToPage("articleEditor", { bid, aid, type: "article" });
+    },
+    deleteDirectory(data, childIndex) {
+      // 拿到 aid 后直接给后端 后端删除
+      EventBus.$emit("deleteDirectory", childIndex);
+    },
+    moveDirectory(data, childIndex, isOpen) {
+      // 拿到 aid 后直接给后端
+      EventBus.$emit("moveDirectory", data, childIndex, isOpen);
+    },
+
+    // 新建分组使进行监听，如果点击除自己外的元素，就进行添加数据
+    listener(element,data) {
+      const handler = (e) => {
+        // 采用了 v-if 来显示 新增分组元素 ，原因是 如果 v-show ,页面将有多个元素有相同 ID
+        const contentWrap = document.getElementById(element);
+        if (contentWrap) {
+          if (!contentWrap.contains(e.target)) {
+            document.removeEventListener("click", handler);
+            this.addGroupDatas(data);
+          }
+        }
+      };
+      document.addEventListener("click", handler);
     },
     navToPage(name, query = {}, params = {}) {
       this.$router.push({
@@ -259,7 +298,7 @@ export default {
 };
 </script>
 <style scoped lang='less'>
-.disable{
+.disable {
   background-color: rgba(129, 128, 128, 0.226);
   cursor: not-allowed;
 }
@@ -278,7 +317,7 @@ export default {
   }
 }
 .level-indication {
-  transition: all .3s;
+  transition: all 0.3s;
   position: relative;
   height: 10px;
   .change_glyphicon {

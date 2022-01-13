@@ -1,7 +1,8 @@
 <template>
   <div>
       <template v-for="(child,j) in data">
-        <RootTree  :key="j" :data='child' :childIndex="j.toString()" :level="0" :operations="operations" :funcs="funcs" :disable="disable"></RootTree>
+        <!-- // 点击最外层 可以 但是如果点击 里层的这样子只会传入  最外层的状态 -->
+        <RootTree  :key="j" :data='child' :childrenDisable="child.isMove" :childIndex="j.toString()" :level="0" :operations="operations" :bid="bid" ></RootTree>
       </template>
     </div>
 </template>
@@ -18,10 +19,20 @@ export default {
       default: true,
     },
     funcs:Object,
-    disable:{
-      type:Object,
-      default:()=>({})
-    }
+    // disable:{
+    //   type:Object,
+    //   default:()=>({})
+    // },
+    bid:String
+  },
+  created(){
+    // console.log(this.$props.data)
+
+  },
+  updated(){
+    // console.log(this.$props.data.isMove,'this.$props.data.isMove')
+    // if(this.childDisable)
+    // this.childDisable= this.$props.data.isMove
   },
   data() {
     return{

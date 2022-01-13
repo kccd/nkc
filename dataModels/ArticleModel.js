@@ -1,6 +1,10 @@
 const mongoose = require('../settings/database');
 const schema = new mongoose.Schema({
   _id: String,
+  type:{
+    type:String,
+    defalut:'text'
+  },
   toc: {
     type: Date,
     default: Date.now,
@@ -39,7 +43,7 @@ const schema = new mongoose.Schema({
 * @return {Object} 创建的 article 对象
 * */
 schema.statics.createArticle = async (props) => {
-  const {title, content, coverFile, uid} = props;
+  const {title, content, coverFile, uid, type} = props;
   const toc = new Date();
   const ArticleModel = mongoose.model('articles');
   const SettingModel = mongoose.model('settings');
@@ -60,6 +64,7 @@ schema.statics.createArticle = async (props) => {
     uid,
     toc,
     did: document.did,
+    type
   });
   await article.save();
   return article;

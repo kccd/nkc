@@ -1,8 +1,6 @@
 const router=require('koa-router')()
 router.post('/',async (ctx,next)=>{
   const {body, db} = ctx;
-  console.log(body)
-
   const {fields} = body;
   const {aid}=fields
   const {title, content} = JSON.parse(fields.article);

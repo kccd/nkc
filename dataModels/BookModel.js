@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const Schema = mongoose.Schema;
 const {timeFormat, getUrl} = require("../nkcModules/tools");
 const schema = new mongoose.Schema({
   _id: String,
@@ -34,7 +35,7 @@ const schema = new mongoose.Schema({
   // postId: post:pid
   // articleId：article:aid
   list: {
-    type: [String],
+    type: [Schema.Types.Mixed],
     default: []
   }
 }, {
@@ -115,23 +116,27 @@ schema.statics.getBooksByUserId = async (uid) => {
   })
 };
 
-schema.methods.bindArticle = async function(articleId) {
+schema.methods.bindArticle = async function(aid) {
   await this.updateOne({
     $addToSet: {
-      list: `${articleId}`
+      list:{aid,child:[]} 
     }
   });
 }
 
 schema.methods.getList = async function(options) {
   let defaultOptions={setUrl:'bookContent', latestTitle:false}
-  const articles = await this.extendArticlesById(this.list, options || defaultOptions);
+  const aids=[]
+  this.list.forEach(item=>{aids.push(item.aid)})
+   // this.list 被替换成了 aids
+  const articles = await this.extendArticlesById(aids, options || defaultOptions);
   const articlesObj = {};
   for(const a of articles) {
     articlesObj[a._id] = a;
   }
   const results = [];
-  for(const aid of this.list) {
+  // this.list 被替换成了 aids
+  for(const aid of aids) {
     const article = articlesObj[aid];
     if(!article) continue;
     results.push(article);
@@ -140,10 +145,13 @@ schema.methods.getList = async function(options) {
 }
 // 为了让预览能服用该方法，对该方法进行了传参，然后进行判断
 schema.methods.extendArticlesById = async function(articlesId,{setUrl='bookContent', latestTitle=false}) {
+
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
   const {timeFormat, getUrl} = require('../nkcModules/tools');
+  // console.log(articlesId,'153')
   const articles = await ArticleModel.find({_id: {$in: articlesId}});
+  // console.log('154',articles)
   const {article: documentSource} = await DocumentModel.getDocumentSources();
   const documents = await DocumentModel.find({
     type: {
@@ -168,6 +176,7 @@ schema.methods.extendArticlesById = async function(articlesId,{setUrl='bookConte
       _id,
       toc,
       uid,
+      type
     } = article;
     const articleObj = articlesObj[_id];
     // prevView 需要拿到最新编辑数据。根据 sid 进行查找，可能会出现多条 ，根据更改时间找到最新一条
@@ -190,10 +199,12 @@ schema.methods.extendArticlesById = async function(articlesId,{setUrl='bookConte
       }
       latestEditorResult=latestEditor
     }
+    // console.log('articleObj',articleObj)
     if(!articleObj) continue;
     const betaDocument = articlesObj[_id].beta;
     const stableDocument = articlesObj[_id].stable;
     if(!stableDocument && !betaDocument) {
+      // console.log('等待')
       continue;
     }
     const document = stableDocument || betaDocument;
@@ -204,12 +215,14 @@ schema.methods.extendArticlesById = async function(articlesId,{setUrl='bookConte
       uid,
       published: !!stableDocument,
       hasBeta: !!betaDocument,
-      title: title || '未填写标题',
+      value: title || '未填写标题',
       url: getUrl(setUrl, this._id, _id,did),
-      time: timeFormat(toc)
+      time: timeFormat(toc),
+      type
     };
     results.push(result);
   }
+
   return results;
 }
 

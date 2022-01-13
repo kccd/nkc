@@ -15,7 +15,6 @@
   import {nkcUploadFile, nkcAPI} from "../../../lib/js/netAPI";
   import {sweetError} from "../../../lib/js/sweetAlert";
   import {screenTopWarning} from "../../../lib/js/topAlert";
-
   export default {
     components: {
       'document-editor': DocumentEditor
@@ -39,7 +38,8 @@
         title: true,
       },
       lockPost: false,
-      doucmentId:''
+      doucmentId:'',
+      articleType:'article',
     }),
     computed: {
       type() {
@@ -82,9 +82,9 @@
         window.open(`/creation/document?_id=${id}&did=${doucmentId}&bid=${bookId}&aid=${articleId}`)
       },
       initId() {
-        const {bid, aid,notice} = this.$route.query;
+        const {bid, aid,type} = this.$route.query;
         this.bookId = bid;
-        notice && (this.notice=notice)
+        type && (this.articleType=type)
         if(aid) {
           this.articleId = aid;
         }
@@ -122,7 +122,7 @@
           cover
         });
       },
-      post(type) {
+      post(type,articleType) {
         if(this.lockPost) return;
         this.lockPost = true;
         const self = this;
@@ -151,6 +151,7 @@
         formData.append('bookId', bookId);
         formData.append('article', JSON.stringify(article));
         formData.append('type', type);
+        formData.append('articleType', articleType);
         let url='/creation/articles/editor'
         if(this.articleId){
           url='/creation/addChapter'
@@ -178,13 +179,22 @@
       },
       modifyArticle() {
         const self = this;
-        this.post(this.type)
+        this.post(this.type,this.articleType)
         .catch(err => {
           console.error(err);
           screenTopWarning(err);
         })
       },
       saveArticle() {
+        this.$router.push({
+        name:"book",
+        query:{
+          data:this.article,
+        },
+        params:{
+          bid:this.bookId
+        },
+      });
         this.post('save')
         .then(() => {
           sweetSuccess('保存成功');

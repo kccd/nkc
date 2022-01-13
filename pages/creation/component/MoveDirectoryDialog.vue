@@ -5,20 +5,14 @@
       p.model_title
         span.title 请选择要放置的目录位置
       .model_content
-        Tree(
-          :data="dialogData",
-          :operations="false",
-          :funcs="{ open, confirm }",
-          :disable="seekResult"
-        )
+        Tree(v-if="showTree", :data="dialogData", :operations="false")
       .model_footer
         .model_footer_container
           button.model_cancle(@click="cancel") 取消
           button.model_confirm(@click="confirm()") 确认
 </template>
-
-
 <script>
+//           :disable="seekResult"
 import Tree from "./tree/Tree.vue";
 import { DraggableElement } from "../../lib/js/draggable";
 import { EventBus } from "../eventBus";
@@ -34,50 +28,133 @@ export default {
       info: "",
       quote: "",
       dialogData: {},
-      msg: {},
+      moveData: {},
+      moveIndex: "",
       seekResult: {},
+      showTree: true,
+      insertIndex: "",
+      selectedLevel: "childLevel",
     };
   },
   created() {
-    // ？？
     this.dialogData = [...this.$props.data];
+
+    EventBus.$on("moveDirectory", (msg, childIndex, isOpen) => {
+      // 重置 数据
+      this.seekResult = this.dialogData;
+      // 根据 childIndex(字符串每个数组记录的是数组中数据的位置) 长度来查找 数组指定位置的数据
+      for (let i = 0; i < childIndex.length; i++) {
+        const position = childIndex[i];
+        this.seekChild({
+          data: this.seekResult,
+          position,
+          currentIndex: i,
+          findLocation: childIndex,
+        });
+      }
+      // 这个地址时 this.dialogData 中对象的地址  修改的数据最外层
+      this.$set(this.seekResult, "isMove", true);
+      this.seekResult = this.dialogData;
+      this.moveIndex = childIndex;
+      for (let i = 0; i < childIndex.length; i++) {
+        const position = childIndex[i];
+        this.seekChild({
+          data: this.seekResult,
+          position,
+          currentIndex: i,
+          findLocation: childIndex,
+          type: "parent",
+        });
+      }
+      // 拿到 被移动的aid 和 
+      this.moveData = msg;
+      this.show = true;
+      this.showTree = true;
+    });
+
+    EventBus.$on("showIndication", (childIndex, status) => {
+      this.seekResult = this.dialogData;
+      for (let i = 0; i < childIndex.length; i++) {
+        const position = childIndex[i];
+        this.seekChild({
+          data: this.seekResult,
+          position,
+          currentIndex: i,
+          findLocation: childIndex,
+        });
+      }
+      this.changeChild(this.dialogData, "showIndication", !status);
+      this.$set(this.seekResult, "showIndication", status);
+      this.insertIndex = childIndex;
+    });
+
+    EventBus.$on("levelSelect", (selectedLevel) => {
+      this.selectedLevel = selectedLevel;
+    });
+
+    EventBus.$on("deleteDirectory", (childIndex) => {
+      this.seekResult = this.dialogData;
+      for (let i = 0; i < childIndex.length; i++) {
+        const position = childIndex[i];
+        this.seekChild({
+          data: this.seekResult,
+          position,
+          currentIndex: i,
+          findLocation: childIndex,
+          type: "parent",
+        });
+      }
+      this.parentData.splice(this.moveIndex.slice(-1));
+      //删除过后发送请求
+    });
+
+
   },
   mounted() {
     this.initDraggableElement();
-    EventBus.$on("moveDirectory", (msg, childIndex) => {
-      console.log("msg", msg, childIndex);
-      console.log(childIndex);
-      for (let i = 0; i < childIndex.length; i++) {
-        const position = childIndex[i];
-        this.seekChild(this.dialogData, position,i,childIndex);
-      }
-      // 这样子给 会导致全部一致 ，只能通过 修改data中的某一项 来完成，但是通过data中某一项来完成 ，数据渲染是 应该又会出现问题。那咋搞啊  ，不能用disaple
-      this.seekResult.isMove = msg.isMove;
-      console.log(this.seekResult)
-      this.msg = msg;
-      this.show = true;
-      console.log(this.dialogData, "console.log(childIndex);");
-    });
   },
   destroyed() {
     EventBus.$off();
   },
   methods: {
-    seekChild(data, position,i,childIndex) {
-      console.log(data, position);
+    changeChild(data, key, value) {
+      if (data) {
+        data.forEach((item) => {
+          this.$set(item, key, value);
+          if (item.child) {
+            this.changeChild(item.child, key, value);
+          }
+        });
+      }
+    },
+    seekChild({ data, position, currentIndex, findLocation, type = "self" }) {
+      if (type === "parent") console.log(data);
       const child = data[position];
-      console.log("child", child);
-      if (child) {
-        if (child.child) {
-          this.seekResult = child.child;
-        } else {
-          this.seekResult = child;
+      if (type === "parent") {
+        // 点击内层
+        if (currentIndex === findLocation.length - 2) {
+          this.parentData = child;
         }
-        if (i === childIndex.length - 1) {
-          console.log("数据查找完毕结果1为", this.seekResult=child);
+        // 点击最外层
+        if (findLocation.length - 2 < 0) {
+          this.parentData = data;
         }
+      } else if (type === "childe") {
       } else {
-        console.error("此位置没有数据");
+        if (child) {
+          if (currentIndex === findLocation.length - 1) {
+            // console.log("数据查找结果为", this.seekResult=child);
+            this.seekResult = child;
+            return;
+          }
+          if (child.child) {
+            this.seekResult = child.child;
+          } else {
+            this.seekResult = child;
+          }
+        } else {
+          console.warn("此位置没有数据");
+        }
       }
     },
     initDraggableElement() {
@@ -88,10 +165,27 @@ export default {
     },
     confirm(data) {
       EventBus.$emit("moveDirectoryConfirm", data);
-      this.callback();
+      // 数据移入选中项 子级或同级
+      if (this.selectedLevel === "childLevel") {
+        this.seekResult.child ?? (this.seekResult.child = []);
+        this.seekResult?.child?.unshift(this.moveData);
+      } else {
+        this.parentData.unshift(this.moveData);
+      }
+      console.log(this.parentData);
+      // 删除被移动的数据
+      this.parentData.splice(this.moveIndex.slice(-1));
+      //删除过后发送请求
+      // 拿到 aid  和  this.parentData 的 id 后端 aid 移动到 childIndx 位置 并且  删除  this.parentData
+      this.$set(this.seekResult, "isMove", false);
+      this.close();
     },
     cancel() {
-      // this.$emit("close");
+      // 数据重置  数据这里有bug
+      this.$set(this.seekResult, "isMove", false);
+      this.$set(this.seekResult, "showIndication", false);
+      // 关掉是 结构重置
+      this.showTree = false;
       this.close();
     },
 
