@@ -27,21 +27,26 @@
           span(style="font-size: 1rem;") 跳转到&nbsp;
           input.input.radius-left(type="text" v-model.number="pageNumber")
           a.button.radius-right(@click="fastSelectPage") 确定
-    .resource-container-header
+    .resource-container-header(v-if="pageType !== 'editPicture'")
       .resource-categories
-        .categoryName(:class="{'active': resourceCategories === 'all'}" @click="selectUserCategory('all')") 全部
-        .categoryName(:class="{'active': resourceCategories === 'trash'}" v-if="watchType === 'category'" @click="selectUserCategory('trash')") 回收站
-        .categoryName(:class="{'active':resourceCategories === 'default'}" @click="selectUserCategory('default')") 未分组
+        .categoryName(:class="{'active': resourceCategories === 'all'}" @click="selectUserCategory('all')")
+          span 全部
+          span(v-if="count.allCount !== 0") ({{count.allCount}})
+        .categoryName(:class="{'active': resourceCategories === 'trash'}" v-if="watchType === 'category'" @click="selectUserCategory('trash')")
+          span 回收站
+          span(v-if="count.trashCount !== 0") ({{count.trashCount}})
+        .categoryName(:class="{'active':resourceCategories === 'default'}" @click="selectUserCategory('default')")
+          span 未分组
+          span(v-if="count.ungroupedCount !== 0") ({{count.ungroupedCount}})
       .fa.fa-spinner.fa-spin.fa-fw(v-if="categoryLoading")
-      .resource-categories(v-else)
-        .categoryName(v-for="c in categories" :class="{'active':resourceCategories === c._id}"
-          :title="'创建时间: ' + timeFormat(c.toc) + '\\n分组名: '+ c.name + '\\n描述: ' + c.description"
-          @click="selectUserCategory(c._id)") {{c.name}}
-        //.fa.fa-refresh(title="重命名" @click="editResourceCategory(c, 'modify')" v-if="editBtn")
-        //.fa.fa-remove(title="删除" @click="editResourceCategory(c, 'delete')" v-if="editBtn")
+      .resource-categories(v-else v-for="c in categories")
+        .categoryName(:class="{'active':resourceCategories === c._id}"
+          :title="'创建时间: ' + timeFormat(c.toc) + '\\n分组名: '+ c.name"
+          @click="selectUserCategory(c._id)")
+          span {{c.name}}
+          span(v-if="c.count !== 0") ({{c.count}})
       button.m-r-05.btn.btn-default.btn-xs(@click="editResourceCategory('', 'create')" v-if="watchType === 'category'") 创建分组
-      button.btn.btn-default.btn-xs(@click="editCategory" v-if="!editBtn && watchType === 'category'") 管理分组
-      .add-button(@click="editFinish" v-if="editBtn && watchType === 'category'") 完成
+      button.btn.btn-default.btn-xs(@click="editCategory" v-if="watchType === 'category'") 管理分组
     .resource-category-content(v-if="pageType === 'list'")
       .resource-category-header
         .selected-resources
@@ -58,8 +63,11 @@
             .resource-type(v-if="files.length" :class="{'active':category === 'upload'}" @click="selectCategory('upload')") 正在上传
         .resource-upload
           input.hidden(ref='inputElement' type="file" multiple="true" @change="selectedFiles")
-          button.btn.btn-default.btn-sm(@click="clickInput" v-if="watchType === 'category' && isApp") 上传文件
-          button.btn.btn-default.btn-sm(@click="moveToCategory" v-if="watchType === 'category' && !isApp && selectedResources.length") 移动到分组
+          button.btn.btn-default.btn-sm.m-r-05(@click="clickInput" v-if="watchType === 'category' && isApp") 上传文件
+          button.btn.btn-default.btn-sm.m-r-05(@click="selectAllResources" v-if="watchType === 'category' && selectedResources.length") 全选
+          button.btn.btn-default.btn-sm.m-r-05(@click="delResource('', 'delete')" v-if="watchType === 'category' && selectedResources.length && resourceCategories !== 'trash'") 移动到回收站
+          button.btn.btn-default.btn-sm.m-r-05(@click="delResource('', 'trash')" v-if="watchType === 'category' && selectedResources.length && resourceCategories === 'trash'") 恢复选中
+          button.btn.btn-default.btn-sm(@click="moveToCategory" v-if="watchType === 'category' && selectedResources.length && resourceCategories !== 'trash'") 移动到分组
       .resources-paging
         +resourcePaging
       .resources-body(v-if="category === 'upload'")
@@ -113,9 +121,9 @@
               .resource-mask(@click="fastSelectResource(r)")
               .resource-do
                 .fa.fa-edit(@click="editImage(r)" v-if="r.mediaType === 'mediaPicture'")
-                .fa.fa-trash-o(@click="editResource(r, 'delete')" v-if="watchType === 'category' && !r.del")
-                .fa.fa-reply(@click="editResource(r, 'trash')" v-if="watchType === 'category' && r.del")
-                .fa.fa-square-o(v-if="watchType === 'category' && !r.del" @click="checkbox(r)")
+                .fa.fa-trash-o(@click="delResource(r, 'delete')" v-if="watchType === 'category' && !r.del")
+                .fa.fa-reply(@click="delResource(r, 'trash')" v-if="watchType === 'category' && r.del")
+                .fa.fa-square-o(v-if="watchType === 'category'" @click="checkbox(r)")
                 .fa.fa-square-o(v-if="watchType === 'select'" @click="selectResource(r)")
           span(v-else-if='r.state === "inProcess"')
             .resource-in-process
@@ -184,8 +192,11 @@
       .categoryName {
         padding: 0 1rem 0 0;
         display: inline-block;
+        position: relative;
         &:hover {
           color: @primary;
+        }
+        .resources-count {
         }
       }
       .resource-categories {
@@ -203,11 +214,6 @@
         }
       }
       .add-button {
-        display: inline-block;
-        cursor: pointer;
-        margin: 0 0.2rem;
-        border: 1px #2e6da4 solid;
-        border-radius: 4px;
         color: #fff;
         background: #337ab7;
         &:hover {
@@ -639,7 +645,7 @@ export default {
   data: () => ({
     categoryLoading: true,//分组loading
     resourceType: 'all',
-    resourceCategories: '',//用户自定义分组存储id
+    resourceCategories: 'all',//用户自定义分组存储id
     resources: [],
     paging: {},
     files: [],
@@ -652,7 +658,7 @@ export default {
     quota: 16,
     pageNumber: "",
     allowedExt: ['all', 'audio', 'video', 'attachment', 'picture'],
-    countLimit: 10,
+    countLimit: 100,
     selectedResources: [],
     loading: true,
     fastSelect: false,
@@ -667,7 +673,11 @@ export default {
     socketEventListener: null,
 
     watchType: 'category',
-    editBtn: false, //编辑分组开关
+    count: {
+      allCount: 0,//全部资源数量
+      ungroupedCount: 0,//未分组资源数量
+      trashCount: 0,//回收站资源数量
+    },
 
   }),
   components: {
@@ -953,6 +963,7 @@ export default {
           self.categories = data.categories;
           self.sizeLimit = data.sizeLimit;
           self.paging = data.paging;
+          self.count = data.count;
           self.pageNumber = self.paging.page + 1;
           self.resources = data.resources;
           self.loading = false;
@@ -964,7 +975,7 @@ export default {
         .catch(function(data) {
           sweetError(data);
         });
-    }, 300),
+    }, 500),
     changePage: function(type) {
       var paging = this.paging;
       if(paging.buttonValue.length <= 1) return;
@@ -992,7 +1003,7 @@ export default {
           if(f.status === "uploaded") throw "文件已上传成功！";
           f.status = "uploading";
           // 获取文件md5
-          return getFileMD5(f.data)
+          return getFileMD5(f.data);
         })
         .then(function(md5) {
           // 将md5发送到后端检测文件是否已上传
@@ -1006,6 +1017,7 @@ export default {
             // 后端找不到相同md5的文件（仅针对附件），则将本地文件上传
             var formData = new FormData();
             formData.append("file", f.data, f.data.name || (Date.now() + '.png'));
+            formData.append('cid', self.resourceCategories);
             return nkcUploadFile("/r", "POST", formData, function(e, progress) {
               f.progress = progress;
             }, 60 * 60 * 1000);
@@ -1037,6 +1049,7 @@ export default {
     uploadSelectFile: function(f) {
       var self = this;
       if(f.constructor === Array) {
+        //上传多个文件
         // 这个数组中文件的顺序和用户选择的顺序相反，即先选的靠后，后选的靠前
         f.forEach(function(file) {
           if(!file.name && file.type.indexOf('image') !== -1) {
@@ -1045,39 +1058,41 @@ export default {
           self.files.push(self.newFile(file));
         });
       } else {
-        f = this.newFile(f);
-        this.files.unshift(f);
+        //上传单个文件
+        f = self.newFile(f);
+        self.files.unshift(f);
       }
       // return console.log(self.files);
-      function uploadFileSeries() {
-        var file;
-        for(var i = 0; i < self.files.length; i++) {
-          var f = self.files[i];
-          if(f.status !== 'unUpload' || f.error) continue;
-          file = f;
-          break;
-        }
-        // var file = self.files[0];
-        if(!file) return Promise.resolve();
-        return self.startUpload(file)
-          .then(new Promise(function(resolve, _) {
-            console.log("【上传成功】", file.name);
-            setTimeout(resolve, 1000);
-          }))
-          .then(function() {
-            return uploadFileSeries();
-          })
-      }
       // var promise = this.startUpload(f);
-      return uploadFileSeries()
+      return self.uploadFileSeries()
         .then(function() {
           console.log("【全部上传完成】");
           if(self.category === "upload" && !self.files.length) {
             setTimeout(function() {
               self.category = "all";
               self.getResources(0);
-            }, 500)
+            }, 1000)
           }
+        })
+    },
+    uploadFileSeries() {
+      const self = this;
+      var file;
+      for(var i = 0; i < self.files.length; i++) {
+        var f = self.files[i];
+        if(f.status !== 'unUpload' || f.error) continue;
+        file = f;
+        break;
+      }
+      // var file = self.files[0];
+      if(!file) return Promise.resolve();
+      return self.startUpload(file)
+        .then(new Promise(function(resolve, _) {
+          console.log("【上传成功】", file.name);
+          setTimeout(resolve, 1000);
+        }))
+        .then(function() {
+          return self.uploadFileSeries();
         })
     },
     // 用户已选择待上传的文件
@@ -1091,15 +1106,15 @@ export default {
       self.uploadSelectFile(files);
     },
     changePageType: function(pageType) {
-      var self = this;
-      this.pageType = pageType;
+      const self = this;
+      self.pageType = pageType;
       if(pageType === "list") {
-        this.crash();
+        self.crash();
       }
     },
     crash: function() {
       var paging = this.paging;
-      // this.getResources(paging.page);
+      this.getResources(paging.page);
     },
     done: function() {
       if(!this.callback) return;
@@ -1144,25 +1159,25 @@ export default {
     },
     //选中资源文件
     selectResource: function(r) {
-      if(this.watchType === 'select') {
-        var index = this.getIndex(this.selectedResources, r);
+      const self = this;
+      if(self.watchType === 'select') {
+        var index = self.getIndex(self.selectedResources, r);
         if(index !== -1) {
-          this.selectedResources.splice(index, 1);
+          self.selectedResources.splice(index, 1);
         } else {
-          if(this.selectedResources.length >= this.countLimit) return;
-          this.selectedResources.push(r);
+          if(self.selectedResources.length >= self.countLimit) return;
+          self.selectedResources.push(r);
         }
-      } else if (this.watchType === 'category') {
-        if(this.selectedResources.length) {
-          this.checkbox(r);
+      } else if (self.watchType === 'category') {
+        if(self.selectedResources.length) {
+          self.checkbox(r);
         } else {
           if(r.mediaType === "mediaPicture") {
-            this.$refs.imageViewer.show([`/r/${r.rid}`]);
+            self.$refs.imageViewer.show([`/r/${r.rid}`]);
           } else if (r.mediaType === "mediaVideo" || r.mediaType === "mediaAudio" ) {
             window.open(`/r/${r.rid}`);
           } else if(r.mediaType === "mediaAttachment") {
-
-            this.$refs.resourceInfo.open({rid: r.rid});
+            self.$refs.resourceInfo.open({rid: r.rid});
           }
         }
       }
@@ -1189,25 +1204,37 @@ export default {
         self.crash();
       });
     },
-    //删除和恢复资源
-    editResource(r, type) {
+    //移动到回收站和恢复资源
+    delResource: debounce(function (r, type) {
       const self = this;
       if(this.watchType !== 'category') return;
+      const resources = [];
+      if(r) {
+        resources.push(r.rid);
+      } else{
+        for(const r of self.selectedResources) {
+          if(!r) return;
+          resources.push(r.rid);
+        }
+      }
       return sweetQuestion(`确定要执行当前操作？`)
         .then(() => {
-          nkcAPI(`/r/${r.rid}/del?type=${type}`, 'POST', {})
+          nkcAPI(`/r/${resources[0]}/del`, 'POST', {
+            resources,
+            type,
+          })
             .then(() => {
+              self.selectedResources = [];
               self.getResources(0);
             })
             .catch(err => {
-              console.log(err);
               sweetError(err);
             })
         })
         .catch(err => {
           sweetError(err);
         })
-    },
+    }, 300),
     //点击用户自定义分组 重复点击去除同一id
     selectUserCategory(_id) {
       if(!_id) return;
@@ -1219,7 +1246,7 @@ export default {
       this.getResources(0);
     },
     //获取用户资源分组
-    getCategories() {
+    getCategories: debounce(function () {
       const self = this;
       nkcAPI(`/rc`, 'GET', {})
       .then(res => {
@@ -1230,9 +1257,9 @@ export default {
         console.log(err);
         sweetError(err);
       })
-    },
+    }, 300),
     //创建， 编辑， 删除用户自定义分组
-    editResourceCategory(c, type) {
+    editResourceCategory: debounce(function(c, type) {
       const self = this;
       if(type === 'delete') {
         return sweetQuestion(`确定要执行当前操作？`)
@@ -1254,13 +1281,11 @@ export default {
             sweetError(err);
           })
       }
-      return self.$refs.categoryModal.open(function(data) {
+      return self.$refs.categoryModal.open(function (data) {
         if(!data) return sweetError('参数错误');
         const name = data[0].value;
-        const description = data[1].value;
         return nkcAPI('/rc', 'POST', {
           name,
-          description,
           type,
           _id: c?c._id:''
         })
@@ -1282,21 +1307,12 @@ export default {
             value: c?c.name:'',
             max: '10'
           },
-          {
-            label: '请输入分组描述',
-            dom: 'input',
-            value: c?c.description:'',
-            max: '20'
-          }
         ]
       });
-    },
+    }, 300),
     //编辑按钮
     editCategory() {
-      this.editBtn = true;
-    },
-    editFinish() {
-      this.editBtn = false;
+      this.$refs.selectCategory.open();
     },
     //资源管理多选
     checkbox(r) {
@@ -1309,7 +1325,7 @@ export default {
       }
     },
     //移动到分组
-    moveToCategory() {
+    moveToCategory: debounce(function () {
       const self = this;
       let resources = [];
       for(const r of self.selectedResources) {
@@ -1332,6 +1348,14 @@ export default {
         })
       },{
       });
+    }, 300),
+    //全选文件
+    selectAllResources() {
+      if(this.selectedResources.length === this.resources.length) {
+        this.selectedResources = [];
+      } else {
+        this.selectedResources = [].concat(this.resources);
+      }
     }
   },
 }

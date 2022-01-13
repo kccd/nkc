@@ -232,7 +232,7 @@ module.exports = {
         "reviewLink",
         "title"
       ],
-      content: "您发布的内容[title]已通过审核，[url=reviewLink(立即查看)]。",
+      content: "您发布的内容[url=reviewLink(title]已通过审核，[url=reviewLink(立即查看)]。",
       type: "documentPassReview"
     },
     {
@@ -240,9 +240,19 @@ module.exports = {
         "reviewLink",
         "title",
         "reason",
+        "editLink",
       ],
-      content: "您发布的内容[url=reviewLink(title)]审核未通过，可能包括但不限于下列原因：[text=reason]。",
-      type: "noDocumentPassReview"
+      content: "您发布的内容[url=reviewLink(title)]由于[text=reason]等原因已被退回，目前只有您自己可以查看。请您在72小时之内修改恢复内容，消除存在的问题，并确保符合规章，点击 [url=editLink(这里)] 进行修改。逾期未修改，嗯iron将被彻底屏蔽，不可恢复，届时不再另行通知。",
+      type: "documentFaulty"
+    },
+    {
+      parameters: [
+        "reviewLink",
+        "title",
+        "reason",
+      ],
+      content: "您发布的内容[text=title]由于[text=reason]等原因已被屏蔽，不可恢复。请您发布内容时确保符合规章，消除存在的问题，否则下次将您的内容标记违规",
+      type: "documentDisabled"
     },
     {
       parameters: [

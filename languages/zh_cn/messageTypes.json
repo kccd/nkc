@@ -111,5 +111,6 @@
   "forumsName": "专业名称",
   "threadCategoriesName": "文章属性",
   "documentPassReview": "文档通过审核",
-  "noDocumentPassReview": "文档未通过审核"
+  "documentFaulty": "文档被退修",
+  "documentDisabled": "文档被屏蔽"
 }

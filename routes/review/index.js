@@ -21,7 +21,7 @@ router
         $in: fid
       }
     }
-    const m = {reviewed: false, status: 'normal', type: 'stable'};
+    const m = {status: 'unknown', type: 'stable', source: 'article'};
     //查找出 未审核 未禁用 未退修的post和document
     const postCount = await db.PostModel.countDocuments(q);
     const documentCount = await db.DocumentModel.countDocuments(m);
@@ -193,11 +193,11 @@ router
       if(!document) ctx.throw(404, `未找到_ID未 ${documentId}的文档`);
       if(document.reviewed) ctx.throw(400, '内容已经审核, 请刷新后重试');
       const targetUser = await db.UserModel.findOne({uid: document.uid});
-      //将document状态改为已审核状态
-      await document.updateOne({
-        reviewed: true,
-      });
       if(pass) {
+        //将document状态改为已审核状态
+        await document.updateOne({
+          status: 'normal',
+        });
         //生成审核记录
         await db.ReviewModel.newReview('passDocument', '', data.user, reason, document);
         message = await db.MessageModel({
@@ -210,20 +210,19 @@ router
           }
         })
       } else {
+        if(!delType) ctx.throw(400, '请选择退修或者禁用');
+        //将document状态改为已审核状态
+        await document.updateOne({
+          status: delType,
+        });
         //生成审核记录
         await db.ReviewModel.newReview('noPassDocument', '', data.user, reason, document);
-        //如果有禁用或退修就修改document的状态值
-        if(delType) {
-          await document.updateOne({
-            status: delType,
-          });
-        }
-        //如果标记用户违规了就将该用户的违规次数加一
+        //如果标记用户违规了就给该用户新增违规记录
         if(violation) {
           //新增违规记录
           await db.UsersScoreLogModel.insertLog({
             user: targetUser,
-            type: '',
+            type: 'score',
             typeIdOfScoreChange: 'violation',
             port: ctx.port,
             delType,
@@ -238,8 +237,9 @@ router
           r: document.uid,
           ty: "STU",
           c: {
+            delType,
             violation,//是否违规
-            type: "noDocumentPassReview",
+            type: delType === 'faulty'?"documentFaulty":"documentDisabled",
             docId: document._id,
             reason,
           }

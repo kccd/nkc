@@ -67,9 +67,8 @@ schema.statics.createDraft = async (props) => {
     toc,
     source: documentSource,
     sid: Did,
-    reviewed: true,
   });
-  await document.setReviewStatus(true);
+  await document.setReviewStatus(DocumentModel.getDocumentStatus().normal);
   const draft = new CreationDraftsModel({
     _id: Did,
     uid,
@@ -156,7 +155,6 @@ schema.statics.checkDraftInfo = async (draft) => {
 
 /*
 * 提交草稿
-* 将开发版变为正式版
 * */
 schema.methods.saveDraft = async function() {
   const DocumentModel = mongoose.model('documents');

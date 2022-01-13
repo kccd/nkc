@@ -9,12 +9,12 @@ router
   .post("/", async (ctx, next) => {
     //添加或修改分类
     const {db, state, body, nkcModules} = ctx;
-    const {name, type, _id, description} = body;
+    const {name, type, _id} = body;
     const {checkString} = nkcModules.checkData;
     checkString(name, {
       name: '文件名',
       minLength: 1,
-      maxLength: 10
+      maxLength: 16
     });
     const oldCategory = await db.ResourceCategoryModel.findOne({uid: state.uid, name});
     if(oldCategory || name === '默认') ctx.throw(403, '已存在相同分组名');
@@ -25,14 +25,12 @@ router
         _id: await db.SettingModel.operateSystemID('resourceCategory', 1),
         name,
         uid: state.uid,
-        description
       });
       await category.save();
     } else if(type === 'modify') {
       await db.ResourceCategoryModel.updateOne({_id}, {
         $set: {
           name,
-          description,
           tlm: new Date(),
         }
       });
@@ -48,7 +46,7 @@ router
     const {cid} = params;
     await db.ResourceModel.updateMany({rid: {$in: resources}}, {
       $set: {
-        cid
+        cid: cid === 'default'?'':cid,
       }
     });
     await next();

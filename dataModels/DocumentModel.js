@@ -99,12 +99,12 @@ const schema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  // 是否通过审核
-  reviewed: {
-    type: Boolean,
-    default: false,
-    index: 1
-  },
+  // // 是否通过审核
+  // reviewed: {
+  //   type: Boolean,
+  //   default: false,
+  //   index: 1
+  // },
   // 文档内容字数 排除了 html 标签
   wordCount: {
     type: Number,
@@ -320,10 +320,10 @@ schema.statics.createBetaDocumentByStableDocument = async function(did) {
   if(!stableDocument) throwErr(500, `文档 ${did} 不存在正式版，无法生成编辑版`);
   const originDocument = stableDocument.toObject();
   delete originDocument._v;
-  originDocument.type = DocumentModel.getDocumentTypes.beta;
+  originDocument.type = DocumentModel.getDocumentTypes().beta;
   originDocument._id = await DocumentModel.getId();
   originDocument.toc = new Date();
-  originDocument.status = 'normal';
+  originDocument.status = DocumentModel.getDocumentStatus().unknown;
   const betaDocument = DocumentModel(originDocument);
   await betaDocument.save();
   await NoteModel.copyDocumentNoteAndUpdateOriginNoteTargetId(stableDocument._id, betaDocument._id);
@@ -355,7 +355,9 @@ schema.statics.publishDocumentByDid = async (did) => {
   });
   //是否需要审核
   const needReview = await documentsObj.beta.getReviewStatusAndCreateReviewLog();
-  await documentsObj.beta.setReviewStatus(!needReview);
+  if(needReview) {
+    await documentsObj.beta.setReviewStatus(DocumentModel.getDocumentStatus().unknown);
+  }
   await documentsObj.beta.pushToSearchDB();
 };
 
@@ -943,6 +945,7 @@ schema.methods.getKeywordsReviewStatus = async function() {
 // 获取审核状态，生成审核记录
 schema.methods.getReviewStatusAndCreateReviewLog = async function() {
   const ReviewModel = mongoose.model('reviews');
+  const DocumentModel = mongoose.model('documents');
   let reviewStatus = await this.getGlobalPostReviewStatus();
   if(!reviewStatus.needReview) {
     reviewStatus = await this.getVerifyPhoneNumberReviewStatus();
@@ -955,16 +958,16 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function() {
   if(needReview) {
     await ReviewModel.newDocumentReview(type, this._id, this.uid, reason);
   } else {
-    await this.setReviewStatus(true);
+    await this.setReviewStatus(DocumentModel.getDocumentStatus().normal);
   }
   return needReview;
 }
 
 // 设置审核状态
-schema.methods.setReviewStatus = async function(reviewed) {
+schema.methods.setReviewStatus = async function(status) {
   await this.updateOne({
     $set: {
-      reviewed
+      status,
     }
   });
 };

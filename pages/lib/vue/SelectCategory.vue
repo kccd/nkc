@@ -14,6 +14,7 @@
           span {{item.name}}
           .folder-option
             .fa.fa-edit(@click="editCategory(item, 'modify')" title="编辑")
+            .fa.fa-trash-o(@click="editCategory(item, 'delete')" title="删除")
     .modal-footer
       //- .nav-info(v-if="path") {{path}}
       .options-button.option-add
@@ -68,7 +69,7 @@
       user-select: none;
       margin: 0.5rem 0 1rem 0;
       height: 15rem;
-      overflow-y: scroll!important;
+      overflow-y: auto;
       .active {
         background: #bbd5e8;
         border-radius: 2px;
@@ -127,7 +128,8 @@ export default {
   data: () => ({
     show: false,
     loading: true,
-    selectCid: ''
+    selectCid: '',
+    callback: ''
   }),
   mounted() {
     this.initDraggableElement();
@@ -142,6 +144,7 @@ export default {
     // 点击确定
     submit() {
       if(!this.selectCid) return;
+      if(!this.callback) this.close();
       this.callback(this.selectCid);
     },
     // 选择文件夹
@@ -172,6 +175,9 @@ export default {
     close() {
       this.draggableElement.hide();
       this.show = false;
+      setTimeout(() => {
+        this.selectCid = '';
+      }, 500)
     }
   }
 }

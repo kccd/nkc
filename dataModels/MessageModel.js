@@ -683,15 +683,16 @@ messageSchema.statics.getParametersData = async (message) => {
     parameters = {
       reviewLink: await PostModel.getUrl(post)
     };
-  } else if(["documentPassReview", "noDocumentPassReview"].includes(type)) {
-    const {docId, reason='暂未填写原因'} = message.c;
+  } else if(["documentFaulty", "documentDisabled"].includes(type)) {
+    const {docId, reason='暂未填写原因', delType} = message.c;
     const document = await DocumentModel.findOne({_id: docId});
     if(!document) return null;
     let article = await ArticlesModel.findOne({did: document.did}).sort({toc: -1});
     article = await ArticlesModel.extendArticles([article]);
     parameters = {
       //获取document所在article的url
-      reviewLink: type === 'documentPassReview'?article[0].url:`/creation/articles/editor?bid=${article[0].bid}&aid=${article[0]._id}`,
+      editLink: type === 'documentPassReview'?article[0].url:`/creation/articles/editor?bid=${article[0].bid}&aid=${article[0]._id}`,
+      reviewLink: article[0].url,
       reason,
       title: document.title,
     };
