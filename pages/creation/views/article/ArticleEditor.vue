@@ -152,11 +152,12 @@
         formData.append('article', JSON.stringify(article));
         formData.append('type', type);
         formData.append('articleType', articleType);
+        formData.append('level', 'outermost');
         let url='/creation/articles/editor'
-        if(this.articleId){
-          url='/creation/addChapter'
-          formData.append('aid', this.articleId);
-        }
+        // if(this.articleId){
+        //   url='/creation/addChapter'
+        //   formData.append('aid', this.articleId);
+        // }
         return nkcUploadFile(url, 'POST', formData)
           .then(data => {
             console.log('data.document?._id',data.document?._id)

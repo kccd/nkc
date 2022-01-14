@@ -91,24 +91,6 @@ export default {
     EventBus.$on("levelSelect", (selectedLevel) => {
       this.selectedLevel = selectedLevel;
     });
-
-    EventBus.$on("deleteDirectory", (childIndex) => {
-      this.seekResult = this.dialogData;
-      for (let i = 0; i < childIndex.length; i++) {
-        const position = childIndex[i];
-        this.seekChild({
-          data: this.seekResult,
-          position,
-          currentIndex: i,
-          findLocation: childIndex,
-          type: "parent",
-        });
-      }
-      this.parentData.splice(this.moveIndex.slice(-1));
-      //删除过后发送请求
-    });
-
-
   },
   mounted() {
     this.initDraggableElement();

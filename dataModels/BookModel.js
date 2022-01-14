@@ -1,6 +1,9 @@
 const mongoose = require('../settings/database');
 const Schema = mongoose.Schema;
-const {timeFormat, getUrl} = require("../nkcModules/tools");
+const {
+  timeFormat,
+  getUrl
+} = require("../nkcModules/tools");
 const schema = new mongoose.Schema({
   _id: String,
   uid: {
@@ -35,7 +38,7 @@ const schema = new mongoose.Schema({
   // postId: post:pid
   // articleId：article:aid
   list: {
-    type: [Schema.Types.Mixed],
+    type: [Object],
     default: []
   }
 }, {
@@ -43,8 +46,13 @@ const schema = new mongoose.Schema({
 });
 
 schema.statics.checkBookInfo = async (book) => {
-  const {name, description} = book;
-  const {checkString} = require('../nkcModules/checkData');
+  const {
+    name,
+    description
+  } = book;
+  const {
+    checkString
+  } = require('../nkcModules/checkData');
   checkString(name, {
     name: '文档名称',
     minLength: 1,
@@ -58,7 +66,11 @@ schema.statics.checkBookInfo = async (book) => {
 }
 
 schema.statics.createBook = async (props) => {
-  const {name, description, uid} = props;
+  const {
+    name,
+    description,
+    uid
+  } = props;
   const BookModel = mongoose.model('books');
   const SettingModel = mongoose.model('settings');
   const book = BookModel({
@@ -70,8 +82,11 @@ schema.statics.createBook = async (props) => {
   await book.save();
   return book;
 };
-schema.methods.getBaseInfo = async function() {
-  const {timeFormat, getUrl} = require('../nkcModules/tools');
+schema.methods.getBaseInfo = async function () {
+  const {
+    timeFormat,
+    getUrl
+  } = require('../nkcModules/tools');
   const {
     _id,
     uid,
@@ -91,13 +106,23 @@ schema.methods.getBaseInfo = async function() {
 };
 schema.statics.getBookById = async (bid) => {
   const BookModel = mongoose.model('books');
-  const book = await BookModel.findOnly({_id: bid});
+  const book = await BookModel.findOnly({
+    _id: bid
+  });
   return await book.getBaseInfo();
 };
 schema.statics.getBooksByUserId = async (uid) => {
   const BookModel = mongoose.model('books');
-  const {timeFormat, getUrl} = require('../nkcModules/tools');
-  const books = await BookModel.find({uid, disabled: {$ne: true}});
+  const {
+    timeFormat,
+    getUrl
+  } = require('../nkcModules/tools');
+  const books = await BookModel.find({
+    uid,
+    disabled: {
+      $ne: true
+    }
+  });
   return books.map(book => {
     const {
       _id,
@@ -111,48 +136,60 @@ schema.statics.getBooksByUserId = async (uid) => {
       time: timeFormat(toc),
       name,
       description,
-      coverUrl: cover? getUrl('bookCover', cover): ''
+      coverUrl: cover ? getUrl('bookCover', cover) : ''
     }
   })
 };
-
-schema.methods.bindArticle = async function(aid) {
+schema.statics.filterList=async function(updateList){
+  let newUpdateList=[...updateList]
+  const allowKeys=['id','child','title','url']
+  function find(data) {
+    data.forEach(item => {
+      for (const key in item) {
+        if (Object.hasOwnProperty.call(item, key)) {
+          const obj = item[key];
+          //  一个都没有删掉 不能删除局部变量
+          if(!allowKeys.includes(key)){
+            console.log(key)
+              delete obj
+          }
+          if(item.child){
+            find(item.child)
+          }
+        }
+      }
+    });
+  }
+  find(newUpdateList)
+  console.log(updateList,'updateList')
+}
+schema.methods.bindArticle = async function (aid) {
   await this.updateOne({
     $addToSet: {
-      list:{aid,child:[]} 
+      list: {
+        aid,
+        child: []
+      }
     }
   });
 }
-
-schema.methods.getList = async function(options) {
-  let defaultOptions={setUrl:'bookContent', latestTitle:false}
-  const aids=[]
-  this.list.forEach(item=>{aids.push(item.aid)})
-   // this.list 被替换成了 aids
-  const articles = await this.extendArticlesById(aids, options || defaultOptions);
-  const articlesObj = {};
-  for(const a of articles) {
-    articlesObj[a._id] = a;
-  }
-  const results = [];
-  // this.list 被替换成了 aids
-  for(const aid of aids) {
-    const article = articlesObj[aid];
-    if(!article) continue;
-    results.push(article);
-  }
-  return results;
-}
-// 为了让预览能服用该方法，对该方法进行了传参，然后进行判断
-schema.methods.extendArticlesById = async function(articlesId,{setUrl='bookContent', latestTitle=false}) {
-
+schema.methods.a=async function(articlesId, {setUrl = 'bookContent',latestTitle = false}, bookList){
+  let newbookList=[...bookList]
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
-  const {timeFormat, getUrl} = require('../nkcModules/tools');
-  // console.log(articlesId,'153')
-  const articles = await ArticleModel.find({_id: {$in: articlesId}});
-  // console.log('154',articles)
-  const {article: documentSource} = await DocumentModel.getDocumentSources();
+  const {
+    timeFormat,
+    getUrl
+  } = require('../nkcModules/tools');
+  const articles = await ArticleModel.find({
+    _id: {
+      $in: articlesId
+    }
+  });
+
+  const {
+    article: documentSource
+  } = await DocumentModel.getDocumentSources();
   const documents = await DocumentModel.find({
     type: {
       $in: ['beta', 'stable']
@@ -163,14 +200,18 @@ schema.methods.extendArticlesById = async function(articlesId,{setUrl='bookConte
     }
   });
   const articlesObj = {};
-  for(const d of documents) {
-    const {type, sid} = d;
+  for (const d of documents) {
+    const {
+      type,
+      sid
+    } = d;
     if (!articlesObj[sid]) articlesObj[sid] = {};
     articlesObj[sid][type] = d;
+    // articlesObj[sid] = d;
   }
-// console.log(articlesObj,'articlesObj')
+ 
   const results = [];
-  for(const article of articles) {
+  for (const article of articles) {
     const {
       did,
       _id,
@@ -181,60 +222,262 @@ schema.methods.extendArticlesById = async function(articlesId,{setUrl='bookConte
     const articleObj = articlesObj[_id];
     // prevView 需要拿到最新编辑数据。根据 sid 进行查找，可能会出现多条 ，根据更改时间找到最新一条
     let latestEditorResult;
-    if(latestTitle){
+    if (latestTitle) {
       const documents = await DocumentModel.find({
-       sid:_id
+        sid: _id
       });
       let time
       let latestEditor;
       for (const obj of documents) {
-        if(!time){
+        if (!time) {
           time = obj.tlm;
           latestEditor = obj
-        }else{
-          const objTimeToStr=obj.tlm.toString()
-          const timeToStr=time.toString()
+        } else {
+          const objTimeToStr = obj.tlm.toString()
+          const timeToStr = time.toString()
           new Date(objTimeToStr).getTime() > new Date(timeToStr).getTime() && (latestEditor = obj) && (time = obj.tlm)
         }
       }
-      latestEditorResult=latestEditor
+      latestEditorResult = latestEditor
     }
-    // console.log('articleObj',articleObj)
-    if(!articleObj) continue;
+    if (!articleObj) continue;
     const betaDocument = articlesObj[_id].beta;
     const stableDocument = articlesObj[_id].stable;
-    if(!stableDocument && !betaDocument) {
-      // console.log('等待')
+    if (!stableDocument && !betaDocument) {
       continue;
     }
     const document = stableDocument || betaDocument;
-    const {title} = (latestTitle ? latestEditorResult : document);
-    // console.log('title',title);
+    const {
+      title
+    } = (latestTitle ? latestEditorResult : document);
     const result = {
       _id,
       uid,
       published: !!stableDocument,
       hasBeta: !!betaDocument,
       value: title || '未填写标题',
-      url: getUrl(setUrl, this._id, _id,did),
+      url: getUrl(setUrl, this._id, _id, did),
       time: timeFormat(toc),
       type
     };
     results.push(result);
   }
 
+  // 根据 添加进 results 的数据来匹配 bookList  如果 id 一致 就把 result 对象上数据给 bookList
+    for (const key in results) {
+      if (Object.hasOwnProperty.call(results, key)) {
+      const result = results[key];
+      function find(data) {
+        for(let i in data){
+          const item=data[i]
+          // console.log(item,result)
+          if(item.aid === result._id ){ 
+            for (const key in result) {
+              if (Object.hasOwnProperty.call(result, key)) {
+                const value = result[key];
+                item[key]=value
+              }
+            }
+          }else{
+            find(item.child)
+          }
+        }
+      }
+      find(newbookList)
+    }
+  }
+  // console.log('bookList',bookList)
+  return newbookList;
+  // return results;
+}
+schema.methods.getList = async function (options={setUrl: 'bookContent',latestTitle: false}, bookList, bid) {
+  // const PostModel = mongoose.model('posts');
+
+  const articlesId = [];
+  const postsId = [];
+
+  const articleObj = {};
+  const postObj = {};
+  function find(list) {
+    for (let i = 0; i < list.length; i++) {
+      const item = list[i];
+      if (item.type === 'article') {
+        item.aid && articlesId.push(item.aid);
+        item.aid && (articleObj[item.type + item.aid] = item);
+      } else if (item.type === 'post') {
+        item.aid && postsId.push(item.aid);
+        item.aid && (articleObj[item.type + item.aid] = item);
+      }
+      if (item.child && item.child.length) {
+        find(item.child);
+      }
+    }
+  }
+  find(this.list)
+  const articles= await this.a(articlesId, options, bookList)
+  // const articles = await this.extendArticlesById(articlesId, options, bookList);
+  
+  // if(bookList.length>0){
+  //   bookList.forEach(item => {
+  //     if(item.aid){
+  //       item={...item,...articleObj[item.type + item.aid]}
+  //     }
+  //   });
+  // }
+  // console.log(bookList,'bookList')
+  const articlesObj = {};
+  for (const a of articles) {
+
+  //   const item = listObj[`article` + a._id];
+  //   item.title = a.document.title;
+  // }
+  // const postsObj = {};
+  // for (const a of posts) {
+  //   postsObj[a.pid] = a;
+  // }
+  const results = [];
+  // // this.list 被替换成了 aids
+  // console.log('article',articlesId)
+  // for (const aid of articlesId) {
+  //   const article = articlesObj[aid];
+  //   if (!article) continue;
+  //   results.push(article);
+  // }
+  // for (const aid of postsId) {
+  //   const article = articlesObj[aid];
+  //   if (!article) continue;
+  //   results.push(article);
+  // }
+  return  articles || [];
+  // return  results;
+}
+// 为了让预览能服用该方法，对该方法进行了传参，然后进行判断
+schema.methods.extendArticlesById = async function (articlesId, {
+  setUrl = 'bookContent',
+  latestTitle = false
+}, bookList) {
+
+  const ArticleModel = mongoose.model('articles');
+  const DocumentModel = mongoose.model('documents');
+  const {
+    timeFormat,
+    getUrl
+  } = require('../nkcModules/tools');
+  const articles = await ArticleModel.find({
+    _id: {
+      $in: articlesId
+    }
+  });
+
+  const {
+    article: documentSource
+  } = await DocumentModel.getDocumentSources();
+  const documents = await DocumentModel.find({
+    type: {
+      $in: ['beta', 'stable']
+    },
+    source: documentSource,
+    sid: {
+      $in: articlesId
+    }
+  });
+  const articlesObj = {};
+  for (const d of documents) {
+    const {
+      type,
+      sid
+    } = d;
+    if (!articlesObj[sid]) articlesObj[sid] = {};
+    articlesObj[sid][type] = d;
+  }
+ 
+  // console.log(articlesObj,'articlesObj')
+  const results = [];
+  for (const article of articles) {
+    const {
+      did,
+      _id,
+      toc,
+      uid,
+      type
+    } = article;
+    const articleObj = articlesObj[_id];
+    // prevView 需要拿到最新编辑数据。根据 sid 进行查找，可能会出现多条 ，根据更改时间找到最新一条
+    let latestEditorResult;
+    if (latestTitle) {
+      const documents = await DocumentModel.find({
+        sid: _id
+      });
+      let time
+      let latestEditor;
+      for (const obj of documents) {
+        if (!time) {
+          time = obj.tlm;
+          latestEditor = obj
+        } else {
+          const objTimeToStr = obj.tlm.toString()
+          const timeToStr = time.toString()
+          new Date(objTimeToStr).getTime() > new Date(timeToStr).getTime() && (latestEditor = obj) && (time = obj.tlm)
+        }
+      }
+      latestEditorResult = latestEditor
+    }
+    if (!articleObj) continue;
+    const betaDocument = articlesObj[_id].beta;
+    const stableDocument = articlesObj[_id].stable;
+    if (!stableDocument && !betaDocument) {
+      continue;
+    }
+    const document = stableDocument || betaDocument;
+    const {
+      title
+    } = (latestTitle ? latestEditorResult : document);
+    const result = {
+      _id,
+      uid,
+      published: !!stableDocument,
+      hasBeta: !!betaDocument,
+      value: title || '未填写标题',
+      url: getUrl(setUrl, this._id, _id, did),
+      time: timeFormat(toc),
+      type
+    };
+    for (const d of documents) {
+      const {
+        type,
+        sid
+      } = d;
+      for(const item of bookList){
+        if(sid === item.aid){
+          item={...item,...result}
+        }
+      }
+    }
+    results.push(result);
+  }
   return results;
 }
 
-schema.methods.getContentById = async function(props) {
-  const {aid, uid} = props;
-  const {list} = this;
+schema.methods.getContentById = async function (props) {
+  const {
+    aid,
+    uid
+  } = props;
+  const {
+    list
+  } = this;
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
-  const {article: documentSource} = await DocumentModel.getDocumentSources();
-  if(list.includes(aid)) {
-    const article = await ArticleModel.findOnly({_id: aid});
-    const {_id} = article;
+  const {
+    article: documentSource
+  } = await DocumentModel.getDocumentSources();
+  if (list.includes(aid)) {
+    const article = await ArticleModel.findOnly({
+      _id: aid
+    });
+    const {
+      _id
+    } = article;
     const {
       did,
       time,
@@ -254,5 +497,6 @@ schema.methods.getContentById = async function(props) {
       uid
     }
   }
+}
 }
 module.exports = mongoose.model('books', schema);

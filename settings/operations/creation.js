@@ -58,6 +58,9 @@ module.exports = {
     editor: {
       GET: 'creationCenter',
       POST: 'creationCenter'
+    },
+    del:{
+      POST:'creationCenter'
     }
   },
   article: {

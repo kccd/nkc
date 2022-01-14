@@ -198,12 +198,36 @@ export default {
     clientX: "",
     clientY: "",
     addDocument: "",
+    seekResult:[],
+    parentData:[]
   }),
   created() {
     EventBus.$on("addGroup", (data) => {
       // this.parentData.child ?? (this.parentData.child = []);
       // this.parentData.child.unshift({ type: "article", value: data.title });
       this.addGroup(data);
+    });
+    EventBus.$on("deleteDirectory", (data,childIndex) => {
+      this.seekResult = this.bookList;
+      for (let i = 0; i < childIndex.length; i++) {
+        const position = childIndex[i];
+        this.seekChild({
+          data: this.seekResult,
+          position,
+          currentIndex: i,
+          findLocation: childIndex,
+          type: "parent",
+        });
+      }
+      console.log(this.bid,'this.bid')
+      this.parentData.splice(childIndex.slice(-1),1);
+      let url ='/creation/articles/del'
+      nkcAPI(url,"post",{
+        data:this.parentData,
+        bid:this.bid
+      }).then(data=>{
+        console.log(data)
+      })
     });
   },
   computed: {
@@ -246,6 +270,49 @@ export default {
     this.getBook();
   },
   methods: {
+    changeChild(data, key, value) {
+      if (data) {
+        data.forEach((item) => {
+          this.$set(item, key, value);
+          if (item.child) {
+            this.changeChild(item.child, key, value);
+          }
+        });
+      }
+    },
+    seekChild({ data, position, currentIndex, findLocation, type = "self" }) {
+      console.log(data)
+      if (type === "parent") console.log(data);
+      const child = data[position];
+      if (type === "parent") {
+        // 点击内层
+        if (currentIndex === findLocation.length - 2) {
+          this.parentData = child;
+        }
+        // 点击最外层
+        if (findLocation.length - 2 < 0) {
+          this.parentData = data;
+          console.log(data)
+        }
+      } else if (type === "child") {
+      } else {
+        if (child) {
+          if (currentIndex === findLocation.length - 1) {
+            console.log("数据查找结果为", this.seekResult=child);
+            this.seekResult = child;
+            return;
+          }
+          if (child.child) {
+            this.seekResult = child.child;
+          } else {
+            this.seekResult = child;
+          }
+        } else {
+          console.warn("此位置没有数据");
+        }
+      }
+    },
+
     addGroup(data) {
       let url = "/creation/articles/editor";
       // '/creation/addChapter'

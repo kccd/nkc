@@ -254,6 +254,7 @@ export default {
       });
       this.addGroupDefaultName = "新建分组";
     },
+    // 和
     addDocument(data, i, bid) {
       // data.push({
       //   type: "article",
@@ -265,8 +266,8 @@ export default {
       this.navToPage("articleEditor", { bid, aid, type: "article" });
     },
     deleteDirectory(data, childIndex) {
-      // 拿到 aid 后直接给后端 后端删除
-      EventBus.$emit("deleteDirectory", childIndex);
+      // 直接把数据后端验证数据是否正确就可以了
+      EventBus.$emit("deleteDirectory",data, childIndex);
     },
     moveDirectory(data, childIndex, isOpen) {
       // 拿到 aid 后直接给后端

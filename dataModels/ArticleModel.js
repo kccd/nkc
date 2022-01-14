@@ -1,10 +1,6 @@
 const mongoose = require('../settings/database');
 const schema = new mongoose.Schema({
   _id: String,
-  type:{
-    type:String,
-    defalut:'text'
-  },
   toc: {
     type: Date,
     default: Date.now,
