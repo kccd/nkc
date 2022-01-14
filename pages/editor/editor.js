@@ -15,6 +15,8 @@
 *
 * */
 
+import {nkcAPI} from "../lib/js/netAPI";
+
 window.editor = undefined;
 window.PostInfo = undefined;
 window.PostButton = undefined;
@@ -146,7 +148,9 @@ function initVueApp() {
 
       title: "", // 文章标题
       content: "", // 文章内容
-      contentLength: "", // 文章内容字数
+      contentLength: "", // 本次文章内容字数
+      oldContentLength: "", // 上一次保存的草稿的全部内容字数
+
 
       cover: "",
       // 新选择的封面图的本地路径
@@ -338,7 +342,9 @@ function initVueApp() {
       },
       // 监听内容输入
       watchContentChange: function() {
-        let content = editor.getContentTxt();
+        const content = editor.getContentTxt();
+        const _content = editor.getContent();
+        this.content = _content;
         this.contentLength = content.length;
       },
       // 判断发表权限
@@ -454,9 +460,10 @@ function initVueApp() {
         }, self.saveDraftTimeout);
       },
       // 手动保存草稿，相比自动保存草稿多了一个成功提示框。
+      // 如果编辑器中的内容为空就提示用户要先输入内容
+      // 如果编辑器中的内容与上一次对比减少了，就提示用户是否要保存
       saveToDraft: function() {
         let self = this;
-        if(!self.content) sweetWarning('请先输入内容');
         self.saveToDraftBase()
           .then(function() {
             const postButton = getPostButton();
@@ -942,8 +949,24 @@ function initVueApp() {
       //保存草稿
       saveToDraftBase: function() {
         let self = this;
-        if(!self.content) return;
+        if(!self.content) sweetWarning('请先输入内容');
         return Promise.resolve()
+          .then(() => {
+            // 获取本次编辑器内容的全部长度
+            const allContentLength = editor.getContent().length;
+            // 如果内容相对上一次减少了就提示用户是否需要保存
+            if(allContentLength < self.oldContentLength) {
+              return sweetQuestion(`您输入的内容发生了变化，是否还要继续保存？`)
+                .then(() => {
+                  return;
+                })
+                .catch(err => {
+                  sweetError(err);
+                })
+            } else {
+              return;
+            }
+          })
           .then(function() {
             let post = self.getPost();
             let desType, desTypeId;
@@ -973,14 +996,18 @@ function initVueApp() {
               post: post,
               draftId: self.draftId,
               desType: desType,
-              desTypeId: desTypeId
+              desTypeId: desTypeId,
             }));
             if(self.coverData) {
               formData.append("postCover", NKC.methods.blobToFile(self.coverData), 'cover.png');
             }
+            // 保存草稿
+            // 当编辑器中的字数减少时提示用户是否需要保存，避免其他窗口的自动保存覆盖内容
             return nkcUploadFile("/u/" + NKC.configs.uid + "/drafts", "POST", formData);
           })
           .then(function(data) {
+            //保存草稿的全部内容长度
+            self.oldContentLength = data.contentLength;
             self.draftId = data.draft.did;
             if(data.draft.cover) {
               self.coverData = "";
