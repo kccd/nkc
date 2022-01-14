@@ -219,6 +219,8 @@ schema.statics.extendArticles = async function(articles) {
       published: !!stableDocument,
       hasBeta: !!betaDocument,
       title: title || '未填写标题',
+      bookUrl: `/book/${bookObj[article._id]._id}`,
+      bookName:  bookObj[article._id].name,
       url: getUrl('bookContent', bookObj[article._id]._id, article._id),
       time: timeFormat(toc),
       did

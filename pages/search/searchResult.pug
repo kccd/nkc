@@ -117,3 +117,19 @@
         .fa.fa-cloud-download &nbsp;
         | 立即下载&nbsp;
       div=`${(result.resource.ext || "未知").toUpperCase()} ${tools.getSize(result.resource.size)}`
+  else if result.docType === "document_article"
+    a(href=result.link target="_blank").clear-a-style.search-result-title!= result.title
+      .search-result-info
+        if !result.anonymous
+          a.clear-a-style.search-result-author(href=`/u/${result.documentUser.uid}`)
+            img(src=tools.getUrl('userAvatar', result.documentUser.avatar, 'sm'))
+            span=result.documentUser.username
+        else
+          span.clear-a-style.search-result-author
+            img(src=anonymousInfo.avatar)
+            span.anonymous-name=anonymousInfo.username
+        .search-result-time
+          +fromNow(result.documentTime)
+        span=result.docType === "document_article" ? "发表于" : "回复于"
+        a.clear-a-style.search-result-forum(href=result.bookUrl)=result.bookName
+      .search-result-abstract!= result.abstract

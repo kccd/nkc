@@ -684,7 +684,7 @@ messageSchema.statics.getParametersData = async (message) => {
       reviewLink: await PostModel.getUrl(post)
     };
   } else if(["documentFaulty", "documentDisabled"].includes(type)) {
-    const {docId, reason='暂未填写原因', delType} = message.c;
+    const {docId, reason} = message.c;
     const document = await DocumentModel.findOne({_id: docId});
     if(!document) return null;
     let article = await ArticlesModel.findOne({did: document.did}).sort({toc: -1});
@@ -693,7 +693,7 @@ messageSchema.statics.getParametersData = async (message) => {
       //获取document所在article的url
       editLink: type === 'documentPassReview'?article[0].url:`/creation/articles/editor?bid=${article[0].bid}&aid=${article[0]._id}`,
       reviewLink: article[0].url,
-      reason,
+      reason: reason?reason:'未知',
       title: document.title,
     };
   } else if(["fundAdmin", "fundApplicant", "fundMember", "fundFinishProject"].includes(type)) {

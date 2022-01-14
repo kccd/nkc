@@ -332,6 +332,7 @@ schema.statics.createBetaDocumentByStableDocument = async function(did) {
 
 /*
 * 将开发版更新为正式版，将正式版更新为历史版
+* 将记录同步到搜索数据库
 * @param {Number} did 文档的引用 ID
 * */
 schema.statics.publishDocumentByDid = async (did) => {
@@ -358,6 +359,7 @@ schema.statics.publishDocumentByDid = async (did) => {
   if(needReview) {
     await documentsObj.beta.setReviewStatus(DocumentModel.getDocumentStatus().unknown);
   }
+  //同步到search数据库
   await documentsObj.beta.pushToSearchDB();
 };
 

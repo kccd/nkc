@@ -20,7 +20,7 @@ func.init = async () => {
         mappings: {
           documents: {
             properties: {
-              docType: { // 文档类型：thread，user，post
+              docType: { // 文档类型：thread，user，post，document_article
                 type: "keyword"
               },
               uid: {
@@ -103,7 +103,7 @@ func.init = async () => {
 
 /*
 * 更新数据，若数据不存在则创建
-* @param {String} docType 文档类型：user, post, thread
+* @param {String} docType 文档类型：user, post, thread, document_article
 * @param {Object} document 数据
 * @author pengxiguaa 2019-5-17
 * */
@@ -119,7 +119,6 @@ func.save = async (docType, document) => {
 
   let aid = "";
   const {
-
     pid = "", toc = new Date(), tid = "", uid = "",
     mainForumsId = [],
     t = "", c = "",
@@ -214,7 +213,7 @@ func.search = async (t, c, options) => {
 
   const {
     searchThreadList, searchPostList, searchAllList, searchUserList,
-    searchColumnList, searchResourceList
+    searchColumnList, searchResourceList, searchDocumentList
   } = await SettingModel.getSettings('page');
 
   let size;
@@ -228,6 +227,8 @@ func.search = async (t, c, options) => {
     size = searchColumnList;
   } else if(t === "resource") {
     size = searchResourceList;
+  } else if(t === "document_article") {
+    size = searchDocumentList;
   } else {
     size = searchAllList;
   }
@@ -466,6 +467,12 @@ func.search = async (t, c, options) => {
         docType: "resource"
       }
     });
+  } else if(t === "document_article") {
+    body.query.bool.must.push({
+      match: {
+        docType: "document_article"
+      }
+    });
   }
 
   if(!["user", "column"].includes(t)) {
@@ -564,9 +571,11 @@ func.search = async (t, c, options) => {
           uid
         }
       };
+      //添加只查看该用户的搜索结果
       body.query.bool.must[0].bool.should[0].bool.must.push(authorMatch);
       body.query.bool.must[0].bool.should[1].bool.must.push(authorMatch);
       body.query.bool.must[0].bool.should[5].bool.must.push(authorMatch);
+      body.query.bool.must[0].bool.should[6].bool.must.push(authorMatch);
     }
 
     if(digest) {

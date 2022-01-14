@@ -242,7 +242,7 @@ module.exports = {
         "reason",
         "editLink",
       ],
-      content: "您发布的内容[url=reviewLink(title)]由于[text=reason]等原因已被退回，目前只有您自己可以查看。请您在72小时之内修改恢复内容，消除存在的问题，并确保符合规章，点击 [url=editLink(这里)] 进行修改。逾期未修改，嗯iron将被彻底屏蔽，不可恢复，届时不再另行通知。",
+      content: "您发布的内容[url=reviewLink(title)]由于[text=reason]等原因已被退回，目前只有您自己可以查看。请您在72小时之内修改恢复内容，消除存在的问题，并确保符合规章，点击 [url=editLink(这里)] 进行修改。逾期未修改，内容将被彻底屏蔽，不可恢复，届时不再另行通知。",
       type: "documentFaulty"
     },
     {

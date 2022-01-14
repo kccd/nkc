@@ -5,7 +5,7 @@ router
     const time = Date.now();
     const {db, data, query, nkcModules} = ctx;
     const {nkcRender} = nkcModules;
-    let {page=0, t, c, d} = query;
+    let {page=0, t, c, d} = query;//c 关键词 t 搜索类型
     const {user} = data;
     // 通过mongodb精准搜索用户名
     let targetUser, existUser = false, searchUserFromMongodb = false;
@@ -73,6 +73,10 @@ router
       options.fid = (allFid).filter(id => fidOfCanGetThreads.includes(id));
     } else {
       options.fid = fidOfCanGetThreads;
+    }
+
+    if(t === 'document_article') {
+      options.fid = [];
     }
 
     // 加载分页设置
@@ -157,33 +161,34 @@ router
         } else if(r.docType === 'document_article') {
           documentId.add(r.tid);
         }
-
+        //
         if(r.highlight) {
           if(r.docType === "post" || r.docType === "thread" || r.docType === 'document_article') {
-            highlightObj[r.pid + "_title"] = r.highlight.title;
+            const _id = r.docType === 'document_article'?r.tid:r.pid;
+            highlightObj[_id + "_title"] = r.highlight.title;
             if(r.highlight.content) {
-              highlightObj[r.pid + "_content"] = "内容：" + r.highlight.content;
+              highlightObj[_id + "_content"] = "内容：" + r.highlight.content;
             }
             if(r.highlight.keywordsEN) {
-              highlightObj[r.pid + "_keywordsEN"] = "关键词：" + r.highlight.keywordsEN;
+              highlightObj[_id + "_keywordsEN"] = "关键词：" + r.highlight.keywordsEN;
             }
             if(r.highlight.keywordsCN) {
-              highlightObj[r.pid + "_keywordsCN"] = "关键词：" + r.highlight.keywordsCN;
+              highlightObj[_id + "_keywordsCN"] = "关键词：" + r.highlight.keywordsCN;
             }
             if(r.highlight.abstractEN) {
-              highlightObj[r.pid + "_abstractEN"] = "Abstract：" + r.highlight.abstractEN;
+              highlightObj[_id + "_abstractEN"] = "Abstract：" + r.highlight.abstractEN;
             }
             if(r.highlight.abstractCN) {
-              highlightObj[r.pid + "_abstractCN"] = "摘要：" + r.highlight.abstractCN;
+              highlightObj[_id + "_abstractCN"] = "摘要：" + r.highlight.abstractCN;
             }
             if(r.highlight.pid) {
-              highlightObj[r.pid + "_pid"] = "文号：" + r.highlight.pid;
+              highlightObj[_id + "_pid"] = "文号：" + r.highlight.pid;
             }
             if(r.highlight.aid) {
-              highlightObj[r.pid + "_aid"] = "基金编号：" + r.highlight.aid;
+              highlightObj[_id + "_aid"] = "基金编号：" + r.highlight.aid;
             }
             if(r.highlight.authors) {
-              highlightObj[r.pid + "_authors"] = "作者：" + r.highlight.authors;
+              highlightObj[_id + "_authors"] = "作者：" + r.highlight.authors;
             }
           } else if(r.docType === "user") {
             if(r.highlight.username) {
@@ -274,12 +279,18 @@ router
         const category = threadCategories[i];
         threadCategoriesObj[category.nodeId] = category;
       }
-
       const documents = await db.DocumentModel.find({
-        _id: {$in: [...documentId]},
-        type: 'stable'
+        did: {$in: [...documentId]},
+        type: 'stable',
+        status: 'normal',
       });
       const documentsObj = {};
+      const articlesObj = {};
+      let articles = await db.ArticleModel.find({did: {$in: [...documentId]}});
+      articles = await db.ArticleModel.extendArticles(articles);
+      for(const a of articles) {
+        articlesObj[a.did] = a;
+      }
       for(const d of documents) {
         documentsObj[d.did] = d;
       }
@@ -424,7 +435,42 @@ router
           r.c = nkcRender.htmlFilter(r.c);
         } else if(docType === 'document_article') {
           // 图书搜索
-          continue;
+          const document = documentsObj[tid];
+          if(!document || document.disabled) continue;
+          const documentUser = userObj[document.uid];
+          if(!documentUser) continue;
+          const link = articlesObj[tid].url;
+          const article = articlesObj[tid];
+          r = {
+            docType,
+            link,
+            title: highlightObj[`${tid}_title`] || document.title || article.title,
+            abstract:
+              highlightObj[`${tid}_pid`] ||
+              highlightObj[`${tid}_aid`] ||
+              highlightObj[`${tid}_authors`] ||
+              highlightObj[`${tid}_keywordsEN`] ||
+              highlightObj[`${tid}_keywordsCN`] ||
+              highlightObj[`${tid}_abstractEN`] ||
+              highlightObj[`${tid}_abstractCN`] ||
+              highlightObj[`${tid}_content`] ||
+              "内容：" + document.content,
+            documentTime: document.toc,
+            articleTime: article.time,
+            tid: document.did,
+            anonymous: document.anonymous,
+          }
+          if(!document.anonymous) {
+            r.documentUser = {
+              uid: documentUser.uid,
+              avatar: documentUser.avatar,
+              username: documentUser.username
+            }
+          }
+          r.bookName = article.bookName;
+          r.bookUrl = article.bookUrl;
+          r.title = nkcRender.htmlFilter(r.title);
+          r.abstract = nkcRender.htmlFilter(r.abstract);
         }
         data.results.push(r);
       }
