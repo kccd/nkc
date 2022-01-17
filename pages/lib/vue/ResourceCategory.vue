@@ -3,7 +3,7 @@
     image-viewer(ref="imageViewer")
     resource-info(ref="resourceInfo")
     common-modal(ref="categoryModal")
-    select-category(ref="selectCategory" @edit-category="editResourceCategory" :categories="categories")
+    select-category(ref="selectCategory" @edit-category="editResourceCategory" :categories="categories" @order-change="getResources(0)")
     mixin resourcePaging
       .resource-paging(v-if="paging && paging.buttonValue")
         .paging-button(v-if="paging.buttonValue.length > 1")
@@ -1259,7 +1259,7 @@ export default {
       })
     }, 300),
     //创建， 编辑， 删除用户自定义分组
-    editResourceCategory: debounce(function(c, type) {
+    editResourceCategory: debounce(function(c, type,callback) {
       const self = this;
       if(type === 'delete') {
         return sweetQuestion(`确定要执行当前操作？`)
@@ -1270,6 +1270,7 @@ export default {
             })
               .then(() => {
                 sweetSuccess('操作成功');
+                callback();
                 self.getCategories();
               })
               .catch(err => {
@@ -1292,6 +1293,7 @@ export default {
         .then(() => {
           self.categoryLoading = true;
           sweetSuccess('操作成功');
+          callback();
           self.getCategories();
           self.$refs.categoryModal.close();
         })
@@ -1312,7 +1314,10 @@ export default {
     }, 300),
     //编辑按钮
     editCategory() {
-      this.$refs.selectCategory.open();
+      const self = this;
+      this.$refs.selectCategory.open(() => {}, {
+        categories: self.categories,
+      });
     },
     //资源管理多选
     checkbox(r) {
@@ -1333,8 +1338,10 @@ export default {
         resources.push(r.rid);
       }
       self.$refs.selectCategory.open(function (cid){
-        nkcAPI(`/rc/${cid}/move`, 'POST', {
-          resources
+        if(cid === self.resourceCategories) return sweetError('资源已存在当前分组');
+        nkcAPI(`/rc/move`, 'POST', {
+          resources,
+          cid
         })
         .then(res => {
           sweetSuccess('操作成功');
@@ -1347,6 +1354,7 @@ export default {
           sweetError(err);
         })
       },{
+        categories: self.categories,
       });
     }, 300),
     //全选文件

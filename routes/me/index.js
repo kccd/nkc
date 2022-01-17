@@ -49,10 +49,8 @@ meRouter
     let newSkip = quota * skip;
     let mediaCount = await db.ResourceModel.find(queryMap).countDocuments();
     //获取用户自定义资源分类
-    let categories = await db.ResourceCategoryModel.find({uid});
-    //拓展出资源分类中分类包含的资源数量
-    categories = await db.ResourceCategoryModel.extendCount(categories);
-    data.categories = categories.reverse();
+    let categories = await db.ResourceCategoryModel.find({uid}).sort({order: 1});
+    data.categories = await db.ResourceCategoryModel.extendCount(categories);
     data.paging = nkcModules.apiFunction.paging(skip, mediaCount, quota);
     let maxSkip = Math.ceil(mediaCount / quota);
     if(maxSkip < 1) maxSkip = 1;

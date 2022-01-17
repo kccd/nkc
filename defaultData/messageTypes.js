@@ -232,7 +232,7 @@ module.exports = {
         "reviewLink",
         "title"
       ],
-      content: "您发布的内容[url=reviewLink(title]已通过审核，[url=reviewLink(立即查看)]。",
+      content: "您发布的内容[url=reviewLink(title)]已通过审核，[url=reviewLink(立即查看)]。",
       type: "documentPassReview"
     },
     {

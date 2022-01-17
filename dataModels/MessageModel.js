@@ -683,7 +683,7 @@ messageSchema.statics.getParametersData = async (message) => {
     parameters = {
       reviewLink: await PostModel.getUrl(post)
     };
-  } else if(["documentFaulty", "documentDisabled"].includes(type)) {
+  } else if(["documentFaulty", "documentDisabled", "documentPassReview"].includes(type)) {
     const {docId, reason} = message.c;
     const document = await DocumentModel.findOne({_id: docId});
     if(!document) return null;

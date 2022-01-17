@@ -25,6 +25,7 @@ const app = new Vue({
     }
   },
   methods: {
+    //实例化可拖动组件
     initSortable() {
       const masterContainer = document.getElementsByClassName('thread-categories')[0];
       new Sortable(masterContainer, {
