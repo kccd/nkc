@@ -24,7 +24,8 @@ var app = new Vue({
     relationship: data.reviewSettings.keyword.condition.relationship,
     wordGroup: data.reviewSettings.keyword.wordGroup || [],
     newWordGroupName: "",
-    newWordGroupKeywords: null
+    newWordGroupKeywords: null,
+    violationCount: 0
   },
   watch: {
     tab: function() {

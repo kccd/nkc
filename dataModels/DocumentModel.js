@@ -348,6 +348,7 @@ schema.statics.publishDocumentByDid = async (did) => {
     documentsObj[d.type] = d;
   }
   if(!documentsObj.beta) throwErr(400, `不存在编辑版，无需发表`);
+
   if(documentsObj.stable) await documentsObj.stable.setAsHistoryDocument();
   await documentsObj.beta.updateOne({
     $set: {
@@ -358,6 +359,10 @@ schema.statics.publishDocumentByDid = async (did) => {
   const needReview = await documentsObj.beta.getReviewStatusAndCreateReviewLog();
   if(needReview) {
     await documentsObj.beta.setReviewStatus(DocumentModel.getDocumentStatus().unknown);
+  } else {
+    //不需要审核
+    //检测document中的@用户并发送消息给用户
+    await documentsObj.beta.sendMessageToAtUsers('article');
   }
   //同步到search数据库
   await documentsObj.beta.pushToSearchDB();
@@ -622,6 +627,7 @@ schema.methods.updateResourceReferences = async function () {
 *   @param {String} username 用户名
 * */
 schema.methods.getAtUsers = async function() {
+  const UserModel = mongoose.model('users');
   const {content = ''} = this;
   const atUsers = [];
   const atUsersId = [];
@@ -666,7 +672,7 @@ schema.methods.getAtUsers = async function() {
         usernames.push(item.slice(0, i));
       }
       const targetUsers = await UserModel.find({usernameLowerCase: {$in: usernames}}, {username: 1, usernameLowerCase: 1, uid: 1});
-      let user = null;
+      let user;
       // 取用户名最长的用户为目标用户
       for(const u of targetUsers) {
         if(user === undefined || user.username.length < u.username.length) {
@@ -703,14 +709,14 @@ schema.methods.sendMessageToAtUsers = async function(from) {
     if(oldAtUsersId.includes(user.uid)) continue;
     newAtUsers.push(user);
     // 发送消息
-    const messageId = await SettingModel.operateSystemId('messages', 1);
+    const messageId = await SettingModel.operateSystemID('messages', 1);
     const message = MessageModel({
       _id: messageId,
       ty: 'STU',
       r: user.uid,
       c: {
-        type: 'at',
-        did: this._id
+        type: 'articleAt',
+        did: this.did,
       }
     });
     await message.save();

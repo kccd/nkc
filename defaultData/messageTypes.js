@@ -38,6 +38,19 @@ module.exports = {
     {
       parameters: [
         "userID",
+        "username",
+        "userURL",
+        "articleTitle",
+        "articleURl",
+        "bookURL",
+        "bookTitle"
+      ],
+      content: "用户[url=userURL(username)]在图书[url=bookURL(bookTitle)]中的章节[url=articleURL(articleTitle)]@了你，[url=articleURL(查看)]。",
+      type: "articleAt"
+    },
+    {
+      parameters: [
+        "userID",
         "userURL",
         "username",
         "threadID",

@@ -209,6 +209,7 @@ router
             docId: document._id,
           }
         })
+        await document.sendMessageToAtUsers('article');
       } else {
         if(!delType) ctx.throw(400, '请选择退修或者禁用');
         //将document状态改为已审核状态
@@ -230,6 +231,8 @@ router
             key: 'violationCount',
             description: reason || '屏蔽文档并标记为违规',
           });
+          //如果用户违规了就将用户图书已发帖数置为0，用户需要发布对应贴数后才能免审核
+          await db.UserGeneralModel.resetReviewedCount(document.uid, ['article', 'comment']);
         }
         if(!remindUser) return;
         message = await db.MessageModel({

@@ -33,8 +33,9 @@ if(data.reviewType === 'post') {
       reason: "",
       delType: "faulty",
       noticeType: [true],
-      illegalType: [],
-      articleId: aid
+      illegalType: false,
+      articleId: aid,
+      resetPostCount: '',
     };
   }
 }

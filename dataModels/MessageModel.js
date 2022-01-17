@@ -362,6 +362,24 @@ messageSchema.statics.getParametersData = async (message) => {
       username: user.username,
       userURL: user.uid? getUrl('userHome', user.uid): ''
     };
+  } else if (type === 'articleAt') {
+    const {did} = message.c;
+    const document = await DocumentModel.findOne({did, type: 'stable', status: 'normal'});
+    if(!document) return null;
+    const user = await UserModel.findOne({uid: document.uid});
+    if(!user) return null;
+    const article = await ArticlesModel.findOne({did});
+    if(!article) return null;
+    const articles = await ArticlesModel.extendArticles([article]);
+    parameters = {
+      userID: document.uid,
+      username: user.username,
+      userURL: getUrl('userHome', document.uid),
+      bookTitle: articles[0].bookName,
+      articleTitle: articles[0].title,
+      articleURL: articles[0].url,
+      bookURL: articles[0].bookUrl,
+    };
   } else if(type === 'xsf') {
     const {pid, num} = message.c;
     const post = await PostModel.findOne({pid});
