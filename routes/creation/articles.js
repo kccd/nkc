@@ -47,11 +47,11 @@ router
       ctx.throw(400, `未知的提交类型 type: ${type}`);
     const { title, content, cover } = JSON.parse(fields.article);
     let article;
+    const book = await db.BookModel.findOne({
+      _id: bookId
+    });
+    let bookList = book.list.toObject();
     if (type === "create") {
-      const book = await db.BookModel.findOne({
-        _id: bookId
-      });
-      let bookList = book.list.toObject();
       // 先创建 一个默认数据，如果是 文章类型，再加上aid  
       let child={
         id:'',
@@ -94,8 +94,7 @@ router
           coverFile
         });
         // await book.bindArticle(article._id);
-        child.aid=article._id
-        child.title=''
+        child.id=article._id
         const res = await db.BookModel.updateOne(
           {
             _id: bookId
@@ -119,12 +118,21 @@ router
         return;
       }
     } else {
-      // if (fields.articleType === "post") {
+      if (fields.articleType === "post") {
 
-      // }
-      // if (fields.articleType === "article") {
-
-      // }
+      }
+      if (fields.articleType === "article") {
+        const res = await db.BookModel.updateOne(
+          {
+            _id: bookId
+          },
+          {
+            $set: {
+              list: bookList
+            }
+          }
+        );
+      }
       article = await db.ArticleModel.findOnly({
         _id: articleId
       });
@@ -149,26 +157,17 @@ router
     await next();
   })
   .post('/del',async (ctx,next)=>{
-
     const {db, data, body}=ctx
     const {data:updateData,bid}=body
-    // for (const key in updateData) {
-    //   if (Object.hasOwnProperty.call(updateData, key)) {
-    //     const v = updateData[key];
-    //     if(!updateData.includes(key)){
-          
-    //     }
-    //   }
-    // }
-    db.BookModel.filterList(updateData)
-    console.log('d',body)
+    const filteredData= await db.BookModel.filterList(updateData)
+    console.log('filteredData',filteredData)
     const res = await db.BookModel.updateOne(
       {
         _id: bid
       },
       {
         $set: {
-          list: updateData
+          list: filteredData
         }
       }
     );

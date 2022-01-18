@@ -12,9 +12,9 @@
       <span :style="{ width: level * 24 + 'px' }"></span>
       <span
         class="icon seat"
-        @click.stop="toggle(childIndex)"
+        @click.stop="toggle('' ,childIndex)"
         v-if="data.child && data.child.length > 0"
-        :class="{ down: isOpen.status, right: !isOpen.status }"
+        :class="{ down: data.isOpen, right: !data.isOpen }"
       >
       </span>
       <span class="seat" v-else></span>
@@ -22,33 +22,38 @@
         <span class="status" v-if="!data.published">[未发布]</span>
         <span class="status" v-else-if="data.hasBeta">[编辑中]</span>
       </span>
+
       <span
         v-if="operations"
         class="title"
         @click.stop="
-          data.type === 'text' && operations && clickArticleTitle(data)
+          data.type !== 'text' && operations && clickArticleTitle(data)
         "
         >{{ data.value }}</span
       >
       <span
         v-else
-        class="fill"
+        class="fill openArea"
         :class="{
           ellipsis: data.showIndication && !data.isMove,
         }"
         @click.stop="moveIndication(data, childIndex)"
         >{{ data.value }}</span
       >
-      <span class="click_block" v-if="operations" @click="toggle()"></span>
+      <span
+        class="click_block openArea"
+        v-if="operations"
+        @click="toggle('', childIndex)"
+      ></span>
 
       <!-- </div> -->
 
       <!-- <transition name="fade"> -->
       <div v-if="operations">
         <div class="operations" v-show="isShowOperation">
-          <span @click.stop="addGroup(data,childIndex)">新建分组</span>
-          <span @click.stop="addDocument(data, childIndex, bid)">新建文档</span>
-          <span @click.stop="moveDirectory(data, childIndex, isOpen)"
+          <span @click.stop="add(data, childIndex)">新建</span>
+          <!-- <span @click.stop="addDocument(data, childIndex, bid)">新建文档</span> -->
+          <span @click.stop="moveDirectory(data, childIndex, data.isOpen, bid)"
             >移动</span
           >
           <span @click.stop="deleteDirectory(data, childIndex)">删除</span>
@@ -107,14 +112,13 @@
     <!-- <transition name="fade"> -->
     <template v-for="(child, j) in data.child">
       <Tree
-        v-show="isOpen.status"
+        v-show="data.isOpen"
+        :bid="bid"
         :key="j"
         :data="child"
         :level="level + 1"
         :childIndex="childIndex + j.toString()"
         :operations="operations"
-        :childrenDisable="childrenDisable"
-        :childDisable="child.isMove"
       ></Tree>
     </template>
     <!-- </transition> -->
@@ -122,9 +126,8 @@
   </div>
 </template>
 <script>
-let globalStatus = {};
-let i = 0;
 import { EventBus } from "../../eventBus.js";
+
 export default {
   name: "Tree",
   props: {
@@ -154,14 +157,13 @@ export default {
   data() {
     return {
       levelSelect: "childLevel",
-      isOpen: { status: false },
       isShowOperation: false,
       isShowAddGroup: false,
       addGroupDefaultName: "新建分组",
-      showIndication: { status: false },
+      showIndication: false,
+      prevParennNode:''
     };
   },
-  inject: ["datas"],
   directives: {
     focus: {
       inserted: function (el) {
@@ -169,16 +171,7 @@ export default {
       },
     },
   },
-  computed: {
-    // newData() {
-    //   console.log('this.data',this.data)
-    //   return {
-    //     ...this.data,
-    //     isShowAddGroup: false,
-    //     isMove:false
-    //   };
-    // },
-  },
+  computed: {},
   created() {},
   mounted() {},
   updated() {},
@@ -189,34 +182,49 @@ export default {
   },
   methods: {
     moveIndication(data, childIndex) {
-      // 如果为禁用状态就不显示指示
-      if (this.childDisable || this.childrenDisable) {
-        this.isOpen.status = !this.isOpen.status;
+      const {isOpen, showIndication, isMove, parentNode, childrenDisable}=this.$props.data
+      // 如果为禁用状态就不显示指示 禁用状态是可以打开关闭的列表
+      if (isMove && !this.$props.operations && childrenDisable) {
+        console.log(1)
+        EventBus.$emit("moveDialogOpenMenu",data, childIndex, !isOpen);
         return;
-      } else if (this.isOpen.status) {
-        if (!this.showIndication.status) {
-          // this.showIndication.status = true;
-          EventBus.$emit("showIndication", childIndex, this.isOpen.status);
-          return;
-        } else {
-          this.isOpen.status = false;
-        }
       }
-      this.isOpen.status = !this.isOpen.status;
-      // 当打开状态时 应该 应该先关闭其他指示，在当前下面打开指示。
-      EventBus.$emit("showIndication", childIndex, this.isOpen.status);
+      // 不属于禁用状态的显示线 会走这个
+      if(!this.$props.operations && !childrenDisable){
+        console.log(6)
+        EventBus.$emit("moveDialogOpenMenu", data, childIndex, !this.$props.data.isOpen);
+        EventBus.$emit("showIndication", childIndex, true,data);
+        
+      // 禁用状态子级走 这    showIndication 是 bug源
+      }else{
+        EventBus.$emit("moveDialogOpenMenu",data, childIndex, !this.$props.data.isOpen);
+      }
     },
-    toggle(instruct) {
+    toggle(instruct, childIndex) {
+      const {operations,data}=this.$props
       switch (instruct) {
         //  打开新建分组
         case "on":
-          this.isOpen.status = true;
+          if(!operations){
+            EventBus.$emit("moveDialogOpenMenu",data, childIndex, true);
+          }else{
+            EventBus.$emit("openMenu", childIndex, true);
+          }
           break;
         case "off":
-          this.isOpen.status = false;
+          if(!operations){
+            EventBus.$emit("moveDialogOpenMenu",data, childIndex, false);
+          }else{
+            EventBus.$emit("openMenu", childIndex, false);
+          }
           break;
         default:
-          this.isOpen.status = !this.isOpen.status;
+          if(!operations){
+                        console.log('toggle')
+            EventBus.$emit("moveDialogOpenMenu",data, childIndex, !data.isOpen);
+          }else{
+            EventBus.$emit("openMenu", childIndex, !data.isOpen);
+          }
       }
     },
     // 编辑
@@ -228,11 +236,14 @@ export default {
     mouseEnter() {
       this.isShowOperation = !this.isShowOperation;
     },
-    addGroup(data,childIndex) {
+    add(data, childIndex) {
+      console.log(this.bid)
+      EventBus.$emit('addDialog',this.bid)
       //
-      this.isShowAddGroup = !this.isShowAddGroup;
-      this.toggle("on");
-      this.listener("add-group-input",data,childIndex);
+      // this.isShowAddGroup = !this.isShowAddGroup;
+      // this.toggle("on",childIndex);
+      // this.listener("add-group-input", data, childIndex);
+
     },
     // 新建分组后添加数据
     addGroupDatas(data) {
@@ -244,13 +255,11 @@ export default {
         value: this.addGroupDefaultName,
         published: false,
       });
-      // 拿到 aid 给后端
       EventBus.$emit("addGroup", {
-        type:'create',
-        aid:data._id,
+        type: "create",
+        aid: data._id,
         articleType: "text",
         value: this.addGroupDefaultName,
-
       });
       this.addGroupDefaultName = "新建分组";
     },
@@ -267,15 +276,15 @@ export default {
     },
     deleteDirectory(data, childIndex) {
       // 直接把数据后端验证数据是否正确就可以了
-      EventBus.$emit("deleteDirectory",data, childIndex);
+      EventBus.$emit("deleteDirectory", data, childIndex);
     },
-    moveDirectory(data, childIndex, isOpen) {
-      // 拿到 aid 后直接给后端
-      EventBus.$emit("moveDirectory", data, childIndex, isOpen);
+    moveDirectory(data, childIndex, isOpen, bid) {
+      console.log('bid',bid)
+      EventBus.$emit("moveDirectory", data, childIndex, isOpen, bid);
     },
 
     // 新建分组使进行监听，如果点击除自己外的元素，就进行添加数据
-    listener(element,data) {
+    listener(element, data) {
       const handler = (e) => {
         // 采用了 v-if 来显示 新增分组元素 ，原因是 如果 v-show ,页面将有多个元素有相同 ID
         const contentWrap = document.getElementById(element);
@@ -299,6 +308,9 @@ export default {
 };
 </script>
 <style scoped lang='less'>
+.openArea{
+  // background: rgb(51, 80, 247);
+}
 .disable {
   background-color: rgba(129, 128, 128, 0.226);
   cursor: not-allowed;
@@ -385,9 +397,9 @@ export default {
     height: 15px;
   }
   .title {
+    color: rgb(69, 69, 250);
     flex: auto;
     max-width: 6rem;
-    // max-width: 100px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -408,12 +420,10 @@ export default {
   .operations {
     text-align: right;
     span {
-      padding: 5px 5px;
+      padding: 2px 0;
       cursor: pointer;
       margin-left: 10px;
       color: rgb(5, 5, 5);
-      border: 1px solid rgba(129, 128, 128, 0.226);
-      border-radius: 4px;
     }
   }
 }

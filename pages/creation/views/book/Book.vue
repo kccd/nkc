@@ -16,8 +16,11 @@
         button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
           @click="navToPage('bookEditor', { bid })"
         ) 设置
-  //- MoveDirectoryDialog(v-show="showMoveCharter", @close="cancel")
-  MoveDirectoryDialog(:data="data") 
+  MoveDirectoryDialog(
+    :bid="bid",
+    :changeStatus="changeStatus"
+  )
+  AddDialog
 </template>
 
 <style lang="less" scoped>
@@ -132,10 +135,12 @@ import { nkcAPI, nkcUploadFile } from "../../../lib/js/netAPI";
 import MoveDirectoryDialog from "../../component/MoveDirectoryDialog.vue";
 import Tree from "../../component/tree/Tree.vue";
 import { EventBus } from "../../eventBus";
+import AddDialog from "../../component/AddDialog.vue";
 export default {
   components: {
     MoveDirectoryDialog,
     Tree,
+    AddDialog
   },
   data: () => ({
     data: [
@@ -149,7 +154,7 @@ export default {
             type: "article",
             value: "articleId",
             published: false,
-            time: "2022/1/10 10:57",
+            time: "2022/1/10 10:57"
           },
           {
             type: "post",
@@ -161,17 +166,17 @@ export default {
                 type: "post",
                 value: "postId",
                 published: false,
-                time: "2022/1/10 10:57",
-              },
-            ],
+                time: "2022/1/10 10:57"
+              }
+            ]
           },
           {
             type: "url",
             value: "https://www.google.com",
             published: false,
-            time: "2022/1/10 10:57",
-          },
-        ],
+            time: "2022/1/10 10:57"
+          }
+        ]
       },
       {
         type: "article",
@@ -183,10 +188,10 @@ export default {
             type: "article",
             value: "articleId",
             published: false,
-            time: "2022/1/10 10:57",
-          },
-        ],
-      },
+            time: "2022/1/10 10:57"
+          }
+        ]
+      }
     ],
     showMoveCharter: false,
     more: false,
@@ -198,16 +203,40 @@ export default {
     clientX: "",
     clientY: "",
     addDocument: "",
-    seekResult:[],
-    parentData:[]
+    seekResult: [],
+    parentData: [],
+    moveDialogData: []
   }),
   created() {
-    EventBus.$on("addGroup", (data) => {
+    EventBus.$on("addGroup", data => {
       // this.parentData.child ?? (this.parentData.child = []);
       // this.parentData.child.unshift({ type: "article", value: data.title });
       this.addGroup(data);
     });
-    EventBus.$on("deleteDirectory", (data,childIndex) => {
+
+    EventBus.$on("deleteDirectory", async (data, childIndex) => {
+      this.seekResult = this.bookList;
+      for (let i = 0; i < childIndex.length - 1; i++) {
+        const position = childIndex[i];
+        this.seekChild({
+          data: this.seekResult,
+          position,
+          currentIndex: i,
+          findLocation: childIndex,
+          type: "parent"
+        });
+      }
+      this.seekResult.child.splice(childIndex.slice(-1), 1);
+      let url = "/creation/articles/del";
+      await nkcAPI(url, "post", {
+        data: this.bookList,
+        bid: this.bid
+      }).then(data => {
+        console.log(data);
+      });
+      this.getBook();
+    });
+    EventBus.$on("openMenu", (childIndex, status) => {
       this.seekResult = this.bookList;
       for (let i = 0; i < childIndex.length; i++) {
         const position = childIndex[i];
@@ -215,19 +244,16 @@ export default {
           data: this.seekResult,
           position,
           currentIndex: i,
-          findLocation: childIndex,
-          type: "parent",
+          findLocation: childIndex
         });
       }
-      console.log(this.bid,'this.bid')
-      this.parentData.splice(childIndex.slice(-1),1);
-      let url ='/creation/articles/del'
-      nkcAPI(url,"post",{
-        data:this.parentData,
-        bid:this.bid
-      }).then(data=>{
-        console.log(data)
-      })
+
+      this.$set(this.seekResult, "isOpen", status);
+      this.changeChild(this.seekResult.child, "isOpen", !status);
+      this.openMenuIndex = childIndex;
+    });
+    EventBus.$on("updatePageData", () => {
+      this.getBook();
     });
   },
   computed: {
@@ -236,11 +262,11 @@ export default {
       return [
         {
           name: "文档创作",
-          page: "books",
+          page: "books"
         },
         {
-          name: book ? book.name : `加载中...`,
-        },
+          name: book ? book.name : `加载中...`
+        }
       ];
     },
     extendedData() {
@@ -248,31 +274,34 @@ export default {
       function res(data) {
         for (let i = 0; i < data.length; i++) {
           that.$set(data, i, { ...data[i], isMove: false });
-          that.$set(data, i, { ...data[i], isOPen: false });
+          that.$set(data, i, { ...data[i], isOpen: false });
           if (data[i].child?.length > 0) {
             res(data[i].child);
           }
         }
       }
       res(this.bookList);
+
       return this.bookList;
-    },
+    }
   },
   provide() {
     return {
-      datas: this.data,
+      datas: this.data
     };
   },
   mounted() {
-    // console.log(extendedData())
     this.bid = this.$route.params.bid;
     this.addDocument = this.$route.query.data;
     this.getBook();
   },
   methods: {
+    changeStatus(msg) {
+      this.$set(msg, "isMove", true);
+    },
     changeChild(data, key, value) {
       if (data) {
-        data.forEach((item) => {
+        data.forEach(item => {
           this.$set(item, key, value);
           if (item.child) {
             this.changeChild(item.child, key, value);
@@ -280,25 +309,32 @@ export default {
         });
       }
     },
+    //  把 子级 父级 同级 都 写入 就不用 每次都要循环找不同级别
     seekChild({ data, position, currentIndex, findLocation, type = "self" }) {
-      console.log(data)
-      if (type === "parent") console.log(data);
       const child = data[position];
       if (type === "parent") {
+        this.seekResult = child;
         // 点击内层
         if (currentIndex === findLocation.length - 2) {
-          this.parentData = child;
+          this.seekResult = child;
+          return;
+        }
+        if (child) {
+          if (child.child) {
+            this.seekResult = child.child;
+          } else {
+            this.seekResult = child;
+          }
         }
         // 点击最外层
-        if (findLocation.length - 2 < 0) {
-          this.parentData = data;
-          console.log(data)
+        if (findLocation.length == 1) {
+          this.seekResult = data;
         }
-      } else if (type === "child") {
+      } else if (type === "childe") {
       } else {
         if (child) {
           if (currentIndex === findLocation.length - 1) {
-            console.log("数据查找结果为", this.seekResult=child);
+            // console.log("数据查找结果为", this.seekResult=child);
             this.seekResult = child;
             return;
           }
@@ -319,12 +355,12 @@ export default {
 
       const { aid, articleType, value, type } = data;
       let formData = new FormData();
-      formData.append("article", JSON.stringify({title:value}));
+      formData.append("article", JSON.stringify({ title: value }));
       formData.append("bookId", this.bid);
       formData.append("aid", aid);
       formData.append("type", type);
       formData.append("articleType", articleType);
-      nkcUploadFile(url, "POST", formData).then((data) => {
+      nkcUploadFile(url, "POST", formData).then(data => {
         console.log(data, "data");
       });
     },
@@ -338,7 +374,7 @@ export default {
       this.$router.push({
         name,
         query,
-        params,
+        params
       });
     },
 
@@ -347,21 +383,21 @@ export default {
         name: "bookContent",
         params: {
           bid: this.bid,
-          id,
-        },
+          id
+        }
       });
     },
     getBook() {
       let url = `/creation/book/${this.bid}`;
       const self = this;
-      nkcAPI(url, "GET")
-        .then((data) => {
+      return nkcAPI(url, "GET")
+        .then(data => {
           console.log(data);
           self.book = data.bookData;
           self.bookList = data.bookList;
         })
         .catch(sweetError);
-    },
-  },
+    }
+  }
 };
 </script>

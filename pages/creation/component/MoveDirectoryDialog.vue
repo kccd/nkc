@@ -5,14 +5,19 @@
       p.model_title
         span.title 请选择要放置的目录位置
       .model_content
-        Tree(v-if="showTree", :data="dialogData", :operations="false")
+        Tree(
+          v-if="showTree",
+          :data="dialogData",
+          :operations="false",
+          :bid="bid"
+        )
       .model_footer
         .model_footer_container
           button.model_cancle(@click="cancel") 取消
           button.model_confirm(@click="confirm()") 确认
 </template>
 <script>
-//           :disable="seekResult"
+import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import Tree from "./tree/Tree.vue";
 import { DraggableElement } from "../../lib/js/draggable";
 import { EventBus } from "../eventBus";
@@ -20,26 +25,29 @@ export default {
   components: {
     Tree,
   },
-  props: ["seat", "data"],
+  props: {
+    bid: String,
+    changeStatus: Function,
+  },
   data() {
     return {
       show: false,
       title: "",
       info: "",
       quote: "",
-      dialogData: {},
+      dialogData: [],
       moveData: {},
       moveIndex: "",
       seekResult: {},
       showTree: true,
       insertIndex: "",
       selectedLevel: "childLevel",
+      openMenuIndex: "",
     };
   },
   created() {
-    this.dialogData = [...this.$props.data];
-
-    EventBus.$on("moveDirectory", (msg, childIndex, isOpen) => {
+    EventBus.$on("moveDirectory", async (msg, childIndex, isOpen, bid) => {
+      await this.getBook(bid);
       // 重置 数据
       this.seekResult = this.dialogData;
       // 根据 childIndex(字符串每个数组记录的是数组中数据的位置) 长度来查找 数组指定位置的数据
@@ -52,27 +60,22 @@ export default {
           findLocation: childIndex,
         });
       }
-      // 这个地址时 this.dialogData 中对象的地址  修改的数据最外层
+      this.changeChild([this.seekResult], "childrenDisable", true);
+      // 不知道为什么 这个不行
       this.$set(this.seekResult, "isMove", true);
-      this.seekResult = this.dialogData;
+      // this.$set(this.seekResult, "parentNode", childIndex);
+      // console.log(this.seekResult===msg,msg,this.seekResult,childIndex)
+      // this.$set(msg, "isMove", true);
+      // this.seekResult = this.dialogData;
       this.moveIndex = childIndex;
-      for (let i = 0; i < childIndex.length; i++) {
-        const position = childIndex[i];
-        this.seekChild({
-          data: this.seekResult,
-          position,
-          currentIndex: i,
-          findLocation: childIndex,
-          type: "parent",
-        });
-      }
-      // 拿到 被移动的aid 和 
+
       this.moveData = msg;
+      // 对话框
       this.show = true;
+      // 树结构 用的v-if
       this.showTree = true;
     });
-
-    EventBus.$on("showIndication", (childIndex, status) => {
+    EventBus.$on("showIndication", (childIndex, status, data) => {
       this.seekResult = this.dialogData;
       for (let i = 0; i < childIndex.length; i++) {
         const position = childIndex[i];
@@ -83,13 +86,29 @@ export default {
           findLocation: childIndex,
         });
       }
+      this.insertIndex = childIndex;
+      //   就这有 bug
       this.changeChild(this.dialogData, "showIndication", !status);
       this.$set(this.seekResult, "showIndication", status);
-      this.insertIndex = childIndex;
     });
-
     EventBus.$on("levelSelect", (selectedLevel) => {
       this.selectedLevel = selectedLevel;
+    });
+    EventBus.$on("moveDialogOpenMenu", (data, childIndex, status = false) => {
+      // this.seekResult = this.dialogData;
+      // for (let i = 0; i < childIndex.length; i++) {
+      //   const position = childIndex[i];
+      //   this.seekChild({
+      //     data: this.seekResult,
+      //     position,
+      //     currentIndex: i,
+      //     findLocation: childIndex,
+      //   });
+      // }
+      this.$set(data, "isOpen", status);
+      // this.changeChild(data.child, "isOpen", !status);
+      console.log(data, "this.seekResult");
+      this.openMenuIndex = childIndex;
     });
   },
   mounted() {
@@ -98,7 +117,25 @@ export default {
   destroyed() {
     EventBus.$off();
   },
+  updated() {},
   methods: {
+    deepClone1(obj) {
+      //判断拷贝的要进行深拷贝的是数组还是对象，是数组的话进行数组拷贝，对象的话进行对象拷贝
+      var objClone = Array.isArray(obj) ? [] : {};
+      //进行深拷贝的不能为空，并且是对象或者是
+      if (obj && typeof obj === "object") {
+        for (key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            if (obj[key] && typeof obj[key] === "object") {
+              objClone[key] = deepClone1(obj[key]);
+            } else {
+              objClone[key] = obj[key];
+            }
+          }
+        }
+      }
+      return objClone;
+    },
     changeChild(data, key, value) {
       if (data) {
         data.forEach((item) => {
@@ -109,17 +146,40 @@ export default {
         });
       }
     },
+    reset(data, key, type) {
+      data.forEach((item) => {
+        if (type === "reset") {
+          this.$set(item, key[0], false);
+          this.$set(item, key[1], false);
+          this.$set(item, key[2], false);
+          this.$set(item, key[3], false);
+        }
+        if (item.child) {
+          this.reset(item.child, key, type);
+        }
+      });
+    },
+    //  把 子级 父级 同级 都 写入 就不用 每次都要循环找不同级别
     seekChild({ data, position, currentIndex, findLocation, type = "self" }) {
-      if (type === "parent") console.log(data);
       const child = data[position];
       if (type === "parent") {
+        this.seekResult = child;
         // 点击内层
         if (currentIndex === findLocation.length - 2) {
-          this.parentData = child;
+          this.seekResult = child;
+          return;
         }
+        if (child) {
+          if (child.child) {
+            this.seekResult = child.child;
+          } else {
+            this.seekResult = child;
+          }
+        }
+        console.log(findLocation, "----------");
         // 点击最外层
-        if (findLocation.length - 2 < 0) {
-          this.parentData = data;
+        if (findLocation.length === 1) {
+          this.seekResult = data;
         }
       } else if (type === "childe") {
       } else {
@@ -145,32 +205,140 @@ export default {
         this.$refs.draggableHandle
       );
     },
-    confirm(data) {
-      EventBus.$emit("moveDirectoryConfirm", data);
-      // 数据移入选中项 子级或同级
-      if (this.selectedLevel === "childLevel") {
-        this.seekResult.child ?? (this.seekResult.child = []);
-        this.seekResult?.child?.unshift(this.moveData);
-      } else {
-        this.parentData.unshift(this.moveData);
+    findParent(data, item) {
+      for (let obj of data) {
+        console.log(obj, item);
+        if (obj.id === item.id) {
+          return data;
+        }
+        if (data.child && data.child.length) {
+          this.findParent(data.child, item);
+        }
       }
-      console.log(this.parentData);
-      // 删除被移动的数据
-      this.parentData.splice(this.moveIndex.slice(-1));
-      //删除过后发送请求
-      // 拿到 aid  和  this.parentData 的 id 后端 aid 移动到 childIndx 位置 并且  删除  this.parentData
-      this.$set(this.seekResult, "isMove", false);
+    },
+    async confirm(data) {
+      // 数据移入选中项 子级
+      if (this.selectedLevel === "childLevel") {
+        this.seekResult = this.dialogData;
+        for (let i = 0; i < this.insertIndex.length; i++) {
+          const position = this.insertIndex[i];
+          this.seekChild({
+            data: this.seekResult,
+            position,
+            currentIndex: i,
+            findLocation: this.insertIndex,
+          });
+        }
+        let length;
+        if (this.insertIndex.length === 1) {
+          length = 1;
+        } else {
+          length = this.insertIndex.length - 1;
+        }
+        this.seekResult.child ?? (this.seekResult.child = []);
+        console.log(this.seekResult);
+        this.seekResult.child.unshift(this.moveData);
+        // 删除被移动的数据
+        this.seekResult = this.dialogData;
+        for (let i = 0; i < length - 1; i++) {
+          const position = this.insertIndex[i];
+          this.seekChild({
+            data: this.seekResult,
+            position,
+            currentIndex: i,
+            findLocation: this.insertIndex,
+            type: "parent",
+          });
+        }
+
+        const deleteDataIndex = this.moveIndex.slice(-1);
+        this.seekResult = this.dialogData;
+        this.findParent(this.dialogData, this.moveData).splice(
+          deleteDataIndex,
+          1
+        );
+        // 数据移入同级
+      } else {
+        //  debugger
+        let length;
+        this.seekResult = this.dialogData;
+        if (this.insertIndex.length === 1) {
+          length = 1;
+        } else {
+          length = this.insertIndex.length - 1;
+        }
+        for (let i = 0; i < length; i++) {
+          const position = this.insertIndex[i];
+          this.seekChild({
+            data: this.seekResult,
+            position,
+            currentIndex: i,
+            findLocation: this.insertIndex,
+            type: "parent",
+          });
+        }
+        console.log(this.seekResult);
+        if (length === 1) {
+          this.seekResult.unshift(this.moveData);
+        } else {
+          this.seekResult.child.unshift(this.moveData);
+        }
+
+        // 因为数据是向前添加的所以 原来的数据向后移动了一位
+        const deleteDataIndex = this.moveIndex.slice(-1);
+        // 因为向上添加 原来位置会后移一位
+        const newIndex = this.insertIndex.slice(-1) - 0 + 1;
+        console.log(this.findParent(this.dialogData, this.moveData), "-----");
+        this.findParent(this.dialogData, this.moveData)[newIndex].child.splice(
+          deleteDataIndex,
+          1
+        );
+        // 应该 父级 改变数据
+        this.$set(this.moveData, "isMove", false);
+        this.$set(this.moveData, "showIndication", false);
+        // 关掉是 结构重置
+        this.showTree = false;
+      }
+
+      let url = "/creation/articles/del";
+      await nkcAPI(url, "post", {
+        data: this.dialogData, // 原先是 this.parentData
+        bid: this.$props.bid,
+      }).then((data) => {
+        console.log(data);
+      });
+      EventBus.$emit("updatePageData");
+      this.reset(
+        this.dialogData,
+        ["isMove", "isOpen", "childrenDisable", "showIndication"],
+        "reset"
+      );
       this.close();
+    },
+    getBook(bid) {
+      let url = `/creation/book/${bid}`;
+      const self = this;
+      return nkcAPI(url, "GET")
+        .then((data) => {
+          console.log(data);
+          self.book = data.bookData;
+          self.dialogData = data.bookList;
+        })
+        .catch(sweetError);
     },
     cancel() {
       // 数据重置  数据这里有bug
-      this.$set(this.seekResult, "isMove", false);
-      this.$set(this.seekResult, "showIndication", false);
+      this.reset(
+        this.dialogData,
+        ["isMove", "isOpen", "childrenDisable", "showIndication"],
+        "reset"
+      );
+      console.log(this.dialogData);
       // 关掉是 结构重置
       this.showTree = false;
+      this.show = false;
       this.close();
     },
-
     open(callback, options) {
       this.callback = callback;
       this.dialogData = options.dialogData;
@@ -271,4 +439,3 @@ export default {
   }
 }
 </style>
-
