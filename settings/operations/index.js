@@ -83,6 +83,7 @@ const logo = require('./logo');
 const book = require('./book');
 const pim = require('./pim');
 const rc = require('./rc');
+const comment = require("./comment");
 const operationObj = {};
 
 
@@ -278,6 +279,7 @@ operationObj.operationTree = {
     mathJax, // 编辑器预览公式
     book, // 书籍
 		rc, //资源分组
+    comment, // 评论系统
 	}
 };
 module.exports = operationObj;
