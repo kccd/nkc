@@ -6,52 +6,56 @@
       .fa.fa-remove
   .module-dialog-content
     .select-type
-      label(for="" style="margin-left: 5px;")
+      label(for="", style="margin-left: 5px")
         span 
           | 新建分组
-          input(type="radio" value="group" v-model="selectType")
-      label(for="" style="margin-left: 10px;")
-        span 
-          | 新建文档
-          input(type="radio" value="document" v-model="selectType")
-      label(for="" style="margin-left: 10px;")
+          input(type="radio", value="group", v-model="selectType")
+      label(for="", style="margin-left: 10px")
         span 
           | 新建URL
-          input(type="radio" value="URL" v-model="selectType")
-      label(for="" style="margin-left: 10px;")
+          input(type="radio", value="URL", v-model="selectType")
+      label(for="", style="margin-left: 10px")
         span 
           | 新建POST
-          input(type="radio" value="POST" v-model="selectType")  
-      .add_group(v-show="selectType === 'group' || selectType === 'URL'")
-        select(v-model="protocol" v-show="selectType === 'URL'" class='select')
-          option(value='http') http
-          option(value='https') https
+          input(type="radio", value="POST", v-model="selectType") 
+      .add-group(v-show="selectType === 'group' || selectType === 'URL'")
+        select.select(v-model="protocol", v-show="selectType === 'URL'")
+          option(value="http") http://
+          option(value="https") https://
         span(v-show="selectType === 'group'") 分组名:
-        input(class="add-group-input select query-input" id="add-group-input" type="text" v-model="inputValue" v-focus)
+        input#add-group-input.add-group-input.select.query-input(
+          type="text",
+          v-model="inputValue",
+          v-focus
+        )
+    .split-line
     .select-post(v-show="selectType === 'POST'")
       .select-post-query
         .select-post-query-width
           input.query-input(
-          type="text",
-          placeholder="请输入pid",
-          v-model="searchContent"
+            type="text",
+            placeholder="请输入pid",
+            v-model="searchContent"
           )
-          button.query-button(@click="query") 查询
-          button.query-button(@click="query('reset')") 重置
+          button.query-button(@click="query(0,'search')") 查询
+          button.reset-button(@click="query(0, 'reset')") 重置
+      .post-list-title
+        //- span.postId.title 标题
+        //- span.postContent.title 内容
       ul.select-post-list
-        li.post-list-title
-          span.postId.title ID
-          span.postContent.title 内容
         .list-container(ref="listContainer")
           .list-height(ref="listHeight")
-            li.post-list-item(
-              v-for="post in [ { id: 1, content: '内容' }, { id: 2, content: '内容2' }, ]"
-            )
-              span.itemId {{ post.id }}
-              span.item-content {{ post.content }}
-    .select-tree
-      span 请选择新建位置
-      Tree(:data="extendedData", :operations="false")
+            li.post-list-item(v-for="post in postList")
+              label.radio-post(for="" )
+                input(type="radio" @input="selectPost(...arguments,post)" )
+              .content
+                p.postId {{ post.firstPost.t }}
+                p.postContent {{ post.firstPost.c }}
+            li(v-if="postList.length === 0" style="font-size:24px") 数据加载中...
+            li(v-else-if="!postList" style="font-size:24px") 暂无数据
+    //- .select-tree
+    //-   span 请选择新建位置
+    //-   Tree(:data="extendedData", :operations="false")
     .m-t-1.m-b-1.text-right
       button.btn.btn-sm.btn-default.m-r-05(@click="close") 关闭
       button.btn.btn-sm.btn-primary(@click="submit") 确定
@@ -62,6 +66,7 @@ import { DraggableElement } from "../../lib/js/draggable";
 import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import Tree from "./tree/Tree.vue";
 import { EventBus } from "../eventBus.js";
+import { getState } from "../../lib/js/state";
 export default {
   components: {
     Tree,
@@ -73,38 +78,44 @@ export default {
     quote: "",
     data: {},
     treeData: [],
-    selectType: "defaultTips",
+    selectType: "group",
     searchContent: "",
-    protocol:'http',
-    inputValue:''
+    protocol: "http://",
+    inputValue: "默认新建分组名",
+    postList: [],
+    addResult:'',
+    selectPostData:'',
+    insertData:{},
+    bid:'',
+    type:''
   }),
   created() {
-    EventBus.$on("addDialog", (bid) => {
+    EventBus.$on("addDialog", (bid, data, childIndex) => {
       if (!bid) console.log("bid不存在");
+      this.bid=bid,
+      this.insertData={
+        data,
+        index:childIndex
+      },
       this.getTreeData(bid);
       this.draggableElement.show();
     });
   },
-  watch:{
-    selectType(){
-      if(this.selectType === 'POST'){
-        this.query(1,"get")
+  watch: {
+    selectType() {
+      if (this.selectType === "POST") {
+        this.query(0, "get");
+      } else if (this.selectType === "URL") {
+        this.inputValue = "www.kechuang.org";
+      } else if (this.selectType === "group") {
+        this.inputValue = "默认新建分组名";
       }
-    }
+    },
   },
   mounted() {
     this.initDraggableElement();
   },
   updated() {
-    this.$nextTick(() => {
-      console.dir(this.$refs.listHeight.clientHeight);
-      if (this.$refs.listHeight.clientHeight < 240) {
-        this.$refs.listContainer.setAttribute(
-          "class",
-          "list-container-noScroll"
-        );
-      }
-    });
   },
   computed: {
     extendedData() {
@@ -124,6 +135,10 @@ export default {
     },
   },
   methods: {
+    selectPost(e,post){
+      // console.log(e,post)
+      this.selectPostData=post
+    },
     getTreeData(bid) {
       // let url = `/creation/book/${bid}`;
       let url = `/creation/book/61e51196e9a1781a80932e99`;
@@ -136,28 +151,53 @@ export default {
         })
         .catch(sweetError);
     },
-    async query(page = 1, type = "get") {
+    async query(page = 0, type = "get") {
+      let url;
       const { searchContent } = this;
-      let url
-      if(type === 'search'){
+      let username = await getState();
+      if (!username.uid) return;
+      if (type === "search") {
         if (!searchContent) return;
-         url = `/u/92837/profile/thread?page=${page}&limit=20&type=${type}&content=${searchContent}`;
-      }else{
-        url= `u/92837/profile/thread?page=${page}&limit=20&type=${type}`;
+        url = `/u/${username.uid}/profile/thread?page=${page}&limit=20&type=${type}&pid=${searchContent}`;
+      } else {
+        url = `/u/${username.uid}/profile/thread?page=${page}&limit=20&type=${type}`;
       }
+      this.postList=[]
       const result = await nkcAPI(url, "get");
-      console.log(result);
+      this.postList =result.threads.length ? result.threads : ''; // 先不改了
+      this.$nextTick(() => {
+      if (this.$refs.listHeight.clientHeight < 480) {
+        this.$refs.listContainer.setAttribute(
+          "class",
+          "list-container-noScroll"
+        );
+      }else{
+        this.$refs.listContainer.setAttribute(
+          "class",
+          "list-container"
+        );
+      }
+    });
     },
     initDraggableElement() {
       this.draggableElement = new DraggableElement(
         this.$el,
         this.$refs.draggableHandle
       );
-
-      console.log(this.draggableElement);
     },
     submit: function () {
-      this.callback(this.data);
+      // this.callback(this.data);
+      if(this.selectType === 'POST'){
+        this.addResult=this.selectPostData
+        this.type='post'
+      }else if(this.selectType === 'URL'){
+        this.addResult=this.protocol + this.inputValue,
+        this.type='url'
+      }else{
+        this.addResult=this.inputValue
+        this.type='text'
+      }
+      EventBus.$emit('addConfirm',this.addResult,this.type,this.insertData)
     },
     pickedFile: function (index) {
       var dom = this.$refs["input" + index][0];
@@ -182,11 +222,15 @@ export default {
   },
   directives: {
     focus: {
-      inserted: function (el) {
+      update: function (el) {
         el.focus();
+        // el.select();
       },
     },
   },
+  destroyed(){
+    EventBus.$off()
+  }
 };
 </script>
 
@@ -197,12 +241,28 @@ export default {
   margin: 0;
   list-style-type: none;
 }
-.select{
-  margin-top:5px;
-  height:2rem; 
+.select {
+  height: 2rem;
 }
-.add-group-input{
-  width:22rem;
+.add-group-input {
+  width: 22rem;
+}
+.query-input {
+  outline: none;
+}
+.postId {
+  font-size: 1.2rem;
+  font-weight: 600;
+  // margin-right: 3px;
+}
+.postContent {
+    margin: 0.6rem 0;
+    max-height: 4.5rem;
+    word-break: break-word;
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
 @import "../../publicModules/base";
 .module-dialog-body {
@@ -245,45 +305,99 @@ export default {
 
   .module-dialog-content {
     .select-tree {
-      border-top:1px solid rgba(218, 216, 216, 0.514);
+      border-top: 1px solid rgba(218, 216, 216, 0.514);
       margin-top: 10px;
     }
     padding: 0 1rem;
     .select-type {
       // margin-top: 10px;
       width: 27rem;
-      margin:10px auto;
+      margin: 10px auto;
+      .add-group {
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        .add-group-input {
+          flex: auto;
+        }
+      }
     }
+    // .split-line{
+    //   border-top:1px solid rgba(218, 216, 216, 0.514);
+    //   margin-bottom:5px;
+    // }
     .select-post {
-      border-top:1px solid rgba(218, 216, 216, 0.514);
       margin-top: 10px;
-      .select-post-query-width{
-        // display: inline-block;
-        width:22rem;
-        margin: 0 auto;
+      .select-post-query-width {
+        button{
+          padding:0 8px;
+          margin-left: 10px;
+        }
       }
-      .query-input {
-        outline: none;
-      }
+
       .select-post-list {
+        display: flex;
+        align-items: baseline;
         margin-top: 5px;
         .list-container {
           border: 1px rgba(218, 216, 216, 0.514) solid;
-          height: 20rem;
+          height: 40rem;
+          width:100%;
           overflow-y: scroll;
-          .post-list-item {
-            margin-top: 3px;
-            background: rgb(216 234 243);
+          .list-height{
+            cursor: pointer;
+            .post-list-item:hover{
+                background-color: #e6e0db ;
+              }
+            .post-list-item {
+              display: flex;
+              align-items: center;
+              .radio-post{
+                margin-right: 10px;
+              }
+              .content{
+                
+              }
+              transition: all .3s ;
+              padding: 1rem;
+              background-color: #f6f2ee;
+              border-radius: 3px;
+            }
           }
         }
         .list-container-noScroll {
+          width: 100%;
           border: 1px rgba(218, 216, 216, 0.514) solid;
-          height: 20rem;
+          height: 40rem;
+          .list-height{
+            cursor: pointer;
+            .post-list-item:hover{
+                background-color: #e6e0db ;
+              }
+            .post-list-item {
+              display: flex;
+              align-items: center;
+              .radio-post{
+                margin-right: 10px;
+              }
+              .content{
+                
+              }
+              transition: all .3s ;
+              padding: 1rem;
+              background-color: #f6f2ee;
+              border-radius: 3px;
+            }
+            
+          }
         }
         li {
           margin-top: 3px;
         }
         .post-list-title {
+          background: rgb(138, 137, 137);
+          display: flex;
+          align-items: baseline;
           font-weight: 600;
         }
       }
@@ -300,7 +414,7 @@ export default {
 }
 ::-webkit-scrollbar-thumb {
   border-radius: 5px;
-  background: bisque;
+  background: rgb(212, 212, 211);
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
 }
 </style>

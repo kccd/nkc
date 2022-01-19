@@ -238,12 +238,7 @@ export default {
     },
     add(data, childIndex) {
       console.log(this.bid)
-      EventBus.$emit('addDialog',this.bid)
-      //
-      // this.isShowAddGroup = !this.isShowAddGroup;
-      // this.toggle("on",childIndex);
-      // this.listener("add-group-input", data, childIndex);
-
+      EventBus.$emit('addDialog',this.bid,data, childIndex)
     },
     // 新建分组后添加数据
     addGroupDatas(data) {

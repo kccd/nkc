@@ -1,20 +1,24 @@
 <template lang="pug">
-.model(v-show="show")
-  .model_box
-    .model_container(ref="draggableHandle")
-      p.model_title
-        span.title 请选择要放置的目录位置
-      .model_content
+.module-dialog-body
+  .module-dialog-header(ref="draggableHandle")
+    .module-dialog-title {{ title }}
+    .module-dialog-close(@click="close")
+      .fa.fa-remove
+  .module-dialog-content
+      .content
         Tree(
           v-if="showTree",
           :data="dialogData",
           :operations="false",
           :bid="bid"
         )
-      .model_footer
-        .model_footer_container
-          button.model_cancle(@click="cancel") 取消
-          button.model_confirm(@click="confirm()") 确认
+      //- .model_footer
+      //-   .model_footer_container
+      //-     button.model_cancle(@click="cancel") 取消
+      //-     button.model_confirm(@click="confirm()") 确认
+      .m-t-1.m-b-1.text-right
+        button.btn.btn-sm.btn-default.m-r-05(@click="cancel") 关闭
+        button.btn.btn-sm.btn-primary(@click="confirm()") 确定
 </template>
 <script>
 import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
@@ -32,7 +36,7 @@ export default {
   data() {
     return {
       show: false,
-      title: "",
+      title: "请选择移动位置",
       info: "",
       quote: "",
       dialogData: [],
@@ -70,8 +74,9 @@ export default {
       this.moveIndex = childIndex;
 
       this.moveData = msg;
+      this.draggableElement.show();
       // 对话框
-      this.show = true;
+      // this.show = true;
       // 树结构 用的v-if
       this.showTree = true;
     });
@@ -365,7 +370,51 @@ export default {
   padding: 0;
   list-style: none;
 }
-
+@import "../../publicModules/base";
+.module-dialog-body {
+  display: none;
+  position: fixed;
+  width: 30rem;
+  max-width: 100%;
+  top: 100px;
+  right: 0;
+  z-index: 1050;
+  background-color: #fff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  border: 1px solid #ddd;
+  margin: 1rem;
+  .module-dialog-content{
+    padding:5px;
+    .content{
+      border: 1px solid #c1b9b9;
+    }
+  }
+  .module-dialog-header {
+    height: 3rem;
+    line-height: 3rem;
+    background-color: #f6f6f6;
+    .module-dialog-close {
+      cursor: pointer;
+      color: #aaa;
+      width: 3rem;
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 3rem;
+      line-height: 3rem;
+      text-align: center;
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.08);
+        color: #777;
+      }
+    }
+    .module-dialog-title {
+      cursor: move;
+      font-weight: 700;
+      margin-left: 1rem;
+    }
+  }
+}
 .model {
   position: fixed;
   top: 0;
@@ -378,18 +427,18 @@ export default {
   align-items: center;
   justify-content: center;
   .model_box {
-    @media (max-width: 800px) {
-      width: 700px;
-    }
-    @media (max-width: 700px) {
-      width: 600px;
-    }
-    @media (max-width: 400px) {
-      width: 380px;
-    }
+    // @media (max-width: 800px) {
+    //   width: 700px;
+    // }
+    // @media (max-width: 700px) {
+    //   width: 600px;
+    // }
+    // @media (max-width: 400px) {
+    //   width: 380px;
+    // }
     background-color: white;
-    height: 550px;
-    width: 800px;
+    // height: 550px;
+    // width: 800px;
     box-shadow: rgba(138, 138, 138, 0.438) 5px 5px 8px;
     border: rgba(138, 138, 138, 0.438) 1px solid;
     .model_container {

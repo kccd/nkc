@@ -514,5 +514,5 @@ router
   .use("/:pid/option", optionRouter.routes(), optionRouter.allowedMethods())
   .use('/:pid/comments', commentsRouter.routes(), commentsRouter.allowedMethods())
   .use('/:pid/comment', commentRouter.routes(), commentRouter.allowedMethods())
-  .use("/:pid/delete", deleteRouter.routes(), deleteRouter.allowedMethods());
+  .use("/:pid/delete", deleteRouter.routes(), deleteRouter.allowedMethods())
 module.exports = router;

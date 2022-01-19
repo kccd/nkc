@@ -1,4 +1,17 @@
 const router = require("koa-router")();
+let aidStatus=false
+function find(data,id){
+  if(data){
+    for (const obj of data) {
+      console.log(obj.id === id,id,obj.id)
+      if(obj.id === id){
+        aidStatus= true
+      }else if(obj.child && obj.child.length){
+        find(obj.child,id)
+      }
+    }
+  }
+}
 router
   .get("/editor", async (ctx, next) => {
     const { query, data, db } = ctx;
@@ -7,7 +20,8 @@ router
       _id: bid
     });
     if (aid) {
-      if (!book.list.includes(aid)) {
+      find(book.list,aid)
+      if (!aidStatus) {
         ctx.throw(400, `文章 ID 错误`);
       }
       const article = await db.ArticleModel.findOnly({

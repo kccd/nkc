@@ -213,7 +213,35 @@ export default {
       // this.parentData.child.unshift({ type: "article", value: data.title });
       this.addGroup(data);
     });
-
+    EventBus.$on('addConfirm', (res,type,{data:insertData,index})=>{
+     // 都是向子级的child 插入数据
+    console.log(this.findId(this.bookList,insertData.id),res)
+    let obj;
+    if(type === 'text'){
+      obj={
+        title:res,
+        type,
+        id:'',
+        url:''
+      }
+    }else if(type === 'url'){
+       obj={
+        title:'',
+        type,
+        id:'',
+        url:res
+      }
+    }else{
+      //  post 拿一下id
+       obj={
+        title:res.title,
+        type,
+        id:res.id,
+        url:''
+      }
+    }
+    this.findId(this.bookList,insertData.id).child.unshift(obj)
+    })
     EventBus.$on("deleteDirectory", async (data, childIndex) => {
       this.seekResult = this.bookList;
       for (let i = 0; i < childIndex.length - 1; i++) {
@@ -298,6 +326,22 @@ export default {
   methods: {
     changeStatus(msg) {
       this.$set(msg, "isMove", true);
+    },
+    findId(data,id){
+      let findData
+      function find(data,id) {
+        if(data){
+          for(let obj of data){
+            if(obj.id === id){
+              findData=obj
+            }else if(obj.child && obj.child.length){
+              find(obj,child,id)
+            }
+          }
+        }
+      } 
+      find(data,id)
+      return findData
     },
     changeChild(data, key, value) {
       if (data) {
