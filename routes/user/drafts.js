@@ -105,8 +105,10 @@ draftsRouter
     const draftCount = await db.DraftModel.countDocuments({uid: user.uid});
     if(draftCount >= 100) ctx.throw(400, "草稿箱已满");
     let draft;
+    let contentLength;
     if(draftId) {
       draft = await db.DraftModel.findOne({did: draftId, uid: user.uid});
+      contentLength = draft.c.length;
     }
     const draftObj = {
       t, c, l, abstractEn, abstractCn, keyWordsEn, keyWordsCn,
@@ -158,6 +160,8 @@ draftsRouter
       await db.AttachmentModel.saveDraftCover(draft.did, files.postCover);
       // await nkcModules.file.saveDraftCover(draft.did, files.postCover);
     }
+    // 将数据库中的内容长度发送给前端，用于内容减少时提示用户是否需要保存
+    data.contentLength = contentLength;
     data.draft = await db.DraftModel.findOne({did: draft.did});
     await next();
   });

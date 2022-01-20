@@ -99,11 +99,6 @@ const schema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  // 是否通过审核
-  reviewed: {
-    type: Boolean,
-    default: false,
-  },
   // 文档内容字数 排除了 html 标签
   wordCount: {
     type: Number,
@@ -229,6 +224,7 @@ schema.statics.createBetaDocument = async (props) => {
     toc,
     source,
     sid,
+    reviewed = false,
   } = props;
   const DocumentModel = mongoose.model('documents');
   const AttachmentModel = mongoose.model('attachments');
@@ -254,6 +250,7 @@ schema.statics.createBetaDocument = async (props) => {
     type: DocumentModel.getDocumentTypes().beta,
     source,
     sid,
+    reviewed,
   });
   await document.save();
   await document.updateResourceReferences();
@@ -317,9 +314,10 @@ schema.statics.createBetaDocumentByStableDocument = async function(did) {
   if(!stableDocument) throwErr(500, `文档 ${did} 不存在正式版，无法生成编辑版`);
   const originDocument = stableDocument.toObject();
   delete originDocument._v;
-  originDocument.type = DocumentModel.getDocumentTypes.beta;
+  originDocument.type = DocumentModel.getDocumentTypes().beta;
   originDocument._id = await DocumentModel.getId();
   originDocument.toc = new Date();
+  originDocument.status = DocumentModel.getDocumentStatus().unknown;
   const betaDocument = DocumentModel(originDocument);
   await betaDocument.save();
   await NoteModel.copyDocumentNoteAndUpdateOriginNoteTargetId(stableDocument._id, betaDocument._id);
@@ -328,6 +326,7 @@ schema.statics.createBetaDocumentByStableDocument = async function(did) {
 
 /*
 * 将开发版更新为正式版，将正式版更新为历史版
+* 将记录同步到搜索数据库
 * @param {Number} did 文档的引用 ID
 * */
 schema.statics.publishDocumentByDid = async (did) => {
@@ -343,14 +342,23 @@ schema.statics.publishDocumentByDid = async (did) => {
     documentsObj[d.type] = d;
   }
   if(!documentsObj.beta) throwErr(400, `不存在编辑版，无需发表`);
+
   if(documentsObj.stable) await documentsObj.stable.setAsHistoryDocument();
   await documentsObj.beta.updateOne({
     $set: {
       type: type[0]
     }
   });
+  //是否需要审核
   const needReview = await documentsObj.beta.getReviewStatusAndCreateReviewLog();
-  await documentsObj.beta.setReviewStatus(needReview);
+  if(needReview) {
+    await documentsObj.beta.setReviewStatus(DocumentModel.getDocumentStatus().unknown);
+  } else {
+    //不需要审核
+    //检测document中的@用户并发送消息给用户
+    await documentsObj.beta.sendMessageToAtUsers('article');
+  }
+  //同步到search数据库
   await documentsObj.beta.pushToSearchDB();
 };
 
@@ -613,6 +621,7 @@ schema.methods.updateResourceReferences = async function () {
 *   @param {String} username 用户名
 * */
 schema.methods.getAtUsers = async function() {
+  const UserModel = mongoose.model('users');
   const {content = ''} = this;
   const atUsers = [];
   const atUsersId = [];
@@ -657,7 +666,7 @@ schema.methods.getAtUsers = async function() {
         usernames.push(item.slice(0, i));
       }
       const targetUsers = await UserModel.find({usernameLowerCase: {$in: usernames}}, {username: 1, usernameLowerCase: 1, uid: 1});
-      let user = null;
+      let user;
       // 取用户名最长的用户为目标用户
       for(const u of targetUsers) {
         if(user === undefined || user.username.length < u.username.length) {
@@ -694,14 +703,14 @@ schema.methods.sendMessageToAtUsers = async function(from) {
     if(oldAtUsersId.includes(user.uid)) continue;
     newAtUsers.push(user);
     // 发送消息
-    const messageId = await SettingModel.operateSystemId('messages', 1);
+    const messageId = await SettingModel.operateSystemID('messages', 1);
     const message = MessageModel({
       _id: messageId,
       ty: 'STU',
       r: user.uid,
       c: {
-        type: 'at',
-        did: this._id
+        type: 'articleAt',
+        did: this.did,
       }
     });
     await message.save();
@@ -862,7 +871,7 @@ schema.methods.getGlobalPostReviewStatus = async function() {
     !user.volumeA &&
     (
       notPassVolumeA.type === 'all' ||
-      notPassVolumeA.type === 'count' && reviewdCount[source] < notPassVolumeA.count
+      notPassVolumeA.type === 'count' && reviewedCount[source] < notPassVolumeA.count
     )
   ) {
     return {
@@ -877,7 +886,7 @@ schema.methods.getGlobalPostReviewStatus = async function() {
     if(!roleList.includes(bl.id) || bl.type === 'none') continue;
     if(
       bl.type === 'all' ||
-      (bl.type === 'count' && reviewdCount[source] < bl.count)
+      (bl.type === 'count' && reviewedCount[source] < bl.count)
     ) {
       return {
         needReview: true,
@@ -938,6 +947,7 @@ schema.methods.getKeywordsReviewStatus = async function() {
 // 获取审核状态，生成审核记录
 schema.methods.getReviewStatusAndCreateReviewLog = async function() {
   const ReviewModel = mongoose.model('reviews');
+  const DocumentModel = mongoose.model('documents');
   let reviewStatus = await this.getGlobalPostReviewStatus();
   if(!reviewStatus.needReview) {
     reviewStatus = await this.getVerifyPhoneNumberReviewStatus();
@@ -946,20 +956,30 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function() {
     reviewStatus = await this.getKeywordsReviewStatus();
   }
   const {needReview, reason, type} = reviewStatus;
+  //如果需要审核，就生成审核记录
   if(needReview) {
     await ReviewModel.newDocumentReview(type, this._id, this.uid, reason);
+  } else {
+    await this.setReviewStatus(DocumentModel.getDocumentStatus().normal);
   }
   return needReview;
 }
 
 // 设置审核状态
-schema.methods.setReviewStatus = async function(reviewed) {
+schema.methods.setReviewStatus = async function(status) {
   await this.updateOne({
     $set: {
-      reviewed
+      status,
     }
   });
 };
+
+/*
+* 拓展document
+* */
+schema.statics.extendDocuments = async function(documents) {
+  return documents;
+}
 
 // 匿名发表相关
 

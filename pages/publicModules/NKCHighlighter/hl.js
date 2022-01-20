@@ -19,6 +19,7 @@ NKC.modules.NKCHL = class {
     self.type = type;
     self.id = targetId;
     self.rootElement = rootElement;
+    //监听鼠标选中事件
     window.addEventListener("mouseup", () => {
       setTimeout(() => {
         self.removeBtn();
@@ -30,6 +31,7 @@ NKC.modules.NKCHL = class {
         "MathJax_CHTML", // 公式
         "MathJax"
       ],
+      //排除带有data-tag为nkcsource的标签
       clownAttr: {
         "data-tag": "nkcsource"
       },
@@ -68,6 +70,7 @@ NKC.modules.NKCHL = class {
               if($(window).width() < 768) {
                 NKC.methods.visitUrl(`/note?content=${content}&targetId=${self.id}&type=${self.type}&offset=${node.offset}&length=${node.length}`, true);
               } else {
+                debugger
                 self.newNote({
                   id: "",
                   content,
@@ -120,7 +123,7 @@ NKC.modules.NKCHL = class {
       });
     } else {
       span.css({
-        top: top - $(document).scrollTop() - 3+ "px"
+        top: top - $(document).scrollTop() - 3 + "px"
       });
     }
     $(body).append(span);

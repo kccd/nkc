@@ -317,6 +317,8 @@ messageSchema.statics.getSystemWarningInfo = async (uid, tUid) => {
 * */
 messageSchema.statics.getParametersData = async (message) => {
   const moment = require("moment");
+  const ArticlesModel = mongoose.model("articles");
+  const DocumentModel = mongoose.model("documents");
   const PostModel = mongoose.model("posts");
   const UserModel = mongoose.model("users");
   const ThreadModel = mongoose.model("threads");
@@ -359,6 +361,23 @@ messageSchema.statics.getParametersData = async (message) => {
       postURL: await PostModel.getUrl(post),
       username: user.username,
       userURL: user.uid? getUrl('userHome', user.uid): ''
+    };
+  } else if (type === 'articleAt') {
+    const {did} = message.c;
+    const document = await DocumentModel.findOne({did, type: 'stable', status: 'normal'});
+    const user = await UserModel.findOne({uid: document.uid});
+    if(!user) return null;
+    const article = await ArticlesModel.findOne({did});
+    if(!article) return null;
+    const articles = await ArticlesModel.extendArticles([article]);
+    parameters = {
+      userID: document.uid,
+      username: user.username,
+      userURL: getUrl('userHome', document.uid),
+      bookTitle: articles[0].bookName,
+      articleTitle: articles[0].title,
+      articleURL: articles[0].url,
+      bookURL: articles[0].bookUrl,
     };
   } else if(type === 'xsf') {
     const {pid, num} = message.c;
@@ -680,6 +699,19 @@ messageSchema.statics.getParametersData = async (message) => {
     if(!post) return null;
     parameters = {
       reviewLink: await PostModel.getUrl(post)
+    };
+  } else if(["documentFaulty", "documentDisabled", "documentPassReview"].includes(type)) {
+    const {docId, reason} = message.c;
+    const document = await DocumentModel.findOne({_id: docId});
+    if(!document) return null;
+    let article = await ArticlesModel.findOne({did: document.did}).sort({toc: -1});
+    article = await ArticlesModel.extendArticles([article]);
+    parameters = {
+      //获取document所在article的url
+      editLink: type === 'documentPassReview'?article[0].url:`/creation/articles/editor?bid=${article[0].bid}&aid=${article[0]._id}`,
+      reviewLink: article[0].url,
+      reason: reason?reason:'未知',
+      title: document.title,
     };
   } else if(["fundAdmin", "fundApplicant", "fundMember", "fundFinishProject"].includes(type)) {
     const {applicationFormId} = message.c;

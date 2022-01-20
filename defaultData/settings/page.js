@@ -9,6 +9,7 @@ module.exports = {
     threadPostList: 30,
     searchThreadList: 30,
     searchPostList: 30,
+    searchDocumentList: 30,
     searchAllList: 30,
     searchUserList: 30,
     threadPostCommentList: 10,

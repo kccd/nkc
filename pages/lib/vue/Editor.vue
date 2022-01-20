@@ -159,6 +159,7 @@
       insertContent(content) {
         this.editor.execCommand("inserthtml", content);
       },
+      //获取编辑器中的完整内容
       getContent() {
         return this.editor.getContent();
       },

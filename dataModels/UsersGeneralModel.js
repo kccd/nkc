@@ -20,6 +20,22 @@ const usersGeneralSchema = new Schema({
       default: 0,
     }
   },
+  /*
+  reviewedCount: {
+    article: {
+      //已发帖
+      count: {
+        type: Number,
+        default: 0
+      },
+      //违规还需发帖
+      violationCount: {
+        type: Number,
+        default: 0
+      }
+    }
+  },
+  */
   waterSetting:{
     waterAdd: {
       type: Boolean,
@@ -238,6 +254,38 @@ const usersGeneralSchema = new Schema({
 }, {
 	collection: 'usersGeneral'
 });
+
+
+/*
+* 重置用户的图书发帖数量
+*
+* */
+usersGeneralSchema.statics.resetReviewedCount = async function (uid, type) {
+  const UsersGeneralSchema = mongoose.model('usersGeneral');
+  const SettingModel = mongoose.model('settings');
+  const review = await SettingModel. findOne({_id: 'review'}, {
+    article: 1,
+    document: 1
+  });
+  //获取违规需要的发帖数
+  const articleViolationCount = review.article.violationCount;
+  const commentViolationCount = review.comment.violationCount;
+  //设置对应违规需要的发帖数
+  if(type.includes('article')) {
+    await UsersGeneralSchema.updateOne({uid}, {
+      $set: {
+       'reviewedCount.article.count': articleViolationCount
+      }
+    });
+  }
+  if(type.includes('comment')) {
+    await UsersGeneralSchema.updateOne({uid}, {
+      $set: {
+        'reviewedCount.article.violationCount': commentViolationCount,
+      }
+    });
+  }
+}
 
 const UsersGeneralModel = mongoose.model('usersGeneral', usersGeneralSchema);
 module.exports = UsersGeneralModel;

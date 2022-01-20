@@ -2,10 +2,11 @@ import { createApp } from "@vue/composition-api";
 import styled, { injectGlobal } from "vue-styled-components";
 import data from "./lib/data";
 import { nkcAPI } from "../lib/js/netAPI";
+import {base64ToStr} from "../lib/js/dataConversion";
 
 const app = createApp({
   setup() {
-    const url = NKC.methods.base64ToStr(data.target);
+    const url = base64ToStr(data.target);
     // const byteArray = base64js.toByteArray(data.target);
     // const url = String.fromCharCode(...byteArray);
     return {

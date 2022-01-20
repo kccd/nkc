@@ -17,6 +17,10 @@ export function getDataById(id) {
   }
 }
 
+export function base64ToStr(base64) {
+  return decodeURIComponent(window.atob(base64))
+};
+
 export function resourceToHtml(type, rid, name) {
   var handles = {
     "picture": function() {

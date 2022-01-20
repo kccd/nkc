@@ -109,6 +109,11 @@ router
           disabled: false,
           mainForumsId: {$ne: recycleId}
         };
+        const m = {
+          status: 'unknown',
+          type: 'stable',
+          source: 'article',
+        }
         if(!ctx.permission("superModerator")) {
           const forums = await db.ForumModel.find({moderators: data.user.uid}, {fid: 1});
           const fid = forums.map(f => f.fid);
@@ -116,6 +121,7 @@ router
             $in: fid
           }
         }
+        const documents = await db.DocumentModel.find(m);
         const posts = await db.PostModel.find(q, {tid: 1, pid: 1});
         const threads = await db.ThreadModel.find({tid: {$in: posts.map(post => post.tid)}}, {recycleMark: 1, oc: 1, tid: 1});
         const threadsObj = {};
@@ -127,6 +133,9 @@ router
             count++;
           }
         });
+        documents.map(document => {
+          if(document) count ++;
+        })
         data.unReviewedCount = count;
       }
     }

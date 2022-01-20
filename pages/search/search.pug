@@ -31,7 +31,7 @@ block content
             .form-group(v-if="t !== 'user'")
               label 作者筛选：
               input.form-control(type='text' name='c' placeholder='请输入用户名' v-model="author" @keyup.enter="search")
-            .form-group(v-if="t !== 'resource'")
+            .form-group(v-if="t !== 'resource' && t !== 'document_article'")
               label 专业筛选：
               .search-forum-div
                 .search-forum(v-for="(forum, index) in selectedForums" :style="'background-color: ' + forum.color + ';'") {{forum.displayName}}
@@ -41,7 +41,7 @@ block content
                       option(:value='""') 不分类
                   .fa.fa-remove(@click="removeFromArr(selectedForums, index)")
                 button.btn.btn-default.btn-sm(@click="selectForum('selected')") 添加
-            .form-group(v-if="t !== 'resource'")
+            .form-group(v-if="t !== 'resource' && t !== 'document_article'")
               label 专业排除：
               .search-forum-div
                 .search-forum(v-for="(forum, index) in excludedForums" :style="'background-color: ' + forum.color + ';'") {{forum.displayName}}
@@ -131,6 +131,8 @@ block content
               a(class=data.t==="user"?"active":"" onclick="app.clickNav('user')") 用户
             li
               a(class=data.t==="resource"?"active":"" onclick="app.clickNav('resource')") 文件
+            li
+              a(class=data.t === "document_article" ? "active" : "" onclick="app.clickNav('document_article')") 图书
         .col-xs-12.col-md-7.search-results
           if data.total > 0
             mixin buttons

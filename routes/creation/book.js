@@ -1,6 +1,7 @@
 const router = require('koa-router')();
 router
   .get('/:bid', async (ctx, next) => {
+    //获取book
     const {data, params, db, nkcModules} = ctx;
     const {bid} = params;
     const {timeFormat, getUrl} = nkcModules.tools;
@@ -17,6 +18,7 @@ router
     await next();
   })
   .get('/:bid/:id', async (ctx, next) => {
+    //获取 article
     const {data, params, db, state} = ctx;
     const book = await db.BookModel.findOnly({_id: params.bid});
     data.bookArticle = await book.getContentById({aid: params.id, uid: state.uid});

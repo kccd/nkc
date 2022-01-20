@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: Number,
   type: {
-    type: String, // disabledPost, disabledThread, returnPost, returnThread, passPost, passThread
+    type: String, // disabledPost, disabledThread, returnPost, returnThread, passPost, passThread, disabledDocument, returnDocument, passDocument
     required: true,
     index: 1
   },
@@ -55,19 +55,21 @@ const schema = new Schema({
 * @param {Object} user 处理人ID
 * @author pengxiguaa 2019-6-3
 * */
-schema.statics.newReview = async (type, post, user, reason) => {
+schema.statics.newReview = async (type, post, user, reason, document) => {
   await mongoose.model("reviews")({
     _id: await mongoose.model("settings").operateSystemID("reviews", 1),
     type,
     reason,
-    pid: post.pid,
-    tid: post.tid,
-    uid: post.uid,
+    docId: document?document._id:'',
+    pid: post?post.pid:'',
+    tid: post?post.tid:'',
+    uid: post?post.uid:document.uid,
     handlerId: user.uid
   }).save();
 };
 
-schema.statics.newDocumentReview = async (type, innerId, uid, reason) => {
+//生成新的document审核
+schema.statics.newDocumentReview = async (type, documentId, uid, reason) => {
   const ReviewModel = mongoose.model('reviews');
   const SettingModel = mongoose.model('settings');
   const review = ReviewModel({
@@ -274,7 +276,7 @@ schema.statics.autoPushToReview = async function(post) {
       return true;
     }
 
-    
+
     const fid = post.mainForumsId[0];
     const forum = await ForumModel.findOne({ fid });
     const currentPostType = post.type;
@@ -305,7 +307,7 @@ schema.statics.autoPushToReview = async function(post) {
         return true;
       }*/
     }
-    
+
     // 六、专业审核设置了送审规则（按角色和等级的关系送审）
     const forumContentSettings = forumReviewSettings.content;
     if(forumContentSettings.range === "only_thread" && currentPostType === "thread"

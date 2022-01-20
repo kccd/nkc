@@ -771,6 +771,7 @@ postSchema.statics.saveAllPostToElasticSearch = async function() {
   console.log(`【同步Post到ES】完成`);
 };
 
+//监听post数据库的save操作，将新增的记录内容保存到一条新建的search记录中以便于搜索
 postSchema.pre('save', async function(next) {
   // elasticSearch: insert/update data
   try{
