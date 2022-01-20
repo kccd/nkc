@@ -1,20 +1,22 @@
 <template lang="pug">
+  mixin bookList(bookListName)
+    .creation-center-books-list
+      .creation-center-book-item(v-for=("book in " + bookListName) @click="navToPage('book', {bid: book._id})")
+        .creation-center-book-cover(:style="`background-image:url(${book.coverUrl})`")
+        .creation-center-book-info
+          .creation-center-book-name {{book.name}}
+          .creation-center-book-description {{book.description}}
+          .creation-center-book-time {{book.time}}
   .creation-center-books
     .creation-center-books-header
       span.h2.m-r-1 图书创作
     .m-b-1
       span.h4.m-r-1 我创建的图书
       button.btn.btn-default.btn-xs(@click="navToPage('bookEditor')") 创建新图书
-    .creation-center-books-list
-      .creation-center-book-item(v-for="book in books" @click="navToPage('book', {bid: book._id})")
-        .creation-center-book-cover(:style="`background-image:url(${book.coverUrl})`")
-        .creation-center-book-info
-          .creation-center-book-name {{book.name}}
-          .creation-center-book-description {{book.description}}
-          .creation-center-book-time {{book.time}}
+    +bookList("books")
     .m-b-1
       span.h4.m-r-1 我参与创作的图书
-
+    +bookList("otherBooks")
 </template>
 
 <style lang="less" scoped>
@@ -73,7 +75,8 @@
 
   export default {
     data: () => ({
-      books: []
+      books: [],
+      otherBooks: []
     }),
     mounted() {
       this.getBooks();
@@ -84,6 +87,7 @@
         nkcAPI(`/creation/books`, 'GET')
           .then(data => {
             self.books = data.books;
+            self.otherBooks = data.otherBooks;
           })
           .catch(sweetError);
       },

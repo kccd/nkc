@@ -1,0 +1,8 @@
+{
+  "readBook": "阅读图书",
+  "writeOwnArticle": "撰写文章",
+  "deleteOwnArticle": "删除文章",
+  "writeOtherArticle": "修改成员文章",
+  "deleteOtherArticle": "删除成员文章",
+  "manageBookList": "管理图书目录"
+}

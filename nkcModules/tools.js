@@ -199,6 +199,9 @@ var Tools = function() {
       case 'documentCover': {
         return '/a/' + id;
       }
+      case 'book': {
+        return '/book/' + id
+      }
       case 'bookContent': {
         return '/book/' + id + '?aid=' + size
       }

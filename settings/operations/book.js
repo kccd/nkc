@@ -1,5 +1,11 @@
 module.exports = {
   PARAMETER: {
-    GET: 'getBook'
+    GET: 'getBook',
+    member: {
+      invitation: {
+        GET: 'bookInvitation',
+        POST: 'bookInvitation'
+      }
+    }
   }
 }
