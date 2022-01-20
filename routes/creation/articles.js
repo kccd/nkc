@@ -174,7 +174,6 @@ router
     const {db, data, body}=ctx
     const {data:updateData,bid}=body
     const filteredData= await db.BookModel.filterList(updateData)
-    console.log('filteredData',filteredData)
     const res = await db.BookModel.updateOne(
       {
         _id: bid

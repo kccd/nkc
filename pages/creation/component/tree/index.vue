@@ -27,9 +27,9 @@
         v-if="operations"
         class="title"
         @click.stop="
-          data.type !== 'text' && operations && clickArticleTitle(data)
+           operations && clickArticleTitle(data)
         "
-        >{{ data.value }}</span
+        >{{ data.title }}</span
       >
       <span
         v-else
@@ -38,7 +38,7 @@
           ellipsis: data.showIndication && !data.isMove,
         }"
         @click.stop="moveIndication(data, childIndex)"
-        >{{ data.value }}</span
+        >{{ data.title }}</span
       >
       <span
         class="click_block openArea"
@@ -51,7 +51,8 @@
       <!-- <transition name="fade"> -->
       <div v-if="operations">
         <div class="operations" v-show="isShowOperation">
-          <span @click.stop="add(data, childIndex)">新建</span>
+          <span @click.stop="add(data, childIndex)">新建子项</span>
+          <span @click.stop="editor(data, childIndex)">修改</span>
           <!-- <span @click.stop="addDocument(data, childIndex, bid)">新建文档</span> -->
           <span @click.stop="moveDirectory(data, childIndex, data.isOpen, bid)"
             >移动</span
@@ -71,7 +72,7 @@
             <input type="radio" value="sameLevel" v-model="levelSelect" />
           </span>
         </label>
-        <label for="" style="margin-left: 5px; margin-bottom: 0">
+        <label v-if="data.describe !== 'seat'" for="" style="margin-left: 5px; margin-bottom: 0">
           <span>
             子级
             <input type="radio" value="childLevel" v-model="levelSelect" />
@@ -127,7 +128,7 @@
 </template>
 <script>
 import { EventBus } from "../../eventBus.js";
-
+import { sweetQuestion } from '../../../lib/js/sweetAlert'
 export default {
   name: "Tree",
   props: {
@@ -181,6 +182,14 @@ export default {
     },
   },
   methods: {
+    editor(data,childIndex){
+      if(data.type !== 'article' ){
+        // 传入 bid 修改的数据 修改数据的坐标 对话框标题 对话框类型
+        EventBus.$emit('addDialog',{bid:this.bid, data, childIndex,title:'修改', type:"editor"})
+      }else{
+        this.navToPage("articleEditor", { bid:this.bid, aid:data._id })
+      }
+    },
     moveIndication(data, childIndex) {
       const {isOpen, showIndication, isMove, parentNode, childrenDisable}=this.$props.data
       // 如果为禁用状态就不显示指示 禁用状态是可以打开关闭的列表
@@ -230,15 +239,29 @@ export default {
     // 编辑
     clickArticleTitle(data) {
       const { bid } = this;
-      const aid = data?._id;
-      this.navToPage("articleEditor", { bid, aid });
+      const aid = data._id;
+      // 修改分组名称吗 
+              console.log(data)
+      if(data.type === 'text'){
+        
+      // 修改url 还是跳转url
+      }else if(data.type === 'url'){
+        window.open(data.url)
+        // 修改post 还是跳转
+      }else if(data.type  === 'post'){
+
+        window.open(data.url)
+      }else{
+        this.navToPage("articleEditor", { bid, aid });
+      }
+      
     },
     mouseEnter() {
       this.isShowOperation = !this.isShowOperation;
     },
     add(data, childIndex) {
       console.log(this.bid)
-      EventBus.$emit('addDialog',this.bid,data, childIndex)
+      EventBus.$emit('addDialog',{bid:this.bid,data, childIndex,title:'新建子项'})
     },
     // 新建分组后添加数据
     addGroupDatas(data) {
@@ -271,10 +294,11 @@ export default {
     },
     deleteDirectory(data, childIndex) {
       // 直接把数据后端验证数据是否正确就可以了
-      EventBus.$emit("deleteDirectory", data, childIndex);
+      sweetQuestion('确认要删除吗？').then(data=>{
+        EventBus.$emit("deleteDirectory", data, childIndex);
+      })
     },
     moveDirectory(data, childIndex, isOpen, bid) {
-      console.log('bid',bid)
       EventBus.$emit("moveDirectory", data, childIndex, isOpen, bid);
     },
 
@@ -380,7 +404,7 @@ export default {
   background: rgba(243, 228, 200, 0.322);
 }
 .child_tree_row {
-  padding: 0 5px;
+  padding: 2px 5px;
   width: 100%;
   transition: all 0.3s;
   display: flex;
@@ -392,6 +416,9 @@ export default {
     height: 15px;
   }
   .title {
+    background: #f6f6f6;
+    border-radius: 3px;
+    text-align: center;
     color: rgb(69, 69, 250);
     flex: auto;
     max-width: 6rem;
@@ -417,7 +444,7 @@ export default {
     span {
       padding: 2px 0;
       cursor: pointer;
-      margin-left: 10px;
+      margin-left: 5px;
       color: rgb(5, 5, 5);
     }
   }

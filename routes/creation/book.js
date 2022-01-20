@@ -2,14 +2,11 @@ const router = require('koa-router')();
 router
   .get('/:bid', async (ctx, next) => {
     const {data, params, db, nkcModules,} = ctx;
-    console.log(ctx)
     const {bid} = params;
     const {timeFormat, getUrl} = nkcModules.tools;
     const book = await db.BookModel.findOnly({_id: bid}); 
-    // let bookList =JSON.parse(JSON.stringify(book.list));
     let bookList =book.list.toObject();
-    // const document = await db.DocumentModel.findOnly({sid: bid});
-        // setUrl:undefined 使用内部默认 latestTitle =true 代表需要最新编辑的 title 
+    // setUrl:undefined 使用内部默认 latestTitle =true 代表需要最新编辑的 title 
     data.bookList = await book.getList({setUrl:'bookContent',latestTitle:true},bookList,bid) || [];
     book.bindArticle
     // data.bookList.document=document

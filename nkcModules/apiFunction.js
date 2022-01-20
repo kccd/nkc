@@ -11,6 +11,7 @@ const axios = require('axios');
 let fn = {};
 
 fn.paging = (page = 0, count, perpage, buttonCount = 5) => {
+  console.log(buttonCount)
   if(!perpage) perpage = defaultPerpage;
   page = parseInt(page);
   let pageCount = Math.ceil(count/perpage);

@@ -1,7 +1,7 @@
 <template lang="pug">
 .module-dialog-body(v-show="true")
   .module-dialog-header(ref="draggableHandle")
-    .module-dialog-title {{ title }}
+    .module-dialog-title {{title}}
     .module-dialog-close(@click="close")
       .fa.fa-remove
   .module-dialog-content
@@ -9,27 +9,42 @@
       label(for="", style="margin-left: 5px")
         span 
           | 新建分组
-          input(type="radio", value="group", v-model="selectType")
+          input(type="radio", value="text", v-model="selectType")
       label(for="", style="margin-left: 10px")
         span 
           | 新建URL
-          input(type="radio", value="URL", v-model="selectType")
+          input(type="radio", value="url", v-model="selectType")
       label(for="", style="margin-left: 10px")
         span 
           | 新建POST
-          input(type="radio", value="POST", v-model="selectType") 
-      .add-group(v-show="selectType === 'group' || selectType === 'URL'")
-        select.select(v-model="protocol", v-show="selectType === 'URL'")
-          option(value="http") http://
-          option(value="https") https://
-        span(v-show="selectType === 'group'") 分组名:
-        input#add-group-input.add-group-input.select.query-input(
+          input(type="radio", value="post", v-model="selectType") 
+      .add-url(v-show="selectType === 'url'")
+        p.url-title
+          span 标题:
+          input.add-group-input.select.query-input(
+          type="text",
+          v-model="urlTitle",
+          v-focus
+        )
+        p.url-address
+          span 地址:
+          select.select(v-model="protocol", v-show="selectType === 'url'")
+            option(value="http://") http://
+            option(value="https://") https://
+          input.add-group-input.select.query-input(
+          type="text",
+          v-model="inputValue",
+          v-focus
+        )
+      .add-group(v-show="selectType === 'text'")
+        span 分组名:
+        input.add-group-input.select.query-input(
           type="text",
           v-model="inputValue",
           v-focus
         )
     .split-line
-    .select-post(v-show="selectType === 'POST'")
+    .select-post(v-show="selectType === 'post'")
       .select-post-query
         .select-post-query-width
           input.query-input(
@@ -39,20 +54,21 @@
           )
           button.query-button(@click="query(0,'search')") 查询
           button.reset-button(@click="query(0, 'reset')") 重置
-      .post-list-title
-        //- span.postId.title 标题
-        //- span.postContent.title 内容
       ul.select-post-list
         .list-container(ref="listContainer")
           .list-height(ref="listHeight")
+            .post-list-paging
+              span(v-for="(page, i) in paging.buttonValue" :key="i" :class="{pageActive:page.type === 'active'}" @click="query(page.num)" )  {{page.type === 'null' ? '...' : page.num}}
             li.post-list-item(v-for="post in postList")
               label.radio-post(for="" )
-                input(type="radio" @input="selectPost(...arguments,post)" )
+                input(type="radio" :value="post.firstPost.pid" v-model="selectPostId" @input="selectPost(post)")
               .content
                 p.postId {{ post.firstPost.t }}
                 p.postContent {{ post.firstPost.c }}
             li(v-if="postList.length === 0" style="font-size:24px") 数据加载中...
             li(v-else-if="!postList" style="font-size:24px") 暂无数据
+            .post-list-paging.bottom
+              span(v-for="(page, i) in paging.buttonValue" :key="i" :class="{pageActive:page.type === 'active'}" @click="query(page.num)") {{page.type === 'null' ? '...' : page.num}}
     //- .select-tree
     //-   span 请选择新建位置
     //-   Tree(:data="extendedData", :operations="false")
@@ -78,20 +94,26 @@ export default {
     quote: "",
     data: {},
     treeData: [],
-    selectType: "group",
+    selectType: "text",
     searchContent: "",
     protocol: "http://",
-    inputValue: "默认新建分组名",
+    inputValue: "默认分组",
     postList: [],
     addResult:'',
+    selectPostId:'',
     selectPostData:'',
     insertData:{},
     bid:'',
-    type:''
+    type:'',
+    urlTitle:'科创',
+    dialogType:'add',
+    paging:[]
   }),
   created() {
-    EventBus.$on("addDialog", (bid, data, childIndex) => {
-      if (!bid) console.log("bid不存在");
+    EventBus.$on("addDialog", ({bid, data, childIndex,title,type='add'}) => {
+      this.dialogType=type
+      this.title=title
+      if (!bid) console.error("bid不存在");
       this.bid=bid,
       this.insertData={
         data,
@@ -99,15 +121,32 @@ export default {
       },
       this.getTreeData(bid);
       this.draggableElement.show();
+      if(type === 'editor'){
+        switch(data.type){
+          case 'url':
+            this.urlTitle=data.title;
+            this.inputValue=data.url;
+            break
+          case 'post':
+            this.selectPostId=data.id;
+            break
+          case 'text':
+            this.inputValue=data.title
+            break
+          default:
+            console.error('不存在的类型')
+        }
+        this.selectType=data.type
+      }
     });
   },
   watch: {
     selectType() {
-      if (this.selectType === "POST") {
+      if (this.selectType === "post") {
         this.query(0, "get");
-      } else if (this.selectType === "URL") {
+      } else if (this.selectType === "url") {
         this.inputValue = "www.kechuang.org";
-      } else if (this.selectType === "group") {
+      } else if (this.selectType === "text") {
         this.inputValue = "默认新建分组名";
       }
     },
@@ -135,9 +174,17 @@ export default {
     },
   },
   methods: {
-    selectPost(e,post){
-      // console.log(e,post)
-      this.selectPostData=post
+
+    selectPost(data){
+      console.log(data)
+      const {firstPost}=data
+      this.selectPostData={
+        title:firstPost.t,
+        id:firstPost.pid,
+        url:firstPost.url,
+        type:'post',
+        child:[]
+      }
     },
     getTreeData(bid) {
       // let url = `/creation/book/${bid}`;
@@ -165,6 +212,7 @@ export default {
       this.postList=[]
       const result = await nkcAPI(url, "get");
       this.postList =result.threads.length ? result.threads : ''; // 先不改了
+      this.paging =result.paging; // 先不改了
       this.$nextTick(() => {
       if (this.$refs.listHeight.clientHeight < 480) {
         this.$refs.listContainer.setAttribute(
@@ -187,17 +235,22 @@ export default {
     },
     submit: function () {
       // this.callback(this.data);
-      if(this.selectType === 'POST'){
+      // 如果修改 值没改变 就不发送请求
+      // 如果是新增 post没有 选中 post 那么 也不执行 后续再加
+      if(this.selectType === 'post'){
         this.addResult=this.selectPostData
         this.type='post'
-      }else if(this.selectType === 'URL'){
-        this.addResult=this.protocol + this.inputValue,
+      }else if(this.selectType === 'url'){
+        this.addResult={
+          title:this.urlTitle,
+          url:this.protocol + this.inputValue,
+        }
         this.type='url'
       }else{
         this.addResult=this.inputValue
         this.type='text'
       }
-      EventBus.$emit('addConfirm',this.addResult,this.type,this.insertData)
+      EventBus.$emit('addConfirm',{res:this.addResult, data:this.insertData, dialogType:this.dialogType})
     },
     pickedFile: function (index) {
       var dom = this.$refs["input" + index][0];
@@ -219,10 +272,13 @@ export default {
         this.data = {};
       }, 500);
     },
+    findPid(data,id){
+
+    }
   },
   directives: {
     focus: {
-      update: function (el) {
+      bind: function (el) {
         el.focus();
         // el.select();
       },
@@ -236,6 +292,9 @@ export default {
 
 
 <style lang="less" scoped>
+.pageActive{
+  background: rgb(248, 226, 211);
+}
 * {
   padding: 0;
   margin: 0;
@@ -245,7 +304,7 @@ export default {
   height: 2rem;
 }
 .add-group-input {
-  width: 22rem;
+  flex: auto;
 }
 .query-input {
   outline: none;
@@ -254,6 +313,22 @@ export default {
   font-size: 1.2rem;
   font-weight: 600;
   // margin-right: 3px;
+}
+.post-list-paging{
+  margin-top:10px;
+  background: rgb(173, 217, 245);
+  height: 20px;
+  span{
+    transition: all .2s;
+    cursor: pointer;
+    margin-right: 5px;
+    padding: 2px 5px;
+    border:1px solid rgb(219, 217, 217);
+    border-radius: 3px;
+  }
+  .bottom{
+
+  }
 }
 .postContent {
     margin: 0.6rem 0;
@@ -313,6 +388,18 @@ export default {
       // margin-top: 10px;
       width: 27rem;
       margin: 10px auto;
+
+      .add-url{
+        margin-top: 5px;
+        .url-title{
+          display: flex;
+          align-items: center;
+        }
+        .url-address{
+          display: flex;
+          align-items: center;
+        }
+      }
       .add-group {
         margin-top: 5px;
         display: flex;
@@ -329,6 +416,7 @@ export default {
     .select-post {
       margin-top: 10px;
       .select-post-query-width {
+        display: flex;
         button{
           padding:0 8px;
           margin-left: 10px;
@@ -345,6 +433,7 @@ export default {
           width:100%;
           overflow-y: scroll;
           .list-height{
+            position: relative;
             cursor: pointer;
             .post-list-item:hover{
                 background-color: #e6e0db ;

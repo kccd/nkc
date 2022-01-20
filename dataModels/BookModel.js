@@ -174,7 +174,6 @@ schema.methods.newExtendArticlesById = async function (articlesId, {
   setUrl = 'bookContent',
   latestTitle = false
 }, bookList) {
-  console.log(bookList,'newbookList')
   let newbookList = [...bookList]
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');

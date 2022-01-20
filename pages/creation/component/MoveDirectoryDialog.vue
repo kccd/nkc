@@ -53,6 +53,11 @@ export default {
     EventBus.$on("moveDirectory", async (msg, childIndex, isOpen, bid) => {
       await this.getBook(bid);
       // 重置 数据
+      // childIndex[0]=childIndex[0]-0+1
+     const arr= childIndex.split('')
+    arr[0]=arr[0]-0+1
+    childIndex= arr.join('')
+      console.log(arr,childIndex,childIndex[0]-0+1,)
       this.seekResult = this.dialogData;
       // 根据 childIndex(字符串每个数组记录的是数组中数据的位置) 长度来查找 数组指定位置的数据
       for (let i = 0; i < childIndex.length; i++) {
@@ -100,19 +105,8 @@ export default {
       this.selectedLevel = selectedLevel;
     });
     EventBus.$on("moveDialogOpenMenu", (data, childIndex, status = false) => {
-      // this.seekResult = this.dialogData;
-      // for (let i = 0; i < childIndex.length; i++) {
-      //   const position = childIndex[i];
-      //   this.seekChild({
-      //     data: this.seekResult,
-      //     position,
-      //     currentIndex: i,
-      //     findLocation: childIndex,
-      //   });
-      // }
       this.$set(data, "isOpen", status);
       // this.changeChild(data.child, "isOpen", !status);
-      console.log(data, "this.seekResult");
       this.openMenuIndex = childIndex;
     });
   },
@@ -224,6 +218,10 @@ export default {
     async confirm(data) {
       // 数据移入选中项 子级
       if (this.selectedLevel === "childLevel") {
+        if(!this.insertIndex) {
+          this.close()
+          return
+        }
         this.seekResult = this.dialogData;
         for (let i = 0; i < this.insertIndex.length; i++) {
           const position = this.insertIndex[i];
@@ -241,11 +239,10 @@ export default {
           length = this.insertIndex.length - 1;
         }
         this.seekResult.child ?? (this.seekResult.child = []);
-        console.log(this.seekResult);
         this.seekResult.child.unshift(this.moveData);
         // 删除被移动的数据
         this.seekResult = this.dialogData;
-        for (let i = 0; i < length - 1; i++) {
+        for (let i = 0; i < length ; i++) {
           const position = this.insertIndex[i];
           this.seekChild({
             data: this.seekResult,
@@ -255,7 +252,6 @@ export default {
             type: "parent",
           });
         }
-
         const deleteDataIndex = this.moveIndex.slice(-1);
         this.seekResult = this.dialogData;
         this.findParent(this.dialogData, this.moveData).splice(
@@ -282,43 +278,58 @@ export default {
             type: "parent",
           });
         }
-        console.log(this.seekResult);
+        // 添加数据
+        const insertposition=this.insertIndex.slice(-1)-0+1
         if (length === 1) {
-          this.seekResult.unshift(this.moveData);
+          this.seekResult.splice(insertposition,0,this.moveData);
         } else {
-          this.seekResult.child.unshift(this.moveData);
+          this.seekResult.child.splice(insertposition, 0, this.moveData);
         }
-
-        // 因为数据是向前添加的所以 原来的数据向后移动了一位
-        const deleteDataIndex = this.moveIndex.slice(-1);
-        // 因为向上添加 原来位置会后移一位
-        const newIndex = this.insertIndex.slice(-1) - 0 + 1;
-        console.log(this.findParent(this.dialogData, this.moveData), "-----");
-        this.findParent(this.dialogData, this.moveData)[newIndex].child.splice(
-          deleteDataIndex,
-          1
-        );
-        // 应该 父级 改变数据
-        this.$set(this.moveData, "isMove", false);
-        this.$set(this.moveData, "showIndication", false);
+        // 可以写成先删除就没这么麻烦 在添加 spice 是可以拿到删除项的  ，让后直接插入指定未知即可。就不需要删除插入都去找未知
+        // 如果插入未知为 第一项 （0） 那么所有未知都会向后移动。占位项为第一项。
+        let deleteDataIndex = this.moveIndex.slice(-1);
+        // 有些项是没有 id的 所一还得通过 查找位置 ，或者在源数据上添加唯一标识
+        // 替换第一个位置的数据 ，因为是先添加导致 数据已经下移一位   
+        let moveIndex
+        //  如果是外层之间 移动位置
+        console.log(this.insertIndex === "0")
+        if(this.insertIndex === "0"){
+          deleteDataIndex=deleteDataIndex-0 + 1
+          const arr= this.moveIndex.split('')
+          arr[0]=arr[0]-0+1
+          moveIndex= arr.join('')
+        }else{
+          moveIndex = this.moveIndex
+        }
+        this.seekResult = this.dialogData;
+        for(let i=0;i<moveIndex.length - 1;i++){
+          const position=moveIndex[i]
+          this.seekChild({data:this.seekResult,position,currentIndex:i,findLocation:moveIndex,type:'parent'})
+        }
+        // 删除   被移动数据层数 最外层
+        if(moveIndex.length === 1){
+          this.seekResult.splice(deleteDataIndex,1)
+        }else{
+          //删除移动里层
+          this.seekResult.child.splice(deleteDataIndex,1)
+        }
         // 关掉是 结构重置
         this.showTree = false;
       }
-
+      this.dialogData.splice(0,1)
       let url = "/creation/articles/del";
       await nkcAPI(url, "post", {
         data: this.dialogData, // 原先是 this.parentData
         bid: this.$props.bid,
-      }).then((data) => {
-        console.log(data);
       });
       EventBus.$emit("updatePageData");
+      // 重置数据
       this.reset(
         this.dialogData,
         ["isMove", "isOpen", "childrenDisable", "showIndication"],
         "reset"
       );
-      this.close();
+      setTimeout(this.close,500)
     },
     getBook(bid) {
       let url = `/creation/book/${bid}`;
@@ -327,6 +338,7 @@ export default {
         .then((data) => {
           console.log(data);
           self.book = data.bookData;
+          data.bookList.unshift({title:'移动到第一项',type:'text',describe:'seat'})
           self.dialogData = data.bookList;
         })
         .catch(sweetError);
@@ -338,7 +350,6 @@ export default {
         ["isMove", "isOpen", "childrenDisable", "showIndication"],
         "reset"
       );
-      console.log(this.dialogData);
       // 关掉是 结构重置
       this.showTree = false;
       this.show = false;

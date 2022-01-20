@@ -16,11 +16,8 @@
         button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
           @click="navToPage('bookEditor', { bid })"
         ) 设置
-  MoveDirectoryDialog(
-    :bid="bid",
-    :changeStatus="changeStatus"
-  )
-  AddDialog
+  MoveDirectoryDialog(:bid="bid", :changeStatus="changeStatus")
+  AddDialog(ref="addDialog")
 </template>
 
 <style lang="less" scoped>
@@ -140,7 +137,7 @@ export default {
   components: {
     MoveDirectoryDialog,
     Tree,
-    AddDialog
+    AddDialog,
   },
   data: () => ({
     data: [
@@ -154,7 +151,7 @@ export default {
             type: "article",
             value: "articleId",
             published: false,
-            time: "2022/1/10 10:57"
+            time: "2022/1/10 10:57",
           },
           {
             type: "post",
@@ -166,17 +163,17 @@ export default {
                 type: "post",
                 value: "postId",
                 published: false,
-                time: "2022/1/10 10:57"
-              }
-            ]
+                time: "2022/1/10 10:57",
+              },
+            ],
           },
           {
             type: "url",
             value: "https://www.google.com",
             published: false,
-            time: "2022/1/10 10:57"
-          }
-        ]
+            time: "2022/1/10 10:57",
+          },
+        ],
       },
       {
         type: "article",
@@ -188,10 +185,10 @@ export default {
             type: "article",
             value: "articleId",
             published: false,
-            time: "2022/1/10 10:57"
-          }
-        ]
-      }
+            time: "2022/1/10 10:57",
+          },
+        ],
+      },
     ],
     showMoveCharter: false,
     more: false,
@@ -205,43 +202,100 @@ export default {
     addDocument: "",
     seekResult: [],
     parentData: [],
-    moveDialogData: []
+    moveDialogData: [],
   }),
   created() {
-    EventBus.$on("addGroup", data => {
+    EventBus.$on("addGroup", (data) => {
       // this.parentData.child ?? (this.parentData.child = []);
       // this.parentData.child.unshift({ type: "article", value: data.title });
       this.addGroup(data);
     });
-    EventBus.$on('addConfirm', (res,type,{data:insertData,index})=>{
-     // 都是向子级的child 插入数据
-    console.log(this.findId(this.bookList,insertData.id),res)
-    let obj;
-    if(type === 'text'){
-      obj={
-        title:res,
-        type,
-        id:'',
-        url:''
+    // 里层添加 还有很多bug
+    EventBus.$on(
+      "addConfirm",
+      async ({ res, data: insertData, dialogType }) => {
+        // insertData 是修改或者新建的数据
+        let obj;
+        if (insertData.data.type === "text") {
+          obj = {
+            title: res,
+            value: res,
+            type: insertData.data.type,
+            id: "",
+            url: "",
+            child: [],
+          };
+        } else if (insertData.data.type === "url") {
+          obj = {
+            title: res.title,
+            type: insertData.data.type,
+            id: "",
+            url: res.url,
+            child: [],
+          };
+        } else {
+          obj = {
+            title: res.title,
+            value: res.title,
+            type: insertData.data.type,
+            id: res.id,
+            url: "",
+            child: [],
+          };
+        }
+        if (dialogType === "editor") {
+          this.seekResult = this.bookList;
+          for (let i = 0; i < insertData.index.length-1; i++) {
+            const position = insertData.index[i];
+            this.seekChild({
+              data: this.seekResult,
+              position,
+              currentIndex: i,
+              findLocation: insertData.index,
+              type: "parent",
+            });
+          }
+          // 修改 如果是修改 最外层
+          const editorIndex = insertData.index.slice(-1);
+
+          if (insertData.index.length === 0) {
+            this.seekResult[editorIndex] = obj;
+          } else {
+            // 里层
+            this.seekResult.child[editorIndex] = obj;
+          }
+        } else {
+          // 都是向子级的child 插入数据
+          // 可能 insertData 是没有id的 所以专门使用id去查找是不行的
+          // 还是得根据 位置进行查找 ，或者 再数据上加上唯一标志
+          // this.findId(this.bookList,insertData.id).child.unshift(obj)
+          const index = insertData.index;
+          console.log(index)
+          this.seekResult= this.bookList
+          for (let i = 0; i < index.length; i++) {
+            const position = index[i];
+            this.seekChild({
+              data: this.seekResult,
+              position,
+              currentIndex: i,
+              findLocation: index,
+            });
+          }
+          this.seekResult.child.unshift(obj);
+        }
+        // 添加修改的共同业务
+        let url = "/creation/articles/del";
+        await nkcAPI(url, "POST", {
+          data: this.bookList,
+          bid: this.bid,
+        }).then((data) => {
+          console.log(data);
+        });
+        this.getBook();
+        this.$refs.addDialog.close();
       }
-    }else if(type === 'url'){
-       obj={
-        title:'',
-        type,
-        id:'',
-        url:res
-      }
-    }else{
-      //  post 拿一下id
-       obj={
-        title:res.title,
-        type,
-        id:res.id,
-        url:''
-      }
-    }
-    this.findId(this.bookList,insertData.id).child.unshift(obj)
-    })
+    );
+
     EventBus.$on("deleteDirectory", async (data, childIndex) => {
       this.seekResult = this.bookList;
       for (let i = 0; i < childIndex.length - 1; i++) {
@@ -251,15 +305,20 @@ export default {
           position,
           currentIndex: i,
           findLocation: childIndex,
-          type: "parent"
+          type: "parent",
         });
       }
-      this.seekResult.child.splice(childIndex.slice(-1), 1);
+      if (childIndex.length === 1) {
+        this.seekResult.splice(childIndex.slice(-1), 1);
+      } else {
+        this.seekResult.child.splice(childIndex.slice(-1), 1);
+      }
+
       let url = "/creation/articles/del";
       await nkcAPI(url, "post", {
         data: this.bookList,
-        bid: this.bid
-      }).then(data => {
+        bid: this.bid,
+      }).then((data) => {
         console.log(data);
       });
       this.getBook();
@@ -272,7 +331,7 @@ export default {
           data: this.seekResult,
           position,
           currentIndex: i,
-          findLocation: childIndex
+          findLocation: childIndex,
         });
       }
 
@@ -290,11 +349,11 @@ export default {
       return [
         {
           name: "文档创作",
-          page: "books"
+          page: "books",
         },
         {
-          name: book ? book.name : `加载中...`
-        }
+          name: book ? book.name : `加载中...`,
+        },
       ];
     },
     extendedData() {
@@ -311,11 +370,11 @@ export default {
       res(this.bookList);
 
       return this.bookList;
-    }
+    },
   },
   provide() {
     return {
-      datas: this.data
+      datas: this.data,
     };
   },
   mounted() {
@@ -327,25 +386,25 @@ export default {
     changeStatus(msg) {
       this.$set(msg, "isMove", true);
     },
-    findId(data,id){
-      let findData
-      function find(data,id) {
-        if(data){
-          for(let obj of data){
-            if(obj.id === id){
-              findData=obj
-            }else if(obj.child && obj.child.length){
-              find(obj,child,id)
+    findId(data, id) {
+      let findData;
+      function find(data, id) {
+        if (data) {
+          for (let obj of data) {
+            if (obj.id === id) {
+              findData = obj;
+            } else if (obj.child && obj.child.length) {
+              find(obj, child, id);
             }
           }
         }
-      } 
-      find(data,id)
-      return findData
+      }
+      find(data, id);
+      return findData;
     },
     changeChild(data, key, value) {
       if (data) {
-        data.forEach(item => {
+        data.forEach((item) => {
           this.$set(item, key, value);
           if (item.child) {
             this.changeChild(item.child, key, value);
@@ -353,7 +412,7 @@ export default {
         });
       }
     },
-    //  把 子级 父级 同级 都 写入 就不用 每次都要循环找不同级别
+    //  把 子级 父级 同级 都 写入 就不用 每次都要循环找不同级别   还可以把 循环封装在内，这个先暂时用着
     seekChild({ data, position, currentIndex, findLocation, type = "self" }) {
       const child = data[position];
       if (type === "parent") {
@@ -404,7 +463,7 @@ export default {
       formData.append("aid", aid);
       formData.append("type", type);
       formData.append("articleType", articleType);
-      nkcUploadFile(url, "POST", formData).then(data => {
+      nkcUploadFile(url, "POST", formData).then((data) => {
         console.log(data, "data");
       });
     },
@@ -418,7 +477,7 @@ export default {
       this.$router.push({
         name,
         query,
-        params
+        params,
       });
     },
 
@@ -427,21 +486,21 @@ export default {
         name: "bookContent",
         params: {
           bid: this.bid,
-          id
-        }
+          id,
+        },
       });
     },
     getBook() {
       let url = `/creation/book/${this.bid}`;
       const self = this;
       return nkcAPI(url, "GET")
-        .then(data => {
+        .then((data) => {
           console.log(data);
           self.book = data.bookData;
           self.bookList = data.bookList;
         })
         .catch(sweetError);
-    }
-  }
+    },
+  },
 };
 </script>
