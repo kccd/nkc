@@ -365,7 +365,6 @@ messageSchema.statics.getParametersData = async (message) => {
   } else if (type === 'articleAt') {
     const {did} = message.c;
     const document = await DocumentModel.findOne({did, type: 'stable', status: 'normal'});
-    if(!document) return null;
     const user = await UserModel.findOne({uid: document.uid});
     if(!user) return null;
     const article = await ArticlesModel.findOne({did});

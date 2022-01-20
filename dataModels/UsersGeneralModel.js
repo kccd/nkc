@@ -23,6 +23,7 @@ const usersGeneralSchema = new Schema({
   /*
   reviewedCount: {
     article: {
+      //已发帖
       count: {
         type: Number,
         default: 0
@@ -260,21 +261,30 @@ const usersGeneralSchema = new Schema({
 *
 * */
 usersGeneralSchema.statics.resetReviewedCount = async function (uid, type) {
-const UsersGeneralSchema = mongoose.model('usersGeneral');
-if(type.includes('article')) {
-  await UsersGeneralSchema.updateOne({uid}, {
-    $set: {
-      'reviewedCount.article': 0,
-    }
+  const UsersGeneralSchema = mongoose.model('usersGeneral');
+  const SettingModel = mongoose.model('settings');
+  const review = await SettingModel. findOne({_id: 'review'}, {
+    article: 1,
+    document: 1
   });
-}
-if(type.includes('comment')) {
-  await UsersGeneralSchema.updateOne({uid}, {
-    $set: {
-      'reviewedCount.comment': 0,
-    }
-  });
-}
+  //获取违规需要的发帖数
+  const articleViolationCount = review.article.violationCount;
+  const commentViolationCount = review.comment.violationCount;
+  //设置对应违规需要的发帖数
+  if(type.includes('article')) {
+    await UsersGeneralSchema.updateOne({uid}, {
+      $set: {
+       'reviewedCount.article.count': articleViolationCount
+      }
+    });
+  }
+  if(type.includes('comment')) {
+    await UsersGeneralSchema.updateOne({uid}, {
+      $set: {
+        'reviewedCount.article.violationCount': commentViolationCount,
+      }
+    });
+  }
 }
 
 const UsersGeneralModel = mongoose.model('usersGeneral', usersGeneralSchema);

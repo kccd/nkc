@@ -231,8 +231,8 @@ router
             key: 'violationCount',
             description: reason || '屏蔽文档并标记为违规',
           });
-          //如果用户违规了就将用户图书已发帖数置为0，用户需要发布对应贴数后才能免审核
-          await db.UserGeneralModel.resetReviewedCount(document.uid, ['article', 'comment']);
+          //如果用户违规了就将用户图书中的reviewedCount.article设置为后台设置违规需要发的贴数，用户每发帖一次就将该数量减一，为零时不需要审核
+          // await db.UserGeneralModel.resetReviewedCount(document.uid, ['article', 'comment']);
         }
         if(!remindUser) return;
         message = await db.MessageModel({

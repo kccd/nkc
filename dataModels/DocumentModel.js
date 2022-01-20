@@ -99,12 +99,6 @@ const schema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  // // 是否通过审核
-  // reviewed: {
-  //   type: Boolean,
-  //   default: false,
-  //   index: 1
-  // },
   // 文档内容字数 排除了 html 标签
   wordCount: {
     type: Number,
