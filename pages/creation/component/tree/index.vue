@@ -118,7 +118,7 @@
         :key="j"
         :data="child"
         :level="level + 1"
-        :childIndex="childIndex + j.toString()"
+        :childIndex="childIndex + ',' + j.toString()"
         :operations="operations"
       ></Tree>
     </template>
@@ -192,24 +192,27 @@ export default {
     },
     moveIndication(data, childIndex) {
       const {isOpen, showIndication, isMove, parentNode, childrenDisable}=this.$props.data
+      childIndex=childIndex.split(',')
       // 如果为禁用状态就不显示指示 禁用状态是可以打开关闭的列表
       if (isMove && !this.$props.operations && childrenDisable) {
-        console.log(1)
+        // console.log(1)
         EventBus.$emit("moveDialogOpenMenu",data, childIndex, !isOpen);
         return;
       }
       // 不属于禁用状态的显示线 会走这个
       if(!this.$props.operations && !childrenDisable){
-        console.log(6)
+        // console.log(6)
         EventBus.$emit("moveDialogOpenMenu", data, childIndex, !this.$props.data.isOpen);
         EventBus.$emit("showIndication", childIndex, true,data);
         
       // 禁用状态子级走 这    showIndication 是 bug源
       }else{
+
         EventBus.$emit("moveDialogOpenMenu",data, childIndex, !this.$props.data.isOpen);
       }
     },
     toggle(instruct, childIndex) {
+      childIndex=childIndex.split(',')
       const {operations,data}=this.$props
       switch (instruct) {
         //  打开新建分组
@@ -249,7 +252,6 @@ export default {
         window.open(data.url)
         // 修改post 还是跳转
       }else if(data.type  === 'post'){
-
         window.open(data.url)
       }else{
         this.navToPage("articleEditor", { bid, aid });
@@ -260,7 +262,7 @@ export default {
       this.isShowOperation = !this.isShowOperation;
     },
     add(data, childIndex) {
-      console.log(this.bid)
+      childIndex=childIndex.split(',')
       EventBus.$emit('addDialog',{bid:this.bid,data, childIndex,title:'新建子项'})
     },
     // 新建分组后添加数据
@@ -292,13 +294,16 @@ export default {
       const aid = data?._id;
       this.navToPage("articleEditor", { bid, aid, type: "article" });
     },
+    //删除
     deleteDirectory(data, childIndex) {
       // 直接把数据后端验证数据是否正确就可以了
       sweetQuestion('确认要删除吗？').then(data=>{
+        childIndex=childIndex.split(',')
         EventBus.$emit("deleteDirectory", data, childIndex);
       })
     },
     moveDirectory(data, childIndex, isOpen, bid) {
+      childIndex=childIndex.split(',')
       EventBus.$emit("moveDirectory", data, childIndex, isOpen, bid);
     },
 
@@ -354,14 +359,14 @@ export default {
   height: 10px;
   .change_glyphicon {
     transform: rotate(135deg);
-    color: pink;
+    color: rgb(122, 166, 247);
     position: absolute;
     top: -22%;
     left: 3%;
   }
   .line {
     display: inline-block;
-    border-bottom: 1px solid pink;
+    border-bottom: 1px solid rgb(116, 170, 231);
     height: 1px;
     width: 92%;
     position: absolute;

@@ -8,8 +8,16 @@ router
     let {did,bid,aid,_id}=query
     const book = await db.BookModel.findOnly({_id: bid});
     data.book = await book.getBaseInfo();
-    data.list = await book.getList({setUrl:'prevView',latestTitle:true});
+    let bookList =book.list.toObject();
+    data.list = await book.getList({setUrl:'prevView',latestTitle:true},bookList) || [];
     if(aid){
+      console.log(await book.getContentById({
+        aid,
+        uid: state.uid
+      }),aid,'/n',)
+      console.log(await book.getContentById({
+        _id
+      }),_id)
       data.bookContent = await book.getContentById({
         aid,
         uid: state.uid

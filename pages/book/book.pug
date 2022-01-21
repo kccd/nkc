@@ -11,15 +11,26 @@ block content
         .book-name=data.book.name
         .book-description=data.book.description
         .book-list
-          for item in data.list
-            a.book-list-item(href=item.url target="_blank")
-              .book-list-item-name
-                if !item.published
-                  span.status [未发布]
-                else if item.hasBeta
-                  span.status [编辑中]
-                span=item.title
-              .book-list-item-time=item.time
-
+          mixin bookList(data,level=2)
+            for item,i in data
+              a.book-list-item(href=item.url || "#"  target=item.url ? "_blank" : '' style="margin-left:"+ ((level.length-2) * 24) + 'px')
+                .book-list-item-name
+                  if !item.published
+                    span.status [未发布]
+                  else if item.hasBeta
+                    span.status [编辑中]
+                  span=item.title
+                .book-list-item-time=item.time
+              if item.child
+                +bookList(item.child,i + ',')
+            if !data.length
+              h3.null 暂时还没有发布的书籍
+          +bookList(data.list)
+  //- mixin pet(name)
+  //-   li.pet= name
+  //- ul
+  //-   +pet('猫')
+  //-   +pet('狗')
+  //-   +pet('猪')
 block scripts
   +includeJS('/book/book.js')

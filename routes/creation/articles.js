@@ -79,10 +79,8 @@ router
           bookList.push(child);
           return;
         }
-
         bookList.forEach(item => {
           if(item.type === 'text'){
-            console.log(item.aid,'tetx')
           }
           if (item.aid === fields.aid) {
             item.child.unshift({
@@ -136,6 +134,19 @@ router
 
       }
       if (fields.articleType === "article") {
+        function find(data,item){
+          if(data){
+            for (const obj of data) {
+              if(obj.id === item.articleId){
+                obj.title = title
+                return
+              }else if(obj.child && obj.child.length){
+                find(obj.child,item)
+              }
+            }
+          }
+        }
+        find(bookList,fields)
         const res = await db.BookModel.updateOne(
           {
             _id: bookId

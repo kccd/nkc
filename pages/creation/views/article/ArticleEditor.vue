@@ -8,6 +8,7 @@
         button.btn.btn-primary.m-r-05(@click="publish") 发布
         button.btn.btn-default(@click="saveArticle") 保存
         button.btn.btn-default(@click="documentPreview") 预览
+    MoveDirectoryDialog(:bid="bookId" ref="moveDialog")
 </template>
 
 <script>
@@ -15,15 +16,19 @@
   import {nkcUploadFile, nkcAPI} from "../../../lib/js/netAPI";
   import {sweetError} from "../../../lib/js/sweetAlert";
   import {screenTopWarning} from "../../../lib/js/topAlert";
+  import MoveDirectoryDialog from '../../component/MoveDirectoryDialog'
+  import { EventBus } from '../../eventBus'
   export default {
     components: {
-      'document-editor': DocumentEditor
+      'document-editor': DocumentEditor,
+      MoveDirectoryDialog
     },
     data: () => ({
       coverFile: null,
       oldCoverFile: null,
       bookId: '',
       id:'',
+      aid:'',
       d_id:'',
       notice:'',
       articleId: '',
@@ -73,10 +78,20 @@
       }
     },
     mounted() {
+      EventBus.$on('saveArticle',()=>{
+        this.post('save')
+        .then(() => {
+          // sweetSuccess('保存成功');
+        })
+      })
       this.initId();
       this.initData();
     },
     methods: {
+      moveDialog(data, childIndex, isOpen, bid, type) {
+        childIndex=childIndex.split(',')
+        EventBus.$emit("moveDirectory", data, childIndex, isOpen, bid, type);
+      },
       documentPreview(){
         const {doucmentId,bookId,articleId,id}=this
         window.open(`/creation/document?_id=${id}&did=${doucmentId}&bid=${bookId}&aid=${articleId}`)
@@ -160,7 +175,6 @@
         // }
         return nkcUploadFile(url, 'POST', formData)
           .then(data => {
-            console.log('data.document?._id',data.document?._id)
             sessionStorage.document_id=data.document?._id
             self.oldCoverFile = self.coverFile;
             self.coverFile = null;
@@ -180,26 +194,31 @@
       },
       modifyArticle() {
         const self = this;
-        this.post(this.type,this.articleType)
+        this.post(this.type,this.articleType).then(data=>{
+        })
         .catch(err => {
-          console.error(err);
           screenTopWarning(err);
         })
       },
       saveArticle() {
-        this.$router.push({
-        name:"book",
-        query:{
-          data:this.article,
-        },
-        params:{
-          bid:this.bookId
-        },
-      });
-        this.post('save')
-        .then(() => {
-          sweetSuccess('保存成功');
-        })
+      //   this.$router.push({
+      //   name:"book",
+      //   query:{
+      //     data:this.article,
+      //   },
+      //   params:{
+      //     bid:this.bookId
+      //   },
+      // });//choice 新建文章
+      let article={
+        title:this.article.title,
+        id:this.articleId,
+        url:'',
+        type:'article',
+        child:[]
+      }
+      this.$refs.moveDialog.moveDialog(article,null,null,this.bookId,'choice')
+      // this.moveDialog(this.article,null,null,null,'choice')
       },
       publish() {
         const self = this;

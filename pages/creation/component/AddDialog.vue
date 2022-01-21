@@ -57,8 +57,6 @@
       ul.select-post-list
         .list-container(ref="listContainer")
           .list-height(ref="listHeight")
-            .post-list-paging
-              span(v-for="(page, i) in paging.buttonValue" :key="i" :class="{pageActive:page.type === 'active'}" @click="query(page.num)" )  {{page.type === 'null' ? '...' : page.num}}
             li.post-list-item(v-for="post in postList")
               label.radio-post(for="" )
                 input(type="radio" :value="post.firstPost.pid" v-model="selectPostId" @input="selectPost(post)")
@@ -67,11 +65,11 @@
                 p.postContent {{ post.firstPost.c }}
             li(v-if="postList.length === 0" style="font-size:24px") 数据加载中...
             li(v-else-if="!postList" style="font-size:24px") 暂无数据
-            .post-list-paging.bottom
-              span(v-for="(page, i) in paging.buttonValue" :key="i" :class="{pageActive:page.type === 'active'}" @click="query(page.num)") {{page.type === 'null' ? '...' : page.num}}
-    //- .select-tree
-    //-   span 请选择新建位置
-    //-   Tree(:data="extendedData", :operations="false")
+            //- .post-list-paging.bottom
+            //-   span(v-for="(page, i) in paging.buttonValue" :key="i" :class="{pageActive:page.type === 'active'}" @click="query(page.num)") {{page.type === 'null' ? '...' : page.num}}
+    .paging(v-show="selectType === 'post'")
+      .post-list-paging
+        span(v-for="(page, i) in paging.buttonValue" :key="i" :class="{pageActive:page.type === 'active'}" @click="query(page.num)" )  {{page.type === 'null' ? '...' : page.num}}
     .m-t-1.m-b-1.text-right
       button.btn.btn-sm.btn-default.m-r-05(@click="close") 关闭
       button.btn.btn-sm.btn-primary(@click="submit") 确定
@@ -83,6 +81,7 @@ import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import Tree from "./tree/Tree.vue";
 import { EventBus } from "../eventBus.js";
 import { getState } from "../../lib/js/state";
+import {sweetSuccess, sweetError}  from '../../lib/js/sweetAlert.js'
 export default {
   components: {
     Tree,
@@ -110,10 +109,27 @@ export default {
     paging:[]
   }),
   created() {
+    
+  },
+  watch: {
+    selectType() {
+      if (this.selectType === "post") {
+        this.query(0, "get");
+      } else if (this.selectType === "url") {
+        this.inputValue = "www.kechuang.org";
+      } else if (this.selectType === "text") {
+        this.inputValue = "默认新建分组名";
+      }
+    },
+  },
+  mounted() {
     EventBus.$on("addDialog", ({bid, data, childIndex,title,type='add'}) => {
       this.dialogType=type
       this.title=title
-      if (!bid) console.error("bid不存在");
+      if (!bid) {
+        sweetError('书籍id不存在')
+        return
+      }
       this.bid=bid,
       this.insertData={
         data,
@@ -134,24 +150,11 @@ export default {
             this.inputValue=data.title
             break
           default:
-            console.error('不存在的类型')
+            sweetError('错误类型')
         }
         this.selectType=data.type
       }
     });
-  },
-  watch: {
-    selectType() {
-      if (this.selectType === "post") {
-        this.query(0, "get");
-      } else if (this.selectType === "url") {
-        this.inputValue = "www.kechuang.org";
-      } else if (this.selectType === "text") {
-        this.inputValue = "默认新建分组名";
-      }
-    },
-  },
-  mounted() {
     this.initDraggableElement();
   },
   updated() {
@@ -174,7 +177,6 @@ export default {
     },
   },
   methods: {
-
     selectPost(data){
       console.log(data)
       const {firstPost}=data
@@ -188,11 +190,11 @@ export default {
     },
     getTreeData(bid) {
       // let url = `/creation/book/${bid}`;
-      let url = `/creation/book/61e51196e9a1781a80932e99`;
+      console.log(bid)
+      let url = `/creation/book/${bid}`;
       const self = this;
       return nkcAPI(url, "GET")
         .then((data) => {
-          console.log(data);
           self.book = data.bookData;
           self.treeData = data.bookList;
         })
@@ -211,7 +213,7 @@ export default {
       }
       this.postList=[]
       const result = await nkcAPI(url, "get");
-      this.postList =result.threads.length ? result.threads : ''; // 先不改了
+      this.postList =result.threads; 
       this.paging =result.paging; // 先不改了
       this.$nextTick(() => {
       if (this.$refs.listHeight.clientHeight < 480) {
@@ -250,7 +252,7 @@ export default {
         this.addResult=this.inputValue
         this.type='text'
       }
-      EventBus.$emit('addConfirm',{res:this.addResult, data:this.insertData, dialogType:this.dialogType})
+      EventBus.$emit('addConfirm',{res:this.addResult, type:this.type, data:this.insertData, dialogType:this.dialogType})
     },
     pickedFile: function (index) {
       var dom = this.$refs["input" + index][0];
@@ -280,7 +282,6 @@ export default {
     focus: {
       bind: function (el) {
         el.focus();
-        // el.select();
       },
     },
   },
@@ -319,7 +320,7 @@ export default {
   background: rgb(173, 217, 245);
   height: 20px;
   span{
-    transition: all .2s;
+    transition: all .4s;
     cursor: pointer;
     margin-right: 5px;
     padding: 2px 5px;
@@ -428,12 +429,13 @@ export default {
         align-items: baseline;
         margin-top: 5px;
         .list-container {
+          position: relative;
           border: 1px rgba(218, 216, 216, 0.514) solid;
           height: 40rem;
           width:100%;
           overflow-y: scroll;
           .list-height{
-            position: relative;
+
             cursor: pointer;
             .post-list-item:hover{
                 background-color: #e6e0db ;

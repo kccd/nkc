@@ -1,13 +1,13 @@
 const router = require('koa-router')();
 router
   .get('/:bid', async (ctx, next) => {
-    console.log(123131)
     const {query, params, data, db, nkcModules, state} = ctx;
     const {bid} = params;
     const {aid} = query;
     const book = await db.BookModel.findOnly({_id: bid});
+    const bookList=book.list.toObject()
     data.book = await book.getBaseInfo();
-    data.list = await book.getList();
+    data.list = await book.getList(undefined,bookList,'published'); //'published'
     if(aid) {
       data.bookContent = await book.getContentById({
         aid,

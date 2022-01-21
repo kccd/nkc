@@ -238,6 +238,7 @@ schema.methods.newExtendArticlesById = async function (articlesId, {
         }
       }
       latestEditorResult = latestEditor
+      // console.log(latestEditorResult,'241')
     }
     if (!articleObj) continue;
     const betaDocument = articlesObj[_id].beta;
@@ -254,20 +255,20 @@ schema.methods.newExtendArticlesById = async function (articlesId, {
       uid,
       published: !!stableDocument,
       hasBeta: !!betaDocument,
+      title: title || '未填写标题',
       value: title || '未填写标题',
       url: getUrl(setUrl, this._id, _id, did),
       time: timeFormat(toc),
     };
     results.push(result);
   }
-  // 根据 添加进 results 的数据来匹配 bookList  如果 id 一致 就把 result 对象上数据给 bookList
+  // 根据 添加进 results 的数据来匹配 bookList  如果 id 一致 就把 results[] 对象上数据给 bookList
   for (const key in results) {
     if (Object.hasOwnProperty.call(results, key)) {
       const result = results[key];
       function find(data) {
         for (let i in data) {
           const item = data[i]
-          console.log(item, result)
           if (item.id === result._id) {
             for (const key in result) {
               if (Object.hasOwnProperty.call(result, key)) {
@@ -289,14 +290,16 @@ schema.methods.newExtendArticlesById = async function (articlesId, {
 schema.methods.getList = async function (options = {
   setUrl: 'bookContent',
   latestTitle: false
-}, bookList=[], bid) {
+}, bookList=[], status='unpublished') {
+  // status  分为 已发布 未发布
+  // console.log(options,bookList,bid)
   // const PostModel = mongoose.model('posts');
   const articlesId = [];
   const postsId = [];
 
   const articleObj = {};
   const postObj = {};
-
+  // 递归 把每一项id加入到相应数组中
   function find(list) {
     for (let i = 0; i < list.length; i++) {
       const item = list[i];
@@ -315,19 +318,38 @@ schema.methods.getList = async function (options = {
     }
   }
   find(this.list)
-  const articles = await this.newExtendArticlesById(articlesId, options, bookList)
-  const articlesObj = {};
-  for (const a of articles) {
+  let articles = await this.newExtendArticlesById(articlesId, options, bookList)
+  // console.log(articles,320)
+  
 
-    const results = [];
-    return articles || [];
+  if(status === 'published'){
+    let publisheds=[]
+    function findPublished(data){
+      data.forEach(item=>{
+        if(item.published){
+          publisheds.push(item)
+        }
+        if(item.child && item.child.length){
+          findPublished(item.child)
+        }
+      })
+    }
+    findPublished(articles)
+    articles=publisheds
   }
+  // const articlesObj = {};
+  return articles || []
+  // for (const a of articles) {
+  //   const results = [];
+  //   return articles || [];
+  // }
 }
  // 为了让预览能服用该方法，对该方法进行了传参，然后进行判断
-schema.methods.extendArticlesById = async function (articlesId, {
-  setUrl = 'bookContent',
-  latestTitle = false
+schema.methods.extendArticlesById = async function (articlesId,options= {
+  setUrl :'bookContent',
+  latestTitle : false
 }, bookList) {
+  console.log(options,bookList)
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
   const {
@@ -409,6 +431,7 @@ schema.methods.extendArticlesById = async function (articlesId, {
       published: !!stableDocument,
       hasBeta: !!betaDocument,
       value: title || '未填写标题',
+      title: title || '未填写标题',
       url: getUrl(setUrl, this._id, _id, did),
       time: timeFormat(toc),
       type
@@ -431,13 +454,29 @@ schema.methods.getContentById = async function (props) {
   } = props;
   const {
     list
-  } = this;
+  } = this.toObject();
+  // console.log(list)
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
   const {
     article: documentSource
   } = await DocumentModel.getDocumentSources();
-  if (list.includes(aid)) {
+  // console.log(list.includes(aid),list)
+  let listIds=[]
+  function find(data){
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+      if(item.type === 'article' && item.id){
+        listIds.push(item.id)
+      }
+      if(item.child && item.child.length){
+        find(item.child)
+      }
+    }
+
+  }
+  find(list)
+  if (listIds.includes(aid)) {
     const article = await ArticleModel.findOnly({
       _id: aid
     });
@@ -462,6 +501,8 @@ schema.methods.getContentById = async function (props) {
       content,
       uid
     }
+  }else{
+    return {}
   }
 }
 module.exports = mongoose.model('books', schema);
