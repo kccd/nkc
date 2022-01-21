@@ -5,7 +5,7 @@ const PATH = require('path');
 const axios = require("axios");
 
 const pictureExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif", "webp"];
-const videoExtensions = ["mp4", "mov", "3gp", "avi", 'webm'];
+const videoExtensions = ["mp4", "mov", "3gp", "avi", 'webm', 'mkv', 'flv', 'wmv'];
 const audioExtensions = ["wav", "amr", "mp3", "aac", 'flac'];
 const breakpointExtensions = ['mp4', 'mp3', 'pdf'];
 
