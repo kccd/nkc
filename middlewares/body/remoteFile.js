@@ -4,6 +4,8 @@ const ContentDisposition = require('content-disposition');
 const {pictureExtensions, breakpointExtensions} = FILE;
 const fileBody = require('./file');
 module.exports = async (ctx) => {
+  // 关闭 gzip 压缩
+  ctx.compress = false;
   const {remoteFile, isAttachment, settings} = ctx;
   const {
     url: fileUrl,
