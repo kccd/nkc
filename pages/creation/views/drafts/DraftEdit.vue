@@ -1,13 +1,12 @@
 <template lang="pug">
-  .row
-    .col-xs-12.col-md-12
-      h2 添加草稿
-      a(@click="back")
-        .fa.fa-arrow-left &nbsp;
-        | 返回上一层
-      document-editor(ref="documentEditor" :configs="formConfigs" @content-change="watchContentChange")
-      .m-t-1.m-b-3
-        button.btn.btn-block.btn-primary(@click="submit") 提交
+  .container-fluid
+    .m-b-1
+      bread-crumb(:list="navList")
+    .standard-max-container
+      .m-b-1
+        document-editor(ref="documentEditor" :configs="formConfigs" @content-change="watchContentChange")
+      .m-b-1
+        button.btn.btn-primary(@click="submit") 提交
 </template>
 
 <style lang="less" scoped>
@@ -91,6 +90,24 @@ export default {
     type() {
       return this.documentDid? 'modify': 'create'
     },
+    navList() {
+      const list = [
+        {
+          name: '图文片段',
+          page: 'drafts'
+        }
+      ];
+      if(this.draftId) {
+        list.push({
+          name: '修改片段',
+        });
+      } else {
+        list.push({
+          name: '新建片段',
+        });
+      }
+      return list;
+    }
   },
   methods: {
     back() {

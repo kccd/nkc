@@ -1,10 +1,11 @@
 <template lang="pug">
-  .row.creation-center-article-editor
-    .col-xs-12.col-md-12.m-b-3
+  .container-fluid.creation-center-article-editor
+    .m-b-1
       bread-crumb(:list="navList")
-    .col-xs-12.col-md-10
-      document-editor(ref="documentEditor" :configs="formConfigs" @content-change="watchContentChange")
-      .m-t-1.m-b-3
+    .standard-max-container
+      .m-b-1
+        document-editor(ref="documentEditor" :configs="formConfigs" @content-change="watchContentChange")
+      .m-t-1
         button.btn.btn-primary.m-r-05(@click="publish") 发布
         button.btn.btn-default(@click="saveArticle") 保存
 

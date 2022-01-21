@@ -14,6 +14,7 @@ router
     } else {
       ctx.remoteTemplate = 'creation/index.pug';
     }
+    ctx.state.navbar = 'full';
     await next();
   })
   .get('/', async (ctx, next) => {

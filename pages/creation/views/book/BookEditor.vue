@@ -1,10 +1,10 @@
 <template lang="pug">
-  .row
+  .container-fluid
     user-selector(ref="userSelector")
     image-selector(ref="imageSelector")
-    .col-xs-12.col-md-12.m-b-3
+    .m-b-1
       bread-crumb(:list="navList")
-    .col-xs-12.col-md-6.col-md-offset-3
+    .standard-container
       .formm
         .form-group
           label.control-label 图书名称
@@ -67,9 +67,10 @@
             label.m-r-1
               input(type="radio" value="self" v-model="book.read")
               span 仅自己
-        .form-group
-          button.btn.btn-default.btn-block(v-if="submitting" disabled) {{progress === 100? `处理中...`: `提交中...${progress}%`}}
-          button.btn.btn-default.btn-block(v-else @click="submit") 提交
+        .form-group.m-b-3
+          button.btn.btn-primary.btn-block(v-if="submitting" disabled) {{progress === 100? `处理中...`: `提交中...${progress}%`}}
+          button.btn.btn-primary.btn-block(v-else @click="submit") 提交
+          //button.btn.btn-danger.btn-block(v-if="bookId") 删除
 </template>
 <script>
   import {nkcAPI} from "../../../lib/js/netAPI";

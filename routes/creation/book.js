@@ -15,6 +15,7 @@ router
       time: timeFormat(book.toc),
       coverUrl: getUrl('bookCover', book.cover)
     };
+    data.bookMembers = await book.getMembers();
     await next();
   })
   .post('/:bid/member', async (ctx, next) => {

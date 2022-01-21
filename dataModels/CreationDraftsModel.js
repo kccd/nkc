@@ -84,7 +84,7 @@ schema.statics.createDraft = async (props) => {
 * */
 schema.statics.extentDrafts = async function (drafts) {
   const DocumentModel = mongoose.model('documents');
-  const apiFunction = require("../nkcModules/apiFunction");
+  const nkcRender = require("../nkcModules/nkcRender");
   const  arr = [];
   const obj = {};
   for(const d of drafts) {
@@ -103,7 +103,7 @@ schema.statics.extentDrafts = async function (drafts) {
   });
   const _drafts = [];
   for(const d of documents) {
-    d.content = await apiFunction.obtainPureText(d.content, true, 300);
+    d.content = await nkcRender.htmlToPlain(d.content, true, 300);
     obj[d.did] = d;
   }
   for(const d of drafts) {

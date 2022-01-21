@@ -1,5 +1,5 @@
 <template lang="pug">
-  .category-container
+  .container-fluid.category-container
     h2 资源管理
     resource-category(ref="resourceCategory")
 </template>

@@ -1,10 +1,9 @@
 extends ../bootstrap_base
 block title
   +includeCSS('/creation/index.css', true)
-  title 创作中心
+  title=`创作中心 - ${remoteState.serverSettings.websiteName}`
 block content
-  .container-fluid.max-width
-    #app
+  #app
 block footer
 block scripts
   +includeJS("/vue-router/dist/vue-router.min.js", true)

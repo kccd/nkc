@@ -8,35 +8,17 @@ router
   .get('/', async (ctx, next) => {
     //获取创作中心草稿
     const {data, db, state, query, nkcModules} = ctx;
-    let {quota, skip, type} = query;
-    const {user} = data;
+    const {page = 0, del} = query;
     const {uid} = state;
-    quota = parseInt(quota);
-    skip = parseInt(skip);
-    let queryMap;
-    if(type === 'all') {
-      queryMap = {"uid": user.uid, "del": false}
-    } else if(type === 'trash') {
-      queryMap = {"uid": user.uid, "del": true}
-    }
-    let newSkip = quota * skip;
-    let mediaCount = await db.CreationDraftsModel.find(queryMap).countDocuments();
-
-    data.paging = nkcModules.apiFunction.paging(skip, mediaCount, quota);
-    let maxSkip = Math.ceil(mediaCount / quota);
-    if(maxSkip < 1) maxSkip = 1;
-    if(skip >= maxSkip){
-      ctx.data.skip = maxSkip - 1;
-    }else{
-      ctx.data.skip = skip;
-    }
-    if(newSkip > mediaCount) {
-      ctx.throw(400, '已经是最后一页了')
-    }
-    ctx.data.maxSkip = maxSkip;
-    let drafts = await db.CreationDraftsModel.find(queryMap).sort({toc: -1}).skip(newSkip).limit(quota);
-    drafts = await db.CreationDraftsModel.extentDrafts(drafts);
-    data.drafts = drafts;
+    const queryMap = {
+      uid,
+      del: del === 'true',
+    };
+    const count = await db.CreationDraftsModel.countDocuments(queryMap);
+    const paging = nkcModules.apiFunction.paging(page, count);
+    const drafts = await db.CreationDraftsModel.find(queryMap).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    data.drafts = await db.CreationDraftsModel.extentDrafts(drafts);
+    data.paging = paging;
     await next();
   })
   .get('/draftEdit', async (ctx, next) => {
