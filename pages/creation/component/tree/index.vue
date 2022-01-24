@@ -18,16 +18,16 @@
       >
       </span>
       <span class="seat" v-else></span>
-      <span v-if="operations">
-        <span class="status" v-if="!data.published">[未发布]</span>
-        <span class="status" v-else-if="data.hasBeta">[编辑中]</span>
+      <span v-if="operations" class="status">
+        <span  v-if="!data.published && data.type ==='article'">[未发布]</span>
+        <span  v-else-if="data.hasBeta && data.type ==='article'">[编辑中]</span>
       </span>
 
       <span
         v-if="operations"
         class="title"
         @click.stop="
-           operations && clickArticleTitle(data)
+           operations && clickArticleTitle(data,childIndex)
         "
         >{{ data.title }}</span
       >
@@ -240,7 +240,7 @@ export default {
       }
     },
     // 编辑
-    clickArticleTitle(data) {
+    clickArticleTitle(data, childIndex) {
       const { bid } = this;
       const aid = data._id;
       // 修改分组名称吗 
@@ -254,7 +254,7 @@ export default {
       }else if(data.type  === 'post'){
         window.open(data.url)
       }else{
-        this.navToPage("articleEditor", { bid, aid });
+        this.navToPage("articleEditor", { bid, aid, data, childIndex });
       }
       
     },
@@ -407,6 +407,10 @@ export default {
 }
 .active {
   background: rgba(243, 228, 200, 0.322);
+}
+.status{
+  width:4.2rem;
+  display:inline-block;
 }
 .child_tree_row {
   padding: 2px 5px;

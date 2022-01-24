@@ -11,6 +11,9 @@
         .creation-center-book-list
           Tree(:data="extendedData", :bid="bid")
         button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
+          @click="add()"
+        ) 新建目录
+        button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
           @click="navToPage('articleEditor', { bid })"
         ) 撰写文章
         button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
@@ -133,7 +136,7 @@ import MoveDirectoryDialog from "../../component/MoveDirectoryDialog.vue";
 import Tree from "../../component/tree/Tree.vue";
 import { EventBus } from "../../eventBus";
 import AddDialog from "../../component/AddDialog.vue";
-import {sweetSuccess, sweetError}  from '../../../lib/js/sweetAlert.js'
+import { sweetSuccess, sweetError } from "../../../lib/js/sweetAlert.js";
 export default {
   components: {
     MoveDirectoryDialog,
@@ -205,8 +208,7 @@ export default {
     parentData: [],
     moveDialogData: [],
   }),
-  created() {
-  },
+  created() {},
   computed: {
     navList() {
       const { book, bid } = this;
@@ -242,15 +244,14 @@ export default {
     };
   },
   mounted() {
-        EventBus.$on("addGroup", (data) => {
+    EventBus.$on("addGroup", (data) => {
       // this.parentData.child ?? (this.parentData.child = []);
       // this.parentData.child.unshift({ type: "article", value: data.title });
       this.addGroup(data);
     });
-    // 里层添加 还有很多bug
     EventBus.$on(
       "addConfirm",
-      async ({ res, type, data: insertData, dialogType }) => {
+      async ({ res, type, data: insertData, dialogType, level }) => {
         // insertData 是修改或者新建的数据
         let obj;
         if (type === "text") {
@@ -269,7 +270,7 @@ export default {
             url: res.url,
             child: [],
           };
-        } else if(type === "post"){
+        } else if (type === "post") {
           obj = {
             title: res.title,
             type: type,
@@ -277,14 +278,13 @@ export default {
             url: res.url,
             child: [],
           };
-        }else{
-          // console.error('不存在的类型')
-          sweetError('不允许的数据类型')
-          return
+        } else {
+          sweetError("不允许的数据类型");
+          return;
         }
         if (dialogType === "editor") {
           this.seekResult = this.bookList;
-          for (let i = 0; i < insertData.index.length-1; i++) {
+          for (let i = 0; i < insertData.index.length - 1; i++) {
             const position = insertData.index[i];
             this.seekChild({
               data: this.seekResult,
@@ -303,22 +303,23 @@ export default {
             this.seekResult.child[editorIndex] = obj;
           }
         } else {
-          // 都是向子级的child 插入数据
-          // 可能 insertData 是没有id的 所以专门使用id去查找是不行的
-          // 还是得根据 位置进行查找 ，或者 再数据上加上唯一标志
-          // this.findId(this.bookList,insertData.id).child.unshift(obj)
-          const index = insertData.index;
-          this.seekResult= this.bookList
-          for (let i = 0; i < index.length; i++) {
-            const position = index[i];
-            this.seekChild({
-              data: this.seekResult,
-              position,
-              currentIndex: i,
-              findLocation: index,
-            });
+          if (level === "outermost") {
+            this.bookList.push(obj);
+          } else {
+            // 都是向子级的child 插入数据
+            const index = insertData.index;
+            this.seekResult = this.bookList;
+            for (let i = 0; i < index.length; i++) {
+              const position = index[i];
+              this.seekChild({
+                data: this.seekResult,
+                position,
+                currentIndex: i,
+                findLocation: index,
+              });
+            }
+            this.seekResult.child.unshift(obj);
           }
-          this.seekResult.child.unshift(obj);
         }
         // 添加修改的共同业务
         let url = "/creation/articles/del";
@@ -326,11 +327,10 @@ export default {
           data: this.bookList,
           bid: this.bid,
         }).then((data) => {
-          if(!data.bid){
-            
-            sweetError(dialogType === 'editor' ? '修改失败' : '添加失败')
-          }else{
-            sweetSuccess((dialogType === 'editor') ? '修改成功' : '添加成功')
+          if (!data.bid) {
+            sweetError(dialogType === "editor" ? "修改失败" : "添加失败");
+          } else {
+            sweetSuccess(dialogType === "editor" ? "修改成功" : "添加成功");
           }
         });
         this.getBook();
@@ -350,12 +350,12 @@ export default {
           type: "parent",
         });
       }
-      console.log(this.seekResult)
+      // console.log(this.seekResult)
       // 最外层 可能是 一位数 可能是 二位数 三位数 等等
       if (childIndex.length === 1) {
         this.seekResult.splice(childIndex[0], 1);
       } else {
-        this.seekResult.child.splice(childIndex[childIndex.length-1], 1);
+        this.seekResult.child.splice(childIndex[childIndex.length - 1], 1);
       }
 
       let url = "/creation/articles/del";
@@ -363,10 +363,10 @@ export default {
         data: this.bookList,
         bid: this.bid,
       }).then(async (data) => {
-        if(!data.bid){
-          sweetError('删除失败')
-        }else{
-          sweetSuccess('删除成功')
+        if (!data.bid) {
+          sweetError("删除失败");
+        } else {
+          sweetSuccess("删除成功");
         }
         this.getBook();
       });
@@ -459,12 +459,20 @@ export default {
             this.seekResult = child;
           }
         } else {
-          sweetError('此位置不存在数据')
-          return
+          sweetError("此位置不存在数据");
+          return;
         }
       }
     },
-
+    add(data, childIndex) {
+      EventBus.$emit("addDialog", {
+        bid: this.bid,
+        data,
+        childIndex,
+        title: "新建同级目录",
+        level: "outermost",
+      });
+    },
     addGroup(data) {
       let url = "/creation/articles/editor";
       // '/creation/addChapter'

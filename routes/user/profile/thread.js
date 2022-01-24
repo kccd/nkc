@@ -27,11 +27,8 @@ module.exports = async (ctx, next) => {
     }
   }
 
-  // 新建post时不用给前端那么多数据
   let threads = await db.ThreadModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
   let postUrl=[]
-
-  // console.log(threads,'threads')
   data.paging = paging;
   threads = await db.ThreadModel.extendThreads(threads, {
     forum: true,

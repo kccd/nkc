@@ -326,11 +326,8 @@ schema.methods.getList = async function (options = {
     let publisheds=[]
     function findPublished(data){
       data.forEach(item=>{
-        if(item.published){
+        if(item.published || item.type !== 'article'){
           publisheds.push(item)
-        }
-        if(item.child && item.child.length){
-          findPublished(item.child)
         }
       })
     }

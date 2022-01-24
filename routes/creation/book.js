@@ -9,7 +9,6 @@ router
     // setUrl:undefined 使用内部默认 latestTitle =true 代表需要最新编辑的 title 
     data.bookList = await book.getList({setUrl:'bookContent',latestTitle:true},bookList) || [];
     book.bindArticle
-    // data.bookList.document=document
     data.bookData = {
       bid: book._id,
       name: book.name,

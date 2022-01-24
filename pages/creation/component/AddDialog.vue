@@ -106,7 +106,8 @@ export default {
     type:'',
     urlTitle:'科创',
     dialogType:'add',
-    paging:[]
+    paging:[],
+    insertLevel:''
   }),
   created() {
     
@@ -123,7 +124,8 @@ export default {
     },
   },
   mounted() {
-    EventBus.$on("addDialog", ({bid, data, childIndex,title,type='add'}) => {
+    EventBus.$on("addDialog", ({bid, data, childIndex,title,type='add', level}) => {
+      this.insertLevel=level
       this.dialogType=type
       this.title=title
       if (!bid) {
@@ -252,7 +254,7 @@ export default {
         this.addResult=this.inputValue
         this.type='text'
       }
-      EventBus.$emit('addConfirm',{res:this.addResult, type:this.type, data:this.insertData, dialogType:this.dialogType})
+      EventBus.$emit('addConfirm',{res:this.addResult, type:this.type, data:this.insertData, dialogType:this.dialogType, level:this.insertLevel})
     },
     pickedFile: function (index) {
       var dom = this.$refs["input" + index][0];
