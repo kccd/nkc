@@ -33,7 +33,7 @@
         @coverHeight: 8rem;
         @itemWidth: 22rem;
         background-color: #fff;
-        border: 1px solid #ddd;
+        border: 1px solid #eee;
         margin: 0 1rem 1rem 0;
         text-align: center;
         border-radius: 3px;

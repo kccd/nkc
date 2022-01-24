@@ -43,7 +43,7 @@
   }
   .module-drafts {
     .paging-button {
-      padding: 0.5rem 1rem 0 1rem;
+      padding: 0 1rem 0 1rem;
     }
 
     .module-draft:last-child {

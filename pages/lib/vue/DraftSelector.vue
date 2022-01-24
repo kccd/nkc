@@ -12,10 +12,10 @@
           .paging-button
             a(:class="{'active': draftType === 'auto'}" @click="selectDraftType('auto')")
               .fa &nbsp;
-              | 自动保存草稿
+              | 草稿列表
             a(:class="{'active': draftType === 'custom'}" @click="selectDraftType('custom')")
               .fa &nbsp;
-              | 自定义草稿
+              | 图文片段
           auto-drafts-box(ref="autoDraftsBox" v-if="draftType === 'auto'" @callback-data="insert")
           custom-drafts-box(ref="customDraftsBox" :type="true" v-else @callback-data="insert")
 
@@ -192,6 +192,13 @@
       },
       selectDraftType(type) {
         this.draftType = type;
+        const self = this;
+        if(type === 'custom') {
+          setTimeout(() => {
+            self.$refs.customDraftsBox.getDrafts();
+          }, 100)
+
+        }
       },
       insert(data) {
         this.callback({content: data});

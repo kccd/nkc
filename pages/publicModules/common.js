@@ -100,6 +100,7 @@ var NKC = {
 };
 
 const state = getState();
+
 Object.assign(NKC.configs, state);
 
 NKC.methods.getLoginStatus = function() {

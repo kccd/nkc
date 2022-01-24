@@ -22,7 +22,7 @@ const routes = [
   {name: 'articleEditor', path: '/creation/articles/editor', component: ArticleEditor},
   {name: 'categories', path: '/creation/categories', component: Categories},
   {name: 'drafts', path: '/creation/drafts', component: Drafts},
-  {name: 'draftEdit', path: '/creation/drafts/draftEdit', component: DraftEdit},
+  {name: 'draftEdit', path: '/creation/drafts/editor', component: DraftEdit},
 ];
 
 
