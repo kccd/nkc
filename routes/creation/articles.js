@@ -3,7 +3,6 @@ let aidStatus=false
 function find(data,id){
   if(data){
     for (const obj of data) {
-      console.log(obj.id === id,id,obj.id)
       if(obj.id === id){
         aidStatus= true
       }else if(obj.child && obj.child.length){

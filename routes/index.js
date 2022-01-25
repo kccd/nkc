@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 const routers = require('../requireFolder')(__dirname);
 const userRouter = routers.user;
+const documentRouter = routers.document;
 const watermarkRouter = routers.watermark;
 const meRouter = routers.me;
 const threadRouter = routers.thread;
@@ -151,4 +152,5 @@ router.use('/creation', creationRouter.routes(), creationRouter.allowedMethods()
 router.use('/draw', drawDataRouter.routes(), drawDataRouter.allowedMethods());
 router.use('/mathJax', mathJaxRouter.routes(), mathJaxRouter.allowedMethods());
 router.use('/book', bookRouter.routes(), bookRouter.allowedMethods());
+router.use('/document', documentRouter.routes(), documentRouter.allowedMethods());
 module.exports = router;

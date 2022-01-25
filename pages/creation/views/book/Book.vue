@@ -11,11 +11,11 @@
         .creation-center-book-list
           Tree(:data="extendedData", :bid="bid")
         button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
-          @click="add()"
-        ) 新建目录
-        button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
           @click="navToPage('articleEditor', { bid })"
         ) 撰写文章
+        button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
+          @click="add()"
+        ) 新建同级
         button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
           @click="navToPage('bookEditor', { bid })"
         ) 设置

@@ -11,13 +11,6 @@ router
     let bookList =book.list.toObject();
     data.list = await book.getList({setUrl:'prevView',latestTitle:true},bookList) || [];
     if(aid){
-      console.log(await book.getContentById({
-        aid,
-        uid: state.uid
-      }),aid,'/n',)
-      console.log(await book.getContentById({
-        _id
-      }),_id)
       data.bookContent = await book.getContentById({
         aid,
         uid: state.uid
@@ -28,6 +21,6 @@ router
     if(!did) did=aid
     const document = await db.DocumentModel.find({sid:aid}).sort({tlm:-1});
       data.document = document[0].toObject()
-    await next();
+      await next();
   })
 module.exports=router

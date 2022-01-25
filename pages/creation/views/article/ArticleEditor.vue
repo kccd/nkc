@@ -6,8 +6,9 @@
       document-editor(ref="documentEditor" :configs="formConfigs" @content-change="watchContentChange")
       .m-t-1.m-b-3
         button.btn.btn-primary.m-r-05(@click="publish") 发布
-        button.btn.btn-default(@click="saveArticle") 保存
+        button.btn.btn-default.m-r-05(@click="saveArticle") 保存
         button.btn.btn-default(@click="documentPreview") 预览
+        button.btn.btn-default(@click="documentHistory") 历史记录
     MoveDirectoryDialog(:bid="bookId" ref="moveDialog")
 </template>
 
@@ -83,12 +84,6 @@
       }
     },
     mounted() {
-      EventBus.$on('saveArticle',()=>{
-        this.post('save')
-        .then(() => {
-          // sweetSuccess('保存成功');
-        })
-      })
       EventBus.$on('publish',(publishIndex,publishId)=>{
         this.post('publish')
         .then(() => {
@@ -114,7 +109,12 @@
       },
       documentPreview(){
         const {doucmentId,bookId,articleId,id}=this
-        window.open(`/creation/document?_id=${id}&did=${doucmentId}&bid=${bookId}&aid=${articleId}`)
+        // window.open(`/document/preview?_id=${id}&did=${doucmentId}&bid=${bookId}&aid=${articleId}`)
+        window.open(`/document/${doucmentId}/preview`)
+      },
+      documentHistory(){
+        const {doucmentId,bookId,articleId,id}=this 
+        window.open(`/document/${doucmentId}/history?bid=${bookId}`)
       },
       initId() {
         const {bid, aid, type, data ,childIndex} = this.$route.query;
@@ -191,10 +191,6 @@
         formData.append('articleType', articleType);
         formData.append('level', 'outermost');
         let url='/creation/articles/editor'
-        // if(this.articleId){
-        //   url='/creation/addChapter'
-        //   formData.append('aid', this.articleId);
-        // }
         return nkcUploadFile(url, 'POST', formData)
           .then(data => {
             sessionStorage.document_id=data.document?._id
@@ -215,7 +211,6 @@
           });
       },
       modifyArticle() {
-        const self = this;
         this.post(this.type,this.articleType).then(data=>{
         })
         .catch(err => {
@@ -223,17 +218,10 @@
         })
       },
       saveArticle() {
-      //   this.$router.push({
-      //   name:"book",
-      //   query:{
-      //     data:this.article,
-      //   },
-      //   params:{
-      //     bid:this.bookId
-      //   },
-      // });//choice 新建文章
-      this.modifyArticle()
-
+       this.post('save')
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
       // this.moveDialog(this.article,null,null,null,'choice')
       },
       publish() {
@@ -248,7 +236,7 @@
       // 文章编辑过后默认添加在列表最后 点击发布选中最后一项  
       let publishType;
       // if(this.publishId === this.articleId && this.publishIndex) publishType="republish" 
-      let  childIndex=this.moveIndex?.split(',')
+      let  childIndex=this.moveIndex?.split(',') || []
       this.$refs.moveDialog.moveDialog(article, childIndex, null, this.bookId, 'choice', publishType,)
       },
       resetCoverFile(cover) {

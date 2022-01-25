@@ -1,34 +1,31 @@
 <template>
   <div class="child_tree" :class="{ disable: data.isMove && !operations }">
-    <!--     :class="{ disable: (childrenDisable || childDisable) && !operations }" -->
     <div
       class="child_tree_row col-xs-12.col-md-12"
       :class="{ active: isShowOperation }"
       @mouseenter="operations && mouseEnter()"
       @mouseleave="operations && mouseEnter()"
     >
-      <!-- @click="!operations && moveIndication(data)" -->
-      <!-- <div> -->
       <span :style="{ width: level * 24 + 'px' }"></span>
       <span
         class="icon seat"
-        @click.stop="toggle('' ,childIndex)"
+        @click.stop="toggle('', childIndex)"
         v-if="data.child && data.child.length > 0"
         :class="{ down: data.isOpen, right: !data.isOpen }"
       >
       </span>
       <span class="seat" v-else></span>
-      <span v-if="operations" class="status">
-        <span  v-if="!data.published && data.type ==='article'">[未发布]</span>
-        <span  v-else-if="data.hasBeta && data.type ==='article'">[编辑中]</span>
+      <span v-if="operations && jurisdiction !== 'tourist'" class="status">
+        <span v-if="!data.published && data.type === 'article'">[未发布]</span>
+        <span v-else-if="data.hasBeta && data.type === 'article'"
+          >[编辑中]</span
+        >
       </span>
 
       <span
         v-if="operations"
         class="title"
-        @click.stop="
-           operations && clickArticleTitle(data,childIndex)
-        "
+        @click.stop="operations && jurisdiction === 'admin' && clickArticleTitle(data, childIndex)"
         >{{ data.title }}</span
       >
       <span
@@ -42,27 +39,22 @@
       >
       <span
         class="click_block openArea"
-        v-if="operations"
+        v-if="operations && jurisdiction !== 'tourist'"
         @click="toggle('', childIndex)"
       ></span>
-
-      <!-- </div> -->
-
-      <!-- <transition name="fade"> -->
-      <div v-if="operations">
+      <div v-if="operations && jurisdiction !== 'tourist'">
         <div class="operations" v-show="isShowOperation">
-          <span @click.stop="add(data, childIndex)">新建子项</span>
-          <span @click.stop="editor(data, childIndex)">修改</span>
-          <!-- <span @click.stop="addDocument(data, childIndex, bid)">新建文档</span> -->
+          <span v-if="jurisdiction === 'admin'" @click.stop="add(data, childIndex)">新建子级</span>
+          <span v-if="jurisdiction === 'admin'" @click.stop="editor(data, childIndex)">修改</span>
           <span @click.stop="moveDirectory(data, childIndex, data.isOpen, bid)"
             >移动</span
           >
-          <span @click.stop="deleteDirectory(data, childIndex)">删除</span>
+          <span v-if="jurisdiction === 'admin'" @click.stop="deleteDirectory(data, childIndex)">删除</span>
         </div>
         <div class="time" v-show="!isShowOperation">{{ data.time }}</div>
       </div>
       <div
-        v-else-if="!operations && data.showIndication && !data.isMove"
+        v-else-if="!operations && data.showIndication && !data.isMove && jurisdiction !== 'tourist'"
         class="move_level col-xs-12.col-md-12"
       >
         <span>移动为</span>
@@ -72,18 +64,20 @@
             <input type="radio" value="sameLevel" v-model="levelSelect" />
           </span>
         </label>
-        <label v-if="data.describe !== 'seat'" for="" style="margin-left: 5px; margin-bottom: 0">
+        <label
+          v-if="data.describe !== 'seat'"
+          for=""
+          style="margin-left: 5px; margin-bottom: 0"
+        >
           <span>
             子级
             <input type="radio" value="childLevel" v-model="levelSelect" />
           </span>
         </label>
-        <!-- </div> -->
       </div>
     </div>
-    <!-- 可以把这个布局给放到 radio 中  -->
     <div
-      v-if="!operations && data.showIndication && !data.isMove"
+      v-if="!operations && data.showIndication && !data.isMove && jurisdiction !== 'tourist'"
       class="level-indication"
       :style="{
         marginLeft:
@@ -109,8 +103,6 @@
         />
       </p>
     </div>
-    <!-- <transition-group name="fade" tag='ul'> -->
-    <!-- <transition name="fade"> -->
     <template v-for="(child, j) in data.child">
       <Tree
         v-show="data.isOpen"
@@ -122,13 +114,11 @@
         :operations="operations"
       ></Tree>
     </template>
-    <!-- </transition> -->
-    <!-- </transition-group> -->
   </div>
 </template>
 <script>
 import { EventBus } from "../../eventBus.js";
-import { sweetQuestion } from '../../../lib/js/sweetAlert'
+import { sweetQuestion } from "../../../lib/js/sweetAlert";
 export default {
   name: "Tree",
   props: {
@@ -157,12 +147,15 @@ export default {
   },
   data() {
     return {
+      // jurisdiction: "tourist",
+      // jurisdiction: "author",
+      jurisdiction: "admin",
       levelSelect: "childLevel",
       isShowOperation: false,
       isShowAddGroup: false,
       addGroupDefaultName: "新建分组",
       showIndication: false,
-      prevParennNode:''
+      prevParennNode: "",
     };
   },
   directives: {
@@ -182,59 +175,83 @@ export default {
     },
   },
   methods: {
-    editor(data,childIndex){
-      if(data.type !== 'article' ){
+    editor(data, childIndex) {
+      if (data.type !== "article") {
         // 传入 bid 修改的数据 修改数据的坐标 对话框标题 对话框类型
-        EventBus.$emit('addDialog',{bid:this.bid, data, childIndex,title:'修改', type:"editor"})
-      }else{
-        this.navToPage("articleEditor", { bid:this.bid, aid:data._id })
+        EventBus.$emit("addDialog", {
+          bid: this.bid,
+          data,
+          childIndex,
+          title: "修改",
+          type: "editor",
+        });
+      } else {
+        this.navToPage("articleEditor", { bid: this.bid, aid: data._id });
       }
     },
     moveIndication(data, childIndex) {
-      const {isOpen, showIndication, isMove, parentNode, childrenDisable}=this.$props.data
-      childIndex=childIndex.split(',')
+      if (childIndex === "0") {
+        this.levelSelect = "sameLevel";
+      }
+      const { isOpen, showIndication, isMove, parentNode, childrenDisable } =
+        this.$props.data;
+      childIndex = childIndex.split(",");
       // 如果为禁用状态就不显示指示 禁用状态是可以打开关闭的列表
       if (isMove && !this.$props.operations && childrenDisable) {
         // console.log(1)
-        EventBus.$emit("moveDialogOpenMenu",data, childIndex, !isOpen);
+        EventBus.$emit("moveDialogOpenMenu", data, childIndex, !isOpen);
         return;
       }
       // 不属于禁用状态的显示线 会走这个
-      if(!this.$props.operations && !childrenDisable){
+      if (!this.$props.operations && !childrenDisable) {
         // console.log(6)
-        EventBus.$emit("moveDialogOpenMenu", data, childIndex, !this.$props.data.isOpen);
-        EventBus.$emit("showIndication", childIndex, true,data);
-        
-      // 禁用状态子级走 这    showIndication 是 bug源
-      }else{
+        EventBus.$emit(
+          "moveDialogOpenMenu",
+          data,
+          childIndex,
+          !this.$props.data.isOpen
+        );
+        EventBus.$emit("showIndication", childIndex, true, data);
 
-        EventBus.$emit("moveDialogOpenMenu",data, childIndex, !this.$props.data.isOpen);
+        // 禁用状态子级走 这    showIndication 是 bug源
+      } else {
+        EventBus.$emit(
+          "moveDialogOpenMenu",
+          data,
+          childIndex,
+          !this.$props.data.isOpen
+        );
       }
     },
     toggle(instruct, childIndex) {
-      childIndex=childIndex.split(',')
-      const {operations,data}=this.$props
+      childIndex = childIndex.split(",");
+      const { operations, data } = this.$props;
       switch (instruct) {
         //  打开新建分组
         case "on":
-          if(!operations){
-            EventBus.$emit("moveDialogOpenMenu",data, childIndex, true);
-          }else{
+          if (!operations) {
+            EventBus.$emit("moveDialogOpenMenu", data, childIndex, true);
+          } else {
             EventBus.$emit("openMenu", childIndex, true);
           }
           break;
         case "off":
-          if(!operations){
-            EventBus.$emit("moveDialogOpenMenu",data, childIndex, false);
-          }else{
+          if (!operations) {
+            EventBus.$emit("moveDialogOpenMenu", data, childIndex, false);
+          } else {
             EventBus.$emit("openMenu", childIndex, false);
           }
           break;
         default:
-          if(!operations){
-                        console.log('toggle')
-            EventBus.$emit("moveDialogOpenMenu",data, childIndex, !data.isOpen);
-          }else{
+          if (!operations) {
+            console.log("toggle");
+            EventBus.$emit(
+              "moveDialogOpenMenu",
+              data,
+              childIndex,
+              !data.isOpen
+            );
+          } else {
             EventBus.$emit("openMenu", childIndex, !data.isOpen);
           }
       }
@@ -243,27 +260,30 @@ export default {
     clickArticleTitle(data, childIndex) {
       const { bid } = this;
       const aid = data._id;
-      // 修改分组名称吗 
-              console.log(data)
-      if(data.type === 'text'){
-        
-      // 修改url 还是跳转url
-      }else if(data.type === 'url'){
-        window.open(data.url)
+      // 修改分组名称吗
+      console.log(data);
+      if (data.type === "text") {
+        // 修改url 还是跳转url
+      } else if (data.type === "url") {
+        window.open(data.url);
         // 修改post 还是跳转
-      }else if(data.type  === 'post'){
-        window.open(data.url)
-      }else{
+      } else if (data.type === "post") {
+        window.open(data.url);
+      } else {
         this.navToPage("articleEditor", { bid, aid, data, childIndex });
       }
-      
     },
     mouseEnter() {
       this.isShowOperation = !this.isShowOperation;
     },
     add(data, childIndex) {
-      childIndex=childIndex.split(',')
-      EventBus.$emit('addDialog',{bid:this.bid,data, childIndex,title:'新建子项'})
+      childIndex = childIndex.split(",");
+      EventBus.$emit("addDialog", {
+        bid: this.bid,
+        data,
+        childIndex,
+        title: "新建子项",
+      });
     },
     // 新建分组后添加数据
     addGroupDatas(data) {
@@ -297,13 +317,13 @@ export default {
     //删除
     deleteDirectory(data, childIndex) {
       // 直接把数据后端验证数据是否正确就可以了
-      sweetQuestion('确认要删除吗？').then(data=>{
-        childIndex=childIndex.split(',')
+      sweetQuestion("确认要删除吗？").then((data) => {
+        childIndex = childIndex.split(",");
         EventBus.$emit("deleteDirectory", data, childIndex);
-      })
+      });
     },
     moveDirectory(data, childIndex, isOpen, bid) {
-      childIndex=childIndex.split(',')
+      childIndex = childIndex.split(",");
       EventBus.$emit("moveDirectory", data, childIndex, isOpen, bid);
     },
 
@@ -332,7 +352,7 @@ export default {
 };
 </script>
 <style scoped lang='less'>
-.openArea{
+.openArea {
   // background: rgb(51, 80, 247);
 }
 .disable {
@@ -340,6 +360,7 @@ export default {
   cursor: not-allowed;
 }
 .child_tree {
+  background: #8db1af;
   margin-bottom: 5px;
 }
 .move_level {
@@ -408,9 +429,9 @@ export default {
 .active {
   background: rgba(243, 228, 200, 0.322);
 }
-.status{
-  width:4.2rem;
-  display:inline-block;
+.status {
+  width: 4.2rem;
+  display: inline-block;
 }
 .child_tree_row {
   padding: 2px 5px;

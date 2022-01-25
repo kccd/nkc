@@ -23,6 +23,7 @@ const {
 	photo_small,
 } = resourceObj;
 const mathJax = require('./mathJax');
+const document = require('./document');
 const editor = require('./editor');
 const edit = require('./edit');
 const exam = require('./exam');
@@ -144,7 +145,7 @@ operationObj.operationTree = {
 		'home.php': {
 			GET: 'discuz'
 		},
-
+		document, //文章
 		poster, //活动海报
 		avatar,// 用户头像
 		avatar_small,

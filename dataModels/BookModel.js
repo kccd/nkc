@@ -319,9 +319,7 @@ schema.methods.getList = async function (options = {
   }
   find(this.list)
   let articles = await this.newExtendArticlesById(articlesId, options, bookList)
-  // console.log(articles,320)
-  
-
+  // 不写两次不行 ，不知会不会写无数次
   if(status === 'published'){
     let publisheds=[]
     function findPublished(data){
@@ -332,21 +330,27 @@ schema.methods.getList = async function (options = {
       })
     }
     findPublished(articles)
+    function a(data){
+      data.forEach((item,i)=>{
+        if(!item.published && item.type === 'article'){
+          data.splice(i,1)
+        }
+        if(item.child && item.child.length){
+          a(item.child)
+        }
+      })
+    }
+    a(publisheds)
     articles=publisheds
   }
-  // const articlesObj = {};
   return articles || []
-  // for (const a of articles) {
-  //   const results = [];
-  //   return articles || [];
-  // }
+
 }
  // 为了让预览能服用该方法，对该方法进行了传参，然后进行判断
 schema.methods.extendArticlesById = async function (articlesId,options= {
   setUrl :'bookContent',
   latestTitle : false
 }, bookList) {
-  console.log(options,bookList)
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
   const {

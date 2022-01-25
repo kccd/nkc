@@ -69,7 +69,6 @@ export default {
         });
       }
       this.insertIndex = childIndex;
-      //   就这有 bug
       this.changeChild(this.dialogData, "showIndication", !status);
       this.$set(this.seekResult, "showIndication", status);
     });
@@ -78,7 +77,6 @@ export default {
     });
     EventBus.$on("moveDialogOpenMenu", (data, childIndex, status = false) => {
       this.$set(data, "isOpen", status);
-      // this.changeChild(data.child, "isOpen", !status);
       this.openMenuIndex = childIndex;
     });
     EventBus.$on(
@@ -94,8 +92,8 @@ export default {
         this.dialogtype = type;
         await this.getBook(bid);
         // 重置 数据
-        // if (type !== "choice") {
-          childIndex[0] = ((childIndex[0] - 0) + 1)+'';
+        if (childIndex.length) {
+          childIndex[0] = childIndex[0] - 0 + 1 + "";
           this.seekResult = this.dialogData;
           // 根据 childIndex(字符串每个数组记录的是数组中数据的位置) 长度来查找 数组指定位置的数据
           for (let i = 0; i < childIndex.length; i++) {
@@ -110,13 +108,17 @@ export default {
           // 给所有当前 项下的子级加上属性 用来判断
           this.changeChild([this.seekResult], "childrenDisable", true);
           this.$set(this.seekResult, "isMove", true);
-        // }
-        this.moveIndex = childIndex;
-        //发布没有给子元素 所有需要找到
-        if(type === "choice"){
-          this.find(this.dialogData,msg)
-          // console.log(this.publishInfo,'publishInfo')
-          msg.child=this.publishInfo.self?.child || []
+          // }
+          this.moveIndex = childIndex;
+          //发布没有给子元素 所有需要找到
+          if (type === "choice") {
+            this.find(this.dialogData, msg);
+            // console.log(this.publishInfo,'publishInfo')
+            msg.child = this.publishInfo.self?.child || [];
+          }
+        }else{
+          console.log('编辑后直接发布')
+          this.$set(this.dialogData[this.dialogData.length - 1], "isMove", true);
         }
         this.moveData = msg;
         this.draggableElement.show();
@@ -131,9 +133,8 @@ export default {
   },
   updated() {},
   methods: {
-    moveDialog(data,childIndex,isOpen,bid,type,publishType) {
+    moveDialog(data, childIndex, isOpen, bid, type, publishType) {
       // 被移动文章的数据
-
       EventBus.$emit(
         "moveDirectory",
         data,
@@ -231,24 +232,28 @@ export default {
     },
     async confirm(data) {
       if (!this.insertIndex.length) {
-          sweetError("请选择后，再点击确定按钮");
-          // this.close();
-          return;
+        sweetError("请选择后，再点击确定按钮");
+        // this.close();
+        return;
       }
       // 数据移入选中项 子级
       if (this.selectedLevel === "childLevel") {
-        // 
-        if (!this.moveIndex && !this.moveData) {
-          for (let i = 0; i < length; i++) {
+        if (!this.moveIndex.length) {
+          const deleteData=this.dialogData[this.dialogData.length - 1]
+          this.seekResult = this.dialogData;
+          console.log(this.seekResult)
+          for (let i = 0; i < this.insertIndex.length; i++) {
             const position = this.insertIndex[i];
             this.seekChild({
               data: this.seekResult,
               position,
               currentIndex: i,
               findLocation: this.insertIndex,
-              type: "parent",
             });
           }
+          let insertDataIndex = this.seekResult;
+          insertDataIndex.child.unshift(deleteData)
+          this.dialogData.splice(this.dialogData.length - 1, 1)
         } else {
           this.seekResult = this.dialogData;
           for (let i = 0; i < this.insertIndex.length; i++) {
@@ -279,7 +284,6 @@ export default {
           insertDataindex.child.unshift(this.moveData);
           // 删除
           if (this.moveIndex.length === 1) {
-            debugger
             deleteDataParent.splice(this.moveIndex.slice(-1), 1);
           } else {
             deleteDataParent.child.splice(this.moveIndex.slice(-1), 1);
@@ -287,8 +291,10 @@ export default {
         }
       } else {
         // 编辑后直接发布 就没有坐标和数据 并且默认在最后一项
-        if (!this.moveIndex && !this.moveData) {
-          for (let i = 0; i < length; i++) {
+        if (!this.moveIndex.length) {
+          const deleteData=this.dialogData[this.dialogData.length - 1]
+          this.seekResult=this.dialogData
+          for (let i = 0; i < this.insertIndex.length - 1; i++) {
             const position = this.insertIndex[i];
             this.seekChild({
               data: this.seekResult,
@@ -298,6 +304,13 @@ export default {
               type: "parent",
             });
           }
+          const insertDataParent=this.seekResult
+          if(this.insertIndex.length === 1){
+            insertDataParent.splice(this.insertIndex[0] - 0 + 1, 0, deleteData)
+          }else{
+            insertDataParent.child.splice(this.insertIndex.slice(-1) - 0 + 1, 0, deleteData)
+          }
+          this.dialogData.splice(this.dialogData.length - 1, 1)
         } else {
           this.seekResult = this.dialogData;
           for (let i = 0; i < this.moveIndex.length - 1; i++) {
@@ -368,12 +381,6 @@ export default {
         sweetSuccess("操作成功");
       }
       EventBus.$emit("updatePageData");
-      // 重置数据
-      this.reset(
-        this.dialogData,
-        ["isMove", "isOpen", "childrenDisable", "showIndication"],
-        "reset"
-      );
       setTimeout(this.close, 500);
     },
     getBook(bid) {
@@ -387,43 +394,12 @@ export default {
             type: "text",
             describe: "seat",
           });
-          // if (self.dialogtype === "choice") {
-          //   // 移动状态
-          //   if (this.moveData) {
-          //     // console.log(self.publishMoveData);
-          //     this.find(data.bookList, this.moveData);
-          //     const moveData =
-          //       self.publishInfo.parent[self.publishInfo.currentIndex];
-          //     self.$set(moveData, "isMove", true);
-          //     self.changeChild([moveData], "childrenDisable", true);
-          //   } else {
-          //     self.$set(
-          //       data.bookList[data.bookList.length - 1],
-          //       "isMove",
-          //       true
-          //     );
-          //     self.changeChild(
-          //       [data.bookList[data.bookList.length - 1]],
-          //       "childrenDisable",
-          //       true
-          //     );
-          //   }
-          // }
           self.dialogData = data.bookList;
         })
         .catch(sweetError);
     },
     cancel() {
-      // 数据重置  数据这里有bug
-      this.reset(
-        this.dialogData,
-        ["isMove", "isOpen", "childrenDisable", "showIndication"],
-        "reset"
-      );
-      // 关掉是 结构重置
-      this.showTree = false;
-      this.show = false;
-      this.close();
+      setTimeout(this.close, 500)
     },
     open(callback, options) {
       this.callback = callback;
@@ -438,6 +414,14 @@ export default {
       this.draggableElement.hide();
       this.show = false;
       this.showTree = false;
+      this.insertIndex=''
+      this.selectedLevel='childLevel'
+            // 重置数据
+      this.reset(
+        this.dialogData,
+        ["isMove", "isOpen", "childrenDisable", "showIndication"],
+        "reset"
+      );
       setTimeout(function () {
         this.dialogData = {};
       }, 500);

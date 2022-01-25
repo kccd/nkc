@@ -5,7 +5,6 @@ const booksRouter = require('./books');
 const bookRouter = require('./book');
 const articlesRouter = require('./articles');
 const documentRouter = require('./document');
-const addChapterRouter = require('./addChapter');
 router
   .use('/', async (ctx, next) => {
     if(ctx.query.t) {
@@ -24,5 +23,4 @@ router
   .use('/book', bookRouter.routes(), bookRouter.allowedMethods())
   .use('/articles', articlesRouter.routes(), articlesRouter.allowedMethods())
   .use('/document', documentRouter.routes(), documentRouter.allowedMethods())
-  .use('/addChapter', addChapterRouter.routes(), addChapterRouter.allowedMethods())
 module.exports = router;
