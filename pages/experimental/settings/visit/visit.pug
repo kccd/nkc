@@ -4,10 +4,36 @@ block eTitle
 block eContent
   .container-fluid.max-width
     .row
-      .hidden#data= objToStr({visitSettings: data.visitSettings})
+      .hidden#data= objToStr({visitSettings: data.visitSettings, certList: data.certList})
       .col-xs-12.col-md-12#app(v-cloak)
         .form-horizontal
-          h4 全局游客限制
+          h4 全局访问限制
+          .form-group
+            label.col-sm-2.control-label 状态
+            .col-sm-10
+              .radio
+                label.m-r-1
+                  input(type="radio" v-model="visitSettings.globalAccessLimit.status" :value="true")
+                  | 开启
+                label
+                  input(type="radio" v-model="visitSettings.globalAccessLimit.status" :value="false")
+                  | 关闭
+          .form-group
+            label.col-sm-2.control-label 白名单
+            .col-sm-6
+              .checkbox
+                label.m-r-05
+                  input(type='checkbox' disabled checked="true")
+                  span 证书 - 运维
+                label.m-r-05(v-for='cl in certList')
+                  input(type='checkbox' v-model="visitSettings.globalAccessLimit.whitelist" :value='cl.type')
+                  span {{cl.name}}
+          .form-group
+            label.col-sm-2.control-label 提示内容
+            .col-sm-6
+              textarea.form-control(rows=5 v-model="visitSettings.globalAccessLimit.description")
+              span.text-info 支持空格和换行
+          h4 游客全局访问限制
           .form-group
             label.col-sm-2.control-label 状态
             .col-sm-10
@@ -24,7 +50,7 @@ block eContent
             .col-sm-6
               textarea.form-control(rows=5 v-model="visitSettings.globalLimitVisitor.description")
               span.text-info 支持空格和换行
-          h4 用户名片页游客限制
+          h4 游客用户名片页访问限制
           .form-group
             label.col-sm-2.control-label 状态
             .col-sm-10

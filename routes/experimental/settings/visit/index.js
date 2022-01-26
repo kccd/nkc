@@ -3,18 +3,23 @@ router
   .get('/', async (ctx, next) => {
     const {db, data} = ctx;
     data.visitSettings = await db.SettingModel.getSettings('visit');
+    data.certList = await db.RoleModel.getCertList(["dev"]);
     ctx.template = 'experimental/settings/visit/visit.pug';
     await next();
   })
   .put('/', async (ctx, next) => {
     const {db, body, nkcModules} = ctx;
-    const {globalLimitVisitor, userHomeLimitVisitor} = body.visitSettings;
-    nkcModules.checkData.checkString(globalLimitVisitor.description, {
-      name: '全局游客限制 - 提示内容',
+    const {globalLimitVisitor, userHomeLimitVisitor, globalAccessLimit} = body.visitSettings;
+    nkcModules.checkData.checkString(globalAccessLimit.description, {
+      name: '全局访问限制 - 提示内容',
       maxLength: 100000,
     });
     nkcModules.checkData.checkString(globalLimitVisitor.description, {
-      name: '用户名片页游客限制 - 提示内容',
+      name: '游客全局访问限制 - 提示内容',
+      maxLength: 100000,
+    });
+    nkcModules.checkData.checkString(globalLimitVisitor.description, {
+      name: '游客用户名片访问限制 - 提示内容',
       maxLength: 100000,
     });
     await db.SettingModel.updateOne({_id: 'visit'}, {
@@ -26,6 +31,11 @@ router
         "c.userHomeLimitVisitor": {
           status: !!userHomeLimitVisitor.status,
           description: userHomeLimitVisitor.description
+        },
+        "c.globalAccessLimit": {
+          status: !!globalAccessLimit.status,
+          description: globalAccessLimit.description,
+          whitelist: globalAccessLimit.whitelist
         }
       }
     });
