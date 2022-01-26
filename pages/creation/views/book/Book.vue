@@ -348,7 +348,7 @@ export default {
         this.seekResult.child.splice(childIndex[childIndex.length - 1], 1);
       }
       let url = `/creation/book/${this.bid}/list/delete`;
-      await nkcAPI(url, "post", {
+      await nkcAPI(url, "delete", {
         data: this.bookList,
         bid: this.bid,
       }).then(async (data) => {
