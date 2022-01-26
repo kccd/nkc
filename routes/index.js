@@ -73,53 +73,52 @@ router.use('/', async (ctx, next) => {
   const visitSettings = await db.SettingModel.getSettings('visit');
   const isWhitelistOperation = settings.operationsType.whitelistOfVisitorLimit.includes(operationId);
   const isResourceOperation = settings.operationsType.fileDownload.includes(operationId);
-  // 全局游客访问限制
-  // 未登录 且 不是白名单操作
+
+  // 游客全局访问限制
+  let limitInfo = null;
   if(
     !user && !isWhitelistOperation && visitSettings.globalLimitVisitor.status
   ) {
+    limitInfo = visitSettings.globalLimitVisitor;
+  }
+
+  // 全局访问限制
+  if(
+    !limitInfo && !isWhitelistOperation && visitSettings.globalAccessLimit.status
+  ) {
+    if(!user) {
+      limitInfo = visitSettings.globalAccessLimit;
+    } else {
+      // 判断用户的证书和等级是否在白名单
+      const userRoles = await user.extendRoles();
+      const grade = await user.extendGrade();
+      let hasRole = false;
+      for(let i = 0; i < userRoles.length; i++) {
+        const roleId = userRoles[i]._id;
+        if(roleId === "dev" || visitSettings.globalAccessLimit.whitelist.includes(`role-${roleId}`)) {
+          hasRole = true;
+          break;
+        }
+      }
+      if(!hasRole) {
+        hasRole = visitSettings.globalAccessLimit.whitelist.includes(`grade-${grade._id}`);
+      }
+      if(!hasRole) {
+        limitInfo = visitSettings.globalAccessLimit;
+      }
+    }
+  }
+
+  if(limitInfo) {
     if(!state.isApp) ctx.status = 401;
     if(
       isResourceOperation ||
       (ctx.request.accepts('json', 'html') === 'json' && ctx.request.get('FROM') === 'nkcAPI')
     ) {
-      return ctx.throw(403, visitSettings.globalLimitVisitor.description);
+      return ctx.throw(403, limitInfo.description);
     } else {
-      data.description = nkcModules.nkcRender.plainEscape(visitSettings.globalLimitVisitor.description);
+      data.description = nkcModules.nkcRender.plainEscape(limitInfo.description);
       return ctx.body = nkcModules.render(path.resolve(__dirname, "../pages/filter_visitor.pug"), data, state);
-    }
-  }
-  // 全局访问限制
-  // 不是白名单
-  if(
-    !isWhitelistOperation && visitSettings.globalAccessLimit.status
-  ) {
-    let limit = true;
-    if(user) {
-      const userRoles = await user.extendRoles();
-      const grade = await user.extendGrade();
-      for(let i = 0; i < userRoles.length; i++) {
-        const roleId = userRoles[i]._id;
-        if(roleId === "dev" || visitSettings.globalAccessLimit.whitelist.includes(`role-${roleId}`)) {
-          limit = false;
-          break;
-        }
-      }
-      if(limit) {
-        limit = !visitSettings.globalAccessLimit.whitelist.includes(`grade-${grade._id}`);
-      }
-    }
-    if(limit) {
-      if(!state.isApp) ctx.status = 401;
-      if(
-        isResourceOperation ||
-        (ctx.request.accepts('json', 'html') === 'json' && ctx.request.get('FROM') === 'nkcAPI')
-      ) {
-        return ctx.throw(403, visitSettings.globalAccessLimit.description);
-      } else {
-        data.description = nkcModules.nkcRender.plainEscape(visitSettings.globalAccessLimit.description);
-        return ctx.body = nkcModules.render(path.resolve(__dirname, "../pages/filter_visitor.pug"), data, state);
-      }
     }
   }
 
