@@ -84,11 +84,11 @@
       }
     },
     mounted() {
-      EventBus.$on('publish',(publishIndex,publishId)=>{
+      EventBus.$on('publish', (publishIndex, publishId)=>{
         this.post('publish')
         .then(() => {
-          publishIndex && (this.publishIndex=publishIndex)
-          publishId && (this.publishId=publishId)
+          publishIndex && (this.publishIndex = publishIndex)
+          publishId && (this.publishId = publishId)
           this.$router.replace({
             name: 'bookContent',
             params: {
@@ -108,12 +108,12 @@
         EventBus.$emit("moveDirectory", data, childIndex, isOpen, bid, type,);
       },
       documentPreview(){
-        const {doucmentId,bookId,articleId,id}=this
+        const {doucmentId}=this
         // window.open(`/document/preview?_id=${id}&did=${doucmentId}&bid=${bookId}&aid=${articleId}`)
         window.open(`/document/${doucmentId}/preview`)
       },
       documentHistory(){
-        const {doucmentId,bookId,articleId,id}=this 
+        const {doucmentId, bookId}=this 
         window.open(`/document/${doucmentId}/history?bid=${bookId}`)
       },
       initId() {
@@ -193,7 +193,6 @@
         let url='/creation/articles/editor'
         return nkcUploadFile(url, 'POST', formData)
           .then(data => {
-            sessionStorage.document_id=data.document?._id
             self.oldCoverFile = self.coverFile;
             self.coverFile = null;
             const {articleId, articleCover} = data;
@@ -211,7 +210,7 @@
           });
       },
       modifyArticle() {
-        this.post(this.type,this.articleType).then(data=>{
+        this.post(this.type, this.articleType).then(data=>{
         })
         .catch(err => {
           screenTopWarning(err);

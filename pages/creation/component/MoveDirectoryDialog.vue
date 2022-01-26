@@ -260,7 +260,6 @@ export default {
     async confirm(data) {
       if (!this.insertIndex.length) {
         sweetError("请选择后，再点击确定按钮");
-        // this.close();
         return;
       }
       // 数据移入选中项 子级
@@ -392,7 +391,7 @@ export default {
       }
       // 删除占位项
       this.dialogData.splice(0, 1);
-      let url = "/creation/articles/del";
+      let url = `/creation/book/${this.$props.bid}/list/move`;
       const resData = await nkcAPI(url, "post", {
         data: this.dialogData,
         bid: this.$props.bid,

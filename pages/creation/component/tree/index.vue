@@ -453,7 +453,7 @@ export default {
     height: 15px;
   }
   .title {
-    background: #757575;
+    background: #b1afaf;
     border-radius: 3px;
     // text-align: center;
     color: rgb(248, 248, 248);

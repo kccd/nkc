@@ -9,7 +9,7 @@ function publish(data, bid){
     post('publish', '', newdata, bid)
   })
 }
-function saveArticle(data,bid){
+function saveArticle(data, bid){
   const newdata=JSON.parse(data)
   sweetQuestion('确定要将当前项添加到创作中心进行编辑吗？').then(()=>{
     post('save', '', newdata, bid)

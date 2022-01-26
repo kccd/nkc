@@ -5,9 +5,9 @@ router
     const {bid} = params;
     const {aid} = query;
     const book = await db.BookModel.findOnly({_id: bid});
-    const bookList=book.list.toObject()
+    const bookList = book.list.toObject()
     data.book = await book.getBaseInfo();
-    data.list = await book.getList(undefined,bookList,'published'); //'published'
+    data.list = await book.getList(undefined, bookList, 'published'); //'published'
     if(aid) {
       data.bookContent = await book.getContentById({
         aid,
@@ -19,5 +19,6 @@ router
       ctx.remoteTemplate = `book/book.pug`;
     }
     await next();
-  });
+  })
+ 
 module.exports = router;

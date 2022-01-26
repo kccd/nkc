@@ -39,7 +39,7 @@ const schema = new mongoose.Schema({
 * @return {Object} 创建的 article 对象
 * */
 schema.statics.createArticle = async (props) => {
-  const {title, content, coverFile, uid, type} = props;
+  const {title, content, coverFile, uid} = props;
   const toc = new Date();
   const ArticleModel = mongoose.model('articles');
   const SettingModel = mongoose.model('settings');
@@ -60,13 +60,12 @@ schema.statics.createArticle = async (props) => {
     uid,
     toc,
     did: document.did,
-    type
   });
   await article.save();
   return article;
 }
 
-schema.methods.getBetaDocumentCoverId = async function(options) {
+schema.methods.getBetaDocumentCoverId = async function() {
   const DocumentModel = mongoose.model('documents');
   const {article: documentSource} = await DocumentModel.getDocumentSources();
   const betaDocument = await DocumentModel.getBetaDocumentBySource(documentSource, this._id);

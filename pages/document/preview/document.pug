@@ -1,11 +1,11 @@
 extends ../../bootstrap_base
 block title
   //- title=data.book.name
-  +includeCSS('/book/bookContent.css')
+  +includeCSS('/document/preview/preview.css')
 block content
   .container-fluid.max-width
     .row
-      //- .col-xs-12.col-md-3.m-t-2
+      .col-xs-12.col-md-3.m-t-2
         //- .book-cover
         //-   img(src=data.book.coverUrl)
         //- .book-name=data.book.name
@@ -25,4 +25,4 @@ block content
         .book-content-content!=data.document.content
 block scripts
   include ../../publicModules/nkcSource
-  +includeJS('/book/bookContent.js')
+  +includeJS('/document/preview/preview.js')

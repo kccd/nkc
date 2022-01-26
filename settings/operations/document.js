@@ -1,12 +1,12 @@
 module.exports = {
   PARAMETER:{
     preview:{
-      GET:'prevViewDocument'
+      GET:'previewDocument'
     },
     history:{
-      GET:'prevViewDocument',
+      GET:'viewHistoryDocument',
       PARAMETER:{
-        GET:'prevViewDocument'
+        GET:'viewSpecifiedHistoryDocument'
       }
     }
   }    

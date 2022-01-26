@@ -1,7 +1,7 @@
 extends ../../bootstrap_base
 block title
   //- title=data.book.name
-  +includeCSS('/document/history/bookContent.css')
+  +includeCSS('/document/history/history.css')
 block content
   .container-fluid.max-width
     .row
@@ -12,7 +12,7 @@ block content
         .book-list
           for list in data.history
             p.title-list()
-              a.book-list-item(href=`/document/${list.did}/history/`+list._id + '?bid=' + data.bookId)=list.title
+              a.book-list-item(href=`/document/${list.did}/history/`+ list._id + '?bid=' + data.bookId)=list.title
               span.time=`编辑于 ${new Date(list.tlm).getFullYear()}-${new Date(list.tlm).getMonth()+1}-${new Date(list.tlm).getDate() }  ${new Date(list.tlm).getHours()}:${new Date(list.tlm).getMinutes()}`
       .col-xs-12.col-md-9.book-content-container
         h1.book-content-title=data.document.title
@@ -31,4 +31,4 @@ block content
           h3 该文章还没有历史记录
 block scripts
   include ../../publicModules/nkcSource
-  +includeJS('/document/history/bookContent.js')
+  +includeJS('/document/history/history.js')

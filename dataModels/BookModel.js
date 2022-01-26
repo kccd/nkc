@@ -1,9 +1,5 @@
 const mongoose = require('../settings/database');
-const Schema = mongoose.Schema;
-const {
-  timeFormat,
-  getUrl
-} = require("../nkcModules/tools");
+const {timeFormat, getUrl} = require("../nkcModules/tools");
 const schema = new mongoose.Schema({
   _id: String,
   uid: {
@@ -291,10 +287,8 @@ schema.methods.getList = async function (options = {
   latestTitle: false
 }, bookList=[], status='unpublished') {
   // status  分为 已发布 未发布
-  // const PostModel = mongoose.model('posts');
   const articlesId = [];
   const postsId = [];
-
   const articleObj = {};
   const postObj = {};
   // 递归 把每一项id加入到相应数组中
@@ -420,7 +414,7 @@ schema.methods.extendArticlesById = async function (articlesId,options= {
       hasBeta: !!betaDocument,
       value: title || '未填写标题',
       title: title || '未填写标题',
-      url: getUrl(setUrl, this._id, _id, did),
+      url: getUrl(setUrl, this._id, _id),
       time: timeFormat(toc),
       type
     };

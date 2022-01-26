@@ -79,8 +79,6 @@ router
           return;
         }
         bookList.forEach(item => {
-          if(item.type === 'text'){
-          }
           if (item.aid === fields.aid) {
             item.child.unshift({
               id:'',
@@ -88,50 +86,32 @@ router
               type: fields.articleType,
               child: []
             });
-          } else if (item.child && item.child.length > 0) {
+          } else if (item.child && item.child.length) {
             changeChild(item.child);
           }
         });
       }
       changeChild(bookList);
-
-      if (fields.articleType === "post") {
-        // 创建 post 
-      } else if (fields.articleType === "article") {
+      if (fields.articleType === "article") {
         article = await db.ArticleModel.createArticle({
           uid: state.uid,
           title,
           content,
           coverFile
         });
-        // await book.bindArticle(article._id);
         child.id=article._id
         const res = await db.BookModel.updateOne(
-          {
-            _id: bookId
-          },
-          {
-            $set: {
-              list: bookList
-            }
-          }
+          { _id: bookId },
+          { $set: { list: bookList }}
         );
-        // text url
       } else {
         const res = await db.BookModel.updateOne(
           { _id: bookId },
-          {
-            $set: {
-              list: bookList
-            }
-          }
+          { $set: { list: bookList }}
         );
         return;
       }
     } else {
-      if (fields.articleType === "post") {
-
-      }
       if (fields.articleType === "article") {
         function find(data,item){
           if(data){
@@ -147,14 +127,8 @@ router
         }
         find(bookList,fields)
         const res = await db.BookModel.updateOne(
-          {
-            _id: bookId
-          },
-          {
-            $set: {
-              list: bookList
-            }
-          }
+          { _id: bookId },
+          { $set: { list: bookList }}
         );
       }
       article = await db.ArticleModel.findOnly({
@@ -180,19 +154,5 @@ router
     data.articleId = article._id;
     await next();
   })
-  .post('/del',async (ctx,next)=>{
-    const {db, data, body}=ctx
-    const {data:updateData,bid}=body
-    const filteredData= await db.BookModel.filterList(updateData)
-    const res = await db.BookModel.updateOne(
-      {
-        _id: bid
-      },
-      {
-        $set: {
-          list: filteredData
-        }
-      }
-    );
-  })
+
 module.exports = router;

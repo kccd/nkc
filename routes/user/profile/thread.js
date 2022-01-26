@@ -8,14 +8,11 @@ module.exports = async (ctx, next) => {
     uid: targetUser.uid
   };
   // 获取总条数
-  // console.log(pageSettings,type)
   const count = await db.ThreadModel.countDocuments(q);
   const buttonCount=Math.ceil(count/10)
   if(type === 'get'){
     pageSettings.userCardThreadList=10
   }
-  console.log(nkcModules.tools.getUrl('post', pid),'nkcModules')
-
   const paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList, buttonCount);
   // console.log(paging,'paging')
   if(type){
@@ -44,6 +41,7 @@ module.exports = async (ctx, next) => {
     showAnonymousUser: true,
     excludeAnonymousPost: false,
   });
+  // 添加地址
   threads.forEach(item => {
     const url=  nkcModules.tools.getUrl('post', item.firstPost.pid)
     item.firstPost.url=url

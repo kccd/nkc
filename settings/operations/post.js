@@ -1,9 +1,4 @@
 module.exports = {
-	post:{
-		list:{
-			GET:"getLIist"
-		},
-	},
 	PARAMETER: {
 		GET: 'visitPost',
 		PUT: 'modifyPost',

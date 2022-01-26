@@ -240,13 +240,9 @@ export default {
   },
   mounted() {
     EventBus.$on("addGroup", (data) => {
-      // this.parentData.child ?? (this.parentData.child = []);
-      // this.parentData.child.unshift({ type: "article", value: data.title });
       this.addGroup(data);
     });
-    EventBus.$on(
-      "addConfirm",
-      async ({ res, type, data: insertData, dialogType, level }) => {
+    EventBus.$on("addConfirm", async ({ res, type, data: insertData, dialogType, level }) => {
         // insertData 是修改或者新建的数据
         let obj;
         if (type === "text") {
@@ -316,8 +312,8 @@ export default {
             this.seekResult.child.unshift(obj);
           }
         }
-        // 添加修改的共同业务
-        let url = "/creation/articles/del";
+        // 添加 修改 的共同业务
+        let url = `/creation/book/${this.bid}/list/add`;
         await nkcAPI(url, "POST", {
           data: this.bookList,
           bid: this.bid,
@@ -345,15 +341,13 @@ export default {
           type: "parent",
         });
       }
-      // console.log(this.seekResult)
       // 最外层 可能是 一位数 可能是 二位数 三位数 等等
       if (childIndex.length === 1) {
         this.seekResult.splice(childIndex[0], 1);
       } else {
         this.seekResult.child.splice(childIndex[childIndex.length - 1], 1);
       }
-
-      let url = "/creation/articles/del";
+      let url = `/creation/book/${this.bid}/list/delete`;
       await nkcAPI(url, "post", {
         data: this.bookList,
         bid: this.bid,
@@ -470,8 +464,6 @@ export default {
     },
     addGroup(data) {
       let url = "/creation/articles/editor";
-      // '/creation/addChapter'
-
       const { aid, articleType, value, type } = data;
       let formData = new FormData();
       formData.append("article", JSON.stringify({ title: value }));
@@ -483,9 +475,6 @@ export default {
         console.log(data, "data");
       });
     },
-    moveChapter(l) {
-      this.showMoveCharter = !this.showMoveCharter;
-    },
     cancel() {
       this.showMoveCharter = false;
     },
@@ -496,7 +485,6 @@ export default {
         params,
       });
     },
-
     switchContent(id) {
       this.$router.push({
         name: "bookContent",

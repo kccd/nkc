@@ -9,7 +9,7 @@ router
     const book = await db.BookModel.findOnly({_id: bid});
     data.book = await book.getBaseInfo();
     let bookList =book.list.toObject();
-    data.list = await book.getList({setUrl:'prevView',latestTitle:true},bookList) || [];
+    data.list = await book.getList({setUrl:'prevView', latestTitle:true}, bookList) || [];
     if(aid){
       data.bookContent = await book.getContentById({
         aid,
