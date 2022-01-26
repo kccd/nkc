@@ -24,11 +24,6 @@
 </template>
 
 <style lang="less" scoped>
-* {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
 .articleTitl {
   cursor: pointer;
   color: black !important;

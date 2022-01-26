@@ -108,7 +108,30 @@ export default {
           // 给所有当前 项下的子级加上属性 用来判断
           this.changeChild([this.seekResult], "childrenDisable", true);
           this.$set(this.seekResult, "isMove", true);
-          // }
+          if (childIndex.length > 1) {
+            let parnetPosition = childIndex.length ;
+            console.log(childIndex)
+            const self = this;
+            function isOPen(length) {
+              self.seekResult = self.dialogData;
+              for (let i = 0; i < length; i++) {
+                const position = childIndex[i];
+                self.seekChild({
+                  data: self.seekResult,
+                  position,
+                  currentIndex: i,
+                  findLocation: childIndex.slice(0,length),
+                  // type: "parent",
+                });
+              }
+              self.$set(self.seekResult, "isOpen", true);
+              if (length < parnetPosition) {
+                isOPen(length + 1);
+              }
+            }
+            isOPen(1);
+          }
+
           this.moveIndex = childIndex;
           //发布没有给子元素 所有需要找到
           if (type === "choice") {
@@ -116,9 +139,12 @@ export default {
             // console.log(this.publishInfo,'publishInfo')
             msg.child = this.publishInfo.self?.child || [];
           }
-        }else{
-          console.log('编辑后直接发布')
-          this.$set(this.dialogData[this.dialogData.length - 1], "isMove", true);
+        } else {
+          this.$set(
+            this.dialogData[this.dialogData.length - 1],
+            "isMove",
+            true
+          );
         }
         this.moveData = msg;
         this.draggableElement.show();
@@ -170,6 +196,7 @@ export default {
     },
     //  把 子级 父级 同级 都 写入 就不用 每次都要循环找不同级别
     seekChild({ data, position, currentIndex, findLocation, type = "self" }) {
+      if (typeof findLocation === 'number')findLocation= String(findLocation)
       const child = data[position];
       if (type === "parent") {
         this.seekResult = child;
@@ -239,9 +266,9 @@ export default {
       // 数据移入选中项 子级
       if (this.selectedLevel === "childLevel") {
         if (!this.moveIndex.length) {
-          const deleteData=this.dialogData[this.dialogData.length - 1]
+          const deleteData = this.dialogData[this.dialogData.length - 1];
           this.seekResult = this.dialogData;
-          console.log(this.seekResult)
+          console.log(this.seekResult);
           for (let i = 0; i < this.insertIndex.length; i++) {
             const position = this.insertIndex[i];
             this.seekChild({
@@ -252,8 +279,8 @@ export default {
             });
           }
           let insertDataIndex = this.seekResult;
-          insertDataIndex.child.unshift(deleteData)
-          this.dialogData.splice(this.dialogData.length - 1, 1)
+          insertDataIndex.child.unshift(deleteData);
+          this.dialogData.splice(this.dialogData.length - 1, 1);
         } else {
           this.seekResult = this.dialogData;
           for (let i = 0; i < this.insertIndex.length; i++) {
@@ -292,8 +319,8 @@ export default {
       } else {
         // 编辑后直接发布 就没有坐标和数据 并且默认在最后一项
         if (!this.moveIndex.length) {
-          const deleteData=this.dialogData[this.dialogData.length - 1]
-          this.seekResult=this.dialogData
+          const deleteData = this.dialogData[this.dialogData.length - 1];
+          this.seekResult = this.dialogData;
           for (let i = 0; i < this.insertIndex.length - 1; i++) {
             const position = this.insertIndex[i];
             this.seekChild({
@@ -304,13 +331,17 @@ export default {
               type: "parent",
             });
           }
-          const insertDataParent=this.seekResult
-          if(this.insertIndex.length === 1){
-            insertDataParent.splice(this.insertIndex[0] - 0 + 1, 0, deleteData)
-          }else{
-            insertDataParent.child.splice(this.insertIndex.slice(-1) - 0 + 1, 0, deleteData)
+          const insertDataParent = this.seekResult;
+          if (this.insertIndex.length === 1) {
+            insertDataParent.splice(this.insertIndex[0] - 0 + 1, 0, deleteData);
+          } else {
+            insertDataParent.child.splice(
+              this.insertIndex.slice(-1) - 0 + 1,
+              0,
+              deleteData
+            );
           }
-          this.dialogData.splice(this.dialogData.length - 1, 1)
+          this.dialogData.splice(this.dialogData.length - 1, 1);
         } else {
           this.seekResult = this.dialogData;
           for (let i = 0; i < this.moveIndex.length - 1; i++) {
@@ -381,7 +412,7 @@ export default {
         sweetSuccess("操作成功");
       }
       EventBus.$emit("updatePageData");
-      setTimeout(this.close, 500);
+      setTimeout(this.close, 200);
     },
     getBook(bid) {
       let url = `/creation/book/${bid}`;
@@ -399,7 +430,7 @@ export default {
         .catch(sweetError);
     },
     cancel() {
-      setTimeout(this.close, 500)
+      setTimeout(this.close, 200);
     },
     open(callback, options) {
       this.callback = callback;
@@ -414,9 +445,9 @@ export default {
       this.draggableElement.hide();
       this.show = false;
       this.showTree = false;
-      this.insertIndex=''
-      this.selectedLevel='childLevel'
-            // 重置数据
+      this.insertIndex = "";
+      this.selectedLevel = "childLevel";
+      // 重置数据
       this.reset(
         this.dialogData,
         ["isMove", "isOpen", "childrenDisable", "showIndication"],
@@ -424,7 +455,7 @@ export default {
       );
       setTimeout(function () {
         this.dialogData = {};
-      }, 500);
+      }, 200);
     },
   },
 };
@@ -452,6 +483,8 @@ export default {
   .module-dialog-content {
     padding: 5px;
     .content {
+      overflow-y: scroll;
+      height: 500px;
       border: 1px solid #c1b9b9;
     }
   }

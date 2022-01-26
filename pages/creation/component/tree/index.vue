@@ -1,5 +1,5 @@
 <template>
-  <div class="child_tree" :class="{ disable: data.isMove && !operations }">
+  <div class="child_tree" :class="{ disable: data.isMove && !operations, bg:operations }">
     <div
       class="child_tree_row col-xs-12.col-md-12"
       :class="{ active: isShowOperation }"
@@ -15,10 +15,11 @@
       >
       </span>
       <span class="seat" v-else></span>
-      <span v-if="operations && jurisdiction !== 'tourist'" class="status">
-        <span v-if="!data.published && data.type === 'article'">[未发布]</span>
+      <!-- @click.stop="toggle('', childIndex)" class="status" -->
+      <span v-if="operations && jurisdiction !== 'tourist'" >
+        <span v-if="!data.published && data.type === 'article'" class="version">[未发布]</span>
         <span v-else-if="data.hasBeta && data.type === 'article'"
-          >[编辑中]</span
+          class="version">[编辑中]</span
         >
       </span>
 
@@ -355,14 +356,19 @@ export default {
 .openArea {
   // background: rgb(51, 80, 247);
 }
+.version{
+  font-size: 1rem;
+}
 .disable {
   background-color: rgba(129, 128, 128, 0.226);
   cursor: not-allowed;
 }
 .child_tree {
-  background: #8db1af;
   margin-bottom: 5px;
 }
+// .bg{
+//   background: #87acc2;
+// }
 .move_level {
   display: flex;
   justify-content: flex-end;
@@ -430,6 +436,7 @@ export default {
   background: rgba(243, 228, 200, 0.322);
 }
 .status {
+  height: 1.2rem;
   width: 4.2rem;
   display: inline-block;
 }
@@ -446,10 +453,10 @@ export default {
     height: 15px;
   }
   .title {
-    background: #f6f6f6;
+    background: #757575;
     border-radius: 3px;
-    text-align: center;
-    color: rgb(69, 69, 250);
+    // text-align: center;
+    color: rgb(248, 248, 248);
     flex: auto;
     max-width: 6rem;
     overflow: hidden;

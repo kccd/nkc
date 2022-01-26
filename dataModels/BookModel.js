@@ -238,7 +238,6 @@ schema.methods.newExtendArticlesById = async function (articlesId, {
         }
       }
       latestEditorResult = latestEditor
-      // console.log(latestEditorResult,'241')
     }
     if (!articleObj) continue;
     const betaDocument = articlesObj[_id].beta;
@@ -292,7 +291,6 @@ schema.methods.getList = async function (options = {
   latestTitle: false
 }, bookList=[], status='unpublished') {
   // status  分为 已发布 未发布
-  // console.log(options,bookList,bid)
   // const PostModel = mongoose.model('posts');
   const articlesId = [];
   const postsId = [];
@@ -319,34 +317,23 @@ schema.methods.getList = async function (options = {
   }
   find(this.list)
   let articles = await this.newExtendArticlesById(articlesId, options, bookList)
-  // 不写两次不行 ，不知会不会写无数次
   if(status === 'published'){
-    let publisheds=[]
     function findPublished(data){
-      data.forEach(item=>{
-        if(item.published || item.type !== 'article'){
-          publisheds.push(item)
+      data.forEach((item, i)=>{
+        if(!item.published && item.type === 'article'){
+          Reflect.deleteProperty(data,i)  
+        }
+        if(item.child && item.child.length){
+          findPublished(item.child)
         }
       })
     }
     findPublished(articles)
-    function a(data){
-      data.forEach((item,i)=>{
-        if(!item.published && item.type === 'article'){
-          data.splice(i,1)
-        }
-        if(item.child && item.child.length){
-          a(item.child)
-        }
-      })
-    }
-    a(publisheds)
-    articles=publisheds
   }
   return articles || []
 
 }
- // 为了让预览能服用该方法，对该方法进行了传参，然后进行判断
+
 schema.methods.extendArticlesById = async function (articlesId,options= {
   setUrl :'bookContent',
   latestTitle : false
@@ -456,23 +443,24 @@ schema.methods.getContentById = async function (props) {
   const {
     list
   } = this.toObject();
-  // console.log(list)
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
   const {
     article: documentSource
   } = await DocumentModel.getDocumentSources();
-  // console.log(list.includes(aid),list)
   let listIds=[]
   function find(data){
     for (let i = 0; i < data.length; i++) {
       const item = data[i];
-      if(item.type === 'article' && item.id){
-        listIds.push(item.id)
+      if(item){
+        if(item.type === 'article' && item.id){
+          listIds.push(item.id)
+        }
+        if(item.child && item.child.length){
+          find(item.child)
+        }
       }
-      if(item.child && item.child.length){
-        find(item.child)
-      }
+      
     }
 
   }
