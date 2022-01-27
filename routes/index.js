@@ -73,55 +73,45 @@ router.use('/', async (ctx, next) => {
   const visitSettings = await db.SettingModel.getSettings('visit');
   const isWhitelistOperation = settings.operationsType.whitelistOfVisitorLimit.includes(operationId);
   const isResourceOperation = settings.operationsType.fileDownload.includes(operationId);
-
-  // 游客全局访问限制
-  let limitInfo = null;
-  if(
-    !user && !isWhitelistOperation && visitSettings.globalLimitVisitor.status
-  ) {
-    limitInfo = visitSettings.globalLimitVisitor;
-  }
-
-  // 全局访问限制
-  if(
-    !limitInfo && !isWhitelistOperation && visitSettings.globalAccessLimit.status
-  ) {
+  const isDev = user.certs.includes('dev');
+  // 如果后台开启了全局访问限制且当前操作未在白名单
+  if(visitSettings.globalAccessLimit.status && !isWhitelistOperation && !isDev) {
+    let userRolesId;
+    let userGradeId;
     if(!user) {
-      limitInfo = visitSettings.globalAccessLimit;
+      userRolesId = ['visitor'];
+      userGradeId = null;
     } else {
-      // 判断用户的证书和等级是否在白名单
-      const userRoles = await user.extendRoles();
-      const grade = await user.extendGrade();
-      let hasRole = false;
-      for(let i = 0; i < userRoles.length; i++) {
-        const roleId = userRoles[i]._id;
-        if(roleId === "dev" || visitSettings.globalAccessLimit.whitelist.includes(`role-${roleId}`)) {
-          hasRole = true;
-          break;
-        }
-      }
-      if(!hasRole) {
-        hasRole = visitSettings.globalAccessLimit.whitelist.includes(`grade-${grade._id}`);
-      }
-      if(!hasRole) {
-        limitInfo = visitSettings.globalAccessLimit;
-      }
+      userRolesId = data.userRoles.map(r => r._id);
+      userGradeId = data.userGrade._id;
     }
-  }
-
-  if(limitInfo) {
-    if(!state.isApp) ctx.status = 401;
+    const {relation, rolesId, gradesId} = visitSettings.globalAccessLimit.whitelist;
+    let hasRole = false;
+    for(const roleId of userRolesId) {
+      if(!rolesId.includes(roleId)) continue;
+      hasRole = true;
+      break;
+    }
+    const hasGrade = gradesId.includes(userGradeId);
     if(
-      isResourceOperation ||
-      (ctx.request.accepts('json', 'html') === 'json' && ctx.request.get('FROM') === 'nkcAPI')
+      // 与关系时，证书不满足或用户等级不满足
+      (relation === 'and' && (!hasRole || !hasGrade)) ||
+      // 或关系时，证书和用户等级均不满足
+      (relation === 'or' && !hasRole && !hasGrade)
     ) {
-      return ctx.throw(403, limitInfo.description);
-    } else {
-      data.description = nkcModules.nkcRender.plainEscape(limitInfo.description);
-      return ctx.body = nkcModules.render(path.resolve(__dirname, "../pages/filter_visitor.pug"), data, state);
+      const description = user? visitSettings.globalAccessLimit.userDescription: visitSettings.globalAccessLimit.visitorDescription;
+      if(!state.isApp) ctx.status = 401;
+      if(
+        isResourceOperation ||
+        (ctx.request.accepts('json', 'html') === 'json' && ctx.request.get('FROM') === 'nkcAPI')
+      ) {
+        return ctx.throw(403, description);
+      } else {
+        data.description = nkcModules.nkcRender.plainEscape(description);
+        return ctx.body = nkcModules.render(path.resolve(__dirname, "../pages/filter_visitor.pug"), data, state);
+      }
     }
   }
-
   await next();
 });
 

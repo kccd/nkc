@@ -3,7 +3,8 @@ const app = new Vue({
   el: '#app',
   data: {
     visitSettings: data.visitSettings,
-    certList: data.certList
+    roles: data.roles,
+    grades: data.grades
   },
   methods: {
     submit() {

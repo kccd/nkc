@@ -3,8 +3,13 @@ module.exports = {
   c: {
     globalAccessLimit: {
       status: false,
-      description: "暂不对普通会员开放",
-      whitelist: []
+      userDescription: "暂不对普通会员开放",
+      visitorDescription: '暂不对游客开放',
+      whitelist: {
+        rolesId: [],
+        gradesId: [],
+        relation: 'or', // or and
+      }
     },
     globalLimitVisitor: {
       status: false,
