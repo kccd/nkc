@@ -73,7 +73,10 @@ router.use('/', async (ctx, next) => {
   const visitSettings = await db.SettingModel.getSettings('visit');
   const isWhitelistOperation = settings.operationsType.whitelistOfVisitorLimit.includes(operationId);
   const isResourceOperation = settings.operationsType.fileDownload.includes(operationId);
-  const isDev = user.certs.includes('dev');
+  let isDev = false;
+  if(user && user.certs && user.certs.includes('dev')) {
+    isDev = true;
+  }
   // 如果后台开启了全局访问限制且当前操作未在白名单
   if(visitSettings.globalAccessLimit.status && !isWhitelistOperation && !isDev) {
     let userRolesId;
