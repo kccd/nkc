@@ -7,6 +7,7 @@ const articlesRouter = require('./articles');
 const categoriesRouter = require('./categories');
 const categoryRouter = require('./category');
 const draftsRouter = require('./drafts');
+const draftRouter = require('./draft');
 router
   .use('/', async (ctx, next) => {
     if(ctx.query.t) {
@@ -14,6 +15,7 @@ router
     } else {
       ctx.remoteTemplate = 'creation/index.pug';
     }
+    ctx.state.navbar = 'full';
     await next();
   })
   .get('/', async (ctx, next) => {
@@ -27,4 +29,5 @@ router
   .use('/book', bookRouter.routes(), bookRouter.allowedMethods())
   .use('/articles', articlesRouter.routes(), articlesRouter.allowedMethods())
   .use('/drafts', draftsRouter.routes(), draftsRouter.allowedMethods())
+  .use('/draft/:did', draftRouter.routes(), draftRouter.allowedMethods())
 module.exports = router;

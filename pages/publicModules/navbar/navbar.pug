@@ -6,7 +6,7 @@ if remoteState.uid
   -var messageSum = remoteState.newMessageCount;
 nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;margin-bottom: 15px;")
 
-  .container-fluid.max-width
+  .container-fluid(class=remoteState.navbar === 'standard'? 'max-width':'')
     .navbar-header
       button.navbar-toggle.collapsed(onclick=`toggleNKCDrawer('left', ${remoteState.uid})`)
         span.sr-only Toggle navigation

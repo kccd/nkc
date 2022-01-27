@@ -1,34 +1,42 @@
 <template lang="pug">
-  .creation-center-books
-    .creation-center-books-header
-      span.h2.m-r-1 图书创作
-    .m-b-1
-      span.h4.m-r-1 我创建的图书
-      button.btn.btn-default.btn-xs(@click="navToPage('bookEditor')") 创建新图书
+  mixin bookList(bookListName)
     .creation-center-books-list
-      .creation-center-book-item(v-for="book in books" @click="navToPage('book', {bid: book._id})")
+      .creation-center-book-item(v-for=("book in " + bookListName) @click="navToPage('book', {bid: book._id})")
         .creation-center-book-cover(:style="`background-image:url(${book.coverUrl})`")
         .creation-center-book-info
           .creation-center-book-name {{book.name}}
-          .creation-center-book-description {{book.description}}
+          .creation-center-book-description(:title="book.description") {{book.description}}
           .creation-center-book-time {{book.time}}
+  .container-fluid.creation-center-books
+    .creation-center-books-header
+      span.m-r-1 我创建的图书
+      button.btn.btn-default.btn-xs(@click="navToPage('bookEditor')") 创建新图书
     .m-b-1
-      span.h4.m-r-1 我参与创作的图书
-
+      +bookList("books")
+    .creation-center-books-header
+      span.m-r-1 我参与创作的图书
+    .m-b-1
+      +bookList("otherBooks")
 </template>
 
 <style lang="less" scoped>
   @import "../../../publicModules/base";
   .creation-center-books{
     .creation-center-books-header{
-      margin-bottom: 2rem;
+      margin-bottom: 1rem;
+      span{
+        font-size: 1.6rem;
+      }
     }
     .creation-center-books-list{
       .creation-center-book-item{
-        @coverHeight: 6rem;
-        @itemWidth: 16rem;
-        border: 1px solid #f4f4f4;
+        @coverHeight: 8rem;
+        @itemWidth: 22rem;
+        background-color: #fff;
+        border: 1px solid #eee;
         margin: 0 1rem 1rem 0;
+        text-align: center;
+        border-radius: 3px;
         display: inline-block;
         cursor: pointer;
         position: relative;
@@ -47,15 +55,15 @@
             height: 2rem;
             margin-bottom: 1rem;
             //background-color: red;
-            font-size: 1.25rem;
-            font-weight: 700;
-            .hideText(@line: 2);
+            font-size: 1.5rem;
+            //font-weight: 700;
+            .hideText(@line: 1);
           }
           .creation-center-book-description{
             color: #555;
-            height: 3rem;
+            height: 1.4rem;
             font-size: 1rem;
-            .hideText(@line: 2);
+            .hideText(@line: 1);
             margin-bottom: 1rem;
           }
           .creation-center-book-time{
@@ -73,7 +81,8 @@
 
   export default {
     data: () => ({
-      books: []
+      books: [],
+      otherBooks: []
     }),
     mounted() {
       this.getBooks();
@@ -84,6 +93,7 @@
         nkcAPI(`/creation/books`, 'GET')
           .then(data => {
             self.books = data.books;
+            self.otherBooks = data.otherBooks;
           })
           .catch(sweetError);
       },

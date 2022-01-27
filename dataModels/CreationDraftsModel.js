@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const nkcRender = require("../nkcModules/nkcRender");
 const schema = new mongoose.Schema({
   _id: String,
   toc: {
@@ -19,11 +20,6 @@ const schema = new mongoose.Schema({
   did: {
     type: Number,
     default: null,
-    index: 1
-  },
-  cid: {
-    type: [String],
-    default: [],
     index: 1
   },
   del: {
@@ -82,36 +78,42 @@ schema.statics.createDraft = async (props) => {
 /*
 * 拓展草稿
 * */
-schema.statics.extentDrafts = async function (drafts) {
+schema.statics.extentDraftsData = async function (drafts) {
   const DocumentModel = mongoose.model('documents');
-  const apiFunction = require("../nkcModules/apiFunction");
-  const  arr = [];
-  const obj = {};
-  for(const d of drafts) {
-    arr.push(d.did);
+  const tools = require('../nkcModules/tools');
+  const nkcRender = require("../nkcModules/nkcRender");
+  const documentsId = [];
+  const documentsObj = {};
+  for(const draft of drafts) {
+    documentsId.push(draft.did);
   }
-  const documents = await DocumentModel.find({did: {$in: arr}}, {
-    _id: 1,
-    uid: 1,
-    tlm: 1,
-    toc: 1,
-    title: 1,
-    cover: 1,
+  const documents = await DocumentModel.find({did: {$in: documentsId}, type: 'beta'}, {
     did: 1,
-    type: 1,
+    title: 1,
     content: 1,
   });
-  const _drafts = [];
-  for(const d of documents) {
-    d.content = await apiFunction.obtainPureText(d.content, true, 300);
-    obj[d.did] = d;
+  const draftsData = [];
+  for(const document of documents) {
+    documentsObj[document.did] = document;
   }
   for(const d of drafts) {
-    d.document = obj[d.did];
-    const n = d.toObject();
-    _drafts.push(n);
+    const {did, _id, toc, tlm, del} = d;
+    const document = documentsObj[did];
+    if(!document) continue;
+    const {
+      title = "",
+      content = ""
+    } = document;
+    const draftData = {
+      draftId: _id,
+      deleted: del,
+      title: title || "未填写标题",
+      content: await nkcRender.htmlToPlain(content || "未填写内容", 500),
+      time: tools.timeFormat(tlm || toc),
+    };
+    draftsData.push(draftData);
   }
-  return _drafts;
+  return draftsData;
 }
 
 /*
@@ -159,8 +161,32 @@ schema.statics.checkDraftInfo = async (draft) => {
 schema.methods.saveDraft = async function() {
   const DocumentModel = mongoose.model('documents');
   const {draft: documentSource} = await DocumentModel.getDocumentSources();
-  const {did} = this;
   await DocumentModel.copyBetaToHistoryBySource(documentSource, this._id);
 }
+
+
+schema.statics.getDraftById = async (draftId) => {
+  const CreationDraftsModel = mongoose.model('creationDrafts');
+  return await CreationDraftsModel.findOnly({_id: draftId});
+};
+
+schema.statics.getUserDraftById = async (draftId, uid) => {
+  const CreationDraftsModel = mongoose.model('creationDrafts');
+  return await CreationDraftsModel.findOnly({_id: draftId, uid});
+}
+
+schema.methods.getDraftData = async function() {
+  const DocumentModel = mongoose.model('documents');
+  const {draft: sourceDraft} = await DocumentModel.getDocumentSources();
+  const betaDocument = await DocumentModel.getBetaDocumentBySource(sourceDraft, this._id);
+  return {
+    draftId: this._id,
+    did: betaDocument.did,
+    docId: betaDocument._id,
+    title: betaDocument.title,
+    content: betaDocument.content,
+    deleted: this.del,
+  };
+};
 
 module.exports = mongoose.model('creationDrafts', schema);

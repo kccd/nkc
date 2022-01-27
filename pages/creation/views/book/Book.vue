@@ -1,7 +1,24 @@
 <template lang="pug">
-  .creation-center-book
-    .m-b-2
+  .container-fluid.creation-center-book
+    .m-b-1
       bread-crumb(:list="navList")
+    .creation-center-book-container.standard-container(v-if="book")
+      .creation-center-book-cover
+        img(:src="book.coverUrl")
+      .creation-center-book-name {{book.name}}
+      .creation-center-book-description {{book.description}}
+      .creation-center-author
+        user-group(:users="bookMembers")
+      .creation-center-book-list
+        .creation-center-book-list-item(v-for="l in bookList")
+          .creation-center-book-list-item-name(@click="clickArticleTitle(l)")
+            span(v-if="!l.published") [未发布]
+            span(v-else-if="l.hasBeta") [编辑中]
+            | {{l.title}}
+          .creation-center-book-list-item-time {{l.time}}
+      button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('articleEditor', {bid})") 撰写文章
+      a.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(:href="getUrl('book', bid)" target="_blank") 阅读图书
+      button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('bookEditor', {bid})") 设置
     .row.m-b-3(v-if="book")
       .col-xs-12.col-md-6.col-md-offset-3
         .creation-center-book-container
@@ -24,6 +41,10 @@
 <style lang="less" scoped>
   @import '../../../publicModules/base';
   .creation-center-book{
+    .creation-center-author{
+      text-align: center;
+      margin-bottom: 1rem;
+    }
     .creation-center-book-cover{
       width: 100%;
       img{
@@ -32,6 +53,7 @@
       margin-bottom: 2rem;
     }
     .creation-center-book-container{
+
       .creation-center-book-name{
         font-size: 2rem;
         text-align: center;
@@ -39,7 +61,7 @@
       }
       .creation-center-book-description{
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
       }
       .creation-center-book-list-selector{
 
@@ -86,11 +108,17 @@
 
 <script>
   import {nkcAPI} from "../../../lib/js/netAPI";
+  import {getUrl} from "../../../lib/js/tools";
+  import UserGroup from '../../../lib/vue/UserGroup';
   export default {
+    components: {
+      'user-group': UserGroup
+    },
     data: () => ({
       bid: '',
       book: null,
       bookList: [],
+      bookMembers: [],
     }),
     computed: {
       navList() {
@@ -111,6 +139,7 @@
       this.getBook();
     },
     methods: {
+      getUrl: getUrl,
       navToPage(name, query = {}, params = {}) {
         this.$router.push({
           name,
@@ -143,6 +172,7 @@
           .then(data => {
             self.book = data.bookData;
             self.bookList = data.bookList;
+            self.bookMembers = data.bookMembers;
           })
           .catch(sweetError);
       }

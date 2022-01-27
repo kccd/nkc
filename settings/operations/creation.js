@@ -3,10 +3,15 @@ module.exports = {
   drafts: {
     GET: 'creationCenter',
     POST: 'creationCenter',
-    DELETE: 'creationCenter',
-    draftEdit: {
+    editor: {
       GET: 'creationCenter',
       POST: 'creationCenter',
+    }
+  },
+  draft: {
+    PARAMETER: {
+      GET: 'creationCenter',
+      DELETE: 'creationCenter'
     }
   },
   category: {
@@ -57,9 +62,10 @@ module.exports = {
   book: {
     PARAMETER: {
       GET: 'creationCenter',
-      PARAMETER: {
-        GET: 'creationCenter'
-      }
+      member: {
+        POST: 'creationCenter',
+        DELETE: 'creationCenter'
+      },
     }
   },
   articles: {

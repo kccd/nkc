@@ -42,6 +42,7 @@ module.exports = async (ctx) => {
     nkcSourceMask: {
       isDisplay: state.threadSettings.playerTips.isDisplay,
       tipContent: state.threadSettings.playerTips.tipContent
-    }
+    },
+    navbar: state.navbar || 'standard', // standard, full
   };
 }

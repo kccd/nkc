@@ -826,5 +826,7 @@
   "publishComment": "发布图书评论",
   "getComments": "获取图书评论",
   "modifyComment": "编辑图书评论",
-  "deleteComment": "删除图书评论"
+  "deleteComment": "删除图书评论",
+  "experimentDocumentPostSettings": "后台管理 - 设置 - 内容发表",
+  "bookInvitation": "处理图书创作邀请"
 }

@@ -1,13 +1,12 @@
 <template lang="pug">
-  .row
-    .col-xs-12.col-md-12
-      h2 添加草稿
-      a(@click="back")
-        .fa.fa-arrow-left &nbsp;
-        | 返回上一层
-      document-editor(ref="documentEditor" :configs="formConfigs" @content-change="watchContentChange")
-      .m-t-1.m-b-3
-        button.btn.btn-block.btn-primary(@click="submit") 提交
+  .container-fluid
+    .m-b-1
+      bread-crumb(:list="navList")
+    .standard-max-container
+      .m-b-1
+        document-editor(ref="documentEditor" :configs="formConfigs" @content-change="watchContentChange")
+      div
+        button.btn.btn-primary(@click="submit") 保存
 </template>
 
 <style lang="less" scoped>
@@ -71,7 +70,6 @@ export default {
       formConfigs: {
         title: true,
       },
-      documentDid: '',
       draftId: '',
       ready: false,
       document: {
@@ -89,8 +87,26 @@ export default {
   },
   computed: {
     type() {
-      return this.documentDid? 'modify': 'create'
+      return this.draftId? 'modify': 'create'
     },
+    navList() {
+      const list = [
+        {
+          name: '图文片段',
+          page: 'drafts'
+        }
+      ];
+      if(this.draftId) {
+        list.push({
+          name: '修改片段',
+        });
+      } else {
+        list.push({
+          name: '新建片段',
+        });
+      }
+      return list;
+    }
   },
   methods: {
     back() {
@@ -100,17 +116,16 @@ export default {
     },
     //获取ID
     initId() {
-      const {draftId, documentDid} = this.$route.query;
+      const {draftId} = this.$route.query;
       this.draftId = draftId;
-      this.documentDid = documentDid;
     },
     //插入编辑数据
     initData() {
       const self = this;
-      if(!self.documentDid) return;
-      nkcAPI(`/creation/drafts/draftEdit?documentDid=${self.documentDid}`, 'GET', {})
+      if(!self.draftId) return;
+      nkcAPI(`/creation/drafts/editor?draftId=${self.draftId}`, 'GET', {})
         .then(res => {
-          const {content, title} = res.document;
+          const {content, title} = res.draftData;
           self.document.content = content;
           self.document.title = title;
           self.initDocumentForm();
@@ -132,18 +147,16 @@ export default {
     //提交表单或自动保存表单
     post(type){
       const self = this;
-      const {draftId, documentDid} = this;
+      const {draftId} = this;
       const {title = '', content = ''} = this.document;
-      nkcAPI('/creation/drafts/draftEdit', 'POST', {
+      nkcAPI('/creation/drafts/editor', 'POST', {
         title,
         content,
         type,
         draftId,
-        documentDid,
       })
         .then(res => {
           self.draftId = res.draftId
-          self.documentDid = res.documentDid;
           if(type === 'save') {
             sweetSuccess('提交成功');
             self.$router.push({

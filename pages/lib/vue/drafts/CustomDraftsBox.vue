@@ -32,11 +32,11 @@
       .drafts-info(v-if="loading") 加载中...
       .module-draft(v-for="d in drafts" v-else)
         .module-info
-          .module-time {{fromNow(d.toc)}}
+          .module-time {{d.time}}
         .module-article-title 标题：
-          span {{d.document.title}}
+          span {{d.title}}
         .module-article-content 内容：
-          span {{d.document.content}}
+          span {{d.content}}
         .module-buttons
           div(title="继续创作" @click="editDraft(d)")
             span 继续创作
@@ -50,7 +50,7 @@
   @import "../../../publicModules/base";
   .drafts-container {
     .resource-paging {
-      padding: 0.5rem 1rem 0 1rem;
+      padding: 0 1rem 0 1rem;
     }
     .drafts-header {
       padding: 0.5rem 1rem 0 1rem;
@@ -251,13 +251,13 @@ export default {
     draftsType: 'all',
     selectedDraftsId: [],
     loading: true,
-    quota: 10,
+    quota: 7,
     pageNumber: "",
   }),
   components: {
   },
   mounted() {
-    this.getDrafts();
+    // this.getDrafts();
   },
   computed: {
     screenType: function() {
@@ -297,17 +297,17 @@ export default {
       this.loading = true;
       const self = this;
       let {quota} = self;
-      if(self.type) quota = 7;
-      nkcAPI(`/creation/drafts?quota=${quota}&skip=${skip}&type=${this.draftsType}&t=${Date.now()}`, 'GET', {})
+      nkcAPI(`/creation/drafts?quota=${quota}&page=${skip}&t=${Date.now()}`, 'GET', {})
         .then(res => {
-          res.drafts.map(d => {
+          res.draftsData.map(d => {
             d.delay = 0;
           })
-          self.drafts = res.drafts;
+          self.drafts = res.draftsData;
           self.paging = res.paging;
           self.loading = false;
         })
         .catch(err => {
+          self.loading = false;
           sweetError(err);
         })
     }, 300),
@@ -316,24 +316,24 @@ export default {
       if(this.type) {
         sweetQuestion(`继续创作将会覆盖编辑器中全部内容，确定继续？`)
           .then(() => {
-            window.location.href = `/creation/drafts/draftEdit?draftId=${item?item._id:''}&documentDid=${item?item.document.did:''}`;
+            window.location.href = `/creation/drafts/editor?draftId=${item.draftId}`;
           })
           .catch(sweetError);
       } else {
-        window.location.href = `/creation/drafts/draftEdit?draftId=${item?item._id:''}&documentDid=${item?item.document.did:''}`;
+        window.location.href = `/creation/drafts/editor?draftId=${item.draftId}`;
       }
     },
     fastSelectedDraft(id) {
-      console.log(id);
+      // console.log(id);
     },
     selectedDraft(item) {
-      console.log(item);
+      // console.log(item);
     },
     delDraft(item, type) {
       const self = this;
       return sweetQuestion(`确定要执行当前操作？`)
         .then(() => {
-          return nkcAPI(`/creation/drafts?_id=${item._id}&type=${type}`, 'DELETE', {})
+          return nkcAPI(`/creation/draft/${item.draftId}?type=${type}`, 'DELETE', {})
             .then(res => {
               //从草稿中去除删除成功的草稿
               self.getDrafts(self.paging.page);
@@ -349,17 +349,22 @@ export default {
     //插入草稿
     insert(item) {
       if(!item) return;
-      this.$emit('callback-data', item.document.content);
-      item.delay = 3;
-      const func = () => {
-        setTimeout(() => {
-          item.delay --;
-          if(item.delay > 0) {
-            func();
+      const self = this;
+      nkcAPI(`/creation/draft/${item.draftId}`, 'GET')
+        .then((data) => {
+          self.$emit('callback-data', data.draftData.content);
+          item.delay = 3;
+          const func = () => {
+            setTimeout(() => {
+              item.delay --;
+              if(item.delay > 0) {
+                func();
+              }
+            }, 1000);
           }
-        }, 1000);
-      }
-      func();
+          func();
+        })
+        .catch(sweetError);
     },
     open: function (callback, options = {}) {
       this.callback = callback;
