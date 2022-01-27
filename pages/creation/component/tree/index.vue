@@ -224,7 +224,6 @@ export default {
           break;
         default:
           if (!operations) {
-            console.log("toggle");
             EventBus.$emit(
               "moveDialogOpenMenu",
               data,
