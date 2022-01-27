@@ -222,7 +222,19 @@ export default {
         }
         if (dialogType === "editor") {
           this.seekResult = this.bookList;
-          console.log(obj,insertData)
+          console.log(insertData.index)
+          for (let i = 0; i < insertData.index.length; i++) {
+            const position = insertData.index[i];
+            this.seekChild({
+              data: this.seekResult,
+              position,
+              currentIndex: i,
+              findLocation: insertData.index,
+            });
+          }
+          console.log(this.seekResult.child)
+          obj.child=this.seekResult.child
+          this.seekResult = this.bookList;
           for (let i = 0; i < insertData.index.length - 1; i++) {
             const position = insertData.index[i];
             this.seekChild({

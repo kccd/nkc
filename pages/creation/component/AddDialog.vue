@@ -113,6 +113,7 @@ export default {
     },
   },
   mounted() {
+    // 子元素没带上
     EventBus.$on("addDialog", ({bid, data, childIndex, title, type='add', level}) => {
       this.insertLevel=level
       this.dialogType=type
@@ -161,7 +162,6 @@ export default {
         }
       }
       res(this.treeData);
-
       return this.treeData;
     },
   },
