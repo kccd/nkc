@@ -362,7 +362,7 @@ export default {
   width: 0;
   height: 0;
   border-top: 5px solid transparent;
-  border-left: 10px solid rgb(97, 96, 96);
+  border-left: 10px solid #0075ff91;
   border-bottom: 5px solid transparent;
   transition: all 0.3s;
 }
