@@ -113,5 +113,8 @@
   "threadCategoriesName": "文章属性",
   "documentPassReview": "文档通过审核",
   "documentFaulty": "文档被退修",
-  "documentDisabled": "文档被屏蔽"
+  "documentDisabled": "文档被屏蔽",
+  "commentPassReview": "图书评论通过审核",
+  "commentFaulty": "图书评论被退修",
+  "commentDisabled": "图书评论被屏蔽"
 }

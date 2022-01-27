@@ -58,10 +58,11 @@ window.PostOption = new Vue({
       };
       const {top, left} = jqDOM.offset();
       if(direction === 'up') {
-        return {
+        const position =  {
           top: top - domHeight,
           left: left - domWidth + jqDOM.width()
         }
+        return position;
       } else {
         return {
           top: top + jqDOM.height(),
@@ -302,6 +303,7 @@ NKC.methods.initPostOption = () => {
         direction,
         jqDOM: dom,
       });
+      //阻止浏览器默认行为
       e.stopPropagation();
     });
     dom.attr('data-init', 'true');

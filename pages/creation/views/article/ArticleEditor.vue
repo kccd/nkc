@@ -172,7 +172,7 @@
       },
       publish() {
         const self = this;
-        this.post('publish')
+        self.post('publish')
         .then(() => {
           self.$router.replace({
             name: 'bookContent',

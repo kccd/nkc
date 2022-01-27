@@ -30,6 +30,12 @@ const schema = new mongoose.Schema({
     required: true,
     index: 1
   },
+  //引用的documentId
+  quoteDid: {
+    type: String,
+    default: '',
+    index: 1,
+  },
   // 当前文档的状态
   // normal: 正常
   // disabled: 被屏蔽
@@ -167,7 +173,8 @@ schema.statics.getDid = async () => {
 schema.statics.getDocumentSources = () => {
   return {
     article: 'article',
-    draft: 'draft'
+    draft: 'draft',
+    comment: 'comment'
   }
 };
 
@@ -225,7 +232,10 @@ schema.statics.createBetaDocument = async (props) => {
     source,
     sid,
     reviewed = false,
+    ip,
+    port
   } = props;
+  const IPModel = mongoose.model('ips');
   const DocumentModel = mongoose.model('documents');
   const AttachmentModel = mongoose.model('attachments');
   const {getHTMLTextLength} = require('../nkcModules/checkData');
@@ -251,6 +261,8 @@ schema.statics.createBetaDocument = async (props) => {
     source,
     sid,
     reviewed,
+    ip: await IPModel.saveIPAndGetToken(ip),
+    port
   });
   await document.save();
   await document.updateResourceReferences();
@@ -948,11 +960,14 @@ schema.methods.getKeywordsReviewStatus = async function() {
 schema.methods.getReviewStatusAndCreateReviewLog = async function() {
   const ReviewModel = mongoose.model('reviews');
   const DocumentModel = mongoose.model('documents');
+  //用户是否满足后台设置的需要审核的设置
   let reviewStatus = await this.getGlobalPostReviewStatus();
   if(!reviewStatus.needReview) {
+    //获取用户是否验证手机号
     reviewStatus = await this.getVerifyPhoneNumberReviewStatus();
   }
   if(!reviewStatus.needReview) {
+    //获取敏感词关键字
     reviewStatus = await this.getKeywordsReviewStatus();
   }
   const {needReview, reason, type} = reviewStatus;
@@ -1010,5 +1025,20 @@ schema.methods.pushToSearchDB = async function() {
     keywordsEN: keywordsEN || [],
   });
 };
+
+/*
+* 向document中插入引用信息
+* */
+schema.methods.initQuote = async function (quoteCid) {
+  const CommentModel = mongoose.model('comments');
+  const DocumentModel = mongoose.model('documents');
+  const comment = await CommentModel.findOne({_id: quoteCid});
+  const document = await DocumentModel.findOne({did: comment.did, type: 'stable'});
+  await this.updateOne({
+    $set: {
+      quoteDid: document._id
+    }
+  })
+}
 
 module.exports = mongoose.model('documents', schema);

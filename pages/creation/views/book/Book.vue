@@ -2,7 +2,7 @@
   .creation-center-book
     .m-b-2
       bread-crumb(:list="navList")
-    .row(v-if="book")
+    .row.m-b-3(v-if="book")
       .col-xs-12.col-md-6.col-md-offset-3
         .creation-center-book-container
           .creation-center-book-cover

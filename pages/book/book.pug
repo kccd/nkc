@@ -6,7 +6,7 @@ block content
   .hidden#data=objToStr({bookId: data.book._id})
   .container-fluid.max-width.book
     .row
-      .col-xs-12.col-md-6.col-md-offset-3
+      #comment-content.col-xs-12.col-md-6.col-md-offset-3
         .book-cover
           img(src=data.book.coverUrl)
         .book-name=data.book.name
@@ -22,6 +22,6 @@ block content
                 span=item.title
               .book-list-item-time=item.time
         #book(v-cloak)
-          comment(:source="source" :sid="sid")
+          comment(:source="source" :sid="sid" ref="comment")
 block scripts
   +includeJS('/book/book.js')

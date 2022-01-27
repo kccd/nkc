@@ -113,7 +113,7 @@ func.save = async (docType, document) => {
   if(
     ![
       "user", "post", "thread", "column", "columnPage", "resource",
-      "document_article"
+      "document_article", "document_comment"
     ].includes(docType)
   ) throwErr(500, "docType error");
 
@@ -153,6 +153,8 @@ func.save = async (docType, document) => {
   } else if(docType === "resource") {
     id = `resource_${tid}`;
   } else if(docType === 'document_article') {
+    id = `document_${tid}`;
+  } else if(docType === 'document_comment') {
     id = `document_${tid}`;
   }
 
@@ -227,7 +229,7 @@ func.search = async (t, c, options) => {
     size = searchColumnList;
   } else if(t === "resource") {
     size = searchResourceList;
-  } else if(t === "document_article") {
+  } else if(t === "document_article" || t === "document_comment") {
     size = searchDocumentList;
   } else {
     size = searchAllList;
@@ -408,12 +410,30 @@ func.search = async (t, c, options) => {
                         should: [
                           createMatch("title", c, 5, relation),
                           createMatch("content", c, 2, relation),
-                          createMatch("pid", c, 100, relation),
                           createMatch("authors", c, 80, relation),
                           createMatch("abstractEN", c, 50, relation),
                           createMatch("abstractCN", c, 50, relation),
                           createMatch("keywordsEN", c, 80, relation),
                           createMatch("keywordsCN", c, 80, relation),
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: 'document_comment'
+                      }
+                    },
+                    {
+                      bool: {
+                        should: [
+                          createMatch("content", c, 2, relation),
+                          createMatch("authors", c, 80, relation),
                         ]
                       }
                     }
@@ -471,6 +491,12 @@ func.search = async (t, c, options) => {
     body.query.bool.must.push({
       match: {
         docType: "document_article"
+      }
+    });
+  } else if(t === "document_comment") {
+    body.query.bool.must.push({
+      match: {
+        docType: "document_comment"
       }
     });
   }
@@ -576,6 +602,7 @@ func.search = async (t, c, options) => {
       body.query.bool.must[0].bool.should[1].bool.must.push(authorMatch);
       body.query.bool.must[0].bool.should[5].bool.must.push(authorMatch);
       body.query.bool.must[0].bool.should[6].bool.must.push(authorMatch);
+      body.query.bool.must[0].bool.should[7].bool.must.push(authorMatch);
     }
 
     if(digest) {

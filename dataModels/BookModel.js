@@ -219,4 +219,11 @@ schema.methods.getContentById = async function(props) {
     }
   }
 }
+
+/*
+* 判断当亲用户是否为该图书的管理员
+* */
+schema.statics.isModerator = async function(uid, book) {
+
+}
 module.exports = mongoose.model('books', schema);

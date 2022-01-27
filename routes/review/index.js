@@ -21,7 +21,7 @@ router
         $in: fid
       }
     }
-    const m = {status: 'unknown', type: 'stable', source: 'article'};
+    const m = {status: 'unknown', type: 'stable', source: {$in: ['article', 'comment']}};
     //查找出 未审核 未禁用 未退修的post和document
     const postCount = await db.PostModel.countDocuments(q);
     const documentCount = await db.DocumentModel.countDocuments(m);
@@ -97,39 +97,51 @@ router
         toc: 1,
         title: 1,
         content: 1,
+        sid: 1,
+        source: 1,
       }).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
       // documents = await db.DocumentModel.extendDocuments(documents, {
       //   uid: data.user?data.user.uid:'',
       //   visitor: data.user,
       // });
-      const docId = new Set();
+      const articleDocId = new Set();
+      const commentDocId = new Set();
       const uid = new Set();
       for(const document of documents) {
         document.content = await nkcModules.apiFunction.obtainPureText(document.content, true, 100);
-        docId.add(document.did);
+        if(document.source === 'article') articleDocId.add(document.did);
+        if(document.source === 'comment') commentDocId.add(document.did);
         uid.add(document.uid);
       }
-      let articles = await db.ArticleModel.find({did: {$in: [...docId]}});
+      let articles = await db.ArticleModel.find({did: {$in: [...articleDocId]}});
       articles = await db.ArticleModel.extendArticles(articles);
+      let comments = await db.CommentModel.find({did: {$in: [...commentDocId]}, source: 'comment'});
+      comments = await db.CommentModel.extendReviewComments(comments);
       const users = await db.UserModel.find({uid: {$in: [...uid]}});
       const usersObj = {};
       const articleObj = {};
+      const commentObj = {};
       users.map(user => {
         usersObj[user.uid] = user;
       })
       articles.map(article => {
         articleObj[article.did] = article;
       })
+      comments.map(comment => {
+        commentObj[comment.did] = comment;
+      })
       for(const document of documents) {
         const article =  articleObj[document.did];
-        if(!article) continue;
+        if(!article && document.source === 'article') continue;
+        const comment = commentObj[document.did];
+        if(!comment && document.source === 'comment') continue;
         let user = usersObj[document.uid];
         if(!user) continue;
         //获取送审原因
         const reviewRecord = await  db.ReviewModel.findOne({docId: document._id}).sort({toc: -1}).limit(1);
         data.results.push({
           document,
-          article,
+          content: article || comment,
           user,
           reason: reviewRecord?reviewRecord.reason : '',
         })
@@ -141,7 +153,14 @@ router
   })
   .put("/", async (ctx, next) => {
     const {data, db, body} = ctx;
-    const {pid, type: reviewType, did, documentId, pass, reason, remindUser, violation, delType} = body;//remindUser 是否通知用户 violation 是否标记违规 delType 退修或禁用
+    let {pid, type: reviewType, did, documentId, pass, reason, remindUser, violation, delType} = body;//remindUser 是否通知用户 violation 是否标记违规 delType 退修或禁用
+    if(!reviewType) {
+      if(pid) {
+        reviewType = 'post';
+      } else {
+        reviewType = 'document';
+      }
+    }
     let message;
     if(reviewType === 'post') {
       const post = await db.PostModel.findOne({pid});
@@ -205,7 +224,7 @@ router
           r: document.uid,
           ty: "STU",
           c: {
-            type: "documentPassReview",
+            type: document.source === 'article'?"documentPassReview":"commentPassReview",
             docId: document._id,
           }
         })
@@ -235,6 +254,12 @@ router
           // await db.UserGeneralModel.resetReviewedCount(document.uid, ['article', 'comment']);
         }
         if(!remindUser) return;
+        let messageType;
+        if(document.source === 'article') {
+          messageType = delType === 'faulty'?"documentFaulty":"documentDisabled";
+        } else {
+          messageType = delType === 'faulty'?"commentFaulty":"commentDisabled";
+        }
         message = await db.MessageModel({
           _id: await db.SettingModel.operateSystemID("messages", 1),
           r: document.uid,
@@ -242,7 +267,7 @@ router
           c: {
             delType,
             violation,//是否违规
-            type: delType === 'faulty'?"documentFaulty":"documentDisabled",
+            type: messageType,
             docId: document._id,
             reason,
           }

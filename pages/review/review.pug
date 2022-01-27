@@ -106,11 +106,16 @@ block content
                 .review-info 用户：
                 .review-user
                   a(href=`/u/${r.user.uid}` target="_blank")=r.user.username
-                .review-info 类型：
-                  .review-time 章节创作
-                .review-info 标题：
-                  .review-thread-title
-                    a(href=`${r.article.url}` target="_blank")=r.article.title
+                  .review-info 类型：
+                    .review-time 章节创作
+                  if r.document.source === 'article'
+                    .review-info 标题：
+                      .review-thread-title
+                        a(href=`${r.content.url}` target="_blank")=r.content.title
+                  else
+                    .review-info 图书标题：
+                      .review-thread-title
+                        span=r.content.bookName
                 if r.reason
                   .review-info 理由：
                   span= r.reason

@@ -223,7 +223,7 @@ schema.statics.extendArticles = async function(articles) {
       bookName:  bookObj[article._id].name,
       url: getUrl('bookContent', bookObj[article._id]._id, article._id),
       time: timeFormat(toc),
-      did
+      did,
     };
     results.push(result);
   }

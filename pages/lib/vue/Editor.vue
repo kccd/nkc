@@ -81,6 +81,7 @@
         wordCount: true, // 是否开启字数统计
         maximumWords: 100, // 最大字符数
         zIndex: 499,
+        contentChangeEventFlag: false, //是否允许触发contentChange
       },
     }),
     async mounted () {

@@ -5,23 +5,24 @@
         .quote-cancel(@click="clearQuote") 取消引用
         .quote-info
           span 引用&nbsp;
-          a(:href="quote.userHome" target="_blank") {{quote.username}}
+          a(:href="`/u/${quote.user.uid}`" target="_blank") {{quote.user.username}}
           span &nbsp;发表于&nbsp;
-          a(:href="quote.url") {{quote.order}} 楼
+          //a(:href="quote.url") {{quote.order}} 楼
+          span {{quote.order}} 楼
           span &nbsp;的回复
         .quote-content {{quote.content}}
 
-    .m-b-05
+    .m-b-05#container
       editor(ref="editor" :configs="editorConfigs" @ready="editorReady" @content-change="editorContentChange")
     .m-b-05
       .checkbox
         label
-          input(type="checkbox")
+          input(type="checkbox" value="true" v-model="checkProtocol")
           span 我已阅读并同意遵守与本次发表相关的全部协议。
           a(href="/protocol" target="_blank") 查看协议
     .m-b-05
-      button.m-r-05.btn.btn-primary.btn-sm 发布
-      button.m-r-05.btn.btn-default.btn-sm 暂存
+      button.m-r-05.btn.btn-primary.btn-sm(@click="publish") 发布
+      button.m-r-05.btn.btn-default.btn-sm(@click="saveComment") 暂存
       .pull-right
         a(href="") 历史版本
 </template>
@@ -59,33 +60,114 @@
 </style>
 
 <script>
-  import Editor from '../lib/vue/Editor'
-  import {getPostEditorConfigs} from '../lib/js/editor'
+  import Editor from '../lib/vue/Editor';
+  import {getPostEditorConfigs} from '../lib/js/editor';
   const commentEditorConfigs = getPostEditorConfigs();
+  import {nkcAPI} from "../lib/js/netAPI";
   export default {
+    props: ['source', 'sid', 'comment'],
     data: () => ({
       editorConfigs: commentEditorConfigs,
-      quote: {
-        cid: 123,
-        order: 2,
-        url: "https://12121",
-        uid: "74185",
-        username: "SPARK",
-        userHome: 'https://192.168.11.250:9000/u/74185',
-        content: "10 次内存泄露 9 次都是 goruntine 引起，端口 8908 后边是一个 NodeJS socket.io 服务端，现在我通过 NodeJS 向 10086 端口同时发起 1000 个 websocket 连接，这些链接均会被代理到 8908 端口服务，然后将所有连接断开，重复几轮后可见控制台报如下错误",
-      }
+      quote: '',
+      commentContent: '',
+      type: '',
+      lockPost: false, //发布与编辑的禁用状态
+      checkProtocol: true,
+      // 是否允许触发contentChange
+      contentChangeEventFlag: false,
     }),
     components: {
       'editor': Editor
     },
+    mounted() {
+    },
     methods: {
       editorReady() {
-        console.log(`编辑器已就绪`)
+        this.$refs.editor.removeNoticeEvent();
+        this.type = this.comment?'modify':'create';
+        this.commentId = this.comment._id;
+        if(this.comment) {
+          this.setContent(this.comment.content);
+        } else {
+          this.contentChangeEventFlag = true;
+        }
       },
+      //编辑器内容发生变化时
       editorContentChange() {
-        console.log(`编辑器内容更新，新内容：`)
+        if(!this.contentChangeEventFlag) {
+          this.contentChangeEventFlag = true;
+          return;
+        }
         const data = this.$refs.editor.getContent();
-        console.log(data);
+        this.commentContent = data;
+        this.post(this.type);
+      },
+      //点击引用获取该楼层的引用信息
+      changeQuote(item) {
+        if(!item) return;
+        const self = this;
+        nkcAPI(`/comment/${item._id}/quote`, 'GET', {})
+        .then(res => {
+          self.quote = res.quote
+          window.location.href='#container';
+        })
+        .catch(err => {
+          sweetError(err);
+        })
+      },
+      //填入编辑器内容
+      setContent(content) {
+        this.$refs.editor.setContent(content);
+      },
+      //提交修改评论内容
+      post(type) {
+        if(!this.checkProtocol) sweetWarning('请勾选协议！');
+        if(!type) return;
+        if(this.lockPost) return;
+        this.lockPost = true;
+        const self = this;
+        return nkcAPI('/comment', 'POST', {
+          content: self.commentContent,
+          type,
+          source: self.source,
+          sid: self.sid,
+          quoteCid: self.quote?self.quote._id:'',
+          commentId: self.commentId,
+        })
+        .then(res => {
+          self.commentId = res.commentId;
+          if(type !== 'publish') {
+            self.lockPost = false;
+            self.type = 'modify';
+          } else {
+            sweetSuccess('发布成功！');
+            self.contentChangeEventFlag = false;
+            //发布成功后通知上层将content清空
+            self.clearContent();
+            self.lockPost = false;
+            self.type = 'create';
+            self.clearQuote();
+          }
+        })
+        .catch(err => {
+          self.lockPost = false;
+          sweetError(err);
+        })
+      },
+      //清空编辑器中的内容
+      clearContent() {
+        this.$refs.editor.setContent('');
+      },
+      //发布评论
+      publish() {
+        const self = this;
+        self.post('publish')
+      },
+      saveComment() {
+        this.post('save')
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
       },
       clearQuote() {
         this.quote = null;

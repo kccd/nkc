@@ -1,5 +1,8 @@
 module.exports = {
   PARAMETER: {
-    GET: 'getBook'
+    GET: 'getBook',
+    options: {
+      GET: "getBook"
+    }
   }
 }

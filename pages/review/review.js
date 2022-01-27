@@ -24,7 +24,7 @@ if(data.reviewType === 'post') {
   for(let i = 0; i < data.results.length; i++) {
     let d = data.results[i].document.did;
     let documentId = data.results[i].document._id;
-    let aid = data.results[i].article._id;
+    let aid = data.results[i].content._id;
     did.push(documentId);
     review[documentId] = {
       documentId: documentId,
