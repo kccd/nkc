@@ -71,6 +71,12 @@ function submit(uid) {
     })
 }
 
+function clearUserColor() {
+  const colorInput = $('input[data-control="selectColor"]');
+  colorInput.minicolors("value", "")
+  saveAppInfo();
+}
+
 // 检测是否已经购买过不打水印的服务
 function isAlreadyPay(info){
   if(!info){
@@ -277,5 +283,6 @@ Object.assign(window, {
   turnPictureImg,
   turnVideoImg,
   saveAppInfo,
+  clearUserColor,
   app,
 });

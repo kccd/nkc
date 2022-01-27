@@ -10,6 +10,7 @@ const cardRouter = require("./card");
 const Router = require('koa-router');
 const router = new Router();
 const nkcRender = require("../../nkcModules/nkcRender");
+const childRouter = require('./child');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 router
 	.post('/', async (ctx, next) => {
@@ -184,6 +185,7 @@ router
 		const {today} = ctx.nkcModules.apiFunction;
 		// 能看到入口的专业id
 		const fidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user, forum.fid);
+    const forumsIdCanShow = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
 		// 拿到能访问的专业id
 		const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user, forum.fid);
 		accessibleFid.push(fid);
@@ -290,8 +292,8 @@ router
 			}
 		} else {
 			// 拿到能看到入口的所有专业id
-			let visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
-      visibleFidArr = visibleFidArr.filter(f => f !== forum.fid);
+			// let visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
+      // visibleFidArr = visibleFidArr.filter(f => f !== forum.fid);
 			// 拿到能看到入口的顶级专业
 			// data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
 		}
@@ -299,6 +301,17 @@ router
 		// if(data.sameLevelForums && data.sameLevelForums.length){
 		// 	data.sameLevelForums = data.sameLevelForums.filter(c => c.fid !== forum.fid)
 		// }
+
+    data.topForums = await db.ForumModel.find({
+      parentsId: [],
+      fid: {
+        $in: forumsIdCanShow,
+      }
+    }, {
+      fid: 1,
+      displayName: 1,
+      description: 1
+    }).sort({order: 1});
 
 
 		data.subUsersCount = await db.SubscribeModel.countDocuments({cancel: false, fid, type: "forum"});
@@ -522,6 +535,7 @@ router
 	.use("/latest", latestRouter.routes(), latestRouter.allowedMethods())
 	.use('/followers', followerRouter.routes(), followerRouter.allowedMethods())
 	.use('/home', homeRouter.routes(), homeRouter.allowedMethods())
+  .use('/child', childRouter.routes(), childRouter.allowedMethods())
   .use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
 module.exports = router;
 
