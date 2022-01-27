@@ -250,15 +250,16 @@ export default {
         this.navToPage("articleEditor", { bid, aid, data, childIndex });
       }
     },
+
     mouseEnter(event) {
       this.isShowOperation = !this.isShowOperation;
-      if(this.isShowOperation){
-        this.$nextTick(()=>{
-          event.target.children[3].classList.add('title2')
-        })
-      }else{
-          event.target.children[3].classList.remove('title2')
-      }
+      // if(this.isShowOperation){
+      //   this.$nextTick(()=>{
+      //     event.target.children[3].classList.add('title2')
+      //   })
+      // }else{
+      //     event.target.children[3].classList.remove('title2')
+      // }
     },
     add(data, childIndex) {
       childIndex = childIndex.split(",");
