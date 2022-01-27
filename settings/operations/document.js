@@ -6,7 +6,7 @@ module.exports = {
     history:{
       GET:'viewHistoryDocument',
       PARAMETER:{
-        GET:'viewSpecifiedHistoryDocument'
+        GET:'viewHistoryDocument'
       }
     }
   }    

@@ -291,7 +291,6 @@ schema.methods.getList = async function (options = {
   const postsId = [];
   const articleObj = {};
   const postObj = {};
-  // 递归 把每一项id加入到相应数组中
   function find(list) {
     for (let i = 0; i < list.length; i++) {
       const item = list[i];
@@ -325,7 +324,6 @@ schema.methods.getList = async function (options = {
     findPublished(articles)
   }
   return articles || []
-
 }
 
 schema.methods.extendArticlesById = async function (articlesId,options= {
@@ -365,8 +363,6 @@ schema.methods.extendArticlesById = async function (articlesId,options= {
     if (!articlesObj[sid]) articlesObj[sid] = {};
     articlesObj[sid][type] = d;
   }
-
-  // console.log(articlesObj,'articlesObj')
   const results = [];
   for (const article of articles) {
     const {
@@ -377,26 +373,6 @@ schema.methods.extendArticlesById = async function (articlesId,options= {
       type
     } = article;
     const articleObj = articlesObj[_id];
-    // preview 需要拿到最新编辑数据。根据 sid 进行查找，可能会出现多条 ，根据更改时间找到最新一条
-    // let latestEditorResult;
-    // if (latestTitle) {
-    //   const documents = await DocumentModel.find({
-    //     sid: _id
-    //   });
-    //   let time
-    //   let latestEditor;
-    //   for (const obj of documents) {
-    //     if (!time) {
-    //       time = obj.tlm;
-    //       latestEditor = obj
-    //     } else {
-    //       const objTimeToStr = obj.tlm.toString()
-    //       const timeToStr = time.toString()
-    //       new Date(objTimeToStr).getTime() > new Date(timeToStr).getTime() && (latestEditor = obj) && (time = obj.tlm)
-    //     }
-    //   }
-    //   latestEditorResult = latestEditor
-    // }
     if (!articleObj) continue;
     const betaDocument = articlesObj[_id].beta;
     const stableDocument = articlesObj[_id].stable;
@@ -407,13 +383,11 @@ schema.methods.extendArticlesById = async function (articlesId,options= {
     const {
       title
     } = document;
-  // } = (latestTitle ? latestEditorResult : document);
     const result = {
       _id,
       uid,
       published: !!stableDocument,
       hasBeta: !!betaDocument,
-      // value: title || '未填写标题',
       title: title || '未填写标题',
       url: getUrl(setUrl, this._id, _id),
       time: timeFormat(toc),
@@ -429,7 +403,6 @@ schema.methods.extendArticlesById = async function (articlesId,options= {
   }
   return results;
 }
-
 schema.methods.getContentById = async function (props) {
   const {
     aid,
@@ -455,9 +428,7 @@ schema.methods.getContentById = async function (props) {
           find(item.child)
         }
       }
-      
     }
-
   }
   find(list)
   if (listIds.includes(aid)) {

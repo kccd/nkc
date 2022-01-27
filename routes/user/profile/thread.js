@@ -9,19 +9,14 @@ module.exports = async (ctx, next) => {
   };
   // 获取总条数
   const count = await db.ThreadModel.countDocuments(q);
-  const buttonCount=Math.ceil(count/10)
   if(type === 'get'){
     pageSettings.userCardThreadList=10
   }
-  const paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList, buttonCount);
-  // console.log(paging,'paging')
-  if(type){
-    paging.perpage=10
-    if(type === 'search' && pid){
+  const paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList);
+  if(type && type === 'search' && pid){
       q={
         oc:pid
       }
-    }
   }
 
   let threads = await db.ThreadModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);

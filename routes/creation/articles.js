@@ -1,16 +1,5 @@
 const router = require("koa-router")();
-let aidStatus=false
-function find(data,id){
-  if(data){
-    for (const obj of data) {
-      if(obj.id === id){
-        aidStatus= true
-      }else if(obj.child && obj.child.length){
-        find(obj.child,id)
-      }
-    }
-  }
-}
+
 router
   .get("/editor", async (ctx, next) => {
     const { query, data, db } = ctx;
@@ -19,6 +8,19 @@ router
       _id: bid
     });
     if (aid) {
+      let aidStatus=false
+      function find(data,id){
+        if(data){
+        for (const obj of data) {
+          if(obj.id === id){
+            aidStatus= true
+            return
+          }else if(obj.child && obj.child.length){
+            find(obj.child,id)
+          }
+        }
+        }
+      }
       find(book.list,aid)
       if (!aidStatus) {
         ctx.throw(400, `文章 ID 错误`);
@@ -69,7 +71,7 @@ router
       let child={
         id:'',
         title,
-        type: fields.articleType,
+        type: 'article',
         child: []
       }
       function changeChild(bookList) {
@@ -83,7 +85,7 @@ router
             item.child.unshift({
               id:'',
               title,
-              type: fields.articleType,
+              type: 'article',
               child: []
             });
           } else if (item.child && item.child.length) {
@@ -92,7 +94,7 @@ router
         });
       }
       changeChild(bookList);
-      if (fields.articleType === "article") {
+      // if (fields.articleType === "article") {
         article = await db.ArticleModel.createArticle({
           uid: state.uid,
           title,
@@ -104,15 +106,15 @@ router
           { _id: bookId },
           { $set: { list: bookList }}
         );
-      } else {
-        const res = await db.BookModel.updateOne(
-          { _id: bookId },
-          { $set: { list: bookList }}
-        );
-        return;
-      }
+      // } else {
+      //   const res = await db.BookModel.updateOne(
+      //     { _id: bookId },
+      //     { $set: { list: bookList }}
+      //   );
+      //   return;
+      // }
     } else {
-      if (fields.articleType === "article") {
+      // if (fields.articleType === "article") {
         function find(data,item){
           if(data){
             for (const obj of data) {
@@ -130,7 +132,7 @@ router
           { _id: bookId },
           { $set: { list: bookList }}
         );
-      }
+      // }
       article = await db.ArticleModel.findOnly({
         _id: articleId
       });
@@ -148,7 +150,7 @@ router
     }
     data.articleCover = await article.getBetaDocumentCoverId();
     // 写文章后返回信息
-    data.doucment = await db.DocumentModel.findOne({
+    data.document = await db.DocumentModel.findOne({
       sid: article._id
     });
     data.articleId = article._id;

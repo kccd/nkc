@@ -283,24 +283,6 @@ export default {
         title: "新建子项",
       });
     },
-    // 新建分组后添加数据
-    addGroupDatas(data) {
-      this.isShowAddGroup = false;
-      // 违背了单选数据流，还没想到更好的方法先这样
-      !this.$props?.data?.child && (this.$props.data.child = []);
-      this.$props?.data?.child?.unshift({
-        type: "text",
-        value: this.addGroupDefaultName,
-        published: false,
-      });
-      EventBus.$emit("addGroup", {
-        type: "create",
-        aid: data._id,
-        articleType: "text",
-        value: this.addGroupDefaultName,
-      });
-      this.addGroupDefaultName = "新建分组";
-    },
     // 和
     addDocument(data, i, bid) {
       // data.push({

@@ -28,10 +28,6 @@
       coverFile: null,
       oldCoverFile: null,
       bookId: '',
-      id:'',
-      aid:'',
-      d_id:'',
-      notice:'',
       articleId: '',
       book: null,
       article: {
@@ -45,10 +41,6 @@
       },
       lockPost: false,
       doucmentId:'',
-      articleType:'article',
-      publishIndex:'',
-      publishId:'',
-      // 发布需要的位置 和 文章数据
       moveData:'',
       moveIndex:''
     }),
@@ -87,8 +79,6 @@
       EventBus.$on('publish', (publishIndex, publishId)=>{
         this.post('publish')
         .then(() => {
-          publishIndex && (this.publishIndex = publishIndex)
-          publishId && (this.publishId = publishId)
           this.$router.replace({
             name: 'bookContent',
             params: {
@@ -109,25 +99,28 @@
       },
       documentPreview(){
         const {doucmentId}=this
-        // window.open(`/document/preview?_id=${id}&did=${doucmentId}&bid=${bookId}&aid=${articleId}`)
-        window.open(`/document/${doucmentId}/preview`)
+        if(doucmentId){
+          window.open(`/document/${doucmentId}/preview`)
+        }else{
+          sweetError('文章id不存在')
+        }
       },
       documentHistory(){
         const {doucmentId, bookId}=this 
         window.open(`/document/${doucmentId}/history?bid=${bookId}`)
       },
       initId() {
-        const {bid, aid, type, data ,childIndex} = this.$route.query;
+        const {bid, aid, data ,childIndex} = this.$route.query;
         this.moveData=data;
         this.moveIndex=childIndex;
         this.bookId = bid;
-        type && (this.articleType=type)
+        // type && (this.articleType=type)
         if(aid) {
           this.articleId = aid;
         }
       },
       initData() {
-        if(this.notice) return
+        // if(this.notice) return
         const self = this;
         const {bookId, articleId} = this;
         let url = `/creation/articles/editor?bid=${bookId}`;
@@ -142,7 +135,7 @@
               self.article.content = content;
               self.article.cover = cover;
               self.doucmentId=did
-              self.id=_id
+              // self.id=_id
             }
             self.book = book;
             self.articleId = articleId;
@@ -159,7 +152,7 @@
           cover
         });
       },
-      post(type,articleType) {
+      post(type) {
         if(this.lockPost) return;
         this.lockPost = true;
         const self = this;
@@ -188,7 +181,6 @@
         formData.append('bookId', bookId);
         formData.append('article', JSON.stringify(article));
         formData.append('type', type);
-        formData.append('articleType', articleType);
         formData.append('level', 'outermost');
         let url='/creation/articles/editor'
         return nkcUploadFile(url, 'POST', formData)
@@ -198,6 +190,7 @@
             const {articleId, articleCover} = data;
             self.articleId = articleId;
             self.resetCoverFile(articleCover);
+            self.doucmentId=data.document.did
           })
           .then(() => {
             if(type !== 'publish') {
@@ -210,7 +203,7 @@
           });
       },
       modifyArticle() {
-        this.post(this.type, this.articleType).then(data=>{
+        this.post(this.type).then(data=>{
         })
         .catch(err => {
           screenTopWarning(err);
@@ -221,7 +214,6 @@
         .then(() => {
           sweetSuccess('保存成功');
         })
-      // this.moveDialog(this.article,null,null,null,'choice')
       },
       publish() {
       let article={
@@ -231,10 +223,8 @@
         type:'article',
         child:[]
       }
-      // this.publishId=this.article.id
       // 文章编辑过后默认添加在列表最后 点击发布选中最后一项  
       let publishType;
-      // if(this.publishId === this.articleId && this.publishIndex) publishType="republish" 
       let  childIndex=this.moveIndex?.split(',') || []
       this.$refs.moveDialog.moveDialog(article, childIndex, null, this.bookId, 'choice', publishType,)
       },

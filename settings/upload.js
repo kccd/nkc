@@ -80,7 +80,6 @@ const uploadSettings = {
   initFolders,
   extGetPath,
   koaBodySetting: {
-    strict:false,
     multipart: true,
     formidable: {
       maxFields: 20,
