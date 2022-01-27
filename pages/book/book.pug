@@ -16,16 +16,10 @@ block content
               if !!item
                 a.book-list-item(href=item.url || "#"  target=item.url ? "_blank" : '' style="margin-left:"+ (level * 24) + 'px')
                   .book-list-item-name
-                    //- if !item.published
-                    //-   span.status [未发布]
-                    //- else if item.hasBeta
-                    //-   span.status [编辑中]
                     span=item.title
                   .book-list-item-time=item.time
                 if item.child
                   +bookList(item.child,level+1 )
-            //- if !data.length
-            //-   h3.null 暂时还没有发布的书籍
           +bookList(data.list)
 block scripts
   +includeJS('/book/book.js')

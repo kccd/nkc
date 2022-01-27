@@ -205,9 +205,6 @@ var Tools = function() {
       case 'editBookArticle': {
         return '/creation/articles/editor?bid=' + id + '&aid=' + size;
       }
-      // case 'prevView': {
-      //   return `/creation/document?did=${did}&bid=${id}&aid=${size}`
-      // }
     }
   };
   self.getAnonymousInfo = function() {

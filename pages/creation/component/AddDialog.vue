@@ -28,7 +28,7 @@
         )
         p.url-address
           span 地址:
-          select.select(v-model="protocol", v-show="selectType === 'url'")
+          select.select.bg(v-model="protocol", v-show="selectType === 'url'")
             option(value="http://") http://
             option(value="https://") https://
           input.add-group-input.select.query-input(
@@ -38,7 +38,7 @@
         )
       .add-group(v-show="selectType === 'text'")
         span 分组名:
-        input.add-group-input.select.query-input(
+        input.select.query-input(
           type="text",
           v-model="inputValue",
           v-focus
@@ -47,13 +47,13 @@
     .select-post(v-show="selectType === 'post'")
       .select-post-query
         .select-post-query-width
-          input.query-input(
+          input.query-input.select(
             type="text",
             placeholder="请输入pid",
             v-model="searchContent"
           )
           button.query-button(@click="query(0,'search')") 查询
-          button.reset-button(@click="query(0, 'reset')") 重置
+          button.reset-button(@click="query(0, 'get')") 重置
       ul.select-post-list
         .list-container(ref="listContainer")
           .list-height(ref="listHeight")
@@ -65,8 +65,6 @@
                 p.postContent {{ post.firstPost.c }}
             li(v-if="postList.length === 0" style="font-size:24px") 数据加载中...
             li(v-else-if="!postList" style="font-size:24px") 暂无数据
-            //- .post-list-paging.bottom
-            //-   span(v-for="(page, i) in paging.buttonValue" :key="i" :class="{pageActive:page.type === 'active'}" @click="query(page.num)") {{page.type === 'null' ? '...' : page.num}}
     .paging(v-show="selectType === 'post'")
       .post-list-paging
         span(v-for="(page, i) in paging.buttonValue" :key="i" :class="{pageActive:page.type === 'active'}" @click="query(page.num)" )  {{page.type === 'null' ? '...' : page.num}}
@@ -109,9 +107,6 @@ export default {
     paging:[],
     insertLevel:''
   }),
-  created() {
-    
-  },
   watch: {
     selectType() {
       if (this.selectType === "post") {
@@ -159,8 +154,6 @@ export default {
     });
     this.initDraggableElement();
   },
-  updated() {
-  },
   computed: {
     extendedData() {
       const that = this;
@@ -191,8 +184,6 @@ export default {
       }
     },
     getTreeData(bid) {
-      // let url = `/creation/book/${bid}`;
-      console.log(bid)
       let url = `/creation/book/${bid}`;
       const self = this;
       return nkcAPI(url, "GET")
@@ -216,7 +207,11 @@ export default {
       this.postList=[]
       const result = await nkcAPI(url, "get");
       this.postList =result.threads; 
-      this.paging =result.paging; // 先不改了
+      this.paging =result.paging;
+      if(!result.threads.length){
+        sweetError('没有查找到数据')
+        this.postList=false
+      }
       this.$nextTick(() => {
       if (this.$refs.listHeight.clientHeight < 480) {
         this.$refs.listContainer.setAttribute(
@@ -295,6 +290,24 @@ export default {
 
 
 <style lang="less" scoped>
+.query-button{
+  padding: 2px 5px;
+  border-radius: 3px;
+  color:#1890ff;
+  text-shadow: none;
+  box-shadow: 0 2px #0000000b;
+  border: 1px solid #1890ff;
+  background: transparent;
+}
+.reset-button{
+  padding: 2px 5px;
+  border-radius: 3px;
+  color:#1890ff;
+  text-shadow: none;
+  box-shadow: 0 2px #0000000b;
+  border: 1px solid #1890ff;
+  background: transparent;
+}
 .pageActive{
   background: rgb(248, 226, 211);
 }
@@ -305,9 +318,8 @@ export default {
 }
 .select {
   height: 2rem;
-}
-.add-group-input {
-  flex: auto;
+  outline: none;
+  border: 1px solid #d9d9d9;
 }
 .query-input {
   outline: none;
@@ -328,9 +340,6 @@ export default {
     padding: 2px 5px;
     border:1px solid rgb(219, 217, 217);
     border-radius: 3px;
-  }
-  .bottom{
-
   }
 }
 .postContent {
@@ -399,8 +408,21 @@ export default {
           align-items: center;
         }
         .url-address{
+          
+          margin-top:5px;
           display: flex;
           align-items: center;
+          .bg{
+            background: #fafafa;
+          }
+          .select{
+            outline: none;
+            border: 1px solid #d9d9d9;
+          }
+          .add-group-input {
+            flex: auto;
+            background: white;
+          }
         }
       }
       .add-group {
@@ -409,6 +431,7 @@ export default {
         align-items: center;
         .add-group-input {
           flex: auto;
+          background: #fafafa;
         }
       }
     }
@@ -448,9 +471,6 @@ export default {
               .radio-post{
                 margin-right: 10px;
               }
-              .content{
-                
-              }
               transition: all .3s ;
               padding: 1rem;
               background-color: #f6f2ee;
@@ -472,9 +492,6 @@ export default {
               align-items: center;
               .radio-post{
                 margin-right: 10px;
-              }
-              .content{
-                
               }
               transition: all .3s ;
               padding: 1rem;

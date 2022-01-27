@@ -215,26 +215,26 @@ schema.methods.newExtendArticlesById = async function (articlesId, {
       uid,
     } = article;
     const articleObj = articlesObj[_id];
-    // prevView 需要拿到最新编辑数据。根据 sid 进行查找，可能会出现多条 ，根据更改时间找到最新一条
-    let latestEditorResult;
-    if (latestTitle) {
-      const documents = await DocumentModel.find({
-        sid: _id
-      });
-      let time
-      let latestEditor;
-      for (const obj of documents) {
-        if (!time) {
-          time = obj.tlm;
-          latestEditor = obj
-        } else {
-          const objTimeToStr = obj.tlm.toString()
-          const timeToStr = time.toString()
-          new Date(objTimeToStr).getTime() > new Date(timeToStr).getTime() && (latestEditor = obj) && (time = obj.tlm)
-        }
-      }
-      latestEditorResult = latestEditor
-    }
+    // preview 需要拿到最新编辑数据。根据 sid 进行查找，可能会出现多条 ，根据更改时间找到最新一条
+    // let latestEditorResult;
+    // if (latestTitle) {
+    //   const documents = await DocumentModel.find({
+    //     sid: _id
+    //   });
+    //   let time
+    //   let latestEditor;
+    //   for (const obj of documents) {
+    //     if (!time) {
+    //       time = obj.tlm;
+    //       latestEditor = obj
+    //     } else {
+    //       const objTimeToStr = obj.tlm.toString()
+    //       const timeToStr = time.toString()
+    //       new Date(objTimeToStr).getTime() > new Date(timeToStr).getTime() && (latestEditor = obj) && (time = obj.tlm)
+    //     }
+    //   }
+    //   latestEditorResult = latestEditor
+    // }
     if (!articleObj) continue;
     const betaDocument = articlesObj[_id].beta;
     const stableDocument = articlesObj[_id].stable;
@@ -244,14 +244,14 @@ schema.methods.newExtendArticlesById = async function (articlesId, {
     const document = stableDocument || betaDocument;
     const {
       title
-    } = (latestTitle ? latestEditorResult : document);
+    } = document;
     const result = {
       _id,
       uid,
       published: !!stableDocument,
       hasBeta: !!betaDocument,
       title: title || '未填写标题',
-      value: title || '未填写标题',
+      // value: title || '未填写标题',
       url: getUrl(setUrl, this._id, _id, did),
       time: timeFormat(toc),
     };
@@ -377,26 +377,26 @@ schema.methods.extendArticlesById = async function (articlesId,options= {
       type
     } = article;
     const articleObj = articlesObj[_id];
-    // prevView 需要拿到最新编辑数据。根据 sid 进行查找，可能会出现多条 ，根据更改时间找到最新一条
-    let latestEditorResult;
-    if (latestTitle) {
-      const documents = await DocumentModel.find({
-        sid: _id
-      });
-      let time
-      let latestEditor;
-      for (const obj of documents) {
-        if (!time) {
-          time = obj.tlm;
-          latestEditor = obj
-        } else {
-          const objTimeToStr = obj.tlm.toString()
-          const timeToStr = time.toString()
-          new Date(objTimeToStr).getTime() > new Date(timeToStr).getTime() && (latestEditor = obj) && (time = obj.tlm)
-        }
-      }
-      latestEditorResult = latestEditor
-    }
+    // preview 需要拿到最新编辑数据。根据 sid 进行查找，可能会出现多条 ，根据更改时间找到最新一条
+    // let latestEditorResult;
+    // if (latestTitle) {
+    //   const documents = await DocumentModel.find({
+    //     sid: _id
+    //   });
+    //   let time
+    //   let latestEditor;
+    //   for (const obj of documents) {
+    //     if (!time) {
+    //       time = obj.tlm;
+    //       latestEditor = obj
+    //     } else {
+    //       const objTimeToStr = obj.tlm.toString()
+    //       const timeToStr = time.toString()
+    //       new Date(objTimeToStr).getTime() > new Date(timeToStr).getTime() && (latestEditor = obj) && (time = obj.tlm)
+    //     }
+    //   }
+    //   latestEditorResult = latestEditor
+    // }
     if (!articleObj) continue;
     const betaDocument = articlesObj[_id].beta;
     const stableDocument = articlesObj[_id].stable;
@@ -406,13 +406,14 @@ schema.methods.extendArticlesById = async function (articlesId,options= {
     const document = stableDocument || betaDocument;
     const {
       title
-    } = (latestTitle ? latestEditorResult : document);
+    } = document;
+  // } = (latestTitle ? latestEditorResult : document);
     const result = {
       _id,
       uid,
       published: !!stableDocument,
       hasBeta: !!betaDocument,
-      value: title || '未填写标题',
+      // value: title || '未填写标题',
       title: title || '未填写标题',
       url: getUrl(setUrl, this._id, _id),
       time: timeFormat(toc),

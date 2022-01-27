@@ -139,56 +139,7 @@ export default {
     AddDialog,
   },
   data: () => ({
-    data: [
-      {
-        type: "text",
-        value: "第一章，阿斯拉达激发",
-        published: false,
-        time: "2022/1/10 10:57",
-        child: [
-          {
-            type: "article",
-            value: "articleId",
-            published: false,
-            time: "2022/1/10 10:57",
-          },
-          {
-            type: "post",
-            value: "postId",
-            published: false,
-            time: "2022/1/10 10:57",
-            child: [
-              {
-                type: "post",
-                value: "postId",
-                published: false,
-                time: "2022/1/10 10:57",
-              },
-            ],
-          },
-          {
-            type: "url",
-            value: "https://www.google.com",
-            published: false,
-            time: "2022/1/10 10:57",
-          },
-        ],
-      },
-      {
-        type: "article",
-        value: "articleId",
-        published: false,
-        time: "2022/1/10 10:57",
-        child: [
-          {
-            type: "article",
-            value: "articleId",
-            published: false,
-            time: "2022/1/10 10:57",
-          },
-        ],
-      },
-    ],
+    data: [],
     showMoveCharter: false,
     more: false,
     bid: "",
@@ -203,7 +154,6 @@ export default {
     parentData: [],
     moveDialogData: [],
   }),
-  created() {},
   computed: {
     navList() {
       const { book, bid } = this;
@@ -229,14 +179,8 @@ export default {
         }
       }
       res(this.bookList);
-
       return this.bookList;
     },
-  },
-  provide() {
-    return {
-      datas: this.data,
-    };
   },
   mounted() {
     EventBus.$on("addGroup", (data) => {

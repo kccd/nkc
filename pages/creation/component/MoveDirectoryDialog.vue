@@ -32,7 +32,6 @@ export default {
   },
   props: {
     bid: String,
-    changeStatus: Function,
   },
   data() {
     return {
@@ -55,7 +54,6 @@ export default {
       seekParent: [],
     };
   },
-  created() {},
   mounted() {
     EventBus.$on("showIndication", (childIndex, status, data) => {
       this.seekResult = this.dialogData;
@@ -157,7 +155,6 @@ export default {
   destroyed() {
     EventBus.$off();
   },
-  updated() {},
   methods: {
     moveDialog(data, childIndex, isOpen, bid, type, publishType) {
       // 被移动文章的数据

@@ -261,13 +261,10 @@ export default {
     clickArticleTitle(data, childIndex) {
       const { bid } = this;
       const aid = data._id;
-      // 修改分组名称吗
-      console.log(data);
       if (data.type === "text") {
-        // 修改url 还是跳转url
+        this.editor(data, childIndex)
       } else if (data.type === "url") {
         window.open(data.url);
-        // 修改post 还是跳转
       } else if (data.type === "post") {
         window.open(data.url);
       } else {
@@ -327,21 +324,6 @@ export default {
       childIndex = childIndex.split(",");
       EventBus.$emit("moveDirectory", data, childIndex, isOpen, bid);
     },
-
-    // 新建分组使进行监听，如果点击除自己外的元素，就进行添加数据
-    listener(element, data) {
-      const handler = (e) => {
-        // 采用了 v-if 来显示 新增分组元素 ，原因是 如果 v-show ,页面将有多个元素有相同 ID
-        const contentWrap = document.getElementById(element);
-        if (contentWrap) {
-          if (!contentWrap.contains(e.target)) {
-            document.removeEventListener("click", handler);
-            this.addGroupDatas(data);
-          }
-        }
-      };
-      document.addEventListener("click", handler);
-    },
     navToPage(name, query = {}, params = {}) {
       this.$router.push({
         name,
@@ -353,9 +335,7 @@ export default {
 };
 </script>
 <style scoped lang='less'>
-.openArea {
-  // background: rgb(51, 80, 247);
-}
+
 .version{
   font-size: 1rem;
 }
@@ -366,9 +346,6 @@ export default {
 .child_tree {
   margin-bottom: 5px;
 }
-// .bg{
-//   background: #87acc2;
-// }
 .move_level {
   display: flex;
   justify-content: flex-end;
