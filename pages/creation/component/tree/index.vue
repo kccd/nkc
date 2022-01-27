@@ -1,6 +1,7 @@
 <template>
   <div class="child_tree" :class="{ disable: data.isMove && !operations, bg:operations }">
     <div
+      :title='map[data.type]+ "：" + data.title'
       class="child_tree_row col-xs-12.col-md-12"
       :class="{ active: isShowOperation }"
       @mouseenter="operations && mouseEnter(...arguments)"
@@ -31,6 +32,7 @@
       >
       <span
         v-else
+        :title='data.title'
         class="fill openArea"
         :class="{
           ellipsis: data.showIndication && !data.isMove,
@@ -132,6 +134,12 @@ export default {
   },
   data() {
     return {
+      map:{
+        article:'文章',
+        url:'链接',
+        text:'分组',
+        post:'post',
+      },
       // jurisdiction: "tourist",
       // jurisdiction: "author",
       jurisdiction: "admin",
@@ -145,6 +153,7 @@ export default {
       EventBus.$emit("levelSelect", this.levelSelect);
     },
   },
+
   methods: {
     editor(data, childIndex) {
       if (data.type !== "article") {

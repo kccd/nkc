@@ -114,7 +114,6 @@ export default {
   },
   mounted() {
     EventBus.$on("addDialog", ({bid, data, childIndex, title, type='add', level}) => {
-      console.log(childIndex)
       this.insertLevel=level
       this.dialogType=type
       this.title=title
