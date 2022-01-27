@@ -1067,6 +1067,21 @@ forumSchema.statics.getAllChildrenFid = async function(fid) {
 forumSchema.methods.getAllChildForumsId = async function() {
   return await client.smembersAsync(`forum:${this.fid}:allChildForumsId`);
 };
+/*
+* 获取专业下所有底层专业id
+* @return 专业id数组
+* */
+forumSchema.methods.getAllBottomLayerChildForumsId = async function() {
+  const forums = await this.getAllChildForums();
+  const forumsId = [];
+  for(const f of forums) {
+    const childForumsId = await f.getAllChildForumsId();
+    if(childForumsId.length !== 0) continue;
+    forumsId.push(f.fid);
+  }
+  if(forumsId.length === 0) forumsId.push(this.fid);
+  return forumsId;
+};
 
 forumSchema.statics.getAllChildForumsIdByFid = async function(fid) {
   return await client.smembersAsync(`forum:${fid}:allChildForumsId`);
@@ -1082,7 +1097,7 @@ forumSchema.statics.getAllChildForumsIdByFid = async function(fid) {
 forumSchema.methods.getAllChildForums = async function() {
   const ForumModel = mongoose.model('forums');
   const allChildForumsId = await this.getAllChildForumsId();
-  const forums = await ForumModel.find({fid: {$in: allChildForumsId}});
+  const forums = await ForumModel.find({fid: {$in: allChildForumsId}}).sort({order: 1});
   return this.allChildForums = forums;
 }
 /*

@@ -210,6 +210,37 @@ function removeLastThreadPanel() {
   threadPanel.eq(length - 1).remove();
 }
 
+const formSearchApp = new Vue({
+  el: "#forumSearch",
+  data: {
+    content: '',
+    show: false,
+  },
+  methods: {
+    switchForumSearch() {
+      this.show = !this.show;
+    },
+    search() {
+      const {content} = this;
+      return Promise.resolve()
+        .then(() => {
+          if(content.length === 0) throw new Error("搜索内容不能为空");
+          return nkcAPI(`/f/${fid}/child?type=all`, 'GET')
+        })
+        .then((res) => {
+          const fid = res.forumsId;
+          const c = window.btoa(encodeURIComponent(content));
+          const d = window.btoa(encodeURIComponent(JSON.stringify({fid})));
+          const form = 'complex';
+          NKC.methods.visitUrl(`/search?c=${c}&d=${d}&form=${form}`, true);
+        })
+        .catch(err => {
+          screenTopWarning(err.message || err.error || err)
+        })
+    }
+  }
+});
+
 Object.assign(window, {
   threadUrlSwitchKey,
   modifyThreadUrl,
@@ -223,4 +254,5 @@ Object.assign(window, {
   createMouseEvents,
   setThreadListNewCount,
   removeLastThreadPanel,
+  formSearchApp,
 });
