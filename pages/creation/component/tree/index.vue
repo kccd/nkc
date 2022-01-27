@@ -3,8 +3,8 @@
     <div
       class="child_tree_row col-xs-12.col-md-12"
       :class="{ active: isShowOperation }"
-      @mouseenter="operations && mouseEnter()"
-      @mouseleave="operations && mouseEnter()"
+      @mouseenter="operations && mouseEnter(...arguments)"
+      @mouseleave="operations && mouseEnter(...arguments)"
     >
       <span :style="{ width: level * 24 + 'px' }"></span>
       <span
@@ -47,7 +47,7 @@
         <div class="operations" v-show="isShowOperation">
           <span v-if="jurisdiction === 'admin'" @click.stop="add(data, childIndex)">新建子级</span>
           <span v-if="jurisdiction === 'admin'" @click.stop="editor(data, childIndex)">修改</span>
-          <span @click.stop="moveDirectory(data, childIndex, data.isOpen, bid)"
+          <span @click.stop="moveDirectory(data, childIndex, bid)"
             >移动</span
           >
           <span v-if="jurisdiction === 'admin'" @click.stop="deleteDirectory(data, childIndex)">删除</span>
@@ -87,22 +87,6 @@
     >
       <span class="glyphicon glyphicon-tag change_glyphicon"></span>
       <span class="line"></span>
-    </div>
-    <div
-      class="add_group"
-      v-if="isShowAddGroup"
-      :style="{ marginLeft: (level + 1) * 24 + 'px' }"
-    >
-      <p id="content_wrap">
-        <span class="seat"></span>
-        <input
-          class="add-group-input"
-          id="add-group-input"
-          type="text"
-          v-model="addGroupDefaultName"
-          v-focus
-        />
-      </p>
     </div>
     <template v-for="(child, j) in data.child">
       <Tree
@@ -153,23 +137,9 @@ export default {
       jurisdiction: "admin",
       levelSelect: "childLevel",
       isShowOperation: false,
-      isShowAddGroup: false,
-      addGroupDefaultName: "新建分组",
       showIndication: false,
-      prevParennNode: "",
     };
   },
-  directives: {
-    focus: {
-      inserted: function (el) {
-        el.focus();
-      },
-    },
-  },
-  computed: {},
-  created() {},
-  mounted() {},
-  updated() {},
   watch: {
     levelSelect() {
       EventBus.$emit("levelSelect", this.levelSelect);
@@ -271,8 +241,15 @@ export default {
         this.navToPage("articleEditor", { bid, aid, data, childIndex });
       }
     },
-    mouseEnter() {
+    mouseEnter(event) {
       this.isShowOperation = !this.isShowOperation;
+      if(this.isShowOperation){
+        this.$nextTick(()=>{
+          event.target.children[3].classList.add('title2')
+        })
+      }else{
+          event.target.children[3].classList.remove('title2')
+      }
     },
     add(data, childIndex) {
       childIndex = childIndex.split(",");
@@ -283,7 +260,6 @@ export default {
         title: "新建子项",
       });
     },
-    // 和
     addDocument(data, i, bid) {
       // data.push({
       //   type: "article",
@@ -302,9 +278,9 @@ export default {
         EventBus.$emit("deleteDirectory", data, childIndex);
       });
     },
-    moveDirectory(data, childIndex, isOpen, bid) {
+    moveDirectory(data, childIndex, bid) {
       childIndex = childIndex.split(",");
-      EventBus.$emit("moveDirectory", data, childIndex, isOpen, bid);
+      EventBus.$emit("moveDirectory", data, childIndex, bid);
     },
     navToPage(name, query = {}, params = {}) {
       this.$router.push({
@@ -407,23 +383,44 @@ export default {
   align-items: baseline;
   // justify-content: space-between;
   .click_block {
+    max-width: 10rem;
     flex: auto;
     opacity: 0;
     height: 15px;
   }
   .title {
+    // transition:all 1s ease-out;
     background: #b1afaf;
     border-radius: 3px;
     // text-align: center;
     color: rgb(248, 248, 248);
     flex: auto;
-    max-width: 6rem;
+    @media (max-width: 500px) {
+        max-width: 12rem;
+    }
+    @media (max-width: 400px) {
+        max-width: 7rem;
+    }
+    max-width: 20rem;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     cursor: pointer;
     margin-left: 5px;
   }
+  // .title2{
+  //   background: #b1afaf;
+  //   border-radius: 3px;
+  //   // text-align: center;
+  //   color: rgb(248, 248, 248);
+  //   flex: auto;
+  //   max-width: 6rem !important;
+  //   overflow: hidden;
+  //   white-space: nowrap;
+  //   text-overflow: ellipsis;
+  //   cursor: pointer;
+  //   margin-left: 5px;
+  // }
   .fill {
     width: 100%;
     position: relative;

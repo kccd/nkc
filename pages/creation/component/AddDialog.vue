@@ -24,7 +24,6 @@
           input.add-group-input.select.query-input(
           type="text",
           v-model="urlTitle",
-          v-focus
         )
         p.url-address
           span 地址:
@@ -34,14 +33,12 @@
           input.add-group-input.select.query-input(
           type="text",
           v-model="inputValue",
-          v-focus
         )
       .add-group(v-show="selectType === 'text'")
         span 分组名:
         input.select.query-input(
           type="text",
           v-model="inputValue",
-          v-focus
         )
     .split-line
     .select-post(v-show="selectType === 'post'")
@@ -87,9 +84,6 @@ export default {
   data: () => ({
     show: true,
     title: "",
-    info: "",
-    quote: "",
-    data: {},
     treeData: [],
     selectType: "text",
     searchContent: "",
@@ -114,12 +108,13 @@ export default {
       } else if (this.selectType === "url") {
         this.inputValue = "www.kechuang.org";
       } else if (this.selectType === "text") {
-        this.inputValue = "默认新建分组名";
+        this.inputValue = '默认分组';
       }
     },
   },
   mounted() {
-    EventBus.$on("addDialog", ({bid, data, childIndex,title,type='add', level}) => {
+    EventBus.$on("addDialog", ({bid, data, childIndex, title, type='add', level}) => {
+      console.log(childIndex)
       this.insertLevel=level
       this.dialogType=type
       this.title=title
@@ -173,7 +168,6 @@ export default {
   },
   methods: {
     selectPost(data){
-      console.log(data)
       const {firstPost}=data
       this.selectPostData={
         title:firstPost.t,
@@ -251,35 +245,9 @@ export default {
       }
       EventBus.$emit('addConfirm',{res:this.addResult, type:this.type, data:this.insertData, dialogType:this.dialogType, level:this.insertLevel})
     },
-    pickedFile: function (index) {
-      var dom = this.$refs["input" + index][0];
-      this.data[index].value = dom.files[0];
-    },
-    open(callback, options) {
-      this.callback = callback;
-      this.data = options.data;
-      this.quote = options.quote;
-      this.title = options.title;
-      this.info = options.info || "";
-      this.draggableElement.show();
-      this.show = true;
-    },
     close() {
       this.draggableElement.hide();
       this.show = false;
-      setTimeout(function () {
-        this.data = {};
-      }, 500);
-    },
-    findPid(data,id){
-
-    }
-  },
-  directives: {
-    focus: {
-      bind: function (el) {
-        el.focus();
-      },
     },
   },
   destroyed(){

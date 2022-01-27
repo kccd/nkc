@@ -37,8 +37,6 @@ export default {
     return {
       show: false,
       title: "请选择移动位置",
-      info: "",
-      quote: "",
       dialogData: [],
       moveData: {},
       moveIndex: [],
@@ -82,10 +80,8 @@ export default {
       async (
         msg,
         childIndex,
-        isOpen,
         bid,
         type = "move",
-        publishType = "publish"
       ) => {
         this.dialogtype = type;
         await this.getBook(bid);
@@ -108,7 +104,6 @@ export default {
           this.$set(this.seekResult, "isMove", true);
           if (childIndex.length > 1) {
             let parnetPosition = childIndex.length ;
-            console.log(childIndex)
             const self = this;
             function isOPen(length) {
               self.seekResult = self.dialogData;
@@ -131,10 +126,9 @@ export default {
           }
 
           this.moveIndex = childIndex;
-          //发布没有给子元素 所有需要找到
+          //发布需要带上所有子元素进行更新
           if (type === "choice") {
             this.find(this.dialogData, msg);
-            // console.log(this.publishInfo,'publishInfo')
             msg.child = this.publishInfo.self?.child || [];
           }
         } else {
@@ -146,7 +140,6 @@ export default {
         }
         this.moveData = msg;
         this.draggableElement.show();
-        // 树结构 用的v-if
         this.showTree = true;
       }
     );
@@ -156,16 +149,13 @@ export default {
     EventBus.$off();
   },
   methods: {
-    moveDialog(data, childIndex, isOpen, bid, type, publishType) {
-      // 被移动文章的数据
+    moveDialog(data, childIndex, isOpen, bid, type) {
       EventBus.$emit(
         "moveDirectory",
         data,
         childIndex,
-        isOpen,
         bid,
         type,
-        publishType
       );
     },
     changeChild(data, key, value) {
@@ -240,13 +230,11 @@ export default {
       for (let key in data) {
         const obj = data[key];
         if (obj.id === item.id) {
-          // return {data,i};
           this.publishInfo = {
             currentIndex: key,
             parent: data,
             self: obj,
           };
-          console.log(1);
           return;
         }
         if (data.child && data.child.length) {
@@ -428,15 +416,6 @@ export default {
     cancel() {
       setTimeout(this.close, 200);
     },
-    open(callback, options) {
-      this.callback = callback;
-      this.dialogData = options.dialogData;
-      this.quote = options.quote;
-      this.title = options.title;
-      this.info = options.info || "";
-      this.draggableElement.show();
-      this.show = true;
-    },
     close() {
       this.draggableElement.hide();
       this.show = false;
@@ -449,9 +428,6 @@ export default {
         ["isMove", "isOpen", "childrenDisable", "showIndication"],
         "reset"
       );
-      setTimeout(function () {
-        this.dialogData = {};
-      }, 200);
     },
   },
 };

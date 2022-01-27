@@ -215,26 +215,6 @@ schema.methods.newExtendArticlesById = async function (articlesId, {
       uid,
     } = article;
     const articleObj = articlesObj[_id];
-    // preview 需要拿到最新编辑数据。根据 sid 进行查找，可能会出现多条 ，根据更改时间找到最新一条
-    // let latestEditorResult;
-    // if (latestTitle) {
-    //   const documents = await DocumentModel.find({
-    //     sid: _id
-    //   });
-    //   let time
-    //   let latestEditor;
-    //   for (const obj of documents) {
-    //     if (!time) {
-    //       time = obj.tlm;
-    //       latestEditor = obj
-    //     } else {
-    //       const objTimeToStr = obj.tlm.toString()
-    //       const timeToStr = time.toString()
-    //       new Date(objTimeToStr).getTime() > new Date(timeToStr).getTime() && (latestEditor = obj) && (time = obj.tlm)
-    //     }
-    //   }
-    //   latestEditorResult = latestEditor
-    // }
     if (!articleObj) continue;
     const betaDocument = articlesObj[_id].beta;
     const stableDocument = articlesObj[_id].stable;
@@ -264,6 +244,7 @@ schema.methods.newExtendArticlesById = async function (articlesId, {
       function find(data) {
         for (let i in data) {
           const item = data[i]
+          if(!item) continue
           if (item.id === result._id) {
             for (const key in result) {
               if (Object.hasOwnProperty.call(result, key)) {
@@ -290,10 +271,10 @@ schema.methods.getList = async function (options = {
   const articlesId = [];
   const postsId = [];
   const articleObj = {};
-  const postObj = {};
   function find(list) {
     for (let i = 0; i < list.length; i++) {
       const item = list[i];
+      if(!item) continue
       if (item.type === 'article' && item.id) {
           articlesId.push(item.id);
           articleObj[item.type + item.id] = item;

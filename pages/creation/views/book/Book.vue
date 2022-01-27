@@ -219,6 +219,7 @@ export default {
         }
         if (dialogType === "editor") {
           this.seekResult = this.bookList;
+          console.log(obj,insertData)
           for (let i = 0; i < insertData.index.length - 1; i++) {
             const position = insertData.index[i];
             this.seekChild({
@@ -292,7 +293,7 @@ export default {
         this.seekResult.child.splice(childIndex[childIndex.length - 1], 1);
       }
       let url = `/creation/book/${this.bid}/list/delete`;
-      await nkcAPI(url, "delete", {
+      await nkcAPI(url, "post", {
         data: this.bookList,
         bid: this.bid,
       }).then(async (data) => {

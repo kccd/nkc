@@ -94,7 +94,6 @@ router
         });
       }
       changeChild(bookList);
-      // if (fields.articleType === "article") {
         article = await db.ArticleModel.createArticle({
           uid: state.uid,
           title,
@@ -106,15 +105,7 @@ router
           { _id: bookId },
           { $set: { list: bookList }}
         );
-      // } else {
-      //   const res = await db.BookModel.updateOne(
-      //     { _id: bookId },
-      //     { $set: { list: bookList }}
-      //   );
-      //   return;
-      // }
     } else {
-      // if (fields.articleType === "article") {
         function find(data,item){
           if(data){
             for (const obj of data) {
@@ -132,7 +123,6 @@ router
           { _id: bookId },
           { $set: { list: bookList }}
         );
-      // }
       article = await db.ArticleModel.findOnly({
         _id: articleId
       });

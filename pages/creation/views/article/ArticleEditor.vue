@@ -93,9 +93,9 @@
       this.initData();
     },
     methods: {
-      moveDialog(data, childIndex, isOpen, bid, type) {
+      moveDialog(data, childIndex, bid, type) {
         childIndex=childIndex.split(',')
-        EventBus.$emit("moveDirectory", data, childIndex, isOpen, bid, type,);
+        EventBus.$emit("moveDirectory", data, childIndex, bid, type);
       },
       documentPreview(){
         const {doucmentId}=this
@@ -226,7 +226,7 @@
       // 文章编辑过后默认添加在列表最后 点击发布选中最后一项  
       let publishType;
       let  childIndex=this.moveIndex?.split(',') || []
-      this.$refs.moveDialog.moveDialog(article, childIndex, null, this.bookId, 'choice', publishType,)
+      this.$refs.moveDialog.moveDialog(article, childIndex, this.bookId, 'choice')
       },
       resetCoverFile(cover) {
         this.cover = cover;

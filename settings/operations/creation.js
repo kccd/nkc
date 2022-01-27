@@ -44,13 +44,13 @@ module.exports = {
       GET: 'creationCenter',
       list:{
         delete:{
-            DELETE:'creationCenterDeleteList'
+          POST:'creationCenterDeleteList'
         },
         move:{
-            POST:'creationCenterMoveList'
+          POST:'creationCenterMoveList'
         },
         add:{
-            POST:'creationCenterAddList'
+          POST:'creationCenterAddList'
         }
       },
       PARAMETER: {

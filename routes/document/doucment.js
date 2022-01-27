@@ -4,8 +4,8 @@ router
   ctx.template='document/preview/document.pug'
   const {db, data, params, state} = ctx;
   const {did} = params
-  const document = await db.DocumentModel.findOne({did: did, uid: state.uid}).sort({tlm: -1});
-  data.document = document
+  const document = await db.DocumentModel.find({did: did, uid: state.uid}).sort({tlm: -1}).skip(0).limit(1);
+  data.document = document[0]
   await next()
 })
 .get('/history', async (ctx, next)=>{
