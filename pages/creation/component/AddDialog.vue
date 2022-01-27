@@ -298,17 +298,6 @@ export default {
   // margin-right: 3px;
 }
 .post-list-paging{
-  // @media (max-width : 500px){
-  //   height:30px;
-  //   span{
-  //     transition: all .4s;
-  //     cursor: pointer;
-  //     margin-right: 10px;
-  //     padding: 4px 10px;
-  //     border:1px solid rgb(219, 217, 217);
-  //     border-radius: 3px;
-  //   }
-  // };
   margin-top:10px;
   background: rgb(173, 217, 245);
   height: 20px;
@@ -432,6 +421,10 @@ export default {
         align-items: baseline;
         margin-top: 5px;
         .list-container {
+          @media (max-height : 600px){
+            height: 28rem;
+
+          };
           position: relative;
           border: 1px rgba(218, 216, 216, 0.514) solid;
           height: 38rem;
