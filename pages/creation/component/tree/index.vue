@@ -156,6 +156,7 @@ export default {
 
   methods: {
     editor(data, childIndex) {
+      childIndex = childIndex.split(',')
       if (data.type !== "article") {
         // 传入 bid 修改的数据 修改数据的坐标 对话框标题 对话框类型
         EventBus.$emit("addDialog", {
