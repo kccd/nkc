@@ -149,7 +149,7 @@ export default {
     EventBus.$off();
   },
   methods: {
-    moveDialog(data, childIndex, isOpen, bid, type) {
+    moveDialog(data, childIndex, bid, type) {
       EventBus.$emit(
         "moveDirectory",
         data,

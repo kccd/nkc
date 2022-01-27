@@ -224,7 +224,6 @@
         child:[]
       }
       // 文章编辑过后默认添加在列表最后 点击发布选中最后一项  
-      let publishType;
       let  childIndex=this.moveIndex?.split(',') || []
       this.$refs.moveDialog.moveDialog(article, childIndex, this.bookId, 'choice')
       },
