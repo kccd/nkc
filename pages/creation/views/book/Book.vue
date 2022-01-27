@@ -10,7 +10,7 @@
         .creation-center-book-description {{ book.description }}
         .creation-center-book-list
           Tree(:data="extendedData", :bid="bid")
-          button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
+          button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm.mt(
           @click="add()"
         ) 新建目录
         button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
@@ -24,6 +24,9 @@
 </template>
 
 <style lang="less" scoped>
+.mt{
+  margin-top: 10px;
+}
 .articleTitl {
   cursor: pointer;
   color: black !important;

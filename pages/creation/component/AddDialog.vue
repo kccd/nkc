@@ -206,7 +206,7 @@ export default {
         this.postList=false
       }
       this.$nextTick(() => {
-      if (this.$refs.listHeight.clientHeight < 480) {
+      if (this.$refs.listHeight.clientHeight < 444) {
         this.$refs.listContainer.setAttribute(
           "class",
           "list-container-noScroll"
@@ -289,6 +289,7 @@ export default {
   border: 1px solid #d9d9d9;
 }
 .query-input {
+  width:12rem;
   outline: none;
 }
 .postId {
@@ -297,6 +298,17 @@ export default {
   // margin-right: 3px;
 }
 .post-list-paging{
+  // @media (max-width : 500px){
+  //   height:30px;
+  //   span{
+  //     transition: all .4s;
+  //     cursor: pointer;
+  //     margin-right: 10px;
+  //     padding: 4px 10px;
+  //     border:1px solid rgb(219, 217, 217);
+  //     border-radius: 3px;
+  //   }
+  // };
   margin-top:10px;
   background: rgb(173, 217, 245);
   height: 20px;
@@ -365,17 +377,17 @@ export default {
     padding: 0 1rem;
     .select-type {
       // margin-top: 10px;
-      width: 27rem;
+      width:100%;
       margin: 10px auto;
 
       .add-url{
+        width:100%;
         margin-top: 5px;
         .url-title{
           display: flex;
           align-items: center;
         }
         .url-address{
-          
           margin-top:5px;
           display: flex;
           align-items: center;
@@ -387,7 +399,6 @@ export default {
             border: 1px solid #d9d9d9;
           }
           .add-group-input {
-            flex: auto;
             background: white;
           }
         }
@@ -423,7 +434,7 @@ export default {
         .list-container {
           position: relative;
           border: 1px rgba(218, 216, 216, 0.514) solid;
-          height: 40rem;
+          height: 38rem;
           width:100%;
           overflow-y: scroll;
           .list-height{
@@ -439,7 +450,7 @@ export default {
                 margin-right: 10px;
               }
               transition: all .3s ;
-              padding: 1rem;
+              padding: .5rem;
               background-color: #f6f2ee;
               border-radius: 3px;
             }
@@ -448,7 +459,7 @@ export default {
         .list-container-noScroll {
           width: 100%;
           border: 1px rgba(218, 216, 216, 0.514) solid;
-          height: 40rem;
+          height: 38rem;
           .list-height{
             cursor: pointer;
             .post-list-item:hover{
@@ -482,6 +493,9 @@ export default {
   }
 }
 ::-webkit-scrollbar {
+  @media (max-width: 500px) {
+       width: 1px;
+  }
   width: 10px;
   height: 1px;
   background: #ededed;
