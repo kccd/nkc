@@ -358,6 +358,7 @@ export default {
   }
 }
 .icon {
+  margin-right: 5px;
   text-align: right;
   width: 0;
   height: 0;
@@ -366,7 +367,9 @@ export default {
   border-bottom: 5px solid transparent;
   transition: all 0.3s;
 }
+// 没有 图标时进行占位
 .seat {
+  margin-right: 5px;
   display: inline-block;
   width: 10px;
   height: 10px;
