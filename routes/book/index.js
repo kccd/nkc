@@ -1,14 +1,18 @@
 const router = require('koa-router')();
 router
   .get('/:bid', async (ctx, next) => {
-    //获取图书
+    //获取图书章节列表以及单独章节
     const {query, params, data, db, nkcModules, state} = ctx;
     const {bid} = params;
     const {aid} = query;
     const book = await db.BookModel.getBookByBid(bid);
+    //获取图书读取权限
     await book.checkReadBookPermission(state.uid);
+    //获取当前用户对于该图书的身份权限,是否具有图书管理权限
+    const bookPermission = await book.getBookPermissionForUser(state.uid);
     data.book = await book.getBaseInfo();
-    data.list = await book.getList();
+    data.list = await book.getList({bookPermission});
+    data.bookPermission = bookPermission;
     if(aid) {
       data.bookContent = await book.getContentById({
         aid,

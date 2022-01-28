@@ -92,7 +92,7 @@ schema.methods.modifyArticle = async function(props) {
     coverFile,
     tlm: toc,
   });
-  this.updateOne({
+  await this.updateOne({
     $set: {
       tlm: toc
     }

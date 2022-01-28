@@ -87,7 +87,7 @@ const schema = new mongoose.Schema({
   collection: 'filterLogs'
 });
 schema.methods.saveErrorInfo = async function(errorInfo = '') {
-  this.updateOne({
+  await this.updateOne({
     $set: {
       'result.errorInfo': errorInfo.toString()
     }

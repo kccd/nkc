@@ -523,5 +523,15 @@ module.exports = {
       content: "您的标题为[url=threadURL(threadTitle)]的文章由于[text=reason]等原因，已被移动到[text=forumsName]。",
       type: "moveThread"
     },
+    {
+      parameters: [
+        "reviewLink",
+        "name",
+        "username",
+        "userURL"
+      ],
+      content: "用户[url=userURL(username)]邀请您一起创作图书[text=name], 点击[url=reviewLink(这里)]前往查看邀请",
+      type: "bookInvitation",
+    }
   ]
 };

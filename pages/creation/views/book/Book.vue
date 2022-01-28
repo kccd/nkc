@@ -10,31 +10,20 @@
       .creation-center-author
         user-group(:users="bookMembers")
       .creation-center-book-list
-        .creation-center-book-list-item(v-for="l in bookList")
+        .creation-center-book-list-item(v-for="l in bookList"
+          :data-status="l.status"
+          :data-type="l.type"
+          )
           .creation-center-book-list-item-name(@click="clickArticleTitle(l)")
             span(v-if="!l.published") [未发布]
             span(v-else-if="l.hasBeta") [编辑中]
+            span(v-else-if="l.status === 'unknown'") [审核中]
+            span(v-else-if="l.status === 'faulty'") (已被退修，请作者修改)
             | {{l.title}}
           .creation-center-book-list-item-time {{l.time}}
       button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('articleEditor', {bid})") 撰写文章
       a.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(:href="getUrl('book', bid)" target="_blank") 阅读图书
       button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('bookEditor', {bid})") 设置
-    .row.m-b-3(v-if="book")
-      .col-xs-12.col-md-6.col-md-offset-3
-        .creation-center-book-container
-          .creation-center-book-cover
-            img(:src="book.coverUrl")
-          .creation-center-book-name {{book.name}}
-          .creation-center-book-description {{book.description}}
-          .creation-center-book-list
-            .creation-center-book-list-item(v-for="l in bookList")
-              .creation-center-book-list-item-name(@click="clickArticleTitle(l)")
-                span(v-if="!l.published") [未发布]
-                span(v-else-if="l.hasBeta") [编辑中]
-                | {{l.title}}
-              .creation-center-book-list-item-time {{l.time}}
-          button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('articleEditor', {bid})") 撰写文章
-          button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(@click="navToPage('bookEditor', {bid})") 设置
 
 </template>
 
@@ -69,9 +58,23 @@
       .creation-center-book-list{
         margin-bottom: 2rem;
         .creation-center-book-list-item{
+          &[data-type='stable'][data-status='unknown'] {
+            background: #ffdcb2!important;
+          }
+          &[data-type='beta'][data-status='unknown'] {
+            background: #ccc!important;
+          }
+          &[data-type='stable'][data-status='faulty'] {
+            background: #ffdbd5!important;
+          }
+          &[data-type='stable'][data-status='disabled'] {
+            background: #bdbdbd!important;
+          }
           @itemHeight: 3rem;
           @timeWidth: 11rem;
+          margin-bottom: 0.2rem;
           padding-right: @timeWidth + 1rem;
+          padding-left: 0.2rem;
           line-height: @itemHeight;
           height: @itemHeight;
           overflow: hidden;
@@ -92,6 +95,7 @@
               color: @primary;
               margin-right: 0.5rem;
             }
+
           }
           .creation-center-book-list-item-time{
             width: @timeWidth;
@@ -150,11 +154,11 @@
       clickArticleTitle(l) {
         const {bid} = this;
         const aid = l._id;
-        if(!l.published) {
-          this.navToPage('articleEditor', {bid, aid})
-        } else {
-          this.navToPage('bookContent', {}, {bid, aid})
-        }
+        // if(!l.published) {
+        this.navToPage('articleEditor', {bid, aid})
+        // } else {
+        //   this.navToPage('bookContent', {}, {bid, aid})
+        // }
       },
       switchContent(id) {
         this.$router.push({

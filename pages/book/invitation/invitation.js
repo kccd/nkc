@@ -3,7 +3,7 @@ import {sweetError} from "../../lib/js/sweetAlert";
 import {visitUrl} from "../../lib/js/pageSwitch";
 import {getDataById} from "../../lib/js/dataConversion";
 const {bookId} = getDataById('data');
-window.modifyInvitationStatus = (agree) => {
+function modifyInvitationStatus(agree){
   nkcAPI(`/book/${bookId}/member/invitation`, 'POST', {
     agree: !!agree
   })
@@ -16,3 +16,7 @@ window.modifyInvitationStatus = (agree) => {
     })
     .catch(sweetError)
 }
+
+Object.assign(window, {
+  modifyInvitationStatus,
+});

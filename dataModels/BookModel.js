@@ -168,10 +168,14 @@ schema.methods.bindArticle = async function(articleId) {
   });
 }
 
-schema.methods.getList = async function() {
+schema.methods.getList = async function(props) {
+  const {bookPermission = ''} = props;
   const articles = await this.extendArticlesById(this.list);
   const articlesObj = {};
   for(const a of articles) {
+    if(!bookPermission) {
+      if(a.status !== 'normal') continue;
+    }
     articlesObj[a._id] = a;
   }
   const results = [];
@@ -183,9 +187,14 @@ schema.methods.getList = async function() {
   return results;
 }
 
+
+/*
+* 通过book.list拓展article
+* */
 schema.methods.extendArticlesById = async function(articlesId) {
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
+  const ReviewModel = mongoose.model('reviews');
   const {timeFormat, getUrl} = require('../nkcModules/tools');
   const articles = await ArticleModel.find({_id: {$in: articlesId}});
   const {article: documentSource} = await DocumentModel.getDocumentSources();
@@ -219,13 +228,20 @@ schema.methods.extendArticlesById = async function(articlesId) {
       continue;
     }
     const document = stableDocument || betaDocument;
-    const {title} = document;
+    const {title, status, type, _id: docId} = document;
+    let review;
+    if(status === 'faulty' || status === 'disabled') {
+      review = await ReviewModel.findOne({docId}).sort({toc: -1}).limit(1);
+    }
     const result = {
       _id,
       uid,
       published: !!stableDocument,
       hasBeta: !!betaDocument,
       title: title || '未填写标题',
+      status,
+      reason: review?review.reason:'',
+      type,
       url: getUrl('bookContent', this._id, _id),
       time: timeFormat(toc)
     };
@@ -234,6 +250,10 @@ schema.methods.extendArticlesById = async function(articlesId) {
   return results;
 }
 
+
+/*
+* 根据ID获取章节内容
+* */
 schema.methods.getContentById = async function(props) {
   const {aid, uid} = props;
   const {list} = this;
@@ -333,8 +353,10 @@ schema.statics.isModerator = async function(uid, book) {
 }
 
 schema.methods.addMembers = async function(membersId) {
+  const SettingModel = mongoose.model('settings');
+  const MessageModel = mongoose.model('messages');
   if(!membersId || membersId.length === 0) return;
-  const {members, uid} = this;
+  const {members, uid, _id: bid, name} = this;
   // 发送邀请消息
   const messages = [];
   for(const memberId of membersId) {
@@ -361,7 +383,20 @@ schema.methods.addMembers = async function(membersId) {
         status: 'pending'
       });
     }
+    messages.push({
+      _id: await SettingModel.operateSystemID("messages", 1),
+      r: memberId,
+      ty: "STU",
+      c: {
+        type: "bookInvitation",
+        bid,
+        name,
+        uid
+      }
+    });
   }
+  //给被邀请的用户发送消息
+  await MessageModel.sendMessagesToUser(messages);
   this.members = members;
   await this.updateOne({
     $set: {
@@ -472,6 +507,22 @@ schema.methods.checkReadBookPermission = async function(uid) {
   if(!hasReadBookPermission) {
     throwErr(403, `权限不足`);
   }
+}
+
+/*
+* 获取用户的图书权限
+* */
+schema.methods.getBookPermissionForUser = async function(uid) {
+  const book = this.toObject();
+  const {members, uid: bookUid} = book;
+  if(uid === bookUid) return 'admin';
+  for(const m of members) {
+    if(m._id === uid && m.status === 'resolved') {
+      return m.role;
+    }
+    continue;
+  }
+  return  null;
 }
 
 module.exports = mongoose.model('books', schema);

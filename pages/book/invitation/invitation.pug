@@ -29,7 +29,7 @@ block content
               a(href=data.bookData.bookUrl target="_blank")=data.bookData.name
               span 》&nbsp;的创作
             div
-              button.m-r-05.btn.btn-xs.btn-success(onclick="modifyInvitationStatus(true)") 接受邀请
-              button.btn.btn-xs.btn-danger(onclick="modifyInvitationStatus(false)") 拒绝
+              button.m-r-05.btn.btn-xs.btn-success(onclick='modifyInvitationStatus(true)') 接受邀请
+              button.btn.btn-xs.btn-danger(onclick='modifyInvitationStatus(false)') 拒绝
 block scripts
   +includeJS('/book/invitation/invitation.js')

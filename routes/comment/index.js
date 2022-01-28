@@ -4,9 +4,26 @@ router
     //获取该图书下的全部评论和用户编辑框中未发布的内容
     const {db, data, state, query, permission} = ctx;
     const {sid} = query;
+    const {user} = data;
     let comments = await db.CommentModel.find({sid, source: 'comment'}).sort({toc: 1});
     let comment = await db.CommentModel.findOne({uid: state.uid, source: 'comment'}).sort({toc: -1}).limit(1);
-    comments = await db.CommentModel.extendBookComments(comments);
+    const book = await db.BookModel.findOne({_id: sid});
+    //管理员权限
+    const permissions = {
+      reviewed: null,
+      disabled: null,
+    };
+    if(user) {
+      if(permission('review')) {
+        permissions.reviewed = true;
+      }
+      if(ctx.permission('movePostsToRecycle') || ctx.permission('movePostsToDraft')) {
+        permissions.disabled = true
+      }
+    }
+    //获取当前用户对该图书的权限
+    const bookPermission = await book.getBookPermissionForUser(state.uid);
+    comments = await db.CommentModel.extendBookComments({comments, uid: state.uid, permissions});
     let document;
     if(comment) {
       document = await db.DocumentModel.findOne({did: comment.did, type: 'beta'});
@@ -17,6 +34,9 @@ router
     } else {
       comment = '';
     }
+
+
+    data.permissions = permissions;
     data.comment = comment;
     data.comments = comments;
     await next();
@@ -29,7 +49,7 @@ router
     if(!comment) ctx.throw(400, '未找到该评论，请刷新后重试');
     const document = await db.DocumentModel.findOne({did: comment.did, type: 'stable', status: 'normal'});
     if(!document) ctx.throw(400, '未找到该评论，请刷新后重试');
-    comment = await db.CommentModel.extendBookComments([comment]);
+    comment = await db.CommentModel.extendBookComments({comments: [comment]});
     const {order, _id: commentId, uid, user, did, sid, source} = comment[0];
     data.quote = {
       _id: commentId,
@@ -97,14 +117,33 @@ router
   })
   .post('/:_id/disabled', async (ctx, next) => {
     //评论退修或禁用
-    const {db, data, params, permission, body} = ctx;
+    const {db, data, params, permission, body, state} = ctx;
     const {_id} = params;
     const {type: status, remindUser, violation, reason} = body;
+    console.log('status', status);
     if(!['faulty', 'disabled'].includes(status)) ctx.throw(401, '错误类型');
     if(!permission('disabledComment')) ctx.throw(403, '权限不足');
     const comment = await db.CommentModel.findOne({_id});
     if(!comment) ctx.throw(401, '未找到评论， 请刷新后重试！');
-    const document = await db.DocumentModel.findOne({did: comment.did, type: 'stable', status: 'normal'});
+    const document = await db.DocumentModel.findOne({did: comment.did, type: 'stable'});
+    if(!document) return ctx.throw(400, '未找到评论');
+    if(status === 'faulty' && document.status === 'faulty') return ctx.throw(401, '评论已被退修');
+    if(status === 'disabled' && document.status === 'disabled') return ctx.throw(401, '评论已被禁用');
+    //查找当前document的审核记录
+    let review = await db.ReviewModel.findOne({docId: document._id}).sort({toc: -1}).limit(1);
+    //如果不存在审核记录就创建一条记录
+    if(!review) {
+      review = await ReviewModel({
+        _id: await db.SettingModel.operateSystemID('reviews', 1),
+        type: status === 'faulty'?'returnDocument':'disabledDocument',
+        reason,
+        docId: document._id,
+        uid: comment.uid,
+      });
+      await review.save();
+    }
+    //更新审核记录的处理人
+    await review.updateReview({uid: state.uid, type: status === 'faulty'?'returnDocument':'disabledDocument', reason});
     const targetUser = await db.UserModel.findOne({uid: document.uid});
     await document.updateOne({
       $set: {

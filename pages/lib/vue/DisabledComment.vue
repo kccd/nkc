@@ -124,6 +124,7 @@ export default {
     },
     submit: function() {
       if(!this.commentId) return;
+      if(!this.reason) return screenTopWarning('请输入原因');
       const self = this;
       nkcAPI(`/comment/${this.commentId}/disabled`, 'POST', {
         type: self.type,

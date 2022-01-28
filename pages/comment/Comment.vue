@@ -24,6 +24,7 @@
           div.skeleton
           div.skeleton
           div.skeleton
+
     .comment-header 评论列表 {{source}} {{sid}}
     .comment-list(v-if="loading")
       .loading(v-if="loading")
@@ -34,7 +35,24 @@
     .comment-list(v-else-if="comments.length === 0")
       .text-center.p-t-3.p-b-3 空空如也~
     .comment-list(v-else)
-      .comment-item(v-for="comment in comments" :data-cid="comment._id" data-show-comments="false")
+      .comment-item(v-for="comment in comments" :data-type="comment.type" :data-status="comment.status" :data-cid="comment._id" data-show-comments="false")
+        .single-post-header(v-if="comment.status === 'faulty'")
+          .reture 当前内容已被退回修改，请作者点击编辑按钮修改
+          span 原因：{{comment.reason}}
+        .single-post-header(v-if="comment.status === 'disabled'")
+          .disabled
+            span.m-r-05 内容已被屏蔽
+            a(@click="" v-if="") 点击解封
+        .single-post-header(v-if="comment.status === 'unknown'")
+          .review 内容待审核
+            span= "送审原因：" + reviewReason
+            div
+              | 通过请点击
+              button.btn.btn-xs.btn-default(@click="") 通过
+              | &nbsp;  按钮，不通过请点击
+              button.btn.btn-xs.btn-default(@click="") 退修或删除
+              | 按钮。
+              a(href=`/review` target="_blank") 待审核列表
         .comment-item-header
           .comment-item-avatar
             img(:src="comment.user.avatar")
@@ -82,6 +100,35 @@
       background-color: #c3b7a7;
       .comment-item-content {
         display: none;
+      }
+    }
+    &[data-type='stable'][data-status='unknown'] {
+      background: #ffdcb2!important;
+    }
+    &[data-type='beta'][data-status='unknown'] {
+      background: #ccc!important;
+    }
+    &[data-type='stable'][data-status='disabled'] {
+      background: #bdbdbd!important;
+    }
+    &[data-type='stable'][data-status='faulty'] {
+      background: #ffdbd5 !important;
+    }
+    .single-post-header{
+      text-align: center;
+      font-style: oblique;
+      button{
+        font-style: normal;
+      }
+      .return{
+        color: red;
+      }
+      .review{
+        color: red;
+      }
+      .disabled{
+        cursor: pointer;
+        color: #c70000;
       }
     }
     .comment-item-header{
@@ -223,6 +270,7 @@
       selfComment: '',
       ready: false,
       editors: {},
+      permissions: {},
     }),
     components: {
       "comment-editor": CommentEditor,
@@ -244,6 +292,7 @@
         .then(res => {
           self.comments = res.comments;
           self.selfComment = res.comment;
+          self.permissions = res.permissions;
           self.loading = false;
         })
         .catch(err => {
@@ -251,6 +300,9 @@
         })
       },
       quote(item) {
+        if(item.status === 'faulty' || item.status === 'disabled') return sweetError('无法引用已被退修或禁用的评论');
+        if(item.status === 'unknown') return sweetError('当前评论未审核');
+        if(item.type !== 'stable') return sweetError('评论未发布');
         this.$refs.commentEditor.changeQuote(item);
       },
       //关闭评论编辑器

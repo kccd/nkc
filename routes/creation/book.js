@@ -1,12 +1,14 @@
 const router = require('koa-router')();
 router
   .get('/:bid', async (ctx, next) => {
-    //获取book
-    const {data, params, db, nkcModules} = ctx;
+    //获取图书列表
+    const {data, params, db, nkcModules, state} = ctx;
     const {bid} = params;
     const {timeFormat, getUrl} = nkcModules.tools;
     const book = await db.BookModel.getBookByBid(bid);
-    data.bookList = await book.getList();
+    const bookPermission = await book.getBookPermissionForUser(state.uid);
+    if(!bookPermission) throwErr(400, '权限不足');
+    data.bookList = await book.getList({bookPermission});
     data.bookData = {
       _id: book._id,
       name: book.name,
@@ -19,6 +21,7 @@ router
     await next();
   })
   .post('/:bid/member', async (ctx, next) => {
+    //添加创作成员
     const {data, body, params, db} = ctx;
     const {bid} = params;
     const {membersId} = body;
@@ -28,6 +31,7 @@ router
     await next();
   })
   .del('/:bid/member', async (ctx, next) => {
+    //删除创作成员
     const {params, query, data, db} = ctx;
     const {bid} = params;
     const {uid} = query;
@@ -36,16 +40,16 @@ router
     data.bookMembers = await book.getAllMembers();
     await next();
   })
-  /*.get('/:bid/:id', async (ctx, next) => {
-    //获取 article
-    const {data, params, db, state} = ctx;
-    const book = await db.BookModel.findOnly({_id: params.bid});
-    data.bookArticle = await book.getContentById({aid: params.id, uid: state.uid});
-    data.bookList = await book.getList();
-    data.bookData = {
-      _id: book._id,
-      name: book.name,
-    };
-    await next();
-  })*/
+  // /*.get('/:bid/:id', async (ctx, next) => {
+  //   //获取 article
+  //   const {data, params, db, state} = ctx;
+  //   const book = await db.BookModel.findOnly({_id: params.bid});
+  //   data.bookArticle = await book.getContentById({aid: params.id, uid: state.uid});
+  //   data.bookList = await book.getList();
+  //   data.bookData = {
+  //     _id: book._id,
+  //     name: book.name,
+  //   };
+  //   await next();
+  // })*/
 module.exports = router;

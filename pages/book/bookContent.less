@@ -16,11 +16,24 @@ body{
   }
   .book-list{
     .book-list-item{
+      margin-bottom: 0.2rem;
+      &[data-type='stable'][data-status='unknown'] {
+        background: #ffdcb2!important;
+      }
+      &[data-type='beta'][data-status='unknown'] {
+        background: #ccc!important;
+      }
+      &[data-type='stable'][data-status='faulty'] {
+        background: #ffdbd5!important;
+      }
+      &[data-type='stable'][data-status='disabled'] {
+        background: #bdbdbd!important;
+      }
       display: block;
       font-size: 1.3rem;
       text-decoration: none;
       color: #333;
-      padding: 0.5rem 0;
+      padding: 0.5rem 0.2rem;
       &:hover{
         background-color: #f7f7f7;
       }

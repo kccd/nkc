@@ -695,7 +695,18 @@ messageSchema.statics.getParametersData = async (message) => {
       noticeContent: content,
       cTitle: cTitle,
     };
-  } else if(["newReview", "passReview"].includes(type)) {
+  } else if(["bookInvitation"].includes(type)) {
+    const {bid, name, uid} = message.c;
+    const user = await UserModel.findOnly({uid});
+    const {username} = user;
+    if(!bid) return null;
+    parameters = {
+      reviewLink: `/book/${bid}/member/invitation`,
+      name,
+      username,
+      userURL: `/u/${uid}`,
+    };
+  }else if(["newReview", "passReview"].includes(type)) {
     const {pid} = message.c;
     const post = await PostModel.findOne({pid});
     if(!post) return null;
@@ -872,6 +883,7 @@ messageSchema.statics.getParametersData = async (message) => {
       CRTargetDesc = library.name;
     } else if(complaintType === 'comment') {
       const comment = await CommentModel.findOne({_id: contentId});
+      if(!comment) return  null;
       CRType = "回复";
       // 投诉目标链接
       CRTarget = `/book/${comment.sid}`;
@@ -1626,6 +1638,21 @@ messageSchema.statics.mySystemInfoMessageFilter = async (uid, messages) => {
     }
     return false;
   });
+}
+
+/*
+* 批量发送消息给用户
+* */
+messageSchema.statics.sendMessagesToUser = async function(messages) {
+  const socket = require('../nkcModules/socket');
+  const MessageModel = mongoose.model('messages');
+  for(const message of messages){
+    if(!message) continue;
+    const m = await MessageModel(message);
+    if(!m) continue;
+    m.save();
+    await socket.sendMessageToUser(m._id);
+  }
 }
 
 const MessageModel = mongoose.model('messages', messageSchema);

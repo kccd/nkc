@@ -74,6 +74,22 @@ schema.virtual('docId')
     return this._docId = val
   });
 
+schema.virtual('status')
+  .get(function() {
+    return this._status;
+  })
+  .set(function(val) {
+    return this._status = val
+  });
+
+schema.virtual('type')
+  .get(function() {
+    return this._type;
+  })
+  .set(function(val) {
+    return this._type = val
+  });
+
 /*
 * 获取评论的有效来源
 * */
@@ -161,7 +177,7 @@ schema.methods.modifyComment = async function (props) {
     content,
     tlm
   });
-  this.updateOne({
+  await this.updateOne({
     $set: {
       tlm,
     }
@@ -170,7 +186,9 @@ schema.methods.modifyComment = async function (props) {
 /*
 * 拓展图书展示的comment
 * */
-schema.statics.extendBookComments = async (comments) => {
+schema.statics.extendBookComments = async (props) => {
+  const ReviewModel = mongoose.model('reviews');
+  const {comments, uid, permissions = {}} = props;
   const DocumentModel = mongoose.model('documents');
   const UserModel = mongoose.model('users');
   const {htmlToPlain} = require("../nkcModules/nkcRender");
@@ -190,14 +208,24 @@ schema.statics.extendBookComments = async (comments) => {
   for(const user of users) {
     usersObj[user.uid] = user;
   }
-  const documents = await DocumentModel.find({did: {$in: didArr}, type: 'stable', source: 'comment', status: 'normal'});
+  const documents = await DocumentModel.find({did: {$in: didArr}, source: 'comment'});
   for(const d of documents) {
-    if(d.status !== 'normal' || d.type !== 'stable') continue;
+    if(!permissions.reviewed) {
+      if((d.status !== 'normal' || d.type !== 'stable') && d.uid !== uid) continue;
+    }
+    let review;
+    if(d.status === 'faulty') {
+      review = await ReviewModel.findOne({docId: d._id}).sort({toc: -1}).limit(1);
+      console.log('review', review);
+    }
     quoteIdArr.push(d.quoteDid);
-    const {content, _id} = d;
+    const {content, _id, type, status} = d;
     documentObj[d.did] = {
       content,
-      _id
+      _id,
+      type,
+      status,
+      reason: review?review.reason:'',
     };
   }
   const quoteDocuments = await DocumentModel.find({_id: {$in: quoteIdArr}});
@@ -229,6 +257,9 @@ schema.statics.extendBookComments = async (comments) => {
     if(!documentObj[c.did]) continue;
     c.content = documentObj[c.did].content;
     c.docId =  documentObj[c.did]._id;
+    c.status = documentObj[c.did].status;
+    c.type = documentObj[c.did].type;
+    c.reason = documentObj[c.did]?documentObj[c.did].reason:'',
     c.user = {
       uid: user.uid,
       username: user.username,
