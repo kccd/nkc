@@ -125,7 +125,7 @@ export default {
         data,
         index:childIndex
       },
-      this.getTreeData(bid);
+      // this.getTreeData(bid);
       this.draggableElement.show();
       if(type === 'editor'){
         switch(data.type){
@@ -174,16 +174,16 @@ export default {
         child:[]
       }
     },
-    getTreeData(bid) {
-      let url = `/creation/book/${bid}`;
-      const self = this;
-      return nkcAPI(url, "GET")
-        .then((data) => {
-          self.book = data.bookData;
-          self.treeData = data.bookList;
-        })
-        .catch(sweetError);
-    },
+    // getTreeData(bid) {
+    //   let url = `/creation/book/${bid}`;
+    //   const self = this;
+    //   return nkcAPI(url, "GET")
+    //     .then((data) => {
+    //       self.book = data.bookData;
+    //       self.treeData = data.bookList;
+    //     })
+    //     .catch(sweetError);
+    // },
     async query(page = 0, type = "get") {
       let url;
       const { searchContent } = this;
