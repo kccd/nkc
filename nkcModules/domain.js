@@ -1,10 +1,10 @@
 const ipHostReg = /^([0-9]{1,3}\.?){4}(:[0-9]{0,5})?$/;
 
-function isIpDomain(host) {
+function isIpDomain(host = '') {
   return ipHostReg.test(host);
 }
 
-function getRootDomainByHost(host) {
+function getRootDomainByHost(host = '') {
   if(isIpDomain(host)) return '';
   host = host.replace(/:.*/ig, '');
   host = host.split('.').reverse();

@@ -39,11 +39,6 @@ module.exports = async (ctx, next) => {
     }
   }
 
-  console.log({
-    cookieDomain,
-    fileDomain
-  });
-
   const {ip, port} = nkcModules.getRealIP({
     remoteIp: ctx.ip,
     remotePort: ctx.req.connection.remotePort,
