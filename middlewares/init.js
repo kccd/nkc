@@ -25,10 +25,22 @@ const fsSync = {
   stat: promisify(fs.stat)
 };
 
+const ipHostReg = /^([0-9]{1,3}\.?){4}(:[0-9]{0,5})?$/;
+
 module.exports = async (ctx, next) => {
   ctx.reqTime = new Date();
   ctx.data = Object.create(null);
   ctx.nkcModules = nkcModules;
+
+  let cookieDomain = '';
+  if(!ipHostReg.test(ctx.host)) {
+    try{
+      let host = ctx.host.replace(/:.*/ig, '');
+      host = host.split('.').reverse();
+      cookieDomain = `${host[1]}.${host[0]}`;
+    } catch(err) {}
+  }
+
   const {ip, port} = nkcModules.getRealIP({
     remoteIp: ctx.ip,
     remotePort: ctx.req.connection.remotePort,
@@ -147,11 +159,9 @@ module.exports = async (ctx, next) => {
         httpOnly: true,
         overwrite: true,
         maxAge: cookieConfig.maxAge,
-        domain: cookieConfig.domain,
       };
-      // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
-      if(global.NKC.isDevelopment) {
-        delete options.domain;
+      if(cookieDomain) {
+        options.domain = cookieDomain;
       }
 	    if(o) {
         options = Object.assign(options, o);
@@ -167,11 +177,9 @@ module.exports = async (ctx, next) => {
         httpOnly: true,
         overwrite: true,
         maxAge: 0,
-        domain: cookieConfig.domain,
       };
-      // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
-      if(global.NKC.isDevelopment) {
-        delete options.domain;
+      if(cookieDomain) {
+        options.domain = cookieDomain;
       }
       ctx.cookies.set(key, '', options);
     }
@@ -183,11 +191,9 @@ module.exports = async (ctx, next) => {
 	  ctx.getCookie = (key, o) => {
       let options = {
         signed: true,
-        domain: cookieConfig.domain,
       };
-      // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
-      if(global.NKC.isDevelopment) {
-        delete options.domain;
+      if(cookieDomain) {
+        options.domain = cookieDomain;
       }
       if(o) {
         options = Object.assign(options, o);
