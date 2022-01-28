@@ -147,8 +147,10 @@ module.exports = async (ctx, next) => {
         httpOnly: true,
         overwrite: true,
         maxAge: cookieConfig.maxAge,
-        domain: cookieConfig.domain,
       };
+      if(cookieConfig.domain) {
+        options.domain = cookieConfig.domain;
+      }
       // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
       if(global.NKC.isDevelopment) {
         delete options.domain;
@@ -167,8 +169,10 @@ module.exports = async (ctx, next) => {
         httpOnly: true,
         overwrite: true,
         maxAge: 0,
-        domain: cookieConfig.domain,
       };
+      if(cookieConfig.domain) {
+        options.domain = cookieConfig.domain;
+      }
       // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
       if(global.NKC.isDevelopment) {
         delete options.domain;
@@ -183,8 +187,10 @@ module.exports = async (ctx, next) => {
 	  ctx.getCookie = (key, o) => {
       let options = {
         signed: true,
-        domain: cookieConfig.domain,
       };
+      if(cookieConfig.domain) {
+        options.domain = cookieConfig.domain;
+      }
       // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
       if(global.NKC.isDevelopment) {
         delete options.domain;
