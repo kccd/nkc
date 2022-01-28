@@ -1,5 +1,5 @@
 <template lang="pug">
-.module-dialog-body(v-show="true")
+.module-dialog-body
   .module-dialog-header(ref="draggableHandle")
     .module-dialog-title {{title}}
     .module-dialog-close(@click="close")
@@ -82,7 +82,6 @@ export default {
     Tree,
   },
   data: () => ({
-    show: true,
     title: "",
     treeData: [],
     selectType: "text",
@@ -113,7 +112,6 @@ export default {
     },
   },
   mounted() {
-    // 子元素没带上
     EventBus.$on("addDialog", ({bid, data, childIndex, title, type='add', level}) => {
       this.insertLevel=level
       this.dialogType=type
@@ -246,7 +244,11 @@ export default {
     },
     close() {
       this.draggableElement.hide();
-      this.show = false;
+      this.inputValue= "默认分组"
+      this.protocol= "http://"
+      this.selectType='text'
+      this.urlTitle='科创'
+      this.dialogType='add'
     },
   },
   destroyed(){

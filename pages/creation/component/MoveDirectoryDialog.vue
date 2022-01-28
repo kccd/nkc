@@ -35,7 +35,6 @@ export default {
   },
   data() {
     return {
-      show: false,
       title: "请选择移动位置",
       dialogData: [],
       moveData: {},
@@ -181,7 +180,6 @@ export default {
         }
       });
     },
-    //  把 子级 父级 同级 都 写入 就不用 每次都要循环找不同级别
     seekChild({ data, position, currentIndex, findLocation, type = "self" }) {
       if (typeof findLocation === 'number')findLocation= String(findLocation)
       const child = data[position];
@@ -418,7 +416,6 @@ export default {
     },
     close() {
       this.draggableElement.hide();
-      this.show = false;
       this.showTree = false;
       this.insertIndex = "";
       this.selectedLevel = "childLevel";
