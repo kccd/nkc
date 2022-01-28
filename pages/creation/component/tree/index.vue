@@ -1,7 +1,7 @@
 <template>
   <div class="child_tree" :class="{ disable: data.isMove && !operations, bg:operations }">
     <div
-      :title='map[data.type]+ "：" + data.title'
+      :title='"类型：" + map[data.type]+ "\r标题：" + data.title + "\r地址：" + data.url'
       class="child_tree_row col-xs-12.col-md-12"
       :class="{ active: isShowOperation }"
       @mouseenter="operations && mouseEnter(...arguments)"

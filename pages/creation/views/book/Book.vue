@@ -19,7 +19,7 @@
         button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
           @click="navToPage('bookEditor', { bid })"
         ) 设置
-  MoveDirectoryDialog(:bid="bid", :changeStatus="changeStatus")
+  MoveDirectoryDialog(:bid="bid")
   AddDialog(ref="addDialog")
 </template>
 
@@ -344,9 +344,6 @@ export default {
     this.getBook();
   },
   methods: {
-    changeStatus(msg) {
-      this.$set(msg, "isMove", true);
-    },
     findId(data, id) {
       let findData;
       function find(data, id) {
@@ -373,7 +370,6 @@ export default {
         });
       }
     },
-    //  把 子级 父级 同级 都 写入 就不用 每次都要循环找不同级别   还可以把 循环封装在内，这个先暂时用着
     seekChild({ data, position, currentIndex, findLocation, type = "self" }) {
       const child = data[position];
       if (type === "parent") {
