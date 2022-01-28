@@ -72,11 +72,11 @@
 
 <script>
 import { DraggableElement } from "../../lib/js/draggable";
-import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
+import { nkcAPI } from "../../lib/js/netAPI";
 import Tree from "./tree/Tree.vue";
 import { EventBus } from "../eventBus.js";
 import { getState } from "../../lib/js/state";
-import {sweetSuccess, sweetError}  from '../../lib/js/sweetAlert.js'
+import {sweetError}  from '../../lib/js/sweetAlert.js'
 export default {
   components: {
     Tree,

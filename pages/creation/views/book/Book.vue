@@ -129,12 +129,13 @@
 </style>
 
 <script>
-import { nkcAPI, nkcUploadFile } from "../../../lib/js/netAPI";
+import { nkcAPI } from "../../../lib/js/netAPI";
 import MoveDirectoryDialog from "../../component/MoveDirectoryDialog.vue";
 import Tree from "../../component/tree/Tree.vue";
 import { EventBus } from "../../eventBus";
 import AddDialog from "../../component/AddDialog.vue";
 import { sweetSuccess, sweetError } from "../../../lib/js/sweetAlert.js";
+
 export default {
   components: {
     MoveDirectoryDialog,
@@ -142,24 +143,14 @@ export default {
     AddDialog,
   },
   data: () => ({
-    data: [],
-    showMoveCharter: false,
-    more: false,
     bid: "",
     book: null,
     bookList: [],
-    chapters: [],
-    mouseEnter: [],
-    clientX: "",
-    clientY: "",
-    addDocument: "",
     seekResult: [],
-    parentData: [],
-    moveDialogData: [],
   }),
   computed: {
     navList() {
-      const { book, bid } = this;
+      const { book } = this;
       return [
         {
           name: "文档创作",
@@ -185,12 +176,10 @@ export default {
       return this.bookList;
     },
   },
+  created(){
+  },
   mounted() {
-    EventBus.$on("addGroup", (data) => {
-      this.addGroup(data);
-    });
     EventBus.$on("addConfirm", async ({ res, type, data: insertData, dialogType, level }) => {
-        // insertData 是修改或者新建的数据
         let obj;
         if (type === "text") {
           obj = {
@@ -222,7 +211,6 @@ export default {
         }
         if (dialogType === "editor") {
           this.seekResult = this.bookList;
-          console.log(insertData.index)
           for (let i = 0; i < insertData.index.length; i++) {
             const position = insertData.index[i];
             this.seekChild({
@@ -232,7 +220,6 @@ export default {
               findLocation: insertData.index,
             });
           }
-          console.log(this.seekResult.child)
           obj.child=this.seekResult.child
           this.seekResult = this.bookList;
           for (let i = 0; i < insertData.index.length - 1; i++) {
@@ -288,7 +275,6 @@ export default {
         this.$refs.addDialog.close();
       }
     );
-
     EventBus.$on("deleteDirectory", async (data, childIndex) => {
       this.seekResult = this.bookList;
       for (let i = 0; i < childIndex.length - 1; i++) {
@@ -340,26 +326,12 @@ export default {
       this.getBook();
     });
     this.bid = this.$route.params.bid;
-    this.addDocument = this.$route.query.data;
     this.getBook();
   },
+  destroyed(){
+    EventBus.$off()
+  },
   methods: {
-    findId(data, id) {
-      let findData;
-      function find(data, id) {
-        if (data) {
-          for (let obj of data) {
-            if (obj.id === id) {
-              findData = obj;
-            } else if (obj.child && obj.child.length) {
-              find(obj, child, id);
-            }
-          }
-        }
-      }
-      find(data, id);
-      return findData;
-    },
     changeChild(data, key, value) {
       if (data) {
         data.forEach((item) => {
@@ -418,36 +390,11 @@ export default {
         level: "outermost",
       });
     },
-    addGroup(data) {
-      let url = "/creation/articles/editor";
-      const { aid, articleType, value, type } = data;
-      let formData = new FormData();
-      formData.append("article", JSON.stringify({ title: value }));
-      formData.append("bookId", this.bid);
-      formData.append("aid", aid);
-      formData.append("type", type);
-      formData.append("articleType", articleType);
-      nkcUploadFile(url, "POST", formData).then((data) => {
-        console.log(data, "data");
-      });
-    },
-    cancel() {
-      this.showMoveCharter = false;
-    },
     navToPage(name, query = {}, params = {}) {
       this.$router.push({
         name,
         query,
         params,
-      });
-    },
-    switchContent(id) {
-      this.$router.push({
-        name: "bookContent",
-        params: {
-          bid: this.bid,
-          id,
-        },
       });
     },
     getBook() {

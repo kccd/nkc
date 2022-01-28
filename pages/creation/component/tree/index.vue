@@ -27,7 +27,7 @@
       <span
         v-if="operations"
         class="title"
-        @click.stop="operations && jurisdiction === 'admin' && clickArticleTitle(data, childIndex)"
+        @click.stop="operations && jurisdiction === 'admin' && clickArticleTitle(...arguments, data, childIndex)"
         >{{ data.title }}</span
       >
       <span
@@ -106,6 +106,8 @@
 <script>
 import { EventBus } from "../../eventBus.js";
 import { sweetQuestion } from "../../../lib/js/sweetAlert";
+import {saveToSessionStorage, getFromSessionStorage, updateInSessionStorage, sessionStorageKeys} from "../../../lib/js/sessionStorage";
+import { scrollTopFun } from '../../scrollTop'
 export default {
   name: "Tree",
   props: {
@@ -117,10 +119,6 @@ export default {
     },
     funcs: Object,
     isMove: Boolean,
-    // disable: {
-    //   type: Object,
-    //   default: () => ({}),
-    // },
     childIndex: String,
     childrenDisable: {
       type: Boolean,
@@ -153,8 +151,18 @@ export default {
       EventBus.$emit("levelSelect", this.levelSelect);
     },
   },
-
+  created(){
+  },
+  mounted(){
+    window.onbeforeunload=function(){
+      saveToSessionStorage(sessionStorageKeys.scrollTop, 0)
+    }
+    this.scrollPosition()
+  },
   methods: {
+    scrollPosition(){
+      scrollTopFun(window, getFromSessionStorage(sessionStorageKeys.scrollTop))
+    },
     editor(data, childIndex) {
       childIndex = childIndex.split(',')
       if (data.type !== "article") {
@@ -237,7 +245,7 @@ export default {
       }
     },
     // 编辑
-    clickArticleTitle(data, childIndex) {
+    clickArticleTitle(e, data, childIndex) {
       const { bid } = this;
       const aid = data._id;
       if (data.type === "text") {
@@ -247,19 +255,13 @@ export default {
       } else if (data.type === "post") {
         window.open(data.url);
       } else {
+        saveToSessionStorage(sessionStorageKeys.scrollTop, document.documentElement.scrollTop)
         this.navToPage("articleEditor", { bid, aid, data, childIndex });
       }
     },
 
     mouseEnter(event) {
       this.isShowOperation = !this.isShowOperation;
-      // if(this.isShowOperation){
-      //   this.$nextTick(()=>{
-      //     event.target.children[3].classList.add('title2')
-      //   })
-      // }else{
-      //     event.target.children[3].classList.remove('title2')
-      // }
     },
     add(data, childIndex) {
       childIndex = childIndex.split(",");

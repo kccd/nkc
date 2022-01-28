@@ -43,12 +43,9 @@ export default {
       showTree: true,
       insertIndex: [],
       selectedLevel: "childLevel",
-      openMenuIndex: "",
-      publishIndex: "",
+      // openMenuIndex: "",
+      // publishIndex: "",
       publishInfo: {},
-      publishMoveData: "",
-      publishMoveIndex: "",
-      seekParent: [],
     };
   },
   mounted() {
@@ -72,7 +69,7 @@ export default {
     });
     EventBus.$on("moveDialogOpenMenu", (data, childIndex, status = false) => {
       this.$set(data, "isOpen", status);
-      this.openMenuIndex = childIndex;
+      // this.openMenuIndex = childIndex;
     });
     EventBus.$on(
       "moveDirectory",
@@ -385,11 +382,11 @@ export default {
       } else {
         if (this.dialogtype === "choice") {
           // this.this.moveData
-          this.publishIndex = this.insertIndex;
+          // this.publishIndex = this.insertIndex;
           // 通知 添加文章页面
           // EventBus.$emit("saveArticle");
           // 发布
-          EventBus.$emit("publish", this.publishIndex, this.moveData.id);
+          EventBus.$emit("publish", this.insertIndex, this.moveData.id);
         }
         sweetSuccess("操作成功");
       }

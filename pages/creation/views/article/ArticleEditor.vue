@@ -19,6 +19,8 @@
   import {screenTopWarning} from "../../../lib/js/topAlert";
   import MoveDirectoryDialog from '../../component/MoveDirectoryDialog'
   import { EventBus } from '../../eventBus'
+  // import {saveToSessionStorage, getFromSessionStorage, updateInSessionStorage, sessionStorageKeys} from "../../../lib/js/sessionStorage";
+  import { scrollTopFun } from '../../scrollTop'
   export default {
     components: {
       'document-editor': DocumentEditor,
@@ -76,6 +78,7 @@
       }
     },
     mounted() {
+      this.scrollPosition()
       EventBus.$on('publish', (publishIndex, publishId)=>{
         this.post('publish')
         .then(() => {
@@ -93,6 +96,9 @@
       this.initData();
     },
     methods: {
+      scrollPosition(){
+      scrollTopFun(window, 0)
+      },
       moveDialog(data, childIndex, bid, type) {
         childIndex=childIndex.split(',')
         EventBus.$emit("moveDirectory", data, childIndex, bid, type);
