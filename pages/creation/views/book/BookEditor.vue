@@ -7,13 +7,13 @@
     .standard-container
       .formm
         .form-group
-          label.control-label 图书名称
+          label.control-label 专题名称
           input.form-control(type="text" v-model="book.name")
         .form-group
-          label.control-label 图书介绍
+          label.control-label 专题介绍
           textarea.form-control(rows=5 v-model="book.description")
         .form-group
-          label.control-label 图书封面
+          label.control-label 专题封面
           .m-r-05
             img.book-cover(v-if="bookCover" :src="bookCover")
           div
@@ -121,17 +121,17 @@
         if(!this.bookId) {
           return [
             {
-              name: '图书创作',
+              name: '专题创作',
               page: 'books'
             },
             {
-              name: '创建新图书'
+              name: '创建新专题'
             }
           ]
         } else {
           return [
             {
-              name: '图书创作',
+              name: '专题创作',
               page: 'books'
             },
             {
@@ -221,7 +221,7 @@
               minLength: 0,
               maxLength: 1000
             });
-            if(!self.bookId && !file) throw new Error(`请选择图书封面`);
+            if(!self.bookId && !file) throw new Error(`请选择专题封面`);
             const formData = new FormData();
             if(file) {
               formData.append('cover', file, 'cover.png');

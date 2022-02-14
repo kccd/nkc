@@ -9,12 +9,12 @@
           .creation-center-book-time {{book.time}}
   .container-fluid.creation-center-books
     .creation-center-books-header
-      span.m-r-1 我创建的图书
-      button.btn.btn-default.btn-xs(@click="navToPage('bookEditor')") 创建新图书
+      span.m-r-1 我创建的专题
+      button.btn.btn-default.btn-xs(@click="navToPage('bookEditor')") 创建新专题
     .m-b-1
       +bookList("books")
     .creation-center-books-header
-      span.m-r-1 我参与创作的图书
+      span.m-r-1 我参与创作的专题
     .m-b-1
       +bookList("otherBooks")
 </template>

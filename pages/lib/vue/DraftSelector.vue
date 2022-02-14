@@ -12,10 +12,10 @@
           .paging-button
             a(:class="{'active': draftType === 'auto'}" @click="selectDraftType('auto')")
               .fa &nbsp;
-              | 草稿列表
+              | 草稿
             a(:class="{'active': draftType === 'custom'}" @click="selectDraftType('custom')")
               .fa &nbsp;
-              | 图文片段
+              | 图文素材
           auto-drafts-box(ref="autoDraftsBox" v-if="draftType === 'auto'" @callback-data="insert")
           custom-drafts-box(ref="customDraftsBox" :type="true" v-else @callback-data="insert")
 

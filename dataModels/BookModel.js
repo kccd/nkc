@@ -38,7 +38,7 @@ const schema = new mongoose.Schema({
     default: false,
     index: 1
   },
-  // 参与图书创作的其他用户
+  // 参与专题创作的其他用户
   members: {
     type: [{
       _id: String, // 用户 ID
@@ -48,7 +48,7 @@ const schema = new mongoose.Schema({
     default: [],
     index: 1
   },
-  // 图书可见性
+  // 专题可见性
   read: {
     type: String,
     default: 'self', // everyone（所有人可见）, self（仅自己可见）, member（仅创作成员可见）
@@ -69,12 +69,12 @@ schema.statics.checkBookInfo = async (book) => {
   const {name, description, read} = book;
   const {checkString} = require('../nkcModules/checkData');
   checkString(name, {
-    name: '文档名称',
+    name: '专题名称',
     minLength: 1,
     maxLength: 100
   });
   checkString(description, {
-    name: '文档介绍',
+    name: '专题介绍',
     minLength: 0,
     maxLength: 1000
   });
@@ -266,14 +266,14 @@ schema.methods.getContentById = async function(props) {
 };
 
 /*
-* 获取图书成员，包括待处理、拒绝邀请的成员
+* 获取专题成员，包括待处理、拒绝邀请的成员
 * @param {[Object]}
 *   @param {String} uid 成员 UID
 *   @param {String} avatarUrl 成员头像链接
 *   @param {String} userHome 成员名片页
 *   @param {String} username 成员账号名称
 *   @param {String} role 成员角色 admin（管理员），member（普通成员）
-*   @param {Boolean} 是否为图书创建者
+*   @param {Boolean} 是否为专题创建者
 *   @param {String} 成员邀请状态 pending（等待邀请），resolved（已接收邀请），rejected（已拒绝邀请）
 * */
 schema.methods.getAllMembers = async function() {
@@ -422,7 +422,7 @@ schema.statics.getMemberPermissions = async function() {
 }
 
 /*
-* 获取用户在当前图书下的权限
+* 获取用户在当前专题下的权限
 * @param {String} uid 用户ID
 * @return {[String]} 权限名 参看 bookPermissions
 * */
@@ -451,7 +451,7 @@ schema.methods.getUserPermissions = async function(uid) {
 };
 
 /*
-* 判断是否拥有阅读图书的权限
+* 判断是否拥有阅读专题的权限
 * @param {String} uid 用户 ID
 * @return {Boolean}
 * */

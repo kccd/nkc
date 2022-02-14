@@ -109,7 +109,7 @@
         const {book, bid} = this;
         return [
           {
-            name: '图书创作',
+            name: '专题创作',
             page: 'books'
           },
           {
