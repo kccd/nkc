@@ -2,26 +2,34 @@ const router = require("koa-router")();
 
 router
   .get("/editor", async (ctx, next) => {
-    const { query, data, db } = ctx;
-    const { bid, aid } = query;
+    const {
+      query,
+      data,
+      db
+    } = ctx;
+    const {
+      bid,
+      aid
+    } = query;
     const book = await db.BookModel.findOnly({
       _id: bid
     });
     if (aid) {
-      let aidStatus=false
-      function find(data,id){
-        if(data){
-        for (const obj of data) {
-          if(obj.id === id){
-            aidStatus= true
-            return
-          }else if(obj.child && obj.child.length){
-            find(obj.child,id)
+      let aidStatus = false
+
+      function find(data, id) {
+        if (data) {
+          for (const obj of data) {
+            if (obj.id === id) {
+              aidStatus = true
+              return
+            } else if (obj.child && obj.child.length) {
+              find(obj.child, id)
+            }
           }
         }
-        }
       }
-      find(book.list,aid)
+      find(book.list, aid)
       if (!aidStatus) {
         ctx.throw(400, `文章 ID 错误`);
       }
@@ -52,15 +60,29 @@ router
     await next();
   })
   .post("/editor", async (ctx, next) => {
-    const { body, state, data, db } = ctx;
-    const { files, fields } = body;
-    const { coverFile } = files;
+    const {
+      body,
+      state,
+      data,
+      db
+    } = ctx;
+    const {
+      files,
+      fields
+    } = body;
+    const {
+      coverFile
+    } = files;
     const type = fields.type;
     const bookId = fields.bookId;
     const articleId = fields.articleId;
     if (!["modify", "publish", "create", "save"].includes(type))
       ctx.throw(400, `未知的提交类型 type: ${type}`);
-    const { title, content, cover } = JSON.parse(fields.article);
+    const {
+      title,
+      content,
+      cover
+    } = JSON.parse(fields.article);
     let article;
     const book = await db.BookModel.findOne({
       _id: bookId
@@ -68,12 +90,13 @@ router
     let bookList = book.list.toObject();
     if (type === "create") {
       // 先创建 一个默认数据，如果是 文章类型，再加上aid  
-      let child={
-        id:'',
+      let child = {
+        id: '',
         title,
         type: 'article',
         child: []
       }
+
       function changeChild(bookList) {
         // 给最外层添加  
         if (fields.level === "outermost" || bookList.length < 1) {
@@ -83,7 +106,7 @@ router
         bookList.forEach(item => {
           if (item.aid === fields.aid) {
             item.child.unshift({
-              id:'',
+              id: '',
               title,
               type: 'article',
               child: []
@@ -94,35 +117,41 @@ router
         });
       }
       changeChild(bookList);
-        article = await db.ArticleModel.createArticle({
-          uid: state.uid,
-          title,
-          content,
-          coverFile
-        });
-        child.id=article._id
-        const res = await db.BookModel.updateOne(
-          { _id: bookId },
-          { $set: { list: bookList }}
-        );
+      article = await db.ArticleModel.createArticle({
+        uid: state.uid,
+        title,
+        content,
+        coverFile
+      });
+      child.id = article._id
+      const res = await db.BookModel.updateOne({
+        _id: bookId
+      }, {
+        $set: {
+          list: bookList
+        }
+      });
     } else {
-        function find(data,item){
-          if(data){
-            for (const obj of data) {
-              if(obj.id === item.articleId){
-                obj.title = title
-                return
-              }else if(obj.child && obj.child.length){
-                find(obj.child,item)
-              }
+      function find(data, item) {
+        if (data) {
+          for (const obj of data) {
+            if (obj.id === item.articleId) {
+              obj.title = title
+              return
+            } else if (obj.child && obj.child.length) {
+              find(obj.child, item)
             }
           }
         }
-        find(bookList,fields)
-        const res = await db.BookModel.updateOne(
-          { _id: bookId },
-          { $set: { list: bookList }}
-        );
+      }
+      find(bookList, fields)
+      const res = await db.BookModel.updateOne({
+        _id: bookId
+      }, {
+        $set: {
+          list: bookList
+        }
+      });
       article = await db.ArticleModel.findOnly({
         _id: articleId
       });

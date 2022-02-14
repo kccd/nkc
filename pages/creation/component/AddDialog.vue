@@ -177,9 +177,9 @@ export default {
     selectPost(data) {
       const { firstPost } = data;
       this.selectPostData = {
-        title: firstPost.t,
+        title: '',
         id: firstPost.pid,
-        url: firstPost.url,
+        url: '',
         type: "post",
         child: [],
       };
@@ -231,9 +231,6 @@ export default {
       );
     },
     submit: function () {
-      // this.callback(this.data);
-      // 如果修改 值没改变 就不发送请求
-      // 如果是新增 post没有 选中 post 那么 也不执行 后续再加
       if (this.selectType === "post") {
         this.addResult = this.selectPostData;
         this.type = "post";

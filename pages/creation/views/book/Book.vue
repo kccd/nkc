@@ -11,8 +11,8 @@
         .creation-center-book-list
           Tree(:data="extendedData", :bid="bid")
           button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm.mt(
-          @click="add()"
-        ) 新建目录
+            @click="add()"
+          ) 新建目录
         button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
           @click="navToPage('articleEditor', { bid })"
         ) 撰写文章
@@ -24,7 +24,7 @@
 </template>
 
 <style lang="less" scoped>
-.mt{
+.mt {
   margin-top: 10px;
 }
 .articleTitl {
@@ -176,10 +176,11 @@ export default {
       return this.bookList;
     },
   },
-  created(){
-  },
+  created() {},
   mounted() {
-    EventBus.$on("addConfirm", async ({ res, type, data: insertData, dialogType, level }) => {
+    EventBus.$on(
+      "addConfirm",
+      async ({ res, type, data: insertData, dialogType, level }) => {
         let obj;
         if (type === "text") {
           obj = {
@@ -199,40 +200,47 @@ export default {
           };
         } else if (type === "post") {
           obj = {
-            title: res.title,
+            title: "",
             type: type,
             id: res.id,
-            url: res.url,
+            url: "",
             child: [],
           };
         } else {
           sweetError("不允许的数据类型");
           return;
         }
-        if (dialogType === "editor") {
-          this.seekResult = this.bookList;
-          for (let i = 0; i < insertData.index.length; i++) {
-            const position = insertData.index[i];
-            this.seekChild({
-              data: this.seekResult,
-              position,
-              currentIndex: i,
-              findLocation: insertData.index,
-            });
-          }
-          obj.child=this.seekResult.child
-          this.seekResult = this.bookList;
-          for (let i = 0; i < insertData.index.length - 1; i++) {
-            const position = insertData.index[i];
-            this.seekChild({
-              data: this.seekResult,
-              position,
-              currentIndex: i,
+        if (dialogType === "editor") { 
+          // this.seekResult = this.bookList;
+          // for (let i = 0; i < insertData.index.length; i++) {
+          //   const position = insertData.index[i];
+          //   this.seekChild({
+          //     data: this.seekResult,
+          //     position,
+          //     currentIndex: i,
+          //     findLocation: insertData.index,
+          //   });
+          // }
+          this.seekChild2({
+              findLocation: insertData.index
+            })
+          obj.child = this.seekResult.child;
+          // this.seekResult = this.bookList;
+          // for (let i = 0; i < insertData.index.length - 1; i++) {
+          //   const position = insertData.index[i];
+          //   this.seekChild({
+          //     data: this.seekResult,
+          //     position,
+          //     currentIndex: i,
+          //     findLocation: insertData.index,
+          //     type: "parent",
+          //   });
+          // }
+          this.seekChild2({
               findLocation: insertData.index,
               type: "parent",
-            });
-          }
-          // 修改 如果是修改 最外层
+            })
+          //  最外层
           const editorIndex = insertData.index.slice(-1);
           if (insertData.index.length === 1) {
             this.seekResult[editorIndex] = obj;
@@ -246,16 +254,19 @@ export default {
           } else {
             // 都是向子级的child 插入数据
             const index = insertData.index;
-            this.seekResult = this.bookList;
-            for (let i = 0; i < index.length; i++) {
-              const position = index[i];
-              this.seekChild({
-                data: this.seekResult,
-                position,
-                currentIndex: i,
-                findLocation: index,
-              });
-            }
+            // this.seekResult = this.bookList;
+            // for (let i = 0; i < index.length; i++) {
+            //   const position = index[i];
+            //   this.seekChild({
+            //     data: this.seekResult,
+            //     position,
+            //     currentIndex: i,
+            //     findLocation: index,
+            //   });
+            // }
+            this.seekChild2({
+              findLocation: index,
+            })
             this.seekResult.child.unshift(obj);
           }
         }
@@ -276,17 +287,19 @@ export default {
       }
     );
     EventBus.$on("deleteDirectory", async (data, childIndex) => {
-      this.seekResult = this.bookList;
-      for (let i = 0; i < childIndex.length - 1; i++) {
-        const position = childIndex[i];
-        this.seekChild({
-          data: this.seekResult,
-          position,
-          currentIndex: i,
-          findLocation: childIndex,
-          type: "parent",
-        });
-      }
+      // this.seekResult = this.bookList;
+      // for (let i = 0; i < childIndex.length - 1; i++) {
+      //   const position = childIndex[i];
+      //   this.seekChild({
+      //     data: this.seekResult,
+      //     position,
+      //     currentIndex: i,
+      //     findLocation: childIndex,
+      //     type: "parent",
+      //   });
+    // }
+      this.seekChild2({findLocation: childIndex, type: "parent"})
+      
       // 最外层 可能是 一位数 可能是 二位数 三位数 等等
       if (childIndex.length === 1) {
         this.seekResult.splice(childIndex[0], 1);
@@ -307,17 +320,19 @@ export default {
       });
     });
     EventBus.$on("openMenu", (childIndex, status) => {
-      this.seekResult = this.bookList;
-      for (let i = 0; i < childIndex.length; i++) {
-        const position = childIndex[i];
-        this.seekChild({
-          data: this.seekResult,
-          position,
-          currentIndex: i,
-          findLocation: childIndex,
-        });
-      }
-
+      // this.seekResult = this.bookList;
+      // for (let i = 0; i < childIndex.length; i++) {
+      //   const position = childIndex[i];
+      //   this.seekChild({
+      //     data: this.seekResult,
+      //     position,
+      //     currentIndex: i,
+      //     findLocation: childIndex,
+      //   });
+      // }
+      this.seekChild2({
+        findLocation: childIndex,
+      });
       this.$set(this.seekResult, "isOpen", status);
       this.changeChild(this.seekResult.child, "isOpen", !status);
       this.openMenuIndex = childIndex;
@@ -328,8 +343,8 @@ export default {
     this.bid = this.$route.params.bid;
     this.getBook();
   },
-  destroyed(){
-    EventBus.$off()
+  destroyed() {
+    EventBus.$off();
   },
   methods: {
     changeChild(data, key, value) {
@@ -342,45 +357,94 @@ export default {
         });
       }
     },
-    seekChild({ data, position, currentIndex, findLocation, type = "self" }) {
-      const child = data[position];
+    // findLocation 是一个数组 存放的数据位置 [0,0,1,2...]
+    seekChild2({ findLocation, type = "self" }) {
+      this.seekResult = this.bookList;
+      let length = findLocation.length
       if (type === "parent") {
-        this.seekResult = child;
-        // 点击内层
-        if (currentIndex === findLocation.length - 2) {
-          this.seekResult = child;
-          return;
-        }
-        if (child) {
-          if (child.child) {
-            this.seekResult = child.child;
-          } else {
-            this.seekResult = child;
-          }
-        }
-        // 点击最外层
-        if (findLocation.length == 1) {
-          this.seekResult = data;
-        }
-      } else if (type === "childe") {
-      } else {
-        if (child) {
-          if (currentIndex === findLocation.length - 1) {
-            // console.log("数据查找结果为", this.seekResult=child);
-            this.seekResult = child;
+        length--;
+      }
+      for (let i = 0; i < length; i++) {
+        const position = findLocation[i];
+        find({ position, currentIndex: i, findLocation, type }, this);
+      }
+      // const that = this;
+      function find({ position, currentIndex, findLocation }, that) {
+        const child = that.seekResult[position];
+        if (type === "parent") {
+          that.seekResult = child;
+          // 点击内层
+          if (currentIndex === findLocation.length - 2) {
+            that.seekResult = child;
             return;
           }
-          if (child.child) {
-            this.seekResult = child.child;
-          } else {
-            this.seekResult = child;
+          if (child) {
+            if (child.child) {
+              that.seekResult = child.child;
+            } else {
+              that.seekResult = child;
+            }
+          }
+          // 点击最外层
+          if (findLocation.length == 1) {
+            that.seekResult = that.bookList;
           }
         } else {
-          sweetError("此位置不存在数据");
-          return;
+          if (child) {
+            if (currentIndex === findLocation.length - 1) {
+              that.seekResult = child;
+              return;
+            }
+            if (child.child) {
+              that.seekResult = child.child;
+            } else {
+              that.seekResult = child;
+            }
+          } else {
+            sweetError("此位置不存在数据");
+            return;
+          }
         }
       }
     },
+    // seekChild({ data, position, currentIndex, findLocation, type = "self" }) {
+    //   const child = data[position];
+    //   if (type === "parent") {
+    //     this.seekResult = child;
+    //     // 点击内层
+    //     if (currentIndex === findLocation.length - 2) {
+    //       this.seekResult = child;
+    //       return;
+    //     }
+    //     if (child) {
+    //       if (child.child) {
+    //         this.seekResult = child.child;
+    //       } else {
+    //         this.seekResult = child;
+    //       }
+    //     }
+    //     // 点击最外层
+    //     if (findLocation.length == 1) {
+    //       this.seekResult = data;
+    //     }
+    //   } else {
+    //     if (child) {
+    //       if (currentIndex === findLocation.length - 1) {
+    //         // console.log("数据查找结果为", this.seekResult=child);
+    //         this.seekResult = child;
+    //         return;
+    //       }
+    //       if (child.child) {
+    //         this.seekResult = child.child;
+    //       } else {
+    //         this.seekResult = child;
+    //       }
+    //     } else {
+    //       sweetError("此位置不存在数据");
+    //       return;
+    //     }
+    //   }
+    // },
     add(data, childIndex) {
       EventBus.$emit("addDialog", {
         bid: this.bid,

@@ -10,7 +10,7 @@ module.exports = async (ctx, next) => {
   // 获取总条数
   const count = await db.ThreadModel.countDocuments(q);
   if(type === 'get'){
-    pageSettings.userCardThreadList=10
+    pageSettings.userCardThreadList = 10
   }
   const paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList);
   if(type && type === 'search' && pid){

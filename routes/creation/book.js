@@ -6,8 +6,7 @@ router
     const {bid} = params;
     const {timeFormat, getUrl} = nkcModules.tools;
     const book = await db.BookModel.findOnly({_id: bid});
-    let bookList = book.list.toObject();
-    data.bookList = await book.getList({setUrl:'bookContent', latestTitle:true}, bookList) || [];
+    data.bookList = await book.getList() || [];
     data.bookData = {
       bid: book._id,
       name: book.name,
@@ -21,9 +20,8 @@ router
   .get('/:bid/:id', async (ctx, next) => {
     const {data, params, db, state} = ctx;
     const book = await db.BookModel.findOnly({_id: params.bid});
-    let bookList =book.list.toObject();
     data.bookArticle = await book.getContentById({aid: params.id, uid: state.uid});
-    data.bookList = await book.getList(undefined,bookList);
+    data.bookList = await book.getList();
     data.bookData = {
       _id: book._id,
       name: book.name,
