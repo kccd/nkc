@@ -21,7 +21,7 @@
       button.btn.btn-sm.btn-primary(@click="confirm()") 确定
 </template>
 <script>
-import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
+import { nkcAPI } from "../../lib/js/netAPI";
 import Tree from "./tree/Tree.vue";
 import { DraggableElement } from "../../lib/js/draggable";
 import { EventBus } from "../eventBus";
@@ -369,7 +369,7 @@ export default {
           }
         }
       }
-      // 删除占位项
+      // 删除添加到第一项
       this.dialogData.splice(0, 1);
       let url = `/creation/book/${this.$props.bid}/list/move`;
       const resData = await nkcAPI(url, "post", {
@@ -381,10 +381,6 @@ export default {
         // this.dialogData=resData.data
       } else {
         if (this.dialogtype === "choice") {
-          // this.this.moveData
-          // this.publishIndex = this.insertIndex;
-          // 通知 添加文章页面
-          // EventBus.$emit("saveArticle");
           // 发布
           EventBus.$emit("publish", this.insertIndex, this.moveData.id);
         }

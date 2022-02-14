@@ -19,16 +19,6 @@ export default {
     },
     bid:String
   },
-  data() {
-    return{
-      isOpen: false,
-    }
-  },
-  methods: {
-    toggle() {
-       this.isOpen = !this.isOpen;
-    },
-  }
 };
 </script>
 <style scoped>

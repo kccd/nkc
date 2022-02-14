@@ -1,7 +1,7 @@
 <template lang="pug">
 .module-dialog-body
   .module-dialog-header(ref="draggableHandle")
-    .module-dialog-title {{title}}
+    .module-dialog-title {{ title }}
     .module-dialog-close(@click="close")
       .fa.fa-remove
   .module-dialog-content
@@ -22,24 +22,21 @@
         p.url-title
           span 标题:
           input.add-group-input.select.query-input(
-          type="text",
-          v-model="urlTitle",
-        )
+            type="text",
+            v-model="urlTitle"
+          )
         p.url-address
           span 地址:
           select.select.bg(v-model="protocol", v-show="selectType === 'url'")
             option(value="http://") http://
             option(value="https://") https://
           input.add-group-input.select.query-input(
-          type="text",
-          v-model="inputValue",
-        )
+            type="text",
+            v-model="inputValue"
+          )
       .add-group(v-show="selectType === 'text'")
         span 分组名:
-        input.select.query-input(
-          type="text",
-          v-model="inputValue",
-        )
+        input.select.query-input(type="text", v-model="inputValue")
     .split-line
     .select-post(v-show="selectType === 'post'")
       .select-post-query
@@ -49,22 +46,32 @@
             placeholder="请输入pid",
             v-model="searchContent"
           )
-          button.query-button(@click="query(0,'search')") 查询
+          button.query-button(@click="query(0, 'search')") 查询
           button.reset-button(@click="query(0, 'get')") 重置
       ul.select-post-list
         .list-container(ref="listContainer")
           .list-height(ref="listHeight")
             li.post-list-item(v-for="post in postList")
-              label.radio-post(for="" )
-                input(type="radio" :value="post.firstPost.pid" v-model="selectPostId" @input="selectPost(post)")
+              label.radio-post(for="")
+                input(
+                  type="radio",
+                  :value="post.firstPost.pid",
+                  v-model="selectPostId",
+                  @input="selectPost(post)"
+                )
               .content
                 p.postId {{ post.firstPost.t }}
                 p.postContent {{ post.firstPost.c }}
-            li(v-if="postList.length === 0" style="font-size:24px") 数据加载中...
-            li(v-else-if="!postList" style="font-size:24px") 暂无数据
+            li(v-if="postList.length === 0", style="font-size: 24px") 数据加载中...
+            li(v-else-if="!postList", style="font-size: 24px") 暂无数据
     .paging(v-show="selectType === 'post'")
       .post-list-paging
-        span(v-for="(page, i) in paging.buttonValue" :key="i" :class="{pageActive:page.type === 'active'}" @click="query(page.num)" )  {{page.type === 'null' ? '...' : page.num}}
+        span(
+          v-for="(page, i) in paging.buttonValue",
+          :key="i",
+          :class="{ pageActive: page.type === 'active' }",
+          @click="query(page.num)"
+        ) {{ page.type === 'null' ? '...' : page.num }}
     .m-t-1.m-b-1.text-right
       button.btn.btn-sm.btn-default.m-r-05(@click="close") 关闭
       button.btn.btn-sm.btn-primary(@click="submit") 确定
@@ -76,7 +83,7 @@ import { nkcAPI } from "../../lib/js/netAPI";
 import Tree from "./tree/Tree.vue";
 import { EventBus } from "../eventBus.js";
 import { getState } from "../../lib/js/state";
-import {sweetError}  from '../../lib/js/sweetAlert.js'
+import { sweetError } from "../../lib/js/sweetAlert.js";
 export default {
   components: {
     Tree,
@@ -89,16 +96,16 @@ export default {
     protocol: "http://",
     inputValue: "默认分组",
     postList: [],
-    addResult:'',
-    selectPostId:'',
-    selectPostData:'',
-    insertData:{},
-    bid:'',
-    type:'',
-    urlTitle:'科创',
-    dialogType:'add',
-    paging:[],
-    insertLevel:''
+    addResult: "",
+    selectPostId: "",
+    selectPostData: "",
+    insertData: {},
+    bid: "",
+    type: "",
+    urlTitle: "科创",
+    dialogType: "add",
+    paging: [],
+    insertLevel: "",
   }),
   watch: {
     selectType() {
@@ -107,44 +114,47 @@ export default {
       } else if (this.selectType === "url") {
         this.inputValue = "www.kechuang.org";
       } else if (this.selectType === "text") {
-        this.inputValue = '默认分组';
+        this.inputValue = "默认分组";
       }
     },
   },
   mounted() {
-    EventBus.$on("addDialog", ({bid, data, childIndex, title, type='add', level}) => {
-      this.insertLevel=level
-      this.dialogType=type
-      this.title=title
-      if (!bid) {
-        sweetError('书籍id不存在')
-        return
-      }
-      this.bid=bid,
-      this.insertData={
-        data,
-        index:childIndex
-      },
-      // this.getTreeData(bid);
-      this.draggableElement.show();
-      if(type === 'editor'){
-        switch(data.type){
-          case 'url':
-            this.urlTitle=data.title;
-            this.inputValue=data.url;
-            break
-          case 'post':
-            this.selectPostId=data.id;
-            break
-          case 'text':
-            this.inputValue=data.title
-            break
-          default:
-            sweetError('错误类型')
+    EventBus.$on(
+      "addDialog",
+      ({ bid, data, childIndex, title, type = "add", level }) => {
+        this.insertLevel = level;
+        this.dialogType = type;
+        this.title = title;
+        if (!bid) {
+          sweetError("书籍id不存在");
+          return;
         }
-        this.selectType=data.type
+        (this.bid = bid),
+          (this.insertData = {
+            data,
+            index: childIndex,
+          }),
+          // this.getTreeData(bid);
+          this.draggableElement.show();
+        if (type === "editor") {
+          switch (data.type) {
+            case "url":
+              this.urlTitle = data.title;
+              this.inputValue = data.url;
+              break;
+            case "post":
+              this.selectPostId = data.id;
+              break;
+            case "text":
+              this.inputValue = data.title;
+              break;
+            default:
+              sweetError("错误类型");
+          }
+          this.selectType = data.type;
+        }
       }
-    });
+    );
     this.initDraggableElement();
   },
   computed: {
@@ -164,15 +174,15 @@ export default {
     },
   },
   methods: {
-    selectPost(data){
-      const {firstPost}=data
-      this.selectPostData={
-        title:firstPost.t,
-        id:firstPost.pid,
-        url:firstPost.url,
-        type:'post',
-        child:[]
-      }
+    selectPost(data) {
+      const { firstPost } = data;
+      this.selectPostData = {
+        title: firstPost.t,
+        id: firstPost.pid,
+        url: firstPost.url,
+        type: "post",
+        child: [],
+      };
     },
     // getTreeData(bid) {
     //   let url = `/creation/book/${bid}`;
@@ -195,27 +205,24 @@ export default {
       } else {
         url = `/u/${username.uid}/profile/thread?page=${page}&limit=20&type=${type}`;
       }
-      this.postList=[]
+      this.postList = [];
       const result = await nkcAPI(url, "get");
-      this.postList =result.threads; 
-      this.paging =result.paging;
-      if(!result.threads.length){
-        sweetError('没有查找到数据')
-        this.postList=false
+      this.postList = result.threads;
+      this.paging = result.paging;
+      if (!result.threads.length) {
+        sweetError("没有查找到数据");
+        this.postList = false;
       }
       this.$nextTick(() => {
-      if (this.$refs.listHeight.clientHeight < 444) {
-        this.$refs.listContainer.setAttribute(
-          "class",
-          "list-container-noScroll"
-        );
-      }else{
-        this.$refs.listContainer.setAttribute(
-          "class",
-          "list-container"
-        );
-      }
-    });
+        if (this.$refs.listHeight.clientHeight < 444) {
+          this.$refs.listContainer.setAttribute(
+            "class",
+            "list-container-noScroll"
+          );
+        } else {
+          this.$refs.listContainer.setAttribute("class", "list-container");
+        }
+      });
     },
     initDraggableElement() {
       this.draggableElement = new DraggableElement(
@@ -227,57 +234,63 @@ export default {
       // this.callback(this.data);
       // 如果修改 值没改变 就不发送请求
       // 如果是新增 post没有 选中 post 那么 也不执行 后续再加
-      if(this.selectType === 'post'){
-        this.addResult=this.selectPostData
-        this.type='post'
-      }else if(this.selectType === 'url'){
-        this.addResult={
-          title:this.urlTitle,
-          url:this.protocol + this.inputValue,
-        }
-        this.type='url'
-      }else{
-        this.addResult=this.inputValue
-        this.type='text'
+      if (this.selectType === "post") {
+        this.addResult = this.selectPostData;
+        this.type = "post";
+      } else if (this.selectType === "url") {
+        this.addResult = {
+          title: this.urlTitle,
+          url: this.protocol + this.inputValue,
+        };
+        this.type = "url";
+      } else {
+        this.addResult = this.inputValue;
+        this.type = "text";
       }
-      EventBus.$emit('addConfirm',{res:this.addResult, type:this.type, data:this.insertData, dialogType:this.dialogType, level:this.insertLevel})
+      EventBus.$emit("addConfirm", {
+        res: this.addResult,
+        type: this.type,
+        data: this.insertData,
+        dialogType: this.dialogType,
+        level: this.insertLevel,
+      });
     },
     close() {
       this.draggableElement.hide();
-      this.inputValue= "默认分组"
-      this.protocol= "http://"
-      this.selectType='text'
-      this.urlTitle='科创'
-      this.dialogType='add'
+      this.inputValue = "默认分组";
+      this.protocol = "http://";
+      this.selectType = "text";
+      this.urlTitle = "科创";
+      this.dialogType = "add";
     },
   },
-  destroyed(){
-    EventBus.$off()
-  }
+  destroyed() {
+    EventBus.$off();
+  },
 };
 </script>
 
 
 <style lang="less" scoped>
-.query-button{
+.query-button {
   padding: 2px 5px;
   border-radius: 3px;
-  color:#1890ff;
+  color: #1890ff;
   text-shadow: none;
   box-shadow: 0 2px #0000000b;
   border: 1px solid #1890ff;
   background: transparent;
 }
-.reset-button{
+.reset-button {
   padding: 2px 5px;
   border-radius: 3px;
-  color:#1890ff;
+  color: #1890ff;
   text-shadow: none;
   box-shadow: 0 2px #0000000b;
   border: 1px solid #1890ff;
   background: transparent;
 }
-.pageActive{
+.pageActive {
   background: rgb(248, 226, 211);
 }
 * {
@@ -291,7 +304,7 @@ export default {
   border: 1px solid #d9d9d9;
 }
 .query-input {
-  width:12rem;
+  width: 12rem;
   outline: none;
 }
 .postId {
@@ -299,27 +312,27 @@ export default {
   font-weight: 600;
   // margin-right: 3px;
 }
-.post-list-paging{
-  margin-top:10px;
+.post-list-paging {
+  margin-top: 10px;
   background: rgb(173, 217, 245);
   height: 20px;
-  span{
-    transition: all .4s;
+  span {
+    transition: all 0.4s;
     cursor: pointer;
     margin-right: 5px;
     padding: 2px 5px;
-    border:1px solid rgb(219, 217, 217);
+    border: 1px solid rgb(219, 217, 217);
     border-radius: 3px;
   }
 }
 .postContent {
-    margin: 0.6rem 0;
-    max-height: 4.5rem;
-    word-break: break-word;
-    display: -webkit-box;
-    overflow: hidden;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+  margin: 0.6rem 0;
+  max-height: 4.5rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 @import "../../publicModules/base";
 .module-dialog-body {
@@ -368,24 +381,24 @@ export default {
     padding: 0 1rem;
     .select-type {
       // margin-top: 10px;
-      width:100%;
+      width: 100%;
       margin: 10px auto;
 
-      .add-url{
-        width:100%;
+      .add-url {
+        width: 100%;
         margin-top: 5px;
-        .url-title{
+        .url-title {
           display: flex;
           align-items: center;
         }
-        .url-address{
-          margin-top:5px;
+        .url-address {
+          margin-top: 5px;
           display: flex;
           align-items: center;
-          .bg{
+          .bg {
             background: #fafafa;
           }
-          .select{
+          .select {
             outline: none;
             border: 1px solid #d9d9d9;
           }
@@ -412,8 +425,8 @@ export default {
       margin-top: 10px;
       .select-post-query-width {
         display: flex;
-        button{
-          padding:0 8px;
+        button {
+          padding: 0 8px;
           margin-left: 10px;
         }
       }
@@ -423,29 +436,27 @@ export default {
         align-items: baseline;
         margin-top: 5px;
         .list-container {
-          @media (max-height : 600px){
+          @media (max-height: 600px) {
             height: 28rem;
-
-          };
+          }
           position: relative;
           border: 1px rgba(218, 216, 216, 0.514) solid;
           height: 38rem;
-          width:100%;
+          width: 100%;
           overflow-y: scroll;
-          .list-height{
-
+          .list-height {
             cursor: pointer;
-            .post-list-item:hover{
-                background-color: #e6e0db ;
-              }
+            .post-list-item:hover {
+              background-color: #e6e0db;
+            }
             .post-list-item {
               display: flex;
               align-items: center;
-              .radio-post{
+              .radio-post {
                 margin-right: 10px;
               }
-              transition: all .3s ;
-              padding: .5rem;
+              transition: all 0.3s;
+              padding: 0.5rem;
               background-color: #f6f2ee;
               border-radius: 3px;
             }
@@ -455,23 +466,22 @@ export default {
           width: 100%;
           border: 1px rgba(218, 216, 216, 0.514) solid;
           height: 38rem;
-          .list-height{
+          .list-height {
             cursor: pointer;
-            .post-list-item:hover{
-                background-color: #e6e0db ;
-              }
+            .post-list-item:hover {
+              background-color: #e6e0db;
+            }
             .post-list-item {
               display: flex;
               align-items: center;
-              .radio-post{
+              .radio-post {
                 margin-right: 10px;
               }
-              transition: all .3s ;
+              transition: all 0.3s;
               padding: 1rem;
               background-color: #f6f2ee;
               border-radius: 3px;
             }
-            
           }
         }
         li {
@@ -489,7 +499,7 @@ export default {
 }
 ::-webkit-scrollbar {
   @media (max-width: 500px) {
-       width: 1px;
+    width: 1px;
   }
   width: 10px;
   height: 1px;

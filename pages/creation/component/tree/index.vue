@@ -4,8 +4,8 @@
       :title='"类型：" + map[data.type]+ "\r标题：" + data.title + "\r地址：" + data.url'
       class="child_tree_row col-xs-12.col-md-12"
       :class="{ active: isShowOperation }"
-      @mouseenter="operations && mouseEnter(...arguments)"
-      @mouseleave="operations && mouseEnter(...arguments)"
+      @mouseenter="operations && mouseEnter()"
+      @mouseleave="operations && mouseEnter()"
     >
       <span :style="{ width: level * 24 + 'px' }"></span>
       <span
@@ -27,7 +27,7 @@
       <span
         v-if="operations"
         class="title"
-        @click.stop="operations && jurisdiction === 'admin' && clickArticleTitle(...arguments, data, childIndex)"
+        @click.stop="operations && jurisdiction === 'admin' && clickArticleTitle(data, childIndex)"
         >{{ data.title }}</span
       >
       <span
@@ -154,7 +154,7 @@ export default {
   created(){
   },
   mounted(){
-    window.onbeforeunload=function(){
+    window.onbeforeunload = function(){
       saveToSessionStorage(sessionStorageKeys.scrollTop, 0)
     }
     this.scrollPosition()
@@ -245,7 +245,7 @@ export default {
       }
     },
     // 编辑
-    clickArticleTitle(e, data, childIndex) {
+    clickArticleTitle(data, childIndex) {
       const { bid } = this;
       const aid = data._id;
       if (data.type === "text") {
@@ -260,7 +260,7 @@ export default {
       }
     },
 
-    mouseEnter(event) {
+    mouseEnter() {
       this.isShowOperation = !this.isShowOperation;
     },
     add(data, childIndex) {
@@ -273,12 +273,6 @@ export default {
       });
     },
     addDocument(data, i, bid) {
-      // data.push({
-      //   type: "article",
-      //   value: "新建文章",
-      //   published: false,
-      // });
-      // 拿到aid 过后 传入给新增页面，新增页面再拿着aid 去找后端向 aid 里面添加数据
       const aid = data?._id;
       this.navToPage("articleEditor", { bid, aid, type: "article" });
     },
