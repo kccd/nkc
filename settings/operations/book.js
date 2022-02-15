@@ -6,6 +6,9 @@ module.exports = {
         GET: 'bookInvitation',
         POST: 'bookInvitation'
       }
+    },
+    options: {
+      GET: "getBook"
     }
   }
 }

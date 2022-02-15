@@ -156,7 +156,9 @@ class SinglePostModule {
     }
     container.attr('data-hide', 'false');
     button.attr('data-show-number', 'false');
+    //评论开关
     this.renderPostCommentNumber(pid);
+    //获取post下的评论
     this.getPostComments(pid, page)
       .then(data => {
         loading.remove();
@@ -169,6 +171,7 @@ class SinglePostModule {
         self.postPermission = postPermission;
         self.tid = tid;
         self.sendAnonymousPost = data.sendAnonymousPost;
+        //获取编辑器上的提示
         const comments = this.createCommentElements(pid);
         comments.html(htmlContent);
         const pagesDom = self.getPages(pid, paging);
@@ -233,6 +236,7 @@ class SinglePostModule {
     button.attr('data-show-number', 'true');
     this.renderPostCommentNumber(pid);
   }
+  //显示评论按钮或折叠评论按钮
   renderPostCommentNumber(pid) {
     const button = this.getCommentButton(pid);
     const number = Number(button.attr('data-number'));

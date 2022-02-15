@@ -21,6 +21,31 @@ body{
   .book-list{
     margin-bottom: 2rem;
     .book-list-item{
+      margin-bottom: 0.2rem;
+      &[data-type='stable'][data-status='unknown'] {
+        background: #ffdcb2!important;
+      }
+      &[data-type='beta'][data-status='unknown'] {
+        background: #ccc!important;
+      }
+      &[data-type='stable'][data-status='faulty'] {
+        background: #ffdbd5!important;
+        height: auto;
+        text-align: center;
+        line-height: normal;
+        .faulty-tip {
+          font-style: oblique;
+        }
+        .faulty-reason {
+          font-style: oblique;
+
+        }
+        .book-list-item-time {
+        }
+      }
+      &[data-type='stable'][data-status='disabled'] {
+        background: #bdbdbd!important;
+      }
       display: block;
       text-decoration: none;
       @itemHeight: 3rem;
@@ -40,6 +65,7 @@ body{
       .book-list-item-name{
         display: inline-block;
         height: 100%;
+        padding-left: 0.2rem;
         .hideText(@line: 1);
         font-size: 1.3rem;
         span.status{

@@ -269,6 +269,34 @@ module.exports = {
     },
     {
       parameters: [
+        "reviewLink",
+        "title",
+        "content"
+      ],
+      content: "您在图书[url=reviewLink(title)]下发表的回复[text=content]已通过审核，[url=reviewLink(立即查看)]。",
+      type: "commentPassReview"
+    },
+    {
+      parameters: [
+        "reviewLink",
+        "title",
+        "reason",
+        "content"
+      ],
+      content: "您在图书[url=reviewLink(title)]下发表的评论[text=content]由于[text=reason]等原因已被退回，目前只有您自己可以查看。请您在72小时之内修改恢复内容，消除存在的问题，并确保符合规章，点击 [url=reviewLink(这里)] 进行修改。逾期未修改，内容将被彻底屏蔽，不可恢复，届时不再另行通知。",
+      type: "commentFaulty"
+    },
+    {
+      parameters: [
+        "reviewLink",
+        "title",
+        "reason",
+      ],
+      content: "您在图书[url=reviewLink(title)]下发表的评论[text=content]由于[text=reason]等原因已被屏蔽，不可恢复。请您发布内容时确保符合规章，消除存在的问题，否则下次将您的内容标记违规",
+      type: "commentDisabled"
+    },
+    {
+      parameters: [
         "applicationFormURL",
         "applicationFormID",
         "applicationFormCode"
@@ -495,5 +523,15 @@ module.exports = {
       content: "您的标题为[url=threadURL(threadTitle)]的文章由于[text=reason]等原因，已被移动到[text=forumsName]。",
       type: "moveThread"
     },
+    {
+      parameters: [
+        "reviewLink",
+        "name",
+        "username",
+        "userURL"
+      ],
+      content: "用户[url=userURL(username)]邀请您一起创作图书[text=name], 点击[url=reviewLink(这里)]前往查看邀请",
+      type: "bookInvitation",
+    }
   ]
 };

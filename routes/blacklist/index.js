@@ -1,11 +1,17 @@
 const router = require("koa-router")();
 router
   .get('/', async (ctx, next) => {
+    //获取该用户在黑名单中的的信息
     const {query, data, db, state} = ctx;
-    let {tUid, pid} = query;
+    let {tUid, pid, cid} = query; // tUid 被拉黑的用户 pid => postId cid => commentId
     if(!tUid) {
-      const post = await db.PostModel.findOnly({pid});
-      tUid = post.uid;
+      if(pid) {
+        const post = await db.PostModel.findOnly({pid});
+        tUid = post.uid;
+      } else if(cid) {
+        const comment = await db.CommentModel.findOnly({_id: cid});
+        tUid = comment.uid;
+      }
     }
     const {user} = data;
     data.subscribed = state.subUsersId.includes(tUid);
@@ -17,9 +23,9 @@ router
   })
   .post('/', async (ctx, next) => {
     const {body, data, db} = ctx;
-    const {tUid, from, pid} = body;
+    const {tUid, from, pid, cid} = body;
     const {user} = data;
-    await db.BlacklistModel.addUserToBlacklist(user.uid, tUid, from, pid);
+    await db.BlacklistModel.addUserToBlacklist(user.uid, tUid, from, pid, cid);
     await next();
   })
   .del('/', async (ctx, next) => {

@@ -72,11 +72,11 @@ class ComplaintSelector extends NKC.modules.DraggablePanel {
         submit() {
           var _this = this;
           nkcAPI("/complaint", "POST", {
-            type: this.type,
-            id: this.id,
-            reasonTypeId: this.reasonTypeId,
-            reasonType: this.reasonType,
-            reasonDescription: this.reasonDescription
+            type: _this.type,
+            id: _this.id,
+            reasonTypeId: _this.reasonTypeId,
+            reasonType: _this.reasonType,
+            reasonDescription: _this.reasonDescription
           })
             .then(function() {
               _this.submitted = true;

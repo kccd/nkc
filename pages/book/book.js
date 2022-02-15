@@ -8,6 +8,10 @@ const app = new Vue({
     sid: data.bookId
   },
   components: {
-    comment: Comment
+    comment: Comment,
+  },
+  mounted() {
+  },
+  methods: {
   }
 });

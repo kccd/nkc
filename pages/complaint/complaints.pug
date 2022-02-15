@@ -43,6 +43,12 @@ block content
               a.complaint-author(:href="'/u/' + c.content.uid" target="_blank") {{c.content.user.username}}
               .complaint-info 所上传的文库文件
               a.complaint-link(@click='showResource(c.contentId)') 查看
+            span(v-else-if="c.type === 'comment'")
+              .complaint-info 投诉了用户
+              .complaint-author(v-if="c.content.anonymous")=anonymousInfo.username
+              a.complaint-author(v-else :href="'/u/' + c.content.uid" target="_blank") {{c.content.user.username}}
+              .complaint-info 所发表的回复
+              a.complaint-link(:href="c.content.url" target="_blank") 查看
             .complaint-content {{c.reasonDescription || "未填写违规详细信息"}}
             .complaint-button(v-if="c.resolved")
               span(@click="c.open = !c.open") 查看详情

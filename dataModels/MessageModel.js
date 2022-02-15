@@ -336,7 +336,9 @@ messageSchema.statics.getParametersData = async (message) => {
   const ThreadCategoryModel = mongoose.model('threadCategories');
   const ForumModel = mongoose.model('forums');
   const PreparationForumModel = mongoose.model('pForum');
+  const CommentModel = mongoose.model('comments');
   const apiFunction = require("../nkcModules/apiFunction");
+  const {htmlToPlain} = require("../nkcModules/nkcRender");
   const {getUrl, getAnonymousInfo} = require('../nkcModules/tools');
   const timeout = 72 * 60 * 60 * 1000;
   let parameters = {};
@@ -693,26 +695,51 @@ messageSchema.statics.getParametersData = async (message) => {
       noticeContent: content,
       cTitle: cTitle,
     };
-  } else if(["newReview", "passReview"].includes(type)) {
+  } else if(["bookInvitation"].includes(type)) {
+    const {bid, name, uid} = message.c;
+    const user = await UserModel.findOnly({uid});
+    const {username} = user;
+    if(!bid) return null;
+    parameters = {
+      reviewLink: `/book/${bid}/member/invitation`,
+      name,
+      username,
+      userURL: `/u/${uid}`,
+    };
+  }else if(["newReview", "passReview"].includes(type)) {
     const {pid} = message.c;
     const post = await PostModel.findOne({pid});
     if(!post) return null;
     parameters = {
       reviewLink: await PostModel.getUrl(post)
     };
-  } else if(["documentFaulty", "documentDisabled", "documentPassReview"].includes(type)) {
+  } else if(["documentFaulty", "documentDisabled", "documentPassReview", "commentFaulty", "commentDisabled", "commentPassReview"].includes(type)) {
     const {docId, reason} = message.c;
     const document = await DocumentModel.findOne({_id: docId});
     if(!document) return null;
-    let article = await ArticlesModel.findOne({did: document.did}).sort({toc: -1});
-    article = await ArticlesModel.extendArticles([article]);
-    parameters = {
-      //获取document所在article的url
-      editLink: type === 'documentPassReview'?article[0].url:`/creation/articles/editor?bid=${article[0].bid}&aid=${article[0]._id}`,
-      reviewLink: article[0].url,
-      reason: reason?reason:'未知',
-      title: document.title,
-    };
+    if(document.source === 'article') {
+      let article = await ArticlesModel.findOne({did: document.did}).sort({toc: -1});
+      article = await ArticlesModel.extendArticles([article]);
+      parameters = {
+        //获取document所在article的url
+        editLink: type === 'documentPassReview'?article[0].url:`/creation/articles/editor?bid=${article[0].bid}&aid=${article[0]._id}`,
+        reviewLink: article[0].url,
+        reason: reason?reason:'未知',
+        title: document.title,
+      };
+    } else if (document.source === 'comment') {
+      let comment = await CommentModel.findOne({_id: document.sid}).sort({toc: -1});
+      comment = await CommentModel.extendReviewComments([comment]);
+      parameters = {
+        //获取document所在comment的url
+        reviewLink: comment[0].bookUrl,
+        content: htmlToPlain(document.content, 100),
+        reason: reason?reason:'未知',
+        title: comment[0].bookName,
+      };
+    }
+
+
   } else if(["fundAdmin", "fundApplicant", "fundMember", "fundFinishProject"].includes(type)) {
     const {applicationFormId} = message.c;
     let applicationForm = await FundApplicationFormModel.findOne({_id: applicationFormId});
@@ -854,6 +881,14 @@ messageSchema.statics.getParametersData = async (message) => {
       // CRTarget = tools.getUrl("library", contentId);
       // 投诉目标描述
       CRTargetDesc = library.name;
+    } else if(complaintType === 'comment') {
+      const comment = await CommentModel.findOne({_id: contentId});
+      if(!comment) return  null;
+      CRType = "回复";
+      // 投诉目标链接
+      CRTarget = `/book/${comment.sid}`;
+      // 投诉目标描述
+      CRTargetDesc = "点击查看";
     } else {
       return null;
     }
@@ -1603,6 +1638,21 @@ messageSchema.statics.mySystemInfoMessageFilter = async (uid, messages) => {
     }
     return false;
   });
+}
+
+/*
+* 批量发送消息给用户
+* */
+messageSchema.statics.sendMessagesToUser = async function(messages) {
+  const socket = require('../nkcModules/socket');
+  const MessageModel = mongoose.model('messages');
+  for(const message of messages){
+    if(!message) continue;
+    const m = await MessageModel(message);
+    if(!m) continue;
+    m.save();
+    await socket.sendMessageToUser(m._id);
+  }
 }
 
 const MessageModel = mongoose.model('messages', messageSchema);

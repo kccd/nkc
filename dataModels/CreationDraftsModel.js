@@ -129,7 +129,7 @@ schema.methods.modifyDraft = async function (props) {
     content,
     tlm: toc,
   });
-  this.updateOne({
+  await this.updateOne({
     $set: {
       tlm: toc,
     }

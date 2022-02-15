@@ -145,12 +145,13 @@
             self.coverFile = null;
             const {articleId, articleCover} = data;
             self.articleId = articleId;
-            self.resetCoverFile(articleCover);
+            return self.resetCoverFile(articleCover);
           })
           .then(() => {
             if(type !== 'publish') {
               self.lockPost = false;
             }
+            return;
           })
           .catch(err => {
             self.lockPost = false;
@@ -173,13 +174,13 @@
       },
       publish() {
         const self = this;
-        this.post('publish')
+        self.post('publish')
         .then(() => {
           self.$router.replace({
-            name: 'bookContent',
+            name: 'book',
             params: {
               bid: self.bookId,
-              aid: self.articleId
+              // aid: self.articleId
             }
           });
         })

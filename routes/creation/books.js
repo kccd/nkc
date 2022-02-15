@@ -7,6 +7,7 @@ router
     await next();
   })
   .get('/editor', async (ctx, next) => {
+    //获取图书设置
     const {db, data, query, nkcModules, state} = ctx;
     const {bid} = query;
     const book = await db.BookModel.findOnly({_id: bid});
@@ -30,6 +31,7 @@ router
     await next();
   })
   .post('/editor', async (ctx, next) => {
+    //提交图书设置
     const {state, body, db, data} = ctx;
     const {files, fields} = body;
     const {cover} = files;
@@ -41,7 +43,6 @@ router
       read,
     } = JSON.parse(fields.book);
     let book;
-
     if(bookId) {
       book = await db.BookModel.findOnly({_id: bookId});
     } else {
@@ -57,10 +58,13 @@ router
     if(!book) {
       book = await db.BookModel.createBook(bookInfo);
     } else {
+      //新创作成员
       const newMembersObj = {};
       for(const m of members) {
+        if(m.uid === state.uid) continue;
         newMembersObj[m.uid] = m;
       }
+      //原创作成员
       const bookMembers = book.members;
       for(const bm of bookMembers) {
         const newBm = newMembersObj[bm._id];

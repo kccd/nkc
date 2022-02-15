@@ -38,7 +38,7 @@ const schema = new Schema({
   },
   handlerId: {
     type: String,
-    required: true,
+    default: '',
     index: 1
   },
   reason: {
@@ -78,7 +78,6 @@ schema.statics.newDocumentReview = async (type, documentId, uid, reason) => {
     reason,
     docId: documentId,
     uid,
-    handlerId: uid,
   });
   await review.save();
 }
@@ -361,6 +360,19 @@ schema.statics.autoPushToReview = async function(post) {
   // }
 
   return needReview;
+}
+/*
+* 更新审核记录的处理人uid
+* */
+schema.methods.updateReview = async function(props) {
+  const {uid, type, reason} = props;
+  await this.updateOne({
+    $set: {
+      handlerId: uid,
+      type,
+      reason,
+    }
+  });
 }
 
 module.exports = mongoose.model("reviews", schema);

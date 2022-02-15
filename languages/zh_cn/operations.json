@@ -821,6 +821,11 @@
   "mathJax": "编辑器预览公式",
   "resourceCategory": "获取资源分组",
   "getBook": "查看书籍内容",
+  "disabledComment": "退修禁用专题评论",
+  "publishComment": "发布专题评论",
+  "getComments": "获取专题评论",
+  "modifyComment": "编辑专题评论",
+  "deleteComment": "删除专题评论",
   "experimentDocumentPostSettings": "后台管理 - 设置 - 内容发表",
   "bookInvitation": "处理专题创作邀请"
 }

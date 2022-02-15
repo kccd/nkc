@@ -1,12 +1,6 @@
 const Router = require("koa-router");
 const router = new Router();
 router
-  // //获取投诉类型
-  // .get("/getType", async (ctx, next) => {
-  //   const {db, data}=ctx;
-  //   data.complaintTypes=await db.ComplaintTypeModel.find().sort({toc:-1})
-  //   await next();
-  // })
   //获取投诉列表和类型
   .get("/", async (ctx, next) => {
     const {query, db, data, nkcModules} = ctx;
@@ -40,6 +34,8 @@ router
         c.type_ = "文章"
       } else if(c.type === "library"){
         c.type_ = "文库"
+      } else if(c.type === "comment"){
+        c.type_ = "图书评论"
       }
       c.reasonType = typesObj[c.reasonTypeId];
     });
@@ -76,6 +72,7 @@ router
     await next();
   })
   .post("/resolve", async (ctx, next) =>{
+    //处理投诉
     const {data, db, body, redis} = ctx;
     const {result, informed, _id, complaints} = body;
     const time = Date.now();
@@ -126,6 +123,7 @@ router
     await next();
   })
   .get('/type', async (ctx, next) => {
+    //获取投诉提示和投诉类型
     const {db, data} = ctx;
     data.complaintTypes = await db.ComplaintTypeModel.find({disabled: false}).sort({order: 1});
     data.complaintTip = (await db.SettingModel.getSettings('complaint')).tip;
