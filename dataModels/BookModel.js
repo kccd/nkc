@@ -59,6 +59,7 @@ const schema = new mongoose.Schema({
   * @param {String} id 当 type 为 post 或 aritcle 时，此字段为对应 ID，其余情况为空字符串
   * @param {String} title 当 type 为 url 或分组时，此字段为标题，其余情况为空字符串
   * @param {String} url 当 type 为 url 时，此字段为链接地址
+  * @param {[]} child 表示子集
   * */
   list: {
     type: [mongoose.Schema.Types.Mixed],
@@ -681,6 +682,31 @@ schema.methods.getBookPermissionForUser = async function(uid) {
     continue;
   }
   return  null;
+}
+
+/*
+* 判断文章 ID 是否合法
+* @param {String} articleId 文章 ID
+* */
+schema.methods.checkArticleId = async function(articleId) {
+  const {list} = this;
+  const getStatus = (arr) => {
+    let status = false;
+    for(const item of arr) {
+      if(item.type === 'article' && item.id === articleId) {
+        status = true;
+        break;
+      }
+      if(item.child && item.child.length > 0) {
+        status = getStatus(item.child);
+      }
+    }
+    return status;
+  }
+  const exist = getStatus(list);
+  if(!exist) {
+    throwErr(500, '文章 ID 错误');
+  }
 }
 
 module.exports = mongoose.model('books', schema);

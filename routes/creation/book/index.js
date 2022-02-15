@@ -41,5 +41,6 @@ router
     await book.removeMemberByUid(uid);
     data.bookMembers = await book.getAllMembers();
     await next();
-  });
+  })
+  .use('/:bid/list', listRouter.routes(), listRouter.allowedMethods())
 module.exports = router;
