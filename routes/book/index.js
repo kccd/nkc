@@ -11,8 +11,9 @@ router
     //获取当前用户对于该图书的身份权限,是否具有图书管理权限
     const bookPermission = await book.getBookPermissionForUser(state.uid);
     data.book = await book.getBaseInfo();
-    data.list = await book.getList({bookPermission});
+    // data.list = await book.getList({bookPermission});
     data.bookPermission = bookPermission;
+    data.list = await book.getList('published');
     if(aid) {
       data.bookContent = await book.getContentById({
         aid,

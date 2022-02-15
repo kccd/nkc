@@ -11,7 +11,10 @@ module.exports = {
       PUT: 'experimentalThreadCategorySettings',
       PARAMETER: {
         PUT: 'experimentalThreadCategorySettings',
-        DELETE: 'experimentalThreadCategorySettings'
+        DELETE: 'experimentalThreadCategorySettings',
+        default: {
+          PUT: 'experimentalThreadCategorySettings',
+        }
       }
     },
 		tools: {

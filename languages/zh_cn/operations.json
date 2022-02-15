@@ -1,4 +1,9 @@
 {
+  "viewHistoryDocument":"查看编辑器内容历史",
+  "previewDocument":"预览编辑器内容",
+  "creationCenterDeleteList":"创作中心删除图书单个目录",
+  "creationCenterMoveList":"创作中心移动图书单个目录",
+  "creationCenterAddList":"创作中心新建图书单个目录",
   "displayExperimentalLink": "显示【管理】入口",
   "visitHome": "访问网站首页",
   "getUserAvatar": "获取用户头像",

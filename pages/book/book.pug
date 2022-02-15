@@ -12,6 +12,18 @@ block content
         .book-name=data.book.name
         .book-description=data.book.description
         .book-list
+
+          //-
+            mixin bookList(data,level=0)
+              for item,i in data
+                if !!item
+                  a.book-list-item(href=item.url || "#"  target=item.url ? "_blank" : '' style="margin-left:"+ (level * 24) + 'px' title="类型：" + `${{article:'文章',text:'分组',post:'post',url:'链接'}[item.type]}`+ "\r标题：" + item.title + "\r地址：" + item.url)
+                    .book-list-item-name
+                      span=item.title
+                    .book-list-item-time=item.time
+                  if item.child
+                    +bookList(item.child,level+1 )
+            +bookList(data.list)
           for item in data.list
             a.book-list-item(href=item.url target="_blank" data-type=item.type data-status=item.status)
               if item.status === 'faulty'

@@ -62,6 +62,20 @@ module.exports = {
   book: {
     PARAMETER: {
       GET: 'creationCenter',
+      list:{
+        delete:{
+          POST:'creationCenterDeleteList'
+        },
+        move:{
+          POST:'creationCenterMoveList'
+        },
+        add:{
+          POST:'creationCenterAddList'
+        }
+      },
+      PARAMETER: {
+        GET: 'creationCenter'
+      },
       member: {
         POST: 'creationCenter',
         DELETE: 'creationCenter'

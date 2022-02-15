@@ -1,0 +1,34 @@
+extends ../../bootstrap_base
+block title
+  //- title=data.book.name
+  +includeCSS('/document/history/history.css')
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-3.m-t-2
+        .book-cover
+          //- img(src=data.book.coverUrl)
+        //- .book-name=list.title
+        .book-list
+          for list in data.history
+            p.title-list()
+              a.book-list-item(href=`/document/${list.did}/history/`+ list._id + '?bid=' + data.bookId)=list.title
+              span.time=`编辑于 ${new Date(list.tlm).getFullYear()}-${new Date(list.tlm).getMonth()+1}-${new Date(list.tlm).getDate() }  ${new Date(list.tlm).getHours()}:${new Date(list.tlm).getMinutes()}`
+      .col-xs-12.col-md-9.book-content-container
+        h1.book-content-title=data.document.title
+        if data.history.length
+          .book-content-info
+            span.m-r-05=`创建于 ${new Date(data.document.dt).getFullYear()}-${new Date(data.document.dt).getMonth()+1}-${new Date(data.document.dt).getDate() }  ${new Date(data.document.dt).getHours()}:${new Date(data.document.dt).getMinutes()}`
+              if data.document.toc
+                span=`，编辑于 ${new Date(data.document.tlm).getFullYear()}-${new Date(data.document.tlm).getMonth()+1}-${new Date(data.document.tlm).getDate() }  ${new Date(data.document.tlm).getHours()}:${new Date(data.document.tlm).getMinutes()}`
+            if remoteState.uid === data.document.uid
+              a(href=data.bookContentEditor target='_blank') 
+          .book-content-content!=data.document.content
+          .btns
+            button.btn.btn-primary.m-r-05(onclick=`publish('${JSON.stringify(data.document)}','${data.bookId}')`) 选择当前版本发布 
+            button.btn.btn-default.m-r-05(onclick=`saveArticle('${JSON.stringify(data.document)}','${data.bookId}')`) 选择当前版本进行编辑
+        else
+          h3 该文章还没有历史记录
+block scripts
+  include ../../publicModules/nkcSource
+  +includeJS('/document/history/history.js')

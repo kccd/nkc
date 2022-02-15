@@ -791,8 +791,7 @@ settingSchema.statics.getWatermarkCoverPathByUid = async (uid, type) => {
   }
   return await SettingModel.getWatermarkCoverPath(
     imagePath,
-    text,
-    watermarkSettings.transparency / 100
+    text
   );
 }
 
@@ -825,17 +824,17 @@ settingSchema.statics.getWatermarkCoverPathByTypeStyle = async (uid, type, style
 }
 
 //创建水印图片
-settingSchema.statics.getWatermarkCoverPath = async (magePath, text, transparent = 1) => {
+settingSchema.statics.getWatermarkCoverPath = async (magePath, text) => {
   const {getFileMD5, getTextMD5} = require('../nkcModules/hash');
   const FILE = require('../nkcModules/file');
   const createWatermark = require('../nkcModules/createWatermark');
   const {watermarkCache} = require("../settings/upload");
-  const md5 = await getFileMD5(magePath) + await getTextMD5(text + transparent);
+  const md5 = await getFileMD5(magePath) + await getTextMD5(text);
   const watermarkPath = PATH.resolve(watermarkCache, `${md5}.png`);
   if(await FILE.access(watermarkPath)) {
     return watermarkPath;
   }
-  const watermarkStream = await createWatermark(magePath, text, transparent);
+  const watermarkStream = await createWatermark(magePath, text);
   const file = fs.createWriteStream(watermarkPath);
   const func = () => {
     return new Promise((resolve, reject) => {

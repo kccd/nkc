@@ -1,5 +1,6 @@
 export const sessionStorageKeys = {
-  draggableElement: 'draggableElement'
+  draggableElement: 'draggableElement',
+  scrollTop: 'scrollTop'
 };
 
 export function getFromSessionStorage(name) {

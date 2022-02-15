@@ -1,5 +1,7 @@
 {
   "port": 10292,
+  "address": "127.0.0.1",
+  "useGPU": false,
   "attachment": [
     {
       "startingTime": "1990-01-01",

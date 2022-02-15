@@ -53,12 +53,15 @@ const schema = new mongoose.Schema({
     type: String,
     default: 'self', // everyone（所有人可见）, self（仅自己可见）, member（仅创作成员可见）
   },
-  // 目录列表
-  // 命名规则：type:id
-  // postId: post:pid
-  // articleId：article:aid
+  /*
+  * 专题目录
+  * @param {String} type text|url|post|article
+  * @param {String} id 当 type 为 post 或 aritcle 时，此字段为对应 ID，其余情况为空字符串
+  * @param {String} title 当 type 为 url 或分组时，此字段为标题，其余情况为空字符串
+  * @param {String} url 当 type 为 url 时，此字段为链接地址
+  * */
   list: {
-    type: [String],
+    type: [mongoose.Schema.Types.Mixed],
     default: []
   }
 }, {
@@ -146,6 +149,27 @@ schema.statics.getBooksByUserId = async (uid) => {
   const books = await BookModel.find({uid, disabled: {$ne: true}});
   return await BookModel.extendBooksData(books);
 };
+schema.statics.filterList = async function (updateList) {
+  let newUpdateList = [...updateList]
+  const allowKeys = ['id', 'child', 'title', 'url','type']
+  // 过滤数据
+  function find(data) {
+    data.forEach(item => {
+      for (const key in item) {
+        if (Object.hasOwnProperty.call(item, key)) {
+          if (!allowKeys.includes(key)) {
+            Reflect.deleteProperty(item, key)
+          }
+          if (item.child && item.child.length) {
+            find(item.child)
+          }
+        }
+      }
+    });
+  }
+  find(newUpdateList)
+  return newUpdateList
+}
 
 schema.statics.getOtherBooksByUserId = async (uid) => {
   const BookModel = mongoose.model('books');
@@ -160,31 +184,133 @@ schema.statics.getOtherBooksByUserId = async (uid) => {
   return await BookModel.extendBooksData(books);
 }
 
-schema.methods.bindArticle = async function(articleId) {
+schema.methods.bindArticle = async function(aid) {
   await this.updateOne({
     $addToSet: {
-      list: `${articleId}`
+      list: {
+        aid,
+        child: []
+      }
     }
   });
 }
 
-schema.methods.getList = async function(props) {
-  const {bookPermission = ''} = props;
-  const articles = await this.extendArticlesById(this.list);
-  const articlesObj = {};
-  for(const a of articles) {
-    if(!bookPermission) {
-      if(a.status !== 'normal') continue;
+/*
+* 拓展专题目录信息
+* */
+schema.methods.extendBookList = async function () {
+  const postsId = new Set();
+  const articlesId = new Set();
+  const bookList = this.list;
+  // 查找 post 和 article id
+  function findId(bookList){
+    for (let i = 0; i < bookList.length; i++) {
+      const item = bookList[i];
+      if(item.type === 'article'){
+        articlesId.add(item.id)
+      }else if(item.type === 'post'){
+        postsId.add(item.id)
+      }
+      if(item.child && item.child.length){
+        findId(item.child)
+      }
     }
-    articlesObj[a._id] = a;
   }
-  const results = [];
-  for(const aid of this.list) {
-    const article = articlesObj[aid];
-    if(!article) continue;
-    results.push(article);
+  findId(bookList);
+  const DocumentModel = mongoose.model('documents');
+  const PostModel = mongoose.model('posts');
+  const posts = await PostModel.find({pid: {$in: [...postsId]}});
+  const postsObj = {};
+  for(const post of posts) {
+    postsObj[post.pid] = post;
   }
-  return results;
+  const {timeFormat, getUrl} = require('../nkcModules/tools');
+  const {
+    article: documentSource
+  } = await DocumentModel.getDocumentSources();
+  const documents = await DocumentModel.find({
+    type: {
+      $in: ['beta', 'stable']
+    },
+    source: documentSource,
+    sid: {
+      $in: [...articlesId]
+    }
+  });
+  const articlesObj = {};
+  for (const d of documents) {
+    const {
+      type,
+      sid
+    } = d;
+    if (!articlesObj[sid]) articlesObj[sid] = {};
+    articlesObj[sid][type] = d;
+  }
+  let _id = this._id
+  const that = this
+  function setKey(extendItem, documentData){
+    extendItem._id = documentData.sid || documentData.tid;
+    extendItem.uid = documentData.uid;
+    if(documentData.type){
+      extendItem.published = documentData.type === "stable" ? true : false;
+      extendItem.hasBeta = documentData.type === "beta" ? true : false;
+    }
+    extendItem.title = documentData.title || documentData.t;
+    let urlType = 'bookContent';
+    switch (extendItem.type) {
+      case 'article':
+        urlType = 'bookContent';
+        _id = that._id
+        break;
+      case 'post':
+        urlType = 'post';
+        _id = extendItem.id
+      default:
+        break;
+    }
+    // item.url = getUrl(urlType, this._id, documentData._id);
+    extendItem.url = getUrl(urlType, _id, extendItem.id);
+    extendItem.time = timeFormat(documentData.toc);
+  }
+  // 查找 post 和 article 类型并扩展数据
+  function find(data) {
+    for (let item of data) {
+      if (!item) continue;
+      if (item.type === "article") {
+        //   {_id, uid, published, hasBeta, title, url, time}
+        const documentData = articlesObj[item.id]['beta'] || articlesObj[item.id]['stable'];
+        setKey(item, documentData)
+      }else if( item.type === 'post'){
+        const postData = postsObj[item.id];
+        setKey(item, postData)
+      }
+      if (item.child && item.child.length) {
+        find(item.child);
+      }
+    }
+  }
+  find(bookList)
+  return bookList;
+}
+
+schema.methods.getList = async function (status ='unpublished') {
+  // status  分为 已发布 未发布
+  let articles = await this.extendBookList()
+  if(status === 'published'){
+    // 只显示发布文章 如果父级未发布那么子级也不显示
+    function findPublished(data){
+      data.forEach((item, i)=>{
+        if(!item.published && item.type === 'article'){
+          Reflect.deleteProperty(data,i)
+        }
+        if(item.child && item.child.length){
+          findPublished(item.child)
+        }
+      })
+    }
+    findPublished(articles)
+  }
+  return articles || []
 }
 
 
@@ -216,9 +342,11 @@ schema.methods.extendArticlesById = async function(articlesId) {
   const results = [];
   for(const article of articles) {
     const {
+      did,
       _id,
       toc,
       uid,
+      type
     } = article;
     const articleObj = articlesObj[_id];
     if(!articleObj) continue;
@@ -228,7 +356,7 @@ schema.methods.extendArticlesById = async function(articlesId) {
       continue;
     }
     const document = stableDocument || betaDocument;
-    const {title, status, type, _id: docId} = document;
+    const {title, status, _id: docId} = document;
     let review;
     if(status === 'faulty' || status === 'disabled') {
       review = await ReviewModel.findOne({docId}).sort({toc: -1}).limit(1);
@@ -245,6 +373,12 @@ schema.methods.extendArticlesById = async function(articlesId) {
       url: getUrl('bookContent', this._id, _id),
       time: timeFormat(toc)
     };
+    for (const d of documents) {
+      const {
+        type,
+        sid
+      } = d;
+    }
     results.push(result);
   }
   return results;
@@ -259,10 +393,31 @@ schema.methods.getContentById = async function(props) {
   const {list} = this;
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
-  const {article: documentSource} = await DocumentModel.getDocumentSources();
-  if(list.includes(aid)) {
-    const article = await ArticleModel.findOnly({_id: aid});
-    const {_id} = article;
+  const {
+    article: documentSource
+  } = await DocumentModel.getDocumentSources();
+  let listIds=[]
+  function find(data){
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+      if(item){
+        if(item.type === 'article' && item.id){
+          listIds.push(item.id)
+        }
+        if(item.child && item.child.length){
+          find(item.child)
+        }
+      }
+    }
+  }
+  find(list)
+  if (listIds.includes(aid)) {
+    const article = await ArticleModel.findOnly({
+      _id: aid
+    });
+    const {
+      _id
+    } = article;
     const {
       did,
       time,
@@ -282,8 +437,11 @@ schema.methods.getContentById = async function(props) {
       uid,
       note: await article.getNote()
     }
+  }else{
+    return null
   }
-};
+}
+
 
 /*
 * 获取专题成员，包括待处理、拒绝邀请的成员

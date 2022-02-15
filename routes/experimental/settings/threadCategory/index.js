@@ -139,4 +139,15 @@ router
     const category = await db.ThreadCategoryModel.findOnly({_id: cid});
     await category.deleteAndClearReference();
     await next();
+  })
+  .put('/:cid/default', async (ctx, next) => {
+    const {body, params, db} = ctx;
+    const {defaultNode} = body;
+    const {cid} = params;
+    await db.ThreadCategoryModel.updateOne({_id: cid}, {
+      $set: {
+        defaultNode
+      }
+    });
+    await next();
   });

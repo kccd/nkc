@@ -1,7 +1,8 @@
 const router = require('koa-router')();
+const listRouter = require('./list')
 router
   .get('/:bid', async (ctx, next) => {
-    //获取图书列表
+    //获取专题列表
     const {data, params, db, nkcModules, state} = ctx;
     const {bid} = params;
     const {timeFormat, getUrl} = nkcModules.tools;
@@ -9,8 +10,9 @@ router
     const bookPermission = await book.getBookPermissionForUser(state.uid);
     if(!bookPermission) throwErr(400, '权限不足');
     data.bookList = await book.getList({bookPermission});
+    data.bookList = await book.getList() || [];
     data.bookData = {
-      _id: book._id,
+      bid: book._id,
       name: book.name,
       description: book.description,
       uid: book.uid,
@@ -39,17 +41,5 @@ router
     await book.removeMemberByUid(uid);
     data.bookMembers = await book.getAllMembers();
     await next();
-  })
-  // /*.get('/:bid/:id', async (ctx, next) => {
-  //   //获取 article
-  //   const {data, params, db, state} = ctx;
-  //   const book = await db.BookModel.findOnly({_id: params.bid});
-  //   data.bookArticle = await book.getContentById({aid: params.id, uid: state.uid});
-  //   data.bookList = await book.getList();
-  //   data.bookData = {
-  //     _id: book._id,
-  //     name: book.name,
-  //   };
-  //   await next();
-  // })*/
+  });
 module.exports = router;

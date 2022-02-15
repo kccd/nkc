@@ -1,6 +1,5 @@
 const mongoose = require('../settings/database');
 const Schema = mongoose.Schema;
-const PATH = require('path');
 const schema = new Schema({
   // 附件ID mongoose.Types.ObjectId().toString()
   _id: String,
@@ -262,7 +261,7 @@ schema.statics.saveScoreIcon = async (file, scoreType) => {
 /*
 * 保存文章封面
 * @param {String} pid post id
-* @param {File} file 文件对象 可选 默认从post resources中选取图片
+* @param {File/String} file 文件对象 或著 rid 可选 默认从post resources中选取图片
 * @author pengxiguaa 2020/7/21
 * */
 schema.statics.savePostCover = async (pid, fileData) => {
@@ -293,7 +292,6 @@ schema.statics.savePostCover = async (pid, fileData) => {
     return;
   }
   if(!file) return;
-
   const time = new Date();
   const aid = await AttachmentModel.getNewId();
   const ext = await FILE.getFileExtension(file, ['jpeg', 'jpg', 'png']);

@@ -1,0 +1,21 @@
+extends ../../bootstrap_base
+block title
+  //- title=data.book.name
+  +includeCSS('/document/preview/preview.css')
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-9.book-content-container
+        h1.book-content-title=data.document.title
+        .book-content-info
+          span.m-r-05=`创建于 ${new Date(data.document.dt).getFullYear()}-${new Date(data.document.dt).getMonth()+1}-${new Date(data.document.dt).getDate() }  ${new Date(data.document.dt).getHours()}:${new Date(data.document.dt).getMinutes()}`
+            if data.document.toc
+              span=`，编辑于 ${new Date(data.document.tlm).getFullYear()}-${new Date(data.document.tlm).getMonth()+1}-${new Date(data.document.tlm).getDate() }  ${new Date(data.document.tlm).getHours()}:${new Date(data.document.tlm).getMinutes()}`
+          if remoteState.uid === data.document.uid
+            a(href=data.bookContentEditor target='_blank') 
+        //-.book-content-cover
+          img(src=data.bookContent.coverUrl)
+        .book-content-content!=data.document.content
+block scripts
+  include ../../publicModules/nkcSource
+  +includeJS('/document/preview/preview.js')

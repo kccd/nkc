@@ -558,4 +558,5 @@ module.exports = {
   getAudioDuration,
   getFileMetaInfo,
   clearMetadata,
+  spawnProcess,
 };

@@ -21,6 +21,11 @@ const schema = new mongoose.Schema({
     required: true,
     index: 1
   },
+  // 作为父级时，在编辑器页默认选择的子分类，cid、default、none
+  defaultNode: {
+    type: String,
+    default: 'none'
+  },
   // 默认子分类名称
   nodeName: {
     type: String,

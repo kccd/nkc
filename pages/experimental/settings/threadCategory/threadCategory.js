@@ -25,7 +25,20 @@ const app = new Vue({
     }
   },
   methods: {
-    //实例化可拖动组件
+    setAsDefault(c, status, value) {
+      if(status) {
+        c.defaultNode = value.toString();
+      } else {
+        c.defaultNode = 'none';
+      }
+      nkcAPI(`/e/settings/threadCategory/${c._id}/default`, 'PUT', {
+        defaultNode: c.defaultNode
+      })
+        .then(() => {
+          sweetSuccess(`操作成功`);
+        })
+        .catch(sweetError)
+    },
     initSortable() {
       const masterContainer = document.getElementsByClassName('thread-categories')[0];
       new Sortable(masterContainer, {

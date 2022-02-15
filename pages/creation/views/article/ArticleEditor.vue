@@ -7,8 +7,10 @@
         document-editor(ref="documentEditor" :configs="formConfigs" @content-change="watchContentChange")
       .m-t-1
         button.btn.btn-primary.m-r-05(@click="publish") 发布
-        button.btn.btn-default(@click="saveArticle") 保存
-
+        button.btn.btn-default.m-r-05(@click="saveArticle") 保存
+        button.btn.btn-default(@click="documentPreview") 预览
+        button.btn.btn-default(@click="documentHistory") 历史记录
+    MoveDirectoryDialog(:bid="bookId" ref="moveDialog")
 </template>
 
 <script>
@@ -16,10 +18,14 @@
   import {nkcUploadFile, nkcAPI} from "../../../lib/js/netAPI";
   import {sweetError} from "../../../lib/js/sweetAlert";
   import {screenTopWarning} from "../../../lib/js/topAlert";
-
+  import MoveDirectoryDialog from '../../component/MoveDirectoryDialog'
+  import { EventBus } from '../../eventBus'
+  // import {saveToSessionStorage, getFromSessionStorage, updateInSessionStorage, sessionStorageKeys} from "../../../lib/js/sessionStorage";
+  import { scrollTopFun } from '../../scrollTop'
   export default {
     components: {
-      'document-editor': DocumentEditor
+      'document-editor': DocumentEditor,
+      MoveDirectoryDialog
     },
     data: () => ({
       coverFile: null,
@@ -37,6 +43,9 @@
         title: true,
       },
       lockPost: false,
+      doucmentId:'',
+      moveData:'',
+      moveIndex:''
     }),
     computed: {
       type() {
@@ -70,30 +79,79 @@
       }
     },
     mounted() {
+    //   addEventListener('visibilitychange',()=>{
+    //   if(document.hidden){
+    //     console.log('页面隐藏')
+
+    //   }else{
+    //     console.log('页面显示')
+    //      location.reload();
+    //   }
+    // })
+      this.scrollPosition()
+      EventBus.$on('publish', ()=>{
+        this.post('publish')
+        .then(() => {
+          this.$router.replace({
+            name: 'bookContent',
+            params: {
+              bid: this.bookId,
+              aid: this.articleId
+            }
+          });
+        })
+        .catch(sweetError);
+      })
       this.initId();
       this.initData();
     },
     methods: {
+      scrollPosition(){
+        scrollTopFun(window, 0)
+      },
+      moveDialog(data, childIndex, bid, type) {
+        childIndex=childIndex.split(',')
+        EventBus.$emit("moveDirectory", data, childIndex, bid, type);
+      },
+      documentPreview(){
+        const {doucmentId}=this
+        if(doucmentId){
+          window.open(`/document/${doucmentId}/preview`)
+        }else{
+          sweetError('文章id不存在')
+        }
+      },
+      documentHistory(){
+        const {doucmentId, bookId}=this
+        window.open(`/document/${doucmentId}/history?bid=${bookId}`)
+      },
       initId() {
-        const {bid, aid} = this.$route.query;
+        const {bid, aid, data, childIndex} = this.$route.query;
+        this.moveData = data;
+        this.moveIndex = childIndex;
         this.bookId = bid;
+        // type && (this.articleType=type)
         if(aid) {
           this.articleId = aid;
         }
       },
       initData() {
+        // if(this.notice) return
         const self = this;
         const {bookId, articleId} = this;
         let url = `/creation/articles/editor?bid=${bookId}`;
         if(articleId) url += `&aid=${articleId}`;
         nkcAPI(url, 'GET')
           .then(data => {
+            // console.log(data,'data')
             const {article, book} = data;
             if(article) {
-              const {title, content, cover} = article;
+              const {title, content, cover, did, _id} = article;
               self.article.title = title;
               self.article.content = content;
               self.article.cover = cover;
+              self.doucmentId = did;
+              // self.id=_id
             }
             self.book = book;
             self.articleId = articleId;
@@ -139,12 +197,15 @@
         formData.append('bookId', bookId);
         formData.append('article', JSON.stringify(article));
         formData.append('type', type);
-        return nkcUploadFile(`/creation/articles/editor`, 'POST', formData)
+        formData.append('level', 'outermost');
+        let url = '/creation/articles/editor';
+        return nkcUploadFile(url, 'POST', formData)
           .then(data => {
             self.oldCoverFile = self.coverFile;
             self.coverFile = null;
             const {articleId, articleCover} = data;
             self.articleId = articleId;
+            self.doucmentId = data.document.did;
             return self.resetCoverFile(articleCover);
           })
           .then(() => {
@@ -173,8 +234,18 @@
         })
       },
       publish() {
-        const self = this;
-        self.post('publish')
+      /*let article={
+        title:this.article.title,
+        id:this.articleId,
+        url:'',
+        type:'article',
+        child:[]
+      }
+      // 文章编辑过后默认添加在列表最后 点击发布选中最后一项
+      let  childIndex=this.moveIndex?.split(',') || []
+      this.$refs.moveDialog.moveDialog(article, childIndex, this.bookId, 'choice')*/
+      const self = this;
+      self.post('publish')
         .then(() => {
           self.$router.replace({
             name: 'book',

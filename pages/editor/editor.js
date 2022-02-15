@@ -34,6 +34,32 @@ import ImageSelector from "../lib/vue/ImageSelector";
 import {blobToFile, fileToBase64} from "../lib/js/file";
 $(function() {
   window.data = NKC.methods.getDataById("data");
+  for(const c of window.data.threadCategories) {
+    c.selectedNode = null;
+    if(c.defaultNode === 'none') continue;
+    if(c.defaultNode === 'default') {
+      c.selectedNode = c.defaultNode;
+    } else {
+      const nodeId = Number(c.defaultNode);
+      if(isNaN(nodeId)) continue;
+      for(const node of c.nodes) {
+        if(node._id !== nodeId) continue;
+        c.selectedNode = node;
+      }
+    }
+  }
+
+  window.editor = UE.getEditor("content", NKC.configs.ueditor.editorConfigs);
+  editor.methods = {};
+  editor.addListener( 'ready', function( status ) {
+    // 编辑器准备就绪
+    // 计算工具栏上边距
+    // 开始初始化vue
+    resetBodyPaddingTop();
+    EditorReady = true;
+    initVueApp();
+    initPostButton();
+  });
   window.data.threadCategories.map(c => c.selectedNode = null);
   const editorContainer = new Vue({
     el: "#content",
