@@ -3,45 +3,23 @@ block title
   title=data.book.name
   +includeCSS('/book/book.css')
 block content
-  .hidden#data=objToStr({bookId: data.book._id})
   .container-fluid.max-width.book
     .row
-      #comment-content.col-xs-12.col-md-6.col-md-offset-3
+      .col-xs-12.col-md-6.col-md-offset-3
         .book-cover
           img(src=data.book.coverUrl)
         .book-name=data.book.name
         .book-description=data.book.description
         .book-list
-
-          //-
-            mixin bookList(data,level=0)
-              for item,i in data
-                if !!item
-                  a.book-list-item(href=item.url || "#"  target=item.url ? "_blank" : '' style="margin-left:"+ (level * 24) + 'px' title="类型：" + `${{article:'文章',text:'分组',post:'post',url:'链接'}[item.type]}`+ "\r标题：" + item.title + "\r地址：" + item.url)
-                    .book-list-item-name
-                      span=item.title
-                    .book-list-item-time=item.time
-                  if item.child
-                    +bookList(item.child,level+1 )
-            +bookList(data.list)
-          for item in data.list
-            a.book-list-item(href=item.url target="_blank" data-type=item.type data-status=item.status)
-              if item.status === 'faulty'
-                .faulty-tip 当前内容已被退修，请作者重新修改内容后发布
-                .faulty-reason
-                  span 原因:
-                  if item.reason
-                    .reason=item.reason
-              .book-list-item-name
-                if !item.published
-                  span.status [未发布]
-                else if item.hasBeta
-                  span.status [编辑中]
-                else if item.status === 'unknown'
-                  span.status [审核中]
-                span=item.title
-              .book-list-item-time=item.time
-        #book(v-cloak)
-          comment(:source="source" :sid="sid" ref="comment")
+          mixin bookList(data,level=0)
+            for item,i in data
+              if !!item
+                a.book-list-item(href=item.url || "#"  target=item.url ? "_blank" : '' style="margin-left:"+ (level * 24) + 'px')
+                  .book-list-item-name
+                    span=item.title
+                  .book-list-item-time=item.time
+                if item.child
+                  +bookList(item.child,level+1 )
+          +bookList(data.list)
 block scripts
   +includeJS('/book/book.js')

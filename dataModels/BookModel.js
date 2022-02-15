@@ -272,6 +272,7 @@ schema.methods.extendBookList = async function () {
     // item.url = getUrl(urlType, this._id, documentData._id);
     extendItem.url = getUrl(urlType, _id, extendItem.id);
     extendItem.time = timeFormat(documentData.toc);
+    extendItem.status = documentData.status;
   }
   // 查找 post 和 article 类型并扩展数据
   function find(data) {
@@ -301,7 +302,7 @@ schema.methods.getList = async function (status ='unpublished') {
     // 只显示发布文章 如果父级未发布那么子级也不显示
     function findPublished(data){
       data.forEach((item, i)=>{
-        if(!item.published && item.type === 'article'){
+        if((!item.published && item.type === 'article') || (item.published && item.status !== 'normal')){
           Reflect.deleteProperty(data,i)
         }
         if(item.child && item.child.length){

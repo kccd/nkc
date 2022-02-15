@@ -298,31 +298,10 @@ export default {
           return;
         }
         if (dialogType === "editor") {
-          // this.seekResult = this.bookList;
-          // for (let i = 0; i < insertData.index.length; i++) {
-          //   const position = insertData.index[i];
-          //   this.seekChild({
-          //     data: this.seekResult,
-          //     position,
-          //     currentIndex: i,
-          //     findLocation: insertData.index,
-          //   });
-          // }
           this.seekChild2({
               findLocation: insertData.index
             })
           obj.child = this.seekResult.child;
-          // this.seekResult = this.bookList;
-          // for (let i = 0; i < insertData.index.length - 1; i++) {
-          //   const position = insertData.index[i];
-          //   this.seekChild({
-          //     data: this.seekResult,
-          //     position,
-          //     currentIndex: i,
-          //     findLocation: insertData.index,
-          //     type: "parent",
-          //   });
-          // }
           this.seekChild2({
               findLocation: insertData.index,
               type: "parent",
@@ -341,16 +320,6 @@ export default {
           } else {
             // 都是向子级的child 插入数据
             const index = insertData.index;
-            // this.seekResult = this.bookList;
-            // for (let i = 0; i < index.length; i++) {
-            //   const position = index[i];
-            //   this.seekChild({
-            //     data: this.seekResult,
-            //     position,
-            //     currentIndex: i,
-            //     findLocation: index,
-            //   });
-            // }
             this.seekChild2({
               findLocation: index,
             })
@@ -363,30 +332,18 @@ export default {
           data: this.bookList,
           bid: this.bid,
         }).then((data) => {
-          if (!data.bid) {
-            sweetError(dialogType === "editor" ? "修改失败" : "添加失败");
-          } else {
+          // if (!data.bid) {
+          //   sweetError(dialogType === "editor" ? "修改失败" : "添加失败");
+          // } else {
             sweetSuccess(dialogType === "editor" ? "修改成功" : "添加成功");
-          }
+          // }
         });
         this.getBook();
         this.$refs.addDialog.close();
       }
     );
     EventBus.$on("deleteDirectory", async (data, childIndex) => {
-      // this.seekResult = this.bookList;
-      // for (let i = 0; i < childIndex.length - 1; i++) {
-      //   const position = childIndex[i];
-      //   this.seekChild({
-      //     data: this.seekResult,
-      //     position,
-      //     currentIndex: i,
-      //     findLocation: childIndex,
-      //     type: "parent",
-      //   });
-    // }
       this.seekChild2({findLocation: childIndex, type: "parent"})
-
       // 最外层 可能是 一位数 可能是 二位数 三位数 等等
       if (childIndex.length === 1) {
         this.seekResult.splice(childIndex[0], 1);
@@ -397,26 +354,11 @@ export default {
       await nkcAPI(url, "post", {
         data: this.bookList,
         bid: this.bid,
-      }).then(async (data) => {
-        if (!data.bid) {
-          sweetError("删除失败");
-        } else {
-          sweetSuccess("删除成功");
-        }
+      }).finally(()=>{
         this.getBook();
       });
     });
     EventBus.$on("openMenu", (childIndex, status) => {
-      // this.seekResult = this.bookList;
-      // for (let i = 0; i < childIndex.length; i++) {
-      //   const position = childIndex[i];
-      //   this.seekChild({
-      //     data: this.seekResult,
-      //     position,
-      //     currentIndex: i,
-      //     findLocation: childIndex,
-      //   });
-      // }
       this.seekChild2({
         findLocation: childIndex,
       });

@@ -19,6 +19,10 @@
       <!-- @click.stop="toggle('', childIndex)" class="status" -->
       <span v-if="operations && jurisdiction !== 'tourist'" >
         <span v-if="!data.published && data.type === 'article'" class="version">[未发布]</span>
+        <span v-else-if="data.published && data.type === 'article' && data.status === 'unknown'" class="version">[未审核]</span>
+        <span v-else-if="data.published && data.type === 'article' && data.status === 'disabled'" class="version">[被屏蔽]</span>
+        <span v-else-if="data.published && data.type === 'article' && data.status === 'faulty'" class="version">[被退修]</span>
+        <span v-else-if="data.published && data.type === 'article' && data.status === 'normal'" class="version">[正常]</span>
         <span v-else-if="data.hasBeta && data.type === 'article'"
           class="version">[编辑中]</span
         >
@@ -175,7 +179,7 @@ export default {
           type: "editor",
         });
       } else {
-        this.navToPage("articleEditor", { bid: this.bid, aid: data._id });
+        this.navToPage("articleEditor", { bid: this.bid, aid: data._id, childIndex });
       }
     },
     moveIndication(data, childIndex) {
@@ -256,7 +260,8 @@ export default {
         window.open(data.url);
       } else {
         saveToSessionStorage(sessionStorageKeys.scrollTop, document.documentElement.scrollTop)
-        this.navToPage("articleEditor", { bid, aid, data, childIndex });
+        // childIndex 当文章进行发布时用于确定位置
+        this.navToPage("articleEditor", { bid, aid, childIndex });
       }
     },
 
@@ -272,10 +277,10 @@ export default {
         title: "新建子项",
       });
     },
-    addDocument(data, i, bid) {
-      const aid = data?._id;
-      this.navToPage("articleEditor", { bid, aid, type: "article" });
-    },
+    // addDocument(data, i, bid) {
+    //   const aid = data?._id;
+    //   this.navToPage("articleEditor", { bid, aid, type: "article" });
+    // },
     //删除
     deleteDirectory(data, childIndex) {
       // 直接把数据后端验证数据是否正确就可以了
@@ -286,7 +291,7 @@ export default {
     },
     moveDirectory(data, childIndex, bid) {
       childIndex = childIndex.split(",");
-      EventBus.$emit("moveDirectory", data, childIndex, bid);
+      EventBus.$emit("moveDirectory", data, childIndex);
     },
     navToPage(name, query = {}, params = {}) {
       this.$router.push({
@@ -302,6 +307,7 @@ export default {
 
 .version{
   font-size: 1rem;
+  color: rgb(113, 169, 241);
 }
 .disable {
   background-color: rgba(129, 128, 128, 0.226);

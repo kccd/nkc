@@ -1,40 +1,32 @@
-import {nkcUploadFile, nkcAPI} from "../../lib/js/netAPI";
+import { nkcAPI } from "../../lib/js/netAPI";
 import {sweetError, sweetSuccess} from "../../lib/js/sweetAlert";
 import { sweetQuestion } from '../../lib/js/sweetAlert'
-window.publish=publish
+// window.publish=publish
 window.saveArticle=saveArticle
-function publish(data, bid){
-  const newdata=JSON.parse(data)
-  sweetQuestion('确定要将当前项发布吗？').then(()=>{
-    post('publish', '', newdata, bid)
-  })
+var currentUrl;
+onload = ()=>{
+  currentUrl = window.location.href
 }
-function saveArticle(data, bid){
-  const newdata=JSON.parse(data)
+// function publish(data){
+//   const newdata = JSON.parse(data)
+//   sweetQuestion('确定要将当前项发布吗？').then(()=>{
+//     post('publish', newdata)
+//   })
+// }
+function saveArticle(data){
+  const newdata = JSON.parse(data)
   sweetQuestion('确定要将当前项添加到创作中心进行编辑吗？').then(()=>{
-    post('save', '', newdata, bid)
+    post('edit', newdata)
   })
 }
-function post(type,articleType,{  uid, title, content, _id, did, toc ,dt, type:version, sid, cover }, bid) {
-  const formData = new FormData();
-  if(sid) {
-    formData.append('articleId', sid);
-  }
-  const article={
-    title,
-    content,
-    cover
-  }
-  formData.append('bookId', bid);
-  formData.append('article', JSON.stringify(article));
-  formData.append('type', type);
-  formData.append('articleType', articleType);
-  formData.append('level', 'outermost');
-  let url='/creation/articles/editor'
-  return nkcUploadFile(url, 'POST', formData)
-    .then(data => {
-      sessionStorage.document_id=data.document?._id
+function post(type, newdata) {
+  const url = `/document/335/history/${newdata.did}/${newdata._id}/${type}`
+  nkcAPI(url, 'GET')
+    .then(() => {
       sweetSuccess('操作成功')
+      let arr = currentUrl.split('/')
+      let prevUrl =  arr.slice(0, arr[5].indexOf('?')).join('/') + window.location.search
+      location.replace(prevUrl)
     })
     .catch(err => {
       sweetError('操作失败,请重试')

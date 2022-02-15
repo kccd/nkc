@@ -25,8 +25,8 @@ block content
               a(href=data.bookContentEditor target='_blank') 
           .book-content-content!=data.document.content
           .btns
-            button.btn.btn-primary.m-r-05(onclick=`publish('${JSON.stringify(data.document)}','${data.bookId}')`) 选择当前版本发布 
-            button.btn.btn-default.m-r-05(onclick=`saveArticle('${JSON.stringify(data.document)}','${data.bookId}')`) 选择当前版本进行编辑
+            //- button.btn.btn-primary.m-r-05(onclick=`publish('${JSON.stringify(data.document)}')`) 选择当前版本发布 
+            button.btn.btn-default.m-r-05(onclick=`saveArticle('${JSON.stringify(data.document)}')`) 选择当前版本进行编辑
         else
           h3 该文章还没有历史记录
 block scripts

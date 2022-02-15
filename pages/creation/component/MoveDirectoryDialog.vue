@@ -46,20 +46,12 @@ export default {
       // openMenuIndex: "",
       // publishIndex: "",
       publishInfo: {},
+      publishFun:'',
+      dialogtype:''
     };
   },
   mounted() {
     EventBus.$on("showIndication", (childIndex, status, data) => {
-      // this.seekResult = this.dialogData;
-      // for (let i = 0; i < childIndex.length; i++) {
-      //   const position = childIndex[i];
-      //   this.seekChild({
-      //     data: this.seekResult,
-      //     position,
-      //     currentIndex: i,
-      //     findLocation: childIndex,
-      //   });
-      // }
       this.seekChild2({
         findLocation: childIndex,
       })
@@ -74,28 +66,13 @@ export default {
       this.$set(data, "isOpen", status);
       // this.openMenuIndex = childIndex;
     });
-    EventBus.$on("moveDirectory", async (
-        msg,
-        childIndex,
-        bid,
-        type = "move",
-      ) => {
+    EventBus.$on("moveDirectory", async (msg, childIndex, type = "move", callBack) => {
+        this.publishFun = callBack
         this.dialogtype = type;
-        await this.getBook(bid);
-        // 重置 数据
+        await this.getBook(this.bid);
+        // 文章已经存在，点击编辑后发布
         if (childIndex.length) {
           childIndex[0] = childIndex[0] - 0 + 1 + "";
-          // this.seekResult = this.dialogData;
-          // // 根据 childIndex(字符串每个数组记录的是数组中数据的位置) 长度来查找 数组指定位置的数据
-          // for (let i = 0; i < childIndex.length; i++) {
-          //   const position = childIndex[i];
-          //   this.seekChild({
-          //     data: this.seekResult,
-          //     position,
-          //     currentIndex: i,
-          //     findLocation: childIndex,
-          //   });
-          // }
           this.seekChild2({
             findLocation: childIndex,
           })
@@ -106,19 +83,8 @@ export default {
             let parnetPosition = childIndex.length ;
             const self = this;
             function isOPen(length) {
-              // self.seekResult = self.dialogData;
-              // for (let i = 0; i < length; i++) {
-              //   const position = childIndex[i];
-              //   self.seekChild({
-              //     data: self.seekResult,
-              //     position,
-              //     currentIndex: i,
-              //     findLocation: childIndex.slice(0,length),
-              //     // type: "parent",
-              //   });
-              // }
               self.seekChild2({
-                findLocation: childIndex.slice(0,length),
+                findLocation: childIndex.slice(0, length),
               })
               self.$set(self.seekResult, "isOpen", true);
               if (length < parnetPosition) {
@@ -127,13 +93,15 @@ export default {
             }
             isOPen(1);
           }
-
           this.moveIndex = childIndex;
-          //发布需要带上所有子元素进行更新
-          if (type === "choice") {
+          //发布需要带上所有子元素进行更新  
+          //如果不进行处理需要在点击编辑时把数据传递 tree》 editor》moveDialog
+          if (type === "publish") {
+            // console.log(msg)
             this.findAllChild(this.dialogData, msg);
-            msg.child = this.publishInfo.self?.child || [];
+            msg.child = this.publishInfo?.self?.child || [];
           }
+          // 新建后直接发布 默认添加在最后一个
         } else {
           this.$set(
             this.dialogData[this.dialogData.length - 1],
@@ -201,15 +169,6 @@ export default {
         }
       }
     },
-    moveDialog(data, childIndex, bid, type) {
-      EventBus.$emit(
-        "moveDirectory",
-        data,
-        childIndex,
-        bid,
-        type,
-      );
-    },
     changeChild(data, key, value) {
       if (data) {
         data.forEach((item) => {
@@ -233,7 +192,6 @@ export default {
         }
       });
     },
-    
     seekChild({ data, position, currentIndex, findLocation, type = "self" }) {
       if (typeof findLocation === 'number')findLocation= String(findLocation)
       const child = data[position];
@@ -303,16 +261,6 @@ export default {
       if (this.selectedLevel === "childLevel") {
         if (!this.moveIndex.length) {
           const deleteData = this.dialogData[this.dialogData.length - 1];
-          // this.seekResult = this.dialogData;
-          // for (let i = 0; i < this.insertIndex.length; i++) {
-          //   const position = this.insertIndex[i];
-          //   this.seekChild({
-          //     data: this.seekResult,
-          //     position,
-          //     currentIndex: i,
-          //     findLocation: this.insertIndex,
-          //   });
-          // }
           this.seekChild2({
             findLocation: this.insertIndex,
           })
@@ -320,32 +268,11 @@ export default {
           insertDataIndex.child.unshift(deleteData);
           this.dialogData.splice(this.dialogData.length - 1, 1);
         } else {
-          // this.seekResult = this.dialogData;
-          // for (let i = 0; i < this.insertIndex.length; i++) {
-          //   const position = this.insertIndex[i];
-          //   this.seekChild({
-          //     data: this.seekResult,
-          //     position,
-          //     currentIndex: i,
-          //     findLocation: this.insertIndex,
-          //   });
-          // }
           this.seekChild2({
             findLocation: this.insertIndex,
           })
           let insertDataindex = this.seekResult;
           // 删除被移动的数据
-          // this.seekResult = this.dialogData;
-          // for (let i = 0; i < this.moveIndex.length - 1; i++) {
-          //   const position = this.moveIndex[i];
-          //   this.seekChild({
-          //     data: this.seekResult,
-          //     position,
-          //     currentIndex: i,
-          //     findLocation: this.moveIndex,
-          //     type: "parent",
-          //   });
-          // }
           this.seekChild2({
             findLocation: this.moveIndex,
             type: "parent",
@@ -366,17 +293,6 @@ export default {
         // 编辑后直接发布 就没有坐标和数据 并且默认在最后一项
         if (!this.moveIndex.length) {
           const deleteData = this.dialogData[this.dialogData.length - 1];
-          // this.seekResult = this.dialogData;
-          // for (let i = 0; i < this.insertIndex.length - 1; i++) {
-          //   const position = this.insertIndex[i];
-          //   this.seekChild({
-          //     data: this.seekResult,
-          //     position,
-          //     currentIndex: i,
-          //     findLocation: this.insertIndex,
-          //     type: "parent",
-          //   });
-          // }
           this.seekChild2({
             findLocation: this.insertIndex,
             type: "parent",
@@ -393,33 +309,11 @@ export default {
           }
           this.dialogData.splice(this.dialogData.length - 1, 1);
         } else {
-          // this.seekResult = this.dialogData;
-          // for (let i = 0; i < this.moveIndex.length - 1; i++) {
-          //   const position = this.moveIndex[i];
-          //   this.seekChild({
-          //     data: this.seekResult,
-          //     position,
-          //     currentIndex: i,
-          //     findLocation: this.moveIndex,
-          //     type: "parent",
-          //   });
-          // }
           this.seekChild2({
             findLocation: this.moveIndex,
             type: "parent",
           })
           let deleteDataParent = this.seekResult;
-          // this.seekResult = this.dialogData;
-          // for (let i = 0; i < this.insertIndex.length - 1; i++) {
-          //   const position = this.insertIndex[i];
-          //   this.seekChild({
-          //     data: this.seekResult,
-          //     position,
-          //     currentIndex: i,
-          //     findLocation: this.insertIndex,
-          //     type: "parent",
-          //   });
-          // }
           this.seekChild2({
             findLocation: this.insertIndex,
             type: "parent",
@@ -455,20 +349,16 @@ export default {
       // 删除添加到第一项
       this.dialogData.splice(0, 1);
       let url = `/creation/book/${this.$props.bid}/list/move`;
-      const resData = await nkcAPI(url, "post", {
+      await nkcAPI(url, "post", {
         data: this.dialogData,
         bid: this.$props.bid,
-      });
-      if (!resData.bid && !resData.length) {
-        sweetError("操作失败");
-        // this.dialogData=resData.data
-      } else {
-        if (this.dialogtype === "choice") {
-          // 发布
-          EventBus.$emit("publish", this.insertIndex, this.moveData.id);
+      }).then(()=>{
+        if(this.publishFun){
+          this.publishFun()
+        }else if(this.dialogtype === 'publish'){
+          sweetError("缺少回调函数");
         }
-        sweetSuccess("操作成功");
-      }
+      })
       EventBus.$emit("updatePageData");
       setTimeout(this.close, 200);
     },
@@ -491,6 +381,7 @@ export default {
       setTimeout(this.close, 200);
     },
     close() {
+      console.log('关闭')
       this.draggableElement.hide();
       this.showTree = false;
       this.insertIndex = "";

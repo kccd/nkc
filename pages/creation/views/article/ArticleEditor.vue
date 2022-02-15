@@ -44,7 +44,7 @@
       },
       lockPost: false,
       doucmentId:'',
-      moveData:'',
+      // moveData:'',
       moveIndex:''
     }),
     computed: {
@@ -89,29 +89,25 @@
     //   }
     // })
       this.scrollPosition()
-      EventBus.$on('publish', ()=>{
-        this.post('publish')
-        .then(() => {
-          this.$router.replace({
-            name: 'bookContent',
-            params: {
-              bid: this.bookId,
-              aid: this.articleId
-            }
-          });
-        })
-        .catch(sweetError);
-      })
+      // EventBus.$on('publish', ()=>{
+      //   this.post('publish')
+      //   .then(() => {
+      //     this.$router.replace({
+      //       name: 'bookContent',
+      //       params: {
+      //         bid: this.bookId,
+      //         aid: this.articleId
+      //       }
+      //     });
+      //   })
+      //   .catch(sweetError);
+      // })
       this.initId();
       this.initData();
     },
     methods: {
       scrollPosition(){
         scrollTopFun(window, 0)
-      },
-      moveDialog(data, childIndex, bid, type) {
-        childIndex=childIndex.split(',')
-        EventBus.$emit("moveDirectory", data, childIndex, bid, type);
       },
       documentPreview(){
         const {doucmentId}=this
@@ -126,11 +122,9 @@
         window.open(`/document/${doucmentId}/history?bid=${bookId}`)
       },
       initId() {
-        const {bid, aid, data, childIndex} = this.$route.query;
-        this.moveData = data;
+        const {bid, aid, childIndex} = this.$route.query;
         this.moveIndex = childIndex;
         this.bookId = bid;
-        // type && (this.articleType=type)
         if(aid) {
           this.articleId = aid;
         }
@@ -234,28 +228,28 @@
         })
       },
       publish() {
-      /*let article={
-        title:this.article.title,
+      let article = {
+        title:'',
         id:this.articleId,
         url:'',
         type:'article',
         child:[]
       }
       // 文章编辑过后默认添加在列表最后 点击发布选中最后一项
-      let  childIndex=this.moveIndex?.split(',') || []
-      this.$refs.moveDialog.moveDialog(article, childIndex, this.bookId, 'choice')*/
-      const self = this;
-      self.post('publish')
+      let  childIndex = this.moveIndex?.split(',') || []
+      EventBus.$emit("moveDirectory", article, childIndex, 'publish', ()=>{
+        this.post('publish')
         .then(() => {
-          self.$router.replace({
-            name: 'book',
+          this.$router.replace({
+            name: 'bookContent',
             params: {
-              bid: self.bookId,
-              // aid: self.articleId
+              bid: this.bookId,
+              aid: this.articleId
             }
           });
         })
         .catch(sweetError);
+      });
       },
       resetCoverFile(cover) {
         this.cover = cover;
