@@ -13,6 +13,9 @@ module.exports = {
     },
     disabled: {
       POST: "disabledComment"
+    },
+    unblock: {
+      POST: "disabledComment"
     }
   }
 }

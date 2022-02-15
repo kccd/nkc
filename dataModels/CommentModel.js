@@ -89,6 +89,13 @@ schema.virtual('type')
   .set(function(val) {
     return this._type = val
   });
+schema.virtual('reason')
+  .get(function() {
+    return this._reason;
+  })
+  .set(function(val) {
+    return this._reason = val
+  });
 
 /*
 * 获取评论的有效来源
@@ -216,7 +223,9 @@ schema.statics.extendBookComments = async (props) => {
     let review;
     if(d.status === 'faulty') {
       review = await ReviewModel.findOne({docId: d._id}).sort({toc: -1}).limit(1);
-      console.log('review', review);
+    }
+    if(d.status === 'unknown') {
+      review = await ReviewModel.findOne({docId: d._id}).sort({toc: -1}).limit(1);
     }
     quoteIdArr.push(d.quoteDid);
     const {content, _id, type, status} = d;

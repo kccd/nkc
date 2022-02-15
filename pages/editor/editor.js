@@ -31,6 +31,7 @@ window.data = undefined;
 import Editor from "../lib/vue/Editor";
 import {getEditorConfigs} from "../lib/js/editor";
 import ImageSelector from "../lib/vue/ImageSelector";
+import ResourceSelector from "../lib/vue/ResourceSelector";
 import {blobToFile, fileToBase64} from "../lib/js/file";
 $(function() {
   window.data = NKC.methods.getDataById("data");
@@ -49,17 +50,17 @@ $(function() {
     }
   }
 
-  window.editor = UE.getEditor("content", NKC.configs.ueditor.editorConfigs);
-  editor.methods = {};
-  editor.addListener( 'ready', function( status ) {
+  // window.editor = UE.getEditor("content", getEditorConfigs());
+  // editor.methods = {};
+  // editor.addListener( 'ready', function( status ) {
     // 编辑器准备就绪
     // 计算工具栏上边距
     // 开始初始化vue
-    resetBodyPaddingTop();
-    EditorReady = true;
-    initVueApp();
-    initPostButton();
-  });
+  //   resetBodyPaddingTop();
+  //   EditorReady = true;
+  //   initVueApp();
+  //   initPostButton();
+  // });
   window.data.threadCategories.map(c => c.selectedNode = null);
   const editorContainer = new Vue({
     el: "#content",
@@ -70,7 +71,9 @@ $(function() {
         stickerSelector: true,
         xsfSelector: true,
         mathJaxSelector: true,
-      }
+      },
+      // 是否允许触发contentChange
+      contentChangeEventFlag: false,
     },
     mounted() {},
     computed: {
@@ -86,6 +89,10 @@ $(function() {
         return this.$refs.threadEditor;
       },
       onContentChange(){
+        if(!this.contentChangeEventFlag) {
+          this.contentChangeEventFlag = true;
+          return;
+        }
         window.PostInfo.watchContentChange();
       },
       editorReady() {
@@ -203,6 +210,7 @@ function initVueApp() {
     },
     components: {
       'image-selector': ImageSelector,
+      'resource-selector': ResourceSelector
     },
     mounted: function() {
       let this_ = this;
@@ -393,19 +401,19 @@ function initVueApp() {
       },
       selectCover: function() {
         let self = this;
-        if(!NKC.modules.SelectResource) {
-          return sweetError("未引入资源选择模块");
-        }
-        if(!NKC.methods.selectImage) {
-          return sweetError("未引入图片裁剪模块");
-        }
-        if(!window.SelectResource) {
-          window.SelectResource = new NKC.modules.SelectResource();
-        }
-        if(!window.SelectImage) {
-          window.SelectImage = new NKC.methods.selectImage();
-        }
-        SelectResource.open(function(data) {
+        // if(!NKC.modules.SelectResource) {
+        //   return sweetError("未引入资源选择模块");
+        // }
+        // if(!NKC.methods.selectImage) {
+        //   return sweetError("未引入图片裁剪模块");
+        // }
+        // if(!window.SelectResource) {
+        //   window.SelectResource = new NKC.modules.SelectResource();
+        // }
+        // if(!window.SelectImage) {
+        //   window.SelectImage = new NKC.methods.selectImage();
+        // }
+        self.$refs.resourceSelector.open(function(data) {
           let r = data.resources[0];
           let url;
           if(r.originId) {
@@ -418,6 +426,7 @@ function initVueApp() {
             url
           })
             .then(res => {
+              self.coverData = res;
               fileToBase64(res)
                 .then(res => {
                   self.coverUrl = res;

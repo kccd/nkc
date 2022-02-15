@@ -42,15 +42,16 @@
         .single-post-header(v-if="comment.status === 'disabled'")
           .disabled
             span.m-r-05 内容已被屏蔽
-            a(@click="" v-if="") 点击解封
+            a(@click="unblock(comment)" v-if="permissions.disabled") 点击解封
         .single-post-header(v-if="comment.status === 'unknown'")
           .review 内容待审核
-            span= "送审原因：" + reviewReason
+            span= "送审原因："
+            span {{comment.reason}}
             div
               | 通过请点击
-              button.btn.btn-xs.btn-default(@click="") 通过
+              button.btn.btn-xs.btn-default(@click="passReview(comment)") 通过
               | &nbsp;  按钮，不通过请点击
-              button.btn.btn-xs.btn-default(@click="") 退修或删除
+              button.btn.btn-xs.btn-default(@click="disabledComment(comment._id)") 退修或删除
               | 按钮。
               a(href=`/review` target="_blank") 待审核列表
         .comment-item-header
@@ -262,6 +263,7 @@
   import Complaint from "../lib/vue/Complaint";
   import DisabledComment from "../lib/vue/DisabledComment";
   import ViolationRecord from "../lib/vue/ViolationRecord";
+  import {screenTopAlert} from "../lib/js/topAlert";
   export default {
     props: ['source', 'sid'],
     data: () => ({
@@ -385,6 +387,19 @@
       //显示违规记录
       viewViolation(uid) {
         this.$refs.violationRecord.open({uid});
+      },
+      //解封
+      unblock(value) {
+        if(!value.docId) return;
+        nkcAPI(`/comment/${value.docId}/unblock`, 'POST', {
+          docsId: [value.docId]
+        })
+        .then(res => {
+          screenTopAlert(value.docId+' 已解除屏蔽')
+        })
+        .catch(err => {
+          sweetError(err);
+        })
       }
     }
 }
