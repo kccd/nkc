@@ -78,8 +78,17 @@
       }
     },
     mounted() {
+    //   addEventListener('visibilitychange',()=>{
+    //   if(document.hidden){
+    //     console.log('页面隐藏')
+       
+    //   }else{
+    //     console.log('页面显示')
+    //      location.reload();
+    //   }
+    // })
       this.scrollPosition()
-      EventBus.$on('publish', (publishIndex, publishId)=>{
+      EventBus.$on('publish', ()=>{
         this.post('publish')
         .then(() => {
           this.$router.replace({
