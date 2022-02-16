@@ -19,9 +19,11 @@ router
     // 默认返回第一项内容
     data.document = data.history[0]
     data.bookId = bid
+    data.ids = {did: data.document.did,_id:data.document._id}
   }else{
     data.document = '',
     data.bookId = ''
+    data.ids = ''
   }
   await next()
 })
@@ -38,6 +40,7 @@ router
     }
   }
   data.document = find(data.history, _id)
+  data.ids = {did: data.document.did,_id:data.document._id}
   await next()
 })
 .get('/history/:sid/:_id/publish',async (ctx, next)=>{
@@ -66,6 +69,9 @@ router
   const { _id, did } = params;
   // 当前历史记录复制一份并改为为编辑版
   // 把正在编辑版本的改为历史记录
+  // const document = await db.DocumentModel.findOne({$and:[{did}, {_id}, {type:'history'}]})
+  // console.log(document)
+  await db.DocumentModel.copyToHistoryToEditDocument(did, _id)
   // await db.DocumentModel.updateOne({$or:[{$and:[{"type":'beta'}, {did}]}, {$and:[{"type":'stable'}, {did}]}]}, {$set:{type:'history'}});
   // await db.DocumentModel.updateOne({$and: [{_id}, {did}, {type:'history'}] }, {$set:{type:'beta'}});
   await next()
