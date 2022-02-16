@@ -10,6 +10,7 @@
       @display-ip-info="displayIpInfo"
       @view-violation="viewViolation"
       )
+    float-user-panel(ref="floatUserPanel")
     violation-record(ref="violationRecord")
     complaint(ref="complaint")
     disabled-comment(ref="disabledComment")
@@ -55,12 +56,12 @@
               | 按钮。
               a(href=`/review` target="_blank") 待审核列表
         .comment-item-header
-          .comment-item-avatar
+          .comment-item-avatar(:data-float-uid="comment.user.uid")
             img(:src="comment.user.avatar")
           .comment-item-info
             .comment-item-username
               span(v-if="!comment.user.userHome") {{comment.user.username}}
-              a(v-else :href="comment.user.userHome") {{comment.user.username}}
+              a(v-else :href="comment.user.userHome" :data-float-uid="comment.user.uid") {{comment.user.username}}
             .comment-item-time {{timeFormat(comment.toc)}}
           .comment-item-floor
             span {{comment.order}}楼
@@ -70,6 +71,7 @@
             a(
               :href="comment.quote.userHome"
               target="_blank"
+              :data-float-uid="comment.quote.uid"
             ) {{comment.quote.username}}
             | &nbsp;发表于&nbsp;
             span {{comment.quote.order}}
@@ -139,6 +141,7 @@
       padding-left: @height + 0.5rem;
       position: relative;
       .comment-item-avatar{
+        cursor: pointer;
         position: absolute;
         border-radius: 50%;
         overflow: hidden;
@@ -264,6 +267,7 @@
   import DisabledComment from "../lib/vue/DisabledComment";
   import ViolationRecord from "../lib/vue/ViolationRecord";
   import {screenTopAlert} from "../lib/js/topAlert";
+  import FloatUserPanel from "../lib/vue/FloatUserPanel";
   export default {
     props: ['source', 'sid'],
     data: () => ({
@@ -280,7 +284,8 @@
       "options": CommentOptions,
       complaint: Complaint,
       "disabled-comment": DisabledComment,
-      "violation-record": ViolationRecord
+      "violation-record": ViolationRecord,
+      "float-user-panel": FloatUserPanel
     },
     mounted() {
       this.getComments();
@@ -296,6 +301,12 @@
           self.selfComment = res.comment;
           self.permissions = res.permissions;
           self.loading = false;
+          $(document).ready(function(){
+            // document 不写默认document
+            self.$nextTick(() => {
+              self.$refs.floatUserPanel.initPanel();
+            });
+          })
         })
         .catch(err => {
           sweetError(err);

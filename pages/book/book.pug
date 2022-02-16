@@ -11,7 +11,7 @@ block content
         .book-name=data.book.name
         .book-description=data.book.description
         .book-list
-          mixin bookList(data,level=0)
+          mixin bookList(data,level)
             for item,i in data
               if !!item
                 a.book-list-item(href=item.url || "#"  target=item.url ? "_blank" : '' style="margin-left:"+ (level * 24) + 'px')
@@ -20,6 +20,8 @@ block content
                   .book-list-item-time=item.time
                 if item.child
                   +bookList(item.child,level+1 )
-          +bookList(data.list)
+          +bookList(data.list, 0)
+        #book(v-cloak)
+          comment(:source="source" :sid="sid" ref="comment")
 block scripts
   +includeJS('/book/book.js')

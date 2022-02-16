@@ -264,7 +264,7 @@ schema.statics.extendBookComments = async (props) => {
   for(const c of comments) {
     const user = usersObj[c.uid];
     if(!documentObj[c.did]) continue;
-    c.content = documentObj[c.did].content;
+    c.content = await CommentModel.renderComment(documentObj[c.did]._id);
     c.docId =  documentObj[c.did]._id;
     c.status = documentObj[c.did].status;
     c.type = documentObj[c.did].type;
@@ -451,4 +451,25 @@ schema.statics.extendComments = async function(comments) {
   return results;
 }
 
+/*
+* 渲染图书评论
+* */
+schema.statics.renderComment = async function(_id) {
+  const nkcRender = require('../nkcModules/nkcRender');
+  const DocumentModel = mongoose.model('documents');
+  const ResourceModel = mongoose.model('resources');
+  const document = await DocumentModel.findOnly({_id});
+  const resourceReferenceId = await document.getResourceReferenceId();
+  const resources = await ResourceModel.getResourcesByReference(resourceReferenceId);
+  const c = nkcRender.renderHTML({
+    type: 'article',
+    post: {
+      c: document.content,
+      resources,
+    },
+    source: 'document',
+    sid: _id
+  });
+  return c;
+}
 module.exports = mongoose.model('comments', schema);
