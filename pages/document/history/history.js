@@ -21,11 +21,11 @@ function saveArticle(data){
 }
 function post(type, newdata) {
   const url = `/document/335/history/${newdata.did}/${newdata._id}/${type}`
-  nkcAPI(url, 'GET')
+  nkcAPI(url, 'POST')
     .then(() => {
       sweetSuccess('操作成功')
       let arr = currentUrl.split('/')
-      let prevUrl =  arr.slice(0, arr[5].indexOf('?')).join('/') + window.location.search
+      let prevUrl =  arr.slice(0, 6).join('/')
       location.replace(prevUrl)
     })
     .catch(err => {

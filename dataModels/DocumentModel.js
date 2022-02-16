@@ -276,7 +276,7 @@ schema.statics.createBetaDocument = async (props) => {
 * 复制当前文档数据创建历史文档
 * @return {Object} history document schema
 * */
-schema.methods.copyToHistoryDocument = async function() {
+schema.methods.copyToHistoryDocument = async function(status) {
   const DocumentModel = mongoose.model('documents');
   const NoteModel = mongoose.model('notes');
   const originDocument = this.toObject();
@@ -284,6 +284,7 @@ schema.methods.copyToHistoryDocument = async function() {
   originDocument.type = DocumentModel.getDocumentTypes().history;
   originDocument._id = await DocumentModel.getId();
   originDocument.toc = new Date();
+  (status === 'edit') && (originDocument.tlm = new Date());
   const document = DocumentModel(originDocument);
   await document.save();
   await NoteModel.copyDocumentNoteAndUpdateNewNoteTargetId(this._id, document._id);
@@ -296,7 +297,7 @@ schema.statics.copyToHistoryToEditDocument = async function(did, _id){
   const DocumentModel = mongoose.model('documents');
   const currentDocument = await DocumentModel.findOne({$and:[{did}, {_id}, {type:'history'}]})
   if(!currentDocument) throwErr(400, `当前文章不存在，请刷新页面重试`);
-  await currentDocument.copyToHistoryDocument();
+  await currentDocument.copyToHistoryDocument('edit');
   // 更改正在编辑版本为历史版
   await this.updateOne({
     did,
@@ -305,7 +306,7 @@ schema.statics.copyToHistoryToEditDocument = async function(did, _id){
     $set: {
         type: DocumentModel.getDocumentTypes().history,
         // toc: new Date(),
-        tim: new Date()
+        tlm: new Date()
     }
   })
   // 设置当前历史版为 编辑版
@@ -329,7 +330,7 @@ schema.methods.modifyAsEditDocument = async function() {
     $set: {
       type: DocumentModel.getDocumentTypes().beta,
       // toc: new Date(),
-      tim: new Date()
+      tlm: new Date()
     }
   });
 };

@@ -43,28 +43,28 @@ router
   data.ids = {did: data.document.did,_id:data.document._id}
   await next()
 })
-.get('/history/:sid/:_id/publish',async (ctx, next)=>{
-  // /document/:did/history/:_id/publish
-  const {db, params} = ctx;
-  // const {_id, did} = params;
-  const stableDocument = await db.DocumentModel.findOne({did, type: 'stable'});
-  // if(!stable)
-  // const {db, params} = ctx;
-  const { _id, sid } = params;
-  // 并且选中的 历史版 变为 正式版，原先的版本（编辑版 或 正式版）变为历史版
-  await db.DocumentModel.updateOne({$or:[{$and:[{"type":'beta'}, {sid}]}, {$and:[{"type":'stable'}, {sid}]}]}, {$set:{type:'history'}});
-  await db.DocumentModel.updateOne({
-    sid,
-    type: {$in: ['beta', 'stable']}
-  }, {
-    $set: {
-      type: 'history'
-    }
-  })
-  await db.DocumentModel.updateOne({$and: [{_id}, {sid}, {type:'history'}] }, {$set:{type:'stable'}});
-  await next()
-})
-.get('/history/:did/:_id/edit',async (ctx, next)=>{
+// .get('/history/:sid/:_id/publish',async (ctx, next)=>{
+//   // /document/:did/history/:_id/publish
+//   const {db, params} = ctx;
+//   // const {_id, did} = params;
+//   const stableDocument = await db.DocumentModel.findOne({did, type: 'stable'});
+//   // if(!stable)
+//   // const {db, params} = ctx;
+//   const { _id, sid } = params;
+//   // 并且选中的 历史版 变为 正式版，原先的版本（编辑版 或 正式版）变为历史版
+//   await db.DocumentModel.updateOne({$or:[{$and:[{"type":'beta'}, {sid}]}, {$and:[{"type":'stable'}, {sid}]}]}, {$set:{type:'history'}});
+//   await db.DocumentModel.updateOne({
+//     sid,
+//     type: {$in: ['beta', 'stable']}
+//   }, {
+//     $set: {
+//       type: 'history'
+//     }
+//   })
+//   await db.DocumentModel.updateOne({$and: [{_id}, {sid}, {type:'history'}] }, {$set:{type:'stable'}});
+//   await next()
+// })
+.post('/history/:did/:_id/edit',async (ctx, next)=>{
   const {db, params} = ctx;
   const { _id, did } = params;
   // 当前历史记录复制一份并改为为编辑版

@@ -8,11 +8,11 @@ module.exports = {
       PARAMETER:{
         GET:'viewHistoryDocument',
         PARAMETER:{
-          publish:{
-            GET:'historyPublish',
-          },
+          // publish:{
+          //   GET:'historyPublish',
+          // },
           edit:{
-            GET:'historyEdit',
+            POST:'historyEdit',
           }
         }
       }
