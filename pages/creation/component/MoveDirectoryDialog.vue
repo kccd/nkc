@@ -272,6 +272,7 @@ export default {
             findLocation: this.insertIndex,
           })
           let insertDataindex = this.seekResult;
+          console.log(insertDataindex,'insertDataindex')
           // 删除被移动的数据
           this.seekChild2({
             findLocation: this.moveIndex,
@@ -285,7 +286,7 @@ export default {
             deleteDataParent.child.splice(this.moveIndex.slice(-1), 1);
           }
           // 插入
-          insertDataindex.child ?? (this.seekResult.child = []);
+          insertDataindex.child ?? (insertDataindex.child = []);
           insertDataindex.child.unshift(this.moveData);
 
         }

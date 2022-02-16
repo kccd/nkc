@@ -151,7 +151,7 @@ schema.statics.getBooksByUserId = async (uid) => {
   return await BookModel.extendBooksData(books);
 };
 schema.statics.filterList = async function (updateList) {
-  let newUpdateList = [...updateList]
+  // let newUpdateList = [...updateList]
   const allowKeys = ['id', 'child', 'title', 'url','type']
   // 过滤数据
   function find(data) {
@@ -168,8 +168,8 @@ schema.statics.filterList = async function (updateList) {
       }
     });
   }
-  find(newUpdateList)
-  return newUpdateList
+  find(updateList)
+  return updateList
 }
 
 schema.statics.getOtherBooksByUserId = async (uid) => {
