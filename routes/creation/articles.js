@@ -55,7 +55,8 @@ router
         id: article._id,
         type: 'article',
         title: '',
-        url: ''
+        url: '',
+        child:[]
       });
       await book.updateOne({
         $set: {

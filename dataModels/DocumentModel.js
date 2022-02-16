@@ -276,7 +276,7 @@ schema.statics.createBetaDocument = async (props) => {
 * 复制当前文档数据创建历史文档
 * @return {Object} history document schema
 * */
-schema.methods.copyToHistoryDocument = async function() {
+schema.methods.copyToHistoryDocument = async function(status) {
   const DocumentModel = mongoose.model('documents');
   const NoteModel = mongoose.model('notes');
   const originDocument = this.toObject();
@@ -284,12 +284,34 @@ schema.methods.copyToHistoryDocument = async function() {
   originDocument.type = DocumentModel.getDocumentTypes().history;
   originDocument._id = await DocumentModel.getId();
   originDocument.toc = new Date();
+  (status === 'edit') && (originDocument.tlm = new Date());
   const document = DocumentModel(originDocument);
   await document.save();
   await NoteModel.copyDocumentNoteAndUpdateNewNoteTargetId(this._id, document._id);
   return document;
 };
-
+/*
+  *复制当前文档创建历史记录，并把当前文档改为编辑版。并且正在编辑的文档改为历史版
+*/
+schema.statics.copyToHistoryToEditDocument = async function(did, _id){
+  const DocumentModel = mongoose.model('documents');
+  const currentDocument = await DocumentModel.findOne({$and:[{did}, {_id}, {type:'history'}]})
+  if(!currentDocument) throwErr(400, `当前文章不存在，请刷新页面重试`);
+  await currentDocument.copyToHistoryDocument('edit');
+  // 更改正在编辑版本为历史版
+  await this.updateOne({
+    did,
+    type: {$in: ['beta', 'stable']}
+  }, {
+    $set: {
+        type: DocumentModel.getDocumentTypes().history,
+        // toc: new Date(),
+        tlm: new Date()
+    }
+  })
+  // 设置当前历史版为 编辑版
+  await currentDocument.modifyAsEditDocument();
+}
 /*
 * 根据来源加载编辑版，并复制编辑版内容生成历史版
 * @param {String} source 来源 参考 documentModel.statics.getDocumentSources
@@ -301,7 +323,28 @@ schema.statics.copyBetaToHistoryBySource = async (source, sid) => {
   if(!betaDocument) throwErr(400, `不存在编辑版，无法保存历史`);
   await betaDocument.copyToHistoryDocument();
 };
-
+// 将当前版本设置为编辑版，并设置最后修改时间
+schema.methods.modifyAsEditDocument = async function() {
+  const DocumentModel = mongoose.model('documents');
+  await this.updateOne({
+    $set: {
+      type: DocumentModel.getDocumentTypes().beta,
+      // toc: new Date(),
+      tlm: new Date()
+    }
+  });
+};
+/*
+* 将当前版本修改为编辑版
+* */
+schema.methods.setAsEditDocument = async function() {
+  const DocumentModel = mongoose.model('documents');
+  await this.updateOne({
+    $set: {
+      type: DocumentModel.getDocumentTypes().beta
+    }
+  });
+};
 /*
 * 将当前版本修改为历史版
 * */
