@@ -323,6 +323,7 @@ export default {
             this.seekChild2({
               findLocation: index,
             })
+            this.seekResult.child ?? (this.seekResult.child=[])
             this.seekResult.child.unshift(obj);
           }
         }
