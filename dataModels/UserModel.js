@@ -2534,6 +2534,21 @@ userSchema.methods.getOnlineStatus = async function() {
   if(this.online === 'app') return '手机在线';
   return '离线';
 };
+/*
+* 设置用户在线状态
+* @param {Boolean} online
+* @return {String} 在线状态
+* */
+userSchema.methods.setOnlineStatus = async function(online) {
+  if(!['', 'web', 'app'].includes(online)) throwErr(500, `用户在线状态设置错误`);
+  this.online = online;
+  await this.updateOne({
+    $set: {
+      online: this.online
+    }
+  });
+  return this.getOnlineStatus();
+}
 
 /*
 * 获取消息通知音链接

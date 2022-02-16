@@ -298,6 +298,17 @@ async function initDefaultHomeBlocks() {
   }
 }
 
+async function initUsersOnlineStatus() {
+  const db = require('../dataModels');
+  await db.UserModel.updateMany({
+    online: {$ne: ''}
+  }, {
+    $set: {
+      online: ''
+    }
+  });
+}
+
 async function init() {
   await initConfig();
   await initSettings();
@@ -312,6 +323,7 @@ async function init() {
   await initComplaintType();
   await initThreadCategory();
   await initDefaultHomeBlocks();
+  await initUsersOnlineStatus();
 }
 
 module.exports = {
@@ -328,4 +340,5 @@ module.exports = {
   initAccount,
   initThreads,
   initComplaintType,
+  initUsersOnlineStatus,
 };

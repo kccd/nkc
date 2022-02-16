@@ -68,8 +68,8 @@ const start = async () => {
       require('./microServices/render/server');
       require('./microServices/media/server');
       require('./microServices/store/server');
-      const socket = require('./socket/index');
-      await socket(server);
+      /*const socket = require('./socket/index');
+      await socket(server);*/
       require('./timedTask');
     }
 

@@ -1,8 +1,8 @@
-const Cookies = require('cookies-string-parse');
 const languages = require('../languages');
 const cookieConfig = require("../config/cookie");
 const translate = require('../nkcModules/translate');
 const {files: fileOperations} = require('../settings/operationsType');
+const {getUserInfo} = require('../nkcModules/cookie');
 
 module.exports = async (ctx, next) => {
 
@@ -11,24 +11,8 @@ module.exports = async (ctx, next) => {
   let userInfo = ctx.getCookie("userInfo");
 	if(!userInfo) {
 	  // 为了兼容app中的部分请求无法附带cookie，故将cookie放到了url中
-		try{
-      let {cookie} = ctx.query || {};
-      if(cookie) {
-        cookie = Buffer.from(cookie, 'base64').toString();
-        if(cookie) {
-          const cookies = new Cookies(cookie, {
-            keys: [cookieConfig.secret]
-          });
-          userInfo = cookies.get('userInfo', {signed: true});
-          if(userInfo) {
-            userInfo = Buffer.from(userInfo, "base64").toString();
-            userInfo = JSON.parse(userInfo);
-          }
-        }
-      }
-		} catch(err) {
-		  if(global.NKC.NODE_ENV !== 'production') console.log(err);
-		}
+    const {cookie} = ctx.query || {};
+    userInfo = getUserInfo(cookie);
 	}
 	let userOperationsId = [];
   let userRoles = [];
