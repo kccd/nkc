@@ -593,6 +593,7 @@
         if(this.cropper) return;
         this.cropper = new Cropper(this.$refs.imageElement, {
           viewMode: 1,
+          aspectRatio: 1,
         });
       },
       destroyCropper() {

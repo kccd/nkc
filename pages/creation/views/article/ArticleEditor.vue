@@ -79,15 +79,27 @@
       }
     },
     mounted() {
-    //   addEventListener('visibilitychange',()=>{
-    //   if(document.hidden){
-    //     console.log('页面隐藏')
-
-    //   }else{
-    //     console.log('页面显示')
-    //      location.reload();
-    //   }
-    // })
+      //  点击此版本进行编辑后 当前页面应该更新数据
+      // window.addEventListener('storage', (ev) => {
+      //   const {
+      //           key,
+      //           newValue,
+      //       } = ev
+      //       console.log(ev, key, newValue)
+      //       if(key === 'lastModify' && newValue){
+      //         // location.reload();
+      //         function keyEvent(key) {
+      //           var e = $.Event('keydown');
+      //           e.keyCode = key;
+      //           e.which = key;
+      //           $(window).trigger(e);
+ 	    //           if(key == 13) {
+	    //             console.log('按下回车键')
+	    //           }
+      //         }
+      //         keyEvent(13)
+      //       }
+      // }),
       this.scrollPosition()
       // EventBus.$on('publish', ()=>{
       //   this.post('publish')
