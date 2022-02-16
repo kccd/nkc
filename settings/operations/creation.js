@@ -73,9 +73,6 @@ module.exports = {
           POST:'creationCenterAddList'
         }
       },
-      PARAMETER: {
-        GET: 'creationCenter'
-      },
       member: {
         POST: 'creationCenter',
         DELETE: 'creationCenter'

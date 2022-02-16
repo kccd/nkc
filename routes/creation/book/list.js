@@ -2,7 +2,7 @@ const router = require('koa-router')();
 const callBack = async (ctx, next)=>{
   const {db, body} = ctx
   const {data:updateData, bid} = body
-  let filteredData = await db.BookModel.filterList(updateData)
+  let filteredData = await db.BookModel.filterList(updateData);
   await db.BookModel.updateOne(
     { _id: bid },
     { $set: { list: filteredData } }
@@ -13,5 +13,5 @@ router
   .post('/delete', callBack )
   .post('/move', callBack )
   .post('/add', callBack )
-  
+
 module.exports = router;
