@@ -1,8 +1,7 @@
 const router = require("koa-router")();
 router
-  .get('/:uid/leftDraw', async (ctx, next) => {
-    const {data, query, state, db, params, permission} = ctx;
-    const {uid} = params;
+  .get('/leftDraw', async (ctx, next) => {
+    const {data, state, db, permission} = ctx;
     const homeSettings = await db.SettingModel.getSettings("home");
     // 是否启用了基金
     const fundSettings = await db.SettingModel.getSettings('fund');
@@ -36,7 +35,7 @@ router
       visitProblemList: permission('visitProblemList'),
       getLibraryLogs: permission('getLibraryLogs'),
       fundSettings: fundSettings,
-      hasUser: data.user?true:false,
+      hasUser: !!state.uid,
       showActivityEnter: homeSettings.showActivityEnter,
       siteToolEnabled: toolSettings.enabled,
       enableFund: fundSettings.enableFund,
@@ -80,17 +79,21 @@ router
     }
     await next();
   })
-  .get('/:uid/rightDraw', async (ctx, next) => {
-    const {data, db,state, params, query, permission} = ctx;
-    data.res = '1111';
-    await next();
-  })
-  .get('/:uid/userDraw', async (ctx, next) => {
-    const {data, db, state, params, permission, nkcModules} = ctx;
-    const {uid, username, info, avatar} = data.user;
+  .get('/userDraw', async (ctx, next) => {
+    const {data, db, nkcModules} = ctx;
+    const {user} = data;
+    const {uid, username, info, avatar} = user;
+    const {
+      newSystemInfoCount,
+      newApplicationsCount,
+      newReminderCount,
+      newUsersMessagesCount
+    } = await user.getNewMessagesCount();
+    const newMessageCount = newSystemInfoCount + newApplicationsCount + newReminderCount + newUsersMessagesCount;
     data.drawState = {
       columnPermission: await db.UserModel.ensureApplyColumnPermission(data.user),
       uid,
+      newMessageCount,
       userInfo: {
         avatar: nkcModules.tools.getUrl('userAvatar', avatar),
         name: username,
@@ -102,8 +105,16 @@ router
     };
     await next();
   })
-  .get('/:uid/userNav', async (ctx, next) => {
-    const {data, db, params, permission, nkcModules} = ctx;
+  .get('/userNav', async (ctx, next) => {
+    const {data, db, nkcModules} = ctx;
+    const {user} = data;
+    const {
+      newSystemInfoCount,
+      newApplicationsCount,
+      newReminderCount,
+      newUsersMessagesCount
+    } = await user.getNewMessagesCount();
+    const newMessageCount = newSystemInfoCount + newApplicationsCount + newReminderCount + newUsersMessagesCount;
     const userScores = await db.UserModel.getUserScores(data.user.uid);
     const userColumn = await db.UserModel.getUserColumn(data.user.uid);
     const userInfo = {
@@ -125,6 +136,7 @@ router
     data.anvState = {
       uid: data.user.uid,
       xsfIcon: nkcModules.tools.getUrl('defaultFile', 'xsf.png'),
+      newMessageCount,
       userInfo,
       columnPermission: await db.UserModel.ensureApplyColumnPermission(data.user),
     };

@@ -7,7 +7,6 @@ export function getState() {
     platform: '',
     selectTypesWhenSubscribe: false,
     refererOperationId: '',
-    newMessageCount: 0,
     fileDomain: '',
   };
   try{
@@ -19,7 +18,6 @@ export function getState() {
     state.platform = windowData.platform;
     state.selectTypesWhenSubscribe = windowData.selectTypesWhenSubscribe;
     state.refererOperationId = windowData.refererOperationId;
-    state.newMessageCount = windowData.newMessageCount || 0;
     state.fileDomain = windowData.fileDomain;
     return state;
   } catch(err) {

@@ -27,7 +27,7 @@
         .col-xs-6.nav-user-link(onclick='messageApp.toChat()')
           .fa.fa-envelope-o
           | 消息中心
-          .count.message-switch.message-count(class="hidden")
+          .count(v-if="user.newMessageCount && user.newMessageCount > 0") {{user.newMessageCount}}
         a(:href="'/u/' + user.uid + '/profile/draft'" target='_blank').col-xs-6.nav-user-link
           .fa.fa-inbox
           | 我的草稿

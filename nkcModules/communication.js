@@ -48,11 +48,19 @@ function getCommunicationClient() {
       const operationsId = await user.getUserOperationsId();
       if(!operationsId.includes(operationId)) return null;
       const onlineStatus = await user.setOnlineStatus(os);
+      const {
+        newSystemInfoCount,
+        newApplicationsCount,
+        newReminderCount,
+        newUsersMessagesCount
+      } = await user.getNewMessagesCount();
+      const newMessageCount = newSystemInfoCount + newApplicationsCount + newReminderCount + newUsersMessagesCount;
       const friendsUid = await MessageModel.getUsersFriendsUid(user.uid);
       return {
         uid: user.uid,
         onlineStatus,
-        friendsUid
+        friendsUid,
+        newMessageCount
       }
     } else if(type === 'messageServiceSetUserOnlineStatus') {
       const {uid, online} = data;

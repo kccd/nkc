@@ -16,8 +16,7 @@
       li
         a(onclick='messageApp.toChat()')
           span.fa.fa-envelope-o &nbsp;消息中心
-            span.user-drawer-message.user-drawer-link.message-switch-div.message-count-container(class="hidden" )
-              span.message-switch.message-count(class="hidden")
+          span.nav-message-item-count(v-if="count && count > 0") {{count}}
           span.pull-right.fa.fa-angle-right
 
       li
@@ -51,8 +50,9 @@
 
 <script>
 export default {
-  props: ['user', 'column', 'permission'],
+  props: ['user', 'column', 'permission', 'count'],
   data: () => ({
+
   }),
   components: {
   },
@@ -65,34 +65,51 @@ export default {
 
 <style lang="less" scoped>
 .user-list-container{
+  .nav-message-item-count {
+    height: 1.2rem;
+    padding: 0 0.32rem;
+    background-color: red;
+    text-align: center;
+    line-height: 1.2rem;
+    color: #fff;
+    border-radius: 0.6rem;
+    position: absolute;
+    top: 1rem;
+    right: 2rem;
+    font-size: 1rem;
+  }
   .user-drawer-list{
     padding: 1rem 0 0 0;
     margin-bottom: 0;
-    li{
-      list-style: none;
-      a{
-        margin: 0 1rem;
-        padding: 0 1rem;
-        font-weight: 700;
-        display: block;
+    nt-size: 1rem;
+  }
+  li {
+    list-style: none;
+    a {
+      position: relative;
+      margin: 0 1rem;
+      padding: 0 1rem;
+      font-weight: 700;
+      display: block;
+      height: 3.4rem;
+      line-height: 3.4rem;
+      font-size: 1.2rem;
+      color: #282c37;
+
+      .fa.pull-right {
+        margin-left: 0.3em;
         height: 3.4rem;
         line-height: 3.4rem;
-        font-size: 1.2rem;
-        color: #282c37;
-        .fa.pull-right {
-          margin-left: 0.3em;
-          height: 3.4rem;
-          line-height: 3.4rem;
-        }
-        .fa{
-          display: inline-block;
-          font: normal normal normal 14px/1 FontAwesome;
-          font-size: inherit;
-          text-rendering: auto;
-          -webkit-font-smoothing: antialiased;
-        }
+      }
+
+      .fa {
+        display: inline-block;
+        font: normal normal normal 14px/1 FontAwesome;
+        font-size: inherit;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+      }
+    }
   }
-}
-}
 }
 </style>

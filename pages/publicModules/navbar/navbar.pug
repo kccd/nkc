@@ -1,9 +1,6 @@
 //- 链接背景高亮判断
 - var navbar = data.navbar || {}
 -var navbar_highlight = data.navbar_highlight||navbar.highlight
-if remoteState.uid
-  //- 新信息条数
-  -var messageSum = remoteState.newMessageCount;
 nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;margin-bottom: 15px;")
 
   .container-fluid(class=remoteState.navbar === 'standard'? 'max-width':'')
@@ -128,7 +125,12 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         .right-draw-content(v-if="drawState.uid")
           user-vue(:remote="drawState")
           user-draw-count(:user="user")
-          user-list(:user="user" :column="drawState.userInfo.userColumn" :permission="drawState.columnPermission")
+          user-list(
+            :user="user"
+            :column="drawState.userInfo.userColumn"
+            :permission="drawState.columnPermission"
+            :count="drawState.newMessageCount"
+            )
           a(onclick="NKC.methods.logout()").nkc-drawer-exit 退出登录
       .left-draw-loading(v-else)
         .loading

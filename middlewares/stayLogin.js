@@ -1,5 +1,4 @@
 const languages = require('../languages');
-const cookieConfig = require("../config/cookie");
 const translate = require('../nkcModules/translate');
 const {files: fileOperations} = require('../settings/operationsType');
 const {getUserInfo} = require('../nkcModules/cookie');
@@ -60,13 +59,7 @@ module.exports = async (ctx, next) => {
     if(ctx.data.operationId === "getResources" || !isResourcePost) {
       const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
       await db.UserModel.extendUsersInfo([user]);
-      const {
-        newSystemInfoCount,
-        newApplicationsCount,
-        newReminderCount,
-        newUsersMessagesCount
-      } = await user.getNewMessagesCount();
-      user.newMessage = newSystemInfoCount + newApplicationsCount + newReminderCount + newUsersMessagesCount;
+      // user.newMessage = newSystemInfoCount + newApplicationsCount + newReminderCount + newUsersMessagesCount;
       user.authLevel = await userPersonal.getAuthLevel();
       user.setPassword = userPersonal.password.salt && userPersonal.password.hash;
       user.boundMobile = userPersonal.nationCode && userPersonal.mobile;

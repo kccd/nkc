@@ -34,7 +34,6 @@ module.exports = async (ctx) => {
     fileDomain: state.fileDomain,
     serverSettings: state.serverSettings,
     selectTypesWhenSubscribe: state.uid?!!state.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe:false,
-    newMessageCount: state.uid? state.user.newMessage: 0,
     logoICO: state.logoICO,
     lotteryStatus: state.uid? state.user.generalSettings.lotterySettings.status: false,
     appStableVersion: state.appStableVersion,

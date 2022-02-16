@@ -1052,10 +1052,13 @@ function initUserNav(uid){
       "user-nav": userNav,
     },
     methods: {
+      updateNewMessageCount(count) {
+        this.anvState.newMessageCount = count;
+      },
       //获取用户导航数据
       getUserNavData(){
         const _this = this;
-        nkcAPI(`/draw/${this.uid}/userNav`, 'GET', {})
+        nkcAPI(`/draw/userNav`, 'GET', {})
           .then(res => {
             _this.anvState = res.anvState;
             _this.loading = false;
@@ -1088,7 +1091,7 @@ function showLeftDrawVue(type, uid) {
     draws[vueDrawId] = leftDraw;
   }
   leftDraw.showDraw();
-};
+}
 //右侧滑动框
 function showRightDrawVue(type, uid){
   const vueDrawId = getVueDrawsId(type);
@@ -1100,13 +1103,30 @@ function showRightDrawVue(type, uid){
   }
   rightDraw.showDraw();
 }
+
+// 更新新消息条数
+function updateNavNewMessageCount(count) {
+  const drawId = getVueDrawsId('right');
+  const draw = draws[drawId];
+  if(draw) {
+    draw.updateNewMessageCount(count);
+  }
+  const userNavId = getVueDrawsId('userNav');
+  const userNav = draws[userNavId];
+  if(userNav) {
+    userNav.updateNewMessageCount(count);
+  }
+}
+
 import userVue from "./user/userVue";
 import userDrawCount from "./user/userDrawCount";
 import userLogin from "./user/userLogin";
 import userList from "./user/userList";
+
+
 //创建右侧滑动框vue实例
 function initRightVue(uid) {
-  const draw = new Vue({
+  return new Vue({
     el: '#drawRight',
     data: {
       uid,
@@ -1125,9 +1145,12 @@ function initRightVue(uid) {
       this.getRightDrawData();
     },
     methods: {
+      updateNewMessageCount(count) {
+        this.drawState.newMessageCount = count;
+      },
       getRightDrawData(){
         const _this = this;
-        nkcAPI('/draw/' + uid + '/userDraw', 'GET', {})
+        nkcAPI('/draw/userDraw', 'GET', {})
           .then(res => {
             _this.drawState = res.drawState;
             _this.user = res.user;
@@ -1142,7 +1165,6 @@ function initRightVue(uid) {
       },
     }
   })
-  return draw;
 }
 
 import Management from '../pages/publicModules/management/managementVue'
@@ -1183,7 +1205,7 @@ function initLeftVue(uid) {
     methods: {
       getLeftDrawData(){
         const _this = this;
-        nkcAPI('/draw/' + uid + '/leftDraw', 'GET' , {})
+        nkcAPI('/draw/leftDraw', 'GET' , {})
           .then(res => {
             _this.untreated.unResolvedComplaintCount = res.unResolvedComplaintCount;
             _this.untreated.unResolvedProblemCount = res.unResolvedProblemCount;
@@ -1498,4 +1520,5 @@ Object.assign(window, {
   initLeftVue,
   initRightVue,
   initUserNavVue,
+  updateNavNewMessageCount,
 });

@@ -93,6 +93,9 @@ const messageApp = new Vue({
     this.initContainer();
     this.initAudio();
     const app = this;
+    socket.on('updateNewMessageCount', count => {
+      app.updateNewMessageCount(count);
+    });
     socket.on('receiveMessage', (data) => {
       if(data.localId) return;
       if(data.beep) {
@@ -182,6 +185,7 @@ const messageApp = new Vue({
       this.newMessageCount = count;
       this.updateNewMessageCountToDom(count);
       this.updateNewMessageCountToNKC(count);
+      updateNavNewMessageCount(count);
     }, 500),
     onContainerPositionChange: debounce(function(position) {
       const {left, top} = position;
