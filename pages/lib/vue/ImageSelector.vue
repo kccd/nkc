@@ -122,6 +122,9 @@
       disabled: true,
       loading: false,
       progress: false,
+      imgInfo:{},
+      reduction:[0,180,-180],
+      minContainerHeight:400
     }),
     mounted() {
       this.initDraggableElement();
@@ -138,7 +141,29 @@
         if(this.init === true) return;
         const image = this.$refs.image;
         this.cropper = new Cropper(image, {
+          viewMode: 0,
           aspectRatio: 1,
+          minContainerHeight:this.minContainerHeight,
+          crop:(e)=>{
+          if(image.height > image.width){
+            this.imgInfo.radio = image.height / image.width
+            this.imgInfo.max = 'height'
+            this.imgInfo.value = image.height 
+          }else if(image.height < image.width){
+            this.imgInfo.radio = image.width / image.height
+            this.imgInfo.max = 'width'
+            this.imgInfo.value = image.width 
+            // 宽没占满高也未占满
+          }else{
+            this.imgInfo={}
+          }
+          //- 如果宽大于高  旋转后 w 408（容器h）
+          //- 如果高大于宽  旋转后 h 408（容器h）
+          // 对比旋转前的 高 和 宽 小了多少
+          // 然后 根据比率 来缩小 scale
+          this.rotateValue = e.detail.rotate
+        }
+        
         });
         this.init = true;
       },
@@ -156,6 +181,7 @@
         this.loading = true;
         const self = this;
         const file = this.$refs.file.files[0];
+        // console.dir(file)
         fileToBase64(file)
           .then(fileBase64 => {
             self.fileBase64 = fileBase64;
@@ -187,10 +213,43 @@
         this.draggableElement.hide();
       },
       rotate(direction) {
+        const self = this;
         if(direction === "left") {
           this.cropper.rotate(-90);
         } else {
           this.cropper.rotate(90);
+        }
+        const contaiorWidth = parseInt(document.querySelector('.cropper-container').style.width)
+        if(self.imgInfo.max === 'width'){
+          // 宽占满只有这一种情况吗
+          // 1 容器宽度小于图片宽度
+          if(contaiorWidth <= self.minContainerHeight * self.imgInfo.radio){
+            const imgWidthInCanvas = contaiorWidth
+            // console.log(imgWidthInCanvas)
+            const scaleRadio = self.minContainerHeight / imgWidthInCanvas
+            if(self.reduction.includes(self.rotateValue)){
+              self.cropper.scale(1)
+            }else{
+              self.cropper.scale(scaleRadio)
+            }
+            // 高粘满
+          }else{
+            const imgWidthIncanvas = self.minContainerHeight * self.imgInfo.radio
+            const scaleRadio = self.minContainerHeight / imgWidthIncanvas
+            // console.log(imgWidthIncanvas)
+            if(self.reduction.includes(self.rotateValue)){
+              self.cropper.scale(1)
+            }else{
+              self.cropper.scale(scaleRadio)
+            }
+          }
+        }else {
+          if(self.reduction.includes(self.rotateValue)){
+            self.cropper.scale(1)
+          }else{
+            const scaleRadio = contaiorWidth / self.minContainerHeight
+            self.cropper.scale(scaleRadio)
+          }
         }
       },
       submit() {

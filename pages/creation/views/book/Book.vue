@@ -253,7 +253,7 @@ export default {
       function res(data) {
         for (let i = 0; i < data.length; i++) {
           that.$set(data, i, { ...data[i], isMove: false });
-          that.$set(data, i, { ...data[i], isOpen: false });
+          that.$set(data, i, { ...data[i], isOpen: true });
           if (data[i].child?.length > 0) {
             res(data[i].child);
           }

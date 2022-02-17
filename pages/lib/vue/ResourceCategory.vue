@@ -678,7 +678,9 @@ export default {
       ungroupedCount: 0,//未分组资源数量
       trashCount: 0,//回收站资源数量
     },
-
+    imgInfo:{},
+    reduction:[0,180,-180],
+    minContainerHeight:500
   }),
   components: {
     'image-viewer': ImageViewer,
@@ -765,8 +767,25 @@ export default {
     initCropper() {
       if(this.cropper) return;
       this.cropper = new Cropper(this.$refs.imageElement, {
-        viewMode: 1,
+        viewMode: 0,
+        minContainerHeight:this.minContainerHeight,
         aspectRatio: 1,
+        crop:(e)=>{
+          if(this.$refs.imageElement.height > this.$refs.imageElement.width){
+            this.imgInfo.radio = this.$refs.imageElement.width / this.$refs.imageElement.height
+            this.imgInfo.max = 'height'
+            this.imgInfo.value = this.$refs.imageElement.height 
+          }else{
+            this.imgInfo.radio = this.$refs.imageElement.width / this.$refs.imageElement.height
+            this.imgInfo.max = 'width'
+            this.imgInfo.value = this.$refs.imageElement.width 
+          }
+          //- 如果宽大于高  旋转后 w 408（容器h）
+          //- 如果高大于宽  旋转后 h 408（容器h）
+          // 对比旋转前的 高 和 宽 小了多少
+          // 然后 根据比率 来缩小 scale
+          this.rotateValue = e.detail.rotate
+        }
       });
     },
     destroyCropper() {
@@ -862,6 +881,57 @@ export default {
         self.cropper.rotate(-90);
       } else {
         self.cropper.rotate(90);
+      }
+      //- console.log('媒体管理')
+      // 编辑文章 选择图片也是这个
+      //- console.log(self.imgInfo)
+      // crop执行 > 再执行的下面的代码
+       const contaiorWidth = parseInt(document.querySelector('.cropper-container').style.width)
+       // self.imgInfo.value > self.minContainerHeight 原始图片宽 大于 容器宽
+      // 在  编辑文章 选择图片宽大于高的出现问题
+      if(self.imgInfo.max === 'width'){
+        // 宽占满 
+        if(contaiorWidth <= self.minContainerHeight * self.imgInfo.radio){
+          if(self.reduction.includes(self.rotateValue)){
+            self.cropper.scale(1);
+          }else{
+            const imgWidthInCanvas = contaiorWidth;
+            //- const scaleRadio = imgWidthInCanvas / self.minContainerHeight 
+            const scaleRadio = self.minContainerHeight / imgWidthInCanvas;
+            self.cropper.scale(scaleRadio);
+          }
+          // 高占满 
+        }else{
+          const imgWidthInCanvas =  self.minContainerHeight * self.imgInfo.radio;
+          const scaleRadio = self.minContainerHeight / imgWidthInCanvas;
+          if(self.reduction.includes(self.rotateValue)){
+            self.cropper.scale(1);
+          }else{
+            self.cropper.scale(scaleRadio);
+          }
+        }
+      }else if(self.imgInfo.max === 'height'){ 
+        // 宽占满
+        if(contaiorWidth < self.imgInfo.value){
+          if(self.reduction.includes(self.rotateValue)){
+            self.cropper.scale(1);
+          }else{
+            const imgWidthInCanvas = contaiorWidth;
+            const scaleRadio = self.minContainerHeight / imgWidthInCanvas
+            self.cropper.scale(scaleRadio);
+          }
+          // 高占满
+        }else{
+          //- console.log('oip-c.jpg')
+
+          const imgHeightInCanvas =  self.minContainerHeight;
+          const scaleRadio = contaiorWidth / imgHeightInCanvas;
+          if(self.reduction.includes(self.rotateValue)){
+            self.cropper.scale(1);
+          }else{
+            self.cropper.scale(scaleRadio);
+          }
+        }
       }
     },
     editImage: function(r) {

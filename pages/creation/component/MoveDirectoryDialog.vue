@@ -63,7 +63,16 @@ export default {
       this.selectedLevel = selectedLevel;
     });
     EventBus.$on("moveDialogOpenMenu", (data, childIndex, status = false) => {
-      this.$set(data, "isOpen", status);
+      this.seekChild2({
+        findLocation: childIndex,
+      })
+      console.log(this.seekResult)
+      if(!this.seekResult.showIndication){
+        this.$set(data, "isOpen", true);
+      }else{
+        this.$set(data, "isOpen", status);
+      }
+      
       // this.openMenuIndex = childIndex;
     });
     EventBus.$on("moveDirectory", async (msg, childIndex, type = "move", callBack) => {
@@ -256,7 +265,6 @@ export default {
       if (!this.insertIndex.length) {
         // sweetError("请选择后，再点击确定按钮");
         // return;
-        console.log(this.selectedLevel)
         this.selectedLevel = ''
       }
       // 数据移入选中项 子级
@@ -383,7 +391,6 @@ export default {
       setTimeout(this.close, 200);
     },
     close() {
-      console.log('关闭')
       this.draggableElement.hide();
       this.showTree = false;
       this.insertIndex = "";
@@ -391,7 +398,7 @@ export default {
       // 重置数据
       this.reset(
         this.dialogData,
-        ["isMove", "isOpen", "childrenDisable", "showIndication"],
+        ["isMove", "childrenDisable", "showIndication"],
         "reset"
       );
     },
