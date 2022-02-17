@@ -9,7 +9,7 @@ const fsPromise = fs.promises;
 const {promisify} = require('util');
 const redis = require('../redis');
 const cookieConfig = require("../config/cookie");
-const serverConfig = require('../config/server');
+const {fileDomain} = require("../config/server");
 
 const fsSync = {
   access: promisify(fs.access),
@@ -25,20 +25,18 @@ const fsSync = {
   stat: promisify(fs.stat)
 };
 
-const ipHostReg = /^([0-9]{1,3}\.?){4}(:[0-9]{0,5})?$/;
-
 module.exports = async (ctx, next) => {
   ctx.reqTime = new Date();
   ctx.data = Object.create(null);
   ctx.nkcModules = nkcModules;
 
   let cookieDomain = '';
-  if(!ipHostReg.test(ctx.host)) {
-    try{
-      let host = ctx.host.replace(/:.*/ig, '');
-      host = host.split('.').reverse();
-      cookieDomain = `${host[1]}.${host[0]}`;
-    } catch(err) {}
+  try{
+    cookieDomain = nkcModules.domain.getRootDomainByHost(ctx.host);
+  } catch(err) {
+    if(global.NKC.isDevelopment) {
+      console.log(err);
+    }
   }
 
   const {ip, port} = nkcModules.getRealIP({
@@ -118,7 +116,7 @@ module.exports = async (ctx, next) => {
         stable: true,
         disabled: false
       }),
-      fileDomain: serverConfig.fileDomain || ''
+      fileDomain: fileDomain || ''
     };
 
     // 下载附件是否需要积分
