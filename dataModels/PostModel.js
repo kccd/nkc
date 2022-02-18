@@ -1836,9 +1836,6 @@ postSchema.statics.extendActivityPosts = async (posts) => {
       mainForumsId,
       parentPostId,
     } = post;
-    if(post.type === 'thread') {
-      console.log('cover', cover);
-    }
     let user;
     if(anonymous) {
       user = anonymousUser;
