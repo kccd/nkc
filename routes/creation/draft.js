@@ -8,9 +8,9 @@ router
     await next();
   })
   .del("/", async (ctx, next) => {
-    const {query, db, state, params} = ctx;
-    const {did: draftId} = params;
-    const {type} = query;
+    const {query, db, state} = ctx;
+    // const {id: draftId,} = params;
+    const {type, id} = query;
     if(!['delete', 'recover'].includes(type)) ctx.throw(400, `未知 ${type}类型`)
     const draft = await db.CreationDraftsModel.getUserDraftById(draftId, state.uid);
     if(draft.uid !== state.uid) ctx.throw(403, `权限不足`);

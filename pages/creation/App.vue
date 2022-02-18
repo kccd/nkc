@@ -10,7 +10,8 @@
             //.fa.fa-angle-right.right
           .creation-center-nav-item(@click="navToPage('drafts')")
             .fa.fa-file-text-o
-            span 图文素材
+            //- span 图文素材
+            span 草稿箱
             //.fa.fa-angle-right.right
           .creation-center-nav-item(@click="navToPage('books')")
             .fa.fa-article

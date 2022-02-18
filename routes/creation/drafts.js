@@ -16,6 +16,45 @@ router
     data.paging = paging;
     await next();
   })
+  .get('/column', async (ctx, next)=>{
+    const {query, db, state, nkcModules, data} = ctx;
+    const {pageNumber = 0, pageLimit = 30} = query;
+    const {uid} = state;
+    // uid 先使用92837
+    const queryCriteria = {
+      uid:92837,
+      source:'column',
+      hasDraft:true
+    }
+    const count = await db.ArticleModel.countDocuments(queryCriteria);
+    console.log(count,'专栏草稿总条数')
+    if(count === 0) {
+      data.draftsData = []
+    }else{
+      const paging = nkcModules.apiFunction.paging(pageNumber, count, Number(pageLimit));
+      const columnsDocument =await db.ArticleModel.find(queryCriteria).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+      const dids = new Set();
+      const resIds = [];
+      for (const item of columnsDocument) {
+        dids.add(item.did)
+        // did 文档id。 aid 文章id。 cid 专栏id
+        resIds.push({aId:item._id})
+      }
+      const columnDocument = await db.DocumentModel.find({
+        type:'beta',
+        source:'column',
+        did:{
+          $in:[...dids]
+        }
+      })
+      console.log(columnDocument,'columnDocument')
+      const responseKey = ['title','content','toc']
+      // responseKey 响应数据包含key   
+      data.draftsData =await db.ArticleModel.filterAndExtendData(responseKey, columnDocument, resIds)
+    }
+    
+    await next()
+  })
   .get('/editor', async (ctx, next) => {
     //获取草稿文档内容
     const {data, db, query, state} = ctx;

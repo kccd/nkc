@@ -893,7 +893,7 @@ export default {
       // crop执行 > 再执行的下面的代码
       const contaiorWidth = parseInt(document.querySelector('.cropper-container').style.width)
       const imgWidthInCanvas = self.minContainerHeight * self.imgInfo.radio;
-      const imgHeightInCanvas = contaiorWidth / self.imgInfo.radio;
+      //- const imgHeightInCanvas = contaiorWidth / self.imgInfo.radio;
       if(self.imgInfo.max === 'width'){
         // 宽占满   
         if(contaiorWidth <= imgWidthInCanvas){
@@ -906,7 +906,6 @@ export default {
           //- this.rotateZoom(self.minContainerHeight, contaiorWidth)
           // 高占满 
         }else{
-          // 图片变为容器高度缩小了多少比率
           // 如果旋转后宽度超出容器宽 最后以容器宽度进行显示
           // imgWidthInCanvas 旋转前图片宽度
           // self.minContainerHeight 旋转后图片宽度变为容器高度
