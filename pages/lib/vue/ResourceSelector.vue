@@ -512,6 +512,9 @@
 
       draggableElement: null,
       socketEventListener: null,
+      imgInfo:{},
+      reduction:[0,180,-180],
+      minContainerHeight:500
     }),
     mounted() {
       this.initDraggableElement();
@@ -592,7 +595,21 @@
       initCropper() {
         if(this.cropper) return;
         this.cropper = new Cropper(this.$refs.imageElement, {
-          viewMode: 1,
+          viewMode: 0,
+          aspectRatio: 1,
+          minContainerHeight:this.minContainerHeight,
+          crop:(e)=>{
+          if(this.$refs.imageElement.height > this.$refs.imageElement.width){
+            this.imgInfo.radio = this.$refs.imageElement.width / this.$refs.imageElement.height
+            this.imgInfo.max = 'height'
+            this.imgInfo.value = this.$refs.imageElement.height 
+          }else{
+            this.imgInfo.radio = this.$refs.imageElement.width / this.$refs.imageElement.height
+            this.imgInfo.max = 'width'
+            this.imgInfo.value = this.$refs.imageElement.width 
+          }
+          this.rotateValue = e.detail.rotate
+        }
         });
       },
       destroyCropper() {
@@ -686,6 +703,14 @@
         this.destroyCropper();
         this.changePageType("list");
       },
+      rotateZoom(originValue, nextValue){
+        if(this.reduction.includes(this.rotateValue)){
+          this.cropper.scale(1);
+        }else{
+          const scaleRadio = originValue / nextValue;
+          this.cropper.scale(scaleRadio);
+        }
+      },
       rotate: function(type) {
         const self = this;
         if(type === "left") {
@@ -693,7 +718,41 @@
         } else {
           self.cropper.rotate(90);
         }
-      },
+      // crop执行> 再执行的下面的代
+        const contaiorWidth = parseInt(document.querySelector('.cropper-container').style.width);
+        const imgWidthInCanvas = self.minContainerHeight * self.imgInfo.radio;
+        if(self.imgInfo.value > 500 && self.imgInfo.max === 'width'){
+          // 宽占满两边
+          if(contaiorWidth <= imgWidthInCanvas){
+            const nextImgWidthInCanvas = (self.minContainerHeight / contaiorWidth) * (contaiorWidth / self.imgInfo.radio)
+            if(nextImgWidthInCanvas > contaiorWidth){
+              this.rotateZoom(contaiorWidth, self.minContainerHeight)
+            }else{
+              this.rotateZoom(self.minContainerHeight, contaiorWidth)
+            }  
+          }else{
+            const nextImgWidthInCanvas = (imgWidthInCanvas / self.minContainerHeight) * self.minContainerHeight
+            if(nextImgWidthInCanvas > contaiorWidth){
+              this.rotateZoom(imgWidthInCanvas, self.minContainerHeight)
+            }else{
+              this.rotateZoom(self.minContainerHeight, imgWidthInCanvas)
+            }
+          }
+        }else if(self.imgInfo.max === 'height'){ 
+        // 宽占满
+          if(contaiorWidth <= imgWidthInCanvas){
+            this.rotateZoom(self.minContainerHeight, contaiorWidth)
+          // 高占满
+          }else{
+            const nextImgHeightInCanvas = (contaiorWidth / self.minContainerHeight) * (imgWidthInCanvas)
+            if(nextImgHeightInCanvas > self.minContainerHeight){
+              this.rotateZoom(self.minContainerHeight, imgWidthInCanvas)
+            }else{
+              this.rotateZoom(contaiorWidth, self.minContainerHeight)
+            }
+          }
+      }
+    },
       editImage: function(r) {
         const self = this;
         this.croppingPicture = false;

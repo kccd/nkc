@@ -122,6 +122,9 @@
       disabled: true,
       loading: false,
       progress: false,
+      imgInfo:{},
+      reduction:[0,180,-180],
+      minContainerHeight:400
     }),
     mounted() {
       this.initDraggableElement();
@@ -138,7 +141,29 @@
         if(this.init === true) return;
         const image = this.$refs.image;
         this.cropper = new Cropper(image, {
+          viewMode: 0,
           aspectRatio: 1,
+          minContainerHeight:this.minContainerHeight,
+          crop:(e)=>{
+          if(image.height > image.width){
+            this.imgInfo.radio = image.width / image.height
+            this.imgInfo.max = 'height'
+            this.imgInfo.value = image.height 
+          }else if(image.height < image.width){
+            this.imgInfo.radio = image.width / image.height
+            this.imgInfo.max = 'width'
+            this.imgInfo.value = image.width 
+            // 宽没占满高也未占满
+          }else{
+            this.imgInfo={}
+          }
+          //- 如果宽大于高  旋转后 w 408（容器h）
+          //- 如果高大于宽  旋转后 h 408（容器h）
+          // 对比旋转前的 高 和 宽 小了多少
+          // 然后 根据比率 来缩小 scale
+          this.rotateValue = e.detail.rotate
+        }
+        
         });
         this.init = true;
       },
@@ -156,6 +181,7 @@
         this.loading = true;
         const self = this;
         const file = this.$refs.file.files[0];
+        // console.dir(file)
         fileToBase64(file)
           .then(fileBase64 => {
             self.fileBase64 = fileBase64;
@@ -186,11 +212,57 @@
       close() {
         this.draggableElement.hide();
       },
+      rotateZoom(originValue, nextValue){
+        if(this.reduction.includes(this.rotateValue)){
+          this.cropper.scale(1);
+        }else{
+            //- const imgWidthInCanvas = originValue;
+          const scaleRadio = originValue / nextValue;
+          this.cropper.scale(scaleRadio);
+        }
+      },
       rotate(direction) {
+        const self = this;
         if(direction === "left") {
           this.cropper.rotate(-90);
         } else {
           this.cropper.rotate(90);
+        }
+        const imgWidthInCanvas = self.minContainerHeight * self.imgInfo.radio;
+        const contaiorWidth = parseInt(document.querySelector('.cropper-container').style.width)
+        if(self.imgInfo.max === 'width'){
+          // 宽占满
+          if(contaiorWidth <= imgWidthInCanvas){
+            const nextImgWidthInCanvas = (self.minContainerHeight / contaiorWidth) * (contaiorWidth / self.imgInfo.radio)
+            if(nextImgWidthInCanvas > contaiorWidth){
+              this.rotateZoom(contaiorWidth, self.minContainerHeight)
+            }else{
+              this.rotateZoom(self.minContainerHeight, contaiorWidth)
+            } 
+            // 高占满 
+          }else{
+            const nextImgWidthInCanvas = (imgWidthInCanvas / self.minContainerHeight) * self.minContainerHeight
+            if(nextImgWidthInCanvas > contaiorWidth){
+              this.rotateZoom(imgWidthInCanvas, self.minContainerHeight)
+            }else{
+              this.rotateZoom(self.minContainerHeight, imgWidthInCanvas)
+            }
+          }
+        }else if(self.imgInfo.max === 'height'){
+          // 宽占满
+          if(contaiorWidth <= imgWidthInCanvas){
+            this.rotateZoom(self.minContainerHeight, contaiorWidth)
+          }else{
+            // 高占满
+            const nextImgHeightInCanvas = (contaiorWidth / self.minContainerHeight) * (imgWidthInCanvas)
+          //- 如果旋转后的高 大于容器高 那么以容器高来显示图片
+          // 山峰图 oip-c.jpg
+            if(nextImgHeightInCanvas > self.minContainerHeight){
+              this.rotateZoom(self.minContainerHeight, imgWidthInCanvas)
+            }else{
+              this.rotateZoom(contaiorWidth, self.minContainerHeight)
+            }
+          }
         }
       },
       submit() {

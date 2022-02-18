@@ -23,6 +23,7 @@ function post(type, newdata) {
   const url = `/document/335/history/${newdata.did}/${newdata._id}/${type}`
   nkcAPI(url, 'POST')
     .then(() => {
+      // localStorage.setItem('lastModify', new Date().getTime())
       sweetSuccess('操作成功')
       let arr = currentUrl.split('/')
       let prevUrl =  arr.slice(0, 6).join('/')

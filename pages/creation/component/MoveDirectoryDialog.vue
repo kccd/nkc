@@ -63,7 +63,16 @@ export default {
       this.selectedLevel = selectedLevel;
     });
     EventBus.$on("moveDialogOpenMenu", (data, childIndex, status = false) => {
-      this.$set(data, "isOpen", status);
+      this.seekChild2({
+        findLocation: childIndex,
+      })
+      console.log(this.seekResult)
+      if(!this.seekResult.showIndication){
+        this.$set(data, "isOpen", true);
+      }else{
+        this.$set(data, "isOpen", status);
+      }
+      
       // this.openMenuIndex = childIndex;
     });
     EventBus.$on("moveDirectory", async (msg, childIndex, type = "move", callBack) => {
@@ -254,8 +263,9 @@ export default {
     },
     async confirm() {
       if (!this.insertIndex.length) {
-        sweetError("请选择后，再点击确定按钮");
-        return;
+        // sweetError("请选择后，再点击确定按钮");
+        // return;
+        this.selectedLevel = ''
       }
       // 数据移入选中项 子级
       if (this.selectedLevel === "childLevel") {
@@ -272,7 +282,6 @@ export default {
             findLocation: this.insertIndex,
           })
           let insertDataindex = this.seekResult;
-          console.log(insertDataindex,'insertDataindex')
           // 删除被移动的数据
           this.seekChild2({
             findLocation: this.moveIndex,
@@ -290,7 +299,7 @@ export default {
           insertDataindex.child.unshift(this.moveData);
 
         }
-      } else {
+      } else if(this.selectedLevel === "sameLevel") {
         // 编辑后直接发布 就没有坐标和数据 并且默认在最后一项
         if (!this.moveIndex.length) {
           const deleteData = this.dialogData[this.dialogData.length - 1];
@@ -382,7 +391,6 @@ export default {
       setTimeout(this.close, 200);
     },
     close() {
-      console.log('关闭')
       this.draggableElement.hide();
       this.showTree = false;
       this.insertIndex = "";
@@ -390,7 +398,7 @@ export default {
       // 重置数据
       this.reset(
         this.dialogData,
-        ["isMove", "isOpen", "childrenDisable", "showIndication"],
+        ["isMove", "childrenDisable", "showIndication"],
         "reset"
       );
     },

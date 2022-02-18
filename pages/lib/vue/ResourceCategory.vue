@@ -678,7 +678,9 @@ export default {
       ungroupedCount: 0,//未分组资源数量
       trashCount: 0,//回收站资源数量
     },
-
+    imgInfo:{},
+    reduction:[0,180,-180],
+    minContainerHeight:500
   }),
   components: {
     'image-viewer': ImageViewer,
@@ -765,7 +767,25 @@ export default {
     initCropper() {
       if(this.cropper) return;
       this.cropper = new Cropper(this.$refs.imageElement, {
-        viewMode: 1,
+        viewMode: 0,
+        minContainerHeight:this.minContainerHeight,
+        aspectRatio: 1,
+        crop:(e)=>{
+          if(this.$refs.imageElement.height > this.$refs.imageElement.width){
+            this.imgInfo.radio = this.$refs.imageElement.width / this.$refs.imageElement.height
+            this.imgInfo.max = 'height'
+            this.imgInfo.value = this.$refs.imageElement.height 
+          }else{
+            this.imgInfo.radio = this.$refs.imageElement.width / this.$refs.imageElement.height
+            this.imgInfo.max = 'width'
+            this.imgInfo.value = this.$refs.imageElement.width 
+          }
+          //- 如果宽大于高  旋转后 w 408（容器h）
+          //- 如果高大于宽  旋转后 h 408（容器h）
+          // 对比旋转前的 高 和 宽 小了多少
+          // 然后 根据比率 来缩小 scale
+          this.rotateValue = e.detail.rotate
+        }
       });
     },
     destroyCropper() {
@@ -855,12 +875,70 @@ export default {
       this.destroyCropper();
       this.changePageType("list");
     },
+    rotateZoom(originValue, nextValue){
+      if(this.reduction.includes(this.rotateValue)){
+        this.cropper.scale(1);
+      }else{
+        const scaleRadio = originValue / nextValue;
+        this.cropper.scale(scaleRadio);
+      }
+    },
     rotate: function(type) {
       const self = this;
       if(type === "left") {
         self.cropper.rotate(-90);
       } else {
         self.cropper.rotate(90);
+      }
+      // crop执行 > 再执行的下面的代码
+      const contaiorWidth = parseInt(document.querySelector('.cropper-container').style.width)
+      const imgWidthInCanvas = self.minContainerHeight * self.imgInfo.radio;
+      const imgHeightInCanvas = contaiorWidth / self.imgInfo.radio;
+      if(self.imgInfo.max === 'width'){
+        // 宽占满   
+        if(contaiorWidth <= imgWidthInCanvas){
+          const nextImgWidthInCanvas = (self.minContainerHeight / contaiorWidth) * (contaiorWidth / self.imgInfo.radio)
+          if(nextImgWidthInCanvas > contaiorWidth){
+            this.rotateZoom(contaiorWidth, self.minContainerHeight)
+          }else{
+            this.rotateZoom(self.minContainerHeight, contaiorWidth)
+          }
+          //- this.rotateZoom(self.minContainerHeight, contaiorWidth)
+          // 高占满 
+        }else{
+          // 图片变为容器高度缩小了多少比率
+          // 如果旋转后宽度超出容器宽 最后以容器宽度进行显示
+          // imgWidthInCanvas 旋转前图片宽度
+          // self.minContainerHeight 旋转后图片宽度变为容器高度
+          // 乘以得出的缩放比率 旋转前图片高度  就是 旋转后的图片在容器中的宽度
+          const nextImgWidthInCanvas = (imgWidthInCanvas / self.minContainerHeight) * self.minContainerHeight
+          // 如果下张图片宽大于容器宽，那么以容器宽显示图片
+          if(nextImgWidthInCanvas > contaiorWidth){
+            this.rotateZoom(imgWidthInCanvas, self.minContainerHeight)
+          }else{
+            this.rotateZoom(self.minContainerHeight, imgWidthInCanvas)
+          }
+        }
+      }else if(self.imgInfo.max === 'height'){ 
+        // 宽占满   高>宽 那么什么情况下 宽会占满 （只有容器高度大于容器宽度会出现）好像没有此种情况？？
+        if(contaiorWidth <= imgWidthInCanvas){
+          this.rotateZoom(self.minContainerHeight, contaiorWidth)
+          // 高占满
+        }else{
+          // 当图片宽高很接近时 如果让图片高度直接变为容器宽，那么图片高度将会超出容器
+          // contaiorWidth 下次图片宽度
+          // self.minContainerHeight 当前图片高度
+          // nextImgHeightInCanvas 计算出的下次图片高度
+          const nextImgHeightInCanvas = (contaiorWidth / self.minContainerHeight) * (imgWidthInCanvas)
+          //- 如果旋转后的高 大于容器高 那么以容器高来显示图片
+          if(nextImgHeightInCanvas > self.minContainerHeight){
+            this.rotateZoom(self.minContainerHeight, imgWidthInCanvas)
+          }else{
+            this.rotateZoom(contaiorWidth, self.minContainerHeight)
+          }
+          // 这个适用于 山峰图 高宽比率相差较小
+          //- this.rotateZoom(self.minContainerHeight, self.minContainerHeight * self.imgInfo.radio)
+        }
       }
     },
     editImage: function(r) {

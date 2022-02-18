@@ -186,8 +186,7 @@ export default {
       if (childIndex === "0") {
         this.levelSelect = "sameLevel";
       }
-      const { isOpen, showIndication, isMove, parentNode, childrenDisable } =
-        this.$props.data;
+      const { isOpen, isMove, childrenDisable } = this.$props.data;
       childIndex = childIndex.split(",");
       // 如果为禁用状态就不显示指示 禁用状态是可以打开关闭的列表
       if (isMove && !this.$props.operations && childrenDisable) {
@@ -197,7 +196,6 @@ export default {
       }
       // 不属于禁用状态的显示线 会走这个
       if (!this.$props.operations && !childrenDisable) {
-        // console.log(6)
         EventBus.$emit(
           "moveDialogOpenMenu",
           data,
@@ -206,7 +204,7 @@ export default {
         );
         EventBus.$emit("showIndication", childIndex, true, data);
 
-        // 禁用状态子级走 这    showIndication 是 bug源
+        // 禁用状态子级
       } else {
         EventBus.$emit(
           "moveDialogOpenMenu",
