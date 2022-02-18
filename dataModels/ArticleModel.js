@@ -21,6 +21,11 @@ const schema = new mongoose.Schema({
     default: null,
     index: 1
   },
+  published: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
   // 当前文章是否包含草稿
   hasDraft: {
     type: Boolean,
@@ -29,7 +34,7 @@ const schema = new mongoose.Schema({
   },
   // 引用文章的模块类型
   source: {
-    type: String,
+    type: String, // column
     required: true,
     index: 1
   },
