@@ -1864,37 +1864,20 @@ postSchema.statics.extendActivityPosts = async (posts) => {
     } else {
       url = tools.getUrl('thread', tid);
     }
-    if(post.type === 'post') {
-      results.push({
-        pid,
-        tid,
-        user,
-        type,
-        toc,
-        url,
-        title: t,
-        content: nkcRender.htmlToPlain(c, 200),
-        cover: cover? tools.getUrl('postCover', cover):null,
-        forumsId: mainForumsId,
-        quote,
-        parentPostId: parentPostId,
-      });
-    } else if(post.type === 'thread') {
-      results.push({
-        pid,
-        tid,
-        user,
-        type,
-        toc,
-        url,
-        title: t,
-        content: nkcRender.htmlToPlain(c, 200),
-        cover: cover? tools.getUrl('postCover', cover):null,
-        forumsId: mainForumsId,
-        quote,
-        parentPostId: parentPostId,
-      });
-    }
+    results.push({
+      pid,
+      tid,
+      user,
+      type,
+      toc,
+      url,
+      title: t,
+      content: nkcRender.htmlToPlain(c, 200),
+      cover: cover? tools.getUrl('postCover', cover):null,
+      forumsId: mainForumsId,
+      quote,
+      parentPostId: parentPostId,
+    });
   }
   return results;
 };
