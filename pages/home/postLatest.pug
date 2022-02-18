@@ -31,24 +31,14 @@ if !isIncluded('postActivity')
     mixin postActivityContent(contentData)
       -console.log('contentData', contentData);
       -var {cover, title, content, url, type} = contentData;
-      if type === 'post'
-        .post-activity-content
-          if title
-            a(href=url target="_blank").post-activity-title=title
-          .post-activity-content-container(class=cover? 'cover':'')
-            if content
-              a(href=url target="_blank").post-post-abstract=content
-            if cover
-              .post-activity-cover(style=`background-image: url(${cover})`)
-      else
-        .post-activity-content
-          if title
-            a(href=url target="_blank").post-activity-title=title
-          .post-activity-content-container(class=cover ? 'cover' : '')
-            if content
-              a(href=url target="_blank").post-post-abstract=content
-            if cover
-              .post-activity-cover(style=`background-image: url(${cover})`)
+      .post-activity-content
+        if title
+          a(href=url target="_blank").post-activity-title=title
+        .post-activity-content-container(class=cover? 'cover':'')
+          if content
+            a(href=url target="_blank").post-post-abstract=content
+          if cover
+            .post-activity-cover(style=`background-image: url(${cover})`)
     mixin postPostsContent(contentData, parentPost)
       -var {cover, title, content, url} = contentData;
       .post-activity-content
