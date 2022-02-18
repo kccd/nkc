@@ -146,7 +146,7 @@
           minContainerHeight:this.minContainerHeight,
           crop:(e)=>{
           if(image.height > image.width){
-            this.imgInfo.radio = image.height / image.width
+            this.imgInfo.radio = image.width / image.height
             this.imgInfo.max = 'height'
             this.imgInfo.value = image.height 
           }else if(image.height < image.width){
@@ -212,6 +212,15 @@
       close() {
         this.draggableElement.hide();
       },
+      rotateZoom(originValue, nextValue){
+        if(this.reduction.includes(this.rotateValue)){
+          this.cropper.scale(1);
+        }else{
+            //- const imgWidthInCanvas = originValue;
+          const scaleRadio = originValue / nextValue;
+          this.cropper.scale(scaleRadio);
+        }
+      },
       rotate(direction) {
         const self = this;
         if(direction === "left") {
@@ -219,36 +228,40 @@
         } else {
           this.cropper.rotate(90);
         }
+        const imgWidthInCanvas = self.minContainerHeight * self.imgInfo.radio;
         const contaiorWidth = parseInt(document.querySelector('.cropper-container').style.width)
         if(self.imgInfo.max === 'width'){
-          // 宽占满只有这一种情况吗
-          // 1 容器宽度小于图片宽度
-          if(contaiorWidth <= self.minContainerHeight * self.imgInfo.radio){
-            const imgWidthInCanvas = contaiorWidth
-            // console.log(imgWidthInCanvas)
-            const scaleRadio = self.minContainerHeight / imgWidthInCanvas
-            if(self.reduction.includes(self.rotateValue)){
-              self.cropper.scale(1)
+          // 宽占满
+          if(contaiorWidth <= imgWidthInCanvas){
+            const nextImgWidthInCanvas = (self.minContainerHeight / contaiorWidth) * (contaiorWidth / self.imgInfo.radio)
+            if(nextImgWidthInCanvas > contaiorWidth){
+              this.rotateZoom(contaiorWidth, self.minContainerHeight)
             }else{
-              self.cropper.scale(scaleRadio)
-            }
-            // 高粘满
+              this.rotateZoom(self.minContainerHeight, contaiorWidth)
+            } 
+            // 高占满 
           }else{
-            const imgWidthIncanvas = self.minContainerHeight * self.imgInfo.radio
-            const scaleRadio = self.minContainerHeight / imgWidthIncanvas
-            // console.log(imgWidthIncanvas)
-            if(self.reduction.includes(self.rotateValue)){
-              self.cropper.scale(1)
+            const nextImgWidthInCanvas = (imgWidthInCanvas / self.minContainerHeight) * self.minContainerHeight
+            if(nextImgWidthInCanvas > contaiorWidth){
+              this.rotateZoom(imgWidthInCanvas, self.minContainerHeight)
             }else{
-              self.cropper.scale(scaleRadio)
+              this.rotateZoom(self.minContainerHeight, imgWidthInCanvas)
             }
           }
-        }else {
-          if(self.reduction.includes(self.rotateValue)){
-            self.cropper.scale(1)
+        }else if(self.imgInfo.max === 'height'){
+          // 宽占满
+          if(contaiorWidth <= imgWidthInCanvas){
+            this.rotateZoom(self.minContainerHeight, contaiorWidth)
           }else{
-            const scaleRadio = contaiorWidth / self.minContainerHeight
-            self.cropper.scale(scaleRadio)
+            // 高占满
+            const nextImgHeightInCanvas = (contaiorWidth / self.minContainerHeight) * (imgWidthInCanvas)
+          //- 如果旋转后的高 大于容器高 那么以容器高来显示图片
+          // 山峰图 oip-c.jpg
+            if(nextImgHeightInCanvas > self.minContainerHeight){
+              this.rotateZoom(self.minContainerHeight, imgWidthInCanvas)
+            }else{
+              this.rotateZoom(contaiorWidth, self.minContainerHeight)
+            }
           }
         }
       },
