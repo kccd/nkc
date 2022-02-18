@@ -1,4 +1,5 @@
 const Router = require("koa-router");
+const editorRouter = require('./editor');
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
@@ -111,5 +112,6 @@ router
       return ctx.redirect(url);
     }
     await next();
-  });
+  })
+  .use('/editor', editorRouter.routes(), editorRouter.allowedMethods())
 module.exports = router;

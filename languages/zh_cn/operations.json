@@ -833,5 +833,6 @@
   "modifyComment": "编辑专题评论",
   "deleteComment": "删除专题评论",
   "experimentDocumentPostSettings": "后台管理 - 设置 - 内容发表",
-  "bookInvitation": "处理专题创作邀请"
+  "bookInvitation": "处理专题创作邀请",
+  "columnEditor": "访问专栏编辑器页"
 }

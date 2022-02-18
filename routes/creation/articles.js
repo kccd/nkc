@@ -42,8 +42,9 @@ router
       _id: bookId
     });
     if(!['modify', 'publish', 'create', 'save'].includes(type)) ctx.throw(400, `未知的提交类型 type: ${type}`);
-    const {title, content, cover} = JSON.parse(fields.article);
+    const {title, content, cover, sid, source} = JSON.parse(fields.article);
     let article;
+    //创建article
     if(type === 'create') {
       article = await db.ArticleModel.createArticle({
         uid: state.uid,
@@ -64,6 +65,7 @@ router
         }
       });
     } else {
+      //编辑或发布
       article = await db.ArticleModel.findOnly({_id: articleId});
       await article.modifyArticle({
         title,

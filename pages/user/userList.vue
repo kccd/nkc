@@ -52,7 +52,6 @@
 export default {
   props: ['user', 'column', 'permission', 'count'],
   data: () => ({
-
   }),
   components: {
   },

@@ -10,10 +10,12 @@
       @display-ip-info="displayIpInfo"
       @view-violation="viewViolation"
       )
-    float-user-panel(ref="floatUserPanel")
+    float-user-panel(ref="floatUserPanel" @open-subscribe="openSubscribe")
+    sticker(ref="sticker")
     violation-record(ref="violationRecord")
     complaint(ref="complaint")
     disabled-comment(ref="disabledComment")
+    subscribe-types(ref="subscribeTypes")
     mixin skeleton
       .comment-item
         .comment-item-header
@@ -40,11 +42,14 @@
         .single-post-header(v-if="comment.status === 'faulty'")
           .reture 当前内容已被退回修改，请作者点击编辑按钮修改
           span 原因：{{comment.reason}}
+        .single-post-header(v-if="comment.status === 'unknown' && !permissions.reviewed")
+          .unknown
+            span.m-r-05 内容待审核
         .single-post-header(v-if="comment.status === 'disabled'")
           .disabled
             span.m-r-05 内容已被屏蔽
             a(@click="unblock(comment)" v-if="permissions.disabled") 点击解封
-        .single-post-header(v-if="comment.status === 'unknown'")
+        .single-post-header(v-if="comment.status === 'unknown' && permissions.reviewed")
           .review 内容待审核
             span= "送审原因："
             span {{comment.reason}}
@@ -132,6 +137,9 @@
       .disabled{
         cursor: pointer;
         color: #c70000;
+      }
+      .unknown {
+        color: red;
       }
     }
     .comment-item-header{
@@ -261,6 +269,7 @@
   import CommentEditor from "./CommentEditor";
   import {nkcAPI} from "../lib/js/netAPI";
   import {getUrl, timeFormat} from "../lib/js/tools";
+  import {replaceNKCRender} from "../lib/js/replaceNKCRender";
   import CommentOptions from "./CommentOptions";
   import CommentPostEditor from "../lib/vue/CommentPostEditor";
   import Complaint from "../lib/vue/Complaint";
@@ -268,6 +277,10 @@
   import ViolationRecord from "../lib/vue/ViolationRecord";
   import {screenTopAlert} from "../lib/js/topAlert";
   import FloatUserPanel from "../lib/vue/FloatUserPanel";
+  import Sticker from "../lib/vue/Sticker";
+  import ImageViewer from "../lib/vue/ImageViewer";
+  import SubscribeTypes from "../lib/vue/SubscribeTypes";
+  // import {initNKCVideo} from "../lib/js/replaceNKCRender";
   export default {
     props: ['source', 'sid'],
     data: () => ({
@@ -276,7 +289,10 @@
       selfComment: '',
       ready: false,
       editors: {},
-      permissions: {},
+      permissions: {
+        disabled: false,
+        reviewed: false,
+      },
     }),
     components: {
       "comment-editor": CommentEditor,
@@ -285,7 +301,10 @@
       complaint: Complaint,
       "disabled-comment": DisabledComment,
       "violation-record": ViolationRecord,
-      "float-user-panel": FloatUserPanel
+      "float-user-panel": FloatUserPanel,
+      sticker: Sticker,
+      "image-viewer": ImageViewer,
+      "subscribe-types": SubscribeTypes
     },
     mounted() {
       this.getComments();
@@ -293,6 +312,18 @@
     methods: {
       getUrl: getUrl,
       timeFormat: timeFormat,
+      replaceNKCUrl: replaceNKCRender,
+      initRender(){
+        const self = this;
+        $(document).ready(function(){
+          // document 不写默认document
+          self.$nextTick(() => {
+            self.$refs.floatUserPanel.initPanel();
+            self.$refs.sticker.init();
+            self.replaceNKCUrl();
+          });
+        })
+      },
       getComments() {
         const self = this;
         nkcAPI(`/comment?sid=${self.sid}`, 'GET', {})
@@ -301,12 +332,9 @@
           self.selfComment = res.comment;
           self.permissions = res.permissions;
           self.loading = false;
-          $(document).ready(function(){
-            // document 不写默认document
-            self.$nextTick(() => {
-              self.$refs.floatUserPanel.initPanel();
-            });
-          })
+        })
+        .then(() => {
+          self.initRender();
         })
         .catch(err => {
           sweetError(err);
@@ -320,7 +348,6 @@
       },
       //关闭评论编辑器
       hideCommentEditor(cid) {
-
       },
       //评论背景开关
       switchPostBackground(cid, show) {
@@ -411,6 +438,12 @@
         .catch(err => {
           sweetError(err);
         })
+      },
+      //打开关注分类
+      openSubscribe(options) {
+        const {uid, subscribed} = options;
+        if(!uid) return;
+        this.$refs.subscribeTypes.subscribeUser(uid, subscribed);
       }
     }
 }

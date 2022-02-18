@@ -18,6 +18,9 @@
         @click="navToPage('articleEditor', { bid })"
       ) 撰写文章
       button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
+        @click="toBookHome"
+      ) 阅读专题
+      button.creation-center-book-list-selector.btn.btn-default.btn-block.btn-sm(
         @click="navToPage('bookEditor', { bid })"
       ) 设置
     MoveDirectoryDialog(:bid="bid")
@@ -100,111 +103,109 @@
       }
     }
   }
-  .creation-center-book{
-    .creation-center-author{
+  .creation-center-author{
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .creation-center-book-cover{
+    width: 100%;
+    img{
+      width: 100%;
+    }
+    margin-bottom: 2rem;
+  }
+  .creation-center-book-container{
+
+    .creation-center-book-name{
+      font-size: 2rem;
       text-align: center;
       margin-bottom: 1rem;
     }
-    .creation-center-book-cover{
-      width: 100%;
-      img{
-        width: 100%;
-      }
-      margin-bottom: 2rem;
+    .creation-center-book-description{
+      text-align: center;
+      margin-bottom: 1rem;
     }
-    .creation-center-book-container{
+    .creation-center-book-list-selector{
 
-      .creation-center-book-name{
-        font-size: 2rem;
-        text-align: center;
-        margin-bottom: 1rem;
-      }
-      .creation-center-book-description{
-        text-align: center;
-        margin-bottom: 1rem;
-      }
-      .creation-center-book-list-selector{
+    }
+    .creation-center-book-list{
+      margin-bottom: 2rem;
+      .creation-center-book-list-item{
+        &[data-type='stable'][data-status='unknown'] {
+          background: #ffdcb2!important;
+        }
+        &[data-type='beta'][data-status='unknown'] {
+          background: #ccc!important;
+        }
+        &[data-type='stable'][data-status='faulty'] {
+          background: #ffdbd5!important;
+        }
+        &[data-type='stable'][data-status='disabled'] {
+          background: #bdbdbd!important;
+        }
+        @itemHeight: 3rem;
+        @timeWidth: 11rem;
+        margin-bottom: 0.2rem;
+        padding-right: @timeWidth + 1rem;
+        padding-left: 0.2rem;
+        line-height: @itemHeight;
+        height: @itemHeight;
+        overflow: hidden;
+        position: relative;
+        background-color: #fff;
+        cursor: pointer;
+        transition: background-color 200ms;
+        &:hover{
+          background-color: #f4f4f4;
+        }
+        .creation-center-book-list-item-name{
+          display: inline-block;
+          height: 100%;
+          .hideText(@line: 1);
+          font-size: 1.3rem;
+          span{
+            font-size: 1rem;
+            color: @primary;
+            margin-right: 0.5rem;
+          }
 
-      }
-      .creation-center-book-list{
-        margin-bottom: 2rem;
-        .creation-center-book-list-item{
-          &[data-type='stable'][data-status='unknown'] {
-            background: #ffdcb2!important;
-          }
-          &[data-type='beta'][data-status='unknown'] {
-            background: #ccc!important;
-          }
-          &[data-type='stable'][data-status='faulty'] {
-            background: #ffdbd5!important;
-          }
-          &[data-type='stable'][data-status='disabled'] {
-            background: #bdbdbd!important;
-          }
-          @itemHeight: 3rem;
-          @timeWidth: 11rem;
-          margin-bottom: 0.2rem;
-          padding-right: @timeWidth + 1rem;
-          padding-left: 0.2rem;
-          line-height: @itemHeight;
+        }
+        .creation-center-book-list-item-time {
+          // width: 26rem;
+          text-align: right;
+          position: absolute;
+          top: 0;
+          right: 0;
           height: @itemHeight;
-          overflow: hidden;
-          position: relative;
-          background-color: #fff;
-          cursor: pointer;
-          transition: background-color 200ms;
-          &:hover{
-            background-color: #f4f4f4;
-          }
-          .creation-center-book-list-item-name{
-            display: inline-block;
-            height: 100%;
-            .hideText(@line: 1);
-            font-size: 1.3rem;
-            span{
-              font-size: 1rem;
-              color: @primary;
-              margin-right: 0.5rem;
-            }
-
-          }
-          .creation-center-book-list-item-time {
-            // width: 26rem;
-            text-align: right;
-            position: absolute;
-            top: 0;
-            right: 0;
-            height: @itemHeight;
-            span {
-              cursor: pointer;
-              font-size: 1rem;
-              margin-left: 10px;
-              text-align: right;
-            }
-          }
-        }
-
-        .creation-add-list {
-          background-color: rgba(red, green, blue, 0.2);
-          width: 145%;
-          li {
-            text-align: center;
-            line-height: 2rem;
-            // height: 80%;
-            font-size: 1rem;
-          }
-          .add-chapter {
+          span {
             cursor: pointer;
-            font-weight: 600;
             font-size: 1rem;
+            margin-left: 10px;
+            text-align: right;
           }
         }
-        .children {
+      }
+
+      .creation-add-list {
+        background-color: rgba(red, green, blue, 0.2);
+        width: 145%;
+        li {
+          text-align: center;
+          line-height: 2rem;
+          // height: 80%;
+          font-size: 1rem;
+        }
+        .add-chapter {
+          cursor: pointer;
+          font-weight: 600;
+          font-size: 1rem;
+        }
+      }
+      .children {
+        display: flex;
+        .child {
           display: flex;
-          .child {
-            display: flex;
-            justify-content: space-between;
-          }
+          justify-content: space-between;
         }
       }
     }
@@ -220,6 +221,8 @@ import { EventBus } from "../../eventBus";
 import AddDialog from "../../component/AddDialog.vue";
 import { sweetSuccess, sweetError } from "../../../lib/js/sweetAlert.js";
 import UserGroup from "../../../lib/vue/userGroup"
+import {visitUrl} from "../../../lib/js/pageSwitch";
+import {getUrl} from "../../../lib/js/tools";
 
 export default {
   components: {
@@ -502,6 +505,10 @@ export default {
         })
         .catch(sweetError);
     },
+    toBookHome() {
+      const {bid} = this;
+      visitUrl(getUrl('book', bid), true)
+    }
   },
 };
 </script>

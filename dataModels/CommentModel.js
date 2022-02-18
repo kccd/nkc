@@ -215,7 +215,7 @@ schema.statics.extendBookComments = async (props) => {
   for(const user of users) {
     usersObj[user.uid] = user;
   }
-  const documents = await DocumentModel.find({did: {$in: didArr}, source: 'comment'});
+  const documents = await DocumentModel.find({did: {$in: didArr}, source: 'comment', type: 'stable'});
   for(const d of documents) {
     if(!permissions.reviewed) {
       if((d.status !== 'normal' || d.type !== 'stable') && d.uid !== uid) continue;
