@@ -176,7 +176,7 @@ router
 
     if(threadListType === "reply") {
       q = {
-        type: 'post',
+        type: {$in: ['post', 'thread']}
       };
       const count = await db.PostModel.countDocuments(q);
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
@@ -193,6 +193,7 @@ router
           post.disabled === true ||
           post.toDraft === true
         ) continue;
+        //全站精选
         const _fidOfCanGetThreads = new Set(fidOfCanGetThreads).size;
         const _mainForumsId = new Set(post.mainForumsId).size;
         const allForumsId = fidOfCanGetThreads.concat(post.mainForumsId);
@@ -200,9 +201,11 @@ router
         if(_fidOfCanGetThreads + _mainForumsId === _allForumsId) {
           continue;
         }
+        //获取用户父级postId的post
         if(post.parentPostId) {
           parentPostsId.push(post.parentPostId);
         }
+        //获取引用的回复
         if(post.quote) {
           const [quotePostId] = post.quote.split(':');
           quotePostsIdObj[post.pid] = quotePostId;
