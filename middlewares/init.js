@@ -9,7 +9,7 @@ const fsPromise = fs.promises;
 const {promisify} = require('util');
 const redis = require('../redis');
 const cookieConfig = require("../config/cookie");
-const serverConfig = require('../config/server');
+const {fileDomain} = require("../config/server");
 
 const fsSync = {
   access: promisify(fs.access),
@@ -29,6 +29,16 @@ module.exports = async (ctx, next) => {
   ctx.reqTime = new Date();
   ctx.data = Object.create(null);
   ctx.nkcModules = nkcModules;
+
+  let cookieDomain = '';
+  try{
+    cookieDomain = nkcModules.domain.getRootDomainByHost(ctx.host);
+  } catch(err) {
+    if(global.NKC.isDevelopment) {
+      console.log(err);
+    }
+  }
+
   const {ip, port} = nkcModules.getRealIP({
     remoteIp: ctx.ip,
     remotePort: ctx.req.connection.remotePort,
@@ -106,7 +116,7 @@ module.exports = async (ctx, next) => {
         stable: true,
         disabled: false
       }),
-      fileDomain: serverConfig.fileDomain || ''
+      fileDomain: fileDomain || ''
     };
 
     // 下载附件是否需要积分
@@ -147,11 +157,9 @@ module.exports = async (ctx, next) => {
         httpOnly: true,
         overwrite: true,
         maxAge: cookieConfig.maxAge,
-        domain: cookieConfig.domain,
       };
-      // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
-      if(global.NKC.isDevelopment) {
-        delete options.domain;
+      if(cookieDomain) {
+        options.domain = cookieDomain;
       }
 	    if(o) {
         options = Object.assign(options, o);
@@ -167,11 +175,9 @@ module.exports = async (ctx, next) => {
         httpOnly: true,
         overwrite: true,
         maxAge: 0,
-        domain: cookieConfig.domain,
       };
-      // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
-      if(global.NKC.isDevelopment) {
-        delete options.domain;
+      if(cookieDomain) {
+        options.domain = cookieDomain;
       }
       ctx.cookies.set(key, '', options);
     }
@@ -183,11 +189,9 @@ module.exports = async (ctx, next) => {
 	  ctx.getCookie = (key, o) => {
       let options = {
         signed: true,
-        domain: cookieConfig.domain,
       };
-      // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
-      if(global.NKC.isDevelopment) {
-        delete options.domain;
+      if(cookieDomain) {
+        options.domain = cookieDomain;
       }
       if(o) {
         options = Object.assign(options, o);

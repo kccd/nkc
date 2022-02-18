@@ -40,6 +40,10 @@ block content
     .row
       .col-xs-12.col-md-2.hidden-sm.hidden-xs.box-shadow-panel.p-r-0
         include ../publicModules/forums_nav/forums_tree
+        +renderForumsPanel("细分专业", data.forum.childrenForums)
+        +renderForumsPanel("同级专业", data.sameLevelForums)
+        +renderForumsBreadcrumb("上级专业", data.forumNav)
+        +renderForumsPanel("顶级专业", data.topForums)
       .col-xs-12.col-md-7.box-shadow-panel.p-r-0
         .forum-info-panel.m-b-1
           .forum-banner
@@ -99,6 +103,7 @@ block content
                   a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}` data-float-fid=fid)= name
               .thread-nav-right
                 if !data.forum.childrenForums || !data.forum.childrenForums.length
+                  button.btn.btn-xs.btn-default.m-r-05(onclick='formSearchApp.switchForumSearch()') 搜索本专业
                   if !data.user
                     button.forum-post-button.btn.btn-default.btn-xs(onclick='NKC.methods.toLogin()')
                       .fa.fa-pencil-square-o
@@ -119,6 +124,11 @@ block content
                   span 细分专业：
                   for f in data.forum.childrenForums
                     a.child-forum-panel(href=`/f/${f.fid}` data-float-fid=f.fid style=`background-color: ${f.color}`)= f.displayName
+                  button.btn.btn-xs.btn-default(onclick='formSearchApp.switchForumSearch()') 搜索本专业
+          .form.form-inline.m-t-1.text-right.forum-search#forumSearch(v-cloak v-if='show')
+            .form-group.m-b-05
+              input.form-control.m-b-05(placeholder="请输入关键词" type='text' v-model='content' @keyup.enter='search')
+              button.btn.btn-default.m-b-05(@click='search') 搜索
         //-if data.forum.childrenForums && data.forum.childrenForums.length
           .m-b-1
             .panel-header 细分专业

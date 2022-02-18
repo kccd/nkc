@@ -2,7 +2,9 @@ const data = NKC.methods.getDataById('data');
 const app = new Vue({
   el: '#app',
   data: {
-    visitSettings: data.visitSettings
+    visitSettings: data.visitSettings,
+    roles: data.roles,
+    grades: data.grades
   },
   methods: {
     submit() {

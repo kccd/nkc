@@ -30,6 +30,8 @@ verifyRouter
     data.verifiedAState = verifiedUploadCardA?verifiedUploadCardA.state:'unUpload';
     data.verifiedBState = verifiedUploadCardB?verifiedUploadCardB.state:'unUpload';
     data.auth3Content = authSettings.auth3Content;
+    data.auth2Content = authSettings.auth2Content;
+    data.auth1Content = authSettings.auth1Content;
     data.authenticate = userPersonal.authenticate;
     ctx.template = "/user/settings/verify/verify.pug";
     await next();

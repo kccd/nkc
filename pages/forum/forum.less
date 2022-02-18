@@ -1,3 +1,4 @@
+@import "../publicModules/base";
 body{
   /*background-color: #f4f4f4;*/
 }
@@ -260,6 +261,9 @@ body{
 }
 .forum-info-panel .forum-post-count{
   margin-top: 0.25rem;
+  height: 2rem;
+  line-height: 2rem;
+  .hideText(@line: 1);
 }
 .forum-info-panel .forum-post-count .count-group{
   display: inline-block;

@@ -10,7 +10,7 @@ const os = platform();
 const linux = (os === 'linux');
 
 const imageExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif", "webp"];
-const videoExtensions = ["mp4", "mov", "3gp", "avi", 'webm'];
+const videoExtensions = ["mp4", "mov", "3gp", "avi", 'webm', 'mkv', 'flv', 'wmv'];
 const audioExtensions = ["wav", "amr", "mp3", "aac", 'flac'];
 
 async function spawnProcess(pathName, args, options = {}) {
@@ -259,7 +259,7 @@ async function getFileMD5(filePath) {
 * */
 async function getFileInfo(filePath) {
   const name = PATH.basename(filePath);
-  const ext = PATH.extname(filePath).replace('.', '');
+  const ext = PATH.extname(filePath).replace('.', '').toLowerCase();
   const hash = await getFileMD5(filePath);
   const {
     size,
@@ -306,9 +306,14 @@ async function getFileInfo(filePath) {
   return fileInfo;
 }
 
+/*
+* 获取置顶年月文件夹中的文件目录
+* @param {Number} year 年
+* @param {Number} month 月
+* */
 async function getFilePathByTime(year, month) {
   const {attachment} = storeConfigs;
-  const monthStr = month < 10? month + '0': month + '';
+  const monthStr = month < 10? '0' + month: month + '';
   const yearStr = year + '';
   const getChildFolder = async (folderPath) => {
     const arr = [];

@@ -8,4 +8,5 @@ methods.clearTimeoutPageCache = db.CacheModel.clearTimeoutPageCache;
 methods.saveActiveUsersToCache = db.ActiveUserModel.saveActiveUsersToCache;
 methods.saveNewUsersToCache = db.ActiveUserModel.saveNewUsersToCache;
 methods.updateVerifiedUpdateState = db.VerifiedUploadModel.updateVerifiedUpdateState;
+methods.updateShopStatus = db.ShopOrdersModel.updateShopStatus;
 module.exports = methods;

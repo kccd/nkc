@@ -24002,6 +24002,8 @@
             var i, j, ci, cj, oldSrc, newSrc;
             for (i = 0; ci = imgs[i++];) {
               oldSrc = ci.getAttribute("_src") || ci.src || "";
+              var dataType = ci.getAttribute('data-type');
+              if(['downloadFailed', 'nkcsource'].indexOf(dataType) !== -1) continue;
               if (oldSrc == info.source && info.state == "SUCCESS") {
                 newSrc = "/default/picloading.png";
                 domUtils.setAttributes(ci, {
@@ -29542,13 +29544,33 @@
               img.getAttribute('data-id') !== id
             ) continue;
             if(state) {
+              domUtils.setAttributes(img, {
+                'data-type': 'picture',
+                'data-tag': 'nkcsource',
+                'src': src,
+                '_src': src,
+              });
+              /*
+              以下方法在 editor.getContent 时未生效
               img.setAttribute('data-type', 'picture');
               img.setAttribute('data-tag', 'nkcsource');
               img.setAttribute('src', src);
+              */
             } else {
+              domUtils.removeAttributes([
+                'data-type',
+                'data-id',
+              ]);
+              domUtils.setAttribute(img, {
+                'src': 'default/picdefault.png',
+                '_src': 'default/picdefault.png',
+                'data-type': 'downloadFailed'
+              });
+              /*
               img.removeAttribute('data-type');
               img.removeAttribute('data-id');
               img.setAttribute('src', 'default/picdefault.png')
+              */
             }
           }
         });

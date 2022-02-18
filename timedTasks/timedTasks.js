@@ -256,4 +256,21 @@ func.initVerifiedUploadState = async() => {
   }, 3.5 * 60 * 60 * 1000);
 }
 
+/*
+* 商城相关定时
+* */
+func.updateShopStatus = async () => {
+  setTimeout(async () => {
+    try{
+      console.log(`正在更新商城数据状态...`);
+      await tasks.updateShopStatus();
+    } catch(err) {
+      console.log(err);
+    } finally {
+      console.log(`商城数据状态更新完成`);
+      await func.updateShopStatus();
+    }
+  }, 70 * 1000)
+}
+
 module.exports = func;

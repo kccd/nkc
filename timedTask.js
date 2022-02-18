@@ -15,7 +15,6 @@ const run = async () => {
   await dbStatus.database();
   jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
   jobs.clearForumAndThreadPostCount();
-  jobs.shop();
   jobs.moveRecycleMarkThreads();
   jobs.clearFileCache();
   jobs.preparationForumCheck();
@@ -33,6 +32,7 @@ const run = async () => {
   await timedTasks.modifyTimeoutApplicationForm();
   await timedTasks.modifyProjectCycle();
   await timedTasks.initHomeBlocksTimeout();
+  await timedTasks.updateShopStatus();
   if(process.connected) process.send('ready');
   process.on('message', function(msg) {
     if (msg === 'shutdown') {

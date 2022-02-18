@@ -5,7 +5,7 @@ router
     const time = Date.now();
     const {db, data, query, nkcModules} = ctx;
     const {nkcRender} = nkcModules;
-    let {page=0, t, c, d} = query;
+    let {page=0, t, c, d, form = ''} = query;
     const {user} = data;
     // 通过mongodb精准搜索用户名
     let targetUser, existUser = false, searchUserFromMongodb = false;
@@ -23,6 +23,7 @@ router
     }
     data.t = t;
     data.d = d;
+    data.form = form;
     let options;
 
     // 高级搜索参数
@@ -31,10 +32,20 @@ router
         options = JSON.parse(decodeURIComponent(Buffer.from(d, "base64").toString()));
         const {fid, excludedFid} = options;
         if(fid && fid.length > 0) {
-          data.selectedForums = await db.ForumModel.find({fid: {$in: fid}});
+          data.selectedForums = await db.ForumModel.find({fid: {$in: fid}}, {
+            fid: 1,
+            displayName: 1,
+            color: 1,
+            avatar: 1,
+          }).sort({order: 1});
         }
         if(excludedFid &&excludedFid.length > 0) {
-          data.excludedForums = await db.ForumModel.find({fid: {$in: excludedFid}});
+          data.excludedForums = await db.ForumModel.find({fid: {$in: excludedFid}}, {
+            fid: 1,
+            displayName: 1,
+            color: 1,
+            avatar: 1,
+          }).sort({order: 1});
         }
         searchUserFromMongodb = !options.author;
       } catch(err) {

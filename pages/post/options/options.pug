@@ -5,10 +5,10 @@ if !isIncluded('options')
     .post-options-panel(v-if='loading')
       .loading 加载中...
     .post-options-panel(v-else)
-      a.option(:href="getUrl('postHome', pid)" target='_blank' v-if='!isComment')
+      a.option(@click='visitUrl(getUrl("postHome", pid), true)' v-if='!isComment')
         .fa.fa-newspaper-o
         span 详情
-      a.option(:href="getUrl('post', pid)" target='_blank' v-else)
+      a.option(@click='visitUrl(getUrl("post", pid), true)' target='_blank' v-else)
         .fa.fa-newspaper-o
         span 详情
       .option(v-if='inColumn !== null' @click='toColumn')

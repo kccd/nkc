@@ -6,7 +6,7 @@ router
     const {t} = query;
     if(t && !['sm', 'lg', 'md', 'ico'].includes(t)) ctx.throw(400, '未知的文件尺寸');
     const attachment = await db.AttachmentModel.findOne({_id: id});
-    if(attachment) {
+    if(attachment && !attachment.disabled) {
       ctx.remoteFile = await attachment.getRemoteFile(t);
     } else {
       ctx.filePath = settings.statics.defaultAvatarPath;

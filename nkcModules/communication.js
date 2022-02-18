@@ -1,6 +1,6 @@
 const CommunicationClient = require('../tools/communicationClient');
 const communicationConfig = require('../config/communication');
-const {port, address} = global.NKC;
+const {port, address} = global.NKC || {};
 let communicationClient;
 
 

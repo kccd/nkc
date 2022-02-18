@@ -6,9 +6,10 @@
 - Database: 
     1. **[mongoDB](https://www.mongodb.com)** v4.4.5
     2. **[Redis](https://redis.io/)** v3.2.100
+    3. **[ElasticSearch](https://elastic.co)** v6.0.1
  
-- Image Processing: **[ImageMagick](https://www.imagemagick.org)** v7.0 or higher
-- Search: **[ElasticSearch 6](https://elastic.co)** with **[IK Analysis for Elasticsearch](https://github.com/medcl/elasticsearch-analysis-ik)**
+- Image Processing: **[ImageMagick](https://www.imagemagick.org)** v7.0.10 
+- PDF Processing: **[Ghostscript](https://www.ghostscript.com/)** v9.53.3, **[QPDF](https://qpdf.sourceforge.io/)** v10.3.2
 - video Processing: **[ffmpeg](https://www.ffmpeg.org/)** v4.0.2
 
 ## Main Frameworks
