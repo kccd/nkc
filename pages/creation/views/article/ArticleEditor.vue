@@ -43,7 +43,7 @@
         title: true,
       },
       lockPost: false,
-      doucmentId:'',
+      documentId:'',
       // moveData:'',
       moveIndex:''
     }),
@@ -110,16 +110,16 @@
         scrollTopFun(window, 0)
       },
       documentPreview(){
-        const {doucmentId}=this
-        if(doucmentId){
-          window.open(`/document/${doucmentId}/preview`)
+        const {documentId}=this
+        if(documentId){
+          window.open(`/document/${documentId}/preview`)
         }else{
           sweetError('文章id不存在')
         }
       },
       documentHistory(){
-        const {doucmentId, bookId}=this
-        window.open(`/document/${doucmentId}/history?bid=${bookId}`)
+        const {documentId, bookId}=this
+        window.open(`/document/${documentId}/history?bid=${bookId}`)
       },
       initId() {
         const {bid, aid, childIndex} = this.$route.query;
@@ -144,7 +144,7 @@
               self.article.title = title;
               self.article.content = content;
               self.article.cover = cover;
-              self.doucmentId = did;
+              self.documentId = did;
               // self.id=_id
             }
             self.book = book;
@@ -199,7 +199,7 @@
             self.coverFile = null;
             const {articleId, articleCover} = data;
             self.articleId = articleId;
-            self.doucmentId = data.document.did;
+            self.documentId = data.document.did;
             return self.resetCoverFile(articleCover);
           })
           .then(() => {

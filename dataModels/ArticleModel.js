@@ -16,11 +16,23 @@ const schema = new mongoose.Schema({
     required: true,
     index: 1
   },
+  sid: {
+    type: String,
+    required: true,
+    index: 1,
+  },
+  source: {
+    type: String,
+    required: true,
+    index: 1,
+  },
+  //document对应版本ID
   did: {
     type: Number,
     default: null,
     index: 1
   },
+  //
   cid: {
     type: [String],
     default: [],
@@ -163,6 +175,7 @@ schema.methods.getEditorBetaDocumentContent = async function() {
 * 拓展articles
 * */
 schema.statics.extendArticles = async function(articles) {
+  console.log('articles', articles);
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
   const BooksModel = mongoose.model('books');

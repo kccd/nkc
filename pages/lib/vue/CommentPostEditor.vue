@@ -125,7 +125,6 @@ export default {
       }
       const data = this.$refs[`commentEditor_${this.comment._id}`].getContent();
       if(data) {
-        console.log(data);
         this.commentContent = data;
         this.post(this.type);
       }

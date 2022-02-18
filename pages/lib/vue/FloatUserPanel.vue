@@ -260,17 +260,19 @@ export default {
   data: () => {
     return {
       user: '',
-      uid: '',
+      uid: getState().uid,
       over: false,
       show: false,
       count: 1,
       onPanel: false,
       users: {},
       timeoutName: '',
+      subscribed: '',
     }
   },
+  components: {
+  },
   mounted() {
-    this.uid = this.getState().uid;
     const self = this;
     const panel = $(self.$el);
     panel.css({
@@ -409,6 +411,11 @@ export default {
         }
       });
     },
+    //关注用户
+    subscribe() {
+      const {user, subscribed} = this;
+      this.$emit('open-subscribe', {uid: user.uid, subscribed: !subscribed});
+    }
   }
 }
 </script>

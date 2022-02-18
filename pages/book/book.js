@@ -17,7 +17,6 @@ const app = new Vue({
 });
 
 function typeConversion(type){
-  console.log(type)
   const  map={
     article:'文章',
     url:'链接',

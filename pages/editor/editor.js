@@ -62,7 +62,7 @@ $(function() {
   //   initPostButton();
   // });
   window.data.threadCategories.map(c => c.selectedNode = null);
-  const editorContainer = new Vue({
+  window.editorContainer = new Vue({
     el: "#content",
     data: {
       editorPlugs: {
@@ -73,7 +73,7 @@ $(function() {
         mathJaxSelector: true,
       },
       // 是否允许触发contentChange
-      contentChangeEventFlag: false,
+      contentChangeEventFlag: true,
     },
     mounted() {},
     computed: {
@@ -379,6 +379,7 @@ function initVueApp() {
         const content = editor.getContentTxt();
         const _content = editor.getContent();
         this.content = _content;
+        debugger
         this.contentLength = content.length;
       },
       // 判断发表权限
@@ -461,7 +462,8 @@ function initVueApp() {
       autoSaveToDraft: function() {
         let self = this;
         let type = this.type;
-        // 内容为空时不自动保存草稿
+        // 内容为空时不自动保存草稿,不做任何操作
+        if(!self.content) return;
         if(type === "newThread") {
           if(
             !self.title &&
@@ -499,15 +501,7 @@ function initVueApp() {
       // 如果编辑器中的内容与上一次对比减少了，就提示用户是否要保存
       saveToDraft: function() {
         let self = this;
-        self.saveToDraftBase()
-          .then(function() {
-            const postButton = getPostButton();
-            postButton.saveToDraftSuccess();
-            sweetSuccess("草稿已保存");
-          })
-          .catch(function(data) {
-            sweetError("草稿保存失败：" + (data.error || data));
-          })
+        self.saveToDraftBase();
       },
       // 设置post相关的数据
       initPost: function(post) {
@@ -578,6 +572,7 @@ function initVueApp() {
         if(!EditorReady) {
           return sweetError("编辑器尚未初始化");
         } else {
+          window.editorContainer.contentChangeEventFlag = false;
           editor.setContent(this.content);
         }
       },
@@ -984,13 +979,15 @@ function initVueApp() {
       //保存草稿
       saveToDraftBase: function() {
         let self = this;
-        if(!self.content) sweetWarning('请先输入内容');
+        if(!self.content) return sweetError('请先输入内容');
         return Promise.resolve()
           .then(() => {
             // 获取本次编辑器内容的全部长度
-            const allContentLength = editor.getContent().length;
+            const allContentLength = editor.getContent();
             // 如果内容相对上一次减少了就提示用户是否需要保存
-            if(allContentLength < self.oldContentLength) {
+            console.log(allContentLength.length, self.oldContentLength.length);
+            debugger
+            if(allContentLength.length < self.oldContentLength.length) {
               return sweetQuestion(`您输入的内容发生了变化，是否还要继续保存？`)
                 .then(() => {
                   return;
@@ -1050,6 +1047,14 @@ function initVueApp() {
               self.cover = data.draft.cover;
             }
             return Promise.resolve();
+          })
+          .then(function(res) {
+            const postButton = getPostButton();
+            postButton.saveToDraftSuccess();
+            sweetSuccess("草稿已保存");
+          })
+          .catch(function(data) {
+            sweetError("草稿保存失败：" + (data.error || data));
           });
       },
     }
