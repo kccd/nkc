@@ -16,28 +16,40 @@ const schema = new mongoose.Schema({
     required: true,
     index: 1
   },
-  sid: {
-    type: String,
-    required: true,
-    index: 1,
-  },
-  source: {
-    type: String,
-    required: true,
-    index: 1,
-  },
-  //document对应版本ID
   did: {
     type: Number,
     default: null,
     index: 1
   },
-  //
-  cid: {
-    type: [String],
-    default: [],
+  published: {
+    type: Boolean,
+    default: false,
     index: 1
   },
+  // 当前文章是否包含草稿
+  hasDraft: {
+    type: Boolean,
+    default: true,
+    index: 1
+  },
+  // 引用文章的模块类型
+  source: {
+    type: String, // column
+    required: true,
+    index: 1
+  },
+  // 引用文章的模块类型所对应的 ID
+  sid: {
+    type: String,
+    default: '',
+    index: 1
+  },
+  // 其他引用模块类型
+  references: {
+    type: String,
+    default: [],
+    index: 1
+  }
 }, {
   collection: 'articles'
 });
@@ -175,7 +187,6 @@ schema.methods.getEditorBetaDocumentContent = async function() {
 * 拓展articles
 * */
 schema.statics.extendArticles = async function(articles) {
-  console.log('articles', articles);
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
   const BooksModel = mongoose.model('books');

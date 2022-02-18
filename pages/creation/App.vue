@@ -13,8 +13,16 @@
             span 图文素材
             //.fa.fa-angle-right.right
           .creation-center-nav-item(@click="navToPage('books')")
+            .fa.fa-article
+            span 内容创作
+            //.fa.fa-angle-right.right
+          .creation-center-nav-item(@click="navToPage('books')")
             .fa.fa-book
             span 专题创作
+            //.fa.fa-angle-right.right
+          .creation-center-nav-item(@click="navToPage('books')")
+            .fa.fa-book
+            span 内容管理
             //.fa.fa-angle-right.right
     .creation-content-container
       transition(:name="transitionName")
