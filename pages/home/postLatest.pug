@@ -3,7 +3,7 @@ if !isIncluded('postActivity')
   mixin postlatest(props)
     -var {from, user, quote, title, content, toc, cover, url, type, parentPost, parentPostId} = props;
     mixin postActivityHeader(headerData)
-      -var {toc, parentPost, showFrom, user} = headerData;
+      -var {toc, parentPost, showFrom, user, type} = headerData;
       .post-activity-header(class=headerData.from?'post-activity-main-header':'')
         .post-activity-avatar
           if headerData.user.avatar
@@ -19,25 +19,36 @@ if !isIncluded('postActivity')
           else
             .post-activity-username=headerData.user.username
           if showFrom
-            if !headerData.parentPostId
+            if !headerData.parentPostId && type === 'post'
               span.post-activity-from=`发表回复`
-              span &nbsp;
-              +fromNow(toc)
-            else
+            else if headerData.parentPostId && type === 'post'
               span.post-activity-from=`发表评论`
-              span &nbsp;
-              +fromNow(toc)
+            else
+              span.post-activity-from=`发表文章`
+            span &nbsp;
+            +fromNow(toc)
 
     mixin postActivityContent(contentData)
-      -var {cover, title, content, url} = contentData;
-      .post-activity-content
-        if title
-          a(href=url target="_blank").post-activity-title=title
-        .post-activity-content-container(class=cover? 'cover':'')
-          if content
-            a(href=url target="_blank").post-post-abstract=content
-          if cover
-            .post-activity-cover(style=`background-image: url(${cover})`)
+      -console.log('contentData', contentData);
+      -var {cover, title, content, url, type} = contentData;
+      if type === 'post'
+        .post-activity-content
+          if title
+            a(href=url target="_blank").post-activity-title=title
+          .post-activity-content-container(class=cover? 'cover':'')
+            if content
+              a(href=url target="_blank").post-post-abstract=content
+            if cover
+              .post-activity-cover(style=`background-image: url(${cover})`)
+      else
+        .post-activity-content
+          if title
+            a(href=url target="_blank").post-activity-title=title
+          .post-activity-content-container(class=cover ? 'cover' : '')
+            if content
+              a(href=url target="_blank").post-post-abstract=content
+            if cover
+              .post-activity-cover(style=`background-image: url(${cover})`)
     mixin postPostsContent(contentData, parentPost)
       -var {cover, title, content, url} = contentData;
       .post-activity-content
@@ -52,8 +63,8 @@ if !isIncluded('postActivity')
           //  .post-activity-cover(style=`background-image: url(${cover})`)
     .post-activity
       .post-activity-content
-        +postActivityHeader({user, toc, parentPost, showFrom: true, parentPostId})
-        +postActivityContent({title, content, cover, url})
+        +postActivityHeader({type, user, toc, parentPost, showFrom: true, parentPostId})
+        +postActivityContent({title, content, cover, url, type})
       if quote
         .post-activity-content.post-activity-quote
           if parentPost

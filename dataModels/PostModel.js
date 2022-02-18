@@ -4,6 +4,7 @@ const nkcRender = require('../nkcModules/nkcRender');
 const {htmlToPlain, renderHTML} = nkcRender;
 const customCheerio = require('../nkcModules/nkcRender/customCheerio');
 const {getQueryObj, obtainPureText} = require('../nkcModules/apiFunction');
+const tools = require("../nkcModules/tools");
 const mongoose = settings.database;
 const {Schema} = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
@@ -1776,15 +1777,22 @@ postSchema.statics.extendActivityPosts = async (posts) => {
   };
   const usersId = new Set();
   const threadsId = new Set();
+  const postOfThreadsId = new Set();
   const firstPostsId = new Set();
   const threadFirstPosts = {};
+  const threadObj = {};
   const usersObj = {};
   for(const post of posts) {
     const {type, uid, tid, anonymous} = post;
     if(type === 'post') threadsId.add(tid);
+    if(type === 'thread') postOfThreadsId.add(tid);
     if(!anonymous) usersId.add(uid);
   }
   const threads = await ThreadModel.find({tid: {$in: [...threadsId]}}, {oc: 1});
+  const postOfThreads = await ThreadModel.find({tid: {$in: [...postOfThreadsId]}});
+  for(const thread of postOfThreads) {
+    threadObj[thread.tid] = thread;
+  }
   for(const thread of threads) {
     firstPostsId.add(thread.oc);
   }
@@ -1828,6 +1836,9 @@ postSchema.statics.extendActivityPosts = async (posts) => {
       mainForumsId,
       parentPostId,
     } = post;
+    if(post.type === 'thread') {
+      console.log('cover', cover);
+    }
     let user;
     if(anonymous) {
       user = anonymousUser;
@@ -1856,20 +1867,37 @@ postSchema.statics.extendActivityPosts = async (posts) => {
     } else {
       url = tools.getUrl('thread', tid);
     }
-    results.push({
-      pid,
-      tid,
-      user,
-      type,
-      toc,
-      url,
-      title: t,
-      content: nkcRender.htmlToPlain(c, 200),
-      cover: cover? tools.getUrl('postCover', cover):null,
-      forumsId: mainForumsId,
-      quote,
-      parentPostId: parentPostId,
-    });
+    if(post.type === 'post') {
+      results.push({
+        pid,
+        tid,
+        user,
+        type,
+        toc,
+        url,
+        title: t,
+        content: nkcRender.htmlToPlain(c, 200),
+        cover: cover? tools.getUrl('postCover', cover):null,
+        forumsId: mainForumsId,
+        quote,
+        parentPostId: parentPostId,
+      });
+    } else if(post.type === 'thread') {
+      results.push({
+        pid,
+        tid,
+        user,
+        type,
+        toc,
+        url,
+        title: t,
+        content: nkcRender.htmlToPlain(c, 200),
+        cover: cover? tools.getUrl('postCover', cover):null,
+        forumsId: mainForumsId,
+        quote,
+        parentPostId: parentPostId,
+      });
+    }
   }
   return results;
 };
