@@ -1152,8 +1152,23 @@ img.apply-column-banner{
       margin-right: 0.5rem;
     }
     position: relative;
-    &:after{
+    &.thread:after {
       content: '我要投稿';
+      border: 1px solid #5d5d5d;
+      color: #252525;
+      font-size: 1.3rem;
+      font-weight: 700;
+      position: absolute;
+      top: 0;
+      left: 0;
+      line-height: @buttonHeight;
+      height: 100%;
+      width: 100%;
+      z-index: 1000;
+      border-radius: 1px;
+    }
+    &.article:after {
+      content: '发表独立文章';
       border: 1px solid #5d5d5d;
       color: #252525;
       font-size: 1.3rem;

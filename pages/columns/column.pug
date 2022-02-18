@@ -4,6 +4,7 @@ block columnTitle
 block content
   include ./modules/columnHeader
   include ./modules/contribute
+  include ./modules/articleContribute
   +mixinColumnHeader({
     user: data.user,
     column: data.column,
@@ -89,6 +90,8 @@ block content
             include ../publicModules/paging/paging_input
         .col-xs-12.col-md-3.box-shadow-panel.m-t-1
           -var columnToolStyle = `background-color: ${data.column.toolColor};`;
+          //--投稿按钮
+          +mixinColumnArticleContribute(data.user, data.column, columnToolStyle)
           +mixinColumnContribute(data.user, data.column, columnToolStyle)
           include ./modules/management
           include ./modules/info
