@@ -18,6 +18,7 @@ export function getState() {
     state.platform = windowData.platform;
     state.selectTypesWhenSubscribe = windowData.selectTypesWhenSubscribe;
     state.refererOperationId = windowData.refererOperationId;
+    state.newMessageCount = 0;
     state.fileDomain = windowData.fileDomain;
     return state;
   } catch(err) {

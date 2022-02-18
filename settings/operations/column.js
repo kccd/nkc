@@ -3,5 +3,8 @@ module.exports = {
   POST: "column_apply",
   apply: {
     GET: "column_apply"
+  },
+  editor: {
+    GET: 'columnEditor'
   }
 };

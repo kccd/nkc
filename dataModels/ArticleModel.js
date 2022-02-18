@@ -21,11 +21,30 @@ const schema = new mongoose.Schema({
     default: null,
     index: 1
   },
-  cid: {
-    type: [String],
-    default: [],
+  // 当前文章是否包含草稿
+  hasDraft: {
+    type: Boolean,
+    default: true,
     index: 1
   },
+  // 引用文章的模块类型
+  source: {
+    type: String,
+    required: true,
+    index: 1
+  },
+  // 引用文章的模块类型所对应的 ID
+  sid: {
+    type: String,
+    default: '',
+    index: 1
+  },
+  // 其他引用模块类型
+  references: {
+    type: String,
+    default: [],
+    index: 1
+  }
 }, {
   collection: 'articles'
 });
