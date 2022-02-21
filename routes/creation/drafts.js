@@ -20,11 +20,10 @@ router
     const {query, db, state, nkcModules, data} = ctx;
     const {page = 0, quota = 30} = query;
     const {uid} = state;
-    // uid 先使用92837
     const queryCriteria = {
       uid,
       source: 'column',
-      hasDraft: true
+      hasDraft: true,
     };
     const count = await db.ArticleModel.countDocuments(queryCriteria);
     data.draftsData = [];

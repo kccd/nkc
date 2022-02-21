@@ -29,5 +29,5 @@ router
   .use('/book', bookRouter.routes(), bookRouter.allowedMethods())
   .use('/articles', articlesRouter.routes(), articlesRouter.allowedMethods())
   .use('/drafts', draftsRouter.routes(), draftsRouter.allowedMethods())
-  .use('/draft/:did', draftRouter.routes(), draftRouter.allowedMethods())
+  .use('/draft', draftRouter.routes(), draftRouter.allowedMethods())
 module.exports = router;

@@ -352,6 +352,31 @@ schema.methods.setAsEditDocument = async function() {
     }
   });
 };
+// schema.statics.getStableDocumnetBySid = async(sid) =>{
+//   const DocumentModel = mongoose.model('documents');
+//   const stableColumn = await DocumentModel.findOne({
+//     sid,
+//     type: DocumentModel.getDocumentTypes().stable
+//   });
+//   return stableColumn
+// }
+ //将 专栏编辑版改为历史版 
+schema.statics.setBetaAsHistoryDocumentById = async (sid) =>{
+  const DocumentModel = mongoose.model('documents');
+  await DocumentModel.updateOne(
+  {
+    sid,
+
+    type: DocumentModel.getDocumentTypes().beta,
+  },
+  {
+    $set:{
+      type: DocumentModel.getDocumentTypes().history,
+      tlm: new Date()
+    }
+  }
+  )
+}
 /*
 * 将当前版本修改为历史版
 * */
