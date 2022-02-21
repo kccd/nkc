@@ -1102,8 +1102,8 @@ schema.statics.getBetaDocumentsBySource = async (type, source, sourcesId) => {
     sid: {$in: sourcesId}
   });
   const documentsObj = {};
-  documents.forEach((document, i)=>{
-    documentsObj[sourcesId[i]] = document;
+  documents.forEach((document)=>{
+    documentsObj[document.sid] = document;
   });
   const results = [];
   for(const sid of sourcesId) {
