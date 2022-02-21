@@ -99,11 +99,6 @@ schema.statics.createArticle = async (props) => {
   await article.save();
   return article;
 }
-schema.static.countDocument = async (queryCriteria)=>{
-  const ArticleModel = mongoose.model('articles');
-  const count =await ArticleModel.find(queryCriteria);
-  return count
-}
 schema.methods.getBetaDocumentCoverId = async function() {
   const DocumentModel = mongoose.model('documents');
   const {article: documentSource} = await DocumentModel.getDocumentSources();
@@ -191,33 +186,7 @@ schema.statics.checkArticleInfo = async (article) => {
     maxTextLength: 10000,
   });
 }
-const {timeFormat} = require('../nkcModules/tools');
-const {htmlToPlain} = require("../nkcModules/nkcRender");
-// 过滤一维数组中的对象的key
-schema.statics.filterAndExtendData = async (allowKey, data, resIds)=>{
-  const newData = []
-  data.forEach((item,i)=>{
-    item = item.toObject()
-    const newItem = {}
-    for (const key in item) {
-      if (Object.hasOwnProperty.call(item, key)) {
-        if(allowKey.includes(key)){
-          if(key === 'toc'){
-            newItem['time'] = timeFormat(item[key])
-            continue;
-          }else if(key === 'content'){
-            newItem[key] = htmlToPlain(item[key], 30)
-            continue;
-          }
-          newItem[key] = item[key]
-        }
-      }
-    }
-    newItem['ids'] = resIds[i]
-    newData.push(newItem)
-  })
-  return newData
-};
+
 schema.methods.getEditorBetaDocumentContent = async function() {
   const DocumentModel = mongoose.model('documents');
   const {article: documentSource} = await DocumentModel.getDocumentSources();
@@ -294,4 +263,17 @@ schema.statics.extendArticles = async function(articles) {
   }
   return results;
 }
+
+schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
+  const DocumentModel = mongoose.model('documents');
+  const {article: articleSource} = await DocumentModel.getDocumentSources();
+  const {beta} = await DocumentModel.getDocumentTypes();
+  const betaDocuments = await DocumentModel.getBetaDocumentsBySource(beta, articleSource, articlesId);
+  const betaDocumentsObj = {};
+  for(const document of betaDocuments) {
+    betaDocumentsObj[document.sid] = document;
+  }
+  return betaDocumentsObj;
+}
+
 module.exports = mongoose.model('articles', schema);

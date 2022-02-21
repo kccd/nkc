@@ -18,41 +18,40 @@ router
   })
   .get('/column', async (ctx, next)=>{
     const {query, db, state, nkcModules, data} = ctx;
-    const {pageNumber = 0, pageLimit = 30} = query;
+    const {page = 0, quota = 30} = query;
     const {uid} = state;
     // uid 先使用92837
     const queryCriteria = {
-      uid:92837,
-      source:'column',
-      hasDraft:true
-    }
+      uid,
+      source: 'column',
+      hasDraft: true
+    };
     const count = await db.ArticleModel.countDocuments(queryCriteria);
-    console.log(count,'专栏草稿总条数')
-    if(count === 0) {
-      data.draftsData = []
-    }else{
-      const paging = nkcModules.apiFunction.paging(pageNumber, count, Number(pageLimit));
-      const columnsDocument =await db.ArticleModel.find(queryCriteria).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-      const dids = new Set();
-      const resIds = [];
-      for (const item of columnsDocument) {
-        dids.add(item.did)
-        // did 文档id。 aid 文章id。 cid 专栏id
-        resIds.push({aId:item._id})
+    data.draftsData = [];
+    if(count > 0) {
+      const paging = nkcModules.apiFunction.paging(page, count, Number(quota));
+      const columnArticles =await db.ArticleModel.find(queryCriteria)
+        .sort({toc: -1})
+        .skip(paging.start)
+        .limit(paging.perpage);
+      const articlesId = [];
+      for (const item of columnArticles) {
+        articlesId.push(item._id);
       }
-      const columnDocument = await db.DocumentModel.find({
-        type:'beta',
-        source:'column',
-        did:{
-          $in:[...dids]
-        }
-      })
-      console.log(columnDocument,'columnDocument')
-      const responseKey = ['title','content','toc']
-      // responseKey 响应数据包含key   
-      data.draftsData =await db.ArticleModel.filterAndExtendData(responseKey, columnDocument, resIds)
+      const articleBetaDocumentsObject = await db.ArticleModel.getBetaDocumentsObjectByArticlesId(articlesId);
+      for(const article of columnArticles) {
+        const betaDocument = articleBetaDocumentsObject[article._id];
+        if(!betaDocument) continue;
+        const {title, content, toc} = betaDocument;
+        data.draftsData.push({
+          title,
+          content: nkcModules.nkcRender.htmlToPlain(content, 200),
+          time: nkcModules.tools.timeFormat(toc),
+          articleId: article._id,
+          columnId: article.sid
+        });
+      }
     }
-    
     await next()
   })
   .get('/editor', async (ctx, next) => {

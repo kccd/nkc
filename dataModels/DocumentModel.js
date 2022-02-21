@@ -200,6 +200,13 @@ schema.statics.checkDocumentSource = async (source) => {
   if(!sourceNames.includes(source)) throwErr(500, `document source error. source=${source}`);
 };
 
+schema.statics.checkDocumentType = async (type) => {
+  const DocumentModel = mongoose.model('documents');
+  const documentTypes = await DocumentModel.getDocumentTypes();
+  const typeNames = Object.values(documentTypes);
+  if(!typeNames.includes(type)) throwErr(500, `document type error. type=${type}`);
+}
+
 /*
 * 新建编辑版文档
 * @param {Object} props
@@ -1082,6 +1089,29 @@ schema.methods.initQuote = async function (quoteCid) {
       quoteDid: document._id
     }
   })
+}
+
+schema.statics.getBetaDocumentsBySource = async (type, source, sourcesId) => {
+  const DocumentModel = mongoose.model('documents');
+  await DocumentModel.checkDocumentSource(source);
+  const {beta, stable} = await DocumentModel.getDocumentTypes();
+  if(![beta, stable].includes(type)) throwErr(500, `document type error. type=${type}`);
+  const documents = await DocumentModel.find({
+    type,
+    source,
+    sid: {$in: sourcesId}
+  });
+  const documentsObj = {};
+  documents.forEach((document, i)=>{
+    documentsObj[sourcesId[i]] = document;
+  });
+  const results = [];
+  for(const sid of sourcesId) {
+    const document = documentsObj[sid];
+    if(!document) continue;
+    results.push(document);
+  }
+  return results;
 }
 
 module.exports = mongoose.model('documents', schema);
