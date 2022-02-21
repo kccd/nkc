@@ -89,7 +89,8 @@ module.exports = {
       POST: 'creationCenter'
     },
     column: {
-      GET: 'creationCenter'
+      GET: 'creationCenter',
+      POST: 'creationCenter',
     }
   },
   article: {

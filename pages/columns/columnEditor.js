@@ -55,7 +55,11 @@ const columnEditor = new Vue({
     getRequest: getRequest,
     //编辑器准备完毕
     editorReady() {
-      this.ready = true;
+      if(this.articleId) {
+
+      } else {
+        this.contentChangeEventFlag = true;
+      }
     },
     initId() {
       const {mid, aid} = this.getRequest();
@@ -66,9 +70,11 @@ const columnEditor = new Vue({
     initData() {
       const self = this;
       const {mid, aid} = this.getRequest();
-      nkcAPI(`/creation/column?aid`, 'GET')
-        .then()
-        .catch()
+      if(!aid) return;
+      nkcAPI(`/creation/articles/column?aid`, 'GET')
+      .then(data => {
+      })
+      .catch()
     },
     //在编辑器中写入数据库
     initDocumentForm() {
@@ -115,6 +121,7 @@ const columnEditor = new Vue({
         abstract = '',
         abstractEN = '',
         origin = '',
+        selectCategory = ''
       } = this.article;
       const article = {
         title,
@@ -125,8 +132,8 @@ const columnEditor = new Vue({
         abstract,
         abstractEN,
         origin,
+        selectCategory
       };
-      const selectCategory = this.$refs.documenEditor.getSelectCategory();
       if(articleId) {
         formData.append('articleId', articleId);
       }
@@ -143,8 +150,7 @@ const columnEditor = new Vue({
         formData.append('type', type);
       }
       const self = this;
-      let url = '/creation/column'
-      debugger
+      let url = '/creation/articles/column'
       return nkcUploadFile(url, 'POST', formData)
         .then(data => {
           self.oldCoverFile = self.coverFile;
@@ -178,7 +184,7 @@ const columnEditor = new Vue({
     },
     modifyArticle() {
       const self = this;
-      this.post(this.type)
+      this.post(self.type)
         .catch(err => {
           screenTopWarning(err);
         })
@@ -211,6 +217,7 @@ const columnEditor = new Vue({
         origin,
         selectCategory
       };
+      this.modifyArticle();
     },
   }
 });

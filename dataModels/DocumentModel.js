@@ -108,7 +108,7 @@ const schema = new mongoose.Schema({
   //是否原创
   origin: {
     type: Boolean,
-    default: '',
+    default: false,
     index: 1
   },
   // 文档内容字数 排除了 html 标签
