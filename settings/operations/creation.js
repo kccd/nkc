@@ -91,6 +91,10 @@ module.exports = {
     }
   },
   article: {
+    GET: 'creationCenter',
+    POST: 'creationCenter',
+  },
+  article: {
     PARAMETER: {
       GET: 'creationCenter'
     }
