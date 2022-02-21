@@ -1,8 +1,11 @@
 <template lang="pug">
   .container-fluid
     .m-b-1(v-if="type === 'all'")
+      span.b-b(@click="toggle('drafts')" :class="{active : draftsType === 'drafts'}") 自定义 
+      span |
+      span.m-r-05.b-b(@click="toggle('column')" :class="{active : draftsType === 'column'}") 专栏
       button.m-r-05.btn.btn-default.btn-sm(@click="newDraft") 新建图文片段
-      button.btn.btn-default.btn-sm(@click="toTrash") 回收站
+      button.btn.btn-default.btn-sm(@click="toTrash" v-show="draftsType === 'drafts'") 回收站
     .m-b-1(v-else)
       bread-crumb(:list="navList")
     .m-b-05(v-if="pages && pages.length > 0")
@@ -23,6 +26,19 @@
 </template>
 <style lang="less" scoped>
   @import "../../../publicModules/base";
+  .b-b{
+     border-bottom:1px solid orange;
+     padding: 2px 4px;
+    //  border-radius: 4px;
+     transition: all .5s;
+     cursor: pointer;
+  }
+  .b-b:hover{
+    border-bottom:1px solid rgb(0, 238, 255);
+  }
+  .active{
+    color: orange;
+  }
   .drafts{
     .draft-item{
       width: 34rem;
@@ -91,6 +107,8 @@
       type: 'all', // all, trash
       draftsData: [],
       paging: null,
+      // 区分是 自定义 还是 专栏
+      draftsType:'drafts'
     }),
     components: {
       'drafts-box': DraftsBox,
@@ -126,6 +144,14 @@
       this.getDrafts();
     },
     methods: {
+      toggle(type){
+        
+        if(type === 'drafts'){
+          this.getDrafts()
+        }else if(type === 'column'){
+          this.getColumn()
+        }
+      },
       initType() {
         const {type = "all"} = this.$route.query;
         this.type = type;
@@ -148,6 +174,16 @@
       switchPage(num) {
         this.getDrafts(num);
       },
+      getColumn(page = 0){
+        // this.draftsData = [{'title':1,content:'11'}];
+        nkcAPI(`/creation/drafts/column?pageNumber=${page}`, 'GET')
+          .then(data => {
+            this.draftsData = data.draftsData
+            this.paging = data.paging;
+            this.draftsType = 'column'
+          })
+          .catch(sweetError)
+      },
       getDrafts(num = 0) {
         const {type} = this;
         const self = this;
@@ -155,20 +191,28 @@
           .then(data => {
             self.draftsData = data.draftsData;
             self.paging = data.paging;
+            this.draftsType = 'drafts'
           })
           .catch(sweetError)
       },
-      draftOption(draft, type) {
+      draftOption(draft, operation) {
+        let deleteTitle = '确定要删除当前自定义草稿吗？删除后可通过回收站找回。' 
         const {draftId} = draft;
+        let deleteUrl = [`/creation/draft?id=${draftId}&type=custom&operation=${operation}`, 'DELETE']
+        if(this.draftsType === 'column'){
+          const {articleId} = draft
+          deleteTitle = '删除后不能恢复，确定要删除当前专栏草稿吗？';
+          deleteUrl[0] = `/creation/draft?id=${articleId}&type=column&operation=${operation}`
+        }
         const self = this;
         return Promise.resolve()
           .then(() => {
-            if(type === 'delete') {
-              return sweetQuestion(`确定要删除当前草稿？`);
+            if(operation === 'delete') {
+              return sweetQuestion(deleteTitle);
             }
           })
           .then(() => {
-            return nkcAPI(`/creation/draft/${draftId}?type=${type}`, 'DELETE')
+            return nkcAPI(...deleteUrl)
           })
           .then(() => {
             self.getDrafts(this.paging.page);
@@ -185,11 +229,16 @@
         this.navToPage("draftEdit", {}, {});
       },
       toEditDraft(draft) {
-        if(this.type !== 'all') return;
-        const {draftId} = draft;
-        this.navToPage("draftEdit", {}, {
+        if(this.draftsType === 'column'){
+          const {articleId, columnId} = draft 
+          window.open(`/column/editor?mid=${columnId}&aid=${articleId}`)
+        }else{
+          if(this.type !== 'all') return;
+          const {draftId} = draft;
+          this.navToPage("draftEdit", {}, {
           draftId: draftId
         });
+        }
       }
     }
   }

@@ -43,7 +43,7 @@ const schema = new mongoose.Schema({
   },
   // 引用文章的模块类型
   source: {
-    type: String, // column
+    type: String, // column, alone
     required: true,
     index: 1
   },
@@ -97,7 +97,6 @@ schema.statics.createArticle = async (props) => {
   await article.save();
   return article;
 }
-
 schema.methods.getBetaDocumentCoverId = async function() {
   const DocumentModel = mongoose.model('documents');
   const {article: documentSource} = await DocumentModel.getDocumentSources();
@@ -262,4 +261,17 @@ schema.statics.extendArticles = async function(articles) {
   }
   return results;
 }
+
+schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
+  const DocumentModel = mongoose.model('documents');
+  const {article: articleSource} = await DocumentModel.getDocumentSources();
+  const {beta} = await DocumentModel.getDocumentTypes();
+  const betaDocuments = await DocumentModel.getBetaDocumentsBySource(beta, articleSource, articlesId);
+  const betaDocumentsObj = {};
+  for(const document of betaDocuments) {
+    betaDocumentsObj[document.sid] = document;
+  }
+  return betaDocumentsObj;
+}
+
 module.exports = mongoose.model('articles', schema);

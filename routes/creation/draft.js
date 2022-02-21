@@ -8,18 +8,24 @@ router
     await next();
   })
   .del("/", async (ctx, next) => {
-    const {query, db, state, params} = ctx;
-    const {did: draftId} = params;
-    const {type} = query;
-    if(!['delete', 'recover'].includes(type)) ctx.throw(400, `未知 ${type}类型`)
-    const draft = await db.CreationDraftsModel.getUserDraftById(draftId, state.uid);
-    if(draft.uid !== state.uid) ctx.throw(403, `权限不足`);
-    await draft.updateOne({
-      $set: {
-        del: type === 'delete',
-        toc: new Date(),
-      }
-    });
-    await next();
+    const {query, db, state} = ctx;
+    const {type, id, operation} = query;
+    const allowType = ['column', 'custom']
+    if(!['delete', 'recover'].includes(operation)) ctx.throw(400, `未知操作 ${operation}类型`)
+    if(!allowType.includes(type)) ctx.throw(400, `未知文章 ${operation}类型`)
+    if(custom === 'custom'){
+      const draft = await db.CreationDraftsModel.getUserDraftById(draftId, state.uid);
+      if(draft.uid !== state.uid) ctx.throw(403, `权限不足`);
+      await draft.updateOne({
+        $set: {
+          del: operation === 'delete',
+          toc: new Date(),
+        }
+      });
+      await next();
+    }
+    else if(operation === 'column'){
+
+    }
   })
 module.exports = router;
