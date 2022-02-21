@@ -395,6 +395,7 @@ schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
 *   @param {String} articleId 文章 ID
 *   @param {String} title 文章标题
 *   @param {String} content 文章摘要
+*   @param {String} coverUrl 封面图链接
 *   @param {String} time 格式化之后的文章内容创建时间
 *   @param {String} mTime 格式化之后的文章内容最后修改时间
 *   @param {Object} column
@@ -444,6 +445,7 @@ schema.statics.extendArticlesList = async (articles) => {
       articleId,
       title: stableDocument.title,
       content: nkcRender.htmlToPlain(stableDocument.content, 200),
+      coverUrl: stableDocument.cover? tools.getUrl('document', stableDocument.cover): '',
       time: tools.timeFormat(stableDocument.toc),
       mTime: tools.timeFormat(stableDocument.tlm),
       column,
