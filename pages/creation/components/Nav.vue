@@ -8,15 +8,15 @@
         .icon.right-icon
           .fa(
             :class="item.hidden?'fa-angle-down': 'fa-angle-up'"
-            v-if="item.child && item.child.length > 0"
+            v-if="item.children && item.children.length > 0"
             )
         .title {{item.title}}
-      .children(v-if="!item.hidden && item.child && item.child.length > 0")
+      .childrenren(v-if="!item.hidden && item.children && item.children.length > 0")
         .item(
-          v-for="childItem in item.child"
-          @click="selectItem(childItem)"
+          v-for="childItemren in item.children"
+          @click="selectItem(childItemren)"
           )
-          .title {{childItem.title}}
+          .title {{childItemren.title}}
 </template>
 
 <style scoped lang="less">
@@ -85,7 +85,7 @@
           title: '内容创作',
           icon: 'fa-file-text-o',
           hidden: false,
-          child: [
+          children: [
             {
               type: 'aloneArticleEditor',
               title: '独立文章'
@@ -101,9 +101,9 @@
           title: '内容管理',
           icon: 'fa-file-text-o',
           hidden: false,
-          child: [
+          children: [
             {
-              type: 'manageArticle',
+              type: 'articles',
               title: '文章管理'
             },
             {
@@ -116,12 +116,36 @@
           type: 'books',
           title: '专题制作',
           icon: 'fa-book',
+        },
+        {
+          type: 'community',
+          title: '社区内容',
+          icon: 'fa-book',
+          hidden: false,
+          children: [
+            {
+              type: 'communityThreads',
+              title: '我的文章'
+            },
+            {
+              type: 'communityPosts',
+              title: '我的回复'
+            },
+            {
+              type: 'communityDrafts',
+              title: '我的草稿'
+            },
+            {
+              type: 'communityNotes',
+              title: '我的笔记'
+            }
+          ]
         }
       ]
     }),
     methods: {
       selectItem(item) {
-        if(item.child && item.child.length > 0) {
+        if(item.children && item.children.length > 0) {
           item.hidden = !item.hidden;
         } else {
           this.$emit('select', item.type);

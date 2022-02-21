@@ -1,5 +1,9 @@
 const router = require('koa-router')();
+const columnRouter = require("./column");
 router
+  .get('/', async (ctx, next) => {
+    await next();
+  })
   .get('/editor', async (ctx, next) => {
     const {query, data, db, state} = ctx;
     const {bid, aid} = query;
@@ -86,5 +90,6 @@ router
     });
     data.articleId = article._id;
     await next();
-  });
+  })
+  .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
 module.exports = router;

@@ -16,6 +16,44 @@ router
     data.paging = paging;
     await next();
   })
+  .get('/column', async (ctx, next)=>{
+    const {query, db, state, nkcModules, data} = ctx;
+    const {page = 0, quota = 30} = query;
+    const {uid} = state;
+    // uid 先使用92837
+    const queryCriteria = {
+      uid,
+      source: 'column',
+      hasDraft: true
+    };
+    const count = await db.ArticleModel.countDocuments(queryCriteria);
+    data.draftsData = [];
+    if(count > 0) {
+      const paging = nkcModules.apiFunction.paging(page, count, Number(quota));
+      const columnArticles =await db.ArticleModel.find(queryCriteria)
+        .sort({toc: -1})
+        .skip(paging.start)
+        .limit(paging.perpage);
+      const articlesId = [];
+      for (const item of columnArticles) {
+        articlesId.push(item._id);
+      }
+      const articleBetaDocumentsObject = await db.ArticleModel.getBetaDocumentsObjectByArticlesId(articlesId);
+      for(const article of columnArticles) {
+        const betaDocument = articleBetaDocumentsObject[article._id];
+        if(!betaDocument) continue;
+        const {title, content, toc} = betaDocument;
+        data.draftsData.push({
+          title,
+          content: nkcModules.nkcRender.htmlToPlain(content, 200),
+          time: nkcModules.tools.timeFormat(toc),
+          articleId: article._id,
+          columnId: article.sid
+        });
+      }
+    }
+    await next()
+  })
   .get('/editor', async (ctx, next) => {
     //获取草稿文档内容
     const {data, db, query, state} = ctx;

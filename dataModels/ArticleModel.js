@@ -1,30 +1,39 @@
 const mongoose = require('../settings/database');
 const schema = new mongoose.Schema({
   _id: String,
+  // 文章创建时间
   toc: {
     type: Date,
     default: Date.now,
     index: 1
   },
+  // 文章最后修改时间
   tlm: {
     type: Date,
     default: null,
     index: 1
   },
+  // 发表人
   uid: {
     type: String,
     required: true,
     index: 1
   },
+  // document did
   did: {
     type: Number,
     default: null,
     index: 1
   },
-  published: {
-    type: Boolean,
-    default: false,
-    index: 1
+  // 文章状态
+  // normal: 正常的（已发布，未被删除）
+  // default: 未发布的（正在编辑，待发布）
+  // deleted: 被删除的（已发布，但被删除了）
+  // cancelled: 被取消发表的（未发布过，在草稿箱被删除）
+  status: {
+    type: String,
+    default: 'default',
+    index: 1,
   },
   // 当前文章是否包含草稿
   hasDraft: {
@@ -34,7 +43,7 @@ const schema = new mongoose.Schema({
   },
   // 引用文章的模块类型
   source: {
-    type: String, // column
+    type: String, // column, alone
     required: true,
     index: 1
   },
@@ -88,7 +97,6 @@ schema.statics.createArticle = async (props) => {
   await article.save();
   return article;
 }
-
 schema.methods.getBetaDocumentCoverId = async function() {
   const DocumentModel = mongoose.model('documents');
   const {article: documentSource} = await DocumentModel.getDocumentSources();
@@ -253,4 +261,17 @@ schema.statics.extendArticles = async function(articles) {
   }
   return results;
 }
+
+schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
+  const DocumentModel = mongoose.model('documents');
+  const {article: articleSource} = await DocumentModel.getDocumentSources();
+  const {beta} = await DocumentModel.getDocumentTypes();
+  const betaDocuments = await DocumentModel.getBetaDocumentsBySource(beta, articleSource, articlesId);
+  const betaDocumentsObj = {};
+  for(const document of betaDocuments) {
+    betaDocumentsObj[document.sid] = document;
+  }
+  return betaDocumentsObj;
+}
+
 module.exports = mongoose.model('articles', schema);

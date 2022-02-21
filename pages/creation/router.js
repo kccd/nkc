@@ -10,6 +10,9 @@ import ArticleEditor from './views/article/ArticleEditor';
 import Categories from './views/category/Categories';
 import Drafts from './views/drafts/drafts';
 import DraftEdit from "./views/drafts/DraftEdit";
+import Articles from './views/articles/Articles';
+import ArticlesColumn from './views/articles/Column';
+
 const routes = [
   {name: 'home', path: '/creation', component: Home},
   {name: 'materials', path: '/creation/materials', component: Materials},
@@ -23,6 +26,12 @@ const routes = [
   {name: 'categories', path: '/creation/categories', component: Categories},
   {name: 'drafts', path: '/creation/drafts', component: Drafts},
   {name: 'draftEdit', path: '/creation/drafts/editor', component: DraftEdit},
+
+  {
+    name: 'articles', path: '/creation/articles', component: Articles, children: [
+      {name: 'articlesColumn', path: 'column', component: ArticlesColumn}
+    ]
+  },
 ];
 
 

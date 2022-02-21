@@ -1,6 +1,9 @@
 module.exports = {
   GET: 'creationCenter',
   drafts: {
+    column:{
+      GET:'creationCenter'
+    },
     GET: 'creationCenter',
     POST: 'creationCenter',
     editor: {
@@ -84,6 +87,9 @@ module.exports = {
     editor: {
       GET: 'creationCenter',
       POST: 'creationCenter'
+    },
+    column: {
+      GET: 'creationCenter'
     }
   },
   article: {
