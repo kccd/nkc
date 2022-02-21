@@ -161,11 +161,14 @@ schema.statics.deleteColumnAricleByArticleId = async (aid)=>{
   // const publishedColumn = await DocumentModel.getStableDocumnetBySid(aid);
   let updateKey = {hasDraft: false, status: 'cancelled', tlm: new Date()}
   // if(publishedColumn) updateKey.status = 'deleted'
-  await ArticleModel.updateOne({
-    _id: aid,
-  }, {
-    $set:updateKey 
-  })
+  const source = (await ArticleModel.getArticleSources()).column
+  await ArticleModel.updateOne(
+    {
+      _id: aid,
+      source
+    }, {
+      $set:updateKey 
+    })
   await DocumentModel.setBetaAsHistoryDocumentById(aid)
 
   // 如果columnArticles 有两条数据 那么 一定是有一个 编辑版 一个发布版吗
