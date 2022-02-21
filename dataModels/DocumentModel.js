@@ -379,7 +379,6 @@ schema.methods.setAsEditDocument = async function() {
 // }
  //将 专栏编辑版改为历史版 
 schema.statics.setBetaAsHistoryDocumentById = async (sid) =>{
-  console.log(sid,'sid')
   const DocumentModel = mongoose.model('documents');
   const source = (await DocumentModel.getDocumentSources()).article
   const history = (await DocumentModel.getDocumentTypes()).history

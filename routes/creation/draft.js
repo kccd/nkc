@@ -10,8 +10,6 @@ router
   .del("/", async (ctx, next) => {
     const {query, db, state} = ctx;
     const {type, id, operation} = query;
-    console.log(type,'type');
-
     const allowType = ['column', 'custom']
     if(!['delete', 'recover'].includes(operation)) ctx.throw(400, `未知操作 ${operation}类型`)
     if(!allowType.includes(type)) ctx.throw(400, `未知文章 ${type}类型`)
