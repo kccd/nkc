@@ -326,6 +326,19 @@ schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
 /*
 * 拓展独立文章列表，用于显示文章列表
 * @param {[Article]}
+* @return {[Object]}
+*   @param {String} articleSource 文章来源
+*   @param {String} articleSourceId 来源 ID
+*   @param {String} articleId 文章 ID
+*   @param {String} title 文章标题
+*   @param {String} content 文章摘要
+*   @param {String} time 格式化之后的文章内容创建时间
+*   @param {String} mTime 格式化之后的文章内容最后修改时间
+*   @param {Object} column
+*     @param {Number} _id 专栏 ID
+*     @param {String} name 专栏名称
+*     @param {String} description 专栏介绍
+*     @param {String} homeUrl 专栏首页链接
 * */
 schema.statics.extendArticlesList = async (articles) => {
   const DocumentModel = mongoose.model('documents');
@@ -358,7 +371,8 @@ schema.statics.extendArticlesList = async (articles) => {
       if(targetColumn) column = {
         _id: targetColumn._id,
         name: targetColumn.name,
-        description: targetColumn.description
+        description: targetColumn.description,
+        homeUrl: tools.getUrl('columnHome', targetColumn._id)
       };
     }
     articlesList.push({

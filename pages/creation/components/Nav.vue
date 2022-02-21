@@ -48,6 +48,9 @@
       font-size: 1.25rem;
       cursor: pointer;
       user-select: none;
+      &:hover{
+        color: @primary;
+      }
       .icon{
         color: #555;
         height: @itemHeight;
