@@ -2,7 +2,10 @@
   .creation-nav
     .creation-nav-header 创作中心
     .creation-nav-item(v-for="item in list")
-      .item(@click="selectItem(item)")
+      .item(
+        @click="selectItem(item)"
+        :class="item.type === selected? 'active':''"
+        )
         .icon.left-icon
           .fa(:class="item.icon")
         .icon.right-icon
@@ -13,10 +16,11 @@
         .title {{item.title}}
       .childrenren(v-if="!item.hidden && item.children && item.children.length > 0")
         .item(
-          v-for="childItemren in item.children"
-          @click="selectItem(childItemren)"
+          v-for="childrenItem in item.children"
+          @click="selectItem(childrenItem)"
+          :class="childrenItem.type === selected? 'active':''"
           )
-          .title {{childItemren.title}}
+          .title {{childrenItem.title}}
 </template>
 
 <style scoped lang="less">
@@ -59,8 +63,10 @@
           right: 0;
         }
       }
-      .title{
-
+      &.active{
+        .title{
+          color: @primary;
+        }
       }
     }
   }
@@ -69,6 +75,7 @@
 <script>
   export default {
     data: () => ({
+      selected: 'creation',
       list: [
         {
           type: 'categories',
@@ -143,7 +150,16 @@
         }
       ]
     }),
+    watch: {
+      $route: 'setNavActive'
+    },
+    mounted() {
+      this.setNavActive()
+    },
     methods: {
+      setNavActive() {
+        this.selected = this.$route.name;
+      },
       selectItem(item) {
         if(item.children && item.children.length > 0) {
           item.hidden = !item.hidden;

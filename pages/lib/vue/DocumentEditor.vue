@@ -58,6 +58,10 @@
               :title="!allowedOriginal?'字数小于' + originalWordLimit + '的文章不可申明原创': ''"
             )
               option(v-for="(text, index) in originLevel" :value="index") {{text}}
+      .form-group(v-if="formConfigs.selectCategory && column.userColumn && !column.addedToColumn")
+        .m-b-2
+          .editor-header 专栏文章分类
+          select-column-categories(ref="selectColumnCategories")
 
 </template>
 
@@ -148,7 +152,6 @@
 }
 </style>
 
-
 <script>
 import Editor from './Editor';
 import ResourceSelector from "./ResourceSelector";
@@ -159,8 +162,9 @@ import {blobToFile, fileToBase64} from "../js/file";
 import {getLength} from "../js/checkData";
 import {getDocumentEditorConfigs} from "../js/editor";
 import {debounce} from '../js/execution';
+import selectColumnCategories from "./selectColumnCategories";
 export default {
-  props: ['configs'],
+  props: ['configs', 'column'],
   data: () => ({
     title: '',
     cover: "",
@@ -171,6 +175,7 @@ export default {
     abstractEN: "", // 英文摘要
     keywords: [], // 中文关键词
     keywordsEN: [], // 英文关键词
+    selectCategory: '', //文章专栏分类
     originalWordLimit: 500,
     originState: 0, // 原创声明
     contentLength: 0,
@@ -194,6 +199,7 @@ export default {
       origin: false,
       cover: false,
       title: false,
+      selectCategory: false,
     },
     // 是否允许触发contentChange
     contentChangeEventFlag: false,
@@ -259,6 +265,9 @@ export default {
     'resource-selector': ResourceSelector,
     'image-selector': ImageSelector,
     'common-modal': CommonModal,
+    'select-column-categories': selectColumnCategories,
+  },
+  mounted() {
   },
   methods: {
     getLength: getLength,
@@ -379,7 +388,8 @@ export default {
         keywords,
         keywordsEN,
         originState,
-        formConfigs
+        formConfigs,
+        selectCategory
       } = this;
       const data = {
         content: this.$refs.editor.getContent(),
@@ -394,13 +404,20 @@ export default {
       if(formConfigs.keywordsEN) data.keywordsEN = keywordsEN;
       if(formConfigs.originState) data.originState = originState;
       if(formConfigs.title) data.title = title;
+      if(formConfigs.selectCategory) data.selectCategory = selectCategory;
       return data;
     },
     initDocumentForm(data) {
       const {
         title = '',
         content = '',
-        cover = ''
+        cover = '',
+        keywords= '',
+        keywordsEN = '',
+        abstract = '',
+        abstractEN = '',
+        origin = '',
+        selectCategory = '',
       } = data;
       this.title = title;
       this.$refs.editor.setContent(content);

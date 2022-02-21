@@ -881,4 +881,32 @@ schema.statics.getHomePageByColumnId = async function(columnId) {
   return page;
 }
 
+/*
+* 通过专栏 ID 数组获取多个专栏
+* @param {[Number]} 专栏 ID 组成的数组
+* @param {String} format 返回的数据类型，array: 数组对象, object: 对象（以专栏 ID 为键，专栏对象为值）
+* @return {[Column] or Object}
+* */
+schema.statics.getColumnsById = async (columnsId, format = 'array') => {
+  const ColumnModel = mongoose.model('columns');
+  let columns = [];
+  if(columnsId.length > 0) {
+    columns = await ColumnModel.find({_id: {$in: columnsId}});
+  }
+  const columnsObj = {};
+  for(const column of columns) {
+    columnsObj[column._id] = column;
+  }
+  if(format === 'array') {
+    const results = [];
+    for(const columnId of columnsId) {
+      const column = columnsObj[columnId];
+      if(!column) continue;
+      results.push(column);
+    }
+    return results;
+  }
+  return columnsObj;
+}
+
 module.exports = mongoose.model("columns", schema);

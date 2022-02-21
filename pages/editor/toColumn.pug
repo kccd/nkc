@@ -7,8 +7,6 @@ if !state.userColumn
 else
   if !data.addedToColumn
     -const column = state.userColumn
-    -console.log('state', state.userColumn, state.columnPermission);
-    -console.log(column);
     include ../publicModules/toColumn/selectCategories
   else
     h5 本文已经发表到专栏，如需从专栏撤稿，请到专栏管理界面操作。

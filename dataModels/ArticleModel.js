@@ -1,4 +1,16 @@
 const mongoose = require('../settings/database');
+
+const articleSources = {
+  column: 'column'
+};
+
+const articleStatus = {
+  normal: 'normal',
+  'default': 'default',
+  deleted: 'deleted',
+  cancelled: 'cancelled'
+};
+
 const schema = new mongoose.Schema({
   _id: String,
   // 文章创建时间
@@ -32,7 +44,7 @@ const schema = new mongoose.Schema({
   // cancelled: 被取消发表的（未发布过，在草稿箱被删除）
   status: {
     type: String,
-    default: 'default',
+    default: articleStatus.default,
     index: 1,
   },
   // 当前文章是否包含草稿
@@ -62,6 +74,44 @@ const schema = new mongoose.Schema({
 }, {
   collection: 'articles'
 });
+
+/*
+* 获取 status
+* */
+schema.statics.getArticleStatus = async () => {
+  return articleStatus;
+};
+
+/*
+* 获取 source
+* */
+schema.statics.getArticleSources = async () => {
+  return articleSources;
+};
+
+/*
+* 检验 status 是否合法
+* @param {String} status 状态
+* */
+schema.statics.checkArticleStatus = async (status) => {
+  const ArticleModel = mongoose.model('articles');
+  const articleStatus = await ArticleModel.getArticleStatus();
+  if(!Object.values(articleStatus).includes(status)) {
+    throwErr(500, `article status error. status=${status}`);
+  }
+}
+/*
+* 检验 source 是否合法
+* @param {String} source 来源
+* */
+schema.statics.checkArticleSource = async (source) => {
+  const ArticleModel = mongoose.model('articles');
+  const articleSources = await ArticleModel.getArticleSources();
+  if(!Object.values(articleSources).includes(source)) {
+    throwErr(500, `article source error. source=${source}`);
+  }
+};
+
 
 /*
 * 向 book 中添加文章，创建 article、document
@@ -281,13 +331,64 @@ schema.statics.extendArticles = async function(articles) {
 schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
   const DocumentModel = mongoose.model('documents');
   const {article: articleSource} = await DocumentModel.getDocumentSources();
-  const {beta} = await DocumentModel.getDocumentTypes();
-  const betaDocuments = await DocumentModel.getBetaDocumentsBySource(beta, articleSource, articlesId);
+  const betaDocuments = await DocumentModel.getBetaDocumentsBySource(articleSource, articlesId);
   const betaDocumentsObj = {};
   for(const document of betaDocuments) {
     betaDocumentsObj[document.sid] = document;
   }
   return betaDocumentsObj;
+}
+
+/*
+* 拓展独立文章列表，用于显示文章列表
+* @param {[Article]}
+* */
+schema.statics.extendArticlesList = async (articles) => {
+  const DocumentModel = mongoose.model('documents');
+  const ArticleModel = mongoose.model('articles');
+  const ColumnModel = mongoose.model('columns');
+  const nkcRender = require("../nkcModules/nkcRender");
+  const tools = require('../nkcModules/tools');
+  const {column: columnSource} = await ArticleModel.getArticleSources();
+  const articlesId = [];
+  const columnsId = [];
+  for(const article of articles) {
+    const {_id, source, sid} = article;
+    articlesId.push(_id);
+    if(source === columnSource) {
+      columnsId.push(sid);
+    }
+  }
+  const {article: articleSource} = await DocumentModel.getDocumentSources();
+  const stableDocumentsObj = await DocumentModel.getStableDocumentsBySource(articleSource, articlesId, 'object');
+  const columnsObj = await ColumnModel.getColumnsById(columnsId, 'object');
+
+  const articlesList = [];
+  for(const article of articles) {
+    const {_id: articleId, source, sid} = article;
+    const stableDocument = stableDocumentsObj[articleId];
+    if(!stableDocument) continue;
+    let column = null;
+    if(source === columnSource) {
+      const targetColumn = columnsObj[sid];
+      if(targetColumn) column = {
+        _id: targetColumn._id,
+        name: targetColumn.name,
+        description: targetColumn.description
+      };
+    }
+    articlesList.push({
+      articleSource: source,
+      articleSourceId: sid,
+      articleId,
+      title: stableDocument.title,
+      content: nkcRender.htmlToPlain(stableDocument.content, 200),
+      time: tools.timeFormat(stableDocument.toc),
+      mTime: tools.timeFormat(stableDocument.tlm),
+      column,
+    });
+  }
+  return articlesList;
 }
 
 module.exports = mongoose.model('articles', schema);

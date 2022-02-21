@@ -198,7 +198,6 @@ export default {
       nkcAPI(url, 'GET', {})
       .then(res => {
         self.folders = res.materials;
-        console.log(self.folders);
         self.materialData = res.materialData || '';
         self.$emit('material-data', res.materialData?res.materialData.crumbs:[]);
         self.loading = false;
