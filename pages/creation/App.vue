@@ -27,7 +27,6 @@
         this.$router.push({name: page});
       },
       selectNavItem(type) {
-        console.log(`selectNavItem:`, type);
         this.navToPage(type);
       }
     }

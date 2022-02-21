@@ -4,8 +4,9 @@
       span.b-b(@click="toggle('drafts')" :class="{active : draftsType === 'drafts'}") 自定义 
       span |
       span.m-r-05.b-b(@click="toggle('column')" :class="{active : draftsType === 'column'}") 专栏
-      button.m-r-05.btn.btn-default.btn-sm(@click="newDraft") 新建图文片段
-      button.btn.btn-default.btn-sm(@click="toTrash" v-show="draftsType === 'drafts'") 回收站
+      p.btn-container(v-show="draftsType === 'drafts'")
+        button.m-r-05.btn.btn-default.btn-sm(@click="newDraft") 新建图文片段
+        button.btn.btn-default.btn-sm(@click="toTrash" ) 回收站
     .m-b-1(v-else)
       bread-crumb(:list="navList")
     .m-b-05(v-if="pages && pages.length > 0")
@@ -38,6 +39,9 @@
   }
   .active{
     color: orange;
+  }
+  .btn-container{
+    margin-top:10px;
   }
   .drafts{
     .draft-item{
@@ -215,6 +219,10 @@
             return nkcAPI(...deleteUrl)
           })
           .then(() => {
+            if(this.draftsType === 'column') {
+              this.getColumn()
+              return
+            }
             self.getDrafts(this.paging.page);
           })
           .catch(sweetError)

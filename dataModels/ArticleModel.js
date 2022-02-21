@@ -153,7 +153,26 @@ schema.methods.getBetaDocumentCoverId = async function() {
   const betaDocument = await DocumentModel.getBetaDocumentBySource(documentSource, this._id);
   return betaDocument? betaDocument.cover: '';
 };
+schema.statics.deleteColumnAricleByArticleId = async (aid)=>{
+  const DocumentModel = mongoose.model('documents');
+  const ArticleModel = mongoose.model('articles');
+  /// document 放到doucument上进行更改
+  
+  // const publishedColumn = await DocumentModel.getStableDocumnetBySid(aid);
+  let updateKey = {hasDraft: false, status: 'cancelled', tlm: new Date()}
+  // if(publishedColumn) updateKey.status = 'deleted'
+  const source = (await ArticleModel.getArticleSources()).column
+  await ArticleModel.updateOne(
+    {
+      _id: aid,
+      source
+    }, {
+      $set:updateKey 
+    })
+  await DocumentModel.setBetaAsHistoryDocumentById(aid)
 
+  // 如果columnArticles 有两条数据 那么 一定是有一个 编辑版 一个发布版吗
+}
 /*
 * 修改 book 中的文章
 * @param {Object} props

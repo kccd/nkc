@@ -12,8 +12,8 @@ router
     const {type, id, operation} = query;
     const allowType = ['column', 'custom']
     if(!['delete', 'recover'].includes(operation)) ctx.throw(400, `未知操作 ${operation}类型`)
-    if(!allowType.includes(type)) ctx.throw(400, `未知文章 ${operation}类型`)
-    if(custom === 'custom'){
+    if(!allowType.includes(type)) ctx.throw(400, `未知文章 ${type}类型`)
+    if(type === 'custom'){
       const draft = await db.CreationDraftsModel.getUserDraftById(draftId, state.uid);
       if(draft.uid !== state.uid) ctx.throw(403, `权限不足`);
       await draft.updateOne({
@@ -24,8 +24,9 @@ router
       });
       await next();
     }
-    else if(operation === 'column'){
-
+    else if(type === 'column'){
+      await db.ArticleModel.deleteColumnAricleByArticleId(id)
+      await next()
     }
   })
 module.exports = router;
