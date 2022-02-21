@@ -108,7 +108,6 @@ draftsRouter
     let contentLength;
     if(draftId) {
       draft = await db.DraftModel.findOne({did: draftId, uid: user.uid});
-      contentLength = draft.c.length;
     }
     const draftObj = {
       t, c, l, abstractEn, abstractCn, keyWordsEn, keyWordsCn,
@@ -159,6 +158,12 @@ draftsRouter
     if(files && files.postCover) {
       await db.AttachmentModel.saveDraftCover(draft.did, files.postCover);
       // await nkcModules.file.saveDraftCover(draft.did, files.postCover);
+    }
+    if(draft) {
+      const oldDraft = await db.DraftModel.findOne({did: draft.did, uid: user.uid});
+      contentLength = oldDraft.c.length;
+    } else {
+      contentLength = post.c.length;
     }
     // 将数据库中的内容长度发送给前端，用于内容减少时提示用户是否需要保存
     data.contentLength = contentLength;

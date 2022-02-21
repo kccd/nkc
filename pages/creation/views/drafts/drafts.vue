@@ -195,14 +195,14 @@
           })
           .catch(sweetError)
       },
-      draftOption(draft, type) {
+      draftOption(draft, operation) {
         let deleteTitle = '确定要删除当前自定义草稿？' 
         const {draftId} = draft;
-        let deleteUrl = [`/creation/draft?id=${draftId}&type=${type}`, 'DELETE']
+        let deleteUrl = [`/creation/draft?id=${draftId}&type=custom&operation=${operation}`, 'DELETE']
         if(this.draftsType === 'column'){
           const {ids:{aId}} = draft
           deleteTitle = '确定要删除当前专栏草稿吗？';
-          deleteUrl[0] = `/creation/draft?id=${aId}&type=column`
+          deleteUrl[0] = `/creation/draft?id=${aId}&type=column&operation=${operation}`
         }
         const self = this;
         return Promise.resolve()

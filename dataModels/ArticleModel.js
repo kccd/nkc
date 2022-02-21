@@ -1,26 +1,31 @@
 const mongoose = require('../settings/database');
 const schema = new mongoose.Schema({
   _id: String,
+  // 文章创建时间
   toc: {
     type: Date,
     default: Date.now,
     index: 1
   },
+  // 文章最后修改时间
   tlm: {
     type: Date,
     default: null,
     index: 1
   },
+  // 发表人
   uid: {
     type: String,
     required: true,
     index: 1
   },
+  // document did
   did: {
     type: Number,
     default: null,
     index: 1
   },
+  // 是否已发布
   published: {
     type: Boolean,
     default: false,
@@ -42,6 +47,12 @@ const schema = new mongoose.Schema({
   sid: {
     type: String,
     default: '',
+    index: 1
+  },
+  // 是否被删除
+  deleted: {
+    type: Boolean,
+    default: false,
     index: 1
   },
   // 其他引用模块类型

@@ -182,7 +182,7 @@ function initVueApp() {
       title: "", // 文章标题
       content: "", // 文章内容
       contentLength: "", // 本次文章内容字数
-      oldContentLength: "", // 上一次保存的草稿的全部内容字数
+      oldContentLength: 0, // 上一次保存的草稿的全部内容字数
 
 
       cover: "",
@@ -379,7 +379,6 @@ function initVueApp() {
         const content = editor.getContentTxt();
         const _content = editor.getContent();
         this.content = _content;
-        debugger
         this.contentLength = content.length;
       },
       // 判断发表权限
@@ -985,9 +984,7 @@ function initVueApp() {
             // 获取本次编辑器内容的全部长度
             const allContentLength = editor.getContent();
             // 如果内容相对上一次减少了就提示用户是否需要保存
-            console.log(allContentLength.length, self.oldContentLength.length);
-            debugger
-            if(allContentLength.length < self.oldContentLength.length) {
+            if(allContentLength.length < self.oldContentLength) {
               return sweetQuestion(`您输入的内容发生了变化，是否还要继续保存？`)
                 .then(() => {
                   return;
@@ -1039,7 +1036,9 @@ function initVueApp() {
           })
           .then(function(data) {
             //保存草稿的全部内容长度
-            self.oldContentLength = data.contentLength;
+            if(data.contentLength) {
+              self.oldContentLength = data.contentLength;
+            }
             self.draftId = data.draft.did;
             if(data.draft.cover) {
               self.coverData = "";

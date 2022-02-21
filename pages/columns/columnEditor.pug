@@ -1,0 +1,17 @@
+extends ../bootstrap_base
+block title
+  title 发表独立文章
+  +includeCSS('/columns/columnEditor.css')
+block content
+  .hidden#data=objToStr({})
+  .container-fluid.max-width#columnEditor
+    .row
+      .col-xs-12.col-md-9.box-shadow-panel.m-b-2
+        .m-b-1
+          document-editor(ref='documentEditor' :configs='formConfigs')
+        .m-b-1
+          button.btn.btn-primary.m-r-05(@click="publish") 发布
+          button.btn.btn-default.m-r-05(@click="saveArticle") 保存
+block scripts
+  +includeJS('/columns/columnEditor.js')
+
