@@ -5,7 +5,7 @@
       .form-group(v-if="formConfigs.title")
         input.form-control.form-title(type="text" v-model="title" placeholder="请输入标题")
       .form-group
-        editor(:configs="editorConfigs" ref="editor" @content-change="watchContentChange" :plugs="editorPlugs")
+        editor(:configs="editorConfigs" ref="editor" @content-change="watchContentChange" :plugs="editorPlugs" @ready="editorReady")
       .form-group(v-if="formConfigs.cover")
         .m-b-2
           .editor-header 封面图
@@ -226,6 +226,9 @@ export default {
     originState() {
       this.watchContentChange();
     },
+    selectCategory() {
+      this.watchContentChange();
+    }
   },
   computed: {
     coverLink() {
@@ -272,6 +275,14 @@ export default {
   methods: {
     getLength: getLength,
     getUrl: getUrl,
+    //编辑器准备完成填入数据
+    editorReady() {
+      this.$emit('ready');
+    },
+    //获取选中你的文章专栏分类
+    getSelectCategory() {
+      return this.$refs.selectColumnCategories.getStatus();
+    },
     // 移除关键词
     removeKeyword: function(index, arr) {
       arr.splice(index, 1);
@@ -389,7 +400,6 @@ export default {
         keywordsEN,
         originState,
         formConfigs,
-        selectCategory
       } = this;
       const data = {
         content: this.$refs.editor.getContent(),
@@ -404,7 +414,7 @@ export default {
       if(formConfigs.keywordsEN) data.keywordsEN = keywordsEN;
       if(formConfigs.originState) data.originState = originState;
       if(formConfigs.title) data.title = title;
-      if(formConfigs.selectCategory) data.selectCategory = selectCategory;
+      if(formConfigs.selectCategory) data.selectCategory = this.getSelectCategory();
       return data;
     },
     initDocumentForm(data) {
@@ -429,10 +439,6 @@ export default {
     },
     // 监听内容输入
     watchContentChange: debounce(function() {
-      if(!this.contentChangeEventFlag) {
-        this.contentChangeEventFlag = true;
-        return;
-      }
       this.updateContentLength();
       this.emitContentChangeEvent();
     }, 500),

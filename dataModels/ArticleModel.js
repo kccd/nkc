@@ -69,10 +69,27 @@ const schema = new mongoose.Schema({
 *   @param {String} title 文章标题，可为空
 *   @param {String} content 文章富文本内容，可为空
 *   @param {String} uid 作者，不可为空
+*   @param {File} coverFile 新的封面图文件对象
+*   @param {String} keywords 关键字中文
+*   @param {String} keywordsEN 英文关键字
+*   @param {String} abstract 摘要中文
+*   @param {String} abstractEN 摘要英文
+*   @param {Boolean} origin 是否原创
 * @return {Object} 创建的 article 对象
 * */
 schema.statics.createArticle = async (props) => {
-  const {title, content, coverFile, uid} = props;
+  const {
+    uid,
+    title,
+    content,
+    coverFile,
+    cover,
+    keywords,
+    keywordsEN,
+    abstract,
+    abstractEN,
+    origin
+  } = props;
   const toc = new Date();
   const ArticleModel = mongoose.model('articles');
   const SettingModel = mongoose.model('settings');
@@ -84,6 +101,12 @@ schema.statics.createArticle = async (props) => {
     coverFile,
     title,
     content,
+    cover,
+    keywords,
+    keywordsEN,
+    abstract,
+    abstractEN,
+    origin,
     toc,
     source: documentSource,
     sid: aid
@@ -93,6 +116,7 @@ schema.statics.createArticle = async (props) => {
     uid,
     toc,
     did: document.did,
+    status: 'default',
   });
   await article.save();
   return article;
@@ -105,16 +129,31 @@ schema.methods.getBetaDocumentCoverId = async function() {
 };
 
 /*
-* 修改 book 中的文章
+* 修改article
 * @param {Object} props
 *   @param {String} title 文章标题，可为空
 *   @param {String} content 文章内容，可为空
 *   @param {String} cover 原封面 ID，可为空
 *   @param {File} coverFile 新的封面图文件对象
+*   @param {String} keywords 关键字中文
+*   @param {String} keywordsEN 英文关键字
+*   @param {String} abstract 摘要中文
+*   @param {String} abstractEN 摘要英文
+*   @param {Boolean} origin 是否原创
 * */
 schema.methods.modifyArticle = async function(props) {
   const DocumentModel = mongoose.model('documents');
-  const {title, content, cover, coverFile} = props;
+  const {
+    title,
+    content,
+    coverFile,
+    cover,
+    keywords,
+    keywordsEN,
+    abstract,
+    abstractEN,
+    origin
+  } = props;
   const {did} = this;
   const toc = new Date();
   await DocumentModel.updateDocumentByDid(did, {
@@ -122,6 +161,11 @@ schema.methods.modifyArticle = async function(props) {
     content,
     cover,
     coverFile,
+    keywords,
+    keywordsEN,
+    abstract,
+    abstractEN,
+    origin,
     tlm: toc,
   });
   await this.updateOne({
@@ -272,6 +316,52 @@ schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
     betaDocumentsObj[document.sid] = document;
   }
   return betaDocumentsObj;
+}
+
+/*
+* 通过article获取document信息
+* @param {Object} article 数据库查询到的article
+* */
+schema.methods.getDocumentForArticle = async function() {
+  const DocumentModel = mongoose.model('documents');
+  const {did} = this;
+  const document = await DocumentModel.findOnly({did});
+  const {
+    _id,
+    uid,
+    status,
+    title,
+    content,
+    coverFile,
+    cover,
+    keywords,
+    keywordsEN,
+    abstract,
+    abstractEN,
+    origin,
+    wordCount,
+    sid,
+    source,
+    type,
+  } = document;
+  return {
+    _id,
+    uid,
+    status,
+    title,
+    content,
+    coverFile,
+    cover,
+    keywords,
+    keywordsEN,
+    abstract,
+    abstractEN,
+    origin,
+    wordCount,
+    sid,
+    source,
+    type
+  }
 }
 
 module.exports = mongoose.model('articles', schema);

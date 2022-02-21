@@ -170,7 +170,6 @@ export default {
         selectedMainCategoriesId: this.selectedMainCategoriesId,
         selectedMinorCategories: this.selectedMinorCategories,
         selectedMinorCategoriesId: this.selectedMinorCategoriesId,
-        checkbox: this.choose.length > 0
       }
     }
   }

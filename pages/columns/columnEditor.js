@@ -1,12 +1,16 @@
 import DocumentEditor from "../lib/vue/DocumentEditor";
 import {getDataById} from "../lib/js/dataConversion";
 import {getRequest} from "../lib/js/tools";
+import {screenTopWarning} from "../lib/js/topAlert";
 const data = getDataById('data');
 const columnEditor = new Vue({
   el: '#columnEditor',
   data: () => {
     return {
+      ready: false,
+      articleId: null,
       column: data.column,
+      columnId: null,
       formConfigs: {
         cover: true,
         title: true,
@@ -49,13 +53,20 @@ const columnEditor = new Vue({
   },
   methods: {
     getRequest: getRequest,
+    //编辑器准备完毕
+    editorReady() {
+      this.ready = true;
+    },
     initId() {
+      const {mid, aid} = this.getRequest();
+      this.columnId = mid;
+      this.articleId = aid;
     },
     //根据articleId获取编辑器中的数据
     initData() {
       const self = this;
-      const {mid, articleId} = this.getRequest();
-      nkcAPI('', 'GET')
+      const {mid, aid} = this.getRequest();
+      nkcAPI(`/creation/column?aid`, 'GET')
         .then()
         .catch()
     },
@@ -89,7 +100,6 @@ const columnEditor = new Vue({
     post(type) {
       if(!type) return;
       if(this.lockPost) return;
-      const self = this;
       const formData = new FormData();
       const {
         coverFile,
@@ -116,21 +126,62 @@ const columnEditor = new Vue({
         abstractEN,
         origin,
       };
+      const selectCategory = this.$refs.documenEditor.getSelectCategory();
       if(articleId) {
         formData.append('articleId', articleId);
       }
+      if(selectCategory) {
+        formData.append('selectCategory', selectCategory);
+      }
       if(coverFile) {
-        formData.append('coverFile', coverFile);
+        formData.append('coverFile', coverFile, 'cover.png');
       }
       if(article) {
-        formData.append('article', article);
+        formData.append('article', JSON.stringify(article));
       }
+      if(type) {
+        formData.append('type', type);
+      }
+      const self = this;
+      let url = '/creation/column'
+      debugger
+      return nkcUploadFile(url, 'POST', formData)
+        .then(data => {
+          self.oldCoverFile = self.coverFile;
+          self.cover = null;
+          const {articleId, articleCover} = data;
+          self.articleId = articleId;
+          self.resetCovetFile(articleCover);
+        })
+        .then(() => {
+          if(type === 'publish') {
+            self.loading = false;
+          }
+          return;
+        })
+        .catch(err => {
+          self.lockPost = false;
+          sweetError(err);
+        })
+    },
+    //重置
+    resetCovetFile(cover) {
+      this.cover = cover;
+      this.coverFile = null;
+      this.$refs.documentEditor.resetCover(cover);
     },
     //发布文章
     publish() {
     },
     //保存文章
     saveArticle() {
+    },
+    modifyArticle() {
+      const self = this;
+      this.post(this.type)
+        .catch(err => {
+          screenTopWarning(err);
+        })
     },
     //当编辑器中的内容发生变化时
     watchContentChange(data) {
@@ -149,7 +200,7 @@ const columnEditor = new Vue({
         origin,
         selectCategory
       } = data;
-      this.article.title = {
+      this.article = {
         title,
         content,
         cover,
