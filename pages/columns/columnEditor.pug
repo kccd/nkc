@@ -3,12 +3,12 @@ block title
   title 发表独立文章
   +includeCSS('/columns/columnEditor.css')
 block content
-  .hidden#data=objToStr({})
+  .hidden#data=objToStr({column: data.column})
   .container-fluid.max-width#columnEditor
     .row
       .col-xs-12.col-md-9.box-shadow-panel.m-b-2
         .m-b-1
-          document-editor(ref='documentEditor' :configs='formConfigs')
+          document-editor(ref="documentEditor" :configs="formConfigs" @content-change="watchContentChange" :column="column")
         .m-b-1
           button.btn.btn-primary.m-r-05(@click="publish") 发布
           button.btn.btn-default.m-r-05(@click="saveArticle") 保存

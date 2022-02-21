@@ -240,27 +240,27 @@
         })
       },
       publish() {
-      let article = {
-        title:'',
-        id:this.articleId,
-        url:'',
-        type:'article',
-        child:[]
-      }
-      // 文章编辑过后默认添加在列表最后 点击发布选中最后一项
-      let  childIndex = this.moveIndex?.split(',') || []
-      EventBus.$emit("moveDirectory", article, childIndex, 'publish', ()=>{
-        this.post('publish')
-        .then(() => {
-          this.$router.replace({
-            name: 'bookContent',
-            params: {
-              bid: this.bookId,
-              aid: this.articleId
-            }
-          });
-        })
-        .catch(sweetError);
+        let article = {
+          title:'',
+          id:this.articleId,
+          url:'',
+          type:'article',
+          child:[]
+        }
+        // 文章编辑过后默认添加在列表最后 点击发布选中最后一项
+        let  childIndex = this.moveIndex?.split(',') || []
+        EventBus.$emit("moveDirectory", article, childIndex, 'publish', ()=>{
+          this.post('publish')
+          .then(() => {
+            this.$router.replace({
+              name: 'bookContent',
+              params: {
+                bid: this.bookId,
+                aid: this.articleId
+              }
+            });
+          })
+          .catch(sweetError);
       });
       },
       resetCoverFile(cover) {
