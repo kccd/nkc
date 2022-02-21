@@ -12,10 +12,7 @@ module.exports = {
     }
   },
   draft: {
-    PARAMETER: {
-      GET: 'creationCenter',
-      DELETE: 'creationCenter'
-    }
+    DELETE:'creationCenter',
   },
   category: {
     GET: 'creationCenter',

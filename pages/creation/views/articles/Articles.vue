@@ -4,7 +4,7 @@
       .article-nav-item(
         v-for="item in navList"
         @click="selectNav(item)"
-        :class="item.active? 'active': ''"
+        :class="item.type === selectedNavType? 'active': ''"
         ) {{item.title}}
     router-view
 </template>
@@ -29,20 +29,28 @@
 <script>
   export default {
     data: () => ({
+      selectedNavType: 'articles',
       navList: [
         {
           title: '全部',
-          type: 'articles',
-          active: true
+          type: 'articles'
         },
         {
-          title: '专栏',
-          type: 'articlesColumn',
-          active: false,
+          title: '专栏文章',
+          type: 'articlesColumn'
         }
       ]
     }),
+    watch: {
+      $route: 'setActiveNav'
+    },
+    mounted() {
+      this.setActiveNav();
+    },
     methods: {
+      setActiveNav() {
+        this.selectedNavType = this.$route.name;
+      },
       selectNav(nav) {
         const {type} = nav;
         console.log(`select nav:`, type);

@@ -1,4 +1,16 @@
 const mongoose = require('../settings/database');
+
+const articleSources = {
+  column: 'column'
+};
+
+const articleStatus = {
+  normal: 'normal',
+  'default': 'default',
+  deleted: 'deleted',
+  cancelled: 'cancelled'
+};
+
 const schema = new mongoose.Schema({
   _id: String,
   // 文章创建时间
@@ -32,7 +44,7 @@ const schema = new mongoose.Schema({
   // cancelled: 被取消发表的（未发布过，在草稿箱被删除）
   status: {
     type: String,
-    default: 'default',
+    default: articleStatus.default,
     index: 1,
   },
   // 当前文章是否包含草稿
@@ -62,6 +74,44 @@ const schema = new mongoose.Schema({
 }, {
   collection: 'articles'
 });
+
+/*
+* 获取 status
+* */
+schema.statics.getArticleStatus = async () => {
+  return articleStatus;
+};
+
+/*
+* 获取 source
+* */
+schema.statics.getArticleSources = async () => {
+  return articleSources;
+};
+
+/*
+* 检验 status 是否合法
+* @param {String} status 状态
+* */
+schema.statics.checkArticleStatus = async (status) => {
+  const ArticleModel = mongoose.model('articles');
+  const articleStatus = await ArticleModel.getArticleStatus();
+  if(!Object.values(articleStatus).includes(status)) {
+    throwErr(500, `article status error. status=${status}`);
+  }
+}
+/*
+* 检验 source 是否合法
+* @param {String} source 来源
+* */
+schema.statics.checkArticleSource = async (source) => {
+  const ArticleModel = mongoose.model('articles');
+  const articleSources = await ArticleModel.getArticleSources();
+  if(!Object.values(articleSources).includes(source)) {
+    throwErr(500, `article source error. source=${source}`);
+  }
+};
+
 
 /*
 * 向 book 中添加文章，创建 article、document
@@ -127,7 +177,26 @@ schema.methods.getBetaDocumentCoverId = async function() {
   const betaDocument = await DocumentModel.getBetaDocumentBySource(documentSource, this._id);
   return betaDocument? betaDocument.cover: '';
 };
+schema.statics.deleteColumnAricleByArticleId = async (aid)=>{
+  const DocumentModel = mongoose.model('documents');
+  const ArticleModel = mongoose.model('articles');
+  /// document 放到doucument上进行更改
 
+  // const publishedColumn = await DocumentModel.getStableDocumnetBySid(aid);
+  let updateKey = {hasDraft: false, status: 'cancelled', tlm: new Date()}
+  // if(publishedColumn) updateKey.status = 'deleted'
+  const source = (await ArticleModel.getArticleSources()).column
+  await ArticleModel.updateOne(
+    {
+      _id: aid,
+      source
+    }, {
+      $set:updateKey
+    })
+  await DocumentModel.setBetaAsHistoryDocumentById(aid)
+
+  // 如果columnArticles 有两条数据 那么 一定是有一个 编辑版 一个发布版吗
+}
 /*
 * 修改article
 * @param {Object} props
@@ -309,13 +378,78 @@ schema.statics.extendArticles = async function(articles) {
 schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
   const DocumentModel = mongoose.model('documents');
   const {article: articleSource} = await DocumentModel.getDocumentSources();
-  const {beta} = await DocumentModel.getDocumentTypes();
-  const betaDocuments = await DocumentModel.getBetaDocumentsBySource(beta, articleSource, articlesId);
+  const betaDocuments = await DocumentModel.getBetaDocumentsBySource(articleSource, articlesId);
   const betaDocumentsObj = {};
   for(const document of betaDocuments) {
     betaDocumentsObj[document.sid] = document;
   }
   return betaDocumentsObj;
+}
+
+/*
+* 拓展独立文章列表，用于显示文章列表
+* @param {[Article]}
+* @return {[Object]}
+*   @param {String} articleSource 文章来源
+*   @param {String} articleSourceId 来源 ID
+*   @param {String} articleId 文章 ID
+*   @param {String} title 文章标题
+*   @param {String} content 文章摘要
+*   @param {String} time 格式化之后的文章内容创建时间
+*   @param {String} mTime 格式化之后的文章内容最后修改时间
+*   @param {Object} column
+*     @param {Number} _id 专栏 ID
+*     @param {String} name 专栏名称
+*     @param {String} description 专栏介绍
+*     @param {String} homeUrl 专栏首页链接
+* */
+schema.statics.extendArticlesList = async (articles) => {
+  const DocumentModel = mongoose.model('documents');
+  const ArticleModel = mongoose.model('articles');
+  const ColumnModel = mongoose.model('columns');
+  const nkcRender = require("../nkcModules/nkcRender");
+  const tools = require('../nkcModules/tools');
+  const {column: columnSource} = await ArticleModel.getArticleSources();
+  const articlesId = [];
+  const columnsId = [];
+  for(const article of articles) {
+    const {_id, source, sid} = article;
+    articlesId.push(_id);
+    if(source === columnSource) {
+      columnsId.push(sid);
+    }
+  }
+  const {article: articleSource} = await DocumentModel.getDocumentSources();
+  const stableDocumentsObj = await DocumentModel.getStableDocumentsBySource(articleSource, articlesId, 'object');
+  const columnsObj = await ColumnModel.getColumnsById(columnsId, 'object');
+
+  const articlesList = [];
+  for(const article of articles) {
+    const {_id: articleId, source, sid} = article;
+    const stableDocument = stableDocumentsObj[articleId];
+    if(!stableDocument) continue;
+    let column = null;
+    if(source === columnSource) {
+      const targetColumn = columnsObj[sid];
+      if(targetColumn) column = {
+        _id: targetColumn._id,
+        name: targetColumn.name,
+        description: targetColumn.description,
+        homeUrl: tools.getUrl('columnHome', targetColumn._id)
+      };
+    }
+    articlesList.push({
+      articleSource: source,
+      articleSourceId: sid,
+      articleId,
+      title: stableDocument.title,
+      content: nkcRender.htmlToPlain(stableDocument.content, 200),
+      time: tools.timeFormat(stableDocument.toc),
+      mTime: tools.timeFormat(stableDocument.tlm),
+      column,
+    });
+  }
+  return articlesList;
 }
 
 /*
