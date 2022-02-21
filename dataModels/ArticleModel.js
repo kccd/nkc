@@ -25,11 +25,15 @@ const schema = new mongoose.Schema({
     default: null,
     index: 1
   },
-  // 是否已发布
-  published: {
-    type: Boolean,
-    default: false,
-    index: 1
+  // 文章状态
+  // normal: 正常的（已发布，未被删除）
+  // default: 未发布的（正在编辑，待发布）
+  // deleted: 被删除的（已发布，但被删除了）
+  // cancelled: 被取消发表的（未发布过，在草稿箱被删除）
+  status: {
+    type: String,
+    default: 'default',
+    index: 1,
   },
   // 当前文章是否包含草稿
   hasDraft: {
@@ -47,12 +51,6 @@ const schema = new mongoose.Schema({
   sid: {
     type: String,
     default: '',
-    index: 1
-  },
-  // 是否被删除
-  deleted: {
-    type: Boolean,
-    default: false,
     index: 1
   },
   // 其他引用模块类型

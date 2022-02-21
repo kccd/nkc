@@ -84,6 +84,9 @@ module.exports = {
     editor: {
       GET: 'creationCenter',
       POST: 'creationCenter'
+    },
+    column: {
+      GET: 'creationCenter'
     }
   },
   article: {
