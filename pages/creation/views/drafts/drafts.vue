@@ -5,7 +5,7 @@
       span |
       span.m-r-05.b-b(@click="toggle('column')" :class="{active : draftsType === 'column'}") 专栏
       button.m-r-05.btn.btn-default.btn-sm(@click="newDraft") 新建图文片段
-      button.btn.btn-default.btn-sm(@click="toTrash") 回收站
+      button.btn.btn-default.btn-sm(@click="toTrash" v-show="draftsType === 'drafts'") 回收站
     .m-b-1(v-else)
       bread-crumb(:list="navList")
     .m-b-05(v-if="pages && pages.length > 0")
@@ -196,18 +196,18 @@
           .catch(sweetError)
       },
       draftOption(draft, operation) {
-        let deleteTitle = '确定要删除当前自定义草稿？' 
+        let deleteTitle = '确定要删除当前自定义草稿吗？删除后可通过回收站找回。' 
         const {draftId} = draft;
         let deleteUrl = [`/creation/draft?id=${draftId}&type=custom&operation=${operation}`, 'DELETE']
         if(this.draftsType === 'column'){
-          const {ids:{aId}} = draft
-          deleteTitle = '确定要删除当前专栏草稿吗？';
-          deleteUrl[0] = `/creation/draft?id=${aId}&type=column&operation=${operation}`
+          const {articleId} = draft
+          deleteTitle = '删除后不能恢复，确定要删除当前专栏草稿吗？';
+          deleteUrl[0] = `/creation/draft?id=${articleId}&type=column&operation=${operation}`
         }
         const self = this;
         return Promise.resolve()
           .then(() => {
-            if(type === 'delete') {
+            if(operation === 'delete') {
               return sweetQuestion(deleteTitle);
             }
           })
@@ -230,8 +230,8 @@
       },
       toEditDraft(draft) {
         if(this.draftsType === 'column'){
-          const {ids:{aid}} = draft 
-          window.open(`/column/editor?aid=${aid}`)
+          const {articleId, columnId} = draft 
+          window.open(`/column/editor?mid=${columnId}&aid=${articleId}`)
         }else{
           if(this.type !== 'all') return;
           const {draftId} = draft;
