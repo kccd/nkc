@@ -15,6 +15,12 @@ const documentTypes = {
   history: "history"
 };
 
+const documentSources = {
+  article: 'article',
+  draft: 'draft',
+  comment: 'comment'
+};
+
 const schema = new mongoose.Schema({
   // 当前文档的 ID，唯一
   _id: Number,
@@ -170,22 +176,18 @@ schema.statics.getDid = async () => {
 * 获取文档合法的来源类型
 * @return {Object}
 * */
-schema.statics.getDocumentSources = () => {
-  return {
-    article: 'article',
-    draft: 'draft',
-    comment: 'comment'
-  }
+schema.statics.getDocumentSources = async () => {
+  return documentSources;
 };
 
 /*
 * 获取文档所有的状态类型
 * */
-schema.statics.getDocumentStatus = () => {
+schema.statics.getDocumentStatus = async () => {
   return documentStatus;
 };
 
-schema.statics.getDocumentTypes = () => {
+schema.statics.getDocumentTypes = async () => {
   return documentTypes;
 };
 
@@ -200,6 +202,21 @@ schema.statics.checkDocumentSource = async (source) => {
   if(!sourceNames.includes(source)) throwErr(500, `document source error. source=${source}`);
 };
 
+/*
+* 检测文档状态是否有效
+* @param {String} status 状态
+* */
+schema.statics.checkDocumentStatus = async (status) => {
+  const DocumentModel = mongoose.model('documents');
+  const documentStatus = await DocumentModel.getDocumentStatus();
+  const typeNames = Object.values(documentStatus);
+  if(!typeNames.includes(status)) throwErr(500, `document status error. status=${status}`);
+}
+
+/*
+* 检测文档类型是否有效
+* @param {String} type 状态
+* */
 schema.statics.checkDocumentType = async (type) => {
   const DocumentModel = mongoose.model('documents');
   const documentTypes = await DocumentModel.getDocumentTypes();
@@ -1091,7 +1108,55 @@ schema.methods.initQuote = async function (quoteCid) {
   })
 }
 
-schema.statics.getBetaDocumentsBySource = async (type, source, sourcesId) => {
+
+/*
+* 将 document 数组转换为对象，键名为 document.did，值为 document
+* @param {[Document]} documents document 对象组成的数组
+* @return {Object}
+* */
+schema.statics.documentArrayToObject = async (documents) => {
+  const documentsObj = {};
+  for(const document of documents) {
+    documentsObj[document.did] = document;
+  }
+  return documentsObj;
+};
+
+/*
+* 通过上层应用类型和 ID，获取编辑版数据
+* @param {String} source 来源
+* @param {[String]} sourcesId 来源 ID 组成的数组
+* @param {String} format array: 数组对象, object: 对象（以 sid 为键，document 为值）
+* @return {[Document] or Object}
+* */
+schema.statics.getBetaDocumentsBySource = async (source, sourcesId, format = 'array') => {
+  const DocumentModel = mongoose.model('documents');
+  const {beta} = await DocumentModel.getDocumentTypes();
+  return await DocumentModel.getDocumentsBySource(beta, source, sourcesId, format);
+};
+
+/*
+* 通过上层应用类型和 ID，获取正式版数据
+* @param {String} source 来源
+* @param {[String]} sourcesId 来源 ID 组成的数组
+* @param {String} format array: 数组对象, object: 对象（以 sid 为键，document 为值）
+* @return {[Document] or Object}
+* */
+schema.statics.getStableDocumentsBySource = async (source, sourcesId, format = 'array') => {
+  const DocumentModel = mongoose.model('documents');
+  const {stable} = await DocumentModel.getDocumentTypes();
+  return await DocumentModel.getDocumentsBySource(stable, source, sourcesId, format);
+}
+
+/*
+* 通过上层应用类型和 ID，获取指定版本的数据
+* @param {String} type 数据版本类型 详情：DocumentModel.getDocumentTypes
+* @param {String} source 来源 详情：DocumentModel.getDocumentSources
+* @param {[String]} sourcesId 来源 ID 组成的数组
+* @param {String} format array: 数组对象, object: 对象（以 sid 为键，document 为值）
+* @return {[Document] or Object}
+* */
+schema.statics.getDocumentsBySource = async (type, source, sourcesId, format = 'array') => {
   const DocumentModel = mongoose.model('documents');
   await DocumentModel.checkDocumentSource(source);
   const {beta, stable} = await DocumentModel.getDocumentTypes();
@@ -1105,13 +1170,16 @@ schema.statics.getBetaDocumentsBySource = async (type, source, sourcesId) => {
   documents.forEach((document)=>{
     documentsObj[document.sid] = document;
   });
-  const results = [];
-  for(const sid of sourcesId) {
-    const document = documentsObj[sid];
-    if(!document) continue;
-    results.push(document);
+  if(format === 'array') {
+    const results = [];
+    for(const sid of sourcesId) {
+      const document = documentsObj[sid];
+      if(!document) continue;
+      results.push(document);
+    }
+    return results;
   }
-  return results;
+  return documentsObj;
 }
 
 module.exports = mongoose.model('documents', schema);
