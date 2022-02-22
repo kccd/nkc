@@ -12,7 +12,7 @@
   import {nkcAPI} from '../../../lib/js/netAPI';
   import {sweetError} from "../../../lib/js/sweetAlert";
   import Paging from '../../../lib/vue/Paging';
-  import ArticlesList from './ArticlesList';
+  import ArticlesList from '../../components/ArticlesList';
   export default {
     data: () => ({
       pages: [],

@@ -28,7 +28,7 @@
 </style>
 
 <script>
-  import ArticlesList from './ArticlesList';
+  import ArticlesList from '../../components/ArticlesList';
   export default {
     components: {
       'articles-list': ArticlesList

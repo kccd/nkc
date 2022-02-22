@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const moment = require('moment');
 
 const articleSources = {
   column: 'column'
@@ -65,12 +66,32 @@ const schema = new mongoose.Schema({
     default: '',
     index: 1
   },
+  // 文章阅读量
+  hits: {
+    type: Number,
+    default: 0,
+  },
+  // 支持数
+  voteUp: {
+    type: Number,
+    default: 0,
+  },
+  // 反对数
+  voteDown: {
+    type: Number,
+    default: 0,
+  },
+  // 评论数
+  comment: {
+    type: Number,
+    default: 0,
+  },
   // 其他引用模块类型
   references: {
     type: String,
     default: [],
     index: 1
-  }
+  },
 }, {
   collection: 'articles'
 });
@@ -430,6 +451,9 @@ schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
 *   @param {String} articleSourceId 来源 ID
 *   @param {String} articleId 文章 ID
 *   @param {String} articleUrl 文章链接
+*   @param {Number} hits 阅读量
+*   @param {Number} voteUp 点赞数
+*   @param {Number} comment 评论数
 *   @param {String} title 文章标题
 *   @param {String} content 文章摘要
 *   @param {String} coverUrl 封面图链接
@@ -463,7 +487,14 @@ schema.statics.extendArticlesList = async (articles) => {
 
   const articlesList = [];
   for(const article of articles) {
-    const {_id: articleId, source, sid} = article;
+    const {
+      _id: articleId,
+      source,
+      sid,
+      voteUp,
+      hits,
+      comment,
+    } = article;
     const stableDocument = stableDocumentsObj[articleId];
     if(!stableDocument) continue;
     let column = null;
@@ -485,11 +516,14 @@ schema.statics.extendArticlesList = async (articles) => {
       articleSourceId: sid,
       articleId,
       articleUrl,
+      voteUp,
+      hits,
+      comment,
       title: stableDocument.title,
       content: nkcRender.htmlToPlain(stableDocument.content, 200),
       coverUrl: stableDocument.cover? tools.getUrl('documentCover', stableDocument.cover): '',
-      time: tools.timeFormat(stableDocument.toc),
-      mTime: tools.timeFormat(stableDocument.tlm),
+      time: moment(stableDocument.toc).format(`YYYY/MM/DD`),
+      mTime: tools.fromNow(stableDocument.tlm),
       column,
     });
   }
