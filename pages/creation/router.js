@@ -12,6 +12,11 @@ import Drafts from './views/drafts/drafts';
 import DraftEdit from "./views/drafts/DraftEdit";
 import Articles from './views/articles/Articles';
 import ArticlesColumn from './views/articles/Column';
+import Community from './views/community/Community';
+import CommunityThread from './views/community/Thread';
+import CommunityPost from './views/community/Post';
+import CommunityDraft from './views/community/Draft';
+import CommunityNote from './views/community/Note';
 
 const routes = [
   {name: 'home', path: '/creation', component: Home},
@@ -26,12 +31,25 @@ const routes = [
   {name: 'categories', path: '/creation/categories', component: Categories},
   {name: 'drafts', path: '/creation/drafts', component: Drafts},
   {name: 'draftEdit', path: '/creation/drafts/editor', component: DraftEdit},
-
   {
-    name: 'articles', path: '/creation/articles', component: Articles, children: [
+    name: 'articles',
+    path: '/creation/articles',
+    component: Articles,
+    children: [
       {name: 'articlesColumn', path: 'column', component: ArticlesColumn}
     ]
   },
+  {
+    name: 'community',
+    path: '/creation/community',
+    component: Community,
+    children: [
+      {name: 'communityThread', path: 'thread', component: CommunityThread},
+      {name: 'communityPost', path: 'post', component: CommunityPost},
+      {name: 'communityDraft', path: 'draft', component: CommunityDraft},
+      {name: 'communityNote', path: 'note', component: CommunityNote},
+    ]
+  }
 ];
 
 

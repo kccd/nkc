@@ -9,6 +9,7 @@ const categoriesRouter = require('./categories');
 const categoryRouter = require('./category');
 const draftsRouter = require('./drafts');
 const draftRouter = require('./draft');
+const communityRouter = require('./community');
 router
   .use('/', async (ctx, next) => {
     if(ctx.query.t) {
@@ -32,4 +33,5 @@ router
   .use('/article', articleRouter.routes(), articleRouter.allowedMethods())
   .use('/drafts', draftsRouter.routes(), draftsRouter.allowedMethods())
   .use('/draft', draftRouter.routes(), draftRouter.allowedMethods())
+  .use('/community', communityRouter.routes(), communityRouter.allowedMethods());
 module.exports = router;

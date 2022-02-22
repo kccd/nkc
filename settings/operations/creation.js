@@ -93,9 +93,22 @@ module.exports = {
   article: {
     GET: 'creationCenter',
     POST: 'creationCenter',
-  },
-  article: {
     PARAMETER: {
+      GET: 'creationCenter'
+    }
+  },
+  community: {
+    GET: 'creationCenter',
+    thread: {
+      GET: 'creationCenter'
+    },
+    post: {
+      GET: 'creationCenter'
+    },
+    draft: {
+      GET: 'creationCenter'
+    },
+    note: {
       GET: 'creationCenter'
     }
   }

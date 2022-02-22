@@ -7,10 +7,10 @@
         router-view
 </template>
 <script>
-  import Nav from './components/Nav';
+  import VerNav from './components/VerNav';
   export default {
     components: {
-      'creation-nav': Nav
+      'creation-nav': VerNav
     },
     data: () => ({
       transitionName: 'fade'
