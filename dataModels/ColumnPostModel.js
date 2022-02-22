@@ -69,6 +69,26 @@ const schema = new Schema({
   collection: "columnPosts"
 });
 /*
+* 根据 专栏ID 和 _id 查找 一篇文章
+*/
+schema.statics.getArticleById = async (columnId, _id)=>{
+  const columnPostsModel = mongoose.model('columnPosts');
+  const PostsModel = mongoose.model('posts');
+  const ArticleModel = mongoose.model('articles');
+  const article = await columnPostsModel.findOne({_id, columnId})
+  if(!article) throwErr(500, '未查找到对应文章');
+  switch (article.type) {
+    case 'thread':
+      return PostsModel.getPostByPid(article.pid)
+    case 'article':
+      // 未完待续
+      await ArticleModel.getArticleById()
+      break;
+    default:
+      break;
+  }
+}
+/*
 * 拓展专栏的内容
 * */
 schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
@@ -147,6 +167,7 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
     categoriesObj[c._id] = c;
   });
   const results = [];
+  // console.log(columnPosts,'columnPosts')
   for(let p of columnPosts) {
     p = p.toObject();
     p.column = columnsObj[p.columnId];
@@ -171,7 +192,8 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
       p.post = p.post.toObject();
       p.post.c = obtainPureText(p.post.c, true, 200);
     }
-    p.post.url = await PostModel.getUrl(p.pid);
+    // p.post.url = await PostModel.getUrl(p.pid);
+    p.post.url = `/m/${p.columnId}/a/${p._id}`
     p.mainCategories = [];
     p.minorCategories = [];
     for(const id of p.cid) {

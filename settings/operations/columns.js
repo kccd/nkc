@@ -1,6 +1,11 @@
 module.exports = {
   GET: "column_get",
   PARAMETER: {
+    a:{
+      PARAMETER:{
+        GET:'column_article_get'
+      }
+    },
     GET: 'column_single_get',
     PUT: "column_single_settings",
     hot: {

@@ -1,0 +1,37 @@
+mixin content(data)
+  header.col-xs-12.col-md-12.thread-nav.p-t-1.p-b-2
+    p.path-navigation
+      span 主页
+      span >
+      span 专栏
+      span >
+      span 具体某个分类
+    p.read-info 
+      span 文号
+      span 阅读量
+      span 评论数
+      span 收藏
+  div.title
+    h1.artivle-title 猫薄荷打火山
+    span.article-author 作者
+    span NKU???
+    span 在下松田诚一 2021-9-7原创 化学工作者的日常
+  p.abstract-title.line-titlt 中文摘要
+  p.cn-abstract
+    //- for abstract,i in data.abstractCn 
+    span=data.abstractCn
+  p.en-abstract.line-titlt Abstract
+    //- for abstract,i in data.abstractEn 
+    span=data.abstractEn
+  div.key-word.line-titlt 关键词
+    p.cn-key-word.key-word-conmon
+      for keyWord,i in data.keyWordsCn 
+        span=keyWord[i]
+    p.en-key-word.key-word-conmon
+      for keyWord,i in data.keyWordsEn 
+        span=keyWord[i]
+  section.content 
+    p.content-title.line-titlt 正文
+    article.content-article=data.c
+
++content(data.article)
