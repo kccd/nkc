@@ -13,6 +13,7 @@
   @import "../../../publicModules/base";
   .creation-articles{
     .articles-nav{
+      margin-bottom: 1rem;
       .article-nav-item{
         display: inline-block;
         margin: 0 1rem 0.5rem 0;
@@ -27,7 +28,11 @@
 </style>
 
 <script>
+  import ArticlesList from './ArticlesList';
   export default {
+    components: {
+      'articles-list': ArticlesList
+    },
     data: () => ({
       selectedNavType: 'articles',
       navList: [

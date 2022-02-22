@@ -112,6 +112,43 @@ schema.statics.checkArticleSource = async (source) => {
   }
 };
 
+/*
+* 获取新的 article id
+* @return {String}
+* */
+schema.statics.getNewId = async () => {
+  const ArticleModel = mongoose.model('articles');
+  const redLock = require('../nkcModules/redLock');
+  const getRedisKeys = require('../nkcModules/getRedisKeys');
+  const {getRandomString} = require('../nkcModules/apiFunction');
+  const key = getRedisKeys('newArticleId');
+  let newId = '';
+  let n = 10;
+  const lock = await redLock.lock(key, 10000);
+  try{
+    while(true) {
+      n = n - 1;
+      const _id = getRandomString('a0', 6);
+      const article = await ArticleModel.findOne({
+        _id
+      }, {
+        _id: 1
+      });
+      if(!article) {
+        newId = _id;
+        break;
+      }
+      if(n === 0) {
+        break;
+      }
+    }
+  } catch(err) {}
+  await lock.unlock();
+  if(!newId) {
+    throwErr(500, `article id error`);
+  }
+  return newId;
+};
 
 /*
 * 向 book 中添加文章，创建 article、document
@@ -142,10 +179,9 @@ schema.statics.createArticle = async (props) => {
   } = props;
   const toc = new Date();
   const ArticleModel = mongoose.model('articles');
-  const SettingModel = mongoose.model('settings');
   const DocumentModel = mongoose.model('documents');
   const {article: documentSource} = await DocumentModel.getDocumentSources();
-  const aid = await SettingModel.getNewId();
+  const aid = await ArticleModel.getNewId();
   const document = await DocumentModel.createBetaDocument({
     uid,
     coverFile,
@@ -393,8 +429,10 @@ schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
 *   @param {String} articleSource 文章来源
 *   @param {String} articleSourceId 来源 ID
 *   @param {String} articleId 文章 ID
+*   @param {String} articleUrl 文章链接
 *   @param {String} title 文章标题
 *   @param {String} content 文章摘要
+*   @param {String} coverUrl 封面图链接
 *   @param {String} time 格式化之后的文章内容创建时间
 *   @param {String} mTime 格式化之后的文章内容最后修改时间
 *   @param {Object} column
@@ -429,21 +467,27 @@ schema.statics.extendArticlesList = async (articles) => {
     const stableDocument = stableDocumentsObj[articleId];
     if(!stableDocument) continue;
     let column = null;
+    let articleUrl = tools.getUrl('aloneArticle', articleId);
     if(source === columnSource) {
       const targetColumn = columnsObj[sid];
-      if(targetColumn) column = {
-        _id: targetColumn._id,
-        name: targetColumn.name,
-        description: targetColumn.description,
-        homeUrl: tools.getUrl('columnHome', targetColumn._id)
-      };
+      if(targetColumn) {
+        column = {
+          _id: targetColumn._id,
+          name: targetColumn.name,
+          description: targetColumn.description,
+          homeUrl: tools.getUrl('columnHome', targetColumn._id)
+        };
+        articleUrl = tools.getUrl('columnArticle', column._id, articleId);
+      }
     }
     articlesList.push({
       articleSource: source,
       articleSourceId: sid,
       articleId,
+      articleUrl,
       title: stableDocument.title,
       content: nkcRender.htmlToPlain(stableDocument.content, 200),
+      coverUrl: stableDocument.cover? tools.getUrl('documentCover', stableDocument.cover): '',
       time: tools.timeFormat(stableDocument.toc),
       mTime: tools.timeFormat(stableDocument.tlm),
       column,

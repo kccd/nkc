@@ -4,7 +4,7 @@
     .creation-nav-item(v-for="item in list")
       .item(
         @click="selectItem(item)"
-        :class="item.type === selected? 'active':''"
+        :class="selected.includes(item.type)? 'active':''"
         )
         .icon.left-icon
           .fa(:class="item.icon")
@@ -18,7 +18,7 @@
         .item(
           v-for="childrenItem in item.children"
           @click="selectItem(childrenItem)"
-          :class="childrenItem.type === selected? 'active':''"
+          :class="selected.includes(childrenItem.type)? 'active':''"
           )
           .title {{childrenItem.title}}
 </template>
@@ -78,18 +78,8 @@
 <script>
   export default {
     data: () => ({
-      selected: 'creation',
+      selected: [],
       list: [
-        {
-          type: 'categories',
-          title: '媒体管理',
-          icon: 'fa-image'
-        },
-        {
-          type: 'drafts',
-          title: '草稿管理',
-          icon: 'fa-file-text-o'
-        },
         {
           type: 'creatContent',
           title: '内容创作',
@@ -97,12 +87,13 @@
           hidden: false,
           children: [
             {
-              type: 'aloneArticleEditor',
-              title: '独立文章'
+              type: 'articleEditor',
+              title: '文章创作'
             },
             {
-              type: 'columnArticleEditor',
-              title: '专栏文章'
+              type: 'books',
+              title: '专题制作',
+              icon: 'fa-book',
             }
           ]
         },
@@ -113,43 +104,32 @@
           hidden: false,
           children: [
             {
+              type: 'columnContent',
+              title: '专栏内容'
+            },
+            {
+              type: 'community',
+              title: '社区内容'
+            }
+            /*{
               type: 'articles',
               title: '文章管理'
             },
             {
               type: 'manageComment',
               title: '评论管理'
-            }
+            }*/
           ]
         },
         {
-          type: 'books',
-          title: '专题制作',
-          icon: 'fa-book',
+          type: 'categories',
+          title: '媒体管理',
+          icon: 'fa-image'
         },
         {
-          type: 'community',
-          title: '社区内容',
-          icon: 'fa-book',
-          hidden: false,
-          children: [
-            {
-              type: 'communityThreads',
-              title: '我的文章'
-            },
-            {
-              type: 'communityPosts',
-              title: '我的回复'
-            },
-            {
-              type: 'communityDrafts',
-              title: '我的草稿'
-            },
-            {
-              type: 'communityNotes',
-              title: '我的笔记'
-            }
-          ]
+          type: 'drafts',
+          title: '草稿管理',
+          icon: 'fa-file-text-o'
         }
       ]
     }),
@@ -161,7 +141,11 @@
     },
     methods: {
       setNavActive() {
-        this.selected = this.$route.name;
+        const name = [];
+        for(const m of this.$route.matched) {
+          name.push(m.name);
+        }
+        this.selected = name;
       },
       selectItem(item) {
         if(item.children && item.children.length > 0) {
