@@ -97,6 +97,15 @@ module.exports = {
       GET: 'creationCenter'
     }
   },
+  column: {
+    GET: 'creationCenter',
+    article: {
+      GET: 'creationCenter'
+    },
+    draft: {
+      GET: 'creationCenter'
+    },
+  },
   community: {
     GET: 'creationCenter',
     thread: {
@@ -109,6 +118,20 @@ module.exports = {
       GET: 'creationCenter'
     },
     note: {
+      GET: 'creationCenter'
+    }
+  },
+  editor: {
+    column: {
+      GET: 'creationCenter'
+    },
+    community: {
+      GET: 'creationCenter'
+    },
+    zone: {
+      GET: 'creationCenter'
+    },
+    book: {
       GET: 'creationCenter'
     }
   }

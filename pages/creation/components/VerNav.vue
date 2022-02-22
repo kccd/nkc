@@ -14,7 +14,7 @@
             v-if="item.children && item.children.length > 0"
             )
         .title {{item.title}}
-      .childrenren(v-if="!item.hidden && item.children && item.children.length > 0")
+      .children(v-if="!item.hidden && item.children && item.children.length > 0")
         .item(
           v-for="childrenItem in item.children"
           @click="selectItem(childrenItem)"
@@ -39,13 +39,13 @@
       user-select: none;
     }
     .item{
-      margin: 0 2rem 0 2rem;
+      margin: 0 3rem 0 3rem;
       @itemHeight: 3rem;
       height: @itemHeight;
       line-height: @itemHeight;
       text-align: center;
       position: relative;
-      font-size: 1.25rem;
+      font-size: 1.35rem;
       cursor: pointer;
       user-select: none;
       &:hover{
@@ -72,6 +72,11 @@
         }
       }
     }
+    .children{
+      .item{
+        font-size: 1.2rem;
+      }
+    }
   }
 </style>
 
@@ -83,33 +88,56 @@
         {
           type: 'creatContent',
           title: '内容创作',
-          icon: 'fa-file-text-o',
+          icon: 'fa-pencil',
           hidden: false,
           children: [
             {
-              type: 'articleEditor',
-              title: '文章创作'
+              type: 'zoneArticleEditor',
+              title: '空间创作'
             },
             {
-              type: 'books',
+              type: 'columnArticleEditor',
+              title: '专栏创作'
+            },
+            {
+              type: 'communityThreadEditor',
+              title: '社区创作'
+            },
+            {
+              type: 'bookEditor',
               title: '专题制作',
-              icon: 'fa-book',
+            },
+            {
+              type: 'drafts',
+              title: '片段创作'
             }
           ]
         },
         {
           type: 'manageContent',
           title: '内容管理',
-          icon: 'fa-file-text-o',
+          icon: 'fa-th-list',
           hidden: false,
           children: [
             {
-              type: 'columnContent',
+              type: 'zone',
+              title: '空间内容'
+            },
+            {
+              type: 'column',
               title: '专栏内容'
             },
             {
               type: 'community',
               title: '社区内容'
+            },
+            {
+              type: 'books',
+              title: '专题内容'
+            },
+            {
+              type: 'drafts',
+              title: '片段内容'
             }
             /*{
               type: 'articles',
@@ -126,11 +154,11 @@
           title: '媒体管理',
           icon: 'fa-image'
         },
-        {
+        /*{
           type: 'drafts',
           title: '草稿管理',
           icon: 'fa-file-text-o'
-        }
+        }*/
       ]
     }),
     watch: {

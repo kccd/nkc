@@ -10,6 +10,8 @@ const categoryRouter = require('./category');
 const draftsRouter = require('./drafts');
 const draftRouter = require('./draft');
 const communityRouter = require('./community');
+const columnRouter = require('./column');
+const editorRouter = require('./editor');
 router
   .use('/', async (ctx, next) => {
     if(ctx.query.t) {
@@ -33,5 +35,7 @@ router
   .use('/article', articleRouter.routes(), articleRouter.allowedMethods())
   .use('/drafts', draftsRouter.routes(), draftsRouter.allowedMethods())
   .use('/draft', draftRouter.routes(), draftRouter.allowedMethods())
-  .use('/community', communityRouter.routes(), communityRouter.allowedMethods());
+  .use('/community', communityRouter.routes(), communityRouter.allowedMethods())
+  .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
+  .use('/editor', editorRouter.routes(), editorRouter.allowedMethods())
 module.exports = router;
