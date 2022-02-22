@@ -208,6 +208,12 @@ var Tools = function() {
       case 'editBookArticle': {
         return '/creation/articles/editor?bid=' + id + '&aid=' + size;
       }
+      case 'aloneArticle': {
+        return '/article/' + id
+      }
+      case 'columnArticle': {
+        return '/m/' + id + '/a/' + size;
+      }
     }
   };
   self.getAnonymousInfo = function() {

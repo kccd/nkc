@@ -17,7 +17,7 @@ router
       status: normalStatus
     };
     const count = await db.ArticleModel.countDocuments(match);
-    const paging = nkcModules.apiFunction.paging(page, count, 1);
+    const paging = nkcModules.apiFunction.paging(page, count);
     const articles = await db.ArticleModel.find(match)
       .sort({toc: -1})
       .skip(paging.start)
