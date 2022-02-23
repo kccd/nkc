@@ -13,11 +13,17 @@
     user-select: none;
     .hor-nav-item{
       display: inline-block;
-      margin: 0 1rem 0.5rem 0;
+      height: 2.5rem;
+      line-height: 2.5rem;
+      padding: 0;
+      margin: 0 2rem 1rem 0;
       font-size: 1.3rem;
       cursor: pointer;
-      &.active, &:hover{
-        color: @primary;
+      &.active{
+        border-bottom: 2px solid @accent;
+      }
+      &:active{
+        opacity: 0.7;
       }
     }
   }

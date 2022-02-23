@@ -25,6 +25,10 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  // 与 type 类型对应的 ID
+  // type: post, pid 表示 post.pid
+  // type: thread, pid 表示 thread.oc
+  // type: article, pid 表示 article._id
   pid: {
     type: String,
     required: true,
@@ -35,7 +39,10 @@ const schema = new Schema({
     required: true,
     index: 1
   },
-  // 内容类型 post: 回复, thread: 文章
+  // 内容类型
+  // post: 回复
+  // thread: 文章
+  // article: 文章（包含空间文章、专栏文章等）
   type: {
     type: String,
     required: true,
@@ -447,5 +454,18 @@ schema.statics.getLatestThreads = async (columnId, count = 3, fids) => {
   }
   return results;
 };
+
+/*
+* 创建专栏文章发布引用记录
+* */
+schema.statics.createColumnPost = async function(article, selectCategory) {
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const {_id, sid, uid, toc} = article;
+}
+
+/*
+* 通过 article id 删除专栏引用
+* */
+
 
 module.exports = mongoose.model("columnPosts", schema);

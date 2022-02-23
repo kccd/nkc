@@ -17,6 +17,16 @@ import CommunityThread from './views/community/Thread';
 import CommunityPost from './views/community/Post';
 import CommunityDraft from './views/community/Draft';
 import CommunityNote from './views/community/Note';
+import Column from './views/column/Column';
+import ColumnArticle from './views/column/Article';
+import ColumnDraft from './views/column/Draft';
+import ColumnArticleEditor from './views/editor/ColumnArticleEditor';
+import CommunityThreadEditor from './views/editor/CommunityThreadEditor';
+import ZoneArticleEditor from './views/editor/ZoneArticleEditor';
+// import BookEditor from './views/editor/BookEditor';
+import Zone from './views/zone/Zone';
+import ZoneArticle from './views/zone/Article';
+import ZoneDraft from './views/zone/draft';
 
 const routes = [
   {name: 'home', path: '/creation', component: Home},
@@ -31,6 +41,9 @@ const routes = [
   {name: 'categories', path: '/creation/categories', component: Categories},
   {name: 'drafts', path: '/creation/drafts', component: Drafts},
   {name: 'draftEdit', path: '/creation/drafts/editor', component: DraftEdit},
+  {name: 'columnArticleEditor', path: '/creation/editor/column', component: ColumnArticleEditor},
+  {name: 'communityThreadEditor', path: '/creation/editor/community', component: CommunityThreadEditor},
+  {name: 'zoneArticleEditor', path: '/creation/editor/zone', component: ZoneArticleEditor},
   {
     name: 'articles',
     path: '/creation/articles',
@@ -48,6 +61,24 @@ const routes = [
       {name: 'communityPost', path: 'post', component: CommunityPost},
       {name: 'communityDraft', path: 'draft', component: CommunityDraft},
       {name: 'communityNote', path: 'note', component: CommunityNote},
+    ]
+  },
+  {
+    name: 'column',
+    path: '/creation/column',
+    component: Column,
+    children: [
+      {name: 'columnArticle', path: 'article', component: ColumnArticle},
+      {name: 'columnDraft', path: 'draft', component: ColumnDraft},
+    ]
+  },
+  {
+    name: 'zone',
+    path: '/creation/zone',
+    component: Zone,
+    children: [
+      {name: 'zoneArticle', path: 'article', component: ZoneArticle},
+      {name: 'zoneDraft', path: 'draft', component: ZoneDraft}
     ]
   }
 ];

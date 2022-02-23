@@ -34,8 +34,8 @@
 </script>
 <style lang="less" scoped>
   @import '../publicModules/base';
-  @leftNavWidth: 16rem;
-  @paddingTop: 4rem;
+  @leftNavWidth: 20rem;
+  @paddingTop: 5rem;
   .creation-nav-container{
     position: fixed;
     background-color: #fff;
@@ -44,9 +44,9 @@
     padding-top: @paddingTop + 1rem;
     left: 0;
     width: @leftNavWidth;
-    border-right: 1px solid #ddd;
   }
   .creation-center{
+    padding-top: 2rem;
     padding-left: @leftNavWidth;
   }
 </style>

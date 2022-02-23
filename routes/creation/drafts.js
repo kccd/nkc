@@ -17,7 +17,7 @@ router
     await next();
   })
   .get('/column', async (ctx, next)=>{
-    const {query, db, state, nkcModules, data} = ctx;
+    /*const {query, db, state, nkcModules, data} = ctx;
     const {page = 0, quota = 30} = query;
     const {uid} = state;
     const queryCriteria = {
@@ -52,7 +52,7 @@ router
         });
       }
     }
-    await next()
+    await next()*/
   })
   .get('/editor', async (ctx, next) => {
     //获取草稿文档内容

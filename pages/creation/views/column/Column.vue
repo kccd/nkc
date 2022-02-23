@@ -1,0 +1,43 @@
+<template lang="pug">
+  .container-fluid.column
+    hor-nav(:list="navList")
+    router-view
+</template>
+
+<script>
+  import HorNav from '../../components/HorNav';
+  export default {
+    components: {
+      'hor-nav': HorNav
+    },
+    data: () => ({
+      navList: [
+        {
+          type: 'columnArticle',
+          title: '文章'
+        },
+        {
+          type: 'columnDraft',
+          title: '草稿'
+        }
+      ]
+    }),
+    watch: {
+      $route() {
+        this.redirect();
+      }
+    },
+    mounted() {
+      this.redirect();
+    },
+    methods: {
+      redirect() {
+        if(this.$route.name === 'column') {
+          this.$router.replace({
+            name: 'columnArticle'
+          });
+        }
+      }
+    }
+  }
+</script>

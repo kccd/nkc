@@ -91,11 +91,21 @@ module.exports = {
     }
   },
   article: {
-    GET: 'creationCenter',
-    POST: 'creationCenter',
     PARAMETER: {
-      GET: 'creationCenter'
+      DELETE: 'creationCenter',
+      draft: {
+        DELETE: 'creationCenter'
+      }
     }
+  },
+  column: {
+    GET: 'creationCenter',
+    article: {
+      GET: 'creationCenter'
+    },
+    draft: {
+      GET: 'creationCenter'
+    },
   },
   community: {
     GET: 'creationCenter',
@@ -109,6 +119,20 @@ module.exports = {
       GET: 'creationCenter'
     },
     note: {
+      GET: 'creationCenter'
+    }
+  },
+  editor: {
+    column: {
+      GET: 'creationCenter'
+    },
+    community: {
+      GET: 'creationCenter'
+    },
+    zone: {
+      GET: 'creationCenter'
+    },
+    book: {
       GET: 'creationCenter'
     }
   }
