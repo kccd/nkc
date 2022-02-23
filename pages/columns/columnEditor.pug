@@ -3,7 +3,7 @@ block title
   title 发表独立文章
   +includeCSS('/columns/columnEditor.css')
 block content
-  .hidden#data=objToStr({column: data.column})
+  .hidden#data=objToStr({column: data.column, websiteCode: data.websiteCode})
   .container-fluid.max-width#columnEditor
     .row
       .col-xs-12.col-md-9.box-shadow-panel.m-b-2
@@ -18,7 +18,7 @@ block content
                 span.article-time {{timeFormat(article.toc)}}
               .article-do(@click="editArticle(article._id)")
                 span 继续编辑
-            .article-more 查看更多
+            .article-more(@click="more") 查看更多
           document-editor(ref="documentEditor" :configs="formConfigs" @ready='editorReady' @content-change="watchContentChange" :column="column")
         .m-b-1
           button.btn.btn-primary.m-r-05(@click="publish") 发布

@@ -47,6 +47,55 @@
               span {{k}}
               .fa.fa-remove.p-l-05(@click="removeKeyword(index, keywordsEN)")
             button.btn.btn-default.btn-sm(@click="addKeyword") 添加
+      .form-group(v-if="formConfigs.authorInfos")
+        .m-b-2
+          .editor-header 作者信息
+            small （选填，信息将公开显示）
+          .editor-authors
+            .table-responsive(v-if="authorInfos.length")
+              table.table-condensed.table
+                thead
+                  tr
+                    th
+                    th 姓名
+                    th {{websiteUserId + "(选填)"}}
+                    th 机构名称(选填)
+                    th 机构地址(选填)
+                    th 通信作者
+                tbody.editor-author(v-for="(a, index) in authorInfos")
+                  tr
+                    th
+                      .fa.fa-trash(@click="removeAuthor(index, authorInfos)" title="删除")
+                      .fa.fa-chevron-up(@click="moveAuthor(index, 'up', authorInfos)" title="上移")
+                      .fa.fa-chevron-down(@click="moveAuthor(index, 'down', authorInfos)" title="下移")
+                    th
+                      input.author-name(type="text" v-model.trim="a.name")
+                    th
+                      input.author-id(type="text" v-model.trim="a.kcid")
+                    th
+                      input(type="text" v-model.tirm="a.agency")
+                    th
+                      input(type="text" v-model.trim="a.agencyAdd")
+                    th
+                      .checkbox
+                        label
+                          input(type="checkbox" :value="true" v-model="a.isContract")
+                  tr(v-if="a.isContract").contract-info
+                    th(colspan="6")
+                      h5 以下信息仅登录用户可见
+                      .display-i-b.m-b-05
+                        span 邮箱
+                        input(type="text" v-model.trim="a.contractObj.contractEmail" placeholder="必填")
+                      .display-i-b.m-b-05
+                        span &nbsp;电话
+                        input(type="text" v-model.trim="a.contractObj.contractTel" placeholder="选填")
+                      .display-i-b.m-b-05
+                        span &nbsp;地址
+                        input(type="text" v-model.trim="a.contractObj.contractAdd" placeholder="选填")
+                      .display-i-b.m-b-05
+                        span &nbsp;邮政编码
+                        input.author-name(type="text" v-model.trim="a.contractObj.contractCode" placeholder="选填")
+            button.btn.btn-default.btn-sm(@click="addAuthor") 添加
       .form-group(v-if="formConfigs.origin")
         .m-b-2
           .editor-header 原创
@@ -66,6 +115,7 @@
 </template>
 
 <style lang="less" scoped>
+@import "../../publicModules/base.less";
 .document-editor {
   .form {
     .form-title{
@@ -87,6 +137,45 @@
         font-weight: 700;
         small {
           color: #88919d;
+        }
+      }
+      .editor-authors {
+        color: #88919d;
+        .editor-author input:focus{
+          outline: none;
+        }
+        .editor-author input{
+          height: 2.5rem;
+          padding: 0.5rem;
+          border: 1px solid #d8d8d8;
+          border-radius: 3px;
+        }
+        .editor-author .author-name{
+          width: 6rem;
+        }
+        .editor-author .author-id{
+          width: 6rem;
+        }
+        .editor-authors thead{
+          color: #88919d;
+        }
+        .contract-info{
+          background-color: #f4f4f4;
+        }
+        .editor-author .fa:hover{
+          color: #8c8c8c;
+        }
+        .editor-author .fa{
+          font-size: 1.3rem;
+          height: 2rem;
+          width: 2rem;
+          line-height: 2rem;
+          cursor: pointer;
+          color: #adadad;
+          text-align: center;
+        }
+        .contract-info h5{
+          color: #9baec8;
         }
       }
       .editor-keywords {
@@ -163,6 +252,9 @@ import {getLength} from "../js/checkData";
 import {getDocumentEditorConfigs} from "../js/editor";
 import {debounce} from '../js/execution';
 import selectColumnCategories from "./selectColumnCategories";
+import {getState} from "../js/state";
+import {getDataById} from "../js/dataConversion";
+const data = getDataById('data');
 export default {
   props: ['configs', 'column'],
   data: () => ({
@@ -175,10 +267,14 @@ export default {
     abstractEN: "", // 英文摘要
     keywords: [], // 中文关键词
     keywordsEN: [], // 英文关键词
+
+    authorInfos: [], // 作者信息
+
     selectCategory: '', //文章专栏分类
     originalWordLimit: 500,
     originState: 0, // 原创声明
     contentLength: 0,
+    websiteUserId: data.websiteCode + "ID",
     originLevel: [
       "不声明",
       "普通转载",
@@ -200,6 +296,7 @@ export default {
       cover: false,
       title: false,
       selectCategory: false,
+      authorInfos: false,
     },
     // 是否允许触发contentChange
     contentChangeEventFlag: false,
@@ -228,6 +325,12 @@ export default {
     },
     selectCategory() {
       this.watchContentChange();
+    },
+    authorInfos: {
+      deep: true,
+      handler(newValue, oldValue) {
+        this.watchContentChange();
+      },
     }
   },
   computed: {
@@ -273,6 +376,7 @@ export default {
   mounted() {
   },
   methods: {
+    getState: getState,
     getLength: getLength,
     getUrl: getUrl,
     //专栏分类发生改变
@@ -345,6 +449,48 @@ export default {
         title: "添加关键词"
       });
     },
+    // 上/下移动作者信息
+    moveAuthor: function(index, type) {
+      let authorInfos = this.authorInfos;
+      let otherIndex;
+      if(type === "up") {
+        if(index === 0) return;
+        otherIndex = index - 1;
+      } else {
+        if((index + 1) === authorInfos.length) return;
+        otherIndex = index + 1;
+      }
+      let info = authorInfos[index];
+      authorInfos[index] = authorInfos[otherIndex];
+      authorInfos[otherIndex] = info;
+      Vue.set(authorInfos, 0, authorInfos[0]);
+    },
+    // 移除作者信息
+    removeAuthor: function(index, arr) {
+      sweetQuestion("确定要删除该条作者信息？")
+        .then(function() {
+          arr.splice(index, 1);
+        })
+        .catch(function(){})
+    },
+    // 添加作者信息
+    addAuthor: function() {
+      let authorInfos = this.authorInfos;
+      authorInfos.push({
+        name: "",
+        kcid: "",
+        agency: "",
+        agencyCountry: "",
+        agencyAdd: "",
+        isContract: false,
+        contractObj: {
+          contractEmail: "",
+          contractTel: "",
+          contractAdd: "",
+          contractCode: ""
+        }
+      });
+    },
     //选择封面图
     selectCover() {
       let self = this;
@@ -404,6 +550,7 @@ export default {
         keywordsEN,
         originState,
         formConfigs,
+        authorInfos
       } = this;
       const data = {
         content: this.$refs.editor.getContent(),
@@ -419,6 +566,7 @@ export default {
       if(formConfigs.origin) data.originState = originState;
       if(formConfigs.title) data.title = title;
       if(formConfigs.selectCategory) data.selectCategory = this.getSelectCategory();
+      if(formConfigs.authorInfos) data.authorInfos = authorInfos;
       return data;
     },
     initDocumentForm(data) {
@@ -431,6 +579,7 @@ export default {
         abstract = '',
         abstractEN = '',
         origin = '',
+        authorInfos= [],
       } = data;
       this.title = title;
       if(content) {
@@ -443,6 +592,7 @@ export default {
       this.abstract = abstract;
       this.abstractEN = abstractEN;
       this.originState = origin;
+      this.authorInfos = authorInfos;
     },
     emitContentChangeEvent() {
       const data = this.getDocumentForm();

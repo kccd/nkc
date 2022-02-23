@@ -124,6 +124,11 @@ const schema = new mongoose.Schema({
     default: 0,
     index: 1
   },
+  authorInfos: {
+    type: [Object],
+    default: [],
+    index: 1
+  },
   // 文档内容字数 排除了 html 标签
   wordCount: {
     type: Number,
@@ -252,6 +257,7 @@ schema.statics.checkDocumentType = async (type) => {
 *   @param {Date} toc 创建时间
 *   @param {String} source 来源 参考 DocumentModel.statics.getDocumentSources
 *   @param {String} sid 来源所对应的 ID
+*   @param {Array} authorInfos 作者信息
 * @return {Object} document schema 对象
 * */
 schema.statics.createBetaDocument = async (props) => {
@@ -265,6 +271,7 @@ schema.statics.createBetaDocument = async (props) => {
     abstract = '',
     abstractEN = '',
     origin = '',
+    authorInfos = [],
     uid,
     toc,
     source,
@@ -294,6 +301,7 @@ schema.statics.createBetaDocument = async (props) => {
     abstract,
     abstractEN,
     origin,
+    authorInfos,
     toc,
     dt: toc,
     type: (await DocumentModel.getDocumentTypes()).beta,
@@ -510,7 +518,8 @@ schema.statics.updateDocumentByDid = async (did, props) => {
     keywords,
     keywordsEN,
     tlm,
-    origin
+    origin,
+    authorInfos
   } = props;
   const AttachmentModel = mongoose.model('attachments');
   const DocumentModel = mongoose.model('documents');
@@ -535,7 +544,8 @@ schema.statics.updateDocumentByDid = async (did, props) => {
       keywordsEN,
       wordCount,
       tlm,
-      origin
+      origin,
+      authorInfos
     }
   });
   const _betaDocument = await DocumentModel.findOnly({_id: betaDocument._id});
