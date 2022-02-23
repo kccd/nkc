@@ -61,7 +61,7 @@
       .form-group(v-if="formConfigs.selectCategory && column.userColumn && !column.addedToColumn")
         .m-b-2
           .editor-header 专栏文章分类
-          select-column-categories(ref="selectColumnCategories")
+          select-column-categories(ref="selectColumnCategories" @change="categoryChange")
 
 </template>
 
@@ -275,6 +275,10 @@ export default {
   methods: {
     getLength: getLength,
     getUrl: getUrl,
+    //专栏分类发生改变
+    categoryChange() {
+      this.selectCategory = this.getSelectCategory();
+    },
     //编辑器准备完成填入数据
     editorReady() {
       this.$emit('ready');

@@ -5,34 +5,41 @@ router
     await next();
   })
   .get('/editor', async (ctx, next) => {
-    const {query, data, db, state} = ctx;
-    const {bid, aid} = query;
-    const book = await db.BookModel.findOnly({_id: bid});
-    const bookPermission = await book.getBookPermissionForUser(state.uid);
-    if(!bookPermission) return ctx.throw(400, '权限不足');
+    //获取独立文章信息
+    const {query, state, db, data} = ctx;
+    const {aid, mid} = query;
+    let document;
+    let article;
+    let articles;
+    const editorInfo = {};
     if(aid) {
-      await book.checkArticleId(aid);
-      const article = await db.ArticleModel.findOnly({_id: aid});
-      const {
-        title,
-        cover,
-        content,
-        did,
-        _id
-      } = await article.getEditorBetaDocumentContent();
-      data.article = {
-        articleId: article._id,
-        title,
-        cover,
-        content,
-        did,
-        _id
-      };
+      //通过aid获取article
+      article = await db.ArticleModel.findOnly({_id: aid, uid: state.uid});
+      if(!article) ctx.throw(400, '未找到article,请刷新后重试');
+      if(article.status === 'deleted') ctx.throw(403, '权限不足');
+      const documentSource = (await db.DocumentModel.getDocumentSources()).article;
+      document = await db.DocumentModel.getBetaDocumentContentBySource(documentSource, article._id);
+      if(document) {
+        editorInfo.document = document;
+      }
+      data.articleId = article._id;
+    } else {
+      //通过columnId获取article
+      const articleStatus = (await db.ArticleModel.getArticleStatus())['default'];
+      articles = await db.ArticleModel.find({sid: mid, uid: state.uid, status: articleStatus, hasDraft: true}).sort({toc: -1}).limit(3);
+      const options = [
+        'title',
+      ];
+      articles = await db.ArticleModel.extendDocumentsOfArticles(articles, options);
     }
-    data.book = {
-      _id: book._id,
-      name: book.name
-    };
+    
+    if(article) {
+      editorInfo.article = article;
+    }
+    if(articles) {
+      editorInfo.articles = articles;
+    }
+    data.editorInfo = editorInfo;
     await next();
   })
   .post('/editor', async (ctx, next) => {
@@ -49,7 +56,8 @@ router
       keywordsEN,
       abstract,
       abstractEN,
-      origin
+      origin,
+      selectCategory,
     } = JSON.parse(fields.article);
     let article;
     if(type === 'create') {
@@ -81,7 +89,9 @@ router
         origin
       });
       if(type === 'publish') {
-        await article.publishArticle();
+        //判断用户是否选择文章专栏分类
+        if(source === 'column' && selectCategory.selectedMainCategoriesId.length === 0) ctx.throw(401, '未选择文章专栏分类');
+        await article.publishArticle({source, selectCategory});
       } else if(type === 'save') {
         await article.saveArticle();
       }

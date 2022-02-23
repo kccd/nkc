@@ -37,6 +37,6 @@ router
     }
     data.editorInfo = editorInfo;
     await next();
-})
+  })
 
 module.exports = router;

@@ -104,6 +104,21 @@ schema.statics.getArticleStatus = async () => {
 };
 
 /*
+* 改变article的status
+* @param {String} status 需要改变的状态
+* */
+schema.methods.changeArticleStatus = async function(status) {
+  const ArticleModel = mongoose.model('articles');
+  const articleStatus = await ArticleModel.getArticleStatus();
+  if(!articleStatus[status]) throw(400, `不存在状态 ${status}`);
+  await this.updateOne({
+    $set: {
+      status,
+    }
+  });
+}
+
+/*
 * 获取 source
 * */
 schema.statics.getArticleSources = async () => {
@@ -309,9 +324,19 @@ schema.methods.modifyArticle = async function(props) {
 * 如果有正式版就将正式版设为历史
 * 将测试版设为正式版
 * */
-schema.methods.publishArticle = async function() {
+schema.methods.publishArticle = async function(options) {
+  const ArticleModel = mongoose.model('articles');
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const {normal} = await ArticleModel.getArticleStatus();
+  const {source,selectCategory} = options;
   const DocumentModel = mongoose.model('documents');
   const {did} = this;
+  //将当前article的状态改为正常
+  await this.changeArticleStatus(normal);
+  //如果发表专栏的文章就将创建文章专栏分类引用记录
+  if(source === 'column') {
+    await ColumnPostModel.createColumnPost(this, selectCategory);
+  }
   await DocumentModel.publishDocumentByDid(did);
 }
 
@@ -640,6 +665,25 @@ schema.methods.changeHasDraftStatus = async function() {
 * 拓展article下的document
 * @param {Object} articles 需要拓展document的article
 * @param {Array} options article需要拓展document的内容
+* document: [
+*   _id,
+*   title,
+*   content,
+*   uid,
+*   cover,
+*   keywordsEN,
+*   keywords,
+*   abstractEN,
+*   abstract,
+*   reviewed,
+*   wordCount,
+*   ip,
+*   port,
+*   did,
+*   toc,
+*   type，
+*   source,
+* ]
 * */
 schema.statics.extendDocumentsOfArticles = async function(articles, options) {
   const DocumentModel = mongoose.model('documents');

@@ -100,6 +100,12 @@ export default {
     }
   },
   watch: {
+    selectedMainCategoriesId() {
+      this.$emit('change');
+    },
+    selectedMinorCategoriesId() {
+      this.$emit('change');
+    }
   },
   methods: {
     getRequest: getRequest,
