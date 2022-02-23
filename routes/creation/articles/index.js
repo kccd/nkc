@@ -58,6 +58,7 @@ router
       abstractEN,
       origin,
       selectCategory,
+      authorInfos,
     } = JSON.parse(fields.article);
     let article;
     if(type === 'create') {
@@ -72,7 +73,8 @@ router
         abstractEN,
         origin,
         source,
-        sid
+        sid,
+        authorInfos
       });
     } else {
       //编辑或发布
@@ -86,11 +88,16 @@ router
         keywordsEN,
         abstract,
         abstractEN,
-        origin
+        origin,
+        authorInfos
       });
       if(type === 'publish') {
         //判断用户是否选择文章专栏分类
         if(source === 'column' && selectCategory.selectedMainCategoriesId.length === 0) ctx.throw(401, '未选择文章专栏分类');
+        //检测文章专栏分类是否有效
+        if(selectCategory.selectedMainCategoriesId.length !== 0 || selectCategory.selectedMinorCategoriesId.length !== 0) {
+          await db.ColumnPostCategoryModel.checkColumnCategory(selectCategory);
+        }
         await article.publishArticle({source, selectCategory});
       } else if(type === 'save') {
         await article.saveArticle();

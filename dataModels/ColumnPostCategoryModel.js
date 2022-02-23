@@ -392,4 +392,22 @@ schema.methods.getChildCategories = async function() {
   });
 }
 
+/*
+* 检测专栏分类是否合法
+* */
+schema.statics.checkColumnCategory = async function(selectCategory) {
+  const {selectedMainCategoriesId, selectedMinorCategoriesId} = selectCategory;
+  const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
+  const arr = selectedMainCategoriesId.concat(selectedMinorCategoriesId);
+  const categories = await ColumnPostCategoryModel.find({_id: {$in: arr}});
+  const obj = {};
+  for(const category of categories) {
+    obj[category._id] = category;
+  }
+  for(const id of arr) {
+    const category = obj[id];
+    if(!category) throwErr(401, `分类Id ${id}无效`);
+  }
+}
+
 module.exports = mongoose.model("columnPostCategories", schema);

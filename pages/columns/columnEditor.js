@@ -1,9 +1,9 @@
 import DocumentEditor from "../lib/vue/DocumentEditor";
 import {getDataById} from "../lib/js/dataConversion";
+const data = getDataById('data');
 import {getRequest, timeFormat} from "../lib/js/tools";
 import {nkcAPI} from "../lib/js/netAPI";
 import {screenTopWarning} from "../lib/js/topAlert";
-const data = getDataById('data');
 const columnEditor = new Vue({
   el: '#columnEditor',
   data: () => {
@@ -21,6 +21,7 @@ const columnEditor = new Vue({
         abstractEN: true,
         origin: true,
         selectCategory: true,
+        authorInfos: true,
       },
       coverFile : null,
       oldCoverFile: null,
@@ -33,7 +34,8 @@ const columnEditor = new Vue({
         abstract: '',
         abstractEN: '',
         originState: '',
-        selectCategory: '',
+        selectCategory: [],
+        authorInfos: [],
       },
       lockPost: false,
       // 是否允许触发contentChange
@@ -94,6 +96,7 @@ const columnEditor = new Vue({
             abstract,
             abstractEN,
             origin,
+            authorInfos,
           } = data.editorInfo.document;
           self.cover = cover;
           self.article = {
@@ -105,6 +108,7 @@ const columnEditor = new Vue({
             abstract,
             abstractEN,
             origin,
+            authorInfos,
           };
           self.setContent(self.article);
         } else if(data.editorInfo.articles) {
@@ -139,7 +143,7 @@ const columnEditor = new Vue({
     },
     //查看更多草稿
     more() {
-     window.location.href = '';
+     window.location.href = '/creation/column/draft';
     },
     //在编辑器中写入数据库
     initDocumentForm() {
@@ -187,7 +191,8 @@ const columnEditor = new Vue({
         abstract = '',
         abstractEN = '',
         origin = '',
-        selectCategory = ''
+        selectCategory = [],
+        authorInfos = []
       } = this.article;
       const article = {
         title,
@@ -198,7 +203,8 @@ const columnEditor = new Vue({
         abstract,
         abstractEN,
         origin,
-        selectCategory
+        selectCategory,
+        authorInfos
       };
       if(articleId) {
         formData.append('articleId', articleId);
@@ -264,7 +270,9 @@ const columnEditor = new Vue({
     publish() {
       //检测是否勾选文章专栏分类
       if(!this.article.title) return sweetWarning('请输入文章标题');
-      if(!this.article.selectCategory || this.article.selectCategory.selectedMainCategoriesId.length === 0) return sweetWarning('请选择文章专栏主分类');
+      if(!this.article.selectCategory
+        || (this.article.selectCategory.selectedMainCategoriesId.length === 0
+          && this.article.selectCategory.selectedMinorCategoriesId.length === 0)) return sweetWarning('请选择文章专栏分类');
       this.post('publish');
     },
     //保存文章
@@ -292,7 +300,8 @@ const columnEditor = new Vue({
         abstract,
         abstractEN,
         originState,
-        selectCategory
+        selectCategory,
+        authorInfos,
       } = data;
       this.coverFile = coverFile;
       this.article = {
@@ -303,7 +312,8 @@ const columnEditor = new Vue({
         abstract,
         abstractEN,
         origin: originState,
-        selectCategory
+        selectCategory,
+        authorInfos
       };
       this.modifyArticle();
     },

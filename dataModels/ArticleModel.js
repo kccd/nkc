@@ -224,7 +224,8 @@ schema.statics.createArticle = async (props) => {
     abstractEN,
     origin,
     source,
-    sid
+    sid,
+    authorInfos
   } = props;
   const toc = new Date();
   const ArticleModel = mongoose.model('articles');
@@ -245,6 +246,7 @@ schema.statics.createArticle = async (props) => {
     toc,
     source: documentSource,
     sid: aid,
+    authorInfos
   });
   const article = new ArticleModel({
     _id: aid,
@@ -348,6 +350,7 @@ schema.methods.deleteArticleAndReferences = async function() {
 *   @param {String} abstract 摘要中文
 *   @param {String} abstractEN 摘要英文
 *   @param {Boolean} origin 是否原创
+*   @param {Array} authorInfos 作者信息
 * */
 schema.methods.modifyArticle = async function(props) {
   const DocumentModel = mongoose.model('documents');
@@ -360,7 +363,8 @@ schema.methods.modifyArticle = async function(props) {
     keywordsEN,
     abstract,
     abstractEN,
-    origin
+    origin,
+    authorInfos
   } = props;
   const {did} = this;
   const toc = new Date();
@@ -375,6 +379,7 @@ schema.methods.modifyArticle = async function(props) {
     abstract,
     abstractEN,
     origin,
+    authorInfos,
     tlm: toc,
   });
   await this.updateOne({
