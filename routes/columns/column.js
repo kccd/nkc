@@ -11,6 +11,7 @@ const contactRouter = require("./contact");
 const topRouter = require("./top");
 const hotRouter = require('./hot');
 const pageRouter = require("./page");
+const articleRouter = require("./article");
 router
   .use("/", async (ctx, next) => {
     const {db, params, data, nkcModules} = ctx;
@@ -244,5 +245,6 @@ router
   .use("/page", pageRouter.routes(), pageRouter.allowedMethods())
   .use("/top", topRouter.routes(), topRouter.allowedMethods())
   .use("/hot", hotRouter.routes(), hotRouter.allowedMethods())
-  .use("/settings", settingsRouter.routes(), settingsRouter.allowedMethods());
+  .use("/settings", settingsRouter.routes(), settingsRouter.allowedMethods())
+  .use("/a", articleRouter.routes(), articleRouter.allowedMethods())
 module.exports = router;

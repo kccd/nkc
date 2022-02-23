@@ -1,0 +1,63 @@
+mixin content(data)
+  .article.col-xs-12.col-md-8.col-md-offset-2
+    header
+      p.path-navigation
+        a.jump(href='/') 主页
+        span >
+        a.jump(href=`/m`) 专栏
+        span >
+        a.jump(href=`/m/${data.column._id}`)=data.column.name
+      p.info-list
+        span.info-list-column-conmon
+          span 文号
+          span=data.thread.oc  
+        span.info-list-column-conmon
+          span.fa.fa-eye=data.thread.hits 
+          span.info-list-column-conmon
+          span.fa.fa-comment=data.thread.count 
+        span.info-list-column-conmon
+          span 收藏
+          span=data.collectedCount 
+        span.fa.fa-cog.info-list-column-conmon(onclick="showSetUp()")
+    .set-up 
+      include ./articleSetup.pug
+    .article-head
+      h1.article-title=data.post.t
+      p
+        for authorInfo in data.post.authorInfos
+          span.article-author=authorInfo.name
+          span.fa.fa-envelope-open-o(onclick='displayAuthor()')
+      p
+        for authorInfo in data.post.authorInfos
+          span=authorInfo.agency
+      .article-info
+        a.author.jump.info-list-column-conmon(href=`/u/${data.post.uid}` target="_blank" data-float-uid=`${data.post.uid}`)
+          img.head-portrait(src="")
+          for authorInfo in data.post.authorInfos
+            span.kcid=authorInfo.kcid 
+        span.modify-time.info-list-column-conmon=data.post.toc
+        if ['3','4','5','6'].includes(data.post.originState)
+          span.info-list-column-conmon.origin 原创
+        a.column.jump.info-list-column-conmon(href=`/m/${data.column._id}` target="_blank")=data.column.name
+    p.abstract-title.line-title 中文摘要
+    p.cn-abstract
+      //- for abstract,i in data.abstractCn 
+      span=data.post.abstractCn
+    p.en-abstract.line-title Abstract
+      //- for abstract,i in data.abstractEn 
+      span=data.post.abstractEn
+    .key-word 
+      p.line-title 关键词
+      p.cn-key-word.key-word-conmon
+        for keyWord,i in data.post.keyWordsCn 
+          span=keyWord
+      p.en-key-word.key-word-conmon
+        for keyWord,i in data.post.keyWordsEn 
+          span=keyWord
+    section.content 
+      p.content-title.line-title 正文
+      article.content-article!=data.post.c
+  include ./articleAuthorInfo.pug
+  #vueMountPoint
+    <float-user-panel ref='floatUserPane'></float-user-panel>
+

@@ -1,0 +1,11 @@
+extends ../bootstrap_base
+block title
+  title=data.article.t
+  +includeCSS('/columns/article_content.css')
+block content
+  .container-fluid.max-width
+    include ./article_content.pug 
+    +content(data.article)
+block scripts 
+ +includeJS('/columns/article.js')
+

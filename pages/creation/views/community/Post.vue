@@ -1,12 +1,24 @@
 <template lang="pug">
-  .community-post 社区回复
+  <community-content  :iframeUrl="iframeUrl"></community-content>
 </template>
 
 
 <script>
-export default {
-  data: () => ({
+import CommunityContent from '../../components/CommunityContent.vue'
+import  {getState} from '../../../lib/js/state.js'
 
-  })
+export default {
+  components:{
+    "community-content": CommunityContent
+  },
+  data: () => ({
+    iframeUrl:'',
+    uid:''
+  }),
+  created(){
+    const user = getState();
+    this.uid = user.uid;
+    this.iframeUrl = `/u/${user.uid}/profile/post?type=hidden`
+  }
 }
 </script>

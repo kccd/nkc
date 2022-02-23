@@ -29,6 +29,7 @@ router
     data.draftsData = [];
     if(count > 0) {
       const paging = nkcModules.apiFunction.paging(page, count, Number(quota));
+      data.paging = paging;
       const columnArticles =await db.ArticleModel.find(queryCriteria)
         .sort({toc: -1})
         .skip(paging.start)

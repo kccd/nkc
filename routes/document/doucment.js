@@ -19,7 +19,7 @@ router
     // 默认返回第一项内容
     data.document = data.history[0]
     data.bookId = bid
-    data.ids = {did: data.document.did,_id:data.document._id}
+    data.ids = {did: data.document.did, _id:data.document._id}
   }else{
     data.document = '',
     data.bookId = ''

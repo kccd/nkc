@@ -4,7 +4,7 @@
       span.b-b(@click="toggle('drafts')" :class="{active : draftsType === 'drafts'}") 自定义 
       span |
       span.m-r-05.b-b(@click="toggle('column')" :class="{active : draftsType === 'column'}") 专栏
-      p.btn-container(v-show="draftsType === 'drafts'")
+      p.m-t-2(v-show="draftsType === 'drafts'")
         button.m-r-05.btn.btn-default.btn-sm(@click="newDraft") 新建图文片段
         button.btn.btn-default.btn-sm(@click="toTrash" ) 回收站
     .m-b-1(v-else)
@@ -39,9 +39,6 @@
   }
   .active{
     color: orange;
-  }
-  .btn-container{
-    margin-top:10px;
   }
   .drafts{
     .draft-item{

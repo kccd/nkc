@@ -60,3 +60,5 @@
               .add-note(v-if="!note.edit")
                 .fa.fa-plus(@click="addNote(note)" title="添加笔记") &nbsp;添加笔记
   include ../../publicModules/paging/paging_input
+  block scripts 
+    +includeJS("/user/profile/note.js")

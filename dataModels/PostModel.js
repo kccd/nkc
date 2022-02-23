@@ -382,6 +382,7 @@ postSchema.virtual('usersVote')
     this._usersVote = t
   });
 
+
 postSchema.methods.extendThread = async function() {
   const ThreadModel = mongoose.model('threads');
   return this.thread = await ThreadModel.findOnly({tid: this.tid})
@@ -852,6 +853,11 @@ const defaultOptions = {
   quote: true, // 仅支持同一篇文章
   toDraftReason: false
 };
+postSchema.statics.getPostByPid = async (pid)=>{
+  const PostModel = mongoose.model("posts");
+  return  PostModel.findOne({pid})
+
+}
 //拓展文章评论
 postSchema.statics.extendPost = async (post, options) => {
   const PostModel = mongoose.model("posts");

@@ -16,7 +16,7 @@ block content
                 a.app-nav(href=link.url class=link.type===data.type?"active":"" data-type="reload")=link.name
 
       else
-        .col-xs-12.col-md-3.box-shadow-panel
+        .col-xs-12.col-md-3.box-shadow-panel.user-info-list
           if data.type
             .account-nav-xs.hidden-md.hidden-lg=data.name
           .account-nav(class=data.type?"hidden-sm hidden-xs":"")
@@ -183,7 +183,7 @@ block content
           include ./subscribe/forum
       if !state.isApp
         .col-xs-12.col-md-2.box-shadow-panel.hidden-sm.hidden-xs
-          .account-nav
+          .account-nav.shopping-cart
             .account-user-links
               .account-user-links
                 a(href=`/shop/order`).col-xs-12.account-user-link
@@ -215,3 +215,5 @@ block scripts
   +includeJS("/user/profile/profile.js")
   if data.type === "note"
     +includeJS("/user/profile/note.js")
+
+  +includeJS('/user/profile/hidden.js')
