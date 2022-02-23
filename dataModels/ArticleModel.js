@@ -497,7 +497,7 @@ schema.statics.extendArticlesList = async (articles) => {
     } = article;
     const stableDocument = stableDocumentsObj[articleId];
     if(!stableDocument) continue;
-    let column = null;
+    let column;
     let articleUrl = tools.getUrl('aloneArticle', articleId);
     if(source === columnSource) {
       const targetColumn = columnsObj[sid];
@@ -529,6 +529,87 @@ schema.statics.extendArticlesList = async (articles) => {
   }
   return articlesList;
 }
+
+/*
+* 拓展独立文章草稿页列表，用于显示文章草稿列表
+* @param {[Article]}
+* @return {[Object]}
+*   @param {String} type 表示草稿类型 create(新写文章) modify(编辑文章)
+*   @param {String} articleId 文章 ID
+*   @param {String} title 文章标题
+*   @param {String} content 文章摘要
+*   @param {String} coverUrl 封面图链接
+*   @param {String} time 格式化之后的文章内容创建时间
+*   @param {String} mTime 格式化之后的文章内容最后修改时间
+*   @param {Object} column
+*     @param {Number} _id 专栏 ID
+*     @param {String} name 专栏名称
+*     @param {String} description 专栏介绍
+*     @param {String} homeUrl 专栏首页链接
+* */
+schema.statics.extendArticlesDraftList = async (articles) => {
+  const ArticleModel = mongoose.model('articles');
+  const DocumentModel = mongoose.model('documents');
+  const ColumnModel = mongoose.model('columns');
+  const nkcRender = require('../nkcModules/nkcRender');
+  const tools = require('../nkcModules/tools');
+  const {column: columnSource} = await ArticleModel.getArticleSources();
+  const {article: articleSource} = await DocumentModel.getDocumentSources();
+  const articlesId = [];
+  const columnsId = [];
+  for(const article of articles) {
+    if(article.source === columnSource) {
+      columnsId.push(article.sid);
+    }
+    articlesId.push(article._id);
+  }
+  const betaDocumentsObject = await DocumentModel.getBetaDocumentsBySource(
+    articleSource,
+    articlesId,
+    'object'
+  );
+  const columnsObj = await ColumnModel.getColumnsById(columnsId, 'object');
+  const results = [];
+  for(const article of articles) {
+    const betaDocument = betaDocumentsObject[article._id];
+    if(!betaDocument) continue;
+    let column;
+    if(article.source === columnSource) {
+      const targetColumn = columnsObj[article.sid];
+      if(targetColumn) {
+        column = {
+          _id: targetColumn._id,
+          name: targetColumn.name,
+          description: targetColumn.description,
+          homeUrl: tools.getUrl('columnHome', targetColumn._id)
+        };
+      }
+    }
+    const {
+      title,
+      content,
+      toc,
+      tlm,
+      cover,
+    } = betaDocument;
+    const {
+      _id: articleId,
+      status,
+    } = article;
+
+    results.push({
+      type: status === 'default'? 'create': 'modify',
+      articleId,
+      title,
+      content: nkcRender.htmlToPlain(content, 200),
+      coverUrl: tools.getUrl('documentCover', cover),
+      column,
+      time: moment(toc).format(`YYYY/MM/DD`),
+      mTime: tools.fromNow(tlm),
+    });
+  }
+  return results;
+};
 
 /*
 * 通过article获取document信息

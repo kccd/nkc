@@ -25,6 +25,10 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  // 与 type 类型对应的 ID
+  // type: post, pid 表示 post.pid
+  // type: thread, pid 表示 thread.oc
+  // type: article, pid 表示 article._id
   pid: {
     type: String,
     required: true,
@@ -35,7 +39,10 @@ const schema = new Schema({
     required: true,
     index: 1
   },
-  // 内容类型 post: 回复, thread: 文章
+  // 内容类型
+  // post: 回复
+  // thread: 文章
+  // article: 文章（包含空间文章、专栏文章等）
   type: {
     type: String,
     required: true,

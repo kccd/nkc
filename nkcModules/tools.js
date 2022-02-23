@@ -214,6 +214,9 @@ var Tools = function() {
       case 'columnArticle': {
         return '/m/' + id + '/a/' + size;
       }
+      case 'columnArticleEditor': {
+        return '/column/editor?mid=' + id + '&aid=' + size;
+      }
     }
   };
   self.getAnonymousInfo = function() {

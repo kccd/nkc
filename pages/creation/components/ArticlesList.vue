@@ -9,8 +9,8 @@
     .article-item-container{
       margin-bottom: 2rem;
     }
-    &.article-item-container:last-child{
-      margin-bottom: 0;
+    & .article-item-container:last-child{
+      margin-bottom: 0.5rem;
     }
   }
 

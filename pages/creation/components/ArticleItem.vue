@@ -6,11 +6,11 @@
       //.article-content {{article.content}}
       .article-info
         .article-time {{article.time}}
-        .article-from 引用自社区
+        .article-from 发表
         .article-count 点赞 {{article.voteUp}} 阅读 {{article.hits}} 评论 {{article.comment}}
       .article-options
-        .article-option 修改
-        .article-option 删除
+        .article-option(@click="navToEditor(article)") 修改
+        .article-option(@click="removeArticle(article)") 删除
 </template>
 
 <style lang="less">
@@ -39,10 +39,10 @@
         height: 2rem;
         line-height: 2rem;
         .hideText(@line: 1);
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.8rem;
       }
       .article-info{
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.8rem;
         &>div{
           display: inline-block;
           margin-right: 0.5rem;
@@ -57,8 +57,11 @@
       .article-options{
         .article-option{
           display: inline-block;
-          margin-right: 0.5rem;
+          margin-right: 1rem;
           cursor: pointer;
+          &:active{
+            color: @primary;
+          }
         }
       }
     }
@@ -66,10 +69,28 @@
 </style>
 
 <script>
+  import {visitUrl} from "../../lib/js/pageSwitch";
+  import {getUrl} from "../../lib/js/tools";
+
+  import {sweetQuestion} from "../../lib/js/sweetAlert";
+
   export default {
     props: ['article'],
     data: () => ({
 
-    })
+    }),
+    methods: {
+      navToEditor(article) {
+        const url = getUrl('columnArticleEditor', article.column._id, article.articleId);
+        visitUrl(url, true);
+      },
+      removeArticle() {
+        sweetQuestion(`确定要删除文章？当前操作不可恢复。`)
+          .then(() => {
+
+          })
+          .catch(sweetError);
+      }
+    }
   }
 </script>
