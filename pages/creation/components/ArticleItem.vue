@@ -2,8 +2,8 @@
   .article-item(:class="{'hasCover': !!article.coverUrl}")
     .article-cover(v-if="article.coverUrl" :style="'background-image: url('+article.coverUrl+')'")
     .article-body
-      a.article-title(:href="article.articleUrl" target="_blank") {{article.title}}
-      //.article-content {{article.content}}
+      .article-title
+        a(:href="article.articleUrl" target="_blank") {{article.title}}
       .article-info
         .article-time {{article.time}}
         .article-from 发表
@@ -33,13 +33,15 @@
     }
     .article-body{
       .article-title{
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #333;
         height: 2rem;
         line-height: 2rem;
         .hideText(@line: 1);
         margin-bottom: 0.8rem;
+        a{
+          font-size: 1.6rem;
+          font-weight: 700;
+          color: #333;
+        }
       }
       .article-info{
         margin-bottom: 0.8rem;
@@ -70,8 +72,6 @@
 
 <script>
   import {visitUrl} from "../../lib/js/pageSwitch";
-  import {getUrl} from "../../lib/js/tools";
-
   import {sweetQuestion} from "../../lib/js/sweetAlert";
 
   export default {
@@ -81,8 +81,7 @@
     }),
     methods: {
       navToEditor(article) {
-        const url = getUrl('columnArticleEditor', article.column._id, article.articleId);
-        visitUrl(url, true);
+        visitUrl(article.articleEditorUrl, true);
       },
       removeArticle() {
         sweetQuestion(`确定要删除文章？当前操作不可恢复。`)

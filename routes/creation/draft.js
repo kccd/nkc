@@ -25,7 +25,6 @@ router
       await next();
     }
     else if(type === 'column'){
-      await db.ArticleModel.deleteColumnAricleByArticleId(id)
       await next()
     }
   })

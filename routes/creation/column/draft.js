@@ -17,22 +17,7 @@ router
       .skip(paging.start)
       .limit(paging.perpage);
     data.articlesDraftList = await db.ArticleModel.extendArticlesDraftList(articles);
-    /*for (const item of columnArticles) {
-      articlesId.push(item._id);
-    }
-    const articleBetaDocumentsObject = await db.ArticleModel.getBetaDocumentsObjectByArticlesId(articlesId);
-    for(const article of columnArticles) {
-      const betaDocument = articleBetaDocumentsObject[article._id];
-      if(!betaDocument) continue;
-      const {title, content, toc} = betaDocument;
-      data.draftsData.push({
-        title,
-        content: nkcModules.nkcRender.htmlToPlain(content, 200),
-        time: nkcModules.tools.timeFormat(toc),
-        articleId: article._id,
-        columnId: article.sid
-      });
-    }*/
+    data.paging = paging;
     await next()
   });
 module.exports = router;

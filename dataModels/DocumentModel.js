@@ -384,33 +384,24 @@ schema.methods.setAsEditDocument = async function() {
     }
   });
 };
-// schema.statics.getStableDocumnetBySid = async(sid) =>{
-//   const DocumentModel = mongoose.model('documents');
-//   const stableColumn = await DocumentModel.findOne({
-//     sid,
-//     type: DocumentModel.getDocumentTypes().stable
-//   });
-//   return stableColumn
-// }
- //将 专栏编辑版改为历史版
-schema.statics.setBetaAsHistoryDocumentById = async (sid) =>{
+
+/*
+* 将 document 由编辑版设为历史版
+* @param {String} source document 来源
+* @param {String} sid document 来源所对应的 ID
+* */
+//将专栏编辑版改为历史版
+schema.statics.setBetaDocumentAsHistoryBySource = async (source, sid) =>{
   const DocumentModel = mongoose.model('documents');
-  const source = (await DocumentModel.getDocumentSources()).article
-  const history = (await DocumentModel.getDocumentTypes()).history
-  const beta = (await DocumentModel.getDocumentTypes()).beta
-  await DocumentModel.updateOne(
-  {
-    sid,
-    source,
-    type: beta,
-  },
-  {
-    $set:{
-      type:history,
+  const historyType = (await DocumentModel.getDocumentTypes()).history
+  const betaDocument = await DocumentModel.getBetaDocumentBySource(source, sid);
+  if(!betaDocument) return;
+  await betaDocument.updateOne({
+    $set: {
+      type: historyType,
       tlm: new Date()
     }
-  }
-  )
+  });
 }
 /*
 * 将当前版本修改为历史版

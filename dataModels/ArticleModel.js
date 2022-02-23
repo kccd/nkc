@@ -237,26 +237,34 @@ schema.methods.getBetaDocumentCoverId = async function() {
   const betaDocument = await DocumentModel.getBetaDocumentBySource(documentSource, this._id);
   return betaDocument? betaDocument.cover: '';
 };
-schema.statics.deleteColumnAricleByArticleId = async (aid)=>{
+
+/*
+* 删除文章的草稿
+* */
+schema.methods.deleteDraft = async function() {
   const DocumentModel = mongoose.model('documents');
   const ArticleModel = mongoose.model('articles');
-  /// document 放到doucument上进行更改
+  const {_id: articleId, status} = this;
+  const {article: articleSource} = await DocumentModel.getDocumentSources();
+  const {
+    cancelled: cancelledStatus,
+    default: defaultStatus,
+  } = await ArticleModel.getArticleStatus();
 
-  // const publishedColumn = await DocumentModel.getStableDocumnetBySid(aid);
-  let updateKey = {hasDraft: false, status: 'cancelled', tlm: new Date()}
-  // if(publishedColumn) updateKey.status = 'deleted'
-  const source = (await ArticleModel.getArticleSources()).column
-  await ArticleModel.updateOne(
-    {
-      _id: aid,
-      source
-    }, {
-      $set:updateKey
-    })
-  await DocumentModel.setBetaAsHistoryDocumentById(aid)
+  // 如果是未发布过的文章，则需要将文章状态改为 cancelled（取消发表）
+  if(status === defaultStatus) {
+    await this.updateOne({
+      $set: {
+        status: cancelledStatus,
+        hasDraft: false,
+        tlm: new Date()
+      }
+    });
+  }
 
-  // 如果columnArticles 有两条数据 那么 一定是有一个 编辑版 一个发布版吗
-}
+  await DocumentModel.setBetaDocumentAsHistoryBySource(articleSource, articleId);
+  await this.changeHasDraftStatus();
+};
 /*
 * 修改article
 * @param {Object} props
@@ -448,6 +456,32 @@ schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
 }
 
 /*
+* 返回文章页链接和编辑器链接
+* @param {String} articleId 文章 ID
+* @param {String} source 文章来源
+* @param {String} sid 文章来源所对应的 ID
+* @return {Object}
+*   @param {String} editorUrl 文章编辑器 url
+*   @param {String} articleUrl 文章的显示页 url
+* */
+schema.statics.getArticleUrlBySource = async function(articleId, source, sid) {
+  const tools = require('../nkcModules/tools');
+  const ArticleModel = mongoose.model('articles');
+  const {column: columnSource} = await ArticleModel.getArticleSources();
+  let editorUrl = '';
+  let articleUrl = '';
+  if(source === columnSource) {
+    editorUrl = tools.getUrl('columnArticleEditor', sid, articleId);
+    articleUrl = tools.getUrl('columnArticle', sid, articleId);
+  }
+
+  return {
+    editorUrl,
+    articleUrl,
+  }
+}
+
+/*
 * 拓展独立文章列表，用于显示文章列表
 * @param {[Article]}
 * @return {[Object]}
@@ -455,6 +489,7 @@ schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
 *   @param {String} articleSourceId 来源 ID
 *   @param {String} articleId 文章 ID
 *   @param {String} articleUrl 文章链接
+*   @param {String} articleEditorUrl 文章编辑器链接
 *   @param {Number} hits 阅读量
 *   @param {Number} voteUp 点赞数
 *   @param {Number} comment 评论数
@@ -502,7 +537,7 @@ schema.statics.extendArticlesList = async (articles) => {
     const stableDocument = stableDocumentsObj[articleId];
     if(!stableDocument) continue;
     let column;
-    let articleUrl = tools.getUrl('aloneArticle', articleId);
+    const {articleUrl, editorUrl} = await ArticleModel.getArticleUrlBySource(articleId, source, sid);
     if(source === columnSource) {
       const targetColumn = columnsObj[sid];
       if(targetColumn) {
@@ -512,7 +547,6 @@ schema.statics.extendArticlesList = async (articles) => {
           description: targetColumn.description,
           homeUrl: tools.getUrl('columnHome', targetColumn._id)
         };
-        articleUrl = tools.getUrl('columnArticle', column._id, articleId);
       }
     }
     articlesList.push({
@@ -520,6 +554,7 @@ schema.statics.extendArticlesList = async (articles) => {
       articleSourceId: sid,
       articleId,
       articleUrl,
+      articleEditorUrl: editorUrl,
       voteUp,
       hits,
       comment,
@@ -543,6 +578,8 @@ schema.statics.extendArticlesList = async (articles) => {
 *   @param {String} title 文章标题
 *   @param {String} content 文章摘要
 *   @param {String} coverUrl 封面图链接
+*   @param {String} articleUrl 文章链接
+*   @param {String} articleEditorUrl 文章编辑器链接
 *   @param {String} time 格式化之后的文章内容创建时间
 *   @param {String} mTime 格式化之后的文章内容最后修改时间
 *   @param {Object} column
@@ -599,16 +636,20 @@ schema.statics.extendArticlesDraftList = async (articles) => {
     const {
       _id: articleId,
       status,
+      source,
+      sid
     } = article;
-
+    const {articleUrl, editorUrl} = await ArticleModel.getArticleUrlBySource(articleId, source, sid);
     results.push({
       type: status === 'default'? 'create': 'modify',
       articleId,
-      title,
+      title: title || '未填写',
       content: nkcRender.htmlToPlain(content, 200),
-      coverUrl: tools.getUrl('documentCover', cover),
+      coverUrl: cover? tools.getUrl('documentCover', cover): '',
+      articleUrl,
+      articleEditorUrl: editorUrl,
       column,
-      time: moment(toc).format(`YYYY/MM/DD`),
+      time: tools.timeFormat(toc),
       mTime: tools.fromNow(tlm),
     });
   }
@@ -629,9 +670,10 @@ schema.methods.changeHasDraftStatus = async function() {
     source: article,
     type: beta
   });
+  this.hasDraft = count > 0;
   await this.updateOne({
     $set: {
-      hasDraft: count > 0,
+      hasDraft: this.hasDraft,
     }
   });
 }
