@@ -379,5 +379,11 @@ schema.statics.getLatestThreads = async (columnId, count = 3, fids) => {
   }
   return results;
 };
+/*
+* 创建专栏文章发布引用记录
+* */
+schema.statics.createColumnPost = async function(article, selectCategory) {
+  const {} = this;
+}
 
 module.exports = mongoose.model("columnPosts", schema);

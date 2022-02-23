@@ -444,6 +444,7 @@ schema.statics.createBetaDocumentByStableDocument = async function(did) {
 * */
 schema.statics.publishDocumentByDid = async (did) => {
   const DocumentModel = mongoose.model('documents');
+  const {checkString} = require('../nkcModules/checkData');
   const {stable, beta} = await DocumentModel.getDocumentTypes();
   const type = [stable, beta];
   const documentsObj = {};
@@ -455,7 +456,15 @@ schema.statics.publishDocumentByDid = async (did) => {
     documentsObj[d.type] = d;
   }
   if(!documentsObj.beta) throwErr(400, `不存在编辑版，无需发表`);
-
+  //判断专栏文章编辑版是否填写标题
+  if((documentsObj.beta).source === 'column') {
+    checkString((documentsObj.beta).source, {
+      name: '文章标题',
+      minTextLength: 1,
+      maxLength: 500
+    })
+  }
+  //如果存在正式版就将正式版变为历史版
   if(documentsObj.stable) await documentsObj.stable.setAsHistoryDocument();
   await documentsObj.beta.updateOne({
     $set: {

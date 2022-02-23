@@ -78,7 +78,7 @@ const columnEditor = new Vue({
       if(!mid) return;
       if(this.articleId) aid = this.articleId;
       let url = `/creation/article?mid=${mid}`;
-      if(aid) url = `/creation/article?aid=${aid}&mid=${mid}`
+      if(aid) url = `/creation/articles/editor?aid=${aid}&mid=${mid}`
       return nkcAPI(url, 'GET')
       .then(data => {
         self.articleId = data.articleId;
@@ -262,8 +262,9 @@ const columnEditor = new Vue({
     },
     //发布文章
     publish() {
-      //弹框选择文章专栏分类
-      this.$refs.selectCategory.open();
+      //检测是否勾选文章专栏分类
+      if(!this.article.title) return sweetWarning('请输入文章标题');
+      if(!this.article.selectCategory || this.article.selectCategory.selectedMainCategoriesId.length === 0) return sweetWarning('请选择文章专栏主分类');
       this.post('publish');
     },
     //保存文章
