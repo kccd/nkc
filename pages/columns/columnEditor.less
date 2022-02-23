@@ -1,0 +1,40 @@
+#columnEditor {
+  .article-box {
+    padding: 1rem;
+    width: 100%;
+    background-color: #fcf8e3;
+    position: relative;
+    .article-list {
+      .article-info {
+        display: inline-block;
+        width: 70%;
+        text-align: right;
+        .article-name {
+          float: left;
+          font-size: 1.2rem;
+          color: #a94442;
+        }
+        .article-time {
+          font-size: 1.2rem;
+        }
+      }
+      .article-do {
+        float: right;
+        cursor: pointer;
+        display: inline-block;
+        span {
+          &:hover {
+            color: #a94442;
+          }
+        }
+      }
+    }
+  }
+  .article-more {
+    cursor: pointer;
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    color: #428bca;
+    font-style: italic;
+  }
+}

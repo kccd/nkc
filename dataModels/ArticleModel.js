@@ -67,7 +67,7 @@ const schema = new mongoose.Schema({
   },
   // 其他引用模块类型
   references: {
-    type: String,
+    type: Array,
     default: [],
     index: 1
   }
@@ -133,12 +133,13 @@ schema.statics.createArticle = async (props) => {
     title,
     content,
     coverFile,
-    cover,
     keywords,
     keywordsEN,
     abstract,
     abstractEN,
-    origin
+    origin,
+    source,
+    sid
   } = props;
   const toc = new Date();
   const ArticleModel = mongoose.model('articles');
@@ -151,7 +152,6 @@ schema.statics.createArticle = async (props) => {
     coverFile,
     title,
     content,
-    cover,
     keywords,
     keywordsEN,
     abstract,
@@ -159,14 +159,16 @@ schema.statics.createArticle = async (props) => {
     origin,
     toc,
     source: documentSource,
-    sid: aid
+    sid: aid,
   });
   const article = new ArticleModel({
     _id: aid,
     uid,
     toc,
     did: document.did,
-    status: 'default',
+    source,
+    sid,
+    status: await ArticleModel.getArticleStatus().default,
   });
   await article.save();
   return article;
@@ -225,6 +227,7 @@ schema.methods.modifyArticle = async function(props) {
   } = props;
   const {did} = this;
   const toc = new Date();
+  //更改document
   await DocumentModel.updateDocumentByDid(did, {
     title,
     content,
@@ -455,49 +458,83 @@ schema.statics.extendArticlesList = async (articles) => {
 }
 
 /*
-* 通过article获取document信息
-* @param {Object} article 数据库查询到的article
+* 更改article的hasDraft字段状态
+* @param {Boolean} type 要改变的状态
 * */
-schema.methods.getDocumentForArticle = async function() {
+schema.methods.changeHasDraftStatus = async function() {
+  const {did, uid} = this;
   const DocumentModel = mongoose.model('documents');
-  const {did} = this;
-  const document = await DocumentModel.findOnly({did});
-  const {
-    _id,
-    uid,
-    status,
-    title,
-    content,
-    coverFile,
-    cover,
-    keywords,
-    keywordsEN,
-    abstract,
-    abstractEN,
-    origin,
-    wordCount,
-    sid,
-    source,
-    type,
-  } = document;
-  return {
-    _id,
-    uid,
-    status,
-    title,
-    content,
-    coverFile,
-    cover,
-    keywords,
-    keywordsEN,
-    abstract,
-    abstractEN,
-    origin,
-    wordCount,
-    sid,
-    source,
-    type
+  const {article} = await DocumentModel.getDocumentSources();
+  const {beta} = await DocumentModel.getDocumentTypes();
+  const documents = await DocumentModel.find({did, uid, source: article, type: beta});
+  await this.updateOne({
+    $set: {
+      hasDraft: documents.length !== 0?true:false,
+    }
+  });
+}
+
+// const articlesOptions = {
+//   _id: false,
+//   uid: false,
+//   cover: false,
+//   title: false,
+//   content: false,
+//   keywordsEN: false,
+//   keywords: false,
+//   abstractEN: false,
+//   abstract: false,
+//   wordCount: false,
+//   ip: false,
+//   port: false,
+//   did: false,
+//   toc: false,
+//   type: false,
+//   source: false,
+//   sid: false,
+//   atUsers: false
+// }
+
+/*
+* 拓展article下的document
+* @param {Object} articles 需要拓展document的article
+* @param {Array} options article需要拓展document的内容
+* */
+schema.statics.extendDocumentsOfArticles = async function(articles, options) {
+  const DocumentModel = mongoose.model('documents');
+  const arr = [];
+  const obj = {};
+  const _articles = [];
+  for(const article of articles) {
+    if(article.type === 'deletes') continue;
+    arr.push(article.did);
   }
+  const {beta} = await DocumentModel.getDocumentTypes();
+  const {article} = await DocumentModel.getDocumentSources();
+  const documents = await DocumentModel.find({did: {$in: arr}, type: beta, source: article});
+  for(const document of documents) {
+    const {_id, uid, cover, title, content, keywordsEN, keywords, abstractEN, abstract, wordCount, ip, port, did, toc, type, source, sid, atUsers} = document;
+    const a = {};
+    for(const t of options) {
+      a[t] = document[t];
+    }
+    obj[document.did] = a;
+  }
+  for(const article of articles) {
+    const {_id, did, toc, status, hasDraft, sid, uid, source} = article;
+    const document = obj[article.did];
+    _articles.push(Object.assign({
+      _id,
+      did,
+      toc,
+      status,
+      hasDraft,
+      sid,
+      uid,
+      source,
+    }, document))
+  }
+  return _articles;
 }
 
 module.exports = mongoose.model('articles', schema);

@@ -94,9 +94,4 @@ module.exports = {
     GET: 'creationCenter',
     POST: 'creationCenter',
   },
-  article: {
-    PARAMETER: {
-      GET: 'creationCenter'
-    }
-  }
 }
