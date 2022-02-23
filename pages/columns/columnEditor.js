@@ -79,7 +79,7 @@ const columnEditor = new Vue({
       let {mid, aid} = this.getRequest();
       if(!mid) return;
       if(this.articleId) aid = this.articleId;
-      let url = `/creation/article?mid=${mid}`;
+      let url = `/creation/articles/editor?mid=${mid}`;
       if(aid) url = `/creation/articles/editor?aid=${aid}&mid=${mid}`
       return nkcAPI(url, 'GET')
       .then(data => {
