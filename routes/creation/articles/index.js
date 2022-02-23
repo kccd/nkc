@@ -35,11 +35,11 @@ router
     };
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/editor', async (ctx, next) => {
     const {db, data, state, body} = ctx;
     const {files, fields} = body;
     const {coverFile} = files;
-    const {type, articleId} = fields;
+    const {type, articleId, source, sid} = fields;
     if(!['modify', 'create', 'publish', 'save'].includes(type)) ctx.throw(400, `未知的提交类型 ${type}`);
     const {
       title,
@@ -58,12 +58,13 @@ router
         title,
         content,
         coverFile,
-        cover,
         keywords,
         keywordsEN,
         abstract,
         abstractEN,
-        origin
+        origin,
+        source,
+        sid
       });
     } else {
       //编辑或发布
@@ -84,6 +85,8 @@ router
       } else if(type === 'save') {
         await article.saveArticle();
       }
+      //改变article的hasDraft状态
+      await article.changeHasDraftStatus();
     }
     data.articleCover = await article.getBetaDocumentCoverId();
     // 写文章后返回信息
@@ -93,61 +96,5 @@ router
     data.articleId = article._id;
     await next();
   })
-  // .post('/editor', async (ctx, next) => {
-  //   const {body, state, data, db} = ctx;
-  //   const {files, fields} = body;
-  //   const {coverFile} = files;
-  //   const type = fields.type;
-  //   const bookId = fields.bookId;
-  //   const articleId = fields.articleId;
-  //   const book = await db.BookModel.findOne({
-  //     _id: bookId
-  //   });
-  //   if(!['modify', 'publish', 'create', 'save'].includes(type)) ctx.throw(400, `未知的提交类型 type: ${type}`);
-  //   const {title, content, cover, sid, source} = JSON.parse(fields.article);
-  //   let article;
-  //   //创建article
-  //   if(type === 'create') {
-  //     article = await db.ArticleModel.createArticle({
-  //       uid: state.uid,
-  //       title,
-  //       content,
-  //       coverFile,
-  //     });
-  //     book.list.push({
-  //       id: article._id,
-  //       type: 'article',
-  //       title: '',
-  //       url: '',
-  //       child:[]
-  //     });
-  //     await book.updateOne({
-  //       $set: {
-  //         list: book.list
-  //       }
-  //     });
-  //   } else {
-  //     //编辑或发布
-  //     article = await db.ArticleModel.findOnly({_id: articleId});
-  //     await article.modifyArticle({
-  //       title,
-  //       content,
-  //       cover,
-  //       coverFile
-  //     });
-  //     if(type === 'publish') {
-  //       await article.publishArticle();
-  //     } else if(type === 'save') {
-  //       await article.saveArticle();
-  //     }
-  //   }
-  //   data.articleCover = await article.getBetaDocumentCoverId();
-  //   // 写文章后返回信息
-  //   data.document = await db.DocumentModel.findOne({
-  //     sid: article._id
-  //   });
-  //   data.articleId = article._id;
-  //   await next();
-  // })
   .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
 module.exports = router;

@@ -93,9 +93,6 @@ module.exports = {
   article: {
     GET: 'creationCenter',
     POST: 'creationCenter',
-    PARAMETER: {
-      GET: 'creationCenter'
-    }
   },
   column: {
     GET: 'creationCenter',

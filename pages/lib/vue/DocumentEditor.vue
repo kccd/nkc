@@ -412,7 +412,7 @@ export default {
       if(formConfigs.abstractEN) data.abstractEN = abstractEN;
       if(formConfigs.keywords) data.keywords = keywords;
       if(formConfigs.keywordsEN) data.keywordsEN = keywordsEN;
-      if(formConfigs.originState) data.originState = originState;
+      if(formConfigs.origin) data.originState = originState;
       if(formConfigs.title) data.title = title;
       if(formConfigs.selectCategory) data.selectCategory = this.getSelectCategory();
       return data;
@@ -427,11 +427,18 @@ export default {
         abstract = '',
         abstractEN = '',
         origin = '',
-        selectCategory = '',
       } = data;
       this.title = title;
-      this.$refs.editor.setContent(content);
+      if(content) {
+        this.$refs.editor.setContent(content);
+      }
       this.cover = cover;
+      this.keywords = keywords;
+      this.keywordsEN = keywordsEN;
+      this.abstract = abstract;
+      this.abstract = abstract;
+      this.abstractEN = abstractEN;
+      this.originState = origin;
     },
     emitContentChangeEvent() {
       const data = this.getDocumentForm();

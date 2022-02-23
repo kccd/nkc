@@ -112,9 +112,16 @@ const schema = new mongoose.Schema({
     default: ''
   },
   //是否原创
+  //   0 "不声明",
+  //   1 "普通转载",
+  //   2 "获授权转载",
+  //   3 "受权发表(包括投稿)",
+  //   4 "发表人参与原创(翻译)",
+  //   5 "发表人是合作者之一",
+  //   6 "发表人本人原创"
   origin: {
-    type: Boolean,
-    default: false,
+    type: Number,
+    default: 0,
     index: 1
   },
   // 文档内容字数 排除了 html 标签
@@ -257,6 +264,7 @@ schema.statics.createBetaDocument = async (props) => {
     keywordsEN = [],
     abstract = '',
     abstractEN = '',
+    origin = '',
     uid,
     toc,
     source,
@@ -273,7 +281,7 @@ schema.statics.createBetaDocument = async (props) => {
   const wordCount = getHTMLTextLength(content);
   const _id = await DocumentModel.getId();
   const did = await DocumentModel.getDid();
-  const document = DocumentModel({
+  const document = await DocumentModel({
     _id,
     did,
     uid,
@@ -285,9 +293,10 @@ schema.statics.createBetaDocument = async (props) => {
     keywordsEN,
     abstract,
     abstractEN,
+    origin,
     toc,
     dt: toc,
-    type: DocumentModel.getDocumentTypes().beta,
+    type: (await DocumentModel.getDocumentTypes()).beta,
     source,
     sid,
     reviewed,
@@ -311,7 +320,7 @@ schema.methods.copyToHistoryDocument = async function(status) {
   const NoteModel = mongoose.model('notes');
   const originDocument = this.toObject();
   delete originDocument._v;
-  originDocument.type = DocumentModel.getDocumentTypes().history;
+  originDocument.type = (await DocumentModel.getDocumentTypes()).history;
   originDocument._id = await DocumentModel.getId();
   originDocument.toc = new Date();
   (status === 'edit') && (originDocument.tlm = new Date());
@@ -334,7 +343,7 @@ schema.statics.copyToHistoryToEditDocument = async function(did, _id){
     type: {$in: ['beta', 'stable']}
   }, {
     $set: {
-        type: DocumentModel.getDocumentTypes().history,
+        type: (await DocumentModel.getDocumentTypes()).history,
         // toc: new Date(),
         tlm: new Date()
     }
@@ -358,7 +367,7 @@ schema.methods.modifyAsEditDocument = async function() {
   const DocumentModel = mongoose.model('documents');
   await this.updateOne({
     $set: {
-      type: DocumentModel.getDocumentTypes().beta,
+      type: (await DocumentModel.getDocumentTypes()).beta,
       // toc: new Date(),
       tlm: new Date()
     }
@@ -371,7 +380,7 @@ schema.methods.setAsEditDocument = async function() {
   const DocumentModel = mongoose.model('documents');
   await this.updateOne({
     $set: {
-      type: DocumentModel.getDocumentTypes().beta
+      type: (await DocumentModel.getDocumentTypes()).beta
     }
   });
 };
@@ -383,7 +392,7 @@ schema.methods.setAsEditDocument = async function() {
 //   });
 //   return stableColumn
 // }
- //将 专栏编辑版改为历史版 
+ //将 专栏编辑版改为历史版
 schema.statics.setBetaAsHistoryDocumentById = async (sid) =>{
   const DocumentModel = mongoose.model('documents');
   const source = (await DocumentModel.getDocumentSources()).article
@@ -410,7 +419,7 @@ schema.methods.setAsHistoryDocument = async function() {
   const DocumentModel = mongoose.model('documents');
   await this.updateOne({
     $set: {
-      type: DocumentModel.getDocumentTypes().history
+      type: (await DocumentModel.getDocumentTypes()).history
     }
   });
 };
@@ -427,7 +436,7 @@ schema.statics.createBetaDocumentByStableDocument = async function(did) {
   if(!stableDocument) throwErr(500, `文档 ${did} 不存在正式版，无法生成编辑版`);
   const originDocument = stableDocument.toObject();
   delete originDocument._v;
-  originDocument.type = DocumentModel.getDocumentTypes().beta;
+  originDocument.type = (await DocumentModel.getDocumentTypes()).beta;
   originDocument._id = await DocumentModel.getId();
   originDocument.toc = new Date();
   originDocument.status = DocumentModel.getDocumentStatus().unknown;
@@ -444,7 +453,7 @@ schema.statics.createBetaDocumentByStableDocument = async function(did) {
 * */
 schema.statics.publishDocumentByDid = async (did) => {
   const DocumentModel = mongoose.model('documents');
-  const {stable, beta} = DocumentModel.getDocumentTypes();
+  const {stable, beta} = await DocumentModel.getDocumentTypes();
   const type = [stable, beta];
   const documentsObj = {};
   const documents = await DocumentModel.find({
@@ -501,6 +510,7 @@ schema.statics.updateDocumentByDid = async (did, props) => {
     keywords,
     keywordsEN,
     tlm,
+    origin
   } = props;
   const AttachmentModel = mongoose.model('attachments');
   const DocumentModel = mongoose.model('documents');
@@ -508,7 +518,7 @@ schema.statics.updateDocumentByDid = async (did, props) => {
   const wordCount = getHTMLTextLength(content);
   let betaDocument = await DocumentModel.findOne({
     did,
-    type: DocumentModel.getDocumentTypes().beta
+    type: (await DocumentModel.getDocumentTypes()).beta
   });
   if(!betaDocument) {
     betaDocument = await DocumentModel.createBetaDocumentByStableDocument(did);
@@ -524,7 +534,8 @@ schema.statics.updateDocumentByDid = async (did, props) => {
       keywords,
       keywordsEN,
       wordCount,
-      tlm
+      tlm,
+      origin
     }
   });
   const _betaDocument = await DocumentModel.findOnly({_id: betaDocument._id});
@@ -544,7 +555,7 @@ schema.statics.getStableDocumentBySource = async (source, sid) => {
   const DocumentModel = mongoose.model('documents');
   await DocumentModel.checkDocumentSource(source);
   return DocumentModel.findOne({
-    type: DocumentModel.getDocumentTypes().stable,
+    type: (await DocumentModel.getDocumentTypes()).stable,
     source,
     sid
   });
@@ -560,7 +571,7 @@ schema.statics.getBetaDocumentBySource = async (source, sid) => {
   const DocumentModel = mongoose.model('documents');
   await DocumentModel.checkDocumentSource(source);
   return DocumentModel.findOne({
-    type: DocumentModel.getDocumentTypes().beta,
+    type: (await DocumentModel.getDocumentTypes()).beta,
     source,
     sid,
   });
