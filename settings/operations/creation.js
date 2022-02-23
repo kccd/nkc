@@ -91,8 +91,12 @@ module.exports = {
     }
   },
   article: {
-    GET: 'creationCenter',
-    POST: 'creationCenter',
+    PARAMETER: {
+      DELETE: 'creationCenter',
+      draft: {
+        DELETE: 'creationCenter'
+      }
+    }
   },
   column: {
     GET: 'creationCenter',

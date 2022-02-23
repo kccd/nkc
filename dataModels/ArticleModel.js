@@ -186,6 +186,18 @@ schema.statics.getNewId = async () => {
   return newId;
 };
 
+
+/*
+* 获取指定 文章 id 和作者 id 的文章
+* @param {String} aid 文章 ID
+* @param {String} uid 作者 ID
+* @return {Object} article 对象
+* */
+schema.statics.getArticleByIdAndUid = async (aid, uid) => {
+  const ArticleModel = mongoose.model('articles');
+  return await ArticleModel.findOnly({_id: aid, uid});
+}
+
 /*
 * 向 book 中添加文章，创建 article、document
 * @param {Object} props
@@ -280,6 +292,50 @@ schema.methods.deleteDraft = async function() {
   await DocumentModel.setBetaDocumentAsHistoryBySource(articleSource, articleId);
   await this.changeHasDraftStatus();
 };
+
+/*
+* 刪除文章
+* */
+schema.methods.deleteArticle = async function() {
+  const ArticleModel = mongoose.model('articles');
+  const {normal: normalStatus, deleted: deletedStatus} = await ArticleModel.getArticleStatus();
+  const {status} = this;
+  if(status !== normalStatus) {
+    throwErr(500, `文章状态异常 status=${this.status}`);
+  }
+  // 删除草稿
+  await this.deleteDraft();
+  // 删除文章
+  this.status = deletedStatus;
+  await this.updateOne({
+    $set: {
+      status: this.status
+    }
+  });
+};
+
+/*
+* 删除文章引用
+* */
+schema.methods.deleteReferences = async function() {
+  const {source, sid, references} = this;
+  const ArticleModel = mongoose.model('articles');
+  const {
+    column: columnSource,
+  } = await ArticleModel.getArticleSources();
+  if(source === columnSource) {
+
+  }
+}
+/*
+* 删除文章并删除文章引用
+* */
+schema.methods.deleteArticleAndReferences = async function() {
+  const {_id: articleId, source, sid} = this;
+  await this.deleteArticle();
+  await this.deleteReferences();
+};
+
 /*
 * 修改article
 * @param {Object} props

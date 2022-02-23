@@ -386,4 +386,9 @@ schema.statics.createColumnPost = async function(article, selectCategory) {
   const {} = this;
 }
 
+/*
+* 通过 article id 删除专栏引用
+* */
+
+
 module.exports = mongoose.model("columnPosts", schema);

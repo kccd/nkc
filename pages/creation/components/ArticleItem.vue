@@ -10,7 +10,7 @@
         .article-count 点赞 {{article.voteUp}} 阅读 {{article.hits}} 评论 {{article.comment}}
       .article-options
         .article-option(@click="navToEditor(article)") 修改
-        .article-option(@click="removeArticle(article)") 删除
+        .article-option(@click="deleteArticle(article)") 删除
 </template>
 
 <style lang="less">
@@ -83,10 +83,14 @@
       navToEditor(article) {
         visitUrl(article.articleEditorUrl, true);
       },
-      removeArticle() {
+      deleteArticle(article) {
+        const self = this;
         sweetQuestion(`确定要删除文章？当前操作不可恢复。`)
           .then(() => {
-
+            return nkcAPI(`/creation/article/${article.articleId}`, 'DELETE')
+          })
+          .then(() => {
+            self.$emit('delete');
           })
           .catch(sweetError);
       }

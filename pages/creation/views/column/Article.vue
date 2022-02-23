@@ -1,7 +1,8 @@
 <template lang="pug">
   .column-article
     paging(:pages="pages" @click-button="selectPageCount")
-    articles-list(:articles="articlesList")
+    blank(v-if="articlesList.length === 0" :height="'20rem'")
+    articles-list(:articles="articlesList" @delete="deleteItem")
     paging(:pages="pages" @click-button="selectPageCount")
 </template>
 
@@ -10,6 +11,7 @@
   import {sweetError} from "../../../lib/js/sweetAlert";
   import Paging from '../../../lib/vue/Paging';
   import ArticlesList from '../../components/ArticlesList';
+  import Blank from '../../components/Blank';
   export default {
     data: () => ({
       pages: [],
@@ -17,6 +19,7 @@
     }),
     components: {
       paging: Paging,
+      blank: Blank,
       'articles-list': ArticlesList,
     },
     mounted() {
@@ -55,6 +58,9 @@
             page: num
           }
         });
+      },
+      deleteItem(index) {
+        this.articlesList.splice(index, 1);
       }
     }
   }

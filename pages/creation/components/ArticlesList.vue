@@ -1,7 +1,7 @@
 <template lang="pug">
   .articles-list
-    .article-item-container(v-for="article in articles")
-      article-item(:article="article")
+    .article-item-container(v-for="(article, index) in articles")
+      article-item(:article="article" @delete="deleteItem(index)")
 </template>
 
 <style lang="less">
@@ -25,6 +25,11 @@
     props: ['articles'],
     data: () => ({
 
-    })
+    }),
+    methods: {
+      deleteItem(index) {
+        this.$emit('delete', index);
+      }
+    }
 }
 </script>

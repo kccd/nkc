@@ -10,7 +10,7 @@
         .article-draft-from {{draft.type === 'create'? '撰写文章': '编辑文章'}}
       .article-draft-options
         .article-draft-option(@click="navToEditor(draft)") 继续创作
-        .article-draft-option(@click="removeArticle(draft)") 删除
+        .article-draft-option(@click="removeDraft(draft)") 删除
 </template>
 
 <style lang="less">
@@ -83,12 +83,20 @@ export default {
     navToEditor(draft) {
       visitUrl(draft.articleEditorUrl, true);
     },
-    removeArticle() {
+    removeDraft(draft) {
+      const self = this;
       sweetQuestion(`确定要删除文章？当前操作不可恢复。`)
         .then(() => {
-
+          const url = `/creation/article/${draft.articleId}/draft`;
+          return nkcAPI(url, 'DELETE')
+        })
+        .then(() => {
+          self.sendMessageToRemoveItem();
         })
         .catch(sweetError);
+    },
+    sendMessageToRemoveItem() {
+      this.$emit("delete");
     }
   }
 }

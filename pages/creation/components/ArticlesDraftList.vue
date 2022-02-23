@@ -1,7 +1,7 @@
 <template lang="pug">
   .articles-draft-list
-    .article-draft-item-container(v-for="draft in drafts")
-      article-draft-item(:draft="draft")
+    .article-draft-item-container(v-for="(draft, index) in drafts")
+      article-draft-item(:draft="draft" @delete="deleteItem(index)")
 </template>
 
 <style lang="less">
@@ -25,6 +25,11 @@ export default {
   props: ['drafts'],
   data: () => ({
 
-  })
+  }),
+  methods: {
+    deleteItem(index) {
+      this.$emit('delete', index);
+    }
+  }
 }
 </script>

@@ -1,7 +1,8 @@
 <template lang="pug">
   .column-draft
     paging(:pages="pages" @click-button="selectPageCount")
-    articles-draft-list(:drafts="articlesDraftList")
+    blank(v-if="articlesDraftList.length === 0" :height="'20rem'")
+    articles-draft-list(:drafts="articlesDraftList" @delete="deleteItem")
     paging(:pages="pages" @click-button="selectPageCount")
 </template>
 
@@ -10,6 +11,7 @@ import {nkcAPI} from '../../../lib/js/netAPI';
 import {sweetError} from "../../../lib/js/sweetAlert";
 import Paging from '../../../lib/vue/Paging';
 import ArticlesDraftList from '../../components/ArticlesDraftList';
+import Blank from '../../components/Blank.vue'
 export default {
   data: () => ({
     pages: [],
@@ -17,6 +19,7 @@ export default {
   }),
   components: {
     paging: Paging,
+    blank: Blank,
     'articles-draft-list': ArticlesDraftList,
   },
   mounted() {
@@ -56,6 +59,10 @@ export default {
           page: num
         }
       });
+    },
+    deleteItem(index) {
+      console.log({index});
+      this.articlesDraftList.splice(index, 1);
     }
   }
 }
