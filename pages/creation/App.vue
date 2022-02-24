@@ -48,5 +48,6 @@
   .creation-center{
     padding-top: 2rem;
     padding-left: @leftNavWidth;
+    padding-bottom: 3rem;
   }
 </style>

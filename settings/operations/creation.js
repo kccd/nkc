@@ -1,9 +1,6 @@
 module.exports = {
   GET: 'creationCenter',
   drafts: {
-    column:{
-      GET:'creationCenter'
-    },
     GET: 'creationCenter',
     POST: 'creationCenter',
     editor: {
@@ -12,7 +9,9 @@ module.exports = {
     }
   },
   draft: {
-    DELETE:'creationCenter',
+    PARAMETER: {
+      DELETE:'creationCenter',
+    }
   },
   category: {
     GET: 'creationCenter',
