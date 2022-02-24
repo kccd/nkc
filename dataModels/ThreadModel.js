@@ -306,6 +306,32 @@ threadSchema.virtual('reason')
 	.set(function(reason) {
 		this._reason = reason;
 	});
+/* 返回此片文章作者的通讯方式
+* @params {String} tid 
+*/ 
+threadSchema.statics.getAuthorCommunicationMode = async (tid)=>{
+  const ThreadModel = mongoose.model('threads')
+  const communication = await ThreadModel.getThreadByTid(tid)
+  let communicationMode = {}
+  try {
+    console.log(communication,'firstPost')
+    communicationMode.value = communication.firstPost.authorInfos.contractObj
+  } catch (error) {
+    // const throwError = require("../nkcMOdules/throwError");
+    // throwError(400,'作者没有通讯方式')
+  }
+  console.log(communicationMode,'communicationMode')
+
+  return communicationMode
+}
+/*得到该整条记录
+*@params {String} tid 
+*/
+threadSchema.statics.getThreadByTid = async (tid)=>{
+  const ThreadModel = mongoose.model('threads')
+  const thread = await ThreadModel.findOne({tid})
+  return await thread.extendFirstPost();
+}
 threadSchema.methods.extendFirstPost = async function() {
   const PostModel = mongoose.model('posts');
   return this.firstPost = await PostModel.findOnly({pid: this.oc})

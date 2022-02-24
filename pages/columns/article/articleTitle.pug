@@ -1,0 +1,21 @@
+//-  文章的标题,作者等
+mixin articleTitle(data)
+  +includeCSS('/columns/article/articleTitle.css')
+  .article-common-head
+        h1.article-common-title=data.post.t
+        p
+          for authorInfo in data.post.authorInfos
+            span.article-common-author=authorInfo.name
+            span.fa.fa-envelope-open-o(onclick="displayAuthor('"+objToStr(authorInfo.contractObj)+"')")
+        p
+          for authorInfo in data.post.authorInfos
+            span=authorInfo.agency
+        .article-common-info
+          a.author.jump.m-r-2(href=`/u/${data.post.uid}` target="_blank" data-float-uid=`${data.post.uid}`)
+            img.head-portrait(src="")
+            for authorInfo in data.post.authorInfos
+              span.kcid=authorInfo.kcid 
+          span.modify-time.m-r-2=data.post.toc
+          if ['3','4','5','6'].includes(data.post.originState)
+            span.m-r-2.origin 原创
+          a.column.jump.m-r-2(href=`/m/${data.column._id}` target="_blank")=data.column.name

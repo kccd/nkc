@@ -1,0 +1,32 @@
+extends ../../bootstrap_base
+block title
+  //-  引入组件并且需要引入对于css
+  title=data.article.post.t
+  +includeCSS('/columns/article/article.css')
+  //- +includeCSS('/columns/article_content.css')
+block content
+  .container-fluid.max-width
+    .article-common.col-xs-12.col-md-8
+      include ./articleNav
+      +articleNav(data.article)
+      include ./articleSetUp
+      +setUp(data.article)
+      include ./articleTitle
+      +articleTitle(data.article)
+      include ./articleAbstract
+      +articleAbstract(data.article)
+      include ./articleContent
+      +articleContent(data.article)
+    .col-xs-12.col-md-4.box-shadow-panel#rightDom   
+      //- 滚动到页头页脚  
+      include ../../module_scrollTo.pug
+  #vueMountPoint
+    //-  显示作者信息
+    <float-user-panel ref='floatUserPane'></float-user-panel>
+    //- <author-communication :contract="contract"></author-communication>
+  //- 显示作者联系信息
+  include ./articleAuthorInfo.pug
+  +authorInfo()
+block scripts 
+ +includeJS('/columns/article/article.js')
+

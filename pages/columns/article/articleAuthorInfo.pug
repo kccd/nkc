@@ -1,5 +1,5 @@
 //- 通信作者
-mixin authorInfo(data)
+mixin authorInfo()
   .modal.fade#moduleAuthor(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
     .modal-dialog.modal-sm(role="document")#moduleAuthorApp
       .modal-content
@@ -11,14 +11,13 @@ mixin authorInfo(data)
           .form
             .form-group()
               h5 通信邮箱：
-              strong {{contract.contractEmail}}
+              strong {{contract.contractEmail || '暂无数据'}}
             .form-group()
               h5 电话号码：
-              strong {{contract.contractTel}}
+              strong {{contract.contractTel || '暂无数据'}}
             .form-group()
               h5 通信地址：
-              strong {{contract.contractAdd}}
+              strong {{contract.contractAdd || '暂无数据'}}
             .form-group()
               h5 邮政编码：
-              strong {{contract.contractCode}}
-+authorInfo({})
+              strong {{contract.contractCode || '暂无数据'}}

@@ -1,12 +1,13 @@
-.article{
+.article-common{
   // margin-left:calc(100% - 58.33333333% - 24.155% ) ;
+  background: white;
 }
-.article-title{
+.article-common-title{
   font-weight: 700;
 }
 .line-title{
   padding: 2px 0; 
-  margin-top: 10px;
+  margin-top: 20px;
   background: #f1f1f1;
   box-shadow: 0 2px 0 0 #d7d7d7;
   font-weight: 600;
@@ -49,7 +50,7 @@ header::after{
   display: block;
   clear: both;
 }
-.article-head{
+.article-common-head{
   text-align: center;
   margin-top: 3rem;
   span{
@@ -58,6 +59,7 @@ header::after{
 }
 .key-word{
   .key-word-conmon{
+    margin-top: 10px;
     font-weight: 100;
     margin-left: 5px;
     color:white;
@@ -66,7 +68,7 @@ header::after{
     span{
       background: rgb(56, 107, 245);
       margin-right: 4px;
-      padding: 2px 3px;
+      padding: 4px 5px;
       border-radius: 3px;
     }
   }
@@ -87,7 +89,7 @@ header::after{
   overflow: hidden;
 }
 .set-up-active{
-  height: 54px;
+  height: calc(100%);
 }
 .set-up-close{
   height: 0px;

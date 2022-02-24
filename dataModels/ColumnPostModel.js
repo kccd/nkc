@@ -97,8 +97,12 @@ schema.statics.filterData = (filterData, allowKey)=>{
   }
   return newObj
 }
-//  返回专栏文章需要的字段
+/*  返回专栏文章需要的字段
+    @param {Number} columnId 专栏ID
+*   @param {Number}  columnPosts的_id columnPosts的 _ID
+*/  
 schema.statics.getRequiredData = async (columnId, _id)=>{
+  const nkcRender = require('../nkcModules/nkcRender');
   const ColumnPostModel = mongoose.model('columnPosts');
   const article = await ColumnPostModel.getArticleById(columnId, _id);
   const postAllowKey = ['t','c','abstratCn','abstratEn','keyWordsCn','keyWordsEn','authorInfos','toc','originState','uid','collectedCount'];
@@ -109,7 +113,15 @@ schema.statics.getRequiredData = async (columnId, _id)=>{
   const filteredPost = ColumnPostModel.filterData(article.post, postAllowKey)
   // const filteredColumnPost = ColumnPostModel.filterData(article.columnPost, columnPostAllowKey) 
   const filteredColumn= ColumnPostModel.filterData(article.column, columnAllowKey)
-  return {thread:filteredThread, post:filteredPost, column:filteredColumn, collectedCount:article.collectedCount,}
+  filteredPost.c = nkcRender.renderHTML({
+    type: 'article',
+    post: {
+      c: filteredPost.c,
+      // resources: await ResourceModel.getResourcesByReference(`column-${page._id}`)
+      resources: []
+    }
+  });
+  return {thread:filteredThread, post:filteredPost, column:filteredColumn, collectedCount:article.collectedCount}
 }
 /*
 * 根据 专栏ID 和 columnPosts的_id 查找 一篇文章的所有数据
@@ -122,12 +134,13 @@ schema.statics.getArticleById = async (columnId, _id)=>{
   const PostsModel = mongoose.model('posts');
   const ArticleModel = mongoose.model('articles');
   const ColumnModel = mongoose.model('columns');
+  
   let columnPost = await ColumnPostsModel.findOne({_id, columnId})
   columnPost = columnPost.toObject()
   if(!columnPost) throwErr(500, '未查找到对应文章');
   switch (columnPost.type) {
     case 'thread':
-      // thread 中包括需要的 回复数 观看数
+      // thread 中 包括需要的 回复数 观看数
       let thread = await ThreadModel.findThreadById(columnPost.tid);
       thread = thread.toObject()
       // 文章主体内容
@@ -139,6 +152,8 @@ schema.statics.getArticleById = async (columnId, _id)=>{
       // 专栏Id对应的专栏名字
       let column = await ColumnModel.findOne({_id:columnPost.columnId})
       column = column.toObject()
+      // 获取作者通讯方式
+      // const communication = await ThreadModel.getAuthorCommunicationMode(columnPost.tid)
       return {thread, post, column, collectedCount:collect};
     case 'article':
       // 未完待续

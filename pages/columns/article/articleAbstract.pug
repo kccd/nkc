@@ -1,0 +1,18 @@
+//- 摘要 和 关键词
+mixin articleAbstract(data)
+  +includeCSS('/columns/article/articleAbstract.css')
+  p.abstract-title.line-title 中文摘要
+      p.cn-abstract
+        //- for abstract,i in data.abstractCn 
+        span=data.post.abstractCn
+      p.en-abstract.line-title Abstract
+        //- for abstract,i in data.abstractEn 
+        span=data.post.abstractEn
+      .key-word 
+        p.line-title 关键词
+        p.cn-key-word.key-word-conmon
+          for keyWord,i in data.post.keyWordsCn 
+            span=keyWord
+        p.en-key-word.key-word-conmon
+          for keyWord,i in data.post.keyWordsEn 
+            span=keyWord

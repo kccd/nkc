@@ -1,6 +1,9 @@
 //- 设置置顶
+//-  点击右上角设置图标后显示
 mixin setUp(data)
-  .col-xs-12.col-md-12
+  +includeCSS('/columns/article/articleSetUp.css')
+  .set-up
+    .col-xs-12.col-md-12
             button.btn.btn-default.btn-sm(onclick=`pushBlock('')`) 推送到模块
 
             button.btn.btn-default.btn-sm#threadTop(onclick=`setTopped('')`) 专业置顶
@@ -38,4 +41,3 @@ mixin setUp(data)
 
             button.btn-sm.btn.btn-danger(onclick="deleteThread()") 退修/删除
 
-+setUp()
