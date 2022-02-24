@@ -296,6 +296,7 @@ const usersPersonalSchema = new Schema({
 	// 最后一次验证手机号的时间(时间戳)
 	lastVerifyPhoneNumberTime: {
 		type: Date,
+    default: Date.now,
 		index: 1
 	},
 	// 需要送审的次数，与后台管理中的审核设置同时作用
