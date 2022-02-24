@@ -18,6 +18,7 @@ NKC.modules.SelectColumnCategories = function() {
       newCategory: {
         parentId: "",
         name: "",
+        brief: '',
         description: "",
         type: 'main'
       },
@@ -64,13 +65,14 @@ NKC.modules.SelectColumnCategories = function() {
         var category = this.newCategory;
         if(!category.type) return this.error = "请选择分类类型";
         if(!category.name) return this.error = "请输入分类名";
-        if(!category.description) return this.error = "请输入分类介绍";
+        if(!category.brief) return this.error = "请输入分类简介";
         nkcAPI("/m/" + this_.columnId + "/category", "POST", category)
           .then(function() {
             app.getCategories();
             app.createCategory = false;
             app.newCategory = {
               name: "",
+              brief: '',
               description: "",
               parentId: "",
               type: 'main'
