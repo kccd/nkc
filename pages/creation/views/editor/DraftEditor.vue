@@ -1,12 +1,19 @@
 <template lang="pug">
   .container-fluid
     .m-b-1
-      bread-crumb(:list="navList")
-    .standard-max-container
-      .m-b-1
-        document-editor(ref="documentEditor" :configs="formConfigs" @content-change="watchContentChange")
-      div
-        button.btn.btn-primary(@click="submit") 保存
+      info-block(:mode="'info'")
+        span 如果意外丢失内容，请在草稿箱查找。
+
+    .m-b-1
+      document-editor(
+        ref="documentEditor"
+        :configs="formConfigs"
+        @content-change="watchContentChange"
+        @ready="editorReady"
+        )
+    .m-b-1
+      button.btn.btn-primary(@click="submit") 提交
+      button.btn.btn-primary(@click="save") 保存
 </template>
 
 <style lang="less" scoped>
@@ -64,6 +71,8 @@ a {
 <script>
 import DocumentEditor from '../../../lib/vue/DocumentEditor';
 import {nkcAPI} from '../../../lib/js/netAPI'
+import InfoBlock from '../../components/InfoBlock';
+
 export default {
   data: function (){
     return {
@@ -80,10 +89,10 @@ export default {
   },
   mounted() {
     this.initId();
-    this.initData();
   },
   components: {
     'document-editor': DocumentEditor,
+    'info-block': InfoBlock,
   },
   computed: {
     type() {
@@ -114,10 +123,13 @@ export default {
         name: 'drafts'
       });
     },
+    editorReady() {
+      this.initData();
+    },
     //获取ID
     initId() {
-      const {draftId} = this.$route.query;
-      this.draftId = draftId;
+      const {id} = this.$route.query;
+      this.draftId = id;
     },
     //插入编辑数据
     initData() {
@@ -149,7 +161,7 @@ export default {
       const self = this;
       const {draftId} = this;
       const {title = '', content = ''} = this.document;
-      nkcAPI('/creation/drafts/editor', 'POST', {
+      return nkcAPI('/creation/drafts/editor', 'POST', {
         title,
         content,
         type,
@@ -164,15 +176,27 @@ export default {
             });
           }
         })
-        .catch(err => {
-          sweetError(err);
-        })
     },
     submit() {
-      this.post('save');
+      const self = this;
+      this
+        .post('save')
+        .then(() => {
+          self.$router.replace({
+            name: 'drafts'
+          });
+        })
+        .catch(sweetError);
+    },
+    save() {
+      this
+        .post('save')
+        .catch(sweetError);
     },
     saveDraft() {
-      this.post(this.type);
+      this
+        .post(this.type)
+        .catch(sweetError);
     },
     watchContentChange(data) {
       const  {content, title} = data;

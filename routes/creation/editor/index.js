@@ -12,4 +12,7 @@ router
   .get('/book', async (ctx, next) => {
     await next();
   })
+  .get('/draft', async (ctx, next) => {
+    await next();
+  });
 module.exports = router;

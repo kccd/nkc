@@ -234,15 +234,15 @@
         this.navToPage("draftEdit", {}, {});
       },
       toEditDraft(draft) {
-        if(this.draftsType === 'column'){
+        if(this.draftsType === 'column') {
           const {articleId, columnId} = draft 
           window.open(`/column/editor?mid=${columnId}&aid=${articleId}`)
-        }else{
+        } else {
           if(this.type !== 'all') return;
           const {draftId} = draft;
-          this.navToPage("draftEdit", {}, {
-          draftId: draftId
-        });
+          this.navToPage("draftEditor", {}, {
+            id: draftId
+          });
         }
       }
     }

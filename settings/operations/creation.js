@@ -134,6 +134,9 @@ module.exports = {
     },
     book: {
       GET: 'creationCenter'
+    },
+    draft: {
+      GET: 'creationCenter'
     }
   }
 }

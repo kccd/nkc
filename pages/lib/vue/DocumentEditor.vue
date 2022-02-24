@@ -5,6 +5,7 @@
       .form-group(v-if="formConfigs.title")
         input.form-control.form-title(type="text" v-model="title" placeholder="请输入标题")
       .form-group
+
         editor(:configs="editorConfigs" ref="editor" @content-change="watchContentChange" :plugs="editorPlugs" @ready="editorReady")
       .form-group(v-if="formConfigs.cover")
         .m-b-2

@@ -9,7 +9,6 @@ import BookEditor from './views/book/BookEditor';
 import ArticleEditor from './views/article/ArticleEditor';
 import Categories from './views/category/Categories';
 import Drafts from './views/drafts/drafts';
-import DraftEdit from "./views/drafts/DraftEdit";
 import Articles from './views/articles/Articles';
 import ArticlesColumn from './views/articles/Column';
 import Community from './views/community/Community';
@@ -27,6 +26,7 @@ import ZoneArticleEditor from './views/editor/ZoneArticleEditor';
 import Zone from './views/zone/Zone';
 import ZoneArticle from './views/zone/Article';
 import ZoneDraft from './views/zone/draft';
+import DraftEditor from './views/editor/DraftEditor';
 
 const routes = [
   {name: 'home', path: '/creation', component: Home},
@@ -40,10 +40,10 @@ const routes = [
   {name: 'articleEditor', path: '/creation/articles/editor', component: ArticleEditor},
   {name: 'categories', path: '/creation/categories', component: Categories},
   {name: 'drafts', path: '/creation/drafts', component: Drafts},
-  {name: 'draftEdit', path: '/creation/drafts/editor', component: DraftEdit},
   {name: 'columnArticleEditor', path: '/creation/editor/column', component: ColumnArticleEditor},
   {name: 'communityThreadEditor', path: '/creation/editor/community', component: CommunityThreadEditor},
   {name: 'zoneArticleEditor', path: '/creation/editor/zone', component: ZoneArticleEditor},
+  {name: 'draftEditor', path: '/creation/editor/draft', component: DraftEditor},
   {
     name: 'articles',
     path: '/creation/articles',

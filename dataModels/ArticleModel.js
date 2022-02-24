@@ -344,7 +344,6 @@ schema.methods.deleteReferences = async function() {
 * 删除文章并删除文章引用
 * */
 schema.methods.deleteArticleAndReferences = async function() {
-  const {_id: articleId, source, sid} = this;
   await this.deleteArticle();
   await this.deleteReferences();
 };
