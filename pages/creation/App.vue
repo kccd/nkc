@@ -4,7 +4,7 @@
       creation-nav(@select="selectNavItem")
     .creation-content-container
       transition(:name="transitionName")
-        router-view
+        router-view(v-if="isRouterAlive")
 </template>
 <script>
   import VerNav from './components/VerNav';
@@ -13,7 +13,8 @@
       'creation-nav': VerNav
     },
     data: () => ({
-      transitionName: 'fade'
+      transitionName: 'fade',
+      isRouterAlive: true,
     }),
     watch: {
       $route (to, from) {
@@ -28,6 +29,10 @@
       },
       selectNavItem(type) {
         this.navToPage(type);
+      },
+      reload() {
+        this.isRouterAlive = false;
+        this.$nextTick(() => (this.isRouterAlive = true));
       }
     }
   }
