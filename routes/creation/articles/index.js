@@ -77,8 +77,10 @@ router
         authorInfos
       });
     } else {
+      if(!articleId) ctx.throw(401, '未接收文章ID');
       //编辑或发布
       article = await db.ArticleModel.findOnly({_id: articleId});
+      if(!article) ctx.throw(400, '未找到文章');
       await article.modifyArticle({
         title,
         content,

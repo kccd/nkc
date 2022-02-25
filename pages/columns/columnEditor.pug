@@ -4,24 +4,9 @@ block title
   +includeCSS('/columns/columnEditor.css')
 block content
   .hidden#data=objToStr({column: data.column, websiteCode: data.websiteCode})
-  .container-fluid.max-width#columnEditor
+  .container-fluid.max-width#columnEditor(v-cloak)
     .row
       .col-xs-12.col-md-9.box-shadow-panel.m-b-2
-        .m-b-1
-          .article-box(v-if="articles.length !== 0")
-            .close.fa.fa-remove(@click="close")
-            span 当前专栏存在草稿,点击编辑继续编辑草稿
-            .article-list(v-for="article of articles")
-              .article-info
-                span.article-name(v-if="article.title") {{article.title}}
-                span.article-name(v-else) 未知
-                span.article-time {{timeFormat(article.toc)}}
-              .article-do(@click="editArticle(article._id)")
-                span 继续编辑
-            .article-more(@click="more") 查看更多
-          document-editor(ref="documentEditor" :configs="formConfigs" @ready='editorReady' @content-change="watchContentChange" :column="column")
-        .m-b-1
-          button.btn.btn-primary.m-r-05(@click="publish") 发布
-          button.btn.btn-default.m-r-05(@click="saveArticle") 保存
+        article-editor(ref="articleEditor" :time='10000')
 block scripts
   +includeJS('/columns/columnEditor.js')

@@ -36,7 +36,7 @@ const schema = new Schema({
   },
   tid: {
     type: String,
-    required: true,
+    default: '',
     index: 1
   },
   // 内容类型
@@ -79,10 +79,10 @@ const schema = new Schema({
 @param{object} filterData 过滤的数据
 @param{array} allowKey filterData保留的key
 
-*/ 
+*/
 schema.statics.filterData = (filterData, allowKey)=>{
   const {timeFormat, getUrl} = require('../nkcModules/tools');
-  let newObj = {} 
+  let newObj = {}
   for (const key in filterData) {
     if (Object.hasOwnProperty.call(filterData, key)) {
       if(allowKey.includes(key)){
@@ -107,7 +107,7 @@ schema.statics.getRequiredData = async (columnId, _id)=>{
   const columnAllowKey = ['name','_id'];
   const filteredThread = ColumnPostModel.filterData(article.thread, threadAllowKey)
   const filteredPost = ColumnPostModel.filterData(article.post, postAllowKey)
-  // const filteredColumnPost = ColumnPostModel.filterData(article.columnPost, columnPostAllowKey) 
+  // const filteredColumnPost = ColumnPostModel.filterData(article.columnPost, columnPostAllowKey)
   const filteredColumn= ColumnPostModel.filterData(article.column, columnAllowKey)
   return {thread:filteredThread, post:filteredPost, column:filteredColumn, collectedCount:article.collectedCount,}
 }
@@ -273,7 +273,8 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
   return results;
 };
 /*
-* 生成在各分类的排序
+* 生成在各主分类的排序
+* @param {[String]} categoriesId 主分类数组
 * */
 schema.statics.getCategoriesOrder = async (categoriesId) => {
   const SettingModel = mongoose.model("settings");
@@ -335,6 +336,7 @@ schema.statics.addColumnPosts = async (columnId, categoriesId, minorCategoriesId
   }
   for(const pid of postsId) {
     let columnPost = await ColumnPostModel.findOne({columnId, pid});
+    //获取著分类排序
     const order = await ColumnPostModel.getCategoriesOrder(categoriesId);
     if(columnPost) {
       await columnPost.updateOne({
@@ -459,8 +461,24 @@ schema.statics.getLatestThreads = async (columnId, count = 3, fids) => {
 * 创建专栏文章发布引用记录
 * */
 schema.statics.createColumnPost = async function(article, selectCategory) {
+  const SettingModel = mongoose.model('settings');
   const ColumnPostModel = mongoose.model('columnPosts');
+  const ColumnModel = mongoose.model('columns');
   const {_id, sid, uid, toc} = article;
+  const column = await ColumnModel.findOnly({_id: sid});
+  const order = await ColumnPostModel.getCategoriesOrder(selectCategory.selectedMainCategoriesId);
+  const columnPost = ColumnPostModel({
+    _id: await SettingModel.operateSystemID("columnPosts", 1),
+    order,
+    columnId: sid,
+    from: article.uid === column.uid ? 'own': 'reprint',
+    top: toc,
+    pid: _id,
+    type: 'article',
+    cid: selectCategory.selectedMainCategoriesId,
+    mcid: selectCategory.selectedMinorCategoriesId,
+  });
+  await columnPost.save();
 }
 
 /*
