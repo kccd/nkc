@@ -140,8 +140,9 @@
     methods: {
       //浏览器窗口大小变化
       watchOnresize() {
+        const self = this;
         window.onresize = function() {
-          this.setSaveInfo(true);
+          self.setSaveInfo(true);
         };
       },
       //更改内容保存信息

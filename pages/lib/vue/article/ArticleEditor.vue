@@ -385,6 +385,57 @@ export default {
       this.coverFile = null;
       this.$refs.documentEditor.resetCover(cover);
     },
+    // 检测作者信息
+    checkAuthorInfos: function() {
+      let self = this;
+      let checkAuthorInfos = this.checkAuthorInfos;
+      for(let i = 0; i < checkAuthorInfos.length; i++) {
+        let info = checkAuthorInfos[i];
+        this.checkString(info.name, {
+          name: "作者姓名",
+          minLength: 1,
+          maxLength: 100
+        });
+        this.checkString(info.kcid, {
+          name: self.websiteUserId,
+          minLength: 0,
+          maxLength: 100
+        });
+        this.checkString(info.agency, {
+          name: "机构名称",
+          minLength: 0,
+          maxLength: 100
+        });
+        this.checkString(info.agencyAdd, {
+          name: "机构地址",
+          minLength: 0,
+          maxLength: 100
+        });
+        if(!info.isContract) continue;
+        // 检测邮箱
+        this.checkEmail(info.contractObj.contractEmail);
+        this.checkString(info.contractObj.contractEmail, {
+          name: "通信邮箱",
+          minLength: 1,
+          maxLength: 200
+        });
+        this.checkString(info.contractObj.contractTel, {
+          name: "通信电话",
+          minLength: 0,
+          maxLength: 100
+        });
+        this.checkString(info.contractObj.contractAdd, {
+          name: "通信地址",
+          minLength: 0,
+          maxLength: 200
+        });
+        this.checkString(info.contractObj.contractCode, {
+          name: "通信邮编",
+          minLength: 0,
+          maxLength: 100
+        });
+      }
+    },
     //检测标题
     checkTitle() {
       if (this.article.title.length < 3) throw new Error('标题不能少于3个字');
