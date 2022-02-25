@@ -100,7 +100,7 @@ schema.statics.filterData = (filterData, allowKey)=>{
 /*  返回专栏文章需要的字段
     @param {Number} columnId 专栏ID
 *   @param {Number}  columnPosts的_id columnPosts的 _ID
-*/  
+*/
 schema.statics.getRequiredData = async (columnId, _id)=>{
   const nkcRender = require('../nkcModules/nkcRender');
   const ColumnPostModel = mongoose.model('columnPosts');
@@ -112,7 +112,7 @@ schema.statics.getRequiredData = async (columnId, _id)=>{
   // const userAllowKey = ['xfs'];
   const filteredThread = ColumnPostModel.filterData(article.thread, threadAllowKey)
   const filteredPost = ColumnPostModel.filterData(article.post, postAllowKey)
-  // const filteredColumnPost = ColumnPostModel.filterData(article.columnPost, columnPostAllowKey) 
+  // const filteredColumnPost = ColumnPostModel.filterData(article.columnPost, columnPostAllowKey)
   const filteredColumn = ColumnPostModel.filterData(article.column, columnAllowKey)
   filteredPost.c = nkcRender.renderHTML({
     type: 'article',
@@ -314,7 +314,7 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
     if(p.post) {
       p.post.url = `/m/${p.columnId}/a/${p._id}`
     } else {
-      p.article.url = ``
+      p.article.url = `/m/${p.columnId}/a/${p._id}#container`;
     }
     p.mainCategories = [];
     p.minorCategories = [];
