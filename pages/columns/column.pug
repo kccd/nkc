@@ -90,8 +90,9 @@ block content
             include ../publicModules/paging/paging_input
         .col-xs-12.col-md-3.box-shadow-panel.m-t-1
           -var columnToolStyle = `background-color: ${data.column.toolColor};`;
-          //--投稿按钮
+          //--发表独立文章按钮
           +mixinColumnArticleContribute(data.user, data.column, columnToolStyle)
+          //--投稿按钮
           +mixinColumnContribute(data.user, data.column, columnToolStyle)
           include ./modules/management
           include ./modules/info
