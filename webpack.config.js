@@ -3,6 +3,7 @@ const webpack = require("webpack");
 const globby = require("globby");
 const { VueLoaderPlugin } = require('vue-loader');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 
 const DIST_DIR = "dist";
 const LIB_DIR_PATTERN = "!pages/**/lib";
@@ -156,6 +157,7 @@ module.exports = {
     ]
   },
   plugins: [
+    // new BundleAnalyzerPlugin(),
     new VueLoaderPlugin(),
     new webpack.ProgressPlugin(),
     new MiniCssExtractPlugin({
@@ -166,7 +168,7 @@ module.exports = {
         const basename = path.basename(file, ext);
         return `${dir}/${basename}.css`;
       }
-    })
+    }),
   ],
   externals: {
     vue: "Vue"
