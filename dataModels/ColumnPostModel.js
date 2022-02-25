@@ -81,6 +81,8 @@ const schema = new Schema({
 
 */
 schema.statics.filterData = (filterData, allowKey)=>{
+  // 
+  if(!filterData) return {}
   const {timeFormat, getUrl} = require('../nkcModules/tools');
   let newObj = {}
   for (const key in filterData) {
@@ -105,15 +107,21 @@ schema.statics.getRequiredData = async (columnId, _id)=>{
   const nkcRender = require('../nkcModules/nkcRender');
   const ColumnPostModel = mongoose.model('columnPosts');
   const article = await ColumnPostModel.getArticleById(columnId, _id);
-  const postAllowKey = ['t','c','abstratCn','abstratEn','keyWordsCn','keyWordsEn','authorInfos','toc','originState','uid','collectedCount'];
+  let postAllowKey = ['t','c','abstratCn','abstratEn','keyWordsCn','keyWordsEn','authorInfos','toc','originState','uid','collectedCount'];
+  const ArticleAllowKey = ['title','content','abstrat','abstratEN','keyWords','keyWordsEN','authorInfos','toc','originState','uid','collectedCount'];
   const threadAllowKey = ['hits','count','oc'];
-  // const columnPostAllowKey = ['columnId'];
   const columnAllowKey = ['name','_id'];
+  if(article.type === 'article'){
+    postAllowKey = ArticleAllowKey
+  }
   // const userAllowKey = ['xfs'];
   const filteredThread = ColumnPostModel.filterData(article.thread, threadAllowKey)
-  const filteredPost = ColumnPostModel.filterData(article.post, postAllowKey)
+  const filteredPost = ColumnPostModel.filterData(article.article, postAllowKey)
+  // 过滤后出问题
+  console.log(filteredPost,'filteredPost')
   // const filteredColumnPost = ColumnPostModel.filterData(article.columnPost, columnPostAllowKey)
   const filteredColumn = ColumnPostModel.filterData(article.column, columnAllowKey)
+  filteredPost.c = filteredPost.c || filteredPost.content
   filteredPost.c = nkcRender.renderHTML({
     type: 'article',
     post: {
@@ -123,7 +131,7 @@ schema.statics.getRequiredData = async (columnId, _id)=>{
     },
     user:{xsf: article.user.xsf}
   });
-  // console.log(article.resources,'article.resources')
+  console.log(filteredPost,'article.resources')
 
   return {thread:filteredThread, post:filteredPost, column:filteredColumn, collectedCount:article.collectedCount, userAvatar:article.user.avatar}
 }
@@ -144,6 +152,7 @@ schema.statics.getArticleById = async (columnId, _id)=>{
   let columnPost = await ColumnPostsModel.findOne({_id, columnId})
   columnPost = columnPost.toObject()
   if(!columnPost) throwErr(500, '未查找到对应文章');
+  let user, resources, column;
   switch (columnPost.type) {
     case 'thread':
       
@@ -154,19 +163,23 @@ schema.statics.getArticleById = async (columnId, _id)=>{
       let post = await PostsModel.getPostByPid(columnPost.pid)
       post = post.toObject()
       // 查找用户
-      let user = await UserModel.findOne({uid:post.uid})
+      user = await UserModel.findOne({uid:post.uid})
       user = user.toObject()
       // 收藏数
       let collect = await ThreadModel.getCollectedCountByTid(columnPost.tid)
       // 专栏Id对应的专栏名字
-      let column = await ColumnModel.findOne({_id:columnPost.columnId})
+      column = await ColumnModel.findOne({_id:columnPost.columnId})
       column = column.toObject()
-      const resources = await ResourceModel.getResourcesByReference(columnPost.pid);
-      return {thread, post, column, collectedCount:collect, resources, user};
+      resources = await ResourceModel.getResourcesByReference(columnPost.pid);
+      return {thread, article:post, column, collectedCount:collect, resources, user, type:'post'};
     case 'article':
       // 未完待续
-      await ArticleModel.getArticleById()
-      break;
+      const article = await ArticleModel.getArticleById(columnPost.pid);
+      user = await UserModel.findOne({uid:article.uid});
+      user = user.toObject();
+      resources = await ResourceModel.getResourcesByReference(`document-${article.did}`);
+      column = await ColumnModel.findOne({_id:columnPost.columnId})
+      return {article, user, resources, column, type:'article'};
     default:
       break;
   }
