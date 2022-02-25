@@ -55,7 +55,8 @@ block settingsContent
                   label
                     input(type="checkbox" :value="p._id" v-model="selectedColumnPostsId")
               .post-content
-                a(:href="p.post.url" target="_blank").post-title {{p.thread.firstPost.t}}
+                a(:href="p.post.url" target="_blank" v-if="p.post && p.post.url").post-title {{p.thread.firstPost.t}}
+                a(:href="p.article.url" target="_blank" v-if="p.article && p.article.url").post-title {{p.article.document.title}}
               .column-post-management-abstract(v-if="p.type === 'post'") {{p.post.c}}...
               .post-info
                 span.m-r-1 ID：{{p._id}}
@@ -70,12 +71,12 @@ block settingsContent
                 span 辅分类：
                   span(v-if='p.minorCategories.length === 0') 无
                   span(v-else v-for="c in p.minorCategories") {{c.name}}&nbsp;
-              b.text-danger(v-if="p.thread.disabled") 文章已屏蔽，仅后台可见
-              b.text-danger(v-else-if="p.post.disabled") 回复已屏蔽，仅后台可见
-              b.text-danger(v-else-if="p.thread.recycleMark") 文章已退修，仅后台可见
-              b.text-danger(v-else-if="p.post.toDraft") 回复已退修，仅后台可见
-              b.text-danger(v-else-if="!p.thread.reviewed") 文章未审核，仅后台可见
-              b.text-danger(v-else-if="!p.post.reviewed") 回复未审核，仅后台可见
+              b.text-danger(v-if="p.thread && p.thread.disabled") 文章已屏蔽，仅后台可见
+              b.text-danger(v-else-if="p.post && p.post.disabled") 回复已屏蔽，仅后台可见
+              b.text-danger(v-else-if="p.thread && p.thread.recycleMark") 文章已退修，仅后台可见
+              b.text-danger(v-else-if="p.post && p.post.toDraft") 回复已退修，仅后台可见
+              b.text-danger(v-else-if="p.type === 'thread' && !p.thread.reviewed") 文章未审核，仅后台可见
+              b.text-danger(v-else-if="p.type === 'post' && !p.post.reviewed") 回复未审核，仅后台可见
               div.text-right
                 button.btn.btn-xs.btn-default(v-if="column.topped.indexOf(p._id) === -1" @click="movePost('columnTop', [p._id])") 首页置顶
                 button.btn.btn-xs.btn-default(v-else @click="movePost('unColumnTop', [p._id])") 取消首页置顶
