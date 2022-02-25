@@ -1,10 +1,13 @@
--var {column, from, type, post, thread, mainCategories, columnId, toc} = columnPost
--var {firstPost} = thread;
+-var {column, from, type, post, thread, article, mainCategories, columnId, toc} = columnPost
+if thread
+  -var {firstPost} = thread;
 .column-posts-post
-  .column-post-body(class=thread.firstPost.cover?"cover":"")
-    if thread.firstPost.cover
-      .column-post-cover
+  .column-post-body(class=(thread && thread.firstPost.cover) || (article && article.document.cover)?"cover":"")
+    .column-post-cover
+      if thread && thread.firstPost.cover
         div(style=`background-image:url(${tools.getUrl("postCover", thread.firstPost.cover)})`)
+      else if article && article.document.cover
+        div(style=`background-image:url(${tools.getUrl("postCover", article.document.cover)})`)
     .column-post-abstract
       if type === "post"
         .column-post-content.post
@@ -16,29 +19,34 @@
           | ：
           span=post.c
       .column-post-title
-        if data.c 
-          a(href=`${post.url}?c=${data.c}` target='_blank')=firstPost.t
-        else 
-          a(href=`${post.url}` target='_blank')=firstPost.t
+        if firstPost
+          a(href=post.url target='_blank')=firstPost.t
+        else if article
+          a(href=article.url target='_blank')=article.document.title
         //a(href=tools.getUrl('columnPost', data.column._id, post.pid))=firstPost.t
       if type === "thread"
         .column-post-content= post.c
+      if type === "article"
+        .column-post-content= article.document.content
       .column-post-info
-        if !data.column || data.column.uid !== post.uid
-          if !thread.firstPost.anonymous
-            a(href=`/u/${thread.firstPost.uid}` target="_blank" data-float-uid=thread.firstPost.uid).column-post-author
-              img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm'))
-              span=thread.firstPost.user.username
-          else
-            span.column-post-author
-              img(src=anonymousInfo.avatar)
-              span.anonymous-name=anonymousInfo.username
+        if post
+          if !data.column || data.column.uid !== post.uid
+            if !thread.firstPost.anonymous
+              a(href=`/u/${thread.firstPost.uid}` target="_blank" data-float-uid=thread.firstPost.uid).column-post-author
+                img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm'))
+                span=thread.firstPost.user.username
+            else
+              span.column-post-author
+                img(src=anonymousInfo.avatar)
+                span.anonymous-name=anonymousInfo.username
         .column-post-time
           span.m-r-05
             //-=fromNow(toc)
             +fromNow(toc)
           if data.column && from === "contribute"
             span 来自投稿
+          else if type === 'thread' || type === 'post'
+            span 引用自社区
         .column-post-forums
           if data.column
             -var category = "";

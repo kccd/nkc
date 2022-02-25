@@ -5,6 +5,7 @@
       .form-group(v-if="formConfigs.title")
         input.form-control.form-title(type="text" v-model="title" placeholder="请输入标题")
       .form-group
+
         editor(:configs="editorConfigs" ref="editor" @content-change="watchContentChange" :plugs="editorPlugs" @ready="editorReady")
       .form-group(v-if="formConfigs.cover")
         .m-b-2
@@ -256,7 +257,7 @@ import {getState} from "../js/state";
 import {getDataById} from "../js/dataConversion";
 const data = getDataById('data');
 export default {
-  props: ['configs', 'column'],
+  props: ['configs'],
   data: () => ({
     title: '',
     cover: "",
@@ -275,6 +276,7 @@ export default {
     originState: 0, // 原创声明
     contentLength: 0,
     websiteUserId: data.websiteCode + "ID",
+    column: data.column,
     originLevel: [
       "不声明",
       "普通转载",
@@ -379,6 +381,9 @@ export default {
     getState: getState,
     getLength: getLength,
     getUrl: getUrl,
+    setSavedStatus(type) {
+      this.$refs.editor.changeSaveInfo(type);
+    },
     //专栏分类发生改变
     categoryChange() {
       this.selectCategory = this.getSelectCategory();

@@ -1,52 +1,32 @@
 <template lang="pug">
   .container-fluid
-    .m-b-1(v-if="type === 'all'")
-      span.b-b(@click="toggle('drafts')" :class="{active : draftsType === 'drafts'}") 自定义 
-      span |
-      span.m-r-05.b-b(@click="toggle('column')" :class="{active : draftsType === 'column'}") 专栏
-      p.m-t-2(v-show="draftsType === 'drafts'")
-        button.m-r-05.btn.btn-default.btn-sm(@click="newDraft") 新建图文片段
-        button.btn.btn-default.btn-sm(@click="toTrash" ) 回收站
-    .m-b-1(v-else)
-      bread-crumb(:list="navList")
-    .m-b-05(v-if="pages && pages.length > 0")
-      paging(:pages="pages" @click-button="switchPage")
-    .m-b-05
-      .drafts
-        .p-t-2.p-b-2.text-center(v-if="!draftsData.length") 空空如也~
-        .draft-item(v-for="draft in draftsData" @click="toEditDraft(draft)" :class="type")
-          .draft-title {{draft.title}}
-          .draft-content {{draft.content}}
-          .draft-time
-            .fa.fa-lightbulb-o.m-r-05
-            span 最后编辑于 {{draft.time}}
-            span.icon.icon-recover(v-if='draft.deleted' @click.stop="recoverDraft(draft)") 恢复
-            span.icon.icon-delete(v-else @click.stop="deleteDraft(draft)") 删除
+    .m-b-1
+      button.m-r-05.btn.btn-default.btn-sm(@click="newDraft") 撰写新片段
+      //button.btn.btn-default.btn-sm(@click="toTrash" ) 回收站
+    paging(:pages="pages" @click-button="switchPage")
+    blank(v-if="draftsData.length === 0")
+    .drafts(v-else)
+      .draft-item(v-for="draft in draftsData" @click="toEditDraft(draft)" :class="type")
+        .draft-title(:title="draft.title") {{draft.title}}
+        .draft-content {{draft.content}}
+        .draft-time
+          .fa.fa-lightbulb-o.m-r-05
+          span 最后编辑于 {{draft.time}}
+          span.icon.icon-recover(v-if='draft.deleted' @click.stop="recoverDraft(draft)") 恢复
+          span.icon.icon-delete(v-else @click.stop="deleteDraft(draft)") 删除
     .m-b-05(v-if="pages && pages.length > 0")
       paging(:pages="pages" @click-button="switchPage")
 </template>
 <style lang="less" scoped>
   @import "../../../publicModules/base";
-  .b-b{
-     border-bottom:1px solid orange;
-     padding: 2px 4px;
-    //  border-radius: 4px;
-     transition: all .5s;
-     cursor: pointer;
-  }
-  .b-b:hover{
-    border-bottom:1px solid rgb(0, 238, 255);
-  }
-  .active{
-    color: orange;
-  }
   .drafts{
     .draft-item{
-      width: 34rem;
+      width: 26.2rem;
+      border-radius: 3px;
       max-width: 100%;
       border: 1px solid #eee;
-      background-color: #fff;
-      padding: 1rem;
+      background-color: #efefef;
+      padding: 1rem 1rem;
       cursor: pointer;
       display: inline-block;
       margin: 0 1rem 1rem 0;
@@ -85,10 +65,10 @@
         }
       }
       .draft-content{
-        height: 10rem;
+        height: 6.8rem;
         margin-bottom: 1rem;
         color: #555;
-        .hideText(@line: 6);
+        .hideText(@line: 4);
       }
       &.trash{
         opacity: 0.8;
@@ -103,17 +83,17 @@
   import DraftsBox from "../../../lib/vue/drafts/CustomDraftsBox";
   import Paging from "../../../lib/vue/Paging";
   import {sweetError, sweetQuestion, sweetSuccess} from '../../../lib/js/sweetAlert';
+  import Blank from '../../components/Blank';
   export default {
     data: () => ({
       type: 'all', // all, trash
       draftsData: [],
       paging: null,
-      // 区分是 自定义 还是 专栏
-      draftsType:'drafts'
     }),
     components: {
       'drafts-box': DraftsBox,
-      'paging': Paging
+      'paging': Paging,
+      'blank': Blank,
     },
     computed: {
       pages() {
@@ -144,15 +124,12 @@
       this.initType();
       this.getDrafts();
     },
+    watch: {
+      $route() {
+        this.getDrafts(this.$route.query.page);
+      }
+    },
     methods: {
-      toggle(type){
-        
-        if(type === 'drafts'){
-          this.getDrafts()
-        }else if(type === 'column'){
-          this.getColumn()
-        }
-      },
       initType() {
         const {type = "all"} = this.$route.query;
         this.type = type;
@@ -173,17 +150,12 @@
         this.getDrafts();
       },
       switchPage(num) {
-        this.getDrafts(num);
-      },
-      getColumn(page = 0){
-        // this.draftsData = [{'title':1,content:'11'}];
-        nkcAPI(`/creation/drafts/column?pageNumber=${page}`, 'GET')
-          .then(data => {
-            this.draftsData = data.draftsData
-            this.paging = data.paging;
-            this.draftsType = 'column'
-          })
-          .catch(sweetError)
+        this.$router.replace({
+          name: this.$route.name,
+          query: {
+            page: num
+          }
+        });
       },
       getDrafts(num = 0) {
         const {type} = this;
@@ -192,37 +164,27 @@
           .then(data => {
             self.draftsData = data.draftsData;
             self.paging = data.paging;
-            this.draftsType = 'drafts'
+            self.draftsType = 'drafts'
           })
           .catch(sweetError)
       },
-      draftOption(draft, operation) {
-        let deleteTitle = '确定要删除当前自定义草稿吗？删除后可通过回收站找回。' 
-        const {draftId} = draft;
-        let deleteUrl = [`/creation/draft?id=${draftId}&type=custom&operation=${operation}`, 'DELETE']
-        if(this.draftsType === 'column'){
-          const {articleId} = draft
-          deleteTitle = '删除后不能恢复，确定要删除当前专栏草稿吗？';
-          deleteUrl[0] = `/creation/draft?id=${articleId}&type=column&operation=${operation}`
-        }
-        const self = this;
+      draftOption(draft, type) {
         return Promise.resolve()
           .then(() => {
-            if(operation === 'delete') {
-              return sweetQuestion(deleteTitle);
+            if(type === 'delete') {
+              return sweetQuestion('片段被删除后无法恢复，确定要删除吗？')
             }
           })
           .then(() => {
-            return nkcAPI(...deleteUrl)
+            return nkcAPI(`/creation/draft/${draft.draftId}?type=${type}`, 'DELETE')
           })
           .then(() => {
-            if(this.draftsType === 'column') {
-              this.getColumn()
-              return
+            if(type === 'recover') {
+              sweetSuccess('片段已恢复')
             }
-            self.getDrafts(this.paging.page);
+            this.getDrafts(this.pages.page);
           })
-          .catch(sweetError)
+          .catch(sweetError);
       },
       recoverDraft(draft) {
         this.draftOption(draft, 'recover')
@@ -231,19 +193,13 @@
         this.draftOption(draft, 'delete')
       },
       newDraft() {
-        this.navToPage("draftEdit", {}, {});
+        this.navToPage("draftEditor", {}, {});
       },
       toEditDraft(draft) {
-        if(this.draftsType === 'column'){
-          const {articleId, columnId} = draft 
-          window.open(`/column/editor?mid=${columnId}&aid=${articleId}`)
-        }else{
-          if(this.type !== 'all') return;
-          const {draftId} = draft;
-          this.navToPage("draftEdit", {}, {
-          draftId: draftId
+        const {draftId} = draft;
+        this.navToPage("draftEditor", {}, {
+          id: draftId
         });
-        }
       }
     }
   }

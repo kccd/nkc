@@ -93,8 +93,37 @@ const schema = new mongoose.Schema({
     index: 1
   }
 }, {
-  collection: 'articles'
+  collection: 'articles',
+  toObject: {
+    getters: true,
+    virtuals: true
+  }
 });
+
+schema.virtual('user')
+  .get(function() {
+    return this._user
+  })
+  .set(function(user) {
+    this._user = user
+  });
+
+schema.virtual('content')
+  .get(function() {
+    return this._content
+  })
+  .set(function(content) {
+    this._content = content
+  });
+
+schema.virtual('url')
+  .get(function() {
+    return this._url
+  })
+  .set(function(url) {
+    this._url = url
+  });
+
 
 /*
 * 获取 status
@@ -344,7 +373,6 @@ schema.methods.deleteReferences = async function() {
 * 删除文章并删除文章引用
 * */
 schema.methods.deleteArticleAndReferences = async function() {
-  const {_id: articleId, source, sid} = this;
   await this.deleteArticle();
   await this.deleteReferences();
 };
@@ -778,6 +806,7 @@ schema.methods.changeHasDraftStatus = async function() {
 /*
 * 拓展article下的document
 * @param {Object} articles 需要拓展document的article
+* @param {string} type 需要拓展的类型 stable beta
 * @param {Array} options article需要拓展document的内容
 * document: [
 *   _id,
@@ -799,7 +828,7 @@ schema.methods.changeHasDraftStatus = async function() {
 *   source,
 * ]
 * */
-schema.statics.extendDocumentsOfArticles = async function(articles, options) {
+schema.statics.extendDocumentsOfArticles = async function(articles, type = 'beta', options) {
   const DocumentModel = mongoose.model('documents');
   const arr = [];
   const obj = {};
@@ -808,9 +837,9 @@ schema.statics.extendDocumentsOfArticles = async function(articles, options) {
     if(article.type === 'deletes') continue;
     arr.push(article.did);
   }
-  const {beta} = await DocumentModel.getDocumentTypes();
+  const documentType = await DocumentModel.getDocumentTypes();
   const {article} = await DocumentModel.getDocumentSources();
-  const documents = await DocumentModel.find({did: {$in: arr}, type: beta, source: article});
+  const documents = await DocumentModel.find({did: {$in: arr}, type: documentType[type], source: article});
   for(const document of documents) {
     const a = {};
     for(const t of options) {
@@ -821,7 +850,8 @@ schema.statics.extendDocumentsOfArticles = async function(articles, options) {
   for(const article of articles) {
     const {_id, did, toc, status, hasDraft, sid, uid, source} = article;
     const document = obj[article.did];
-    _articles.push(Object.assign({
+    if(!document) continue;
+    _articles.push({
       _id,
       did,
       toc,
@@ -830,7 +860,8 @@ schema.statics.extendDocumentsOfArticles = async function(articles, options) {
       sid,
       uid,
       source,
-    }, document))
+      document,
+    })
   }
   return _articles;
 }

@@ -108,7 +108,7 @@
               title: '专题制作',
             },
             {
-              type: 'drafts',
+              type: 'draftEditor',
               title: '片段创作'
             }
           ]

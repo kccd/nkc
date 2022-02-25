@@ -7,7 +7,7 @@
       //.article-draft-content {{draft.content}}
       .article-draft-info
         .article-draft-time {{draft.time}}
-        .article-draft-from {{draft.type === 'create'? '撰写文章': '编辑文章'}}
+        .article-draft-from {{draft.type === 'create'? '新写文章': '修改文章'}}
       .article-draft-options
         .article-draft-option(@click="navToEditor(draft)") 继续创作
         .article-draft-option(@click="removeDraft(draft)") 删除
@@ -85,7 +85,7 @@ export default {
     },
     removeDraft(draft) {
       const self = this;
-      sweetQuestion(`确定要删除文章？当前操作不可恢复。`)
+      sweetQuestion(`草稿被删除后无法恢复，确定要删除吗？`)
         .then(() => {
           const url = `/creation/article/${draft.articleId}/draft`;
           return nkcAPI(url, 'DELETE')

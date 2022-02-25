@@ -8,12 +8,47 @@
       xsf-selector(ref="xsfSelector")
       math-jax-selector(ref="mathJaxSelector")
       drafts-selector(ref="draft")
-      div(:id="domId")
+      .editor-container(:id="domId")
+        .save-info(:class="saveInfoClass" ref="saveInfo")
+          .save-success(v-if="saveInfo === 'succeeded'")
+            .fa.fa-check-circle.m-r-05
+            span 内容已保存
+          .save-filed(v-if="saveInfo === 'failed'")
+            .fa.fa-remove.m-r-05
+            span 内容保存失败
+          .save-saving(v-if="saveInfo === 'saving'") 内容保存中...
 </template>
 
 <style lang="less" scoped>
   .editor{
     background-color: #f4f4f4;
+    .editor-container {
+      position: relative;
+    }
+    .save-info {
+      text-align: right;
+      z-index: 1000;
+      margin: auto;
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: rgba(0, 0, 0, 0);
+      font-size: 1.2rem;
+      transition: opacity 200ms;
+      opacity: 0;
+      &.succeeded, &.failed, &.saving{
+        opacity: 1;
+      }
+      .save-success {
+        color: #2b90d9;
+      }
+      .save-filed {
+        color: #e85a71;
+      }
+      .save-saving {
+        color: #666;
+      }
+    }
   }
 </style>
 
@@ -44,6 +79,10 @@
       domId: '',
       errorInfo: '',
       noticeFunc: null,
+      saveInfo: '', //消息dom显示
+      saveInfoClass: '', //消息框dom显示
+      infoTime: '',
+      ready: false,
       defaultPlugs: {
         resourceSelector: true,
         draftSelector: true,
@@ -102,8 +141,39 @@
         this.editor.destroy();
       }
       this.removeNoticeEvent();
+      this.removeScrollEvent();
     },
     methods: {
+      //浏览器窗口大小变化
+      watchOnresize() {
+        const self = this;
+        window.onresize = function() {
+          self.setSaveInfo(true);
+        };
+      },
+      //更改内容保存信息
+      changeSaveInfo(info) {
+        const self = this;
+        if(!info) return;
+        clearTimeout(self.infoTime);
+        if(info === 'saving') {
+          self.infoTime = setTimeout(function() {
+            self.saveInfo = info;
+            self.saveInfoClass = info;
+          }, 200);
+        } else {
+          self.saveInfo = info;
+          self.saveInfoClass = info;
+          if(info === 'succeeded') {
+            setTimeout(function (){
+              self.saveInfoClass = '';
+              setTimeout(function() {
+                self.saveInfo = '';
+              }, 200);
+            }, 1000);
+          }
+        }
+      },
       contentChange(){
         const  _this = this;
         return this.editor.addListener("contentChange", function () {
@@ -120,13 +190,40 @@
           const {domId, defaultConfigs, configs = {}} = self;
           self.editor = UE.getEditor(domId, Object.assign({}, defaultConfigs, configs));
           self.editor.ready(resolve);
-
         })
           .then(() => {
             setTimeout(() => {
+              self.ready = true;
               self.$emit('ready');
+              self.initScrollEvent();
+              self.watchOnresize();
             }, 500)
           });
+      },
+      scrollEvent() {
+        this.setSaveInfo(true);
+      },
+      //监听屏幕滚动创建文档保存提示dom
+      initScrollEvent() {
+        const self = this;
+        self.setSaveInfo();
+        window.addEventListener("scroll", this.scrollEvent);
+      },
+      removeScrollEvent() {
+        window.removeEventListener("scroll", this.scrollEvent);
+      },
+      setSaveInfo(flag) {
+        const self = this;
+        if(!self.ready) return;
+        const editorDom = $(`#${self.domId}`).find('.edui-editor-toolbarbox').eq(0);
+        const editorContainer = $('.editor-container').eq(0);
+        const {top: containerTop} = editorContainer.offset();
+        const {top} = editorDom.offset();
+        const height = editorDom.height();
+        const saveInfoDom = $(this.$refs.saveInfo);
+        saveInfoDom.css({
+          top: flag?top - containerTop + height:height,
+        });
       },
       initNoticeEvent() {
         this.removeNoticeEvent();
