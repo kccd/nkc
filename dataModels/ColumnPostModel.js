@@ -152,41 +152,48 @@ schema.statics.getArticleById = async (columnId, _id)=>{
 * 拓展专栏的内容
 * */
 schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
-  if(columnPosts.length === 0) return [];
+  if (columnPosts.length === 0) return [];
   const PostModel = mongoose.model("posts");
   const ThreadModel = mongoose.model("threads");
   const UserModel = mongoose.model("users");
   const ColumnModel = mongoose.model("columns");
+  const ArticleModel = mongoose.model('articles');
   const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
   const pid = new Set();
   const tid = new Set();
   const uid = new Set();
+  const aid = new Set();
   const columnId = new Set();
   let cid = [];
-  const postsObj = {}, threadsObj = {};
+  const postsObj = {}, threadsObj = {}, articleObj = {};
+  //文章类型分类
   columnPosts.map(post => {
-    pid.add(post.pid);
-    tid.add(post.tid);
+    if (post.type === 'post') pid.add(post.pid);
+    if (post.type === 'thread') tid.add(post.tid);
+    if (post.type === 'article') aid.add(post.pid);
     columnId.add(post.columnId);
     cid = cid.concat(post.cid, post.mcid);
   });
+  //文章查找规则
   const threadMatch = {
     tid: {
       $in: [...tid]
     }
   };
-  if(fidOfCanGetThread) {
+  if (fidOfCanGetThread) {
     threadMatch.recycleMark = {$ne: true};
     threadMatch.disabled = false;
     threadMatch.reviewed = true;
     threadMatch.mainForumsId = {$in: fidOfCanGetThread};
   }
+  //查找文章对应的专栏
   const columns = await ColumnModel.find({_id: {$in: [...columnId]}});
   const columnsObj = {};
   columns.map(column => {
     columnsObj[column._id] = column;
   });
   let threads = await ThreadModel.find(threadMatch);
+  //拓展thread
   threads = await ThreadModel.extendThreads(threads, {
     htmlToText: true,
     category: false,
@@ -203,10 +210,11 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
   threads.map(thread => {
     threadsObj[thread.tid] = thread;
   });
+  //post文章查找规则
   const postMatch = {
     pid: {$in: [...pid]}
   };
-  if(fidOfCanGetThread) {
+  if (fidOfCanGetThread) {
     postMatch.toDraft = {$ne: true};
     postMatch.disabled = false;
     postMatch.mainForumsId = {$in: fidOfCanGetThread};
@@ -216,6 +224,29 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
     postsObj[post.pid] = post;
     uid.add(post.uid);
   });
+  //独立文章查找
+  const articleMatch = {
+    _id: {$in: [...aid]}
+  };
+  const {normal} = await ArticleModel.getArticleStatus();
+  const {column: ArticleSource} = await ArticleModel.getArticleSources();
+  if (fidOfCanGetThread) {
+    articleMatch.status = normal;
+    articleMatch.source = ArticleSource;
+  }
+  let articles = await ArticleModel.find(articleMatch);
+  const articleOptions = [
+    '_id',
+    'content',
+    'title',
+    'cover',
+    'toc',
+  ]
+  articles = await ArticleModel.extendDocumentsOfArticles(articles, 'stable', articleOptions);
+  articles.map(article => {
+    articleObj[article._id] = article;
+    uid.add(article.uid);
+  })
   const usersObj = {};
   const users = await UserModel.find({uid: {$in: [...uid]}});
   users.map(user => {
@@ -227,13 +258,12 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
     categoriesObj[c._id] = c;
   });
   const results = [];
-  // console.log(columnPosts,'columnPosts')
   for(let p of columnPosts) {
     p = p.toObject();
     p.column = columnsObj[p.columnId];
     if(!p.column) continue;
     p.thread = threadsObj[p.tid];
-    if(!p.thread) continue;
+    if(!p.thread && p.type !== 'article') continue;
     if(p.type === "thread") {
       if(p.thread.firstPost.anonymous) {
         p.thread.uid = "";
@@ -241,7 +271,7 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
         p.thread.firstPost.user = "";
       }
       p.post = p.thread.firstPost;
-    } else {
+    } else if(p.type === 'post') {
       p.post = postsObj[p.pid];
       if(!p.post) continue;
       if(p.post.anonymous) {
@@ -251,9 +281,18 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
       }
       p.post = p.post.toObject();
       p.post.c = obtainPureText(p.post.c, true, 200);
+    } else if(p.type === 'article') {
+      p.article = articleObj[p.pid];
+      if(!p.article) continue;
+      p.article.user = usersObj[p.article.uid];
+      p.article.document.content = obtainPureText(p.article.document.content, true, 200);
     }
     // p.post.url = await PostModel.getUrl(p.pid);
-    p.post.url = `/m/${p.columnId}/a/${p._id}`
+    if(p.post) {
+      p.post.url = `/m/${p.columnId}/a/${p._id}`
+    } else {
+      p.article.url = ``
+    }
     p.mainCategories = [];
     p.minorCategories = [];
     for(const id of p.cid) {
