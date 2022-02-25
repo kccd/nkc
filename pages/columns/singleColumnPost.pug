@@ -19,7 +19,7 @@ if thread
           | ：
           span=post.c
       .column-post-title
-        if firstPost
+        if post && post.url
           a(href=post.url target='_blank')=firstPost.t
         else if article
           a(href=article.url target='_blank')=article.document.title
