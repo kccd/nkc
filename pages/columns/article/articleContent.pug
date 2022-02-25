@@ -1,0 +1,9 @@
+//-  文章正文
+mixin articleContent(data)
+    +includeCSS('/columns/article/articleContent.css')
+    p.content-title.line-title 正文
+    section.content
+      article!=data.post.c
+
+
+

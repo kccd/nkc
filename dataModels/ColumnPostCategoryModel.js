@@ -250,7 +250,12 @@ schema.statics.getChildCategoryId = async (categoryId) => {
   const results = await mongoose.model("columnPostCategories").getChildCategory(categoryId);
   return results.map(r => r._id);
 };
-
+/*
+ * 通过分类id获取id对应的名称
+ */
+schema.statics.getCategoryNameById = async (id)=>{
+  return await mongoose.model("columnPostCategories").findOne({_id:id},{name:1})
+}
 /*
 * 操作分类内容时，移除不在该分类下的置顶文章
 * @param {Number} columnId 专栏ID

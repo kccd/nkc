@@ -61,18 +61,24 @@ router
     const q = {
       columnId: column._id
     };
+    //当前用户能查看的文章
     const fidOfCanGetThread = await db.ForumModel.getReadableForumsIdByUid(data.user? data.user.uid: '');
     const sort = {};
     if(cid) {
+      //主分类
       const category = await db.ColumnPostCategoryModel.findOnly({_id: cid});
       if(category.columnId !== column._id) ctx.throw(400, `文章分类【${cid}】不存在或已被专栏主删除`);
       if(page === 0 && !mcid) {
         data.categoryDescription = await category.renderDescription();
       }
+      //主分类的子分类
       data.childCategories = await category.getChildCategories();
       data.category = category;
+      //分类下的文章数量
       data.categoryPostCount = await db.ColumnPostModel.countDocuments({columnId: column._id, cid: category._id});
+      //分类导航
       data.categoriesNav = await db.ColumnPostCategoryModel.getCategoryNav(category._id);
+      //子分类
       const minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id, data.category._id, true);
       data.minorCategories = minorCategories.filter(mc => {
         data.categoryPostCount += mc.count;

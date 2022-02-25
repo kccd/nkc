@@ -6,7 +6,7 @@
         span 当前专栏存在草稿,点击编辑继续编辑草稿
         .article-list(v-for="article of articles")
           .article-info
-            span.article-name(v-if="article.title") {{article.title}}
+            span.article-name(v-if="article.document.title") {{article.document.title}}
             span.article-name(v-else) 未知
             span.article-time {{timeFormat(article.toc)}}
           .article-do(@click="editArticle(article._id)")

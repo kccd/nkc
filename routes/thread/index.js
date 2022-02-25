@@ -486,6 +486,7 @@ threadRouter
     }
 
 		data.thread = thread;
+    console.log(thread,'thread')
 		data.forums = forums;
 
 		data.replyTarget = `t/${tid}`;

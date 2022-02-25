@@ -30,7 +30,7 @@ router
       const options = [
         'title',
       ];
-      articles = await db.ArticleModel.extendDocumentsOfArticles(articles, options);
+      articles = await db.ArticleModel.extendDocumentsOfArticles(articles, 'beta', options);
     }
     
     if(article) {

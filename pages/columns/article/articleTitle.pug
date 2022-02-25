@@ -1,0 +1,29 @@
+//-  文章的标题,作者等
+mixin articleTitle(data)
+  +includeCSS('/columns/article/articleTitle.css')
+  .common-article-head
+        h1.common-article-title=data.post.t
+        p
+          for authorInfo in data.post.authorInfos
+            span=authorInfo.name
+            span.common-article-author.fa.fa-envelope-open-o(onclick="displayAuthor('"+objToStr(authorInfo.contractObj)+"')")
+        p
+          for authorInfo in data.post.authorInfos
+            span=authorInfo.agency
+        .common-article-info
+          //- for authorInfo in data.post.authorInfos
+          //-   a.common-article-author.jump.m-r-1(href=`/u/${data.post.uid}` target="_blank" data-float-uid=`${data.post.uid}`)
+          //-     img.head-portrait(src="")
+          //-     span.kcid=authorInfo.kcid 
+          a.common-article-author.jump.m-r-1(href=`/u/${data.post.uid}` target="_blank" data-float-uid=`${data.post.uid}`)
+            //- img.head-portrait(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+            img(src=tools.getUrl('userAvatar', data.userAvatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+            span.kcid=data.post.authorInfos[0].kcid 
+          span.modify-time.m-r-1=data.post.toc
+          if ['3','4','5','6'].includes(data.post.originState)
+            span#dropdown.m-r-1.origin.fa.fa-caret-square-o-down.origin-icon.dropdown(onclick="originTitle()") 原创
+              .dropdown-menu(aria-labelledby='dropdown-level')
+                  span(style="padding:5px")!=`${getOriginLevel(data.post.originState)}`
+          a.column.jump.m-r-1(href=`/m/${data.column._id}` target="_blank")=data.column.name
+  block scripts
+    +includeJS('/columns/article/articleTitle.js')
