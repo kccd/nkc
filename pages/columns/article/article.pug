@@ -21,12 +21,16 @@ block content
       //- 滚动到页头页脚  
       include ../../module_scrollTo.pug
   #vueMountPoint
-    //-  显示作者信息
+    //-  hover显示作者信息
     <float-user-panel ref='floatUserPane'></float-user-panel>
     //- <author-communication :contract="contract"></author-communication>
   //- 显示作者联系信息
   include ./articleAuthorInfo.pug
   +authorInfo()
+  //- include ../../publicModules/floatForumNav
+  include ../../publicModules/nkcSource
+  //- 下拉后左边显示的所属专业 上级专业 同级专业
+  //- +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 block scripts 
- +includeJS('/columns/article/article.js')
+//-  +includeJS('/columns/article/article.js')
 

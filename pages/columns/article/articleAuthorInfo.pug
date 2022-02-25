@@ -11,13 +11,15 @@ mixin authorInfo()
           .form
             .form-group()
               h5 通信邮箱：
-              strong {{contract.contractEmail || '暂无数据'}}
+              strong {{contract.contractEmail }}
             .form-group()
               h5 电话号码：
-              strong {{contract.contractTel || '暂无数据'}}
+              strong {{contract.contractTel }}
             .form-group()
               h5 通信地址：
-              strong {{contract.contractAdd || '暂无数据'}}
+              strong {{contract.contractAdd }}
             .form-group()
               h5 邮政编码：
-              strong {{contract.contractCode || '暂无数据'}}
+              strong {{contract.contractCode }}
+  block scripts 
+    +includeJS('/columns/article/articleAuthorInfo.js')

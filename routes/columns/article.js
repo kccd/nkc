@@ -8,7 +8,7 @@ router.get('/:aid', async (ctx, next)=>{
 
   // console.log(article,'article')
   data.article = article
-  // 文章所属分类
+  // 文章所属分类 名字 和 id
   if(category.c){
     let categoryInfo = await db.ColumnPostCategoryModel.getCategoryNameById(category.c)
     data.article.category = {name:categoryInfo.name, id:categoryInfo._id}

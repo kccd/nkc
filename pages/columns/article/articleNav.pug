@@ -2,23 +2,23 @@
 mixin articleNav(data)
   +includeCSS('/columns/article/articleNav.css')
   header
-    p.path-navigation
+    p.path-navigation.hidden-xs
       a.jump(href=`/m`) 专栏
-      span >
+      span.nav-common >
       a.jump(href=`/m/${data.column._id}`)=data.column.name
-      span >
+      span.nav-common >
       if data.category
         a.jump(href=`/m/${data.column._id}?c=${data.category.id}`)=data.category.name
       else 
         a.jump(href=`/m/${data.column._id}`) 全部
     p.info-list
-      span.m-r-2
+      span.m-r-1
         span 文号
         span=data.thread.oc  
-      span.m-r-2
+      span.m-r-1
         span.fa.fa-eye(title="浏览数")=data.thread.hits 
         span.fa.fa-comment(title='回复数' onclick="window.location.href='#container'")=data.thread.count 
-      span.m-r-2
+      span.m-r-1
         span 收藏
         span=data.collectedCount 
-      span.fa.fa-cog.m-r-2(onclick="showSetUp()")
+      span.fa.fa-cog.m-r-1(onclick="showSetUp()")

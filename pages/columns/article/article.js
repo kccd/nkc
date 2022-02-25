@@ -1,6 +1,6 @@
 import FloatUserPanel from '../../lib/vue/FloatUserPanel.vue'
 // import AuthorCommunication from '../lib/vue/AuthorCommunication.vue'
-Object.assign(window, {showSetUp, displayAuthor})
+// Object.assign(window, {showSetUp, displayAuthor})
 let author = {};
 $(document).ready(function(){
   author.dom = $("#moduleAuthor");
@@ -20,24 +20,18 @@ $(document).ready(function(){
     methods:{
     }
   });
-  author.app = new Vue({
-	  el: "#moduleAuthorApp",
-	  data: {
-		  contract: ""
-	  }
-  });
+  // author.app = new Vue({
+	//   el: "#moduleAuthorApp",
+	//   data: {
+	// 	  contract: ""
+	//   }
+  // });
 })
-function displayAuthor(contractStr) {
-  var contract = NKC.methods.strToObj(contractStr);
-  author.app.contract = contract;
-  // author.vm.contract = contract
-  author.dom.modal("show");
+// function displayAuthor(contractStr) {
+//   var contract = NKC.methods.strToObj(contractStr);
+//   author.app.contract = contract;
+//   // author.vm.contract = contract
+//   author.dom.modal("show");
 
-}
-function showSetUp(){
-  if($('.set-up').attr('class') === 'set-up'){
-    $('.set-up')[0].classList.add('set-up-active')
-  }else{
-    $('.set-up')[0].classList.remove('set-up-active')
-  }
-}
+// }
+

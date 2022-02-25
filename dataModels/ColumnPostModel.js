@@ -109,19 +109,23 @@ schema.statics.getRequiredData = async (columnId, _id)=>{
   const threadAllowKey = ['hits','count','oc'];
   // const columnPostAllowKey = ['columnId'];
   const columnAllowKey = ['name','_id'];
+  // const userAllowKey = ['xfs'];
   const filteredThread = ColumnPostModel.filterData(article.thread, threadAllowKey)
   const filteredPost = ColumnPostModel.filterData(article.post, postAllowKey)
   // const filteredColumnPost = ColumnPostModel.filterData(article.columnPost, columnPostAllowKey) 
-  const filteredColumn= ColumnPostModel.filterData(article.column, columnAllowKey)
+  const filteredColumn = ColumnPostModel.filterData(article.column, columnAllowKey)
   filteredPost.c = nkcRender.renderHTML({
     type: 'article',
     post: {
       c: filteredPost.c,
       // resources: await ResourceModel.getResourcesByReference(`column-${page._id}`)
-      resources: []
-    }
+      resources: article.resources
+    },
+    user:{xsf: article.user.xsf}
   });
-  return {thread:filteredThread, post:filteredPost, column:filteredColumn, collectedCount:article.collectedCount}
+  // console.log(article.resources,'article.resources')
+
+  return {thread:filteredThread, post:filteredPost, column:filteredColumn, collectedCount:article.collectedCount, userAvatar:article.user.avatar}
 }
 /*
 * 根据 专栏ID 和 columnPosts的_id 查找 一篇文章的所有数据
@@ -134,27 +138,31 @@ schema.statics.getArticleById = async (columnId, _id)=>{
   const PostsModel = mongoose.model('posts');
   const ArticleModel = mongoose.model('articles');
   const ColumnModel = mongoose.model('columns');
+  const ResourceModel = mongoose.model("resources");
+  const UserModel = mongoose.model("users");
   
   let columnPost = await ColumnPostsModel.findOne({_id, columnId})
   columnPost = columnPost.toObject()
   if(!columnPost) throwErr(500, '未查找到对应文章');
   switch (columnPost.type) {
     case 'thread':
+      
       // thread 中 包括需要的 回复数 观看数
       let thread = await ThreadModel.findThreadById(columnPost.tid);
       thread = thread.toObject()
       // 文章主体内容
       let post = await PostsModel.getPostByPid(columnPost.pid)
-
       post = post.toObject()
+      // 查找用户
+      let user = await UserModel.findOne({uid:post.uid})
+      user = user.toObject()
       // 收藏数
       let collect = await ThreadModel.getCollectedCountByTid(columnPost.tid)
       // 专栏Id对应的专栏名字
       let column = await ColumnModel.findOne({_id:columnPost.columnId})
       column = column.toObject()
-      // 获取作者通讯方式
-      // const communication = await ThreadModel.getAuthorCommunicationMode(columnPost.tid)
-      return {thread, post, column, collectedCount:collect};
+      const resources = await ResourceModel.getResourcesByReference(columnPost.pid);
+      return {thread, post, column, collectedCount:collect, resources, user};
     case 'article':
       // 未完待续
       await ArticleModel.getArticleById()
