@@ -16,8 +16,8 @@ mixin articleNav(data)
         span 文号
         span=data.thread.oc  
       span.m-r-1
-        span.fa.fa-eye(title="浏览数")=data.thread.hits 
-        span.fa.fa-comment(title='回复数' onclick="window.location.href='#container'")=data.thread.count 
+        span.m-r-1.fa.fa-eye(title="浏览数")=data.thread.hits 
+        span.m-r-1.fa.fa-comment(title='回复数' onclick="window.location.href='#container'")=data.thread.count 
       span.m-r-1
         span 收藏
         span=data.collectedCount 
