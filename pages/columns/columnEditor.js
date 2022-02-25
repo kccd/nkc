@@ -3,7 +3,8 @@ import {getDataById} from "../lib/js/dataConversion";
 const data = getDataById('data');
 import {getRequest, timeFormat} from "../lib/js/tools";
 import {nkcAPI} from "../lib/js/netAPI";
-import {screenTopWarning} from "../lib/js/topAlert";
+import {checkString} from "../lib/js/checkData";
+import {getLength} from "../lib/js/checkData";
 const columnEditor = new Vue({
   el: '#columnEditor',
   data: () => {
@@ -51,11 +52,24 @@ const columnEditor = new Vue({
   computed: {
     type() {
       return this.articleId?'modify':'create';
-    }
+    },
+    // 关键词字数
+    keywordsLength() {
+      return this.article.keyWordsEn.length + this.article.keyWordsCn.length;
+    },
+    // 摘要的字节数
+    abstractCnLength: function() {
+      return this.getLength(this.abstractCn);
+    },
+    abstractEnLength: function() {
+      return this.getLength(this.abstractEn);
+    },
   },
   methods: {
     getRequest: getRequest,
     timeFormat: timeFormat,
+    checkString: checkString,
+    getLength: getLength,
     //编辑器准备完毕
     editorReady() {
       this.initId();
@@ -266,8 +280,46 @@ const columnEditor = new Vue({
       this.coverFile = null;
       this.$refs.documentEditor.resetCover(cover);
     },
+    //检测标题
+    checkTitle() {
+      if (this.article.title.length < 3) throw new Error('标题不能少于3个字');
+      if (this.article.title.length > 100) throw new Error('标题不能超过100个字');
+    },
+    //检测内容
+    checkContent() {
+      let contentText = $(this.article.content).text();
+      if(contentText.length > 100000) {
+        throw new Error('内容不能超过10万字');
+      }
+      if(contentText.length < 2) {
+        throw new Error('内容不能少于2个字');
+      }
+    },
+    // 检测关键词
+    checkKeywords() {
+      if(this.article.keywordsLength > 50) throw "关键词数量超出限制"
+    },
+    // 检测摘要
+    checkAbstract: function() {
+      this.checkString(this.article.abstractCn, {
+        name: "中文摘要",
+        minLength: 0,
+        maxLength: 1000
+      });
+      this.checkString(this.article.abstractEn, {
+        name: "英文摘要",
+        minLength: 0,
+        maxLength: 1000
+      });
+    },
+    //表单验证
+    checkPost() {
+    
+    },
     //发布文章
     publish() {
+      //表单验证
+      this.checkPost()
       //检测是否勾选文章专栏分类
       if(!this.article.title) return sweetWarning('请输入文章标题');
       if(!this.article.selectCategory
