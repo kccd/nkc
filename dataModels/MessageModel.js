@@ -714,6 +714,7 @@ messageSchema.statics.getParametersData = async (message) => {
       reviewLink: await PostModel.getUrl(post)
     };
   } else if(["documentFaulty", "documentDisabled", "documentPassReview", "commentFaulty", "commentDisabled", "commentPassReview"].includes(type)) {
+    //独立文章article 和 评论comment 审核
     const {docId, reason} = message.c;
     const document = await DocumentModel.findOne({_id: docId});
     if(!document) return null;
@@ -722,7 +723,7 @@ messageSchema.statics.getParametersData = async (message) => {
       article = await ArticlesModel.extendArticles([article]);
       parameters = {
         //获取document所在article的url
-        editLink: type === 'documentPassReview'?article[0].url:`/creation/articles/editor?bid=${article[0].bid}&aid=${article[0]._id}`,
+        editLink: type === 'documentPassReview'?article[0].url:``,
         reviewLink: article[0].url,
         reason: reason?reason:'未知',
         title: document.title,
@@ -1415,7 +1416,7 @@ messageSchema.statics.extendMessages = async (messages = []) => {
               return `
                 <button class="agree" onclick="window._messageFriendApplication('${uid}', 'agree')">同意</button>
                 <button class="disagree" onclick="window._messageFriendApplication('${uid}', 'disagree')">拒绝</button>
-                <button class="ignored" onclick="window._messageFriendApplication('${uid}', 'ignored')">忽略</button>` 
+                <button class="ignored" onclick="window._messageFriendApplication('${uid}', 'ignored')">忽略</button>`
             } else if(agree === 'true') {
               return `<div class="agree">已同意</div>`
             } else if(agree === 'false') {

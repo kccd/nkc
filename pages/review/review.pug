@@ -107,7 +107,10 @@ block content
                 .review-user
                   a(href=`/u/${r.user.uid}` target="_blank")=r.user.username
                   .review-info 类型：
-                    .review-time 章节创作
+                    if r.content.source === 'column'
+                      .review-time 独立文章创作
+                    else
+                      .review-time 文章创作
                   if r.document.source === 'article'
                     .review-info 标题：
                       .review-thread-title

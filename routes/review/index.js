@@ -90,6 +90,7 @@ router
         });
       }
     } else {
+      //先查找出需要审核的document
       let documents = await db.DocumentModel.find(m, {
         _id: 1,
         uid: 1,
@@ -114,6 +115,7 @@ router
         uid.add(document.uid);
       }
       let articles = await db.ArticleModel.find({did: {$in: [...articleDocId]}});
+      //拓展article内容
       articles = await db.ArticleModel.extendArticles(articles);
       let comments = await db.CommentModel.find({did: {$in: [...commentDocId]}, source: 'comment'});
       comments = await db.CommentModel.extendReviewComments(comments);

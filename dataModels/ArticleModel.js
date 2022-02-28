@@ -503,14 +503,24 @@ schema.methods.getEditorBetaDocumentContent = async function() {
 * */
 schema.statics.extendArticles = async function(articles) {
   const ArticleModel = mongoose.model('articles');
+  const ColumnPostModel = mongoose.model('columnPosts');
   const DocumentModel = mongoose.model('documents');
-  const BooksModel = mongoose.model('books');
   const {article: documentSource} = await DocumentModel.getDocumentSources();
+  const articleSource = await ArticleModel.getArticleSources();
   const {timeFormat, getUrl} = require('../nkcModules/tools');
   const articlesId = [];
+  const columnPostArr = [];
+  const columnPostObj = {};
   for(const article of articles) {
     articlesId.push(article._id);
+    if(article.source === articleSource.column) columnPostArr.push(article._id);
   }
+  //查找出独立文章所在的专栏
+  const columnPosts = await ColumnPostModel.find({pid: {$in: columnPostArr}});
+  for(const columnPost of columnPosts) {
+    columnPostObj[columnPost.pid] = columnPost;
+  }
+  //根据article查找出独立文章下的内容
   const documents = await DocumentModel.find({
     type: {
       $in: ['beta', 'stable']
@@ -527,15 +537,6 @@ schema.statics.extendArticles = async function(articles) {
     articlesObj[sid][type] = d;
   }
   const results = [];
-  const bookObj = {};
-  const books = await BooksModel.find({list: {$in: articlesId}});
-  for(const book of books) {
-    articlesId.map(id => {
-      if(book.list.includes(id)) {
-        bookObj[id] = book;
-      }
-    })
-  }
   for(const article of articles) {
     const {
       _id,
@@ -551,18 +552,27 @@ schema.statics.extendArticles = async function(articles) {
     }
     const document = stableDocument || betaDocument;
     const {title, did} = document;
+    let columnPost;
+    if(article.source === articleSource.column) {
+      columnPost = columnPostObj[article._id];
+      if(!columnPost) continue;
+    }
+    let url;
+    if(article.source === articleSource.column) {
+      url = `/m/${columnPost.columnId}/a${article._id}#container`;
+    } else {
+      url = '';
+    }
     const result = {
       _id,
       uid,
-      bid: bookObj[article._id]._id,
       published: !!stableDocument,
       hasBeta: !!betaDocument,
       title: title || '未填写标题',
-      bookUrl: `/book/${bookObj[article._id]._id}`,
-      bookName:  bookObj[article._id].name,
-      url: getUrl('bookContent', bookObj[article._id]._id, article._id),
+      url,
       time: timeFormat(toc),
       did,
+      source: article.source,
     };
     results.push(result);
   }

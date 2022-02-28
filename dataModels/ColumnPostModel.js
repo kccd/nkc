@@ -312,25 +312,29 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
     }
     // p.post.url = await PostModel.getUrl(p.pid);
     if(p.post) {
+      //论坛文章链接
       p.post.url = `/m/${p.columnId}/a/${p._id}`
     } else {
+      //专栏文章链接
       p.article.url = `/m/${p.columnId}/a/${p._id}#container`;
     }
     p.mainCategories = [];
     p.minorCategories = [];
+    //添加主分类
     for(const id of p.cid) {
       const c = categoriesObj[id];
       if(c) {
         p.mainCategories.push(c);
       }
     }
+    //添加子分类
     for(const id of p.mcid) {
       const c = categoriesObj[id];
       if(c) {
         p.minorCategories.push(c);
       }
     }
-    results.push(p)
+    results.push(p);
   }
   return results;
 };

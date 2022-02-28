@@ -482,7 +482,7 @@ schema.statics.publishDocumentByDid = async (did) => {
   //是否需要审核
   const needReview = await documentsObj.beta.getReviewStatusAndCreateReviewLog();
   if(needReview) {
-    await documentsObj.beta.setReviewStatus(DocumentModel.getDocumentStatus().unknown);
+    await documentsObj.beta.setReviewStatus((await DocumentModel.getDocumentStatus()).unknown);
   } else {
     //不需要审核
     //检测document中的@用户并发送消息给用户
