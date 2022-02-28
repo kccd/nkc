@@ -3,6 +3,7 @@ block title
   +includeCSS('/creation/index.css', true)
   title=`创作中心 - ${remoteState.serverSettings.websiteName}`
 block content
+  .hidden#data=objToStr({column: data.column, websiteCode: data.websiteCode})
   #app
 block footer
 block scripts

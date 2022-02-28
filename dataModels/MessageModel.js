@@ -723,7 +723,7 @@ messageSchema.statics.getParametersData = async (message) => {
       article = await ArticlesModel.extendArticles([article]);
       parameters = {
         //获取document所在article的url
-        editLink: type === 'documentPassReview'?article[0].url:``,
+        editLink: article[0].url,
         reviewLink: article[0].url,
         reason: reason?reason:'未知',
         title: document.title,

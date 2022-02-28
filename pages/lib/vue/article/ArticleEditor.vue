@@ -73,12 +73,14 @@ import {getRequest, timeFormat} from "../../js/tools";
 import {nkcAPI} from "../../js/netAPI";
 import {checkString} from "../../js/checkData";
 import {getLength} from "../../js/checkData";
+import {getDataById} from "../../js/dataConversion";
+const data = getDataById('data');
 export default {
   props:['time'],
   data: () => ({
     ready: false,
     articleId: null,
-    columnId: null,
+    columnId: data.column.userColumn._id,
     formConfigs: {
       cover: true,
       title: true,
@@ -158,7 +160,13 @@ export default {
     initData() {
       const self = this;
       let {mid, aid} = this.getRequest();
-      if(!mid) return;
+      if(!mid) {
+        if(self.columnId) {
+          mid = self.columnId;
+        } else {
+          return;
+        }
+      };
       if(this.articleId) aid = this.articleId;
       let url = `/creation/articles/editor?mid=${mid}`;
       if(aid) url = `/creation/articles/editor?aid=${aid}&mid=${mid}`

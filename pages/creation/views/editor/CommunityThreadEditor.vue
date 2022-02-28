@@ -1,5 +1,6 @@
 <template lang="pug">
-  .community-thread-editor 社区创作
+  .container-fluid
+    .community-thread-editor 社区创作
 </template>
 
 <script>

@@ -14,11 +14,20 @@ const columnRouter = require('./column');
 const editorRouter = require('./editor');
 router
   .use('/', async (ctx, next) => {
+    const {data, state, db} = ctx;
     if(ctx.query.t) {
       ctx.template = 'creation/index.pug';
     } else {
       ctx.remoteTemplate = 'creation/index.pug';
     }
+    data.column = {
+      userColumn: state.userColumn,
+      columnPermission: state.columnPermission,
+      addedToColumn: state.addedToColumn
+    };
+    // 取网站代号
+    let serverSetting = await db.SettingModel.getSettings("server");
+    data.websiteCode = String(serverSetting.websiteCode).toLocaleUpperCase();
     ctx.state.navbar = 'full';
     await next();
   })

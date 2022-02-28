@@ -8,9 +8,9 @@ router
         columnPermission: state.columnPermission,
         addedToColumn: state.addedToColumn
     };
-  // 取网站代号
-  let serverSetting = await db.SettingModel.getSettings("server");
-  data.websiteCode = String(serverSetting.websiteCode).toLocaleUpperCase();
+    // 取网站代号
+    let serverSetting = await db.SettingModel.getSettings("server");
+    data.websiteCode = String(serverSetting.websiteCode).toLocaleUpperCase();
     await next();
   });
 module.exports = router;

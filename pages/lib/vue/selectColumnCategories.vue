@@ -61,6 +61,8 @@
 
 <script>
 import {getRequest} from "../js/tools";
+import {getDataById} from "../js/dataConversion";
+const data = getDataById('data');
 export default {
   data: () => ({
     loaded: false,
@@ -68,6 +70,7 @@ export default {
     minorCategories: [],
     selectedMainCategoriesId: [],
     selectedMinorCategoriesId: [],
+    columnId: '',
     error: "",
     createCategory: false,
     newCategory: {
@@ -79,7 +82,7 @@ export default {
     },
   }),
   mounted() {
-    this.columnId = this.getRequest().mid;
+    this.columnId = this.getRequest().mid || data.column.userColumn._id;
     this.getCategories();
   },
   computed: {
