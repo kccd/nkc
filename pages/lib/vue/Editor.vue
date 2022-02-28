@@ -59,7 +59,7 @@
   import {getUrl} from "../js/tools";
   import {initDblclick} from "../js/dblclick";
   import {resourceToHtml} from "../js/dataConversion";
-  import ResourceSelector from './NewResourceSelector';
+  import ResourceSelector from './ResourceSelector';
   import DraftSelector from './DraftSelector';
   import StickerSelector from './StickerSelector';
   import MathJaxSelector from "./MathJaxSelector";

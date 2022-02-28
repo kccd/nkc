@@ -1,6 +1,6 @@
 <template lang="pug">
-  .zone-moment-editor 空间动态创作
-    .standard-container
+  .zone-moment-editor
+    .standard-container.p-t-3
       moment-editor
 </template>
 

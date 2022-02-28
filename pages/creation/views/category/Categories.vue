@@ -5,12 +5,12 @@
 </template>
 
 <script>
-import ResourceCategory from "../../../lib/vue/ResourceCategory";
+import ResourceSelector from "../../../lib/vue/ResourceSelector";
 export default {
   data: () => ({
   }),
   components: {
-    'resource-category': ResourceCategory,
+    'resource-category': ResourceSelector,
   },
   methods: {
 
