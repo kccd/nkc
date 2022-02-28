@@ -1,18 +1,19 @@
 <template lang="pug">
   .container-fluid
-    .m-b-1
-      info-block(:mode="'info'")
-        span 片段内容编辑器提示
-    .m-b-1
-      document-editor(
-        ref="documentEditor"
-        :configs="formConfigs"
-        @content-change="watchContentChange"
-        @ready="editorReady"
-        )
-    .m-b-1
-      button.btn.btn-primary.m-r-05(@click="submit") 提交
-      button.btn.btn-default(@click="manuallySaveAsHistory" :disabled="!draftId") 保存
+    .standard-max-container
+      .m-b-1
+        info-block(:mode="'info'")
+          span 片段内容编辑器提示
+      .m-b-1
+        document-editor(
+          ref="documentEditor"
+          :configs="formConfigs"
+          @content-change="watchContentChange"
+          @ready="editorReady"
+          )
+      .m-b-1
+        button.btn.btn-primary.m-r-05(@click="submit") 提交
+        button.btn.btn-default(@click="manuallySaveAsHistory" :disabled="!draftId") 保存
 </template>
 
 <style lang="less" scoped>

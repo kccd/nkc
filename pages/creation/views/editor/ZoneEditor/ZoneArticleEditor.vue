@@ -1,5 +1,6 @@
 <template lang="pug">
-  .zone-article-editor 空间创作
+  .zone-moment-editor 空间文章创作
+
 </template>
 
 <script>

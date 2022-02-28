@@ -12,6 +12,7 @@ const draftRouter = require('./draft');
 const communityRouter = require('./community');
 const columnRouter = require('./column');
 const editorRouter = require('./editor');
+const zoneRouter = require('./zone');
 router
   .use('/', async (ctx, next) => {
     if(ctx.query.t) {
@@ -38,4 +39,5 @@ router
   .use('/community', communityRouter.routes(), communityRouter.allowedMethods())
   .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
   .use('/editor', editorRouter.routes(), editorRouter.allowedMethods())
+  .use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods())
 module.exports = router;
