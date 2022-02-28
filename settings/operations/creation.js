@@ -129,7 +129,13 @@ module.exports = {
       GET: 'creationCenter'
     },
     zone: {
-      GET: 'creationCenter'
+      GET: 'creationCenter',
+      moment: {
+        GET: 'creationCenter'
+      },
+      article: {
+        GET: 'creationCenter'
+      }
     },
     book: {
       GET: 'creationCenter'

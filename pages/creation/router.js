@@ -21,7 +21,9 @@ import ColumnArticle from './views/column/Article';
 import ColumnDraft from './views/column/Draft';
 import ColumnArticleEditor from './views/editor/ColumnArticleEditor';
 import CommunityThreadEditor from './views/editor/CommunityThreadEditor';
-import ZoneArticleEditor from './views/editor/ZoneArticleEditor';
+import ZoneEditor from './views/editor/ZoneEditor/ZoneEditor';
+import ZoneArticleEditor from './views/editor/ZoneEditor/ZoneArticleEditor';
+import ZoneMomentEditor from './views/editor/ZoneEditor/ZoneMomentEditor';
 // import BookEditor from './views/editor/BookEditor';
 import Zone from './views/zone/Zone';
 import ZoneArticle from './views/zone/Article';
@@ -42,7 +44,15 @@ const routes = [
   {name: 'drafts', path: '/creation/drafts', component: Drafts},
   {name: 'columnArticleEditor', path: '/creation/editor/column', component: ColumnArticleEditor},
   {name: 'communityThreadEditor', path: '/creation/editor/community', component: CommunityThreadEditor},
-  {name: 'zoneArticleEditor', path: '/creation/editor/zone', component: ZoneArticleEditor},
+  {
+    name: 'zoneEditor',
+    path: '/creation/editor/zone',
+    component: ZoneEditor,
+    children: [
+      {name: 'zoneArticleEditor', path: '/creation/editor/zone/article', component: ZoneArticleEditor},
+      {name: 'zoneMomentEditor', path: '/creation/editor/zone/moment', component: ZoneMomentEditor},
+    ]
+  },
   {name: 'draftEditor', path: '/creation/editor/draft', component: DraftEditor},
   {
     name: 'articles',

@@ -9,6 +9,12 @@ router
   .get('/zone', async (ctx, next) => {
     await next();
   })
+  .get('/zone/moment', async (ctx, next) => {
+    await next();
+  })
+  .get("/zone/article", async (ctx, next) => {
+    await next();
+  })
   .get('/book', async (ctx, next) => {
     await next();
   })

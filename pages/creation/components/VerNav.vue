@@ -92,7 +92,7 @@
           hidden: false,
           children: [
             {
-              type: 'zoneArticleEditor',
+              type: 'zoneEditor',
               title: '空间创作'
             },
             {
