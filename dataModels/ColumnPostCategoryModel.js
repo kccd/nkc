@@ -251,10 +251,25 @@ schema.statics.getChildCategoryId = async (categoryId) => {
   return results.map(r => r._id);
 };
 /*
- * 通过分类id获取id对应的名称
+ * 获取专栏下一篇文章的分类及其父级分类 
+ * @param {Array} ids columnPosts表的cid
+ * 
  */
-schema.statics.getCategoryNameById = async (id)=>{
-  return await mongoose.model("columnPostCategories").findOne({_id:id},{name:1})
+schema.statics.getParentCategoryById = async (ids)=>{
+  // 只获取了第一个ID
+  const id = ids[0];
+  // console.log(id,'id')
+  const navList = [];
+  const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
+
+  async function currentCategory(id){
+    let nav = await ColumnPostCategoryModel.findOne({_id: id, type:'main'});
+    nav && navList.push(nav) && nav.parentId && await currentCategory(nav.parentId)
+  }
+  await currentCategory(id)
+  return navList.reverse()
+  
+  
 }
 /*
 * 操作分类内容时，移除不在该分类下的置顶文章

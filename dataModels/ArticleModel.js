@@ -180,12 +180,16 @@ schema.statics.checkArticleSource = async (source) => {
 schema.statics.getArticleById = async (_id)=>{
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
-  const articleInfo = await ArticleModel.findOne({_id});
+  let articleInfo = await ArticleModel.findOne({_id});
+  articleInfo = articleInfo.toObject()
   if(!articleInfo) throwErr(500, '未查找到对应文章');
   // 如果根据 sid 找会有多张
   // const document = await DocumentModel.getDocumentBySid(_id);
-  return await DocumentModel.getStableArticleById(_id)
-  
+  let document = await DocumentModel.getStableArticleById(_id)
+  const documentResourceId =await document.getResourceReferenceId()
+  document = document.toObject()
+  console.log(document,'---')
+  return {articleInfo, document, documentResourceId}
 }
 /*
 * 获取新的 article id

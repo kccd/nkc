@@ -5,14 +5,17 @@ mixin articleAbstract(data)
       p.cn-abstract
         //- for abstract,i in data.abstractCn 
         span=data.post.abstractCn
-      p.en-abstract.line-title Abstract
-        //- for abstract,i in data.abstractEn 
-        span=data.post.abstractEn
-      .key-word 
-        p.line-title 关键词
-        p.cn-key-word.key-word-conmon
-          for keyWord,i in data.post.keyWordsCn 
-            span=keyWord
-        p.en-key-word.key-word-conmon
-          for keyWord,i in data.post.keyWordsEn 
-            span=keyWord
+  p.en-abstract.line-title Abstract
+    p.en-abstract
+      //- for abstract,i in data.abstractEn 
+      span=data.post.abstractEn
+
+  p.line-title 关键词
+    p.cn-key-word.key-word-conmon
+      for keyWord,i in data.post.keyWordsCn
+        //- span.key-word-contaior  
+        span.t=keyWord
+    p.en-key-word.key-word-conmon
+      for keyWord,i in data.post.keyWordsEn 
+        //- span.key-word-contaior 
+        span.t=keyWord

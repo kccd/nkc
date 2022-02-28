@@ -2,7 +2,7 @@ import FloatUserPanel from '../../lib/vue/FloatUserPanel.vue'
 // 移动到作者名称上显示的hover效果
 $(document).ready(()=>{
   new Vue({
-    el: "#vueMountPoint",
+    el: "#authorHover",
     components:{
       'float-user-panel': FloatUserPanel,
     },

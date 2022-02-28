@@ -1,7 +1,9 @@
 //-  文章的标题,作者等
 mixin articleTitle(data)
   +includeCSS('/columns/article/articleTitle.css')
-  .common-article-head
+  .common-article-head#authorHover
+        //-  hover显示作者信息
+        <float-user-panel ref='floatUserPane'></float-user-panel>
         h1.common-article-title=data.post.t
         p
           for authorInfo in data.post.authorInfos
@@ -18,7 +20,8 @@ mixin articleTitle(data)
           a.common-article-author.jump.m-r-1(href=`/u/${data.post.uid}` target="_blank" data-float-uid=`${data.post.uid}`)
             //- img.head-portrait(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
             img(src=tools.getUrl('userAvatar', data.userAvatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
-            span.kcid=data.post.authorInfos[0].kcid 
+            if data.post.authorInfos[0]
+              span.kcid=data.post.authorInfos[0].kcid 
           span.modify-time.m-r-1=data.post.toc
           if ['3','4','5','6'].includes(data.post.originState)
             span#dropdown.m-r-1.origin.fa.fa-caret-square-o-down.origin-icon.dropdown(onclick="originTitle()") 原创

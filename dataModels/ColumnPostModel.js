@@ -107,33 +107,69 @@ schema.statics.getRequiredData = async (columnId, _id)=>{
   const nkcRender = require('../nkcModules/nkcRender');
   const ColumnPostModel = mongoose.model('columnPosts');
   const article = await ColumnPostModel.getArticleById(columnId, _id);
-  let postAllowKey = ['t','c','abstratCn','abstratEn','keyWordsCn','keyWordsEn','authorInfos','toc','originState','uid','collectedCount'];
-  const ArticleAllowKey = ['title','content','abstrat','abstratEN','keyWords','keyWordsEN','authorInfos','toc','originState','uid','collectedCount'];
-  const threadAllowKey = ['hits','count','oc'];
-  const columnAllowKey = ['name','_id'];
+  let postAllowKey = ['t', 'c', 'abstractCn', 'abstractEn', 'keyWordsCn', 'keyWordsEn', 'authorInfos', 'toc', 'originState', 'uid', 'collectedCount'];
+  const documentAllowKey = ['title', 'content', 'abstract', 'abstractEN', 'keywords', 'keywordsEN', 'authorInfos', 'toc', 'origin', 'uid', 'collectedCount'];
+  let threadAllowKey = ['hits', 'count', 'oc'];
+  const columnAllowKey = ['name', '_id'];
+  const ArticleAllowKey = ['hits', 'comment', 'voteUp', 'voteDown'];
   if(article.type === 'article'){
-    postAllowKey = ArticleAllowKey
+    threadAllowKey = ArticleAllowKey;
+    postAllowKey = documentAllowKey;
+    // 文章内容
+    // session = article.article.document
+
+    // thread = article.article.articleInfo
   }
-  // const userAllowKey = ['xfs'];
+  // else if(article.type === 'post'){
+    // thread = article.thread;
+    // session = article.article;
+  // }
+  
   const filteredThread = ColumnPostModel.filterData(article.thread, threadAllowKey)
   const filteredPost = ColumnPostModel.filterData(article.article, postAllowKey)
-  // 过滤后出问题
-  console.log(filteredPost,'filteredPost')
-  // const filteredColumnPost = ColumnPostModel.filterData(article.columnPost, columnPostAllowKey)
+  //获取专栏名和id
   const filteredColumn = ColumnPostModel.filterData(article.column, columnAllowKey)
   filteredPost.c = filteredPost.c || filteredPost.content
   filteredPost.c = nkcRender.renderHTML({
     type: 'article',
     post: {
       c: filteredPost.c,
-      // resources: await ResourceModel.getResourcesByReference(`column-${page._id}`)
       resources: article.resources
     },
     user:{xsf: article.user.xsf}
   });
-  console.log(filteredPost,'article.resources')
+  let resData = {mainCategory: article.mainCategory ,auxiliaryCategory: article.auxiliaryCategory  , thread:filteredThread, post:filteredPost, column:filteredColumn, collectedCount:article.collectedCount, userAvatar:article.user.avatar}
+  if(article.type === 'article'){
+    // 把文章字段改为和 post 字段相同
+    let changeKeyPost = {}
+    const map ={
+      title: 't',
+      content: 'c',
+      c: 'c',
+      abstract: 'abstractCn',
+      abstractEN: 'abstractEn',
+      keywords: 'keyWordsCn',
+      keywordsEN: 'keyWordsEn',
+      authorInfos: 'authorInfos',
+      toc: 'toc',
+      origin: 'originState',
+      uid : 'uid',
+      collectedCount: 'collectedCount'
+    }
+    for (const key in filteredPost) {
+      if (Object.hasOwnProperty.call(filteredPost, key)) {
+        const element = filteredPost[key];
+        changeKeyPost[map[key]] = element
+      }
+    }
+    resData.post = changeKeyPost;
+    
+  }
+  // else if(article.type === 'post'){
 
-  return {thread:filteredThread, post:filteredPost, column:filteredColumn, collectedCount:article.collectedCount, userAvatar:article.user.avatar}
+  // }
+  console.log(resData)
+  return resData
 }
 /*
 * 根据 专栏ID 和 columnPosts的_id 查找 一篇文章的所有数据
@@ -148,14 +184,15 @@ schema.statics.getArticleById = async (columnId, _id)=>{
   const ColumnModel = mongoose.model('columns');
   const ResourceModel = mongoose.model("resources");
   const UserModel = mongoose.model("users");
-  
+  const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
+
   let columnPost = await ColumnPostsModel.findOne({_id, columnId})
+  // columnPost.getNav
   columnPost = columnPost.toObject()
   if(!columnPost) throwErr(500, '未查找到对应文章');
-  let user, resources, column;
+  let user, resources, column, mainCategory, auxiliaryCategory;
   switch (columnPost.type) {
     case 'thread':
-      
       // thread 中 包括需要的 回复数 观看数
       let thread = await ThreadModel.findThreadById(columnPost.tid);
       thread = thread.toObject()
@@ -167,19 +204,28 @@ schema.statics.getArticleById = async (columnId, _id)=>{
       user = user.toObject()
       // 收藏数
       let collect = await ThreadModel.getCollectedCountByTid(columnPost.tid)
-      // 专栏Id对应的专栏名字
+      //获取专栏名和id
       column = await ColumnModel.findOne({_id:columnPost.columnId})
       column = column.toObject()
+      // 获取当前专栏下一篇文章的分类及其父级
+      mainCategory = await ColumnPostCategoryModel.getParentCategoryById(columnPost.cid)
+      auxiliaryCategory = await ColumnPostCategoryModel.getMinorCategories(columnPost.columnId, columnPost.mcid)
+      
       resources = await ResourceModel.getResourcesByReference(columnPost.pid);
-      return {thread, article:post, column, collectedCount:collect, resources, user, type:'post'};
+      return {thread, article:post, column, collectedCount:collect, resources, user, mainCategory ,auxiliaryCategory, type:'post'};
     case 'article':
-      // 未完待续
+      // article 包含 article document documentResourceid
       const article = await ArticleModel.getArticleById(columnPost.pid);
-      user = await UserModel.findOne({uid:article.uid});
+      user = await UserModel.findOne({uid:article.articleInfo.uid});
       user = user.toObject();
-      resources = await ResourceModel.getResourcesByReference(`document-${article.did}`);
+      resources = await ResourceModel.getResourcesByReference(article.documentResourceId);
+      // 获取 专栏名称和id
       column = await ColumnModel.findOne({_id:columnPost.columnId})
-      return {article, user, resources, column, type:'article'};
+      column = column.toObject()
+      mainCategory = await ColumnPostCategoryModel.getParentCategoryById(columnPost.cid)
+      auxiliaryCategory = await ColumnPostCategoryModel.getMinorCategories(columnPost.columnId, columnPost.mcid)
+      // Auxiliary  console.log(category, 'category')
+      return {thread: article.articleInfo, article: article.document, resources, user, column, mainCategory ,auxiliaryCategory,  type:'article'};
     default:
       break;
   }
