@@ -1,0 +1,45 @@
+//- 页头的文章导航路径和右边文号,浏览数,回复,收藏设置
+  @params {String} _id 专栏id
+  @params {String} name 专栏名称
+  @params {Number} hits 浏览数
+  @params {Number} count 回复数
+  @params {String} oc 文号
+  @params {Array} mainCategory 主分类
+  @params {Array} auxiliaryCategory 辅分类
+  @params {Number} collectedCount 收藏数
+
+mixin nav(data)
+  -var {_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount} = data
+  +includeCSS('/columns/article/nav.css')
+  header
+    p.path-navigation.hidden-xs
+      //- a.jump(href=`/m`) 专栏
+      //- span.nav-common >
+      a.jump(href=`/m/${_id}`)=name
+      span.nav-common >
+      if mainCategory
+        for category,i in mainCategory
+          a.jump(href=`/m/${_id}?c=${category._id}`)=category.name
+          if mainCategory.length !== i+1
+            span.nav-common >
+      else 
+        a.jump(href=`/m/${_id}`) 全部
+    if auxiliaryCategory.length
+      p.path-navigation.m-l-5.hidden-xs
+        span  辅分类:
+        for category,i in auxiliaryCategory
+          a.jump(href=`/m/${_id}?c=${category._id}`)=category.name 
+          if auxiliaryCategory.length !== i+1
+            span.m-l-1.nav-common |
+      
+    p.info-list
+      span.m-r-1
+        span 文号
+        span=oc  
+      span.m-r-1
+        span.m-r-1.fa.fa-eye(title="浏览数")=hits 
+        span.m-r-1.fa.fa-comment(title='回复数' onclick="window.location.href='#container'")=count
+      span.m-r-1
+        span 收藏
+        span=collectedCount 
+      span.fa.fa-cog.m-r-1(onclick="showSetUp()")

@@ -1,36 +1,45 @@
+//- 
+ 
+  @param {Object} post 文章主体信息
+  @param {Object} column 文章专栏信息
+  @param {Array} mainCategory 文章主分类
+  @param {Array} auxiliaryCategory 文章辅分类
+  @param {Object} thread 文章文号 浏览数 回复数等
+  @param {Number}} collectedCount 文章收藏数
 extends ../../bootstrap_base
 block title
-  //-  引入组件并且需要引入对于css
-  title=data.article.post.t
+  -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar} = data.article
+  -var {_id, name} = column
+  -var {hits, count, oc} = thread
+  -var {authorInfos, uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c} = post
+  title=t
   +includeCSS('/columns/article/article.css')
-  //- +includeCSS('/columns/article_content.css')
 block content
   .container-fluid.max-width
-    .article-common.col-xs-12.col-md-8
-      include ./articleNav
-      +articleNav(data.article)
-      include ./articleSetUp
-      +setUp(data.article)
-      include ./articleTitle
-      +articleTitle(data.article)
-      include ./articleAbstract
-      +articleAbstract(data.article)
-      include ./articleContent
-      +articleContent(data.article)
-    .col-xs-12.col-md-4.box-shadow-panel#rightDom   
+    .article-common.col-xs-12.col-md-9.box-shadow-panel
+      include ./nav
+      +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount})
+      include ./setUp
+      +setUp()
+      include ./title
+      +title({t, authorInfos, uid, userAvatar, toc, originState, name, _id})
+      include ./abstract
+      +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
+      include ./content
+      +content(c)
+    .col-xs-12.col-md-3.box-shadow-panel#rightDom   
       //- 滚动到页头页脚  
       include ../../module_scrollTo.pug
-  #vueMountPoint
-    //-  hover显示作者信息
-    <float-user-panel ref='floatUserPane'></float-user-panel>
-    //- <author-communication :contract="contract"></author-communication>
+    //- float-user-panel(ref='floatUserPane') 
   //- 显示作者联系信息
-  include ./articleAuthorInfo.pug
+  include ./authorInfo.pug
   +authorInfo()
   //- include ../../publicModules/floatForumNav
   include ../../publicModules/nkcSource
+
   //- 下拉后左边显示的所属专业 上级专业 同级专业
   //- +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 block scripts 
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
 //-  +includeJS('/columns/article/article.js')
 
