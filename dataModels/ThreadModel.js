@@ -312,16 +312,13 @@ threadSchema.virtual('reason')
 threadSchema.statics.getAuthorCommunicationMode = async (tid)=>{
   const ThreadModel = mongoose.model('threads')
   const communication = await ThreadModel.getThreadByTid(tid)
-  let communicationMode = {}
+  let communicationMode = ''
   try {
-    console.log(communication,'firstPost')
     communicationMode.value = communication.firstPost.authorInfos.contractObj
   } catch (error) {
     // const throwError = require("../nkcMOdules/throwError");
     // throwError(400,'作者没有通讯方式')
   }
-  console.log(communicationMode,'communicationMode')
-
   return communicationMode
 }
 /*得到该整条记录

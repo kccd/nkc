@@ -177,17 +177,19 @@ schema.statics.checkArticleSource = async (source) => {
     throwErr(500, `article source error. source=${source}`);
   }
 };
-// 未完待续
-schema.statics.getArticleById = async (_id)=>{
+/*
+*  根据 文章id 查找文章 包括 article docuemnt documentResource
+*/
+schema.statics.getDocumentInfoById = async (_id)=>{
   const ArticleModel = mongoose.model('articles');
-  const DocumentModel = mongoose.model('document');
-  const articleInfo = await ArticleModel.findOne({_id});
-  
+  const DocumentModel = mongoose.model('documents');
+  let articleInfo = await ArticleModel.findOne({_id});
+  articleInfo = articleInfo.toObject()
   if(!articleInfo) throwErr(500, '未查找到对应文章');
-  // 如果根据 sid 找会有多张
-  // const document = await DocumentModel.getDocumentBySid(_id);
-
-  
+  let document = await DocumentModel.getStableArticleById(_id)
+  const documentResourceId =await document.getResourceReferenceId()
+  document = document.toObject()
+  return {articleInfo, document, documentResourceId}
 }
 /*
 * 获取新的 article id

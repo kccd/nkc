@@ -738,7 +738,20 @@ schema.methods.getRenderingData = async function(uid) {
 schema.methods.getResourceReferenceId = async function() {
   return `document_${this.did}`;
 }
-
+/*
+* @params {String} sid 根据sid 获取 document
+*/
+schema.statics.getStableArticleById =async (sid)=>{
+  console.log(sid,'sid')
+  const DocumentModel = mongoose.model('documents');
+  const source = (await DocumentModel.getDocumentSources()).article
+  const type = (await DocumentModel.getDocumentTypes()).stable
+  return await DocumentModel.findOne({
+    sid,
+    source,
+    type
+  })
+}
 /*
 * 解析 document 内容（c 字段）中的 resource 引用
 * 将当前 document ID 记录到 resource references 上

@@ -5,8 +5,13 @@ block title
   else
     title=`主页 - ${data.name}`
   +includeCSS("/user/profile/profile.css")
+  if data.type === "thread" || data.type === "post" || data.type === "draft"  || data.type === "note" 
+    //- 不知道怎么写内联样式
+    +includeCSS("/user/profile/hidden.css")
+
+      
 block content
-  .container-fluid.max-width
+  .container-fluid.max-width.common-hidden-profile
     .row
       if state.isApp
         if state.platform !== 'reactNative'
@@ -16,7 +21,7 @@ block content
                 a.app-nav(href=link.url class=link.type===data.type?"active":"" data-type="reload")=link.name
 
       else
-        .col-xs-12.col-md-3.box-shadow-panel.user-info-list
+        .col-xs-12.col-md-3.box-shadow-panel#get-left-user-info-list
           if data.type
             .account-nav-xs.hidden-md.hidden-lg=data.name
           .account-nav(class=data.type?"hidden-sm hidden-xs":"")
@@ -183,7 +188,7 @@ block content
           include ./subscribe/forum
       if !state.isApp
         .col-xs-12.col-md-2.box-shadow-panel.hidden-sm.hidden-xs
-          .account-nav.shopping-cart
+          .account-nav.shopping-cart.common-hidden-profile
             .account-user-links
               .account-user-links
                 a(href=`/shop/order`).col-xs-12.account-user-link
@@ -202,6 +207,7 @@ block content
 
   .hidden#subUsersId=objToStr({threads: data.threads, subThreadsId: data.subThreadsId, collectionThreadsId: data.collectionThreadsId, subUsersId: data.subUsersId, subForumsId: data.subForumsId, subColumnsId: data.subColumnsId, subscribes: data.subscribesObj})
 block scripts
+
   include ../../publicModules/subscribeTypes/subscribeTypes
   include ../../publicModules/commonModal/commonModal
   include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
@@ -212,8 +218,10 @@ block scripts
     script.
       var SummaryCalendar = new NKC.modules.SummaryCalender($(".summary-calendar")[0]);
       var SummaryPie = new NKC.modules.SummaryPie($(".summary-pie")[0]);
+  if data.type === "thread" || data.type === "post" || data.type === "draft"  || data.type === "note" 
+    +includeJS('/user/profile/hidden.js')
+    
   +includeJS("/user/profile/profile.js")
   if data.type === "note"
     +includeJS("/user/profile/note.js")
 
-  +includeJS('/user/profile/hidden.js')
