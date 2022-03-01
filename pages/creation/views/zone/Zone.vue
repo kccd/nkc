@@ -10,6 +10,10 @@ export default {
   data: () => ({
     navList: [
       {
+        type: 'zoneMoment',
+        title: '动态'
+      },
+      {
         type: 'zoneArticle',
         title: '文章'
       },
@@ -35,7 +39,7 @@ export default {
     redirect() {
       if(this.$route.name === 'zone') {
         this.$router.replace({
-          name: 'zoneArticle'
+          name: 'zoneMoment'
         });
       }
     }

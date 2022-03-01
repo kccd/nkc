@@ -18,18 +18,18 @@ router
   })
   .post('/', async (ctx, next) => {
     const {db, body, state, data} = ctx;
-    const {type, momentId, content, resourcesId} = body;
-    let moment;
-    data.momentId = momentId;
-    if(type === 'create') {
+    const {type, content, resourcesId} = body;
+    let moment = await db.MomentModel.getUnPublishedMomentByUid(state.uid);
+    if(!moment) {
       moment = await db.MomentModel.createMoment({
         content,
         resourcesId,
         uid: state.uid
       });
-      data.momentId = moment._id;
-    } else if(type === 'modify') {
-      const moment = await db.MomentModel.findOnly({_id: momentId});
+    }
+    if(type === 'publish') {
+      await moment.publish();
+    } else {
       await moment.modifyMoment({
         content,
         resourcesId

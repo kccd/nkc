@@ -204,4 +204,46 @@ schema.methods.getBetaDocument = async function() {
   return await DocumentModel.getBetaDocumentBySource(momentSource, this._id);
 };
 
+schema.methods.publish = async function() {
+  const DocumentModel = mongoose.model('documents');
+  const ResourceModel = mongoose.model('resources');
+  const {moment: momentSource} = await DocumentModel.getDocumentSources();
+  const betaDocument = await DocumentModel.getBetaDocumentBySource(momentSource, this._id);
+  if(!betaDocument) throwErr(500, `动态数据错误 momentId=${this._id}`);
+  const {checkString} = require('../nkcModules/checkData');
+  checkString(betaDocument.content, {
+    name: '动态内容',
+    minLength: 1,
+    maxLength: 1000
+  });
+  if(this.files.length > 0) {
+    let mediaType;
+    const resources = await ResourceModel.find({
+      uid: this.uid,
+      rid: {$in: this.files}
+    }, {
+      rid: 1,
+      mediaType: 1
+    });
+    if(resources.length !== files.length) {
+      throwErr(500, `媒体文件类型错误`);
+    }
+    for(const resource of resources) {
+      if(!mediaType) {
+        mediaType = resource.mediaType;
+      } else {
+        if(mediaType !== resource.mediaType) {
+          throwErr(500, `媒体文件类型错误`);
+        }
+      }
+    }
+  }
+  this.status = momentStatus.normal;
+  await this.updateOne({
+    $set: {
+      status: this.status
+    }
+  });
+};
+
 module.exports = mongoose.model('moments', schema);
