@@ -1,4 +1,9 @@
 <!--用户悬浮框-->
+<!--
+  注意事项，由于offset获取的元素偏移量时相对一整个页面，而position是相对于设置了绝对定位的父级，刚好bootstrap的布局容器设置了绝对定位.所以要获取到布局容器的偏移量用鼠标
+  移入要展示悬浮框的dom的偏移量来减去布局容器的偏移量 即给布局容器加上#comment-content;
+-->
+
 <template lang="pug">
   #floatUserPanel(v-cloak v-show="show")
     transition(name="fade")
@@ -367,6 +372,7 @@ export default {
             left = documentWidth - panelWidth;
           }
           const {top: contentTop, left: contentWidth} = $('#comment-content').offset();
+          console.log('offset', contentTop, contentWidth, top, left);
           panel.css({
             top: top - contentTop,
             left: left - contentWidth

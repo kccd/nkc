@@ -774,11 +774,11 @@ export default {
           if(this.$refs.imageElement.height > this.$refs.imageElement.width){
             this.imgInfo.radio = this.$refs.imageElement.width / this.$refs.imageElement.height
             this.imgInfo.max = 'height'
-            this.imgInfo.value = this.$refs.imageElement.height 
+            this.imgInfo.value = this.$refs.imageElement.height
           }else{
             this.imgInfo.radio = this.$refs.imageElement.width / this.$refs.imageElement.height
             this.imgInfo.max = 'width'
-            this.imgInfo.value = this.$refs.imageElement.width 
+            this.imgInfo.value = this.$refs.imageElement.width
           }
           //- 如果宽大于高  旋转后 w 408（容器h）
           //- 如果高大于宽  旋转后 h 408（容器h）
@@ -895,7 +895,7 @@ export default {
       const imgWidthInCanvas = self.minContainerHeight * self.imgInfo.radio;
       //- const imgHeightInCanvas = contaiorWidth / self.imgInfo.radio;
       if(self.imgInfo.max === 'width'){
-        // 宽占满   
+        // 宽占满
         if(contaiorWidth <= imgWidthInCanvas){
           const nextImgWidthInCanvas = (self.minContainerHeight / contaiorWidth) * (contaiorWidth / self.imgInfo.radio)
           if(nextImgWidthInCanvas > contaiorWidth){
@@ -904,7 +904,7 @@ export default {
             this.rotateZoom(self.minContainerHeight, contaiorWidth)
           }
           //- this.rotateZoom(self.minContainerHeight, contaiorWidth)
-          // 高占满 
+          // 高占满
         }else{
           // 如果旋转后宽度超出容器宽 最后以容器宽度进行显示
           // imgWidthInCanvas 旋转前图片宽度
@@ -918,7 +918,7 @@ export default {
             this.rotateZoom(self.minContainerHeight, imgWidthInCanvas)
           }
         }
-      }else if(self.imgInfo.max === 'height'){ 
+      }else if(self.imgInfo.max === 'height'){
         // 宽占满   高>宽 那么什么情况下 宽会占满 （只有容器高度大于容器宽度会出现）好像没有此种情况？？
         if(contaiorWidth <= imgWidthInCanvas){
           this.rotateZoom(self.minContainerHeight, contaiorWidth)
