@@ -14,7 +14,7 @@ $(document).ready(()=>{
       document.querySelector('.shopping-cart').style.display = 'none';
       // 获取 左侧 （显示用户信息）
       document.querySelector('#get-left-user-info-list').style.display = 'none';
-      
+      body.style.background = 'none'
     }
   }
   document.querySelector('body').style.opacity = '1';
