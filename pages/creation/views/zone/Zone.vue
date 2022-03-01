@@ -1,11 +1,44 @@
 <template lang="pug">
-  .zone 空间创作
+  .container-fluid.zone
+    hor-nav(:list="navList" v-if="$route.name !== 'ZoneReviseEditor'" )
+    router-view
 </template>
 
 <script>
+import HorNav from "../../components/HorNav";
 export default {
   data: () => ({
-
-  })
+    navList: [
+      {
+        type: 'zoneArticle',
+        title: '文章'
+      },
+      {
+        type: 'zoneDraft',
+        title: '草稿'
+      }
+    ]
+  }),
+  components: {
+    "hor-nav": HorNav
+  },
+  watch: {
+    $route() {
+      this.redirect();
+    }
+  },
+  mounted() {
+    this.redirect();
+  },
+  methods: {
+    //路由重定向
+    redirect() {
+      if(this.$route.name === 'zone') {
+        this.$router.replace({
+          name: 'zoneArticle'
+        });
+      }
+    }
+  }
 }
 </script>

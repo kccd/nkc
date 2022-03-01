@@ -2,7 +2,8 @@ const mongoose = require('../settings/database');
 const moment = require('moment');
 
 const articleSources = {
-  column: 'column'
+  column: 'column',
+  zone: 'zone',
 };
 
 const articleStatus = {
@@ -436,14 +437,17 @@ schema.methods.publishArticle = async function(options) {
   const ArticleModel = mongoose.model('articles');
   const ColumnPostModel = mongoose.model('columnPosts');
   const {normal} = await ArticleModel.getArticleStatus();
-  const {source,selectCategory} = options;
+  const {source, selectCategory} = options;
   const DocumentModel = mongoose.model('documents');
   const {did} = this;
   //将当前article的状态改为正常
   await this.changeArticleStatus(normal);
-  //如果发表专栏的文章就将创建文章专栏分类引用记录
   if(source === 'column') {
+    //如果发表专栏的文章就将创建文章专栏分类引用记录
     await ColumnPostModel.createColumnPost(this, selectCategory);
+  } else if(source === 'zone') {
+    //如果发布的article为空间文章就创建一条新的动态并绑定当前article
+    
   }
   await DocumentModel.publishDocumentByDid(did);
 }
@@ -599,15 +603,23 @@ schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
 *   @param {String} editorUrl 文章编辑器 url
 *   @param {String} articleUrl 文章的显示页 url
 * */
-schema.statics.getArticleUrlBySource = async function(articleId, source, sid) {
+schema.statics.getArticleUrlBySource = async function(articleId, source, sid, status) {
   const tools = require('../nkcModules/tools');
   const ArticleModel = mongoose.model('articles');
-  const {column: columnSource} = await ArticleModel.getArticleSources();
+  const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
+  const {default: defaultStatus} = await ArticleModel.getArticleStatus();
   let editorUrl = '';
   let articleUrl = '';
   if(source === columnSource) {
     editorUrl = tools.getUrl('columnArticleEditor', sid, articleId);
     articleUrl = tools.getUrl('columnArticle', sid, articleId);
+  } else if(source === zoneSource) {
+    if(status === defaultStatus) {
+      editorUrl = tools.getUrl('zoneArticleEditor', sid, articleId);
+    } else {
+      editorUrl = tools.getUrl('zoneReviseEditor', sid, articleId);
+    }
+    articleUrl = tools.getUrl('zoneArticle', sid, articleId);
   }
 
   return {
@@ -668,11 +680,12 @@ schema.statics.extendArticlesList = async (articles) => {
       voteUp,
       hits,
       comment,
+      status
     } = article;
     const stableDocument = stableDocumentsObj[articleId];
     if(!stableDocument) continue;
     let column;
-    const {articleUrl, editorUrl} = await ArticleModel.getArticleUrlBySource(articleId, source, sid);
+    const {articleUrl, editorUrl} = await ArticleModel.getArticleUrlBySource(articleId, source, sid, status);
     if(source === columnSource) {
       const targetColumn = columnsObj[sid];
       if(targetColumn) {

@@ -7,6 +7,6 @@ block content
   .container-fluid.max-width#columnEditor(v-cloak)
     .row
       .col-xs-12.col-md-9.box-shadow-panel.m-b-2
-        article-editor(ref="articleEditor" :time='10000')
+        article-editor(ref="articleEditor" :configs="formConfigs" time="60000" source="column")
 block scripts
   +includeJS('/columns/columnEditor.js')

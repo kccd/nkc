@@ -1,5 +1,7 @@
 <template lang="pug">
   .container-fluid
+    .m-b-1
+      bread-crumb(:list="navList")
     .standard-max-container
       .m-b-1
         info-block(:mode="'info'")
@@ -84,7 +86,16 @@ export default {
       document: {
         title: '',
         content: ''
-      }
+      },
+      navList: [
+        {
+          name: '内容创作',
+        },
+        {
+          name: '片段创作',
+          page: 'draftEditor'
+        }
+      ]
     }
   },
   mounted() {

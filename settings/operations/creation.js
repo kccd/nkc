@@ -106,6 +106,21 @@ module.exports = {
       GET: 'creationCenter'
     },
   },
+  zone: {
+    GET: 'creationCenter',
+    article: {
+      GET: 'creationCenter',
+      editor: {
+        GET: 'creationCenter',
+      }
+    },
+    draft: {
+      GET: 'creationCenter'
+    },
+    moment: {
+      GET: 'creationCenter'
+    }
+  },
   community: {
     GET: 'creationCenter',
     thread: {
