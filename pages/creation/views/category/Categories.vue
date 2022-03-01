@@ -1,16 +1,16 @@
 <template lang="pug">
   .container-fluid.category-container
     h2 资源管理
-    resource-category(ref="resourceCategory")
+    resource-selector-core(ref="resourceSelectorCore")
 </template>
 
 <script>
-import ResourceSelector from "../../../lib/vue/ResourceSelector";
+import ResourceSelectorCore from "../../../lib/vue/ResourceSelectorCore";
 export default {
   data: () => ({
   }),
   components: {
-    'resource-category': ResourceSelector,
+    'resource-selector-core': ResourceSelectorCore,
   },
   methods: {
 
