@@ -1,6 +1,6 @@
 
 $(document).ready(()=>{
-  if(window.location.search){
+  if(top.location.search){
     const serach = top.location.search.split('=')
     // 页面先隐藏 等隐藏了不需要页面后再显示
     if(serach[0] ==='?type' && serach[1] === 'hidden'){
@@ -16,6 +16,7 @@ $(document).ready(()=>{
       document.querySelector('#get-left-user-info-list').style.display = 'none';
       
     }
-    document.querySelector('body').style.opacity = '1';
   }
+  document.querySelector('body').style.opacity = '1';
+
 })

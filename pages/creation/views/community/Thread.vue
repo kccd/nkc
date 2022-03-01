@@ -13,7 +13,7 @@ export default {
   },
   data: () => ({
     iframeUrl:'',
-    uid:''
+    uid:'',
   }),
   created(){
     const user = getState();

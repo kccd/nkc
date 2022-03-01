@@ -1,6 +1,6 @@
 // import FloatUserPanel from '../../lib/vue/FloatUserPanel.vue'
 // 移动到作者名称上显示的hover效果
-$(document).ready(()=>{
+// $(document).ready(()=>{
   // new Vue({
   //   el: "#vue-author-hover",
   //   components:{
@@ -12,7 +12,7 @@ $(document).ready(()=>{
   //     })
   //   },
   // });
-})
+// })
 Object.assign(window, {originTitle})
 function originTitle(){
   if($('#dropdown').hasClass('open')){

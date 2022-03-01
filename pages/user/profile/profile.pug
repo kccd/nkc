@@ -4,6 +4,7 @@ block title
     title 主页
   else
     title=`主页 - ${data.name}`
+    //- meta = `${}`
   +includeCSS("/user/profile/profile.css")
   if data.type === "thread" || data.type === "post" || data.type === "draft"  || data.type === "note" 
     //- 不知道怎么写内联样式
@@ -11,7 +12,7 @@ block title
 
       
 block content
-  .container-fluid.max-width.common-hidden-profile
+  .container-fluid.max-width
     .row
       if state.isApp
         if state.platform !== 'reactNative'

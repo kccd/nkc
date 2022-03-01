@@ -5,7 +5,9 @@
     width="800"
     height="800"
     :src="iframeUrl">
-    <!-- class="hidden" -->
+    <div class="loading" v-show="loadingShow">
+      <i class="fa fa-spinner loading-icon" aria-hidden="true"></i> 
+    </div>
   </iframe>
 </template>
 <script>
@@ -14,6 +16,10 @@
       iframeUrl:{
         require:true,
         type:String
+      },
+      loading:{
+        default:false,
+        type:Boolean
       }
     },
     data(){
@@ -65,11 +71,31 @@
           }
         }
       })
+    },
+    methods:{
+      showLoading(status){
+        this.loadingShow = status
+      }
     }
   }
 </script>
 
 <style scoped>
+.loading{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.loading-icon{
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  font-size: 48px;
+}
 iframe {
     border: none;
     width: 100%;
