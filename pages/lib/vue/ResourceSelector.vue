@@ -72,11 +72,10 @@ export default {
     },
     open(callback, options) {
       const self = this;
+      self.draggableElement.show();
+      self.show = true;
       self.$refs.resourceSelectorCore.open(function (res){
-        if(!res) {
-          self.draggableElement.show();
-          self.show = true;
-        } else {
+        if(res) {
           callback(res);
         }
 

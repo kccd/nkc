@@ -689,7 +689,7 @@ export default {
     'select-category': SelectCategory,
   },
   mounted() {
-    this.getResources(0);
+    if(this.watchType === 'category') this.getResources(0);
     this.initSocketEvent();
     this.initDragUploadEvent();
   },
