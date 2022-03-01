@@ -1,9 +1,17 @@
 const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
-    const {query, db, data} = ctx;
+    const {query, db, data, state} = ctx;
     const {from, page} = query;
     if(from === 'editor') {
+      const moment = await db.MomentModel.getUnPublishedMomentDataByUid(state.uid);
+      if(moment) {
+        const {momentId, videosId, picturesId, content} = moment;
+        data.momentId = momentId;
+        data.videosId = videosId;
+        data.picturesId = picturesId;
+        data.content = content;
+      }
       return await next();
     }
     await next();

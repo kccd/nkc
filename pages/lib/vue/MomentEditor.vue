@@ -230,6 +230,9 @@
       picturesId: ['325195', '325194'],
       videosId: ['325203'],
     }),
+    mounted() {
+      this.initData();
+    },
     computed: {
       contentLength() {
         const {content} = this;
@@ -279,6 +282,7 @@
             self.content = content;
             self.picturesId = picturesId;
             self.videosId = videosId;
+            self.setTextareaSize();
           })
           .catch(err => {
             sweetError(err);

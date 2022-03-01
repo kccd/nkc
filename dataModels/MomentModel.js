@@ -157,6 +157,51 @@ schema.statics.getUnPublishedMomentByUid = async (uid) => {
     uid,
     status: momentStatus.default,
   });
+}
+
+schema.statics.getUnPublishedMomentDataByUid = async (uid) => {
+  const MomentModel = mongoose.model('moments');
+  const ResourceModel = mongoose.model('resources');
+  const moment = await MomentModel.getUnPublishedMomentByUid(uid);
+  if(moment) {
+    let picturesId = [];
+    let videosId = [];
+    const oldResourcesId = moment.files;
+    if(oldResourcesId.length > 0) {
+      const resources = await ResourceModel.find({rid: {$in: oldResourcesId}}, {
+        rid: 1,
+        mediaType: 1,
+      });
+      const resourcesId = resources.map(r => r.rid);
+      if(resources.length > 0) {
+        if (resources[0].mediaType === 'mediaPicture') {
+          picturesId = resourcesId;
+        } else {
+          videosId = resourcesId;
+        }
+      }
+    }
+    const DocumentModel = mongoose.model('documents');
+    const {moment: momentSource} = await DocumentModel.getDocumentSources();
+    const betaDocument = await DocumentModel.getBetaDocumentBySource(momentSource, moment._id);
+    return {
+      momentId: moment._id,
+      toc: betaDocument.toc,
+      tlm: betaDocument.tlm,
+      uid: betaDocument.uid,
+      content: betaDocument.content,
+      picturesId,
+      videosId,
+    }
+  } else {
+    return null;
+  }
+};
+
+schema.methods.getBetaDocument = async function() {
+  const DocumentModel = mongoose.model('documents');
+  const {moment: momentSource} = await DocumentModel.getDocumentSources();
+  return await DocumentModel.getBetaDocumentBySource(momentSource, this._id);
 };
 
 module.exports = mongoose.model('moments', schema);
