@@ -16,10 +16,23 @@
           v-model="content"
           placeholder="想分享什么新鲜事？"
           )
+      .files-container
+        .pictures
+          .picture-item(v-for="(url, index) in picturesUrl" :style="'background-image: url('+url+')'")
+            .icon-remove(@click="removeFromArr(picturesId, index)")
+              .fa.fa-trash-o
+        .videos
+          .video-item(v-for="(videoUrl, index) in videosUrl")
+            .icon-remove(@click="removeFromArr(videosId, index)")
+              .fa.fa-trash-o
+            video(:src="videoUrl.url" :poster="videoUrl.cover" controls="controls")
     .buttons-container
-      .button-icon(@click="selectMedia")
+      .button-icon(@click="selectPicture" :class="{'disabled': videosId.length > 0}")
         .icon.fa.fa-image
-        span 媒体
+        span 图片
+      .button-icon(@click="selectVideo" :class="{'disabled': picturesId.length > 0}")
+        .icon.fa.fa-file-video-o
+        span 视频
       .button-icon
         .icon.fa.fa-smile-o.icon-face
         span 表情
@@ -31,6 +44,72 @@
 <style lang="less" scoped>
   @import '../../publicModules/base';
   .moment-editor{
+    .files-container{
+      .videos{
+        margin-bottom: 1rem;
+        .video-item{
+          position: relative;
+          border-radius: 0.5rem;
+          overflow: hidden;
+          font-size: 0;
+          .icon-remove{
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 3rem;
+            z-index: 10;
+            width: 3rem;
+            font-size: 1.4rem;
+            line-height: 3rem;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.3);
+            transition: background-color 100ms;
+            border-radius: 50%;
+            color: #fff;
+            &:hover{
+              background-color: rgba(0, 0, 0, 0.5);
+            }
+          }
+          video{
+            max-width: 100%;
+            max-height: 100%;
+          }
+        }
+      }
+      .pictures{
+        margin-bottom: 1rem;
+        .picture-item{
+          @pictureHeight: 8rem;
+          position: relative;
+          display: inline-block;
+          height: @pictureHeight;
+          width: @pictureHeight;
+          background-color: #000;
+          overflow: hidden;
+          margin-right: 0.5rem;
+          border-radius: 10px;
+          background-size: cover;
+          background-position: center;
+          .icon-remove{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2rem;
+            line-height: 2rem;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 100ms;
+            &:hover{
+              background-color: rgba(0, 0, 0, 0.5);
+            }
+          }
+        }
+      }
+    }
     position: relative;
     .content-body.ghost{
       position: absolute;
@@ -40,7 +119,7 @@
       z-index: -1;
     }
     .content-container{
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
       padding: 1rem;
       border: 1px solid #ccc;
       border-radius: 0.5rem;
@@ -56,7 +135,7 @@
         outline: none;
         padding: 0;
         &.ghost{
-          overflow: auto;
+          //overflow: auto;
         }
       }
     }
@@ -64,7 +143,7 @@
       @buttonHeight: 2.5rem;
       @buttonPostWidth: 5rem;
       position: relative;
-      padding-right: @buttonPostWidth;
+      padding-right: @buttonPostWidth + 3rem;
       .button-icon{
         height: @buttonHeight;
         border-radius: 50%;
@@ -72,7 +151,7 @@
         line-height: @buttonHeight;
         cursor: pointer;
         color: #555;
-        margin-right: 0.5rem;
+        margin-right: 1rem;
         .icon{
           font-size: 1.6rem;
           margin-right: 0.3rem;
@@ -91,6 +170,15 @@
             color: #333;
           }
 
+        }
+        &.disabled{
+          cursor: not-allowed;
+          .icon{
+            color: #aaa;
+          }
+          span{
+            color: #aaa;
+          }
         }
       }
       .button-pull{
@@ -123,6 +211,9 @@
 <script>
   import ResourceSelector from './ResourceSelector';
   import {getLength} from '../js/checkData';
+  import {getUrl} from '../js/tools';
+  import {screenTopWarning} from "../js/topAlert";
+
   export default {
     components: {
       'resource-selector': ResourceSelector
@@ -130,7 +221,13 @@
     data: () => ({
       textareaHeight: '0',
       maxContentLength: 1000,
-      content: ''
+      maxPictureCount: 9,
+      maxVideoCount: 1,
+      autoSaveContentInterval: 3000,
+      momentId: '',
+      content: '',
+      picturesId: ['325195', '325194'],
+      videosId: ['325203'],
     }),
     computed: {
       contentLength() {
@@ -144,6 +241,25 @@
       remainingWords() {
         const {maxContentLength, contentLength} = this;
         return maxContentLength - contentLength;
+      },
+      picturesUrl() {
+        const {picturesId} = this;
+        const filesUrl = [];
+        for(const rid of picturesId) {
+          const url = getUrl('resource', rid);
+          filesUrl.push(url);
+        }
+        return filesUrl;
+      },
+      videosUrl() {
+        const {videosId} = this;
+        const filesUrl = [];
+        for(const rid of videosId) {
+          const url = getUrl('resource', rid);
+          const cover = getUrl('resource', rid, 'cover')
+          filesUrl.push({url, cover});
+        }
+        return filesUrl;
       }
     },
     methods: {
@@ -155,16 +271,73 @@
           self.textareaHeight = scrollHeight + 'px';
         });
       },
-      selectMedia() {
-        this.$refs.resourceSelector.open(data => {
-          console.log(data);
-        })
+      addResourcesId(type, resourcesId) {
+        const {maxPictureCount, maxVideoCount} = this;
+        if(type === 'picture') {
+          const picturesId = [...new Set(this.picturesId.concat(resourcesId))];
+          this.picturesId = picturesId.slice(0, maxPictureCount);
+        } else {
+          const videosId = [...new Set(this.videosId.concat(resourcesId))];
+          this.videosId = videosId.slice(0, maxVideoCount);
+        }
+      },
+      selectPicture() {
+        const self = this;
+        if(self.videosId.length > 0) return;
+        const type = 'picture';
+        this.$refs.resourceSelector.open(res => {
+          self.addResourcesId(type, res.resourcesId);
+          self.$refs.resourceSelector.close();
+        }, {
+          allowedExt: type,
+          countLimit: self.maxPictureCount - self.picturesId.length
+        });
+      },
+      selectVideo() {
+        const self = this;
+        if(self.picturesId.length > 0) return;
+        const type = 'video';
+        this.$refs.resourceSelector.open(res => {
+          self.addResourcesId(type, res.resourcesId);
+          self.$refs.resourceSelector.close();
+        }, {
+          allowedExt: type,
+          countLimit: self.maxVideoCount - self.videosId.length
+        });
+
+      },
+      removeFromArr(arr, index) {
+        arr.splice(index, 1)
       },
       publishContent() {
 
       },
+      saveContent() {
+        const {content, picturesId, videosId, momentId} = this;
+        const resourcesId = picturesId.length > 0? picturesId: videosId;
+        const type = momentId? 'modify': 'create';
+        return nkcAPI(`/creation/zone/moment`, 'POST', {
+          type,
+          content,
+          resourcesId
+        });
+      },
       autoSaveContent() {
-        const {content} = this;
+        const {autoSaveContentInterval} = this;
+        const self = this;
+        setTimeout(() => {
+          self
+            .saveContent()
+            .then(() => {
+              console.log(`动态自动保存成功`);
+            })
+            .catch(err => {
+              screenTopWarning(`保存动态失败：${err.error || err.message}`);
+            })
+            .finally(() => {
+              self.autoSaveContent();
+            })
+        }, autoSaveContentInterval)
       }
     }
   }
