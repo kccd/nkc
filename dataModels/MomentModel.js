@@ -323,7 +323,7 @@ schema.methods.publish = async function() {
 * @return {moment schema}
 * */
 schema.statics.createQuoteMomentToPublish = async (uid, quoteType, quoteId) => {
-  const MomentModel = mongoose.model('moment');
+  const MomentModel = mongoose.model('moments');
   await MomentModel.checkMomentQuoteType(quoteType);
   const momentId = await MomentModel.getNewId();
   const moment = MomentModel({

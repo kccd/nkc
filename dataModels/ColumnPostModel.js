@@ -386,7 +386,7 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
       p.post.url = `/m/${p.columnId}/a/${p._id}`
     } else {
       //专栏文章链接
-      p.article.url = `/m/${p.columnId}/a/${p._id}#container`;
+      p.article.url = `/m/${p.columnId}/a/${p._id}`;
     }
     p.mainCategories = [];
     p.minorCategories = [];
@@ -625,7 +625,7 @@ schema.statics.deleteColumnPost = async function(aid) {
   const ColumnPostModel = mongoose.model('columnPosts');
   const article = await ArticleModel.findOnly({_id: aid});
   const {article: articleType} = await ColumnPostModel.getColumnPostType();
-  if(!article) throwErr(`_id为 ${aid}的文章不存在`);
+  if(!article) throwErr(400, `_id为 ${aid}的文章不存在`);
   const {_id} = article;
   await ColumnPostModel.deleteOne({pid: _id, type: articleType});
 }

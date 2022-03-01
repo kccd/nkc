@@ -387,9 +387,7 @@ export default {
               //跳转到专栏页面
               window.location.href = `/m/${columnId}`;
             } else if(source === 'zone') {
-              self.$route.push({
-                name: 'zoneArticle',
-              });
+              sweetSuccess('发布成功');
             }
           } else if(type === 'save') {
             //草稿保存成功显示报讯成功信息
