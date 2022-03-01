@@ -91,6 +91,7 @@
           })
           .then(() => {
             self.$emit('delete');
+            sweetSuccess('操作成功');
           })
           .catch(sweetError);
       }

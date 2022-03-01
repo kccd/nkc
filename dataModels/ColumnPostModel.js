@@ -1,6 +1,11 @@
 const mongoose = require("../settings/database");
 const {obtainPureText} = require("../nkcModules/apiFunction");
 const Schema = mongoose.Schema;
+const columnPostType = {
+  post: 'post',
+  thread: 'thread',
+  article: 'article',
+};
 const schema = new Schema({
   _id: Number,
   columnId: {
@@ -75,13 +80,21 @@ const schema = new Schema({
 }, {
   collection: "columnPosts"
 });
+
+/*
+* 获取 type
+* */
+schema.statics.getColumnPostType = async () => {
+  return columnPostType;
+};
+
 /*
 @param{object} filterData 过滤的数据
 @param{array} allowKey filterData保留的key
 
 */
 schema.statics.filterData = (filterData, allowKey)=>{
-  // 
+  //
   if(!filterData) return {}
   const {timeFormat, getUrl} = require('../nkcModules/tools');
   let newObj = {}
@@ -607,6 +620,16 @@ schema.statics.createColumnPost = async function(article, selectCategory) {
 /*
 * 通过 article id 删除专栏引用
 * */
+schema.statics.deleteColumnPost = async function(aid) {
+  const ArticleModel = mongoose.model('articles');
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const article = await ArticleModel.findOnly({_id: aid});
+  const {article: articleType} = await ColumnPostModel.getColumnPostType();
+  if(!article) throwErr(`_id为 ${aid}的文章不存在`);
+  const {_id} = article;
+  await ColumnPostModel.deleteOne({pid: _id, type: articleType});
+}
+
 
 
 module.exports = mongoose.model("columnPosts", schema);
