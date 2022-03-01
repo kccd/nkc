@@ -92,6 +92,7 @@ export default {
         })
         .then(() => {
           self.sendMessageToRemoveItem();
+          sweetSuccess('操作成功');
         })
         .catch(sweetError);
     },
