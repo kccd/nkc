@@ -322,7 +322,6 @@ schema.methods.deleteDraft = async function() {
     cancelled: cancelledStatus,
     default: defaultStatus,
   } = await ArticleModel.getArticleStatus();
-
   // 如果是未发布过的文章，则需要将文章状态改为 cancelled（取消发表）
   if(status === defaultStatus) {
     await this.updateOne({
@@ -343,13 +342,17 @@ schema.methods.deleteDraft = async function() {
 * */
 schema.methods.deleteArticle = async function() {
   const ArticleModel = mongoose.model('articles');
+  const ColumnPostModel = mongoose.model('columnPosts');
   const {normal: normalStatus, deleted: deletedStatus} = await ArticleModel.getArticleStatus();
-  const {status} = this;
+  const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
+  const {status, source, _id} = this;
   if(status !== normalStatus) {
     throwErr(500, `文章状态异常 status=${this.status}`);
   }
   // 删除草稿
   await this.deleteDraft();
+  //根据文章id删除引用
+  if(source === columnSource) await ColumnPostModel.deleteColumnPost(_id);
   // 删除文章
   this.status = deletedStatus;
   await this.updateOne({
@@ -619,7 +622,7 @@ schema.statics.getArticleUrlBySource = async function(articleId, source, sid, st
     if(status === defaultStatus) {
       editorUrl = tools.getUrl('zoneArticleEditor', sid, articleId);
     } else {
-      editorUrl = tools.getUrl('zoneReviseEditor', sid, articleId);
+      editorUrl = tools.getUrl('zoneArticleEditor', sid, articleId);
     }
     articleUrl = tools.getUrl('zoneArticle', sid, articleId);
   }

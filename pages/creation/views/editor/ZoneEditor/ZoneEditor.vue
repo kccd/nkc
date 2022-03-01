@@ -14,11 +14,11 @@
       navList: [
         {
           type: 'zoneMomentEditor',
-          title: '发表动态'
+          title: '动态创作'
         },
         {
           type: 'zoneArticleEditor',
-          title: '发表文章'
+          title: '文章创作'
         }
       ]
     }),

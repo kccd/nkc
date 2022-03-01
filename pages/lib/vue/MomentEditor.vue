@@ -38,7 +38,8 @@
         span 表情
       .button-pull
         span.number(:class="{'warning': remainingWords < 0}") {{remainingWords}}
-        button.publish 发动态
+        button.publish(:class="{'disabled': submitting}" v-if="submitting") 发动态
+        button.publish(@click="publishContent" v-else) 发动态
 </template>
 
 <style lang="less" scoped>
@@ -202,6 +203,10 @@
           background-color: @accent;
           border: none;
           color: #fff;
+          &.disabled{
+            opacity: 0.7;
+            cursor: not-allowed;
+          }
         }
       }
     }
@@ -221,15 +226,19 @@
       'resource-selector': ResourceSelector
     },
     data: () => ({
+      submitting: false,
       textareaHeight: '0',
       maxContentLength: 1000,
-      maxPictureCount: 9,
+      maxPictureCount: 12,
       maxVideoCount: 1,
       momentId: '',
       content: '',
-      picturesId: ['325195', '325194'],
-      videosId: ['325203'],
+      picturesId: [],
+      videosId: [],
     }),
+    mounted() {
+      this.initData();
+    },
     computed: {
       contentLength() {
         const {content} = this;
@@ -279,10 +288,17 @@
             self.content = content;
             self.picturesId = picturesId;
             self.videosId = videosId;
+            self.setTextareaSize();
           })
           .catch(err => {
             sweetError(err);
           });
+      },
+      lockButton() {
+        this.submitting = true;
+      },
+      unlockButton() {
+        this.submitting = false;
       },
       setTextareaSize() {
         const self = this;
@@ -310,7 +326,7 @@
           self.addResourcesId(type, res.resourcesId);
           self.$refs.resourceSelector.close();
         }, {
-          allowedExt: type,
+          allowedExt: [type],
           countLimit: self.maxPictureCount - self.picturesId.length
         });
       },
@@ -322,7 +338,7 @@
           self.addResourcesId(type, res.resourcesId);
           self.$refs.resourceSelector.close();
         }, {
-          allowedExt: type,
+          allowedExt: [type],
           countLimit: self.maxVideoCount - self.videosId.length
         });
 
@@ -331,11 +347,27 @@
         arr.splice(index, 1)
       },
       publishContent() {
-        console.log(`publishContent`)
+        const self = this;
+        self.lockButton();
+        self
+          .saveContent()
+          .then(() => {
+            return nkcAPI(`/creation/zone/moment`, 'POST', {
+              type: 'publish',
+              momentId: self.momentId,
+            })
+          })
+          .then(() => {
+            self.unlockButton();
+          })
+          .catch(err => {
+            self.unlockButton();
+            sweetError(err);
+          });
       },
       onContentChange: debounce(function() {
         this.saveContent();
-      }, 200),
+      }, 500),
       saveContent() {
         const {content, picturesId, videosId, momentId} = this;
         const self = this;
