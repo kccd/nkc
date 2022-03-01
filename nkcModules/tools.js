@@ -217,6 +217,15 @@ var Tools = function() {
       case 'columnArticleEditor': {
         return '/column/editor?mid=' + id + '&aid=' + size;
       }
+      case 'zoneArticleEditor': {
+        return '/creation/editor/zone/article?aid=' + size;
+      }
+      case 'zoneArticle': {
+        return '';
+      }
+      case 'zoneReviseEditor': {
+        return '/creation/zone/article/editor?aid=' + size;
+      }
     }
   };
   self.getAnonymousInfo = function() {

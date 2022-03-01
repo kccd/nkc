@@ -31,6 +31,7 @@
       this.redirect();
     },
     methods: {
+      //路由重定向
       redirect() {
         if(this.$route.name === 'column') {
           this.$router.replace({

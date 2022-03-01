@@ -23,10 +23,18 @@ router
         editorInfo.document = document;
       }
       data.articleId = article._id;
-    } else {
+    } else if(mid) {
       //通过columnId获取article
       const articleStatus = (await db.ArticleModel.getArticleStatus())['default'];
       articles = await db.ArticleModel.find({sid: mid, uid: state.uid, status: articleStatus, hasDraft: true}).sort({toc: -1}).limit(3);
+      const options = [
+        'title',
+      ];
+      articles = await db.ArticleModel.extendDocumentsOfArticles(articles, 'beta', options);
+    } else {
+      //如果都没有就获取空间文章
+      const articleStatus = (await db.ArticleModel.getArticleStatus())['default'];
+      articles = await db.ArticleModel.find({sid: '', uid: state.uid, status: articleStatus, hasDraft: true}).sort({toc: -1}).limit(3);
       const options = [
         'title',
       ];
@@ -97,7 +105,7 @@ router
         //判断用户是否选择文章专栏分类
         if(source === 'column' && selectCategory.selectedMainCategoriesId.length === 0) ctx.throw(401, '未选择文章专栏分类');
         //检测文章专栏分类是否有效
-        if(selectCategory.selectedMainCategoriesId.length !== 0 || selectCategory.selectedMinorCategoriesId.length !== 0) {
+        if(source === 'column') {
           await db.ColumnPostCategoryModel.checkColumnCategory(selectCategory);
         }
         await article.publishArticle({source, selectCategory});

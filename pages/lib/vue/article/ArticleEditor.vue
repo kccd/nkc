@@ -3,7 +3,7 @@
     .m-b-1
       .article-box(v-if="articles.length !== 0")
         .close.fa.fa-remove(@click="close")
-        span 当前专栏存在草稿,点击编辑继续编辑草稿
+        span 当前{{source === 'column'?'专栏':'空间'}}存在草稿,点击编辑继续编辑草稿
         .article-list(v-for="article of articles")
           .article-info
             span.article-name(v-if="article.document.title") {{article.document.title}}
@@ -12,7 +12,7 @@
           .article-do(@click="editArticle(article._id)")
             span 继续编辑
         .article-more(@click="more") 查看更多
-      document-editor(ref="documentEditor" :configs="formConfigs" @ready='editorReady' @content-change="watchContentChange")
+      document-editor(ref="documentEditor" :configs="configs" @ready='editorReady' @content-change="watchContentChange")
     .m-b-1
       button.btn.btn-primary.m-r-05(@click="publish") 发布
       button.btn.btn-default.m-r-05(@click="saveArticle") 保存
@@ -76,22 +76,11 @@ import {getLength} from "../../js/checkData";
 import {getDataById} from "../../js/dataConversion";
 const data = getDataById('data');
 export default {
-  props:['time'],
+  props:['time', 'source', 'configs'],
   data: () => ({
     ready: false,
     articleId: null,
     columnId: data.column.userColumn._id,
-    formConfigs: {
-      cover: true,
-      title: true,
-      keywords: true,
-      keywordsEN: true,
-      abstract: true,
-      abstractEN: true,
-      origin: true,
-      selectCategory: true,
-      authorInfos: true,
-    },
     coverFile : null,
     oldCoverFile: null,
     cover: null,
@@ -148,28 +137,40 @@ export default {
       this.$refs.documentEditor.initDocumentForm(data);
     },
     initId() {
-      const {mid, aid} = this.getRequest();
-      if(mid) {
-        this.columnId = mid;
-      }
-      if(aid) {
-        this.articleId = aid;
-      }
+      if(this.source === 'column') {
+        const {mid, aid} = this.getRequest();
+        if(mid) {
+          this.columnId = mid;
+        }
+        if(aid) {
+          this.articleId = aid;
+        }
+      } else if(this.source === 'zone') {
+        const {aid} = this.getRequest();
+        if(aid) this.articleId = aid;
+      };
     },
     //根据articleId或者mid获取编辑器中的数据
     initData() {
       const self = this;
-      let {mid, aid} = this.getRequest();
-      if(!mid) {
-        if(self.columnId) {
-          mid = self.columnId;
-        } else {
-          return;
-        }
-      };
-      if(this.articleId) aid = this.articleId;
-      let url = `/creation/articles/editor?mid=${mid}`;
-      if(aid) url = `/creation/articles/editor?aid=${aid}&mid=${mid}`
+      let mid, aid, url = '/creation/articles/editor';
+      if(self.source === 'column') {
+        mid = this.getRequest().mid;
+        aid = this.getRequest().aid;
+        if(!mid) {
+          if(self.columnId) {
+            mid = self.columnId;
+          } else {
+            return;
+          }
+        };
+        url = `/creation/articles/editor?mid=${mid}`;
+        if(aid) url = `/creation/articles/editor?mid=${mid}&aid=${aid}`;
+        if(this.articleId) aid = this.articleId;
+      } else if(self.source === 'zone') {
+        aid = this.getRequest().aid;
+        if(aid) url = `/creation/articles/editor?aid=${aid}`;
+      }
       return nkcAPI(url, 'GET')
         .then(data => {
           self.articleId = data.articleId;
@@ -201,7 +202,7 @@ export default {
             };
             self.setContent(self.article);
           } else if(data.editorInfo.articles) {
-            //存在正在编辑中的内容
+            //存在正在编辑中的专栏文章
             self.articles = data.editorInfo.articles;
           }
         })
@@ -212,20 +213,29 @@ export default {
     //继续编辑草稿
     editArticle(aid) {
       const self = this;
+      if(!aid) return;
       //改变地址栏参数
       let url = window.location.href;
-      const {aid: articleId} = self.getRequest();
-      if(!articleId) {
-        self.articleId = articleId;
-        url = url + `&aid=${aid}`;
-        window.history.replaceState(null, null, url);
-        this.initData()
-          .then(() => {
-            self.articles = [];
-          });
-      } else {
-        return;
+      let {aid: articleId, mid} = self.getRequest();
+      if(self.source === 'column') {
+        //专栏编辑器
+        if(!mid) url = url + `?mid=${self.columnId}`;
+        if(!articleId) {
+          self.articleId = aid;
+          url = url + `&aid=${aid}`;
+        } else {
+          return;
+        }
+      } else if (self.source === 'zone') {
+        //空间编辑器
+        if(mid) sweetError('空间编辑器不存在mid');
+        url = url + `?aid=${aid}`;
       }
+      window.history.replaceState(null, null, url);
+      self.initData()
+        .then(() => {
+          self.articles = [];
+        });
     },
     //自动保存草稿 保存成功无提示
     autoSaveToDraft() {
@@ -233,9 +243,9 @@ export default {
       //是否开启自动保存功能 不传入time关闭自动保存功能
       if(!self.time) return;
       const {aid, mid} = self.getRequest();
-      //当地址栏不存在aid和mid时不需要保存
+      //当处于专栏文章编辑器，地址栏不存在aid和mid时不需要保存
       setTimeout(function() {
-        if(!aid || !mid) {
+        if(self.source === 'column' && !aid || !mid) {
           return self.autoSaveToDraft();
         };
         self.post('save')
@@ -259,6 +269,12 @@ export default {
     },
     //查看更多草稿
     more() {
+      let url;
+      if(this.source === 'column') {
+        url = '/creation/column/draft'
+      } else if(this.source === 'zone') {
+        url = '/creation/column/draft';
+      }
       window.location.href = '/creation/column/draft';
     },
     //在编辑器中写入数据库
@@ -298,7 +314,8 @@ export default {
         coverFile,
         articleId = this.getRequest().aid,
         columnId,
-        cover
+        cover,
+        source
       } = this;
       const {
         title = '',
@@ -325,16 +342,16 @@ export default {
       };
       if(articleId) {
         formData.append('articleId', articleId);
-      } else {
-        console.log('articleId不存在', articleId, type);
       }
       if(selectCategory) {
         formData.append('selectCategory', selectCategory);
       }
-      if(columnId) {
+      if(columnId && source === 'column') {
         formData.append('sid', columnId);
       }
-      formData.append('source', 'column');
+      if(source) {
+        formData.append('source', source);
+      }
       if(coverFile) {
         formData.append('coverFile', coverFile, 'cover.png');
       }
@@ -357,7 +374,7 @@ export default {
           let url = window.location.href;
           const {aid} = self.getRequest();
           if(!aid) {
-            url = url + `&aid=${articleId}`;
+            url = url + `${source === 'column'?'&':'?'}aid=${articleId}`;
             window.history.replaceState(null, null, url);
           }
           return self.resetCovetFile(articleCover);
@@ -366,8 +383,14 @@ export default {
           if(type === 'publish') {
             //移除编辑器默认事件
             self.$refs.documentEditor.removeNoticeEvent();
-            //跳转到专栏也买你
-            window.location.href = `/m/${columnId}`;
+            if(source === 'column') {
+              //跳转到专栏页面
+              window.location.href = `/m/${columnId}`;
+            } else if(source === 'zone') {
+              self.$route.push({
+                name: 'zoneArticle',
+              });
+            }
           } else if(type === 'save') {
             //草稿保存成功显示报讯成功信息
             const time = new Date();
@@ -446,31 +469,31 @@ export default {
     },
     //检测标题
     checkTitle() {
-      if (this.article.title.length < 3) throw new Error('标题不能少于3个字');
-      if (this.article.title.length > 100) throw new Error('标题不能超过100个字');
+      if (this.article.title.length < 3) sweetError('标题不能少于3个字');
+      if (this.article.title.length > 100) sweetError('标题不能超过100个字');
     },
     //检测内容
     checkContent() {
-      let contentText = $(this.article.content).text();
+      let contentText = this.article.content;
       if(contentText.length > 100000) {
-        throw new Error('内容不能超过10万字');
+        sweetError('内容不能超过10万字');
       }
       if(contentText.length < 2) {
-        throw new Error('内容不能少于2个字');
+        sweetError('内容不能少于2个字');
       }
     },
     // 检测关键词
     checkKeywords() {
-      if(this.article.keywordsLength > 50) throw "关键词数量超出限制"
+      if(this.article.keywordsLength > 50) sweetError("关键词数量超出限制");
     },
     // 检测摘要
     checkAbstract: function() {
-      this.checkString(this.article.abstractCn, {
+      this.checkString(this.article.abstract, {
         name: "中文摘要",
         minLength: 0,
         maxLength: 1000
       });
-      this.checkString(this.article.abstractEn, {
+      this.checkString(this.article.abstractEN, {
         name: "英文摘要",
         minLength: 0,
         maxLength: 1000
@@ -478,17 +501,18 @@ export default {
     },
     //表单验证
     checkPost() {
-
+      this.checkTitle();
+      this.checkContent();
     },
-    //发布文章
+    //发布文章 需要进行表单验证
     publish() {
       //表单验证
       this.checkPost()
       //检测是否勾选文章专栏分类
       if(!this.article.title) return sweetWarning('请输入文章标题');
-      if(!this.article.selectCategory
-        || (this.article.selectCategory.selectedMainCategoriesId.length === 0
-          && this.article.selectCategory.selectedMinorCategoriesId.length === 0)) return sweetWarning('请选择文章专栏分类');
+      if(this.source === 'column' && !this.article.selectCategory
+        || (this.article.selectCategory && this.article.selectCategory.selectedMainCategoriesId
+          && this.article.selectCategory.selectedMainCategoriesId.length === 0)) return sweetWarning('请选择文章专栏分类');
       this.post('publish');
     },
     //保存文章 有提示保存成功

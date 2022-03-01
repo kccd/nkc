@@ -27,6 +27,7 @@ import ZoneMomentEditor from './views/editor/ZoneEditor/ZoneMomentEditor';
 // import BookEditor from './views/editor/BookEditor';
 import Zone from './views/zone/Zone';
 import ZoneArticle from './views/zone/Article';
+import ZoneReviseEditor from './views/zone/editor';
 import ZoneDraft from './views/zone/draft';
 import DraftEditor from './views/editor/DraftEditor';
 
@@ -88,7 +89,8 @@ const routes = [
     component: Zone,
     children: [
       {name: 'zoneArticle', path: 'article', component: ZoneArticle},
-      {name: 'zoneDraft', path: 'draft', component: ZoneDraft}
+      {name: 'zoneDraft', path: 'draft', component: ZoneDraft},
+      {name: 'ZoneReviseEditor', path: 'article/editor', component: ZoneReviseEditor},
     ]
   }
 ];

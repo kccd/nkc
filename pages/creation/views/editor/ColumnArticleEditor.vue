@@ -1,6 +1,9 @@
 <template lang="pug">
-  .container-fluid
-    article-editor(ref="articleEditor")
+  .column-creation
+    .m-b-1
+      bread-crumb(:list="navList")
+    .standard-max-container
+      article-editor(ref="articleEditor" :configs="formConfigs" time="60000" source="column")
 </template>
 <script>
   import ArticleEditor from "../../../lib/vue/article/ArticleEditor";
@@ -11,7 +14,26 @@
       'article-editor': ArticleEditor
     },
     data: () => ({
-
+      formConfigs: {
+        cover: true,
+        title: true,
+        keywords: true,
+        keywordsEN: true,
+        abstract: true,
+        abstractEN: true,
+        origin: true,
+        selectCategory: true,
+        authorInfos: true,
+      },
+      navList: [
+        {
+          name: '内容创作',
+        },
+        {
+          name: '专栏创作',
+          page: 'columnArticleEditor'
+        }
+      ]
     }),
   }
 </script>
