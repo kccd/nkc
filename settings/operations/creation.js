@@ -118,7 +118,8 @@ module.exports = {
       GET: 'creationCenter'
     },
     moment: {
-      GET: 'creationCenter'
+      GET: 'creationCenter',
+      POST: 'creationCenter'
     }
   },
   community: {

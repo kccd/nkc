@@ -213,6 +213,8 @@
   import {getLength} from '../js/checkData';
   import {getUrl} from '../js/tools';
   import {screenTopWarning} from "../js/topAlert";
+  import {debounce} from '../js/execution';
+  import {nkcAPI} from '../js/netAPI';
 
   export default {
     components: {
@@ -223,7 +225,6 @@
       maxContentLength: 1000,
       maxPictureCount: 9,
       maxVideoCount: 1,
-      autoSaveContentInterval: 3000,
       momentId: '',
       content: '',
       picturesId: ['325195', '325194'],
@@ -262,7 +263,27 @@
         return filesUrl;
       }
     },
+    watch: {
+      'picturesId.length': 'onContentChange',
+      'videosId.length': 'onContentChange',
+      'content': 'onContentChange'
+    },
     methods: {
+      initData() {
+        const self = this;
+        nkcAPI(`/creation/zone/moment?from=editor`, 'GET')
+          .then(res => {
+            const {momentId, content, picturesId, videosId} = res;
+            if(!momentId) return;
+            self.momentId = momentId;
+            self.content = content;
+            self.picturesId = picturesId;
+            self.videosId = videosId;
+          })
+          .catch(err => {
+            sweetError(err);
+          });
+      },
       setTextareaSize() {
         const self = this;
         setTimeout(() => {
@@ -310,34 +331,29 @@
         arr.splice(index, 1)
       },
       publishContent() {
-
+        console.log(`publishContent`)
       },
+      onContentChange: debounce(function() {
+        this.saveContent();
+      }, 200),
       saveContent() {
         const {content, picturesId, videosId, momentId} = this;
+        const self = this;
         const resourcesId = picturesId.length > 0? picturesId: videosId;
         const type = momentId? 'modify': 'create';
         return nkcAPI(`/creation/zone/moment`, 'POST', {
           type,
+          momentId,
           content,
           resourcesId
+        })
+        .then((res) => {
+          self.momentId = res.momentId;
+          console.log(`动态已自动保存`);
+        })
+        .catch(err => {
+          screenTopWarning(`动态保存失败：${err.error || err.message || err}`);
         });
-      },
-      autoSaveContent() {
-        const {autoSaveContentInterval} = this;
-        const self = this;
-        setTimeout(() => {
-          self
-            .saveContent()
-            .then(() => {
-              console.log(`动态自动保存成功`);
-            })
-            .catch(err => {
-              screenTopWarning(`保存动态失败：${err.error || err.message}`);
-            })
-            .finally(() => {
-              self.autoSaveContent();
-            })
-        }, autoSaveContentInterval)
       }
     }
   }

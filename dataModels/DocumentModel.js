@@ -18,7 +18,8 @@ const documentTypes = {
 const documentSources = {
   article: 'article',
   draft: 'draft',
-  comment: 'comment'
+  comment: 'comment',
+  moment: 'moment'
 };
 
 const schema = new mongoose.Schema({
