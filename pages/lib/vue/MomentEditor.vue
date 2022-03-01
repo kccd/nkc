@@ -1,6 +1,7 @@
 <template lang="pug">
   .moment-editor
     resource-selector(ref="resourceSelector")
+    emoji-selector(ref="emojiSelector")
     .content-body.ghost
       .content-container
         textarea.ghost(
@@ -33,7 +34,7 @@
       .button-icon(@click="selectVideo" :class="{'disabled': picturesId.length > 0}")
         .icon.fa.fa-file-video-o
         span 视频
-      .button-icon
+      .button-icon(@click="selectEmoji")
         .icon.fa.fa-smile-o.icon-face
         span 表情
       .button-pull
@@ -220,10 +221,11 @@
   import {screenTopWarning} from "../js/topAlert";
   import {debounce} from '../js/execution';
   import {nkcAPI} from '../js/netAPI';
-
+  import EmojiSelector from './EmojiSelector';
   export default {
     components: {
-      'resource-selector': ResourceSelector
+      'resource-selector': ResourceSelector,
+      'emoji-selector': EmojiSelector
     },
     data: () => ({
       submitting: false,
@@ -341,7 +343,39 @@
           allowedExt: [type],
           countLimit: self.maxVideoCount - self.videosId.length
         });
-
+      },
+      resetFocus(newPosition) {
+        const element = this.$refs.textarea;
+        if(element.setSelectionRange) {
+          element.focus();
+          element.setSelectionRange(newPosition, newPosition);
+        } else if(element.createTextRange) {
+          const range = element.createTextRange();
+          range.collapse(true);
+          range.moveEnd("character", newPosition);
+          range.moveStart("character", newPosition);
+          range.select();
+        }
+      },
+      insertContent(text) {
+        const {content} = this;
+        const element = this.$refs.textarea;
+        const insert = element.selectionStart;
+        const startContent = content.slice(0, insert);
+        const endContent = content.slice(insert, content.length);
+        this.content = startContent + text + endContent;
+        const newPosition = insert + text.length;
+        const self = this;
+        setTimeout(() => {
+          self.resetFocus(newPosition);
+        });
+      },
+      selectEmoji() {
+        const self = this;
+        this.$refs.emojiSelector.open(res => {
+          const {code} = res;
+          self.insertContent(`[${code}]`);
+        });
       },
       removeFromArr(arr, index) {
         arr.splice(index, 1)
