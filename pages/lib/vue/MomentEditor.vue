@@ -326,7 +326,7 @@
           self.addResourcesId(type, res.resourcesId);
           self.$refs.resourceSelector.close();
         }, {
-          allowedExt: type,
+          allowedExt: [type],
           countLimit: self.maxPictureCount - self.picturesId.length
         });
       },
@@ -338,7 +338,7 @@
           self.addResourcesId(type, res.resourcesId);
           self.$refs.resourceSelector.close();
         }, {
-          allowedExt: type,
+          allowedExt: [type],
           countLimit: self.maxVideoCount - self.videosId.length
         });
 

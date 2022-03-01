@@ -28,7 +28,6 @@ import ZoneMomentEditor from './views/editor/ZoneEditor/ZoneMomentEditor';
 import Zone from './views/zone/Zone';
 import ZoneArticle from './views/zone/Article';
 import ZoneMoment from './views/zone/Moment';
-import ZoneArticleReviseEditor from './views/zone/editor';
 import ZoneDraft from './views/zone/draft';
 import DraftEditor from './views/editor/DraftEditor';
 
@@ -92,7 +91,6 @@ const routes = [
       {name: 'zoneMoment', path: 'moment', component: ZoneMoment},
       {name: 'zoneArticle', path: 'article', component: ZoneArticle},
       {name: 'zoneDraft', path: 'draft', component: ZoneDraft},
-      {name: 'ZoneArticleReviseEditor', path: 'article/editor', component: ZoneArticleReviseEditor},
     ]
   }
 ];

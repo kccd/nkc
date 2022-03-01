@@ -81,7 +81,7 @@
     }),
     methods: {
       navToEditor(article) {
-        visitUrl(article.articleEditorUrl, true);
+        visitUrl(article.articleEditorUrl, false);
       },
       deleteArticle(article) {
         const self = this;

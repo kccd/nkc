@@ -622,7 +622,7 @@ schema.statics.getArticleUrlBySource = async function(articleId, source, sid, st
     if(status === defaultStatus) {
       editorUrl = tools.getUrl('zoneArticleEditor', sid, articleId);
     } else {
-      editorUrl = tools.getUrl('zoneReviseEditor', sid, articleId);
+      editorUrl = tools.getUrl('zoneArticleEditor', sid, articleId);
     }
     articleUrl = tools.getUrl('zoneArticle', sid, articleId);
   }

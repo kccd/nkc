@@ -215,16 +215,14 @@ var Tools = function() {
         return '/m/' + id + '/a/' + size;
       }
       case 'columnArticleEditor': {
-        return '/column/editor?mid=' + id + '&aid=' + size;
+        return '/creation/editor/column?mid='+id+'&aid=' + size;
+        // return '/column/editor?mid=' + id + '&aid=' + size;
       }
       case 'zoneArticleEditor': {
         return '/creation/editor/zone/article?aid=' + size;
       }
       case 'zoneArticle': {
         return '';
-      }
-      case 'zoneReviseEditor': {
-        return '/creation/zone/article/editor?aid=' + size;
       }
     }
   };
