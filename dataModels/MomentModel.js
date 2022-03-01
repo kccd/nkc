@@ -225,7 +225,7 @@ schema.methods.publish = async function() {
       rid: 1,
       mediaType: 1
     });
-    if(resources.length !== files.length) {
+    if(resources.length !== this.files.length) {
       throwErr(500, `媒体文件类型错误`);
     }
     for(const resource of resources) {
