@@ -80,7 +80,7 @@ export default {
   data: () => ({
     ready: false,
     articleId: null,
-    columnId: data.column.userColumn._id,
+    columnId: data.column.userColumn?data.column.userColumn._id : '',
     coverFile : null,
     oldCoverFile: null,
     cover: null,
@@ -153,25 +153,39 @@ export default {
     //根据articleId或者mid获取编辑器中的数据
     initData() {
       const self = this;
-      let mid, aid, url = '/creation/articles/editor';
+      if(!self.source) return sweetError('文章来源source未知');
+      let mid, aid, url = '/creation/articles/editor', query = `?source=${self.source}`;
+      let router = window.location.href;
+      const urlSource = self.getRequest().source;
+      if(!urlSource) {
+        router = router + `?source=${self.source}`;
+      }
       if(self.source === 'column') {
         mid = this.getRequest().mid;
         aid = this.getRequest().aid;
         if(!mid) {
           if(self.columnId) {
             mid = self.columnId;
+            router = router + `&mid=${mid}`;
           } else {
             return;
           }
         };
-        url = `/creation/articles/editor?mid=${mid}`;
-        if(aid) url = `/creation/articles/editor?mid=${mid}&aid=${aid}`;
-        if(this.articleId) aid = this.articleId;
+        query = query + `&mid=${mid}`;
+        // if(!aid) {
+        //   if(self.articleId) aid = self.articleId;
+        //   router = router + `&aid=${aid}`;
+        // }
+        if(aid) {
+          query = query + `&mid=${mid}&aid=${aid}`;
+        }
       } else if(self.source === 'zone') {
         aid = this.getRequest().aid;
-        if(aid) url = `/creation/articles/editor?aid=${aid}`;
+        if(aid) query = query + `&aid=${aid}`;
       }
-      return nkcAPI(url, 'GET')
+      //修改地址栏历史记录
+      self.reviseHistory(router);
+      return nkcAPI(url + query, 'GET')
         .then(data => {
           self.articleId = data.articleId;
           if(!data.editorInfo.document) self.contentChangeEventFlag = true;
@@ -229,13 +243,18 @@ export default {
       } else if (self.source === 'zone') {
         //空间编辑器
         if(mid) sweetError('空间编辑器不存在mid');
-        url = url + `?aid=${aid}`;
+        url = url + `&aid=${aid}`;
       }
-      window.history.replaceState(null, null, url);
+      self.reviseHistory(url);
       self.initData()
         .then(() => {
           self.articles = [];
         });
+    },
+    //修改历史记录地址
+    reviseHistory(url) {
+      if(!url) return;
+      window.history.replaceState(null, null, url);
     },
     //自动保存草稿 保存成功无提示
     autoSaveToDraft() {
@@ -375,7 +394,7 @@ export default {
           const {aid} = self.getRequest();
           if(!aid) {
             url = url + `${source === 'column'?'&':'?'}aid=${articleId}`;
-            window.history.replaceState(null, null, url);
+            self.reviseHistory(url);
           }
           return self.resetCovetFile(articleCover);
         })
@@ -387,9 +406,7 @@ export default {
               //跳转到专栏页面
               window.location.href = `/m/${columnId}`;
             } else if(source === 'zone') {
-              self.$route.push({
-                name: 'zoneArticle',
-              });
+              sweetSuccess('发布成功');
             }
           } else if(type === 'save') {
             //草稿保存成功显示报讯成功信息

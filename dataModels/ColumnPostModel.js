@@ -114,18 +114,19 @@ schema.statics.filterData = (filterData, allowKey)=>{
 }
 /*  返回专栏文章需要的字段
     @param {Number} columnId 专栏ID
-*   @param {Number}  columnPosts的_id columnPosts的 _ID
+*   @param {Number}  专栏引用_id columnPosts的 _ID
 */
 schema.statics.getDataRequiredForArticle = async (columnId, _id)=>{
   const nkcRender = require('../nkcModules/nkcRender');
   const ColumnPostModel = mongoose.model('columnPosts');
-  const article = await ColumnPostModel.getArticleDataById(columnId, _id);
+  //查找当前引用
+  const columnPost = await ColumnPostModel.getArticleDataById(columnId, _id);
   let postAllowKey = ['t', 'c', 'abstractCn', 'abstractEn', 'keyWordsCn', 'keyWordsEn', 'authorInfos', 'toc', 'originState', 'uid', 'collectedCount'];
   const documentAllowKey = ['title', 'content', 'abstract', 'abstractEN', 'keywords', 'keywordsEN', 'authorInfos', 'toc', 'origin', 'uid', 'collectedCount'];
   let threadAllowKey = ['hits', 'count', 'oc'];
   const columnAllowKey = ['name', '_id'];
   const ArticleAllowKey = ['hits', 'comment', 'voteUp', 'voteDown'];
-  if(article.type === 'article'){
+  if(columnPost.type === 'article'){
     threadAllowKey = ArticleAllowKey;
     postAllowKey = documentAllowKey;
     // 文章内容
@@ -138,21 +139,21 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id)=>{
     // session = article.article;
   // }
   
-  const filteredThread = ColumnPostModel.filterData(article.thread, threadAllowKey)
-  const filteredPost = ColumnPostModel.filterData(article.article, postAllowKey)
+  const filteredThread = ColumnPostModel.filterData(columnPost.thread, threadAllowKey)
+  const filteredPost = ColumnPostModel.filterData(columnPost.article, postAllowKey)
   //获取专栏名和id
-  const filteredColumn = ColumnPostModel.filterData(article.column, columnAllowKey)
+  const filteredColumn = ColumnPostModel.filterData(columnPost.column, columnAllowKey)
   filteredPost.c = filteredPost.c || filteredPost.content
   filteredPost.c = nkcRender.renderHTML({
     type: 'article',
     post: {
       c: filteredPost.c,
-      resources: article.resources
+      resources: columnPost.resources
     },
-    user:{xsf: article.user.xsf}
+    user:{xsf: columnPost.user.xsf}
   });
-  let resData = {mainCategory: article.mainCategory ,auxiliaryCategory: article.auxiliaryCategory  , thread:filteredThread, post:filteredPost, column:filteredColumn, collectedCount:article.collectedCount, userAvatar:article.user.avatar}
-  if(article.type === 'article'){
+  let resData = {mainCategory: columnPost.mainCategory ,auxiliaryCategory: columnPost.auxiliaryCategory  , thread:filteredThread, post:filteredPost, column:filteredColumn, collectedCount:columnPost.collectedCount, userAvatar:columnPost.user.avatar}
+  if(columnPost.type === 'article'){
     // 把文章字段改为和 post 字段相同
     let changeKeyPost = {}
     const map ={
@@ -386,7 +387,7 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
       p.post.url = `/m/${p.columnId}/a/${p._id}`
     } else {
       //专栏文章链接
-      p.article.url = `/m/${p.columnId}/a/${p._id}#container`;
+      p.article.url = `/m/${p.columnId}/a/${p._id}`;
     }
     p.mainCategories = [];
     p.minorCategories = [];
@@ -625,7 +626,7 @@ schema.statics.deleteColumnPost = async function(aid) {
   const ColumnPostModel = mongoose.model('columnPosts');
   const article = await ArticleModel.findOnly({_id: aid});
   const {article: articleType} = await ColumnPostModel.getColumnPostType();
-  if(!article) throwErr(`_id为 ${aid}的文章不存在`);
+  if(!article) throwErr(400, `_id为 ${aid}的文章不存在`);
   const {_id} = article;
   await ColumnPostModel.deleteOne({pid: _id, type: articleType});
 }

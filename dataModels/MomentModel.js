@@ -6,6 +6,12 @@ const momentStatus = {
   deleted: 'deleted'
 };
 
+const momentQuoteTypes = {
+  article: 'article',
+  post: 'post',
+  moment: 'moment',
+};
+
 const schema = new mongoose.Schema({
   _id: String,
   // 发表时间
@@ -33,7 +39,7 @@ const schema = new mongoose.Schema({
   // 转发别人的动态时，若此字段为空字符创则表示完全转发而非引用转发
   did: {
     type: Number,
-    required: true,
+    default: null,
     index: 1
   },
   // 作为评论时此字段表示动态 ID，作为动态时此字段为空字符
@@ -70,10 +76,34 @@ const schema = new mongoose.Schema({
   }
 });
 
+/*
+* 获取动态的状态列表
+* */
 schema.statics.getMomentStatus = async () => {
   return momentStatus;
 };
 
+/*
+* 获取动态的引用类型
+* */
+schema.statics.getMomentQuoteTypes = async () => {
+  return momentQuoteTypes;
+};
+
+/*
+* 检测引用类型是否合法
+* */
+schema.statics.checkMomentQuoteType = async (quoteType) => {
+  const quoteTypes = Object.values(momentQuoteTypes);
+  if(!quoteTypes.includes(quoteType)) {
+    throwErr(500, `动态引用类型错误`);
+  }
+};
+
+/*
+* 获取新的动态 ID
+* @return {String}
+* */
 schema.statics.getNewId = async () => {
   const MomentModel = mongoose.model('moments');
   const redLock = require('../nkcModules/redLock');
@@ -109,6 +139,15 @@ schema.statics.getNewId = async () => {
 
 };
 
+/*
+* 创建一条未发布的动态
+* 用户主动创作动态时，调用此函数生成动态
+* @param {Object} props
+*   @param {String} uid 发表人 ID
+*   @param {String} content 动态内容
+*   @param {[String]} resourcesId 资源 ID 组成的数组
+* @return {moment schema}
+* */
 schema.statics.createMoment = async (props) => {
   const {uid, content, resourcesId} = props;
   const MomentModel = mongoose.model('moments');
@@ -135,6 +174,12 @@ schema.statics.createMoment = async (props) => {
   return moment;
 };
 
+/*
+* 修改动态内容
+* @param {Object}
+*   @param {String} content 动态内容
+*   @param {[String]} resourcesId 资源 ID 组成的数组
+* */
 schema.methods.modifyMoment = async function(props) {
   const {content, resourcesId} = props;
   const DocumentModel = mongoose.model('documents');
@@ -151,6 +196,11 @@ schema.methods.modifyMoment = async function(props) {
   });
 }
 
+/*
+* 通过发表人 ID 获取未发布的动态
+* @param {String} uid 发表人 ID
+* @return {moment schema or null}
+* */
 schema.statics.getUnPublishedMomentByUid = async (uid) => {
   const MomentModel = mongoose.model('moments');
   return MomentModel.findOne({
@@ -159,6 +209,18 @@ schema.statics.getUnPublishedMomentByUid = async (uid) => {
   });
 }
 
+/*
+* 通过发表人 ID 获取未发布的动态数据
+* @param {String} uid 发表人 ID
+* @return {Object or null}
+*   @param {String} momentId 动态 ID
+*   @param {Date} toc 动态创建时间
+*   @param {Date} tlm 动态最后修改时间
+*   @param {String} uid 发表人 ID
+*   @param {String} content 动态内容 ID
+*   @param {[String]} picturesId 动态附带的图片 ID（resourceId）
+*   @param {[String]} videosId 动态附带的视频 ID（resourceId）
+* */
 schema.statics.getUnPublishedMomentDataByUid = async (uid) => {
   const MomentModel = mongoose.model('moments');
   const ResourceModel = mongoose.model('resources');
@@ -198,12 +260,19 @@ schema.statics.getUnPublishedMomentDataByUid = async (uid) => {
   }
 };
 
+/*
+* 获取动态的编辑版 document
+* @return {document schema}
+* */
 schema.methods.getBetaDocument = async function() {
   const DocumentModel = mongoose.model('documents');
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
   return await DocumentModel.getBetaDocumentBySource(momentSource, this._id);
 };
 
+/*
+* 发布一条动态
+* */
 schema.methods.publish = async function() {
   const DocumentModel = mongoose.model('documents');
   const ResourceModel = mongoose.model('resources');
@@ -246,4 +315,25 @@ schema.methods.publish = async function() {
   });
 };
 
+/*
+* 创建并发布一条引用类型的动态
+* @param {String} uid 发表人 ID
+* @param {String} quoteType 引用类型 momentQuoteType
+* @param {String} quoteId 引用类型对应的 ID
+* @return {moment schema}
+* */
+schema.statics.createQuoteMomentToPublish = async (uid, quoteType, quoteId) => {
+  const MomentModel = mongoose.model('moments');
+  await MomentModel.checkMomentQuoteType(quoteType);
+  const momentId = await MomentModel.getNewId();
+  const moment = MomentModel({
+    _id: momentId,
+    uid,
+    quoteType,
+    quoteId,
+    status: momentStatus.normal,
+  });
+  await moment.save();
+  return moment;
+};
 module.exports = mongoose.model('moments', schema);

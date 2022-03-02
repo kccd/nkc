@@ -78,7 +78,6 @@ export default {
         if(res) {
           callback(res);
         }
-
       }, options);
     },
     close() {

@@ -81,7 +81,7 @@ export default {
   }),
   methods: {
     navToEditor(draft) {
-      visitUrl(draft.articleEditorUrl, true);
+      visitUrl(draft.articleEditorUrl, false);
     },
     removeDraft(draft) {
       const self = this;

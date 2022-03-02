@@ -1,0 +1,23 @@
+if !isIncluded('comment')
+  +includeCSS('/publicModules/commentCenter/comment.css')
+  .comment-container
+    mixin skeleton
+      .comment-item
+        .comment-item-header
+          .comment-item-avatar.skeleton
+          .comment-item-info
+            .comment-item-username.skeleton
+            .comment-item-time.skeleton
+        .comment-item-content
+          div.skeleton
+          div.skeleton
+          div.skeleton
+    .comment-header 评论列表：
+    .comment-list
+      .loading
+        +skeleton
+        +skeleton
+        +skeleton
+    .comment-list
+      .text-center.p-t-3.p-b-3 空空如也~
+  +includeJS('/publicModules/commentCenter/comment.js')

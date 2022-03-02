@@ -441,10 +441,12 @@ schema.methods.modifyArticle = async function(props) {
 schema.methods.publishArticle = async function(options) {
   const ArticleModel = mongoose.model('articles');
   const ColumnPostModel = mongoose.model('columnPosts');
+  const MomentModel = mongoose.model('moments');
   const {normal} = await ArticleModel.getArticleStatus();
+  const {article: articleQuoteType} = await MomentModel.getMomentQuoteTypes();
   const {source, selectCategory} = options;
   const DocumentModel = mongoose.model('documents');
-  const {did} = this;
+  const {did, uid, _id: articleId} = this;
   //将当前article的状态改为正常
   await this.changeArticleStatus(normal);
   if(source === 'column') {
@@ -452,7 +454,12 @@ schema.methods.publishArticle = async function(options) {
     await ColumnPostModel.createColumnPost(this, selectCategory);
   } else if(source === 'zone') {
     //如果发布的article为空间文章就创建一条新的动态并绑定当前article
-    
+    const {_id: momentId} = await MomentModel.createQuoteMomentToPublish(uid, articleQuoteType, articleId);
+    await this.updateOne({
+      $set: {
+        sid: momentId,
+      }
+    });
   }
   await DocumentModel.publishDocumentByDid(did);
 }
@@ -568,7 +575,7 @@ schema.statics.extendArticles = async function(articles) {
     }
     let url;
     if(article.source === articleSource.column) {
-      url = `/m/${columnPost.columnId}/a${article._id}#container`;
+      url = `/m/${columnPost.columnId}/a${article._id}`;
     } else {
       url = '';
     }

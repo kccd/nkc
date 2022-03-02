@@ -1,5 +1,5 @@
-//- 
- 
+//-
+
   @param {Object} post 文章主体信息
   @param {Object} column 文章专栏信息
   @param {Array} mainCategory 文章主分类
@@ -8,15 +8,16 @@
   @param {Number}} collectedCount 文章收藏数
 extends ../../bootstrap_base
 block title
-  -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar} = data.article
+  -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar} = data.columnPost
   -var {_id, name} = column
   -var {hits, count, oc} = thread
   -var {authorInfos, uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c} = post
   title=t
   +includeCSS('/columns/article/article.css')
 block content
+  .hidden#data=objToStr({comments: data.comments})
   .container-fluid.max-width
-    .article-common.col-xs-12.col-md-9
+    .article-common.col-xs-12.col-md-9.m-b-1
       include ./nav
       +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount})
       include ./setUp
@@ -27,10 +28,11 @@ block content
       +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
       include ./content
       +content(c)
-    .col-xs-12.col-md-3.box-shadow-panel#rightDom   
-      //- 滚动到页头页脚  
+    .article-common.col-xs-12.col-md-9
+      include ../../publicModules/commentCenter/comment
+    .col-xs-12.col-md-3.box-shadow-panel#rightDom
+      //- 滚动到页头页脚
       include ../../module_scrollTo.pug
-    //- float-user-panel(ref='floatUserPane') 
   //- 显示作者联系信息
   include ./authorInfo.pug
   +authorInfo()
@@ -39,7 +41,7 @@ block content
 
   //- 下拉后左边显示的所属专业 上级专业 同级专业
   //- +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
-block scripts 
+block scripts
   include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
 //-  +includeJS('/columns/article/article.js')
 
