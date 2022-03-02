@@ -37,7 +37,7 @@ export default {
           iframe.onload = () => {
             var iDoc = iframe.contentDocument || iframe.contentWindow.document;
             var height =
-              iDoc.documentElement.clientHeight || iDoc.body.clientHeight;
+              iDoc.body.scrollHeight || iDoc.body.clientHeight;
             iframe.style.height = height + "px";
             // this.showLoading(false);
             this.$emit('closeLoading')
@@ -47,7 +47,7 @@ export default {
         iframe.onload = () => {
           var iDoc = iframe.contentDocument || iframe.contentWindow.document;
           var height =
-            iDoc.documentElement.clientHeight || iDoc.body.clientHeight;
+            iDoc.body.scrollHeight || iDoc.body.clientHeight;
           iframe.style.height = height + "px";
           this.$emit('closeLoading')
 
