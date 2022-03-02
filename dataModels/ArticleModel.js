@@ -624,7 +624,12 @@ schema.statics.getArticleUrlBySource = async function(articleId, source, sid, st
   let articleUrl = '';
   if(source === columnSource) {
     editorUrl = tools.getUrl('columnArticleEditor', sid, articleId);
-    articleUrl = tools.getUrl('columnArticle', sid, articleId);
+    const ColumnPostModel = mongoose.model('columnPosts');
+    const {article: articleType} = await ColumnPostModel.getColumnPostTypes();
+    const columnPost = await ColumnPostModel.findOne({type: articleType, pid: articleId}, {_id: 1});
+    if(columnPost) {
+      articleUrl = tools.getUrl('columnArticle', sid, columnPost._id);
+    }
   } else if(source === zoneSource) {
     if(status === defaultStatus) {
       editorUrl = tools.getUrl('zoneArticleEditor', sid, articleId);
