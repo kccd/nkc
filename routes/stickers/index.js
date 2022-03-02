@@ -1,7 +1,7 @@
 const router = require("koa-router")();
 router
   .get("/", async (ctx, next) => {
-    const {nkcModules, query, db, data} = ctx;
+    const {nkcModules, query, db, data, state} = ctx;
     const {page = 0, perpage = 120} = query;
     const q = {
       disabled: false,
@@ -17,6 +17,7 @@ router
     const count = await db.StickerModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
     data.stickers = await db.StickerModel.find(q).sort({hits: -1}).skip(paging.start).limit(paging.perpage);
+    data.emoji = state.twemoji;
     data.paging = paging;
     ctx.template = "stickers/stickers.pug";
     await next();
