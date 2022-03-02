@@ -7,14 +7,18 @@ router
   .get('/editor', async (ctx, next) => {
     //获取独立文章信息
     const {query, state, db, data} = ctx;
-    const {aid, mid} = query;
+    let {aid, mid, source} = query;
+    if(!source) ctx.throw(401, '文章来源未知');
+    console.log('source', source);
     let document;
     let article;
     let articles;
+    //获取article来源
+    const articleSource = (await db.ArticleModel.getArticleSources())[source];
     const editorInfo = {};
     if(aid) {
       //通过aid获取article
-      article = await db.ArticleModel.findOnly({_id: aid, uid: state.uid});
+      article = await db.ArticleModel.findOnly({_id: aid, uid: state.uid, source: articleSource});
       if(!article) ctx.throw(400, '未找到article,请刷新后重试');
       if(article.status === 'deleted') ctx.throw(403, '权限不足');
       const documentSource = (await db.DocumentModel.getDocumentSources()).article;
@@ -23,24 +27,23 @@ router
         editorInfo.document = document;
       }
       data.articleId = article._id;
-    } else if(mid) {
-      //通过columnId获取article
-      const articleStatus = (await db.ArticleModel.getArticleStatus())['default'];
-      articles = await db.ArticleModel.find({sid: mid, uid: state.uid, status: articleStatus, hasDraft: true}).sort({toc: -1}).limit(3);
-      const options = [
-        'title',
-      ];
-      articles = await db.ArticleModel.extendDocumentsOfArticles(articles, 'beta', options);
     } else {
-      //如果都没有就获取空间文章
+      //如果不存在aid就获取当前专栏或者当前用户空间下的所有文章草稿
       const articleStatus = (await db.ArticleModel.getArticleStatus())['default'];
-      articles = await db.ArticleModel.find({sid: '', uid: state.uid, status: articleStatus, hasDraft: true}).sort({toc: -1}).limit(3);
+      const m = {
+        sid: mid?mid:'',
+        uid: state.uid,
+        status: articleStatus,
+        source: articleSource,
+        hasDraft: true
+      };
+      articles = await db.ArticleModel.find(m).sort({toc: -1}).limit(3);
       const options = [
         'title',
       ];
       articles = await db.ArticleModel.extendDocumentsOfArticles(articles, 'beta', options);
     }
-    
+
     if(article) {
       editorInfo.article = article;
     }

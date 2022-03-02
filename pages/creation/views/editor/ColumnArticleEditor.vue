@@ -2,9 +2,22 @@
   .column-creation
     .m-b-1
       bread-crumb(:list="navList")
-    .standard-max-container
+    .standard-max-container(v-if="column.userColumn")
       article-editor(ref="articleEditor" :configs="formConfigs" time="60000" source="column")
+    .standard-max-container(v-else)
+      .no-column
+        span 您还未开通专栏，点击
+        a(href="/column/apply") 这里
+        span 去开通专栏吧
+
 </template>
+<style>
+.no-column {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bolder;
+}
+</style>
 <script>
   import ArticleEditor from "../../../lib/vue/article/ArticleEditor";
   import {getDataById} from "../../../lib/js/dataConversion";
@@ -25,6 +38,7 @@
         selectCategory: true,
         authorInfos: true,
       },
+      column: data.column,
       navList: [
         {
           name: '内容创作',
