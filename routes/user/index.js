@@ -239,8 +239,9 @@ userRouter
     }
 
     const superModerator = ctx.permission("superModerator");
-
     if(!t) {
+
+    } else if(t === 'post') {
       if(Number(page) === 0) {
         data.userPostSummary = await db.UserModel.getUserPostSummary(targetUser.uid);
         // nkcModules.apiFunction.shuffle(data.userPostSummary);
