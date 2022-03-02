@@ -73,6 +73,16 @@ const schema = new mongoose.Schema({
     type: [String],
     default: [],
     index: 1
+  },
+  // 点赞
+  voteUp: {
+    type: Number,
+    default: 0,
+  },
+  // 点踩
+  voteDown: {
+    type: Number,
+    default: 0
   }
 });
 
@@ -307,6 +317,7 @@ schema.methods.publish = async function() {
       }
     }
   }
+  await DocumentModel.publishDocumentByDid(this.did);
   this.status = momentStatus.normal;
   await this.updateOne({
     $set: {
@@ -341,7 +352,72 @@ schema.statics.createQuoteMomentToPublish = async (uid, quoteType, quoteId) => {
 * 拓展动态信息
 * */
 schema.statics.extendMomentsData = async (moments) => {
-
+  const UserModel = mongoose.model('users');
+  const ResourceModel = mongoose.model('resources');
+  const DocumentModel = mongoose.model('documents');
+  const PostModel = mongoose.model('posts');
+  const MomentModel = mongoose.model('moments');
+  const ArticleModel = mongoose.model('articles');
+  const {getUrl, fromNow} = require('../nkcModules/tools');
+  const {moment: momentSource} = await DocumentModel.getDocumentSources();
+  const usersId = [];
+  const momentsId = [];
+  let resourcesId = [];
+  for(const moment of moments) {
+    const {uid, files, _id} = moment;
+    usersId.push(uid);
+    resourcesId = resourcesId.concat(files);
+    momentsId.push(_id);
+  }
+  // 准备用户数据
+  const usersObj = await UserModel.getUsersObjectByUsersId(usersId);
+  // 准备附件数据
+  const resourcesObj = await ResourceModel.getResourcesObjectByResourcesId(resourcesId);
+  // 准备动态内容
+  const stableDocumentsObj = await DocumentModel.getStableDocumentsBySource(momentSource, momentsId, 'object');
+  const results = [];
+  for(const moment of moments) {
+    const {
+      uid,
+      files,
+      toc,
+      _id,
+      voteUp,
+    } = moment;
+    const user = usersObj[uid];
+    if(!user) continue;
+    const {username, avatar} = user;
+    const betaDocument = stableDocumentsObj[_id];
+    const content = betaDocument? betaDocument.content: '';
+    const filesData = [];
+    for(const rid of files) {
+      const resource = resourcesObj[rid];
+      if(!resource) continue;
+      const {mediaType} = resource;
+      let coverUrl = '';
+      let type = 'picture';
+      if(mediaType === 'mediaVideo') {
+        coverUrl = getUrl('videoCover', rid);
+        type = 'video';
+      }
+      filesData.push({
+        type,
+        url: getUrl('resource', rid),
+        coverUrl
+      });
+    }
+    results.push({
+      uid,
+      username,
+      avatarUrl: getUrl('userAvatar', avatar),
+      userHome: getUrl('userHome', uid),
+      time: fromNow(toc),
+      content,
+      voteUp,
+      files: filesData
+    });
+  }
+  return results;
 };
 
 module.exports = mongoose.model('moments', schema);

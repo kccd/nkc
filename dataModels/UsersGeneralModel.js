@@ -18,6 +18,14 @@ const usersGeneralSchema = new Schema({
     article: {
       type: Number,
       default: 0,
+    },
+    comment: {
+      type: Number,
+      default: 0,
+    },
+    moment: {
+      type: Number,
+      default: 0
     }
   },
   /*

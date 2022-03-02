@@ -1269,4 +1269,19 @@ resourceSchema.methods.updateFilesInfo = async function() {
   return files;
 };
 
+/*
+* 指定资源ID，获取以资源ID为键资源对象为值的对象
+* @param {[String]} resourcesId 资源ID组成的数组
+* */
+resourceSchema.statics.getResourcesObjectByResourcesId = async (resourcesId) => {
+  const ResourceModel = mongoose.model('resources');
+  const resources = await ResourceModel.find({rid: {$in: resourcesId}});
+  const obj = {};
+  for(let i = 0; i < resources.length; i++) {
+    const resource = resources[i];
+    obj[resource.rid] = resource;
+  }
+  return obj;
+}
+
 module.exports = mongoose.model('resources', resourceSchema);
