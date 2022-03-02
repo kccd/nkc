@@ -1,8 +1,9 @@
 const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
-    const {query, db, data, state} = ctx;
+    const {query, db, data, state, nkcModules} = ctx;
     const {from, page} = query;
+    // 编辑器获取待发布的动态
     if(from === 'editor') {
       const moment = await db.MomentModel.getUnPublishedMomentDataByUid(state.uid);
       if(moment) {
@@ -14,6 +15,17 @@ router
       }
       return await next();
     }
+    // 获取动态列表
+    const match = {
+      uid: state.uid,
+      parent: '',
+      status: 'normal',
+    };
+    const count = await db.MomentModel.countDocuments(match);
+    const paging = nkcModules.apiFunction.paging(page, count);
+    const moments = await db.MomentModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    data.momentsData = await db.MomentModel.extendMomentsData(moments);
+    data.paging = paging;
     await next();
   })
   .post('/', async (ctx, next) => {
