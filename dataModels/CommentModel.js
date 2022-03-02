@@ -103,7 +103,7 @@ schema.virtual('reason')
 /*
 * 获取comment source
 * */
-schema.statics.gerCommentSource = async function() {
+schema.statics.getCommentSource = async function() {
   return commentSource;
 }
 
