@@ -631,12 +631,8 @@ schema.statics.getArticleUrlBySource = async function(articleId, source, sid, st
       articleUrl = tools.getUrl('columnArticle', sid, columnPost._id);
     }
   } else if(source === zoneSource) {
-    if(status === defaultStatus) {
-      editorUrl = tools.getUrl('zoneArticleEditor', sid, articleId);
-    } else {
-      editorUrl = tools.getUrl('zoneArticleEditor', sid, articleId);
-    }
-    articleUrl = tools.getUrl('zoneArticle', sid, articleId);
+    editorUrl = tools.getUrl('zoneArticleEditor', sid, articleId);
+    articleUrl = tools.getUrl('zoneArticle', articleId);
   }
 
   return {

@@ -222,7 +222,7 @@ var Tools = function() {
         return '/creation/editor/zone/article?aid=' + size;
       }
       case 'zoneArticle': {
-        return '';
+        return '/zone/a/' + id;
       }
     }
   };
