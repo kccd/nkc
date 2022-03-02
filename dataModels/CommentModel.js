@@ -1,4 +1,7 @@
 const mongoose = require('../settings/database');
+const commentSource = {
+        article: 'article',
+      };
 const schema = new mongoose.Schema({
   _id: String,
   uid: {
@@ -96,6 +99,13 @@ schema.virtual('reason')
   .set(function(val) {
     return this._reason = val
   });
+
+/*
+* 获取comment source
+* */
+schema.statics.gerCommentSource = async function() {
+  return commentSource;
+}
 
 /*
 * 获取评论的有效来源
