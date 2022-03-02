@@ -44,7 +44,21 @@ $(document).ready(()=>{
       document.querySelector('.shopping-cart').style.display = 'none';
       // 获取 左侧 （显示用户信息） 
       document.querySelector('#get-left-user-info-list').style.display = 'none';
-      body.style.background = 'none'
+      // body.style.background = 'none';
+      const content = $('#container-fluid-show')[0]
+      content.addEventListener('click',function(e){
+        if(e.target.tagName === 'A'){
+          e.preventDefault()
+          if(!e.target.href) return
+          // 笔记的我的全部按钮 回复的分页按钮 不打开新标签
+          const parentElement = e.target.parentElement
+          if(parentElement._prevClass === "paging-button" || parentElement.tagName === 'LI' ){
+            window.location.href = e.target.href
+            return
+          }
+          window.open(e.target.href)
+        }
+      })
     }
   }
   document.querySelector('body').style.opacity = '1';
