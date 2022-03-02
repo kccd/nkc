@@ -5,7 +5,7 @@
       title="展示社区内容相关子项"
       importance="high"
       frameborder="0"
-      scrolling="auto"
+      scrolling="no"
       width="800"
       height="0"
       :src="iframeUrl"
