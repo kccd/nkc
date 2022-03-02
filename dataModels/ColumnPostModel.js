@@ -96,7 +96,7 @@ schema.statics.getColumnPostTypes = async () => {
 schema.statics.filterData = (filterData, allowKey)=>{
   //
   if(!filterData) return {}
-  const {timeFormat, getUrl} = require('../nkcModules/tools');
+  const {timeFormat} = require('../nkcModules/tools');
   let newObj = {}
   for (const key in filterData) {
     if (Object.hasOwnProperty.call(filterData, key)) {
