@@ -1,4 +1,4 @@
-import {fromNow} from '../../lib/js/tools'
+// import {fromNow} from '../../lib/js/tools'
 const data = NKC.methods.getDataById("subUsersId");
 $(document).ready(()=>{
   const noteApp = new Vue({
@@ -16,7 +16,7 @@ $(document).ready(()=>{
     methods: {
       getUrl: NKC.methods.tools.getUrl,
       visitUrl: NKC.methods.visitUrl,
-      fromNow: NKC.methods.fromNow || fromNow,
+      fromNow: NKC.methods.fromNow,
       modifyNote(nc) {
         nc.edit = !nc.edit;
         if(nc.edit) {
