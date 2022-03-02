@@ -1,5 +1,5 @@
 <template>
-  <div id='ifream-container'>
+  <!-- <div id='ifream-container'> -->
     <iframe
       id="inlineFrameExample"
       title="展示社区内容相关子项"
@@ -11,7 +11,7 @@
       :src="iframeUrl"
     >
     </iframe>
-  </div>
+  <!-- </div> -->
 </template>
 <script>
 export default {
@@ -31,7 +31,7 @@ export default {
     // this.hiddenIferam()
     this.$nextTick(() => {
       const iframe = document.querySelector("iframe"); 
-      iframe.style.height = 0 + "px";
+      // iframe.style.height = 0 + "px";
       if (iframe.attachEvent) {
         iframe.attachEvent("onload", () => {
           iframe.onload = () => {
@@ -65,21 +65,12 @@ export default {
 </script>
 
 <style scoped>
-#ifream-container{
+/* #ifream-container{
   overflow: hidden;
-}
+} */
 iframe {
-  border: none;
+  /* border: none; */
   width: 100%;
 }
-.hidden {
-  /* visibility:hidden */
-  opacity: 0;
-  /* display: none; */
-}
-.show {
-  opacity: 1;
-  /* display: block; */
-  /* visibility: visible; */
-}
+
 </style>

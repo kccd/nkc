@@ -42,7 +42,7 @@ $(document).ready(()=>{
       document.querySelector('.footer').style.display = 'none';
       // 获取 右上 （购物车）
       document.querySelector('.shopping-cart').style.display = 'none';
-      // 获取 左侧 （显示用户信息）
+      // 获取 左侧 （显示用户信息） 
       document.querySelector('#get-left-user-info-list').style.display = 'none';
       body.style.background = 'none'
     }
