@@ -27,7 +27,7 @@ export default {
   /* position: absolute; */
   /* top: 0; */
   /* left: 0; */
-  background-color: #d8d9da82;
+  /* background-color: #e0e2e51c; */
 }
 @keyframes rotate{
   0% {
