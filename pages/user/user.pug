@@ -162,7 +162,7 @@ block content
                 a.pointer.button(onclick="selectAll()") 全选
                 a.pointer.button.radius-right(onclick="toColumn()") 推送到专栏
           include ../publicModules/paging/paging
-          if data.t === "thread" || !data.t
+          if data.t === "thread" || data.t === "post"
             if data.posts.length === 0
               .user-list-warning 用户貌似未发表过任何内容~
             else
@@ -170,13 +170,13 @@ block content
               for post, index in data.posts
                 if index
                   hr
-                if data.paging.page === 0 && !data.t
+                if data.paging.page === 0 && data.t === 'post'
                   if index > 2 && !insert
                     -insert = true;
                     include ./summary
                     hr
                 include ./single_post
-              if data.paging.page === 0 && !data.t
+              if data.paging.page === 0 && data.t === 'post'
                 if !insert
                   include ./summary
           else
@@ -244,6 +244,6 @@ block scripts
     -const column = state.userColumn;
     include ../publicModules/toColumn/toColumn
   +includeJS("/echarts/dist/echarts.min.js")
-  if !data.t || data.paging.page !== 0
+  if data.t === 'post' || data.paging.page !== 0
     +includeJS("/user/summary.js")
   +includeJS("/user/user.js")

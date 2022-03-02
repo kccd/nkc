@@ -336,4 +336,12 @@ schema.statics.createQuoteMomentToPublish = async (uid, quoteType, quoteId) => {
   await moment.save();
   return moment;
 };
+
+/*
+* 拓展动态信息
+* */
+schema.statics.extendMomentsData = async (moments) => {
+
+};
+
 module.exports = mongoose.model('moments', schema);

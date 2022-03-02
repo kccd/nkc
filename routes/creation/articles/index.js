@@ -9,7 +9,6 @@ router
     const {query, state, db, data} = ctx;
     let {aid, mid, source} = query;
     if(!source) ctx.throw(401, '文章来源未知');
-    console.log('source', source);
     let document;
     let article;
     let articles;

@@ -1,7 +1,7 @@
 const mongoose = require("../settings/database");
 const {obtainPureText} = require("../nkcModules/apiFunction");
 const Schema = mongoose.Schema;
-const columnPostType = {
+const columnPostTypes = {
   post: 'post',
   thread: 'thread',
   article: 'article',
@@ -84,8 +84,8 @@ const schema = new Schema({
 /*
 * 获取 type
 * */
-schema.statics.getColumnPostType = async () => {
-  return columnPostType;
+schema.statics.getColumnPostTypes = async () => {
+  return columnPostTypes;
 };
 
 /*
@@ -625,7 +625,7 @@ schema.statics.deleteColumnPost = async function(aid) {
   const ArticleModel = mongoose.model('articles');
   const ColumnPostModel = mongoose.model('columnPosts');
   const article = await ArticleModel.findOnly({_id: aid});
-  const {article: articleType} = await ColumnPostModel.getColumnPostType();
+  const {article: articleType} = await ColumnPostModel.getColumnPostTypes();
   if(!article) throwErr(400, `_id为 ${aid}的文章不存在`);
   const {_id} = article;
   await ColumnPostModel.deleteOne({pid: _id, type: articleType});

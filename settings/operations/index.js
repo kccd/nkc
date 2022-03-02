@@ -85,6 +85,7 @@ const book = require('./book');
 const pim = require('./pim');
 const rc = require('./rc');
 const comment = require("./comment");
+const zone = require('./zone');
 const operationObj = {};
 
 
@@ -281,6 +282,7 @@ operationObj.operationTree = {
     book, // 书籍
 		rc, //资源分组
     comment, // 评论系统
+    zone, // 空间
 	}
 };
 module.exports = operationObj;
