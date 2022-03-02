@@ -1,4 +1,34 @@
 
+// document.addEventListener('click',({target})=>{
+//   // console.log(target, (target.innerText === '全部'))
+//   const iframe = document.body;
+//     console.log(iframe.style.opacity="0") 
+//   if((target.innerText === '全部') || (target.innerText === '我的')){
+//     const iframe = document.querySelector("iframe");
+//     console.log(iframe) 
+//     iframe.style.height = 0 + "px";
+//     if (iframe.attachEvent) {
+//       iframe.attachEvent("onload", () => {
+//         iframe.onload = () => {
+//           var iDoc = iframe.contentDocument || iframe.contentWindow.document;
+//           var height =
+//             iDoc.documentElement.clientHeight || iDoc.body.clientHeight;
+//           iframe.style.height = height + "px";
+//         };
+//       });
+//     } else {
+//       iframe.onload = () => {
+//         var iDoc = iframe.contentDocument || iframe.contentWindow.document;
+//         var height =
+//           iDoc.documentElement.clientHeight || iDoc.body.clientHeight;
+//         iframe.style.height = height + "px";
+//       };
+//     }
+//   }
+// })
+// function listenerIfream (){
+  
+// }
 $(document).ready(()=>{
   if(top.location.search){
     const serach = top.location.search.split('=')
@@ -18,5 +48,4 @@ $(document).ready(()=>{
     }
   }
   document.querySelector('body').style.opacity = '1';
-
 })

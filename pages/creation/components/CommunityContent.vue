@@ -1,13 +1,17 @@
 <template>
-  <iframe
-    id="inlineFrameExample"
-    title="展示社区内容相关子项"
-    importance="high"
-    width="800"
-    height="800"
-    :src="iframeUrl"
-  >
-  </iframe>
+  <div id='ifream-container'>
+    <iframe
+      id="inlineFrameExample"
+      title="展示社区内容相关子项"
+      importance="high"
+      frameborder="0"
+      scrolling="auto"
+      width="800"
+      height="0"
+      :src="iframeUrl"
+    >
+    </iframe>
+  </div>
 </template>
 <script>
 export default {
@@ -24,8 +28,9 @@ export default {
   created() {
   },
   mounted() {
+    // this.hiddenIferam()
     this.$nextTick(() => {
-      const iframe = document.querySelector("iframe");
+      const iframe = document.querySelector("iframe"); 
       iframe.style.height = 0 + "px";
       if (iframe.attachEvent) {
         iframe.attachEvent("onload", () => {
@@ -54,11 +59,15 @@ export default {
     // showLoading(status) {
     //   this.loadingShow = status;
     // },
+
   },
 };
 </script>
 
 <style scoped>
+#ifream-container{
+  overflow: hidden;
+}
 iframe {
   border: none;
   width: 100%;
