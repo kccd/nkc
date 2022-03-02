@@ -26,6 +26,7 @@
         margin: 0 0.5rem 0.5rem 0;
         height: 2rem;
         width: 2rem;
+        cursor: pointer;
         img{
           height: 100%;
           width: 100%;
@@ -34,6 +35,7 @@
     }
     .emoji-header{
       height: 3rem;
+      cursor: move;
       line-height: 3rem;
       background-color: #f6f6f6;
       position: relative;
