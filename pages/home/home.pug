@@ -144,6 +144,7 @@ block content
             include ../publicModules/canvas_logo
           include ../publicModules/improveUserInfo
           include ../publicModules/management/management
+          +managementPanel(data.managementData)
           include ../publicModules/apps/apps
           if data.noticeThreads && data.noticeThreads.length > 0
             -let sideThreads = data.noticeThreads

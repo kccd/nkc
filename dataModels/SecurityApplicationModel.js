@@ -150,4 +150,5 @@ schema.statics.getPendingApplication = async (uid) => {
     status: 'pending'
   });
 };
+
 module.exports = mongoose.model('securityApplications', schema);

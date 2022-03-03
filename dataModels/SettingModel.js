@@ -956,4 +956,103 @@ settingSchema.statics.saveSiteLog = async (filePath) => {
   });
 }
 
+/*
+* 获取前台管理面板的入口以及未处理数目
+* @param {user schema}
+* @return {[Object]}
+*   @param {String} name 入口名称
+*   @param {String} url 入口链接
+*   @param {String} icon 图标名称
+*   @param {Number} 待处理条数
+* */
+settingSchema.statics.getManagementData = async (user) => {
+  const SettingModel = mongoose.model('settings');
+  const ForumModel = mongoose.model('forums');
+  const PostModel = mongoose.model('posts');
+  const ThreadModel = mongoose.model('threads');
+  const DocumentModel = mongoose.model('documents');
+  const ComplaintModel = mongoose.model('complaints');
+  const ProblemModel = mongoose.model('problems');
+  const results = [];
+  if(user.hasPermission('nkcManagement')) {
+    results.push({
+      name: '前台管理',
+      url: '/nkc',
+      icon: 'fa-cogs',
+      count: 0,
+    });
+  }
+  if(user.hasPermission('visitExperimentalStatus')) {
+    results.push({
+      name: '后台管理',
+      url: '/e',
+      icon: 'fa-cogs',
+      count: 0
+    });
+  }
+  if(user.hasPermission('review')) {
+    const recycleId = await SettingModel.getRecycleId();
+    const q = {
+      reviewed: false,
+      disabled: false,
+      mainForumsId: {$ne: recycleId}
+    };
+    const m = {
+      status: (await DocumentModel.getDocumentStatus()).unknown,
+      type: (await DocumentModel.getDocumentTypes()).stable,
+      source: (await DocumentModel.getDocumentSources()).article,
+    }
+    if(!user.hasPermission("superModerator")) {
+      const forums = await ForumModel.find({moderators: user.uid}, {fid: 1});
+      const fid = forums.map(f => f.fid);
+      q.mainForumsId = {
+        $in: fid
+      }
+    }
+    const posts = await PostModel.find(q, {tid: 1, pid: 1});
+    const threads = await ThreadModel.find({tid: {$in: posts.map(post => post.tid)}}, {recycleMark: 1, oc: 1, tid: 1});
+    const threadsObj = {};
+    threads.map(thread => threadsObj[thread.tid] = thread);
+    let count = 0;
+    posts.map(post => {
+      const thread = threadsObj[post.tid];
+      if(thread && (thread.oc !== post.pid || !thread.recycleMark)) {
+        count++;
+      }
+    });
+    count += await DocumentModel.countDocuments(m);
+    results.push({
+      name: '内容审核',
+      url: '/review',
+      icon: 'fa-shield',
+      count
+    });
+  }
+  if(user.hasPermission('complaintGet')) {
+    results.push({
+      name: '投诉列表',
+      url: '/complaint',
+      icon: 'fa-minus-circle',
+      count: await ComplaintModel.countDocuments({resolved: false})
+    });
+  }
+  if(user.hasPermission('visitProblemList')) {
+    results.push({
+      name: '问题列表',
+      url: '/problem/list',
+      icon: 'fa-exclamation-circle',
+      count: await ProblemModel.countDocuments({resolved: false}),
+    });
+  }
+  if(user.hasPermission('getLibraryLogs')) {
+    results.push({
+      name: '文库记录',
+      url: '/libraries/logs',
+      icon: 'fa-book',
+      count: 0
+    });
+  }
+  return results;
+}
+
 module.exports = mongoose.model('settings', settingSchema);

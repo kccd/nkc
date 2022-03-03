@@ -95,50 +95,8 @@ router
     data.t = threadListType;
     data.navbar = {highlight: threadListType};
 
-    // 管理 未处理条数
-    if(!state.isApp) {
-      if(ctx.permission("complaintGet")) {
-        data.unResolvedComplaintCount = await db.ComplaintModel.countDocuments({resolved: false});
-      }
-      if(ctx.permission("visitProblemList")) {
-        data.unResolvedProblemCount = await db.ProblemModel.countDocuments({resolved: false});
-      }
-      if(ctx.permission("review")) {
-        const q = {
-          reviewed: false,
-          disabled: false,
-          mainForumsId: {$ne: recycleId}
-        };
-        const m = {
-          status: 'unknown',
-          type: 'stable',
-          source: 'article',
-        }
-        if(!ctx.permission("superModerator")) {
-          const forums = await db.ForumModel.find({moderators: data.user.uid}, {fid: 1});
-          const fid = forums.map(f => f.fid);
-          q.mainForumsId = {
-            $in: fid
-          }
-        }
-        const documents = await db.DocumentModel.find(m);
-        const posts = await db.PostModel.find(q, {tid: 1, pid: 1});
-        const threads = await db.ThreadModel.find({tid: {$in: posts.map(post => post.tid)}}, {recycleMark: 1, oc: 1, tid: 1});
-        const threadsObj = {};
-        threads.map(thread => threadsObj[thread.tid] = thread);
-        let count = 0;
-        posts.map(post => {
-          const thread = threadsObj[post.tid];
-          if(thread && (thread.oc !== post.pid || !thread.recycleMark)) {
-            count++;
-          }
-        });
-        documents.map(document => {
-          if(document) count ++;
-        })
-        data.unReviewedCount = count;
-      }
-    }
+    // 管理面板需要的数据
+    data.managementData = await db.SettingModel.getManagementData(user);
 
 
     if(threadListType === "home") {
