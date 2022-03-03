@@ -5,12 +5,19 @@ router.get('/:aid', async (ctx, next)=>{
   const {_id, aid} = params;
   // const category =  query
   let columnPost = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid);
-  const {article: articleSource} = await db.CommentModel.getCommentSource();
+  const {article: articleSource} = await db.CommentModel.getCommentSources();
+  const {article} = columnPost;
+  const {_id: articleId} = article;
   //获取该文章下的评论
-  let comments = await db.CommentModel.find({sid: aid, sourceL: articleSource});
-  let comment = await db.CommentModel.findOne({uid: state.uid, source: articleSource}).sort({toc: -1}).limit(1);
+  let comments = await db.CommentModel.find({sid: articleId, source: articleSource});
+  let comment = await db.CommentModel.findOne({uid: state.uid, source: articleSource, sid: articleId}).sort({toc: -1}).limit(1);
+  comments = await db.CommentModel.extendPostComments({comments, uid: state.uid});
+  if(comment ) {
+    comment = await comment.extendEditorComment();
+    if(comment.type === 'beta') data.comment = comment || '';
+  }
   data.columnPost = columnPost;
-  data.comments = comments;
+  data.comments = comments || [];
   await next();
 })
 module.exports = router;

@@ -1,0 +1,45 @@
+//- 字段详情/pages/thread/singlePost/singlePost.pug
+if !isIncluded('singlePostBottom')
+  include ./singleCommentVote
+  mixin singleCommentBottom(props)
+    -var {cid} = props;
+    .single-post-bottom
+      .single-post-bottom-item.hidden.switch-hidden-status
+        .switch-hidden-status-button(onclick=`NKC.methods.switchPostContent('${cid}')`)
+      .single-post-bottom-item(onclick=`quotePost('${cid}')`)
+        .fa.fa-comment-o.reply-icon
+        span 引用
+      .single-post-bottom-item
+        if 1
+          span.single-post-comment-button(
+            onclick=`NKC.methods.switchPostComment("${cid}")`
+            data-show-number='true'
+            data-type='singlePostCommentButton'
+            data-cid=cid
+          )=`评论${count>0? `(${count})`:``}`
+        else
+          span.single-post-comment-button.disabled(title='当前回复不允许评论') 评论
+      //- .single-post-bottom-item
+        .post-vote-container
+          +singlePostVote(cid, vote, voteUp)
+      if permission('creditKcb')
+        .single-post-bottom-item(onclick=`credit('${cid}', 'kcb')` title='鼓励')
+          .fa.fa-cny.credit-kcb
+      .single-post-bottom-item(data-type='share' data-share-type='post' data-share-id=cid title='分享')
+        .fa.fa-share-square-o.share-icon
+      .single-post-bottom-item(data-type='postOption' data-cid=cid title='其他操作')
+        .fa.fa-sliders.option-icon
+
+    .single-post-comment(data-type='singlePostComment' data-cid=cid).nkc-hidden
+      .post-comments-div(id=`post_comments_${cid}`)
+        .text-center 加载评论中，请稍候...
+      .post-comment-warning.text-danger
+      .post-comment-editor(class=`edit_${cid}_container`)
+        h5.post-editor-notice 200字以内，仅用于支线交流，主线讨论请采用回复功能。
+        div(class=`edit_${cid}_container_input`)
+      .m-t-1.m-b-1.pointer.text-center(onclick=`hidePostComments('${cid}', true)` class=`display-n hide_comments_button_${cid}`)=`折叠评论 `
+        span.fa.fa-angle-up
+
+
+
+

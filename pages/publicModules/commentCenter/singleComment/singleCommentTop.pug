@@ -1,0 +1,31 @@
+if !isIncluded('singleCommentTop')
+  mixin singleCommentTop(props)
+    -var {_id: cid, username, toc, uid, avatar, home, gradeId, gradeName} = props;
+    -var {reason, reviewed, isAuthor, order, tlm} = props;
+    .single-post-top
+        .single-post-avatar(
+          data-float-uid=uid
+          )
+          img(src=avatar class=banned ? 'user-banned-avatar':'')
+        .single-post-user
+          .single-post-username
+            a(
+              data-anonymous=!uid
+              href=tools.getUrl('userHome', uid)
+              target='_blank'
+              data-float-uid=uid
+            )=username
+            include ../../../user/grade
+            +userGrade(gradeId, gradeName)
+            if isAuthor
+              span 作者
+          .single-post-toc
+            +fromNow(toc)
+            if tlm
+              | &nbsp;修改于&nbsp;
+              +fromNow(tlm)
+        .single-post-floor
+          a(href=tools.getUrl('post', cid))=order + '楼'
+          .single-post-checkbox
+            label
+              input(type='checkbox' data-pid=cid)

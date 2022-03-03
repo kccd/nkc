@@ -1,0 +1,12 @@
+if !isIncluded('singleCommentCenter')
+  //-引用的回复
+  include ./singleCommentQuote
+  mixin singleCommentCenter(props)
+    -var {quote, title, content, aid} = props;
+    .single-comment-center
+      if quote
+        +singleCommentQuote(quote)
+      .single-comment-title=title
+      .single-comment-content!=content
+
+

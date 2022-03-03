@@ -13,7 +13,7 @@
         .quote-content {{quote.content}}
 
     .m-b-05#container
-      editor(ref="editor" :configs="editorConfigs" @ready="editorReady" @content-change="editorContentChange")
+      editor(ref="editor" :configs="editorConfigs" @ready="editorReady" @content-change="editorContentChange" )
     .m-b-05
       .checkbox
         label
@@ -28,7 +28,7 @@
 </template>
 
 <style lang="less" scoped>
-  @import "../publicModules/base";
+  @import "../../../publicModules/base";
   .quote{
     border: 1px solid #ded9d4;
     border-left-width: 5px;
@@ -60,10 +60,10 @@
 </style>
 
 <script>
-  import Editor from '../lib/vue/Editor';
-  import {getPostEditorConfigs} from '../lib/js/editor';
+  import Editor from '../Editor';
+  import {getPostEditorConfigs} from '../../js/editor';
   const commentEditorConfigs = getPostEditorConfigs();
-  import {nkcAPI} from "../lib/js/netAPI";
+  import {nkcAPI} from "../../js/netAPI";
   export default {
     props: ['source', 'sid', 'comment'],
     data: () => ({
@@ -85,8 +85,8 @@
       editorReady() {
         this.$refs.editor.removeNoticeEvent();
         this.type = this.comment?'modify':'create';
-        this.commentId = this.comment._id;
         if(this.comment) {
+          this.commentId = this.comment._id;
           this.setContent(this.comment.content);
         } else {
           this.contentChangeEventFlag = true;
@@ -115,6 +115,10 @@
           sweetError(err);
         })
       },
+      //设置编辑器保存状态 succeeded failed saving
+      setSavedStatus(type) {
+        this.$refs.editor.changeSaveInfo(type);
+      },
       //填入编辑器内容
       setContent(content) {
         this.$refs.editor.setContent(content);
@@ -126,6 +130,7 @@
         if(this.lockPost) return;
         this.lockPost = true;
         const self = this;
+        self.setSavedStatus('saving');
         return nkcAPI('/comment', 'POST', {
           content: self.commentContent,
           type,
@@ -148,8 +153,10 @@
             self.type = 'create';
             self.clearQuote();
           }
+          self.setSavedStatus('succeeded');
         })
         .catch(err => {
+          self.setSavedStatus('failed');
           self.lockPost = false;
           sweetError(err);
         })
@@ -163,6 +170,7 @@
         const self = this;
         self.post('publish')
       },
+      //暂存评论内容
       saveComment() {
         this.post('save')
         .then(() => {

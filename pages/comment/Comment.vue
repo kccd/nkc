@@ -266,12 +266,12 @@
 </style>
 
 <script>
-  import CommentEditor from "./CommentEditor";
+  import CommentEditor from "../lib/vue/comment/CommentEditor";
   import {nkcAPI} from "../lib/js/netAPI";
   import {getUrl, timeFormat} from "../lib/js/tools";
   import {replaceNKCRender} from "../lib/js/replaceNKCRender";
   import CommentOptions from "./CommentOptions";
-  import CommentPostEditor from "../lib/vue/CommentPostEditor";
+  import CommentPostEditor from "../lib/vue/comment/CommentPostEditor";
   import Complaint from "../lib/vue/Complaint";
   import DisabledComment from "../lib/vue/DisabledComment";
   import ViolationRecord from "../lib/vue/ViolationRecord";
@@ -280,7 +280,6 @@
   import Sticker from "../lib/vue/Sticker";
   import ImageViewer from "../lib/vue/ImageViewer";
   import SubscribeTypes from "../lib/vue/SubscribeTypes";
-  // import {initNKCVideo} from "../lib/js/replaceNKCRender";
   export default {
     props: ['source', 'sid'],
     data: () => ({
