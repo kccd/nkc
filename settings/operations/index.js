@@ -86,6 +86,7 @@ const pim = require('./pim');
 const rc = require('./rc');
 const comment = require("./comment");
 const zone = require('./zone');
+const subscribe = require('./subscribe');
 const operationObj = {};
 
 
@@ -283,6 +284,7 @@ operationObj.operationTree = {
 		rc, //资源分组
     comment, // 评论系统
     zone, // 空间
+    g: subscribe, // 空间
 	}
 };
 module.exports = operationObj;

@@ -79,6 +79,8 @@ const resourceCategoryRouter = routers.resourceCategory;
 const commentRouter = routers.comment;
 // 空间
 const zoneRouter = routers.zone;
+// 首页关注
+const subscribeRouter = routers.subscribe;
 const path = require('path');
 
 router.use('/', async (ctx, next) => {
@@ -161,4 +163,5 @@ router.use('/document', documentRouter.routes(), documentRouter.allowedMethods()
 router.use('/rc', resourceCategoryRouter.routes(), resourceCategoryRouter.allowedMethods());
 router.use('/comment', commentRouter.routes(), commentRouter.allowedMethods());
 router.use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods());
+router.use('/g', subscribeRouter.routes(), subscribeRouter.allowedMethods());
 module.exports = router;

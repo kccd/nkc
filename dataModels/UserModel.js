@@ -2312,6 +2312,39 @@ userSchema.methods.getUserOperationsId = async function() {
   }
   return [...new Set(operations)];
 };
+
+/*
+* 判断用户是否拥有某个权限
+* @param {String} operationId 权限名
+* @return {Boolean}
+* */
+userSchema.methods.hasPermission = async function(operationId) {
+  const operationsId = await this.getUserOperationsId();
+  return operationsId.includes(operationId);
+}
+
+/*
+* 判断用户是拥有指定权限集合中的某一个权限
+* @param {[String]} operationsId 权限名组成的数组
+* @return {Boolean}
+* */
+userSchema.methods.hasPermissionOr = async function(operationsId = []) {
+  const userOperationsId = await this.getUserOperationsId();
+  const newOperationsId = new Set(userOperationsId.concat(operationsId));
+  return newOperationsId.size !== (userOperationsId.length + operationsId.length);
+};
+
+/*
+* 判断用户是否拥有指定的所有权限
+* @param {[String]} operationsId 权限名组成的数组
+* @return {Boolean}
+* */
+userSchema.methods.hasPermissionAnd = async function(operationsId = []) {
+  const userOperationsId = await this.getUserOperationsId();
+  const newOperationsId = new Set(userOperationsId.concat(operationsId));
+  return newOperationsId.size === userOperationsId.length;
+}
+
 /*
 * 判断用户是否为顶级专家
 * @return {Boolean}
