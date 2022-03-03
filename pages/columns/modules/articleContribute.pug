@@ -5,7 +5,7 @@ mixin mixinColumnArticleContribute(user, column, columnToolStyle)
         else if user.uid !== column.uid
             a.column-contribute.article(href=`/m/${column._id}/contribute` target='_blank')
         else
-            a.column-contribute.article(href=`/column/editor?mid=${column._id}`)
+            a.column-contribute.article(href=`/column/editor?source=column&mid=${column._id}`)
         if !user || user.uid !== column.uid
             p 通过审核即可在本专栏显示
         else

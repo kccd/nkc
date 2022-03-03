@@ -152,7 +152,16 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id)=>{
     },
     user:{xsf: columnPost.user.xsf}
   });
-  let resData = {mainCategory: columnPost.mainCategory ,auxiliaryCategory: columnPost.auxiliaryCategory  , thread:filteredThread, post:filteredPost, column:filteredColumn, collectedCount:columnPost.collectedCount, userAvatar:columnPost.user.avatar}
+  let resData = {
+    mainCategory: columnPost.mainCategory,
+    auxiliaryCategory: columnPost.auxiliaryCategory,
+    thread:filteredThread,
+    post:filteredPost,
+    column:filteredColumn,
+    collectedCount:columnPost.collectedCount,
+    userAvatar:columnPost.user.avatar,
+    article: columnPost.article,
+  }
   if(columnPost.type === 'article'){
     // 把文章字段改为和 post 字段相同
     let changeKeyPost = {}
@@ -188,7 +197,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id)=>{
 *  @param {Number} columnId 专栏ID
 *  @param {Number}  columnPosts的_id columnPosts的 _ID
 */
-schema.statics.getArticleDataById = async (columnId, _id)=>{
+schema.statics.getArticleDataById = async function(columnId, _id){
   const ColumnPostsModel = mongoose.model('columnPosts');
   const ThreadModel = mongoose.model('threads');
   const PostsModel = mongoose.model('posts');

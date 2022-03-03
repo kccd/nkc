@@ -142,14 +142,20 @@
       }
       this.removeNoticeEvent();
       this.removeScrollEvent();
+      this.removeWindowOnResizeEvent();
     },
     methods: {
       //浏览器窗口大小变化
-      watchOnresize() {
-        const self = this;
-        window.onresize = function() {
-          self.setSaveInfo(true);
-        };
+      windowOnResizeEvent() {
+        this.setSaveInfo(true);
+      },
+      //监听浏览器窗口变化
+      initWindowOnResizeEvent() {
+        window.addEventListener('resize', this.windowOnResizeEvent);
+      },
+      //销毁浏览器变化事件
+      removeWindowOnResizeEvent() {
+        window.removeEventListener('resize', this.windowOnResizeEvent);
       },
       //更改内容保存信息
       changeSaveInfo(info) {
@@ -196,7 +202,7 @@
               self.ready = true;
               self.$emit('ready');
               self.initScrollEvent();
-              self.watchOnresize();
+              self.initWindowOnResizeEvent();
             }, 500)
           });
       },

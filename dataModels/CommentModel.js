@@ -1,6 +1,8 @@
 const mongoose = require('../settings/database');
+const {getUrl} = require("../nkcModules/tools");
 const commentSource = {
         article: 'article',
+        book: 'book'
       };
 const schema = new mongoose.Schema({
   _id: String,
@@ -103,18 +105,8 @@ schema.virtual('reason')
 /*
 * 获取comment source
 * */
-schema.statics.getCommentSource = async function() {
+schema.statics.getCommentSources = async function() {
   return commentSource;
-}
-
-/*
-* 获取评论的有效来源
-* */
-schema.statics.getCommentSources = async () => {
-  return {
-    article: 'article',
-    book: 'book'
-  };
 }
 /*
 * 检测来源的合法性
@@ -137,6 +129,7 @@ schema.statics.createComment = async (options) => {
   const SettingModel = mongoose.model('settings');
   const CommentModel = mongoose.model('comments');
   const {comment: commentSource}  = await DocumentModel.getDocumentSources();
+  const {article: articleSource} = await CommentModel.getCommentSources();
   const cid = await SettingModel.getNewId();
   const document = await DocumentModel.createBetaDocument({
     uid,
@@ -151,7 +144,7 @@ schema.statics.createComment = async (options) => {
     _id: cid,
     uid,
     toc,
-    source: commentSource,
+    source: articleSource,
     sid,
     did: document.did,
   });
@@ -201,11 +194,16 @@ schema.methods.modifyComment = async function (props) {
   });
 }
 /*
-* 拓展图书展示的comment
+* 拓展展示的comment评论数据
+* @param {object} props
+* props: {
+*   comments {object} 需要拓展的评论
+*   uid {string} 当前用户的uid
+* }
 * */
-schema.statics.extendBookComments = async (props) => {
+schema.statics.extendPostComments = async (props) => {
   const ReviewModel = mongoose.model('reviews');
-  const {comments, uid, permissions = {}} = props;
+  const {comments, uid} = props;
   const DocumentModel = mongoose.model('documents');
   const UserModel = mongoose.model('users');
   const {htmlToPlain} = require("../nkcModules/nkcRender");
@@ -225,19 +223,19 @@ schema.statics.extendBookComments = async (props) => {
   for(const user of users) {
     usersObj[user.uid] = user;
   }
-  const documents = await DocumentModel.find({did: {$in: didArr}, source: 'comment', type: 'stable'});
+  const {comment: commentSource} = await DocumentModel.getDocumentSources();
+  const {stable: stableType} = await DocumentModel.getDocumentTypes();
+  const documents = await DocumentModel.find({did: {$in: didArr}, source: commentSource, type: stableType});
   for(const d of documents) {
-    if(!permissions.reviewed) {
-      if((d.status !== 'normal' || d.type !== 'stable') && d.uid !== uid) continue;
-    }
+    //用户是否具有审核权限
+    // if(!permissions.reviewed) {
+    //   if((d.status !== 'normal' || d.type !== 'stable') && d.uid !== uid) continue;
+    // }
     let review;
-    if(d.status === 'faulty') {
+    if(d.status === 'faulty' || d.status === 'unknown') {
       review = await ReviewModel.findOne({docId: d._id}).sort({toc: -1}).limit(1);
     }
-    if(d.status === 'unknown') {
-      review = await ReviewModel.findOne({docId: d._id}).sort({toc: -1}).limit(1);
-    }
-    quoteIdArr.push(d.quoteDid);
+    if(d.quoteDid) quoteIdArr.push(d.quoteDid);
     const {content, _id, type, status} = d;
     documentObj[d.did] = {
       content,
@@ -249,15 +247,17 @@ schema.statics.extendBookComments = async (props) => {
   }
   const quoteDocuments = await DocumentModel.find({_id: {$in: quoteIdArr}});
   for(const document of quoteDocuments) {
-    const {uid, toc, content, _id, sid, did} = document;
+    const {uid, toc, content, _id, sid, did, tlm} = document;
     const comment = await CommentModel.findOne({did});
     const user = await UserModel.findOne({uid});
     const {username, avatar} = user;
     quoteObj[document._id] = {
+      cid: comment._id,
       uid,
       toc,
+      tlm,
       content: htmlToPlain(content, 100),
-      _id,
+      docId: _id,
       sid,
       did,
       order: comment.order,
@@ -273,21 +273,28 @@ schema.statics.extendBookComments = async (props) => {
   const _comments = [];
   for(const c of comments) {
     const user = usersObj[c.uid];
+    const userGrade = await user.extendGrade();
     if(!documentObj[c.did]) continue;
-    c.content = await CommentModel.renderComment(documentObj[c.did]._id);
-    c.docId =  documentObj[c.did]._id;
-    c.status = documentObj[c.did].status;
-    c.type = documentObj[c.did].type;
-    c.reason = documentObj[c.did]?documentObj[c.did].reason:'',
-    c.user = {
-      uid: user.uid,
-      username: user.username,
-      avatar: getUrl('userAvatar', user.avatar),
-      userHome: `/u/${user.uid}`
-    }
-    c.quote = documentObj[c.did].quote;
     const m = c.toObject();
-    _comments.push(m);
+    _comments.push({
+      ...m,
+      content: await CommentModel.renderComment(documentObj[c.did]._id),
+      docId: documentObj[c.did]._id,
+      status: documentObj[c.did].status,
+      type: documentObj[c.did].type,
+      reason: documentObj[c.did]?documentObj[c.did].reason:null, //审核原因
+      tlm: documentObj[c.did].tlm,
+      user: {
+        uid: user.uid,
+        username: user.username,
+        avatar: getUrl('userAvatar', user.avatar),
+        userHome: `/u/${user.uid}`,
+        gradeId: userGrade._id,
+        gradeName: userGrade.displayName,
+      },
+      isAuthor: m.uid === uid?true:false,
+      quote: documentObj[c.did].quote || null,
+    });
   }
   return _comments;
 }
@@ -299,7 +306,6 @@ schema.statics.extendBookComments = async (props) => {
 schema.statics.extendReviewComments = async function(comments) {
   const CommentModel = mongoose.model('comments');
   const DocumentModel = mongoose.model('documents');
-  const BookModel = mongoose.model('books');
   const {comment: documentSource} = await DocumentModel.getDocumentSources();
   const {timeFormat, getUrl} = require('../nkcModules/tools');
   const commentsId = [];
@@ -324,11 +330,6 @@ schema.statics.extendReviewComments = async function(comments) {
     commentsObj[sid][type] = d;
   }
   const results = [];
-  const bookObj = {};
-  const books = await BookModel.find({_id: {$in: booksId}});
-  for(const book of books) {
-    bookObj[book._id] = book;
-  }
   for(const comment of comments) {
     const {
       _id,
@@ -345,11 +346,8 @@ schema.statics.extendReviewComments = async function(comments) {
     const result = {
       _id,
       uid,
-      bid: bookObj[comment.sid]._id,
       published: !!stableComment,
       hasBeta: !!betaComment,
-      bookUrl: `/book/${bookObj[comment.sid]._id}`,
-      bookName: bookObj[comment.sid].name,
       time: timeFormat(toc),
       did,
     };
@@ -359,7 +357,7 @@ schema.statics.extendReviewComments = async function(comments) {
 }
 
 /*
-* 拓展单个需要编辑的评论内容
+* 拓展单个需要编辑评论内容
 * */
 schema.methods.extendEditorComment = async function() {
   const DocumentModel = mongoose.model('documents');
@@ -383,21 +381,22 @@ schema.methods.extendEditorComment = async function() {
     content: betaComment?betaComment.content:stableComment.content,
     source: betaComment?betaComment.source:stableComment.source,
     sid: betaComment?betaComment.sid:stableComment.sid,
+    type: betaComment?betaComment.type:stableComment.type,
     time: timeFormat(toc),
     did,
   }
 }
 
 /*
-* 修改comment的order
+* 更新comment的order
 * */
 schema.methods.updateOrder = async function () {
   const CommentModel = mongoose.model('comments');
   const DocumentModel = mongoose.model('documents');
-  const {comment: documentSource} = await DocumentModel.getDocumentSources();
+  const {article: articleSource} = await DocumentModel.getDocumentSources();
   const {sid, order} = this;
   //获取上一个评论的楼层
-  const afterComment = await CommentModel.findOne({source: documentSource, sid}).sort({toc: -1}).skip(1).limit(1);
+  const afterComment = await CommentModel.findOne({source: articleSource, sid}).sort({toc: -1}).skip(1).limit(1);
   if(order === 0) {
     await this.updateOne({
       $set: {

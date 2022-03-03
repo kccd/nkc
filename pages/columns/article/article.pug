@@ -15,7 +15,7 @@ block title
   title=t
   +includeCSS('/columns/article/article.css')
 block content
-  .hidden#data=objToStr({comments: data.comments})
+  .hidden#data=objToStr({comments: data.comments, comment: data.comment, article: data.columnPost.article})
   .container-fluid.max-width
     .article-common.col-xs-12.col-md-9.m-b-1
       include ./nav
