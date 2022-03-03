@@ -146,6 +146,7 @@ block content
           include ../publicModules/management/management
           +managementPanel(data.managementData)
           include ../publicModules/apps/apps
+          +appsPanel(data.appsData)
           if data.noticeThreads && data.noticeThreads.length > 0
             -let sideThreads = data.noticeThreads
             -let sideThreadsHideInfo = true;

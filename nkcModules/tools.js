@@ -148,6 +148,9 @@ var Tools = function() {
       case "messageUserDetail": {
         return "/u/" + id + "?from=message"
       }
+      case "statics": {
+        return "/statics/" + id;
+      }
       case 'siteFile': {
         return "/statics/site/" + id;
       }

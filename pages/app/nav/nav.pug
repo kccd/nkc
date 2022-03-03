@@ -59,20 +59,13 @@ block content
           span 我的表情
           .icon-right
             .fa.fa-angle-right
-        .nav-link-header 应用
-        .nav-apps
-          a.nav-app(href=`/fund`)
-            img(src=`/statics/apps/fund.png`)
-            .name 科创基金
-          a.nav-app(href=`/exam`)
-            img(src=`/statics/apps/exam.png`)
-            .name 考试系统
-          a.nav-app(href=`/activity`)
-            img(src=`/statics/apps/activity.png`)
-            .name 活动
-          a.nav-app(href=`/tools`)
-            img(src=`/statics/apps/tools.png`)
-            .name 计算工具
+        if data.appsData && data.appsData.length > 0
+          .nav-link-header 应用
+          .nav-apps
+            for a in data.appsData
+              a.nav-app(href=a.url)
+                img(src=a.icon)
+                .name=a.name
         .nav-link-header 交易管理
         a.nav-link(href=`/shop/cart`)
           .icon-left
@@ -135,57 +128,17 @@ block content
           span 偏好设置
           .icon-right
             .fa.fa-angle-right
-        if permissionsOr(["nkcManagement", "visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs"])
+        if data.managementData && data.managementData.length > 0
           .nav-link-header 网站管理
-          if permission("nkcManagement")
-            a.nav-link(href=`/nkc` target='_blank')
+          for m in data.managementData
+            a.nav-link(href=m.url target="_blank")
               .icon-left
-                .fa.fa-cogs
-              span 前台管理
+                .fa(class=m.icon)
+              span=m.name
               .icon-right
+                if m.count
+                  .icon-count=m.count
                 .fa.fa-angle-right
-          if permission("visitExperimentalStatus")
-            a.nav-link(href=`/e` target='_blank')
-              .icon-left
-                .fa.fa-cogs
-              span 后台管理
-              .icon-right
-                .fa.fa-angle-right
-          if permission("review")
-            a.nav-link(href=`/review` target='_blank')
-              .icon-left
-                .fa.fa-shield
-              span 审核内容
-              .icon-right
-                if data.unReviewedCount
-                  .icon-count=data.unReviewedCount
-                .fa.fa-angle-right
-          if permission("complaintGet")
-            a.nav-link(href=`/complaint` target='_blank')
-              .icon-left
-                .fa.fa-minus-circle
-              span 投诉列表
-              .icon-right
-                if data.unResolvedComplaintCount
-                  .icon-count=data.unResolvedComplaintCount
-                .fa.fa-angle-right
-          if permission("visitProblemList")
-            a.nav-link(href=`/problem/list` target='_blank')
-              .icon-left
-                .fa.fa-exclamation-circle
-              span 问题列表
-              .icon-right
-                if data.unResolvedProblemCount
-                  .icon-count=data.unResolvedProblemCount
-                .fa.fa-angle-right
-
-            if permission("getLibraryLogs")
-              a.nav-link(href=`/libraries/logs` target='_blank')
-                .icon-left
-                  .fa.fa-book
-                span 文库记录
-                .icon-right
-                  .fa.fa-angle-right
           .nav-link-header 其他
           a.nav-link(href=`/f` target='_blank')
             .icon-left

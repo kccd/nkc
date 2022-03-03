@@ -3,7 +3,7 @@ const reactNativeCallback = {};
 let reactNativeIndex = 0;
 
 export function RNPostMessage(obj) {
-  window.ReactNativeWebview.postMessage(JSON.stringify(obj));
+  window.ReactNativeWebView.postMessage(JSON.stringify(obj));
 }
 
 export function RNEmit(type, data, callback) {

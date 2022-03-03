@@ -173,14 +173,13 @@ mixin renderHome(homeBlock)
     if permissionsOr(["nkcManagement", "visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs"])
       .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
         +homeBlockHeader(false, false)
-        -var hidePanelHeader = true;
         include ../publicModules/management/management
-        +managementPanel(data.managementData, {hidePanelHeader: true})
+        +managementPanel(homeBlock.data, {hidePanelHeader: true})
   else if homeBlock._id === 'webApply'
     .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
       +homeBlockHeader(false, false)
-      -var hidePanelHeader = true;
       include  ../publicModules/apps/apps
+      +appsPanel(homeBlock.data, {hidePanelHeader: true})
   else
     -var bgColor = homeBlock.blockStyle.backgroundColor || '#fff';
     .home-forums-list.m-b-1(
