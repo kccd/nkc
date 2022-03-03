@@ -27,6 +27,11 @@ router
       _fc.forums = forumsObj[_id] || [];
       if(_fc.forums.length) data.categoryForums.push(_fc);
     });
+
+    // 获取 管理面板 和 应用面板 数据
+    // data.managementData = await db.SettingModel.getManagementData(data.user);
+    // data.appsData = await db.SettingModel.getAppsData();
+
     data.permission = {
       nkcManagement: permission('nkcManagement'),
       visitExperimentalStatus: permission('visitExperimentalStatus'),
