@@ -187,9 +187,91 @@ schema.statics.getDocumentInfoById = async (_id)=>{
   articleInfo = articleInfo.toObject()
   if(!articleInfo) throwErr(500, '未查找到对应文章');
   let document = await DocumentModel.getStableArticleById(_id)
-  const documentResourceId =await document.getResourceReferenceId()
+  console.log(document)
+  const documentResourceId = await document.getResourceReferenceId()
   document = document.toObject()
+
   return {articleInfo, document, documentResourceId}
+}
+
+/*
+@param{object} filterData 过滤的数据
+@param{array} allowKey filterData保留的key
+
+*/
+schema.statics.filterData = (filterData, allowKey)=>{
+  //
+  if(!filterData) return {}
+  const {timeFormat} = require('../nkcModules/tools');
+  let newObj = {}
+  for (const key in filterData) {
+    if (Object.hasOwnProperty.call(filterData, key)) {
+      if(allowKey.includes(key)){
+        if(key === 'toc') {
+          newObj[key] = timeFormat(filterData[key])
+          continue;
+        }
+        const item = filterData[key];
+        newObj[key] = item
+      }
+    }
+  }
+  return newObj
+}
+/*
+* 获取空间文章显示的内容
+* @param {String} id 文章id
+*/
+schema.statics.getZoneArticle = async (id)=>{
+  const nkcRender = require('../nkcModules/nkcRender');
+  const UserModel = mongoose.model("users");
+
+  const ArticleModel = mongoose.model('articles');
+  const ResourceModel = mongoose.model('resources')
+  const {articleInfo, document, documentResourceId} = await ArticleModel.getDocumentInfoById(id);
+  const documentAllowKey = ['title', 'content', 'abstract', 'abstractEN', 'keywords', 'keywordsEN', 'authorInfos', 'toc', 'origin', 'uid', 'collectedCount'];
+  const filteredDocument = await ArticleModel.filterData(document, documentAllowKey)
+  const documentContent = await ArticleModel.changeKey(filteredDocument)
+  let user = await UserModel.findOne({uid:articleInfo.uid});
+  user = user.toObject();
+  let resources = await ResourceModel.getResourcesByReference(documentResourceId);
+  documentContent.c = nkcRender.renderHTML({
+    type: 'article',
+    post: {
+      c: documentContent.c,
+      resources
+    },
+    user:{xsf: user.xsf}
+  });
+  return {post: documentContent,  userAvatar: user.avatar ,thread: articleInfo, column:{} ,collectedCount:'' , mainCategory:[],auxiliaryCategory:[]}
+}
+/*
+* 修改为文章(/columns/article/article.pug)指定的字段 
+* param {ObJect} content 文章正文数据 
+*/ 
+schema.statics.changeKey = async (content)=>{
+  let changeKeyPost = {}
+    const map ={
+      title: 't',
+      content: 'c',
+      c: 'c',
+      abstract: 'abstractCn',
+      abstractEN: 'abstractEn',
+      keywords: 'keyWordsCn',
+      keywordsEN: 'keyWordsEn',
+      authorInfos: 'authorInfos',
+      toc: 'toc',
+      origin: 'originState',
+      uid : 'uid',
+      collectedCount: 'collectedCount'
+    }
+    for (const key in content) {
+      if (Object.hasOwnProperty.call(content, key)) {
+        const element = content[key];
+        changeKeyPost[map[key]] = element
+      }
+    }
+    return changeKeyPost
 }
 /*
 * 获取新的 article id

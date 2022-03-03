@@ -12,18 +12,18 @@ mixin nav(data)
   -var {_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount} = data
   +includeCSS('/columns/article/nav.css')
   header
-    p.path-navigation.hidden-xs
-      //- a.jump(href=`/m`) 专栏
-      //- span.nav-common >
-      a.jump(href=`/m/${_id}`)=name
-      span.nav-common >
-      if mainCategory
-        for category,i in mainCategory
-          a.jump(href=`/m/${_id}?c=${category._id}`)=category.name
-          if mainCategory.length !== i+1
-            span.nav-common >
-      else 
-        a.jump(href=`/m/${_id}`) 全部
+    if mainCategory.length
+      p.path-navigation.hidden-xs
+        //- a.jump(href=`/m`) 专栏
+        //- span.nav-common >
+        a.jump(href=`/m/${_id}`)=name
+        span.nav-common >
+          for category,i in mainCategory
+            a.jump(href=`/m/${_id}?c=${category._id}`)=category.name
+            if mainCategory.length !== i+1
+              span.nav-common >
+      //- else 
+      //-   a.jump(href=`/m/${_id}`) 全部
     if auxiliaryCategory.length
       p.path-navigation.m-l-5.hidden-xs
         span  辅分类:
