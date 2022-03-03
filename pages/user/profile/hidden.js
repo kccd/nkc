@@ -47,16 +47,24 @@ $(document).ready(()=>{
       // body.style.background = 'none';
       const content = $('#container-fluid-show')[0]
       content.addEventListener('click',function(e){
+        let url;
+        // 回复点击作者 通过 e.target.parentElement 获取a标签
+        if(e.target.parentElement.tagName === "A"){
+          e.preventDefault()
+          url = e.target.parentElement.href
+          window.open(url)
+        }
         if(e.target.tagName === 'A'){
           e.preventDefault()
-          if(!e.target.href) return
-          // 笔记的我的全部按钮 回复的分页按钮 不打开新标签
+          url = e.target.href
+          if(!url) return
+          // 笔记的我的全部按钮 回复的分页按钮 在当前窗口打开
           const parentElement = e.target.parentElement
           if(parentElement._prevClass === "paging-button" || parentElement.tagName === 'LI' ){
             window.location.href = e.target.href
             return
           }
-          window.open(e.target.href)
+          window.open(url)
         }
       })
     }

@@ -33,13 +33,14 @@ mixin nav(data)
             span.m-l-1.nav-common |
       
     p.info-list
+      if oc
+        span.m-r-1
+          span 文号
+          span=oc  
       span.m-r-1
-        span 文号
-        span=oc  
-      span.m-r-1
-        span.m-r-1.fa.fa-eye(title="浏览数")=hits 
-        span.m-r-1.fa.fa-comment(title='回复数' onclick="window.location.href='#container'")=count
+        span.m-r-1.fa.fa-eye(title="浏览数")=hits || 0
+        span.m-r-1.fa.fa-comment(title='回复数' onclick="window.location.href='#container'")=count || 0
       span.m-r-1
         span 收藏
-        span=collectedCount 
+        span=collectedCount || 0
       span.fa.fa-cog.m-r-1(onclick="showSetUp()")

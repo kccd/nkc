@@ -5,13 +5,41 @@ block title
   else
     title=`主页 - ${data.name}`
     //- meta = `${}`
+  script.
+    const search = top.location.search.split('=')
+    if(search[0] === "?type" && search[1] === 'hidden'){
+      var style = document.createElement('style'); 
+      style.type = 'text/css'; 
+      style.innerHTML="body{ background-color:white;padding-top:0;opacity:0;}"; 
+      document.getElementsByTagName('head').item(0).appendChild(style); 
+      //- const link = document.createElement('link');
+      //- link.rel = 'stylesheet';
+      //- link.type = "text/css";
+      //- link.href = "/user/profile/hidden.css"
+      //- document.getElementsByTagName("head")[0].appendChild(link);
+    }
+    //- script. 
+    //-   style.
+    //-     body{
+    //-       opacity: 0;
+    //-       background-color: white;
+    //-       padding-top: 0;
+    //-     } 
   +includeCSS("/user/profile/profile.css")
   if data.type === "thread" || data.type === "post" || data.type === "draft"  || data.type === "note" 
-    //- 不知道怎么写内联样式
-    +includeCSS("/user/profile/hidden.css")
-
-      
+    //- +includeCSS("/user/profile/hidden.css")
+    
+    
 block content
+  //- script.
+  //-   const search = top.location.search.split('=')
+  //-   if(search[0] === "?type" && search[1] === 'hidden'){
+  //-     const link = document.createElement('link');
+  //-     link.rel = 'stylesheet';
+  //-     link.type = "text/css";
+  //-     link.href = "/user/profile/hidden.css"
+  //-     document.getElementsByTagName("head")[0].appendChild(link);
+  //-   } 
   .container-fluid.max-width
     .row
       if state.isApp
@@ -219,8 +247,16 @@ block scripts
     script.
       var SummaryCalendar = new NKC.modules.SummaryCalender($(".summary-calendar")[0]);
       var SummaryPie = new NKC.modules.SummaryPie($(".summary-pie")[0]);
-  if data.type === "thread" || data.type === "post" || data.type === "draft"  || data.type === "note" 
-    +includeJS('/user/profile/hidden.js')
+  if data.type === "thread" || data.type === "post" || data.type === "draft"  || data.type === "note"
+    script. 
+      if(top.location.search.split('=')[0]==='?type' && top.location.search.split('=')[1] === 'hidden'){
+        var script = document.createElement('script');
+        script.src = "/user/profile/hidden.js";
+        var firstScript = document.getElementsByTagName('script')[0];
+        firstScript.parentNode.insertBefore(script,firstScript);
+
+      }
+    //- +includeJS('/user/profile/hidden.js')
     
   +includeJS("/user/profile/profile.js")
   if data.type === "note"

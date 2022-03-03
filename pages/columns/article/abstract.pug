@@ -6,23 +6,25 @@
 mixin abstract(data)
  -var {abstractCn, abstractEn, keyWordsCn, keyWordsEn} = data
   +includeCSS('/columns/article/abstract.css')
-  p.abstract-title.line-title 中文摘要
-      p.cn-abstract
-        //- for abstract,i in data.abstractCn 
-        span=abstractCn
-  p.en-abstract.line-title Abstract
-    p.en-abstract
-      //- for abstract,i in data.abstractEn 
-      span=abstractEn
+  if abstractCn
+    p.abstract-title.line-title 中文摘要
+        p.cn-abstract.abstract-content
+          //- for abstract,i in data.abstractCn 
+          span=abstractCn
+  if abstractEn
+    p.en-abstract.line-title Abstract
+      p.en-abstract.abstract-content
+        //- for abstract,i in data.abstractEn 
+        span=abstractEn
 
   p.line-title 关键词
-    p.cn-key-word.key-word-conmon
-      if keyWordsCn
+    if keyWordsCn
+      p.cn-key-word.key-word-conmon
         for keyWord,i in keyWordsCn
           //- span.key-word-contaior  
           span.t(onclick=`turnSearch("${keyWord}")`)=keyWord
-    p.en-key-word.key-word-conmon
-      if keyWordsEn
+    if keyWordsEn
+      p.en-key-word.key-word-conmon
         for keyWord,i in keyWordsEn 
           //- span.key-word-contaior 
           span.t(onclick=`turnSearch("${keyWord}")`)=keyWord
