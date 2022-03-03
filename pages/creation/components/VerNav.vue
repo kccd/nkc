@@ -1,6 +1,6 @@
 <template lang="pug">
   .creation-nav
-    .creation-nav-header 创作中心
+    .creation-nav-header(@click="selectType('home')") 创作中心
     .creation-nav-item(v-for="item in list")
       .item(
         @click="selectItem(item)"
@@ -179,8 +179,11 @@
         if(item.children && item.children.length > 0) {
           item.hidden = !item.hidden;
         } else {
-          this.$emit('select', item.type);
+          this.selectType(item.type);
         }
+      },
+      selectType(type) {
+        this.$emit('select', type);
       }
     }
   }

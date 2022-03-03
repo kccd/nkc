@@ -162,7 +162,7 @@ block content
                 a.pointer.button(onclick="selectAll()") 全选
                 a.pointer.button.radius-right(onclick="toColumn()") 推送到专栏
           include ../publicModules/paging/paging
-          if data.t === "thread" || data.t === "post"
+          if data.t === "thread" || data.t === "post" || !data.t
             if data.posts.length === 0
               .user-list-warning 用户貌似未发表过任何内容~
             else

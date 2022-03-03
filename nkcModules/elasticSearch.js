@@ -156,6 +156,8 @@ func.save = async (docType, document) => {
     id = `document_${tid}`;
   } else if(docType === 'document_comment') {
     id = `document_${tid}`;
+  } else if(docType === 'document_moment') {
+    id = `document_${tid}`;
   }
 
   return await client.index({
