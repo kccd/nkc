@@ -13,21 +13,23 @@ block title
   -var {hits, count, oc} = thread
   -var {authorInfos, uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c} = post
   title=t
-  +includeCSS('../columns/article/article.css')
+  +includeCSS('../../columns/article/article.css')
 block content
   .hidden#data=objToStr({comments: data.comments})
   .container-fluid.max-width
-    .article-common.col-xs-12.col-md-9.m-b-1
-      include ../columns/article/nav
-      +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount})
-      include ../columns/article/setUp
-      +setUp()
-      include ../columns/article/title
-      +title({t, authorInfos, uid, userAvatar, toc, originState, name, _id})
-      include ../columns/article/abstract
-      +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
-      include ../columns/article/content
-      +content(c)
+    .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel 
+      .m-b-1 
+        .row
+          include ../columns/article/nav
+          +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount})
+          include ../columns/article/setUp
+          +setUp()
+          include ../columns/article/title
+          +title({t, authorInfos, uid, userAvatar, toc, originState, name, _id})
+          include ../columns/article/abstract
+          +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
+          include ../columns/article/content
+          +content(c)
     .article-common.col-xs-12.col-md-9
       include ../publicModules/commentCenter/comment
     .col-xs-12.col-md-3.box-shadow-panel#rightDom
