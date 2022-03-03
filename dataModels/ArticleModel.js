@@ -187,7 +187,6 @@ schema.statics.getDocumentInfoById = async (_id)=>{
   articleInfo = articleInfo.toObject()
   if(!articleInfo) throwErr(500, '未查找到对应文章');
   let document = await DocumentModel.getStableArticleById(_id)
-  console.log(document)
   const documentResourceId = await document.getResourceReferenceId()
   document = document.toObject()
 
