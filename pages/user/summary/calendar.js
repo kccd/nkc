@@ -153,3 +153,4 @@ NKC.modules.SummaryCalender = function(dom, year) {
   };
   self.setYear(year);
 };
+export default NKC.modules.SummaryCalender;

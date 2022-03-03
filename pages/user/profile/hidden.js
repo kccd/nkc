@@ -30,10 +30,10 @@
   
 // }
 $(document).ready(()=>{
-  if(top.location.search){
-    const serach = top.location.search.split('=')
-    // 页面先隐藏 等隐藏了不需要页面后再显示
-    if(serach[0] ==='?type' && serach[1] === 'hidden'){
+  // if(top.location.search){
+  //   const serach = top.location.search.split('=')
+  //   // 页面先隐藏 等隐藏了不需要页面后再显示
+  //   if(serach[0] ==='?type' && serach[1] === 'hidden'){
       document.querySelector('.row').style.display = 'flex';
       document.querySelector('.row').style.justifyContent += 'center'
       // 获取 页头
@@ -67,7 +67,7 @@ $(document).ready(()=>{
           window.open(url)
         }
       })
-    }
-  }
+  //   }
+  // }
   document.querySelector('body').style.opacity = '1';
 })
