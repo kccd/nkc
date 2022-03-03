@@ -1,4 +1,3 @@
-import FloatUserPanel from '../../lib/vue/FloatUserPanel.vue'
 // import AuthorCommunication from '../lib/vue/AuthorCommunication.vue'
 // Object.assign(window, {showSetUp, displayAuthor})
 let author = {};
@@ -7,7 +6,6 @@ $(document).ready(function(){
   author.vm = new Vue({
 	  el: "#vueMountPoint",
     components:{
-      'float-user-panel': FloatUserPanel,
       // 'author-communication':AuthorCommunication
     },
 	  data: {
@@ -15,7 +13,6 @@ $(document).ready(function(){
 	  },
     // template:"<float-user-panel ref='floatUserPane'></float-user-panel>",
     mounted(){
-      this.$refs.floatUserPane.initPanel()
     },
     methods:{
     }

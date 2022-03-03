@@ -17,8 +17,8 @@ block title
 block content
   .hidden#data=objToStr({comments: data.comments, comment: data.comment, article: data.columnPost.article})
   .container-fluid.max-width
-    .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel 
-      .m-b-1 
+    .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel
+      .m-b-1
         .row
           include ./nav
           +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount})
@@ -39,7 +39,7 @@ block content
   include ./authorInfo.pug
   +authorInfo()
   //- include ../../publicModules/floatForumNav
-  include ../../publicModules/nkcSource
+  //include ../../publicModules/nkcSource
 
   //- 下拉后左边显示的所属专业 上级专业 同级专业
   //- +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})

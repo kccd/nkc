@@ -15,7 +15,20 @@ const commentEditor = new Vue({
   },
   methods: {
     initId() {
+    },
+    quoteComment(cid) {
     }
   }
 })
-window.CommentPostEditor = CommentPostEditor;
+const singPostBottom = new Vue({
+  el: '#singPostBottom',
+  data: {
+  
+  },
+  mounted() {
+  },
+  methods: {
+  
+  }
+});
+window.commentEditor = commentEditor;
