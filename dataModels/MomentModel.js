@@ -207,6 +207,18 @@ schema.methods.modifyMoment = async function(props) {
 }
 
 /*
+* 标记当前动态为已删除
+* */
+schema.methods.deleteMoment = async function() {
+  this.status = momentStatus.deleted;
+  await this.updateOne({
+    $set: {
+      status: this.status
+    }
+  });
+}
+
+/*
 * 通过发表人 ID 获取未发布的动态
 * @param {String} uid 发表人 ID
 * @return {moment schema or null}
@@ -256,6 +268,10 @@ schema.statics.getUnPublishedMomentDataByUid = async (uid) => {
     const DocumentModel = mongoose.model('documents');
     const {moment: momentSource} = await DocumentModel.getDocumentSources();
     const betaDocument = await DocumentModel.getBetaDocumentBySource(momentSource, moment._id);
+    if(!betaDocument) {
+      await moment.deleteMoment();
+      return null;
+    }
     return {
       momentId: moment._id,
       toc: betaDocument.toc,
@@ -360,6 +376,9 @@ schema.statics.extendMomentsData = async (moments) => {
   const ArticleModel = mongoose.model('articles');
   const {getUrl, fromNow} = require('../nkcModules/tools');
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
+  const nkcRender = require('../nkcModules/nkcRender');
+  const {filterMessageContent} = require("../nkcModules/xssFilters");
+  const {twemoji} = require('../settings/editor');
   const usersId = [];
   const momentsId = [];
   let resourcesId = [];
@@ -388,7 +407,21 @@ schema.statics.extendMomentsData = async (moments) => {
     if(!user) continue;
     const {username, avatar} = user;
     const betaDocument = stableDocumentsObj[_id];
-    const content = betaDocument? betaDocument.content: '';
+    let content = '';
+    if(betaDocument) {
+      // 替换空格
+      content = betaDocument.content.replace(/ /g, '&nbsp;');
+      // 处理链接
+      content = nkcRender.URLifyHTML(content);
+      // 过滤标签 仅保留标签 a['href']
+      content = filterMessageContent(content);
+      // 替换换行符
+      content = content.replace(/\n/g, '<br/>');
+      content = content.replace(/\[(.*?)]/g, function(r, v1) {
+        if(!twemoji.includes(v1)) return r;
+        return '<img class="message-emoji" src="/twemoji/2/svg/'+ v1 +'.svg"/>';
+      });
+    }
     const filesData = [];
     for(const rid of files) {
       const resource = resourcesObj[rid];
