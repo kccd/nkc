@@ -1,8 +1,9 @@
 const router = require('koa-router')();
 router
 .get('/calendar', async (ctx, next)=>{
-  const {db, data, query, params} = ctx;
-  const {uid} = params;
+  const {db, data, query} = ctx;
+  const {uid} = ctx.state;
+
   const {year = new Date().getFullYear()} = query;
   const posts = await db.PostModel.aggregate([
     {
@@ -38,16 +39,16 @@ router
   await next();
 })
 .get('/active', async (ctx, next)=>{
-  const {db, data, params} = ctx;
-  const {uid} = params;
+  const {db, data} = ctx;
+  const {uid} = ctx.state;
+
   data.pie = await db.UserModel.getUserPostSummary(uid);
   await next();
 
 })
 .get('/visit', async (ctx, next)=>{
-  const { data, db ,params} = ctx;
-  const { uid } = params;
-  // const {visitUserLogs, visitSelfLogs} = await db.UserModel.visit(uid)
+  const { data, db } = ctx;
+  const {uid} = ctx.state;
   data.visitUserLogs = await db.UserModel.visitUserLogs(uid);
   data.visitSelfLogs = await db.UserModel.visitSelfLogs(uid)
   data.visitThreadLogs = await db.UserModel.recentReading(uid)

@@ -10,36 +10,12 @@ block title
     if(pathname[1] === "creation" && pathname[2] === 'community'){
       var style = document.createElement('style'); 
       style.type = 'text/css'; 
-      style.innerHTML="body{ background-color:white;padding-top:0;opacity:0;}"; 
+      // 为了应对一些页码或其他内部刷新
+      style.innerHTML="body{ background-color:white;padding-top:0;display:none;}"; 
       document.getElementsByTagName('head').item(0).appendChild(style); 
-      //- const link = document.createElement('link');
-      //- link.rel = 'stylesheet';
-      //- link.type = "text/css";
-      //- link.href = "/user/profile/hidden.css"
-      //- document.getElementsByTagName("head")[0].appendChild(link);
     }
-    //- script. 
-    //-   style.
-    //-     body{
-    //-       opacity: 0;
-    //-       background-color: white;
-    //-       padding-top: 0;
-    //-     } 
   +includeCSS("/user/profile/profile.css")
-  if data.type === "thread" || data.type === "post" || data.type === "draft"  || data.type === "note" 
-    //- +includeCSS("/user/profile/hidden.css")
-    
-    
 block content
-  //- script.
-  //-   const search = top.location.search.split('=')
-  //-   if(search[0] === "?type" && search[1] === 'hidden'){
-  //-     const link = document.createElement('link');
-  //-     link.rel = 'stylesheet';
-  //-     link.type = "text/css";
-  //-     link.href = "/user/profile/hidden.css"
-  //-     document.getElementsByTagName("head")[0].appendChild(link);
-  //-   } 
   .container-fluid.max-width
     .row
       if state.isApp

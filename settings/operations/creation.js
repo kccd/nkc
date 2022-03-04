@@ -1,6 +1,6 @@
 module.exports = {
   GET: 'creationCenter',
-  PARAMETER:{
+  home:{
     calendar:{
       GET: 'creationCenter',
     },
