@@ -77,7 +77,7 @@ export default {
       return fromNow(time);
     },
     async getuser() {
-      nkcAPI(`/creation/${this.user.uid}/visit`, "GET")
+      nkcAPI(`/creation/home/visit`, "GET")
         .then((data) => {
           this.visitThreadLogs = data.visitThreadLogs;
           this.visitUserLogs = data.visitUserLogs;
@@ -86,7 +86,7 @@ export default {
         .catch(sweetError);
     },
     getPie() {
-      nkcAPI("/creation/" + this.user.uid + "/active", "GET")
+      nkcAPI("/creation/home/active", "GET")
         .then((data) => {
           this.renderPie(data.pie);
         })
@@ -159,7 +159,7 @@ export default {
     },
     getData() {
       nkcAPI(
-        "/creation/" + this.user.uid + "/calendar?year=" + this.selected,
+        "/creation/home/calendar?year=" + this.selected,
         "GET"
       )
         .then((data) => {
