@@ -68,10 +68,10 @@ const routes = [
     path: '/creation/community',
     component: Community,
     children: [
-      {name: 'communityThread', path: 'thread?type=hidden', component: CommunityThread},
-      {name: 'communityPost', path: 'post?type=hidden', component: CommunityPost},
-      {name: 'communityDraft', path: 'draft?type=hidden', component: CommunityDraft},
-      {name: 'communityNote', path: 'note?type=hidden', component: CommunityNote},
+      {name: 'communityThread', path: 'thread', component: CommunityThread},
+      {name: 'communityPost', path: 'post', component: CommunityPost},
+      {name: 'communityDraft', path: 'draft', component: CommunityDraft},
+      {name: 'communityNote', path: 'note', component: CommunityNote},
     ]
   },
   {

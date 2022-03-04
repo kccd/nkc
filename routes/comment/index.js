@@ -25,7 +25,7 @@ router
     }
     //获取当前用户对该图书的权限
     const bookPermission = await book.getBookPermissionForUser(state.uid);
-    comments = await db.CommentModel.extendBookComments({comments, uid: state.uid, permissions});
+    comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, permissions});
     let document;
     if(comment) {
       document = await db.DocumentModel.findOne({did: comment.did, type: 'beta'});
@@ -50,7 +50,7 @@ router
     if(!comment) ctx.throw(400, '未找到该评论，请刷新后重试');
     const document = await db.DocumentModel.findOne({did: comment.did, type: 'stable', status: 'normal'});
     if(!document) ctx.throw(400, '未找到该评论，请刷新后重试');
-    comment = await db.CommentModel.extendBookComments({comments: [comment]});
+    comment = await db.CommentModel.extendPostComments({comments: [comment]});
     const {order, _id: commentId, uid, user, did, sid, source} = comment[0];
     data.quote = {
       _id: commentId,
@@ -121,7 +121,6 @@ router
     const {db, data, params, permission, body, state} = ctx;
     const {_id} = params;
     const {type: status, remindUser, violation, reason} = body;
-    console.log('status', status);
     if(!['faulty', 'disabled'].includes(status)) ctx.throw(401, '错误类型');
     if(!permission('disabledComment')) ctx.throw(403, '权限不足');
     const comment = await db.CommentModel.findOne({_id});

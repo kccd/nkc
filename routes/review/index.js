@@ -21,7 +21,8 @@ router
         $in: fid
       }
     }
-    const m = {status: 'unknown', type: 'stable', source: {$in: ['article', 'comment']}};
+    const {article: articleSource, comment: commentSource} = await db.DocumentModel.getDocumentSources();
+    const m = {status: 'unknown', type: 'stable', source: {$in: [articleSource, commentSource]}};
     //查找出 未审核 未禁用 未退修的post和document
     const postCount = await db.PostModel.countDocuments(q);
     const documentCount = await db.DocumentModel.countDocuments(m);
@@ -110,14 +111,15 @@ router
       const uid = new Set();
       for(const document of documents) {
         document.content = await nkcModules.apiFunction.obtainPureText(document.content, true, 100);
-        if(document.source === 'article') articleDocId.add(document.did);
-        if(document.source === 'comment') commentDocId.add(document.did);
+        if(document.source === articleSource) articleDocId.add(document.did);
+        if(document.source === commentSource) commentDocId.add(document.did);
         uid.add(document.uid);
       }
       let articles = await db.ArticleModel.find({did: {$in: [...articleDocId]}});
       //拓展article内容
       articles = await db.ArticleModel.extendArticles(articles);
-      let comments = await db.CommentModel.find({did: {$in: [...commentDocId]}, source: 'comment'});
+      const {article} = await db.CommentModel.getCommentSources();
+      let comments = await db.CommentModel.find({did: {$in: [...commentDocId]}, source: article});
       comments = await db.CommentModel.extendReviewComments(comments);
       const users = await db.UserModel.find({uid: {$in: [...uid]}});
       const usersObj = {};

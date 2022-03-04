@@ -12,12 +12,17 @@ if !isIncluded('comment')
           div.skeleton
           div.skeleton
           div.skeleton
-    .comment-header 评论列表：
-    .comment-list
-      .loading
-        +skeleton
-        +skeleton
-        +skeleton
-    .comment-list
-      .text-center.p-t-3.p-b-3 空空如也~
+    .comment-header
+    if data.comments &&  data.comments.length !== 0
+      .comment-list.m-t-1
+        .loading
+          +skeleton
+          +skeleton
+          +skeleton
+      .comment-list.m-t-1
+        include ./singleComment/singleComment
+        for comment in data.comments
+          +singleComment(comment)
+    #commentEditor.m-t-1(v-cloak)
+      comment-editor(ref="commentEditor" source="comment" :sid="articleId" :comment="comment")
   +includeJS('/publicModules/commentCenter/comment.js')

@@ -20,7 +20,7 @@
 </template>
 
 <style lang="less" scoped>
-@import '../../publicModules/base';
+@import '../../../publicModules/base';
 .comment-container {
   .single-comment-editor-container {
     padding: 1rem 0.5rem;
@@ -50,9 +50,9 @@
 </style>
 
 <script>
-import {getPostEditorConfigs} from "../js/editor";
-import {nkcAPI} from "../js/netAPI";
-import Editor from "./Editor";
+import {getPostEditorConfigs} from "../../js/editor";
+import {nkcAPI} from "../../js/netAPI";
+import Editor from "../Editor";
 export default {
   props: ['cid'],
   data: () => ({
