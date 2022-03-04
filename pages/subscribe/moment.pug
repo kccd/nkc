@@ -2,4 +2,17 @@ extends ./subscribe
 block sTitle
   title=`最新动态 - ${remoteState.serverSettings.websiteName}`
 block sContent
-  div moment content
+  include ../publicModules/moment/singleMoment
+  div
+    .m-b-1
+      #momentForm(v-cloak)
+        moment-editor(@published='onPublished')
+    if data.paging.pageCount > 1
+      .m-b-1
+        include ../publicModules/paging/paging
+    +momentList(data.momentsData, data.paging)
+    if data.paging.pageCount > 1
+      .p-t-1
+        include ../publicModules/paging/paging_input
+block sScripts
+  +includeJS('/subscribe/moment.js')

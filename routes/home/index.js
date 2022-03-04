@@ -366,7 +366,6 @@ router
           }
         ]
       };
-
       const count = await db.PostModel.countDocuments(q);
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
       let posts = await db.PostModel.find(q, {
@@ -610,8 +609,7 @@ router
 
     // 是否启用了基金
     const fundSettings = await db.SettingModel.getSettings('fund');
-    // const fundSettings = await db.SettingModel.findOne({_id: 'fund'});
-    let enableFund = fundSettings.enableFund;
+    const enableFund = fundSettings.enableFund;
     if(enableFund) {
       // 基金名称
       data.fundName = fundSettings.fundName;
@@ -634,12 +632,7 @@ router
         }
       }
     }
-    data.enableFund = enableFund;
-    // 是否启用了网站工具
-    const toolSettings = await db.SettingModel.getSettings("tools");
-    data.siteToolEnabled = toolSettings.enabled;
-    // 是否显示“活动”入口
-    data.showActivityEnter = homeSettings.showActivityEnter;
+    data.appsData = await db.SettingModel.getAppsData();
     ctx.template = "home/home.pug";
     await next();
   });

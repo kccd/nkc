@@ -1,0 +1,59 @@
+if !isIncluded('subscribe/nav.pug')
+  style.
+    .subscribe-lists {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      border-bottom: 1px solid #fff;
+    }
+    .subscribe-list {
+      display: inline-block;
+      position: relative;
+      border-radius: 3px;
+      color: #282c37;
+      font-weight: 700;
+    }
+
+    .subscribe-list .fa {
+      padding: 0.3rem;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .subscribe-list > a {
+      /*color: #7e8da0;*/
+      color: #282c37;
+      font-size: 1.2rem;
+      height: 2.5rem;
+      display: inline-block;
+      border-radius: 3px;
+      line-height: 2.5rem;
+      padding: 0 0.7rem;
+      box-sizing: border-box;
+    }
+
+    .subscribe-list > a:hover, .subscribe-list > a:focus {
+      text-decoration: none;
+      color: #2b90d9;
+    }
+
+    .subscribe-list > a.active {
+      background-color: #2b90d9;
+      color: #fff;
+    }
+  mixin navItem(type, name, activeType)
+    .subscribe-list
+      a(data-type="reload" href=`/g/${type}`
+        class=type === activeType ? "active" : ""
+      )=name
+
+  mixin subscribeNav(activeType)
+    .subscribe-lists.m-b-1
+      +navItem("moment", "动态", activeType)
+      +navItem("user", "用户", activeType)
+      +navItem("forum", "专业", activeType)
+      +navItem("column", "专栏", activeType)
+      +navItem("thread", "文章", activeType)

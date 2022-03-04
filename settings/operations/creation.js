@@ -1,5 +1,16 @@
 module.exports = {
   GET: 'creationCenter',
+  home:{
+    calendar:{
+      GET: 'creationCenter',
+    },
+    active:{
+      GET: 'creationCenter',
+    },
+    visit:{
+      GET: 'creationCenter',
+    },
+  },
   drafts: {
     GET: 'creationCenter',
     POST: 'creationCenter',

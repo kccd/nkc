@@ -16,9 +16,8 @@ block title
   +includeCSS('/columns/article/article.css')
 block content
   .hidden#data=objToStr({comments: data.comments, comment: data.comment, article: data.columnPost.article})
-  .container-fluid.max-width
-    .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel
-      .m-b-1
+    .container-fluid.max-width
+      .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel
         .row
           include ./nav
           +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount})
@@ -30,12 +29,11 @@ block content
           +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
           include ./content
           +content(c)
-  .container-fluid.max-width
-    .article-common.col-xs-12.col-md-9#comment-content
-      include ../../publicModules/commentCenter/comment
-    .col-xs-12.col-md-3.box-shadow-panel#rightDom
-      //- 滚动到页头页脚
-      include ../../module_scrollTo.pug
+  .article-common.col-xs-12.col-md-9#comment-content
+    include ../../publicModules/commentCenter/comment
+  .col-xs-12.col-md-3.box-shadow-panel#rightDom
+    //- 滚动到页头页脚
+    include ../../module_scrollTo.pug
   //- 显示作者联系信息
   include ./authorInfo.pug
   +authorInfo()

@@ -270,32 +270,17 @@ block content
           +forumPanel("细分专业", data.forum.childrenForums)
         //-if data.forum.parentsId.length && data.sameLevelForums && data.sameLevelForums.length > 0
           +forumPanel("同级专业", data.sameLevelForums, true)
-        if data.forum.noticeThreads.length > 0
-          -let sideThreads = data.forum.noticeThreads;
-          -let sideThreadsHeader = "专业公告"
-          include ../publicModules/side_thread_list
+        include ../publicModules/side_thread_list
+        +sideThreadsPanel(data.forum.noticeThreads, "专业公告")
         .m-b-1
           .panel-header 分享
           include ../publicModules/share/forum
-        -let sideThreads = data.featuredThreads;
-        -let sideThreadsHeader = "精选文章"
-        include ../publicModules/side_thread_list
-        -sideThreads = data.latestThreads;
-        -sideThreadsHeader = "最新文章"
-        include ../publicModules/side_thread_list
-        if data.recommendThreads && data.recommendThreads.length > 0
-          -let sideThreads = data.recommendThreads;
-          -let sideThreadsHeader = "推荐文章"
-          include ../publicModules/side_thread_list
+        +sideThreadsPanel(data.featuredThreads, "精选文章")
+        +sideThreadsPanel(data.latestThreads, "最新文章")
+        +sideThreadsPanel(data.recommendThreads, "推荐文章")
         if data.user
-          if data.subThreads && data.subThreads.length > 0
-            -let sideThreads = data.subThreads;
-            -let sideThreadsHeader = "关注的文章"
-            include ../publicModules/side_thread_list
-          if data.userThreads && data.userThreads.length > 0
-            -let sideThreads = data.userThreads;
-            -let sideThreadsHeader = "我的文章"
-            include ../publicModules/side_thread_list
+          +sideThreadsPanel(data.subThreads, "关注的文章")
+          +sideThreadsPanel(data.userThreads, "我的文章")
         if data.subUsers && data.subUsers.length > 0
           .m-t-1
             .panel-header 关注者

@@ -27,6 +27,11 @@ router
       _fc.forums = forumsObj[_id] || [];
       if(_fc.forums.length) data.categoryForums.push(_fc);
     });
+
+    // 获取 管理面板 和 应用面板 数据
+    // data.managementData = await db.SettingModel.getManagementData(data.user);
+    // data.appsData = await db.SettingModel.getAppsData();
+
     const user = await db.UserModel.findOnly({uid: state.uid});
     data.managementData = await db.SettingModel.getManagementData(user);
     data.permission = {

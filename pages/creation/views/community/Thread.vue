@@ -1,6 +1,6 @@
 <template lang="pug">
   //- div(style="position:relative;min-height:39rem")
-  div.article-common.col-xs-12.col-md-9(style="height:39rem")
+  div.article-common.col-xs-12.col-md-9(style="disply:none" ref='block')
     <community-content :iframeUrl="iframeUrl" @closeLoading="closeLoading"></community-content>
     Loading(v-show='show')
 </template>
@@ -35,6 +35,7 @@ export default {
     },
     closeLoading(){
       this.showLoading(false)
+      this.$refs.block.style.display = 'block'
     }
   }
 }

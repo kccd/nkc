@@ -8,6 +8,7 @@ const PATH = require("path");
 const fs = require("fs");
 const statics = require("../settings/statics");
 const destroy = require("destroy");
+const {getUrl} = require("../nkcModules/tools");
 const fsPromise = fs.promises;
 
 const settingSchema = new Schema({
@@ -963,9 +964,10 @@ settingSchema.statics.saveSiteLog = async (filePath) => {
 *   @param {String} name 入口名称
 *   @param {String} url 入口链接
 *   @param {String} icon 图标名称
-*   @param {Number} 待处理条数
+*   @param {Number} count 待处理条数
 * */
 settingSchema.statics.getManagementData = async (user) => {
+  if(!user) return [];
   const SettingModel = mongoose.model('settings');
   const ForumModel = mongoose.model('forums');
   const PostModel = mongoose.model('posts');
@@ -1053,6 +1055,49 @@ settingSchema.statics.getManagementData = async (user) => {
     });
   }
   return results;
-}
+};
+
+/*
+* 获取应用列表应用入口
+* @param {[Object]}
+*   @param {String} name 应用名称
+*   @param {String} url 引用入口链接
+*   @param {String} icon 引用图标链接
+* */
+settingSchema.statics.getAppsData = async () => {
+  const SettingModel = mongoose.model('settings');
+  const {getUrl} = require('../nkcModules/tools');
+  const results = [];
+  const fundSettings = await SettingModel.getSettings('fund');
+  if(fundSettings.enableFund) {
+    results.push({
+      name: `${fundSettings.fundName}`,
+      url: '/fund',
+      icon: getUrl('statics', "apps/fund.png")
+    })
+  }
+  results.push({
+    name: '考试系统',
+    url: '/exam',
+    icon: getUrl('statics', "apps/exam.png"),
+  });
+  const homeSettings = await SettingModel.getSettings('home');
+  if(homeSettings.showActivityEnter) {
+    results.push({
+      name: '活动',
+      url: '/activity',
+      icon: getUrl('statics', "apps/activity.png")
+    });
+  }
+  const toolSettings = await SettingModel.getSettings("tools");
+  if(toolSettings.enabled) {
+    results.push({
+      name: '计算工具',
+      url: '/tools',
+      icon: getUrl('statics', "apps/tools.png")
+    });
+  }
+  return results;
+};
 
 module.exports = mongoose.model('settings', settingSchema);

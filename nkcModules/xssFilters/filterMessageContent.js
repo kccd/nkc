@@ -3,7 +3,7 @@ const xss = require('xss');
 module.exports = (html) => {
   html = xss(html, {
     whiteList: {
-      a: ['href']
+      a: ['href', 'target']
     },
     onTagAttr: function(tag, name, value, isWhiteAttr) {
       if(isWhiteAttr) {

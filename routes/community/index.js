@@ -93,7 +93,9 @@ router
     // 含有最新回复的文章
     data.latestPosts = await db.PostModel.getLatestPosts(fidOfCanGetThreads, 6);
     // 拓展管理未读条数
-    await nkcModules.apiFunction.extendManagementInfo(ctx);
+    data.managementData = await db.SettingModel.getManagementData(data.user);
+    // 应用列表
+    data.appsData = await db.SettingModel.getAppsData();
     data.navbar_highlight = 'community';
     ctx.template = 'community/community.pug';
     await next();

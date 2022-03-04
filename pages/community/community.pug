@@ -60,62 +60,10 @@ block content
                 if data.subscribesDisplayMode === 'brief'
                   for forum in data.subForums
                     a.home-subscribe-forum-brief(href=`/f/${forum.fid}` data-float-fid=forum.fid)=forum.displayName
-        if permissionsOr(["visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs", "nkcManagement"])
-          .home-forums-other.m-b-1
-            .panel-header 网站管理
-            .home-managements
-              if permission("nkcManagement")
-                a.home-management(href="/nkc" target='_blank')
-                  .fa.fa-cogs
-                  span &nbsp;前台管理
-              if permission("visitExperimentalStatus")
-                a.home-management(href="/e" target='_blank')
-                  .fa.fa-cogs
-                  span &nbsp;后台管理
-              if permission("review")
-                a.home-management(href="/review" target='_blank')
-                  .fa.fa-shield
-                  span &nbsp;审核内容
-                  if data.unReviewedCount
-                    .count=data.unReviewedCount
-              if permission("complaintGet")
-                a.home-management(href="/complaint" target='_blank')
-                  .fa.fa-minus-circle
-                  span &nbsp;投诉列表
-                  if data.unResolvedComplaintCount
-                    .count=data.unResolvedComplaintCount
-              if permission("visitProblemList")
-                a.home-management(href="/problem/list" target='_blank')
-                  .fa.fa-exclamation-circle
-                  span &nbsp;问题列表
-                  if data.unResolvedProblemCount
-                    .count=data.unResolvedProblemCount
-              if permission("getLibraryLogs")
-                a.home-management(href="/libraries/logs" target='_blank')
-                  .fa.fa-book
-                  span &nbsp;文库记录
-        .home-forums-other.m-b-1.m-t-1
-          .panel-header 应用
-          .home-apps
-            if data.enableFund
-              a.home-app(href=`/fund` target="_blank")
-                .home-app-img
-                  img(src=`/statics/apps/fund.png`)
-                .home-app-name= data.fundName || "基金"
-            a.home-app(href=`/exam` target="_blank")
-              .home-app-img
-                img(src=`/statics/apps/exam.png`)
-              .home-app-name 考试系统
-            if data.showActivityEnter
-              a.home-app(href=`/activity` target="_blank")
-                .home-app-img
-                  img(src=`/statics/apps/activity.png`)
-                .home-app-name 活动
-            if data.siteToolEnabled
-              a.home-app(href=`/tools` target="_blank")
-                .home-app-img
-                  img(src=`/statics/apps/tools.png`)
-                .home-app-name 计算工具
+        include ../publicModules/management/management
+        +managementPanel(data.managementData)
+        include ../publicModules/apps/apps
+        +appsPanel(data.appsData)
         //- 最新发表
         if data.originalThreads && data.originalThreads.length > 0
           .home-forums-list.m-b-1
