@@ -3,13 +3,13 @@ if !isIncluded('singlePostBottom')
   include ./singleCommentVote
   mixin singleCommentBottom(props)
     -var {cid} = props;
-    .single-post-bottom
+    .single-post-bottom#singPostBottom
       .single-post-bottom-item.hidden.switch-hidden-status
         .switch-hidden-status-button(onclick=`NKC.methods.switchPostContent('${cid}')`)
-      .single-post-bottom-item(onclick=`quotePost('${cid}')`)
+      .single-post-bottom-item(onclick=`window.commentEditor.quoteComment(${cid})`)
         .fa.fa-comment-o.reply-icon
         span 引用
-      .single-post-bottom-item
+      //- .single-post-bottom-item
         if 1
           span.single-post-comment-button(
             onclick=`NKC.methods.switchPostComment("${cid}")`
@@ -22,10 +22,10 @@ if !isIncluded('singlePostBottom')
       //- .single-post-bottom-item
         .post-vote-container
           +singlePostVote(cid, vote, voteUp)
-      if permission('creditKcb')
+      //- if permission('creditKcb')
         .single-post-bottom-item(onclick=`credit('${cid}', 'kcb')` title='鼓励')
           .fa.fa-cny.credit-kcb
-      .single-post-bottom-item(data-type='share' data-share-type='post' data-share-id=cid title='分享')
+      //- .single-post-bottom-item(data-type='share' data-share-type='post' data-share-id=cid title='分享')
         .fa.fa-share-square-o.share-icon
       .single-post-bottom-item(data-type='postOption' data-cid=cid title='其他操作')
         .fa.fa-sliders.option-icon
