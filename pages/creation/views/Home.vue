@@ -2,41 +2,92 @@
 .container-fluid.max-width
   .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel 
     .calendar
-      div(ref="canvasDom", style="min-height: 29rem")
+      .min-h(ref="canvasDom")
       #set-year
         select(@change="summaryCalendar", v-model="selected")
           template(v-for="year in years")
             option(:key="year", :value="year") {{ year }}
     .pie
-      #pie(ref="renderPie" style="min-height: 29rem")
+      #pie.min-h(ref="renderPie")
+    .account-logs
+      .account-header 最近阅读
+      .account-description
+      div 
+        .account-logs-thread(v-for="(vt, i) in visitThreadLogs", :key="i") 
+          span {{ setTime(vt.timeStamp) }}
+          span 看过
+          a(:href="'/t/' + vt.tid") {{ vt.thread.firstPost.t }}
+    .account-logs
+      .account-header 看过的用户
+      .account-description
+      div
+        div(v-if="!visitUserLogs.length")
+          .null 空空如也~
+        .account-logs-user(v-for="(log, i) in visitUserLogs", :key="i")
+          .account-logs-user-avatar
+            //- img(src=tools.getUrl("userAvatar", log.targetUser.avatar, "sm") data-float-uid=log.toUid)
+            img(:src="log.targetUser.avatar")
+          .account-logs-user-info
+            a.account-logs-user-name(:href="'/u/' + log.toUid") {{ log.targetUser.username }}
+            .account-logs-user-time {{ setTime(log.timeStamp) }}
+
+    .account-logs
+      .account-header 我的读者排名
+      .account-description
+      div
+        div(v-if="!visitSelfLogs.length") 
+          .null 空空如也~
+        .account-logs-user(v-for="(log, i) in visitSelfLogs")
+          .account-logs-user-avatar
+            //- img(src=tools.getUrl("userAvatar", log.user.avatar, "sm") data-float-uid=log.uid)
+            img(:src="log.user.avatar")
+          .account-logs-user-info
+            a.account-logs-user-name(:href="'/u/' + log.uid") {{ log.user.username }}
+            .account-logs-user-time {{ setTime(log.timeStamp) }}
 </template>
 
 <script>
 import { getState } from "../../lib/js/state";
 import { detailedTime } from "../../lib/js/time";
-
+import { fromNow } from "../../lib/js/tools";
 
 export default {
   data: () => ({
     user: "",
-    year: "2022",
     dom: "",
     myChart: "",
     years: [],
-    selected: "",
+    selected: new Date().getFullYear(),
+    visitThreadLogs: [],
+    visitUserLogs: [],
+    visitSelfLogs: [],
   }),
+  computed: {},
   created() {
     this.user = getState();
+    this.getuser();
   },
   mounted() {
     this.dom = this.$refs.canvasDom;
-    this.setYear(this.year);
+    this.setYear(this.selected);
     this.getPie();
   },
   methods: {
+    setTime(time) {
+      return fromNow(time);
+    },
+    async getuser() {
+      nkcAPI(`/creation/${this.user.uid}/visit`, "GET")
+        .then((data) => {
+          this.visitThreadLogs = data.visitThreadLogs;
+          this.visitUserLogs = data.visitUserLogs;
+          this.visitSelfLogs = data.visitSelfLogs;
+        })
+        .catch(sweetError);
+    },
     getPie() {
-      nkcAPI("/u/" + this.user.uid + "/profile/summary/pie", "GET")
-        .then((data)=> {
+      nkcAPI("/creation/" + this.user.uid + "/active", "GET")
+        .then((data) => {
           this.renderPie(data.pie);
         })
         .catch(sweetError);
@@ -108,12 +159,12 @@ export default {
     },
     getData() {
       nkcAPI(
-        "/u/" + this.user.uid + "/profile/summary/calendar?year=" + this.year,
+        "/creation/" + this.user.uid + "/calendar?year=" + this.selected,
         "GET"
       )
         .then((data) => {
           this.initEcharts(data.posts);
-          this.createYearList(data.targetUser.toc);
+          this.createYearList(data.user.toc);
         })
         .catch(sweetError);
     },
@@ -125,7 +176,7 @@ export default {
       for (var i = nowYear; i >= registerYear; i--) {
         this.years.push(i);
       }
-      this.selected = this.years[0];
+      // this.selected = this.years[0];
       // this.dom.appendChild(select[0]);
     },
     initEcharts(data) {
@@ -175,7 +226,7 @@ export default {
         title: {
           left: "left",
           subtext: "根据用户发表的文章和回复统计",
-          text: this.year + "年发表统计",
+          text: this.selected + "年发表统计",
         },
         tooltip: {},
         visualMap: [
@@ -212,7 +263,7 @@ export default {
           left: 30,
           right: 30,
           cellSize: ["auto", 13],
-          range: this.year,
+          range: this.selected,
           /*splitLine: {
           show: false
         },*/
@@ -247,9 +298,9 @@ export default {
     },
     setYear(year) {
       if (year) year = parseInt(year);
-      this.year = year || new Date().getFullYear();
-      this.begin = new Date(this.year + "-1-1 00:00:00").getTime();
-      this.end = new Date(this.year + 1 + "-1-1 00:00:00").getTime();
+      this.selected = year || new Date().getFullYear();
+      this.begin = new Date(this.selected + "-1-1 00:00:00").getTime();
+      this.end = new Date(this.selected + 1 + "-1-1 00:00:00").getTime();
       this.getData();
     },
     summaryCalendar() {
@@ -263,6 +314,72 @@ export default {
 };
 </script>
 <style scoped>
+.account-logs
+  .account-logs-user
+  .account-logs-user-info
+  .account-logs-user-time {
+  font-size: 1rem;
+  margin-top: 0.2rem;
+  color: #aaa;
+}
+.account-logs
+  .account-logs-user
+  .account-logs-user-info
+  .account-logs-user-name {
+  height: 1.5rem;
+  color: #2b90d9;
+  font-weight: 700;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.account-logs .account-logs-thread a {
+  font-size: 1.25rem;
+  color: #2b90d9;
+}
+.account-logs .account-logs-thread span {
+  color: #e85a71;
+  margin-right: 0.5rem;
+}
+.account-logs .account-logs-user .account-logs-user-avatar {
+  display: table-cell;
+  vertical-align: top;
+}
+.account-logs .account-logs-user .account-logs-user-info {
+  width: 7rem;
+  display: table-cell;
+  vertical-align: top;
+  height: 3rem;
+}
+.account-logs .account-logs-user .account-logs-user-avatar img {
+  height: 3rem;
+  width: 3rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+.account-logs .account-logs-user {
+  display: inline-block;
+  width: 10.4rem;
+  margin: 0 0.5rem 0.5rem 0;
+}
+.null {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+  text-align: center;
+}
+.account-header {
+  margin-bottom: 10px;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.calendar {
+  position: relative;
+}
+.min-h {
+  min-height: 25rem;
+}
 #set-year {
   position: absolute;
   top: 10px;
