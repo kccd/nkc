@@ -1,5 +1,24 @@
 if !isIncluded('publicModules/moment/moment.pug')
   +includeCSS('/publicModules/moment/moment.css')
+
+  mixin momentList(momentsData)
+    .moments-container
+      for momentData in momentsData
+        .moment-item
+          +singleMoment(momentData)
+
+  mixin momentFiles(files)
+    if files && files.length > 0
+      -var fileType = files[0].type;
+      -var fileCount = files.length;
+      .single-moment-files
+        for file in files
+          .single-moment-file(class=`count-${fileCount}`)
+            if fileType === 'video'
+              video(src=file.url poster=file.coverUrl controls='controls')
+            else
+              .picture(style=`background-image: url(${file.url})`)
+
   mixin singleMoment(momentData)
     -var {uid, toc, username, avatarUrl, userHome, time, content, voteUp, files} = momentData;
     .single-moment-container
@@ -13,16 +32,12 @@ if !isIncluded('publicModules/moment/moment.pug')
           .single-moment-time
             +fromNow(toc)
         .single-moment-content!=content
-      .single-moment-bottom
-        .single-moment-bottom-left
-          .fa.fa-comment-o
-        .single-moment-bottom-center
-          .fa.fa-retweet
-        .single-moment-bottom-right
-          .fa.fa-thumbs-o-up
-  mixin momentList(momentsData)
-    .moments-container
-      for momentData in momentsData
-        .moment-item
-          +singleMoment(momentData)
+        +momentFiles(files)
+        .single-moment-bottom
+          .single-moment-bottom-left
+            .fa.fa-comment-o
+          .single-moment-bottom-center
+            .fa.fa-share
+          .single-moment-bottom-right
+            .fa.fa-thumbs-o-up
 

@@ -430,7 +430,7 @@ schema.statics.extendMomentsData = async (moments) => {
       let coverUrl = '';
       let type = 'picture';
       if(mediaType === 'mediaVideo') {
-        coverUrl = getUrl('videoCover', rid);
+        coverUrl = getUrl('resource', rid, 'cover');
         type = 'video';
       }
       filesData.push({

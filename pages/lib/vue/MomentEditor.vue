@@ -233,7 +233,7 @@
       submitting: false,
       textareaHeight: '0',
       maxContentLength: 1000,
-      maxPictureCount: 12,
+      maxPictureCount: 9,
       maxVideoCount: 1,
       momentId: '',
       content: '',
