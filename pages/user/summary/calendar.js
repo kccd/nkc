@@ -64,7 +64,6 @@ NKC.modules.SummaryCalender = function(dom, year) {
         max: i * 2 - 1
       });
     }
-    
     var pieces = [];
     for(var i = 0; i < defaultPieces.length; i++) {
       var p = defaultPieces[i];

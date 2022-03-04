@@ -34,7 +34,7 @@ router
       }
     }
   ]);
-  data.posts = posts? posts: [];
+  data.posts = posts || [];
   await next();
 })
 .get('/active', async (ctx, next)=>{

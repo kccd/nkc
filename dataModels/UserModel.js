@@ -514,7 +514,7 @@ userSchema.statics.visitSelfLogs = async (uid) =>{
 //    return data;
 // }
 /*
-* 查找用户近期阅读文章
+* 返回 用户近期阅读文章
 * param {String} uid 用户id
 */
 userSchema.statics.recentReading = async (uid) =>{

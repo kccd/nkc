@@ -170,28 +170,25 @@ export default {
     },
     createYearList(toc) {
       this.years = [];
-
       var registerYear = new Date(toc).getFullYear();
       var nowYear = new Date().getFullYear();
       for (var i = nowYear; i >= registerYear; i--) {
         this.years.push(i);
       }
-      // this.selected = this.years[0];
-      // this.dom.appendChild(select[0]);
     },
     initEcharts(data) {
       if (this.myChart && this.myChart.dispose) {
         this.myChart.dispose();
       }
       var timeObj = {};
-      for (var i = 0; i < data.length; i++) {
+      for (var i = 0; i < data.length; i++) {        
         var t = data[i];
         timeObj[t._id] = t.count;
       }
       var times = {};
       for (var i = this.begin; i < this.end; i = i + 24 * 60 * 60 * 1000) {
-        var timeName = detailedTime(i).slice(0, 11);
-        times[detailedTime(i).slice(0, 11)] = timeObj[timeName] || 0;
+        var timeName = detailedTime(i).slice(0, 10);
+        times[detailedTime(i).slice(0, 10)] = timeObj[timeName] || 0;
       }
       data = [];
       var max = 0;
@@ -200,28 +197,27 @@ export default {
         if (times[i] > max) max = times[i];
         data.push([i, times[i]]);
       }
-      var start = 1,
-        pieceMax = 10000;
-      var defaultPieces = [];
-      for (var i = start; i < pieceMax; i = i * 2) {
-        defaultPieces.push({
-          min: i,
-          max: i * 2 - 1,
-        });
+       var start = 1, pieceMax = 10000;
+    var defaultPieces = [];
+    for(var i = start; i < pieceMax; i = i * 2) {
+      defaultPieces.push({
+        min: i,
+        max: i * 2 - 1
+      });
+    }
+    var pieces = [];
+    for(var i = 0; i < defaultPieces.length; i++) {
+      var p = defaultPieces[i];
+      if(max >= p.min) {
+        pieces.push(p);
       }
-      var pieces = [];
-      for (var i = 0; i < defaultPieces.length; i++) {
-        var p = defaultPieces[i];
-        if (max >= p.min) {
-          pieces.push(p);
-        }
-      }
-      if (!pieces.length) {
-        pieces.push({
-          min: 1,
-          max: 1,
-        });
-      }
+    }
+    if(!pieces.length) {
+      pieces.push({
+        min: 1,
+        max: 1
+      })
+    }
       var option = {
         title: {
           left: "left",
@@ -238,35 +234,12 @@ export default {
             pieces: pieces,
           },
         ],
-        /*visualMap: {
-        min: 1,
-        max: maxMap,
-        type: 'piecewise',
-        orient: 'horizontal',
-        left: 'center',
-        top: 65,
-        /!*inRange: {
-          color: [
-            'rgba(191, 68, 76, 1)',
-            'rgba(191, 68, 76, 0.8)',
-            'rgba(191, 68, 76, 0.6)',
-            'rgba(191, 68, 76, 0.4)',
-            'rgba(191, 68, 76, 0.2)'
-          ],
-        },*!/
-        textStyle: {
-          color: '#000'
-        }
-      },*/
         calendar: {
           top: 120,
           left: 30,
           right: 30,
           cellSize: ["auto", 13],
           range: this.selected,
-          /*splitLine: {
-          show: false
-        },*/
           dayLabel: {
             nameMap: "cn",
           },
@@ -295,6 +268,7 @@ export default {
 
       this.myChart = echarts.init(this.dom);
       this.myChart.setOption(option);
+
     },
     setYear(year) {
       if (year) year = parseInt(year);
