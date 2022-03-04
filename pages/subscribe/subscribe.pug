@@ -8,7 +8,10 @@ block content
       .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom.box-shadow-panel.p-r-0
         include ../publicModules/forums_nav/forums_tree
       .col-xs-12.col-md-7.box-shadow-panel.p-r-0
-        block sContent
+        div
+          include ./subscribeNav
+          +subscribeNav(data.type)
+          block sContent
       .col-xs-12.col-md-3
         .hidden-xs.hidden-sm#rightDom.box-shadow-panel
           .hidden-xs.hidden-sm.m-b-1
@@ -17,34 +20,13 @@ block content
           include ../publicModules/management/management
           +managementPanel(data.managementData)
           include ../publicModules/apps/apps
-          //if data.noticeThreads && data.noticeThreads.length > 0
-          //  -let sideThreads = data.noticeThreads
-          //  -let sideThreadsHideInfo = true;
-          //  -let sideThreadsHeader = "公告通知"
-          //  include ../publicModules/side_thread_list
-          //if data.featuredThreads && data.featuredThreads.length > 0
-          //  -let sideThreads = data.featuredThreads
-          //  -let sideThreadsHideInfo = false;
-          //  -let sideThreadsHeader = "精选文章"
-          //  include ../publicModules/side_thread_list
-          //if data.subscribeThreads && data.subscribeThreads.length > 0
-          //  -let sideThreads = data.subscribeThreads
-          //  -let sideThreadsHideInfo = false;
-          //  -let sideThreadsHeader = "我关注的"
-          //  include ../publicModules/side_thread_list
-          //if data.latestThreads && data.latestThreads.length > 0
-          //  -let sideThreads = data.latestThreads
-          //  -let sideThreadsHideInfo = false;
-          //  -let sideThreadsHeader = "最新文章"
-          //  include ../publicModules/side_thread_list
-          //if data.recommendThreads && data.recommendThreads.length > 0
-          //  -let sideThreads = data.recommendThreads
-          //  -let sideThreadsHideInfo = false;
-          //  -let sideThreadsHeader = "推荐文章"
-          //  include ../publicModules/side_thread_list
-          //include ../publicModules/activeUsers/activeUsers
-          //+newUsersSmall(data.newUsers)
+          include ../publicModules/side_thread_list
+          +sideThreadsPanel(data.noticeThreads, "公告通知", true)
+          +sideThreadsPanel(data.featuredThreads, "精选文章", false)
+          +sideThreadsPanel(data.articleThreads, "最新文章", false)
+          +sideThreadsPanel(data.recommendThreads, "推荐文章", false)
         include ../publicModules/scrollTo
 
 block scripts
+  include ../publicModules/floatUserPanel/floatUserPanel
   block sScripts

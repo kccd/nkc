@@ -445,6 +445,7 @@ schema.statics.extendMomentsData = async (moments) => {
       avatarUrl: getUrl('userAvatar', avatar),
       userHome: getUrl('userHome', uid),
       time: fromNow(toc),
+      toc,
       content,
       voteUp,
       files: filesData

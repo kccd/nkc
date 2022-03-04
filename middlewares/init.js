@@ -39,6 +39,7 @@ module.exports = async (ctx, next) => {
   }
 
   try {
+    ctx.internalData = {};
     ctx.body = ctx.request.body;
     ctx.db = db;
 	  ctx.tools = tools;

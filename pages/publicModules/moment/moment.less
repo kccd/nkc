@@ -1,0 +1,84 @@
+.single-moment-container{
+  @avatarWidth: 4rem;
+  position: relative;
+  padding-left: @avatarWidth + 1rem;
+  min-height: @avatarWidth;
+  .single-moment-left{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: @avatarWidth;
+    .single-moment-avatar{
+      height: @avatarWidth;
+      width: @avatarWidth;
+      border-radius: 50%;
+      overflow: hidden;
+      img{
+        height: 100%;
+        width: 100%;
+      }
+    }
+  }
+  .single-moment-right{
+    .single-moment-header{
+      margin-bottom: 0.5rem;
+    }
+    .single-moment-user{
+      display: inline-block;
+      margin-right: 0.5rem;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+    .single-moment-time{
+      display: inline-block;
+      font-size: 1rem;
+      color: #555;
+    }
+    .single-moment-content{
+      font-size: 1.25rem;
+      color: #000;
+      line-height: 2rem;
+      img{
+        height: 1.5rem;
+        width: 1.5rem;
+        margin: 0 0.1rem;
+        vertical-align: text-bottom;
+      }
+    }
+  }
+  .single-moment-bottom{
+    position: relative;
+    @padding: 3rem;
+    height: @padding;
+    line-height: @padding;
+    padding-left: @padding;
+    padding-right: @padding;
+    font-size: 1.3rem;
+    text-align: center;
+    .single-moment-bottom-left{
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: @padding;
+    }
+    .single-moment-bottom-right{
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: @padding;
+    }
+  }
+}
+.moments-container{
+  .moment-item{
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.3rem;
+    margin-bottom: 1.5rem;
+  }
+  & .moment-item:last-child{
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+}

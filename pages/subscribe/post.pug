@@ -1,0 +1,18 @@
+extends ./subscribe
+block sTitle
+  title=`最新动态 - ${remoteState.serverSettings.websiteName}`
+block sContent
+  div
+    if !data.activity || data.activity.length === 0
+      .p-t-5.p-b-5.text-center
+        h4
+          b 空空如也~
+    else
+      -showPagingSortButton = false;
+      include ../publicModules/paging/paging
+      include ./postActivity
+        for a in data.activity
+          +postActivity(a)
+      include ../publicModules/paging/paging_input
+block sScripts
+  +includeJS('/subscribe/moment.js')

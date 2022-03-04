@@ -18,11 +18,11 @@
           placeholder="想分享什么新鲜事？"
           )
       .files-container
-        .pictures
+        .pictures(v-if="picturesUrl.length > 0")
           .picture-item(v-for="(url, index) in picturesUrl" :style="'background-image: url('+url+')'")
             .icon-remove(@click="removeFromArr(picturesId, index)")
               .fa.fa-trash-o
-        .videos
+        .videos(v-if="videosUrl.length > 0")
           .video-item(v-for="(videoUrl, index) in videosUrl")
             .icon-remove(@click="removeFromArr(videosId, index)")
               .fa.fa-trash-o
@@ -121,7 +121,7 @@
       z-index: -1;
     }
     .content-container{
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       padding: 1rem;
       border: 1px solid #ccc;
       border-radius: 0.5rem;
@@ -155,16 +155,16 @@
         color: #555;
         margin-right: 1rem;
         .icon{
-          font-size: 1.6rem;
+          font-size: 1.2rem;
           margin-right: 0.3rem;
           color: #777;
           transition: color 100ms;
           &.icon-face{
-            font-size: 1.8rem;
+            font-size: 1.3rem;
           }
         }
         span{
-          font-size: 1.15rem;
+          font-size: 1rem;
           transition: color 100ms;
         }
         &:hover{
@@ -222,7 +222,9 @@
   import {debounce} from '../js/execution';
   import {nkcAPI} from '../js/netAPI';
   import EmojiSelector from './EmojiSelector';
+  import {sweetSuccess} from '../js/sweetAlert';
   export default {
+    props: ['published'],
     components: {
       'resource-selector': ResourceSelector,
       'emoji-selector': EmojiSelector
@@ -392,12 +394,16 @@
             })
           })
           .then(() => {
-            self.unlockButton();
+            // sweetSuccess('发表成功');
+            self.sendPublishedEvent();
           })
           .catch(err => {
             self.unlockButton();
             sweetError(err);
           });
+      },
+      sendPublishedEvent() {
+        this.$emit('published')
       },
       onContentChange: debounce(function() {
         this.saveContent();

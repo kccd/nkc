@@ -978,7 +978,7 @@ settingSchema.statics.getManagementData = async (user) => {
   const results = [];
   if(user.hasPermission('nkcManagement')) {
     results.push({
-      name: '前台管理11',
+      name: '前台管理',
       url: '/nkc',
       icon: 'fa-cogs',
       count: 0,
@@ -1077,7 +1077,7 @@ settingSchema.statics.getAppsData = async () => {
     })
   }
   results.push({
-    name: '考试系统11',
+    name: '考试系统',
     url: '/exam',
     icon: getUrl('statics', "apps/exam.png"),
   });

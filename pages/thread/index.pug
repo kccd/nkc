@@ -509,16 +509,9 @@ block content
               //- .panel-header 作者
               -const author = data.targetUser;
               include ./authorInfo
-            if data.targetUserThreads && data.targetUserThreads.length
-              -let sideThreads = data.targetUserThreads
-              -let sideThreadsHeader= "作者最新文章"
-              -let sideThreadsHideInfo = false;
-              include ../publicModules/side_thread_list
-          if data.sameThreads && data.sameThreads.length
-            -let sideThreads = data.sameThreads
-            -let sideThreadsHeader = "相似文章推荐"
-            -let sideThreadsHideInfo = false;
             include ../publicModules/side_thread_list
+            +sideThreadsPanel(data.targetUserThreads, "作者最新文章", false)
+            +sideThreadsPanel(data.sameThreads, "相似文章推荐", false)
           .hidden-sm.hidden-xs
             include ../publicModules/footer/footer_sm
 

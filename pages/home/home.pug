@@ -93,7 +93,7 @@ block content
               else
                 -showPagingSortButton = false;
                 include ../publicModules/paging/paging
-                include ./postActivity
+                include ../subscribe/postActivity
                   for a in data.activity
                     +postActivity(a)
                 include ../publicModules/paging/paging_input
@@ -147,31 +147,12 @@ block content
           +managementPanel(data.managementData)
           include ../publicModules/apps/apps
           +appsPanel(data.appsData)
-          if data.noticeThreads && data.noticeThreads.length > 0
-            -let sideThreads = data.noticeThreads
-            -let sideThreadsHideInfo = true;
-            -let sideThreadsHeader= "公告通知"
-            include ../publicModules/side_thread_list
-          if data.featuredThreads && data.featuredThreads.length > 0
-            -let sideThreads = data.featuredThreads
-            -let sideThreadsHideInfo = false;
-            -let sideThreadsHeader= "精选文章"
-            include ../publicModules/side_thread_list
-          if data.subscribeThreads && data.subscribeThreads.length > 0
-            -let sideThreads = data.subscribeThreads
-            -let sideThreadsHideInfo = false;
-            -let sideThreadsHeader= "我关注的"
-            include ../publicModules/side_thread_list
-          if data.latestThreads && data.latestThreads.length > 0
-            -let sideThreads = data.latestThreads
-            -let sideThreadsHideInfo = false;
-            -let sideThreadsHeader= "最新文章"
-            include ../publicModules/side_thread_list
-          if data.recommendThreads && data.recommendThreads.length > 0
-            -let sideThreads = data.recommendThreads
-            -let sideThreadsHideInfo = false;
-            -let sideThreadsHeader= "推荐文章"
-            include ../publicModules/side_thread_list
+          include ../publicModules/side_thread_list
+          +sideThreadsPanel(data.noticeThreads, '公告通知', true)
+          +sideThreadsPanel(data.featuredThreads, '精选文章', false)
+          +sideThreadsPanel(data.subscribeThreads, '我关注的', false)
+          +sideThreadsPanel(data.latestThreads, '最新文章', false)
+          +sideThreadsPanel(data.recommendThreads, '推荐文章', false)
           include ../publicModules/activeUsers/activeUsers
           +newUsersSmall(data.newUsers)
         include ../publicModules/scrollTo
