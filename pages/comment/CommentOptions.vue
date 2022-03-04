@@ -1,5 +1,8 @@
 <template lang="pug">
-  #modulePostOptions(:style="'top:'+position.top+'px;left:'+position.left+'px'" v-show="show" @click='')
+  #modulePostOptions(:style="'top:'+position.top+'px;left:'+position.left+'px'" v-show="show" @click="")
+    violation-record(ref="violationRecord")
+    complaint(ref="complaint")
+    disabled-comment(ref="disabledComment")
     .post-options-panel(v-if='loading')
       .loading 加载中...
     .post-options-panel(v-else)
@@ -47,6 +50,7 @@
     transition: height 1s;
     @optionHeight: 2rem;
     .option{
+      text-align: left;
       &:hover{
         background-color: #eee;
       }
@@ -89,8 +93,15 @@
 <script>
 import {timeFormat} from "../lib/js/tools";
 import {nkcAPI} from "../lib/js/netAPI";
+import ViolationRecord from "../lib/vue/ViolationRecord";
+import DisabledComment from "../lib/vue/DisabledComment";
+import Complaint from "../lib/vue/Complaint";
 export default {
-  props:['source', 'sid'],
+  components: {
+    "disabled-comment": DisabledComment,
+    complaint: Complaint,
+    "violation-record": ViolationRecord
+  },
   data: () => ({
     show: false,
     loading: true,
@@ -140,9 +151,8 @@ export default {
   methods: {
     timeFormat: timeFormat,
     getPermission() {
-      if(!this.sid) return;
       const self = this;
-      nkcAPI(`/book/${self.sid}/options?cid=${self.comment._id}`, 'GET', {})
+      return nkcAPI(`/comment/${self.comment._id}/options?aid=${self.comment.sid}`, 'GET', {})
       .then(res => {
         self.options = res.options;
         self.toc = res.toc;
@@ -151,19 +161,21 @@ export default {
       .catch(err => {
         sweetError(err);
       })
+
     },
     open(props) {
       this.loading = true;
       const {comment, DOM, direction} = props;
       this.toc = null;
       this.options = {};
-      const self = this;
       this.comment = comment;
-      //获取多选菜单权限
-      this.getPermission();
-      self.direction = direction;
-      self.jqDOM = DOM;
-      self.show = true;
+      //获取菜单权限
+      this.getPermission()
+      .then(() => {
+        this.show = true;
+      });
+      this.direction = direction;
+      this.jqDOM = DOM;
     },
     close() {
       this.show = false;
@@ -174,19 +186,45 @@ export default {
     },
     //退修或删除
     disableComment() {
-      this.$emit('disabled', this.comment._id);
+      this.$refs.disabledComment.open(function (res){
+      }, {
+        cid: this.comment._id
+      })
     },
     //投诉或举报
     complaint() {
-      this.$emit('complaint', this.comment._id);
+      this.$refs.complaint.open('comment', this.comment._id);
     },
     //通过审核
     passReview() {
-      this.$emit('pass-review', this.comment);
+      const {docId: documentId, did} = this.comment;
+      if(!documentId || !did) return;
+      nkcAPI('/review' , 'PUT', {
+        pass: true,
+        documentId,
+        did,
+        type: 'document'
+      })
+        .then(res => {
+          sweetSuccess('操作成功');
+        })
+        .catch(err => {
+          sweetError(err);
+        })
     },
     //查看IP
     displayIpInfo() {
-      this.$emit('display-ip-info', this.options.ipInfo);
+      const ip = this.options.ipInfo;
+      if(!ip) return;
+      nkcAPI(`/ipinfo?ip=${ip}`, 'GET')
+        .then(function(res) {return res.ipInfo})
+        .then(function(info){
+          if(!info) return sweetError('获取ip信息失败！');
+          return asyncSweetCustom("<p style='font-weight: normal;'>ip: "+ info.ip +"<br>位置: "+ info.location +"</p>");
+        })
+        .catch(err => {
+          sweetError(err);
+        })
     },
     //加入黑名单 tUid 被拉黑的用户
     userBlacklist() {
@@ -202,7 +240,7 @@ export default {
     },
     //违规记录
     viewViolationRecord() {
-      this.$emit('view-violation', this.comment.uid);
+      this.$refs.violationRecord.open({uid: this.comment.uid});
     },
     //用户移除黑名单 tUid 被拉黑的用户
     removeUserToBlackList(uid) {

@@ -27,13 +27,9 @@ router
       _fc.forums = forumsObj[_id] || [];
       if(_fc.forums.length) data.categoryForums.push(_fc);
     });
+    const user = await db.UserModel.findOnly({uid: state.uid});
+    data.managementData = await db.SettingModel.getManagementData(user);
     data.permission = {
-      nkcManagement: permission('nkcManagement'),
-      visitExperimentalStatus: permission('visitExperimentalStatus'),
-      review: permission('review'),
-      complaintGet: permission('complaintGet'),
-      visitProblemList: permission('visitProblemList'),
-      getLibraryLogs: permission('getLibraryLogs'),
       fundSettings: fundSettings,
       hasUser: !!state.uid,
       showActivityEnter: homeSettings.showActivityEnter,
@@ -44,12 +40,12 @@ router
     const recycleId = await db.SettingModel.getRecycleId();
     // 管理 未处理条数
     if(!state.isApp) {
-      if(permission("complaintGet")) {
-        data.unResolvedComplaintCount = await db.ComplaintModel.countDocuments({resolved: false});
-      }
-      if(permission("visitProblemList")) {
-        data.unResolvedProblemCount = await db.ProblemModel.countDocuments({resolved: false});
-      }
+      // if(permission("complaintGet")) {
+      //   data.unResolvedComplaintCount = await db.ComplaintModel.countDocuments({resolved: false});
+      // }
+      // if(permission("visitProblemList")) {
+      //   data.unResolvedProblemCount = await db.ProblemModel.countDocuments({resolved: false});
+      // }
       if(permission("review")) {
         const q = {
           reviewed: false,
@@ -63,18 +59,18 @@ router
             $in: fid
           }
         }
-        const posts = await db.PostModel.find(q, {tid: 1, pid: 1});
-        const threads = await db.ThreadModel.find({tid: {$in: posts.map(post => post.tid)}}, {recycleMark: 1, oc: 1, tid: 1});
-        const threadsObj = {};
-        threads.map(thread => threadsObj[thread.tid] = thread);
-        let count = 0;
-        posts.map(post => {
-          const thread = threadsObj[post.tid];
-          if(thread && (thread.oc !== post.pid || !thread.recycleMark)) {
-            count++;
-          }
-        });
-        data.unReviewedCount = count;
+        // const posts = await db.PostModel.find(q, {tid: 1, pid: 1});
+        // const threads = await db.ThreadModel.find({tid: {$in: posts.map(post => post.tid)}}, {recycleMark: 1, oc: 1, tid: 1});
+        // const threadsObj = {};
+        // threads.map(thread => threadsObj[thread.tid] = thread);
+        // let count = 0;
+        // posts.map(post => {
+        //   const thread = threadsObj[post.tid];
+        //   if(thread && (thread.oc !== post.pid || !thread.recycleMark)) {
+        //     count++;
+        //   }
+        // });
+        // data.unReviewedCount = count;
       }
     }
     await next();

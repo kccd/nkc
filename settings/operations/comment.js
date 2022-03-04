@@ -16,6 +16,9 @@ module.exports = {
     },
     unblock: {
       POST: "disabledComment"
+    },
+    options: {
+      GET: "getCommentPermission"
     }
   }
 }

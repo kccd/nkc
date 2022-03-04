@@ -520,7 +520,8 @@ schema.statics.updateDocumentByDid = async (did, props) => {
     keywordsEN,
     tlm,
     origin,
-    authorInfos
+    authorInfos,
+    quoteDid = '',
   } = props;
   const AttachmentModel = mongoose.model('attachments');
   const DocumentModel = mongoose.model('documents');
@@ -546,7 +547,8 @@ schema.statics.updateDocumentByDid = async (did, props) => {
       wordCount,
       tlm,
       origin,
-      authorInfos
+      authorInfos,
+      quoteDid
     }
   });
   const _betaDocument = await DocumentModel.findOnly({_id: betaDocument._id});
@@ -1164,14 +1166,13 @@ schema.methods.pushToSearchDB = async function() {
 /*
 * 向document中插入引用信息
 * */
-schema.methods.initQuote = async function (quoteCid) {
-  const CommentModel = mongoose.model('comments');
+schema.methods.initQuote = async function (quoteDid) {
   const DocumentModel = mongoose.model('documents');
-  const comment = await CommentModel.findOne({_id: quoteCid});
-  const document = await DocumentModel.findOne({did: comment.did, type: 'stable'});
+  const document = await DocumentModel.findOnly({_id: quoteDid, type: 'stable'});
+  if(!document) throwErr(400, '未找到引用信息');
   await this.updateOne({
     $set: {
-      quoteDid: document._id
+      quoteDid
     }
   })
 }

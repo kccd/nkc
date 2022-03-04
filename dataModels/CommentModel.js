@@ -1,5 +1,6 @@
 const mongoose = require('../settings/database');
 const {getUrl} = require("../nkcModules/tools");
+const {htmlToPlain} = require("../nkcModules/nkcRender");
 const commentSource = {
         article: 'article',
         book: 'book'
@@ -123,7 +124,7 @@ schema.statics.checkCommentSource = async (source) => {
 * 创建comment
 * */
 schema.statics.createComment = async (options) => {
-  const {uid, content, sid, ip, port, quoteCid} = options;
+  const {uid, content, sid, ip, port, quoteDid} = options;
   const toc = new Date();
   const DocumentModel = mongoose.model('documents');
   const SettingModel = mongoose.model('settings');
@@ -149,8 +150,8 @@ schema.statics.createComment = async (options) => {
     did: document.did,
   });
   //如果存在引用就及那个引用信息插入到document中
-  if(quoteCid) {
-    await document.initQuote(quoteCid)
+  if(quoteDid) {
+    await document.initQuote(quoteDid)
   }
   await comment.save();
   return comment;
@@ -180,10 +181,11 @@ schema.methods.saveComment = async function () {
 * */
 schema.methods.modifyComment = async function (props) {
   const DocumentModel = mongoose.model('documents');
-  const {content} = props;
+  const {content, quoteDid} = props;
   const {did} = this;
   const tlm = new Date();
   await DocumentModel.updateDocumentByDid(did, {
+    quoteDid,
     content,
     tlm
   });
@@ -310,7 +312,9 @@ schema.statics.extendReviewComments = async function(comments) {
   const {timeFormat, getUrl} = require('../nkcModules/tools');
   const commentsId = [];
   const booksId = [];
+  // console.log('comments', comments);
   for(const comment of comments) {
+    if(!comment) continue;
     commentsId.push(comment._id);
     booksId.push(comment.sid);
   }
@@ -331,6 +335,7 @@ schema.statics.extendReviewComments = async function(comments) {
   }
   const results = [];
   for(const comment of comments) {
+    if(!comment) continue;
     const {
       _id,
       toc,
@@ -361,15 +366,42 @@ schema.statics.extendReviewComments = async function(comments) {
 * */
 schema.methods.extendEditorComment = async function() {
   const DocumentModel = mongoose.model('documents');
+  const CommentModel = mongoose.model('comments');
+  const UserModel = mongoose.model('users');
   const {timeFormat, getUrl} = require('../nkcModules/tools');
-  const {comment: documentSource} = await DocumentModel.getDocumentSources();
+  const {comment: commentSource} = await DocumentModel.getDocumentSources();
+  const {beta: betaType, stable: stableType} = await DocumentModel.getDocumentTypes();
   const {did, _id, toc, uid} = this;
-  const documents = await DocumentModel.find({did, type: {$in: ['beta', 'stable']}, source: documentSource, sid: _id});
+  const documents = await DocumentModel.find({did, type: {$in: [betaType, stableType]}, source: commentSource, sid: _id});
   const commentsObj = {};
+  const quoteIdArr= [];
+  const quoteObj= {};
   for(const document of documents) {
-    const {type, sid} = document;
+    const {type, sid, quoteDid} = document;
+    if(quoteDid) quoteIdArr.push(quoteDid);
     if(!commentsObj[sid]) commentsObj[sid] = {};
     commentsObj[sid][type] = document;
+  }
+  const quoteDocuments = await DocumentModel.find({_id: {$in: quoteIdArr}});
+  for(const document of quoteDocuments) {
+    const {uid, toc, content, _id, sid, did, tlm} = document;
+    const comment = await CommentModel.findOne({did});
+    const user = await UserModel.findOne({uid});
+    const {username, avatar} = user;
+    quoteObj[document._id] = {
+      cid: comment._id,
+      uid,
+      toc,
+      tlm,
+      content: htmlToPlain(content, 100),
+      docId: _id,
+      sid,
+      did,
+      order: comment.order,
+      username,
+      avatar: getUrl('userAvatar', avatar),
+      userHome: `/u/${user.uid}`
+    };
   }
   const commentObj = commentsObj[_id]
   const stableComment = commentObj.stable;
@@ -382,8 +414,10 @@ schema.methods.extendEditorComment = async function() {
     source: betaComment?betaComment.source:stableComment.source,
     sid: betaComment?betaComment.sid:stableComment.sid,
     type: betaComment?betaComment.type:stableComment.type,
+    quoteDid: betaComment?betaComment.quoteDid:stableComment.quoteDid,
     time: timeFormat(toc),
     did,
+    quote: quoteObj[betaComment?betaComment.quoteDid:stableComment.quoteDid]
   }
 }
 

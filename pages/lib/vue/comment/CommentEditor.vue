@@ -5,7 +5,7 @@
         .quote-cancel(@click="clearQuote") 取消引用
         .quote-info
           span 引用&nbsp;
-          a(:href="`/u/${quote.user.uid}`" target="_blank") {{quote.user.username}}
+          a(:href="`/u/${quote.uid}`" target="_blank") {{quote.username}}
           span &nbsp;发表于&nbsp;
           //a(:href="quote.url") {{quote.order}} 楼
           span {{quote.order}} 楼
@@ -86,7 +86,9 @@
         this.$refs.editor.removeNoticeEvent();
         this.type = this.comment?'modify':'create';
         if(this.comment) {
+          this.commentContent = this.comment.content;
           this.commentId = this.comment._id;
+          if(this.comment.quote) this.quote = this.comment.quote;
           this.setContent(this.comment.content);
         } else {
           this.contentChangeEventFlag = true;
@@ -103,12 +105,13 @@
         this.post(this.type);
       },
       //点击引用获取该楼层的引用信息
-      changeQuote(item) {
-        if(!item) return;
+      changeQuote(docId, source) {
+        if(!docId) return;
         const self = this;
-        nkcAPI(`/comment/${item._id}/quote`, 'GET', {})
+        nkcAPI(`/comment/${docId}/quote?source=${source}`, 'GET', {})
         .then(res => {
           self.quote = res.quote
+          self.post(self.type);
           window.location.href='#container';
         })
         .catch(err => {
@@ -136,7 +139,7 @@
           type,
           source: self.source,
           sid: self.sid,
-          quoteCid: self.quote?self.quote._id:'',
+          quoteDid: self.quote?self.quote.docId:'',
           commentId: self.commentId,
         })
         .then(res => {
@@ -151,7 +154,7 @@
             self.clearContent();
             self.lockPost = false;
             self.type = 'create';
-            self.clearQuote();
+            self.quote = null;
           }
           self.setSavedStatus('succeeded');
         })
@@ -179,6 +182,7 @@
       },
       clearQuote() {
         this.quote = null;
+        this.post(this.type);
       }
     }
   }

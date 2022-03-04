@@ -2,11 +2,13 @@
 if !isIncluded('singlePostBottom')
   include ./singleCommentVote
   mixin singleCommentBottom(props)
-    -var {cid} = props;
-    .single-post-bottom#singPostBottom
-      .single-post-bottom-item.hidden.switch-hidden-status
+    -var {cid, docId, props: comment} = props;
+    .single-post-bottom
+      #singleCommentBottom
+        comment-options(ref="commentOptions")
+      //- .single-post-bottom-item.hidden.switch-hidden-status
         .switch-hidden-status-button(onclick=`NKC.methods.switchPostContent('${cid}')`)
-      .single-post-bottom-item(onclick=`window.commentEditor.quoteComment(${cid})`)
+      .single-post-bottom-item(onclick=`window.commentEditor.quoteComment('${docId}')`)
         .fa.fa-comment-o.reply-icon
         span 引用
       //- .single-post-bottom-item
@@ -27,10 +29,10 @@ if !isIncluded('singlePostBottom')
           .fa.fa-cny.credit-kcb
       //- .single-post-bottom-item(data-type='share' data-share-type='post' data-share-id=cid title='分享')
         .fa.fa-share-square-o.share-icon
-      .single-post-bottom-item(data-type='postOption' data-cid=cid title='其他操作')
+      .single-post-bottom-item(data-type='CommentOption' data-cid=cid onclick=`window.singleCommentBottom.openOptions(this)` title='其他操作')
         .fa.fa-sliders.option-icon
 
-    .single-post-comment(data-type='singlePostComment' data-cid=cid).nkc-hidden
+    //.single-post-comment(data-type='singlePostComment' data-cid=cid).nkc-hidden
       .post-comments-div(id=`post_comments_${cid}`)
         .text-center 加载评论中，请稍候...
       .post-comment-warning.text-danger
