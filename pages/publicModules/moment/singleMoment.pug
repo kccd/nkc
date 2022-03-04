@@ -13,11 +13,12 @@ if !isIncluded('publicModules/moment/moment.pug')
       -var fileCount = files.length;
       .single-moment-files
         for file in files
-          .single-moment-file(class=`count-${fileCount}`)
-            if fileType === 'video'
+          if fileType === 'video'
+            .single-moment-file(data-count=fileCount data-type=fileType)
               video(src=file.url poster=file.coverUrl controls='controls')
-            else
-              .picture(style=`background-image: url(${file.url})`)
+          else
+            .single-moment-file(data-count=fileCount data-type=fileType)
+              img(src=file.url)
 
   mixin singleMoment(momentData)
     -var {uid, toc, username, avatarUrl, userHome, time, content, voteUp, files} = momentData;

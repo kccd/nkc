@@ -81,6 +81,7 @@
   }
   .single-moment-files{
     font-size: 0;
+    @maxHeight: 30rem;
     .single-moment-file{
       display: inline-block;
       margin-right: 0.5rem;
@@ -90,15 +91,24 @@
         border-radius: 3px;
         cursor: pointer;
         width: 100%;
-        max-height: 30rem;
+        max-height: @maxHeight;
       }
-      .picture{
+      img{
         border-radius: 3px;
         cursor: pointer;
         height: 10.3rem;
         width: 10.3rem;
         background-size: cover;
         background-position: center;
+      }
+      &[data-count="1"] {
+        display: block;
+        margin: 0;
+        img{
+          height: auto;
+          max-height: @maxHeight;
+          width: 100%;
+        }
       }
     }
   }
