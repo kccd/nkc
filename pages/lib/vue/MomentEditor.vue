@@ -152,12 +152,12 @@
         display: inline-block;
         line-height: @buttonHeight;
         cursor: pointer;
-        color: #555;
+        color: #333;
         margin-right: 1rem;
         .icon{
           font-size: 1.2rem;
           margin-right: 0.3rem;
-          color: #777;
+          color: #333;
           transition: color 100ms;
           &.icon-face{
             font-size: 1.3rem;
@@ -169,7 +169,7 @@
         }
         &:hover{
           .icon, span{
-            color: #333;
+            color: #000;
           }
 
         }
