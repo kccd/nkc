@@ -142,7 +142,7 @@ router
     let review = await db.ReviewModel.findOne({docId: document._id}).sort({toc: -1}).limit(1);
     //如果不存在审核记录就创建一条记录
     if(!review) {
-      review = await ReviewModel({
+      review = await db.ReviewModel({
         _id: await db.SettingModel.operateSystemID('reviews', 1),
         type: status === 'faulty'?'returnDocument':'disabledDocument',
         reason,
@@ -203,9 +203,6 @@ router
     if(!document) ctx.throw(400, `未找到ID为${_id}的document`);
     const comment = await db.CommentModel.findOnly({_id: document.sid});
     if(!comment) ctx.throw(400, `未找到ID为${document.sid}的comment`);
-    const book = await db.BookModel.findOnly({_id: comment.sid});
-    if(!book) ctx.throw(400, `未找到ID为${comment.sid}的book`);
-    const bookPermission = await book.getBookPermissionForUser(state.uid);
     const isModerator = ctx.permission('superModerator') || bookPermission === 'admin'?true:false;
     if(!isModerator) ctx.throw(403, `您没有权限处理ID为${document._id}的document`);
     if(document.status !== 'disabled') ctx.throw(400, `ID为${document._id}的回复未被屏蔽，请刷新`);

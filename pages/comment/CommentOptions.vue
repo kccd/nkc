@@ -182,13 +182,17 @@ export default {
       this.$emit('complaint', this.comment._id);
     },
     //通过审核
-    passReview() {
-      const {docId: documentId, did} = this.comment;
-      if(!documentId || !did) return;
+    passReview(_id) {
+      let docId;
+      if(_id) {
+        docId = _id;
+      } else {
+        if(!this.comment) return;
+        docId = this.comment.docId;
+      }
       nkcAPI('/review' , 'PUT', {
         pass: true,
-        documentId,
-        did,
+        docId,
         type: 'document'
       })
         .then(res => {
