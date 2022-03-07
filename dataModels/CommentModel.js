@@ -442,21 +442,18 @@ schema.methods.updateOrder = async function () {
 
 /*
 *拓展投诉的comments
+* @para {Object} comments 需要拓展的评论
 * */
 schema.statics.extendComments = async function(comments) {
   const DocumentModel = mongoose.model('documents');
-  const BookModel = mongoose.model('books');
   const UserModel = mongoose.model('users');
   const {timeFormat, getUrl} = require('../nkcModules/tools');
   const didArr = [];
-  const bookId = [];
   const uidArr = [];
   const documentObj = {};
-  const booksObj = {};
   const userObj = {};
   for(const c of comments) {
     didArr.push(c.did);
-    bookId.push(c.sid);
     uidArr.push(c.uid);
   }
   const users = await UserModel.find({uid: {$in: uidArr}});
@@ -464,18 +461,13 @@ schema.statics.extendComments = async function(comments) {
     userObj[user.uid] = user;
   }
   const documents = await DocumentModel.find({did: {$in: didArr}, type: 'stable', status: 'normal'});
-  const books = await BookModel.find({_id: {$in: bookId}});
   for(const d of documents) {
     documentObj[d.did] = d;
-  }
-  for(const b of books) {
-    booksObj[b._id] = b;
   }
   const results = [];
   for(const c of comments) {
     const {did, sid, _id, source, toc, uid} = c;
     const document = documentObj[did];
-    const book = booksObj[sid];
     const {content, } = document;
     const result = {
       _id,
@@ -483,11 +475,10 @@ schema.statics.extendComments = async function(comments) {
       sid,
       source,
       uid,
+      url: '',
       time: timeFormat(toc),
       c: content,
-      url: `/book/${book._id}`,
       user: userObj[uid],
-      bookName: booksObj[sid].name,
     }
     results.push(result);
   }

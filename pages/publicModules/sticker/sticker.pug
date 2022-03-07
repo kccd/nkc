@@ -25,4 +25,4 @@ if !isIncluded('sticker')
             button.btn.btn-sm.btn-theme(@click="collection") 添加到表情
           .sticker-warning(v-if="sticker.shared").pre-wrap {{notesAboutUploading}}
   include ../../publicModules/moment
-  +includeJS("/publicModules/sticker/sticker.js")
+  +includeDeferJS("/publicModules/sticker/sticker.js")

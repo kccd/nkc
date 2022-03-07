@@ -34,7 +34,6 @@ $(document).ready(function(){
   })
     .then(function() {
       // 内容折叠
-      // NKC.methods.insertRenderedPost();
       // 菜单按钮
     })
     .catch(function(data) {

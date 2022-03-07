@@ -22,6 +22,7 @@
 <style lang="less" scoped>
 @import '../../../publicModules/base';
 .comment-container {
+  text-align: left;
   .single-comment-editor-container {
     padding: 1rem 0.5rem;
     background: #fff;
@@ -79,6 +80,8 @@ export default {
   components: {
     'editor': Editor,
   },
+  mounted() {
+  },
   computed: {
     editorConfigs() {
       return getPostEditorConfigs();
@@ -104,6 +107,7 @@ export default {
       nkcAPI(`/comment/${cid}/commentEditor`, 'GET', {})
       .then(res => {
         self.comment = res.comment;
+        self.commentContent = res.comment.content;
         self.type = 'modify';
       })
       .catch(err => {
@@ -129,12 +133,18 @@ export default {
         this.post(this.type);
       }
     },
+    //设置编辑器保存状态 succeeded failed saving
+    setSavedStatus(type) {
+      this.$refs[`commentEditor_${this.comment._id}`].changeSaveInfo(type);
+    },
+    //提交内容
     post(type) {
       if(!this.protocol) sweetWarning('请勾选协议！');
       if(!type) return;
       if(this.lockPost) return;
       this.lockPost = true;
       const self = this;
+      self.setSavedStatus('saving');
       return nkcAPI('/comment', 'POST', {
         content: self.commentContent,
         type,
@@ -153,9 +163,11 @@ export default {
             //提交成功后关闭评论编辑器
             self.close();
           }
+          self.setSavedStatus('succeeded');
         })
         .catch(err => {
           self.lockPost = false;
+          self.setSavedStatus('failed');
           sweetError(err);
         })
     },

@@ -1,8 +1,5 @@
 <template lang="pug">
   #modulePostOptions(:style="'top:'+position.top+'px;left:'+position.left+'px'" v-show="show" @click="")
-    violation-record(ref="violationRecord")
-    complaint(ref="complaint")
-    disabled-comment(ref="disabledComment")
     .post-options-panel(v-if='loading')
       .loading 加载中...
     .post-options-panel(v-else)
@@ -93,15 +90,7 @@
 <script>
 import {timeFormat} from "../lib/js/tools";
 import {nkcAPI} from "../lib/js/netAPI";
-import ViolationRecord from "../lib/vue/ViolationRecord";
-import DisabledComment from "../lib/vue/DisabledComment";
-import Complaint from "../lib/vue/Complaint";
 export default {
-  components: {
-    "disabled-comment": DisabledComment,
-    complaint: Complaint,
-    "violation-record": ViolationRecord
-  },
   data: () => ({
     show: false,
     loading: true,
@@ -186,14 +175,11 @@ export default {
     },
     //退修或删除
     disableComment() {
-      this.$refs.disabledComment.open(function (res){
-      }, {
-        cid: this.comment._id
-      })
+      this.$emit('disable-comment', this.comment._id);
     },
     //投诉或举报
     complaint() {
-      this.$refs.complaint.open('comment', this.comment._id);
+      this.$emit('complaint', this.comment._id);
     },
     //通过审核
     passReview() {
@@ -240,7 +226,7 @@ export default {
     },
     //违规记录
     viewViolationRecord() {
-      this.$refs.violationRecord.open({uid: this.comment.uid});
+      this.$emit('violation-record', this.comment.uid);
     },
     //用户移除黑名单 tUid 被拉黑的用户
     removeUserToBlackList(uid) {

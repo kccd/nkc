@@ -172,6 +172,7 @@ schema.statics.extendComplaints = async (complaints) => {
     } else if(type === "library"){
       r.content = libraryObj[c.contentId];
     } else if (type === 'comment') {
+      if(!commentObj[c.contentId]) continue;
       r.content = commentObj[c.contentId];
     }
     if(r.handlerId) {
