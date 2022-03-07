@@ -1188,11 +1188,7 @@ function initLeftVue(uid) {
         enableFund: false,
       },
       categoryForums: [],
-      untreated: {
-        unResolvedComplaintCount: '',
-        unResolvedProblemCount: '',
-        unReviewedCount: '',
-      },
+      management: [],
     },
     mounted() {
       this.getLeftDrawData();
@@ -1207,11 +1203,9 @@ function initLeftVue(uid) {
         const _this = this;
         nkcAPI('/draw/leftDraw', 'GET' , {})
           .then(res => {
-            _this.untreated.unResolvedComplaintCount = res.unResolvedComplaintCount;
-            _this.untreated.unResolvedProblemCount = res.unResolvedProblemCount;
-            _this.untreated.unReviewedCount = res .unReviewedCount;
             _this.categoryForums = res.categoryForums;
             _this.permission = res.permission;
+            _this.management = res.managementData;
             _this.loading = false;
           })
           .catch(err => {

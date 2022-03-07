@@ -1,33 +1,16 @@
 <template lang="pug">
-  .m-b-1(v-if="permission.nkcManagement || permission.visitExperimentalStatus || permission.review || permission.complaintGet || permission.visitProblemList || permission.getLibraryLogs")
+  .m-b-1(v-if="management.length !== 0")
     .panel-header 管理
     .module-managements
-      a.module-management(v-if="permission.nkcManagement" href="/nkc" target='_blank')
-        .fa.fa-cogs
-        span &nbsp;前台管理
-      a.module-management(v-if="permission.visitExperimentalStatus" href="/e" target='_blank')
-        .fa.fa-cogs
-          span &nbsp;后台管理
-      a.module-management(v-if="permission.review" href="/review" target='_blank')
-        .fa.fa-shield
-        span &nbsp;审核内容
-        .management-count(v-if="data.unReviewedCount") {{data.unReviewedCount}}
-      a.module-management(v-if="permission.complaintGet" href="/complaint" target='_blank')
-        .fa.fa-minus-circle
-        span &nbsp;投诉列表
-        .management-count(v-if="data.unResolvedComplaintCount") {{data.unResolvedComplaintCount}}
-      a.module-management(v-if="permission.visitProblemList" href="/problem/list" target='_blank')
-        .fa.fa-exclamation-circle
-        span &nbsp;问题列表
-        .management-count(v-if="data.unResolvedProblemCount") {{data.unResolvedProblemCount}}
-      a.module-management(v-if="permission.getLibraryLogs" href="/libraries/logs" target='_blank')
-        .fa.fa-book
-        span &nbsp;文库记录
+      a.module-management(v-for="m in management" :href="m.url" target='_blank')
+        .fa(:class="m.icon")
+        span &nbsp;{{m.name}}
+        .management-count(v-if="m.count !== 0") {{m.count}}
 </template>
 
 <script>
 export default {
-  props: ['permission', 'data'],
+  props: ['management'],
   data: () => ({
   }),
   mounted() {

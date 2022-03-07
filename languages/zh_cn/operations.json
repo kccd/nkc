@@ -836,5 +836,6 @@
   "experimentDocumentPostSettings": "后台管理 - 设置 - 内容发表",
   "bookInvitation": "处理专题创作邀请",
   "columnEditor": "访问专栏编辑器页",
-  "visitZoneArticle": "访问空间文章"
+  "visitZoneArticle": "访问空间文章",
+  "getCommentPermission": "获取评论权限"
 }

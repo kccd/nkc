@@ -317,7 +317,7 @@ messageSchema.statics.getSystemWarningInfo = async (uid, tUid) => {
 * */
 messageSchema.statics.getParametersData = async (message) => {
   const moment = require("moment");
-  const ArticlesModel = mongoose.model("articles");
+  const ArticleModel = mongoose.model("articles");
   const DocumentModel = mongoose.model("documents");
   const PostModel = mongoose.model("posts");
   const UserModel = mongoose.model("users");
@@ -369,9 +369,9 @@ messageSchema.statics.getParametersData = async (message) => {
     const document = await DocumentModel.findOne({did, type: 'stable', status: 'normal'});
     const user = await UserModel.findOne({uid: document.uid});
     if(!user) return null;
-    const article = await ArticlesModel.findOne({did});
+    const article = await ArticleModel.findOne({did});
     if(!article) return null;
-    const articles = await ArticlesModel.extendArticles([article]);
+    const articles = await ArticleModel.extendArticles([article]);
     parameters = {
       userID: document.uid,
       username: user.username,
@@ -717,26 +717,30 @@ messageSchema.statics.getParametersData = async (message) => {
     //独立文章article 和 评论comment 审核
     const {docId, reason} = message.c;
     const document = await DocumentModel.findOne({_id: docId});
+    const {comment: commentSource} = await DocumentModel.getDocumentSources();
     if(!document) return null;
     if(document.source === 'article') {
-      let article = await ArticlesModel.findOne({did: document.did}).sort({toc: -1});
-      article = await ArticlesModel.extendArticles([article]);
+      let article = await ArticleModel.findOne({did: document.did}).sort({toc: -1});
+      article = await ArticleModel.extendArticles([article]);
       parameters = {
         //获取document所在article的url
-        editLink: article[0].url,
-        reviewLink: article[0].url,
+        editLink: article[0].url || 'www.baidu.com',
+        reviewLink: article[0].url || 'www.baidu.com',
         reason: reason?reason:'未知',
-        title: document.title,
+        title: document.title + article[0].url?'':'[文章已被删除]',
       };
+      // console.log('article', article, docId, document.did);
     } else if (document.source === 'comment') {
       let comment = await CommentModel.findOne({_id: document.sid}).sort({toc: -1});
+      if(!comment) return;
+      // console.log('comment', comment, commentSource, document.sid, docId);
       comment = await CommentModel.extendReviewComments([comment]);
       parameters = {
         //获取document所在comment的url
-        reviewLink: comment[0].bookUrl,
+        reviewLink: 'www.baidu.com',
         content: htmlToPlain(document.content, 100),
         reason: reason?reason:'未知',
-        title: comment[0].bookName,
+        title: '未知',
       };
     }
 

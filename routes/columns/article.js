@@ -13,8 +13,10 @@ router.get('/:aid', async (ctx, next)=>{
   let comment = await db.CommentModel.findOne({uid: state.uid, source: articleSource, sid: articleId}).sort({toc: -1}).limit(1);
   comments = await db.CommentModel.extendPostComments({comments, uid: state.uid});
   if(comment ) {
-    comment = await comment.extendEditorComment();
-    if(comment.type === 'beta') data.comment = comment || '';
+    comment = await comment.extendEditorComment(comment);
+    if(comment.type === 'beta') {
+      data.comment = comment || '';
+    }
   }
   data.columnPost = columnPost;
   data.comments = comments || [];

@@ -35,7 +35,7 @@ router
       } else if(c.type === "library"){
         c.type_ = "文库"
       } else if(c.type === "comment"){
-        c.type_ = "图书评论"
+        c.type_ = "评论"
       }
       c.reasonType = typesObj[c.reasonTypeId];
     });

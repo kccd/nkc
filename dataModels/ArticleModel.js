@@ -245,9 +245,9 @@ schema.statics.getZoneArticle = async (id)=>{
   return {post: documentContent,  userAvatar: user.avatar ,thread: articleInfo, column:{} ,collectedCount:'' , mainCategory:[],auxiliaryCategory:[]}
 }
 /*
-* 修改为文章(/columns/article/article.pug)指定的字段 
-* param {ObJect} content 文章正文数据 
-*/ 
+* 修改为文章(/columns/article/article.pug)指定的字段
+* param {ObJect} content 文章正文数据
+*/
 schema.statics.changeKey = async (content)=>{
   let changeKeyPost = {}
     const map ={
@@ -614,6 +614,7 @@ schema.statics.extendArticles = async function(articles) {
   }
   //查找出独立文章所在的专栏
   const columnPosts = await ColumnPostModel.find({pid: {$in: columnPostArr}});
+  console.log('columnPosts', columnPosts);
   for(const columnPost of columnPosts) {
     columnPostObj[columnPost.pid] = columnPost;
   }
@@ -652,11 +653,14 @@ schema.statics.extendArticles = async function(articles) {
     let columnPost;
     if(article.source === articleSource.column) {
       columnPost = columnPostObj[article._id];
-      if(!columnPost) continue;
     }
     let url;
     if(article.source === articleSource.column) {
-      url = `/m/${columnPost.columnId}/a${article._id}`;
+      if(columnPost) {
+        url = `/m/${columnPost.columnId}/a${article._id}`;
+      } else {
+        url = '';
+      }
     } else {
       url = '';
     }

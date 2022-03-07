@@ -35,6 +35,7 @@
 <style lang="less" scoped>
 @import "../../publicModules/base";
 .module-dialog-body{
+  text-align: left;
   display: none;
   position: fixed;
   width: 50rem;

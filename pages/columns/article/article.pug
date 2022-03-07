@@ -18,19 +18,18 @@ block content
   .hidden#data=objToStr({comments: data.comments, comment: data.comment, article: data.columnPost.article})
   .container-fluid.max-width
     .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel
-      .m-b-1
-        .row
-          include ./nav
-          +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount})
-          include ./setUp
-          +setUp()
-          include ./title
-          +title({t, authorInfos, uid, userAvatar, toc, originState, name, _id})
-          include ./abstract
-          +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
-          include ./content
-          +content(c)
-    .article-common.col-xs-12.col-md-9
+      .row
+        include ./nav
+        +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount})
+        include ./setUp
+        +setUp()
+        include ./title
+        +title({t, authorInfos, uid, userAvatar, toc, originState, name, _id})
+        include ./abstract
+        +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
+        include ./content
+        +content(c)
+    .article-common.col-xs-12.col-md-9#comment-content
       include ../../publicModules/commentCenter/comment
     .col-xs-12.col-md-3.box-shadow-panel#rightDom
       //- 滚动到页头页脚
@@ -39,11 +38,14 @@ block content
   include ./authorInfo.pug
   +authorInfo()
   //- include ../../publicModules/floatForumNav
-  //include ../../publicModules/nkcSource
+  include ../../publicModules/nkcSource
 
   //- 下拉后左边显示的所属专业 上级专业 同级专业
   //- +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 block scripts
+  +includeDeferJS('/columns/article/article.js', false)
   include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
-//-  +includeJS('/columns/article/article.js')
+  //+includeJS('/thread/index.js')
+  //+includeJS('/thread/singlePost/singlePost.js')
+  //-  +includeJS('/columns/article/article.js')
 

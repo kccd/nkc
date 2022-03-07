@@ -3,10 +3,10 @@ if !isIncluded('singleCommentCenter')
   include ./singleCommentQuote
   mixin singleCommentCenter(props)
     -var {quote, title, content, aid} = props;
-    .single-comment-center
+    .single-post-center
       if quote
         +singleCommentQuote(quote)
-      .single-comment-title=title
-      .single-comment-content!=content
+      .single-post-title=title
+      .single-post-content!=content
 
 

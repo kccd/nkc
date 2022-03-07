@@ -4,9 +4,6 @@
       :source="source"
       :sid="sid"
       @editor-comment="editorComment"
-      @disabled="disabledComment"
-      @complaint="complaint"
-      @pass-review="passReview"
       @display-ip-info="displayIpInfo"
       @view-violation="viewViolation"
       )

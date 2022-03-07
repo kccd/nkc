@@ -43,3 +43,9 @@ if !isIncluded('baseMixin')
       )
   mixin includeVueApp(url, selector)
     script(src=`${url}?v=${remoteState.startTime}` data-vue-app-selector=selector)
+  mixin includeDeferJS(url, origin)
+    if origin
+      script(src=`${url}`)
+    else
+      script(defer='defer' src=`${url}?v=${remoteState.startTime}`)
+

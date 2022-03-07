@@ -4,19 +4,20 @@ if !isIncluded('singleComment')
   +includeCSS("/publicModules/commentCenter/singleComment/singleComment.css")
   +includeJS("/publicModules/commentCenter/singleComment/singleComment.js")
   mixin singleComment(props)
-    -var {user, content, _id, order, quote, isAuthor, reason, type, status, uid, toc, tlm} = props;
+    -var {user, content, _id, order, quote, isAuthor, reason, type, status, uid, toc, tlm, docId} = props;
+    .hidden(id=`comment_${_id}`)=objToStr({comment: props})
     .single-post-container(
-      data-un-reviewed=status === 'unknown'?false:true
-      data-disabled=status === 'disabled'?true:false
-      data-return=status === 'faulty'?true:false
+      data-un-reviewed=status === 'unknown'
+      data-disabled=status === 'disabled'
+      data-return=status === 'faulty'
       data-highlight=highlight === _id
       data-pid=_id
       data-hide=isAuthor? 'not': hide
       id=highlight === _id? 'highlight': undefined
       )
       include ./singleCommentTop
-      +singleCommentTop(Object.assign({}, user, {_id, isAuthor, order, reviewed: status === 'unknown'?false:true, reason, toc, tlm}))
+      +singleCommentTop(Object.assign({}, user, {_id, isAuthor, order, reviewed: status !== 'unknown', reason, toc, tlm}))
       include ./singleCommentCenter
-      +singleCommentCenter({content, aid: _id})
+      +singleCommentCenter({content, aid: _id, quote})
       include ./singleCommentBottom
-      +singleCommentBottom({cid: _id})
+      +singleCommentBottom({cid: _id, docId, props})

@@ -273,7 +273,7 @@ module.exports = {
         "title",
         "content"
       ],
-      content: "您在图书[url=reviewLink(title)]下发表的回复[text=content]已通过审核，[url=reviewLink(立即查看)]。",
+      content: "您在文章[url=reviewLink(title)]下发表的回复[text=content]已通过审核，[url=reviewLink(立即查看)]。",
       type: "commentPassReview"
     },
     {
@@ -283,7 +283,7 @@ module.exports = {
         "reason",
         "content"
       ],
-      content: "您在图书[url=reviewLink(title)]下发表的评论[text=content]由于[text=reason]等原因已被退回，目前只有您自己可以查看。请您在72小时之内修改恢复内容，消除存在的问题，并确保符合规章，点击 [url=reviewLink(这里)] 查看。逾期未修改，内容将被彻底屏蔽，不可恢复，届时不再另行通知。",
+      content: "您在文章[url=reviewLink(title)]下发表的评论[text=content]由于[text=reason]等原因已被退回，目前只有您自己可以查看。请您在72小时之内修改恢复内容，消除存在的问题，并确保符合规章，点击 [url=reviewLink(这里)] 查看。逾期未修改，内容将被彻底屏蔽，不可恢复，届时不再另行通知。",
       type: "commentFaulty"
     },
     {
@@ -292,7 +292,7 @@ module.exports = {
         "title",
         "reason",
       ],
-      content: "您在图书[url=reviewLink(title)]下发表的评论[text=content]由于[text=reason]等原因已被屏蔽，不可恢复。请您发布内容时确保符合规章，消除存在的问题，否则下次将您的内容标记违规",
+      content: "您在文章[url=reviewLink(title)]下发表的评论[text=content]由于[text=reason]等原因已被屏蔽，不可恢复。请您发布内容时确保符合规章，消除存在的问题，否则下次将您的内容标记违规",
       type: "commentDisabled"
     },
     {
