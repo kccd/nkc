@@ -1,17 +1,30 @@
 @import "../base";
 .single-moment-container{
   @avatarWidth: 4rem;
+  @avatarWidthMin: 3rem;
   position: relative;
   padding-left: @avatarWidth + 1rem;
+  padding-right: @avatarWidth;
   min-height: @avatarWidth;
+  @media(max-width: 787px) {
+    padding-right: 1rem;
+    padding-left: @avatarWidthMin + 0.5rem;
+  }
   .single-moment-left{
     position: absolute;
     top: 0;
     left: 0;
     width: @avatarWidth;
+    @media(max-width: 787px) {
+      width: @avatarWidthMin;
+    }
     .single-moment-avatar{
       height: @avatarWidth;
       width: @avatarWidth;
+      @media(max-width: 787px) {
+        height: @avatarWidthMin;
+        width: @avatarWidthMin;
+      }
       border-radius: 50%;
       overflow: hidden;
       img{
@@ -20,6 +33,7 @@
       }
     }
   }
+
   .single-moment-right{
     .single-moment-header{
       margin-bottom: 0.5rem;
@@ -82,44 +96,66 @@
   .single-moment-files{
     font-size: 0;
     @maxHeight: 30rem;
-    .single-comment-video{
-      video{
-        border-radius: 3px;
-        cursor: pointer;
-        width: 100%;
-        //max-height: @maxHeight;
-      }
-    }
-    .single-moment-picture{
-      font-size: 0;
-      border-radius: 3px;
-      overflow: hidden;
-      cursor: pointer;
-      &.inline-block{
-        display: inline-block;
-        //margin-right: 0.5rem;
-        //margin-bottom: 0.5rem;
-        //height: 10.3rem;
-        width: 33%;
-        position: relative;
-        background-color: #000;
-        img{
-          position: absolute;
-          max-height: 100%;
-          max-width: 100%;
-          display: block;
-          top: 0;
-          left: 0;
-          bottom: 0;
-          right: 0;
-          margin: auto;
+    @maxWidth: 100%;
+    @margin: 1%;
+    &[data-file-type="video"] {
+      .single-comment-video{
+        margin: 0 @margin @margin 0;
+        video{
+          border-radius: 3px;
+          cursor: pointer;
+          width: 100%;
         }
       }
-      &.block{
-        display: block;
-        img{
-          width: 100%;
-          max-height: @maxHeight;
+    }
+    &[data-file-type="picture"] {
+      width: 70%;
+      .single-moment-file {
+        font-size: 0;
+        overflow: hidden;
+        cursor: pointer;
+        display: inline-block;
+        width: (@maxWidth - 3 * @margin) / 3;
+        margin: 0 @margin @margin 0;
+        div {
+          background-size: cover;
+          background-position: center;
+          padding-top: 100%;
+          position: relative;
+          background-color: #000;
+          img {
+            position: absolute;
+            min-height: 100%;
+            min-width: 100%;
+            display: block;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            filter: alpha(opacity=0);
+            z-index: 10;
+          }
+        }
+      }
+      &[data-file-count="1"] {
+        .single-moment-file {
+          width: @maxWidth - @margin;
+          div {
+            padding: 0;
+            display: block;
+            width: 100%;
+
+            img {
+              position: relative;
+              max-width: 100%;
+            }
+          }
+        }
+
+      }
+
+      &[data-file-count="2"], &[data-file-count="4"] {
+        .single-moment-file {
+          width: (@maxWidth - 2 * @margin) / 2;
         }
       }
     }

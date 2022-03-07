@@ -12,14 +12,24 @@ if !isIncluded('publicModules/moment/moment.pug')
     if files && files.length > 0
       -var fileType = files[0].type;
       -var fileCount = files.length;
-      .single-moment-files
+      .single-moment-files(
+        data-file-type=fileType
+        data-file-count=fileCount
+        )
         for file in files
-          if fileType === 'video'
-            .single-comment-video
+          .single-moment-file
+            if fileType === 'video'
               +singleVideo(file)
-          else
-            .single-moment-picture(class=files.length === 1? 'block': 'inline-block' )
-              img(data-src=file.url data-tag='nkcsource' data-type='picture' class="lazyload")
+            else
+              div(style=`background-image: url(${file.url})`)
+                img(
+                  data-src=file.url
+                  data-tag='nkcsource'
+                  data-type='picture'
+                  class="lazyload"
+                  alt=file.filename
+                  title=file.filename
+                  )
 
   mixin singleMoment(momentData)
     -var {uid, toc, username, avatarUrl, userHome, time, content, voteUp, files} = momentData;
