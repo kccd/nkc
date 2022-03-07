@@ -34,12 +34,14 @@ $(document).ready(function(){
   })
     .then(function() {
       // 内容折叠
-      // 菜单按钮
+      NKC.methods.autoHideCommentContent();
     })
     .catch(function(data) {
       console.error(data);
     });
 })
+
+
 // function displayAuthor(contractStr) {
 //   var contract = NKC.methods.strToObj(contractStr);
 //   author.app.contract = contract;
