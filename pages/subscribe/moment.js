@@ -6,7 +6,7 @@ const momentForm = new Vue({
   },
   methods: {
     onPublished() {
-      window.location.reload();
+      window.location.href = location.pathname;
     }
   }
 })

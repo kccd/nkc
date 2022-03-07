@@ -1,0 +1,49 @@
+if !isIncluded('publicModules/mediaPreview/picture.pug')
+  +includeCSS('publicModules/mediaPreview/mediaPreview.css')
+  mixin singlePicture(props)
+    -var {url, height, width, filename, disabled} = props
+    if disabled
+      span.single-picture.single-picture-disabled 图片已被屏蔽
+    else
+      if !width || !height
+        span.single-picture
+          img(data-src=url alt=filename data-type="view")
+      else
+        span.single-picture
+          span(style=`padding-top: ${(height * 100) / width}%`)
+            img(data-src=url alt=filename data-type="view" class="lazyload")
+  mixin singleVideo(props)
+    -var {rid, sources, url, filename, disabled, lost} = props
+    -var {coverUrl} = props;
+    if disabled
+      span(
+        data-tag="nkcsource"
+        data-type="video-not-found"
+        data-id=rid
+        )
+        span 视频已被屏蔽
+    else if lost
+      span(
+        data-tag="nkcsource"
+        data-type="video-not-found"
+        data-id=rid
+      )
+        span 视频已丢失
+    else
+      span(
+        data-tag="nkcsource"
+        data-type="video"
+        data-id=rid
+        data-visitor-access=visitorAccess
+        )
+        span
+          video(
+            class="plyr-dom"
+            preload="none"
+            controls="controls"
+            poster=coverUrl
+            data-rid=rid
+            data-plyr-title=filename
+            )
+            for source in sources
+              source(src=source.url type="video/mp4" size=source.height data-size=source.dataSize)

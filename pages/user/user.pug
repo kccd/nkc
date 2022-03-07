@@ -162,7 +162,14 @@ block content
                 a.pointer.button(onclick="selectAll()") 全选
                 a.pointer.button.radius-right(onclick="toColumn()") 推送到专栏
           include ../publicModules/paging/paging
-          if data.t === "thread" || data.t === "post" || !data.t
+          if !data.t
+            if !data.momentsData || data.momentsData.length === 0
+              .user-list-warning 空空如也~
+            else
+              .p-t-1
+                include ../publicModules/moment/singleMoment
+                +momentList(data.momentsData)
+          else if ['thread', 'post'].includes(data.t)
             if data.posts.length === 0
               .user-list-warning 用户貌似未发表过任何内容~
             else
@@ -232,6 +239,8 @@ block content
             include ./side_user_list
 
 block scripts
+  if !data.t
+    include ../publicModules/moment/momentSource
   include ../publicModules/toTop/toTop
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatForumPanel/floatForumPanel

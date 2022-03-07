@@ -4,6 +4,9 @@ router
   .use('/', async (ctx, next) => {
     const {data, db, path, internalData} = ctx;
     data.type = path.replace('/g/', '');
+    data.navbar = {
+      highlight: 'subscribe'
+    };
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,

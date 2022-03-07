@@ -81,7 +81,7 @@ userRouter
     const {pageSettings} = state;
     const {user} = data;
 
-    data.complaintTypes = ctx.state.language.complaintTypes;
+    // data.complaintTypes = ctx.state.language.complaintTypes;
 
     const {t, page=0, from} = query;
     data.t = t;
@@ -240,7 +240,16 @@ userRouter
 
     const superModerator = ctx.permission("superModerator");
     if(!t) {
-
+      // 加载用户的动态
+      const match = {
+        uid: targetUser.uid,
+        status: (await db.MomentModel.getMomentStatus()).normal,
+        parent: ''
+      };
+      const count = await db.MomentModel.countDocuments(match);
+      paging = nkcModules.apiFunction.paging(page, count);
+      const moments = await db.MomentModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+      data.momentsData = await db.MomentModel.extendMomentsData(moments);
     } else if(t === 'post') {
       if(Number(page) === 0) {
         data.userPostSummary = await db.UserModel.getUserPostSummary(targetUser.uid);

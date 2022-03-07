@@ -368,6 +368,7 @@ schema.statics.createQuoteMomentToPublish = async (uid, quoteType, quoteId) => {
 * 拓展动态信息
 * */
 schema.statics.extendMomentsData = async (moments) => {
+  const videoSize = require('../settings/video');
   const UserModel = mongoose.model('users');
   const ResourceModel = mongoose.model('resources');
   const DocumentModel = mongoose.model('documents');
@@ -426,18 +427,55 @@ schema.statics.extendMomentsData = async (moments) => {
     for(const rid of files) {
       const resource = resourcesObj[rid];
       if(!resource) continue;
-      const {mediaType} = resource;
-      let coverUrl = '';
-      let type = 'picture';
-      if(mediaType === 'mediaVideo') {
-        coverUrl = getUrl('resource', rid, 'cover');
-        type = 'video';
+      await resource.setFileExist();
+      const {
+        mediaType,
+        defaultFile,
+        disabled,
+        isFileExist,
+        visitorAccess
+      } = resource;
+      let fileData;
+
+      if(mediaType === 'mediaPicture') {
+        const {
+          height,
+          width,
+          name: filename
+        } = defaultFile;
+        fileData = {
+          type: 'picture',
+          url: getUrl('resource', rid),
+          height,
+          width,
+          filename,
+          disabled,
+          lost: !isFileExist,
+        };
+      } else {
+        const {name: filename} = defaultFile;
+        const sources = [];
+        for(const {size, dataSize} of resource.videoSize) {
+          const {height} = videoSize[size];
+          const url = getUrl('resource', rid, size) + '&w=' + resource.token;
+          sources.push({
+            url,
+            height,
+            dataSize,
+          });
+        }
+        fileData = {
+          type: 'video',
+          coverUrl: getUrl('resource', rid, 'cover'),
+          visitorAccess,
+          sources,
+          filename,
+          disabled,
+          lost: !isFileExist,
+        };
       }
-      filesData.push({
-        type,
-        url: getUrl('resource', rid),
-        coverUrl
-      });
+
+      filesData.push(fileData);
     }
     results.push({
       uid,

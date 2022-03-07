@@ -1,5 +1,6 @@
 if !isIncluded('publicModules/moment/moment.pug')
   +includeCSS('/publicModules/moment/moment.css')
+  include ../../publicModules/mediaPreview/mediaPreview
 
   mixin momentList(momentsData)
     .moments-container
@@ -14,11 +15,11 @@ if !isIncluded('publicModules/moment/moment.pug')
       .single-moment-files
         for file in files
           if fileType === 'video'
-            .single-moment-file(data-count=fileCount data-type=fileType)
-              video(src=file.url poster=file.coverUrl controls='controls')
+            .single-comment-video
+              +singleVideo(file)
           else
-            .single-moment-file(data-count=fileCount data-type=fileType)
-              img(src=file.url)
+            .single-moment-picture(class=files.length === 1? 'block': 'inline-block')
+              img(data-src=file.url data-tag='nkcsource' data-type='picture' class="lazyload")
 
   mixin singleMoment(momentData)
     -var {uid, toc, username, avatarUrl, userHome, time, content, voteUp, files} = momentData;

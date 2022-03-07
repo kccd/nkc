@@ -82,32 +82,40 @@
   .single-moment-files{
     font-size: 0;
     @maxHeight: 30rem;
-    .single-moment-file{
-      display: inline-block;
-      margin-right: 0.5rem;
-      margin-bottom: 0.5rem;
-      font-size: 0;
+    .single-comment-video{
       video{
         border-radius: 3px;
         cursor: pointer;
         width: 100%;
         max-height: @maxHeight;
       }
-      img{
-        border-radius: 3px;
-        cursor: pointer;
+    }
+    .single-moment-picture{
+      font-size: 0;
+      border-radius: 3px;
+      overflow: hidden;
+      cursor: pointer;
+      &.inline-block{
+        display: inline-block;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
         height: 10.3rem;
         width: 10.3rem;
-        background-size: cover;
-        background-position: center;
-      }
-      &[data-count="1"] {
-        display: block;
-        margin: 0;
+        position: relative;
         img{
-          height: auto;
-          max-height: @maxHeight;
+          position: absolute;
+          min-width: 100%;
+          min-height: 100%;
+          display: block;
+          top: 0;
+          left: 0;
+        }
+      }
+      &.block{
+        display: block;
+        img{
           width: 100%;
+          max-height: @maxHeight;
         }
       }
     }
