@@ -2,7 +2,7 @@ if !isIncluded('singleComment')
   include ./singleCommentQuote
   include ./singleCommentContainer
   +includeCSS("/publicModules/commentCenter/singleComment/singleComment.css")
-  +includeJS("/publicModules/commentCenter/singleComment/singleComment.js")
+  +includeDeferJS("/publicModules/commentCenter/singleComment/singleComment.js")
   mixin singleComment(props)
     -var {user, content, _id, order, quote, isAuthor, reason, type, status, uid, toc, tlm, docId} = props;
     .hidden(id=`comment_${_id}`)=objToStr({comment: props})
@@ -15,6 +15,8 @@ if !isIncluded('singleComment')
       data-hide='true'
       id=highlight === _id? 'highlight': undefined
       )
+      include ./singleCommentWarningInfo
+      +singleCommentWarningInfo({status, docId, cid: _id, reason})
       include ./singleCommentTop
       +singleCommentTop(Object.assign({}, user, {_id, isAuthor, order, reviewed: status !== 'unknown', reason, toc, tlm}))
       include ./singleCommentCenter

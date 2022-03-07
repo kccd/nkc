@@ -157,7 +157,7 @@ router
   })
   .put("/", async (ctx, next) => {
     const {data, db, body} = ctx;
-    let {pid, type: reviewType, did, documentId, pass, reason, remindUser, violation, delType} = body;//remindUser 是否通知用户 violation 是否标记违规 delType 退修或禁用
+    let {pid, type: reviewType, docId, pass, reason, remindUser, violation, delType} = body;//remindUser 是否通知用户 violation 是否标记违规 delType 退修或禁用
     if(!reviewType) {
       if(pid) {
         reviewType = 'post';
@@ -212,8 +212,8 @@ router
         }
       });
     } else {
-      const document = await db.DocumentModel.findOne({_id: documentId});
-      if(!document) ctx.throw(404, `未找到_ID未 ${documentId}的文档`);
+      const document = await db.DocumentModel.findOne({_id: docId});
+      if(!document) ctx.throw(404, `未找到_ID为 ${docId}的文档`);
       if(document.reviewed) ctx.throw(400, '内容已经审核, 请刷新后重试');
       const targetUser = await db.UserModel.findOne({uid: document.uid});
       if(pass) {

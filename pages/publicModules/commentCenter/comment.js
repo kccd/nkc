@@ -23,12 +23,13 @@ const commentEditor = new Vue({
   }
 })
 
-
 import CommentOptions from "../../comment/CommentOptions";
 import DisabledComment from "../../lib/vue/DisabledComment";
 import Complaint from "../../lib/vue/Complaint";
 import ViolationRecord from "../../lib/vue/ViolationRecord";
 import CommentPostEditor from "../../lib/vue/comment/CommentPostEditor";
+import {nkcAPI} from "../../lib/js/netAPI";
+import {screenTopAlert} from "../../lib/js/topAlert";
 const singleBottomDom = $('.single-post-bottom');
 const singleCommentBottom = {};
 for(let i = 0;i < singleBottomDom.length;i++) {
@@ -97,7 +98,25 @@ for(let i = 0;i < singleBottomDom.length;i++) {
       switchPostBackground(cid, show) {
         const dom = $(`.single-post-container[data-cid="${cid}"]`);
         dom.attr('data-show-comments', show);
+      },
+      //通过审核
+      passReview(docId) {
+        this.$refs.commentOptions.passReview(docId);
+      },
+      //评论解封
+      unblock(docId) {
+        if(!docId) return;
+        nkcAPI(`/comment/${docId}/unblock`, 'POST', {
+          docsId: [docId]
+        })
+          .then(res => {
+            screenTopAlert(docId +' 已解除屏蔽')
+          })
+          .catch(err => {
+            sweetError(err);
+          })
       }
+      
     }
   });
 }

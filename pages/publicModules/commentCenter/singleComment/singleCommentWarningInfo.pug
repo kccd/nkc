@@ -1,0 +1,26 @@
+if !isIncluded('singlePostWarningInfo')
+  mixin singleCommentWarningInfo(props)
+    -var {status, docId, cid, reason} = props;
+    if status === 'faulty'
+      .single-post-header
+        .reture 当前内容已被退回修改，请作者点击编辑按钮修改
+        span=`原因：${reason}`
+    else if status === 'disabled'
+      .single-post-header
+        .disabled
+          span.m-r-05 内容已被屏蔽
+          if permission('unblockPosts')
+            a(onclick=`window.singleCommentBottom['${cid}'].unblock('${docId}')`) 点击解封
+    else if status === 'unknown'
+      .single-post-header
+        .review 内容待审核
+        if permission('review')
+          if reason
+            span= "送审原因：" + reason
+          div
+            | 通过请点击
+            button.btn.btn-xs.btn-default(onclick=`window.singleCommentBottom['${cid}'].passReview('${docId}')`) 通过
+            | &nbsp;  按钮，不通过请点击
+            button.btn.btn-xs.btn-default(onclick=`window.singleCommentBottom['${cid}'].disableComment('${cid}')`) 退修或删除
+            | 按钮。
+            a(href=`/review` target="_blank") 待审核列表
