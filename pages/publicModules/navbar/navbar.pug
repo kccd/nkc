@@ -38,7 +38,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           a(href='/?t=latest') 最新
         li(class=navbar_highlight === 'subscribe' ? 'active' : '')
           if remoteState.uid
-            a(href='/?t=subscribe&d=user') 关注
+            a(href='/g/moment') 关注
           else
             a.pointer(onclick='NKC.methods.toLogin()') 关注
         li(class=navbar_highlight === 'columns' ? 'active' : '')
@@ -95,7 +95,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             a(href='/?t=latest') 最新
           .col-xs-3
             if remoteState.uid
-              a(href='/?t=subscribe') 关注
+              a(href='/g/moment') 关注
             else
               a(onclick="Login.open()") 关注
           .col-xs-3

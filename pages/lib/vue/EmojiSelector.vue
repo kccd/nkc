@@ -4,6 +4,13 @@
       .emoji-title 表情选择
       .emoji-close(@click="close")
         .fa.fa-remove
+    .emoji-form
+      .checkbox
+        label.m-r-1
+          input(type="checkbox" v-model="multipleSelection")
+          span 多选模式
+        span.text-success(v-if="selected") 已选择
+
     .emoji-container
       .emoji-item(v-for="(url, index) in emojiUrl" @click="selectEmoji(index)")
         img(:src="url")
@@ -19,6 +26,13 @@
     background-color: #fff;
     box-shadow: 0 0 5px rgba(0,0,0,0.2);
     border: 1px solid #c7c7c7;
+    .emoji-form{
+      padding: 0 1rem;
+      .checkbox{
+        margin-bottom: 0;
+        margin-top: 0.5rem;
+      }
+    }
     .emoji-container{
       padding: 1rem;
       .emoji-item{
@@ -27,6 +41,10 @@
         height: 2rem;
         width: 2rem;
         cursor: pointer;
+        border: 1px solid #fff;
+        &:hover{
+          border-color: #aaa;
+        }
         img{
           height: 100%;
           width: 100%;
@@ -66,12 +84,26 @@
   import {sweetError} from "../js/sweetAlert";
   import {getUrl} from "../js/tools";
   import {DraggableElement} from "../js/draggable";
+  import {localStorageKeys, getFromLocalStorage, saveToLocalStorage} from "../js/localStorage";
+
+  const emojiSelectorKey = localStorageKeys.emojiSelector;
+  const {
+    multipleSelection = true
+  } = getFromLocalStorage(emojiSelectorKey);
 
   export default {
     data: () => ({
       callback: null,
-      emoji: []
+      emoji: [],
+      multipleSelection,
+      selected: false,
+      statusTimeout: null,
     }),
+    watch: {
+      multipleSelection() {
+        saveToLocalStorage(emojiSelectorKey, {multipleSelection: !!this.multipleSelection});
+      }
+    },
     mounted() {
       this.initDraggableElement();
     },
@@ -119,6 +151,23 @@
           code: emoji[index],
           url: emojiUrl[index]
         });
+        if(!this.multipleSelection){
+          this.close();
+        } else {
+          this.setStatus()
+        }
+      },
+      setStatus() {
+        const self = this;
+        self.selected = false;
+        setTimeout(() => {
+          clearTimeout(self.statusTimeout);
+          self.selected = true;
+          self.statusTimeout = setTimeout(() => {
+            self.selected = false;
+          }, 1500);
+        }, 100)
+
       }
     }
   }

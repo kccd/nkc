@@ -1,3 +1,7 @@
+export const localStorageKeys = {
+  emojiSelectorMultipleSelection: 'emojiSelectorMultipleSelection'
+};
+
 /*
 * 从本地存储中读取数据
 * @param {String} name 键名
