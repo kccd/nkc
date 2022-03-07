@@ -18,7 +18,7 @@ if !isIncluded('publicModules/moment/moment.pug')
             .single-comment-video
               +singleVideo(file)
           else
-            .single-moment-picture(class=files.length === 1? 'block': 'inline-block')
+            .single-moment-picture(class=files.length === 1? 'block': 'inline-block' )
               img(data-src=file.url data-tag='nkcsource' data-type='picture' class="lazyload")
 
   mixin singleMoment(momentData)
