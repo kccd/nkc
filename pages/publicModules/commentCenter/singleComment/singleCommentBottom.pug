@@ -14,8 +14,8 @@ if !isIncluded('singlePostBottom')
         @violation-record="violationRecord"
         @editor-comment="editorComment"
       )
-      //- .single-post-bottom-item.hidden.switch-hidden-status
-        .switch-hidden-status-button(onclick=`NKC.methods.switchPostContent('${cid}')`)
+      .single-post-bottom-item.hidden.switch-hidden-status
+        .switch-hidden-status-button(onclick=`NKC.methods.switchCommentContent('${cid}')`)
       .single-post-bottom-item(onclick=`window.commentEditor.quoteComment('${docId}')`)
         .fa.fa-comment-o.reply-icon
         span 引用
@@ -42,7 +42,7 @@ if !isIncluded('singlePostBottom')
       comment-post-editor(:ref=`"editorContainer"` cid=cid @close-editor="closePostCommentEditor")
 
 
-    //.single-post-comment(data-type='singlePostComment' data-cid=cid).nkc-hidden
+    //-.single-post-comment(data-type='singlePostComment' data-cid=cid).nkc-hidden
       .post-comments-div(id=`post_comments_${cid}`)
         .text-center 加载评论中，请稍候...
       .post-comment-warning.text-danger

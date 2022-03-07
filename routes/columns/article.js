@@ -18,6 +18,8 @@ router.get('/:aid', async (ctx, next)=>{
       data.comment = comment || '';
     }
   }
+  const hidePostSettings = await db.SettingModel.getSettings("hidePost");
+  data.postHeight = hidePostSettings.postHeight;
   data.columnPost = columnPost;
   data.comments = comments || [];
   await next();

@@ -13,6 +13,9 @@ block title
   -var {hits, count, oc} = thread
   -var {authorInfos, uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c} = post
   title=t
+  //- 与post隐藏相关的设置
+  include ../../thread/hidePostContentSettings
+    +hidePostContentSettings(data.postHeight)
   +includeCSS('/columns/article/article.css')
 block content
   .hidden#data=objToStr({comments: data.comments, comment: data.comment, article: data.columnPost.article})
@@ -45,7 +48,4 @@ block content
 block scripts
   +includeDeferJS('/columns/article/article.js', false)
   include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
-  //+includeJS('/thread/index.js')
-  //+includeJS('/thread/singlePost/singlePost.js')
-  //-  +includeJS('/columns/article/article.js')
 

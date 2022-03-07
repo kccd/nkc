@@ -58,7 +58,7 @@ for(let i = 0;i < singleBottomDom.length;i++) {
         if(init === 'true') return;
         this.$refs.commentOptions.open({DOM: target, comment: data.comment, direction});
         //阻止事件冒泡到父级
-        // e.stopPropagation();
+        event.stopPropagation();
       },
       //查看违规记录
       violationRecord(uid) {
@@ -95,34 +95,12 @@ for(let i = 0;i < singleBottomDom.length;i++) {
       },
       //评论背景开关
       switchPostBackground(cid, show) {
-        const dom = $(`.comment-item[data-cid="${cid}"]`);
+        const dom = $(`.single-post-container[data-cid="${cid}"]`);
         dom.attr('data-show-comments', show);
       }
     }
   });
 }
 
-
-// const postEditor = new Vue({
-//   el: "#commentPostEditor",
-//   data: {
-//
-//   },
-//   components: {
-//     "comment-post-editor": CommentPostEditor
-//   },
-//   methods: {
-//     //评论编辑器开关
-//     switchCommentEditor(cid) {
-//       this.$refs[`editorContainer_${cid}`].open(cid);
-//       window.singleCommentBottom.switchPostBackground(cid, 'true');
-//     },
-//     //关闭评论编辑器
-//     closePostCommentEditor(cid) {
-//       window.singleCommentBottom.closeCommentEditor(cid);
-//     }
-//   }
-// });
-// window.commentPostEditor = postEditor;
 window.commentEditor = commentEditor;
 window.singleCommentBottom = singleCommentBottom;
