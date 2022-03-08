@@ -1,6 +1,6 @@
 <template lang="pug">
   .moment-commments 动态评论列表 MomentId: {{mid}}
-    textarea-editor(:placeholder="placeholder" )
+    moment-comment-editor
 </template>
 
 <style lang="less" scoped>
@@ -8,15 +8,14 @@
 </style>
 
 <script>
-  import TextareaEditor from './TextareaEditor'
+  import MomentCommentEditor from './MomentCommentEditor'
   export default {
     props: ['mid'],
     components: {
-      'textarea-editor': TextareaEditor,
+      'moment-comment-editor': MomentCommentEditor,
     },
     data: () => ({
       moments: [],
-      placeholder: '发表你的评论',
     }),
     computed: {
       momentId() {
