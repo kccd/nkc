@@ -1,7 +1,8 @@
 const router = require('koa-router')();
 router.get('/:aid', async (ctx, next)=>{
-  const {db, data, nkcModules, params, query, state} = ctx;
+  const {db, data, nkcModules, params, query, state, permission} = ctx;
   const {pageSettings} = state;
+  const {user} = data;
   const {page = 0, last_page, highlight, t} = query;
   ctx.template = 'columns/article/article.pug';
   const {_id, aid} = params;
@@ -10,15 +11,31 @@ router.get('/:aid', async (ctx, next)=>{
   const {article: articleSource} = await db.CommentModel.getCommentSources();
   let {_id: articleId} = columnPost.article.articleInfo;
   const _article = await db.ArticleModel.findOnly({_id: articleId});
+  const isModerator = await _article.isModerator(state.uid);
   let match = {
     sid: articleId,
     source: articleSource
   };
   //只看作者
-  if(t == 'author') {
+  if(t === 'author') {
     data.t = t;
     match.uid = _article.uid;
   }
+  const permissions = {
+  
+  };
+  if(user) {
+    if(permission('review')) {
+      permissions.reviewed = true;
+    }
+    //禁用和退修权限
+    if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {
+      permissions.disabled = true
+    }
+  }
+  // if(!isModerator || !permission("review")) {
+  //   match.
+  // }
   const count = await db.CommentModel.countDocuments(match);
   const paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
   data.paging = paging;
@@ -27,7 +44,7 @@ router.get('/:aid', async (ctx, next)=>{
     .skip(paging.start)
     .limit(paging.perpage);
   let comment = await db.CommentModel.findOne({uid: state.uid, source: articleSource, sid: articleId}).sort({toc: -1}).limit(1);
-  comments = await db.CommentModel.extendPostComments({comments, uid: state.uid});
+  comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions});
   if(comment ) {
     comment = await comment.extendEditorComment(comment);
     if(comment.type === 'beta') {
@@ -35,7 +52,7 @@ router.get('/:aid', async (ctx, next)=>{
     }
   }
   const hidePostSettings = await db.SettingModel.getSettings("hidePost");
-  const isModerator = await _article.isModerator(state.uid);
+  data.permissions = permissions;
   data.isModerator =  isModerator;
   data.postHeight = hidePostSettings.postHeight;
   data.columnPost = columnPost;

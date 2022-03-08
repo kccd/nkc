@@ -205,7 +205,7 @@ schema.methods.modifyComment = async function (props) {
 * */
 schema.statics.extendPostComments = async (props) => {
   const ReviewModel = mongoose.model('reviews');
-  const {comments, uid} = props;
+  const {comments, uid, isModerator = '', permissions = {}} = props;
   const DocumentModel = mongoose.model('documents');
   const UserModel = mongoose.model('users');
   const {htmlToPlain} = require("../nkcModules/nkcRender");
@@ -227,12 +227,13 @@ schema.statics.extendPostComments = async (props) => {
   }
   const {comment: commentSource} = await DocumentModel.getDocumentSources();
   const {stable: stableType} = await DocumentModel.getDocumentTypes();
+  const {normal: normalStatus} = await DocumentModel.getDocumentStatus();
   const documents = await DocumentModel.find({did: {$in: didArr}, source: commentSource, type: stableType});
   for(const d of documents) {
     //用户是否具有审核权限
-    // if(!permissions.reviewed) {
-    //   if((d.status !== 'normal' || d.type !== 'stable') && d.uid !== uid) continue;
-    // }
+    if(!permissions.reviewed) {
+      if((d.status !== normalStatus || d.type !== stableType) && !isModerator) continue;
+    }
     let review;
     if(d.status === 'faulty' || d.status === 'unknown') {
       review = await ReviewModel.findOne({docId: d._id}).sort({toc: -1}).limit(1);
