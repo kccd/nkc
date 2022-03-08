@@ -15,11 +15,11 @@ if !isIncluded('comment')
   .p-l-2.p-r-2.m-b--05
     include ../../publicModules/paging/paging
     +articleNav
-    if disableComment
+    if disableComment && data.comments.length !== 0
       //- 回复批量管理
       +manageComments
   .comment-container
-    if data.comments &&  data.comments.length !== 0
+    if data.comments && data.comments.length !== 0
       .comment-list.m-t-1
         include ./singleComment/singleComment
         for comment in data.comments
@@ -27,7 +27,7 @@ if !isIncluded('comment')
   .p-l-2.p-r-2.m-b--05
     include ../../publicModules/paging/paging
     +articleNav
-    if disableComment
+    if disableComment && data.comments.length !== 0
       //- 回复批量管理
       +manageComments
   #commentEditor.m-t-1(v-cloak)
