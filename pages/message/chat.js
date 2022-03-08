@@ -94,8 +94,7 @@ const messageApp = new Vue({
     this.initContainer();
     this.initAudio();
     const app = this;
-    socket.on('updateNewMessageCount', (data) => {
-      console.log('count-chat', data)
+    socket.on('newMessageCountAndRedEnvelopeStatus', (data) => {
       const {redEnvelopeStatus , newMessageCount} = data;
       if(redEnvelopeStatus){
         this.showLottery = true
