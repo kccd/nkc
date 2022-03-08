@@ -480,6 +480,7 @@ schema.statics.extendMomentsData = async (moments) => {
       filesData.push(fileData);
     }
     results.push({
+      momentId: _id,
       uid,
       username,
       avatarUrl: getUrl('userAvatar', avatar),
