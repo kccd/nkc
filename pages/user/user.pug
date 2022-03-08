@@ -167,7 +167,7 @@ block content
               .user-list-warning 空空如也~
             else
               .p-t-1
-                include ../publicModules/moment/singleMoment
+                include ../publicModules/moment/moment
                 +momentList(data.momentsData)
           else if ['thread', 'post'].includes(data.t)
             if data.posts.length === 0

@@ -2,7 +2,7 @@ extends ./subscribe
 block sTitle
   title=`最新动态 - ${remoteState.serverSettings.websiteName}`
 block sContent
-  include ../publicModules/moment/singleMoment
+  include ../publicModules/moment/moment
   div
     .m-b-1
       #momentForm(v-cloak)
