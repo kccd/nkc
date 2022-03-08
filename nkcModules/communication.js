@@ -60,7 +60,7 @@ function getCommunicationClient() {
       const newMessageCount = newSystemInfoCount + newApplicationsCount + newReminderCount + newUsersMessagesCount;
       const friendsUid = await MessageModel.getUsersFriendsUid(user.uid);
 
-      let {lotterySettings: {status, close}} = await UsersGenerals.findOne({uid: user.uid})
+      let {lotterySettings: {status, close}} = await UsersGenerals.findOne({uid: user.uid}, {lotterySettings: 1})
       const redEnvelopeSettings = await SettingModel.getSettings('redEnvelope');
       let redEnvelopeStatus = false;
       if (status && close && !redEnvelopeSettings.random.close) {
