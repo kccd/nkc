@@ -121,5 +121,75 @@ for(let i = 0;i < singleBottomDom.length;i++) {
   });
 }
 
+function getPostsDom() {
+  return $(".single-post-checkbox input[type='checkbox']");
+}
+
+//重置选中评论
+function resetCheckbox() {
+  getPostsDom().prop("checked", false);
+}
+
+//评论管理开关
+function manageComments() {
+  resetCheckbox();
+  const comments = getPostsDom();
+  if(comments.eq(0).css("display") === "none") {
+    comments.css("display", "inline-block")
+  } else {
+    comments.css("display", "none");
+  }
+}
+
+//获取选中的评论id
+function getMarkedCommentId() {
+  const commentsId = [];
+  const comments = getPostsDom();
+  for(var i = 0;i < comments.length;i ++) {
+    const comment = comments.eq(i);
+    if(comment.prop("checked")) {
+      commentsId.push(comment.attr("data-docId"));
+    }
+  }
+  return commentsId;
+}
+
+//全选
+function markAllComments() {
+  const comments = getPostsDom();
+  if(comments.eq(0).css("display") !== "inline-block") return;
+  var length = comments.length;
+  var count = 0;
+  for(var i = 0; i < length; i++) {
+    var p = comments.eq(i);
+    if(p.prop("checked")) count ++;
+  }
+  if(length === count) {
+    comments.prop("checked", false);
+  } else {
+    comments.prop("checked", true);
+  }
+}
+
+//退修或禁用
+function disabledMarkedComment() {
+  const commentsId = getMarkedCommentId();
+  disabledArticleComment(commentsId);
+}
+
+function disabledArticleComment(commentsId) {
+  NKC.methods.disabledComments(commentsId);
+}
+
 window.commentEditor = commentEditor;
 window.singleCommentBottom = singleCommentBottom;
+
+Object.assign(window, {
+  getPostsDom,
+  resetCheckbox,
+  manageComments,
+  getMarkedCommentId,
+  markAllComments,
+  disabledArticleComment,
+  disabledMarkedComment,
+});

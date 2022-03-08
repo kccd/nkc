@@ -429,7 +429,7 @@ NKC.methods.doExchange = function(arr) {
 };
 
 /*
-* 批量 屏蔽或退修 回复或文章
+* 批量 屏蔽或退修 post回复或文章
 * @param {String/Array} pid postId或postId组成的数组
 * */
 NKC.methods.disabledPosts = function(pid) {
@@ -464,6 +464,56 @@ NKC.methods.disabledPosts = function(pid) {
         sweetError(data);
         DisabledPost.unlock();
       })
+  });
+};
+
+/*
+* 批量 屏蔽或退修 article回复或文章
+* @param {String/Array} commentsId commentId或commentId组成的数组
+* */
+NKC.methods.disabledComments = function(id) {
+  let comments = id;
+  if(typeof id === "string"){
+    comments = [id];
+  }
+  if(!id || !comments.length) return;
+  if(!window.DisabledPost) {
+    window.DisabledPost = new NKC.modules.DisabledPost();
+  }
+  let commentArr = [];
+  window.DisabledPost.open(function(data) {
+    for(let i = 0; i < comments.length; i ++) {
+      const docId = comments[i];
+      commentArr.push({
+        delType: data.type === 'toDraft'?'faulty':'disabled',
+        docId,
+        type: 'document',
+        reason: data.reason,
+        remindUser: data.remindUser,
+        violation: data.violation
+      });
+    }
+    submit(commentArr, 0)
+      .then(() => {
+        DisabledPost.close();
+        DisabledPost.unlock();
+      })
+      .catch(() => {
+        DisabledPost.unlock();
+      });
+    function submit(arr, index) {
+      let d = arr[index];
+      if(!d) return;
+      return nkcAPI('/review', "PUT", d)
+        .then(function() {
+          screenTopAlert("操作成功");
+          submit(commentArr, index + 1);
+        })
+        .catch(function(data) {
+          sweetError(data);
+          submit(commentArr, index + 1);
+        })
+    }
   });
 };
 

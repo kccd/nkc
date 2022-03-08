@@ -18,7 +18,7 @@ block title
     +hidePostContentSettings(data.postHeight)
   +includeCSS('/columns/article/article.css')
 block content
-  .hidden#data=objToStr({comments: data.comments, comment: data.comment, article: data.columnPost.article})
+  .hidden#data=objToStr({comments: data.comments, comment: data.comment, article: data.columnPost.article.articleInfo})
   .container-fluid.max-width
     .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel
       .row
@@ -32,7 +32,7 @@ block content
         +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
         include ./content
         +content(c)
-    .article-common.col-xs-12.col-md-9#comment-content
+    .article-common.col-xs-12.col-md-9.box-shadow-panel#comment-content
       include ../../publicModules/commentCenter/comment
     .col-xs-12.col-md-3.box-shadow-panel#rightDom
       //- 滚动到页头页脚
@@ -48,4 +48,5 @@ block content
 block scripts
   +includeDeferJS('/columns/article/article.js', false)
   include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../../publicModules/disabledPost/disabledPost
 

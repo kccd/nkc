@@ -1,11 +1,35 @@
 if !isIncluded('comment')
   +includeCSS('/publicModules/commentCenter/comment.css')
+  -var disableComment = permissionsOr(["movePostsToRecycle", "movePostsToDraft"]) && data.isModerator;
+  //- 发表人筛选
+  mixin articleNav
+    .paging-button
+      a.button.radius-left(href=`/m/${data.columnPost.column._id}/a/${data.columnPost._id}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
+      a.button.radius-right(href=`/m/${data.columnPost.column._id}/a/${data.columnPost._id}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
+  //- 批量管理回复
+  mixin manageComments
+    .paging-button
+      a.button.radius-left(onclick="manageComments()") 管理
+      a.button(onclick="markAllComments()") 全选
+      a.button.radius-right(onclick="disabledMarkedComment()") 退修或屏蔽
+  .p-l-2.p-r-2.m-b--05
+    include ../../publicModules/paging/paging
+    +articleNav
+    if disableComment && data.comments.length !== 0
+      //- 回复批量管理
+      +manageComments
   .comment-container
-    if data.comments &&  data.comments.length !== 0
+    if data.comments && data.comments.length !== 0
       .comment-list.m-t-1
         include ./singleComment/singleComment
         for comment in data.comments
           +singleComment(comment)
+  .p-l-2.p-r-2.m-b--05
+    include ../../publicModules/paging/paging
+    +articleNav
+    if disableComment && data.comments.length !== 0
+      //- 回复批量管理
+      +manageComments
   #commentEditor.m-t-1(v-cloak)
     comment-editor(ref="commentEditor" source="comment" :sid="articleId" :comment="comment")
   +includeDeferJS('/publicModules/commentCenter/comment.js')

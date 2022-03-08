@@ -140,7 +140,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id)=>{
   // }
   
   const filteredThread = ColumnPostModel.filterData(columnPost.thread, threadAllowKey)
-  const filteredPost = ColumnPostModel.filterData(columnPost.article, postAllowKey)
+  const filteredPost = ColumnPostModel.filterData(columnPost.article.document, postAllowKey)
   //获取专栏名和id
   const filteredColumn = ColumnPostModel.filterData(columnPost.column, columnAllowKey)
   filteredPost.c = filteredPost.c || filteredPost.content
@@ -153,6 +153,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id)=>{
     user:{xsf: columnPost.user.xsf}
   });
   let resData = {
+    _id: columnPost._id,
     mainCategory: columnPost.mainCategory,
     auxiliaryCategory: columnPost.auxiliaryCategory,
     thread:filteredThread,
@@ -246,7 +247,7 @@ schema.statics.getArticleDataById = async function(columnId, _id){
       mainCategory = await ColumnPostCategoryModel.getParentCategoryByIds(columnPost.cid)
       auxiliaryCategory = await ColumnPostCategoryModel.getMinorCategories(columnPost.columnId, columnPost.mcid)
       // Auxiliary  console.log(category, 'category')
-      return {thread: article.articleInfo, article: article.document, resources, user, column, mainCategory ,auxiliaryCategory,  type:'article'};
+      return {_id: columnPost._id, thread: article.articleInfo, article: article, resources, user, column, mainCategory ,auxiliaryCategory,  type:'article'};
     default:
       break;
   }

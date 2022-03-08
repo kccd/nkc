@@ -987,4 +987,12 @@ schema.statics.extendDocumentsOfArticles = async function(articles, type = 'beta
   return _articles;
 }
 
+/*
+* 获取当前用户的专家权限
+* */
+schema.methods.isModerator = async function(uid) {
+  const {uid: articleUid} = this;
+  return uid === articleUid;
+}
+
 module.exports = mongoose.model('articles', schema);

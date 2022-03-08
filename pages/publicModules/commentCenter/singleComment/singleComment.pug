@@ -18,7 +18,7 @@ if !isIncluded('singleComment')
       include ./singleCommentWarningInfo
       +singleCommentWarningInfo({status, docId, cid: _id, reason})
       include ./singleCommentTop
-      +singleCommentTop(Object.assign({}, user, {_id, isAuthor, order, reviewed: status !== 'unknown', reason, toc, tlm}))
+      +singleCommentTop(Object.assign({}, user, {_id, docId, isAuthor, order, reviewed: status !== 'unknown', reason, toc, tlm}))
       include ./singleCommentCenter
       +singleCommentCenter({content, aid: _id, quote})
       include ./singleCommentBottom
