@@ -444,6 +444,7 @@ schema.statics.extendMomentsData = async (moments) => {
           name: filename
         } = defaultFile;
         fileData = {
+          rid,
           type: 'picture',
           url: getUrl('resource', rid),
           height,
@@ -465,6 +466,7 @@ schema.statics.extendMomentsData = async (moments) => {
           });
         }
         fileData = {
+          rid: rid,
           type: 'video',
           coverUrl: getUrl('resource', rid, 'cover'),
           visitorAccess,

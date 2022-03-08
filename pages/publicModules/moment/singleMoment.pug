@@ -17,11 +17,18 @@ if !isIncluded('publicModules/moment/moment.pug')
         data-file-count=fileCount
         )
         for file in files
-          .single-moment-file
+          -var fixSize = "";
+          -var singleMomentFileStyle = '';
+          //- 仅只有一张图片时，设置图片站位
+          if fileType === "picture" && files.length === 1 && file.height && file.width
+            -var paddingTop = file.height * 100 / file.width;
+            -singleMomentFileStyle = `padding-top: ${paddingTop}%;`
+            -fixSize = "fix-size";
+          .single-moment-file(class=fixSize style=singleMomentFileStyle)
             if fileType === 'video'
               +singleVideo(file)
             else
-              div(style=`background-image: url(${file.url})`)
+              div(style=`background-image: url(${file.url})` class=fixSize)
                 img(
                   data-src=file.url
                   data-tag='nkcsource'
