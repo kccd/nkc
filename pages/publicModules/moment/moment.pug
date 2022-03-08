@@ -54,13 +54,13 @@ if !isIncluded('publicModules/moment/moment.pug')
         .single-moment-content!=content
         +momentFiles(files)
         .single-moment-bottom
-          .single-moment-bottom-left(
-            onclick=`openCommentContainerByMomentId("${momentId}")`
+          .single-moment-bottom-left.fa.fa-comment-o(
+            data-moment-id=momentId
+            data-event-name='openCommentContainer'
             )
-            .fa.fa-comment-o
           .single-moment-bottom-center
             .fa.fa-retweet
-          .single-moment-bottom-right
-            .fa.fa-thumbs-o-up
-        .single-moment-comment-container(data-moment-id=momentId)
+          .single-moment-bottom-right.fa.fa-thumbs-o-up
+        .single-moment-comment-container(v-if='!hidden' v-cloak)
+          moment-comments(:mid="momentId")
 

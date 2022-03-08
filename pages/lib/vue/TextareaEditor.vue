@@ -1,0 +1,114 @@
+<template lang="pug">
+  .textarea-editor
+    .textarea-editor-container.ghost
+      div
+        textarea(
+          ref="ghostTextarea"
+          v-model="content"
+          )
+    .textarea-editor-container
+      div
+        textarea(
+          ref="textarea"
+          @input="setTextareaSize"
+          :style="'height:' + textareaHeight"
+          v-model="content"
+          :placeholder="placeholder || defaultPlaceholder"
+        )
+
+</template>
+
+
+<style lang="less" scoped>
+  .textarea-editor{
+    position: relative;
+    .textarea-editor-container{
+      &.ghost{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: -1;
+      }
+      &>div{
+        margin-bottom: 0.5rem;
+        padding: 0.5rem 0.8rem;
+        border: 1px solid #ccc;
+        border-radius: 0.5rem;
+        font-size: 0;
+        textarea{
+          min-height: 5rem;
+          resize: none;
+          overflow: hidden;
+          width: 100%;
+          border: none;
+          font-size: 1.2rem;
+          line-height: 2rem;
+          border-radius: 0;
+          outline: none;
+          padding: 0;
+        }
+      }
+    }
+  }
+</style>
+
+<script>
+  export default {
+    props: ['placeholder'],
+    data: () => ({
+      defaultPlaceholder: "想分享什么新鲜事？",
+      content: '',
+      textareaHeight: '0',
+    }),
+    watch: {
+      'content': 'onContentChange',
+    },
+    methods: {
+      setTextareaSize() {
+        const self = this;
+        setTimeout(() => {
+          const ghostElement = self.$refs.ghostTextarea;
+          const scrollHeight = ghostElement.scrollHeight;
+          self.textareaHeight = scrollHeight + 'px';
+        });
+      },
+      getContent() {
+        return this.content;
+      },
+      setContent(content) {
+        this.content = content;
+        this.setTextareaSize();
+      },
+      resetFocus(newPosition) {
+        const element = this.$refs.textarea;
+        if(element.setSelectionRange) {
+          element.focus();
+          element.setSelectionRange(newPosition, newPosition);
+        } else if(element.createTextRange) {
+          const range = element.createTextRange();
+          range.collapse(true);
+          range.moveEnd("character", newPosition);
+          range.moveStart("character", newPosition);
+          range.select();
+        }
+      },
+      insertContent(text) {
+        const {content} = this;
+        const element = this.$refs.textarea;
+        const insert = element.selectionStart;
+        const startContent = content.slice(0, insert);
+        const endContent = content.slice(insert, content.length);
+        this.content = startContent + text + endContent;
+        const newPosition = insert + text.length;
+        const self = this;
+        setTimeout(() => {
+          self.resetFocus(newPosition);
+        });
+      },
+      onContentChange() {
+        this.$emit('content-change', this.content);
+      }
+    }
+  }
+</script>

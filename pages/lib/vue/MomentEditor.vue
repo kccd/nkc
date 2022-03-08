@@ -2,21 +2,8 @@
   .moment-editor
     resource-selector(ref="resourceSelector")
     emoji-selector(ref="emojiSelector")
-    .content-body.ghost
-      .content-container
-        textarea.ghost(
-          ref="ghostTextarea"
-          v-model="content"
-        )
     .content-body
-      .content-container
-        textarea(
-          ref="textarea"
-          @input="setTextareaSize"
-          :style="'height:' + textareaHeight"
-          v-model="content"
-          placeholder="想分享什么新鲜事？"
-          )
+      textarea-editor(ref="textareaEditor" @content-change="onTextareaEditorContentChange")
       .files-container
         .pictures(v-if="picturesUrl.length > 0")
           .picture-item(v-for="(url, index) in picturesUrl" :style="'background-image: url('+url+')'")
@@ -222,12 +209,13 @@
   import {debounce} from '../js/execution';
   import {nkcAPI} from '../js/netAPI';
   import EmojiSelector from './EmojiSelector';
-  import {sweetSuccess} from '../js/sweetAlert';
+  import TextareaEditor from './TextareaEditor';
   export default {
     props: ['published'],
     components: {
       'resource-selector': ResourceSelector,
-      'emoji-selector': EmojiSelector
+      'emoji-selector': EmojiSelector,
+      'textarea-editor': TextareaEditor
     },
     data: () => ({
       submitting: false,
@@ -290,9 +278,9 @@
             if(!momentId) return;
             self.momentId = momentId;
             self.content = content;
+            self.syncTextareaEditorContent();
             self.picturesId = picturesId;
             self.videosId = videosId;
-            self.setTextareaSize();
           })
           .catch(err => {
             sweetError(err);
@@ -303,14 +291,6 @@
       },
       unlockButton() {
         this.submitting = false;
-      },
-      setTextareaSize() {
-        const self = this;
-        setTimeout(() => {
-          const ghostElement = self.$refs.ghostTextarea;
-          const scrollHeight = ghostElement.scrollHeight;
-          self.textareaHeight = scrollHeight + 'px';
-        });
       },
       addResourcesId(type, resourcesId) {
         const {maxPictureCount, maxVideoCount} = this;
@@ -346,31 +326,8 @@
           countLimit: self.maxVideoCount - self.videosId.length
         });
       },
-      resetFocus(newPosition) {
-        const element = this.$refs.textarea;
-        if(element.setSelectionRange) {
-          element.focus();
-          element.setSelectionRange(newPosition, newPosition);
-        } else if(element.createTextRange) {
-          const range = element.createTextRange();
-          range.collapse(true);
-          range.moveEnd("character", newPosition);
-          range.moveStart("character", newPosition);
-          range.select();
-        }
-      },
       insertContent(text) {
-        const {content} = this;
-        const element = this.$refs.textarea;
-        const insert = element.selectionStart;
-        const startContent = content.slice(0, insert);
-        const endContent = content.slice(insert, content.length);
-        this.content = startContent + text + endContent;
-        const newPosition = insert + text.length;
-        const self = this;
-        setTimeout(() => {
-          self.resetFocus(newPosition);
-        });
+        return this.$refs.textareaEditor.insertContent(text);
       },
       selectEmoji() {
         const self = this;
@@ -404,6 +361,12 @@
       },
       sendPublishedEvent() {
         this.$emit('published')
+      },
+      onTextareaEditorContentChange(content) {
+        this.content = content;
+      },
+      syncTextareaEditorContent() {
+        this.$refs.textareaEditor.setContent(this.content);
       },
       onContentChange: debounce(function() {
         this.saveContent();
