@@ -1112,16 +1112,20 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function() {
   if(needReview) {
     await ReviewModel.newDocumentReview(type, this._id, this.uid, reason);
   } else {
-    await this.setReviewStatus(DocumentModel.getDocumentStatus().normal);
+    await this.setReviewStatus((await DocumentModel.getDocumentStatus()).normal);
   }
   return needReview;
 }
 
 // 设置审核状态
 schema.methods.setReviewStatus = async function(status) {
+  const DocumentModel = mongoose.model('documents');
+  let _status = status;
+  const {unknown} = await DocumentModel.getDocumentStatus();
+  if(!status) _status = unknown;
   await this.updateOne({
     $set: {
-      status,
+      status: _status,
     }
   });
 };

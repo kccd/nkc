@@ -57,14 +57,13 @@ router
     let comment = await db.CommentModel.findOne({source, did: document.did});
     if(!comment) ctx.throw(400, '未找到引用信息，请刷新后重试');
     comment = await db.CommentModel.extendPostComments({comments: [comment]});
-    const {order, _id: commentId, uid, user, did, sid, source: commentSource, docId} = comment[0];
+    const {order, _id: commentId, user, did, sid, source: commentSource, docId} = comment[0];
     data.quote = {
       _id: commentId,
       order,
       docId,
       comment: comment[0],
-      uid,
-      user,
+      ...user,
       did,
       sid,
       commentSource,
