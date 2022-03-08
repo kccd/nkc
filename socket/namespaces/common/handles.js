@@ -1,6 +1,6 @@
 async function message(data) {
   // this.sendMessage(this.NKC.data.user.uid, "2333333");
-  // console.log("收到了消息:", data);
+  console.log("收到了消息:", data);
 }
 
 async function disconnect(data) {

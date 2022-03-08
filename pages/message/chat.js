@@ -6,7 +6,7 @@ import {getFromLocalStorage, updateInLocalStorage, saveToLocalStorage} from "../
 import {debounce} from "../lib/js/execution";
 import {sleep} from "../lib/js/timeout";
 import FastClick from "fastclick";
-
+import Lottery from '../lib/vue/lottery.vue'
 const messageAppId = '#messageApp';
 const socketContainer = '#socketContainer';
 const localStorageKey = 'NKC_CHAT_2';
@@ -17,7 +17,7 @@ const messageApp = new Vue({
     showPanel: false,
     mouseOver: false,
     repeatOver: false,
-
+    showLottery: false,
     appName: '喵喵',
 
     containerInfo: {
@@ -57,7 +57,8 @@ const messageApp = new Vue({
     audio: null,
   },
   components: {
-    Message
+    Message,
+    Lottery
   },
   computed: {
     boxContent() {
@@ -93,8 +94,13 @@ const messageApp = new Vue({
     this.initContainer();
     this.initAudio();
     const app = this;
-    socket.on('updateNewMessageCount', count => {
-      app.updateNewMessageCount(count);
+    socket.on('updateNewMessageCount', (data) => {
+      console.log('count-chat', data)
+      const {redEnvelopeStatus , newMessageCount} = data;
+      if(redEnvelopeStatus){
+        this.showLottery = true
+      }
+      app.updateNewMessageCount(newMessageCount);
     });
     socket.on('receiveMessage', (data) => {
       if(data.localId) return;

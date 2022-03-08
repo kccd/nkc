@@ -158,10 +158,7 @@ export default {
       myChart.setOption(option);
     },
     getData() {
-      nkcAPI(
-        "/creation/home/calendar?year=" + this.selected,
-        "GET"
-      )
+      nkcAPI("/creation/home/calendar?year=" + this.selected, "GET")
         .then((data) => {
           this.initEcharts(data.posts);
           this.createYearList(data.user.toc);
@@ -181,7 +178,7 @@ export default {
         this.myChart.dispose();
       }
       var timeObj = {};
-      for (var i = 0; i < data.length; i++) {        
+      for (var i = 0; i < data.length; i++) {
         var t = data[i];
         timeObj[t._id] = t.count;
       }
@@ -197,27 +194,28 @@ export default {
         if (times[i] > max) max = times[i];
         data.push([i, times[i]]);
       }
-       var start = 1, pieceMax = 10000;
-    var defaultPieces = [];
-    for(var i = start; i < pieceMax; i = i * 2) {
-      defaultPieces.push({
-        min: i,
-        max: i * 2 - 1
-      });
-    }
-    var pieces = [];
-    for(var i = 0; i < defaultPieces.length; i++) {
-      var p = defaultPieces[i];
-      if(max >= p.min) {
-        pieces.push(p);
+      var start = 1,
+        pieceMax = 10000;
+      var defaultPieces = [];
+      for (var i = start; i < pieceMax; i = i * 2) {
+        defaultPieces.push({
+          min: i,
+          max: i * 2 - 1,
+        });
       }
-    }
-    if(!pieces.length) {
-      pieces.push({
-        min: 1,
-        max: 1
-      })
-    }
+      var pieces = [];
+      for (var i = 0; i < defaultPieces.length; i++) {
+        var p = defaultPieces[i];
+        if (max >= p.min) {
+          pieces.push(p);
+        }
+      }
+      if (!pieces.length) {
+        pieces.push({
+          min: 1,
+          max: 1,
+        });
+      }
       var option = {
         title: {
           left: "left",
@@ -268,7 +266,6 @@ export default {
 
       this.myChart = echarts.init(this.dom);
       this.myChart.setOption(option);
-
     },
     setYear(year) {
       if (year) year = parseInt(year);
@@ -287,56 +284,52 @@ export default {
   },
 };
 </script>
-<style scoped>
-.account-logs
-  .account-logs-user
-  .account-logs-user-info
-  .account-logs-user-time {
-  font-size: 1rem;
-  margin-top: 0.2rem;
-  color: #aaa;
-}
-.account-logs
-  .account-logs-user
-  .account-logs-user-info
-  .account-logs-user-name {
-  height: 1.5rem;
-  color: #2b90d9;
-  font-weight: 700;
-  word-break: break-word;
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-}
-.account-logs .account-logs-thread a {
-  font-size: 1.25rem;
-  color: #2b90d9;
-}
-.account-logs .account-logs-thread span {
-  color: #e85a71;
-  margin-right: 0.5rem;
-}
-.account-logs .account-logs-user .account-logs-user-avatar {
-  display: table-cell;
-  vertical-align: top;
-}
+<style scoped lang="less">
 .account-logs .account-logs-user .account-logs-user-info {
   width: 7rem;
   display: table-cell;
   vertical-align: top;
   height: 3rem;
+  .account-logs-user-name {
+    height: 1.5rem;
+    color: #2b90d9;
+    font-weight: 700;
+    word-break: break-word;
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+  .account-logs-user-time {
+    font-size: 1rem;
+    margin-top: 0.2rem;
+    color: #aaa;
+  }
 }
-.account-logs .account-logs-user .account-logs-user-avatar img {
-  height: 3rem;
-  width: 3rem;
-  border-radius: 50%;
-  margin-right: 0.5rem;
+.account-logs .account-logs-thread {
+  a {
+    font-size: 1.25rem;
+    color: #2b90d9;
+  }
+  span {
+    color: #e85a71;
+    margin-right: 0.5rem;
+  }
 }
 .account-logs .account-logs-user {
   display: inline-block;
   width: 10.4rem;
   margin: 0 0.5rem 0.5rem 0;
+  .account-logs-user-avatar img {
+    height: 3rem;
+    width: 3rem;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+  }
+  .account-logs-user-avatar {
+    display: table-cell;
+    vertical-align: top;
+  }
 }
 .null {
   padding-top: 5rem;

@@ -23,6 +23,9 @@ function getCommunicationClient() {
     const PostModel = require('../dataModels/PostModel');
     const ThreadModel = require('../dataModels/ThreadModel');
     const ForumModel = require('../dataModels/ForumModel');
+    const UsersGenerals = require('../dataModels/UsersGeneralModel')
+    const SettingModel = require("../dataModels/SettingModel");
+
     const {from, content} = req;
     const {type, data} = content;
     if(type === 'resourceStatus') {
@@ -56,11 +59,19 @@ function getCommunicationClient() {
       } = await user.getNewMessagesCount();
       const newMessageCount = newSystemInfoCount + newApplicationsCount + newReminderCount + newUsersMessagesCount;
       const friendsUid = await MessageModel.getUsersFriendsUid(user.uid);
+
+      let {lotterySettings: {status, close}} = await UsersGenerals.findOne({uid: user.uid})
+      const redEnvelopeSettings = await SettingModel.getSettings('redEnvelope');
+      let redEnvelopeStatus = false;
+      if (status && close && !redEnvelopeSettings.random.close) {
+        redEnvelopeStatus = true;
+      } 
       return {
         uid: user.uid,
         onlineStatus,
         friendsUid,
-        newMessageCount
+        newMessageCount,
+        redEnvelopeStatus
       }
     } else if(type === 'messageServiceSetUserOnlineStatus') {
       const {uid, online} = data;
@@ -100,6 +111,13 @@ function getCommunicationClient() {
         hasPermission
       }
     }
+    //  else if(type === 'messageServiceGetLotterySettings') {
+    //   let {lotterySettings: {status, close}} = await UsersGenerals.findOne({uid: data.uid})
+    //   const redEnvelopeSettings = await SettingModel.getSettings('redEnvelope');
+    //   return {
+    //     status, close, redEnvelopeStatus: redEnvelopeSettings.random.close
+    //   }
+    // }
   });
   return communicationClient;
 }

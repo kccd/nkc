@@ -92,7 +92,10 @@ class CommunicationClient {
   async getServiceInfoPromise(targetServiceName, content) {
     return this.post(targetServiceName, communicationConfig.searchEventName, content);
   }
+
   onMessage(callback) {
+    // console.log(communicationConfig.messageEventName,'communicationConfig.messageEventName')
+
     this.socket.on(communicationConfig.messageEventName, async (data, _callback) => {
       Promise.resolve()
         .then(() => {
