@@ -722,6 +722,7 @@ messageSchema.statics.getParametersData = async (message) => {
     if(document.source === 'article') {
       let article = await ArticleModel.findOne({did: document.did}).sort({toc: -1});
       article = await ArticleModel.extendArticles([article]);
+      if(article[0]) return;
       parameters = {
         //获取document所在article的url
         editLink: article[0].url || 'www.baidu.com',
@@ -731,16 +732,16 @@ messageSchema.statics.getParametersData = async (message) => {
       };
       // console.log('article', article, docId, document.did);
     } else if (document.source === 'comment') {
-      let comment = await CommentModel.findOne({_id: document.sid}).sort({toc: -1});
+      const comment = await CommentModel.findOne({_id: document.sid}).sort({toc: -1});
       if(!comment) return;
-      // console.log('comment', comment, commentSource, document.sid, docId);
-      comment = await CommentModel.extendReviewComments([comment]);
+      const _comment = await CommentModel.extendReviewComments([comment]);
+      if(!_comment[0]) return;
       parameters = {
         //获取document所在comment的url
-        reviewLink: 'www.baidu.com',
+        reviewLink: _comment[0].url || '',
         content: htmlToPlain(document.content, 100),
         reason: reason?reason:'未知',
-        title: '未知',
+        title: _comment[0].title || '未知',
       };
     }
 

@@ -205,7 +205,7 @@ schema.methods.modifyComment = async function (props) {
 * */
 schema.statics.extendPostComments = async (props) => {
   const ReviewModel = mongoose.model('reviews');
-  const {comments, uid} = props;
+  const {comments, uid, isModerator = '', permissions = {}} = props;
   const DocumentModel = mongoose.model('documents');
   const UserModel = mongoose.model('users');
   const {htmlToPlain} = require("../nkcModules/nkcRender");
@@ -227,12 +227,15 @@ schema.statics.extendPostComments = async (props) => {
   }
   const {comment: commentSource} = await DocumentModel.getDocumentSources();
   const {stable: stableType} = await DocumentModel.getDocumentTypes();
+  const {normal: normalStatus} = await DocumentModel.getDocumentStatus();
   const documents = await DocumentModel.find({did: {$in: didArr}, source: commentSource, type: stableType});
   for(const d of documents) {
     //用户是否具有审核权限
-    // if(!permissions.reviewed) {
-    //   if((d.status !== 'normal' || d.type !== 'stable') && d.uid !== uid) continue;
-    // }
+    if(!permissions.reviewed) {
+      if(d.uid !== uid) {
+        if((d.status !== normalStatus || d.type !== stableType) && !isModerator) continue;
+      }
+    }
     let review;
     if(d.status === 'faulty' || d.status === 'unknown') {
       review = await ReviewModel.findOne({docId: d._id}).sort({toc: -1}).limit(1);
@@ -303,24 +306,46 @@ schema.statics.extendPostComments = async (props) => {
 
 
 /*
-* 拓展审核comment
+* 拓展审核comment信息
 * */
 schema.statics.extendReviewComments = async function(comments) {
   const CommentModel = mongoose.model('comments');
+  const ColumnPostModel = mongoose.model('columnPosts');
   const DocumentModel = mongoose.model('documents');
+  const ArticleModel = mongoose.model('articles');
   const {comment: documentSource} = await DocumentModel.getDocumentSources();
   const {timeFormat, getUrl} = require('../nkcModules/tools');
   const commentsId = [];
-  const booksId = [];
-  // console.log('comments', comments);
+  const articleSid = [];
+  const articleId = [];
+  const didArr = [];
   for(const comment of comments) {
     if(!comment) continue;
     commentsId.push(comment._id);
-    booksId.push(comment.sid);
+    articleSid.push(comment.sid);
   }
-  const documents = await DocumentModel.find({
+  const articles = await ArticleModel.find({_id: {$in: articleSid}});
+  for(const article of articles) {
+    didArr.push(article.did);
+    articleId.push(article._id);
+  }
+  const {article: articleType} = await ColumnPostModel.getColumnPostTypes();
+  const columnPosts = await ColumnPostModel.find({pid: {$in: articleId}, type: articleType});
+  const columnPostObj = {};
+  for(const c of columnPosts) {
+    columnPostObj[c.pid] = c;
+  }
+  const {stable: stableType, beta: betaType} = await DocumentModel.getDocumentTypes();
+  const articleDocuments = await DocumentModel.find({did: {$in: didArr}, type: {$in: [stableType, betaType]}});
+  const articlesDocumentObj = {};
+  for(const d of articleDocuments) {
+    const {type, sid} = d;
+    if(!articlesDocumentObj[sid]) articlesDocumentObj[sid] = {};
+    articlesDocumentObj[sid][type] = d;
+  }
+  const commentDocuments = await DocumentModel.find({
     type: {
-      $in: ['beta', 'stable']
+      $in: [betaType, stableType]
     },
     source: documentSource,
     sid: {
@@ -328,7 +353,7 @@ schema.statics.extendReviewComments = async function(comments) {
     }
   });
   const  commentsObj = {};
-  for(const d of documents) {
+  for(const d of commentDocuments) {
     const {type, sid} = d;
     if(!commentsObj[sid]) commentsObj[sid] = {};
     commentsObj[sid][type] = d;
@@ -340,13 +365,18 @@ schema.statics.extendReviewComments = async function(comments) {
       _id,
       toc,
       uid,
+      sid
     } = comment;
     const commentObj = commentsObj[_id];
-    if(!commentObj) continue;
+    const articleDocumentObj = articlesDocumentObj[sid];
+    if(!commentObj || !articleDocumentObj) continue;
     const betaComment = commentObj.beta;
     const stableComment = commentObj.stable;
+    const betaArticleDocument = articleDocumentObj.beta;
+    const stableArticleDocument = articleDocumentObj.stable;
     if(!stableComment && !betaComment) continue;
     const document = stableComment || betaComment;
+    const articleDocument = stableArticleDocument || betaArticleDocument;
     const {did} = document;
     const result = {
       _id,
@@ -355,6 +385,8 @@ schema.statics.extendReviewComments = async function(comments) {
       hasBeta: !!betaComment,
       time: timeFormat(toc),
       did,
+      url: `/m/${columnPostObj[sid].columnId}/a/${columnPostObj[sid]._id}`,
+      title: articleDocument.title,
     };
     results.push(result);
   }

@@ -612,9 +612,9 @@ schema.statics.extendArticles = async function(articles) {
     articlesId.push(article._id);
     if(article.source === articleSource.column) columnPostArr.push(article._id);
   }
+  const {article: articleType} = await ColumnPostModel.getColumnPostTypes();
   //查找出独立文章所在的专栏
-  const columnPosts = await ColumnPostModel.find({pid: {$in: columnPostArr}});
-  console.log('columnPosts', columnPosts);
+  const columnPosts = await ColumnPostModel.find({pid: {$in: columnPostArr}, type: articleType});
   for(const columnPost of columnPosts) {
     columnPostObj[columnPost.pid] = columnPost;
   }
@@ -670,7 +670,7 @@ schema.statics.extendArticles = async function(articles) {
       published: !!stableDocument,
       hasBeta: !!betaDocument,
       title: title || '未填写标题',
-      url,
+      url: `/m/${columnPostObj[_id].columnId}/a/${columnPostObj[_id]._id}`,
       time: timeFormat(toc),
       did,
       source: article.source,
