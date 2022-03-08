@@ -114,8 +114,8 @@ router
       });
       if(type === 'publish') {
         const lock = await nkcModules.redLock.lock(comment._id, 6000);
-        await comment.publishComment();
         await comment.updateOrder();
+        await comment.publishComment();
         await lock.unlock();
       } else if(type === 'save') {
         await comment.saveComment()

@@ -78,8 +78,7 @@ var app = new Vue({
       if(data.pass) {
         d = {
           pass: data.pass,
-          documentId: data.documentId,
-          did: data.did,
+          docId: data.documentId,
           type: 'document',
         };
         url = "/review";
@@ -89,8 +88,7 @@ var app = new Vue({
           d = {
             type: 'document',
             pass: data.pass,
-            documentId: data.documentId,
-            did: [data.did],
+            docId: data.documentId,
             reason: data.reason,
             delType: data.delType,
             remindUser: data.noticeType,
