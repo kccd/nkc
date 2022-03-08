@@ -1,0 +1,66 @@
+if !isIncluded('publicModules/moment/moment.pug')
+  +includeCSS('/publicModules/moment/moment.css')
+  +includeDeferJS('/publicModules/moment/moment.js')
+  include ../../publicModules/mediaPreview/mediaPreview
+  mixin momentList(momentsData)
+    .moments-container
+      for momentData in momentsData
+        .moment-item
+          +singleMoment(momentData)
+
+  mixin momentFiles(files)
+    if files && files.length > 0
+      -var fileType = files[0].type;
+      -var fileCount = files.length;
+      .single-moment-files(
+        data-file-type=fileType
+        data-file-count=fileCount
+        )
+        for file in files
+          -var fixSize = "";
+          -var singleMomentFileStyle = '';
+          //- 仅只有一张图片时，设置图片站位
+          if fileType === "picture" && files.length === 1 && file.height && file.width
+            -var paddingTop = file.height * 100 / file.width;
+            -singleMomentFileStyle = `padding-top: ${paddingTop}%;`
+            -fixSize = "fix-size";
+          .single-moment-file(class=fixSize style=singleMomentFileStyle)
+            if fileType === 'video'
+              +singleVideo(file)
+            else
+              div(style=`background-image: url(${file.url})` class=fixSize)
+                img(
+                  data-src=file.url
+                  data-tag='nkcsource'
+                  data-type='picture'
+                  class="lazyload"
+                  alt=file.filename
+                  title=file.filename
+                  )
+
+  mixin singleMoment(momentData)
+    -var {uid, toc, username, avatarUrl, userHome, time, content, voteUp, files} = momentData;
+    -var {momentId} = momentData;
+    .single-moment-container(data-moment-id=momentId)
+      .single-moment-left
+        .single-moment-avatar(data-float-uid=uid)
+          img(src=avatarUrl)
+      .single-moment-right
+        .single-moment-header
+          .single-moment-user(data-float-uid=uid)
+            a(href=userHome target="_blank")=username
+          .single-moment-time
+            +fromNow(toc)
+        .single-moment-content!=content
+        +momentFiles(files)
+        .single-moment-bottom
+          .single-moment-bottom-left(
+            onclick=`openCommentContainerByMomentId("${momentId}")`
+            )
+            .fa.fa-comment-o
+          .single-moment-bottom-center
+            .fa.fa-retweet
+          .single-moment-bottom-right
+            .fa.fa-thumbs-o-up
+        .single-moment-comment-container(data-moment-id=momentId)
+

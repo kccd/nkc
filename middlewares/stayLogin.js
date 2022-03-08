@@ -65,6 +65,7 @@ module.exports = async (ctx, next) => {
       user.boundMobile = userPersonal.nationCode && userPersonal.mobile;
       user.boundEmail = userPersonal.email;
       user.draftCount = await db.DraftModel.countDocuments({uid: user.uid});
+      //  需要更改为 socket 获取状态然后返回
       user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
       languageName = user.generalSettings.language;
       if(user.generalSettings.lotterySettings.status) {

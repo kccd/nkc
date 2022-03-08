@@ -1,6 +1,7 @@
 if !isIncluded('chat')
   +includeCSS('/message/chat.css')
   #messageApp(v-cloak)
+    Lottery(v-if = "showLottery")
     #minimizeContainer.theme-primary(v-if='containerMode === "minimize"' @click='unsetMinimize')
       .fa.fa-comments
       span(v-if='boxContent') {{boxContent}}
