@@ -10,8 +10,19 @@ router.get('/:aid', async (ctx, next)=>{
   let columnPost = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid);
   const {article: articleSource} = await db.CommentModel.getCommentSources();
   let {_id: articleId} = columnPost.article.articleInfo;
-  const _article = await db.ArticleModel.findOnly({_id: articleId});
+  let _article = await db.ArticleModel.findOnly({_id: articleId});
   const isModerator = await _article.isModerator(state.uid);
+  _article = await db.ArticleModel.extendDocumentsOfArticles([_article], 'stable', [
+    '_id',
+    'uid',
+    'status'
+  ]);
+  const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
+  if(_article[0].document.status !== normalStatus && !isModerator) {
+    if(!permission('review')) {
+      return ctx.throw(403, '权限不足');
+    }
+  }
   let match = {
     sid: articleId,
     source: articleSource
