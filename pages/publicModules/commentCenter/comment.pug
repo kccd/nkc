@@ -18,7 +18,7 @@ if !isIncluded('comment')
     if disableComment && data.comments.length !== 0
       //- 回复批量管理
       +manageComments
-  .comment-container
+  .p-a-0.comment-container#comment-content
     if data.comments && data.comments.length !== 0
       .comment-list.m-t-1
         include ./singleComment/singleComment
