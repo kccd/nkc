@@ -2,18 +2,25 @@
 $(document).ready(()=>{
   // if(top.location.search){
   //   const serach = top.location.search.split('=')
-  //   // 页面先隐藏 等隐藏了不需要页面后再显示
   //   if(serach[0] ==='?type' && serach[1] === 'hidden'){
-      document.querySelector('.row').style.display = 'flex';
-      document.querySelector('.row').style.justifyContent += 'center'
+      // document.querySelector('.row').style.display = 'flex';
+      // document.querySelector('.row').style.justifyContent += 'center'
+      // console.log(document.querySelector('.row'))
       // 获取 页头
-      document.querySelector('.navbar').style.display = 'none';
+      const navbar = document.querySelector('.navbar');
+      // alert(navbar);
+      navbar && (navbar.style.display = 'none');
       // 获取 页脚
-      document.querySelector('.footer').style.display = 'none';
+      const footer = document.querySelector('.footer');
+      // alert(footer);
+
+      footer && (footer.style.display = 'none');
       // 获取 右上 （购物车）
-      document.querySelector('.shopping-cart').style.display = 'none';
+      const shoppingCart = document.querySelector('.shopping-cart');
+      shoppingCart && (shoppingCart.style.display = 'none');
       // 获取 左侧 （显示用户信息） 
-      document.querySelector('#get-left-user-info-list').style.display = 'none';
+      const userInfo = document.querySelector('#get-left-user-info-list');
+      userInfo && (userInfo.style.display = 'none');
       // body.style.background = 'none';
       const content = $('#container-fluid-show')[0]
       content.addEventListener('click',function(e){
@@ -39,5 +46,6 @@ $(document).ready(()=>{
       })
   //   }
   // }
-  document.querySelector('body').style.display = 'block';
+  const body = document.querySelector('body');
+  body && (body.style.display = 'block');
 })
