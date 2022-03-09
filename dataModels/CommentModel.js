@@ -403,7 +403,7 @@ schema.methods.extendEditorComment = async function() {
   const {timeFormat, getUrl} = require('../nkcModules/tools');
   const {comment: commentSource} = await DocumentModel.getDocumentSources();
   const {beta: betaType, stable: stableType} = await DocumentModel.getDocumentTypes();
-  const {did, _id, toc, uid} = this;
+  const {did, _id, toc, uid, sid} = this;
   const documents = await DocumentModel.find({did, type: {$in: [betaType, stableType]}, source: commentSource, sid: _id});
   const commentsObj = {};
   const quoteIdArr= [];
@@ -444,7 +444,8 @@ schema.methods.extendEditorComment = async function() {
     docId: betaComment?betaComment._id:stableComment._id,
     content: betaComment?betaComment.content:stableComment.content,
     source: betaComment?betaComment.source:stableComment.source,
-    sid: betaComment?betaComment.sid:stableComment.sid,
+    // sid: betaComment?betaComment.sid:stableComment.sid,
+    sid,
     type: betaComment?betaComment.type:stableComment.type,
     quoteDid: betaComment?betaComment.quoteDid:stableComment.quoteDid,
     time: timeFormat(toc),

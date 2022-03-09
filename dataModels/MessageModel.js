@@ -725,7 +725,7 @@ messageSchema.statics.getParametersData = async (message) => {
       if(!article[0]) return;
       parameters = {
         //获取document所在article的url
-        reviewLink: article[0].url || 'www.baidu.com',
+        reviewLink: article[0].url || '',
         reason: reason?reason:'未知',
         title: document.title + article[0].url?'':'[文章已被删除]',
       };
