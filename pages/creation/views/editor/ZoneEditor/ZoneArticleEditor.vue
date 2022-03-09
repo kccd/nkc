@@ -1,7 +1,7 @@
 <template lang="pug">
   .zone-moment-editor
-    .standard-max-container
-      article-editor(ref="articleEditor" time="60000" source="zone" :configs="configs")
+    //- .standard-max-container
+    article-editor(ref="articleEditor" time="60000" source="zone" :configs="configs")
 </template>
 
 <script>

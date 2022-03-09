@@ -1,5 +1,5 @@
 <template lang="pug">
-  .container-fluid
+  .standard-max-container 
     .m-b-1
       button.m-r-05.btn.btn-default.btn-sm(@click="newDraft") 撰写新片段
       //button.btn.btn-default.btn-sm(@click="toTrash" ) 回收站

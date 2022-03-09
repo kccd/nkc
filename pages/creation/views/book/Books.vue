@@ -7,7 +7,7 @@
           .creation-center-book-name {{book.name}}
           .creation-center-book-description(:title="book.description") {{book.description}}
           .creation-center-book-time {{book.time}}
-  .container-fluid.creation-center-books
+  .standard-max-container.creation-center-books
     .creation-center-books-header
       span.m-r-1 我创建的专题
       button.btn.btn-default.btn-xs(@click="navToPage('bookEditor')") 创建新专题

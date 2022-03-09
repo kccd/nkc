@@ -1,10 +1,10 @@
 <template lang="pug">
-  .column-creation
+  .column-creation.standard-max-container
     .m-b-1
       bread-crumb(:list="navList")
-    .standard-max-container(v-if="column.userColumn")
+    template(v-if="column.userColumn")
       article-editor(ref="articleEditor" :configs="formConfigs" time="60000" source="column")
-    .standard-max-container(v-else)
+    template(v-else)
       .no-column
         span 您还未开通专栏，点击
         a(href="/column/apply") 这里
@@ -16,6 +16,9 @@
   text-align: center;
   font-size: 1.2rem;
   font-weight: bolder;
+}
+.row{
+  width: 100%;
 }
 </style>
 <script>
