@@ -231,7 +231,9 @@ window.user = new (class {
     })
   }
 })();
-
+// window.onerror = (err)=>{
+//   alert(err)
+// }
 
 window.removeBlacklist = (uid, _id) => {
   NKC.methods.removeUserFromBlacklist(uid)
@@ -242,6 +244,7 @@ window.removeBlacklist = (uid, _id) => {
     })
 }
 
+/*
 if(NKC.configs.isApp) {
   window.ready()
     .then(function() {
@@ -251,3 +254,4 @@ if(NKC.configs.isApp) {
       });
     })
 }
+*/

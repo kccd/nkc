@@ -38,6 +38,7 @@
     },
     mounted() {
       this.redirect();
+      
     },
     methods: {
       redirect() {

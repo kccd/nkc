@@ -1,6 +1,6 @@
 <template lang="pug">
   .moment-commments 动态评论列表 MomentId: {{mid}}
-    moment-comment-editor
+    moment-comment-editor(:mid="momentId")
 </template>
 
 <style lang="less" scoped>

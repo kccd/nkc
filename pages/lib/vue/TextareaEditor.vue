@@ -5,13 +5,14 @@
         textarea(
           ref="ghostTextarea"
           v-model="content"
+          :style="ghostTextareaStyle"
           )
     .textarea-editor-container
       div
         textarea(
           ref="textarea"
           @input="setTextareaSize"
-          :style="'height:' + textareaHeight"
+          :style="textareaStyle"
           v-model="content"
           :placeholder="placeholder || defaultPlaceholder"
         )
@@ -37,7 +38,7 @@
         border-radius: 0.5rem;
         font-size: 0;
         textarea{
-          min-height: 5rem;
+          //min-height: 5rem;
           resize: none;
           overflow: hidden;
           width: 100%;
@@ -54,13 +55,26 @@
 </style>
 
 <script>
+  import {debounce} from '../js/execution';
   export default {
-    props: ['placeholder'],
+    props: ['placeholder', 'height'],
     data: () => ({
       defaultPlaceholder: "想分享什么新鲜事？",
+      defaultHeight: "5rem",
       content: '',
       textareaHeight: '0',
     }),
+    computed: {
+      minHeight() {
+        return this.height || this.defaultHeight;
+      },
+      ghostTextareaStyle() {
+        return `height: 0;min-height: ${this.minHeight}`
+      },
+      textareaStyle() {
+        return `height: ${this.textareaHeight}; min-height: ${this.minHeight};`;
+      }
+    },
     watch: {
       'content': 'onContentChange',
     },
@@ -106,9 +120,9 @@
           self.resetFocus(newPosition);
         });
       },
-      onContentChange() {
+      onContentChange: debounce(function() {
         this.$emit('content-change', this.content);
-      }
+      }, 200)
     }
   }
 </script>
