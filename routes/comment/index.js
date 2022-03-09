@@ -93,7 +93,18 @@ router
       type,
       commentId
     } = body;
-    console.log('body', body);
+    let article = await db.ArticleModel.findOnly({_id: sid});
+    if(!article) ctx.throw(400, '未找到文章，请刷新后重试');
+    article = await db.ArticleModel.extendDocumentsOfArticles([article], 'stable', [
+      '_id',
+      'status',
+      'uid'
+    ]);
+    if(!article[0]) ctx.throw(404, '未找到对应文章，或文章状态异常');
+    const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
+    if(article[0].document.status !== normalStatus) {
+      return ctx.throw(403, '文章状态异常');
+    }
     if(!['modify', 'publish', 'create', 'save'].includes(type)) ctx.throw(400, `未知的提交类型 type: ${type}`);
     let comment;
     if(type === 'create') {

@@ -30,6 +30,7 @@ if !isIncluded('comment')
     if disableComment && data.comments.length !== 0
       //- 回复批量管理
       +manageComments
-  #commentEditor.m-t-1(v-cloak)
-    comment-editor(ref="commentEditor" source="comment" :sid="articleId" :comment="comment")
+  if data.articleStatus === 'normal'
+    #commentEditor.m-t-1(v-cloak)
+      comment-editor(ref="commentEditor" source="comment" :sid="articleId" :comment="comment")
   +includeDeferJS('/publicModules/commentCenter/comment.js')

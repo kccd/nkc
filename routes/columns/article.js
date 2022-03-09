@@ -17,6 +17,7 @@ router.get('/:aid', async (ctx, next)=>{
     'uid',
     'status'
   ]);
+  data.articleStatus = _article[0].document.status;
   const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
   if(_article[0].document.status !== normalStatus && !isModerator) {
     if(!permission('review')) {
