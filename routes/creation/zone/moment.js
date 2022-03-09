@@ -2,10 +2,15 @@ const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
     const {query, db, data, state, nkcModules} = ctx;
-    const {from, page} = query;
+    const {from, page, mid} = query;
     // 编辑器获取待发布的动态
     if(from === 'editor') {
-      const moment = await db.MomentModel.getUnPublishedMomentDataByUid(state.uid);
+      let moment;
+      if(mid) {
+        moment = await db.getUnPublishedMomentCommentDataById(state.uid, mid);
+      } else {
+        moment = await db.MomentModel.getUnPublishedMomentDataByUid(state.uid);
+      }
       if(moment) {
         const {momentId, videosId, picturesId, content} = moment;
         data.momentId = momentId;

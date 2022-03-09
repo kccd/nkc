@@ -219,6 +219,55 @@ schema.methods.deleteMoment = async function() {
 }
 
 /*
+* 通过发表人ID和动态ID获取当前动态下未发布的评论
+* @param {String} uid 发表人ID
+* @param {String} mid 动态ID
+* @return {moment schema or null}
+* */
+schema.statics.getUnPublishedMomentCommentById = async (uid, mid) => {
+  const MomentModel = mongoose.model('moments');
+  return MomentModel.findOne({
+    uid,
+    parent: mid,
+    status: momentStatus.default
+  });
+};
+
+/*
+* 通过发表人ID和动态ID获取当前动态下未发布的评论
+* @param {String} uid 发表人ID
+* @param {String} mid 动态ID
+* @return {Object or null}
+*   @param {String} momentId 动态 ID
+*   @param {Date} toc 动态创建时间
+*   @param {Date} tlm 动态最后修改时间
+*   @param {String} uid 发表人 ID
+*   @param {String} content 动态内容 ID
+* */
+schema.statics.getUnPublishedMomentCommentDataById = async (uid, mid) => {
+  const MomentModel = mongoose.model('moments');
+  const moment = await MomentModel.getUnPublishedMomentCommentById(uid, mid);
+  if(moment) {
+    const DocumentModel = mongoose.model('documents');
+    const {moment: momentSource} = await DocumentModel.getDocumentSources();
+    const betaDocument = await DocumentModel.getBetaDocumentBySource(momentSource, moment._id);
+    if(!betaDocument) {
+      await moment.deleteMoment();
+      return null;
+    }
+    return {
+      momentId: moment._id,
+      toc: betaDocument.toc,
+      tlm: betaDocument.tlm,
+      uid: betaDocument.uid,
+      content: betaDocument.content,
+    }
+  } else {
+    return null;
+  }
+};
+
+/*
 * 通过发表人 ID 获取未发布的动态
 * @param {String} uid 发表人 ID
 * @return {moment schema or null}
@@ -227,6 +276,7 @@ schema.statics.getUnPublishedMomentByUid = async (uid) => {
   const MomentModel = mongoose.model('moments');
   return MomentModel.findOne({
     uid,
+    parent: '',
     status: momentStatus.default,
   });
 }
