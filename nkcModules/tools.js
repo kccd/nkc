@@ -251,6 +251,9 @@ var Tools = function() {
     }
     return theRequest;
   };
+  //地址栏添加参数
+  // name {string} 参数名称
+  // value 参数值
   self.addUrlPara = function(name, value) {
     let currentUrl = window.location.href.split('#')[0];
     if (/\?/g.test(currentUrl)) {
