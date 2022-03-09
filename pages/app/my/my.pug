@@ -36,6 +36,11 @@ block content
               .my-links
                 .my-class-title 我的作品
                 .my-link
+                  a.nav-box(href=`/creation`)
+                    .icon-left
+                      img(src=tools.getUrl('getIcons', 'thread.png'))
+                    span 创作中心
+                .my-link
                   a.nav-box(href=`/u/${data.user.uid}/profile/thread`)
                     .icon-left
                       img(src=tools.getUrl('getIcons', 'thread.png'))
