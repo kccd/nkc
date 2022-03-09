@@ -837,5 +837,6 @@
   "bookInvitation": "处理专题创作邀请",
   "columnEditor": "访问专栏编辑器页",
   "visitZoneArticle": "访问空间文章",
-  "getCommentPermission": "获取评论权限"
+  "getCommentPermission": "获取评论权限",
+  "getCommentIpInfo": "获取评论ip"
 }

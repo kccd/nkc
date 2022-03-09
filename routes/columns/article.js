@@ -9,6 +9,7 @@ router.get('/:aid', async (ctx, next)=>{
   // const category =  query
   let columnPost = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid);
   const {article: articleSource} = await db.CommentModel.getCommentSources();
+  const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
   let {_id: articleId} = columnPost.article.articleInfo;
   let _article = await db.ArticleModel.findOnly({_id: articleId});
   const isModerator = await _article.isModerator(state.uid);
@@ -26,12 +27,13 @@ router.get('/:aid', async (ctx, next)=>{
   }
   let match = {
     sid: articleId,
+    status: commentStatus,
     source: articleSource
   };
   //只看作者
   if(t === 'author') {
     data.t = t;
-    match.uid = _article.uid;
+    match.uid = _article[0].uid;
   }
   const permissions = {
   
@@ -55,7 +57,7 @@ router.get('/:aid', async (ctx, next)=>{
   let comments = await db.CommentModel.find(match)
     .skip(paging.start)
     .limit(paging.perpage);
-  let comment = await db.CommentModel.findOne({uid: state.uid, source: articleSource, sid: articleId}).sort({toc: -1}).limit(1);
+  let comment = await db.CommentModel.findOne({uid: state.uid, source: articleSource, sid: articleId, status: defaultComment}).sort({toc: -1}).limit(1);
   comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions});
   if(comment ) {
     comment = await comment.extendEditorComment(comment);

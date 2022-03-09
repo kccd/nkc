@@ -204,17 +204,19 @@ export default {
     },
     //查看IP
     displayIpInfo() {
-      const ip = this.options.ipInfo;
-      if(!ip) return;
-      nkcAPI(`/ipinfo?ip=${ip}`, 'GET')
-        .then(function(res) {return res.ipInfo})
-        .then(function(info){
-          if(!info) return sweetError('获取ip信息失败！');
-          return asyncSweetCustom("<p style='font-weight: normal;'>ip: "+ info.ip +"<br>位置: "+ info.location +"</p>");
-        })
-        .catch(err => {
-          sweetError(err);
-        })
+      if(!this.comment) return sweetWarning('未找到评论内容');
+      const {_id}= this.comment;
+      nkcAPI(`/comment/${_id}/ipInfo`, 'GET')
+      .then((res) => {
+        return res.ipInfo;
+      })
+      .then((info) => {
+        if(!info) return sweetError('获取ip地址失败');
+        return asyncSweetCustom("<p style='font-weight: normal;'>ip: "+ info.ip +"<br>位置: "+ info.location +"</p>");
+      })
+      .catch((err) => {
+        sweetError(err);
+      })
     },
     //加入黑名单 tUid 被拉黑的用户
     userBlacklist() {
