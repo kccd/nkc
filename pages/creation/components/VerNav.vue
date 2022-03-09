@@ -1,35 +1,79 @@
 <template lang="pug">
-  .creation-nav
-    a.creation-nav-header(@click.prevent="selectType('home', '/creation')" url='/creation' :class="{'creation-nav-header-isApp': isApp}") 创作中心
-    .creation-nav-item(v-for="item in list")
-      .item(
-       
-        :class="selected.includes(item.type)? 'active':''"
-        )
-        .icon.left-icon
-          .fa(:class="item.icon")
-        .icon.right-icon
-          .fa(
-            :class="item.hidden?'fa-angle-down': 'fa-angle-up'"
-            v-if="item.children && item.children.length > 0"
-            )
-        a.title(:href="item.url"  @click.prevent="selectParentItem(item)") {{item.title}}
-      .children(v-if="!item.hidden && item.children && item.children.length > 0")
+  .creation-nav(ref="creationNav")
+    //- :class="{'creation-nav-header-isApp': isApp}"
+    a.creation-nav-header(@click.prevent="selectType('home', '/creation')" url='/creation') 创作中心
+    button.collapsed(@click='openMenu()')
+      span.sr-only
+      span.icon-bar
+      span.icon-bar
+      span.icon-bar
+    .creation-nav-contaior(ref="CNC")
+      .creation-nav-item(v-for="item in list")
         .item(
-          v-for="childrenItem in item.children"
-          :class="selected.includes(childrenItem.type)? 'active':''"
+          :class="selected.includes(item.type)? 'active':''"
           )
-          a.title(:href="childrenItem.url" @click.prevent="selectItem(childrenItem)") {{childrenItem.title}}
+          .icon.left-icon
+            .fa(:class="item.icon")
+          .icon.right-icon
+            .fa(
+              :class="item.hidden?'fa-angle-down': 'fa-angle-up'"
+              v-if="item.children && item.children.length > 0"
+              )
+          a.parent-title(:href="item.url"  @click.prevent="selectParentItem(item)") {{item.title}}
+        .children(v-if="!item.hidden && item.children && item.children.length > 0")
+          .item(
+            v-for="childrenItem in item.children"
+            :class="selected.includes(childrenItem.type)? 'active':''"
+            )
+            a.title(:href="childrenItem.url" @click.prevent="selectItem(childrenItem)") {{childrenItem.title}}
 </template>
 
 <style scoped lang="less">
   @import '../../publicModules/base';
-  .title{
+  @max-width: 1000px;
+  //  @media screen and (max-width: @max-width) {
+    // .bottom{
+    //   position: fixed;
+    //   bottom: 0;
+    //   background: rgba(135, 132, 132, 0.33);
+    // }
+    // .to-top{
+    //   top: 0;
+    // }
+    // .showHeight{
+    //   overflow: initial!important;
+    // }
+  //  }
+  
+  a{
     color: black;
     text-decoration: none;
   }
+  button{
+    display: none;
+    border: none;
+    background: transparent;
+    @media screen and (max-width: @max-width) {
+      .icon-bar{
+        margin-top: 6px;
+        background-color: black;
+        width: 22px;
+        height: 2px;
+        border-radius: 1px;
+        display: block;
+      }
+      display: block;
+      position: absolute;
+      top: -1.5rem;
+      right: .5rem;
+    }
+  }
   .creation-nav{
-    @max-width: 1000px;
+    @media screen and (max-width: @max-width) {
+      overflow: hidden;
+      height: 0;
+      transition: height .3s ease-in-out;
+    }
     .creation-nav-header{
       @headerHeight: 4rem;
       height: @headerHeight;
@@ -38,13 +82,14 @@
       font-weight: 700;
       color: @accent;
       text-align: center;
-      margin-bottom: 1rem;
+      width: 100%;
+      display: inline-block;
       cursor: pointer;
       user-select: none;
       @media screen and (max-width: @max-width){
         position: absolute;
-        top: 5rem;
-        left: 1rem;
+        top: -1rem;
+        left: 15px;
         font-size:1.5rem;
         font-weight: 600;
         height: 1.3rem;
@@ -52,6 +97,7 @@
         margin-bottom: 0;
         float: left;
         text-align: left;
+        width: auto;
       }
     }
     .item{
@@ -63,6 +109,9 @@
         .icon{
           width: 0;
           height: 0;
+        }
+        .parent-title{
+          color: #878484;
         }
       } 
       margin: 0 3rem 0 3rem;
@@ -120,16 +169,18 @@
       }
     }
   }
-  .creation-nav-header-isApp{
-    top: 1.7rem !important;
-  }
+  // .creation-nav-header-isApp{
+  //   top: 1.7rem !important;
+  // }
 </style>
 
 <script>
 import { getState } from "../../lib/js/state";
 
   export default {
+    name:'VerNav',
     data: () => ({
+      showMenu: false,
       selected: [],
       isApp: false,
       list: [
@@ -234,6 +285,12 @@ import { getState } from "../../lib/js/state";
       this.setNavActive()
     },
     methods: {
+      openMenu(){
+        // console.dir(this.$refs.CNC.clientHeight)
+        this.$refs.creationNav.style.height = !this.showMenu ? this.$refs.CNC.clientHeight + 'px' : 0;
+        // console.dir(this.$refs.creationNav.style.height)
+        this.showMenu = !this.showMenu;
+      },
       setNavActive() {
         const name = [];
         for(const m of this.$route.matched) {

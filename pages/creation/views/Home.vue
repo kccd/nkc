@@ -1,13 +1,13 @@
 <template lang="pug">
-.container-fluid.max-width
+.max-width
   .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel 
-    .calendar
+    .calendar.overflow-x
       .min-h(ref="canvasDom")
       #set-year
         select(@change="summaryCalendar", v-model="selected")
           template(v-for="year in years")
             option(:key="year", :value="year") {{ year }}
-    .pie
+    .pie.overflow-x
       #pie.min-h(ref="renderPie")
     .account-logs
       .account-header 最近阅读
@@ -285,6 +285,21 @@ export default {
 };
 </script>
 <style scoped lang="less">
+ @max-width: 1000px;
+.overflow-x{
+  @media screen and (max-width: @max-width) {
+    overflow-x: scroll;
+    width: 100%;
+  }
+  
+}
+.min-h {
+  min-height: 25rem;
+  @media screen and (max-width: @max-width){
+    min-width: 45rem;
+    
+  }
+}
 .account-logs .account-logs-user .account-logs-user-info {
   width: 7rem;
   display: table-cell;
@@ -344,12 +359,10 @@ export default {
 .calendar {
   position: relative;
 }
-.min-h {
-  min-height: 25rem;
-}
+
 #set-year {
   position: absolute;
-  top: 10px;
+  top: 1.3rem;
   right: 10px;
 }
 </style>

@@ -40,9 +40,9 @@ export default {
 }
 .loading-title{
   text-align: center;
-  position: absolute;
+  /* position: absolute;
   top: calc(100% - 53%);
-  left: calc(100% - 53%);
+  left: calc(100% - 50% - 41px); */
 }
 .loading-title >p{
   font-weight: 600;

@@ -2,7 +2,7 @@
 .creation-center
   .creation-nav-container
     creation-nav(@select="selectNavItem")
-  .creation-nav-container-phone(:class="{'creation-nav-container-isApp': isApp}")
+  .creation-nav-container-phone.col-xs-12.col-md-9(:class="{'creation-nav-container-isApp': isApp}")
     creation-nav(@select="selectNavItem")
   .creation-content-container
     transition(:name="transitionName")
@@ -79,7 +79,7 @@ export default {
   padding-bottom: 3rem;
   .creation-content-container {
     @media screen and(max-width: @max-width) {
-      padding: 1rem;
+      // padding: 1rem;
     }
   }
 }
