@@ -251,6 +251,23 @@ var Tools = function() {
     }
     return theRequest;
   };
+  self.addUrlPara = function(name, value) {
+    let currentUrl = window.location.href.split('#')[0];
+    if (/\?/g.test(currentUrl)) {
+      if (/name=[-\w]{4,25}/g.test(currentUrl)) {
+        currentUrl = currentUrl.replace(/name=[-\w]{4,25}/g, name + "=" + value);
+      } else {
+        currentUrl += "&" + name + "=" + value;
+      }
+    } else {
+      currentUrl += "?" + name + "=" + value;
+    }
+    if (window.location.href.split('#')[1]) {
+      window.history.replaceState(null, null, currentUrl + '#' + window.location.href.split('#')[1]);
+    } else {
+      window.history.replaceState(null, null, currentUrl);
+    }
+  };
   self.getSize = function(size, digits) {
     size = Number(size);
     if(digits === undefined) digits = 2;
