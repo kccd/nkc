@@ -19,6 +19,9 @@ module.exports = {
     },
     options: {
       GET: "getCommentPermission"
+    },
+    ipInfo: {
+      GET: "getCommentIpInfo"
     }
   }
 }

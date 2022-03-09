@@ -5,6 +5,12 @@ const commentSource = {
         article: 'article',
         book: 'book'
       };
+const commentStatus = {
+        normal: 'normal',
+        'default': 'default',
+        deleted: 'deleted',
+        cancelled: 'cancelled'
+      };
 const schema = new mongoose.Schema({
   _id: String,
   uid: {
@@ -21,6 +27,11 @@ const schema = new mongoose.Schema({
   order: {
     type: Number,
     default: 0,
+    index: 1
+  },
+  status: {
+    type: String,
+    default: commentStatus.default,
     index: 1
   },
   // 引用来源（评论所在的系统，例如 article、book 等）
@@ -80,13 +91,13 @@ schema.virtual('docId')
     return this._docId = val
   });
 
-schema.virtual('status')
-  .get(function() {
-    return this._status;
-  })
-  .set(function(val) {
-    return this._status = val
-  });
+// schema.virtual('status')
+//   .get(function() {
+//     return this._status;
+//   })
+//   .set(function(val) {
+//     return this._status = val
+//   });
 
 schema.virtual('type')
   .get(function() {
@@ -109,6 +120,14 @@ schema.virtual('reason')
 schema.statics.getCommentSources = async function() {
   return commentSource;
 }
+
+/*
+* 获取comment状态
+* */
+schema.statics.getCommentStatus = async function() {
+  return commentStatus;
+}
+
 /*
 * 检测来源的合法性
 * @param {String} source
@@ -162,9 +181,29 @@ schema.statics.createComment = async (options) => {
 * */
 schema.methods.publishComment = async function () {
   const DocumentModel = mongoose.model('documents');
+  const CommentModel = mongoose.model('comments');
   const {did} = this;
+  const {normal: normalStatus} = await CommentModel.getCommentStatus();
+  //将comment的status改变为正常
+  await this.changeCommentStatus(normalStatus);
   await DocumentModel.publishDocumentByDid(did);
 }
+
+/*
+* 改变comment的status
+* @param {String} status comment的状态
+* */
+schema.methods.changeCommentStatus = async function(status) {
+  const CommentModel = mongoose.model('comments');
+  const commentStatus = await CommentModel.getCommentStatus();
+  if(!commentStatus[status]) throwErr(400, "不存在该状态");
+  await this.updateOne({
+    $set: {
+      status
+    }
+  });
+}
+
 
 /*
 * 保存comment
@@ -539,4 +578,50 @@ schema.statics.renderComment = async function(_id) {
   });
   return c;
 }
+
+/*
+* 拓展comment的document
+* @param {object} comments 需要拓展的comment
+* @param {string} type 需要拓展的document类型
+* @param {[string]} options 需要拓展的document字段
+* */
+schema.statics.extendDocumentOfComment = async function(comments, type = 'beta', options) {
+  const DocumentModel = mongoose.model('documents');
+  const CommentModel = mongoose.model('comments');
+  const arr = [];
+  const obj = {};
+  const _comments = [];
+  const {deleted: deletedStatus} = await CommentModel.getCommentStatus();
+  for(const c of comments) {
+    if(c.status === deletedStatus) continue;
+    arr.push(c.did);
+  }
+  const documentTypes = await DocumentModel.getDocumentTypes();
+  const {comment: commentSource} = await DocumentModel.getDocumentSources();
+  const documents = await DocumentModel.find({did: {$in: arr}, type: documentTypes[type], source: commentSource});
+  for(const d of documents) {
+    const a = {};
+    for(const t of options) {
+      a[t] = d[t];
+    }
+    obj[d.did] = a;
+  }
+  for(const c of comments) {
+    const {_id, did, toc, status, sid, uid, source} = c;
+    const document = obj[c.did];
+    if(!document) continue;
+    _comments.push({
+      _id,
+      did,
+      toc,
+      status,
+      sid,
+      uid,
+      source,
+      document,
+    });
+  }
+  return _comments;
+}
+
 module.exports = mongoose.model('comments', schema);

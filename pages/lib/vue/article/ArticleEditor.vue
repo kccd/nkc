@@ -69,7 +69,7 @@
 
 <script>
 import DocumentEditor from "../DocumentEditor";
-import {getRequest, timeFormat} from "../../js/tools";
+import {getRequest, timeFormat, addUrlPara} from "../../js/tools";
 import {nkcAPI} from "../../js/netAPI";
 import {checkString} from "../../js/checkData";
 import {getLength} from "../../js/checkData";
@@ -126,6 +126,7 @@ export default {
   methods: {
     getRequest: getRequest,
     timeFormat: timeFormat,
+    addUrlPara: addUrlPara,
     checkString: checkString,
     getLength: getLength,
     //编辑器准备完毕
@@ -155,10 +156,9 @@ export default {
       const self = this;
       if(!self.source) return sweetError('文章来源source未知');
       let mid, aid, url = '/creation/articles/editor', query = `?source=${self.source}`;
-      let router = window.location.href;
       const urlSource = self.getRequest().source;
       if(!urlSource) {
-        router = router + `?source=${self.source}`;
+        self.addUrlPara('source', self.source);
       }
       if(self.source === 'column') {
         mid = this.getRequest().mid;
@@ -166,16 +166,12 @@ export default {
         if(!mid) {
           if(self.columnId) {
             mid = self.columnId;
-            router = router + `&mid=${mid}`;
+            self.addUrlPara('mid', mid);
           } else {
             return;
           }
         };
         query = query + `&mid=${mid}`;
-        // if(!aid) {
-        //   if(self.articleId) aid = self.articleId;
-        //   router = router + `&aid=${aid}`;
-        // }
         if(aid) {
           query = query + `&mid=${mid}&aid=${aid}`;
         }
@@ -183,8 +179,6 @@ export default {
         aid = this.getRequest().aid;
         if(aid) query = query + `&aid=${aid}`;
       }
-      //修改地址栏历史记录
-      self.reviseHistory(router);
       return nkcAPI(url + query, 'GET')
         .then(data => {
           self.articleId = data.articleId;
@@ -236,16 +230,14 @@ export default {
         if(!mid) url = url + `?mid=${self.columnId}`;
         if(!articleId) {
           self.articleId = aid;
-          url = url + `&aid=${aid}`;
         } else {
           return;
         }
       } else if (self.source === 'zone') {
         //空间编辑器
         if(mid) sweetError('空间编辑器不存在mid');
-        url = url + `&aid=${aid}`;
       }
-      self.reviseHistory(url);
+      self.addUrlPara('aid', aid);
       self.initData()
         .then(() => {
           self.articles = [];
@@ -390,11 +382,9 @@ export default {
           const {articleId, articleCover} = data;
           self.articleId = articleId;
           //改变地址栏参数
-          let url = window.location.href;
           const {aid} = self.getRequest();
           if(!aid) {
-            url = url + `${source === 'column'?'&':'?'}aid=${articleId}`;
-            self.reviseHistory(url);
+            self.addUrlPara('aid', articleId);
           }
           return self.resetCovetFile(articleCover);
         })
