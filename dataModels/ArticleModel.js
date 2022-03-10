@@ -535,7 +535,11 @@ schema.methods.publishArticle = async function(options) {
     await ColumnPostModel.createColumnPost(this, selectCategory);
   } else if(source === 'zone') {
     //如果发布的article为空间文章就创建一条新的动态并绑定当前article
-    const {_id: momentId} = await MomentModel.createQuoteMomentToPublish(uid, articleQuoteType, articleId);
+    const {_id: momentId} = await MomentModel.createQuoteMomentAndPublish({
+      uid,
+      quoteType: articleQuoteType,
+      quoteId: articleId
+    });
     await this.updateOne({
       $set: {
         sid: momentId,
@@ -993,6 +997,44 @@ schema.statics.extendDocumentsOfArticles = async function(articles, type = 'beta
 schema.methods.isModerator = async function(uid) {
   const {uid: articleUid} = this;
   return uid === articleUid;
+}
+
+/*
+* 获取当前article的文章链接链接
+* @param {object} articles 需要拓展文章链接的文章article
+* res： articles
+* */
+schema.statics.getArticlesUrl = async function(articles) {
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const ArticleModel = mongoose.model('articles');
+  const columnArticlesId = [];
+  const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
+  for(const article of articles) {
+    if(article.source === columnSource) {
+      columnArticlesId.push(article._id);
+    }
+  }
+  const {article: articleType} = await ColumnPostModel.getColumnPostTypes();
+  //查找专栏文章引用
+  const columnPosts = await ColumnPostModel.find({pid: {$in: columnArticlesId}, type: articleType});
+  const columnPostsObj = {};
+  for(const columnPost of columnPosts) {
+    columnPostsObj[columnPost.pid] =columnPost;
+  }
+  const results = [];
+  for(const article of articles) {
+    let url;
+    if(article.source === columnSource) {
+      url = `/m/${columnPostsObj[article._id].columnId}/a/${columnPostsObj[article._id]._id}`;
+    } else if(article.source === zoneSource) {
+      url = `/zone/a/${article._id}`;
+    }
+    results.push({
+      ...article.toObject(),
+      url,
+    });
+  }
+  return results;
 }
 
 module.exports = mongoose.model('articles', schema);

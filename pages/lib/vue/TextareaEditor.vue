@@ -55,6 +55,7 @@
 </style>
 
 <script>
+  import {debounce} from '../js/execution';
   export default {
     props: ['placeholder', 'height'],
     data: () => ({
@@ -119,9 +120,9 @@
           self.resetFocus(newPosition);
         });
       },
-      onContentChange() {
+      onContentChange: debounce(function() {
         this.$emit('content-change', this.content);
-      }
+      }, 200)
     }
   }
 </script>

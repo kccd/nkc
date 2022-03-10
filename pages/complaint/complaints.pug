@@ -47,7 +47,7 @@ block content
               .complaint-info 投诉了用户
               .complaint-author(v-if="c.content && c.content.anonymous")=anonymousInfo.username
               a.complaint-author(v-else-if="c.content" :href="'/u/' + c.content.uid" target="_blank") {{c.content.user.username}}
-              .complaint-info 所发表的回复
+              .complaint-info 所发表的评论
               a.complaint-link(v-if="c.content && c.content.url" :href="c.content.url" target="_blank") 查看
             .complaint-content {{c.reasonDescription || "未填写违规详细信息"}}
             .complaint-button(v-if="c.resolved")

@@ -150,19 +150,33 @@ schema.statics.getNewId = async () => {
 };
 
 /*
-* 创建一条未发布的动态
-* 用户主动创作动态时，调用此函数生成动态
+* 创建一条未发布的动态或评论
+* 创建动态和评论时均会调用此函数
 * @param {Object} props
 *   @param {String} uid 发表人 ID
 *   @param {String} content 动态内容
 *   @param {[String]} resourcesId 资源 ID 组成的数组
+*   @param {String} parent 评论时所评论的动态ID
 * @return {moment schema}
 * */
-schema.statics.createMoment = async (props) => {
-  const {uid, content, resourcesId} = props;
+schema.statics.createMomentCore = async (props) => {
+  const {
+    uid,
+    content = '',
+    resourcesId = [],
+    parent = '',
+    quoteId = '',
+    quoteType = '',
+  } = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
+  const {checkString} = require('../nkcModules/checkData');
+  checkString(content, {
+    name: '评论内容',
+    minLength: 0,
+    maxLength: 100000
+  });
   const toc = new Date();
   const momentId = await MomentModel.getNewId();
   const document = await DocumentModel.createBetaDocument({
@@ -175,13 +189,77 @@ schema.statics.createMoment = async (props) => {
   const moment = MomentModel({
     _id: momentId,
     uid,
+    parent,
     status: momentStatus.default,
     did: document.did,
+    quoteId,
+    quoteType,
     toc,
     files: resourcesId
   });
   await moment.save();
   return moment;
+};
+
+/*
+* 创建一条未发布的动态
+* 用户主动创作动态时，调用此函数生成动态
+* @param {Object} props
+*   @param {String} uid 发表人 ID
+*   @param {String} content 动态内容
+*   @param {[String]} resourcesId 资源 ID 组成的数组
+* @return {moment schema}
+* */
+schema.statics.createMoment = async (props) => {
+  const {uid, content, resourcesId} = props;
+  const MomentModel = mongoose.model('moments');
+  return await MomentModel.createMomentCore({
+    uid,
+    content,
+    resourcesId
+  });
+};
+
+/*
+* 创建一条未发布的引用动态
+* @param {Object} props
+*   @param {String} uid 发表人ID
+*   @param {String} content 动态内容
+*   @param {[String]} resourcesId 资源ID
+*   @param {String} quoteType 引用类型 getMomentQuoteTypes
+*   @param {String} quoteId 引用类型对应的ID
+* @return {moment schema}
+* */
+schema.statics.createQuoteMoment = async props => {
+  const {uid, content, resourcesId, quoteId, quoteType} = props;
+  const MomentModel = mongoose.model('moments');
+  return await MomentModel.createMomentCore({
+    uid,
+    content,
+    resourcesId,
+    quoteId,
+    quoteType
+  });
+};
+
+/*
+* 创建一条未发布的动态评论
+* @param {Object} props
+*   @param {String} uid 发表人 ID
+*   @param {String} content 动态内容
+*   @param {[String]} resourcesId 资源 ID 组成的数组
+*   @param {String} parent 评论时所评论的动态ID
+* @return {moment schema}
+* */
+schema.statics.createMomentComment = async (props) => {
+  const MomentModel = mongoose.model('moments');
+  const {uid, content, parent, resourcesId} = props;
+  return await MomentModel.createMomentCore({
+    uid,
+    content,
+    resourcesId,
+    parent
+  });
 };
 
 /*
@@ -204,7 +282,7 @@ schema.methods.modifyMoment = async function(props) {
       tlm: time
     }
   });
-}
+};
 
 /*
 * 标记当前动态为已删除
@@ -216,7 +294,56 @@ schema.methods.deleteMoment = async function() {
       status: this.status
     }
   });
-}
+};
+
+/*
+* 通过发表人ID和动态ID获取当前动态下未发布的评论
+* @param {String} uid 发表人ID
+* @param {String} mid 动态ID
+* @return {moment schema or null}
+* */
+schema.statics.getUnPublishedMomentCommentById = async (uid, mid) => {
+  const MomentModel = mongoose.model('moments');
+  return MomentModel.findOne({
+    uid,
+    parent: mid,
+    status: momentStatus.default
+  });
+};
+
+/*
+* 通过发表人ID和动态ID获取当前动态下未发布的评论
+* @param {String} uid 发表人ID
+* @param {String} mid 动态ID
+* @return {Object or null}
+*   @param {String} momentId 动态 ID
+*   @param {Date} toc 动态创建时间
+*   @param {Date} tlm 动态最后修改时间
+*   @param {String} uid 发表人 ID
+*   @param {String} content 动态内容 ID
+* */
+schema.statics.getUnPublishedMomentCommentDataById = async (uid, mid) => {
+  const MomentModel = mongoose.model('moments');
+  const moment = await MomentModel.getUnPublishedMomentCommentById(uid, mid);
+  if(moment) {
+    const DocumentModel = mongoose.model('documents');
+    const {moment: momentSource} = await DocumentModel.getDocumentSources();
+    const betaDocument = await DocumentModel.getBetaDocumentBySource(momentSource, moment._id);
+    if(!betaDocument) {
+      await moment.deleteMoment();
+      return null;
+    }
+    return {
+      momentId: moment._id,
+      toc: betaDocument.toc,
+      tlm: betaDocument.tlm,
+      uid: betaDocument.uid,
+      content: betaDocument.content,
+    }
+  } else {
+    return null;
+  }
+};
 
 /*
 * 通过发表人 ID 获取未发布的动态
@@ -227,9 +354,10 @@ schema.statics.getUnPublishedMomentByUid = async (uid) => {
   const MomentModel = mongoose.model('moments');
   return MomentModel.findOne({
     uid,
+    parent: '',
     status: momentStatus.default,
   });
-}
+};
 
 /*
 * 通过发表人 ID 获取未发布的动态数据
@@ -297,20 +425,22 @@ schema.methods.getBetaDocument = async function() {
 };
 
 /*
-* 发布一条动态
+* 检测当前动态或评论的内容
 * */
-schema.methods.publish = async function() {
+schema.methods.checkBeforePublishing = async function() {
   const DocumentModel = mongoose.model('documents');
   const ResourceModel = mongoose.model('resources');
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
   const betaDocument = await DocumentModel.getBetaDocumentBySource(momentSource, this._id);
   if(!betaDocument) throwErr(500, `动态数据错误 momentId=${this._id}`);
-  const {checkString} = require('../nkcModules/checkData');
-  checkString(betaDocument.content, {
-    name: '动态内容',
-    minLength: 1,
-    maxLength: 1000
-  });
+  if(!this.quoteType || !this.quoteId) {
+    const {checkString} = require('../nkcModules/checkData');
+    checkString(betaDocument.content, {
+      name: '动态内容',
+      minLength: 1,
+      maxLength: 1000
+    });
+  }
   if(this.files.length > 0) {
     let mediaType;
     const resources = await ResourceModel.find({
@@ -333,6 +463,14 @@ schema.methods.publish = async function() {
       }
     }
   }
+};
+
+/*
+* 发布当前动态或评论
+* */
+schema.methods.publish = async function() {
+  const DocumentModel = mongoose.model('documents');
+  await this.checkBeforePublishing();
   await DocumentModel.publishDocumentByDid(this.did);
   this.status = momentStatus.normal;
   await this.updateOne({
@@ -343,38 +481,109 @@ schema.methods.publish = async function() {
 };
 
 /*
-* 创建并发布一条引用类型的动态
-* @param {String} uid 发表人 ID
-* @param {String} quoteType 引用类型 momentQuoteType
-* @param {String} quoteId 引用类型对应的 ID
-* @return {moment schema}
+* 发布一条评论
+* 分为两种情况，发布评论、转发动态
+* @param {String} postType 发表类型 comment(发表评论), repost(转发)
+* @param {Boolean} alsoPost 是否触发附带操作，根据postType判断动作类型 comment(同时转发)、repost(同时评论)
 * */
-schema.statics.createQuoteMomentToPublish = async (uid, quoteType, quoteId) => {
+schema.methods.publishMomentComment = async function(postType, alsoPost) {
+  if(!['comment', 'repost'].includes(postType)) {
+    throwErr(500, `类型指定错误 postType=${postType}`);
+  }
   const MomentModel = mongoose.model('moments');
-  await MomentModel.checkMomentQuoteType(quoteType);
-  const momentId = await MomentModel.getNewId();
-  const moment = MomentModel({
-    _id: momentId,
-    uid,
-    quoteType,
-    quoteId,
-    status: momentStatus.normal,
-  });
-  await moment.save();
-  return moment;
+  const {moment: quoteType} = momentQuoteTypes;
+  const {_id, uid, resourcesId, parent} = this;
+  const {content} = await this.getBetaDocument();
+
+  if(postType === 'comment' || alsoPost) {
+    // 需要创建评论
+    await this.publish();
+  }
+  if(postType === 'repost' || alsoPost) {
+    // 需要转发动态
+    await MomentModel.createQuoteMomentAndPublish({
+      uid,
+      content,
+      resourcesId,
+      quoteType,
+      quoteId: parent,
+    });
+  }
 };
 
 /*
-* 拓展动态信息
+* 创建并发布一条引用类型的动态
+* @param {Object}
+  * @param {String} uid 发表人 ID
+  * @param {String} quoteType 引用类型 momentQuoteType
+  * @param {String} quoteId 引用类型对应的 ID
+  * @param {String} content 动态内容(可为空)
+  * @param {[String]} resourcesId 资源ID(可为空)
+* @return {moment schema}
+* */
+schema.statics.createQuoteMomentAndPublish = async (props) => {
+  const {uid, quoteType, quoteId, content, resourcesId = []} = props;
+  const MomentModel = mongoose.model('moments');
+  const moment = await MomentModel.createQuoteMoment({
+    uid,
+    resourcesId,
+    quoteType,
+    quoteId,
+    content
+  });
+  await moment.publish();
+  return moment;
+};
+
+schema.statics.getMomentsByMomentsId = async (momentsId, type = 'array') => {
+  const MomentModel = mongoose.model('moments');
+  const moments = await MomentModel.find({_id: {$in: momentsId}});
+  const obj = {};
+  for(const m of moments) {
+    obj[m._id] = m;
+  }
+  if(type === 'array') {
+    const arr = [];
+    for(const mid of momentsId) {
+      const moment = obj[mid];
+      if(!moment) return;
+      arr.push(moment);
+    }
+    return arr;
+  }
+  return obj;
+};
+
+schema.statics.extendQuotesData = async (quotes) => {
+  const MomentModel = mongoose.model('moments');
+  const quoteTypes = await MomentModel.getMomentQuoteTypes();
+  const momentId = [];
+  for(const quote of quotes) {
+    const [quoteType, quoteId] = quote.split(':');
+    if(quoteType === quoteTypes.moment) momentId.push(quoteId);
+  }
+  const moments = await MomentModel.getMomentsByMomentsId(momentId);
+  const momentsData = await MomentModel.extendMomentsData(moments);
+  const results = {};
+  for(const quote of quotes) {
+    const [quoteType, quoteId] = quote.split(':');
+    let result = null;
+    if(quoteType === quoteTypes.moment) {
+      result =  momentsData[quoteId];
+    }
+    results[quote] = result;
+  }
+  return results;
+};
+
+/*
+* 获取动态显示所需要的基础数据
 * */
 schema.statics.extendMomentsData = async (moments) => {
   const videoSize = require('../settings/video');
   const UserModel = mongoose.model('users');
   const ResourceModel = mongoose.model('resources');
   const DocumentModel = mongoose.model('documents');
-  const PostModel = mongoose.model('posts');
-  const MomentModel = mongoose.model('moments');
-  const ArticleModel = mongoose.model('articles');
   const {getUrl, fromNow} = require('../nkcModules/tools');
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
   const nkcRender = require('../nkcModules/nkcRender');
@@ -384,7 +593,11 @@ schema.statics.extendMomentsData = async (moments) => {
   const momentsId = [];
   let resourcesId = [];
   for(const moment of moments) {
-    const {uid, files, _id} = moment;
+    const {
+      uid,
+      files,
+      _id,
+    } = moment;
     usersId.push(uid);
     resourcesId = resourcesId.concat(files);
     momentsId.push(_id);
@@ -395,7 +608,7 @@ schema.statics.extendMomentsData = async (moments) => {
   const resourcesObj = await ResourceModel.getResourcesObjectByResourcesId(resourcesId);
   // 准备动态内容
   const stableDocumentsObj = await DocumentModel.getStableDocumentsBySource(momentSource, momentsId, 'object');
-  const results = [];
+  const results = {};
   for(const moment of moments) {
     const {
       uid,
@@ -479,7 +692,7 @@ schema.statics.extendMomentsData = async (moments) => {
 
       filesData.push(fileData);
     }
-    results.push({
+    results[_id] = {
       momentId: _id,
       uid,
       username,
@@ -490,7 +703,40 @@ schema.statics.extendMomentsData = async (moments) => {
       content,
       voteUp,
       files: filesData
-    });
+    };
+  }
+  return results;
+};
+
+/*
+* 拓展动态信息
+* 考虑黑名单
+* */
+schema.statics.extendMomentsListData = async (moments) => {
+  const MomentModel = mongoose.model('moments');
+  const momentsData = await MomentModel.extendMomentsData(moments);
+  const quotesId = [];
+  for(const moment of moments) {
+    const {quoteId, quoteType} = moment;
+     if(quoteType && quoteId) {
+       quotesId.push(`${quoteType}:${quoteId}`);
+     }
+  }
+  const quotesData = await MomentModel.extendQuotesData(quotesId);
+  const results = [];
+  for(const moment of moments) {
+    const {quoteType, quoteId, _id} = moment;
+    const momentData = momentsData[_id];
+    let quoteData = null;
+    if(quoteType || quoteId) {
+      quoteData = {
+        quoteType,
+        quoteId,
+        data: quotesData[`${quoteType}:${quoteId}`]
+      }
+    }
+    momentData.quoteData = quoteData;
+    results.push(momentData);
   }
   return results;
 };

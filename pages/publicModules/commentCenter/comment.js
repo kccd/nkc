@@ -1,6 +1,7 @@
 import {getDataById} from "../../lib/js/dataConversion";
 const data = getDataById('data');
 import CommentEditor from "../../lib/vue/comment/CommentEditor";
+import {delUrlParam, addUrlParam} from "../../lib/js/tools";
 const commentEditor = new Vue({
   el: "#commentEditor",
   data: {
@@ -192,4 +193,6 @@ Object.assign(window, {
   markAllComments,
   disabledArticleComment,
   disabledMarkedComment,
+  addUrlKey,
+  delUrlKey,
 });

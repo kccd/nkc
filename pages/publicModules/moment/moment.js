@@ -34,7 +34,12 @@ class Moment {
         },
         data: {
           momentId: this.momentId,
-          hidden: true
+          hidden: true,
+          postType: null,
+          postTypes: {
+            report: 'repost',
+            comment: 'comment'
+          }
         },
         methods: {
           show() {
@@ -43,8 +48,27 @@ class Moment {
           hide() {
             this.hidden = true;
           },
-          toggle() {
-            this.hidden = !this.hidden;
+          repostToggle() {
+            if(this.hidden) {
+              this.hidden = false;
+            } else if(this.postType === 'repost') {
+              this.hidden = true;
+            }
+            this.setAsRepost();
+          },
+          commentToggle() {
+            if(this.hidden) {
+              this.hidden = false;
+            } else if(this.postType === 'comment') {
+              this.hidden = true;
+            }
+            this.setAsComment();
+          },
+          setAsRepost() {
+            this.postType = this.postTypes.report;
+          },
+          setAsComment() {
+            this.postType = this.postTypes.comment;
           }
         }
       })
@@ -53,7 +77,12 @@ class Moment {
   // 打开评论列表
   openCommentContainer() {
     this.initCommentApp();
-    this.commentApp.toggle();
+    this.commentApp.commentToggle();
+  }
+  // 打开转发面板
+  openReportContainer() {
+    this.initCommentApp();
+    this.commentApp.repostToggle();
   }
 }
 

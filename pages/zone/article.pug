@@ -13,13 +13,17 @@ block title
   -var {hits, count, oc} = thread
   -var {authorInfos, uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c} = post
   title=t
+  //- 与post隐藏相关的设置
+  include ../thread/hidePostContentSettings
+  if data.postHeight
+    +hidePostContentSettings(data.postHeight)
   +includeCSS('../../columns/article/article.css')
 block content
-  .hidden#data=objToStr({comments: data.comments})
+  .hidden#data=objToStr({comments: data.comments, comment: data.comment, article: data.article})
   .container-fluid.max-width
-    .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel 
-      .m-b-1 
-        .row
+    .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel
+      .row
+        .m-b-1
           include ../columns/article/nav
           +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount})
           include ../columns/article/setUp
@@ -30,8 +34,9 @@ block content
           +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
           include ../columns/article/content
           +content(c)
-    .article-common.col-xs-12.col-md-9
-      include ../publicModules/commentCenter/comment
+    .article-common.col-xs-12.col-md-9.box-shadow-panel#comment-content
+      .row
+        include ../publicModules/commentCenter/comment
     .col-xs-12.col-md-3.box-shadow-panel#rightDom
       //- 滚动到页头页脚
       include ../module_scrollTo.pug
@@ -44,6 +49,8 @@ block content
   //- 下拉后左边显示的所属专业 上级专业 同级专业
   //- +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 block scripts
+  +includeDeferJS('/columns/article/article.js', false)
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../publicModules/disabledPost/disabledPost
 //-  +includeJS('/columns/article/article.js')
 
