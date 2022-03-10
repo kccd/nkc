@@ -2,7 +2,7 @@
 .creation-center
   .creation-nav-container
     creation-nav(@select="selectNavItem")
-  .creation-nav-container-phone.col-xs-12.col-md-9(:class="{'creation-nav-container-isApp': isApp}")
+  .creation-nav-container-phone.standard-max-container(:class="{'creation-nav-container-isApp': isApp}")
     creation-nav(@select="selectNavItem")
   .creation-content-container
     transition(:name="transitionName")
@@ -12,7 +12,6 @@
 import VerNav from "./components/VerNav";
 import { getState } from "../lib/js/state";
 import { visitUrl } from "../lib/js/pageSwitch";
-
 export default {
   components: {
     "creation-nav": VerNav,
@@ -35,9 +34,8 @@ export default {
   },
   methods: {
     navToPage(page, url) {
-      // // console.log()
       if (this.isApp) {
-        visitUrl(url);
+        visitUrl(url, true);
         return;
       }
       this.$router.push({ name: page });
@@ -88,6 +86,7 @@ export default {
     display: none;
   }
   .creation-nav-container-phone {
+    position: relative;
     display: block;
     margin-bottom: 2rem;
     margin-top: 1.5rem;
