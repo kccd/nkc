@@ -3,7 +3,7 @@
     .moment-comment-nav
       span(
         v-for='n in nav'
-        :class="{'active': n.type === activeNav}"
+        :class="{'active': n.type === sort}"
         @click="setActiveNav(n.type)"
         ) {{n.name}}
     .moment-comment-list
@@ -35,7 +35,7 @@
     },
     data: () => ({
       moments: [],
-      activeNav: null,
+      sort: null,
       nav: [
         {
           type: 'hot',
@@ -52,7 +52,7 @@
     },
     methods: {
       setActiveNav(type) {
-        this.activeNav = type;
+        this.sort = type;
         this.getComments();
       },
       getComments(page = 0) {
