@@ -1,8 +1,8 @@
 <template lang="pug">
-  .container-fluid
+  .standard-max-container
     .m-b-1
       bread-crumb(:list="navList")
-    .standard-max-container
+    div
       .m-b-1
         info-block(:mode="'info'")
           span 片段内容编辑器提示

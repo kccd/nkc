@@ -1,5 +1,5 @@
 <template lang="pug">
-  .zone-article-editor
+  .zone-article-editor.standard-max-container
     hor-nav(:list="navList")
     router-view
 </template>

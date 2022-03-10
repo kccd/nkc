@@ -16,7 +16,7 @@ router
       .sort({toc: -1})
       .skip(paging.start)
       .limit(paging.perpage)
-    data.momentsData = await db.MomentModel.extendMomentsData(moments);
+    data.momentsData = await db.MomentModel.extendMomentsListData(moments);
     data.paging = paging;
     ctx.template = 'subscribe/moment.pug';
     await next();

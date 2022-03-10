@@ -1,5 +1,5 @@
 <template lang="pug">
-  .container-fluid.community
+  .standard-max-container.community
     hor-nav(:list="navList")
     router-view
 </template>

@@ -535,7 +535,7 @@ schema.methods.publishArticle = async function(options) {
     await ColumnPostModel.createColumnPost(this, selectCategory);
   } else if(source === 'zone') {
     //如果发布的article为空间文章就创建一条新的动态并绑定当前article
-    const {_id: momentId} = await MomentModel.createQuoteMomentToPublish(uid, articleQuoteType, articleId);
+    const {_id: momentId} = await MomentModel.createQuoteMomentAndPublish(uid, articleQuoteType, articleId);
     await this.updateOne({
       $set: {
         sid: momentId,

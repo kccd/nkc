@@ -9,10 +9,10 @@
 <style lang="less" scoped>
   @import '../../publicModules/base';
   .hor-nav{
-    @max-width: 1000px;
-    @media screen and (max-width: max-width) {
-      margin-left: 1rem;
-    }
+    // @max-width: 1000px;
+    // @media screen and (max-width: @max-width) {
+    //   margin-left: 15px;
+    // }
     margin-bottom: 1rem;
     user-select: none;
     .hor-nav-item{

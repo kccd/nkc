@@ -1,30 +1,30 @@
 @import "../base";
-.single-moment-container{
+.single-moment-top-container{
   @avatarWidth: 4rem;
   @avatarWidthMin: 3rem;
   position: relative;
   padding-left: @avatarWidth + 1rem;
-  padding-right: @avatarWidth;
+  //padding-right: @avatarWidth;
   min-height: @avatarWidth;
-  @media(max-width: 787px) {
+  /*@media(max-width: 787px) {
     padding-right: 1rem;
     padding-left: @avatarWidthMin + 0.5rem;
-  }
+  }*/
   .single-moment-left{
     position: absolute;
     top: 0;
     left: 0;
     width: @avatarWidth;
-    @media(max-width: 787px) {
+    /*@media(max-width: 787px) {
       width: @avatarWidthMin;
-    }
+    }*/
     .single-moment-avatar{
       height: @avatarWidth;
       width: @avatarWidth;
-      @media(max-width: 787px) {
+      /*@media(max-width: 787px) {
         height: @avatarWidthMin;
         width: @avatarWidthMin;
-      }
+      }*/
       border-radius: 50%;
       overflow: hidden;
       img{
@@ -47,6 +47,18 @@
         color: @primary;
       }
     }
+    .single-moment-avatar{
+      display: inline-block;
+      height: 2rem;
+      width: 2rem;
+      border-radius: 50%;
+      overflow: hidden;
+      vertical-align: middle;
+      img{
+        height: 100%;
+        width: 100%;
+      }
+    }
     .single-moment-time{
       display: inline-block;
       font-size: 1rem;
@@ -66,35 +78,6 @@
       a{
         color: @primary;
       }
-    }
-  }
-  .single-moment-bottom{
-    position: relative;
-    @padding: 3rem;
-    height: @padding;
-    line-height: @padding;
-    padding-left: @padding;
-    padding-right: @padding;
-    font-size: 1.3rem;
-    text-align: center;
-    color: #3f3f3f;
-    .single-moment-bottom-left{
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: @padding;
-      line-height: @padding;
-      width: @padding;
-      cursor: pointer;
-    }
-    .single-moment-bottom-right{
-      position: absolute;
-      top: 0;
-      right: 0;
-      height: @padding;
-      line-height: @padding;
-      width: @padding;
-      cursor: pointer;
     }
   }
   .single-moment-files{
@@ -176,6 +159,63 @@
     }
   }
 }
+
+.single-moment-bottom-container{
+  padding-left: 5rem;
+  //padding-right: 4rem;
+  .single-moment-bottom{
+    position: relative;
+    @padding: 3rem;
+    height: @padding;
+    line-height: @padding;
+    padding-left: @padding;
+    padding-right: @padding;
+    font-size: 1.3rem;
+    text-align: center;
+    color: #3f3f3f;
+    .single-moment-bottom-left{
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: @padding;
+      line-height: @padding;
+      width: @padding;
+      cursor: pointer;
+    }
+    .single-moment-bottom-right{
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: @padding;
+      line-height: @padding;
+      width: @padding;
+      cursor: pointer;
+    }
+  }
+}
+
+.single-moment-center-container{
+  padding-left: 5rem;
+  margin-bottom: 0.5rem;
+  .single-moment-center-content{
+    width: 100%;
+    max-width: 100%;
+    padding: 1rem;
+    border: 1px solid #d5d5d5;
+    border-radius: 5px;
+    background-color: #f6f2ee;
+  }
+  .single-moment-top-container{
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .single-moment-files{
+    &[data-file-type="picture"]{
+      width: 50%;
+    }
+  }
+}
+
 .moments-container{
   .moment-item{
     border-bottom: 1px solid #eee;

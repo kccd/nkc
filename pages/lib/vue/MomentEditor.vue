@@ -3,7 +3,8 @@
     resource-selector(ref="resourceSelector")
     emoji-selector(ref="emojiSelector")
     .content-body
-      textarea-editor(ref="textareaEditor" @content-change="onTextareaEditorContentChange")
+      .textarea-editor-container
+        textarea-editor(ref="textareaEditor" @content-change="onTextareaEditorContentChange")
       .files-container
         .pictures(v-if="picturesUrl.length > 0")
           .picture-item(v-for="(url, index) in picturesUrl" :style="'background-image: url('+url+')'")
@@ -107,26 +108,8 @@
       width: 100%;
       z-index: -1;
     }
-    .content-container{
-      margin-bottom: 0.5rem;
-      padding: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 0.5rem;
-      textarea{
-        min-height: 4rem;
-        resize: none;
-        overflow: hidden;
-        width: 100%;
-        border: none;
-        font-size: 1.25rem;
-        line-height: 2rem;
-        border-radius: 0;
-        outline: none;
-        padding: 0;
-        &.ghost{
-          //overflow: auto;
-        }
-      }
+    .textarea-editor-container{
+      margin-bottom: 1rem;
     }
     .buttons-container{
       @buttonHeight: 2.5rem;
@@ -177,8 +160,9 @@
         height: @buttonHeight;
         overflow: hidden;
         span.number{
-          margin-right: 0.3rem;
-          color: #555;
+          margin-right: 1rem;
+          font-weight: 700;
+          color: #787878;
           &.warning{
             color: red;
           }
@@ -372,13 +356,11 @@
         this.saveContent();
       }, 500),
       saveContent() {
-        const {content, picturesId, videosId, momentId} = this;
+        const {content, picturesId, videosId} = this;
         const self = this;
         const resourcesId = picturesId.length > 0? picturesId: videosId;
-        const type = momentId? 'modify': 'create';
         return nkcAPI(`/creation/zone/moment`, 'POST', {
-          type,
-          momentId,
+          type: 'modify',
           content,
           resourcesId
         })
@@ -387,7 +369,7 @@
           console.log(`动态已自动保存`);
         })
         .catch(err => {
-          screenTopWarning(`动态保存失败：${err.error || err.message || err}`);
+          screenTopWarning(`实时保存失败：${err.error || err.message || err}`);
         });
       }
     }

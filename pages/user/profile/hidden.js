@@ -23,6 +23,7 @@ $(document).ready(()=>{
       userInfo && (userInfo.style.display = 'none');
       // body.style.background = 'none';
       const content = $('#container-fluid-show')[0]
+      content && (content.children[0].style.padding = '0');
       content.addEventListener('click',function(e){
         let url;
         // 回复点击作者 通过 e.target.parentElement 获取a标签

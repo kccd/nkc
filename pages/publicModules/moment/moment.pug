@@ -38,29 +38,54 @@ if !isIncluded('publicModules/moment/moment.pug')
                   title=file.filename
                   )
 
-  mixin singleMoment(momentData)
+
+  mixin singleMoment(momentData, quote)
     -var {uid, toc, username, avatarUrl, userHome, time, content, voteUp, files} = momentData;
-    -var {momentId} = momentData;
+    -var {momentId, quoteData} = momentData;
     .single-moment-container(data-moment-id=momentId)
-      .single-moment-left
-        .single-moment-avatar(data-float-uid=uid)
-          img(src=avatarUrl)
-      .single-moment-right
-        .single-moment-header
-          .single-moment-user(data-float-uid=uid)
-            a(href=userHome target="_blank")=username
-          .single-moment-time
-            +fromNow(toc)
-        .single-moment-content!=content
-        +momentFiles(files)
-        .single-moment-bottom
-          .single-moment-bottom-left.fa.fa-comment-o(
-            data-moment-id=momentId
-            data-event-name='openCommentContainer'
+      .single-moment-top-container
+        if !quote
+          .single-moment-left
+            .single-moment-avatar(data-float-uid=uid)
+              img(src=avatarUrl)
+        .single-moment-right
+          .single-moment-header
+            if quote
+              .single-moment-avatar
+                img(src=avatarUrl)
+            .single-moment-user(data-float-uid=uid)
+              a(href=userHome target="_blank")=username
+            .single-moment-time
+              +fromNow(toc)
+          .single-moment-content!=content
+          +momentFiles(files)
+      if !quote
+        if quoteData && quoteData.data
+          .single-moment-center-container
+            .single-moment-center-content
+              +quoteData(quoteData)
+        .single-moment-bottom-container
+          .single-moment-bottom
+            .single-moment-bottom-left.fa.fa-comment-o(
+              data-moment-id=momentId
+              data-event-name='openCommentContainer'
+              )
+            .single-moment-bottom-center.fa.fa-retweet(
+              data-moment-id=momentId
+              data-event-name='openReportContainer'
             )
-          .single-moment-bottom-center
-            .fa.fa-retweet
-          .single-moment-bottom-right.fa.fa-thumbs-o-up
-        .single-moment-comment-container(v-if='!hidden' v-cloak)
-          moment-comments(:mid="momentId")
+            .single-moment-bottom-right.fa.fa-thumbs-o-up
+          .single-moment-comment-container(v-if='!hidden' v-cloak)
+            moment-comments(:mid="momentId" :type='postType')
+
+
+
+  mixin quoteData(quoteData)
+    -var {quoteType, quoteId, data} = quoteData;
+    if quoteType === 'moment'
+      +quoteMoment(data)
+
+  mixin quoteMoment(data)
+    +singleMoment(data, true)
+
 

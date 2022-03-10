@@ -87,15 +87,12 @@
   import {localStorageKeys, getFromLocalStorage, saveToLocalStorage} from "../js/localStorage";
 
   const emojiSelectorKey = localStorageKeys.emojiSelector;
-  const {
-    multipleSelection = true
-  } = getFromLocalStorage(emojiSelectorKey);
 
   export default {
     data: () => ({
       callback: null,
       emoji: [],
-      multipleSelection,
+      multipleSelection: true,
       selected: false,
       statusTimeout: null,
     }),
@@ -105,6 +102,7 @@
       }
     },
     mounted() {
+      this.initMultipleSelection();
       this.initDraggableElement();
     },
     computed: {
@@ -118,6 +116,12 @@
       }
     },
     methods: {
+      initMultipleSelection() {
+        const {
+          multipleSelection = true
+        } = getFromLocalStorage(emojiSelectorKey);
+        this.multipleSelection = multipleSelection;
+      },
       initDraggableElement() {
         this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
       },
@@ -136,6 +140,7 @@
         this.draggableElement.hide();
       },
       open(callback) {
+        this.initMultipleSelection();
         const self = this;
         self.callback = callback;
         self.show();

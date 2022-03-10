@@ -1,76 +1,76 @@
 <template lang="pug">
-  .container-fluid
+  .standard-max-container
     user-selector(ref="userSelector")
     image-selector(ref="imageSelector")
     .m-b-1
       bread-crumb(:list="navList")
-    .standard-container
-      .formm
-        .form-group
-          label.control-label 专题名称
-          input.form-control(type="text" v-model="book.name")
-        .form-group
-          label.control-label 专题介绍
-          textarea.form-control(rows=5 v-model="book.description")
-        .form-group
-          label.control-label 专题封面
-          .m-r-05
-            img.book-cover(v-if="bookCover" :src="bookCover")
-          div
-            button.btn.btn-default.btn-sm(@click="openImageSelector") 选择封面
-        .form-group(v-if="bookId")
-          label.control-label 创作成员
-          .table-responsive
-            table.table.nkc-table.m-b-05
-              thead
-                tr
-                  th 用户名
-                  th 角色
-                  th 状态
-                  th 操作
-              tbody
-                tr(v-for="m in bookMembers")
-                  th.member-name
-                    img(:src="m.avatarUrl")
-                    a(:href="m.userHome" target="_blank") {{m.username}}
-                  th
-                    .radio.m-t-05.m-b-05
-                      label.m-r-1
-                        input(type="radio" value="admin" v-model="m.role" :disabled="m.isFounder")
-                        span 管理员
-                      label
-                        input(type="radio" value="member" v-model="m.role" :disabled="m.isFounder")
-                        span 普通成员
-                  th.member-status(:class="m.status") {{m.statusName}}
-                  th
-                    button.btn.btn-xs.btn-default(v-if="m.status !== 'rejected' && !m.isFounder" @click="removeMember(m)") 删除
-                    button.btn.btn-xs.btn-default(v-if="m.status === 'rejected'") 重新邀请
-          .m-b-05
-            button.btn.btn-default.btn-xs(@click="selectorMember") 添加成员
-          .permission-info.bg-info.p-a-05
-            strong 权限说明
-            div 管理员：
-              span {{rolePermission.admin.join("、")}}
-            div 普通成员：
-              span {{rolePermission.member.join("、")}}
+      //- .standard-container
+    .formm
+      .form-group
+        label.control-label 专题名称
+        input.form-control(type="text" v-model="book.name")
+      .form-group
+        label.control-label 专题介绍
+        textarea.form-control(rows=5 v-model="book.description")
+      .form-group
+        label.control-label 专题封面
+        .m-r-05
+          img.book-cover(v-if="bookCover" :src="bookCover")
+        div
+          button.btn.btn-default.btn-sm(@click="openImageSelector") 选择封面
+      .form-group(v-if="bookId")
+        label.control-label 创作成员
+        .table-responsive
+          table.table.nkc-table.m-b-05
+            thead
+              tr
+                th 用户名
+                th 角色
+                th 状态
+                th 操作
+            tbody
+              tr(v-for="m in bookMembers")
+                th.member-name
+                  img(:src="m.avatarUrl")
+                  a(:href="m.userHome" target="_blank") {{m.username}}
+                th
+                  .radio.m-t-05.m-b-05
+                    label.m-r-1
+                      input(type="radio" value="admin" v-model="m.role" :disabled="m.isFounder")
+                      span 管理员
+                    label
+                      input(type="radio" value="member" v-model="m.role" :disabled="m.isFounder")
+                      span 普通成员
+                th.member-status(:class="m.status") {{m.statusName}}
+                th
+                  button.btn.btn-xs.btn-default(v-if="m.status !== 'rejected' && !m.isFounder" @click="removeMember(m)") 删除
+                  button.btn.btn-xs.btn-default(v-if="m.status === 'rejected'") 重新邀请
+        .m-b-05
+          button.btn.btn-default.btn-xs(@click="selectorMember") 添加成员
+        .permission-info.bg-info.p-a-05
+          strong 权限说明
+          div 管理员：
+            span {{rolePermission.admin.join("、")}}
+          div 普通成员：
+            span {{rolePermission.member.join("、")}}
 
 
-        .form-group(v-if="bookId")
-          label.control-label 谁可以阅读
-          .radio
-            label.m-r-1
-              input(type="radio" value="everyone" v-model="book.read")
-              span 所有人
-            label.m-r-1
-              input(type="radio" value="member" v-model="book.read")
-              span 仅创作成员
-            label.m-r-1
-              input(type="radio" value="self" v-model="book.read")
-              span 仅自己
-        .form-group.m-b-3
-          button.btn.btn-primary.btn-block(v-if="submitting" disabled) {{progress === 100? `处理中...`: `提交中...${progress}%`}}
-          button.btn.btn-primary.btn-block(v-else @click="submit") 提交
-          //button.btn.btn-danger.btn-block(v-if="bookId") 删除
+      .form-group(v-if="bookId")
+        label.control-label 谁可以阅读
+        .radio
+          label.m-r-1
+            input(type="radio" value="everyone" v-model="book.read")
+            span 所有人
+          label.m-r-1
+            input(type="radio" value="member" v-model="book.read")
+            span 仅创作成员
+          label.m-r-1
+            input(type="radio" value="self" v-model="book.read")
+            span 仅自己
+      .form-group.m-b-3
+        button.btn.btn-primary.btn-block(v-if="submitting" disabled) {{progress === 100? `处理中...`: `提交中...${progress}%`}}
+        button.btn.btn-primary.btn-block(v-else @click="submit") 提交
+        //button.btn.btn-danger.btn-block(v-if="bookId") 删除
 </template>
 <script>
   import {nkcAPI} from "../../../lib/js/netAPI";
@@ -278,7 +278,6 @@
         })
         .then(data => {
           self.bookMembers = data.bookMembers;
-          console.log(data.bookMembers, self.bookMembers)
         })
         .catch(sweetError)
       },

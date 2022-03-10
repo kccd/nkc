@@ -1,5 +1,5 @@
 <template lang="pug">
-  .container-fluid.column
+  .standard-max-container.column
     hor-nav(:list="navList")
     router-view
 </template>
