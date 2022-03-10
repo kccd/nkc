@@ -254,7 +254,7 @@ var Tools = function() {
   //地址栏添加参数
   // name {string} 参数名称
   // value 参数值
-  self.addUrlPara = function(name, value) {
+  self.addUrlParam = function(name, value) {
     let currentUrl = window.location.href.split('#')[0];
     if (/\?/g.test(currentUrl)) {
       if (/name=[-\w]{4,25}/g.test(currentUrl)) {
@@ -266,11 +266,38 @@ var Tools = function() {
       currentUrl += "?" + name + "=" + value;
     }
     if (window.location.href.split('#')[1]) {
-      window.history.replaceState(null, null, currentUrl + '#' + window.location.href.split('#')[1]);
+      currentUrl = currentUrl + '#' + window.location.href.split('#')[1]
+      window.history.replaceState(null, null, currentUrl);
     } else {
       window.history.replaceState(null, null, currentUrl);
     }
+    return currentUrl;
   };
+  //删除地址栏中的指定参数并返回删除参数后的地址
+  // paramKey {string} 需要删除的键
+  self.delUrlParam = function(paramKey) {
+    let url = window.location.href;    //页面url
+    let urlParam = window.location.search.substr(1);  //页面参数
+    let beforeUrl = url.substr(0, url.indexOf("?"));  //页面主地址（参数之前地址）
+    let nextUrl = "";
+    let arr = new Array();
+    if (urlParam != "") {
+      let urlParamArr = urlParam.split("&"); //将参数按照&符分成数组
+      for (let i = 0; i < urlParamArr.length; i++) {
+        let paramArr = urlParamArr[i].split("="); //将参数键，值拆开
+        //如果键与要删除的不一致，则加入到参数中
+        if (paramArr[0] != paramKey) {
+          arr.push(urlParamArr[i]);
+        }
+      }
+    }
+    if (arr.length > 0) {
+      nextUrl = "?" + arr.join("&");
+    }
+    url = beforeUrl + nextUrl;
+    return url;
+  }
+  
   self.getSize = function(size, digits) {
     size = Number(size);
     if(digits === undefined) digits = 2;

@@ -1002,22 +1002,32 @@ schema.methods.isModerator = async function(uid) {
 * */
 schema.statics.getArticlesUrl = async function(articles) {
   const ColumnPostModel = mongoose.model('columnPosts');
-  const DocumentModel = mongoose.model('documents');
-  const articlesIdArr = [];
+  const ArticleModel = mongoose.model('articles');
+  const columnArticlesId = [];
+  const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
   for(const article of articles) {
-    articlesIdArr.push(article._id);
+    if(article.source === columnSource) {
+      columnArticlesId.push(article._id);
+    }
   }
   const {article: articleType} = await ColumnPostModel.getColumnPostTypes();
-  const columnPosts = await ColumnPostModel.find({pid: {$in: articlesIdArr}, type: articleType});
+  //查找专栏文章引用
+  const columnPosts = await ColumnPostModel.find({pid: {$in: columnArticlesId}, type: articleType});
   const columnPostsObj = {};
   for(const columnPost of columnPosts) {
     columnPostsObj[columnPost.pid] =columnPost;
   }
   const results = [];
   for(const article of articles) {
+    let url;
+    if(article.source === columnSource) {
+      url = `/m/${columnPostsObj[article._id].columnId}/a/${columnPostsObj[article._id]._id}`;
+    } else if(article.source === zoneSource) {
+      url = `/zone/a/${article._id}`;
+    }
     results.push({
       ...article.toObject(),
-      url: `/m/${columnPostsObj[article._id].columnId}/a/${columnPostsObj[article._id]._id}`,
+      url,
     });
   }
   return results;
