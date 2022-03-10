@@ -431,15 +431,16 @@ schema.methods.checkBeforePublishing = async function() {
   const DocumentModel = mongoose.model('documents');
   const ResourceModel = mongoose.model('resources');
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
-  console.log({momentSource, id:this._id})
   const betaDocument = await DocumentModel.getBetaDocumentBySource(momentSource, this._id);
   if(!betaDocument) throwErr(500, `动态数据错误 momentId=${this._id}`);
-  const {checkString} = require('../nkcModules/checkData');
-  checkString(betaDocument.content, {
-    name: '动态内容',
-    minLength: 1,
-    maxLength: 1000
-  });
+  if(!this.quoteType || !this.quoteId) {
+    const {checkString} = require('../nkcModules/checkData');
+    checkString(betaDocument.content, {
+      name: '动态内容',
+      minLength: 1,
+      maxLength: 1000
+    });
+  }
   if(this.files.length > 0) {
     let mediaType;
     const resources = await ResourceModel.find({
