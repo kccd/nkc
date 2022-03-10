@@ -11,6 +11,7 @@ router.get('/:aid', async (ctx, next)=>{
   const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
   let {_id: articleId} = columnPost.article.articleInfo;
   let _article = await db.ArticleModel.findOnly({_id: articleId});
+  const baseUrl = (await db.ArticleModel.getArticlesUrl([_article]))[0].url;
   data.article = _article;
   const isModerator = await _article.isModerator(state.uid);
   //获取当前文章信息
@@ -70,6 +71,7 @@ router.get('/:aid', async (ctx, next)=>{
     }
   }
   const hidePostSettings = await db.SettingModel.getSettings("hidePost");
+  data.baseUrl = baseUrl;
   data.originalUrl = ctx.originalUrl;
   data.permissions = permissions;
   data.isModerator =  isModerator;

@@ -12,6 +12,7 @@ router
     const articleRelatedContent = await db.ArticleModel.getZoneArticle(aid);
     data.columnPost = articleRelatedContent;
     let article = await db.ArticleModel.findOnly({_id: aid});
+    const baseUrl = (await db.ArticleModel.getArticlesUrl([article]))[0].url;
     data.article = article;
     const isModerator = await article.isModerator(state.uid);
     //获取当前文章信息
@@ -66,7 +67,7 @@ router
           data.comment = comment || '';
       }
     }
-    data.originalUrl = ctx.originalUrl;
+    data.baseUrl = baseUrl;
     data.articleStatus = article[0].document.status;
     const hidePostSettings = await db.SettingModel.getSettings("hidePost");
     data.postHeight = hidePostSettings.postHeight;
