@@ -995,4 +995,32 @@ schema.methods.isModerator = async function(uid) {
   return uid === articleUid;
 }
 
+/*
+* 获取当前article的文章链接链接
+* @param {object} articles 需要拓展文章链接的文章article
+* res： articles
+* */
+schema.statics.getArticlesUrl = async function(articles) {
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const DocumentModel = mongoose.model('documents');
+  const articlesIdArr = [];
+  for(const article of articles) {
+    articlesIdArr.push(article._id);
+  }
+  const {article: articleType} = await ColumnPostModel.getColumnPostTypes();
+  const columnPosts = await ColumnPostModel.find({pid: {$in: articlesIdArr}, type: articleType});
+  const columnPostsObj = {};
+  for(const columnPost of columnPosts) {
+    columnPostsObj[columnPost.pid] =columnPost;
+  }
+  const results = [];
+  for(const article of articles) {
+    results.push({
+      ...article.toObject(),
+      url: `/m/${columnPostsObj[article._id].columnId}/a/${columnPostsObj[article._id]._id}`,
+    });
+  }
+  return results;
+}
+
 module.exports = mongoose.model('articles', schema);

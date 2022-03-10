@@ -119,7 +119,8 @@ router
       //拓展article内容
       articles = await db.ArticleModel.extendArticles(articles);
       const {article} = await db.CommentModel.getCommentSources();
-      let comments = await db.CommentModel.find({did: {$in: [...commentDocId]}, source: article});
+      //查找评论
+      let comments = await db.CommentModel.find({did: {$in: [...commentDocId]}});
       comments = await db.CommentModel.extendReviewComments(comments);
       const users = await db.UserModel.find({uid: {$in: [...uid]}});
       const usersObj = {};

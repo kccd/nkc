@@ -13,6 +13,7 @@ router.get('/:aid', async (ctx, next)=>{
   let {_id: articleId} = columnPost.article.articleInfo;
   let _article = await db.ArticleModel.findOnly({_id: articleId});
   const isModerator = await _article.isModerator(state.uid);
+  //获取当前文章信息
   _article = await db.ArticleModel.extendDocumentsOfArticles([_article], 'stable', [
     '_id',
     'uid',
@@ -26,9 +27,7 @@ router.get('/:aid', async (ctx, next)=>{
     }
   }
   let match = {
-    sid: articleId,
     status: commentStatus,
-    source: articleSource
   };
   //只看作者
   if(t === 'author') {
@@ -36,7 +35,6 @@ router.get('/:aid', async (ctx, next)=>{
     match.uid = _article[0].uid;
   }
   const permissions = {
-  
   };
   if(user) {
     if(permission('review')) {
@@ -53,14 +51,20 @@ router.get('/:aid', async (ctx, next)=>{
   const count = await db.CommentModel.countDocuments(match);
   const paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
   data.paging = paging;
+  //获取该文章下当前用户编辑了未发布的评论内容
+  const m = {
+    uid: state.uid,
+    status: defaultComment,
+  };
+  let comment = await db.CommentModel.getCommentsByArticleId({match: m, source: _article[0].source, aid: _article[0]._id,});
   //获取该文章下的评论
-  let comments = await db.CommentModel.find(match)
-    .skip(paging.start)
-    .limit(paging.perpage);
-  let comment = await db.CommentModel.findOne({uid: state.uid, source: articleSource, sid: articleId, status: defaultComment}).sort({toc: -1}).limit(1);
-  comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions});
-  if(comment ) {
-    comment = await comment.extendEditorComment(comment);
+  let comments = await db.CommentModel.getCommentsByArticleId({match, paging, source: _article[0].source, aid: _article[0]._id,});
+  if(comments && comments.length !== 0) {
+    comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions});
+  }
+  if(comment && comment.length !== 0) {
+    //拓展单个评论内容
+    comment = await comment[0].extendEditorComment();
     if(comment.type === 'beta') {
       data.comment = comment || '';
     }

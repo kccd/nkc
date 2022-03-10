@@ -1,5 +1,4 @@
 const mongoose = require('../settings/database');
-const {getUrl} = require("../nkcModules/tools");
 const {htmlToPlain} = require("../nkcModules/nkcRender");
 const commentSource = {
         article: 'article',
@@ -34,12 +33,12 @@ const schema = new mongoose.Schema({
     default: commentStatus.default,
     index: 1
   },
-  // 引用来源（评论所在的系统，例如 article、book 等）
-  source: {
-    type: String,
-    required: true,
-    index: 1
-  },
+  // // 引用来源（评论所在的系统，例如 article、book 等）
+  // source: {
+  //   type: String,
+  //   required: true,
+  //   index: 1
+  // },
   did: {
     type: String,
     required: true,
@@ -143,29 +142,34 @@ schema.statics.checkCommentSource = async (source) => {
 * 创建comment
 * */
 schema.statics.createComment = async (options) => {
-  const {uid, content, sid, ip, port, quoteDid} = options;
+  const {uid, content, sid, ip, port, quoteDid, source} = options;
   const toc = new Date();
   const DocumentModel = mongoose.model('documents');
   const SettingModel = mongoose.model('settings');
   const CommentModel = mongoose.model('comments');
-  const {comment: commentSource}  = await DocumentModel.getDocumentSources();
-  const {article: articleSource} = await CommentModel.getCommentSources();
+  const ArticlePostModel = mongoose.model('articlePosts');
+  const {comment: commentDocumentSource}  = await DocumentModel.getDocumentSources();
   const cid = await SettingModel.getNewId();
   const document = await DocumentModel.createBetaDocument({
     uid,
     content,
     toc,
-    source: commentSource,
+    source: commentDocumentSource,
     sid:  cid,
     ip,
     port
+  });
+  // 获取文章引用并将comment绑定到引用上
+  const articlePost = await ArticlePostModel.getArticlePostByArticleId({
+    sid,
+    source,
+    uid
   });
   const comment = new CommentModel({
     _id: cid,
     uid,
     toc,
-    source: articleSource,
-    sid,
+    sid: articlePost._id,
     did: document.did,
   });
   //如果存在引用就及那个引用信息插入到document中
@@ -352,18 +356,31 @@ schema.statics.extendReviewComments = async function(comments) {
   const ColumnPostModel = mongoose.model('columnPosts');
   const DocumentModel = mongoose.model('documents');
   const ArticleModel = mongoose.model('articles');
+  const ArticlePostModel = mongoose.model('articlePosts');
   const {comment: documentSource} = await DocumentModel.getDocumentSources();
   const {timeFormat, getUrl} = require('../nkcModules/tools');
   const commentsId = [];
-  const articleSid = [];
+  const articlePostSid = [];
   const articleId = [];
   const didArr = [];
   for(const comment of comments) {
     if(!comment) continue;
     commentsId.push(comment._id);
-    articleSid.push(comment.sid);
+    articlePostSid.push(comment.sid);
   }
-  const articles = await ArticleModel.find({_id: {$in: articleSid}});
+  //查找评论的引用
+  const articlePosts = await ArticlePostModel.find({_id: {$in: articlePostSid}});
+  const articlePostsObj = {};
+  for(const articlePost of articlePosts) {
+    articleId.push(articlePost.sid);
+    articlePostsObj[articlePost._id] = articlePost;
+  }
+  const commentsObj = {};
+  for(const comment of comments) {
+    commentsObj[comment.sid] = comment;
+  }
+  //查找评论所属文章
+  const articles = await ArticleModel.find({_id: {$in: articleId}});
   for(const article of articles) {
     didArr.push(article.did);
     articleId.push(article._id);
@@ -391,23 +408,23 @@ schema.statics.extendReviewComments = async function(comments) {
       $in: commentsId
     }
   });
-  const  commentsObj = {};
+  const  commentsDocumentObj = {};
   for(const d of commentDocuments) {
     const {type, sid} = d;
-    if(!commentsObj[sid]) commentsObj[sid] = {};
-    commentsObj[sid][type] = d;
+    if(!commentsDocumentObj[sid]) commentsDocumentObj[sid] = {};
+    commentsDocumentObj[sid][type] = d;
   }
   const results = [];
   for(const comment of comments) {
-    if(!comment) continue;
     const {
       _id,
       toc,
       uid,
       sid
     } = comment;
-    const commentObj = commentsObj[_id];
-    const articleDocumentObj = articlesDocumentObj[sid];
+    const commentObj = commentsDocumentObj[_id];
+    const articlePost = articlePostsObj[sid];
+    const articleDocumentObj = articlesDocumentObj[articlePost.sid];
     if(!commentObj || !articleDocumentObj) continue;
     const betaComment = commentObj.beta;
     const stableComment = commentObj.stable;
@@ -424,7 +441,7 @@ schema.statics.extendReviewComments = async function(comments) {
       hasBeta: !!betaComment,
       time: timeFormat(toc),
       did,
-      url: `/m/${columnPostObj[sid].columnId}/a/${columnPostObj[sid]._id}`,
+      url: `/m/${columnPostObj[articlePost.sid].columnId}/a/${columnPostObj[articlePost.sid]._id}`,
       title: articleDocument.title,
     };
     results.push(result);
@@ -519,15 +536,28 @@ schema.methods.updateOrder = async function () {
 schema.statics.extendComments = async function(comments) {
   const DocumentModel = mongoose.model('documents');
   const UserModel = mongoose.model('users');
+  const ArticlePostModel = mongoose.model('articlePosts');
+  const ArticleModel = mongoose.model('articles');
+  const CommentModel = mongoose.model('comments');
   const {timeFormat, getUrl} = require('../nkcModules/tools');
   const didArr = [];
   const uidArr = [];
+  const articlePostId = [];
+  const articlesId = [];
   const documentObj = {};
   const userObj = {};
-  for(const c of comments) {
+  const _comments = await CommentModel.getCommentUrl(comments);
+  for(const c of _comments) {
     didArr.push(c.did);
     uidArr.push(c.uid);
+    articlePostId.push(c.sid);
   }
+  const articlePosts = await ArticlePostModel.find({_id: {$in: articlePostId}});
+  for(const articlePost of articlePosts) {
+    articlesId.push(articlePost.sid);
+  }
+  let articles = await ArticleModel.find({_id: {$in: articlesId}});
+  articles = await ArticleModel.getArticlesUrl(articles);
   const users = await UserModel.find({uid: {$in: uidArr}});
   for(const user of users) {
     userObj[user.uid] = user;
@@ -537,8 +567,8 @@ schema.statics.extendComments = async function(comments) {
     documentObj[d.did] = d;
   }
   const results = [];
-  for(const c of comments) {
-    const {did, sid, _id, source, toc, uid} = c;
+  for(const c of _comments) {
+    const {did, sid, _id, source, toc, uid, url} = c;
     const document = documentObj[did];
     const {content, } = document;
     const result = {
@@ -547,7 +577,7 @@ schema.statics.extendComments = async function(comments) {
       sid,
       source,
       uid,
-      url: '',
+      url,
       time: timeFormat(toc),
       c: content,
       user: userObj[uid],
@@ -622,6 +652,70 @@ schema.statics.extendDocumentOfComment = async function(comments, type = 'beta',
     });
   }
   return _comments;
+}
+
+/*
+* 通过文章引用去获取文章下的评论
+* */
+schema.statics.getCommentsByArticleId = async function(props) {
+  const {aid, source, paging = null, match} = props;
+  const ArticlePostModel = mongoose.model('articlePosts');
+  const CommentModel = mongoose.model('comments');
+  const articlePost = await ArticlePostModel.findOne({sid: aid, source});
+  if(!articlePost) return;
+  let comments;
+  if(paging) {
+    comments = await CommentModel.find({...match, sid: articlePost._id}).skip(paging.start).limit(paging.perpage);
+  } else {
+    comments = await CommentModel.find({...match, sid: articlePost._id}).sort({toc: -1}).limit(1);
+  }
+  return comments;
+}
+
+
+/*
+* 通过comments获取评论所属文章链接
+* @param {object} comments 需要拓展文章链接的评论comment
+* */
+schema.statics.getCommentUrl = async function(comments) {
+  const ArticleModel = mongoose.model('articles');
+  const ArticlePostModel = mongoose.model('articlePosts');
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const commentsSid = [];
+  for(const comment of comments) {
+    commentsSid.push(comment.sid);
+  }
+  const articlePosts = await ArticlePostModel.find({_id: {$in: commentsSid}});
+  const articlePostsSid = [];
+  const articlePostsObj = {};
+  for(const articlePost of articlePosts) {
+    articlePostsSid.push(articlePost.sid);
+    articlePostsObj[articlePost._id] = articlePost;
+  }
+  const articles = await ArticleModel.find({_id: {$in: articlePostsSid}});
+  const articlesId = [];
+  for(const article of articles) {
+    articlesId.push(article._id);
+  }
+  const columnPosts = await ColumnPostModel.find({pid: {$in: articlesId}});
+  const columnPostsObj = {};
+  for(const columnPost of columnPosts) {
+    columnPostsObj[columnPost.pid] = columnPost;
+  }
+  const results = [];
+  for(const comment of comments) {
+    const {sid, _id, source} = comment;
+    const articlePost = articlePostsObj[sid];
+    if(!articlePost) return;
+    const columnPost = columnPostsObj[articlePost.sid];
+    if(!columnPost) return;
+    results.push({
+      ...comment.toObject(),
+      url: `/m/${columnPost.columnId}/a/${columnPost._id}`,
+    });
+  }
+  return results;
+  
 }
 
 module.exports = mongoose.model('comments', schema);

@@ -887,11 +887,12 @@ messageSchema.statics.getParametersData = async (message) => {
       // 投诉目标描述
       CRTargetDesc = library.name;
     } else if(complaintType === 'comment') {
-      const comment = await CommentModel.findOne({_id: contentId});
-      if(!comment) return  null;
-      CRType = "回复";
+      let comment = await CommentModel.findOne({_id: contentId});
+      if(!comment) return null;
+      comment = await CommentModel.getCommentUrl([comment]);
+      CRType = "评论";
       // 投诉目标链接
-      CRTarget = `/book/${comment.sid}`;
+      CRTarget = comment[0].url;
       // 投诉目标描述
       CRTargetDesc = "点击查看";
     } else {
