@@ -1,6 +1,7 @@
 const mongoose = require('../settings/database');
 const articlePostSources = {
         column: 'column',
+        zone: 'zone',
       };
 const schema = new mongoose.Schema({
   _id: String,

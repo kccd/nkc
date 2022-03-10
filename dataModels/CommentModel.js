@@ -415,6 +415,7 @@ schema.statics.extendReviewComments = async function(comments) {
     commentsDocumentObj[sid][type] = d;
   }
   const results = [];
+  const {column: columnSource, zone: zoneSource} = await ArticlePostModel.getArticlePostSources();
   for(const comment of comments) {
     const {
       _id,
@@ -434,6 +435,12 @@ schema.statics.extendReviewComments = async function(comments) {
     const document = stableComment || betaComment;
     const articleDocument = stableArticleDocument || betaArticleDocument;
     const {did} = document;
+    let url;
+    if(articlePosts.source === columnSource) {
+      url = `/m/${columnPostObj[articlePost.sid].columnId}/a/${columnPostObj[articlePost.sid]._id}`;
+    } else if (articlePosts.source === zoneSource){
+      url =  `/zone/a/${articlePosts.sid}`;
+    }
     const result = {
       _id,
       uid,
@@ -441,7 +448,7 @@ schema.statics.extendReviewComments = async function(comments) {
       hasBeta: !!betaComment,
       time: timeFormat(toc),
       did,
-      url: `/m/${columnPostObj[articlePost.sid].columnId}/a/${columnPostObj[articlePost.sid]._id}`,
+      url,
       title: articleDocument.title,
     };
     results.push(result);
@@ -703,19 +710,27 @@ schema.statics.getCommentUrl = async function(comments) {
     columnPostsObj[columnPost.pid] = columnPost;
   }
   const results = [];
+  const {column: columnSource, zone: zoneSource} = await ArticlePostModel.getArticlePostSources();
   for(const comment of comments) {
     const {sid, _id, source} = comment;
     const articlePost = articlePostsObj[sid];
     if(!articlePost) return;
     const columnPost = columnPostsObj[articlePost.sid];
-    if(!columnPost) return;
+    if(articlePost.source === columnSource) {
+      if(!columnPost) return;
+    }
+    let url;
+    if(articlePost.source === columnSource) {
+      url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
+    } else if (articlePost.source === zoneSource){
+      url =  `/zone/a/${articlePost.sid}`;
+    }
     results.push({
       ...comment.toObject(),
-      url: `/m/${columnPost.columnId}/a/${columnPost._id}`,
+      url,
     });
   }
   return results;
-  
 }
 
 module.exports = mongoose.model('comments', schema);

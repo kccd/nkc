@@ -54,7 +54,7 @@ router
     const document = await db.DocumentModel.findOne({_id, type: stableType});
     if(document.status !== normalStatus) ctx.throw(403, '权限不足');
     if(!document) ctx.throw(400, '未找到引用信息，请刷新后重试');
-    let comment = await db.CommentModel.findOne({source, did: document.did});
+    let comment = await db.CommentModel.findOne({did: document.did});
     if(!comment) ctx.throw(400, '未找到引用信息，请刷新后重试');
     comment = await db.CommentModel.extendPostComments({comments: [comment]});
     const {order, _id: commentId, user, did, sid, source: commentSource, docId} = comment[0];

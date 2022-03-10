@@ -4,8 +4,8 @@ if !isIncluded('comment')
   //- 发表人筛选
   mixin articleNav
     .paging-button
-      a.button.radius-left(href=`/m/${data.columnPost.column._id}/a/${data.columnPost._id}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
-      a.button.radius-right(href=`/m/${data.columnPost.column._id}/a/${data.columnPost._id}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
+      a.button.radius-left(href=`${data.originalUrl}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
+      a.button.radius-right(href=`${data.originalUrl}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
   //- 批量管理回复
   mixin manageComments
     .paging-button

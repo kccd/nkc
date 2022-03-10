@@ -69,7 +69,7 @@
 
 <script>
 import DocumentEditor from "../DocumentEditor";
-import {getRequest, timeFormat, addUrlPara} from "../../js/tools";
+import {getRequest, timeFormat, addUrlParam} from "../../js/tools";
 import {nkcAPI} from "../../js/netAPI";
 import {checkString} from "../../js/checkData";
 import {getLength} from "../../js/checkData";
@@ -126,7 +126,7 @@ export default {
   methods: {
     getRequest: getRequest,
     timeFormat: timeFormat,
-    addUrlPara: addUrlPara,
+    addUrlParam: addUrlParam,
     checkString: checkString,
     getLength: getLength,
     //编辑器准备完毕
@@ -158,7 +158,7 @@ export default {
       let mid, aid, url = '/creation/articles/editor', query = `?source=${self.source}`;
       const urlSource = self.getRequest().source;
       if(!urlSource) {
-        self.addUrlPara('source', self.source);
+        self.addUrlParam('source', self.source);
       }
       if(self.source === 'column') {
         mid = this.getRequest().mid;
@@ -166,7 +166,7 @@ export default {
         if(!mid) {
           if(self.columnId) {
             mid = self.columnId;
-            self.addUrlPara('mid', mid);
+            self.addUrlParam('mid', mid);
           } else {
             return;
           }
@@ -237,7 +237,7 @@ export default {
         //空间编辑器
         if(mid) sweetError('空间编辑器不存在mid');
       }
-      self.addUrlPara('aid', aid);
+      self.addUrlParam('aid', aid);
       self.initData()
         .then(() => {
           self.articles = [];
@@ -384,7 +384,7 @@ export default {
           //改变地址栏参数
           const {aid} = self.getRequest();
           if(!aid) {
-            self.addUrlPara('aid', articleId);
+            self.addUrlParam('aid', articleId);
           }
           return self.resetCovetFile(articleCover);
         })
