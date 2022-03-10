@@ -29,7 +29,7 @@ router
     const count = await db.MomentModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count);
     const moments = await db.MomentModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-    data.momentsData = await db.MomentModel.extendMomentsData(moments);
+    data.momentsData = await db.MomentModel.extendMomentsListData(moments);
     data.paging = paging;
     await next();
   })
@@ -49,7 +49,7 @@ router
       });
     }
     if(type === 'publish') {
-      await moment.publishAsMoment();
+      await moment.publish();
     } else {
       await moment.modifyMoment({
         content,
@@ -65,6 +65,8 @@ router
     const {
       type,
       content,
+      postType,
+      alsoPost
     } = body;
     if(!['modify', 'publish'].includes(type)) {
       ctx.throw(403, `类型指定错误 type=${type}`);
@@ -78,7 +80,7 @@ router
       });
     }
     if(type === 'publish') {
-      await moment.publishAsMoment();
+      await moment.publishMomentComment(postType, alsoPost);
     } else {
       await moment.modifyMoment({
         content,

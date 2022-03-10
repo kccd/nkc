@@ -13,17 +13,17 @@
         .fa.fa-smile-o
         span 表情
       .option-box
-        .checkbox
-          label(v-if="postType === types.comment")
-            input(type="checkbox" :value="true" v-model="alsoRepost")
+        .checkbox(v-if="postType === types.comment")
+          label
+            input(type="checkbox" :value="true" v-model="alsoPost")
             span 同时转发
         .checkbox(v-if="postType === types.repost")
           label
-            input(type="checkbox" :value="true" v-model="alsoComment")
+            input(type="checkbox" :value="true" v-model="alsoPost")
             span 同时评论
       .option-box-right
         span {{remainingWords}}
-        button.btn.btn-default.btn-sm 提交
+        button.btn.btn-default.btn-sm(@click="publish") 提交
 
 </template>
 
@@ -88,11 +88,9 @@
       'emoji-selector': EmojiSelector
     },
     data: () => ({
-      placeholder: '发表你的评论',
       maxContentLength: 1000,
       content: '',
-      alsoRepost: false,
-      alsoComment: false,
+      alsoPost: false,
       momentCommentId: null,
       types: {
         repost: 'repost',
@@ -106,6 +104,12 @@
       this.getMomentComment()
     },
     computed: {
+      placeholder() {
+        return {
+          comment: '发表你的评论',
+          repost: '发表你的想法'
+        }[this.postType]
+      },
       postType() {
         return this.type || this.types.comment; // repost(转发), comment(评论)
       },
@@ -171,6 +175,23 @@
         .catch(err => {
           screenTopWarning(`动态保存失败：${err.error || err.message || err}`)
         });
+      },
+      publish() {
+        const self = this;
+        const {postType, alsoPost, content, momentId} = this;
+        return nkcAPI(`/creation/zone/moment/${momentId}`, 'POST', {
+          type: 'publish',
+          content,
+          postType,
+          alsoPost,
+        })
+          .then(res => {
+            self.$emit('published');
+            console.log(`published`)
+          })
+          .catch(err => {
+            sweetError(err)
+          });
       }
     }
   }
