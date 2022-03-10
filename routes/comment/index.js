@@ -112,7 +112,7 @@ router
         uid: state.uid,
         content,
         quoteDid,
-        source,
+        source: article[0].source,
         sid,
         ip: ctx.address,
         port: ctx.port
