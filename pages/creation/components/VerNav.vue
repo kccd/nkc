@@ -24,7 +24,7 @@
             @click="selectItem(childrenItem)"
             )
             p.mobile-show-icon
-              <i :class="childrenItem.icon" aria-hidden="true"></i>
+              i(:class="childrenItem.icon" aria-hidden="true")
             a.title(:href="childrenItem.url" @click.stop.prevent="selectItem(childrenItem)") {{childrenItem.title}}
 </template>
 
@@ -307,29 +307,28 @@ import { getState } from "../../lib/js/state";
     },
     methods: {
       center(){
-       const doms =  document.querySelector('.creation-nav-container-phone').querySelectorAll('.children')
-       const domWidth = doms[0].offsetWidth + 1;
-      //  app 上没有forEach这个方法
-       if(doms.forEach){
-          doms.forEach((dom)=>{
-            const children = dom.querySelectorAll('.item');
-            const last = children[children.length -1];
-            const marginRight = parseInt(getComputedStyle(last).marginRight);
-            dom.style.cssText += "width:" + (domWidth - marginRight) + "px;display:block";
-            // this.isApp && (dom.style.background = 'red');
-            last.style.marginRight = 0;
-        })
-       }else{
-          for(let i = 0; i<doms.length; i++){
-            const dom = doms[i];
-            const children = dom.querySelectorAll('.item');
-            const last = children[children.length -1];
-            const marginRight = parseInt(getComputedStyle(last).marginRight)
-            dom.style.cssText += "width:" + (domWidth - marginRight) + "px;display:block";
-            // this.isApp && (dom.style.background = 'red');
-            last.style.marginRight = 0;
-          }
-       }
+        const doms =  document.querySelector('.creation-nav-container-phone').querySelectorAll('.children')
+        const domWidth = doms[0].offsetWidth + 1;
+        //  app 上没有forEach这个方法
+        if(doms.forEach){
+            doms.forEach((dom)=>{
+              const children = dom.querySelectorAll('.item');
+              const last = children[children.length -1];
+              const marginRight = parseInt(getComputedStyle(last).marginRight);
+              dom.style.cssText += "width:" + (domWidth - marginRight) + "px;display:block";
+              // this.isApp && (dom.style.background = 'red');
+              last.style.marginRight = 0;
+          })
+        }else{
+            for(let i = 0; i<doms.length; i++){
+              const dom = doms[i];
+              const children = dom.querySelectorAll('.item');
+              const last = children[children.length -1];
+              const marginRight = parseInt(getComputedStyle(last).marginRight)
+              dom.style.cssText += "width:" + (domWidth - marginRight) + "px;display:block";
+              last.style.marginRight = 0;
+            }
+        }
       },
       openMenu(){
         // console.dir(this.$refs.CNC.clientHeight)
