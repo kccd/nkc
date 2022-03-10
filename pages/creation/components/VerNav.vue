@@ -89,7 +89,7 @@
       @media screen and (max-width: @max-width){
         position: absolute;
         top: -1rem;
-        left: 15px;
+        left: 1rem;
         font-size:1.5rem;
         font-weight: 600;
         height: 1.3rem;

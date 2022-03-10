@@ -1,5 +1,5 @@
 <template lang="pug">
-  .container-fluid.zone
+  .standard-max-container.zone
     hor-nav(:list="navList" v-if="$route.name !== 'ZoneReviseEditor'" )
     router-view
 </template>

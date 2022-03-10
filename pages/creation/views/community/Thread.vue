@@ -40,3 +40,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+.article-common{
+  padding: 0!important;
+}
+</style>

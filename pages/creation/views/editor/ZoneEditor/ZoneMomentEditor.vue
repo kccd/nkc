@@ -1,7 +1,7 @@
 <template lang="pug">
-  .zone-moment-editor
-    .standard-container.p-t-3
-      moment-editor
+  .zone-moment-editor.p-t-3
+    //- .standard-container.p-t-3
+    moment-editor
 </template>
 
 <script>
