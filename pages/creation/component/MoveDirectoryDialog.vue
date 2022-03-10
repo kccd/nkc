@@ -66,7 +66,6 @@ export default {
       this.seekChild2({
         findLocation: childIndex,
       })
-      console.log(this.seekResult)
       if(!this.seekResult.showIndication){
         this.$set(data, "isOpen", true);
       }else{
