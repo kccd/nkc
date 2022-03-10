@@ -7,7 +7,7 @@ router
     if(from === 'editor') {
       let moment;
       if(mid) {
-        moment = await db.getUnPublishedMomentCommentDataById(state.uid, mid);
+        moment = await db.MomentModel.getUnPublishedMomentCommentDataById(state.uid, mid);
       } else {
         moment = await db.MomentModel.getUnPublishedMomentDataByUid(state.uid);
       }
@@ -33,9 +33,13 @@ router
     data.paging = paging;
     await next();
   })
+  // 发表动态
   .post('/', async (ctx, next) => {
-    const {db, body, state, data} = ctx;
+    const {db, body, state} = ctx;
     const {type, content, resourcesId} = body;
+    if(!['modify', 'publish'].includes(type)) {
+      ctx.throw(403, `类型指定错误 type=${type}`);
+    }
     let moment = await db.MomentModel.getUnPublishedMomentByUid(state.uid);
     if(!moment) {
       moment = await db.MomentModel.createMoment({
@@ -45,11 +49,40 @@ router
       });
     }
     if(type === 'publish') {
-      await moment.publish();
+      await moment.publishAsMoment();
     } else {
       await moment.modifyMoment({
         content,
         resourcesId
+      });
+    }
+    await next();
+  })
+  // 发表评论
+  .post('/:mid', async (ctx, next) => {
+    const {db, params, body, state} = ctx;
+    const {mid: momentId} = params;
+    const {
+      type,
+      content,
+    } = body;
+    if(!['modify', 'publish'].includes(type)) {
+      ctx.throw(403, `类型指定错误 type=${type}`);
+    }
+    let moment = await db.MomentModel.getUnPublishedMomentCommentById(state.uid, momentId);
+    if(!moment) {
+      moment = await db.MomentModel.createMomentComment({
+        content,
+        uid: state.uid,
+        parent: momentId,
+      });
+    }
+    if(type === 'publish') {
+      await moment.publishAsMoment();
+    } else {
+      await moment.modifyMoment({
+        content,
+        resourcesId: []
       });
     }
     await next();

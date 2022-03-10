@@ -130,7 +130,10 @@ module.exports = {
     },
     moment: {
       GET: 'creationCenter',
-      POST: 'creationCenter'
+      POST: 'creationCenter',
+      PARAMETER: {
+        POST: 'creationCenter'
+      }
     }
   },
   community: {

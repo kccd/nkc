@@ -156,13 +156,25 @@ schema.statics.getNewId = async () => {
 *   @param {String} uid 发表人 ID
 *   @param {String} content 动态内容
 *   @param {[String]} resourcesId 资源 ID 组成的数组
+*   @param {String} parent 评论时所评论的动态ID
 * @return {moment schema}
 * */
-schema.statics.createMoment = async (props) => {
-  const {uid, content, resourcesId} = props;
+schema.statics.createMomentCore = async (props) => {
+  const {
+    uid,
+    content = '',
+    resourcesId = [],
+    parent = ''
+  } = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
+  const {checkString} = require('../nkcModules/checkData');
+  checkString(content, {
+    name: '评论内容',
+    minLength: 0,
+    maxLength: 100000
+  });
   const toc = new Date();
   const momentId = await MomentModel.getNewId();
   const document = await DocumentModel.createBetaDocument({
@@ -175,6 +187,7 @@ schema.statics.createMoment = async (props) => {
   const moment = MomentModel({
     _id: momentId,
     uid,
+    parent,
     status: momentStatus.default,
     did: document.did,
     toc,
@@ -182,6 +195,46 @@ schema.statics.createMoment = async (props) => {
   });
   await moment.save();
   return moment;
+}
+
+/*
+* 创建一条未发布的动态
+* 用户主动创作动态时，调用此函数生成动态
+* @param {Object} props
+*   @param {String} uid 发表人 ID
+*   @param {String} content 动态内容
+*   @param {[String]} resourcesId 资源 ID 组成的数组
+* @return {moment schema}
+* */
+schema.statics.createMoment = async (props) => {
+  const {uid, content, resourcesId} = props;
+  const MomentModel = mongoose.model('moments');
+  return await MomentModel.createMomentCore({
+    uid,
+    content,
+    resourcesId
+  });
+};
+
+/*
+* 创建一条未发布的动态
+* 用户主动创作动态时，调用此函数生成动态
+* @param {Object} props
+*   @param {String} uid 发表人 ID
+*   @param {String} content 动态内容
+*   @param {[String]} resourcesId 资源 ID 组成的数组
+*   @param {String} parent 评论时所评论的动态ID
+* @return {moment schema}
+* */
+schema.statics.createMomentComment = async (props) => {
+  const MomentModel = mongoose.model('moments');
+  const {uid, content, parent, resourcesId} = props;
+  return await MomentModel.createMomentCore({
+    uid,
+    content,
+    resourcesId,
+    parent
+  });
 };
 
 /*
@@ -346,10 +399,7 @@ schema.methods.getBetaDocument = async function() {
   return await DocumentModel.getBetaDocumentBySource(momentSource, this._id);
 };
 
-/*
-* 发布一条动态
-* */
-schema.methods.publish = async function() {
+schema.methods.checkBeforePublishing = async function() {
   const DocumentModel = mongoose.model('documents');
   const ResourceModel = mongoose.model('resources');
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
@@ -383,6 +433,14 @@ schema.methods.publish = async function() {
       }
     }
   }
+};
+
+/*
+* 发布一条动态
+* */
+schema.methods.publishAsMoment = async function() {
+  const DocumentModel = mongoose.model('documents');
+  await this.checkBeforePublishing();
   await DocumentModel.publishDocumentByDid(this.did);
   this.status = momentStatus.normal;
   await this.updateOne({
@@ -390,6 +448,33 @@ schema.methods.publish = async function() {
       status: this.status
     }
   });
+};
+
+/*
+* 发布一条评论
+* 分为两种情况，发布评论、转发动态
+* @param {String} postType 发表类型 comment(发表评论), repost(转发)
+* @param {Boolean} alsoPost 是否触发附带操作，根据postType判断动作类型 comment(同时转发)、repost(同时评论)
+* */
+schema.methods.publishAsMomentComment = async function(postType, alsoPost) {
+  if(!['comment', 'repost'].includes(postType)) {
+    throwErr(500, `类型指定错误 postType=${postType}`);
+  }
+  const DocumentModel = mongoose.model('documents');
+  await this.checkBeforePublishing();
+  await DocumentModel.publishDocumentByDid(this.did);
+
+  let repost = false;
+  let comment = false;
+
+  if(postType === 'comment') {
+    // 发表评论
+    comment = true;
+    if(alsoPost) repost = true;
+  } else {
+    repost = true;
+    if(alsoPost) comment = true;
+  }
 };
 
 /*
@@ -416,6 +501,7 @@ schema.statics.createQuoteMomentToPublish = async (uid, quoteType, quoteId) => {
 
 /*
 * 拓展动态信息
+* 考虑黑名单
 * */
 schema.statics.extendMomentsData = async (moments) => {
   const videoSize = require('../settings/video');
