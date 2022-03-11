@@ -37,16 +37,23 @@ module.exports = {
     },
     {
       parameters: [
-        "userID",
         "username",
         "userURL",
-        "articleTitle",
-        "articleURl",
-        "bookURL",
-        "bookTitle"
+        "reviewLink",
+        "title",
       ],
-      content: "用户[url=userURL(username)]在图书[url=bookURL(bookTitle)]中的章节[url=articleURL(articleTitle)]@了你，[url=articleURL(查看)]。",
+      content: "用户[url=userURL(username)]在文章[url=reviewLink(title)]中@了你，[url=reviewLink(查看)]。",
       type: "articleAt"
+    },
+    {
+      parameters: [
+        "userUrl",
+        "reviewLink",
+        "title",
+        "username",
+      ],
+      content: "用户[url=userURL(username)]在文章[url=reviewLink(title)]中@了你，[url=reviewLink(查看)]",
+      type: "commentAt"
     },
     {
       parameters: [

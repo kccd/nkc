@@ -841,9 +841,10 @@ schema.methods.getAtUsers = async function() {
 schema.methods.sendMessageToAtUsers = async function(from) {
   if(!['post', 'article'].includes(from)) throwErr(500, `document from error`);
   const socket = require('../nkcModules/socket');
+  const DocumentModel = mongoose.model('documents');
   const MessageModel = mongoose.model('messages');
   const SettingModel = mongoose.model('settings');
-  const {atUsers: oldAtUsers} = this;
+  const {atUsers: oldAtUsers, source} = this;
   const atUsers = await this.getAtUsers();
   const oldAtUsersId = oldAtUsers.map(u => u.uid);
   const newAtUsers = oldAtUsers;
@@ -858,7 +859,7 @@ schema.methods.sendMessageToAtUsers = async function(from) {
       ty: 'STU',
       r: user.uid,
       c: {
-        type: 'articleAt',
+        type: `${source}At`,
         did: this.did,
       }
     });
