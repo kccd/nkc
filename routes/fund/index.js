@@ -57,6 +57,7 @@ fundRouter
     };
     const queryOfFunding = {
 	    disabled: false,
+      useless: null,
 			'status.adminSupport': true,
 	    'status.completed': {$ne: true}
     };

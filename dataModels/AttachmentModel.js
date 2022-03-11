@@ -285,7 +285,7 @@ schema.statics.savePostCover = async (pid, fileData) => {
       if(!resource) return;
       const {url} = await resource.getRemoteFile();
       file = await downloader(url);
-    } else if(typeof fileData === undefined) {
+    } else if(typeof fileData === 'undefined') {
       const extArr = ['jpg', 'jpeg', 'png'];
       const resource = await ResourceModel.findOne({ext: {$in: extArr}, references: pid});
       if(!resource) return;
