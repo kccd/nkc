@@ -471,9 +471,9 @@ NKC.methods.disabledPosts = function(pid) {
 * 批量 屏蔽或退修 article回复或文章
 * @param {String/Array} commentsId commentId或commentId组成的数组
 * */
-NKC.methods.disabledComments = function(id) {
+NKC.methods.disabledDocuments = function(id) {
   let comments = id;
-  if(typeof id === "string"){
+  if(typeof id === "string" || typeof id === "number"){
     comments = [id];
   }
   if(!id || !comments.length) return;

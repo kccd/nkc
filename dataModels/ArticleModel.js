@@ -525,14 +525,18 @@ schema.methods.publishArticle = async function(options) {
   const MomentModel = mongoose.model('moments');
   const {normal} = await ArticleModel.getArticleStatus();
   const {article: articleQuoteType} = await MomentModel.getMomentQuoteTypes();
+  const {article: articleType} = await ColumnPostModel.getColumnPostTypes();
   const {source, selectCategory} = options;
   const DocumentModel = mongoose.model('documents');
   const {did, uid, _id: articleId} = this;
   //将当前article的状态改为正常
   await this.changeArticleStatus(normal);
   if(source === 'column') {
-    //如果发表专栏的文章就将创建文章专栏分类引用记录
-    await ColumnPostModel.createColumnPost(this, selectCategory);
+    //如果发表专栏的文章就将创建文章专栏分类引用记录 先查找是否存在引用，如果没有就创建一条新的引用
+    const columnPost = await ColumnPostModel.findOne({pid: articleId, type: articleType});
+    if(!columnPost) {
+      await ColumnPostModel.createColumnPost(this, selectCategory);
+    }
   } else if(source === 'zone') {
     //如果发布的article为空间文章就创建一条新的动态并绑定当前article
     const {_id: momentId} = await MomentModel.createQuoteMomentAndPublish(uid, articleQuoteType, articleId);
@@ -1000,7 +1004,7 @@ schema.methods.isModerator = async function(uid) {
 * @param {object} articles 需要拓展文章链接的文章article
 * res： articles
 * */
-schema.statics.getArticlesUrl = async function(articles) {
+schema.statics.getArticlesInfo = async function(articles) {
   const ColumnPostModel = mongoose.model('columnPosts');
   const ArticleModel = mongoose.model('articles');
   const columnArticlesId = [];
@@ -1020,13 +1024,18 @@ schema.statics.getArticlesUrl = async function(articles) {
   const results = [];
   for(const article of articles) {
     let url;
+    let editorUrl;
     if(article.source === columnSource) {
-      url = `/m/${columnPostsObj[article._id].columnId}/a/${columnPostsObj[article._id]._id}`;
+      const columnPost = columnPostsObj[article._id];
+      editorUrl = `/column/editor?source=column&mid=${columnPost.columnId}&aid=${columnPost.pid}`;
+      url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
     } else if(article.source === zoneSource) {
+      editorUrl = `/creation/editor/zone/article?source=zone&aid=${article._id}`;
       url = `/zone/a/${article._id}`;
     }
     results.push({
       ...article.toObject(),
+      editorUrl,
       url,
     });
   }

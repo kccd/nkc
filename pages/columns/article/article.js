@@ -1,5 +1,7 @@
 // import AuthorCommunication from '../lib/vue/AuthorCommunication.vue'
 // Object.assign(window, {showSetUp, displayAuthor})
+import {getDataById} from "../../lib/js/dataConversion";
+const data = getDataById('data');
 let author = {};
 $(document).ready(function(){
   author.dom = $("#moduleAuthor");
@@ -42,8 +44,12 @@ $(document).ready(function(){
       console.error(data);
     });
 })
-
-
+const article = data.article;
+function deleteArticle() {
+  const {document} = article;
+  const {_id} = document;
+  NKC.methods.disabledDocuments(_id);
+}
 // function displayAuthor(contractStr) {
 //   var contract = NKC.methods.strToObj(contractStr);
 //   author.app.contract = contract;
@@ -51,4 +57,6 @@ $(document).ready(function(){
 //   author.dom.modal("show");
 
 // }
-
+Object.assign(window, {
+  deleteArticle,
+})

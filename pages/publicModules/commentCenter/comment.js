@@ -179,7 +179,7 @@ function disabledMarkedComment() {
 }
 
 function disabledArticleComment(commentsId) {
-  NKC.methods.disabledComments(commentsId);
+  NKC.methods.disabledDocuments(commentsId);
 }
 
 window.commentEditor = commentEditor;
