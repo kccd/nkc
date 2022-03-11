@@ -31,10 +31,10 @@ export default {
   created(){
     const { isApp } = getState();
     this.isApp = isApp;
-    
+  },
+  mounted(){
   },
   methods: {
-    
     navToPage(page, url) {
       if (this.isApp) {
         visitUrl(url, true);

@@ -156,8 +156,8 @@
       }
     }
     .children{
-      display: inline;
       @media screen and (max-width: @max-width){
+        display: table;
         max-width: 36.1rem;
         margin: auto;
         margin-bottom: 10px;
@@ -174,9 +174,17 @@
         }
         @media screen and (max-width: 400px) {
           margin: 0;
-          margin-right: .5rem;
+          margin-right: .2rem;
+          font-size: 1.1rem;
         }
+        transition: margin-right 1s;
         font-size: 1.2rem;
+      }
+      
+      .item:last-child{
+        @media screen and (max-width: @max-width){
+          margin-right: 0rem;
+        }
       }
     }
   }
@@ -303,33 +311,10 @@ import { getState } from "../../lib/js/state";
       const { isApp } = getState();
       this.isApp = isApp;
       this.setNavActive()
-      this.center();
+      
     },
     methods: {
-      center(){
-        const doms =  document.querySelector('.creation-nav-container-phone').querySelectorAll('.children')
-        const domWidth = doms[0].offsetWidth + 1;
-        //  app 上没有forEach这个方法
-        if(doms.forEach){
-            doms.forEach((dom)=>{
-              const children = dom.querySelectorAll('.item');
-              const last = children[children.length -1];
-              const marginRight = parseInt(getComputedStyle(last).marginRight);
-              dom.style.cssText += "width:" + (domWidth - marginRight) + "px;display:block";
-              // this.isApp && (dom.style.background = 'red');
-              last.style.marginRight = 0;
-          })
-        }else{
-            for(let i = 0; i<doms.length; i++){
-              const dom = doms[i];
-              const children = dom.querySelectorAll('.item');
-              const last = children[children.length -1];
-              const marginRight = parseInt(getComputedStyle(last).marginRight)
-              dom.style.cssText += "width:" + (domWidth - marginRight) + "px;display:block";
-              last.style.marginRight = 0;
-            }
-        }
-      },
+      
       openMenu(){
         // console.dir(this.$refs.CNC.clientHeight)
         this.$refs.creationNav.style.height = !this.showMenu ? this.$refs.CNC.clientHeight + 'px' : 0;
