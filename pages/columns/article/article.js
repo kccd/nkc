@@ -33,8 +33,10 @@ $(document).ready(function(){
     }
   })
     .then(function() {
-      // 内容折叠
-      NKC.methods.autoHideCommentContent();
+      if(NKC.methods.autoHideCommentContent) {
+        // 内容折叠
+        NKC.methods.autoHideCommentContent();
+      }
     })
     .catch(function(data) {
       console.error(data);

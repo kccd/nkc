@@ -193,6 +193,4 @@ Object.assign(window, {
   markAllComments,
   disabledArticleComment,
   disabledMarkedComment,
-  addUrlKey,
-  delUrlKey,
 });

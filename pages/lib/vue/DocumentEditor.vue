@@ -12,7 +12,7 @@
           .editor-header 封面图
             //small （如未指定，默认从内容中选取）
           .editor-cover
-            resource-selector(ref="resource")
+            resource-selector(ref="resourceSelector")
             image-selector(ref="image")
             .editor-cover-default(v-if="!coverLink" @click="selectCover")
               .fa.fa-plus
@@ -499,7 +499,7 @@ export default {
     //选择封面图
     selectCover() {
       let self = this;
-      self.$refs.resource.open(function(data) {
+      self.$refs.resourceSelector.open(function(data) {
         let r = data.resources[0];
         let url;
         if(r.originId) {
@@ -514,8 +514,13 @@ export default {
               .then(base64 => {
                 self.coverFile = file;
                 self.coverUrl = base64;
+                //关闭弹框
                 self.$refs.image.close();
               })
+          })
+          .then(() => {
+            //关闭资源弹框
+            self.$refs.resourceSelector.close();
           })
           .catch(err => {
             console.log(err);

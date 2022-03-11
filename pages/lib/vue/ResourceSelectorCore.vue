@@ -642,6 +642,7 @@ import ResourceInfo from "./ResourceInfo";
 import CommonModal from "./CommonModal";
 import SelectCategory from "./SelectCategory";
 export default {
+  props: ['watch-type'],
   data: () => ({
     categoryLoading: true,//分组loading
     resourceType: 'all',
@@ -672,7 +673,6 @@ export default {
 
     socketEventListener: null,
 
-    watchType: 'category',
     count: {
       allCount: 0,//全部资源数量
       ungroupedCount: 0,//未分组资源数量
@@ -689,7 +689,9 @@ export default {
     'select-category': SelectCategory,
   },
   mounted() {
-    if(this.watchType === 'category') this.getResources(0);
+    if(this.watchType === 'category') {
+      this.getResources(0);
+    }
     this.initSocketEvent();
     this.initDragUploadEvent();
   },

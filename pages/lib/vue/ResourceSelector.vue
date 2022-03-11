@@ -5,7 +5,7 @@
       .module-dialog-close(@click="close")
         .fa.fa-remove
     .module-dialog-content
-      resource-selector-core(ref="resourceSelectorCore")
+      resource-selector-core(ref="resourceSelectorCore" watch-type="select")
 </template>
 
 <style lang="less" scoped>
@@ -77,7 +77,7 @@ export default {
       const self = this;
       self.draggableElement.show();
       self.show = true;
-      self.$refs.resourceSelectorCore.open(function (res){
+      return self.$refs.resourceSelectorCore.open(function (res){
         if(res) {
           callback(res);
         }
