@@ -535,6 +535,14 @@ schema.statics.createQuoteMomentAndPublish = async (props) => {
   return moment;
 };
 
+/*
+* 通过指定多个动态ID，获取多条动态
+* @param {[String]} momentsId 动态ID组成的数组
+* @param {String} type 指定返回的数据格式 array(数组), object(对象)
+* @return {Object or [Object]}
+*   当为对象时，键为mid，值为moment对象
+*   当为数组时，数组值为moment对象
+* */
 schema.statics.getMomentsByMomentsId = async (momentsId, type = 'array') => {
   const MomentModel = mongoose.model('moments');
   const moments = await MomentModel.find({_id: {$in: momentsId}});
@@ -554,35 +562,95 @@ schema.statics.getMomentsByMomentsId = async (momentsId, type = 'array') => {
   return obj;
 };
 
+/*
+* 拓展引用数据，引用的数据包含 moment, article, thread 等
+* @param {[String]} quotes 引用类型加引用ID组成的字符创 格式：`${quoteType}:${quoteId}`
+* @return {Object} 键为 `${quoteType}:${quoteId}` 值为对象，对象属性如下：
+*   当引用的为moment时，数据为 MomentModel.statics.extendMomentsData 返回的数据
+*   当引用的为article时，数据为 ArticleModel.statics.getArticlesDataByArticlesId 返回的数据
+* */
 schema.statics.extendQuotesData = async (quotes) => {
   const MomentModel = mongoose.model('moments');
+  const ArticleModel = mongoose.model('articles');
   const quoteTypes = await MomentModel.getMomentQuoteTypes();
-  const momentId = [];
+  const articlesId = [];
+  const momentsId = [];
   for(const quote of quotes) {
     const [quoteType, quoteId] = quote.split(':');
-    if(quoteType === quoteTypes.moment) momentId.push(quoteId);
+    if(quoteType === quoteTypes.moment) momentsId.push(quoteId);
+    if(quoteType === quoteTypes.article) articlesId.push(quoteId);
   }
-  const moments = await MomentModel.getMomentsByMomentsId(momentId);
+  // 加载动态
+  const moments = await MomentModel.getMomentsByMomentsId(momentsId);
   const momentsData = await MomentModel.extendMomentsData(moments);
+  // 加载文章
+  const articlesData = await ArticleModel.getArticlesDataByArticlesId(articlesId);
   const results = {};
   for(const quote of quotes) {
     const [quoteType, quoteId] = quote.split(':');
     let result = null;
     if(quoteType === quoteTypes.moment) {
       result =  momentsData[quoteId];
+    } else if(quoteType === quoteTypes.article) {
+      result = articlesData[quoteId];
     }
+    if(!result) continue;
     results[quote] = result;
   }
   return results;
 };
 
 /*
+* 当动态引用了其他内容且当前动态不存在内容时，调用此函数生成默认的内容
+* @param {String} quoteType 引用类型
+* @return {String}
+* */
+schema.statics.getQuoteDefaultContent = async (quoteType) => {
+  switch(quoteType) {
+    case momentQuoteTypes.article: {
+      return '我发表了新的文章~'
+    }
+    case momentQuoteTypes.moment: {
+      return '我转发了动态~'
+    }
+  }
+}
+
+/*
 * 获取动态显示所需要的基础数据
+* @param {[schema moment]}
+* @return {[Object]}
+*   @param {String} momentId 动态ID
+*   @param {String} uid 发表人ID
+*   @param {String} username 发表人用户名
+*   @param {String} avatarUrl 发表人头像链接
+*   @param {String} userHome 发表人个人名片页
+*   @param {String} time 格式化后的发表时间
+*   @param {Date} toc 发表时间
+*   @param {String} content 动态内容
+*   @param {Number} voteUp 点赞数
+*   @param {[Object]} files 附带的资源
+*     @param {String} rid 资源ID
+*     @param {String} type 资源类型 video, picture
+*     @param {String} filename 文件名
+*     @param {Boolean} disabled 资源是否被屏蔽
+*     @param {Boolean} lost 资源是否已丢失
+*     图片特有
+*     @param {Number} height 高度
+*     @param {Number} width 宽度
+*     视频特有
+*     @param {String} coverUrl 视频封面（类型为图片时为空）
+*     @param {Boolean} visitorAccess 游客是否有权限直接查看视频
+*     @param {[Object]} sources
+*       @param {String} url 视频链接
+*       @param {String} height 视频分辨率 480p、720p、1080p
+*       @param {Number} dataSize 视频大小
 * */
 schema.statics.extendMomentsData = async (moments) => {
   const videoSize = require('../settings/video');
   const UserModel = mongoose.model('users');
   const ResourceModel = mongoose.model('resources');
+  const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
   const {getUrl, fromNow} = require('../nkcModules/tools');
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
@@ -616,6 +684,7 @@ schema.statics.extendMomentsData = async (moments) => {
       toc,
       _id,
       voteUp,
+      quoteType,
     } = moment;
     const user = usersObj[uid];
     if(!user) continue;
@@ -636,6 +705,11 @@ schema.statics.extendMomentsData = async (moments) => {
         return '<img class="message-emoji" src="/twemoji/2/svg/'+ v1 +'.svg"/>';
       });
     }
+
+    if(!content && quoteType) {
+      content = await MomentModel.getQuoteDefaultContent(quoteType);
+    }
+
     const filesData = [];
     for(const rid of files) {
       const resource = resourcesObj[rid];
@@ -711,6 +785,38 @@ schema.statics.extendMomentsData = async (moments) => {
 /*
 * 拓展动态信息
 * 考虑黑名单
+* @param {[schema moment]}
+* @return {[Object]}
+*   @param {String} momentId 动态ID
+*   @param {String} uid 发表人ID
+*   @param {String} username 发表人用户名
+*   @param {String} avatarUrl 发表人头像链接
+*   @param {String} userHome 发表人个人名片页
+*   @param {String} time 格式化后的发表时间
+*   @param {Date} toc 发表时间
+*   @param {String} content 动态内容
+*   @param {Number} voteUp 点赞数
+*   @param {[Object]} files 附带的资源
+*     @param {String} rid 资源ID
+*     @param {String} type 资源类型 video, picture
+*     @param {String} filename 文件名
+*     @param {Boolean} disabled 资源是否被屏蔽
+*     @param {Boolean} lost 资源是否已丢失
+*     图片特有
+*     @param {Number} height 高度
+*     @param {Number} width 宽度
+*     视频特有
+*     @param {String} coverUrl 视频封面（类型为图片时为空）
+*     @param {Boolean} visitorAccess 游客是否有权限直接查看视频
+*     @param {[Object]} sources
+*       @param {String} url 视频链接
+*       @param {String} height 视频分辨率 480p、720p、1080p
+*       @param {Number} dataSize 视频大小
+*   @param {Object} quoteData
+*     @param {String} quoteType 引用类型
+*     @param {String} quoteId 引用ID
+*     @param {Object} data
+*       当引用的为moment时，数据为 schema.statics.extendMomentsData 返回的数据
 * */
 schema.statics.extendMomentsListData = async (moments) => {
   const MomentModel = mongoose.model('moments');
