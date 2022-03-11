@@ -602,11 +602,11 @@
           if(this.$refs.imageElement.height > this.$refs.imageElement.width){
             this.imgInfo.radio = this.$refs.imageElement.width / this.$refs.imageElement.height
             this.imgInfo.max = 'height'
-            this.imgInfo.value = this.$refs.imageElement.height 
+            this.imgInfo.value = this.$refs.imageElement.height
           }else{
             this.imgInfo.radio = this.$refs.imageElement.width / this.$refs.imageElement.height
             this.imgInfo.max = 'width'
-            this.imgInfo.value = this.$refs.imageElement.width 
+            this.imgInfo.value = this.$refs.imageElement.width
           }
           this.rotateValue = e.detail.rotate
         }
@@ -643,6 +643,7 @@
         // 销毁事件
         window.socket.off('fileTransformProcess', this.socketEventListener);
       },
+      //创建拖拽和粘贴上传事件
       initDragUploadEvent() {
         const $dragDom = $(this.$refs.pasteContent);
         let originText = "";
@@ -729,7 +730,7 @@
               this.rotateZoom(contaiorWidth, self.minContainerHeight)
             }else{
               this.rotateZoom(self.minContainerHeight, contaiorWidth)
-            }  
+            }
           }else{
             const nextImgWidthInCanvas = (imgWidthInCanvas / self.minContainerHeight) * self.minContainerHeight
             if(nextImgWidthInCanvas > contaiorWidth){
@@ -738,7 +739,7 @@
               this.rotateZoom(self.minContainerHeight, imgWidthInCanvas)
             }
           }
-        }else if(self.imgInfo.max === 'height'){ 
+        }else if(self.imgInfo.max === 'height'){
         // 宽占满
           if(contaiorWidth <= imgWidthInCanvas){
             this.rotateZoom(self.minContainerHeight, contaiorWidth)

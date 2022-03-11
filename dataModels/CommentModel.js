@@ -553,7 +553,7 @@ schema.statics.extendComments = async function(comments) {
   const articlesId = [];
   const documentObj = {};
   const userObj = {};
-  const _comments = await CommentModel.getCommentUrl(comments);
+  const _comments = await CommentModel.getCommentInfo(comments);
   for(const c of _comments) {
     didArr.push(c.did);
     uidArr.push(c.uid);
@@ -681,16 +681,25 @@ schema.statics.getCommentsByArticleId = async function(props) {
 
 
 /*
-* 通过comments获取评论所属文章链接
+* 通过comments获取评论所属文章链接以及评论信息
 * @param {object} comments 需要拓展文章链接的评论comment
 * */
-schema.statics.getCommentUrl = async function(comments) {
+schema.statics.getCommentInfo = async function(comments) {
   const ArticleModel = mongoose.model('articles');
   const ArticlePostModel = mongoose.model('articlePosts');
   const ColumnPostModel = mongoose.model('columnPosts');
+  const DocumentModel = mongoose.model('documents');
   const commentsSid = [];
+  const commentDid = [];
   for(const comment of comments) {
     commentsSid.push(comment.sid);
+    commentDid.push(comment.did);
+  }
+  const {stable: stableType} = await DocumentModel.getDocumentTypes();
+  const documents = await DocumentModel.find({did: commentDid, type: stableType});
+  const commentDocumentsObj = {};
+  for(const d of documents) {
+    commentDocumentsObj[d.did] = documents;
   }
   const articlePosts = await ArticlePostModel.find({_id: {$in: commentsSid}});
   const articlePostsSid = [];
@@ -701,8 +710,15 @@ schema.statics.getCommentUrl = async function(comments) {
   }
   const articles = await ArticleModel.find({_id: {$in: articlePostsSid}});
   const articlesId = [];
+  const articlesDid = [];
   for(const article of articles) {
+    articlesDid.push(article.did);
     articlesId.push(article._id);
+  }
+  const articleDocumentObj = {};
+  const articleDocuments = await DocumentModel.find({did: {$in: articlesDid}, type: stableType});
+  for(const d of articleDocuments) {
+    articleDocumentObj[d.sid] = d;
   }
   const columnPosts = await ColumnPostModel.find({pid: {$in: articlesId}});
   const columnPostsObj = {};
@@ -712,8 +728,10 @@ schema.statics.getCommentUrl = async function(comments) {
   const results = [];
   const {column: columnSource, zone: zoneSource} = await ArticlePostModel.getArticlePostSources();
   for(const comment of comments) {
-    const {sid, _id, source} = comment;
+    const {sid, _id, source, did} = comment;
     const articlePost = articlePostsObj[sid];
+    const commentDocument = commentDocumentsObj[did] || null;
+    const articleDocument = articleDocumentObj[articlePost.sid] || null;
     if(!articlePost) return;
     const columnPost = columnPostsObj[articlePost.sid];
     if(articlePost.source === columnSource) {
@@ -727,6 +745,8 @@ schema.statics.getCommentUrl = async function(comments) {
     }
     results.push({
       ...comment.toObject(),
+      commentDocument,
+      articleDocument,
       url,
     });
   }

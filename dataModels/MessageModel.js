@@ -3,6 +3,7 @@ const SettingModel = require('./SettingModel');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const tools = require("../nkcModules/tools");
+const {getUrl} = require("../nkcModules/tools");
 const messageSchema = new Schema({
 
   // 消息id
@@ -365,21 +366,39 @@ messageSchema.statics.getParametersData = async (message) => {
       userURL: user.uid? getUrl('userHome', user.uid): ''
     };
   } else if (type === 'articleAt') {
+    //article文章@用户
     const {did} = message.c;
-    const document = await DocumentModel.findOne({did, type: 'stable', status: 'normal'});
+    const {stable: stableType} = await DocumentModel.getDocumentTypes();
+    const {normal: normalStatus} = await DocumentModel.getDocumentStatus();
+    const document = await DocumentModel.findOne({did, type: stableType, status: normalStatus});
     const user = await UserModel.findOne({uid: document.uid});
     if(!user) return null;
     const article = await ArticleModel.findOne({did});
     if(!article) return null;
     const articles = await ArticleModel.extendArticles([article]);
     parameters = {
-      userID: document.uid,
       username: user.username,
       userURL: getUrl('userHome', document.uid),
-      bookTitle: articles[0].bookName,
-      articleTitle: articles[0].title,
-      articleURL: articles[0].url,
-      bookURL: articles[0].bookUrl,
+      reviewLink: articles[0].url,
+      title: articles[0].title,
+    };
+  } else if(type === 'commentAt') {
+    const {did} = message.c;
+    const {stable: stableType} = await DocumentModel.getDocumentTypes();
+    const {normal: normalStatus} = await DocumentModel.getDocumentStatus();
+    const document = await DocumentModel.findOne({did, type: stableType, status: normalStatus});
+    if(!document) return null;
+    const user = await UserModel.findOne({uid: document.uid});
+    if(!user) return null;
+    const {normal} = await CommentModel.getCommentStatus();
+    let comment = await CommentModel.findOne({did, status: normal});
+    if(!comment) return null;
+    comment = await CommentModel.getCommentInfo([comment]);
+    parameters = {
+      username: user.username,
+      userURL: getUrl('userHome', document.uid),
+      reviewLink: comment[0].url,
+      title: comment[0].articleDocument.title,
     };
   } else if(type === 'xsf') {
     const {pid, num} = message.c;
@@ -889,7 +908,7 @@ messageSchema.statics.getParametersData = async (message) => {
     } else if(complaintType === 'comment') {
       let comment = await CommentModel.findOne({_id: contentId});
       if(!comment) return null;
-      comment = await CommentModel.getCommentUrl([comment]);
+      comment = await CommentModel.getCommentInfo([comment]);
       CRType = "评论";
       // 投诉目标链接
       CRTarget = comment[0].url;
