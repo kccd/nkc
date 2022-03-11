@@ -11,10 +11,11 @@ router.get('/:aid', async (ctx, next)=>{
   const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
   let {_id: articleId} = columnPost.article.articleInfo;
   let _article = await db.ArticleModel.findOnly({_id: articleId});
+  const articleInfo = (await db.ArticleModel.getArticlesInfo([_article]))[0];
   //获取文章链接
-  const baseUrl = (await db.ArticleModel.getArticlesInfo([_article]))[0].url;
+  const baseUrl = articleInfo.url;
   //获取文章编辑链接
-  const editorUrl = (await db.ArticleModel.getArticlesInfo([_article]))[0].editorUrl;
+  const editorUrl = articleInfo.editorUrl;
   data.editorUrl = editorUrl;
   const isModerator = await _article.isModerator(state.uid);
   //获取当前文章信息
@@ -23,7 +24,7 @@ router.get('/:aid', async (ctx, next)=>{
     'uid',
     'status',
   ]);
-  data.article = _article[0];
+  data.article = articleInfo;
   data.articleStatus = _article[0].document.status;
   const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
   if(_article[0].document.status !== normalStatus && !isModerator) {

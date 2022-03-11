@@ -1006,17 +1006,34 @@ schema.methods.isModerator = async function(uid) {
 /*
 * 获取当前article的文章链接链接
 * @param {object} articles 需要拓展文章链接的文章article
-* res： articles
+* res： {
+*   articles: [
+*     {
+*       article, 原article
+*       url, 文章链接地址
+*       editorUrl， 文章编辑地址
+* }]}
 * */
 schema.statics.getArticlesInfo = async function(articles) {
   const ColumnPostModel = mongoose.model('columnPosts');
   const ArticleModel = mongoose.model('articles');
+  const DocumentModel = mongoose.model('documents');
+  const ReviewModel = mongoose.model('reviews');
   const columnArticlesId = [];
+  const articlesDid = [];
+  const articleDocumentsObj = {};
   const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
   for(const article of articles) {
     if(article.source === columnSource) {
       columnArticlesId.push(article._id);
     }
+    articlesDid.push(article.did);
+  }
+  const {article: articleSource} = await DocumentModel.getDocumentSources();
+  const {stable: stableType} = await DocumentModel.getDocumentTypes();
+  const articleDocuments = await DocumentModel.find({did: {$in: articlesDid}, source: articleSource, type: stableType});
+  for(const d of articleDocuments) {
+    articleDocumentsObj[d.did] = d;
   }
   const {article: articleType} = await ColumnPostModel.getColumnPostTypes();
   //查找专栏文章引用
@@ -1029,6 +1046,11 @@ schema.statics.getArticlesInfo = async function(articles) {
   for(const article of articles) {
     let url;
     let editorUrl;
+    const document = articleDocumentsObj[article.did];
+    let review
+    if(document) {
+      review = (await ReviewModel.find({docId: document._id}).sort({toc: -1}).limit(1))[0];
+    }
     if(article.source === columnSource) {
       const columnPost = columnPostsObj[article._id];
       editorUrl = `/column/editor?source=column&mid=${columnPost.columnId}&aid=${columnPost.pid}`;
@@ -1039,6 +1061,8 @@ schema.statics.getArticlesInfo = async function(articles) {
     }
     results.push({
       ...article.toObject(),
+      reason: review?review.reason:'',
+      document,
       editorUrl,
       url,
     });

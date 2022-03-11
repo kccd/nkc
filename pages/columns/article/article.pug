@@ -36,13 +36,25 @@ block content
     .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel
       .row
         if data.articleStatus !== 'normal'
-          .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${data.articleStatus === 'faulty' ? 'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;' : ''}`)
-            if data.articleStatus === 'faulty'
+          if data.articleStatus === 'faulty'
+            .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${data.articleStatus === 'faulty' ? 'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;' : ''}`)
               .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
-              p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${测试原因}`
+              p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${data.article.reason}`
+              +thread
+          else if data.articleStatus === 'disabled'
+            .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${data.articleStatus === 'disabled' ? 'border: 1px solid #666;padding: 0.5rem;border-radius: 5px;background-color: #fff;' : ''}`)
+              .h4.text-center(style='color: #666;') 本文已被封禁，不可查看
+              if permission('review')
+                .text-center
+                  a(onclick="") 点击解封
+              p.text-center(style='border-bottom: 1px solid #666; padding-bottom: 1rem;color: #666;')= `封禁原因：${data.article.reason}`
+              if permission('review')
+                +thread
+          else if data.articleStatus === 'unknown'
+            -let reviewData  = data.article
+            include ./module_review
             +thread
         else
-          include ./module_review
           +thread
     .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel#comment-content
       .row

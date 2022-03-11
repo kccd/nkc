@@ -317,7 +317,7 @@ export default {
     //发布文章
     post(type) {
       if(!type) return;
-      if(this.lockPost) return;
+      if(this.lockPost && type !== 'publish') return;
       this.lockPost = true;
       this.$refs.documentEditor.setSavedStatus('saving');
       const formData = new FormData();
