@@ -539,7 +539,11 @@ schema.methods.publishArticle = async function(options) {
     }
   } else if(source === 'zone') {
     //如果发布的article为空间文章就创建一条新的动态并绑定当前article
-    const {_id: momentId} = await MomentModel.createQuoteMomentAndPublish(uid, articleQuoteType, articleId);
+    const {_id: momentId} = await MomentModel.createQuoteMomentAndPublish({
+      uid,
+      quoteType: articleQuoteType,
+      quoteId: articleId
+    });
     await this.updateOne({
       $set: {
         sid: momentId,
@@ -1040,6 +1044,72 @@ schema.statics.getArticlesInfo = async function(articles) {
     });
   }
   return results;
+}
+
+/*
+* 通过指定文章ID获取文章数据
+* @param {[String]} articlesId 文章ID组成的数组
+* @param {String} type 返回的数据类型 array, object
+* @return {[Object] or Object}
+*   当返回类型为array时，值为文章数据
+*   当返回类型为object时，键为文章ID，值为文章数据
+*   文章数据格式如下：
+*     @param {String} title 文章标题
+*     @param {String} content 文章内容摘要
+*     @param {String} coverUrl 文章封面图链接
+*     @param {String} username 发表人用户名
+*     @param {String} uid 发表人ID
+*     @param {String} avatarUrl 发表人头像链接
+*     @param {String} userHome 发表人个人名片页链接
+*     @param {String} time 格式化之后的发表时间
+*     @param {Date} toc 发表时间
+*     @param {String} articleId 文章ID
+* */
+schema.statics.getArticlesDataByArticlesId = async function(articlesId, type = 'object') {
+  const ArticleModel = mongoose.model('articles');
+  const UserModel = mongoose.model('users');
+  const {getUrl, timeFormat} = require('../nkcModules/tools');
+  const nkcRender = require('../nkcModules/nkcRender');
+  const articles = await ArticleModel.find({_id: {$in: articlesId}});
+  const usersId = [];
+  for(const article of articles) {
+    usersId.push(article.uid);
+  }
+  const usersObj = await UserModel.getUsersObjectByUsersId(usersId);
+  const DocumentModel = mongoose.model('documents');
+  const {article: articleSource} = await DocumentModel.getDocumentSources();
+  const stableDocuments = await DocumentModel.getStableDocumentsBySource(articleSource, articlesId, 'object');
+  const obj = {};
+  for(const article of articles) {
+    const stableDocument = stableDocuments[article._id];
+    if(!stableDocument) continue;
+    const user = usersObj[article.uid];
+    if(!user) continue;
+    const {title, content, cover} = stableDocument;
+    obj[article._id] = {
+      title,
+      content: nkcRender.htmlToPlain(content, 200),
+      coverUrl: getUrl('documentCover', cover),
+      username: user.username,
+      uid: user.uid,
+      avatarUrl: getUrl('userAvatar', user.avatar),
+      userHome: getUrl('userHome', user.uid),
+      time: timeFormat(article.toc),
+      toc: article.toc,
+      articleId: article._id,
+    };
+  }
+  if(type === 'object') {
+    return obj;
+  } else {
+    const results = [];
+    for(const articleId of articlesId) {
+      const result = obj[articleId];
+      if(!result) continue;
+      results.push(result);
+    }
+    return results;
+  }
 }
 
 module.exports = mongoose.model('articles', schema);
