@@ -21,6 +21,8 @@ window.articleOption = new Vue({
       username: '',
       uid: ''
     },
+  
+    direction: null,
     
     top: 300,
     left: 300,
@@ -77,14 +79,14 @@ window.articleOption = new Vue({
       this.jqDOM = jqDOM;
       this.direction = direction;
       const self = this;
-      self.show = true;
       self.loading = true;
-      debugger
       //获取当前用户对文章的操作权限
-      nkcAPI(`/creation/article/${aid}/option`, 'GET')
+      nkcAPI(`/creation/article/${aid}/options`, 'GET')
         .then(data => {
           if(data.optionStatus) self.optionStatus = data.optionStatus;
           self.loading = false;
+          self.show = true;
+          self.toc = data.toc
         })
         .catch(err => {
           sweetError(err);
