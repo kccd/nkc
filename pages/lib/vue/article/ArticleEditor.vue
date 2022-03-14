@@ -13,6 +13,10 @@
             span 继续编辑
         .article-more(@click="more") 查看更多
       document-editor(ref="documentEditor" :configs="configs" @ready='editorReady' @content-change="watchContentChange")
+      .form-group(v-if="column && configs.selectCategory && column.userColumn && !column.addedToColumn")
+        .m-b-2
+          .editor-header 专栏文章分类
+          select-column-categories(ref="selectColumnCategories" @change="categoryChange")
     .m-b-1
       button.btn.btn-primary.m-r-05(@click="publish") 发布
       button.btn.btn-default.m-r-05(@click="saveArticle") 保存
@@ -69,22 +73,24 @@
 
 <script>
 import DocumentEditor from "../DocumentEditor";
+import selectColumnCategories from "../selectColumnCategories";
 import {getRequest, timeFormat, addUrlParam} from "../../js/tools";
 import {nkcAPI} from "../../js/netAPI";
 import {checkString} from "../../js/checkData";
 import {getLength} from "../../js/checkData";
-import {getDataById} from "../../js/dataConversion";
-const data = getDataById('data');
+import {getColumnInfo} from "../../js/tools";
 export default {
   props:['time', 'source', 'configs'],
   data: () => ({
     ready: false,
     articleId: null,
-    columnId: data.column.userColumn?data.column.userColumn._id : '',
+    columnId: null,
+    column: null,
     coverFile : null,
     oldCoverFile: null,
     cover: null,
     autoSaveInfo: '',//草稿保存信息
+    selectCategory: '', //文章专栏分类
     article: {
       title: '',
       content: '',
@@ -103,6 +109,7 @@ export default {
   }),
   components: {
     "document-editor": DocumentEditor,
+    'select-column-categories': selectColumnCategories,
   },
   computed: {
     type() {
@@ -121,7 +128,7 @@ export default {
     },
   },
   mounted() {
-    this.autoSaveToDraft();
+    this.getColumn();
   },
   methods: {
     getRequest: getRequest,
@@ -129,6 +136,22 @@ export default {
     addUrlParam: addUrlParam,
     checkString: checkString,
     getLength: getLength,
+    getColumn() {
+      const self = this;
+      getColumnInfo()
+        .then(res => {
+          self.column = res;
+          self.columnId = res.userColumn._id
+        })
+    },
+    //专栏分类发生改变
+    categoryChange() {
+      this.selectCategory = this.getSelectCategory();
+    },
+    //获取选中你的文章专栏分类
+    getSelectCategory() {
+      return this.$refs.selectColumnCategories.getStatus();
+    },
     //编辑器准备完毕
     editorReady() {
       this.initId();
@@ -326,7 +349,8 @@ export default {
         articleId = this.getRequest().aid,
         columnId,
         cover,
-        source
+        source,
+        selectCategory = [],
       } = this;
       const {
         title = '',
@@ -336,7 +360,6 @@ export default {
         abstract = '',
         abstractEN = '',
         origin = '',
-        selectCategory = [],
         authorInfos = []
       } = this.article;
       const article = {
@@ -517,9 +540,9 @@ export default {
       this.checkPost()
       //检测是否勾选文章专栏分类
       if(!this.article.title) return sweetWarning('请输入文章标题');
-      if(this.source === 'column' && !this.article.selectCategory
-        || (this.article.selectCategory && this.article.selectCategory.selectedMainCategoriesId
-          && this.article.selectCategory.selectedMainCategoriesId.length === 0)) return sweetWarning('请选择文章专栏分类');
+      if(this.source === 'column' && !this.selectCategory
+        || (this.selectCategory && this.selectCategory.selectedMainCategoriesId
+          && this.selectCategory.selectedMainCategoriesId.length === 0)) return sweetWarning('请选择文章专栏分类');
       this.post('publish');
     },
     //保存文章 有提示保存成功
@@ -550,7 +573,6 @@ export default {
         abstract,
         abstractEN,
         originState,
-        selectCategory,
         authorInfos,
       } = data;
       this.coverFile = coverFile;
@@ -562,7 +584,6 @@ export default {
         abstract,
         abstractEN,
         origin: originState,
-        selectCategory,
         authorInfos
       };
       this.modifyArticle();

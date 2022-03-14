@@ -8,6 +8,8 @@ export function getState() {
     selectTypesWhenSubscribe: false,
     refererOperationId: '',
     fileDomain: '',
+    websiteCode: '',
+    column: '',
   };
   try{
     const windowDataDom = document.querySelector('meta[name="window-data"]');
@@ -20,6 +22,7 @@ export function getState() {
     state.refererOperationId = windowData.refererOperationId;
     state.newMessageCount = 0;
     state.fileDomain = windowData.fileDomain;
+    state.websiteCode = windowData.websiteCode;
     return state;
   } catch(err) {
     console.error(`获取 state 数据失败`);

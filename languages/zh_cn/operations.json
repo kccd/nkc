@@ -838,5 +838,6 @@
   "columnEditor": "访问专栏编辑器页",
   "visitZoneArticle": "访问空间文章",
   "getCommentPermission": "获取评论权限",
-  "getCommentIpInfo": "获取评论ip"
+  "getCommentIpInfo": "获取评论ip",
+  "getColumnInfo": "专栏 - 获取用户专栏信息"
 }
