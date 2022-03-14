@@ -22,8 +22,12 @@ block content
   .container-fluid.max-width
     .column
       .row
-        block baseColumnContent
+        .col-xs-12.col-md-9.box-shadow-panel.m-t-1
+          block baseColumnContent
+        //- .col-xs-12.col-md-1.box-shadow-panel#rightDom
+          //- 滚动到页头页脚
         .col-xs-12.col-md-3.box-shadow-panel.m-t-1
+          include ../module_scrollTo.pug
           include ./modules/management
           include ./modules/info
 block scripts

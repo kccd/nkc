@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const {twemoji} = require("../settings/editor");
 
 const momentStatus = {
   normal: 'normal',
@@ -83,6 +84,11 @@ const schema = new mongoose.Schema({
   voteDown: {
     type: Number,
     default: 0
+  },
+  // 楼层
+  order: {
+    type: Number,
+    default: 0
   }
 });
 
@@ -146,7 +152,35 @@ schema.statics.getNewId = async () => {
     throwErr(500, `moment id error`);
   }
   return newId;
+};
 
+/*
+* 获取动态最新评论的楼层
+* @param {String} mid 动态ID
+* @return {Number}
+* */
+schema.statics.getMomentOrder = async (mid) => {
+  const MomentModel = mongoose.model('moments');
+  const redLock = require('../nkcModules/redLock');
+  const getRedisKeys = require('../nkcModules/getRedisKeys');
+  const key = getRedisKeys('momentOrder', mid);
+  const lock = await redLock.lock(key, 6000);
+  let order = 0;
+  try{
+    const comment = await MomentModel.findOne({
+      parent: mid
+    }, {
+      order: 1
+    }).sort({order: -1});
+    if(comment) {
+      order = comment.order + 1;
+    }
+    await lock.unlock();
+  } catch (err) {
+    await lock.unlock();
+    throwErr(500, `moment order error`);
+  }
+  return order;
 };
 
 /*
@@ -481,6 +515,19 @@ schema.methods.publish = async function() {
 };
 
 /*
+* 更新评论楼层
+* @param {Number}
+* */
+schema.methods.updateOrder = async function(order) {
+  this.order = order;
+  await this.updateOne({
+    $set: {
+      order: this.order
+    }
+  });
+}
+
+/*
 * 发布一条评论
 * 分为两种情况，发布评论、转发动态
 * @param {String} postType 发表类型 comment(发表评论), repost(转发)
@@ -497,6 +544,8 @@ schema.methods.publishMomentComment = async function(postType, alsoPost) {
 
   if(postType === 'comment' || alsoPost) {
     // 需要创建评论
+    const order = await MomentModel.getMomentOrder(parent);
+    await this.updateOrder(order);
     await this.publish();
   }
   if(postType === 'repost' || alsoPost) {
@@ -617,6 +666,29 @@ schema.statics.getQuoteDefaultContent = async (quoteType) => {
 }
 
 /*
+* 渲染动态或评论内容
+* @param {String} content 待渲染的内容
+* @return {String} 渲染后的富文本内容
+* */
+schema.statics.renderContent = async (content) => {
+  const nkcRender = require("../nkcModules/nkcRender");
+  const {filterMessageContent} = require("../nkcModules/xssFilters");
+  // 替换空格
+  content = content.replace(/ /g, '&nbsp;');
+  // 处理链接
+  content = nkcRender.URLifyHTML(content);
+  // 过滤标签 仅保留标签 a['href']
+  content = filterMessageContent(content);
+  // 替换换行符
+  content = content.replace(/\n/g, '<br/>');
+  content = content.replace(/\[(.*?)]/g, function(r, v1) {
+    if(!twemoji.includes(v1)) return r;
+    return '<img class="message-emoji" src="/twemoji/2/svg/'+ v1 +'.svg"/>';
+  });
+  return content;
+};
+
+/*
 * 获取动态显示所需要的基础数据
 * @param {[schema moment]}
 * @return {[Object]}
@@ -692,18 +764,7 @@ schema.statics.extendMomentsData = async (moments) => {
     const betaDocument = stableDocumentsObj[_id];
     let content = '';
     if(betaDocument) {
-      // 替换空格
-      content = betaDocument.content.replace(/ /g, '&nbsp;');
-      // 处理链接
-      content = nkcRender.URLifyHTML(content);
-      // 过滤标签 仅保留标签 a['href']
-      content = filterMessageContent(content);
-      // 替换换行符
-      content = content.replace(/\n/g, '<br/>');
-      content = content.replace(/\[(.*?)]/g, function(r, v1) {
-        if(!twemoji.includes(v1)) return r;
-        return '<img class="message-emoji" src="/twemoji/2/svg/'+ v1 +'.svg"/>';
-      });
+      content = await MomentModel.renderContent(betaDocument.content);
     }
 
     if(!content && quoteType) {
@@ -846,5 +907,47 @@ schema.statics.extendMomentsListData = async (moments) => {
   }
   return results;
 };
+
+schema.statics.extendCommentsData = async function (comments) {
+  const DocumentModel = mongoose.model('documents');
+  const MomentModel = mongoose.model('moments');
+  const UserModel = mongoose.model('users');
+  const {getUrl, timeFormat} = require('../nkcModules/tools');
+  const usersId = [];
+  const commentsId = [];
+  for(const comment of comments) {
+    const {uid, _id} = comment;
+    usersId.push(uid);
+    commentsId.push(_id);
+  }
+  const usersObj = await UserModel.getUsersObjectByUsersId(usersId);
+  const {moment: momentSource} = await DocumentModel.getDocumentSources();
+  const stableDocuments = await DocumentModel.getStableDocumentsBySource(momentSource, commentsId, 'object');
+  const commentsData = [];
+  for(const comment of comments) {
+    const {
+      uid,
+      _id,
+      order,
+      toc,
+    } = comment;
+    const user = usersObj[uid];
+    if(!user) continue;
+    const stableDocument = stableDocuments[_id];
+    if(!stableDocument) continue;
+    commentsData.push({
+      commentId: _id,
+      uid: user.uid,
+      order,
+      content: await MomentModel.renderContent(stableDocument.content),
+      username: user.username,
+      avatarUrl: getUrl('userAvatar', user.avatar),
+      userHome: getUrl('userHome', user.uid),
+      time: timeFormat(toc),
+      toc: toc,
+    });
+  }
+  return commentsData;
+}
 
 module.exports = mongoose.model('moments', schema);
