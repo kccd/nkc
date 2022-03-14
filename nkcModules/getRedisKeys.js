@@ -16,5 +16,6 @@ module.exports = (type, v1, v2) => {
     case 'resourceToken': return `resource:${v1}:token:${v2}`;
     case 'newArticleId': return `newArticleId`;
     case 'newMomentId': return `newMomentId`;
+    case 'momentOrder': return `moment:${v1}:order`
   }
 }
