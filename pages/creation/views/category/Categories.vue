@@ -1,7 +1,7 @@
 <template lang="pug">
-  .standard-max-container.category-container
+  .category-container
     h2 资源管理
-    resource-selector-core(ref="resourceSelectorCore")
+    resource-selector-core(ref="resourceSelectorCore" watch-type="category")
 </template>
 
 <script>
@@ -12,8 +12,9 @@ export default {
   components: {
     'resource-selector-core': ResourceSelectorCore,
   },
+  mounted() {
+  },
   methods: {
-
   }
 }
 </script>

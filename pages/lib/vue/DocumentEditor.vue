@@ -12,7 +12,7 @@
           .editor-header 封面图
             //small （如未指定，默认从内容中选取）
           .editor-cover
-            resource-selector(ref="resource")
+            resource-selector(ref="resourceSelector")
             image-selector(ref="image")
             .editor-cover-default(v-if="!coverLink" @click="selectCover")
               .fa.fa-plus
@@ -108,10 +108,7 @@
               :title="!allowedOriginal?'字数小于' + originalWordLimit + '的文章不可申明原创': ''"
             )
               option(v-for="(text, index) in originLevel" :value="index") {{text}}
-      .form-group(v-if="formConfigs.selectCategory && column.userColumn && !column.addedToColumn")
-        .m-b-2
-          .editor-header 专栏文章分类
-          select-column-categories(ref="selectColumnCategories" @change="categoryChange")
+
 
 </template>
 
@@ -252,10 +249,7 @@ import {blobToFile, fileToBase64} from "../js/file";
 import {getLength} from "../js/checkData";
 import {getDocumentEditorConfigs} from "../js/editor";
 import {debounce} from '../js/execution';
-import selectColumnCategories from "./selectColumnCategories";
 import {getState} from "../js/state";
-import {getDataById} from "../js/dataConversion";
-const data = getDataById('data');
 export default {
   props: ['configs'],
   data: () => ({
@@ -271,12 +265,10 @@ export default {
 
     authorInfos: [], // 作者信息
 
-    selectCategory: '', //文章专栏分类
     originalWordLimit: 500,
     originState: 0, // 原创声明
     contentLength: 0,
-    websiteUserId: data.websiteCode + "ID",
-    column: data.column,
+    websiteUserId: getState().websiteCode + "ID",
     originLevel: [
       "不声明",
       "普通转载",
@@ -297,7 +289,6 @@ export default {
       origin: false,
       cover: false,
       title: false,
-      selectCategory: false,
       authorInfos: false,
     },
     // 是否允许触发contentChange
@@ -323,9 +314,6 @@ export default {
       this.watchContentChange();
     },
     originState() {
-      this.watchContentChange();
-    },
-    selectCategory() {
       this.watchContentChange();
     },
     authorInfos: {
@@ -373,7 +361,6 @@ export default {
     'resource-selector': ResourceSelector,
     'image-selector': ImageSelector,
     'common-modal': CommonModal,
-    'select-column-categories': selectColumnCategories,
   },
   mounted() {
   },
@@ -384,17 +371,9 @@ export default {
     setSavedStatus(type) {
       this.$refs.editor.changeSaveInfo(type);
     },
-    //专栏分类发生改变
-    categoryChange() {
-      this.selectCategory = this.getSelectCategory();
-    },
     //编辑器准备完成填入数据
     editorReady() {
       this.$emit('ready');
-    },
-    //获取选中你的文章专栏分类
-    getSelectCategory() {
-      return this.$refs.selectColumnCategories.getStatus();
     },
     // 移除关键词
     removeKeyword: function(index, arr) {
@@ -499,7 +478,7 @@ export default {
     //选择封面图
     selectCover() {
       let self = this;
-      self.$refs.resource.open(function(data) {
+      self.$refs.resourceSelector.open(function(data) {
         let r = data.resources[0];
         let url;
         if(r.originId) {
@@ -514,8 +493,13 @@ export default {
               .then(base64 => {
                 self.coverFile = file;
                 self.coverUrl = base64;
+                //关闭弹框
                 self.$refs.image.close();
               })
+          })
+          .then(() => {
+            //关闭资源弹框
+            self.$refs.resourceSelector.close();
           })
           .catch(err => {
             console.log(err);
@@ -570,7 +554,6 @@ export default {
       if(formConfigs.keywordsEN) data.keywordsEN = keywordsEN;
       if(formConfigs.origin) data.originState = originState;
       if(formConfigs.title) data.title = title;
-      if(formConfigs.selectCategory) data.selectCategory = this.getSelectCategory();
       if(formConfigs.authorInfos) data.authorInfos = authorInfos;
       return data;
     },

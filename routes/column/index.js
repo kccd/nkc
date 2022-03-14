@@ -46,6 +46,16 @@ router
     ctx.template = "column/column.pug";
     await next();
   })
+  .get("/getColumn", async (ctx, next) => {
+    const {db, data, state} = ctx;
+    const column = {
+        userColumn: state.userColumn,
+        columnPermission: state.columnPermission,
+        addedToColumn: state.addedToColumn
+      };
+    data.column = column;
+    await next();
+  })
   .post("/", async (ctx, next) => {
     const {data, db, body, nkcModules, tools, state} = ctx;
     if(!state.columnPermission) ctx.throw(403, "你的账号暂未满足开设专栏的条件");

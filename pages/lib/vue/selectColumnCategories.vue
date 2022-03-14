@@ -61,8 +61,7 @@
 
 <script>
 import {getRequest} from "../js/tools";
-import {getDataById} from "../js/dataConversion";
-const data = getDataById('data');
+import {getColumnInfo} from "../js/tools";
 export default {
   data: () => ({
     loaded: false,
@@ -82,7 +81,7 @@ export default {
     },
   }),
   mounted() {
-    this.columnId = this.getRequest().mid || data.column.userColumn._id;
+    this.getColumn();
     this.getCategories();
   },
   computed: {
@@ -113,6 +112,17 @@ export default {
   },
   methods: {
     getRequest: getRequest,
+    getColumn(){
+      const self = this;
+      let id = null;
+      getColumnInfo()
+        .then(res => {
+          if(res.userColumn) {
+            id = res.userColumn._id;
+          }
+        })
+      self.columnId = self.getRequest().mid || id;
+    },
     getMainCategoryById: function(_id) {
       for(var i = 0; i < this.mainCategories.length; i++) {
         if(this.mainCategories[i]._id === _id) return this.mainCategories[i];
@@ -125,7 +135,7 @@ export default {
     },
     getCategories: function() {
       const self = this;
-      nkcAPI("/m/" + this.columnId + "/category?from=fastPost", "GET")
+      nkcAPI("/m/" + self.columnId + "/category?from=fastPost", "GET")
         .then(function(data) {
           self.loaded = true;
           for(var i = 0; i < data.mainCategories.length; i++) {

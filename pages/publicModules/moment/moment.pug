@@ -57,6 +57,9 @@ if !isIncluded('publicModules/moment/moment.pug')
               a(href=userHome target="_blank")=username
             .single-moment-time
               +fromNow(toc)
+            if !quote
+              .single-moment-options
+                .fa.fa-ellipsis-h
           .single-moment-content!=content
           +momentFiles(files)
       if !quote
@@ -84,8 +87,23 @@ if !isIncluded('publicModules/moment/moment.pug')
     -var {quoteType, quoteId, data} = quoteData;
     if quoteType === 'moment'
       +quoteMoment(data)
+    if quoteType === 'article'
+      +quoteArticle(data)
 
   mixin quoteMoment(data)
     +singleMoment(data, true)
 
-
+  mixin quoteArticle(data)
+    .single-moment-header
+      .single-moment-avatar
+        img(src=data.avatarUrl)
+      .single-moment-user(data-float-uid=data.uid)
+        a(href=data.userHome target="_blank")=data.username
+      .single-moment-time
+        +fromNow(data.toc)
+    .single-moment-title
+      a(href="/" target='_blank')=data.title
+    .single-moment-abstract(class=data.coverUrl? 'cover': '')
+      if data.coverUrl
+        .single-moment-cover(style=`background-image: url(${data.coverUrl})`)
+      span=data.content

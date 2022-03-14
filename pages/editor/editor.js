@@ -436,6 +436,9 @@ function initVueApp() {
                 })
               self.$refs.imageSelector.close();
             })
+            .then(() => {
+              self.$refs.resourceSelector.close();
+            })
             .catch(err => {
               console.log(err);
               sweetError(err);

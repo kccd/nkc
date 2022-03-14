@@ -1,5 +1,7 @@
 module.exports = async (ctx) => {
-  const {state, nkcModules, template, remoteTemplate} = ctx;
+  const {state, nkcModules, template, remoteTemplate, db} = ctx;
+  // 取网站代号
+  let serverSetting = await db.SettingModel.getSettings("server");
   if(!template && !remoteTemplate) return;
   const userInfo = !state.uid? null: {
     uid: state.uid,
@@ -35,6 +37,7 @@ module.exports = async (ctx) => {
     serverSettings: state.serverSettings,
     selectTypesWhenSubscribe: state.uid?!!state.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe:false,
     logoICO: state.logoICO,
+    websiteCode: String(serverSetting.websiteCode).toLocaleUpperCase(),
     lotteryStatus: state.uid? state.user.generalSettings.lotterySettings.status: false,
     appStableVersion: state.appStableVersion,
     startTime: global.NKC.startTime,
