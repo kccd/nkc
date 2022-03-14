@@ -1,5 +1,6 @@
 <template lang="pug">
-  .standard-max-container
+  //- .standard-max-container
+  .standard-container
     user-selector(ref="userSelector")
     image-selector(ref="imageSelector")
     .m-b-1

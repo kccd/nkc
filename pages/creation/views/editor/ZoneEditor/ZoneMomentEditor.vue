@@ -1,5 +1,5 @@
 <template lang="pug">
-  .zone-moment-editor.p-t-3
+  .zone-moment-editor
     //- .standard-container.p-t-3
     moment-editor
 </template>
