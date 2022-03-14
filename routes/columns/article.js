@@ -1,10 +1,10 @@
 const router = require('koa-router')();
 router.get('/:aid', async (ctx, next)=>{
-  ctx.template = 'columns/page.pug';
+  // ctx.template = 'columns/page.pug';
   const {db, data, nkcModules, params, query, state, permission} = ctx;
   const {pageSettings} = state;
   const {page = 0, last_page, highlight, t} = query;
-  // ctx.template = 'columns/article/article.pug';
+  ctx.template = 'columns/article/article.pug';
   const { user } = data;
 
   const {_id, aid} = params;

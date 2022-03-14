@@ -105,6 +105,9 @@ module.exports = {
       DELETE: 'creationCenter',
       draft: {
         DELETE: 'creationCenter'
+      },
+      option: {
+        GET: "creationCenter"
       }
     }
   },
