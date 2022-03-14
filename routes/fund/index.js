@@ -67,8 +67,17 @@ fundRouter
     };
 		const queryOfCompleted = {
 			disabled: false,
-			'status.completed': true,
-			useless: null
+      $or: [
+        { // 已完成的申请
+          'status.completed': true,
+          useless: null
+        },
+        { // 已终止的申请
+          'status.adminSupport': true,
+          useless: 'stop'
+        }
+      ]
+
 		};
     const applying = await db.FundApplicationFormModel.find(queryOfApplying).sort({toc: -1}).limit(10);
     data.applying = await db.FundApplicationFormModel.extendAsApplicationFormList(applying);
