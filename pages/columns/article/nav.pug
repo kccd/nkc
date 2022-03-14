@@ -37,9 +37,9 @@ mixin nav(data)
         span.m-r-1
           span 文号
           span=oc  
-      span.m-r-1
-        span.m-r-1.fa.fa-eye(title="浏览数")=hits || 0
-        span.m-r-1.fa.fa-comment(title='回复数' onclick="window.location.href='#container'")=count || 0
+      
+      span.m-r-1.fa.fa-eye(title="浏览数")=hits || 0
+      span.m-r-1.fa.fa-comment(title='回复数' onclick="window.location.href='#container'")=count || 0
       span.m-r-1
         span 收藏
         span=collectedCount || 0
