@@ -46,6 +46,16 @@ router
     }
     await next();
   })
+  .use(['/a', '/page'], async (ctx, next)=>{
+    const { data, db } = ctx;
+    const { column } = data;
+    // 专栏内容公共部分数据
+    data.column = await column.extendColumn();
+    data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
+    data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
+    data.timeline = await db.ColumnModel.getTimeline(column._id);
+    await next()
+  })
   .get("/", async (ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
     let {page = 0, c: categoriesIdString = ''} = query;
