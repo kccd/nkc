@@ -110,7 +110,6 @@ router
       },
       user: data.user
     });
-    data.type = 'page';
     data.page = page;
     // data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
     // data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
