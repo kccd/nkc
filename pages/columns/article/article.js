@@ -2,6 +2,7 @@
 // Object.assign(window, {showSetUp, displayAuthor})
 import {getDataById} from "../../lib/js/dataConversion";
 const data = getDataById('data');
+import {nkcAPI} from "../../lib/js/netAPI";
 let author = {};
 $(document).ready(function(){
   author.dom = $("#moduleAuthor");
@@ -57,6 +58,34 @@ function deleteArticle() {
 //   author.dom.modal("show");
 
 // }
+//文章审核通过
+function reviewArticle() {
+  const {document} = article;
+  const {_id} = document;
+  if(!_id) return sweetError('未找到文章，请刷新后重试');
+  nkcAPI('/review', 'PUT', {
+    pass: true,
+    docId: _id,
+    type: 'document'
+  })
+    .then(res => {
+      sweetSuccess('操作成功');
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    })
+    .catch(err => {
+      sweetError(err);
+    })
+}
+
+//禁用或删除
+function disabledArticles() {
+  deleteArticle();
+}
+
 Object.assign(window, {
   deleteArticle,
+  reviewArticle,
+  disabledArticles
 })

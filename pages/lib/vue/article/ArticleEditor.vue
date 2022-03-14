@@ -13,7 +13,7 @@
             span 继续编辑
         .article-more(@click="more") 查看更多
       document-editor(ref="documentEditor" :configs="configs" @ready='editorReady' @content-change="watchContentChange")
-      .form-group(v-if="column && configs.selectCategory && column.userColumn && !column.addedToColumn")
+      .form-group(v-if="articleStatus === 'default' && column && configs.selectCategory && column.userColumn && !column.addedToColumn")
         .m-b-2
           .editor-header 专栏文章分类
           select-column-categories(ref="selectColumnCategories" @change="categoryChange")
@@ -89,6 +89,7 @@ export default {
     coverFile : null,
     oldCoverFile: null,
     cover: null,
+    articleStatus: null, //文章当前状态
     autoSaveInfo: '',//草稿保存信息
     selectCategory: '', //文章专栏分类
     article: {
@@ -206,6 +207,10 @@ export default {
         .then(data => {
           self.articleId = data.articleId;
           if(!data.editorInfo.document) self.contentChangeEventFlag = true;
+          if(data.editorInfo.article) {
+            //获取文章的发表状态
+            self.aticleStatus = data.editorInfo.article.status;
+          }
           if(data.editorInfo.document) {
             //当存在aid时直接获取对应article内容，并填入编辑器中
             const {
@@ -409,15 +414,16 @@ export default {
           if(!aid) {
             self.addUrlParam('aid', articleId);
           }
-          return self.resetCovetFile(articleCover);
+          self.resetCovetFile(articleCover);
+          return data;
         })
-        .then(() => {
+        .then(res => {
           if(type === 'publish') {
             //移除编辑器默认事件
             self.$refs.documentEditor.removeNoticeEvent();
             if(source === 'column') {
-              //跳转到专栏页面
-              window.location.href = `/m/${columnId}`;
+              //跳转到文章预览界面
+              if(res.articleUrl) window.location.href = res.articleUrl;
             } else if(source === 'zone') {
               sweetSuccess('发布成功');
             }
@@ -540,7 +546,7 @@ export default {
       this.checkPost()
       //检测是否勾选文章专栏分类
       if(!this.article.title) return sweetWarning('请输入文章标题');
-      if(this.source === 'column' && !this.selectCategory
+      if(this.articleStatus === 'default' && this.source === 'column' && !this.selectCategory
         || (this.selectCategory && this.selectCategory.selectedMainCategoriesId
           && this.selectCategory.selectedMainCategoriesId.length === 0)) return sweetWarning('请选择文章专栏分类');
       this.post('publish');

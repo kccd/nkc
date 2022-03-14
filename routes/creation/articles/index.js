@@ -106,9 +106,9 @@ router
       });
       if(type === 'publish') {
         //判断用户是否选择文章专栏分类
-        if(source === 'column' && selectCategory.selectedMainCategoriesId.length === 0) ctx.throw(401, '未选择文章专栏分类');
+        if(source === 'column' && article.status === 'default' && selectCategory.selectedMainCategoriesId.length === 0) ctx.throw(401, '未选择文章专栏分类');
         //检测文章专栏分类是否有效
-        if(source === 'column') {
+        if(source === 'column' && article.status === 'default') {
           await db.ColumnPostCategoryModel.checkColumnCategory(selectCategory);
         }
         await article.publishArticle({source, selectCategory});
@@ -123,7 +123,9 @@ router
     data.document = await db.DocumentModel.findOne({
       sid: article._id
     });
-    data.articleId = article._id;
+    article = await db.ArticleModel.getArticlesInfo([article]);
+    data.articleUrl = article[0].url;
+    data.articleId = article[0]._id;
     await next();
   })
   .use('/column', columnRouter.routes(), columnRouter.allowedMethods())

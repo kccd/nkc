@@ -23,7 +23,7 @@ block content
       include ./nav
       +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount})
       include ./setUp
-      //- 文章操作
+      //- 文章管理员操作
       +setUp()
       include ./title
       +title({t, authorInfos, uid, userAvatar, toc, originState, name, _id})
@@ -31,6 +31,8 @@ block content
       +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
       include ./content
       +content(c)
+      //- 文章用户操作
+
   .hidden#data=objToStr({comments: data.comments, comment: data.comment, article: data.article})
   .container-fluid.max-width
     .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel
