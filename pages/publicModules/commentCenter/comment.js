@@ -35,7 +35,9 @@ const singleBottomDom = $('.single-post-bottom');
 const singleCommentBottom = {};
 for(let i = 0;i < singleBottomDom.length;i++) {
   const dom = singleBottomDom.eq(i);
+  if(!dom) continue;
   const cid = dom.attr('cid');
+  if(!cid) continue;
   singleCommentBottom[cid] = new Vue({
     el: `#singleCommentBottom_${cid}`,
     data: {
@@ -51,6 +53,7 @@ for(let i = 0;i < singleBottomDom.length;i++) {
     },
     methods: {
       getDataById: getDataById,
+      //其他操作
       openOptions(e) {
         const target = $(e);
         const direction = e.getAttribute('data-direction') || 'up';

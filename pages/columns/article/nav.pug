@@ -18,10 +18,10 @@ mixin nav(data)
         //- span.nav-common >
         a.article-common-nav(href=`/m/${_id}`)=name
         span.nav-common /
-          for category,i in mainCategory
-            a.article-common-nav(href=`/m/${_id}?c=${category._id}`)=category.name
-            if mainCategory.length !== i+1
-              span.nav-common /
+        for category,i in mainCategory
+          a.article-common-nav(href=`/m/${_id}?c=${category._id}`)=category.name
+          if mainCategory.length !== i+1
+            span.nav-common /
       //- else 
       //-   a.jump(href=`/m/${_id}`) 全部
     if auxiliaryCategory.length
@@ -37,9 +37,9 @@ mixin nav(data)
         span.m-r-1
           span 文号
           span=oc  
-      span.m-r-1
-        span.m-r-1.fa.fa-eye(title="浏览数")=hits || 0
-        span.m-r-1.fa.fa-comment(title='回复数' onclick="window.location.href='#container'")=count || 0
+      
+      span.m-r-1.fa.fa-eye(title="浏览数")=hits || 0
+      span.m-r-1.fa.fa-comment(title='回复数' onclick="window.location.href='#container'")=count || 0
       span.m-r-1
         span 收藏
         span=collectedCount || 0

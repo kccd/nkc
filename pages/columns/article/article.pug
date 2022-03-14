@@ -35,10 +35,10 @@ block content
       +articleEditTime(data.article.document.tlm)
       //- 文章用户操作
       .single-post-bottom
-        .single-comment-bottom-item
+        a.single-comment-bottom-item(href="#container")
           .fa.fa-comment-o.reply-icon
           span 回复
-        .single-comment-bottom-item(data-type="commentOption" data-aid=data.article._id title="其他操作" data-direction="down")
+        .single-comment-bottom-item(data-type="articleOption" data-aid=data.article._id title="其他操作" data-direction="down")
           .fa.fa-sliders.option-icon
   .hidden#data=objToStr({comments: data.comments, comment: data.comment, article: data.article})
   .container-fluid.max-width
@@ -81,6 +81,8 @@ block content
   //- +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 block scripts
   +includeDeferJS('/columns/article/article.js', false)
+  +includeDeferJS('/publicModules/articleCenter/articleOption/options.js', false)
   include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../../publicModules/articleCenter/articleOption/options
   include ../../publicModules/disabledPost/disabledPost
 
