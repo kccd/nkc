@@ -57,6 +57,9 @@ if !isIncluded('publicModules/moment/moment.pug')
               a(href=userHome target="_blank")=username
             .single-moment-time
               +fromNow(toc)
+            if !quote
+              .single-moment-options
+                .fa.fa-ellipsis-h
           .single-moment-content!=content
           +momentFiles(files)
       if !quote

@@ -1,11 +1,14 @@
 <template lang="pug">
   .moment-commments
-    .moment-comment-nav
-      span(
+    .moment-comment-nav(v-if="postType === 'comment'")
+      .post-type 评论列表
+      .sort-item(
         v-for='n in nav'
         :class="{'active': n.type === sort}"
         @click="setActiveNav(n.type)"
         ) {{n.name}}
+    .moment-comment-nav(v-else)
+      .post-type 转发动态
     .moment-comment-list
 
 
@@ -16,7 +19,13 @@
   @import '../../publicModules/base';
   .moment-comment-nav{
     margin-bottom: 1rem;
-    span{
+    .post-type{
+      font-weight: 700;
+      display: inline-block;
+      margin-right: 1rem;
+    }
+    .sort-item{
+      display: inline-block;
       cursor: pointer;
       margin-right: 0.5rem;
       &.active{
@@ -28,6 +37,8 @@
 
 <script>
   import MomentCommentEditor from './MomentCommentEditor'
+  import {sweetError} from "../js/sweetAlert";
+
   export default {
     props: ['mid', 'type'],
     components: {
@@ -56,7 +67,13 @@
         this.getComments();
       },
       getComments(page = 0) {
-
+        const {sort, postType, momentId} = this;
+        if(postType !== 'comment') return;
+        nkcAPI(`/moment/${momentId}/comments`, 'GET')
+          .then(res => {
+            console.log(res)
+          })
+          .catch(sweetError)
       }
     },
     computed: {
