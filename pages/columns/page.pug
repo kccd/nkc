@@ -5,19 +5,18 @@ block baseColumnTitle
   else
     title=`${data.column.name}`
 block baseColumnContent
-  .col-xs-12.col-md-9.box-shadow-panel.m-t-1.p-r-0
-    div
-      if data.page.t
-        .column-page-title=data.page.t
-      .column-page-content!=data.page.c
-      if data.user && data.user.uid === data.column.uid
-        .m-t-1.text-right
-          if data.page.hidden
-            span.m-t-2.text-danger 已关闭，仅自己可见。
-            button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, false)`) 开启
-          else
-            button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, true)`) 关闭
-          a.m-l-05.btn.btn-xs.btn-default(href=`/m/${data.column._id}/settings/page?t=edit&id=${data.page._id}`) 编辑
+  div
+    if data.page.t
+      .column-page-title=data.page.t
+    .column-page-content!=data.page.c
+    if data.user && data.user.uid === data.column.uid
+      .m-t-1.text-right
+        if data.page.hidden
+          span.m-t-2.text-danger 已关闭，仅自己可见。
+          button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, false)`) 开启
+        else
+          button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, true)`) 关闭
+        a.m-l-05.btn.btn-xs.btn-default(href=`/m/${data.column._id}/settings/page?t=edit&id=${data.page._id}`) 编辑
 
 
   
