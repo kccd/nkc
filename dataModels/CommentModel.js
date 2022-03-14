@@ -564,7 +564,7 @@ schema.statics.extendComments = async function(comments) {
     articlesId.push(articlePost.sid);
   }
   let articles = await ArticleModel.find({_id: {$in: articlesId}});
-  articles = await ArticleModel.getArticlesUrl(articles);
+  articles = await ArticleModel.getArticlesInfo(articles);
   const users = await UserModel.find({uid: {$in: uidArr}});
   for(const user of users) {
     userObj[user.uid] = user;

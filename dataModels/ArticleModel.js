@@ -525,14 +525,18 @@ schema.methods.publishArticle = async function(options) {
   const MomentModel = mongoose.model('moments');
   const {normal} = await ArticleModel.getArticleStatus();
   const {article: articleQuoteType} = await MomentModel.getMomentQuoteTypes();
+  const {article: articleType} = await ColumnPostModel.getColumnPostTypes();
   const {source, selectCategory} = options;
   const DocumentModel = mongoose.model('documents');
   const {did, uid, _id: articleId} = this;
   //将当前article的状态改为正常
   await this.changeArticleStatus(normal);
   if(source === 'column') {
-    //如果发表专栏的文章就将创建文章专栏分类引用记录
-    await ColumnPostModel.createColumnPost(this, selectCategory);
+    //如果发表专栏的文章就将创建文章专栏分类引用记录 先查找是否存在引用，如果没有就创建一条新的引用
+    const columnPost = await ColumnPostModel.findOne({pid: articleId, type: articleType});
+    if(!columnPost) {
+      await ColumnPostModel.createColumnPost(this, selectCategory);
+    }
   } else if(source === 'zone') {
     //如果发布的article为空间文章就创建一条新的动态并绑定当前article
     const {_id: momentId} = await MomentModel.createQuoteMomentAndPublish({
@@ -1002,17 +1006,34 @@ schema.methods.isModerator = async function(uid) {
 /*
 * 获取当前article的文章链接链接
 * @param {object} articles 需要拓展文章链接的文章article
-* res： articles
+* res： {
+*   articles: [
+*     {
+*       article, 原article
+*       url, 文章链接地址
+*       editorUrl， 文章编辑地址
+* }]}
 * */
-schema.statics.getArticlesUrl = async function(articles) {
+schema.statics.getArticlesInfo = async function(articles) {
   const ColumnPostModel = mongoose.model('columnPosts');
   const ArticleModel = mongoose.model('articles');
+  const DocumentModel = mongoose.model('documents');
+  const ReviewModel = mongoose.model('reviews');
   const columnArticlesId = [];
+  const articlesDid = [];
+  const articleDocumentsObj = {};
   const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
   for(const article of articles) {
     if(article.source === columnSource) {
       columnArticlesId.push(article._id);
     }
+    articlesDid.push(article.did);
+  }
+  const {article: articleSource} = await DocumentModel.getDocumentSources();
+  const {stable: stableType} = await DocumentModel.getDocumentTypes();
+  const articleDocuments = await DocumentModel.find({did: {$in: articlesDid}, source: articleSource, type: stableType});
+  for(const d of articleDocuments) {
+    articleDocumentsObj[d.did] = d;
   }
   const {article: articleType} = await ColumnPostModel.getColumnPostTypes();
   //查找专栏文章引用
@@ -1024,13 +1045,25 @@ schema.statics.getArticlesUrl = async function(articles) {
   const results = [];
   for(const article of articles) {
     let url;
+    let editorUrl;
+    const document = articleDocumentsObj[article.did];
+    let review
+    if(document) {
+      review = (await ReviewModel.find({docId: document._id}).sort({toc: -1}).limit(1))[0];
+    }
     if(article.source === columnSource) {
-      url = `/m/${columnPostsObj[article._id].columnId}/a/${columnPostsObj[article._id]._id}`;
+      const columnPost = columnPostsObj[article._id];
+      editorUrl = `/column/editor?source=column&mid=${columnPost.columnId}&aid=${columnPost.pid}`;
+      url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
     } else if(article.source === zoneSource) {
+      editorUrl = `/creation/editor/zone/article?source=zone&aid=${article._id}`;
       url = `/zone/a/${article._id}`;
     }
     results.push({
       ...article.toObject(),
+      reason: review?review.reason:'',
+      document,
+      editorUrl,
       url,
     });
   }

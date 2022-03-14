@@ -13,16 +13,21 @@ router.get('/:aid', async (ctx, next)=>{
   const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
   let {_id: articleId} = columnPost.article.articleInfo;
   let _article = await db.ArticleModel.findOnly({_id: articleId});
-  const baseUrl = (await db.ArticleModel.getArticlesUrl([_article]))[0].url;
   data.article = _article;
   data.type = 'article';
+  const articleInfo = (await db.ArticleModel.getArticlesInfo([_article]))[0];
+  //获取文章链接
+  const baseUrl = articleInfo.url;
+  //获取文章编辑链接
+  data.editorUrl = articleInfo.editorUrl;
   const isModerator = await _article.isModerator(state.uid);
   //获取当前文章信息
   _article = await db.ArticleModel.extendDocumentsOfArticles([_article], 'stable', [
     '_id',
     'uid',
-    'status'
+    'status',
   ]);
+  data.article = articleInfo;
   data.articleStatus = _article[0].document.status;
   const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
   if(_article[0].document.status !== normalStatus && !isModerator) {
@@ -75,7 +80,6 @@ router.get('/:aid', async (ctx, next)=>{
   }
   const hidePostSettings = await db.SettingModel.getSettings("hidePost");
   data.baseUrl = baseUrl;
-  data.originalUrl = ctx.originalUrl;
   data.permissions = permissions;
   data.isModerator =  isModerator;
   data.postHeight = hidePostSettings.postHeight;

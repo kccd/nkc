@@ -1,3 +1,5 @@
+//创建变量时必须都要使用var,不然使用的文件无法获取到函数内容
+
 var isNode = typeof window === 'undefined';
 
 var Tools = function() {
@@ -255,7 +257,7 @@ var Tools = function() {
   // name {string} 参数名称
   // value 参数值
   self.addUrlParam = function(name, value) {
-    let currentUrl = window.location.href.split('#')[0];
+    var currentUrl = window.location.href.split('#')[0];
     if (/\?/g.test(currentUrl)) {
       if (/name=[-\w]{4,25}/g.test(currentUrl)) {
         currentUrl = currentUrl.replace(/name=[-\w]{4,25}/g, name + "=" + value);
@@ -276,17 +278,17 @@ var Tools = function() {
   //删除地址栏中的指定参数并返回删除参数后的地址
   // paramKey {string} 需要删除的键
   self.delUrlParam = function(paramKey) {
-    let url = window.location.href;    //页面url
-    let urlParam = window.location.search.substr(1);  //页面参数
-    let beforeUrl = url.substr(0, url.indexOf("?"));  //页面主地址（参数之前地址）
-    let nextUrl = "";
-    let arr = new Array();
+    var url = window.location.href;    //页面url
+    var urlParam = window.location.search.substr(1);  //页面参数
+    var beforeUrl = url.substr(0, url.indexOf("?"));  //页面主地址（参数之前地址）
+    var nextUrl = "";
+    var arr = new Array();
     if (urlParam != "") {
-      let urlParamArr = urlParam.split("&"); //将参数按照&符分成数组
-      for (let i = 0; i < urlParamArr.length; i++) {
-        let paramArr = urlParamArr[i].split("="); //将参数键，值拆开
+      var urlParamArr = urlParam.split("&"); //将参数按照&符分成数组
+      for (var i = 0; i < urlParamArr.length; i++) {
+        var paramArr = urlParamArr[i].split("="); //将参数键，值拆开
         //如果键与要删除的不一致，则加入到参数中
-        if (paramArr[0] != paramKey) {
+        if (paramArr[0] !== paramKey) {
           arr.push(urlParamArr[i]);
         }
       }
@@ -297,6 +299,17 @@ var Tools = function() {
     url = beforeUrl + nextUrl;
     return url;
   }
+  
+  //获取当前用户的专栏信息
+  self.getColumnInfo = function() {
+    return nkcAPI('/column/getColumn', 'GET')
+      .then((res) => {
+        return res.column;
+      })
+      .catch((err) => {
+        sweetError(err);
+      });
+  };
   
   self.getSize = function(size, digits) {
     size = Number(size);

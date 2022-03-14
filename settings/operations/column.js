@@ -4,6 +4,9 @@ module.exports = {
   apply: {
     GET: "column_apply"
   },
+  getColumn: {
+    GET: "getColumnInfo",
+  },
   editor: {
     GET: 'columnEditor'
   }
