@@ -1,91 +1,23 @@
-extends ./columnBase
-block columnTitle
-  if(data.type === 'page')
-    if data.page.t
-      title=`${data.page.t} - ${data.column.name}`
-    else
-      title=`${data.column.name}`
-  if(data.type === 'article')
-    title=`${data.columnPost.post.t}`
-  style.
-    body {
-      padding-top: 0;
-      background-color: #f6f6f6;
-    }
-  style=`body{background-color: ${data.column.color};}`
+extends ./pageBase
+block baseColumnTitle
+  if data.page.t
+    title=`${data.page.t} - ${data.column.name}`
+  else
+    title=`${data.column.name}`
+block baseColumnContent
+  .col-xs-12.col-md-9.box-shadow-panel.m-t-1.p-r-0
+    div
+      if data.page.t
+        .column-page-title=data.page.t
+      .column-page-content!=data.page.c
+      if data.user && data.user.uid === data.column.uid
+        .m-t-1.text-right
+          if data.page.hidden
+            span.m-t-2.text-danger 已关闭，仅自己可见。
+            button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, false)`) 开启
+          else
+            button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, true)`) 关闭
+          a.m-l-05.btn.btn-xs.btn-default(href=`/m/${data.column._id}/settings/page?t=edit&id=${data.page._id}`) 编辑
 
-block content
-  include ./modules/columnHeader
-  include ./modules/contribute
-  +mixinColumnHeader({
-    user: data.user,
-    column: data.column,
-    subColumnsId: state.subColumnsId,
-    navCategories: data.navCategories,
-    categories: data.categories,
-    hideBanner: false
-  })
-  .container-fluid.max-width
-    .column
-      .row
-        if(data.type === 'page')  
-          .col-xs-12.col-md-9.box-shadow-panel.m-t-1.p-r-0
-            div
-              if data.page.t
-                .column-page-title=data.page.t
-              .column-page-content!=data.page.c
-              if data.user && data.user.uid === data.column.uid
-                .m-t-1.text-right
-                  if data.page.hidden
-                    span.m-t-2.text-danger 已关闭，仅自己可见。
-                    button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, false)`) 开启
-                  else
-                    button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, true)`) 关闭
-                  a.m-l-05.btn.btn-xs.btn-default(href=`/m/${data.column._id}/settings/page?t=edit&id=${data.page._id}`) 编辑
-        if(data.type === 'article')
-          .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel.m-t-1
-            -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar} = data.columnPost
-            -var {_id, name} = column
-            -var {hits, count, oc} = thread
-            -var {authorInfos, uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c} = post
-            .row
-              .m-b-1
-                include ./article/nav
-                +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount})
-                include ./article/setUp
-                +setUp()
-                include ./article/title
-                +title({t, authorInfos, uid, userAvatar, toc, originState, name, _id})
-                include ./article/abstract
-                +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
-                include ./article/content
-                +content(c)
-              .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel#comment-content
-                .row
-                  include ../publicModules/commentCenter/comment
-              //- .col-xs-12.col-md-3.box-shadow-panel#rightDom
-              //-   //- 滚动到页头页脚
-              //-   include ../module_scrollTo.pug
-              //- 显示作者联系信息
-              include ./article/authorInfo.pug
-              +authorInfo()
-              include ../publicModules/floatForumNav
-              include ../publicModules/nkcSource
-              
-        .col-xs-12.col-md-3.box-shadow-panel.m-t-1
-          include ./modules/management
-          include ./modules/info
-block scripts
-  include ../publicModules/nkcSource
-  include ../publicModules/commonModal/commonModal
-  include ../publicModules/selectColor
-  include ../publicModules/subscribeTypes/subscribeTypes
 
-  +includeJS("/columns/settings/page.js")
-  +includeJS("/columns/column.js")
-  +includeJS("/columns/management.js")
-  +mixinColumnNavLinkScript()
-  if(data.type === 'article')
-    +includeDeferJS('/columns/article/article.js', false)
-    include ../publicModules/floatUserPanel/floatUserPanel.2.pug
-    include ../publicModules/disabledPost/disabledPost
+  

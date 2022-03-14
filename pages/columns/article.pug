@@ -1,0 +1,45 @@
+extends ./pageBase
+block baseColumnTitle
+    title=`${data.columnPost.post.t}`
+block baseColumnContent
+  .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel.m-t-1
+    -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar} = data.columnPost
+    -var {_id, name} = column
+    -var {hits, count, oc} = thread
+    -var {authorInfos, uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c} = post
+    .row
+      .m-b-1
+        include ./article/nav
+        +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount})
+        include ./article/setUp
+        +setUp()
+        include ./article/title
+        +title({t, authorInfos, uid, userAvatar, toc, originState, name, _id})
+        include ./article/abstract
+        +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
+        include ./article/content
+        +content(c)
+      .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel#comment-content
+        .row
+          include ../publicModules/commentCenter/comment
+      //- .col-xs-12.col-md-3.box-shadow-panel#rightDom
+      //-   //- 滚动到页头页脚
+      //-   include ../module_scrollTo.pug
+      //- 显示作者联系信息
+      include ./article/authorInfo.pug
+      +authorInfo()
+      include ../publicModules/floatForumNav
+      include ../publicModules/nkcSource
+block scripts
+  include ../publicModules/nkcSource
+  include ../publicModules/commonModal/commonModal
+  include ../publicModules/selectColor
+  include ../publicModules/subscribeTypes/subscribeTypes
+
+  +includeJS("/columns/settings/page.js")
+  +includeJS("/columns/column.js")
+  +includeJS("/columns/management.js")
+  +mixinColumnNavLinkScript()
+  +includeDeferJS('/columns/article/article.js', false)
+  include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../publicModules/disabledPost/disabledPost
