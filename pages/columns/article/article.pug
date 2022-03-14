@@ -31,8 +31,15 @@ block content
       +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
       include ./content
       +content(c)
+      include ./articleEditTime
+      +articleEditTime(data.article.document.tlm)
       //- 文章用户操作
-
+      .single-post-bottom
+        .single-comment-bottom-item
+          .fa.fa-comment-o.reply-icon
+          span 回复
+        .single-comment-bottom-item(data-type="commentOption" data-aid=data.article._id title="其他操作" data-direction="down")
+          .fa.fa-sliders.option-icon
   .hidden#data=objToStr({comments: data.comments, comment: data.comment, article: data.article})
   .container-fluid.max-width
     .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel

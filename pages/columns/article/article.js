@@ -84,8 +84,14 @@ function disabledArticles() {
   deleteArticle();
 }
 
+//打开文章其他操作
+function　openArticleOption() {
+
+}
+
 Object.assign(window, {
   deleteArticle,
   reviewArticle,
-  disabledArticles
+  disabledArticles,
+  openArticleOption
 })
