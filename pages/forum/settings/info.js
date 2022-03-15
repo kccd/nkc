@@ -8,9 +8,17 @@ import Editor from '../../lib/vue/Editor'
 import {getForumEditorConfigs} from "../../lib/js/editor";
 import ImageSelector from "../../lib/vue/ImageSelector";
 import {blobToFile, fileToBase64} from "../../lib/js/file";
+import { debounce } from "../../lib/js/execution";
+import { nkcAPI } from "../../lib/js/netAPI";
 const app = new Vue({
 	el: '#app',
 	data: {
+		editorName:{
+			professionalDescription: 'professionalDescription',
+			latestProfessional: 'latestProfessional'
+		},
+		professionalDescription: false,
+		latestProfessional: false,
 		logoData: '',
 		logoFile: '',
 		bannerData: '',
@@ -28,6 +36,36 @@ const app = new Vue({
 	computed: {
 		EditorConfigs() {
 			return getForumEditorConfigs();
+		},
+		professionalDescriptionTitle(){
+			const {declare, _declare} = forum
+			if(!declare && !_declare){
+				return "未填写，点击立即填写"
+			}
+			else if(!declare && _declare){
+				return "未提交，点击继续填写"
+			}
+		  else if(declare && !_declare){
+				return "已提交，点击编辑"
+			}
+			else{
+				return "已提交，点击继续编辑"
+			}
+		},
+		latestProfessionalNoticeTitle(){
+			const {latestBlockNotice, _latestBlockNotice} = forum
+			if(!latestBlockNotice && !_latestBlockNotice){
+				return "未填写，点击立即填写"
+			}
+			else if(!latestBlockNotice && _latestBlockNotice){
+				return "未提交，点击继续填写"
+			}
+		  else if(latestBlockNotice && !_latestBlockNotice){
+				return "已提交，点击编辑"
+			}
+			else{
+				return "已提交，点击继续编辑"
+			}
 		}
 	},
 	mounted() {
@@ -43,13 +81,33 @@ const app = new Vue({
 		'image-selector': ImageSelector
 	},
 	methods: {
-		getUrl: NKC.methods.tools.getUrl,
-		editorReady() {
-			this.setEditorContent();
+		
+		showEditor(editor){
+			this[editor] = true;
 		},
-		setEditorContent() {
-			this.$refs.forumExplainEditor.setContent(forum.declare);
-			this.$refs.forumNoticeEditor.setContent(forum.latestBlockNotice);
+		professionalDescriptionContent(){
+			const content = this.$refs.forumExplainEditor.getContent();;
+			debounce(()=>{
+				nkcAPI(`/f/${this.forum.fid}/settings/info/declare`, "PUT", { _declare: content })
+			}, 500)()
+		},
+		latestProfessionalContent(){
+			const content = this.$refs.forumNoticeEditor.getContent();
+			debounce(()=>{
+				nkcAPI(`/f/${this.forum.fid}/settings/info/latestBlockNotice`, "PUT", { _latestBlockNotice: content })
+			}, 500)()
+		},
+
+		getUrl: NKC.methods.tools.getUrl,
+		editorReady(editorName) {
+			this.setEditorContent(editorName);
+		},
+		setEditorContent(editorName) {
+			if(editorName === "professionalDescription"){
+				this.$refs.forumExplainEditor.setContent(forum._declare || forum.declare);
+			}else if(editorName === "latestProfessional"){
+				this.$refs.forumNoticeEditor.setContent(forum._latestBlockNotice || forum.latestBlockNotice);
+			}
 		},
 		str2arr(str) {
 			const arr = str.split(',');
@@ -136,8 +194,9 @@ const app = new Vue({
 					forum.noticeThreadsId = self.str2arr(forum._noticeThreadsId);
 					forum.basicThreadsId = self.str2arr(forum._basicThreadsId);
 					forum.valuableThreadsId = self.str2arr(forum._valuableThreadsId);
-					forum.declare = self.$refs.forumExplainEditor.getContent();
-					forum.content = self.$refs.forumNoticeEditor.getContent();
+					// 如果没有打开编辑器 那么优先提交正在编辑的内容 如果正在编辑的内容不存在才是保存已经发布的内容					
+					forum.declare = self.$refs.forumExplainEditor?.getContent() || forum._declare || forum.declare;
+					forum.content = self.$refs.forumNoticeEditor?.getContent() || forum._latestBlockNotice || forum.latestBlockNotice;
 					const formData = new FormData();
 					formData.append('forum', JSON.stringify(forum));
 					if(self.logoFile) {
@@ -149,8 +208,8 @@ const app = new Vue({
 					return nkcUploadFile(`/f/${self.forum.fid}/settings/info`, 'PUT', formData);
 				})
 				.then((data) => {
-					self.$refs.forumExplainEditor.removeNoticeEvent();
-					self.$refs.forumNoticeEditor.removeNoticeEvent();
+					self.$refs.forumExplainEditor?.removeNoticeEvent();
+					self.$refs.forumNoticeEditor?.removeNoticeEvent();
 					if(data.logo) {
 						self.logoData = '';
 						self.logoFile = '';
