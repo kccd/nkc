@@ -16,7 +16,7 @@ router
     const {user} = data;
     const {uid} = state;
     const {normal: articleStatus} = await db.ArticleModel.getArticleStatus();
-    let article = await db.ArticleModel.findOnly({_id: aid, status: articleStatus});
+    let article = await db.ArticleModel.findOnly({_id: aid});
     if(!article) ctx.throw(404, '未找到文章，请刷新后重试');
     article = (await db.ArticleModel.getArticlesInfo([article]))[0];
     data.article = article;
@@ -29,6 +29,7 @@ router
       if(document.status !== normalStatus) ctx.throw(401, '权限不足');
     }
     const optionStatus = {
+      type: 'article',
       anonymous: null,
       disabled: null,
       complaint: null,
@@ -75,7 +76,7 @@ router
     const {disabled, normal} = await db.DocumentModel.getDocumentStatus();
     const document = await db.DocumentModel.findOnly({did: article.did, type: stable});
     if(document.status !== disabled) ctx.throw(400, '文章未被禁用，请刷新后重试');
-    await document.setReviewStatus(normal);
+    await document.setStatus(normal);
     if(!article || !document) ctx.throw(404, '未找到文章，请刷新后重试');
     await next();
   })

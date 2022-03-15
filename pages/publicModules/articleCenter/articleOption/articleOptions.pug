@@ -5,32 +5,30 @@ if !isIncluded('articleOptions')
     .post-options-panel(v-if='loading')
       .loading 加载中...
     .post-options-panel(v-else)
-      a.option(@click='visitUrl(getUrl("postHome", pid), true)' v-if='!isComment')
-        .fa.fa-newspaper-o
-        span 详情
-      .option(v-if='optionStatus.anonymousUser !== null' @click='viewAuthorInfo')
-        .fa.fa-share-square-o
-        span 查看作者
-      .option(@click='replyPost' v-if='optionStatus.type === "article" && uid')
+      //
+      //.option(v-if='optionStatus.anonymousUser !== null' @click='viewAuthorInfo')
+      //  .fa.fa-share-square-o
+      //  span 查看作者
+      .option(@click='replyArticle' v-if='optionStatus.type === "article" && uid')
         .fa.fa-comment-o
         span 回复
-      a.option(v-if='postType === "thread"' :href="'/t/' + tid + '?t=author'")
-        .fa.fa-filter
-        span 只看作者
-      .option(v-if='optionStatus.subscribe !== null' @click='subscribeThread')
-        .fa.fa-bookmark-o
-        span(v-if='optionStatus.subscribe === false') 加入关注
-        span(v-else) 取消关注
-      a.option(v-if='optionStatus.edit !== null' @click='visitUrl("/editor?ver=ue&type=post&id=" + pid, true)')
+      //a.option(v-if='postType === "thread"' :href="'/t/' + tid + '?t=author'")
+      //  .fa.fa-filter
+      //  span 只看作者
+      //.option(v-if='optionStatus.subscribe !== null' @click='subscribeThread')
+      //  .fa.fa-bookmark-o
+      //  span(v-if='optionStatus.subscribe === false') 加入关注
+      //  span(v-else) 取消关注
+      a.option(v-if='optionStatus.edit !== null' @click='editArticle')
         .fa.fa-edit
         span 编辑
-      .option(v-if='optionStatus.reviewed === false' @click='reviewPost')
+      .option(v-if="optionStatus.reviewed === 'unknown'" @click='reviewArticle')
         .fa.fa-check-circle-o
         span 通过审核
       //.option(v-if='commentControl' @click='toCommentControl')
       //  .fa.fa-commenting
       //  span 评论控制
-      .option(v-if='optionStatus.disable !== null' @click='disablePost')
+      .option(v-if='optionStatus.disable !== null' @click='disableArticle')
         .fa.fa-eye-slash
         span 退修或删除
       //a.option(v-if='history !== null' @click='visitUrl("/p/" + pid + "/history", true)')

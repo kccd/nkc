@@ -155,6 +155,20 @@ schema.methods.changeStatus = async function(status) {
 }
 
 /*
+*
+* 根据did来设置article的status
+* */
+schema.statics.setStatus = async function(did, status) {
+  const ArticleModel= mongoose.model('articles');
+  const article = await ArticleModel.findOnly({did});
+  await article.updateOne({
+    $set: {
+      status,
+    }
+  });
+}
+
+/*
 * 获取 source
 * */
 schema.statics.getArticleSources = async () => {
@@ -1021,6 +1035,7 @@ schema.methods.isModerator = async function(uid) {
 * }]}
 * */
 schema.statics.getArticlesInfo = async function(articles) {
+  const UserModel = mongoose.model('users');
   const ColumnPostModel = mongoose.model('columnPosts');
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
@@ -1028,12 +1043,19 @@ schema.statics.getArticlesInfo = async function(articles) {
   const columnArticlesId = [];
   const articlesDid = [];
   const articleDocumentsObj = {};
+  const uidArr = [];
+  const userObj = {};
   const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
   for(const article of articles) {
     if(article.source === columnSource) {
       columnArticlesId.push(article._id);
     }
     articlesDid.push(article.did);
+    uidArr.push(article.uid);
+  }
+  const users = await UserModel.find({uid: {$in: uidArr}});
+  for(const user of users) {
+    userObj[user.uid] = user;
   }
   const {article: articleSource} = await DocumentModel.getDocumentSources();
   const {stable: stableType} = await DocumentModel.getDocumentTypes();
@@ -1071,6 +1093,7 @@ schema.statics.getArticlesInfo = async function(articles) {
       reason: review?review.reason:'',
       document,
       editorUrl,
+      user: userObj[article.uid],
       url,
     });
   }

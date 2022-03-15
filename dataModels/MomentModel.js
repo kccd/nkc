@@ -351,6 +351,20 @@ schema.methods.changeStatus = async function(status) {
 }
 
 /*
+*
+* 根据did来设置article的status
+* */
+schema.statics.setStatus = async function(did, status) {
+  const MomentModel = mongoose.model('moments');
+  const moment = await MomentModel.findOnly({did});
+  await moment.updateOne({
+    $set: {
+      status,
+    }
+  });
+}
+
+/*
 * 通过发表人ID和动态ID获取当前动态下未发布的评论
 * @param {String} uid 发表人ID
 * @param {String} mid 动态ID

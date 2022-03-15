@@ -214,6 +214,20 @@ schema.methods.changeStatus = async function(status) {
   });
 }
 
+/*
+*
+* 根据did来设置article的status
+* */
+schema.statics.setStatus = async function(did, status) {
+  const CommentModel = mongoose.model('comments');
+  const comment = await CommentModel.findOnly({did});
+  await comment.updateOne({
+    $set: {
+      status,
+    }
+  });
+}
+
 
 /*
 * 保存comment
@@ -599,7 +613,7 @@ schema.statics.extendComments = async function(comments) {
   for(const user of users) {
     userObj[user.uid] = user;
   }
-  const documents = await DocumentModel.find({did: {$in: didArr}, type: 'stable', status: 'normal'});
+  const documents = await DocumentModel.find({did: {$in: didArr}, type: 'stable'});
   for(const d of documents) {
     documentObj[d.did] = d;
   }
@@ -607,7 +621,7 @@ schema.statics.extendComments = async function(comments) {
   for(const c of _comments) {
     const {did, sid, _id, source, toc, uid, url} = c;
     const document = documentObj[did];
-    const {content, } = document;
+    const {content} = document;
     const result = {
       _id,
       did,

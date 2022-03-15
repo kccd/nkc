@@ -914,6 +914,15 @@ messageSchema.statics.getParametersData = async (message) => {
       CRTarget = comment[0].url;
       // 投诉目标描述
       CRTargetDesc = "点击查看";
+    } else if(complaintType === 'article') {
+      let article = await ArticleModel.findOnly({_id: contentId});
+      article = (await ArticleModel.getArticlesInfo([article]))[0];
+      if(!article) return null;
+      CRType = "文章";
+      // 投诉目标链接
+      CRTarget = article.url;
+      // 投诉目标描述
+      CRTargetDesc = "点击查看";
     } else {
       return null;
     }

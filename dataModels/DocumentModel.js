@@ -483,7 +483,7 @@ schema.statics.publishDocumentByDid = async (did) => {
   //是否需要审核
   const needReview = await documentsObj.beta.getReviewStatusAndCreateReviewLog();
   if(needReview) {
-    await documentsObj.beta.setReviewStatus((await DocumentModel.getDocumentStatus()).unknown);
+    await documentsObj.beta.setStatus((await DocumentModel.getDocumentStatus()).unknown);
   } else {
     //不需要审核
     //检测document中的@用户并发送消息给用户
@@ -1113,39 +1113,34 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function() {
   if(needReview) {
     await ReviewModel.newDocumentReview(type, this._id, this.uid, reason);
   } else {
-    await this.setReviewStatus((await DocumentModel.getDocumentStatus()).normal);
+    await this.setStatus((await DocumentModel.getDocumentStatus()).normal);
   }
   return needReview;
 }
-
-// 设置审核状态 当document的状态改变时，同时去改变上层来源的状态
-schema.methods.setReviewStatus = async function(status) {
+schema.methods.syncParentStatus = async function() {
   const DocumentModel = mongoose.model('documents');
   const ArticleModel = mongoose.model('articles');
   const CommentModel = mongoose.model('comments');
   const MomentModel = mongoose.model('moments');
-  const {source, did} = this;
-  let _status = status;
-  let parent;
+  const {source, did, status} = this;
   const {article, comment, moment} = await DocumentModel.getDocumentSources();
   if(source === article) {
-    parent = await ArticleModel.findOnly({did});
+    await ArticleModel.setStatus(did, status);
   } else if(source === comment) {
-    parent= await CommentModel.findOnly({did});
+    await CommentModel.setStatus(did, status);
   } else if(source === moment) {
-    parent = await MomentModel.findOnly({did});
+    await MomentModel.setStatus(did, status);
   }
-  const {unknown, normal, faulty, disabled} = await DocumentModel.getDocumentStatus();
-  if(!status) _status = unknown;
+}
+// 设置审核状态 当document的状态改变时，同时去改变上层来源的状态
+schema.methods.setStatus = async function(status) {
+  this.status = status;
   await this.updateOne({
     $set: {
-      status: _status,
+      status: this.status,
     }
   });
-  // 同步document父级的状态
-  if(parent) {
-    await parent.changeStatus(_status);
-  }
+  await this.syncParentStatus();
 };
 
 /*

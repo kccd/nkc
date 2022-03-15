@@ -86,16 +86,19 @@ schema.statics.extendComplaints = async (complaints) => {
   const ThreadModel = mongoose.model("threads");
   const LibraryModel = mongoose.model("libraries");
   const CommentModel = mongoose.model('comments');
+  const ArticleModel = mongoose.model('articles');
   const uid = new Set();
   const pid = new Set();
   const tid = new Set();
   const lid = new Set();
   const cid = new Set();
+  const aid = new Set();
   const userObj = {};
   const postObj = {};
   const threadObj = {};
   const libraryObj = {};
   const commentObj = {};
+  const articleObj = {};
   complaints.map(c => {
     const {type} = c;
     uid.add(c.uid);
@@ -109,6 +112,8 @@ schema.statics.extendComplaints = async (complaints) => {
       lid.add(c.contentId);
     } else if (type === "comment") {
       cid.add(c.contentId);
+    } else if(type === "article") {
+      aid.add(c.contentId);
     }
     if(c.handlerId) uid.add(c.handlerId);
   });
@@ -118,6 +123,7 @@ schema.statics.extendComplaints = async (complaints) => {
   let threads = await ThreadModel.find({tid: {$in: [...tid]}});
   let libraries = await LibraryModel.find({_id: {$in: [...lid]}});
   let comments = await CommentModel.find({_id: {$in: [...cid]}});
+  let articles = await ArticleModel.find({_id: {$in: [...aid]}});
   posts = await PostModel.extendPosts(posts, {
     user: true,
     userGrade: false,
@@ -125,9 +131,13 @@ schema.statics.extendComplaints = async (complaints) => {
     usersVote: false,
     credit: false
   });
+  articles = await ArticleModel.getArticlesInfo(articles);
   comments = await CommentModel.extendComments(comments);
   comments.map(c => {
     commentObj[c._id] = c;
+  })
+  articles.map(a => {
+    articleObj[a._id] = a;
   })
   threads = await ThreadModel.extendThreads(threads, {
     forum: false,
@@ -174,6 +184,8 @@ schema.statics.extendComplaints = async (complaints) => {
     } else if (type === 'comment') {
       if(!commentObj[c.contentId]) continue;
       r.content = commentObj[c.contentId];
+    } else if(type === 'article') {
+      r.content = articleObj[c.contentId];
     }
     if(r.handlerId) {
       r.handler = userObj[c.handlerId];

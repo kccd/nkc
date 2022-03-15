@@ -97,6 +97,11 @@ window.articleOption = new Vue({
           sweetError(err);
         });
     },
+    editArticle() {
+      if(this.article) {
+        window.location.href = this.article.editorUrl;
+      }
+    },
     toColumn() {
       const {inColumn, pid, userColumnId} = this;
       if(inColumn) {
@@ -151,8 +156,8 @@ window.articleOption = new Vue({
       const {tid, subscribe} = this;
       SubscribeTypes.subscribeThread(tid, !subscribe);
     },
-    replyPost() {
-      window.quotePost(this.pid);
+    replyArticle() {
+      window.location.href = '#container';
     },
     hidePostContent() {
       const {pid, hidePost} = this;
@@ -197,8 +202,9 @@ window.articleOption = new Vue({
     postWarning() {
       openPostWarningDom(this.pid);
     },
-    disablePost() {
-      disabledThreadPost(this.pid);
+    disableArticle() {
+      const {_id} = this.article.document;
+      NKC.methods.disabledDocuments(_id);
     },
     viewViolationRecord() {
       NKC.modules.violationRecord.open({uid: this.postUserId});
@@ -294,9 +300,22 @@ window.articleOption = new Vue({
     displayIpInfo() {
       NKC.methods.getIpInfo(this.ipInfo);
     },
-    reviewPost() {
-      const {pid} = this;
-      reviewPost(pid)
+    reviewArticle() {
+      const {_id} = this.article.document;
+      nkcAPI('/review', 'PUT', {
+        pass: true,
+        docId: _id,
+        type: 'document'
+      })
+        .then(res => {
+          sweetSuccess('操作成功');
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        })
+        .catch(err => {
+          sweetError(err);
+        })
     },
     toCommentControl() {
       const {pid} = this;
@@ -307,13 +326,10 @@ window.articleOption = new Vue({
     },
     complaintSelector(){
       var self = this;
+      const {_id} = self.article;
       if(!window.complaintSelector)
         window.complaintSelector = new NKC.modules.ComplaintSelector();
-      if(this.postType === 'thread') {
-        complaintSelector.open("thread", this.tid)
-      } else {
-        complaintSelector.open("post", this.pid)
-      }
+      complaintSelector.open("article", _id);
       self.close();
     }
   }

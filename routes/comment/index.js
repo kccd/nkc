@@ -165,7 +165,7 @@ router
     //更新审核记录的处理人
     await review.updateReview({uid: state.uid, type: status === 'faulty'?'returnDocument':'disabledDocument', reason});
     const targetUser = await db.UserModel.findOne({uid: document.uid});
-    await document.setReviewStatus(status);
+    await document.setStatus(status);
     //标记违规
     if(violation) {
       //新增违规记录
@@ -215,7 +215,7 @@ router
     if(document.status !== 'disabled') ctx.throw(400, `ID为${document._id}的回复未被屏蔽，请刷新`);
     const {normal: normalStatus} = await db.DocumentModel.getDocumentStatus();
     //更新document的状态
-    await document.setReviewStatus(normalStatus);
+    await document.setStatus(normalStatus);
     await next();
   })
   .get('/:_id/options', async (ctx, next) => {
