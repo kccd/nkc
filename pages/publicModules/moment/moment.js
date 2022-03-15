@@ -69,6 +69,13 @@ class Moment {
           },
           setAsComment() {
             this.postType = this.postTypes.comment;
+            if(!this.hidden) {
+              const self = this;
+              setTimeout(() => {
+                self.$refs.momentComments.init();
+              }, 100);
+            }
+
           }
         }
       })

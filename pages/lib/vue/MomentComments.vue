@@ -146,10 +146,12 @@
         }
       ]
     }),
-    mounted() {
-      this.setActiveNav(this.nav[0].type);
-    },
     methods: {
+      init() {
+        if(this.postType === 'comment') {
+          this.setActiveNav(this.nav[0].type);
+        }
+      },
       setActiveNav(type) {
         this.sort = type;
         this.getComments();

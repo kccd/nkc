@@ -85,7 +85,7 @@ if !isIncluded('publicModules/moment/moment.pug')
               if voteUp > 0
                 span= voteUp
           .single-moment-comment-container(v-if='!hidden' v-cloak)
-            moment-comments(:mid="momentId" :type='postType')
+            moment-comments(:mid="momentId" :type='postType' ref='momentComments')
 
 
 
