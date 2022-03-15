@@ -108,10 +108,15 @@ function momentsContainerElementInitEvent(momentContainerElement) {
   element.addEventListener('click', (e) => {
     const target = $(e.target);
     // 获取事件名称，对应 momentInstance 中的函数
-    const eventName = target.attr('data-event-name');
+    let eventName = target.attr('data-event-name');
     // 当前动态ID
-    const momentId = target.attr('data-moment-id');
-    if(!eventName || !momentId) return;
+    let momentId = target.attr('data-moment-id');
+    if(!eventName || !momentId) {
+      const parent = target.parent().eq(0);
+      eventName = parent.attr('data-event-name');
+      momentId = parent.attr('data-moment-id');
+      if(!eventName || !momentId) return;
+    }
     const momentInstance = getMomentInstanceByMomentId(momentId);
     momentInstance[eventName]();
   });

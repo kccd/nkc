@@ -130,13 +130,19 @@
     text-align: center;
     color: #3f3f3f;
     .single-moment-bottom-left{
+      text-align: left;
       position: absolute;
       top: 0;
       left: 0;
       height: @padding;
       line-height: @padding;
-      width: @padding;
       cursor: pointer;
+      .fa{
+        margin-right: 0.5rem;
+      }
+      span{
+        font-size: 1.1rem;
+      }
     }
     .single-moment-bottom-right{
       position: absolute;
@@ -144,8 +150,14 @@
       right: 0;
       height: @padding;
       line-height: @padding;
-      width: @padding;
       cursor: pointer;
+      text-align: right;
+      .fa{
+        margin-right: 0.5rem;
+      }
+      span{
+        font-size: 1.1rem;
+      }
     }
   }
 }
@@ -272,4 +284,11 @@
   a{
     color: @primary;
   }
+}
+.single-moment-comment-container{
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 1rem 1rem 0.5rem 1rem;
+  border-radius: 5px;
+  margin-bottom: 1rem
 }

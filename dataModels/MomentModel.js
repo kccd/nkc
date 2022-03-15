@@ -13,12 +13,26 @@ const momentQuoteTypes = {
   moment: 'moment',
 };
 
+const momentCommentPerPage = 10;
+
 const schema = new mongoose.Schema({
   _id: String,
-  // 发表时间
+  // 创建时间
   toc: {
     type: Date,
     default: Date.now,
+    index: 1
+  },
+  // 发表时间
+  top: {
+    type: Date,
+    index: 1,
+    default: null,
+  },
+  // 最后修改时间
+  tlm: {
+    type: Date,
+    default: null,
     index: 1
   },
   // 发表人
@@ -78,6 +92,7 @@ const schema = new mongoose.Schema({
   // 点赞
   voteUp: {
     type: Number,
+    index: 1,
     default: 0,
   },
   // 点踩
@@ -85,7 +100,7 @@ const schema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  // 楼层
+  // 作为动态时表示回复数，作为评论时表示楼层
   order: {
     type: Number,
     default: 0
@@ -104,6 +119,14 @@ schema.statics.getMomentStatus = async () => {
 * */
 schema.statics.getMomentQuoteTypes = async () => {
   return momentQuoteTypes;
+};
+
+/*
+* 获取动态评论每页条数
+* @return {Number}
+* */
+schema.statics.getMomentCommentPerPage = async () => {
+  return momentCommentPerPage;
 };
 
 /*
@@ -154,34 +177,6 @@ schema.statics.getNewId = async () => {
   return newId;
 };
 
-/*
-* 获取动态最新评论的楼层
-* @param {String} mid 动态ID
-* @return {Number}
-* */
-schema.statics.getMomentOrder = async (mid) => {
-  const MomentModel = mongoose.model('moments');
-  const redLock = require('../nkcModules/redLock');
-  const getRedisKeys = require('../nkcModules/getRedisKeys');
-  const key = getRedisKeys('momentOrder', mid);
-  const lock = await redLock.lock(key, 6000);
-  let order = 0;
-  try{
-    const comment = await MomentModel.findOne({
-      parent: mid
-    }, {
-      order: 1
-    }).sort({order: -1});
-    if(comment) {
-      order = comment.order + 1;
-    }
-    await lock.unlock();
-  } catch (err) {
-    await lock.unlock();
-    throwErr(500, `moment order error`);
-  }
-  return order;
-};
 
 /*
 * 创建一条未发布的动态或评论
@@ -368,7 +363,8 @@ schema.statics.getUnPublishedMomentCommentDataById = async (uid, mid) => {
       return null;
     }
     return {
-      momentId: moment._id,
+      momentCommentId: moment._id,
+      momentId: moment.parent,
       toc: betaDocument.toc,
       tlm: betaDocument.tlm,
       uid: betaDocument.uid,
@@ -505,26 +501,46 @@ schema.methods.checkBeforePublishing = async function() {
 schema.methods.publish = async function() {
   const DocumentModel = mongoose.model('documents');
   await this.checkBeforePublishing();
+  const time = new Date();
   await DocumentModel.publishDocumentByDid(this.did);
   this.status = momentStatus.normal;
   await this.updateOne({
     $set: {
+      top: time,
       status: this.status
     }
   });
 };
 
 /*
-* 更新评论楼层
-* @param {Number}
+* 更新评论楼层和动态评论数
 * */
-schema.methods.updateOrder = async function(order) {
-  this.order = order;
-  await this.updateOne({
-    $set: {
-      order: this.order
-    }
-  });
+schema.methods.updateMomentCommentOrder = async function() {
+  const MomentModel = mongoose.model('moments');
+  const redLock = require('../nkcModules/redLock');
+  const getRedisKeys = require('../nkcModules/getRedisKeys');
+  const {parent} = this;
+  const key = getRedisKeys('momentOrder', parent);
+  const lock = await redLock.lock(key, 6000);
+  try{
+    const moment = await MomentModel.findOnly({_id: parent});
+    const order = moment.order + 1;
+    await moment.updateOne({
+      $set: {
+        order,
+      }
+    });
+    this.order = order;
+    await this.updateOne({
+      $set: {
+        order: this.order,
+      }
+    });
+    await lock.unlock();
+  } catch(err) {
+    await lock.unlock();
+    throwErr(500, err.message);
+  }
 }
 
 /*
@@ -544,8 +560,7 @@ schema.methods.publishMomentComment = async function(postType, alsoPost) {
 
   if(postType === 'comment' || alsoPost) {
     // 需要创建评论
-    const order = await MomentModel.getMomentOrder(parent);
-    await this.updateOrder(order);
+    await this.updateMomentCommentOrder();
     await this.publish();
   }
   if(postType === 'repost' || alsoPost) {
@@ -726,9 +741,6 @@ schema.statics.extendMomentsData = async (moments) => {
   const DocumentModel = mongoose.model('documents');
   const {getUrl, fromNow} = require('../nkcModules/tools');
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
-  const nkcRender = require('../nkcModules/nkcRender');
-  const {filterMessageContent} = require("../nkcModules/xssFilters");
-  const {twemoji} = require('../settings/editor');
   const usersId = [];
   const momentsId = [];
   let resourcesId = [];
@@ -756,6 +768,7 @@ schema.statics.extendMomentsData = async (moments) => {
       toc,
       _id,
       voteUp,
+      order,
       quoteType,
     } = moment;
     const user = usersObj[uid];
@@ -837,6 +850,7 @@ schema.statics.extendMomentsData = async (moments) => {
       toc,
       content,
       voteUp,
+      commentCount: order,
       files: filesData
     };
   }
@@ -930,13 +944,15 @@ schema.statics.extendCommentsData = async function (comments) {
       _id,
       order,
       toc,
+      parent,
     } = comment;
     const user = usersObj[uid];
     if(!user) continue;
     const stableDocument = stableDocuments[_id];
     if(!stableDocument) continue;
     commentsData.push({
-      commentId: _id,
+      momentId: parent,
+      momentCommentId: _id,
       uid: user.uid,
       order,
       content: await MomentModel.renderContent(stableDocument.content),
@@ -948,6 +964,15 @@ schema.statics.extendCommentsData = async function (comments) {
     });
   }
   return commentsData;
+}
+
+/*
+* 获取评论所在页数
+* @param {Number} order 楼层
+* @return {Number}
+* */
+schema.statics.getPageByOrder = async (order) => {
+  return Math.ceil(order / momentCommentPerPage) - 1;
 }
 
 module.exports = mongoose.model('moments', schema);

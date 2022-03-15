@@ -23,7 +23,7 @@
             span 同时评论
       .option-box-right
         span {{remainingWords}}
-        button.btn.btn-default.btn-sm(@click="publish") 提交
+        button.btn.btn-default.btn-sm(@click="publish" :disabled="disablePostButton") 提交
 
 </template>
 
@@ -91,11 +91,13 @@
       maxContentLength: 1000,
       content: '',
       alsoPost: false,
-      momentCommentId: null,
+      momentCommentId: '',
+      submitting: false,
       types: {
         repost: 'repost',
         comment: 'comment'
-      }
+      },
+      disableSavingCount: 0,
     }),
     watch: {
       content: 'onContentChange'
@@ -126,9 +128,23 @@
       remainingWords() {
         const {maxContentLength, contentLength} = this;
         return maxContentLength - contentLength;
+      },
+      disablePostButton() {
+        return this.submitting || this.content.length === 0 || !this.momentCommentId;
       }
     },
     methods: {
+      reset() {
+        this.lockAutoSaving(1);
+        this.momentCommentId = '';
+        this.setTextareaEditorContent('');
+      },
+      lockAutoSaving(num) {
+        this.disableSavingCount = num;
+      },
+      unlockAutoSaving() {
+        this.disableSavingCount = 0;
+      },
       selectEmoji() {
         const self = this;
         this.$refs.emojiSelector.open(res => {
@@ -144,15 +160,19 @@
         const self = this;
         nkcAPI(`/creation/zone/moment?from=editor&mid=${momentId}`, 'GET')
           .then(res => {
-            const {content, momentId} = res;
-            if(!momentId) return;
+            const {content, momentCommentId} = res;
+            if(!momentCommentId) return;
             self.content = content;
+            self.momentCommentId = momentCommentId;
             self.syncTextareaEditorContent();
           })
           .catch(sweetError)
       },
+      setTextareaEditorContent(content) {
+        this.$refs.textareaEditor.setContent(content);
+      },
       syncTextareaEditorContent() {
-        this.$refs.textareaEditor.setContent(this.content);
+        this.setTextareaEditorContent(this.content);
       },
       onTextareaEditorContentChange(content) {
         this.content = content;
@@ -164,32 +184,55 @@
         const {
           content,
           momentId,
+          disableSavingCount
         } = this;
+        const self = this;
+        if(disableSavingCount > 0) {
+          this.disableSavingCount --;
+          return;
+        }
         return nkcAPI(`/creation/zone/moment/${momentId}`, 'POST', {
           type: 'modify',
           content,
         })
         .then(res => {
           console.log(`动态已自动保存`);
+          self.momentCommentId = res.momentCommentId;
         })
         .catch(err => {
           screenTopWarning(`动态保存失败：${err.error || err.message || err}`)
         });
       },
+      lockPost() {
+        this.submitting = true;
+      },
+      unlockPost() {
+        this.submitting = false;
+      },
       publish() {
         const self = this;
         const {postType, alsoPost, content, momentId} = this;
-        return nkcAPI(`/creation/zone/moment/${momentId}`, 'POST', {
-          type: 'publish',
-          content,
-          postType,
-          alsoPost,
-        })
+        this.lockPost();
+        return Promise.resolve()
+          .then(() => {
+            if(content.length === 0) throw new Error(`请输入内容`);
+            return nkcAPI(`/creation/zone/moment/${momentId}`, 'POST', {
+              type: 'publish',
+              content,
+              postType,
+              alsoPost,
+            })
+          })
           .then(res => {
-            self.$emit('published');
-            console.log(`published`)
+            self.unlockPost();
+            self.$emit('published', {
+              momentCommentId: res.momentCommentId,
+              momentCommentPage: res.momentCommentPage,
+            });
+            self.reset();
           })
           .catch(err => {
+            self.unlockPost();
             sweetError(err)
           });
       }
