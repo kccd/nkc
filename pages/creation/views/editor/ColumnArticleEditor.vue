@@ -1,6 +1,6 @@
 <template lang="pug">
   .column-creation.standard-max-container
-    .m-b-1
+    //.m-b-1
       bread-crumb(:list="navList")
     template(v-if="column.userColumn")
       article-editor(ref="articleEditor" :configs="formConfigs" time="60000" source="column")

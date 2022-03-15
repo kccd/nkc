@@ -120,9 +120,9 @@
           self.resetFocus(newPosition);
         });
       },
-      onContentChange: debounce(function() {
+      onContentChange: function() {
         this.$emit('content-change', this.content);
-      }, 200)
+      }
     }
   }
 </script>

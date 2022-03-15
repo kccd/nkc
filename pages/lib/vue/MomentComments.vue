@@ -19,16 +19,21 @@
               span {{commentData.username}}
             .moment-comment-time
               from-now(:time="commentData.toc")
-
+            .moment-comment-options
+              .moment-comment-option
+                .fa.fa-thumbs-o-up
+              .moment-comment-option
+                .fa.fa-ellipsis-h
           .moment-comment-item-content(v-html="commentData.content")
+      paging(:pages="pageButtons" @click-button="clickPageButton")
 
-    moment-comment-editor(:mid="momentId" :type="postType")
+    moment-comment-editor(:mid="momentId" :type="postType" @published="onPublished")
 </template>
 
 <style lang="less" scoped>
   @import '../../publicModules/base';
   .moment-comment-nav{
-    margin-bottom: 0.8rem;
+    margin-bottom: 2rem;
     .post-type{
       font-weight: 700;
       display: inline-block;
@@ -44,10 +49,37 @@
     }
   }
   .moment-comment-list-container{
+    margin-bottom: 2rem;
     .moment-comment-list{
+      margin-bottom: 1rem;
       .moment-comment-item{
+        &:hover{
+          background-color: #eee;
+        }
+        padding: 0.5rem 0;
+        margin-bottom: 0rem;
         .moment-comment-item-header{
           margin-bottom: 0.5rem;
+          position: relative;
+        }
+        .moment-comment-options{
+          @height: 2rem;
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: @height;
+          width: 2 * @height;
+          .moment-comment-option{
+            display: inline-block;
+            height: @height;
+            line-height: @height;
+            text-align: center;
+            width: @height;
+            cursor: pointer;
+            &:hover{
+              opacity: 0.7;
+            }
+          }
         }
         .moment-comment-time{
           display: inline-block;
@@ -71,7 +103,7 @@
           }
         }
         .moment-comment-item-content {
-          margin-bottom: 0.5rem;
+          //margin-bottom: 0.5rem;
           /deep/img{
             height: 1.5rem;
             width: 1.5rem;
@@ -92,7 +124,6 @@
   import {sweetError} from "../js/sweetAlert";
   import Paging from '../vue/Paging';
   import FromNow from '../vue/FromNow';
-
   export default {
     props: ['mid', 'type'],
     components: {
@@ -136,6 +167,10 @@
       },
       clickPageButton(page) {
         this.getComments(page);
+      },
+      onPublished(res) {
+        const {momentCommentPage} = res;
+        this.getComments(momentCommentPage);
       }
     },
     computed: {

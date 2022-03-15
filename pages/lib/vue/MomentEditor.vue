@@ -27,7 +27,7 @@
         span 表情
       .button-pull
         span.number(:class="{'warning': remainingWords < 0}") {{remainingWords}}
-        button.publish(:class="{'disabled': submitting}" v-if="submitting") 发动态
+        button.publish(:class="{'disabled': disablePublish}" v-if="disablePublish") 发动态
         button.publish(@click="publishContent" v-else) 发动态
 </template>
 
@@ -246,6 +246,10 @@
           filesUrl.push({url, cover});
         }
         return filesUrl;
+      },
+      disablePublish() {
+        const {submitting, momentId, content} = this;
+        return submitting || !momentId || content.length === 0
       }
     },
     watch: {
@@ -254,6 +258,10 @@
       'content': 'onContentChange'
     },
     methods: {
+      reset() {
+        this.momentId = '';
+        this.setTextareaEditorContent('');
+      },
       initData() {
         const self = this;
         nkcAPI(`/creation/zone/moment?from=editor`, 'GET')
@@ -325,17 +333,16 @@
       },
       publishContent() {
         const self = this;
+        const {content, picturesId, videosId} = this;
+        const resourcesId = picturesId.length > 0? picturesId: videosId;
         self.lockButton();
-        self
-          .saveContent()
+        return nkcAPI(`/creation/zone/moment`, 'POST', {
+          type: 'publish',
+          content,
+          resourcesId
+        })
           .then(() => {
-            return nkcAPI(`/creation/zone/moment`, 'POST', {
-              type: 'publish',
-              momentId: self.momentId,
-            })
-          })
-          .then(() => {
-            // sweetSuccess('发表成功');
+            self.unlockButton();
             self.sendPublishedEvent();
           })
           .catch(err => {
@@ -349,8 +356,11 @@
       onTextareaEditorContentChange(content) {
         this.content = content;
       },
+      setTextareaEditorContent(content) {
+        this.$refs.textareaEditor.setContent(content);
+      },
       syncTextareaEditorContent() {
-        this.$refs.textareaEditor.setContent(this.content);
+        this.setTextareaEditorContent(this.content);
       },
       onContentChange: debounce(function() {
         this.saveContent();

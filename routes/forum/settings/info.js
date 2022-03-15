@@ -6,6 +6,20 @@ infoRouter
 		ctx.template = 'forum/settings/info.pug';
 		await next();
 	})
+	.put('/declare', async (ctx, next)=>{
+		const {data, db, body, nkcModules} = ctx;
+		const {forum} = data;
+		const { _declare } = body
+		await forum.updateOne({ _declare });
+		await next()
+	})
+	.put('/latestBlockNotice', async (ctx, next)=>{
+		const {data, db, body, nkcModules} = ctx;
+		const {forum} = data;
+		const { _latestBlockNotice } = body
+		await forum.updateOne({_latestBlockNotice });
+		await next()
+	})
 	.put('/', async (ctx, next) => {
 		const {data, db, body, nkcModules} = ctx;
 		const {forum} = data;
@@ -43,7 +57,7 @@ infoRouter
 		// 富文本内容中每一个source添加引用
 		await db.ResourceModel.toReferenceSource("forum-" + forum.fid, declare);
 		// if(!declare) ctx.throw(400, '专业说明不能为空');
-		await forum.updateOne({declare});
+		await forum.updateOne({ declare, _declare: '' });
 		if(did) {
 			await db.DraftModel.removeDraftById(did, data.user.uid);
 		}
@@ -52,7 +66,7 @@ infoRouter
 		//修改专业最新页板块公告
 		// 富文本内容中每一个source添加引用
 		await db.ResourceModel.toReferenceSource("forum-notice-" + forum.fid, content);
-		await forum.updateOne({latestBlockNotice: content});
+		await forum.updateOne({ latestBlockNotice: content, _latestBlockNotice: '' });
 		data.redirect = `/f/${forum.fid}`;
 
 		const logoFile = body.files.logo;
