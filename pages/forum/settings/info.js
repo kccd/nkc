@@ -89,12 +89,18 @@ const app = new Vue({
 			const content = this.$refs.forumExplainEditor.getContent();;
 			debounce(()=>{
 				nkcAPI(`/f/${this.forum.fid}/settings/info/declare`, "PUT", { _declare: content })
+				.catch(err=>{
+					sweetError(err);
+				})
 			}, 500)()
 		},
 		latestProfessionalContent(){
 			const content = this.$refs.forumNoticeEditor.getContent();
 			debounce(()=>{
 				nkcAPI(`/f/${this.forum.fid}/settings/info/latestBlockNotice`, "PUT", { _latestBlockNotice: content })
+				.catch((err)=>{
+					sweetError(err);
+				});
 			}, 500)()
 		},
 

@@ -72,6 +72,7 @@ const forumSchema = new Schema({
 		type: String,
 		default: ''
   },
+  // 板块说明编辑内容
   _declare: {
     type: String,
 		default: ''
@@ -81,6 +82,7 @@ const forumSchema = new Schema({
     type: String,
     default: ''
   },
+  // 专业最新页板块公告编辑内容
   _latestBlockNotice: {
     type: String,
     default: ''
