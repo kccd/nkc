@@ -107,7 +107,7 @@ export default {
     reason: '',
     remindUser: true,
     violation: false,
-    commentId: '',
+    docId: null,
   }),
   mounted() {
     this.initDraggableElement();
@@ -124,11 +124,13 @@ export default {
       this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
     },
     submit: function() {
-      if(!this.commentId) return;
+      if(!this.docId) return;
       if(!this.reason) return screenTopWarning('请输入原因');
       const self = this;
-      nkcAPI(`/comment/${this.commentId}/disabled`, 'POST', {
-        type: self.type,
+      nkcAPI('/review', 'PUT', {
+        delType: self.type,
+        docId: self.docId,
+        type: 'document',
         remindUser: self.remindUser,
         violation: self.violation,
         reason: self.reason
@@ -142,9 +144,8 @@ export default {
       })
     },
     open(callback, options) {
-      const {cid} = options;
-      if(!cid) return;
-      this.commentId = cid;
+      const {docId} = options;
+      this.docId = docId;
       this.callback = callback;
       this.draggableElement.show();
       this.show = true;

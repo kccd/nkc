@@ -95,14 +95,14 @@ router
     } = body;
     let article = await db.ArticleModel.findOnly({_id: sid});
     if(!article) ctx.throw(400, '未找到文章，请刷新后重试');
-    article = await db.ArticleModel.extendDocumentsOfArticles([article], 'stable', [
+    article = (await db.ArticleModel.extendDocumentsOfArticles([article], 'stable', [
       '_id',
       'status',
       'uid'
-    ]);
-    if(!article[0]) ctx.throw(404, '未找到对应文章，或文章状态异常');
+    ]))[0];
+    if(!article) ctx.throw(404, '未找到对应文章，或文章状态异常');
     const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
-    if(article[0].document.status !== normalStatus) {
+    if(article.document.status !== normalStatus) {
       return ctx.throw(403, '文章状态异常');
     }
     if(!['modify', 'publish', 'create', 'save'].includes(type)) ctx.throw(400, `未知的提交类型 type: ${type}`);
@@ -112,7 +112,7 @@ router
         uid: state.uid,
         content,
         quoteDid,
-        source: article[0].source,
+        source: article.source,
         sid,
         ip: ctx.address,
         port: ctx.port
@@ -124,10 +124,10 @@ router
         content
       });
       if(type === 'publish') {
-        const lock = await nkcModules.redLock.lock(comment._id, 6000);
-        await comment.updateOrder();
+        // 获取最新评论的楼层
+        const order = await db.CommentModel.getCommentOrder(article._id);
+        await comment.updateOrder(order);
         await comment.publishComment();
-        await lock.unlock();
       } else if(type === 'save') {
         await comment.saveComment()
       }
@@ -135,6 +135,7 @@ router
     data.commentId = comment._id;
     await next();
   })
+  //废除， 评论退修或者禁用在审核路由传入docId即可
   .post('/:_id/disabled', async (ctx, next) => {
     //评论退修或禁用
     const {db, data, params, permission, body, state} = ctx;
@@ -164,11 +165,7 @@ router
     //更新审核记录的处理人
     await review.updateReview({uid: state.uid, type: status === 'faulty'?'returnDocument':'disabledDocument', reason});
     const targetUser = await db.UserModel.findOne({uid: document.uid});
-    await document.updateOne({
-      $set: {
-        status,
-      }
-    });
+    await document.setReviewStatus(status);
     //标记违规
     if(violation) {
       //新增违规记录
@@ -216,7 +213,9 @@ router
     const isModerator = ctx.permission('superModerator') || bookPermission === 'admin'?true:false;
     if(!isModerator) ctx.throw(403, `您没有权限处理ID为${document._id}的document`);
     if(document.status !== 'disabled') ctx.throw(400, `ID为${document._id}的回复未被屏蔽，请刷新`);
-    await document.updateOne({status: 'normal'});
+    const {normal: normalStatus} = await db.DocumentModel.getDocumentStatus();
+    //更新document的状态
+    await document.setReviewStatus(normalStatus);
     await next();
   })
   .get('/:_id/options', async (ctx, next) => {

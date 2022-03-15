@@ -2,8 +2,12 @@ const router = require('koa-router')();
 router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
   const {pageSettings} = state;
-  const {page = 0, last_page, highlight, t} = query;
-  ctx.template = 'columns/article.pug';
+  const {page = 0, last_page, highlight, t, test} = query;
+  if(test) {
+  ctx.template = 'columns/article/article.pug';
+  } else {
+    ctx.template = 'columns/article.pug';
+  }
   const { user } = data;
 
   const {_id, aid} = params;
@@ -34,7 +38,6 @@ router.get('/:aid', async (ctx, next)=>{
     }
   }
   let match = {
-    status: commentStatus,
   };
   //只看作者
   if(t === 'author') {
@@ -46,6 +49,8 @@ router.get('/:aid', async (ctx, next)=>{
   if(user) {
     if(permission('review')) {
       permissions.reviewed = true;
+    } else {
+      match.status = commentStatus;
     }
     //禁用和退修权限
     if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {

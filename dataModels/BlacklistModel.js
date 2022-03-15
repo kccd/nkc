@@ -37,6 +37,12 @@ const schema = new Schema({
     type: String,
     default: '',
     index: 1
+  },
+  // 拉黑来源 articleId
+  aid: {
+    type: String,
+    default: '',
+    index: 1
   }
 }, {
   collection: "blacklists"
@@ -51,7 +57,7 @@ const schema = new Schema({
 * @return {Object} list 创建的拉黑记录
 * @author pengxiguaa 2020/06/05
 * */
-schema.statics.addUserToBlacklist = async (uid, tUid, from, pid = '', cid = '') => {
+schema.statics.addUserToBlacklist = async (uid, tUid, from, pid = '', cid = '', aid = '') => {
   if(uid === tUid) throwErr(400, `不允许添加自己到黑名单`);
   const BL = mongoose.model('blacklists');
   const SettingModel = mongoose.model('settings');
@@ -67,7 +73,8 @@ schema.statics.addUserToBlacklist = async (uid, tUid, from, pid = '', cid = '') 
     tUid,
     from,
     pid,
-    cid
+    cid,
+    aid,
   });
   await list.save();
   return list;

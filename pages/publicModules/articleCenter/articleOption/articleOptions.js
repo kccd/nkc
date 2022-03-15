@@ -1,3 +1,5 @@
+import {nkcAPI} from "../../../lib/js/netAPI";
+
 window.articleOption = new Vue({
   el: '#moduleArticleOptions',
   data: {
@@ -21,6 +23,10 @@ window.articleOption = new Vue({
       username: '',
       uid: ''
     },
+    
+    article: null,
+  
+    direction: null,
     
     top: 300,
     left: 300,
@@ -77,14 +83,15 @@ window.articleOption = new Vue({
       this.jqDOM = jqDOM;
       this.direction = direction;
       const self = this;
-      self.show = true;
       self.loading = true;
-      debugger
       //获取当前用户对文章的操作权限
-      nkcAPI(`/creation/article/${aid}/option`, 'GET')
+      nkcAPI(`/creation/article/${aid}/options`, 'GET')
         .then(data => {
           if(data.optionStatus) self.optionStatus = data.optionStatus;
+          self.article = data.article;
           self.loading = false;
+          self.show = true;
+          self.toc = data.toc
         })
         .catch(err => {
           sweetError(err);
@@ -203,13 +210,86 @@ window.articleOption = new Vue({
         moduleComplaint.open("post", this.pid);
       }
     },
+    //用户黑名单
     userBlacklist() {
-      const {blacklist, postUserId} = this;
+      const {blacklist, articleUserId} = this.optionStatus;
+      const {uid, _id} = this.article;
       if(blacklist) {
-        NKC.methods.removeUserFromBlacklist(postUserId);
+        this.removeUserToBlackList(articleUserId);
       } else {
-        NKC.methods.addUserToBlacklist(postUserId, 'post', this.pid);
+        this.addUserToBlackList(uid, 'article', _id);
       }
+    },
+    //用户移除黑名单 tUid 被拉黑的用户
+    removeUserToBlackList(uid) {
+      nkcAPI('/blacklist?tUid=' + uid, 'GET')
+        .then(data => {
+          if(!data.bl) throw "对方未在黑名单中";
+          return nkcAPI('/blacklist?tUid=' + uid, 'DELETE');
+        })
+        .then(data => {
+          sweetSuccess('操作成功！');
+          return data;
+        })
+        .catch(sweetError);
+    },
+    //用户添加到黑名单 tUid 被拉黑的用户 form 拉黑来源 cid 被拉黑的comment
+    addUserToBlackList(tUid, from, aid) {
+      var isFriend = false, subscribed = false;
+      return Promise.resolve()
+        .then(function() {
+          return nkcAPI('/blacklist?tUid=' + tUid,  'GET')
+        })
+        .then(function(data) {
+          isFriend = data.isFriend;
+          subscribed = data.subscribed;
+          var bl = data.bl;
+          if(bl) throw '对方已在黑名单中';
+          var info;
+          if(isFriend) {
+            info = '该会员在你的好友列表中，确定放入黑名单吗？';
+          } else if(subscribed) {
+            info = '该会员在你的关注列表中，确定放入黑名单吗？';
+          }
+          if(info) return sweetQuestion(info);
+        })
+        .then(function() {
+          if(isFriend) {
+            return nkcAPI(`/message/friend?uid=` + tUid, 'DELETE', {})
+          }
+        })
+        .then(function() {
+          if(subscribed) {
+            return SubscribeTypes.subscribeUserPromise(tUid, false);
+          }
+        })
+        .then(function() {
+          return nkcAPI('/blacklist', 'POST', {
+            tUid: tUid,
+            from: from,
+            aid
+          })
+        })
+        .then(function(data) {
+          sweetSuccess('操作成功');
+          return data;
+        })
+        .catch(sweetError);
+    },
+    //文章解封
+    unblock() {
+      const {document, _id} = this.article;
+      const {_id: docId} = document;
+      if(_id) return;
+      nkcAPI(`/comment/${_id}/unblock`, 'POST', {
+        docsId: [docId]
+      })
+        .then(res => {
+          screenTopAlert('已解除屏蔽');
+        })
+        .catch(err => {
+          sweetError(err);
+        })
     },
     displayIpInfo() {
       NKC.methods.getIpInfo(this.ipInfo);

@@ -209,7 +209,7 @@ export default {
           if(!data.editorInfo.document) self.contentChangeEventFlag = true;
           if(data.editorInfo.article) {
             //获取文章的发表状态
-            self.aticleStatus = data.editorInfo.article.status;
+            self.articleStatus = data.editorInfo.article.status;
           }
           if(data.editorInfo.document) {
             //当存在aid时直接获取对应article内容，并填入编辑器中
@@ -423,7 +423,11 @@ export default {
             self.$refs.documentEditor.removeNoticeEvent();
             if(source === 'column') {
               //跳转到文章预览界面
-              if(res.articleUrl) window.location.href = res.articleUrl;
+              if(res.articleUrl) {
+                window.location.href = res.articleUrl;
+              } else {
+                window.location.href = `/m/${self.columnId}`;
+              }
             } else if(source === 'zone') {
               sweetSuccess('发布成功');
             }

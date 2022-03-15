@@ -15,12 +15,15 @@ router
     const {aid} = params;
     const {user} = data;
     const {uid} = state;
-    const article = await db.ArticleModel.find({_id: aid});
+    const {normal: articleStatus} = await db.ArticleModel.getArticleStatus();
+    let article = await db.ArticleModel.findOnly({_id: aid, status: articleStatus});
     if(!article) ctx.throw(404, '未找到文章，请刷新后重试');
+    article = (await db.ArticleModel.getArticlesInfo([article]))[0];
+    data.article = article;
     const {stable: stableType} = await db.DocumentModel.getDocumentTypes();
     const {normal: normalStatus} = await db.DocumentModel.getDocumentStatus();
     const {article: articleSource} = await db.DocumentModel.getDocumentSources();
-    const document = await db.DocumentModel.findOne({did: article.did, type: stableType, source: articleSource});
+    const document = await db.DocumentModel.findOnly({did: article.did, type: stableType, source: articleSource});
     if(!document) return ctx.throw(404, '未找到文章，请刷新后重试');
     if(!permission('review')) {
       if(document.status !== normalStatus) ctx.throw(401, '权限不足');
@@ -34,6 +37,7 @@ router
       ipInfo: null,
       violation: null,
       blackList: null,
+      source: document.source
     };
     if(user) {
       if(permission('review')) {
@@ -56,11 +60,23 @@ router
         optionStatus.blacklist = await db.BlacklistModel.checkUser(user.uid, article.uid);
         // 违规记录
         optionStatus.violation = ctx.permission('violationRecord')? true: null;
-        data.commentUserId = article.uid;
+        data.articleUserId = article.uid;
       }
     }
     data.optionStatus = optionStatus;
     data.toc = document.toc;
+    await next();
+  })
+  .post('/:aid/unblock', async (ctx, next) => {
+    const {db, data, state, params} = ctx;
+    const {aid} = params;
+    const article = await db.ArticleModel.findOnly({_id: aid});
+    const {stable} = await db.DocumentModel.getDocumentTypes();
+    const {disabled, normal} = await db.DocumentModel.getDocumentStatus();
+    const document = await db.DocumentModel.findOnly({did: article.did, type: stable});
+    if(document.status !== disabled) ctx.throw(400, '文章未被禁用，请刷新后重试');
+    await document.setReviewStatus(normal);
+    if(!article || !document) ctx.throw(404, '未找到文章，请刷新后重试');
     await next();
   })
   .use('/:aid/draft', draftRouter.routes(), draftRouter.allowedMethods())

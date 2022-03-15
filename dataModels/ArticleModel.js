@@ -7,10 +7,13 @@ const articleSources = {
 };
 
 const articleStatus = {
-  normal: 'normal',
-  'default': 'default',
-  deleted: 'deleted',
-  cancelled: 'cancelled'
+  normal: 'normal',// 正常
+  'default': 'default',// 默认状态 创建了article但未进行任何操作
+  disabled: 'disabled', //禁用
+  faulty: 'faulty', //退修
+  unknown: 'unknown',// 未审核
+  deleted: 'deleted',//article被删除
+  cancelled: 'cancelled'// 取消发布
 };
 
 const schema = new mongoose.Schema({
@@ -44,6 +47,9 @@ const schema = new mongoose.Schema({
   // default: 未发布的（正在编辑，待发布）
   // deleted: 被删除的（已发布，但被删除了）
   // cancelled: 被取消发表的（未发布过，在草稿箱被删除）
+  // disabled: 被禁用的（已发布但被管理员禁用了）
+  // faulty: 被退修的 （已发布但被管理员退修了）
+  // unknown: 状态位置的 （已发布未审核
   status: {
     type: String,
     default: articleStatus.default,
@@ -137,7 +143,7 @@ schema.statics.getArticleStatus = async () => {
 * 改变article的status
 * @param {String} status 需要改变的状态
 * */
-schema.methods.changeArticleStatus = async function(status) {
+schema.methods.changeStatus = async function(status) {
   const ArticleModel = mongoose.model('articles');
   const articleStatus = await ArticleModel.getArticleStatus();
   if(!articleStatus[status]) throw(400, `不存在状态 ${status}`);
@@ -530,7 +536,7 @@ schema.methods.publishArticle = async function(options) {
   const DocumentModel = mongoose.model('documents');
   const {did, uid, _id: articleId} = this;
   //将当前article的状态改为正常
-  await this.changeArticleStatus(normal);
+  await this.changeStatus(normal);
   if(source === 'column') {
     //如果发表专栏的文章就将创建文章专栏分类引用记录 先查找是否存在引用，如果没有就创建一条新的引用
     const columnPost = await ColumnPostModel.findOne({pid: articleId, type: articleType});
@@ -1053,6 +1059,7 @@ schema.statics.getArticlesInfo = async function(articles) {
     }
     if(article.source === columnSource) {
       const columnPost = columnPostsObj[article._id];
+      if(!columnPost) return;
       editorUrl = `/column/editor?source=column&mid=${columnPost.columnId}&aid=${columnPost.pid}`;
       url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
     } else if(article.source === zoneSource) {

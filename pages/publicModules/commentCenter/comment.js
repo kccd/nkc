@@ -70,10 +70,10 @@ for(let i = 0;i < singleBottomDom.length;i++) {
         this.$refs.violationRecord.open({uid});
       },
       //退修或删除
-      disableComment(cid) {
+      disableComment(docId) {
         this.$refs.disabledComment.open(function (res){
         }, {
-          cid
+          docId
         })
       },
       //投诉或举报
@@ -146,16 +146,16 @@ function manageComments() {
 }
 
 //获取选中的评论id
-function getMarkedCommentId() {
-  const commentsId = [];
+function getMarkedCommentDocId() {
+  const commentsDocId = [];
   const comments = getPostsDom();
   for(var i = 0;i < comments.length;i ++) {
     const comment = comments.eq(i);
     if(comment.prop("checked")) {
-      commentsId.push(comment.attr("data-docId"));
+      commentsDocId.push(comment.attr("data-docId"));
     }
   }
-  return commentsId;
+  return commentsDocId;
 }
 
 //全选
@@ -177,12 +177,12 @@ function markAllComments() {
 
 //退修或禁用
 function disabledMarkedComment() {
-  const commentsId = getMarkedCommentId();
-  disabledArticleComment(commentsId);
+  const commentsDocId = getMarkedCommentDocId();
+  disabledArticleComment(commentsDocId);
 }
 
-function disabledArticleComment(commentsId) {
-  NKC.methods.disabledDocuments(commentsId);
+function disabledArticleComment(commentsDocId) {
+  NKC.methods.disabledDocuments(commentsDocId);
 }
 
 window.commentEditor = commentEditor;
@@ -192,7 +192,7 @@ Object.assign(window, {
   getPostsDom,
   resetCheckbox,
   manageComments,
-  getMarkedCommentId,
+  getMarkedCommentDocId,
   markAllComments,
   disabledArticleComment,
   disabledMarkedComment,

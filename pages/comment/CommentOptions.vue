@@ -175,7 +175,7 @@ export default {
     },
     //退修或删除
     disableComment() {
-      this.$emit('disable-comment', this.comment._id);
+      this.$emit('disable-comment', this.comment.docId);
     },
     //投诉或举报
     complaint() {

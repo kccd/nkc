@@ -4,7 +4,10 @@ const {twemoji} = require("../settings/editor");
 const momentStatus = {
   normal: 'normal',
   'default': 'default',
-  deleted: 'deleted'
+  deleted: 'deleted',
+  disabled: 'disabled', //禁用
+  faulty: 'faulty', //退修
+  unknown: 'unknown',// 未审核
 };
 
 const momentQuoteTypes = {
@@ -45,6 +48,9 @@ const schema = new mongoose.Schema({
   // normal: 正常的（已发布，未被删除）
   // default: 未发布的（正在编辑，待发布）
   // deleted: 被删除的（已发布，但被删除了）
+  // disabled: 被禁用的（已发布但被管理员禁用了）
+  // faulty: 被退修的 （已发布但被管理员退修了）
+  // unknown: 状态位置的 （已发布未审核）
   status: {
     type: String,
     default: momentStatus.default,
@@ -324,6 +330,20 @@ schema.methods.deleteMoment = async function() {
     }
   });
 };
+
+/*
+* 修改当前动态的status
+* */
+schema.methods.changeStatus = async function(status) {
+  const MomentModel = mongoose.model('moments');
+  const momentStatus = await MomentModel.getMomentStatus();
+  if(!momentStatus[status]) throwErr(400, "不存在该状态");
+  await this.updateOne({
+    $set: {
+      status
+    }
+  });
+}
 
 /*
 * 通过发表人ID和动态ID获取当前动态下未发布的评论

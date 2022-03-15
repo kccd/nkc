@@ -84,8 +84,23 @@ function disabledArticles() {
   deleteArticle();
 }
 
+//文章解封
+function unblock() {
+  const {document, _id} = article;
+  if(!_id) return;
+  nkcAPI(`/creation/article/${_id}/unblock`, 'POST', {
+  })
+    .then(res => {
+      screenTopAlert('已解除屏蔽');
+    })
+    .catch(err => {
+      sweetError(err);
+    })
+}
+
 Object.assign(window, {
   deleteArticle,
   reviewArticle,
   disabledArticles,
+  unblock
 })

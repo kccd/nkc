@@ -106,8 +106,11 @@ module.exports = {
       draft: {
         DELETE: 'creationCenter'
       },
-      option: {
+      options: {
         GET: "creationCenter"
+      },
+      unblock: {
+        POST: 'creationCenter'
       }
     }
   },
