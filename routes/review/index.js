@@ -167,6 +167,7 @@ router
       }
     }
     let message;
+    const {normal: normalStatus, faulty: faultyStatus, unknown: unknownStatus, disabled: disabledStatus} = await db.DocumentModel.getDocumentStatus();
     if(reviewType === 'post') {
       const post = await db.PostModel.findOne({pid});
 
@@ -219,9 +220,7 @@ router
       const targetUser = await db.UserModel.findOne({uid: document.uid});
       if(pass) {
         //将document状态改为已审核状态
-        await document.updateOne({
-          status: 'normal',
-        });
+        await document.setReviewStatus(normalStatus);
         //生成审核记录
         await db.ReviewModel.newReview('passDocument', '', data.user, reason, document);
         message = await db.MessageModel({
@@ -237,9 +236,7 @@ router
       } else {
         if(!delType) ctx.throw(400, '请选择退修或者禁用');
         //将document状态改为已审核状态
-        await document.updateOne({
-          status: delType,
-        });
+        await document.setReviewStatus(delType);
         //生成审核记录
         await db.ReviewModel.newReview('noPassDocument', '', data.user, reason, document);
         //如果标记用户违规了就给该用户新增违规记录

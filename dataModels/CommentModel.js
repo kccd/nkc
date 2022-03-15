@@ -8,7 +8,10 @@ const commentStatus = {
         normal: 'normal',
         'default': 'default',
         deleted: 'deleted',
-        cancelled: 'cancelled'
+        cancelled: 'cancelled',
+        disabled: 'disabled', //禁用
+        faulty: 'faulty', //退修
+        unknown: 'unknown',// 未审核
       };
 const schema = new mongoose.Schema({
   _id: String,
@@ -28,6 +31,9 @@ const schema = new mongoose.Schema({
     default: 0,
     index: 1
   },
+  // disabled: 被禁用的（已发布但被管理员禁用了）
+  // faulty: 被退修的 （已发布但被管理员退修了）
+  // unknown: 状态位置的 （已发布未审核
   status: {
     type: String,
     default: commentStatus.default,
@@ -189,7 +195,7 @@ schema.methods.publishComment = async function () {
   const {did} = this;
   const {normal: normalStatus} = await CommentModel.getCommentStatus();
   //将comment的status改变为正常
-  await this.changeCommentStatus(normalStatus);
+  await this.changeStatus(normalStatus);
   await DocumentModel.publishDocumentByDid(did);
 }
 
@@ -197,7 +203,7 @@ schema.methods.publishComment = async function () {
 * 改变comment的status
 * @param {String} status comment的状态
 * */
-schema.methods.changeCommentStatus = async function(status) {
+schema.methods.changeStatus = async function(status) {
   const CommentModel = mongoose.model('comments');
   const commentStatus = await CommentModel.getCommentStatus();
   if(!commentStatus[status]) throwErr(400, "不存在该状态");
@@ -520,21 +526,45 @@ schema.methods.extendEditorComment = async function() {
 /*
 * 更新comment的order
 * */
-schema.methods.updateOrder = async function () {
-  const CommentModel = mongoose.model('comments');
-  const DocumentModel = mongoose.model('documents');
-  const {article: articleSource} = await DocumentModel.getDocumentSources();
-  const {sid, order} = this;
-  //获取上一个评论的楼层
-  const afterComment = await CommentModel.findOne({source: articleSource, sid}).sort({toc: -1}).skip(1).limit(1);
-  if(order === 0) {
-    await this.updateOne({
-      $set: {
-        order: afterComment?afterComment.order + 1:1,
-      }
-    });
-  }
+schema.methods.updateOrder = async function (order) {
+  this.order = order;
+  await this.updateOne({
+    $set: {
+      order: this.order
+    }
+  });
 }
+
+
+/*
+* 根据articleId获取评论楼层
+* */
+schema.statics.getCommentOrder = async function(aid) {
+  const CommentModel = mongoose.model('comments');
+  const ArticlePostModel = mongoose.model('articlePosts');
+  const redLock = require('../nkcModules/redLock');
+  const getRedisKeys = require('../nkcModules/getRedisKeys');
+  const key = getRedisKeys('commentOrder', aid);
+  const lock = await redLock.lock(key, 6000);
+  const articlePost = await ArticlePostModel.findOnly({sid: aid});
+  let order = 0;
+  try{
+    const comment = await CommentModel.findOne({
+      sid: articlePost._id,
+    }, {
+      order: 1
+    }).sort({order: -1});
+    if(comment) {
+      order = comment.order + 1;
+    }
+    await lock.unlock();
+  } catch(err) {
+    await lock.unlock();
+    throwErr(500, `moment order error`);
+  }
+  return order;
+}
+
 
 /*
 *拓展投诉的comments

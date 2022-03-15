@@ -28,7 +28,6 @@ router
       }
     }
     let match = {
-      status: commentStatus,
     };
     //只看作者
     if(t === 'author') {
@@ -40,6 +39,8 @@ router
     if(user) {
       if(permission('review')) {
           permissions.reviewed = true;
+      } else {
+        match.status = commentStatus;
       }
       //禁用和退修权限
       if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {

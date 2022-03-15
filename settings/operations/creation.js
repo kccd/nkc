@@ -108,6 +108,9 @@ module.exports = {
       },
       options: {
         GET: "creationCenter"
+      },
+      unblock: {
+        POST: 'creationCenter'
       }
     }
   },

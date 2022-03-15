@@ -55,7 +55,7 @@ block content
               .h4.text-center(style='color: #666;') 本文已被封禁，不可查看
               if permission('review')
                 .text-center
-                  a(onclick="") 点击解封
+                  a(onclick="unblock()") 点击解封
               p.text-center(style='border-bottom: 1px solid #666; padding-bottom: 1rem;color: #666;')= `封禁原因：${data.article.reason}`
               if permission('review')
                 +thread

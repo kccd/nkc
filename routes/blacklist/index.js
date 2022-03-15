@@ -23,9 +23,9 @@ router
   })
   .post('/', async (ctx, next) => {
     const {body, data, db} = ctx;
-    const {tUid, from, pid, cid} = body;
+    const {tUid, from, pid, cid, aid} = body;
     const {user} = data;
-    await db.BlacklistModel.addUserToBlacklist(user.uid, tUid, from, pid, cid);
+    await db.BlacklistModel.addUserToBlacklist(user.uid, tUid, from, pid, cid, aid);
     await next();
   })
   .del('/', async (ctx, next) => {

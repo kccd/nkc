@@ -3,10 +3,10 @@ const cheerio = require('cheerio');
 const markNotes = require("../nkcModules/nkcRender/markNotes");
 
 const documentStatus = {
-  disabled: "disabled",
-  normal: "normal",
-  faulty: "faulty",
-  unknown: "unknown"
+  disabled: "disabled",// 禁用
+  normal: "normal",// 正常状态 能被所有用户查看的文档
+  faulty: "faulty", // 退修
+  unknown: "unknown"// 未知状态 未审核过
 };
 
 const documentTypes = {
@@ -1118,17 +1118,34 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function() {
   return needReview;
 }
 
-// 设置审核状态
+// 设置审核状态 当document的状态改变时，同时去改变上层来源的状态
 schema.methods.setReviewStatus = async function(status) {
   const DocumentModel = mongoose.model('documents');
+  const ArticleModel = mongoose.model('articles');
+  const CommentModel = mongoose.model('comments');
+  const MomentModel = mongoose.model('moments');
+  const {source, did} = this;
   let _status = status;
-  const {unknown} = await DocumentModel.getDocumentStatus();
+  let parent;
+  const {article, comment, moment} = await DocumentModel.getDocumentSources();
+  if(source === article) {
+    parent = await ArticleModel.findOnly({did});
+  } else if(source === comment) {
+    parent= await CommentModel.findOnly({did});
+  } else if(source === moment) {
+    parent = await MomentModel.findOnly({did});
+  }
+  const {unknown, normal, faulty, disabled} = await DocumentModel.getDocumentStatus();
   if(!status) _status = unknown;
   await this.updateOne({
     $set: {
       status: _status,
     }
   });
+  // 同步document父级的状态
+  if(parent) {
+    await parent.changeStatus(_status);
+  }
 };
 
 /*
