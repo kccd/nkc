@@ -1,4 +1,6 @@
 {
+  "saveForumLatestBlockNotice": "保存专业最新页板块公告编辑内容",
+  "saveForumDeclare": "保存专业说明编辑内容",
   "column_article_get":"打开指定专栏下的一篇文章",
   "historyEdit":"选择一条历史记录为编辑版",
   "viewHistoryDocument":"查看编辑器内容历史",
