@@ -1,5 +1,5 @@
 <template lang="pug">
-  .standard-max-container.column
+  .standard-not-centered.column
     hor-nav(:list="navList")
     router-view
 </template>

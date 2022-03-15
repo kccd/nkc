@@ -1,5 +1,5 @@
 <template lang="pug">
-  .standard-max-container.zone
+  .standard-not-centered.zone
     hor-nav(:list="navList" v-if="$route.name !== 'ZoneReviseEditor'" )
     router-view
 </template>
