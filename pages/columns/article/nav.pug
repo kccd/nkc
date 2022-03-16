@@ -9,7 +9,7 @@
   @params {Number} collectedCount 收藏数
 
 mixin nav(data)
-  -var {_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount, article} = data
+  -var {_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount, article, collected} = data
   +includeCSS('/columns/article/nav.css')
   header
     if mainCategory.length
@@ -41,7 +41,6 @@ mixin nav(data)
       span.m-r-1.fa.fa-eye(title="浏览数")=article.hits || 0
       span.m-r-1.fa.fa-comment(title='回复数' onclick="window.location.href='#container'")=article.replies || 0
       span.m-r-1(titlt='收藏数' onclick='collectArticle()')
-        span 收藏
-        span=article.collectedCount || 0
+        span=`${collected?'已收藏': '收藏'}${collectedCount ? `(${collectedCount})` : ''}`
       if showManagement
         span.fa.fa-cog.m-r-1(onclick="showSetUp()")

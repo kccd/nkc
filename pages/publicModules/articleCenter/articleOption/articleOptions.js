@@ -139,11 +139,14 @@ window.articleOption = new Vue({
       });
     },
     collectionThread() {
-      const {tid, collection} = this;
+      const {_id} = this.article;
+      const {collection} = this.optionStatus;
       const self = this;
-      SubscribeTypes.collectionThreadPromise(tid, !collection)
+      nkcAPI(`/article/${_id}/collection`, 'POST', {
+        type: !collection,
+      })
         .then(() => {
-          self.collection = !collection;
+          self.optionStatus.collection = !collection;
           if(collection) {
             sweetSuccess(`已取消收藏`);
           } else {

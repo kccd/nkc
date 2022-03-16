@@ -1189,4 +1189,16 @@ schema.methods.addArticleHits = async function() {
   });
 }
 
+/*
+* 获取文章的收藏数
+* */
+schema.statics.getCollectedCountByAid = async function(aid) {
+  const SubscribeModel = mongoose.model('subscribes');
+  return await SubscribeModel.countDocuments({
+    type: 'article',
+    cancel: false,
+    tid: aid,
+  });
+}
+
 module.exports = mongoose.model('articles', schema);

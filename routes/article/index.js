@@ -2,6 +2,7 @@ const router = require('koa-router')();
 const draftRouter = require('./draft');
 const optionsRouter = require('./options');
 const unblockRouter = require('./unblock');
+const collectionRouter = require('./colection');
 router
   .get('/', async (ctx, next) => {
     await next();
@@ -17,5 +18,6 @@ router
   .use('/:aid/draft', draftRouter.routes(), draftRouter.allowedMethods())
   .use('/:aid/options', optionsRouter.routes(), optionsRouter.allowedMethods())
   .use('/:aid/unblock', unblockRouter.routes(), unblockRouter.allowedMethods())
+  .use('/:aid/collection', collectionRouter.routes(), collectionRouter.allowedMethods())
 module.exports = router;
 

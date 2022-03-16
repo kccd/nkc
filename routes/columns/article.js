@@ -9,7 +9,6 @@ router.get('/:aid', async (ctx, next)=>{
     ctx.template = 'columns/article.pug';
   }
   const { user } = data;
-
   const {_id, aid} = params;
   let columnPost = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid);
   const {article: articleSource} = await db.CommentModel.getCommentSources();
@@ -45,11 +44,17 @@ router.get('/:aid', async (ctx, next)=>{
   }
   const permissions = {
   };
+  data.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);
+  data.collected = false
   if(user) {
     if(permission('review')) {
       permissions.reviewed = true;
     } else {
       match.status = commentStatus;
+    }
+    const collection = await db.SubscribeModel.findOne({cancel: false, uid: data.user.uid, tid: article._id, type: "article"});
+    if(collection) {
+      data.collected = true
     }
     //禁用和退修权限
     if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {
@@ -89,15 +94,4 @@ router.get('/:aid', async (ctx, next)=>{
   data.comments = comments || [];
   await next();
 })
-  .get('/:aid/collection', async (cxt, next) => {
-    const {db, data, params,body, state} = ctx;
-    const {aid} = params;
-    const {type, } = body;
-    const {user} = data;
-    const article = await db.ArticleModel.findOnly({_id: aid});
-    if(!article) ctx.throw(404, '未找到文章，请刷新后重试');
-    const {disabled}= await db.ArticleModel.getArticleStatus();
-    if(article.status === disabled) ctx.throw(400, '不能收藏已被封禁的文章');
-    let collection = await db.SubscribeModel.findOne({cancel: false, });
-  })
 module.exports = router;

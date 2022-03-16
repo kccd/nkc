@@ -726,9 +726,9 @@ schema.statics.insertSubscribe = async (type, uid, tid) => {
 * @return {Boolean}
 * @author pengxiguaa 2020-12-15
 * */
-schema.statics.checkCollectionThread = async (uid, tid) => {
+schema.statics.checkCollectionThread = async (uid, tid, type) => {
   const SubscribeModel = mongoose.model('subscribes');
-  const count = await SubscribeModel.countDocuments({cancel: false, uid, tid, type: 'collection'});
+  const count = await SubscribeModel.countDocuments({cancel: false, uid, tid, type});
   return count > 0;
 };
 /*

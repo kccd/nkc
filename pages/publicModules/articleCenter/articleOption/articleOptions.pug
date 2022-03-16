@@ -25,6 +25,10 @@ if !isIncluded('articleOptions')
       .option(v-if="optionStatus.reviewed === 'unknown'" @click='reviewArticle')
         .fa.fa-check-circle-o
         span 通过审核
+      .option(v-if='optionStatus.collection !== null' @click='collectionThread')
+        .fa.fa-folder-o
+        span(v-if='optionStatus.collection === false') 加入收藏
+        span(v-else) 取消收藏
       //.option(v-if='commentControl' @click='toCommentControl')
       //  .fa.fa-commenting
       //  span 评论控制

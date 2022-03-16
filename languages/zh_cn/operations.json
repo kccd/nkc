@@ -848,5 +848,6 @@
   "deleteArticle": "删除文章",
   "getArticleOptions": "获取文章操作权限",
   "unblockArticle": "解封文章",
-  "deleteArticleDraft": "删除文章草稿"
+  "deleteArticleDraft": "删除文章草稿",
+  "collectionArticle": "收藏文章"
 }

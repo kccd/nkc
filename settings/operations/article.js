@@ -10,6 +10,9 @@ module.exports = {
     },
     draft: {
       DELETE: "deleteArticleDraft"
+    },
+    collection: {
+      POST: 'collectionArticle'
     }
   }
 };

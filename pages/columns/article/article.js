@@ -101,7 +101,18 @@ function unblock() {
 //收藏文章
 function collectArticle() {
   const {_id} = article;
-  
+  const {collectedCount} = data;
+  nkcAPI(`/article/${_id}/collection`, 'POST', {
+    type: !collectedCount,
+  })
+    .then(() => {
+      if(collectedCount) {
+        sweetSuccess(`已取消收藏`);
+      } else {
+        sweetSuccess(`已加入收藏`);
+      }
+    })
+    .catch(sweetError);
 }
 
 Object.assign(window, {
