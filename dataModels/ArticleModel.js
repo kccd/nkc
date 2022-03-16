@@ -1040,8 +1040,10 @@ schema.statics.getArticlesInfo = async function(articles) {
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
   const ReviewModel = mongoose.model('reviews');
+  const ArticlePostModel = mongoose.model('articlePosts');
   const columnArticlesId = [];
   const articlesDid = [];
+  const articleId = [];
   const articleDocumentsObj = {};
   const uidArr = [];
   const userObj = {};
@@ -1050,6 +1052,7 @@ schema.statics.getArticlesInfo = async function(articles) {
     if(article.source === columnSource) {
       columnArticlesId.push(article._id);
     }
+    articleId.push(article._id);
     articlesDid.push(article.did);
     uidArr.push(article.uid);
   }
@@ -1069,6 +1072,13 @@ schema.statics.getArticlesInfo = async function(articles) {
   const columnPostsObj = {};
   for(const columnPost of columnPosts) {
     columnPostsObj[columnPost.pid] =columnPost;
+  }
+  //查找文章评论引用
+  let articlePosts = await ArticlePostModel.find({sid: {$in: articleId}});
+  //获取评论引用信息
+  const articlePostsObj = {};
+  for(const a of articlePosts) {
+    articlePostsObj[a.sid] = a;
   }
   const results = [];
   for(const article of articles) {
@@ -1094,6 +1104,7 @@ schema.statics.getArticlesInfo = async function(articles) {
       document,
       editorUrl,
       user: userObj[article.uid],
+      replies: articlePostsObj[article._id].replies,
       url,
     });
   }
@@ -1164,6 +1175,18 @@ schema.statics.getArticlesDataByArticlesId = async function(articlesId, type = '
     }
     return results;
   }
+}
+
+/*
+* 文章阅读数量增加
+* */
+schema.methods.addArticleHits = async function() {
+  const hits = this.hits
+  await this.updateOne({
+    $set: {
+      hits: hits + 1,
+    }
+  });
 }
 
 module.exports = mongoose.model('articles', schema);

@@ -844,5 +844,9 @@
   "getCommentIpInfo": "获取评论ip",
   "visitSingleMoment": "访问动态详情页",
   "getMomentComments": "获取动态的评论",
-  "deleteMomentComment": "删除动态评论"
+  "deleteMomentComment": "删除动态评论",
+  "deleteArticle": "删除文章",
+  "getArticleOptions": "获取文章操作权限",
+  "unblockArticle": "解封文章",
+  "deleteArticleDraft": "删除文章草稿"
 }

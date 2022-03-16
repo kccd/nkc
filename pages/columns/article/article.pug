@@ -18,10 +18,11 @@ block title
     +hidePostContentSettings(data.postHeight)
   +includeCSS('/columns/article/article.css')
 block content
+  -var showManagement = data.user && data.isModerator && permission('review');
   mixin thread
     .m-b-1
       include ./nav
-      +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount})
+      +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount,article: data.article})
       include ./setUp
       //- 文章管理员操作
       +setUp()

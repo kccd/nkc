@@ -25,6 +25,7 @@ const schema = new Schema({
   // 3. user 关注的用户
   // 4. column 订阅的专栏
   // 5. collection 收藏的文章
+  // 6. article 关注的article文章
   type: {
     type: String,
     required: true,

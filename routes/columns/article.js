@@ -15,24 +15,23 @@ router.get('/:aid', async (ctx, next)=>{
   const {article: articleSource} = await db.CommentModel.getCommentSources();
   const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
   let {_id: articleId} = columnPost.article.articleInfo;
-  let _article = await db.ArticleModel.findOnly({_id: articleId});
-  data.article = _article;
-  const articleInfo = (await db.ArticleModel.getArticlesInfo([_article]))[0];
-  //获取文章链接
-  const baseUrl = articleInfo.url;
-  //获取文章编辑链接
-  data.editorUrl = articleInfo.editorUrl;
-  const isModerator = await _article.isModerator(state.uid);
+  const article = await db.ArticleModel.findOnly({_id: articleId});
+  //文章阅读量加一
+  await article.addArticleHits();
+  const isModerator = await article.isModerator(state.uid);
   //获取当前文章信息
-  _article = await db.ArticleModel.extendDocumentsOfArticles([_article], 'stable', [
-    '_id',
-    'uid',
-    'status',
-  ]);
-  data.article = articleInfo;
-  data.articleStatus = _article[0].document.status;
+  // const _article = await db.ArticleModel.extendDocumentsOfArticles([article], 'stable', [
+  //   '_id',
+  //   'uid',
+  //   'status',
+  // ]);
+  const _article = (await db.ArticleModel.getArticlesInfo([article]))[0];
+  data.article = _article;
+  //获取文章链接
+  const baseUrl = _article.url;
+  data.articleStatus = _article.document.status;
   const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
-  if(_article[0].document.status !== normalStatus && !isModerator) {
+  if(_article.document.status !== normalStatus && !isModerator) {
     if(!permission('review')) {
       return ctx.throw(403, '权限不足');
     }
@@ -42,7 +41,7 @@ router.get('/:aid', async (ctx, next)=>{
   //只看作者
   if(t === 'author') {
     data.t = t;
-    match.uid = _article[0].uid;
+    match.uid = _article.uid;
   }
   const permissions = {
   };
@@ -68,9 +67,9 @@ router.get('/:aid', async (ctx, next)=>{
     uid: state.uid,
     status: defaultComment,
   };
-  let comment = await db.CommentModel.getCommentsByArticleId({match: m, source: _article[0].source, aid: _article[0]._id,});
+  let comment = await db.CommentModel.getCommentsByArticleId({match: m, source: _article.source, aid: _article._id,});
   //获取该文章下的评论
-  let comments = await db.CommentModel.getCommentsByArticleId({match, paging, source: _article[0].source, aid: _article[0]._id,});
+  let comments = await db.CommentModel.getCommentsByArticleId({match, paging, source: _article.source, aid: _article._id,});
   if(comments && comments.length !== 0) {
     comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions});
   }
@@ -90,4 +89,15 @@ router.get('/:aid', async (ctx, next)=>{
   data.comments = comments || [];
   await next();
 })
+  .get('/:aid/collection', async (cxt, next) => {
+    const {db, data, params,body, state} = ctx;
+    const {aid} = params;
+    const {type, } = body;
+    const {user} = data;
+    const article = await db.ArticleModel.findOnly({_id: aid});
+    if(!article) ctx.throw(404, '未找到文章，请刷新后重试');
+    const {disabled}= await db.ArticleModel.getArticleStatus();
+    if(article.status === disabled) ctx.throw(400, '不能收藏已被封禁的文章');
+    let collection = await db.SubscribeModel.findOne({cancel: false, });
+  })
 module.exports = router;

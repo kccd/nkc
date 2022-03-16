@@ -87,7 +87,7 @@ export default {
       const self = this;
       sweetQuestion(`草稿被删除后无法恢复，确定要删除吗？`)
         .then(() => {
-          const url = `/creation/article/${draft.articleId}/draft`;
+          const url = `/article/${draft.articleId}/draft`;
           return nkcAPI(url, 'DELETE')
         })
         .then(() => {

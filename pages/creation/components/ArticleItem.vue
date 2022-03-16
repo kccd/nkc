@@ -87,7 +87,7 @@
         const self = this;
         sweetQuestion(`确定要删除文章？当前操作不可恢复。`)
           .then(() => {
-            return nkcAPI(`/creation/article/${article.articleId}`, 'DELETE')
+            return nkcAPI(`/article/${article.articleId}`, 'DELETE')
           })
           .then(() => {
             self.$emit('delete');

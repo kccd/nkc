@@ -85,7 +85,7 @@ window.articleOption = new Vue({
       const self = this;
       self.loading = true;
       //获取当前用户对文章的操作权限
-      nkcAPI(`/creation/article/${aid}/options`, 'GET')
+      nkcAPI(`/article/${aid}/options`, 'GET')
         .then(data => {
           if(data.optionStatus) self.optionStatus = data.optionStatus;
           self.article = data.article;
@@ -207,7 +207,8 @@ window.articleOption = new Vue({
       NKC.methods.disabledDocuments(_id);
     },
     viewViolationRecord() {
-      NKC.modules.violationRecord.open({uid: this.postUserId});
+      const {uid} = this.article;
+      NKC.modules.violationRecord.open({uid});
     },
     complaintPost() {
       if(this.postType === 'thread') {
@@ -223,7 +224,7 @@ window.articleOption = new Vue({
       if(blacklist) {
         this.removeUserToBlackList(articleUserId);
       } else {
-        this.addUserToBlackList(uid, 'article', _id);
+        this.addUserToBlackList(articleUserId, 'article', _id);
       }
     },
     //用户移除黑名单 tUid 被拉黑的用户

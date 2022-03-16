@@ -556,27 +556,22 @@ schema.methods.updateOrder = async function (order) {
 schema.statics.getCommentOrder = async function(aid) {
   const CommentModel = mongoose.model('comments');
   const ArticlePostModel = mongoose.model('articlePosts');
-  const redLock = require('../nkcModules/redLock');
-  const getRedisKeys = require('../nkcModules/getRedisKeys');
-  const key = getRedisKeys('commentOrder', aid);
-  const lock = await redLock.lock(key, 6000);
   const articlePost = await ArticlePostModel.findOnly({sid: aid});
+  const {default: defaultStatus} = await CommentModel.getCommentStatus();
   let order = 0;
   try{
-    const comment = await CommentModel.findOne({
+    //获取当前文章下已经发表过的评论数量
+    const count = await CommentModel.countDocuments({
       sid: articlePost._id,
-    }, {
-      order: 1
-    }).sort({order: -1});
-    if(comment) {
-      order = comment.order + 1;
-    }
-    await lock.unlock();
+      status: {
+        $ne: defaultStatus,
+      }
+    });
+    if(count !== 0) order = count;
   } catch(err) {
-    await lock.unlock();
     throwErr(500, `moment order error`);
   }
-  return order;
+  return order + 1;
 }
 
 

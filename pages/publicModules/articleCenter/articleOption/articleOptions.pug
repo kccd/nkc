@@ -28,7 +28,7 @@ if !isIncluded('articleOptions')
       //.option(v-if='commentControl' @click='toCommentControl')
       //  .fa.fa-commenting
       //  span 评论控制
-      .option(v-if='optionStatus.disable !== null' @click='disableArticle')
+      .option(v-if='optionStatus.disabled !== null' @click='disableArticle')
         .fa.fa-eye-slash
         span 退修或删除
       //a.option(v-if='history !== null' @click='visitUrl("/p/" + pid + "/history", true)')
@@ -51,4 +51,5 @@ if !isIncluded('articleOptions')
         span {{format('YYYY/MM/DD HH:mm:ss', toc)}}
   block scripts
     include ../../complaint/complaintBox
+    include ../../violationRecord/violationRecord
     +includeDeferJS('/publicModules/articleCenter/articleOption/articleOptions.js', false)

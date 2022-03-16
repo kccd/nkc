@@ -9,7 +9,7 @@
   @params {Number} collectedCount 收藏数
 
 mixin nav(data)
-  -var {_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount} = data
+  -var {_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount, article} = data
   +includeCSS('/columns/article/nav.css')
   header
     if mainCategory.length
@@ -22,25 +22,26 @@ mixin nav(data)
           a.article-common-nav(href=`/m/${_id}?c=${category._id}`)=category.name
           if mainCategory.length !== i+1
             span.nav-common /
-      //- else 
+      //- else
       //-   a.jump(href=`/m/${_id}`) 全部
     if auxiliaryCategory.length
       p.path-navigation.m-l-5.hidden-xs
         span.article-common-nav  辅分类:
         for category,i in auxiliaryCategory
-          a.article-common-nav(href=`/m/${_id}?c=${category._id}`)=category.name 
+          a.article-common-nav(href=`/m/${_id}?c=${category._id}`)=category.name
           if auxiliaryCategory.length !== i+1
             span.m-l-1.nav-common /
-      
+
     p.info-list
       if oc
         span.m-r-1
           span 文号
-          span=oc  
-      
-      span.m-r-1.fa.fa-eye(title="浏览数")=hits || 0
-      span.m-r-1.fa.fa-comment(title='回复数' onclick="window.location.href='#container'")=count || 0
-      span.m-r-1
+          span=oc
+
+      span.m-r-1.fa.fa-eye(title="浏览数")=article.hits || 0
+      span.m-r-1.fa.fa-comment(title='回复数' onclick="window.location.href='#container'")=article.replies || 0
+      span.m-r-1(titlt='收藏数' onclick='collectArticle()')
         span 收藏
-        span=collectedCount || 0
-      span.fa.fa-cog.m-r-1(onclick="showSetUp()")
+        span=article.collectedCount || 0
+      if showManagement
+        span.fa.fa-cog.m-r-1(onclick="showSetUp()")
