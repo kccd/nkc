@@ -35,6 +35,7 @@ import ResourceSelector from "../lib/vue/ResourceSelector";
 import {blobToFile, fileToBase64} from "../lib/js/file";
 $(function() {
   window.data = NKC.methods.getDataById("data");
+  // console.log(window.data,'---------')
   for(const c of window.data.threadCategories) {
     c.selectedNode = null;
     if(c.defaultNode === 'none') continue;
@@ -339,6 +340,9 @@ function initVueApp() {
         arr.shift();
         return arr;
       }
+    },
+    updated(){
+      
     },
     methods: {
       getLength: NKC.methods.checkData.getLength,

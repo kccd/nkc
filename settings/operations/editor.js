@@ -1,3 +1,6 @@
 module.exports = {
-	GET: 'visitEditor'
+	GET: 'visitEditor',
+	copy:{
+		GET: 'visitEditor'
+	}
 };

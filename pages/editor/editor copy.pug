@@ -1,0 +1,77 @@
+extends ../bootstrap_base
+block title
+  title 编辑器
+  +includeCSS("/editor/editor.css")
+  style.
+    .nkcshade{
+      box-shadow: none;
+    }
+    body{
+      padding-top: 120px;
+    }
+block content
+  .container-fluid.max-width.edito
+      .row#app-publish-article
+        .col-xs-12.col-md-9.box-shadow-panel.m-b-2
+          div
+            //- .vue-render
+            .m-b-1.m-t-1.m-l-05.m-r-05  
+              
+              article-title( :data="pageData" :state="pageState.state" @getTitle = "getTitle")
+              article-content  
+              .m-b-2
+              classification( :data="pageData" )
+              .m-b-2
+              cover
+              .m-b-2
+              abstract( :post= "pageData.post" )
+              .m-b-2
+              key-word( :abstract= "{cn:pageData.post?.abstractCn, en:pageData.post?.abstractEn}" )
+              .m-b-2
+              author-info( :p-authorInfos= "pageData.post?.authorInfos" )
+              .m-b-2
+              original( :original="{wordLimit: pageData.originalWordLimit, state: pageData.originalState}" )
+              .m-b-2
+              investigation( :data="pageData" )
+              //- if data.createSurveyPermission
+              //-   if data.type === "newThread" || (data.type === "modifyThread" && data.post.surveyId)
+              //-     .m-b-2
+              //-       .editor-header 调查
+              //-         button.btn.btn-success.btn-xs(style="vertical-align: top;"
+              //-           onclick="disabledSurveyForm()"
+              //-           id="disabledSurveyButton"
+              //-         ) 创建
+              //-       include ../publicModules/survey/edit
+              .m-b-2
+              .editor-header 专栏
+              //- include ../editor/toColumn
+        .col-xs-12.col-md-3.box-shadow-panel 
+          modify-submit( :notice="pageState.state.editorSettings?.notes" @getData="getData")
+        //- .col-xs-12.col-md-3.box-shadow-panel#FloatPostButtonContainer
+        //-   div
+        //-     +editorInto
+        //-     +modifySubmit("FloatPostButton", true)
+  .hidden#state=objToStr({ state }) 
+  .hidden#data=objToStr({createSurveyPermission: data.createSurveyPermission, minorForumCount: data.minorForumCount, originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft, websiteCode: data.websiteCode, toColumn: !!data.toColumn, threadCategories: data.threadCategories})
+block scripts
+  include ../publicModules/moment
+  include ../editor/modules/selectAuthorInfo
+  include ../publicModules/commonModal/commonModal
+  include ../publicModules/subscribeTypes/subscribeTypes
+  include ../publicModules/floatForumPanel/floatForumPanel
+  include ../publicModules/crop/crop_new
+  include ../publicModules/selectUser/selectUser
+  include ../publicModules/selectResource/selectResource
+  include ../publicModules/selectDraft/selectDraft
+  include ../publicModules/sticker/selectSticker
+  include ../publicModules/insertHideContent/insertHideContent
+  include ../ueditor/dialogs/mathformulaV2/mathformula
+  include ../publicModules/forumSelector/forumSelector
+  +includeJS('/message/connectSocket.js')
+  +includeJS('/tools.js')
+  if state.userColumn && !data.addedToColumn
+    +includeJS("/publicModules/toColumn/selectCategories.js")
+  +includeJS('/publicModules/survey/edit.js')
+  //- +includeJS("/editor/editor.js")
+
+  +includeJS("/editor/editor copy.js")

@@ -1196,6 +1196,7 @@ export default {
       this.getResources(paging.page);
     },
     done: function() {
+
       if(!this.callback) return;
       var selectedResources = this.selectedResources;
       var selectedResourcesId = this.selectedResourcesId;
