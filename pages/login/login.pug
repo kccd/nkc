@@ -9,24 +9,24 @@ block content
 block scripts
   script.
     $(function() {
-      window.RootApp.openLoginPanel('login');
+      window.RootApp.$refs.login.open('login');
     });
 
-  if state.isApp && state.platform === 'reactNative'
+  if remoteState.isApp && remoteState.platform === 'reactNative'
     style.
-      #moduleLogin{
+      .module-login{
         height: 100%!important;
         width: 100%!important;
       }
-      #moduleLogin>div{
+      .module-login>div{
         margin: 0;
         transition: none;
       }
-      #moduleLogin>div>div{
+      .module-login>div>div{
         border: none;
         border-radius: 0;
       }
-      #moduleLogin>div, #moduleLogin>div>div{
+      .module-login>div, .module-login>div>div{
         width: 100%!important;
         height: 100%!important;
       }
