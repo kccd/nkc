@@ -975,9 +975,10 @@ postSchema.statics.extendPosts = async (posts, options) => {
     });
   }
   if(o.usersVote) {
-    const votes = await PostsVoteModel.find({uid: o.uid, pid: {$in: [...pid]}});
+    const {post: postSource} = await PostsVoteModel.getVoteSources();
+    const votes = await PostsVoteModel.find({source: postSource, uid: o.uid, sid: {$in: [...pid]}});
     for(const v of votes) {
-      voteObj[v.pid] = v.type;
+      voteObj[v.sid] = v.type;
     }
   }
 
@@ -1128,7 +1129,8 @@ postSchema.methods.updatePostsVote = async function() {
     postsId = [this.pid];
   }
 
-  const votes = await PostsVoteModel.find({pid: {$in: postsId}});
+  const {post: postSource} = await PostsVoteModel.getVoteSources();
+  const votes = await PostsVoteModel.find({source: postSource, sid: {$in: postsId}});
 
   let upNum = 0, downNum = 0;
   let upNumTotal = 0, downNumTotal = 0;
@@ -1136,12 +1138,12 @@ postSchema.methods.updatePostsVote = async function() {
   for(const vote of votes) {
     if(vote.type === 'up') {
       upNumTotal += vote.num;
-      if(vote.pid === this.pid) {
+      if(vote.sid === this.pid) {
         upNum += vote.num;
       }
     } else {
       downNumTotal += vote.num;
-      if(vote.pid === this.pid) {
+      if(vote.sid === this.pid) {
         downNum += vote.num;
       }
     }

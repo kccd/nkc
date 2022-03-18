@@ -14,7 +14,7 @@
           span.fa.fa-columns &nbsp;开设专栏
           span.pull-right.fa.fa-angle-right
       li
-        a(onclick='messageApp.toChat()')
+        a(onclick='RootApp.openChatPanel()')
           span.fa.fa-envelope-o &nbsp;消息中心
           span.nav-message-item-count(v-if="count && count > 0") {{count}}
           span.pull-right.fa.fa-angle-right

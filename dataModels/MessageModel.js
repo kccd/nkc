@@ -832,15 +832,16 @@ messageSchema.statics.getParametersData = async (message) => {
     votesId = votesId.map(v => {
       return mongoose.Types.ObjectId(v);
     });
-    const votes = await PostsVoteModel.find({_id: {$in: votesId}}, {
-      pid: 1, uid: 1
+    const {post: postSource} = await PostsVoteModel.getVoteSources();
+    const votes = await PostsVoteModel.find({source: postSource, _id: {$in: votesId}}, {
+      sid: 1, uid: 1
     });
     if(!votes.length) return null;
     const usersId = [];
     let pid = '';
     votes.map(v => {
       usersId.push(v.uid);
-      pid = v.pid;
+      pid = v.sid;
     });
     const users = await UserModel.find({uid: {$in: usersId}}, {username: 1});
     if(!users.length) return null;

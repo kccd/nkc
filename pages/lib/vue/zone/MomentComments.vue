@@ -10,6 +10,9 @@
     .moment-comment-nav(v-else)
       .post-type 转发动态
     .moment-comment-list-container(v-if="postType === 'comment'")
+      .moment-comment-null(v-if="commentsData.length === 0")
+        span(v-if="loading") 加载中...
+        span(v-else) 空空如也~
       paging(:pages="pageButtons" @click-button="clickPageButton")
       .moment-comment-list
         .moment-comment-item(v-for="commentData in commentsData")
@@ -20,8 +23,9 @@
             .moment-comment-time
               from-now(:time="commentData.toc")
             .moment-comment-options
-              .moment-comment-option
+              .moment-comment-option(@click="vote(commentData)" :class="{'active': commentData.voteType === 'up'}")
                 .fa.fa-thumbs-o-up
+                span(v-if="commentData.voteUp > 0") {{commentData.voteUp}}
               .moment-comment-option
                 .fa.fa-ellipsis-h
           .moment-comment-item-content(v-html="commentData.content")
@@ -31,7 +35,7 @@
 </template>
 
 <style lang="less" scoped>
-  @import '../../publicModules/base';
+  @import '../../../publicModules/base';
   .moment-comment-nav{
     margin-bottom: 2rem;
     .post-type{
@@ -40,6 +44,7 @@
       margin-right: 1rem;
     }
     .sort-item{
+      user-select: none;
       display: inline-block;
       cursor: pointer;
       margin-right: 0.5rem;
@@ -50,14 +55,17 @@
   }
   .moment-comment-list-container{
     margin-bottom: 2rem;
+    .moment-comment-null{
+      text-align: center;
+    }
     .moment-comment-list{
       margin-bottom: 1rem;
       .moment-comment-item{
         &:hover{
-          background-color: #eee;
+          background-color: #f4f4f4;
         }
         padding: 0.5rem 0;
-        margin-bottom: 0rem;
+        margin-bottom: 0;
         .moment-comment-item-header{
           margin-bottom: 0.5rem;
           position: relative;
@@ -68,16 +76,22 @@
           top: 0;
           right: 0;
           height: @height;
-          width: 2 * @height;
           .moment-comment-option{
             display: inline-block;
             height: @height;
             line-height: @height;
             text-align: center;
-            width: @height;
             cursor: pointer;
+            padding: 0 0.2rem;
+            margin-left: 0.5rem;
             &:hover{
               opacity: 0.7;
+            }
+            &.active{
+              color: @accent;
+            }
+            span{
+              margin-left: 0.2rem;
             }
           }
         }
@@ -104,6 +118,9 @@
         }
         .moment-comment-item-content {
           //margin-bottom: 0.5rem;
+          word-break: keep-all;
+          word-wrap: break-word;
+          white-space: pre-wrap;
           /deep/img{
             height: 1.5rem;
             width: 1.5rem;
@@ -121,9 +138,12 @@
 
 <script>
   import MomentCommentEditor from './MomentCommentEditor';
-  import {sweetError} from "../js/sweetAlert";
-  import Paging from '../vue/Paging';
-  import FromNow from '../vue/FromNow';
+  import {sweetError} from "../../js/sweetAlert";
+  import Paging from '../Paging';
+  import FromNow from '../FromNow';
+  import {momentVote} from "../../js/zone/vote";
+  import {visitUrl} from "../../js/pageSwitch";
+
   export default {
     props: ['mid', 'type'],
     components: {
@@ -135,6 +155,7 @@
       commentsData: [],
       paging: null,
       sort: null,
+      loading: true,
       nav: [
         {
           type: 'hot',
@@ -160,10 +181,11 @@
         const self = this;
         const {sort, postType, momentId} = this;
         if(postType !== 'comment') return;
-        nkcAPI(`/moment/${momentId}/comments?sort=${sort}&page=${page}`, 'GET')
+        nkcAPI(`/zone/m/${momentId}/comments?sort=${sort}&page=${page}`, 'GET')
           .then(res => {
             self.commentsData = res.commentsData;
             self.paging = res.paging;
+            self.loading = false;
           })
           .catch(sweetError)
       },
@@ -172,7 +194,24 @@
       },
       onPublished(res) {
         const {momentCommentPage} = res;
-        this.getComments(momentCommentPage);
+        const {postType} = this;
+        if(postType === 'comment') {
+          this.getComments(momentCommentPage);
+          this.$emit('post-comment');
+        } else {
+          visitUrl(`/g/moment`);
+        }
+      },
+      vote(commentData) {
+        const voteType = 'up';
+        const cancel = voteType === commentData.voteType;
+        momentVote(commentData.momentCommentId, voteType, cancel)
+          .then(res => {
+            const {voteUp} = res;
+            commentData.voteUp = voteUp;
+            commentData.voteType = cancel? '': voteType;
+          })
+          .catch(sweetError)
       }
     },
     computed: {

@@ -5,18 +5,15 @@
       .module-dialog-close(@click="close")
         .fa.fa-remove
     .module-dialog-content
-      .draggable-panel-loading.p-t-2.p-b-3(v-if='loading') 加载中...
-      .draggable-panel-loading.p-t-1.p-b-3(v-else-if='error')
+      .draggable-panel-loading.p-t-2.p-b-3.text-center(v-if='loading') 加载中...
+      .draggable-panel-loading.p-t-1.p-b-3.text-center(v-else-if='errorInfo')
         .text-center.m-b-1.text-danger {{errorInfo}}
-        button.btn.btn-default.btn-md(@click='reload') 重新加载
-        button.btn.btn-default.btn-md(onclick='NKC.methods.toLogin()') 登录
-        button.btn.btn-default.btn-md(onclick='NKC.methods.toLogin("register")') 注册
+        button.btn.btn-default.btn-md.btn-sm.m-r-05(@click='reload') 重新加载
+        button.btn.btn-default.btn-md.btn-sm.m-r-05(@click='toLogin') 登录
+        button.btn.btn-default.btn-md.btn-sm.m-r-05(@click='toRegister') 注册
       .draggable-panel-content(v-else-if='resource')
         .download-panel
           .m-b-1.bg-warning.text-warning.p-a-05.bg-border.download-warning(v-if='downloadWarning') {{downloadWarning}}
-          .m-b-1.bg-info.text-info.p-a-05.bg-border.download-warning(v-if='downloadTime') 你在&nbsp;
-            strong {{downloadTime}}
-            | &nbsp;下载过当前文件。
           .file-base-info.m-b-1
             .file-name.m-b-05 文件名称：
               strong {{resource.defaultFile.name}}
@@ -38,11 +35,19 @@
                 | 积分不足，
                 a(href='/account/finance/recharge' target='_blank') 去充值
             div.bg-danger.p-a-05.text-center.bg-border.text-danger(v-else) 文件已丢失
+          .m-b-1.bg-info.text-info.p-a-05.bg-border.download-warning(v-if='downloadTime') 你在&nbsp;
+            strong {{downloadTime}}
+            | &nbsp;下载过当前文件。
+          .download-count-limit(v-if="fileCountLimitInfo")
+            hr
+            download-file-limit(:data="fileCountLimitInfo")
+
 </template>
 <style lang="less" scoped>
 @import "../../publicModules/base";
 .module-dialog-body {
   display: none;
+  font-size: 1.2rem;
   position: fixed;
   width: 40rem;
   max-width: 100%;
@@ -52,7 +57,7 @@
   background-color: #fff;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
   border: 1px solid #ddd;
-  margin: 1rem;
+  margin: 0;
 
   .module-dialog-header {
     height: 3rem;
@@ -84,8 +89,6 @@
   }
 
   .module-dialog-content {
-    padding: 0 1rem;
-    margin: 1.25rem;
     .download-panel{
       padding: 0.5rem;
     }
@@ -111,7 +114,13 @@ import {RNDownloadFile} from '../js/reactNative'
 import {getState} from '../js/state';
 import {getUrl, timeFormat} from '../js/tools';
 import {DraggableElement} from '../js/draggable';
+import DownloadFileLimit from './DownloadFileLimit';
+import {toLogin} from "../js/account";
+
 export default {
+  components: {
+    'download-file-limit': DownloadFileLimit,
+  },
   data: function (){
     return {
       loading: true,
@@ -130,8 +139,6 @@ export default {
       freeTime: 0, // 租期，超过后需重新支付
       downloadWarning: ''
     }
-  },
-  components: {
   },
   mounted() {
     this.initDraggableElement();
@@ -184,6 +191,12 @@ export default {
   methods: {
     getUrl: getUrl,
     timeFormat: timeFormat,
+    toLogin() {
+      toLogin('login');
+    },
+    toRegister() {
+      toLogin('register');
+    },
     initDraggableElement() {
       this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
     },

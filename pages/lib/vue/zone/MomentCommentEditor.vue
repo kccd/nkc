@@ -7,7 +7,9 @@
           ref="textareaEditor"
           :placeholder="placeholder"
           height="4rem"
-          @content-change="onTextareaEditorContentChange")
+          @content-change="onTextareaEditorContentChange"
+          @click-ctrl-enter="onClickEnter"
+          )
     .moment-comment-option-container
       .option-box(@click="selectEmoji")
         .fa.fa-smile-o
@@ -76,11 +78,11 @@
 </style>
 
 <script>
-  import TextareaEditor from './TextareaEditor';
-  import {sweetError} from '../js/sweetAlert';
-  import {debounce} from "../js/execution";
-  import {getLength} from "../js/checkData";
-  import EmojiSelector from '../vue/EmojiSelector';
+  import TextareaEditor from '../TextareaEditor';
+  import {sweetError} from '../../js/sweetAlert';
+  import {debounce} from "../../js/execution";
+  import {getLength} from "../../js/checkData";
+  import EmojiSelector from '../EmojiSelector';
   export default {
     props: ['mid', 'type'],
     components: {
@@ -208,6 +210,9 @@
       },
       unlockPost() {
         this.submitting = false;
+      },
+      onClickEnter() {
+        this.publish();
       },
       publish() {
         const self = this;

@@ -24,7 +24,8 @@
 </template>
 
 <style lang="less" scoped>
-  @import "../message.2.0.less";
+  @import "../../../publicModules/base";
+  @headerHeight: 3.4rem;
   .page-search-container{
     width: 100%;
     top: @headerHeight;
@@ -129,7 +130,7 @@
     closePage,
     addFriend,
     openChatPage
-  } from '../message.2.0.js';
+  } from '../../../message/message.2.0.js';
   export default {
     data: () => ({
       content: '',

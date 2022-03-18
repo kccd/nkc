@@ -73,7 +73,7 @@ block content
                       span 分享
                     -let collectEvent;
                     if !data.user
-                      -collectEvent = `NKC.methods.toLogin()`;
+                      -collectEvent = `RootApp.openLoginPanel()`;
                     else if data.collected
                       -collectEvent = `SubscribeTypes.collectionThread('${thread.tid}', false)`;
                     else
@@ -481,9 +481,9 @@ block content
             else
               //- 游客
               p 想参与大家的讨论？现在就&nbsp;
-                a.pointer(onclick="NKC.methods.toLogin('login')") 登录
+                a.pointer(onclick="RootApp.openLoginPanel('login')") 登录
                 | &nbsp;或者&nbsp;
-                a.pointer(onclick="NKC.methods.toLogin('register')") 注册
+                a.pointer(onclick="RootApp.openLoginPanel('register')") 注册
                 | 。
           -var floatCategories = [];
           for f in data.threadNav

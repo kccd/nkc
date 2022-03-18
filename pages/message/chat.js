@@ -1,5 +1,5 @@
 
-import Message from './message.2.0.vue';
+import Message from '../lib/vue/message/Message.2.0.vue';
 import {getScrollBarWidth, hasScrollBar} from "../lib/js/scrollBar";
 import {DraggableElement} from "../lib/js/draggable";
 import {getFromLocalStorage, updateInLocalStorage, saveToLocalStorage} from "../lib/js/localStorage";

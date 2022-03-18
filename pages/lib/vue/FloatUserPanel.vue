@@ -39,7 +39,7 @@
               .number {{user.xsf}}
             .border-left.col
               a.link(:onclick="'NKC.methods.toChat(\"' +user.uid+'\")'" v-if="uid && user.uid !== uid") 私信
-              a.link(onclick="Login.open()" v-else-if="!uid") 私信
+              a.link(onclick="RootApp.openLoginPanel()" v-else-if="!uid") 私信
             .border-left.col(v-if="user.column")
               a.link(:href="'/m/' + user.column._id" target="_blank" :title="user.column.name") 专栏
 </template>

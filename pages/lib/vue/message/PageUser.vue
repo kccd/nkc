@@ -66,7 +66,8 @@
 
 </template>
 <style scoped lang="less">
-  @import '../message.2.0.less';
+  @import "../../../publicModules/base";
+  @headerHeight: 3.4rem;
   .chat-user{
     padding: 2rem;
     position: absolute;
@@ -124,7 +125,7 @@
     closePage,
     openChatPage,
     removeChat
-  } from '../message.2.0.js';
+  } from '../../../message/message.2.0.js';
   export default {
     data: () => ({
       tUser: null,

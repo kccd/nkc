@@ -26,9 +26,5 @@ export function logout() {
 * @param {String} type login(默认), register
 * */
 export function toLogin(type = 'login') {
-  if(isApp) {
-    RNOpenLoginPage(type);
-  } else {
-    Login.open(type);
-  }
+  window.RootApp.openLoginPanel(type);
 }

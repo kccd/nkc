@@ -1,4 +1,6 @@
-import MomentComments from '../../lib/vue/MomentComments';
+import MomentComments from '../../lib/vue/zone/MomentComments';
+import {momentVote} from "../../lib/js/zone/vote";
+import {sweetError} from "../../lib/js/sweetAlert";
 
 // 已创建的动态实例，{momentId: momentInstance}
 const momentsInstance = {};
@@ -22,6 +24,21 @@ class Moment {
   getCommentContainerElement() {
     const containerElement = this.getContainerElement();
     return containerElement.find('.single-moment-comment-container');
+  }
+  // 获取点赞外层容器
+  getVoteContainerElement() {
+    const commentContainerElement = this.getContainerElement();
+    return commentContainerElement.find(`.single-moment-bottom-right`);
+  }
+  // 获取点赞数字 dom
+  getVoteElement() {
+    const voteContainerElement = this.getVoteContainerElement();
+    return voteContainerElement.find(`span`);
+  }
+  // 获取引用窗口
+  getQuoteContainerElement() {
+    const containerElement = this.getContainerElement();
+    return containerElement.find('.single-moment-center-content');
   }
   // 实例化评论列表外层 vue
   initCommentApp() {
@@ -90,6 +107,38 @@ class Moment {
   openReportContainer() {
     this.initCommentApp();
     this.commentApp.repostToggle();
+  }
+  // 点赞
+  voteUp() {
+    const self = this;
+    const voteContainer = this.getVoteContainerElement();
+    const voteType = voteContainer.attr('data-vote-type');
+    const cancel = voteType === 'up';
+    momentVote(this.momentId, 'up', cancel)
+      .then(res => {
+        const {voteUp} = res;
+        self.modifyVoteDom(voteUp, cancel? '': 'up');
+      })
+      .catch(sweetError);
+  }
+  /*
+  * 更改点赞数
+  * @param {Number} number
+  * @param {String} voteType 当前点赞类型 up(已点赞) 空字符串(未点赞)
+  * */
+  modifyVoteDom(number, voteType) {
+    const voteElement = this.getVoteElement();
+    const voteContainerElement = this.getVoteContainerElement();
+    voteElement.text(number);
+    voteContainerElement.attr('data-vote-type', voteType);
+    const className = 'hidden';
+    if(number === 0) {
+      if(!voteElement.hasClass(className)) {
+        voteElement.addClass(className);
+      }
+    } else {
+      voteElement.removeClass(className);
+    }
   }
 }
 

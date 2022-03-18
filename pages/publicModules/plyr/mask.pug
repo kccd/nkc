@@ -7,8 +7,8 @@ include ../downloadPanel/downloadPanel
       .plyr-mask-wrap
         .player-tip-content 视频暂不能访问，请登录试试
         .player-tip-button
-          a.download.m-r-05(onclick='NKC.methods.toLogin()') 登录
-          a.download.m-r-05(onclick='NKC.methods.toLogin("register")') 注册
+          a.download.m-r-05(onclick='RootApp.openLoginPanel()') 登录
+          a.download.m-r-05(onclick='RootApp.openLoginPanel("register")') 注册
   .plyr-mask-video.plyr-mask-video-preview
     .plyr-mask-fix
       // 预览提示
@@ -35,8 +35,8 @@ include ../downloadPanel/downloadPanel
     .plyr-mask-fix
       .player-tip-content 音频暂不能访问，请登录试试
       .player-tip-button
-        a.download.m-r-05(onclick='NKC.methods.toLogin()') 登录
-        a.download.m-r-05(onclick='NKC.methods.toLogin("register")') 注册
+        a.download.m-r-05(onclick='RootApp.openLoginPanel()') 登录
+        a.download.m-r-05(onclick='RootApp.openLoginPanel("register")') 注册
 
 +includeJS("/publicModules/plyr/mask.js")
 +includeCSS("/publicModules/plyr/mask.css")

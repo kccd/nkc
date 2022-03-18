@@ -562,7 +562,8 @@ threadRouter
 		// 【待改】加载鼓励、学术分
     data.creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
 		if(data.user) {
-      const vote = await db.PostsVoteModel.findOne({uid: data.user.uid, pid: thread.oc});
+      const {post: postSource} = await db.PostsVoteModel.getVoteSources();
+      const vote = await db.PostsVoteModel.findOne({source: postSource, uid: data.user.uid, sid: thread.oc});
       thread.firstPost.usersVote = vote?vote.type: '';
       // data.kcbSettings = await db.SettingModel.getSettings("kcb");
       data.digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');

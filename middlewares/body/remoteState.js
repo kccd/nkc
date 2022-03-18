@@ -37,7 +37,6 @@ module.exports = async (ctx) => {
     serverSettings: state.serverSettings,
     selectTypesWhenSubscribe: state.uid?!!state.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe:false,
     logoICO: state.logoICO,
-    websiteCode: String(serverSetting.websiteCode).toLocaleUpperCase(),
     lotteryStatus: state.uid? state.user.generalSettings.lotterySettings.status: false,
     appStableVersion: state.appStableVersion,
     startTime: global.NKC.startTime,

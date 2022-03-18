@@ -1,3 +1,5 @@
+import {toLogin} from "../lib/js/account";
+
 $(function() {
   if(!window.CommonModal) {
     window.CommonModal = new NKC.modules.CommonModal();
@@ -125,7 +127,7 @@ function toppedColumn(id, type) {
     .catch(sweetError)
 }
 function subscribeColumn(columnId) {
-  if(!NKC.configs.uid) return NKC.methods.toLogin();
+  if(!NKC.configs.uid) return toLogin();
   var subscriptionButton = $('[data-type="subscriptionButton"][data-column-id="'+columnId+'"]');
   var subscriptionNumber = $('[data-type="subscriptionNumber"][data-column-id="'+columnId+'"]');
   var subscribed = subscriptionButton.attr('data-subscribed') === 'true';

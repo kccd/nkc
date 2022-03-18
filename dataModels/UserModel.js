@@ -736,9 +736,12 @@ userSchema.methods.updateUserMessage = async function() {
 		operationId: 'violation'
 	});
 
+  const {post: postSource} = await PostsVoteModel.getVoteSources();
+
   let voteUpCount = await PostsVoteModel.aggregate([
     {
       $match: {
+        source: postSource,
         tUid: this.uid,
         type: "up"
       }
@@ -754,6 +757,7 @@ userSchema.methods.updateUserMessage = async function() {
   let voteDownCount = await PostsVoteModel.aggregate([
     {
       $match: {
+        source: postSource,
         tUid: this.uid,
         type: "down"
       }

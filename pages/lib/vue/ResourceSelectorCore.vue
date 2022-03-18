@@ -631,16 +631,18 @@ import {visitUrl} from "../js/pageSwitch";
 import {nkcAPI, nkcUploadFile} from "../js/netAPI";
 import {getState} from '../js/state';
 import {screenTopWarning} from '../js/topAlert';
+import {getSocket} from '../js/socket';
+import ImageViewer from "./ImageViewer";
+import ResourceInfo from "./ResourceInfo";
+import CommonModal from "./CommonModal";
+import SelectCategory from "./SelectCategory";
 const {isApp} = getState();
 import {
   RNTakePictureAndUpload,
   RNTakeAudioAndUpload,
   RNTakeVideoAndUpload
 } from '../js/reactNative';
-import ImageViewer from "./ImageViewer";
-import ResourceInfo from "./ResourceInfo";
-import CommonModal from "./CommonModal";
-import SelectCategory from "./SelectCategory";
+const socket = getSocket();
 export default {
   props: ['watch-type'],
   data: () => ({
@@ -809,13 +811,13 @@ export default {
         }
         self.getResources(0);
       }
-      window.socket.on("fileTransformProcess", this.socketEventListener);
+      socket.on("fileTransformProcess", this.socketEventListener);
     },
     // 销毁注册的 socket 事件
     removeSocketEvent() {
       if(!this.socketEventListener) return;
       // 销毁事件
-      window.socket.off('fileTransformProcess', this.socketEventListener);
+      socket.off('fileTransformProcess', this.socketEventListener);
     },
     initDragUploadEvent() {
       const $dragDom = $(this.$refs.pasteContent);

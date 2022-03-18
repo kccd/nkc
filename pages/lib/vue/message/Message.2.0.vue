@@ -150,34 +150,34 @@
 
 <script>
 
-  import PageList from './components/PageList.vue';
-  import PageChat from './components/PageChat.vue';
-  import PageUser from './components/PageUser.vue';
-  import PageCategory from './components/PageCategory.vue';
-  import PageSearch from './components/PageSearch.vue';
-  import PageSetting from './components/PageSetting.vue';
+  import PageList from './PageList.vue';
+  import PageChat from './PageChat.vue';
+  import PageUser from './PageUser.vue';
+  import PageCategory from './PageCategory.vue';
+  import PageSearch from './PageSearch.vue';
+  import PageSetting from './PageSetting.vue';
 
   import {
     receiveMessage,
     markAsRead,
     withdrawn,
-  } from './socketEvents/message.js';
+  } from '../../../message/socketEvents/message.js';
   import {
     updateChat,
     removeChat,
     updateChatList
-  } from './socketEvents/chat.js';
+  } from '../../../message/socketEvents/chat.js';
   import {
     removeCategory,
     updateCategoryList
-  } from './socketEvents/category.js'
+  } from '../../../message/socketEvents/category.js'
   import {
     updateUserOnlineStatus,
     removeFriend,
     updateUserList
-  } from './socketEvents/user.js'
-  import {addSocketStatusChangedEvent, getSocketStatus} from "../lib/js/socket";
-  import {sendNewMessageCount} from "./message.2.0";
+  } from '../../../message/socketEvents/user.js'
+  import {addSocketStatusChangedEvent, getSocketStatus} from "../../js/socket";
+  import {sendNewMessageCount} from "../../../message/message.2.0";
 
   export default {
     props: ['mode', 'socket'],
@@ -250,7 +250,7 @@
       this.selectPage(this.pageId.PageList);
       // this.openUserPage({type: 'UTU', uid: '74230'})
       this.initSocket(this.socket);
-      const socketStatus = getSocketStatus(this.socketApp);
+      const socketStatus = getSocketStatus();
       this.setSocketStatus(socketStatus);
     },
     methods: {
@@ -295,7 +295,7 @@
           }
         });
 
-        addSocketStatusChangedEvent(socketApp, this.setSocketStatus)
+        addSocketStatusChangedEvent(this.setSocketStatus)
       },
       getPage(pageId) {
         return this.$refs[this.pageId[pageId]];

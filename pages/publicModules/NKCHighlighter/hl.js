@@ -11,6 +11,7 @@
 *
 *
 * */
+import {toLogin} from "../../lib/js/account";
 
 NKC.modules.NKCHL = class {
   constructor(options) {
@@ -100,7 +101,7 @@ NKC.modules.NKCHL = class {
             NKC.methods.visitUrl(`/note/${source.id}`, true);
           }
         } else {
-          NKC.methods.toLogin("login");
+          toLogin("login");
         }
       })
       .on(hl.eventNames.hover, function(source) {

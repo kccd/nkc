@@ -4,22 +4,22 @@
     emoji-selector(ref="emojiSelector")
     .content-body
       .textarea-editor-container
-        textarea-editor(ref="textareaEditor" @content-change="onTextareaEditorContentChange")
+        textarea-editor(ref="textareaEditor" @content-change="onTextareaEditorContentChange" @click-ctrl-enter="onClickEnter")
       .files-container
         .pictures(v-if="picturesUrl.length > 0")
           .picture-item(v-for="(url, index) in picturesUrl" :style="'background-image: url('+url+')'")
-            .icon-remove(@click="removeFromArr(picturesId, index)")
+            .icon-remove(@click="removeFromArr(picturesId, index)" title="取消选择")
               .fa.fa-trash-o
         .videos(v-if="videosUrl.length > 0")
           .video-item(v-for="(videoUrl, index) in videosUrl")
-            .icon-remove(@click="removeFromArr(videosId, index)")
+            .icon-remove(@click="removeFromArr(videosId, index)" title="取消选择")
               .fa.fa-trash-o
             video(:src="videoUrl.url" :poster="videoUrl.cover" controls="controls")
     .buttons-container
-      .button-icon(@click="selectPicture" :class="{'disabled': videosId.length > 0}")
+      .button-icon(@click="selectPicture" :class="{'disabled': !allowedToSelectPicture}")
         .icon.fa.fa-image
         span 图片
-      .button-icon(@click="selectVideo" :class="{'disabled': picturesId.length > 0}")
+      .button-icon(@click="selectVideo" :class="{'disabled': !allowedToSelectVideo}")
         .icon.fa.fa-file-video-o
         span 视频
       .button-icon(@click="selectEmoji")
@@ -32,16 +32,19 @@
 </template>
 
 <style lang="less" scoped>
-  @import '../../publicModules/base';
+  @import '../../../publicModules/base';
   .moment-editor{
     .files-container{
       .videos{
         margin-bottom: 1rem;
         .video-item{
           position: relative;
-          border-radius: 0.5rem;
           overflow: hidden;
           font-size: 0;
+          max-width: 70%;
+          @media(max-width: 768px) {
+            max-width: 100%;
+          }
           .icon-remove{
             cursor: pointer;
             position: absolute;
@@ -51,14 +54,17 @@
             z-index: 10;
             width: 3rem;
             font-size: 1.4rem;
+            padding: 0 1rem;
+            .fa{
+              margin-right: 0.2rem;
+            }
             line-height: 3rem;
             text-align: center;
-            background-color: rgba(0, 0, 0, 0.3);
+            background-color: rgba(0, 0, 0, 0.8);
             transition: background-color 100ms;
-            border-radius: 50%;
             color: #fff;
             &:hover{
-              background-color: rgba(0, 0, 0, 0.5);
+              background-color: rgba(0, 0, 0, 1);
             }
           }
           video{
@@ -186,14 +192,14 @@
 </style>
 
 <script>
-  import ResourceSelector from './ResourceSelector';
-  import {getLength} from '../js/checkData';
-  import {getUrl} from '../js/tools';
-  import {screenTopWarning} from "../js/topAlert";
-  import {debounce} from '../js/execution';
-  import {nkcAPI} from '../js/netAPI';
-  import EmojiSelector from './EmojiSelector';
-  import TextareaEditor from './TextareaEditor';
+  import ResourceSelector from '../ResourceSelector';
+  import {getLength} from '../../js/checkData';
+  import {getUrl} from '../../js/tools';
+  import {screenTopWarning} from "../../js/topAlert";
+  import {debounce} from '../../js/execution';
+  import {nkcAPI} from '../../js/netAPI';
+  import EmojiSelector from '../EmojiSelector';
+  import TextareaEditor from '../TextareaEditor';
   export default {
     props: ['published'],
     components: {
@@ -216,6 +222,14 @@
       this.initData();
     },
     computed: {
+      allowedToSelectPicture() {
+        const {picturesId, videosId, maxPictureCount} = this;
+        return videosId.length === 0 && picturesId.length < maxPictureCount;
+      },
+      allowedToSelectVideo() {
+        const {picturesId, videosId, maxVideoCount} = this;
+        return picturesId.length === 0 && videosId.length < maxVideoCount;
+      },
       contentLength() {
         const {content} = this;
         return getLength(content);
@@ -296,7 +310,7 @@
       },
       selectPicture() {
         const self = this;
-        if(self.videosId.length > 0) return;
+        if(!this.allowedToSelectPicture) return;
         const type = 'picture';
         this.$refs.resourceSelector.open(res => {
           self.addResourcesId(type, res.resourcesId);
@@ -308,7 +322,7 @@
       },
       selectVideo() {
         const self = this;
-        if(self.picturesId.length > 0) return;
+        if(!this.allowedToSelectVideo) return;
         const type = 'video';
         this.$refs.resourceSelector.open(res => {
           self.addResourcesId(type, res.resourcesId);
@@ -361,6 +375,9 @@
       },
       syncTextareaEditorContent() {
         this.setTextareaEditorContent(this.content);
+      },
+      onClickEnter() {
+        this.publishContent();
       },
       onContentChange: debounce(function() {
         this.saveContent();

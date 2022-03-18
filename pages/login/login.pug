@@ -9,7 +9,7 @@ block content
 block scripts
   script.
     $(function() {
-      Login.open('login');
+      window.RootApp.openLoginPanel('login');
     });
 
   if state.isApp && state.platform === 'reactNative'

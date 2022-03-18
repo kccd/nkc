@@ -41,7 +41,7 @@ if !isIncluded('publicModules/moment/moment.pug')
 
   mixin singleMoment(momentData, quote)
     -var {uid, toc, username, avatarUrl, userHome, time, content, voteUp, files} = momentData;
-    -var {momentId, quoteData, commentCount} = momentData;
+    -var {momentId, quoteData, commentCount, voteType = ''} = momentData;
     .single-moment-container(data-moment-id=momentId)
       .single-moment-top-container
         if !quote
@@ -74,16 +74,18 @@ if !isIncluded('publicModules/moment/moment.pug')
               data-event-name='openCommentContainer'
               )
               .fa.fa-comment-o
-              if commentCount > 0
-                span= commentCount
+              span(class=commentCount===0? 'hidden': '')= commentCount
             .single-moment-bottom-center.fa.fa-retweet(
               data-moment-id=momentId
               data-event-name='openReportContainer'
             )
-            .single-moment-bottom-right
+            .single-moment-bottom-right(
+              data-moment-id=momentId
+              data-event-name='voteUp'
+              data-vote-type=voteType
+            )
               .fa.fa-thumbs-o-up
-              if voteUp > 0
-                span= voteUp
+              span(class=voteUp===0? 'hidden': '')= voteUp
           .single-moment-comment-container(v-if='!hidden' v-cloak)
             moment-comments(:mid="momentId" :type='postType' ref='momentComments')
 

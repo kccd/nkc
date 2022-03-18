@@ -52,7 +52,8 @@
 </template>
 
 <style lang="less">
-  @import "../message.2.0.less";
+  @import "../../../publicModules/base";
+  @headerHeight: 3.4rem;
   .message-category-container{
     .category-info{
       position: absolute;
@@ -159,7 +160,7 @@
   import {
     closePage,
     openUserPage,
-  } from '../message.2.0.js';
+  } from '../../../message/message.2.0.js';
   export default {
     data: () => ({
       category: null,

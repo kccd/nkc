@@ -115,9 +115,9 @@
             a.pointer(@click='modifyPost' v-if="status === 'beginning'") 修改
           else
             | 你的IP已于 {{postTime}} 提交结果。若你没有提交过，请&nbsp;
-            a(onclick="Login.open('login')") 登录
+            a(onclick="RootApp.openLoginPanel('login')") 登录
             | &nbsp;或&nbsp;
-            a(onclick="Login.open('register')") 注册
+            a(onclick="RootApp.openLoginPanel('register')") 注册
             | 。
         //- 权限提示
         p(v-if="!havePermission")
@@ -125,9 +125,9 @@
             | 作者限定了参与人员的范围，你的账号不在参与范围之内。
           else
             | 作者限定了参与人员的范围，请先&nbsp;
-            a(onclick="Login.open('login')") 登录
+            a(onclick="RootApp.openLoginPanel('login')") 登录
             | &nbsp;或&nbsp;
-            a(onclick="Login.open('register')") 注册
+            a(onclick="RootApp.openLoginPanel('register')") 注册
             | 。
 
       .form-button(v-if="!posted")

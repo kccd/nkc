@@ -68,7 +68,8 @@
 </template>
 
 <style lang="less" scoped>
-  @import "../message.2.0.less";
+  @import "../../../publicModules/base";
+  @headerHeight: 3.4rem;
   .page-setting-container{
     padding: 2rem;
     position: absolute;
@@ -82,7 +83,7 @@
 
 <script>
   import ModuleHeader from './ModuleHeader.vue';
-  import {closePage} from '../message.2.0.js';
+  import {closePage} from '../../../message/message.2.0.js';
   export default {
     data: () => ({
       messageSettings: null,

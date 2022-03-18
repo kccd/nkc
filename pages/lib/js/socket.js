@@ -1,3 +1,15 @@
+import {getState} from "./state";
+const {
+  uid,
+  refererOperationId,
+} = getState();
+
+const hasLogged = !!uid;
+const operationId = refererOperationId;
+
+const functions = [];
+const handlers = [];
+
 const events = [
   {
     type: 'connect',
@@ -42,19 +54,94 @@ for(const e of events) {
   eventsObj[e.type] = e;
 }
 
-export function addSocketStatusChangedEvent(socket, func) {
-  const initEvent = function(event) {
-    socket.on(event.type, function() {
-      func(event);
+/*
+* 获取socket.io实例
+* */
+export function getSocket() {
+  if(!hasLogged) return null;
+  else if(window.socket) {
+    return window.socket;
+  } else {
+    const query = {
+      operationId,
+      data: {},
+    };
+    const socket = io('/common', {
+      forceNew: false,
+      reconnection: true,
+      autoConnect: true,
+      transports: ['polling', 'websocket'],
+      reconnectionDelay: 5000,
+      reconnectionDelayMax: 10000,
+      query: query,
+      extraHeaders: {
+        "X-socket-io": "polling"
+      }
     });
-  }
-  for(var i = 0; i < events.length; i++) {
-    const event = events[i];
-    initEvent(event);
+
+    socket.on('connect', function () {
+      console.log('socket连接成功');
+    });
+    socket.on('error', function() {
+      console.log('socket连接出错');
+      socket.disconnect();
+    });
+    socket.on('disconnect', function() {
+      console.log('socket连接已断开');
+    });
+    window.socket = socket;
+    return window.socket;
   }
 }
 
-export function getSocketStatus(socket) {
+function initSocketIoEvent(event, func) {
+  const socket = getSocket();
+  if(!socket) return;
+  let index = functions.indexOf(func);
+  let handlerObj;
+  if(index === -1) {
+    handlerObj = {};
+    functions.push(func);
+    handlers.push(handlerObj);
+  } else {
+    handlerObj = handlers[index];
+  }
+  let handler = handlerObj[event.type];
+  if(handler) return;
+  handler = function() {
+    func(event);
+  };
+  handlerObj[event.type] = handler;
+  socket.on(event.type, handler);
+}
+
+function removeSocketIoEvent(event, func) {
+  const socket = getSocket();
+  if(!socket) return;
+  let index = functions.indexOf(func);
+  if(index === -1) return;
+  const handlerObj = handlers[index];
+  const handler = handlerObj[event.type];
+  if(!handler) return;
+  socket.off(event.type, handler);
+  handlerObj[event.type] = undefined;
+}
+
+export function addSocketStatusChangedEvent(func) {
+  for(const event of events) {
+    initSocketIoEvent(event, func);
+  }
+}
+
+export function removeSocketStatusChangedEvent(func) {
+  for(const event of events) {
+    removeSocketIoEvent(event, func);
+  }
+}
+
+export function getSocketStatus() {
+  const socket = getSocket();
+  if(!socket) return null;
   const {connected} = socket;
   if(connected) {
     return eventsObj.connect;

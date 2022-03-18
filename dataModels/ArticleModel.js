@@ -1118,6 +1118,7 @@ schema.statics.getArticlesInfo = async function(articles) {
 *     @param {String} time 格式化之后的发表时间
 *     @param {Date} toc 发表时间
 *     @param {String} articleId 文章ID
+*     @param {String} uid 文章的阅读链接
 * */
 schema.statics.getArticlesDataByArticlesId = async function(articlesId, type = 'object') {
   const ArticleModel = mongoose.model('articles');
@@ -1135,6 +1136,7 @@ schema.statics.getArticlesDataByArticlesId = async function(articlesId, type = '
   const stableDocuments = await DocumentModel.getStableDocumentsBySource(articleSource, articlesId, 'object');
   const obj = {};
   for(const article of articles) {
+    const articleUrl = await ArticleModel.getArticleUrlBySource(article._id, article.source, article.sid);
     const stableDocument = stableDocuments[article._id];
     if(!stableDocument) continue;
     const user = usersObj[article.uid];
@@ -1151,6 +1153,7 @@ schema.statics.getArticlesDataByArticlesId = async function(articlesId, type = '
       time: timeFormat(article.toc),
       toc: article.toc,
       articleId: article._id,
+      url: articleUrl.articleUrl
     };
   }
   if(type === 'object') {

@@ -10,7 +10,8 @@
 </template>
 
 <style scoped lang="less">
-  @import "../message.2.0.less";
+  @import "../../../publicModules/base";
+  @headerHeight: 3.4rem;
   .page-header{
     margin: 0;
     height: @headerHeight;

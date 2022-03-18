@@ -74,7 +74,8 @@
 
 
 <style lang="less" scoped>
-  @import '../message.2.0.less';
+  @import "../../../publicModules/base";
+  @headerHeight: 3.4rem;
   @listHeight: 3rem;
   @listPaddingTop: 0.8rem;
   @listRightTopHeight: 1.8rem;
@@ -391,8 +392,8 @@
     openSearchPage,
     sendNewMessageCount,
     removeChat
-  } from '../message.2.0.js';
-  import {briefTime} from '../../lib/js/time.js';
+  } from '../../../message/message.2.0.js';
+  import {briefTime} from '../../js/time.js';
   export default {
     data: () => ({
       showOptions: false,

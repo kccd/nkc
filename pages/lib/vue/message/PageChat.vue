@@ -115,7 +115,8 @@
 </template>
 
 <style scoped lang="less">
-  @import "../message.2.0.less";
+  @import "../../../publicModules/base";
+  @headerHeight: 3.4rem;
   @textareaContainerHeight: 6rem;
   @buttonContainerHeight: 3rem;
   @bgColor: #eee;
@@ -477,12 +478,12 @@
 <script>
   const CHAT_CONTENT_ID = `NKC_CHAT_CONTENT`;
   import ModuleHeader from './ModuleHeader.vue';
-  import {saveToLocalStorage, getFromLocalStorage} from "../../lib/js/localStorage";
+  import {saveToLocalStorage, getFromLocalStorage} from "../../js/localStorage";
   import {
     closePage,
     openUserPage,
-  } from '../message.2.0.js';
-  import {withdrawn, onWithdrawn} from '../message.2.0.js';
+  } from '../../../message/message.2.0.js';
+  import {withdrawn, onWithdrawn} from '../../../message/message.2.0.js';
   export default {
     data: () => ({
       type: '',

@@ -625,6 +625,7 @@ schema.methods.getVoteUpTrends = async function(minTime, maxTime) {
   const ColumnModel = mongoose.model('columns');
   const ColumnPostModel = mongoose.model('columnPosts');
   const PostsVoteModel = mongoose.model('postsVotes');
+  const {post: postSource} = await PostsVoteModel.getVoteSources();
   const columnId = this._id;
   const {
     times,
@@ -643,7 +644,8 @@ schema.methods.getVoteUpTrends = async function(minTime, maxTime) {
     [
       {
         $match: {
-          pid: {$in: columnPostsId},
+          source: postSource,
+          sid: {$in: columnPostsId},
           type: 'up',
           toc: {
             $gte: _minTime,

@@ -27,9 +27,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           )
       else
         .navbar-brand.userInfo-m
-          a(onclick="Login.open()" title='还记得密码吗？') 登录
+          a(onclick="RootApp.openLoginPanel()" title='还记得密码吗？') 登录
           span &nbsp
-          a(onclick="Login.open('register')" title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
+          a(onclick="RootApp.openLoginPanel('register')" title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
 
     //- 电脑屏幕
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
@@ -40,7 +40,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           if remoteState.uid
             a(href='/g/moment') 关注
           else
-            a.pointer(onclick='NKC.methods.toLogin()') 关注
+            a.pointer(onclick='RootApp.openLoginPanel()') 关注
         li(class=navbar_highlight === 'columns' ? 'active' : '')
           a(href=`/m`) 专栏
         li(class=navbar_highlight === 'community' ? 'active' : '')
@@ -55,7 +55,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             if data.forum
               -editorHref = `/editor?type=forum&id=${data.forum.fid}`;
             a(href=editorHref target='_blank') 发表文章
-          li.new-message.message-switch.pointer.message-count-container(class="hidden" onclick='messageApp.toChat()')
+          li.new-message.message-switch.pointer.message-count-container(class="hidden" onclick='RootApp.openChatPanel()')
             span 消息
             .nav-user-avatar-count.message-switch.message-count(class="hidden")
 
@@ -72,9 +72,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             img.nav-user-avatar-sm(src=remoteState.userInfo.avatar)
         else
           li.userInfo
-            a(onclick="Login.open()" title='还记得密码吗？') 登录
+            a(onclick="RootApp.openLoginPanel()" title='还记得密码吗？') 登录
           li.userInfo
-            a(onclick="Login.open('register')" title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
+            a(onclick="RootApp.openLoginPanel('register')" title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
 
       .navbar-md.navbar-search.hidden-xs.inline-block.form-inline
         input.inline-block.form-control(type='text' id='navSearchInputMD' placeholder='关键词 文号 用户')
@@ -97,7 +97,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             if remoteState.uid
               a(href='/g/moment') 关注
             else
-              a(onclick="Login.open()") 关注
+              a(onclick="RootApp.openLoginPanel()") 关注
           .col-xs-3
             a(href=`/m`) 专栏
           .col-xs-3
