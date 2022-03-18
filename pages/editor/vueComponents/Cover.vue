@@ -79,9 +79,7 @@ export default {
     },
     getData(){
       return {
-        cover: this,cover,
-        coverData: coverData,
-        coverUrl: coverUrl
+        cover: this.cover,
       }
     }
   }

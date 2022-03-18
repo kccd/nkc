@@ -47,7 +47,7 @@ export default {
     },
     getData(){
       return {
-        // 声明原创
+        originState : this.originState
       }
     }
   }

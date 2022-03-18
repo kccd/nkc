@@ -53,8 +53,8 @@ export default {
   methods: {
     getData(){
       return {
-        cn: this.cn,
-        en: this.en
+        abstractCn: this.cn,
+        abstractEn: this.en
       }
     },
     // getLength(str = ''){

@@ -24,13 +24,26 @@ export default {
       xsfSelector: true,
       mathJaxSelector: true,
       content: "",
-      EditorReady: false
+      EditorReady: false,
     },
     // 是否允许触发contentChange
     contentChangeEventFlag: true,
-    content: ""
+    content: "",
+    quoteHtml: ""
+
   }),
+  props: {
+    c: {
+      type: String,
+    }
+  },
   created() {
+        let reg = /<blockquote cite.+?blockquote>/;
+        let quoteHtml = this.c?.match(reg);
+        if(quoteHtml && quoteHtml[0]) {
+          this.quoteHtml = quoteHtml[0];
+        }
+        this.content = post.c.replace(reg, "");
   },
   mounted() {},
   computed: {
@@ -39,6 +52,7 @@ export default {
     }
   },
   methods: {
+
     setContent() {
       // window.editorContainer.contentChangeEventFlag = false; ？？
       this.$refs.threadEditor.setContent(this.content);
@@ -70,11 +84,8 @@ export default {
       this.content = _content;
       this.contentLength = content.length;
     },
-    getContentObj(){
-      return {
-        content: this.content,
-        contentLength: this.contentLength
-      }
+    getData(){
+      return  {c: this.content + (this.quoteHtml || "")};  
     },
     editorReady() {
       //编辑器准备就绪

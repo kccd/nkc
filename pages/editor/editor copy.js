@@ -28,7 +28,7 @@ import KeyWord from "./vueComponents/KeyWord.vue";
 import AuthorInfo from "./vueComponents/AuthorInfo.vue";
 import Original from "./vueComponents/Original.vue";
 import Investigation from "./vueComponents/Investigation.vue" 
-
+import Column from "./vueComponents/Column.vue"
 
 window.state = NKC.methods.getDataById("state");
   console.log(state)
@@ -49,7 +49,7 @@ new Vue({
     "author-info": AuthorInfo,
     "original": Original,
     "investigation": Investigation,
-
+    "column": Column
  
   },
   data: ()=>({
@@ -59,12 +59,28 @@ new Vue({
   created(){
     console.log(window.data)
   },
-  getTitle(title){
-    this.title = title
-  },
-  getData(submitFn){
-
-    submitFn()
+  methods: {
+    readyData(submitFn){
+      if(!submitFn){
+        console.error('callback is not fined');
+        return
+      };
+      //  pageData.draftId
+      // pageData.post.parentPostId;
+      
+      const refs =this.$refs;
+      let submitData= {};
+      console.log(refs);
+      for (const key in refs) {
+        console.log(key)
+        if (refs.hasOwnProperty(key)) {
+          const vue = refs[key];
+          Object.assign( submitData, vue.getData()) 
+        }
+      }
+      console.log(submitData,'data')
+      submitFn()
+    }
   }
 })
 
@@ -120,42 +136,16 @@ $(function() {
   if(NKC.modules.SelectColumnCategories) {
     window.PostToColumn = new NKC.modules.SelectColumnCategories();
   }
-  // 实例化投票模块
-  // 获取数据时需判断实例是否存在
-  if(NKC.modules.SurveyEdit && $("#moduleSurveyEdit").length) {
-
-    window.PostSurvey = new NKC.modules.SurveyEdit();
-    PostSurvey.app.disabled = true;
-    PostSurvey.init({surveyId: data.post?.surveyId || ""});
-    if(data.type !== "newThread") {
-      hideButton();
-    }
-    if(data.post && data.post.surveyId) {
-      disabledSurveyForm();
-    }
-  }
-  // window.editor = editor;
 });
 
 
 // NKC.methods.selectedDraft = function(draft) {
 //   PostInfo.insertDraft(draft);
 // }
-function disabledSurveyForm() {
-  if(!PostSurvey) return;
-  let button = $("#disabledSurveyButton");
-  if(PostSurvey.app.disabled) {
-    button.text("取消").removeClass("btn-success").addClass("btn-danger");
-  } else {
-    button.text("创建").removeClass("btn-danger").addClass("btn-success");
-  }
-  console.log(PostSurvey.app);
-  PostSurvey.app.disabled = !PostSurvey.app.disabled;
-}
+
 Object.assign(window, {
   // initVueApp,
   // resetBodyPaddingTop,
-  disabledSurveyForm,
   // hideButton,
   // mediaInsertUE,
   // saveUEContentToLocal,

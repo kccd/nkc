@@ -119,6 +119,12 @@ export default {
     this.threadCategories = this.data.threadCategories;
     this.minorForumCount = this.data.minorForumCount;
   },
+  updated(){
+    console.log(this.minorForumCount)
+    console.log(this.type)
+    console.log(this.threadCategories)
+    console.log(this.selectedForums)
+  },
   mounted() {
     this.selectedForums = this.data.mainForums || [];
   },
@@ -133,6 +139,23 @@ export default {
     }
   },
   methods: {
+    getThreadCategoriesId() {
+        const tcId = [];
+        for(const tc of this.threadCategories) {
+          if([null, 'default'].includes(tc.selectedNode)) continue;
+          tcId.push(tc.selectedNode._id);
+        }
+        return tcId;
+    },
+    selectedCategoriesId: function() {
+        let arr = [];
+        let selectedForums = this.selectedForums;
+        for(let i = 0; i < selectedForums.length; i++) {
+          let forum = selectedForums[i];
+          if(forum.cid) arr.push(forum.cid);
+        }
+        return arr;
+      },
     setUrl(type, id) {
       return getUrl(type, id);
     },
@@ -169,6 +192,13 @@ export default {
           disabledForumsId: []
         }
       );
+    },
+    getData(){
+      return {
+        fids: this.selectedForumsId,
+        cids: this.selectedCategoriesId,
+        tcId: this.getThreadCategoriesId()
+      }
     }
   }
 };

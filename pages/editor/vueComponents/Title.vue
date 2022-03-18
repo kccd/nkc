@@ -57,8 +57,8 @@ export default {
     },
   },
   methods: {
-    getTitleValue() {
-      return this.titleValue;
+    getData() {
+      return {t: this.titleValue};
     },
   },
 };

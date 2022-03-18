@@ -76,7 +76,7 @@ export default {
   },
   methods: {
     getData(){
-      return this.authorInfos
+      return {authorInfos: this.authorInfos}
     },
     removeAuthor(index, arr) {
       sweetQuestion("确定要删除该条作者信息？")

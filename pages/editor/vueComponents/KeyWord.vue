@@ -88,7 +88,11 @@ export default {
       );
     },
     getData(){
-      return
+      return {
+        keyWordsEn: this.keyWordsEn,
+        keyWordsCn: this.keyWordsCn,
+
+      }
     }
   },
   computed: {

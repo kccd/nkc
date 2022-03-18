@@ -35,7 +35,7 @@ import ResourceSelector from "../lib/vue/ResourceSelector";
 import {blobToFile, fileToBase64} from "../lib/js/file";
 $(function() {
   window.data = NKC.methods.getDataById("data");
-  // console.log(window.data,'---------')
+  console.log(window.data,'---------')
   for(const c of window.data.threadCategories) {
     c.selectedNode = null;
     if(c.defaultNode === 'none') continue;
@@ -227,7 +227,9 @@ function initVueApp() {
       this.post = data.post;
       this.forum = data.forum;
       this.type = data.type;
+      
       this.draftId = data.draftId;
+      console.log(data.draftId)
       this.oldDraft = data.oldDraft;
       this.initPost(data.post);
       let self = this;
@@ -838,18 +840,29 @@ function initVueApp() {
         let self = this;
         self.getTitle();
         self.getContent();
+        // 摘要
         post.abstractCn = self.abstractCn;
         post.abstractEn = self.abstractEn;
+        // 评论ID
         post.parentPostId = self.parentPostId;
+        // 关键词
         post.keyWordsEn = self.keyWordsEn;
         post.keyWordsCn = self.keyWordsCn;
+        // 封面
         post.cover = self.cover;
+        // 标题
         post.t = self.title;
+        // 主分类id
         post.fids = self.selectedForumsId;
+        console.log(self.selectedCategoriesI,'self.selectedCategoriesI')
         post.cids = self.selectedCategoriesId;
+        // 内容
         post.c = (self.quoteHtml||"") + self.content;
+        // 作者信息
         post.authorInfos = self.authorInfos;
+        // 原创
         post.originState = self.originState;
+        // 草稿ID
         post.did = self.draftId;
         // 仅当用户有权发表匿名内容且当前专业允许发表匿名内容时，才将匿名标志提交到服务器。
         const postButton = getPostButton();

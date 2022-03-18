@@ -31,7 +31,7 @@
             .col-xs-6.p-l-05
               button.btn.btn-default.btn-block(@click="saveToDraftBase") 存草稿
         else
-          button.btn.btn-theme(@click="submit" v-if="checkProtocol && !disabledSubmit") 提交
+          button.btn.btn-theme(@click="readyData" v-if="checkProtocol && !disabledSubmit") 提交
           button.btn.btn-theme(v-else disabled :title="!checkProtocol?'请先勾选同意遵守全部协议':''")
             span(v-if="disabledSubmit")
               span 提交中...&nbsp;
@@ -328,7 +328,7 @@ export default {
     },
     //拿取其他组件数据
     readyData(){
-      this.$emit('getData', data => this.submit(data))
+      this.$emit('ready-data', data => this.submit(data))
     },
     submit() {
       let post = {},
@@ -411,10 +411,6 @@ export default {
           this.showCloseInfo = false;
           if (NKC.configs.platform === "reactNative") {
             NKC.methods.visitUrlAndClose(data.redirect);
-            /*this.visitUrl(data.redirect || "/", true);
-              setTimeout(() => {
-                NKC.methods.appClosePage();
-              }, 1000);*/
           } else if (NKC.configs.platform === "apiCloud") {
             this.visitUrl(data.redirect || "/");
             setTimeout(function() {
@@ -440,5 +436,8 @@ export default {
 .editor-auto-save {
   padding: 0.5rem 0;
   color: #9baec8;
+}
+.modifySubmit{
+  position: fixed;
 }
 </style>
