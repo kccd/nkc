@@ -30,7 +30,8 @@ export default {
     }
   },
   created() {
-    // this.keyWordsCn = post.keyWordsCn;
+    this.keyWordsCn = this.post?.keyWordsCn || [];
+    this.keyWordsEn = this.post?.keyWordsEn || [];
   },
   methods: {
     removeKeyword(index, arr) {

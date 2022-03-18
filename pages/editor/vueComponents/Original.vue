@@ -45,6 +45,11 @@ export default {
         "6": "发表人本人原创"
       };
     },
+  },
+  methods: {
+    contentChange(length){
+      this.contentLength = length
+    },
     getData(){
       return {
         originState : this.originState

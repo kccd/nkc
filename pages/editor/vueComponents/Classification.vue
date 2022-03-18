@@ -117,14 +117,10 @@ export default {
   },
   created() {
     this.threadCategories = this.data.threadCategories;
+    console.log(this.threadCategories, "threadCategories");
     this.minorForumCount = this.data.minorForumCount;
   },
-  updated(){
-    console.log(this.minorForumCount)
-    console.log(this.type)
-    console.log(this.threadCategories)
-    console.log(this.selectedForums)
-  },
+  updated() {},
   mounted() {
     this.selectedForums = this.data.mainForums || [];
   },
@@ -136,33 +132,42 @@ export default {
       let arr = [].concat(this.selectedForums);
       arr.shift();
       return arr;
+    },
+    selectedForumsId() {
+      let arr = [];
+      let selectedForums = this.selectedForums;
+      for (let i = 0; i < selectedForums.length; i++) {
+        let forum = selectedForums[i];
+        if (forum.fid) arr.push(forum.fid);
+      }
+      return arr;
+    },
+    selectedCategoriesId: function() {
+      let arr = [];
+      let selectedForums = this.selectedForums;
+      for (let i = 0; i < selectedForums.length; i++) {
+        let forum = selectedForums[i];
+        if (forum.cid) arr.push(forum.cid);
+      }
+      return arr;
     }
   },
   methods: {
     getThreadCategoriesId() {
-        const tcId = [];
-        for(const tc of this.threadCategories) {
-          if([null, 'default'].includes(tc.selectedNode)) continue;
-          tcId.push(tc.selectedNode._id);
-        }
-        return tcId;
+      const tcId = [];
+      for (const tc of this.threadCategories) {
+        if ([null, "default"].includes(tc.selectedNode)) continue;
+        tcId.push(tc.selectedNode._id);
+      }
+      return tcId;
     },
-    selectedCategoriesId: function() {
-        let arr = [];
-        let selectedForums = this.selectedForums;
-        for(let i = 0; i < selectedForums.length; i++) {
-          let forum = selectedForums[i];
-          if(forum.cid) arr.push(forum.cid);
-        }
-        return arr;
-      },
     setUrl(type, id) {
       return getUrl(type, id);
     },
     selectThreadCategory(c, n) {
-      // console.log(c.selectedNode)
+      console.log(c,n)
       c.selectedNode = n;
-      this.$forceUpdate()
+      this.$forceUpdate();
     },
     selectForumsByType(type) {
       let self = this;
@@ -193,12 +198,12 @@ export default {
         }
       );
     },
-    getData(){
+    getData() {
       return {
         fids: this.selectedForumsId,
         cids: this.selectedCategoriesId,
         tcId: this.getThreadCategoriesId()
-      }
+      };
     }
   }
 };
@@ -206,8 +211,8 @@ export default {
 
 <style scope>
 .editor-thread-category-nodes .editor-thread-category-node.active {
-    color: #fff;
-    background-color: #2b90d9;
-    border-color: #2b90d9;
+  color: #fff;
+  background-color: #2b90d9;
+  border-color: #2b90d9;
 }
 </style>

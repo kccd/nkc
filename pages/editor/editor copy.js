@@ -35,6 +35,23 @@ window.state = NKC.methods.getDataById("state");
 
   window.data = NKC.methods.getDataById("data");
   console.log(data)
+  if(window.data?.threadCategories){
+        for(const c of window.data.threadCategories) {
+          c.selectedNode = null;
+          if(c.defaultNode === 'none') continue;
+          if(c.defaultNode === 'default') {
+            c.selectedNode = c.defaultNode;
+          } else {
+            const nodeId = Number(c.defaultNode);
+            if(isNaN(nodeId)) continue;
+            for(const node of c.nodes) {
+              if(node._id !== nodeId) continue;
+              c.selectedNode = node;
+            }
+          }
+        }
+      }
+
 new Vue({
   el: '#app-publish-article',
   components: {
@@ -57,29 +74,39 @@ new Vue({
     pageState: window.state
   }),
   created(){
-    console.log(window.data)
+  
   },
   methods: {
+    removeEditor(){
+      console.log('1231');
+      this.$refs.content.removeEditor()
+    },
+    contentChange(length){
+      // if(length >= this.pageData.originalWordLimit){
+        this.$refs.original.contentChange(length)
+      // }
+    },
     readyData(submitFn){
       if(!submitFn){
         console.error('callback is not fined');
         return
       };
-      //  pageData.draftId
+      // pageData.draftId
       // pageData.post.parentPostId;
-      
+
       const refs =this.$refs;
       let submitData= {};
-      console.log(refs);
       for (const key in refs) {
-        console.log(key)
         if (refs.hasOwnProperty(key)) {
           const vue = refs[key];
           Object.assign( submitData, vue.getData()) 
         }
       }
+      // 添加 草稿id 和 parentPostId
+      submitData["did"] = this.pageData.draftId;
+      submitData["parentPostId"] = this.pageData.parentPostId;
       console.log(submitData,'data')
-      submitFn()
+      submitFn(submitData)
     }
   }
 })
@@ -106,37 +133,37 @@ window.data = undefined;
 
 
 
-$(function() {
+// $(function() {
 
-  window.data = NKC.methods.getDataById("data");
+//   window.data = NKC.methods.getDataById("data");
 
-  if(window.data?.threadCategories){
-    for(const c of window.data.threadCategories) {
-      c.selectedNode = null;
-      if(c.defaultNode === 'none') continue;
-      if(c.defaultNode === 'default') {
-        c.selectedNode = c.defaultNode;
-      } else {
-        const nodeId = Number(c.defaultNode);
-        if(isNaN(nodeId)) continue;
-        for(const node of c.nodes) {
-          if(node._id !== nodeId) continue;
-          c.selectedNode = node;
-        }
-      }
-    }
-  }
+//   if(window.data?.threadCategories){
+//     for(const c of window.data.threadCategories) {
+//       c.selectedNode = null;
+//       if(c.defaultNode === 'none') continue;
+//       if(c.defaultNode === 'default') {
+//         c.selectedNode = c.defaultNode;
+//       } else {
+//         const nodeId = Number(c.defaultNode);
+//         if(isNaN(nodeId)) continue;
+//         for(const node of c.nodes) {
+//           if(node._id !== nodeId) continue;
+//           c.selectedNode = node;
+//         }
+//       }
+//     }
+//   }
   
 
-  window.data.threadCategories.map(c => c.selectedNode = null);
+//   window.data.threadCategories.map(c => c.selectedNode = null);
 
-  // NKC.methods.ueditor.initDownloadEvent(editor);
-  // 实例化专栏模块，如果不存在构造函数则用户没有权限转发。
-  // 在提交数据前，读取专栏分类的时候，注意判断是否存在实例PostToColumn。
-  if(NKC.modules.SelectColumnCategories) {
-    window.PostToColumn = new NKC.modules.SelectColumnCategories();
-  }
-});
+//   // NKC.methods.ueditor.initDownloadEvent(editor);
+//   // 实例化专栏模块，如果不存在构造函数则用户没有权限转发。
+//   // 在提交数据前，读取专栏分类的时候，注意判断是否存在实例PostToColumn。
+//   if(NKC.modules.SelectColumnCategories) {
+//     window.PostToColumn = new NKC.modules.SelectColumnCategories();
+//   }
+// });
 
 
 // NKC.methods.selectedDraft = function(draft) {

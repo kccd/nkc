@@ -8,7 +8,7 @@
     div(v-else)
       .editor-cover-img
         img(:src="coverUrl" v-if="coverUrl")
-        img(:src="getUrl('postCover', cover)" v-else-if="cover")
+        //- img(:src="getUrl('postCover', cover)" v-else-if="cover")
       .m-t-05
         button.btn.btn-default.btn-sm(@click="selectCover") 重新选择
         button.btn.btn-default.btn-sm(@click="removeCover") 删除
@@ -19,8 +19,8 @@
 <script>
 import ResourceSelector from "../../lib/vue/ResourceSelector";
 import ImageSelector from "../../lib/vue/ImageSelector";
-import {blobToFile, fileToBase64} from "../../lib/js/file";
-
+import { fileToBase64 } from "../../lib/js/file";
+import { getUrl } from "../../lib/js/tools";
 export default {
   data: () => ({
     cover: "",
@@ -28,8 +28,18 @@ export default {
     type: "newThread"
   }),
   components: {
-    'resource-selector': ResourceSelector,
-    'image-selector': ImageSelector,
+    "resource-selector": ResourceSelector,
+    "image-selector": ImageSelector
+  },
+  props: {
+    "cover-value": {
+      type: String
+    }
+  },
+  created() {
+    if (this["cover-value"]) {
+      this.coverUrl = getUrl("postCover", this["cover-value"]);
+    }
   },
   methods: {
     selectCover() {
@@ -77,10 +87,12 @@ export default {
       this.coverData = "";
       this.coverUrl = "";
     },
-    getData(){
+    getData() {
       return {
         cover: this.cover,
-      }
+        coverData: this.coverData,
+        coverUrl: this.coverUrl
+      };
     }
   }
 };

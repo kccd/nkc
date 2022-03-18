@@ -19,42 +19,32 @@
         .checkbox
           .editor-auto-save(v-if="autoSaveInfo")
             .fa.fa-check-circle &nbsp;{{autoSaveInfo}}
-        if blockButton
-          .row
-            .col-xs-6.p-r-05
-              button.btn.btn-theme.btn-block(@click="submit" v-if="checkProtocol && !disabledSubmit") 提交
-              button.btn.btn-theme.btn-block(v-else disabled :title="!checkProtocol?'请先勾选同意遵守全部协议':''")
-                span(v-if="disabledSubmit")
-                  span 提交中...&nbsp;
-                  .fa.fa-spinner.fa-spin
-                span(v-else) 提交
-            .col-xs-6.p-l-05
-              button.btn.btn-default.btn-block(@click="saveToDraftBase") 存草稿
-        else
-          button.btn.btn-theme(@click="readyData" v-if="checkProtocol && !disabledSubmit") 提交
-          button.btn.btn-theme(v-else disabled :title="!checkProtocol?'请先勾选同意遵守全部协议':''")
-            span(v-if="disabledSubmit")
-              span 提交中...&nbsp;
-              .fa.fa-spinner.fa-spin
-            span(v-else) 提交
-          button.btn.btn-default(@click="saveToDraftBase") 存草稿
+        .row
+          .col-xs-6.p-r-05
+            button.btn.btn-theme.btn-block(@click="readyData" :disabled="disabledSubmit") {{disabledSubmit ? "提交中..." : "提交"}}
+          .col-xs-6.p-l-05
+            button.btn.btn-default.btn-block(@click="saveToDraftBase") 存草稿
 </template>
 
 <script>
 import { nkcAPI } from "../../lib/js/netAPI";
-import { timeFormat } from "../../lib/js/tools"
+import { timeFormat } from "../../lib/js/tools";
 export default {
   props: {
     blockButton: {
       default: true,
       type: Boolean
     },
-    notice:{
+    notice: {
       type: String
+    },
+    data: {
+      type: Object,
+      required: true
     }
   },
   data: () => ({
-    // thread = data.thread;
+    type: "newThread",
     disabledSubmit: false, // 锁定提交按钮
     checkProtocol: true, // 是否勾选协议
     // 当前用户是否有权限发表匿名内容
@@ -80,6 +70,10 @@ export default {
     }
   },
   methods: {
+    checkString: NKC.methods.checkData.checkString,
+    checkEmail: NKC.methods.checkData.checkEmail,
+    visitUrl: NKC.methods.visitUrl,
+
     setFloatDom() {
       const oldDom = $("#submit-scroll-sm");
       const scrollWidth = oldDom.width();
@@ -166,7 +160,7 @@ export default {
             return;
           }
         })
-        .then( ()=> {
+        .then(() => {
           let post = this.getPost();
           let desType, desTypeId;
           let type = this.type;
@@ -215,7 +209,7 @@ export default {
             formData
           );
         })
-        .then( data=> {
+        .then(data => {
           //保存草稿的全部内容长度
           if (data.contentLength) {
             this.oldContentLength = data.contentLength;
@@ -228,19 +222,18 @@ export default {
           }
           return Promise.resolve();
         })
-        .then( res=> {
+        .then(res => {
           const postButton = getPostButton();
           postButton.saveToDraftSuccess();
           sweetSuccess("草稿已保存");
         })
-        .catch( data=> {
+        .catch(data => {
           sweetError("草稿保存失败：" + (data.error || data));
         });
     },
-    checkAuthorInfos() {
-      let checkAuthorInfos = this.checkAuthorInfos;
-      for (let i = 0; i < checkAuthorInfos.length; i++) {
-        let info = checkAuthorInfos[i];
+    checkAuthorInfos(arr) {
+      for (let i = 0; i < arr.length; i++) {
+        let info = arr[i];
         this.checkString(info.name, {
           name: "作者姓名",
           minLength: 1,
@@ -287,13 +280,16 @@ export default {
       }
     },
     // 检测标题
-    checkTitle() {
-      if (this.title.length < 3) throw new Error("标题不能少于3个字");
-      if (this.title.length > 100) throw new Error("标题不能超过100个字");
+    checkTitle(v) {
+      if(!v){
+        throw new Error("标题不能少于3个字")
+      }
+      if (v.length < 3) throw new Error("标题不能少于3个字");
+      if (v.length > 100) throw new Error("标题不能超过100个字");
     },
     // 检测内容
-    checkContent() {
-      let contentText = $(this.content).text();
+    checkContent(v) {
+      let contentText = $(v).text();
       if (contentText.length > 100000) {
         throw new Error("内容不能超过10万字");
       }
@@ -302,129 +298,135 @@ export default {
       }
     },
     // 检测摘要
-    checkAbstract() {
-      this.checkString(this.abstractCn, {
+    checkAbstract(cn, en) {
+      this.checkString(cn, {
         name: "中文摘要",
         minLength: 0,
         maxLength: 1000
       });
-      this.checkString(this.abstractEn, {
+      this.checkString(en, {
         name: "英文摘要",
         minLength: 0,
         maxLength: 1000
       });
     },
     // 检测已选专业
-    checkForums() {
-      if (!this.selectedForumsId.length) throw "请至少选择一个专业";
-      for (let i = 0; i < this.selectedForums.length; i++) {
-        let f = this.selectedForums[i];
+    checkForums(v) {
+      if (!v.length) throw "请至少选择一个专业";
+      for (let i = 0; i < v.length; i++) {
+        let f = v[i];
         if (f.cid === null) throw "请选择完整的专业分类";
       }
     },
+    checkThreadCategory(v) {
+      for (const tc of v) {
+        if (tc.selectedNode === null) {
+          throw new Error(`请选择${tc.name}`);
+        }
+      }
+    },
     // 检测关键词
-    checkKeywords() {
-      if (this.keywordsLength > 50) throw "关键词数量超出限制";
+    checkKeywords(cn, en) {
+      if (cn.length + en.length > 50) throw "关键词数量超出限制";
     },
     //拿取其他组件数据
-    readyData(){
-      this.$emit('ready-data', data => this.submit(data))
+    readyData() {
+      this.$emit("ready-data", submitData => this.submit(submitData));
     },
-    submit() {
-      let post = {},
-        type;
+    submit(submitData) {
+      let type;
       Promise.resolve()
         .then(() => {
           // 锁住发表按钮
-          this.disablePostButton();
+          this.disabledSubmit = true;
           type = this.type;
-          post = this.getPost();
         })
         .then(() => {
           if (type === "newThread") {
             // 发新帖：从专业点发表、首页点发表、草稿箱
-            this.checkTitle();
-            this.checkContent();
-            this.checkAbstract();
-            this.checkForums();
-            this.checkThreadCategory();
-            this.checkKeywords();
-            this.checkAuthorInfos();
+            this.checkTitle(submitData.t);
+            this.checkContent(submitData.c);
+            this.checkAbstract(submitData.abstractCn, submitData.abstractEn);
+            this.checkForums(submitData.fids);
+            this.checkThreadCategory(this.data.threadCategories);
+            this.checkKeywords(submitData.keyWordsCn, submitData.keyWordsEn);
+            this.checkAuthorInfos(submitData.authorInfos);
             let formData = new FormData();
-            formData.append("body", JSON.stringify({ post: post }));
+            formData.append("body", JSON.stringify({ post: submitData }));
             if (this.coverData) {
               formData.append(
                 "postCover",
-                NKC.methods.blobToFile(this.coverData),
+                NKC.methods.blobToFile(submitData.coverData),
                 "cover.png"
               );
             }
-            return nkcUploadFile("/f/" + post.fids[0], "POST", formData);
+            return nkcUploadFile("/f/" + submitData.fids[0], "POST", formData);
           } else if (type === "newPost") {
             // 发表回复：从文章页点"去编辑器"、草稿箱
-            this.checkString(this.title, {
+            this.checkString(submitData.t, {
               name: "标题",
               minLength: 0,
               maxLength: 200
             });
-            this.checkContent();
-            return nkcAPI("/t/" + this.thread.tid, "POST", { post: post });
+            this.checkContent(submitData.c);
+            return nkcAPI("/t/" + this.data?.thread?.tid, "POST", {
+              post: submitData
+            });
           } else if (type === "modifyPost") {
             // 修改post
-            this.checkString(this.title, {
+            this.checkString(submitData.t, {
               name: "标题",
               minLength: 0,
               maxLength: 200
             });
-            this.checkContent();
+            this.checkContent(submitData.c);
             let formData = new FormData();
-            formData.append("body", JSON.stringify({ post: post }));
+            formData.append("body", JSON.stringify({ post: submitData }));
             if (this.coverData) {
               formData.append(
                 "postCover",
-                NKC.methods.blobToFile(this.coverData),
+                NKC.methods.blobToFile(submitData.coverData),
                 "cover.png"
               );
             }
             return nkcUploadFile("/p/" + this.post.pid, "PUT", formData);
           } else if (type === "modifyThread") {
             // 修改thread
-            this.checkTitle();
-            this.checkContent();
-            this.checkAbstract();
-            this.checkKeywords();
-            this.checkAuthorInfos();
+            this.checkTitle(submitData.t);
+            this.checkContent(submitData.c);
+            this.checkAbstract(submitData.abstractCn, submitData.abstractEn);
+            this.checkKeywords(submitData.keyWordsCn, submitData.keyWordsEn);
+            this.checkAuthorInfos(submitData.authorInfos);
             let formData = new FormData();
-            formData.append("body", JSON.stringify({ post: post }));
+            formData.append("body", JSON.stringify({ post: submitData }));
             if (this.coverData) {
               formData.append(
                 "postCover",
-                NKC.methods.blobToFile(this.coverData),
+                NKC.methods.blobToFile(submitData.coverData),
                 "cover.png"
               );
             }
-            return nkcUploadFile("/p/" + this.post.pid, "PUT", formData);
+            return nkcUploadFile("/p/" + this.data?.post?.pid, "PUT", formData);
           }
         })
         .then(data => {
-          editor.removeNoticeEvent();
-          this.showCloseInfo = false;
+          this.$emit('remove-editor')
           if (NKC.configs.platform === "reactNative") {
             NKC.methods.visitUrlAndClose(data.redirect);
           } else if (NKC.configs.platform === "apiCloud") {
             this.visitUrl(data.redirect || "/");
             setTimeout(function() {
+              //  api ？？？
               api.closeWin();
             }, 1000);
           } else {
             this.visitUrl(data.redirect || "/");
           }
-          // 解锁发表按钮
-          // PostButton.disabledSubmit = false;
         })
         .catch(err => {
           // 解锁发表按钮
-          this.enablePostButton();
+          this.disabledSubmit = false;
+
           sweetError(err);
         });
     }
@@ -437,7 +439,7 @@ export default {
   padding: 0.5rem 0;
   color: #9baec8;
 }
-.modifySubmit{
+.modifySubmit {
   position: fixed;
 }
 </style>
