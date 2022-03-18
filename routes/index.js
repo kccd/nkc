@@ -81,8 +81,6 @@ const commentRouter = routers.comment;
 const zoneRouter = routers.zone;
 // 首页关注
 const subscribeRouter = routers.subscribe;
-// 动态
-const momentRouter = routers.moment;
 //独立文章
 const articleRouter = routers.article;
 
@@ -169,6 +167,5 @@ router.use('/rc', resourceCategoryRouter.routes(), resourceCategoryRouter.allowe
 router.use('/comment', commentRouter.routes(), commentRouter.allowedMethods());
 router.use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods());
 router.use('/g', subscribeRouter.routes(), subscribeRouter.allowedMethods());
-router.use('/moment', momentRouter.routes(), momentRouter.allowedMethods());
 router.use('/article', articleRouter.routes(), articleRouter.allowedMethods());
 module.exports = router;
