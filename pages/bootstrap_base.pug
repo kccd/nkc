@@ -96,6 +96,7 @@ block body
   #rootApp(v-cloak)
     chat(ref='chat' v-if='hasLogged')
     login(ref='login' v-if='!hasLogged')
+    user-draw(ref="userDraw" v-if="hasLogged" )
   +includeJS('/global/root.js')
 
   block scripts

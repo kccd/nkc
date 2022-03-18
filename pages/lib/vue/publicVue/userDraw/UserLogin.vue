@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import {toLogin} from "../lib/js/account";
+import {toLogin} from "../../../js/account";
 
 export default {
   data: () => ({

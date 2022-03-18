@@ -2,6 +2,8 @@ import Chat from '../lib/vue/message/Chat';
 import Login from '../lib/vue/Login';
 import {RNOpenLoginPage, RNToChat} from "../lib/js/reactNative";
 import {getState} from "../lib/js/state";
+import initUserNav from "./userPanel";
+import UserDraw from "../lib/vue/publicVue/userDraw/UserDraw";
 import {initAppGlobalClickLinkEvent, initGlobalClickEvent, initGlobalLongPressEvent} from "./event";
 
 const {isApp, platform, uid} = getState();
@@ -15,6 +17,7 @@ window.RootApp = new Vue({
   components: {
     'chat': Chat,
     'login': Login,
+    "user-draw": UserDraw,
   },
   computed: {
     hasLogged() {
@@ -45,5 +48,15 @@ window.RootApp = new Vue({
         this.$refs.chat.showMessagePanel(uid);
       }
     },
+    //打开右侧抽屉
+    openDraw(type) {
+      this.$refs.userDraw.openDraw(type);
+    },
+    //关闭抽屉
+    closeDraw(type) {
+      this.$refs.userDraw.colseDraw(type);
+    }
   }
 });
+
+window.initUserNav = initUserNav;

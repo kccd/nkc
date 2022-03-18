@@ -5,7 +5,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
 
   .container-fluid(class=remoteState.navbar === 'standard'? 'max-width':'')
     .navbar-header
-      button.navbar-toggle.collapsed(onclick=`toggleNKCDrawer('left', ${remoteState.uid})`)
+      button.navbar-toggle.collapsed(onclick="window.RootApp.openDraw('left')")
         span.sr-only Toggle navigation
         span.icon-bar
         span.icon-bar
@@ -23,7 +23,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           .userInfo-m-point.message-switch.message-count(class="hidden")
           img(
             src=remoteState.userInfo.avatar
-            onclick=`toggleNKCDrawer('right', ${remoteState.uid})`
+            onclick="window.RootApp.openDraw('right')"
           )
       else
         .navbar-brand.userInfo-m
@@ -63,12 +63,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             .nav-user-content
               div
                 #userNav
-                  .user-nav-container(v-if="show && !loading")
-                    user-nav(:user="anvState")
-                  .left-draw-loading(v-else)
-                    .loading
-                      .fa.fa-spinner.fa-spin.fa-fw
-                      .loading-text 加载中
+                  user-panel(ref="userPanel")
             img.nav-user-avatar-sm(src=remoteState.userInfo.avatar)
         else
           li.userInfo
@@ -81,59 +76,6 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         button.btn.btn-default(onclick=`NKC.methods.search("navSearchInputMD")`)
           .fa.fa-search
 
-//- 侧滑抽屉
-//- nkc-drawer-left 暂时屏蔽
-.nkc-drawer-left
-  .nkc-drawer-left-mask(onclick="closeNKCDrawer('left')")
-  .nkc-drawer-left-body
-    #drawLeft
-      .left-draw-container(v-if="show && !loading")
-        .m-a-1
-          include ../post_button
-        .navbar-link
-          .col-xs-3
-            a(href='/?t=latest') 最新
-          .col-xs-3
-            if remoteState.uid
-              a(href='/g/moment') 关注
-            else
-              a(onclick="RootApp.openLoginPanel()") 关注
-          .col-xs-3
-            a(href=`/m`) 专栏
-          .col-xs-3
-            a(href=`/c`) 社区
-        .m-a-1#navbar_custom_dom
-        .m-a-1
-          Management(:management="management")
-          Apps(:permission="permission")
-          Forums(:forums="categoryForums")
-          //include ../management/management
-          //include ../subscribeTypes/subscribeTypesPanel
-          //include ../apps/apps
-          //include ../forums_nav/forums_tree
-      .left-draw-loading(v-else)
-        .loading
-          .fa.fa-spinner.fa-spin.fa-fw
-          .loading-text 加载中
 
-//- nkc-drawer-right 暂时屏蔽
-.nkc-drawer-right
-  .nkc-drawer-right-mask(onclick="closeNKCDrawer('right')")
-  .nkc-drawer-right-body
-    #drawRight
-      .right-draw-container(v-if="show && !loading")
-        .right-draw-content(v-if="drawState.uid")
-          user-vue(:remote="drawState")
-          user-draw-count(:user="user")
-          user-list(
-            :user="user"
-            :column="drawState.userInfo.userColumn"
-            :permission="drawState.columnPermission"
-            :count="drawState.newMessageCount"
-            )
-          a(onclick="NKC.methods.logout()").nkc-drawer-exit 退出登录
-      .left-draw-loading(v-else)
-        .loading
-          .fa.fa-spinner.fa-spin.fa-fw
-          .loading-text 加载中
+
 

@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import {getUrl} from "../lib/js/tools";
+import {getUrl} from "../../../js/tools";
 export default {
   props: ["scores", "xsf", "sicon", "xsficon"],
   data: () => ({

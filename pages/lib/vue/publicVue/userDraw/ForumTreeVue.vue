@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import SimpleForums from "./renderSimpleForums"
+import SimpleForums from "../../../../publicModules/forums_nav/renderSimpleForums"
 export default {
   props: ["forums"],
   data: () => ({
