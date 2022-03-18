@@ -32,7 +32,7 @@
       | 正在编辑&nbsp;
       a(:href="data.forum.url" target="_blank") {{data.forum.title}}
       | &nbsp;的最新页板块公告
-    input.editor-title(placeholder="请输入标题..." id="title" v-model="titleValue" @change="getTitleValue()" )  
+    input.editor-title(placeholder="请输入标题..." id="title" v-model="titleValue" )  
     hr
 </template>
 <script>
@@ -51,6 +51,9 @@ export default {
     titleValue: "",
     openOnEditNotes: localStorage.getItem("open-on-edit-notes") === "yes",
   }),
+  created(){
+    this.titleValue = this.data?.post?.t || ""
+  },
   watch: {
     openOnEditNotes(boolean) {
       localStorage.setItem("open-on-edit-notes", boolean ? "yes" : "no");

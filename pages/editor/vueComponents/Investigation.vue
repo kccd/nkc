@@ -358,22 +358,20 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      console.log(1231321)
+      console.log(1231321);
       this.initPostSurvey();
     });
   },
   methods: {
-    checkNumber: NKC.methods.checkData.checkNumber,
-    checkString: NKC.methods.checkData.checkString,
     getUrl: NKC.methods.tools.getUrl,
     init(options) {
-        console.log(this.survey,'this.survey')
+      console.log(this.survey, "this.survey");
 
       options = options || {};
       if (options.pid) this.newSurvey.pid = options.pid;
       if (options.surveyId) {
         nkcAPI("/survey/" + options.surveyId, "GET")
-          .then( data => {
+          .then(data => {
             for (var i = 0; i < data.survey.options.length; i++) {
               var option = data.survey.options[i];
               option.links_ = this.modifyLinks(option.links);
@@ -389,17 +387,14 @@ export default {
             this.disabled = false;
             this.users = data.allowedUsers;
             this.targetUser = data.targetUser;
-            this.setTime(
-              new Date(this.survey.st),
-              new Date(this.survey.et)
-            );
+            this.setTime(new Date(this.survey.st), new Date(this.survey.et));
           })
           .catch(function(data) {
             sweetError(data);
           });
       } else {
         this.survey = this.newSurvey;
-        console.log(this.survey,'this.survey')
+        console.log(this.survey, "this.survey");
       }
     },
     getSurveyData() {
@@ -651,6 +646,7 @@ export default {
       throw err;
     },
     submit: function() {
+      console.log(123);
       if (this.disabled) return;
       this.error = "";
       var survey = JSON.parse(JSON.stringify(this.survey));
@@ -696,6 +692,8 @@ export default {
       survey.reward.onceKcb = parseFloat(survey.reward.onceKcb || 0);
       survey.reward.rewardCount = parseInt(survey.reward.rewardCount || 0);
       survey.reward.onceKcb = survey.reward.onceKcb * 100;
+      console.log(survey, "survey");
+
       return survey;
     },
     requestData() {
@@ -741,24 +739,24 @@ export default {
       $("#disabledSurveyButton").hide();
     },
     initPostSurvey() {
-      
-        this.init({ surveyId: this.data?.post?.surveyId || "" });
-        if (this.data.type !== "newThread") {
-          this.hideButton();
-        }
-        if (this.data.post && this.data.post.surveyId) {
-          this.disabledSurveyForm();
-        }
-      
+      this.init({ surveyId: this.data?.post?.surveyId || "" });
+      if (this.data.type !== "newThread") {
+        this.hideButton();
+      }
+      if (this.data.post && this.data.post.surveyId) {
+        this.disabledSurveyForm();
+      }
     },
     disabledSurveyForm() {
       this.disabled = !this.disabled;
-      console.log(this.disabled)
+      console.log(this.disabled);
     },
     getData() {
-      return {
-        survey: this.getSurvey()
-      };
+      if (this.getSurvey()) {
+        return {
+          survey: this.getSurvey()
+        };
+      }
     }
   }
 };
@@ -804,44 +802,43 @@ export default {
 .btn {
   vertical-align: top;
 }
- .survey-type{
+.survey-type {
   display: inline-block;
   margin-right: 1rem;
   cursor: pointer;
   padding-top: 7px;
 }
- .survey-type span{
+.survey-type span {
   font-weight: 700;
 }
- .survey-type .fa{
+.survey-type .fa {
   margin-right: 0.3rem;
   font-size: 15px;
   color: green;
 }
- .survey-type .fa-circle-o{
+.survey-type .fa-circle-o {
   color: #555;
 }
- .option-answers{
+.option-answers {
   padding: 0.5rem;
   padding-left: 2rem;
   /*background-color: #eee;*/
-
 }
- .add-option-button{
+.add-option-button {
   cursor: pointer;
   font-weight: 700;
   /*color: #2b90d9;*/
 }
- .survey-option{
+.survey-option {
   padding: 0.5rem;
   margin-bottom: 1rem;
   background-color: #f4f4f4;
   border-radius: 3px;
 }
- .survey-option:first-child{
+.survey-option:first-child {
   border-top: none;
 }
- .survey-option .fa{
+.survey-option .fa {
   cursor: pointer;
   font-size: 1.2rem;
   color: #888;
@@ -849,19 +846,19 @@ export default {
   width: 1.5rem;
   text-align: center;
 }
- .survey-options{
+.survey-options {
   margin-top: 0.5rem;
 }
- .option-index{
+.option-index {
   font-weight: 700;
   font-size: 1.3rem;
-  margin-bottom:0.5rem;
+  margin-bottom: 0.5rem;
 }
- .option-resources{
+.option-resources {
   margin-top: 0.5rem;
   font-size: 0;
 }
- .option-resource {
+.option-resource {
   height: 5rem;
   display: inline-block;
   width: 7rem;
@@ -869,23 +866,22 @@ export default {
   background-color: #000;
   margin: 0 0.5rem 0.5rem 0;
 }
- .option-resource-img{
+.option-resource-img {
   height: 100%;
   width: 100%;
   background-size: cover;
 }
- .option-resource{
+.option-resource {
   font-size: 0;
   cursor: pointer;
   position: relative;
   text-align: center;
-
 }
- .option-resource img{
+.option-resource img {
   max-height: 100%;
   max-width: 100%;
 }
- .option-resource .fa{
+.option-resource .fa {
   position: absolute;
   display: none;
   top: 0;
@@ -895,43 +891,43 @@ export default {
   text-align: center;
   line-height: 2rem;
   width: 2rem;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   color: #fff;
 }
- .option-resource:hover .fa{
+.option-resource:hover .fa {
   display: block;
 }
 @media (max-width: 991px) {
-   .option-resource .fa{
+  .option-resource .fa {
     display: block;
   }
 }
- .survey-answers{
+.survey-answers {
   background-color: #f4f4f4;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
 }
- .survey-answer{
+.survey-answer {
   margin-bottom: 0.5rem;
 }
- .survey-scores input{
+.survey-scores input {
   max-width: 3rem;
 }
-.module-survey-form .option-content{
+.module-survey-form .option-content {
   font-weight: 700;
   /*margin-bottom: 0.5rem;*/
 }
-.module-survey-form .survey-form-description{
+.module-survey-form .survey-form-description {
   font-size: 1.4rem;
   font-weight: 700;
 }
-.module-survey-form .option-resource>img{
+.module-survey-form .option-resource > img {
   height: 6rem;
   cursor: pointer;
   margin-right: 0.5rem;
   margin-bottom: 0.3rem;
 }
-.module-survey-form .option-resource>div{
+.module-survey-form .option-resource > div {
   height: 6rem;
   display: inline-block;
   width: 9rem;
@@ -941,14 +937,14 @@ export default {
   cursor: pointer;
   background-size: cover;
 }
-.module-survey-form .survey-form-option{
+.module-survey-form .survey-form-option {
   margin: 1rem 0;
 }
-.module-survey-form .option-links{
+.module-survey-form .option-links {
   display: table-cell;
   vertical-align: top;
 }
-.module-survey-form .option-link{
+.module-survey-form .option-link {
   width: 100%;
   overflow: hidden;
   cursor: pointer;
@@ -958,14 +954,14 @@ export default {
   word-break: break-all;
   height: 1.5rem;
 }
-.module-survey-form .option-content{
+.module-survey-form .option-content {
   position: relative;
   padding-right: 6rem;
 }
-.module-survey-form .option-content.option-survey{
+.module-survey-form .option-content.option-survey {
   padding-right: 0;
 }
-.module-survey-form .option-button{
+.module-survey-form .option-button {
   width: 6rem;
   position: absolute;
   top: 0;
@@ -974,72 +970,72 @@ export default {
   font-size: 1.4rem;
   cursor: pointer;
 }
-.module-survey-form .option-button select{
+.module-survey-form .option-button select {
   font-size: 1.2rem;
   font-weight: normal;
 }
-.module-survey-form .option-button span.score{
+.module-survey-form .option-button span.score {
   font-size: 1.2rem;
   font-weight: normal;
   color: #667282;
 }
-.module-survey-form .option-button .fa.fa-square-o{
+.module-survey-form .option-button .fa.fa-square-o {
   color: #888;
 }
-.module-survey-form .option-button .fa.fa-check-square-o{
+.module-survey-form .option-button .fa.fa-check-square-o {
   color: #2b90d9;
 }
-.module-survey-form .form-warning{
+.module-survey-form .form-warning {
   color: #808080;
   margin-bottom: 0.5rem;
 }
-.module-survey-form .option-answer span.active{
+.module-survey-form .option-answer span.active {
   font-size: 1.2rem;
   font-weight: 700;
   color: #2b90d9;
 }
-.module-survey-form .option-answers{
+.module-survey-form .option-answers {
   padding-left: 1rem;
 }
-.module-survey-form .option-answer.error{
+.module-survey-form .option-answer.error {
   border: 3px solid #ff5200;
 }
-.module-survey-form .option-answer{
+.module-survey-form .option-answer {
   background-color: #f6f6f6;
   margin: 0.5rem 0;
   border-radius: 3px;
   padding: 0.5rem;
 }
-.module-survey-form .option-content{
+.module-survey-form .option-content {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   font-size: 1.25rem;
   /*background-color: #f4f4f4;*/
 }
-.module-survey-form .answer-content{
+.module-survey-form .answer-content {
   background-color: #f6f6f6;
   font-weight: normal;
   padding-right: 0;
   font-size: 1.2rem;
   margin-bottom: 0;
 }
-.module-survey-form .answer-content .option-button{
+.module-survey-form .answer-content .option-button {
   width: 10rem;
 }
-.module-survey-form .survey-score-input{
+.module-survey-form .survey-score-input {
   max-width: 2rem;
   font-size: 1.2rem;
 }
-.module-survey-form .survey-score-score{
+.module-survey-form .survey-score-score {
   font-size: 1rem;
 }
-.module-survey-form .option-status{
+.module-survey-form .option-status {
   position: relative;
   overflow: hidden;
   height: 2rem;
   line-height: 2rem;
 }
-.module-survey-form .option-status .number{
+.module-survey-form .option-status .number {
   position: absolute;
   transition: width 2s;
   top: 0;
@@ -1047,21 +1043,21 @@ export default {
   height: 8px;
   border-radius: 4px;
 }
-.module-survey-form .number-background{
+.module-survey-form .number-background {
   position: absolute;
   border-radius: 4px;
   top: 0;
   left: 0;
   width: 100%;
   height: 8px;
-  background-color: rgba(0,0,0,0.05);
+  background-color: rgba(0, 0, 0, 0.05);
 }
-.module-survey-form .option-status-container{
+.module-survey-form .option-status-container {
   position: relative;
   margin-right: 8rem;
   margin-top: 0.6rem;
 }
-.module-survey-form .option-status-info{
+.module-survey-form .option-status-info {
   position: absolute;
   top: 0;
   width: 8rem;
@@ -1074,64 +1070,64 @@ export default {
   color: #9baec8;
   right: 0;
 }
-.module-survey-form .option-status-info.survey-score{
+.module-survey-form .option-status-info.survey-score {
   width: 100%;
   position: relative;
   padding-top: 0.3rem;
   text-align: right;
 }
-.module-survey-form .form-post-users a{
+.module-survey-form .form-post-users a {
   display: inline-block;
   margin-right: -1rem;
 }
-.module-survey-form .form-post-users a img{
+.module-survey-form .form-post-users a img {
   height: 3rem;
   width: 3rem;
   border: 2px solid #f4f4f4;
   border-radius: 50%;
 }
-.module-survey-form .option-score-input{
+.module-survey-form .option-score-input {
   display: inline-block;
   color: #888;
 }
-.module-survey-form .option-score-input input{
+.module-survey-form .option-score-input input {
   width: 4rem;
 }
-.module-survey-form .option-score-input .score{
+.module-survey-form .option-score-input .score {
   font-size: 1.2rem;
   font-weight: 700;
   /*color: #9baec8;*/
   display: inline;
 }
-.module-survey-form .option-score-limit{
+.module-survey-form .option-score-limit {
   display: inline-block;
 }
 
-.module-survey-form .option-select-count{
+.module-survey-form .option-select-count {
   text-align: right;
   font-size: 1.2rem;
   color: #9baec8;
 }
 
- .selected-users{
+.selected-users {
   padding: 0.5rem 0;
 }
- .selected-user{
+.selected-user {
   font-size: 0;
   display: inline-block;
   margin: 0 0.5rem 0.5rem 0;
   vertical-align: top;
 }
- .selected-user-avatar img{
+.selected-user-avatar img {
   height: 2rem;
   width: 2rem;
   border-radius: 3px 0 0 3px;
 }
- .selected-user-avatar{
+.selected-user-avatar {
   display: inline-block;
   vertical-align: top;
 }
- .selected-user-name{
+.selected-user-name {
   vertical-align: top;
   display: inline-block;
   height: 2rem;
@@ -1142,8 +1138,7 @@ export default {
   background-color: #999;
   color: #fff;
 }
- .selected-user-name .fa{
+.selected-user-name .fa {
   cursor: pointer;
 }
-
 </style>
