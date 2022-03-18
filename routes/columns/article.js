@@ -10,88 +10,149 @@ router.get('/:aid', async (ctx, next)=>{
   }
   const { user } = data;
   const {_id, aid} = params;
-  let columnPost = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid);
-  const {article: articleSource} = await db.CommentModel.getCommentSources();
-  const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
-  let {_id: articleId} = columnPost.article.articleInfo;
-  const article = await db.ArticleModel.findOnly({_id: articleId});
-  //文章阅读量加一
-  await article.addArticleHits();
-  const isModerator = await article.isModerator(state.uid);
-  //获取当前文章信息
-  // const _article = await db.ArticleModel.extendDocumentsOfArticles([article], 'stable', [
-  //   '_id',
-  //   'uid',
-  //   'status',
-  // ]);
-  const _article = (await db.ArticleModel.getArticlesInfo([article]))[0];
-  data.article = _article;
-  //获取文章链接
-  const baseUrl = _article.url;
-  data.articleStatus = _article.document.status;
-  const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
-  if(_article.document.status !== normalStatus && !isModerator) {
-    if(!permission('review')) {
-      return ctx.throw(403, '权限不足');
+  let columnPostData = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid, user.xsf);
+  data.columnPost = columnPostData;
+  data.columnPost.collected = false;
+  const {article, thread} = await db.ColumnPostModel.getColumnPostTypes();
+  let isModerator;
+  if(columnPostData.type === article) {
+    //获取文章的评论信息
+    const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
+    const _article = columnPostData.article;
+    const article = await db.ArticleModel.findOnly({_id: _article._id});
+    isModerator = await article.isModerator(state.uid);
+    const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
+    if(_article.status !== normalStatus && !isModerator) {
+      if(!permission('review')) {
+        return ctx.throw(403, '权限不足');
+      }
     }
+    let match = {
+    };
+    //只看作者
+    if(t === 'author') {
+      data.t = t;
+      match.uid = _article.uid;
+    }
+    const permissions = {
+    };
+    //文章收藏数
+    data.columnPost.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);
+    if(user) {
+      //用户是否是作者
+      if(permission('review')) {
+        permissions.reviewed = true;
+      } else {
+        match.status = commentStatus;
+      }
+      //是否收藏文章
+      const collection = await db.SubscribeModel.findOne({cancel: false, uid: data.user.uid, tid: article._id, type: "article"});
+      if(collection) {
+        data.columnPost.collected = true;
+      }
+      //禁用和退修权限
+      if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {
+        permissions.disabled = true
+      }
+    }
+    //获取评论分页
+    const count = await db.CommentModel.countDocuments(match);
+    const paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
+    data.paging = paging;
+    //获取该文章下当前用户编辑了未发布的评论内容
+    const m = {
+      uid: state.uid,
+      status: defaultComment,
+    };
+    let comment = await db.CommentModel.getCommentsByArticleId({match: m, source: _article.source, aid: _article._id,});
+    //获取该文章下的评论
+    let comments = await db.CommentModel.getCommentsByArticleId({match, paging, source: _article.source, aid: _article._id,});
+    if(comments && comments.length !== 0) {
+      comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions});
+    }
+    if(comment && comment.length !== 0) {
+      //拓展单个评论内容
+      comment = await comment[0].extendEditorComment();
+      if(comment.type === 'beta') {
+        data.comment = comment || '';
+      }
+    }
+    data.article = _article;
+    data.permissions = permissions;
+    data.comments = comments || [];
+    //文章浏览数加一
+    await article.addArticleHits();
+  } else if(columnPostData.type === thread) {
+    //获取论坛文章的评论
+    const thread = await db.ThreadModel.findOnly({tid: columnPostData.thread.tid});
+    //
+    if(!thread) ctx.throw(400, '未找到文章，请刷洗');
+    //判断用户是否具有专家权限
+    isModerator = await db.ForumModel.isModerator(state.uid, thread.mainForumsId);
+    //文章收藏数
+    data.columnPost.collectedCount = await db.ThreadModel.getCollectedCountByTid(thread.tid);
+    //获取用户是否收藏文章
+    if(user) {
+      const collection = await db.SubscribeModel.findOne({cancel: false, uid: data.user.uid, tid: thread.tid, type: "collection"});
+      if(collection) {
+        data.columnPost.collected = true;
+      }
+    }
+    // 文章处于待审核的状态
+    // 若当前用户不是专家、不是作者，则在此抛出403
+    if(!thread.reviewed) {
+      if(!data.user || (!isModerator && data.user.uid !== thread.uid)) ctx.throw(403, "文章还未通过审核，暂无法阅读");
+    }
+    // 文章处于已被退回的状态
+    if(thread.recycleMark) {
+      // 用户不具有专家权限
+      if(!isModerator) {
+        // 访问用户没有查看被退回文章的权限，且不是自己发表的文章则抛出403
+        if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
+          if(!data.user || thread.uid !== data.user.uid) ctx.throw(403, '文章已被退回修改，暂无法阅读。');
+        }
+      }
+      // 获取文章被退回的原因
+      const threadLogOne = await db.DelPostLogModel.findOne({"threadId":thread.tid,"postType":"thread","delType":"toDraft","modifyType":false}).sort({toc: -1});
+      thread.reason = threadLogOne.reason || '';
+    }
+    //文章回复查询规则 只查询状态正常的回复
+    const match = {
+      tid: thread.tid,
+      type: 'post',
+      parentPostsId: {
+        $size: 0
+      },
+      reviewed: true,
+      disabled: false,
+      toDraft: {$ne: true},
+    };
+    //获取分页设置
+    const {pageSettings} = state;
+    //获取当前文章下的回复总数
+    const count = await db.PostModel.countDocuments(match);
+    //获取文章下的所有回复
+    const paging = nkcModules.apiFunction.paging(page, count, pageSettings.threadPostList)
+    data.paging = paging;
+    //加载回复
+    let posts = await db.PostModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    const options = {
+      uid: data.user?data.user.uid:'',
+      visitor: data.user,
+    };
+    //拓展专栏的文章回复
+    posts = await db.PostModel.extendPostsByColumn(posts, options);
+    data.columnPost.posts  = posts;
+    // 文章访问量加1
+    await thread.updateOne({$inc: {hits: 1}});
+  } else {
+    return;
   }
-  let match = {
-  };
-  //只看作者
-  if(t === 'author') {
-    data.t = t;
-    match.uid = _article.uid;
-  }
-  const permissions = {
-  };
-  data.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);
-  data.collected = false
-  if(user) {
-    if(permission('review')) {
-      permissions.reviewed = true;
-    } else {
-      match.status = commentStatus;
-    }
-    const collection = await db.SubscribeModel.findOne({cancel: false, uid: data.user.uid, tid: article._id, type: "article"});
-    if(collection) {
-      data.collected = true
-    }
-    //禁用和退修权限
-    if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {
-      permissions.disabled = true
-    }
-  }
-  // if(!isModerator || !permission("review")) {
-  //   match.
-  // }
-  const count = await db.CommentModel.countDocuments(match);
-  const paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
-  data.paging = paging;
-  //获取该文章下当前用户编辑了未发布的评论内容
-  const m = {
-    uid: state.uid,
-    status: defaultComment,
-  };
-  let comment = await db.CommentModel.getCommentsByArticleId({match: m, source: _article.source, aid: _article._id,});
-  //获取该文章下的评论
-  let comments = await db.CommentModel.getCommentsByArticleId({match, paging, source: _article.source, aid: _article._id,});
-  if(comments && comments.length !== 0) {
-    comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions});
-  }
-  if(comment && comment.length !== 0) {
-    //拓展单个评论内容
-    comment = await comment[0].extendEditorComment();
-    if(comment.type === 'beta') {
-      data.comment = comment || '';
-    }
+  if(isModerator) {
+    data.isModerator =  isModerator;
   }
   const hidePostSettings = await db.SettingModel.getSettings("hidePost");
-  data.baseUrl = baseUrl;
-  data.permissions = permissions;
-  data.isModerator =  isModerator;
   data.postHeight = hidePostSettings.postHeight;
-  data.columnPost = columnPost;
-  data.comments = comments || [];
   await next();
 })
 module.exports = router;

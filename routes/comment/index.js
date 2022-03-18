@@ -91,18 +91,20 @@ router
       content,
       quoteDid,
       type,
-      commentId
+      commentId,
+      commentType, //用于判断当前提交的数据的sid是articleId还是articlePostId
     } = body;
-    let article = await db.ArticleModel.findOnly({_id: sid});
+    let articlePost;
+    //当sid为comment的sid时
+    if(commentType === 'comment') {
+      //获取引用id
+      articlePost = await db.ArticlePostModel.findOnly({_id: sid});
+      if(!articlePost) ctx.throw(400, '未找到引用，请刷新');
+    }
+    let article = await db.ArticleModel.findOnly({_id: articlePost?articlePost.sid:sid});
     if(!article) ctx.throw(400, '未找到文章，请刷新后重试');
-    article = (await db.ArticleModel.extendDocumentsOfArticles([article], 'stable', [
-      '_id',
-      'status',
-      'uid'
-    ]))[0];
-    if(!article) ctx.throw(404, '未找到对应文章，或文章状态异常');
     const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
-    if(article.document.status !== normalStatus) {
+    if(article.status !== normalStatus) {
       return ctx.throw(403, '文章状态异常');
     }
     if(!['modify', 'publish', 'create', 'save'].includes(type)) ctx.throw(400, `未知的提交类型 type: ${type}`);

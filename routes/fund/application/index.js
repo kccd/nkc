@@ -47,7 +47,7 @@ applicationRouter
 		  data.userRoles, data.userGrade, data.user
     );
 		await applicationForm.extendApplicationFormInfo(state.uid, accessForumsId);
-    data.targetUserInFundBlacklist = await db.FundBlacklistModel.inBlacklist(applicationForm.uid);
+		data.targetUserInFundBlacklist = await db.FundBlacklistModel.inBlacklist(applicationForm.uid);
     ctx.template = 'fund/applicationForm/applicationForm.pug';
 		await next();
 	})

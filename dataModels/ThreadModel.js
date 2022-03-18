@@ -307,8 +307,8 @@ threadSchema.virtual('reason')
 		this._reason = reason;
 	});
 /* 返回此片文章作者的通讯方式
-* @params {String} tid 
-*/ 
+* @params {String} tid
+*/
 threadSchema.statics.getAuthorCommunicationMode = async (tid)=>{
   const ThreadModel = mongoose.model('threads')
   const communication = await ThreadModel.getThreadByTid(tid)
@@ -322,7 +322,7 @@ threadSchema.statics.getAuthorCommunicationMode = async (tid)=>{
   return communicationMode
 }
 /*得到该整条记录
-*@params {String} tid 
+*@params {String} tid
 */
 threadSchema.statics.getThreadByTid = async (tid)=>{
   const ThreadModel = mongoose.model('threads')
@@ -2209,5 +2209,53 @@ threadSchema.methods.extendThreadCategories = async function() {
   this.threadCategoriesWarning = threadCategoriesWarning;
   return this.threadCategories = threadCategories;
 };
+
+/*
+* 根据专栏引用获取文章thread信息
+* */
+threadSchema.statics.getThreadInfoByColumn = async function(columnPost) {
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const UserModel = mongoose.model('users');
+  const ColumnModel = mongoose.model('columns');
+  const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
+  const ResourceModel = mongoose.model('resources');
+  const {getUrl} = require('../nkcModules/tools');
+  const {tid, pid, columnId, cid, mcid} = columnPost;
+  // thread 中 包括需要的 回复数 观看数
+  let thread = await ThreadModel.findThreadById(tid);
+  thread = thread.toObject()
+  // 文章主体内容
+  let post = await PostModel.getPostByPid(pid)
+  post = post.toObject()
+  // 查找用户
+  let user = await UserModel.findOne({uid: post.uid})
+  user = user.toObject()
+  // 收藏数
+  let collect = await ThreadModel.getCollectedCountByTid(tid)
+  //获取专栏名和id
+  let column = await ColumnModel.findOne({_id: columnId})
+  column = column.toObject()
+  // 获取当前专栏下一篇文章的分类及其父级
+  const mainCategory = await ColumnPostCategoryModel.getParentCategoryByIds(cid)
+  const auxiliaryCategory = await ColumnPostCategoryModel.getMinorCategories(columnId, mcid)
+  //获取文章的链接
+  const url = getUrl('thread', thread.tid);
+  //获取引用的所有资源
+  const resources = await ResourceModel.getResourcesByReference(pid);
+  return {
+    _id: columnPost._id,
+    thread,
+    article:post,
+    column,
+    collectedCount: collect,
+    resources,
+    user,
+    mainCategory,
+    auxiliaryCategory,
+    type: columnPost.type,
+    url,
+  };
+}
 
 module.exports = mongoose.model('threads', threadSchema);

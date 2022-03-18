@@ -1,28 +1,30 @@
 import {getDataById} from "../../lib/js/dataConversion";
 const data = getDataById('data');
 import CommentEditor from "../../lib/vue/comment/CommentEditor";
-import {delUrlParam, addUrlParam} from "../../lib/js/tools";
-const commentEditor = new Vue({
-  el: "#commentEditor",
-  data: {
-    comment: data.comment || null,
-    articleId: data.article._id || '',
-  },
-  components: {
-    "comment-editor": CommentEditor
-  },
-  mounted() {
-    this.initId();
-  },
-  methods: {
-    initId() {
+if(data.type === 'article') {
+  window.commentEditor = new Vue({
+    el: "#commentEditor",
+    data: {
+      comment: data.comment || null,
+      articleId: data.article._id || '',
     },
-    //引用评论
-    quoteComment(docId) {
-      this.$refs.commentEditor.changeQuote(docId, 'article');
+    components: {
+      "comment-editor": CommentEditor
+    },
+    mounted() {
+      this.initId();
+    },
+    methods: {
+      initId() {
+      },
+      //引用评论
+      quoteComment(docId) {
+        this.$refs.commentEditor.changeQuote(docId, 'article');
+      }
     }
-  }
-})
+  })
+}
+
 
 import CommentOptions from "../../comment/CommentOptions";
 import DisabledComment from "../../lib/vue/DisabledComment";
@@ -185,7 +187,6 @@ function disabledArticleComment(commentsDocId) {
   NKC.methods.disabledDocuments(commentsDocId);
 }
 
-window.commentEditor = commentEditor;
 window.singleCommentBottom = singleCommentBottom;
 
 Object.assign(window, {
