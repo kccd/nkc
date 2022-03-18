@@ -1,3 +1,5 @@
+import {getSocket} from "../lib/js/socket";
+const socket = getSocket();
 var SubscribeTypes, surveyForms = [], draftId = "", author = {};
 const commonModel = new NKC.modules.CommonModal();
 window.Attachments = undefined;
@@ -1229,6 +1231,7 @@ $(function() {
 			window.location.hash = hash;
 		}, 1000)
 	}
+
 	if(NKC.configs.uid && socket) {
 		NKC.methods.setThreadListNewPostCount($('#threadId').text().trim(), 0);
 		window.bulletComments = new NKC.modules.BulletComments({

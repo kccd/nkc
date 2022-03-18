@@ -1,5 +1,6 @@
 <template lang="pug">
   .modal.fade.module-login(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+    verifications(ref="verifications")
     .modal-dialog(role="document").module-login-app
       .modal-content
         .modal-header
@@ -104,7 +105,7 @@
                     div(v-else)
 
                       button.btn.post-button.register-step(v-if='registerStep === 2' @click='changeStep(1)') 上一步
-                      button.btn.post-button.register-step(v-if='registerStep === 1' @click='changeStep(2)') 下一步
+                      button.btn.post-button.register-step.m-l-05(v-if='registerStep === 1' @click='changeStep(2)') 下一步
 
                       button.btn.post-button(@click="submit" v-if="!submitting && registerStep === 2 && !submitting") 注册
                       button.btn.post-button(v-if='submitting')
@@ -242,6 +243,7 @@
 </style>
 
 <script>
+  import Verifications from './Verifications';
   import {getState} from '../js/state';
   import {
     RNCloseWebview,
@@ -258,6 +260,9 @@
   let timeout, loginBehavior = [];
 
   export default {
+    components: {
+      'verifications': Verifications
+    },
     data: () => ({
       isApp,
       websiteBrief,
@@ -425,7 +430,7 @@
           url = "/sendMessage/login";
 
         }
-        verifications
+        this.$refs.verifications
           .open()
           .then(function(data) {
             body.verifySecret = data.secret;

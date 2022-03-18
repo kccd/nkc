@@ -582,9 +582,6 @@ block scripts
   include ../post/options/options
   include ../publicModules/commonModal/commonModal
 
-  //- 通用socket
-  if data.user
-    +includeJS('/message/connectSocket.js')
   //- 违规记录模块 NKC.modules.violationRecord
   if permission("violationRecord")
     include ../publicModules/violationRecord/violationRecord.pug

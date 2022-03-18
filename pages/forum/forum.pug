@@ -298,9 +298,6 @@ block content
         include ../publicModules/scrollTo
 
 block scripts
-  //- 通用socket
-  if data.user
-    +includeJS('/message/connectSocket.js')
   include ../publicModules/subscribeTypes/subscribeTypes
   if data.type === "home"
     include ../publicModules/nkcSource
