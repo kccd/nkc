@@ -58,6 +58,7 @@ block content
         if data.postPermission && data.postPermission.warning
           .m-b-1.text-danger.p-a-1!=data.postPermission.warning
         div
+          //- 标题 
           #notes.m-b-1.m-t-1.m-l-05.m-r-05(v-cloak)
             if data.type === "newPost"
               .editor-type-info
@@ -110,6 +111,7 @@ block content
             image-selector(ref="imageSelector")
             resource-selector(ref="resourceSelector")
             hr
+            //- 专业分类
             .m-b-2(v-if="['newThread'].indexOf(type) !== -1")
               .editor-header 专业分类
               .m-b-1
@@ -171,6 +173,7 @@ block content
                       )
                       span {{c.nodeName}}
                   .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(v-if='c.selectedNode && c.selectedNode.warning') 注意事项：{{c.selectedNode.warning}}
+            //- 封面图
             .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
               .editor-header 封面图
                 small （如未指定，默认从内容中选取）
@@ -184,6 +187,7 @@ block content
                   .m-t-05
                     button.btn.btn-default.btn-sm(@click="selectCover") 重新选择
                     button.btn.btn-default.btn-sm(@click="removeCover") 删除
+            //- 摘要
             .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
               .editor-header 摘要
                 small （选填）
@@ -194,6 +198,7 @@ block content
                 .col-xs-12.col-md-6
                   textarea(placeholder="英文摘要，最多可输入1000字符" rows=7 v-model.trim="abstractEn")
                   .editor-abstract-info(:class="{'warning': abstractEnLength > 1000}") {{abstractEnLength}} / 1000
+            //- 关键词
             .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
               .editor-header 关键词
                 small （选填，最多可添加50个，当前已添加
@@ -269,7 +274,7 @@ block content
               .m-b-2
                 .editor-header 调查
                   button.btn.btn-success.btn-xs(style="vertical-align: top;"
-                    onclick="disabledSurveyForm()"
+                    onclick="disabledSurveyForm(111)"
                     id="disabledSurveyButton"
                   ) 创建
                 include ../publicModules/survey/edit
