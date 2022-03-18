@@ -2,7 +2,7 @@ const router = require('koa-router')();
 const draftRouter = require('./draft');
 const optionsRouter = require('./options');
 const unblockRouter = require('./unblock');
-const collectionRouter = require('./colection');
+const collectionRouter = require('./collection');
 router
   .get('/', async (ctx, next) => {
     await next();

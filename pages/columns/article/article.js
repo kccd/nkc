@@ -101,12 +101,26 @@ function unblock() {
 //收藏文章
 function collectArticle() {
   const {_id} = article;
-  const {collectedCount} = data;
+  const {collected} = data;
   nkcAPI(`/article/${_id}/collection`, 'POST', {
-    type: !collectedCount,
+    type: !collected,
   })
     .then(() => {
-      if(collectedCount) {
+      if(collected) {
+        sweetSuccess(`已取消收藏`);
+      } else {
+        sweetSuccess(`已加入收藏`);
+      }
+    })
+    .catch(sweetError);
+}
+//收藏论坛文章
+function collectThread() {
+  const {tid} = article;
+  const {collected} = data;
+  SubscribeTypes.collectionThreadPromise(tid, !collected)
+    .then(() => {
+      if(collected) {
         sweetSuccess(`已取消收藏`);
       } else {
         sweetSuccess(`已加入收藏`);
@@ -115,10 +129,16 @@ function collectArticle() {
     .catch(sweetError);
 }
 
+function toUrl(url) {
+  window.location.href = url;
+}
+
 Object.assign(window, {
   deleteArticle,
   reviewArticle,
   disabledArticles,
   unblock,
-  collectArticle
+  collectArticle,
+  collectThread,
+  toUrl
 })

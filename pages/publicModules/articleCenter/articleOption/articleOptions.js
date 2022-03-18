@@ -15,7 +15,9 @@ window.articleOption = new Vue({
     postType: '',
     isComment: false,
     postUserId: '',
-    tid: '',
+    tid: null,
+    collected: null,
+    type: 'article', //需要操作的文章
     // 发表时间
     toc: '',
     // 作者
@@ -79,12 +81,26 @@ window.articleOption = new Vue({
       this.show = false;
     },
     open(props) {
-      const {aid, direction, jqDOM} = props;
+      const {aid, direction, jqDOM, tid = '', collected = '',} = props;
       this.jqDOM = jqDOM;
       this.direction = direction;
       const self = this;
       self.loading = true;
       //获取当前用户对文章的操作权限
+      if(aid)  {
+        self.getPermissions(aid)
+      } else if(tid) {
+        self.tid = tid;
+        self.collected = collected;
+        self.loading = false;
+        self.show = true;
+        self.type = 'thread';
+      }
+      
+    },
+    //获取当前操作权限
+    getPermissions(aid) {
+      const self = this;
       nkcAPI(`/article/${aid}/options`, 'GET')
         .then(data => {
           if(data.optionStatus) self.optionStatus = data.optionStatus;
@@ -139,28 +155,50 @@ window.articleOption = new Vue({
       });
     },
     collectionThread() {
-      const {_id} = this.article;
-      const {collection} = this.optionStatus;
-      const self = this;
-      nkcAPI(`/article/${_id}/collection`, 'POST', {
-        type: !collection,
-      })
-        .then(() => {
-          self.optionStatus.collection = !collection;
-          if(collection) {
-            sweetSuccess(`已取消收藏`);
-          } else {
-            sweetSuccess(`已加入收藏`);
-          }
+      let {type, tid, collected} = this;
+      if(type === 'article') {
+        const {_id} = this.article;
+        const {collection} = this.optionStatus;
+        const self = this;
+        nkcAPI(`/article/${_id}/collection`, 'POST', {
+          type: !collection,
         })
-        .catch(sweetError);
+          .then(() => {
+            self.optionStatus.collection = !collection;
+            if(collection) {
+              sweetSuccess(`已取消收藏`);
+            } else {
+              sweetSuccess(`已加入收藏`);
+            }
+          })
+          .catch(sweetError);
+      } else if(type === 'thread') {
+        if(collected === 'true') {
+          collected = true
+        } else if(collected === 'false') {
+          collected = false;
+        }
+        SubscribeTypes.collectionThreadPromise(tid, !collected)
+          .then(() => {
+            if(collected) {
+              sweetSuccess(`已取消收藏`);
+            } else {
+              sweetSuccess(`已加入收藏`);
+            }
+          })
+          .catch(sweetError);
+      }
     },
     subscribeThread() {
       const {tid, subscribe} = this;
       SubscribeTypes.subscribeThread(tid, !subscribe);
     },
     replyArticle() {
-      window.location.href = '#container';
+      if(this.type === 'article') {
+        window.location.href = '#container';
+      } else if(this.type === 'thread') {
+        window.location.href = `/t/${this.tid}#container`;
+      }
     },
     hidePostContent() {
       const {pid, hidePost} = this;
@@ -348,9 +386,13 @@ NKC.methods.initArticleOption = () => {
     if(init === 'true') continue;
     dom.on('click', (e) => {
       const aid = dom.attr('data-aid');
+      const tid = dom.attr('data-tid');
+      const collected = dom.attr('data-collected');
       const direction = dom.attr('data-direction') || 'up';
       articleOption.open({
         aid,
+        tid,
+        collected,
         direction,
         jqDOM: dom,
       });

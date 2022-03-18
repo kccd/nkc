@@ -138,7 +138,8 @@
           content: self.commentContent,
           type,
           source: self.source,
-          sid: self.sid,
+          sid: self.comment?self.comment.sid:self.sid,
+          commentType: self.comment?'comment':'article',
           quoteDid: self.quote?self.quote.docId:'',
           commentId: self.commentId,
         })

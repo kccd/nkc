@@ -313,6 +313,7 @@ schema.statics.extendPostComments = async (props) => {
       reason: review?review.reason:'',
     };
   }
+  //获取引用评论
   const quoteDocuments = await DocumentModel.find({_id: {$in: quoteIdArr}});
   for(const document of quoteDocuments) {
     const {uid, toc, content, _id, sid, did, tlm} = document;

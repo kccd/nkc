@@ -35,7 +35,7 @@ const schema = new mongoose.Schema({
     index: 1
   },
   //文章评论数量
-  replies: {
+  count: {
     type: Number,
     default: 0,
     index: 1,
@@ -92,7 +92,7 @@ schema.statics.getArticlePostInfo = async function(articlePosts) {
   for(const a of articlePosts) {
     results.push({
       ...a.toObject(),
-      replies: await CommentModel.countDocuments({sid: a._id})
+      count: await CommentModel.countDocuments({sid: a._id})
     });
   }
   return results;
@@ -104,10 +104,10 @@ schema.statics.getArticlePostInfo = async function(articlePosts) {
 schema.statics.updateOrder = async function(order, aid) {
   const ArticlePostModel = mongoose.model('articlePosts');
   const articlePost = await ArticlePostModel.findOnly({sid: aid});
-  articlePost.replies = order;
+  articlePost.count = order;
   await articlePost.updateOne({
     $set: {
-      replies: articlePost.replies,
+      count: articlePost.count,
     }
   });
 };

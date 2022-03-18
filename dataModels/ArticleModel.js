@@ -206,8 +206,9 @@ schema.statics.getDocumentInfoById = async (_id)=>{
   let articleInfo = await ArticleModel.findOne({_id});
   articleInfo = articleInfo.toObject()
   if(!articleInfo) throwErr(500, '未查找到对应文章');
-  let document = await DocumentModel.getStableArticleById(_id)
-  const documentResourceId = await document.getResourceReferenceId()
+  let document = await DocumentModel.getStableArticleById(_id);
+  const documentResourceId = await document.getResourceReferenceId();
+
   document = document.toObject()
 
   return {articleInfo, document, documentResourceId}
@@ -1032,6 +1033,8 @@ schema.methods.isModerator = async function(uid) {
 *       article, 原article
 *       url, 文章链接地址
 *       editorUrl， 文章编辑地址
+*       user, 文章的用户信息
+*       replies, 文章回复数
 * }]}
 * */
 schema.statics.getArticlesInfo = async function(articles) {
@@ -1098,13 +1101,17 @@ schema.statics.getArticlesInfo = async function(articles) {
       editorUrl = `/creation/editor/zone/article?source=zone&aid=${article._id}`;
       url = `/zone/a/${article._id}`;
     }
+    const documentResourceId = await document.getResourceReferenceId()
+    //获取文章引用的资源
+    // const resources = await ResourceModel.getResourcesByReference(documentResourceId);
     results.push({
       ...article.toObject(),
       reason: review?review.reason:'',
       document,
+      documentResourceId,
       editorUrl,
       user: userObj[article.uid],
-      replies: articlePostsObj[article._id].replies,
+      count: articlePostsObj[article._id]?articlePostsObj[article._id].count : 0,
       url,
     });
   }
@@ -1184,12 +1191,7 @@ schema.statics.getArticlesDataByArticlesId = async function(articlesId, type = '
 * 文章阅读数量增加
 * */
 schema.methods.addArticleHits = async function() {
-  const hits = this.hits
-  await this.updateOne({
-    $set: {
-      hits: hits + 1,
-    }
-  });
+  await this.updateOne({$inc: {hits: 1}});
 }
 
 /*
@@ -1204,4 +1206,32 @@ schema.statics.getCollectedCountByAid = async function(aid) {
   });
 }
 
+/*
+*  通过专栏引用获取专栏文章信息
+* */
+schema.statics.getArticleInfoByColumn = async function(columnPost) {
+  const ArticleModel = mongoose.model('articles');
+  const ResourceModel = mongoose.model('resources');
+  const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
+  const ColumnModel = mongoose.model('columns');
+  const {pid, cid, mcid, columnId} = columnPost;
+  const article = await ArticleModel.findOnly({_id: pid});
+  const articleInfo = (await ArticleModel.getArticlesInfo([article]))[0];
+  const resources = await ResourceModel.getResourcesByReference(articleInfo.documentResourceId);
+  // 获取 专栏名称和id
+  let column = await ColumnModel.findOne({_id: columnId})
+  column = column.toObject()
+  const mainCategory = await ColumnPostCategoryModel.getParentCategoryByIds(cid)
+  const auxiliaryCategory = await ColumnPostCategoryModel.getMinorCategories(columnId, mcid)
+  return {
+    _id: columnPost._id,
+    thread: article,
+    article: articleInfo,
+    resources,
+    column,
+    mainCategory,
+    auxiliaryCategory,
+    type: columnPost.type
+  };
+};
 module.exports = mongoose.model('articles', schema);

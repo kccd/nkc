@@ -864,6 +864,13 @@ postSchema.statics.extendPost = async (post, options) => {
   const posts = await PostModel.extendPosts([post], options);
   return posts[0];
 };
+
+/*
+* 拓展post评论内容
+* @params {object} post 需要拓展的评论
+* @params {object} options 需要拓展post的内容
+* */
+
 postSchema.statics.extendPosts = async (posts, options) => {
   // 若需要判断用户是否点赞点踩，需要options.user
   const UserModel = mongoose.model('users');
@@ -1904,5 +1911,19 @@ postSchema.statics.checkPostCommentPermission = async (pid, type) => {
     return ['rw'].includes(post.comment);
   }
 };
+
+/*
+* 拓展专栏文章回复
+* */
+postSchema.statics.extendPostsByColumn = async function(posts, options) {
+  const PostModel = mongoose.model('posts');
+  let results = posts;
+  results = await PostModel.extendPosts(results, options);
+  results = await PostModel.extendPosts(results);
+  results = await PostModel.filterPostsInfo(results);
+  results = results.reverse();
+  return results;
+}
+
 
 module.exports = mongoose.model('posts', postSchema);

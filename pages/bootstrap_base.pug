@@ -100,17 +100,6 @@ block body
     login(ref='login' v-if='!hasLogged')
   +includeJS('/global/root.js')
 
-  //
-  //
-  //if remoteState.uid
-  //  //- 通用socket
-  //  if !remoteState.isApp
-  //    //- 接入即时通信
-  //    +includeJS('/message/connectSocket.js')
-  //    include ./message/chat
-  //
-  //if (!remoteState.isApp || remoteState.platform === 'reactNative') && !data.user
-  //  include ./publicModules/login/login
   block scripts
   if !remoteState.isApp
     //- 生成二维码 页脚
