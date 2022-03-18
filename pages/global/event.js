@@ -1,0 +1,106 @@
+import {openImageViewer} from '../lib/js/imageViewer';
+import {strToObj} from "../lib/js/dataConversion";
+import {initLongPressEvent} from "../lib/js/longPress";
+import {RNDownloadFile, RNOpenNewPage, RNUrlPathEval} from "../lib/js/reactNative";
+
+/*
+* 查看单张图片
+* @param {Object} data
+*   @param {String} url 图片链接
+*   @param {String} name 图片名称
+* */
+function viewImage(data) {
+  const {
+    name = '',
+    url = ''
+  } = data;
+  const images = [{
+    name,
+    url
+  }];
+  openImageViewer(images, 0);
+}
+/*
+* 查看多张图片
+* @param {Object} data
+*   @param {[Object]} images
+*     @param {String} url 图片链接
+*     @param {String} name 图片名称
+*   @param {Number} index 默认打开的图片索引
+* */
+function viewImages(data) {
+  const {images, index} = data;
+  openImageViewer(images, index);
+}
+
+/*
+* 下载文件
+* @param {Object} data
+*   @param {String} name 文件名称
+*   @param {String} url 文件链接
+* */
+function downloadFile(data) {
+  const {name, url} = data;
+  RNDownloadFile(name, url);
+}
+
+const eventFunctions = {
+  viewImage,
+  viewImages,
+  downloadFile,
+};
+
+function globalEvent(eventType, e) {
+  const element = e.target;
+  const elementJQ = $(element);
+  const operation = elementJQ.attr(`data-global-${eventType}`);
+  if(!operation) return;
+  const eventFunction = eventFunctions[operation];
+  if(!eventFunction) return;
+  let data = elementJQ.attr('data-global-data');
+  data = strToObj(data);
+  eventFunction(data);
+}
+
+/*
+* 监听全局图片点击事件
+* img标签需包含以下属性
+* data-global-click=operation
+* data-global-data='' object json string
+* */
+export function initGlobalClickEvent() {
+  document.addEventListener('click', e => {
+    globalEvent('click', e);
+  });
+}
+
+/*
+* 监听长按事件
+* */
+export function initGlobalLongPressEvent() {
+  initLongPressEvent(document, e => {
+    globalEvent('long-press', e);
+  });
+}
+
+/*
+* APP 监听点击 a 标签
+* */
+export function initAppGlobalClickLinkEvent() {
+  document.addEventListener('click', e => {
+    let element = e.target;
+    let elementJQ = $(element);
+    const tagName = element.nodeName.toLowerCase();
+    if(tagName !== 'a') {
+      element = elementJQ.parents('a');
+      if(element.length === 0) return;
+      element = element[0];
+      elementJQ = $(element);
+    }
+    const href = elementJQ.attr('href');
+    if(!href) return;
+    const title = elementJQ.attr('title') || '';
+    const targetUrl = RNUrlPathEval(window.location.href, href);
+    RNOpenNewPage(targetUrl, title);
+  });
+}

@@ -12,9 +12,7 @@ export function visitUrl(url, blank) {
   } else {
     const {isApp} = getState();
     if(isApp) {
-      if(url.indexOf('http') !== 0) {
-        url = window.location.origin + url;
-      }
+      url = fixUrl(url);
       RNOpenNewPage(url);
     } else {
       window.open(url);

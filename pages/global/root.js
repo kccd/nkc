@@ -2,6 +2,8 @@ import Chat from '../lib/vue/message/Chat';
 import Login from '../lib/vue/Login';
 import {RNOpenLoginPage, RNToChat} from "../lib/js/reactNative";
 import {getState} from "../lib/js/state";
+import {initAppGlobalClickLinkEvent, initGlobalClickEvent, initGlobalLongPressEvent} from "./event";
+
 const {isApp, platform, uid} = getState();
 
 window.RootApp = new Vue({
@@ -12,7 +14,7 @@ window.RootApp = new Vue({
   },
   components: {
     'chat': Chat,
-    'login': Login
+    'login': Login,
   },
   computed: {
     hasLogged() {
@@ -20,8 +22,9 @@ window.RootApp = new Vue({
     }
   },
   mounted() {
-    // this.openChatPanel()
-    // this.openLoginPanel();
+    initGlobalClickEvent();
+    initGlobalLongPressEvent();
+    initAppGlobalClickLinkEvent();
   },
   methods: {
     openLoginPanel(type) {
@@ -41,6 +44,6 @@ window.RootApp = new Vue({
       } else {
         this.$refs.chat.showMessagePanel(uid);
       }
-    }
+    },
   }
 });

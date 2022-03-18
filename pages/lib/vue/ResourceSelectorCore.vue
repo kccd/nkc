@@ -136,7 +136,7 @@
       .module-sr-footer
         .pull-left
           input.hidden(ref='inputElement' type="file" multiple="true" @change="selectedFiles")
-          button.btn.btn-default.btn-sm(@click="clickInput") 上传
+          button.btn.btn-default.btn-sm.m-r-05(@click="clickInput") 上传
           button.btn.btn-default.btn-sm.m-r-05(v-if='isApp' @click="takePicture") 拍照
           button.btn.btn-default.btn-sm.m-r-05(v-if='isApp' @click="takeVideo") 录像
           button.btn.btn-default.btn-sm.m-r-05(v-if='isApp' @click="recordAudio") 录音

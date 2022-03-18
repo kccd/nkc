@@ -37,6 +37,8 @@ block head
   +includeJS('/bootstrap/js/bootstrap.min.js', true)
   // socket.io
   +includeJS('/socket.io-client/dist/socket.io.js', true)
+  // 二维码库
+  +includeJS("/qrcode/build/qrcode.js")
   // fontAwesome 图标相关
   +includeCSS('/font-awesome/css/font-awesome.css')
 
@@ -103,6 +105,3 @@ block body
     script.
       console.log('(c)2021 成都科创科学文化研究院')
       console.log('Project Repository: https://github.com/kccd/nkc')
-  if remoteState.isApp && remoteState.platform === 'reactNative'
-    script.
-      document.body.style.userSelect = window._userSelect || 'none';

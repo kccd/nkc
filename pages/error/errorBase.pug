@@ -44,9 +44,4 @@ block body
   +includeJS("/publicModules/common.js")
   +includeJS('/tools.js')
   +includeJS('/bootstrap/js/bootstrap.min.js')
-  if state.isApp && state.platform === 'apiCloud'
-    script!=`NKC.configs.isApp = true;NKC.configs.appOS="${state.appOS}";`
-    +includeJS("/appAPi/app.js")
   +includeJS("/interface_common.js")
-  if !data.user && data.status === 403
-    include ../publicModules/login/login

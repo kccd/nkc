@@ -1,4 +1,6 @@
 import {sweetQuestion} from "./sweetAlert";
+import {fixUrl} from "./url";
+
 const reactNativeCallback = {};
 let reactNativeIndex = 0;
 
@@ -92,7 +94,16 @@ export function RNLogin() {
   RNEmit('login');
 }
 
+/*
+* @param {[Object]} images 图片信息
+*   @param {String} name 图片名称
+*   @param {String} url 图片链接
+* @param {Number} index 打开后默认显示的图片索引
+* */
 export function RNViewImage(urls, index) {
+  for(const url of urls) {
+    url.url = fixUrl(url.url);
+  }
   RNEmit('viewImage', {
     urls,
     index,

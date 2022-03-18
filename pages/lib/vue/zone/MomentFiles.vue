@@ -5,7 +5,7 @@
     :data-file-count="fileCount"
     )
     .moment-file(
-      v-for="fileData in filesData"
+      v-for="(fileData, index) in filesData"
       :style="fileData.fileContainerStyle"
       :class="fileData.fileContainerClass"
       )
@@ -15,7 +15,7 @@
         :class="fileData.pictureContainerClass"
         )
         img(
-          data-click-opeartion="view"
+          @click="viewPictures(index)"
           :src="fileData.url"
           :alt="fileData.filename"
           :title="fileData.filename"
@@ -95,6 +95,8 @@
 
 <script>
   import VideoPlayer from '../VideoPlayer';
+  import {openImageViewer} from "../../js/imageViewer";
+
   export default {
     /*
     * prop {[Object]} data
@@ -171,7 +173,19 @@
       }
     },
     methods: {
-
+      viewPictures(index) {
+        const {filesData} = this;
+        const images = [];
+        for(const fileData of filesData) {
+          if(fileData.type !== 'picture') continue;
+          images.push({
+            url: fileData.url,
+            name: fileData.filename
+          });
+        }
+        if(images.length === 0) return;
+        openImageViewer(images, index);
+      },
     }
   }
 </script>
