@@ -268,7 +268,7 @@ export default {
     originalWordLimit: 500,
     originState: 0, // 原创声明
     contentLength: 0,
-    websiteUserId: getState().websiteCode + "ID",
+    websiteUserId: (getState().websiteCode).toUpperCase() + "ID",
     originLevel: [
       "不声明",
       "普通转载",

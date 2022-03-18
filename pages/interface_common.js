@@ -1003,20 +1003,6 @@ function openNKCDrawer(type) {
   stopBodyScroll(true);
 }
 function closeNKCDrawer(type) {
-  if(localStorage.getItem("apptype") === "app") {
-    if(type === "left"){
-      api.setRefreshHeaderInfo({
-        bgColor: '#eeeeee',
-        textColor: '#aaaaaa',
-        textDown: '下拉刷新',
-        textUp: '松开刷新',
-        textLoading: '刷新成功，正在加载资源...',
-        showTime: false
-      }, function(ret, err) {
-        window.location.reload();
-      });
-    }
-  }
   $(".nkc-drawer-"+type).removeClass("active");
   $(".nkc-drawer-"+type+"-mask").removeClass("active");
   $(".nkc-drawer-"+type+"-body").removeClass("active");
@@ -1024,56 +1010,15 @@ function closeNKCDrawer(type) {
 }
 
 //鼠标移入头像时显示用户操作导航
-function initUserNavVue(type, uid){
+function initUserNavVue(type){
   const vueDrawId = getVueDrawsId(type);
   let userNavDraw = draws[vueDrawId];
   if(!userNavDraw){
     //创建vue实例
-    userNavDraw = initUserNav(uid);
+    userNavDraw = initUserNav();
     draws[vueDrawId] = userNavDraw;
   }
   userNavDraw.showDraw();
-}
-
-import userNav from "./publicModules/userNav/userNavBox";
-//创建用户导航栏vue实例
-function initUserNav(uid){
-  const draw = new Vue({
-    el: '#userNav',
-    data: {
-      uid,
-      show: false,
-      loading: true,
-      anvState: {}
-    },
-    mounted(){
-      this.getUserNavData();
-    },
-    components: {
-      "user-nav": userNav,
-    },
-    methods: {
-      updateNewMessageCount(count) {
-        this.anvState.newMessageCount = count;
-      },
-      //获取用户导航数据
-      getUserNavData(){
-        const _this = this;
-        nkcAPI(`/draw/userNav`, 'GET', {})
-          .then(res => {
-            _this.anvState = res.anvState;
-            _this.loading = false;
-          })
-          .catch(err => {
-            console.log(err);
-          })
-      },
-      showDraw(){
-        this.show = true;
-      }
-    }
-  })
-  return draw;
 }
 
 //已经实例化的vue实例
@@ -1083,23 +1028,23 @@ function getVueDrawsId(type) {
 }
 
 //左侧滑动框
-function showLeftDrawVue(type, uid) {
+function showLeftDrawVue(type) {
   const vueDrawId = getVueDrawsId(type);
   let leftDraw = draws[vueDrawId];
   if(!leftDraw) {
     //创建vue实例
-    leftDraw = initLeftVue(uid);
+    leftDraw = initLeftVue();
     draws[vueDrawId] = leftDraw;
   }
   leftDraw.showDraw();
 }
 //右侧滑动框
-function showRightDrawVue(type, uid){
+function showRightDrawVue(type){
   const vueDrawId = getVueDrawsId(type);
   let rightDraw = draws[vueDrawId];
   if(!rightDraw) {
     //创建vue实例
-    rightDraw = initRightVue(uid);
+    rightDraw = window.initRightVue();
     draws[vueDrawId] = rightDraw;
   }
   rightDraw.showDraw();
@@ -1119,127 +1064,22 @@ function updateNavNewMessageCount(count) {
   }
 }
 
-import userVue from "./user/userVue";
-import userDrawCount from "./user/userDrawCount";
-import userLogin from "./user/userLogin";
-import userList from "./user/userList";
 
-
-//创建右侧滑动框vue实例
-function initRightVue(uid) {
-  return new Vue({
-    el: '#drawRight',
-    data: {
-      uid,
-      user: {},
-      show: false,
-      loading: true,
-      drawState: {},
-    },
-    components: {
-      "user-vue": userVue,
-      "user-draw-count": userDrawCount,
-      "user-login": userLogin,
-      "user-list": userList,
-    },
-    mounted() {
-      this.getRightDrawData();
-    },
-    methods: {
-      updateNewMessageCount(count) {
-        this.drawState.newMessageCount = count;
-      },
-      getRightDrawData(){
-        const _this = this;
-        nkcAPI('/draw/userDraw', 'GET', {})
-          .then(res => {
-            _this.drawState = res.drawState;
-            _this.user = res.user;
-            _this.loading = false;
-          })
-          .catch(err => {
-
-          })
-      },
-      showDraw(){
-        this.show = true;
-      },
-    }
-  })
-}
-
-import Management from '../pages/publicModules/management/managementVue'
-import Apps from '../pages/publicModules/apps/appsVue'
-import Forums from '../pages/publicModules/forums_nav/forum_tree_vue'
-//创建左侧滑动框vue实例
-function initLeftVue(uid) {
-  const draw = new Vue({
-    el: '#drawLeft',
-    data: {
-      loading: true,
-      show: false,
-      uid,
-      permission: {
-        nkcManagement: false,
-        visitExperimentalStatus: false,
-        review: false,
-        complaintGet: false,
-        visitProblemList: false,
-        getLibraryLogs: false,
-        enableFund: false,
-      },
-      categoryForums: [],
-      management: [],
-    },
-    mounted() {
-      this.getLeftDrawData();
-    },
-    components: {
-      Management,
-      Apps,
-      Forums,
-    },
-    methods: {
-      getLeftDrawData(){
-        const _this = this;
-        nkcAPI('/draw/leftDraw', 'GET' , {})
-          .then(res => {
-            _this.categoryForums = res.categoryForums;
-            _this.permission = res.permission;
-            _this.management = res.managementData;
-            _this.loading = false;
-          })
-          .catch(err => {
-            console.log(err);
-          })
-      },
-      showDraw(){
-        this.show = true;
-      }
-    }
-  })
-  return draw;
-}
-
-function toggleNKCDrawer(type, uid) {
+//抽屉开关
+function toggleNKCDrawer(type) {
   var nkcDrawer = $(".nkc-drawer-"+type);
+  //激活状态下关闭抽屉
   if(nkcDrawer.hasClass('active')) {
     closeNKCDrawer(type);
   } else {
-    if(localStorage.getItem("apptype") === "app") {
-      if(api.frameName) {
-        api.setFrameAttr({
-          name: api.frameName,
-          bounces: false
-        });
-      }
-    }
+    //否则就打开抽屉
     openNKCDrawer(type);
-    if(type === 'left') {
-      showLeftDrawVue(type, uid);
-    } else if (type === 'right') {
-      showRightDrawVue(type, uid);
-    }
+    //实例化vue
+    // if(type === 'left') {
+    //   showLeftDrawVue(type);
+    // } else if (type === 'right') {
+    //   showRightDrawVue(type);
+    // }
   }
 }
 
@@ -1513,7 +1353,6 @@ Object.assign(window, {
   sweetPrompt,
   showLeftDrawVue,
   initLeftVue,
-  initRightVue,
   initUserNavVue,
   updateNavNewMessageCount,
 });

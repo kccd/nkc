@@ -124,10 +124,10 @@ router
       sid: article._id
     });
     data.articleId = article._id;
-    const _article = (await db.ArticleModel.getArticlesInfo([article]));
-    if(_article[0]) {
-      data.articleUrl = _article[0].url;
-    }
+    // const _article = (await db.ArticleModel.getArticlesInfo([article]));
+    // if(_article[0]) {
+    //   data.articleUrl = _article[0].url;
+    // }
     await next();
   })
   .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
