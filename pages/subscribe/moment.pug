@@ -3,17 +3,13 @@ block sTitle
   title=`最新动态 - ${remoteState.serverSettings.websiteName}`
 block sContent
   include ../publicModules/moment/moment
-  div
+  #moment(v-cloak)
     .m-b-1
-      #momentForm(v-cloak)
-        moment-editor(@published='onPublished')
-    if data.paging.pageCount > 1
-      .m-b-1
-        include ../publicModules/paging/paging
-    +momentList(data.momentsData, data.paging)
-    if data.paging.pageCount > 1
-      .p-t-1
-        include ../publicModules/paging/paging_input
+      moment-editor(@published='onPublished')
+    paging(:pages="pages" :mb='1' @click-button='selectPage')
+    moments(:moments="momentsData")
+    paging(:pages="pages" @click-button='selectPage')
+  #data.hidden=objToStr({momentsData: data.momentsData, paging: data.paging})
 block sScripts
   include ../publicModules/moment/momentSource
   +includeJS('/subscribe/moment.js')

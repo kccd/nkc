@@ -56,7 +56,6 @@
 <script>
 import {DraggableElement} from "../js/draggable";
 import ResourceSelectorCore from "./ResourceSelectorCore";
-import connectSocket from '../../message/connectSocket.js'
 
 export default {
   data: () => ({
@@ -66,7 +65,6 @@ export default {
     'resource-selector-core': ResourceSelectorCore,
   },
   mounted() {
-    connectSocket()
     this.initDraggableElement();
   },
   methods: {

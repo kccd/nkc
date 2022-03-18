@@ -140,7 +140,7 @@ style.
         if !product.productSettings.priceShowToVisit && !data.user
           p
             span.title 价格
-            a.pointer(style="color:orangered" onclick="Login.open('login')") 登录可见
+            a.pointer(style="color:orangered" onclick="RootApp.openLoginPanel('login')") 登录可见
         else if !product.productSettings.priceShowToVisit && product.productStatus == "stopsale"
           p
             span.title 价格
@@ -167,7 +167,7 @@ style.
       if !product.productSettings.priceShowToVisit && !data.user
         p
           span.title 运费
-          a.pointer(style="color:orangered" onclick="Login.open('login')") 登录可见
+          a.pointer(style="color:orangered" onclick="RootApp.openLoginPanel('login')") 登录可见
       else if !product.productSettings.priceShowToVisit && product.productStatus == "stopsale"
         p
           span.title 价格
@@ -221,8 +221,8 @@ style.
             a.btn.btn.addCart(role='button' onclick=`addProductToCart()`)
               span.fa.fa-shopping-cart  加入购物车
           else
-            a.btn.btn.buy(role='button' onclick="NKC.methods.toLogin('login')" style="margin-left:10px") 立即购买
-            a.btn.btn.addCart(role='button' onclick="NKC.methods.toLogin('login')")
+            a.btn.btn.buy(role='button' onclick="RootApp.openLoginPanel('login')" style="margin-left:10px") 立即购买
+            a.btn.btn.addCart(role='button' onclick="RootApp.openLoginPanel('login')")
               span.fa.fa-shopping-cart  加入购物车
   .col-xs-1.col-md-1
 

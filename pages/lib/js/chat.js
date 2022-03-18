@@ -9,6 +9,6 @@ export function toChat(uid, name, type) {
       type: type || 'UTU'
     });
   } else {
-    messageApp.toChat(uid);
+    RootApp.openChatPanel(uid);
   }
 }

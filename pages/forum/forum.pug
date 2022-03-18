@@ -100,7 +100,7 @@ block content
               .thread-nav-right
                 if !data.forum.childrenForums || !data.forum.childrenForums.length
                   if !data.user
-                    button.forum-post-button.btn.btn-default.btn-xs(onclick='NKC.methods.toLogin()')
+                    button.forum-post-button.btn.btn-default.btn-xs(onclick='RootApp.openLoginPanel()')
                       .fa.fa-pencil-square-o
                       | &nbsp;发表文章
                   else if data.noPermissionReason

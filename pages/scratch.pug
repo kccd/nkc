@@ -3,9 +3,5 @@ include ./publicModules/mixin.pug
 html(lang='zh-CN')
   head
     block head
-  if !remoteState.isApp
-    body(id='body').mdui-theme-primary-blue-grey.mdui-theme-accent-pink
-      block body
-  else
-    body(id='body').mdui-theme-primary-blue-grey.mdui-theme-accent-pink
-      block body
+  body(id='body')
+    block body

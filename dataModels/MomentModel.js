@@ -663,11 +663,12 @@ schema.statics.getMomentsByMomentsId = async (momentsId, type = 'array') => {
 /*
 * 拓展引用数据，引用的数据包含 moment, article, thread 等
 * @param {[String]} quotes 引用类型加引用ID组成的字符创 格式：`${quoteType}:${quoteId}`
+* @param {String} uid 访问者 ID
 * @return {Object} 键为 `${quoteType}:${quoteId}` 值为对象，对象属性如下：
 *   当引用的为moment时，数据为 MomentModel.statics.extendMomentsData 返回的数据
 *   当引用的为article时，数据为 ArticleModel.statics.getArticlesDataByArticlesId 返回的数据
 * */
-schema.statics.extendQuotesData = async (quotes) => {
+schema.statics.extendQuotesData = async (quotes, uid = '') => {
   const MomentModel = mongoose.model('moments');
   const ArticleModel = mongoose.model('articles');
   const quoteTypes = await MomentModel.getMomentQuoteTypes();
@@ -680,7 +681,7 @@ schema.statics.extendQuotesData = async (quotes) => {
   }
   // 加载动态
   const moments = await MomentModel.getMomentsByMomentsId(momentsId);
-  const momentsData = await MomentModel.extendMomentsData(moments);
+  const momentsData = await MomentModel.extendMomentsData(moments, uid);
   // 加载文章
   const articlesData = await ArticleModel.getArticlesDataByArticlesId(articlesId);
   const results = {};
@@ -723,7 +724,7 @@ schema.statics.renderContent = async (content) => {
   const nkcRender = require("../nkcModules/nkcRender");
   const {filterMessageContent} = require("../nkcModules/xssFilters");
   // 替换空格
-  content = content.replace(/ /g, '&nbsp;');
+  // content = content.replace(/ /g, '&nbsp;');
   // 处理链接
   content = nkcRender.URLifyHTML(content);
   // 过滤标签 仅保留标签 a['href']
@@ -740,6 +741,7 @@ schema.statics.renderContent = async (content) => {
 /*
 * 获取动态显示所需要的基础数据
 * @param {[schema moment]}
+* @param {String} uid 访问者 ID
 * @return {[Object]}
 *   @param {String} momentId 动态ID
 *   @param {String} uid 发表人ID
@@ -750,6 +752,7 @@ schema.statics.renderContent = async (content) => {
 *   @param {Date} toc 发表时间
 *   @param {String} content 动态内容
 *   @param {Number} voteUp 点赞数
+*   @param {String} url 动态详情页链接
 *   @param {[Object]} files 附带的资源
 *     @param {String} rid 资源ID
 *     @param {String} type 资源类型 video, picture
@@ -762,17 +765,19 @@ schema.statics.renderContent = async (content) => {
 *     视频特有
 *     @param {String} coverUrl 视频封面（类型为图片时为空）
 *     @param {Boolean} visitorAccess 游客是否有权限直接查看视频
+*     @param {String} mask 视频遮罩内容
 *     @param {[Object]} sources
 *       @param {String} url 视频链接
 *       @param {String} height 视频分辨率 480p、720p、1080p
 *       @param {Number} dataSize 视频大小
 * */
-schema.statics.extendMomentsData = async (moments) => {
+schema.statics.extendMomentsData = async (moments, uid = '') => {
   const videoSize = require('../settings/video');
   const UserModel = mongoose.model('users');
   const ResourceModel = mongoose.model('resources');
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
+  const PostsVoteModel = mongoose.model('postsVotes');
   const {getUrl, fromNow} = require('../nkcModules/tools');
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
   const usersId = [];
@@ -794,6 +799,15 @@ schema.statics.extendMomentsData = async (moments) => {
   const resourcesObj = await ResourceModel.getResourcesObjectByResourcesId(resourcesId);
   // 准备动态内容
   const stableDocumentsObj = await DocumentModel.getStableDocumentsBySource(momentSource, momentsId, 'object');
+  // 点赞内容
+  const {moment: momentVoteSource} = await PostsVoteModel.getVoteSources();
+
+  const votesType = await PostsVoteModel.getVotesTypeBySource(
+    momentVoteSource,
+    momentsId,
+    uid
+  );
+
   const results = {};
   for(const moment of moments) {
     const {
@@ -828,7 +842,8 @@ schema.statics.extendMomentsData = async (moments) => {
         defaultFile,
         disabled,
         isFileExist,
-        visitorAccess
+        visitorAccess,
+        mask,
       } = resource;
       let fileData;
 
@@ -865,6 +880,7 @@ schema.statics.extendMomentsData = async (moments) => {
           type: 'video',
           coverUrl: getUrl('resource', rid, 'cover'),
           visitorAccess,
+          mask,
           sources,
           filename,
           disabled,
@@ -884,8 +900,10 @@ schema.statics.extendMomentsData = async (moments) => {
       toc,
       content,
       voteUp,
+      voteType: votesType[_id],
       commentCount: order,
-      files: filesData
+      files: filesData,
+      url: getUrl('zoneMoment', _id),
     };
   }
   return results;
@@ -895,6 +913,7 @@ schema.statics.extendMomentsData = async (moments) => {
 * 拓展动态信息
 * 考虑黑名单
 * @param {[schema moment]}
+* @param {String} uid 访问者 ID
 * @return {[Object]}
 *   @param {String} momentId 动态ID
 *   @param {String} uid 发表人ID
@@ -917,6 +936,7 @@ schema.statics.extendMomentsData = async (moments) => {
 *     视频特有
 *     @param {String} coverUrl 视频封面（类型为图片时为空）
 *     @param {Boolean} visitorAccess 游客是否有权限直接查看视频
+*     @param {String} mask 视频遮罩内容
 *     @param {[Object]} sources
 *       @param {String} url 视频链接
 *       @param {String} height 视频分辨率 480p、720p、1080p
@@ -927,9 +947,9 @@ schema.statics.extendMomentsData = async (moments) => {
 *     @param {Object} data
 *       当引用的为moment时，数据为 schema.statics.extendMomentsData 返回的数据
 * */
-schema.statics.extendMomentsListData = async (moments) => {
+schema.statics.extendMomentsListData = async (moments, uid = '') => {
   const MomentModel = mongoose.model('moments');
-  const momentsData = await MomentModel.extendMomentsData(moments);
+  const momentsData = await MomentModel.extendMomentsData(moments, uid);
   const quotesId = [];
   for(const moment of moments) {
     const {quoteId, quoteType} = moment;
@@ -956,10 +976,27 @@ schema.statics.extendMomentsListData = async (moments) => {
   return results;
 };
 
-schema.statics.extendCommentsData = async function (comments) {
+/*
+* @param {[schema moment]} comments 动态评论对象组成的数组
+* @param {String} uid 访问者
+* @return {[Object]}
+*   @param {String} momentId 评论所在动态ID
+*   @param {String} momentCommentId 评论ID
+*   @param {String} uid 作者ID
+*   @param {String} username 作者名称
+*   @param {String} avatarUrl 作者头像链接
+*   @param {String} userHome 作者主页链接
+*   @param {String} time 格式化后的发表时间
+*   @param {Date} toc 发表时间
+*   @param {Number} order 评论所在楼层
+*   @param {Number} voteUp 评论点赞数
+*   @param {String} content 评论内容，富文本
+* */
+schema.statics.extendCommentsData = async function (comments, uid) {
   const DocumentModel = mongoose.model('documents');
   const MomentModel = mongoose.model('moments');
   const UserModel = mongoose.model('users');
+  const PostsVoteModel = mongoose.model('postsVotes');
   const {getUrl, timeFormat} = require('../nkcModules/tools');
   const usersId = [];
   const commentsId = [];
@@ -971,6 +1008,12 @@ schema.statics.extendCommentsData = async function (comments) {
   const usersObj = await UserModel.getUsersObjectByUsersId(usersId);
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
   const stableDocuments = await DocumentModel.getStableDocumentsBySource(momentSource, commentsId, 'object');
+  const {moment: momentVoteSource} = await PostsVoteModel.getVoteSources();
+  const votesType = await PostsVoteModel.getVotesTypeBySource(
+    momentVoteSource,
+    commentsId,
+    uid
+  );
   const commentsData = [];
   for(const comment of comments) {
     const {
@@ -979,6 +1022,7 @@ schema.statics.extendCommentsData = async function (comments) {
       order,
       toc,
       parent,
+      voteUp,
     } = comment;
     const user = usersObj[uid];
     if(!user) continue;
@@ -989,6 +1033,8 @@ schema.statics.extendCommentsData = async function (comments) {
       momentCommentId: _id,
       uid: user.uid,
       order,
+      voteUp,
+      voteType: votesType[_id],
       content: await MomentModel.renderContent(stableDocument.content),
       username: user.username,
       avatarUrl: getUrl('userAvatar', user.avatar),
@@ -1008,5 +1054,62 @@ schema.statics.extendCommentsData = async function (comments) {
 schema.statics.getPageByOrder = async (order) => {
   return Math.ceil(order / momentCommentPerPage) - 1;
 }
+
+/*
+* 点赞或点踩
+* @param {String} voteType up(点赞) down(点踩)
+* @param {String} uid 点赞或点踩用户ID
+* @return {Object} 最新点赞点踩数
+*   @param {Number} voteUp 点赞数
+*   @param {Number} voteDown 点踩数
+* */
+schema.methods.vote = async function(voteType, uid, cancel = false) {
+  const PostsVoteModel = mongoose.model('postsVotes');
+  const {moment: momentSource} = await PostsVoteModel.getVoteSources();
+  const func = cancel? PostsVoteModel.cancelVote: PostsVoteModel.addVote;
+  await func({
+    source: momentSource,
+    sid: this._id,
+    uid,
+    voteType,
+    tUid: this.uid,
+  });
+  const {voteUp, voteDown} = await this.syncVoteCount();
+  return {
+    voteUp,
+    voteDown
+  };
+};
+
+/*
+* 同步动态或动态评论的点赞点踩数
+* @return {Object} 最新点赞点踩数
+*   @param {Number} voteUp 点赞数
+*   @param {Number} voteDown 点踩数
+* */
+schema.methods.syncVoteCount = async function() {
+  const PostsVoteModel = mongoose.model('postsVotes');
+  const {_id} = this;
+  const {moment: momentSource} = await PostsVoteModel.getVoteSources();
+  const voteTypes = await PostsVoteModel.getVoteTypes();
+
+  const voteUp = await PostsVoteModel.getTotalVote(momentSource, _id, voteTypes.up);
+  const voteDown = await PostsVoteModel.getTotalVote(momentSource, _id, voteTypes.down);
+
+  this.voteUp = voteUp;
+  this.voteDown = voteDown;
+
+  await this.updateOne({
+    $set: {
+      voteUp: this.voteUp,
+      voteDown: this.voteDown
+    }
+  });
+
+  return {
+    voteUp: this.voteUp,
+    voteDown: this.voteDown,
+  }
+};
 
 module.exports = mongoose.model('moments', schema);

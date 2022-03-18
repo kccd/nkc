@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  import MomentEditor from '../../../../lib/vue/MomentEditor';
+  import MomentEditor from '../../../../lib/vue/zone/MomentEditor';
   export default {
     components: {
       'moment-editor': MomentEditor

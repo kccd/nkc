@@ -24,7 +24,7 @@ router
       }
     }
     //获取当前用户对该图书的权限
-    const bookPermission = await book.getBookPermissionForUser(state.uid);
+    // const bookPermission = await book.getBookPermissionForUser(state.uid);
     comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, permissions});
     let document;
     if(comment) {
@@ -124,10 +124,20 @@ router
         content
       });
       if(type === 'publish') {
-        // 获取最新评论的楼层
-        const order = await db.CommentModel.getCommentOrder(article._id);
-        await comment.updateOrder(order);
-        await comment.publishComment();
+        const key = await nkcModules.getRedisKeys('commentOrder', article._id);
+        const lock = await nkcModules.redLock.lock(key, 6000);
+        try{
+          // 获取最新评论的楼层
+          const order = await db.CommentModel.getCommentOrder(article._id);
+          await comment.updateOrder(order);
+          await comment.publishComment();
+          //更新评论引用的评论数replies
+          await db.ArticlePostModel.updateOrder(order, article._id);
+          await lock.unlock();
+        } catch (err){
+          await lock.unlock();
+          throwErr(500, err);
+        }
       } else if(type === 'save') {
         await comment.saveComment()
       }
@@ -261,8 +271,10 @@ router
         optionStatus.ipInfo = ctx.permission('ipinfo')? document.ip : null;
         // 未匿名
         if(!document.anonymous) {
-          // 黑名单
-          optionStatus.blacklist = await db.BlacklistModel.checkUser(user.uid, comment.uid);
+          if(user.uid !== comment.uid) {
+            // 黑名单
+            optionStatus.blacklist = await db.BlacklistModel.checkUser(user.uid, comment.uid);
+          }
           // 违规记录
           optionStatus.violation = ctx.permission('violationRecord')? true: null;
           data.commentUserId = comment.uid;

@@ -1040,8 +1040,10 @@ schema.statics.getArticlesInfo = async function(articles) {
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
   const ReviewModel = mongoose.model('reviews');
+  const ArticlePostModel = mongoose.model('articlePosts');
   const columnArticlesId = [];
   const articlesDid = [];
+  const articleId = [];
   const articleDocumentsObj = {};
   const uidArr = [];
   const userObj = {};
@@ -1050,6 +1052,7 @@ schema.statics.getArticlesInfo = async function(articles) {
     if(article.source === columnSource) {
       columnArticlesId.push(article._id);
     }
+    articleId.push(article._id);
     articlesDid.push(article.did);
     uidArr.push(article.uid);
   }
@@ -1069,6 +1072,13 @@ schema.statics.getArticlesInfo = async function(articles) {
   const columnPostsObj = {};
   for(const columnPost of columnPosts) {
     columnPostsObj[columnPost.pid] =columnPost;
+  }
+  //查找文章评论引用
+  let articlePosts = await ArticlePostModel.find({sid: {$in: articleId}});
+  //获取评论引用信息
+  const articlePostsObj = {};
+  for(const a of articlePosts) {
+    articlePostsObj[a.sid] = a;
   }
   const results = [];
   for(const article of articles) {
@@ -1094,6 +1104,7 @@ schema.statics.getArticlesInfo = async function(articles) {
       document,
       editorUrl,
       user: userObj[article.uid],
+      replies: articlePostsObj[article._id].replies,
       url,
     });
   }
@@ -1118,6 +1129,7 @@ schema.statics.getArticlesInfo = async function(articles) {
 *     @param {String} time 格式化之后的发表时间
 *     @param {Date} toc 发表时间
 *     @param {String} articleId 文章ID
+*     @param {String} uid 文章的阅读链接
 * */
 schema.statics.getArticlesDataByArticlesId = async function(articlesId, type = 'object') {
   const ArticleModel = mongoose.model('articles');
@@ -1135,6 +1147,7 @@ schema.statics.getArticlesDataByArticlesId = async function(articlesId, type = '
   const stableDocuments = await DocumentModel.getStableDocumentsBySource(articleSource, articlesId, 'object');
   const obj = {};
   for(const article of articles) {
+    const articleUrl = await ArticleModel.getArticleUrlBySource(article._id, article.source, article.sid);
     const stableDocument = stableDocuments[article._id];
     if(!stableDocument) continue;
     const user = usersObj[article.uid];
@@ -1151,6 +1164,7 @@ schema.statics.getArticlesDataByArticlesId = async function(articlesId, type = '
       time: timeFormat(article.toc),
       toc: article.toc,
       articleId: article._id,
+      url: articleUrl.articleUrl
     };
   }
   if(type === 'object') {
@@ -1164,6 +1178,30 @@ schema.statics.getArticlesDataByArticlesId = async function(articlesId, type = '
     }
     return results;
   }
+}
+
+/*
+* 文章阅读数量增加
+* */
+schema.methods.addArticleHits = async function() {
+  const hits = this.hits
+  await this.updateOne({
+    $set: {
+      hits: hits + 1,
+    }
+  });
+}
+
+/*
+* 获取文章的收藏数
+* */
+schema.statics.getCollectedCountByAid = async function(aid) {
+  const SubscribeModel = mongoose.model('subscribes');
+  return await SubscribeModel.countDocuments({
+    type: 'article',
+    cancel: false,
+    tid: aid,
+  });
 }
 
 module.exports = mongoose.model('articles', schema);

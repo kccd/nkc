@@ -1,3 +1,4 @@
+import {addSocketStatusChangedEvent} from '../../lib/js/socket';
 var app = new Vue({
   el: '#app',
   data: {

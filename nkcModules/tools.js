@@ -229,6 +229,9 @@ var Tools = function() {
       case 'zoneArticle': {
         return '/zone/a/' + id;
       }
+      case 'zoneMoment': {
+        return '/zone/m/' + id;
+      }
     }
   };
   self.getAnonymousInfo = function() {

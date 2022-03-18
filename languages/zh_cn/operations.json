@@ -842,7 +842,16 @@
   "getCommentPermission": "获取评论权限",
   "getColumnInfo": "专栏 - 获取用户专栏信息",
   "getCommentIpInfo": "获取评论ip",
-  "visitSingleMoment": "访问动态详情页",
-  "getMomentComments": "获取动态的评论",
-  "deleteMomentComment": "删除动态评论"
+  "visitZoneSingleMoment": "访问动态详情页",
+  "getZoneMomentComments": "获取动态的评论",
+  "deleteZoneMomentComment": "删除动态评论",
+  "zoneMomentCommentVote": "点赞/点踩空间动态评论",
+  "zoneMomentVote": "点赞/点踩空间动态",
+  "getZoneMomentCommentOptions": "获取空间动态评论操作列表",
+  "getZoneMomentOptions": "获取空间动态操作列表",
+  "deleteArticle": "删除文章",
+  "getArticleOptions": "获取文章操作权限",
+  "unblockArticle": "解封文章",
+  "deleteArticleDraft": "删除文章草稿",
+  "collectionArticle": "收藏文章"
 }

@@ -266,7 +266,6 @@
 </style>
 
 <script>
-  import connectSocket from '../../message/connectSocket.js'
   import {getUrl} from "../js/tools";
   import {DraggableElement} from "../js/draggable";
   import {fileToBase64} from "../js/file";
@@ -291,7 +290,6 @@
       notesAboutUsing: ''
     }),
     mounted() {
-      connectSocket();
       this.initDraggableElement();
     },
     methods: {

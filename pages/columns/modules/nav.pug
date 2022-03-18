@@ -60,7 +60,7 @@
             a(href=`/m/${data.column._id}/contribute` target="_blank")
               button 投稿
           else
-            a.pointer(onclick="Login.open('login')")
+            a.pointer(onclick="RootApp.openLoginPanel('login')")
               button 投稿
         else
           a(href="/editor?toColumn=true" target="_blank")
@@ -75,7 +75,7 @@
       .column-sub-button
         //(onclick=`subscribeColumn(${data.column._id}, true, this)`)
         if !data.user
-          a.pointer(onclick="Login.open('login')" target="_blank")
+          a.pointer(onclick="RootApp.openLoginPanel('login')" target="_blank")
             button + 关注
         else
           if state.subColumnsId.includes(data.column._id)

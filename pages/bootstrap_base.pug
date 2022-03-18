@@ -1,6 +1,7 @@
 extends scratch.pug
 block head
 
+  -var isReactNative = remoteState.isApp && remoteState.platform === "reactNative";
 
   meta(charset='UTF-8')
   meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
@@ -8,76 +9,108 @@ block head
   meta(name="format-detection" content="telephone=no")
   meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
 
+  //- 渲染页面时将浏览器JS环境所需数据藏到meta元素中
   include ./publicModules/state
 
+  //- 标签页链接
   link(rel='shortcut icon' href=remoteState.logoICO)
-  if process.env.NODE_ENV === "production"
+
+  // vue
+  if remoteState.isProduction
     +includeJS("/external_pkgs/vue.min.js", true)
   else
     +includeJS("/external_pkgs/vue.js", true)
+
+  // promise polyfill
   +includeJS('/Promise/promise.min.js', true)
+  // babel polyfill
   +includeJS('/external_pkgs/polyfill/dist/polyfill.min.js', true)
+  // jquery 相关
   +includeJS('/jquery/2.2.4/dist/jquery.min.js')
-  +includeJS('/publicModules/common.js')
-  +includeJS('/tools.js')
-  if remoteState.isApp && remoteState.platform === 'apiCloud'
-    +includeJS("/appAPi/api.js")
+  +includeJS('/jquery/jquery-ui.1.11.4.min.js', true)
+  // twemoji 表情
+  +includeJS('/twemoji/2/twemoji.min.js', true)
+  //- 弹窗模块
+  +includeJS("/sweetalert2/dist/sweetalert2.all.min.js", true)
+  // bootstrap 相关
   +includeCSS('/bootstrap/css/bootstrap.css')
-  //- +includeCSS('/iconfont/iconfont.css')
+  +includeJS('/bootstrap/js/bootstrap.min.js', true)
+  // socket.io
+  +includeJS('/socket.io-client/dist/socket.io.js', true)
+  // fontAwesome 图标相关
   +includeCSS('/font-awesome/css/font-awesome.css')
+
+  // 全局背景颜色设置
   style=`body{background-color: ${remoteState.serverSettings.backgroundColor}}`
+  // 全局样式
   +includeCSS('/nkc_styles.css')
-  if remoteState.isApp
-    style.
-      body{
-        padding-top: 0;
-      }
   +includeCSS('/publicModules/public.css')
+
+  // reactNative 全局颜色设置
+  // 在 reactNative 上不会显示页面头部，故去掉上内边距
+  if isReactNative
+    +includeCSS('/publicModules/reactNative.css')
+
   block title
     meta(name="description" content="倡导科学理性，发展科技爱好")
     title bootstrap_base
-  if remoteState.isApp && remoteState.platform === 'reactNative'
-    +includeJS('/appApi/reactNative.js')
+
+  // 每个页面都会引入的公共方法
+  +includeJS('/publicModules/common.js')
+  // 前后端公用的方法
+  +includeJS('/tools.js')
+  // 前后端公用的方法 数据类型检查相关
+  +includeJS("/checkData.js")
+  // 加载 reactNative 特有方法 待改
+  if isReactNative
+    +includeJS('/global/reactNative.js')
 
 block body
   block navbar
     div
+      // APP 无需显示页面头部
       if !remoteState.isApp
         include ./publicModules/navbar/navbar.pug
 
   block content
     h1 hello world!
+
+  // APP 无需显示页面底部
   if !remoteState.isApp
     block footer
       include ./publicModules/footer/footer
-  //-if remoteState.uid
-    if data.user.generalSettings.lotterySettings.status
-      include module_lottery
-  +includeJS('/jquery/jquery-ui.1.11.4.min.js', true)
-  //-app使用的js
-  if remoteState.isApp && remoteState.platform === 'apiCloud'
-    +includeJS("/appAPi/app.js")
-  +includeJS('/bootstrap/js/bootstrap.min.js', true)
-  +includeJS('/twemoji/2/twemoji.min.js', true)
+
+  // 屏蔽线上模式 vue 提示
   if remoteState.isProduction
     script.
       Vue.config.productionTip = false;
-  //- 弹窗模块
-  +includeJS("/sweetalert2/dist/sweetalert2.all.min.js", true)
-  // 前后端公用 数据类型检查
-  +includeJS("/checkData.js")
-  //- 旧版common.js兼容旧的页面
-  +includeJS('/interface_common.js')
-  if remoteState.uid
-    +includeJS('/socket.io-client/dist/socket.io.js', true)
-    //- 通用socket
-    if !remoteState.isApp
-      //- 接入即时通信
-      +includeJS('/message/connectSocket.js')
-      include ./message/chat
 
-  if (!remoteState.isApp || remoteState.platform === 'reactNative') && !data.user
-    include ./publicModules/login/login
+  // 会员连接 socket.io
+  +includeJS('/message/connectSocket.js')
+
+
+  //- 旧版common.js兼容旧的页面 （待改，需去掉其中的立即执行代码）
+  +includeJS('/interface_common.js')
+
+  // 创建全局vue实例
+  // 挂载聊天、登录、图片预览组件
+  // 完成所有页面均需要的准备工作
+  #rootApp(v-cloak)
+    chat(ref='chat' v-if='hasLogged')
+    login(ref='login' v-if='!hasLogged')
+  +includeJS('/global/root.js')
+
+  //
+  //
+  //if remoteState.uid
+  //  //- 通用socket
+  //  if !remoteState.isApp
+  //    //- 接入即时通信
+  //    +includeJS('/message/connectSocket.js')
+  //    include ./message/chat
+  //
+  //if (!remoteState.isApp || remoteState.platform === 'reactNative') && !data.user
+  //  include ./publicModules/login/login
   block scripts
   if !remoteState.isApp
     //- 生成二维码 页脚

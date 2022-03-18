@@ -335,7 +335,7 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
   const {normal} = await ArticleModel.getArticleStatus();
   const {column: ArticleSource} = await ArticleModel.getArticleSources();
   if (fidOfCanGetThread) {
-    articleMatch.status = normal;
+    // articleMatch.status = normal;
     articleMatch.source = ArticleSource;
   }
   let articles = await ArticleModel.find(articleMatch);

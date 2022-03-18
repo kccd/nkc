@@ -121,6 +121,7 @@ router
     const paging = nkcModules.apiFunction.paging(page, count, column.perpage);
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
     data.paging = paging;
+    //获取专栏文章
     data.columnPosts = await db.ColumnPostModel.extendColumnPosts(columnPosts, fidOfCanGetThread);
     data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);

@@ -1,4 +1,5 @@
 import {generalRequest, nkcAPI, nkcUploadFile} from "./lib/js/netAPI";
+import {toLogin} from "./lib/js/account";
 import {
   sweetAlert,
   sweetWarning,
@@ -783,7 +784,7 @@ function copyLink(id) {
 }
 
 function postsVote(pid, type) {
-  if(!NKC.configs.uid || type === 'login') return NKC.methods.toLogin('login');
+  if(!NKC.configs.uid || type === 'login') return toLogin('login');
   var url = '/p/' + pid + '/vote/down';
   if(type === 'up') {
     url = '/p/' + pid + '/vote/up';

@@ -9,6 +9,8 @@ export function getState() {
     refererOperationId: '',
     fileDomain: '',
     websiteCode: '',
+    websiteName: '',
+    websiteBrief: '',
     column: '',
   };
   try{
@@ -23,6 +25,8 @@ export function getState() {
     state.newMessageCount = 0;
     state.fileDomain = windowData.fileDomain;
     state.websiteCode = windowData.websiteCode;
+    state.websiteName = windowData.websiteName;
+    state.websiteBrief = windowData.websiteBrief;
     return state;
   } catch(err) {
     console.error(`获取 state 数据失败`);

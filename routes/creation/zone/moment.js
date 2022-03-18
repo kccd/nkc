@@ -20,16 +20,17 @@ router
       }
       return await next();
     }
+    const {normal: normalStatus} = await db.MomentModel.getMomentStatus();
     // 获取动态列表
     const match = {
       uid: state.uid,
       parent: '',
-      status: 'normal',
+      status: normalStatus,
     };
     const count = await db.MomentModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count);
     const moments = await db.MomentModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-    data.momentsData = await db.MomentModel.extendMomentsListData(moments);
+    data.momentsData = await db.MomentModel.extendMomentsListData(moments, state.uid);
     data.paging = paging;
     await next();
   })

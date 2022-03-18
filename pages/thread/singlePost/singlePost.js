@@ -1,5 +1,6 @@
 import {getCommentEditorConfigs} from '../../lib/js/editor';
 import Editor from '../../lib/vue/Editor';
+import {toLogin} from "../../lib/js/account";
 
 class SinglePostModule {
   constructor() {
@@ -404,7 +405,7 @@ class SinglePostModule {
   // 打开回评输入框
   switchCommentForm(pid) {
     if(!NKC.configs.uid) {
-      return NKC.methods.toLogin();
+      return toLogin();
     }
     const singleComment = this.getSingleComment(pid);
     singleComment.find('.single-post-comment-error').remove();

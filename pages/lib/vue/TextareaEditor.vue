@@ -15,6 +15,7 @@
           :style="textareaStyle"
           v-model="content"
           :placeholder="placeholder || defaultPlaceholder"
+          @keyup.ctrl.enter="keyUpEnter"
         )
 
 </template>
@@ -119,6 +120,9 @@
         setTimeout(() => {
           self.resetFocus(newPosition);
         });
+      },
+      keyUpEnter() {
+        this.$emit('click-ctrl-enter');
       },
       onContentChange: function() {
         this.$emit('content-change', this.content);

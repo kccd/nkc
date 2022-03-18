@@ -4,7 +4,6 @@ const materialsRouter = require('./materials');
 const booksRouter = require('./books');
 const bookRouter = require('./book');
 const articlesRouter = require('./articles');
-const articleRouter = require('./article');
 const categoriesRouter = require('./categories');
 const categoryRouter = require('./category');
 const draftsRouter = require('./drafts');
@@ -44,7 +43,6 @@ router
   .use('/books', booksRouter.routes(), booksRouter.allowedMethods())
   .use('/book', bookRouter.routes(), bookRouter.allowedMethods())
   .use('/articles', articlesRouter.routes(), articlesRouter.allowedMethods())
-  .use('/article', articleRouter.routes(), articleRouter.allowedMethods())
   .use('/drafts', draftsRouter.routes(), draftsRouter.allowedMethods())
   .use('/draft', draftRouter.routes(), draftRouter.allowedMethods())
   .use('/community', communityRouter.routes(), communityRouter.allowedMethods())

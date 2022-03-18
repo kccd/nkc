@@ -249,7 +249,7 @@ userRouter
       const count = await db.MomentModel.countDocuments(match);
       paging = nkcModules.apiFunction.paging(page, count);
       const moments = await db.MomentModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-      data.momentsData = await db.MomentModel.extendMomentsListData(moments);
+      data.momentsData = await db.MomentModel.extendMomentsListData(moments, state.uid);
     } else if(t === 'post') {
       if(Number(page) === 0) {
         data.userPostSummary = await db.UserModel.getUserPostSummary(targetUser.uid);

@@ -7,7 +7,7 @@ module.exports = {
     },
     playerTips: {
       isDisplay: false,
-      tipContent: ""
+      tipContent: "仅供内部学术交流或培训使用，请先保存到本地。本内容不代表本站观点，未经原作者同意，请勿转载。"
     },
     disablePost: {
       status: false,

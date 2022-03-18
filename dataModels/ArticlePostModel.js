@@ -34,6 +34,12 @@ const schema = new mongoose.Schema({
     default: Date.now,
     index: 1
   },
+  //文章评论数量
+  replies: {
+    type: Number,
+    default: 0,
+    index: 1,
+  }
 }, {
   collection: "articlePosts"
 });
@@ -68,7 +74,6 @@ schema.statics.creatCommentPost = async function(props) {
 schema.statics.getArticlePostByArticleId = async function(props) {
   const ArticlePostModel = mongoose.model('articlePosts');
   const {sid, source, uid} = props;
-  console.log('props', props);
   let articlePost = await ArticlePostModel.findOne({sid, source});
   if(!articlePost) {
     //如果不存在引用就创建一条新的引用
@@ -76,5 +81,35 @@ schema.statics.getArticlePostByArticleId = async function(props) {
   }
   return articlePost;
 }
+
+/*
+* 获取评论引用信息
+* 返回当前引用夫人回复数量
+* */
+schema.statics.getArticlePostInfo = async function(articlePosts) {
+  const CommentModel = mongoose.model('comments');
+  const results = [];
+  for(const a of articlePosts) {
+    results.push({
+      ...a.toObject(),
+      replies: await CommentModel.countDocuments({sid: a._id})
+    });
+  }
+  return results;
+};
+
+/*
+* 更新评论引用的评论数量
+* */
+schema.statics.updateOrder = async function(order, aid) {
+  const ArticlePostModel = mongoose.model('articlePosts');
+  const articlePost = await ArticlePostModel.findOnly({sid: aid});
+  articlePost.replies = order;
+  await articlePost.updateOne({
+    $set: {
+      replies: articlePost.replies,
+    }
+  });
+};
 
 module.exports = mongoose.model('articlePosts', schema);

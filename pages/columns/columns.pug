@@ -77,7 +77,7 @@ block scripts
     }
     function subscribeColumn(columnId) {
       if(!NKC.configs.uid) {
-        return NKC.methods.toLogin();
+        return window.RootApp.openLoginPanel();
       }
       var dom = $('.column[data-column-id="'+columnId+'"] .column-subscription');
       var subscribed = dom.attr('data-subscribed');

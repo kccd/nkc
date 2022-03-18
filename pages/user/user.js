@@ -1,4 +1,19 @@
-const data = NKC.methods.getDataById('data');
+import Moments from '../lib/vue/zone/Moments';
+import {getDataById} from "../lib/js/dataConversion";
+
+const data = getDataById('data');
+
+const moment = new Vue({
+  el: "#moment",
+  components: {
+    'moments': Moments,
+  },
+  data: {
+    momentsData: data.momentsData
+  }
+});
+
+
 
 window.checkbox = undefined;
 window.checkboxBody = undefined;

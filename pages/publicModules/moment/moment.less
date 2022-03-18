@@ -4,27 +4,16 @@
   @avatarWidthMin: 3rem;
   position: relative;
   padding-left: @avatarWidth + 1rem;
-  //padding-right: @avatarWidth;
   min-height: @avatarWidth;
-  /*@media(max-width: 787px) {
-    padding-right: 1rem;
-    padding-left: @avatarWidthMin + 0.5rem;
-  }*/
+
   .single-moment-left{
     position: absolute;
     top: 0;
     left: 0;
     width: @avatarWidth;
-    /*@media(max-width: 787px) {
-      width: @avatarWidthMin;
-    }*/
     .single-moment-avatar{
       height: @avatarWidth;
       width: @avatarWidth;
-      /*@media(max-width: 787px) {
-        height: @avatarWidthMin;
-        width: @avatarWidthMin;
-      }*/
       border-radius: 50%;
       overflow: hidden;
       img{
@@ -33,7 +22,6 @@
       }
     }
   }
-
   .single-moment-right{
   }
   .single-moment-files{
@@ -152,6 +140,9 @@
       line-height: @padding;
       cursor: pointer;
       text-align: right;
+      &[data-vote-type="up"] {
+        color: @accent;
+      }
       .fa{
         margin-right: 0.5rem;
       }

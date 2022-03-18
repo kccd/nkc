@@ -35,7 +35,7 @@ block content
           .app-forum-subscribe
             if f.canSubscribe
               if !data.user
-                div(onclick=`NKC.methods.toLogin('login')`) 关注
+                div(onclick=`RootApp.openLoginPanel('login')`) 关注
               else if f.subscribed
                 div.cancel(onclick=`subscribeForum(false, "${f.fid}")` data-button-fid=f.fid) 取关
               else

@@ -24,7 +24,7 @@
         a(href=`/column/apply` target='_blank' v-else-if="user.uid && user.columnPermission").col-xs-6.nav-user-link
           .fa.fa-columns
           | 开设专栏
-        .col-xs-6.nav-user-link(onclick='messageApp.toChat()')
+        .col-xs-6.nav-user-link(onclick='RootApp.openChatPanel()')
           .fa.fa-envelope-o
           | 消息中心
           .count(v-if="user.newMessageCount && user.newMessageCount > 0") {{user.newMessageCount}}

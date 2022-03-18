@@ -1,7 +1,7 @@
 mixin mixinColumnContribute(user, column, columnToolStyle)
   .column-tool-container.column-contribute-body(style=columnToolStyle)
     if !user
-      .column-contribute.thread(onclick='NKC.methods.toLogin()')
+      .column-contribute.thread(onclick='RootApp.openLoginPanel()')
     else if user.uid !== column.uid
       a.column-contribute.thread(href=`/m/${column._id}/contribute` target='_blank')
     else

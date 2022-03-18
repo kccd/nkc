@@ -1,5 +1,5 @@
 <template lang="pug">
-  .paging(v-if="pagesData.length")
+  .paging(v-if="pagesData.length" :style="containerStyle")
     span.paging-button(
       v-for="b in pagesData"
       :class="b.type"
@@ -45,10 +45,19 @@
 
 <script>
   export default {
-    props: ['pages'],
+    props: ['pages', 'pb', 'pt', 'mb', 'mt'],
     data: () => ({
     }),
     computed: {
+      containerStyle() {
+        const {pb = 0, pt = 0, mb = 0, mt = 0} = this;
+        return (
+          `padding-bottom: ${pb}rem;` +
+          `padding-top: ${pt}rem;` +
+          `margin-bottom: ${mb}rem;` +
+          `margin-top: ${mt}rem;`
+        );
+      },
       pagesData() {
         return this.pages.map(page => {
           const {type, num} = page;

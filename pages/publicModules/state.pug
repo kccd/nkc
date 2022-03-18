@@ -9,7 +9,9 @@ if remoteState.isApp
   -windowData.isApp = true;
   -windowData.appOS = remoteState.appOS;
   -windowData.platform = remoteState.platform;
--windowData.fileDomain = remoteState.fileDomain;
--windowData.websiteCode = remoteState.websiteCode;
 
+-windowData.fileDomain = remoteState.fileDomain;
+-windowData.websiteCode = remoteState.serverSettings.websiteCode;
+-windowData.websiteName = remoteState.serverSettings.websiteName;
+-windowData.websiteBrief = remoteState.serverSettings.brief;
 meta(name='window-data' content=objToStr(windowData))

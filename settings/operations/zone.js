@@ -3,5 +3,30 @@ module.exports = {
     PARAMETER: {
       GET: 'visitZoneArticle'
     }
+  },
+  m: {
+    PARAMETER: {
+      GET: 'visitZoneSingleMoment',
+      vote: {
+        POST: 'zoneMomentVote'
+      },
+      options: {
+        GET: 'getZoneMomentOption'
+      },
+      comments: {
+        GET: 'getZoneMomentComments'
+      },
+      comment: {
+        PARAMETER: {
+          DELETE: 'deleteZoneMomentComment',
+          vote: {
+            POST: 'zoneMomentCommentVote'
+          },
+          options: {
+            GET: 'getZoneMomentCommentOptions'
+          }
+        }
+      }
+    }
   }
 }

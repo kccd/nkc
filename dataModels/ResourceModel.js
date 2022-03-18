@@ -239,6 +239,14 @@ resourceSchema.virtual('visitorAccess')
     return this._visitorAccess = visitorAccess;
   });
 
+resourceSchema.virtual('mask')
+  .get(function() {
+    return this._mask;
+  })
+  .set(function(mask) {
+    return this._mask = mask;
+  })
+
 resourceSchema.virtual('token')
   .get(function() {
     return this._token;
@@ -248,7 +256,9 @@ resourceSchema.virtual('token')
   });
 
 /*
- * 文件是否存在
+ * 拓展附件信息
+ * 拓展了以下字段
+ * {String} mask 作为音视频时的播放器遮罩内容
  */
 resourceSchema.methods.setFileExist = async function(excludedMediaTypes = []) {
   const {files = {}, mediaType} = this;
@@ -262,6 +272,13 @@ resourceSchema.methods.setFileExist = async function(excludedMediaTypes = []) {
   if(['mediaVideo', 'mediaAudio', 'mediaAttachment'].includes(this.mediaType)) {
     const {visitorAccess} = await SettingModel.getSettings('download');
     this.visitorAccess = visitorAccess[this.mediaType];
+  }
+
+  // 加载音视频遮罩内容
+  if(['mediaVideo', 'mediaAudio'].includes(this.mediaType)) {
+    const {playerTips} = await SettingModel.getSettings('thread');
+    const {isDisplay, tipContent} = playerTips;
+    this.mask = isDisplay && tipContent.length > 0? tipContent: '';
   }
 
   // 拓展预览音视频的 token

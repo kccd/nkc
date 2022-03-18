@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import {toLogin} from "../lib/js/account";
+
 export default {
   data: () => ({
   }),
@@ -18,7 +20,7 @@ export default {
   mounted() {
   },
   methods: {
-    toLogin: NKC.methods.toLogin,
+    toLogin,
   }
 }
 </script>

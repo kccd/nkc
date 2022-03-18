@@ -25,6 +25,7 @@ const schema = new Schema({
   // 3. user 关注的用户
   // 4. column 订阅的专栏
   // 5. collection 收藏的文章
+  // 6. article 关注的article文章
   type: {
     type: String,
     required: true,
@@ -725,9 +726,9 @@ schema.statics.insertSubscribe = async (type, uid, tid) => {
 * @return {Boolean}
 * @author pengxiguaa 2020-12-15
 * */
-schema.statics.checkCollectionThread = async (uid, tid) => {
+schema.statics.checkCollectionThread = async (uid, tid, type) => {
   const SubscribeModel = mongoose.model('subscribes');
-  const count = await SubscribeModel.countDocuments({cancel: false, uid, tid, type: 'collection'});
+  const count = await SubscribeModel.countDocuments({cancel: false, uid, tid, type});
   return count > 0;
 };
 /*
