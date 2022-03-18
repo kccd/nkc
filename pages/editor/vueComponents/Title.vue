@@ -58,8 +58,7 @@ export default {
   },
   methods: {
     getTitleValue() {
-      // console.log(this.titleValue);
-      return this.titleValue
+      return this.titleValue;
     },
   },
 };
