@@ -45,7 +45,7 @@ router
       }
       if(isThread) {
         // 收藏
-        optionStatus.collection = await db.SubscribeModel.checkCollectionThread(user.uid, post.tid);
+        optionStatus.collection = await db.SubscribeModel.checkCollectionThread(user.uid, post.tid, 'collection');
         // 关注
         optionStatus.subscribe = await db.SubscribeModel.checkSubscribeThread(user.uid, post.tid);
       }
