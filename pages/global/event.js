@@ -50,6 +50,11 @@ const eventFunctions = {
   downloadFile,
 };
 
+/*
+* 点击事件、触摸时间触发之后执行的函数，统一处理
+* @param {String} eventType 时间类型 click, long-press
+* @param {Event}
+* */
 function globalEvent(eventType, e) {
   const element = e.target;
   const elementJQ = $(element);
