@@ -29,16 +29,20 @@ export default {
       if(type === 'left') {
         //打开左侧抽屉
         this.$refs.userLeftDraw.showDraw();
+        this.closeDraw('right');
       } else if(type === 'right'){
         //打开右侧抽屉
         this.$refs.userRightDraw.showDraw();
+        this.closeDraw('left');
       }
     },
     closeDraw(type) {
       if(type === 'left') {
         //关闭左侧抽屉
+        this.$refs.userLeftDraw.closeDraw();
       } else if(type === 'right') {
         //关闭右侧抽屉
+        this.$refs.userRightDraw.closeDraw();
       }
     },
   }

@@ -59,7 +59,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             span 消息
             .nav-user-avatar-count.message-switch.message-count(class="hidden")
 
-          li.dropdown.userInfo.nav-user(onmouseover=`initUserNavVue('userNav', ${remoteState.uid})`)
+          li.dropdown.userInfo.nav-user(onmouseover="window.RootApp.showUserPanel()")
             .nav-user-content
               div
                 #userNav

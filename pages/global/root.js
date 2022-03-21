@@ -30,6 +30,15 @@ window.RootApp = new Vue({
     initAppGlobalClickLinkEvent();
   },
   methods: {
+    //更新右侧抽屉消息条数
+    updateNewMessageCount(count) {
+      this.$refs.userRightDraw.updateNewMessageCount(count);
+      initUserNav().updateNewMessageCount(count);
+    },
+    showUserPanel() {
+      initUserNav().showDraw();
+    },
+    //
     openLoginPanel(type) {
       if(this.isReactNative) {
         RNOpenLoginPage(type);
