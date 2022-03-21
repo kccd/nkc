@@ -54,7 +54,7 @@
                 .html(v-html='message.content' v-if="message.contentType === 'html'")
                 //- 发送的图片消息
                 .image(v-else-if="message.contentType === 'image'")
-                  img.chat-message-image(:src="message.content.fileUrlSM" :data-src="message.content.fileUrl")
+                  img.chat-message-image(:src="message.content.fileUrlSM" data-global-click="viewImage" data-global-long-press="downloadFile" :data-global-data="objToStr({name: '', url: message.content.fileUrl})" :data-src="message.content.fileUrl")
                 //- 发送的文件消息
                 .file(v-else-if="message.contentType === 'file'")
                   a(:href="message.content.fileUrl" target='_blank') {{message.content.filename}}
@@ -484,6 +484,7 @@
     openUserPage,
   } from '../../../message/message.2.0.js';
   import {withdrawn, onWithdrawn} from '../../../message/message.2.0.js';
+  import {objToStr, getUrl, getSize, timeFormat} from "../../js/tools";
   export default {
     data: () => ({
       type: '',
@@ -527,11 +528,11 @@
         chatContent[uid] = content;
         saveToLocalStorage(CHAT_CONTENT_ID, chatContent);
       },
-      messages() {
-        setTimeout(() => {
-          NKC.methods.initImageViewer('.chat-message-image');
-        }, 200);
-      }
+      // messages() {
+      //   setTimeout(() => {
+      //     NKC.methods.initImageViewer('.chat-message-image');
+      //   }, 200);
+      // }
     },
     mounted() {
       const app = this;
@@ -645,9 +646,10 @@
       ModuleHeader
     },
     methods: {
-      getUrl: NKC.methods.tools.getUrl,
-      getSize: NKC.methods.tools.getSize,
-      timeFormat: NKC.methods.tools.timeFormat,
+      objToStr: objToStr,
+      getUrl: getUrl,
+      getSize: getSize,
+      timeFormat: timeFormat,
       clearWarningContent() {
         this.warningContent = ''
       },

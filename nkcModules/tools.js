@@ -314,6 +314,11 @@ var Tools = function() {
       });
   };
   
+  // pug渲染时藏数据，对应前端函数strToObj
+  self.objToStr = function(obj) {
+    return encodeURIComponent(JSON.stringify(obj));
+  }
+  
   self.getSize = function(size, digits) {
     size = Number(size);
     if(digits === undefined) digits = 2;

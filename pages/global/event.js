@@ -7,7 +7,7 @@ import {
   RNOpenNewPage,
   RNUrlPathEval
 } from "../lib/js/reactNative";
-import {debounce, throttle} from "../lib/js/execution";
+import {throttle} from "../lib/js/execution";
 
 const state = getState();
 const isReactNative = state.isApp && state.platform === 'reactNative';
