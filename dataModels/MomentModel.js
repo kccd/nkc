@@ -5,8 +5,6 @@ const momentStatus = {
   normal: 'normal',
   'default': 'default',
   deleted: 'deleted',
-  disabled: 'disabled', //禁用
-  faulty: 'faulty', //退修
   unknown: 'unknown',// 未审核
 };
 
@@ -1109,5 +1107,13 @@ schema.methods.syncVoteCount = async function() {
     voteDown: this.voteDown,
   }
 };
+/*
+* 获取当前用户是否是作者
+* @param {string} currentUid 当前uid
+* */
+schema.methods.getAuthorByUid = async function(currentUid) {
+  const {uid} = this;
+  return uid === currentUid;
+}
 
 module.exports = mongoose.model('moments', schema);

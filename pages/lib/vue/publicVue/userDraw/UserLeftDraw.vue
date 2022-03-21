@@ -24,7 +24,37 @@
           .fa.fa-spinner.fa-spin.fa-fw
           .loading-text 加载中
 </template>
-
+<style lang="less">
+@import '../../../../publicModules/base';
+.nkc-drawer-left{
+  position: fixed;
+  top: 0;
+  height: 0;
+  width: 100%;
+  z-index: 500;
+  left: 0;
+  background-color: rgba(0,0,0,0.2);
+}
+.nkc-drawer-left-body {
+  width: 70%;
+  position: fixed;
+  top: 0;
+  right: -70%;
+  /*z-index: 10003;*/
+  padding-top: 50px;
+  z-index: 500;
+  height: 100%;
+  overflow-y: auto;
+  background-color: #fff;
+  transition: right 300ms, left 300ms;
+}
+.nkc-drawer-left.active{
+  height: 100%;
+}
+.nkc-drawer-left-body.active{
+  left: 0;
+}
+</style>
 <script>
 import ManagementVue from "./ManagementVue";
 import AppsVue from "./AppsVue";
