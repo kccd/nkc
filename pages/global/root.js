@@ -1,10 +1,14 @@
 import Chat from '../lib/vue/message/Chat';
 import Login from '../lib/vue/Login';
-import {RNOpenLoginPage, RNToChat} from "../lib/js/reactNative";
+import {RNOpenLoginPage, RNSyncPageInfo, RNToChat} from "../lib/js/reactNative";
 import {getState} from "../lib/js/state";
-import initUserNav from "./userPanel";
 import UserDraw from "../lib/vue/publicVue/userDraw/UserDraw";
-import {initAppGlobalClickLinkEvent, initGlobalClickEvent, initGlobalLongPressEvent} from "./event";
+import {
+  initAppGlobalClickLinkEvent,
+  initGlobalClickEvent,
+  initGlobalLongPressEvent
+} from "./event";
+import userPanel from "./userPanel";
 
 const {isApp, platform, uid} = getState();
 
@@ -28,15 +32,20 @@ window.RootApp = new Vue({
     initGlobalClickEvent();
     initGlobalLongPressEvent();
     initAppGlobalClickLinkEvent();
+
+    $(() => {
+      // 这里的代码会在页面准备就绪之后执行
+      RNSyncPageInfo({uid});
+    });
   },
   methods: {
     //更新右侧抽屉消息条数
     updateNewMessageCount(count) {
       this.$refs.userRightDraw.updateNewMessageCount(count);
-      initUserNav().updateNewMessageCount(count);
+      userPanel.updateNewMessageCount(count);
     },
     showUserPanel() {
-      initUserNav().showDraw();
+      userPanel.showDraw();
     },
     //
     openLoginPanel(type) {
@@ -68,4 +77,3 @@ window.RootApp = new Vue({
   }
 });
 
-window.initUserNav = initUserNav;

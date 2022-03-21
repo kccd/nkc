@@ -63,11 +63,18 @@ block head
   +includeJS('/tools.js')
   // 前后端公用的方法 数据类型检查相关
   +includeJS("/checkData.js")
-  // 加载 reactNative 特有方法 待改
-  if isReactNative
-    +includeJS('/global/reactNative.js')
 
 block body
+
+  // 创建全局vue实例
+  // 挂载聊天、登录、图片预览组件
+  // 完成所有页面均需要的准备工作
+  #rootApp(v-cloak)
+    chat(ref='chat' v-if='hasLogged' @update-new-messaeg="updateNewMessageCount")
+    login(ref='login' v-if='!hasLogged')
+    user-draw(ref="userDraw" v-if="hasLogged" )
+  +includeJS('/global/root.js')
+
   block navbar
     div
       // APP 无需显示页面头部
@@ -89,15 +96,6 @@ block body
 
   //- 旧版common.js兼容旧的页面 （待改，需去掉其中的立即执行代码）
   +includeJS('/interface_common.js')
-
-  // 创建全局vue实例
-  // 挂载聊天、登录、图片预览组件
-  // 完成所有页面均需要的准备工作
-  #rootApp(v-cloak)
-    chat(ref='chat' v-if='hasLogged' @update-new-messaeg="updateNewMessageCount")
-    login(ref='login' v-if='!hasLogged')
-    user-draw(ref="userDraw" v-if="hasLogged" )
-  +includeJS('/global/root.js')
 
   block scripts
   if !remoteState.isApp

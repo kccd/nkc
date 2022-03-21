@@ -5,8 +5,6 @@ const momentStatus = {
   normal: 'normal',
   'default': 'default',
   deleted: 'deleted',
-  disabled: 'disabled', //禁用
-  faulty: 'faulty', //退修
   unknown: 'unknown',// 未审核
 };
 
@@ -48,9 +46,7 @@ const schema = new mongoose.Schema({
   // normal: 正常的（已发布，未被删除）
   // default: 未发布的（正在编辑，待发布）
   // deleted: 被删除的（已发布，但被删除了）
-  // disabled: 被禁用的（已发布但被管理员禁用了）
-  // faulty: 被退修的 （已发布但被管理员退修了）
-  // unknown: 状态位置的 （已发布未审核）
+  // unknown: 状态未知的 （已发布，未审核）
   status: {
     type: String,
     default: momentStatus.default,
@@ -1111,5 +1107,13 @@ schema.methods.syncVoteCount = async function() {
     voteDown: this.voteDown,
   }
 };
+/*
+* 获取当前用户是否是作者
+* @param {string} currentUid 当前uid
+* */
+schema.methods.getAuthorByUid = async function(currentUid) {
+  const {uid} = this;
+  return uid === currentUid;
+}
 
 module.exports = mongoose.model('moments', schema);

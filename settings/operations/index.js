@@ -88,6 +88,7 @@ const comment = require("./comment");
 const zone = require('./zone');
 const subscribe = require('./subscribe');
 const article = require('./article');
+const moment = require ('./moment');
 const operationObj = {};
 
 
@@ -287,6 +288,7 @@ operationObj.operationTree = {
     zone, // 空间
     g: subscribe, // 关注
 		article, //独立文章
+		moment, //动态
 	}
 };
 module.exports = operationObj;
