@@ -1,7 +1,14 @@
 <template lang="pug">
 
   .single-moment-container(v-if="momentData")
-    .single-moment-top-container
+    .single-moment-top-container#comment-content
+      moment-option(
+        ref="momentOption"
+        @complaint="complaint"
+        @violation-record="violationRecord"
+        )
+      complaint(ref="complaint")
+      violation-record(ref="violationRecord")
       .single-moment-left
         .single-moment-avatar(:data-float-uid="momentData.uid")
           img(:src="momentData.avatarUrl")
@@ -11,7 +18,8 @@
             a(:href="momentData.userHome" target="_blank") {{momentData.username}}
           .single-moment-time
             from-now(:time="momentData.toc")
-          .single-moment-header-options
+          //- 其他操作
+          .single-moment-header-options(@click="openOption($event)" data-direction="down")
             .fa.fa-ellipsis-h
         //- 动态内容
         .single-moment-content(v-html="momentData.content")
@@ -283,13 +291,18 @@
   import {sweetError} from "../../js/sweetAlert";
   import MomentComments from './MomentComments';
   import MomentQuote from './MomentQuote';
-
+  import MomentOption from "./momentOption/MomentOption";
+  import Complaint from "../Complaint";
+  import ViolationRecord from "../ViolationRecord";
   export default {
     components: {
       'from-now': FromNow,
       'moment-files': MomentFiles,
       'moment-comments': MomentComments,
-      'moment-quote': MomentQuote
+      'moment-quote': MomentQuote,
+      "moment-option": MomentOption,
+      "complaint": Complaint,
+      "violation-record": ViolationRecord
     },
     /*
     * prop {Object} data 动态用于显示的数据 组装自 MomentModel.statics.extendMomentsListData
@@ -341,7 +354,26 @@
       },
       onPostComment() {
         this.momentData.commentCount ++;
-      }
+      },
+      //打开其他操作
+      openOption(e) {
+        const target = $(e);
+        const direction = target.attr('data-direction') || 'up';
+        const init = target.attr('data-init');
+        if(init === 'true') return;
+        //显示操作菜单
+        this.$refs.momentOption.open({DOM: e.target, moment: this.momentData, direction});
+        //阻止浏览器默认事件
+        e.stopPropagation();
+      },
+      //投诉或举报
+      complaint(mid) {
+        this.$refs.complaint.open('moment', mid);
+      },
+      //查看违规记录
+      violationRecord(uid) {
+        this.$refs.violationRecord.open({uid});
+      },
     }
   }
 </script>

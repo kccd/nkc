@@ -853,5 +853,8 @@
   "getArticleOptions": "获取文章操作权限",
   "unblockArticle": "解封文章",
   "deleteArticleDraft": "删除文章草稿",
-  "collectionArticle": "收藏文章"
+  "collectionArticle": "收藏文章",
+  "deleteMoment": "删除动态",
+  "getMomentOption": "获取动态操作权限",
+  "getMomentIpInfo": "获取动态的ip信息"
 }

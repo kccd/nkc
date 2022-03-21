@@ -83,6 +83,8 @@ const zoneRouter = routers.zone;
 const subscribeRouter = routers.subscribe;
 //独立文章
 const articleRouter = routers.article;
+//动态
+const momentRouter = routers.moment;
 
 const path = require('path');
 
@@ -168,4 +170,5 @@ router.use('/comment', commentRouter.routes(), commentRouter.allowedMethods());
 router.use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods());
 router.use('/g', subscribeRouter.routes(), subscribeRouter.allowedMethods());
 router.use('/article', articleRouter.routes(), articleRouter.allowedMethods());
+router.use('/moment', momentRouter.routes(), momentRouter.allowedMethods());
 module.exports = router;

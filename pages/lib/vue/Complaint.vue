@@ -161,6 +161,7 @@ export default {
     initDraggableElement() {
       this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
     },
+    //获取投诉类型
     getComplaintList() {
       this.loading = true;
       const self = this;
@@ -178,7 +179,7 @@ export default {
       const self = this;
       nkcAPI("/complaint", "POST", {
         type: self.type,
-        id: self.commentId,
+        id: self.cid,
         reasonTypeId: self.reasonTypeId,
         reasonType: self.reasonType,
         reasonDescription: self.reasonDescription
@@ -198,7 +199,7 @@ export default {
       this.submitted = false;
       this.reasonTypeId = "";
       this.reasonDescription = "";
-      this.commentId = id;
+      this.cid = id;
       this.draggableElement.show();
       this.show = true;
     },
