@@ -65,6 +65,32 @@ export default {
 </script>
 
 <style>
+
+
+.editor-abstract textarea:focus{
+  outline: none;
+}
+.editor-abstract textarea{
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  resize: none;
+  padding: 0.5rem;
+}
+.editor-abstract-info{
+  text-align: right;
+  font-size: 1.2rem;
+  color: #9baec8;
+}
+.editor-header{
+  font-size: 1.25rem;
+  margin: 0.3rem 0;
+  color: #555;
+  font-weight: 700;
+}
+.editor-header small{
+  color: #88919d;
+}
 .warning {
   color: #ff6262;
 }

@@ -1,12 +1,12 @@
 <template lang="pug">
-#content
+.content
   editor(
-    :configs="editorConfigs",
-    ref="threadEditor",
-    @ready="editorReady",
-    @content-change="onContentChange",
-    :plugs="editorPlugs"
-  )
+      :configs="editorConfigs",
+      ref="threadEditor",
+      @ready="editorReady",
+      @content-change="onContentChange",
+      :plugs="editorPlugs",
+    )
 </template>
 
 <script>
@@ -17,6 +17,7 @@ export default {
     editor: Editor
   },
   data: () => ({
+    openOnEditNotes: localStorage.getItem("open-on-edit-notes") === "yes",
     editorPlugs: {
       resourceSelector: true,
       draftSelector: true,
@@ -27,12 +28,13 @@ export default {
     // 是否允许触发contentChange
     contentChangeEventFlag: true,
     content: "",
-    quoteHtml: ""
+    quoteHtml: "",
+    contentLength: ''
   }),
   props: {
     c: {
       type: String
-    }
+    },
   },
   created() {
     let reg = /<blockquote cite.+?blockquote>/;
@@ -79,10 +81,10 @@ export default {
       const _content = this.$refs.threadEditor.getContent();
       this.content = _content;
       this.contentLength = content.length;
-      this.$emit('content-change', content.length);
+      this.$emit("content-change", content.length);
     },
     getData() {
-      return { c: this.content + (this.quoteHtml || "") };
+      return { c: this.content + (this.quoteHtml || ""), contentLength: this.contentLength};
     },
     editorReady() {
       //编辑器准备就绪
@@ -95,8 +97,21 @@ export default {
     removeEditor() {
       this.$refs.threadEditor.removeNoticeEvent();
     }
+  },
+  watch: {
+    openOnEditNotes: function(val) {
+      localStorage.setItem("open-on-edit-notes", val ? "yes" : "no");
+    }
   }
 };
 </script>
 
-<style></style>
+<style scoped lang="less">
+
+.content #edui1_toolbarbox{
+  position: fixed;
+  top: 43px;
+  left: 0px;
+  width: 100%;
+}
+</style>

@@ -25,21 +25,26 @@ export default {
   data: () => ({
     cover: "",
     coverUrl: "",
-    type: "newThread"
+    type: "newThread",
+    coverData: ''
   }),
   components: {
     "resource-selector": ResourceSelector,
     "image-selector": ImageSelector
   },
   props: {
-    "cover-value": {
+    value: {
       type: String
     }
   },
   created() {
-    if (this["cover-value"]) {
-      this.coverUrl = getUrl("postCover", this["cover-value"]);
-    }
+    if(typeof this.value === 'undefined') {
+      console.error('this.value is undefined');
+      return
+    } 
+
+    this.coverUrl = getUrl("postCover", this.value);
+    
   },
   methods: {
     selectCover() {
@@ -72,7 +77,6 @@ export default {
               this.$refs.resourceSelector.close();
             })
             .catch(err => {
-              console.log(err);
               sweetError(err);
             });
         },
@@ -98,4 +102,32 @@ export default {
 };
 </script>
 
-<style></style>
+<style lang="less" scoped>
+
+.editor-cover-img{
+  height: 12rem;
+  width: 18rem;
+}
+.editor-cover-img img{
+  height: 100%;
+}
+.editor-cover-default .fa{
+  height: 12rem;
+  cursor: pointer;
+  width: 18rem;
+  line-height: 12rem;
+  text-align: center;
+  color: #aaa;
+  font-size: 1.5rem;
+  background-color: #eee;
+}
+.editor-header{
+  font-size: 1.25rem;
+  margin: 0.3rem 0;
+  color: #555;
+  font-weight: 700;
+}
+.editor-header small{
+  color: #88919d;
+}
+</style>

@@ -15,10 +15,8 @@
 *
 * */
 
-
-import {nkcAPI} from "../lib/js/netAPI";
+import { nkcAPI } from "../lib/js/netAPI";
 import ModifySubmit from "./vueComponents/ModifySubmit.vue";
-// import ModifyNotice from "./vueComponents/ModifyNotice.vue";
 import Title from "./vueComponents/Title.vue";
 import Content from "./vueComponents/Content.vue";
 import Classification from "./vueComponents/Classification.vue";
@@ -27,90 +25,85 @@ import Abstract from "./vueComponents/Abstract.vue";
 import KeyWord from "./vueComponents/KeyWord.vue";
 import AuthorInfo from "./vueComponents/AuthorInfo.vue";
 import Original from "./vueComponents/Original.vue";
-import Investigation from "./vueComponents/Investigation.vue" 
-import Column from "./vueComponents/Column.vue"
+import Investigation from "./vueComponents/Investigation.vue";
+import Column from "./vueComponents/Column.vue";
 window.nkcAPI = nkcAPI;
 window.state = NKC.methods.getDataById("state");
-  console.log(state)
+console.log(state);
 
-  window.data = NKC.methods.getDataById("data");
-  console.log(data)
-  if(window.data?.threadCategories){
-        for(const c of window.data.threadCategories) {
-          c.selectedNode = null;
-          if(c.defaultNode === 'none') continue;
-          if(c.defaultNode === 'default') {
-            c.selectedNode = c.defaultNode;
-          } else {
-            const nodeId = Number(c.defaultNode);
-            if(isNaN(nodeId)) continue;
-            for(const node of c.nodes) {
-              if(node._id !== nodeId) continue;
-              c.selectedNode = node;
-            }
-          }
-        }
+window.data = NKC.methods.getDataById("data");
+console.log(data,'data');
+
+if (window.data?.threadCategories) {
+  for (const c of window.data.threadCategories) {
+    c.selectedNode = null;
+    if (c.defaultNode === "none") continue;
+    if (c.defaultNode === "default") {
+      c.selectedNode = c.defaultNode;
+    } else {
+      const nodeId = Number(c.defaultNode);
+      if (isNaN(nodeId)) continue;
+      for (const node of c.nodes) {
+        if (node._id !== nodeId) continue;
+        c.selectedNode = node;
       }
+    }
+  }
+}
 
 new Vue({
-  el: '#app-publish-article',
+  el: "#app-publish-article",
   components: {
     "modify-submit": ModifySubmit,
-    // "modify-notice": ModifyNotice,
     "article-title": Title,
     "article-content": Content,
-    "classification": Classification,
-    "cover": Cover,
-    "abstract": Abstract,
+    classification: Classification,
+    cover: Cover,
+    abstract: Abstract,
     "key-word": KeyWord,
     "author-info": AuthorInfo,
-    "original": Original,
-    "investigation": Investigation,
-    "column": Column
- 
+    original: Original,
+    investigation: Investigation,
+    column: Column
   },
-  data: ()=>({
-    pageData: window.data, 
+  data: () => ({
+    pageData: window.data,
     pageState: window.state
   }),
-  created(){
-  
-  },
+  created() {},
   methods: {
-    removeEditor(){
-      console.log('1231');
-      this.$refs.content.removeEditor()
+    removeEditor() {
+      this.$refs.content.removeEditor();
     },
-    contentChange(length){
+    contentChange(length) {
       // if(length >= this.pageData.originalWordLimit){
-        this.$refs.original.contentChange(length)
+      this.$refs.original.contentChange(length);
       // }
     },
-    readyData(submitFn){
-      if(!submitFn){
-        console.error('callback is not fined');
-        return
-      };
+    readyData(submitFn) {
+      if (!submitFn) {
+        console.error("callback is not fined");
+        return;
+      }
       // pageData.draftId
       // pageData.post.parentPostId;
 
-      const refs =this.$refs;
-      let submitData= {};
+      const refs = this.$refs;
+      let submitData = {};
       for (const key in refs) {
         if (refs.hasOwnProperty(key)) {
           const vue = refs[key];
-          Object.assign( submitData, vue.getData()) 
+          Object.assign(submitData, vue.getData());
         }
       }
       // 添加 草稿id 和 parentPostId
       submitData["did"] = this.pageData.draftId;
       submitData["parentPostId"] = this.pageData.parentPostId;
-      console.log(submitData,'data')
-      submitFn(submitData)
+      console.log(submitData,'submitData');
+      submitFn(submitData);
     }
   }
-})
-
+});
 
 window.editor = undefined;
 window.PostInfo = undefined;
@@ -128,10 +121,6 @@ window.data = undefined;
 // import ImageSelector from "../lib/vue/ImageSelector";
 // import ResourceSelector from "../lib/vue/ResourceSelector";
 // import {blobToFile, fileToBase64} from "../lib/js/file";
-
-
-
-
 
 // $(function() {
 
@@ -153,7 +142,6 @@ window.data = undefined;
 //       }
 //     }
 //   }
-  
 
 //   window.data.threadCategories.map(c => c.selectedNode = null);
 
@@ -164,7 +152,6 @@ window.data = undefined;
 //     window.PostToColumn = new NKC.modules.SelectColumnCategories();
 //   }
 // });
-
 
 // NKC.methods.selectedDraft = function(draft) {
 //   PostInfo.insertDraft(draft);

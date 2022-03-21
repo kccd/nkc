@@ -214,4 +214,22 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+#moduleSelectColumnCategories .category-type{
+    background-color: #d0d0d0;
+    border-left: 6px solid #555;
+    padding-left: 0.5rem;
+    font-weight: 700;
+    height: 2rem;
+    line-height: 2rem;
+  }
+.editor-header{
+  font-size: 1.25rem;
+  margin: 0.3rem 0;
+  color: #555;
+  font-weight: 700;
+}
+.editor-header small{
+  color: #88919d;
+}
+</style>

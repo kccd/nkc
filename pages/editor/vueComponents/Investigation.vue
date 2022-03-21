@@ -359,15 +359,12 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      console.log(1231321);
       this.initPostSurvey();
     });
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
     init(options) {
-      console.log(this.survey, "this.survey");
-
       options = options || {};
       if (options.pid) this.newSurvey.pid = options.pid;
       if (options.surveyId) {
@@ -395,7 +392,6 @@ export default {
           });
       } else {
         this.survey = this.newSurvey;
-        console.log(this.survey, "this.survey");
       }
     },
     getSurveyData() {
@@ -647,7 +643,6 @@ export default {
       throw err;
     },
     submit: function() {
-      console.log(123);
       if (this.disabled) return;
       this.error = "";
       var survey = JSON.parse(JSON.stringify(this.survey));
@@ -693,8 +688,6 @@ export default {
       survey.reward.onceKcb = parseFloat(survey.reward.onceKcb || 0);
       survey.reward.rewardCount = parseInt(survey.reward.rewardCount || 0);
       survey.reward.onceKcb = survey.reward.onceKcb * 100;
-      console.log(survey, "survey");
-
       return survey;
     },
     requestData() {
@@ -750,7 +743,6 @@ export default {
     },
     disabledSurveyForm() {
       this.disabled = !this.disabled;
-      console.log(this.disabled);
     },
     getData() {
       if (this.getSurvey()) {
@@ -764,6 +756,18 @@ export default {
 </script>
 
 <style scope>
+.editor-header{
+  font-size: 1.25rem;
+  margin: 0.3rem 0;
+  color: #555;
+  font-weight: 700;
+}
+.editor-header small{
+  color: #88919d;
+}
+#disabledSurveyButton{
+  margin-left: 5px;
+}
 .btn-success {
   color: #fff;
   background-color: #5cb85c;

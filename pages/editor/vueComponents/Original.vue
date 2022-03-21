@@ -16,14 +16,14 @@ export default {
     contentLength: 0
   }),
   props: {
-    "original": {
+    original: {
       type: Object,
       required: true
     },
   },
   created() {
     if(typeof this.original.state === "undefined"){
-      console.warn('original.state is not defined');
+      console.error('original.state is not defined');
       return
     }
     this.originState = this.original.state
@@ -59,4 +59,15 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+
+.editor-header{
+  font-size: 1.25rem;
+  margin: 0.3rem 0;
+  color: #555;
+  font-weight: 700;
+}
+.editor-header small{
+  color: #88919d;
+}
+</style>

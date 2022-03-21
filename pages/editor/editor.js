@@ -229,7 +229,6 @@ function initVueApp() {
       this.type = data.type;
       
       this.draftId = data.draftId;
-      console.log(data.draftId)
       this.oldDraft = data.oldDraft;
       this.initPost(data.post);
       let self = this;
