@@ -40,18 +40,18 @@ block content
   .hidden#state=objToStr( state ) 
   .hidden#data=objToStr({createSurveyPermission: data.createSurveyPermission, minorForumCount: data.minorForumCount, originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft, websiteCode: data.websiteCode, toColumn: !!data.toColumn, threadCategories: data.threadCategories})
 block scripts
-  include ../publicModules/moment
-  include ../editor/modules/selectAuthorInfo
-  include ../publicModules/commonModal/commonModal
-  include ../publicModules/subscribeTypes/subscribeTypes
-  include ../publicModules/floatForumPanel/floatForumPanel
-  include ../publicModules/crop/crop_new
-  include ../publicModules/selectUser/selectUser
-  include ../publicModules/selectResource/selectResource
-  include ../publicModules/selectDraft/selectDraft
-  include ../publicModules/sticker/selectSticker
-  include ../publicModules/insertHideContent/insertHideContent
-  include ../ueditor/dialogs/mathformulaV2/mathformula
+  //- include ../publicModules/moment
+  //- include ../editor/modules/selectAuthorInfo
+  //- include ../publicModules/commonModal/commonModal
+  //- include ../publicModules/subscribeTypes/subscribeTypes
+  //- include ../publicModules/floatForumPanel/floatForumPanel
+  //- include ../publicModules/crop/crop_new
+  //- include ../publicModules/selectUser/selectUser
+  //- include ../publicModules/selectResource/selectResource
+  //- include ../publicModules/selectDraft/selectDraft
+  //- include ../publicModules/sticker/selectSticker
+  //- include ../publicModules/insertHideContent/insertHideContent
+  //- include ../ueditor/dialogs/mathformulaV2/mathformula
   include ../publicModules/forumSelector/forumSelector
   if state.userColumn && !data.addedToColumn
     //- +includeJS("/publicModules/toColumn/selectCategories.js")

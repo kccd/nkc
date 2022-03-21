@@ -101,6 +101,7 @@
 
 <script>
 import { getUrl } from "../../lib/js/tools";
+// import { nkcAPI } from "../../lib/js/netAPI";
 
 export default {
   data: () => ({

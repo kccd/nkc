@@ -262,6 +262,7 @@
 </template>
 
 <script>
+import { nkcAPI } from "../../lib/js/netAPI";
 export default {
   data: () => ({
     disabled: true,

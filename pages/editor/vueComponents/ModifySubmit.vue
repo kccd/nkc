@@ -27,8 +27,10 @@
 </template>
 
 <script>
-import { nkcAPI } from "../../lib/js/netAPI";
+import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
+import { sweetError } from "../../lib/js/sweetAlert.js";
 import { timeFormat } from "../../lib/js/tools";
+
 export default {
   props: {
     blockButton: {

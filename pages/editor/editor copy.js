@@ -29,7 +29,7 @@ import AuthorInfo from "./vueComponents/AuthorInfo.vue";
 import Original from "./vueComponents/Original.vue";
 import Investigation from "./vueComponents/Investigation.vue" 
 import Column from "./vueComponents/Column.vue"
-
+window.nkcAPI = nkcAPI;
 window.state = NKC.methods.getDataById("state");
   console.log(state)
 
