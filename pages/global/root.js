@@ -1,10 +1,14 @@
 import Chat from '../lib/vue/message/Chat';
 import Login from '../lib/vue/Login';
-import {RNOpenLoginPage, RNToChat} from "../lib/js/reactNative";
+import {RNOpenLoginPage, RNSyncPageInfo, RNToChat} from "../lib/js/reactNative";
 import {getState} from "../lib/js/state";
 import initUserNav from "./userPanel";
 import UserDraw from "../lib/vue/publicVue/userDraw/UserDraw";
-import {initAppGlobalClickLinkEvent, initGlobalClickEvent, initGlobalLongPressEvent} from "./event";
+import {
+  initAppGlobalClickLinkEvent,
+  initGlobalClickEvent,
+  initGlobalLongPressEvent
+} from "./event";
 
 const {isApp, platform, uid} = getState();
 
@@ -28,6 +32,7 @@ window.RootApp = new Vue({
     initGlobalClickEvent();
     initGlobalLongPressEvent();
     initAppGlobalClickLinkEvent();
+    RNSyncPageInfo({uid});
   },
   methods: {
     //更新右侧抽屉消息条数

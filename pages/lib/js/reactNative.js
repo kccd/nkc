@@ -1,14 +1,19 @@
 import {sweetQuestion} from "./sweetAlert";
+import {getState} from "./state";
 import {fixUrl} from "./url";
+const state = getState();
+const isReactNative = state.isApp && state.platform === 'reactNative';
 
 const reactNativeCallback = {};
 let reactNativeIndex = 0;
 
 export function RNPostMessage(obj) {
+  if(!isReactNative) return;
   window.ReactNativeWebView.postMessage(JSON.stringify(obj));
 }
 
 export function RNEmit(type, data, callback) {
+  if(!isReactNative) return;
   data = data || {};
   var index = reactNativeIndex ++;
   reactNativeCallback[index] = callback;

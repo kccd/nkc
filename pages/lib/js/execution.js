@@ -17,7 +17,18 @@ export function debounce(callback, time) {
 
 /*
 * 限流
+* @param {Function} callback 需要执行的函数
+* @param {Number} time callback 执行的间隔 ms
 * */
-export function throttle() {
-
+export function throttle(callback, time) {
+  let running = false;
+  return function() {
+    if(!running) {
+      callback.bind(this)(...arguments);
+      running = true;
+      setTimeout(() => {
+        running = false;
+      }, time)
+    }
+  }
 }

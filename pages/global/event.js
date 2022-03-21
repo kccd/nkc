@@ -1,7 +1,16 @@
 import {openImageViewer} from '../lib/js/imageViewer';
 import {strToObj} from "../lib/js/dataConversion";
 import {initLongPressEvent} from "../lib/js/longPress";
-import {RNDownloadFile, RNOpenNewPage, RNUrlPathEval} from "../lib/js/reactNative";
+import {getState} from "../lib/js/state";
+import {
+  RNDownloadFile,
+  RNOpenNewPage,
+  RNUrlPathEval
+} from "../lib/js/reactNative";
+import {debounce, throttle} from "../lib/js/execution";
+
+const state = getState();
+const isReactNative = state.isApp && state.platform === 'reactNative';
 
 /*
 * 查看单张图片
@@ -41,7 +50,7 @@ function viewImages(data) {
 * */
 function downloadFile(data) {
   const {name, url} = data;
-  RNDownloadFile(name, url);
+  RNDownloadFile(name, url)
 }
 
 const eventFunctions = {
@@ -68,8 +77,7 @@ function globalEvent(eventType, e) {
 }
 
 /*
-* 监听全局图片点击事件
-* img标签需包含以下属性
+* 监听全局点击事件
 * data-global-click=operation
 * data-global-data='' object json string
 * */
@@ -92,7 +100,10 @@ export function initGlobalLongPressEvent() {
 * APP 监听点击 a 标签
 * */
 export function initAppGlobalClickLinkEvent() {
-  document.addEventListener('click', e => {
+  if(!isReactNative) return;
+  // 限流 限制点击链接最小间隔时间为1000ms
+  // 防止app同时打开多个相同的页面
+  const handle = throttle(function(e) {
     let element = e.target;
     let elementJQ = $(element);
     const tagName = element.nodeName.toLowerCase();
@@ -107,5 +118,7 @@ export function initAppGlobalClickLinkEvent() {
     const title = elementJQ.attr('title') || '';
     const targetUrl = RNUrlPathEval(window.location.href, href);
     RNOpenNewPage(targetUrl, title);
-  });
+    e.preventDefault();
+  }, 1000);
+  document.addEventListener('click', handle);
 }

@@ -48,9 +48,7 @@ const schema = new mongoose.Schema({
   // normal: 正常的（已发布，未被删除）
   // default: 未发布的（正在编辑，待发布）
   // deleted: 被删除的（已发布，但被删除了）
-  // disabled: 被禁用的（已发布但被管理员禁用了）
-  // faulty: 被退修的 （已发布但被管理员退修了）
-  // unknown: 状态位置的 （已发布未审核）
+  // unknown: 状态未知的 （已发布，未审核）
   status: {
     type: String,
     default: momentStatus.default,
