@@ -62,6 +62,9 @@ export function RNDownloadFile(filename, url, callback) {
     })
 }
 
+/*
+* 获取文件列表
+* */
 export function RNGetFiles(data, callback) {
   return RNEmit('getFiles', {
     data
@@ -81,20 +84,33 @@ export function RNUpdateMusicListAndPlay(list, callback) {
   RNEmit('updateMusicListAndPlay', {list}, callback);
 }
 
+/*
+* RN打开文件
+* */
 export function RNOpenFile(data, callback) {
   RNEmit('openFile', data, callback);
 }
 
+/*
+* RN控制台打印
+* @param {任意数据类型} data 需打印的内容
+* */
 export function RNConsoleLog(data) {
   RNEmit('consoleLog', {
     content: data
   });
 }
 
+/*
+* RN删除文件
+* */
 export function RNDeleteFile(data, callback) {
   RNEmit('delFile', data, callback);
 }
 
+/*
+* 同步网站用户到RN
+* */
 export function RNLogin() {
   RNEmit('login');
 }
@@ -115,70 +131,203 @@ export function RNViewImage(urls, index) {
   });
 }
 
+/*
+* 关闭当前页面
+* @param {Object} data
+*   @param {Boolean} drawer
+* */
 export function RNCloseWebview(data) {
   RNEmit('closeWebView', data);
 }
 
+/*
+* RN退出登录
+* */
 export function RNLogout() {
   RNEmit('logout');
 }
 
+/*
+* RN检测版本号并更新
+* */
 export function RNCheckAndUpdateApp() {
   RNEmit('check_and_update_app');
 }
 
+/*
+* RN打开编辑器页面
+* @param {String} url 编辑器页面链接
+* */
 export function RNOpenEditorPage(url) {
   RNEmit("openEditorPage", {
     url
   });
 }
 
+/*
+* RN更新已登录用户信息
+* */
 export function RNUpdateLocalUser() {
   RNEmit("updateLocalUser", {});
 }
 
+/*
+* RN打开新页面（不关闭原来的页面）
+* @param {String} url 新页面链接
+* @param {String} title 页面标题
+* */
 export function RNOpenNewPage(url, title = '') {
   RNEmit('openNewPage', {href: url, title});
 }
 
+/*
+* 拍照并上传到resource
+* @param {Object} data 空对象
+* @param {Function} callback 上传成功后的回调
+* */
 export function RNTakePictureAndUpload(data, callback) {
   RNEmit('takePictureAndUpload', data, callback);
 }
+
+/*
+* 录制视频并上传到resource
+* @param {Object} data 空对象
+* @param {Function} callback 上传成功后的回调
+* */
 export function RNTakeVideoAndUpload(data, callback) {
   RNEmit('takeVideoAndUpload', data, callback);
 }
+
+/*
+* 录音并上传到resource
+* @param {Object} data 空对象
+* @param {Function} callback 上传成功后的回调
+* */
 export function RNTakeAudioAndUpload(data, callback) {
   RNEmit('takeAudioAndUpload', data, callback);
 }
 
+/*
+* RN底部气泡弹窗
+* @param {Object} data
+*   @param {String} content 需显示的内容
+* */
 export function RNToast(data) {
-  RNEmit('toast', data);
+  const {content} = data;
+  RNEmit('toast', {content});
 }
 
+/*
+* 获取输入法键盘状态
+* @param {Function} callback 回调，接收如下参数
+*   @param {Object}
+*     @param {String} keyboardStatus show(显示状态) hide(隐藏状态)
+* */
 export function RNGetKeyboardStatus(callback) {
   RNEmit('getKeyboardStatus', {}, callback);
 }
+
+/*
+* RN打开消息对话框
+* @param {Object} data
+*   @param {String} type 对话类型 UTU, STU, STE
+*   @param {String} uid UTU时，对方ID
+*   @param {String} username 对方名称
+* */
 export function RNToChat(data) {
-  RNEmit('toChat', data);
+  const {
+    type,
+    uid,
+    username
+  } = data;
+  RNEmit('toChat', {
+    type,
+    uid,
+    username
+  });
 }
+
+/*
+* RN打开新页面，然后关闭旧页面
+* @param {String} url 新页面链接
+* */
 export function RNVisitUrlAndClose(url) {
-  if(url.indexOf('http') !== 0) url = window.location.origin + url;
+  url = fixUrl(url);
   RNEmit('openNewPageAndClose', {href: url})
 }
+
+/*
+* RN打开登录或注册页面
+* @param {String} type login(登录) register(注册)
+* */
 export function RNOpenLoginPage(type) {
   RNEmit('openLoginPage', {type})
 }
+
+/*
+* 刷新RN Webview页面
+* */
 export function RNReloadWebview() {
   RNEmit('reloadWebView');
 }
+
+/*
+* 选择地区
+* @return {[String]} 地区名称组成的数组
+* */
 export function RNSelectLocation() {
   return new Promise(resolve => {
-    RNToast('selectLocation', {}, resolve);
+    RNEmit('selectLocation', {}, resolve);
   });
 }
+
+/*
+* 调用RN微信支付
+* @param {Object} data
+*   @param {String} url
+*   @param {String} H5Url
+*   @param {String} referer
+* */
 export function RNWechatPay(data) {
-  RNEmit('weChatPay', data);
+  const {
+    url,
+    H5Url,
+    referer
+  } = data;
+  RNEmit('weChatPay', {
+    url,
+    H5Url,
+    referer
+  });
 }
+
+/*
+* 传递页面相关信息到RN
+* @param {Object} data
+*   @param {String} uid
+* */
 export function RNSyncPageInfo(data) {
-  RNEmit('syncPageInfo', data);
+  const {uid} = data;
+  RNEmit('syncPageInfo', {
+    uid
+  });
+}
+
+/*
+* 保存图片到相册
+* @param {Object} data
+*   @param {String} name 图片文件名
+*   @param {String} url 图片链接
+* */
+export function RNSaveImage(data) {
+  const {url, name} = data;
+  // 此接口待RN更新后需调整
+  RNEmit('longViewImage', {
+    urls: [
+      {
+        url, name
+      }
+    ],
+    index: 0,
+  });
 }

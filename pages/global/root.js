@@ -32,7 +32,11 @@ window.RootApp = new Vue({
     initGlobalClickEvent();
     initGlobalLongPressEvent();
     initAppGlobalClickLinkEvent();
-    RNSyncPageInfo({uid});
+
+    $(() => {
+      // 这里的代码会在页面准备就绪之后执行
+      RNSyncPageInfo({uid});
+    });
   },
   methods: {
     //更新右侧抽屉消息条数

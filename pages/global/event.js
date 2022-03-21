@@ -4,7 +4,7 @@ import {initLongPressEvent} from "../lib/js/longPress";
 import {getState} from "../lib/js/state";
 import {
   RNDownloadFile,
-  RNOpenNewPage,
+  RNOpenNewPage, RNSaveImage,
   RNUrlPathEval
 } from "../lib/js/reactNative";
 import {throttle} from "../lib/js/execution";
@@ -53,10 +53,25 @@ function downloadFile(data) {
   RNDownloadFile(name, url)
 }
 
+/*
+* 保存图片到相册
+* @param {Object}
+*   @param {String} name 图片文件名
+*   @param {String} url 图片链接
+* */
+function saveImage(data) {
+  const {name, url} = data;
+  RNSaveImage(name, url);
+}
+
+/*
+* data-global-click 和 data-global-long-press 合法的操作
+* */
 const eventFunctions = {
   viewImage,
   viewImages,
   downloadFile,
+  saveImage,
 };
 
 /*
@@ -113,6 +128,9 @@ export function initAppGlobalClickLinkEvent() {
       element = element[0];
       elementJQ = $(element);
     }
+    const dataType = elementJQ.attr('data-type');
+    // 判断是否不需要新窗打开，待改
+    if(dataType === 'reload') return;
     const href = elementJQ.attr('href');
     if(!href) return;
     const title = elementJQ.attr('title') || '';
