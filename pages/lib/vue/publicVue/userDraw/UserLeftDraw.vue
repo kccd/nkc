@@ -55,8 +55,26 @@ export default {
   mounted() {
     this.getLeftDrawData();
   },
+  watch: {
+    show(oldValue, newValue) {
+      let bodyEl = document.body;
+      let nkcDrawerBodyTop;
+      if(this.show === true) {
+        nkcDrawerBodyTop = window.scrollY;
+        bodyEl.style.position = 'fixed';
+        bodyEl.style.top = -nkcDrawerBodyTop + 'px';
+      } else {
+        bodyEl.style.position = '';
+        bodyEl.style.top = '';
+        window.scrollTo(0, nkcDrawerBodyTop) // 回到原先的top
+      }
+    }
+  },
   methods: {
-    getState: getState(),
+    getState: getState,
+    updateNewMessageCount() {
+
+    },
     getLeftDrawData(){
       const _this = this;
       nkcAPI('/draw/leftDraw', 'GET' , {})
@@ -72,18 +90,10 @@ export default {
     },
     showDraw(){
       this.show = !this.show;
-      let bodyEl = document.body;
-      let nkcDrawerBodyTop;
-      if (this.show) {
-        nkcDrawerBodyTop = window.scrollY;
-        bodyEl.style.position = 'fixed';
-        bodyEl.style.top = -nkcDrawerBodyTop + 'px';
-      } else {
-        bodyEl.style.position = '';
-        bodyEl.style.top = '';
-        window.scrollTo(0, nkcDrawerBodyTop) // 回到原先的top
-      }
-    }
+    },
+    closeDraw() {
+      this.show = false;
+    },
   }
 }
 </script>

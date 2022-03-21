@@ -12,7 +12,7 @@ function initUserNav(){
     },
     methods: {
       updateNewMessageCount(count) {
-        this.$refs.userPanel.updateNewMessageCount()
+        this.$refs.userPanel.updateNewMessageCount(count)
       },
       showDraw() {
         this.$refs.userPanel.showDraw()

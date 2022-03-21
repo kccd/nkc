@@ -991,77 +991,9 @@ function numToFloatTwo(str) {
 
 var nkcDrawerBodyTop = 0;
 
-function openNKCDrawer(type) {
-  $(".nkc-drawer-"+type).addClass("active");
-  $(".nkc-drawer-"+type+"-body").addClass("active");
-  $(".nkc-drawer-"+type+"-mask").addClass("active");
-  if(type === "left") {
-    closeNKCDrawer("right");
-  } else {
-    closeNKCDrawer("left");
-  }
-  stopBodyScroll(true);
-}
-function closeNKCDrawer(type) {
-  $(".nkc-drawer-"+type).removeClass("active");
-  $(".nkc-drawer-"+type+"-mask").removeClass("active");
-  $(".nkc-drawer-"+type+"-body").removeClass("active");
-  stopBodyScroll(false);
-}
-
-//鼠标移入头像时显示用户操作导航
-function initUserNavVue(type){
-  const vueDrawId = getVueDrawsId(type);
-  let userNavDraw = draws[vueDrawId];
-  if(!userNavDraw){
-    //创建vue实例
-    userNavDraw = initUserNav();
-    draws[vueDrawId] = userNavDraw;
-  }
-  userNavDraw.showDraw();
-}
-
-//已经实例化的vue实例
-const draws = {};
-function getVueDrawsId(type) {
-  return `vue_draw_${type}`;
-}
-
-//左侧滑动框
-function showLeftDrawVue(type) {
-  const vueDrawId = getVueDrawsId(type);
-  let leftDraw = draws[vueDrawId];
-  if(!leftDraw) {
-    //创建vue实例
-    leftDraw = initLeftVue();
-    draws[vueDrawId] = leftDraw;
-  }
-  leftDraw.showDraw();
-}
-//右侧滑动框
-function showRightDrawVue(type){
-  const vueDrawId = getVueDrawsId(type);
-  let rightDraw = draws[vueDrawId];
-  if(!rightDraw) {
-    //创建vue实例
-    rightDraw = window.initRightVue();
-    draws[vueDrawId] = rightDraw;
-  }
-  rightDraw.showDraw();
-}
-
 // 更新新消息条数
 function updateNavNewMessageCount(count) {
-  const drawId = getVueDrawsId('right');
-  const draw = draws[drawId];
-  if(draw) {
-    draw.updateNewMessageCount(count);
-  }
-  const userNavId = getVueDrawsId('userNav');
-  const userNav = draws[userNavId];
-  if(userNav) {
-    userNav.updateNewMessageCount(count);
-  }
+  window.RootApp.updateNewMessageCount(count);
 }
 
 
@@ -1337,8 +1269,6 @@ Object.assign(window, {
   disabledThread,
   numToFloatTwo,
   nkcDrawerBodyTop,
-  openNKCDrawer,
-  closeNKCDrawer,
   toggleNKCDrawer,
   stopBodyScroll,
   openLeftDrawer,
@@ -1351,8 +1281,5 @@ Object.assign(window, {
   openToNewLocation,
   addApptypeToUrl,
   sweetPrompt,
-  showLeftDrawVue,
-  initLeftVue,
-  initUserNavVue,
   updateNavNewMessageCount,
 });

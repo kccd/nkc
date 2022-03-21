@@ -363,7 +363,7 @@
         this.newMessageCount = count;
         this.updateNewMessageCountToDom(count);
         this.updateNewMessageCountToNKC(count);
-        updateNavNewMessageCount(count);
+        this.$emit('update-new-message', count);
       }, 500),
       onContainerPositionChange: debounce(function(position) {
         const {left, top} = position;
