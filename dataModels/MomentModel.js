@@ -147,7 +147,7 @@ schema.statics.checkMomentQuoteType = async (quoteType) => {
 * @return {String}
 * */
 schema.methods.getResourceReferenceId = async function() {
-  return `moment_${this._id}`;
+  return `moment-${this._id}`;
 }
 
 /*
