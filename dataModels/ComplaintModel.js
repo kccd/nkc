@@ -87,18 +87,21 @@ schema.statics.extendComplaints = async (complaints) => {
   const LibraryModel = mongoose.model("libraries");
   const CommentModel = mongoose.model('comments');
   const ArticleModel = mongoose.model('articles');
+  const MomentModel= mongoose.model('moments');
   const uid = new Set();
   const pid = new Set();
   const tid = new Set();
   const lid = new Set();
   const cid = new Set();
   const aid = new Set();
+  const mid = new Set();
   const userObj = {};
   const postObj = {};
   const threadObj = {};
   const libraryObj = {};
   const commentObj = {};
   const articleObj = {};
+  let momentObj = {};
   complaints.map(c => {
     const {type} = c;
     uid.add(c.uid);
@@ -114,6 +117,8 @@ schema.statics.extendComplaints = async (complaints) => {
       cid.add(c.contentId);
     } else if(type === "article") {
       aid.add(c.contentId);
+    } else if(type === "moment") {
+      mid.add(c.contentId);
     }
     if(c.handlerId) uid.add(c.handlerId);
   });
@@ -124,6 +129,7 @@ schema.statics.extendComplaints = async (complaints) => {
   let libraries = await LibraryModel.find({_id: {$in: [...lid]}});
   let comments = await CommentModel.find({_id: {$in: [...cid]}});
   let articles = await ArticleModel.find({_id: {$in: [...aid]}});
+  let moments = await MomentModel.find({_id: {$in: [...mid]}});
   posts = await PostModel.extendPosts(posts, {
     user: true,
     userGrade: false,
@@ -132,6 +138,7 @@ schema.statics.extendComplaints = async (complaints) => {
     credit: false
   });
   articles = await ArticleModel.getArticlesInfo(articles);
+  momentObj = await MomentModel.extendMomentsData(moments);
   comments = await CommentModel.extendComments(comments);
   comments.map(c => {
     commentObj[c._id] = c;
@@ -186,6 +193,8 @@ schema.statics.extendComplaints = async (complaints) => {
       r.content = commentObj[c.contentId];
     } else if(type === 'article') {
       r.content = articleObj[c.contentId];
+    } else if(type === 'moment') {
+      r.content = momentObj[c.contentId];
     }
     if(r.handlerId) {
       r.handler = userObj[c.handlerId];

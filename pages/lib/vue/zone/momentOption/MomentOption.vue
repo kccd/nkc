@@ -247,8 +247,9 @@ export default {
         })
         .catch(sweetError);
     },
-    //用户添加到黑名单 tUid 被拉黑的用户 form 拉黑来源 cid 被拉黑的comment
+    //用户添加到黑名单 tUid 被拉黑的用户 form 拉黑来源 mid 被拉黑的moment
     addUserToBlackList(tUid, from, mid) {
+      const self = this;
       var isFriend = false, subscribed = false;
       return Promise.resolve()
         .then(function() {
@@ -274,7 +275,7 @@ export default {
         })
         .then(function() {
           if(subscribed) {
-            return SubscribeTypes.subscribeUserPromise(tUid, false);
+            return self.subscribeUserPromise(tUid, false);
           }
         })
         .then(function() {
@@ -289,6 +290,10 @@ export default {
           return data;
         })
         .catch(sweetError);
+    },
+    subscribeUserPromise(id, sub, cid) {
+      const method = sub? "POST": "DELETE";
+      return nkcAPI("/u/" + id + "/subscribe", method, {cid: cid || []});
     },
     //删除动态
     deleteMoment() {

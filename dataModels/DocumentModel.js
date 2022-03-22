@@ -50,6 +50,7 @@ const schema = new mongoose.Schema({
     index: 1,
   },
   // 当前文档的状态
+  // default: 默认状态
   // normal: 正常
   // disabled: 被屏蔽
   // faulty: 被退修
@@ -1130,14 +1131,17 @@ schema.methods.syncParentStatus = async function() {
   const ArticleModel = mongoose.model('articles');
   const CommentModel = mongoose.model('comments');
   const MomentModel = mongoose.model('moments');
+  const DraftModel= mongoose.model('drafts');
   const {source, did, status} = this;
-  const {article, comment, moment} = await DocumentModel.getDocumentSources();
+  const {article, comment, moment, draft} = await DocumentModel.getDocumentSources();
   if(source === article) {
     await ArticleModel.setStatus(did, status);
   } else if(source === comment) {
     await CommentModel.setStatus(did, status);
   } else if(source === moment) {
     await MomentModel.setStatus(did, status);
+  } else if(source === draft) {
+    await DraftModel.setStatus(did, status);
   }
 }
 // 设置审核状态 当document的状态改变时，同时去改变上层来源的状态

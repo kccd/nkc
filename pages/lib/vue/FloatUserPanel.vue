@@ -288,6 +288,9 @@ export default {
       top: 300,
       left: 300
     });
+    $(() => {
+      this.initPanel();
+    })
   },
   methods: {
     getUrl: getUrl,
@@ -372,7 +375,6 @@ export default {
             left = documentWidth - panelWidth;
           }
           const {top: contentTop, left: contentWidth} = $('#comment-content').offset();
-          console.log('offset', contentTop, contentWidth, top, left);
           panel.css({
             top: top - contentTop,
             left: left - contentWidth
@@ -420,7 +422,7 @@ export default {
     //关注用户
     subscribe() {
       const {user, subscribed} = this;
-      this.$emit('open-subscribe', {uid: user.uid, subscribed: !subscribed});
+      this.$emit('subscribe', {uid: user.uid, subscribed: !subscribed});
     }
   }
 }

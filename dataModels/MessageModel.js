@@ -338,6 +338,7 @@ messageSchema.statics.getParametersData = async (message) => {
   const ForumModel = mongoose.model('forums');
   const PreparationForumModel = mongoose.model('pForum');
   const CommentModel = mongoose.model('comments');
+  const MomentModel = mongoose.model('moments');
   const apiFunction = require("../nkcModules/apiFunction");
   const {htmlToPlain} = require("../nkcModules/nkcRender");
   const {getUrl, getAnonymousInfo} = require('../nkcModules/tools');
@@ -923,6 +924,17 @@ messageSchema.statics.getParametersData = async (message) => {
       // 投诉目标链接
       CRTarget = article.url;
       // 投诉目标描述
+      CRTargetDesc = "点击查看";
+    } else if(complaintType === 'moment') {
+      //动态投诉处理消息
+      let moment = await MomentModel.findOnly({_id: contentId});
+      if(!moment) return null;
+      moment = (await MomentModel.extendMomentsData([moment]))[contentId];
+      if(!moment) return null;
+      CRType = "动态";
+      //投诉的动态链接
+      CRTarget = moment.url;
+      //投书的动态描述
       CRTargetDesc = "点击查看";
     } else {
       return null;

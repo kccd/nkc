@@ -918,6 +918,7 @@ schema.statics.extendMomentsData = async (moments, uid = '') => {
     results[_id] = {
       momentId: _id,
       uid,
+      user,
       username,
       avatarUrl: getUrl('userAvatar', avatar),
       userHome: getUrl('userHome', uid),
@@ -1154,5 +1155,22 @@ schema.methods.getAuthorByUid = async function(currentUid) {
   const {uid} = this;
   return uid === currentUid;
 }
+
+// /*
+// * 拓展投诉的动态信息
+// * */
+// schema.statics.extendComplaintMoments = async function(moments) {
+//   const DocumentModel = mongoose.model('documents');
+//   const MomentModel = mongoose.model('moments');
+//   const didArr = [];
+//   const uidArr = [];
+//   for(const m of moments) {
+//     didArr.push(m.did);
+//     uidArr.push(m.uid);
+//   }
+//   const {stable} = await DocumentModel.getDocumentTypes();
+//   const documents = await DocumentModel.find({did: {$in: didArr}, type: stable});
+//
+// }
 
 module.exports = mongoose.model('moments', schema);
