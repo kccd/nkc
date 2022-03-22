@@ -127,7 +127,7 @@ const draftSchema = new Schema({
 * @author pengxiguaa 2019-9-17
 * */
 draftSchema.statics.removeDraftById = async (id, uid) => {
-  const DraftModel = mongoose.model("draft");
+  const DraftModel = mongoose.model("drafts");
   const SurveyModel = mongoose.model("surveys");
   const draft = await DraftModel.findOne({did: id, uid});
   if(!draft) return;
@@ -154,4 +154,4 @@ draftSchema.statics.setStatus = async function(did, status) {
   });
 }
 
-module.exports = mongoose.model('draft', draftSchema);
+module.exports = mongoose.model('drafts', draftSchema);

@@ -489,7 +489,7 @@ schema.statics.publishDocumentByDid = async (did) => {
   });
   //是否需要审核
   const needReview = await documentsObj.beta.getReviewStatusAndCreateReviewLog();
-  if(needReview) {
+  if(!needReview) {
     await documentsObj.beta.setStatus((await DocumentModel.getDocumentStatus()).unknown);
   } else {
     //不需要审核

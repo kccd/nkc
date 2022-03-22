@@ -366,7 +366,7 @@ schema.statics.saveRecommendThreadCover = async (file, type) => {
 * @author pengxiguaa 2020-8-3
 * */
 schema.statics.saveDraftCover = async (did, file) => {
-  const DraftModel = mongoose.model('draft');
+  const DraftModel = mongoose.model('drafts');
   const AttachmentModel = mongoose.model('attachments');
   const FILE = require('../nkcModules/file');
   const draft = await DraftModel.findOne({did});
