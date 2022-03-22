@@ -1,14 +1,7 @@
 <template lang="pug">
 
   .single-moment-container(v-if="momentData")
-    .single-moment-top-container#comment-content
-      moment-option(
-        ref="momentOption"
-        @complaint="complaint"
-        @violation-record="violationRecord"
-        )
-      complaint(ref="complaint")
-      violation-record(ref="violationRecord")
+    .single-moment-top-container
       .single-moment-left
         .single-moment-avatar(:data-float-uid="momentData.uid")
           img(:src="momentData.avatarUrl")
@@ -306,9 +299,6 @@
       'moment-files': MomentFiles,
       'moment-comments': MomentComments,
       'moment-quote': MomentQuote,
-      "moment-option": MomentOption,
-      "complaint": Complaint,
-      "violation-record": ViolationRecord
     },
     /*
     * prop {Object} data 动态用于显示的数据 组装自 MomentModel.statics.extendMomentsListData
@@ -370,11 +360,10 @@
       //打开其他操作
       openOption(e) {
         const target = e.target;
-        const direction = $(target).attr('data-direction') || 'down';
+        const direction = $(target).attr('data-direction') || 'up';
         const init = $(target).attr('data-init');
         if(init === 'true') return;
-        //显示操作菜单
-        this.$refs.momentOption.open({DOM: $(target), moment: this.momentData, direction});
+        this.$emit('open-option', {DOM: $(target), moment: this.momentData, direction});
         //阻止浏览器默认事件
         e.stopPropagation();
       },
