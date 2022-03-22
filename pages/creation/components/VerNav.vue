@@ -67,7 +67,7 @@
       position: absolute;
       top: -1.5rem;
       right: .5rem;
-      
+
     }
   }
   .creation-nav{
@@ -118,7 +118,7 @@
         .parent-title{
           color: #878484;
         }
-      } 
+      }
       margin: 0 3rem 0 3rem;
       @itemHeight: 3rem;
       height: @itemHeight;
@@ -180,7 +180,7 @@
         transition: margin-right 1s;
         font-size: 1.2rem;
       }
-      
+
       .item:last-child{
         @media screen and (max-width: @max-width){
           margin-right: 0rem;
@@ -228,12 +228,12 @@ import { getState } from "../../lib/js/state";
               url: '/creation/editor/community',
               icon: 'fa fa-columns'
             },
-            {
+            /*{
               type: 'bookEditor',
               title: '专题制作',
               url: '/creation/books/editor',
               icon: 'fa fa-object-group'
-            },
+            },*/
             {
               type: 'draftEditor',
               title: '片段创作',
@@ -266,12 +266,12 @@ import { getState } from "../../lib/js/state";
               url: '/creation/community',
               icon: 'fa fa-columns'
             },
-            {
+            /*{
               type: 'books',
               title: '专题内容',
               url: '/creation/books',
               icon: 'fa fa-object-group'
-            },
+            },*/
             {
               type: 'drafts',
               title: '片段内容',
@@ -305,16 +305,16 @@ import { getState } from "../../lib/js/state";
       $route: 'setNavActive'
     },
     created(){
-      
+
     },
     mounted() {
       const { isApp } = getState();
       this.isApp = isApp;
       this.setNavActive()
-      
+
     },
     methods: {
-      
+
       openMenu(){
         // console.dir(this.$refs.CNC.clientHeight)
         this.$refs.creationNav.style.height = !this.showMenu ? this.$refs.CNC.clientHeight + 'px' : 0;
@@ -335,7 +335,7 @@ import { getState } from "../../lib/js/state";
             return
           }
         }
-        
+
         this.selectItem(item)
       },
       selectItem(item) {

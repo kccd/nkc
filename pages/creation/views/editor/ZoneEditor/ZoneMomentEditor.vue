@@ -1,7 +1,7 @@
 <template lang="pug">
   .zone-moment-editor
     .standard-container.p-t-3
-      moment-editor
+      moment-editor(@published="onPublished")
 </template>
 
 <script>
@@ -12,6 +12,13 @@
     },
     data: () => ({
 
-    })
+    }),
+    methods: {
+      onPublished() {
+        this.$router.replace({
+          name: 'zoneMoment'
+        });
+      }
+    }
 }
 </script>
