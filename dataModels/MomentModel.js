@@ -831,7 +831,7 @@ schema.statics.extendMomentsData = async (moments, uid = '') => {
     const {
       uid,
       files,
-      toc,
+      top,
       _id,
       voteUp,
       order,
@@ -914,8 +914,8 @@ schema.statics.extendMomentsData = async (moments, uid = '') => {
       username,
       avatarUrl: getUrl('userAvatar', avatar),
       userHome: getUrl('userHome', uid),
-      time: fromNow(toc),
-      toc,
+      time: fromNow(top),
+      toc: top,
       content,
       voteUp,
       voteType: votesType[_id],
@@ -1038,7 +1038,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       uid,
       _id,
       order,
-      toc,
+      top,
       parent,
       voteUp,
     } = comment;
@@ -1057,8 +1057,8 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       username: user.username,
       avatarUrl: getUrl('userAvatar', user.avatar),
       userHome: getUrl('userHome', user.uid),
-      time: timeFormat(toc),
-      toc: toc,
+      time: timeFormat(top),
+      toc: top,
     });
   }
   return commentsData;
