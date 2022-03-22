@@ -89,6 +89,7 @@ import {nkcAPI} from "../../../js/netAPI";
 import {timeFormat} from "../../../js/tools";
 export default {
   data: () => ({
+    uid: NKC.configs.uid,
     show: false,
     loading: true,
     jqDOM: null,
@@ -97,12 +98,14 @@ export default {
     direction: '',
     moment: null,
     options: {},
-    toc: null
+    toc: null,
+    top: 300,
+    left: 300,
   }),
   computed: {
     position() {
       const {jqDOM, domHeight, domWidth, direction} = this;
-      if(!jqDOM) return {
+      if(jqDOM === null) return {
         left: 0,
         top: 0,
       }
@@ -116,7 +119,7 @@ export default {
       } else {
         return {
           top: top + jqDOM.height(),
-          left: left - domWidth + jqDOM.width(),
+          left: left + domWidth - jqDOM.width(),
         }
       }
     }
@@ -141,6 +144,9 @@ export default {
   },
   methods: {
     timeFormat: timeFormat,
+    clickElement(e) {
+      e.stopPropagation();
+    },
     //获取当前用户的操作权限
     getPermission() {
       const self = this;
