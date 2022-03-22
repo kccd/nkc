@@ -36,6 +36,8 @@ router
         c.type_ = "文库"
       } else if(c.type === "comment"){
         c.type_ = "评论"
+      } else if(c.type === "moment") {
+        c.type_ = "动态"
       }
       c.reasonType = typesObj[c.reasonTypeId];
     });

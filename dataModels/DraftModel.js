@@ -138,4 +138,20 @@ draftSchema.statics.removeDraftById = async (id, uid) => {
   }
 };
 
+
+/*
+* 通过did设置片段的状态
+* @param {string} did 需要改变状态的片段的did
+* @param {string} 需要改变的状态
+* */
+draftSchema.statics.setStatus = async function(did, status) {
+  const DraftModel = mongoose.model('drafts');
+  const draft = await DraftModel.findOnly({did});
+  await draft.updateOne({
+    $set: {
+      status,
+    }
+  });
+}
+
 module.exports = mongoose.model('draft', draftSchema);
