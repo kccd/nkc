@@ -1,6 +1,11 @@
 <template lang="pug">
 
   .single-moment-container(v-if="momentData")
+    float-user-panel(
+      ref="floatUserPanel"
+      @subscribe="subscribe"
+    )
+    subscribe-types(ref="subscribeTypes")
     .single-moment-top-container
       .single-moment-left
         .single-moment-avatar(:data-float-uid="momentData.uid")
@@ -290,15 +295,16 @@
   import {sweetError} from "../../js/sweetAlert";
   import MomentComments from './MomentComments';
   import MomentQuote from './MomentQuote';
-  import MomentOption from "./momentOption/MomentOption";
-  import Complaint from "../Complaint";
-  import ViolationRecord from "../ViolationRecord";
+  import FloatUserPanel from "../FloatUserPanel";
+  import SubscribeTypes from "../SubscribeTypes";
   export default {
     components: {
       'from-now': FromNow,
       'moment-files': MomentFiles,
       'moment-comments': MomentComments,
       'moment-quote': MomentQuote,
+      'float-user-panel': FloatUserPanel,
+      'subscribe-types': SubscribeTypes
     },
     /*
     * prop {Object} data 动态用于显示的数据 组装自 MomentModel.statics.extendMomentsListData
@@ -375,6 +381,11 @@
       violationRecord(uid) {
         this.$refs.violationRecord.open({uid});
       },
+      //关注或取关用户
+      subscribe(props) {
+        const {uid, subscribed} = props;
+        this.$refs.subscribeTypes.subscribeUser(uid, subscribed);
+      }
     }
   }
 </script>
