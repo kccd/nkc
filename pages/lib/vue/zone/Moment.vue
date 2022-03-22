@@ -358,7 +358,7 @@
       //打开其他操作
       openOption(e) {
         const target = e.target;
-        const direction = $(target).attr('data-direction') || 'down';
+        const direction = $(target).attr('data-direction') || 'up';
         const init = $(target).attr('data-init');
         if(init === 'true') return;
         //显示操作菜单

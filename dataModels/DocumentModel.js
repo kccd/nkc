@@ -738,7 +738,7 @@ schema.methods.getRenderingData = async function(uid) {
 * @return {String}
 * */
 schema.methods.getResourceReferenceId = async function() {
-  return `document-${this.did}`;
+  return `document_${this.did}`;
 }
 /*
 * @params {String} sid 根据sid 获取 document

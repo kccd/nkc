@@ -19,9 +19,9 @@
         .fa.fa-ban
         span(v-if='options.blacklist === false') 加入黑名单
         span(v-else) 移除黑名单
-      .option(v-if='options.ipInfo !== null' @click='displayIpInfo')
-        .fa.fa-map-marker
-        span 查看IP
+      //.option(v-if='options.ipInfo !== null' @click='displayIpInfo')
+      //  .fa.fa-map-marker
+      //  span 查看IP
       .option.time
         span {{timeFormat(toc)}}
 </template>
@@ -129,15 +129,15 @@ export default {
   },
   updated() {
     const dom = $(this.$el);
-    // const content = $('#comment-content');
-    // let top = 0;
-    // let left = 0;
-    // if(content) {
-    //   top = content .offset().top;
-    //   left = content .offset().left;
-    // }
-    this.domHeight = dom.height();
-    this.domWidth = dom.width();
+    const content = $('#comment-content');
+    let top = 0;
+    let left = 0;
+    if(content) {
+      top = content .offset().top;
+      left = content .offset().left;
+    }
+    this.domHeight = dom.height() + top;
+    this.domWidth = dom.width() + left;
   },
   methods: {
     timeFormat: timeFormat,
@@ -153,7 +153,6 @@ export default {
         .catch(err => {
           sweetError(err);
         })
-
     },
     open(props) {
       this.loading = true;
