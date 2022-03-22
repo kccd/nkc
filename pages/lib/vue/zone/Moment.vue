@@ -357,12 +357,12 @@
       },
       //打开其他操作
       openOption(e) {
-        const target = $(e);
-        const direction = target.attr('data-direction') || 'up';
-        const init = target.attr('data-init');
+        const target = e.target;
+        const direction = $(target).attr('data-direction') || 'down';
+        const init = $(target).attr('data-init');
         if(init === 'true') return;
         //显示操作菜单
-        this.$refs.momentOption.open({DOM: e.target, moment: this.momentData, direction});
+        this.$refs.momentOption.open({DOM: $(target), moment: this.momentData, direction});
         //阻止浏览器默认事件
         e.stopPropagation();
       },

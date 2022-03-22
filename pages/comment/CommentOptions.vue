@@ -133,7 +133,11 @@ export default {
   updated() {
     const dom = $(this.$el);
     const content = $('#comment-content');
-    const {top, left} = content.offset();
+    let top = 0,left = 0;
+    if(content) {
+      top = (content.offset()).top;
+      left = (content.offset()).left;
+    }
     this.domHeight = dom.height() + top;
     this.domWidth = dom.width() + left;
   },
