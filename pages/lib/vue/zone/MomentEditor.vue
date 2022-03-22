@@ -27,7 +27,9 @@
         span 表情
       .button-pull
         span.number(:class="{'warning': remainingWords < 0}") {{remainingWords}}
-        button.publish(:class="{'disabled': disablePublish}" v-if="disablePublish") 发动态
+        button.publish(:class="{'disabled': disablePublish}" v-if="submitting" title="发表中，请稍候")
+          .fa.fa-spinner.fa-spin
+        button.publish(:class="{'disabled': disablePublish}" v-else-if="disablePublish") 发动态
         button.publish(@click="publishContent" v-else) 发动态
 </template>
 
@@ -356,7 +358,6 @@
           resourcesId
         })
           .then(() => {
-            self.unlockButton();
             self.sendPublishedEvent();
           })
           .catch(err => {

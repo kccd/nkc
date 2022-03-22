@@ -899,7 +899,8 @@ schema.statics.checkGlobalPostPermission = async (uid, source, type = 'stable') 
     examNotPass,
     defaultInterval,
     defaultCount,
-    intervalLimit = []
+    intervalLimit = [],
+    countLimit = [],
   } = postPermission;
 
   // 身份认证判断

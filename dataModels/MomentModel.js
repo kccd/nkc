@@ -503,7 +503,8 @@ schema.methods.getBetaDocument = async function() {
 };
 
 /*
-* 检测当前动态或评论的内容
+* 检测当前动态或评论的内容是否合法
+* 检测用户发表动态的时间条数限制
 * */
 schema.methods.checkBeforePublishing = async function() {
   const DocumentModel = mongoose.model('documents');
@@ -511,6 +512,8 @@ schema.methods.checkBeforePublishing = async function() {
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
   const betaDocument = await DocumentModel.getBetaDocumentBySource(momentSource, this._id);
   if(!betaDocument) throwErr(500, `动态数据错误 momentId=${this._id}`);
+  // 检测发表权限
+  await DocumentModel.checkGlobalPostPermission(this.uid, momentSource);
   if(!this.quoteType || !this.quoteId) {
     const {checkString} = require('../nkcModules/checkData');
     checkString(betaDocument.content, {
