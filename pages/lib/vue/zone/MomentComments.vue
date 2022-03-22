@@ -15,7 +15,10 @@
         span(v-else) 空空如也~
       paging(:pages="pageButtons" @click-button="clickPageButton")
       .moment-comment-list
-        .moment-comment-item(v-for="commentData in commentsData")
+        .moment-comment-item(
+          v-for="commentData in commentsData"
+          :class="{'active': focusCommentId === commentData.momentCommentId}"
+          )
           .moment-comment-item-header
             a.moment-comment-avatar(:href="commentData.userHome" target="_blank")
               img(:src="commentData.avatarUrl")
@@ -63,6 +66,10 @@
       .moment-comment-item{
         &:hover{
           background-color: #f4f4f4;
+        }
+        &.active{
+          background-color: #ffebcf;
+          padding: 0.5rem;
         }
         padding: 0.5rem 0;
         margin-bottom: 0;
@@ -145,7 +152,7 @@
   import {visitUrl} from "../../js/pageSwitch";
 
   export default {
-    props: ['mid', 'type'],
+    props: ['mid', 'type', 'focus'],
     components: {
       'paging': Paging,
       'from-now': FromNow,
@@ -156,6 +163,7 @@
       paging: null,
       sort: null,
       loading: true,
+      focusedComment: false,
       nav: [
         {
           type: 'hot',
@@ -179,9 +187,23 @@
       },
       getComments(page = 0) {
         const self = this;
-        const {sort, postType, momentId} = this;
+        const {
+          postType,
+          momentId,
+          focusCommentId,
+          focusedComment
+        } = this;
         if(postType !== 'comment') return;
-        nkcAPI(`/zone/m/${momentId}/comments?sort=${sort}&page=${page}`, 'GET')
+        let focus = '';
+        if(!focusedComment) {
+          this.focusedComment = true;
+          if(focusCommentId) {
+            this.setActiveNav(this.nav[1].type);
+            focus = focusCommentId;
+          }
+        }
+        const url = `/zone/m/${momentId}/comments?sort=${this.sort}&page=${page}&focus=${focus}`;
+        nkcAPI(url, 'GET')
           .then(res => {
             self.commentsData = res.commentsData;
             self.paging = res.paging;
@@ -215,6 +237,9 @@
       }
     },
     computed: {
+      focusCommentId() {
+        return this.focus;
+      },
       postType() {
         return this.type;
       },

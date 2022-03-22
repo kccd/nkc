@@ -56,7 +56,13 @@
 
         // 评论列表
         .single-moment-moments(v-if="showPanelType")
-          moment-comments(ref="momentComments" :mid="momentData.momentId" :type="showPanelType" @post-comment="onPostComment")
+          moment-comments(
+            ref="momentComments"
+            :mid="momentData.momentId"
+            :type="showPanelType"
+            @post-comment="onPostComment"
+            :focus="focus"
+            )
 </template>
 
 <style lang="less" scoped>
@@ -306,8 +312,9 @@
     },
     /*
     * prop {Object} data 动态用于显示的数据 组装自 MomentModel.statics.extendMomentsListData
+    * prop {String} focus 高亮的评论ID
     * */
-    props: ['data'],
+    props: ['data', 'focus'],
     data: () => ({
       momentData: null,
       showPanelType: '', // comment, repost
@@ -318,6 +325,11 @@
     }),
     mounted() {
       this.initData();
+    },
+    computed: {
+      focusCommentId() {
+        return this.focus;
+      }
     },
     methods: {
       initData() {

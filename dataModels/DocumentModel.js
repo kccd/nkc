@@ -2,11 +2,17 @@ const mongoose = require('../settings/database');
 const cheerio = require('cheerio');
 const markNotes = require("../nkcModules/nkcRender/markNotes");
 
+/*
+* document状态
+* 当document状态发生改变时会同步当前状态到上层
+* 上层 documentSources
+* */
 const documentStatus = {
+  'default': 'default', // 默认状态
   disabled: "disabled",// 禁用
   normal: "normal",// 正常状态 能被所有用户查看的文档
   faulty: "faulty", // 退修
-  unknown: "unknown"// 未知状态 未审核过
+  unknown: "unknown"// 需要审核
 };
 
 const documentTypes = {
@@ -50,7 +56,7 @@ const schema = new mongoose.Schema({
   // unknown: 未知（默认状态，需要审核才能确定）
   status: {
     type: String,
-    default: documentStatus.unknown,
+    default: documentStatus.default,
     index: 1
   },
   // 文档的创建人
@@ -1082,7 +1088,7 @@ schema.methods.getKeywordsReviewStatus = async function() {
   const keywords = this.keywords || [];
   const keywordsEN = this.keywordsEN || [];
   const documentContent = content + title + abstract + abstractEN + (keywords.concat(keywordsEN)).join(' ');
-  const matchedKeywords = await ReviewModel.matchKeywords(documentContent, keywordGroupId);
+  const matchedKeywords = await ReviewModel.matchKeywordsByGroupsId(documentContent, keywordGroupId);
   if(matchedKeywords.length > 0) {
     return {
       needReview: true,
@@ -1113,6 +1119,7 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function() {
   //如果需要审核，就生成审核记录
   if(needReview) {
     await ReviewModel.newDocumentReview(type, this._id, this.uid, reason);
+    await this.setStatus((await DocumentModel.getDocumentStatus()).unknown);
   } else {
     await this.setStatus((await DocumentModel.getDocumentStatus()).normal);
   }

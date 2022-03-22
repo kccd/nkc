@@ -1,11 +1,18 @@
 const mongoose = require('../settings/database');
 const {twemoji} = require("../settings/editor");
 
+// 包含所有document的状态
+// 并且额外包含 deleted, cancelled
 const momentStatus = {
-  normal: 'normal',
-  'default': 'default',
-  deleted: 'deleted',
-  unknown: 'unknown',// 未审核
+  // document status
+  'default': 'default', // 默认状态
+  disabled: "disabled",// 禁用
+  normal: "normal",// 正常状态 能被所有用户查看的文档
+  faulty: "faulty", // 退修
+  unknown: "unknown", // 需要审核
+  // 额外
+  deleted: 'deleted', // 已删除
+  cancelled: 'cancelled', // 取消发表
 };
 
 const momentQuoteTypes = {
@@ -1071,6 +1078,16 @@ schema.statics.extendCommentsData = async function (comments, uid) {
 * */
 schema.statics.getPageByOrder = async (order) => {
   return Math.ceil(order / momentCommentPerPage) - 1;
+}
+
+/*
+* 获取评论所在页数
+* @param {String} MomentCommentId 动态评论ID
+* */
+schema.statics.getPageByMomentCommentId = async (momentCommentId) => {
+  const MomentModel = mongoose.model('moments');
+  const moment = await MomentModel.findOnly({_id: momentCommentId}, {_id: 1, order: 1});
+  return MomentModel.getPageByOrder(moment.order);
 }
 
 /*

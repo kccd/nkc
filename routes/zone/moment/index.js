@@ -10,12 +10,14 @@ router
     await next();
   })
   .get('/:mid', async (ctx, next) => {
-    const {data, state, internalData, db} = ctx;
+    const {query, data, state, internalData, db} = ctx;
     const {moment} = internalData;
+    const {cid = ''} = query;
     const [momentListData] = await db.MomentModel.extendMomentsListData([moment], state.uid);
     if(!momentListData) {
       ctx.throw(500, `动态数据错误 momentId=${moment._id}`);
     }
+    data.commentId = cid;
     data.momentListData = momentListData;
     ctx.remoteTemplate = 'zone/moment/moment.pug';
     await next();

@@ -3,10 +3,19 @@ router
   .get('/', async (ctx, next) => {
     const {db, data, internalData, query, nkcModules, state} = ctx;
     const {moment} = internalData;
-    const {sort = 'hot', page = 0} = query;
+    let {
+      sort = 'hot',
+      page = 0,
+      focus = '', // 需要高亮的评论ID，可为空字符串
+    } = query;
+
+    if(focus) {
+      page = await db.MomentModel.getPageByMomentCommentId(focus);
+    }
+    const {normal: normalStatus} = await db.MomentModel.getMomentStatus();
     const match = {
       parent: moment._id,
-      status: 'normal'
+      status: normalStatus
     };
     const sortObj = sort === 'hot'? {voteUp: -1, top: 1}: {top: -1};
     const count = await db.MomentModel.countDocuments(match);
