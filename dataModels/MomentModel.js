@@ -141,6 +141,24 @@ schema.statics.checkMomentQuoteType = async (quoteType) => {
   }
 };
 
+
+/*
+* 获取 moment 在 resource 中的引用 ID
+* @return {String}
+* */
+schema.methods.getResourceReferenceId = async function() {
+  return `moment_${this._id}`;
+}
+
+/*
+* 为动态引用的资源添加动态的引用
+* */
+schema.methods.updateResourceReferences = async function() {
+  const ResourceModel = mongoose.model('resources');
+  const referenceId = await this.getResourceReferenceId();
+  await ResourceModel.replaceReferencesById(this.files, referenceId);
+}
+
 /*
 * 获取新的动态 ID
 * @return {String}
@@ -540,6 +558,7 @@ schema.methods.publish = async function() {
       status: this.status
     }
   });
+  await this.updateResourceReferences();
 };
 
 /*

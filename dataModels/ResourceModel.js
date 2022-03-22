@@ -493,6 +493,33 @@ resourceSchema.statics.getResourcesByReference = async function(id) {
 };
 
 /*
+* 指定引用ID，从已有resource中去掉当前引用ID，并给新指定的resource中添加引用ID
+* @param {[String]} resourcesId 需添加引用ID的资源ID
+* @param {String} referenceId 引用ID
+* */
+resourceSchema.statics.replaceReferencesById = async function(resourcesId, referenceId) {
+  const ResourceModel = mongoose.model('resources');
+  await ResourceModel.updateMany({
+    rid: {
+      $nin: resourcesId
+    }
+  }, {
+    $pull: {
+      references: referenceId
+    }
+  });
+  await ResourceModel.updateMany({
+    rid: {
+      $in: resourcesId
+    }
+  }, {
+    $addToSet: {
+      references: referenceId
+    }
+  });
+};
+
+/*
 * 检查用户是否有权限上传当前文件
 * @param {Object} user 用户对象
 * @param {File} file 文件对象
@@ -891,10 +918,15 @@ resourceSchema.methods.updateForumsId = async function() {
 
 /*
 * 判断用户是否有权限访问资源
+* @param {[String]} accessibleForumsId 访问能够访问的专业ID组成的数组
 * */
 resourceSchema.methods.checkAccessPermission = async function(accessibleForumsId) {
-  const {tou} = this;
-  for(const id of this.references) {
+  const {tou, references} = this;
+  if(references.length === 0) {
+    // 不允许访问未使用过的资源
+    throwErr(403, `权限不足`);
+  }
+  for(const id of references) {
     // 非 post 引用的资源 直接放行
     if(id.includes('-')) {
       return;
