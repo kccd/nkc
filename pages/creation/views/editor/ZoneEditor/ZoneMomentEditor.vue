@@ -6,6 +6,8 @@
 
 <script>
   import MomentEditor from '../../../../lib/vue/zone/MomentEditor';
+  import {visitUrl} from "../../../../lib/js/pageSwitch";
+
   export default {
     components: {
       'moment-editor': MomentEditor
@@ -15,9 +17,7 @@
     }),
     methods: {
       onPublished() {
-        this.$router.replace({
-          name: 'zoneMoment'
-        });
+        visitUrl('/g/moment')
       }
     }
 }
