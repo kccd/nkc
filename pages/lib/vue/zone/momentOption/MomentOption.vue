@@ -129,15 +129,15 @@ export default {
   },
   updated() {
     const dom = $(this.$el);
-    const content = $('#comment-content');
-    let top = 0;
-    let left = 0;
-    if(content) {
-      top = content .offset().top;
-      left = content .offset().left;
-    }
-    this.domHeight = dom.height() + top;
-    this.domWidth = dom.width() + left;
+    // const content = $('#comment-content');
+    // let top = 0;
+    // let left = 0;
+    // if(content) {
+    //   top = content .offset().top;
+    //   left = content .offset().left;
+    // }
+    this.domHeight = dom.height();
+    this.domWidth = dom.width();
   },
   methods: {
     timeFormat: timeFormat,

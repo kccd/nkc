@@ -71,7 +71,6 @@ export default {
     "user-list": userList,
   },
   mounted() {
-    this.getRightDrawData();
   },
   watch: {
     show(oldValue, newValue) {
@@ -106,6 +105,9 @@ export default {
         })
     },
     showDraw(){
+      if(this.loading) {
+        this.getRightDrawData()
+      }
       this.show = !this.show;
     },
     closeDraw() {

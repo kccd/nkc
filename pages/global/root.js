@@ -8,8 +8,11 @@ import {
   initGlobalClickEvent,
   initGlobalLongPressEvent
 } from "./event";
-import userPanel from "./userPanel";
-
+import {initUserPanel} from "./userPanel";
+let userPanel;
+$(() => {
+  userPanel = initUserPanel();
+})
 const {isApp, platform, uid} = getState();
 
 window.RootApp = new Vue({
