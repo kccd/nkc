@@ -29,12 +29,12 @@ export default {
     contentChangeEventFlag: true,
     content: "",
     quoteHtml: "",
-    contentLength: ''
+    contentLength: ""
   }),
   props: {
     c: {
       type: String
-    },
+    }
   },
   created() {
     let reg = /<blockquote cite.+?blockquote>/;
@@ -70,29 +70,25 @@ export default {
       return this.$refs.threadEditor;
     },
     onContentChange() {
-      // if (!this.contentChangeEventFlag) {
-      //   this.contentChangeEventFlag = true;
-      //   return;
-      // }
       this.watchContentChange();
     },
     watchContentChange() {
       const content = this.$refs.threadEditor.getContentTxt();
       const _content = this.$refs.threadEditor.getContent();
       this.content = _content;
-      this.contentLength = content.length;
+      this.contentLength = this.content.length;
       this.$emit("content-change", content.length);
     },
     getData() {
-      return { c: this.content + (this.quoteHtml || ""), contentLength: this.contentLength};
+      return {
+        c: this.content + (this.quoteHtml || ""),
+        contentLength: this.contentLength
+      };
     },
     editorReady() {
       //编辑器准备就绪
       this.setContent();
       this.resetBodyPaddingTop();
-      // this.EditorReady = true;
-      // initVueApp();
-      // initPostButton();
     },
     removeEditor() {
       this.$refs.threadEditor.removeNoticeEvent();
@@ -107,11 +103,27 @@ export default {
 </script>
 
 <style scoped lang="less">
-
-.content #edui1_toolbarbox{
+.content #edui1_toolbarbox.edui-default {
   position: fixed;
+  padding-left: 15px;
   top: 43px;
   left: 0px;
   width: 100%;
+  z-index: 1030;
+  left: 0;
+  top: 45px;
+  background-color: rgba(250, 250, 250, 0.95) !important;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+  border: none;
+  border-bottom: 1px solid #dbdbdb;
+  padding: 0.5rem 0;
+  #edui1_toolbarboxouter{
+    max-width: 1300px!important;
+    margin-right: auto;
+    margin-left: auto
+  }
+}
+#edui1 {
+  border: none;
 }
 </style>

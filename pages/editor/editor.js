@@ -35,7 +35,6 @@ import ResourceSelector from "../lib/vue/ResourceSelector";
 import {blobToFile, fileToBase64} from "../lib/js/file";
 $(function() {
   window.data = NKC.methods.getDataById("data");
-  console.log(window.data,'---------')
   for(const c of window.data.threadCategories) {
     c.selectedNode = null;
     if(c.defaultNode === 'none') continue;
@@ -354,7 +353,6 @@ function initVueApp() {
       format: NKC.methods.format,
       getUrl: NKC.methods.tools.getUrl,
       selectThreadCategory(c, n) {
-        console.log(c, n);
         c.selectedNode = n;
       },
       insertDraftInfo: function(draft) {
@@ -553,7 +551,6 @@ function initVueApp() {
         return tcId;
       },
       checkThreadCategory() {
-        console.log(this.threadCategories);
         for(const tc of this.threadCategories) {
           if(tc.selectedNode === null) {
             throw new Error(`请选择${tc.name}`);
@@ -855,7 +852,6 @@ function initVueApp() {
         post.t = self.title;
         // 主分类id
         post.fids = self.selectedForumsId;
-        console.log(self.selectedCategoriesI,'')
         post.cids = self.selectedCategoriesId;
         // 内容
         post.c = (self.quoteHtml||"") + self.content;
@@ -885,7 +881,6 @@ function initVueApp() {
           if(survey) post.survey = survey;
         }
         post.tcId = self.getThreadCategoriesId();
-        console.log(post,'post');
         return post;
       },
       disablePostButton() {
@@ -1393,7 +1388,6 @@ function appUpdateImage() {
             duration: 1000,
             location: "bottom"
           })
-          console.log(JSON.stringify(err))
         }
       })
     } else {

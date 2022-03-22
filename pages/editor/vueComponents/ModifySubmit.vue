@@ -1,7 +1,7 @@
 <template lang="pug">
   .modifySubmit
     h5.text-danger 温馨提示：
-    div(v-html="notice") {{notice}}
+    .pre-wrap {{notice}}
     div(v-cloak)
         hr
         .checkbox(v-if="havePermissionToSendAnonymousPost")
@@ -21,49 +21,46 @@
             .fa.fa-check-circle &nbsp;{{autoSaveInfo}}
         .row
           .col-xs-6.p-r-05
-            button.btn.btn-theme.btn-block(@click="readyData" :disabled="disabledSubmit") {{disabledSubmit ? "提交中..." : "提交"}}
+            button.btn.btn-theme.btn-block(@click="readyData" :disabled="disabledSubmit || !checkProtocol") {{disabledSubmit ? "提交中..." : "提交"}}
           .col-xs-6.p-l-05
-            button.btn.btn-default.btn-block(@click="saveToDraftBase") 存草稿
+            button.btn.btn-default.btn-block(@click="saveToDraftBase('manual')") 存草稿
 </template>
 
 <script>
 import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import { sweetError } from "../../lib/js/sweetAlert.js";
 import { timeFormat } from "../../lib/js/tools";
-
 export default {
   props: {
-    blockButton: {
-      default: true,
-      type: Boolean
-    },
     notice: {
       type: String
     },
     data: {
       type: Object,
       required: true
-    }
+    },
   },
   data: () => ({
     type: "newThread",
     disabledSubmit: false, // 锁定提交按钮
     checkProtocol: true, // 是否勾选协议
     // 当前用户是否有权限发表匿名内容
-    havePermissionToSendAnonymousPost:
-      data.havePermissionToSendAnonymousPost || false,
+    havePermissionToSendAnonymousPost: false,
     // 允许发表匿名内容的专业ID
-    allowedAnonymousForumsId: data.allowedAnonymousForumsId || [],
+    allowedAnonymousForumsId: [],
     // 根据当前所选专业判断用户是否有权限勾选匿名，若无权则此处无需将匿名标志提交到服务器。（新发表时不匿名，修改时无法需改匿名标志）
     allowedAnonymous: false,
     // 是否匿名
-    anonymous: data.post ? data.post.anonymous : false,
+    anonymous: false,
     autoSaveInfo: "",
     oldContent: "",
     oldContentLength: "",
-    saveDraftTimeout: 3000
+    saveDraftTimeout: 60000
   }),
   created() {
+    this.allowedAnonymousForumsId =  this.data.allowedAnonymousForumsId || []
+    this.havePermissionToSendAnonymousPost = this.data.havePermissionToSendAnonymousPost || false
+    if (this.data?.post) this.oldContent = this.data.post.c;
     if (this.data?.type) this.type = this.data.type;
     if (this.data?.forum) this.forum = this.data.forum;
     if (this.data?.threda) this.threda = this.data.threda;
@@ -83,24 +80,14 @@ export default {
   mounted() {
     this.autoSaveToDraft();
   },
+  updated(){
+  },
   methods: {
     checkString: NKC.methods.checkData.checkString,
     checkEmail: NKC.methods.checkData.checkEmail,
     visitUrl: NKC.methods.visitUrl,
-
-    setFloatDom() {
-      const oldDom = $("#submit-scroll-sm");
-      const scrollWidth = oldDom.width();
-      const { left, top } = oldDom.offset();
-      $("#submit-scroll").css({
-        width: scrollWidth + 30,
-        display: "block",
-        left,
-        top
-      });
-    },
-    checkAnonymous() {
-      let selectedForumsId = this.selectedForumsId;
+    checkAnonymous(selectedForumsId) {
+      // let selectedForumsId = window.PostInfo.selectedForumsId;
       let havePermission = false;
       for (let i = 0; i < selectedForumsId.length; i++) {
         let fid = selectedForumsId[i];
@@ -124,45 +111,52 @@ export default {
     autoSaveToDraft() {
       this.readyDataForSave();
       let type = this.type;
+      const { saveData } = this;
       // 内容为空时不自动保存草稿,不做任何操作
-      // if (!saveData.content) return;
-      // if (type === "newThread") {
-      //   if (
-      //     !saveData.title &&
-      //     !saveData.content &&
-      //     (!saveData.selectedForums || !this.selectedForums.length) &&
-      //     !saveData.cover &&
-      //     !saveData.abstractCn &&
-      //     !saveData.abstractEn &&
-      //     !saveData.keyWordsCn &&
-      //     !saveData.keyWordsEn &&
-      //     !saveData.authorInfos &&
-      //     !saveData.surveyId
-      //   )
-      //     return;
-      // } else if (type === "newPost") {
-      //   if (!saveData.title && !saveData.content) return;
-      // }
+      if (!saveData.c) return;
+      if (type === "newThread") {
+        if (
+          !(
+            saveData.t ||
+            saveData.c ||
+            !saveData.tcId || this.tcId.length ||
+            saveData.cids.length ||
+            saveData.fids.length ||
+            saveData.cover ||
+            saveData.abstractCn ||
+            saveData.abstractEn ||
+            saveData.keyWordsCn.length ||
+            saveData.keyWordsEn.length ||
+            saveData.authorInfos ||
+            saveData.surveyId
+          )
+        )
+          return;
+      } else if (type === "newPost") {
+        if (!saveData.title && !saveData.content) return;
+      }
       setTimeout(() => {
         this.saveToDraftBase("automatic")
           .then(() => {
-            this.autoReadyData();
+            this.autoSaveToDraft();
           })
           .catch(data => {
             sweetError("草稿保存失败：" + (data.error || data));
-            this.autoReadyData();
+            this.autoSaveToDraft();
           });
       }, this.saveDraftTimeout);
     },
-    saveToDraftBase(type = "manual") {
-      if(type === 'manual') this.readyDataForSave();
-      if (!data.c) return sweetError("请先输入内容");
+    saveToDraftBase(savetType = "manual") {
+      if (savetType === "manual") this.readyDataForSave();
+      const { saveData } = this;
+      if (!saveData.c) return sweetError("请先输入内容");
+      let type = this.type;
+
       return Promise.resolve()
         .then(() => {
           // 获取本次编辑器内容的全部长度
           // const allContentLength = editor.getContent();
-          // 如果内容相对上一次减少了就提示用户是否需要保存
-          if (data.contentLength < data.oldContentLength) {
+          if (saveData.c !== this.oldContent) {
             return sweetQuestion(`您输入的内容发生了变化，是否还要继续保存？`)
               .then(() => {
                 return;
@@ -177,7 +171,6 @@ export default {
         .then(() => {
           // let post = this.getPost();
           let desType, desTypeId;
-          let type = this.type;
           if (type === "newThread") {
             desType = "forum";
           } else if (type === "newPost") {
@@ -202,16 +195,16 @@ export default {
           formData.append(
             "body",
             JSON.stringify({
-              post: data,
+              post: saveData,
               draftId: this.draftId,
               desType: desType,
               desTypeId: desTypeId
             })
           );
-          if (data.coverData) {
+          if (saveData.coverData) {
             formData.append(
               "postCover",
-              NKC.methods.blobToFile(data.coverData),
+              NKC.methods.blobToFile(saveData.coverData),
               "cover.png"
             );
           }
@@ -226,8 +219,8 @@ export default {
         .then(data => {
           //保存草稿的全部内容长度
           if (data.contentLength) {
-            this.oldContentLength = data.contentLength;
-            this.oldContent = data.content;
+            this.oldContentLength = data.draft?.c?.length;
+            this.oldContent = data.draft?.c;
           }
           this.draftId = data.draft.did;
           if (data.draft.cover) {
@@ -353,7 +346,7 @@ export default {
     // 获取其他组件数据 保存时使用
     readyDataForSave() {
       this.$emit("ready-data", data => {
-        this.saveData = data
+        this.saveData = data;
       });
     },
     submit(submitData) {
@@ -433,6 +426,8 @@ export default {
           }
         })
         .then(data => {
+            console.log(api,'api')
+
           this.$emit("remove-editor");
           if (NKC.configs.platform === "reactNative") {
             NKC.methods.visitUrlAndClose(data.redirect);
@@ -452,12 +447,18 @@ export default {
 
           sweetError(err);
         });
+    },
+    getData(){
+      return {
+        anonymous: this.anonymous,
+        checkProtocol: this.checkProtocol
+      }
     }
   }
 };
 </script>
 
-<style scope>
+<style scoped>
 .editor-auto-save {
   padding: 0.5rem 0;
   color: #9baec8;

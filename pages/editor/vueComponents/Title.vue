@@ -11,7 +11,7 @@
       .on-edit-notes
         .on-edit-label 您正在修改已经发表的内容，以下提示非常重要，请务必详读。
           a.detail(@click="openOnEditNotes = !openOnEditNotes") {{openOnEditNotes ? "收起":"展开"}}
-        .on-edit-note-content(v-if="openOnEditNotes" ) {{state.editorSettings.onEditNotes}}
+        .on-edit-note-content(v-if="openOnEditNotes" ) {{notice}}
       //- .on-edit-note-content(v-if="openOnEditNotes")!=nkcRender.plainEscape(state.editorSettings.onEditNotes)
     .editor-type-info(v-else-if="data.type === 'modifyPost'")
       .fa.fa-lightbulb-o
@@ -20,7 +20,7 @@
       .on-edit-notes
         .on-edit-label 您正在修改已经发表的内容，以下提示非常重要，请务必详读。
           a.detail(@click="openOnEditNotes = !openOnEditNotes") {{openOnEditNotes ?  "收起":"展开"}}
-        .on-edit-note-content(v-if="openOnEditNotes") {{state.editorSettings.onEditNotes}}
+        .on-edit-note-content(v-if="openOnEditNotes") {{notice}}
       //- .on-edit-note-content(v-if="openOnEditNotes")!=nkcRender.plainEscape(state.editorSettings.onEditNotes)
     .editor-type-info(v-else-if='data.type === "modifyForumDeclare"')
       .fa.fa-lightbulb-o
@@ -42,9 +42,9 @@ export default {
       required: true,
       type: Object,
     },
-    state:{
+    notice:{
       required: true,
-      type: Object,
+      type: String,
     }
   },
   data: () => ({

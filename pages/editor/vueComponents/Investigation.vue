@@ -755,7 +755,7 @@ export default {
 };
 </script>
 
-<style scope>
+<style scoped>
 .editor-header{
   font-size: 1.25rem;
   margin: 0.3rem 0;

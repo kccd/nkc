@@ -71,15 +71,15 @@ export default {
     keyWordsEn: [] // 英文关键词
   }),
   props: {
-    post: {
+    keywords: {
       type: Object,
       require: true,
       default: () => ({})
     }
   },
   created() {
-    this.keyWordsCn = this.post?.keyWordsCn || [];
-    this.keyWordsEn = this.post?.keyWordsEn || [];
+    this.keyWordsCn = this.keywords?.cn || [];
+    this.keyWordsEn = this.keywords?.en || [];
     if (this.keyWordsCn.length) {
       this.data[0].value = this.keyWordsCn.join(",");
     }
@@ -173,6 +173,7 @@ export default {
 }
 .fa-remove {
   float: right;
+  padding: 2rem;
 }
 .modal-dialog {
   margin: 10rem auto;

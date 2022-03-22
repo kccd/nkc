@@ -7,7 +7,7 @@
       h5(v-else) 目前还不能开设专栏，通常是因为你参与讨论较少或没有文章被列入精选。
   div(v-else)
     div(v-if="!data.addedToColumn") 
-      #moduleSelectColumnCategories(
+      .moduleSelectColumnCategories(
       :data-column-id="state.column._id"
       :data-to-column='data.toColumn?"true":""'
       v-cloak)
@@ -95,7 +95,7 @@ export default {
   },
   created() {
     this.choose = this.data.toColumn ? [true] : [];
-    this.columnId = this.state.column._id || "";
+    this.columnId = this.state.column?._id || "";
   },
   mounted: function() {
     if (this.choose.length) {
@@ -215,21 +215,21 @@ export default {
 </script>
 
 <style scoped>
-#moduleSelectColumnCategories .category-type{
-    background-color: #d0d0d0;
-    border-left: 6px solid #555;
-    padding-left: 0.5rem;
-    font-weight: 700;
-    height: 2rem;
-    line-height: 2rem;
-  }
-.editor-header{
+.moduleSelectColumnCategories .category-type {
+  background-color: #d0d0d0;
+  border-left: 6px solid #555;
+  padding-left: 0.5rem;
+  font-weight: 700;
+  height: 2rem;
+  line-height: 2rem;
+}
+.editor-header {
   font-size: 1.25rem;
   margin: 0.3rem 0;
   color: #555;
   font-weight: 700;
 }
-.editor-header small{
+.editor-header small {
   color: #88919d;
 }
 </style>

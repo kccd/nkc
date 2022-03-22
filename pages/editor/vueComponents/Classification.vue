@@ -97,19 +97,25 @@
       .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(
         v-if="c.selectedNode && c.selectedNode.warning"
       ) 注意事项：{{ c.selectedNode.warning }}
+  forum-selector(ref="forumSelector")
 </template>
 
 <script>
 import { getUrl } from "../../lib/js/tools";
 // import { nkcAPI } from "../../lib/js/netAPI";
+import ForumSelector from "./ForumSelector.vue";
 
 export default {
   data: () => ({
     selectedForums: [],
     threadCategories: [],
     type: "newThread",
-    minorForumCount: ""
+    minorForumCount: "",
+    show: false
   }),
+  components: {
+    "forum-selector": ForumSelector
+  },
   props: {
     data: {
       require: true,
@@ -170,15 +176,15 @@ export default {
     },
     selectForumsByType(type) {
       let self = this;
-      if (!window.ForumSelector)
-        window.ForumSelector = new NKC.modules.ForumSelector();
+      // if (!window.ForumSelector)
+        // window.ForumSelector = new NKC.modules.ForumSelector();
       let selectedForumsId = [].concat(self.selectedForumsId);
       let highlightForumId = "";
       if (type === "mainForum") {
         highlightForumId = selectedForumsId.shift();
       }
-      ForumSelector.open(
-        function(r) {
+      this.$refs.forumSelector.open(
+        r => {
           r.logo = r.forum.logo;
           r.color = r.forum.color;
           r.fName = r.forum.displayName;
@@ -189,6 +195,7 @@ export default {
             if (self.selectedForumsId.indexOf(r.fid) !== -1) return;
             self.selectedForums.push(r);
           }
+          this.$emit('selected-forumids', this.selectedForumsId)
         },
         {
           highlightForumId: highlightForumId,
@@ -208,7 +215,7 @@ export default {
 };
 </script>
 
-<style scope lang="less">
+<style scoped lang="less">
 
 .editor-thread-category-nodes{
   @nodeHeight: 2.6rem;

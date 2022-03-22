@@ -14,6 +14,7 @@
 *   forumDeclare: 编辑专业说明的草稿
 *
 * */
+import { sweetError } from "../lib/js/sweetAlert.js";
 
 import { nkcAPI } from "../lib/js/netAPI";
 import ModifySubmit from "./vueComponents/ModifySubmit.vue";
@@ -29,11 +30,7 @@ import Investigation from "./vueComponents/Investigation.vue";
 import Column from "./vueComponents/Column.vue";
 window.nkcAPI = nkcAPI;
 window.state = NKC.methods.getDataById("state");
-console.log(state);
-
 window.data = NKC.methods.getDataById("data");
-console.log(data,'data');
-
 if (window.data?.threadCategories) {
   for (const c of window.data.threadCategories) {
     c.selectedNode = null;
@@ -50,7 +47,6 @@ if (window.data?.threadCategories) {
     }
   }
 }
-
 new Vue({
   el: "#app-publish-article",
   components: {
@@ -68,26 +64,33 @@ new Vue({
   },
   data: () => ({
     pageData: window.data,
-    pageState: window.state
+    pageState: window.state,
+    forumIds: []
   }),
-  created() {},
+  created() {
+  },
   methods: {
+    // 控制 提交组件 是否可选匿名发表
+    selectedForumIds(ids){
+      this.$refs.submit.checkAnonymous(ids)
+    },
+    // 移除编辑器
     removeEditor() {
       this.$refs.content.removeEditor();
     },
+    // 编辑器内容改变
     contentChange(length) {
-      // if(length >= this.pageData.originalWordLimit){
       this.$refs.original.contentChange(length);
-      // }
     },
+    // 提交和保存时获取各组件数据
     readyData(submitFn) {
       if (!submitFn) {
-        console.error("callback is not fined");
+        console.error("submitFn is not fined");
         return;
       }
       // pageData.draftId
       // pageData.post.parentPostId;
-
+      // 每个组件下都有一个getData返回数据
       const refs = this.$refs;
       let submitData = {};
       for (const key in refs) {
@@ -99,72 +102,7 @@ new Vue({
       // 添加 草稿id 和 parentPostId
       submitData["did"] = this.pageData.draftId;
       submitData["parentPostId"] = this.pageData.parentPostId;
-      console.log(submitData,'submitData');
       submitFn(submitData);
     }
   }
-});
-
-window.editor = undefined;
-window.PostInfo = undefined;
-window.PostButton = undefined;
-window.FloatPostButton = undefined;
-window.PostToColumn = undefined;
-window.PostSurvey = undefined;
-window.ForumSelector = undefined;
-window.CommonModal = undefined;
-// 标志：编辑器是否已初始化
-let EditorReady = false;
-window.data = undefined;
-// import Editor from "../lib/vue/Editor";
-// import {getEditorConfigs} from "../lib/js/editor";
-// import ImageSelector from "../lib/vue/ImageSelector";
-// import ResourceSelector from "../lib/vue/ResourceSelector";
-// import {blobToFile, fileToBase64} from "../lib/js/file";
-
-// $(function() {
-
-//   window.data = NKC.methods.getDataById("data");
-
-//   if(window.data?.threadCategories){
-//     for(const c of window.data.threadCategories) {
-//       c.selectedNode = null;
-//       if(c.defaultNode === 'none') continue;
-//       if(c.defaultNode === 'default') {
-//         c.selectedNode = c.defaultNode;
-//       } else {
-//         const nodeId = Number(c.defaultNode);
-//         if(isNaN(nodeId)) continue;
-//         for(const node of c.nodes) {
-//           if(node._id !== nodeId) continue;
-//           c.selectedNode = node;
-//         }
-//       }
-//     }
-//   }
-
-//   window.data.threadCategories.map(c => c.selectedNode = null);
-
-//   // NKC.methods.ueditor.initDownloadEvent(editor);
-//   // 实例化专栏模块，如果不存在构造函数则用户没有权限转发。
-//   // 在提交数据前，读取专栏分类的时候，注意判断是否存在实例PostToColumn。
-//   if(NKC.modules.SelectColumnCategories) {
-//     window.PostToColumn = new NKC.modules.SelectColumnCategories();
-//   }
-// });
-
-// NKC.methods.selectedDraft = function(draft) {
-//   PostInfo.insertDraft(draft);
-// }
-
-Object.assign(window, {
-  // initVueApp,
-  // resetBodyPaddingTop,
-  // hideButton,
-  // mediaInsertUE,
-  // saveUEContentToLocal,
-  // setLocalContentToUE,
-  // appUpdateVideo,
-  // appUpdateImage,
-  // EditorReady
 });

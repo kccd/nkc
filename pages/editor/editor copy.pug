@@ -13,32 +13,41 @@ block content
   .container-fluid.max-width.edito
       .row#app-publish-article
         .col-xs-12.col-md-9.box-shadow-panel.m-b-2
-          div
-            //- .vue-render
-            .m-b-1.m-t-1.m-l-05.m-r-05  
-              
-              article-title( :data="pageData" :state="pageState" ref="title")
-              article-content( ref="content" @content-change="contentChange" :c="pageData.post?.c" :notice="pageState.editorSettings?.onEditNotes")  
-              .m-b-2
-              classification( v-if="pageData.type !== 'modifyThread'" :data="pageData" ref="classification" )
-              .m-b-2
-              cover(ref="cover" :value="pageData.post?.cover")
-              .m-b-2
-              abstract(ref="abstract" :abstract= "{cn:pageData.post?.abstractCn, en:pageData.post?.abstractEn}" )
-              .m-b-2
-              key-word(ref="keyWord" :post= "pageData.post"  )
-              .m-b-2
-              author-info(ref="authorInfo" :author= "pageData.post?.authorInfos" )
-              .m-b-2
-              original(ref="original" :original="{wordLimit: pageData.originalWordLimit, state: pageData.post?.originState}" )
-              .m-b-2
-              investigation(ref="investigation" :data="pageData" )
-              .m-b-2
-              column(ref="column" :state="{userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column:pageState.userColumn || {}}" :data="{addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn}")
+          //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t 
+            //- 2.notice editorSettings.onEditNotes
+          article-title(ref="title" :data="pageData" :notice="pageState.editorSettings.onEditNotes" )
+            //- 1. @content-change 编辑器内容改变触发 2. c 编辑器内容
+          article-content(ref="content" @content-change="contentChange" :c="pageData.post?.c")  
+          .m-b-2(v-if="pageData.type !== 'modifyThread'")
+            //- 1. @selected-forumids 选择的主分类后id给提交组件 2. data 包含 threadCategories minorForumCount mainForums
+            classification(ref="classification"  :data="pageData"  @selected-forumids="selectedForumIds")
+          .m-b-2
+            //- 1.value 封面图值
+            cover(ref="cover" :value="pageData.post?.cover")
+          .m-b-2
+            //- 1 abstract 中英文摘要
+            abstract(ref="abstract" :abstract= "{cn:pageData.post?.abstractCn, en:pageData.post?.abstractEn}" )
+          .m-b-2
+            //- 1.keywords 中英文关键字
+            key-word(ref="keyWord" :keywords= "{cn: pageData.post?.keyWordCn, en: pageData.post?.keyWordEn}"  )
+          .m-b-2
+            //- 1.author 作者信息
+            author-info(ref="authorInfo" :author= "pageData.post?.authorInfos" )
+          .m-b-2
+            //- 1.original 包含最小字数和文章状态
+            original(ref="original" :original="{wordLimit: pageData.originalWordLimit, state: pageData.post?.originState}" )
+          .m-b-2
+            //- 1.data包含 createSurveyPermission type post.surveyId
+            investigation(ref="investigation" :data="pageData" )
+          .m-b-2
+            //- 1.state  
+            column(ref="column" :state="{userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column:pageState.userColumn }" :data="{addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn}")
         .col-xs-12.col-md-3.box-shadow-panel 
-          modify-submit( :notice="pageState.editorSettings?.notes" :data="pageData" @ready-data="readyData" @remove-editor="removeEditor")
+          //- 1.notice 温馨提示的内容  2.data 中只需要post therad type forum allowedAnonymousForumsId havePermissionToSendAnonymousPost threadCategories
+          //- 3.@ready-data 提交 和 保存时用于获取数据并提交 4.@remove-editor 提交后移除编辑器
+          modify-submit(ref="submit" :notice="pageState.editorSettings?.notes" :data="pageData" @ready-data="readyData" @remove-editor="removeEditor")
   .hidden#state=objToStr( state ) 
   .hidden#data=objToStr({addedToColumn: data.addedToColumn, createSurveyPermission: data.createSurveyPermission, minorForumCount: data.minorForumCount, originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft, websiteCode: data.websiteCode, toColumn: !!data.toColumn, threadCategories: data.threadCategories})
 block scripts
-  include ../publicModules/forumSelector/forumSelector
+  //- include ../publicModules/forumSelector/forumSelector
   +includeJS("/editor/editor copy.js")
