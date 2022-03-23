@@ -6,6 +6,9 @@
       @subscribe="subscribe"
     )
     subscribe-types(ref="subscribeTypes")
+
+    moment-status(ref="momentStatus" :moment-data="momentData")
+
     .single-moment-top-container
       .single-moment-left
         .single-moment-avatar(:data-float-uid="momentData.uid")
@@ -60,6 +63,7 @@
             :type="showPanelType"
             @post-comment="onPostComment"
             :focus="focus"
+            @open-comment-option="openCommentOption"
             )
 </template>
 
@@ -297,6 +301,7 @@
   import MomentQuote from './MomentQuote';
   import FloatUserPanel from "../FloatUserPanel";
   import SubscribeTypes from "../SubscribeTypes";
+  import MomentStatus from "./MomentStatus";
   export default {
     components: {
       'from-now': FromNow,
@@ -304,7 +309,8 @@
       'moment-comments': MomentComments,
       'moment-quote': MomentQuote,
       'float-user-panel': FloatUserPanel,
-      'subscribe-types': SubscribeTypes
+      'subscribe-types': SubscribeTypes,
+      'moment-status': MomentStatus
     },
     /*
     * prop {Object} data 动态用于显示的数据 组装自 MomentModel.statics.extendMomentsListData
@@ -385,6 +391,10 @@
       subscribe(props) {
         const {uid, subscribed} = props;
         this.$refs.subscribeTypes.subscribeUser(uid, subscribed);
+      },
+      //打开评论的其他操作
+      openCommentOption(data) {
+        this.$emit('option-comment-option', data);
       }
     }
   }

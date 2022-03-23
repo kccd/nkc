@@ -21,7 +21,7 @@ router
       if(!document) return ctx.throw(404, '未找到文章，请刷新后重试');
     }
     if(!permission('review')) {
-      if(moment.status !== normal || !isAuthor) ctx.throw(401, '权限不足');
+      if(moment.status !== normal && !isAuthor) ctx.throw(401, '权限不足');
     }
     const optionStatus = {
       type: 'moment',
@@ -40,13 +40,14 @@ router
       if(isAuthor && moment.status !== deleted) {
         optionStatus.delete = true;
       }
-      //投诉权限
-      optionStatus.complaint = permission('complaintPost')?true:null;
+      
       // 未匿名
       if(!moment.anonymous) {
         if(!isAuthor) {
           // 黑名单
           optionStatus.blacklist = await db.BlacklistModel.checkUser(user.uid, moment.uid);
+          //投诉权限
+          optionStatus.complaint = permission('complaintPost')?true:null;
         }
         // 违规记录
         optionStatus.violation = ctx.permission('violationRecord')? true: null;

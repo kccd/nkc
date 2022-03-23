@@ -1,7 +1,8 @@
 const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
-    const {query, db, data, state, nkcModules} = ctx;
+    const {query, db, data, state, nkcModules, permission} = ctx;
+    const {user} = data;
     const {from, page, mid} = query;
     // 编辑器获取待发布的动态
     if(from === 'editor') {

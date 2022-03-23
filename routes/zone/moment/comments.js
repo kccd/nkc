@@ -1,6 +1,7 @@
 const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
+    //获取动态下的评论
     const {db, data, internalData, query, nkcModules, state} = ctx;
     const {moment} = internalData;
     let {

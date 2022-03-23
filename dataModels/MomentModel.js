@@ -844,6 +844,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       voteUp,
       order,
       quoteType,
+      status,
     } = moment;
     let f = moment[field];
     const user = usersObj[uid];
@@ -928,6 +929,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       toc: top,
       content,
       voteUp,
+      status,
       voteType: votesType[_id],
       commentCount: order,
       source: 'moment',

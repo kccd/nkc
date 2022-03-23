@@ -1,5 +1,6 @@
 <template lang="pug">
   .moments
+    //动态操作
     moment-option(
       ref="momentOption"
       @complaint="complaint"
@@ -11,6 +12,7 @@
       moment(
         :data="momentData"
         @open-option="openOption"
+        @option-comment-option="openOption"
       )
 </template>
 
@@ -35,7 +37,7 @@
       'moment': Moment,
       'complaint': Complaint,
       'violation-record': ViolationRecord,
-      'float-user-panel': FloatUserPanel
+      'float-user-panel': FloatUserPanel,
     },
     data: () => ({
 
@@ -53,7 +55,7 @@
       //查看违规记录
       violationRecord(uid) {
         this.$refs.violationRecord.open({uid});
-      }
+      },
     }
   }
 </script>
