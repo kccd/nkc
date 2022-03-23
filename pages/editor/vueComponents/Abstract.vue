@@ -26,19 +26,10 @@ export default {
     }
   },
   created() {
-    if(typeof this.abstract.cn === 'undefined'){
-      console.warn('post.cn is not defined')
-      this.cn = "";
-      return;
-    };
-    if(typeof this.abstract.en === 'undefined'){
-      console.warn('post.en is not defined')
-      this.en = "";
-      return;
-
-    };
-    this.cn = this.abstract.cn ;
-    this.en = this.abstract.en;
+    // this.setData()
+  },
+  updated(){
+    // this.setData()
   },
   computed: {
     abstractCnLength() {
@@ -50,7 +41,31 @@ export default {
 
     }
   },
+  watch: {
+    abstract: {
+      immediate: true,
+     handler(n){
+        this.cn = n.cn || '';
+      this.en = n.en || '';
+     }
+    }
+  },
   methods: {
+    // setData(){
+    //   if(typeof this.abstract.cn === 'undefined'){
+    //   console.warn('post.cn is not defined')
+    //   this.cn = "";
+    //   return;
+    // };
+    // if(typeof this.abstract.en === 'undefined'){
+    //   console.warn('post.en is not defined')
+    //   this.en = "";
+    //   return;
+
+    // };
+    // this.cn = this.abstract.cn ;
+    // this.en = this.abstract.en;
+    // },
     getData(){
       return {
         abstractCn: this.cn,

@@ -122,13 +122,19 @@ export default {
       type: Object
     }
   },
-  created() {
-    this.threadCategories = this.data.threadCategories || [];
-    this.minorForumCount = this.data.minorForumCount || [];
-  },
-  updated() {},
-  mounted() {
-    this.selectedForums = this.data.mainForums || [];
+  // created() {
+  //   this.threadCategories = this.data.threadCategories || [];
+  //   this.minorForumCount = this.data.minorForumCount || [];
+  // },
+  // updated() {},
+  // mounted() {
+  //   this.selectedForums = this.data.mainForums || [];
+  // },
+  watch: {
+    data(n, o){
+      this.threadCategories = n.threadCategories;
+      this.minorForumCount = n.minorForumCount;
+    }
   },
   computed: {
     mainForum: function() {

@@ -33,46 +33,58 @@
       a(:href="data.forum.url" target="_blank") {{data.forum.title}}
       | &nbsp;的最新页板块公告
     input.editor-title(placeholder="请输入标题..." id="title" v-model="titleValue" )  
-    hr
 </template>
 <script>
 export default {
   props: {
     data: {
       required: true,
-      type: Object,
+      type: Object
     },
-    notice:{
+    notice: {
       required: true,
-      type: String,
+      type: String
     }
   },
   data: () => ({
     titleValue: "",
-    openOnEditNotes: localStorage.getItem("open-on-edit-notes") === "yes",
+    openOnEditNotes: localStorage.getItem("open-on-edit-notes") === "yes"
   }),
-  created(){
-    this.titleValue = this.data?.post?.t || ""
-  },
+  // created(){
+  //   this.setData();
+  // },
+  // updated(){
+  //   this.setData()
+  // },
   watch: {
     openOnEditNotes(boolean) {
       localStorage.setItem("open-on-edit-notes", boolean ? "yes" : "no");
     },
+    data: {
+      immediate: true,
+      handler(n) {
+        console.log(n);
+        this.titleValue = n?.post?.t || "";
+      }
+    }
   },
   methods: {
+    // setData(){
+    //   this.titleValue = this.data?.post?.t || ""
+    // },
     getData() {
-      return {t: this.titleValue};
-    },
-  },
+      return { t: this.titleValue };
+    }
+  }
 };
 </script>
 <style scoped lang="less">
 .on-edit-notes .on-edit-label {
-    padding: 6px 0;
-    cursor: pointer;
-    font-weight: bold;
+  padding: 6px 0;
+  cursor: pointer;
+  font-weight: bold;
 }
-.editor-title{
+.editor-title {
   width: 100%;
   height: 4rem;
   border: none;
@@ -80,15 +92,15 @@ export default {
   font-weight: 700;
   padding: 0.2rem;
 }
-.editor-title:focus{
+.editor-title:focus {
   outline: none;
 }
-.editor-type-info{
+.editor-type-info {
   font-size: 1.2rem;
   color: #888;
   margin-bottom: 1rem;
 }
-.editor-type-info .fa{
+.editor-type-info .fa {
   margin-right: 0.3rem;
 }
 .on-edit-notes {
@@ -100,10 +112,9 @@ export default {
     font-weight: bold;
     .detail {
       text-decoration: underline;
-      
     }
   }
-  .on-edit-note-content{
+  .on-edit-note-content {
     color: #414141;
   }
 }

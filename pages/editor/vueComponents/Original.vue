@@ -21,12 +21,21 @@ export default {
       required: true
     },
   },
-  created() {
-    if(typeof this.original.state === "undefined"){
-      console.error('original.state is not defined');
-      return
+  // created() {
+  //   if(typeof this.original.state === "undefined"){
+  //     console.error('original.state is not defined');
+  //     return
+  //   }
+  //   this.originState = this.original.state
+  // },
+  watch: {
+    original: {
+      immediate: true,
+      handler(n){
+      this.originState = n.state
+
+      }
     }
-    this.originState = this.original.state
   },
   computed: {
     allowedOriginal() {

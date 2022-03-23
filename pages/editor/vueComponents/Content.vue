@@ -1,12 +1,12 @@
 <template lang="pug">
 .content
   editor(
-      :configs="editorConfigs",
-      ref="threadEditor",
-      @ready="editorReady",
-      @content-change="onContentChange",
-      :plugs="editorPlugs",
-    )
+    :configs="editorConfigs",
+    ref="threadEditor",
+    @ready="editorReady",
+    @content-change="onContentChange",
+    :plugs="editorPlugs"
+  )
 </template>
 
 <script>
@@ -36,15 +36,23 @@ export default {
       type: String
     }
   },
-  created() {
-    let reg = /<blockquote cite.+?blockquote>/;
-    let quoteHtml = this.c?.match(reg);
-    if (quoteHtml && quoteHtml[0]) {
-      this.quoteHtml = quoteHtml[0];
+  watch: {
+    c: {
+      immediate: true,
+      handler(n) {
+        let reg = /<blockquote cite.+?blockquote>/;
+        let quoteHtml = n?.match(reg);
+        if (quoteHtml && quoteHtml[0]) {
+          this.quoteHtml = quoteHtml[0];
+        }
+        this.content = n?.replace(reg, "") || "";
+        // 真奇怪 
+      }
+    },
+    openOnEditNotes: function(val) {
+      localStorage.setItem("open-on-edit-notes", val ? "yes" : "no");
     }
-    this.content = this.c?.replace(reg, "") || "";
   },
-  mounted() {},
   computed: {
     editorConfigs() {
       return getEditorConfigs();
@@ -52,7 +60,6 @@ export default {
   },
   methods: {
     setContent() {
-      // window.editorContainer.contentChangeEventFlag = false; ？？
       this.$refs.threadEditor.setContent(this.content);
     },
     resetBodyPaddingTop() {
@@ -94,15 +101,10 @@ export default {
       this.$refs.threadEditor.removeNoticeEvent();
     }
   },
-  watch: {
-    openOnEditNotes: function(val) {
-      localStorage.setItem("open-on-edit-notes", val ? "yes" : "no");
-    }
-  }
 };
 </script>
 
-<style scoped lang="less">
+<style lang="less">
 .content #edui1_toolbarbox.edui-default {
   position: fixed;
   padding-left: 15px;
@@ -117,10 +119,10 @@ export default {
   border: none;
   border-bottom: 1px solid #dbdbdb;
   padding: 0.5rem 0;
-  #edui1_toolbarboxouter{
-    max-width: 1300px!important;
+  #edui1_toolbarboxouter {
+    max-width: 1300px !important;
     margin-right: auto;
-    margin-left: auto
+    margin-left: auto;
   }
 }
 #edui1 {

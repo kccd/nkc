@@ -38,13 +38,21 @@ export default {
     }
   },
   created() {
-    if(typeof this.value === 'undefined') {
-      console.error('this.value is undefined');
-      return
-    } 
+    // if(typeof this.value === 'undefined') {
+    //   console.error('this.value is undefined');
+    //   return
+    // } 
 
-    this.coverUrl = getUrl("postCover", this.value);
+    // this.coverUrl = getUrl("postCover", this.value);
     
+  },
+  watch: {
+    value: {
+      immediate: true,
+      handler(n){
+        if(!(typeof this.value === 'undefined')) this.coverUrl = getUrl("postCover", n);
+      }
+    }
   },
   methods: {
     selectCover() {

@@ -297,15 +297,32 @@ router
 
     // 多维分类
     data.threadCategories = await db.ThreadCategoryModel.getCategoryTree({disabled: false});
+    const {id} = query;
+
+    data.reqUrl = {
+     type,
+     id 
+    }
     await next();
   })
   .get('/copy',async (ctx, next)=>{
+    const {db, data, query} = ctx;
+    const {user} = data;
+    await db.UserModel.checkUserBaseInfo(user);
+    ctx.template = "editor/editor copy.pug";
+    const {id, type} = query;
+
+    data.reqUrl = {
+     type,
+     id 
+    }
+    await next();
+  })
+  .get('/data', async (ctx, next)=>{
     const {db, data, query, state} = ctx;
     const {type} = query;
     const {user} = data;
     await db.UserModel.checkUserBaseInfo(user);
-    ctx.template = "editor/editor copy.pug";
-
     data.notice = '';
 
     // 需要预制的专业和文章分类
@@ -315,7 +332,7 @@ router
     // 取网站代号
     let serverSetting = await db.SettingModel.getSettings("server");
     data.websiteCode = String(serverSetting.websiteCode).toLocaleUpperCase();
-
+    // data.pageType = type;
     if(!type) { // 直接进编辑器
       data.type = "newThread";
     } else if(type === "forum") { // 在专业进编辑器，需要预制当前专业
@@ -366,20 +383,6 @@ router
         comment: !!parentPostCount
       };
       selectedForumsId = thread.mainForumsId || [];
-    } else if(type === "forum_declare") { // 修改专业说明
-      data.type = "modifyForumDeclare";
-      const {id} = query;
-      const forum = await db.ForumModel.findOnly({fid: id});
-      if(!forum.moderators.includes(user.uid) && !ctx.permission("superModerator")) ctx.throw(403, "你没有权限编辑专业说明");
-      // 渲染nkcsource
-      data.post = {
-        c: forum.declare
-      };
-      data.forum = {
-        fid: forum.fid,
-        title: forum.displayName,
-        url: `/f/${forum.fid}`
-      };
     } else if(type === "redit") { // 从草稿箱来
       let {id, o} = query;
       let draft = await db.DraftModel.findOne({did: id, uid: user.uid});
@@ -459,21 +462,7 @@ router
       } else {
         ctx.throw(400, `未知的草稿类型：${desType}`);
       }
-    } else if(type === "forum_latest_notice") {
-      data.type = "modifyForumLatestNotice";
-      const {id} = query;
-      const forum = await db.ForumModel.findOnly({fid: id});
-      if(!forum.moderators.includes(user.uid) && !ctx.permission("superModerator")) ctx.throw(403, "你没有权限编辑专业最新页板块公告");
-      // 渲染nkcsource
-      data.post = {
-        c: forum.latestBlockNotice
-      };
-      data.forum = {
-        fid: forum.fid,
-        title: forum.displayName,
-        url: `/f/${forum.fid}`
-      };
-    }
+    } 
     // 拓展专业信息
     data.mainForums = [];
     if(selectedForumsId.length) {
@@ -512,35 +501,6 @@ router
         });
       }
     }
-
-    // 根据类型加载最新的草稿
-    /* if(type !== "redit") {
-      let obj = {};
-      if(data.type === "newThread") {
-        obj = {desType: "forum"};
-      } else if(data.type === "newPost") {
-        obj = {
-          desType: "thread",
-          desTypeId: data.thread.tid
-        };
-      } else if(["modifyPost", "modifyThread"].includes(data.type)) {
-        obj = {
-          desType: "post",
-          desTypeId: data.post.pid
-        };
-      } else {
-        obj = {
-          desType: "forumDeclare",
-          desTypeId: data.forum.fid
-        };
-      }
-      obj.uid = user.uid;
-      const d = await db.DraftModel.findOne(obj).sort({toc: -1});
-      if(d) data.oldDraft = {
-        did: d.did,
-        tlm: d.tlm || d.toc
-      };
-    } */
     // 判断用户是否能够发表匿名内容
     if(data.type === "newThread") {
       data.havePermissionToSendAnonymousPost =
@@ -590,10 +550,11 @@ router
     }
 
     state.editorSettings = await db.SettingModel.getSettings("editor");
-
+    data.state = state;
     // 多维分类
     data.threadCategories = await db.ThreadCategoryModel.getCategoryTree({disabled: false});
     await next();
-  });
+  })
+  ;
 
 module.exports = router;

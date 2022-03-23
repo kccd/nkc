@@ -1,6 +1,6 @@
 <template lang="pug">
   //- data.createSurveyPermission && data.type === "newThread" || (data.type === "modifyThread" && data.post.surveyId)
-  .investigation(v-if="data.createSurveyPermission && data.type === 'newThread' || (data.type === 'modifyThread' && data.post.surveyId)")
+  .investigation(v-if="createSurveyPermission && type === 'newThread' || (type === 'modifyThread' && post.surveyId)")
     .editor-header 调查
       button.btn.btn-xs(
         @click="disabledSurveyForm()"
@@ -289,12 +289,27 @@ export default {
       hour: "",
       minute: ""
     },
-    error: ""
+    error: "",
+    createSurveyPermission: '',
+    type: '',
+    post: ''
   }),
   props: {
     data: {
       type: Object,
       required: true
+    }
+  },
+  watch: {
+    data: {
+      immediate: true,
+      handler(n){
+        this.createSurveyPermission = n.createSurveyPermission
+        this.type = n.type
+        this.post = n.post;
+      this.initPostSurvey();
+
+      }
     }
   },
   computed: {
@@ -733,11 +748,11 @@ export default {
       $("#disabledSurveyButton").hide();
     },
     initPostSurvey() {
-      this.init({ surveyId: this.data?.post?.surveyId || "" });
-      if (this.data.type !== "newThread") {
+      this.init({ surveyId: this.post?.surveyId || "" });
+      if (this.type !== "newThread") {
         this.hideButton();
       }
-      if (this.data.post && this.data.post.surveyId) {
+      if (this.post && this.post.surveyId) {
         this.disabledSurveyForm();
       }
     },

@@ -58,13 +58,24 @@ export default {
     saveDraftTimeout: 60000
   }),
   created() {
-    this.allowedAnonymousForumsId =  this.data.allowedAnonymousForumsId || []
-    this.havePermissionToSendAnonymousPost = this.data.havePermissionToSendAnonymousPost || false
-    if (this.data?.post) this.oldContent = this.data.post.c;
-    if (this.data?.type) this.type = this.data.type;
-    if (this.data?.forum) this.forum = this.data.forum;
-    if (this.data?.threda) this.threda = this.data.threda;
-    if (this.data?.post?.pid) this.pid = this.data.post.pid;
+    // this.allowedAnonymousForumsId =  this.data.allowedAnonymousForumsId || []
+    // this.havePermissionToSendAnonymousPost = this.data.havePermissionToSendAnonymousPost || false
+    // if (this.data?.post) this.oldContent = this.data.post.c;
+    // if (this.data?.type) this.type = this.data.type;
+    // if (this.data?.forum) this.forum = this.data.forum;
+    // if (this.data?.threda) this.threda = this.data.threda;
+    // if (this.data?.post?.pid) this.pid = this.data.post.pid;
+  },
+  watch: {
+    data(n){
+      this.allowedAnonymousForumsId =  n?.allowedAnonymousForumsId || []
+    this.havePermissionToSendAnonymousPost = n?.havePermissionToSendAnonymousPost || false
+    if (n?.post) this.oldContent = n.post.c;
+    if (n?.type) this.type = n.type;
+    if (n?.forum) this.forum = n.forum;
+    if (n?.threda) this.threda = n.threda;
+    if (n?.post?.pid) this.pid = n.post.pid;
+    }
   },
   computed: {
     selectedForumsId() {
@@ -426,8 +437,6 @@ export default {
           }
         })
         .then(data => {
-            console.log(api,'api')
-
           this.$emit("remove-editor");
           if (NKC.configs.platform === "reactNative") {
             NKC.methods.visitUrlAndClose(data.redirect);

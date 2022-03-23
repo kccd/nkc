@@ -77,15 +77,22 @@ export default {
       default: () => ({})
     }
   },
-  created() {
-    this.keyWordsCn = this.keywords?.cn || [];
-    this.keyWordsEn = this.keywords?.en || [];
-    if (this.keyWordsCn.length) {
-      this.data[0].value = this.keyWordsCn.join(",");
-    }
-    if (this.keyWordsEn.length) {
-      this.data[1].value = this.keyWordsEn.join(",");
-    }
+  watch: {
+    keywords(n, o){
+      this.$set(this.data[0],"value", n.cn && n.cn.join(",") || [])
+      this.$set(this.data[1],"value", n.en && n.en.join(",") || [])
+      // this.data[0].value = n.cn && n.cn.join(",") || [];
+      // this.data[1].value = n.en && n.en.join(",") || [];
+      this.submit()
+    },
+    // keywords: {
+    //   immediate: true,
+    //   handler(n, o){
+    //     console.log(n)
+    //     this.$set(this.data[0],"value", n.cn && n.cn.join(",") || [])
+    //   this.$set(this.data[1],"value", n.en && n.en.join(",") || [])
+    //   }
+    // }
   },
   methods: {
     close() {
@@ -171,10 +178,7 @@ export default {
   line-height: 5rem;
   font-size: 1.3rem;
 }
-.fa-remove {
-  float: right;
-  padding: 2rem;
-}
+
 .modal-dialog {
   margin: 10rem auto;
 }

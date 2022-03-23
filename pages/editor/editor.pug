@@ -1,7 +1,7 @@
 extends ../bootstrap_base
 block title
   title 编辑器
-  +includeCSS("/editor/editor.css")
+  +includeCSS("/editor/editorOld.css")
   style.
     .nkcshade{
       box-shadow: none;
@@ -310,4 +310,4 @@ block scripts
   if state.userColumn && !data.addedToColumn
     +includeJS("/publicModules/toColumn/selectCategories.js")
   +includeJS('/publicModules/survey/edit.js')
-  +includeJS("/editor/editor.js")
+  +includeJS("/editor/editorOld.js")

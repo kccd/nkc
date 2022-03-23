@@ -61,7 +61,6 @@
                   button.btn.btn-primary.btn-sm(@click="saveCategory") 保存
                   button.btn.btn-default.btn-sm(@click="cancelAddCategory") 取消
     h5(v-else) 本文已经发表到专栏，如需从专栏撤稿，请到专栏管理界面操作。
-
 </template>
 
 <script>
@@ -100,6 +99,14 @@ export default {
   mounted: function() {
     if (this.choose.length) {
       this.getCategories();
+    }
+  },
+  watch: {
+    data(n, o) {
+      this.choose = n.toColumn ? [true] : [];
+    },
+    state(n, o) {
+      this.columnId = n.column?._id || "";
     }
   },
   methods: {

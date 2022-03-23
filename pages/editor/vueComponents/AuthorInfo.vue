@@ -50,7 +50,6 @@
 </template>
 
 <script>
-
 export default {
   data: () => ({
     websiteUserId: data.websiteCode + "ID",
@@ -59,23 +58,22 @@ export default {
   props: {
     author: {
       type: Array,
-      default: ()=>([])
+      default: () => []
     }
   },
-  created() {
-    if(typeof this["author"] === "undefined"){
-      console.warn("p-authorInfos is not defined");
-      this.authorInfos = [];
-      return
-    }
-    this.authorInfos = this["author"];
-  },
-  mounted(){
+  watch: {
+    author: {
+      immediate: true,
+      handler(n){
+      this.authorInfos = n
 
+      }
+    }
   },
   methods: {
-    getData(){
-      return {authorInfos: this.authorInfos}
+  
+    getData() {
+      return { authorInfos: this.authorInfos };
     },
     removeAuthor(index, arr) {
       sweetQuestion("确定要删除该条作者信息？")
@@ -121,26 +119,25 @@ export default {
 </script>
 
 <style scoped>
-
-.editor-author input:focus{
+.editor-author input:focus {
   outline: none;
 }
-.editor-author input{
+.editor-author input {
   height: 2.5rem;
   padding: 0.5rem;
   border: 1px solid #d8d8d8;
   border-radius: 3px;
 }
-.editor-author .author-name{
+.editor-author .author-name {
   width: 6rem;
 }
-.editor-author .author-id{
+.editor-author .author-id {
   width: 6rem;
 }
-.editor-author .fa:hover{
+.editor-author .fa:hover {
   color: #8c8c8c;
 }
-.editor-author .fa{
+.editor-author .fa {
   font-size: 1.3rem;
   height: 2rem;
   width: 2rem;
@@ -149,16 +146,16 @@ export default {
   color: #adadad;
   text-align: center;
 }
-.editor-authors thead{
+.editor-authors thead {
   color: #88919d;
 }
-.editor-header{
+.editor-header {
   font-size: 1.25rem;
   margin: 0.3rem 0;
   color: #555;
   font-weight: 700;
 }
-.editor-header small{
+.editor-header small {
   color: #88919d;
 }
 </style>
