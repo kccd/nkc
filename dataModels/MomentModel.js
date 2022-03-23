@@ -561,11 +561,11 @@ schema.methods.publish = async function() {
   await this.checkBeforePublishing();
   const time = new Date();
   await DocumentModel.publishDocumentByDid(this.did);
-  this.status = momentStatus.normal;
+  // this.status = momentStatus.normal;
   await this.updateOne({
     $set: {
       top: time,
-      status: this.status
+      // status: this.status
     }
   });
   await this.updateResourceReferences();
@@ -767,6 +767,7 @@ schema.statics.renderContent = async (content) => {
 * 获取动态显示所需要的基础数据
 * @param {[schema moment]}
 * @param {String} uid 访问者 ID
+* @param {String} field 拓展返回对象的键
 * @return {[Object]}
 *   @param {String} momentId 动态ID
 *   @param {String} uid 发表人ID
@@ -796,7 +797,7 @@ schema.statics.renderContent = async (content) => {
 *       @param {String} height 视频分辨率 480p、720p、1080p
 *       @param {Number} dataSize 视频大小
 * */
-schema.statics.extendMomentsData = async (moments, uid = '') => {
+schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
   const videoSize = require('../settings/video');
   const UserModel = mongoose.model('users');
   const ResourceModel = mongoose.model('resources');
@@ -844,6 +845,7 @@ schema.statics.extendMomentsData = async (moments, uid = '') => {
       order,
       quoteType,
     } = moment;
+    let f = moment[field];
     const user = usersObj[uid];
     if(!user) continue;
     const {username, avatar} = user;
@@ -915,7 +917,7 @@ schema.statics.extendMomentsData = async (moments, uid = '') => {
 
       filesData.push(fileData);
     }
-    results[_id] = {
+    results[f] = {
       momentId: _id,
       uid,
       user,
@@ -928,6 +930,7 @@ schema.statics.extendMomentsData = async (moments, uid = '') => {
       voteUp,
       voteType: votesType[_id],
       commentCount: order,
+      source: 'moment',
       files: filesData,
       url: getUrl('zoneMoment', _id),
     };

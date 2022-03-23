@@ -21,8 +21,8 @@ router
         $in: fid
       }
     }
-    const {article: articleSource, comment: commentSource} = await db.DocumentModel.getDocumentSources();
-    const m = {status: 'unknown', type: 'stable', source: {$in: [articleSource, commentSource]}};
+    const {article: articleSource, comment: commentSource, moment: momentSource} = await db.DocumentModel.getDocumentSources();
+    const m = {status: 'unknown', type: 'stable', source: {$in: [articleSource, commentSource, momentSource]}};
     //查找出 未审核 未禁用 未退修的post和document
     const postCount = await db.PostModel.countDocuments(q);
     const documentCount = await db.DocumentModel.countDocuments(m);
@@ -108,13 +108,18 @@ router
       // });
       const articleDocId = new Set();
       const commentDocId = new Set();
+      const momentDocId = new Set();
       const uid = new Set();
       for(const document of documents) {
         document.content = await nkcModules.apiFunction.obtainPureText(document.content, true, 100);
         if(document.source === articleSource) articleDocId.add(document.did);
         if(document.source === commentSource) commentDocId.add(document.did);
+        if(document.source === momentSource) momentDocId.add(document.did);
         uid.add(document.uid);
       }
+      //拓展动态内容
+      let moments = await db.MomentModel.find({did: {$in: [...momentDocId]}});
+      moments = await db.MomentModel.extendMomentsData(moments, '', 'did');
       let articles = await db.ArticleModel.find({did: {$in: [...articleDocId]}});
       //拓展article内容
       articles = await db.ArticleModel.extendArticles(articles);
@@ -140,13 +145,15 @@ router
         if(!article && document.source === 'article') continue;
         const comment = commentObj[document.did];
         if(!comment && document.source === 'comment') continue;
+        const moment = moments[document.did];
+        if(!moment && document.source === 'moment') continue;
         let user = usersObj[document.uid];
         if(!user) continue;
         //获取送审原因
         const reviewRecord = await  db.ReviewModel.findOne({docId: document._id}).sort({toc: -1}).limit(1);
         data.results.push({
           document,
-          content: article || comment,
+          content: article || comment || moment,
           user,
           reason: reviewRecord?reviewRecord.reason : '',
         })
@@ -223,18 +230,26 @@ router
         await document.setStatus(normalStatus);
         //生成审核记录
         await db.ReviewModel.newReview('passDocument', '', data.user, reason, document);
+        let passType;
+        if(document.source === 'article') {
+          passType = "documentPassReview";
+        } else if(document.source === 'comment') {
+          passType = "commentPassReview";
+        } else if(document.source === 'moment') {
+          passType = "momentPass";
+        }
         message = await db.MessageModel({
           _id: await db.SettingModel.operateSystemID("messages", 1),
           r: document.uid,
           ty: "STU",
           c: {
-            type: document.source === 'article'?"documentPassReview":"commentPassReview",
+            type: passType,
             docId: document._id,
           }
         })
         await document.sendMessageToAtUsers('article');
       } else {
-        if(!delType) ctx.throw(400, '请选择退修或者禁用');
+        if(!delType) ctx.throw(400, '请选择审核状态');
         //将document状态改为已审核状态
         await document.setStatus(delType);
         //生成审核记录
@@ -259,8 +274,10 @@ router
         let messageType;
         if(document.source === 'article') {
           messageType = delType === 'faulty'?"documentFaulty":"documentDisabled";
-        } else {
+        } else if(document.source === 'comment') {
           messageType = delType === 'faulty'?"commentFaulty":"commentDisabled";
+        } else if(document.source === 'moment') {
+          messageType = 'momentDelete';
         }
         message = await db.MessageModel({
           _id: await db.SettingModel.operateSystemID("messages", 1),

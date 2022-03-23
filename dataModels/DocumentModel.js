@@ -489,7 +489,7 @@ schema.statics.publishDocumentByDid = async (did) => {
   });
   //是否需要审核
   const needReview = await documentsObj.beta.getReviewStatusAndCreateReviewLog();
-  if(!needReview) {
+  if(needReview) {
     await documentsObj.beta.setStatus((await DocumentModel.getDocumentStatus()).unknown);
   } else {
     //不需要审核
@@ -933,9 +933,9 @@ schema.statics.checkGlobalPostPermission = async (uid, source, type = 'stable') 
     }
     if(examNotPass.count <= documentCountToday) {
       if(!examVolumeA && !examVolumeB) {
-        throwErr(403, `今日发表次数已达上限（${examNotPass} 次），请明天再试`);
+        throwErr(403, `今日发表次数已达上限（${examNotPass.count} 次），请明天再试`);
       } else {
-        throwErr(403, `今日发表次数已达上限（${examNotPass} 次），请参加考试，通过后可获取更多发表权限`);
+        throwErr(403, `今日发表次数已达上限（${examNotPass.count} 次），请参加考试，通过后可获取更多发表权限`);
       }
     }
   }
@@ -1116,7 +1116,7 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function() {
     //获取敏感词关键字
     reviewStatus = await this.getKeywordsReviewStatus();
   }
-  const {needReview, reason, type} = reviewStatus;
+  let {needReview, reason, type} = reviewStatus;
   //如果需要审核，就生成审核记录
   if(needReview) {
     await ReviewModel.newDocumentReview(type, this._id, this.uid, reason);

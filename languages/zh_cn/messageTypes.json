@@ -119,5 +119,7 @@
   "commentPassReview": "图书评论通过审核",
   "commentFaulty": "图书评论被退修",
   "commentDisabled": "图书评论被屏蔽",
-  "bookInvitation": "图书创作邀请"
+  "bookInvitation": "图书创作邀请",
+  "momentDelete": "动态被删除",
+  "momentPass": "动态审核通过"
 }
