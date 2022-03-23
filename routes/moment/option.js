@@ -11,7 +11,7 @@ router
     let isAuthor = await moment.getAuthorByUid(user.uid);
     //判断当动态的状态不正常时用户是否具有操作权限
     if(moment.status !== normal) {
-      if(!permission('review') || !isAuthor) ctx.throw(400, '权限不足');
+      if(!permission('review') && !isAuthor) ctx.throw(400, '权限不足');
     }
     const {stable: stableType} = await db.DocumentModel.getDocumentTypes();
     const {normal: normalStatus, deleted: deletedStatus} = await db.DocumentModel.getDocumentStatus();

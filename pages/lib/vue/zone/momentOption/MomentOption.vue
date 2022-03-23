@@ -3,6 +3,9 @@
     .post-options-panel(v-if='loading')
       .loading 加载中...
     .post-options-panel(v-else)
+      a.option(v-if="moment.url" :href="moment.url")
+        .fa.fa-newspaper-o
+        span 查看详情
       a.option(v-if="options.delete" @click="deleteMoment")
         .fa.fa-edit
         span 删除
@@ -118,8 +121,8 @@ export default {
         return position;
       } else {
         return {
-          top: top + jqDOM.height(),
-          left: left + domWidth - jqDOM.width(),
+          top: top + domHeight,
+          left: left + jqDOM.width() - domWidth,
         }
       }
     }
@@ -133,14 +136,21 @@ export default {
   updated() {
     const dom = $(this.$el);
     const content = $('#comment-content');
+    const {jqDOM, domHeight, domWidth, direction} = this;
     let top = 0;
     let left = 0;
     if(content) {
-      top = content .offset().top;
-      left = content .offset().left;
+      top = content.offset().top;
+      left = content.offset().left;
     }
-    this.domHeight = dom.height() + top;
-    this.domWidth = dom.width() + left;
+    if(direction === 'up') {
+      this.domHeight = dom.height() + top;
+      this.domWidth = dom.width() + left;
+    } else {
+      this.domHeight = dom.height() - top;
+      this.domWidth = dom.width() + left;
+    }
+
   },
   methods: {
     timeFormat: timeFormat,
@@ -150,7 +160,7 @@ export default {
     //获取当前用户的操作权限
     getPermission() {
       const self = this;
-      return nkcAPI(`/moment/${self.moment.momentId}/options`, 'GET', {})
+      return nkcAPI(`/moment/${self.moment.momentCommentId?self.moment.momentCommentId:self.moment.momentId}/options`, 'GET', {})
         .then(res => {
           self.options = res.optionStatus;
           self.toc = res.toc;
@@ -179,7 +189,7 @@ export default {
     },
     //投诉或举报
     complaint() {
-      this.$emit('complaint', this.moment.momentId);
+      this.$emit('complaint', this.moment.momentCommentId?this.moment.momentCommentId:this.moment.momentId);
     },
     //通过审核
     passReview(_id) {
@@ -188,7 +198,7 @@ export default {
         docId = _id;
       } else {
         if(!this.moment) return;
-        docId = this.moment.momentId;
+        docId = this.moment.momentCommentId?this.moment.momentCommentId:this.moment.momentId;
       }
       nkcAPI('/review' , 'PUT', {
         pass: true,
@@ -205,8 +215,8 @@ export default {
     //查看IP
     displayIpInfo() {
       if(!this.moment) return sweetWarning('未找到评论内容');
-      const {momentId}= this.moment;
-      nkcAPI(`/moment/${momentId}/ipInfo`, 'GET')
+      const {momentId, momentCommentId}= this.moment;
+      nkcAPI(`/moment/${momentCommentId?momentCommentId:momentId}/ipInfo`, 'GET')
         .then((res) => {
           return res.ipInfo;
         })
@@ -220,14 +230,18 @@ export default {
     },
     //加入黑名单 tUid 被拉黑的用户
     userBlacklist() {
-      const {uid: tUid, momentId} = this.moment;
+      const {uid: tUid, momentId, momentCommentId} = this.moment;
+      let _id = momentCommentId;
+      if(!momentCommentId) {
+        _id = momentId;
+      }
       const {blacklist} = this.options;
       if(blacklist) {
         //移除黑名单
         this.removeUserToBlackList(tUid);
       } else {
         //加入黑名单
-        this.addUserToBlackList(tUid, 'comment', momentId)
+        this.addUserToBlackList(tUid, 'comment', _id)
       }
     },
     //违规记录
@@ -297,11 +311,15 @@ export default {
     },
     //删除动态
     deleteMoment() {
-      const {momentId} = this.moment;
-      if(!momentId) return;
+      const {momentId, momentCommentId} = this.moment;
+      let _id = momentCommentId || '';
+      if(!_id) {
+        _id = momentId;
+      }
+      if(!_id) return;
       sweetQuestion("你确定要删除吗？")
         .then(() => {
-          nkcAPI(`/moment/${momentId}`, 'DELETE', {
+          nkcAPI(`/moment/${_id}`, 'DELETE', {
           })
             .then(() => {
               sweetSuccess('操作成功');
@@ -310,6 +328,13 @@ export default {
               sweetError(err);
             })
         })
+    },
+    //查看详情
+    detail() {
+      const {url} = this.moment;
+      if(url) {
+        window.location.href = url;
+      }
     }
   }
 }

@@ -8,6 +8,7 @@
     )
     complaint(ref="complaint")
     violation-record(ref="violationRecord")
+    moment-status(ref="momentStatus")
     .moment-container(:key="momentData.momentId" v-for="momentData in moments")
       moment(
         :data="momentData"
@@ -30,6 +31,7 @@
   import ViolationRecord from "../ViolationRecord";
   import MomentOption from "./momentOption/MomentOption";
   import FloatUserPanel from "../FloatUserPanel";
+  import MomentStatus from "./MomentStatus";
   export default {
     props: ['moments'],
     components: {
@@ -38,6 +40,7 @@
       'complaint': Complaint,
       'violation-record': ViolationRecord,
       'float-user-panel': FloatUserPanel,
+      'moment-status': MomentStatus
     },
     data: () => ({
 

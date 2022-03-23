@@ -7,7 +7,7 @@
     )
     subscribe-types(ref="subscribeTypes")
 
-    moment-status(ref="momentStatus" :moment-data="momentData")
+    moment-status(ref="momentStatus" :moment="momentData")
 
     .single-moment-top-container
       .single-moment-left
@@ -20,8 +20,8 @@
           .single-moment-time
             from-now(:time="momentData.toc")
           //- 其他操作
-          .single-moment-header-options(@click="openOption($event)" data-direction="down")
-            .fa.fa-ellipsis-h
+          .single-moment-header-options.fa.fa-ellipsis-h(@click.stop="openOption($event)" data-direction="down")
+
         //- 动态内容
         .single-moment-content(v-html="momentData.content")
 
