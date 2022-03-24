@@ -1,4 +1,5 @@
-import Home from '../views/creation/Home';
+import Creation from '../views/creation/creation';
+// import Home from '../views/creation/Home';
 import Materials from '../views/creation/material/Material';
 import Material from '../views/creation/material/MaterialFolder';
 import DocumentEditor from '../views/creation/material/DocumentEditor'
@@ -32,7 +33,7 @@ import ZoneDraft from '../views/creation/zone/draft';
 import DraftEditor from '../views/creation/editor/DraftEditor';
 
 export const routesName = {
-  creationHome: 'creationHome',
+  creation: 'creation',
   creationMaterial: 'creationMaterial',
   creationMaterials: 'creationMaterials',
   creationBooks: 'creationBooks',
@@ -51,65 +52,72 @@ export const routesName = {
 }
 
 export default [
-  {name: 'home', path: '/creation', component: Home},
-  {name: 'materials', path: '/creation/materials', component: Materials},
-  {name: 'material', path: '/creation/material/:id', component: Material},
-  {name: 'books', path: '/creation/books', component: Books},
-  {name: 'addDocument', path: '/creation/materials/editor', component: DocumentEditor},
-  {name: 'book', path: '/creation/book/:bid', component: Book},
-  {name: 'bookContent', path: '/creation/book/:bid/:aid', component: BookContent},
-  {name: 'bookEditor', path: '/creation/books/editor', component: BookEditor},
-  {name: 'articleEditor', path: '/creation/articles/editor', component: ArticleEditor},
-  {name: 'categories', path: '/creation/categories', component: Categories},
-  {name: 'drafts', path: '/creation/drafts', component: Drafts},
-  {name: 'columnArticleEditor', path: '/creation/editor/column', component: ColumnArticleEditor},
-  {name: 'communityThreadEditor', path: '/creation/editor/community', component: CommunityThreadEditor},
   {
-    name: 'zoneEditor',
-    path: '/creation/editor/zone',
-    component: ZoneEditor,
+    name: routesName.creation,
+    path: '/creation',
+    component: Creation,
     children: [
-      {name: 'zoneArticleEditor', path: '/creation/editor/zone/article', component: ZoneArticleEditor},
-      {name: 'zoneMomentEditor', path: '/creation/editor/zone/moment', component: ZoneMomentEditor},
+      {name: 'home', path: '/creation', component: Home},
+      {name: 'materials', path: '/creation/materials', component: Materials},
+      {name: 'material', path: '/creation/material/:id', component: Material},
+      {name: 'books', path: '/creation/books', component: Books},
+      {name: 'addDocument', path: '/creation/materials/editor', component: DocumentEditor},
+      {name: 'book', path: '/creation/book/:bid', component: Book},
+      {name: 'bookContent', path: '/creation/book/:bid/:aid', component: BookContent},
+      {name: 'bookEditor', path: '/creation/books/editor', component: BookEditor},
+      {name: 'articleEditor', path: '/creation/articles/editor', component: ArticleEditor},
+      {name: 'categories', path: '/creation/categories', component: Categories},
+      {name: 'drafts', path: '/creation/drafts', component: Drafts},
+      {name: 'columnArticleEditor', path: '/creation/editor/column', component: ColumnArticleEditor},
+      {name: 'communityThreadEditor', path: '/creation/editor/community', component: CommunityThreadEditor},
+      {
+        name: 'zoneEditor',
+        path: '/creation/editor/zone',
+        component: ZoneEditor,
+        children: [
+          {name: 'zoneArticleEditor', path: '/creation/editor/zone/article', component: ZoneArticleEditor},
+          {name: 'zoneMomentEditor', path: '/creation/editor/zone/moment', component: ZoneMomentEditor},
+        ]
+      },
+      {name: 'draftEditor', path: '/creation/editor/draft', component: DraftEditor},
+      {
+        name: 'articles',
+        path: '/creation/articles',
+        component: Articles,
+        children: [
+          {name: 'articlesColumn', path: 'column', component: ArticlesColumn}
+        ]
+      },
+      {
+        name: 'community',
+        path: '/creation/community',
+        component: Community,
+        children: [
+          {name: 'communityThread', path: 'thread', component: CommunityThread},
+          {name: 'communityPost', path: 'post', component: CommunityPost},
+          {name: 'communityDraft', path: 'draft', component: CommunityDraft},
+          {name: 'communityNote', path: 'note', component: CommunityNote},
+        ]
+      },
+      {
+        name: 'column',
+        path: '/creation/column',
+        component: Column,
+        children: [
+          {name: 'columnArticle', path: 'article', component: ColumnArticle},
+          {name: 'columnDraft', path: 'draft', component: ColumnDraft},
+        ]
+      },
+      {
+        name: 'zone',
+        path: '/creation/zone',
+        component: Zone,
+        children: [
+          {name: 'zoneMoment', path: 'moment', component: ZoneMoment},
+          {name: 'zoneArticle', path: 'article', component: ZoneArticle},
+          {name: 'zoneDraft', path: 'draft', component: ZoneDraft},
+        ]
+      }
     ]
   },
-  {name: 'draftEditor', path: '/creation/editor/draft', component: DraftEditor},
-  {
-    name: 'articles',
-    path: '/creation/articles',
-    component: Articles,
-    children: [
-      {name: 'articlesColumn', path: 'column', component: ArticlesColumn}
-    ]
-  },
-  {
-    name: 'community',
-    path: '/creation/community',
-    component: Community,
-    children: [
-      {name: 'communityThread', path: 'thread', component: CommunityThread},
-      {name: 'communityPost', path: 'post', component: CommunityPost},
-      {name: 'communityDraft', path: 'draft', component: CommunityDraft},
-      {name: 'communityNote', path: 'note', component: CommunityNote},
-    ]
-  },
-  {
-    name: 'column',
-    path: '/creation/column',
-    component: Column,
-    children: [
-      {name: 'columnArticle', path: 'article', component: ColumnArticle},
-      {name: 'columnDraft', path: 'draft', component: ColumnDraft},
-    ]
-  },
-  {
-    name: 'zone',
-    path: '/creation/zone',
-    component: Zone,
-    children: [
-      {name: 'zoneMoment', path: 'moment', component: ZoneMoment},
-      {name: 'zoneArticle', path: 'article', component: ZoneArticle},
-      {name: 'zoneDraft', path: 'draft', component: ZoneDraft},
-    ]
-  }
 ];
