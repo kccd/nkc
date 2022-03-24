@@ -5,10 +5,24 @@ block title
 block content
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-8.col-md-offset-2
+      .col-xs-12.col-md-8.col-md-offset-2#comment-content
         .zone-moment-container
           #app(v-cloak)
-            moment(ref='moment' :data="momentListData" :focus='focusCommentId')
+            //动态操作
+            moment-option(
+              ref="momentOption"
+              @complaint="complaint"
+              @violation-record="violationRecord"
+            )
+            complaint(ref="complaint")
+            violation-record(ref="violationRecord")
+            moment(
+              ref='moment'
+              :data="momentListData"
+              :focus='focusCommentId'
+              @open-option="openOption"
+              @option-comment-option="openOption"
+              )
   .hidden#data=objToStr({momentListData: data.momentListData, commentId: data.commentId})
 block scripts
   include ../../publicModules/moment/momentSource

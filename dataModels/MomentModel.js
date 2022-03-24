@@ -1,5 +1,6 @@
 const mongoose = require('../settings/database');
 const {twemoji} = require("../settings/editor");
+const {getUrl, timeFormat} = require("../nkcModules/tools");
 
 // 包含所有document的状态
 // 并且额外包含 deleted, cancelled
@@ -345,11 +346,11 @@ schema.methods.modifyMoment = async function(props) {
 * */
 schema.methods.deleteMoment = async function() {
   this.status = momentStatus.deleted;
-  await this.updateOne({
-    $set: {
-      status: this.status
-    }
-  });
+  const DocumentModel = mongoose.model('documents');
+  const {stable} = await DocumentModel.getDocumentTypes();
+  const {did} = this;
+  const document = await DocumentModel.findOnly({did, type: stable});
+  await document.setStatus(this.status);
 };
 
 /*
@@ -844,6 +845,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       voteUp,
       order,
       quoteType,
+      status,
     } = moment;
     let f = moment[field];
     const user = usersObj[uid];
@@ -928,6 +930,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       toc: top,
       content,
       voteUp,
+      status,
       voteType: votesType[_id],
       commentCount: order,
       source: 'moment',
@@ -1026,6 +1029,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
   const MomentModel = mongoose.model('moments');
   const UserModel = mongoose.model('users');
   const PostsVoteModel = mongoose.model('postsVotes');
+  const ReviewModel = mongoose.model('reviews');
   const {getUrl, timeFormat} = require('../nkcModules/tools');
   const usersId = [];
   const commentsId = [];
@@ -1038,6 +1042,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
   const stableDocuments = await DocumentModel.getStableDocumentsBySource(momentSource, commentsId, 'object');
   const {moment: momentVoteSource} = await PostsVoteModel.getVoteSources();
+  const {unknown} = await MomentModel.getMomentStatus();
   const votesType = await PostsVoteModel.getVotesTypeBySource(
     momentVoteSource,
     commentsId,
@@ -1052,15 +1057,19 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       top,
       parent,
       voteUp,
+      status,
+      did
     } = comment;
     const user = usersObj[uid];
     if(!user) continue;
     const stableDocument = stableDocuments[_id];
     if(!stableDocument) continue;
-    commentsData.push({
+    const data = {
       momentId: parent,
+      docId: stableDocument._id,
       momentCommentId: _id,
       uid: user.uid,
+      status,
       order,
       voteUp,
       voteType: votesType[_id],
@@ -1070,7 +1079,13 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       userHome: getUrl('userHome', user.uid),
       time: timeFormat(top),
       toc: top,
-    });
+    };
+    //如果动态的状态为为审核就获取动态的送审原因
+    if(status === unknown) {
+      const review = await ReviewModel.findOne({docId: stableDocument._id});
+      if(review) data.reason = review.reason;
+    }
+    commentsData.push(data);
   }
   return commentsData;
 }
