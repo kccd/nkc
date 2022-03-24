@@ -8,26 +8,13 @@
 </template>
 <script>
 export default {
-   methods: {
-    // showLoading(status) {
-    //   this.loadingShow = status;
-    // },
-  },
-   data() {
-    return {
-    //   loadingShow: false,
-    };
-  },
+
 }
 </script>
 <style scoped>
 .loading {
   width: 100%;
   height: 100%;
-  /* position: absolute; */
-  /* top: 0; */
-  /* left: 0; */
-  /* background-color: #e0e2e51c; */
 }
 @keyframes rotate{
   0% {
@@ -40,31 +27,12 @@ export default {
 }
 .loading-title{
   text-align: center;
-  /* position: absolute;
-  top: calc(100% - 53%);
-  left: calc(100% - 50% - 41px); */
 }
 .loading-title >p{
   font-weight: 600;
 }
 .loading-icon {
-  /* bottom: 0; */
-  /* right: 0; */
   font-size: 24px;
-  animation: rotate 2.3s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
-}
-iframe {
-  border: none;
-  width: 100%;
-}
-.hidden {
-  /* visibility:hidden */
-  opacity: 0;
-  /* display: none; */
-}
-.show {
-  opacity: 1;
-  /* display: block; */
-  /* visibility: visible; */
+  animation: rotate 2.3s linear infinite;
 }
 </style>
