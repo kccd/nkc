@@ -88,31 +88,31 @@ export default {
       {
         label: "中文，添加多个请以逗号分隔",
         dom: "textarea",
-        value: "",
+        value: ""
       },
       {
         label: "英文，添加多个请以逗号分隔",
         dom: "textarea",
-        value: "",
-      },
+        value: ""
+      }
     ],
     showModel: false,
     keyWordsCn: [], // 中文关键词
-    keyWordsEn: [], // 英文关键词
+    keyWordsEn: [] // 英文关键词
   }),
   props: {
     keywords: {
       type: Object,
       require: true,
-      default: () => ({}),
-    },
+      default: () => ({})
+    }
   },
   watch: {
     keywords(n, o) {
       this.$set(this.data[0], "value", (n.cn && n.cn.join(",")) || "");
       this.$set(this.data[1], "value", (n.en && n.en.join(",")) || "");
       this.submit();
-    },
+    }
   },
   methods: {
     close() {
@@ -121,13 +121,13 @@ export default {
         {
           label: "中文，添加多个请以逗号分隔",
           dom: "textarea",
-          value: "",
+          value: ""
         },
         {
           label: "英文，添加多个请以逗号分隔",
           dom: "textarea",
-          value: "",
-        },
+          value: ""
+        }
       ];
     },
     open() {
@@ -162,13 +162,12 @@ export default {
             this.keyWordsEn.push(en);
           }
         }
-      if (!enArr.length) return sweetError("请输入关键词");
-
+        if (!enArr.length) return sweetError("请输入关键词");
       }
-      
+
       this.close();
     },
-    pickedFile: function (index) {
+    pickedFile: function(index) {
       var dom = this.$refs["input" + index][0];
       this.data[index].value = dom.files[0];
     },
@@ -182,20 +181,20 @@ export default {
     getData() {
       return {
         keyWordsEn: this.keyWordsEn,
-        keyWordsCn: this.keyWordsCn,
+        keyWordsCn: this.keyWordsCn
       };
-    },
+    }
   },
   computed: {
-    keywordsLength: function () {
+    keywordsLength: function() {
       return this.keyWordsEn.length + this.keyWordsCn.length;
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style scoped lang="less">
-.fa-remove{
+.fa-remove {
   float: right;
   padding: 1rem;
 }
@@ -203,7 +202,7 @@ export default {
 .modal-footer {
   border-top: 0;
 }
-.modal-header{
+.modal-header {
   padding: 0;
 }
 

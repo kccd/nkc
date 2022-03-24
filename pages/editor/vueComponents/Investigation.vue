@@ -307,8 +307,7 @@ export default {
         this.createSurveyPermission = n.createSurveyPermission
         this.type = n.type
         this.post = n.post;
-      this.initPostSurvey();
-
+        this.initPostSurvey();
       }
     }
   },

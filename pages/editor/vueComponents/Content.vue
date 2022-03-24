@@ -46,7 +46,7 @@ export default {
           this.quoteHtml = quoteHtml[0];
         }
         this.content = n?.replace(reg, "") || "";
-        // 真奇怪 
+        // 真奇怪
       }
     },
     openOnEditNotes: function(val) {
@@ -100,7 +100,7 @@ export default {
     removeEditor() {
       this.$refs.threadEditor.removeNoticeEvent();
     }
-  },
+  }
 };
 </script>
 

@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { getState } from "../../lib/js/state"
+import { getState } from "../../lib/js/state";
 export default {
   data: () => ({
     authorInfos: []
@@ -64,15 +64,14 @@ export default {
   watch: {
     author: {
       immediate: true,
-      handler(n){
-      this.authorInfos = n
-
+      handler(n) {
+        this.authorInfos = n;
       }
     }
   },
   methods: {
-    websiteUserId(){
-      return getState().websiteCode + 'ID'
+    websiteUserId() {
+      return getState().websiteCode + "ID";
     },
     getData() {
       return { authorInfos: this.authorInfos };

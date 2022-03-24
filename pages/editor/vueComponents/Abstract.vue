@@ -13,7 +13,6 @@
 
 <script>
 export default {
-
   data: () => ({
     cn: "", // 中文摘要
     en: "" // 英文摘要
@@ -21,33 +20,32 @@ export default {
   props: {
     abstract: {
       require: true,
-      type : Object,
-      default: ()=>({})
+      type: Object,
+      default: () => ({})
     }
   },
   created() {
     // this.setData()
   },
-  updated(){
+  updated() {
     // this.setData()
   },
   computed: {
     abstractCnLength() {
       // return this.getLength(this.cn);
-      return NKC.methods.checkData.getLength(this.cn)
+      return NKC.methods.checkData.getLength(this.cn);
     },
     abstractEnLength() {
-      return NKC.methods.checkData.getLength(this.en)
-
+      return NKC.methods.checkData.getLength(this.en);
     }
   },
   watch: {
     abstract: {
       immediate: true,
-     handler(n){
-        this.cn = n.cn || '';
-      this.en = n.en || '';
-     }
+      handler(n) {
+        this.cn = n.cn || "";
+        this.en = n.en || "";
+      }
     }
   },
   methods: {
@@ -66,12 +64,12 @@ export default {
     // this.cn = this.abstract.cn ;
     // this.en = this.abstract.en;
     // },
-    getData(){
+    getData() {
       return {
         abstractCn: this.cn,
         abstractEn: this.en
-      }
-    },
+      };
+    }
     // getLength(str = ''){
     //   NKC.methods.checkData.getLength(str)
     // }
@@ -80,30 +78,28 @@ export default {
 </script>
 
 <style scoped>
-
-
-.editor-abstract textarea:focus{
+.editor-abstract textarea:focus {
   outline: none;
 }
-.editor-abstract textarea{
+.editor-abstract textarea {
   width: 100%;
   border: 1px solid #ccc;
   border-radius: 3px;
   resize: none;
   padding: 0.5rem;
 }
-.editor-abstract-info{
+.editor-abstract-info {
   text-align: right;
   font-size: 1.2rem;
   color: #9baec8;
 }
-.editor-header{
+.editor-header {
   font-size: 1.25rem;
   margin: 0.3rem 0;
   color: #555;
   font-weight: 700;
 }
-.editor-header small{
+.editor-header small {
   color: #88919d;
 }
 .warning {

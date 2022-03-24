@@ -81,7 +81,7 @@ export default {
       description: "",
       type: "main"
     },
-    columnId: ''
+    columnId: ""
   }),
   props: {
     state: {
@@ -92,11 +92,6 @@ export default {
       type: Object,
       required: true
     }
-  },
-  mounted: function() {
-    //- if (this.choose.length) {
-    //-   this.getCategories();
-    //- }
   },
   watch: {
     data: {
@@ -218,7 +213,7 @@ export default {
       }
       return arr;
     }
-  },
+  }
 };
 </script>
 
