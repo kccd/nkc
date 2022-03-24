@@ -31,19 +31,6 @@
 <style scoped lang="less">
   @import '../../publicModules/base';
   @max-width: 1000px;
-  //  @media screen and (max-width: @max-width) {
-    // .bottom{
-    //   position: fixed;
-    //   bottom: 0;
-    //   background: rgba(135, 132, 132, 0.33);
-    // }
-    // .to-top{
-    //   top: 0;
-    // }
-    // .showHeight{
-    //   overflow: initial!important;
-    // }
-  //  }
   .fa-2{
     font-size: 2rem;
   }
@@ -195,7 +182,7 @@
 
 <script>
 import { getState } from "../../lib/js/state";
-
+import { routesName } from "../routes/creation"
   export default {
     name:'VerNav',
     data: () => ({
@@ -208,22 +195,21 @@ import { getState } from "../../lib/js/state";
           title: '内容创作',
           icon: 'fa-pencil',
           hidden: false,
-          url:'',
           children: [
             {
-              type: 'zoneEditor',
+              type: routesName.creationZoneEditor,
               title: '空间创作',
               url: '/creation/editor/zone',
               icon: 'fa fa-cube'
             },
             {
-              type: 'columnArticleEditor',
+              type: routesName.creationColumnArticleEditor,
               title: '专栏创作',
               url: '/creation/editor/column',
               icon: 'fa fa-server'
             },
             {
-              type: 'communityThreadEditor',
+              type: routesName.creationCommunityThreadEditor,
               title: '社区创作',
               url: '/creation/editor/community',
               icon: 'fa fa-columns'
@@ -235,7 +221,7 @@ import { getState } from "../../lib/js/state";
               icon: 'fa fa-object-group'
             },*/
             {
-              type: 'draftEditor',
+              type: routesName.creationDraftEditor,
               title: '片段创作',
               url: '/creation/editor/draft',
               icon: 'fa fa-file-text-o'
@@ -249,19 +235,19 @@ import { getState } from "../../lib/js/state";
           hidden: false,
           children: [
             {
-              type: 'zone',
+              type: routesName.creationZone,
               title: '空间内容',
               url: '/creation/zone',
               icon: 'fa fa-cube'
             },
             {
-              type: 'column',
+              type: routesName.creationColumn,
               title: '专栏内容',
               url: '/creation/column',
               icon: 'fa fa-server'
             },
             {
-              type: 'community',
+              type: routesName.creationCommunity,
               title: '社区内容',
               url: '/creation/community',
               icon: 'fa fa-columns'
@@ -273,7 +259,7 @@ import { getState } from "../../lib/js/state";
               icon: 'fa fa-object-group'
             },*/
             {
-              type: 'drafts',
+              type: routesName.creationDrafts,
               title: '片段内容',
               url: '/creation/drafts',
               icon: 'fa fa-file-text-o'
@@ -289,7 +275,7 @@ import { getState } from "../../lib/js/state";
           ]
         },
         {
-          type: 'categories',
+          type: routesName.creationCategories,
           title: '媒体管理',
           icon: 'fa-image',
           url: '/creation/categories',

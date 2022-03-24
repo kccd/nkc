@@ -6,6 +6,7 @@
 
 <script>
   import HorNav from '../../../../components/HorNav';
+  import { routesName } from '../../../../routes/creation'
   export default {
     components: {
       'hor-nav': HorNav
@@ -13,11 +14,11 @@
     data: () => ({
       navList: [
         {
-          type: 'zoneMomentEditor',
+          type: routesName.creationZoneMomentEditor,
           title: '动态创作'
         },
         {
-          type: 'zoneArticleEditor',
+          type: routesName.creationZoneArticleEditor,
           title: '文章创作'
         }
       ]
@@ -32,9 +33,9 @@
     },
     methods: {
       redirect() {
-        if(this.$route.name === 'zoneEditor') {
+        if(this.$route.name === 'creationZoneEditor') {
           this.$router.replace({
-            name: 'zoneMomentEditor'
+            name: routesName.creationZoneMomentEditor
           });
         }
       }

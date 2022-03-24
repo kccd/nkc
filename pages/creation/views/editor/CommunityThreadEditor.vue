@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import Editor from "../../../../editor/vueComponents/Editor";
+import Editor from "../../../editor/vueComponents/Editor";
 export default {
   components: {
     editor: Editor
@@ -16,7 +16,5 @@ export default {
 .m-b-2{
   padding-left:0;
 }
-.community-thread-editor{
-  padding-bottom: 10px;
-}
+
 </style>

@@ -18,3 +18,6 @@ export function getScrollBarWidth() {
   document.body.removeChild(scrollDiv);
   return scrollBarWidth;
 }
+export function scrollFun(dom, top = 0, left = 0){
+  dom.scroll(top, left)
+}
