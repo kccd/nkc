@@ -6,7 +6,7 @@ router
   //   await next();
   // })
   // .get('/', async (ctx, next) => {
-  //   ctx.remoteTemplate = 'creation/index.pug';
+  //   ctx.remoteTemplate = 'vueRoot/index.pug';
   //   await next();
   // })
   .get('/:mid', async (ctx, next) => {
