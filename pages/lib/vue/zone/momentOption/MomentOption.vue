@@ -121,7 +121,7 @@ export default {
         return position;
       } else {
         return {
-          top: top + domHeight,
+          top: top + jqDOM.height() - domHeight,
           left: left + jqDOM.width() - domWidth,
         }
       }
@@ -140,17 +140,16 @@ export default {
     let top = 0;
     let left = 0;
     if(content) {
-      top = content.offset().top;
-      left = content.offset().left;
+      top = (content.offset()).top;
+      left = (content.offset()).left;
     }
     if(direction === 'up') {
       this.domHeight = dom.height() + top;
       this.domWidth = dom.width() + left;
     } else {
-      this.domHeight = dom.height() - top;
+      this.domHeight = top;
       this.domWidth = dom.width() + left;
     }
-
   },
   methods: {
     timeFormat: timeFormat,
