@@ -1,8 +1,10 @@
 const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
-    const {db, data, internalData, query, nkcModules, state} = ctx;
+    //获取动态下的评论
+    const {db, data, internalData, query, nkcModules, state, permission} = ctx;
     const {moment} = internalData;
+    const {user} = data;
     let {
       sort = 'hot',
       page = 0,
@@ -15,8 +17,16 @@ router
     const {normal: normalStatus} = await db.MomentModel.getMomentStatus();
     const match = {
       parent: moment._id,
-      status: normalStatus
+      $or: [
+        {status: normalStatus}, {uid: user.uid}
+      ]
     };
+    if(user) {
+      if(permission('review')) {
+        delete match.status;
+        delete match.$or;
+      }
+    }
     const sortObj = sort === 'hot'? {voteUp: -1, top: 1}: {top: -1};
     const count = await db.MomentModel.countDocuments(match);
     const perPage = await db.MomentModel.getMomentCommentPerPage();

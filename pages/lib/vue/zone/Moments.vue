@@ -1,5 +1,6 @@
 <template lang="pug">
   .moments
+    //动态操作
     moment-option(
       ref="momentOption"
       @complaint="complaint"
@@ -7,10 +8,12 @@
     )
     complaint(ref="complaint")
     violation-record(ref="violationRecord")
+    moment-status(ref="momentStatus")
     .moment-container(:key="momentData.momentId" v-for="momentData in moments")
       moment(
         :data="momentData"
         @open-option="openOption"
+        @option-comment-option="openOption"
       )
 </template>
 
@@ -28,6 +31,7 @@
   import ViolationRecord from "../ViolationRecord";
   import MomentOption from "./momentOption/MomentOption";
   import FloatUserPanel from "../FloatUserPanel";
+  import MomentStatus from "./MomentStatus";
   export default {
     props: ['moments'],
     components: {
@@ -35,7 +39,8 @@
       'moment': Moment,
       'complaint': Complaint,
       'violation-record': ViolationRecord,
-      'float-user-panel': FloatUserPanel
+      'float-user-panel': FloatUserPanel,
+      'moment-status': MomentStatus
     },
     data: () => ({
 
@@ -53,7 +58,7 @@
       //查看违规记录
       violationRecord(uid) {
         this.$refs.violationRecord.open({uid});
-      }
+      },
     }
   }
 </script>

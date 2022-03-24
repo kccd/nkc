@@ -17,8 +17,9 @@
       .moment-comment-list
         .moment-comment-item(
           v-for="commentData in commentsData"
-          :class="{'active': focusCommentId === commentData.momentCommentId}"
+          :class=`{'active': focusCommentId === commentData.momentCommentId, 'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted'}`
           )
+          moment-status(ref="momentStatus" :moment="commentData")
           .moment-comment-item-header
             a.moment-comment-avatar(:href="commentData.userHome" target="_blank")
               img(:src="commentData.avatarUrl")
@@ -29,8 +30,8 @@
               .moment-comment-option(@click="vote(commentData)" :class="{'active': commentData.voteType === 'up'}")
                 .fa.fa-thumbs-o-up
                 span(v-if="commentData.voteUp > 0") {{commentData.voteUp}}
-              .moment-comment-option
-                .fa.fa-ellipsis-h
+              .moment-comment-option.fa.fa-ellipsis-h(@click.stop="openOption($event, commentData)" data-direction="up")
+
           .moment-comment-item-content(v-html="commentData.content")
       paging(:pages="pageButtons" @click-button="clickPageButton")
 
@@ -70,6 +71,12 @@
         &.active{
           background-color: #ffebcf;
           padding: 0.5rem;
+        }
+        &.unknown {
+          background: #ffd598;
+        }
+        &.deleted {
+          background: #bdbdbd;
         }
         padding: 0.5rem 0;
         margin-bottom: 0;
@@ -150,6 +157,7 @@
   import FromNow from '../FromNow';
   import {momentVote} from "../../js/zone/vote";
   import {visitUrl} from "../../js/pageSwitch";
+  import MomentStatus from "./MomentStatus";
 
   export default {
     props: ['mid', 'type', 'focus'],
@@ -157,6 +165,7 @@
       'paging': Paging,
       'from-now': FromNow,
       'moment-comment-editor': MomentCommentEditor,
+      'moment-status': MomentStatus
     },
     data: () => ({
       commentsData: [],
@@ -175,6 +184,21 @@
         }
       ]
     }),
+    computed: {
+      focusCommentId() {
+        return this.focus;
+      },
+      postType() {
+        return this.type;
+      },
+      momentId() {
+        return this.mid;
+      },
+      pageButtons() {
+        return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
+      },
+
+    },
     methods: {
       init() {
         if(this.postType === 'comment') {
@@ -234,21 +258,17 @@
             commentData.voteType = cancel? '': voteType;
           })
           .catch(sweetError)
+      },
+      //打开其他操作
+      openOption(e, moment) {
+        const target = e.target;
+        const direction = $(target).attr('data-direction') || 'up';
+        const init = $(target).attr('data-init');
+        if(init === 'true') return;
+        this.$emit('open-comment-option', {DOM: $(target), moment, direction});
+        //阻止浏览器默认事件
+        e.stopPropagation();
       }
     },
-    computed: {
-      focusCommentId() {
-        return this.focus;
-      },
-      postType() {
-        return this.type;
-      },
-      momentId() {
-        return this.mid;
-      },
-      pageButtons() {
-        return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
-      }
-    }
   }
 </script>
