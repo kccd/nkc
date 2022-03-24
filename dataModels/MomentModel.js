@@ -1,11 +1,18 @@
 const mongoose = require('../settings/database');
 const {twemoji} = require("../settings/editor");
 
+// 包含所有document的状态
+// 并且额外包含 deleted, cancelled
 const momentStatus = {
-  normal: 'normal',
-  'default': 'default',
-  deleted: 'deleted',
-  unknown: 'unknown',// 未审核
+  // document status
+  'default': 'default', // 默认状态
+  disabled: "disabled",// 禁用
+  normal: "normal",// 正常状态 能被所有用户查看的文档
+  faulty: "faulty", // 退修
+  unknown: "unknown", // 需要审核
+  // 额外
+  deleted: 'deleted', // 已删除
+  cancelled: 'cancelled', // 取消发表
 };
 
 const momentQuoteTypes = {
@@ -140,6 +147,24 @@ schema.statics.checkMomentQuoteType = async (quoteType) => {
     throwErr(500, `动态引用类型错误`);
   }
 };
+
+
+/*
+* 获取 moment 在 resource 中的引用 ID
+* @return {String}
+* */
+schema.methods.getResourceReferenceId = async function() {
+  return `moment-${this._id}`;
+}
+
+/*
+* 为动态引用的资源添加动态的引用
+* */
+schema.methods.updateResourceReferences = async function() {
+  const ResourceModel = mongoose.model('resources');
+  const referenceId = await this.getResourceReferenceId();
+  await ResourceModel.replaceReferencesById(this.files, referenceId);
+}
 
 /*
 * 获取新的动态 ID
@@ -485,7 +510,8 @@ schema.methods.getBetaDocument = async function() {
 };
 
 /*
-* 检测当前动态或评论的内容
+* 检测当前动态或评论的内容是否合法
+* 检测用户发表动态的时间条数限制
 * */
 schema.methods.checkBeforePublishing = async function() {
   const DocumentModel = mongoose.model('documents');
@@ -493,6 +519,8 @@ schema.methods.checkBeforePublishing = async function() {
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
   const betaDocument = await DocumentModel.getBetaDocumentBySource(momentSource, this._id);
   if(!betaDocument) throwErr(500, `动态数据错误 momentId=${this._id}`);
+  // 检测发表权限
+  await DocumentModel.checkGlobalPostPermission(this.uid, momentSource);
   if(!this.quoteType || !this.quoteId) {
     const {checkString} = require('../nkcModules/checkData');
     checkString(betaDocument.content, {
@@ -533,13 +561,14 @@ schema.methods.publish = async function() {
   await this.checkBeforePublishing();
   const time = new Date();
   await DocumentModel.publishDocumentByDid(this.did);
-  this.status = momentStatus.normal;
+  // this.status = momentStatus.normal;
   await this.updateOne({
     $set: {
       top: time,
-      status: this.status
+      // status: this.status
     }
   });
+  await this.updateResourceReferences();
 };
 
 /*
@@ -738,6 +767,7 @@ schema.statics.renderContent = async (content) => {
 * 获取动态显示所需要的基础数据
 * @param {[schema moment]}
 * @param {String} uid 访问者 ID
+* @param {String} field 拓展返回对象的键
 * @return {[Object]}
 *   @param {String} momentId 动态ID
 *   @param {String} uid 发表人ID
@@ -767,7 +797,7 @@ schema.statics.renderContent = async (content) => {
 *       @param {String} height 视频分辨率 480p、720p、1080p
 *       @param {Number} dataSize 视频大小
 * */
-schema.statics.extendMomentsData = async (moments, uid = '') => {
+schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
   const videoSize = require('../settings/video');
   const UserModel = mongoose.model('users');
   const ResourceModel = mongoose.model('resources');
@@ -809,12 +839,13 @@ schema.statics.extendMomentsData = async (moments, uid = '') => {
     const {
       uid,
       files,
-      toc,
+      top,
       _id,
       voteUp,
       order,
       quoteType,
     } = moment;
+    let f = moment[field];
     const user = usersObj[uid];
     if(!user) continue;
     const {username, avatar} = user;
@@ -886,18 +917,20 @@ schema.statics.extendMomentsData = async (moments, uid = '') => {
 
       filesData.push(fileData);
     }
-    results[_id] = {
+    results[f] = {
       momentId: _id,
       uid,
+      user,
       username,
       avatarUrl: getUrl('userAvatar', avatar),
       userHome: getUrl('userHome', uid),
-      time: fromNow(toc),
-      toc,
+      time: fromNow(top),
+      toc: top,
       content,
       voteUp,
       voteType: votesType[_id],
       commentCount: order,
+      source: 'moment',
       files: filesData,
       url: getUrl('zoneMoment', _id),
     };
@@ -1016,7 +1049,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       uid,
       _id,
       order,
-      toc,
+      top,
       parent,
       voteUp,
     } = comment;
@@ -1035,8 +1068,8 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       username: user.username,
       avatarUrl: getUrl('userAvatar', user.avatar),
       userHome: getUrl('userHome', user.uid),
-      time: timeFormat(toc),
-      toc: toc,
+      time: timeFormat(top),
+      toc: top,
     });
   }
   return commentsData;
@@ -1049,6 +1082,16 @@ schema.statics.extendCommentsData = async function (comments, uid) {
 * */
 schema.statics.getPageByOrder = async (order) => {
   return Math.ceil(order / momentCommentPerPage) - 1;
+}
+
+/*
+* 获取评论所在页数
+* @param {String} MomentCommentId 动态评论ID
+* */
+schema.statics.getPageByMomentCommentId = async (momentCommentId) => {
+  const MomentModel = mongoose.model('moments');
+  const moment = await MomentModel.findOnly({_id: momentCommentId}, {_id: 1, order: 1});
+  return MomentModel.getPageByOrder(moment.order);
 }
 
 /*
@@ -1115,5 +1158,22 @@ schema.methods.getAuthorByUid = async function(currentUid) {
   const {uid} = this;
   return uid === currentUid;
 }
+
+// /*
+// * 拓展投诉的动态信息
+// * */
+// schema.statics.extendComplaintMoments = async function(moments) {
+//   const DocumentModel = mongoose.model('documents');
+//   const MomentModel = mongoose.model('moments');
+//   const didArr = [];
+//   const uidArr = [];
+//   for(const m of moments) {
+//     didArr.push(m.did);
+//     uidArr.push(m.uid);
+//   }
+//   const {stable} = await DocumentModel.getDocumentTypes();
+//   const documents = await DocumentModel.find({did: {$in: didArr}, type: stable});
+//
+// }
 
 module.exports = mongoose.model('moments', schema);

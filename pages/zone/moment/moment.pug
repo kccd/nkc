@@ -8,8 +8,8 @@ block content
       .col-xs-12.col-md-8.col-md-offset-2
         .zone-moment-container
           #app(v-cloak)
-            moment(ref='moment' :data="momentListData")
-  .hidden#data=objToStr({momentListData: data.momentListData})
+            moment(ref='moment' :data="momentListData" :focus='focusCommentId')
+  .hidden#data=objToStr({momentListData: data.momentListData, commentId: data.commentId})
 block scripts
   include ../../publicModules/moment/momentSource
   +includeJS('/zone/moment/moment.js')

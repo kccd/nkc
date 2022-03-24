@@ -24,6 +24,7 @@ if(data.reviewType === 'post') {
   for(let i = 0; i < data.results.length; i++) {
     let d = data.results[i].document.did;
     let documentId = data.results[i].document._id;
+    let source = data.results[i].document.source;
     let aid = data.results[i].content._id;
     did.push(documentId);
     review[documentId] = {
@@ -31,7 +32,7 @@ if(data.reviewType === 'post') {
       did: d,
       pass: true,
       reason: "",
-      delType: "faulty",
+      delType: source !== 'moment'?"faulty":"delete",
       noticeType: [true],
       illegalType: false,
       articleId: aid,
@@ -83,36 +84,19 @@ var app = new Vue({
         };
         url = "/review";
       } else {
-        if(data.delType === "disabled") {
-          //屏蔽
-          d = {
-            type: 'document',
-            pass: data.pass,
-            docId: data.documentId,
-            reason: data.reason,
-            delType: data.delType,
-            remindUser: data.noticeType,
-            violation: data.illegalType
-          };
-          method = "PUT";
-          url = "/review";
-        } else {
-          //退修
-          d = {
-            type: 'document',
-            pass: data.pass,
-            documentId: data.documentId,
-            did: [data.did],
-            reason: data.reason,
-            delType: data.delType,
-            remindUser: data.noticeType,
-            violation: data.illegalType
-          };
-          url = "/review";
-          method = "PUT";
-        }
+        d = {
+          type: 'document',
+          pass: data.pass,
+          docId: data.documentId,
+          did: [data.did],
+          reason: data.reason,
+          delType: data.delType,
+          remindUser: data.noticeType,
+          violation: data.illegalType
+        };
+        method = "PUT";
+        url = "/review";
       }
-
       nkcAPI(url, method, d)
         .then(function() {
           screenTopAlert("DocumentId: " + data.documentId + " 处理成功!");

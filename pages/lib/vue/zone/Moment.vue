@@ -1,14 +1,12 @@
 <template lang="pug">
 
   .single-moment-container(v-if="momentData")
-    .single-moment-top-container#comment-content
-      moment-option(
-        ref="momentOption"
-        @complaint="complaint"
-        @violation-record="violationRecord"
-        )
-      complaint(ref="complaint")
-      violation-record(ref="violationRecord")
+    float-user-panel(
+      ref="floatUserPanel"
+      @subscribe="subscribe"
+    )
+    subscribe-types(ref="subscribeTypes")
+    .single-moment-top-container
       .single-moment-left
         .single-moment-avatar(:data-float-uid="momentData.uid")
           img(:src="momentData.avatarUrl")
@@ -56,7 +54,13 @@
 
         // 评论列表
         .single-moment-moments(v-if="showPanelType")
-          moment-comments(ref="momentComments" :mid="momentData.momentId" :type="showPanelType" @post-comment="onPostComment")
+          moment-comments(
+            ref="momentComments"
+            :mid="momentData.momentId"
+            :type="showPanelType"
+            @post-comment="onPostComment"
+            :focus="focus"
+            )
 </template>
 
 <style lang="less" scoped>
@@ -291,23 +295,22 @@
   import {sweetError} from "../../js/sweetAlert";
   import MomentComments from './MomentComments';
   import MomentQuote from './MomentQuote';
-  import MomentOption from "./momentOption/MomentOption";
-  import Complaint from "../Complaint";
-  import ViolationRecord from "../ViolationRecord";
+  import FloatUserPanel from "../FloatUserPanel";
+  import SubscribeTypes from "../SubscribeTypes";
   export default {
     components: {
       'from-now': FromNow,
       'moment-files': MomentFiles,
       'moment-comments': MomentComments,
       'moment-quote': MomentQuote,
-      "moment-option": MomentOption,
-      "complaint": Complaint,
-      "violation-record": ViolationRecord
+      'float-user-panel': FloatUserPanel,
+      'subscribe-types': SubscribeTypes
     },
     /*
     * prop {Object} data 动态用于显示的数据 组装自 MomentModel.statics.extendMomentsListData
+    * prop {String} focus 高亮的评论ID
     * */
-    props: ['data'],
+    props: ['data', 'focus'],
     data: () => ({
       momentData: null,
       showPanelType: '', // comment, repost
@@ -318,6 +321,11 @@
     }),
     mounted() {
       this.initData();
+    },
+    computed: {
+      focusCommentId() {
+        return this.focus;
+      }
     },
     methods: {
       initData() {
@@ -357,12 +365,11 @@
       },
       //打开其他操作
       openOption(e) {
-        const target = $(e);
-        const direction = target.attr('data-direction') || 'up';
-        const init = target.attr('data-init');
+        const target = e.target;
+        const direction = $(target).attr('data-direction') || 'up';
+        const init = $(target).attr('data-init');
         if(init === 'true') return;
-        //显示操作菜单
-        this.$refs.momentOption.open({DOM: e.target, moment: this.momentData, direction});
+        this.$emit('open-option', {DOM: $(target), moment: this.momentData, direction});
         //阻止浏览器默认事件
         e.stopPropagation();
       },
@@ -374,6 +381,11 @@
       violationRecord(uid) {
         this.$refs.violationRecord.open({uid});
       },
+      //关注或取关用户
+      subscribe(props) {
+        const {uid, subscribed} = props;
+        this.$refs.subscribeTypes.subscribeUser(uid, subscribed);
+      }
     }
   }
 </script>

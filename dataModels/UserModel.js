@@ -411,7 +411,7 @@ userSchema.methods.getUsersThreads = async function() {
 };
 /*返回我看过的用户
 * @param {String} uid 用户id
-*/ 
+*/
 userSchema.statics.visitUserLogs = async (uid)=>{
   const tools = require('../nkcModules/tools');
   const UserModel = mongoose.model('users');
@@ -422,7 +422,7 @@ userSchema.statics.visitUserLogs = async (uid)=>{
   const users = await UserModel.find({ uid: { $in: usersId } });
   const usersObj = {};
   users.forEach(u =>{
-    u.avatar = tools.getUrl('userAvatar', u.avatar) 
+    u.avatar = tools.getUrl('userAvatar', u.avatar)
     usersObj[u.uid] = u
   });
   const visitUsersId = [];
@@ -485,7 +485,7 @@ userSchema.statics.visitSelfLogs = async (uid) =>{
 //    const users = await UserModel.find({ uid: { $in: usersId } });
 //    const usersObj = {};
 //    users.map(u =>{
-//     u.avatar = tools.getUrl('userAvatar', u.avatar) 
+//     u.avatar = tools.getUrl('userAvatar', u.avatar)
 //     return usersObj[u.uid] = u
 //   });
 //    const data = {};
@@ -936,7 +936,7 @@ userSchema.statics.createUser = async (option) => {
 };
 
 userSchema.methods.extendDraftCount = async function() {
-  return this.draftCount = await mongoose.model("draft").countDocuments({uid: this.uid});
+  return this.draftCount = await mongoose.model("drafts").countDocuments({uid: this.uid});
 };
 
 userSchema.methods.extendGrade = async function() {

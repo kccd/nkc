@@ -7,6 +7,7 @@ const app = new Vue({
     'moment': Moment,
   },
   data: {
+    focusCommentId: data.commentId,
     momentListData: data.momentListData
   },
   mounted() {

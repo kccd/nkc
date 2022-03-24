@@ -19,9 +19,9 @@
         .fa.fa-ban
         span(v-if='options.blacklist === false') 加入黑名单
         span(v-else) 移除黑名单
-      .option(v-if='options.ipInfo !== null' @click='displayIpInfo')
-        .fa.fa-map-marker
-        span 查看IP
+      //.option(v-if='options.ipInfo !== null' @click='displayIpInfo')
+      //  .fa.fa-map-marker
+      //  span 查看IP
       .option.time
         span {{timeFormat(toc)}}
 </template>
@@ -89,6 +89,7 @@ import {nkcAPI} from "../../../js/netAPI";
 import {timeFormat} from "../../../js/tools";
 export default {
   data: () => ({
+    uid: NKC.configs.uid,
     show: false,
     loading: true,
     jqDOM: null,
@@ -97,12 +98,14 @@ export default {
     direction: '',
     moment: null,
     options: {},
-    toc: null
+    toc: null,
+    top: 300,
+    left: 300,
   }),
   computed: {
     position() {
       const {jqDOM, domHeight, domWidth, direction} = this;
-      if(!jqDOM) return {
+      if(jqDOM === null) return {
         left: 0,
         top: 0,
       }
@@ -116,7 +119,7 @@ export default {
       } else {
         return {
           top: top + jqDOM.height(),
-          left: left - domWidth + jqDOM.width(),
+          left: left + domWidth - jqDOM.width(),
         }
       }
     }
@@ -141,6 +144,9 @@ export default {
   },
   methods: {
     timeFormat: timeFormat,
+    clickElement(e) {
+      e.stopPropagation();
+    },
     //获取当前用户的操作权限
     getPermission() {
       const self = this;
@@ -153,7 +159,6 @@ export default {
         .catch(err => {
           sweetError(err);
         })
-
     },
     open(props) {
       this.loading = true;
@@ -242,8 +247,9 @@ export default {
         })
         .catch(sweetError);
     },
-    //用户添加到黑名单 tUid 被拉黑的用户 form 拉黑来源 cid 被拉黑的comment
+    //用户添加到黑名单 tUid 被拉黑的用户 form 拉黑来源 mid 被拉黑的moment
     addUserToBlackList(tUid, from, mid) {
+      const self = this;
       var isFriend = false, subscribed = false;
       return Promise.resolve()
         .then(function() {
@@ -269,7 +275,7 @@ export default {
         })
         .then(function() {
           if(subscribed) {
-            return SubscribeTypes.subscribeUserPromise(tUid, false);
+            return self.subscribeUserPromise(tUid, false);
           }
         })
         .then(function() {
@@ -284,6 +290,10 @@ export default {
           return data;
         })
         .catch(sweetError);
+    },
+    subscribeUserPromise(id, sub, cid) {
+      const method = sub? "POST": "DELETE";
+      return nkcAPI("/u/" + id + "/subscribe", method, {cid: cid || []});
     },
     //删除动态
     deleteMoment() {

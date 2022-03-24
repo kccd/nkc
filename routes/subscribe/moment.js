@@ -1,6 +1,7 @@
 const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
+    //获取需要展示的动态
     const {state, db, data, query, nkcModules} = ctx;
     const {page = 0} = query;
     const subUid= await db.SubscribeModel.getUserSubUsersId(state.uid);

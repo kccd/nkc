@@ -1679,7 +1679,7 @@ threadSchema.statics.postNewThread = async (options) => {
   const ThreadModel = mongoose.model("threads");
   const PostModel = mongoose.model("posts");
   const MessageModel = mongoose.model("messages");
-  const DraftModel = mongoose.model("draft");
+  const DraftModel = mongoose.model("drafts");
   const ReviewModel = mongoose.model("reviews");
   // 检测专业ID
   await ForumModel.checkForumCategoryBeforePost(options.fids);

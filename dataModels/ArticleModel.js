@@ -157,6 +157,8 @@ schema.methods.changeStatus = async function(status) {
 /*
 *
 * 根据did来设置article的status
+* @param {string} did 片段的did
+* @param {string} status 需要设置的状态
 * */
 schema.statics.setStatus = async function(did, status) {
   const ArticleModel= mongoose.model('articles');

@@ -1,9 +1,7 @@
 const settings = require('../settings');
-const SettingModel = require('./SettingModel');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const tools = require("../nkcModules/tools");
-const {getUrl} = require("../nkcModules/tools");
 const messageSchema = new Schema({
 
   // 消息id
@@ -338,6 +336,7 @@ messageSchema.statics.getParametersData = async (message) => {
   const ForumModel = mongoose.model('forums');
   const PreparationForumModel = mongoose.model('pForum');
   const CommentModel = mongoose.model('comments');
+  const MomentModel = mongoose.model('moments');
   const apiFunction = require("../nkcModules/apiFunction");
   const {htmlToPlain} = require("../nkcModules/nkcRender");
   const {getUrl, getAnonymousInfo} = require('../nkcModules/tools');
@@ -732,11 +731,10 @@ messageSchema.statics.getParametersData = async (message) => {
     parameters = {
       reviewLink: await PostModel.getUrl(post)
     };
-  } else if(["documentFaulty", "documentDisabled", "documentPassReview", "commentFaulty", "commentDisabled", "commentPassReview"].includes(type)) {
+  } else if(["documentFaulty", "documentDisabled", "documentPassReview", "commentFaulty", "commentDisabled", "commentPassReview", "momentDelete", "momentPass"].includes(type)) {
     //独立文章article 和 评论comment 审核
     const {docId, reason} = message.c;
     const document = await DocumentModel.findOne({_id: docId});
-    const {comment: commentSource} = await DocumentModel.getDocumentSources();
     if(!document) return null;
     if(document.source === 'article') {
       let article = await ArticleModel.findOne({did: document.did}).sort({toc: -1});
@@ -748,9 +746,8 @@ messageSchema.statics.getParametersData = async (message) => {
         reason: reason?reason:'未知',
         title: document.title + article[0].url?'':'[文章已被删除]',
       };
-      // console.log('article', article, docId, document.did);
     } else if (document.source === 'comment') {
-      const comment = await CommentModel.findOne({_id: document.sid}).sort({toc: -1});
+      const comment = await CommentModel.findOnly({_id: document.sid});
       if(!comment) return;
       const _comment = await CommentModel.extendReviewComments([comment]);
       if(!_comment[0]) return;
@@ -761,9 +758,17 @@ messageSchema.statics.getParametersData = async (message) => {
         reason: reason?reason:'未知',
         title: _comment[0].title || '未知',
       };
+    } else if(document.source === 'moment') {
+      const moment = await MomentModel.findOnly({_id: document.sid});
+      if(!moment) return null;
+      const _moment = (await MomentModel.extendMomentsData([moment]))[document.sid];
+      if(!_moment) return null;
+      parameters = {
+        reviewLink: _moment.url || '',
+        content: htmlToPlain(document.content, 100),
+        reason: reason?reason:'未知',
+      };
     }
-
-
   } else if(["fundAdmin", "fundApplicant", "fundMember", "fundFinishProject"].includes(type)) {
     const {applicationFormId} = message.c;
     let applicationForm = await FundApplicationFormModel.findOne({_id: applicationFormId});
@@ -923,6 +928,17 @@ messageSchema.statics.getParametersData = async (message) => {
       // 投诉目标链接
       CRTarget = article.url;
       // 投诉目标描述
+      CRTargetDesc = "点击查看";
+    } else if(complaintType === 'moment') {
+      //动态投诉处理消息
+      let moment = await MomentModel.findOnly({_id: contentId});
+      if(!moment) return null;
+      moment = (await MomentModel.extendMomentsData([moment]))[contentId];
+      if(!moment) return null;
+      CRType = "动态";
+      //投诉的动态链接
+      CRTarget = moment.url;
+      //投书的动态描述
       CRTargetDesc = "点击查看";
     } else {
       return null;

@@ -109,12 +109,18 @@ block content
                   .review-info 类型：
                     if r.content.source === 'column'
                       .review-time 独立文章创作
+                    else if r.content.source === 'moment'
+                      .review-time 动态
                     else
                       .review-time 文章创作
                   if r.document.source === 'article'
                     .review-info 标题：
                       .review-thread-title
                         a(href=`${r.content.url}` target="_blank")=r.content.title
+                  else if r.document.source === 'moment'
+                    .review-info 链接：
+                      .review-thread-title
+                        a(href=`${r.content.url}` target="_blank") 点击这里跳转
                   else
                     .review-info 图书标题：
                       .review-thread-title
@@ -130,10 +136,14 @@ block content
                       input(type="radio" :value="false" v-model=`review['${r.document._id}'].pass`)
                       span 不通过
                     div(v-if=`!review['${r.document._id}'].pass`)
-                      input(type="radio" value="faulty" v-model=`review['${r.document._id}'].delType`)
-                      span.m-r-1 退修
-                      input(type="radio" value="disabled" v-model=`review['${r.document._id}'].delType`)
-                      span 屏蔽
+                      if r.document.source === 'moment'
+                        input(type="radio" value="delete" v-model=`review['${r.document._id}'].delType`)
+                        span.m-r-1 删除
+                      else
+                        input(type="radio" value="faulty" v-model=`review['${r.document._id}'].delType`)
+                        span.m-r-1 退修
+                        input(type="radio" value="disabled" v-model=`review['${r.document._id}'].delType`)
+                        span 屏蔽
                       .m-t-1
                         input(type="checkbox" :value="true" v-model=`review['${r.document._id}'].noticeType`)
                         span.m-r-1 通知用户

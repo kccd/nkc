@@ -84,6 +84,26 @@ schema.statics.newDocumentReview = async (type, documentId, uid, reason) => {
 
 const pureWordRegExp = /([^\u4e00-\u9fa5a-zA-Z0-9])/gi;
 const MatchedKeyword = { result: [] };
+
+/*
+* 获取触发的敏感词
+* @param {String} content 待检测的内容
+* @param {[String]} groupsId 敏感词组ID
+* @return {[String]} 触发的敏感词组成的数组
+* */
+schema.statics.matchKeywordsByGroupsId = async (content, groupsId) => {
+  const ReviewModel = mongoose.model('reviews');
+  const SettingModel = mongoose.model('settings');
+  const reviewSettings = await SettingModel.getSettings('review');
+  const keywordSettings = reviewSettings.keyword;
+  if(!keywordSettings) return [];
+  if(!keywordSettings.enable) return [];
+  const {wordGroup} = keywordSettings;
+  const groups = wordGroup.filter(group => groupsId.includes(group.id));
+  if(groups.length === 0) return [];
+  return await ReviewModel.matchKeywords(content, groups);
+};
+
 schema.statics.matchKeywords = async (content, groups) => {
   const SettingModel = mongoose.model('settings');
   const reviewSettings = await SettingModel.getSettings('review');

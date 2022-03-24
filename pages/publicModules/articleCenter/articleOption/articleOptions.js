@@ -96,7 +96,6 @@ window.articleOption = new Vue({
         self.show = true;
         self.type = 'thread';
       }
-      
     },
     //获取当前操作权限
     getPermissions(aid) {

@@ -2,11 +2,17 @@ const mongoose = require('../settings/database');
 const cheerio = require('cheerio');
 const markNotes = require("../nkcModules/nkcRender/markNotes");
 
+/*
+* document状态
+* 当document状态发生改变时会同步当前状态到上层
+* 上层 documentSources
+* */
 const documentStatus = {
+  'default': 'default', // 默认状态
   disabled: "disabled",// 禁用
   normal: "normal",// 正常状态 能被所有用户查看的文档
   faulty: "faulty", // 退修
-  unknown: "unknown"// 未知状态 未审核过
+  unknown: "unknown"// 需要审核
 };
 
 const documentTypes = {
@@ -44,13 +50,14 @@ const schema = new mongoose.Schema({
     index: 1,
   },
   // 当前文档的状态
+  // default: 默认状态
   // normal: 正常
   // disabled: 被屏蔽
   // faulty: 被退修
   // unknown: 未知（默认状态，需要审核才能确定）
   status: {
     type: String,
-    default: documentStatus.unknown,
+    default: documentStatus.default,
     index: 1
   },
   // 文档的创建人
@@ -899,7 +906,8 @@ schema.statics.checkGlobalPostPermission = async (uid, source, type = 'stable') 
     examNotPass,
     defaultInterval,
     defaultCount,
-    intervalLimit = []
+    intervalLimit = [],
+    countLimit = [],
   } = postPermission;
 
   // 身份认证判断
@@ -925,9 +933,9 @@ schema.statics.checkGlobalPostPermission = async (uid, source, type = 'stable') 
     }
     if(examNotPass.count <= documentCountToday) {
       if(!examVolumeA && !examVolumeB) {
-        throwErr(403, `今日发表次数已达上限（${examNotPass} 次），请明天再试`);
+        throwErr(403, `今日发表次数已达上限（${examNotPass.count} 次），请明天再试`);
       } else {
-        throwErr(403, `今日发表次数已达上限（${examNotPass} 次），请参加考试，通过后可获取更多发表权限`);
+        throwErr(403, `今日发表次数已达上限（${examNotPass.count} 次），请参加考试，通过后可获取更多发表权限`);
       }
     }
   }
@@ -1081,7 +1089,7 @@ schema.methods.getKeywordsReviewStatus = async function() {
   const keywords = this.keywords || [];
   const keywordsEN = this.keywordsEN || [];
   const documentContent = content + title + abstract + abstractEN + (keywords.concat(keywordsEN)).join(' ');
-  const matchedKeywords = await ReviewModel.matchKeywords(documentContent, keywordGroupId);
+  const matchedKeywords = await ReviewModel.matchKeywordsByGroupsId(documentContent, keywordGroupId);
   if(matchedKeywords.length > 0) {
     return {
       needReview: true,
@@ -1108,10 +1116,11 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function() {
     //获取敏感词关键字
     reviewStatus = await this.getKeywordsReviewStatus();
   }
-  const {needReview, reason, type} = reviewStatus;
+  let {needReview, reason, type} = reviewStatus;
   //如果需要审核，就生成审核记录
   if(needReview) {
     await ReviewModel.newDocumentReview(type, this._id, this.uid, reason);
+    await this.setStatus((await DocumentModel.getDocumentStatus()).unknown);
   } else {
     await this.setStatus((await DocumentModel.getDocumentStatus()).normal);
   }
@@ -1122,14 +1131,17 @@ schema.methods.syncParentStatus = async function() {
   const ArticleModel = mongoose.model('articles');
   const CommentModel = mongoose.model('comments');
   const MomentModel = mongoose.model('moments');
+  const DraftModel= mongoose.model('drafts');
   const {source, did, status} = this;
-  const {article, comment, moment} = await DocumentModel.getDocumentSources();
+  const {article, comment, moment, draft} = await DocumentModel.getDocumentSources();
   if(source === article) {
     await ArticleModel.setStatus(did, status);
   } else if(source === comment) {
     await CommentModel.setStatus(did, status);
   } else if(source === moment) {
     await MomentModel.setStatus(did, status);
+  } else if(source === draft) {
+    await DraftModel.setStatus(did, status);
   }
 }
 // 设置审核状态 当document的状态改变时，同时去改变上层来源的状态
