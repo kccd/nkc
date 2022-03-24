@@ -1,19 +1,19 @@
 <template lang="pug">
   .moments
     //动态操作
-    moment-option(
-      ref="momentOption"
-      @complaint="complaint"
-      @violation-record="violationRecord"
-    )
+    //moment-option(
+    //  ref="momentOption"
+    //  @complaint="complaint"
+    //  @violation-record="violationRecord"
+    //)
     complaint(ref="complaint")
     violation-record(ref="violationRecord")
     moment-status(ref="momentStatus")
     .moment-container(:key="momentData.momentId" v-for="momentData in moments")
       moment(
         :data="momentData"
-        @open-option="openOption"
-        @option-comment-option="openOption"
+        @complaint="complaint"
+        @violation-record="violationRecord"
       )
 </template>
 
@@ -48,9 +48,9 @@
     mounted() {
     },
     methods: {
-      openOption(data) {
-        this.$refs.momentOption.open(data);
-      },
+      // openOption(data) {
+      //   this.$refs.momentOption.open(data);
+      // },
       //投诉或举报
       complaint(mid) {
         this.$refs.complaint.open('moment', mid);

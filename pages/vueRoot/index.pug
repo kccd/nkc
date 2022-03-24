@@ -3,6 +3,7 @@ block title
   +includeCSS('/vueRoot/index.css', true)
   title=`SPA`
 block content
+  .hidden#data=objToStr({column: data.column, websiteCode: data.websiteCode})
   #app
 block footer
 block scripts

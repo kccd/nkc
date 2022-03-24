@@ -13,7 +13,8 @@
             span 继续编辑
         .article-more(@click="more") 查看更多
       document-editor(ref="documentEditor" :configs="configs" @ready='editorReady' @content-change="watchContentChange")
-      .form-group(v-if="articleStatus === 'default' && column && configs.selectCategory && column.userColumn && !column.addedToColumn")
+      //只有article的状态为default或者不存在article时才会显示专栏文章分类
+      .form-group(v-if="(articleStatus === 'default' || !articleStatus) && column && configs.selectCategory && column.userColumn && !column.addedToColumn")
         .m-b-2
           .editor-header 专栏文章分类
           select-column-categories(ref="selectColumnCategories" @change="categoryChange")
