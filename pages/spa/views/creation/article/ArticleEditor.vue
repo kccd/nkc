@@ -18,7 +18,7 @@
   import {nkcUploadFile, nkcAPI} from "../../../../lib/js/netAPI";
   import {sweetError} from "../../../../lib/js/sweetAlert";
   import {screenTopWarning} from "../../../../lib/js/topAlert";
-  import MoveDirectoryDialog from '../../../component/MoveDirectoryDialog'
+  import MoveDirectoryDialog from '../../../components/MoveDirectoryDialog'
   import { EventBus } from '../../../eventBus'
   // import {saveToSessionStorage, getFromSessionStorage, updateInSessionStorage, sessionStorageKeys} from "../../../lib/js/sessionStorage";
   import { scrollTopFun } from '../../../scrollTop'
@@ -79,48 +79,11 @@
       }
     },
     mounted() {
-      //  点击此版本进行编辑后 当前页面应该更新数据
-      // window.addEventListener('storage', (ev) => {
-      //   const {
-      //           key,
-      //           newValue,
-      //       } = ev
-      //       console.log(ev, key, newValue)
-      //       if(key === 'lastModify' && newValue){
-      //         // location.reload();
-      //         function keyEvent(key) {
-      //           var e = $.Event('keydown');
-      //           e.keyCode = key;
-      //           e.which = key;
-      //           $(window).trigger(e);
- 	    //           if(key == 13) {
-	    //             console.log('按下回车键')
-	    //           }
-      //         }
-      //         keyEvent(13)
-      //       }
-      // }),
-      this.scrollPosition()
-      // EventBus.$on('publish', ()=>{
-      //   this.post('publish')
-      //   .then(() => {
-      //     this.$router.replace({
-      //       name: 'bookContent',
-      //       params: {
-      //         bid: this.bookId,
-      //         aid: this.articleId
-      //       }
-      //     });
-      //   })
-      //   .catch(sweetError);
-      // })
+      scrollTopFun(window, 0)
       this.initId();
       this.initData();
     },
     methods: {
-      scrollPosition(){
-        scrollTopFun(window, 0)
-      },
       documentPreview(){
         const {documentId}=this
         if(documentId){

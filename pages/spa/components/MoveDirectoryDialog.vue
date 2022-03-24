@@ -22,7 +22,7 @@
 </template>
 <script>
 import { nkcAPI } from "../../lib/js/netAPI";
-import Tree from "./tree/Tree.vue";
+import Tree from "./components/tree/Tree.vue";
 import { DraggableElement } from "../../lib/js/draggable";
 import { EventBus } from "../eventBus";
 import { sweetSuccess, sweetError } from "../../lib/js/sweetAlert.js";

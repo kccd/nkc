@@ -161,12 +161,9 @@ export default {
     window.onbeforeunload = function(){
       saveToSessionStorage(sessionStorageKeys.scrollTop, 0)
     }
-    this.scrollPosition()
+    scrollTopFun(window, getFromSessionStorage(sessionStorageKeys.scrollTop))
   },
   methods: {
-    scrollPosition(){
-      scrollTopFun(window, getFromSessionStorage(sessionStorageKeys.scrollTop))
-    },
     editor(data, childIndex) {
       childIndex = childIndex.split(',')
       if (data.type !== "article") {

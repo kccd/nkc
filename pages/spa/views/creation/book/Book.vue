@@ -215,10 +215,10 @@
 
 <script>
 import { nkcAPI } from "../../../../lib/js/netAPI";
-import MoveDirectoryDialog from "../../../component/MoveDirectoryDialog.vue";
-import Tree from "../../../component/tree/Tree.vue";
+import MoveDirectoryDialog from "../../../components/MoveDirectoryDialog.vue";
+import Tree from "../../../components/tree/Tree.vue";
 import { EventBus } from "../../../eventBus";
-import AddDialog from "../../../component/AddDialog.vue";
+import AddDialog from "../../../components/AddDialog.vue";
 import { sweetSuccess, sweetError } from "../../../../lib/js/sweetAlert.js";
 import UserGroup from "../../../../lib/vue/UserGroup"
 import {visitUrl} from "../../../../lib/js/pageSwitch";
