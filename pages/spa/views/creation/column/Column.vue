@@ -6,6 +6,7 @@
 
 <script>
   import HorNav from '../../../components/HorNav';
+  import { routesName } from '../../../routes/creation'
   export default {
     components: {
       'hor-nav': HorNav
@@ -13,11 +14,11 @@
     data: () => ({
       navList: [
         {
-          type: 'columnArticle',
+          type: routesName.creationColumnArticle,
           title: '文章'
         },
         {
-          type: 'columnDraft',
+          type: routesName.creationColumnDraft,
           title: '草稿'
         }
       ]
@@ -33,9 +34,9 @@
     methods: {
       //路由重定向
       redirect() {
-        if(this.$route.name === 'column') {
+        if(this.$route.name === 'creationColumn') {
           this.$router.replace({
-            name: 'columnArticle'
+            name: routesName.creationColumnArticle
           });
         }
       }

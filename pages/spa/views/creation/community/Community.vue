@@ -7,6 +7,7 @@
 
 <script>
   import HorNav from '../../../components/HorNav';
+  import { routesName } from '../../../routes/creation'
   export default {
     components: {
       'hor-nav': HorNav
@@ -15,19 +16,19 @@
       navList: [
         {
           title: '文章',
-          type: 'communityThread'
+          type: routesName.creationCommunityThread
         },
         {
           title: '回复',
-          type: 'communityPost'
+          type: routesName.creationCommunityPost
         },
         {
           title: '草稿',
-          type: 'communityDraft'
+          type: routesName.creationCommunityDraft
         },
         {
           title: '笔记',
-          type: 'communityNote'
+          type: routesName.creationCommunityNote
         }
       ]
     }),
@@ -42,9 +43,9 @@
     },
     methods: {
       redirect() {
-        if(this.$route.name === 'community') {
+        if(this.$route.name === 'creationCommunity') {
           this.$router.replace({
-            name: 'communityThread'
+            name: routesName.creationCommunityThread
           });
         }
       }

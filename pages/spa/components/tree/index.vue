@@ -111,7 +111,7 @@
 import { EventBus } from "../../eventBus.js";
 import { sweetQuestion } from "../../../lib/js/sweetAlert";
 import {saveToSessionStorage, getFromSessionStorage, updateInSessionStorage, sessionStorageKeys} from "../../../lib/js/sessionStorage";
-import { scrollTopFun } from '../../scrollTop'
+import { scrollFun } from '../../../lib/js/scrollBar'
 export default {
   name: "Tree",
   props: {
@@ -161,7 +161,7 @@ export default {
     window.onbeforeunload = function(){
       saveToSessionStorage(sessionStorageKeys.scrollTop, 0)
     }
-    scrollTopFun(window, getFromSessionStorage(sessionStorageKeys.scrollTop))
+    scrollFun(window, getFromSessionStorage(sessionStorageKeys.scrollTop), 0)
   },
   methods: {
     editor(data, childIndex) {

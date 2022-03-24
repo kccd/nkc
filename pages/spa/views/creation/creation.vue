@@ -6,41 +6,59 @@
       creation-nav(@select="selectNavItem")
     .creation-content-container
       transition(:name="transitionName")
+        home(v-if="showHome")
         router-view(v-if="isRouterAlive")
 </template>
 <script>
 import VerNav from "../../components/VerNav";
 import { getState } from "../../../lib/js/state";
 import { visitUrl } from "../../../lib/js/pageSwitch";
+import Home from "./Home"
 export default {
   components: {
     "creation-nav": VerNav,
+    home: Home
   },
   data: () => ({
     transitionName: "fade",
     isRouterAlive: true,
-    isApp: false
+    isApp: false,
+    showHome: false,
   }),
   watch: {
-    $route(to, from) {
-      const toDepth = to.path.split("/").length;
-      const fromDepth = from.path.split("/").length;
-      this.transitionName = toDepth < fromDepth ? "fade" : "fade";
-    },
+    "$route": {
+      // immediate: true,
+      handler(to, from){
+        const toDepth = to.path.split("/").length;
+        const fromDepth = from.path.split("/").length;
+        this.transitionName = toDepth < fromDepth ? "fade" : "fade";
+        this.isShowHome()
+      }
+    }
   },
   created(){
     const { isApp } = getState();
     this.isApp = isApp;
-  },
-  mounted(){
+    this.isShowHome()
   },
   methods: {
+    isShowHome(){
+      if(this.$route.path === "/creation"){
+        this.showHome = true; 
+      }else{
+        this.showHome = false;
+      }
+    },
     navToPage(page, url) {
       if (this.isApp) {
         visitUrl(url, true);
         return;
       }
-      this.$router.push({ name: page });
+      if(page === 'home'){
+        this.$router.push({ path: url });
+      }else{
+        this.$router.push({ name: page });
+      }
     },
     selectNavItem(type, url) {
       this.navToPage(type, url);
