@@ -80,7 +80,8 @@ export default {
       name: "",
       description: "",
       type: "main"
-    }
+    },
+    columnId: ''
   }),
   props: {
     state: {
@@ -92,21 +93,34 @@ export default {
       required: true
     }
   },
-  created() {
-    this.choose = this.data.toColumn ? [true] : [];
-    this.columnId = this.state.column?._id || "";
-  },
   mounted: function() {
-    if (this.choose.length) {
-      this.getCategories();
-    }
+    //- if (this.choose.length) {
+    //-   this.getCategories();
+    //- }
   },
   watch: {
-    data(n, o) {
-      this.choose = n.toColumn ? [true] : [];
+    data: {
+      immediate: true,
+      handler(n) {
+        this.choose = n.toColumn ? [true] : [];
+      }
     },
-    state(n, o) {
-      this.columnId = n.column?._id || "";
+    state: {
+      immediate: true,
+      handler(n) {
+        this.columnId = n.column?._id || "";
+      }
+    },
+    choose: function() {
+      if (this.choose.length > 0 && this.mainCategories.length === 0) {
+        this.getCategories();
+      } else {
+        this.loaded = false;
+        this.mainCategories = [];
+        this.selectedMainCategoriesId = [];
+        this.minorCategories = [];
+        this.selectedMinorCategoriesId = [];
+      }
     }
   },
   methods: {
@@ -144,7 +158,7 @@ export default {
           this.mainCategories = data.mainCategories;
           this.minorCategories = data.minorCategories;
         })
-        .catch(function(data) {
+        .catch(data => {
           this.loaded = true;
           sweetError(data);
         });
@@ -205,19 +219,6 @@ export default {
       return arr;
     }
   },
-  watch: {
-    choose: function() {
-      if (this.choose.length > 0 && this.mainCategories.length === 0) {
-        this.getCategories();
-      } else {
-        this.loaded = false;
-        this.mainCategories = [];
-        this.selectedMainCategoriesId = [];
-        this.minorCategories = [];
-        this.selectedMinorCategoriesId = [];
-      }
-    }
-  }
 };
 </script>
 

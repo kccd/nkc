@@ -8,8 +8,6 @@
 </template>
 
 <script>
-
-
 export default {
   data: () => ({
     originState: 0,
@@ -19,21 +17,13 @@ export default {
     original: {
       type: Object,
       required: true
-    },
+    }
   },
-  // created() {
-  //   if(typeof this.original.state === "undefined"){
-  //     console.error('original.state is not defined');
-  //     return
-  //   }
-  //   this.originState = this.original.state
-  // },
   watch: {
     original: {
       immediate: true,
-      handler(n){
-      this.originState = n.state
-
+      handler(n) {
+        this.originState = n.state || 0;
       }
     }
   },
@@ -41,7 +31,6 @@ export default {
     allowedOriginal() {
       return this.contentLength >= this.original?.wordLimit;
       // if(!allowed) this.originState = 0;
-
     },
     getOriginLevel() {
       return {
@@ -53,30 +42,29 @@ export default {
         "5": "发表人是合作者之一",
         "6": "发表人本人原创"
       };
-    },
+    }
   },
   methods: {
-    contentChange(length){
-      this.contentLength = length
+    contentChange(length) {
+      this.contentLength = length;
     },
-    getData(){
+    getData() {
       return {
-        originState : this.originState
-      }
+        originState: this.originState
+      };
     }
   }
 };
 </script>
 
 <style scoped>
-
-.editor-header{
+.editor-header {
   font-size: 1.25rem;
   margin: 0.3rem 0;
   color: #555;
   font-weight: 700;
 }
-.editor-header small{
+.editor-header small {
   color: #88919d;
 }
 </style>
