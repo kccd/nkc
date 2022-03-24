@@ -17,7 +17,7 @@
       .form-group(v-if="(articleStatus === 'default' || !articleStatus) && column && configs.selectCategory && column.userColumn && !column.addedToColumn")
         .m-b-2
           .editor-header 专栏文章分类
-          select-column-categories(ref="selectColumnCategories" @change="categoryChange")
+          select-column-categories(ref="selectColumnCategories" @change="categoryChange" :column-id="columnId")
     .m-b-1
       button.btn.btn-primary.m-r-05(@click="publish") 发布
       button.btn.btn-default.m-r-05(@click="saveArticle") 保存
