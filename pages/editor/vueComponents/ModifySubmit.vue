@@ -38,7 +38,7 @@ export default {
     data: {
       type: Object,
       required: true
-    },
+    }
   },
   data: () => ({
     type: "newThread",
@@ -67,14 +67,15 @@ export default {
     // if (this.data?.post?.pid) this.pid = this.data.post.pid;
   },
   watch: {
-    data(n){
-      this.allowedAnonymousForumsId =  n?.allowedAnonymousForumsId || []
-    this.havePermissionToSendAnonymousPost = n?.havePermissionToSendAnonymousPost || false
-    if (n?.post) this.oldContent = n.post.c;
-    if (n?.type) this.type = n.type;
-    if (n?.forum) this.forum = n.forum;
-    if (n?.threda) this.threda = n.threda;
-    if (n?.post?.pid) this.pid = n.post.pid;
+    data(n) {
+      this.allowedAnonymousForumsId = n?.allowedAnonymousForumsId || [];
+      this.havePermissionToSendAnonymousPost =
+        n?.havePermissionToSendAnonymousPost || false;
+      if (n?.post) this.oldContent = n.post.c;
+      if (n?.type) this.type = n.type;
+      if (n?.forum) this.forum = n.forum;
+      if (n?.threda) this.threda = n.threda;
+      if (n?.post?.pid) this.pid = n.post.pid;
     }
   },
   computed: {
@@ -91,8 +92,7 @@ export default {
   mounted() {
     this.autoSaveToDraft();
   },
-  updated(){
-  },
+  updated() {},
   methods: {
     checkString: NKC.methods.checkData.checkString,
     checkEmail: NKC.methods.checkData.checkEmail,
@@ -130,7 +130,8 @@ export default {
           !(
             saveData.t ||
             saveData.c ||
-            !saveData.tcId || this.tcId.length ||
+            !saveData.tcId ||
+            this.tcId.length ||
             saveData.cids.length ||
             saveData.fids.length ||
             saveData.cover ||
@@ -457,11 +458,11 @@ export default {
           sweetError(err);
         });
     },
-    getData(){
+    getData() {
       return {
         anonymous: this.anonymous,
         checkProtocol: this.checkProtocol
-      }
+      };
     }
   }
 };

@@ -15,7 +15,7 @@ router
   })
   .get('/editor', async (ctx, next) => {
     const {db, params} = ctx;
-    ctx.remoteTemplate = 'creation/index.pug';
+    ctx.remoteTemplate = 'vueRoot/index.pug';
     await next();
   })
   .get('/document', async (ctx, next) => {

@@ -9,7 +9,7 @@
             tr
               th
               th 姓名
-              th {{websiteUserId + "(选填)"}}
+              th {{websiteUserId() + "(选填)"}}
               th 机构名称(选填)
               th 机构地址(选填)
               th 通信作者
@@ -50,9 +50,9 @@
 </template>
 
 <script>
+import { getState } from "../../lib/js/state";
 export default {
   data: () => ({
-    websiteUserId: data.websiteCode + "ID",
     authorInfos: []
   }),
   props: {
@@ -64,14 +64,15 @@ export default {
   watch: {
     author: {
       immediate: true,
-      handler(n){
-      this.authorInfos = n
-
+      handler(n) {
+        this.authorInfos = n;
       }
     }
   },
   methods: {
-  
+    websiteUserId() {
+      return getState().websiteCode + "ID";
+    },
     getData() {
       return { authorInfos: this.authorInfos };
     },

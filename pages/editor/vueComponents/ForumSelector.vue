@@ -183,18 +183,21 @@ export default {
     }
   },
   mounted() {
-    this.$nextTick(()=>{
-      this.draggable = new DraggableElement(this.$refs.selectForum, this.$refs.title)
-    })
+    this.$nextTick(() => {
+      this.draggable = new DraggableElement(
+        this.$refs.selectForum,
+        this.$refs.title
+      );
+    });
   },
-  destroyed(){
-    this.draggable.destroy()
+  destroyed() {
+    this.draggable.destroy();
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
     open(callback, options = {}) {
       this.show = true;
-      
+
       this.callback = callback;
       const {
         disabledForumsId = [],
@@ -349,7 +352,8 @@ export default {
 @import "../../publicModules/base";
 
 .moduleForumSelectorApp {
-  will-change: auto;  top: calc(50% - 22rem);
+  will-change: auto;
+  top: calc(50% - 22rem);
   left: calc(50% - 18rem);
   height: 43rem;
   min-height: 43rem;
