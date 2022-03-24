@@ -26,19 +26,10 @@ export default {
     }
   },
   created() {
-    if(typeof this.abstract.cn === 'undefined'){
-      console.warn('post.cn is not defined')
-      this.cn = "";
-      return;
-    };
-    if(typeof this.abstract.en === 'undefined'){
-      console.warn('post.en is not defined')
-      this.en = "";
-      return;
-
-    };
-    this.cn = this.abstract.cn ;
-    this.en = this.abstract.en;
+    // this.setData()
+  },
+  updated(){
+    // this.setData()
   },
   computed: {
     abstractCnLength() {
@@ -50,7 +41,31 @@ export default {
 
     }
   },
+  watch: {
+    abstract: {
+      immediate: true,
+     handler(n){
+        this.cn = n.cn || '';
+      this.en = n.en || '';
+     }
+    }
+  },
   methods: {
+    // setData(){
+    //   if(typeof this.abstract.cn === 'undefined'){
+    //   console.warn('post.cn is not defined')
+    //   this.cn = "";
+    //   return;
+    // };
+    // if(typeof this.abstract.en === 'undefined'){
+    //   console.warn('post.en is not defined')
+    //   this.en = "";
+    //   return;
+
+    // };
+    // this.cn = this.abstract.cn ;
+    // this.en = this.abstract.en;
+    // },
     getData(){
       return {
         abstractCn: this.cn,
@@ -64,7 +79,33 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+
+
+.editor-abstract textarea:focus{
+  outline: none;
+}
+.editor-abstract textarea{
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  resize: none;
+  padding: 0.5rem;
+}
+.editor-abstract-info{
+  text-align: right;
+  font-size: 1.2rem;
+  color: #9baec8;
+}
+.editor-header{
+  font-size: 1.25rem;
+  margin: 0.3rem 0;
+  color: #555;
+  font-weight: 700;
+}
+.editor-header small{
+  color: #88919d;
+}
 .warning {
   color: #ff6262;
 }

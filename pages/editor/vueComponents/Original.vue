@@ -16,17 +16,26 @@ export default {
     contentLength: 0
   }),
   props: {
-    "original": {
+    original: {
       type: Object,
       required: true
     },
   },
-  created() {
-    if(typeof this.original.state === "undefined"){
-      console.warn('original.state is not defined');
-      return
+  // created() {
+  //   if(typeof this.original.state === "undefined"){
+  //     console.error('original.state is not defined');
+  //     return
+  //   }
+  //   this.originState = this.original.state
+  // },
+  watch: {
+    original: {
+      immediate: true,
+      handler(n){
+      this.originState = n.state
+
+      }
     }
-    this.originState = this.original.state
   },
   computed: {
     allowedOriginal() {
@@ -59,4 +68,15 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+
+.editor-header{
+  font-size: 1.25rem;
+  margin: 0.3rem 0;
+  color: #555;
+  font-weight: 700;
+}
+.editor-header small{
+  color: #88919d;
+}
+</style>

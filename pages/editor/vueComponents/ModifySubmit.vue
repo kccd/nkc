@@ -1,7 +1,7 @@
 <template lang="pug">
   .modifySubmit
     h5.text-danger 温馨提示：
-    div(v-html="notice") {{notice}}
+    .pre-wrap {{notice}}
     div(v-cloak)
         hr
         .checkbox(v-if="havePermissionToSendAnonymousPost")
@@ -21,45 +21,62 @@
             .fa.fa-check-circle &nbsp;{{autoSaveInfo}}
         .row
           .col-xs-6.p-r-05
-            button.btn.btn-theme.btn-block(@click="readyData" :disabled="disabledSubmit") {{disabledSubmit ? "提交中..." : "提交"}}
+            button.btn.btn-theme.btn-block(@click="readyData" :disabled="disabledSubmit || !checkProtocol") {{disabledSubmit ? "提交中..." : "提交"}}
           .col-xs-6.p-l-05
-            button.btn.btn-default.btn-block(@click="saveToDraftBase") 存草稿
+            button.btn.btn-default.btn-block(@click="saveToDraftBase('manual')") 存草稿
 </template>
 
 <script>
 import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import { sweetError } from "../../lib/js/sweetAlert.js";
 import { timeFormat } from "../../lib/js/tools";
-
 export default {
   props: {
-    blockButton: {
-      default: true,
-      type: Boolean
-    },
     notice: {
       type: String
     },
     data: {
       type: Object,
       required: true
-    }
+    },
   },
   data: () => ({
     type: "newThread",
     disabledSubmit: false, // 锁定提交按钮
     checkProtocol: true, // 是否勾选协议
     // 当前用户是否有权限发表匿名内容
-    havePermissionToSendAnonymousPost:
-      data.havePermissionToSendAnonymousPost || false,
+    havePermissionToSendAnonymousPost: false,
     // 允许发表匿名内容的专业ID
-    allowedAnonymousForumsId: data.allowedAnonymousForumsId || [],
+    allowedAnonymousForumsId: [],
     // 根据当前所选专业判断用户是否有权限勾选匿名，若无权则此处无需将匿名标志提交到服务器。（新发表时不匿名，修改时无法需改匿名标志）
     allowedAnonymous: false,
     // 是否匿名
-    anonymous: data.post ? data.post.anonymous : false,
-    autoSaveInfo: ""
+    anonymous: false,
+    autoSaveInfo: "",
+    oldContent: "",
+    oldContentLength: "",
+    saveDraftTimeout: 60000
   }),
+  created() {
+    // this.allowedAnonymousForumsId =  this.data.allowedAnonymousForumsId || []
+    // this.havePermissionToSendAnonymousPost = this.data.havePermissionToSendAnonymousPost || false
+    // if (this.data?.post) this.oldContent = this.data.post.c;
+    // if (this.data?.type) this.type = this.data.type;
+    // if (this.data?.forum) this.forum = this.data.forum;
+    // if (this.data?.threda) this.threda = this.data.threda;
+    // if (this.data?.post?.pid) this.pid = this.data.post.pid;
+  },
+  watch: {
+    data(n){
+      this.allowedAnonymousForumsId =  n?.allowedAnonymousForumsId || []
+    this.havePermissionToSendAnonymousPost = n?.havePermissionToSendAnonymousPost || false
+    if (n?.post) this.oldContent = n.post.c;
+    if (n?.type) this.type = n.type;
+    if (n?.forum) this.forum = n.forum;
+    if (n?.threda) this.threda = n.threda;
+    if (n?.post?.pid) this.pid = n.post.pid;
+    }
+  },
   computed: {
     selectedForumsId() {
       let arr = [];
@@ -71,24 +88,17 @@ export default {
       return arr;
     }
   },
+  mounted() {
+    this.autoSaveToDraft();
+  },
+  updated(){
+  },
   methods: {
     checkString: NKC.methods.checkData.checkString,
     checkEmail: NKC.methods.checkData.checkEmail,
     visitUrl: NKC.methods.visitUrl,
-
-    setFloatDom() {
-      const oldDom = $("#submit-scroll-sm");
-      const scrollWidth = oldDom.width();
-      const { left, top } = oldDom.offset();
-      $("#submit-scroll").css({
-        width: scrollWidth + 30,
-        display: "block",
-        left,
-        top
-      });
-    },
-    checkAnonymous() {
-      let selectedForumsId = this.selectedForumsId;
+    checkAnonymous(selectedForumsId) {
+      // let selectedForumsId = window.PostInfo.selectedForumsId;
       let havePermission = false;
       for (let i = 0; i < selectedForumsId.length; i++) {
         let fid = selectedForumsId[i];
@@ -110,31 +120,35 @@ export default {
       this.autoSaveInfo = "草稿已保存 " + this.format(time);
     },
     autoSaveToDraft() {
+      this.readyDataForSave();
       let type = this.type;
+      const { saveData } = this;
       // 内容为空时不自动保存草稿,不做任何操作
-      if (!this.content) return;
+      if (!saveData.c) return;
       if (type === "newThread") {
         if (
-          !this.title &&
-          !this.content &&
-          (!this.selectedForums || !this.selectedForums.length) &&
-          !this.cover &&
-          !this.abstractCn &&
-          !this.abstractEn &&
-          !this.keyWordsCn &&
-          !this.keyWordsEn &&
-          !this.authorInfos &&
-          !this.surveyId
+          !(
+            saveData.t ||
+            saveData.c ||
+            !saveData.tcId || this.tcId.length ||
+            saveData.cids.length ||
+            saveData.fids.length ||
+            saveData.cover ||
+            saveData.abstractCn ||
+            saveData.abstractEn ||
+            saveData.keyWordsCn.length ||
+            saveData.keyWordsEn.length ||
+            saveData.authorInfos ||
+            saveData.surveyId
+          )
         )
           return;
       } else if (type === "newPost") {
-        if (!this.title && !this.content) return;
+        if (!saveData.title && !saveData.content) return;
       }
       setTimeout(() => {
-        this.saveToDraftBase()
+        this.saveToDraftBase("automatic")
           .then(() => {
-            const postButton = getPostButton();
-            postButton.saveToDraftSuccess();
             this.autoSaveToDraft();
           })
           .catch(data => {
@@ -143,14 +157,17 @@ export default {
           });
       }, this.saveDraftTimeout);
     },
-    saveToDraftBase() {
-      if (!this.content) return sweetError("请先输入内容");
+    saveToDraftBase(savetType = "manual") {
+      if (savetType === "manual") this.readyDataForSave();
+      const { saveData } = this;
+      if (!saveData.c) return sweetError("请先输入内容");
+      let type = this.type;
+
       return Promise.resolve()
         .then(() => {
           // 获取本次编辑器内容的全部长度
-          const allContentLength = editor.getContent();
-          // 如果内容相对上一次减少了就提示用户是否需要保存
-          if (allContentLength.length < this.oldContentLength) {
+          // const allContentLength = editor.getContent();
+          if (saveData.c !== this.oldContent) {
             return sweetQuestion(`您输入的内容发生了变化，是否还要继续保存？`)
               .then(() => {
                 return;
@@ -163,9 +180,8 @@ export default {
           }
         })
         .then(() => {
-          let post = this.getPost();
+          // let post = this.getPost();
           let desType, desTypeId;
-          let type = this.type;
           if (type === "newThread") {
             desType = "forum";
           } else if (type === "newPost") {
@@ -173,10 +189,10 @@ export default {
             desTypeId = this.thread.tid;
           } else if (type === "modifyPost") {
             desType = "post";
-            desTypeId = this.post.pid;
+            desTypeId = this.pid;
           } else if (type === "modifyThread") {
             desType = "post";
-            desTypeId = this.post.pid;
+            desTypeId = this.pid;
           } else if (type === "modifyForumDeclare") {
             desType = "forumDeclare";
             desTypeId = this.forum.fid;
@@ -190,16 +206,16 @@ export default {
           formData.append(
             "body",
             JSON.stringify({
-              post: post,
+              post: saveData,
               draftId: this.draftId,
               desType: desType,
               desTypeId: desTypeId
             })
           );
-          if (this.coverData) {
+          if (saveData.coverData) {
             formData.append(
               "postCover",
-              NKC.methods.blobToFile(this.coverData),
+              NKC.methods.blobToFile(saveData.coverData),
               "cover.png"
             );
           }
@@ -214,7 +230,8 @@ export default {
         .then(data => {
           //保存草稿的全部内容长度
           if (data.contentLength) {
-            this.oldContentLength = data.contentLength;
+            this.oldContentLength = data.draft?.c?.length;
+            this.oldContent = data.draft?.c;
           }
           this.draftId = data.draft.did;
           if (data.draft.cover) {
@@ -225,9 +242,11 @@ export default {
           return Promise.resolve();
         })
         .then(res => {
-          const postButton = getPostButton();
-          postButton.saveToDraftSuccess();
-          sweetSuccess("草稿已保存");
+          // const postButton = getPostButton();
+          if (type === "manual") {
+            sweetSuccess("草稿已保存");
+          }
+          this.saveToDraftSuccess();
         })
         .catch(data => {
           sweetError("草稿保存失败：" + (data.error || data));
@@ -283,8 +302,8 @@ export default {
     },
     // 检测标题
     checkTitle(v) {
-      if(!v){
-        throw new Error("标题不能少于3个字")
+      if (!v) {
+        throw new Error("标题不能少于3个字");
       }
       if (v.length < 3) throw new Error("标题不能少于3个字");
       if (v.length > 100) throw new Error("标题不能超过100个字");
@@ -335,6 +354,12 @@ export default {
     readyData() {
       this.$emit("ready-data", submitData => this.submit(submitData));
     },
+    // 获取其他组件数据 保存时使用
+    readyDataForSave() {
+      this.$emit("ready-data", data => {
+        this.saveData = data;
+      });
+    },
     submit(submitData) {
       let type;
       Promise.resolve()
@@ -355,7 +380,7 @@ export default {
             this.checkAuthorInfos(submitData.authorInfos);
             let formData = new FormData();
             formData.append("body", JSON.stringify({ post: submitData }));
-            if (this.coverData) {
+            if (submitData.coverData) {
               formData.append(
                 "postCover",
                 NKC.methods.blobToFile(submitData.coverData),
@@ -384,14 +409,14 @@ export default {
             this.checkContent(submitData.c);
             let formData = new FormData();
             formData.append("body", JSON.stringify({ post: submitData }));
-            if (this.coverData) {
+            if (submitData.coverData) {
               formData.append(
                 "postCover",
                 NKC.methods.blobToFile(submitData.coverData),
                 "cover.png"
               );
             }
-            return nkcUploadFile("/p/" + this.post.pid, "PUT", formData);
+            return nkcUploadFile("/p/" + this.pid, "PUT", formData);
           } else if (type === "modifyThread") {
             // 修改thread
             this.checkTitle(submitData.t);
@@ -401,18 +426,18 @@ export default {
             this.checkAuthorInfos(submitData.authorInfos);
             let formData = new FormData();
             formData.append("body", JSON.stringify({ post: submitData }));
-            if (this.coverData) {
+            if (submitData.coverData) {
               formData.append(
                 "postCover",
                 NKC.methods.blobToFile(submitData.coverData),
                 "cover.png"
               );
             }
-            return nkcUploadFile("/p/" + this.data?.post?.pid, "PUT", formData);
+            return nkcUploadFile("/p/" + this.pid, "PUT", formData);
           }
         })
         .then(data => {
-          this.$emit('remove-editor')
+          this.$emit("remove-editor");
           if (NKC.configs.platform === "reactNative") {
             NKC.methods.visitUrlAndClose(data.redirect);
           } else if (NKC.configs.platform === "apiCloud") {
@@ -431,17 +456,24 @@ export default {
 
           sweetError(err);
         });
+    },
+    getData(){
+      return {
+        anonymous: this.anonymous,
+        checkProtocol: this.checkProtocol
+      }
     }
   }
 };
 </script>
 
-<style scope>
+<style scoped>
 .editor-auto-save {
   padding: 0.5rem 0;
   color: #9baec8;
 }
 .modifySubmit {
+  max-width: 25rem;
   position: fixed;
 }
 </style>

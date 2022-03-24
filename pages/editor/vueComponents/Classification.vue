@@ -88,7 +88,7 @@
           :class="{ active: c.selectedNode === n }",
           :title="n.description"
         )
-          span {{ n.name }}
+          span {{ n.name }} 
         .editor-thread-category-node(
           @click="selectThreadCategory(c, 'default')",
           :class="{ active: c.selectedNode === 'default' }"
@@ -97,33 +97,41 @@
       .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(
         v-if="c.selectedNode && c.selectedNode.warning"
       ) 注意事项：{{ c.selectedNode.warning }}
+  forum-selector(ref="forumSelector")
 </template>
 
 <script>
 import { getUrl } from "../../lib/js/tools";
 // import { nkcAPI } from "../../lib/js/netAPI";
+import ForumSelector from "./ForumSelector.vue";
 
 export default {
   data: () => ({
     selectedForums: [],
     threadCategories: [],
     type: "newThread",
-    minorForumCount: ""
+    minorForumCount: "",
+    show: false
   }),
+  components: {
+    "forum-selector": ForumSelector
+  },
   props: {
     data: {
       require: true,
       type: Object
     }
   },
-  created() {
-    this.threadCategories = this.data.threadCategories;
-    console.log(this.threadCategories, "threadCategories");
-    this.minorForumCount = this.data.minorForumCount;
-  },
-  updated() {},
-  mounted() {
-    this.selectedForums = this.data.mainForums || [];
+  watch: {
+    data: {
+      immediate: true,
+      handler(n){
+        this.threadCategories = n.threadCategories || [];
+        this.minorForumCount = n.minorForumCount || [];
+        this.selectedForums = n.mainForums || [];
+      }
+      
+    }
   },
   computed: {
     mainForum: function() {
@@ -143,7 +151,7 @@ export default {
       }
       return arr;
     },
-    selectedCategoriesId: function() {
+    selectedCategoriesId() {
       let arr = [];
       let selectedForums = this.selectedForums;
       for (let i = 0; i < selectedForums.length; i++) {
@@ -166,21 +174,20 @@ export default {
       return getUrl(type, id);
     },
     selectThreadCategory(c, n) {
-      console.log(c,n)
       c.selectedNode = n;
       this.$forceUpdate();
     },
     selectForumsByType(type) {
       let self = this;
-      if (!window.ForumSelector)
-        window.ForumSelector = new NKC.modules.ForumSelector();
+      // if (!window.ForumSelector)
+        // window.ForumSelector = new NKC.modules.ForumSelector();
       let selectedForumsId = [].concat(self.selectedForumsId);
       let highlightForumId = "";
       if (type === "mainForum") {
         highlightForumId = selectedForumsId.shift();
       }
-      ForumSelector.open(
-        function(r) {
+      this.$refs.forumSelector.open(
+        r => {
           r.logo = r.forum.logo;
           r.color = r.forum.color;
           r.fName = r.forum.displayName;
@@ -191,6 +198,7 @@ export default {
             if (self.selectedForumsId.indexOf(r.fid) !== -1) return;
             self.selectedForums.push(r);
           }
+          this.$emit('selected-forumids', this.selectedForumsId)
         },
         {
           highlightForumId: highlightForumId,
@@ -210,7 +218,84 @@ export default {
 };
 </script>
 
-<style scope>
+<style scoped lang="less">
+
+.editor-thread-category-nodes{
+  @nodeHeight: 2.6rem;
+  user-select: none;
+  .editor-thread-category-warning{
+    border-radius: 3px;
+  }
+  .editor-thread-category-node{
+    display: inline-block;
+    box-sizing: border-box;
+    height: @nodeHeight;
+    line-height: @nodeHeight;
+    padding: 0 1rem;
+    background-color: #fff;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    color: #555;
+    margin: 0 0.8rem 0.8rem 0;
+    cursor: pointer;
+    &.active{
+      color: #fff;
+      // background-color: @primary;
+      // border-color: @primary;
+    }
+  }
+}
+.editor-thread-category-description{
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+.editor-main-forum-note{
+  //background-color: #f4f4f4;
+  padding: 0.5rem;
+  border-radius: 3px;
+  margin-bottom: 0.5rem;
+}
+.editor-main-forum-name{
+  display: inline-block;
+  font-size: 1rem;
+  padding-left: 0.5rem;
+  vertical-align: top;
+}
+.editor-main-forum-name select{
+  border: 1px solid #dadada;
+}
+.editor-main-forum-avatar{
+  height: 2.3rem;
+  display: inline-block;
+  width: 2.3rem;
+  border-radius: 50%;
+}
+.editor-main-forum{
+  display: inline-block;
+  height: 2.4rem;
+  color: #666;
+  /* border: 1px solid #eee; */
+  font-weight: 700;
+  vertical-align: top;
+  line-height: 2.4rem;
+  border-radius: 1.2rem;
+  vertical-align: top;
+  padding-right: 2.4rem;
+  position: relative;
+  background-color: #f6f6f6;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  margin: 0 0.5rem 0.5rem 0;
+  font-size: 0;
+}
+.editor-header{
+  font-size: 1.25rem;
+  margin: 0.3rem 0;
+  color: #555;
+  font-weight: 700;
+}
+.editor-header small{
+  color: #88919d;
+}
 .editor-thread-category-nodes .editor-thread-category-node.active {
   color: #fff;
   background-color: #2b90d9;

@@ -7,7 +7,7 @@
       h5(v-else) 目前还不能开设专栏，通常是因为你参与讨论较少或没有文章被列入精选。
   div(v-else)
     div(v-if="!data.addedToColumn") 
-      #moduleSelectColumnCategories(
+      .moduleSelectColumnCategories(
       :data-column-id="state.column._id"
       :data-to-column='data.toColumn?"true":""'
       v-cloak)
@@ -61,7 +61,6 @@
                   button.btn.btn-primary.btn-sm(@click="saveCategory") 保存
                   button.btn.btn-default.btn-sm(@click="cancelAddCategory") 取消
     h5(v-else) 本文已经发表到专栏，如需从专栏撤稿，请到专栏管理界面操作。
-
 </template>
 
 <script>
@@ -95,11 +94,19 @@ export default {
   },
   created() {
     this.choose = this.data.toColumn ? [true] : [];
-    this.columnId = this.state.column._id || "";
+    this.columnId = this.state.column?._id || "";
   },
   mounted: function() {
     if (this.choose.length) {
       this.getCategories();
+    }
+  },
+  watch: {
+    data(n, o) {
+      this.choose = n.toColumn ? [true] : [];
+    },
+    state(n, o) {
+      this.columnId = n.column?._id || "";
     }
   },
   methods: {
@@ -214,4 +221,22 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.moduleSelectColumnCategories .category-type {
+  background-color: #d0d0d0;
+  border-left: 6px solid #555;
+  padding-left: 0.5rem;
+  font-weight: 700;
+  height: 2rem;
+  line-height: 2rem;
+}
+.editor-header {
+  font-size: 1.25rem;
+  margin: 0.3rem 0;
+  color: #555;
+  font-weight: 700;
+}
+.editor-header small {
+  color: #88919d;
+}
+</style>

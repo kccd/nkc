@@ -1,5 +1,5 @@
 <template lang="pug">
-#content
+.content
   editor(
     :configs="editorConfigs",
     ref="threadEditor",
@@ -17,6 +17,7 @@ export default {
     editor: Editor
   },
   data: () => ({
+    openOnEditNotes: localStorage.getItem("open-on-edit-notes") === "yes",
     editorPlugs: {
       resourceSelector: true,
       draftSelector: true,
@@ -27,22 +28,31 @@ export default {
     // 是否允许触发contentChange
     contentChangeEventFlag: true,
     content: "",
-    quoteHtml: ""
+    quoteHtml: "",
+    contentLength: ""
   }),
   props: {
     c: {
       type: String
     }
   },
-  created() {
-    let reg = /<blockquote cite.+?blockquote>/;
-    let quoteHtml = this.c?.match(reg);
-    if (quoteHtml && quoteHtml[0]) {
-      this.quoteHtml = quoteHtml[0];
+  watch: {
+    c: {
+      immediate: true,
+      handler(n) {
+        let reg = /<blockquote cite.+?blockquote>/;
+        let quoteHtml = n?.match(reg);
+        if (quoteHtml && quoteHtml[0]) {
+          this.quoteHtml = quoteHtml[0];
+        }
+        this.content = n?.replace(reg, "") || "";
+        // 真奇怪 
+      }
+    },
+    openOnEditNotes: function(val) {
+      localStorage.setItem("open-on-edit-notes", val ? "yes" : "no");
     }
-    this.content = this.c?.replace(reg, "") || "";
   },
-  mounted() {},
   computed: {
     editorConfigs() {
       return getEditorConfigs();
@@ -50,7 +60,6 @@ export default {
   },
   methods: {
     setContent() {
-      // window.editorContainer.contentChangeEventFlag = false; ？？
       this.$refs.threadEditor.setContent(this.content);
     },
     resetBodyPaddingTop() {
@@ -68,35 +77,55 @@ export default {
       return this.$refs.threadEditor;
     },
     onContentChange() {
-      // if (!this.contentChangeEventFlag) {
-      //   this.contentChangeEventFlag = true;
-      //   return;
-      // }
       this.watchContentChange();
     },
     watchContentChange() {
       const content = this.$refs.threadEditor.getContentTxt();
       const _content = this.$refs.threadEditor.getContent();
       this.content = _content;
-      this.contentLength = content.length;
-      this.$emit('content-change', content.length);
+      this.contentLength = this.content.length;
+      this.$emit("content-change", content.length);
     },
     getData() {
-      return { c: this.content + (this.quoteHtml || "") };
+      return {
+        c: this.content + (this.quoteHtml || ""),
+        contentLength: this.contentLength
+      };
     },
     editorReady() {
       //编辑器准备就绪
       this.setContent();
       this.resetBodyPaddingTop();
-      // this.EditorReady = true;
-      // initVueApp();
-      // initPostButton();
     },
     removeEditor() {
       this.$refs.threadEditor.removeNoticeEvent();
     }
-  }
+  },
 };
 </script>
 
-<style></style>
+<style lang="less">
+.content #edui1_toolbarbox.edui-default {
+  position: fixed;
+  padding-left: 15px;
+  top: 43px;
+  left: 0px;
+  width: 100%;
+  z-index: 1030;
+  left: 0;
+  top: 45px;
+  background-color: rgba(250, 250, 250, 0.95) !important;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+  border: none;
+  border-bottom: 1px solid #dbdbdb;
+  padding: 0.5rem 0;
+  #edui1_toolbarboxouter {
+    max-width: 1300px !important;
+    margin-right: auto;
+    margin-left: auto;
+  }
+}
+#edui1 {
+  border: none;
+}
+</style>
