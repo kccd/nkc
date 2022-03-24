@@ -17,9 +17,9 @@ router
   .use('/', async (ctx, next) => {
     const {data, state, db} = ctx;
     if(ctx.query.t) {
-      ctx.template = 'creation/index.pug';
+      ctx.template = 'vueRoot/index.pug';
     } else {
-      ctx.remoteTemplate = 'creation/index.pug';
+      ctx.remoteTemplate = 'vueRoot/index.pug';
     }
     data.column = {
       userColumn: state.userColumn,

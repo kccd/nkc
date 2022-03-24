@@ -1,0 +1,12 @@
+extends ../bootstrap_base
+block title
+  +includeCSS('/vueRoot/index.css', true)
+  title=`SPA`
+block content
+  #app
+block footer
+block scripts
+  +includeJS('/echarts/dist/echarts.min.js')
+  +includeJS("/vue-router/dist/vue-router.min.js", true)
+  +includeJS('/spa/index.js')
+

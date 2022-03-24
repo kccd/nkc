@@ -5,14 +5,19 @@ const { VueLoaderPlugin } = require('vue-loader');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 
+// 输出文件夹
 const DIST_DIR = "dist";
+// vue入口文件
+const SPA_DIR_PATTERN = "!pages/spa";
 const LIB_DIR_PATTERN = "!pages/**/lib";
 const COMPONENTS_DIR_PATTERN = "!pages/**/components";
-const SCRIPTS_PATTERNS = ["./pages/**/*{.js,.jsx}", LIB_DIR_PATTERN, COMPONENTS_DIR_PATTERN];
-const STYLES_PATTERNS = ["./pages/**/*.less", LIB_DIR_PATTERN, COMPONENTS_DIR_PATTERN];
+const SCRIPTS_PATTERNS = ["./pages/**/*{.js,.jsx}", LIB_DIR_PATTERN, COMPONENTS_DIR_PATTERN, SPA_DIR_PATTERN];
+const STYLES_PATTERNS = ["./pages/**/*.less", LIB_DIR_PATTERN, COMPONENTS_DIR_PATTERN, SPA_DIR_PATTERN];
+const SPA_PATTERNS = ["./pages/spa/index.js"];
 
 const scriptFiles = globby.sync(SCRIPTS_PATTERNS);
 const styleFiles = globby.sync(STYLES_PATTERNS);
+const spaFiles = globby.sync(SPA_PATTERNS);
 
 /**
  * 生成id到entry的映射关系图
@@ -47,7 +52,8 @@ module.exports = {
   ...baseConfig,
   entry: {
     ...makeEntryMap(scriptFiles),
-    ...makeEntryMap(styleFiles, "?css_assets")
+    ...makeEntryMap(styleFiles, "?css_assets"),
+    ...makeEntryMap(spaFiles),
   },
   output: {
     path: path.resolve(__dirname, DIST_DIR),

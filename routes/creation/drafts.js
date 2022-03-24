@@ -22,7 +22,7 @@ router
     const {draftId} = query;
     const draft = await db.CreationDraftsModel.getUserDraftById(draftId, state.uid);
     data.draftData = await draft.getDraftData();
-    ctx.remoteTemplate = 'creation/index.pug';
+    ctx.remoteTemplate = 'vueRoot/index.pug';
     await next();
   })
   .post('/editor', async (ctx, next) => {
