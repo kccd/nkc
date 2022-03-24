@@ -71,16 +71,16 @@
           :data="{addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn}"
         )
   .col-xs-12.col-md-3.box-shadow-panel 
-    div
-      //- 1.notice 温馨提示的内容  2.data 中只需要post therad type forum allowedAnonymousForumsId havePermissionToSendAnonymousPost threadCategories
-      //- 3.@ready-data 提交 和 保存时用于获取数据并提交 4.@remove-editor 提交后移除编辑器
-      modify-submit(
-        ref="submit",
-        :notice="pageState.editorSettings && pageState.editorSettings.notes" 
-        :data="pageData"
-        @ready-data="readyData",
-        @remove-editor="removeEditor"
-      )
+    
+    //- 1.notice 温馨提示的内容  2.data 中只需要post therad type forum allowedAnonymousForumsId havePermissionToSendAnonymousPost threadCategories
+    //- 3.@ready-data 提交 和 保存时用于获取数据并提交 4.@remove-editor 提交后移除编辑器
+    modify-submit(
+      ref="submit",
+      :notice="pageState.editorSettings && pageState.editorSettings.notes" 
+      :data="pageData"
+      @ready-data="readyData",
+      @remove-editor="removeEditor"
+    )
 </template>
 
 <script>
