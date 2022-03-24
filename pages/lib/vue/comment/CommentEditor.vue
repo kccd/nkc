@@ -21,8 +21,8 @@
           span 我已阅读并同意遵守与本次发表相关的全部协议。
           a(href="/protocol" target="_blank") 查看协议
     .m-b-05
-      button.m-r-05.btn.btn-primary.btn-sm(@click="publish") 发布
-      button.m-r-05.btn.btn-default.btn-sm(@click="saveComment") 暂存
+      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="!commentContent") 发布
+      button.m-r-05.btn.btn-default.btn-sm(@click="saveComment" :disabled="!commentContent") 暂存
       .pull-right
         a(href="") 历史版本
 </template>
@@ -78,6 +78,8 @@
     }),
     components: {
       'editor': Editor
+    },
+    computed: {
     },
     mounted() {
     },
@@ -168,6 +170,7 @@
       //清空编辑器中的内容
       clearContent() {
         this.$refs.editor.setContent('');
+        this.commentContent = '';
       },
       //发布评论
       publish() {
