@@ -195,8 +195,15 @@ export default {
 </script>
 
 <style scoped lang="less">
-.modal-header,
+.fa-remove{
+  float: right;
+  padding: 1rem;
+}
+
 .modal-footer {
+  border-top: 0;
+}
+.modal-header{
   padding: 0;
 }
 

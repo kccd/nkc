@@ -14,32 +14,11 @@
 *   forumDeclare: 编辑专业说明的草稿
 *
 * */
-window.reqUrl = NKC.methods.getDataById("data");
 
 import Editor from "./vueComponents/Editor.vue";
 new Vue({
   el: "#app-publish-article",
   components: {
     editor: Editor
-  },
-  props: {},
-  data() {
-    return {
-      pageData: {},
-      pageState: {}
-    };
-  },
-  created() {
-    let url = `/editor/data`;
-    if (reqUrl.type && reqUrl.id) {
-      url = `/editor/data?type=${reqUrl.type}&id=${reqUrl.id}`
-    }
-    nkcAPI(
-      url,
-      "get"
-    ).then(resData => {
-      this.pageData = resData;
-      this.pageState = resData.state;
-    });
   },
 });
