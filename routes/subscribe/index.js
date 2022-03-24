@@ -137,8 +137,9 @@ router
         }
       ]
     };
+    let paging;
     const count = await db.PostModel.countDocuments(match);
-    const paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
+    paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
     let posts = await db.PostModel.find(match, {
       pid: 1,
       tid: 1,
