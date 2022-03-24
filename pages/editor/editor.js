@@ -38,7 +38,6 @@ new Vue({
       url,
       "get"
     ).then(resData => {
-      console.log(resData,'resData')
       this.pageData = resData;
       this.pageState = resData.state;
     });

@@ -111,18 +111,8 @@ export default {
     keywords(n, o) {
       this.$set(this.data[0], "value", (n.cn && n.cn.join(",")) || "");
       this.$set(this.data[1], "value", (n.en && n.en.join(",")) || "");
-      // this.data[0].value = n.cn && n.cn.join(",") || [];
-      // this.data[1].value = n.en && n.en.join(",") || [];
       this.submit();
     },
-    // keywords: {
-    //   immediate: true,
-    //   handler(n, o){
-    //     console.log(n)
-    //     this.$set(this.data[0],"value", n.cn && n.cn.join(",") || [])
-    //   this.$set(this.data[1],"value", n.en && n.en.join(",") || [])
-    //   }
-    // }
   },
   methods: {
     close() {
@@ -147,9 +137,7 @@ export default {
     submit() {
       this.keyWordsEn = [];
       this.keyWordsCn = [];
-
       let keywordCn = this.data[0].value;
-      console.log(keywordCn)
       if (keywordCn) {
         keywordCn = keywordCn.replace(/，/gi, ",");
         let cnArr = keywordCn.split(",");

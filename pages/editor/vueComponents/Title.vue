@@ -63,7 +63,6 @@ export default {
     data: {
       immediate: true,
       handler(n) {
-        console.log(n);
         this.titleValue = n?.post?.t || "";
       }
     }

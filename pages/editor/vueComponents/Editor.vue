@@ -151,7 +151,6 @@ export default {
       // pageData.post.parentPostId;
       // 每个组件下都有一个getData返回数据
       const refs = this.$refs;
-      console.log(refs,'refs')
       let submitData = {};
       for (const key in refs) {
         if (refs.hasOwnProperty(key)) {
