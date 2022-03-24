@@ -756,4 +756,21 @@ schema.methods.cancelSubscribe = async function() {
   });
 };
 
+/*
+* 获取用户收藏的所有文章tid 包含thread和article
+* @param {string} uid 需要查找收藏文章的用户uid
+* @return {array} 返回的用户收藏的文章的tid
+* */
+schema.statics.getUserSubTid = async function(uid) {
+  const SubscribeModel = mongoose.model('subscribes');
+  const subs = await SubscribeModel.find({uid, cancel: false, $or: [
+    {type: 'article'}, {type: 'thread'}
+    ]}).sort({toc: -1});
+  const tidArr = [];
+  for(const s of subs) {
+    tidArr.push(s.tid);
+  }
+  return tidArr;
+}
+
 module.exports = mongoose.model('subscribes', schema);

@@ -1,7 +1,6 @@
 const router = require('koa-router')();
 router
   .post('/', async (ctx, next) => {
-    console.log('收藏article');
     const {db, data, params,body, state} = ctx;
     const {aid} = params;
     const {type, cid = []} = body;
@@ -11,7 +10,6 @@ router
     const {disabled}= await db.ArticleModel.getArticleStatus();
     if(article.status === disabled) ctx.throw(400, '不能收藏已被封禁的文章');
     let collection = await db.SubscribeModel.findOne({cancel: false, tid: aid, uid: user.uid, type: 'article'});
-    console.log('type', type, collection)
     if(type) {
      if(collection) ctx.throw(400, '文章已收藏，请勿重复提交');
       for(const typeId of cid) {

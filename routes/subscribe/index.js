@@ -77,7 +77,10 @@ router
         break;
       }
       case 'thread': {
-        subTid = await db.SubscribeModel.getUserSubThreadsId(state.uid, "sub");
+        //获取用户关注的文章
+        // subTid = await db.SubscribeModel.getUserSubThreadsId(state.uid, "sub");
+        //获取用户收藏的文章的tid
+        subTid = await db.SubscribeModel.getUserSubTid(state.uid);
         break;
       }
       case 'forum': {
