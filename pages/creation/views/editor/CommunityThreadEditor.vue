@@ -28,3 +28,8 @@ export default {
   }
 };
 </script>
+<style>
+.m-b-2{
+  padding-left:0;
+}
+</style>

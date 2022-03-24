@@ -2,15 +2,15 @@
 .key-word
   .editor-header 关键词
     small （选填，最多可添加50个，当前已添加
-      span(v-if="keywordsLength <= 50") {{keywordsLength}}
-      b.warning(v-else) {{keywordsLength}}
-      |个）
+      span(v-if="keywordsLength <= 50") {{ keywordsLength }}
+      b.warning(v-else) {{ keywordsLength }}
+      | 个）
   .editor-keywords
     .editor-keyword(v-for="(k, index) in keyWordsCn")
-      span {{k}}
+      span {{ k }}
       .fa.fa-remove.p-l-05(@click="removeKeyword(index, keyWordsCn)")
     .editor-keyword(v-for="(k, index) in keyWordsEn")
-      span {{k}}
+      span {{ k }}
       .fa.fa-remove.p-l-05(@click="removeKeyword(index, keyWordsEn)")
     button.btn.btn-default.btn-sm(@click="addKeyword") 添加
 
@@ -19,32 +19,62 @@
       .modal-content
         .modal-header
           .fa.fa-remove(@click="close")
-          .modal-title {{title}}
-          .quote-content(v-if="quote") {{quote}}
+          .modal-title {{ title }}
+          .quote-content(v-if="quote") {{ quote }}
         .modal-body
           .form
             .form-group(v-for="(d, index) in data")
-              h5(v-if="d.label") {{d.label}}
+              h5(v-if="d.label") {{ d.label }}
               //- 数字input
-              input.form-control(v-if="d.dom === 'input' && d.type === 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model.number="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
+              input.form-control(
+                v-if="d.dom === 'input' && d.type === 'number' && d.type !== 'file'",
+                :type="d.type || 'text'",
+                v-model.number="d.value",
+                :placeholder="d.placeholder || ''",
+                @keyup.enter="submit"
+              )
               //- 非数字input
-              input.form-control(v-if="d.dom === 'input' && d.type !== 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
+              input.form-control(
+                v-if="d.dom === 'input' && d.type !== 'number' && d.type !== 'file'",
+                :type="d.type || 'text'",
+                v-model="d.value",
+                :placeholder="d.placeholder || ''",
+                @keyup.enter="submit"
+              )
               //- 文件input
-              input.form-control(v-if="d.dom === 'input' && d.type === 'file'" type="file" @change="pickedFile(index)" @keyup.enter="submit" :ref="'input' + index" :accept="d.accept")
+              input.form-control(
+                v-if="d.dom === 'input' && d.type === 'file'",
+                type="file",
+                @change="pickedFile(index)",
+                @keyup.enter="submit",
+                :ref="'input' + index",
+                :accept="d.accept"
+              )
               //- 文本框
-              textarea.form-control(v-if="d.dom === 'textarea'" v-model="d.value" :placeholder="d.placeholder || ''" :rows="d.rows || 4" @keyup.enter="!d.disabledKeyup?submit:';'" )
+              textarea.form-control(
+                v-if="d.dom === 'textarea'",
+                v-model="d.value",
+                :placeholder="d.placeholder || ''",
+                :rows="d.rows || 4",
+                @keyup.enter="!d.disabledKeyup ? submit : ';'"
+              )
               //- 单选
               .radio(v-if="d.dom === 'radio'")
                 label.m-r-05(v-for="r in d.radios")
-                  input(type="radio" :value="r.value" v-model="d.value")
-                  span {{r.name}}
+                  input(type="radio", :value="r.value", v-model="d.value")
+                  span {{ r.name }}
               .checkbox(v-if="d.dom === 'checkbox'")
                 label.m-r-05(v-for="r in d.checkboxes")
-                  input(type="checkbox" :value="r._id" name="checkboxes" v-model="d.value")
-                  span {{r.name}}
+                  input(
+                    type="checkbox",
+                    :value="r._id",
+                    name="checkboxes",
+                    v-model="d.value"
+                  )
+                  span {{ r.name }}
         .modal-footer
           .options-button
-            a(data-dismiss="modal" @click="close") 关闭
+            a(data-dismiss="modal", @click="close") 关闭
             a.active(@click="submit") 确定
 </template>
 
@@ -58,32 +88,32 @@ export default {
       {
         label: "中文，添加多个请以逗号分隔",
         dom: "textarea",
-        value: ""
+        value: "",
       },
       {
         label: "英文，添加多个请以逗号分隔",
         dom: "textarea",
-        value: ""
-      }
+        value: "",
+      },
     ],
     showModel: false,
     keyWordsCn: [], // 中文关键词
-    keyWordsEn: [] // 英文关键词
+    keyWordsEn: [], // 英文关键词
   }),
   props: {
     keywords: {
       type: Object,
       require: true,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
   watch: {
-    keywords(n, o){
-      this.$set(this.data[0],"value", n.cn && n.cn.join(",") || [])
-      this.$set(this.data[1],"value", n.en && n.en.join(",") || [])
+    keywords(n, o) {
+      this.$set(this.data[0], "value", (n.cn && n.cn.join(",")) || "");
+      this.$set(this.data[1], "value", (n.en && n.en.join(",")) || "");
       // this.data[0].value = n.cn && n.cn.join(",") || [];
       // this.data[1].value = n.en && n.en.join(",") || [];
-      this.submit()
+      this.submit();
     },
     // keywords: {
     //   immediate: true,
@@ -97,16 +127,18 @@ export default {
   methods: {
     close() {
       this.showModel = false;
-      this.data = [{
-        label: "中文，添加多个请以逗号分隔",
-        dom: "textarea",
-        value: ""
-      },
-      {
-        label: "英文，添加多个请以逗号分隔",
-        dom: "textarea",
-        value: ""
-      }];
+      this.data = [
+        {
+          label: "中文，添加多个请以逗号分隔",
+          dom: "textarea",
+          value: "",
+        },
+        {
+          label: "英文，添加多个请以逗号分隔",
+          dom: "textarea",
+          value: "",
+        },
+      ];
     },
     open() {
       this.showModel = true;
@@ -115,30 +147,40 @@ export default {
     submit() {
       this.keyWordsEn = [];
       this.keyWordsCn = [];
+
       let keywordCn = this.data[0].value;
+      console.log(keywordCn)
+      if (keywordCn) {
+        keywordCn = keywordCn.replace(/，/gi, ",");
+        let cnArr = keywordCn.split(",");
+        for (let i = 0; i < cnArr.length; i++) {
+          let cn = cnArr[i];
+          cn = cn.trim();
+          if (cn && this.keyWordsCn.indexOf(cn) === -1) {
+            this.keyWordsCn.push(cn);
+          }
+        }
+        if (!cnArr.length) return sweetError("请输入关键词");
+      }
+
       let keywordEn = this.data[1].value;
-      keywordCn = keywordCn.replace(/，/gi, ",");
-      keywordEn = keywordEn.replace(/，/gi, ",");
-      let cnArr = keywordCn.split(",");
-      let enArr = keywordEn.split(",");
-      for (let i = 0; i < cnArr.length; i++) {
-        let cn = cnArr[i];
-        cn = cn.trim();
-        if (cn && this.keyWordsCn.indexOf(cn) === -1) {
-          this.keyWordsCn.push(cn);
+      if (keywordEn) {
+        keywordEn = keywordEn.replace(/，/gi, ",");
+        let enArr = keywordEn.split(",");
+        for (let i = 0; i < enArr.length; i++) {
+          let en = enArr[i];
+          en = en.trim();
+          if (en && this.keyWordsEn.indexOf(en) === -1) {
+            this.keyWordsEn.push(en);
+          }
         }
+      if (!enArr.length) return sweetError("请输入关键词");
+
       }
-      for (let i = 0; i < enArr.length; i++) {
-        let en = enArr[i];
-        en = en.trim();
-        if (en && this.keyWordsEn.indexOf(en) === -1) {
-          this.keyWordsEn.push(en);
-        }
-      }
-      if (!cnArr.length && !enArr.length) return sweetError("请输入关键词");
+      
       this.close();
     },
-    pickedFile: function(index) {
+    pickedFile: function (index) {
       var dom = this.$refs["input" + index][0];
       this.data[index].value = dom.files[0];
     },
@@ -148,25 +190,25 @@ export default {
     addKeyword() {
       this.open();
     },
-    update() {
-    },
+    update() {},
     getData() {
       return {
         keyWordsEn: this.keyWordsEn,
-        keyWordsCn: this.keyWordsCn
+        keyWordsCn: this.keyWordsCn,
       };
-    }
+    },
   },
   computed: {
-    keywordsLength: function() {
+    keywordsLength: function () {
       return this.keyWordsEn.length + this.keyWordsCn.length;
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped lang="less">
-.modal-header, .modal-footer{
+.modal-header,
+.modal-footer {
   padding: 0;
 }
 
