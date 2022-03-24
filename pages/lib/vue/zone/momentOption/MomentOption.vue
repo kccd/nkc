@@ -114,13 +114,14 @@ export default {
       }
       const {left, top} = jqDOM.offset();
       if(direction === 'up') {
-        const position = {
+        return {
           top: top - domHeight,
-          left: left - domWidth + jqDOM.width(),
+          left: left + jqDOM.width() - domWidth,
         }
-        return position;
       } else {
         return {
+          // top: top + jqDOM.height() - domHeight,
+          // left: left + jqDOM.width() - domWidth,
           top: top + jqDOM.height() - domHeight,
           left: left + jqDOM.width() - domWidth,
         }
@@ -134,22 +135,24 @@ export default {
     })
   },
   updated() {
-    const dom = $(this.$el);
-    const content = $('#comment-content');
-    const {jqDOM, domHeight, domWidth, direction} = this;
-    let top = 0;
-    let left = 0;
-    if(content) {
-      top = (content.offset()).top;
-      left = (content.offset()).left;
-    }
-    if(direction === 'up') {
-      this.domHeight = dom.height() + top;
-      this.domWidth = dom.width() + left;
-    } else {
-      this.domHeight = top;
-      this.domWidth = dom.width() + left;
-    }
+    this.$nextTick(() => {
+      const dom = $(this.$el);
+      const content = $('#comment-content');
+      const {jqDOM, domHeight, domWidth, direction} = this;
+      let top = 0;
+      let left = 0;
+      if(content) {
+        top = (content.offset()).top;
+        left = (content.offset()).left;
+      }
+      if(direction === 'up') {
+        this.domHeight = dom.height() + top;
+        this.domWidth = dom.width() + left;
+      } else {
+        this.domHeight = dom.height() + top;
+        this.domWidth = dom.width() + left;
+      }
+    })
   },
   methods: {
     timeFormat: timeFormat,
