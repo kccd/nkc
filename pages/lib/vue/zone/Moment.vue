@@ -9,12 +9,13 @@
 
     moment-status(ref="momentStatus" :moment="momentData")
 
+
     .single-moment-top-container#comment-content
       moment-option(
         ref="momentOption"
         @complaint="complaint"
         @violation-record="violationRecord"
-        )
+      )
       .single-moment-left
         .single-moment-avatar(:data-float-uid="momentData.uid")
           img(:src="momentData.avatarUrl")

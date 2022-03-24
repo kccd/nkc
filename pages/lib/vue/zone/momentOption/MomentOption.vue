@@ -120,9 +120,7 @@ export default {
         }
       } else {
         return {
-          // top: top + jqDOM.height() - domHeight,
-          // left: left + jqDOM.width() - domWidth,
-          top: top + jqDOM.height() - domHeight,
+          top: jqDOM.height(),
           left: left + jqDOM.width() - domWidth,
         }
       }
@@ -135,24 +133,22 @@ export default {
     })
   },
   updated() {
-    this.$nextTick(() => {
-      const dom = $(this.$el);
-      const content = $('#comment-content');
-      const {jqDOM, domHeight, domWidth, direction} = this;
-      let top = 0;
-      let left = 0;
-      if(content) {
-        top = (content.offset()).top;
-        left = (content.offset()).left;
-      }
-      if(direction === 'up') {
-        this.domHeight = dom.height() + top;
-        this.domWidth = dom.width() + left;
-      } else {
-        this.domHeight = dom.height() + top;
-        this.domWidth = dom.width() + left;
-      }
-    })
+    const dom = $(this.$el);
+    const content = $('#comment-content');
+    const {jqDOM, domHeight, domWidth, direction} = this;
+    let top = 0;
+    let left = 0;
+    if(content) {
+      top = (content.offset()).top;
+      left = (content.offset()).left;
+    }
+    if(direction === 'up') {
+      this.domHeight = dom.height() + top;
+      this.domWidth = dom.width() + left;
+    } else {
+      this.domHeight = dom.height() + top;
+      this.domWidth = dom.width() + left;
+    }
   },
   methods: {
     timeFormat: timeFormat,
