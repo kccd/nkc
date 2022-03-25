@@ -20,9 +20,9 @@ if thread
           span=post.c
       .column-post-title
         if post && post.url
-          a(href=post.url + '?test=1')=firstPost.t
+          a(href=post.url)=firstPost.t
         else if article
-          a(href=article.url + '?test=1')=article.document.title
+          a(href=article.url)=article.document.title
         //a(href=tools.getUrl('columnPost', data.column._id, post.pid))=firstPost.t
       if type === "thread"
         .column-post-content= post.c

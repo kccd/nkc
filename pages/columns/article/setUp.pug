@@ -4,7 +4,8 @@ mixin setUp()
   +includeCSS('/columns/article/setUp.css')
   .set-up
     .col-xs-12.col-md-12
-      a.btn.btn-default.btn-sm(href=data.article.editorUrl) 编辑文章
+      if data.article.editorUrl
+        a.btn.btn-default.btn-sm(href=data.article.editorUrl) 编辑文章
       //
       //button.btn.btn-default.btn-sm#threadTop(onclick=`setTopped('')`) 专业置顶
       //

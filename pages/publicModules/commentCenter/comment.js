@@ -65,7 +65,7 @@ for(let i = 0;i < singleBottomDom.length;i++) {
         if(init === 'true') return;
         this.$refs.commentOptions.open({DOM: target, comment: data.comment, direction});
         //阻止事件冒泡到父级
-        event.stopPropagation();
+        // event.stopPropagation();
       },
       //查看违规记录
       violationRecord(uid) {

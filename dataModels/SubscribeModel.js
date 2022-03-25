@@ -761,16 +761,59 @@ schema.methods.cancelSubscribe = async function() {
 * @param {string} uid 需要查找收藏文章的用户uid
 * @return {array} 返回的用户收藏的文章的tid
 * */
-schema.statics.getUserSubTid = async function(uid) {
+schema.statics.getUserSubTid = async function(m) {
   const SubscribeModel = mongoose.model('subscribes');
-  const subs = await SubscribeModel.find({uid, cancel: false, $or: [
-    {type: 'article'}, {type: 'thread'}
-    ]}).sort({toc: -1});
+  const subs = await SubscribeModel.find(m).sort({toc: -1});
   const tidArr = [];
   for(const s of subs) {
     tidArr.push(s.tid);
   }
   return tidArr;
+}
+/*
+* 获取收藏的文章展示
+* */
+schema.statics.getCollectThreadOrArticle = async function(m, paging) {
+  const SubscribeModel = mongoose.model('subscribes');
+  const PostModel = mongoose.model('posts');
+  const ArticleModel = mongoose.model('articles');
+  const subs = await SubscribeModel.find(m)
+    .sort({toc: -1})
+    .skip(paging.start)
+    .limit(paging.perpage);
+  const tid = [];
+  const aid = [];
+  const articlesObj = {};
+  const postsObj = {};
+  const subsArr = [];
+  for(const s of subs) {
+    if(s.type === 'thread') tid.push(s.tid);
+    if(s.type === 'article') aid.push(s.tid);
+  }
+  const {normal} = await ArticleModel.getArticleStatus();
+  //查找论坛文章
+  let posts = await PostModel.find({tid: {$in: tid}, type: 'thread'});
+  posts = await PostModel.extendActivityPosts(posts);
+  //查找专栏文章
+  let articles = await ArticleModel.find({_id: {$in: aid}, status: normal});
+  articles = await ArticleModel.getArticlesInfo(articles);
+  for(const post of posts) {
+    postsObj[post.tid] = post;
+    if(postsObj[post.tid]) {
+      postsObj[post.tid].type = 'thread';
+    }
+  }
+  for(const article of articles) {
+    articlesObj[article._id] = article;
+    if(articlesObj[article._id]) {
+      articlesObj[article._id].type = 'article';
+    }
+  }
+  for(const s of subs) {
+    if(s.type === 'thread') subsArr.push(postsObj[s.tid]);
+    if(s.type === 'article') subsArr.push(articlesObj[s.tid]);
+  }
+  return subsArr;
 }
 
 module.exports = mongoose.model('subscribes', schema);
