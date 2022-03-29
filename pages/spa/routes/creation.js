@@ -57,7 +57,6 @@ export default [
     path: '/creation',
     component: Creation,
     children: [
-      {name: 'home', path: '/creation', component: Home},
       {name: 'materials', path: '/creation/materials', component: Materials},
       {name: 'material', path: '/creation/material/:id', component: Material},
       {name: 'books', path: '/creation/books', component: Books},

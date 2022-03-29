@@ -232,6 +232,9 @@ var Tools = function() {
       case 'zoneMoment': {
         return '/zone/m/' + id;
       }
+      case 'downloadApp': {
+        return '/app/' + id + '/' + size
+      }
     }
   };
   self.getAnonymousInfo = function() {
@@ -302,7 +305,7 @@ var Tools = function() {
     url = beforeUrl + nextUrl;
     return url;
   }
-  
+
   //获取当前用户的专栏信息
   self.getColumnInfo = function() {
     return nkcAPI('/column/getColumn', 'GET')
@@ -313,12 +316,12 @@ var Tools = function() {
         sweetError(err);
       });
   };
-  
+
   // pug渲染时藏数据，对应前端函数strToObj
   self.objToStr = function(obj) {
     return encodeURIComponent(JSON.stringify(obj));
   }
-  
+
   self.getSize = function(size, digits) {
     size = Number(size);
     if(digits === undefined) digits = 2;

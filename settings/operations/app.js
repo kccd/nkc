@@ -1,5 +1,8 @@
 module.exports = {
 	GET: 'visitAppDownload',
+  upgrade: {
+    GET: 'APPUpgrade',
+  },
 	location: {
 		GET: "selectLocation",
 	},

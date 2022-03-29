@@ -1,6 +1,7 @@
 import {sweetQuestion} from "./sweetAlert";
 import {getState} from "./state";
 import {fixUrl} from "./url";
+import {throttle} from "./execution";
 const state = getState();
 const isReactNative = state.isApp && state.platform === 'reactNative';
 
@@ -12,7 +13,13 @@ export function RNPostMessage(obj) {
   window.ReactNativeWebView.postMessage(JSON.stringify(obj));
 }
 
-export function RNEmit(type, data, callback) {
+/*
+* 立即向RN发送事件
+* @param {String} type 事件名
+* @param {Object} data 发送的数据
+* @param {Function} callback 回调函数
+* */
+export function RNEmitCore(type, data, callback) {
   if(!isReactNative) return;
   data = data || {};
   var index = reactNativeIndex ++;
@@ -23,6 +30,14 @@ export function RNEmit(type, data, callback) {
     webFunctionId: index
   });
 }
+
+/*
+* 立即向RN发送事件，但间隔时间最小为1000ms，小于1000ms内的调用将被忽略
+* @param {String} type 事件名
+* @param {Object} data 发送的数据
+* @param {Function} callback 回调函数
+* */
+export const RNEmit = throttle(RNEmitCore, 1000);
 
 export function RNOnMessage(res) {
   var webFunctionId = res.webFunctionId;
@@ -148,10 +163,10 @@ export function RNLogout() {
 }
 
 /*
-* RN检测版本号并更新
+* RN打开检查更新页面
 * */
-export function RNCheckAndUpdateApp() {
-  RNEmit('check_and_update_app');
+export function RNOpenUpgradePage() {
+  RNEmit('openUpgradePage');
 }
 
 /*
