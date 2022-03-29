@@ -15,6 +15,7 @@ export default [
   {
     name: routerName.user,
     path: '/u/:uid',
+    redirect: '/u/:uid/moment',
     component: User,
     children: [
       {

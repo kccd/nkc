@@ -3,9 +3,12 @@
   //- 用户左侧面板
   .col-sx-12.col-md-3.box-shadow-panel.p-r-0.p-l-0#get-left-user-info-list
     //- 用户链接
-    user-link(ref="userLink" :target-user="targetUser" :nav-links="navLinks")
+    .m-b-1
+      user-link(ref="userLink" :target-user="targetUser" :nav-links="navLinks")
     //用户关注
-    user-focus-on(ref="userFocusOn")
+    .m-b-1
+      user-focus-on(ref="userFocusOn")
+
   //- 用户中间面板 先hi用户的动态， 文章，恢复等信息
   .col-xs-12.col-md-7.box-shadow-panel.p-r-0
     user-card(ref="userCard")

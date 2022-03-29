@@ -31,7 +31,8 @@ const verifiedAssets = require("./verifiedAssets");
 const userHomeInfoRouter = require("./userHomeInfo");
 //获取用户卡片
 const userHomeCardRouter = require("./userHomeCard");
-
+//获取用户链接
+const navLinksRouter = require("./navLinks");
 
 const path = require('path');
 
@@ -113,4 +114,5 @@ userRouter
   .use("/:uid/verifiedAssets", verifiedAssets.routes(), verifiedAssets.allowedMethods())
   .use("/:uid/userHome", userHomeInfoRouter.routes(), userHomeInfoRouter.allowedMethods())
   .use("/:uid/userHomeCard", userHomeCardRouter.routes(), userHomeCardRouter.allowedMethods())
+  .use("/:uid/navLinks", navLinksRouter.routes(), navLinksRouter.allowedMethods())
 module.exports = userRouter;
