@@ -5,6 +5,23 @@ if remoteState.uid
   -windowData.selectTypesWhenSubscribe = remoteState.selectTypesWhenSubscribe;
   -windowData.refererOperationId = remoteState.operationId;
   -windowData.newMessageCount = remoteState.newMessageCount;
+  //- 关于 
+  -windowData.about = remoteState.serverSettings.links.info;
+  //- 应用
+  -windowData.app = remoteState.serverSettings.links.app;
+  //- 友情链接
+  -windowData.links = remoteState.serverSettings.links.other;
+  //- 其他
+  -windowData.telephone = remoteState.serverSettings.telephone;
+  //- github地址
+  -windowData.gitHub = remoteState.serverSettings.github;
+  //- 声明
+  -windowData.statement = remoteState.serverSettings.statement;
+  //- 版权
+  -windowData.copyright = remoteState.serverSettings.copyright;
+  //- 备案
+  -windowData.record = remoteState.serverSettings.record;
+  -windowData.appStableVersion = remoteState.appStableVersion;
 if remoteState.isApp
   -windowData.isApp = true;
   -windowData.appOS = remoteState.appOS;

@@ -4,6 +4,7 @@
     .col-sx-12.col-md-12
       Panel(ref="panel" :target-user="targetUser" v-if="targetUser")
       account-user(ref="accountUser" :target-user="targetUser" :nav-links="navLinks")
+      footer-vue(ref="footerVue")
 </template>
 
 <style lang="less" scoped>
@@ -17,6 +18,7 @@ import {nkcAPI} from "../../../lib/js/netAPI";
 import {getState} from "../../../lib/js/state";
 import Panel from "./userPanel/Panel";
 import AccountUser from "./userPanel/AccountUser";
+import Footer from "../../../lib/vue/publicVue/Footer/Footer.vue"
 export default {
   data:() => ({
     targetUser: null,
@@ -27,7 +29,8 @@ export default {
   }),
   components: {
     Panel: Panel,
-    "account-user": AccountUser
+    "account-user": AccountUser,
+    "footer-vue": Footer
   },
   created() {
     const {isApp} = getState();

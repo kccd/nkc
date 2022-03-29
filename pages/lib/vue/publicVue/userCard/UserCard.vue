@@ -36,10 +36,9 @@
             label
               input(type="checkbox" :value="post.pid" v-model="checkboxPosts")
           single-post(ref="singlePost" :post="post")
-    .user-list-item(v-else-if="['follow'].includes(t)")
-      .user-list-warning(v-if="!users || users.length === 0") 未关注任何用户
-      .user-follow
-        user-attention( ref="user-attention" :users="users")
+    .user-list-item(v-else-if="['follow', 'fans'].includes(t)")
+      .user-list-warning(v-if="!users || users.length === 0") {{t === 'fans' ? "还没有粉丝" : "还没有关注任何用户"}}
+      user-follow-and-fans(ref="userFollowAndFans" :users="users")
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
@@ -59,9 +58,11 @@ import Complaint from "../../Complaint";
 import ViolationRecord from "../../ViolationRecord";
 import Review from "../postReview/Review";
 import SinglePost from "../postModel/SinglePost";
-import UserAttention from "../userAttention/UserAttention"
+import UserFollowAndFans from "../userAttention/UserFollowAndFans"
 import Paging from "../../Paging";
 import ToColumn from "../toColumn/ToColumn";
+import { EventBus } from "../eventBus"
+
 export default {
   data:() => ({
     uid: '',
@@ -79,8 +80,8 @@ export default {
     "violation-record": ViolationRecord,
     "review": Review,
     "single-post": SinglePost,
-    // 关注
-    "user-attention": UserAttention,
+    // 关注 和 粉丝 
+    "user-follow-and-fans": UserFollowAndFans,
     "paging": Paging,
     "to-column": ToColumn
   },
@@ -93,6 +94,15 @@ export default {
     const {uid} = this.$route.params;
     this.uid = uid;
     this.getUserCardInfo();
+    // pageType 显示的页面类型。例如 动态 回复。 num 页码
+    EventBus.$on("updateData", ( pageType, num )=>{
+      switch( type ){
+        case "follow": 
+          this.getUserCardInfo( pageType, num );
+        default:
+          break
+      }
+    })
   },
   methods: {
     //获取用户卡片信息
@@ -176,6 +186,9 @@ export default {
     clickButton(num) {
       this.getUserCardInfo(this.t, num);
     }
+  },
+  destroyed(){
+    EventBus.$off();
   }
 }
 </script>

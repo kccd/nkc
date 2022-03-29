@@ -27,6 +27,15 @@ export function getState() {
     state.websiteCode = windowData.websiteCode;
     state.websiteName = windowData.websiteName;
     state.websiteBrief = windowData.websiteBrief;
+    state.about = windowData.about;
+    state.app = windowData.app;
+    state.links = windowData.links;
+    state.telephone = windowData.telephone;
+    state.gitHub = windowData.gitHub;
+    state.statement = windowData.statement;
+    state.copyright = windowData.copyright;
+    state.record = windowData.record;
+    state.appStableVersion = window.appStableVersion;
     return state;
   } catch(err) {
     console.error(`获取 state 数据失败`);

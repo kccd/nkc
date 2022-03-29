@@ -7,52 +7,74 @@
         a( :href="'/u/' + userData.uid" target="_blank") {{ userData.username }}
       .grade( title="等级" ) {{ userData.info.certsName }}
       .introduce( title="简介" ) {{ userData.description || "暂未填写个人简介"}}
-    .follow-button( title="取关" @click="cancelAttention( userData.uid )" ) 取关
+    .follow-button( title="取消关注" @click="subscribe( userData.uid )" ) {{ this.pageType === "follow" ? "取关" : "关注" }}
 </template>
 <script>
 import { getUrl } from "../../../js/tools";
-import { sweetError } from "../../../js/tools"
+import { sweetError } from "../../../js/tools";
+import { EventBus } from "../eventBus";
 export default {
-  data: ()=>({
+  data: () => ({
     userData: [],
+    pageType: ""
   }),
   props: {
-    "user" : {
+    user: {
       type: Object,
-      required: true,
+      required: true
     }
   },
   watch: {
-    "user": {
+    user: {
       immediate: true,
       handler(n) {
-        if(typeof n === 'undefined'){
-          console.error('user is undefined');
-          return
+        if (typeof n === "undefined") {
+          console.error("user is undefined");
+          return;
         }
         this.userData = n;
       }
     }
   },
+  created() {
+    if (typeof this.$route.params.pageType === "undefined") {
+      console.error("this.$route.params.pageType is undefined");
+      return;
+    }
+    this.pageType = this.$route.params.pageType;
+  },
   methods: {
-    cancelAttention(id) {
-      var method = "DELETE";
+    setButtonText() {
+      switch (this.$route.params.pageType) {
+        case "follow":
+          return "取关";
+        case "fans":
+          return "关注";
+        default:
+          return "";
+      }
+    },
+    subscribe(id) {
+      var method = this.pageType === "follow" ? "DELETE" : "POST";
       nkcAPI("/u/" + id + "/subscribe", method, { cid: [] })
-      .then( ()=>{
-        
-      })
-      .catch( ()=>{
-
-      });
+        .then(() => {
+          EventBus.$emit("updateData", "follow");
+        })
+        .catch(e => {
+          sweetError(e);
+        });
     },
     setUrl(avatar) {
-      return getUrl('userAvatar', avatar)
+      return getUrl("userAvatar", avatar);
     }
+  },
+  destroyed() {
+    EventBus.$off();
   }
-}
+};
 </script>
 <style scoped lang="less">
-.userInfo{
+.userInfo {
   height: 6rem;
   margin-bottom: 0.5rem;
   padding: 0.5rem;
@@ -60,22 +82,22 @@ export default {
   border: 1px solid #eee;
   /*display: -webkit-flex;*/
 }
-.userInfo .avatar{
+.userInfo .avatar {
   display: table-cell;
 }
-.userInfo .avatar img{
+.userInfo .avatar img {
   height: 5rem;
   border-radius: 3px;
   width: 5rem;
 }
-.userInfo .describe{
+.userInfo .describe {
   padding-left: 1rem;
   vertical-align: top;
   display: table-cell;
   /*flex-grow: 1;
   -webkit-flex: 1;*/
 }
-.userInfo .name{
+.userInfo .name {
   height: 1.6rem;
   font-size: 1.3rem;
   margin-right: 4rem;
@@ -85,10 +107,10 @@ export default {
   -webkit-line-clamp: 1;
   overflow: hidden;
 }
-.userInfo .follow-button{
+.userInfo .follow-button {
   height: 1.6rem;
   padding: 0 1rem;
-  line-height:1.6rem;
+  line-height: 1.6rem;
   position: absolute;
   right: 0.5rem;
   top: 0.5rem;
@@ -101,7 +123,7 @@ export default {
   float: right;
   font-size: 1rem;
 }
-.userInfo .grade{
+.userInfo .grade {
   font-size: 1rem;
   height: 1.4rem;
   color: #e85a71;
@@ -110,7 +132,7 @@ export default {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
 }
-.userInfo .introduce{
+.userInfo .introduce {
   height: 1.6rem;
   padding-top: 0.2rem;
   font-size: 1rem;

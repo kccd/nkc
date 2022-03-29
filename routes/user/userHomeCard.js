@@ -332,7 +332,7 @@ router
             if(!data.noPromission) {
                 const subs = await db.SubscribeModel.find(q, {uid: 1}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
                 data.users = await db.UserModel.find({uid: {$in: subs.map(s => s.uid)}});
-                await db.UserModel.extendUsersInfo(data.users);
+                data.users = await db.UserModel.extendUsersInfo(data.users);
             }
         }
         //排除封禁用户和名片被屏蔽的用户
