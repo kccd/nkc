@@ -1,7 +1,7 @@
 <template lang="pug">
   .post-panel.b-s-10
-    to-column(ref="toColumn")
     .paging-button
+<<<<<<< HEAD
       a.radius-left.button(@click="getUserCardInfo()" :class="!t?'active':''") 动态
       a.button(@click="getUserCardInfo('post')" :class="t === 'post'?'active':''") 回复
       a.button(@click="getUserCardInfo('thread')" :class="t === 'thread'?'active':''") 文章
@@ -39,20 +39,22 @@
     .user-list-item(v-else-if="['follow', 'fans'].includes(t)")
       .user-list-warning(v-if="!users || users.length === 0") {{t === 'fans' ? "还没有粉丝" : "还没有关注任何用户"}}
       user-follow-and-fans(ref="userFollowAndFans" :users="users")
+=======
+      a.radius-left.button(@click="toRoute('moment')" :class="t === 'moment'?'active':''") 动态
+      a.button(@click="toRoute('post')" :class="t === 'post'?'active':''") 回复
+      a.button(@click="toRoute('thread')" :class="t === 'thread'?'active':''") 文章
+      a.button(@click="toRoute('follow')" :class="t === 'follow' ? 'active' : ''") 关注
+      a.radius-right.button(@click="toRoute('fans')" :class="t === 'fans' ? 'active' : ''") 粉丝
+    .post-panel-item
+      router-view
+>>>>>>> 8b498f28c89a9575574a8e5d45ba90b92e31e4d1
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
-.checkbox {
-  display: inline-block;
-  min-width: 15px;
-  min-height: 15px;
-}
-.checkbox label{
-  min-height: 15px;
-}
 </style>
 <script>
 import {nkcAPI} from "../../../js/netAPI";
+<<<<<<< HEAD
 import Moments from "../../zone/Moments";
 import Complaint from "../../Complaint";
 import ViolationRecord from "../../ViolationRecord";
@@ -63,6 +65,9 @@ import Paging from "../../Paging";
 import ToColumn from "../toColumn/ToColumn";
 import { EventBus } from "../eventBus"
 
+=======
+import Paging from "../../Paging";
+>>>>>>> 8b498f28c89a9575574a8e5d45ba90b92e31e4d1
 export default {
   data:() => ({
     uid: '',
@@ -71,10 +76,9 @@ export default {
     posts: null,
     users: [],
     paging: null,
-    managementBtn: false,
-    checkboxPosts: [],
   }),
   components: {
+<<<<<<< HEAD
     "moments": Moments,
     "complaint": Complaint,
     "violation-record": ViolationRecord,
@@ -82,8 +86,9 @@ export default {
     "single-post": SinglePost,
     // 关注 和 粉丝 
     "user-follow-and-fans": UserFollowAndFans,
+=======
+>>>>>>> 8b498f28c89a9575574a8e5d45ba90b92e31e4d1
     "paging": Paging,
-    "to-column": ToColumn
   },
   computed: {
     pageButtons() {
@@ -91,8 +96,10 @@ export default {
     },
   },
   mounted() {
-    const {uid} = this.$route.params;
+    const {params, name} = this.$route;
+    const {uid} = params;
     this.uid = uid;
+<<<<<<< HEAD
     this.getUserCardInfo();
     // pageType 显示的页面类型。例如 动态 回复。 num 页码
     EventBus.$on("updateData", ( pageType, num )=>{
@@ -103,85 +110,19 @@ export default {
           break
       }
     })
+=======
+    this.t = name;
+>>>>>>> 8b498f28c89a9575574a8e5d45ba90b92e31e4d1
   },
   methods: {
-    //获取用户卡片信息
-    getUserCardInfo(type, page) {
-      const {uid} = this;
-      const self= this;
-      let url = `/u/${uid}/userHomeCard`;
-      if(type) {
-        url = url + `?t=${type}`
-      }
-      if(page) {
-        const index = url .indexOf('?');
-        if(index === -1) {
-          url = url + `?page=${page}`;
-        } else {
-          url = url + `&page=${page}`;
-        }
-      }
-      nkcAPI(url, "GET")
-      .then(res => {
-        self.t = res.t;
-        self.paging = res.paging;
-        self.momentsData = res.momentsData;
-        self.posts = res.posts;
-        //  关注的用户
-        self.users = res.users;
-      })
-      .catch(err => {
-        sweetError(err);
-      })
+    //跳转到指定路由
+    toRoute(name) {
+      this.t = name;
+      this.$router.push({
+        name
+      });
     },
-    //投诉或举报
-    complaint(mid) {
-      this.$refs.complaint.open('moment', mid);
-    },
-    //查看违规记录
-    violationRecord(uid) {
-      this.$refs.violationRecord.open({uid});
-    },
-    //post管理开关
-    managementPosts() {
-      this.managementBtn = !this.managementBtn;
-    },
-    //全选
-    selectAll() {
-      const {posts, checkboxPosts} = this;
-      const postIds = [];
-      for(const post of posts) {
-        postIds.push(post.pid);
-      }
-      if(checkboxPosts.length === postIds.length) {
-        this.checkboxPosts = [];
-      } else {
-        this.checkboxPosts = postIds;
-      }
-    },
-    //推送到专栏
-    toColumn() {
-      const self = this;
-      this.$refs.toColumn.open(function (data){
-        const categoriesId = data.categoriesId;
-        const columnId = data.columnId;
-        nkcAPI('/m/' + columnId + '/post', 'POST', {
-          categoriesId,
-          type: 'addToColumnsId',
-          postsId: self.checkboxPosts,
-        })
-        .then(() => {
-          sweetSuccess("操作成功");
-          self.checkboxPosts = [];
-          self.$refs.toColumn.close();
-        })
-        .catch(err => {
-          sweetError(err);
-        })
-      }, {
-        selectMul :true,
-      } );
-    },
+<<<<<<< HEAD
     //点击分页
     clickButton(num) {
       this.getUserCardInfo(this.t, num);
@@ -189,6 +130,8 @@ export default {
   },
   destroyed(){
     EventBus.$off();
+=======
+>>>>>>> 8b498f28c89a9575574a8e5d45ba90b92e31e4d1
   }
 }
 </script>

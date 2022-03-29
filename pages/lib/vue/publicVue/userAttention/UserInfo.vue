@@ -5,7 +5,7 @@
     .describe
       .name( title="姓名" )
         a( :href="'/u/' + userData.uid" target="_blank") {{ userData.username }}
-      .grade( title="等级" ) {{ userData.info.certsName }}
+      .grade( title="等级" ) {{ userData.info?userData.info.certsName:'' }}
       .introduce( title="简介" ) {{ userData.description || "暂未填写个人简介"}}
     .follow-button( title="取消关注" @click="subscribe( userData.uid )" ) {{ this.pageType === "follow" ? "取关" : "关注" }}
 </template>
@@ -57,12 +57,21 @@ export default {
     subscribe(id) {
       var method = this.pageType === "follow" ? "DELETE" : "POST";
       nkcAPI("/u/" + id + "/subscribe", method, { cid: [] })
+<<<<<<< HEAD
         .then(() => {
           EventBus.$emit("updateData", "follow");
         })
         .catch(e => {
           sweetError(e);
         });
+=======
+      .then( ()=>{
+
+      })
+      .catch( ()=>{
+
+      });
+>>>>>>> 8b498f28c89a9575574a8e5d45ba90b92e31e4d1
     },
     setUrl(avatar) {
       return getUrl("userAvatar", avatar);

@@ -1,0 +1,147 @@
+<template lang="pug">
+  .user-post-list
+    to-column(ref="toColumn")
+    .user-list-warning(v-if="!posts || posts.length === 0") 用户貌似未发表过任何内容
+    .user-post-list
+      paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
+      .paging-button(v-if="routeName === 'thread'" )
+        a.pointer.button.radius-left.radius-right(@click="managementPosts()") 管理
+        span.post-management-button
+          a.pointer.button(@click="selectAll()") 全选
+          a.pointer.button.radius-right(@click="toColumn()") 推送到专栏
+      .post-item(v-for="(post, index) in posts")
+        hr(v-if="index")
+        review(ref="review" :post="post" v-if="!post.reviewed")
+        .thread-draft-info(v-else-if="post.draft") 退修中，仅自己可见，修改后对所有人可见
+        .thread-disabled-info(v-else-if="post.disabled" ) 已屏蔽，仅自己可见
+        .checkbox(v-if="managementBtn" )
+          label
+            input(type="checkbox" :value="post.pid" v-model="checkboxPosts")
+        single-post(ref="singlePost" :post="post")
+</template>
+<style lang="less">
+@import "../../../../publicModules/base";
+.checkbox {
+  display: inline-block;
+  min-width: 15px;
+  min-height: 15px;
+}
+.checkbox label{
+  min-height: 15px;
+}
+</style>
+<script>
+import Review from "../postReview/Review";
+import SinglePost from "../postModel/SinglePost";
+import Paging from "../../Paging";
+import ToColumn from "../toColumn/ToColumn";
+import {nkcAPI} from "../../../js/netAPI";
+export default {
+  data: () => ({
+    posts: [],
+    paging: {},
+    uid: null,
+    routeName: null,
+    managementBtn: false,
+    checkboxPosts: [],
+  }),
+  components: {
+    "review": Review,
+    "single-post": SinglePost,
+    "paging": Paging,
+    "to-column": ToColumn
+  },
+  computed: {
+    pageButtons() {
+      return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
+    },
+  },
+  watch: {
+    '$route.name': function (newVal, oldVal){
+      if(newVal) this.initData();
+    }
+  },
+  mounted() {
+    this.initData();
+  },
+  methods: {
+    initData() {
+      const {name, params} = this.$route;
+      this.routeName = name;
+      const {uid} = params;
+      this.uid = uid;
+      this.getUserCardInfo(name, 0);
+    },
+    //获取用户卡片信息
+    getUserCardInfo(type, page) {
+      const {uid} = this;
+      const self= this;
+      let url = `/u/${uid}/userHomeCard`;
+      if(type) {
+        url = url + `?t=${type}`
+      }
+      if(page) {
+        const index = url .indexOf('?');
+        if(index === -1) {
+          url = url + `?page=${page}`;
+        } else {
+          url = url + `&page=${page}`;
+        }
+      }
+      nkcAPI(url, "GET")
+        .then(res => {
+          self.t = res.t;
+          self.paging = res.paging;
+          self.posts = res.posts;
+        })
+        .catch(err => {
+          sweetError(err);
+        })
+    },
+    //post管理开关
+    managementPosts() {
+      this.managementBtn = !this.managementBtn;
+    },
+    //全选
+    selectAll() {
+      const {posts, checkboxPosts} = this;
+      const postIds = [];
+      for(const post of posts) {
+        postIds.push(post.pid);
+      }
+      if(checkboxPosts.length === postIds.length) {
+        this.checkboxPosts = [];
+      } else {
+        this.checkboxPosts = postIds;
+      }
+    },
+    //推送到专栏
+    toColumn() {
+      const self = this;
+      this.$refs.toColumn.open(function (data){
+        const categoriesId = data.categoriesId;
+        const columnId = data.columnId;
+        nkcAPI('/m/' + columnId + '/post', 'POST', {
+          categoriesId,
+          type: 'addToColumnsId',
+          postsId: self.checkboxPosts,
+        })
+          .then(() => {
+            sweetSuccess("操作成功");
+            self.checkboxPosts = [];
+            self.$refs.toColumn.close();
+          })
+          .catch(err => {
+            sweetError(err);
+          })
+      }, {
+        selectMul :true,
+      } );
+    },
+    //点击分页
+    clickButton(num) {
+      this.getUserCardInfo(this.routeName, num);
+    }
+  }
+}
+</script>
