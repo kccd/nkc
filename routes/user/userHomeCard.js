@@ -320,7 +320,7 @@ router
             if(!data.noPromission) {
                 const subs = await db.SubscribeModel.find(q, {tUid: 1}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
                 data.users = await db.UserModel.find({uid: {$in: subs.map(s => s.tUid)}});
-                await db.UserModel.extendUsersInfo(data.users);
+                data.users = await db.UserModel.extendUsersInfo(data.users)
             }
         } else {
             const q = {

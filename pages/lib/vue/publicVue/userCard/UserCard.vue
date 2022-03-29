@@ -30,6 +30,10 @@
           .thread-draft-info(v-else-if="post.draft") 退修中，仅自己可见，修改后对所有人可见
           .thread-disabled-info(v-else-if="post.disabled" ) 已屏蔽，仅自己可见
           single-post(ref="singlePost" :post="post")
+    .user-list-item(v-else-if="['follow'].includes(t)")
+      .user-list-warning(v-if="!users || users.length === 0") 未关注任何用户
+      .user-follow
+        user-attention( ref="user-attention" :users="users")
 </template>
 <style lang="less">
 @import "../../../../publicModules/base";
@@ -41,19 +45,23 @@ import Complaint from "../../Complaint";
 import ViolationRecord from "../../ViolationRecord";
 import Review from "../postReview/Review";
 import SinglePost from "../postModel/SinglePost";
+import UserAttention from "../userAttention/UserAttention"
 export default {
   data:() => ({
     uid: '',
     t: null,
     momentsData: null,
     posts: null,
+    users: [],
   }),
   components: {
     "moments": Moments,
     "complaint": Complaint,
     "violation-record": ViolationRecord,
     "review": Review,
-    "single-post": SinglePost
+    "single-post": SinglePost,
+    // 关注
+    "user-attention": UserAttention
   },
   mounted() {
     const {uid} = this.$route.params;
@@ -75,6 +83,8 @@ export default {
         self.t = res.t;
         self.momentsData = res.momentsData;
         self.posts = res.posts;
+        //  关注的用户
+        self.users = res.users;
       })
       .catch(err => {
         sweetError(err);
