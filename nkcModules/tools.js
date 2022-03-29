@@ -308,15 +308,13 @@ var Tools = function() {
   
   //获取当前用户的专栏信息
   self.getColumnInfo = function() {
-    let column;
-    nkcAPI('/column/getColumn', 'GET')
+   return nkcAPI('/column/getColumn', 'GET')
       .then((res) => {
-        column = res.column;
+        return res.column;
       })
       .catch((err) => {
         sweetError(err);
       });
-    return column;
   };
   
   // pug渲染时藏数据，对应前端函数strToObj

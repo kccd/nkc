@@ -10,7 +10,6 @@ router
     const {nkcRender} = nkcModules;
     const {pageSettings} = state;
     const {t, page=0, from} = query;
-    console.log('t', t);
     data.t = t;
     const targetUser = await db.UserModel.findOnly({uid});
     //如果未登录
