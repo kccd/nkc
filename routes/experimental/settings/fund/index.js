@@ -65,15 +65,15 @@ router
 
     const {enabled, min, max, defaultMoney, payment} = donation;
     const {aliPay, wechatPay} = payment;
-    checkNumber(min, {
+    checkNumber(min / 100, {
       name: '单笔赞助最小金额',
       min: 1,
-      max: 500000,
+      max: 10000,
     });
-    checkNumber(max, {
+    checkNumber(max / 100, {
       name: '单笔赞助最大金额',
       min: 1,
-      max: 500000,
+      max: 10000,
     });
     if(min > max) {
       ctx.throw(400, `单笔赞助最小金额不能大于最大金额`);
