@@ -77,11 +77,11 @@ block eContent
             label.control-label.col-sm-2 金额
             .col-sm-6
               .form-inline
-                h5 单笔赞助最小金额（元，精确到 0.01，不超过 5000）
+                h5 单笔赞助最小金额（元，精确到 0.01，不超过 10000）
                 input.form-control(type='text' v-model.number='fundSettings.donation.min')
-                h5 单笔赞助最大金额（元，精确到 0.01，不超过 5000）
+                h5 单笔赞助最大金额（元，精确到 0.01，不超过 10000）
                 input.form-control(type='text' v-model.number='fundSettings.donation.max')
-              h5 预设金额（逗号分隔，元，精确到 0.01，不超过 5000）
+              h5 预设金额（逗号分隔，元，精确到 0.01，不超过 10000）
               textarea.form-control(rows=2 v-model='defaultMoney')
           .form-group
             label.control-label.col-sm-2 支付方式
