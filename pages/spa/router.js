@@ -1,12 +1,12 @@
 import creationRoutes from './routes/creation';
-
+import userRouter from './routes/user';
 const routes = [
-  ...creationRoutes
+  ...creationRoutes,
+  ...userRouter
 ];
 
 
 // 防止路由重复点击报错
-
 const originalPush = VueRouter.prototype.push;
 const originalReplace = VueRouter.prototype.replace;
 VueRouter.prototype.push = function push(location) {

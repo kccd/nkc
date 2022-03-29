@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import userScore from "./uerScoresVue";
+import userScore from "./userScoresVue";
 export default {
   props: ["remote"],
   data: () => ({
