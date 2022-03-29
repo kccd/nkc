@@ -1,5 +1,5 @@
 import User from '../views/user/user';
-import UserAttention from "../../lib/vue/publicVue/userCard/UserAttention";
+import UserFollowAndFans from "../../lib/vue/publicVue/userFollowAndFans/UserFollowAndFans";
 import UserMoment from "../../lib/vue/publicVue/userCard/UserMoment";
 import UserPostList from "../../lib/vue/publicVue/userCard/UserPostList";
 export const routerName = {
@@ -35,12 +35,14 @@ export default [
       {
         name: routerName.follow,
         path: '/u/:uid/follow',
-        component: UserAttention,
+        component: UserFollowAndFans,
+        props: { pageType: "follow" }
       },
       {
         name: routerName.fans,
         path: '/u/:uid/fans',
-        component: UserAttention,
+        component: UserFollowAndFans,
+        props: { pageType: "fans" }
       }
     ]
   }

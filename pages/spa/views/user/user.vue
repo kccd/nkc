@@ -18,7 +18,7 @@ import {nkcAPI} from "../../../lib/js/netAPI";
 import {getState} from "../../../lib/js/state";
 import Panel from "./userPanel/Panel";
 import AccountUser from "./userPanel/AccountUser";
-import Footer from "../../../lib/vue/publicVue/Footer/Footer.vue"
+import Footer from "../../../lib/vue/publicVue/Footer/Footer"
 export default {
   data:() => ({
     targetUser: null,

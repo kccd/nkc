@@ -7,20 +7,23 @@
         a( :href="'/u/' + userData.uid" target="_blank") {{ userData.username }}
       .grade( title="等级" ) {{ userData.info?userData.info.certsName:'' }}
       .introduce( title="简介" ) {{ userData.description || "暂未填写个人简介"}}
-    .follow-button( title="取消关注" @click="subscribe( userData.uid )" ) {{ this.pageType === "follow" ? "取关" : "关注" }}
+    .follow-button( title="取消关注" @click="subscribe( userData.uid )" ) {{ type === "follow" ? "取关" : "关注" }}
 </template>
 <script>
 import { getUrl } from "../../../js/tools";
 import { sweetError } from "../../../js/tools";
-import { EventBus } from "../eventBus";
 export default {
   data: () => ({
     userData: [],
-    pageType: ""
+    type: ""
   }),
   props: {
     user: {
       type: Object,
+      required: true
+    },
+    pageType: {
+      type: String,
       required: true
     }
   },
@@ -34,52 +37,39 @@ export default {
         }
         this.userData = n;
       }
-    }
-  },
-  created() {
-    if (typeof this.$route.params.pageType === "undefined") {
-      console.error("this.$route.params.pageType is undefined");
-      return;
-    }
-    this.pageType = this.$route.params.pageType;
-  },
-  methods: {
-    setButtonText() {
-      switch (this.$route.params.pageType) {
-        case "follow":
-          return "取关";
-        case "fans":
-          return "关注";
-        default:
-          return "";
-      }
     },
+    pageType: {
+      immediate: true,
+      handler(n) {
+        if (typeof n === "undefined") {
+          console.error("pageType is undefined");
+          return;
+        }
+        this.type = n;
+      }
+    }
+  },
+  created() {},
+  methods: {
+    // setBtnText(){
+    //   if ( this.type === "follow" ){
+    //     return "取关"
+    //   }else if (this.type === "fans"){}
+    // },
     subscribe(id) {
-      var method = this.pageType === "follow" ? "DELETE" : "POST";
+      var method = this.type === "follow" ? "DELETE" : "POST";
       nkcAPI("/u/" + id + "/subscribe", method, { cid: [] })
-<<<<<<< HEAD
         .then(() => {
-          EventBus.$emit("updateData", "follow");
+          this.$parent.getUserCardInfo()
         })
         .catch(e => {
           sweetError(e);
         });
-=======
-      .then( ()=>{
-
-      })
-      .catch( ()=>{
-
-      });
->>>>>>> 8b498f28c89a9575574a8e5d45ba90b92e31e4d1
     },
     setUrl(avatar) {
       return getUrl("userAvatar", avatar);
     }
   },
-  destroyed() {
-    EventBus.$off();
-  }
 };
 </script>
 <style scoped lang="less">
