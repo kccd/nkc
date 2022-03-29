@@ -1,7 +1,7 @@
 <template lang="pug">
 .user-account
   //用户左侧面板
-  .col-sx-12.col-md-3.box-shadow-panel#get-left-user-info-list
+  .col-sx-12.col-md-3.box-shadow-panel.p-r-0.p-l-0#get-left-user-info-list
     .account-user-links
       .account-user-links(v-if="targetUser")
         a(:href="`/u/${targetUser.uid}`" target='_blank').col-xs-6.account-user-link

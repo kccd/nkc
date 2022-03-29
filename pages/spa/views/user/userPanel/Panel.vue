@@ -1,5 +1,5 @@
 <template lang="pug">
-  .user-panel.m-b-1
+  .user-banner.m-b-1
     .hidden-user-home-tip(v-if="targetUser && targetUser.hidden" )
       span 用户名片已被屏蔽
       //用户名片
@@ -23,7 +23,7 @@
 
 <style lang="less">
 @import "../../../../publicModules/base";
-.user-panel {
+.user-banner {
   height: 13rem;
   .hidden-user-home-tip {
   }
