@@ -1,5 +1,5 @@
 <template lang="pug">
-  .account-user-links
+  .account-user-links(v-cloak)
     .account-user-links(v-if="targetUser")
       a(:href="`/u/${targetUser.uid}`" target='_blank').col-xs-6.account-user-link
         .fa.fa-user-circle-o
@@ -25,13 +25,7 @@
       a(href=`/creation` target="_blank").col-xs-6.account-user-link
         .fa.fa-lightbulb-o
         | 创作中心
-    .account-url(v-if="navLink" v-for="navLink in navLinks")
-      .account-name(v-if="navLink.name") {{navLink.name}}
-      .account-lis
-        a.acocunt-li(v-for="link in navLink.links" :href="link.url" :class="{'active': link.type===type}")
-          .name {{link.name}}
-            span {{link.count || ''}}
-          .fa.fa-angle-right
+
 </template>
 <style lang="less">
 @import "../../../../publicModules/base";
@@ -68,11 +62,18 @@
 }
 </style>
 <script>
+import {getColumnInfo} from "../../../../lib/js/tools";
 export default {
   props: ['target-user', 'nav-links'],
   data: () => ({
     targetColumn: null,
   }),
+  mounted() {
+    getColumnInfo()
+    .then(res => {
+      this.targetColumn = res.userColumn;
+    })
+  },
   methods: {
 
   }

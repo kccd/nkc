@@ -43,11 +43,12 @@ export default {
     //获取用户主页信息
     getUserInfo() {
       const self = this;
-      nkcAPI(`/u/${this.uid}`, 'GET')
+      nkcAPI(`/u/${this.uid}/userHome`, 'GET')
       .then(res => {
+        console.log('res', res);
         self.t = res.t;
+        self.navLinks = res.navLinks;
         self.targetUser = res.targetUser;
-        console.log(res.targetUser);
       })
       .catch(err => {
         sweetError(err);

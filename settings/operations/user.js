@@ -2,8 +2,11 @@ module.exports = {
 	GET: 'searchUser',
 	PARAMETER: {
 		GET: 'visitUserCard',
-		userHomeInfo: {
+		userHome: {
 			GET: "getUserHomeInfo"
+		},
+		navLinks: {
+			GET: "getUserHomeInfo",
 		},
 		userHomeCard: {
 			GET: "getUserHomeCard"
