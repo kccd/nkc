@@ -5,7 +5,7 @@
     .describe
       .name( title="姓名" )
         a( :href="'/u/' + userData.uid" target="_blank") {{ userData.username }}
-      .grade( title="等级" ) {{ userData.info.certsName }}
+      .grade( title="等级" ) {{ userData.info?userData.info.certsName:'' }}
       .introduce( title="简介" ) {{ userData.description || "暂未填写个人简介"}}
     .follow-button( title="取关" @click="cancelAttention( userData.uid )" ) 取关
 </template>
@@ -39,7 +39,7 @@ export default {
       var method = "DELETE";
       nkcAPI("/u/" + id + "/subscribe", method, { cid: [] })
       .then( ()=>{
-        
+
       })
       .catch( ()=>{
 

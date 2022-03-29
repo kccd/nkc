@@ -1,8 +1,8 @@
 <template lang="pug">
-  .user-attention  
-    //- user-info 数组中的一个用户对象 
+  .user-attention
+    //- user-info 数组中的一个用户对象
     .col-xs-12.col-md-6(v-for="user in usersInfo")
-      user-info( :key="user.uid" :user="user" )
+      user-info( :key="user.uid" :user="user || {}" )
 </template>
 
 <script>
@@ -15,7 +15,7 @@ export default {
     usersInfo: []
   }),
   props: {
-    users: {
+    'users': {
       type: Array,
       required: true
     }
