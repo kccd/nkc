@@ -856,5 +856,7 @@
   "collectionArticle": "收藏文章",
   "deleteMoment": "删除动态",
   "getMomentOption": "获取动态操作权限",
-  "getMomentIpInfo": "获取动态的ip信息"
+  "getMomentIpInfo": "获取动态的ip信息",
+  "getUserHomeInfo": "获取用户个人主页信息",
+  "getUserHomeCard": "获取用户主页卡片内容列表"
 }

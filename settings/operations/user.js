@@ -2,6 +2,12 @@ module.exports = {
 	GET: 'searchUser',
 	PARAMETER: {
 		GET: 'visitUserCard',
+		userHomeInfo: {
+			GET: "getUserHomeInfo"
+		},
+		userHomeCard: {
+			GET: "getUserHomeCard"
+		},
 		verifiedAssets: {
 			PARAMETER: {
 				GET: "visitVerifiedUpload"

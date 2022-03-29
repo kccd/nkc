@@ -939,6 +939,7 @@ userSchema.methods.extendDraftCount = async function() {
   return this.draftCount = await mongoose.model("drafts").countDocuments({uid: this.uid});
 };
 
+
 userSchema.methods.extendGrade = async function() {
 	const UsersGradeModel = mongoose.model('usersGrades');
 	if(!this.score || this.score < 0) {
