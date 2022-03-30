@@ -25,7 +25,7 @@
       a(href=`/creation` target="_blank").col-xs-6.account-user-link
         .fa.fa-lightbulb-o
         | 创作中心
-
+    nav-links(ref="navLinks" :nav-links="navLinks")
 </template>
 <style lang="less">
 @import "../../../../publicModules/base";
@@ -62,12 +62,16 @@
 }
 </style>
 <script>
+import NavLinks from "./NavLinks";
 import {getColumnInfo} from "../../../../lib/js/tools";
 export default {
   props: ['target-user', 'nav-links'],
   data: () => ({
     targetColumn: null,
   }),
+  components: {
+    "nav-links": NavLinks
+  },
   mounted() {
     getColumnInfo()
     .then(res => {

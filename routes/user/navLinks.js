@@ -6,7 +6,18 @@ router
   //获取用户个人主页链接
   const {db, data, state, params} = ctx;
   const {uid} = params;
-  const {targetUid} = state;
+  const {targetUser} = data;
+  const {
+    threadCount,
+    postCount,
+    draftCount,
+  } = targetUser;
+  const noteCount = await db.NoteContentModel.countDocuments({
+    uid: targetUser.uid,
+    deleted: false,
+  });
+  console.log('noteCount', noteCount);
+  const {uid: targetUid} = state;
   if(uid !== targetUid) ctx.throw(401, '权限不足');
   if(state.isApp) {
     data.appLinks = [

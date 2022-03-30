@@ -1,24 +1,25 @@
 <template lang="pug">
   .user-banner.m-b-1
-    .hidden-user-home-tip(v-if="targetUser && targetUser.hidden" )
-      span 用户名片已被屏蔽
-      //用户名片
-    .account-nav(v-if="targetUser" )
-      //用户banner
-      .account-user-banner-container
-        .account-user-banner
-          a(:href="getUrl('userBanner', targetUser.banner)")
-            img(:src="getUrl('userBanner', targetUser.banner)")
-        .account-user-info
-          .account-user-avatar
-            a(:href="getUrl('userAvatar', targetUser.avatar, 'lg')" target="_blank").user-avatar
-              img(:src="getUrl('userAvatar', targetUser.avatar)")
-          .account-user-name {{targetUser.username}}
-            user-level(ref="userLevel" :target-user="targetUser")
-          .account-user-certs {{targetUser.info.certsName}}
-          .account-user-description {{targetUser.description}}
-          .account-user-kcb
-            user-scores(ref="userScore")
+    .row
+      .hidden-user-home-tip(v-if="targetUser && targetUser.hidden" )
+        span 用户名片已被屏蔽
+        //用户名片
+      .account-nav(v-if="targetUser" )
+        //用户banner
+        .account-user-banner-container
+          .account-user-banner
+            a(:href="getUrl('userBanner', targetUser.banner)")
+              img(:src="getUrl('userBanner', targetUser.banner)")
+          .account-user-info
+            .account-user-avatar
+              a(:href="getUrl('userAvatar', targetUser.avatar, 'lg')" target="_blank").user-avatar
+                img(:src="getUrl('userAvatar', targetUser.avatar)")
+            .account-user-name {{targetUser.username}}
+              user-level(ref="userLevel" :target-user="targetUser")
+            .account-user-certs {{targetUser.info.certsName}}
+            .account-user-description {{targetUser.description}}
+            .account-user-kcb
+              user-scores(ref="userScore")
 </template>
 
 <style lang="less">
