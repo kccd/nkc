@@ -1,6 +1,23 @@
 module.exports = {
 	GET: 'searchUser',
 	PARAMETER: {
+		content: {
+			moment: {
+				GET: "getUserHomeCard"
+			},
+			post: {
+				GET: "getUserHomeCard"
+			},
+			thread: {
+				GET: "getUserHomeCard"
+			},
+			follow: {
+				GET: "getUserHomeCard",
+			},
+			fans: {
+				GET: "getUserHomeCard",
+			},
+		},
 		GET: 'visitUserCard',
 		userHome: {
 			GET: "getUserHomeInfo"
@@ -21,10 +38,10 @@ module.exports = {
 			GET: "getUserHomeCard"
 		},
 		follow: {
-			GET: "getUserHomeCard"
+			GET: "getUserHomeCard",
 		},
 		fans: {
-			GET: "getUserHomeCard"
+			GET: "getUserHomeCard",
 		},
 		verifiedAssets: {
 			PARAMETER: {

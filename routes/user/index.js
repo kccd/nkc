@@ -33,6 +33,8 @@ const userHomeInfoRouter = require("./userHomeInfo");
 const userHomeCardRouter = require("./userHomeCard");
 //获取用户链接
 const navLinksRouter = require("./navLinks");
+// 请求内容
+const contentRouter = require("./content");
 
 const path = require('path');
 
@@ -115,4 +117,5 @@ userRouter
   .use("/:uid/userHome", userHomeInfoRouter.routes(), userHomeInfoRouter.allowedMethods())
   .use("/:uid/userHomeCard", userHomeCardRouter.routes(), userHomeCardRouter.allowedMethods())
   .use("/:uid/navLinks", navLinksRouter.routes(), navLinksRouter.allowedMethods())
+  .use("/:uid/content", contentRouter.routes(), contentRouter.allowedMethods())
 module.exports = userRouter;

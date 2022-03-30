@@ -36,7 +36,8 @@ export default {
   methods: {
     getUserCardInfo(page) {
       const uid = this.$route.params.uid;
-      let url = `/u/${uid}/userHomeCard?t=${this.type}`;
+      // let url = `/u/${uid}/userHomeCard?t=${this.type}`;
+      let url = `/u/${uid}/content/${this.type}`;
       if (page) {
         const index = url.indexOf("?");
         if (index === -1) {
