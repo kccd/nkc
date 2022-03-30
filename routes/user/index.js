@@ -83,6 +83,7 @@ userRouter
     await next();
   })
   .get(['/:uid', '/:uid/moment', '/:uid/post', '/:uid/thread', '/:uid/follow', '/:uid/fans'], async (ctx, next) => {
+    
     //访问用户个人主页
     ctx.template = 'vueRoot/index.pug';
     // ctx.template = "user/user.pug";

@@ -76,9 +76,11 @@ export default {
     getUserCardInfo(type, page) {
       const {uid} = this;
       const self= this;
-      let url = `/u/${uid}/userHomeCard`;
+      // let url = `/u/${uid}/userHomeCard`;
+      let url = `/u/${uid}/content`;
       if(type) {
-        url = url + `?t=${type}`
+        // url = url + `?t=${type}`
+        url = url + `/${type}`
       }
       if(page) {
         const index = url .indexOf('?');

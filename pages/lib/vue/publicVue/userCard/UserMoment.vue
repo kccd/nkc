@@ -51,7 +51,8 @@ export default {
     getUserCardInfo(type, page) {
       const {uid} = this;
       const self= this;
-      let url = `/u/${uid}/userHomeCard`;
+      // let url = `/u/${uid}/userHomeCard`;
+      let url = `/u/${uid}/content/moment`;
       if(type) {
         url = url + `?t=${type}`
       }
