@@ -82,8 +82,7 @@ userRouter
     }
     await next();
   })
-  .get(['/:uid', '/:uid/moment', '/:uid/post', '/:uid/thread', '/:uid/follow', '/:uid/fans'], async (ctx, next) => {
-    
+  .get(['/:uid', '/:uid/content/moment', '/:uid/content/post', '/:uid/content/thread', '/:uid/content/follow', '/:uid/content/fans', '/:uid/s/thread', '/:uid/s/column', '/:uid/s/user', '/:uid/s/forum'], async (ctx, next) => {
     //访问用户个人主页
     ctx.template = 'vueRoot/index.pug';
     // ctx.template = "user/user.pug";

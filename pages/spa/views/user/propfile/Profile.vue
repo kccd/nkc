@@ -13,7 +13,6 @@
 @import "../../../../publicModules/base";
 </style>
 <script>
-import Paging from "../../Paging";
 export default {
   data:() => ({
     uid: '',
@@ -24,7 +23,6 @@ export default {
     paging: null,
   }),
   components: {
-    "paging": Paging,
   },
   computed: {
     pageButtons() {

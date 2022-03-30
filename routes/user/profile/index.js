@@ -136,100 +136,101 @@ router
       });
     } else {
       data.navLinks = [
-        {
-          name: "",
-          links: [
-            {
-              type: "",
-              url: `/u/${targetUser.uid}/profile`,
-              name: "数据概览",
-              count: 0
-            }
-          ]
-        },
-        {
-          name: "我的作品",
-          links: [
-            {
-              type: "thread",
-              url: `/u/${targetUser.uid}/profile/thread`,
-              name: "我的文章",
-              count: threadCount
-            },
-            {
-              type: "post",
-              url: `/u/${targetUser.uid}/profile/post`,
-              name: "我的回复",
-              count: postCount
-            },
-            {
-              type: "draft",
-              url: `/u/${targetUser.uid}/profile/draft`,
-              name: "我的草稿",
-              count: draftCount
-            },
-            {
-              type: "note",
-              url: `/u/${targetUser.uid}/profile/note`,
-              name: "我的笔记",
-              count: noteCount
-            }
-          ]
-        },
+        // {
+        //   name: "",
+        //   links: [
+        //     {
+        //       type: "",
+        //       url: `/u/${targetUser.uid}/profile`,
+        //       name: "数据概览",
+        //       count: 0
+        //     }
+        //   ]
+        // },
+        // {
+        //   name: "我的作品",
+        //   links: [
+        //     {
+        //       type: "thread",
+        //       url: `/u/${targetUser.uid}/profile/thread`,
+        //       name: "我的文章",
+        //       count: threadCount
+        //     },
+        //     {
+        //       type: "post",
+        //       url: `/u/${targetUser.uid}/profile/post`,
+        //       name: "我的回复",
+        //       count: postCount
+        //     },
+        //     {
+        //       type: "draft",
+        //       url: `/u/${targetUser.uid}/profile/draft`,
+        //       name: "我的草稿",
+        //       count: draftCount
+        //     },
+        //     {
+        //       type: "note",
+        //       url: `/u/${targetUser.uid}/profile/note`,
+        //       name: "我的笔记",
+        //       count: noteCount
+        //     }
+        //   ]
+        // },
         {
           name: "我的关注",
           links: [
             {
               type: "subscribe/user",
-              url: `/u/${targetUser.uid}/profile/subscribe/user`,
+              url: `/u/${targetUser.uid}/s/user`,
               name: "关注的用户",
               count: data.subUsersId.length
             },
             {
               type: "subscribe/forum",
-              url: `/u/${targetUser.uid}/profile/subscribe/forum`,
+              url: `/u/${targetUser.uid}/s/forum`,
               name: "关注的专业",
               count: data.subForumsId.length
             },
             {
               type: "subscribe/column",
               name: "关注的专栏",
-              url: `/u/${targetUser.uid}/profile/subscribe/column`,
+              url: `/u/${targetUser.uid}/s/column`,
               count: data.subColumnsId.length
             },
-            {
-              type: "subscribe/thread",
-              url: `/u/${targetUser.uid}/profile/subscribe/thread`,
-              name: "关注的文章",
-              count: data.subThreadsId.length
-            },
+            // {
+            //   type: "subscribe/thread",
+            //   url: `/u/${targetUser.uid}/profile/subscribe/thread`,
+            //   name: "关注的文章",
+            //   count: data.subThreadsId.length
+            // },
             {
               type: "subscribe/collection",
-              url: `/u/${targetUser.uid}/profile/subscribe/collection`,
+              url: `/u/${targetUser.uid}/s/collection`,
               name: "收藏的文章",
               count: data.collectionThreadsId.length
-            }
-          ]
-        },
-        {
-          name: "我的交往",
-          links: [
-            {
-              type: "follower",
-              name: "我的粉丝",
-              url: `/u/${targetUser.uid}/profile/follower`,
-              count: data.fansId.length
             },
             {
               type: 'blacklist',
               name: '黑名单',
-              url: `/u/${targetUser.uid}/profile/blacklist`,
+              url: `/u/${targetUser.uid}/s/blacklist`,
               count: await db.BlacklistModel.countDocuments({
                 uid: targetUser.uid
               }),
             }
           ]
-        }
+        },
+        // {
+        //   name: "我的交往",
+        //   links: [
+        //     {
+        //       type: "follower",
+        //       name: "我的粉丝",
+        //       url: `/u/${targetUser.uid}/profile/follower`,
+        //       count: data.fansId.length
+        //     },
+        //
+        //   ]
+        // }
       ];
       data.name = "";
       data.navLinks.map(nav => {
