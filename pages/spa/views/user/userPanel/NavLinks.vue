@@ -52,7 +52,7 @@
         text-decoration: none;
         color: @primary;
       }
-      .fa{
+      & .fa{
         position: absolute;
         height: @liHeight;
         line-height: @liHeight;
