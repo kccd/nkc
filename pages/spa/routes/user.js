@@ -8,6 +8,7 @@ import SubscribeColumns from "../views/user/subscribe/SubscribeColumns";
 import SubscribeBlackList from "../views/user/subscribe/SubscribeBlackList";
 import SubscribeUsers from "../views/user/subscribe/SubscribeUsers";
 import SubscribeForums from "../views/user/subscribe/SubscribeForums";
+import SubscribeThreads from "../views/user/subscribe/SubscribeThreads";
 export const routerName = {
   user: 'userHome',
   follow: 'follow',
@@ -20,7 +21,8 @@ export const routerName = {
   profile: 'profile',
   subColumns: 'subColumns',
   subUsers: 'subUsers',
-  subForums: 'subForums'
+  subForums: 'subForums',
+  subThreads: 'subThreads',
 }
 
 export default [
@@ -34,6 +36,7 @@ export default [
         name: routerName.subscribe,
         path: '/u/:uid/s',
         component: Subscribe,
+        redirect: '/u/:uid/s/user',
         children: [
           {
             name: routerName.blackList,
@@ -54,6 +57,11 @@ export default [
             name: routerName.subUsers,
             path: '/u/:uid/s/user',
             component: SubscribeUsers,
+          },
+          {
+            name: routerName.subThreads,
+            path: '/u/:uid/s/thread',
+            component: SubscribeThreads,
           }
         ]
       },
@@ -61,6 +69,7 @@ export default [
         name: routerName.profile,
         path: '/u/:uid/content',
         component: Profile,
+        redirect: '/u/:uid:content/moment',
         children: [
           {
             name: routerName.moment,

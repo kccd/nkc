@@ -3,7 +3,7 @@
     .account-url(v-if="navLink" v-for="navLink in navLinks")
       .account-name(v-if="navLink.name") {{navLink.name}}
       .account-lis
-        a.acocunt-li(v-for="link in navLink.links" :href="link.url" :class="{'active': link.type === ''}")
+        .acocunt-li(v-for="link in navLink.links" @click="toRoute(link.url)" :class="{'active': link.type === ''}")
           .name {{link.name}}
             span {{link.count || ''}}
           .fa.fa-angle-right
@@ -76,6 +76,11 @@ export default {
   mounted() {
   },
   methods: {
+    toRoute(path) {
+      this.$router.push({
+        path
+      });
+    }
   }
 
 }

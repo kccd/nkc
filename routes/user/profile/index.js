@@ -205,14 +205,14 @@ router
             // },
             {
               type: "subscribe/collection",
-              url: `/u/${targetUser.uid}/s/collection`,
+              url: `/u/${targetUser.uid}/s/thread`,
               name: "收藏的文章",
               count: data.collectionThreadsId.length
             },
             {
               type: 'blacklist',
               name: '黑名单',
-              url: `/u/${targetUser.uid}/s/blacklist`,
+              url: `/u/${targetUser.uid}/s/blackList`,
               count: await db.BlacklistModel.countDocuments({
                 uid: targetUser.uid
               }),

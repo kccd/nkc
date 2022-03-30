@@ -1,6 +1,6 @@
 <template lang="pug">
   .subscribe-container
-    h4 这是用户关注的内容
+    router-view
 </template>
 <style lang="less">
 

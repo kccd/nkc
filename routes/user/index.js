@@ -35,6 +35,8 @@ const userHomeCardRouter = require("./userHomeCard");
 const navLinksRouter = require("./navLinks");
 // 请求内容
 const contentRouter = require("./content");
+//用户关注的内容
+const sRouter = require('./subscribe/index');
 
 const path = require('path');
 
@@ -82,7 +84,7 @@ userRouter
     }
     await next();
   })
-  .get(['/:uid', '/:uid/content/moment', '/:uid/content/post', '/:uid/content/thread', '/:uid/content/follow', '/:uid/content/fans', '/:uid/s/thread', '/:uid/s/column', '/:uid/s/user', '/:uid/s/forum'], async (ctx, next) => {
+  .get(['/:uid', '/:uid/content/moment', '/:uid/content/post', '/:uid/content/thread', '/:uid/content/follow', '/:uid/content/fans', '/:uid/s/thread', '/:uid/s/column', '/:uid/s/user', '/:uid/s/forum', '/:uid/s/blackList'], async (ctx, next) => {
     //访问用户个人主页
     ctx.template = 'vueRoot/index.pug';
     // ctx.template = "user/user.pug";
@@ -118,4 +120,5 @@ userRouter
   .use("/:uid/userHomeCard", userHomeCardRouter.routes(), userHomeCardRouter.allowedMethods())
   .use("/:uid/navLinks", navLinksRouter.routes(), navLinksRouter.allowedMethods())
   .use("/:uid/content", contentRouter.routes(), contentRouter.allowedMethods())
+  .use("/:uid/s", sRouter.routes(), sRouter.allowedMethods())
 module.exports = userRouter;
