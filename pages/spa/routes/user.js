@@ -2,13 +2,15 @@ import User from '../views/user/user';
 import UserFollowAndFans from "../../lib/vue/publicVue/userFollowAndFans/UserFollowAndFans";
 import UserMoment from "../../lib/vue/publicVue/userCard/UserMoment";
 import UserPostList from "../../lib/vue/publicVue/userCard/UserPostList";
+import Subscribe from "../views/user/subscribe/Subscribe";
 export const routerName = {
   user: 'userHome',
   follow: 'follow',
   fans: 'fans',
   moment: 'moment',
   post: 'post',
-  thread: 'thread'
+  thread: 'thread',
+  subscribe: 'subscribe',
 }
 
 export default [
@@ -17,6 +19,13 @@ export default [
     path: '/u/:uid',
     redirect: '/u/:uid/moment',
     component: User,
+    // children: [
+    //   {
+    //     name: routerName.subscribe,
+    //     path: '/u/:uid/profile',
+    //     component: Subscribe,
+    //   }
+    // ],
     children: [
       {
         name: routerName.moment,
