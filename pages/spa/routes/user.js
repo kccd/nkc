@@ -3,58 +3,96 @@ import UserFollowAndFans from "../../lib/vue/publicVue/userFollowAndFans/UserFol
 import UserMoment from "../../lib/vue/publicVue/userCard/UserMoment";
 import UserPostList from "../../lib/vue/publicVue/userCard/UserPostList";
 import Subscribe from "../views/user/subscribe/Subscribe";
+import Profile from "../views/user/propfile/Profile";
+import SubscribeColumns from "../views/user/subscribe/SubscribeColumns";
+import SubscribeBlackList from "../views/user/subscribe/SubscribeBlackList";
+import SubscribeUsers from "../views/user/subscribe/SubscribeUsers";
+import SubscribeForums from "../views/user/subscribe/SubscribeForums";
 export const routerName = {
   user: 'userHome',
   follow: 'follow',
   fans: 'fans',
   moment: 'moment',
   post: 'post',
-  thread: 'thread',
+  blackList: 'blackList',
   subscribe: 'subscribe',
+  thread: 'thread',
+  profile: 'profile',
+  subColumns: 'subColumns',
+  subUsers: 'subUsers',
+  subForums: 'subForums'
 }
 
 export default [
   {
     name: routerName.user,
     path: '/u/:uid',
-    redirect: '/u/:uid/moment',
+    redirect: '/u/:uid/content/moment',
     component: User,
-    // children: [
-    //   {
-    //     name: routerName.subscribe,
-    //     path: '/u/:uid/profile',
-    //     component: Subscribe,
-    //   }
-    // ],
     children: [
       {
-        name: routerName.moment,
-        path: '/u/:uid/moment',
-        component: UserMoment,
+        name: routerName.subscribe,
+        path: '/u/:uid/s',
+        component: Subscribe,
+        children: [
+          {
+            name: routerName.blackList,
+            path: '/u/:uid/s/blackList',
+            component: SubscribeBlackList,
+          },
+          {
+            name: routerName.subColumns,
+            path: '/u/:uid/s/column',
+            component: SubscribeColumns,
+          },
+          {
+            name: routerName.subForums,
+            path: '/u/:uid/s/forum',
+            component: SubscribeForums,
+          },
+          {
+            name: routerName.subUsers,
+            path: '/u/:uid/s/user',
+            component: SubscribeUsers,
+          }
+        ]
       },
       {
-        name: routerName.post,
-        path: '/u/:uid/post',
-        component: UserPostList
-      },
-      {
-        name: routerName.thread,
-        path: '/u/:uid/thread',
-        component: UserPostList
-      },
-      {
-        name: routerName.follow,
-        path: '/u/:uid/follow',
-        component: UserFollowAndFans,
-        props: { pageType: "follow" }
-      },
-      {
-        name: routerName.fans,
-        path: '/u/:uid/fans',
-        component: UserFollowAndFans,
-        props: { pageType: "fans" }
+        name: routerName.profile,
+        path: '/u/:uid/content',
+        component: Profile,
+        children: [
+          {
+            name: routerName.moment,
+            path: '/u/:uid/content/moment',
+            component: UserMoment,
+          },
+          {
+            name: routerName.post,
+            path: '/u/:uid/content/post',
+            component: UserPostList
+          },
+          {
+            name: routerName.thread,
+            path: '/u/:uid/content/thread',
+            component: UserPostList
+          },
+          {
+            name: routerName.follow,
+            path: '/u/:uid/content/follow',
+            component: UserFollowAndFans,
+            props: { pageType: "follow" }
+          },
+          {
+            name: routerName.fans,
+            path: '/u/:uid/content/fans',
+            component: UserFollowAndFans,
+            props: { pageType: "fans" }
+          }
+        ]
       }
-    ]
+    ],
+    
   }
 ]
 

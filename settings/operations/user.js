@@ -28,20 +28,19 @@ module.exports = {
 		userHomeCard: {
 			GET: "getUserHomeCard"
 		},
-		moment: {
-			GET: "getUserHomeCard"
-		},
-		post: {
-			GET: "getUserHomeCard"
-		},
-		thread: {
-			GET: "getUserHomeCard"
-		},
-		follow: {
-			GET: "getUserHomeCard",
-		},
-		fans: {
-			GET: "getUserHomeCard",
+		s: {
+			thread: {
+				GET: "getUserHomeCard"
+			},
+			column: {
+				GET: "getUserHomeCard"
+			},
+			user: {
+				GET: "getUserHomeCard"
+			},
+			forum: {
+				GET: "getUserHomeCard",
+			},
 		},
 		verifiedAssets: {
 			PARAMETER: {
