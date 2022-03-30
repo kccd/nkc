@@ -3,7 +3,7 @@
     .account-url(v-if="navLink" v-for="navLink in navLinks")
       .account-name(v-if="navLink.name") {{navLink.name}}
       .account-lis
-        a.acocunt-li(v-for="link in navLink.links" :href="link.url" :class="{'active': link.type === ''}")
+        a.account-li(v-for="link in navLink.links" :href="link.url" :class="{'active': link.type === ''}")
           .name {{link.name}}
             span {{link.count || ''}}
           .fa.fa-angle-right
@@ -52,7 +52,7 @@
         text-decoration: none;
         color: @primary;
       }
-      .fa{
+      & .fa{
         position: absolute;
         height: @liHeight;
         line-height: @liHeight;
