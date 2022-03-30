@@ -6,8 +6,6 @@
     div 主分类：
       div
         button.subscribe-type 全部
-      div(v-for="t in subscribeTypes" :key=t)
-        button.subscribe-type {{t}}
 
 
 </template>
@@ -16,21 +14,24 @@
 </style>
 <script>
 import {nkcAPI} from "../../../../lib/js/netAPI";
-import {getState} from "../../../../lib/js/state";
+
 export default {
-  data: () =>({
+  data: () => ({
     uid: NKC.configs.uid,
-    users: [],
-    subscribeTypes:['XIAO','垃圾']
+    users: []
   }),
   components: {
 
   },
+  mounted() {
+    this.getSubUser();
+  },
   methods: {
-    getUser() {
+    //获取关注的用户
+    getSubUser() {
       const self = this;
-      nkcAPI(`/u/${self.uid}/s/user`, 'GET')
-      .then((res) => {
+      nkcAPI(`/u/${self.uid}/profile/subscribe/user`, 'GET')
+      .then(res => {
         self.users = res.users;
       })
       .catch(err => {

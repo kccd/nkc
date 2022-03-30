@@ -69,7 +69,7 @@ export default [
         name: routerName.profile,
         path: '/u/:uid/content',
         component: Profile,
-        redirect: '/u/:uid:content/moment',
+        redirect: '/u/:uid/content/moment',
         children: [
           {
             name: routerName.moment,

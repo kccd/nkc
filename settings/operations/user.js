@@ -29,6 +29,9 @@ module.exports = {
 			GET: "getUserHomeCard"
 		},
 		s: {
+			subUser: {
+				GET: "getUserHomeCard"
+			},
 			thread: {
 				GET: "getUserHomeCard"
 			},
@@ -41,6 +44,9 @@ module.exports = {
 			forum: {
 				GET: "getUserHomeCard",
 			},
+			blackList: {
+				GET: "getUserHomeCard",
+			}
 		},
 		verifiedAssets: {
 			PARAMETER: {

@@ -15,11 +15,19 @@ export default {
   components: {
 
   },
+  mounted() {
+    this.initData();
+    this.getBlackList();
+  },
   methods: {
+    initData() {
+      const {uid} = this.$route.params;
+      this.uid = uid;
+    },
     //获取用户黑名单
     getBlackList() {
       const self = this;
-      nkcAPI(`/u/${this.uid}/s/blackList`, 'GET')
+      nkcAPI(`/u/${this.uid}/profile/blacklist`, 'GET')
       .then(res => {
         self.blackList = res.blackList;
       })

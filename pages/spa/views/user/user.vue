@@ -49,10 +49,8 @@ export default {
       const self = this;
       nkcAPI(`/u/${this.uid}/profile`, 'GET')
       .then(res => {
-        console.log('res', res);
         self.t = res.t;
         self.navLinks = res.navLinks;
-        console.log('navLinks', self.navLinks);
         self.targetUser = res.targetUser;
       })
       .catch(err => {
