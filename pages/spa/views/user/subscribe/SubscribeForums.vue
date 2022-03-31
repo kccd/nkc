@@ -171,6 +171,7 @@
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import Paging from "../../../../lib/vue/Paging";
 import {getUrl} from "../../../../lib/js/tools";
+import {subForum} from "../../../../lib/js/subscribe";
 export default {
   data: () => ({
     uid: '',
@@ -230,7 +231,7 @@ export default {
     },
     //取关和关注
     subForum(fid) {
-      let method;
+      const sub = !this.subForumsId.includes(fid);
     },
     //点击专业分类时
     clickType(id) {
