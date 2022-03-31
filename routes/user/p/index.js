@@ -1,7 +1,15 @@
 const Router = require("koa-router");
 const router = new Router();
-const sRouter = require('./subscribe');
-const userRouter = require('./subscribe/user');
+const subUserRouter = require('./subscribe/user');
+const subForumRouter = require('./subscribe/forum');
+const subColumnRouter = require('./subscribe/column');
+const subThreadRouter = require('./subscribe/thread');
+const blacklistRouter = require('./subscribe/blackList');
+const momentRouter = require('./moment');
+const postRouter = require('./post');
+const threadRouter = require('./thread');
+const followerRouter = require('./follower');
+const fanRouter = require('./fan');
 router
   .get('/', async (ctx, next) => {
     //获取主页导航等信息
@@ -241,6 +249,15 @@ router
   .get('/s', async (ctx, next) => {
     await next();
   })
-  .get('/s/user', userRouter)
+  .get('/s/user', subUserRouter)
+  .get('/s/forum', subForumRouter)
+  .get('/s/column', subColumnRouter)
+  .get('/s/thread', subThreadRouter)
+  .get('/s/blacklist', blacklistRouter)
+  .get('/moment', momentRouter)
+  .get('/post', postRouter)
+  .get('/thread', threadRouter)
+  .get('/fan', fanRouter)
+  .get('/follower', followerRouter)
 
 module.exports = router;
