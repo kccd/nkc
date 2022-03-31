@@ -1,24 +1,29 @@
 <template lang="pug">
   //关注的用户
-  .subscribe-user
+  .subscribe-user(v-cloak)
     .subscribe-types
       .main-type 主分类：
         .box-shadow-panel
-          button.subscribe-type(:class="{'active':Object.keys(checkClassification).length===0}") 全部
-        .box-shadow-panel(v-for="t in subscribeTypes")
+          button.subscribe-type(:class="{'active':Object.keys(checkClassification).length===0}" @click="typeClick()") 全部
+        .box-shadow-panel(v-for="t in subscribeTypes" @click="typeClick(t._id)")
           button.subscribe-type {{t.name}}
       .subscribe-type-edit 管理分类
     .subscribe-divide-lines
     .subscribe-user-content
-      .null(v-if="users.length==0" ) 空空如也~~
-      .subscribe-user-box
-        .subscribe-user-lists(v-for="t in users")
+      .null(v-if="subscribes.length==0" ) 空空如也~~
+      .subscribe-user-box(v-else)
+        .subscribe-user-lists(v-for="followedUser in subscribes")
           .subscribe-user-list
             .subscribe-user-list-avatar
-              img.img
+              img.img(:src="getUrl('userAvatar',followedUser.targetUser.avatar, 'sm')")
             .subscribe-user-list-content
               .account-follower-name
-
+                a(:href="`/u/${followedUser.tUid}`" ) {{followedUser.targetUser.username}}
+                .account-follower-buttons
+                  button.category(v-if="active") 分类
+                  //button.category 分类
+                  button.subscribe(:class="active ?'cancel':'focus'") {{active?'取关':'关注'}}
+                  //button.subscribe(class='cancel') {{'取关'}}
               .account-follower-level
               .account-follower-description
 </template>
@@ -121,6 +126,47 @@
         overflow: hidden;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 1;
+        a{
+          font-size: 1.4rem;
+          color: #2b90d9;
+          transition: border-bottom-color 200ms;
+          border-bottom: 1px solid rgba(0, 0, 0, 0);
+        }
+        .account-follower-buttons{
+          position: absolute;
+          top: 0;
+          right: 0;
+          font-size: 1rem;
+          button{
+            background: #fff;
+            height: 2rem;
+            width: 4rem;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+            &.category:hover{
+              background-color: #eee;
+            }
+          }
+          .cancel{
+            background-color: #e85a71;
+            border: 1px solid #e85a71;
+            color: #fff;
+            margin-left: 3px;
+            &:hover{
+              background-color: #cb4c61;
+            }
+          }
+          .focus{
+            background-color: #2b90d9;
+            border: 1px solid #2b90d9;
+            color: #fff;
+            &:hover{
+              background-color: #2777b1;
+            }
+          }
+        }
+
       }
       .account-follower-level{
         margin-top: 0.5rem;
@@ -150,35 +196,62 @@
 </style>
 <script>
 import {nkcAPI} from "../../../../lib/js/netAPI";
-
+import {getUrl} from "../../../../lib/js/tools";
 export default {
   data: () => ({
-    uid: NKC.configs.uid,
-    users: [],//被关注数组
+    uid: '',
+    users: [],
     subscribeTypes: [],//关注分类
-    checkClassification:{}
+    subscribes: [],//被关注用户列表
+    checkClassification:{},
+    t:'',
+    active:true
   }),
   components: {
 
   },
-  mounted() {
+  created() {
+    this.initData()
     this.getSubUser();
   },
+  mounted() {
+  },
   methods: {
+    getUrl: getUrl,
+    initData() {
+      const {uid} = this.$route.params;
+      this.uid = uid;
+    },
     //获取关注的用户
-    getSubUser() {
+    getSubUser(page) {
       const self = this;
-      nkcAPI(`/u/${self.uid}/p/s/user`, 'GET')
+      let url = `/u/${self.uid}/p/s/user`;
+      if(self.t) {
+        url += `?t=${self.t}`;
+      }
+      if(page) {
+        if(url.indexOf('?') === -1) {
+          url += `?page=${page}`;
+        } else {
+          url += `page=${page}`;
+        }
+      }
+      console.log('url', url);
+      nkcAPI(url, 'GET')
       .then(res => {
-        console.log(res);
-        self.users = res.users;
+        // self.users = res.users;
         console.log(res);
         self.subscribeTypes = res.subscribeTypes;
-
+        self.subscribes = res.subscribes
       })
       .catch(err => {
         sweetError(err);
       })
+    },
+    typeClick(t){
+      console.log(t)
+      this.t=t;
+      this.getSubUser()
     }
   }
 }
