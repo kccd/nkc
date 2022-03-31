@@ -24,8 +24,9 @@ export default {
     //获取关注的用户
     getSubUser() {
       const self = this;
-      nkcAPI(`/u/${self.uid}/profile/subscribe/user`, 'GET')
+      nkcAPI(`/u/${self.uid}/p/s/user`, 'GET')
       .then(res => {
+        console.log(res);
         self.users = res.users;
       })
       .catch(err => {

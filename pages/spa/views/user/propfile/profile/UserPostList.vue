@@ -20,7 +20,7 @@
         single-post(ref="singlePost" :post="post")
 </template>
 <style lang="less">
-@import "../../../../publicModules/base";
+@import "../../../../../publicModules/base";
 .checkbox {
   display: inline-block;
   min-width: 15px;
@@ -31,11 +31,11 @@
 }
 </style>
 <script>
-import Review from "../postReview/Review";
-import SinglePost from "../postModel/SinglePost";
-import Paging from "../../Paging";
-import ToColumn from "../toColumn/ToColumn";
-import {nkcAPI} from "../../../js/netAPI";
+import Review from "../../../../../lib/vue/publicVue/postReview/Review";
+import SinglePost from "../../../../../lib/vue/publicVue/postModel/SinglePost";
+import Paging from "../../../../../lib/vue/Paging";
+import ToColumn from "../../../../../lib/vue/publicVue/toColumn/ToColumn";
+import {nkcAPI} from "../../../../../lib/js/netAPI";
 export default {
   data: () => ({
     posts: [],

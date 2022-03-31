@@ -13,14 +13,14 @@
       violation-record(ref="violationRecord")
 </template>
 <style lang="less">
-@import "../../../../publicModules/base";
+@import "../../../../../publicModules/base";
 </style>
 <script>
-import Moments from "../../zone/Moments";
-import Complaint from "../../Complaint";
-import ViolationRecord from "../../ViolationRecord";
-import Paging from "../../Paging";
-import {nkcAPI} from "../../../js/netAPI";
+import Moments from "../../../../../lib/vue/zone/Moments";
+import Complaint from "../../../../../lib/vue/Complaint";
+import ViolationRecord from "../../../../../lib/vue/ViolationRecord";
+import Paging from "../../../../../lib/vue/Paging";
+import {nkcAPI} from "../../../../../lib/js/netAPI";
 
 export default {
   data: () => ({

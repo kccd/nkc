@@ -25,7 +25,6 @@ router
     if (user.uid !== targetUser.uid && !ctx.permission("visitAllUserProfile")) {
       ctx.throw(403, "权限不足");
     }
-
     const {
       threadCount,
       postCount,
@@ -36,14 +35,21 @@ router
     url = url.replace(/\/u\/[0-9]+?\/profile\/*/ig, "");
     data.type = url;
     data.host = serverConfig.domain + ':' + serverConfig.port;
+    //获取关注的用户id
     data.subUsersId = await db.SubscribeModel.getUserSubUsersId(targetUser.uid);
     data.subTopicsId = await db.SubscribeModel.getUserSubForumsId(targetUser.uid, "topic");
     data.subDisciplinesId = await db.SubscribeModel.getUserSubForumsId(targetUser.uid, "discipline");
+    //获取关注的专业id
     data.subForumsId = data.subTopicsId.concat(data.subDisciplinesId);
+    //获取关注的专栏id
     data.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(targetUser.uid);
+    //获取关注的文章id
     data.subThreadsId = await db.SubscribeModel.getUserSubThreadsId(targetUser.uid, "sub");
+    //获取粉丝id
     data.fansId = await db.SubscribeModel.getUserFansId(targetUser.uid);
+    //获取收藏的文章id
     data.collectionThreadsId = await db.SubscribeModel.getUserCollectionThreadsId(targetUser.uid);
+    //获取当前用户等级信息
     data.targetUserScores = await db.UserModel.updateUserScores(targetUser.uid);
     if(targetUser.uid !== user.uid) {
       data.targetColumn = await db.UserModel.getUserColumn(targetUser.uid);
@@ -181,20 +187,20 @@ router
           links: [
             {
               type: "subscribe/user",
-              url: `/u/${targetUser.uid}/s/user`,
+              url: `/u/${targetUser.uid}/p/s/user`,
               name: "关注的用户",
               count: data.subUsersId.length
             },
             {
               type: "subscribe/forum",
-              url: `/u/${targetUser.uid}/s/forum`,
+              url: `/u/${targetUser.uid}/p/s/forum`,
               name: "关注的专业",
               count: data.subForumsId.length
             },
             {
               type: "subscribe/column",
               name: "关注的专栏",
-              url: `/u/${targetUser.uid}/s/column`,
+              url: `/u/${targetUser.uid}/p/s/column`,
               count: data.subColumnsId.length
             },
             // {
@@ -205,14 +211,14 @@ router
             // },
             {
               type: "subscribe/collection",
-              url: `/u/${targetUser.uid}/s/thread`,
+              url: `/u/${targetUser.uid}/p/s/thread`,
               name: "收藏的文章",
               count: data.collectionThreadsId.length
             },
             {
               type: 'blacklist',
               name: '黑名单',
-              url: `/u/${targetUser.uid}/s/blackList`,
+              url: `/u/${targetUser.uid}/p/s/blackList`,
               count: await db.BlacklistModel.countDocuments({
                 uid: targetUser.uid
               }),

@@ -1,7 +1,8 @@
 module.exports = {
 	GET: 'searchUser',
 	PARAMETER: {
-		content: {
+		p: {
+			GET: "visitUserCard",
 			moment: {
 				GET: "getUserHomeCard"
 			},
@@ -17,6 +18,24 @@ module.exports = {
 			fans: {
 				GET: "getUserHomeCard",
 			},
+			s: {
+				GET: "visitUserCard",
+				thread: {
+					GET: "getUserHomeCard"
+				},
+				column: {
+					GET: "getUserHomeCard"
+				},
+				user: {
+					GET: "getUserHomeCard"
+				},
+				forum: {
+					GET: "getUserHomeCard",
+				},
+				blackList: {
+					GET: "getUserHomeCard",
+				}
+			},
 		},
 		GET: 'visitUserCard',
 		userHome: {
@@ -28,26 +47,7 @@ module.exports = {
 		userHomeCard: {
 			GET: "getUserHomeCard"
 		},
-		s: {
-			subUser: {
-				GET: "getUserHomeCard"
-			},
-			thread: {
-				GET: "getUserHomeCard"
-			},
-			column: {
-				GET: "getUserHomeCard"
-			},
-			user: {
-				GET: "getUserHomeCard"
-			},
-			forum: {
-				GET: "getUserHomeCard",
-			},
-			blackList: {
-				GET: "getUserHomeCard",
-			}
-		},
+		
 		verifiedAssets: {
 			PARAMETER: {
 				GET: "visitVerifiedUpload"

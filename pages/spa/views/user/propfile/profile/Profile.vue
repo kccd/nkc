@@ -1,5 +1,5 @@
 <template lang="pug">
-  .post-panel.b-s-10
+  .div
     .paging-button
       a.radius-left.button(@click="toRoute('moment')" :class="t === 'moment'?'active':''") 动态
       a.button(@click="toRoute('post')" :class="t === 'post'?'active':''") 回复
@@ -9,26 +9,15 @@
     .post-panel-item
       router-view
 </template>
-<style lang="less" scoped>
-@import "../../../../publicModules/base";
+<style lang="less">
+@import "../../../../../publicModules/base";
+
 </style>
 <script>
 export default {
-  data:() => ({
-    uid: '',
+  data: () => ({
     t: null,
-    momentsData: null,
-    posts: null,
-    users: [],
-    paging: null,
   }),
-  components: {
-  },
-  computed: {
-    pageButtons() {
-      return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
-    },
-  },
   mounted() {
     const {params, name} = this.$route;
     const {uid} = params;
