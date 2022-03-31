@@ -1,9 +1,6 @@
-const Router = require("koa-router");
-const router = new Router();
-router
-  .get('/', async (ctx, next) => {
+module.exports = async (ctx, next) => {
     const {state, data, db, query, nkcModules} = ctx;
-    const {page = 0} = query;
+    const {page = 0,t = ''} = query;
     const {match} = state;
     match.type = "user";
     match.uid = data.targetUser.uid;
@@ -17,5 +14,4 @@ router
     data.subscribesObj = subscribesObj;
     data.paging = paging;
     await next();
-  })
-module.exports = router;
+};

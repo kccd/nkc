@@ -24,7 +24,6 @@ export default {
   data:() => ({
     targetUser: null,
     navLinks: null,
-    t: '',
     uid: null,
     isApp: null,
   }),
@@ -47,9 +46,8 @@ export default {
     //获取用户主页信息
     getUserInfo() {
       const self = this;
-      nkcAPI(`/u/${this.uid}/profile`, 'GET')
+      nkcAPI(`/u/${this.uid}/p`, 'GET')
       .then(res => {
-        self.t = res.t;
         self.navLinks = res.navLinks;
         self.targetUser = res.targetUser;
       })

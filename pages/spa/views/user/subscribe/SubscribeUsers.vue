@@ -18,7 +18,7 @@
               img.img
             .subscribe-user-list-content
               .account-follower-name
-                
+
               .account-follower-level
               .account-follower-description
 </template>
@@ -168,11 +168,12 @@ export default {
     //获取关注的用户
     getSubUser() {
       const self = this;
-      nkcAPI(`/u/${self.uid}/profile/subscribe/user`, 'GET')
+      nkcAPI(`/u/${self.uid}/p/s/user`, 'GET')
       .then(res => {
         console.log(res);
+        self.users = res.users;
+        console.log(res);
         self.subscribeTypes = res.subscribeTypes;
-        self.users = res.subForumsId;
 
       })
       .catch(err => {
