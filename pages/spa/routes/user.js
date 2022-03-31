@@ -1,5 +1,5 @@
 import User from '../views/user/user';
-import UserFollowAndFans from "../../lib/vue/publicVue/userFollowAndFans/UserFollowAndFans";
+import UserFollowerAndFans from "../../lib/vue/publicVue/userFollowAndFans/UserFollowerAndFans";
 import UserMoment from "../views/user/propfile/profile/UserMoment";
 import UserPostList from "../views/user/propfile/profile/UserPostList";
 import Subscribe from "../views/user/subscribe/Subscribe";
@@ -10,10 +10,9 @@ import SubscribeBlackList from "../views/user/subscribe/SubscribeBlackList";
 import SubscribeUsers from "../views/user/subscribe/SubscribeUsers";
 import SubscribeForums from "../views/user/subscribe/SubscribeForums";
 import SubscribeThreads from "../views/user/subscribe/SubscribeThreads";
-import AccountUser from "../views/user/AccountUser";
 export const routerName = {
   user: 'userHome',
-  follow: 'follow',
+  follower: 'follower',
   fans: 'fans',
   moment: 'moment',
   post: 'post',
@@ -63,15 +62,15 @@ export default [
                 component: UserPostList
               },
               {
-                name: routerName.follow,
-                path: '/u/:uid/p/follow',
-                component: UserFollowAndFans,
-                props: { pageType: "follow" }
+                name: routerName.follower,
+                path: '/u/:uid/p/follower',
+                component: UserFollowerAndFans,
+                props: { pageType: "follower" }
               },
               {
                 name: routerName.fans,
                 path: '/u/:uid/p/fans',
-                component: UserFollowAndFans,
+                component: UserFollowerAndFans,
                 props: { pageType: "fans" }
               },
             ]
