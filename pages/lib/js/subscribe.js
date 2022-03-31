@@ -1,3 +1,10 @@
-export function subForum() {
-
+export function subForum(id, sub, cid) {
+  let method;
+  if(sub) {
+    method = "POST";
+  } else {
+    method = "DELETE";
+  }
+  return nkcAPI('f' + id + 'subscribe', method, {cid: cid || []})
 }
+
