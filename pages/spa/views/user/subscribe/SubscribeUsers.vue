@@ -12,7 +12,7 @@
     .subscribe-user-content
       .null(v-if="subscribes.length==0" ) 空空如也~~
       .subscribe-user-box(v-else)
-        .subscribe-user-lists(v-for="followedUser in subscribes")
+        .subscribe-user-lists(v-for="(followedUser,index) in subscribes")
           .subscribe-user-list
             .subscribe-user-list-avatar
               img.img(:src="getUrl('userAvatar',followedUser.targetUser.avatar, 'sm')")
@@ -20,9 +20,9 @@
               .account-follower-name
                 a(:href="`/u/${followedUser.tUid}`" ) {{followedUser.targetUser.username}}
                 .account-follower-buttons
-                  button.category(v-if="active") 分类
+                  button.category(v-if="subUsersId.indexOf(followedUser.tUid)+1") 分类
                   //button.category 分类
-                  button.subscribe(:class="active ?'cancel':'focus'") {{active?'取关':'关注'}}
+                  button.subscribe(:class="subUsersId.indexOf(followedUser.tUid)+1 ?'cancel':'focus'" @click="unfollow(followedUser.tUid,index)") {{active?'取关':'关注'}}
                   //button.subscribe(class='cancel') {{'取关'}}
               .account-follower-level
               .account-follower-description
@@ -205,7 +205,7 @@ export default {
     subscribes: [],//被关注用户列表
     checkClassification:{},
     t:'',
-    active:true
+    subUsersId:[],//被关注的tuid
   }),
   components: {
 
@@ -239,19 +239,21 @@ export default {
       console.log('url', url);
       nkcAPI(url, 'GET')
       .then(res => {
-        // self.users = res.users;
-        console.log(res);
         self.subscribeTypes = res.subscribeTypes;
-        self.subscribes = res.subscribes
+        self.subscribes = res.subscribes;
+        self.subUsersId = res.subUsersId
       })
       .catch(err => {
         sweetError(err);
       })
     },
     typeClick(t){
-      console.log(t)
       this.t=t;
       this.getSubUser()
+    },
+    //取消关注
+    unfollow(tUid,index){
+      this.subUsersId.splice(index,1)
     }
   }
 }
