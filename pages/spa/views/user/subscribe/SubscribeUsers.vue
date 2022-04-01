@@ -1,31 +1,35 @@
 <template lang="pug">
   //关注的用户
-  .subscribe-user(v-cloak)
+  .subscribe-user(v-if="loading")
+    subscribe-types(ref="subscribeTypes")
+    float-user-panel(ref="floatUserPanel")
     .subscribe-types
       .main-type 主分类：
         .box-shadow-panel
-          button.subscribe-type(:class="{'active':Object.keys(checkClassification).length===0}" @click="typeClick()") 全部
-        .box-shadow-panel(v-for="t in subscribeTypes" @click="typeClick(t._id)")
-          button.subscribe-type {{t.name}}
-      .subscribe-type-edit 管理分类
+          button.subscribe-type(:class="{'active':t.length===0}" @click="typeClick('')") 全部
+        .box-shadow-panel(v-for="type in subscribeTypes")
+          button.subscribe-type(:class="{'active':t === type._id}" @click="typeClick(type._id)") {{type.name}}
+      .subscribe-type-edit(@click="openTypesModal()") 管理分类
     .subscribe-divide-lines
+    paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     .subscribe-user-content
       .null(v-if="subscribes.length==0" ) 空空如也~~
       .subscribe-user-box(v-else)
         .subscribe-user-lists(v-for="(followedUser,index) in subscribes")
           .subscribe-user-list
             .subscribe-user-list-avatar
-              img.img(:src="getUrl('userAvatar',followedUser.targetUser.avatar, 'sm')")
+              img.img(:src="getUrl('userAvatar',followedUser.targetUser.avatar, 'sm')" :data-float-uid="followedUser.tUid")
             .subscribe-user-list-content
               .account-follower-name
                 a(:href="`/u/${followedUser.tUid}`" ) {{followedUser.targetUser.username}}
                 .account-follower-buttons
-                  button.category(v-if="subUsersId.indexOf(followedUser.tUid)+1") 分类
-                  //button.category 分类
-                  button.subscribe(:class="subUsersId.indexOf(followedUser.tUid)+1 ?'cancel':'focus'" @click="unfollow(followedUser.tUid,index)") {{subUsersId.indexOf(followedUser.tUid)+1?'取关':'关注'}}
-                  //button.subscribe(class='cancel') {{'取关'}}
+                  button.category(v-if="subUsersId.indexOf(followedUser.tUid)+1" @click="openTypesModal(followedUser._id)") 分类
+                  button.subscribe(:class="subUsersId.indexOf(followedUser.tUid)+1 ?'cancel':'focus'" @click="userFollowType(followedUser.tUid)") {{subUsersId.indexOf(followedUser.tUid)+1?'取关':'关注'}}
               .account-follower-level
-              .account-follower-description
+                span(:style="{color:followedUser.targetUser.grade.color}") {{followedUser.targetUser.grade.displayName}}
+                img.grade-icon(:src="getUrl('gradeIcon', followedUser.targetUser.grade._id)" :title="followedUser.targetUser.grade.displayName" )
+                span.account-follower-certs {{followedUser.targetUser.info.certsName}}
+              .account-follower-description {{followedUser.targetUser.description || "暂无简介"}}
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
@@ -95,7 +99,6 @@
 .subscribe-user-content{
   padding-top: 15px;
   .subscribe-user-lists{
-    background: #fff59d;
     margin-bottom: 1.5rem;
     &:last-child{
       margin-bottom: 0;
@@ -171,6 +174,9 @@
       .account-follower-level{
         margin-top: 0.5rem;
         font-size: 1rem;
+        .account-follower-certs{
+          margin-left: 6px;
+        }
       }
       .account-follower-description{
         margin-top: 0.5rem;
@@ -197,25 +203,39 @@
 <script>
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl} from "../../../../lib/js/tools";
-import {subForum} from "../../../../lib/js/subscribe";
+import {subUsers, subTypesChange} from "../../../../lib/js/subscribe";
+import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
+import FloatUserPanel from "../../../../lib/vue/FloatUserPanel";
+import Paging from "../../../../lib/vue/Paging";
 export default {
   data: () => ({
     uid: '',
     users: [],
     subscribeTypes: [],//关注分类
-    subscribes: [],//被关注用户列表
-    checkClassification:{},
-    t:'',
-    subUsersId:[],//被关注的tuid
+    subscribes: null,//被关注用户列表
+    t: '',//分类的_id
+    subUsersId: [],//被关注的tuid
+    cid: '',
+    paging: null,
+    targetUser: null,
+    loading: false,
   }),
   components: {
-
+    "subscribe-types": SubscribeTypes,
+    "float-user-panel" : FloatUserPanel,
+    'paging': Paging
   },
   created() {
     this.initData()
     this.getSubUser();
   },
   mounted() {
+    // this.$refs.floatUserPanel.initState()
+  },
+  computed: {
+    pageButtons() {
+      return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
+    },
   },
   methods: {
     getUrl: getUrl,
@@ -225,6 +245,7 @@ export default {
     },
     //获取关注的用户
     getSubUser(page) {
+      this.loading = false;
       const self = this;
       let url = `/u/${self.uid}/p/s/user`;
       if(self.t) {
@@ -240,22 +261,59 @@ export default {
       console.log('url', url);
       nkcAPI(url, 'GET')
       .then(res => {
+        if(self.$refs.floatUserPanel) {
+          self.$refs.floatUserPanel.initPanel();
+        }
+        self.loading = true;
         self.subscribeTypes = res.subscribeTypes;
         self.subscribes = res.subscribes;
         self.subUsersId = res.subUsersId
+        self.paging = res.paging;
       })
       .catch(err => {
         sweetError(err);
       })
     },
-    typeClick(t){
-      this.t=t;
+    //分类选项查询和变化
+    typeClick(t) {
+      console.log(t)
+      this.t = t;
       this.getSubUser()
     },
-    //取消关注
-    unfollow(tUid,index){
-      this.subUsersId.splice(index,1)
-    }
+    //取消关注和关注
+    userFollowType(uid) {
+      const sub = !this.subUsersId.includes(uid);
+      const self = this;
+      const index = self.subUsersId.indexOf(uid);
+      subUsers(uid,sub)
+          .then((res)=>{
+            if(sub) {
+              sweetSuccess('关注成功');
+              if(index === -1) self.subUsersId.push(uid);
+            } else {
+              sweetSuccess('取消关注');
+              if(index !== -1) self.subUsersId.splice(index, 1);
+            }
+
+          })
+    },
+    //分类弹窗操作
+    openTypesModal(_id) {
+      this.$refs.subscribeTypes.open((cid) => {
+        console.log([...cid],[_id]);
+        subTypesChange([...cid],[_id])
+        .then((res)=>{
+          this.$refs.subscribeTypes.close();
+          sweetSuccess("执行成功");
+        })
+      },{
+
+      });
+    },
+    //点击分页按钮
+    clickBtn(num) {
+      this.getForums(num);
+    },
   }
 }
 </script>
