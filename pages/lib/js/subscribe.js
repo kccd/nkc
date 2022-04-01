@@ -49,3 +49,11 @@ export function subColumn(id, sub, cid) {
     });
 }
 
+//收藏文章
+export function collectionThread(id, collection, cid) {
+  return nkcAPI('/t/' + id + '/collection', 'POSt', {
+    type: !!collection,
+    cid: cid || []
+  })
+}
+

@@ -66,6 +66,9 @@ export default {
     //跳转到指定类型
     toType(id) {
       this.$emit('click-type', id);
+    },
+    editType() {
+      this.$emit('edit-type');
     }
   }
 }

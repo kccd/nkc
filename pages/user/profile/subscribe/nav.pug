@@ -1,7 +1,6 @@
 div
   .subscribe-types
-    .subscribe-type-edit(onclick="user." +
-    "()") 管理分类
+    .subscribe-type-edit(onclick="user.editType()") 管理分类
     div 主分类：
       a.subscribe-type(href=`/u/${data.targetUser.uid}/profile/${data.type}` class=!data.parentType?"active":"") 全部
       for t in data.subscribeTypes
