@@ -6,7 +6,7 @@ import Subscribe from "../views/user/subscribe/Subscribe";
 import ProfileView from "../views/user/propfile/ProfileView";
 import Profile from "../views/user/propfile/profile/Profile";
 import SubscribeColumns from "../views/user/subscribe/SubscribeColumns";
-import SubscribeBlackList from "../views/user/subscribe/SubscribeBlackList";
+import SubscribeBlacklist from "../views/user/subscribe/SubscribeBlacklist";
 import SubscribeUsers from "../views/user/subscribe/SubscribeUsers";
 import SubscribeForums from "../views/user/subscribe/SubscribeForums";
 import SubscribeCollection from "../views/user/subscribe/SubscribeCollection";
@@ -16,7 +16,7 @@ export const routerName = {
   fans: 'fans',
   moment: 'moment',
   post: 'post',
-  blackList: 'blackList',
+  blacklist: 'blacklist',
   subscribe: 'subscribe',
   thread: 'thread',
   profile: 'profile',
@@ -82,9 +82,9 @@ export default [
             component: Subscribe,
             children: [
               {
-                name: routerName.blackList,
-                path: '/u/:uid/p/s/blackList',
-                component: SubscribeBlackList,
+                name: routerName.blacklist,
+                path: '/u/:uid/p/s/blacklist',
+                component: SubscribeBlacklist,
               },
               {
                 name: routerName.subColumns,

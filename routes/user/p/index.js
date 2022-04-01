@@ -184,7 +184,7 @@ router
             {
               type: 'blacklist',
               name: '黑名单',
-              url: `/u/${targetUser.uid}/p/s/blackList`,
+              url: `/u/${targetUser.uid}/p/s/blacklist`,
               count: await db.BlacklistModel.countDocuments({
                 uid: targetUser.uid
               }),

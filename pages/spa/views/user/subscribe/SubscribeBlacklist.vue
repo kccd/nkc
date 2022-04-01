@@ -27,7 +27,7 @@ export default {
     //获取用户黑名单
     getBlackList() {
       const self = this;
-      nkcAPI(`/u/${this.uid}/profile/blacklist`, 'GET')
+      nkcAPI(`/u/${this.uid}/p/s/blacklist`, 'GET')
       .then(res => {
         self.blackList = res.blackList;
       })
