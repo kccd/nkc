@@ -1,7 +1,8 @@
 <template lang="pug">
   .subscribe-thread(v-if="targetUser")
     .box-shadow-panel
-      nav-types(ref="navTypes" :target-user="targetUser" :parent-type="t" type="collection" :subscribe-types="subscribeTypes" @click-type="clickType")
+      subscribe-types(ref="subscribeTypes")
+      nav-types(ref="navTypes" :target-user="targetUser" :parent-type="parentType" type="collection" :subscribe-types="subscribeTypes" @click-type="clickType")
       paging(ref="paging" :pages="pageButtons")
       .account-threads.subscribe-thread
         .null(v-if="!subscribes.length") 空空如也~
@@ -15,7 +16,7 @@
             .account-thread-content(:style="!subscribe.thread.firstPost.cover?'display: block':''")
               .account-thread-title(:class="subscribe.thread.digest?'digest':''")
                 .account-follower-buttons(:data-thread="subscribe.tid" :class="collectionThreadsId.includes(subscribe.tid) ? 'active' : ''")
-                  button.category.collection-button.m-r-05(@click="moveSub(subscribe.tid)") 分类
+                  button.category.collection-button.m-r-05(@click="moveSub([subscribe.tid])") 分类
                   button.subscribe.collection-button(@click="subThread(subscribe.tid, 'collection')")
                 a(:href="`/t/${subscribe.thread.tid}`" :title="subscribe.thread.firstPost.t") {{subscribe.thread.firstPost.t}}
               .account-thread-abstract {{subscribe.thread.firstPost.abstractCN || subscribe.thread.firstPost.c}}
@@ -333,6 +334,7 @@
 <script>
 import NavTypes from "./NavTypes";
 import Paging from "../../../../lib/vue/Paging";
+import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl, fromNow} from "../../../../lib/js/tools";
 export default {
@@ -342,10 +344,12 @@ export default {
     subscribes: [],
     paging: null,
     t: 'null',
+    parentType: null,
     collectionThreadsId: [],
     subscribeTypes: [],
   }),
   components: {
+    "subscribe-types": SubscribeTypes,
     'nav-types': NavTypes,
     'paging': Paging
   },
@@ -395,8 +399,8 @@ export default {
         self.targetUser = res.targetUser;
         self.subscribes = res.subscribes;
         self.paging = res.paging;
+        self.parentType = res.parentType;
         self.t = res.t;
-        console.log(res.t);
         self.collectionThreadsId = res.collectionThreadsId;
         self.subscribeTypes = res.subscribeTypes;
       })
@@ -404,8 +408,44 @@ export default {
         sweetError(err);
       })
     },
-    moveSub() {
-
+    //取消收藏
+    moveSub(subsId = []) {
+      const subscribes = [];
+      const self = this;
+      const _subscribes = self.subscribes;
+      _subscribes.
+      subsId.map(id => {
+        const s = self.subscribes[id];
+        if(s) subscribes.push(s);
+      })
+      let selectedTypesId = [];
+      if(subscribes.length === 1) {
+        selectedTypesId = subscribes[0].cid;
+      } else if(subscribes.length === 0) {
+        return;
+      }
+      subsId = subscribes.map(s => s._id);
+      self.$refs.subscribeTypes.open((typesId) => {
+        nkcAPI("/account/subscribes", "PUT", {
+          type: "modifyType",
+          typesId: typesId,
+          subscribesId: subsId
+        })
+          .then(function() {
+            self.$refs.subscribeTypes.close();
+            subscribes.map(s => {
+              s.cid = typesId
+            });
+            sweetSuccess("执行成功");
+          })
+          .catch(function(data) {
+            sweetError(data);
+          })
+      }, {
+        selectedTypesId: selectedTypesId,
+        hideInfo: true,
+        selectTypesWhenSubscribe: true
+      });
     },
     //收藏文章
     subThread() {

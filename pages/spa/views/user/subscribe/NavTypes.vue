@@ -1,7 +1,7 @@
 <template lang="pug">
   .subscribe-types-list(v-if="targetUser")
     .subscribe-types
-      .subscribe-type-edit(@click="editType()") 管理分类{{parentType}}111
+      .subscribe-type-edit(@click="editType()") 管理分类
       div 主分类：
         a.subscribe-type(@click="toType('')" :class="!parentType?'active':''") 全部
         a.subscribe-type(v-for="t in subscribeTypes" @click="toType(t._id)" :class="parentType && parentType._id === t._id?'active':''") {{t.name}}

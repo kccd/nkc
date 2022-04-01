@@ -32,7 +32,7 @@ module.exports = {
 				forum: {
 					GET: "getUserHomeCard",
 				},
-				blackList: {
+				blacklist: {
 					GET: "getUserHomeCard",
 				}
 			},
