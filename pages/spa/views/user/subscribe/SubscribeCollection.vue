@@ -2,7 +2,7 @@
   .subscribe-thread(v-if="targetUser")
     .box-shadow-panel
       subscribe-types(ref="subscribeTypes")
-      nav-types(ref="navTypes" :target-user="targetUser" :parent-type="parentType" type="collection" :subscribe-types="subscribeTypes" @click-type="clickType")
+      nav-types(ref="navTypes" :target-user="targetUser" :parent-type="parentType" type="collection" :subscribe-types="subscribeTypes" @click-type="clickType"  @edit-type="editType")
       paging(ref="paging" :pages="pageButtons")
       .account-threads.subscribe-thread
         .null(v-if="!subscribes.length") 空空如也~
@@ -337,6 +337,7 @@ import Paging from "../../../../lib/vue/Paging";
 import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl, fromNow} from "../../../../lib/js/tools";
+import {collectionThread} from "../../../../lib/js/subscribe";
 export default {
   data: () => ({
     uid: null,
@@ -357,7 +358,6 @@ export default {
     pageButtons() {
       return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
     },
-
   },
   mounted() {
     this.initData();
@@ -411,11 +411,14 @@ export default {
     //取消收藏
     moveSub(subsId = []) {
       const subscribes = [];
+      const _subscribesObj = {};
       const self = this;
       const _subscribes = self.subscribes;
-      _subscribes.
+      _subscribes.map(s => {
+        _subscribesObj[s.tid] = s;
+      })
       subsId.map(id => {
-        const s = self.subscribes[id];
+        const s = _subscribesObj[id];
         if(s) subscribes.push(s);
       })
       let selectedTypesId = [];
@@ -447,14 +450,47 @@ export default {
         selectTypesWhenSubscribe: true
       });
     },
-    //收藏文章
-    subThread() {
-
+    //收藏和取消收藏文章
+    subThread(id) {
+      const self = this;
+      const sub = !self.collectionThreadsId.includes(id);
+      if(sub) {
+        self.$refs.subscribeTypes.open((cid) => {
+          collectionThread(id, sub, cid)
+          .then(() => {
+            const index = self.collectionThreadsId.indexOf(id);
+            if(index === -1) self.collectionThreadsId.push(id);
+            sweetSuccess('收藏成功');
+            self.$refs.subscribeTypes.close();
+          })
+          .catch(err => {
+            sweetError(err);
+          })
+        }, {
+        })
+      } else {
+        collectionThread(id, sub)
+          .then(() => {
+            const index = self.collectionThreadsId.indexOf(id);
+            if(index !== -1) self.collectionThreadsId.splice(index, 1);
+            sweetSuccess('收藏已取消');
+          })
+          .catch(err => {
+            sweetError(err);
+          })
+      }
     },
     //点击文章分类时
     clickType(t){
       this.t = t;
       this.getThreads();
+    },
+    //管理分类
+    editType() {
+      this.$refs.subscribeTypes.open(() => {
+      },{
+        editType: true
+      })
     }
   }
 }
