@@ -20,7 +20,7 @@ module.exports = {
 			},
 			s: {
 				GET: "visitUserCard",
-				thread: {
+				collection: {
 					GET: "getUserHomeCard"
 				},
 				column: {

@@ -3,7 +3,7 @@ const router = new Router();
 const subUserRouter = require('./subscribe/user');
 const subForumRouter = require('./subscribe/forum');
 const subColumnRouter = require('./subscribe/column');
-const subThreadRouter = require('./subscribe/thread');
+const subCollectionRouter = require('./subscribe/collection');
 const blacklistRouter = require('./subscribe/blackList');
 const momentRouter = require('./moment');
 const postRouter = require('./post');
@@ -177,7 +177,7 @@ router
             // },
             {
               type: "subscribe/collection",
-              url: `/u/${targetUser.uid}/p/s/thread`,
+              url: `/u/${targetUser.uid}/p/s/collection`,
               name: "收藏的文章",
               count: collectionThreadsId.length
             },
@@ -252,7 +252,7 @@ router
   .get('/s/user', subUserRouter)
   .get('/s/forum', subForumRouter)
   .get('/s/column', subColumnRouter)
-  .get('/s/thread', subThreadRouter)
+  .get('/s/collection', subCollectionRouter)
   .get('/s/blacklist', blacklistRouter)
   .get('/moment', momentRouter)
   .get('/post', postRouter)

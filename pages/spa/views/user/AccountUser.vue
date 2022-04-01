@@ -11,7 +11,7 @@
         user-focus-on(ref="userFocusOn")
 
     //- 用户中间面板 先hi用户的动态， 文章，恢复等信息
-    .col-xs-12.col-md-7.box-shadow-panel.p-r-0
+    .col-xs-12.col-md-7.p-r-0
       router-view
       //user-card(ref="userCard")
     //用户右侧面板
