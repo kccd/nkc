@@ -6,5 +6,9 @@ export function subForum(id, sub, cid) {
     method = "DELETE";
   }
   return nkcAPI('/f/' + id + '/subscribe', method, {cid: cid || []})
+};
+//取关和关注
+export function subUsers(){
+
 }
 
