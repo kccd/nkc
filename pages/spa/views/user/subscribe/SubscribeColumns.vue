@@ -1,15 +1,17 @@
 <template lang="pug">
-  .subscribe-columns
-    .null(v-if="!subscribes" ) 空空如也~~
-    .account-follower(v-for="item in subscribes")
-      .account-follower-avatar
-        img.img(:src="getUrl('columnAvatar',item.column._id, 'sm')")
-      .account-follower-content
-        .account-follower-name
-          .account-follower-buttons
-            button.subscribe(:class="subColumnsId.indexOf(item.column._id)+1 ?'cancel':'focus'" @click="columnFollowType(item.column._id)") {{subColumnsId.indexOf(item.column._id)+1?'取关':'关注'}}
-          a(:href="getUrl('columnHome', item.column._id)") {{item.column.name}}
-        .account-follower-description {{item.column.description || "暂无简介"}}
+  div
+    paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
+    .subscribe-columns
+      .null(v-if="!subscribes" ) 空空如也~~
+      .account-follower(v-for="item in subscribes")
+        .account-follower-avatar
+          img.img(:src="getUrl('columnAvatar',item.column._id, 'sm')")
+        .account-follower-content
+          .account-follower-name
+            .account-follower-buttons
+              button.subscribe(:class="subColumnsId.indexOf(item.column._id)+1 ?'cancel':'focus'" @click="columnFollowType(item.column._id)") {{subColumnsId.indexOf(item.column._id)+1?'取关':'关注'}}
+            a(:href="getUrl('columnHome', item.column._id)") {{item.column.name}}
+          .account-follower-description {{item.column.description || "暂无简介"}}
 </template>
 <style lang="less" scoped>
 .subscribe-columns{
@@ -93,14 +95,21 @@
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl} from "../../../../lib/js/tools";
 import {subColumn} from "../../../../lib/js/subscribe";
+import Paging from "../../../../lib/vue/Paging";
 export default {
   data: () => ({
     uid: null,
     subscribes: null,
-    subColumnsId:null
+    subColumnsId:null,
+    paging: null,
   }),
   components: {
-
+    'paging': Paging
+  },
+  computed: {
+    pageButtons() {
+      return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
+    },
   },
   mounted() {
     this.initData();
@@ -120,12 +129,16 @@ export default {
         console.log('res', res);
         self.subscribes = res.subscribes;
         self.subColumnsId = res.subscribes.map((res)=> res.column._id)
-
+        self.paging = res.paging;
       })
       .catch(err => {
         sweetError(err);
       })
 
+    },
+    //点击分页按钮
+    clickBtn(num) {
+      this.getForums(num);
     },
     //取消关注和关注
     columnFollowType(uid) {
@@ -141,7 +154,6 @@ export default {
               sweetSuccess('取消关注');
               if(index !== -1) self.subColumnsId.splice(index, 1);
             }
-
           })
     },
   }

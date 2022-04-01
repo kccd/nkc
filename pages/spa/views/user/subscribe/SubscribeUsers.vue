@@ -312,7 +312,7 @@ export default {
     },
     //点击分页按钮
     clickBtn(num) {
-      this.getForums(num);
+      this.getSubUser(num);
     },
   }
 }

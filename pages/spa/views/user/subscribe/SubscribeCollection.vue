@@ -37,7 +37,7 @@
                   .fa.fa-comment
                   span {{subscribe.thread.count}}
 </template>
-<style lang="less">
+<style lang="less" scoped>
 @import "../../../../publicModules/base";
 @media (max-width: 768px) {
   .account-thread-avatar{
