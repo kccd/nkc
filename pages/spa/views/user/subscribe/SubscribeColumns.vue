@@ -27,8 +27,9 @@ export default {
     //获取用户关注的专栏列表
     getColumns() {
       const self = this;
-      nkcAPI(`/u/${self.uid}/profile/subscribe/column`, 'GET')
+      nkcAPI(`/u/${self.uid}/p/s/column`, 'GET')
       .then(res => {
+        console.log('res', res);
         self.columns = res.columns;
       })
       .catch(err => {
