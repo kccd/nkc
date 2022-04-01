@@ -232,6 +232,22 @@ export default {
     //取关和关注
     subForum(fid) {
       const sub = !this.subForumsId.includes(fid);
+      const self = this;
+      subForum(fid, sub)
+      .then(() => {
+        const index = self.subForumsId.indexOf(fid);
+        if(sub) {
+          sweetSuccess('关注成功');
+          //将关注的id添加到关注的专业id数组中
+          if(index === -1) self.subForumsId.push(fid);
+        } else {
+          sweetSuccess('关注已取消');
+          //将关注的id从关注专业中去除
+          if(index !== -1) self.subForumsId.splice(index, 1);
+        }
+      }).catch(err => {
+          sweetError(err);
+      })
     },
     //点击专业分类时
     clickType(id) {

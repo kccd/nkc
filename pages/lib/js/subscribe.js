@@ -5,6 +5,6 @@ export function subForum(id, sub, cid) {
   } else {
     method = "DELETE";
   }
-  return nkcAPI('f' + id + 'subscribe', method, {cid: cid || []})
+  return nkcAPI('/f/' + id + '/subscribe', method, {cid: cid || []})
 }
 
