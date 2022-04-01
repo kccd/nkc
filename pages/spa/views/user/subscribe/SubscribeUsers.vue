@@ -22,7 +22,7 @@
                 .account-follower-buttons
                   button.category(v-if="subUsersId.indexOf(followedUser.tUid)+1") 分类
                   //button.category 分类
-                  button.subscribe(:class="subUsersId.indexOf(followedUser.tUid)+1 ?'cancel':'focus'" @click="unfollow(followedUser.tUid,index)") {{active?'取关':'关注'}}
+                  button.subscribe(:class="subUsersId.indexOf(followedUser.tUid)+1 ?'cancel':'focus'" @click="unfollow(followedUser.tUid,index)") {{subUsersId.indexOf(followedUser.tUid)+1?'取关':'关注'}}
                   //button.subscribe(class='cancel') {{'取关'}}
               .account-follower-level
               .account-follower-description
@@ -197,6 +197,7 @@
 <script>
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl} from "../../../../lib/js/tools";
+import {subForum} from "../../../../lib/js/subscribe";
 export default {
   data: () => ({
     uid: '',
