@@ -408,7 +408,7 @@ export default {
         sweetError(err);
       })
     },
-    //取消收藏
+    //转移分类
     moveSub(subsId = []) {
       const subscribes = [];
       const _subscribesObj = {};
