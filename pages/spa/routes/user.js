@@ -9,7 +9,7 @@ import SubscribeColumns from "../views/user/subscribe/SubscribeColumns";
 import SubscribeBlackList from "../views/user/subscribe/SubscribeBlackList";
 import SubscribeUsers from "../views/user/subscribe/SubscribeUsers";
 import SubscribeForums from "../views/user/subscribe/SubscribeForums";
-import SubscribeThreads from "../views/user/subscribe/SubscribeThreads";
+import SubscribeCollection from "../views/user/subscribe/SubscribeCollection";
 export const routerName = {
   user: 'userHome',
   follower: 'follower',
@@ -26,6 +26,7 @@ export const routerName = {
   subForums: 'subForums',
   subThreads: 'subThreads',
   profileView: 'profileView',
+  subCollection: 'subCollection'
 }
 
 export default [
@@ -101,9 +102,9 @@ export default [
                 component: SubscribeUsers,
               },
               {
-                name: routerName.subThreads,
-                path: '/u/:uid/p/s/thread',
-                component: SubscribeThreads,
+                name: routerName.subCollection,
+                path: '/u/:uid/p/s/collection',
+                component: SubscribeCollection,
               }
             ]
           }
