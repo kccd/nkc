@@ -22,7 +22,7 @@
               img.img(:src="getUrl('userAvatar',followedUser.targetUser.avatar, 'sm')" :data-float-uid="followedUser.tUid")
             .subscribe-user-list-content
               .account-follower-name
-                a(:href="`/u/${followedUser.tUid}`" ) {{followedUser.targetUser.username}}
+                a(:href="`/u/${followedUser.tUid}`" :data-float-uid="followedUser.tUid") {{followedUser.targetUser.username}}
                 .account-follower-buttons
                   button.category(v-if="subUsersId.indexOf(followedUser.tUid)+1" @click="openTypesModal(followedUser._id,followedUser.cid)") 分类
                   button.subscribe(:class="subUsersId.indexOf(followedUser.tUid)+1 ?'cancel':'focus'" @click="userFollowType(followedUser.tUid)") {{subUsersId.indexOf(followedUser.tUid)+1?'取关':'关注'}}

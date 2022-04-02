@@ -8,7 +8,7 @@
           .item-left
             img(:src="getUrl('userAvatar', item.user.avatar)" :data-float-uid="item.user.uid")
           .item-center
-            a.username(:href="`/u/${item.user.uid}`") {{item.user.username}}
+            a.username(:href="`/u/${item.user.uid}`" :data-float-uid="item.user.uid") {{item.user.username}}
             //.description(:title="${format('YYYY/MM/DD HH:mm:ss', item.toc)}") {{fromNow(item.toc)}}
             //    | &nbsp;&nbsp;来自&nbsp;&nbsp;
             .description() {{fromNow(item.toc)}}&nbsp;&nbsp;来自&nbsp;&nbsp;
