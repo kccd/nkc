@@ -24,10 +24,15 @@
 }
 </style>
 <script>
+import {getUrl} from "../../../../lib/js/tools";
+
 export default {
   props: ['forums'],
   data: () => ({
 
-  })
+  }),
+  methods: {
+    getUrl: getUrl,
+  }
 }
 </script>

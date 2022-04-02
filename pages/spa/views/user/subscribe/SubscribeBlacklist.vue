@@ -2,6 +2,7 @@
   .subscribe-black-list(v-if="targetUser")
     float-user-panel(ref="floatUserPanel")
     .null(v-if="!bl" ) 空空如也~~
+    //paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     .black-list-box(v-else )
       .col-xs-12.col-md-6(v-for="item in bl")
         .list-body
@@ -45,10 +46,10 @@
       .item-center {
         padding: 0 3rem 0 4.6rem;
         .username {
+          display: inline-block;
           font-size: 1.3rem;
           height: 1.8rem;
           word-break: break-word;
-          display: -webkit-box;
           overflow: hidden;
           -webkit-box-orient: vertical;
           -webkit-line-clamp: 1;
@@ -91,18 +92,26 @@ import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl,fromNow} from "../../../../lib/js/tools";
 import {removeUserFromBlacklist} from "../../../../lib/js/subscribe";
 import floatUserPanel from "../../../../lib/vue/FloatUserPanel";
+import Paging from "../../../../lib/vue/Paging";
 export default {
   data: () => ({
     uid: NKC.configs.uid,
     bl: null,
     targetUser: null,
+    paging: null,
   }),
   components: {
-    "float-user-panel":floatUserPanel
+    "float-user-panel":floatUserPanel,
+    'paging': Paging
   },
   mounted() {
     this.initData();
     this.getBlackList();
+  },
+  computed: {
+    pageButtons() {
+      return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
+    },
   },
   methods: {
     getUrl: getUrl,
@@ -131,7 +140,11 @@ export default {
     removeBlacklist(tUid){
       removeUserFromBlacklist(tUid)
       this.getBlackList();
-    }
+    },
+    //点击分页按钮
+    clickBtn(num) {
+      this.getSubUser(num);
+    },
   }
 }
 </script>
