@@ -13,18 +13,22 @@
           .account-user-avatar
             a(:href="getUrl('userAvatar', targetUser.avatar, 'lg')" target="_blank").user-avatar
               img(:src="getUrl('userAvatar', targetUser.avatar)")
-          .account-user-name {{targetUser.username}}
-            user-level(ref="userLevel" :target-user="targetUser")
-          .account-user-certs {{targetUser.info.certsName}}
-          .account-user-description {{targetUser.description}}
-          .account-user-kcb
-            user-scores(ref="userScore")
+          .account-user-right
+            .account-user-name {{targetUser.username}}
+              user-level(ref="userLevel" :target-user="targetUser")
+            .account-user-certs {{targetUser.info.certsName}}
+            .account-user-description {{targetUser.description}}
+            .account-user-kcb
+              user-scores(ref="userScore")
+    .btn-ban
+      .fa.fa-ban(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="用户违规？点我！")
 </template>
 
 <style lang="less">
 @import "../../../../publicModules/base";
 .user-banner {
   height: 13rem;
+  position: relative;
   .hidden-user-home-tip {
   }
   .account-nav {
@@ -48,14 +52,39 @@
             border: 3px solid #fff;
           }
         }
-        .account-user-name {
+        .account-user-right{
           display: inline-block;
+          margin-left: 2rem;
+          .account-user-name {
+            font-size: 16px;
+            display: inline-block;
+            .account-user-level {
+              display: inline-block;
+            }
+          }
+          .account-user-certs{
+            color: #e85a71;
+          }
+
+
         }
 
-        .account-user-level {
-          display: inline-block;
-        }
       }
+    }
+  }
+  .btn-ban{
+    width: 50px;
+    height: 100px;
+    background: #0e0e0e;
+    position: absolute;
+    top:0;
+    .fa-ban{
+      color: red;
+      background: #fff;
+      width: 20px;
+      height: 20px;
+      text-align: center;
+      line-height: 20px;
     }
   }
 }

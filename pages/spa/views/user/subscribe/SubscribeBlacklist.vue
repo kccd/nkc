@@ -1,9 +1,9 @@
 <template lang="pug">
   .subscribe-black-list(v-if="targetUser")
     float-user-panel(ref="floatUserPanel")
+    paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     .null(v-if="!bl" ) 空空如也~~
-    //paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
-    .black-list-box(v-else )
+    .black-list-box(v-else)
       .col-xs-12.col-md-6(v-for="item in bl")
         .list-body
           .item-left
@@ -23,14 +23,17 @@
 @import "../../../../publicModules/base";
 .subscribe-black-list{
   width: 100%;
+  height: auto;
   .black-list-box{
     width: 100%;
     display: table;
     content: " ";
+    height: auto;
     .list-body{
       position: relative;
       height: 3.6rem;
       margin: 1rem 0;
+      height: auto;
       .item-left {
         position: absolute;
         left: 0;
@@ -116,7 +119,6 @@ export default {
   methods: {
     getUrl: getUrl,
     fromNow: fromNow,
-
     initData() {
       const {uid} = this.$route.params;
       this.uid = uid;

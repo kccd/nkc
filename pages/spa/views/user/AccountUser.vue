@@ -14,6 +14,14 @@
 </template>
 <style lang="less">
 @import "../../../publicModules/base";
+body{
+  @media (max-width: 991px) {
+    #comment-content{
+      padding: 0;
+    }
+  }
+}
+
 </style>
 <script>
 import {getColumnInfo} from "../../../lib/js/tools";
