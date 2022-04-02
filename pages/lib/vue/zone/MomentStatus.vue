@@ -57,7 +57,6 @@ export default {
     },
     //删除动态
     deleteMoment() {
-      console.log(this.moment);
       const {momentId, momentCommentId} = this.moment;
       let _id = momentCommentId;
       if(!_id) {

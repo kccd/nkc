@@ -253,7 +253,6 @@ export default {
           url += `page=${page}`;
         }
       }
-      console.log('url', url);
       nkcAPI(url, 'GET')
       .then(res => {
         if(self.$refs.floatUserPanel) {

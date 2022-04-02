@@ -12,6 +12,7 @@ const threadRouter = require('./thread');
 const followerRouter = require('./follower');
 const fanRouter = require('./fan');
 const manageRouter = require('./manage');
+const userRouter = require('./subUser');
 router
   .get('/', async (ctx, next) => {
     //获取主页导航等信息
@@ -269,5 +270,6 @@ router
   .get('/fan', fanRouter)
   .get('/follower', followerRouter)
   .get('/manage', manageRouter)
+  .get('/subUser', userRouter)
 
 module.exports = router;
