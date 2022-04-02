@@ -10,7 +10,7 @@
     //user-card(ref="userCard")
   //用户右侧面板
   .col-xs-12.col-md-2.box-shadow-panel.hidden-sm.hidden-xs.p-r-0.m-b-1
-    right-panel(:forums="forums")
+    right-panel(:forums="forums" :target-user="targetUser")
 </template>
 <style lang="less">
 @import "../../../publicModules/base";

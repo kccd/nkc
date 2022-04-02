@@ -2,7 +2,7 @@
   .subscribe-thread(v-if="targetUser")
     subscribe-types(ref="subscribeTypes")
     nav-types(ref="navTypes" :target-user="targetUser" :parent-type="parentType" type="collection" :subscribe-types="subscribeTypes" @click-type="clickType"  @edit-type="editType")
-    paging(ref="paging" :pages="pageButtons")
+    paging(ref="paging" :pages="pageButtons" @click-button="clickPage")
     .account-threads.subscribe-thread
       .null(v-if="!subscribes.length") 空空如也~
       .subscribe-thread-list(v-else)
@@ -490,6 +490,11 @@ export default {
       },{
         editType: true
       })
+    },
+    //点击分页
+    clickPage(num) {
+      if(!num) return;
+      this.getThreads(num);
     }
   }
 }
