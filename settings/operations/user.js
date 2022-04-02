@@ -3,6 +3,9 @@ module.exports = {
 	PARAMETER: {
 		p: {
 			GET: "visitUserCard",
+			subUser: {
+				GET: "visitUserCard",
+			},
 			manage: {
 				GET: "getUserHomeCard"
 			},
@@ -18,7 +21,7 @@ module.exports = {
 			follow: {
 				GET: "getUserHomeCard",
 			},
-			fans: {
+			fan: {
 				GET: "getUserHomeCard",
 			},
 			s: {

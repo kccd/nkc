@@ -918,7 +918,6 @@
             f.status = "unUpload";
             f.progress = 0;
             f.error = data.error || data;
-            console.log(data);
             screenTopWarning(data.error || data);
           })
       },
