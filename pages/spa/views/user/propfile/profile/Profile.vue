@@ -9,9 +9,11 @@
     .post-panel-item
       router-view
 </template>
-<style lang="less">
+<style lang="less" scoped>
 @import "../../../../../publicModules/base";
-
+.paging-button {
+  padding: 15px;
+}
 </style>
 <script>
 export default {

@@ -19,6 +19,23 @@ var CheckData = function () {
     var zhCN = data.match(/[^\x00-\xff]/g) || [];
     return data.length + zhCN.length;
   };
+  
+  /*
+  * 验证动态码
+  * @param {string} 需要验证的用户uid
+  * */
+  self.checkUserCode = function (uid) {
+    return sweetPrompt('请输入动态码')
+      .then(code => {
+        return nkcAPI(`/u/${data.uid}/code`, 'POST', {code})
+      })
+      .then(() => {
+        sweetSuccess('验证通过');
+      })
+      .catch(err => {
+        sweetError(err);
+      });
+  }
   /*
   * 检测数字类型
   * @param data 需要检测的数据

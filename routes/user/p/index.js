@@ -10,6 +10,7 @@ const postRouter = require('./post');
 const threadRouter = require('./thread');
 const followerRouter = require('./follower');
 const fanRouter = require('./fan');
+const manageRouter = require('./manage');
 router
   .get('/', async (ctx, next) => {
     //获取主页导航等信息
@@ -27,6 +28,12 @@ router
     const subTopicsId = await db.SubscribeModel.getUserSubForumsId(targetUser.uid, "topic");
     const subDisciplinesId = await db.SubscribeModel.getUserSubForumsId(targetUser.uid, "discipline");
     const subForumsId = subTopicsId.concat(subDisciplinesId);
+    // 获取用户能够访问的专业ID
+    data.targetUserSubForums = await db.ForumModel.find({
+      fid: {
+        $in: subForumsId
+      }
+    });
     //获取收藏的文章id
     const collectionThreadsId = await db.SubscribeModel.getUserCollectionThreadsId(targetUser.uid);
     if(state.isApp) {
@@ -259,5 +266,6 @@ router
   .get('/thread', threadRouter)
   .get('/fan', fanRouter)
   .get('/follower', followerRouter)
+  .get('/manage', manageRouter)
 
 module.exports = router;
