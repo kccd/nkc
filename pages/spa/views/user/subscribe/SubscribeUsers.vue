@@ -4,13 +4,6 @@
     subscribe-types(ref="subscribeTypes")
     float-user-panel(ref="floatUserPanel")
     nav-types(ref="navTypes" :target-user="targetUser" :parent-type="parentType" type="collection" :subscribe-types="subscribeTypes" @click-type="typeClick"  @edit-type="editType")
-    //.subscribe-types
-    //  .main-type 主分类：
-    //    .box-shadow-panel
-    //      button.subscribe-type(:class="{'active':t.length===0}" @click="typeClick('')") 全部
-    //    .box-shadow-panel(v-for="type in subscribeTypes")
-    //      button.subscribe-type(:class="{'active':t === type._id}" @click="typeClick(type._id)") {{type.name}}
-    //  .subscribe-type-edit(@click="openTypesModal()") 管理分类
     .subscribe-divide-lines
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     .subscribe-user-content
@@ -296,7 +289,6 @@ export default {
       const index = self.subUsersId.indexOf(uid);
       if(sub){
         self.$refs.subscribeTypes.open((cid) => {
-          console.log('cid',cid)
           subUsers(uid, sub, [...cid])
               .then(() => {
                 if(index === -1) self.subUsersId.push(uid);
@@ -326,7 +318,6 @@ export default {
       const self = this;
       this.$refs.subscribeTypes.open((cid) => {
         self.showCid = cid
-        console.log('3',self.showCid);
         subTypesChange([...cid],[_id])
         .then((res)=>{
           this.$refs.subscribeTypes.close();
