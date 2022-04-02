@@ -122,11 +122,18 @@ export default {
       this.uid = uid;
     },
     //获取用户关注的专栏列表
-    getColumns() {
+    getColumns(page) {
       const self = this;
-      nkcAPI(`/u/${self.uid}/p/s/column`, 'GET')
+      let url = `/u/${self.uid}/p/s/column`;
+      if(page) {
+        if(url.indexOf('?') === -1) {
+          url = url + `?page=${page}`;
+        } else {
+          url = url + `page=${page}`;
+        }
+      }
+      nkcAPI(url, 'GET')
       .then(res => {
-        console.log('res', res);
         self.subscribes = res.subscribes;
         self.subColumnsId = res.subscribes.map((res)=> res.column._id)
         self.paging = res.paging;
@@ -138,7 +145,7 @@ export default {
     },
     //点击分页按钮
     clickBtn(num) {
-      this.getForums(num);
+      this.getColumns(num);
     },
     //取消关注和关注
     columnFollowType(uid) {

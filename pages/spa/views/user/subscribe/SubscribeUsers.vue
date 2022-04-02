@@ -1,15 +1,16 @@
 <template lang="pug">
   //关注的用户
-  .subscribe-user(v-if="loading")
+  .subscribe-user(v-if="targetUser")
     subscribe-types(ref="subscribeTypes")
     float-user-panel(ref="floatUserPanel")
-    .subscribe-types
-      .main-type 主分类：
-        .box-shadow-panel
-          button.subscribe-type(:class="{'active':t.length===0}" @click="typeClick('')") 全部
-        .box-shadow-panel(v-for="type in subscribeTypes")
-          button.subscribe-type(:class="{'active':t === type._id}" @click="typeClick(type._id)") {{type.name}}
-      .subscribe-type-edit(@click="openTypesModal()") 管理分类
+    nav-types(ref="navTypes" :target-user="targetUser" :parent-type="parentType" type="collection" :subscribe-types="subscribeTypes" @click-type="typeClick"  @edit-type="editType")
+    //.subscribe-types
+    //  .main-type 主分类：
+    //    .box-shadow-panel
+    //      button.subscribe-type(:class="{'active':t.length===0}" @click="typeClick('')") 全部
+    //    .box-shadow-panel(v-for="type in subscribeTypes")
+    //      button.subscribe-type(:class="{'active':t === type._id}" @click="typeClick(type._id)") {{type.name}}
+    //  .subscribe-type-edit(@click="openTypesModal()") 管理分类
     .subscribe-divide-lines
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     .subscribe-user-content
@@ -21,9 +22,9 @@
               img.img(:src="getUrl('userAvatar',followedUser.targetUser.avatar, 'sm')" :data-float-uid="followedUser.tUid")
             .subscribe-user-list-content
               .account-follower-name
-                a(:href="`/u/${followedUser.tUid}`" ) {{followedUser.targetUser.username}}
+                a(:href="`/u/${followedUser.tUid}`" :data-float-uid="followedUser.tUid") {{followedUser.targetUser.username}}
                 .account-follower-buttons
-                  button.category(v-if="subUsersId.indexOf(followedUser.tUid)+1" @click="openTypesModal(followedUser._id)") 分类
+                  button.category(v-if="subUsersId.indexOf(followedUser.tUid)+1" @click="openTypesModal(followedUser._id,followedUser.cid)") 分类
                   button.subscribe(:class="subUsersId.indexOf(followedUser.tUid)+1 ?'cancel':'focus'" @click="userFollowType(followedUser.tUid)") {{subUsersId.indexOf(followedUser.tUid)+1?'取关':'关注'}}
               .account-follower-level
                 span(:style="{color:followedUser.targetUser.grade.color}") {{followedUser.targetUser.grade.displayName}}
@@ -201,9 +202,10 @@
 }
 </style>
 <script>
+import NavTypes from "./NavTypes";
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl} from "../../../../lib/js/tools";
-import {subUsers, subTypesChange} from "../../../../lib/js/subscribe";
+import {subUsers, subTypesChange, collectionThread} from "../../../../lib/js/subscribe";
 import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
 import FloatUserPanel from "../../../../lib/vue/FloatUserPanel";
 import Paging from "../../../../lib/vue/Paging";
@@ -218,9 +220,11 @@ export default {
     cid: '',
     paging: null,
     targetUser: null,
-    loading: false,
+    showCid:[],
+    parentType: null,
   }),
   components: {
+    'nav-types': NavTypes,
     "subscribe-types": SubscribeTypes,
     "float-user-panel" : FloatUserPanel,
     'paging': Paging
@@ -230,7 +234,6 @@ export default {
     this.getSubUser();
   },
   mounted() {
-    // this.$refs.floatUserPanel.initState()
   },
   computed: {
     pageButtons() {
@@ -245,7 +248,6 @@ export default {
     },
     //获取关注的用户
     getSubUser(page) {
-      this.loading = false;
       const self = this;
       let url = `/u/${self.uid}/p/s/user`;
       if(self.t) {
@@ -264,7 +266,8 @@ export default {
         if(self.$refs.floatUserPanel) {
           self.$refs.floatUserPanel.initPanel();
         }
-        self.loading = true;
+        self.targetUser = res.targetUser;
+        self.parentType = res.parentType;
         self.subscribeTypes = res.subscribeTypes;
         self.subscribes = res.subscribes;
         self.subUsersId = res.subUsersId
@@ -276,38 +279,63 @@ export default {
     },
     //分类选项查询和变化
     typeClick(t) {
-      console.log(t)
       this.t = t;
       this.getSubUser()
+    },
+    //管理分类
+    editType() {
+      this.$refs.subscribeTypes.open(() => {
+      },{
+        editType: true
+      })
     },
     //取消关注和关注
     userFollowType(uid) {
       const sub = !this.subUsersId.includes(uid);
       const self = this;
       const index = self.subUsersId.indexOf(uid);
-      subUsers(uid,sub)
-          .then((res)=>{
-            if(sub) {
-              sweetSuccess('关注成功');
-              if(index === -1) self.subUsersId.push(uid);
-            } else {
+      if(sub){
+        self.$refs.subscribeTypes.open((cid) => {
+          console.log('cid',cid)
+          subUsers(uid, sub, [...cid])
+              .then(() => {
+                if(index === -1) self.subUsersId.push(uid);
+                sweetSuccess('关注成功');
+                self.$refs.subscribeTypes.close();
+                this.getSubUser()
+              })
+              .catch(err => {
+                sweetError(err);
+              })
+        }, {
+        })
+      }else{
+        subUsers(uid,sub)
+            .then((res)=>{
               sweetSuccess('取消关注');
               if(index !== -1) self.subUsersId.splice(index, 1);
-            }
+            })
+            .catch(err => {
+              sweetError(err);
+        })
+      }
 
-          })
     },
     //分类弹窗操作
-    openTypesModal(_id) {
+    openTypesModal(_id,cid) {
+      const self = this;
       this.$refs.subscribeTypes.open((cid) => {
-        console.log([...cid],[_id]);
+        self.showCid = cid
+        console.log('3',self.showCid);
         subTypesChange([...cid],[_id])
         .then((res)=>{
           this.$refs.subscribeTypes.close();
           sweetSuccess("执行成功");
         })
       },{
-
+        selectedTypesId: cid,//[]
+        hideInfo: true,
+        selectTypesWhenSubscribe: true
       });
     },
     //点击分页按钮
