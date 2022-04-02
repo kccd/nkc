@@ -35,6 +35,7 @@ const navLinksRouter = require("./navLinks");
 // 请求内容
 const contentRouter = require("./content");
 const pRouter = require('./p/index');
+const subscribeRouter = require('./subscribe');
 const path = require('path');
 
 
@@ -92,6 +93,7 @@ userRouter
     await next();
   })
 	.use('/:uid/transaction', transactionRouter.routes(), transactionRouter.allowedMethods())
+    .use('/:uid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
 	.use('/:uid/bills', billRouter.routes(), billRouter.allowedMethods())
 	// .use('/:uid/banner', bannerRouter.routes(), bannerRouter.allowedMethods())
 	.use('/:uid/banned', bannedRouter.routes(), bannedRouter.allowedMethods())

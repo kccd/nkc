@@ -1,21 +1,85 @@
 <template lang="pug">
-  .subscribe-black-list
-    .null(v-if="!blackList" ) 空空如也~~
-    .col-xs-12.col-md-6
-      //.list-body(v-for="item in blackList")
-      //  .item-left
-      //    img(:src="getUrl('userAvatar', item.user.avatar)")
-      //  .item-center
-      //    a.username(:href="/u/${item.user.uid}") {{item.user.username}}
-      //    .description(:title="${format('YYYY/MM/DD HH:mm:ss', item.toc)}") `${fromNow(item.toc)}`
-      //      | &nbsp;&nbsp;来自&nbsp;&nbsp;
-      //      span!=item.fromHTML
-      //  .item-right
-      //    .icon(title="移除" @click="removeBlacklist('${b.user.uid}', ${b._id})")
-      //      .fa.fa-trash
+  .subscribe-black-list(v-if="targetUser")
+    float-user-panel(ref="floatUserPanel")
+    .null(v-if="!bl" ) 空空如也~~
+    .black-list-box(v-else )
+      .col-xs-12.col-md-6(v-for="item in bl")
+        .list-body
+          .item-left
+            img(:src="getUrl('userAvatar', item.user.avatar)" :data-float-uid="item.user.uid")
+          .item-center
+            a.username(:href="`/u/${item.user.uid}`") {{item.user.username}}
+            //.description(:title="${format('YYYY/MM/DD HH:mm:ss', item.toc)}") {{fromNow(item.toc)}}
+            //    | &nbsp;&nbsp;来自&nbsp;&nbsp;
+            .description() {{fromNow(item.toc)}}&nbsp;&nbsp;来自&nbsp;&nbsp;
+              span(v-html="item.fromHTML")
+          .item-right
+            .icon(title="移除" @click="removeBlacklist(item.user.uid)")
+              .fa.fa-trash
+
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
+.subscribe-black-list{
+  width: 100%;
+  .black-list-box{
+    width: 100%;
+    display: table;
+    content: " ";
+    .list-body{
+      position: relative;
+      height: 3.6rem;
+      margin: 1rem 0;
+      .item-left {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 3.6rem;
+        width: 3.6rem;
+        img {
+          height: 100%;
+          width: 100%;
+          border-radius: 50%;
+        }
+      }
+      .item-center {
+        padding: 0 3rem 0 4.6rem;
+        .username {
+          font-size: 1.3rem;
+          height: 1.8rem;
+          word-break: break-word;
+          display: -webkit-box;
+          overflow: hidden;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 1;
+        }
+        .description {
+          margin-top: 0.3rem;
+          font-size: 1rem;
+          font-style: oblique;
+        }
+      }
+      .item-right {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 3.6rem;
+        width: 2rem;
+        .icon {
+          text-align: center;
+          color: #aaa;
+          cursor: pointer;
+          font-size: 1.3rem;
+          &:hover{
+            color: #0e0e0e;
+          }
+        }
+      }
+    }
+  }
+}
+
+
 .null {
   padding-top: 5rem;
   padding-bottom: 5rem;
@@ -25,13 +89,16 @@
 <script>
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl,fromNow} from "../../../../lib/js/tools";
+import {removeUserFromBlacklist} from "../../../../lib/js/subscribe";
+import floatUserPanel from "../../../../lib/vue/FloatUserPanel";
 export default {
   data: () => ({
     uid: NKC.configs.uid,
-    blackList: null,
+    bl: null,
+    targetUser: null,
   }),
   components: {
-
+    "float-user-panel":floatUserPanel
   },
   mounted() {
     this.initData();
@@ -39,6 +106,8 @@ export default {
   },
   methods: {
     getUrl: getUrl,
+    fromNow: fromNow,
+
     initData() {
       const {uid} = this.$route.params;
       this.uid = uid;
@@ -48,12 +117,21 @@ export default {
       const self = this;
       nkcAPI(`/u/${this.uid}/p/s/blacklist`, 'GET')
       .then(res => {
-        self.blackList = res.blackList;
+        if(self.$refs.floatUserPanel) {
+          self.$refs.floatUserPanel.initPanel();
+        }
+        self.bl = res.bl;
+        self.targetUser = res.targetUser;
       })
       .catch(err => {
         sweetError(err);
       })
     },
+    //删除黑名单
+    removeBlacklist(tUid){
+      removeUserFromBlacklist(tUid)
+      this.getBlackList();
+    }
   }
 }
 </script>

@@ -306,7 +306,9 @@ export default {
        this.user = '';
     },
     initPanel() {
+      console.log('1')
       const doms = $(`[data-float-uid]`);
+      console.log(doms)
       for(var i = 0; i < doms.length; i++ ) {
         const dom = doms.eq(i);
         if(dom.attr("data-float-init") === "true") continue;

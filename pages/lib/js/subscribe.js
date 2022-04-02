@@ -57,3 +57,23 @@ export function collectionThread(id, collection, cid) {
   })
 }
 
+/*
+* 将用户从黑名单中移除
+* @param {String} tUid 需要移除用户的ID
+* */
+export function removeUserFromBlacklist(tUid) {
+    return Promise.resolve()
+        .then(function() {
+            return nkcAPI('/blacklist?tUid=' + tUid, 'GET')
+        })
+        .then(function(data) {
+            if(!data.bl) throw '对方未在黑名单中';
+            return nkcAPI('/blacklist?tUid=' + tUid, 'DELETE');
+        })
+        .then(function(data) {
+            sweetSuccess('操作成功');
+            return data;
+        })
+        .catch(sweetError);
+}
+
