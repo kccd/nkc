@@ -36,7 +36,6 @@
 <style lang="less">
 @import "../../../../publicModules/base";
 .home-subscribe-forum {
-  padding: 15px;
   .account-followers{
     margin-top: 0.5rem;
     .account-follower:last-child{

@@ -1,11 +1,9 @@
 <template lang="pug">
-.container-fluid.max-width
-  .row
-    .col-sx-12.col-md-12
-      .row
-        Panel(ref="panel" :target-user="targetUser" v-if="targetUser")
-        account-user(ref="accountUser" :target-user="targetUser" :nav-links="navLinks")
-        footer-vue(ref="footerVue")
+.container-fluid.max-width(v-cloak)
+  .col-sx-12.col-md-12
+    Panel(ref="panel" :target-user="targetUser" v-if="targetUser")
+    account-user(ref="accountUser" :target-user="targetUser" :nav-links="navLinks" :forums="subForums")
+    footer-vue(ref="footerVue")
 </template>
 
 <style lang="less" scoped>
@@ -26,6 +24,7 @@ export default {
     navLinks: null,
     uid: null,
     isApp: null,
+    subForums: [],
   }),
   components: {
     Panel: Panel,
@@ -48,6 +47,7 @@ export default {
       const self = this;
       nkcAPI(`/u/${this.uid}/p`, 'GET')
       .then(res => {
+        self.subForums = res.targetUserSubForums;
         self.navLinks = res.navLinks;
         self.targetUser = res.targetUser;
       })

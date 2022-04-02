@@ -3,6 +3,9 @@ module.exports = {
 	PARAMETER: {
 		p: {
 			GET: "visitUserCard",
+			manage: {
+				GET: "getUserHomeCard"
+			},
 			moment: {
 				GET: "getUserHomeCard"
 			},
