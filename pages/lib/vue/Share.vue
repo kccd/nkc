@@ -8,7 +8,7 @@
       img(src='/default/weibo.png')
     .share-icon(@click="shareShowWeChat()" title="分享到微信")
       img(src='/default/weChat.png')
-    .share-icon(title="点击复制分享链接")
+    .share-icon(title="点击复制分享链接" @click="copyUrl")
       #shareLinkButton
         .fa.fa-link
     .weChat-image
@@ -64,13 +64,13 @@
 </style>
 <script>
 import {getState} from "../js/state";
-import {ClipboardJS} from "../../../public/clipboard/clipboard.min";
+import {screenTopAlert} from "../js/topAlert";
 export default {
   props: ['shareType', 'shareTitle', 'share-id', 'share-description', 'share-avatar'],
   data: () => ({
   }),
   mounted() {
-    this.initClipboard();
+    this.initQrcodeCanvas();
   },
   computed: {
     description() {
@@ -82,19 +82,46 @@ export default {
   },
   methods: {
     getState: getState,
-    //实例化复制组件
-    initClipboard() {
-      // var clipboard = new ClipboardJS('#shareLinkButton', {
-      //   text: function(trigger) {
-      //     return window.location.origin + window.location.pathname;
-      //   }
-      // });
-      // if(!window.clipboardLoaded) {
-      //   clipboard.on('success', function() {
-      //     screenTopAlert("链接已复制到粘贴板");
-      //   });
-      //   window.clipboardLoaded = true;
-      // }
+    copyUrl() {
+      const copyTest = window.location.href;
+      const input = document.createElement('input');
+      input.value = copyTest;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('Copy');
+      input.className = 'oInput';
+      input.style.display = 'none';
+      screenTopAlert('复制成功');
+    },
+    initQrcodeCanvas() {
+      const toCanvas = function(dom) {
+        const url = dom.getAttribute('data-url');
+        let path = dom.getAttribute("data-path");
+        let origin = dom.getAttribute("data-origin");
+        if (!origin) origin = window.location.origin;
+        if (!path) path = window.location.pathname;
+        QRCode.toCanvas(dom, url ? url : (origin + path), {
+          margin: 1,
+          width: 114,
+          color: {
+            dark: "#333333"
+          }
+        }, function (err, url) {
+          if (err) {
+            console.log(err);
+            screenTopWarning(err);
+          } else {
+            dom.setAttribute('data-init', 'true');
+          }
+        });
+      }
+      const qrcodeCanvas = document.getElementsByClassName("qrcode-canvas");
+      for (let i = 0; i < qrcodeCanvas.length; i++) {
+        const dom = qrcodeCanvas[i];
+        const init = dom.getAttribute("data-init");
+        if (init === 'true') continue;
+        toCanvas(dom);
+      }
     },
     //分享到微信
     shareShowWeChat() {
@@ -102,24 +129,24 @@ export default {
     },
     //分享到其他
     shareToOther(shareType, type, title, pid, description, avatar) {
-      var origin = window.location.origin;
+      const origin = window.location.origin;
       var lk = origin +'/default/logo3.png';
       if(shareType === "column") {
         lk = origin + "/a/" + avatar
       } else if(shareType === "user") {
         lk = origin + NKC.methods.tools.getUrl('userAvatar', pid)
       }
-      var newLink = window.open();
-      var str = window.location.origin + window.location.pathname;
+      const newLink = window.open();
+      const str = window.location.origin + window.location.pathname;
       if(str){
-        var para = {
+        const para = {
           'str': str,
           'type': shareType,
           targetId: pid // 与type类型对应的Id
         };
         nkcAPI('/s', "POST", para)
           .then(function(data) {
-            var newUrl = data.newUrl;
+            let newUrl = data.newUrl;
             if(data.newUrl.indexOf('http') !== 0) {
               newUrl = origin + newUrl;
             }

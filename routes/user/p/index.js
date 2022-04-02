@@ -5,6 +5,7 @@ const subForumRouter = require('./subscribe/forum');
 const subColumnRouter = require('./subscribe/column');
 const subCollectionRouter = require('./subscribe/collection');
 const blacklistRouter = require('./subscribe/blackList');
+const subThreadRouter = require('./subscribe/thread');
 const momentRouter = require('./moment');
 const postRouter = require('./post');
 const threadRouter = require('./thread');
@@ -261,6 +262,7 @@ router
   .get('/s/column', subColumnRouter)
   .get('/s/collection', subCollectionRouter)
   .get('/s/blacklist', blacklistRouter)
+  .get('/s/thread', subThreadRouter)
   .get('/moment', momentRouter)
   .get('/post', postRouter)
   .get('/thread', threadRouter)
