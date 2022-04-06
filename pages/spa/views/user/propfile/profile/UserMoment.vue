@@ -44,17 +44,14 @@ export default {
     const {name, params} = this.$route;
     const {uid} = params;
     this.uid = uid;
-    this.getUserCardInfo('', 0);
+    this.getUserCardInfo(0);
   },
   methods: {
     //获取用户卡片信息
-    getUserCardInfo(type, page) {
+    getUserCardInfo(page) {
       const {uid} = this;
       const self= this;
-      let url = `/u/${uid}/userHomeCard`;
-      if(type) {
-        url = url + `?t=${type}`
-      }
+      let url = `/u/${uid}/p/moment`;
       if(page) {
         const index = url .indexOf('?');
         if(index === -1) {
@@ -83,7 +80,7 @@ export default {
     },
     //点击分页
     clickButton(num) {
-      this.getUserCardInfo('', num);
+      this.getUserCardInfo(num);
     }
   }
 }

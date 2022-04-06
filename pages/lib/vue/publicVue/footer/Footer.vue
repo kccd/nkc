@@ -55,6 +55,9 @@
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
+footer.footer {
+  border-top: none;
+}
 </style>
 <script>
 import { getState } from "../../../js/state";
