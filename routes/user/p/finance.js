@@ -2,6 +2,10 @@ module.exports = async (ctx, next) => {
   const {nkcModules, query, data, db} = ctx;
   const {targetUser} = data;
   const {t, page} = query;
+  // 用户积分
+  if(ctx.permission('viewUserScores')) {
+    data.targetUserScores = await db.UserModel.getUserScores(targetUser.uid);
+  };
   const q = {
     verify: true
   };
