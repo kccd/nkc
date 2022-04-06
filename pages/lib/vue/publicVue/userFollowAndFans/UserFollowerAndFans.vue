@@ -27,6 +27,14 @@ export default {
       return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
     },
   },
+  watch: {
+    '$route.name': function(newVal, oldVal){
+      if(newVal) {
+        this.initData();
+        this.getUserCardInfo();
+      }
+    }
+  },
   mounted() {
     this.initData();
     this.getUserCardInfo();
@@ -44,7 +52,7 @@ export default {
     },
     getUserCardInfo(page) {
       this.loading = false;
-      let url = `/u/${this.uid}/p/${this.routeName}`;
+      let url = `/u/${this.uid}/p/follower?t=${this.routeName}`;
       const self = this;
       if (page) {
         const index = url.indexOf("?");

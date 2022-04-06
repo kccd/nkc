@@ -74,6 +74,7 @@ export default {
 </script>
 <style scoped lang="less">
 .userInfo {
+  margin: 1rem;
   height: 6rem;
   margin-bottom: 0.5rem;
   padding: 0.5rem;
