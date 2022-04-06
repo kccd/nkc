@@ -98,7 +98,7 @@ import floatUserPanel from "../../../../lib/vue/FloatUserPanel";
 import Paging from "../../../../lib/vue/Paging";
 export default {
   data: () => ({
-    uid: NKC.configs.uid,
+    uid: null,
     bl: null,
     targetUser: null,
     paging: null,

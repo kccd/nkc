@@ -36,6 +36,7 @@ const navLinksRouter = require("./navLinks");
 const contentRouter = require("./content");
 const pRouter = require('./p/index');
 const subscribeRouter = require('./subscribe');
+const userPanelRouter = require('./userPanel');
 const path = require('path');
 
 
@@ -118,4 +119,5 @@ userRouter
   .use("/:uid/navLinks", navLinksRouter.routes(), navLinksRouter.allowedMethods())
   .use("/:uid/content", contentRouter.routes(), contentRouter.allowedMethods())
   .use("/:uid/p", pRouter.routes(), pRouter.allowedMethods())
+  .use("/:uid", userPanelRouter.routes(), userPanelRouter.allowedMethods())
 module.exports = userRouter;

@@ -43,6 +43,9 @@ module.exports = {
 				}
 			},
 		},
+		userPanel: {
+			GET: 'visitUserCard',
+		},
 		GET: 'visitUserCard',
 		userHome: {
 			GET: "getUserHomeInfo"
