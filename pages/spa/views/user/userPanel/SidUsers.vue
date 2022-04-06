@@ -8,12 +8,15 @@
             .user-card-user-list
               .side-user(
                 v-for="(u, index) in sidUsers"
-                :data-float-uid="u.uid"
-                data-global-mouseover="showUserPanel"
+
                 v-if="index <= 7"
               )
                 a(:href="`/u/${u.uid}`" target="_blank")
-                  img(:src="getUrl('userAvatar', u.avatar)")
+                  img(
+                    :src="getUrl('userAvatar', u.avatar)"
+                    data-global-mouseover="showUserPanel"
+                    :data-global-data="u.uid"
+                    )
             a(:href="`/u/${targetUser.uid}/p/${type}`" v-if="sidUsers.length > 8").user-card-user-link 查看更多
 </template>
 <style lang="less">

@@ -68,7 +68,8 @@ function saveImage(data) {
 * 显示用户悬浮名片
 * */
 function showUserPanel(data, dom) {
-  const {uid} = data;
+  const DOM = $(dom);
+  window.showFloatUserPanel(data, dom);
 }
 
 /*
@@ -92,8 +93,6 @@ function globalEvent(eventType, e) {
   const elementJQ = $(element);
   const operation = elementJQ.attr(`data-global-${eventType}`);
   if(!operation) return;
-  console.log(operation);
-  debugger
   const eventFunction = eventFunctions[operation];
   if(!eventFunction) return;
   let data = elementJQ.attr('data-global-data');
