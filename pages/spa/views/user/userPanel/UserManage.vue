@@ -4,10 +4,10 @@
     .panel-header 管理
     .m-b-2
       .user-card-sub-div
-        a(:href="`/u/${targetUser.uid}/transaction`" target="_blank").btn.btn-default.btn-sm.m-b-05 查看地址
-        button.m-b-05.btn.btn-default.btn-sm(@click="violationRecord(targetUser.uid)") 违规信息
-        a(:href="`/u/${targetUser.uid}/alt`" target="_blank").btn.btn-default.btn-sm.m-b-05 查马甲
-        button.m-b-05.btn.btn-default.btn-sm(@click="checkUserCode()") 验证动态码
+        a(:href="`/u/${targetUser.uid}/transaction`" target="_blank").m-r-05.btn.btn-default.btn-sm.m-b-05 查看地址
+        button.m-b-05.btn.btn-default.btn-sm.m-r-05(@click="violationRecord(targetUser.uid)") 违规信息
+        a(:href="`/u/${targetUser.uid}/alt`" target="_blank").m-r-05.btn.btn-default.btn-sm.m-b-05 查马甲
+        button.m-b-05.btn.btn-default.btn-sm.m-r-05(@click="checkUserCode()") 验证动态码
 </template>
 <style lang="less" scoped>
 .user-manage {
@@ -15,7 +15,7 @@
   padding: 0.5rem 0;
   transition: box-shadow 300ms;
   &:hover{
-    box-shadow: 0px -8px 8px -4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px -8px 8px -8px rgba(0, 0, 0, 0.2);
   }
   .panel-header {
     height: 1.4rem;

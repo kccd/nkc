@@ -22,7 +22,7 @@
   padding: 0.5rem 0;
   transition: box-shadow 300ms;
   &:hover{
-    box-shadow: 0px -8px 8px -4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px -8px 8px -8px rgba(0, 0, 0, 0.2);
   }
 }
 .share-title{

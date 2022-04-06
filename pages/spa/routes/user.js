@@ -10,6 +10,7 @@ import SubscribeBlacklist from "../views/user/subscribe/SubscribeBlacklist";
 import SubscribeUsers from "../views/user/subscribe/SubscribeUsers";
 import SubscribeForums from "../views/user/subscribe/SubscribeForums";
 import SubscribeCollection from "../views/user/subscribe/SubscribeCollection";
+import Finance from "../views/user/propfile/profile/Finance"
 export const routerName = {
   user: 'userHome',
   follower: 'follower',
@@ -26,7 +27,8 @@ export const routerName = {
   subForums: 'subForums',
   subThreads: 'subThreads',
   profileView: 'profileView',
-  subCollection: 'subCollection'
+  subCollection: 'subCollection',
+  finance: 'finance'
 }
 
 export default [
@@ -45,6 +47,7 @@ export default [
           {
             name: routerName.profile,
             path: '/',
+            redirect: '/u/:uid/p/moment',
             component: Profile,
             children: [
               {
@@ -52,6 +55,7 @@ export default [
                 path: '/u/:uid/p/moment',
                 component: UserMoment,
               },
+
               {
                 name: routerName.post,
                 path: '/u/:uid/p/post',
@@ -109,7 +113,12 @@ export default [
             ]
           }
         ]
-      }
+      },
+      {
+        name: routerName.finance,
+        path: '/u/:uid/p/finance',
+        component: Finance,
+      },
     ],
     
   }

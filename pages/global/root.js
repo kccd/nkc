@@ -3,7 +3,7 @@ import Login from '../lib/vue/Login';
 import {RNOpenLoginPage, RNSyncPageInfo, RNToChat} from "../lib/js/reactNative";
 import {getState} from "../lib/js/state";
 import UserDraw from "../lib/vue/publicVue/userDraw/UserDraw";
-import FloatUserPanel from "../lib/vue/FloatUserPanel";
+import UserFloatPanel from "../lib/vue/UserFloatPanel";
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
@@ -27,7 +27,7 @@ window.RootApp = new Vue({
     'chat': Chat,
     'login': Login,
     "user-draw": UserDraw,
-    "float-user-panel": FloatUserPanel
+    "user-float-panel": UserFloatPanel
   },
   computed: {
     hasLogged() {
@@ -39,7 +39,6 @@ window.RootApp = new Vue({
     initGlobalLongPressEvent();
     initAppGlobalClickLinkEvent();
     initGlobalMouseOverEvent();
-    this.$refs.floatUserPanel.initPanel();
     $(() => {
       // 这里的代码会在页面准备就绪之后执行
     });
@@ -53,7 +52,6 @@ window.RootApp = new Vue({
     showUserPanel() {
       userPanel.showDraw();
     },
-    //
     openLoginPanel(type) {
       if(this.isReactNative) {
         RNOpenLoginPage(type);
@@ -79,7 +77,7 @@ window.RootApp = new Vue({
     //关闭抽屉
     closeDraw(type) {
       this.$refs.userDraw.colseDraw(type);
-    }
+    },
   }
 });
 
