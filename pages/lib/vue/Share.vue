@@ -1,20 +1,39 @@
 <template lang="pug">
-  .share(v-if="!getState.app")
-    .share-icon(@click="shareToOther(shareType, 'qq', shareTitle, shareId, shareDescription, shareAvatar)" title="分享给QQ好友")
-      img(src='/default/QQ.png')
-    .share-icon(@click="shareToOther(shareType, 'qzone', shareTitle, shareId, shareDescription, shareAvatar)" title="分享到QQ空间")
-      img(src='/default/qzone.png')
-    .share-icon(@click="shareToOther(shareType, 'weibo', shareTitle, shareId, shareDescription, shareAvatar)" title="分享到微博")
-      img(src='/default/weibo.png')
-    .share-icon(@click="shareShowWeChat()" title="分享到微信")
-      img(src='/default/weChat.png')
-    .share-icon(title="点击复制分享链接" @click="copyUrl")
-      #shareLinkButton
-        .fa.fa-link
-    .weChat-image
-      canvas.qrcode-canvas
+  .share-box
+    .share-title 分享链接
+    .share(v-if="!getState.app")
+      .share-icon(@click="shareToOther(shareType, 'qq', shareTitle, shareId, shareDescription, shareAvatar)" title="分享给QQ好友")
+        img(src='/default/QQ.png')
+      .share-icon(@click="shareToOther(shareType, 'qzone', shareTitle, shareId, shareDescription, shareAvatar)" title="分享到QQ空间")
+        img(src='/default/qzone.png')
+      .share-icon(@click="shareToOther(shareType, 'weibo', shareTitle, shareId, shareDescription, shareAvatar)" title="分享到微博")
+        img(src='/default/weibo.png')
+      .share-icon(@click="shareShowWeChat()" title="分享到微信")
+        img(src='/default/weChat.png')
+      .share-icon(title="点击复制分享链接" @click="copyUrl")
+        #shareLinkButton
+          .fa.fa-link
+      .weChat-image
+        canvas.qrcode-canvas
 </template>
-<style lang="less">
+<style lang="less" scoped>
+.share-box{
+  border-top: 1px solid #eee;
+  padding: 0.5rem 0;
+  transition: box-shadow 300ms;
+  &:hover{
+    box-shadow: 0px -8px 8px -4px rgba(0, 0, 0, 0.2);
+  }
+}
+.share-title{
+  height: 1.4rem;
+  line-height: 1.4rem;
+  width: 100%;
+  text-align: center;
+  font-size: 1rem;
+  border-radius: 0.7rem;
+  margin-bottom: 1rem;
+}
 .share{
   padding: 0;
   font-size: 0;

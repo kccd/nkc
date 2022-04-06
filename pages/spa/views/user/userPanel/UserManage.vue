@@ -11,10 +11,22 @@
 </template>
 <style lang="less" scoped>
 .user-manage {
+  border-top: 1px solid #eee;
+  padding: 0.5rem 0;
+  transition: box-shadow 300ms;
+  &:hover{
+    box-shadow: 0px -8px 8px -4px rgba(0, 0, 0, 0.2);
+  }
   .panel-header {
-    margin: -15px -15px 1rem -15px;
-    border-bottom: 1px solid #f4f4f4;
-    padding: 0 1rem;
+    height: 1.4rem;
+    line-height: 1.4rem;
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
+    border-radius: 0.7rem;
+    margin-bottom: 1rem;
+    color: #333;
+    font-weight: normal;
   }
 }
 </style>
