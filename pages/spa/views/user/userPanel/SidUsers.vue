@@ -8,7 +8,8 @@
             .user-card-user-list
               .side-user(
                 v-for="(u, index) in sidUsers"
-                :data-global-mouseover="u.uid"
+                :data-float-uid="u.uid"
+                data-global-click="showUserPanel"
                 v-if="index <= 7"
               )
                 a(:href="`/u/${u.uid}`" target="_blank")
@@ -26,7 +27,7 @@ export default {
 
   }),
   methods: {
-    getUrl: getUrl,
+    getUrl: getUrl
   }
 }
 </script>

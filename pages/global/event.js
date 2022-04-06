@@ -65,14 +65,22 @@ function saveImage(data) {
 }
 
 /*
+* 显示用户悬浮名片
+* */
+function showUserPanel(data, dom) {
+  const {uid} = data;
+}
+
+/*
 * data-global-click 和 data-global-long-press 合法的操作
 * */
 const eventFunctions = {
-  viewImage,
-  viewImages,
-  downloadFile,
-  saveImage,
-};
+    viewImage,
+    viewImages,
+    downloadFile,
+    saveImage,
+    showUserPanel,
+  }
 
 /*
 * 点击事件、触摸时间触发之后执行的函数，统一处理
@@ -88,7 +96,7 @@ function globalEvent(eventType, e) {
   if(!eventFunction) return;
   let data = elementJQ.attr('data-global-data');
   data = strToObj(data);
-  eventFunction(data);
+  eventFunction(data, elementJQ);
 }
 
 /*
@@ -116,7 +124,7 @@ export function initGlobalLongPressEvent() {
 * */
 export function initGlobalMouseOverEvent() {
   document.addEventListener('mouseover', e => {
-    globalEvent('mouseover', e);
+    // globalEvent('mouseover', e);
   });
 }
 
