@@ -45,6 +45,7 @@ export default [
           {
             name: routerName.profile,
             path: '/',
+            redirect: '/u/:uid/p/moment',
             component: Profile,
             children: [
               {

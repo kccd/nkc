@@ -17,7 +17,10 @@ module.exports = async (ctx, next) => {
     }
   }
   let paging;
-  if(t === "follow") {
+  if(user) {
+    data.userSubUid = state.subUsersId;
+  }
+  if(t === "follower") {
     //关注的用户
     const q = {
       uid: targetUser.uid,

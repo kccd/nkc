@@ -76,7 +76,7 @@ const eventFunctions = {
 
 /*
 * 点击事件、触摸时间触发之后执行的函数，统一处理
-* @param {String} eventType 时间类型 click, long-press
+* @param {String} eventType 时间类型 click, long-press, mouseover
 * @param {Event}
 * */
 function globalEvent(eventType, e) {
@@ -108,6 +108,15 @@ export function initGlobalClickEvent() {
 export function initGlobalLongPressEvent() {
   initLongPressEvent(document, e => {
     globalEvent('long-press', e);
+  });
+}
+
+/*
+* 监听鼠标悬浮事件
+* */
+export function initGlobalMouseOverEvent() {
+  document.addEventListener('mouseover', e => {
+    globalEvent('mouseover', e);
   });
 }
 
