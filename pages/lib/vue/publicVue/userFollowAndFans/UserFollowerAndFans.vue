@@ -1,9 +1,9 @@
 <template lang="pug">
-  .row
+  .row(v-if="loading")
     paging.col-xs-12.col-md-12(ref="paging" :pages="pageButtons" @click-button="clickButton")
     //- user-info 数组中的一个用户对象
     .col-xs-12.col-md-6(v-for="user in users")
-      user-info( :key="user.uid" :user="user" :page-type="type")
+      user-info( :key="user.uid" :user="user" :page-type="t")
 </template>
 
 <script>
@@ -16,42 +16,26 @@ export default {
     "paging": Paging,
   },
   data: () => ({
-    type: "follow",
     users: [],
     uid: '',
     paging: '',
     routeName: '',
+    loading: false,
   }),
-  props: ["pageType"],
   computed: {
     pageButtons() {
       return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
     },
   },
-  watch: {
-    pageType: {
-      immediate: true,
-      handler(n) {
-        if (typeof n === "undefined") {
-          console.error("pageType is undefined");
-          return;
-        }
-
-        this.type = n;
-        this.getUserCardInfo();
-      }
-    }
-  },
-  created() {
-
-  },
   mounted() {
     this.initData();
+    this.getUserCardInfo();
   },
   methods: {
     initData() {
       const {params, name} = this.$route;
       this.routeName = name;
+      this.t = name;
       const {uid} = params;
       this.uid = uid;
     },
@@ -59,6 +43,7 @@ export default {
       this.getUserCardInfo( num );
     },
     getUserCardInfo(page) {
+      this.loading = false;
       let url = `/u/${this.uid}/p/${this.routeName}`;
       const self = this;
       if (page) {
@@ -71,9 +56,9 @@ export default {
       }
       nkcAPI(url, "GET")
         .then(res => {
-          self.t = res.t;
           self.paging = res.paging;
           self.users = res.users;
+          self.loading = true;
         })
         .catch(err => {
           sweetError(err);
