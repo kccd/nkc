@@ -21,9 +21,9 @@
             .account-user-kcb
               user-scores(ref="userScore")
     div(v-if="panelPermission && (panelPermission.unBannedUser || panelPermission.bannedUser ||panelPermission.clearUserInfo)" )
-      .btn-ban(v-show="showBanBox")
+      .btn-ban(v-show="showBanBox" @click="clickBanContext()")
         .fa.fa-ban( title="用户违规？点我！")
-        ul
+        ul(v-show="showBanContext" )
           li(v-if="targetUser && (targetUser.certs.includes('banned') && panelPermission.unBannedUser)")
             a(@click="bannedUser(targetUser.uid, false)") 解除封禁
           li(v-if="targetUser && (targetUser.certs.includes('banned') && panelPermission.bannedUser)")
@@ -32,7 +32,7 @@
             a(@click="hideUserHome(false,targetUser.uid)")  取消屏蔽用户名片
           li(v-if="panelPermission.hideUserHome && targetUser && !targetUser.hidden")
             a(@click="hideUserHome(true,targetUser.uid)")  屏蔽用户名片
-          li.divider(role="separator")
+          li.divider
           li(v-if="panelPermission.clearUserInfo")
             a(@click="clearUserInfo(targetUser.uid, 'avatar')") 删除头像
           li(v-if="panelPermission.clearUserInfo")
@@ -92,7 +92,7 @@
     }
   }
   .btn-ban{
-    background: #fff;
+    //background: #fff;
     position: absolute;
     top:0;
     z-index: 1;
@@ -103,6 +103,30 @@
       height: 20px;
       text-align: center;
       line-height: 20px;
+      margin-bottom: 2px;
+    }
+    ul{
+      background: #fff;
+      list-style-type: none;
+      padding-left: 0;
+      margin-left: 2px;
+      border-radius: 2px;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+      li{
+        padding: 5px 25px 5px 15px;
+        a{
+          color: #0e0e0e;
+          &:hover{
+            cursor: pointer;
+          }
+        }
+      }
+      .divider{
+        height: 1px;
+        width: 100%;
+        background: 	#C0C0C0;
+        padding: 0;
+      }
     }
   }
 }
@@ -120,7 +144,7 @@ export default {
     showBanBox:false,
     panelPermission:null,
     targetUser:null,
-
+    showBanContext:false,
   }),
   components: {
     "user-scores": UserScoresVue,
@@ -179,6 +203,10 @@ export default {
         .catch(function(data) {
           screenTopWarning(data);
         })
+    },
+    //点击显示禁止内容
+    clickBanContext(){
+      this.showBanContext = !this.showBanContext
     },
     //鼠标移入
     enter(){
