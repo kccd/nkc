@@ -30,7 +30,7 @@
               .moment-comment-option(@click="vote(commentData)" :class="{'active': commentData.voteType === 'up'}")
                 .fa.fa-thumbs-o-up
                 span(v-if="commentData.voteUp > 0") {{commentData.voteUp}}
-              .moment-comment-option.fa.fa-ellipsis-h(@click.stop="openOption($event, commentData)" data-direction="up")
+              .moment-comment-option.fa.fa-ellipsis-h(@click="openOption($event, commentData)" data-direction="up")
 
           .moment-comment-item-content(v-html="commentData.content")
       paging(:pages="pageButtons" @click-button="clickPageButton")

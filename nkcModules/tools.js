@@ -232,6 +232,9 @@ var Tools = function() {
       case 'zoneMoment': {
         return '/zone/m/' + id;
       }
+      case 'columnThread': {
+        return '/m/' + id + '/a/' + size;
+      }
       case 'downloadApp': {
         return '/app/' + id + '/' + size
       }

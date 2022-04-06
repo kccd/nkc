@@ -1,7 +1,62 @@
 module.exports = {
 	GET: 'searchUser',
 	PARAMETER: {
+		p: {
+			GET: "visitUserCard",
+			subUser: {
+				GET: "visitUserCard",
+			},
+			manage: {
+				GET: "getUserHomeCard"
+			},
+			moment: {
+				GET: "getUserHomeCard"
+			},
+			post: {
+				GET: "getUserHomeCard"
+			},
+			thread: {
+				GET: "getUserHomeCard"
+			},
+			follower: {
+				GET: "getUserHomeCard",
+			},
+			fan: {
+				GET: "getUserHomeCard",
+			},
+			s: {
+				GET: "visitUserCard",
+				collection: {
+					GET: "getUserHomeCard"
+				},
+				column: {
+					GET: "getUserHomeCard"
+				},
+				user: {
+					GET: "getUserHomeCard"
+				},
+				forum: {
+					GET: "getUserHomeCard",
+				},
+				blacklist: {
+					GET: "getUserHomeCard",
+				}
+			},
+		},
+		userPanel: {
+			GET: 'visitUserCard',
+		},
 		GET: 'visitUserCard',
+		userHome: {
+			GET: "getUserHomeInfo"
+		},
+		navLinks: {
+			GET: "getUserHomeInfo",
+		},
+		userHomeCard: {
+			GET: "getUserHomeCard"
+		},
+		
 		verifiedAssets: {
 			PARAMETER: {
 				GET: "visitVerifiedUpload"

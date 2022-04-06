@@ -8,11 +8,11 @@ block title
   script.
     const pathname = top.location.pathname.split('/')
     if(pathname[1] === "creation" && pathname[2] === 'community'){
-      var style = document.createElement('style'); 
-      style.type = 'text/css'; 
+      var style = document.createElement('style');
+      style.type = 'text/css';
       // 为了应对一些页码或其他内部刷新
-      style.innerHTML="body{ background-color:white;padding-top:0;display:none;}"; 
-      document.getElementsByTagName('head').item(0).appendChild(style); 
+      style.innerHTML="body{ background-color:white;padding-top:0;display:none;}";
+      document.getElementsByTagName('head').item(0).appendChild(style);
     }
   +includeCSS("/user/profile/profile.css")
 block content
@@ -29,6 +29,7 @@ block content
         .col-xs-12.col-md-3.box-shadow-panel#get-left-user-info-list
           if data.type
             .account-nav-xs.hidden-md.hidden-lg=data.name
+          //- 用户信息面板
           .account-nav(class=data.type?"hidden-sm hidden-xs":"")
             .account-user-banner
               a(href=tools.getUrl('userBanner', data.targetUser.banner, 'lg') target="_blank")
@@ -224,7 +225,7 @@ block scripts
       var SummaryCalendar = new NKC.modules.SummaryCalender($(".summary-calendar")[0]);
       var SummaryPie = new NKC.modules.SummaryPie($(".summary-pie")[0]);
   if data.type === "thread" || data.type === "post" || data.type === "draft"  || data.type === "note"
-    script. 
+    script.
       const pathname2 = top.location.pathname.split('/')
       if(pathname2[1]==='creation' && pathname2[2] === 'community'){
         var script = document.createElement('script');
@@ -234,7 +235,7 @@ block scripts
 
       }
     //- +includeJS('/user/profile/hidden.js')
-    
+
   +includeJS("/user/profile/profile.js")
   if data.type === "note"
     +includeJS("/user/profile/note.js")

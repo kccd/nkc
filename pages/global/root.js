@@ -3,10 +3,11 @@ import Login from '../lib/vue/Login';
 import {RNOpenLoginPage, RNSyncPageInfo, RNToChat} from "../lib/js/reactNative";
 import {getState} from "../lib/js/state";
 import UserDraw from "../lib/vue/publicVue/userDraw/UserDraw";
+import FloatUserPanel from "../lib/vue/FloatUserPanel";
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
-  initGlobalLongPressEvent
+  initGlobalLongPressEvent,
 } from "./event";
 import {initUserPanel} from "./userPanel";
 let userPanel;
@@ -25,6 +26,7 @@ window.RootApp = new Vue({
     'chat': Chat,
     'login': Login,
     "user-draw": UserDraw,
+    "float-user-panel": FloatUserPanel
   },
   computed: {
     hasLogged() {
@@ -35,7 +37,7 @@ window.RootApp = new Vue({
     initGlobalClickEvent();
     initGlobalLongPressEvent();
     initAppGlobalClickLinkEvent();
-
+    this.$refs.floatUserPanel.initPanel();
     $(() => {
       // 这里的代码会在页面准备就绪之后执行
     });

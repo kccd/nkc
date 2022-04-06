@@ -6,19 +6,20 @@
 
 <script>
 import HorNav from "../../../components/HorNav";
+import { routesName } from "../../../routes/creation.js"
 export default {
   data: () => ({
     navList: [
       {
-        type: 'zoneMoment',
+        type: routesName.creationZoneMoment,
         title: '动态'
       },
       {
-        type: 'zoneArticle',
+        type: routesName.creationZoneArticle,
         title: '文章'
       },
       {
-        type: 'zoneDraft',
+        type: routesName.creationZoneDraft,
         title: '草稿'
       }
     ]
@@ -37,9 +38,9 @@ export default {
   methods: {
     //路由重定向
     redirect() {
-      if(this.$route.name === 'zone') {
+      if(this.$route.name === 'creationZone') {
         this.$router.replace({
-          name: 'zoneMoment'
+          name: routesName.creationZoneMoment
         });
       }
     }

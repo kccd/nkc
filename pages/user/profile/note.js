@@ -81,7 +81,6 @@ $(document).ready(()=>{
       textareaAutoResize(nc, t) {
         const textArea = this.getTextarea(nc, t);
         const num = 4 * 12;
-        alert(textArea,'textArea')
         if(num < textArea.scrollHeight) {
           textArea.style.height = textArea.scrollHeight + 'px';
         } else {

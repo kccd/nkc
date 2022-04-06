@@ -151,6 +151,7 @@ export default {
         source: self.comment.source,
         sid: self.comment.sid,
         commentId: self.comment._id,
+        commentType: 'comment',
       })
         .then(res => {
           self.commentId = res.commentId;

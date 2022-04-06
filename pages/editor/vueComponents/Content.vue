@@ -1,12 +1,11 @@
 <template lang="pug">
-.content
-  editor(
-    :configs="editorConfigs",
-    ref="threadEditor",
-    @ready="editorReady",
-    @content-change="onContentChange",
-    :plugs="editorPlugs"
-  )
+editor(
+  :configs="editorConfigs",
+  ref="threadEditor",
+  @ready="editorReady",
+  @content-change="onContentChange",
+  :plugs="editorPlugs"
+)
 </template>
 
 <script>
@@ -23,7 +22,7 @@ export default {
       draftSelector: true,
       stickerSelector: true,
       xsfSelector: true,
-      mathJaxSelector: true
+      mathJaxSelector: true,
     },
     // 是否允许触发contentChange
     contentChangeEventFlag: true,
@@ -105,7 +104,7 @@ export default {
 </script>
 
 <style lang="less">
-.content #edui1_toolbarbox.edui-default {
+#edui1_toolbarbox.edui-default {
   position: fixed;
   padding-left: 15px;
   top: 43px;

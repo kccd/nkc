@@ -155,10 +155,10 @@ window.articleOption = new Vue({
     },
     collectionThread() {
       let {type, tid, collected} = this;
+      const self = this;
       if(type === 'article') {
-        const {_id} = this.article;
-        const {collection} = this.optionStatus;
-        const self = this;
+        const {_id} = self.article;
+        const {collection} = self.optionStatus;
         nkcAPI(`/article/${_id}/collection`, 'POST', {
           type: !collection,
         })

@@ -114,14 +114,13 @@ export default {
       }
       const {left, top} = jqDOM.offset();
       if(direction === 'up') {
-        const position = {
+        return {
           top: top - domHeight,
-          left: left - domWidth + jqDOM.width(),
+          left: left + jqDOM.width() - domWidth,
         }
-        return position;
       } else {
         return {
-          top: top + jqDOM.height() - domHeight,
+          top: jqDOM.height(),
           left: left + jqDOM.width() - domWidth,
         }
       }
@@ -147,7 +146,7 @@ export default {
       this.domHeight = dom.height() + top;
       this.domWidth = dom.width() + left;
     } else {
-      this.domHeight = top;
+      this.domHeight = dom.height() + top;
       this.domWidth = dom.width() + left;
     }
   },

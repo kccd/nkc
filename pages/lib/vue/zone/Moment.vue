@@ -9,7 +9,13 @@
 
     moment-status(ref="momentStatus" :moment="momentData")
 
-    .single-moment-top-container
+
+    .single-moment-top-container#comment-content
+      moment-option(
+        ref="momentOption"
+        @complaint="complaint"
+        @violation-record="violationRecord"
+      )
       .single-moment-left
         .single-moment-avatar(:data-float-uid="momentData.uid")
           img(:src="momentData.avatarUrl")
@@ -20,7 +26,7 @@
           .single-moment-time
             from-now(:time="momentData.toc")
           //- 其他操作
-          .single-moment-header-options.fa.fa-ellipsis-h(@click.stop="openOption($event)" data-direction="down")
+          .single-moment-header-options.fa.fa-ellipsis-h(@click="openOption($event)" data-direction="down")
 
         //- 动态内容
         .single-moment-content(v-html="momentData.content")
@@ -302,6 +308,7 @@
   import FloatUserPanel from "../FloatUserPanel";
   import SubscribeTypes from "../SubscribeTypes";
   import MomentStatus from "./MomentStatus";
+  import MomentOption from "./momentOption/MomentOption";
   export default {
     components: {
       'from-now': FromNow,
@@ -310,7 +317,8 @@
       'moment-quote': MomentQuote,
       'float-user-panel': FloatUserPanel,
       'subscribe-types': SubscribeTypes,
-      'moment-status': MomentStatus
+      'moment-status': MomentStatus,
+      'moment-option': MomentOption
     },
     /*
     * prop {Object} data 动态用于显示的数据 组装自 MomentModel.statics.extendMomentsListData
@@ -375,17 +383,18 @@
         const direction = $(target).attr('data-direction') || 'up';
         const init = $(target).attr('data-init');
         if(init === 'true') return;
-        this.$emit('open-option', {DOM: $(target), moment: this.momentData, direction});
-        //阻止浏览器默认事件
-        e.stopPropagation();
+        this.$refs.momentOption.open({DOM: $(target), moment: this.momentData, direction});
+        // this.$emit('open-option', {DOM: $(target), moment: this.momentData, direction});
+        //阻止浏览器默认事件 阻止事件冒泡
+        // e.stopPropagation();
       },
       //投诉或举报
       complaint(mid) {
-        this.$refs.complaint.open('moment', mid);
+        this.$emit('complaint', mid);
       },
       //查看违规记录
       violationRecord(uid) {
-        this.$refs.violationRecord.open({uid});
+        this.$emit('violation-record', uid);
       },
       //关注或取关用户
       subscribe(props) {
@@ -394,7 +403,8 @@
       },
       //打开评论的其他操作
       openCommentOption(data) {
-        this.$emit('option-comment-option', data);
+        this.$refs.momentOption.open(data);
+        // this.$emit('option-comment-option', data);
       }
     }
   }

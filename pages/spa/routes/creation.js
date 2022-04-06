@@ -41,7 +41,7 @@ export const routesName = {
   creationBook: 'creationBook',
   creationBookContent: 'creationBookContent',
   creationBookEditor: 'creationBookEditor',
-  creationArticleEditor: 'createArticleEditor',
+  creationArticleEditor: 'creationArticleEditor',
   creationCategories: 'creationCategories',
   creationDrafts: 'creationDrafts',
   creationColumnArticleEditor: 'creationColumnArticleEditor',
@@ -49,6 +49,21 @@ export const routesName = {
   creationZoneEditor: 'creationZoneEditor',
   creationZoneArticleEditor: 'creationZoneArticleEditor',
   creationZoneMomentEditor: 'creationZoneMomentEditor',
+  creationDraftEditor: 'creationDraftEditor',
+  creationArticles: 'creationArticles',
+  creationArticlesColumn: 'creationArticlesColumn',
+  creationCommunity: 'creationCommunity',
+  creationCommunityThread: 'creationCommunityThread',
+  creationCommunityPost: 'creationCommunityPost',
+  creationCommunityDraft: 'creationCommunityDraft',
+  creationCommunityNote: 'creationCommunityNote',
+  creationColumn: 'creationColumn',
+  creationColumnArticle: 'creationColumnArticle',
+  creationColumnDraft: 'creationColumnDraft',
+  creationZone: 'creationZone',
+  creationZoneMoment: 'creationZoneMoment',
+  creationZoneArticle: 'creationZoneArticle',
+  creationZoneDraft: 'creationZoneDraft'
 }
 
 export default [
@@ -57,64 +72,65 @@ export default [
     path: '/creation',
     component: Creation,
     children: [
-      {name: 'materials', path: '/creation/materials', component: Materials},
-      {name: 'material', path: '/creation/material/:id', component: Material},
-      {name: 'books', path: '/creation/books', component: Books},
-      {name: 'addDocument', path: '/creation/materials/editor', component: DocumentEditor},
-      {name: 'book', path: '/creation/book/:bid', component: Book},
-      {name: 'bookContent', path: '/creation/book/:bid/:aid', component: BookContent},
-      {name: 'bookEditor', path: '/creation/books/editor', component: BookEditor},
-      {name: 'articleEditor', path: '/creation/articles/editor', component: ArticleEditor},
-      {name: 'categories', path: '/creation/categories', component: Categories},
-      {name: 'drafts', path: '/creation/drafts', component: Drafts},
-      {name: 'columnArticleEditor', path: '/creation/editor/column', component: ColumnArticleEditor},
-      {name: 'communityThreadEditor', path: '/creation/editor/community', component: CommunityThreadEditor},
+      // {name: 'home', path: '/creation', component: Home},
+      {name: routesName.creationMaterials, path: '/creation/materials', component: Materials},
+      {name: routesName.creationMaterial, path: '/creation/material/:id', component: Material},
+      {name: routesName.creationBooks, path: '/creation/books', component: Books},
+      {name: routesName.creationAddDocument, path: '/creation/materials/editor', component: DocumentEditor},
+      {name: routesName.creationBook, path: '/creation/book/:bid', component: Book},
+      {name: routesName.creationBookContent, path: '/creation/book/:bid/:aid', component: BookContent},
+      {name: routesName.creationBookEditor, path: '/creation/books/editor', component: BookEditor},
+      {name: routesName.creationArticleEditor, path: '/creation/articles/editor', component: ArticleEditor},
+      {name: routesName.creationCategories, path: '/creation/categories', component: Categories},
+      {name: routesName.creationDrafts, path: '/creation/drafts', component: Drafts},
+      {name: routesName.creationColumnArticleEditor, path: '/creation/editor/column', component: ColumnArticleEditor},
+      {name: routesName.creationCommunityThreadEditor, path: '/creation/editor/community', component: CommunityThreadEditor},
       {
-        name: 'zoneEditor',
+        name: routesName.creationZoneEditor,
         path: '/creation/editor/zone',
         component: ZoneEditor,
         children: [
-          {name: 'zoneArticleEditor', path: '/creation/editor/zone/article', component: ZoneArticleEditor},
-          {name: 'zoneMomentEditor', path: '/creation/editor/zone/moment', component: ZoneMomentEditor},
+          {name: routesName.creationZoneArticleEditor, path: '/creation/editor/zone/article', component: ZoneArticleEditor},
+          {name: routesName.creationZoneMomentEditor, path: '/creation/editor/zone/moment', component: ZoneMomentEditor},
         ]
       },
-      {name: 'draftEditor', path: '/creation/editor/draft', component: DraftEditor},
+      {name: routesName.creationDraftEditor, path: '/creation/editor/draft', component: DraftEditor},
       {
-        name: 'articles',
+        name: routesName.creationArticles,
         path: '/creation/articles',
         component: Articles,
         children: [
-          {name: 'articlesColumn', path: 'column', component: ArticlesColumn}
+          {name: routesName.creationArticlesColumn, path: 'column', component: ArticlesColumn}
         ]
       },
       {
-        name: 'community',
+        name: routesName.creationCommunity,
         path: '/creation/community',
         component: Community,
         children: [
-          {name: 'communityThread', path: 'thread', component: CommunityThread},
-          {name: 'communityPost', path: 'post', component: CommunityPost},
-          {name: 'communityDraft', path: 'draft', component: CommunityDraft},
-          {name: 'communityNote', path: 'note', component: CommunityNote},
+          {name: routesName.creationCommunityThread, path: 'thread', component: CommunityThread},
+          {name: routesName.creationCommunityPost, path: 'post', component: CommunityPost},
+          {name: routesName.creationCommunityDraft, path: 'draft', component: CommunityDraft},
+          {name: routesName.creationCommunityNote, path: 'note', component: CommunityNote},
         ]
       },
       {
-        name: 'column',
+        name: routesName.creationColumn,
         path: '/creation/column',
         component: Column,
         children: [
-          {name: 'columnArticle', path: 'article', component: ColumnArticle},
-          {name: 'columnDraft', path: 'draft', component: ColumnDraft},
+          {name: routesName.creationColumnArticle, path: 'article', component: ColumnArticle},
+          {name: routesName.creationColumnDraft, path: 'draft', component: ColumnDraft},
         ]
       },
       {
-        name: 'zone',
+        name: routesName.creationZone,
         path: '/creation/zone',
         component: Zone,
         children: [
-          {name: 'zoneMoment', path: 'moment', component: ZoneMoment},
-          {name: 'zoneArticle', path: 'article', component: ZoneArticle},
-          {name: 'zoneDraft', path: 'draft', component: ZoneDraft},
+          {name: routesName.creationZoneMoment, path: 'moment', component: ZoneMoment},
+          {name: routesName.creationZoneArticle, path: 'article', component: ZoneArticle},
+          {name: routesName.creationZoneDraft, path: 'draft', component: ZoneDraft},
         ]
       }
     ]

@@ -84,6 +84,7 @@
   import Paging from "../../../../lib/vue/Paging";
   import {sweetError, sweetQuestion, sweetSuccess} from '../../../../lib/js/sweetAlert';
   import Blank from '../../../components/Blank';
+  import { routesName } from '../../../routes/creation'
   export default {
     data: () => ({
       type: 'all', // all, trash
@@ -193,11 +194,11 @@
         this.draftOption(draft, 'delete')
       },
       newDraft() {
-        this.navToPage("draftEditor", {}, {});
+        this.navToPage(routesName.creationDraftEditor, {}, {});
       },
       toEditDraft(draft) {
         const {draftId} = draft;
-        this.navToPage("draftEditor", {}, {
+        this.navToPage(routesName.creationDraftEditor, {}, {
           id: draftId
         });
       }
