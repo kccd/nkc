@@ -316,7 +316,7 @@ shareRouter
     });
     await shareLogs.save();
     data.newUrl = "/s/" + token;
-    data.logoUrl = nkcModules.tools.getUrl('siteIcon', state.serverSettings.siteIcon);
+    data.logoUrl = nkcModules.tools.getUrl('siteIcon', 'sm');
     await lock.unlock();
     await next();
   });

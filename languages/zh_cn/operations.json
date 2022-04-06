@@ -857,6 +857,8 @@
   "deleteMoment": "删除动态",
   "getMomentOption": "获取动态操作权限",
   "getMomentIpInfo": "获取动态的ip信息",
+  "APPUpgrade": "APP检查更新",
+  "APPGetAccountInfo": "APP获取已登录账户信息",
   "getUserHomeInfo": "获取用户个人主页信息",
   "getUserHomeCard": "获取用户主页卡片内容列表"
 }
