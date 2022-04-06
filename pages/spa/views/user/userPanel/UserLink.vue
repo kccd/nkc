@@ -19,7 +19,7 @@
       a(href=`/column` target='_blank' v-else).col-xs-6.account-user-link
         .fa.fa-columns
         | 开设专栏
-      a(:href="`/u/${targetUser.uid}/profile/finance?t=all`").col-xs-6.account-user-link
+      a(@click="toRoute('finance')").col-xs-6.account-user-link
         .fa.fa-file-text-o
         | 我的账单
       a(href=`/creation` target="_blank").col-xs-6.account-user-link
@@ -79,7 +79,9 @@ export default {
     })
   },
   methods: {
-
+    toRoute(path){
+      this.$router.push({name:path})
+    }
   }
 }
 </script>

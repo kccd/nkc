@@ -24,6 +24,9 @@ module.exports = {
 			fan: {
 				GET: "getUserHomeCard",
 			},
+			finance: {
+				GET: "getUserHomeCard",
+			},
 			s: {
 				GET: "visitUserCard",
 				collection: {
