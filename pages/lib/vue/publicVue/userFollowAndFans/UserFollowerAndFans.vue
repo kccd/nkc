@@ -1,21 +1,31 @@
 <template lang="pug">
   .row
+    paging.col-xs-12.col-md-12(ref="paging" :pages="pageButtons" @click-button="clickButton")
     //- user-info 数组中的一个用户对象 
     .col-xs-12.col-md-6(v-for="user in users")
-      user-info( :key="user.uid" :user="user || {}" :page-type="type")
+      user-info( :key="user.uid" :user="user" :page-type="type")
 </template>
 
 <script>
 import UserInfo from "./UserInfo";
+import Paging from "../../Paging";
+
 export default {
   components: {
     "user-info": UserInfo,
-    type: "follow"
+    "paging": Paging,
   },
   data: () => ({
-    users: []
+    type: "follow",
+    users: [],
+    paging: ''
   }),
   props: ["pageType"],
+  computed: {
+    pageButtons() {
+      return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
+    },
+  },
   watch: {
     pageType: {
       immediate: true,
@@ -34,6 +44,9 @@ export default {
     
   },
   methods: {
+    clickButton(num) {
+      this.getUserCardInfo( num );
+    },
     getUserCardInfo(page) {
       const uid = this.$route.params.uid;
       // let url = `/u/${uid}/userHomeCard?t=${this.type}`;

@@ -70,16 +70,13 @@ export default {
       this.routeName = name;
       const {uid} = params;
       this.uid = uid;
-      this.getUserCardInfo(name, 0);
+      this.getUserCardInfo(0);
     },
     //获取用户卡片信息
-    getUserCardInfo(type, page) {
-      const {uid} = this;
+    getUserCardInfo(page) {
+      const {uid, routeName} = this;
       const self= this;
-      let url = `/u/${uid}/userHomeCard`;
-      if(type) {
-        url = url + `?t=${type}`
-      }
+      let url = `/u/${uid}/p/${routeName}`;
       if(page) {
         const index = url .indexOf('?');
         if(index === -1) {
@@ -140,7 +137,7 @@ export default {
     },
     //点击分页
     clickButton(num) {
-      this.getUserCardInfo(this.routeName, num);
+      this.getUserCardInfo(num);
     }
   }
 }
