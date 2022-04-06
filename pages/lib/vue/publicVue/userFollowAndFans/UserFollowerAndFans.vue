@@ -3,7 +3,7 @@
     paging.col-xs-12.col-md-12(ref="paging" :pages="pageButtons" @click-button="clickButton")
     //- user-info 数组中的一个用户对象
     .col-xs-12.col-md-6(v-for="user in users")
-      user-info( :key="user.uid" :user="user" :page-type="t")
+      user-info( :key="user.uid" :user="user" :page-type="t" :sub-uid="userSubUid")
 </template>
 
 <script>
@@ -21,6 +21,7 @@ export default {
     paging: '',
     routeName: '',
     loading: false,
+    userSubUid: '',
   }),
   computed: {
     pageButtons() {
@@ -67,6 +68,7 @@ export default {
           self.paging = res.paging;
           self.users = res.users;
           self.loading = true;
+          self.userSubUid = res.userSubUid;
         })
         .catch(err => {
           sweetError(err);

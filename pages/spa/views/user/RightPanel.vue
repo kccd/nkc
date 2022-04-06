@@ -2,8 +2,7 @@
   .hidden-sm.hidden-xs(v-if="forums" )
     sub-forum(:forums="forums")
     user-manage(ref="userManage")
-    fans
-    sub-user
+    subscribes
     share(ref="share" share-type="user" :share-title="targetUser.username || targetUser.uid" :share-id="targetUser.uid" :share-description="targetUser.description" :share-avatar="targetUser.avatar")
 </template>
 <style lang="less" scoped>
@@ -12,9 +11,8 @@
 <script>
 import SubForum from "./userPanel/SubForum";
 import UserManage from "./userPanel/UserManage";
-import SubUser from "./userPanel/SubUser";
 import Share from "../../../lib/vue/Share";
-import Fans from "./userPanel/Fans";
+import Subscribes from "./userPanel/Subscribes";
 export default {
   props: ['forums', 'target-user'],
   data: ()=> ({
@@ -24,8 +22,7 @@ export default {
     "sub-forum": SubForum,
     "user-manage": UserManage,
     "share": Share,
-    "sub-user": SubUser,
-    "fans": Fans
+    "subscribes": Subscribes
   },
   mounted() {
   },
