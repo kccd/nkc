@@ -207,6 +207,7 @@ router
         }
     
         if(t === "follow") {
+            //关注的用户
             const q = {
                 uid: targetUser.uid,
                 type: "user",
@@ -220,6 +221,7 @@ router
                 data.users = await db.UserModel.extendUsersInfo(data.users)
             }
         } else {
+            //粉丝
             const q = {
                 tUid: targetUser.uid,
                 type: "user",

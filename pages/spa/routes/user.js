@@ -13,7 +13,7 @@ import SubscribeCollection from "../views/user/subscribe/SubscribeCollection";
 export const routerName = {
   user: 'userHome',
   follower: 'follower',
-  fans: 'fans',
+  fan: 'fan',
   moment: 'moment',
   post: 'post',
   blacklist: 'blacklist',
@@ -69,10 +69,10 @@ export default [
                 props: { pageType: "follower" }
               },
               {
-                name: routerName.fans,
-                path: '/u/:uid/p/fans',
+                name: routerName.fan,
+                path: '/u/:uid/p/fan',
                 component: UserFollowerAndFans,
-                props: { pageType: "fans" }
+                props: { pageType: "fan" }
               },
             ]
           },

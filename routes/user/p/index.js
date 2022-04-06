@@ -16,7 +16,7 @@ const userRouter = require('./subUser');
 router
   .get('/', async (ctx, next) => {
     //获取主页导航等信息
-    const {db, state, data, params } = ctx;
+    const {db, state, data, params, nkcModules } = ctx;
     const {user , targetUser} = data;
     // 验证权限
     if (user.uid !== targetUser.uid && !ctx.permission("visitAllUserProfile")) {
@@ -30,6 +30,28 @@ router
     const subTopicsId = await db.SubscribeModel.getUserSubForumsId(targetUser.uid, "topic");
     const subDisciplinesId = await db.SubscribeModel.getUserSubForumsId(targetUser.uid, "discipline");
     const subForumsId = subTopicsId.concat(subDisciplinesId);
+    // 获取用户积分信息
+    if(ctx.permission('viewUserScores')) {
+      data.targetUserScores = await db.UserModel.getUserScores(targetUser.uid);
+    }
+    if(
+      !ctx.permission('hideUserHome') &&
+      (!user || user.uid !== targetUser.uid)
+    ) {
+      if(targetUser.hidden) {
+        nkcModules.throwError(404, "根据相关法律法规和政策，该内容不予显示", "noPermissionToVisitHiddenUserHome");
+      }
+      if(
+        (await db.UserModel.contentNeedReview(targetUser.uid, 'thread')) ||
+        (await db.UserModel.contentNeedReview(targetUser.uid, 'post'))
+      ) {
+        data.contentNeedReview = true;
+        data.targetUser.username = '';
+        data.targetUser.description = '';
+        data.targetUser.avatar = '';
+        data.targetUser.banner = '';
+      }
+    }
     // 获取用户能够访问的专业ID
     data.targetUserSubForums = await db.ForumModel.find({
       fid: {

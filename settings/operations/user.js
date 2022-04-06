@@ -18,7 +18,7 @@ module.exports = {
 			thread: {
 				GET: "getUserHomeCard"
 			},
-			follow: {
+			follower: {
 				GET: "getUserHomeCard",
 			},
 			fan: {

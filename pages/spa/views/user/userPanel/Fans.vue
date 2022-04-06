@@ -1,6 +1,6 @@
 <template lang="pug">
   .sub-fans(v-if="sideFans && sideFans.length !== 0")
-    .panel-header 关注
+    .panel-header 粉丝
     .m-b-2
       .user-card-sub-div
         .home-topic-item-div
