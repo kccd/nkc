@@ -19,7 +19,7 @@
             .account-user-certs {{targetUser.info.certsName}}
             .account-user-description {{targetUser.description}}
             .account-user-kcb
-              user-scores(ref="userScore")
+              user-scores(ref="userScore" )
     div(v-if="panelPermission && (panelPermission.unBannedUser || panelPermission.bannedUser ||panelPermission.clearUserInfo)" )
       .btn-ban(v-show="showBanBox" @click="clickBanContext()")
         .fa.fa-ban( title="用户违规？点我！")
@@ -59,7 +59,7 @@
         }
       }
       .account-user-info {
-        margin-top: -10rem;
+        margin-top: -11rem;
         .account-user-avatar {
           display: inline-block;
           margin-left: 2rem;
@@ -72,6 +72,7 @@
           }
         }
         .account-user-right{
+          width: 50%;
           display: inline-block;
           margin-left: 2rem;
           .account-user-name {
@@ -84,7 +85,11 @@
           .account-user-certs{
             color: #e85a71;
           }
-
+          .account-user-description{
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
 
         }
 
@@ -124,8 +129,9 @@
       .divider{
         height: 1px;
         width: 100%;
-        background: 	#C0C0C0;
+        background: #DCDCDC;
         padding: 0;
+        margin: 3px 0;
       }
     }
   }
@@ -137,6 +143,7 @@ import UserScoresVue from "../../../../lib/vue/publicVue/userDraw/UserScoresVue"
 import UserLevel from "./UserLevel";
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {screenTopWarning} from "../../../../lib/js/topAlert";
+import {getState} from "../../../../lib/js/state";
 export default {
   // props: ['targetUser'],
   data: () => ({
@@ -153,8 +160,13 @@ export default {
   created() {
     this.initData()
     this.getPanelData()
+    //移动段才能永久显示封禁框
+    if(getState && getState.isApp){
+      this.showBanBox = true
+    }
   },
   mounted() {
+    // console.log(getState);
 
   },
   methods: {
