@@ -19,7 +19,7 @@
             .account-user-certs {{targetUser.info.certsName}}
             .account-user-description {{targetUser.description}}
             .account-user-kcb
-              user-scores(ref="userScore")
+              user-scores(ref="userScore" :scores="scores" :xsf="targetUser.xsf" )
     div(v-if="panelPermission && (panelPermission.unBannedUser || panelPermission.bannedUser ||panelPermission.clearUserInfo)" )
       .btn-ban(v-show="showBanBox" @click="clickBanContext()")
         .fa.fa-ban( title="用户违规？点我！")
@@ -59,34 +59,46 @@
         }
       }
       .account-user-info {
-        margin-top: -10rem;
+        margin-top: -11rem;
+        position: relative;
         .account-user-avatar {
+          position: absolute;
+          top: 0px;
           display: inline-block;
           margin-left: 2rem;
           img {
-            width: 8rem;
-            height: 8rem;
-            border-radius: 50%;
-            box-sizing: border-box;
-            border: 3px solid #fff;
-          }
-        }
+             width: 8rem;
+             height: 8rem;
+             border-radius: 50%;
+             box-sizing: border-box;
+             border: 3px solid #fff;
+           }
+         }
         .account-user-right{
-          display: inline-block;
-          margin-left: 2rem;
-          .account-user-name {
-            font-size: 16px;
-            display: inline-block;
-            .account-user-level {
-              display: inline-block;
-            }
-          }
-          .account-user-certs{
-            color: #e85a71;
-          }
+           width: 50%;
+           display: inline-block;
+           margin-left: 144px;
+           .account-user-name {
+             font-size: 16px;
+             display: inline-block;
+             .account-user-level {
+               display: inline-block;
+             }
+           }
+           .account-user-certs{
+             color: #e85a71;
+           }
+           .account-user-description{
+             white-space: nowrap;
+             overflow: hidden;
+             text-overflow: ellipsis;
+           }
+           .account-user-kcb{
+             display: inline-block;
+           }
+         }
 
 
-        }
 
       }
     }
@@ -124,8 +136,9 @@
       .divider{
         height: 1px;
         width: 100%;
-        background: 	#C0C0C0;
+        background: #DCDCDC;
         padding: 0;
+        margin: 3px 0;
       }
     }
   }
@@ -137,14 +150,16 @@ import UserScoresVue from "../../../../lib/vue/publicVue/userDraw/UserScoresVue"
 import UserLevel from "./UserLevel";
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {screenTopWarning} from "../../../../lib/js/topAlert";
+import {getState} from "../../../../lib/js/state";
 export default {
-  // props: ['targetUser'],
+  props: ['targetUserScores'],
   data: () => ({
-    uid:null,
-    showBanBox:false,
-    panelPermission:null,
-    targetUser:null,
-    showBanContext:false,
+    uid: null,
+    showBanBox: false,
+    panelPermission: null,
+    targetUser: null,
+    showBanContext: false,
+    scores: null
   }),
   components: {
     "user-scores": UserScoresVue,
@@ -153,6 +168,11 @@ export default {
   created() {
     this.initData()
     this.getPanelData()
+    //移动段才能永久显示封禁框
+    if(getState && getState.isApp){
+      this.showBanBox = true
+    }
+    this.scores = this.targetUserScores
   },
   mounted() {
 

@@ -1,7 +1,7 @@
 <template lang="pug">
 .container-fluid.max-width(v-cloak)
   .col-sx-12.col-md-12
-    Panel(ref="panel" :target-user="targetUser" v-if="targetUser")
+    Panel(ref="panel" :target-user="targetUser" :target-user-scores="targetUserScores" v-if="targetUser")
     account-user(ref="accountUser" :target-user="targetUser" :nav-links="navLinks" :forums="subForums")
     footer-vue(ref="footerVue")
 </template>
@@ -25,6 +25,7 @@ export default {
     uid: null,
     isApp: null,
     subForums: [],
+    targetUserScores:null,
   }),
   components: {
     Panel: Panel,
@@ -50,6 +51,7 @@ export default {
         self.subForums = res.targetUserSubForums;
         self.navLinks = res.navLinks;
         self.targetUser = res.targetUser;
+        self.targetUserScores = res.targetUserScores;
       })
       .catch(err => {
         sweetError(err);

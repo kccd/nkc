@@ -8,6 +8,7 @@ import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
   initGlobalLongPressEvent,
+  initGlobalMouseOverEvent
 } from "./event";
 import {initUserPanel} from "./userPanel";
 let userPanel;
@@ -37,6 +38,7 @@ window.RootApp = new Vue({
     initGlobalClickEvent();
     initGlobalLongPressEvent();
     initAppGlobalClickLinkEvent();
+    initGlobalMouseOverEvent();
     this.$refs.floatUserPanel.initPanel();
     $(() => {
       // 这里的代码会在页面准备就绪之后执行

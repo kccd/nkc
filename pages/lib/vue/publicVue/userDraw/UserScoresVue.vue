@@ -19,8 +19,6 @@ export default {
   }),
   components: {
   },
-  mounted() {
-  },
   methods: {
     getUrl: getUrl,
   }

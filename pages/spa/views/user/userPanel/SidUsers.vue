@@ -8,7 +8,8 @@
             .user-card-user-list
               .side-user(
                 v-for="(u, index) in sidUsers"
-                :data-global-mouseover="u.uid"
+                :data-float-uid="u.uid"
+                data-global-mouseover="showUserPanel"
                 v-if="index <= 7"
               )
                 a(:href="`/u/${u.uid}`" target="_blank")
@@ -16,7 +17,13 @@
             a(:href="`/u/${targetUser.uid}/p/${type}`" v-if="sidUsers.length > 8").user-card-user-link 查看更多
 </template>
 <style lang="less">
-
+.sub-fans {
+  .panel-header {
+    margin: -15px -15px 1rem -15px;
+    border-bottom: 1px solid #f4f4f4;
+    padding: 0 1rem;
+  }
+}
 </style>
 <script>
 import {getUrl} from "../../../../lib/js/tools";
@@ -26,7 +33,7 @@ export default {
 
   }),
   methods: {
-    getUrl: getUrl,
+    getUrl: getUrl
   }
 }
 </script>
