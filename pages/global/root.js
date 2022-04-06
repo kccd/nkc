@@ -38,7 +38,6 @@ window.RootApp = new Vue({
 
     $(() => {
       // 这里的代码会在页面准备就绪之后执行
-      RNSyncPageInfo({uid});
     });
   },
   methods: {

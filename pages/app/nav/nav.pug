@@ -2,21 +2,27 @@ extends ../../bootstrap_base
 block title
   +includeCSS("/app/nav/nav.css")
 block content
+  -var avatarUrl = tools.getUrl('userAvatar', data.user.avatar);
+  -var bannerUrl = tools.getUrl('userBanner', data.user.banner);
   .app-nav
-    .nav-header
+    //.nav-header
       .nav-header-icon.nav-back(onclick='closeWin()')
         .fa.fa-arrow-left
     .nav-user
       .user-avatar
-        img(src=tools.getUrl('userAvatar', data.user.avatar) data-type="view" id="userAvatar")
+        img(
+          src=avatarUrl
+          data-global-click='viewImage'
+          data-global-data=objToStr({name: 'avatar', url: avatarUrl})
+          id="userAvatar")
       .user-info
         .user-name(id="username")=data.user.username
         .user-certs
           img(src=tools.getUrl("gradeIcon", data.user.grade._id))
           span=data.user.info.certsName
         .user-description(id="userDescription")=data.user.description || "未填写个人简介"
-    .nav-banner-mask
-    .nav-banner(style=`background-image: url(${tools.getUrl('userBanner', data.user.banner)})` id="userBanner")
+    .nav-banner-mask(data-global-click='viewImage' data-global-data=objToStr({name: 'banner', url: bannerUrl}))
+    .nav-banner(style=`background-image: url(${bannerUrl})` id="userBanner")
     .nav-content
       .nav-scores
         include ../../publicModules/userScores

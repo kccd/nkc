@@ -101,8 +101,6 @@ function RNInitClientEvent() {
   })
 }
 
-// 同步页面信息
-RNSyncPageInfo({uid});
 // 初始化链接点击事件
 RNInitClientEvent();
 // 初始化图片长按事件

@@ -10,6 +10,8 @@ loginRouter
 		await next();
 	})
 	.get('/', async (ctx, next) => {
+    const {t: type} = ctx.query;
+    ctx.data.type = type || 'login';
 		ctx.template = 'login/login.pug';
 		await next();
 	})

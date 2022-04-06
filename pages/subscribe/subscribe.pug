@@ -9,8 +9,9 @@ block content
         include ../publicModules/forums_nav/forums_tree
       .col-xs-12.col-md-7.box-shadow-panel.p-r-0#comment-content
         div
-          include ./subscribeNav
-          +subscribeNav(data.type)
+          if !remoteState.isApp
+            include ./subscribeNav
+            +subscribeNav(data.type)
           block sContent
       .col-xs-12.col-md-3
         .hidden-xs.hidden-sm#rightDom.box-shadow-panel
