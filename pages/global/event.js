@@ -92,6 +92,8 @@ function globalEvent(eventType, e) {
   const elementJQ = $(element);
   const operation = elementJQ.attr(`data-global-${eventType}`);
   if(!operation) return;
+  console.log(operation);
+  debugger
   const eventFunction = eventFunctions[operation];
   if(!eventFunction) return;
   let data = elementJQ.attr('data-global-data');
@@ -124,7 +126,7 @@ export function initGlobalLongPressEvent() {
 * */
 export function initGlobalMouseOverEvent() {
   document.addEventListener('mouseover', e => {
-    // globalEvent('mouseover', e);
+    globalEvent('mouseover', e);
   });
 }
 
