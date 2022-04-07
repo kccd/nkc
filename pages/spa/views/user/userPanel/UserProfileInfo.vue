@@ -1,6 +1,6 @@
 <template lang="pug">
   .user-info(v-if="targetUser")
-    .user-column
+    .user-column(v-if="targetUser.column")
       .panel-header 他的专栏
       .m-b-2
         .column-item
