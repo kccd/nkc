@@ -11,13 +11,13 @@
 </template>
 
 <script>
-import UserScore from "./UserScoresVue";
+import UserScoresVue from "./UserScoresVue";
 export default {
   props: ["remote"],
   data: () => ({
   }),
   components: {
-    'user-score': UserScore,
+    'user-score': UserScoresVue,
   },
   mounted() {
   },

@@ -1,6 +1,7 @@
 <template lang="pug">
   .zone-article-editor
-    hor-nav(:list="navList")
+    .standard-fluid-container
+      hor-nav(:list="navList")
     router-view
 </template>
 
