@@ -26,9 +26,9 @@
       .finance-context-nav
         li(:class="navType==='all'?'active':''" @click="navTypeChange('all')") 所有
         li(:class="navType==='in' ?'active':''" @click="navTypeChange('in')") 收入
-        li(:class="navType==='out'?'active':''" @click="navTypeChange('out')") 支出
+        li(:class="navType==='payout'?'active':''" @click="navTypeChange('payout')") 支出
       .finance-context-table
-        table.table.table-bordered
+        table.table.table-bordered(v-if="navType !== 'all'" )
           thead
             tr
               th 时间
@@ -37,7 +37,8 @@
               th 类型
               th 说明
               th
-                span(v-if="!t" ) 支付者
+                span(v-if="t === 'in'" ) 支付者
+                span(v-else-if="t === 'payout'" ) 收款人
               th 金额
               th 其他
           tbody(v-if="kcbsRecords && kcbsRecords.length >0 ")
@@ -49,12 +50,45 @@
               th
                 .table-content(:title="item.description") {{item.description}}
               th
-                span(v-if="t" ) {{item.toUser || nkcBankName}}
-                span(v-else ) {{item.fromUser || nkcBankName}}
+                span(v-if="t === 'in'" ) {{item.toUser.username || nkcBankName}}
+                span(v-else-if="t === 'payout'" ) {{item.fromUser.username || nkcBankName}}
               th {{item.num / 100}}
               th
                 a(:href="item.post.url" target="_blank" v-if="item.post" ) {{'文号（'+item.pid+'）'}}
                 span(v-if="item.ordersId && item.ordersId.length !== 0" ) {{'订单号（'+item.ordersId.join(', ')}}
+        table.table.table-bordered(v-else)
+          thead
+            tr
+              th 时间
+              th 账单ID
+              th 积分名
+              th 类型
+              th 说明
+              th 交易对象
+              th 收入
+              th 支出
+              th 其他
+          tbody(v-if="kcbsRecords && kcbsRecords.length >0 ")
+              tr(v-for="item in kcbsRecords")
+                th {{timeFormat("YYYY-MM-DD HH:mm:ss", item.toc)}}
+                th {{item._id}}
+                th {{item.scoreName}}
+                th {{item.lang}}
+                th
+                  .table-content(:title="item.description") {{item.description}}
+                th
+                  span(v-if="(item.to === targetUser.uid) && !item.fromUser" ) {{nkcBankName}}
+                  a(v-else-if="(item.to === targetUser.uid) && item.fromUser" :href="`/u/${item.from}`" target="_blank") {{item.fromUser.username}}
+                  span(v-else-if="(item.to !== targetUser.uid) && !item.toUser" ) {{nkcBankName}}
+                  a(v-else-if="(item.to !== targetUser.uid) && item.toUser" :href="`/u/${item.to}`" target="_blank") {{item.toUser.username}}
+                th
+                    span(v-if="item.to === targetUser.uid" ) {{item.num / 100}}
+                th
+                    span(v-if="item.from === targetUser.uid" ) {{item.num / 100}}
+                th
+                  a(:href="item.post.url" target="_blank" v-if="item.post" ) {{'文号（'+item.pid+'）'}}
+                  span(v-if="item.ordersId && item.ordersId.length !== 0" ) {{'订单号（'+item.ordersId.join(', ')+'）'}}
+        .text-center(v-if="kcbsRecords && kcbsRecords.length === 0") 暂无记录
 
 </template>
 <style lang="less" scoped>
@@ -140,7 +174,8 @@ export default {
     navType:'all',
     nkcBankName: null,
     kcbsRecords: null,
-    t: null
+    t: null,
+    targetUser: null
   }),
   created() {
     const uid = getState().uid
@@ -152,14 +187,19 @@ export default {
   },
   methods: {
     timeFormat: timeFormat,
-    // format:format,
-    getUserAccountInfo(){
+    getUserAccountInfo(type){
       const self = this;
-      nkcAPI(`/u/${this.uid}/p/finance`, 'GET')
+      let url = `/u/${this.uid}/p/finance`;
+      if(type){
+        url += `?t=${type}`
+      }
+      nkcAPI(url, 'GET')
         .then(res => {
           self.targetUserScores = res.targetUserScores;
           self.kcbsRecords = res.kcbsRecords;
           self.nkcBankName = res.nkcBankName;
+          self.t = res.t;
+          self.targetUser = res.targetUser;
           // self.nkcBankName = res.nkcBankName;
         })
         .catch(err => {
@@ -181,6 +221,7 @@ export default {
     },
     navTypeChange(type){
       this.navType = type
+      this.getUserAccountInfo(type)
     }
   },
   beforeDestroy() {  // 实例销毁之前对点击事件进行解绑

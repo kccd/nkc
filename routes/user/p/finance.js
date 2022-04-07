@@ -29,7 +29,10 @@ module.exports = async (ctx, next) => {
   await db.KcbsRecordModel.hideSecretInfo(kcbsRecords);
   const kcbNumber = await db.KcbsRecordModel.extendKcbsRecords(kcbsRecords);
   data.kcbsRecords = kcbNumber.map((item)=>{
-    item['lang'] = languages['zh_cn']['kcbsTypes'][item.type]
+    const m = item;
+    m.lang = languages['zh_cn']['kcbsTypes'][item.type];
+
+    return m;
   });
   data.paging = paging;
   data.t = t;
