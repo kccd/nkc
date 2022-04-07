@@ -1,3 +1,4 @@
+const languages = require("../../../nkcModules/language");
 module.exports = async (ctx, next) => {
   const {nkcModules, query, data, db} = ctx;
   const {targetUser} = data;
@@ -24,9 +25,12 @@ module.exports = async (ctx, next) => {
   }
   const count = await db.KcbsRecordModel.countDocuments(q);
   const paging = nkcModules.apiFunction.paging(page, count);
-  let kcbsRecords = await db.KcbsRecordModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+  let kcbsRecords = await db.KcbsRecordModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage)
   await db.KcbsRecordModel.hideSecretInfo(kcbsRecords);
-  data.kcbsRecords = await db.KcbsRecordModel.extendKcbsRecords(kcbsRecords);
+  const kcbNumber = await db.KcbsRecordModel.extendKcbsRecords(kcbsRecords);
+  data.kcbsRecords = kcbNumber.map((item)=>{
+    item['lang'] = languages['zh_cn']['kcbsTypes'][item.type]
+  });
   data.paging = paging;
   data.t = t;
   targetUser.kcb = await db.UserModel.updateUserKcb(targetUser.uid);
