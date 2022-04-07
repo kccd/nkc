@@ -90,49 +90,55 @@
               .fa.fa-spinner.fa-spin.fa-fw
           .resource-name
             span {{f.name}}
-      .resources-body(v-else
+      .resources-body(
+        v-else
         :class="watchType === 'select'?'':'min-length'")
         //-.resources-loading(v-if="loading")
           .fa.fa-spinner.fa-spin.fa-fw
           .loading-text 加载中...
         .resource-info(v-if="!resources.length") 空空如也~
         //- 资源显示
-        .resource(v-else v-for="r, index in resources"
+        .resource-padding-container(
+          v-else
+          v-for="(r, index) in resources"
           :class="watchType === 'select'?'resource-select':'resource-category'"
-          :title="'时间：'+ timeFormat(r.toc)+'\\n文件名：' + r.oname")
-          span(v-if='r.state === "usable"')
-            .resource-picture(v-if="r.mediaType === 'uploading'" :style="'background-image:url(/rt/' + r.rid + ')'")
-            .resource-picture.media-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
-            .resource-picture.media-picture(v-if="r.mediaType === 'mediaVideo'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
-            .resource-picture.icon(v-if="r.mediaType === 'mediaAudio'" :style="'background-image:url(/attachIcon/mp3.png)'")
-            .resource-picture.icon(v-if="r.mediaType === 'mediaAttachment'" :style="'background-image:url(/attachIcon/'+r.ext+'.png)'")
-          span(v-else)
-            .resource-picture.resource-in-process-bg
-          .resource-name
-            span(v-if="r.mediaType === 'mediaVideo'") (视频)
-            span {{r.oname}}
-          span(v-if='r.state === "usable"')
-            .resource-options(v-if="selectedResourcesId.indexOf(r.rid) !== -1" )
-              .resource-mask.active(@click="fastSelectResource(r)")
-              .resource-do
-                .fa.fa-check-square-o.active(@click="selectResource(r)")
-              .resource-index {{selectedResourcesId.indexOf(r.rid) + 1}}
-            .resource-options(v-else)
-              .resource-mask(@click="fastSelectResource(r)")
-              .resource-do
-                .fa.fa-edit(@click="editImage(r)" v-if="r.mediaType === 'mediaPicture'")
-                .fa.fa-trash-o(@click="delResource(r, 'delete')" v-if="watchType === 'category' && !r.del")
-                .fa.fa-reply(@click="delResource(r, 'trash')" v-if="watchType === 'category' && r.del")
-                .fa.fa-square-o(v-if="watchType === 'category'" @click="checkbox(r)")
-                .fa.fa-square-o(v-if="watchType === 'select'" @click="selectResource(r)")
-          span(v-else-if='r.state === "inProcess"')
-            .resource-in-process
-              span 处理中..
-              .fa.fa-spinner.fa-spin.fa-fw
-          span(v-else)
-            .resource-in-process
-              span 处理失败
-              .fa.fa-exclamation-circle.pointer(v-if='r.errorInfo' :title='r.errorInfo' @click='showErrorInfo(r)')
+          )
+          .resource(
+            :title="'时间：'+ timeFormat(r.toc)+'\\n文件名：' + r.oname"
+            )
+            span(v-if='r.state === "usable"')
+              .resource-picture(v-if="r.mediaType === 'uploading'" :style="'background-image:url(/rt/' + r.rid + ')'")
+              .resource-picture.media-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
+              .resource-picture.media-picture(v-if="r.mediaType === 'mediaVideo'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
+              .resource-picture.icon(v-if="r.mediaType === 'mediaAudio'" :style="'background-image:url(/attachIcon/mp3.png)'")
+              .resource-picture.icon(v-if="r.mediaType === 'mediaAttachment'" :style="'background-image:url(/attachIcon/'+r.ext+'.png)'")
+            span(v-else)
+              .resource-picture.resource-in-process-bg
+            .resource-name
+              span(v-if="r.mediaType === 'mediaVideo'") (视频)
+              span {{r.oname}}
+            span(v-if='r.state === "usable"')
+              .resource-options(v-if="selectedResourcesId.indexOf(r.rid) !== -1" )
+                .resource-mask.active(@click="fastSelectResource(r)")
+                .resource-do
+                  .fa.fa-check-square-o.active(@click="selectResource(r)")
+                .resource-index {{selectedResourcesId.indexOf(r.rid) + 1}}
+              .resource-options(v-else)
+                .resource-mask(@click="fastSelectResource(r)")
+                .resource-do
+                  .fa.fa-edit(@click="editImage(r)" v-if="r.mediaType === 'mediaPicture'")
+                  .fa.fa-trash-o(@click="delResource(r, 'delete')" v-if="watchType === 'category' && !r.del")
+                  .fa.fa-reply(@click="delResource(r, 'trash')" v-if="watchType === 'category' && r.del")
+                  .fa.fa-square-o(v-if="watchType === 'category'" @click="checkbox(r)")
+                  .fa.fa-square-o(v-if="watchType === 'select'" @click="selectResource(r)")
+            span(v-else-if='r.state === "inProcess"')
+              .resource-in-process
+                span 处理中..
+                .fa.fa-spinner.fa-spin.fa-fw
+            span(v-else)
+              .resource-in-process
+                span 处理失败
+                .fa.fa-exclamation-circle.pointer(v-if='r.errorInfo' :title='r.errorInfo' @click='showErrorInfo(r)')
       .module-sr-footer
         .pull-left
           input.hidden(ref='inputElement' type="file" multiple="true" @change="selectedFiles")
@@ -267,7 +273,7 @@
       .resources-body {
         font-size: 0;
         position: relative;
-        min-height: 28rem;
+        min-height: 18rem;
         .resources-loading {
           width: 100%;
           height: 100%;
@@ -389,22 +395,59 @@
     overflow-y: scroll;
     margin: 0.5rem 0;
   }
-   .resource{
-      margin: 0 1% 1% 0;
-      position: relative;
-      font-size: 0;
-      /*cursor: pointer;*/
-      display: inline-block;
-   }
-   .resource-select {
-     width: 23.5%;
-     height: 7.5rem;
-   }
-   .resource-category {
-     width: 13.7rem;
+
+  .resource-padding-container {
+    width: 19.5%;
+    padding-top: 14.6%;
+    margin-right: 0.5%;
+    margin-bottom: 0.5%;
+    display: inline-block;
+
+    position: relative;
+    .resource{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .resource-padding-container.resource-select{
+    width: 24.5%;
+    padding-top: 18.4%;
+  }
+
+
+  @media(max-width: 768px) {
+    .resource-padding-container{
+      width: 24.5%;
+      padding-top: 18.4%;
+    }
+  }
+
+  @media(max-width: 400px) {
+    .resource-padding-container{
+      width: 32.5%;
+      padding-top: 24.3%;
+    }
+  }
+  /*
+  .resource{
+    margin: 0 1% 1% 0;
+    position: relative;
+    font-size: 0;
+    display: inline-block;
+  }
+  .resource-select {
+    width: 23.5%;
+    height: 7.5rem;
+  }
+  .resource-category {
+     width: 25%;
      height: 13.7rem;
-   }
-   .selected-resource-header{
+  }*/
+  .selected-resource-header{
     margin-bottom: 0.5rem;
   }
    .resource>div{
@@ -636,6 +679,8 @@ import ImageViewer from "./ImageViewer";
 import ResourceInfo from "./ResourceInfo";
 import CommonModal from "./CommonModal";
 import SelectCategory from "./SelectCategory";
+import {openImageViewer} from "../js/imageViewer";
+
 const {isApp} = getState();
 import {
   RNTakePictureAndUpload,
@@ -1257,7 +1302,7 @@ export default {
           self.checkbox(r);
         } else {
           if(r.mediaType === "mediaPicture") {
-            self.$refs.imageViewer.show([`/r/${r.rid}`]);
+            self.openImages(r.rid);
           } else if (r.mediaType === "mediaVideo" || r.mediaType === "mediaAudio" ) {
             window.open(`/r/${r.rid}`);
           } else if(r.mediaType === "mediaAttachment") {
@@ -1265,6 +1310,21 @@ export default {
           }
         }
       }
+    },
+    openImages(rid) {
+      const images = [];
+      let index = 0;
+      for(let i = 0; i < this.resources.length; i++) {
+        const r = this.resources[i];
+        if(r.mediaType !== 'mediaPicture') continue;
+        if(r.rid === rid) index = i;
+        images.push({
+          url: getUrl('resource', r.rid, 'lg'),
+          name: r.oname,
+        });
+      }
+      if(images.length === 0) return;
+      openImageViewer(images, index);
     },
     selectResourceType: function(t) {
       this.resourceType = t;

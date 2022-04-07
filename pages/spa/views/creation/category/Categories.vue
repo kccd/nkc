@@ -1,6 +1,5 @@
 <template lang="pug">
-  .category-container.standard-max-container
-    h2 资源管理
+  .category-container.standard-fluid-max-container
     resource-selector-core(ref="resourceSelectorCore" watch-type="category")
 </template>
 

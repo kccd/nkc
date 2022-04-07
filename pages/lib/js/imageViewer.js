@@ -35,3 +35,16 @@ export function openImageViewer(images, index) {
     openWebImageViewer(images, index);
   }
 }
+
+/*
+* 打开指定url的图片
+* @param {String} url
+* */
+export function openSingleImageByUrl(url) {
+  openImageViewer([
+    {
+      url,
+      name: url
+    }
+  ], 0)
+}
