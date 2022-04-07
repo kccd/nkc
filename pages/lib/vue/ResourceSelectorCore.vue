@@ -1050,7 +1050,9 @@ export default {
           self.loading = false;
           self.categoryLoading = false;
           if(self.watchType === 'select') {
-            self.callback();
+            if(self.callback) {
+              self.callback();
+            }
           }
         })
         .catch(function(data) {
