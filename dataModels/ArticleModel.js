@@ -1165,7 +1165,7 @@ schema.statics.getArticlesDataByArticlesId = async function(articlesId, type = '
     obj[article._id] = {
       title,
       content: nkcRender.htmlToPlain(content, 200),
-      coverUrl: getUrl('documentCover', cover),
+      coverUrl: cover? getUrl('documentCover', cover): '',
       username: user.username,
       uid: user.uid,
       avatarUrl: getUrl('userAvatar', user.avatar),
