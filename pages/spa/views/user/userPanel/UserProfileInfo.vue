@@ -31,7 +31,7 @@
           width: 4rem;
           height: 4rem;
           margin-right: 1rem;
-          border-radius: 25%;
+          border-radius: 15%;
         }
       }
       .column-content {
@@ -39,10 +39,18 @@
         vertical-align: top;
         width: 100%;
         a {
+          vertical-align: top;
           font-size: 1.4rem;
-          color: #999;
+          color: #0e0e0e;
+          font-weight: bold;
           transition: border-bottom-color 200ms;
           border-bottom: 1px solid rgba(0, 0, 0, 0);
+        }
+        .column-focus-count {
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: #999;
+          vertical-align: bottom;
         }
       }
     }
@@ -71,9 +79,6 @@ export default {
     userColumn: null,
     userInformation: null,
   }),
-  mounted() {
-    console.log('targetUser', this.targetUser);
-  },
   methods: {
     getUrl: getUrl,
     timeFormat: timeFormat,

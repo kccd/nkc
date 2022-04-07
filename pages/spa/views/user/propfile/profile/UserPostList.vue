@@ -1,5 +1,5 @@
 <template lang="pug">
-  .user-post-list.box-shadow-panel
+  .user-post-list
     to-column(ref="toColumn")
     .user-list-warning(v-if="!posts || posts.length === 0") 用户貌似未发表过任何内容
     .user-post-list

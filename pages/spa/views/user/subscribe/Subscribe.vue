@@ -4,7 +4,6 @@
 </template>
 <style lang="less" scoped>
 .subscribe-container{
-  padding: 15px;
 }
 </style>
 <script>

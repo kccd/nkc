@@ -5,6 +5,9 @@
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
+.post-panel {
+  padding: 0;
+}
 </style>
 <script>
 export default {

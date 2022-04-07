@@ -2,7 +2,6 @@
 .user-account.m-b-1(v-if="targetUser")
   //- 用户左侧面板
   left-panel(:nav-links="navLinks" :target-user="targetUser")
-
   //- 用户中间面板 先hi用户的动态， 文章，恢复等信息
   .user-container.col-xs-12.col-md-7.p-r-0.m-b-1.box-shadow-panel#comment-content
     router-view

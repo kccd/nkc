@@ -1,25 +1,24 @@
 <template lang="pug">
-  .user-banner(@mouseenter="enter()" @mouseleave="leave()").m-b-1
+  .user-banner(@mouseenter="enter()" @mouseleave="leave()" v-if="targetUser").m-b-1
     .hidden-user-home-tip(v-if="targetUser && targetUser.hidden" )
       span 用户名片已被屏蔽
       //用户名片
-    .account-nav(v-if="targetUser" )
-      //用户banner
+    .account-banner(v-if="targetUser" )
+      //用户banner容器
       .account-user-banner-container
-        .account-user-banner
-          a(:href="getUrl('userBanner', targetUser.banner)")
-            img(:src="getUrl('userBanner', targetUser.banner)")
-        .account-user-info
-          .account-user-avatar
-            a(:href="getUrl('userAvatar', targetUser.avatar, 'lg')" target="_blank").user-avatar
-              img(:src="getUrl('userAvatar', targetUser.avatar)")
-          .account-user-right
-            .account-user-name {{targetUser.username}}
-              user-level(ref="userLevel" :target-user="targetUser")
-            .account-user-certs {{targetUser.info.certsName}}
-            .account-user-description {{targetUser.description}}
-            .account-user-kcb
-              user-scores(ref="userScore" :scores="scores" :xsf="targetUser.xsf" )
+        .account-user-banner(:style="`backgroundImage: url('${getUrl('userBanner', targetUser.banner)}')`" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
+          //img(:src="getUrl('userBanner', targetUser.banner)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
+          .account-user-info
+            .account-user-avatar
+              img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
+            .account-user-introduce
+              .account-user-name {{targetUser.username}}
+                user-level(ref="userLevel" :target-user="targetUser")
+              .account-user-certs {{targetUser.info.certsName}}
+              .account-user-kcb
+                user-scores(ref="userScore" :scores="scores" :xsf="targetUser.xsf" )
+        .account-nav
+
     div(v-if="panelPermission && (panelPermission.unBannedUser || panelPermission.bannedUser ||panelPermission.clearUserInfo)" )
       .btn-ban(v-show="showBanBox" @click="clickBanContext()")
         .fa.fa-ban( title="用户违规？点我！")
@@ -41,65 +40,59 @@
             a(@click="clearUserInfo(targetUser.uid, 'username')") 删除用户名
           li(v-if="panelPermission.clearUserInfo")
             a(@click="clearUserInfo(targetUser.uid, 'description')") 删除简介
+
 </template>
 
 <style lang="less">
 @import "../../../../publicModules/base";
 .user-banner {
-  height: 13rem;
+  height: auto;
   position: relative;
   .hidden-user-home-tip {
   }
-  .account-nav {
+  .account-banner {
+    height: 14rem;
+    width: 100%;
     .account-user-banner-container {
       .account-user-banner {
-        img {
+        background-size: 100%;
+        background-repeat: no-repeat;
+        border-radius: 4px;
+        .account-user-info {
+          position: relative;
+          margin: 0 4rem;
           width: 100%;
-          height: 13rem;
+          height: auto;
+          .account-user-avatar {
+            position: absolute;
+            left: 0;
+            bottom: -4rem;
+            margin-right: 2rem;
+            img {
+              width: 10rem;
+              height: 10rem;
+              border: 4px solid #fff;
+              border-radius: 8%;
+            }
+          }
+          .account-user-introduce {
+            margin: 0 11rem;
+            text-align: end;
+            .account-user-name {
+
+            }
+            .account-user-certs {
+
+            }
+            .account-user-kcb {
+
+            }
+          }
         }
       }
-      .account-user-info {
-        margin-top: -11rem;
-        position: relative;
-        .account-user-avatar {
-          position: absolute;
-          top: 0px;
-          display: inline-block;
-          margin-left: 2rem;
-          img {
-             width: 8rem;
-             height: 8rem;
-             border-radius: 50%;
-             box-sizing: border-box;
-             border: 3px solid #fff;
-           }
-         }
-        .account-user-right{
-           width: 50%;
-           display: inline-block;
-           margin-left: 144px;
-           .account-user-name {
-             font-size: 16px;
-             display: inline-block;
-             .account-user-level {
-               display: inline-block;
-             }
-           }
-           .account-user-certs{
-             color: #e85a71;
-           }
-           .account-user-description{
-             white-space: nowrap;
-             overflow: hidden;
-             text-overflow: ellipsis;
-           }
-           .account-user-kcb{
-             display: inline-block;
-           }
-         }
-
-
-
+      .account-nav {
+        width: 100%;
+        height: 6rem;
       }
     }
   }
@@ -142,6 +135,21 @@
       }
     }
   }
+  .user-account {
+    .account-left {
+      .user-avatar {
+        img {
+          width: 8rem;
+          height: 8rem;
+          border: 4px solid #fff;
+          border-radius: 8%;
+        }
+      }
+      .user-info {
+
+      }
+    }
+  }
 }
 </style>
 <script>
@@ -151,6 +159,7 @@ import UserLevel from "./UserLevel";
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {screenTopWarning} from "../../../../lib/js/topAlert";
 import {getState} from "../../../../lib/js/state";
+import {objToStr} from "../../../../lib/js/tools";
 export default {
   props: ['targetUserScores'],
   data: () => ({
@@ -178,6 +187,7 @@ export default {
 
   },
   methods: {
+    objToStr: objToStr,
     getUrl: getUrl,
     //获取uid
     initData() {
@@ -189,8 +199,8 @@ export default {
       const self = this;
       nkcAPI(`/u/${this.uid}/userPanel`,'GET')
       .then(res => {
-        this.panelPermission = res.panelPermission
-        this.targetUser = res.targetUser
+        self.panelPermission = res.panelPermission;
+        self.targetUser = res.targetUser;
       })
     },
     // 封禁用户,banned:false 解封，true 封禁
