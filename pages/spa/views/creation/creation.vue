@@ -12,7 +12,7 @@
 <script>
 import VerNav from "../../components/VerNav";
 import { getState } from "../../../lib/js/state";
-import { visitUrl } from "../../../lib/js/pageSwitch";
+import { visitUrl, setPageTitle } from "../../../lib/js/pageSwitch";
 import Home from "./Home"
 export default {
   components: {
@@ -39,12 +39,13 @@ export default {
   created(){
     const { isApp } = getState();
     this.isApp = isApp;
-    this.isShowHome()
+    this.isShowHome();
+    setPageTitle('创作中心');
   },
   methods: {
     isShowHome(){
       if(this.$route.path === "/creation"){
-        this.showHome = true; 
+        this.showHome = true;
       }else{
         this.showHome = false;
       }
