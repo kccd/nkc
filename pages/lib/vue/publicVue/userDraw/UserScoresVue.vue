@@ -11,20 +11,6 @@
         span {{xsf}}
 </template>
 
-<script>
-import {getUrl} from "../../../js/tools";
-export default {
-  props: ["scores", "xsf", "sicon", "xsficon"],
-  data: () => ({
-  }),
-  components: {
-  },
-  methods: {
-    getUrl: getUrl,
-  }
-}
-</script>
-
 <style lang="less" scoped>
 .user-scores{
   text-align: center;
@@ -45,3 +31,17 @@ export default {
   }
 }
 </style>
+
+<script>
+import {getUrl} from "../../../js/tools";
+export default {
+  props: ["scores", "xsf", "sicon", "xsficon"],
+  data: () => ({
+  }),
+  methods: {
+    getUrl: getUrl,
+  }
+}
+</script>
+
+

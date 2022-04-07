@@ -1,5 +1,7 @@
 <template lang="pug">
   .left-panel
+    //用户信息
+
     //- 用户链接
     .m-b-1(v-if="rolePermissionsType" )
       user-link(ref="userLink" :target-user="targetUser" :nav-links="navLinks")
