@@ -1,5 +1,5 @@
 <template lang="pug">
-  .hidden-sm.hidden-xs(v-if="forums" )
+  .col-xs-12.col-md-2.box-shadow-panel.hidden-sm.hidden-xs.p-r-0.m-b-1(v-if="forums")
     sub-forum(:forums="forums")
     subscribes
 </template>

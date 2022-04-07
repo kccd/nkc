@@ -1,5 +1,5 @@
 <template lang="pug">
-  .post-panel.b-s-10
+  .post-panel
     .post-panel-item
       router-view
 </template>

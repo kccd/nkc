@@ -1,5 +1,5 @@
 <template lang="pug">
-  .sub-forums
+  .sub-forums.m-b-1
     .panel-header 关注的领域
     .m-b-2
       .user-card-sub-div

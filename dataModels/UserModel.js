@@ -1161,7 +1161,8 @@ userSchema.statics.extendUsersInfo = async (users) => {
         name: column.name,
         banner: column.banner,
         avatar: column.avatar,
-        abbr: column.abbr
+        abbr: column.abbr,
+        subCount: column.subCount,
       }
     }
     for(const cert of certs) {
