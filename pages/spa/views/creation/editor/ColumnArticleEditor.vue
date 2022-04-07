@@ -1,5 +1,5 @@
 <template lang="pug">
-  .column-creation.standard-max-container
+  .column-creation.standard-fluid-max-container
     //.m-b-1
       bread-crumb(:list="navList")
     template(v-if="column.userColumn")
