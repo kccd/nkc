@@ -1,5 +1,5 @@
 <template lang="pug">
-  .user-manage(v-if="targetUser && (permissions.visitUserTransaction || permissions.violationRecord || permissions.getUserOtherAccount || permissions.viewUserCode)")
+  .user-manage.m-b-1(v-if="targetUser && (permissions.visitUserTransaction || permissions.violationRecord || permissions.getUserOtherAccount || permissions.viewUserCode)")
     violation-record(ref="violationRecord")
     .panel-header 管理
     .m-b-2
@@ -11,23 +11,8 @@
 </template>
 <style lang="less" scoped>
 .user-manage {
-  border-top: 1px solid #eee;
-  padding: 0.5rem 0;
+  padding: 15px;
   transition: box-shadow 300ms;
-  &:hover{
-    box-shadow: 0px -8px 8px -8px rgba(0, 0, 0, 0.2);
-  }
-  .panel-header {
-    height: 1.4rem;
-    line-height: 1.4rem;
-    width: 100%;
-    text-align: center;
-    font-size: 1rem;
-    border-radius: 0.7rem;
-    margin-bottom: 1rem;
-    color: #333;
-    font-weight: normal;
-  }
 }
 </style>
 <script>

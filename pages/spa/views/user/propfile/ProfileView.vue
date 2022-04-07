@@ -1,10 +1,13 @@
 <template lang="pug">
-  .post-panel.b-s-10
+  .post-panel
     .post-panel-item
       router-view
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
+.post-panel {
+  padding: 0;
+}
 </style>
 <script>
 export default {

@@ -5,7 +5,7 @@ module.exports = async (ctx, next) => {
   const q = {
     verify: true
   };
-  if(!t) {
+  if(t === 'in') {
     q.to = targetUser.uid;
   } else if(t === 'payout') {
     q.from = targetUser.uid;

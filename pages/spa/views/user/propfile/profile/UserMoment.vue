@@ -1,5 +1,5 @@
 <template lang="pug">
-  .user-moment.box-shadow-panel
+  .user-moment
     paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
     .user-list-awrning(v-if="!momentsData || momentsData.length === 0") 空空如也~
     .p-t-1(v-else)

@@ -1,6 +1,6 @@
 <template lang="pug">
-  .share-box
-    .share-title 分享链接
+  .share-box.m-b-1
+    .panel-header 分享链接
     .share(v-if="!getState.app")
       .share-icon(@click="shareToOther(shareType, 'qq', shareTitle, shareId, shareDescription, shareAvatar)" title="分享给QQ好友")
         img(src='/default/QQ.png')
@@ -18,21 +18,8 @@
 </template>
 <style lang="less" scoped>
 .share-box{
-  border-top: 1px solid #eee;
-  padding: 0.5rem 0;
+  padding: 15px;
   transition: box-shadow 300ms;
-  &:hover{
-    box-shadow: 0px -8px 8px -8px rgba(0, 0, 0, 0.2);
-  }
-}
-.share-title{
-  height: 1.4rem;
-  line-height: 1.4rem;
-  width: 100%;
-  text-align: center;
-  font-size: 1rem;
-  border-radius: 0.7rem;
-  margin-bottom: 1rem;
 }
 .share{
   padding: 0;

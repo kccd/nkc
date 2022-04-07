@@ -267,12 +267,20 @@ export default {
       users: {},
       timeoutName: '',
       subscribed: '',
+      DOM: '',
     }
   },
   mounted() {
     window.showFloatUserPanel = this.showFloatUserPanel;
+    window.initMouseleaveEvent = this.initMouseleaveEvent;
     const self = this;
     const panel = $(self.$el);
+    if(panel) {
+      panel.on("mouseover", function() {
+        self.timeoutName = null;
+        self.onPanel = true;
+      });
+    }
     panel.css({
       top: 0,
       left: 0
@@ -281,6 +289,17 @@ export default {
       top: 300,
       left: 300
     });
+  },
+  updated() {
+    const self = this;
+    if(self.DOM) {
+      self.DOM.on('mouseleave', function () {
+        //鼠标离开元素
+        self.timeoutName = setTimeout(() => {
+          self.reset();
+        }, 200);
+      })
+    }
   },
   methods: {
     getUrl: getUrl,
@@ -295,24 +314,23 @@ export default {
       this.over = false;
       this.user = '';
     },
+    //当鼠标离开元素时
+    initMouseleaveEvent() {
+      //鼠标离开元素
+      this.timeoutName = setTimeout(() => {
+        this.reset();
+      }, 200);
+    },
     //改变悬浮框的定位并显示
     showFloatUserPanel(uid, dom) {
-      const self = this;
       const DOM = $(dom);
+      this.DOM = DOM;
       this.initEvent(DOM);
-      DOM.on("mouseleave", function() {
-        //鼠标离开元素
-        self.timeoutName = setTimeout(() => {
-          self.reset();
-        }, 200);
-      });
     },
     initEvent(dom, position = 'right') {
       const self = this;
       //鼠标悬浮在元素上
-      if(self.timeoutName) {
-        clearTimeout(self.timeoutName);
-      }
+      clearTimeout(self.timeoutName);
       self.count ++;
       self.over = true;
       let uid;
@@ -343,9 +361,7 @@ export default {
           });
           panel.on("mouseover", function() {
             clearTimeout(self.timeoutName);
-            self.show = true;
             self.onPanel = true;
-            self.over = true;
           });
 
           const documentWidth = $(document).width() - 10;

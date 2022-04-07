@@ -73,6 +73,13 @@ function showUserPanel(data, dom) {
 }
 
 /*
+* 鼠标移出隐藏用户名片
+* */
+function hideUserPanel(data, dome) {
+  window.initMouseleaveEvent()
+}
+
+/*
 * data-global-click 和 data-global-long-press 合法的操作
 * */
 const eventFunctions = {
@@ -81,6 +88,7 @@ const eventFunctions = {
     downloadFile,
     saveImage,
     showUserPanel,
+    hideUserPanel,
   }
 
 /*
@@ -121,11 +129,16 @@ export function initGlobalLongPressEvent() {
 }
 
 /*
-* 监听鼠标悬浮事件
+* 监听鼠标移入移出悬浮事件
 * */
 export function initGlobalMouseOverEvent() {
+  //鼠标移入
   document.addEventListener('mouseover', e => {
     globalEvent('mouseover', e);
+  });
+  //鼠标移出
+  document.addEventListener('mouseleave', e => {
+    globalEvent('mouseleave', e);
   });
 }
 
