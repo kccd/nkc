@@ -1,7 +1,14 @@
 <template lang="pug">
   .article-editor
     .m-b-1
-      .article-box(v-if="articles.length !== 0")
+      .article-box(v-if="articles.length > 0")
+        .article-box-header 草稿
+        .article-box-text {{articles[0].document.title || '未命名'}}
+        .article-box-option
+          button.btn.btn-xs.btn-primary.m-r-05(@click="editArticle(articles[0]._id)") 继续编辑
+          button.btn.btn-xs.btn-default(@click="more") 查看更多
+          .fa.fa-remove(@click="close")
+      //-.article-box(v-if="articles.length !== 0")
         .close.fa.fa-remove(@click="close")
         span 当前{{source === 'column'?'专栏':'空间'}}存在草稿,点击编辑继续编辑草稿
         .article-list(v-for="article of articles")
@@ -27,13 +34,55 @@
 </template>
 
 <style lang="less">
+  @import "../../../publicModules/base";
   .article-editor {
     .article-box {
-      padding: 1rem;
+      @height: 3rem;
+      @padding: 1rem;
+      @boxHeaderWidth: 4rem;
+      @boxOptionWidth: 14rem;
+      height: @height;
+      line-height: @height;
+      padding-left: @boxHeaderWidth;
+      padding-right: @boxOptionWidth + 0.5rem;
       width: 100%;
-      background-color: #fcf8e3;
+      background-color: #d9edf7;
       position: relative;
-      .article-list {
+      border: 1px solid #c6e5ff;
+      .article-box-header{
+        color: @primary;
+        font-size: 1.2rem;
+        font-weight: 700;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: @height;
+        line-height: @height;
+        width: @boxHeaderWidth;
+        text-align: center;
+      }
+      .article-box-text{
+        font-size: 1.3rem;
+        .hideText(@line: 1);
+      }
+      .article-box-option{
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: @height;
+        line-height: @height;
+        width: @boxOptionWidth;
+        text-align: right;
+        .fa{
+          height: @height;
+          cursor: pointer;
+          line-height: @height;
+          width: @height;
+          text-align: center;
+        }
+      }
+
+      /*.article-list {
         .article-info {
           display: inline-block;
           width: 70%;
@@ -57,7 +106,7 @@
             }
           }
         }
-      }
+      }*/
     }
     .article-more {
       cursor: pointer;

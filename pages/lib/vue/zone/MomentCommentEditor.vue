@@ -25,8 +25,9 @@
             span 同时评论
       .option-box-right
         span {{remainingWords}}
-        button.btn.btn-default.btn-sm(@click="publish" :disabled="disablePostButton") 提交
-
+        button.btn.btn-default.btn-sm(@click="publish" :disabled="disablePostButton" v-if="submitting" title="发表中，请稍候")
+          .fa.fa-spinner.fa-spin
+        button.btn.btn-default.btn-sm(@click="publish" :disabled="disablePostButton" v-else) 提交
 </template>
 
 <style lang="less" scoped>
@@ -60,7 +61,7 @@
         position: absolute;
         width: @paddingRight;
         button{
-
+          width: 4rem;
         }
         span{
           height: @height;
