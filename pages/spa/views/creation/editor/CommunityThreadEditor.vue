@@ -1,5 +1,5 @@
 <template lang="pug">
-  .standard-max-container
+  .standard-fluid-max-container
     .community-thread-editor 社区创作
     editor
 </template>

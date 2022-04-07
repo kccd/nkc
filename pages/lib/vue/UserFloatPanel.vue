@@ -1,9 +1,3 @@
-<!--用户悬浮框-->
-<!--
-  注意事项，由于offset获取的元素偏移量时相对一整个页面，而position是相对于设置了绝对定位的父级，刚好bootstrap的布局容器设置了绝对定位.所以要获取到布局容器的偏移量用鼠标
-  移入要展示悬浮框的dom的偏移量来减去布局容器的偏移量 即给布局容器加上#comment-content;
--->
-
 <template lang="pug">
   #floatUserPanel(v-cloak v-show="show")
     transition(name="fade")
@@ -273,11 +267,20 @@ export default {
       users: {},
       timeoutName: '',
       subscribed: '',
+      DOM: '',
     }
   },
   mounted() {
+    window.showFloatUserPanel = this.showFloatUserPanel;
+    window.initMouseleaveEvent = this.initMouseleaveEvent;
     const self = this;
     const panel = $(self.$el);
+    if(panel) {
+      panel.on("mouseover", function() {
+        self.timeoutName = null;
+        self.onPanel = true;
+      });
+    }
     panel.css({
       top: 0,
       left: 0
@@ -286,9 +289,17 @@ export default {
       top: 300,
       left: 300
     });
-    $(() => {
-      this.initPanel();
-    })
+  },
+  updated() {
+    const self = this;
+    if(self.DOM) {
+      self.DOM.on('mouseleave', function () {
+        //鼠标离开元素
+        self.timeoutName = setTimeout(() => {
+          self.reset();
+        }, 200);
+      })
+    }
   },
   methods: {
     getUrl: getUrl,
@@ -299,42 +310,38 @@ export default {
     },
     reset() {
       this.show = false;
-       this.onPanel = false;
-       this.over = false;
-       this.user = '';
+      this.onPanel = false;
+      this.over = false;
+      this.user = '';
     },
-    initPanel() {
-      const doms = $(`[data-float-uid]`);
-      for(var i = 0; i < doms.length; i++ ) {
-        const dom = doms.eq(i);
-        if(dom.attr("data-float-init") === "true") continue;
-        let position = dom.attr("data-float-position");
-        if(getState.isApp) return;
-        this.initEvent(doms.eq(i), position);
-      }
+    //当鼠标离开元素时
+    initMouseleaveEvent() {
+      //鼠标离开元素
+      this.timeoutName = setTimeout(() => {
+        this.reset();
+      }, 200);
+    },
+    //改变悬浮框的定位并显示
+    showFloatUserPanel(uid, dom) {
+      const DOM = $(dom);
+      this.DOM = DOM;
+      this.initEvent(DOM);
     },
     initEvent(dom, position = 'right') {
       const self = this;
-      dom.on("mouseleave", function() {
-        //鼠标离开元素
-        self.timeoutName = setTimeout(() => {
-          self.reset();
-        }, 200);
-      });
-      dom.on("mouseover", function() {
-        //鼠标悬浮在元素上
-        clearTimeout(self.timeoutName);
-        self.count ++;
-        self.over = true;
-        let uid;
-        let count_ = self.count;
-        let left, top, width, height;
-        //延迟过滤掉鼠标意外划过元素
-        self.timeout(300)
+      //鼠标悬浮在元素上
+      clearTimeout(self.timeoutName);
+      self.count ++;
+      self.over = true;
+      let uid;
+      let count_ = self.count;
+      let left, top, width, height;
+      //延迟过滤掉鼠标意外划过元素
+      self.timeout(300)
         .then(() => {
           if(count_ !== self.count) throw "timeout 1";
           if(!self.over) throw "timeout 2";
-          uid = dom.attr("data-float-uid");
+          uid = dom.attr("data-global-data");
           left = dom.offset().left;
           top = dom.offset().top;
           width = dom.width();
@@ -372,16 +379,15 @@ export default {
           if((left + panelWidth) > documentWidth) {
             left = documentWidth - panelWidth;
           }
-          const {top: contentTop, left: contentWidth} = $('#comment-content').offset();
+          // const {top: contentTop, left: contentWidth} = $('#comment-content').offset();
           panel.css({
-            top: top - contentTop,
-            left: left - contentWidth
+            top: top,
+            left: left
           });
         })
         .catch(err => {
           console.log(err);
         })
-      });
       dom.attr('data-float-init', 'true');
     },
     //延迟

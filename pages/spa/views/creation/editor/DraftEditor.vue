@@ -1,5 +1,5 @@
 <template lang="pug">
-  .standard-max-container
+  .standard-fluid-max-container
     .m-b-1
       bread-crumb(:list="navList")
     div

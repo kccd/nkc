@@ -1,5 +1,8 @@
 module.exports = {
 	GET: 'visitAppDownload',
+  upgrade: {
+    GET: 'APPUpgrade',
+  },
 	location: {
 		GET: "selectLocation",
 	},
@@ -12,6 +15,9 @@ module.exports = {
 	my: {
 		GET: "APPGetMy"
 	},
+  account: {
+    GET: 'APPGetAccountInfo'
+  },
 	download: {
 		GET: "appGetDownload"
 	},

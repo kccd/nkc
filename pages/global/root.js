@@ -3,11 +3,12 @@ import Login from '../lib/vue/Login';
 import {RNOpenLoginPage, RNSyncPageInfo, RNToChat} from "../lib/js/reactNative";
 import {getState} from "../lib/js/state";
 import UserDraw from "../lib/vue/publicVue/userDraw/UserDraw";
-import FloatUserPanel from "../lib/vue/FloatUserPanel";
+import UserFloatPanel from "../lib/vue/UserFloatPanel";
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
   initGlobalLongPressEvent,
+  initGlobalMouseOverEvent
 } from "./event";
 import {initUserPanel} from "./userPanel";
 let userPanel;
@@ -26,7 +27,7 @@ window.RootApp = new Vue({
     'chat': Chat,
     'login': Login,
     "user-draw": UserDraw,
-    "float-user-panel": FloatUserPanel
+    "user-float-panel": UserFloatPanel
   },
   computed: {
     hasLogged() {
@@ -37,10 +38,9 @@ window.RootApp = new Vue({
     initGlobalClickEvent();
     initGlobalLongPressEvent();
     initAppGlobalClickLinkEvent();
-    this.$refs.floatUserPanel.initPanel();
+    initGlobalMouseOverEvent();
     $(() => {
       // 这里的代码会在页面准备就绪之后执行
-      RNSyncPageInfo({uid});
     });
   },
   methods: {
@@ -52,7 +52,6 @@ window.RootApp = new Vue({
     showUserPanel() {
       userPanel.showDraw();
     },
-    //
     openLoginPanel(type) {
       if(this.isReactNative) {
         RNOpenLoginPage(type);
@@ -78,7 +77,7 @@ window.RootApp = new Vue({
     //关闭抽屉
     closeDraw(type) {
       this.$refs.userDraw.colseDraw(type);
-    }
+    },
   }
 });
 

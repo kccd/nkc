@@ -1,6 +1,6 @@
 <template lang="pug">
-  .nav-links
-    .account-url(v-if="navLink" v-for="navLink in navLinks")
+  .account-url.m-b-1
+    .account-link(v-if="navLink" v-for="navLink in navLinks")
       .account-name(v-if="navLink.name") {{navLink.name}}
       .account-lis
         .account-li(v-for="link in navLink.links" @click="toRoute(link.url)" :class="{'active': link.type === ''}")
@@ -10,7 +10,6 @@
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
-.nav-links {
   .account-url{
     @liHeight: 4rem;
     border-top: 1px solid #eee;
@@ -64,11 +63,8 @@
       }
     }
   }
-}
 </style>
 <script>
-import {nkcAPI} from "../../../../lib/js/netAPI";
-
 export default {
   props: ['nav-links'],
   data: () => ({

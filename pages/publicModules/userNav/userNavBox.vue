@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import userScore from "../../lib/vue/publicVue/userDraw/userScoresVue";
+import UserScoresVue from "../../lib/vue/publicVue/userDraw/UserScoresVue";
 export default {
   props: ['user'],
   data: () => ({
@@ -70,7 +70,7 @@ export default {
     }
   },
   components: {
-    "user-score": userScore,
+    "user-score": UserScoresVue,
   },
   methods: {
   }
