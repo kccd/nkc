@@ -35,6 +35,8 @@ export class DraggableElement {
     const self = this;
     this.root = element;
     this.JQRoot = $(this.root);
+    this.rootElementHeight = 0;
+    this.rootElementWidth = 0;
     this._mousedownEvent = () => {
       self.updateZIndex();
     };
@@ -56,10 +58,15 @@ export class DraggableElement {
               left: ui.position.left
             });
           }
+        },
+        start: function() {
+          self.getRootElementSize();
+        },
+        stop: function() {
+          self.setRootElementSize();
         }
       })
       .on('mousedown', this._mousedownEvent);
-    this.addClassAndInsertDraggableStyleToDocument();
     this.updateZIndex();
     this.setPositionCenter();
   }
@@ -104,16 +111,35 @@ export class DraggableElement {
       });
     }
   }
-  addClassAndInsertDraggableStyleToDocument() {
-    const className = 'draggable-element';
-    const dataType = 'draggableStyle';
-    let style = $(`style[data-type="${dataType}"]`);
-    if(style.length === 0) {
-      style = $('<style></style>');
-      style.attr('data-type', dataType);
-      style.text(`.${className}{height: auto!important;}`);
-      $(body).append(style);
+  getRootElementSize() {
+    const style= this.JQRoot.attr('style');
+    const styleArr = style.split(';');
+    let height = '';
+    let width = '';
+    for(let attr of styleArr) {
+      if(height && width) break;
+      attr = attr.split(':');
+      if(attr.length !== 2) continue;
+      const name = attr[0].trim();
+      const value = attr[1].trim();
+      if(name === 'width') {
+        width = value;
+      } else if(name === 'height') {
+        height = value;
+      }
     }
-    this.JQRoot.addClass(className);
+    this.rootElementHeight = height;
+    this.rootElementWidth = width;
+  }
+  // 当拖动元素之后
+  // draggable库会在元素style属性上设置当前元素的高宽
+  // 最终导致元素无法再自适应大小
+  // 可通过此方法清除高宽
+  setRootElementSize() {
+    const {rootElementHeight, rootElementWidth} = this;
+    this.JQRoot.css({
+      height: rootElementHeight,
+      width: rootElementWidth,
+    });
   }
 }
