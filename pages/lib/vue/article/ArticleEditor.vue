@@ -79,7 +79,7 @@ import {getRequest, timeFormat, addUrlParam} from "../../js/tools";
 import {nkcAPI} from "../../js/netAPI";
 import {checkString} from "../../js/checkData";
 import {getLength} from "../../js/checkData";
-import {getColumnInfo} from "../../js/tools";
+import {getColumnInfo} from "../../js/column";
 export default {
   props:['time', 'source', 'configs'],
   data: () => ({
