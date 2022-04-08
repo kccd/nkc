@@ -18,7 +18,7 @@
 }
 </style>
 <script>
-import {getColumnInfo} from "../../../lib/js/tools";
+import {getColumnInfo} from "../../../lib/js/column";
 import LeftPanel from "./LeftPanel";
 import RightPanel from "./RightPanel";
 export default {

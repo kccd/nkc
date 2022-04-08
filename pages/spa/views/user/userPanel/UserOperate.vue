@@ -57,7 +57,7 @@
   }
 </style>
 <script>
-import {getColumnInfo} from "../../../../lib/js/tools";
+import {getColumnInfo} from "../../../../lib/js/column";
 export default {
   props: ['targetUser'],
   data: () => ({

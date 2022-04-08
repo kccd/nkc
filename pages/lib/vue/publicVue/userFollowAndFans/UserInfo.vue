@@ -1,9 +1,17 @@
 <template lang="pug">
   .userInfo
-    .avatar( title="头像" )
+    .avatar(
+      data-global-mouseover="showUserPanel"
+      data-global-mouseout="hideUserPanel"
+      :data-global-data="objToStr({uid: userData.uid})"
+    )
       img(:src="setUrl( userData.avatar )")
     .describe
-      .name( title="姓名" )
+      .name(
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        :data-global-data="objToStr({uid: userData.uid})"
+         )
         a( :href="'/u/' + userData.uid" target="_blank") {{ userData.username }}
       .grade( title="等级" ) {{ userData.info?userData.info.certsName:'' }}
       .introduce( title="简介" ) {{ userData.description || "暂未填写个人简介"}}
@@ -11,6 +19,7 @@
 </template>
 <script>
 import {getUrl} from "../../../js/tools";
+import {objToStr} from "../../../js/tools";
 export default {
   data: () => ({
     userData: [],
@@ -55,6 +64,7 @@ export default {
   mounted() {
   },
   methods: {
+    objToStr: objToStr,
     subscribe(uid) {
       const self = this;
       const method = self.subUid.includes(uid) ? "DELETE" : "POST";

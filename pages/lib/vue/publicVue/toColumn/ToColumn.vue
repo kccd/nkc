@@ -147,7 +147,7 @@
 </style>
 <script>
 import {DraggableElement} from "../../../js/draggable";
-import {getColumnInfo} from "../../../js/tools";
+import {getColumnInfo} from "../../../js/column";
 export default  {
   data: () => ({
     show: false,

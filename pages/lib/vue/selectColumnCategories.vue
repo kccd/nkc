@@ -61,7 +61,6 @@
 
 <script>
 import {getRequest} from "../js/tools";
-import {getColumnInfo} from "../js/tools";
 export default {
   props: ['column-id'],
   data: () => ({
@@ -111,17 +110,6 @@ export default {
   },
   methods: {
     getRequest: getRequest,
-    // getColumn(){
-    //   const self = this;
-    //   let id = null;
-    //   getColumnInfo()
-    //     .then(res => {
-    //       if(res.userColumn) {
-    //         id = res.userColumn._id;
-    //       }
-    //     })
-    //   self.columnId = self.getRequest().mid || id;
-    // },
     getMainCategoryById: function(_id) {
       for(var i = 0; i < this.mainCategories.length; i++) {
         if(this.mainCategories[i]._id === _id) return this.mainCategories[i];
