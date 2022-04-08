@@ -64,7 +64,7 @@
   .hidden-user-home-tip {
   }
   .account-banner {
-    height: 13rem;
+    height: 12rem;
     width: 100%;
     .account-user-banner-container {
       .account-user-banner {
@@ -116,9 +116,11 @@
             display: inline-block;
             font-size: 20px;
             font-weight: bold;
+            position: relative;
+            top: -8px;
             span{
               display: inline-block;
-              padding: 15px 30px 0 0;
+              padding: 0 30px 0 0;
             }
           }
           .account-nav-right{
@@ -128,11 +130,11 @@
             text-align: center;
             &>div{
               display: inline-block;
-              padding: 5px 15px;
-              font-width: bold;
-              font-size: 1rem;
+              padding: 3px 15px 0 15px;
+              font-weight: bold;
+              font-size: 12px;
               &>span{
-                font-size: 2rem;
+                font-size: 18px;
               }
             }
           }
