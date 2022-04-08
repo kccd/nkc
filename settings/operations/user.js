@@ -1,7 +1,14 @@
 module.exports = {
 	GET: 'searchUser',
 	PARAMETER: {
-		content: {
+		p: {
+			GET: "visitUserCard",
+			subUser: {
+				GET: "visitUserCard",
+			},
+			manage: {
+				GET: "getUserHomeCard"
+			},
 			moment: {
 				GET: "getUserHomeCard"
 			},
@@ -11,12 +18,36 @@ module.exports = {
 			thread: {
 				GET: "getUserHomeCard"
 			},
-			follow: {
+			follower: {
 				GET: "getUserHomeCard",
 			},
-			fans: {
+			fan: {
 				GET: "getUserHomeCard",
 			},
+			finance: {
+				GET: "getUserHomeCard",
+			},
+			s: {
+				GET: "visitUserCard",
+				collection: {
+					GET: "getUserHomeCard"
+				},
+				column: {
+					GET: "getUserHomeCard"
+				},
+				user: {
+					GET: "getUserHomeCard"
+				},
+				forum: {
+					GET: "getUserHomeCard",
+				},
+				blacklist: {
+					GET: "getUserHomeCard",
+				}
+			},
+		},
+		userPanel: {
+			GET: 'visitUserCard',
 		},
 		GET: 'visitUserCard',
 		userHome: {
@@ -28,20 +59,7 @@ module.exports = {
 		userHomeCard: {
 			GET: "getUserHomeCard"
 		},
-		s: {
-			thread: {
-				GET: "getUserHomeCard"
-			},
-			column: {
-				GET: "getUserHomeCard"
-			},
-			user: {
-				GET: "getUserHomeCard"
-			},
-			forum: {
-				GET: "getUserHomeCard",
-			},
-		},
+		
 		verifiedAssets: {
 			PARAMETER: {
 				GET: "visitVerifiedUpload"

@@ -33,6 +33,7 @@ block content
       .m-t-05 加载中
 block scripts
   script.
+    var messageApp = RootApp.$refs.chat;
     messageApp.showMessagePanel();
     if($(window).width() <= 768) {
       messageApp.setMaximize();

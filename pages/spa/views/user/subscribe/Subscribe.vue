@@ -1,20 +1,12 @@
 <template lang="pug">
-  .subscribe-container
-    h4 这是用户关注的内容
+  .subscribe-container.box-shadow-panel
+    router-view
 </template>
-<style lang="less">
-
+<style lang="less" scoped>
+.subscribe-container{
+}
 </style>
 <script>
 export default {
-  data: () => ({
-
-  }),
-  components: {
-
-  },
-  methods: {
-
-  }
 }
 </script>

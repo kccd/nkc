@@ -20,7 +20,7 @@
         single-post(ref="singlePost" :post="post")
 </template>
 <style lang="less">
-@import "../../../../publicModules/base";
+@import "../../../../../publicModules/base";
 .checkbox {
   display: inline-block;
   min-width: 15px;
@@ -31,11 +31,11 @@
 }
 </style>
 <script>
-import Review from "../postReview/Review";
-import SinglePost from "../postModel/SinglePost";
-import Paging from "../../Paging";
-import ToColumn from "../toColumn/ToColumn";
-import {nkcAPI} from "../../../js/netAPI";
+import Review from "../../../../../lib/vue/publicVue/postReview/Review";
+import SinglePost from "../../../../../lib/vue/publicVue/postModel/SinglePost";
+import Paging from "../../../../../lib/vue/Paging";
+import ToColumn from "../../../../../lib/vue/publicVue/toColumn/ToColumn";
+import {nkcAPI} from "../../../../../lib/js/netAPI";
 export default {
   data: () => ({
     posts: [],
@@ -70,18 +70,13 @@ export default {
       this.routeName = name;
       const {uid} = params;
       this.uid = uid;
-      this.getUserCardInfo(name, 0);
+      this.getUserCardInfo(0);
     },
     //获取用户卡片信息
-    getUserCardInfo(type, page) {
-      const {uid} = this;
+    getUserCardInfo(page) {
+      const {uid, routeName} = this;
       const self= this;
-      // let url = `/u/${uid}/userHomeCard`;
-      let url = `/u/${uid}/content`;
-      if(type) {
-        // url = url + `?t=${type}`
-        url = url + `/${type}`
-      }
+      let url = `/u/${uid}/p/${routeName}`;
       if(page) {
         const index = url .indexOf('?');
         if(index === -1) {
@@ -142,7 +137,7 @@ export default {
     },
     //点击分页
     clickButton(num) {
-      this.getUserCardInfo(this.routeName, num);
+      this.getUserCardInfo(num);
     }
   }
 }

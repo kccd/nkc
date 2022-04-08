@@ -1,7 +1,7 @@
 import {
   RNCloseWebview,
   RNLogout,
-  RNCheckAndUpdateApp,
+  RNOpenUpgradePage,
 } from "../../lib/js/reactNative";
 import {sweetError} from "../../lib/js/sweetAlert";
 
@@ -18,6 +18,6 @@ window.logout = function() {
     })
 };
 
-window.updateApp = function() {
-  RNCheckAndUpdateApp();
+window.openUpgradePage = function() {
+  RNOpenUpgradePage();
 }

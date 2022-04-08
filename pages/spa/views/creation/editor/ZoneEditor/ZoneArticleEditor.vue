@@ -1,6 +1,6 @@
 <template lang="pug">
   .zone-moment-editor
-    .standard-max-container
+    .standard-fluid-max-container
       article-editor(ref="articleEditor" time="60000" source="zone" :configs="configs")
 </template>
 

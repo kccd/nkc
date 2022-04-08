@@ -1,11 +1,9 @@
 <template lang="pug">
-.container-fluid.max-width
-  .row
-    .col-sx-12.col-md-12
-      .row
-        Panel(ref="panel" :target-user="targetUser" v-if="targetUser")
-        account-user(ref="accountUser" :target-user="targetUser" :nav-links="navLinks")
-        footer-vue(ref="footerVue")
+.container-fluid.max-width(v-cloak)
+  .col-sx-12.col-md-12
+    Panel(ref="panel" :target-user="targetUser" :target-user-scores="targetUserScores" v-if="targetUser")
+    account-user(ref="accountUser" :target-user="targetUser" :nav-links="navLinks" :forums="subForums")
+    footer-vue(ref="footerVue")
 </template>
 
 <style lang="less" scoped>
@@ -24,9 +22,10 @@ export default {
   data:() => ({
     targetUser: null,
     navLinks: null,
-    t: '',
     uid: null,
     isApp: null,
+    subForums: [],
+    targetUserScores:null,
   }),
   components: {
     Panel: Panel,
@@ -47,13 +46,12 @@ export default {
     //获取用户主页信息
     getUserInfo() {
       const self = this;
-      nkcAPI(`/u/${this.uid}/profile`, 'GET')
+      nkcAPI(`/u/${this.uid}/p`, 'GET')
       .then(res => {
-        console.log('res', res);
-        self.t = res.t;
+        self.subForums = res.targetUserSubForums;
         self.navLinks = res.navLinks;
-        console.log('navLinks', self.navLinks);
         self.targetUser = res.targetUser;
+        self.targetUserScores = res.targetUserScores;
       })
       .catch(err => {
         sweetError(err);

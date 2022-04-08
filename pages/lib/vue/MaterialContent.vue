@@ -260,7 +260,6 @@ export default {
     //移动文件夹
     moveFolders() {
       if(this.selectFoldersId.length === 0) return sweetWarning('请先选择文件夹');
-      console.log(this.selectFoldersId);
     }
   }
 }

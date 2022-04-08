@@ -13,14 +13,14 @@
       violation-record(ref="violationRecord")
 </template>
 <style lang="less">
-@import "../../../../publicModules/base";
+@import "../../../../../publicModules/base";
 </style>
 <script>
-import Moments from "../../zone/Moments";
-import Complaint from "../../Complaint";
-import ViolationRecord from "../../ViolationRecord";
-import Paging from "../../Paging";
-import {nkcAPI} from "../../../js/netAPI";
+import Moments from "../../../../../lib/vue/zone/Moments";
+import Complaint from "../../../../../lib/vue/Complaint";
+import ViolationRecord from "../../../../../lib/vue/ViolationRecord";
+import Paging from "../../../../../lib/vue/Paging";
+import {nkcAPI} from "../../../../../lib/js/netAPI";
 
 export default {
   data: () => ({
@@ -44,18 +44,14 @@ export default {
     const {name, params} = this.$route;
     const {uid} = params;
     this.uid = uid;
-    this.getUserCardInfo('', 0);
+    this.getUserCardInfo(0);
   },
   methods: {
     //获取用户卡片信息
-    getUserCardInfo(type, page) {
+    getUserCardInfo(page) {
       const {uid} = this;
       const self= this;
-      // let url = `/u/${uid}/userHomeCard`;
-      let url = `/u/${uid}/content/moment`;
-      if(type) {
-        url = url + `?t=${type}`
-      }
+      let url = `/u/${uid}/p/moment`;
       if(page) {
         const index = url .indexOf('?');
         if(index === -1) {
@@ -84,7 +80,7 @@ export default {
     },
     //点击分页
     clickButton(num) {
-      this.getUserCardInfo('', num);
+      this.getUserCardInfo(num);
     }
   }
 }

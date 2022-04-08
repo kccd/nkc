@@ -1,5 +1,4 @@
 const Router = require('koa-router');
-const subscribeRouter = require('./subscribe');
 const billRouter = require('./bills');
 const productionRouter = require('./production');
 const bannedRouter = require('./banned');
@@ -35,7 +34,9 @@ const userHomeCardRouter = require("./userHomeCard");
 const navLinksRouter = require("./navLinks");
 // 请求内容
 const contentRouter = require("./content");
-
+const pRouter = require('./p/index');
+const subscribeRouter = require('./subscribe');
+const userPanelRouter = require('./userPanel');
 const path = require('path');
 
 
@@ -80,12 +81,95 @@ userRouter
         return ctx.body = nkcModules.render(path.resolve(__dirname, '../../pages/filter_visitor.pug'), data, state);
       }
     }
+    ctx.template = 'vueRoot/index.pug';
     await next();
   })
-  .get(['/:uid', '/:uid/content/moment', '/:uid/content/post', '/:uid/content/thread', '/:uid/content/follow', '/:uid/content/fans', '/:uid/s/thread', '/:uid/s/column', '/:uid/s/user', '/:uid/s/forum'], async (ctx, next) => {
+  .get('/:uid', async (ctx, next) => {
     //访问用户个人主页
-    ctx.template = 'vueRoot/index.pug';
-    // ctx.template = "user/user.pug";
+    //获取用户个人主页信息
+    const {params, state, db, data, query, nkcModules} = ctx;
+    const {uid} = params;
+    const {nkcRender} = nkcModules;
+    const {pageSettings} = state;
+    const {user} = data;
+    // data.complaintTypes = ctx.state.language.complaintTypes;
+  
+    const {t, page=0, from} = query;
+    data.t = t;
+  
+    const targetUser = await db.UserModel.findById(uid);
+    await targetUser.extendGrade();
+    data.targetUser = targetUser;
+  
+    if(state.uid !== targetUser.uid) {
+      targetUser.description = nkcRender.replaceLink(targetUser.description);
+    }
+    // 用户积分
+    if(ctx.permission('viewUserScores')) {
+      data.targetUserScores = await db.UserModel.getUserScores(targetUser.uid);
+    }
+    // 如果未登录或者已登录但不是自己的名片
+    if(
+      !ctx.permission('hideUserHome') &&
+      (!user || user.uid !== targetUser.uid)
+    ) {
+      if(targetUser.hidden) {
+        nkcModules.throwError(404, "根据相关法律法规和政策，该内容不予显示", "noPermissionToVisitHiddenUserHome");
+      }
+      if(
+        (await db.UserModel.contentNeedReview(targetUser.uid, 'thread')) ||
+        (await db.UserModel.contentNeedReview(targetUser.uid, 'post'))
+      ) {
+        data.contentNeedReview = true;
+        data.targetUser.username = '';
+        data.targetUser.description = '';
+        data.targetUser.avatar = '';
+        data.targetUser.banner = '';
+      }
+    }
+    await db.UserModel.extendUsersInfo([targetUser]);
+    if(user) {
+      data.inBlacklist = !!(await db.BlacklistModel.findOne({uid: user.uid, tUid: targetUser.uid}));
+    }
+    //获取用户名片，用户消息等信息
+    if(from && from === "panel" && ctx.request.get('FROM') === "nkcAPI") {
+      if(data.user) {
+        data.subscribed = state.subUsersId.includes(uid);
+        data.friend = null;
+        const friend = await db.FriendModel.findOne({uid: data.user.uid, tUid: data.targetUser.uid});
+        if(friend) {
+          const categories = await db.FriendsCategoryModel.find({
+            uid: data.user.uid,
+          });
+          data.friendCategories = categories.map(c => {
+            const {_id,name, description, friendsId} = c;
+            return {
+              _id,
+              name,
+              description,
+              usersId: friendsId
+            };
+          })
+          data.friend = {
+            uid: friend.uid,
+            tUid: friend.tUid,
+            ...friend.info
+          };
+          if(!data.friend.phone || !data.friend.phone.length) data.friend.phone = [''];
+        }
+      }
+      return await next();
+    } else if(from === 'message') {
+      if(!user) ctx.throw(403, '你暂未登录');
+      data.friend = await db.FriendModel.findOne({uid: user.uid, tUid: targetUser.uid});
+      data.friendCategories = await db.FriendsCategoryModel.find({uid: user.uid}).sort({toc: -1});
+      data.targetUserName = targetUser.username || targetUser.uid;
+      if(data.friend && data.friend.info.name) {
+        data.targetUserName = data.friend.info.name || data.targetUserName;
+      }
+      ctx.template = 'message/appUserDetail/appUserDetail.pug';
+      return await next();
+    }
     await next();
   })
   .post('/:uid/pop', async (ctx, next) => {
@@ -94,7 +178,7 @@ userRouter
     await next();
   })
 	.use('/:uid/transaction', transactionRouter.routes(), transactionRouter.allowedMethods())
-  .use('/:uid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
+    .use('/:uid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
 	.use('/:uid/bills', billRouter.routes(), billRouter.allowedMethods())
 	// .use('/:uid/banner', bannerRouter.routes(), bannerRouter.allowedMethods())
 	.use('/:uid/banned', bannedRouter.routes(), bannedRouter.allowedMethods())
@@ -118,4 +202,6 @@ userRouter
   .use("/:uid/userHomeCard", userHomeCardRouter.routes(), userHomeCardRouter.allowedMethods())
   .use("/:uid/navLinks", navLinksRouter.routes(), navLinksRouter.allowedMethods())
   .use("/:uid/content", contentRouter.routes(), contentRouter.allowedMethods())
+  .use("/:uid/p", pRouter.routes(), pRouter.allowedMethods())
+  .use("/:uid", userPanelRouter.routes(), userPanelRouter.allowedMethods())
 module.exports = userRouter;

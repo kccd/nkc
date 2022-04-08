@@ -1,17 +1,25 @@
 <template lang="pug">
   .userInfo
-    .avatar( title="头像" )
+    .avatar(
+      data-global-mouseover="showUserPanel"
+      data-global-mouseout="hideUserPanel"
+      :data-global-data="objToStr({uid: userData.uid})"
+    )
       img(:src="setUrl( userData.avatar )")
     .describe
-      .name( title="姓名" )
+      .name(
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        :data-global-data="objToStr({uid: userData.uid})"
+         )
         a( :href="'/u/' + userData.uid" target="_blank") {{ userData.username }}
       .grade( title="等级" ) {{ userData.info?userData.info.certsName:'' }}
       .introduce( title="简介" ) {{ userData.description || "暂未填写个人简介"}}
-    .follow-button( title="取消关注" @click="subscribe( userData.uid )" ) {{ setBtnText() }}
+    .follow-button( title="取消关注" @click="subscribe( userData.uid )" ) {{ subUid.includes(userData.uid) ? "取关" : "关注" }}
 </template>
 <script>
-import { getUrl } from "../../../js/tools";
-import { sweetError } from "../../../js/tools";
+import {getUrl} from "../../../js/tools";
+import {objToStr} from "../../../js/tools";
 export default {
   data: () => ({
     userData: [],
@@ -25,6 +33,10 @@ export default {
     pageType: {
       type: String,
       required: true
+    },
+    subUid: {
+      type: Array,
+      required: true,
     }
   },
   watch: {
@@ -49,30 +61,20 @@ export default {
       }
     }
   },
-  created() {},
+  mounted() {
+  },
   methods: {
-    setBtnText(){
-      if ( this.type === "follow" ){
-        this.reqMethod = "DELETE"
-        return "取关"
-      }else if (this.type === "fans"){
-        if(this.user.mutualAttention){
-          this.reqMethod = "DELETE"
-          return "取关"
-        }else{
-          this.reqMethod = "POST"
-          return "关注"
-        }
-      }
-    },
-    subscribe(id) {
-      // var method = this.type === "follow" ? "DELETE" : "POST";
-      nkcAPI("/u/" + id + "/subscribe", this.reqMethod, { cid: [] })
+    objToStr: objToStr,
+    subscribe(uid) {
+      const self = this;
+      const method = self.subUid.includes(uid) ? "DELETE" : "POST";
+      nkcAPI("/u/" + uid + "/subscribe", method, { cid: [] })
         .then(() => {
-          this.$parent.getUserCardInfo()
+          sweetSuccess('操作成功');
+          self.$parent.getUserCardInfo()
         })
-        .catch(e => {
-          sweetError(e);
+        .catch(err => {
+          sweetError(err);
         });
     },
     setUrl(avatar) {
@@ -83,6 +85,7 @@ export default {
 </script>
 <style scoped lang="less">
 .userInfo {
+  margin: 1rem;
   height: 6rem;
   margin-bottom: 0.5rem;
   padding: 0.5rem;

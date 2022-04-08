@@ -275,8 +275,6 @@ export default {
       subscribed: '',
     }
   },
-  components: {
-  },
   mounted() {
     const self = this;
     const panel = $(self.$el);

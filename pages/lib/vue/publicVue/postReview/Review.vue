@@ -20,7 +20,6 @@ export default {
   data: () => ({
   }),
   mounted() {
-    console.log('post', this.post);
   },
   methods: {
     //审核post

@@ -1,11 +1,9 @@
 <template lang="pug">
-  .row
+  .row(v-if="loading")
     paging.col-xs-12.col-md-12(ref="paging" :pages="pageButtons" @click-button="clickButton")
-    //- user-info 数组中的一个用户对象 
-    .col.xs-12.col-md-12(v-if="!users || !users.length")
-      h3 {{title}}
+    //- user-info 数组中的一个用户对象
     .col-xs-12.col-md-6(v-for="user in users")
-      user-info( :key="user.uid" :user="user" :page-type="type")
+      user-info( :key="user.uid" :user="user" :page-type="t" :sub-uid="userSubUid")
 </template>
 
 <script>
@@ -19,50 +17,45 @@ export default {
     "paging": Paging,
   },
   data: () => ({
-    type: "follow",
     users: [],
+    uid: '',
     paging: '',
-    title: "数据加载中..."
+    routeName: '',
+    loading: false,
+    userSubUid: '',
   }),
-  props: ["pageType"],
   computed: {
     pageButtons() {
       return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
     },
   },
   watch: {
-    pageType: {
-      immediate: true,
-      handler(n) {
-        if (typeof n === "undefined") {
-          console.error("pageType is undefined");
-          return;
-        }
-        this.type = n;
+    '$route.name': function(newVal, oldVal){
+      if(newVal) {
+        this.initData();
         this.getUserCardInfo();
       }
     }
   },
-  created() {
-    
+  mounted() {
+    this.initData();
+    this.getUserCardInfo();
   },
   methods: {
+    initData() {
+      const {params, name} = this.$route;
+      this.routeName = name;
+      this.t = name;
+      const {uid} = params;
+      this.uid = uid;
+    },
     clickButton(num) {
       this.getUserCardInfo( num );
     },
     getUserCardInfo(page) {
-      // 如果切换 粉丝和关注那么清空数据
-      if(!prevType){
-        prevType = this.type;
-      }else{
-        if(prevType !== this.type){
-          this.users = [];
-          prevType = this.type;
-        }
-      }
-      const uid = this.$route.params.uid;
-      // let url = `/u/${uid}/userHomeCard?t=${this.type}`;
-      let url = `/u/${uid}/content/${this.type}`;
+      this.loading = false;
+      let url = `/u/${this.uid}/p/follower?t=${this.routeName}`;
+      const self = this;
       if (page) {
         const index = url.indexOf("?");
         if (index === -1) {
@@ -73,12 +66,10 @@ export default {
       }
       nkcAPI(url, "GET")
         .then(res => {
-          this.t = res.t;
-          this.paging = res.paging;
-          this.users = res.users;
-          if(!res.users || !res.users.length){
-            this.title = "暂无数据！"
-          }
+          self.paging = res.paging;
+          self.users = res.users;
+          self.loading = true;
+          self.userSubUid = res.userSubUid;
         })
         .catch(err => {
           this.title = "数据加载失败！"

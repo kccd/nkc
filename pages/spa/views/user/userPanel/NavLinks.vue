@@ -1,17 +1,17 @@
 <template lang="pug">
-  .nav-links
-    .account-url(v-if="navLink" v-for="navLink in navLinks")
-      .account-name(v-if="navLink.name") {{navLink.name}}
+  .account-url.m-b-1
+    .account-link(v-if="navLink" v-for="navLink in navLinks")
+      .panel-header(v-if="navLink.name") {{navLink.name}}
       .account-lis
-        a.acocunt-li(v-for="link in navLink.links" :href="link.url" :class="{'active': link.type === ''}")
+        .account-li(v-for="link in navLink.links" @click="toRoute(link.url)" :class="{'active': link.type === ''}")
           .name {{link.name}}
             span {{link.count || ''}}
           .fa.fa-angle-right
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
-.nav-links {
   .account-url{
+    padding: 0!important;
     @liHeight: 4rem;
     border-top: 1px solid #eee;
     .account-lis .account-li:first-child .name{
@@ -20,14 +20,9 @@
     position: relative;
     padding: 0.5rem 0;
     transition: box-shadow 300ms;
-    .account-name{
-      @accountNameHeight: 1.4rem;
-      height: @accountNameHeight;
-      line-height: @accountNameHeight;
-      width: 100%;
-      text-align: center;
-      font-size: 1rem;
-      border-radius: @accountNameHeight / 2;
+    .panel-header {
+      border-bottom: 1px solid#f4f4f4;
+      padding: 0 1rem;
     }
     &:hover{
       box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
@@ -52,7 +47,7 @@
         text-decoration: none;
         color: @primary;
       }
-      .fa{
+      & .fa{
         position: absolute;
         height: @liHeight;
         line-height: @liHeight;
@@ -64,11 +59,8 @@
       }
     }
   }
-}
 </style>
 <script>
-import {nkcAPI} from "../../../../lib/js/netAPI";
-
 export default {
   props: ['nav-links'],
   data: () => ({
@@ -76,6 +68,11 @@ export default {
   mounted() {
   },
   methods: {
+    toRoute(path) {
+      this.$router.push({
+        path
+      });
+    }
   }
 
 }

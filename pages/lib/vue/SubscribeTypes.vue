@@ -22,7 +22,7 @@
             button.btn.btn-sm.btn-block.btn-primary(@click="save") 保存
             button.btn.btn-sm.btn-block.btn-default(@click="closeForm") 取消
         div(v-else)
-          .checkbox(v-for="t, index in types")
+          .list(v-for="(t, index) in types")
             label(v-if="!editType")
               span(v-html="'&nbsp;&nbsp;&nbsp;'" v-if="t.pid")
               input(type="checkbox" :value="t._id" v-model="selectedTypesId")

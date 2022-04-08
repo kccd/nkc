@@ -1,61 +1,196 @@
 <template lang="pug">
-  .user-banner.m-b-1
-    .row
-      .hidden-user-home-tip(v-if="targetUser && targetUser.hidden" )
-        span 用户名片已被屏蔽
-        //用户名片
-      .account-nav(v-if="targetUser" )
-        //用户banner
-        .account-user-banner-container
-          .account-user-banner
-            a(:href="getUrl('userBanner', targetUser.banner)")
-              img(:src="getUrl('userBanner', targetUser.banner)")
+  .user-banner(@mouseenter="enter()" @mouseleave="leave()" v-if="targetUser").m-b-1
+    .hidden-user-home-tip(v-if="targetUser && targetUser.hidden" )
+      span 用户名片已被屏蔽
+      //用户名片
+    .account-banner(v-if="targetUser" )
+      //用户banner容器
+      .account-user-banner-container
+        .account-user-banner(:style="`backgroundImage: url('${getUrl('userBanner', targetUser.banner)}')`" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
+          //img(:src="getUrl('userBanner', targetUser.banner)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
           .account-user-info
             .account-user-avatar
-              a(:href="getUrl('userAvatar', targetUser.avatar, 'lg')" target="_blank").user-avatar
-                img(:src="getUrl('userAvatar', targetUser.avatar)")
-            .account-user-name {{targetUser.username}}
-              user-level(ref="userLevel" :target-user="targetUser")
-            .account-user-certs {{targetUser.info.certsName}}
-            .account-user-description {{targetUser.description}}
-            .account-user-kcb
-              user-scores(ref="userScore")
+              img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
+            .account-user-introduce
+              .account-user-name {{targetUser.username}}
+                user-level(ref="userLevel" :target-user="targetUser")
+              .account-user-certs {{targetUser.info.certsName}}
+              .account-user-kcb
+                user-scores(ref="userScore" :scores="scores" :xsf="targetUser.xsf" )
+        .account-nav
+          .account-nav-box
+            .account-nav-left
+            .account-nav-middle
+              span(@click="containerChange('moment')") 动态
+              span(@click="containerChange('post')") 社区
+              span(@click="containerChange('subColumns')") 专栏
+            .account-nav-right
+              div
+                div 关注
+                span 123
+              div
+                div 粉丝
+                span 123
+
+    div(v-if="panelPermission && (panelPermission.unBannedUser || panelPermission.bannedUser ||panelPermission.clearUserInfo)" )
+      .btn-ban(v-show="showBanBox" @click="clickBanContext()")
+        .fa.fa-ban( title="用户违规？点我！")
+        ul(v-show="showBanContext" )
+          li(v-if="targetUser && (targetUser.certs.includes('banned') && panelPermission.unBannedUser)")
+            a(@click="bannedUser(targetUser.uid, false)") 解除封禁
+          li(v-if="targetUser && (targetUser.certs.includes('banned') && panelPermission.bannedUser)")
+            a(@click="bannedUser(targetUser.uid, true)") 封禁用户
+          li(v-if="panelPermission.hideUserHome && targetUser && targetUser.hidden")
+            a(@click="hideUserHome(false,targetUser.uid)")  取消屏蔽用户名片
+          li(v-if="panelPermission.hideUserHome && targetUser && !targetUser.hidden")
+            a(@click="hideUserHome(true,targetUser.uid)")  屏蔽用户名片
+          li.divider
+          li(v-if="panelPermission.clearUserInfo")
+            a(@click="clearUserInfo(targetUser.uid, 'avatar')") 删除头像
+          li(v-if="panelPermission.clearUserInfo")
+            a(@click="clearUserInfo(targetUser.uid, 'banner')") 删除背景
+          li(v-if="panelPermission.clearUserInfo")
+            a(@click="clearUserInfo(targetUser.uid, 'username')") 删除用户名
+          li(v-if="panelPermission.clearUserInfo")
+            a(@click="clearUserInfo(targetUser.uid, 'description')") 删除简介
+
 </template>
 
 <style lang="less">
 @import "../../../../publicModules/base";
 .user-banner {
-  height: 13rem;
+  height: auto;
+  position: relative;
   .hidden-user-home-tip {
   }
-  .account-nav {
+  .account-banner {
+    height: 13rem;
+    width: 100%;
     .account-user-banner-container {
       .account-user-banner {
-        img {
+        background-size: 100%;
+        background-repeat: no-repeat;
+        border-radius: 4px;
+        .account-user-info {
+          position: relative;
+          margin: 0 4rem;
           width: 100%;
-          height: 13rem;
-        }
-      }
-      .account-user-info {
-        margin-top: -10rem;
-        .account-user-avatar {
-          display: inline-block;
-          margin-left: 2rem;
-          img {
-            width: 8rem;
-            height: 8rem;
-            border-radius: 50%;
-            box-sizing: border-box;
-            border: 3px solid #fff;
+          height: auto;
+          .account-user-avatar {
+            position: absolute;
+            left: 0;
+            bottom: -4rem;
+            margin-right: 2rem;
+            img {
+              width: 10rem;
+              height: 10rem;
+              border: 4px solid #fff;
+              border-radius: 8%;
+            }
+          }
+          .account-user-introduce {
+            margin: 0 11rem;
+            .account-user-name {
+
+            }
+            .account-user-certs {
+
+            }
+            .account-user-kcb {
+              display: inline-block;
+            }
           }
         }
-        .account-user-name {
-          display: inline-block;
-        }
+      }
+      .account-nav {
+        width: 100%;
 
-        .account-user-level {
-          display: inline-block;
+        .account-nav-box{
+          .account-nav-left{
+            width: 25%;
+            display: inline-block;
+          }
+          .account-nav-middle{
+            width: 58%;
+            padding-left: 15px;;
+            display: inline-block;
+            font-size: 20px;
+            font-weight: bold;
+            span{
+              display: inline-block;
+              padding: 15px 30px 0 0;
+            }
+          }
+          .account-nav-right{
+            width: 17%;
+            display: inline-block;
+            padding-left: 15px;
+            text-align: center;
+            &>div{
+              display: inline-block;
+              padding: 5px 15px;
+              font-width: bold;
+              font-size: 1rem;
+              &>span{
+                font-size: 2rem;
+              }
+            }
+          }
         }
+      }
+    }
+  }
+  .btn-ban{
+    //background: #fff;
+    position: absolute;
+    top:0;
+    z-index: 1;
+    .fa-ban{
+      color: red;
+      background: #fff;
+      width: 20px;
+      height: 20px;
+      text-align: center;
+      line-height: 20px;
+      margin-bottom: 2px;
+    }
+    ul{
+      background: #fff;
+      list-style-type: none;
+      padding-left: 0;
+      margin-left: 2px;
+      border-radius: 2px;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+      li{
+        padding: 5px 25px 5px 15px;
+        a{
+          color: #0e0e0e;
+          &:hover{
+            cursor: pointer;
+          }
+        }
+      }
+      .divider{
+        height: 1px;
+        width: 100%;
+        background: #DCDCDC;
+        padding: 0;
+        margin: 3px 0;
+      }
+    }
+  }
+  .user-account {
+    .account-left {
+      .user-avatar {
+        img {
+          width: 8rem;
+          height: 8rem;
+          border: 4px solid #fff;
+          border-radius: 8%;
+        }
+      }
+      .user-info {
+
       }
     }
   }
@@ -65,20 +200,101 @@
 import {getUrl} from "../../../../lib/js/tools";
 import UserScoresVue from "../../../../lib/vue/publicVue/userDraw/UserScoresVue";
 import UserLevel from "./UserLevel";
+import {nkcAPI} from "../../../../lib/js/netAPI";
+import {screenTopWarning} from "../../../../lib/js/topAlert";
+import {getState} from "../../../../lib/js/state";
+import {objToStr} from "../../../../lib/js/tools";
 export default {
-  props: ['targetUser'],
+  props: ['targetUserScores'],
   data: () => ({
+    uid: null,
+    showBanBox: false,
+    panelPermission: null,
+    targetUser: null,
+    showBanContext: false,
+    scores: null
   }),
   components: {
     "user-scores": UserScoresVue,
     "user-level": UserLevel
   },
   created() {
+    this.initData()
+    this.getPanelData()
+    //移动段才能永久显示封禁框
+    if(getState && getState.isApp){
+      this.showBanBox = true
+    }
+    this.scores = this.targetUserScores
   },
   mounted() {
+
   },
   methods: {
+    objToStr: objToStr,
     getUrl: getUrl,
+    //获取uid
+    initData() {
+      const {uid} = this.$route.params;
+      this.uid = uid;
+    },
+    //获取数据
+    getPanelData(){
+      const self = this;
+      nkcAPI(`/u/${this.uid}/userPanel`,'GET')
+      .then(res => {
+        self.panelPermission = res.panelPermission;
+        self.targetUser = res.targetUser;
+      })
+    },
+    // 封禁用户,banned:false 解封，true 封禁
+    bannedUser(uid, banned) {
+      let method = 'PUT';
+      if(banned) method = 'DELETE';
+      nkcAPI('/u/' + uid + '/banned', method, {})
+        .then(function() {
+          window.location.reload();
+        })
+        .catch(function(data) {
+          screenTopWarning(data.error||data);
+        });
+    },
+    // 取消屏蔽用户名片，isHidden是否隐藏用户主页
+    hideUserHome(isHidden, uid) {
+      nkcAPI("/u/" + uid + "/hide", "POST", {setHidden: isHidden})
+        .catch(sweetError)
+        .then(function() {location.reload()});
+    },
+    //清楚用户信息，type 类型， 可选：avatar、banner、description、username
+    clearUserInfo(uid, type) {
+      if(!confirm("该操作不可撤回，确定要执行？")) return;
+      nkcAPI("/u/" + uid + "/clear", "POST", {
+        type: type
+      })
+        .then(function() {
+          screenTopAlert("删除成功");
+        })
+        .catch(function(data) {
+          screenTopWarning(data);
+        })
+    },
+    //中间显示内容路由切换
+    containerChange(path){
+      this.$router.push({name: path})
+    },
+    //点击显示禁止内容
+    clickBanContext(){
+      this.showBanContext = !this.showBanContext
+    },
+    //鼠标移入
+    enter(){
+      this.showBanBox = true;
+    },
+    //鼠标移除
+    leave(){
+      this.showBanBox = false;
+    }
+
   }
 }
 </script>

@@ -65,30 +65,57 @@ function saveImage(data) {
 }
 
 /*
+* 显示用户悬浮名片
+* */
+function showUserPanel(data, dom) {
+  const {uid} = data;
+  window.showFloatUserPanel(uid, dom);
+}
+
+/*
+* 鼠标移出隐藏用户名片
+* */
+function hideUserPanel(data, dome) {
+  window.initMouseleaveEvent()
+}
+
+/*
 * data-global-click 和 data-global-long-press 合法的操作
 * */
 const eventFunctions = {
-  viewImage,
-  viewImages,
-  downloadFile,
-  saveImage,
-};
+    viewImage,
+    viewImages,
+    downloadFile,
+    saveImage,
+    showUserPanel,
+    hideUserPanel,
+  }
 
 /*
 * 点击事件、触摸时间触发之后执行的函数，统一处理
-* @param {String} eventType 时间类型 click, long-press
+* @param {String} eventType 时间类型 click, long-press, mouseover
 * @param {Event}
 * */
 function globalEvent(eventType, e) {
   const element = e.target;
-  const elementJQ = $(element);
-  const operation = elementJQ.attr(`data-global-${eventType}`);
+  let elementJQ = $(element);
+  let operation = elementJQ.attr(`data-global-${eventType}`);
+  //获取点击元素的父级元素中包含该属性的元素， 不查找包含该属性的子级
+  if(!operation) {
+    const doms = elementJQ.parents(`[data-global-${eventType}]`);
+    const dom = doms.eq(0);
+    const val = dom.attr(`data-global-${eventType}`);
+    elementJQ = dom;
+    if(val) {
+      operation = val;
+    }
+  }
   if(!operation) return;
   const eventFunction = eventFunctions[operation];
   if(!eventFunction) return;
   let data = elementJQ.attr('data-global-data');
   data = strToObj(data);
-  eventFunction(data);
+  eventFunction(data, elementJQ);
 }
 
 /*
@@ -108,6 +135,20 @@ export function initGlobalClickEvent() {
 export function initGlobalLongPressEvent() {
   initLongPressEvent(document, e => {
     globalEvent('long-press', e);
+  });
+}
+
+/*
+* 监听鼠标移入移出悬浮事件
+* */
+export function initGlobalMouseOverEvent() {
+  //鼠标移入
+  document.addEventListener('mouseover', e => {
+    globalEvent('mouseover', e);
+  });
+  //鼠标移出
+  document.addEventListener('mouseout', e => {
+    globalEvent('mouseout', e);
   });
 }
 

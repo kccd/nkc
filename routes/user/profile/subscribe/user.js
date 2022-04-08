@@ -2,6 +2,7 @@ module.exports = async (ctx, next) => {
   const {state, data, db, query, nkcModules} = ctx;
   const {page = 0} = query;
   const {match} = state;
+
   match.type = "user";
   match.uid = data.targetUser.uid;
   match.cancel = false;

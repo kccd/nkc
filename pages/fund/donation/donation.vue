@@ -18,14 +18,21 @@
     .donation-list
       .donation-pay(v-for='p in payment')
         span(:class="{'active': paymentType === p.type}" @click='selectPaymentType(p.type)') {{p.name}}
+    .payment-info
+      span 服务商（非本站）将收取 {{fee * 100}}% 的手续费
+      h4
+        span 实际支付金额为
+        strong &nbsp;{{totalMoney / 100}}&nbsp;
+        | 元
     .checkbox.m-t-05
       label
         input(type='checkbox' :value='true' v-model='anonymous')
         span 匿名赞助
-    .payment-info {{paymentInfo}}
+
     .m-t-1.m-b-1
       button.payment-button(v-if='!donation.enabled' disabled) 赞助功能已关闭
       button.payment-button(v-else-if='submitting' disabled) 提交中
+      button.payment-button(v-else-if='exceedsMaxValue' disabled) 单次支付金额不能超过 {{donation.max / 100}} 元
       button.payment-button(v-else @click='submit') 提交
     .payment-description {{description}}
 </template>
@@ -65,6 +72,9 @@
       margin: 0.5rem 0 ;
       font-size: 1rem;
       color: #555;
+      strong{
+        color: @accent;
+      }
     }
     .payment-description{
       white-space: pre-wrap;
@@ -163,7 +173,10 @@
       paymentInfo() {
         const {totalMoney, fee} = this;
         if(totalMoney === null) return '';
-        return `服务商（非本站）将收取 ${fee * 100}% 的手续费，实际支付金额为 ${totalMoney / 100} 元`;
+        return `服务商（非本站）将收取 ${fee * 100}% 的手续费，实际支付金额为 <strong>${totalMoney / 100}</strong> 元`;
+      },
+      exceedsMaxValue() {
+        return this.totalMoney > this.donation.max;
       }
     },
     methods: {
@@ -238,7 +251,7 @@
               throw new Error(`赞助金额不能小于 ${donation.min / 100} 元`);
             }
             if(totalMoney > donation.max) {
-              throw new Error(`赞助金额不能大于 ${donation.min / 100} 元`);
+              throw new Error(`赞助金额不能大于 ${donation.max / 100} 元`);
             }
             if(
               NKC.methods.isPcBrowser() ||

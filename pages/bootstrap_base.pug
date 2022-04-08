@@ -73,6 +73,8 @@ block body
     chat(ref='chat' v-if='hasLogged' @update-new-messaeg="updateNewMessageCount")
     login(ref='login' v-if='!hasLogged')
     user-draw(ref="userDraw" v-if="hasLogged")
+    user-float-panel(ref="userFloatPanel" v-if="hasLogged" @subscribe="subscribe")
+    subscribe-types(ref="subscribeTypes" v-if="hasLogged")
   +includeJS('/global/root.js')
 
   block navbar
