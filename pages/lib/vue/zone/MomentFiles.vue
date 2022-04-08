@@ -57,7 +57,7 @@
         }
         img {
           position: absolute;
-          min-height: 100%;
+          //min-height: 100%;
           min-width: 100%;
           display: block;
           top: 0;
