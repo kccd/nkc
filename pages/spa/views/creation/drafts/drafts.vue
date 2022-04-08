@@ -6,30 +6,42 @@
     paging(:pages="pages" @click-button="switchPage")
     blank(v-if="draftsData.length === 0")
     .drafts(v-else)
-      .draft-item(v-for="draft in draftsData" @click="toEditDraft(draft)" :class="type")
-        .draft-title(:title="draft.title") {{draft.title}}
-        .draft-content {{draft.content}}
-        .draft-time
-          .fa.fa-lightbulb-o.m-r-05
-          span 最后编辑于 {{draft.time}}
-          span.icon.icon-recover(v-if='draft.deleted' @click.stop="recoverDraft(draft)") 恢复
-          span.icon.icon-delete(v-else @click.stop="deleteDraft(draft)") 删除
+      .draft-item-container(v-for="draft in draftsData" @click="toEditDraft(draft)")
+        .draft-item( :class="type")
+          .draft-title(:title="draft.title") {{draft.title}}
+          .draft-content {{draft.content}}
+          .draft-time
+            .fa.fa-lightbulb-o.m-r-05
+            span 最后编辑于 {{draft.time}}
+            span.icon.icon-recover(v-if='draft.deleted' @click.stop="recoverDraft(draft)") 恢复
+            span.icon.icon-delete(v-else @click.stop="deleteDraft(draft)") 删除
     .m-b-05(v-if="pages && pages.length > 0")
       paging(:pages="pages" @click-button="switchPage")
 </template>
 <style lang="less" scoped>
   @import "../../../../publicModules/base";
   .drafts{
+    .draft-item-container{
+      position: relative;
+      width: 24%;
+      margin-right: 1%;
+      margin-bottom: 1%;
+      display: inline-block;
+      @media(max-width: 768px) {
+        width: 32%;
+      }
+      @media(max-width: 500px) {
+        width: 48%;
+      }
+    }
     .draft-item{
-      width: 26.2rem;
+      width: 100%;
       border-radius: 3px;
-      max-width: 100%;
       border: 1px solid #eee;
       background-color: #efefef;
       padding: 1rem 1rem;
       cursor: pointer;
       display: inline-block;
-      margin: 0 1rem 1rem 0;
       .draft-title{
         @height: 2.8rem;
         height: @height;
