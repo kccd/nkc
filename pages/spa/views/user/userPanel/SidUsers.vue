@@ -15,7 +15,7 @@
                   img(
                     :src="getUrl('userAvatar', u.avatar)"
                     data-global-mouseover="showUserPanel"
-                    data-global-mouseleave="hideUserPanel"
+                    data-global-mouseout="hideUserPanel"
                     :data-global-data="u.uid"
                     )
             a(:href="`/u/${targetUser.uid}/p/${type}`" v-if="sidUsers.length > 8").user-card-user-link 查看更多

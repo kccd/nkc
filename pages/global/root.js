@@ -1,9 +1,10 @@
 import Chat from '../lib/vue/message/Chat';
 import Login from '../lib/vue/Login';
-import {RNOpenLoginPage, RNSyncPageInfo, RNToChat} from "../lib/js/reactNative";
+import {RNOpenLoginPage, RNToChat} from "../lib/js/reactNative";
 import {getState} from "../lib/js/state";
 import UserDraw from "../lib/vue/publicVue/userDraw/UserDraw";
 import UserFloatPanel from "../lib/vue/UserFloatPanel";
+import SubscribeTypes from "../lib/vue/SubscribeTypes";
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
@@ -11,6 +12,7 @@ import {
   initGlobalMouseOverEvent
 } from "./event";
 import {initUserPanel} from "./userPanel";
+import {subUsers} from "../lib/js/subscribe";
 let userPanel;
 $(() => {
   userPanel = initUserPanel();
@@ -27,7 +29,8 @@ window.RootApp = new Vue({
     'chat': Chat,
     'login': Login,
     "user-draw": UserDraw,
-    "user-float-panel": UserFloatPanel
+    "user-float-panel": UserFloatPanel,
+    "subscribe-types": SubscribeTypes
   },
   computed: {
     hasLogged() {
@@ -78,6 +81,32 @@ window.RootApp = new Vue({
     closeDraw(type) {
       this.$refs.userDraw.colseDraw(type);
     },
+    //关注取关用户
+    subscribe(options) {
+      const {uid, sub} = options;
+      const self = this;
+      if(sub) {
+        self.$refs.subscribeTypes.open((cid) => {
+          subUsers(uid, sub, [...cid])
+            .then(() => {
+              sweetSuccess('关注成功');
+              self.$refs.subscribeTypes.close();
+            })
+            .catch(err => {
+              sweetError(err);
+            })
+        }, {
+        })
+      } else {
+        subUsers(uid, sub)
+          .then(()=>{
+            sweetSuccess('取关成功');
+          })
+          .catch(err => {
+            sweetError(err);
+          })
+      }
+    }
   }
 });
 
