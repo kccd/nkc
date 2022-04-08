@@ -7,6 +7,7 @@
 </template>
 
 <script>
+let prevType = '';
 import UserInfo from "./UserInfo";
 import Paging from "../../Paging";
 
@@ -71,6 +72,7 @@ export default {
           self.userSubUid = res.userSubUid;
         })
         .catch(err => {
+          this.title = "数据加载失败！"
           sweetError(err);
         });
     }
@@ -78,4 +80,8 @@ export default {
 };
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+  h3{
+    text-align: center;
+  }
+</style>
