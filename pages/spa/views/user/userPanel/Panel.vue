@@ -18,6 +18,13 @@
               .account-user-kcb
                 user-scores(ref="userScore" :scores="scores" :xsf="targetUser.xsf" )
         .account-nav
+          .account-nav-box
+            .account-nav-left
+            .account-nav-middle
+              span(@click="containerChange('moment')") 动态
+              span(@click="containerChange('post')") 社区
+              span(@click="containerChange('s/column')") 专栏
+
 
     div(v-if="panelPermission && (panelPermission.unBannedUser || panelPermission.bannedUser ||panelPermission.clearUserInfo)" )
       .btn-ban(v-show="showBanBox" @click="clickBanContext()")
@@ -51,7 +58,7 @@
   .hidden-user-home-tip {
   }
   .account-banner {
-    height: 14rem;
+    height: 13rem;
     width: 100%;
     .account-user-banner-container {
       .account-user-banner {
@@ -77,7 +84,6 @@
           }
           .account-user-introduce {
             margin: 0 11rem;
-            text-align: end;
             .account-user-name {
 
             }
@@ -85,14 +91,30 @@
 
             }
             .account-user-kcb {
-
+              display: inline-block;
             }
           }
         }
       }
       .account-nav {
         width: 100%;
-        height: 6rem;
+
+        .account-nav-box{
+          .account-nav-left{
+            width: 25%;
+            display: inline-block;
+          }
+          .account-nav-middle{
+            padding-left: 15px;;
+            display: inline-block;
+            font-size: 20px;
+            font-weight: bold;
+            span{
+              display: inline-block;
+              padding: 15px 30px 0 0;
+            }
+          }
+        }
       }
     }
   }
@@ -233,6 +255,10 @@ export default {
         .catch(function(data) {
           screenTopWarning(data);
         })
+    },
+    //中间显示内容路由切换
+    containerChange(path){
+      this.$router.push(path)
     },
     //点击显示禁止内容
     clickBanContext(){
