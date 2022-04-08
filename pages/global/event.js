@@ -99,7 +99,16 @@ const eventFunctions = {
 function globalEvent(eventType, e) {
   const element = e.target;
   const elementJQ = $(element);
-  const operation = elementJQ.attr(`data-global-${eventType}`);
+  let operation = elementJQ.attr(`data-global-${eventType}`);
+  //获取点击元素的父级元素中包含该属性的元素， 不查找包含该属性的子级
+  if(!operation) {
+    const doms = elementJQ.parents(`[data-global-${eventType}]`);
+    const dom = doms.eq(0);
+    const val = dom.attr(`data-global-${eventType}`);
+    if(val) {
+      operation = val;
+    }
+  }
   if(!operation) return;
   const eventFunction = eventFunctions[operation];
   if(!eventFunction) return;
