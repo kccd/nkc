@@ -23,8 +23,14 @@
             .account-nav-middle
               span(@click="containerChange('moment')") 动态
               span(@click="containerChange('post')") 社区
-              span(@click="containerChange('s/column')") 专栏
-
+              span(@click="containerChange('subColumns')") 专栏
+            .account-nav-right
+              div
+                div 关注
+                span 123
+              div
+                div 粉丝
+                span 123
 
     div(v-if="panelPermission && (panelPermission.unBannedUser || panelPermission.bannedUser ||panelPermission.clearUserInfo)" )
       .btn-ban(v-show="showBanBox" @click="clickBanContext()")
@@ -105,6 +111,7 @@
             display: inline-block;
           }
           .account-nav-middle{
+            width: 58%;
             padding-left: 15px;;
             display: inline-block;
             font-size: 20px;
@@ -112,6 +119,21 @@
             span{
               display: inline-block;
               padding: 15px 30px 0 0;
+            }
+          }
+          .account-nav-right{
+            width: 17%;
+            display: inline-block;
+            padding-left: 15px;
+            text-align: center;
+            &>div{
+              display: inline-block;
+              padding: 5px 15px;
+              font-width: bold;
+              font-size: 1rem;
+              &>span{
+                font-size: 2rem;
+              }
             }
           }
         }
@@ -258,7 +280,7 @@ export default {
     },
     //中间显示内容路由切换
     containerChange(path){
-      this.$router.push(path)
+      this.$router.push({name: path})
     },
     //点击显示禁止内容
     clickBanContext(){
