@@ -394,14 +394,27 @@ router
         .sort({ toc: -1 })
         .skip(paging.start)
         .limit(paging.perpage);
+      // 我的关注
+      const follow = await db.SubscribeModel.find({
+        uid: targetUser.uid,
+        type: "user",
+        cancel: false
+      }, { tUid: 1 })
       data.users = await db.UserModel.find({
         uid: { $in: subs.map(s => s.uid) }
       });
       data.users = await db.UserModel.extendUsersInfo(data.users);
       let newUsers = [];
-      let i = 0;
       for (let obj of data.users) {
         let newObj = {};
+        // 如果我的关注中关注了粉丝,那么 =true
+        newObj.mutualAttention = false;
+        for (let f of follow) {
+          if (f.tUid === obj.uid) {
+            newObj.mutualAttention = true;
+            break;
+          }
+        }
         newObj.avatar = obj.avatar;
         newObj.description = obj.description;
         newObj.info = obj.info;
