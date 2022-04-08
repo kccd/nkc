@@ -17,6 +17,8 @@
               .account-user-certs {{targetUser.info.certsName}}
               .account-user-kcb
                 user-scores(ref="userScore" :scores="scores" :xsf="targetUser.xsf" )
+              .account-user-subscribe(v-if="subscribeBtn" ) {{subscribeBtnType ? '取关' : '关注' }}
+
         .account-nav
           .account-nav-box
             .account-nav-left
@@ -27,10 +29,10 @@
             .account-nav-right
               div
                 div 关注
-                span 123
+                span {{followersCount >= 1000 ? (followersCount/1000).toFixed(1)+'K' : followersCount}}
               div
                 div 粉丝
-                span 123
+                span {{fansCount >= 1000 ? (fansCount/1000).toFixed(1)+'K' : fansCount}}
 
     div(v-if="panelPermission && (panelPermission.unBannedUser || panelPermission.bannedUser ||panelPermission.clearUserInfo)" )
       .btn-ban(v-show="showBanBox" @click="clickBanContext()")
@@ -58,6 +60,11 @@
 
 <style lang="less">
 @import "../../../../publicModules/base";
+@media (max-width: 992px){
+  .account-nav{
+    display: none;
+  }
+}
 .user-banner {
   height: auto;
   position: relative;
@@ -74,7 +81,6 @@
         .account-user-info {
           position: relative;
           margin: 0 4rem;
-          width: 100%;
           height: auto;
           .account-user-avatar {
             position: absolute;
@@ -89,13 +95,7 @@
             }
           }
           .account-user-introduce {
-            margin: 0 11rem;
-            .account-user-name {
-
-            }
-            .account-user-certs {
-
-            }
+            margin: 0 0 0 11rem;
             .account-user-kcb {
               display: inline-block;
             }
@@ -207,20 +207,23 @@ import {screenTopWarning} from "../../../../lib/js/topAlert";
 import {getState} from "../../../../lib/js/state";
 import {objToStr} from "../../../../lib/js/tools";
 export default {
-  props: ['targetUserScores'],
+  props: ['targetUserScores', "fansCount",  "followersCount"],
   data: () => ({
     uid: null,
     showBanBox: false,
     panelPermission: null,
     targetUser: null,
     showBanContext: false,
-    scores: null
+    scores: null,
+    subscribeBtn:false,
+    subscribeBtnType:false,
   }),
   components: {
     "user-scores": UserScoresVue,
     "user-level": UserLevel
   },
   created() {
+    console.log(this.$route)
     this.initData()
     this.getPanelData()
     //移动段才能永久显示封禁框
@@ -228,6 +231,7 @@ export default {
       this.showBanBox = true
     }
     this.scores = this.targetUserScores
+
   },
   mounted() {
 
@@ -247,6 +251,13 @@ export default {
       .then(res => {
         self.panelPermission = res.panelPermission;
         self.targetUser = res.targetUser;
+        if(res.user.uid !== self.$route.params.uid){
+          self.subscribeBtn = true
+        }
+
+        if(res.subUid.some((value)=>{ return value === res.targetUser.uid })){
+          self.subscribeBtnType = true
+        }
       })
     },
     // 封禁用户,banned:false 解封，true 封禁

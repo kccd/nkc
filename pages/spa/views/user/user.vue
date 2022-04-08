@@ -1,8 +1,8 @@
 <template lang="pug">
 .container-fluid.max-width(v-cloak)
   .col-sx-12.col-md-12
-    Panel(ref="panel" :target-user="targetUser" :target-user-scores="targetUserScores" v-if="targetUser")
-    account-user(ref="accountUser" :target-user="targetUser" :nav-links="navLinks" :forums="subForums")
+    Panel(ref="panel" :fans-count="fansCount" :followers-count="followersCount" :target-user="targetUser" :target-user-scores="targetUserScores" v-if="targetUser")
+    account-user(ref="accountUser" :target-user-fans="targetUserFans" :target-user-followers="targetUserFollowers" :target-user="targetUser" :nav-links="navLinks" :forums="subForums")
     footer-vue(ref="footerVue")
 </template>
 
@@ -26,6 +26,10 @@ export default {
     isApp: null,
     subForums: [],
     targetUserScores:null,
+    fansCount:null,
+    followersCount:null,
+    targetUserFans:null,
+    targetUserFollowers:null,
   }),
   components: {
     Panel: Panel,
@@ -52,6 +56,10 @@ export default {
         self.navLinks = res.navLinks;
         self.targetUser = res.targetUser;
         self.targetUserScores = res.targetUserScores;
+        self.fansCount = res.fansCount;
+        self.followersCount = res.followersCount;
+        self.targetUserFans = res.targetUserFans;
+        self.targetUserFollowers = res.targetUserFollowers;
       })
       .catch(err => {
         sweetError(err);
