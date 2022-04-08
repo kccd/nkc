@@ -1,12 +1,6 @@
 <template lang="pug">
 
   .single-moment-container(v-if="momentData")
-    float-user-panel(
-      ref="floatUserPanel"
-      @subscribe="subscribe"
-    )
-    subscribe-types(ref="subscribeTypes")
-
     moment-status(ref="momentStatus" :moment="momentData")
 
 
@@ -17,11 +11,19 @@
         @violation-record="violationRecord"
       )
       .single-moment-left
-        .single-moment-avatar(:data-float-uid="momentData.uid")
+        .single-moment-avatar(
+          data-global-mouseover="showUserPanel"
+          data-global-mouseout="hideUserPanel"
+          :data-global-data="objToStr({uid: momentData.uid})"
+        )
           img(:src="momentData.avatarUrl")
       .single-moment-right
         .single-moment-header
-          .single-moment-user(:data-float-uid="momentData.uid")
+          .single-moment-user(
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            :data-global-data="objToStr({uid: momentData.uid})"
+          )
             a(:href="momentData.userHome" target="_blank") {{momentData.username}}
           .single-moment-time
             from-now(:time="momentData.toc")
@@ -299,14 +301,13 @@
 </style>
 
 <script>
-  import FromNow from '../../../lib/vue/FromNow';
   import {momentVote} from "../../js/zone/vote";
-  import MomentFiles from './MomentFiles';
   import {sweetError} from "../../js/sweetAlert";
+  import {objToStr} from "../../js/tools";
+  import FromNow from '../../../lib/vue/FromNow';
+  import MomentFiles from './MomentFiles';
   import MomentComments from './MomentComments';
   import MomentQuote from './MomentQuote';
-  import FloatUserPanel from "../FloatUserPanel";
-  import SubscribeTypes from "../SubscribeTypes";
   import MomentStatus from "./MomentStatus";
   import MomentOption from "./momentOption/MomentOption";
   export default {
@@ -315,8 +316,6 @@
       'moment-files': MomentFiles,
       'moment-comments': MomentComments,
       'moment-quote': MomentQuote,
-      'float-user-panel': FloatUserPanel,
-      'subscribe-types': SubscribeTypes,
       'moment-status': MomentStatus,
       'moment-option': MomentOption
     },
@@ -342,6 +341,7 @@
       }
     },
     methods: {
+      objToStr: objToStr,
       initData() {
         const {data} = this;
         this.momentData = JSON.parse(JSON.stringify(data));
@@ -395,11 +395,6 @@
       //查看违规记录
       violationRecord(uid) {
         this.$emit('violation-record', uid);
-      },
-      //关注或取关用户
-      subscribe(props) {
-        const {uid, subscribed} = props;
-        this.$refs.subscribeTypes.subscribeUser(uid, subscribed);
       },
       //打开评论的其他操作
       openCommentOption(data) {

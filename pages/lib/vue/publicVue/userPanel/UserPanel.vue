@@ -8,7 +8,7 @@
         .loading-text 加载中
 </template>
 
-<style lang="less">
+<style lang="less" scoped>
 @import '../../../../publicModules/base';
 .user-panel {
   height: 100%;

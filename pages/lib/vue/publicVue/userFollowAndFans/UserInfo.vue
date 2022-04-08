@@ -1,9 +1,17 @@
 <template lang="pug">
   .userInfo
-    .avatar( title="头像" )
+    .avatar(
+      data-global-mouseover="showUserPanel"
+      data-global-mouseout="hideUserPanel"
+      :data-global-data="objToStr({uid: userData.uid})"
+    )
       img(:src="setUrl( userData.avatar )")
     .describe
-      .name( title="姓名" )
+      .name(
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        :data-global-data="objToStr({uid: userData.uid})"
+         )
         a( :href="'/u/' + userData.uid" target="_blank") {{ userData.username }}
       .grade( title="等级" ) {{ userData.info?userData.info.certsName:'' }}
       .introduce( title="简介" ) {{ userData.description || "暂未填写个人简介"}}
@@ -11,6 +19,7 @@
 </template>
 <script>
 import {getUrl} from "../../../js/tools";
+import {objToStr} from "../../../js/tools";
 export default {
   data: () => ({
     userData: [],
@@ -55,6 +64,7 @@ export default {
   mounted() {
   },
   methods: {
+    objToStr: objToStr,
     subscribe(uid) {
       const self = this;
       const method = self.subUid.includes(uid) ? "DELETE" : "POST";
@@ -81,6 +91,12 @@ export default {
   padding: 0.5rem;
   position: relative;
   border: 1px solid #eee;
+  box-shadow: 0 1px 3px 1px #f1d196 ;
+  transition: all .5s linear;
+  // &:hover{
+    // box-shadow: 0 2px 5px 1px #bdac8e;
+    // transform: translateY(-7px);
+  // }
   /*display: -webkit-flex;*/
 }
 .userInfo .avatar {
@@ -109,15 +125,14 @@ export default {
   overflow: hidden;
 }
 .userInfo .follow-button {
-  height: 1.6rem;
-  padding: 0 1rem;
-  line-height: 1.6rem;
+  // height: 1.6rem;
+  padding: 0.25rem 1rem;
+  // line-height: 1.6rem;
   position: absolute;
   right: 0.5rem;
   top: 0.5rem;
-  vertical-align: text-bottom;
   color: #fff;
-  border-radius: 3px;
+  border-radius: 5px;
   cursor: pointer;
   background-color: #9baec8;
   border-color: #9baec8;

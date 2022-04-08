@@ -1,15 +1,23 @@
 <template lang="pug">
   .subscribe-black-list(v-if="targetUser")
-    float-user-panel(ref="floatUserPanel")
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     .null(v-if="!bl" ) 空空如也~~
     .black-list-box(v-else)
       .col-xs-12.col-md-6(v-for="item in bl")
         .list-body
           .item-left
-            img(:src="getUrl('userAvatar', item.user.avatar)" :data-float-uid="item.user.uid")
+            img(:src="getUrl('userAvatar', item.user.avatar)"
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              :data-global-data="objToStr({uid: item.user.uid})"
+              )
           .item-center
-            a.username(:href="`/u/${item.user.uid}`" :data-float-uid="item.user.uid") {{item.user.username}}
+            a.username(
+              :href="`/u/${item.user.uid}`"
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              :data-global-data="objToStr({uid: item.user.uid})"
+              ) {{item.user.username}}
             //.description(:title="${format('YYYY/MM/DD HH:mm:ss', item.toc)}") {{fromNow(item.toc)}}
             //    | &nbsp;&nbsp;来自&nbsp;&nbsp;
             .description() {{fromNow(item.toc)}}&nbsp;&nbsp;来自&nbsp;&nbsp;
@@ -94,7 +102,7 @@
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl,fromNow} from "../../../../lib/js/tools";
 import {removeUserFromBlacklist} from "../../../../lib/js/subscribe";
-import floatUserPanel from "../../../../lib/vue/FloatUserPanel";
+import {objToStr} from "../../../../lib/js/tools";
 import Paging from "../../../../lib/vue/Paging";
 export default {
   data: () => ({
@@ -104,7 +112,6 @@ export default {
     paging: null,
   }),
   components: {
-    "float-user-panel":floatUserPanel,
     'paging': Paging
   },
   mounted() {
@@ -117,6 +124,7 @@ export default {
     },
   },
   methods: {
+    objToStr: objToStr,
     getUrl: getUrl,
     fromNow: fromNow,
     initData() {

@@ -90,7 +90,6 @@ window.floatForumPanel = new Vue({
               clearTimeout(self.timeoutName);
               self.onPanel = true;
             });
-
             const documentWidth = $(document).width() - 10;
 
             const panelWidth = 24 * 12;

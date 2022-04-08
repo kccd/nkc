@@ -110,7 +110,6 @@ window.floatUserPanel = new Vue({
             if((left + panelWidth) > documentWidth) {
               left = documentWidth - panelWidth;
             }
-
             panel.css({
               top,
               left

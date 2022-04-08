@@ -2,7 +2,6 @@
   //关注的用户
   .subscribe-user(v-if="targetUser")
     subscribe-types(ref="subscribeTypes")
-    float-user-panel(ref="floatUserPanel")
     nav-types(ref="navTypes" :target-user="targetUser" :parent-type="parentType" type="collection" :subscribe-types="subscribeTypes" @click-type="typeClick"  @edit-type="editType")
     .subscribe-divide-lines
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
@@ -12,10 +11,20 @@
         .subscribe-user-lists(v-for="(followedUser,index) in subscribes")
           .subscribe-user-list
             .subscribe-user-list-avatar
-              img.img(:src="getUrl('userAvatar',followedUser.targetUser.avatar, 'sm')" :data-float-uid="followedUser.tUid")
+              img.img(
+                :src="getUrl('userAvatar',followedUser.targetUser.avatar, 'sm')"
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                :data-global-data="objToStr({uid: followedUser.tUid})"
+                )
             .subscribe-user-list-content
               .account-follower-name
-                a(:href="`/u/${followedUser.tUid}`" :data-float-uid="followedUser.tUid") {{followedUser.targetUser.username}}
+                a(
+                  :href="`/u/${followedUser.tUid}`"
+                  data-global-mouseover="showUserPanel"
+                  data-global-mouseout="hideUserPanel"
+                  :data-global-data="objToStr({uid: followedUser.tUid})"
+                  ) {{followedUser.targetUser.username}}
                 .account-follower-buttons
                   button.category(v-if="subUsersId.indexOf(followedUser.tUid)+1" @click="openTypesModal(followedUser._id,followedUser.cid)") 分类
                   button.subscribe(:class="subUsersId.indexOf(followedUser.tUid)+1 ?'cancel':'focus'" @click="userFollowType(followedUser.tUid)") {{subUsersId.indexOf(followedUser.tUid)+1?'取关':'关注'}}
@@ -198,9 +207,9 @@
 import NavTypes from "./NavTypes";
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl} from "../../../../lib/js/tools";
-import {subUsers, subTypesChange, collectionThread} from "../../../../lib/js/subscribe";
+import {subUsers, subTypesChange} from "../../../../lib/js/subscribe";
+import {objToStr} from "../../../../lib/js/tools";
 import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
-import FloatUserPanel from "../../../../lib/vue/FloatUserPanel";
 import Paging from "../../../../lib/vue/Paging";
 export default {
   data: () => ({
@@ -219,7 +228,6 @@ export default {
   components: {
     'nav-types': NavTypes,
     "subscribe-types": SubscribeTypes,
-    "float-user-panel" : FloatUserPanel,
     'paging': Paging
   },
   created() {
@@ -234,6 +242,7 @@ export default {
     },
   },
   methods: {
+    objToStr: objToStr,
     getUrl: getUrl,
     initData() {
       const {uid} = this.$route.params;
@@ -255,9 +264,6 @@ export default {
       }
       nkcAPI(url, 'GET')
       .then(res => {
-        if(self.$refs.floatUserPanel) {
-          self.$refs.floatUserPanel.initPanel();
-        }
         self.targetUser = res.targetUser;
         self.parentType = res.parentType;
         self.subscribeTypes = res.subscribeTypes;

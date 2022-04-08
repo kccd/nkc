@@ -48,6 +48,7 @@ router
     if(user) {
       data.inBlacklist = !!(await db.BlacklistModel.findOne({uid: user.uid, tUid: targetUser.uid}));
     }
+    //获取用户名片，用户消息等信息
     if(from && from === "panel" && ctx.request.get('FROM') === "nkcAPI") {
       if(data.user) {
         data.subscribed = state.subUsersId.includes(uid);

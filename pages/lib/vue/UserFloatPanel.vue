@@ -1,5 +1,5 @@
 <template lang="pug">
-  #floatUserPanel(v-cloak v-show="show")
+  .float-user-panel(v-cloak v-show="show")
     transition(name="fade")
       .float-user(v-if="user && (over || onPanel)")
         .float-user-top
@@ -10,8 +10,8 @@
           .float-user-uid ID: {{user.uid}}
           .float-user-info
             a(:href="'/u/' + user.uid" target="_blank" :style="uid?'padding-right: 3.5rem;':''" :title="user.username").float-user-name {{user.username}}
-            button(v-if="uid && subscribed" @click.stop="subscribe") 取关
-            button.active(v-if="uid && !subscribed" @click.stop="subscribe") 关注
+            button(v-if="uid && subscribed" @click="subscribe") 取关
+            button.active(v-if="uid && !subscribed" @click="subscribe") 关注
             .float-user-cert
               img.float-user-grade(:src="getUrl('gradeIcon', user.grade._id)" :title="user.grade.displayName" v-if="user.certs.indexOf('banned') < 0")
               .float-user-destroy(v-if="user.destroyed") 用户已注销
@@ -38,9 +38,9 @@
               a.link(:href="'/m/' + user.column._id" target="_blank" :title="user.column.name") 专栏
 </template>
 
-<style lang="less">
-#floatUserPanel{
-  @import "../../publicModules/base.less";
+<style lang="less" scoped>
+@import "../../publicModules/base.less";
+.float-user-panel{
   top: 0;
   left: 0;
   position: absolute;
@@ -255,6 +255,7 @@
 import {getUrl, fromNow} from "../js/tools";
 import {timeFormat} from "../js/time";
 import {getState} from "../js/state";
+import {strToObj} from "../js/dataConversion";
 export default {
   data: () => {
     return {
@@ -275,12 +276,6 @@ export default {
     window.initMouseleaveEvent = this.initMouseleaveEvent;
     const self = this;
     const panel = $(self.$el);
-    if(panel) {
-      panel.on("mouseover", function() {
-        self.timeoutName = null;
-        self.onPanel = true;
-      });
-    }
     panel.css({
       top: 0,
       left: 0
@@ -289,17 +284,6 @@ export default {
       top: 300,
       left: 300
     });
-  },
-  updated() {
-    const self = this;
-    if(self.DOM) {
-      self.DOM.on('mouseleave', function () {
-        //鼠标离开元素
-        self.timeoutName = setTimeout(() => {
-          self.reset();
-        }, 200);
-      })
-    }
   },
   methods: {
     getUrl: getUrl,
@@ -325,28 +309,28 @@ export default {
     showFloatUserPanel(uid, dom) {
       const DOM = $(dom);
       this.DOM = DOM;
-      this.initEvent(DOM);
+      this.initEvent(DOM, '', uid);
     },
-    initEvent(dom, position = 'right') {
+    initEvent(dom, position = 'right', uid) {
       const self = this;
       //鼠标悬浮在元素上
       clearTimeout(self.timeoutName);
       self.count ++;
       self.over = true;
-      let uid;
       let count_ = self.count;
-      let left, top, width, height;
+      let left, top, width, height, targetUid;
       //延迟过滤掉鼠标意外划过元素
       self.timeout(300)
         .then(() => {
+          targetUid = uid || strToObj(dom.attr("data-global-data")).uid;
+          const userObj = self.getUserById(targetUid);
           if(count_ !== self.count) throw "timeout 1";
           if(!self.over) throw "timeout 2";
-          uid = dom.attr("data-global-data");
           left = dom.offset().left;
           top = dom.offset().top;
           width = dom.width();
           height = dom.height();
-          return self.getUserById(uid);
+          return userObj;
         })
         .then((userObj) => {
           const {user, subscribed} = userObj;
@@ -379,7 +363,6 @@ export default {
           if((left + panelWidth) > documentWidth) {
             left = documentWidth - panelWidth;
           }
-          // const {top: contentTop, left: contentWidth} = $('#comment-content').offset();
           panel.css({
             top: top,
             left: left
@@ -402,31 +385,27 @@ export default {
     getUserById(id) {
       const self = this;
       return new Promise((resolve, reject) => {
-        let userObj = self.users[id];
-        if(userObj) {
-          resolve(userObj);
-        } else {
-          nkcAPI(`/u/${id}?from=panel`, "GET")
-            .then(data => {
-              if(data.targetUser.hidden) return;
-              const userObj = {
-                subscribed: data.subscribed,
-                user: data.targetUser
-              };
-              self.users[data.targetUser.uid] = userObj;
-              resolve(userObj);
-            })
-            .catch(err => {
-              console.log(err);
-              reject(err);
-            });
-        }
+        //每次都获取数据实时更新
+        nkcAPI(`/u/${id}?from=panel`, "GET")
+          .then(data => {
+            if(data.targetUser.hidden) return;
+            const userObj = {
+              subscribed: data.subscribed,
+              user: data.targetUser
+            };
+            self.users[data.targetUser.uid] = userObj;
+            resolve(userObj);
+          })
+          .catch(err => {
+            sweetError(err);
+            reject(err);
+          });
       });
     },
     //关注用户
     subscribe() {
       const {user, subscribed} = this;
-      this.$emit('subscribe', {uid: user.uid, subscribed: !subscribed});
+      this.$emit('subscribe', {uid: user.uid, sub: !subscribed});
     }
   }
 }

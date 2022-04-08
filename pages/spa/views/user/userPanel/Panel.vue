@@ -18,6 +18,19 @@
               .account-user-kcb
                 user-scores(ref="userScore" :scores="scores" :xsf="targetUser.xsf" )
         .account-nav
+          .account-nav-box
+            .account-nav-left
+            .account-nav-middle
+              span(@click="containerChange('moment')") 动态
+              span(@click="containerChange('post')") 社区
+              span(@click="containerChange('subColumns')") 专栏
+            .account-nav-right
+              div
+                div 关注
+                span 123
+              div
+                div 粉丝
+                span 123
 
     div(v-if="panelPermission && (panelPermission.unBannedUser || panelPermission.bannedUser ||panelPermission.clearUserInfo)" )
       .btn-ban(v-show="showBanBox" @click="clickBanContext()")
@@ -51,7 +64,7 @@
   .hidden-user-home-tip {
   }
   .account-banner {
-    height: 14rem;
+    height: 13rem;
     width: 100%;
     .account-user-banner-container {
       .account-user-banner {
@@ -77,7 +90,6 @@
           }
           .account-user-introduce {
             margin: 0 11rem;
-            text-align: end;
             .account-user-name {
 
             }
@@ -85,14 +97,46 @@
 
             }
             .account-user-kcb {
-
+              display: inline-block;
             }
           }
         }
       }
       .account-nav {
         width: 100%;
-        height: 6rem;
+
+        .account-nav-box{
+          .account-nav-left{
+            width: 25%;
+            display: inline-block;
+          }
+          .account-nav-middle{
+            width: 58%;
+            padding-left: 15px;;
+            display: inline-block;
+            font-size: 20px;
+            font-weight: bold;
+            span{
+              display: inline-block;
+              padding: 15px 30px 0 0;
+            }
+          }
+          .account-nav-right{
+            width: 17%;
+            display: inline-block;
+            padding-left: 15px;
+            text-align: center;
+            &>div{
+              display: inline-block;
+              padding: 5px 15px;
+              font-width: bold;
+              font-size: 1rem;
+              &>span{
+                font-size: 2rem;
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -233,6 +277,10 @@ export default {
         .catch(function(data) {
           screenTopWarning(data);
         })
+    },
+    //中间显示内容路由切换
+    containerChange(path){
+      this.$router.push({name: path})
     },
     //点击显示禁止内容
     clickBanContext(){
