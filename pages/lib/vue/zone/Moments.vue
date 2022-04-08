@@ -30,7 +30,6 @@
   import Complaint from "../Complaint";
   import ViolationRecord from "../ViolationRecord";
   import MomentOption from "./momentOption/MomentOption";
-  import FloatUserPanel from "../FloatUserPanel";
   import MomentStatus from "./MomentStatus";
   export default {
     props: ['moments'],
@@ -39,7 +38,6 @@
       'moment': Moment,
       'complaint': Complaint,
       'violation-record': ViolationRecord,
-      'float-user-panel': FloatUserPanel,
       'moment-status': MomentStatus
     },
     data: () => ({
