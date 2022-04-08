@@ -500,6 +500,7 @@ resourceSchema.statics.getResourcesByReference = async function(id) {
 resourceSchema.statics.replaceReferencesById = async function(resourcesId, referenceId) {
   const ResourceModel = mongoose.model('resources');
   await ResourceModel.updateMany({
+    references: referenceId,
     rid: {
       $nin: resourcesId
     }

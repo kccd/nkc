@@ -308,8 +308,6 @@
   import MomentFiles from './MomentFiles';
   import MomentComments from './MomentComments';
   import MomentQuote from './MomentQuote';
-  import FloatUserPanel from "../FloatUserPanel";
-  import SubscribeTypes from "../SubscribeTypes";
   import MomentStatus from "./MomentStatus";
   import MomentOption from "./momentOption/MomentOption";
   export default {
@@ -318,8 +316,6 @@
       'moment-files': MomentFiles,
       'moment-comments': MomentComments,
       'moment-quote': MomentQuote,
-      'float-user-panel': FloatUserPanel,
-      'subscribe-types': SubscribeTypes,
       'moment-status': MomentStatus,
       'moment-option': MomentOption
     },

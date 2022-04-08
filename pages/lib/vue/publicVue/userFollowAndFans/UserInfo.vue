@@ -91,6 +91,12 @@ export default {
   padding: 0.5rem;
   position: relative;
   border: 1px solid #eee;
+  box-shadow: 0 1px 3px 1px #f1d196 ;
+  transition: all .5s linear;
+  // &:hover{
+    // box-shadow: 0 2px 5px 1px #bdac8e;
+    // transform: translateY(-7px);
+  // }
   /*display: -webkit-flex;*/
 }
 .userInfo .avatar {
@@ -119,15 +125,14 @@ export default {
   overflow: hidden;
 }
 .userInfo .follow-button {
-  height: 1.6rem;
-  padding: 0 1rem;
-  line-height: 1.6rem;
+  // height: 1.6rem;
+  padding: 0.25rem 1rem;
+  // line-height: 1.6rem;
   position: absolute;
   right: 0.5rem;
   top: 0.5rem;
-  vertical-align: text-bottom;
   color: #fff;
-  border-radius: 3px;
+  border-radius: 5px;
   cursor: pointer;
   background-color: #9baec8;
   border-color: #9baec8;

@@ -18,6 +18,7 @@ import {getState} from "../../../lib/js/state";
 import Panel from "./userPanel/Panel";
 import AccountUser from "./AccountUser";
 import Footer from "../../../lib/vue/publicVue/Footer/Footer"
+import {setPageTitle} from "../../../lib/js/pageSwitch";
 export default {
   data:() => ({
     targetUser: null,
@@ -60,6 +61,7 @@ export default {
         self.followersCount = res.followersCount;
         self.targetUserFans = res.targetUserFans;
         self.targetUserFollowers = res.targetUserFollowers;
+        setPageTitle(self.targetUser.username + '的主页');
       })
       .catch(err => {
         sweetError(err);

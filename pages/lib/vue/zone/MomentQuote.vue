@@ -79,7 +79,7 @@
         margin-bottom: 0.5rem;
       }
       .moment-quote-abstract{
-        height: 7rem;
+        max-height: 7rem;
         @width: 9rem;
         .hideText(@line: 4);
         font-size: 1.25rem;

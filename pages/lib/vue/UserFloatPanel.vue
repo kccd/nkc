@@ -1,5 +1,5 @@
 <template lang="pug">
-  #floatUserPanel(v-cloak v-show="show")
+  .float-user-panel(v-cloak v-show="show")
     transition(name="fade")
       .float-user(v-if="user && (over || onPanel)")
         .float-user-top
@@ -38,9 +38,9 @@
               a.link(:href="'/m/' + user.column._id" target="_blank" :title="user.column.name") 专栏
 </template>
 
-<style lang="less">
-#floatUserPanel{
-  @import "../../publicModules/base.less";
+<style lang="less" scoped>
+@import "../../publicModules/base.less";
+.float-user-panel{
   top: 0;
   left: 0;
   position: absolute;

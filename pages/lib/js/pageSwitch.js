@@ -19,3 +19,7 @@ export function visitUrl(url, blank) {
     }
   }
 }
+
+export function setPageTitle(content) {
+  $('title').text(content);
+}
