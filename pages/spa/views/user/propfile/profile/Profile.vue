@@ -21,12 +21,18 @@ export default {
     t: null,
   }),
   mounted() {
-    const {params, name} = this.$route;
-    const {uid} = params;
-    this.uid = uid;
-    this.t = name;
+    this.initData();
+  },
+  updated() {
+    this.initData();
   },
   methods: {
+    initData() {
+      const {params, name} = this.$route;
+      const {uid} = params;
+      this.uid = uid;
+      this.t = name;
+    },
     //跳转到指定路由
     toRoute(name) {
       this.t = name;
