@@ -68,8 +68,8 @@ function saveImage(data) {
 * 显示用户悬浮名片
 * */
 function showUserPanel(data, dom) {
-  const DOM = $(dom);
-  window.showFloatUserPanel(data, dom);
+  const {uid} = data;
+  window.showFloatUserPanel(uid, dom);
 }
 
 /*
@@ -98,13 +98,14 @@ const eventFunctions = {
 * */
 function globalEvent(eventType, e) {
   const element = e.target;
-  const elementJQ = $(element);
+  let elementJQ = $(element);
   let operation = elementJQ.attr(`data-global-${eventType}`);
   //获取点击元素的父级元素中包含该属性的元素， 不查找包含该属性的子级
   if(!operation) {
     const doms = elementJQ.parents(`[data-global-${eventType}]`);
     const dom = doms.eq(0);
     const val = dom.attr(`data-global-${eventType}`);
+    elementJQ = dom;
     if(val) {
       operation = val;
     }

@@ -255,6 +255,7 @@
 import {getUrl, fromNow} from "../js/tools";
 import {timeFormat} from "../js/time";
 import {getState} from "../js/state";
+import {strToObj} from "../js/dataConversion";
 export default {
   data: () => {
     return {
@@ -308,22 +309,21 @@ export default {
     showFloatUserPanel(uid, dom) {
       const DOM = $(dom);
       this.DOM = DOM;
-      this.initEvent(DOM);
+      this.initEvent(DOM, '', uid);
     },
-    initEvent(dom, position = 'right') {
+    initEvent(dom, position = 'right', uid) {
       const self = this;
       //鼠标悬浮在元素上
       clearTimeout(self.timeoutName);
       self.count ++;
       self.over = true;
-      let uid;
       let count_ = self.count;
-      let left, top, width, height;
+      let left, top, width, height, targetUid;
       //延迟过滤掉鼠标意外划过元素
       self.timeout(300)
         .then(() => {
-          uid = dom.attr("data-global-data");
-          const userObj = self.getUserById(uid);
+          targetUid = uid || strToObj(dom.attr("data-global-data")).uid;
+          const userObj = self.getUserById(targetUid);
           if(count_ !== self.count) throw "timeout 1";
           if(!self.over) throw "timeout 2";
           left = dom.offset().left;
@@ -363,7 +363,6 @@ export default {
           if((left + panelWidth) > documentWidth) {
             left = documentWidth - panelWidth;
           }
-          // const {top: contentTop, left: contentWidth} = $('#comment-content').offset();
           panel.css({
             top: top,
             left: left
@@ -387,10 +386,6 @@ export default {
       const self = this;
       return new Promise((resolve, reject) => {
         //每次都获取数据实时更新
-        // let userObj = self.users[id];
-        // if(userObj) {
-        //   resolve(userObj);
-        // } else {
         nkcAPI(`/u/${id}?from=panel`, "GET")
           .then(data => {
             if(data.targetUser.hidden) return;
@@ -405,7 +400,6 @@ export default {
             sweetError(err);
             reject(err);
           });
-        // }
       });
     },
     //关注用户
