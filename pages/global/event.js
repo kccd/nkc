@@ -137,8 +137,8 @@ export function initGlobalMouseOverEvent() {
     globalEvent('mouseover', e);
   });
   //鼠标移出
-  document.addEventListener('mouseleave', e => {
-    globalEvent('mouseleave', e);
+  document.addEventListener('mouseout', e => {
+    globalEvent('mouseout', e);
   });
 }
 
