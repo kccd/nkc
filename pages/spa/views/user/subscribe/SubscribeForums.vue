@@ -19,13 +19,29 @@
       .null(v-if="!subscribes.length") 空空如也~
       .account-follower(v-for="subscribe in subscribes" v-else)
         .account-follower-avatar
-          img.img(:src="getUrl('forumLogo', subscribe.forum.logo)" v-if="subscribe.forum.logo")
-          .img(:style="`background-color: ${subscribe.forum.color};`" v-else)
+          img.img(
+            :src="getUrl('forumLogo', subscribe.forum.logo)"
+            v-if="subscribe.forum.logo"
+            data-global-mouseover="showForumPanel"
+            data-global-mouseout="hideForumPanel"
+            :data-global-data="objToStr({fid: subscribe.forum.fid})"
+            )
+          .img(
+            :style="`background-color: ${subscribe.forum.color};`" v-else
+            data-global-mouseover="showForumPanel"
+            data-global-mouseout="hideForumPanel"
+            :data-global-data="objToStr({fid: subscribe.forum.fid})"
+            )
         .account-follower-content
           .account-follower-name
             .account-follower-buttons(:data-forum="subscribe.forum.fid" :class="subForumsId.includes(subscribe.forum.fid)?'active':''" @click="subForum(subscribe.forum.fid, 'forum')")
               button.subscribe
-            a(:href="`/f/${subscribe.forum.fid}`") {{subscribe.forum.displayName}}
+            a(
+              :href="`/f/${subscribe.forum.fid}`"
+              data-global-mouseover="showForumPanel"
+              data-global-mouseout="hideForumPanel"
+              :data-global-data="objToStr({fid: subscribe.forum.fid})"
+              ) {{subscribe.forum.displayName}}
           .account-follower-info
             | 文章：
             span {{subscribe.forum.countThreads}}
@@ -169,9 +185,10 @@
 </style>
 <script>
 import {nkcAPI} from "../../../../lib/js/netAPI";
-import Paging from "../../../../lib/vue/Paging";
 import {getUrl} from "../../../../lib/js/tools";
 import {subForum} from "../../../../lib/js/subscribe";
+import {objToStr} from "../../../../lib/js/tools";
+import Paging from "../../../../lib/vue/Paging";
 export default {
   data: () => ({
     uid: '',
@@ -195,6 +212,7 @@ export default {
     this.getForums();
   },
   methods: {
+    objToStr: objToStr,
     getUrl: getUrl,
     initData() {
       const {uid} = this.$route.params;

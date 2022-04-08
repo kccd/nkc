@@ -47,12 +47,12 @@
         button(type="button" class="btn btn-sm btn-primary" @click="complete") 确定
 </template>
 
-<style lang="less">
+<style lang="less" scoped>
 @import "../../publicModules/base";
 .module-dialog-body{
   display: none;
   position: fixed;
-  width: 30rem;
+  width: 34rem;
   max-width: 100%;
   top: 100px;
   right: 0;

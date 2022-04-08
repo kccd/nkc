@@ -80,16 +80,33 @@ function hideUserPanel(data, dome) {
 }
 
 /*
+*  显示专业名片
+* */
+function showForumPanel(data, dom) {
+  const {fid} = data;
+  window.showForumPanel(dom, fid);
+}
+
+/*
+* 隐藏用户名片
+* */
+function hideForumPanel() {
+  window.hideForumPanel();
+}
+
+/*
 * data-global-click 和 data-global-long-press 合法的操作
 * */
 const eventFunctions = {
-    viewImage,
-    viewImages,
-    downloadFile,
-    saveImage,
-    showUserPanel,
-    hideUserPanel,
-  }
+  viewImage,
+  viewImages,
+  downloadFile,
+  saveImage,
+  showUserPanel,
+  hideUserPanel,
+  showForumPanel,
+  hideForumPanel,
+}
 
 /*
 * 点击事件、触摸时间触发之后执行的函数，统一处理
