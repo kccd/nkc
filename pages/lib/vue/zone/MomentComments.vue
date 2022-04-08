@@ -22,8 +22,17 @@
           moment-status(ref="momentStatus" :moment="commentData")
           .moment-comment-item-header
             a.moment-comment-avatar(:href="commentData.userHome" target="_blank")
-              img(:src="commentData.avatarUrl")
-              span {{commentData.username}}
+              img(
+                :src="commentData.avatarUrl"
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                :data-global-data="objToStr({uid: commentData.uid})"
+                )
+              span(
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                :data-global-data="objToStr({uid: commentData.uid})"
+              ) {{commentData.username}}
             .moment-comment-time
               from-now(:time="commentData.toc")
             .moment-comment-options
@@ -151,12 +160,13 @@
 </style>
 
 <script>
-  import MomentCommentEditor from './MomentCommentEditor';
   import {sweetError} from "../../js/sweetAlert";
-  import Paging from '../Paging';
-  import FromNow from '../FromNow';
   import {momentVote} from "../../js/zone/vote";
   import {visitUrl} from "../../js/pageSwitch";
+  import {objToStr} from "../../js/tools";
+  import Paging from '../Paging';
+  import FromNow from '../FromNow';
+  import MomentCommentEditor from './MomentCommentEditor';
   import MomentStatus from "./MomentStatus";
 
   export default {
@@ -200,6 +210,7 @@
 
     },
     methods: {
+      objToStr: objToStr,
       init() {
         if(this.postType === 'comment') {
           this.setActiveNav(this.nav[0].type);
