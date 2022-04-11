@@ -31,7 +31,6 @@ NKC.modules.CommonModal = function() {
     methods: {
       submit: function() {
         if(this.link){
-          console.log(this.data[6],'this.data[6]')
           const reg = /^http(s)?:\/\/.+/;
           if(!reg.test(this.data[6].value)){
             throw "不是一个正确的网址"

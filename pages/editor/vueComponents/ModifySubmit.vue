@@ -1,29 +1,37 @@
 <template lang="pug">
-  .modifySubmit
-    h5.text-danger 温馨提示：
-    .pre-wrap {{notice}}
-    div(v-cloak)
-        hr
-        .checkbox(v-if="havePermissionToSendAnonymousPost")
-          label
-            input(type="checkbox" v-model="anonymous" :value="true" :disabled="!allowedAnonymous")
-            span
-              | 匿名发表
-              span.text-danger(v-if='!allowedAnonymous') (所选专业分类不支持匿名发表)
-        .checkbox
-          label
-            input(type="checkbox" v-model="checkProtocol" :value="true")
-            span
-              | 我已阅读并同意遵守与本次发表相关的全部协议。
-              a(href=`/protocol` target="_blank") 查看协议
-        .checkbox
-          .editor-auto-save(v-if="autoSaveInfo")
-            .fa.fa-check-circle &nbsp;{{autoSaveInfo}}
-        .row
-          .col-xs-6.p-r-05
-            button.btn.btn-theme.btn-block(@click="readyData" :disabled="disabledSubmit || !checkProtocol") {{disabledSubmit ? "提交中..." : "提交"}}
-          .col-xs-6.p-l-05
-            button.btn.btn-default.btn-block(@click="saveToDraftBase('manual')") 存草稿
+.modifySubmit
+  h5.text-danger 温馨提示：
+  .pre-wrap {{ notice }}
+  div(v-cloak)
+    hr
+    .checkbox(v-if="havePermissionToSendAnonymousPost")
+      label
+        input(
+          type="checkbox",
+          v-model="anonymous",
+          :value="true",
+          :disabled="!allowedAnonymous"
+        )
+        span
+          | 匿名发表
+          span.text-danger(v-if="!allowedAnonymous") (所选专业分类不支持匿名发表)
+    .checkbox
+      label
+        input.agreement(type="checkbox", v-model="checkProtocol", :value="true")
+        span
+          | 我已阅读并同意遵守与本次发表相关的全部协议。
+          a(href="/protocol", target="_blank") 查看协议
+    .checkbox
+      .editor-auto-save(v-if="autoSaveInfo")
+        .fa.fa-check-circle &nbsp;{{ autoSaveInfo }}
+    .row
+      .col-xs-6.p-r-05
+        button.btn.btn-theme.btn-block(
+          @click="readyData",
+          :disabled="disabledSubmit || !checkProtocol"
+        ) {{ disabledSubmit ? '提交中...' : '提交' }}
+      .col-xs-6.p-l-05
+        button.btn.btn-default.btn-block(@click="saveToDraftBase('manual')") 存草稿
 </template>
 
 <script>
@@ -33,12 +41,12 @@ import { timeFormat } from "../../lib/js/tools";
 export default {
   props: {
     notice: {
-      type: String
+      type: String,
     },
     data: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   data: () => ({
     type: "newThread",
@@ -55,17 +63,8 @@ export default {
     autoSaveInfo: "",
     oldContent: "",
     oldContentLength: "",
-    saveDraftTimeout: 60000
+    saveDraftTimeout: 60000,
   }),
-  created() {
-    // this.allowedAnonymousForumsId =  this.data.allowedAnonymousForumsId || []
-    // this.havePermissionToSendAnonymousPost = this.data.havePermissionToSendAnonymousPost || false
-    // if (this.data?.post) this.oldContent = this.data.post.c;
-    // if (this.data?.type) this.type = this.data.type;
-    // if (this.data?.forum) this.forum = this.data.forum;
-    // if (this.data?.threda) this.threda = this.data.threda;
-    // if (this.data?.post?.pid) this.pid = this.data.post.pid;
-  },
   watch: {
     data(n) {
       this.allowedAnonymousForumsId = n?.allowedAnonymousForumsId || [];
@@ -76,7 +75,7 @@ export default {
       if (n?.forum) this.forum = n.forum;
       if (n?.threda) this.threda = n.threda;
       if (n?.post?.pid) this.pid = n.post.pid;
-    }
+    },
   },
   computed: {
     selectedForumsId() {
@@ -87,12 +86,13 @@ export default {
         if (forum.fid) arr.push(forum.fid);
       }
       return arr;
-    }
+    },
   },
   mounted() {
+    // console.log(this.$data,'有缓存的情况')
     this.autoSaveToDraft();
   },
-  updated() {},
+ 
   methods: {
     checkString: NKC.methods.checkData.checkString,
     checkEmail: NKC.methods.checkData.checkEmail,
@@ -152,7 +152,7 @@ export default {
           .then(() => {
             this.autoSaveToDraft();
           })
-          .catch(data => {
+          .catch((data) => {
             sweetError("草稿保存失败：" + (data.error || data));
             this.autoSaveToDraft();
           });
@@ -173,7 +173,7 @@ export default {
               .then(() => {
                 return;
               })
-              .catch(err => {
+              .catch((err) => {
                 sweetError(err);
               });
           } else {
@@ -210,7 +210,7 @@ export default {
               post: saveData,
               draftId: this.draftId,
               desType: desType,
-              desTypeId: desTypeId
+              desTypeId: desTypeId,
             })
           );
           if (saveData.coverData) {
@@ -228,7 +228,7 @@ export default {
             formData
           );
         })
-        .then(data => {
+        .then((data) => {
           //保存草稿的全部内容长度
           if (data.contentLength) {
             this.oldContentLength = data.draft?.c?.length;
@@ -242,14 +242,14 @@ export default {
           }
           return Promise.resolve();
         })
-        .then(res => {
+        .then((res) => {
           // const postButton = getPostButton();
           if (type === "manual") {
             sweetSuccess("草稿已保存");
           }
           this.saveToDraftSuccess();
         })
-        .catch(data => {
+        .catch((data) => {
           sweetError("草稿保存失败：" + (data.error || data));
         });
     },
@@ -259,22 +259,22 @@ export default {
         this.checkString(info.name, {
           name: "作者姓名",
           minLength: 1,
-          maxLength: 100
+          maxLength: 100,
         });
         this.checkString(info.kcid, {
           name: this.websiteUserId,
           minLength: 0,
-          maxLength: 100
+          maxLength: 100,
         });
         this.checkString(info.agency, {
           name: "机构名称",
           minLength: 0,
-          maxLength: 100
+          maxLength: 100,
         });
         this.checkString(info.agencyAdd, {
           name: "机构地址",
           minLength: 0,
-          maxLength: 100
+          maxLength: 100,
         });
         if (!info.isContract) continue;
         // 检测邮箱
@@ -282,22 +282,22 @@ export default {
         this.checkString(info.contractObj.contractEmail, {
           name: "通信邮箱",
           minLength: 1,
-          maxLength: 200
+          maxLength: 200,
         });
         this.checkString(info.contractObj.contractTel, {
           name: "通信电话",
           minLength: 0,
-          maxLength: 100
+          maxLength: 100,
         });
         this.checkString(info.contractObj.contractAdd, {
           name: "通信地址",
           minLength: 0,
-          maxLength: 200
+          maxLength: 200,
         });
         this.checkString(info.contractObj.contractCode, {
           name: "通信邮编",
           minLength: 0,
-          maxLength: 100
+          maxLength: 100,
         });
       }
     },
@@ -324,12 +324,12 @@ export default {
       this.checkString(cn, {
         name: "中文摘要",
         minLength: 0,
-        maxLength: 1000
+        maxLength: 1000,
       });
       this.checkString(en, {
         name: "英文摘要",
         minLength: 0,
-        maxLength: 1000
+        maxLength: 1000,
       });
     },
     // 检测已选专业
@@ -353,11 +353,11 @@ export default {
     },
     //拿取其他组件数据
     readyData() {
-      this.$emit("ready-data", submitData => this.submit(submitData));
+      this.$emit("ready-data", (submitData) => this.submit(submitData));
     },
     // 获取其他组件数据 保存时使用
     readyDataForSave() {
-      this.$emit("ready-data", data => {
+      this.$emit("ready-data", (data) => {
         this.saveData = data;
       });
     },
@@ -394,18 +394,18 @@ export default {
             this.checkString(submitData.t, {
               name: "标题",
               minLength: 0,
-              maxLength: 200
+              maxLength: 200,
             });
             this.checkContent(submitData.c);
             return nkcAPI("/t/" + this.data?.thread?.tid, "POST", {
-              post: submitData
+              post: submitData,
             });
           } else if (type === "modifyPost") {
             // 修改post
             this.checkString(submitData.t, {
               name: "标题",
               minLength: 0,
-              maxLength: 200
+              maxLength: 200,
             });
             this.checkContent(submitData.c);
             let formData = new FormData();
@@ -437,13 +437,13 @@ export default {
             return nkcUploadFile("/p/" + this.pid, "PUT", formData);
           }
         })
-        .then(data => {
+        .then((data) => {
           this.$emit("remove-editor");
           if (NKC.configs.platform === "reactNative") {
             NKC.methods.visitUrlAndClose(data.redirect);
           } else if (NKC.configs.platform === "apiCloud") {
             this.visitUrl(data.redirect || "/");
-            setTimeout(function() {
+            setTimeout(function () {
               //  api ？？？
               api.closeWin();
             }, 1000);
@@ -451,7 +451,7 @@ export default {
             this.visitUrl(data.redirect || "/");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           // 解锁发表按钮
           this.disabledSubmit = false;
 
@@ -461,14 +461,23 @@ export default {
     getData() {
       return {
         anonymous: this.anonymous,
-        checkProtocol: this.checkProtocol
+        checkProtocol: this.checkProtocol,
       };
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
+@media screen and (max-width: 1000px) {
+  .col-xs-12 {
+    width: 100%;
+  }
+  .modifySubmit {
+    position: static !important;
+    margin: auto;
+  }
+}
 .editor-auto-save {
   padding: 0.5rem 0;
   color: #9baec8;

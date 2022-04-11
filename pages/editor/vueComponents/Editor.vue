@@ -1,5 +1,5 @@
 <template lang="pug">
-.editor
+.editor.row
   .col-xs-12.col-md-9.box-shadow-panel.m-b-2
     div
       //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t 
@@ -47,7 +47,8 @@
         //- 1.author 作者信息
         author-info(
           ref="authorInfo",
-          :author= "pageData.post &&pageData.post.authorInfos"
+          :author= "pageData.post && pageData.post.authorInfos"
+          :a = undefined
         )
       .m-b-2(v-if="!hideType.includes(pageData.type)")
         //- 1.original 包含最小字数和文章状态
@@ -118,16 +119,7 @@ export default {
     pageData: {},
     pageState: {}
   }),
-  props: {
-    // data: {
-    //   type: Object,
-    //   default: () => ({})
-    // },
-    // state: {
-    //   type: Object,
-    //   default: () => ({})
-    // }
-  },
+
   created() {
     let search= this.$route?.query;
     let url = `/editor/data`;
@@ -145,11 +137,26 @@ export default {
       .catch(err => {
         sweetError(err)
       });
+
+    window.addEventListener('pageshow',this.clearCache)
+  },
+  destroyed(){
+    window.removeEventListener("pageshow", this.clearCache)
+    this.pageData = {};
+    this.pageState = {};
   },
   methods: {
-    setData() {
-      this.pageData = this.data;
-      this.pageState = this.state;
+    clearCache(event){
+      if(event.persisted || window.performance && window.performance.navigation.type === 2){
+        // 清除缓存
+        // $(".editor-title").val('');
+        $(".abstract-cn").val('');
+        $(".abstract-en").val('');
+        // console.log('有缓存', this.$refs.title.$forceUpdate)
+        // console.log('设置默认')
+        $('.agreement').prop('checked', true);
+      }
+    
     },
     // 控制 提交组件 是否可选匿名发表
     selectedForumIds(ids) {
@@ -178,31 +185,32 @@ export default {
       for (const key in refs) {
         if (refs.hasOwnProperty(key)) {
           const vue = refs[key];
-          Object.assign(submitData, vue && vue.getData());
+          // console.log(vue && vue.getData(),'vue')
+          Object.assign(submitData, vue && vue.getData());                                                                                                    
         }
       }
       // 添加 草稿id 和 parentPostId
       submitData["did"] = this.pageData.draftId;
       submitData["parentPostId"] = this.pageData.parentPostId;
       submitFn(submitData);
+
     }
   },
-  // watch: {
-  //   //  n 新值 o 旧值
-  //   data: {
-  //     immediate: true,
-  //     handler(n) {
-  //       this.pageData = n;
-  //     }
-  //   },
-  //   state: {
-  //     immediate: true,
-  //     handler(n) {
-  //       this.pageState = n;
-  //     }
-  //   }
-  // }
 };
 </script>
 
-<style></style>
+<style scoped>
+@media screen and (max-width: 1000px) {
+  .editor{
+    padding: auto 15px;
+  }
+}
+.row{
+  width: 100%;
+}
+.box-shadow-panel:after, .editor:after{
+  content: '';
+  display: block;
+  clear: both;
+}
+</style>
