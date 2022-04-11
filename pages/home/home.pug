@@ -18,7 +18,11 @@ block content
                 a(href=`/u/${data.user.uid}/profile/subscribe/forum` target="_blank") 管理
             .visited-forums
               for f in state.subForums
-                .visited-forum(data-float-fid=f.fid)
+                .visited-forum(
+                  data-global-mouseover="showForumPanel"
+                  data-global-mouseout="hideForumPanel"
+                  data-global-data=objToStr({fid: f.fid})
+                )
                   if f.logo
                     img.visited-forum-icon(src=tools.getUrl("forumLogo", f.logo))
                   else

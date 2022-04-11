@@ -58,7 +58,11 @@ block content
                     for n in data.threadNav
                       -const {fid, cid, name} = n;
                       span.nav-delimiter >
-                      a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}` data-float-fid=fid)= name
+                      a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}`
+                        data-global-mouseover="showForumPanel"
+                        data-global-mouseout="hideForumPanel"
+                        data-global-data=objToStr({fid})
+                      )= name
                   .thread-nav-right
                     .nav-count
                       .nav-post-id=`文号 ${data.thread.oc}`
@@ -214,7 +218,11 @@ block content
                       if thread.type !== "fund"
                         .thread-info.text-center(style="margin-top:1.5rem")
                           if !thread.firstPost.anonymous
-                            a(href=`/u/${thread.uid}` data-float-uid=thread.uid target="_blank")
+                            a(href=`/u/${thread.uid}`
+                              data-global-mouseover="showUserPanel"
+                              data-global-mouseout="hideUserPanel"
+                              data-global-data=objToStr({uid: thread.uid})
+                              target="_blank")
                               img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
                               span= ` ${thread.firstPost.user.username}`
                           else
@@ -237,7 +245,11 @@ block content
                               if index > 0
                                 //-span ,&nbsp;
                                 span(style='color: #333;') ，
-                              a(href=`/f/${forum.fid}` data-float-fid=forum.fid)=forum.displayName
+                              a(href=`/f/${forum.fid}`
+                                data-global-mouseover="showForumPanel"
+                                data-global-mouseout="hideForumPanel"
+                                data-global-data=objToStr({fid: forum.fid})
+                              )=forum.displayName
                         if (post.abstractCn.length !== 0 || post.abstractEn.length !== 0) && data.thread.type !== "product"
                           .abstract(style="margin-top:1rem; word-break: break-all;")
                             if post.abstractCn.length !== 0
@@ -325,7 +337,11 @@ block content
                           for f,index in forums
                             if index !== 0
                               span &nbsp;/&nbsp;
-                            a(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+                            a(href=`/f/${f.fid}`
+                              data-global-mouseover="showForumPanel"
+                              data-global-mouseout="hideForumPanel"
+                              data-global-data=objToStr({fid: f.fid})
+                            )=f.displayName
                         span.m-r-1
                         //- 文章属性
                         for tc in data.thread.threadCategories

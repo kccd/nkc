@@ -8,15 +8,23 @@
         .editor-main-forum-avatar(
           :style="'background-color: ' + mainForum.color",
           v-if="!mainForum.logo",
-          :data-float-fid="mainForum.fid"
+          data-global-mouseover="showUserPanel"
+          data-global-mouseout="hideUserPanel"
+          :data-global-data="objToStr({fid: mainForum.fid})"
         )
         img.editor-main-forum-avatar(
           :src="setUrl('forumLogo', mainForum.logo)",
           v-else,
-          :data-float-fid="mainForum.fid"
+          data-global-mouseover="showUserPanel"
+          data-global-mouseout="hideUserPanel"
+          :data-global-data="objToStr({fid: mainForum.fid})"
         )
         .editor-main-forum-name
-          span(:data-float-fid="mainForum.fid") {{ mainForum.fName }}
+          span(
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            :data-global-data="objToStr({fid: mainForum.fid})"
+          ) {{ mainForum.fName }}
           | :
           select(v-model="mainForum.cid")
             option(:value="null") 请选择分类
@@ -38,15 +46,24 @@
           .editor-main-forum-avatar(
             :style="'background-color: ' + mf.color",
             v-if="!mf.logo",
-            :data-float-fid="mf.fid"
+
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            :data-global-data="objToStr({fid: mf.fid})"
           )
           img.editor-main-forum-avatar(
             :src="getUrl('forumLogo', mf.logo)",
             v-else,
-            :data-float-fid="mf.fid"
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            :data-global-data="objToStr({fid: mf.fid})"
           )
           .editor-main-forum-name
-            span(:data-float-fid="mf.fid") {{ mf.forum.displayName }}
+            span(
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              :data-global-data="objToStr({fid: mf.fid})"
+            ) {{ mf.forum.displayName }}
             | :
             select(v-model="mf.cid")
               option(:value="null") 请选择分类
@@ -88,7 +105,7 @@
           :class="{ active: c.selectedNode === n }",
           :title="n.description"
         )
-          span {{ n.name }} 
+          span {{ n.name }}
         .editor-thread-category-node(
           @click="selectThreadCategory(c, 'default')",
           :class="{ active: c.selectedNode === 'default' }"

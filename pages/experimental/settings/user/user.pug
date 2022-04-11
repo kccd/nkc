@@ -57,10 +57,22 @@ block eContent
                   input(type='checkbox' :value='u.uid' v-model='selectedUsersId')
                 th.nwd {{format("YYYY-MM-DD HH:mm:ss", u.toc)}}
                 th.mwd
-                  a(:href="getUrl('userHome', u.uid)" target='_blank' :data-float-uid="u.uid") {{u.uid}}
+                  a(:href="getUrl('userHome', u.uid)" target='_blank'
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    :data-global-data="objToStr({uid: u.uid})"
+                  ) {{u.uid}}
                 th
-                  img.user-avatar(:src="getUrl('userAvatar', u.avatar)" :data-float-uid="u.uid")
-                  a(:href="getUrl('userHome', u.uid)" target="_blank" :data-float-uid="u.uid") {{u.username}}
+                  img.user-avatar(:src="getUrl('userAvatar', u.avatar)"
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    :data-global-data="objToStr({uid: u.uid})"
+                  )
+                  a(:href="getUrl('userHome', u.uid)" target="_blank"
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    :data-global-data="objToStr({uid: u.uid})"
+                  ) {{u.username}}
                 th
                   span(v-for='r in u.roles') {{r.displayName}}&nbsp;
                 th.mwd

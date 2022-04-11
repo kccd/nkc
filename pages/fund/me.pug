@@ -35,7 +35,9 @@ block fundContent
                       a(
                         href=tools.getUrl('userHome', applicant.uid)
                         target="_blank"
-                        data-float-uid=applicant.uid
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        data-global-data=objToStr({uid: applicant.uid})
                         )= applicant.user.username
                       span=` 的组队邀请`
                       br
@@ -58,7 +60,9 @@ block fundContent
                                   a(
                                     href=tools.getUrl('userHome', u.uid)
                                     target='_blank'
-                                    data-float-uid=u.uid
+                                    data-global-mouseover="showUserPanel"
+                                    data-global-mouseout="hideUserPanel"
+                                    data-global-data=objToStr({uid: u.uid})
                                     )= `${u.user.username} `
                             br
                             span=`申请表ID：${a._id}`

@@ -58,7 +58,7 @@ block content
         if data.postPermission && data.postPermission.warning
           .m-b-1.text-danger.p-a-1!=data.postPermission.warning
         div
-          //- 标题 
+          //- 标题
           #notes.m-b-1.m-t-1.m-l-05.m-r-05(v-cloak)
             if data.type === "newPost"
               .editor-type-info
@@ -118,10 +118,22 @@ block content
                 .editor-main-forums
                   h5 主分类（必选）
                   .editor-main-forum(v-if="mainForum")
-                    .editor-main-forum-avatar(:style="'background-color: ' + mainForum.color" v-if="!mainForum.logo" :data-float-fid="mainForum.fid")
-                    img.editor-main-forum-avatar(:src="getUrl('forumLogo', mainForum.logo)" v-else :data-float-fid="mainForum.fid")
+                    .editor-main-forum-avatar(:style="'background-color: ' + mainForum.color" v-if="!mainForum.logo"
+                      data-global-mouseover="showUserPanel"
+                      data-global-mouseout="hideUserPanel"
+                      :data-global-data="objToStr({fid: mainForum.fid})"
+                    )
+                    img.editor-main-forum-avatar(:src="getUrl('forumLogo', mainForum.logo)" v-else
+                    data-global-mouseover="showUserPanel"
+                      data-global-mouseout="hideUserPanel"
+                      :data-global-data="objToStr({fid: mainForum.fid})"
+                    )
                     .editor-main-forum-name
-                      span(:data-float-fid="mainForum.fid") {{mainForum.fName}}
+                      span(
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        :data-global-data="objToStr({fid: mainForum.fid})"
+                      ) {{mainForum.fName}}
                       | :
                       select(v-model='mainForum.cid')
                         option(:value='null') 请选择分类
@@ -139,10 +151,22 @@ block content
                     |，最多{{minorForumCount.max}}个）
                   .editor-minor-forum-container(v-for='(mf, index) in minorForums')
                     .editor-main-forum
-                      .editor-main-forum-avatar(:style="'background-color: ' + mf.color" v-if="!mf.logo" :data-float-fid="mf.fid")
-                      img.editor-main-forum-avatar(:src="getUrl('forumLogo', mf.logo)" v-else :data-float-fid="mf.fid")
+                      .editor-main-forum-avatar(:style="'background-color: ' + mf.color" v-if="!mf.logo"
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        :data-global-data="objToStr({fid: mf.fid})"
+                      )
+                      img.editor-main-forum-avatar(:src="getUrl('forumLogo', mf.logo)" v-else
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        :data-global-data="objToStr({fid: mf.fid})"
+                      )
                       .editor-main-forum-name
-                        span(:data-float-fid="mf.fid") {{mf.forum.displayName}}
+                        span(
+                          data-global-mouseover="showUserPanel"
+                          data-global-mouseout="hideUserPanel"
+                          :data-global-data="objToStr({fid: mf.fid})"
+                        ) {{mf.forum.displayName}}
                         | :
                         select(v-model='mf.cid')
                           option(:value='null') 请选择分类

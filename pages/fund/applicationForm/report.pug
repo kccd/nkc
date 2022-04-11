@@ -24,12 +24,16 @@ if !isIncluded('report')
         else
           img(
             src=tools.getUrl('userAvatar', applicant.user.avatar)
-            data-float-uid=applicant.uid
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid: applicant.uid})
             )
           a(
             href=tools.getUrl('userHome', applicant.user.uid)
             target="_blank"
-            data-float-uid=applicant.uid
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid: applicant.uid})
             )=applicant.user.username
         span.m-l-05.report-time
           +fromNow(report.toc)

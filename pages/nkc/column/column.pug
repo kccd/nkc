@@ -60,7 +60,11 @@ block nkcContent
                     a(href=tools.getUrl('columnHome', c._id) target="_blank")=c.name
                   th(style='width: 11rem;')
                     img.m-r-05(src=tools.getUrl('userAvatar', c.user.avatar) style='width: 1.4rem;height: 1.4rem;border-radius: 50%;')
-                    a(href=tools.getUrl('userHome', c.uid) target="_blank" data-float-uid=c.uid)=c.user.username
+                    a(href=tools.getUrl('userHome', c.uid) target="_blank"
+                      data-global-mouseover="showUserPanel"
+                      data-global-mouseout="hideUserPanel"
+                      data-global-data=objToStr({uid: c.uid})
+                      )=c.user.username
                   th(style='width: 30rem;')=c.abbr
                   th(style='width: 10rem;')
                     if c.closed

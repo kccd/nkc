@@ -57,7 +57,9 @@ if !isIncluded('project')
           a.m-r-05(
             href=tools.getUrl('forumHome', forum.fid)
             target="_blank"
-            data-float-fid=forum.fid
+            data-global-mouseover="showForumPanel"
+            data-global-mouseout="hideForumPanel"
+            data-global-data=objToStr({fid: forum.fid})
             )=forum.displayName
         else
           span 暂未选择

@@ -1,3 +1,4 @@
+import {objToStr} from "../../lib/js/tools";
 var app = new Vue({
   el: '#app',
   data: {
@@ -9,6 +10,7 @@ var app = new Vue({
     searchScoreType: '',
   },
   methods: {
+    objToStr: objToStr,
     fromNow: NKC.methods.fromNow,
     format: NKC.methods.format,
     ipUrl: NKC.methods.ipUrl,

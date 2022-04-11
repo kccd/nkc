@@ -16,9 +16,17 @@
 
   .moment-quote(v-if="data")
     .moment-quote-header
-      .moment-quote-avatar
+      .moment-quote-avatar(
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        :data-global-data="objToStr({uid: quoteData.data.uid})"
+      )
         img(:src="quoteData.data.avatarUrl")
-      .moment-quote-username
+      .moment-quote-username(
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        :data-global-data="objToStr({uid: quoteData.data.uid})"
+      )
         a(:href="quoteData.data.userHome" target="_blank") {{quoteData.data.username}}
       .moment-quote-time
         from-now(:time="quoteData.data.toc")
@@ -128,6 +136,7 @@
 </style>
 
 <script>
+  import {objToStr} from "../../js/tools";
   import MomentFiles from './MomentFiles';
   import FromNow from '../FromNow';
   export default {
@@ -143,6 +152,9 @@
       quoteData() {
         return this.data;
       }
+    },
+    methods: {
+      objToStr: objToStr,
     }
   }
 </script>

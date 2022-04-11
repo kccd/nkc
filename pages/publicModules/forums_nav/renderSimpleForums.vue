@@ -1,15 +1,23 @@
 <template lang="pug">
   .simpleForum-container
     .simpleForum-content(v-for="forum in forums")
-      a.simpleForum-parent-name(:href="getUrl('forumHome', forum.fid)" :data-float-fid="forum.fid") {{forum.displayName}}
+      a.simpleForum-parent-name(:href="getUrl('forumHome', forum.fid)"
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        :data-global-data="objToStr({fid: forum.fid})"
+      ) {{forum.displayName}}
       span.simpleForum-name-box(v-for="(cf, index) in forum.childrenForums")
         span(v-if="index === 0") :
         span(v-else) |
-        a.simpleForum-child-name(:href="getUrl('forumHome', cf.fid)" :data-float-fid="cf.fid" :style="'backgroundColor:' + bgc(cf.color, 0.1)") {{cf.displayName}}
+        a.simpleForum-child-name(:href="getUrl('forumHome', cf.fid)"
+          data-global-mouseover="showForumPanel"
+          data-global-mouseout="hideForumPanel"
+          :data-global-data="objToStr({fid: cf.fid})"
+          :data-float-fid="cf.fid" :style="'backgroundColor:' + bgc(cf.color, 0.1)") {{cf.displayName}}
 </template>
 
 <script>
-import {getUrl} from "../../lib/js/tools";
+import {getUrl, objToStr} from "../../lib/js/tools";
 import hexToRgba from "hex-to-rgba";
 export default {
   props: ["forums"],
@@ -20,6 +28,7 @@ export default {
   mounted() {
   },
   methods: {
+    objToStr: objToStr,
     getUrl: getUrl,
     bgc(color, alpha){
       return hexToRgba(color, alpha);

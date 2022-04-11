@@ -1,3 +1,4 @@
+import {objToStr} from "../../lib/js/tools";
 var app = new Vue({
   el: "#app",
   data: {
@@ -18,6 +19,7 @@ var app = new Vue({
     }, 500)
   },
   methods: {
+    objToStr: objToStr,
     format: NKC.methods.format,
     search: function() {
       // window.location.href = "/e/log/withdraw?t=" + app.t + "&content=" + app.content;

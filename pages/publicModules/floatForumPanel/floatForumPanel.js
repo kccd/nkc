@@ -56,6 +56,7 @@ window.floatForumPanel = new Vue({
         }, 200);
       });
       dom.on("mouseover", async function(e) {
+        console.log('显示用户悬浮框');
         // 鼠标已悬浮在元素上
         clearTimeout(self.timeoutName);
         self.count ++;
@@ -90,6 +91,7 @@ window.floatForumPanel = new Vue({
               clearTimeout(self.timeoutName);
               self.onPanel = true;
             });
+
             const documentWidth = $(document).width() - 10;
 
             const panelWidth = 24 * 12;

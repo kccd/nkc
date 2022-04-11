@@ -43,7 +43,11 @@ block eContent
                   td= rec.email
                   td
                     img(src=tools.getUrl("userAvatar", rec.user.avatar) style="width:40px;height:40;margin-right:10px")
-                    a(href=`/u/${rec.uid}` target="_blank" data-float-uid=rec.uid)= rec.user.username
+                    a(href=`/u/${rec.uid}` target="_blank"
+                      data-global-mouseover="showUserPanel"
+                      data-global-mouseout="hideUserPanel"
+                      data-global-data=objToStr({uid: rec.uid})
+                    )= rec.user.username
                   - let typeChineseName = lang("secretBehaviors", rec.type);
                   td= typeChineseName? `${typeChineseName}(${rec.type})` : rec.type
                   td

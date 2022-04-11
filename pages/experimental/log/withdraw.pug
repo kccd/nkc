@@ -48,7 +48,11 @@ block content
                 th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
                 th {{record._id}}
                 th
-                  a(:href="'/u/' + record.fromUser.uid" target='_blank' :data-float-uid='record.fromUser.uid') {{record.fromUser.username}}
+                  a(:href="'/u/' + record.fromUser.uid" target='_blank'
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    :data-global-data="objToStr({uid: record.fromUser.uid})"
+                  ) {{record.fromUser.username}}
                 th {{record.num/100}}
                 th
                   span(v-if="record.c && record.c.alipayAccount") {{record.c.alipayAccount}}   {{record.c.alipayName}}

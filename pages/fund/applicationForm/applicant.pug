@@ -23,7 +23,9 @@ if !isIncluded('applicant')
             a(
               href=tools.getUrl('userHome', applicant.uid)
               target='_blank'
-              data-float-uid=applicant.uid
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: applicant.uid})
               )=applicant.user.username
           .h5=`真实姓名：${applicant.name}`
           if applicant.idCardNumber
@@ -47,7 +49,9 @@ if !isIncluded('applicant')
                 a(
                   href=tools.getUrl('userHome', m.uid)
                   target='_blank'
-                  data-float-uid=m.uid
+                  data-global-mouseover="showUserPanel"
+                  data-global-mouseout="hideUserPanel"
+                  data-global-data=objToStr({uid: m.uid})
                   )=m.user.username
           else
             .h5=`申请方式：个人`

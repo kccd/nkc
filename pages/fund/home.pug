@@ -52,7 +52,11 @@ block fundContent
                       if !b.user.uid
                         span=b.user.username
                       else
-                        a(data-float-uid=b.user.uid href=tools.getUrl("userHome", b.user.uid) target="_blank")=b.user.username
+                        a(
+                          data-global-mouseover="showUserPanel"
+                          data-global-mouseout="hideUserPanel"
+                          data-global-data=objToStr({uid: b.user.uid})
+                          href=tools.getUrl("userHome", b.user.uid) target="_blank")=b.user.username
                     .time
                       +fromNow(b.time)
                     .fund 赞助&nbsp;

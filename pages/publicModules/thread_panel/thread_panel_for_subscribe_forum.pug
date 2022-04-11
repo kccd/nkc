@@ -8,11 +8,19 @@
       //- 作者信息 专业信息 时间
       .thread-panel-author-info
         if thread.user.uid
-          .thread-panel-author(data-float-uid=thread.user.uid)
+          .thread-panel-author(
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid: thread.user.uid})
+          )
             a(href=`/u/${thread.user.uid}` target="_blank")= thread.user.username
         else
           .thread-panel-author
-            span.anonymous-name= thread.user.username
+            span.anonymous-name(
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: thread.user.uid})
+            )=thread.user.username
 
         .thread-panel-time=fromNow(thread.toc)
 

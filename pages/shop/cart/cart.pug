@@ -23,7 +23,11 @@ block shopContent
                 .order-info
                   button.m-r-05.order-button(onclick=`selectAll(${index})`) 全选
                   .name 卖家：
-                    a.value(href=`/u/${d.user.uid}` data-float-uid=d.user.uid)=d.user.username
+                    a.value(href=`/u/${d.user.uid}`
+                      data-global-mouseover="showUserPanel"
+                      data-global-mouseout="hideUserPanel"
+                      data-global-data=objToStr({uid: d.user.uid})
+                    )=d.user.username
                     a.value(href=`/message?uid=${d.user.uid}` title=`联系买家(${d.user.online ? "在线" : "离线"})` target="_blank")
                       .fa.fa-commenting-o(class=d.user.online ? "active" : "")
             for c, key in d.products

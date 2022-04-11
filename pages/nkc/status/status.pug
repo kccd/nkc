@@ -30,7 +30,11 @@ block nkcContent
         if data.onlineUsersCount > 5000
           h5 最近活动的5000名在线用户
         for targetUser in data.onlineUsers
-          a.m-r-05.m-b-05.display-i-b(href=`/u/${targetUser.uid}` data-float-uid=targetUser.uid)=targetUser.username
+          a.m-r-05.m-b-05.display-i-b(href=`/u/${targetUser.uid}`
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid: targetUser.uid})
+            )=targetUser.username
   .col-xs-12.col-md-12.m-b-1#app(v-cloak)
     h5 操作统计
     .m-b-1

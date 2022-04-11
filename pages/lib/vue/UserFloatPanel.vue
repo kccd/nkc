@@ -323,14 +323,14 @@ export default {
       self.timeout(300)
         .then(() => {
           targetUid = uid || strToObj(dom.attr("data-global-data")).uid;
-          const userObj = self.getUserById(targetUid);
           if(count_ !== self.count) throw "timeout 1";
           if(!self.over) throw "timeout 2";
           left = dom.offset().left;
           top = dom.offset().top;
           width = dom.width();
           height = dom.height();
-          return userObj;
+          return self.getUserById(targetUid);
+          ;
         })
         .then((userObj) => {
           const {user, subscribed} = userObj;

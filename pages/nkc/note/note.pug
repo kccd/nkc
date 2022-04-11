@@ -30,7 +30,11 @@ block nkcContent
               th.text=n.note.content
               th
                 a(href=`/u/${n.user.uid}` target="_blank").user
-                  img(src=tools.getUrl("userAvatar", n.user.avatar) data-float-uid=n.user.uid)
+                  img(src=tools.getUrl("userAvatar", n.user.avatar)
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    data-global-data=objToStr({uid: n.user.uid})
+                  )
                   span=n.user.username
               th.text!=n.html
               th

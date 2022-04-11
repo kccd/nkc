@@ -341,6 +341,7 @@ import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl, fromNow} from "../../../../lib/js/tools";
 import {collectionThread} from "../../../../lib/js/subscribe";
+import {objToStr} from "../../../../lib/js/tools";
 export default {
   data: () => ({
     uid: null,
@@ -367,6 +368,7 @@ export default {
     this.getThreads();
   },
   methods: {
+    objToStr: objToStr,
     getUrl: getUrl,
     fromNow: fromNow,
     threadType(thread) {
