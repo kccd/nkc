@@ -17,15 +17,15 @@
               //.account-user-certs {{targetUser.info.certsName}}
               .account-user-kcb
                 user-scores(ref="userScore" :scores="scores" :xsf="targetUser.xsf" )
-              .account-user-subscribe(v-if="subscribeBtn" :class="subscribeBtn ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
+              .account-user-subscribe(v-if="subscribeBtn" :class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
 
         .account-nav
           .account-nav-box
             .account-nav-left
             .account-nav-middle
-              span(@click="containerChange('moment')") 动态
-              span(@click="containerChange('post')") 社区
-              span(@click="containerChange('subColumns')") 专栏
+              span(@click="containerChange('moment')" :class="{'active': $route.name === 'moment'}") 动态
+              span(@click="containerChange('post')" :class="{'active': $route.name === 'post'}") 社区
+              span(@click="containerChange('subColumns')" :class="{'active': $route.name === 'subColumns'}") 专栏
             .account-nav-right
               div
                 div 关注
@@ -145,9 +145,13 @@
             font-weight: bold;
             position: relative;
             top: -8px;
+            cursor: pointer;
             span{
               display: inline-block;
               padding: 0 30px 0 0;
+              &.active {
+                color: #2b90d9;
+              }
             }
           }
           .account-nav-right{
@@ -245,9 +249,9 @@ export default {
     targetUser: null,
     showBanContext: false,
     scores: null,
-    subscribeBtn:false,
-    subscribeBtnType:false,
-    appStyleType:false,
+    subscribeBtn: false,
+    subscribeBtnType: false,
+    appStyleType: false,
   }),
   components: {
     "user-scores": UserScoresVue,
@@ -364,7 +368,6 @@ export default {
     leave(){
       this.showBanBox = false;
     }
-
   }
 }
 </script>
