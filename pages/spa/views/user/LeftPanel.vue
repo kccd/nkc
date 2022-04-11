@@ -5,7 +5,7 @@
       .m-b-1(v-if="targetUser")
         user-profile-info(ref="userProfileInfo" :target-user="targetUser")
       //用户操作
-      user-operate(:target-user="targetUser")
+      user-operate(:target-user="targetUser" v-if="rolePermissionsType")
       //- 用户链接
       nav-links(ref="userLink" v-if="rolePermissionsType" :nav-links="navLinks")
       //用户关注

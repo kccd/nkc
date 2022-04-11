@@ -64,6 +64,9 @@
   .account-nav{
     display: none;
   }
+  .account-user-banner{
+    margin-bottom: 46px;
+  }
 }
 .user-banner {
   height: auto;
@@ -75,9 +78,11 @@
     width: 100%;
     .account-user-banner-container {
       .account-user-banner {
-        background-size: 100%;
         background-repeat: no-repeat;
         border-radius: 4px;
+        background-size: cover;
+        position: relative;
+        background-position: center center;
         .account-user-info {
           position: relative;
           height: auto;
