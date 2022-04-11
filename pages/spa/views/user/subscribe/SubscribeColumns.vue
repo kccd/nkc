@@ -9,7 +9,7 @@
         .account-follower-content
           .account-follower-name
             .account-follower-buttons
-              button.subscribe(:class="subColumnsId.indexOf(item.column._id)+1 ?'cancel':'focus'" @click="columnFollowType(item.column._id)") {{subColumnsId.indexOf(item.column._id)+1?'取关':'关注'}}
+              button.subscribe(:class="subColumnsId.indexOf(item.column._id)+1 && visitorSubColumnsId.indexOf(item.column._id)+1 ?'cancel':'focus'" @click="columnFollowType(item.column._id)") {{subColumnsId.indexOf(item.column._id)+1 && visitorSubColumnsId.indexOf(item.column._id)+1 ? '取关':'关注'}}
             a(:href="getUrl('columnHome', item.column._id)") {{item.column.name}}
           .account-follower-description {{item.column.description || "暂无简介"}}
 </template>
@@ -102,6 +102,8 @@ export default {
     subscribes: null,
     subColumnsId:null,
     paging: null,
+    visitorSubColumnsId:null,
+    user:null,
   }),
   components: {
     'paging': Paging
@@ -135,8 +137,10 @@ export default {
       nkcAPI(url, 'GET')
       .then(res => {
         self.subscribes = res.subscribes;
-        self.subColumnsId = res.subscribes.map((res)=> res.column._id)
+        self.subColumnsId = res.subscribes.map((res)=> res.column._id);
         self.paging = res.paging;
+        self.visitorSubColumnsId = res.subColumnsId;
+        self.user = res.user;
       })
       .catch(err => {
         sweetError(err);
@@ -149,17 +153,18 @@ export default {
     },
     //取消关注和关注
     columnFollowType(uid) {
-      const sub = !this.subColumnsId.includes(uid);
       const self = this;
-      const index = self.subColumnsId.indexOf(uid);
+      let subIdType = uid !== self.user.uid ? self.visitorSubColumnsId : self.subColumnsId;
+      const sub = !subIdType.includes(uid);
+      const index = subIdType.indexOf(uid);
       subColumn(uid,sub)
           .then((res)=>{
             if(sub) {
               sweetSuccess('关注成功');
-              if(index === -1) self.subColumnsId.push(uid);
+              if(index === -1) subIdType.push(uid);
             } else {
               sweetSuccess('取消关注');
-              if(index !== -1) self.subColumnsId.splice(index, 1);
+              if(index !== -1) subIdType.splice(index, 1);
             }
           })
     },

@@ -7,18 +7,17 @@
     .account-banner(v-if="targetUser" )
       //用户banner容器
       .account-user-banner-container
-        .account-user-banner(:style="`backgroundImage: url('${getUrl('userBanner', targetUser.banner)}')`" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
-          //img(:src="getUrl('userBanner', targetUser.banner)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
-          .account-user-info(:class="showBanBox ? 'app-margin' : 'pc-margin'")
+        .account-user-banner(:style="`backgroundImage: url('${getUrl('userBanner', targetUser.userBanner)}')`" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
+          .account-user-info(:class="appStyleType ? 'app-margin' : 'pc-margin'")
             .account-user-avatar
               img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
             .account-user-introduce
               .account-user-name {{targetUser.username}}
                 user-level(ref="userLevel" :target-user="targetUser")
-              .account-user-certs {{targetUser.info.certsName}}
+              //.account-user-certs {{targetUser.info.certsName}}
               .account-user-kcb
                 user-scores(ref="userScore" :scores="scores" :xsf="targetUser.xsf" )
-              .account-user-subscribe(v-if="subscribeBtn" :class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
+              .account-user-subscribe(v-if="subscribeBtn" :class="subscribeBtn ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
 
         .account-nav
           .account-nav-box
@@ -72,7 +71,7 @@
   .hidden-user-home-tip {
   }
   .account-banner {
-    height: 12rem;
+    //height: 12rem;
     width: 100%;
     .account-user-banner-container {
       .account-user-banner {
@@ -82,6 +81,7 @@
         .account-user-info {
           position: relative;
           height: auto;
+          padding-top: 45px;
           .account-user-avatar {
             position: absolute;
             left: 0;
@@ -247,6 +247,7 @@ export default {
     scores: null,
     subscribeBtn:false,
     subscribeBtnType:false,
+    appStyleType:false,
   }),
   components: {
     "user-scores": UserScoresVue,
@@ -258,9 +259,10 @@ export default {
     this.getPanelData()
     //移动段才能永久显示封禁框
     if(getState && getState.isApp){
-      this.showBanBox = true
+      this.showBanBox = true;
+      this.appStyleType = true;
     }
-    this.scores = this.targetUserScores
+    this.scores = this.targetUserScores;
   },
   methods: {
     objToStr: objToStr,
