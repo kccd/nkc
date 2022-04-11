@@ -1,3 +1,4 @@
+import {objToStr} from "../../lib/js/tools";
 NKC.modules.SurveyForm = function(id) {
   var self = this;
   id = id || "#moduleSurveyForm";
@@ -115,6 +116,7 @@ NKC.modules.SurveyForm = function(id) {
       }
     },
     methods: {
+      objToStr: objToStr,
       format: NKC.methods.format,
       getUrl: NKC.methods.tools.getUrl,
       getColor: NKC.methods.getRandomColor,

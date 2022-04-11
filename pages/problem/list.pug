@@ -56,7 +56,11 @@ block content
                         span=anonymousUserInfo.username
                       else
                         img(src=tools.getUrl('userAvatar', p.user.avatar))
-                        a(href=tools.getUrl('userHome', p.user.uid) data-float-uid=p.user.uid)=p.user.username
+                        a(href=tools.getUrl('userHome', p.user.uid)
+                          data-global-mouseover="showUserPanel"
+                          data-global-mouseout="hideUserPanel"
+                          data-global-data=objToStr({uid: p.user.uid})
+                          )=p.user.username
 
                     th
                       if !p.viewed

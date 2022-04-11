@@ -11,7 +11,9 @@ if !isIncluded('singleCommentTop')
           data-anonymous=!uid
           href=tools.getUrl('userHome', uid)
           target='_blank'
-          data-float-uid=uid
+          data-global-mouseover="showUserPanel"
+          data-global-mouseout="hideUserPanel"
+          data-global-data=objToStr({uid})
         )=username
         if parentUser
           span 评论
@@ -19,7 +21,9 @@ if !isIncluded('singleCommentTop')
             data-anonymous=!parentUser.uid
             href=tools.getUrl('userHome', parentUser.uid)
             target='_blank'
-            data-float-uid=parentUser.uid
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid: headerData.parentUser.uid})
           )=parentUser.username
         span.single-comment-reply-button(onclick=`NKC.methods.switchCommentForm("${pid}")`) 回评
         if digest

@@ -33,7 +33,11 @@ mixin displayForum
       if f.fid !== data.forum.fid
         -displayForumNav = true;
         .thread-panel-forum
-          a(href=`/f/${f.fid}` data-float-fid=f.fid target=aTarget)= f.displayName
+          a(href=`/f/${f.fid}`
+            data-global-mouseover="showForumPanel"
+            data-global-mouseout="hideForumPanel"
+            data-global-data=objToStr({fid: f.fid})
+            target=aTarget)= f.displayName
     if !displayForumNav && thread.categories.length !== 0
       for category in thread.categories
         if data.threadTypesId.includes(category.cid)
@@ -45,7 +49,11 @@ mixin displayForum
       -forum = thread.forums[0];
     if forum
       .thread-panel-forum
-        a(href=`/f/${forum.fid}` data-float-fid=forum.fid target=aTarget)= forum.displayName
+        a(href=`/f/${forum.fid}`
+          data-global-mouseover="showForumPanel"
+          data-global-mouseout="hideForumPanel"
+          data-global-data=objToStr({fid: forum.fid})
+          target=aTarget)= forum.displayName
 
 mixin displayPageCount
   -const pageCount = Math.ceil(thread.count / state.pageSettings.threadPostList)
@@ -100,7 +108,11 @@ mixin displayColumn(columns)
       .thread-panel-content
         .thread-panel-author-info
           if !thread.firstPost.anonymous
-            a.thread-panel-minimalist-avatar(href=`/u/${thread.uid}` target="_blank" data-float-uid=thread.uid)
+            a.thread-panel-minimalist-avatar(href=`/u/${thread.uid}` target="_blank"
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: thread.uid})
+            )
               img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') class=thread.firstPost.user.certs.includes('banned')?'user-banned-avatar':'')
           else
             .thread-panel-minimalist-avatar
@@ -132,7 +144,11 @@ mixin displayColumn(columns)
       .thread-panel-content
         .thread-panel-author-avatar
           if !thread.firstPost.anonymous
-            .thread-panel-author(data-float-uid=thread.uid)
+            .thread-panel-author(
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: thread.uid})
+            )
               a(href=`/u/${thread.uid}` target="_blank")
                 img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') class=thread.firstPost.user.certs.includes('banned')?'user-banned-avatar':'')
           else
@@ -148,7 +164,11 @@ mixin displayColumn(columns)
           +threadCategories
 
           if !thread.firstPost.anonymous
-            .thread-panel-author(data-float-uid=thread.uid)
+            .thread-panel-author(
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: thread.uid})
+            )
               a(
                 href=`/u/${thread.uid}` target="_blank"
               )= thread.firstPost.user.username
@@ -193,7 +213,11 @@ mixin displayColumn(columns)
             .thread-panel-brief-replay
               span.fa.fa-commenting-o
               if !thread.lastPost.anonymous
-                a(href=`/u/${thread.lastPost.uid}` target="_blank" data-float-uid=thread.lastPost.uid)=thread.lastPost.user.username
+                a(href=`/u/${thread.lastPost.uid}` target="_blank"
+                  data-global-mouseover="showUserPanel"
+                  data-global-mouseout="hideUserPanel"
+                  data-global-data=objToStr({uid: thread.lastPost.uid})
+                )=thread.lastPost.user.username
               else
                 span 匿名用户
               | &nbsp;
@@ -211,10 +235,19 @@ mixin displayColumn(columns)
           +checkBox
 
           if !thread.firstPost.anonymous
-            .thread-panel-author(data-float-uid=thread.uid)
-              a(href=`/u/${thread.uid}` target="_blank")
+            .thread-panel-author
+              a(
+                href=`/u/${thread.uid}`
+                target="_blank"
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                data-global-data=objToStr({uid: thread.uid})
+                )
                 img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') class=thread.firstPost.user.certs.includes('banned')?'user-banned-avatar':'')
               a(
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                data-global-data=objToStr({uid: thread.uid})
                 href=`/u/${thread.uid}` target="_blank"
               )= thread.firstPost.user.username
           else
@@ -280,7 +313,11 @@ mixin displayColumn(columns)
                   +fromNow(thread.lastPost.toc)
                   span=`· ${thread.lastPost.c.slice(0, 200)}`
                 if !thread.lastPost.anonymous
-                  a.thread-panel-reply-user(href=`/u/${thread.lastPost.uid}` target="_blank" data-float-uid=thread.lastPost.uid)
+                  a.thread-panel-reply-user(href=`/u/${thread.lastPost.uid}` target="_blank"
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    data-global-data=objToStr({uid: thread.lastPost.uid})
+                  )
                     img(src=tools.getUrl("userAvatar", thread.lastPost.user.avatar, "sm"))
                 else
                   .thread-panel-reply-user

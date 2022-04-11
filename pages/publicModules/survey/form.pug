@@ -95,7 +95,11 @@
         div(v-if="showResult")
           p {{postResult}}
           .form-post-users(v-if='users && users.length')
-            a(onclick="NKC.methods.visitUrl('/u/' + user.uid)" :data-float-uid="user.uid" v-for="user in users")
+            a(onclick="NKC.methods.visitUrl('/u/' + user.uid)"
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              :data-global-data="objToStr({uid: user.uid})"
+              v-for="user in users")
               img(:src="getUrl('userAvatar', user.avatar)")
         //- 时间限制
         p(v-if="timeInfo") {{timeInfo}}

@@ -44,7 +44,11 @@ block content
                     th(style='min-width: 10rem;')
                       img(src=tools.getUrl('userAvatar', a.user.avatar))
                       | &nbsp;
-                      a(href=tools.getUrl('userHome', a.user.uid) data-float-uid=a.user.uid target="_blank")
+                      a(href=tools.getUrl('userHome', a.user.uid)
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        data-global-data=objToStr({uid: a.user.uid})
+                        target="_blank")
                         if a.user.banned
                           del=a.user.username
                         else
@@ -58,7 +62,10 @@ block content
           div.m-b-05
             img.avatar(src=tools.getUrl('userAvatar', data.targetUser.avatar))
             a.m-r-05(
-              href=tools.getUrl('userHome', data.targetUser.uid) data-float-uid=data.targetUser.uid
+              href=tools.getUrl('userHome', data.targetUser.uid)
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: data.targetUser.uid})
               target="_blank"
             )=data.targetUser.username
             span 已使用过的IP：

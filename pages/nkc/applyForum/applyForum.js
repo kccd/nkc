@@ -1,3 +1,4 @@
+import {objToStr} from "../../lib/js/tools";
 const data = NKC.methods.getDataById('data');
 const app = new Vue({
   el: "#app",
@@ -5,6 +6,7 @@ const app = new Vue({
     pForums: data.pForums
   },
   methods: {
+    objToStr: objToStr,
     timeFormat: NKC.methods.tools.timeFormat,
     getUrl: NKC.methods.tools.getUrl,
     agree(f) {

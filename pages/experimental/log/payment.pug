@@ -53,7 +53,11 @@ block eContent
                       span 游客
                     else
                       img.avatar-sm(src=tools.getUrl('userAvatar', r.user.avatar))
-                      a(href=tools.getUrl('userHome', r.user.uid) target="_blank" data-float-uid=r.user.uid)=r.user.username
+                      a(href=tools.getUrl('userHome', r.user.uid) target="_blank"
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        data-global-data=objToStr({uid: r.user.uid})
+                      )=r.user.username
                   th.table-th-sm
                     if r.type === 'transfer'
                       span 收款

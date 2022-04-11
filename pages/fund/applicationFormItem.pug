@@ -19,7 +19,11 @@ if !isIncluded('applicationFormItem')
         .applicant-users
           for u in users
             -var {username, avatar, uid} = u;
-            a.applicant-user(href=tools.getUrl('userHome', uid) data-float-uid=uid target='_blank')
+            a.applicant-user(href=tools.getUrl('userHome', uid) target='_blank'
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid})
+            )
               img(src=tools.getUrl('userAvatar', avatar))
   mixin applicationFormList(arr)
     if arr && arr.length

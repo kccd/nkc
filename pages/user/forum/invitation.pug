@@ -11,7 +11,9 @@ block content
       .col-xs-12.col-md-6.col-md-offset-3#protocol
         h3.m-b-1.text-center 用户
           a(href=tools.getUrl('userHome', data.targetUser.uid) target="_blank"
-          data-float-uid=data.targetUser.uid
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid: data.targetUser.uid})
           )=data.targetUser.username
           | 邀请你成为专业
           strong {{formName}}

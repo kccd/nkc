@@ -1,3 +1,4 @@
+import {objToStr} from "../../../lib/js/tools";
 const data = NKC.methods.getDataById('data');
 const usersObj = {};
 data.users.map(u => {
@@ -25,6 +26,7 @@ const app = new Vue({
     }
   },
   methods: {
+    objToStr: objToStr,
     format: NKC.methods.format,
     getUrl: NKC.methods.tools.getUrl,
     getIpUrl: NKC.methods.tools.getIpUrl,

@@ -40,7 +40,11 @@ div
                       .fa.fa-trash(title="删除" @click="deleteNote(note, n)")
                     .options(v-else)
                       .user
-                        a(@click="visitUrl('/u/' + n.uid, true)" :data-float-uid="n.uid")
+                        a(@click="visitUrl('/u/' + n.uid, true)"
+                          data-global-mouseover="showUserPanel"
+                          data-global-mouseout="hideUserPanel"
+                          :data-global-data="objToStr({uid: n.uid})"
+                        )
                           img(:src="getUrl('userAvatar', n.user.avatar)")
                           span {{n.user.username}}
                     .content

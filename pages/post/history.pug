@@ -38,7 +38,11 @@ block content
                     .user
                       | 发表人：
                       if h.targetUser
-                        a.username(href=`/u/${h.targetUser.uid}` data-float-uid=h.targetUser.uid target="_blank")=h.targetUser.username
+                        a.username(href=`/u/${h.targetUser.uid}`
+                          data-global-mouseover="showUserPanel"
+                          data-global-mouseout="hideUserPanel"
+                          data-global-data=objToStr({uid: h.targetUser.uid})
+                          target="_blank")=h.targetUser.username
                       else
                         span 匿名用户
                       a.m-l-05.pointer.ip(onclick=`NKC.methods.getIpInfo('${h.iplm}')`)=` ${h.iplm}`
@@ -71,7 +75,11 @@ block content
                     .user
                       | 发表人：
                       if h.targetUser
-                        a.username(href=`/u/${h.targetUser.uid}` data-float-uid=h.targetUser.uid target="_blank")=h.targetUser.username
+                        a.username(href=`/u/${h.targetUser.uid}`
+                          data-global-mouseover="showUserPanel"
+                          data-global-mouseout="hideUserPanel"
+                          data-global-data=objToStr({uid: h.targetUser.uid})
+                          target="_blank")=h.targetUser.username
                       else
                         span 匿名用户
                       a.m-l-05.pointer.ip(onclick=`NKC.methods.getIpInfo('${h.iplm}')`)=` ${h.iplm}`

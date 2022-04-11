@@ -9,7 +9,9 @@ if !isIncluded('singleCommentQuote')
           data-anonymous=!uid
           href=tools.getUrl('userHome', uid)
           target="_blank"
-          data-float-uid=uid
+          data-global-mouseover="showUserPanel"
+          data-global-mouseout="hideUserPanel"
+          data-global-data=objToStr({uid})
         )=username
         | 发表于
         a(href=tools.getUrl('article', aid, true) target="_blank")=order

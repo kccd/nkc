@@ -31,7 +31,9 @@ block eContent
                     a(
                       href=tools.getUrl('userHome', filterLog.operator.uid)
                       target="_blank"
-                      data-float-uid=filterLog.operator.uid
+                      data-global-mouseover="showUserPanel"
+                      data-global-mouseout="hideUserPanel"
+                      data-global-data=objToStr({uid: filterLog.operator.uid})
                       )=filterLog.operator.username
                   th
                     if filterLog.status === 'waiting'

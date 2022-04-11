@@ -12,7 +12,11 @@ if creditPost && creditPost.credits && creditPost.credits.length > 0
           span.TPCType=`${data.creditScore.name} `
             |&nbsp;&nbsp;
         span.TPCIA
-          a(href=`/u/${c.fromUser.uid}` style='text-decoration: none;' data-float-uid=c.fromUser.uid)
+          a(href=`/u/${c.fromUser.uid}` style='text-decoration: none;'
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid: c.fromUser.uid})
+          )
             img.TPCIAI(src=tools.getUrl('userAvatar', c.fromUser.avatar, 'sm'))
             span.TPCIssuer &nbsp;#{c.fromUser.username} &nbsp;&nbsp;
         span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;

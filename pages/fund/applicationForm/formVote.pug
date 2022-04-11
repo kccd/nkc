@@ -24,7 +24,9 @@ if !isIncluded('formVote')
               a.m-r-05(
                 href=tools.getUrl('userHome', u.uid)
                 target="_blank"
-                data-float-uid=u.uid
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                data-global-data=objToStr({uid: u.uid})
                 )=u.username
       if form.objectors && form.objectors.length > 0
         .m-b-1
@@ -34,7 +36,9 @@ if !isIncluded('formVote')
               a.m-r-05(
                 href=tools.getUrl('userHome', u.uid)
                 target="_blank"
-                data-float-uid=u.uid
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                data-global-data=objToStr({uid: u.uid})
               )=u.username
   script.
     function formVote(formId) {
