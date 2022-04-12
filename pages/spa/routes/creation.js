@@ -84,7 +84,7 @@ export default [
       {name: routesName.creationCategories, path: '/creation/categories', component: Categories},
       {name: routesName.creationDrafts, path: '/creation/drafts', component: Drafts},
       {name: routesName.creationColumnArticleEditor, path: '/creation/editor/column', component: ColumnArticleEditor},
-      {name: routesName.creationCommunityThreadEditor, path: '/creation/editor/community', component: CommunityThreadEditor},
+      {name: routesName.creationCommunityThreadEditor, path: '/creation/editor/community', component: CommunityThreadEditor, meta: {keepAlive: true}},
       {
         name: routesName.creationZoneEditor,
         path: '/creation/editor/zone',

@@ -110,8 +110,8 @@
 <script>
 import { EventBus } from "../../eventBus.js";
 import { sweetQuestion } from "../../../lib/js/sweetAlert";
-import {saveToSessionStorage, getFromSessionStorage, updateInSessionStorage, sessionStorageKeys} from "../../../lib/js/sessionStorage";
-import { scrollFun } from '../../../lib/js/scrollBar'
+// import {saveToSessionStorage, getFromSessionStorage, updateInSessionStorage, sessionStorageKeys} from "../../../lib/js/sessionStorage";
+// import { scrollFun } from '../../../lib/js/scrollBar'
 export default {
   name: "Tree",
   props: {
@@ -158,10 +158,10 @@ export default {
   created(){
   },
   mounted(){
-    window.onbeforeunload = function(){
-      saveToSessionStorage(sessionStorageKeys.scrollTop, 0)
-    }
-    scrollFun(window, getFromSessionStorage(sessionStorageKeys.scrollTop), 0)
+    // window.onbeforeunload = function(){
+    //   saveToSessionStorage(sessionStorageKeys.scrollTop, 0)
+    // }
+    // scrollFun(window, getFromSessionStorage(sessionStorageKeys.scrollTop), 0)
   },
   methods: {
     editor(data, childIndex) {
@@ -254,7 +254,7 @@ export default {
       } else if (data.type === "post") {
         window.open(data.url);
       } else {
-        saveToSessionStorage(sessionStorageKeys.scrollTop, document.documentElement.scrollTop)
+        // saveToSessionStorage(sessionStorageKeys.scrollTop, document.documentElement.scrollTop)
         // childIndex 当文章进行发布时用于确定位置
         this.navToPage("articleEditor", { bid, aid, childIndex });
       }

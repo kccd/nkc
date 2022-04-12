@@ -64,7 +64,9 @@ export default {
     author: {
       immediate: true,
       handler(n) {
-        this.authorInfos = [] || n;
+        if(typeof n !== "undefined"){
+          this.authorInfos = [...n] || [];
+        }
       }
     },
   },

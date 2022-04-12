@@ -58,7 +58,6 @@
       },
       selectNav(nav) {
         const {type} = nav;
-        console.log(`select nav:`, type);
         this.$router.replace({
           name: type,
         });

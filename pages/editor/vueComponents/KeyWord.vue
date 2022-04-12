@@ -79,7 +79,7 @@
 </template>
 
 <script>
-// import { DraggableElement } from "../../lib/js/draggable";
+import { DraggableElement } from "../../lib/js/draggable";
 
 export default {
   data: () => ({
@@ -110,38 +110,46 @@ export default {
     }
   },
   watch: {
-    keywords(n, o) {
-      this.$set(this.data[0], "value", (n.cn && n.cn.join(",")) || "");
-      this.$set(this.data[1], "value", (n.en && n.en.join(",")) || "");
-      this.submit();
+    keywords: {
+      immediate: true,
+      handler(n){
+        if(typeof n !== "undefined"){
+          this.$set(this.data[0], "value", (n.cn && n.cn.join(",")) || "");
+          this.$set(this.data[1], "value", (n.en && n.en.join(",")) || "");
+          this.submit();
+        }
+        
+      }
+      
     }
   },
   methods: {
     close() {
       this.showModel = false;
-      this.data = [
-        {
-          label: "中文，添加多个请以逗号分隔",
-          dom: "textarea",
-          value: ""
-        },
-        {
-          label: "英文，添加多个请以逗号分隔",
-          dom: "textarea",
-          value: ""
-        }
-      ];
+      // this.data = [
+      //   {
+      //     label: "中文，添加多个请以逗号分隔",
+      //     dom: "textarea",
+      //     value: ""
+      //   },
+      //   {
+      //     label: "英文，添加多个请以逗号分隔",
+      //     dom: "textarea",
+      //     value: ""
+      //   }
+      // ];
     },
     open() {
       this.showModel = true;
       // this.$forcedUpdate()
       // console.log(this.$el)
-      // this.draggableElement = new DraggableElement(
-      //   this.$refs.model,
-      //   this.$refs.addKeyword
-      // );
-      //     this.draggableElement.show();
-
+      // 等待v-if dom加载完成
+      this.$nextTick(()=>{
+        this.draggableElement = new DraggableElement(
+        this.$refs.model,
+        this.$refs.addKeyword
+      );
+      })
     },
     submit() {
       this.keyWordsEn = [];
@@ -221,6 +229,7 @@ export default {
 }
 
 .modal-title {
+  cursor: move;
   text-align: center;
   height: 4rem;
   color: #282c37;

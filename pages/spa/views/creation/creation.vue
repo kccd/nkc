@@ -7,7 +7,9 @@
     .creation-content-container
       transition(:name="transitionName")
         home(v-if="showHome")
-        router-view(v-if="isRouterAlive")
+        //- 浏览器返回上一个页面时缓存提交时的状态，需要在路由为组件配置才能生效
+        keep-alive
+          router-view(v-if="isRouterAlive")
 </template>
 <script>
 import VerNav from "../../components/VerNav";

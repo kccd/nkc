@@ -7,8 +7,7 @@
       article-title(
         ref="title",
         :data="pageData",
-        :notice="pageState.editorSettings && pageState.editorSettings.onEditNotes || ''"
-        
+        :notice="(pageState.editorSettings && pageState.editorSettings.onEditNotes) || ''"
       )
       //- @content-change="contentChange"
       //- 1. @content-change 编辑器内容改变触发 2. c 编辑器内容  newPost
@@ -17,68 +16,59 @@
         :c="pageData.post && pageData.post.c",
         @content-change="contentChange"
       ) 
-      .m-b-2(v-if='!["newPost", "modifyThread", "modifyPost"].includes(pageData.type)')
+      .m-b-2(
+        v-if="!['newPost', 'modifyThread', 'modifyPost'].includes(pageData.type)"
+      )
         //- 1. @selected-forumids 选择的主分类后id给提交组件 2. data 包含 threadCategories minorForumCount mainForums 
         classification(
           ref="classification",
           :data="pageData",
-          @selected-forumids="selectedForumIds",
-          
+          @selected-forumids="selectedForumIds"
         )
       .m-b-2(v-if="!hideType.includes(pageData.type)")
         //- 1.value 封面图值
-        cover(
-          ref="cover",
-          :value="pageData.post && pageData.post.cover"
-        )
+        cover(ref="cover", :value="pageData.post && pageData.post.cover")
       .m-b-2(v-if="!hideType.includes(pageData.type)")
         //- 1 abstract 中英文摘要
         abstract(
           ref="abstract",
-          :abstract= " {cn:pageData.post && pageData.post.abstractCn, en:pageData.post &&pageData.post.abstractEn}"
+          :abstract="{ cn: pageData.post && pageData.post.abstractCn, en: pageData.post && pageData.post.abstractEn }"
         )
       .m-b-2(v-if="!hideType.includes(pageData.type)")
         //- 1.keywords 中英文关键字
         key-word(
           ref="keyWord",
-          :keywords= "{cn:pageData.post && pageData.post.keyWordsCn, en:pageData.post && pageData.post.keyWordsEn}",
+          :keywords="{ cn: pageData.post && pageData.post.keyWordsCn, en: pageData.post && pageData.post.keyWordsEn }"
         )
       .m-b-2(v-if="!hideType.includes(pageData.type)")
         //- 1.author 作者信息
         author-info(
           ref="authorInfo",
-          :author= "pageData.post && pageData.post.authorInfos"
-          :a = undefined
+          :author="pageData.post && pageData.post.authorInfos"
         )
       .m-b-2(v-if="!hideType.includes(pageData.type)")
         //- 1.original 包含最小字数和文章状态
         original(
           ref="original",
-          :original="{wordLimit: pageData.originalWordLimit, state: pageData.post && pageData.post.originState}",
-          
+          :original="{ wordLimit: pageData.originalWordLimit, state: pageData.post && pageData.post.originState }"
         )
       .m-b-2(v-if="!hideType.includes(pageData.type)")
         //- 1.data包含 createSurveyPermission type post.surveyId
-        investigation(
-          ref="investigation",
-          :data="pageData" 
-          
-        )
+        investigation(ref="investigation", :data="pageData")
       .m-b-2
         //- 1.state  
         column(
           ref="column",
-          :state="{userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column:pageState.userColumn }" 
-          :data="{addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn}"
+          :state="{ userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column: pageState.userColumn }",
+          :data="{ addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn }"
         )
   .col-xs-12.col-md-3.box-shadow-panel 
-    
     //- 1.notice 温馨提示的内容  2.data 中只需要post therad type forum allowedAnonymousForumsId havePermissionToSendAnonymousPost threadCategories
     //- 3.@ready-data 提交 和 保存时用于获取数据并提交 4.@remove-editor 提交后移除编辑器
     modify-submit(
       ref="submit",
-      :notice="pageState.editorSettings && pageState.editorSettings.notes" 
-      :data="pageData"
+      :notice="pageState.editorSettings && pageState.editorSettings.notes",
+      :data="pageData",
       @ready-data="readyData",
       @remove-editor="removeEditor"
     )
@@ -112,52 +102,40 @@ export default {
     "author-info": AuthorInfo,
     original: Original,
     investigation: Investigation,
-    column: Column
+    column: Column,
   },
   data: () => ({
     hideType: ["newPost", "modifyPost"],
     pageData: {},
-    pageState: {}
+    pageState: {},
   }),
 
   created() {
-    let search= this.$route?.query;
+    let search = this.$route?.query;
     let url = `/editor/data`;
     // 如果后台给了数据就用后台的 否则读取浏览器地址
     if (reqUrl && reqUrl.type && reqUrl.id) {
       url = `/editor/data?type=${reqUrl.type}&id=${reqUrl.id}`;
-    }else if(search && search.type && search.id){
+    } else if (search && search.type && search.id) {
       url = `/editor/data?type=${search.type}&id=${search.id}`;
     }
     nkcAPI(url, "get")
-      .then(resData => {
+      .then((resData) => {
         this.pageData = resData;
         this.pageState = resData.state;
       })
-      .catch(err => {
-        sweetError(err)
+      .catch((err) => {
+        sweetError(err);
       });
-
-    window.addEventListener('pageshow',this.clearCache)
   },
-  destroyed(){
-    window.removeEventListener("pageshow", this.clearCache)
+  destroyed() {
     this.pageData = {};
     this.pageState = {};
   },
+  updated() {
+    // console.log('更新了吗')
+  },
   methods: {
-    clearCache(event){
-      if(event.persisted || window.performance && window.performance.navigation.type === 2){
-        // 清除缓存
-        // $(".editor-title").val('');
-        $(".abstract-cn").val('');
-        $(".abstract-en").val('');
-        // console.log('有缓存', this.$refs.title.$forceUpdate)
-        // console.log('设置默认')
-        $('.agreement').prop('checked', true);
-      }
-    
-    },
     // 控制 提交组件 是否可选匿名发表
     selectedForumIds(ids) {
       this.$refs.submit.checkAnonymous(ids);
@@ -186,30 +164,81 @@ export default {
         if (refs.hasOwnProperty(key)) {
           const vue = refs[key];
           // console.log(vue && vue.getData(),'vue')
-          Object.assign(submitData, vue && vue.getData());                                                                                                    
+          Object.assign(submitData, vue && vue.getData());
         }
       }
       // 添加 草稿id 和 parentPostId
       submitData["did"] = this.pageData.draftId;
       submitData["parentPostId"] = this.pageData.parentPostId;
       submitFn(submitData);
-
-    }
+    },
   },
 };
 </script>
 
 <style scoped>
+.col-md-9 {
+  position: relative;
+  min-height: 1px;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+.box-shadow-panel > div {
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 3px;
+}
+@media (max-width: 991px) {
+  .col-md-9 {
+    width: 75%;
+  }
+  .col-md-3 {
+    width: 25%;
+  }
+  .box-shadow-panel {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .box-shadow-panel > * {
+    border-radius: 0;
+  }
+  .col-xs-6 {
+    position: relative;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+    width: 50%;
+    float: left;
+  }
+  .col-xs-12 {
+  float: left;
+  width: 100%;
+  position: relative;
+  min-height: 1px;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+}
+.m-b-2 {
+  margin-bottom: 2rem;
+}
+
+
+.m-b-05 {
+  margin-bottom: 0.5rem !important;
+}
 @media screen and (max-width: 1000px) {
-  .editor{
+  .editor {
     padding: auto 15px;
   }
 }
-.row{
+.row {
   width: 100%;
 }
-.box-shadow-panel:after, .editor:after{
-  content: '';
+.box-shadow-panel:after,
+.editor:after {
+  content: "";
   display: block;
   clear: both;
 }
