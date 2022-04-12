@@ -95,7 +95,8 @@ export default {
           name: '片段创作',
           page: 'draftEditor'
         }
-      ]
+      ],
+      editorInitOk: false
     }
   },
   mounted() {
@@ -113,8 +114,20 @@ export default {
           id: this.draftId,
         }
       })
-    }
+    },
+    $route(to){
+      if(to.path === "/creation/drafts"){
+        this.$refs.documentEditor.removeNoticeEvent()
+      }else if(to.path === "/creation/editor/draft"){
+        // console.log("进入编辑器")
+        if(this.editorInitOk){
+          this.initId();
+          this.initData()
+        }
+      }
+    },
   },
+  
   computed: {
     type() {
       return this.draftId? 'modify': 'create'
@@ -127,6 +140,7 @@ export default {
       });
     },
     editorReady() {
+      this.editorInitOk = true;
       this.initData();
     },
     //获取ID

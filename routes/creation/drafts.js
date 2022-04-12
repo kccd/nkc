@@ -11,7 +11,7 @@ router
     };
     const count = await db.CreationDraftsModel.countDocuments(queryMap);
     const paging = nkcModules.apiFunction.paging(page, count, quota);
-    const drafts = await db.CreationDraftsModel.find(queryMap).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    const drafts = await db.CreationDraftsModel.find(queryMap).sort({toc: -1}).skip(paging.start).limit(Number(paging.perpage));
     data.draftsData = await db.CreationDraftsModel.extentDraftsData(drafts);
     data.paging = paging;
     await next();
