@@ -80,6 +80,16 @@
       resize: none;
     }
   }
+  @media(max-width: 568px) {
+    .socket-container{
+      width: 100%!important;
+      height: 100%!important;
+      max-width: 100%!important;
+      max-height: 100%!important;
+      left: 0;
+      top: 0;
+    }
+  }
 
 
   .message-container{

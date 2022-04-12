@@ -4,7 +4,7 @@
   @params {Array} authorInfos 文章作者
 
   @params {String} uid 用户id
-  @params {String} userAvatar 
+  @params {String} userAvatar
 
   @params {String} toc  文章创建时间
   @params {String} originState  文章源
@@ -26,10 +26,14 @@ mixin title(data)
         for authorInfo in authorInfos
           span.common-article-author=authorInfo.agency
     .common-article-info
-      a.common-article-author.jump.m-r-1(href=`/u/${uid}` target="_blank" data-float-uid=`${uid}`)
+      a.common-article-author.jump.m-r-1(href=`/u/${uid}` target="_blank"
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        data-global-data=objToStr({uid})
+      )
         img(src=tools.getUrl('userAvatar', userAvatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
         if authorInfos && authorInfos[0]
-          span.kcid=authorInfos[0].kcid 
+          span.kcid=authorInfos[0].kcid
       span.modify-time.m-r-1=toc
       if ['3','4','5','6'].includes(originState)
         span#dropdown.m-r-1.origin.fa.fa-caret-square-o-down.origin-icon.dropdown(onclick="originTitle()") 原创

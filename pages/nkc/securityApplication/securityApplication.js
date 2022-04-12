@@ -1,3 +1,4 @@
+import {objToStr} from "../../lib/js/tools";
 const data = NKC.methods.getDataById('data');
 data.applications.map(a => {
   a._status = 'pending';
@@ -8,6 +9,7 @@ const app = new Vue({
     applications: data.applications,
   },
   methods: {
+    objToStr: objToStr,
     fromNow: NKC.methods.fromNow,
     timeFormat: NKC.methods.timeFormat,
     getUrl: NKC.methods.tools.getUrl,

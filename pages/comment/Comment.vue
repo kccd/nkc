@@ -7,12 +7,10 @@
       @display-ip-info="displayIpInfo"
       @view-violation="viewViolation"
       )
-    float-user-panel(ref="floatUserPanel" @open-subscribe="openSubscribe")
     sticker(ref="sticker")
     violation-record(ref="violationRecord")
     complaint(ref="complaint")
     disabled-comment(ref="disabledComment")
-    subscribe-types(ref="subscribeTypes")
     mixin skeleton
       .comment-item
         .comment-item-header
@@ -58,12 +56,20 @@
               | 按钮。
               a(href=`/review` target="_blank") 待审核列表
         .comment-item-header
-          .comment-item-avatar(:data-float-uid="comment.user.uid")
+          .comment-item-avatar(
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            :data-global-data="objToStr({uid: comment.quote.uid})"
+          )
             img(:src="comment.user.avatar")
           .comment-item-info
-            .comment-item-username
+            .comment-item-username(
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              :data-global-data="objToStr({uid: comment.quote.uid})"
+            )
               span(v-if="!comment.user.userHome") {{comment.user.username}}
-              a(v-else :href="comment.user.userHome" :data-float-uid="comment.user.uid") {{comment.user.username}}
+              a(v-else :href="comment.user.userHome") {{comment.user.username}}
             .comment-item-time {{timeFormat(comment.toc)}}
           .comment-item-floor
             span {{comment.order}}楼
@@ -73,7 +79,9 @@
             a(
               :href="comment.quote.userHome"
               target="_blank"
-              :data-float-uid="comment.quote.uid"
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              :data-global-data="objToStr({uid: comment.quote.uid})"
             ) {{comment.quote.username}}
             | &nbsp;发表于&nbsp;
             span {{comment.quote.order}}
@@ -263,20 +271,19 @@
 </style>
 
 <script>
-  import CommentEditor from "../lib/vue/comment/CommentEditor";
   import {nkcAPI} from "../lib/js/netAPI";
   import {getUrl, timeFormat} from "../lib/js/tools";
   import {replaceNKCRender} from "../lib/js/replaceNKCRender";
+  import {screenTopAlert} from "../lib/js/topAlert";
+  import {objToStr} from "../lib/js/tools";
+  import CommentEditor from "../lib/vue/comment/CommentEditor";
   import CommentOptions from "./CommentOptions";
   import CommentPostEditor from "../lib/vue/comment/CommentPostEditor";
   import Complaint from "../lib/vue/Complaint";
   import DisabledComment from "../lib/vue/DisabledComment";
   import ViolationRecord from "../lib/vue/ViolationRecord";
-  import {screenTopAlert} from "../lib/js/topAlert";
-  import FloatUserPanel from "../lib/vue/FloatUserPanel";
   import Sticker from "../lib/vue/Sticker";
   import ImageViewer from "../lib/vue/ImageViewer";
-  import SubscribeTypes from "../lib/vue/SubscribeTypes";
   export default {
     props: ['source', 'sid'],
     data: () => ({
@@ -297,15 +304,14 @@
       complaint: Complaint,
       "disabled-comment": DisabledComment,
       "violation-record": ViolationRecord,
-      "float-user-panel": FloatUserPanel,
       sticker: Sticker,
       "image-viewer": ImageViewer,
-      "subscribe-types": SubscribeTypes
     },
     mounted() {
       this.getComments();
     },
     methods: {
+      objToStr: objToStr,
       getUrl: getUrl,
       timeFormat: timeFormat,
       replaceNKCUrl: replaceNKCRender,
@@ -435,12 +441,6 @@
           sweetError(err);
         })
       },
-      //打开关注分类
-      openSubscribe(options) {
-        const {uid, subscribed} = options;
-        if(!uid) return;
-        this.$refs.subscribeTypes.subscribeUser(uid, subscribed);
-      }
     }
 }
 </script>

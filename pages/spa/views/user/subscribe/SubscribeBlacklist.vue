@@ -1,6 +1,5 @@
 <template lang="pug">
   .subscribe-black-list(v-if="targetUser")
-    float-user-panel(ref="floatUserPanel")
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     .null(v-if="!bl" ) 空空如也~~
     .black-list-box(v-else)
@@ -104,7 +103,6 @@ import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl,fromNow} from "../../../../lib/js/tools";
 import {removeUserFromBlacklist} from "../../../../lib/js/subscribe";
 import {objToStr} from "../../../../lib/js/tools";
-import floatUserPanel from "../../../../lib/vue/FloatUserPanel";
 import Paging from "../../../../lib/vue/Paging";
 export default {
   data: () => ({
@@ -114,7 +112,6 @@ export default {
     paging: null,
   }),
   components: {
-    "float-user-panel":floatUserPanel,
     'paging': Paging
   },
   mounted() {

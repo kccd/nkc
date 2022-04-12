@@ -5,7 +5,11 @@ if !isIncluded('activeUsers')
       .panel-header=name || '最近活跃用户'
       div
         for u in users
-          .active-user-avatar(data-float-uid=u.uid)
+          .active-user-avatar(
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid: u.uid})
+            )
             a(href=`/u/${u.uid}` target="_blank")
               img(src=tools.getUrl('userAvatar', u.avatar))
 
@@ -14,7 +18,11 @@ if !isIncluded('activeUsers')
       .panel-header=name || '最近活跃用户'
       .active-users
         for u in users
-          a(href=`/u/${u.uid}` data-float-uid=u.uid target="_blank").active-user
+          a(href=`/u/${u.uid}`
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid: u.uid})
+            target="_blank").active-user
             .active-user-avatar
               img(src=tools.getUrl("userAvatar", u.avatar))
             .active-user-name=u.username

@@ -5,16 +5,19 @@
       .m-b-1(v-if="targetUser")
         user-profile-info(ref="userProfileInfo" :target-user="targetUser")
       //用户操作
-      user-operate(:target-user="targetUser")
+      .m-b-1(v-if="isSelf")
+        user-operate(:target-user="targetUser")
       //- 用户链接
-      nav-links(ref="userLink" v-if="rolePermissionsType" :nav-links="navLinks")
+      .m-b-1(v-if="isSelf")
+        nav-links(ref="userLink" v-if="rolePermissionsType" :nav-links="navLinks")
       //用户关注
       //.m-b-1(v-if="rolePermissionsType" )
       //  user-focus-on(ref="userFocusOn")
-      user-manage(ref="userManage")
+      .m-b-1
+        user-manage(ref="userManage")
       //  分享链接
-      share(ref="share" share-type="user" :share-title="targetUser.username || targetUser.uid" :share-id="targetUser.uid" :share-description="targetUser.description" :share-avatar="targetUser.avatar")
-
+      .m-b-1
+        share(ref="share" share-type="user" :share-title="targetUser.username || targetUser.uid" :share-id="targetUser.uid" :share-description="targetUser.description" :share-avatar="targetUser.avatar")
 
 </template>
 <style lang="less">
@@ -34,6 +37,8 @@ export default {
   props: ['nav-links', 'target-user'],
   data: () => ({
     rolePermissionsType: null,
+    targetUid: '',
+    uid: getState().uid,
   }),
   created() {
     this.rolePermissionsType = this.rolePermissions
@@ -45,6 +50,10 @@ export default {
       }else{
         return false
       }
+    },
+    isSelf() {
+      const {uid, targetUid} = this;
+      return targetUid === uid;
     }
   },
   components: {
@@ -55,8 +64,14 @@ export default {
     "user-profile-info": UserProfileInfo,
     "user-operate": UserOperate
   },
+  mounted() {
+    this.initData();
+  },
   methods: {
-
+    initData() {
+      const {uid} = this.$route.params;
+      this.targetUid = uid;
+    }
   }
 }
 </script>

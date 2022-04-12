@@ -1,5 +1,5 @@
 <template lang="pug">
-  .account-url.m-b-1
+  .account-url
     .account-link(v-if="navLink" v-for="navLink in navLinks")
       .panel-header(v-if="navLink.name") {{navLink.name}}
       .account-lis

@@ -1,3 +1,4 @@
+import {objToStr} from "../../lib/js/tools";
 const data = NKC.methods.getDataById("data");
 data.stickers.map(s => {
   if(s.reviewed === null) {
@@ -17,6 +18,7 @@ const app = new Vue({
     NKC.methods.initImageViewer(".sticker-image")
   },
   methods: {
+    objToStr: objToStr,
     getUrl: NKC.methods.tools.getUrl,
     format: NKC.methods.format,
     visitUrl: NKC.methods.visitUrl,

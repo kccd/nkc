@@ -9,6 +9,9 @@
             :href="`/f/${f.fid}`"
             :style="`background-color: ${f.color || '#808080'}`"
             :title="f.description"
+            data-global-mouseover="showForumPanel"
+            data-global-mouseout="hideForumPanel"
+            :data-global-data="objToStr({fid: f.fid})"
           ).topic-item
             img(v-if="f.logo" :src="getUrl('forumLogo', f.logo)")
             span {{f.displayName}}
@@ -25,13 +28,14 @@
 </style>
 <script>
 import {getUrl} from "../../../../lib/js/tools";
-
+import {objToStr} from "../../../../lib/js/tools";
 export default {
   props: ['forums'],
   data: () => ({
 
   }),
   methods: {
+    objToStr: objToStr,
     getUrl: getUrl,
   }
 }

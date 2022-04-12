@@ -6,7 +6,9 @@ if !isIncluded('formBriefInfo')
       a(
         href=tools.getUrl('userHome', form.applicant.user.uid)
         target="_blank"
-        data-float-uid=form.applicant.uid
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        data-global-data=objToStr({uid: form.applicant.uid})
         )=form.applicant.user.username
     if form.members && form.members.length > 0
       h5=`组员：`
@@ -16,5 +18,7 @@ if !isIncluded('formBriefInfo')
           a(
             href=tools.getUrl('userHome', u.user.uid)
             target="_blank"
-            data-float-uid=u.user.uid
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid: u.user.uid})
           )=u.user.username

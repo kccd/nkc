@@ -1,11 +1,11 @@
-export function subForum(id, sub, cid) {
+export function subForum(fid, sub, cid) {
   let method;
   if(sub) {
     method = "POST";
   } else {
     method = "DELETE";
   }
-  return nkcAPI('/f/' + id + '/subscribe', method, {cid: cid || []})
+  return nkcAPI('/f/' + fid + '/subscribe', method, {cid: cid || []})
 };
 
 /*

@@ -7,7 +7,7 @@
     router-view
     //user-card(ref="userCard")
   //用户右侧面板
-  right-panel(:forums="forums" :target-user="targetUser")
+  right-panel(:forums="forums" :target-user="targetUser" :target-user-fans="targetUserFans" :target-user-followers="targetUserFollowers" )
 </template>
 <style lang="less">
 @import "../../../publicModules/base";
@@ -22,7 +22,7 @@ import {getColumnInfo} from "../../../lib/js/column";
 import LeftPanel from "./LeftPanel";
 import RightPanel from "./RightPanel";
 export default {
-  props: ['navLinks', 'target-user', 'type', 'forums'],
+  props: ['navLinks', 'target-user', 'type', 'forums', "targetUserFans", "targetUserFollowers"],
   data: () => ({
     targetColumn: getColumnInfo(),
   }),

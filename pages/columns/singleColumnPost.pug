@@ -12,7 +12,11 @@ if thread
       if type === "post"
         .column-post-content.post
           if !post.anonymous
-            a.column-thread-author(href=`/u/${post.uid}` target="_blank" data-float-uid=post.uid)
+            a.column-thread-author(href=`/u/${post.uid}` target="_blank"
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: post.uid})
+            )
               span=post.user.username
           else
             span.anonymous-name=anonymousInfo.username
@@ -32,7 +36,11 @@ if thread
         if post
           if !data.column || data.column.uid !== post.uid
             if !thread.firstPost.anonymous
-              a(href=`/u/${thread.firstPost.uid}` target="_blank" data-float-uid=thread.firstPost.uid).column-post-author
+              a(href=`/u/${thread.firstPost.uid}` target="_blank"
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                data-global-data=objToStr({uid: thread.firstPost.uid})
+              ).column-post-author
                 img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm'))
                 span=thread.firstPost.user.username
             else

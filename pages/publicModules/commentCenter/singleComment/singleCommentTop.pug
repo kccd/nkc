@@ -4,7 +4,9 @@ if !isIncluded('singleCommentTop')
     -var {reason, reviewed, isAuthor, order, tlm} = props;
     .single-post-top
       .single-post-avatar(
-        data-float-uid=uid
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        data-global-data=objToStr({uid})
         )
         img(src=avatar class=banned ? 'user-banned-avatar':'')
       .single-post-user
@@ -13,7 +15,9 @@ if !isIncluded('singleCommentTop')
             data-anonymous=!uid
             href=tools.getUrl('userHome', uid)
             target='_blank'
-            data-float-uid=uid
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid})
           )=username
           include ../../../user/grade
           +userGrade(gradeId, gradeName)

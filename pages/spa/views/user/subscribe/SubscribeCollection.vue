@@ -25,7 +25,11 @@
               a.thread-forum-link(:href="`/f/${subscribe.thread.forums[0].fid}`" target="_blank") {{subscribe.thread.forums[0].displayName}}
               span(v-if="subscribe.thread.firstPost.anonymous") 匿名
               a.thread-user(:href="`/u/${subscribe.thread.uid}`" v-else)
-                img(:src="getUrl('userAvatar', subscribe.thread.firstPost.user.avatar)" :data-float-uid="subscribe.thread.uid")
+                img(:src="getUrl('userAvatar', subscribe.thread.firstPost.user.avatar)"
+                  data-global-mouseover="showUserPanel"
+                  data-global-mouseout="hideUserPanel"
+                  :data-global-data="objToStr({uid: subscribe.thread.uid})"
+                )
                 span {{subscribe.thread.firstPost.user.username}}
               .thread-thumbup(v-if="subscribe.thread.firstPost.voteUp")
                 .fa.fa-thumbs-up
@@ -337,6 +341,7 @@ import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl, fromNow} from "../../../../lib/js/tools";
 import {collectionThread} from "../../../../lib/js/subscribe";
+import {objToStr} from "../../../../lib/js/tools";
 export default {
   data: () => ({
     uid: null,
@@ -363,6 +368,7 @@ export default {
     this.getThreads();
   },
   methods: {
+    objToStr: objToStr,
     getUrl: getUrl,
     fromNow: fromNow,
     threadType(thread) {

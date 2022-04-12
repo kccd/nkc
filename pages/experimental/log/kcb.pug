@@ -64,10 +64,18 @@ block eContent
 
                 th
                   span(v-if='record.from === "bank"')=data.nkcBankName
-                  a(:href="'/u/' + record.fromUser.uid" v-else target='_blank' :data-float-uid='record.fromUser.uid') {{record.fromUser.username}}
+                  a(:href="'/u/' + record.fromUser.uid" v-else target='_blank'
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    :data-global-data="objToStr({uid: record.fromUser.uid})"
+                  ) {{record.fromUser.username}}
                 th
                   span(v-if='record.to === "bank"')=data.nkcBankName
-                  a(:href="'/u/' + record.toUser.uid" v-else target='_blank' :data-float-uid='record.toUser.uid') {{record.toUser.username}}
+                  a(:href="'/u/' + record.toUser.uid" v-else target='_blank'
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    :data-global-data="objToStr({uid: record.toUser.uid})"
+                  ) {{record.toUser.username}}
                 th {{record.num>0?'+':''}}{{record.num/100}}
                 th {{record.description}}
                   span.text-danger {{record.hideDescription?"【已屏蔽】":""}}

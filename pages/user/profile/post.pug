@@ -31,7 +31,11 @@ div
             img(src=anonymousInfo.avatar)
             span=anonymousInfo.username
           else
-            a(href=`/u/${parentPost.uid}` data-float-uid=parentPost.uid)
+            a(href=`/u/${parentPost.uid}`
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: parentPost.uid})
+            )
               img(src=tools.getUrl("userAvatar", parentPost.user.avatar, "sm"))
               span=parentPost.user.username
           span ：

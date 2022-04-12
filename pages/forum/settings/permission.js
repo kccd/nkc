@@ -1,3 +1,4 @@
+import {objToStr} from "../../lib/js/tools";
 const data = NKC.methods.getDataById('data');
 const selectUser = new NKC.modules.SelectUser();
 const app = new Vue({
@@ -36,6 +37,7 @@ const app = new Vue({
     this.initUserPanel();
   },
   methods: {
+    objToStr: objToStr,
     initUserPanel() {
       setTimeout(() => {
         window.floatUserPanel.initPanel();

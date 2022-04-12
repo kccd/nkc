@@ -44,7 +44,7 @@ module.exports = async (ctx, next) => {
     q.reviewed = true;
   }
   const count = await db.ThreadModel.countDocuments(q);
-  paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList);
+  const paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList);
   let threads = await db.ThreadModel.find(q, {
     tid: 1,
     hasCover: 1,
@@ -111,6 +111,7 @@ module.exports = async (ctx, next) => {
     
     results.push(result);
   }
+  data.paging = paging;
   data.posts = results;
   await next();
 }

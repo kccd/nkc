@@ -8,6 +8,9 @@ module.exports = {
   banner: {
     PARAMETER: {
       POST: "modifyUserBanner",
+			userBanner: {
+				POST: "modifyUserBanner",
+			}
     }
   },
 	shopLogo: {

@@ -1,6 +1,6 @@
 <template lang="pug">
   .zone-article-editor
-    .standard-fluid-container
+    .standard-fluid-max-container
       hor-nav(:list="navList")
     router-view
 </template>

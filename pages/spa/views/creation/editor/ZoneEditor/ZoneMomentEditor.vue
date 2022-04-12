@@ -1,6 +1,6 @@
 <template lang="pug">
   .zone-moment-editor
-    .standard-fluid-container.p-t-1
+    .standard-fluid-container
       moment-editor(@published="onPublished")
 </template>
 

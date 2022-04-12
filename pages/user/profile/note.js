@@ -1,4 +1,5 @@
 // import {fromNow} from '../../lib/js/tools'
+import {objToStr} from "../../lib/js/tools";
 const data = NKC.methods.getDataById("subUsersId");
 $(document).ready(()=>{
   const noteApp = new Vue({
@@ -14,6 +15,7 @@ $(document).ready(()=>{
       }
     },
     methods: {
+      objToStr: objToStr,
       getUrl: NKC.methods.tools.getUrl,
       visitUrl: NKC.methods.visitUrl,
       fromNow: NKC.methods.fromNow,

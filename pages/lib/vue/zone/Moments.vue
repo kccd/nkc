@@ -20,8 +20,8 @@
 <style lang="less" scoped>
   .moment-container{
     border-bottom: 1px solid #eee;
-    padding-bottom: 0.3rem;
     margin-bottom: 1.5rem;
+    padding: 0 15px;
   }
 </style>
 
@@ -30,7 +30,6 @@
   import Complaint from "../Complaint";
   import ViolationRecord from "../ViolationRecord";
   import MomentOption from "./momentOption/MomentOption";
-  import FloatUserPanel from "../FloatUserPanel";
   import MomentStatus from "./MomentStatus";
   export default {
     props: ['moments'],
@@ -39,7 +38,6 @@
       'moment': Moment,
       'complaint': Complaint,
       'violation-record': ViolationRecord,
-      'float-user-panel': FloatUserPanel,
       'moment-status': MomentStatus
     },
     data: () => ({
