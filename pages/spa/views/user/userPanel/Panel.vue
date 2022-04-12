@@ -8,16 +8,18 @@
       //用户banner容器
       .account-user-banner-container
         .account-user-banner(:style="`backgroundImage: url('${getUrl('userBanner', targetUser.userBanner)}')`" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
-        .account-user-info
-          .account-user-avatar
-            img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
-          .account-user-introduce
-            .account-user-name {{targetUser.username}}
-              user-level(ref="userLevel" :target-user="targetUser")
-              span.account-user-subscribe(v-if="subscribeBtn" :class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
-            //.account-user-kcb
-            //  user-scores(ref="userScore" :scores="scores" :xsf="targetUser.xsf" )
-
+          .account-user-info
+            .account-user-avatar
+              img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
+            .account-user-introduce
+              .account-user-name {{targetUser.username}}
+                user-level(ref="userLevel" :target-user="targetUser")
+              .account-user-kcb
+                user-scores(ref="userScore" :scores="scores" :xsf="targetUser.xsf" )
+              .account-user-subscribe(v-if="subscribeBtn")
+                div(:class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
+                div.link(@click.stop="toChat(targetUser.uid)" v-if="selfUid") 私信
+                div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
         .account-nav
           .account-nav-box
             .account-nav-left
@@ -59,9 +61,9 @@
 
 <style lang="less">
 @import "../../../../publicModules/base";
-@media (max-width: 992px){
+@media (max-width: 991px){
   .account-nav{
-    display: none;
+    visibility: hidden;
   }
 }
 .user-banner {
@@ -75,72 +77,73 @@
     .account-user-banner-container {
       .account-user-banner {
         width: 100%;
-        overflow: hidden;
-        height: 18rem;
+        height: 14rem;
         background-repeat: no-repeat;
         border-radius: 4px;
         background-size: cover;
         background-position: center center;
-        @media (max-width: 991px) {
-          height: 15rem;
-        }
-      }
-      .account-user-info {
         position: relative;
-        height: auto;
-        .account-user-avatar {
-          position: absolute;
-          left: 5rem;
-          top: -4rem;
-          height: 10rem;
-          width: 10rem;
-          border-radius: 1rem;
-          background-color: rgba(0, 0, 0, 0.2);
-          @media (max-width: 991px) {
-            left: 1rem;
+        .account-user-info {
+          position: relative;
+          height: auto;
+          top: 96px;
+          margin: 0rem 4rem 0 4rem;
+          @media (max-width: 991px){
+            margin: 0rem 1rem;
           }
-          img {
-            width: 10rem;
-            height: 10rem;
-            border: 4px solid #fff;
-            border-radius: 8%;
-          }
-        }
-        .account-user-introduce {
-          margin: 0 0 0 15rem;
-          @media (max-width: 991px) {
-            margin: 0 0 0 12rem;
-            padding-bottom: 30px;
-          }
-          .account-user-kcb {
-            display: inline-block;
-          }
-          .account-user-subscribe{
+          .account-user-avatar {
             position: absolute;
-            text-align: center;
-            background: #fff;
-            height: 27px;
-            line-height: 27px;
-            width: 5rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
             top: 0;
-            right: 0;
-            cursor:pointer;
+            height: 10rem;
+            width: 10rem;
+            border-radius: 1rem;
+            background-color: rgba(0, 0, 0, 0.2);
+
+            img {
+              width: 10rem;
+              height: 10rem;
+              border: 4px solid #fff;
+              border-radius: 8%;
+            }
           }
-          .focus{
-            background-color: #2b90d9;
-            color: #fff;
-          }
-          .cancel{
-            background-color: #e85a71;
-            color: #fff;
+          .account-user-introduce {
+            margin: 0 0 0 11rem;
+
+            .account-user-kcb {
+              display: inline-block;
+            }
+            .account-user-subscribe{
+              position: absolute;
+              top: 0;
+              right: 0;
+              div{
+                text-align: center;
+                background: #fff;
+                height: 27px;
+                line-height: 27px;
+                width: 5rem;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                cursor:pointer;
+
+              }
+              .focus{
+                background-color: #2b90d9;
+                color: #fff;
+              }
+              .cancel{
+                background-color: #e85a71;
+                color: #fff;
+              }
+            }
+
           }
         }
       }
+
       .account-nav {
         width: 100%;
-
+        height: 46px;
         .account-nav-box{
           .account-nav-left{
             width: 25%;
@@ -253,6 +256,7 @@ export default {
   props: ['targetUserScores', "fansCount",  "followersCount"],
   data: () => ({
     uid: null,
+    selfUid: getState().uid,
     showBanBox: false,
     panelPermission: null,
     targetUser: null,
@@ -274,6 +278,12 @@ export default {
       this.showBanBox = true;
     }
     this.scores = this.targetUserScores;
+  },
+  mounted() {
+    // const doms = $('.link');
+    // for(let i = 0; i<doms.length; i++) {
+    //
+    // }
   },
   methods: {
     objToStr: objToStr,
@@ -358,6 +368,9 @@ export default {
             })
       }
 
+    },
+    toChat(uid){
+      NKC.methods.toChat(uid)
     },
     //中间显示内容路由切换
     containerChange(path){
