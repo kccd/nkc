@@ -8,16 +8,15 @@
       //用户banner容器
       .account-user-banner-container
         .account-user-banner(:style="`backgroundImage: url('${getUrl('userBanner', targetUser.userBanner)}')`" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
-          .account-user-info(:class="appStyleType ? 'app-margin' : 'pc-margin'")
-            .account-user-avatar
-              img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
-            .account-user-introduce
-              .account-user-name {{targetUser.username}}
-                user-level(ref="userLevel" :target-user="targetUser")
-              //.account-user-certs {{targetUser.info.certsName}}
-              .account-user-kcb
-                user-scores(ref="userScore" :scores="scores" :xsf="targetUser.xsf" )
-              .account-user-subscribe(v-if="subscribeBtn" :class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
+        .account-user-info
+          .account-user-avatar
+            img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
+          .account-user-introduce
+            .account-user-name {{targetUser.username}}
+              user-level(ref="userLevel" :target-user="targetUser")
+              span.account-user-subscribe(v-if="subscribeBtn" :class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
+            //.account-user-kcb
+            //  user-scores(ref="userScore" :scores="scores" :xsf="targetUser.xsf" )
 
         .account-nav
           .account-nav-box
@@ -64,9 +63,6 @@
   .account-nav{
     display: none;
   }
-  .account-user-banner{
-    margin-bottom: 46px;
-  }
 }
 .user-banner {
   height: auto;
@@ -78,60 +74,67 @@
     width: 100%;
     .account-user-banner-container {
       .account-user-banner {
+        width: 100%;
+        overflow: hidden;
+        height: 18rem;
         background-repeat: no-repeat;
         border-radius: 4px;
         background-size: cover;
-        position: relative;
         background-position: center center;
-        .account-user-info {
-          position: relative;
-          height: auto;
-          padding-top: 45px;
-          .account-user-avatar {
+        @media (max-width: 991px) {
+          height: 15rem;
+        }
+      }
+      .account-user-info {
+        position: relative;
+        height: auto;
+        .account-user-avatar {
+          position: absolute;
+          left: 5rem;
+          top: -4rem;
+          height: 10rem;
+          width: 10rem;
+          border-radius: 1rem;
+          background-color: rgba(0, 0, 0, 0.2);
+          @media (max-width: 991px) {
+            left: 1rem;
+          }
+          img {
+            width: 10rem;
+            height: 10rem;
+            border: 4px solid #fff;
+            border-radius: 8%;
+          }
+        }
+        .account-user-introduce {
+          margin: 0 0 0 15rem;
+          @media (max-width: 991px) {
+            margin: 0 0 0 12rem;
+            padding-bottom: 46px;
+          }
+          .account-user-kcb {
+            display: inline-block;
+          }
+          .account-user-subscribe{
             position: absolute;
-            left: 0;
-            bottom: -4rem;
-            margin-right: 2rem;
-            img {
-              width: 10rem;
-              height: 10rem;
-              border: 4px solid #fff;
-              border-radius: 8%;
-            }
+            text-align: center;
+            background: #fff;
+            height: 27px;
+            line-height: 27px;
+            width: 5rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+
+            cursor:pointer;
           }
-          .account-user-introduce {
-            margin: 0 0 0 11rem;
-            .account-user-kcb {
-              display: inline-block;
-            }
-            .account-user-subscribe{
-              position: absolute;
-              text-align: center;
-              background: #fff;
-              height: 27px;
-              line-height: 27px;
-              width: 5rem;
-              border: 1px solid #ccc;
-              border-radius: 5px;
-              bottom: 10px;
-              right: 0;
-              cursor:pointer;
-            }
-            .focus{
-              background-color: #2b90d9;
-              color: #fff;
-            }
-            .cancel{
-              background-color: #e85a71;
-              color: #fff;
-            }
+          .focus{
+            background-color: #2b90d9;
+            color: #fff;
           }
-        }
-        .pc-margin{
-          margin: 0 4rem;
-        }
-        .app-margin{
-          margin: 0 1rem;
+          .cancel{
+            background-color: #e85a71;
+            color: #fff;
+          }
         }
       }
       .account-nav {
@@ -256,7 +259,6 @@ export default {
     scores: null,
     subscribeBtn: false,
     subscribeBtnType: false,
-    appStyleType: false,
   }),
   components: {
     "user-scores": UserScoresVue,
@@ -269,7 +271,6 @@ export default {
     //移动段才能永久显示封禁框
     if(getState && getState.isApp){
       this.showBanBox = true;
-      this.appStyleType = true;
     }
     this.scores = this.targetUserScores;
   },

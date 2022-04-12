@@ -270,6 +270,8 @@ router
     data.followersCount = followersCount;
     data.targetUserFans = await db.UserModel.extendUsersInfo(targetUserFans);
     data.targetUserFollowers = await db.UserModel.extendUsersInfo(targetUserFollowers);
+    data.code = await db.UserModel.getCode(targetUser.uid);
+    data.code = data.code.pop();
     await next();
   })
   .use('/s', async (ctx, next) => {

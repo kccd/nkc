@@ -16,6 +16,7 @@
           .description(v-if="targetUser.description") {{targetUser.description}}
           .description(v-else) 暂无简介
           .register-time {{timeFormat('YYYY/MM/DD', targetUser.toc)}}注册， 活动于{{fromNow(targetUser.tlv)}}
+          .code {{"动态码："+code}}
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
@@ -73,7 +74,7 @@
 import {getUrl, fromNow} from "../../../../lib/js/tools";
 import {timeFormat} from "../../../../lib/js/time";
 export default {
-  props: ['targetUser'],
+  props: ['targetUser', 'code'],
   data: () => ({
     uid: '',
     userColumn: null,

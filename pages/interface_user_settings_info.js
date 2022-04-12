@@ -115,7 +115,7 @@ function selectBackBanner() {
         screenTopWarning(data);
       });
   }, {
-    aspectRatio: 11,
+    aspectRatio: 6,
   });
 }
 

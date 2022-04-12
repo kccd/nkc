@@ -3,7 +3,7 @@
     .col-sx-12.col-md-3.box-shadow-panel.p-r-0.p-l-0.m-b-1
       //用户信息
       .m-b-1(v-if="targetUser")
-        user-profile-info(ref="userProfileInfo" :target-user="targetUser")
+        user-profile-info(ref="userProfileInfo" :target-user="targetUser" :code="code")
       //用户操作
       .m-b-1(v-if="isSelf")
         user-operate(:target-user="targetUser")
@@ -35,7 +35,7 @@ import UserManage from "./userPanel/UserManage";
 import {getState} from "../../../lib/js/state";
 
 export default {
-  props: ['nav-links', 'target-user'],
+  props: ['nav-links', 'target-user', "code"],
   data: () => ({
     rolePermissionsType: null,
     targetUid: '',

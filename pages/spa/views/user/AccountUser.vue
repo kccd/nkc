@@ -1,7 +1,7 @@
 <template lang="pug">
 .user-account.m-b-1(v-if="targetUser")
   //- 用户左侧面板
-  left-panel(:nav-links="navLinks" :target-user="targetUser")
+  left-panel(:nav-links="navLinks" :target-user="targetUser" :code="code")
   //- 用户中间面板 先hi用户的动态， 文章，恢复等信息
   .user-container.col-xs-12.col-md-7.p-r-0.m-b-1.box-shadow-panel#comment-content
     router-view
@@ -22,7 +22,7 @@ import {getColumnInfo} from "../../../lib/js/column";
 import LeftPanel from "./LeftPanel";
 import RightPanel from "./RightPanel";
 export default {
-  props: ['navLinks', 'target-user', 'type', 'forums', "targetUserFans", "targetUserFollowers"],
+  props: ['navLinks', 'target-user', 'type', 'forums', "targetUserFans", "targetUserFollowers", "code"],
   data: () => ({
     targetColumn: getColumnInfo(),
   }),
