@@ -1,7 +1,7 @@
 <template lang="pug">
   .user-post
     to-column(ref="toColumn")
-    .user-list-warning(v-if="!posts || posts.length === 0") 用户貌似未发表过任何内容
+    .user-list-warning(v-if="(!posts || posts.length === 0) && !loading") 用户貌似未发表过任何内容
     .user-post-list
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
       .paging-button(v-if="routeName === 'thread'" )
@@ -21,16 +21,22 @@
 </template>
 <style lang="less" scoped>
 @import "../../../../../publicModules/base";
-.checkbox {
-  display: inline-block;
-  min-width: 15px;
-  min-height: 15px;
-}
-.checkbox label{
-  min-height: 15px;
-}
-.user-post-list {
-  padding: 15px;
+.user-post {
+  .user-list-warning {
+    text-align: center;
+    font-size: 1.2rem;
+  }
+  .checkbox {
+    display: inline-block;
+    min-width: 15px;
+    min-height: 15px;
+  }
+  .checkbox label{
+    min-height: 15px;
+  }
+  .user-post-list {
+    padding: 0 15px;
+  }
 }
 </style>
 <script>
@@ -43,6 +49,7 @@ export default {
   data: () => ({
     posts: [],
     paging: {},
+    loading: true,
     uid: null,
     routeName: null,
     managementBtn: false,
@@ -78,6 +85,7 @@ export default {
     },
     //获取用户卡片信息
     getPostList(page) {
+      this.loading = true;
       const {uid, routeName} = this;
       const self= this;
       let url = `/u/${uid}/p/${routeName}`;
@@ -95,6 +103,7 @@ export default {
           self.paging = res.paging;
           self.posts = res.posts;
           self.permissions = res.permissions;
+          this.loading = false;
         })
         .catch(err => {
           sweetError(err);

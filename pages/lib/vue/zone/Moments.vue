@@ -20,8 +20,8 @@
 <style lang="less" scoped>
   .moment-container{
     border-bottom: 1px solid #eee;
-    padding-bottom: 0.3rem;
     margin-bottom: 1.5rem;
+    padding: 0 15px;
   }
 </style>
 
