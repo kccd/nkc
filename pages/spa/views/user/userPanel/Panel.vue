@@ -110,7 +110,7 @@
           margin: 0 0 0 15rem;
           @media (max-width: 991px) {
             margin: 0 0 0 12rem;
-            padding-bottom: 46px;
+            padding-bottom: 30px;
           }
           .account-user-kcb {
             display: inline-block;
@@ -124,7 +124,8 @@
             width: 5rem;
             border: 1px solid #ccc;
             border-radius: 5px;
-
+            top: 0;
+            right: 0;
             cursor:pointer;
           }
           .focus{
