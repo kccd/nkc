@@ -1,5 +1,5 @@
 <template lang="pug">
-  .user-post-list
+  .user-post
     to-column(ref="toColumn")
     .user-list-warning(v-if="!posts || posts.length === 0") 用户貌似未发表过任何内容
     .user-post-list
@@ -11,15 +11,15 @@
           a.pointer.button.radius-right(@click="toColumn()") 推送到专栏
       .post-item(v-for="(post, index) in posts")
         hr(v-if="index")
-        review(ref="review" :post="post" v-if="!post.reviewed")
-        .thread-draft-info(v-else-if="post.draft") 退修中，仅自己可见，修改后对所有人可见
+        review(ref="review" :post="post" :permissions="permissions" @refresh="refreshPage" v-if="!post.reviewed")
+        .thread-draft-info(v-else-if="post.toDraft") 退修中，仅自己可见，修改后对所有人可见
         .thread-disabled-info(v-else-if="post.disabled" ) 已屏蔽，仅自己可见
         .checkbox(v-if="managementBtn" )
           label
             input(type="checkbox" :value="post.pid" v-model="checkboxPosts")
         single-post(ref="singlePost" :post="post")
 </template>
-<style lang="less">
+<style lang="less" scoped>
 @import "../../../../../publicModules/base";
 .checkbox {
   display: inline-block;
@@ -28,6 +28,9 @@
 }
 .checkbox label{
   min-height: 15px;
+}
+.user-post-list {
+  padding: 15px;
 }
 </style>
 <script>
@@ -43,6 +46,7 @@ export default {
     uid: null,
     routeName: null,
     managementBtn: false,
+    permissions: {},
     checkboxPosts: [],
   }),
   components: {
@@ -70,10 +74,10 @@ export default {
       this.routeName = name;
       const {uid} = params;
       this.uid = uid;
-      this.getUserCardInfo(0);
+      this.getPostList(0);
     },
     //获取用户卡片信息
-    getUserCardInfo(page) {
+    getPostList(page) {
       const {uid, routeName} = this;
       const self= this;
       let url = `/u/${uid}/p/${routeName}`;
@@ -90,10 +94,16 @@ export default {
           self.t = res.t;
           self.paging = res.paging;
           self.posts = res.posts;
+          self.permissions = res.permissions;
         })
         .catch(err => {
           sweetError(err);
         })
+    },
+    //刷新当前页面
+    refreshPage() {
+      const {page} = this.paging;
+      this.getPostList(page);
     },
     //post管理开关
     managementPosts() {
