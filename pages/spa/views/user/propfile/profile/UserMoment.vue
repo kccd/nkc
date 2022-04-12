@@ -1,8 +1,8 @@
 <template lang="pug">
   .user-moment
     paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
-    .user-list-awrning(v-if="!momentsData || momentsData.length === 0") 空空如也~
-    .p-t-1(v-else)
+    .user-list-warning(v-if="(!momentsData || momentsData.length === 0) && !loading") 空空如也~
+    .moment-list(v-else)
       moments(
         ref="moments"
         :moments="momentsData"
@@ -14,6 +14,12 @@
 </template>
 <style lang="less">
 @import "../../../../../publicModules/base";
+.user-moment {
+  .user-list-warning {
+    text-align: center;
+    font-size: 1.2rem;
+  }
+}
 </style>
 <script>
 import Moments from "../../../../../lib/vue/zone/Moments";
@@ -27,6 +33,7 @@ export default {
     momentsData: [],
     paging: {},
     uid: null,
+    loading: false,
   }),
   components: {
     "moments": Moments,
@@ -49,6 +56,7 @@ export default {
   methods: {
     //获取用户卡片信息
     getUserCardInfo(page) {
+      this.loading = true;
       const {uid} = this;
       const self= this;
       let url = `/u/${uid}/p/moment`;
@@ -65,6 +73,7 @@ export default {
           self.t = res.t;
           self.paging = res.paging;
           self.momentsData = res.momentsData;
+          this.loading = false;
         })
         .catch(err => {
           sweetError(err);
