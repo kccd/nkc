@@ -61,8 +61,8 @@
 
 <script>
   import Editor from '../Editor';
-  import {getPostEditorConfigs} from '../../js/editor';
-  const commentEditorConfigs = getPostEditorConfigs();
+  import {getCommentEditorConfigs} from '../../js/editor';
+  const commentEditorConfigs = getCommentEditorConfigs();
   import {nkcAPI} from "../../js/netAPI";
   export default {
     props: ['source', 'sid', 'comment'],
