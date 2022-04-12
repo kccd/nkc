@@ -18,6 +18,8 @@
   .user-list-warning {
     text-align: center;
     font-size: 1.2rem;
+    margin-top: 5rem;
+    margin-bottom: 5rem;
   }
 }
 </style>

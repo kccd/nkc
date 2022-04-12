@@ -89,7 +89,7 @@ function selectBanner() {
         screenTopWarning(data);
       });
   }, {
-    aspectRatio: 8,
+    aspectRatio: 2,
   });
 }
 function selectBackBanner() {
