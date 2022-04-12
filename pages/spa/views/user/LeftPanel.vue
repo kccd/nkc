@@ -19,7 +19,6 @@
       .m-b-1
         share(ref="share" share-type="user" :share-title="targetUser.username || targetUser.uid" :share-id="targetUser.uid" :share-description="targetUser.description" :share-avatar="targetUser.avatar")
 
-
 </template>
 <style lang="less">
 @import "../../../publicModules/base";

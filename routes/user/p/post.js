@@ -136,6 +136,7 @@ module.exports = async (ctx, next) => {
     result.disabled = (result.postType === "postToForum" && thread.disabled) || (result.postType === "postToThread" && !post.toDraft && post.disabled);
     results.push(result);
   }
+  data.paging = paging;
   data.posts = results;
   await next();
 }

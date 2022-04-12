@@ -272,6 +272,23 @@ router
     data.targetUserFollowers = await db.UserModel.extendUsersInfo(targetUserFollowers);
     await next();
   })
+  .use('/', async (ctx, next) => {
+    const {db, data, permission, state} = ctx;
+    const {uid} = state;
+    const {user} = data;
+    const permissions = {
+      reviewed: null,
+      disabled: null,
+    };
+    if(user) {
+      if(permission('review')) permissions.reviewed = true;
+      if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {
+        permissions.disabled = true;
+      }
+    }
+    data.permissions = permissions;
+    await next();
+  })
   .use('/s', async (ctx, next) => {
     const { query, data, db, state } = ctx;
     let { t } = query;
