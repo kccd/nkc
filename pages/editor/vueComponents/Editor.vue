@@ -180,8 +180,8 @@ export default {
 .col-md-9 {
   position: relative;
   min-height: 1px;
-  padding-right: 15px;
-  padding-left: 15px;
+  /* padding-right: 15px;
+  padding-left: 15px; */
 }
 .box-shadow-panel > div {
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
@@ -206,8 +206,8 @@ export default {
   .col-xs-6 {
     position: relative;
     min-height: 1px;
-    padding-right: 15px;
-    padding-left: 15px;
+    /* padding-right: 15px;
+    padding-left: 15px; */
     width: 50%;
     float: left;
   }
@@ -216,8 +216,6 @@ export default {
   width: 100%;
   position: relative;
   min-height: 1px;
-  padding-right: 15px;
-  padding-left: 15px;
 }
 }
 .m-b-2 {
