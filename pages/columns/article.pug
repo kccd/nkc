@@ -38,7 +38,7 @@ block baseColumnContent
         else
           .single-comment-bottom-item(data-type="articleOption" data-tid=article.tid data-collected=`${collected}` title="其他操作" data-direction="up")
             .fa.fa-sliders.option-icon
-  .hidden#data=objToStr({comments: data.comments, comment: data.comment, article, collectedCount, type, collected,})
+  .hidden#data=objToStr({comments: data.comments, comment: data.comment, article, collectedCount, type, collected})
   .article-common.m-b-1.box-shadow-panel
     .row
       if type === 'article' && article.status !== 'normal' && article.status !== undefined

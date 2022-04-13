@@ -58,6 +58,8 @@ router
     const {files, fields} = body;
     const {coverFile} = files;
     const {type, articleId, source, sid} = fields;
+    const {normal: normalStatus, default: defaultStatus} = await db.ArticleModel.getArticleStatus();
+    const {column: columnSource, zone: zoneSource} = await db.ArticleModel.getArticleSources();
     if(!['modify', 'create', 'publish', 'save'].includes(type)) ctx.throw(400, `未知的提交类型 ${type}`);
     const {
       title,
@@ -106,12 +108,12 @@ router
       });
       if(type === 'publish') {
         //判断用户是否选择文章专栏分类
-        if(source === 'column' && article.status === 'default' && selectCategory.selectedMainCategoriesId.length === 0) ctx.throw(401, '未选择文章专栏分类');
+        if(source === columnSource && article.status === defaultStatus && selectCategory.selectedMainCategoriesId.length === 0) ctx.throw(401, '未选择文章专栏分类');
         //检测文章专栏分类是否有效
-        if(source === 'column' && article.status === 'default') {
+        if(source === columnSource && article.status === defaultStatus) {
           await db.ColumnPostCategoryModel.checkColumnCategory(selectCategory);
         }
-        await article.publishArticle({source, selectCategory});
+        data.articleUrl = await article.publishArticle({source, selectCategory});
       } else if(type === 'save') {
         await article.saveArticle();
       }
@@ -124,10 +126,6 @@ router
       sid: article._id
     });
     data.articleId = article._id;
-    // const _article = (await db.ArticleModel.getArticlesInfo([article]));
-    // if(_article[0]) {
-    //   data.articleUrl = _article[0].url;
-    // }
     await next();
   })
   .use('/column', columnRouter.routes(), columnRouter.allowedMethods())

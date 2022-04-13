@@ -243,13 +243,15 @@ schema.statics.filterData = (filterData, allowKey)=>{
 }
 /*
 * 获取空间文章显示的内容
-* @param {String} id 文章id
+* @param {String} id 文章article id
 */
 schema.statics.getZoneArticle = async (id)=>{
   const nkcRender = require('../nkcModules/nkcRender');
   const UserModel = mongoose.model("users");
   const ArticleModel = mongoose.model('articles');
   const ResourceModel = mongoose.model('resources')
+  let article = await ArticleModel.findOnly({_id: id});
+  article = (await ArticleModel.getArticlesInfo([article]))[0];
   const {articleInfo, document, documentResourceId} = await ArticleModel.getDocumentInfoById(id);
   const documentAllowKey = ['title', 'content', 'abstract', 'abstractEN', 'keywords', 'keywordsEN', 'authorInfos', 'toc', 'origin', 'uid', 'collectedCount'];
   const filteredDocument = await ArticleModel.filterData(document, documentAllowKey)
@@ -263,9 +265,20 @@ schema.statics.getZoneArticle = async (id)=>{
       c: documentContent.c,
       resources
     },
-    user:{xsf: user.xsf}
   });
-  return {post: documentContent,  userAvatar: user.avatar ,thread: articleInfo, column:{} ,collectedCount:'' , mainCategory:[],auxiliaryCategory:[]}
+  return {
+    post: documentContent,
+    userAvatar: user.avatar,
+    thread: articleInfo,
+    column: {},
+    collectedCount: '',
+    mainCategory: [],
+    auxiliaryCategory: [],
+    user,
+    article,
+    type: 'article',
+    collectedCount: await ArticleModel.getCollectedCountByAid(id),
+  }
 }
 /*
 * 修改为文章(/columns/article/article.pug)指定的字段
@@ -554,12 +567,15 @@ schema.methods.publishArticle = async function(options) {
   const {did, uid, _id: articleId} = this;
   //将当前article的状态改为正常
   await this.changeStatus(normal);
+  let columnPost;
+  let articleUrl;
   if(source === 'column') {
     //如果发表专栏的文章就将创建文章专栏分类引用记录 先查找是否存在引用，如果没有就创建一条新的引用
-    const columnPost = await ColumnPostModel.findOne({pid: articleId, type: articleType});
+    columnPost = await ColumnPostModel.findOne({pid: articleId, type: articleType});
     if(!columnPost) {
-      await ColumnPostModel.createColumnPost(this, selectCategory);
+      columnPost = await ColumnPostModel.createColumnPost(this, selectCategory);
     }
+    articleUrl = `/m/${columnPost.columnId}/a/${columnPost._id}`;
   } else if(source === 'zone') {
     //如果发布的article为空间文章就创建一条新的动态并绑定当前article
     const {_id: momentId} = await MomentModel.createQuoteMomentAndPublish({
@@ -572,8 +588,10 @@ schema.methods.publishArticle = async function(options) {
         sid: momentId,
       }
     });
+    articleUrl = `/zone/a/${articleId}`;
   }
   await DocumentModel.publishDocumentByDid(did);
+  return articleUrl;
 }
 
 schema.methods.getStableDocId = async function () {

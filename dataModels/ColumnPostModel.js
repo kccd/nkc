@@ -600,6 +600,7 @@ schema.statics.createColumnPost = async function(article, selectCategory) {
     mcid: selectCategory.selectedMinorCategoriesId,
   });
   await columnPost.save();
+  return columnPost;
 }
 
 /*

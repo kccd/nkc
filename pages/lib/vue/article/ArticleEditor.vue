@@ -471,15 +471,8 @@ export default {
           if(type === 'publish') {
             //移除编辑器默认事件
             self.$refs.documentEditor.removeNoticeEvent();
-            if(source === 'column') {
-              //跳转到文章预览界面
-              if(res.articleUrl) {
-                window.location.href = res.articleUrl;
-              } else {
-                window.location.href = `/m/${self.columnId}`;
-              }
-            } else if(source === 'zone') {
-              sweetSuccess('发布成功');
+            if(res.articleUrl) {
+              window.location.href = res.articleUrl;
             }
           } else if(type === 'save') {
             //草稿保存成功显示报讯成功信息

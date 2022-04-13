@@ -479,6 +479,8 @@ export default {
     selectCover() {
       let self = this;
       self.$refs.resourceSelector.open(function(data) {
+        //关闭资源弹框
+        self.$refs.resourceSelector.close();
         let r = data.resources[0];
         let url;
         if(r.originId) {
@@ -497,12 +499,8 @@ export default {
                 self.$refs.image.close();
               })
           })
-          .then(() => {
-            //关闭资源弹框
-            self.$refs.resourceSelector.close();
-          })
           .catch(err => {
-            console.log(err);
+            sweetError(err);
           })
       }, {
         allowedExt: ["picture"],
