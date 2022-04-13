@@ -1,7 +1,9 @@
 <template lang="pug">
 .user-account.m-b-1(v-if="targetUser")
   //- 用户左侧面板
-  left-panel(:nav-links="navLinks" :target-user="targetUser" :code="code")
+  .left-panel-box(:class="leftPanelBoxOperation ? 'left-panel-box-show' : 'left-panel-box-none'")
+    .left-panel-box-operation(@click="clickLeftBox") {{leftPanelBoxOperation ? "收起" : "展开"}}
+    left-panel(:nav-links="navLinks" :target-user="targetUser" :code="code" :target-user-scores="targetUserScores")
   //- 用户中间面板 先hi用户的动态， 文章，恢复等信息
   .user-container.col-xs-12.col-md-7.p-r-0.m-b-1.box-shadow-panel#comment-content
     router-view
@@ -11,9 +13,33 @@
 </template>
 <style lang="less">
 @import "../../../publicModules/base";
+.left-panel-box-operation{
+  display: none;
+}
 @media (max-width: 991px) {
   .user-container{
     padding: 0;
+  }
+  .left-panel-box{
+    .left-panel-box-operation{
+      display: block;
+      position: relative;
+      top: 25px;
+      z-index: 10;
+      right: 10px;
+      text-align: right;
+      cursor:pointer;
+    }
+  }
+  .left-panel-box-none{
+    height: 130px;
+    overflow: hidden;
+    margin-top: -20px;
+  }
+  .left-panel-box-show{
+    height: auto;
+    margin-top: -20px;
+    //overflow: hidden;
   }
 }
 </style>
@@ -22,9 +48,10 @@ import {getColumnInfo} from "../../../lib/js/column";
 import LeftPanel from "./LeftPanel";
 import RightPanel from "./RightPanel";
 export default {
-  props: ['navLinks', 'target-user', 'type', 'forums', "targetUserFans", "targetUserFollowers", "code"],
+  props: ['navLinks', 'target-user', 'type', 'forums', "targetUserFans", "targetUserFollowers", "code","targetUserScores"],
   data: () => ({
     targetColumn: getColumnInfo(),
+    leftPanelBoxOperation: false,
   }),
   components: {
     "left-panel": LeftPanel,
@@ -33,7 +60,9 @@ export default {
   mounted() {
   },
   methods: {
-
+    clickLeftBox(){
+      this.leftPanelBoxOperation = !this.leftPanelBoxOperation
+    }
   }
 }
 
