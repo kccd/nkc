@@ -14,12 +14,12 @@
             .account-user-introduce
               .account-user-name {{targetUser.username}}
                 user-level(ref="userLevel" :target-user="targetUser")
-              .account-user-kcb
-                user-scores(ref="userScore" :scores="scores" :xsf="targetUser.xsf" )
               .account-user-subscribe(v-if="subscribeBtn")
                 div(:class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
                 div.link(@click.stop="toChat(targetUser.uid)" v-if="selfUid") 私信
                 div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
+                div(v-if="usersBlUid.indexOf(targetUser.uid,1) === -1" ) 加入黑名单
+                div(v-else-if="usersBlUid.indexOf(targetUser.uid,1) !== -1") 移除黑名单
         .account-nav
           .account-nav-box
             .account-nav-left
@@ -94,23 +94,31 @@
           .account-user-avatar {
             position: absolute;
             top: 0;
-            height: 10rem;
-            width: 10rem;
             border-radius: 1rem;
-            background-color: rgba(0, 0, 0, 0.2);
-
             img {
               width: 10rem;
               height: 10rem;
               border: 4px solid #fff;
               border-radius: 8%;
+              @media (max-width: 991px){
+                width: 8rem;
+                height: 8rem;
+              }
             }
           }
           .account-user-introduce {
             margin: 0 0 0 11rem;
-
-            .account-user-kcb {
-              display: inline-block;
+            @media (max-width: 991px){
+              margin: 0 0 0 9rem;
+            }
+            .account-user-name{
+              margin-top: 25px;
+              font-size: 20px;
+              font-weight: bold;
+              @media (max-width: 991px){
+                font-size: 16px;
+                font-weight: bold;
+              }
             }
             .account-user-subscribe{
               position: absolute;
@@ -243,7 +251,6 @@
 </style>
 <script>
 import {getUrl} from "../../../../lib/js/tools";
-import UserScoresVue from "../../../../lib/vue/publicVue/userDraw/UserScoresVue";
 import UserLevel from "./UserLevel";
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {screenTopWarning} from "../../../../lib/js/topAlert";
@@ -261,12 +268,11 @@ export default {
     panelPermission: null,
     targetUser: null,
     showBanContext: false,
-    scores: null,
     subscribeBtn: false,
     subscribeBtnType: false,
+    usersBlUid: [],
   }),
   components: {
-    "user-scores": UserScoresVue,
     "user-level": UserLevel,
     "subscribe-types": SubscribeTypes,
   },
@@ -277,13 +283,8 @@ export default {
     if(getState && getState.isApp){
       this.showBanBox = true;
     }
-    this.scores = this.targetUserScores;
   },
   mounted() {
-    // const doms = $('.link');
-    // for(let i = 0; i<doms.length; i++) {
-    //
-    // }
   },
   methods: {
     objToStr: objToStr,
@@ -300,6 +301,7 @@ export default {
       .then(res => {
         self.panelPermission = res.panelPermission;
         self.targetUser = res.targetUser;
+        self.usersBlUid = res.usersBlUid;
         if(res.user.uid !== self.$route.params.uid){
           self.subscribeBtn = true
         }
@@ -368,6 +370,54 @@ export default {
             })
       }
 
+    },
+    //用户添加到黑名单 tUid 被拉黑的用户 form 拉黑来源 mid 被拉黑的moment
+    addUserToBlackList(tUid, from, mid) {
+      const self = this;
+      var isFriend = false, subscribed = false;
+      return Promise.resolve()
+        .then(function() {
+          return nkcAPI('/blacklist?tUid=' + tUid,  'GET')
+        })
+        .then(function(data) {
+          isFriend = data.isFriend;
+          subscribed = data.subscribed;
+          var bl = data.bl;
+          if(bl) throw '对方已在黑名单中';
+          var info;
+          if(isFriend) {
+            info = '该会员在你的好友列表中，确定放入黑名单吗？';
+          } else if(subscribed) {
+            info = '该会员在你的关注列表中，确定放入黑名单吗？';
+          }
+          if(info) return sweetQuestion(info);
+        })
+        .then(function() {
+          if(isFriend) {
+            return nkcAPI(`/message/friend?uid=` + tUid, 'DELETE', {})
+          }
+        })
+        .then(function() {
+          if(subscribed) {
+            return self.subscribeUserPromise(tUid, false);
+          }
+        })
+        .then(function() {
+          return nkcAPI('/blacklist', 'POST', {
+            tUid: tUid,
+            from: from,
+            mid
+          })
+        })
+        .then(function(data) {
+          sweetSuccess('操作成功');
+          return data;
+        })
+        .catch(sweetError);
+    },
+    subscribeUserPromise(id, sub, cid) {
+      const method = sub? "POST": "DELETE";
+      return nkcAPI("/u/" + id + "/subscribe", method, {cid: cid || []});
     },
     toChat(uid){
       NKC.methods.toChat(uid)
