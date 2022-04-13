@@ -23,6 +23,8 @@
 @import "../../../../../publicModules/base";
 .user-post {
   .user-list-warning {
+    margin-top: 5rem;
+    margin-bottom: 5rem;
     text-align: center;
     font-size: 1.2rem;
   }

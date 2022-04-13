@@ -8,11 +8,10 @@ router
     const {user} = data;
     const {page = 0, last_pages, highlight, t} = query;
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
-    // 获取文章需要显示的数据
+    // 获取空间文章需要显示的数据
     const articleRelatedContent = await db.ArticleModel.getZoneArticle(aid);
     data.columnPost = articleRelatedContent;
     let article = await db.ArticleModel.findOnly({_id: aid});
-    const baseUrl = (await db.ArticleModel.getArticlesInfo([article]))[0].url;
     data.article = article;
     const isModerator = await article.isModerator(state.uid);
     //获取当前文章信息
@@ -68,13 +67,13 @@ router
           data.comment = comment || '';
       }
     }
-    data.baseUrl = baseUrl;
     data.articleStatus = article[0].document.status;
     const hidePostSettings = await db.SettingModel.getSettings("hidePost");
     data.postHeight = hidePostSettings.postHeight;
     data.permissions = permissions;
     data.isModerator =  isModerator;
     data.comments = comments || [];
+    data.type = 'article';
     await next();
   });
 module.exports = router;

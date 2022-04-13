@@ -207,12 +207,13 @@ schema.statics.getDocumentInfoById = async (_id)=>{
   const DocumentModel = mongoose.model('documents');
   let articleInfo = await ArticleModel.findOne({_id});
   articleInfo = articleInfo.toObject()
+  articleInfo.url = `/zone/a/${_id}`;
   if(!articleInfo) throwErr(500, '未查找到对应文章');
   let document = await DocumentModel.getStableArticleById(_id);
   const documentResourceId = await document.getResourceReferenceId();
 
   document = document.toObject()
-
+  
   return {articleInfo, document, documentResourceId}
 }
 
@@ -247,7 +248,6 @@ schema.statics.filterData = (filterData, allowKey)=>{
 schema.statics.getZoneArticle = async (id)=>{
   const nkcRender = require('../nkcModules/nkcRender');
   const UserModel = mongoose.model("users");
-
   const ArticleModel = mongoose.model('articles');
   const ResourceModel = mongoose.model('resources')
   const {articleInfo, document, documentResourceId} = await ArticleModel.getDocumentInfoById(id);

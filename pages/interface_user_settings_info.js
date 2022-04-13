@@ -89,7 +89,7 @@ function selectBanner() {
         screenTopWarning(data);
       });
   }, {
-    aspectRatio: 8,
+    aspectRatio: 2,
   });
 }
 function selectBackBanner() {
@@ -115,7 +115,7 @@ function selectBackBanner() {
         screenTopWarning(data);
       });
   }, {
-    aspectRatio: 11,
+    aspectRatio: 6,
   });
 }
 

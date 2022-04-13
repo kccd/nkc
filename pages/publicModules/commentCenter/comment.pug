@@ -4,8 +4,14 @@ if !isIncluded('comment')
   //- 发表人筛选
   mixin articleNav
     .paging-button
-      a.button.radius-left(href=`${data.columnPost.article.url}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
-      a.button.radius-right(href=`${data.columnPost.article.url}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
+      //- 当文章为专栏文章时
+      if data.columnPost.article
+        a.button.radius-left(href=`${data.columnPost.article.url}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
+        a.button.radius-right(href=`${data.columnPost.article.url}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
+      else
+        //- 当文章为空间文章时
+        a.button.radius-left(href=`${data.columnPost.thread.url}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
+        a.button.radius-right(href=`${data.columnPost.thread.url}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
   //- 批量管理回复
   mixin manageComments
     .paging-button
@@ -30,7 +36,7 @@ if !isIncluded('comment')
     if disableComment && data.comments.length !== 0
       //- 回复批量管理
       +manageComments
-  if data.columnPost.type === 'article' && data.columnPost.article.status && data.columnPost.article.status === 'normal'
+  if (data.columnPost.type === 'article' && data.columnPost.article.status && data.columnPost.article.status === 'normal') || (data.columnPost.thread && data.columnPost.thread.status && data.columnPost.thread.status === 'normal')
     #commentEditor.m-t-1(v-cloak)
       comment-editor(ref="commentEditor" source="comment" :sid="articleId" :comment="comment")
   +includeDeferJS('/publicModules/commentCenter/comment.js')
