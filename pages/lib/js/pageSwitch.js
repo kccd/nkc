@@ -1,5 +1,7 @@
 import {getState} from './state';
 import {RNOpenNewPage} from "./reactNative";
+import {fixUrl} from "./url";
+
 /*
 * 打开链接 兼容APP
 * @param {String} url 链接

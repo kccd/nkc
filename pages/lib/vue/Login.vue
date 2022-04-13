@@ -268,7 +268,7 @@
       websiteBrief,
       websiteName,
       nationCodes: getNationCodes(),
-      type: "login",
+      type: LoginType.SignIn,
       registerStep: 1,
       category: "username", // username, mobile, mobileCode
       username: "",
@@ -477,9 +477,16 @@
       },
       open: function(type) {
         $(this.$el).modal("show");
-        this.type = type || "login";
+        this.type = type || LoginType.SignIn;
         this.getSvgData();
       }
     }
   };
+
+
+  export const LoginType = {
+    SignIn: 'login',
+    SignUp: 'register'
+  }
+
 </script>

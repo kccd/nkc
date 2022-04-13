@@ -94,6 +94,7 @@
         &.cover{
           padding-left: @width + 1rem;
           position: relative;
+          height: 7rem;
         }
         .moment-quote-cover{
           position: absolute;
