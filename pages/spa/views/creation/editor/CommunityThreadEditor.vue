@@ -1,5 +1,5 @@
 <template lang="pug">
-  .community-a
+  div
     .community-thread-editor
     editor
 </template>
@@ -12,15 +12,8 @@ export default {
   },
 };
 </script>
-<style lang="less">
-.m-b-2{
-  padding-left:0;
-}
+<style lang="less" scoped>
 .community-thread-editor{
   padding-bottom: 10px;
 }
-.community-a{
-  padding-left: 30px;
-}
-
 </style>
