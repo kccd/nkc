@@ -706,12 +706,10 @@ schema.statics.extendArticles = async function(articles) {
     let url;
     if(article.source === articleSource.column) {
       if(columnPost) {
-        url = `/m/${columnPost.columnId}/a${article._id}`;
-      } else {
-        url = '';
+        url = `/m/${columnPostObj[_id].columnId}/a/${columnPostObj[_id]._id}`;
       }
-    } else {
-      url = '';
+    } else if(article.source === articleSource.zone) {
+      url = `/zone/a/${article._id}`;
     }
     const result = {
       _id,
@@ -719,7 +717,7 @@ schema.statics.extendArticles = async function(articles) {
       published: !!stableDocument,
       hasBeta: !!betaDocument,
       title: title || '未填写标题',
-      url: `/m/${columnPostObj[_id].columnId}/a/${columnPostObj[_id]._id}`,
+      url,
       time: timeFormat(toc),
       did,
       source: article.source,

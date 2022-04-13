@@ -49,39 +49,44 @@ block content
             .fa.fa-sliders.option-icon
   .hidden#data=objToStr({comments: data.comments, comment: data.comment, article, collectedCount, type, collected})
   .container-fluid.max-width
-    .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel
-      .row
-        if type === 'article' && article.status !== 'normal' && article.status !== undefined
-          if article.status === 'faulty'
-            .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${article.status === 'faulty' ? 'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;' : ''}`)
-              .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
-              p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${article.reason}`
-              +thread
-          else if article.status === 'disabled'
-            .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${article.status === 'disabled' ? 'border: 1px solid #666;padding: 0.5rem;border-radius: 5px;background-color: #fff;' : ''}`)
-              .h4.text-center(style='color: #666;') 本文已被封禁，不可查看
-              if permission('review')
-                .text-center
-                  a(onclick="unblock()") 点击解封
-              p.text-center(style='border-bottom: 1px solid #666; padding-bottom: 1rem;color: #666;')= `封禁原因：${article.reason}`
-              if permission('review')
+    .row
+      .col-xs-12.col-md-9.article-common.box-shadow-panel#comment-content
+        .m-b-1
+          if type === 'article' && article.status !== 'normal' && article.status !== undefined
+            if article.status === 'faulty'
+              .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${article.status === 'faulty' ? 'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;' : ''}`)
+                .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
+                p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${article.reason}`
                 +thread
-          else if article.status === 'unknown'
-            -let reviewData = article
-            include ../columns/article/module_review
+            else if article.status === 'disabled'
+              .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${article.status === 'disabled' ? 'border: 1px solid #666;padding: 0.5rem;border-radius: 5px;background-color: #fff;' : ''}`)
+                .h4.text-center(style='color: #666;') 本文已被封禁，不可查看
+                if permission('review')
+                  .text-center
+                    a(onclick="unblock()") 点击解封
+                p.text-center(style='border-bottom: 1px solid #666; padding-bottom: 1rem;color: #666;')= `封禁原因：${article.reason}`
+                if permission('review')
+                  +thread
+            else if article.status === 'unknown'
+              -let reviewData = article;
+              include ../columns/article/module_review
+              +thread
+          else
             +thread
-        else
-          +thread
-    .article-common.m-b-1.box-shadow-panel(style="position: relative")#comment-content
-      .row
-        include ../publicModules/commentCenter/comment
+        .m-b-1
+          include ../publicModules/commentCenter/comment
+      .col-xs-12.col-md-3.box-shadow-panel#rightDom
+        //- 滚动到页头页脚
+        include ../module_scrollTo.pug
   include ../publicModules/floatForumNav
   include ../publicModules/nkcSource
   //- 下拉后左边显示的所属专业 上级专业 同级专业
   //- +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 block scripts
   +includeDeferJS('/columns/article/article.js', false)
+  +includeDeferJS('/publicModules/articleCenter/articleOption/options.js', false)
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../publicModules/articleCenter/articleOption/articleOptions
   include ../publicModules/disabledPost/disabledPost
 //-  +includeJS('/columns/article/article.js')
 
