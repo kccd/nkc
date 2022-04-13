@@ -24,14 +24,12 @@
     .checkbox
       .editor-auto-save(v-if="autoSaveInfo")
         .fa.fa-check-circle &nbsp;{{ autoSaveInfo }}
-    .row
-      .col-xs-6.p-r-05
-        button.btn.btn-theme.btn-block(
-          @click="readyData",
-          :disabled="disabledSubmit || !checkProtocol"
-        ) {{ disabledSubmit ? '提交中...' : '提交' }}
-      .col-xs-6.p-l-05
-        button.btn.btn-default.btn-block(@click="saveToDraftBase('manual')") 存草稿
+    .row.btn-area
+      button.btn.btn-theme(
+        @click="readyData",
+        :disabled="disabledSubmit || !checkProtocol"
+      ) {{ disabledSubmit ? '提交中...' : '提交' }}
+      button.btn.btn-default(@click="saveToDraftBase('manual')") 存草稿
 </template>
 
 <script>
@@ -468,14 +466,39 @@ export default {
 };
 </script>
 
-<style scoped>
-@media screen and (max-width: 1000px) {
+<style scoped lang="less">
+
+.col-md-3 {
+
+    width: 25%;
+}
+.clo-xs-12{
+  width: 100%;
+}
+@media screen and (max-width: 992px) {
   .col-xs-12 {
     width: 100%;
   }
   .modifySubmit {
-    position: static !important;
     margin: auto;
+  }
+  .btn-area{
+    text-align: center;
+  }
+}
+@media (min-width: 992px){
+  .btn-area{
+    text-align: left;
+    padding-left: 15px;
+  }
+}
+.row{
+  width: 100%;
+}
+.btn-area{
+  
+  .btn:nth-child(1){
+    margin-right: 10px;
   }
 }
 .editor-auto-save {
@@ -483,7 +506,15 @@ export default {
   color: #9baec8;
 }
 .modifySubmit {
-  max-width: 25rem;
-  position: fixed;
+  button{
+    
+    max-width: 10rem;
+    min-width: 6rem;
+    @media (max-width: 1100px) {
+      min-width: 0;
+    }
+  }
+  /* max-width: 25rem; */
+  width: 100%;
 }
 </style>

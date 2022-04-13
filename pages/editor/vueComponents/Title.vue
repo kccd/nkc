@@ -75,12 +75,15 @@ export default {
   font-weight: bold;
 }
 .editor-title {
+  margin-bottom: 15px;
   width: 100%;
-  height: 4rem;
-  border: none;
+  display: block;
+  height: 5rem;
+  padding: 0;
   font-size: 2rem;
-  font-weight: 700;
-  padding: 0.2rem;
+  box-shadow: none;
+  border: none;
+  border-bottom: 1px solid #f4f4f4;
 }
 .editor-title:focus {
   outline: none;

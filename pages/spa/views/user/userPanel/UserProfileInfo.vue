@@ -1,6 +1,5 @@
 <template lang="pug">
   .user-info(v-if="targetUser")
-    .code {{"动态码："+code}}
     .user-column(v-if="targetUser.column")
         .panel-header 他的专栏
         .m-b-2
@@ -80,7 +79,7 @@
 import {getUrl, fromNow} from "../../../../lib/js/tools";
 import {timeFormat} from "../../../../lib/js/time";
 export default {
-  props: ['targetUser', 'code'],
+  props: ['targetUser'],
   data: () => ({
     uid: '',
     userColumn: null,

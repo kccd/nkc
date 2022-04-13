@@ -1,9 +1,10 @@
 <template lang="pug">
 .container-fluid.max-width(v-cloak)
-  .col-sx-12.col-md-12
-    Panel(ref="panel" :fans-count="fansCount" :followers-count="followersCount" :target-user="targetUser" :target-user-scores="targetUserScores" v-if="targetUser")
-    account-user(ref="accountUser" :target-user-fans="targetUserFans" :target-user-followers="targetUserFollowers" :target-user="targetUser" :nav-links="navLinks" :forums="subForums" :code="code")
-    footer-vue(ref="footerVue")
+  .row
+    .col-sx-12.col-md-12
+      panel(ref="panel" :fans-count="fansCount" :followers-count="followersCount" :target-user="targetUser" :target-user-scores="targetUserScores" v-if="targetUser")
+      account-user(ref="accountUser" :target-user-fans="targetUserFans" :target-user-followers="targetUserFollowers" :target-user="targetUser" :nav-links="navLinks" :forums="subForums" :code="code")
+      footer-vue(ref="footerVue")
 </template>
 
 <style lang="less" scoped>
@@ -34,7 +35,7 @@ export default {
     code: null,
   }),
   components: {
-    Panel: Panel,
+    "panel": Panel,
     "account-user": AccountUser,
     "footer-vue": Footer
   },

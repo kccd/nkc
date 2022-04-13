@@ -12,9 +12,9 @@
         data-global-mouseout="hideUserPanel"
         :data-global-data="objToStr({uid: userData.uid})"
          )
-        a( :href="'/u/' + userData.uid" target="_blank") {{ userData.username }}
-      .grade( title="等级" ) {{ userData.info?userData.info.certsName:'' }}
-      .introduce( title="简介" ) {{ userData.description || "暂未填写个人简介"}}
+        a.username( :title="userData.username" :href="'/u/' + userData.uid" target="_blank") {{ userData.username }}
+      .grade( :title="userData.info?userData.info.certsName:''" ) {{ userData.info?userData.info.certsName:'' }}
+      .introduce( :title="userData.description" ) {{ userData.description || "暂未填写个人简介"}}
     .follow-button( title="取消关注" @click="subscribe( userData.uid )" ) {{ subUid.includes(userData.uid) ? "取关" : "关注" }}
 </template>
 <script>
@@ -84,6 +84,19 @@ export default {
 };
 </script>
 <style scoped lang="less">
+.name{
+  width: 100%;
+  .username{
+    width: 100%;
+    display: inline-block;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    padding-left: 0;
+  }
+}
+
 .userInfo {
   margin: 1rem;
   height: 6rem;
@@ -108,6 +121,7 @@ export default {
   width: 5rem;
 }
 .userInfo .describe {
+  word-break: break-all;
   padding-left: 1rem;
   vertical-align: top;
   display: table-cell;
@@ -115,14 +129,12 @@ export default {
   -webkit-flex: 1;*/
 }
 .userInfo .name {
+  width: 70%;
   height: 1.6rem;
   font-size: 1.3rem;
   margin-right: 4rem;
   color: #2b90d9;
   display: inline-block;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  overflow: hidden;
 }
 .userInfo .follow-button {
   // height: 1.6rem;
@@ -149,6 +161,7 @@ export default {
   -webkit-line-clamp: 1;
 }
 .userInfo .introduce {
+  width: 100%;
   height: 1.6rem;
   padding-top: 0.2rem;
   font-size: 1rem;

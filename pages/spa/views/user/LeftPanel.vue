@@ -1,6 +1,9 @@
 <template lang="pug">
   .left-panel
     .col-sx-12.col-md-3.box-shadow-panel.p-r-0.p-l-0.m-b-1
+      //用户动态码和财政
+      .m-b-1(v-if="isSelf")
+        user-code-and-finance(ref="userProfileInfo" :target-user="targetUser" :code="code" :target-user-scores="targetUserScores")
       //用户信息
       .m-b-1(v-if="targetUser")
         user-profile-info(ref="userProfileInfo" :target-user="targetUser" :code="code")
@@ -27,6 +30,7 @@
 <script>
 import UserOperate from "./userPanel/UserOperate";
 import UserProfileInfo from "./userPanel/UserProfileInfo";
+import UserCodeAndFinance from "./userPanel/UserCodeAndFinance";
 import UserFocusOn from "./userPanel/UserFocusOn";
 import NavLinks from "./userPanel/NavLinks";
 import Share from "../../../lib/vue/Share";
@@ -34,7 +38,7 @@ import UserManage from "./userPanel/UserManage";
 import {getState} from "../../../lib/js/state";
 
 export default {
-  props: ['nav-links', 'target-user', "code"],
+  props: ['nav-links', 'target-user', "code","targetUserScores"],
   data: () => ({
     rolePermissionsType: null,
     targetUid: '',
@@ -62,7 +66,8 @@ export default {
     "share":Share,
     "user-manage": UserManage,
     "user-profile-info": UserProfileInfo,
-    "user-operate": UserOperate
+    "user-operate": UserOperate,
+    "user-code-and-finance": UserCodeAndFinance
   },
   mounted() {
     this.initData();

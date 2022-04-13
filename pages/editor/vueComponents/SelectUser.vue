@@ -1,48 +1,49 @@
 <template lang="pug">
-  .modal.fade(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" ref="selectUser")
-    .modal-dialog(role="document" v-cloak)
-      .modal-content
-        .modal-header
-          button.close(data-dismiss="modal" aria-label="Close")
-            span(aria-hidden="true") &times;
-          .modal-title.text-center 选择用户
-        .modal-body
-          .selected-users
-            h5 已选择用户({{selectedUsersId.length + '/' + userCount}})：
-              span(v-if="!selectedUsers.length") 无
-            .selected-user(v-for="u, index in selectedUsers")
-              .selected-user-avatar
-                img(:src="getUrl('userAvatar', u.avatar, 'sm')")
-              .selected-user-name {{u.username}}
-                .fa.fa-remove(@click="removeUser(index)")
-          .input-group
-            .input-group-btn
-              button.btn.btn-default.dropdown-toggle(data-toggle="dropdown" aria-haspopup="true" aria-expanded=false)
-                | {{getTypeName(type)}}&nbsp;
-                span.caret
-              ul.dropdown-menu
-                li.pointer
-                  a(@click="selectType('username')") {{getTypeName("username")}}
-                li.pointer
-                  a(@click="selectType('uid')") {{getTypeName("uid")}}
-            input.form-control.search-input(type="text" v-model.trim="keyword" @keyup.enter="search")
-            button.search-button(@click="search")
-              .fa.fa-search
-          .search-results
-            h5.text-danger(v-if="searchInfo") {{searchInfo}}
-            .search-user(v-for="u in searchUsers" @click="selectUser(u)")
-              .search-user-avatar
-                img(:src="getUrl('userAvatar', u.avatar, 'sm')")
-              .search-user-info
-                .search-user-name {{u.username}}
-                  //.button.fa.fa-plus-circle(@click="selectUser(u)")
-                .search-user-description {{u.description}}
-        .modal-footer
-          button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭
-          button(type="button" class="btn btn-primary btn-sm" disabled=true v-if="!selectedUsersId.length") 确定
-          button(type="button" class="btn btn-primary btn-sm" @click="done" v-else) 确定
+  //- .modal.fade(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" ref="selectUser")
+  //-   .modal-dialog(role="document" v-cloak)
+  .modal-content(ref="selectUser" v-if="show")
+    .modal-header(ref="header")
+      span.fa.fa-remove(@click="close")
+      .modal-title.text-left 选择用户
+    .modal-body
+      .selected-users
+        h5 已选择用户({{selectedUsersId.length + '/' + userCount}})：
+          span(v-if="!selectedUsers.length") 无
+        .selected-user(v-for="u, index in selectedUsers")
+          .selected-user-avatar
+            img(:src="getUrl('userAvatar', u.avatar, 'sm')")
+          .selected-user-name {{u.username}}
+            .fa.fa-remove(@click="removeUser(index)")
+      .input-group
+        .input-group-btn
+          button.btn.btn-default.dropdown-toggle(aria-expanded=false)
+            | {{getTypeName(type)}}&nbsp;
+            span.caret
+          ul.dropdown-menu
+            li.pointer
+              a(@click="selectType('username')") {{getTypeName("username")}}
+            li.pointer
+              a(@click="selectType('uid')") {{getTypeName("uid")}}
+        input.form-control.search-input(type="text" v-model.trim="keyword" @keyup.enter="search")
+        button.search-button(@click="search")
+          .fa.fa-search
+      .search-results
+        h5.text-danger(v-if="searchInfo") {{searchInfo}}
+        .search-user(v-for="u in searchUsers" @click="selectUser(u)")
+          .search-user-avatar
+            img(:src="getUrl('userAvatar', u.avatar, 'sm')")
+          .search-user-info
+            .search-user-name {{u.username}}
+              //.button.fa.fa-plus-circle(@click="selectUser(u)")
+            .search-user-description {{u.description}}
+    .modal-footer
+      button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
+      button(type="button" class="btn btn-primary btn-sm" disabled=true v-if="!selectedUsersId.length") 确定
+      button(type="button" class="btn btn-primary btn-sm" @click="done" v-else) 确定
 </template>
 <script>
+import { DraggableElement } from "../../lib/js/draggable";
+
 export default {
   data:()=> ({
       users: [],
@@ -53,7 +54,8 @@ export default {
       type: "username", // username, uid
       keyword: "",
       paging: "",
-      show: false
+      show: false,
+      draggableElement: {}
     }),
     computed: {
       selectedUsers: function() {
@@ -128,16 +130,25 @@ export default {
         this.userCount = options.userCount || 99;
         this.callback = callback;
         // self.dom.modal("show");
-        $(this.$refs.selectUser).modal("show");
+        // $(this.$refs.selectUser).modal("show");
+        this.show = true;
+        this.$nextTick(()=>{
+          this.draggableElement = new DraggableElement(
+            this.$refs.selectUser,
+            this.$refs.header
+        );
+        })
       },
       close: function() {
-        $(this.$refs.selectUser).modal("hide");
+        // $(this.$refs.selectUser).modal("hide");
+        this.show = false;
         setTimeout( ()=> {
           this.searchUsers = [];
           this.type = "username";
           this.selectedUsersId = [];
           this.userCount = 0;
         }, 1000);
+        this.draggableElement.destroy && this.draggableElement.destroy();
       },
       done: function() {
         this.callback({
@@ -151,13 +162,52 @@ export default {
     }
 }
 </script>
-<style scoped>
+<style scoped lang="less">
 @media (min-width: 768px){
-  .modal-dialog{
-    width: 400px;
+.modal-dialog{
+  width: 400px;
+}
+}
+.fa-remove{
+  width: 3rem;
+  height: 3rem;
+  text-align: center;
+  line-height: 3rem;
+  float: right;
+  &:hover{
+    background-color: rgba(0, 0, 0, 0.08);
+    color: #777;
+    cursor: pointer;
   }
 }
+.modal-title{
+  padding-left: 5px;
+  height: 3rem;
+  line-height: 3rem;
+}
+// .close{
+//   padding: 3px 9px;
+//   &:hover{
+//     background: red;
+//     cursor: pointer;
+//   }
+// }
+.text-left{
+  text-align: left;
+}
+.modal-content{
+  position: fixed;
+  top: 20%;
+  width: 30rem;
+}
 .modal-header{
+  font-weight: 700;
+  padding: 0;
+  height: 3rem;
+  color: #000;
+  cursor: all-scroll;
+  user-select: none;
+  background-color: #f6f6f6;
   border-bottom: none;
 }
 .modal-body{
