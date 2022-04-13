@@ -309,7 +309,7 @@ export function RNWechatPay(data) {
     H5Url,
     referer
   } = data;
-  RNEmit('weChatPay', {
+  RNEmit('', {
     url,
     H5Url,
     referer
@@ -345,4 +345,11 @@ export function RNSaveImage(data) {
     ],
     index: 0,
   });
+}
+
+/*
+* 打开app下载列表
+* */
+export function RNOpenDownloadList() {
+  RNEmit('openDownloadList');
 }

@@ -1,3 +1,5 @@
+import {RNOpenDownloadList} from "../../lib/js/reactNative";
+
 const tabs = [
   {
     id: '/thread',
@@ -58,3 +60,8 @@ $(function() {
   //   },
   // });
 });
+
+
+window.openDownloadList = function() {
+  RNOpenDownloadList();
+}

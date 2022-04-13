@@ -136,9 +136,6 @@ export default {
       const self = this;
       nkcAPI(`/u/${this.uid}/p/s/blacklist`, 'GET')
       .then(res => {
-        if(self.$refs.floatUserPanel) {
-          self.$refs.floatUserPanel.initPanel();
-        }
         self.bl = res.bl;
         self.targetUser = res.targetUser;
       })

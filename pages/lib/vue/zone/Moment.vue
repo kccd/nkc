@@ -5,11 +5,11 @@
 
 
     .single-moment-top-container#comment-content
-      moment-option(
-        ref="momentOption"
-        @complaint="complaint"
-        @violation-record="violationRecord"
-      )
+      //moment-option(
+      //  ref="momentOption"
+      //  @complaint="complaint"
+      //  @violation-record="violationRecord"
+      //)
       .single-moment-left
         .single-moment-avatar(
           data-global-mouseover="showUserPanel"
@@ -29,7 +29,11 @@
             from-now(:time="momentData.toc")
           //- 其他操作
           .single-moment-header-options.fa.fa-ellipsis-h(@click="openOption($event)" data-direction="down")
-
+            moment-option(
+              ref="momentOption"
+              @complaint="complaint"
+              @violation-record="violationRecord"
+            )
         //- 动态内容
         .single-moment-content(v-html="momentData.content")
 
@@ -71,7 +75,7 @@
             :type="showPanelType"
             @post-comment="onPostComment"
             :focus="focus"
-            @open-comment-option="openCommentOption"
+
             )
 </template>
 
@@ -240,9 +244,6 @@
       top: 0;
       right: 0;
       cursor: pointer;
-      &:hover{
-        opacity: 0.7;
-      }
     }
   }
   .single-moment-title{
@@ -309,7 +310,7 @@
   import MomentComments from './MomentComments';
   import MomentQuote from './MomentQuote';
   import MomentStatus from "./MomentStatus";
-  import MomentOption from "./momentOption/MomentOption";
+  import MomentOptionFixed from "./momentOption/MomentOptionFixed";
   export default {
     components: {
       'from-now': FromNow,
@@ -317,7 +318,7 @@
       'moment-comments': MomentComments,
       'moment-quote': MomentQuote,
       'moment-status': MomentStatus,
-      'moment-option': MomentOption
+      'moment-option': MomentOptionFixed
     },
     /*
     * prop {Object} data 动态用于显示的数据 组装自 MomentModel.statics.extendMomentsListData
@@ -380,11 +381,9 @@
       //打开其他操作
       openOption(e) {
         const target = e.target;
-        const direction = $(target).attr('data-direction') || 'up';
         const init = $(target).attr('data-init');
         if(init === 'true') return;
-        this.$refs.momentOption.open({DOM: $(target), moment: this.momentData, direction});
-        // this.$emit('open-option', {DOM: $(target), moment: this.momentData, direction});
+        this.$refs.momentOption.open({DOM: $(target), moment: this.momentData});
         //阻止浏览器默认事件 阻止事件冒泡
         // e.stopPropagation();
       },
@@ -396,11 +395,6 @@
       violationRecord(uid) {
         this.$emit('violation-record', uid);
       },
-      //打开评论的其他操作
-      openCommentOption(data) {
-        this.$refs.momentOption.open(data);
-        // this.$emit('option-comment-option', data);
-      }
     }
   }
 </script>

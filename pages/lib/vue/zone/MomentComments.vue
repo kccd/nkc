@@ -16,7 +16,7 @@
       paging(:pages="pageButtons" @click-button="clickPageButton")
       .moment-comment-list
         .moment-comment-item(
-          v-for="commentData in commentsData"
+          v-for="(commentData, index) in commentsData"
           :class=`{'active': focusCommentId === commentData.momentCommentId, 'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted'}`
           )
           moment-status(ref="momentStatus" :moment="commentData")
@@ -39,8 +39,12 @@
               .moment-comment-option(@click="vote(commentData)" :class="{'active': commentData.voteType === 'up'}")
                 .fa.fa-thumbs-o-up
                 span(v-if="commentData.voteUp > 0") {{commentData.voteUp}}
-              .moment-comment-option.fa.fa-ellipsis-h(@click="openOption($event, commentData)" data-direction="up")
-
+              .moment-comment-option.fa.fa-ellipsis-h(@click="openOption($event, commentData, index)" data-direction="up")
+                moment-option(
+                  :ref="`momentOption_${index}`"
+                  @complaint="complaint"
+                  @violation-record="violationRecord"
+                )
           .moment-comment-item-content(v-html="commentData.content")
       paging(:pages="pageButtons" @click-button="clickPageButton")
 
@@ -107,14 +111,14 @@
             cursor: pointer;
             padding: 0 0.2rem;
             margin-left: 0.5rem;
-            &:hover{
-              opacity: 0.7;
-            }
             &.active{
               color: @accent;
             }
             span{
               margin-left: 0.2rem;
+            }
+            #modulePostOptions{
+
             }
           }
         }
@@ -168,14 +172,15 @@
   import FromNow from '../FromNow';
   import MomentCommentEditor from './MomentCommentEditor';
   import MomentStatus from "./MomentStatus";
-
+  import MomentOptionFixed from "./momentOption/MomentOptionFixed";
   export default {
     props: ['mid', 'type', 'focus'],
     components: {
       'paging': Paging,
       'from-now': FromNow,
       'moment-comment-editor': MomentCommentEditor,
-      'moment-status': MomentStatus
+      'moment-status': MomentStatus,
+      'moment-option': MomentOptionFixed
     },
     data: () => ({
       commentsData: [],
@@ -271,15 +276,21 @@
           .catch(sweetError)
       },
       //打开其他操作
-      openOption(e, moment) {
+      openOption(e, moment, index) {
+        const self = this;
         const target = e.target;
-        const direction = $(target).attr('data-direction') || 'up';
-        const init = $(target).attr('data-init');
-        if(init === 'true') return;
-        this.$emit('open-comment-option', {DOM: $(target), moment, direction});
-        //阻止浏览器默认事件
+        const name = `momentOption_${index}`;
+        self.$refs[name][0].open({DOM: $(target), moment});
         e.stopPropagation();
-      }
+      },
+      //投诉或举报
+      complaint(mid) {
+        this.$emit('complaint', mid);
+      },
+      //查看违规记录
+      violationRecord(uid) {
+        this.$emit('violation-record', uid);
+      },
     },
   }
 </script>

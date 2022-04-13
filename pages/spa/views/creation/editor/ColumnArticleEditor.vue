@@ -11,7 +11,7 @@
         span 去开通专栏吧
 
 </template>
-<style>
+<style scoped>
 .no-column {
   text-align: center;
   font-size: 1.2rem;
