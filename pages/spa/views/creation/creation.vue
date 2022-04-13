@@ -19,7 +19,7 @@ import Home from "./Home"
 export default {
   components: {
     "creation-nav": VerNav,
-    home: Home
+    "home": Home
   },
   data: () => ({
     transitionName: "fade",
@@ -27,6 +27,16 @@ export default {
     isApp: false,
     showHome: false,
   }),
+  beforeCreate() {
+    $('body').css({
+      backgroundColor: '#fff'
+    })
+  },
+  beforeDestroy() {
+    $('body').css({
+      backgroundColor: ''
+    })
+  },
   watch: {
     "$route": {
       // immediate: true,
@@ -73,11 +83,13 @@ export default {
   },
 };
 </script>
+
 <style lang="less" scoped>
 @import "../../../publicModules/base";
 @leftNavWidth: 20rem;
 @paddingTop: 5rem;
 @max-width: 1000px;
+
 .creation-nav-container-isApp{
   margin-top: 3rem !important;
 }
