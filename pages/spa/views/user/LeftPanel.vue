@@ -1,26 +1,25 @@
 <template lang="pug">
-  .left-panel
-    .col-sx-12.col-md-3.box-shadow-panel.p-r-0.p-l-0.m-b-1
-      //用户动态码和财政
-      .m-b-1(v-if="isSelf")
-        user-code-and-finance(ref="userProfileInfo" :target-user="targetUser" :code="code" :target-user-scores="targetUserScores")
-      //用户信息
-      .m-b-1(v-if="targetUser")
-        user-profile-info(ref="userProfileInfo" :target-user="targetUser" :code="code")
-      //用户操作
-      .m-b-1(v-if="isSelf")
-        user-operate(:target-user="targetUser")
-      //- 用户链接
-      .m-b-1(v-if="isSelf")
-        nav-links(ref="userLink" v-if="rolePermissionsType" :nav-links="navLinks")
-      //用户关注
-      //.m-b-1(v-if="rolePermissionsType" )
-      //  user-focus-on(ref="userFocusOn")
-      .m-b-1
-        user-manage(ref="userManage")
-      //  分享链接
-      .m-b-1
-        share(ref="share" share-type="user" :share-title="targetUser.username || targetUser.uid" :share-id="targetUser.uid" :share-description="targetUser.description" :share-avatar="targetUser.avatar")
+  .left-panel.box-shadow-panel
+    //用户动态码和财政
+    .m-b-1(v-if="isSelf")
+      user-code-and-finance(ref="userProfileInfo" :target-user="targetUser" :code="code" :target-user-scores="targetUserScores")
+    //用户信息
+    .m-b-1(v-if="targetUser")
+      user-profile-info(ref="userProfileInfo" :target-user="targetUser" :code="code")
+    //用户操作
+    .m-b-1(v-if="isSelf")
+      user-operate(:target-user="targetUser")
+    //- 用户链接
+    .m-b-1(v-if="isSelf")
+      nav-links(ref="userLink" v-if="rolePermissionsType" :nav-links="navLinks")
+    //用户关注
+    //.m-b-1(v-if="rolePermissionsType" )
+    //  user-focus-on(ref="userFocusOn")
+    .m-b-1
+      user-manage(ref="userManage")
+    //  分享链接
+    .m-b-1
+      share(ref="share" share-type="user" :share-title="targetUser.username || targetUser.uid" :share-id="targetUser.uid" :share-description="targetUser.description" :share-avatar="targetUser.avatar")
 
 </template>
 <style lang="less">

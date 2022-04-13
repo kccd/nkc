@@ -1,61 +1,62 @@
 <template lang="pug">
-  .user-banner(@mouseenter="enter()" @mouseleave="leave()" v-if="targetUser").m-b-1
-    subscribe-types(ref="subscribeTypes")
-    .hidden-user-home-tip(v-if="targetUser && targetUser.hidden" )
-      span 用户名片已被屏蔽
-      //用户名片
-    .account-banner(v-if="targetUser" )
-      //用户banner容器
-      .account-user-banner-container
-        .account-user-banner(:style="`backgroundImage: url('${getUrl('userBanner', targetUser.userBanner)}')`" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
-          .account-user-info
-            .account-user-avatar
-              img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
-            .account-user-introduce
-              .account-user-name {{targetUser.username}}
-                user-level(ref="userLevel" :target-user="targetUser")
-              .account-user-subscribe(v-if="subscribeBtn")
-                div(:class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
-                div.link(@click.stop="toChat(targetUser.uid)" v-if="selfUid") 私信
-                div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
-                div(v-if="usersBlUid.indexOf(targetUser.uid,1) === -1" ) 加入黑名单
-                div(v-else-if="usersBlUid.indexOf(targetUser.uid,1) !== -1") 移除黑名单
-        .account-nav
-          .account-nav-box
-            .account-nav-left
-            .account-nav-middle
-              span(@click="containerChange('moment')" :class="{'active': $route.name === 'moment'}") 动态
-              span(@click="containerChange('post')" :class="{'active': $route.name === 'post'}") 社区
-              span(@click="containerChange('subColumns')" :class="{'active': $route.name === 'subColumns'}") 专栏
-            .account-nav-right
-              div
-                div 关注
-                span {{followersCount >= 1000 ? (followersCount/1000).toFixed(1)+'K' : followersCount}}
-              div
-                div 粉丝
-                span {{fansCount >= 1000 ? (fansCount/1000).toFixed(1)+'K' : fansCount}}
+  .container-fluid.max-width
+    .user-banner(@mouseenter="enter()" @mouseleave="leave()" v-if="targetUser").m-b-1
+      subscribe-types(ref="subscribeTypes")
+      .hidden-user-home-tip(v-if="targetUser && targetUser.hidden" )
+        span 用户名片已被屏蔽
+        //用户名片
+      .account-banner(v-if="targetUser" )
+        //用户banner容器
+        .account-user-banner-container
+          .account-user-banner(:style="`backgroundImage: url('${getUrl('userBanner', targetUser.userBanner)}')`" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
+            .account-user-info
+              .account-user-avatar
+                img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
+              .account-user-introduce
+                .account-user-name {{targetUser.username}}
+                  user-level(ref="userLevel" :target-user="targetUser")
+                .account-user-subscribe(v-if="subscribeBtn")
+                  div(:class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
+                  div.link(@click.stop="toChat(targetUser.uid)" v-if="selfUid") 私信
+                  div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
+                  div(v-if="usersBlUid.indexOf(targetUser.uid,1) === -1" ) 加入黑名单
+                  div(v-else-if="usersBlUid.indexOf(targetUser.uid,1) !== -1") 移除黑名单
+          .account-nav
+            .account-nav-box
+              .account-nav-left
+              .account-nav-middle
+                span(@click="containerChange('moment')" :class="{'active': $route.name === 'moment'}") 动态
+                span(@click="containerChange('post')" :class="{'active': $route.name === 'post'}") 社区
+                span(@click="containerChange('subColumns')" :class="{'active': $route.name === 'subColumns'}") 专栏
+              .account-nav-right
+                div
+                  div 关注
+                  span {{followersCount >= 1000 ? (followersCount/1000).toFixed(1)+'K' : followersCount}}
+                div
+                  div 粉丝
+                  span {{fansCount >= 1000 ? (fansCount/1000).toFixed(1)+'K' : fansCount}}
 
-    div(v-if="panelPermission && (panelPermission.unBannedUser || panelPermission.bannedUser ||panelPermission.clearUserInfo)" )
-      .btn-ban(v-show="showBanBox" @click="clickBanContext()")
-        .fa.fa-ban( title="用户违规？点我！")
-        ul(v-show="showBanContext" )
-          li(v-if="targetUser && (targetUser.certs.includes('banned') && panelPermission.unBannedUser)")
-            a(@click="bannedUser(targetUser.uid, false)") 解除封禁
-          li(v-if="targetUser && (targetUser.certs.includes('banned') && panelPermission.bannedUser)")
-            a(@click="bannedUser(targetUser.uid, true)") 封禁用户
-          li(v-if="panelPermission.hideUserHome && targetUser && targetUser.hidden")
-            a(@click="hideUserHome(false,targetUser.uid)")  取消屏蔽用户名片
-          li(v-if="panelPermission.hideUserHome && targetUser && !targetUser.hidden")
-            a(@click="hideUserHome(true,targetUser.uid)")  屏蔽用户名片
-          li.divider
-          li(v-if="panelPermission.clearUserInfo")
-            a(@click="clearUserInfo(targetUser.uid, 'avatar')") 删除头像
-          li(v-if="panelPermission.clearUserInfo")
-            a(@click="clearUserInfo(targetUser.uid, 'banner')") 删除背景
-          li(v-if="panelPermission.clearUserInfo")
-            a(@click="clearUserInfo(targetUser.uid, 'username')") 删除用户名
-          li(v-if="panelPermission.clearUserInfo")
-            a(@click="clearUserInfo(targetUser.uid, 'description')") 删除简介
+      div(v-if="panelPermission && (panelPermission.unBannedUser || panelPermission.bannedUser ||panelPermission.clearUserInfo)" )
+        .btn-ban(v-show="showBanBox" @click="clickBanContext()")
+          .fa.fa-ban( title="用户违规？点我！")
+          ul(v-show="showBanContext" )
+            li(v-if="targetUser && (targetUser.certs.includes('banned') && panelPermission.unBannedUser)")
+              a(@click="bannedUser(targetUser.uid, false)") 解除封禁
+            li(v-if="targetUser && (targetUser.certs.includes('banned') && panelPermission.bannedUser)")
+              a(@click="bannedUser(targetUser.uid, true)") 封禁用户
+            li(v-if="panelPermission.hideUserHome && targetUser && targetUser.hidden")
+              a(@click="hideUserHome(false,targetUser.uid)")  取消屏蔽用户名片
+            li(v-if="panelPermission.hideUserHome && targetUser && !targetUser.hidden")
+              a(@click="hideUserHome(true,targetUser.uid)")  屏蔽用户名片
+            li.divider
+            li(v-if="panelPermission.clearUserInfo")
+              a(@click="clearUserInfo(targetUser.uid, 'avatar')") 删除头像
+            li(v-if="panelPermission.clearUserInfo")
+              a(@click="clearUserInfo(targetUser.uid, 'banner')") 删除背景
+            li(v-if="panelPermission.clearUserInfo")
+              a(@click="clearUserInfo(targetUser.uid, 'username')") 删除用户名
+            li(v-if="panelPermission.clearUserInfo")
+              a(@click="clearUserInfo(targetUser.uid, 'description')") 删除简介
 
 </template>
 
@@ -72,14 +73,15 @@
   .hidden-user-home-tip {
   }
   .account-banner {
-    //height: 12rem;
+    background-color: #fff;
     width: 100%;
+    border-radius: 3px;
+    overflow: hidden;
     .account-user-banner-container {
       .account-user-banner {
         width: 100%;
         height: 14rem;
         background-repeat: no-repeat;
-        border-radius: 4px;
         background-size: cover;
         background-position: center center;
         position: relative;
@@ -112,7 +114,6 @@
               margin: 0 0 0 9rem;
             }
             .account-user-name{
-              margin-top: 25px;
               font-size: 20px;
               font-weight: bold;
               @media (max-width: 991px){
