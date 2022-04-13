@@ -499,7 +499,7 @@ export default {
   color: #9baec8;
 }
 .modifySubmit {
-  background: transparent;
+  background-color: transparent!important;
   button{
     max-width: 10rem;
     min-width: 6rem;
