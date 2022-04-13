@@ -1,6 +1,6 @@
 <template lang="pug">
   .community-a
-    .community-thread-editor 社区创作
+    .community-thread-editor
     editor
 </template>
 
@@ -9,7 +9,7 @@ import Editor from "../../../../editor/vueComponents/Editor";
 export default {
   components: {
     editor: Editor
-  }
+  },
 };
 </script>
 <style lang="less">

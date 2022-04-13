@@ -120,6 +120,9 @@ export default {
 </script>
 
 <style scoped>
+.contract-info span{
+  margin-right: 10px;
+}
 .editor-author input:focus {
   outline: none;
 }

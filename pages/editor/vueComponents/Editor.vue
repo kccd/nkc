@@ -184,8 +184,8 @@ export default {
   padding-left: 15px; */
 }
 .box-shadow-panel > div {
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
-  padding: 15px;
+  box-shadow: none ;
+  padding: 0;
   background-color: #fff;
   border-radius: 3px;
 }
