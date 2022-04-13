@@ -21,7 +21,7 @@
   import MoveDirectoryDialog from '../../../components/MoveDirectoryDialog'
   import { EventBus } from '../../../eventBus'
   // import {saveToSessionStorage, getFromSessionStorage, updateInSessionStorage, sessionStorageKeys} from "../../../lib/js/sessionStorage";
-  import { scrollFun } from "../../../../lib/js/scrollBar";
+  // import { scrollFun } from "../../../../lib/js/scrollBar";
   export default {
     components: {
       'document-editor': DocumentEditor,
@@ -79,7 +79,7 @@
       }
     },
     mounted() {
-      scrollFun(window, 0, 0)
+      // scrollFun(window, 0, 0)
       this.initId();
       this.initData();
     },

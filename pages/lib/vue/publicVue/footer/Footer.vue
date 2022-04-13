@@ -77,7 +77,8 @@ export default {
       appStableVersion: "",
     };
   },
-  created() {
+  created() {},
+  mounted() {
     const {
       record,
       copyright,
@@ -87,7 +88,7 @@ export default {
       links,
       app,
       about,
-      appStableVersion,
+      appStableVersion
     } = getState();
     const data = {
       record,
@@ -98,7 +99,7 @@ export default {
       links,
       app,
       about,
-      appStableVersion,
+      appStableVersion
     };
     for (let key in data) {
       data.hasOwnProperty(key) && (this[key] = data[key]);
@@ -108,20 +109,20 @@ export default {
 </script>
 
 <style scoped>
-@media (min-width: 992px){
-.col-md-2 {
+@media (min-width: 992px) {
+  .col-md-2 {
     width: 16.66666667%;
+  }
 }
-}
-.container-fluid{
+.container-fluid {
   padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
 }
-canvas{
+canvas {
   display: inline-block;
-    vertical-align: baseline;
+  vertical-align: baseline;
 }
 .container-fluid.max-width {
   max-width: 1300px;
@@ -131,15 +132,15 @@ canvas{
   margin-right: -15px;
   margin-left: -15px;
 }
-@media all and (max-width: 992px){
+@media all and (max-width: 992px) {
   .col-xs-6 {
-  position: relative;
-  min-height: 1px;
-  padding-right: 15px;
-  padding-left: 15px;
-  width: 50%;
-  float: left;
-}
+    position: relative;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+    width: 50%;
+    float: left;
+  }
 }
 .col-xs-12 {
   float: left;

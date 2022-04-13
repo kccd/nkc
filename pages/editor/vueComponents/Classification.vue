@@ -182,7 +182,7 @@ export default {
       const tcId = [];
       for (const tc of this.threadCategories) {
         if ([null, "default"].includes(tc.selectedNode)) continue;
-        tcId.push(tc.selectedNode._id);
+        tc.selectedNode && tcId.push(tc.selectedNode._id);
       }
       return tcId;
     },

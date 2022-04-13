@@ -17,6 +17,7 @@
 </template>
 
 <script>
+
 import ResourceSelector from "../../lib/vue/ResourceSelector";
 import ImageSelector from "../../lib/vue/ImageSelector";
 import { fileToBase64 } from "../../lib/js/file";

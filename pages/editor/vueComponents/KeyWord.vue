@@ -14,11 +14,11 @@
       .fa.fa-remove.p-l-05(@click="removeKeyword(index, keyWordsEn)")
     button.btn.btn-default.btn-sm(@click="addKeyword") 添加
 
-  .modal.fade(v-if="showModel")
+  .modal.fade(v-if="showModel" ref="model")
     .modal-dialog.modal-sm
       .modal-content
-        .modal-header
-          .fa.fa-remove(@click="close")
+        .modal-header(ref="addKeyword")
+          .fa.fa-remove.close-modal(@click="close")
           .modal-title {{ title }}
           .quote-content(v-if="quote") {{ quote }}
         .modal-body
@@ -79,6 +79,8 @@
 </template>
 
 <script>
+import { DraggableElement } from "../../lib/js/draggable";
+
 export default {
   data: () => ({
     title: "添加关键词",
@@ -108,31 +110,46 @@ export default {
     }
   },
   watch: {
-    keywords(n, o) {
-      this.$set(this.data[0], "value", (n.cn && n.cn.join(",")) || "");
-      this.$set(this.data[1], "value", (n.en && n.en.join(",")) || "");
-      this.submit();
+    keywords: {
+      immediate: true,
+      handler(n){
+        if(typeof n !== "undefined"){
+          this.$set(this.data[0], "value", (n.cn && n.cn.join(",")) || "");
+          this.$set(this.data[1], "value", (n.en && n.en.join(",")) || "");
+          this.submit();
+        }
+        
+      }
+      
     }
   },
   methods: {
     close() {
       this.showModel = false;
-      this.data = [
-        {
-          label: "中文，添加多个请以逗号分隔",
-          dom: "textarea",
-          value: ""
-        },
-        {
-          label: "英文，添加多个请以逗号分隔",
-          dom: "textarea",
-          value: ""
-        }
-      ];
+      // this.data = [
+      //   {
+      //     label: "中文，添加多个请以逗号分隔",
+      //     dom: "textarea",
+      //     value: ""
+      //   },
+      //   {
+      //     label: "英文，添加多个请以逗号分隔",
+      //     dom: "textarea",
+      //     value: ""
+      //   }
+      // ];
     },
     open() {
       this.showModel = true;
       // this.$forcedUpdate()
+      // console.log(this.$el)
+      // 等待v-if dom加载完成
+      this.$nextTick(()=>{
+        this.draggableElement = new DraggableElement(
+        this.$refs.model,
+        this.$refs.addKeyword
+      );
+      })
     },
     submit() {
       this.keyWordsEn = [];
@@ -194,27 +211,43 @@ export default {
 </script>
 
 <style scoped lang="less">
-.fa-remove {
+.close-modal{
   float: right;
-  padding: 1rem;
+  padding: 8px 8px;
+  &:hover{
+    background: #b1b3b648;
+    cursor: pointer;
+  }
 }
 
 .modal-footer {
   border-top: 0;
+  padding-top: 0;
 }
 .modal-header {
   padding: 0;
 }
 
 .modal-title {
+  cursor: move;
   text-align: center;
-  height: 5rem;
+  height: 4rem;
   color: #282c37;
   font-weight: 700;
-  line-height: 5rem;
+  line-height: 4rem;
   font-size: 1.3rem;
 }
-
+.p-l-05 {
+    padding-left: 0.5rem !important;
+}
+.fa {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
 .modal-dialog {
   margin: 10rem auto;
 }
@@ -255,5 +288,9 @@ export default {
 }
 .editor-header small {
   color: #88919d;
+}
+.options-button{
+  display: inline-block;
+    padding-right: 0;
 }
 </style>
