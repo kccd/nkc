@@ -8,49 +8,85 @@
   @param {Number}} collectedCount 文章收藏数
 extends ../bootstrap_base
 block title
-  -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar} = data.columnPost
+  -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, collected} = data.columnPost
   -var {_id, name} = column
-  -var {hits, count, oc} = thread
-  -var {authorInfos, uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c} = post
+  -var {hits, count, oc, url} = thread
+  -var {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm} = post
   title=t
+  -var showManagement = data.user && data.isModerator && permission('review');
   //- 与post隐藏相关的设置
   include ../thread/hidePostContentSettings
   if data.postHeight
     +hidePostContentSettings(data.postHeight)
   +includeCSS('../../columns/article/article.css')
 block content
-  .hidden#data=objToStr({comments: data.comments, comment: data.comment, article: data.article, type: data.type})
+  mixin thread
+    .m-b-1
+      include ../columns/article/nav
+      +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url})
+      include ../columns/article/setUp
+      if type === 'article'
+        //- 文章管理员操作
+        +setUp()
+      include ../columns/article/title
+      +title({t, article, uid, userAvatar: user.avatar, toc, originState, name, _id})
+      include ../columns/article/abstract
+      +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
+      include ../columns/article/content
+      +content(c)
+      include ../columns/article/articleEditTime
+      +articleEditTime(tlm)
+      //- 文章用户其他操作
+      .single-post-bottom#articleOption
+        if type === 'article'
+          a.single-comment-bottom-item(href="#container")
+            .fa.fa-comment-o.reply-icon
+            span 回复
+          .single-comment-bottom-item(data-type="articleOption" data-aid=article._id title="其他操作" data-direction="down")
+            .fa.fa-sliders.option-icon
+        else
+          .single-comment-bottom-item(data-type="articleOption" data-tid=article.tid data-collected=`${collected}` title="其他操作" data-direction="up")
+            .fa.fa-sliders.option-icon
+  .hidden#data=objToStr({comments: data.comments, comment: data.comment, article, collectedCount, type, collected})
   .container-fluid.max-width
-    .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel
-      .row
+    .row
+      .col-xs-12.col-md-9.article-common.box-shadow-panel#comment-content
         .m-b-1
-          include ../columns/article/nav
-          +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount})
-          include ../columns/article/setUp
-          +setUp()
-          include ../columns/article/title
-          +title({t, authorInfos, uid, userAvatar, toc, originState, name, _id})
-          include ../columns/article/abstract
-          +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
-          include ../columns/article/content
-          +content(c)
-    .article-common.col-xs-12.col-md-9.box-shadow-panel#comment-content
-      .row
-        include ../publicModules/commentCenter/comment
-    .col-xs-12.col-md-3.box-shadow-panel#rightDom
-      //- 滚动到页头页脚
-      include ../module_scrollTo.pug
-  //- 显示作者联系信息
-  include ../columns/article/authorInfo.pug
-  +authorInfo()
-  //- include ../../publicModules/floatForumNav
+          if type === 'article' && article.status !== 'normal' && article.status !== undefined
+            if article.status === 'faulty'
+              .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${article.status === 'faulty' ? 'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;' : ''}`)
+                .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
+                p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${article.reason}`
+                +thread
+            else if article.status === 'disabled'
+              .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${article.status === 'disabled' ? 'border: 1px solid #666;padding: 0.5rem;border-radius: 5px;background-color: #fff;' : ''}`)
+                .h4.text-center(style='color: #666;') 本文已被封禁，不可查看
+                if permission('review')
+                  .text-center
+                    a(onclick="unblock()") 点击解封
+                p.text-center(style='border-bottom: 1px solid #666; padding-bottom: 1rem;color: #666;')= `封禁原因：${article.reason}`
+                if permission('review')
+                  +thread
+            else if article.status === 'unknown'
+              -let reviewData = article;
+              include ../columns/article/module_review
+              +thread
+          else
+            +thread
+        .m-b-1
+          include ../publicModules/commentCenter/comment
+      .col-xs-12.col-md-3.box-shadow-panel#rightDom
+        //- 滚动到页头页脚
+        include ../module_scrollTo.pug
+  include ../publicModules/floatForumNav
   include ../publicModules/nkcSource
-
   //- 下拉后左边显示的所属专业 上级专业 同级专业
   //- +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 block scripts
   +includeDeferJS('/columns/article/article.js', false)
+  +includeDeferJS('/publicModules/articleCenter/articleOption/options.js', false)
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../publicModules/articleCenter/articleOption/articleOptions
   include ../publicModules/disabledPost/disabledPost
 //-  +includeJS('/columns/article/article.js')
 
