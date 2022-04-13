@@ -362,9 +362,9 @@ export default {
       if(this.source === 'column') {
         url = '/creation/column/draft'
       } else if(this.source === 'zone') {
-        url = '/creation/column/draft';
+        url = '/creation/zone/draft';
       }
-      window.location.href = '/creation/column/draft';
+      window.location.href = url;
     },
     //在编辑器中写入数据库
     initDocumentForm() {

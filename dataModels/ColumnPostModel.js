@@ -616,6 +616,19 @@ schema.statics.deleteColumnPost = async function(aid) {
   await ColumnPostModel.deleteOne({pid: _id, type: articleType});
 }
 
+/*
+* 拓展专栏文章显示列表
+* @params {Object} articles 需要拓展的article集合
+*
+* */
+schema.statics.extendColumnArticles = async function(articles) {
+  const ArticleModel = mongoose.model('articles');
+  const _articles = await ArticleModel.getArticlesInfo(articles);
+  for(const article of _articles) {
+    const {} = article;
+  }
+  return null;
+}
 
 
 module.exports = mongoose.model("columnPosts", schema);

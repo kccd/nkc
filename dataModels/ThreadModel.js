@@ -75,6 +75,7 @@ const threadSchema = new Schema({
 	  index: 1,
     default: false
   },
+  //文章内容第一个pid
   oc: {
     type: String,
     default: '',
@@ -794,7 +795,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
   const parentForumsId = new Set(), forumsObj = {}, categoryObj = {}, columnsObj = {};
 
   threads = threads.filter(thread => !!thread);
-
+  
   threads.map(thread => {
     if(!thread) return;
     thread.tcId = thread.tcId || [];
@@ -805,7 +806,6 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       thread.columns = [];
       columnIds = columnIds.concat(thread.columnsId);
       columnIds = [...new Set(columnIds)];
-
     }
     if(o.forum) {
       forumsId = forumsId.concat(thread.mainForumsId);

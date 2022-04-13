@@ -96,6 +96,9 @@ mixin displayColumn(columns)
 -}
 //- -var threadTitle = tools.removeLink(thread.firstPost.t);
 -var threadTitle = thread.firstPost.t;
+-var threadUrl = `/t/${thread.tid}`;
+if data.t === 'column'
+  -threadurl=thread.url;
 .thread-panel(class=threadPanelClass data-tid=thread.tid)
   if !thread.reviewed
     include ../module_review
@@ -119,7 +122,7 @@ mixin displayColumn(columns)
               img(src=anonymousInfo.avatar)
           .thread-panel-minimalist-title
             +checkBox
-            a.thread-panel-minimalist-title-a.thread-panel-url(href=`/t/${thread.tid}` title=threadTitle class=thread.digest ? "digest" : ""  target=aTarget)=threadTitle
+            a.thread-panel-minimalist-title-a.thread-panel-url(href=threadurl title=threadTitle class=thread.digest ? "digest" : ""  target=aTarget)=threadTitle
             +displayPageCount
           .absolute-count
             -const toc = tools.briefTime(thread.firstPost.toc);
@@ -158,7 +161,7 @@ mixin displayColumn(columns)
           +checkBox
           //- 文章标题
           .thread-panel-title
-            a.title-content.thread-panel-url(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
+            a.title-content.thread-panel-url(href=threadurl class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
             +displayPageCount
 
           +threadCategories
@@ -285,7 +288,7 @@ mixin displayColumn(columns)
 
         //- 文章标题
         .thread-panel-title
-          a.title-content.thread-panel-url(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
+          a.title-content.thread-panel-url(href=threadurl class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
           -const pageCount = thread.count / state.pageSettings.threadPostList
           -let ellipsis = false;
           -for(let i = 1; i < pageCount; i++)
@@ -303,9 +306,9 @@ mixin displayColumn(columns)
             +minThreadCover('p-r-1')
           .thread-panel-abstract-content
             if thread.firstPost.abstractCn
-              a.thread-panel-url(href=`/t/${thread.tid}` target=aTarget).thread-panel-post=thread.firstPost.abstractCn.slice(0, 200)
+              a.thread-panel-url(href=threadurl target=aTarget).thread-panel-post=thread.firstPost.abstractCn.slice(0, 200)
             else
-              a.thread-panel-url(href=`/t/${thread.tid}` target=aTarget).thread-panel-post=thread.firstPost.c.slice(0, 200)
+              a.thread-panel-url(href=threadurl target=aTarget).thread-panel-post=thread.firstPost.c.slice(0, 200)
             if hasReply
               .thread-panel-reply
                 a(href=lastPostUrl target=aTarget)
