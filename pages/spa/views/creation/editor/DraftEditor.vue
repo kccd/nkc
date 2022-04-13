@@ -119,8 +119,13 @@ export default {
       if(to.path === "/creation/drafts"){
         this.$refs.documentEditor.removeNoticeEvent()
       }else if(to.path === "/creation/editor/draft"){
+
         // console.log("进入编辑器")
         if(this.editorInitOk){
+          this.$refs.documentEditor.initDocumentForm({
+            content: '',
+            title: ''
+          });
           this.initId();
           this.initData()
         }
