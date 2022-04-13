@@ -46,28 +46,29 @@
                 .display-i-b.m-b-05
                   span &nbsp;邮政编码
                   input.author-name(type="text" v-model.trim="a.contractObj.contractCode" placeholder="选填")
-      button.btn.btn-default.btn-sm(@click="addAuthor") 添加
+      button.btn.btn-default.btn-sm(@click.stop="addAuthor") 添加
 </template>
 
 <script>
 import { getState } from "../../lib/js/state";
 export default {
   data: () => ({
-    authorInfos: []
+    authorInfos: [],
   }),
   props: {
     author: {
       type: Array,
-      default: () => []
-    }
+    },
   },
   watch: {
     author: {
       immediate: true,
       handler(n) {
-        this.authorInfos = n;
+        if(typeof n !== "undefined"){
+          this.authorInfos = [...n] || [];
+        }
       }
-    }
+    },
   },
   methods: {
     websiteUserId() {
@@ -99,8 +100,7 @@ export default {
       Vue.set(authorInfos, 0, authorInfos[0]);
     },
     addAuthor() {
-      let authorInfos = this.authorInfos;
-      authorInfos.push({
+      this.authorInfos.push({
         name: "",
         kcid: "",
         agency: "",

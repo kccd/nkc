@@ -32,7 +32,7 @@
       | 正在编辑&nbsp;
       a(:href="data.forum.url" target="_blank") {{data.forum.title}}
       | &nbsp;的最新页板块公告
-    input.editor-title(placeholder="请输入标题..." id="title" v-model="titleValue" )  
+    input.editor-title(placeholder="请输入标题..." v-model="titleValue" )  
 </template>
 <script>
 export default {
@@ -50,12 +50,6 @@ export default {
     titleValue: "",
     openOnEditNotes: localStorage.getItem("open-on-edit-notes") === "yes"
   }),
-  // created(){
-  //   this.setData();
-  // },
-  // updated(){
-  //   this.setData()
-  // },
   watch: {
     openOnEditNotes(boolean) {
       localStorage.setItem("open-on-edit-notes", boolean ? "yes" : "no");
@@ -68,9 +62,6 @@ export default {
     }
   },
   methods: {
-    // setData(){
-    //   this.titleValue = this.data?.post?.t || ""
-    // },
     getData() {
       return { t: this.titleValue };
     }

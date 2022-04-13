@@ -190,14 +190,6 @@
                     label.m-r-1(v-for="g in grades")
                       input(type="checkbox" v-model="survey.permission.gradesId" :value="g._id")
                       span {{g.displayName}}
-              //- if permission("showSurveyCertLimit")
-                .form.col-sm-12
-                  .form-group
-                    label 用户证书
-                    .checkbox
-                      label.m-r-1(v-for="r in roles")
-                        input(type="checkbox" v-model="survey.permission.certsId" :value="r._id")
-                        span {{r.displayName}}
               h5.text-danger 用户必须同时满足以上条件才能参与。
               .form.col-sm-12
                 .form-group
@@ -259,12 +251,18 @@
                     option(value=i)=i
                 | &nbsp;分
                 h5.text-danger(v-if="deadlineMax") 调查时间不能超过{{deadlineMax}}天。
+    select-user(ref ="selectUser")
+    resource-selector(ref= "resourceSelector")
 </template>
 
 <script>
 import { nkcAPI } from "../../lib/js/netAPI";
+import SelectUser from "./SelectUser"
+import ResourceSelector from "../../lib/vue/ResourceSelector";
+
 export default {
   data: () => ({
+    showSelectUser: false,
     disabled: true,
     deadlineMax: "",
     targetUser: "",
@@ -299,6 +297,10 @@ export default {
       type: Object,
       required: true
     }
+  },
+  components: {
+    "resource-selector": ResourceSelector,
+   "select-user": SelectUser,
   },
   watch: {
     data: {
@@ -549,15 +551,9 @@ export default {
       });
     },
     selectUser: function() {
-      if (!window.SelectUser) {
-        if (NKC.modules.SelectUser) {
-          window.SelectUser = new NKC.modules.SelectUser();
-        } else {
-          return sweetError("未引入选择用户模块");
-        }
-      }
+      // this.showSelectUser = true;
       var app = this;
-      SelectUser.open(
+      this.$refs.selectUser.open(
         function(data) {
           var usersId = data.usersId;
           var users = data.users;
@@ -577,20 +573,21 @@ export default {
       );
     },
     addResource: function(o) {
-      if (!window.SelectResource) {
-        if (NKC.modules.SelectResource) {
-          window.SelectResource = new NKC.modules.SelectResource();
-        } else {
-          return sweetError("未引入选择资源附件模块");
-        }
-      }
-      SelectResource.open(
-        function(data) {
+      // if (!window.SelectResource) {
+      //   if (NKC.modules.SelectResource) {
+      //     window.SelectResource = new NKC.modules.SelectResource();
+      //   } else {
+      //     return sweetError("未引入选择资源附件模块");
+      //   }
+      // }
+      this.$refs.resourceSelector.open(
+        data => {
           var resourcesId = data.resourcesId;
           for (var i = 0; i < resourcesId.length; i++) {
             var id = resourcesId[i];
             if (o.resourcesId.indexOf(id) === -1) o.resourcesId.push(id);
           }
+          this.$refs.resourceSelector.close()
         },
         {
           allowedExt: ["picture"]
@@ -705,7 +702,7 @@ export default {
       return survey;
     },
     requestData() {
-      var this_ = this;
+      const this_ = this;
       this_.setTime();
       this_.newSurvey = {
         st: "",
@@ -729,18 +726,18 @@ export default {
         options: [this.newOption()],
         type: "vote"
       };
-      nkcAPI("/survey?t=thread", "GET").then(function(data) {
-        this_.deadlineMax = data.deadlineMax;
-        this_.grades = data.grades;
+      nkcAPI("/survey?t=thread", "GET").then( (data)=> {
+        this.deadlineMax = data.deadlineMax;
+        this.grades = data.grades;
         var arr = [];
         for (var i = 0; i < data.grades.length; i++) {
           arr.push(data.grades[i]._id);
         }
-        this_.newSurvey.permission.gradesId = arr;
-        this_.roles = data.roles;
-        this_.targetUser = data.user;
-        this_.surveyRewardScore = data.surveyRewardScore;
-        this_.targetUserSurveyRewardScore = data.targetUserSurveyRewardScore;
+        this.newSurvey.permission.gradesId = arr;
+        this.roles = data.roles;
+        this.targetUser = data.user;
+        this.surveyRewardScore = data.surveyRewardScore;
+        this.targetUserSurveyRewardScore = data.targetUserSurveyRewardScore;
       });
     },
     hideButton() {

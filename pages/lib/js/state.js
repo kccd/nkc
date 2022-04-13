@@ -35,7 +35,7 @@ export function getState() {
     state.statement = windowData.statement;
     state.copyright = windowData.copyright;
     state.record = windowData.record;
-    state.appStableVersion = window.appStableVersion;
+    state.appStableVersion = windowData.appStableVersion;
     return state;
   } catch(err) {
     console.error(`获取 state 数据失败`);
