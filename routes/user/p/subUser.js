@@ -22,6 +22,10 @@ module.exports = async (ctx, next) => {
       $in: fans.map(s => s.uid)
     }
   });
+  const fansCount = targetUserFans.length
+  const followersCount = targetUserFollowers.length
+  data.fansCount = fansCount;
+  data.followersCount = followersCount;
   data.targetUserFans = await db.UserModel.extendUsersInfo(targetUserFans);
   data.targetUserFollowers = await db.UserModel.extendUsersInfo(targetUserFollowers);
   await next();

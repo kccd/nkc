@@ -96,7 +96,11 @@ block content
                 for n in data.forumNav
                   -const {fid, name, cid} = n;
                   span.nav-delimiter >
-                  a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}` data-float-fid=fid)= name
+                  a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}`
+                    data-global-mouseover="showForumPanel"
+                    data-global-mouseout="hideForumPanel"
+                    data-global-data=objToStr({fid})
+                  )= name
               .thread-nav-right
                 if !data.forum.childrenForums || !data.forum.childrenForums.length
                   if !data.user
@@ -237,7 +241,11 @@ block content
               for founder in data.founderList
                 li.forum-founder-item
                   .forum-founder-avatar(style=`background-image: url(${tools.getUrl("userAvatar", founder.avatar)})`)
-                  a.fouum-founder-username(href=tools.getUrl("userHome", founder.uid) target="_blank" data-float-uid=founder.uid)= founder.username
+                  a.fouum-founder-username(href=tools.getUrl("userHome", founder.uid) target="_blank"
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    data-global-data=objToStr({uid: founder.uid})
+                  )= founder.username
         .m-b-1
           .panel-header 专业介绍
           .forum-description!= nkcRender.htmlFilter(data.forum.description) || "暂无专业介绍"
@@ -259,10 +267,18 @@ block content
               for u in data.moderators
                 a.forum-moderator(href=`/u/${u.uid}` target="_blank")
                   .forum-moderator-avatar
-                    img(src=tools.getUrl("userAvatar", u.avatar) data-float-uid=u.uid)
+                    img(src=tools.getUrl("userAvatar", u.avatar)
+                      data-global-mouseover="showUserPanel"
+                      data-global-mouseout="hideUserPanel"
+                      data-global-data=objToStr({uid: u.uid})
+                    )
                   .forum-moderator-info
                     .forum-moderator-name
-                      span(data-float-uid=u.uid)=u.username
+                      span(
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        data-global-data=objToStr({uid: u.uid})
+                      )=u.username
                     .forum-moderator-description=u.description || "暂无简介"
         //-if data.forum.parentForums && data.forum.parentForums.length > 0
           +forumPanel("上级专业", data.forum.parentForums)

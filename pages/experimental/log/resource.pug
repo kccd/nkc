@@ -68,8 +68,16 @@ block eContent
                   th.normal-width
                     a(href=tools.getUrl('resource', r.rid) target="_blank")=r.rid
                   th
-                    img(src=tools.getUrl('userAvatar', r.user.avatar) style='width: 1.6rem;height: 1.6rem;border-radius: 50%;' data-float-uid=r.uid).m-r-05
-                    a(href=tools.getUrl('userHome', r.uid) target='_blank' data-float-uid=r.uid)=r.user.username
+                    img(src=tools.getUrl('userAvatar', r.user.avatar) style='width: 1.6rem;height: 1.6rem;border-radius: 50%;'
+                      data-global-mouseover="showUserPanel"
+                      data-global-mouseout="hideUserPanel"
+                      data-global-data=objToStr({uid: r.uid})
+                    ).m-r-05
+                    a(href=tools.getUrl('userHome', r.uid) target='_blank'
+                      data-global-mouseover="showUserPanel"
+                      data-global-mouseout="hideUserPanel"
+                      data-global-data=objToStr({uid: r.uid})
+                    )=r.user.username
                   th
                     div=`文件名：${r.oname} `
                       span.text-danger=`${!r.isFileExist? '已丢失': '' }`

@@ -1,5 +1,5 @@
 <template lang="pug">
-  .share-box.m-b-1
+  .share-box
     .panel-header 分享链接
     .share(v-if="!getState.app")
       .share-icon(@click="shareToOther(shareType, 'qq', shareTitle, shareId, shareDescription, shareAvatar)" title="分享给QQ好友")

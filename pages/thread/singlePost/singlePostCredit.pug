@@ -9,7 +9,9 @@ if !isIncluded('singlePostCredit')
             .name=name
             a(
               href=tools.getUrl('userHome', uid) target="_blank"
-              data-float-uid=uid
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid})
               )
               img(src=avatar)
               span=username

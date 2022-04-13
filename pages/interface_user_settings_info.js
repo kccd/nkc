@@ -76,7 +76,7 @@ function selectBanner() {
       if (e.total === e.loaded) {
         $(".upload-info-banner").text('上传完成！');
         setTimeout(function () {
-          $(".upload-info-banner").text('');
+          $(".upload-ifo-bnanner").text('');
         }, 2000);
       }
     }, "POST")
@@ -89,7 +89,33 @@ function selectBanner() {
         screenTopWarning(data);
       });
   }, {
-    aspectRatio: 8,
+    aspectRatio: 2,
+  });
+}
+function selectBackBanner() {
+  selectImage.show(function(data){
+    var user = NKC.methods.getDataById("data").user;
+    var formData = new FormData();
+    formData.append("file", data, Date.now() + '.png');
+    uploadFilePromise('/banner/' + user.uid + '/userBanner', formData, function (e, percentage) {
+      $(".upload-info-banner").text('上传中...' + percentage);
+      if (e.total === e.loaded) {
+        $(".upload-info-banner").text('上传完成！');
+        setTimeout(function () {
+          $(".upload-ifo-bnanner").text('');
+        }, 2000);
+      }
+    }, "POST")
+      .then(function (data) {
+        $("#userBackBanner").attr("src", NKC.methods.tools.getUrl('userBanner', data.user.userBanner) + '&time=' + Date.now());
+        emitEventToUpdateLocalUser(data);
+        selectImage.close();
+      })
+      .catch(function (data) {
+        screenTopWarning(data);
+      });
+  }, {
+    aspectRatio: 6,
   });
 }
 
@@ -140,6 +166,7 @@ Object.assign(window, {
   getFocus,
   selectAvatar,
   selectBanner,
+  selectBackBanner,
   app,
   emitEventToUpdateLocalUser,
 });

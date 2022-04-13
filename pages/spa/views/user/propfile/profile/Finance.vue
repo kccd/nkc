@@ -95,8 +95,13 @@
 .finance-box{
   padding: 15px;
   .finance-head{
+    user-select: none;
     position: relative;
     text-align: right;
+    .fa {
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
     .finance-head-link{
       position: absolute;
       right: 0;
@@ -178,9 +183,9 @@ export default {
     targetUser: null
   }),
   created() {
-    const uid = getState().uid
-    this.uid = uid
-    this.getUserAccountInfo()
+    const uid = getState().uid;
+    this.uid = uid;
+    this.getUserAccountInfo();
   },
   mounted() {
     window.addEventListener("click", this.clickOther);
@@ -191,7 +196,7 @@ export default {
       const self = this;
       let url = `/u/${this.uid}/p/finance`;
       if(type){
-        url += `?t=${type}`
+        url += `?t=${type}`;
       }
       nkcAPI(url, 'GET')
         .then(res => {
@@ -208,20 +213,20 @@ export default {
     },
     //打开操作框
     operationShow(){
-      this.show = true;
+      this.show = !this.show;
     },
     //点击其他地方关闭操作
     clickOther() {
-      const showType = this.show
+      const showType = this.show;
       if(showType){
         this.show = false;
       }else {
-        return
+        return;
       }
     },
     navTypeChange(type){
-      this.navType = type
-      this.getUserAccountInfo(type)
+      this.navType = type;
+      this.getUserAccountInfo(type);
     }
   },
   beforeDestroy() {  // 实例销毁之前对点击事件进行解绑

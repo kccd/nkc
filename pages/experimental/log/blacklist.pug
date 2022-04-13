@@ -29,11 +29,27 @@ block eContent
                   tr
                     th=dateString(d.toc)
                     th.user
-                      img(src=tools.getUrl('userAvatar', d.user.avatar) data-float-uid=d.user.uid)
-                      a(href=`/u/${d.user.uid}` target="_blank" data-float-uid=d.user.uid)=d.user.username
+                      img(src=tools.getUrl('userAvatar', d.user.avatar)
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        data-global-data=objToStr({uid: d.user.uid})
+                      )
+                      a(href=`/u/${d.user.uid}` target="_blank"
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        data-global-data=objToStr({uid: d.user.uid})
+                      )=d.user.username
                     th.user
-                      img(src=tools.getUrl('userAvatar', d.tUser.avatar) data-float-uid=d.tUser.uid)
-                      a(href=`/u/${d.tUser.uid}` target="_blank" data-float-uid=d.tUser.uid)=d.tUser.username
+                      img(src=tools.getUrl('userAvatar', d.tUser.avatar)
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        data-global-data=objToStr({uid: d.tUser.uid})
+                      )
+                      a(href=`/u/${d.tUser.uid}` target="_blank"
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        data-global-data=objToStr({uid: d.tUser.uid})
+                      )=d.tUser.username
                     th.from
                       if d.from === 'message'
                         span 短消息系统
@@ -53,8 +69,16 @@ block eContent
                 for d in data.bl
                   tr
                     th.user
-                      img(src=tools.getUrl('userAvatar', d.user.avatar) data-float-uid=d.user.uid)
-                      a(href=`/u/${d.user.uid}` target="_blank" data-float-uid=d.user.uid)=d.user.username
+                      img(src=tools.getUrl('userAvatar', d.user.avatar)
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        data-global-data=objToStr({uid: d.user.uid})
+                      )
+                      a(href=`/u/${d.user.uid}` target="_blank"
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        data-global-data=objToStr({uid: d.user.uid})
+                      )=d.user.username
                     th=d.count
 
         include ../../publicModules/paging/paging_input

@@ -2,14 +2,22 @@ if !isIncluded('homeForumList')
   +includeCSS('/community/homeForumList.css')
   mixin forumList(f)
     .home-forums-brief
-      a.home-forums-parent(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+      a.home-forums-parent(href=`/f/${f.fid}`
+        data-global-mouseover="showForumPanel"
+        data-global-mouseout="hideForumPanel"
+        data-global-data=objToStr({fid: f.fid})
+      )=f.displayName
       if f.childrenForums && f.childrenForums.length
         span ：
         for cf, index in f.childrenForums
           if index !== 0
             span |
           //-style=`background-color: ${f.color}`
-          a.home-forums-child(href=`/f/${cf.fid}` data-float-fid=cf.fid style=`background-color: ${hexToRgba(f.color, 0.1)}`)=cf.displayName
+          a.home-forums-child(href=`/f/${cf.fid}`
+            data-global-mouseover="showForumPanel"
+            data-global-mouseout="hideForumPanel"
+            data-global-data=objToStr({fid: cf.fid})
+            style=`background-color: ${hexToRgba(f.color, 0.1)}`)=cf.displayName
             if cf.countPostsToday && cf.countPostsToday > 0
               sup=cf.countPostsToday
   mixin detailedForumList(f, disableChild)
@@ -21,12 +29,24 @@ if !isIncluded('homeForumList')
             .detailed-forum-panel
               if disableChild
                 if f.logo
-                  img.detailed-forum-panel-icon(src=tools.getUrl('forumLogo', f.logo) data-float-fid=f.fid)
+                  img.detailed-forum-panel-icon(src=tools.getUrl('forumLogo', f.logo)
+                    data-global-mouseover="showForumPanel"
+                    data-global-mouseout="hideForumPanel"
+                    data-global-data=objToStr({fid: f.fid})
+                  )
                 else
-                  .detailed-forum-panel-icon(style=`background-color: ${f.color}` data-float-fid=f.fid)
+                  .detailed-forum-panel-icon(style=`background-color: ${f.color}`
+                    data-global-mouseover="showForumPanel"
+                    data-global-mouseout="hideForumPanel"
+                    data-global-data=objToStr({fid: f.fid})
+                  )
               .detailed-forum-panel-info(class=disableChild?'':'p-l-0')
                 .detailed-forum-panel-name
-                  a(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+                  a(href=`/f/${f.fid}`
+                    data-global-mouseover="showForumPanel"
+                    data-global-mouseout="hideForumPanel"
+                    data-global-data=objToStr({fid: f.fid})
+                  )=f.displayName
                   if disableChild
                     | &nbsp;
                     span(title=`更新/文章/回复`)
@@ -63,12 +83,24 @@ if !isIncluded('homeForumList')
             .detailed-forum-panel
               if disableChild
                 if f.logo
-                  img.detailed-forum-panel-icon(src=tools.getUrl('forumLogo', f.logo) data-float-fid=f.fid)
+                  img.detailed-forum-panel-icon(src=tools.getUrl('forumLogo', f.logo)
+                    data-global-mouseover="showForumPanel"
+                    data-global-mouseout="hideForumPanel"
+                    data-global-data=objToStr({fid: f.fid})
+                  )
                 else
-                  .detailed-forum-panel-icon(style=`background-color: ${f.color}` data-float-fid=f.fid)
+                  .detailed-forum-panel-icon(style=`background-color: ${f.color}`
+                    data-global-mouseover="showForumPanel"
+                    data-global-mouseout="hideForumPanel"
+                    data-global-data=objToStr({fid: f.fid})
+                  )
               .detailed-forum-panel-info(class=disableChild?'':'p-l-0')
                 .detailed-forum-panel-name
-                  a(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+                  a(href=`/f/${f.fid}`
+                    data-global-mouseover="showForumPanel"
+                    data-global-mouseout="hideForumPanel"
+                    data-global-data=objToStr({fid: f.fid})
+                  )=f.displayName
                   if disableChild
                     | &nbsp;
                     span(title=`文章/回复`)

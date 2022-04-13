@@ -145,6 +145,11 @@ const userSchema = new Schema({
     type: String,
     default: ""
   },
+  //用户个人主页背景
+  userBanner: {
+    type: String,
+    default: '',
+  },
   // 支持数
   voteUpCount: {
     type: Number,

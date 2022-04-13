@@ -1,36 +1,39 @@
 <template lang="pug">
   .user-banner(@mouseenter="enter()" @mouseleave="leave()" v-if="targetUser").m-b-1
+    subscribe-types(ref="subscribeTypes")
     .hidden-user-home-tip(v-if="targetUser && targetUser.hidden" )
       span 用户名片已被屏蔽
       //用户名片
     .account-banner(v-if="targetUser" )
       //用户banner容器
       .account-user-banner-container
-        .account-user-banner(:style="`backgroundImage: url('${getUrl('userBanner', targetUser.banner)}')`" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
-          //img(:src="getUrl('userBanner', targetUser.banner)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
+        .account-user-banner(:style="`backgroundImage: url('${getUrl('userBanner', targetUser.userBanner)}')`" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
           .account-user-info
             .account-user-avatar
               img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
             .account-user-introduce
               .account-user-name {{targetUser.username}}
                 user-level(ref="userLevel" :target-user="targetUser")
-              .account-user-certs {{targetUser.info.certsName}}
               .account-user-kcb
                 user-scores(ref="userScore" :scores="scores" :xsf="targetUser.xsf" )
+              .account-user-subscribe(v-if="subscribeBtn")
+                div(:class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
+                div.link(@click.stop="toChat(targetUser.uid)" v-if="selfUid") 私信
+                div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
         .account-nav
           .account-nav-box
             .account-nav-left
             .account-nav-middle
-              span(@click="containerChange('moment')") 动态
-              span(@click="containerChange('post')") 社区
-              span(@click="containerChange('subColumns')") 专栏
+              span(@click="containerChange('moment')" :class="{'active': $route.name === 'moment'}") 动态
+              span(@click="containerChange('post')" :class="{'active': $route.name === 'post'}") 社区
+              span(@click="containerChange('subColumns')" :class="{'active': $route.name === 'subColumns'}") 专栏
             .account-nav-right
               div
                 div 关注
-                span 123
+                span {{followersCount >= 1000 ? (followersCount/1000).toFixed(1)+'K' : followersCount}}
               div
                 div 粉丝
-                span 123
+                span {{fansCount >= 1000 ? (fansCount/1000).toFixed(1)+'K' : fansCount}}
 
     div(v-if="panelPermission && (panelPermission.unBannedUser || panelPermission.bannedUser ||panelPermission.clearUserInfo)" )
       .btn-ban(v-show="showBanBox" @click="clickBanContext()")
@@ -58,29 +61,44 @@
 
 <style lang="less">
 @import "../../../../publicModules/base";
+@media (max-width: 991px){
+  .account-nav{
+    visibility: hidden;
+  }
+}
 .user-banner {
   height: auto;
   position: relative;
   .hidden-user-home-tip {
   }
   .account-banner {
-    height: 13rem;
+    //height: 12rem;
     width: 100%;
     .account-user-banner-container {
       .account-user-banner {
-        background-size: 100%;
+        width: 100%;
+        height: 14rem;
         background-repeat: no-repeat;
         border-radius: 4px;
+        background-size: cover;
+        background-position: center center;
+        position: relative;
         .account-user-info {
           position: relative;
-          margin: 0 4rem;
-          width: 100%;
           height: auto;
+          top: 96px;
+          margin: 0rem 4rem 0 4rem;
+          @media (max-width: 991px){
+            margin: 0rem 1rem;
+          }
           .account-user-avatar {
             position: absolute;
-            left: 0;
-            bottom: -4rem;
-            margin-right: 2rem;
+            top: 0;
+            height: 10rem;
+            width: 10rem;
+            border-radius: 1rem;
+            background-color: rgba(0, 0, 0, 0.2);
+
             img {
               width: 10rem;
               height: 10rem;
@@ -89,22 +107,43 @@
             }
           }
           .account-user-introduce {
-            margin: 0 11rem;
-            .account-user-name {
+            margin: 0 0 0 11rem;
 
-            }
-            .account-user-certs {
-
-            }
             .account-user-kcb {
               display: inline-block;
             }
+            .account-user-subscribe{
+              position: absolute;
+              top: 0;
+              right: 0;
+              div{
+                text-align: center;
+                background: #fff;
+                height: 27px;
+                line-height: 27px;
+                width: 5rem;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                cursor:pointer;
+
+              }
+              .focus{
+                background-color: #2b90d9;
+                color: #fff;
+              }
+              .cancel{
+                background-color: #e85a71;
+                color: #fff;
+              }
+            }
+
           }
         }
       }
+
       .account-nav {
         width: 100%;
-
+        height: 46px;
         .account-nav-box{
           .account-nav-left{
             width: 25%;
@@ -116,9 +155,15 @@
             display: inline-block;
             font-size: 20px;
             font-weight: bold;
+            position: relative;
+            top: -8px;
+            cursor: pointer;
             span{
               display: inline-block;
-              padding: 15px 30px 0 0;
+              padding: 0 30px 0 0;
+              &.active {
+                color: #2b90d9;
+              }
             }
           }
           .account-nav-right{
@@ -128,11 +173,11 @@
             text-align: center;
             &>div{
               display: inline-block;
-              padding: 5px 15px;
-              font-width: bold;
-              font-size: 1rem;
+              padding: 3px 15px 0 15px;
+              font-weight: bold;
+              font-size: 12px;
               &>span{
-                font-size: 2rem;
+                font-size: 18px;
               }
             }
           }
@@ -204,31 +249,41 @@ import {nkcAPI} from "../../../../lib/js/netAPI";
 import {screenTopWarning} from "../../../../lib/js/topAlert";
 import {getState} from "../../../../lib/js/state";
 import {objToStr} from "../../../../lib/js/tools";
+import {subUsers} from "../../../../lib/js/subscribe";
+import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
+
 export default {
-  props: ['targetUserScores'],
+  props: ['targetUserScores', "fansCount",  "followersCount"],
   data: () => ({
     uid: null,
+    selfUid: getState().uid,
     showBanBox: false,
     panelPermission: null,
     targetUser: null,
     showBanContext: false,
-    scores: null
+    scores: null,
+    subscribeBtn: false,
+    subscribeBtnType: false,
   }),
   components: {
     "user-scores": UserScoresVue,
-    "user-level": UserLevel
+    "user-level": UserLevel,
+    "subscribe-types": SubscribeTypes,
   },
   created() {
     this.initData()
     this.getPanelData()
     //移动段才能永久显示封禁框
     if(getState && getState.isApp){
-      this.showBanBox = true
+      this.showBanBox = true;
     }
-    this.scores = this.targetUserScores
+    this.scores = this.targetUserScores;
   },
   mounted() {
-
+    // const doms = $('.link');
+    // for(let i = 0; i<doms.length; i++) {
+    //
+    // }
   },
   methods: {
     objToStr: objToStr,
@@ -245,6 +300,12 @@ export default {
       .then(res => {
         self.panelPermission = res.panelPermission;
         self.targetUser = res.targetUser;
+        if(res.user.uid !== self.$route.params.uid){
+          self.subscribeBtn = true
+        }
+        if(res.user.subUid.some((value)=>{ return value === res.targetUser.uid })){
+          self.subscribeBtnType = true
+        }
       })
     },
     // 封禁用户,banned:false 解封，true 封禁
@@ -278,6 +339,39 @@ export default {
           screenTopWarning(data);
         })
     },
+    //取消关注和关注
+    userFollowType(uid) {
+      const self = this;
+      if(!self.subscribeBtnType){
+        self.$refs.subscribeTypes.open((cid) => {
+          subUsers(uid, true, [...cid])
+              .then(() => {
+                sweetSuccess('关注成功');
+                self.subscribeBtnType = true;
+                self.$refs.subscribeTypes.close();
+                this.getPanelData()
+              })
+              .catch(err => {
+                sweetError(err);
+              })
+        }, {
+        })
+      }else{
+        subUsers(uid,false)
+            .then((res)=>{
+              sweetSuccess('取消关注');
+              self.subscribeBtnType = false;
+              // if(index !== -1) self.subUsersId.splice(index, 1);
+            })
+            .catch(err => {
+              sweetError(err);
+            })
+      }
+
+    },
+    toChat(uid){
+      NKC.methods.toChat(uid)
+    },
     //中间显示内容路由切换
     containerChange(path){
       this.$router.push({name: path})
@@ -294,7 +388,6 @@ export default {
     leave(){
       this.showBanBox = false;
     }
-
   }
 }
 </script>

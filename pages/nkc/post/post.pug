@@ -34,7 +34,11 @@ block nkcContent
             else
               -type = '评论';
             .post-type(class=`post-type-` + post.type)=type
-            a(href=`/u/${post.user.uid}` target="_blank" data-float-uid=post.user.uid).post-user
+            a(href=`/u/${post.user.uid}` target="_blank"
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: post.user.uid})
+              ).post-user
               img(src=tools.getUrl("userAvatar", post.user.avatar))
               span= post.user.username
             a.post-url(href=post.url target="_blank") 原文链接
@@ -42,7 +46,11 @@ block nkcContent
               for f, index in post.forums
                 if index > 0
                   span ，
-                a(href=`/f/${f.fid}` target='_blank' data-float-fid=f.fid)=f.displayName
+                a(href=`/f/${f.fid}` target='_blank'
+                  data-global-mouseover="showForumPanel"
+                  data-global-mouseout="hideForumPanel"
+                  data-global-data=objToStr({fid: f.fid})
+                )=f.displayName
 
             .post-options
               .hidden(id=`data_${post.pid}`)=objToStr({tid: post.thread.tid, pid: post.pid, mainForumsId: post.mainForumsId, categoriesId: post.categoriesId, tcId: post.tcId})

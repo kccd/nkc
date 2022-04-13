@@ -18,7 +18,7 @@ router
   .get('/', async (ctx, next) => {
     //获取主页导航等信息
     const {db, state, data, params, nkcModules } = ctx;
-    const {user , targetUser} = data;
+    const {user, targetUser} = data;
     // 验证权限
     if (user.uid !== targetUser.uid && !ctx.permission("visitAllUserProfile")) {
       ctx.throw(403, "权限不足");
@@ -243,6 +243,52 @@ router
         })
       });
     }
+    //获取用户个人主页的粉丝和关注
+    const sub = await db.SubscribeModel.find({
+      type: "user",
+      cancel: false,
+      uid: targetUser.uid
+    }, {tUid: 1}).sort({toc: -1}).limit(9);
+    const targetUserFollowers = await db.UserModel.find({
+      uid: {
+        $in: sub.map(s => s.tUid)
+      }
+    });
+    const fans = await db.SubscribeModel.find({
+      type: "user",
+      cancel: false,
+      tUid: targetUser.uid,
+    }, {uid: 1}).sort({toc: -1}).limit(9);
+    const targetUserFans = await db.UserModel.find({
+      uid: {
+        $in: fans.map(s => s.uid)
+      }
+    });
+    const fansCount = targetUserFans.length
+    const followersCount = targetUserFollowers.length
+    data.fansCount = fansCount;
+    data.followersCount = followersCount;
+    data.targetUserFans = await db.UserModel.extendUsersInfo(targetUserFans);
+    data.targetUserFollowers = await db.UserModel.extendUsersInfo(targetUserFollowers);
+    data.code = await db.UserModel.getCode(targetUser.uid);
+    data.code = data.code.pop();
+    await next();
+  })
+  .use('/', async (ctx, next) => {
+    const {db, data, permission, state} = ctx;
+    const {uid} = state;
+    const {user} = data;
+    const permissions = {
+      reviewed: null,
+      disabled: null,
+    };
+    if(user) {
+      if(permission('review')) permissions.reviewed = true;
+      if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {
+        permissions.disabled = true;
+      }
+    }
+    data.permissions = permissions;
     await next();
   })
   .use('/s', async (ctx, next) => {
@@ -293,6 +339,6 @@ router
   .get('/fan', fanRouter)
   .get('/follower', followerRouter)
   .get('/manage', manageRouter)
-  .get('/subUser', userRouter)
+  // .get('/subUser', userRouter)
   .get('/finance',financeRouter)
 module.exports = router;

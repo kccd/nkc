@@ -3,8 +3,6 @@
     router-view
 </template>
 <style lang="less" scoped>
-.subscribe-container{
-}
 </style>
 <script>
 export default {

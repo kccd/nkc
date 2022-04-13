@@ -28,11 +28,12 @@ window.CommonModal = undefined;
 // 标志：编辑器是否已初始化
 let EditorReady = false;
 window.data = undefined;
-import Editor from "../lib/vue/Editor";
 import {getEditorConfigs} from "../lib/js/editor";
+import {objToStr} from "../lib/js/tools";
+import Editor from "../lib/vue/Editor";
 import ImageSelector from "../lib/vue/ImageSelector";
 import ResourceSelector from "../lib/vue/ResourceSelector";
-import {blobToFile, fileToBase64} from "../lib/js/file";
+import {fileToBase64} from "../lib/js/file";
 $(function() {
   window.data = NKC.methods.getDataById("data");
   for(const c of window.data.threadCategories) {
@@ -342,9 +343,10 @@ function initVueApp() {
       }
     },
     updated(){
-      
+    
     },
     methods: {
+      objToStr: objToStr,
       getLength: NKC.methods.checkData.getLength,
       checkString: NKC.methods.checkData.checkString,
       checkEmail: NKC.methods.checkData.checkEmail,

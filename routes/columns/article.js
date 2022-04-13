@@ -3,11 +3,7 @@ router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
   const {pageSettings} = state;
   const {page = 0, last_page, highlight, t, test} = query;
-  if(test) {
-  ctx.template = 'columns/article/article.pug';
-  } else {
-    ctx.template = 'columns/article.pug';
-  }
+  ctx.template = 'columns/article.pug';
   const { user } = data;
   const {_id, aid} = params;
   let columnPostData = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid, user.xsf);

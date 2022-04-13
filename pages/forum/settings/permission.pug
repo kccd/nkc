@@ -130,8 +130,12 @@ block content
           .panel-heading 主管专家
           .panel-body
             .forum-moderators
-              span.forum-moderator(v-for='uid, index in forum.moderators').m-r-1
-                a(:href="'/u/' + uid" target='_blank' :data-float-uid='uid') {{users[uid].username}}
+              span.forum-moderator(v-for='(uid, index) in forum.moderators').m-r-1
+                a(:href="'/u/' + uid" target='_blank'
+                  data-global-mouseover="showUserPanel"
+                  data-global-mouseout="hideUserPanel"
+                  :data-global-data="objToStr({uid})"
+                ) {{users[uid].username}}
                 .icon.fa.fa-remove(title='移除' @click='removeModerator(index)')
             .m-t-05
               button.btn.btn-default(@click='addModerator') 添加

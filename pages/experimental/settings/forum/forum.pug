@@ -120,7 +120,11 @@ block eContent
               tr(v-for='f in forums' v-if='selectedLevels.includes(f.level)')
                 th.order-th(:style="'padding-left:' + (f.level * 1.5) + 'rem;'")
                   input.order.m-r-1(type='text' v-model.number='f.order')
-                  a.forum-displayName(:href="getUrl('forumHome', f.fid)" target="_blank" :data-float-fid="f.fid").name {{f.displayName}}
+                  a.forum-displayName(:href="getUrl('forumHome', f.fid)" target="_blank"
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    :data-global-data="objToStr({fid: f.fid})"
+                  ).name {{f.displayName}}
                 th
                   .radio
                     label.m-r-05

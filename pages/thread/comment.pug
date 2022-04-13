@@ -11,7 +11,11 @@ if data.highlight === comment.pid
 .post-comment(class=klass id=`post_comment_${comment.pid}`)
   .post-comment-body.highlight
     if !comment.anonymous
-      a.post-comment-user(href=`/u/${comment.uid}` target="_blank" data-float-uid=comment.uid)
+      a.post-comment-user(href=`/u/${comment.uid}` target="_blank"
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        data-global-data=objToStr({uid: comment.uid})
+        )
         img(src=tools.getUrl('userAvatar', comment.user.avatar, 'sm'))
         span=comment.user.username
     else
@@ -23,7 +27,11 @@ if data.highlight === comment.pid
     if comment.parentPost
       span.m-l-05.m-r-05 评论
       if !comment.parentPost.anonymous
-        a.display-i-b.post-comment-user(href=`/u/${comment.parentPost.user.uid}` target="_blank" data-float-uid=comment.parentPost.user.uid)
+        a.display-i-b.post-comment-user(href=`/u/${comment.parentPost.user.uid}` target="_blank"
+          data-global-mouseover="showUserPanel"
+          data-global-mouseout="hideUserPanel"
+          data-global-data=objToStr({uid: comment.parentPost.user.uid})
+        )
           span=comment.parentPost.user.username
       else
         .display-i-b.post-comment-user

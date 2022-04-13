@@ -1,8 +1,9 @@
 <template lang="pug">
-  .row(v-if="loading")
+  .row
     paging.col-xs-12.col-md-12(ref="paging" :pages="pageButtons" @click-button="clickButton")
+    .user-list-warning(v-if="(!users || users.length === 0) && !loading") 空空如也~
     //- user-info 数组中的一个用户对象
-    .col-xs-12.col-md-6(v-for="user in users")
+    .col-xs-12.col-md-6(v-for="user in users" v-else)
       user-info( :key="user.uid" :user="user" :page-type="t" :sub-uid="userSubUid")
 </template>
 
@@ -53,7 +54,7 @@ export default {
       this.getUserCardInfo( num );
     },
     getUserCardInfo(page) {
-      this.loading = false;
+      this.loading = true;
       let url = `/u/${this.uid}/p/follower?t=${this.routeName}`;
       const self = this;
       if (page) {
@@ -68,8 +69,8 @@ export default {
         .then(res => {
           self.paging = res.paging;
           self.users = res.users;
-          self.loading = true;
           self.userSubUid = res.userSubUid;
+          self.loading = false;
         })
         .catch(err => {
           this.title = "数据加载失败！"
@@ -83,5 +84,9 @@ export default {
 <style scoped lang="less">
   h3{
     text-align: center;
+  }
+  .user-list-warning {
+    text-align: center;
+    font-size: 1.2rem;
   }
 </style>

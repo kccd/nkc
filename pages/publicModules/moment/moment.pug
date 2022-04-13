@@ -46,14 +46,22 @@ if !isIncluded('publicModules/moment/moment.pug')
       .single-moment-top-container
         if !quote
           .single-moment-left
-            .single-moment-avatar(data-float-uid=uid)
+            .single-moment-avatar(
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid})
+              )
               img(src=avatarUrl)
         .single-moment-right
           .single-moment-header
             if quote
               .single-moment-avatar
                 img(src=avatarUrl)
-            .single-moment-user(data-float-uid=uid)
+            .single-moment-user(
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid})
+            )
               a(href=userHome target="_blank")=username
             .single-moment-time
               +fromNow(toc)
@@ -105,7 +113,11 @@ if !isIncluded('publicModules/moment/moment.pug')
     .single-moment-header
       .single-moment-avatar
         img(src=data.avatarUrl)
-      .single-moment-user(data-float-uid=data.uid)
+      .single-moment-user(
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        data-global-data=objToStr({uid: data.uid})
+      )
         a(href=data.userHome target="_blank")=data.username
       .single-moment-time
         +fromNow(data.toc)

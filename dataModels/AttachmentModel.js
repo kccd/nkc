@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const FILE = require("../nkcModules/file");
 const Schema = mongoose.Schema;
 const schema = new Schema({
   // 附件ID mongoose.Types.ObjectId().toString()
@@ -569,6 +570,45 @@ schema.statics.saveUserBanner = async (uid, file) => {
   await UserModel.updateOne({uid}, {
     $set: {
       banner: attachment._id
+    }
+  });
+  return attachment;
+};
+
+/*
+* 更新用户主页的背景
+* @param {String} uid 用户 ID
+* @param {File} file
+* @return {Object} attachment 对象
+* */
+schema.statics.saveUserBackBanner = async (uid, file) => {
+  const AttachmentModel = mongoose.model('attachments');
+  const UserModel = mongoose.model('users');
+  const time = new Date();
+  const aid = await AttachmentModel.getNewId();
+  const FILE = require('../nkcModules/file');
+  const ext = await FILE.getFileExtension(file, ['jpeg', 'png', 'jpg']);
+  const attachment = await AttachmentModel.createAttachmentAndPushFile({
+    aid,
+    file,
+    ext,
+    uid,
+    sizeLimit: 20 * 1024 * 1024,
+    time,
+    type: 'userBanner',
+    images: [
+      {
+        type: 'def',
+        name: `${aid}.${ext}`,
+        height: 400,
+        width: 800,
+        quality: 95
+      }
+    ]
+  });
+  await UserModel.updateOne({uid}, {
+    $set: {
+      userBanner: attachment._id
     }
   });
   return attachment;

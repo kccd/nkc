@@ -3,18 +3,21 @@
     .col-sx-12.col-md-3.box-shadow-panel.p-r-0.p-l-0.m-b-1
       //用户信息
       .m-b-1(v-if="targetUser")
-        user-profile-info(ref="userProfileInfo" :target-user="targetUser")
+        user-profile-info(ref="userProfileInfo" :target-user="targetUser" :code="code")
       //用户操作
-      user-operate(:target-user="targetUser")
+      .m-b-1(v-if="isSelf")
+        user-operate(:target-user="targetUser")
       //- 用户链接
-      nav-links(ref="userLink" v-if="rolePermissionsType" :nav-links="navLinks")
+      .m-b-1(v-if="isSelf")
+        nav-links(ref="userLink" v-if="rolePermissionsType" :nav-links="navLinks")
       //用户关注
       //.m-b-1(v-if="rolePermissionsType" )
       //  user-focus-on(ref="userFocusOn")
-      user-manage(ref="userManage")
+      .m-b-1
+        user-manage(ref="userManage")
       //  分享链接
-      share(ref="share" share-type="user" :share-title="targetUser.username || targetUser.uid" :share-id="targetUser.uid" :share-description="targetUser.description" :share-avatar="targetUser.avatar")
-
+      .m-b-1
+        share(ref="share" share-type="user" :share-title="targetUser.username || targetUser.uid" :share-id="targetUser.uid" :share-description="targetUser.description" :share-avatar="targetUser.avatar")
 
 </template>
 <style lang="less">
@@ -31,9 +34,11 @@ import UserManage from "./userPanel/UserManage";
 import {getState} from "../../../lib/js/state";
 
 export default {
-  props: ['nav-links', 'target-user'],
+  props: ['nav-links', 'target-user', "code"],
   data: () => ({
     rolePermissionsType: null,
+    targetUid: '',
+    uid: getState().uid,
   }),
   created() {
     this.rolePermissionsType = this.rolePermissions
@@ -45,6 +50,10 @@ export default {
       }else{
         return false
       }
+    },
+    isSelf() {
+      const {uid, targetUid} = this;
+      return targetUid === uid;
     }
   },
   components: {
@@ -55,8 +64,14 @@ export default {
     "user-profile-info": UserProfileInfo,
     "user-operate": UserOperate
   },
+  mounted() {
+    this.initData();
+  },
   methods: {
-
+    initData() {
+      const {uid} = this.$route.params;
+      this.targetUid = uid;
+    }
   }
 }
 </script>
