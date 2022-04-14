@@ -68,7 +68,7 @@ div()
               button.btn.btn-default.btn-sm(v-if='!selectedForum' disabled) 下一步
               button.btn.btn-primary.btn-sm(v-else @click='next') 下一步
             span(v-else)
-              button.btn.btn-default.btn-sm(@click='previous') 上一步
+              button.btn.btn-default.btn-sm.btn-last(@click='previous') 上一步
               button.btn.btn-primary.btn-sm(v-if='selectedThreadType' @click='submit') 确定
               button.btn.btn-primary.btn-sm(v-else disabled title='请选择文章分类') 确定
 </template>
@@ -327,6 +327,7 @@ export default {
       const { selectedForum, selectedThreadType } = this;
       if (!selectedForum) return sweetError(`请选择专业`);
       if (!selectedThreadType) return sweetError(`请选择文章分类`);
+      console.log(selectedForum)
       this.callback({
         forum: selectedForum,
         threadType: selectedThreadType === "none" ? null : selectedThreadType,
@@ -350,7 +351,9 @@ export default {
 
 <style lang="less" scoped>
 @import "../../publicModules/base";
-
+.btn-last{
+  margin-right: 10px;
+}
 .moduleForumSelectorApp {
   will-change: auto;
   top: calc(50% - 22rem);
@@ -367,10 +370,11 @@ export default {
   border-radius: 3px;
   // display: none;
   .draggable-panel-header {
+    font-weight: 700;
     @headerHeight: 2.8rem;
     height: @headerHeight;
     position: relative;
-    background-color: #dadada;
+    background-color: #f6f6f6;
     padding-right: @headerHeight;
     border-radius: 3px 3px 0 0;
     user-select: none;
@@ -390,8 +394,8 @@ export default {
       text-align: center;
       font-size: 1.3rem;
       &:hover {
-        background-color: red;
-        color: #fff;
+        background-color: rgba(0, 0, 0, 0.08);
+        color: #777;
       }
     }
   }

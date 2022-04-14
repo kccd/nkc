@@ -18,13 +18,13 @@ VueRouter.prototype.replace = function replace(location) {
 
 const router = new VueRouter({
   // 浏览器返回上一个页面时跳转到提交之前的滚动位置
-  scrollBehavior(to, from, savePosition){
-    if(savePosition){
-      return savePosition
-    }else{
-      return {x:0, y:0};
-    }
-  },
+  // scrollBehavior(to, from, savePosition){
+  //   if(savePosition){
+  //     return savePosition
+  //   }else{
+  //     return {x:0, y:0};
+  //   }
+  // },
   mode: 'history',
   routes
 });

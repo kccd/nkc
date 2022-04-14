@@ -118,9 +118,10 @@
 </template>
 
 <script>
-import { getUrl } from "../../lib/js/tools";
+import { getUrl, objToStr } from "../../lib/js/tools";
 // import { nkcAPI } from "../../lib/js/netAPI";
 import ForumSelector from "./ForumSelector.vue";
+
 
 export default {
   data: () => ({
@@ -178,6 +179,9 @@ export default {
     }
   },
   methods: {
+    objToStr(obj){
+      return objToStr(obj)
+    },
     getThreadCategoriesId() {
       const tcId = [];
       for (const tc of this.threadCategories) {

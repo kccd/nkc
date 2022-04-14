@@ -2,9 +2,9 @@
   //- data.createSurveyPermission && data.type === "newThread" || (data.type === "modifyThread" && data.post.surveyId)
   .investigation(v-if="createSurveyPermission && type === 'newThread' || (type === 'modifyThread' && post.surveyId)")
     .editor-header 调查
-      button.btn.btn-xs(
+      button.btn.btn-xs.disabledSurveyButton(
         @click="disabledSurveyForm()"
-        id="disabledSurveyButton"
+        ref="disabledSurveyButton"
         :class="{'btn-danger': !disabled , 'btn-success': disabled}"
       ) {{!disabled ? "取消" : "创建"}}
     .survey-edit-body(v-cloak v-if="survey && roles.length && !disabled")
@@ -741,7 +741,7 @@ export default {
       });
     },
     hideButton() {
-      $("#disabledSurveyButton").hide();
+      $(this.$refs.disabledSurveyButton).hide();
     },
     initPostSurvey() {
       this.init({ surveyId: this.post?.surveyId || "" });
@@ -776,7 +776,7 @@ export default {
 .editor-header small{
   color: #88919d;
 }
-#disabledSurveyButton{
+.disabledSurveyButton{
   margin-left: 5px;
 }
 .btn-success {
