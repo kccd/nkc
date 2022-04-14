@@ -19,8 +19,6 @@
                   div(:class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
                   div.link(@click.stop="toChat(targetUser.uid)" v-if="selfUid") 私信
                   div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
-                  //div(v-if="usersBlUid.indexOf(targetUser.uid,1) === -1" ) 加入黑名单
-                  //div(v-else-if="usersBlUid.indexOf(targetUser.uid,1) !== -1") 移除黑名单
                 .fa(:class="subscribeBtnBoxType ? 'fa-angle-up' : 'fa-angle-down'" @click.stop="subscribeBtnBoxChange(!subscribeBtnBoxType)")
           .account-nav
             .account-nav-box
@@ -418,73 +416,6 @@ export default {
             })
       }
 
-    },
-
-    //用户移除黑名单 tUid 被拉黑的用户
-    removeUserToBlackList(uid) {
-      nkcAPI('/blacklist?tUid=' + uid, 'GET')
-        .then(data => {
-          if(!data.bl) throw "对方未在黑名单中";
-          return nkcAPI('/blacklist?tUid=' + uid, 'DELETE');
-        })
-        .then(data => {
-          sweetSuccess('操作成功！');
-          this.getPanelData()
-
-          return data;
-        })
-        .catch(sweetError);
-    },
-
-    //用户添加到黑名单 tUid 被拉黑的用户 form 拉黑来源 mid 被拉黑的moment
-    addUserToBlackList(tUid, from, mid) {
-      const self = this;
-      var isFriend = false, subscribed = false;
-      return Promise.resolve()
-        .then(function() {
-          return nkcAPI('/blacklist?tUid=' + tUid,  'GET')
-        })
-        .then(function(data) {
-          isFriend = data.isFriend;
-          subscribed = data.subscribed;
-          var bl = data.bl;
-          if(bl) throw '对方已在黑名单中';
-          var info;
-          if(isFriend) {
-            info = '该会员在你的好友列表中，确定放入黑名单吗？';
-          } else if(subscribed) {
-            info = '该会员在你的关注列表中，确定放入黑名单吗？';
-          }
-          if(info) return sweetQuestion(info);
-        })
-        .then(function() {
-          if(isFriend) {
-            return nkcAPI(`/message/friend?uid=` + tUid, 'DELETE', {})
-          }
-        })
-        .then(function() {
-          if(subscribed) {
-            return self.subscribeUserPromise(tUid, false);
-          }
-        })
-        .then(function() {
-          return nkcAPI('/blacklist', 'POST', {
-            tUid: tUid,
-            from: from,
-            mid
-          })
-        })
-        .then(function(data) {
-          sweetSuccess('操作成功');
-          self.getPanelData()
-          self.subscribeBtnType = false;
-          return data;
-        })
-        .catch(sweetError);
-    },
-    subscribeUserPromise(id, sub, cid) {
-      const method = sub? "POST": "DELETE";
-      return nkcAPI("/u/" + id + "/subscribe", method, {cid: cid || []});
     },
 
     //主页关注私信按钮盒子展开

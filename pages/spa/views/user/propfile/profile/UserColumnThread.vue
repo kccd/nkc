@@ -1,9 +1,23 @@
 <template lang="pug">
   .user-column-thread
-    h4 这是用户在专栏下发表的文章
+    .user-column-head
+      .user-column-avatar
+        img()
+      .user-column-content
+        a.user-column-username 专栏名称
+        span.user-column-from 添加文章
+        .user-column-time-sm
+          span 时间
+
+
 </template>
 <style lang="less">
-
+.user-column-head{
+  padding-left: 3.3rem;
+  min-height: 2.8rem;
+  position: relative;
+  margin-bottom: 0.5rem;
+}
 </style>
 <script>
 import {nkcAPI} from "../../../../../lib/js/netAPI";
