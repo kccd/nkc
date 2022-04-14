@@ -28,7 +28,7 @@
               .account-nav-middle
                 span(@click="containerChange('moment')" :class="{'active': $route.name === 'moment'}") 动态
                 span(@click="containerChange('post')" :class="{'active': $route.name === 'post'}") 社区
-                span(@click="containerChange('subColumns')" :class="{'active': $route.name === 'subColumns'}") 专栏
+                span(@click="containerChange('column')" :class="{'active': $route.name === 'column'}") 专栏
                 span(@click="containerChange('follower')" :class="{'active': ($route.name === 'follower' || $route.name === 'fan')}") 关注
               .account-nav-right
                 .sub-item(@click="containerChange('follower')")

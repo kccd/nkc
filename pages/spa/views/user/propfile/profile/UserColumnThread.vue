@@ -1,19 +1,38 @@
 <template lang="pug">
-
+  .user-column-thread
+    h4 这是用户在专栏下发表的文章
 </template>
 <style lang="less">
 
 </style>
 <script>
- export default {
-   data: () => ({
+import {nkcAPI} from "../../../../../lib/js/netAPI";
+export default {
+  data: () => ({
+  uid: '',
+  threads: '',
+  }),
+  mounted() {
 
-   }),
-   mounted() {
-
+  },
+  methods: {
+   //获取基本数据
+   initData() {
+     const {uid} = this.$route.params;
+     this.uid = uid;
    },
-   methods: {
-    //获取用户在专栏下发表的文章
+  //获取用户在专栏下发表的文章
+   getColumnThreads() {
+     const self = this;
+     nkcAPI("", "GET")
+     .then(res => {
+        self.threads = res.threads;
+        self.paging = res.paging;
+     })
+     .catch(err => {
+       sweetError(err);
+     })
    }
- }
+  }
+}
 </script>
