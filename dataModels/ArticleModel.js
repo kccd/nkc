@@ -1043,8 +1043,8 @@ schema.methods.isModerator = async function(uid) {
 }
 
 /*
-* 获取当前article的文章链接链接
-* @param {object} articles 需要拓展文章链接的文章article
+* 获取article文章的信息
+* @param {object} articles 需要拓展信息的文章article
 * res： {
 *   articles: [
 *     {
