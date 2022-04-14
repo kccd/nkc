@@ -31,10 +31,10 @@
                 span(@click="containerChange('subColumns')" :class="{'active': $route.name === 'subColumns'}") 专栏
                 span(@click="containerChange('follower')" :class="{'active': ($route.name === 'follower' || $route.name === 'fan')}") 关注
               .account-nav-right
-                div
+                .sub-item(@click="containerChange('follower')")
                   div 关注
                   span {{followersCount >= 1000 ? (followersCount/1000).toFixed(1)+'K' : followersCount}}
-                div
+                .sub-item(@click="containerChange('fan')")
                   div 粉丝
                   span {{fansCount >= 1000 ? (fansCount/1000).toFixed(1)+'K' : fansCount}}
 
@@ -215,12 +215,16 @@
             display: inline-block;
             padding-left: 15px;
             text-align: center;
-            &>div{
+            .sub-item{
               display: inline-block;
-              padding: 3px 15px 0 15px;
+              margin: 3px 15px 0 15px;
               font-weight: bold;
               font-size: 12px;
-              &>span{
+              cursor: pointer;
+              div {
+
+              }
+              span{
                 font-size: 18px;
               }
             }
