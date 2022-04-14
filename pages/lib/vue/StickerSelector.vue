@@ -301,11 +301,13 @@
       notesAboutUsing: ''
     }),
     mounted() {
-      this.initDraggableElement();
       socket.on('fileTransformProcess',(data)=>{
-        // this.type='own'
         this.getStickers()
       })
+      this.initDraggableElement();
+    },
+    destroyed(){
+      socket.removeListener("fileTransformProcess")
     },
     methods: {
       getUrl,
