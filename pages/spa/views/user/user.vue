@@ -1,7 +1,7 @@
 <template lang="pug">
   div
-    panel(ref="panel" :fans-count="fansCount" :followers-count="followersCount" :target-user-scores="targetUserScores" v-if="targetUser")
-    account-user(ref="accountUser" :target-user-fans="targetUserFans" :target-user-followers="targetUserFollowers" :target-user="targetUser" :nav-links="navLinks" :forums="subForums" :code="code")
+    panel(ref="panel" :fans-count="fansCount" :followers-count="followersCount"  v-if="targetUser")
+    account-user(ref="accountUser" :users-bl-uid="usersBlUid" :target-user-scores="targetUserScores" :target-user-fans="targetUserFans" :target-user-followers="targetUserFollowers" :target-user="targetUser" :nav-links="navLinks" :forums="subForums" :code="code")
     footer-vue(ref="footerVue")
 </template>
 
@@ -31,6 +31,7 @@ export default {
     targetUserFans: null,
     targetUserFollowers: null,
     code: null,
+    usersBlUid: []
   }),
   components: {
     "panel": Panel,
@@ -62,6 +63,7 @@ export default {
         self.targetUserFans = res.targetUserFans;
         self.targetUserFollowers = res.targetUserFollowers;
         self.code = res.code;
+        self.usersBlUid = res.usersBlUid;
         setPageTitle(self.targetUser.username + '的主页');
       })
       .catch(err => {

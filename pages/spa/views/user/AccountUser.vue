@@ -6,7 +6,7 @@
         .col-xs-12.col-md-2.left-panel-container
           .left-panel-box(:class="leftPanelBoxOperation ? 'left-panel-box-show' : 'left-panel-box-none'")
             .left-panel-box-operation(@click="clickLeftBox") {{leftPanelBoxOperation ? "收起" : "展开"}}
-            left-panel(:nav-links="navLinks" :target-user="targetUser" :code="code" :target-user-scores="targetUserScores")
+            left-panel(:nav-links="navLinks" :users-bl-uid="usersBlUid" :target-user="targetUser" :code="code" :target-user-scores="targetUserScores")
         //- 用户中间面板 先hi用户的动态， 文章，恢复等信息
         .col-xs-12.col-md-7.center-panel-container
           .user-container.p-r-0.m-b-1.box-shadow-panel
@@ -63,7 +63,7 @@ import {getColumnInfo} from "../../../lib/js/column";
 import LeftPanel from "./LeftPanel";
 import RightPanel from "./RightPanel";
 export default {
-  props: ['navLinks', 'target-user', 'type', 'forums', "targetUserFans", "targetUserFollowers", "code","targetUserScores"],
+  props: ['navLinks', 'target-user', 'type', 'forums', "targetUserFans", "targetUserFollowers", "code","targetUserScores", "usersBlUid"],
   data: () => ({
     targetColumn: getColumnInfo(),
     leftPanelBoxOperation: false,

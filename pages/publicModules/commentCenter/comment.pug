@@ -18,7 +18,7 @@ if !isIncluded('comment')
       a.button.radius-left(onclick="manageComments()") 管理
       a.button(onclick="markAllComments()") 全选
       a.button.radius-right(onclick="disabledMarkedComment()") 退修或屏蔽
-  .p-l-2.p-r-2.m-b--05
+  .m-b--05
     include ../../publicModules/paging/paging
     +articleNav
     if disableComment && data.comments.length !== 0
@@ -30,7 +30,7 @@ if !isIncluded('comment')
         include ./singleComment/singleComment
         for comment in data.comments
           +singleComment(comment)
-  .p-l-2.p-r-2.m-b--05
+  .m-b--05
     include ../../publicModules/paging/paging
     +articleNav
     if disableComment && data.comments.length !== 0

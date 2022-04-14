@@ -10,6 +10,7 @@ router
     const {page = 0, last_pages, highlight, t} = query;
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     let article = await db.ArticleModel.findOnly({_id: aid});
+    const articlePost = await db.ArticlePostModel.findOne({sid: article._id, source: article.source});
     // 获取空间文章需要显示的数据
     const articleRelatedContent = await db.ArticleModel.getZoneArticle(article._id);
     data.columnPost = articleRelatedContent;
@@ -29,6 +30,9 @@ router
     }
     let match = {
     };
+    if(articlePost) {
+      match.sid = articlePost._id;
+    }
     //只看作者
     if(t === 'author') {
       data.t = t;
@@ -63,9 +67,9 @@ router
       uid: state.uid,
       status: defaultComment,
     };
-    let comment = await db.CommentModel.getCommentsByArticleId({match: m, source: _article.source, aid: _article._id,});
+    let comment = await db.CommentModel.getCommentsByArticleId({match: m,});
     //获取该文章下的评论
-    let comments = await db.CommentModel.getCommentsByArticleId({match, paging, source: _article.source, aid: _article._id,});
+    let comments = await db.CommentModel.getCommentsByArticleId({match, paging});
     if(comments && comments.length !== 0) {
       comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions});
     }

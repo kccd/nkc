@@ -338,7 +338,7 @@ export default {
       .then(res => {
         self.panelPermission = res.panelPermission;
         self.targetUser = res.targetUser;
-        self.usersBlUid = res.usersBlUid;
+        // self.usersBlUid = res.usersBlUid;
         if(res.user.uid !== self.$route.params.uid){
           self.subscribeBtn = true
         }
@@ -478,9 +478,8 @@ export default {
 
     //主页关注私信按钮盒子展开
     subscribeBtnBoxChange(bool){
-      console.log(bool)
       this.subscribeBtnBoxType = bool;
-      if(bool) this.$refs.subscribeBox.style.height = '11rem';
+      if(bool) this.$refs.subscribeBox.style.height = '8rem';
       else this.$refs.subscribeBox.style.height = '3rem';
     },
     toChat(uid){
