@@ -102,7 +102,35 @@ router
     const count = await db.WeakPasswordResultModel.countDocuments();
     const paging = nkcModules.apiFunction.paging(page, count);
     data.paging = paging;
-    data.list = await db.WeakPasswordResultModel.aggregate([
+    const list = await db.WeakPasswordResultModel.find({}).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
+    data.list = [];
+    const usersId = list.map(l => l.uid);
+    let users = await db.UserModel.find({uid: {$in: usersId}});
+    users = await db.UserModel.extendUsersInfo(users);
+    const usersObj = {};
+    for(const user of users) {
+      usersObj[user.uid] = user;
+    }
+    for(const l of list) {
+      const {toc, uid, password} = l;
+      const user = usersObj[uid];
+      if(!user) continue;
+      data.list.push({
+        uid,
+        toc,
+        password,
+        userBanned: user.certs.includes('banned'),
+        userToc: user.toc,
+        userTlm: user.tlv,
+        userAvatar: user.avatar,
+        username: user.username,
+        userCertsName: user.info.certsName,
+        userGradeId: user.grade._id,
+        userGradeName: user.grade.displayName,
+      });
+    }
+    await next();
+    /*const list = await db.WeakPasswordResultModel.aggregate([
       { $match: {} },
       { $skip: paging.start },
       { $limit: paging.perpage },
@@ -119,9 +147,25 @@ router
           toc: 1,
           _id: 0,
           "userinfo.username": 1,
-          "userinfo.avatar": 1
+          "userinfo.avatar": 1,
+          "userinfo.tlm": 1,
       } }
-    ]);
-    return next();
+    ]);*/
+    // const uidArr = [];
+    // for(const l of list) {
+    //   uidArr.push(l.uid);
+    // }
+    // //查找出对应的用户数据
+    // const users = await db.UserModel.find({uid: {$in: uidArr}});
+    // const userObj = {};
+    // for(const u of users) {
+    //   userObj[u.uid] = u;
+    // }
+    // for(const l of list) {
+    //   l.user = userObj[l.uid];
+    // }
+    // console.log('list', list);
+    // data.list = list;
+    // return next();
   });
 module.exports = router;
