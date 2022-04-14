@@ -95,13 +95,17 @@ if thread.type === 'thread'
   -threadPanelClass += ' p-b-0';
 -}
 //- -var threadTitle = tools.removeLink(thread.firstPost.t);
-if thread.type === 'article' && data.t === 'column'
-  -var threadTitle = thread.document.title;
-else
-  -var threadTitle = thread.firstPost.t;
--var threadUrl = `/t/${thread.tid}`;
+-var threadTitle;
+-var threadUrl;
 if data.t === 'column'
-  -threadurl=thread.url;
+  if thread.type === 'article'
+    -threadTitle = thread.document.title;
+  else
+    -threadTitle = thread.firstPost.t;
+  -threadUrl = thread.url;
+else
+  -threadTitle = thread.firstPost.t;
+  -threadUrl = `/t/${thread.tid}`;
 if data.t  === 'column' && thread.type === 'article'
   .thread-panel(class=threadPanelClass)
     .thread-panel-body(class=styleType)
@@ -115,7 +119,7 @@ if data.t  === 'column' && thread.type === 'article'
             )
               img(src=tools.getUrl('userAvatar', thread.user.avatar, 'sm') class=thread.user.certs.includes('banned') ? 'user-banned-avatar':'')
             .thread-panel-minimalist-title
-              a.thread-panel-minimalist-title-a.thread-panel-url(href=threadurl title=threadTitle class=thread.digest ? "digest" : ""  target=aTarget)=threadTitle
+              a.thread-panel-minimalist-title-a.thread-panel-url(href=threadUrl title=threadTitle class=thread.digest ? "digest" : ""  target=aTarget)=threadTitle
             .absolute-count
               -const toc = tools.briefTime(thread.toc);
               -let tlm;
@@ -148,7 +152,7 @@ if data.t  === 'column' && thread.type === 'article'
           .thread-panel-author-info
             //- 文章标题
             .thread-panel-title
-              a.title-content.thread-panel-url(href=threadurl class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
+              a.title-content.thread-panel-url(href=threadUrl class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
 
             .thread-panel-author(
               data-global-mouseover="showUserPanel"
@@ -185,7 +189,7 @@ if data.t  === 'column' && thread.type === 'article'
                 .fa.fa-eye=thread.hits
               if thread.comment
                 .fa
-                  a.a-jump(href=`${threadurl}#container` target="_blank")
+                  a.a-jump(href=`${threadUrl}#container` target="_blank")
                     span.fa.fa-comment=thread.comment
 
 
@@ -239,15 +243,15 @@ if data.t  === 'column' && thread.type === 'article'
                 .fa.fa-comment=` ${thread.comment}`
           //- 文章标题
           .thread-panel-title
-            a.title-content.thread-panel-url(href=threadurl class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
+            a.title-content.thread-panel-url(href=threadUrl class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
           .thread-panel-abstract
             if postCoverPosition === 'left'
               +minThreadCover('p-r-1')
             .thread-panel-abstract-content
               if thread.document.abstractCn
-                a.thread-panel-url(href=threadurl target=aTarget).thread-panel-post=thread.document.abstract.slice(0, 200)
+                a.thread-panel-url(href=threadUrl target=aTarget).thread-panel-post=thread.document.abstract.slice(0, 200)
               else
-                a.thread-panel-url(href=threadurl target=aTarget).thread-panel-post=thread.document.content.slice(0, 200)
+                a.thread-panel-url(href=threadUrl target=aTarget).thread-panel-post=thread.document.content.slice(0, 200)
               if hasReply
                 .thread-panel-reply
                   a(href=lastPostUrl target=aTarget)
@@ -292,7 +296,7 @@ else
                 img(src=anonymousInfo.avatar)
             .thread-panel-minimalist-title
               +checkBox
-              a.thread-panel-minimalist-title-a.thread-panel-url(href=threadurl title=threadTitle class=thread.digest ? "digest" : ""  target=aTarget)=threadTitle
+              a.thread-panel-minimalist-title-a.thread-panel-url(href=threadUrl title=threadTitle class=thread.digest ? "digest" : ""  target=aTarget)=threadTitle
               +displayPageCount
             .absolute-count
               -const toc = tools.briefTime(thread.firstPost.toc);
@@ -331,7 +335,7 @@ else
             +checkBox
             //- 文章标题
             .thread-panel-title
-              a.title-content.thread-panel-url(href=threadurl class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
+              a.title-content.thread-panel-url(href=threadUrl class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
               +displayPageCount
 
             +threadCategories
@@ -458,7 +462,7 @@ else
 
           //- 文章标题
           .thread-panel-title
-            a.title-content.thread-panel-url(href=threadurl class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
+            a.title-content.thread-panel-url(href=threadUrl class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
             -const pageCount = thread.count / state.pageSettings.threadPostList
             -let ellipsis = false;
             -for(let i = 1; i < pageCount; i++)
@@ -476,9 +480,9 @@ else
               +minThreadCover('p-r-1')
             .thread-panel-abstract-content
               if thread.firstPost.abstractCn
-                a.thread-panel-url(href=threadurl target=aTarget).thread-panel-post=thread.firstPost.abstractCn.slice(0, 200)
+                a.thread-panel-url(href=threadUrl target=aTarget).thread-panel-post=thread.firstPost.abstractCn.slice(0, 200)
               else
-                a.thread-panel-url(href=threadurl target=aTarget).thread-panel-post=thread.firstPost.c.slice(0, 200)
+                a.thread-panel-url(href=threadUrl target=aTarget).thread-panel-post=thread.firstPost.c.slice(0, 200)
               if hasReply
                 .thread-panel-reply
                   a(href=lastPostUrl target=aTarget)
