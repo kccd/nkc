@@ -17,6 +17,7 @@ const threadSchema = new Schema({
     default: 'article',
     index: 1
   },
+  //文章的评论数量
   count: {
     type: Number,
     default: 0

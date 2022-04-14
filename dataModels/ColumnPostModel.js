@@ -624,10 +624,17 @@ schema.statics.deleteColumnPost = async function(aid) {
 schema.statics.extendColumnArticles = async function(articles) {
   const ArticleModel = mongoose.model('articles');
   const _articles = await ArticleModel.getArticlesInfo(articles);
-  for(const article of _articles) {
-    const {} = article;
-  }
-  return null;
+  return _articles;
+}
+
+/*
+* 拓展专栏引用的专栏信息
+* */
+schema.methods.extendColumnPost = async function() {
+  const ColumnModel = mongoose.model('columns');
+  const {columnId} = this;
+  const column = await ColumnModel.findOne({_id: columnId});
+  return column;
 }
 
 

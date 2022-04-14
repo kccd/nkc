@@ -559,6 +559,10 @@ router
         const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
         let columnArticles = await db.ArticleModel.find({_id: {$in: aidArr}});
         columnArticles = await db.ColumnPostModel.extendColumnArticles(columnArticles);
+        const articleObj = {};
+        for(const ca of columnArticles) {
+          articleObj[ca._id] = ca;
+        }
         columnThreads = await db.ThreadModel.extendThreads(columnThreads, {
           htmlToText: true,
           removeLink: true,
@@ -574,7 +578,21 @@ router
         }
         threads = [];
         for(const c of columnPosts) {
-          const t = threadObj[c.pid];
+          let t;
+          if(c.type === threadType) {
+            t = threadObj[c.pid];
+            if(t) t.type = 'thread';
+          } else if(c.type === articleType){
+            t = articleObj[c.pid];
+            if(t) {
+              //获取当前引用的专栏
+              const column = await c.extendColumnPost();
+              t.type = 'article';
+              t.document.content = nkcModules.nkcRender.htmlToPlain(t.document.content, 200),
+              //获取文章的专栏信息
+              t.columns= [column];
+            }
+          }
           if(t) {
             t.url = `/m/${c.columnId}/a/${c._id}`;
             threads.push(t);
@@ -591,13 +609,13 @@ router
           categoriesId: 1,
           disabled: 1, recycleMark: 1
         }).skip(paging.start).limit(paging.perpage).sort(sort);
+        threads = await db.ThreadModel.extendThreads(threads, {
+          htmlToText: true,
+          removeLink: true,
+          forum,
+          extendColumns: t === 'column'?true:false
+        });
       }
-      threads = await db.ThreadModel.extendThreads(threads, {
-        htmlToText: true,
-        removeLink: true,
-        forum,
-        extendColumns: t === 'column'?true:false
-      });
     }
     const superModerator = ctx.permission("superModerator");
     let canManageFid = [];
