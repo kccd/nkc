@@ -16,6 +16,7 @@ router.get('/:aid', async (ctx, next)=>{
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     const _article = columnPostData.article;
     const article = await db.ArticleModel.findOnly({_id: _article._id});
+    const articlePost = await db.ArticlePostModel.findOne({sid: article._id, source: article.source});
     isModerator = await article.isModerator(state.uid);
     const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
     if(_article.status !== normalStatus && !isModerator) {
@@ -25,6 +26,9 @@ router.get('/:aid', async (ctx, next)=>{
     }
     let match = {
     };
+    if(articlePost) {
+      match.sid = articlePost._id;
+    }
     //只看作者
     if(t === 'author') {
       data.t = t;
@@ -60,9 +64,9 @@ router.get('/:aid', async (ctx, next)=>{
       uid: state.uid,
       status: defaultComment,
     };
-    let comment = await db.CommentModel.getCommentsByArticleId({match: m, source: _article.source, aid: _article._id,});
+    let comment = await db.CommentModel.getCommentsByArticleId({match: m});
     //获取该文章下的评论
-    let comments = await db.CommentModel.getCommentsByArticleId({match, paging, source: _article.source, aid: _article._id,});
+    let comments = await db.CommentModel.getCommentsByArticleId({match, paging});
     if(comments && comments.length !== 0) {
       comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions});
     }
