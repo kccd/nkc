@@ -9,6 +9,9 @@ module.exports = {
 			manage: {
 				GET: "getUserHomeCard"
 			},
+			column: {
+				GET: "getUserHomeCard",
+			},
 			moment: {
 				GET: "getUserHomeCard"
 			},

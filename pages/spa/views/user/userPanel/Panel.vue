@@ -62,7 +62,7 @@
 
 </template>
 
-<style lang="less">
+<style lang="less" scoped>
 @import "../../../../publicModules/base";
 @media (max-width: 991px){
   .account-nav{

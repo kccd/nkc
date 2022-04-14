@@ -14,6 +14,7 @@ const fanRouter = require('./fan');
 const manageRouter = require('./manage');
 const userRouter = require('./subUser');
 const financeRouter = require('./finance');
+const columnRouter = require('./column');
 router
   .get('/', async (ctx, next) => {
     //获取主页导航等信息
@@ -355,4 +356,5 @@ router
   .get('/manage', manageRouter)
   // .get('/subUser', userRouter)
   .get('/finance',financeRouter)
+  .get('/column', columnRouter)
 module.exports = router;

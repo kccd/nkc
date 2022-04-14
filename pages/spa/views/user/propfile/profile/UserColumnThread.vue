@@ -9,22 +9,25 @@
 import {nkcAPI} from "../../../../../lib/js/netAPI";
 export default {
   data: () => ({
-  uid: '',
-  threads: '',
+    uid: '',
+    threads: '',
+    loading: false,
   }),
   mounted() {
-
+    this.initData();
+    this.getColumnThreads();
   },
   methods: {
-   //获取基本数据
-   initData() {
+    //获取基本数据
+    initData() {
      const {uid} = this.$route.params;
      this.uid = uid;
-   },
-  //获取用户在专栏下发表的文章
-   getColumnThreads() {
+    },
+    //获取用户在专栏下发表的文章
+    getColumnThreads(page) {
+     this.loading = true;
      const self = this;
-     nkcAPI("", "GET")
+     nkcAPI(`/u/${self.uid}/p/column`, "GET")
      .then(res => {
         self.threads = res.threads;
         self.paging = res.paging;
@@ -32,7 +35,8 @@ export default {
      .catch(err => {
        sweetError(err);
      })
-   }
+     this.loading = false;
+    }
   }
 }
 </script>
