@@ -705,16 +705,13 @@ schema.statics.extendDocumentOfComment = async function(comments, type = 'beta',
 * 通过文章引用去获取文章下的评论
 * */
 schema.statics.getCommentsByArticleId = async function(props) {
-  const {aid, source, paging = null, match} = props;
-  const ArticlePostModel = mongoose.model('articlePosts');
+  const {paging = null, match} = props;
   const CommentModel = mongoose.model('comments');
-  const articlePost = await ArticlePostModel.findOne({sid: aid, source});
-  if(!articlePost) return;
   let comments;
   if(paging) {
-    comments = await CommentModel.find({...match, sid: articlePost._id}).skip(paging.start).limit(paging.perpage);
+    comments = await CommentModel.find({...match}).skip(paging.start).limit(paging.perpage);
   } else {
-    comments = await CommentModel.find({...match, sid: articlePost._id}).sort({toc: -1}).limit(1);
+    comments = await CommentModel.find({...match}).sort({toc: -1}).limit(1);
   }
   return comments;
 }
