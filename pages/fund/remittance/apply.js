@@ -22,11 +22,21 @@ const app = new Vue({
     getUrl: NKC.methods.tools.getUrl,
     applyRemittance() {
       const {content, number, form, selectedPosts} = this;
-      nkcAPI(`/fund/a/${form._id}/remittance/apply`, 'POST', {
-        number,
-        c: content,
-        selectedThreads: selectedPosts.map(s => s.tid)
-      })
+
+      window.sendMessage();
+
+      return Promise.resolve()
+        .then(() => {
+          return sweetPrompt('请输入短信验证码：');
+        })
+        .then(code => {
+          return nkcAPI(`/fund/a/${form._id}/remittance/apply`, 'POST', {
+            code,
+            number,
+            c: content,
+            selectedThreads: selectedPosts.map(s => s.tid)
+          })
+        })
         .then(() => {
           window.location.reload();
         })
@@ -57,10 +67,30 @@ window.verifyRemittance = (number, formId) => {
     .catch(sweetError)
 }
 
+window.sendMessage = () => {
+  nkcAPI(`/sendMessage/withdraw`, 'POST', {})
+    .then(() => {
+      screenTopAlert(`验证码发送成功`);
+    })
+    .catch(err => {
+      screenTopWarning(err.error || err.message)
+    })
+}
+
 window.applyRemittance = (number, formId) => {
-  nkcAPI(`/fund/a/${formId}/remittance/apply`, 'POST', {
-    number
-  })
+
+  window.sendMessage();
+
+  return Promise.resolve()
+    .then(() => {
+      return sweetPrompt('请输入短信验证码：');
+    })
+    .then(code => {
+      return nkcAPI(`/fund/a/${formId}/remittance/apply`, 'POST', {
+        number,
+        code
+      })
+    })
     .then(() => {
       window.location.reload();
     })
