@@ -1,20 +1,35 @@
 <template lang="pug">
-.user-account.m-b-1(v-if="targetUser")
-  //- 用户左侧面板
-  .left-panel-box(:class="leftPanelBoxOperation ? 'left-panel-box-show' : 'left-panel-box-none'")
-    .left-panel-box-operation(@click="clickLeftBox") {{leftPanelBoxOperation ? "收起" : "展开"}}
-    left-panel(:nav-links="navLinks" :target-user="targetUser" :code="code" :target-user-scores="targetUserScores")
-  //- 用户中间面板 先hi用户的动态， 文章，恢复等信息
-  .user-container.col-xs-12.col-md-7.p-r-0.m-b-1.box-shadow-panel#comment-content
-    router-view
-    //user-card(ref="userCard")
-  //用户右侧面板
-  right-panel(:forums="forums" :target-user="targetUser" :target-user-fans="targetUserFans" :target-user-followers="targetUserFollowers" )
+  .container-fluid.max-width
+    .user-account.m-b-1(v-if="targetUser")
+      .row
+        //- 用户左侧面板
+        .col-xs-12.col-md-2.left-panel-container
+          .left-panel-box(:class="leftPanelBoxOperation ? 'left-panel-box-show' : 'left-panel-box-none'")
+            .left-panel-box-operation(@click="clickLeftBox") {{leftPanelBoxOperation ? "收起" : "展开"}}
+            left-panel(:nav-links="navLinks" :target-user="targetUser" :code="code" :target-user-scores="targetUserScores")
+        //- 用户中间面板 先hi用户的动态， 文章，恢复等信息
+        .col-xs-12.col-md-7.center-panel-container
+          .user-container.p-r-0.m-b-1.box-shadow-panel
+            router-view
+          //user-card(ref="userCard")
+        //用户右侧面板
+        .col-xs-12.col-md-3
+          right-panel(:forums="forums" :target-user="targetUser" :target-user-fans="targetUserFans" :target-user-followers="targetUserFollowers" )
 </template>
 <style lang="less">
 @import "../../../publicModules/base";
 .left-panel-box-operation{
   display: none;
+}
+.left-panel-container{
+  @media(min-width: 992px) {
+    padding-right: 0!important;
+  }
+}
+.center-panel-container{
+  @media(min-width: 992px) {
+    padding-right: 0!important;
+  }
 }
 @media (max-width: 991px) {
   .user-container{

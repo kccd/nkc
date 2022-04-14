@@ -1,6 +1,6 @@
 <template lang="pug">
 .max-width
-  .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel
+  .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel.xs-p
     .calendar.overflow-x
       .min-h(ref="canvasDom")
       #set-year
@@ -286,10 +286,16 @@ export default {
 </script>
 <style scoped lang="less">
  @max-width: 1000px;
+ @media (max-width: @max-width) {
+   .xs-p{
+      padding: 0 5px;
+    }
+ }
 .overflow-x{
   @media screen and (max-width: @max-width) {
     overflow-x: scroll;
     width: 100%;
+    
   }
 
 }

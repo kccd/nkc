@@ -1,5 +1,5 @@
 <template lang="pug">
-.editor.row
+.editor.row.p-l-30
   .col-xs-12.col-md-9.box-shadow-panel.m-b-2
     div
       //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t 
@@ -177,6 +177,9 @@ export default {
 </script>
 
 <style scoped>
+.p-l-30{
+  padding-left: 30px;
+}
 .col-md-9 {
   position: relative;
   min-height: 1px;

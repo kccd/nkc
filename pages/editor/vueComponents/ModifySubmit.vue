@@ -24,7 +24,7 @@
     .checkbox
       .editor-auto-save(v-if="autoSaveInfo")
         .fa.fa-check-circle &nbsp;{{ autoSaveInfo }}
-    .row.btn-area
+    .btn-area
       button.btn.btn-theme(
         @click="readyData",
         :disabled="disabledSubmit || !checkProtocol"
@@ -469,10 +469,9 @@ export default {
 <style scoped lang="less">
 
 .col-md-3 {
-
-    width: 25%;
+  width: 25%;
 }
-.clo-xs-12{
+.col-xs-12{
   width: 100%;
 }
 @media screen and (max-width: 992px) {
@@ -481,22 +480,16 @@ export default {
   }
   .modifySubmit {
     margin: auto;
+    position: static;
+    width: 100%;
   }
-  .btn-area{
-    text-align: center;
-  }
-}
-@media (min-width: 992px){
   .btn-area{
     text-align: left;
-    padding-left: 15px;
   }
 }
-.row{
-  width: 100%;
-}
+// @media (min-width: 992px){
+// }
 .btn-area{
-  
   .btn:nth-child(1){
     margin-right: 10px;
   }
@@ -506,15 +499,17 @@ export default {
   color: #9baec8;
 }
 .modifySubmit {
+  background-color: transparent!important;
   button{
-    
     max-width: 10rem;
     min-width: 6rem;
     @media (max-width: 1100px) {
       min-width: 0;
     }
   }
-  /* max-width: 25rem; */
-  width: 100%;
+  @media (min-width: 992px) {
+    max-width: 25rem;
+    position: fixed;
+  }
 }
 </style>
