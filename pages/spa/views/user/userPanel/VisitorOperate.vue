@@ -9,18 +9,24 @@
 </style>
 <script>
 import {nkcAPI} from "../../../../lib/js/netAPI";
+import {EventBus} from "../../../eventBus";
 
 export default {
   props: ["usersBlUid", "targetUser"],
   data: () => ({
-    usersBlUidList: []
+    usersBlUidList: [],
   }),
   created() {
     this.usersBlUidList = this.usersBlUid
+    EventBus.$on('removeToBl',(uid)=>{
+      this.usersBlUidList.splice(this.usersBlUidList.findIndex(item => item === uid),1)
+    })
+  },
+  mounted() {
   },
   methods: {
     blackListOperation(){
-      const bool = this.usersBlUidList.indexOf(this.targetUser.uid,1) === -1
+      const bool = this.usersBlUidList.indexOf(this.targetUser.uid,1) === -1;
       if(bool) this.addUserToBlackList(this.targetUser.uid,"userHome")
       else this.removeUserToBlackList(this.targetUser.uid)
     },
@@ -33,8 +39,7 @@ export default {
         })
         .then(data => {
           sweetSuccess('操作成功！');
-          this.getPanelData()
-
+          this.usersBlUidList.splice(this.usersBlUidList.findIndex(item => item === uid),1);
           return data;
         })
         .catch(sweetError);
@@ -79,8 +84,8 @@ export default {
         })
         .then(function(data) {
           sweetSuccess('操作成功');
-          self.getPanelData()
-          self.subscribeBtnType = false;
+          self.usersBlUidList.push(tUid)
+          EventBus.$emit('addToBl')
           return data;
         })
         .catch(sweetError);

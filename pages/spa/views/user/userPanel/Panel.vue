@@ -293,6 +293,7 @@ import {getState} from "../../../../lib/js/state";
 import {objToStr} from "../../../../lib/js/tools";
 import {subUsers} from "../../../../lib/js/subscribe";
 import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
+import {EventBus} from "../../../eventBus";
 
 export default {
   props: ['targetUserScores', "fansCount",  "followersCount"],
@@ -320,6 +321,10 @@ export default {
     if(getState && getState.isApp){
       this.showBanBox = true;
     }
+    EventBus.$on('addToBl',()=>{
+      console.log('1111')
+      this.subscribeBtnType = false
+    })
   },
   mounted() {
   },
@@ -388,6 +393,7 @@ export default {
                 sweetSuccess('关注成功');
                 self.subscribeBtnType = true;
                 self.$refs.subscribeTypes.close();
+                EventBus.$emit('removeToBl',uid)
                 this.getPanelData()
               })
               .catch(err => {
