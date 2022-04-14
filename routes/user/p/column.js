@@ -22,6 +22,7 @@ module.exports = async (ctx, next) => {
   fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !forumInReduceVisits.includes(fid));
   const topicsId = await db.ForumModel.getForumsIdFromRedis("topic");
   const disciplinesId = await db.ForumModel.getForumsIdFromRedis("discipline");
+  const homeSettings = await db.SettingModel.getSettings("home");
   
   // 排除话题下的文章
   if(!homeSettings.list || !homeSettings.list.topic) {
@@ -46,9 +47,8 @@ module.exports = async (ctx, next) => {
       aidArr.push(c.pid);
     }
   }
-  console.log('fidOfCanGetThreads', fidOfCanGetThreads);
   //获取社区文章
-  const columnThreads = await db.ThreadModel.find({});
+  // const columnThreads = await db.ThreadModel.find({});
   //拓展专栏引用下的文章
   data.paging = paging;
   await next();
