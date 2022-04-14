@@ -114,7 +114,6 @@ router
     for(const l of list) {
       const {toc, uid, password} = l;
       const user = usersObj[uid];
-      console.log('user', user);
       if(!user) continue;
       data.list.push({
         uid,
