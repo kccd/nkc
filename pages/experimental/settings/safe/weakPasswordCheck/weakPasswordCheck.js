@@ -27,3 +27,7 @@ new Vue({
     }
   }
 })
+
+window.viewText = (text) => {
+  sweetAlert(text)
+}
