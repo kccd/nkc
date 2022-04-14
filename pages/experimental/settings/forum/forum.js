@@ -38,9 +38,9 @@ window.app = new Vue({
     updating: false,
   },
   mounted() {
-    setTimeout(() => {
+    /*setTimeout(() => {
       floatForumPanel.initPanel();
-    }, 500)
+    }, 500)*/
   },
   computed: {
     listTypeCount() {

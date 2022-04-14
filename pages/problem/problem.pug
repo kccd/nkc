@@ -79,7 +79,12 @@ block content
             .problem-images.p-t-1
               for aid in problem.attachId
                 .problem-image
-                  img(src=tools.getUrl('problemImage', aid, 'sm') data-src=tools.getUrl('problemImage', aid) data-type="view")
+                  img(
+                    src=tools.getUrl('problemImage', aid, 'sm')
+                    data-src=tools.getUrl('problemImage', aid)
+                    data-global-click='viewImage'
+                    data-global-data=objToStr({url: tools.getUrl('problemImage', aid)})
+                  )
           if problem.referrer
             h5.m-b-05=`链接：`
             div

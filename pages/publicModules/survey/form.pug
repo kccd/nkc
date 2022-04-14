@@ -9,7 +9,7 @@
 
     .option-resources(v-if="survey.type === 'vote'")
       .option-resource
-        img(v-for="r in survey.options[0].resourcesId" :src="getUrl('resource', r, 'sm')" :data-src="getUrl('resource', r)" data-type='view')
+        img(v-for="r in survey.options[0].resourcesId" :src="getUrl('resource', r, 'sm')" :data-src="getUrl('resource', r)" data-global-click='viewImage' :data-global-data="objToStr({url: getUrl('resource', r)})")
       .option-links(v-if="survey.options[0].links && survey.options[0].links")
         a.option-link(v-for="l in survey.options[0].links" @click="visitUrl(l)" :title="l") {{l}}
 
@@ -23,7 +23,7 @@
         .option-info
           .option-resources(v-if="o.resourcesId && o.resourcesId.length")
             .option-resource
-              img(v-for="r in o.resourcesId" :src="getUrl('resource', r, 'sm')" :data-src="getUrl('resource', r)" data-type='view')
+              img(v-for="r in o.resourcesId" :src="getUrl('resource', r, 'sm')" :data-src="getUrl('resource', r)" data-global-click='viewImage' :data-global-data="objToStr({url: getUrl('resource', r)})")
             .option-links(v-if="o.links && o.links.length")
               a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
         .option-status(v-if="showResult")
@@ -39,7 +39,7 @@
         .option-info
           .option-resources
             .option-resource(v-if="o.resourcesId && o.resourcesId.length")
-              img(v-for="r in o.resourcesId" :src="getUrl('resource', r, 'sm')" :data-src="getUrl('resource', r)" data-type='view')
+              img(v-for="r in o.resourcesId" :src="getUrl('resource', r, 'sm')" :data-src="getUrl('resource', r)" data-global-click='viewImage' :data-global-data="objToStr({url: getUrl('resource', r)})")
             //p {{o.description}}
             .option-links(v-if="o.links && o.links.length")
               a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
@@ -52,7 +52,7 @@
             .option-info
               .option-resources
                 .option-resource(v-if="a.resourcesId && a.resourcesId.length")
-                  img(v-for="r in a.resourcesId" :src="getUrl('resource', r, 'sm')" :data-src="getUrl('resource', r)" data-type='view')
+                  img(v-for="r in a.resourcesId" :src="getUrl('resource', r, 'sm')" :data-src="getUrl('resource', r)" data-global-click='viewImage' :data-global-data="objToStr({url: getUrl('resource', r)})")
                 .option-links(v-if="a.links && a.links.length")
                   a.option-link(v-for="l in a.links" @click="visitUrl(l)" :title="l") {{l}}
             .option-status(v-if="showResult")
@@ -69,7 +69,7 @@
         .option-info
           .option-resources
             .option-resource(v-if="o.resourcesId && o.resourcesId.length")
-              img(v-for="r in o.resourcesId" :src="getUrl('resource', r, 'sm')" :data-src="getUrl('resource', r)" data-type='view')
+              img(v-for="r in o.resourcesId" :src="getUrl('resource', r, 'sm')" :data-src="getUrl('resource', r)" data-global-click='viewImage' :data-global-data="objToStr({url: getUrl('resource', r)})")
             .option-links(v-if="o.links && o.links.length")
               a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
         .option-answers(v-if="o.answers && o.answers.length")
@@ -78,7 +78,7 @@
             .option-info
               .option-resources
                 .option-resource(v-if="a.resourcesId && a.resourcesId.length")
-                  img(v-for="r in a.resourcesId" :src="getUrl('resource', r, 'sm')" :data-src="getUrl('resource', r)" data-type='view')
+                  img(v-for="r in a.resourcesId" :src="getUrl('resource', r, 'sm')" :data-src="getUrl('resource', r)" data-global-click='viewImage' :data-global-data="objToStr({url: getUrl('resource', r)})")
                 //p {{o.description}}
                 .option-links(v-if="a.links && a.links.length")
                   a.option-link(v-for="l in a.links" @click="visitUrl(l)" :title="l") {{l}}

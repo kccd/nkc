@@ -30,8 +30,8 @@ var app = new Vue({
     this.searchType = data.t || 'username';
     this.searchoperationId = data.operationId || '';
     this.searchScoreType = data.scoreType || '';
-    setTimeout(function() {
+    /*setTimeout(function() {
       floatUserPanel.initPanel();
-    }, 500)
+    }, 500)*/
   }
 });

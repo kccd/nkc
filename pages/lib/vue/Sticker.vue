@@ -16,12 +16,12 @@
       .sticker-option(v-if="sticker.collected")
         .sticker-info(v-if="uid !== sticker.tUid") 已添加到表情
         .sticker-info(v-if="management").m-t-05
-          button.btn.btn-sm.btn-primary(@click="shareSticker" v-if="!sticker.shared && sticker.reviewed && uid === sticker.tUid") 设为共享
-          button.btn.btn-sm.btn-primary(@click="moveSticker") 移到最前
+          button.btn.btn-sm.btn-primary.m-r-05(@click="shareSticker" v-if="!sticker.shared && sticker.reviewed && uid === sticker.tUid") 设为共享
+          button.btn.btn-sm.btn-primary.m-r-05(@click="moveSticker") 移到最前
           button.btn.btn-sm.btn-danger(@click="removeSticker") 删除
       .sticker-option(v-else-if="sticker.shared")
         button.btn.btn-sm.btn-theme(@click="collection") 添加到表情
-      .sticker-warning(v-if="sticker.shared").pre-wrap {{notesAboutUploading}}
+      .sticker-warning(v-if="sticker.shared").pre-wrap {{notesAboutUsing}}
 </template>
 
 <style lang="less" scoped>
@@ -66,6 +66,7 @@
   .module-dialog-content{
     padding: 0 1rem;
     text-align: center;
+    margin-bottom: 1rem;
     .sticker-image{
       display: inline-block;
       @height: 10rem;
@@ -115,7 +116,7 @@ export default {
     uid: NKC.configs.uid,
     management: false,
     loading: false,
-    notesAboutUploading: ''
+    notesAboutUsing: ''
   }),
   mounted() {
     this.initDraggableElement();
@@ -178,19 +179,6 @@ export default {
         })
         .catch(sweetError);
     },
-    //监听表情点击事件
-    init() {
-      const self = this;
-      const dom = $("span[data-tag='nkcsource'][data-type='sticker']");
-      dom.each(function () {
-        const d = $(this);
-        if(d.attr("data-sticker-init") === "true") return;
-        d.on("click", function() {
-          self.open($(this).attr("data-id"), !!$(this).attr("data-sticker-management"));
-        });
-        d.attr("data-sticker-init", "true");
-      })
-    },
     initDraggableElement() {
       this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
     },
@@ -207,7 +195,7 @@ export default {
       .then(data => {
         self.sticker = data.sticker;
         self.loading = false;
-        self.notesAboutUploading = data.notesAboutUploading;
+        self.notesAboutUsing = data.notesAboutUsing;
       })
       .catch(err => {
         sweetError(err);

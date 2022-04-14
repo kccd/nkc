@@ -39,9 +39,9 @@ const app = new Vue({
   methods: {
     objToStr: objToStr,
     initUserPanel() {
-      setTimeout(() => {
+      /*setTimeout(() => {
         window.floatUserPanel.initPanel();
-      }, 500)
+      }, 500)*/
     },
     selectAll: function(p) {
       if(p.operationsId.length === this.operationsId.length) {

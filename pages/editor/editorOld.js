@@ -227,7 +227,7 @@ function initVueApp() {
       this.post = data.post;
       this.forum = data.forum;
       this.type = data.type;
-      
+
       this.draftId = data.draftId;
       this.oldDraft = data.oldDraft;
       this.initPost(data.post);
@@ -266,9 +266,9 @@ function initVueApp() {
     watch: {
       selectedForums: function() {
         let self = this;
-        setTimeout(function() {
+        /*setTimeout(function() {
           floatForumPanel.initPanel();
-        }, 100)
+        }, 100)*/
         const postButton = getPostButton();
         if(postButton) { // 检测是否可以勾选匿名
           postButton.checkAnonymous();
@@ -343,7 +343,7 @@ function initVueApp() {
       }
     },
     updated(){
-    
+
     },
     methods: {
       objToStr: objToStr,

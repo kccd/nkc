@@ -320,7 +320,7 @@
         $(document).ready(function(){
           // document 不写默认document
           self.$nextTick(() => {
-            self.$refs.floatUserPanel.initPanel();
+            // self.$refs.floatUserPanel.initPanel();
             self.$refs.sticker.init();
             self.replaceNKCUrl();
           });

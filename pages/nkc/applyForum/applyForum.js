@@ -28,7 +28,7 @@ const app = new Vue({
     }
   },
   mounted() {
-    floatUserPanel.initPanel();
+    // floatUserPanel.initPanel();
   }
 });
 

@@ -144,7 +144,7 @@ const app = new Vue({
         return self.addMembers(data.usersId)
           .then(() => {
             // selectUser.close();
-            setTimeout(floatUserPanel.initPanel);
+            // setTimeout(floatUserPanel.initPanel);
           })
           .catch(err => {
             sweetError(err);

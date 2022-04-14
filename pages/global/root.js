@@ -6,6 +6,7 @@ import UserDraw from "../lib/vue/publicVue/userDraw/UserDraw";
 import UserFloatPanel from "../lib/vue/UserFloatPanel";
 import SubscribeTypes from "../lib/vue/SubscribeTypes";
 import FloatForumPanel from "../lib/vue/forum/FloatForumPanel";
+import Sticker from '../lib/vue/Sticker';
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
@@ -32,7 +33,8 @@ window.RootApp = new Vue({
     "user-draw": UserDraw,
     "user-float-panel": UserFloatPanel,
     "float-forum-panel": FloatForumPanel,
-    "subscribe-types": SubscribeTypes
+    "subscribe-types": SubscribeTypes,
+    "sticker-panel": Sticker,
   },
   computed: {
     hasLogged() {

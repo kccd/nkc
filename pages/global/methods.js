@@ -30,3 +30,11 @@ export function openForumFloatPanel(fid, dom) {
 export function closeForumFloatPanel() {
   window.RootApp.$refs.forumFloatPanel.hideForumPanel();
 }
+
+export function openStickerPanel(id, management = false) {
+  window.RootApp.$refs.stickerPanel.open(id, management);
+}
+
+export function closeStickerPanel() {
+
+}

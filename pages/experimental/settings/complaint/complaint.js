@@ -61,7 +61,7 @@ var app = new Vue({
     complaintSettings: data.complaintSettings,
   },
   mounted () {
-    floatUserPanel.initPanel();
+    // floatUserPanel.initPanel();
   },
   methods: {
     objToStr: objToStr,

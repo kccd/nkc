@@ -32,10 +32,10 @@ block content
                     .applicationForm-header 活动信息
                     hr
                   .col-xs-12.col-md-6
-                    h5 
+                    h5
                       span 活动时间：
                       span=` ${data.activity.holdStartTime.toLocaleString()} ~ ${data.activity.holdEndTime.toLocaleString()}`
-                    h5 
+                    h5
                       span 报名时间：
                       span=` ${data.activity.enrollStartTime.toLocaleString()} ~ ${data.activity.enrollEndTime.toLocaleString()}`
                     h5
@@ -119,7 +119,7 @@ block content
                       hr
                     .col-xs-12.col-md-12
                       -for(let post of data.activity.posts)
-                        hr(style="border:0.5px dashed;" color="#DDDDDD") 
+                        hr(style="border:0.5px dashed;" color="#DDDDDD")
                         a(href=`/u/${post.uid}`)= post.user.username
                         span!=` 发表于 ${post.toc.toLocaleString()}`
                         div!=`${post.commentContent}`
@@ -183,10 +183,10 @@ block content
                     .applicationForm-header 活动信息
                     hr
                   .col-xs-12.col-md-6
-                    h5 
+                    h5
                       span 活动时间：
                       span=` ${data.history.holdStartTime.toLocaleString()} ~ ${data.history.holdEndTime.toLocaleString()}`
-                    h5 
+                    h5
                       span 报名时间：
                       span=` ${data.history.enrollStartTime.toLocaleString()} ~ ${data.history.enrollEndTime.toLocaleString()}`
                     h5
@@ -229,7 +229,6 @@ block scripts
   script(src=`/activity/activitySingle.js?v=${global.NKC.startTime}`)
   +includeJS('/external_pkgs/citySet/agency.json.js')
   +includeJS('/external_pkgs/citySet/citySet.js')
-  include ../publicModules/sticker/sticker
   include ../publicModules/plyr/plyr.js.pug
   include ../publicModules/lazySizes
   include ../publicModules/imageViewer

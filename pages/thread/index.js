@@ -1280,17 +1280,13 @@ function insertRenderedPost(renderedPost) {
 	var parentDom = $('.single-posts-container');
 	parentDom.append(JQDOM);
 	// 用户悬浮面板
-	floatUserPanel.initPanel();
+	// floatUserPanel.initPanel();
 	// 分享
 	NKC.methods.initSharePanel();
-	// 表情
-	NKC.methods.initStickerViewer();
 	// 视频音频组件渲染
 	NKC.methods.initVideo();
 	// 操作
 	NKC.methods.initPostOption();
-	// 图片预览
-	if(!NKC.configs.isApp) NKC.methods.initImageViewer();
 	// 外链复原
   NKC.methods.replaceNKCUrl();
 	// 划词笔记

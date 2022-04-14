@@ -23,7 +23,7 @@ block content
                 a(@click="shareSticker" v-if="management") 设为共享
               a.warning(@click="removeSticker" v-if="management") 删除
             include ../publicModules/paging/paging
-          .m-t-05(v-if="!ownStickers.length")  
+          .m-t-05(v-if="!ownStickers.length")
             .null 空空如也~
           .stickers-body.m-t-05(v-else)
             .sticker(v-for="s in ownStickers")
@@ -33,14 +33,21 @@ block content
               //-.un-review(v-if="s.reviewed === null") 审核中...
               //-.un-passed(v-else-if="s.reviewed === false") 未通过
                 .fa.fa-question(:title="s.reason" @click=`showReason(s)`)
-              img(:src="getUrl('sticker', s.rid)" :data-sticker-rid="s.rid" data-sticker-management="true")
+              img(
+                :src="getUrl('sticker', s.rid)"
+                data-global-click='viewSticker'
+                :data-global-data="objToStr({rid: s.rid, management: true})"
+                )
         .hot-stickers(v-if="hotStickers.length")
           h5 热门表情&nbsp;
             a.pointer.hot-stickers-button(@click="visitUrl('/stickers')") 查看更多
           .hot-stickers-body
             .hot-sticker(v-for="s in hotStickers")
-              img(:src="getUrl('sticker', s.rid)" :data-sticker-rid="s.rid")
+              img(
+                :src="getUrl('sticker', s.rid)"
+                data-global-click='viewSticker'
+                :data-global-data="objToStr({rid: s.rid})"
+                )
 
 block scripts
-  include ../publicModules/sticker/sticker
   +includeJS("/stickers/sticker.js")

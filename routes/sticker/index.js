@@ -90,7 +90,8 @@ router
     const {rid} = params;
     const {t} = query;
     let sticker = await db.StickerModel.findOnly({from: "upload", rid});
-
+    const stickerSettings = await db.SettingModel.getSettings("sticker");
+    data.notesAboutUsing = stickerSettings.notesAboutUsing;
     if(t === "json") {
       if(!sticker) ctx.throw(404, "表情不存在");
       if(sticker.disabled && !ctx.permission("nkcManagementSticker")) ctx.throw(403, "表情已被屏蔽");
