@@ -20,20 +20,7 @@ router
       })
       data.panelPermission = panelPermission;
 
-      const match = {
-        uid: user.uid
-      };
-      // const count = await db.BlacklistModel.countDocuments(match);
-      // const paging = nkcModules.apiFunction.paging(page, count);
-      const bl = await db.BlacklistModel.find(match).sort({toc: -1});
-      const usersId = bl.map(b => {
-        return b.tUid
-      });
-      const users = await db.UserModel.find({uid: usersId});
-      const usersBlUid = users.map(b => {
-        return b.uid
-      });
-      data.usersBlUid = usersBlUid;
+
       await next();
     })
 module.exports = router;

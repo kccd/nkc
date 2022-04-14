@@ -6,7 +6,10 @@
     //用户信息
     .m-b-1(v-if="targetUser")
       user-profile-info(ref="userProfileInfo" :target-user="targetUser" :code="code")
-    //用户操作
+    //访客用户加黑举报操作
+    .m-b-1(v-if="!isSelf")
+      visitor-operate(:users-bl-uid="usersBlUid" :target-user="targetUser")
+    //用户自己操作
     .m-b-1(v-if="isSelf")
       user-operate(:target-user="targetUser")
     //- 用户链接
@@ -31,13 +34,14 @@ import UserOperate from "./userPanel/UserOperate";
 import UserProfileInfo from "./userPanel/UserProfileInfo";
 import UserCodeAndFinance from "./userPanel/UserCodeAndFinance";
 import UserFocusOn from "./userPanel/UserFocusOn";
+import VisitorOperate from "./userPanel/VisitorOperate";
 import NavLinks from "./userPanel/NavLinks";
 import Share from "../../../lib/vue/Share";
 import UserManage from "./userPanel/UserManage";
 import {getState} from "../../../lib/js/state";
 
 export default {
-  props: ['nav-links', 'target-user', "code","targetUserScores"],
+  props: ['nav-links', 'target-user', "code","targetUserScores", "usersBlUid"],
   data: () => ({
     rolePermissionsType: null,
     targetUid: '',
@@ -66,7 +70,8 @@ export default {
     "user-manage": UserManage,
     "user-profile-info": UserProfileInfo,
     "user-operate": UserOperate,
-    "user-code-and-finance": UserCodeAndFinance
+    "user-code-and-finance": UserCodeAndFinance,
+    "visitor-operate": VisitorOperate
   },
   mounted() {
     this.initData();

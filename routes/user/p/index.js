@@ -272,6 +272,20 @@ router
     data.targetUserFollowers = await db.UserModel.extendUsersInfo(targetUserFollowers);
     data.code = await db.UserModel.getCode(targetUser.uid);
     data.code = data.code.pop();
+
+    //用户的黑名单
+    const match = {
+      uid: user.uid
+    };
+    const bl = await db.BlacklistModel.find(match).sort({toc: -1});
+    const usersId = bl.map(b => {
+      return b.tUid
+    });
+    const users = await db.UserModel.find({uid: usersId});
+    const usersBlUid = users.map(b => {
+      return b.uid
+    });
+    data.usersBlUid = usersBlUid;
     await next();
   })
   .use('/', async (ctx, next) => {

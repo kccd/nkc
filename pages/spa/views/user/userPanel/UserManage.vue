@@ -11,7 +11,6 @@
 </template>
 <style lang="less" scoped>
 .user-manage {
-  padding: 15px;
   transition: box-shadow 300ms;
 }
 </style>
