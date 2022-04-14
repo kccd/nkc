@@ -569,9 +569,8 @@ router
           forum,
           extendColumns: t === 'column'?true:false
         });
-        const _threads = Object.assign(columnThreads, {});
         const threadObj = {};
-        for(const thread of _threads) {
+        for(const thread of columnThreads) {
           if(thread) {
             threadObj[thread.oc] = thread;
           }

@@ -47,8 +47,40 @@ module.exports = async (ctx, next) => {
       aidArr.push(c.pid);
     }
   }
+  const q = {
+    mainForumsId: {
+      $in: fidOfCanGetThreads
+    },
+    recycleMark: {
+      $ne: true
+    },
+    disabled: false,
+    reviewed: true,
+    inColumn: true,
+    oc: {$in: tidArr}
+  };
   //获取社区文章
-  // const columnThreads = await db.ThreadModel.find({});
+  let columnThreads = await db.ThreadModel.find(q, {
+    uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
+    tlm: 1, fid: 1, hasCover: 1,
+    mainForumsId: 1, hits: 1, count: 1,
+    digest: 1, reviewed: 1,
+    columnsId: 1,
+    categoriesId: 1,
+    disabled: 1, recycleMark: 1
+  });
+  columnThreads = await db.ThreadModel.extendThreads(columnThreads, {
+    htmlToText: true,
+    removeLink: true,
+    forum,
+    extendColumns: t === 'column'?true:false
+  });
+  let columnArticles = await db.ArticleModel.find({_id: {$in: aidArr}});
+  columnArticles = await db.ColumnPostModel.extendColumnArticles(columnArticles);
+  const articleObj = {};
+  for(const ca of columnArticles) {
+    articleObj[ca._id] = ca;
+  }
   //拓展专栏引用下的文章
   data.paging = paging;
   await next();
