@@ -16,7 +16,14 @@ router
     data.notesAboutUsing = notesAboutUsing;
     const count = await db.StickerModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
-    data.stickers = await db.StickerModel.find(q).sort({hits: -1}).skip(paging.start).limit(paging.perpage);
+    const stickers = await db.StickerModel.find(q).sort({hits: -1}).skip(paging.start).limit(paging.perpage);
+    let arr= [];
+    for (let i = 0; i < stickers.length; i++) {
+      const newSticker = stickers[i].toObject();
+      newSticker.state = 'usable';
+      arr.push(newSticker)
+    }
+    data.stickers = arr
     data.emoji = state.twemoji;
     data.paging = paging;
     ctx.template = "stickers/stickers.pug";
