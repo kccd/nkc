@@ -32,7 +32,7 @@ export default {
     targetUserFans: null,
     targetUserFollowers: null,
     code: null,
-    usersBlUid: []
+    usersBlUid: [],
   }),
   components: {
     "panel": Panel,
