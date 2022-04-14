@@ -14,12 +14,15 @@
             .account-user-introduce
               .account-user-name {{targetUser.username}}
                 user-level(ref="userLevel" :target-user="targetUser")
-              .account-user-subscribe(v-if="subscribeBtn")
+              .account-user-subscribe(v-if="subscribeBtn" ref="subscribeBox" )
                 div(:class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
                 div.link(@click.stop="toChat(targetUser.uid)" v-if="selfUid") 私信
                 div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
-                div(v-if="usersBlUid.indexOf(targetUser.uid,1) === -1" ) 加入黑名单
-                div(v-else-if="usersBlUid.indexOf(targetUser.uid,1) !== -1") 移除黑名单
+                //div(v-if="usersBlUid.indexOf(targetUser.uid,1) === -1" @click.stop="addUserToBlackList(targetUser.uid,'userHome')") 加入黑名单
+                //div(v-else-if="usersBlUid.indexOf(targetUser.uid,1) !== -1" @click.stop="removeUserToBlackList(targetUser.uid)") 移除黑名单
+              .fa(:class="subscribeBtnBoxType ? 'fa-angle-up' : 'fa-angle-down'" @click.stop="subscribeBtnBoxChange(!subscribeBtnBoxType)")
+              //.fa.fa-angle-down.scroll-to-bottom(@click.stop="subscribeBtnBoxChange(false)")
+
         .account-nav
           .account-nav-box
             .account-nav-left
@@ -86,7 +89,7 @@
         .account-user-info {
           position: relative;
           height: auto;
-          top: 96px;
+          top: 8rem;
           margin: 0rem 4rem 0 4rem;
           @media (max-width: 991px){
             margin: 0rem 1rem;
@@ -108,8 +111,35 @@
           }
           .account-user-introduce {
             margin: 0 0 0 11rem;
+            .fa{
+              display: none;
+            }
             @media (max-width: 991px){
               margin: 0 0 0 9rem;
+              .fa{
+                display: block;
+              }
+              .fa-angle-down{
+                position: absolute;
+                top: 36px;
+                right: 2.5rem;
+                font-size: 2rem;
+                &::before {
+                  content: "\f107";
+                }
+
+              }
+              .fa-angle-up{
+                position: absolute;
+                top: 6rem;
+                right: 2.5rem;
+                font-size: 2rem;
+                &:before {
+                  @media (max-width: 991px){
+                    content: "\f106";
+                  }
+                }
+              }
             }
             .account-user-name{
               margin-top: 25px;
@@ -124,16 +154,22 @@
               position: absolute;
               top: 0;
               right: 0;
+              height: 3rem;
+              overflow: hidden;
               div{
+                display: inline-block;
                 text-align: center;
                 background: #fff;
-                height: 27px;
-                line-height: 27px;
-                width: 5rem;
+                width: auto;
                 border: 1px solid #ccc;
                 border-radius: 5px;
                 cursor:pointer;
-
+                padding: 0.5rem 1rem;
+                margin-right: 1rem;
+                @media (max-width: 991px){
+                  display: block;
+                  margin-bottom: 0.5rem;
+                }
               }
               .focus{
                 background-color: #2b90d9;
@@ -270,7 +306,9 @@ export default {
     showBanContext: false,
     subscribeBtn: false,
     subscribeBtnType: false,
+    subscribeBtnBoxType: false,
     usersBlUid: [],
+
   }),
   components: {
     "user-level": UserLevel,
@@ -371,6 +409,23 @@ export default {
       }
 
     },
+
+    //用户移除黑名单 tUid 被拉黑的用户
+    removeUserToBlackList(uid) {
+      nkcAPI('/blacklist?tUid=' + uid, 'GET')
+        .then(data => {
+          if(!data.bl) throw "对方未在黑名单中";
+          return nkcAPI('/blacklist?tUid=' + uid, 'DELETE');
+        })
+        .then(data => {
+          sweetSuccess('操作成功！');
+          this.getPanelData()
+
+          return data;
+        })
+        .catch(sweetError);
+    },
+
     //用户添加到黑名单 tUid 被拉黑的用户 form 拉黑来源 mid 被拉黑的moment
     addUserToBlackList(tUid, from, mid) {
       const self = this;
@@ -411,6 +466,8 @@ export default {
         })
         .then(function(data) {
           sweetSuccess('操作成功');
+          self.getPanelData()
+          self.subscribeBtnType = false;
           return data;
         })
         .catch(sweetError);
@@ -418,6 +475,14 @@ export default {
     subscribeUserPromise(id, sub, cid) {
       const method = sub? "POST": "DELETE";
       return nkcAPI("/u/" + id + "/subscribe", method, {cid: cid || []});
+    },
+
+    //主页关注私信按钮盒子展开
+    subscribeBtnBoxChange(bool){
+      console.log(bool)
+      this.subscribeBtnBoxType = bool;
+      if(bool) this.$refs.subscribeBox.style.height = '11rem';
+      else this.$refs.subscribeBox.style.height = '3rem';
     },
     toChat(uid){
       NKC.methods.toChat(uid)
