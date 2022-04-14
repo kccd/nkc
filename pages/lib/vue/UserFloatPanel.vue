@@ -272,8 +272,8 @@ export default {
     }
   },
   mounted() {
-    window.showFloatUserPanel = this.showFloatUserPanel;
-    window.initMouseleaveEvent = this.initMouseleaveEvent;
+    // window.showFloatUserPanel = this.showFloatUserPanel;
+    // window.initMouseleaveEvent = this.initMouseleaveEvent;
     const self = this;
     const panel = $(self.$el);
     panel.css({

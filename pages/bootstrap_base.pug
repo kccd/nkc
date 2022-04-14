@@ -74,7 +74,7 @@ block body
     login(ref='login' v-if='!hasLogged')
     user-draw(ref="userDraw" v-if="hasLogged")
     user-float-panel(ref="userFloatPanel" v-if="hasLogged" @subscribe="subscribe")
-    float-forum-panel(ref="floatForumPanel" v-if="hasLogged")
+    float-forum-panel(ref="forumFloatPanel" v-if="hasLogged")
     subscribe-types(ref="subscribeTypes" v-if="hasLogged")
   +includeJS('/global/root.js')
 

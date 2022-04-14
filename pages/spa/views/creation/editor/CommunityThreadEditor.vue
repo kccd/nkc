@@ -1,6 +1,5 @@
 <template lang="pug">
   div
-    .community-thread-editor
     editor
 </template>
 
@@ -12,8 +11,3 @@ export default {
   },
 };
 </script>
-<style lang="less" scoped>
-.community-thread-editor{
-  padding-bottom: 10px;
-}
-</style>
