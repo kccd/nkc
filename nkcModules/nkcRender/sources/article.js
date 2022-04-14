@@ -40,7 +40,7 @@ module.exports = {
     const url = getUrl("sticker", id);
     return `
       <span data-tag="nkcsource" data-type="sticker" data-id="${id}">
-        <img src="${url}" alt="sticker" style="max-width: 200px">
+        <img src="${url}" alt="sticker" style="max-width: 200px" data-global-click="viewImage" data-global-data="${objToStr({url})}">
       </span>
     `.trim();
   },
