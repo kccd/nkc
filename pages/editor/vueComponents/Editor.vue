@@ -127,15 +127,24 @@ export default {
       .catch((err) => {
         sweetError(err);
       });
+    window.addEventListener('pageshow',this.clearCache)
   },
   destroyed() {
+    window.removeEventListener("pageshow", this.clearCache)
     this.pageData = {};
     this.pageState = {};
   },
-  updated() {
-    // console.log('更新了吗')
-  },
   methods: {
+    clearCache(event){
+      if(event.persisted || window.performance && window.performance.navigation.type === 2){
+        // 清除缓存
+        // $(".editor-title").val('');
+        $(".abstract-cn").val('');
+        $(".abstract-en").val('');
+        $('.agreement').prop('checked', true);
+      }
+    
+    },
     // 控制 提交组件 是否可选匿名发表
     selectedForumIds(ids) {
       this.$refs.submit.checkAnonymous(ids);
@@ -175,7 +184,11 @@ export default {
   },
 };
 </script>
-
+<style>
+.edui-default .edui-editor-toolbarboxouter{
+  background-color: white !important;
+}
+</style>
 <style scoped>
 .p-l-30{
   padding-left: 30px;
