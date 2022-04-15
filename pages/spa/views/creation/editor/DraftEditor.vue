@@ -15,7 +15,9 @@
           )
       .m-b-1
         button.btn.btn-primary.m-r-05(@click="submit") 提交
-        button.btn.btn-default(@click="manuallySaveAsHistory" :disabled="!draftId") 保存
+        button.btn.btn-default.m-r-05(@click="manuallySaveAsHistory" :disabled="!draftId") 保存
+        button.btn.btn-default.m-r-05(@click="preview" :disabled="!draftId") 预览
+        button.btn.btn-default.m-r-05(@click="history" :disabled="!draftId") 历史
 </template>
 
 <style lang="less" scoped>
@@ -73,6 +75,7 @@ a {
 <script>
 import DocumentEditor from '../../../../lib/vue/DocumentEditor';
 import {nkcAPI} from '../../../../lib/js/netAPI'
+import { getUrl } from '../../../../lib/js/tools'
 import InfoBlock from '../../../components/InfoBlock';
 
 export default {
@@ -139,6 +142,15 @@ export default {
     },
   },
   methods: {
+    preview(){
+      const url = getUrl('preview', "draft", this.draftId);
+      window.open(url);
+    },
+    history(){
+      // if(!this.draftId) return
+      const url = getUrl('history', "draft", this.draftId);
+      window.open(url);
+    },
     back() {
       this.$router.push({
         name: 'drafts'

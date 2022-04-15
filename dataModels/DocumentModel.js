@@ -348,15 +348,16 @@ schema.methods.copyToHistoryDocument = async function(status) {
 /*
   *复制当前文档创建历史记录，并把当前文档改为编辑版。并且正在编辑的文档改为历史版
 */
-schema.statics.copyToHistoryToEditDocument = async function(did, _id){
+schema.statics.copyToHistoryToEditDocument = async function(sid, source, _id){
   const DocumentModel = mongoose.model('documents');
-  const currentDocument = await DocumentModel.findOne({$and:[{did}, {_id}, {type:'history'}]})
+  const currentDocument = await DocumentModel.findOne({ _id, type: 'history' })
   if(!currentDocument) throwErr(400, `当前文章不存在，请刷新页面重试`);
   await currentDocument.copyToHistoryDocument('edit');
   // 更改正在编辑版本为历史版
   await this.updateOne({
-    did,
-    type: {$in: ['beta', 'stable']}
+    sid,
+    source,
+    type: "beta"
   }, {
     $set: {
         type: (await DocumentModel.getDocumentTypes()).history,
@@ -1131,7 +1132,7 @@ schema.methods.syncParentStatus = async function() {
   const ArticleModel = mongoose.model('articles');
   const CommentModel = mongoose.model('comments');
   const MomentModel = mongoose.model('moments');
-  const DraftModel= mongoose.model('drafts');
+  const creationDrafts= mongoose.model('creationDrafts');
   const {source, did, status} = this;
   const {article, comment, moment, draft} = await DocumentModel.getDocumentSources();
   if(source === article) {
@@ -1141,7 +1142,7 @@ schema.methods.syncParentStatus = async function() {
   } else if(source === moment) {
     await MomentModel.setStatus(did, status);
   } else if(source === draft) {
-    await DraftModel.setStatus(did, status);
+    await creationDrafts.setStatus(did, status);
   }
 }
 // 设置审核状态 当document的状态改变时，同时去改变上层来源的状态
