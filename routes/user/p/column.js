@@ -105,7 +105,6 @@ module.exports = async (ctx, next) => {
           t.type = 'article';
           t.document.content = nkcModules.nkcRender.htmlToPlain(t.document.content, 200);
             //获取文章的专栏信息
-            // t.columns= [column];
           t.threadName = column.name
 
         }
