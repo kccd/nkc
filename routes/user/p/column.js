@@ -103,13 +103,16 @@ module.exports = async (ctx, next) => {
           const column = await c.extendColumnPost();
           //获取当前引用的专栏
           t.type = 'article';
-          t.document.content = nkcModules.nkcRender.htmlToPlain(t.document.content, 200),
+          t.document.content = nkcModules.nkcRender.htmlToPlain(t.document.content, 200);
             //获取文章的专栏信息
-            t.columns= [column];
+            // t.columns= [column];
+          t.threadName = column.name
+
         }
       }
       if(t) {
         t.url = `/m/${c.columnId}/a/${c._id}`;
+        t.homeUrl = `/m/${c.columnId}`;
         threads.push(t);
       }
     }
