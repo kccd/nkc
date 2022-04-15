@@ -30,6 +30,12 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  //对应内容的uid
+  tUid: {
+    type: String,
+    require: true,
+    index: 1
+  },
   // 与 type 类型对应的 ID
   // type: post, pid 表示 post.pid
   // type: thread, pid 表示 thread.oc
@@ -475,6 +481,7 @@ schema.statics.addColumnPosts = async (columnId, categoriesId, minorCategoriesId
       tid: thread.tid,
       top: post.toc,
       order,
+      tUid: thread.uid,
       pid,
       type: thread.oc === pid? "thread": "post",
       columnId: column._id,
@@ -580,6 +587,7 @@ schema.statics.getLatestThreads = async (columnId, count = 3, fids) => {
 
 /*
 * 创建专栏文章发布引用记录
+* @params {object} article 需要创建引用的文章article
 * */
 schema.statics.createColumnPost = async function(article, selectCategory) {
   const SettingModel = mongoose.model('settings');
@@ -598,6 +606,7 @@ schema.statics.createColumnPost = async function(article, selectCategory) {
     type: 'article',
     cid: selectCategory.selectedMainCategoriesId,
     mcid: selectCategory.selectedMinorCategoriesId,
+    tUid: uid,
   });
   await columnPost.save();
   return columnPost;
