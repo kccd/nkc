@@ -331,7 +331,6 @@ router
         const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
         let articles = await db.ArticleModel.find({_id: {$in: subColumnArticlesId}, status: normalStatus});
         articles = await db.ArticleModel.getArticlesInfo(articles);
-        console.log('articles', articles);
         for(const article of articles) {
           articleObj[article._id] = article;
         }
@@ -346,7 +345,7 @@ router
           } else if(sc.type === articleType) {
             t = articleObj[sc.pid];
             if(t) {
-              const {toc, user, document} = t;
+              const {toc, user, document, url} = t;
               //获取当前引用的专栏信息
               const column = await sc.extendColumnPost();
               thread = {
@@ -356,17 +355,25 @@ router
                 user: {
                   id: column._id,
                   name: column.name,
-                  avatar: column.avatar,
-                  homeUrl: `/m/${column._id}`,
+                  avatar: nkcModules.tools.getUrl('columnAvatar', column.avatar),
+                  homeUrl: nkcModules.tools.getUrl('columnHome', column._id),
                 },
                 quote: {
                   user: {
                     uid: user.uid,
-                    avatar: user.avatar,
+                    avatar: nkcModules.tools.getUrl('userAvatar', user.avatar),
                     username: user.username,
-                    banner
-                  }
-                }
+                    banned: user.certs.includes('banned'),
+                    homeUrl: nkcModules.tools.getUrl('userHome', user.uid),
+                    name: user.username,
+                    id: user.uid,
+                  },
+                  title: document.title,
+                  content: nkcModules.nkcRender.htmlToPlain(document.content, 200),
+                  cover: nkcModules.tools.getUrl('postCover', document.cover),
+                  toc: document.toc,
+                  url,
+                },
               };
             }
           }
