@@ -12,11 +12,11 @@
               :title="timeFormat(item.toc)"
             ) {{fromNow(item.toc)}}
         .user-column-content
-          a(:href="item.url" target="_blank").user-column-content-title {{item.document && item.document.title}}
+          a(:href="item.url" target="_blank").user-column-content-title {{item.title}}
           .user-column-content-container
-            a(:href="item.url" target="_blank").user-column-content-abstract {{item.document && item.document.content}}
+            a(:href="item.url" target="_blank").user-column-content-abstract {{item.content}}
             .user-column-content-cover
-              img(:src="getUrl('postCover', item.document && item.document.cover)")
+              img(:src="getUrl('postCover', item.cover)")
 </template>
 <style lang="less">
 .user-column-thread{

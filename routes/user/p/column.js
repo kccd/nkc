@@ -37,9 +37,9 @@ module.exports = async (ctx, next) => {
     }
     //获取访问的用户在专栏下的文章引用
     const columnPosts = await db.ColumnPostModel.find({columnId: column._id, hidden: false}, {pid: 1, columnId: 1, type: 1}).skip(paging.start).limit(paging.perpage).sort({toc: -1});
-    const tidArr = [];
+    const tidArr = [];//社区文章Id数组
     const pidArr = [];
-    const aidArr = [];
+    const aidArr = [];//专栏
     const {post, thread, article} = await db.ColumnPostModel.getColumnPostTypes();
     for(const c of columnPosts) {
       if(c.type === post) {
@@ -94,8 +94,18 @@ module.exports = async (ctx, next) => {
     const threads = [];
     for (const c of columnPosts) {
       let t;
+      let need_t = {};
       if(c.type === threadType) {
         t = threadObj[c.pid];
+        need_t.content = t.firstPost.c;
+        need_t.title = t.firstPost.t;
+        need_t.cover = t.firstPost.cover;
+        need_t.toc = t.toc;
+        // need_t.t = t;
+        need_t.commentCount = t.count;
+        need_t.voteUp = t.firstPost.voteUp;
+        need_t.voteDown = t.firstPost.voteDown;
+        need_t.hits = t.hits;
         if(t) t.type = 'thread';
       } else if(c.type === articleType){
         t = articleObj[c.pid];
@@ -103,16 +113,23 @@ module.exports = async (ctx, next) => {
           const column = await c.extendColumnPost();
           //获取当前引用的专栏
           t.type = 'article';
-          t.document.content = nkcModules.nkcRender.htmlToPlain(t.document.content, 200);
+          need_t.content = nkcModules.nkcRender.htmlToPlain(t.document.content, 200);
+          need_t.title = t.document.title;
+          need_t.cover = t.document.cover;
             //获取文章的专栏信息
-          t.threadName = column.name
-
+          need_t.threadName = column.name;
+          need_t.toc = t.toc;
+          need_t.voteUp = t.voteUp;
+          need_t.voteDown = t.voteDown;
+          need_t.t = t;
+          need_t.hits = t.hits;
+          need_t.count = t.count;
         }
       }
       if(t) {
-        t.url = `/m/${c.columnId}/a/${c._id}`;
-        t.homeUrl = `/m/${c.columnId}`;
-        threads.push(t);
+        need_t.url = `/m/${c.columnId}/a/${c._id}`;
+        need_t.homeUrl = `/m/${c.columnId}`;
+        threads.push(need_t);
       }
     }
     data.threads = threads;
