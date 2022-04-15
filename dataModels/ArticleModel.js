@@ -1079,7 +1079,8 @@ schema.statics.getArticlesInfo = async function(articles) {
     articlesDid.push(article.did);
     uidArr.push(article.uid);
   }
-  const users = await UserModel.find({uid: {$in: uidArr}});
+  let users = await UserModel.find({uid: {$in: uidArr}});
+  users = await UserModel.extendUsersInfo(users);
   for(const user of users) {
     userObj[user.uid] = user;
   }

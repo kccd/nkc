@@ -51,11 +51,14 @@ router
     let subColumnId = [];
     let subForumsId = [];
     let subColumnPostsId = [];
+    let subColumnPosts = [];
+    const subColumnArticlesId = [];
     let subs = [];
     let count;
     let paging;
     let posts;
     const pageSettings = await db.SettingModel.getSettings('page');
+    const {thread: threadType, article: articleType, post: postType} = await db.ColumnPostModel.getColumnPostTypes();
 
     switch(type) {
       case 'column': {
@@ -73,9 +76,18 @@ router
             columnsObj[c._id] = c;
           }
           subColumnId = columns.map(c => c._id);
-          const subColumnPosts = await db.ColumnPostModel.find({columnId: {$in: subColumnId}, hidden: false}, {pid: 1, columnId: 1});
+          const match = {
+            columnId: {$in: subColumnId},
+            hidden: false};
+          const count = await db.ColumnPostModel.countDocuments(match);
+          paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
+          subColumnPosts = await db.ColumnPostModel.find(match, {pid: 1, columnId: 1, type: 1}).skip(paging.start).limit(paging.perpage).sort({toc: -1});
           for(const sc of subColumnPosts) {
-            subColumnPostsId.push(sc.pid);
+            if(sc.type === threadType) {
+              subColumnPostsId.push(sc.pid);
+            } else if(sc.type === articleType) {
+              subColumnArticlesId.push(sc.pid);
+            }
             columnPostsObj[sc.pid] = columnsObj[sc.columnId];
             subColumnPostsObj[sc.pid] = sc;
           }
@@ -267,30 +279,101 @@ router
       ]
     };
     if(type !== 'thread') {
-      count = await db.PostModel.countDocuments(match);
-      paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
-      posts = await db.PostModel.find(match, {
-        pid: 1,
-        tid: 1,
-        uid: 1,
-        toc: 1,
-        type: 1,
-        c: 1,
-        t: 1,
-        anonymous: 1,
-        cover: 1,
-        mainForumsId: 1,
-        columnsId: 1
-      })
-        .sort({toc: -1})
-        .skip(paging.start)
-        .limit(paging.perpage)
-      posts = await db.PostModel.extendActivityPosts(posts);
-      
-      for(let i = 0; i < posts.length; i++) {
-        const post = posts[i];
-        const a = extendPost(post);
-        activity.push(a);
+      if(type !== 'column') {
+        count = await db.PostModel.countDocuments(match);
+        paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
+        posts = await db.PostModel.find(match, {
+          pid: 1,
+          tid: 1,
+          uid: 1,
+          toc: 1,
+          type: 1,
+          c: 1,
+          t: 1,
+          anonymous: 1,
+          cover: 1,
+          mainForumsId: 1,
+          columnsId: 1
+        })
+          .sort({toc: -1})
+          .skip(paging.start)
+          .limit(paging.perpage)
+        posts = await db.PostModel.extendActivityPosts(posts);
+  
+        for(let i = 0; i < posts.length; i++) {
+          const post = posts[i];
+          const a = extendPost(post);
+          activity.push(a);
+        }
+      } else {
+        posts = await db.PostModel.find(match, {
+          pid: 1,
+          tid: 1,
+          uid: 1,
+          toc: 1,
+          type: 1,
+          c: 1,
+          t: 1,
+          anonymous: 1,
+          cover: 1,
+          mainForumsId: 1,
+          columnsId: 1
+        })
+          .sort({toc: -1})
+          .skip(paging.start)
+          .limit(paging.perpage)
+        posts = await db.PostModel.extendActivityPosts(posts);
+        const postObj = {};
+        const articleObj = {};
+        for(const post of posts) {
+          postObj[post.pid] = post;
+        }
+        const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
+        let articles = await db.ArticleModel.find({_id: {$in: subColumnArticlesId}, status: normalStatus});
+        articles = await db.ArticleModel.getArticlesInfo(articles);
+        console.log('articles', articles);
+        for(const article of articles) {
+          articleObj[article._id] = article;
+        }
+        for(const sc of subColumnPosts) {
+          let t;
+          let thread;
+          if(sc.type === threadType) {
+            t = postObj[sc.pid];
+            if(t) {
+              thread = extendPost(t);
+            }
+          } else if(sc.type === articleType) {
+            t = articleObj[sc.pid];
+            if(t) {
+              const {toc, user, document} = t;
+              //获取当前引用的专栏信息
+              const column = await sc.extendColumnPost();
+              thread = {
+                toc,
+                form: '添加专栏文章',
+                type: 'article',
+                user: {
+                  id: column._id,
+                  name: column.name,
+                  avatar: column.avatar,
+                  homeUrl: `/m/${column._id}`,
+                },
+                quote: {
+                  user: {
+                    uid: user.uid,
+                    avatar: user.avatar,
+                    username: user.username,
+                    banner
+                  }
+                }
+              };
+            }
+          }
+          if(thread) {
+            activity.push(thread);
+          }
+        }
       }
     } else {
       for(const sub of subs) {
