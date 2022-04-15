@@ -1058,6 +1058,7 @@ schema.methods.isModerator = async function(uid) {
 schema.statics.getArticlesInfo = async function(articles) {
   const UserModel = mongoose.model('users');
   const ColumnPostModel = mongoose.model('columnPosts');
+  const ColumnModel = mongoose.model('columns');
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
   const ReviewModel = mongoose.model('reviews');
@@ -1065,6 +1066,7 @@ schema.statics.getArticlesInfo = async function(articles) {
   const columnArticlesId = [];
   const articlesDid = [];
   const articleId = [];
+  const columnsId = [];
   const articleDocumentsObj = {};
   const uidArr = [];
   const userObj = {};
@@ -1092,6 +1094,7 @@ schema.statics.getArticlesInfo = async function(articles) {
   const columnPosts = await ColumnPostModel.find({pid: {$in: columnArticlesId}, type: articleType});
   const columnPostsObj = {};
   for(const columnPost of columnPosts) {
+    columnsId.push(columnPost.columnId);
     columnPostsObj[columnPost.pid] =columnPost;
   }
   //查找文章评论引用
@@ -1122,6 +1125,7 @@ schema.statics.getArticlesInfo = async function(articles) {
     const documentResourceId = await document.getResourceReferenceId()
     //获取文章引用的资源
     // const resources = await ResourceModel.getResourcesByReference(documentResourceId);
+    
     results.push({
       ...article.toObject(),
       reason: review?review.reason:'',
