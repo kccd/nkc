@@ -36,8 +36,8 @@ module.exports = async (ctx, next) => {
       fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !disciplinesId.includes(fid));
     }
     //获取访问的用户在专栏下的文章引用
-    const columnPosts = await db.ColumnPostModel.find({columnId: column._id, hidden: false}, {pid: 1, columnId: 1, type: 1}).skip(paging.start).limit(paging.perpage).sort({toc: -1});
-    const tidArr = [];//社区文章Id数组
+    const columnPosts = await db.ColumnPostModel.find({tUid: targetUser.uid, hidden: false}, {pid: 1, columnId: 1, type: 1}).skip(paging.start).limit(paging.perpage).sort({toc: -1});
+    const tidArr = [];
     const pidArr = [];
     const aidArr = [];//专栏
     const {post, thread, article} = await db.ColumnPostModel.getColumnPostTypes();
