@@ -16,7 +16,7 @@
           .user-column-content-container
             a(:href="item.url" target="_blank").user-column-content-abstract {{item.document && item.document.content}}
             .user-column-content-cover
-              img(:src="getUrl('userAvatar', item.user && item.user.avatar)")
+              img(:src="getUrl('postCover', item.document && item.document.cover)")
 </template>
 <style lang="less">
 .user-column-thread{
