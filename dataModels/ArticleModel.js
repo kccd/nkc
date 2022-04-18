@@ -253,7 +253,7 @@ schema.statics.getZoneArticle = async (id)=>{
   let article = await ArticleModel.findOnly({_id: id});
   article = (await ArticleModel.getArticlesInfo([article]))[0];
   const {articleInfo, document, documentResourceId} = await ArticleModel.getDocumentInfoById(id);
-  const documentAllowKey = ['title', 'content', 'abstract', 'abstractEN', 'keywords', 'keywordsEN', 'authorInfos', 'toc', 'origin', 'uid', 'collectedCount'];
+  const documentAllowKey = ['title', 'content', 'abstract', 'abstractEN', 'keywords', 'keywordsEN', 'authorInfos', 'toc', 'origin', 'uid', 'collectedCount', 'tlm'];
   const filteredDocument = await ArticleModel.filterData(document, documentAllowKey)
   const documentContent = await ArticleModel.changeKey(filteredDocument)
   let user = await UserModel.findOne({uid:articleInfo.uid});
@@ -298,7 +298,8 @@ schema.statics.changeKey = async (content)=>{
       toc: 'toc',
       origin: 'originState',
       uid : 'uid',
-      collectedCount: 'collectedCount'
+      collectedCount: 'collectedCount',
+      tlm: 'tlm'
     }
     for (const key in content) {
       if (Object.hasOwnProperty.call(content, key)) {
@@ -544,11 +545,6 @@ schema.methods.modifyArticle = async function(props) {
     authorInfos,
     tlm: toc,
   });
-  await this.updateOne({
-    $set: {
-      tlm: toc
-    }
-  });
 }
 /*
 * 发布 article
@@ -590,6 +586,12 @@ schema.methods.publishArticle = async function(options) {
     });
     articleUrl = `/zone/a/${articleId}`;
   }
+  //更新文章的最后修改时间
+  await this.updateOne({
+    $set: {
+      tlm: new Date(),
+    }
+  });
   await DocumentModel.publishDocumentByDid(did);
   return articleUrl;
 }
@@ -1058,6 +1060,7 @@ schema.methods.isModerator = async function(uid) {
 schema.statics.getArticlesInfo = async function(articles) {
   const UserModel = mongoose.model('users');
   const ColumnPostModel = mongoose.model('columnPosts');
+  const ColumnModel = mongoose.model('columns');
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
   const ReviewModel = mongoose.model('reviews');
@@ -1065,6 +1068,7 @@ schema.statics.getArticlesInfo = async function(articles) {
   const columnArticlesId = [];
   const articlesDid = [];
   const articleId = [];
+  const columnsId = [];
   const articleDocumentsObj = {};
   const uidArr = [];
   const userObj = {};
@@ -1077,7 +1081,8 @@ schema.statics.getArticlesInfo = async function(articles) {
     articlesDid.push(article.did);
     uidArr.push(article.uid);
   }
-  const users = await UserModel.find({uid: {$in: uidArr}});
+  let users = await UserModel.find({uid: {$in: uidArr}});
+  users = await UserModel.extendUsersInfo(users);
   for(const user of users) {
     userObj[user.uid] = user;
   }
@@ -1092,6 +1097,7 @@ schema.statics.getArticlesInfo = async function(articles) {
   const columnPosts = await ColumnPostModel.find({pid: {$in: columnArticlesId}, type: articleType});
   const columnPostsObj = {};
   for(const columnPost of columnPosts) {
+    columnsId.push(columnPost.columnId);
     columnPostsObj[columnPost.pid] =columnPost;
   }
   //查找文章评论引用
@@ -1122,6 +1128,7 @@ schema.statics.getArticlesInfo = async function(articles) {
     const documentResourceId = await document.getResourceReferenceId()
     //获取文章引用的资源
     // const resources = await ResourceModel.getResourcesByReference(documentResourceId);
+    
     results.push({
       ...article.toObject(),
       reason: review?review.reason:'',
@@ -1225,7 +1232,16 @@ schema.statics.getCollectedCountByAid = async function(aid) {
 }
 
 /*
-*  通过专栏引用获取专栏文章信息
+* 通过专栏引用获取专栏文章信息
+* @params {object} 需要获取文章信息的专栏文章引用
+* @return {object}
+*   @params {object} thread 文章信息
+*   @params {object} article 专栏文章内容
+*   @params {object} resources 专栏文章引用的资源信息
+*   @params {object} column 专栏文章的专栏信息
+*   @params {array} auxiliaryCategory 文章辅分类
+*   @params {array} mainCategory 文章主分类
+*   @params {string} mainCategory 文章引用类型 thread article
 * */
 schema.statics.getArticleInfoByColumn = async function(columnPost) {
   const ArticleModel = mongoose.model('articles');

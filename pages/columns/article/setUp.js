@@ -1,4 +1,3 @@
-Object.assign(window, {showSetUp})
 function showSetUp(){
   const childH = $('.set-up')[0].children[0].clientHeight
   const selfH = $('.set-up')[0].clientHeight;
@@ -10,3 +9,8 @@ function showSetUp(){
     $('.set-up').height(0)
   }
 }
+
+Object.assign(window, {
+  showSetUp
+})
+

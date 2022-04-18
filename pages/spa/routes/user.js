@@ -10,7 +10,8 @@ import SubscribeBlacklist from "../views/user/subscribe/SubscribeBlacklist";
 import SubscribeUsers from "../views/user/subscribe/SubscribeUsers";
 import SubscribeForums from "../views/user/subscribe/SubscribeForums";
 import SubscribeCollection from "../views/user/subscribe/SubscribeCollection";
-import Finance from "../views/user/propfile/profile/Finance"
+import Finance from "../views/user/propfile/profile/Finance";
+import UserColumnThread from "../views/user/propfile/profile/UserColumnThread";
 export const routerName = {
   user: 'userHome',
   follower: 'follower',
@@ -28,7 +29,8 @@ export const routerName = {
   subThreads: 'subThreads',
   profileView: 'profileView',
   subCollection: 'subCollection',
-  finance: 'finance'
+  finance: 'finance',
+  column: 'column',
 }
 
 export default [
@@ -55,7 +57,6 @@ export default [
                 path: '/u/:uid/p/moment',
                 component: UserMoment,
               },
-
               {
                 name: routerName.post,
                 path: '/u/:uid/p/post',
@@ -78,6 +79,11 @@ export default [
                 component: UserFollowerAndFans,
                 props: { pageType: "fan" }
               },
+              {
+                name: routerName.column,
+                path: '/u/:uid/p/column',
+                component: UserColumnThread,
+              }
             ]
           },
           {

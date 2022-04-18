@@ -1,7 +1,8 @@
 <template lang="pug">
   .visitor-operate
+    complaint(ref="complaint")
     button.m-b-05.m-r-05.btn-sm.btn-default.btn(@click="blackListOperation") {{usersBlUidList.indexOf(targetUser.uid,1) === -1 ? '加入黑名单' : '移出黑名单'}}
-    button.m-b-05.m-r-05.btn-sm.btn-default.btn 举报
+    button.m-b-05.m-r-05.btn-sm.btn-default.btn(@click="userComplaint") 举报
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
@@ -9,18 +10,32 @@
 </style>
 <script>
 import {nkcAPI} from "../../../../lib/js/netAPI";
-
+import {EventBus} from "../../../eventBus";
+import Complaint from "../../../../lib/vue/Complaint";
 export default {
   props: ["usersBlUid", "targetUser"],
   data: () => ({
-    usersBlUidList: []
+    usersBlUidList: [],
   }),
+  components:{
+    "complaint":Complaint
+  },
   created() {
     this.usersBlUidList = this.usersBlUid
+    EventBus.$on('removeToBl',(uid)=>{
+      this.usersBlUidList.splice(this.usersBlUidList.findIndex(item => item === uid),1)
+    })
+  },
+  mounted() {
   },
   methods: {
+    //举报
+    userComplaint(){
+      this.$refs.complaint.open('user',this.targetUser.uid)
+    },
+    //拉黑按钮操作
     blackListOperation(){
-      const bool = this.usersBlUidList.indexOf(this.targetUser.uid,1) === -1
+      const bool = this.usersBlUidList.indexOf(this.targetUser.uid,1) === -1;
       if(bool) this.addUserToBlackList(this.targetUser.uid,"userHome")
       else this.removeUserToBlackList(this.targetUser.uid)
     },
@@ -33,8 +48,7 @@ export default {
         })
         .then(data => {
           sweetSuccess('操作成功！');
-          this.getPanelData()
-
+          this.usersBlUidList.splice(this.usersBlUidList.findIndex(item => item === uid),1);
           return data;
         })
         .catch(sweetError);
@@ -79,8 +93,8 @@ export default {
         })
         .then(function(data) {
           sweetSuccess('操作成功');
-          self.getPanelData()
-          self.subscribeBtnType = false;
+          self.usersBlUidList.push(tUid)
+          EventBus.$emit('addToBl')
           return data;
         })
         .catch(sweetError);

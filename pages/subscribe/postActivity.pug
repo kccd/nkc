@@ -16,15 +16,22 @@ if !isIncluded('postActivity')
             else
               div(style=`background-color: ${headerData.user.color}`)
         else
-          .post-activity-avatar(
-            data-global-mouseover="showForumPanel"
-            data-global-mouseout="hideForumPanel"
-            data-global-data=objToStr({fid: headerData.user.dataFloatFid})
-          )
-            if headerData.user.avatar
-              img(src=headerData.user.avatar)
-            else
-              div(style=`background-color: ${headerData.user.color}`)
+          if headerData.user.dataFloatFid
+            .post-activity-avatar(
+              data-global-mouseover="showForumPanel"
+              data-global-mouseout="hideForumPanel"
+              data-global-data=objToStr({fid: headerData.user.dataFloatFid})
+            )
+              if headerData.user.avatar
+                img(src=headerData.user.avatar)
+              else
+                div(style=`background-color: ${headerData.user.color}`)
+          else
+            .post-activity-avatar
+              if headerData.user.avatar
+                img(src=headerData.user.avatar)
+              else
+                div(style=`background-color: ${headerData.user.color}`)
         .post-activity-user
           if headerData.user.homeUrl
             if headerData.user.uid
@@ -35,12 +42,17 @@ if !isIncluded('postActivity')
                 data-global-data=objToStr({uid: headerData.user.uid})
                 ).post-activity-username=headerData.user.name ||  headerData.user.username
             else
-              a(
-                href=headerData.user.homeUrl target="_blank"
-                data-global-mouseover="showForumPanel"
-                data-global-mouseout="hideForumPanel"
-                data-global-data=objToStr({fid: headerData.user.dataFloatFid})
-              ).post-activity-username=headerData.user.name || headerData.user.username
+              if headerData.user.dataFloatFid
+                a(
+                  href=headerData.user.homeUrl target="_blank"
+                  data-global-mouseover="showForumPanel"
+                  data-global-mouseout="hideForumPanel"
+                  data-global-data=objToStr({fid: headerData.user.dataFloatFid})
+                ).post-activity-username=headerData.user.name || headerData.user.username
+              else
+                a(
+                  href=headerData.user.homeUrl target="_blank"
+                ).post-activity-username=headerData.user.name || headerData.user.username
           else
             .post-activity-username=headerData.user.name || headerData.user.username
           if !headerData.from

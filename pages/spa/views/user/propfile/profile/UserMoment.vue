@@ -75,11 +75,11 @@ export default {
           self.t = res.t;
           self.paging = res.paging;
           self.momentsData = res.momentsData;
-          this.loading = false;
         })
         .catch(err => {
           sweetError(err);
         })
+      this.loading = false;
     },
     //投诉或举报
     complaint(mid) {

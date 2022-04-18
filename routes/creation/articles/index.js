@@ -108,7 +108,7 @@ router
       });
       if(type === 'publish') {
         //判断用户是否选择文章专栏分类
-        if(source === columnSource && article.status === defaultStatus && selectCategory.selectedMainCategoriesId.length === 0) ctx.throw(401, '未选择文章专栏分类');
+        if(source === columnSource && article.status === defaultStatus && (!selectCategory.selectedMainCategoriesId || selectCategory.selectedMainCategoriesId.length === 0)) ctx.throw(401, '未选择文章专栏分类');
         //检测文章专栏分类是否有效
         if(source === columnSource && article.status === defaultStatus) {
           await db.ColumnPostCategoryModel.checkColumnCategory(selectCategory);

@@ -158,7 +158,7 @@ export default {
     },
     //点击分页
     clickButton(num) {
-      this.getUserCardInfo(num);
+      this.getPostList(num);
     }
   }
 }

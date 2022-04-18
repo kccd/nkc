@@ -18,6 +18,7 @@ import Panel from "./userPanel/Panel";
 import AccountUser from "./AccountUser";
 import Footer from "../../../lib/vue/publicVue/Footer/Footer"
 import {setPageTitle} from "../../../lib/js/pageSwitch";
+import {EventBus} from "../../eventBus";
 export default {
   data:() => ({
     targetUser: null,
@@ -31,7 +32,7 @@ export default {
     targetUserFans: null,
     targetUserFollowers: null,
     code: null,
-    usersBlUid: []
+    usersBlUid: [],
   }),
   components: {
     "panel": Panel,
