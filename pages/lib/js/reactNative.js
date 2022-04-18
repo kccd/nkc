@@ -196,6 +196,18 @@ export function RNOpenNewPage(url, title = '') {
 }
 
 /*
+* RN打开RN屏幕
+* @param {String} name 屏幕名
+* @param {Object} params 屏幕接收的参数
+* */
+export function RNOpenNativeScreen(name, params = {}) {
+  RNEmit('openNativeScreen', {
+    name,
+    params
+  });
+}
+
+/*
 * 拍照并上传到resource
 * @param {Object} data 空对象
 * @param {Function} callback 上传成功后的回调

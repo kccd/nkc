@@ -1,4 +1,7 @@
-import {RNOpenDownloadList} from "../../lib/js/reactNative";
+import {
+  RNOpenDownloadList,
+  RNOpenNativeScreen
+} from "../../lib/js/reactNative";
 
 const tabs = [
   {
@@ -64,4 +67,8 @@ $(function() {
 
 window.openDownloadList = function() {
   RNOpenDownloadList();
+}
+
+window.openNativeScreen = function() {
+  RNOpenNativeScreen('CreationScreen')
 }
