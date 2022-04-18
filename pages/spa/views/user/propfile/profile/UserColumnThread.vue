@@ -40,9 +40,11 @@
   margin-bottom: 0.6rem;
   .user-column-title{
     position: relative;
+    padding-right: 6rem;
     .user-column-name{
       color: #000;
       margin-right: 0.5rem;
+
     }
     .user-column-data{
       position: absolute;
@@ -82,6 +84,9 @@
         padding-right: 10rem;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 3;
+        @media (max-width: 991px) {
+          padding-right: 8rem;
+        }
       }
       .user-column-content-cover{
         background: #00a0e9;
@@ -94,6 +99,13 @@
           width: 9.5rem;
           border-radius: 3px;
           background-size: cover;
+        }
+        @media (max-width: 991px) {
+          top: -0.5rem;
+          img{
+            height: 5.5rem;
+            width: 7.5rem;
+          }
         }
       }
     }
