@@ -146,7 +146,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
         uid,
         originState: origin,
         toc,
-        tlm,
+        tlm: article.tlm,
         t: title,
         abstractCn: abstract,
         abstractEn: abstractEN,

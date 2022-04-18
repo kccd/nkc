@@ -253,7 +253,7 @@ schema.statics.getZoneArticle = async (id)=>{
   let article = await ArticleModel.findOnly({_id: id});
   article = (await ArticleModel.getArticlesInfo([article]))[0];
   const {articleInfo, document, documentResourceId} = await ArticleModel.getDocumentInfoById(id);
-  const documentAllowKey = ['title', 'content', 'abstract', 'abstractEN', 'keywords', 'keywordsEN', 'authorInfos', 'toc', 'origin', 'uid', 'collectedCount'];
+  const documentAllowKey = ['title', 'content', 'abstract', 'abstractEN', 'keywords', 'keywordsEN', 'authorInfos', 'toc', 'origin', 'uid', 'collectedCount', 'tlm'];
   const filteredDocument = await ArticleModel.filterData(document, documentAllowKey)
   const documentContent = await ArticleModel.changeKey(filteredDocument)
   let user = await UserModel.findOne({uid:articleInfo.uid});
@@ -298,7 +298,8 @@ schema.statics.changeKey = async (content)=>{
       toc: 'toc',
       origin: 'originState',
       uid : 'uid',
-      collectedCount: 'collectedCount'
+      collectedCount: 'collectedCount',
+      tlm: 'tlm'
     }
     for (const key in content) {
       if (Object.hasOwnProperty.call(content, key)) {
@@ -544,11 +545,6 @@ schema.methods.modifyArticle = async function(props) {
     authorInfos,
     tlm: toc,
   });
-  await this.updateOne({
-    $set: {
-      tlm: toc
-    }
-  });
 }
 /*
 * 发布 article
@@ -590,6 +586,12 @@ schema.methods.publishArticle = async function(options) {
     });
     articleUrl = `/zone/a/${articleId}`;
   }
+  //更新文章的最后修改时间
+  await this.updateOne({
+    $set: {
+      tlm: new Date(),
+    }
+  });
   await DocumentModel.publishDocumentByDid(did);
   return articleUrl;
 }
