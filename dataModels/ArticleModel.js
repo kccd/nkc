@@ -1230,7 +1230,16 @@ schema.statics.getCollectedCountByAid = async function(aid) {
 }
 
 /*
-*  通过专栏引用获取专栏文章信息
+* 通过专栏引用获取专栏文章信息
+* @params {object} 需要获取文章信息的专栏文章引用
+* @return {object}
+*   @params {object} thread 文章信息
+*   @params {object} article 专栏文章内容
+*   @params {object} resources 专栏文章引用的资源信息
+*   @params {object} column 专栏文章的专栏信息
+*   @params {array} auxiliaryCategory 文章辅分类
+*   @params {array} mainCategory 文章主分类
+*   @params {string} mainCategory 文章引用类型 thread article
 * */
 schema.statics.getArticleInfoByColumn = async function(columnPost) {
   const ArticleModel = mongoose.model('articles');

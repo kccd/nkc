@@ -16,9 +16,8 @@ block baseColumnContent
       include ./article/nav
       +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url})
       include ./article/setUp
-      if type === 'article'
-        //- 文章管理员操作
-        +setUp()
+      //- 文章管理员操作
+      +setUp()
       include ./article/title
       +title({t, article, uid, userAvatar: user.avatar, toc, originState, name, _id})
       include ./article/abstract
