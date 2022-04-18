@@ -203,7 +203,15 @@ export function RNOpenNewPage(url, title = '') {
 export function RNTakePictureAndUpload(data, callback) {
   RNEmit('takePictureAndUpload', data, callback);
 }
-
+/*
+* 拍摄照片并发送给用户
+* @param {Object} data
+*   @param {String} uid 对方UID
+* @param {Function} callback 发送完成之后的回调
+* */
+export function RNTakePictureAndSendToUser(data, callback) {
+  RNEmit('takePictureAndSendToUser', data, callback);
+}
 /*
 * 录制视频并上传到resource
 * @param {Object} data 空对象
@@ -211,6 +219,15 @@ export function RNTakePictureAndUpload(data, callback) {
 * */
 export function RNTakeVideoAndUpload(data, callback) {
   RNEmit('takeVideoAndUpload', data, callback);
+}
+/*
+* 拍摄照片并发送给用户
+* @param {Object} data
+*   @param {String} uid 对方UID
+* @param {Function} callback 发送完成之后的回调
+* */
+export function RNTakeVideoAndSendToUser(data, callback) {
+  RNEmit('takeVideoAndSendToUser', data, callback);
 }
 
 /*
@@ -221,6 +238,17 @@ export function RNTakeVideoAndUpload(data, callback) {
 export function RNTakeAudioAndUpload(data, callback) {
   RNEmit('takeAudioAndUpload', data, callback);
 }
+
+/*
+* 拍摄照片并发送给用户
+* @param {Object} data
+*   @param {String} uid 对方UID
+* @param {Function} callback 发送完成之后的回调1
+* */
+export function RNTakeAudioAndSendToUser(data, callback) {
+  RNEmit('takeAudioAndSendToUser', data, callback)
+}
+
 
 /*
 * RN底部气泡弹窗

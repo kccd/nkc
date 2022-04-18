@@ -10,9 +10,8 @@ window.audio = audio;
 
 import {onWithdrawn, withdrawn} from '../message.2.0.js';
 import {
-  RNGetKeyboardStatus, RNTakeAudioAndUpload,
-  RNTakePictureAndUpload,
-  RNTakeVideoAndUpload,
+  RNGetKeyboardStatus, RNTakeAudioAndSendToUser, RNTakePictureAndSendToUser,
+  RNTakeVideoAndSendToUser,
   RNToast,
   RNViewImage
 } from '../../lib/js/reactNative';
@@ -311,11 +310,11 @@ window.app = new Vue({
     useCamera(type) {
       let func;
       if(type === 'video') {
-        func = RNTakeVideoAndUpload;
+        func = RNTakeVideoAndSendToUser;
       } else if(type === 'audio') {
-        func = RNTakeAudioAndUpload;
+        func = RNTakeAudioAndSendToUser;
       } else {
-        func = RNTakePictureAndUpload;
+        func = RNTakePictureAndSendToUser;
       }
       func({
         uid: this.tUser.uid,
