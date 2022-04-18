@@ -174,9 +174,9 @@ export default {
   text-align: center;
   line-height: 3rem;
   float: right;
+  color: #888;
   &:hover{
     background-color: rgba(0, 0, 0, 0.08);
-    color: #777;
     cursor: pointer;
   }
 }

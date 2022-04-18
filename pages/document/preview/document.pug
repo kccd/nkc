@@ -1,6 +1,10 @@
 extends ../../bootstrap_base
 block title
   //- title=data.book.name
+  style.
+    body{
+      display: none;
+    }
   +includeCSS('/document/preview/preview.css')
 block content
   .container-fluid.max-width
