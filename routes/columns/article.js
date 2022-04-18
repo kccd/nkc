@@ -65,8 +65,11 @@ router.get('/:aid', async (ctx, next)=>{
       status: defaultComment,
     };
     let comment = await db.CommentModel.getCommentsByArticleId({match: m});
-    //获取该文章下的评论
-    let comments = await db.CommentModel.getCommentsByArticleId({match, paging});
+    let comments;
+    //获取该文章下的评论 存在评论盒子时才查找当前文章下的评论
+    if(articlePost) {
+      comments = await db.CommentModel.getCommentsByArticleId({match, paging});
+    }
     if(comments && comments.length !== 0) {
       comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions});
     }
