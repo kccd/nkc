@@ -8,8 +8,6 @@
 .user-info {
   .code {
     text-align: center;
-    height: 3rem;
-    line-height: 3rem;
     font-size: 1.5rem;
   }
 

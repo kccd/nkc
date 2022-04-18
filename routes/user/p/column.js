@@ -97,16 +97,18 @@ module.exports = async (ctx, next) => {
       let need_t = {};
       if(c.type === threadType) {
         t = threadObj[c.pid];
-        need_t.content = t.firstPost.c;
-        need_t.title = t.firstPost.t;
-        need_t.cover = t.firstPost.cover;
-        need_t.toc = t.toc;
-        // need_t.t = t;
-        need_t.commentCount = t.count;
-        need_t.voteUp = t.firstPost.voteUp;
-        need_t.voteDown = t.firstPost.voteDown;
-        need_t.hits = t.hits;
-        if(t) t.type = 'thread';
+        if(t) {
+          t.type = 'thread';
+          need_t.content = t.firstPost.c;
+          need_t.title = t.firstPost.t;
+          need_t.cover = t.firstPost.cover;
+          need_t.toc = t.toc;
+          // need_t.t = t;
+          need_t.commentCount = t.count;
+          need_t.voteUp = t.firstPost.voteUp;
+          need_t.voteDown = t.firstPost.voteDown;
+          need_t.hits = t.hits;
+        }
       } else if(c.type === articleType){
         t = articleObj[c.pid];
         if(t) {
