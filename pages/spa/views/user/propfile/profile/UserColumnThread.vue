@@ -1,16 +1,20 @@
 <template lang="pug">
   .user-column-thread
+    paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     .user-column-box(v-for="item in threads" )
       .user-column-body
         .user-column-title
-          .user-column-content
-            a.user-column-name(:href="item.homeUrl" target="_blank") {{item.threadName}}
-            span(
-              data-type="nkcTimestamp"
-              :data-time="(new Date(item.toc)).getTime()"
-              data-time-type='fromNow'
-              :title="timeFormat(item.toc)"
-            ) {{fromNow(item.toc)}}
+          a.user-column-name(:href="item.homeUrl" target="_blank") {{item.threadName}}
+          span(
+            data-type="nkcTimestamp"
+            :data-time="(new Date(item.toc)).getTime()"
+            data-time-type='fromNow'
+            :title="timeFormat(item.toc)"
+          ) {{fromNow(item.toc)}}
+          .user-column-data
+            .fa.fa-thumbs-up(v-if="item.voteUp" ) {{item.voteUp}}
+            .fa.fa-eye(v-if="item.hits" ) {{item.hits}}
+            .fa.fa-comment(v-if="item.count" ) {{item.count}}
         .user-column-content
           a(:href="item.url" target="_blank").user-column-content-title {{item.title}}
           .user-column-content-container
@@ -35,16 +39,21 @@
   border: 2px solid #eae6e2;
   margin-bottom: 0.6rem;
   .user-column-title{
+    position: relative;
     .user-column-name{
       color: #000;
       margin-right: 0.5rem;
     }
-  }
-    .user-column-time-sm{
-      font-size: 1rem;
-      color: #000;
+    .user-column-data{
+      position: absolute;
+      top: 0;
+      right: 0;
+      div{
+        margin-left: 5px;
+      }
     }
   }
+}
   .user-column-content{
     margin-bottom: 0.6rem;
     .user-column-content-title{
@@ -93,15 +102,27 @@
 <script>
 import {nkcAPI} from "../../../../../lib/js/netAPI";
 import {timeFormat, fromNow, getUrl} from "../../../../../lib/js/tools";
+import Paging from "../../../../../lib/vue/Paging";//改路径
+
+
 export default {
   data: () => ({
     uid: '',
     loading: false,
     threads:null,
+    paging: null,
   }),
+  components:{
+    "paging": Paging,
+  },
   mounted() {
     this.initData();
     this.getColumnThreads();
+  },
+  computed: {
+    pageButtons() {
+      return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
+    },
   },
   methods: {
     timeFormat:timeFormat,
@@ -116,7 +137,15 @@ export default {
     getColumnThreads(page) {
      this.loading = true;
      const self = this;
-     nkcAPI(`/u/${self.uid}/p/column`, "GET")
+      let url = `/u/${this.uid}/p/column`;
+      if(page) {
+        if(url.indexOf('?') === -1) {
+          url = url + `?page=${page}`;
+        } else {
+          url = url + `page=${page}`;
+        }
+      }
+     nkcAPI(url, "GET")
      .then(res => {
         self.threads = res.threads;
         self.paging = res.paging;
@@ -125,7 +154,11 @@ export default {
        sweetError(err);
      })
      this.loading = false;
-    }
+    },
+    //点击分页按钮
+    clickBtn(num) {
+      this.getColumnThreads(num);
+    },
   }
 }
 </script>
