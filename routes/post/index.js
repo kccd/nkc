@@ -94,7 +94,7 @@ router
     };
     data.post = await db.PostModel.extendPost(post, extendPostOptions);
     data.postUrl = await db.PostModel.getUrl(data.post);
-    const {post: postSource} = await PostsVoteModel.getVoteSources();
+    const {post: postSource} = await db.PostsVoteModel.getVoteSources();
     const voteUp = await db.PostsVoteModel.find({source: postSource, sid: pid, type: 'up'}).sort({toc: 1});
     const uid = new Set();
     for(const v of voteUp) {

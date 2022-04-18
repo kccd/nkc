@@ -63,7 +63,13 @@
         div.null(v-else-if="!stickers.length") 空空如也~
         div(v-else)
           .sticker(v-for="s in stickers" @click="selectSticker(s)" :key="s._id" :class="{'share': type === 'share'}")
-            img(:src=`getUrl('sticker', s.rid)`)
+            img(v-if="s.state === 'usable'" :src=`getUrl('sticker', s.rid)`)
+            .mask(v-else-if = 's.state === "inProcess"')
+              span 处理中...
+            .mask(v-else-if='s.state === "useless"')
+              span 处理失败   
+            .mask(v-else)
+              span 加载中...
           .share-warning(v-if="type === 'share'")
             .pre-wrap {{notesAboutUsing}}
 </template>
@@ -163,6 +169,10 @@
           }
         }
         .sticker{
+          span{
+            // font-weight: 700;
+            font-size: 1.3rem;
+          }
           @height: 8.2rem;
           overflow: hidden;
           height: @height;
@@ -270,7 +280,8 @@
   import {DraggableElement} from "../js/draggable";
   import {fileToBase64} from "../js/file";
   import {screenTopWarning} from "../js/topAlert";
-
+  import { getSocket } from "../js/socket"
+  const socket = getSocket();
   export default {
     data: () => ({
       draggableElement: null,
@@ -290,7 +301,13 @@
       notesAboutUsing: ''
     }),
     mounted() {
+      socket.on('fileTransformProcess',(data)=>{
+        this.getStickers()
+      })
       this.initDraggableElement();
+    },
+    destroyed(){
+      socket.removeListener("fileTransformProcess")
     },
     methods: {
       getUrl,
@@ -381,6 +398,8 @@
           const file = files[i];
           self.addLocalFile(file);
         }
+        $(input).val('');
+
       },
       selectLocalFile() {
         this.$refs.imageInput.click();

@@ -39,7 +39,7 @@ block content
                   .review-time 回复
                   .review-info 标题：
                   .review-thread-title
-                    a(href=`/t/${r.thread.tid}` target="_blank")=r.thread.firstPost.t
+                    a(href=`/t/${r.thread.tid}` target="_blank" v-pre)=r.thread.firstPost.t
                   .review-info 专业：
                   .review-thread-title
                     for f, index in r.thread.forums
@@ -48,7 +48,7 @@ block content
                       a(href=`/f/${f.fid}` target="_blank")=f.displayName
                   if r.reason
                     .review-info 理由：
-                    span= r.reason
+                    span(v-pre)= r.reason
 
                   .review-info ，
                   .review-thread-title
@@ -58,7 +58,7 @@ block content
                   .review-time 文章
                   .review-info 标题：
                   .review-thread-title
-                    a(href=`/t/${r.thread.tid}` target="_blank")=r.thread.firstPost.t
+                    a(href=`/t/${r.thread.tid}` target="_blank" v-pre)=r.thread.firstPost.t
                   .review-info 专业：
                   .review-thread-title
                     for f, index in r.thread.forums
@@ -67,16 +67,16 @@ block content
                       a(href=`/f/${f.fid}` target="_blank")=f.displayName
                   if r.reason
                     .review-info 理由：
-                    span= r.reason
+                    span(v-pre)= r.reason
                 if r.post.abstractCn
-                  .review-post-content=`中文摘要：${r.post.abstractCn}`
+                  .review-post-content(v-pre)=`中文摘要：${r.post.abstractCn}`
                 if r.post.abstractEn
-                  .review-post-content=`英文摘要：${r.post.abstractEn}`
+                  .review-post-content(v-pre)=`英文摘要：${r.post.abstractEn}`
                 if r.post.keyWordsCn.length
-                  .review-post-content=`中文关键词：${r.post.keyWordsCn.join(', ')}`
+                  .review-post-content(v-pre)=`中文关键词：${r.post.keyWordsCn.join(', ')}`
                 if r.post.keyWordsEn.length
-                  .review-post-content=`英文关键词：${r.post.keyWordsEn.join(', ')}`
-                .review-post-content!=r.post.c
+                  .review-post-content(v-pre)=`英文关键词：${r.post.keyWordsEn.join(', ')}`
+                .review-post-content(v-pre)!=r.post.c
                 .review-input-div(v-if=`1 || selectedPid.indexOf('${r.post.pid}') !== -1`)
                   .m-b-1
                     input(type="radio" :value="true" v-model=`review['${r.post.pid}'].pass`)
@@ -116,7 +116,7 @@ block content
                   if r.document.source === 'article'
                     .review-info 标题：
                       .review-thread-title
-                        a(href=`${r.content.url}` target="_blank")=r.content.title
+                        a(href=`${r.content.url}` target="_blank" v-pre)=r.content.title
                   else if r.document.source === 'moment'
                     .review-info 链接：
                       .review-thread-title
@@ -124,11 +124,11 @@ block content
                   else
                     .review-info 图书标题：
                       .review-thread-title
-                        span=r.content.bookName
+                        span(v-pre)=r.content.bookName
                 if r.reason
                   .review-info 理由：
-                  span= r.reason
-                .review-post-content!=r.document.content
+                  span(v-pre)= r.reason
+                .review-post-content(v-pre)!=r.document.content
                   .review-input-div(v-if=`1 || selectedDid.indexOf('${r.document._id}') !== -1`)
                     .m-b-1
                       input(type="radio" :value="true" v-model=`review['${r.document._id}'].pass`)

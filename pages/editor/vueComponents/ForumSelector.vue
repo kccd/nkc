@@ -1,8 +1,8 @@
 <template lang="pug">
 div()
   .moduleForumSelectorApp(v-show="show" ref="selectForum")
-    .draggable-panel-header
-      .draggable-panel-title( ref="title") 选择专业
+    .draggable-panel-header( ref="title")
+      .draggable-panel-title() 选择专业
       .draggable-panel-right-button(@click='close')
         .fa.fa-remove
     .draggable-panel-body
@@ -355,9 +355,8 @@ export default {
   margin-right: 10px;
 }
 .moduleForumSelectorApp {
-  will-change: auto;
-  top: calc(50% - 22rem);
-  left: calc(50% - 18rem);
+  top: 20%;
+  // left: calc(50% - 18rem);
   height: 43rem;
   min-height: 43rem;
   position: fixed;
@@ -385,6 +384,7 @@ export default {
       cursor: all-scroll;
     }
     .draggable-panel-right-button {
+      color: #888;
       position: absolute;
       top: 0;
       right: 0;

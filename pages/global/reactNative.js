@@ -102,6 +102,6 @@ function RNInitClientEvent() {
 }
 
 // 初始化链接点击事件
-RNInitClientEvent();
+// RNInitClientEvent();
 // 初始化图片长按事件
-RNInitLongPressEventToDownloadImage();
+// RNInitLongPressEventToDownloadImage();

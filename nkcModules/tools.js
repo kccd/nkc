@@ -238,6 +238,12 @@ var Tools = function() {
       case 'downloadApp': {
         return '/app/' + id + '/' + size
       }
+      case 'preview': {
+        return '/document/preview?source=' + id + '&sid=' + size
+      }
+      case 'history': {
+        return '/document/history?source=' + id + '&sid=' + size
+      }
     }
   };
   self.getAnonymousInfo = function() {

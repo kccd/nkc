@@ -104,6 +104,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.module-dialog-body{
+  margin: 0;
+}
 .editor-cover-img {
   height: 12rem;
   width: 18rem;

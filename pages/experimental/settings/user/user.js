@@ -86,9 +86,9 @@ const app = new Vue({
     }
   },
   mounted() {
-    setTimeout(() => {
+    /*setTimeout(() => {
       floatUserPanel.initPanel();
-    }, 500)
+    }, 500)*/
   }
 });
 

@@ -91,10 +91,3 @@ export default {
 };
 </script>
 
-<style lang="less">
-@media screen and (max-width: 1000px) {
-  .box-shadow-panel > div {
-    padding: 0;
-  }
-}
-</style>

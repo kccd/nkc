@@ -14,8 +14,8 @@ const app = new Vue({
     stickers: data.stickers
   },
   mounted() {
-    floatUserPanel.initPanel();
-    NKC.methods.initImageViewer(".sticker-image")
+    // floatUserPanel.initPanel();
+    // NKC.methods.initImageViewer(".sticker-image")
   },
   methods: {
     objToStr: objToStr,

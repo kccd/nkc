@@ -1,6 +1,13 @@
 import {openImageViewer} from '../lib/js/imageViewer';
 import {strToObj} from "../lib/js/dataConversion";
 import {initLongPressEvent} from "../lib/js/longPress";
+import {
+  openUserFloatPanel,
+  closeUserFloatPanel,
+  openForumFloatPanel,
+  closeForumFloatPanel,
+  openStickerPanel
+} from "./methods";
 import {getState} from "../lib/js/state";
 import {
   RNDownloadFile,
@@ -69,14 +76,14 @@ function saveImage(data) {
 * */
 function showUserPanel(data, dom) {
   const {uid} = data;
-  window.showFloatUserPanel(uid, dom);
+  openUserFloatPanel(uid, dom);
 }
 
 /*
 * 鼠标移出隐藏用户名片
 * */
 function hideUserPanel(data, dome) {
-  window.initMouseleaveEvent()
+  closeUserFloatPanel();
 }
 
 /*
@@ -84,14 +91,18 @@ function hideUserPanel(data, dome) {
 * */
 function showForumPanel(data, dom) {
   const {fid} = data;
-  window.showForumPanel(dom, fid);
+  openForumFloatPanel(fid, dom);
 }
 
 /*
 * 隐藏用户名片
 * */
 function hideForumPanel() {
-  window.hideForumPanel();
+  closeForumFloatPanel();
+}
+
+function viewSticker(data) {
+  openStickerPanel(data.rid, data.management || false);
 }
 
 /*
@@ -106,6 +117,7 @@ const eventFunctions = {
   hideUserPanel,
   showForumPanel,
   hideForumPanel,
+  viewSticker,
 }
 
 /*

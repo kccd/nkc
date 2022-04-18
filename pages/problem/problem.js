@@ -84,7 +84,7 @@ function checkMark() {
 
 
 $(function() {
-	NKC.methods.initImageViewer('.problem-images')
+	// NKC.methods.initImageViewer('.problem-images')
 })
 
 checkMark();

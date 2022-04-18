@@ -10,9 +10,9 @@ $(document).ready(()=>{
       timeout: null
     },
     mounted() {
-      if(window.floatUserPanel) {
+      /*if(window.floatUserPanel) {
         window.floatUserPanel.initPanel();
-      }
+      }*/
     },
     methods: {
       objToStr: objToStr,

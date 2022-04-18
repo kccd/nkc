@@ -2,12 +2,20 @@
 .abstract
   .editor-header 摘要
     small （选填）
-  .row.editor-abstract
-    .col-xs-12.col-md-6
-      textarea.abstract-cn(placeholder="中文摘要，最多可输入1000字符", rows=7, v-model="cn")
+  .row.editor-abstract.clear-marginLR
+    .col-xs-12.col-md-6.clear-paddingL
+      textarea.abstract-cn(
+        placeholder="中文摘要，最多可输入1000字符",
+        rows=7,
+        v-model="cn"
+      )
       .editor-abstract-info(:class="{ warning: abstractCnLength > 1000 }") {{ abstractCnLength }} / 1000
-    .col-xs-12.col-md-6
-      textarea.abstract-en(placeholder="英文摘要，最多可输入1000字符", rows=7, v-model="en")
+    .col-xs-12.col-md-6.clear-paddingR
+      textarea.abstract-en(
+        placeholder="英文摘要，最多可输入1000字符",
+        rows=7,
+        v-model="en"
+      )
       .editor-abstract-info(:class="{ warning: abstractEnLength > 1000 }") {{ abstractEnLength }} / 1000
 </template>
 
@@ -54,6 +62,71 @@ export default {
 </script>
 
 <style scoped>
+.box-shadow-panel > div {
+  box-shadow: none;
+  padding: 0;
+  background-color: #fff;
+  border-radius: 3px;
+}
+@media (max-width: 992px) {
+  .col-xs-12 {
+    width: 100%;
+    float: left;
+    position: relative;
+    min-height: 1px;
+  }
+  .clear-paddingL{
+    padding-right: 0;
+  };
+  .clear-paddingR{
+    padding-left: 0;
+  };
+}
+@media (min-width: 992px) {
+  .col-md-3 {
+    width: 25%;
+    float: left;
+  }
+  .col-md-9 {
+    width: 75%;
+    float: left;
+  }
+}
+
+.row:before {
+  display: table;
+  content: " ";
+}
+.row::after {
+  display: table;
+  content: " ";
+}
+* {
+  box-sizing: border-box;
+}
+*:before,
+*:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+*::after {
+  clear: both;
+}
+.m-b-2 {
+  margin-bottom: 2rem;
+}
+.row {
+  margin-right: -15px;
+  margin-left: -15px;
+}
+
+.col-md-9 {
+  position: relative;
+  min-height: 1px;
+  padding-right: 15px;
+  padding-left: 15px;
+}
 .editor-abstract textarea:focus {
   outline: none;
 }
@@ -80,5 +153,16 @@ export default {
 }
 .warning {
   color: #ff6262;
+}
+
+.clear-paddingL {
+  padding-left: 0;
+}
+.clear-paddingR {
+  padding-right: 0;
+}
+.clear-marginLR {
+  margin-left: 0;
+  margin-right: 0;
 }
 </style>

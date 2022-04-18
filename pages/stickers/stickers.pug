@@ -14,7 +14,6 @@ block content
           .stickers-body
             for s in data.stickers
               .sticker(data-sticker-rid=s.rid)
-                img(src=tools.getUrl('sticker', s.rid))
-          include ../publicModules/paging/paging_input    
+                img(src=tools.getUrl('sticker', s.rid) data-global-click='viewSticker' data-global-data=objToStr({rid: s.rid, management: true}))
+          include ../publicModules/paging/paging_input
 block scripts
-  include ../publicModules/sticker/sticker              

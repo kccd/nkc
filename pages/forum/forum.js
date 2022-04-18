@@ -166,8 +166,8 @@ function updateThreadListCount() {
 * @author pengxiguaa 2020-12-11
 * */
 function createMouseEvents() {
-  floatUserPanel.initPanel();
-  floatForumPanel.initPanel();
+  // floatUserPanel.initPanel();
+  // floatForumPanel.initPanel();
 }
 
 /*

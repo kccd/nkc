@@ -210,11 +210,9 @@ class SinglePostModule {
       });
   }
   initNKCSource() {
-    floatUserPanel.initPanel();
+    // floatUserPanel.initPanel();
     NKC.methods.initSharePanel();
     NKC.methods.initPostOption();
-    NKC.methods.initStickerViewer();
-    if(!NKC.configs.isApp) NKC.methods.initImageViewer();
     NKC.methods.replaceNKCUrl();
     NKC.methods.initVideo();
   }

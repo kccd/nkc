@@ -2,14 +2,13 @@
   .creation-center
     .creation-nav-container
       creation-nav(@select="selectNavItem")
-    .creation-nav-container-phone.standard-max-container(:class="{'creation-nav-container-isApp': isApp}")
+    //- .creation-nav-container-phone.standard-max-container(:class="{'creation-nav-container-isApp': isApp}")
+    .creation-nav-container-phone.standard-max-container(v-if = "isApp")
       creation-nav(@select="selectNavItem")
     .creation-content-container
       transition(:name="transitionName")
         home(v-if="showHome")
-        //- 浏览器返回上一个页面时缓存提交时的状态，需要在路由为组件配置才能生效
-        keep-alive
-          router-view(v-if="isRouterAlive")
+        router-view(v-if="isRouterAlive")
 </template>
 <script>
 import VerNav from "../../components/VerNav";
@@ -50,7 +49,8 @@ export default {
   },
   created(){
     const { isApp } = getState();
-    this.isApp = isApp;
+    // 如果是app 不显示导航
+    this.isApp = !isApp;
     this.isShowHome();
     setPageTitle('创作中心');
   },

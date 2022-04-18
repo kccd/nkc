@@ -14,9 +14,9 @@ var app = new Vue({
     this.t = data.t || "username";
     this.content = data.content;
     this.mainScore = data.mainScore;
-    setTimeout(function() {
+    /*setTimeout(function() {
       floatUserPanel.initPanel();
-    }, 500)
+    }, 500)*/
   },
   methods: {
     objToStr: objToStr,

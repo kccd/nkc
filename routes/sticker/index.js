@@ -30,7 +30,16 @@ router
         paging = nkcModules.apiFunction.paging(page, count, limit);
       }
 
-      data.stickers = await db.StickerModel.find(q).sort({order: -1}).skip(paging.start).limit(paging.perpage);
+      let arr = [];
+      const stickers = await db.StickerModel.find(q).sort({order: -1}).skip(paging.start).limit(paging.perpage);      
+      for (let i = 0; i < stickers.length; i++) {
+        const newSticker = stickers[i].toObject();
+        const model = await db.ResourceModel.findOne({rid: newSticker.rid})
+        newSticker.reason = newSticker.reason.replace("\n", "");
+        newSticker.state = model.state || 'useless';
+        arr.push(newSticker)
+      }
+      data.stickers = arr
       data.stickers.map(s => {
         s.reason = s.reason.replace("\n", "");
       });
@@ -90,7 +99,8 @@ router
     const {rid} = params;
     const {t} = query;
     let sticker = await db.StickerModel.findOnly({from: "upload", rid});
-
+    const stickerSettings = await db.SettingModel.getSettings("sticker");
+    data.notesAboutUsing = stickerSettings.notesAboutUsing;
     if(t === "json") {
       if(!sticker) ctx.throw(404, "表情不存在");
       if(sticker.disabled && !ctx.permission("nkcManagementSticker")) ctx.throw(403, "表情已被屏蔽");

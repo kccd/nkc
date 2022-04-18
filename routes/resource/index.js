@@ -227,7 +227,7 @@ resourceRouter
     };
     if(cid && cid !== 'default' && cid !== 'all' && cid !== 'trash') resourceInfo.cid = cid;
     const r = db.ResourceModel(resourceInfo);
-
+    // console.log('share', share)
     // 创建表情数据
     if(type === "sticker") {
       if(mediaType !== "mediaPicture") {

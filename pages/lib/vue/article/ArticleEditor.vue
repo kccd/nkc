@@ -27,7 +27,9 @@
           select-column-categories(ref="selectColumnCategories" @change="categoryChange" :column-id="columnId")
     .m-b-1
       button.btn.btn-primary.m-r-05(@click="publish") 发布
-      button.btn.btn-default.m-r-05(@click="saveArticle") 保存
+      button.btn.btn-default.m-r-05(@click="saveArticle" :disabled="!articleId") 保存
+      button.btn.btn-default.m-r-05(@click="preview" :disabled="!articleId") 预览
+      button.btn.btn-default.m-r-05(@click="history" :disabled="!articleId") 历史
       .checkbox
         .editor-auto-save(v-if="autoSaveInfo")
           .fa.fa-check-circle &nbsp;{{autoSaveInfo}}
@@ -129,6 +131,8 @@ import {nkcAPI} from "../../js/netAPI";
 import {checkString} from "../../js/checkData";
 import {getLength} from "../../js/checkData";
 import {getColumnInfo} from "../../js/column";
+import { getUrl } from '../../js/tools'
+
 export default {
   props:['time', 'source', 'configs'],
   data: () => ({
@@ -187,6 +191,14 @@ export default {
     addUrlParam: addUrlParam,
     checkString: checkString,
     getLength: getLength,
+    preview(){
+      const url = getUrl('preview', "article", this.articleId);
+      window.open(url);
+    },
+    history(){
+      const url = getUrl('history', "article", this.articleId);
+      window.open(url);
+    },
     getColumn() {
       const self = this;
       getColumnInfo()

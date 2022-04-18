@@ -1,79 +1,72 @@
 const router = require('koa-router')();
 router
-.get('/preview', async (ctx, next) => {
+.get('preview', async (ctx, next) => {
   ctx.template='document/preview/document.pug'
-  const {db, data, params, state} = ctx;
-  const {did} = params
-  const document = await db.DocumentModel.find({did: did, uid: state.uid}).sort({tlm: -1}).skip(0).limit(1);
-  data.document = document[0]
-  await next()
+  const {db, data, state, query} = ctx;
+  // console.log('query', query);
+  const {sid, source} = query;
+  const document = await db.DocumentModel.find({sid, source, uid: state.uid, type: "beta"}).sort({tlm: -1}).skip(0).limit(1);
+  if(!document.length) ctx.throw(400, "该文章已被发布")
+  let user = await db.UserModel.findOne({uid: state.uid});
+  user = user.toObject();
+  // 用于前端判断当前是什么类型页面 
+  data.type = source; 
+  data.document = document[0]; 
+  data.document.avatar = user.avatar; 
+  await next();
 })
-.get('/history', async (ctx, next)=>{
+.get('history', async (ctx, next)=>{
   ctx.template = 'document/history/document.pug'
-  const {db, data, params, state, query} = ctx;
-  const {did} = params
-  const {bid} = query
+  const {db, data, state, query} = ctx;
+  const {sid, source} = query;
+  data.type = source; 
+
+  // const {bid} = query
   //  获取列表
-  data.history = await db.DocumentModel.find({ $and:[{ did: did }, {type: 'history'}, {uid: state.uid}] }).sort({ tlm:-1 });
+  data.history = await db.DocumentModel.find({ $and:[{ sid, source }, {type: 'history'}, {uid: state.uid}] }).sort({ tlm:-1 });
   if(data.history.length){
     // 默认返回第一项内容
     data.document = data.history[0]
-    data.bookId = bid
-    data.ids = {did: data.document.did, _id:data.document._id}
+    // data.bookId = bid
+    data.currentPage = {_id: data.document._id, source: data.document.source, sid: data.document.sid};
   }else{
     data.document = '',
-    data.bookId = ''
-    data.ids = ''
+    // data.bookId = ''
+    data.currentPage = ''
   }
   await next()
 })
-.get('/history/:_id',async (ctx, next)=>{
+.get('history/:_id',async (ctx, next)=>{
   ctx.template = 'document/history/document.pug'
   const {db, data, params, state, query} = ctx;
-  const { bid } = query
-  const { _id, did } = params
-  data.bookId = bid
-  data.history =  await db.DocumentModel.find({ $and:[{did}, {type:'history'}, {uid:state.uid}] }).sort({tlm:-1});
+  const { sid, source } = query
+  const { _id } = params;
+  data.type = source; 
+
+  // console.log(_id, '_id')
+  // data.bookId = bid
+  data.history =  await db.DocumentModel.find({ sid, source, type: 'history', uid: state.uid }).sort({tlm:-1});
   function find(data, id){
     for (const obj of data) {
       if(obj._id == id) return obj
     }
   }
-  data.document = find(data.history, _id)
-  data.ids = {did: data.document.did,_id:data.document._id}
+  data.document = find(data.history, _id);
+  // 点击当前版本进行编辑后 前端会刷新当前页面 而_id 的文章已经变为编辑版 不存在历史记录中，因此默认返回第一条数据 
+  if(!data.document){
+    data.document = data.history[0];
+  }
+  data.currentPage = {_id: data.document._id, source: data.document.source, sid: data.document.sid};;
   await next()
 })
-// .get('/history/:sid/:_id/publish',async (ctx, next)=>{
-//   // /document/:did/history/:_id/publish
-//   const {db, params} = ctx;
-//   // const {_id, did} = params;
-//   const stableDocument = await db.DocumentModel.findOne({did, type: 'stable'});
-//   // if(!stable)
-//   // const {db, params} = ctx;
-//   const { _id, sid } = params;
-//   // 并且选中的 历史版 变为 正式版，原先的版本（编辑版 或 正式版）变为历史版
-//   await db.DocumentModel.updateOne({$or:[{$and:[{"type":'beta'}, {sid}]}, {$and:[{"type":'stable'}, {sid}]}]}, {$set:{type:'history'}});
-//   await db.DocumentModel.updateOne({
-//     sid,
-//     type: {$in: ['beta', 'stable']}
-//   }, {
-//     $set: {
-//       type: 'history'
-//     }
-//   })
-//   await db.DocumentModel.updateOne({$and: [{_id}, {sid}, {type:'history'}] }, {$set:{type:'stable'}});
-//   await next()
-// })
-.post('/history/:did/:_id/edit',async (ctx, next)=>{
-  const {db, params} = ctx;
-  const { _id, did } = params;
-  // 当前历史记录复制一份并改为为编辑版
-  // 把正在编辑版本的改为历史记录
-  // const document = await db.DocumentModel.findOne({$and:[{did}, {_id}, {type:'history'}]})
-  // console.log(document)
-  await db.DocumentModel.copyToHistoryToEditDocument(did, _id)
-  // await db.DocumentModel.updateOne({$or:[{$and:[{"type":'beta'}, {did}]}, {$and:[{"type":'stable'}, {did}]}]}, {$set:{type:'history'}});
-  // await db.DocumentModel.updateOne({$and: [{_id}, {did}, {type:'history'}] }, {$set:{type:'beta'}});
+.post('history/:_id/edit',async (ctx, next)=>{
+  const {db, params, query} = ctx;
+  //  正在编辑的改为历史版
+  const { sid, source } = query
+  // 当前历史记录改为编辑版，并且复制了一份为历史版 
+  const { _id } = params;
+
+  await db.DocumentModel.copyToHistoryToEditDocument(sid, source, _id)
   await next()
 })
 module.exports = router;

@@ -43,7 +43,15 @@ schema.virtual('document')
     return this._document = val
   });
 
-
+schema.statics.setStatus = async function(did, status) {
+  const CreationDrafts = mongoose.model('creationDrafts');
+  const draft = await CreationDrafts.findOnly({did});
+  await draft.updateOne({
+    $set: {
+      status,
+    }
+  });
+}
 /*
 * 创建文档和草稿
 * */
@@ -64,14 +72,22 @@ schema.statics.createDraft = async (props) => {
     source: documentSource,
     sid: Did,
   });
-  await document.setStatus(DocumentModel.getDocumentStatus().normal);
-  const draft = new CreationDraftsModel({
+  const draft = await new CreationDraftsModel({
     _id: Did,
     uid,
     toc,
     did: document.did,
   });
   await draft.save();
+  const status = await DocumentModel.getDocumentStatus();
+  await document.setStatus(status.normal);
+  // const draft = new CreationDraftsModel({
+  //   _id: Did,
+  //   uid,
+  //   toc,
+  //   did: document.did,
+  // });
+  // await draft.save();
   return draft;
 }
 

@@ -43,7 +43,7 @@ const app = new Vue({
     }
   },
   updated() {
-    floatUserPanel.initPanel();
+    // floatUserPanel.initPanel();
   }
 })
 
