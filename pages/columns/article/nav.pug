@@ -46,8 +46,5 @@ mixin nav(data)
       else
         span.m-r-1(titlt='收藏数' onclick='collectThread()')
           span=`${collected?'已收藏': '收藏'}${collectedCount ? `(${collectedCount})` : ''}`
-      if showManagement && type === 'article'
-        span.fa.fa-cog.m-r-1(onclick="showSetUp()")
-      else
-        span.nav-count.fa.fa-cog.m-r-1(onclick=`toUrl('${url}')` title="跳转到文章页")
+      span.fa.fa-cog.m-r-1(onclick="showSetUp()")
 
