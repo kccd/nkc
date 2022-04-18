@@ -63,7 +63,7 @@ export default {
       }
     },
     navToPage(page, url) {
-      if (this.isApp) {
+      if (!this.isApp) {
         visitUrl(url, true);
         return;
       }
