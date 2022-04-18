@@ -5,6 +5,7 @@ import { sweetQuestion } from '../../lib/js/sweetAlert'
 window.saveArticle=saveArticle
 var currentUrl;
 onload = ()=>{
+  document.body.style='display:block'
   currentUrl = window.location.href
 }
 // function publish(data){

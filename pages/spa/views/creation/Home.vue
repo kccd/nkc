@@ -1,6 +1,6 @@
 <template lang="pug">
-.max-width
-  .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel.xs-p
+.standard-fluid-max-container.clear-float
+  .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel.xs-p.clear-padding
     .calendar.overflow-x
       .min-h(ref="canvasDom")
       #set-year
@@ -285,12 +285,78 @@ export default {
 };
 </script>
 <style scoped lang="less">
+.box-shadow-panel > div {
+  box-shadow: none;
+  padding: 0;
+  background-color: #fff;
+  border-radius: 3px;
+}
+@media (max-width: 992px) {
+  .col-xs-12 {
+    width: 100%;
+    float: left;
+    position: relative;
+    min-height: 1px;
+}
+}
+@media (min-width: 992px) {
+    .col-md-3 {
+    width: 25%;
+    float: left;
+  }
+  .col-md-9 {
+    width: 75%;
+    float: left;
+  }
+}
+
+.row:before{
+    display: table;
+    content: " ";
+}
+.row::after{
+  display: table;
+  content: " ";
+}
+*{
+  box-sizing: border-box;
+}
+*:before, *:after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+*::after{
+  clear: both
+}
+.m-b-2 {
+    margin-bottom: 2rem;
+}
+.row {
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.col-md-9 {
+  position: relative;
+  min-height: 1px;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+.clear-padding{
+  padding: 0;
+}
+.clear-marginLR{
+  margin-left: 0;
+  margin-right: 0;
+}
+
  @max-width: 1000px;
- @media (max-width: @max-width) {
-   .xs-p{
-      padding: 0 5px;
-    }
- }
+//  @media (max-width: @max-width) {
+//    .xs-p{
+//       padding: 0 1rem;
+//     }
+//  }
 .overflow-x{
   @media screen and (max-width: @max-width) {
     overflow-x: scroll;
@@ -365,7 +431,11 @@ export default {
 .calendar {
   position: relative;
 }
-
+.clear-float::after{
+  content: "";
+  display: block;
+  clear: both;
+}
 #set-year {
   position: absolute;
   top: 1.3rem;

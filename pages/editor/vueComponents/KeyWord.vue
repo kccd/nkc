@@ -291,6 +291,7 @@ h5:nth-child(1) {
   border-color: #ccc;
 }
 .close-modal {
+  color: #888;
   text-align: center;
   line-height: 2.8rem;
   float: right;
@@ -298,7 +299,6 @@ h5:nth-child(1) {
   height: 2.8rem;
   &:hover {
     background-color: rgba(0, 0, 0, 0.08);
-    color: #777;
     cursor: pointer;
   }
 }

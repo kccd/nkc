@@ -2,7 +2,8 @@
   .creation-center
     .creation-nav-container
       creation-nav(@select="selectNavItem")
-    .creation-nav-container-phone.standard-max-container(:class="{'creation-nav-container-isApp': isApp}")
+    //- .creation-nav-container-phone.standard-max-container(:class="{'creation-nav-container-isApp': isApp}")
+    .creation-nav-container-phone.standard-max-container(v-if = "isApp")
       creation-nav(@select="selectNavItem")
     .creation-content-container
       transition(:name="transitionName")
@@ -48,7 +49,8 @@ export default {
   },
   created(){
     const { isApp } = getState();
-    this.isApp = isApp;
+    // 如果是app 不显示导航
+    this.isApp = !isApp;
     this.isShowHome();
     setPageTitle('创作中心');
   },
