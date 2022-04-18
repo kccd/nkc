@@ -1,77 +1,78 @@
 <template lang="pug">
-.editor.row.p-l-30
-  .col-xs-12.col-md-9.box-shadow-panel.m-b-2
-    div
-      //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t 
-      //- 2.notice editorSettings.onEditNotes
-      article-title(
-        ref="title",
-        :data="pageData",
-        :notice="(pageState.editorSettings && pageState.editorSettings.onEditNotes) || ''"
-      )
-      //- @content-change="contentChange"
-      //- 1. @content-change 编辑器内容改变触发 2. c 编辑器内容  newPost
-      article-content(
-        ref="content",
-        :c="pageData.post && pageData.post.c",
-        @content-change="contentChange"
-      ) 
-      .m-b-2(
-        v-if="!['newPost', 'modifyThread', 'modifyPost'].includes(pageData.type)"
-      )
-        //- 1. @selected-forumids 选择的主分类后id给提交组件 2. data 包含 threadCategories minorForumCount mainForums 
-        classification(
-          ref="classification",
+.editor
+  .row.clear-marginLR
+    .col-xs-12.col-md-9.box-shadow-panel.m-b-2.clear-padding
+      div
+        //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t 
+        //- 2.notice editorSettings.onEditNotes
+        article-title(
+          ref="title",
           :data="pageData",
-          @selected-forumids="selectedForumIds"
+          :notice="(pageState.editorSettings && pageState.editorSettings.onEditNotes) || ''"
         )
-      .m-b-2(v-if="!hideType.includes(pageData.type)")
-        //- 1.value 封面图值
-        cover(ref="cover", :value="pageData.post && pageData.post.cover")
-      .m-b-2(v-if="!hideType.includes(pageData.type)")
-        //- 1 abstract 中英文摘要
-        abstract(
-          ref="abstract",
-          :abstract="{ cn: pageData.post && pageData.post.abstractCn, en: pageData.post && pageData.post.abstractEn }"
+        //- @content-change="contentChange"
+        //- 1. @content-change 编辑器内容改变触发 2. c 编辑器内容  newPost
+        article-content(
+          ref="content",
+          :c="pageData.post && pageData.post.c",
+          @content-change="contentChange"
+        ) 
+        .m-b-2(
+          v-if="!['newPost', 'modifyThread', 'modifyPost'].includes(pageData.type)"
         )
-      .m-b-2(v-if="!hideType.includes(pageData.type)")
-        //- 1.keywords 中英文关键字
-        key-word(
-          ref="keyWord",
-          :keywords="{ cn: pageData.post && pageData.post.keyWordsCn, en: pageData.post && pageData.post.keyWordsEn }"
-        )
-      .m-b-2(v-if="!hideType.includes(pageData.type)")
-        //- 1.author 作者信息
-        author-info(
-          ref="authorInfo",
-          :author="pageData.post && pageData.post.authorInfos"
-        )
-      .m-b-2(v-if="!hideType.includes(pageData.type)")
-        //- 1.original 包含最小字数和文章状态
-        original(
-          ref="original",
-          :original="{ wordLimit: pageData.originalWordLimit, state: pageData.post && pageData.post.originState }"
-        )
-      .m-b-2(v-if="!hideType.includes(pageData.type)")
-        //- 1.data包含 createSurveyPermission type post.surveyId
-        investigation(ref="investigation", :data="pageData")
-      .m-b-2
-        //- 1.state  
-        column(
-          ref="column",
-          :state="{ userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column: pageState.userColumn }",
-          :data="{ addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn }"
-        )
-  .col-xs-12.col-md-3.box-shadow-panel 
-    //- 1.notice 温馨提示的内容  2.data 中只需要post therad type forum allowedAnonymousForumsId havePermissionToSendAnonymousPost threadCategories
-    //- 3.@ready-data 提交 和 保存时用于获取数据并提交 4.@remove-editor 提交后移除编辑器
-    modify-submit(
-      ref="submit",
-      :notice="pageState.editorSettings && pageState.editorSettings.notes",
-      :data="pageData",
-      @ready-data="readyData",
-      @remove-editor="removeEditor"
-    )
+          //- 1. @selected-forumids 选择的主分类后id给提交组件 2. data 包含 threadCategories minorForumCount mainForums 
+          classification(
+            ref="classification",
+            :data="pageData",
+            @selected-forumids="selectedForumIds"
+          )
+        .m-b-2(v-if="!hideType.includes(pageData.type)")
+          //- 1.value 封面图值
+          cover(ref="cover", :value="pageData.post && pageData.post.cover")
+        .m-b-2(v-if="!hideType.includes(pageData.type)")
+          //- 1 abstract 中英文摘要
+          abstract(
+            ref="abstract",
+            :abstract="{ cn: pageData.post && pageData.post.abstractCn, en: pageData.post && pageData.post.abstractEn }"
+          )
+        .m-b-2(v-if="!hideType.includes(pageData.type)")
+          //- 1.keywords 中英文关键字
+          key-word(
+            ref="keyWord",
+            :keywords="{ cn: pageData.post && pageData.post.keyWordsCn, en: pageData.post && pageData.post.keyWordsEn }"
+          )
+        .m-b-2(v-if="!hideType.includes(pageData.type)")
+          //- 1.author 作者信息
+          author-info(
+            ref="authorInfo",
+            :author="pageData.post && pageData.post.authorInfos"
+          )
+        .m-b-2(v-if="!hideType.includes(pageData.type)")
+          //- 1.original 包含最小字数和文章状态
+          original(
+            ref="original",
+            :original="{ wordLimit: pageData.originalWordLimit, state: pageData.post && pageData.post.originState }"
+          )
+        .m-b-2(v-if="!hideType.includes(pageData.type)")
+          //- 1.data包含 createSurveyPermission type post.surveyId
+          investigation(ref="investigation", :data="pageData")
+        .m-b-2
+          //- 1.state  
+          column(
+            ref="column",
+            :state="{ userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column: pageState.userColumn }",
+            :data="{ addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn }"
+          )
+    .col-xs-12.col-md-3.box-shadow-panel
+      //- 1.notice 温馨提示的内容  2.data 中只需要post therad type forum allowedAnonymousForumsId havePermissionToSendAnonymousPost threadCategories
+      //- 3.@ready-data 提交 和 保存时用于获取数据并提交 4.@remove-editor 提交后移除编辑器
+      modify-submit(
+        ref="submit",
+        :notice="pageState.editorSettings && pageState.editorSettings.notes",
+        :data="pageData",
+        @ready-data="readyData",
+        @remove-editor="removeEditor"
+      )
 </template>
 
 <script>
@@ -127,23 +128,25 @@ export default {
       .catch((err) => {
         sweetError(err);
       });
-    window.addEventListener('pageshow',this.clearCache)
+    window.addEventListener("pageshow", this.clearCache);
   },
   destroyed() {
-    window.removeEventListener("pageshow", this.clearCache)
+    window.removeEventListener("pageshow", this.clearCache);
     this.pageData = {};
     this.pageState = {};
   },
   methods: {
-    clearCache(event){
-      if(event.persisted || window.performance && window.performance.navigation.type === 2){
+    clearCache(event) {
+      if (
+        event.persisted ||
+        (window.performance && window.performance.navigation.type === 2)
+      ) {
         // 清除缓存
         // $(".editor-title").val('');
-        $(".abstract-cn").val('');
-        $(".abstract-en").val('');
-        $('.agreement').prop('checked', true);
+        $(".abstract-cn").val("");
+        $(".abstract-en").val("");
+        $(".agreement").prop("checked", true);
       }
-    
     },
     // 控制 提交组件 是否可选匿名发表
     selectedForumIds(ids) {
@@ -185,75 +188,77 @@ export default {
 };
 </script>
 <style>
-.edui-default .edui-editor-toolbarboxouter{
+.edui-default .edui-editor-toolbarboxouter {
   background-color: white !important;
 }
 </style>
 <style scoped>
-.p-l-30{
-  padding-left: 30px;
-}
-.col-md-9 {
-  position: relative;
-  min-height: 1px;
-  /* padding-right: 15px;
-  padding-left: 15px; */
-}
+
+
+
 .box-shadow-panel > div {
-  box-shadow: none ;
+  box-shadow: none;
   padding: 0;
   background-color: #fff;
   border-radius: 3px;
 }
-@media (max-width: 991px) {
-  .col-md-9 {
-    width: 75%;
-  }
-  .col-md-3 {
-    width: 25%;
-  }
-  .box-shadow-panel {
-    padding-left: 0;
-    padding-right: 0;
-  }
-  .box-shadow-panel > * {
-    border-radius: 0;
-  }
-  .col-xs-6 {
+@media (max-width: 992px) {
+  .col-xs-12 {
+    width: 100%;
+    float: left;
     position: relative;
     min-height: 1px;
-    /* padding-right: 15px;
-    padding-left: 15px; */
-    width: 50%;
+}
+}
+@media (min-width: 992px) {
+    .col-md-3 {
+    width: 25%;
     float: left;
   }
-  .col-xs-12 {
-  float: left;
-  width: 100%;
-  position: relative;
-  min-height: 1px;
-}
-}
-.m-b-2 {
-  margin-bottom: 2rem;
-}
-
-
-.m-b-05 {
-  margin-bottom: 0.5rem !important;
-}
-@media screen and (max-width: 1000px) {
-  .editor {
-    padding: auto 15px;
+  .col-md-9 {
+    width: 75%;
+    float: left;
   }
 }
-.row {
-  width: 100%;
+
+.row:before{
+    display: table;
+    content: " ";
 }
-.box-shadow-panel:after,
-.editor:after {
-  content: "";
-  display: block;
-  clear: both;
+.row::after{
+  display: table;
+  content: " ";
+}
+*{
+  box-sizing: border-box;
+}
+*:before, *:after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+*::after{
+  clear: both
+}
+.m-b-2 {
+    margin-bottom: 2rem;
+}
+.row {
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.col-md-9 {
+  position: relative;
+  min-height: 1px;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+.clear-padding{
+  padding: 0;
+}
+.clear-marginLR{
+  margin-left: 0;
+  margin-right: 0;
 }
 </style>

@@ -1,5 +1,5 @@
 <template lang="pug">
-  div
+  .standard-fluid-max-container
     editor
 </template>
 
