@@ -37,83 +37,83 @@ export default [
   {
     name: routerName.user,
     path: '/u/:uid',
-    redirect: '/u/:uid/p/moment',
+    redirect: '/u/:uid/profile/moment',
     component: User,
     children: [
       {
         name: routerName.profileView,
-        path: '/u/:uid/p',
+        path: '/u/:uid/profile',
         component: ProfileView,
-        redirect: '/u/:uid/p/moment',
+        redirect: '/u/:uid/profile/moment',
         children: [
           {
             name: routerName.profile,
             path: '/',
-            redirect: '/u/:uid/p/moment',
+            redirect: '/u/:uid/profile/moment',
             component: Profile,
             children: [
               {
                 name: routerName.moment,
-                path: '/u/:uid/p/moment',
+                path: '/u/:uid/profile/moment',
                 component: UserMoment,
               },
               {
                 name: routerName.post,
-                path: '/u/:uid/p/post',
+                path: '/u/:uid/profile/post',
                 component: UserPostList
               },
               {
                 name: routerName.thread,
-                path: '/u/:uid/p/thread',
+                path: '/u/:uid/profile/thread',
                 component: UserPostList
               },
               {
                 name: routerName.follower,
-                path: '/u/:uid/p/follower',
+                path: '/u/:uid/profile/follower',
                 component: UserFollowerAndFans,
                 props: { pageType: "follower" }
               },
               {
                 name: routerName.fan,
-                path: '/u/:uid/p/fan',
+                path: '/u/:uid/profile/fan',
                 component: UserFollowerAndFans,
                 props: { pageType: "fan" }
               },
               {
                 name: routerName.column,
-                path: '/u/:uid/p/column',
+                path: '/u/:uid/profile/column',
                 component: UserColumnThread,
               }
             ]
           },
           {
             name: routerName.subscribe,
-            path: '/u/:uid/p/s',
+            path: '/u/:uid/profile/subscribe',
             component: Subscribe,
             children: [
               {
                 name: routerName.blacklist,
-                path: '/u/:uid/p/s/blacklist',
+                path: '/u/:uid/profile/subscribe/blacklist',
                 component: SubscribeBlacklist,
               },
               {
                 name: routerName.subColumns,
-                path: '/u/:uid/p/s/column',
+                path: '/u/:uid/profile/subscribe/column',
                 component: SubscribeColumns,
               },
               {
                 name: routerName.subForums,
-                path: '/u/:uid/p/s/forum',
+                path: '/u/:uid/profile/subscribe/forum',
                 component: SubscribeForums,
               },
               {
                 name: routerName.subUsers,
-                path: '/u/:uid/p/s/user',
+                path: '/u/:uid/profile/subscribe/user',
                 component: SubscribeUsers,
               },
               {
                 name: routerName.subCollection,
-                path: '/u/:uid/p/s/collection',
+                path: '/u/:uid/profile/subscribe/collection',
                 component: SubscribeCollection,
               }
             ]
@@ -122,7 +122,7 @@ export default [
       },
       {
         name: routerName.finance,
-        path: '/u/:uid/p/finance',
+        path: '/u/:uid/profile/finance',
         component: Finance,
       },
     ],

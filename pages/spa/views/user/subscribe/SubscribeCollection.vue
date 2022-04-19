@@ -390,7 +390,7 @@ export default {
     //获取用户收藏的文章
     getThreads(page) {
       const self = this;
-      let url = `/u/${self.uid}/p/s/collection`;
+      let url = `/u/${self.uid}/profile/subscribe/collection`;
       if(self.t) url = url + `?t=${self.t}`;
       if(page) {
         if(url.indexOf('?') === -1) {

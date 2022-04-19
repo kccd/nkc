@@ -47,6 +47,7 @@ import SinglePost from "../../../../../lib/vue/publicVue/postModel/SinglePost";
 import Paging from "../../../../../lib/vue/Paging";
 import ToColumn from "../../../../../lib/vue/publicVue/toColumn/ToColumn";
 import {nkcAPI} from "../../../../../lib/js/netAPI";
+import {getState} from "../../../../../lib/js/state";
 export default {
   data: () => ({
     posts: [],
@@ -80,9 +81,10 @@ export default {
   methods: {
     initData() {
       const {name, params} = this.$route;
+      const {uid: stateUid} = getState();
       this.routeName = name;
       const {uid} = params;
-      this.uid = uid;
+      this.uid = uid || stateUid;
       this.getPostList(0);
     },
     //获取用户卡片信息
@@ -90,7 +92,7 @@ export default {
       this.loading = true;
       const {uid, routeName} = this;
       const self= this;
-      let url = `/u/${uid}/p/${routeName}`;
+      let url = `/u/${uid}/profile/${routeName}`;
       if(page) {
         const index = url .indexOf('?');
         if(index === -1) {

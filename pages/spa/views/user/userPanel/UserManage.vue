@@ -44,7 +44,7 @@ export default {
     //获取用户管理权限
     getManage() {
       const self = this;
-      nkcAPI(`/u/${self.uid}/p/manage`, 'GET')
+      nkcAPI(`/u/${self.uid}/profile/manage`, 'GET')
       .then(res => {
         self.targetUser = res.targetUser;
         self.permissions = res.permissions;

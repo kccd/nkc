@@ -15,6 +15,8 @@ const manageRouter = require('./manage');
 const userRouter = require('./subUser');
 const financeRouter = require('./finance');
 const columnRouter = require('./column');
+const draftRouter  = require('./draft');
+const noteRouter  = require('./note');
 router
   .get('/', async (ctx, next) => {
     //获取主页导航等信息
@@ -186,20 +188,20 @@ router
           links: [
             {
               type: "subscribe/user",
-              url: `/u/${targetUser.uid}/p/s/user`,
+              url: `/u/${targetUser.uid}/profile/subscribe/user`,
               name: "关注的用户",
               count: subUsersId.length
             },
             {
               type: "subscribe/forum",
-              url: `/u/${targetUser.uid}/p/s/forum`,
+              url: `/u/${targetUser.uid}/profile/subscribe/forum`,
               name: "关注的专业",
               count: subForumsId.length
             },
             {
               type: "subscribe/column",
               name: "关注的专栏",
-              url: `/u/${targetUser.uid}/p/s/column`,
+              url: `/u/${targetUser.uid}/profile/subscribe/column`,
               count: subColumnsId.length
             },
             // {
@@ -210,14 +212,14 @@ router
             // },
             {
               type: "subscribe/collection",
-              url: `/u/${targetUser.uid}/p/s/collection`,
+              url: `/u/${targetUser.uid}/profile/subscribe/collection`,
               name: "收藏的文章",
               count: collectionThreadsId.length
             },
             {
               type: 'blacklist',
               name: '黑名单',
-              url: `/u/${targetUser.uid}/p/s/blacklist`,
+              url: `/u/${targetUser.uid}/profile/subscribe/blacklist`,
               count: await db.BlacklistModel.countDocuments({
                 uid: targetUser.uid
               }),
@@ -306,7 +308,7 @@ router
     data.permissions = permissions;
     await next();
   })
-  .use('/s', async (ctx, next) => {
+  .use('/subscribe', async (ctx, next) => {
     const { query, data, db, state } = ctx;
     let { t } = query;
     const { targetUser } = data;
@@ -339,22 +341,23 @@ router
     }
     await next();
   })
-  .get('/s', async (ctx, next) => {
+  .get('/subscribe', async (ctx, next) => {
     await next();
   })
-  .get('/s/user', subUserRouter)
-  .get('/s/forum', subForumRouter)
-  .get('/s/column', subColumnRouter)
-  .get('/s/collection', subCollectionRouter)
-  .get('/s/blacklist', blacklistRouter)
-  .get('/s/thread', subThreadRouter)
+  .get('/subscribe/user', subUserRouter)
+  .get('/subscribe/forum', subForumRouter)
+  .get('/subscribe/column', subColumnRouter)
+  .get('/subscribe/collection', subCollectionRouter)
+  .get('/subscribe/blacklist', blacklistRouter)
+  .get('/subscribe/thread', subThreadRouter)
   .get('/moment', momentRouter)
   .get('/post', postRouter)
   .get('/thread', threadRouter)
   .get('/fan', fanRouter)
   .get('/follower', followerRouter)
   .get('/manage', manageRouter)
-  // .get('/subUser', userRouter)
+  .get('/draft', draftRouter)
+  .get('/note', noteRouter)
   .get('/finance',financeRouter)
   .get('/column', columnRouter)
 module.exports = router;

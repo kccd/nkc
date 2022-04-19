@@ -53,7 +53,7 @@ export default {
     //获取用户主页信息
     getUserInfo() {
       const self = this;
-      nkcAPI(`/u/${this.uid}/p`, 'GET')
+      nkcAPI(`/u/${this.uid}/profile`, 'GET')
       .then(res => {
         self.subForums = res.targetUserSubForums;
         self.navLinks = res.navLinks;

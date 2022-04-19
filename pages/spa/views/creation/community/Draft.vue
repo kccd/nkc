@@ -1,47 +1,23 @@
 <template lang="pug">
-  div.article-common.col-xs-12.col-md-9(style="disply:none" ref='block')
-    Loading(v-show='show')
-    <community-content :iframeUrl="iframeUrl" @closeLoading="closeLoading"></community-content>
+  div.article-common.col-xs-12.col-md-9.m-b-1
+    user-draft(ref="userDraft")
 </template>
 
-
 <script>
-import Loading from '../../../../lib/vue/Loading'
-
-import CommunityContent from '../../../components/CommunityContent.vue'
-import  {getState} from '../../../../lib/js/state.js'
+import UserDraft from "../../../../lib/vue/drafts/UserDraft";
 export default {
   components:{
-    "community-content": CommunityContent,
-    Loading
+    "user-draft": UserDraft
   },
   data: () => ({
-    iframeUrl:'',
-    uid:'',
-    show:false
   }),
-  created(){
-    this.showLoading(true)
-
-    const user = getState();
-    this.uid = user.uid;
-    this.iframeUrl = `/u/${user.uid}/profile/draft?type=hidden`
-  },
   mounted(){
-
   },
   methods:{
-    showLoading(status){
-      this.show = status
-    },
-    closeLoading(){
-      this.showLoading(false)
-      this.$refs.block.style.display = 'block'
-    }
   }
 }
 </script>
-<style scoped>
+<style lang="less" scoped>
 .article-common{
   padding: 0!important;
 }

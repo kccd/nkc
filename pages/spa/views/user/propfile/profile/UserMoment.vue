@@ -61,7 +61,7 @@ export default {
       this.loading = true;
       const {uid} = this;
       const self= this;
-      let url = `/u/${uid}/p/moment`;
+      let url = `/u/${uid}/profile/moment`;
       if(page) {
         const index = url .indexOf('?');
         if(index === -1) {

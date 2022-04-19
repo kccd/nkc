@@ -149,7 +149,7 @@ export default {
     getColumnThreads(page) {
      this.loading = true;
      const self = this;
-      let url = `/u/${this.uid}/p/column`;
+      let url = `/u/${this.uid}/profile/column`;
       if(page) {
         if(url.indexOf('?') === -1) {
           url = url + `?page=${page}`;

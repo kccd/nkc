@@ -22,7 +22,7 @@ export default {
     },
     getSubThread(page) {
       const self = this;
-      let url = `/u/${self.uid}p/s/thread`
+      let url = `/u/${self.uid}/profile/subscribe/thread`
       if(this.t) {
         url += `?t=${this.t}`;
       }
