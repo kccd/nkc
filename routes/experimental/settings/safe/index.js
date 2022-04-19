@@ -119,6 +119,7 @@ router
         uid,
         toc,
         password,
+        userXSF: user.xsf,
         userBanned: user.certs.includes('banned'),
         userToc: user.toc,
         userTlm: user.tlv,
@@ -130,42 +131,34 @@ router
       });
     }
     await next();
-    /*const list = await db.WeakPasswordResultModel.aggregate([
-      { $match: {} },
-      { $skip: paging.start },
-      { $limit: paging.perpage },
-      { $lookup: {
-          from: "users",
-          localField: "uid",
-          foreignField: "uid",
-          as: "userinfo"
-      } },
-      { $unwind: "$userinfo" },
-      { $project: {
-          uid: 1,
-          password: 1,
-          toc: 1,
-          _id: 0,
-          "userinfo.username": 1,
-          "userinfo.avatar": 1,
-          "userinfo.tlm": 1,
-      } }
-    ]);*/
-    // const uidArr = [];
-    // for(const l of list) {
-    //   uidArr.push(l.uid);
-    // }
-    // //查找出对应的用户数据
-    // const users = await db.UserModel.find({uid: {$in: uidArr}});
-    // const userObj = {};
-    // for(const u of users) {
-    //   userObj[u.uid] = u;
-    // }
-    // for(const l of list) {
-    //   l.user = userObj[l.uid];
-    // }
-    // console.log('list', list);
-    // data.list = list;
-    // return next();
+  })
+  .post("/weakPasswordCheck/result", async (ctx, next) => {
+    const {db, state} = ctx;
+    const results = await db.WeakPasswordResultModel.find({}, {uid: 1});
+    const resultsUsersId = results.map(r => r.uid);
+    const users = await db.UserModel.find({uid: {$in: resultsUsersId}, certs: {$ne: 'banned'}}, {uid: 1});
+    const toc = Date.now();
+    const usersId = [];
+    for(const user of users) {
+      usersId.push(user.uid);
+      await db.ManageBehaviorModel.insertLog({
+        ip: ctx.address,
+        port: ctx.port,
+        uid: state.uid,
+        toUid: user.uid,
+        operationId: 'bannedUser',
+        toc,
+      });
+    }
+    if(usersId.length > 0) {
+      await db.UserModel.updateMany({
+        uid: {$in: usersId}
+      }, {
+        $addToSet: {
+          certs: 'banned'
+        }
+      });
+    }
+    await next();
   });
 module.exports = router;

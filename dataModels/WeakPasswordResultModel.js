@@ -17,7 +17,7 @@ const schema = new Schema({
   toc: {
     type: Date,
     default: Date.now
-  },
+  }
 });
 
 let checkWorker = null;

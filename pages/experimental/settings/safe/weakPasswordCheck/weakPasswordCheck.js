@@ -31,3 +31,14 @@ new Vue({
 window.viewText = (text) => {
   sweetAlert(text)
 }
+
+window.bannedAllUser = () => {
+  return sweetQuestion(`确定要封禁所有弱密码用户`)
+    .then(() => {
+      return nkcAPI('/e/settings/safe/weakPasswordCheck/result', 'POST')
+    })
+    .then(() => {
+      sweetSuccess('执行成功');
+    })
+    .catch(sweetError);
+}
