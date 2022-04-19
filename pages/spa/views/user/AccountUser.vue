@@ -21,7 +21,6 @@
 @import "../../../publicModules/base";
 .left-panel-box{
   height: 100%;
-
 }
 
 @media (min-width: 992px) {

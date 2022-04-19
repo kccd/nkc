@@ -132,6 +132,7 @@
             .account-user-name{
               font-size: 20px;
               font-weight: bold;
+              text-shadow: 1px 0px 2px #FFF;
               @media (max-width: 991px){
                 font-size: 16px;
                 font-weight: bold;
