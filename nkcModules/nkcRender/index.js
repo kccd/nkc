@@ -56,7 +56,7 @@ class NKCRender {
         if(href && !domainWhitelistReg.test(href)) {
           a.attr("target", "_blank");
           // 通过提示页代理外链的访问
-          const url = Buffer.from(encodeURIComponent(href)).toString('base64')
+          const url = encodeURIComponent(Buffer.from(href).toString('base64'));
           a.attr("href", "/l?t=" + url);
           // a.attr('data-type', 'nkc-url');
           // a.attr('data-url', url);
