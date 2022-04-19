@@ -226,18 +226,6 @@ router
             }
           ]
         },
-        // {
-        //   name: "我的交往",
-        //   links: [
-        //     {
-        //       type: "follower",
-        //       name: "我的粉丝",
-        //       url: `/u/${targetUser.uid}/profile/follower`,
-        //       count: data.fansId.length
-        //     },
-        //
-        //   ]
-        // }
       ];
       data.name = "";
       data.navLinks.map(nav => {
@@ -267,10 +255,16 @@ router
         $in: fans.map(s => s.uid)
       }
     });
-    const fansCount = targetUserFans.length
-    const followersCount = targetUserFollowers.length
-    data.fansCount = fansCount;
-    data.followersCount = followersCount;
+    data.fansCount = await db.SubscribeModel.countDocuments({
+      type: "user",
+      cancel: false,
+      tUid: targetUser.uid,
+    });
+    data.followersCount = await db.SubscribeModel.countDocuments({
+      type: "user",
+      cancel: false,
+      uid: targetUser.uid
+    });
     data.targetUserFans = await db.UserModel.extendUsersInfo(targetUserFans);
     data.targetUserFollowers = await db.UserModel.extendUsersInfo(targetUserFollowers);
     data.code = await db.UserModel.getCode(targetUser.uid);

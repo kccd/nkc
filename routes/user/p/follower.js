@@ -56,5 +56,6 @@ module.exports = async (ctx, next) => {
       return !u.certs.includes('banned') && !u.hidden;
     })
   }
+  data.paging = paging;
   await next();
 }
