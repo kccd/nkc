@@ -80,9 +80,6 @@ export default {
       this.showBanBox = true;
     }
   },
-  mounted() {
-    console.log('certs', this.targetUser.certs);
-  },
   methods: {
     //点击显示禁止内容
     clickBanContext(type){

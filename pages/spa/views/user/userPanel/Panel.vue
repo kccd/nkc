@@ -271,7 +271,6 @@ export default {
     this.initData()
     this.getPanelData()
     EventBus.$on('addToBl',()=>{
-      console.log('1111')
       this.subscribeBtnType = false
     })
   },

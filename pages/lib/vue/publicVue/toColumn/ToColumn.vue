@@ -261,7 +261,6 @@ export default  {
       nkcAPI("/m/" + this.columnId + "/category?from=dialog", "GET")
         .then(function(data) {
           this_.column = data.column;
-          console.log('data', data);
           for(var i = 0; i < data.mainCategories.length; i++) {
             var c = data.mainCategories[i];
             var str = "";
