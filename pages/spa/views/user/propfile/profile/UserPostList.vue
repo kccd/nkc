@@ -80,9 +80,14 @@ export default {
   },
   methods: {
     initData() {
-      const {name, params} = this.$route;
+      const {params, path} = this.$route;
       const {uid: stateUid} = getState();
-      this.routeName = name;
+      const index = path.indexOf('thread');
+      if(index === -1) {
+        this.routeName = 'post';
+      } else {
+        this.routeName = 'thread';
+      }
       const {uid} = params;
       this.uid = uid || stateUid;
       this.getPostList(0);

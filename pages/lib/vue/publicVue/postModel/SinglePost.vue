@@ -13,8 +13,7 @@
         span(v-if="post.parentPostId") 评论
         span(v-else) 回复
 
-  a(:href="post.link" v-if="post.postType === 'postToThread'")
-    .single-post-count {{post.abstract || post.content}}
+  a.single-post-content(:href="post.link" v-if="post.postType === 'postToThread'") {{post.abstract || post.content}}
   .post-content-body(v-else)
     .post-cover
       .post-cover-img(:style="`background-image: url('${getUrl('postCover', post.cover)}')`")
@@ -98,7 +97,6 @@
       -webkit-line-clamp: 3;
       overflow: hidden;
     }
-
     .single-post-content:hover, .single-post-content:link, .single-post-content:active, .single-post-content:visited {
       text-decoration: none;
       color: #282c37;
