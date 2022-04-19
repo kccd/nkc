@@ -21,7 +21,11 @@
 @import "../../../publicModules/base";
 .left-panel-box{
   height: 100%;
-  .left-panel-box-operation{
+
+}
+
+@media (min-width: 992px) {
+  .left-panel-box-operation.fa{
     display: none;
   }
 }

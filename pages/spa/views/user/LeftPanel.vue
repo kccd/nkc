@@ -15,9 +15,6 @@
     //- 用户链接
     .m-b-1(v-if="isSelf")
       nav-links(ref="userLink" v-if="rolePermissionsType" :nav-links="navLinks")
-    //用户关注
-    //.m-b-1(v-if="rolePermissionsType" )
-    //  user-focus-on(ref="userFocusOn")
     .m-b-1
       user-manage(ref="userManage")
     //  分享链接
