@@ -56,18 +56,23 @@ router.get('/:aid', async (ctx, next)=>{
       }
     }
     //获取评论分页
-    const count = await db.CommentModel.countDocuments(match);
+    let count = 0;
+    if(articlePost) {
+      count = await db.CommentModel.countDocuments(match);
+    }
     const paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
     data.paging = paging;
-    //获取该文章下当前用户编辑了未发布的评论内容
-    const m = {
-      uid: state.uid,
-      status: defaultComment,
-    };
-    let comment = await db.CommentModel.getCommentsByArticleId({match: m});
-    let comments;
+    //获取该文章下当前用户编辑了未发布的评论内容 必须通过专栏评论盒子去查找评论，如果没有评论盒子评论就为空
+    let comment = null;
+    let comments = [];
     //获取该文章下的评论 存在评论盒子时才查找当前文章下的评论
     if(articlePost) {
+      const m = {
+        uid: state.uid,
+        status: defaultComment,
+        sid: articlePost._id
+      };
+      comment = await db.CommentModel.getCommentsByArticleId({match: m});
       comments = await db.CommentModel.getCommentsByArticleId({match, paging});
     }
     if(comments && comments.length !== 0) {

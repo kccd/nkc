@@ -21,8 +21,12 @@
           span 我已阅读并同意遵守与本次发表相关的全部协议。
           a(href="/protocol" target="_blank") 查看协议
     .m-b-05
-      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="!commentContent") 发布
-      button.m-r-05.btn.btn-default.btn-sm(@click="saveComment" :disabled="!commentContent") 暂存
+      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="!commentContent || lockPost" v-if="!publishing") 发布
+      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="!commentContent || lockPost" v-if="publishing") 发布中...
+        span.fa.fa-spinner.fa-spin
+      button.m-r-05.btn.btn-default.btn-sm(@click="saveComment" :disabled="!commentContent || lockPost" v-if="!saving") 暂存
+      button.m-r-05.btn.btn-default.btn-sm(@click="saveComment" :disabled="!commentContent || lockPost" v-if="saving") 暂存中...
+        span.fa.fa-spinner.fa-spin
       .pull-right
         a(href="") 历史版本
 </template>
@@ -75,6 +79,8 @@
       checkProtocol: true,
       // 是否允许触发contentChange
       contentChangeEventFlag: false,
+      publishing: false,
+      saving: false,
     }),
     components: {
       'editor': Editor
@@ -130,6 +136,11 @@
       },
       //提交修改评论内容
       post(type) {
+        if(type === 'publish') {
+          this.publishing = true;
+        } else if(type === 'save') {
+          this.saving = true;
+        }
         if(!this.checkProtocol) sweetWarning('请勾选协议！');
         if(!type) return;
         if(this.lockPost) return;
@@ -148,18 +159,21 @@
         .then(res => {
           self.commentId = res.commentId;
           if(type !== 'publish') {
-            self.lockPost = false;
+            if(type === 'save') {
+              self.saving = false;
+            }
             self.type = 'modify';
           } else {
             sweetSuccess('发布成功！');
             self.contentChangeEventFlag = false;
             //发布成功后通知上层将content清空
             self.clearContent();
-            self.lockPost = false;
             self.type = 'create';
             self.quote = null;
+            self.publishing = false;
           }
           self.setSavedStatus('succeeded');
+          self.lockPost = false;
         })
         .catch(err => {
           self.setSavedStatus('failed');
