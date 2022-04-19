@@ -146,6 +146,14 @@ schema.statics.checkCommentSource = async (source) => {
 
 /*
 * 创建comment
+* @params {Object} options 创建comment需要的内容
+*  @params {string} uid 创建评论的uid
+*  @params {string} content 评论的内容
+*  @params {string} sid 评论的盒子id
+*  @params {string} ip 评论的创建人的ip
+*  @params {string} port 评论的创建人的设备端口
+*  @params {string} quoteId 评论的引用的内容的id
+*  @params {string} source 评论的内容的来源
 * */
 schema.statics.createComment = async (options) => {
   const {uid, content, sid, ip, port, quoteDid, source} = options;
@@ -247,6 +255,7 @@ schema.methods.modifyComment = async function (props) {
   const {content, quoteDid} = props;
   const {did} = this;
   const tlm = new Date();
+  //通过id去更新document的内容
   await DocumentModel.updateDocumentByDid(did, {
     quoteDid,
     content,
