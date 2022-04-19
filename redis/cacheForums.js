@@ -18,6 +18,9 @@ async function func() {
   const rolesDB = await RoleModel.find();
   const gradesDB = await UsersGradeModel.find();
 
+  const rolesDBIds = rolesDB.map(role => role._id);
+  const gradesDBIds = gradesDB.map(grade => grade._id);
+
   const roles = {};
   const grades = {};
   const rolesAndGrades = {};
@@ -44,7 +47,9 @@ async function func() {
       fid
     } = forum;
 
-    const {rolesId, gradesId, relation} = forum.permission.read;
+    let {rolesId, gradesId, relation} = forum.permission.read;
+    rolesId = rolesId.filter(roleId => rolesDBIds.includes(roleId));
+    gradesId = gradesId.filter(gradeId => gradesDBIds.includes(gradeId));
 
     // 专家
     forum.moderators.map(uid => {
