@@ -83,5 +83,26 @@ manageBehaviorSchema.methods.extendOperationName = async function(){
 	return this.operationData = operationData
 }
 
+manageBehaviorSchema.statics.insertLog = async (props) => {
+  const ManageBehaviorModel = mongoose.model('manageBehaviors');
+  const {
+    uid,
+    toUid,
+    operationId,
+    toc,
+    ip,
+    port,
+  } = props;
+  const log = ManageBehaviorModel({
+    uid,
+    toUid,
+    operationId,
+    toc,
+    ip,
+    port
+  });
+  await log.save();
+}
+
 const ManageBehaviorModel = mongoose.model('manageBehaviors', manageBehaviorSchema);
 module.exports = ManageBehaviorModel;
