@@ -36,9 +36,6 @@
   .checkbox label{
     min-height: 15px;
   }
-  .user-post-list {
-    padding: 0 15px;
-  }
 }
 </style>
 <script>
