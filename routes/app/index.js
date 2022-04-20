@@ -7,6 +7,7 @@ const downloadRouter = require("./download");
 const { upload } = require('../../settings');
 const upgradeRouter = require('./upgrade');
 const accountRouter = require('./account');
+const ProfileRouter = require('./profile');
 const { androidSavePath, iosSavePath } = upload;
 appRouter
   .get('/', async (ctx, next) => {
@@ -72,4 +73,5 @@ appRouter
   .use('/download', downloadRouter.routes(), downloadRouter.allowedMethods())
   .use('/upgrade', upgradeRouter.routes(), upgradeRouter.allowedMethods())
   .use('/account', accountRouter.routes(), accountRouter.allowedMethods())
+  .use('/profile', ProfileRouter.routes(), ProfileRouter.allowedMethods())
 module.exports = appRouter;

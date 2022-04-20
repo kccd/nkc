@@ -21,6 +21,24 @@ module.exports = {
 	download: {
 		GET: "appGetDownload"
 	},
+	profile: {
+		GET: "appVisitProfile",
+		sub: {
+			GET: "appVisitProfile",
+			user: {
+				GET: "appVisitProfile",
+			},
+			forum: {
+				GET: "appVisitProfile",
+			},
+			column: {
+				GET: "appVisitProfile",
+			},
+			thread: {
+				GET: "appVisitProfile",
+			},
+		},
+	},
 	scoreChange: {
 		PARAMETER: {
 			GET: 'APPgetScoreChange'
