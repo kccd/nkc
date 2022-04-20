@@ -1,8 +1,8 @@
 <template lang="pug">
   .account-user-links(v-if="targetUser")
-    a(:href="`/u/${targetUser.uid}`" target='_blank').col-xs-6.account-user-link
-      .fa.fa-user-circle-o
-      | 访客视角
+    //a(:href="`/u/${targetUser.uid}`" target='_blank').col-xs-6.account-user-link
+    //  .fa.fa-user-circle-o
+    //  | 访客视角
     a(href="/message" target='_blank').col-xs-6.account-user-link
       .fa.fa-comments
       | 消息中心

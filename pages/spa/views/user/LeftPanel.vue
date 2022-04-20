@@ -14,8 +14,8 @@
       user-operate(:target-user="targetUser")
     //- 用户链接
     .m-b-1(v-if="isSelf")
-      nav-links(ref="userLink" v-if="rolePermissionsType" :nav-links="navLinks")
-    .m-b-1(v-if="")
+      nav-links(ref="userLink" :nav-links="navLinks")
+    .m-b-1(v-if="permissions.reviewed")
       user-manage(ref="userManage")
     //  分享链接
     .m-b-1
@@ -67,8 +67,8 @@ export default {
   mounted() {
     const self = this;
     this.initData();
-    EventBus.$on('permissions', function(permissions) {
-      self.permissions = permissions;
+    EventBus.$on('permissions', (res) => {
+      self.permissions = res;
     });
   },
   methods: {

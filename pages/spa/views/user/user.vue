@@ -55,7 +55,6 @@ export default {
       const self = this;
       nkcAPI(`/u/${this.uid}/profile`, 'GET')
       .then(res => {
-        EventBus.$emit('permissions', res.permissions);
         self.subForums = res.targetUserSubForums;
         self.navLinks = res.navLinks;
         self.targetUser = res.targetUser;
