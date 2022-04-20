@@ -4,7 +4,7 @@
     .user-list-warning(v-if="(!posts || posts.length === 0) && !loading") 用户貌似未发表过任何内容
     .user-post-list
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
-      .paging-button(v-if="routeName === 'thread'" )
+      .paging-button(v-if="routeName === 'thread' && permissions.reviewed" )
         a.pointer.button.radius-left.radius-right(@click="managementPosts()") 管理
         span.post-management-button
           a.pointer.button(@click="selectAll()") 全选
@@ -112,7 +112,8 @@ export default {
           self.paging = res.paging;
           self.posts = res.posts;
           self.permissions = res.permissions;
-          this.loading = false;
+          console.log('permissions', self.permissions);
+          self.loading = false;
         })
         .catch(err => {
           sweetError(err);

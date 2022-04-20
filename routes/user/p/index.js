@@ -23,9 +23,9 @@ router
     const {db, state, data, params, nkcModules } = ctx;
     const {user, targetUser} = data;
     // 验证权限
-    if (user.uid !== targetUser.uid && !ctx.permission("visitAllUserProfile")) {
-      ctx.throw(403, "权限不足");
-    }
+    // if (user.uid !== targetUser.uid && !ctx.permission("visitAllUserProfile")) {
+    //   ctx.throw(403, "权限不足");
+    // }
     //获取关注的用户
     const subUsersId = await db.SubscribeModel.getUserSubUsersId(targetUser.uid);
     //获取关注的专栏id
@@ -64,175 +64,177 @@ router
     });
     //获取收藏的文章id
     const collectionThreadsId = await db.SubscribeModel.getUserCollectionThreadsId(targetUser.uid);
-    if(state.isApp) {
-      data.appLinks = [
-        {
-          type: "thread",
-          url: `/u/${targetUser.uid}/profile/thread`,
-          name: "我的文章",
-        },
-        {
-          type: "post",
-          url: `/u/${targetUser.uid}/profile/post`,
-          name: "我的回复",
-        },
-        {
-          type: "draft",
-          url: `/u/${targetUser.uid}/profile/draft`,
-          name: "我的草稿",
-        },
-        {
-          type: "note",
-          name: "我的笔记",
-          url: `/u/${targetUser.uid}/profile/note`,
-        },
-        {
-          type: "subscribe/user",
-          url: `/u/${targetUser.uid}/profile/subscribe/user`,
-          name: "关注的用户",
-        },
-        {
-          type: "subscribe/forum",
-          url: `/u/${targetUser.uid}/profile/subscribe/forum`,
-          name: "关注的专业",
-        },
-        /*{
-          type: "subscribe/topic",
-          url: `/u/${targetUser.uid}/profile/subscribe/topic`,
-          name: "关注的话题",
-        },
-        {
-          type: "subscribe/discipline",
-          url: `/u/${targetUser.uid}/profile/subscribe/discipline`,
-          name: "关注的学科",
-        },*/
-        {
-          type: "subscribe/column",
-          name: "关注的专栏",
-          url: `/u/${targetUser.uid}/profile/subscribe/column`,
-        },
-        {
-          type: "subscribe/thread",
-          url: `/u/${targetUser.uid}/profile/subscribe/thread`,
-          name: "关注的文章",
-        },
-        {
-          type: "subscribe/collection",
-          url: `/u/${targetUser.uid}/profile/subscribe/collection`,
-          name: "收藏的文章",
-        },
-        {
-          type: "finance",
-          url: `/u/${targetUser.uid}/profile/finance?t=all`,
-          name: "我的账单",
-        },
-        {
-          type: "follower",
-          name: "我的粉丝",
-          url: `/u/${targetUser.uid}/profile/follower`,
-        },
-        {
-          type: 'blacklist',
-          name: '黑名单',
-          url: `/u/${targetUser.uid}/profile/blacklist`,
-        }
-      ];
-      data.name = "";
-      data.appLinks.map(link => {
-        if (data.type === link.type) data.name = link.name;
-      });
-    } else {
-      data.navLinks = [
-        // {
-        //   name: "",
-        //   links: [
-        //     {
-        //       type: "",
-        //       url: `/u/${targetUser.uid}/profile`,
-        //       name: "数据概览",
-        //       count: 0
-        //     }
-        //   ]
-        // },
-        // {
-        //   name: "我的作品",
-        //   links: [
-        //     {
-        //       type: "thread",
-        //       url: `/u/${targetUser.uid}/profile/thread`,
-        //       name: "我的文章",
-        //       count: threadCount
-        //     },
-        //     {
-        //       type: "post",
-        //       url: `/u/${targetUser.uid}/profile/post`,
-        //       name: "我的回复",
-        //       count: postCount
-        //     },
-        //     {
-        //       type: "draft",
-        //       url: `/u/${targetUser.uid}/profile/draft`,
-        //       name: "我的草稿",
-        //       count: draftCount
-        //     },
-        //     {
-        //       type: "note",
-        //       url: `/u/${targetUser.uid}/profile/note`,
-        //       name: "我的笔记",
-        //       count: noteCount
-        //     }
-        //   ]
-        // },
-        {
-          name: "我的关注",
-          links: [
-            {
-              type: "subscribe/user",
-              url: `/u/${targetUser.uid}/profile/subscribe/user`,
-              name: "关注的用户",
-              count: subUsersId.length
-            },
-            {
-              type: "subscribe/forum",
-              url: `/u/${targetUser.uid}/profile/subscribe/forum`,
-              name: "关注的专业",
-              count: subForumsId.length
-            },
-            {
-              type: "subscribe/column",
-              name: "关注的专栏",
-              url: `/u/${targetUser.uid}/profile/subscribe/column`,
-              count: subColumnsId.length
-            },
-            // {
-            //   type: "subscribe/thread",
-            //   url: `/u/${targetUser.uid}/profile/subscribe/thread`,
-            //   name: "关注的文章",
-            //   count: data.subThreadsId.length
-            // },
-            {
-              type: "subscribe/collection",
-              url: `/u/${targetUser.uid}/profile/subscribe/collection`,
-              name: "收藏的文章",
-              count: collectionThreadsId.length
-            },
-            {
-              type: 'blacklist',
-              name: '黑名单',
-              url: `/u/${targetUser.uid}/profile/subscribe/blacklist`,
-              count: await db.BlacklistModel.countDocuments({
-                uid: targetUser.uid
-              }),
-            }
-          ]
-        },
-      ];
-      data.name = "";
-      data.navLinks.map(nav => {
-        nav.links.map(link => {
+    if(user.uid === targetUser.uid) {
+      if(state.isApp) {
+        data.appLinks = [
+          {
+            type: "thread",
+            url: `/u/${targetUser.uid}/profile/thread`,
+            name: "我的文章",
+          },
+          {
+            type: "post",
+            url: `/u/${targetUser.uid}/profile/post`,
+            name: "我的回复",
+          },
+          {
+            type: "draft",
+            url: `/u/${targetUser.uid}/profile/draft`,
+            name: "我的草稿",
+          },
+          {
+            type: "note",
+            name: "我的笔记",
+            url: `/u/${targetUser.uid}/profile/note`,
+          },
+          {
+            type: "subscribe/user",
+            url: `/u/${targetUser.uid}/profile/subscribe/user`,
+            name: "关注的用户",
+          },
+          {
+            type: "subscribe/forum",
+            url: `/u/${targetUser.uid}/profile/subscribe/forum`,
+            name: "关注的专业",
+          },
+          /*{
+            type: "subscribe/topic",
+            url: `/u/${targetUser.uid}/profile/subscribe/topic`,
+            name: "关注的话题",
+          },
+          {
+            type: "subscribe/discipline",
+            url: `/u/${targetUser.uid}/profile/subscribe/discipline`,
+            name: "关注的学科",
+          },*/
+          {
+            type: "subscribe/column",
+            name: "关注的专栏",
+            url: `/u/${targetUser.uid}/profile/subscribe/column`,
+          },
+          {
+            type: "subscribe/thread",
+            url: `/u/${targetUser.uid}/profile/subscribe/thread`,
+            name: "关注的文章",
+          },
+          {
+            type: "subscribe/collection",
+            url: `/u/${targetUser.uid}/profile/subscribe/collection`,
+            name: "收藏的文章",
+          },
+          {
+            type: "finance",
+            url: `/u/${targetUser.uid}/profile/finance?t=all`,
+            name: "我的账单",
+          },
+          {
+            type: "follower",
+            name: "我的粉丝",
+            url: `/u/${targetUser.uid}/profile/follower`,
+          },
+          {
+            type: 'blacklist',
+            name: '黑名单',
+            url: `/u/${targetUser.uid}/profile/blacklist`,
+          }
+        ];
+        data.name = "";
+        data.appLinks.map(link => {
           if (data.type === link.type) data.name = link.name;
-        })
-      });
+        });
+      } else {
+        data.navLinks = [
+          // {
+          //   name: "",
+          //   links: [
+          //     {
+          //       type: "",
+          //       url: `/u/${targetUser.uid}/profile`,
+          //       name: "数据概览",
+          //       count: 0
+          //     }
+          //   ]
+          // },
+          // {
+          //   name: "我的作品",
+          //   links: [
+          //     {
+          //       type: "thread",
+          //       url: `/u/${targetUser.uid}/profile/thread`,
+          //       name: "我的文章",
+          //       count: threadCount
+          //     },
+          //     {
+          //       type: "post",
+          //       url: `/u/${targetUser.uid}/profile/post`,
+          //       name: "我的回复",
+          //       count: postCount
+          //     },
+          //     {
+          //       type: "draft",
+          //       url: `/u/${targetUser.uid}/profile/draft`,
+          //       name: "我的草稿",
+          //       count: draftCount
+          //     },
+          //     {
+          //       type: "note",
+          //       url: `/u/${targetUser.uid}/profile/note`,
+          //       name: "我的笔记",
+          //       count: noteCount
+          //     }
+          //   ]
+          // },
+          {
+            name: "我的关注",
+            links: [
+              {
+                type: "subscribe/user",
+                url: `/u/${targetUser.uid}/profile/subscribe/user`,
+                name: "关注的用户",
+                count: subUsersId.length
+              },
+              {
+                type: "subscribe/forum",
+                url: `/u/${targetUser.uid}/profile/subscribe/forum`,
+                name: "关注的专业",
+                count: subForumsId.length
+              },
+              {
+                type: "subscribe/column",
+                name: "关注的专栏",
+                url: `/u/${targetUser.uid}/profile/subscribe/column`,
+                count: subColumnsId.length
+              },
+              // {
+              //   type: "subscribe/thread",
+              //   url: `/u/${targetUser.uid}/profile/subscribe/thread`,
+              //   name: "关注的文章",
+              //   count: data.subThreadsId.length
+              // },
+              {
+                type: "subscribe/collection",
+                url: `/u/${targetUser.uid}/profile/subscribe/collection`,
+                name: "收藏的文章",
+                count: collectionThreadsId.length
+              },
+              {
+                type: 'blacklist',
+                name: '黑名单',
+                url: `/u/${targetUser.uid}/profile/subscribe/blacklist`,
+                count: await db.BlacklistModel.countDocuments({
+                  uid: targetUser.uid
+                }),
+              }
+            ]
+          },
+        ];
+        data.name = "";
+        data.navLinks.map(nav => {
+          nav.links.map(link => {
+            if (data.type === link.type) data.name = link.name;
+          })
+        });
+      }
     }
     //获取用户个人主页的粉丝和关注
     const sub = await db.SubscribeModel.find({
