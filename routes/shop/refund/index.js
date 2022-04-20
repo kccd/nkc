@@ -15,7 +15,7 @@ router
     if(order.buyUid !== user.uid) ctx.throw(400, "您没有权限操作别人的订单");
     const orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
     order = (await db.ShopOrdersModel.translateOrderStatus(orders))[0];
-    const {refundStatus, orderStatus} = order;
+    const {refundStatus, orderStatus, shipToc, orderFreightPrice} = order;
     // 判断订单退款的状态
     if(refundStatus === "ing") ctx.throw(400, "订单正在退款中，请勿重复提交申请");
     if(refundStatus === "success") ctx.throw(400, "订单退款已完成，请勿重复提交申请");
@@ -62,13 +62,21 @@ router
         paramId: param?param.costId: "",
         root
       };
+      
       let refundMoney = Number(money)*100;
+      // 未发货 退回运费
+      let orderPrice;
+      if(shipToc === null){
+        orderPrice = order.orderPrice + orderFreightPrice;
+      }else{
+        orderPrice = order.orderPrice;
+      }
       refundMoney = Number(refundMoney.toFixed(2));
       if(refundMoney < 0) ctx.throw(400, "退款金额不能小于0");
       if(param) {
         if(refundMoney > param.singlePrice * param.count) ctx.throw(400, "退款金额不能超过要退款的商品的金额");
       } else {
-        if(refundMoney > order.orderPrice) ctx.throw(400, "退款金额不能超过全部商品的总金额");
+        if(refundMoney > orderPrice) ctx.throw(400, "退款金额不能超过全部商品的总金额");
       }
       r.money = refundMoney;
       if(orderStatus === "unShip") {
