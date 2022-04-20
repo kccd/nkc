@@ -109,7 +109,6 @@ export default {
           self.paging = res.paging;
           self.posts = res.posts;
           self.permissions = res.permissions;
-          console.log('permissions', self.permissions);
           self.loading = false;
         })
         .catch(err => {

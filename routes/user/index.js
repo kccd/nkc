@@ -64,7 +64,9 @@ userRouter
     const {data, db, params} = ctx;
     data.targetUser = await db.UserModel.findOne({uid: params.uid});
     if(!data.targetUser) ctx.throw(404, `不存在ID为${params.uid}的用户`);
+    //拓展用户权限
     await data.targetUser.extendRoles();
+    //拓展用户等级
     await data.targetUser.extendGrade();
     await data.targetUser.extendDraftCount();
     await db.UserModel.extendUserInfo(data.targetUser);
