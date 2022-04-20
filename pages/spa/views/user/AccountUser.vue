@@ -14,7 +14,7 @@
             router-view
           //user-card(ref="userCard")
         //用户右侧面板
-        .col-xs-12.col-md-3
+        .col-xs-12.col-md-3.right-panel-container
           right-panel(:forums="forums" :target-user="targetUser" :target-user-fans="targetUserFans" :target-user-followers="targetUserFollowers" )
 </template>
 <style lang="less">
@@ -26,6 +26,10 @@
 @media (min-width: 992px) {
   .left-panel-box-operation.fa{
     display: none;
+  }
+  .center-panel-container {
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 @media (max-width: 991px) {
@@ -43,6 +47,9 @@
   .left-panel-box-show{
     height: 100%;
     transition: height 1s;
+  }
+  .box-shadow-panel {
+
   }
 }
 </style>
