@@ -24,7 +24,6 @@
 </template>
 <style lang="less">
 .user-column-thread{
-  padding: 0 15px;
   a{
     cursor: pointer;
   }

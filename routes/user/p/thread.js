@@ -9,6 +9,7 @@ module.exports = async (ctx, next) => {
   if(data.user) {
     canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
   }
+  const superModerator = ctx.permission("superModerator");
   //获取用户的文章
   const q = {
     uid: targetUser.uid,

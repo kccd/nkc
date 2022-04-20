@@ -4,7 +4,8 @@
     .user-list-warning(v-if="(!users || users.length === 0) && !loading") 空空如也~
     //- user-info 数组中的一个用户对象
     .col-xs-12.col-md-6(v-for="user in users" v-else)
-      user-info( :key="user.uid" :user="user" :page-type="t" :sub-uid="userSubUid")
+      .row
+        user-info( :key="user.uid" :user="user" :page-type="t" :sub-uid="userSubUid")
 </template>
 
 <script>

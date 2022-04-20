@@ -7,17 +7,17 @@
   .module-dialog-content
     .select-type
       label(for="", style="margin-left: 5px")
-        span 
+        span
           | 新建分组
           input(type="radio", value="text", v-model="selectType")
       label(for="", style="margin-left: 10px")
-        span 
+        span
           | 新建URL
           input(type="radio", value="url", v-model="selectType")
       label(for="", style="margin-left: 10px")
-        span 
+        span
           | 新建POST
-          input(type="radio", value="post", v-model="selectType") 
+          input(type="radio", value="post", v-model="selectType")
       .add-url(v-show="selectType === 'url'")
         p.url-title
           span 标题:
@@ -63,7 +63,7 @@
                 p.postId {{ post.firstPost.t }}
                 p.postContent {{ post.firstPost.c }}
             li(v-if="postList.length === 0", style="font-size: 24px") 数据加载中...
-            li(v-else-if="!postList", style="font-size: 24px") 暂无数据  
+            li(v-else-if="!postList", style="font-size: 24px") 暂无数据
     .paging(v-show="selectType === 'post'")
       .post-list-paging(v-if="paging.buttonValue && paging.buttonValue.length")
         span(
@@ -208,7 +208,6 @@ export default {
       this.postList = [];
       const result = await nkcAPI(url, "get");
       this.postList = result.threads;
-      console.log(result.paging)
       this.paging = result.paging;
       if (!result.threads.length) {
         sweetError("没有查找到数据");
@@ -513,4 +512,3 @@ export default {
 }
 </style>
 
-          

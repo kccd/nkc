@@ -18,7 +18,6 @@
 </template>
 <style lang="less" scoped>
 .share-box{
-  padding: 15px;
   transition: box-shadow 300ms;
 }
 .share{

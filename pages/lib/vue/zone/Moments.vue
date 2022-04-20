@@ -21,7 +21,6 @@
   .moment-container{
     border-bottom: 1px solid #eee;
     margin-bottom: 1.5rem;
-    padding: 0 15px;
   }
 </style>
 
