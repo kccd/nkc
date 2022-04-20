@@ -31,6 +31,10 @@ export const routerName = {
   subCollection: 'subCollection',
   finance: 'finance',
   column: 'column',
+  appSubUser: 'subUser',
+  appSubForum: 'subForum',
+  appSubColumn: 'subColumn',
+  appSubThread: 'subThread',
 }
 
 export default [
@@ -127,6 +131,32 @@ export default [
       },
     ],
     
+  },
+  {
+    name: routerName.appSubUser,
+    path: '/app/profile',
+    children: [
+      {
+        name: routerName.appSubUser,
+        path: '/app/profile/sub/user',
+        component: SubscribeUsers
+      },
+      {
+        name: routerName.appSubForum,
+        path: '/app/profile/sub/forum',
+        component: SubscribeForums
+      },
+      {
+        name: routerName.appSubColumn,
+        path: '/app/profile/sub/column',
+        component: SubscribeColumns
+      },
+      {
+        name: routerName.appSubThread,
+        path: '/app/profile/sub/thread',
+        component: SubscribeCollection
+      },
+    ]
   }
 ]
 
