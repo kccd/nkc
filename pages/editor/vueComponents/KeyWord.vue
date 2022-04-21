@@ -127,9 +127,9 @@ export default {
   },
   mounted(){
     this.draggableElement = new DraggableElement(
-          this.$refs.model,
-          this.$refs.addKeyword
-        );
+      this.$refs.model,
+      this.$refs.addKeyword
+    );
   },
   destroyed(){
     this.draggableElement.destroy && this.draggableElement.destroy();
@@ -137,7 +137,6 @@ export default {
   methods: {
     close() {
       this.showModel = false;
-      
     },
     open() {
       this.showModel = true;
