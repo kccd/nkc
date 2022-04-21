@@ -38,6 +38,7 @@ export const routerName = {
   appSubThread: 'subThread',
   appFan: 'fan',
   appFollower: 'follower',
+  appScore: 'appScore'
 }
 
 export default [
@@ -133,7 +134,7 @@ export default [
         component: Finance,
       },
     ],
-    
+
   },
   {
     name: routerName.appSubUser,
@@ -170,6 +171,11 @@ export default [
         path: '/app/profile/sub/fan',
         component: UserFollowerAndFans
       },
+      {
+        name: routerName.appScore,
+        path: '/app/profile/finance',
+        component: Finance
+      }
     ]
   }
 ]

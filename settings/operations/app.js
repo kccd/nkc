@@ -23,6 +23,9 @@ module.exports = {
 	},
 	profile: {
 		GET: "appVisitProfile",
+    finance: {
+      GET: 'appVisitProfile'
+    },
 		sub: {
 			GET: "appVisitProfile",
 			user: {

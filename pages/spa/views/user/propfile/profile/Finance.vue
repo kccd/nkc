@@ -17,17 +17,17 @@
         small(v-for="item in targetUserScores").p-l-1.text-success {{item.name}}
           strong.h4.text-danger {{item.number / 100}}
           span {{item.unit}}
-        .display-i-b.p-l-1
-          a.btn.btn-success.btn-sm(href="/account/finance/recharge" target="_blank") 充值
-          span &nbsp;
-          a.btn.btn-default.btn-sm(href="/account/finance/withdraw" target="_blank") 提现
-          span &nbsp;
-          a.btn.btn-default.btn-sm(href="/account/finance/exchange" target="_blank") 兑换
+      .m-b-1
+        a.btn.btn-success.btn-sm(href="/account/finance/recharge" target="_blank") 充值
+        span &nbsp;
+        a.btn.btn-default.btn-sm(href="/account/finance/withdraw" target="_blank") 提现
+        span &nbsp;
+        a.btn.btn-default.btn-sm(href="/account/finance/exchange" target="_blank") 兑换
       .finance-context-nav
         li(:class="navType==='all'?'active':''" @click="navTypeChange('all')") 所有
         li(:class="navType==='in' ?'active':''" @click="navTypeChange('in')") 收入
         li(:class="navType==='payout'?'active':''" @click="navTypeChange('payout')") 支出
-      .finance-context-table
+      .finance-context-table.table-responsive
         table.table.table-bordered(v-if="navType !== 'all'" )
           thead
             tr
@@ -183,8 +183,7 @@ export default {
     targetUser: null
   }),
   created() {
-    const uid = getState().uid;
-    this.uid = uid;
+    this.uid = getState().uid;
     this.getUserAccountInfo();
   },
   mounted() {
