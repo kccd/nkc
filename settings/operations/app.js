@@ -23,6 +23,9 @@ module.exports = {
 	},
 	profile: {
 		GET: "appVisitProfile",
+    blacklist: {
+      GET: 'appVisitProfile'
+    },
     finance: {
       GET: 'appVisitProfile'
     },

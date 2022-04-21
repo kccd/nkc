@@ -1,6 +1,7 @@
 const router = require("koa-router")();
 const subRouter = require('./subscribe');
 const financeRouter = require('./finance');
+const blacklistRouter = require('./blacklist');
 router
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
@@ -13,4 +14,5 @@ router
   })
   .use('/sub', subRouter.routes(), subRouter.allowedMethods())
   .use('/finance', financeRouter.routes(), financeRouter.allowedMethods())
+  .use('/blacklist', blacklistRouter.routes(), blacklistRouter.allowedMethods())
 module.exports = router;

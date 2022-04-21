@@ -38,7 +38,8 @@ export const routerName = {
   appSubThread: 'subThread',
   appFan: 'fan',
   appFollower: 'follower',
-  appScore: 'appScore'
+  appScore: 'appScore',
+  appBlacklist: 'appBlacklist'
 }
 
 export default [
@@ -175,6 +176,11 @@ export default [
         name: routerName.appScore,
         path: '/app/profile/finance',
         component: Finance
+      },
+      {
+        name: routerName.appBlacklist,
+        path: '/app/profile/blacklist',
+        component: SubscribeBlacklist,
       }
     ]
   }
