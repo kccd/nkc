@@ -1,5 +1,5 @@
 <template lang="pug">
-  .home-subscribe-forum
+  .home-subscribe-forum(v-if="!loading")
     .account-forum-categories.paging-button(v-if="targetUser")
       a.button.radius-left(
         :class="!t?'active':''"
@@ -15,9 +15,10 @@
     //- 分页显示
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     //关注的专业列表
-    .account-followers.account-forums
-      .null(v-if="!subscribes.length") 空空如也~
-      .account-follower(v-for="subscribe in subscribes" v-else)
+    .account-followers.account-forums(v-if="!subscribes.length && targetUser")
+      .null 空空如也~
+    .account-followers.account-forums(v-else)
+      .account-follower(v-for="subscribe in subscribes")
         .account-follower-avatar
           img.img(
             :src="getUrl('forumLogo', subscribe.forum.logo)"
@@ -49,9 +50,14 @@
             span {{subscribe.forum.countPosts}}
           .account-follower-description {{subscribe.forum.description || "暂无简介"}}
 </template>
-<style lang="less">
+<style lang="less" scoped>
 @import "../../../../publicModules/base";
 .home-subscribe-forum {
+  .null {
+    text-align: center;
+    margin-top: 5rem;
+    margin-bottom: 5rem;
+  }
   .account-followers{
     margin-top: 0.5rem;
     .account-follower:last-child{
@@ -188,7 +194,9 @@ import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl} from "../../../../lib/js/tools";
 import {subForum} from "../../../../lib/js/subscribe";
 import {objToStr} from "../../../../lib/js/tools";
+import {getState} from "../../../../lib/js/state";
 import Paging from "../../../../lib/vue/Paging";
+import {setPageTitle} from "../../../../lib/js/pageSwitch";
 export default {
   data: () => ({
     uid: '',
@@ -198,6 +206,7 @@ export default {
     paging: null,
     subscribes: [],
     subForumsId: [],
+    loading: false,
   }),
   components: {
     "paging": Paging
@@ -208,6 +217,7 @@ export default {
     },
   },
   mounted() {
+    setPageTitle('关注的专业');
     this.initData();
     this.getForums();
   },
@@ -216,10 +226,12 @@ export default {
     getUrl: getUrl,
     initData() {
       const {uid} = this.$route.params;
-      this.uid = uid;
+      const {uid: stateUid} = getState();
+      this.uid = uid || stateUid;
     },
     //获取用户关注的专业列表
     getForums(page) {
+      this.loading = true;
       const self = this;
       let url = `/u/${self.uid}/profile/subscribe/forum`;
       if(self.t) url = url + `?t=${self.t}`;
@@ -242,6 +254,7 @@ export default {
       .catch(err => {
         sweetError(err);
       })
+      self.loading = false;
     },
     //点击分页按钮
     clickBtn(num) {

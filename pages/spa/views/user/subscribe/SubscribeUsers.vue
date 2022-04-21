@@ -6,7 +6,7 @@
     .subscribe-divide-lines
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     .subscribe-user-content
-      .null(v-if="subscribes.length==0" ) 空空如也~~
+      .null(v-if="subscribes.length === 0" ) 空空如也~~
       .subscribe-user-box(v-else)
         .subscribe-user-lists(v-for="(followedUser,index) in subscribes")
           .subscribe-user-list
@@ -106,95 +106,95 @@
     &:last-child{
       margin-bottom: 0;
     }
-    .subscribe-user-list-avatar{
-      display: table-cell;
-      vertical-align: top;
-      .img{
-        width: 5rem;
-        height: 5rem;
-        border-radius: 50%;
-        box-sizing: border-box;
-        border: 2px solid #eee;
-        margin-right: 1.3rem;
-      }
-    }
-    .subscribe-user-list-content{
-      display: table-cell;
-      vertical-align: top;
-      width: 100%;
-      position: relative;
-      .account-follower-name{
-        height: 2.1rem;
-        box-sizing: border-box;
-        padding-right: 9rem;
-        word-break: break-word;
-        display: -webkit-box;
-        overflow: hidden;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 1;
-        a{
-          font-size: 1.4rem;
-          color: #2b90d9;
-          transition: border-bottom-color 200ms;
-          border-bottom: 1px solid rgba(0, 0, 0, 0);
+    .subscribe-user-list {
+      .subscribe-user-list-avatar{
+        display: table-cell;
+        vertical-align: top;
+        .img{
+          width: 5rem;
+          height: 5rem;
+          border-radius: 50%;
+          box-sizing: border-box;
+          border: 2px solid #eee;
+          margin-right: 1.3rem;
         }
-        .account-follower-buttons{
-          position: absolute;
-          top: 0;
-          right: 0;
+      }
+      .subscribe-user-list-content{
+        display: table-cell;
+        vertical-align: top;
+        width: 100%;
+        position: relative;
+        .account-follower-name{
+          height: 2.1rem;
+          box-sizing: border-box;
+          padding-right: 9rem;
+          word-break: break-word;
+          display: -webkit-box;
+          overflow: hidden;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 1;
+          a{
+            font-size: 1.4rem;
+            color: #2b90d9;
+            transition: border-bottom-color 200ms;
+            border-bottom: 1px solid rgba(0, 0, 0, 0);
+          }
+          .account-follower-buttons{
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 1rem;
+            button{
+              background: #fff;
+              height: 2rem;
+              width: 4rem;
+              border: 1px solid #ccc;
+              border-radius: 2px;
+              box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+              &.category:hover{
+                background-color: #eee;
+              }
+            }
+            .cancel{
+              background-color: #e85a71;
+              border: 1px solid #e85a71;
+              color: #fff;
+              margin-left: 3px;
+              &:hover{
+                background-color: #cb4c61;
+              }
+            }
+            .focus{
+              background-color: #2b90d9;
+              border: 1px solid #2b90d9;
+              color: #fff;
+              &:hover{
+                background-color: #2777b1;
+              }
+            }
+          }
+
+        }
+        .account-follower-level{
+          margin-top: 0.5rem;
           font-size: 1rem;
-          button{
-            background: #fff;
-            height: 2rem;
-            width: 4rem;
-            border: 1px solid #ccc;
-            border-radius: 2px;
-            box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
-            &.category:hover{
-              background-color: #eee;
-            }
-          }
-          .cancel{
-            background-color: #e85a71;
-            border: 1px solid #e85a71;
-            color: #fff;
-            margin-left: 3px;
-            &:hover{
-              background-color: #cb4c61;
-            }
-          }
-          .focus{
-            background-color: #2b90d9;
-            border: 1px solid #2b90d9;
-            color: #fff;
-            &:hover{
-              background-color: #2777b1;
-            }
+          .account-follower-certs{
+            margin-left: 6px;
           }
         }
-
-      }
-      .account-follower-level{
-        margin-top: 0.5rem;
-        font-size: 1rem;
-        .account-follower-certs{
-          margin-left: 6px;
+        .account-follower-description{
+          margin-top: 0.5rem;
+          height: 1.5rem;
+          word-break: break-word;
+          display: -webkit-box;
+          overflow: hidden;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 1;
+          color: #777;
+          font-size: 1.15rem;
         }
-      }
-      .account-follower-description{
-        margin-top: 0.5rem;
-        height: 1.5rem;
-        word-break: break-word;
-        display: -webkit-box;
-        overflow: hidden;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 1;
-        color: #777;
-        font-size: 1.15rem;
       }
     }
-
-
   }
   .null {
     padding-top: 5rem;
@@ -205,12 +205,14 @@
 </style>
 <script>
 import NavTypes from "./NavTypes";
+import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
+import Paging from "../../../../lib/vue/Paging";
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl} from "../../../../lib/js/tools";
 import {subUsers, subTypesChange} from "../../../../lib/js/subscribe";
 import {objToStr} from "../../../../lib/js/tools";
-import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
-import Paging from "../../../../lib/vue/Paging";
+import {getState} from "../../../../lib/js/state";
+import {setPageTitle} from "../../../../lib/js/pageSwitch";
 export default {
   data: () => ({
     uid: '',
@@ -230,11 +232,10 @@ export default {
     "subscribe-types": SubscribeTypes,
     'paging': Paging
   },
-  created() {
-    this.initData()
-    this.getSubUser();
-  },
   mounted() {
+    setPageTitle('关注的用户');
+    this.initData();
+    this.getSubUser();
   },
   computed: {
     pageButtons() {
@@ -246,11 +247,13 @@ export default {
     getUrl: getUrl,
     initData() {
       const {uid} = this.$route.params;
-      this.uid = uid;
+      const {uid: stateUid} = getState();
+      this.uid = uid || stateUid;
     },
     //获取关注的用户
     getSubUser(page) {
       const self = this;
+      if(!self.uid) return sweetError('uid is undefined');
       let url = `/u/${self.uid}/profile/subscribe/user`;
       if(self.t) {
         url += `?t=${self.t}`;

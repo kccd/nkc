@@ -9,10 +9,12 @@
 </template>
 
 <script>
+import {setPageTitle} from "../../../js/pageSwitch";
+
 let prevType = '';
 import UserInfo from "./UserInfo";
 import Paging from "../../Paging";
-
+import {getState} from "../../../js/state";
 export default {
   components: {
     "user-info": UserInfo,
@@ -42,14 +44,23 @@ export default {
   mounted() {
     this.initData();
     this.getUserCardInfo();
+    setPageTitle(this.routeName === 'fan'?'粉丝':'关注');
   },
   methods: {
     initData() {
-      const {params, name} = this.$route;
+      const {path, params} = this.$route;
+      const {uid: stateUid} = getState();
+      const index = path.indexOf('follower');
+      let name;
+      if(index === -1) {
+        name = 'fan';
+      } else {
+        name = 'follower';
+      }
       this.routeName = name;
       this.t = name;
       const {uid} = params;
-      this.uid = uid;
+      this.uid = uid || stateUid;
     },
     clickButton(num) {
       this.getUserCardInfo( num );

@@ -1,8 +1,8 @@
 <template lang="pug">
-  div
+  div(v-if="!loading")
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     .subscribe-columns
-      .null(v-if="!subscribes || subscribes.length === 0" ) 空空如也~~
+      .null(v-if="!subscribes.length" ) 空空如也~~
       .account-follower(v-for="item in subscribes")
         .account-follower-avatar
           img.img(:src="getUrl('columnAvatar',item.column._id, 'sm')")
@@ -95,7 +95,9 @@
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl} from "../../../../lib/js/tools";
 import {subColumn} from "../../../../lib/js/subscribe";
+import {getState} from "../../../../lib/js/state";
 import Paging from "../../../../lib/vue/Paging";
+import {setPageTitle} from "../../../../lib/js/pageSwitch";
 export default {
   data: () => ({
     uid: null,
@@ -104,6 +106,7 @@ export default {
     paging: null,
     visitorSubColumnsId:null,
     user:null,
+    loading : false,
   }),
   components: {
     'paging': Paging
@@ -114,6 +117,7 @@ export default {
     },
   },
   mounted() {
+    setPageTitle('关注的专栏');
     this.initData();
     this.getColumns();
   },
@@ -121,10 +125,12 @@ export default {
     getUrl: getUrl,
     initData() {
       const {uid} = this.$route.params;
-      this.uid = uid;
+      const {uid: stateUid} = getState();
+      this.uid = uid || stateUid;
     },
     //获取用户关注的专栏列表
     getColumns(page) {
+      this.loading = true;
       const self = this;
       let url = `/u/${self.uid}/profile/subscribe/column`;
       if(page) {
@@ -145,7 +151,7 @@ export default {
       .catch(err => {
         sweetError(err);
       })
-
+      self.loading = false;
     },
     //点击分页按钮
     clickBtn(num) {

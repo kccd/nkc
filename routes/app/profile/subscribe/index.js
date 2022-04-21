@@ -12,5 +12,11 @@ router
   .get('/thread', async (ctx, next) => {
     await next();
   })
+  .get('/fan', async (ctx, next) => {
+    await next();
+  })
+  .get('/follower', async (ctx, next) => {
+    await next();
+  })
 
 module.exports = router;

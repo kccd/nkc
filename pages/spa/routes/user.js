@@ -12,6 +12,7 @@ import SubscribeForums from "../views/user/subscribe/SubscribeForums";
 import SubscribeCollection from "../views/user/subscribe/SubscribeCollection";
 import Finance from "../views/user/propfile/profile/Finance";
 import UserColumnThread from "../views/user/propfile/profile/UserColumnThread";
+import AppProfileView from "../views/app/profile/AppProfileView";
 export const routerName = {
   user: 'userHome',
   follower: 'follower',
@@ -35,6 +36,8 @@ export const routerName = {
   appSubForum: 'subForum',
   appSubColumn: 'subColumn',
   appSubThread: 'subThread',
+  appFan: 'fan',
+  appFollower: 'follower',
 }
 
 export default [
@@ -135,6 +138,7 @@ export default [
   {
     name: routerName.appSubUser,
     path: '/app/profile',
+    component: AppProfileView,
     children: [
       {
         name: routerName.appSubUser,
@@ -155,6 +159,16 @@ export default [
         name: routerName.appSubThread,
         path: '/app/profile/sub/thread',
         component: SubscribeCollection
+      },
+      {
+        name: routerName.appFollower,
+        path: '/app/profile/sub/follower',
+        component: UserFollowerAndFans
+      },
+      {
+        name: routerName.appFan,
+        path: '/app/profile/sub/fan',
+        component: UserFollowerAndFans
       },
     ]
   }

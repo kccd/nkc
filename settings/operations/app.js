@@ -37,6 +37,12 @@ module.exports = {
 			thread: {
 				GET: "appVisitProfile",
 			},
+			fan: {
+				GET: "appVisitProfile",
+			},
+			follower: {
+				GET: "appVisitProfile",
+			},
 		},
 	},
 	scoreChange: {

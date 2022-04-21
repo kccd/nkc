@@ -51,6 +51,10 @@
     }
   }
 }
+.null {
+  text-align: center;
+  margin: 5rem 0;
+}
 .account-threads, .account-followers{
   .account-thread:last-child{
     margin-bottom: 0;
@@ -342,6 +346,8 @@ import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl, fromNow} from "../../../../lib/js/tools";
 import {collectionThread} from "../../../../lib/js/subscribe";
 import {objToStr} from "../../../../lib/js/tools";
+import {getState} from "../../../../lib/js/state";
+import {setPageTitle} from "../../../../lib/js/pageSwitch";
 export default {
   data: () => ({
     uid: null,
@@ -364,6 +370,7 @@ export default {
     },
   },
   mounted() {
+    setPageTitle('收藏的文章');
     this.initData();
     this.getThreads();
   },
@@ -385,7 +392,8 @@ export default {
     },
     initData() {
       const {uid} = this.$route.params;
-      this.uid = uid;
+      const {uid: stateUid} = getState();
+      this.uid = uid || stateUid;
     },
     //获取用户收藏的文章
     getThreads(page) {
