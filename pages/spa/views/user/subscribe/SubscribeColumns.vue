@@ -126,7 +126,7 @@ export default {
     //获取用户关注的专栏列表
     getColumns(page) {
       const self = this;
-      let url = `/u/${self.uid}/p/s/column`;
+      let url = `/u/${self.uid}/profile/subscribe/column`;
       if(page) {
         if(url.indexOf('?') === -1) {
           url = url + `?page=${page}`;

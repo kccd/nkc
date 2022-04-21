@@ -13,7 +13,7 @@
       .panel-header 个人简介
       .m-b-2
         .information-item
-          .description(v-if="targetUser.description") {{targetUser.description}}
+          .description(v-if="targetUser.description" v-html="description")
           .description(v-else) 暂无简介
           .register-time {{timeFormat('YYYY/MM/DD', targetUser.toc)}}注册， 活动于{{fromNow(targetUser.tlv)}}
 </template>
@@ -78,6 +78,7 @@
 <script>
 import {getUrl, fromNow} from "../../../../lib/js/tools";
 import {timeFormat} from "../../../../lib/js/time";
+import {marked} from 'marked';
 export default {
   props: ['targetUser'],
   data: () => ({
@@ -85,6 +86,13 @@ export default {
     userColumn: null,
     userInformation: null,
   }),
+  computed: {
+    description() {
+      const {description} = this.targetUser;
+      const content = marked(description);
+      return content;
+    }
+  },
   methods: {
     getUrl: getUrl,
     timeFormat: timeFormat,

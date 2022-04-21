@@ -194,7 +194,7 @@ export default {
     timeFormat: timeFormat,
     getUserAccountInfo(type){
       const self = this;
-      let url = `/u/${this.uid}/p/finance`;
+      let url = `/u/${this.uid}/profile/finance`;
       if(type){
         url += `?t=${type}`;
       }

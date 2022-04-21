@@ -18,6 +18,7 @@
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {checkUserCode} from "../../../../lib/js/checkData";
 import ViolationRecord from "../../../../lib/vue/ViolationRecord";
+import {EventBus} from "../../../eventBus";
 export default {
   data: () => ({
     permissions: {
@@ -44,10 +45,11 @@ export default {
     //获取用户管理权限
     getManage() {
       const self = this;
-      nkcAPI(`/u/${self.uid}/p/manage`, 'GET')
+      nkcAPI(`/u/${self.uid}/profile/manage`, 'GET')
       .then(res => {
         self.targetUser = res.targetUser;
         self.permissions = res.permissions;
+        EventBus.$emit('permissions', res.permissions);
       })
       .catch(err => {
         sweetError(err);

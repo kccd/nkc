@@ -46,7 +46,6 @@ export default {
       const self = this;
       return nkcAPI(`/creation/column/draft?page=${page}`, 'GET')
         .then(res => {
-          console.log(res.articlesDraftList);
           self.pages = res.paging.buttonValue;
           self.articlesDraftList = res.articlesDraftList;
         });
@@ -61,7 +60,6 @@ export default {
       });
     },
     deleteItem(index) {
-      console.log({index});
       this.articlesDraftList.splice(index, 1);
     }
   }

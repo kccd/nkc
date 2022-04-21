@@ -251,7 +251,7 @@ export default {
     //获取关注的用户
     getSubUser(page) {
       const self = this;
-      let url = `/u/${self.uid}/p/s/user`;
+      let url = `/u/${self.uid}/profile/subscribe/user`;
       if(self.t) {
         url += `?t=${self.t}`;
       }

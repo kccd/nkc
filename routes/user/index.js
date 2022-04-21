@@ -8,7 +8,7 @@ const transactionRouter = require('./transaction');
 // const bannerRouter = require('./banner');
 const clearRouter = require("./clear");
 const subRouter = require("./sub");
-const profileRouter = require("./profile");
+// const profileRouter = require("./profile");
 const transferRouter = require("./transfer");
 const myProblemsRouter = require("./myProblems");
 const destroyRouter = require("./destroy");
@@ -34,7 +34,7 @@ const userHomeCardRouter = require("./userHomeCard");
 const navLinksRouter = require("./navLinks");
 // 请求内容
 const contentRouter = require("./content");
-const pRouter = require('./p/index');
+const profileRouter = require('./p/index');
 const subscribeRouter = require('./subscribe');
 const userPanelRouter = require('./userPanel');
 const path = require('path');
@@ -64,7 +64,9 @@ userRouter
     const {data, db, params} = ctx;
     data.targetUser = await db.UserModel.findOne({uid: params.uid});
     if(!data.targetUser) ctx.throw(404, `不存在ID为${params.uid}的用户`);
+    //拓展用户权限
     await data.targetUser.extendRoles();
+    //拓展用户等级
     await data.targetUser.extendGrade();
     await data.targetUser.extendDraftCount();
     await db.UserModel.extendUserInfo(data.targetUser);
@@ -188,7 +190,7 @@ userRouter
   .use("/:uid/clear", clearRouter.routes(), clearRouter.allowedMethods())
   .use("/:uid/transfer", transferRouter.routes(), transferRouter.allowedMethods())
 	.use('/:uid/production', productionRouter.routes(), productionRouter.allowedMethods())
-  .use("/:uid/profile", profileRouter.routes(), profileRouter.allowedMethods())
+  // .use("/:uid/profile", profileRouter.routes(), profileRouter.allowedMethods())
   .use("/:uid/destroy", destroyRouter.routes(), destroyRouter.allowedMethods())
   .use("/:uid/myProblems", myProblemsRouter.routes(), myProblemsRouter.allowedMethods())
   .use("/:uid/violationRecord", violationRouter.routes(), violationRouter.allowedMethods())
@@ -202,6 +204,6 @@ userRouter
   .use("/:uid/userHomeCard", userHomeCardRouter.routes(), userHomeCardRouter.allowedMethods())
   .use("/:uid/navLinks", navLinksRouter.routes(), navLinksRouter.allowedMethods())
   .use("/:uid/content", contentRouter.routes(), contentRouter.allowedMethods())
-  .use("/:uid/p", pRouter.routes(), pRouter.allowedMethods())
+  .use("/:uid/profile", profileRouter.routes(), profileRouter.allowedMethods())
   .use("/:uid", userPanelRouter.routes(), userPanelRouter.allowedMethods())
 module.exports = userRouter;

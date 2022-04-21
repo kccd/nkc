@@ -132,12 +132,21 @@ export default {
       this.uid = uid;
     },
     //获取用户黑名单
-    getBlackList() {
+    getBlackList(page) {
       const self = this;
-      nkcAPI(`/u/${this.uid}/p/s/blacklist`, 'GET')
+      let url = `/u/${this.uid}/profile/subscribe/blacklist`;
+      if(page) {
+        if(url.indexOf('?') === -1) {
+          url = url + `?page=${page}`;
+        } else {
+          url = url + `page=${page}`;
+        }
+      }
+      nkcAPI(url, 'GET')
       .then(res => {
         self.bl = res.bl;
         self.targetUser = res.targetUser;
+        self.paging = res.paging;
       })
       .catch(err => {
         sweetError(err);

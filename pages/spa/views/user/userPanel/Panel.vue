@@ -27,7 +27,7 @@
                 span(@click="containerChange('moment')" :class="{'active': $route.name === 'moment'}") 动态
                 span(@click="containerChange('post')" :class="{'active': $route.name === 'post'}") 社区
                 span(@click="containerChange('column')" :class="{'active': $route.name === 'column'}") 专栏
-                span(@click="containerChange('follower')" :class="{'active': ($route.name === 'follower' || $route.name === 'fan')}") 关注
+                //span(@click="containerChange('follower')" :class="{'active': ($route.name === 'follower' || $route.name === 'fan')}") 关注
               .account-nav-right
                 .sub-item(@click="containerChange('follower')")
                   div 关注
@@ -130,8 +130,9 @@
               }
             }
             .account-user-name{
-              font-size: 20px;
+              font-size: 1.5rem;
               font-weight: bold;
+              text-shadow: 1px 0px 2px #FFF;
               @media (max-width: 991px){
                 font-size: 16px;
                 font-weight: bold;
@@ -271,7 +272,6 @@ export default {
     this.initData()
     this.getPanelData()
     EventBus.$on('addToBl',()=>{
-      console.log('1111')
       this.subscribeBtnType = false
     })
   },

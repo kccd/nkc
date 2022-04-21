@@ -1,7 +1,7 @@
 module.exports = {
 	GET: 'searchUser',
 	PARAMETER: {
-		p: {
+		profile: {
 			GET: "visitUserCard",
 			subUser: {
 				GET: "visitUserCard",
@@ -21,6 +21,12 @@ module.exports = {
 			thread: {
 				GET: "getUserHomeCard"
 			},
+			note: {
+				GET: "userProfile"
+			},
+			draft: {
+				GET: "userProfile"
+			},
 			follower: {
 				GET: "getUserHomeCard",
 			},
@@ -30,7 +36,7 @@ module.exports = {
 			finance: {
 				GET: "getUserHomeCard",
 			},
-			s: {
+			subscribe: {
 				GET: "visitUserCard",
 				collection: {
 					GET: "getUserHomeCard"
@@ -206,61 +212,61 @@ module.exports = {
       GET: "transferKcbToUser",
       POST: "transferKcbToUser"
     },
-		profile: {
-			GET: 'userProfile',
-			summary: {
-				pie: {
-					GET: "userProfile"
-				},
-				calendar: {
-					GET: "userProfile"
-				}
-			},
-			thread: {
-				GET: "userProfile"
-			},
-			post: {
-				GET: "userProfile"
-			},
-			draft: {
-				GET: "userProfile"
-			},
-			finance: {
-				GET: "userProfile"
-			},
-			follower: {
-				GET: "userProfile"
-			},
-			subscribe: {
-				user: {
-					GET: "userProfile"
-				},
-				topic: {
-					GET: "userProfile"
-				},
-				forum: {
-					GET: 'userProfile',
-				},
-				discipline: {
-					GET: "userProfile"
-				},
-				column: {
-					GET: "userProfile"
-				},
-				thread: {
-					GET: "userProfile"
-				},
-				collection: {
-					GET: "userProfile"
-				}
-			},
-			note: {
-				GET: "userProfile"
-			},
-			blacklist: {
-				GET: 'userProfile'
-			}
-		},
+		// profile: {
+		// 	GET: 'userProfile',
+		// 	summary: {
+		// 		pie: {
+		// 			GET: "userProfile"
+		// 		},
+		// 		calendar: {
+		// 			GET: "userProfile"
+		// 		}
+		// 	},
+		// 	thread: {
+		// 		GET: "userProfile"
+		// 	},
+		// 	post: {
+		// 		GET: "userProfile"
+		// 	},
+		// 	draft: {
+		// 		GET: "userProfile"
+		// 	},
+		// 	finance: {
+		// 		GET: "userProfile"
+		// 	},
+		// 	follower: {
+		// 		GET: "userProfile"
+		// 	},
+		// 	subscribe: {
+		// 		user: {
+		// 			GET: "userProfile"
+		// 		},
+		// 		topic: {
+		// 			GET: "userProfile"
+		// 		},
+		// 		forum: {
+		// 			GET: 'userProfile',
+		// 		},
+		// 		discipline: {
+		// 			GET: "userProfile"
+		// 		},
+		// 		column: {
+		// 			GET: "userProfile"
+		// 		},
+		// 		thread: {
+		// 			GET: "userProfile"
+		// 		},
+		// 		collection: {
+		// 			GET: "userProfile"
+		// 		}
+		// 	},
+		// 	note: {
+		// 		GET: "userProfile"
+		// 	},
+		// 	blacklist: {
+		// 		GET: 'userProfile'
+		// 	}
+		// },
 		destroy: {
     	GET: "destroyAccount",
 			POST: "destroyAccount"

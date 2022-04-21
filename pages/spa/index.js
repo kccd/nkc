@@ -1,5 +1,7 @@
 import router from './router';
+import Vue from 'vue';
 import App from './App';
+import store from './store';
 import Breadcrumb from '../lib/vue/Breadcrumb';
 import Viewer from 'v-viewer';
 Vue.use(Viewer);
@@ -11,6 +13,7 @@ Viewer.setDefaults({
 })
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app');
 

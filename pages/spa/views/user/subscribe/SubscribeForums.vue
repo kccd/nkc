@@ -221,7 +221,7 @@ export default {
     //获取用户关注的专业列表
     getForums(page) {
       const self = this;
-      let url = `/u/${self.uid}/p/s/forum`;
+      let url = `/u/${self.uid}/profile/subscribe/forum`;
       if(self.t) url = url + `?t=${self.t}`;
       if(page) {
         if(url.indexOf('?') === -1) {

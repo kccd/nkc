@@ -135,7 +135,7 @@ export default {
       }
     },
   },
-  
+
   computed: {
     type() {
       return this.draftId? 'modify': 'create'
@@ -207,11 +207,10 @@ export default {
     },
     submit() {
       const self = this;
-      this
-        .post('save')
+      this.post('save')
         .then(() => {
-          self.$router.replace({
-            name: 'drafts'
+          self.$router.push({
+            name: 'creationDrafts'
           });
         })
         .catch(sweetError);

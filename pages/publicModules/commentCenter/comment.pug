@@ -30,6 +30,8 @@ if !isIncluded('comment')
         include ./singleComment/singleComment
         for comment in data.comments
           +singleComment(comment)
+    else
+      .null 还没有人评论哦~~
   .m-b--05
     include ../../publicModules/paging/paging
     +articleNav

@@ -4,7 +4,7 @@
     .user-list-warning(v-if="(!posts || posts.length === 0) && !loading") 用户貌似未发表过任何内容
     .user-post-list
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
-      .paging-button(v-if="routeName === 'thread'" )
+      .paging-button(v-if="routeName === 'thread' && permissions.reviewed" )
         a.pointer.button.radius-left.radius-right(@click="managementPosts()") 管理
         span.post-management-button
           a.pointer.button(@click="selectAll()") 全选
@@ -36,9 +36,6 @@
   .checkbox label{
     min-height: 15px;
   }
-  .user-post-list {
-    padding: 0 15px;
-  }
 }
 </style>
 <script>
@@ -47,6 +44,7 @@ import SinglePost from "../../../../../lib/vue/publicVue/postModel/SinglePost";
 import Paging from "../../../../../lib/vue/Paging";
 import ToColumn from "../../../../../lib/vue/publicVue/toColumn/ToColumn";
 import {nkcAPI} from "../../../../../lib/js/netAPI";
+import {getState} from "../../../../../lib/js/state";
 export default {
   data: () => ({
     posts: [],
@@ -79,10 +77,16 @@ export default {
   },
   methods: {
     initData() {
-      const {name, params} = this.$route;
-      this.routeName = name;
+      const {params, path} = this.$route;
+      const {uid: stateUid} = getState();
+      const index = path.indexOf('thread');
+      if(index === -1) {
+        this.routeName = 'post';
+      } else {
+        this.routeName = 'thread';
+      }
       const {uid} = params;
-      this.uid = uid;
+      this.uid = uid || stateUid;
       this.getPostList(0);
     },
     //获取用户卡片信息
@@ -90,7 +94,7 @@ export default {
       this.loading = true;
       const {uid, routeName} = this;
       const self= this;
-      let url = `/u/${uid}/p/${routeName}`;
+      let url = `/u/${uid}/profile/${routeName}`;
       if(page) {
         const index = url .indexOf('?');
         if(index === -1) {
@@ -105,7 +109,7 @@ export default {
           self.paging = res.paging;
           self.posts = res.posts;
           self.permissions = res.permissions;
-          this.loading = false;
+          self.loading = false;
         })
         .catch(err => {
           sweetError(err);

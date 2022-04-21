@@ -14,6 +14,9 @@
 .paging-button {
   padding: 15px;
 }
+.post-panel-item {
+  padding: 0 15px;
+}
 </style>
 <script>
 export default {

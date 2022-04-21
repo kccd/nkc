@@ -10,6 +10,7 @@ router
     const {page = 0, last_pages, highlight, t} = query;
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     let article = await db.ArticleModel.findOnly({_id: aid});
+    //查找文章的评论盒子
     const articlePost = await db.ArticlePostModel.findOne({sid: article._id, source: article.source});
     // 获取空间文章需要显示的数据
     const articleRelatedContent = await db.ArticleModel.getZoneArticle(article._id);
@@ -58,18 +59,26 @@ router
         data.columnPost.collected = true;
       }
     }
+    let count = 0;
     //获取评论分页
-    const count = await db.CommentModel.countDocuments(match);
+    if(articlePost) {
+      count = await db.CommentModel.countDocuments(match);
+    }
     const paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
     data.paging = paging;
+    let comment = null;
+    let comments = [];
     //获取该文章下当前用户编辑了未发布的评论内容
-    const m = {
-      uid: state.uid,
-      status: defaultComment,
-    };
-    let comment = await db.CommentModel.getCommentsByArticleId({match: m,});
-    //获取该文章下的评论
-    let comments = await db.CommentModel.getCommentsByArticleId({match, paging});
+    if(articlePost) {
+      const m = {
+        uid: state.uid,
+        status: defaultComment,
+        sid: articlePost._id,
+      };
+      comment = await db.CommentModel.getCommentsByArticleId({match: m,});
+      //获取该文章下的评论
+      comments = await db.CommentModel.getCommentsByArticleId({match, paging});
+    }
     if(comments && comments.length !== 0) {
       comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions});
     }

@@ -30,7 +30,6 @@
         const self = this;
         nkcAPI(`/creation/articles/column?page=${page}`, 'GET')
           .then(res => {
-            console.log(res);
             self.pages = res.paging.buttonValue;
             self.articlesList = res.articlesList;
           })
