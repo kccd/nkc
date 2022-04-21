@@ -6,7 +6,7 @@
       span(v-if='boxContent') {{boxContent}}
     .display-socket-container(v-show='containerMode !== "minimize"')
       .socket-container(
-        v-if='showPanel'
+        v-show='showPanel'
         :style='containerStyle'
         ref='socketContainer'
       )
@@ -185,7 +185,7 @@
   import {DraggableElement} from "../../js/draggable";
   import {getFromLocalStorage, updateInLocalStorage, saveToLocalStorage} from "../../js/localStorage";
   import {debounce} from "../../js/execution";
-  import {sleep} from "../../js/timeout";
+  // import {sleep} from "../../js/timeout";
   import FastClick from "fastclick";
   import Lottery from '../lottery.vue'
 
@@ -238,6 +238,7 @@
       newMessageCount: 0,
 
       audio: null,
+      draggable: ''
     }),
     components: {
       Message,
@@ -274,6 +275,8 @@
       },
     },
     mounted() {
+      this.draggable = new DraggableElement(this.$refs.socketContainer, '.draggable-handle', this.onContainerPositionChange);
+      this.initSocketContainerMouseEvent();
       this.initContainer();
       this.initAudio();
       const app = this;
@@ -295,16 +298,18 @@
       this.updateNewMessageCount(newMessageCount);
       FastClick.attach(this.$refs.messageApp);
     },
+    destroyed(){
+      this.draggable && this.draggable.destroy()
+    },
     watch: {
-      async showPanel() {
-        const app = this;
-        if(this.showPanel) {
-          await sleep(100);
-          new DraggableElement(this.$refs.socketContainer, '.draggable-handle', app.onContainerPositionChange);
-          await sleep(100);
-          app.initSocketContainerMouseEvent();
-        }
-      },
+      // async showPanel() {
+      //   const app = this;
+      //   if(this.showPanel) {
+      //     await sleep(100);
+      //     await sleep(100);
+      //     app.initSocketContainerMouseEvent();
+      //   }
+      // },
       mode() {
         this.saveChatInfoToLocalStorage();
       },
@@ -445,11 +450,13 @@
         const containerMode = 'normal';
         this.setContainerModeData(containerMode);
         this.saveContainerModeToLocalStorage(containerMode);
+
       },
       // 隐藏socket面板
       hideMessagePanel() {
         this.onMouseLeave();
         this.showPanel = false;
+        this.setSocketInfo()
       },
       // 存储关闭前socket面板的位置
       setSocketInfo() {
