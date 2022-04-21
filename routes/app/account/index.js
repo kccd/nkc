@@ -28,6 +28,10 @@ router
         gradeColor: userGrade.color,
       };
     }
+
+    data.apps = await db.SettingModel.getAppsData();
+    data.management = await db.SettingModel.getManagementData(user);
+
     await next();
   })
 module.exports = router;

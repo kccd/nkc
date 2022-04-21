@@ -976,7 +976,7 @@ settingSchema.statics.getManagementData = async (user) => {
   const ComplaintModel = mongoose.model('complaints');
   const ProblemModel = mongoose.model('problems');
   const results = [];
-  if(user.hasPermission('nkcManagement')) {
+  if(await user.hasPermission('nkcManagement')) {
     results.push({
       name: '前台管理',
       url: '/nkc',
@@ -984,7 +984,7 @@ settingSchema.statics.getManagementData = async (user) => {
       count: 0,
     });
   }
-  if(user.hasPermission('visitExperimentalStatus')) {
+  if(await user.hasPermission('visitExperimentalStatus')) {
     results.push({
       name: '后台管理',
       url: '/e',
@@ -992,7 +992,7 @@ settingSchema.statics.getManagementData = async (user) => {
       count: 0
     });
   }
-  if(user.hasPermission('review')) {
+  if(await user.hasPermission('review')) {
     const recycleId = await SettingModel.getRecycleId();
     const q = {
       reviewed: false,
@@ -1004,7 +1004,7 @@ settingSchema.statics.getManagementData = async (user) => {
       type: (await DocumentModel.getDocumentTypes()).stable,
       source: (await DocumentModel.getDocumentSources()).article,
     }
-    if(!user.hasPermission("superModerator")) {
+    if(!await user.hasPermission("superModerator")) {
       const forums = await ForumModel.find({moderators: user.uid}, {fid: 1});
       const fid = forums.map(f => f.fid);
       q.mainForumsId = {
@@ -1030,7 +1030,7 @@ settingSchema.statics.getManagementData = async (user) => {
       count
     });
   }
-  if(user.hasPermission('complaintGet')) {
+  if(await user.hasPermission('complaintGet')) {
     results.push({
       name: '投诉列表',
       url: '/complaint',
@@ -1038,7 +1038,7 @@ settingSchema.statics.getManagementData = async (user) => {
       count: await ComplaintModel.countDocuments({resolved: false})
     });
   }
-  if(user.hasPermission('visitProblemList')) {
+  if(await user.hasPermission('visitProblemList')) {
     results.push({
       name: '问题列表',
       url: '/problem/list',
@@ -1046,7 +1046,7 @@ settingSchema.statics.getManagementData = async (user) => {
       count: await ProblemModel.countDocuments({resolved: false}),
     });
   }
-  if(user.hasPermission('getLibraryLogs')) {
+  if(await user.hasPermission('getLibraryLogs')) {
     results.push({
       name: '文库记录',
       url: '/libraries/logs',
