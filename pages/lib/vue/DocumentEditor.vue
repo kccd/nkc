@@ -26,7 +26,7 @@
         .m-b-2
           .editor-header 摘要
             small （选填）
-          .row.editor-abstract
+          .row.editor-abstract.clear-marginR
             .col-xs-12.col-md-6(v-if="formConfigs.abstract")
               textarea(placeholder="中文摘要，最多可输入1000字符" rows=7 v-model.trim="abstract")
               .editor-abstract-info(:class="{'warning': abstractCnLength > 1000}") {{abstractCnLength}} / 1000

@@ -23,7 +23,7 @@ block content
               h5 订单ID：{{order.orderId}}
               h5 订单状态：{{order.status}}
               h5 订单总价：
-                strong.text-danger {{order.orderPrice/100 + order.orderFreightPrice/100}}
+                strong.text-danger {{ (order.orderPrice + order.orderFreightPrice) /100}}
                 | 元 （商品总价：{{order.orderPrice/100}}元，邮费：{{order.orderFreightPrice/100}}元
                 span(v-if="order.refundMoney > 0") ，已退款：{{order.refundMoney/100}}元
                 | ）

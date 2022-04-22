@@ -73,13 +73,16 @@ var app = new Vue({
       if(this.order) return this.order.product.user;
     },
     refundMoneyMax: function() {
-      var maxMoney = 0;
       if(this.param) {
         return this.param.singlePrice * this.param.count;
       } else {
+        // 没发货的情况
+        if(this.order.shipToc === null){
+          return this.order.orderPrice + this.order.orderFreightPrice;
+        }
         return this.order.orderPrice
       }
-    }
+    },
   },
   mounted: function() {
     var data = document.getElementById('data');
@@ -174,7 +177,10 @@ var app = new Vue({
         if(param) {
           if(newRefund.money*100 > param.productPrice) return this.error = "退款金额不能超过退款中的商品的金额";
         } else {
-          if(newRefund.money*100 > this.order.orderPrice) return this.error = "退款金额不能超过商品总金额";
+          // 1.1 * 100 不会得到预期结果
+          // 如果只考虑 最大两位小数 （parseInt(Number)）
+          console.log(newRefund.money, this.order.orderPrice)
+          if( parseInt(newRefund.money*100) > this.order.orderPrice + (!this.order.shipToc ? this.order.orderFreightPrice : 0) ) return this.error = "退款金额不能超过商品总金额";
         }
       }
       else return this.error = "请输入正确的退款金额";

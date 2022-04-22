@@ -180,7 +180,7 @@ var app = new Vue({
         if(!this.mobile) return this.error = "请输入收件人手机号";
         if(!this.address) return this.error = "请输入收件人地址";
       }
-
+      
       nkcAPI(url, method, {
         orderId: this.order.orderId,
         type: type,

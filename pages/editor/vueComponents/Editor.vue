@@ -142,7 +142,7 @@ export default {
         (window.performance && window.performance.navigation.type === 2)
       ) {
         // 清除缓存
-        // $(".editor-title").val('');
+        $(".editor-title").val('');
         $(".abstract-cn").val("");
         $(".abstract-en").val("");
         $(".agreement").prop("checked", true);
@@ -211,7 +211,7 @@ export default {
 }
 }
 @media (min-width: 992px) {
-    .col-md-3 {
+  .col-md-3 {
     width: 25%;
     float: left;
   }

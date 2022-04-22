@@ -171,7 +171,7 @@
         .sticker{
           span{
             // font-weight: 700;
-            font-size: 1.3rem;
+            font-size: 1rem;
           }
           @height: 8.2rem;
           overflow: hidden;

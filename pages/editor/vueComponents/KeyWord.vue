@@ -16,7 +16,7 @@
 
   //- .modal.fade(v-if="showModel", )
   //-   .modal-dialog.modal-sm
-  .modal-content(ref="model" v-if="showModel")
+  .modal-content(ref="model" v-show="showModel")
     .modal-header(ref="addKeyword")
       .fa.fa-remove.close-modal(@click="close")
       .modal-title {{ title }}
@@ -125,34 +125,21 @@ export default {
       },
     },
   },
+  mounted(){
+    this.draggableElement = new DraggableElement(
+      this.$refs.model,
+      this.$refs.addKeyword
+    );
+  },
+  destroyed(){
+    this.draggableElement.destroy && this.draggableElement.destroy();
+  },
   methods: {
     close() {
       this.showModel = false;
-      this.draggableElement.destroy && this.draggableElement.destroy();
-      // this.data = [
-      //   {
-      //     label: "中文，添加多个请以逗号分隔",
-      //     dom: "textarea",
-      //     value: ""
-      //   },
-      //   {
-      //     label: "英文，添加多个请以逗号分隔",
-      //     dom: "textarea",
-      //     value: ""
-      //   }
-      // ];
     },
     open() {
       this.showModel = true;
-      // this.$forcedUpdate()
-      // console.log(this.$el)
-      // 等待v-if dom加载完成
-      this.$nextTick(() => {
-        this.draggableElement = new DraggableElement(
-          this.$refs.model,
-          this.$refs.addKeyword
-        );
-      });
     },
     submit() {
       this.keyWordsEn = [];

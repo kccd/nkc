@@ -394,6 +394,9 @@
     removeChat
   } from '../../../message/message.2.0.js';
   import {briefTime} from '../../js/time.js';
+  import {nkcAPI} from '../../js/netAPI';
+  import {sweetError} from "../../js/sweetAlert";
+
   export default {
     data: () => ({
       showOptions: false,

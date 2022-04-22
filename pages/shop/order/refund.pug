@@ -16,8 +16,8 @@ block content
         h5 订单ID：{{order.orderId}}
         h5 订单状态：{{order.status}}
         h5 订单总价：
-          strong.text-danger {{order.orderPrice/100 + order.orderFreightPrice/100}}
-          | 元 （商品总价：{{order.orderPrice/100}}元，运费：{{order.orderFreightPrice/100}}元
+          strong.text-danger {{(order.orderPrice + order.orderFreightPrice) / 100}}
+          | 元 （商品总价：{{order.orderPrice/100}}元123131，运费：{{order.orderFreightPrice/100}}元
           span(v-if="order.refundMoney > 0") ，已退款：{{order.refundMoney/100}}元
           | ）
         h5 商品列表
@@ -60,7 +60,7 @@ block content
               h5 订单ID：{{order.orderId}}
               h5 订单状态：{{order.status}}
               h5 订单总价：
-                strong.text-danger {{order.orderPrice/100 + order.orderFreightPrice/100}}
+                strong.text-danger {{(order.orderPrice + order.orderFreightPrice)/100}}
                 |元 （商品总价：{{order.orderPrice/100}}元，运费：{{order.orderFreightPrice/100}}元
                 span(v-if="order.refundMoney > 0") ，已退款：{{order.refundMoney/100}}元
                 |）
@@ -170,8 +170,8 @@ block content
                       span.disabled(v-else) 只退款
                   .form-group
                     label 3、填写退款金额（不超过
-                      strong.text-danger {{refundMoneyMax/100}}
-                      | 元）      
+                      strong.text-danger {{refundMoneyMax / 100 }}
+                      | 元：{{!order.shipToc ? "含运费" : "不含运费，商品已发货"}}）      
                     input.form-control(v-model.number="newRefund.money" type="number")
                   .form-group    
                     label 4、填写理由（不超过
