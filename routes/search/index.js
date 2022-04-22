@@ -169,7 +169,7 @@ router
           columnPageId.add(r.tid);
         } else if(r.docType === "resource") {
           resourceId.add(r.tid);
-        } else if(r.docType === 'document_article') {
+        } else if(r.docType.indexOf('document') !== -1) {
           documentId.add(r.tid);
         }
         //
