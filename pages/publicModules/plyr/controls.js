@@ -22,18 +22,19 @@ function onlyOnePlayingAnytime(players) {
       }
     })
   }
-  players.map(player => player.on("play", handle));
+  // map改为了foreach
+  players.forEach(player => player.on("play", handle));
 }
 
 // 播放完前一个紧接着播放下一个音频
 function autoPlayNextAudio(players) {
-  players.map(player =>
+  players.forEach(player =>
     player.on("ended", event => {
       const currentPlayer = event.detail.plyr;
       let index = players.indexOf(currentPlayer);
       if(index < 0) return;
-      for(let i = index; i < players.length; i++) {
-        const nextPlayer = players[index + 1];
+      for(let i = index + 1; i < players.length; i++) {
+        const nextPlayer = players[i];
         if(nextPlayer && nextPlayer.type === "audio") {
           return nextPlayer.play();
         }

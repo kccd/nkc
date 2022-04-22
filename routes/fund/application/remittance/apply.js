@@ -17,7 +17,21 @@ router
     const {data, db, body} = ctx;
     const {applicationForm} = data;
     const {account, fund, timeToPassed, reportNeedThreads} = applicationForm;
-    const {number, c, selectedThreads} = body;
+    const {number, c, selectedThreads, code} = body;
+
+    // 申请前需验证短信验证码
+    const usersPersonal = await db.UsersPersonalModel.findOnly({uid: applicationForm.uid});
+
+    const option = {
+      nationCode: usersPersonal.nationCode,
+      mobile: usersPersonal.mobile,
+      code,
+      type: 'withdraw',
+      ip: ctx.address,
+    };
+
+    const smsCode = await db.SmsCodeModel.ensureCode(option);
+    await smsCode.mark();
 
     // 系统审核
     // 系统审核不存在分期拨款

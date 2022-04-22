@@ -15,6 +15,8 @@ const {
 let allSpeedLimit;
 
 module.exports = async (ctx) => {
+  // 关闭 gzip 压缩
+  ctx.compress = false;
   const {filePath, isAttachment, fileName, resource, fs, tg, db} = ctx;
   let stats;
   try {

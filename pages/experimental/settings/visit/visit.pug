@@ -4,10 +4,52 @@ block eTitle
 block eContent
   .container-fluid.max-width
     .row
-      .hidden#data= objToStr({visitSettings: data.visitSettings})
+      .hidden#data= objToStr({visitSettings: data.visitSettings, roles: data.roles, grades: data.grades})
       .col-xs-12.col-md-12#app(v-cloak)
         .form-horizontal
-          h4 全局游客限制
+          h4 全局访问限制
+          .form-group
+            label.col-sm-2.control-label 状态
+            .col-sm-10
+              .radio
+                label.m-r-1
+                  input(type="radio" v-model="visitSettings.globalAccessLimit.status" :value="true")
+                  | 开启
+                label
+                  input(type="radio" v-model="visitSettings.globalAccessLimit.status" :value="false")
+                  | 关闭
+          .form-group
+            label.col-sm-2.control-label 白名单
+            .col-sm-6
+              .checkbox
+                h5 证书
+                label.m-r-1(v-for='role in roles')
+                  input(type='checkbox' v-model="visitSettings.globalAccessLimit.whitelist.rolesId" :value='role._id')
+                  span {{role.displayName}}
+              .radio
+                h5 关系
+                label.m-r-1
+                  input(type='radio' v-model="visitSettings.globalAccessLimit.whitelist.relation" value='and')
+                  span 与
+                label
+                  input(type='radio' v-model="visitSettings.globalAccessLimit.whitelist.relation" value='or')
+                  span 或
+              .checkbox
+                h5 用户等级
+                label.m-r-1(v-for='grade in grades')
+                  input(type='checkbox' v-model="visitSettings.globalAccessLimit.whitelist.gradesId" :value='grade._id')
+                  span {{grade.displayName}}
+          .form-group
+            label.col-sm-2.control-label 登录用户提示内容
+            .col-sm-6
+              textarea.form-control(rows=5 v-model="visitSettings.globalAccessLimit.userDescription")
+              span.text-info 支持空格和换行
+          .form-group
+            label.col-sm-2.control-label 游客提示内容
+            .col-sm-6
+              textarea.form-control(rows=5 v-model="visitSettings.globalAccessLimit.visitorDescription")
+              span.text-info 支持空格和换行
+          h4 游客全局访问限制
           .form-group
             label.col-sm-2.control-label 状态
             .col-sm-10
@@ -24,7 +66,7 @@ block eContent
             .col-sm-6
               textarea.form-control(rows=5 v-model="visitSettings.globalLimitVisitor.description")
               span.text-info 支持空格和换行
-          h4 用户名片页游客限制
+          h4 游客用户名片页访问限制
           .form-group
             label.col-sm-2.control-label 状态
             .col-sm-10

@@ -91,16 +91,49 @@ const path = require('path');
 router.use('/', async (ctx, next) => {
   const {data, state, db, nkcModules, settings} = ctx;
   const {user, operationId} = data;
-  if(
-    !user &&
-    !settings.operationsType.whitelistOfVisitorLimit.includes(operationId)
-  ) {
-    const visitSettings = await db.SettingModel.getSettings('visit');
-    if(visitSettings.globalLimitVisitor.status) {
-      data.description = nkcModules.nkcRender.plainEscape(visitSettings.globalLimitVisitor.description);
+  const visitSettings = await db.SettingModel.getSettings('visit');
+  const isWhitelistOperation = settings.operationsType.whitelistOfVisitorLimit.includes(operationId);
+  const isResourceOperation = settings.operationsType.fileDownload.includes(operationId);
+  let isDev = false;
+  if(user && user.certs && user.certs.includes('dev')) {
+    isDev = true;
+  }
+  // 如果后台开启了全局访问限制且当前操作未在白名单
+  if(visitSettings.globalAccessLimit.status && !isWhitelistOperation && !isDev) {
+    let userRolesId;
+    let userGradeId;
+    if(!user) {
+      userRolesId = ['visitor'];
+      userGradeId = null;
+    } else {
+      userRolesId = data.userRoles.map(r => r._id);
+      userGradeId = data.userGrade._id;
+    }
+    const {relation, rolesId, gradesId} = visitSettings.globalAccessLimit.whitelist;
+    let hasRole = false;
+    for(const roleId of userRolesId) {
+      if(!rolesId.includes(roleId)) continue;
+      hasRole = true;
+      break;
+    }
+    const hasGrade = gradesId.includes(userGradeId);
+    if(
+      // 与关系时，证书不满足或用户等级不满足
+      (relation === 'and' && (!hasRole || !hasGrade)) ||
+      // 或关系时，证书和用户等级均不满足
+      (relation === 'or' && !hasRole && !hasGrade)
+    ) {
+      const description = user? visitSettings.globalAccessLimit.userDescription: visitSettings.globalAccessLimit.visitorDescription;
       if(!state.isApp) ctx.status = 401;
-
-      return ctx.body = nkcModules.render(path.resolve(__dirname, '../pages/filter_visitor.pug'), data, state);
+      if(
+        isResourceOperation ||
+        (ctx.request.accepts('json', 'html') === 'json' && ctx.request.get('FROM') === 'nkcAPI')
+      ) {
+        return ctx.throw(403, description);
+      } else {
+        data.description = nkcModules.nkcRender.plainEscape(description);
+        return ctx.body = nkcModules.render(path.resolve(__dirname, "../pages/filter_visitor.pug"), data, state);
+      }
     }
   }
   await next();

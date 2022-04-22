@@ -19,7 +19,7 @@ module.exports = {
       cwd: "./",
       wait_ready: true,
       shutdown_with_message: true,
-      instances: 8,
+      instances: 1,
       exec_mode: 'cluster',
       restart_delay: 5000, // 崩溃后重启前的等待毫秒数
       increment_var: 'PROCESS_ID',
@@ -34,7 +34,7 @@ module.exports = {
       cwd: "./",
       shutdown_with_message: true,
       wait_ready: true,
-      instances: 12,
+      instances: 1,
       exec_mode: 'cluster',
       restart_delay: 5000, // 崩溃后重启前的等待毫秒数
       increment_var: 'PROCESS_ID',
@@ -58,19 +58,30 @@ module.exports = {
       }
     },
     {
-      name: 'proxy',
+      name: 'backup',
       script: 'server.js',
-      cwd: "./microServices/proxy/",
+      cwd: "./microServices/backup/",
       wait_ready: true,
       shutdown_with_message: true,
-      instances: 2,
-      exec_mode: 'cluster',
       restart_delay: 5000, // 崩溃后重启前的等待毫秒数
       increment_var: 'PROCESS_ID',
       env: {
         NODE_ENV: 'production',
         PROCESS_ID: 0,
       }
-    }
+    },
+    {
+      name: 'store',
+      script: 'server.js',
+      cwd: "./microServices/store/",
+      wait_ready: true,
+      shutdown_with_message: true,
+      restart_delay: 5000, // 崩溃后重启前的等待毫秒数
+      increment_var: 'PROCESS_ID',
+      env: {
+        NODE_ENV: 'production',
+        PROCESS_ID: 0,
+      }
+    },
   ]
 };

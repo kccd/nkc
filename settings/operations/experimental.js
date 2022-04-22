@@ -301,7 +301,8 @@ module.exports = {
 			weakPasswordCheck: {
         GET: "weakPasswordCheck",
         result: {
-          GET: "weakPasswordCheckResult"
+          GET: "weakPasswordCheckResult",
+          POST: 'weakPasswordCheckResult',
         }
       }
     },

@@ -33,6 +33,7 @@ moduleToColumn.init = function(callback) {
       newCategory: {
         parentId: "",
         name: "",
+        brief: '',
         description: "",
         type: 'main' // main, minor
       },
@@ -71,13 +72,14 @@ moduleToColumn.init = function(callback) {
         var this_ = this;
         var category = this.newCategory;
         if(!category.name) return this.error = "请输入分类名";
-        if(!category.description) return this.error = "请输入分类介绍";
+        if(!category.brief) return this.error = "请输入分类简介";
         nkcAPI("/m/" + this.column._id + "/category", "POST", category)
           .then(function() {
             this_.getCategories();
             this_.createCategory = false;
             this_.newCategory = {
               name: "",
+              brief: '',
               description: "",
               parentId: "",
               type: 'main'

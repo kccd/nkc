@@ -7,9 +7,21 @@ block eContent
     #data.hidden=objToStr({certs: data.certs, authSettings: data.authSettings})
     #app.row(v-cloak)
       .col-xs-12.col-md-8
-        h4 身份认证审核员
-        span 提交身份认证申请时，给拥有相应证书的用户发送通知。
+        //- h4 身份认证审核员
+        //- span 提交身份认证申请时，给拥有相应证书的用户发送通知。
         .form-horizontal
+          .form-group
+            label.col-sm-3.control-label 身份认证 1 提示语：
+            .col-sm-9
+              //- h5.text-danger 请输入用户手机号证验证提示语
+              textarea.form-control(rows=4 v-model='authSettings.auth1Content')
+          .form-group
+          .form-group
+            label.col-sm-3.control-label 身份认证 2 提示语：
+            .col-sm-9
+              //- h5.text-danger 请输入用户身份证验证提示语
+              textarea.form-control(rows=4 v-model='authSettings.auth2Content')
+          .form-group
           .form-group
             label.col-sm-3.control-label 身份认证 3 提示语：
             .col-sm-9
@@ -18,6 +30,7 @@ block eContent
           .form-group
             label.col-sm-3.control-label 身份认证审核员
             .col-sm-9
+              h5.text-danger 提交身份认证申请时，给拥有相应证书的用户发送通知。
               h5 指定证书
               .cert-panel
                 span(title="点击移除该证书" :style="'background-color: '+cert.color + ';'" v-for="cert in selectedCerts" @click="removeCert(cert._id)") {{cert.displayName}}
@@ -29,6 +42,35 @@ block eContent
               h5 指定UID
               h5.text-danger 英文逗号“ , ”分隔
               textarea.form-control(v-model="auditorIdStr")
+          .form-group
+            label.col-sm-3.control-label 定期验证手机号
+            .col-sm-9
+              .radio
+                span 状态：
+                label.m-r-1
+                  input(type='radio' :value='true' v-model='authSettings.verifyPhoneNumber.enabled')
+                  | 开启
+                label
+                  input(type='radio' :value='false' v-model='authSettings.verifyPhoneNumber.enabled')
+                  | 关闭
+              .m-b-05.form-inline.m-t-05
+                span 间隔时间：
+                input.m-r-05.form-control(type='text' v-model.number='authSettings.verifyPhoneNumber.interval')
+                span 小时
+              .radio
+                span 未验证手机号时：
+                label.m-r-1
+                  input(type='radio' value='reviewPost' v-model='authSettings.verifyPhoneNumber.type')
+                  | 内容必审
+                label
+                  input(type='radio' value='disablePublish' v-model='authSettings.verifyPhoneNumber.type')
+                  | 禁止发表
+              .m-t-05
+                .m-b-05 内容必审时页面提示：
+                textarea.form-control(rows=2 v-model='authSettings.verifyPhoneNumber.reviewPostContent')
+              .m-t-05
+                .m-b-05 禁止发表时页面提示：
+                textarea.form-control(rows=2 v-model='authSettings.verifyPhoneNumber.disablePublishContent')
           .form-group
             label.col-sm-3.control-label
             .col-sm-9

@@ -2,6 +2,7 @@ const rateLimit = require('koa-ratelimit');
 const redisClientCache = require('../settings/redisClientCache');
 const fs = require('fs');
 const redis = require('ioredis');
+const redisConfig = require('../config/redis');
 const path = require('path');
 const rateLimitErrorInfo = fs.readFileSync(path.resolve(__dirname, `../pages/error/429.html`));
 const {files: fileOperations} = require('../settings/operationsType');
@@ -14,7 +15,11 @@ const {
 } = require('../config/rateLimit.json');
 module.exports = {
   total: rateLimit({
-    db: new redis(),
+    db: new redis({
+      host: redisConfig.address,
+      port: redisConfig.port,
+      db: redisConfig.db
+    }),
     duration: rateLimitTotal[0],
     disableHeader: false,
     errorMessage: rateLimitErrorInfo,
@@ -24,7 +29,11 @@ module.exports = {
     max: rateLimitTotal[1]
   }),
   totalFile: rateLimit({
-    db: new redis(),
+    db: new redis({
+      host: redisConfig.address,
+      port: redisConfig.port,
+      db: redisConfig.db
+    }),
     duration: rateLimitTotalFile[0],
     disableHeader: false,
     errorMessage: rateLimitErrorInfo,
@@ -37,7 +46,11 @@ module.exports = {
     }
   }),
   totalHtml: rateLimit({
-    db: new redis(),
+    db: new redis({
+      host: redisConfig.address,
+      port: redisConfig.port,
+      db: redisConfig.db
+    }),
     duration: rateLimitTotalHtml[0],
     disableHeader: false,
     errorMessage: rateLimitErrorInfo,
@@ -50,7 +63,11 @@ module.exports = {
     }
   }),
   userFile: rateLimit({
-    db: new redis(),
+    db: new redis({
+      host: redisConfig.address,
+      port: redisConfig.port,
+      db: redisConfig.db
+    }),
     duration: rateLimitUserFile[0],
     disableHeader: false,
     errorMessage: rateLimitErrorInfo,
@@ -63,7 +80,11 @@ module.exports = {
     }
   }),
   userHtml: rateLimit({
-    db: new redis(),
+    db: new redis({
+      host: redisConfig.address,
+      port: redisConfig.port,
+      db: redisConfig.db
+    }),
     duration: rateLimitUserHtml[0],
     disableHeader: false,
     errorMessage: rateLimitErrorInfo,

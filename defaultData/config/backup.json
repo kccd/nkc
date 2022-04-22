@@ -1,4 +1,4 @@
 {
-  "folder": "",
-  "time": ""
+  "folder": "/MongoDB",
+  "time": "0 0 2 * * *"
 }

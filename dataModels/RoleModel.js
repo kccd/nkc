@@ -270,10 +270,10 @@ roleSchema.statics.extendRole = async (_id) => {
 * */
 roleSchema.statics.getCertList = async (blacklist = []) => {
 	blacklist.push('default');
-	const RM = mongoose.model("roles");
-	const GM = mongoose.model("usersGrades");
-	const roles = await RM.find({_id: {$nin: blacklist}}, {_id: 1, displayName: 1}).sort({toc: 1});
-	const grades = await GM.find({}, {_id: 1, displayName: 1}).sort({_id: 1});
+	const RoleModel = mongoose.model("roles");
+	const UsersGradeModel = mongoose.model("usersGrades");
+	const roles = await RoleModel.find({_id: {$nin: blacklist}}, {_id: 1, displayName: 1}).sort({toc: 1});
+	const grades = await UsersGradeModel.find({}, {_id: 1, displayName: 1}).sort({_id: 1});
 	const data = [];
 	for(const role of roles) {
 		data.push({

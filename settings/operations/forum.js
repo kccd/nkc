@@ -5,6 +5,9 @@ module.exports = {
 		GET: 'visitForumHome', // 查看专业主页
 		POST: 'postToForum', // 在专业中发表文章
     DELETE: 'deleteForum', // 删除专业
+    child: {
+      GET: 'getForumChildForums'
+    },
     card: {
       GET: "visitForumCard"
     },

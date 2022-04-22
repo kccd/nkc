@@ -102,26 +102,63 @@ router
     const count = await db.WeakPasswordResultModel.countDocuments();
     const paging = nkcModules.apiFunction.paging(page, count);
     data.paging = paging;
-    data.list = await db.WeakPasswordResultModel.aggregate([
-      { $match: {} },
-      { $skip: paging.start },
-      { $limit: paging.perpage },
-      { $lookup: {
-          from: "users",
-          localField: "uid",
-          foreignField: "uid",
-          as: "userinfo"
-      } },
-      { $unwind: "$userinfo" },
-      { $project: {
-          uid: 1,
-          password: 1,
-          toc: 1,
-          _id: 0,
-          "userinfo.username": 1,
-          "userinfo.avatar": 1
-      } }
-    ]);
-    return next();
+    const list = await db.WeakPasswordResultModel.find({}).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
+    data.list = [];
+    const usersId = list.map(l => l.uid);
+    let users = await db.UserModel.find({uid: {$in: usersId}});
+    users = await db.UserModel.extendUsersInfo(users);
+    const usersObj = {};
+    for(const user of users) {
+      usersObj[user.uid] = user;
+    }
+    for(const l of list) {
+      const {toc, uid, password} = l;
+      const user = usersObj[uid];
+      if(!user) continue;
+      data.list.push({
+        uid,
+        toc,
+        password,
+        userXSF: user.xsf,
+        userBanned: user.certs.includes('banned'),
+        userToc: user.toc,
+        userTlm: user.tlv,
+        userAvatar: user.avatar,
+        username: user.username,
+        userCertsName: user.info.certsName,
+        userGradeId: user.grade._id,
+        userGradeName: user.grade.displayName,
+      });
+    }
+    await next();
+  })
+  .post("/weakPasswordCheck/result", async (ctx, next) => {
+    const {db, state} = ctx;
+    const results = await db.WeakPasswordResultModel.find({}, {uid: 1});
+    const resultsUsersId = results.map(r => r.uid);
+    const users = await db.UserModel.find({uid: {$in: resultsUsersId}, certs: {$ne: 'banned'}}, {uid: 1});
+    const toc = Date.now();
+    const usersId = [];
+    for(const user of users) {
+      usersId.push(user.uid);
+      await db.ManageBehaviorModel.insertLog({
+        ip: ctx.address,
+        port: ctx.port,
+        uid: state.uid,
+        toUid: user.uid,
+        operationId: 'bannedUser',
+        toc,
+      });
+    }
+    if(usersId.length > 0) {
+      await db.UserModel.updateMany({
+        uid: {$in: usersId}
+      }, {
+        $addToSet: {
+          certs: 'banned'
+        }
+      });
+    }
+    await next();
   });
 module.exports = router;

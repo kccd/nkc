@@ -129,6 +129,12 @@ userRouter
         data.targetUser.banner = '';
       }
     }
+
+    // 禁止游客查看开除学籍用户的名片
+    if (!user && targetUser.certs.includes('banned')) {
+      nkcModules.throwError(404, "根据相关法律法规和政策，该内容不予显示", "noPermissionToVisitHiddenUserHome");
+    }
+
     await db.UserModel.extendUsersInfo([targetUser]);
     if(user) {
       data.inBlacklist = !!(await db.BlacklistModel.findOne({uid: user.uid, tUid: targetUser.uid}));

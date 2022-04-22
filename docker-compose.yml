@@ -1,0 +1,30 @@
+version: '3.5'
+services:
+  Redis:
+    #image: "redis:3.2.100-nanoserver"
+    image: "redis:3.2.12"
+    #command: redis-server --requirepass sOmE_sEcUrE_pAsS
+    hostname: "redis"
+    ports:
+    - "6379:6379"
+    # volumes:
+    # - redisData:/bitnami/redis/data
+    environment:
+     - REDIS_REPLICATION_MODE=master
+  MongoDB:
+    image: "mongo:4.4.5"
+    hostname: "mongo"
+    ports:
+    - "27017:27017"
+    # volumns:
+    # - MongoData:/data/db
+  Elasticsearch:
+    image: "elasticsearch:6.8.22"
+    hostname: "elasticsearch"
+    ports:
+    - "9200:9200"
+    - "9300:9300" # optional
+    # volumns:
+    # - ElasticsearchData:/usr/share/elasticsearch/data
+    environment:
+    - "discovery.type=single-node"

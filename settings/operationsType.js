@@ -72,6 +72,7 @@ module.exports = {
     "getMessageFile"
   ],
   whitelistOfVisitorLimit: [
+    'logout',
     'visitLogin',
     'submitLogin',
     'getRegisterCode',
@@ -106,6 +107,7 @@ module.exports = {
   fileDownload: [
     'getResources',
     'getAttachment',
+    'getSiteSpecific',
     'visitVerifiedUpload',
     'auditorVisitVerifiedUpload',
     'getMessageFile',
