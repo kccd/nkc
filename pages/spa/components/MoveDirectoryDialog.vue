@@ -126,6 +126,7 @@ export default {
   },
   destroyed() {
     EventBus.$off();
+    this.draggableElement && this.draggableElement.destroy();
   },
   methods: {
     seekChild2({ findLocation, type = "self" }) {
@@ -243,6 +244,7 @@ export default {
         this.$el,
         this.$refs.draggableHandle
       );
+      this.draggableElement.setPositionCenter();
     },
     findAllChild(data, item) {
       for (let key in data) {

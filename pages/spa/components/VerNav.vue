@@ -53,8 +53,8 @@
       display: block;
       position: absolute;
       top: -1.5rem;
-      right: .5rem;
-
+      right: 15px;
+      padding: 0;
     }
   }
   .creation-nav{
@@ -81,7 +81,7 @@
       @media screen and (max-width: @max-width){
         position: absolute;
         top: -1rem;
-        left: 1rem;
+        left: 15px;
         font-size:1.5rem;
         font-weight: 600;
         height: 1.3rem;

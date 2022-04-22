@@ -2,15 +2,15 @@
 .abstract
   .editor-header 摘要
     small （选填）
-  .row.editor-abstract.clear-marginLR
-    .col-xs-12.col-md-6.clear-paddingL
+  .row.editor-abstract
+    .col-xs-12.col-md-6
       textarea.abstract-cn(
         placeholder="中文摘要，最多可输入1000字符",
         rows=7,
         v-model="cn"
       )
       .editor-abstract-info(:class="{ warning: abstractCnLength > 1000 }") {{ abstractCnLength }} / 1000
-    .col-xs-12.col-md-6.clear-paddingR
+    .col-xs-12.col-md-6
       textarea.abstract-en(
         placeholder="英文摘要，最多可输入1000字符",
         rows=7,
@@ -155,7 +155,7 @@ export default {
   color: #ff6262;
 }
 
-.clear-paddingL {
+/* .clear-paddingL {
   padding-left: 0;
 }
 .clear-paddingR {
@@ -164,5 +164,5 @@ export default {
 .clear-marginLR {
   margin-left: 0;
   margin-right: 0;
-}
+} */
 </style>

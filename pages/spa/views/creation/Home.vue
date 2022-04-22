@@ -1,6 +1,6 @@
 <template lang="pug">
 .standard-fluid-max-container.clear-float
-  .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel.xs-p.clear-padding
+  .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel.xs-p
     .calendar.overflow-x
       .min-h(ref="canvasDom")
       #set-year
@@ -16,7 +16,7 @@
         .account-logs-thread(v-for="(vt, i) in visitThreadLogs", :key="i")
           span {{ setTime(vt.timeStamp) }}
           span 看过
-          a(:href="'/t/' + vt.tid") {{ vt.thread.firstPost.t }}
+          a.article-title(:title="vt.thread.firstPost.t" :href="'/t/' + vt.tid") {{ vt.thread.firstPost.t }}
     .account-logs
       .account-header 看过的用户
       .account-description
@@ -285,6 +285,16 @@ export default {
 };
 </script>
 <style scoped lang="less">
+.account-logs-thread{
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  a{
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+}
 .box-shadow-panel > div {
   box-shadow: none;
   padding: 0;
@@ -292,6 +302,9 @@ export default {
   border-radius: 3px;
 }
 @media (max-width: 992px) {
+  .article-title{
+    display: block;
+  }
   .col-xs-12 {
     width: 100%;
     float: left;
@@ -343,13 +356,13 @@ export default {
   padding-right: 15px;
   padding-left: 15px;
 }
-.clear-padding{
-  padding: 0;
-}
-.clear-marginLR{
-  margin-left: 0;
-  margin-right: 0;
-}
+// .clear-padding{
+//   padding: 0;
+// }
+// .clear-marginLR{
+//   margin-left: 0;
+//   margin-right: 0;
+// }
 
  @max-width: 1000px;
 //  @media (max-width: @max-width) {

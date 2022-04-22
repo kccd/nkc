@@ -176,7 +176,8 @@ export default {
   mounted() {
     this.initDraggableElement();
   },
-  computed: {
+  destroyed(){
+    this.draggableElement && this.draggableElement.destroy();
   },
   methods: {
     getUrl: getUrl,
@@ -184,7 +185,9 @@ export default {
     format: timeFormat,
     getSize: getSize,
     initDraggableElement() {
-      this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
+      this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
+      this.draggableElement.setPositionCenter();
+
     },
     getResource: function(rid) {
       const self = this;

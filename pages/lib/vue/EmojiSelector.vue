@@ -105,6 +105,9 @@
       this.initMultipleSelection();
       this.initDraggableElement();
     },
+    destroyed(){
+      this.draggableElement && this.draggableElement.destroy();
+    },
     computed: {
       emojiUrl() {
         const {emoji} = this;
@@ -123,7 +126,9 @@
         this.multipleSelection = multipleSelection;
       },
       initDraggableElement() {
-        this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
+        this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
+        this.draggableElement.setPositionCenter();
+
       },
       initData() {
         const self = this;

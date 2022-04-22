@@ -136,7 +136,9 @@ export default {
           this.draggableElement = new DraggableElement(
             this.$refs.selectUser,
             this.$refs.header
-        );
+          );
+          this.draggableElement.setPositionCenter()
+
         })
       },
       close: function() {
@@ -148,7 +150,7 @@ export default {
           this.selectedUsersId = [];
           this.userCount = 0;
         }, 1000);
-        this.draggableElement.destroy && this.draggableElement.destroy();
+        this.draggableElement && this.draggableElement.destroy();
       },
       done: function() {
         this.callback({

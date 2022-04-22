@@ -192,6 +192,9 @@ export default  {
       this.columnId = res.userColumn._id;
     })
   },
+  destroyed(){
+    this.draggableElement && this.draggableElement.destroy();
+  },
   computed: {
     excludes: function() {
       const this_ = this;
@@ -211,7 +214,8 @@ export default  {
   },
   methods: {
     initDraggableElement() {
-      this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
+      this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
+      this.draggableElement.setPositionCenter();
     },
     //关闭弹窗
     close() {

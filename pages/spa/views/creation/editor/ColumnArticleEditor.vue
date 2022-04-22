@@ -17,9 +17,6 @@
   font-size: 1.2rem;
   font-weight: bolder;
 }
-.row{
-  width: 100%;
-}
 </style>
 <script>
   import ArticleEditor from "../../../../lib/vue/article/ArticleEditor";

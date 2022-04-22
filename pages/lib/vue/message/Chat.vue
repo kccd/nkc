@@ -6,7 +6,7 @@
       span(v-if='boxContent') {{boxContent}}
     .display-socket-container(v-show='containerMode !== "minimize"')
       .socket-container(
-        v-show='showPanel'
+        v-if='showPanel'
         :style='containerStyle'
         ref='socketContainer'
       )
@@ -275,8 +275,6 @@
       },
     },
     mounted() {
-      this.draggable = new DraggableElement(this.$refs.socketContainer, '.draggable-handle', this.onContainerPositionChange);
-      this.initSocketContainerMouseEvent();
       this.initContainer();
       this.initAudio();
       const app = this;
@@ -298,18 +296,22 @@
       this.updateNewMessageCount(newMessageCount);
       FastClick.attach(this.$refs.messageApp);
     },
-    destroyed(){
-      this.draggable && this.draggable.destroy()
-    },
     watch: {
-      // async showPanel() {
-      //   const app = this;
-      //   if(this.showPanel) {
-      //     await sleep(100);
-      //     await sleep(100);
-      //     app.initSocketContainerMouseEvent();
-      //   }
-      // },
+      async showPanel() {
+        const app = this;
+        if(this.showPanel) {
+        this.$nextTick(()=>{
+          this.draggableElement = new DraggableElement(this.$refs.socketContainer, '.draggable-handle', this.onContainerPositionChange);
+          const localValue = getFromLocalStorage(localStorageKey);
+          if (!(localValue && localValue.left && localValue.top)){
+            this.draggableElement.setPositionCenter()
+          }
+          app.initSocketContainerMouseEvent();
+          })
+        }else{
+          this.draggableElement && this.draggableElement.destroy()
+        }
+      },
       mode() {
         this.saveChatInfoToLocalStorage();
       },

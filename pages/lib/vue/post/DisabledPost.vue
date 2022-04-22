@@ -113,9 +113,13 @@ export default {
   mounted() {
     this.initDraggableElement();
   },
+  destroyed(){
+    this.draggableElement && this.draggableElement.destroy();
+  },
   methods: {
     initDraggableElement() {
-      this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
+      this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
+      this.draggableElement.setPositionCenter();
     },
     submit: function() {
       if(!this.reason) return screenTopWarning("请输入原因");

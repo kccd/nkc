@@ -1,9 +1,9 @@
 <template lang="pug">
 .editor
-  .row.clear-marginLR
-    .col-xs-12.col-md-9.box-shadow-panel.m-b-2.clear-padding
+  .row
+    .col-xs-12.col-md-9.m-b-2
       div
-        //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t 
+        //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t  .clear-padding
         //- 2.notice editorSettings.onEditNotes
         article-title(
           ref="title",
@@ -63,7 +63,7 @@
             :state="{ userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column: pageState.userColumn }",
             :data="{ addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn }"
           )
-    .col-xs-12.col-md-3.box-shadow-panel
+    .col-xs-12.col-md-3
       //- 1.notice 温馨提示的内容  2.data 中只需要post therad type forum allowedAnonymousForumsId havePermissionToSendAnonymousPost threadCategories
       //- 3.@ready-data 提交 和 保存时用于获取数据并提交 4.@remove-editor 提交后移除编辑器
       modify-submit(
@@ -187,6 +187,7 @@ export default {
   },
 };
 </script>
+
 <style>
 .edui-default .edui-editor-toolbarboxouter {
   background-color: white !important;
@@ -196,12 +197,12 @@ export default {
 
 
 
-.box-shadow-panel > div {
+/* .box-shadow-panel > div {
   box-shadow: none;
   padding: 0;
   background-color: #fff;
   border-radius: 3px;
-}
+} */
 @media (max-width: 992px) {
   .col-xs-12 {
     width: 100%;
@@ -254,11 +255,11 @@ export default {
   padding-right: 15px;
   padding-left: 15px;
 }
-.clear-padding{
+/* .clear-padding{
   padding: 0;
 }
 .clear-marginLR{
   margin-left: 0;
   margin-right: 0;
-}
+} */
 </style>
