@@ -104,6 +104,7 @@ import {getUrl,fromNow} from "../../../../lib/js/tools";
 import {removeUserFromBlacklist} from "../../../../lib/js/subscribe";
 import {objToStr} from "../../../../lib/js/tools";
 import Paging from "../../../../lib/vue/Paging";
+import {getState} from "../../../../lib/js/state";
 export default {
   data: () => ({
     uid: null,
@@ -129,12 +130,13 @@ export default {
     fromNow: fromNow,
     initData() {
       const {uid} = this.$route.params;
-      this.uid = uid;
+      const {uid: stateUid} = getState();
+      this.uid = uid || stateUid;
     },
     //获取用户黑名单
     getBlackList(page) {
       const self = this;
-      let url = `/u/${this.uid}/profile/subscribe/blacklist`;
+      let url = `/u/${self.uid}/profile/subscribe/blacklist`;
       if(page) {
         if(url.indexOf('?') === -1) {
           url = url + `?page=${page}`;
