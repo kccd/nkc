@@ -14,6 +14,7 @@
                 img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
               .account-user-introduce
                 .account-user-name {{targetUser.username}}
+                .account-user-certs
                   user-level(ref="userLevel" :target-user="targetUser")
                 .account-user-subscribe(v-if="subscribeBtn" ref="subscribeBox")
                   div(:class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
@@ -78,7 +79,7 @@
           position: relative;
           height: auto;
           top: 8rem;
-          margin: 0rem 4rem 0 4rem;
+          margin: 0rem 3rem 0 3rem;
           @media (max-width: 991px){
             margin: 0rem 1rem;
           }
@@ -130,8 +131,9 @@
               }
             }
             .account-user-name{
-              font-size: 1.5rem;
-              font-weight: bold;
+              padding-top: 1rem;
+              font-size: 1.6rem;
+              //font-weight: bold;
               text-shadow: 1px 0px 2px #FFF;
               @media (max-width: 991px){
                 font-size: 16px;

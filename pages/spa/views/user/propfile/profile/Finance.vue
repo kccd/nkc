@@ -1,5 +1,5 @@
 <template lang="pug">
-  .finance-box.b-s-10
+  .finance-box
     .finance-head
       .fa.fa-sliders.option-icon(@click.stop="operationShow")
       .finance-head-link(v-show="show")
@@ -18,17 +18,17 @@
           strong.h4.text-danger {{item.number / 100}}
           span {{item.unit}}
       .m-b-1
-        paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
-      .m-b-1
         a.btn.btn-success.btn-sm(href="/account/finance/recharge" target="_blank") 充值
         span &nbsp;
         a.btn.btn-default.btn-sm(href="/account/finance/withdraw" target="_blank") 提现
         span &nbsp;
         a.btn.btn-default.btn-sm(href="/account/finance/exchange" target="_blank") 兑换
-      .finance-context-nav
+      .finance-context-nav.m-b-1
         li(:class="navType==='all'?'active':''" @click="navTypeChange('all')") 所有
         li(:class="navType==='in' ?'active':''" @click="navTypeChange('in')") 收入
         li(:class="navType==='payout'?'active':''" @click="navTypeChange('payout')") 支出
+      .m-b-1(v-if="pageButtons.length > 0")
+        paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
       .finance-context-table.table-responsive
         table.table.table-bordered(v-if="navType !== 'all'" )
           thead
@@ -91,11 +91,12 @@
                   a(:href="item.post.url" target="_blank" v-if="item.post" ) {{'文号（'+item.pid+'）'}}
                   span(v-if="item.ordersId && item.ordersId.length !== 0" ) {{'订单号（'+item.ordersId.join(', ')+'）'}}
         .text-center(v-if="kcbsRecords && kcbsRecords.length === 0") 暂无记录
+      .m-b-1(v-if="pageButtons.length > 0")
+        paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
 
 </template>
 <style lang="less" scoped>
 .finance-box{
-  padding: 15px;
   .finance-head{
     user-select: none;
     position: relative;
@@ -238,7 +239,8 @@ export default {
     },
     navTypeChange(type){
       this.navType = type;
-      this.getUserAccountInfo(this.paging.page, type);
+      // this.getUserAccountInfo(this.paging.page, type);
+      this.getUserAccountInfo(0, type);
     },
     clickBtn(num) {
       this.getUserAccountInfo(num, this.t);
