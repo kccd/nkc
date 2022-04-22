@@ -68,7 +68,7 @@ export class DraggableElement {
       })
       .on('mousedown', this._mousedownEvent);
     this.updateZIndex();
-    this.setPositionCenter = this.setPositionCenter;
+    // this.setPositionCenter = this.setPositionCenter;
   }
   show() {
    this.JQRoot.show();
