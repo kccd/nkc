@@ -1,5 +1,5 @@
 <template lang="pug">
-  .standard-not-centered
+  .standard-fluid-max-container
     editor
 </template>
 
