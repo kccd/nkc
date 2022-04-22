@@ -18,6 +18,8 @@
           strong.h4.text-danger {{item.number / 100}}
           span {{item.unit}}
       .m-b-1
+        paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
+      .m-b-1
         a.btn.btn-success.btn-sm(href="/account/finance/recharge" target="_blank") 充值
         span &nbsp;
         a.btn.btn-default.btn-sm(href="/account/finance/withdraw" target="_blank") 提现
@@ -172,6 +174,7 @@
 import {nkcAPI} from "../../../../../lib/js/netAPI";
 import {timeFormat} from "../../../../../lib/js/time";
 import {getState} from "../../../../../lib/js/state";
+import Paging from "../../../../../lib/vue/Paging";
 export default {
   data: () => ({
     targetUserScores: null,
@@ -180,22 +183,31 @@ export default {
     nkcBankName: null,
     kcbsRecords: null,
     t: null,
-    targetUser: null
+    targetUser: null,
+    paging: null,
   }),
+  components: {
+    "paging": Paging
+  },
   created() {
     this.uid = getState().uid;
     this.getUserAccountInfo();
+  },
+  computed: {
+    pageButtons() {
+      return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
+    },
   },
   mounted() {
     window.addEventListener("click", this.clickOther);
   },
   methods: {
     timeFormat: timeFormat,
-    getUserAccountInfo(type){
+    getUserAccountInfo(page=0, type=''){
       const self = this;
-      let url = `/u/${this.uid}/profile/finance`;
+      let url = `/u/${this.uid}/profile/finance?page=${page}`;
       if(type){
-        url += `?t=${type}`;
+        url += `&t=${type}`;
       }
       nkcAPI(url, 'GET')
         .then(res => {
@@ -203,6 +215,7 @@ export default {
           self.kcbsRecords = res.kcbsRecords;
           self.nkcBankName = res.nkcBankName;
           self.t = res.t;
+          self.paging = res.paging;
           self.targetUser = res.targetUser;
           // self.nkcBankName = res.nkcBankName;
         })
@@ -225,11 +238,15 @@ export default {
     },
     navTypeChange(type){
       this.navType = type;
-      this.getUserAccountInfo(type);
+      this.getUserAccountInfo(this.paging.page, type);
+    },
+    clickBtn(num) {
+      this.getUserAccountInfo(num, this.t);
     }
   },
   beforeDestroy() {  // 实例销毁之前对点击事件进行解绑
     window.removeEventListener('click', this.clickOther);
-  }
+  },
+
 }
 </script>
