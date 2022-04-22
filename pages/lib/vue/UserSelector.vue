@@ -59,7 +59,7 @@
       this.initDraggableElement();
     },
     destroyed() {
-
+      this.draggableElement && this.draggableElement.destroy();
     },
     computed: {
       selectedUsers: function() {
@@ -76,7 +76,8 @@
       checkString: checkString,
       getUrl: getUrl,
       initDraggableElement() {
-        this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
+        this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
+        this.draggableElement.setPositionCenter();
       },
       removeUser: function(index) {
         this.selectedUsersId.splice(index, 1);

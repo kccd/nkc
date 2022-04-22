@@ -143,6 +143,9 @@ export default {
   mounted() {
     this.initDraggableElement();
   },
+  destroyed(){
+    this.draggableElement && this.draggableElement.destroy();
+  },
   computed: {
     costScores() {
       const {userScores, needScore} = this;
@@ -199,6 +202,8 @@ export default {
     },
     initDraggableElement() {
       this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
+      this.draggableElement.setPositionCenter()
+
     },
     visitUrl({name, url}) {
       url = url + `&time=${Date.now()}`

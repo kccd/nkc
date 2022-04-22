@@ -130,9 +130,11 @@ export default {
       this.$refs.model,
       this.$refs.addKeyword
     );
+    this.draggable.setPositionCenter()
+    
   },
   destroyed(){
-    this.draggableElement.destroy && this.draggableElement.destroy();
+    this.draggableElement && this.draggableElement.destroy();
   },
   methods: {
     close() {

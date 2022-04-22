@@ -181,11 +181,13 @@
       this.initDraggableElement();
     },
     destroyed() {
-      this.destroyDraggableElement();
+      this.draggableElement && this.draggableElement.destroy()
     },
     methods: {
       initDraggableElement() {
         this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
+        this.draggableElement.setPositionCenter()
+
       },
       destroyDraggableElement() {
         this.draggableElement.destroy();

@@ -94,7 +94,7 @@ export default {
     // console.log(this.$data,'有缓存的情况')
     this.setInterval = setInterval(this.autoSaveToDraft, this.saveDraftTimeout);
   },
-  deactivated(){
+  destroyed(){
     clearInterval(this.setInterval)
   },
   methods: {

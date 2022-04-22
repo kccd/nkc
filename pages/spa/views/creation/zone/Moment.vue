@@ -8,6 +8,11 @@
   .moment{
     width: 56rem;
     max-width: 100%;
+    .moment-quote-title{
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
   }
 </style>
 <script>

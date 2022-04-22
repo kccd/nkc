@@ -625,6 +625,8 @@
       },
       initDraggableElement() {
         this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
+        this.draggableElement.setPositionCenter();
+
       },
       // 注册事件，当上传的文件处理成功后更新列表
       initSocketEvent() {

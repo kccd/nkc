@@ -132,10 +132,13 @@
     destroyed() {
       this.destroyCropper();
       this.destroyDraggable();
+      this.draggableElement && this.draggableElement.destroy();
     },
     methods: {
       initDraggableElement() {
-        this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
+        this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
+        this.draggableElement.setPositionCenter();
+
       },
       initModal() {
         if(this.init === true) return;

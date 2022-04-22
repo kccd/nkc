@@ -89,11 +89,15 @@
     },
     mounted() {
       this.initDraggableElement();
-      const self = this;
+    },
+    destroyed(){
+      this.draggableElement && this.draggableElement.destroy();
     },
     methods: {
       initDraggableElement() {
-        this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
+        this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
+        this.draggableElement.setPositionCenter();
+
       },
       updateMathJaxView() {
         const {content} = this;

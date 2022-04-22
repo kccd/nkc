@@ -157,6 +157,9 @@ export default {
     );
     this.initDraggableElement();
   },
+  destroyed(){
+    this.draggableElement && this.draggableElement.destroy();
+  },
   computed: {
     extendedData() {
       const that = this;
@@ -229,6 +232,7 @@ export default {
         this.$el,
         this.$refs.draggableHandle
       );
+      this.draggableElement.setPositionCenter();
     },
     submit: function () {
       if (this.selectType === "post") {

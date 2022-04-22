@@ -112,6 +112,9 @@ export default {
   mounted() {
     this.initDraggableElement();
   },
+  destroyed(){
+    this.draggableElement && this.draggableElement.destroy();
+  },
   watch: {
     type: function() {
       if(this.type === 'toDisabled') {
@@ -122,6 +125,8 @@ export default {
   methods: {
     initDraggableElement() {
       this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
+      this.draggableElement.setPositionCenter()
+
     },
     submit: function() {
       if(!this.docId) return;

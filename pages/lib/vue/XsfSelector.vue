@@ -79,9 +79,13 @@ export default {
   mounted() {
     this.initDraggableElement();
   },
+  destroyed(){
+    this.draggableElement && this.draggableElement.destroy();
+  },
   methods: {
     initDraggableElement() {
-      this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
+      this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
+      this.draggableElement.setPositionCenter();
     },
     close: function() {
       this.draggableElement.hide();

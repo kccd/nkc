@@ -307,12 +307,14 @@
       this.initDraggableElement();
     },
     destroyed(){
-      socket.removeListener("fileTransformProcess")
+      socket.removeListener("fileTransformProcess");
+      this.draggableElement && this.draggableElement.destroy();
     },
     methods: {
       getUrl,
       initDraggableElement() {
-        this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
+        this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
+        this.draggableElement.setPositionCenter();
       },
       selectType(type) {
         this.type = type;

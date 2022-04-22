@@ -96,7 +96,8 @@ export default {
     highlightForumId: "",
     show: false,
     needThreadType: true,
-    showThreadTypes: false
+    showThreadTypes: false,
+    draggableElement: '',
   }),
   computed: {
     forumData() {
@@ -184,14 +185,15 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      this.draggable = new DraggableElement(
+      this.draggableElement = new DraggableElement(
         this.$refs.selectForum,
         this.$refs.title
       );
+      this.draggableElement.setPositionCenter()
     });
   },
   destroyed() {
-    this.draggable.destroy();
+    this.draggableElement && this.draggableElement.destroy();
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
