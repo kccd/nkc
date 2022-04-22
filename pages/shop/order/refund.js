@@ -113,7 +113,7 @@ var app = new Vue({
           setTimeout(function() {
             // window.location.href="/shop/order"
             openToNewLocation("/shop/order");
-          }, 2000); 
+          }, 2000);
         })
         .catch(function(data) {
           app.error = data.error || data;
@@ -133,7 +133,7 @@ var app = new Vue({
           app.info = "保存成功";
           setTimeout(function() {
             app.info = "";
-          }, 3000); 
+          }, 3000);
         })
         .catch(function(data) {
           app.error = data.error || data;
@@ -179,7 +179,6 @@ var app = new Vue({
         } else {
           // 1.1 * 100 不会得到预期结果
           // 如果只考虑 最大两位小数 （parseInt(Number)）
-          console.log(newRefund.money, this.order.orderPrice)
           if( parseInt(newRefund.money*100) > this.order.orderPrice + (!this.order.shipToc ? this.order.orderFreightPrice : 0) ) return this.error = "退款金额不能超过商品总金额";
         }
       }
@@ -228,7 +227,7 @@ var app = new Vue({
           }
         }
         app.uploadStatus = "上传中... " + (index+1) + "/" + arr.length + " " + p.toFixed(1) + "%";
-        
+
       })
         .then(function(data) {
           var cert = data.cert;
@@ -254,7 +253,7 @@ var app = new Vue({
       })
         .then(function() {
           window.location.reload();
-        })    
+        })
         .catch(function(data) {
           this.error = data.error || data;
         });
@@ -272,7 +271,7 @@ var app = new Vue({
           screenTopWarning(data);
         });
     },
-    
+
     refundType: function(t) {
       return {
         'money': '只退款',
@@ -280,6 +279,6 @@ var app = new Vue({
       }[t];
     }
   }
-});   
+});
 
 window.app = app;

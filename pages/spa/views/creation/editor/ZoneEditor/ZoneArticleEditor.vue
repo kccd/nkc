@@ -24,9 +24,3 @@ export default {
   })
 }
 </script>
-<style>
-.clear-marginR{
-  margin-right: 0;
-}
-
-</style>

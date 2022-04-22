@@ -1,6 +1,6 @@
 <template lang="pug">
   #moduleSelectColumnCategories
-    .row.clear-marginR
+    .row
       .col-xs-6
         div(style="background-color: #eee;padding: 0.5rem;")
           .text-center(v-if="!loaded") 加载中...
