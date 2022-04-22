@@ -65,6 +65,7 @@ const start = async () => {
     if(global.NKC.isDevelopment) {
       require('./microServices/communication/server');
       require('./microServices/render/server');
+      require('./microServices/store/server');
       require('./timedTask');
     }
 
