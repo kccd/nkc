@@ -2,12 +2,9 @@
   .app-profile-view
     router-view
 </template>
-<style lang="less">
+<style lang="less" scoped>
 .app-profile-view {
   padding: 15px;
-  background-color: #fff;
-}
-body {
   background-color: #fff;
 }
 </style>

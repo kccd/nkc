@@ -104,7 +104,7 @@ export default {
   padding: 0.5rem;
   position: relative;
   border: 1px solid #eee;
-  box-shadow: 0 1px 3px 1px #f1d196 ;
+  //box-shadow: 0 1px 3px 1px #f1d196 ;
   transition: all .5s linear;
   // &:hover{
     // box-shadow: 0 2px 5px 1px #bdac8e;
