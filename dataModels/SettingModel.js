@@ -976,11 +976,12 @@ settingSchema.statics.getManagementData = async (user) => {
   const ComplaintModel = mongoose.model('complaints');
   const ProblemModel = mongoose.model('problems');
   const results = [];
+  
   if(await user.hasPermission('nkcManagement')) {
     results.push({
       name: '前台管理',
       url: '/nkc',
-      icon: 'fa-cogs',
+      icon: 'ft-layers',
       count: 0,
     });
   }
@@ -988,7 +989,7 @@ settingSchema.statics.getManagementData = async (user) => {
     results.push({
       name: '后台管理',
       url: '/e',
-      icon: 'fa-cogs',
+      icon: 'i-server',
       count: 0
     });
   }
@@ -1026,7 +1027,7 @@ settingSchema.statics.getManagementData = async (user) => {
     results.push({
       name: '内容审核',
       url: '/review',
-      icon: 'fa-shield',
+      icon: 'fs-preview',
       count
     });
   }
@@ -1034,7 +1035,7 @@ settingSchema.statics.getManagementData = async (user) => {
     results.push({
       name: '投诉列表',
       url: '/complaint',
-      icon: 'fa-minus-circle',
+      icon: 'ft-alert-triangle',
       count: await ComplaintModel.countDocuments({resolved: false})
     });
   }
@@ -1042,7 +1043,7 @@ settingSchema.statics.getManagementData = async (user) => {
     results.push({
       name: '问题列表',
       url: '/problem/list',
-      icon: 'fa-exclamation-circle',
+      icon: 'e-new',
       count: await ProblemModel.countDocuments({resolved: false}),
     });
   }
@@ -1050,7 +1051,7 @@ settingSchema.statics.getManagementData = async (user) => {
     results.push({
       name: '文库记录',
       url: '/libraries/logs',
-      icon: 'fa-book',
+      icon: 'i-library',
       count: 0
     });
   }
