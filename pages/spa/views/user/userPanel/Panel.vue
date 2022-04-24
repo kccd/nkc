@@ -79,7 +79,7 @@
           position: relative;
           height: auto;
           top: 8rem;
-          margin: 0rem 3rem 0 3rem;
+          margin: 0rem 4rem 0 4rem;
           @media (max-width: 991px){
             margin: 0rem 1rem;
           }
@@ -131,9 +131,8 @@
               }
             }
             .account-user-name{
-              padding-top: 1rem;
-              font-size: 1.6rem;
-              //font-weight: bold;
+              font-size: 1.5rem;
+              font-weight: bold;
               text-shadow: 1px 0px 2px #FFF;
               @media (max-width: 991px){
                 font-size: 16px;
@@ -263,7 +262,7 @@ export default {
     subscribeBtnType: false,
     subscribeBtnBoxType: false,
     usersBlUid: [],
-
+    stopInAndOut: false,
   }),
   components: {
     "user-level": UserLevel,
@@ -276,6 +275,9 @@ export default {
     EventBus.$on('addToBl',()=>{
       this.subscribeBtnType = false
     })
+    if(getState() && getState().isApp){
+      this.stopInAndOut = true;
+    }
   },
   mounted() {
   },
@@ -346,14 +348,23 @@ export default {
     containerChange(path){
       this.$router.push({name: path})
     },
-    //鼠标移入
+    //鼠标移入,移动段屏蔽
     enter(){
-      this.$refs.adminManage.changeShowBanBox(true);
+      if(this.stopInAndOut){
+        return
+      }else{
+        this.$refs.adminManage.changeShowBanBox(true);
+      }
     },
     //鼠标移除
     leave(){
-      this.$refs.adminManage.changeShowBanBox(false);
-      this.$refs.adminManage.clickBanContext(false);
+      if(this.stopInAndOut){
+        return
+      }else{
+        this.$refs.adminManage.changeShowBanBox(false);
+        this.$refs.adminManage.clickBanContext(false);
+      }
+
     }
   }
 }

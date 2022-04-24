@@ -20,7 +20,7 @@ func.init = async () => {
         mappings: {
           documents: {
             properties: {
-              docType: { // 文档类型：thread，user，post，document_article
+              docType: { // 文档类型：thread， user， post，document_article， document_comment
                 type: "keyword"
               },
               uid: {
@@ -113,7 +113,7 @@ func.save = async (docType, document) => {
   if(
     ![
       "user", "post", "thread", "column", "columnPage", "resource",
-      "document_article", "document_comment", "document_moment"
+      "document_article", "document_comment"
     ].includes(docType)
   ) throwErr(500, "docType error");
 
@@ -153,11 +153,9 @@ func.save = async (docType, document) => {
   } else if(docType === "resource") {
     id = `resource_${tid}`;
   } else if(docType === 'document_article') {
-    id = `document_${tid}`;
+    id = `article_${tid}`;
   } else if(docType === 'document_comment') {
-    id = `document_${tid}`;
-  } else if(docType === 'document_moment') {
-    id = `document_${tid}`;
+    id = `comment_${tid}`;
   }
 
   return await client.index({

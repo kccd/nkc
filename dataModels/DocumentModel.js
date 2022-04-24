@@ -1190,7 +1190,10 @@ schema.methods.pushToSearchDB = async function() {
     abstractCN: abstract,
     keywordsCN: keywords || [],
     keywordsEN: keywordsEN || [],
-  });
+  })
+    .catch(err => {
+      console.log(err);
+    })
 };
 
 /*
