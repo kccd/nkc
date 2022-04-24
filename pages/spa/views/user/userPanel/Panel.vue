@@ -154,6 +154,7 @@
                 font-weight: bold;
                 text-shadow: 1px 0px 2px #333;
                 padding-top: 1rem;
+                margin-bottom: 0.5rem;
                 color: #fff;
                 @media (max-width: 768px){
                   font-size: 14px;
