@@ -209,7 +209,7 @@
             .sub-item{
               display: inline-block;
               margin: 3px 15px 0 15px;
-              font-weight: bold;
+              //font-weight: bold;
               font-size: 12px;
               cursor: pointer;
               text-align: center;
