@@ -27,7 +27,8 @@
       width: 100%;
       text-align: center;
       span {
-        padding: 0.5rem;
+        padding:0.5rem 2.5rem 0.5rem 2.5rem;
+        font-size: 1.5rem;
       }
       .active {
         color: #2b90d9;
