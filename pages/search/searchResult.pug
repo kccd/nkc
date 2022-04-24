@@ -7,7 +7,11 @@
     a(href=result.link target="_blank").clear-a-style.search-result-title!= result.title
     .search-result-info
       if !result.anonymous
-        a.clear-a-style.search-result-author(href=`/u/${result.postUser.uid}`)
+        a.clear-a-style.search-result-author(href=`/u/${result.postUser.uid}`
+          data-global-mouseover="showUserPanel"
+          data-global-mouseout="hideUserPanel"
+          data-global-data=objToStr({uid: result.postUser.uid})
+        )
           img(src=tools.getUrl('userAvatar', result.postUser.avatar, 'sm'))
           span=result.postUser.username
       else
@@ -31,11 +35,19 @@
       .box-shadow-panel
         div(style="max-width: 100%;width: 70rem;")
           .search-result-avatar
-            a(href=`/u/${result.user.uid}` target="_blank")
+            a(href=`/u/${result.user.uid}` target="_blank"
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: result.user.uid})
+            )
               img(src=tools.getUrl('userAvatar', result.user.avatar))
           .search-result-user-info
             .display-i-b.m-r-05
-              a.clear-a-style(href=`/u/${result.user.uid}` target="_blank").search-result-username!=result.username
+              a.clear-a-style(href=`/u/${result.user.uid}` target="_blank"
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                data-global-data=objToStr({uid: result.user.uid})
+              ).search-result-username!=result.username
                 -let targetUser = result.user;
               .display-i-b
                 include ../user/module_user_grade
@@ -81,7 +93,11 @@
                   else
                     button.btn.btn-xs.btn-default(onclick=`SubscribeTypes.subscribeColumn('${result.column._id}', true)`) 关注
               .m-t-05 专栏主：
-                a(href=`/u/${result.column.uid}` target="_blank")=result.column.user.username
+                a(href=`/u/${result.column.uid}` target="_blank"
+                  data-global-mouseover="showUserPanel"
+                  data-global-mouseout="hideUserPanel"
+                  data-global-data=objToStr({uid: result.column.uid})
+                )=result.column.user.username
               .m-t-05=`关注人数：${result.column.subCount}`
             .display-i-b
               .search-result-time
@@ -105,7 +121,11 @@
   else if result.docType === "resource"
     a(onclick=`showResource('${result.resource._id}')`).pointer.clear-a-style.search-result-title!= result.t
     .search-result-info
-      a.clear-a-style.search-result-author(href=`/u/${result.resource.uid}`)
+      a.clear-a-style.search-result-author(href=`/u/${result.resource.uid}`
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        data-global-data=objToStr({uid: result.resource.uid})
+      )
         img(src=tools.getUrl("userAvatar", result.resource.user.avatar, "sm"))
         span=result.resource.user.username
       .search-result-time
@@ -118,18 +138,52 @@
         | 立即下载&nbsp;
       div=`${(result.resource.ext || "未知").toUpperCase()} ${tools.getSize(result.resource.size)}`
   else if result.docType === "document_article"
+    .checkbox.thread-checkbox(style="display: inline;")
+      label
+        input(type="checkbox" data-article-id=result.articleId data-document-id=result.documentId)
     a(href=result.link target="_blank").clear-a-style.search-result-title!= result.title
-      .search-result-info
-        if !result.anonymous
-          a.clear-a-style.search-result-author(href=`/u/${result.documentUser.uid}`)
-            img(src=tools.getUrl('userAvatar', result.documentUser.avatar, 'sm'))
-            span=result.documentUser.username
-        else
-          span.clear-a-style.search-result-author
-            img(src=anonymousInfo.avatar)
-            span.anonymous-name=anonymousInfo.username
-        .search-result-time
-          +fromNow(result.documentTime)
-        span=result.docType === "document_article" ? "发表于" : "回复于"
-        a.clear-a-style.search-result-forum(href=result.bookUrl)=result.bookName
-      .search-result-abstract!= result.abstract
+    .search-result-info
+      if !result.anonymous
+        a.clear-a-style.search-result-author(href=`/u/${result.documentUser.uid}`
+          data-global-mouseover="showUserPanel"
+          data-global-mouseout="hideUserPanel"
+          data-global-data=objToStr({uid: result.documentUser.uid})
+        )
+          img(src=tools.getUrl('userAvatar', result.documentUser.avatar, 'sm'))
+          span=result.documentUser.username
+      else
+        span.clear-a-style.search-result-author
+          img(src=anonymousInfo.avatar)
+          span.anonymous-name=anonymousInfo.username
+      .search-result-time
+        +fromNow(result.documentTime)
+      if result.source === 'column'
+        span 发表于专栏
+        a.clear-a-style.search-result-forum(href=result.column.homeUrl target="_blank")=result.column.name
+      else if result.source === 'zone'
+        span 发表于空间文章
+    .search-result-abstract!= result.abstract
+  else if result.docType === 'document_comment'
+    .checkbox.thread-checkbox(style="display: inline;")
+      label
+        input(type="checkbox" data-comment-id=result.commentId data-document-id=result.documentId)
+    a(href=result.articleUrl target="_blank").clear-a-style.search-result-title!= result.articleTitle
+    .search-result-info
+      if !result.anonymous
+        a.clear-a-style.search-result-author(href=`/u/${result.commentUser.uid}`
+          data-global-mouseover="showUserPanel"
+          data-global-mouseout="hideUserPanel"
+          data-global-data=objToStr({uid: result.commentUser.uid})
+        )
+          img(src=tools.getUrl('userAvatar', result.commentUser.avatar, 'sm'))
+          span=result.commentUser.username
+      else
+        span.clear-a-style.search-result-author
+          img(src=anonymousInfo.avatar)
+          span.anonymous-name=anonymousInfo.username
+      .search-result-time
+        //-=fromNow(result.postTime)
+        +fromNow(result.commentTime)
+      span=result.source==='column'?'回复于专栏文章':'回复于空间文章'
+      a.clear-a-style.search-result-forum(href=result.articleUrl target="_blank")=result.articleTitle
+    .search-result-abstract!= result.abstract

@@ -1,5 +1,6 @@
 const mongoose = require('../settings/database');
 const moment = require('moment');
+const tools = require("../nkcModules/tools");
 
 const articleSources = {
   column: 'column',
@@ -1072,6 +1073,7 @@ schema.statics.getArticlesInfo = async function(articles) {
   const articleDocumentsObj = {};
   const uidArr = [];
   const userObj = {};
+  const columnObj = {};
   const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
   for(const article of articles) {
     if(article.source === columnSource) {
@@ -1100,6 +1102,16 @@ schema.statics.getArticlesInfo = async function(articles) {
     columnsId.push(columnPost.columnId);
     columnPostsObj[columnPost.pid] =columnPost;
   }
+  
+  const columns = await ColumnModel.find({_id: {$in: columnsId}});
+  for(const column of columns) {
+    columnObj[column._id] = {
+      _id: column._id,
+      name: column.name,
+      description: column.description,
+      homeUrl: tools.getUrl('columnHome', column._id)
+    };
+  }
   //查找文章评论引用
   let articlePosts = await ArticlePostModel.find({sid: {$in: articleId}});
   //获取评论引用信息
@@ -1116,9 +1128,11 @@ schema.statics.getArticlesInfo = async function(articles) {
     if(document) {
       review = (await ReviewModel.find({docId: document._id}).sort({toc: -1}).limit(1))[0];
     }
+    const columnPost = columnPostsObj[article._id];
     if(article.source === columnSource) {
-      const columnPost = columnPostsObj[article._id];
-      if(!columnPost) return;
+      if(!columnPost) {
+        continue
+      };
       editorUrl = `/column/editor?source=column&mid=${columnPost.columnId}&aid=${columnPost.pid}`;
       url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
     } else if(article.source === zoneSource) {
@@ -1128,8 +1142,7 @@ schema.statics.getArticlesInfo = async function(articles) {
     const documentResourceId = await document.getResourceReferenceId()
     //获取文章引用的资源
     // const resources = await ResourceModel.getResourcesByReference(documentResourceId);
-    
-    results.push({
+    const info = {
       ...article.toObject(),
       reason: review?review.reason:'',
       document,
@@ -1138,7 +1151,11 @@ schema.statics.getArticlesInfo = async function(articles) {
       user: userObj[article.uid],
       count: articlePostsObj[article._id]?articlePostsObj[article._id].count : 0,
       url,
-    });
+    };
+    if(article.source === 'column') {
+      info.column = columnObj[columnPost.columnId];
+    }
+    results.push(info);
   }
   return results;
 }

@@ -745,7 +745,7 @@ schema.statics.getCommentInfo = async function(comments) {
   const documents = await DocumentModel.find({did: commentDid, type: stableType});
   const commentDocumentsObj = {};
   for(const d of documents) {
-    commentDocumentsObj[d.did] = documents;
+    commentDocumentsObj[d.did] = d;
   }
   const articlePosts = await ArticlePostModel.find({_id: {$in: commentsSid}});
   const articlePostsSid = [];
@@ -777,6 +777,7 @@ schema.statics.getCommentInfo = async function(comments) {
     const {sid, _id, source, did} = comment;
     const articlePost = articlePostsObj[sid];
     const commentDocument = commentDocumentsObj[did] || null;
+    if(!articlePost) continue;
     const articleDocument = articleDocumentObj[articlePost.sid] || null;
     if(!articlePost) return;
     const columnPost = columnPostsObj[articlePost.sid];
