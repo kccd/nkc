@@ -1,14 +1,14 @@
 <template lang="pug">
   .user-info(v-if="targetUser")
     .user-column(v-if="targetUser.column")
-        .panel-header 他的专栏
-        .m-b-2
-          .column-item
-            .column-avatar
-              img(:src="getUrl('columnAvatar', targetUser.column.avatar)")
-            .column-content
-              a.column-title(:href="`/m/${targetUser.column._id}`") {{targetUser.column.name}}
-              .column-focus-count {{targetUser.column.subCount}}人关注
+      .panel-header 他的专栏
+      .m-b-2
+        .column-item
+          .column-avatar
+            img(:src="getUrl('columnAvatar', targetUser.column.avatar)")
+          .column-content
+            a.column-title(:href="`/m/${targetUser.column._id}`") {{targetUser.column.name}}
+            .column-focus-count {{targetUser.column.subCount}}人关注
     .user-information
       .panel-header 个人简介
       .m-b-2

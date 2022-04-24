@@ -1,6 +1,6 @@
 <template lang="pug">
   .finance-box
-    .finance-head
+    //-.finance-head
       .fa.fa-sliders.option-icon(@click.stop="operationShow")
       .finance-head-link(v-show="show")
         a(href=`/shop/order`)
