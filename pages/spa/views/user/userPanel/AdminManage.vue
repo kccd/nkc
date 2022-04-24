@@ -1,6 +1,6 @@
 <template lang="pug">
   .user-admin-manage(v-if="panelPermission && (panelPermission.unBannedUser || panelPermission.bannedUser ||panelPermission.clearUserInfo)" )
-    .btn-ban(v-show="showBanBox" @click="clickBanContext(true)")
+    .btn-ban(v-show="showBanBox" @click="clickBanContext(!showBanContext)")
       .fa.fa-ban( title="用户违规？点我！")
       ul(v-show="showBanContext" )
         li(v-if="targetUser && (targetUser.certs.includes('banned') && panelPermission.unBannedUser)")
@@ -76,7 +76,7 @@ export default {
   }),
   created() {
     //移动段才能永久显示封禁框
-    if(getState && getState.isApp){
+    if(getState() && getState().isApp){
       this.showBanBox = true;
     }
   },
@@ -118,6 +118,7 @@ export default {
     },
     //用户信息管理显示控制
     changeShowBanBox(type) {
+
       this.showBanBox = type;
     }
   }

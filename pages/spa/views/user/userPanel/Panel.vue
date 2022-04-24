@@ -261,7 +261,7 @@ export default {
     subscribeBtnType: false,
     subscribeBtnBoxType: false,
     usersBlUid: [],
-
+    stopInAndOut: false,
   }),
   components: {
     "user-level": UserLevel,
@@ -274,6 +274,9 @@ export default {
     EventBus.$on('addToBl',()=>{
       this.subscribeBtnType = false
     })
+    if(getState() && getState().isApp){
+      this.stopInAndOut = true;
+    }
   },
   mounted() {
   },
@@ -344,14 +347,23 @@ export default {
     containerChange(path){
       this.$router.push({name: path})
     },
-    //鼠标移入
+    //鼠标移入,移动段屏蔽
     enter(){
-      this.$refs.adminManage.changeShowBanBox(true);
+      if(this.stopInAndOut){
+        return
+      }else{
+        this.$refs.adminManage.changeShowBanBox(true);
+      }
     },
     //鼠标移除
     leave(){
-      this.$refs.adminManage.changeShowBanBox(false);
-      this.$refs.adminManage.clickBanContext(false);
+      if(this.stopInAndOut){
+        return
+      }else{
+        this.$refs.adminManage.changeShowBanBox(false);
+        this.$refs.adminManage.clickBanContext(false);
+      }
+
     }
   }
 }
