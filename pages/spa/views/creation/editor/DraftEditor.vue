@@ -5,7 +5,7 @@
     div
       .m-b-1
         info-block(:mode="'info'")
-          span 通过编辑器中的草稿箱面板，您可以快速将图文片段插入到正在编辑的文章内容中。
+          span 在编辑器中的草稿箱面板内，您可以快速将图文片段插入到正在编辑的文章内容中。
       .m-b-1
         document-editor(
           ref="documentEditor"
