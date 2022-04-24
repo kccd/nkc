@@ -138,6 +138,9 @@
         | 立即下载&nbsp;
       div=`${(result.resource.ext || "未知").toUpperCase()} ${tools.getSize(result.resource.size)}`
   else if result.docType === "document_article"
+    .checkbox.thread-checkbox(style="display: inline;")
+      label
+        input(type="checkbox" data-article-id=result.articleId data-document-id=result.documentId)
     a(href=result.link target="_blank").clear-a-style.search-result-title!= result.title
     .search-result-info
       if !result.anonymous
@@ -161,6 +164,9 @@
         span 发表于空间文章
     .search-result-abstract!= result.abstract
   else if result.docType === 'document_comment'
+    .checkbox.thread-checkbox(style="display: inline;")
+      label
+        input(type="checkbox" data-comment-id=result.commentId data-document-id=result.documentId)
     a(href=result.articleUrl target="_blank").clear-a-style.search-result-title!= result.articleTitle
     .search-result-info
       if !result.anonymous

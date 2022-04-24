@@ -777,6 +777,7 @@ schema.statics.getCommentInfo = async function(comments) {
     const {sid, _id, source, did} = comment;
     const articlePost = articlePostsObj[sid];
     const commentDocument = commentDocumentsObj[did] || null;
+    if(!articlePost) continue;
     const articleDocument = articleDocumentObj[articlePost.sid] || null;
     if(!articlePost) return;
     const columnPost = columnPostsObj[articlePost.sid];

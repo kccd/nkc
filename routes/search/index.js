@@ -178,7 +178,10 @@ router
         }
         if(r.highlight) {
           if(r.docType === "post" || r.docType === "thread" || r.docType === 'document_article' || r.docType === 'document_comment') {
-            const _id = r.docType === 'document_article'?r.tid:r.pid;
+            let _id =r.pid;
+            if(r.docType === 'document_article' || r.docType === 'document_comment') {
+              _id = r.tid;
+            }
             highlightObj[_id + "_title"] = r.highlight.title;
             if(r.highlight.content) {
               highlightObj[_id + "_content"] = "内容：" + r.highlight.content;
@@ -234,7 +237,7 @@ router
             }
           }
         }
-
+        
       });
       const posts = await db.PostModel.find({pid: {$in: [...pids]}, reviewed: true});
       posts.map(post => {
@@ -453,6 +456,8 @@ router
           r = {
             source: article.source,
             docType,
+            documentId: document._id,
+            articleId: article._id,
             link: article.url,
             title: highlightObj[`${tid}_title`] || document.title || article.title,
             abstract:
@@ -490,17 +495,13 @@ router
           const commentUser = userObj[uid];
           r = {
             source: commentDocument.source,
+            documentId: commentDocument._id,
+            commentId: comment._id,
             docType,
             articleUrl: url,
             articleTitle: articleDocument.title,
             abstract:
-              highlightObj[`${tid}_pid`] ||
-              highlightObj[`${tid}_aid`] ||
               highlightObj[`${tid}_authors`] ||
-              highlightObj[`${tid}_keywordsEN`] ||
-              highlightObj[`${tid}_keywordsCN`] ||
-              highlightObj[`${tid}_abstractEN`] ||
-              highlightObj[`${tid}_abstractCN`] ||
               highlightObj[`${tid}_content`] ||
               "内容：" + nkcModules.apiFunction.obtainPureText(commentDocument.content, true, 200),
             articleTime: articleDocument.toc,
