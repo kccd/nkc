@@ -5,7 +5,7 @@
       .moment-quote-title
         a(:href="quoteData.data.url" target="_blank") {{quoteData.data.title}}
       .moment-quote-abstract(:class="{'cover': quoteData.data.coverUrl}")
-        .moment-quote-cover(:style="'background-image: url('+quoteData.data.coverUrl+')'")
+        .moment-quote-cover(v-if='quoteData.data.coverUrl' :style="'background-image: url('+quoteData.data.coverUrl+')'")
         span {{quoteData.data.content}}
 
   mixin momentBody
