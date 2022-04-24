@@ -9,20 +9,21 @@
         //用户banner容器
         .account-user-banner-container
           .account-user-banner(:style="`backgroundImage: url('${getUrl('userBanner', targetUser.userBanner)}')`" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
-            .account-user-info.row
-              .account-user-avatar.col-xs-3.col-sm-2.col-md-2.hidden-xs
-                img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
-              .account-user-introduce.col-xs-12.col-sm-10.col-md-10
-                .account-user-avatar-xs
-                  img.xs.hidden-sm.hidden-md.hidden-lg(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
-                .account-user-name {{targetUser.username}}
-                .account-user-certs
-                  user-level(ref="userLevel" :target-user="targetUser")
-                .account-user-subscribe(v-if="subscribeBtn" ref="subscribeBox")
-                  div(:class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
-                  div.link(@click.stop="toChat(targetUser.uid)" v-if="selfUid") 私信
-                  div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
-                .fa(v-if="subscribeBtn" :class="subscribeBtnBoxType ? 'fa-angle-up' : 'fa-angle-down'" @click.stop="subscribeBtnBoxChange(!subscribeBtnBoxType)")
+            .account-box-mask
+              .account-user-info.row
+                .account-user-avatar.col-xs-3.col-sm-2.col-md-2.hidden-xs
+                  img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
+                .account-user-introduce.col-xs-12.col-sm-10.col-md-10
+                  .account-user-avatar-xs
+                    img.xs.hidden-sm.hidden-md.hidden-lg(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
+                  .account-user-name {{targetUser.username}}
+                  .account-user-certs
+                    user-level(ref="userLevel" :target-user="targetUser")
+                  .account-user-subscribe(v-if="subscribeBtn" ref="subscribeBox")
+                    div(:class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
+                    div.link(@click.stop="toChat(targetUser.uid)" v-if="selfUid") 私信
+                    div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
+                  .fa(v-if="subscribeBtn" :class="subscribeBtnBoxType ? 'fa-angle-up' : 'fa-angle-down'" @click.stop="subscribeBtnBoxChange(!subscribeBtnBoxType)")
           .account-nav
             .account-nav-box.row
               .account-nav-left.col-xs-12.col-md-2.hidden-xs.hidden-sm
@@ -66,6 +67,7 @@
     border-radius: 3px;
     overflow: hidden;
     .account-user-banner-container {
+
       .account-user-banner {
         width: 100%;
         height: 14rem;
@@ -73,118 +75,135 @@
         background-size: cover;
         background-position: center center;
         position: relative;
-        .account-user-info {
-          position: relative;
-          height: auto;
-          top: 8rem;
-          .account-user-avatar {
-            text-align: center;
-            img {
-              width: 10rem;
-              height: 10rem;
-              border: 4px solid #fff;
-              border-radius: 8%;
-              @media (max-width: 991px){
-                width: 8rem;
-                height: 8rem;
-              }
-            }
-          }
-          .account-user-introduce {
-            padding: 0;
+        .account-box-mask{
+          background: linear-gradient(rgba(0,0,0,0), 80%, rgba(0,0,0,1));
+          height: 100%;
+          .account-user-info {
+            position: relative;
+            height: auto;
+            top: 8rem;
             @media (max-width: 768px){
-              padding-left: 10rem;
+              top: 10rem;
             }
-            .account-user-avatar-xs{
-              position: absolute;
-              top: 0;
-              left: 3rem;
+            .account-user-avatar {
+              text-align: center;
               img {
-                width: 6rem;
-                height: 6rem;
+                width: 10rem;
+                height: 10rem;
                 border: 4px solid #fff;
                 border-radius: 8%;
-              }
-            }
-            .fa{
-              display: none;
-            }
-            @media (max-width: 991px){
-              .fa{
-                display: block;
-                width: 40px;
-                height: 40px;
-                text-align: center;
-                z-index: 100;
-              }
-              .fa-angle-down{
-                position: absolute;
-                top: 36px;
-                right: 3.5rem;
-                font-size: 2rem;
-                &::before {
-                  content: "\f107";
+                @media (max-width: 991px){
+                  width: 8rem;
+                  height: 8rem;
                 }
-
               }
-              .fa-angle-up{
+            }
+            .account-user-introduce {
+              padding: 0;
+              @media (max-width: 768px){
+                padding-left: 10rem;
+              }
+              .account-user-avatar-xs{
                 position: absolute;
-                top: 6rem;
-                right: 3.5rem;
-                font-size: 2rem;
-                &:before {
-                  @media (max-width: 991px){
-                    content: "\f106";
+                top: 0;
+                left: 3rem;
+                img {
+                  width: 6rem;
+                  height: 6rem;
+                  border: 4px solid #fff;
+                  border-radius: 10px;
+                }
+              }
+              .fa{
+                display: none;
+              }
+              @media (max-width: 991px){
+                .fa{
+                  display: block;
+                  width: 40px;
+                  height: 20px;
+                  text-align: center;
+                  z-index: 100;
+                }
+                .fa-angle-down{
+                  position: absolute;
+                  top: 27px;
+                  right: 3.5rem;
+                  font-size: 2rem;
+                  color: #fff;
+                  &::before {
+                    content: "\f107";
+                  }
+
+                }
+                .fa-angle-up{
+                  position: absolute;
+                  top: 5rem;
+                  right: 3.5rem;
+                  font-size: 2rem;
+                  height: 40px;
+                  &:before {
+                    @media (max-width: 991px){
+                      content: "\f106";
+                    }
                   }
                 }
               }
-            }
-            .account-user-name{
-              font-size: 1.5rem;
-              font-weight: bold;
-              text-shadow: 1px 0px 2px #FFF;
-              @media (max-width: 768px){
-                font-size: 14px;
-              }
-            }
-            .account-user-subscribe{
-              position: absolute;
-              top: 0;
-              right: 2rem;
-              height: 3rem;
-              overflow: hidden;
-              div{
-                display: inline-block;
-                text-align: center;
-                background: #fff;
-                width: auto;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                cursor:pointer;
-                padding: 0.5rem 1rem;
-                margin-right: 1rem;
-                @media (max-width: 991px){
-                  display: block;
-                  margin-bottom: 0.5rem;
+              .account-user-name{
+                font-size: 1.5rem;
+                font-weight: bold;
+                text-shadow: 1px 0px 2px #FFF;
+                padding-top: 1rem;
+                color: #fff;
+                @media (max-width: 768px){
+                  font-size: 14px;
+                  padding-top: 0;
                 }
               }
-              .focus{
-                background-color: #2b90d9;
+              .account-user-certs{
                 color: #fff;
               }
-              .cancel{
-                background-color: #e85a71;
-                color: #fff;
+              .account-user-subscribe{
+                position: absolute;
+                top: 0;
+                right: 2rem;
+                height: 3rem;
+                overflow: hidden;
+                z-index: 1;
+                div{
+                  display: inline-block;
+                  text-align: center;
+                  background: #fff;
+                  width: auto;
+                  border: 1px solid #ccc;
+                  border-radius: 5px;
+                  cursor:pointer;
+                  padding: 3px 1rem;
+                  margin-right: 1rem;
+                  @media (max-width: 991px){
+                    display: block;
+                    margin-bottom: 8px;
+                  }
+                }
+                .focus{
+                  background-color: #2b90d9;
+                  color: #fff;
+                }
+                .cancel{
+                  background-color: #e85a71;
+                  color: #fff;
+                }
               }
-            }
 
+            }
           }
         }
+
       }
 
       .account-nav {
         width: 100%;
-        height: 46px;
+        height: 48px;
         .account-nav-box{
           .account-nav-middle{
             height: 46px;
