@@ -152,7 +152,7 @@
               .account-user-name{
                 font-size: 1.5rem;
                 font-weight: bold;
-                text-shadow: 1px 0px 2px #FFF;
+                text-shadow: 1px 0px 2px #333;
                 padding-top: 1rem;
                 color: #fff;
                 @media (max-width: 768px){
