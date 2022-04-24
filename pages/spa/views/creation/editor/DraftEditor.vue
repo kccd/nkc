@@ -1,11 +1,11 @@
 <template lang="pug">
   .standard-fluid-max-container
-    .m-b-1
+    //-.m-b-1
       bread-crumb(:list="navList")
     div
       .m-b-1
         info-block(:mode="'info'")
-          span 片段内容编辑器提示
+          span 通过编辑器中的草稿箱面板，您可以快速将图文片段插入到正在编辑的文章内容中。
       .m-b-1
         document-editor(
           ref="documentEditor"

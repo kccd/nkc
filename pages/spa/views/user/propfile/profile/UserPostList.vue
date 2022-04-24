@@ -3,7 +3,8 @@
     to-column(ref="toColumn")
     .user-list-warning(v-if="(!posts || posts.length === 0) && !loading") 用户貌似未发表过任何内容
     .user-post-list
-      paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
+      span.m-r-05(v-if="pageButtons.length > 0")
+        paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
       .paging-button(v-if="routeName === 'thread' && permissions.reviewed" )
         a.pointer.button.radius-left.radius-right(@click="managementPosts()") 管理
         span.post-management-button
