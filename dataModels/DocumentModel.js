@@ -347,14 +347,20 @@ schema.methods.copyToHistoryDocument = async function(status) {
 };
 /*
   *复制当前文档创建历史记录，并把当前文档改为编辑版。并且正在编辑的文档改为历史版
+  *param {String} uid 用户id
+  *param {String} sid document的sid 
+  *param {String} source 文章类型
+  * 
 */
-schema.statics.copyToHistoryToEditDocument = async function(sid, source, _id){
+schema.statics.copyToHistoryToEditDocument = async function(uid, sid, source, _id){
   const DocumentModel = mongoose.model('documents');
-  const currentDocument = await DocumentModel.findOne({ _id, type: 'history' })
+  const currentDocument = await DocumentModel.findOne({uid, _id, type: 'history' })
   if(!currentDocument) throwErr(400, `当前文章不存在，请刷新页面重试`);
+  // 复制当前文档数据创建历史文档
   await currentDocument.copyToHistoryDocument('edit');
-  // 更改正在编辑版本为历史版
+  // 更改当前正在编辑版本为历史版
   await this.updateOne({
+    uid,
     sid,
     source,
     type: "beta"

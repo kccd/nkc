@@ -7,6 +7,14 @@ router
     data.draftData = await draft.getDraftData();
     await next();
   })
+  .get("/:id", async (ctx, next) =>{
+    const {data, params, db, state} = ctx;
+    const {id: draftId} = params;
+    const draft = await db.DocumentModel.findOne({sid: draftId, uid: state.uid});
+    if(!draft) ctx.throw(400, "不存在该片段，请刷新试试");
+    data.draftData = draft;
+    await next();
+  })
   .del("/:id", async (ctx, next) => {
     const {query, params, db, state} = ctx;
     const {id: draftId} = params;

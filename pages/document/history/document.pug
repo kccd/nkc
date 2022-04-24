@@ -14,7 +14,7 @@ block content
         .book-list
           for list in data.history
             p.title-list()
-              a.book-list-item(href=`/document/history/${list._id}?source=${list.source}&sid=${list.sid}` )=list.title
+              a.book-list-item(href=`/document/history/${list._id}?source=${list.source}&sid=${list.sid}` )=`${list.title || "未填写标题"}`
               span.time=`编辑于 ${format(`YYYY-MM-DD HH:mm:ss`, list.tlm)}`
       .col-xs-12.col-md-9.book-content-container
         if data.history.length
@@ -29,7 +29,7 @@ block content
               span 收藏
             .nav-count
               .fa.fa-cog
-          h1.book-content-title=data.document.title
+          h1.book-content-title=`${data.document.title || "未填写标题"}`
           .thread-info.text-center
             if data.document.authorInfos
               for authorInfo in data.document.authorInfos
@@ -76,7 +76,7 @@ block content
             //- .book-content-content!=data.document.content
           .book-content-content!=data.document.content
           .btns
-            button.btn.btn-default.m-r-05(onclick=`saveArticle('${JSON.stringify(data.currentPage)}')`) 选择当前版本进行编辑
+            button.btn.btn-default.m-r-05(onclick=`saveArticle('${JSON.stringify(data.urlComponent)}')`) 选择当前版本进行编辑
         else
           h3 该文章还没有历史记录
 block scripts

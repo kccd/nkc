@@ -244,6 +244,9 @@ var Tools = function() {
       case 'history': {
         return '/document/history?source=' + id + '&sid=' + size
       }
+      case 'draftEditor': {
+        return '/creation/editor/draft?id=' + id;
+      }
     }
   };
   self.getAnonymousInfo = function() {

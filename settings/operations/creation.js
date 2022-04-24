@@ -22,6 +22,7 @@ module.exports = {
   draft: {
     PARAMETER: {
       DELETE:'creationCenter',
+      GET: 'creationCenter'
     }
   },
   category: {

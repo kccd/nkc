@@ -4,6 +4,7 @@ const moment = require('moment');
 const articleSources = {
   column: 'column',
   zone: 'zone',
+  draft: 'draft'
 };
 
 const articleStatus = {
@@ -752,7 +753,7 @@ schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
 schema.statics.getArticleUrlBySource = async function(articleId, source, sid, status) {
   const tools = require('../nkcModules/tools');
   const ArticleModel = mongoose.model('articles');
-  const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
+  const {column: columnSource, zone: zoneSource, draft: draftSource} = await ArticleModel.getArticleSources();
   const {default: defaultStatus} = await ArticleModel.getArticleStatus();
   let editorUrl = '';
   let articleUrl = '';
@@ -767,6 +768,9 @@ schema.statics.getArticleUrlBySource = async function(articleId, source, sid, st
   } else if(source === zoneSource) {
     editorUrl = tools.getUrl('zoneArticleEditor', sid, articleId);
     articleUrl = tools.getUrl('zoneArticle', articleId);
+  }else if (source === draftSource) {
+    editorUrl = tools.getUrl('draftEditor', sid);
+    // articleUrl = tools.getUrl('draftEditor', );
   }
 
   return {
