@@ -4,22 +4,22 @@
       .fa.fa-ban( title="用户违规？点我！")
       ul(v-show="showBanContext" )
         li(v-if="targetUser && (targetUser.certs.includes('banned') && panelPermission.unBannedUser)")
-          a(@click="bannedUser(targetUser.uid, false)") 解除封禁
+          a(@click.stop="bannedUser(targetUser.uid, false)") 解除封禁
         li(v-if="targetUser && (!targetUser.certs.includes('banned') && panelPermission.bannedUser)")
-          a(@click="bannedUser(targetUser.uid, true)") 封禁用户
+          a(@click.stop="bannedUser(targetUser.uid, true)") 封禁用户
         li(v-if="panelPermission.hideUserHome && targetUser && targetUser.hidden")
-          a(@click="hideUserHome(false,targetUser.uid)")  取消屏蔽用户名片
+          a(@click.stop="hideUserHome(false,targetUser.uid)")  取消屏蔽用户名片
         li(v-if="panelPermission.hideUserHome && targetUser && !targetUser.hidden")
-          a(@click="hideUserHome(true,targetUser.uid)")  屏蔽用户名片
+          a(@click.stop="hideUserHome(true,targetUser.uid)")  屏蔽用户名片
         li.divider
         li(v-if="panelPermission.clearUserInfo")
-          a(@click="clearUserInfo(targetUser.uid, 'avatar')") 删除头像
+          a(@click.stop="clearUserInfo(targetUser.uid, 'avatar')") 删除头像
         li(v-if="panelPermission.clearUserInfo")
-          a(@click="clearUserInfo(targetUser.uid, 'banner')") 删除背景
+          a(@click.stop="clearUserInfo(targetUser.uid, 'banner')") 删除背景
         li(v-if="panelPermission.clearUserInfo")
-          a(@click="clearUserInfo(targetUser.uid, 'username')") 删除用户名
+          a(@click.stop="clearUserInfo(targetUser.uid, 'username')") 删除用户名
         li(v-if="panelPermission.clearUserInfo")
-          a(@click="clearUserInfo(targetUser.uid, 'description')") 删除简介
+          a(@click.stop="clearUserInfo(targetUser.uid, 'description')") 删除简介
 </template>
 <style lang="less" scoped>
 .btn-ban{
