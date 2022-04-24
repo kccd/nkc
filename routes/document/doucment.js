@@ -1,4 +1,6 @@
 const router = require('koa-router')();
+const nkcRender = require('../../nkcModules/nkcRender');
+
 router
 .get('preview', async (ctx, next) => {
   ctx.template='document/preview/document.pug'
@@ -9,9 +11,19 @@ router
   if(!document.length) ctx.throw(400, "该文章已被发布")
   let user = await db.UserModel.findOne({uid: state.uid});
   user = user.toObject();
-  // 用于前端判断当前是什么类型页面 
+  
+  // 用于pug渲染判断当前是什么类型页面 
   data.type = source; 
   data.document = document[0]; 
+  const documentResourceId = await data.document.getResourceReferenceId();
+  let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
+  data.document.content = nkcRender.renderHTML({
+    type: 'article',
+    post: {
+      c: data.document.content,
+      resources
+    },
+  });
   data.document.avatar = user.avatar; 
   await next();
 })
@@ -27,6 +39,15 @@ router
   if(data.history.length){
     // 默认返回第一项内容
     data.document = data.history[0]
+    const documentResourceId = await data.document.getResourceReferenceId();
+    let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
+    data.document.content = nkcRender.renderHTML({
+      type: 'article',
+      post: {
+        c: data.document.content,
+        resources
+      },
+    });
     // data.bookId = bid
     data.currentPage = {_id: data.document._id, source: data.document.source, sid: data.document.sid};
   }else{
@@ -52,10 +73,20 @@ router
     }
   }
   data.document = find(data.history, _id);
+  
   // 点击当前版本进行编辑后 前端会刷新当前页面 而_id 的文章已经变为编辑版 不存在历史记录中，因此默认返回第一条数据 
   if(!data.document){
     data.document = data.history[0];
   }
+  const documentResourceId = await data.document.getResourceReferenceId();
+  let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
+  data.document.content = nkcRender.renderHTML({
+    type: 'article',
+    post: {
+      c: data.document.content,
+      resources
+    },
+  });
   data.currentPage = {_id: data.document._id, source: data.document.source, sid: data.document.sid};;
   await next()
 })
