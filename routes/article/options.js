@@ -16,7 +16,7 @@ router
     const document = await db.DocumentModel.findOnly({did: article.did, type: stableType, source: articleSource});
     if(!document) return ctx.throw(404, '未找到文章，请刷新后重试');
     if(!permission('review')) {
-      if(document.status !== normalStatus) ctx.throw(401, '权限不足');
+      if(document.status !== normalStatus && uid !== article.uid) ctx.throw(401, '权限不足');
     }
     const optionStatus = {
       type: 'article',
@@ -29,14 +29,17 @@ router
       ipInfo: null,
       violation: null,
       blacklist: null,
-      source: document.source
+      history: null,
+      source: document.source,
     };
     if(user) {
       if(permission('review')) {
         optionStatus.reviewed = document.status;
+        optionStatus.history = true;
       }
       if(uid === article.uid) {
         optionStatus.edit = true;
+        optionStatus.history = true;
       }
       //退修禁用权限
       optionStatus.disabled = (
