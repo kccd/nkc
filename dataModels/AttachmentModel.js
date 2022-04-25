@@ -581,7 +581,7 @@ schema.statics.saveUserBanner = async (uid, file) => {
 * @param {File} file
 * @return {Object} attachment 对象
 * */
-schema.statics.saveUserBackBanner = async (uid, file) => {
+schema.statics.saveUserHomeBanner = async (uid, file) => {
   const AttachmentModel = mongoose.model('attachments');
   const UserModel = mongoose.model('users');
   const time = new Date();
@@ -600,15 +600,15 @@ schema.statics.saveUserBackBanner = async (uid, file) => {
       {
         type: 'def',
         name: `${aid}.${ext}`,
-        height: 400,
-        width: 800,
+        height: 180,
+        width: 1270,
         quality: 95
       }
     ]
   });
   await UserModel.updateOne({uid}, {
     $set: {
-      userBanner: attachment._id
+      homeBanner: attachment._id
     }
   });
   return attachment;
