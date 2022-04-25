@@ -5,6 +5,7 @@ const tools = require("../nkcModules/tools");
 const articleSources = {
   column: 'column',
   zone: 'zone',
+  draft: 'draft'
 };
 
 const articleStatus = {
@@ -231,7 +232,7 @@ schema.statics.filterData = (filterData, allowKey)=>{
   for (const key in filterData) {
     if (Object.hasOwnProperty.call(filterData, key)) {
       if(allowKey.includes(key)){
-        if(key === 'toc') {
+        if(key === 'toc' || key === 'tlm' || key === 'dt') {
           newObj[key] = timeFormat(filterData[key])
           continue;
         }
@@ -254,7 +255,7 @@ schema.statics.getZoneArticle = async (id)=>{
   let article = await ArticleModel.findOnly({_id: id});
   article = (await ArticleModel.getArticlesInfo([article]))[0];
   const {articleInfo, document, documentResourceId} = await ArticleModel.getDocumentInfoById(id);
-  const documentAllowKey = ['title', 'content', 'abstract', 'abstractEN', 'keywords', 'keywordsEN', 'authorInfos', 'toc', 'origin', 'uid', 'collectedCount', 'tlm'];
+  const documentAllowKey = ['title', 'content', 'abstract', 'abstractEN', 'keywords', 'keywordsEN', 'authorInfos', 'toc', 'origin', 'uid', 'collectedCount', 'tlm', 'dt'];
   const filteredDocument = await ArticleModel.filterData(document, documentAllowKey)
   const documentContent = await ArticleModel.changeKey(filteredDocument)
   let user = await UserModel.findOne({uid:articleInfo.uid});
@@ -300,7 +301,8 @@ schema.statics.changeKey = async (content)=>{
       origin: 'originState',
       uid : 'uid',
       collectedCount: 'collectedCount',
-      tlm: 'tlm'
+      tlm: 'tlm',
+      dt: 'dt'
     }
     for (const key in content) {
       if (Object.hasOwnProperty.call(content, key)) {
@@ -754,7 +756,7 @@ schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
 schema.statics.getArticleUrlBySource = async function(articleId, source, sid, status) {
   const tools = require('../nkcModules/tools');
   const ArticleModel = mongoose.model('articles');
-  const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
+  const {column: columnSource, zone: zoneSource, draft: draftSource} = await ArticleModel.getArticleSources();
   const {default: defaultStatus} = await ArticleModel.getArticleStatus();
   let editorUrl = '';
   let articleUrl = '';
@@ -769,6 +771,9 @@ schema.statics.getArticleUrlBySource = async function(articleId, source, sid, st
   } else if(source === zoneSource) {
     editorUrl = tools.getUrl('zoneArticleEditor', sid, articleId);
     articleUrl = tools.getUrl('zoneArticle', articleId);
+  }else if (source === draftSource) {
+    editorUrl = tools.getUrl('draftEditor', sid);
+    // articleUrl = tools.getUrl('draftEditor', );
   }
 
   return {

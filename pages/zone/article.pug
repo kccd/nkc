@@ -11,7 +11,7 @@ block title
   -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, collected} = data.columnPost
   -var {_id, name} = column
   -var {hits, count, oc, url} = thread
-  -var {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm} = post
+  -var {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt} = post
   title=t
   -var showManagement = data.user && data.isModerator && permission('review');
   //- 与post隐藏相关的设置
@@ -35,7 +35,7 @@ block content
       include ../columns/article/content
       +content(c)
       include ../columns/article/articleEditTime
-      +articleEditTime(tlm)
+      +articleEditTime(tlm, dt, toc)
       //- 文章用户其他操作
       .single-post-bottom#articleOption
         if type === 'article'

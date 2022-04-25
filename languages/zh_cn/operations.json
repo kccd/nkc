@@ -864,5 +864,6 @@
   "getUserHomeInfo": "获取用户个人主页信息",
   "getUserHomeCard": "获取用户主页卡片内容列表",
   "getArticleInfo": "获取文章信息",
-  "getZoneMomentOption": "获取空间操作权限"
+  "getZoneMomentOption": "获取空间操作权限",
+  "viewUserArticle": "查看用户文章"
 }
