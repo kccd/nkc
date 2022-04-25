@@ -1,5 +1,5 @@
 <template lang="pug">
-  .user-manage(v-if="targetUser && (permissions.visitUserTransaction || permissions.violationRecord || permissions.getUserOtherAccount || permissions.viewUserCode)")
+  .user-manage.m-b-1(v-if="targetUser && (permissions.visitUserTransaction || permissions.violationRecord || permissions.getUserOtherAccount || permissions.viewUserCode)")
     violation-record(ref="violationRecord")
     .panel-header 管理
     .m-b-2

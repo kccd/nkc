@@ -9,26 +9,30 @@
         //用户banner容器
         .account-user-banner-container
           .account-user-banner(:style="`backgroundImage: url('${getUrl('userBanner', targetUser.userBanner)}')`" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
-            .account-user-info
-              .account-user-avatar
-                img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
-              .account-user-introduce
-                .account-user-name {{targetUser.username}}
-                  user-level(ref="userLevel" :target-user="targetUser")
-                .account-user-subscribe(v-if="subscribeBtn" ref="subscribeBox")
-                  div(:class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
-                  div.link(@click.stop="toChat(targetUser.uid)" v-if="selfUid") 私信
-                  div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
-                .fa(:class="subscribeBtnBoxType ? 'fa-angle-up' : 'fa-angle-down'" @click.stop="subscribeBtnBoxChange(!subscribeBtnBoxType)")
+            .account-box-mask
+              .account-user-info.row
+                .account-user-avatar.col-xs-3.col-sm-2.col-md-2.hidden-xs
+                  img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
+                .account-user-introduce.col-xs-12.col-sm-10.col-md-10
+                  .account-user-avatar-xs
+                    img.xs.hidden-sm.hidden-md.hidden-lg(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
+                  .account-user-name {{targetUser.username}}
+                  .account-user-certs
+                    user-level(ref="userLevel" :target-user="targetUser")
+                  .account-user-subscribe(v-if="subscribeBtn" ref="subscribeBox")
+                    div(:class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
+                    div.link(@click.stop="toChat(targetUser.uid)" v-if="selfUid") 私信
+                    div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
+                  .fa(v-if="subscribeBtn" :class="subscribeBtnBoxType ? 'fa-angle-up' : 'fa-angle-down'" @click.stop="subscribeBtnBoxChange(!subscribeBtnBoxType)")
           .account-nav
-            .account-nav-box
-              .account-nav-left
-              .account-nav-middle
+            .account-nav-box.row
+              .account-nav-left.col-xs-12.col-md-2.hidden-xs.hidden-sm
+              .account-nav-middle.col-xs-12.col-md-7.p-l-0.hidden-xs.hidden-sm
                 span(@click="containerChange('moment')" :class="{'active': $route.name === 'moment'}") 动态
                 span(@click="containerChange('post')" :class="{'active': $route.name === 'post'}") 社区
                 span(@click="containerChange('column')" :class="{'active': $route.name === 'column'}") 专栏
                 //span(@click="containerChange('follower')" :class="{'active': ($route.name === 'follower' || $route.name === 'fan')}") 关注
-              .account-nav-right
+              .account-nav-right.col-xs-12.col-md-3
                 .sub-item(@click="containerChange('follower')")
                   div 关注
                   span {{followersCount >= 1000 ? (followersCount/1000).toFixed(1)+'K' : followersCount}}
@@ -42,11 +46,7 @@
 
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
-@media (max-width: 991px){
-  .account-nav{
-    visibility: hidden;
-  }
-}
+
 .hidden-user-home-tip {
   line-height: 4rem;
   text-align: center;
@@ -67,6 +67,7 @@
     border-radius: 3px;
     overflow: hidden;
     .account-user-banner-container {
+
       .account-user-banner {
         width: 100%;
         height: 14rem;
@@ -74,121 +75,142 @@
         background-size: cover;
         background-position: center center;
         position: relative;
-        .account-user-info {
-          position: relative;
-          height: auto;
-          top: 8rem;
-          margin: 0rem 4rem 0 4rem;
-          @media (max-width: 991px){
-            margin: 0rem 1rem;
-          }
-          .account-user-avatar {
-            position: absolute;
-            top: 0;
-            border-radius: 1rem;
-            img {
-              width: 10rem;
-              height: 10rem;
-              border: 4px solid #fff;
-              border-radius: 8%;
-              @media (max-width: 991px){
-                width: 8rem;
-                height: 8rem;
-              }
+        .account-box-mask{
+          background: linear-gradient(rgba(0,0,0,0), 80%, rgba(0,0,0,1));
+          height: 100%;
+          .account-user-info {
+            position: relative;
+            height: auto;
+            top: 8rem;
+            @media (max-width: 768px){
+              top: 10rem;
             }
-          }
-          .account-user-introduce {
-            margin: 0 0 0 11rem;
-            .fa{
-              display: none;
-            }
-            @media (max-width: 991px){
-              margin: 0 0 0 9rem;
-              .fa{
-                display: block;
-              }
-              .fa-angle-down{
-                position: absolute;
-                top: 36px;
-                right: 2.5rem;
-                font-size: 2rem;
-                &::before {
-                  content: "\f107";
+            .account-user-avatar {
+              text-align: center;
+              img {
+                width: 10rem;
+                height: 10rem;
+                border: 4px solid #fff;
+                border-radius: 8%;
+                @media (max-width: 991px){
+                  width: 8rem;
+                  height: 8rem;
                 }
-
               }
-              .fa-angle-up{
+            }
+            .account-user-introduce {
+              padding: 0;
+              @media (max-width: 768px){
+                padding-left: 10rem;
+              }
+              .account-user-avatar-xs{
                 position: absolute;
-                top: 6rem;
-                right: 2.5rem;
-                font-size: 2rem;
-                &:before {
-                  @media (max-width: 991px){
-                    content: "\f106";
+                top: 0;
+                left: 3rem;
+                img {
+                  width: 6rem;
+                  height: 6rem;
+                  border: 4px solid #fff;
+                  border-radius: 10px;
+                }
+              }
+              .fa{
+                display: none;
+              }
+              @media (max-width: 991px){
+                .fa{
+                  display: block;
+                  width: 40px;
+                  height: 20px;
+                  text-align: center;
+                  z-index: 100;
+                }
+                .fa-angle-down{
+                  position: absolute;
+                  top: 27px;
+                  right: 3.5rem;
+                  font-size: 2rem;
+                  color: #fff;
+                  &::before {
+                    content: "\f107";
+                  }
+
+                }
+                .fa-angle-up{
+                  position: absolute;
+                  top: 5rem;
+                  right: 3.5rem;
+                  font-size: 2rem;
+                  height: 40px;
+                  &:before {
+                    @media (max-width: 991px){
+                      content: "\f106";
+                    }
                   }
                 }
               }
-            }
-            .account-user-name{
-              font-size: 1.5rem;
-              font-weight: bold;
-              text-shadow: 1px 0px 2px #FFF;
-              @media (max-width: 991px){
-                font-size: 16px;
+              .account-user-name{
+                font-size: 1.5rem;
                 font-weight: bold;
-              }
-            }
-            .account-user-subscribe{
-              position: absolute;
-              top: 0;
-              right: 0;
-              height: 3rem;
-              overflow: hidden;
-              div{
-                display: inline-block;
-                text-align: center;
-                background: #fff;
-                width: auto;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                cursor:pointer;
-                padding: 0.5rem 1rem;
-                margin-right: 1rem;
-                @media (max-width: 991px){
-                  display: block;
-                  margin-bottom: 0.5rem;
+                text-shadow: 1px 0px 2px #333;
+                padding-top: 1rem;
+                margin-bottom: 0.5rem;
+                color: #fff;
+                @media (max-width: 768px){
+                  font-size: 14px;
+                  padding-top: 0;
                 }
               }
-              .focus{
-                background-color: #2b90d9;
+              .account-user-certs{
                 color: #fff;
               }
-              .cancel{
-                background-color: #e85a71;
-                color: #fff;
+              .account-user-subscribe{
+                position: absolute;
+                top: 0;
+                right: 2rem;
+                height: 3rem;
+                overflow: hidden;
+                z-index: 1;
+                div{
+                  display: inline-block;
+                  text-align: center;
+                  background: #fff;
+                  width: auto;
+                  border: 1px solid #ccc;
+                  border-radius: 5px;
+                  cursor:pointer;
+                  padding: 3px 1rem;
+                  margin-right: 1rem;
+                  @media (max-width: 991px){
+                    display: block;
+                    margin-bottom: 8px;
+                  }
+                }
+                .focus{
+                  background-color: #2b90d9;
+                  color: #fff;
+                }
+                .cancel{
+                  background-color: #e85a71;
+                  color: #fff;
+                }
               }
-            }
 
+            }
           }
         }
+
       }
 
       .account-nav {
         width: 100%;
-        height: 46px;
+        height: 48px;
         .account-nav-box{
-          .account-nav-left{
-            width: 25%;
-            display: inline-block;
-          }
           .account-nav-middle{
-            width: 58%;
-            padding-left: 15px;;
-            display: inline-block;
-            font-size: 20px;
+            height: 46px;
+            line-height: 46px;
+            font-size: 18px;
             font-weight: bold;
-            position: relative;
-            top: -8px;
             cursor: pointer;
             span{
               display: inline-block;
@@ -199,19 +221,18 @@
             }
           }
           .account-nav-right{
-            width: 17%;
             display: inline-block;
-            padding-left: 15px;
             text-align: center;
+            @media (max-width: 991px){
+              text-align: right;
+            }
             .sub-item{
               display: inline-block;
               margin: 3px 15px 0 15px;
-              font-weight: bold;
+              //font-weight: bold;
               font-size: 12px;
               cursor: pointer;
-              div {
-
-              }
+              text-align: center;
               span{
                 font-size: 18px;
               }
@@ -230,9 +251,6 @@
           border: 4px solid #fff;
           border-radius: 8%;
         }
-      }
-      .user-info {
-
       }
     }
   }
@@ -261,7 +279,7 @@ export default {
     subscribeBtnType: false,
     subscribeBtnBoxType: false,
     usersBlUid: [],
-
+    stopInAndOut: false,
   }),
   components: {
     "user-level": UserLevel,
@@ -274,6 +292,9 @@ export default {
     EventBus.$on('addToBl',()=>{
       this.subscribeBtnType = false
     })
+    if(getState() && getState().isApp){
+      this.stopInAndOut = true;
+    }
   },
   mounted() {
   },
@@ -344,14 +365,23 @@ export default {
     containerChange(path){
       this.$router.push({name: path})
     },
-    //鼠标移入
+    //鼠标移入,移动段屏蔽
     enter(){
-      this.$refs.adminManage.changeShowBanBox(true);
+      if(this.stopInAndOut){
+        return
+      }else{
+        this.$refs.adminManage.changeShowBanBox(true);
+      }
     },
     //鼠标移除
     leave(){
-      this.$refs.adminManage.changeShowBanBox(false);
-      this.$refs.adminManage.clickBanContext(false);
+      if(this.stopInAndOut){
+        return
+      }else{
+        this.$refs.adminManage.changeShowBanBox(false);
+        this.$refs.adminManage.clickBanContext(false);
+      }
+
     }
   }
 }

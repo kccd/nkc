@@ -20,8 +20,8 @@
           span.pull-right.fa.fa-angle-right
 
       li
-        a(:href="'/u/' + user.uid + '/profile/draft'")
-          span.fa.fa-inbox &nbsp;我的草稿
+        a(:href="'/creation/community/draft'")
+          span.fa.fa-inbox &nbsp;社区草稿
             span(v-if="user && user.draftCount > 0") ({{user.draftCount}})
           span.pull-right.fa.fa-angle-right
       li

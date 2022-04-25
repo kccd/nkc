@@ -68,28 +68,29 @@
           button.btn.btn-default.btn-sm.m-r-05(@click="delResource('', 'delete')" v-if="watchType === 'category' && selectedResources.length && resourceCategories !== 'trash'") 移动到回收站
           button.btn.btn-default.btn-sm.m-r-05(@click="delResource('', 'trash')" v-if="watchType === 'category' && selectedResources.length && resourceCategories === 'trash'") 恢复选中
           button.btn.btn-default.btn-sm(@click="moveToCategory" v-if="watchType === 'category' && selectedResources.length && resourceCategories !== 'trash'") 移动到分组
-      .resources-paging
+      .resources-paging(v-if="category !== 'upload'")
         +resourcePaging
       .resources-body(v-if="category === 'upload'")
         .resource-info(v-if="!files.length") 空空如也~
-        .resource(v-else v-for="f, index in files" :class="watchType === 'select'?'resource-select':'resource-category'")
-          .resource-upload-body(v-if="f.status === 'uploading'")
-            .resource-picture.upload(v-if="f.progress !== 100" :class="{'uploadSelect': watchType === 'select'}")
-              span 上传中..{{f.progress}}%
-              .fa.fa-spinner.fa-spin.fa-fw
-            .resource-picture.upload(v-else :class="{'uploadSelect': watchType === 'select'}")
-              span 处理中..
-              .fa.fa-spinner.fa-spin.fa-fw
-          .resource-upload-body(v-if="f.status === 'unUpload'")
-            .resource-picture.upload(v-if="f.error" :class="{'uploadSelect': watchType === 'select'}")
-              .remove-file
-                .fa.fa-remove(@click="removeFile(index)")
-              span.pointer(@click="startUpload(f)") 上传失败，点击重试
-            .resource-picture.upload(v-else :class="{'uploadSelect': watchType === 'select'}")
-              span 等待中...
-              .fa.fa-spinner.fa-spin.fa-fw
-          .resource-name
-            span {{f.name}}
+        .resource-padding-container(v-else v-for="(f, index) in files")
+          .resource(:class="watchType === 'select'?'resource-select':'resource-category'")
+            .resource-upload-body(v-if="f.status === 'uploading'")
+              .resource-picture.upload(v-if="f.progress !== 100" :class="{'uploadSelect': watchType === 'select'}")
+                span 上传中..{{f.progress}}%
+                .fa.fa-spinner.fa-spin.fa-fw
+              .resource-picture.upload(v-else :class="{'uploadSelect': watchType === 'select'}")
+                span 处理中..
+                .fa.fa-spinner.fa-spin.fa-fw
+            .resource-upload-body(v-if="f.status === 'unUpload'")
+              .resource-picture.upload(v-if="f.error" :class="{'uploadSelect': watchType === 'select'}")
+                .remove-file
+                  .fa.fa-remove(@click="removeFile(index)")
+                span.pointer(@click="startUpload(f)") 上传失败，点击重试
+              .resource-picture.upload(v-else :class="{'uploadSelect': watchType === 'select'}")
+                span 等待中...
+                .fa.fa-spinner.fa-spin.fa-fw
+            .resource-name
+              span {{f.name}}
       .resources-body(
         v-else
         :class="watchType === 'select'?'':'min-length'")

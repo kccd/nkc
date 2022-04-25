@@ -86,13 +86,13 @@ router
       options.fid = fidOfCanGetThreads;
     }
 
-    if(t === 'document_article') {
+    if(t === 'document_article' || t === 'document_comment') {
       options.fid = [];
     }
 
     // 加载分页设置
     const {searchThreadList, searchAllList, searchPostList, searchUserList,
-      searchColumnList, searchResourceList
+      searchColumnList, searchResourceList, searchDocumentList
     } = (await db.SettingModel.findById("page")).c;
 
     // 用户输入了搜索的关键词，进入高级搜索。
@@ -106,7 +106,6 @@ router
         resource.highlight = r.highlight;
         return resource;
       });
-
       // 根据分页设置，计算分页
       let perpage;
       if(t === "user") {
@@ -122,6 +121,8 @@ router
         perpage = searchColumnList;
       } else if(t === "resource") {
         perpage = searchResourceList;
+      } else if(t === 'document_article' || t === 'document_comment') {
+        perpage = searchDocumentList;
       } else {
         perpage = searchAllList;
         if(searchUserFromMongodb) {
@@ -154,7 +155,8 @@ router
       const columnId = new Set();
       const columnPageId = new Set();
       const resourceId = new Set();
-      const documentId = new Set();
+      const articleDocumentId = new Set();
+      const commentDocumentId = new Set();
       let threadCategoriesId = [];
       const highlightObj = {};
       results.map(r => {
@@ -169,13 +171,17 @@ router
           columnPageId.add(r.tid);
         } else if(r.docType === "resource") {
           resourceId.add(r.tid);
-        } else if(r.docType === 'document_article') {
-          documentId.add(r.tid);
+        } else if(r.docType === "document_article") {
+          articleDocumentId.add(r.tid);
+        } else if(r.docType === "document_comment") {
+          commentDocumentId.add(r.tid);
         }
-        //
         if(r.highlight) {
-          if(r.docType === "post" || r.docType === "thread" || r.docType === 'document_article') {
-            const _id = r.docType === 'document_article'?r.tid:r.pid;
+          if(r.docType === "post" || r.docType === "thread" || r.docType === 'document_article' || r.docType === 'document_comment') {
+            let _id =r.pid;
+            if(r.docType === 'document_article' || r.docType === 'document_comment') {
+              _id = r.tid;
+            }
             highlightObj[_id + "_title"] = r.highlight.title;
             if(r.highlight.content) {
               highlightObj[_id + "_content"] = "内容：" + r.highlight.content;
@@ -231,7 +237,7 @@ router
             }
           }
         }
-
+        
       });
       const posts = await db.PostModel.find({pid: {$in: [...pids]}, reviewed: true});
       posts.map(post => {
@@ -290,20 +296,19 @@ router
         const category = threadCategories[i];
         threadCategoriesObj[category.nodeId] = category;
       }
-      const documents = await db.DocumentModel.find({
-        did: {$in: [...documentId]},
-        type: 'stable',
-        status: 'normal',
-      });
-      const documentsObj = {};
+
       const articlesObj = {};
-      let articles = await db.ArticleModel.find({did: {$in: [...documentId]}});
-      articles = await db.ArticleModel.extendArticles(articles);
+      const commentObj = {}
+      const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
+      let articles = await db.ArticleModel.find({did: {$in: [...articleDocumentId]}, status: normalStatus});
+      let comments = await db.CommentModel.find({did: {$in: [...commentDocumentId]}, status: normalStatus});
+      articles = await db.ArticleModel.getArticlesInfo(articles);
+      comments = await db.CommentModel.getCommentInfo(comments);
       for(const a of articles) {
         articlesObj[a.did] = a;
       }
-      for(const d of documents) {
-        documentsObj[d.did] = d;
+      for(const c of comments) {
+        commentObj[c.did] = c;
       }
 
       // 根据文档类型，拓展数据
@@ -330,8 +335,6 @@ router
             if(!ctx.permission("displayDisabledPosts")) {
               m.disabled = false;
             }
-            // const obj = await db.ThreadModel.getPostStep(thread.tid, m);
-            // link = `/t/${thread.tid}?page=${obj.page}&highlight=${post.pid}#${post.pid}`;
             link = await db.PostModel.getUrl(post);
           }
 
@@ -445,16 +448,17 @@ router
           r.t = nkcRender.htmlFilter(r.t);
           r.c = nkcRender.htmlFilter(r.c);
         } else if(docType === 'document_article') {
-          // 图书搜索
-          const document = documentsObj[tid];
-          if(!document || document.disabled) continue;
-          const documentUser = userObj[document.uid];
-          if(!documentUser) continue;
-          const link = articlesObj[tid].url;
+          //article文章搜索
           const article = articlesObj[tid];
+          if(!article) continue;
+          const {document, user, column = ''} = article;
+          const articleUser = userObj[user.uid];
           r = {
+            source: article.source,
             docType,
-            link,
+            documentId: document._id,
+            articleId: article._id,
+            link: article.url,
             title: highlightObj[`${tid}_title`] || document.title || article.title,
             abstract:
               highlightObj[`${tid}_pid`] ||
@@ -465,23 +469,52 @@ router
               highlightObj[`${tid}_abstractEN`] ||
               highlightObj[`${tid}_abstractCN`] ||
               highlightObj[`${tid}_content`] ||
-              "内容：" + document.content,
+              "内容：" + nkcModules.apiFunction.obtainPureText(document.content, true, 200),
             documentTime: document.toc,
-            articleTime: article.time,
+            articleTime: article.toc,
             tid: document.did,
             anonymous: document.anonymous,
           }
           if(!document.anonymous) {
             r.documentUser = {
-              uid: documentUser.uid,
-              avatar: documentUser.avatar,
-              username: documentUser.username
+              uid: articleUser.uid,
+              avatar: articleUser.avatar,
+              username: articleUser.username
             }
           }
-          r.bookName = article.bookName;
-          r.bookUrl = article.bookUrl;
+          if(column) {
+            r.column = column;
+          }
           r.title = nkcRender.htmlFilter(r.title);
           r.abstract = nkcRender.htmlFilter(r.abstract);
+        } else if(docType === 'document_comment') {
+          //comment搜索
+          const comment = commentObj[tid];
+          if(!comment) continue;
+          const {uid, commentDocument, articleDocument, url} = comment;
+          const commentUser = userObj[uid];
+          r = {
+            source: commentDocument.source,
+            documentId: commentDocument._id,
+            commentId: comment._id,
+            docType,
+            articleUrl: url,
+            articleTitle: articleDocument.title,
+            abstract:
+              highlightObj[`${tid}_authors`] ||
+              highlightObj[`${tid}_content`] ||
+              "内容：" + nkcModules.apiFunction.obtainPureText(commentDocument.content, true, 200),
+            articleTime: articleDocument.toc,
+            commentTime: commentDocument.toc,
+            user: commentUser,
+          };
+          if(!commentDocument.anonymous) {
+            r.commentUser = {
+              uid: commentUser.uid,
+              avatar: commentUser.avatar,
+              username: commentUser.username
+            }
+          }
         }
         data.results.push(r);
       }

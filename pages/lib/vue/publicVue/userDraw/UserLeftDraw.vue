@@ -8,7 +8,7 @@
           .col-xs-3
             a(href='/?t=latest') 最新
           .col-xs-3
-            a(href='/g/moment' v-if="getState.uid" ) 关注
+            a(href='/g/moment' v-if="logged" ) 关注
             a(onclick="RootApp.openLoginPanel()" v-else) 关注
           .col-xs-3
             a(href=`/m`) 专栏
@@ -61,8 +61,10 @@ import AppsVue from "./AppsVue";
 import ForumTreeVue from "./ForumTreeVue";
 import {nkcAPI} from "../../../js/netAPI";
 import {getState} from "../../../js/state";
+const {uid} = getState();
 export default {
   data: () => ({
+    logged: !!uid,
     loading: true,
     show: false,
     permission: {

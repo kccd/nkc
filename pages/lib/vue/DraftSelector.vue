@@ -15,7 +15,7 @@
               | 草稿
             a(:class="{'active': draftType === 'custom'}" @click="selectDraftType('custom')")
               .fa &nbsp;
-              | 图文素材
+              | 图文片段
           auto-drafts-box(ref="autoDraftsBox" v-if="draftType === 'auto'" @callback-data="insert")
           custom-drafts-box(ref="customDraftsBox" :type="true" v-else @callback-data="insert")
 

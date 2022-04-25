@@ -15,8 +15,7 @@
     //- 用户链接
     .m-b-1(v-if="isSelf")
       nav-links(ref="userLink" :nav-links="navLinks")
-    .m-b-1(v-if="permissions.reviewed")
-      user-manage(ref="userManage")
+    user-manage(ref="userManage")
     //  分享链接
     .m-b-1
       share(ref="share" share-type="user" :share-title="targetUser.username || targetUser.uid" :share-id="targetUser.uid" :share-description="targetUser.description" :share-avatar="targetUser.avatar")
@@ -67,9 +66,6 @@ export default {
   mounted() {
     const self = this;
     this.initData();
-    EventBus.$on('permissions', (res) => {
-      self.permissions = res;
-    });
   },
   methods: {
     initData() {

@@ -20,7 +20,7 @@ func.init = async () => {
         mappings: {
           documents: {
             properties: {
-              docType: { // 文档类型：thread，user，post，document_article
+              docType: { // 文档类型：thread， user， post，document_article， document_comment
                 type: "keyword"
               },
               uid: {
@@ -113,7 +113,7 @@ func.save = async (docType, document) => {
   if(
     ![
       "user", "post", "thread", "column", "columnPage", "resource",
-      "document_article", "document_comment", "document_moment"
+      "document_article", "document_comment"
     ].includes(docType)
   ) throwErr(500, "docType error");
 
@@ -153,11 +153,9 @@ func.save = async (docType, document) => {
   } else if(docType === "resource") {
     id = `resource_${tid}`;
   } else if(docType === 'document_article') {
-    id = `document_${tid}`;
+    id = `article_${tid}`;
   } else if(docType === 'document_comment') {
-    id = `document_${tid}`;
-  } else if(docType === 'document_moment') {
-    id = `document_${tid}`;
+    id = `comment_${tid}`;
   }
 
   return await client.index({
@@ -272,6 +270,7 @@ func.search = async (t, c, options) => {
     createMatch("keywordsEN", c, 80, relation),
     createMatch("keywordsCN", c, 80, relation),
   ];
+  //搜索文章
   if(t === 'thread' && onlyTitle) {
     threadConditions.length = 1;
   }
@@ -450,16 +449,40 @@ func.search = async (t, c, options) => {
   };
   if(t === "post") {
     body.query.bool.must.push({
-      match: {
-        docType: "post"
+      bool: {
+        should: [
+          {
+            match: {
+              docType: "post"
+            }
+          },
+          {
+            match: {
+              docType: "document_comment"
+            }
+          }
+        ]
       }
     });
   } else if(t === "thread") {
-    body.query.bool.must.push({
-      match: {
-        docType: "thread"
+    body.query.bool.must.push(
+      {
+        bool: {
+          should: [
+            {
+              match: {
+                docType: "thread"
+              }
+            },
+            {
+              match: {
+                docType: "document_article"
+              }
+            }
+          ]
+        }
       }
-    });
+    );
   } else if(t === "user") {
     body.query.bool.must.push({
       match: {
@@ -492,7 +515,7 @@ func.search = async (t, c, options) => {
   } else if(t === "document_article") {
     body.query.bool.must.push({
       match: {
-        docType: "document_article"
+        docType: "document_article",
       }
     });
   } else if(t === "document_comment") {

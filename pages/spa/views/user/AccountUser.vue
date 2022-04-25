@@ -41,7 +41,7 @@
     background: #f6f2ee;
   }
   .left-panel-box-none{
-    height: 16rem;
+    height: 0rem;
     overflow: hidden;
   }
   .left-panel-box-show{
