@@ -8,7 +8,7 @@
       .account-banner(v-if="targetUser" )
         //用户banner容器
         .account-user-banner-container
-          .account-user-banner(:style="`backgroundImage: url('${getUrl('userBanner', targetUser.userBanner)}')`" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
+          .account-user-banner(:style="`backgroundImage: url('${getUrl('userHomeBanner', targetUser.homeBanner)}')`" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.banner)})")
             .account-box-mask
               .account-user-info.row
                 .account-user-avatar.col-xs-3.col-sm-2.col-md-2.hidden-xs

@@ -23,6 +23,9 @@ if !isIncluded('articleOptions')
         a.option(v-if='optionStatus.edit !== null' @click='editArticle')
           .fa.fa-edit
           span 编辑
+        a.option(v-if='optionStatus.history !== null' @click='showHistory')
+          .fa.fa-history
+          span 查看历史
         .option(v-if="optionStatus.reviewed === 'unknown'" @click='reviewArticle')
           .fa.fa-check-circle-o
           span 通过审核

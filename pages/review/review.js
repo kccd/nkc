@@ -3,8 +3,8 @@ var pid = [];
 var did = [];
 var review = {};
 var reviewType = data.reviewType;
-if(data.reviewType === 'post') {
-  for(var i = 0; i < data.results.length; i++) {
+for(var i = 0; i < data.results.length; i++) {
+  if(['thread', 'post'].includes(data.results[i].type)) {
     var p = data.results[i].post.pid;
     var tid = data.results[i].thread.tid;
     var isThread = data.results[i].thread.oc === p;
@@ -19,9 +19,7 @@ if(data.reviewType === 'post') {
       illegalType: [],
       threadId: tid
     };
-  }
-} else {
-  for(let i = 0; i < data.results.length; i++) {
+  } else if(data.results[i].type === 'document') {
     let d = data.results[i].document.did;
     let documentId = data.results[i].document._id;
     let source = data.results[i].document.source;
@@ -39,6 +37,7 @@ if(data.reviewType === 'post') {
       resetPostCount: '',
     };
   }
+  
 }
 
 var app = new Vue({
@@ -50,26 +49,21 @@ var app = new Vue({
     pid: pid,
     did: did,
     review: review,
-    reviewType: reviewType?reviewType:'post',
   },
   mounted() {
   },
   methods: {
     selectAll: function() {
-      if(this.reviewType === 'post') {
-        if(this.selectedPid.length === this.pid.length) {
-          this.selectedPid = []
-        } else {
-          this.selectedPid = [].concat(this.pid);
-        }
+      if(this.selectedPid.length === this.pid.length) {
+        this.selectedPid = []
       } else {
-        if(this.selectedDid.length === this.did.length) {
-          this.selectedDid = []
-        } else {
-          this.selectedDid = [].concat(this.did);
-        }
+        this.selectedPid = [].concat(this.pid);
       }
-
+      if(this.selectedDid.length === this.did.length) {
+        this.selectedDid = []
+      } else {
+        this.selectedDid = [].concat(this.did);
+      }
     },
     //提交document审核
     document(arr, index) {
@@ -153,7 +147,7 @@ var app = new Vue({
         }
       }
 
-      nkcAPI(url, method, d)
+      return nkcAPI(url, method, d)
         .then(function() {
           screenTopAlert("PID: " + data.postId + " 处理成功!");
           app.post(arr, index+1);
@@ -165,68 +159,74 @@ var app = new Vue({
         });
     },
     submit: function(id) {
-      if(this.reviewType === 'post') {
-        let pidArr;
-        if(typeof id === "string") { // 提交单个
-          pidArr = [id];
-        } else { // 提交多个
-          pidArr = this.selectedPid;
-        }
-        let arr = [];
-        for(let i = 0; i < pidArr.length; i++) {
-          let reviewData = this.review[pidArr[i]];
-          arr.push({
-            pass: reviewData.pass,
-            reason: reviewData.reason,
-            delType: reviewData.delType,
-            postType: reviewData.isThread?"thread":"post",
-            threadId: reviewData.threadId,
-            postId: reviewData.pid,
-            noticeType: reviewData.noticeType.length > 0,
-            illegalType: reviewData.illegalType.length > 0
-          });
-        }
-        this.post(arr, 0);
-      } else {
-        let didArr;
-        if(typeof id === "string") {//提交单个
-          didArr = [id];
-        } else {
-          didArr = this.selectedDid;
-        }
-        let arr = [];
-        for(let i = 0; i < didArr.length; i++) {
-          let reviewData = this.review[didArr[i]];
-          arr.push({
-            documentId: reviewData.documentId,
-            did: reviewData.did,
-            pass: reviewData.pass,
-            reason: reviewData.reason,
-            delType: reviewData.delType,
-            articleId: reviewData.articleId,
-            noticeType: reviewData.noticeType.length > 0,
-            illegalType: reviewData.illegalType.length > 0
-          });
-        }
-        this.document(arr, 0);
-      }
-
+      const self = this;
+      Promise.resolve()
+        .then(() => {
+          if(self.selectedPid.length !== 0) {
+            let pidArr;
+            if(typeof id === "string") { // 提交单个
+              pidArr = [id];
+            } else { // 提交多个
+              pidArr = self.selectedPid;
+            }
+            let arr = [];
+            for(let i = 0; i < pidArr.length; i++) {
+              let reviewData = self.review[pidArr[i]];
+              arr.push({
+                pass: reviewData.pass,
+                reason: reviewData.reason,
+                delType: reviewData.delType,
+                postType: reviewData.isThread?"thread":"post",
+                threadId: reviewData.threadId,
+                postId: reviewData.pid,
+                noticeType: reviewData.noticeType.length > 0,
+                illegalType: reviewData.illegalType.length > 0
+              });
+            }
+            return self.post(arr, 0);
+          }
+          return;
+        })
+        .then(() => {
+          if(self.selectedDid.length !== 0) {
+            let didArr;
+            if(typeof id === "string") {//提交单个
+              didArr = [id];
+            } else {
+              didArr = self.selectedDid;
+            }
+            let arr = [];
+            for(let i = 0; i < didArr.length; i++) {
+              let reviewData = self.review[didArr[i]];
+              arr.push({
+                documentId: reviewData.documentId,
+                did: reviewData.did,
+                pass: reviewData.pass,
+                reason: reviewData.reason,
+                delType: reviewData.delType,
+                articleId: reviewData.articleId,
+                noticeType: reviewData.noticeType.length > 0,
+                illegalType: reviewData.illegalType.length > 0
+              });
+            }
+            self.document(arr, 0);
+          }
+        })
+        .catch((err) => {
+          sweetError(err);
+        })
     },
     chooseAll: function(type) {
-      if(this.reviewType === 'post') {
-        for(var i = 0; i < this.selectedPid.length; i++) {
-          var p = this.selectedPid[i];
-          var reviewData = this.review[p];
-          reviewData.pass = type;
-        }
-      } else {
-        for(var i = 0; i < this.selectedDid.length; i++) {
-          var d = this.selectedDid[i];
-          var reviewData = this.review[d];
-          reviewData.pass = type;
-        }
+      for(var i = 0; i < this.selectedPid.length; i++) {
+        var p = this.selectedPid[i];
+        var reviewData = this.review[p];
+        reviewData.pass = type;
       }
-
+      for(var i = 0; i < this.selectedDid.length; i++) {
+        var d = this.selectedDid[i];
+        var reviewData = this.review[d];
+        reviewData.pass = type;
+      }
     },
     //选择审核类型
     selectReviewType(type) {

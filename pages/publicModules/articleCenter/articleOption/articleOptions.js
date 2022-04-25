@@ -1,4 +1,5 @@
 import {nkcAPI} from "../../../lib/js/netAPI";
+import {getUrl} from "../../../lib/js/tools";
 
 window.articleOption = new Vue({
   el: '#moduleArticleOptions',
@@ -79,6 +80,12 @@ window.articleOption = new Vue({
     },
     close() {
       this.show = false;
+    },
+    //查看文章历史
+    showHistory() {
+      const {_id} = this.article;
+      const url = getUrl('history', "article", _id);
+      window.open(url);
     },
     open(props) {
       const {aid, direction, jqDOM, tid = '', collected = '',} = props;

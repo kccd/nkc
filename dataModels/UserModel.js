@@ -146,7 +146,7 @@ const userSchema = new Schema({
     default: ""
   },
   //用户个人主页背景
-  userBanner: {
+  homeBanner: {
     type: String,
     default: '',
   },

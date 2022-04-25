@@ -1,4 +1,5 @@
 import { api as viewerApi } from "v-viewer";
+import "viewerjs/dist/viewer.min.css";
 import {RNViewImage} from "./reactNative";
 import {getState} from "./state";
 const state = getState();
