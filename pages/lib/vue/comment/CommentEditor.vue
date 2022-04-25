@@ -27,8 +27,8 @@
       button.m-r-05.btn.btn-default.btn-sm(@click="saveComment" :disabled="!commentContent || lockPost" v-if="!saving") 暂存
       button.m-r-05.btn.btn-default.btn-sm(@click="saveComment" :disabled="!commentContent || lockPost" v-if="saving") 暂存中...
         span.fa.fa-spinner.fa-spin
-      .pull-right
-        a(href="") 历史版本
+      //.pull-right
+      //  a(:href="`/document/history?source=article&sid=${sid}`") 历史版本
 </template>
 
 <style lang="less" scoped>
