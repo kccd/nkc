@@ -39,7 +39,7 @@ router
   // const {bid} = query
   //  获取列表
   const {betaHistory, stableHistory, history} = await db.DocumentModel.getDocumentTypes();
-  data.history = await db.DocumentModel.find({ $and:[{ sid, source }, {type: {$in: [betaHistory, stableHistory, history]}}, {uid: state.uid}] }).sort({ tlm:-1 });
+  data.history = await db.DocumentModel.find({ $and:[{ sid, source }, {type: {$in: [betaHistory, stableHistory]}}, {uid: state.uid}] }).sort({ tlm:-1 });
   if(data.history.length){
     // 默认返回第一项内容
     data.document = data.history[0]
@@ -85,7 +85,7 @@ router
 
   // console.log(_id, '_id')
   // data.bookId = bid
-  const {betaHistory, stableHistory, history} = await db.DocumentModel.getDocumentTypes();
+  const {betaHistory, stableHistory} = await db.DocumentModel.getDocumentTypes();
   data.history =  await db.DocumentModel.find({ sid, source, type: {$in: [betaHistory, stableHistory, history]}, uid: state.uid }).sort({tlm:-1});
   data.type = source;
   function find(data, id){
