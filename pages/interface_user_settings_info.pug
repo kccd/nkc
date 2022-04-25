@@ -1,10 +1,10 @@
 extends bootstrap_base
 block title
   title 基本资料设置
-  -const mainContainer1400 = true
-  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
-
 block content
+  -var avatarUrl = tools.getUrl("userAvatar", data.user.avatar);
+  -var bannerUrl = tools.getUrl("userBanner", data.user.banner);
+  -var homeBannerUrl = tools.getUrl('userHomeBanner', data.user.homeBanner);
   #data.hidden=objToStr({user: data.user, usernameSettings: data.usernameSettings, modifyUsernameCount: data.modifyUsernameCount, usernameScore: data.usernameScore})
   .container-fluid.max-width
     .row
@@ -20,8 +20,12 @@ block content
                 label.col-sm-2.control-label 头像：
                 .col-sm-10
                   .user-settings-img-avatar
-                    a(href=`${tools.getUrl("userAvatar", data.user.avatar, 'lg')}` target="_blank")
-                      img#userAvatar(src=tools.getUrl("userAvatar", data.user.avatar) style='width: 100%;')
+                    img#userAvatar(
+                      src=avatarUrl
+                      style='width: 100%;'
+                      data-global-click='viewImage'
+                      data-global-data=objToStr({name: 'avatar', url: avatarUrl})
+                      )
                     .text-center.m-t-1
                       button.btn.btn-default.btn-sm(onclick='selectAvatar()') 选择图片
                       h5.upload-info
@@ -29,8 +33,12 @@ block content
                 label.col-sm-2.control-label 用户背景：
                 .col-sm-10
                   .user-settings-img-banner
-                    a(href=tools.getUrl('userBanner', data.user.banner) target="_blank")
-                      img#userBanner(src=tools.getUrl('userBanner', data.user.banner) style='width: 100%;')
+                    img#userBanner(
+                      src=bannerUrl
+                      style='width: 100%;'
+                      data-global-click='viewImage'
+                      data-global-data=objToStr({name: 'banner', url: bannerUrl})
+                      )
                     .text-center.m-t-1
                       button.btn.btn-default.btn-sm(onclick='selectBanner()') 选择图片
                       h5.upload-info-banner
@@ -38,11 +46,15 @@ block content
                 label.col-sm-2.control-label 主页背景：
                 .col-sm-10
                   .user-settings-img-banner
-                    a(href=tools.getUrl('userBanner', data.user.userBanner) target="_blank")
-                      img#userBackBanner(src=tools.getUrl('userBanner', data.user.userBanner) style='width: 100%;')
+                    img#userBackBanner(
+                      src=homeBannerUrl
+                      style='width: 100%;'
+                      data-global-click='viewImage'
+                      data-global-data=objToStr({name: 'homeBanner', url: homeBannerUrl})
+                      )
                     .text-center.m-t-1
                       button.btn.btn-default.btn-sm(onclick='selectBackBanner()') 选择图片
-                      h5.upload-info-banner
+                      h5.upload-info-home-banner
               .form-group
                 label.col-sm-2.control-label 用户名：
                 .col-sm-5
@@ -81,6 +93,4 @@ block content
                   button.btn.btn-primary(onclick=`submit(${data.user.uid})`) 保存
 block scripts
   include ./publicModules/crop/crop_new
-  +includeJS('/jquery/jquery.minicolors.js')
-  +includeJS("/interface_common.js")
   +includeJS('/interface_user_settings_info.js')

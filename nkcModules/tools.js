@@ -33,6 +33,9 @@ var Tools = function() {
       case "userBanner": {
         return fileDomain + "/a/"+ id + t
       }
+      case "userHomeBanner": {
+        return fileDomain + "/a/"+ id + t
+      }
       case "scoreIcon": {
         if(id === 'default') {
           return "/default/kcb.png"

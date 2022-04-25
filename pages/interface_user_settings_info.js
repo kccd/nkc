@@ -97,17 +97,17 @@ function selectBackBanner() {
     var user = NKC.methods.getDataById("data").user;
     var formData = new FormData();
     formData.append("file", data, Date.now() + '.png');
-    uploadFilePromise('/banner/' + user.uid + '/userBanner', formData, function (e, percentage) {
-      $(".upload-info-banner").text('上传中...' + percentage);
+    uploadFilePromise('/banner/' + user.uid + '/homeBanner', formData, function (e, percentage) {
+      $(".upload-info-home-banner").text('上传中...' + percentage);
       if (e.total === e.loaded) {
-        $(".upload-info-banner").text('上传完成！');
+        $(".upload-info-home-banner").text('上传完成！');
         setTimeout(function () {
-          $(".upload-ifo-bnanner").text('');
+          $(".upload-info-home-banner").text('');
         }, 2000);
       }
     }, "POST")
       .then(function (data) {
-        $("#userBackBanner").attr("src", NKC.methods.tools.getUrl('userBanner', data.user.userBanner) + '&time=' + Date.now());
+        $("#userBackBanner").attr("src", NKC.methods.tools.getUrl('userHomeBanner', data.user.homeBanner) + '&time=' + Date.now());
         emitEventToUpdateLocalUser(data);
         selectImage.close();
       })
@@ -115,7 +115,7 @@ function selectBackBanner() {
         screenTopWarning(data);
       });
   }, {
-    aspectRatio: 6,
+    aspectRatio: 7,
   });
 }
 
