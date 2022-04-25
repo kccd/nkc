@@ -5,7 +5,7 @@ router
     ctx.template = "review/review.pug";
     const {nkcModules, data, db, query} = ctx;
     const {page=0, reviewType = 'post'} = query;
-    if(!['post', 'document'].includes(reviewType)) ctx.throw(400, `不存在参数 ${reviewType}`);
+    // if(!['post', 'document'].includes(reviewType)) ctx.throw(400, `不存在参数 ${reviewType}`);
     const {user} = data;
     const recycleId = await db.SettingModel.getRecycleId();
     const q = {
@@ -23,141 +23,143 @@ router
     }
     const {article: articleSource, comment: commentSource, moment: momentSource} = await db.DocumentModel.getDocumentSources();
     const m = {status: 'unknown', type: 'stable', source: {$in: [articleSource, commentSource, momentSource]}};
-    //查找出 未审核 未禁用 未退修的post和document
+    //查找出 未审核 未禁用 未退修的post和document的数量
     const postCount = await db.PostModel.countDocuments(q);
     const documentCount = await db.DocumentModel.countDocuments(m);
-    const paging = nkcModules.apiFunction.paging(page, reviewType === 'post'?postCount:documentCount, 100);
+    //获取审核列表分页
+    const paging = nkcModules.apiFunction.paging(page, postCount > documentCount?postCount:documentCount, 30);
     data.results = [];
-    if(reviewType === 'post') {
-      let posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-      posts = await db.PostModel.extendPosts(posts, {
-        uid: data.user?data.user.uid: '',
-        visitor: data.user
-      });
-      const tid = new Set(), uid = new Set();
-      for(const post of posts) {
-        tid.add(post.tid);
-        uid.add(post.uid);
-      }
-      let threads = await db.ThreadModel.find({tid: {$in: [...tid]}, disabled: false});
-      threads = await db.ThreadModel.extendThreads(threads, {
-        lastPost: false,
-        lastPostUser: false,
-        forum: true,
-        category: false,
-        firstPostResource: false
-      });
-      const users = await db.UserModel.find({uid: {$in: [...uid]}});
-      const usersObj = {};
-      const threadsObj = {};
-      users.map(user => {
-        usersObj[user.uid] = user;
-      });
-      threads.map(thread => {
-        threadsObj[thread.tid] = thread;
-      });
-      for(const post of posts) {
-        const thread = threadsObj[post.tid];
-        if(!thread) continue;
-        let user;
-        if(post.anonymous) {
-          thread.uid = "";
-          post.uid = "";
-          post.uidlm = "";
-        } else {
-          user = usersObj[post.uid];
-          if(!user) continue;
-        }
-        let type, link;
-        if(thread.oc === post.pid) {
-          if(thread.recycleMark) {
-            continue;
-          }
-          type = "thread";
-          link = `/t/${thread.tid}`;
-        } else {
-          type = "post";
-          link = await db.PostModel.getUrl(post);
-        }
-        // 从reviews表中读出送审原因
-        const reviewRecord = await db.ReviewModel.findOne({ pid: post.pid }).sort({ toc: -1 }).limit(1);
-        data.results.push({
-          post,
-          user,
-          thread,
-          type,
-          link,
-          reason: reviewRecord? reviewRecord.reason : "",
-        });
-      }
-    } else {
-      //先查找出需要审核的document
-      let documents = await db.DocumentModel.find(m, {
-        _id: 1,
-        uid: 1,
-        did: 1,
-        toc: 1,
-        title: 1,
-        content: 1,
-        sid: 1,
-        source: 1,
-      }).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-      // documents = await db.DocumentModel.extendDocuments(documents, {
-      //   uid: data.user?data.user.uid:'',
-      //   visitor: data.user,
-      // });
-      const articleDocId = new Set();
-      const commentDocId = new Set();
-      const momentDocId = new Set();
-      const uid = new Set();
-      for(const document of documents) {
-        document.content = await nkcModules.apiFunction.obtainPureText(document.content, true, 100);
-        if(document.source === articleSource) articleDocId.add(document.did);
-        if(document.source === commentSource) commentDocId.add(document.did);
-        if(document.source === momentSource) momentDocId.add(document.did);
-        uid.add(document.uid);
-      }
-      //拓展动态内容
-      let moments = await db.MomentModel.find({did: {$in: [...momentDocId]}});
-      moments = await db.MomentModel.extendMomentsData(moments, '', 'did');
-      let articles = await db.ArticleModel.find({did: {$in: [...articleDocId]}});
-      //拓展article内容
-      articles = await db.ArticleModel.extendArticles(articles);
-      const {article} = await db.CommentModel.getCommentSources();
-      //查找评论
-      let comments = await db.CommentModel.find({did: {$in: [...commentDocId]}});
-      comments = await db.CommentModel.extendReviewComments(comments);
-      const users = await db.UserModel.find({uid: {$in: [...uid]}});
-      const usersObj = {};
-      const articleObj = {};
-      const commentObj = {};
-      users.map(user => {
-        usersObj[user.uid] = user;
-      })
-      articles.map(article => {
-        articleObj[article.did] = article;
-      })
-      comments.map(comment => {
-        commentObj[comment.did] = comment;
-      })
-      for(const document of documents) {
-        const article =  articleObj[document.did];
-        if(!article && document.source === 'article') continue;
-        const comment = commentObj[document.did];
-        if(!comment && document.source === 'comment') continue;
-        const moment = moments[document.did];
-        if(!moment && document.source === 'moment') continue;
-        let user = usersObj[document.uid];
+    //获取需要审核的post
+    const tid = new Set(), postUid = new Set();
+    let posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    posts = await db.PostModel.extendPosts(posts, {
+      uid: data.user?data.user.uid: '',
+      visitor: data.user
+    });
+    for(const post of posts) {
+      tid.add(post.tid);
+      postUid.add(post.uid);
+    }
+    let threads = await db.ThreadModel.find({tid: {$in: [...tid]}, disabled: false});
+    threads = await db.ThreadModel.extendThreads(threads, {
+      lastPost: false,
+      lastPostUser: false,
+      forum: true,
+      category: false,
+      firstPostResource: false
+    });
+    const postUsers = await db.UserModel.find({uid: {$in: [...postUid]}});
+    const postUsersObj = {};
+    const threadsObj = {};
+    postUsers.map(user => {
+      postUsersObj[user.uid] = user;
+    });
+    threads.map(thread => {
+      threadsObj[thread.tid] = thread;
+    });
+    for(const post of posts) {
+      const thread = threadsObj[post.tid];
+      if(!thread) continue;
+      let user;
+      if(post.anonymous) {
+        thread.uid = "";
+        post.uid = "";
+        post.uidlm = "";
+      } else {
+        user = postUsersObj[post.uid];
         if(!user) continue;
-        //获取送审原因
-        const reviewRecord = await  db.ReviewModel.findOne({docId: document._id}).sort({toc: -1}).limit(1);
-        data.results.push({
-          document,
-          content: article || comment || moment,
-          user,
-          reason: reviewRecord?reviewRecord.reason : '',
-        })
       }
+      let type, link;
+      if(thread.oc === post.pid) {
+        if(thread.recycleMark) {
+          continue;
+        }
+        type = "thread";
+        link = `/t/${thread.tid}`;
+      } else {
+        type = "post";
+        link = await db.PostModel.getUrl(post);
+      }
+      // 从reviews表中读出送审原因
+      const reviewRecord = await db.ReviewModel.findOne({ pid: post.pid }).sort({ toc: -1 }).limit(1);
+      data.results.push({
+        post,
+        user,
+        thread,
+        type,
+        link,
+        reason: reviewRecord? reviewRecord.reason : "",
+      });
+    }
+    
+    
+    //先查找出需要审核的document
+    let documents = await db.DocumentModel.find(m, {
+      _id: 1,
+      uid: 1,
+      did: 1,
+      toc: 1,
+      title: 1,
+      content: 1,
+      sid: 1,
+      source: 1,
+    }).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    // documents = await db.DocumentModel.extendDocuments(documents, {
+    //   uid: data.user?data.user.uid:'',
+    //   visitor: data.user,
+    // });
+    const articleDocId = new Set();
+    const commentDocId = new Set();
+    const momentDocId = new Set();
+    const uid = new Set();
+    for(const document of documents) {
+      document.content = await nkcModules.apiFunction.obtainPureText(document.content, true, 100);
+      if(document.source === articleSource) articleDocId.add(document.did);
+      if(document.source === commentSource) commentDocId.add(document.did);
+      if(document.source === momentSource) momentDocId.add(document.did);
+      uid.add(document.uid);
+    }
+    //拓展动态内容
+    let moments = await db.MomentModel.find({did: {$in: [...momentDocId]}});
+    moments = await db.MomentModel.extendMomentsData(moments, '', 'did');
+    let articles = await db.ArticleModel.find({did: {$in: [...articleDocId]}});
+    //拓展article内容
+    articles = await db.ArticleModel.extendArticles(articles);
+    const {article} = await db.CommentModel.getCommentSources();
+    //查找评论
+    let comments = await db.CommentModel.find({did: {$in: [...commentDocId]}});
+    comments = await db.CommentModel.extendReviewComments(comments);
+    const users = await db.UserModel.find({uid: {$in: [...uid]}});
+    const usersObj = {};
+    const articleObj = {};
+    const commentObj = {};
+    users.map(user => {
+      usersObj[user.uid] = user;
+    })
+    articles.map(article => {
+      articleObj[article.did] = article;
+    })
+    comments.map(comment => {
+      commentObj[comment.did] = comment;
+    })
+    for(const document of documents) {
+      const article =  articleObj[document.did];
+      if(!article && document.source === 'article') continue;
+      const comment = commentObj[document.did];
+      if(!comment && document.source === 'comment') continue;
+      const moment = moments[document.did];
+      if(!moment && document.source === 'moment') continue;
+      let user = usersObj[document.uid];
+      if(!user) continue;
+      //获取送审原因
+      const reviewRecord = await  db.ReviewModel.findOne({docId: document._id}).sort({toc: -1}).limit(1);
+      data.results.push({
+        type: 'document',
+        document,
+        content: article || comment || moment,
+        user,
+        reason: reviewRecord?reviewRecord.reason : '',
+      })
     }
     data.reviewType = reviewType;
     data.paging = paging;
