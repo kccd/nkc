@@ -6,14 +6,14 @@ module.exports = async (ctx, next) => {
   const {page=0} = query;
   const {pageSettings} = state;
   data.threads = [];
-  //达能存在专栏时
+  //当存在专栏时
   if(column._id) {
     const match = {
       columnId: column._id,
       hidden: false
     };
     const count = await db.ColumnPostModel.countDocuments(match);
-    const paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
+    const paging = nkcModules.apiFunction.paging(page, count, 20);
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,

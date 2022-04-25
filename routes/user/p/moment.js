@@ -9,8 +9,9 @@ module.exports = async (ctx, next) => {
     parent: '',
   };
   const count = await db.MomentModel.countDocuments(match);
-  const paging = nkcModules.apiFunction.paging(page, count);
+  const paging = nkcModules.apiFunction.paging(page, count, 20);
   const moments = await db.MomentModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+  data.paging = paging;
   data.momentsData = await db.MomentModel.extendMomentsListData(moments, state.uid);
   await next();
 }

@@ -9,10 +9,10 @@ block content
     .row#app(v-cloak)
       .col-xs-12.col-md-9
         .p-b-1
-          .paging-button.pointer
-            a.radius-left.button(@click="selectReviewType('post')" :class="{'active': reviewType === 'post'}") post表
-          .paging-button.pointer
-            a.radius-left.button(@click="selectReviewType('document')" :class="{'active': reviewType === 'document'}") document表
+          //.paging-button.pointer
+          //  a.radius-left.button(@click="selectReviewType('post')" :class="{'active': reviewType === 'post'}") post表
+          //.paging-button.pointer
+          //  a.radius-left.button(@click="selectReviewType('document')" :class="{'active': reviewType === 'document'}") document表
           .paging-button.pointer
             a.radius-left.button(@click="selectAll") 全选
             a.button(@click="chooseAll(true)") 通过已选
@@ -22,7 +22,7 @@ block content
           include ../publicModules/paging/paging
         .review-panel-div.box-shadow-panel
           for r in data.results
-            if data.reviewType === 'post'
+            if r.type === 'post' || r.type === 'thread'
               .review-panel
                 .review-time
                   input(type="checkbox" value=r.post.pid v-model=`selectedPid`)
@@ -97,7 +97,7 @@ block content
                       textarea.form-control(rows=5 placeholder="请说明理由" v-model=`review['${r.post.pid}'].reason`)
                   .m-t-1
                     button.btn.btn-sm.btn-primary(@click=`submit('${r.post.pid}')`) 提交
-            else if data.reviewType === 'document'
+            else if r.type === 'document'
               .review-panel
                 .review-time
                   input(type="checkbox" value=r.document._id v-model=`selectedDid`)
@@ -128,7 +128,7 @@ block content
                 if r.reason
                   .review-info 理由：
                   span(v-pre)= r.reason
-                .review-post-content(v-pre)!=r.document.content
+                .review-post-content!=r.document.content
                   .review-input-div(v-if=`1 || selectedDid.indexOf('${r.document._id}') !== -1`)
                     .m-b-1
                       input(type="radio" :value="true" v-model=`review['${r.document._id}'].pass`)
