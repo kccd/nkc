@@ -28,7 +28,7 @@ mixin checkBox
         )
 mixin displayForum
   if data.forum
-    -let displayForumNav = false;
+    -var displayForumNav = false;
     for f in thread.forums
       if f.fid !== data.forum.fid
         -displayForumNav = true;
@@ -44,7 +44,7 @@ mixin displayForum
           .thread-panel-forum
             a(href=`/f/${data.forum.fid}?cat=${category.cid}` target=aTarget)= category.name
   else
-    -let forum;
+    -var forum;
     if thread.forums && thread.forums.length
       -forum = thread.forums[0];
     if forum
@@ -57,14 +57,14 @@ mixin displayForum
 
 mixin displayPageCount
   -const pageCount = Math.ceil(thread.count / state.pageSettings.threadPostList)
-  -let ellipsis = false;
+  -var ellipsis = false;
   if pageCount >= 2
     a.thread-title-page(href=`/t/${thread.tid}?&page=${1}`)= 2
   if pageCount > 3
     span.thread-title-page.p-a-0 ...
   if pageCount >= 3
     a.thread-title-page(href=`/t/${thread.tid}?&page=${pageCount - 1}`)= pageCount
-  //--for (let i = 1; i < pageCount; i++)
+  //--for (var i = 1; i < pageCount; i++)
     if i < 4 || i > pageCount - 3
       a.thread-title-page(href=`/t/${thread.tid}?&page=${i}`)= i + 1
     else if !ellipsis
@@ -84,13 +84,14 @@ if thread.type === 'thread'
   -const lastPostUrl = `/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`;
   -const hasReply = thread.firstPost.pid !== thread.lastPost.pid;
 -const threadListStyle = defaultThreadListStyle || state.threadListStyle;
--let postCoverPosition = 'null';
--let styleType = threadListStyle.type;
+-var postCoverPosition = 'null';
+-console.log('threadListStyle', threadListStyle.type);
+-var styleType = threadListStyle.type;
 - if (styleType === 'abstract') {
   -postCoverPosition = threadListStyle.cover;
 -}
 if thread.type === 'thread'
-  -let threadPanelClass = !thread.reviewed || thread.recycleMark || thread.disabled?"reviewed":"";
+  -var threadPanelClass = !thread.reviewed || thread.recycleMark || thread.disabled?"reviewed":'';
 -if (styleType !== 'abstract') {
   -threadPanelClass += ' p-b-0';
 -}
@@ -122,7 +123,7 @@ if data.t  === 'column' && thread.type === 'article'
               a.thread-panel-minimalist-title-a.thread-panel-url(href=threadUrl title=threadTitle class=thread.digest ? "digest" : ""  target=aTarget)=threadTitle
             .absolute-count
               -const toc = tools.briefTime(thread.toc);
-              -let tlm;
+              -var tlm;
               if hasReply
                 -tlm = tools.briefTime(thread.toc);
               span.thread-panel-minimalist-toc
@@ -300,7 +301,7 @@ else
               +displayPageCount
             .absolute-count
               -const toc = tools.briefTime(thread.firstPost.toc);
-              -let tlm;
+              -var tlm;
               if hasReply
                 -tlm = tools.briefTime(thread.lastPost.toc);
               span.thread-panel-minimalist-toc
@@ -464,8 +465,8 @@ else
           .thread-panel-title
             a.title-content.thread-panel-url(href=threadUrl class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
             -const pageCount = thread.count / state.pageSettings.threadPostList
-            -let ellipsis = false;
-            -for(let i = 1; i < pageCount; i++)
+            -var ellipsis = false;
+            -for(var i = 1; i < pageCount; i++)
               if i < 4 || i > pageCount - 3
                 a.thread-title-page(href=`/t/${thread.tid}?&page=${i}`)= i + 1
               else if !ellipsis
