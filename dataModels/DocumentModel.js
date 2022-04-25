@@ -18,7 +18,9 @@ const documentStatus = {
 const documentTypes = {
   stable: "stable",
   beta: "beta",
-  history: "history"
+  history: "history",
+  betaHistory: "betaHistory",
+  stableHistory: "stableHistory",
 };
 
 const documentSources = {
@@ -37,7 +39,7 @@ const schema = new mongoose.Schema({
     required: true,
     index: 1
   },
-  // 版本类型 stable, beta, history
+  // 版本类型 stable, beta, history, betaHistory //编辑版历史, stableHistory //正式版历史,
   type: {
     type: String,
     required: true,
@@ -336,7 +338,7 @@ schema.methods.copyToHistoryDocument = async function(status) {
   const NoteModel = mongoose.model('notes');
   const originDocument = this.toObject();
   delete originDocument._v;
-  originDocument.type = (await DocumentModel.getDocumentTypes()).history;
+  originDocument.type = (await DocumentModel.getDocumentTypes()).betaHistory;
   originDocument._id = await DocumentModel.getId();
   originDocument.toc = new Date();
   (status === 'edit') && (originDocument.tlm = new Date());
@@ -410,7 +412,7 @@ schema.methods.setAsEditDocument = async function() {
 //将专栏编辑版改为历史版
 schema.statics.setBetaDocumentAsHistoryBySource = async (source, sid) =>{
   const DocumentModel = mongoose.model('documents');
-  const historyType = (await DocumentModel.getDocumentTypes()).history
+  const historyType = (await DocumentModel.getDocumentTypes()).betaHistory
   const betaDocument = await DocumentModel.getBetaDocumentBySource(source, sid);
   if(!betaDocument) return;
   await betaDocument.updateOne({
@@ -427,7 +429,7 @@ schema.methods.setAsHistoryDocument = async function() {
   const DocumentModel = mongoose.model('documents');
   await this.updateOne({
     $set: {
-      type: (await DocumentModel.getDocumentTypes()).history
+      type: (await DocumentModel.getDocumentTypes()).stableHistory,
     }
   });
 };
@@ -481,7 +483,7 @@ schema.statics.publishDocumentByDid = async (did) => {
       maxLength: 500
     })
   }
-  //如果存在正式版就将正式版变为历史版
+  //如果存在正式版就将正式版变为正式历史版
   if(documentsObj.stable) await documentsObj.stable.setAsHistoryDocument();
   await documentsObj.beta.updateOne({
     $set: {
