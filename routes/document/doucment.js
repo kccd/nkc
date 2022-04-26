@@ -16,6 +16,9 @@ router
   // 用于pug渲染判断当前是什么类型页面
   data.type = source;
   data.document = document[0];
+  // 查询文章作者
+  const authorInfo = await db.UserModel.findOnly({uid: data.document.uid});
+  data.articleAuthor = authorInfo;
   const documentResourceId = await data.document.getResourceReferenceId();
   let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
   data.document.content = nkcRender.renderHTML({
@@ -31,18 +34,23 @@ router
 .get('history', async (ctx, next)=>{
   //获取文档历史版本
   ctx.template = 'document/history/document.pug'
-  const {db, data, state, query, permission} = ctx;
+  const {db, data, state, query, permission, nkcModules} = ctx;
   if(!permission("viewUserArticle")) ctx.throw(400, "没有权限")
-  const {sid, source} = query;
+  const {sid, source, page=0} = query;
   data.type = source;
-
-  // const {bid} = query
-  //  获取列表
   const {betaHistory, stableHistory, history} = await db.DocumentModel.getDocumentTypes();
-  data.history = await db.DocumentModel.find({ $and:[{ sid, source }, {type: {$in: [betaHistory, stableHistory]}}, {uid: state.uid}] }).sort({ tlm:-1 });
+  const queryCriteria = { $and:[{ sid, source }, {type: {$in: [betaHistory, stableHistory]}}, {uid: state.uid}] };
+  //  获取列表
+  // 返回分页信息
+  const count =  await db.DocumentModel.countDocuments(queryCriteria);
+  const paging = nkcModules.apiFunction.paging(page, count, 10);
+  data.paging = paging;
+  data.history = await await db.DocumentModel.find(queryCriteria).sort({tlm: -1}).skip(paging.start).limit(paging.perpage);
   if(data.history.length){
     // 默认返回第一项内容
-    data.document = data.history[0]
+    data.document = data.history[0];
+    const authorInfo = await db.UserModel.findOnly({uid: data.document.uid});
+    data.articleAuthor = authorInfo;
     const documentResourceId = await data.document.getResourceReferenceId();
     let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
     data.document.content = nkcRender.renderHTML({
@@ -77,17 +85,17 @@ router
 })
 .get('history/:_id',async (ctx, next)=>{
   ctx.template = 'document/history/document.pug'
-  const {db, data, params, state, query, permission} = ctx;
+  const {db, data, params, state, query, permission, nkcModules} = ctx;
   if(!permission("viewUserArticle")) ctx.throw(400, "没有权限");
-  const { sid, source } = query;
+  const { sid, source, page=0 } = query;
   const { _id } = params;
   data.type = source;
-
-  // console.log(_id, '_id')
-  // data.bookId = bid
   const {betaHistory, stableHistory} = await db.DocumentModel.getDocumentTypes();
-  data.history =  await db.DocumentModel.find({ sid, source, type: {$in: [betaHistory, stableHistory, history]}, uid: state.uid }).sort({tlm:-1});
+  const queryCriteria = { sid, source, type: {$in: [betaHistory, stableHistory]}, uid: state.uid };
+  const count =  await db.DocumentModel.countDocuments(queryCriteria);
+  const paging = nkcModules.apiFunction.paging(page, count, 10);
   data.type = source;
+  data.history =  await db.DocumentModel.find(queryCriteria).sort({tlm:-1}).skip(paging.start).limit(paging.perpage);
   function find(data, id){
     for (const obj of data) {
       if(obj._id == id) return obj
@@ -95,11 +103,10 @@ router
   }
   // 在 历史记录中找到当前需要显示内容的文章
   data.document = find(data.history, _id);
-
-  // 点击当前版本进行编辑后 前端会刷新当前页面 而_id 的文章已经变为编辑版 不存在历史记录中，因此默认返回第一条数据
-  if(!data.document){
-    data.document = data.history[0];
-  }
+  if(!data.document) ctx.throw(400, "当前文章不存在或正在进行编辑");
+  data.paging = paging;
+  const authorInfo = await db.UserModel.findOnly({uid: data.document.uid});
+  data.articleAuthor = authorInfo;
   const documentResourceId = await data.document.getResourceReferenceId();
   let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
   data.document.content = nkcRender.renderHTML({
@@ -114,7 +121,7 @@ router
   if (source === "article"){
     article  = await db.ArticleModel.findOne({_id: data.document.sid, uid: state.uid});
     //  选择此版本进行编辑的url
-    editorUrl = { editorUrl } = await db.ArticleModel.getArticleUrlBySource(article._id, article.source, article.sid);
+    editorUrl = await db.ArticleModel.getArticleUrlBySource(article._id, article.source, article.sid);
   }
   if( source === "draft"){
     editorUrl = await db.ArticleModel.getArticleUrlBySource(data.document.sid, data.document.source, data.document.sid);
@@ -131,7 +138,7 @@ router
   const { sid, source } = query
   // 当前历史记录改为编辑版，并且复制了一份为历史版
   const { _id } = params;
-  await db.DocumentModel.copyToHistoryToEditDocument(state.uid, sid, source, _id);
+  await db.DocumentModel.copyToHistoryToEditDocument(state.uid, sid, source, Number(_id));
   await next()
 })
 module.exports = router;

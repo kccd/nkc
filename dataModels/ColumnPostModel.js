@@ -129,7 +129,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
   let res = {};
   if(articleData.type === articleType){
     const {_id: columnPostId, thread, article, editorUrl, column, mainCategory, auxiliaryCategory, type} = articleData;
-    const {uid, origin, toc, title, abstract, abstractEN, keywordsEN, keywords, content, tlm, dt} = article.document;
+    const {uid, origin, toc, title, abstract, abstractEN, keywordsEN, keywords, content, tlm, dt, authorInfos} = article.document;
     //获取文章评论数
     thread.count = article.count;
     res = {
@@ -143,6 +143,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
       mainCategory,
       auxiliaryCategory,
       post: {
+        authorInfos,
         dt,
         uid,
         originState: origin,
@@ -158,7 +159,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
     };
   } else if(articleData.type === threadType) {
     const {article, thread, _id, column, user, resources, mainCategory, auxiliaryCategory, type, url} = articleData;
-    const {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm} = article;
+    const {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, authorInfos, dt} = article;
     thread.url = url;
     res = {
       _id,
@@ -170,6 +171,8 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
       mainCategory,
       auxiliaryCategory,
       post: {
+        authorInfos,
+        dt,
         uid,
         tlm,
         toc,

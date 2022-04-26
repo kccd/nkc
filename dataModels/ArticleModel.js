@@ -5,7 +5,6 @@ const tools = require("../nkcModules/tools");
 const articleSources = {
   column: 'column',
   zone: 'zone',
-  draft: 'draft'
 };
 
 const articleStatus = {
@@ -256,8 +255,10 @@ schema.statics.getZoneArticle = async (id)=>{
   article = (await ArticleModel.getArticlesInfo([article]))[0];
   const {articleInfo, document, documentResourceId} = await ArticleModel.getDocumentInfoById(id);
   const documentAllowKey = ['title', 'content', 'abstract', 'abstractEN', 'keywords', 'keywordsEN', 'authorInfos', 'toc', 'origin', 'uid', 'collectedCount', 'tlm', 'dt'];
+  // 返回需要的数据
   const filteredDocument = await ArticleModel.filterData(document, documentAllowKey)
-  const documentContent = await ArticleModel.changeKey(filteredDocument)
+  // 统一key
+  const documentContent = await ArticleModel.changeKey(filteredDocument);
   let user = await UserModel.findOne({uid:articleInfo.uid});
   user = user.toObject();
   let resources = await ResourceModel.getResourcesByReference(documentResourceId);
@@ -756,7 +757,10 @@ schema.statics.getBetaDocumentsObjectByArticlesId = async function(articlesId) {
 schema.statics.getArticleUrlBySource = async function(articleId, source, sid, status) {
   const tools = require('../nkcModules/tools');
   const ArticleModel = mongoose.model('articles');
-  const {column: columnSource, zone: zoneSource, draft: draftSource} = await ArticleModel.getArticleSources();
+  const DocumentModel = mongoose.model('documents');
+  // 片段创作
+  const {  draft: fragmentDraft } = await DocumentModel.getDocumentSources();
+  const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
   const {default: defaultStatus} = await ArticleModel.getArticleStatus();
   let editorUrl = '';
   let articleUrl = '';
@@ -771,7 +775,7 @@ schema.statics.getArticleUrlBySource = async function(articleId, source, sid, st
   } else if(source === zoneSource) {
     editorUrl = tools.getUrl('zoneArticleEditor', sid, articleId);
     articleUrl = tools.getUrl('zoneArticle', articleId);
-  }else if (source === draftSource) {
+  }else if (source === fragmentDraft) {
     editorUrl = tools.getUrl('draftEditor', sid);
     // articleUrl = tools.getUrl('draftEditor', );
   }
