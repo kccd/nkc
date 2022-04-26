@@ -30,6 +30,7 @@ router
     const momentsId = [];
     const articlesId = [];
     const commentsId = [];
+    const momentsListObj = {};
     for(const document of documents) {
       const {
         uid, source, sid,
@@ -55,13 +56,16 @@ router
     const usersObj = await db.UserModel.getUsersObjectByUsersId(usersId);
     const articlesObj = await db.ArticleModel.getArticlesObjectByArticlesId(articlesId);
     const momentsObj = await db.MomentModel.getMomentsObjectByMomentsId(momentsId);
+    const momentsList = await db.MomentModel.extendMomentsListData(Object.values(momentsObj));
     const commentsObj = await db.CommentModel.getCommentsObjectByCommentsId(commentsId);
     const commentsInfo = await db.CommentModel.getCommentInfo(Object.values(commentsObj));
     const commentsUrl = {};
     for(const commentInfo of commentsInfo) {
       commentsUrl[commentInfo._id] = commentInfo.url;
     }
-
+    for(const m of momentsList) {
+      momentsListObj[m.momentId] = m;
+    }
     const documentsInfo = [];
     for(const document of documents) {
       const {
@@ -83,6 +87,7 @@ router
 
       let from;
       let url;
+      let quote;
 
       switch(source) {
         case documentSourcesObj.article: {
@@ -108,7 +113,9 @@ router
         }
         case documentSourcesObj.moment: {
           const moment = momentsObj[sid];
-          url = getUrl('singleMoment', moment._id);
+          const momentInfo = momentsListObj[moment._id];
+          if(moment.quoteId) quote = momentInfo.quoteData;
+          url = getUrl('zoneMoment', moment._id);
           from = '动态';
           break;
         }
@@ -158,6 +165,10 @@ router
         status,
         source,
       };
+      //如果是动态就加入动态资源和引用信息
+      if(source === documentSourcesObj.moment) {
+        result.quoteData = '';
+      }
       documentsInfo.push(result);
     }
 

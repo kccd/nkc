@@ -10,6 +10,8 @@
     a(href="/review", target="_blank") 待审核列表
   .moment-status(v-else-if="moment && moment.status === 'deleted'")
     .deleted 内容已被删除
+  .moment-status(v-else-if="moment && moment.status === 'faulty'")
+    .deleted 内容已被屏蔽
 </template>
 
 <style lang="less">
@@ -22,6 +24,9 @@
   }
   .deleted {
     background: #bdbdbd;
+  }
+  .deleted {
+    background: #e29d9d;
   }
 }
 </style>

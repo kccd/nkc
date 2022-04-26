@@ -2,8 +2,6 @@
 
   .single-moment-container(v-if="momentData")
     moment-status(ref="momentStatus" :moment="momentData")
-
-
     .single-moment-top-container#comment-content
       //moment-option(
       //  ref="momentOption"

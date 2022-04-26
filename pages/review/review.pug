@@ -96,7 +96,7 @@ block content
                     .m-t-1
                       textarea.form-control(rows=5 placeholder="请说明理由" v-model=`review['${r.post.pid}'].reason`)
                   .m-t-1
-                    button.btn.btn-sm.btn-primary(@click=`submit('${r.post.pid}')`) 提交
+                    button.btn.btn-sm.btn-primary(@click=`submit('${r.post.pid}', 'post')`) 提交
             else if r.type === 'document'
               .review-panel
                 .review-time
@@ -152,7 +152,7 @@ block content
                       .m-t-1
                         textarea.form-control(rows=5 placeholder="请说明理由" v-model=`review['${r.document._id}'].reason`)
                     .m-t-1
-                      button.btn.btn-sm.btn-primary(@click=`submit('${r.document._id}')`) 提交
+                      button.btn.btn-sm.btn-primary(@click=`submit('${r.document._id}', 'document')`) 提交
         .p-t-1
           include ../publicModules/paging/paging_input
           .paging-button.pointer
