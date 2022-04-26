@@ -33,8 +33,13 @@ block content
               span.common-article-author=authorInfo.agency
         .m-t-1.text-center
           //- 用户头像
-          img(src=tools.getUrl('userAvatar', avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
-          if data.articleAuthor
+          a(
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid:data.articleAuthor.uid})
+            )
+            img(src=tools.getUrl('userAvatar', data.articleAuthor.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+            if data.articleAuthor
             span.kcid=data.articleAuthor.username
           span(style='color: #555555;margin-right:5px' title=format(`YYYY-MM-DD HH:mm:ss`, data.document.toc))= ` ${format(`YYYY-MM-DD HH:mm:ss`, data.document.toc)}`
           if data.document.origin && data.document.origin !== "0"
@@ -66,7 +71,9 @@ block content
                         span.keyWordstagEn(style="cursor:pointer")!=keyEn
         .book-content-content!=data.document.content
         include ../../columns/article/authorInfo.pug
-        +authorInfo()    
+        +authorInfo() 
+        include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+
 block scripts
   include ../../publicModules/nkcSource
   +includeJS('/document/preview/preview.js')
