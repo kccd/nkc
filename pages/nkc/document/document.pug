@@ -17,7 +17,6 @@ block nkcContent
     include ../../publicModules/paging/paging_input
     .management-posts
       for document in data.documentsInfo
-        -console.log('document', document);
         .management-post(class=document.status)
           .post-header
             .post-time=format("YYYY/MM/DD HH:mm:ss", document.toc)
@@ -47,10 +46,10 @@ block nkcContent
                 if document.abstractEN
                   .col-xs-12.col-md-6
                     .post-title=`英文摘要：${document.abstractEN || '无'}`
-                if document.keywords
+                if document.keywords.length !== 0
                   .col-xs-12.col-md-6
                     .post-title=`中文关键词：${document.keywords.join(', ') || '无'}`
-                if document.keywordsEN
+                if document.keywordsEN.length !== 0
                   .col-xs-12.col-md-6
                     .post-title=`英文关键词：${document.keywordsEN.join(', ') || '无'}`
             .row
@@ -64,7 +63,7 @@ block nkcContent
                     if document.t
                       .col-xs-12.col-md-6
                         .post-title=`内容标题：${document.t || '无'}`
-            .post-content.bg-danger.p-a-05!=document.content
+            .post-content.bg-danger.p-a-05!=`${document.content || '未填写内容'}`
     include ../../publicModules/paging/paging_input
 block nkcScripts
   +includeJS('/nkc/document/document.js')

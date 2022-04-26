@@ -158,11 +158,11 @@ var app = new Vue({
           app.post(arr, index+1);
         });
     },
-    submit: function(id) {
+    submit: function(id, type) {
       const self = this;
       Promise.resolve()
         .then(() => {
-          if(self.selectedPid.length !== 0) {
+          if(self.selectedPid.length !== 0 || (id && type === 'post')) {
             let pidArr;
             if(typeof id === "string") { // 提交单个
               pidArr = [id];
@@ -188,7 +188,7 @@ var app = new Vue({
           return;
         })
         .then(() => {
-          if(self.selectedDid.length !== 0) {
+          if(self.selectedDid.length !== 0 || (id && type === 'document')) {
             let didArr;
             if(typeof id === "string") {//提交单个
               didArr = [id];
