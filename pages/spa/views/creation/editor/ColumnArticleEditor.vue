@@ -6,9 +6,9 @@
       article-editor(ref="articleEditor" :configs="formConfigs" time="60000" source="column")
     template(v-else)
       .no-column
-        span 您还未开通专栏，点击
-        a(href="/column/apply") 这里
-        span 去开通专栏吧
+        span 您还未开通专栏，点击&nbsp;
+        a(href="/column") 这里
+        span &nbsp;去开通专栏。
 
 </template>
 <style scoped>

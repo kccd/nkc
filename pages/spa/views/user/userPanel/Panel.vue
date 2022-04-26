@@ -66,6 +66,7 @@
     width: 100%;
     border-radius: 3px;
     overflow: hidden;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
     .account-user-banner-container {
 
       .account-user-banner {

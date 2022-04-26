@@ -1,7 +1,7 @@
 <template lang="pug">
   .user-post
     to-column(ref="toColumn")
-    .user-list-warning(v-if="(!posts || posts.length === 0) && !loading") 用户貌似未发表过任何内容
+    blank(v-if="(!posts || posts.length === 0) && !loading")
     .user-post-list
       span.m-r-05(v-if="pageButtons.length > 0")
         paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
@@ -46,6 +46,7 @@ import Paging from "../../../../../lib/vue/Paging";
 import ToColumn from "../../../../../lib/vue/publicVue/toColumn/ToColumn";
 import {nkcAPI} from "../../../../../lib/js/netAPI";
 import {getState} from "../../../../../lib/js/state";
+import Blank from '../../../../components/Blank';
 export default {
   data: () => ({
     posts: [],
@@ -58,6 +59,7 @@ export default {
     checkboxPosts: [],
   }),
   components: {
+    "blank": Blank,
     "review": Review,
     "single-post": SinglePost,
     "paging": Paging,

@@ -7,7 +7,7 @@ module.exports = async (ctx, next) => {
   const {pageSettings} = state;
   data.threads = [];
   //当存在专栏时
-  if(column._id) {
+  if(column) {
     const match = {
       columnId: column._id,
       hidden: false
@@ -26,7 +26,7 @@ module.exports = async (ctx, next) => {
     const topicsId = await db.ForumModel.getForumsIdFromRedis("topic");
     const disciplinesId = await db.ForumModel.getForumsIdFromRedis("discipline");
     const homeSettings = await db.SettingModel.getSettings("home");
-  
+
     // 排除话题下的文章
     if(!homeSettings.list || !homeSettings.list.topic) {
       fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !topicsId.includes(fid));

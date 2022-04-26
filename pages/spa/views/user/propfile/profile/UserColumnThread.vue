@@ -1,7 +1,8 @@
 <template lang="pug">
   .user-column-thread
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
-    .user-column-box(v-for="item in threads" )
+    blank(v-if="threads.length === 0")
+    .user-column-box(v-for="item in threads" v-else)
       .user-column-body
         .user-column-title
           a.user-column-name(:href="item.homeUrl" target="_blank") {{item.threadName}}
@@ -114,6 +115,7 @@
 import {nkcAPI} from "../../../../../lib/js/netAPI";
 import {timeFormat, fromNow, getUrl} from "../../../../../lib/js/tools";
 import Paging from "../../../../../lib/vue/Paging";//改路径
+import Blank from '../../../../components/Blank';
 
 
 export default {
@@ -125,6 +127,7 @@ export default {
   }),
   components:{
     "paging": Paging,
+    'blank': Blank
   },
   mounted() {
     this.initData();

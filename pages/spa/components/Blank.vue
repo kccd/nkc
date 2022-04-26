@@ -8,7 +8,6 @@
     width: 100%;
     text-align: center;
     font-size: 1.25rem;
-    font-weight: 700;
   }
 </style>
 
@@ -20,7 +19,7 @@
     }),
     computed: {
       style() {
-        const h = this.height || '20rem';
+        const h = this.height || '10rem';
         return `height: ${h}; line-height: ${h};`
       }
     }

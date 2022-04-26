@@ -104,7 +104,7 @@
                         .fa.fa-spinner.fa-spin.fa-3x.fa-fw.button-icon
                     div(v-else)
 
-                      button.btn.post-button.register-step(v-if='registerStep === 2' @click='changeStep(1)') 上一步
+                      button.btn.post-button.register-step.m-r-05(v-if='registerStep === 2' @click='changeStep(1)') 上一步
                       button.btn.post-button.register-step.m-l-05(v-if='registerStep === 1' @click='changeStep(2)') 下一步
 
                       button.btn.post-button(@click="submit" v-if="!submitting && registerStep === 2 && !submitting") 注册

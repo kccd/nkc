@@ -4,9 +4,6 @@ const optionsRouter = require('./options');
 const unblockRouter = require('./unblock');
 const collectionRouter = require('./collection');
 router
-  .get('/', async (ctx, next) => {
-    await next();
-  })
   .del('/:aid', async (ctx, next) => {
     const {params, db, state} = ctx;
     const {aid} = params;
