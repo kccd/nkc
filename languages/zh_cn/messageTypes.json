@@ -116,9 +116,9 @@
   "documentPassReview": "文章通过审核",
   "documentFaulty": "文章被退修",
   "documentDisabled": "文章被屏蔽",
-  "commentPassReview": "图书评论通过审核",
-  "commentFaulty": "图书评论被退修",
-  "commentDisabled": "图书评论被屏蔽",
+  "commentPassReview": "评论通过审核",
+  "commentFaulty": "评论被退修",
+  "commentDisabled": "评论被屏蔽",
   "bookInvitation": "图书创作邀请",
   "momentDelete": "动态被删除",
   "momentPass": "动态审核通过"
