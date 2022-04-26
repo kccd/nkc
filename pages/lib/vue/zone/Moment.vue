@@ -8,7 +8,6 @@
       //moment-option(
       //  ref="momentOption"
       //  @complaint="complaint"
-      //  @violation-record="violationRecord"
       //)
       .single-moment-left
         .single-moment-avatar(
@@ -32,7 +31,6 @@
             moment-option(
               ref="momentOption"
               @complaint="complaint"
-              @violation-record="violationRecord"
             )
         //- 动态内容
         .single-moment-content(v-html="momentData.content")
@@ -75,7 +73,6 @@
             :type="showPanelType"
             @post-comment="onPostComment"
             :focus="focus"
-
             )
 </template>
 
@@ -390,10 +387,6 @@
       //投诉或举报
       complaint(mid) {
         this.$emit('complaint', mid);
-      },
-      //查看违规记录
-      violationRecord(uid) {
-        this.$emit('violation-record', uid);
       },
     }
   }

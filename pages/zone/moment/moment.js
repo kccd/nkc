@@ -3,6 +3,7 @@ import MomentOption from "../../lib/vue/zone/momentOption/MomentOption";
 import Complaint from "../../lib/vue/Complaint";
 import ViolationRecord from "../../lib/vue/ViolationRecord";
 import {getDataById} from "../../lib/js/dataConversion";
+import {EventBus} from "../../spa/eventBus";
 const data = getDataById('data');
 const app = new Vue({
   el: "#app",
@@ -18,7 +19,12 @@ const app = new Vue({
     momentListData: data.momentListData
   },
   mounted() {
-    this.showCommentPanel();
+    const self = this;
+    self.showCommentPanel();
+    //查看违规记录
+    EventBus.$on('violation-record', function (uid) {
+      self.$refs.violationRecord.open({uid});
+    });
   },
   methods: {
     showCommentPanel() {
@@ -30,10 +36,6 @@ const app = new Vue({
     //投诉或举报
     complaint(mid) {
       this.$refs.complaint.open('moment', mid);
-    },
-    //查看违规记录
-    violationRecord(uid) {
-      this.$refs.violationRecord.open({uid});
     },
   }
 });

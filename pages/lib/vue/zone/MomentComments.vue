@@ -43,7 +43,6 @@
                 moment-option(
                   :ref="`momentOption_${index}`"
                   @complaint="complaint"
-                  @violation-record="violationRecord"
                 )
           .moment-comment-item-content(v-html="commentData.content")
       paging(:pages="pageButtons" @click-button="clickPageButton")
@@ -286,10 +285,6 @@
       //投诉或举报
       complaint(mid) {
         this.$emit('complaint', mid);
-      },
-      //查看违规记录
-      violationRecord(uid) {
-        this.$emit('violation-record', uid);
       },
     },
   }

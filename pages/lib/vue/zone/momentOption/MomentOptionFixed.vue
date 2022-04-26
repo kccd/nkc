@@ -1,5 +1,5 @@
 <template lang="pug">
-  #modulePostOptions( v-show="show" @click="")
+  .moment-options( v-show="show" @click="")
     .post-options-panel(v-if='loading')
       .loading 加载中...
     .post-options-panel(v-else)
@@ -29,9 +29,9 @@
         span {{timeFormat(toc)}}
 </template>
 
-<style lang="less">
+<style lang="less" scoped>
 @import '../../../../publicModules/base';
-#modulePostOptions{
+.moment-options{
   position: absolute;
   z-index: 1000;
   right: 0;
@@ -91,6 +91,7 @@
 <script>
 import {nkcAPI} from "../../../js/netAPI";
 import {timeFormat} from "../../../js/tools";
+import {EventBus} from "../../../../spa/eventBus";
 export default {
   data: () => ({
     uid: NKC.configs.uid,
@@ -198,7 +199,7 @@ export default {
     },
     //违规记录
     viewViolationRecord() {
-      this.$emit('violation-record', this.moment.uid);
+      EventBus.$emit('violation-record', this.moment.uid);
     },
     //用户移除黑名单 tUid 被拉黑的用户
     removeUserToBlackList(uid) {
