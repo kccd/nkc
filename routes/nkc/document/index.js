@@ -87,7 +87,7 @@ router
 
       let from;
       let url;
-      let quote;
+      let momentInfo;
 
       switch(source) {
         case documentSourcesObj.article: {
@@ -113,8 +113,7 @@ router
         }
         case documentSourcesObj.moment: {
           const moment = momentsObj[sid];
-          const momentInfo = momentsListObj[moment._id];
-          if(moment.quoteId) quote = momentInfo.quoteData;
+          momentInfo = momentsListObj[moment._id];
           url = getUrl('zoneMoment', moment._id);
           from = '动态';
           break;
@@ -167,7 +166,7 @@ router
       };
       //如果是动态就加入动态资源和引用信息
       if(source === documentSourcesObj.moment) {
-        result.quoteData = '';
+        result.momentInfo = momentInfo;
       }
       documentsInfo.push(result);
     }
