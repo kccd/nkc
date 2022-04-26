@@ -24,3 +24,15 @@ window.deleteArticle = function (_id) {
       })
   });
 }
+
+window.deleteMoment = function (momentId) {
+  if(!momentId) return;
+  sweetQuestion("你确定要删除吗？")
+    .then(() => nkcAPI(`/moment/${momentId}`, "DELETE"))
+    .then(() => {
+      sweetSuccess('操作成功');
+    })
+    .catch(err => {
+      sweetError(err);
+    })
+}
