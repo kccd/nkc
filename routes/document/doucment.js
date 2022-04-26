@@ -6,12 +6,11 @@ router
   //获取文档预览信息
   ctx.template='document/preview/document.pug'
   const {db, data, state, query, permission} = ctx;
-  
+
   const {sid, source} = query;
+  const {user} = data;
   const document = await db.DocumentModel.find({sid, source, uid: state.uid, type: "beta"}).sort({tlm: -1}).skip(0).limit(1);
   if(!document.length) ctx.throw(400, "该文章已被发布")
-  let user = await db.UserModel.findOne({uid: state.uid});
-  user = user.toObject();
 
   // 用于pug渲染判断当前是什么类型页面
   data.type = source;
@@ -21,8 +20,7 @@ router
     if(!permission("viewUserArticle")) ctx.throw(403, "没有权限")
   }
   // 查询文章作者
-  const authorInfo = await db.UserModel.findOnly({uid: data.document.uid});
-  data.articleAuthor = authorInfo;
+  data.articleAuthor = await db.UserModel.findOnly({uid: data.document.uid});
   const documentResourceId = await data.document.getResourceReferenceId();
   let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
   data.document.content = nkcRender.renderHTML({
@@ -39,7 +37,7 @@ router
   //获取文档历史版本
   ctx.template = 'document/history/document.pug'
   const {db, data, state, query, permission, nkcModules} = ctx;
-  
+
   const {sid, source, page=0} = query;
   data.type = source;
   const {betaHistory, stableHistory} = await db.DocumentModel.getDocumentTypes();
@@ -56,8 +54,7 @@ router
     if(data.document.uid !== state.uid){
       if(!permission("viewUserArticle")) ctx.throw(403, "没有权限")
     }
-    const authorInfo = await db.UserModel.findOnly({uid: data.document.uid});
-    data.articleAuthor = authorInfo;
+    data.articleAuthor = await db.UserModel.findOnly({uid: data.document.uid});
     const documentResourceId = await data.document.getResourceReferenceId();
     let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
     data.document.content = nkcRender.renderHTML({
@@ -84,7 +81,7 @@ router
     // 包含了将此版本改为编辑版的url 组成
     data.urlComponent = {_id: data.document._id, source: data.document.source, sid: data.document.sid, editorUrl};
   }else{
-    data.document = '',
+    data.document = '';
     // data.bookId = ''
     data.urlComponent = ''
   }
@@ -104,7 +101,7 @@ router
   data.history =  await db.DocumentModel.find(queryCriteria).sort({tlm:-1}).skip(paging.start).limit(paging.perpage);
   function find(data, id){
     for (const obj of data) {
-      if(obj._id == id) return obj
+      if(obj._id === id) return obj
     }
   }
   // 在 历史记录中找到当前需要显示内容的文章
@@ -114,8 +111,7 @@ router
     if(!permission("viewUserArticle")) ctx.throw(403, "没有权限")
   }
   data.paging = paging;
-  const authorInfo = await db.UserModel.findOnly({uid: data.document.uid});
-  data.articleAuthor = authorInfo;
+  data.articleAuthor = await db.UserModel.findOnly({uid: data.document.uid});
   const documentResourceId = await data.document.getResourceReferenceId();
   let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
   data.document.content = nkcRender.renderHTML({
