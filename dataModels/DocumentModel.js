@@ -939,7 +939,7 @@ schema.statics.checkGlobalPostPermission = async (uid, source, type = 'stable') 
         throwErr(403, `请参加考试，通过后可获得发表权限`);
       }
     }
-    if(examNotPass.count <= documentCountToday) {
+    if(examNotPass.limited && examNotPass.count <= documentCountToday) {
       if(!examVolumeA && !examVolumeB) {
         throwErr(403, `今日发表次数已达上限（${examNotPass.count} 次），请明天再试`);
       } else {
@@ -1060,6 +1060,10 @@ schema.methods.getGlobalPostReviewStatus = async function() {
         reason: '因用户等级限制，审核通过的文章数量不足'
       }
     }
+  }
+
+  return {
+    needReview: false
   }
 }
 /*
