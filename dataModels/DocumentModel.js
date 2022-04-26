@@ -356,8 +356,8 @@ schema.methods.copyToHistoryDocument = async function(status) {
 */
 schema.statics.copyToHistoryToEditDocument = async function(uid, sid, source, _id){
   const DocumentModel = mongoose.model('documents');
-  const {betaHistory, stableHistory, history} = await DocumentModel.getDocumentTypes();
-  const currentDocument = await DocumentModel.findOnly({uid, _id, type: {$in: [betaHistory, stableHistory, history]}})
+  const {betaHistory, stableHistory} = await DocumentModel.getDocumentTypes();
+  const currentDocument = await DocumentModel.findOnly({uid, _id, type: {$in: [betaHistory, stableHistory]}})
   if(!currentDocument) throwErr(400, `当前文章不存在，请刷新页面重试`);
   // 复制当前文档数据创建历史文档
   await currentDocument.copyToHistoryDocument('edit');
@@ -369,7 +369,7 @@ schema.statics.copyToHistoryToEditDocument = async function(uid, sid, source, _i
     type: "beta"
   }, {
     $set: {
-        type: (await DocumentModel.getDocumentTypes()).history,
+        type: (await DocumentModel.getDocumentTypes()).betaHistory,
         // toc: new Date(),
         tlm: new Date()
     }
