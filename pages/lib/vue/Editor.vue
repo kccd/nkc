@@ -162,7 +162,7 @@
         window.removeEventListener('resize', this.windowOnResizeEvent);
       },
       // 显示保存提示
-      showSavingInfoPanel(duration = 1000) {
+      showSavingInfoPanel(duration = 2000) {
         this.savingInfoPanelStatus = 'show';
         clearTimeout(this.saveInfoClassTimer);
         if(duration > 0) {
