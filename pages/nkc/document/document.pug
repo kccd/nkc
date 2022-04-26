@@ -31,7 +31,7 @@ block nkcContent
               span= document.username
             a.post-url(href=document.url target="_blank") 原文链接
             .post-options
-              if document.momentInfo.status === 'deleted'
+              if document.source === 'moment' && document.momentInfo.status === 'deleted'
                 span.status 已被删除
               if document.status === 'disabled'
                 span.status 已被屏蔽
