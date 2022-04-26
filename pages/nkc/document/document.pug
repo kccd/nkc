@@ -31,12 +31,17 @@ block nkcContent
               span= document.username
             a.post-url(href=document.url target="_blank") 原文链接
             .post-options
+              if document.momentInfo.status === 'deleted'
+                span.status 已被删除
               if document.status === 'disabled'
                 span.status 已被屏蔽
               else if document.status === 'faulty'
                 span.status 已被退休
               if permissionsOr(["movePostsToDraft", "movePostsToRecycle"])
-                button.btn-xs.btn.btn-danger(onclick=`deleteArticle('${document._id}')`) 退修/删除
+                if document.source !== 'moment'
+                  button.btn-xs.btn.btn-danger(onclick=`deleteArticle('${document._id}')`) 退修/删除
+                else
+                  button.btn-xs.btn.btn-danger(onclick=`deleteMoment('${document.momentInfo.momentId}')`) 删除
           .post-body
             if document.source === 'article'
               .row
