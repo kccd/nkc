@@ -1,6 +1,5 @@
 const mongoose = require('../settings/database');
 const {twemoji} = require("../settings/editor");
-const {getUrl, timeFormat} = require("../nkcModules/tools");
 
 // 包含所有document的状态
 // 并且额外包含 deleted, cancelled
@@ -1191,4 +1190,20 @@ schema.methods.getAuthorByUid = async function(currentUid) {
 //
 // }
 
+/*
+* 指定动态ID，获取动态对象
+* @param {[String]} momentsId
+* @return {Object} 键为动态ID，值为动态对象
+* */
+schema.statics.getMomentsObjectByMomentsId = async function(momentsId) {
+  const MomentModel = mongoose.model('moments');
+  const moments = await MomentModel.find({_id: {$in: momentsId}});
+  const momentsObj = {};
+  for(const moment of moments) {
+    momentsObj[moment._id] = moment;
+  }
+  return momentsObj;
+}
+
 module.exports = mongoose.model('moments', schema);
+

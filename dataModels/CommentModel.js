@@ -800,4 +800,20 @@ schema.statics.getCommentInfo = async function(comments) {
   return results;
 }
 
+
+/*
+* 指定动态ID，获取动态对象
+* @param {[String]} momentsId
+* @return {Object} 键为动态ID，值为动态对象
+* */
+schema.statics.getCommentsObjectByCommentsId = async function(commentsId) {
+  const CommentModel = mongoose.model('comments');
+  const comments = await CommentModel.find({_id: {$in: commentsId}});
+  const commentsObj = {};
+  for(const comment of comments) {
+    commentsObj[comment._id] = comment;
+  }
+  return commentsObj;
+}
+
 module.exports = mongoose.model('comments', schema);

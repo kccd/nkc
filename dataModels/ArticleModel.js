@@ -214,7 +214,7 @@ schema.statics.getDocumentInfoById = async (_id)=>{
   const documentResourceId = await document.getResourceReferenceId();
 
   document = document.toObject()
-  
+
   return {articleInfo, document, documentResourceId}
 }
 
@@ -1112,7 +1112,7 @@ schema.statics.getArticlesInfo = async function(articles) {
     columnsId.push(columnPost.columnId);
     columnPostsObj[columnPost.pid] =columnPost;
   }
-  
+
   const columns = await ColumnModel.find({_id: {$in: columnsId}});
   for(const column of columns) {
     columnObj[column._id] = {
@@ -1295,4 +1295,20 @@ schema.statics.getArticleInfoByColumn = async function(columnPost) {
     type: columnPost.type
   };
 };
+
+/*
+* 指定文章ID获取文章对象
+* @param {[String]} articlesId
+* @return {Object} 键为文章ID，值为文章对象
+* */
+schema.statics.getArticlesObjectByArticlesId = async (articlesId) => {
+  const ArticleModel = mongoose.model('articles');
+  const articles = await ArticleModel.find({_id: {$in: articlesId}});
+  const articlesObj = {};
+  for(const article of articles) {
+    articlesObj[article._id] = article;
+  }
+  return articlesObj;
+};
+
 module.exports = mongoose.model('articles', schema);

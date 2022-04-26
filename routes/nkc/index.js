@@ -8,6 +8,7 @@ const section = require("./section");
 const applyForumRouter = require('./applyForum');
 const securityApplication = require('./securityApplication');
 const moment = require("moment");
+const documentRouter = require("./document");
 router
   .get("/", async (ctx, next) => {
     const {db, query, data, nkcModules} = ctx;
@@ -227,5 +228,6 @@ router
   .use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods())
   .use('/securityApplication', securityApplication.routes(), securityApplication.allowedMethods())
   .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
+  .use('/document', documentRouter.routes(), documentRouter.allowedMethods())
   .use("/section", section.routes(), section.allowedMethods());
 module.exports = router;

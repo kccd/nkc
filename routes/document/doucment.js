@@ -39,7 +39,7 @@ router
   const {sid, source, page=0} = query;
   data.type = source;
   const {betaHistory, stableHistory, history} = await db.DocumentModel.getDocumentTypes();
-  const queryCriteria = { $and:[{ sid, source }, {type: {$in: [betaHistory, stableHistory, history]}}, {uid: state.uid}] };
+  const queryCriteria = { $and:[{ sid, source }, {type: {$in: [betaHistory, stableHistory]}}, {uid: state.uid}] };
   //  获取列表
   // 返回分页信息
   const count =  await db.DocumentModel.countDocuments(queryCriteria);
@@ -90,8 +90,8 @@ router
   const { sid, source, page=0 } = query;
   const { _id } = params;
   data.type = source;
-  const {betaHistory, stableHistory, history} = await db.DocumentModel.getDocumentTypes();
-  const queryCriteria = { sid, source, type: {$in: [betaHistory, stableHistory, history]}, uid: state.uid };
+  const {betaHistory, stableHistory} = await db.DocumentModel.getDocumentTypes();
+  const queryCriteria = { sid, source, type: {$in: [betaHistory, stableHistory]}, uid: state.uid };
   const count =  await db.DocumentModel.countDocuments(queryCriteria);
   const paging = nkcModules.apiFunction.paging(page, count, 10);
   data.type = source;

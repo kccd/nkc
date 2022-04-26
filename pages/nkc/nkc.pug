@@ -40,8 +40,14 @@ block content
             li(class=data.nav === 'post' ? "active" : "")
               a(href=`/nkc/post`)
                 .fa.fa-paper-plane
-                | 最新发表
+                | 社区内容
                 if !permission("nkcManagementPost")
+                  | （无权）
+            li(class=data.nav === 'document' ? "active" : "")
+              a(href=`/nkc/document`)
+                .fa.fa-paper-plane
+                | 独立内容
+                if !permission("nkcManagementDocument")
                   | （无权）
             li(class=data.nav === 'applyForum' ? 'active' : '')
               a(href=`/nkc/applyForum`)

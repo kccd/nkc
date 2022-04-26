@@ -18,7 +18,6 @@ const documentStatus = {
 const documentTypes = {
   stable: "stable",
   beta: "beta",
-  history: "history",
   betaHistory: "betaHistory",
   stableHistory: "stableHistory",
 };
@@ -39,7 +38,7 @@ const schema = new mongoose.Schema({
     required: true,
     index: 1
   },
-  // 版本类型 stable, beta, history, betaHistory //编辑版历史, stableHistory //正式版历史,
+  // 版本类型 stable, beta, betaHistory //编辑版历史, stableHistory //正式版历史,
   type: {
     type: String,
     required: true,
@@ -331,7 +330,7 @@ schema.statics.createBetaDocument = async (props) => {
 
 /*
 * 复制当前文档数据创建历史文档
-* @return {Object} history document schema
+* @return {Object} betaHistory document schema
 * */
 schema.methods.copyToHistoryDocument = async function(status) {
   const DocumentModel = mongoose.model('documents');
@@ -350,14 +349,13 @@ schema.methods.copyToHistoryDocument = async function(status) {
 /*
   *复制当前文档创建历史记录，并把当前文档改为编辑版。并且正在编辑的文档改为历史版
   *param {String} uid 用户id
-  *param {String} sid document的sid 
+  *param {String} sid document的sid
   *param {String} source 文章类型
-  * 
+  *
 */
 schema.statics.copyToHistoryToEditDocument = async function(uid, sid, source, _id){
   const DocumentModel = mongoose.model('documents');
-  const {betaHistory, stableHistory} = await DocumentModel.getDocumentTypes();
-  const currentDocument = await DocumentModel.findOnly({uid, _id, type: {$in: [betaHistory, stableHistory]}})
+  const currentDocument = await DocumentModel.findOne({uid, _id, type: documentTypes.betaHistory})
   if(!currentDocument) throwErr(400, `当前文章不存在，请刷新页面重试`);
   // 复制当前文档数据创建历史文档
   await currentDocument.copyToHistoryDocument('edit');
@@ -895,7 +893,7 @@ schema.methods.sendMessageToAtUsers = async function(from) {
 * 检测用户是否有权发表指定来源的内容
 * @param {String} uid 发表人 ID
 * @param {String} source 来源 参考 DocumentModel.statics.getDocumentSources
-* @param {String} type 类型 默认 stable, 可选 stable, history, beta
+* @param {String} type 类型 默认 stable, 可选 stable, betaHistory, stableHistory, beta
 * */
 schema.statics.checkGlobalPostPermission = async (uid, source, type = 'stable') => {
   const DocumentModel = mongoose.model('documents');
