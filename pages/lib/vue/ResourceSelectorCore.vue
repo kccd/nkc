@@ -1315,15 +1315,15 @@ export default {
     openImages(rid) {
       const images = [];
       let index = 0;
-      for(let i = 0; i < this.resources.length; i++) {
-        const r = this.resources[i];
-        if(r.mediaType !== 'mediaPicture') continue;
-        if(r.rid === rid) index = i;
+      for(const r of this.resources) {
+        if(r.mediaType !== 'mediaPicture' || r.state !== 'usable') continue;
         images.push({
           url: getUrl('resource', r.rid, 'lg'),
           name: r.oname,
         });
+        if(r.rid === rid) index = images.length - 1;
       }
+      console.log(images, index)
       if(images.length === 0) return;
       openImageViewer(images, index);
     },
