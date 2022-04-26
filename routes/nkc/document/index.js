@@ -2,7 +2,7 @@ const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
     const {db, data, query, nkcModules} = ctx;
-    const {page = 0, source = ''} = query;
+    let {page = 0, t = ''} = query;
     const {getUrl} = nkcModules.tools;
     const {
       stable: stableDocumentType
@@ -16,11 +16,11 @@ router
       type: stableDocumentType,
       source: {$ne: documentSourcesObj.draft}
     };
-    if(source) {
-      if(documentSources.includes(source)) {
-        match.source = source;
+    if(t) {
+      if(documentSources.includes(t)) {
+        match.source = t;
       } else {
-        ctx.throw(400, `document source error. source=${source}`);
+        ctx.throw(400, `document source error. source=${t}`);
       }
     }
     const count = await db.DocumentModel.countDocuments(match);
@@ -77,6 +77,7 @@ router
         title = '',
         keywords = [],
         keywordsEN = [],
+        status = ''
       } = document;
       const user = usersObj[uid];
 
@@ -128,7 +129,8 @@ router
           break;
         }
       }
-
+      const documentResourceId = await document.getResourceReferenceId();
+      let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
       const result = {
         _id,
         did,
@@ -143,16 +145,25 @@ router
         keywords,
         keywordsEN,
         title,
-        content,
+        content: nkcModules.nkcRender.renderHTML({
+          type: 'article',
+          post: {
+            c: content,
+            resources
+          },
+        }),
         // 类型相关
         from, // string 来源
         url,
+        status,
+        source,
       };
       documentsInfo.push(result);
     }
 
     data.documentsInfo = documentsInfo;
-
+    data.t = t;
+    data.paging = paging;
     ctx.template = 'nkc/document/document.pug';
     data.nav = 'document';
     await next();
