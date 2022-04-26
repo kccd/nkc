@@ -13,7 +13,6 @@
       moment(
         :data="momentData"
         @complaint="complaint"
-        @violation-record="violationRecord"
       )
 </template>
 
@@ -30,6 +29,7 @@
   import ViolationRecord from "../ViolationRecord";
   import MomentOption from "./momentOption/MomentOption";
   import MomentStatus from "./MomentStatus";
+  import {EventBus} from "../../../spa/eventBus";
   export default {
     props: ['moments'],
     components: {
@@ -43,6 +43,10 @@
 
     }),
     mounted() {
+      const self = this;
+      EventBus.$on('violation-record', function(uid) {
+        self.$refs.violationRecord.open({uid});
+      });
     },
     methods: {
       // openOption(data) {
@@ -51,10 +55,6 @@
       //投诉或举报
       complaint(mid) {
         this.$refs.complaint.open('moment', mid);
-      },
-      //查看违规记录
-      violationRecord(uid) {
-        this.$refs.violationRecord.open({uid});
       },
     }
   }
