@@ -1323,7 +1323,6 @@ export default {
         });
         if(r.rid === rid) index = images.length - 1;
       }
-      console.log(images, index)
       if(images.length === 0) return;
       openImageViewer(images, index);
     },
