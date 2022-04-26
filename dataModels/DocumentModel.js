@@ -356,7 +356,8 @@ schema.methods.copyToHistoryDocument = async function(status) {
 */
 schema.statics.copyToHistoryToEditDocument = async function(uid, sid, source, _id){
   const DocumentModel = mongoose.model('documents');
-  const currentDocument = await DocumentModel.findOne({uid, _id, type: 'history' })
+  const {betaHistory, stableHistory, history} = await DocumentModel.getDocumentTypes();
+  const currentDocument = await DocumentModel.findOnly({uid, _id, type: {$in: [betaHistory, stableHistory, history]}})
   if(!currentDocument) throwErr(400, `当前文章不存在，请刷新页面重试`);
   // 复制当前文档数据创建历史文档
   await currentDocument.copyToHistoryDocument('edit');

@@ -11,7 +11,7 @@ block title
   -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, collected} = data.columnPost
   -var {_id, name} = column
   -var {hits, count, oc, url} = thread
-  -var {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm} = post
+  -var {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, authorInfos} = post
   title=t
   //- 与post隐藏相关的设置
   include ../../thread/hidePostContentSettings
@@ -28,7 +28,7 @@ block content
         //- 文章管理员操作
         +setUp()
       include ./title
-      +title({t, article, uid, userAvatar: user.avatar, toc, originState, name, _id})
+      +title({t, article, uid, user, toc, originState, name, _id, authorInfos})
       include ./abstract
       +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
       include ./content

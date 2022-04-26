@@ -6,7 +6,7 @@ block baseColumnContent
   -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, collected} = data.columnPost
   -var {_id, name} = column
   -var {hits, count, oc, url} = thread
-  -var {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt} = post
+  -var {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt, authorInfos} = post
   -var showManagement = data.user && data.isModerator && permission('review');
   //- 与post隐藏相关的设置
   include ../thread/hidePostContentSettings
@@ -19,7 +19,7 @@ block baseColumnContent
       //- 文章管理员操作
       +setUp()
       include ./article/title
-      +title({t, article, uid, userAvatar: user.avatar, toc, originState, name, _id})
+      +title({t, article, uid, toc, originState, name, _id, authorInfos, user})
       include ./article/abstract
       +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
       include ./article/content
