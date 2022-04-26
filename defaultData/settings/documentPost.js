@@ -249,7 +249,7 @@ module.exports = {
           },
           {
             id: 'grade-0',
-            limited: true,
+            limited: false,
             interval: 1
           }
         ],
@@ -261,7 +261,7 @@ module.exports = {
           },
           {
             id: 'grade-0',
-            limited: true,
+            limited: false,
             count: 100
           }
         ]
@@ -285,12 +285,12 @@ module.exports = {
           },
           {
             id: 'grade-1',
-            type: 'count',
+            type: 'none',
             count: 10
           },
           {
             id: 'grade-0',
-            type: 'all',
+            type: 'none',
             count: 1
           }
         ],
