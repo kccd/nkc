@@ -53,6 +53,7 @@
 <script>
 import {getPostEditorConfigs} from "../../js/editor";
 import {nkcAPI} from "../../js/netAPI";
+import {debounce} from "../../js/execution";
 import Editor from "../Editor";
 export default {
   props: ['cid'],
@@ -122,7 +123,7 @@ export default {
       this.$emit('close-editor', this.comment._id);
     },
     //当编辑器中的内容变化时
-    editorContentChange() {
+    editorContentChange: debounce(function() {
       if(!this.contentChangeEventFlag) {
         this.contentChangeEventFlag = true;
         return;
@@ -132,7 +133,7 @@ export default {
         this.commentContent = data;
         this.post(this.type);
       }
-    },
+    }, 1000),
     //设置编辑器保存状态 succeeded failed saving
     setSavedStatus(type) {
       this.$refs[`commentEditor_${this.comment._id}`].changeSaveInfo(type);
