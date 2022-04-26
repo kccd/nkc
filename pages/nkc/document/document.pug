@@ -4,5 +4,70 @@ block nkcTitle
   +includeCSS('/nkc/document/document.css')
 block nkcContent
   div
+    .m-b-05
+      ul.nav.nav-tabs
+        li(class=!data.t ? 'active' : "")
+          a(href='/nkc/document') 全部
+        li(class=data.t === 'article' ? 'active' : "")
+          a(href='/nkc/document?t=article') 文章
+        li(class=data.t === 'comment' ? 'active' : "")
+          a(href='/nkc/document?t=comment') 评论
+        li(class=data.t === 'moment' ? 'active' : "")
+          a(href='/nkc/document?t=moment') 动态
+    include ../../publicModules/paging/paging_input
+    .management-posts
+      for document in data.documentsInfo
+        -console.log('document', document);
+        .management-post(class=document.status)
+          .post-header
+            .post-time=format("YYYY/MM/DD HH:mm:ss", document.toc)
+
+            span.post-type(class=document.source)=document.from
+            a(href=`/u/${document.uid}` target="_blank"
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: document.uid})
+            ).post-user
+              img(src=document.userAvatarUrl)
+              span= document.username
+            a.post-url(href=document.url target="_blank") 原文链接
+            .post-options
+              if document.status === 'disabled'
+                span.status 已被屏蔽
+              else if document.status === 'faulty'
+                span.status 已被退休
+              if permissionsOr(["movePostsToDraft", "movePostsToRecycle"])
+                button.btn-xs.btn.btn-danger(onclick=`deleteArticle('${document._id}')`) 退修/删除
+          .post-body
+            if document.source === 'article'
+              .row
+                if document.abstract
+                  .col-xs-12.col-md-6
+                    .post-title=`中文摘要：${document.abstract || '无'}`
+                if document.abstractEN
+                  .col-xs-12.col-md-6
+                    .post-title=`英文摘要：${document.abstractEN || '无'}`
+                if document.keywords
+                  .col-xs-12.col-md-6
+                    .post-title=`中文关键词：${document.keywords.join(', ') || '无'}`
+                if document.keywordsEN
+                  .col-xs-12.col-md-6
+                    .post-title=`英文关键词：${document.keywordsEN.join(', ') || '无'}`
+            .row
+              .col-xs-12
+                .bg-danger.p-a-05
+                  .row
+                    if document.title
+                      .col-xs-12.col-md-6
+                        .post-title=`文章标题：`
+                          a(href=document.url target='_blank')=document.title
+                    if document.t
+                      .col-xs-12.col-md-6
+                        .post-title=`内容标题：${document.t || '无'}`
+            .post-content.bg-danger.p-a-05!=document.content
+    include ../../publicModules/paging/paging_input
 block nkcScripts
   +includeJS('/nkc/document/document.js')
+  include ../../publicModules/nkcSource
+  include ../../publicModules/disabledPost/disabledPost
+

@@ -67,6 +67,7 @@
   import Editor from '../Editor';
   import {getCommentEditorConfigs} from '../../js/editor';
   const commentEditorConfigs = getCommentEditorConfigs();
+  import {debounce} from "../../js/execution";
   import {nkcAPI} from "../../js/netAPI";
   export default {
     props: ['source', 'sid', 'comment'],
@@ -103,15 +104,14 @@
         }
       },
       //编辑器内容发生变化时
-      editorContentChange() {
+      editorContentChange: debounce(function() {
         if(!this.contentChangeEventFlag) {
           this.contentChangeEventFlag = true;
           return;
         }
-        const data = this.$refs.editor.getContent();
-        this.commentContent = data;
+        this.commentContent = this.$refs.editor.getContent();
         this.post(this.type);
-      },
+      }, 1000),
       //点击引用获取该楼层的引用信息
       changeQuote(docId, source) {
         if(!docId) return;

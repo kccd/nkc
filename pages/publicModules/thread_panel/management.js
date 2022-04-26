@@ -94,7 +94,6 @@ function disabledSelectedPosts() {
     Promise.resolve()
       .then(() => {
         if(postsId.length !== 0) {
-          console.log('postsId.length', postsId.length, postsId);
           return nkcAPI(url, method, body)
             .then(function() {
               screenTopAlert("操作成功");
@@ -107,7 +106,7 @@ function disabledSelectedPosts() {
           const arr = [];
           for(const id of documentsId) {
             arr.push({
-              delType: type,
+              delType: type === 'toDraft'?'faulty':'disabled',
               docId: id,
               type: 'document',
               remindUser: remindUser,

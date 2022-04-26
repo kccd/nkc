@@ -9,14 +9,14 @@
       math-jax-selector(ref="mathJaxSelector")
       drafts-selector(ref="draft")
       .editor-container(:id="domId")
-        .save-info(:class="saveInfoClass" ref="saveInfo")
-          .save-success(v-if="saveInfo === 'succeeded'")
+        .save-info(:class="{'display': ready && savingInfo && savingInfoPanelStatus === 'show'}" ref="saveInfo")
+          .save-success(v-if="savingInfo === 'succeeded'")
             .fa.fa-check-circle.m-r-05
             span 内容已保存
-          .save-filed(v-if="saveInfo === 'failed'")
+          .save-filed(v-if="savingInfo === 'failed'")
             .fa.fa-remove.m-r-05
             span 内容保存失败
-          .save-saving(v-if="saveInfo === 'saving'") 内容保存中...
+          .save-saving(v-if="savingInfo === 'saving'") 内容保存中...
 </template>
 
 <style lang="less" scoped>
@@ -26,26 +26,29 @@
       position: relative;
     }
     .save-info {
+      padding: 0.3rem 0.5rem;
+      background-color: rgba(255, 255, 255, 1);
+      box-shadow: rgb(169, 169, 169) 1px 1px 3px 0;
       text-align: right;
+      border-radius: 3px;
       z-index: 1000;
       margin: auto;
       position: absolute;
       top: 0;
-      right: 0;
-      background-color: rgba(0, 0, 0, 0);
+      right: 5px;
       font-size: 1.2rem;
       transition: opacity 200ms;
       opacity: 0;
-      &.succeeded, &.failed, &.saving{
+      &.display {
         opacity: 1;
       }
-      .save-success {
-        color: #2b90d9;
+      .save-success .fa {
+        color: green;
       }
-      .save-filed {
-        color: #e85a71;
+      .save-filed .fa{
+        color: red;
       }
-      .save-saving {
+      .save-saving .fa{
         color: #666;
       }
     }
@@ -79,9 +82,10 @@
       domId: '',
       errorInfo: '',
       noticeFunc: null,
-      saveInfo: '', //消息dom显示
-      saveInfoClass: '', //消息框dom显示
-      infoTime: '',
+      savingInfo: '', //消息dom显示
+      savingInfoTimer: null,
+      savingInfoPanelStatus: 'show', //消息框dom显示 show hide
+      savingInfoPanelTimer: null,
       ready: false,
       defaultPlugs: {
         resourceSelector: true,
@@ -157,28 +161,61 @@
       removeWindowOnResizeEvent() {
         window.removeEventListener('resize', this.windowOnResizeEvent);
       },
+      // 显示保存提示
+      showSavingInfoPanel(duration = 1000) {
+        this.savingInfoPanelStatus = 'show';
+        clearTimeout(this.saveInfoClassTimer);
+        if(duration > 0) {
+          this.saveInfoClassTimer = setTimeout(() => {
+            this.savingInfoPanelStatus = 'hide';
+          }, duration);
+        }
+      },
       //更改内容保存信息
       changeSaveInfo(info) {
         const self = this;
         if(!info) return;
-        clearTimeout(self.infoTime);
-        if(info === 'saving') {
-          self.infoTime = setTimeout(function() {
+        self.savingInfo = info;
+        clearTimeout(self.savingInfoTimer);
+        let duration = 1000;
+        if(self.savingInfo === 'failed') {
+          duration = 0;
+        }
+        if(self.savingInfo === 'saving') {
+          self.savingInfoTimer = setTimeout(() => {
+            self.showSavingInfoPanel(duration);
+          }, 500);
+        } else {
+          self.showSavingInfoPanel(duration);
+        }
+
+        /*if(info === 'saving') {
+          clearTimeout(self.savingInfoTimer);
+          clearTimeout(self.savedInfoTimer);
+          clearTimeout(self.savingInfoContentTimer);
+          self.savingInfoTimer = setTimeout(() => {
             self.saveInfo = info;
             self.saveInfoClass = info;
-          }, 200);
-        } else {
+          }, 200)
+        } else if(info === 'succeeded') {
+          clearTimeout(self.savingInfoTimer);
+          clearTimeout(self.savedInfoTimer);
+          clearTimeout(self.savingInfoContentTimer);
           self.saveInfo = info;
           self.saveInfoClass = info;
-          if(info === 'succeeded') {
-            setTimeout(function (){
-              self.saveInfoClass = '';
-              setTimeout(function() {
-                self.saveInfo = '';
-              }, 200);
-            }, 1000);
-          }
-        }
+          self.savedInfoTimer = setTimeout(() => {
+            self.saveInfoClass = '';
+            self.savingInfoContentTimer = setTimeout(() => {
+              self.saveInfo = '';
+            }, 200);
+          }, 1000);
+        } else if(info === 'failed') {
+          clearTimeout(self.savingInfoTimer);
+          clearTimeout(self.savedInfoTimer);
+          clearTimeout(self.savingInfoContentTimer);
+          self.saveInfo = info;
+          self.saveInfoClass = info;
+        }*/
       },
       contentChange(){
         const  _this = this;
@@ -228,7 +265,7 @@
         const height = editorDom.height();
         const saveInfoDom = $(this.$refs.saveInfo);
         saveInfoDom.css({
-          top: flag?top - containerTop + height:height,
+          top: (flag?top - containerTop + height:height) + 5,
         });
       },
       initNoticeEvent() {
