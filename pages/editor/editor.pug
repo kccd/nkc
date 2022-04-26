@@ -10,10 +10,15 @@ block title
     .nkcshade{
       box-shadow: none;
     }
+    #app-publish-article{
+      /*background-color: #fff;*/
+    }
 block content
   .container-fluid.max-width.edito
-      #app-publish-article
-        editor
+    .row
+      .col-xs-12.box-shadow-panel
+        #app-publish-article
+          editor
   .hidden#data=objToStr(data.reqUrl)
 block scripts
   +includeJS("/editor/editor.js")
