@@ -9,89 +9,97 @@ block title
 block content
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-3
-        .book-cover
-        .book-list
-          for list in data.history
-            p.title-list()
-              a.book-list-item(href=`/document/history/${list._id}?source=${list.source}&sid=${list.sid}` )=`${list.title || "未填写标题"}`
-              span.history=`${list.type==='stableHistory'? '已发布' : '未发布' } `
-              span.time=`编辑于 ${format(`YYYY-MM-DD HH:mm:ss`, list.tlm)}`
-        if (data.paging.buttonValue && data.paging.buttonValue.length)
-          .paging
-            .post-list-paging
-              for page, i in data.paging.buttonValue
-                a(
-                  :class="",
-                  href=`/document/history?source=${data.urlComponent.source}&sid=${data.urlComponent.sid}&page=${i}`
-                )=`${page.type === 'null' ? '...' : page.num}`
-      .col-xs-12.col-md-9.book-content-container
-        if data.history.length
-          .thread-nav-right
-            .nav-count(title=`浏览数`)
-              .fa.fa-eye
-              span 0
-            .nav-count(title=`回复数`)
-              .fa.fa-comment
-              span 0
-            .nav-count.pointer
-              span 收藏
-            .nav-count
-              .fa.fa-cog
-          h1.book-content-title=`${data.document.title || "未填写标题"}`
-          .m-t-1.text-center
-            if data.document.authorInfos
-              for authorInfo in data.document.authorInfos
-                span=authorInfo.name
-                span.common-article-author.fa.fa-envelope-open-o( onclick="displayAuthor('"+objToStr(authorInfo.contractObj)+"')")
-          .m-t-1.text-center
-            if data.document.authorInfos
-              for authorInfo in data.document.authorInfos
-                span.common-article-author=authorInfo.agency
-          .m-t-1.text-center
-            //- 用户头像
-            img(src=tools.getUrl('userAvatar', avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
-            if data.articleAuthor
-              span.jump.kcid=data.articleAuthor.username
-            span(style='color: #555555;margin-right:5px' title=format(`YYYY-MM-DD HH:mm:ss`, data.document.toc))= ` ${format(`YYYY-MM-DD HH:mm:ss`, data.document.toc)}`
-            if data.document.origin && data.document.origin !== "0"
-              -var levelText = getOriginLevel(data.document.origin);
-              if data.document.origin == "3" || data.document.origin == "4" || data.document.origin == "5" || data.document.origin == "6"
-                span(style="color:#9baec8;margin-right:3px" onclick="originTitle()") 原创
-            a.column.jump.m-r-1(href=`/m/${_id}` target="_blank")=name
-            
-          if data.type !== "draft"
-            if (data.document.abstract.length || data.document.abstractEN.length)
-              .abstract(style="margin-top:1rem; word-break: break-all;")
-                if data.document.abstract.length
+      if data.history.length
+        .col-xs-12.col-md-3.book-nav
+          .book-cover
+          .book-list
+            for list in data.history
+              p.title-list()
+                a.book-list-item(href=`/document/history/${list._id}?source=${list.source}&sid=${list.sid}` )=`${list.title || "未填写标题"}`
+                span.history=`${list.type==='stableHistory'? '已发布' : '未发布' } `
+                span.time=`编辑于 ${format(`YYYY-MM-DD HH:mm:ss`, list.tlm)}`
+          if (data.paging.buttonValue && data.paging.buttonValue.length)
+            .paging
+              .post-list-paging
+                for page, i in data.paging.buttonValue
+                  a(
+                    :class="",
+                    href=`/document/history?source=${data.urlComponent.source}&sid=${data.urlComponent.sid}&page=${i}`
+                  )=`${page.type === 'null' ? '...' : page.num}`
+        .col-xs-12.col-md-9.book-content-container
+          if data.history.length
+            .thread-nav-right
+              .nav-count(title=`浏览数`)
+                .fa.fa-eye
+                span 0
+              .nav-count(title=`回复数`)
+                .fa.fa-comment
+                span 0
+              .nav-count.pointer
+                span 收藏
+              .nav-count
+                .fa.fa-cog
+            h1.book-content-title=`${data.document.title || "未填写标题"}`
+            .m-t-1.text-center
+              if data.document.authorInfos
+                for authorInfo in data.document.authorInfos
+                  span=authorInfo.name
+                  span.common-article-author.fa.fa-envelope-open-o( onclick="displayAuthor('"+objToStr(authorInfo.contractObj)+"')")
+            .m-t-1.text-center
+              if data.document.authorInfos
+                for authorInfo in data.document.authorInfos
+                  span.common-article-author=authorInfo.agency
+            .m-t-1.text-center
+              //- 用户头像
+              a(
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                data-global-data=objToStr({uid:data.articleAuthor.uid})
+              )
+                img(src=tools.getUrl('userAvatar', data.articleAuthor.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+                if data.articleAuthor
+                  span.jump.kcid=data.articleAuthor.username
+              span(style='color: #555555;margin-right:5px' title=format(`YYYY-MM-DD HH:mm:ss`, data.document.toc))= ` ${format(`YYYY-MM-DD HH:mm:ss`, data.document.toc)}`
+              if data.document.origin && data.document.origin !== "0"
+                -var levelText = getOriginLevel(data.document.origin);
+                if data.document.origin == "3" || data.document.origin == "4" || data.document.origin == "5" || data.document.origin == "6"
+                  span(style="color:#9baec8;margin-right:3px" onclick="originTitle()") 原创
+              a.column.jump.m-r-1(href=`/m/${_id}` target="_blank")=name
+              
+            if data.type !== "draft"
+              if (data.document.abstract.length || data.document.abstractEN.length)
+                .abstract(style="margin-top:1rem; word-break: break-all;")
+                  if data.document.abstract.length
+                    .panel.panel-default(style="border:0;margin-bottom:0")
+                      .panel-heading.paperHeader 中文摘要
+                      .panel-body!=LineFeedConversion(data.document.abstract)
+                  if data.document.abstractEN.length
+                    .panel.panel-default(style="border:0;margin-bottom:0")
+                      .panel-heading.paperHeader Abstract
+                      .panel-body!=LineFeedConversion(data.document.abstractEN)
+              if (data.document.keywords.length || data.document.keywordsEN.length)
+                .keyWords(style="margin-top:1rem;")
                   .panel.panel-default(style="border:0;margin-bottom:0")
-                    .panel-heading.paperHeader 中文摘要
-                    .panel-body!=LineFeedConversion(data.document.abstract)
-                if data.document.abstractEN.length
-                  .panel.panel-default(style="border:0;margin-bottom:0")
-                    .panel-heading.paperHeader Abstract
-                    .panel-body!=LineFeedConversion(data.document.abstractEN)
-            if (data.document.keywords.length || data.document.keywordsEN.length)
-              .keyWords(style="margin-top:1rem;")
-                .panel.panel-default(style="border:0;margin-bottom:0")
-                  .panel-heading.paperHeader 关键词
-                  .panel-body(style="padding:5px")
-                    if data.document.keywords.length
-                      div
-                        for keyCn in data.document.keywords
-                          span.keyWordstagCn(style="cursor:pointer")!=keyCn
-                    if data.document.keywordsEN.length
-                      div(style="margin-top:5px")
-                        for keyEn in data.document.keywordsEN
-                          span.keyWordstagEn(style="cursor:pointer")!=keyEn
-            //- .book-content-content!=data.document.content
-          .book-content-content!=data.document.content
-          .btns
-            button.btn.btn-default.m-r-05(onclick=`saveArticle('${JSON.stringify(data.urlComponent)}')`) 选择当前版本进行编辑
-        else
-          h3 该文章还没有历史记录
+                    .panel-heading.paperHeader 关键词
+                    .panel-body(style="padding:5px")
+                      if data.document.keywords.length
+                        div
+                          for keyCn in data.document.keywords
+                            span.keyWordstagCn(style="cursor:pointer")!=keyCn
+                      if data.document.keywordsEN.length
+                        div(style="margin-top:5px")
+                          for keyEn in data.document.keywordsEN
+                            span.keyWordstagEn(style="cursor:pointer")!=keyEn
+              //- .book-content-content!=data.document.content
+            .book-content-content!=data.document.content
+            .btns
+              button.btn.btn-default.m-r-05(onclick=`saveArticle('${JSON.stringify(data.urlComponent)}')`) 编辑
+      else
+        h3 该文章还没有历史记录
     include ../../columns/article/authorInfo.pug
-    +authorInfo()    
+    +authorInfo()
+    include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+
 block scripts
   //- include ../../columns/article/authorInfo.pug
   include ../../publicModules/nkcSource
