@@ -64,6 +64,15 @@ block nkcContent
                       .col-xs-12.col-md-6
                         .post-title=`内容标题：${document.t || '无'}`
             .post-content.bg-danger.p-a-05!=`${document.content || '未填写内容'}`
+            if document.source === 'moment' && document.momentInfo.files
+              .post-content-source
+                for file in document.momentInfo.files
+                  if file.type === 'picture'
+                    img.m-r-05(src=file.url data-global-click="viewImage" data-global-data=objToStr({url: file.url}))
+                  else if file.type === 'video'
+                    video(controls).m-r-05
+                      for source in file.sources
+                        source(src=source.url height=source.height)
     include ../../publicModules/paging/paging_input
 block nkcScripts
   +includeJS('/nkc/document/document.js')
