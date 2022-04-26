@@ -22,26 +22,20 @@ block content
           .nav-count
             .fa.fa-cog
         h1.book-content-title=data.document.title
-        //- .book-content-info
-        //-   span.m-r-05=`创建于 ${new Date(data.document.dt).getFullYear()}-${new Date(data.document.dt).getMonth()+1}-${new Date(data.document.dt).getDate() }  ${new Date(data.document.dt).getHours()}:${new Date(data.document.dt).getMinutes()}`
-        //-     if data.document.toc
-        //-       span=`，编辑于 ${new Date(data.document.tlm).getFullYear()}-${new Date(data.document.tlm).getMonth()+1}-${new Date(data.document.tlm).getDate() }  ${new Date(data.document.tlm).getHours()}:${new Date(data.document.tlm).getMinutes()}`
-        //-   if remoteState.uid === data.document.uid
-        //-     a(href=data.bookContentEditor target='_blank')
-        .thread-info.text-center
+        .m-t-1.text-center
           if data.document.authorInfos
             for authorInfo in data.document.authorInfos
               span=authorInfo.name
-              span.common-article-author.fa.fa-envelope-open-o(onclick="displayAuthor('"+objToStr(authorInfo.contractObj)+"')")
-        .thread-info.text-center
+              span.common-article-author.fa.fa-envelope-open-o(style="color:#000" onclick="displayAuthor('"+objToStr(authorInfo.contractObj)+"')")
+        .m-t-1.text-center
           if data.document.authorInfos
             for authorInfo in data.document.authorInfos
               span.common-article-author=authorInfo.agency
-        .thread-info.text-center
+        .m-t-1.text-center
           //- 用户头像
           img(src=tools.getUrl('userAvatar', avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
-          if data.document.authorInfos && data.document.authorInfos[0]
-            span.kcid=data.document.authorInfos[0].kcid
+          if data.articleAuthor
+            span.kcid=data.articleAuthor.username
           span(style='color: #555555;margin-right:5px' title=format(`YYYY-MM-DD HH:mm:ss`, data.document.toc))= ` ${format(`YYYY-MM-DD HH:mm:ss`, data.document.toc)}`
           if data.document.origin && data.document.origin !== "0"
             if data.document.origin == "3" || data.document.origin == "4" || data.document.origin == "5" || data.document.origin == "6"
@@ -71,6 +65,8 @@ block content
                       for keyEn in data.document.keywordsEN
                         span.keyWordstagEn(style="cursor:pointer")!=keyEn
         .book-content-content!=data.document.content
+        include ../../columns/article/authorInfo.pug
+        +authorInfo()    
 block scripts
   include ../../publicModules/nkcSource
   +includeJS('/document/preview/preview.js')

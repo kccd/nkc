@@ -9,7 +9,25 @@
   // bottom: 0;
   margin-top:20px
 }
+.jump {
+  color: #337ab7;
+}
 body{
+  .post-list-paging {
+    margin-top: 10px;
+    // background: rgb(173, 217, 245);
+    box-shadow:  0 2px 2px 2px #f7efef;
+    // height: 20px;
+    padding: 5px;
+    a {
+      transition: all 0.4s;
+      cursor: pointer;
+      margin-right: 5px;
+      padding: 2px 5px;
+      border: 1px solid rgb(219, 217, 217);
+      border-radius: 3px;
+    }
+  }
   .thread-nav-right{
     float: right;
     *{
@@ -37,7 +55,8 @@ body{
   }
   .book-list{
     .title-list{
-      background:#e4e4e4 ;
+      background:#f7f6f6 ;
+      box-shadow: 0 0 1px 1px #d3d2d0;
     }
     text-align: center;
     .book-list-item{
@@ -47,9 +66,8 @@ body{
       font-weight: 600;
       text-decoration: none;
       color: #333;
-      padding: 0.5rem 0;
       &:hover{
-        background-color: #f7f7f7;
+        background-color: #ffffff;
       }
     }
   }

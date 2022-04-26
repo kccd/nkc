@@ -779,10 +779,10 @@ schema.statics.getCommentInfo = async function(comments) {
     const commentDocument = commentDocumentsObj[did] || null;
     if(!articlePost) continue;
     const articleDocument = articleDocumentObj[articlePost.sid] || null;
-    if(!articlePost) return;
+    if(!articlePost) continue;
     const columnPost = columnPostsObj[articlePost.sid];
     if(articlePost.source === columnSource) {
-      if(!columnPost) return;
+      if(!columnPost) continue;
     }
     let url;
     if(articlePost.source === columnSource) {
