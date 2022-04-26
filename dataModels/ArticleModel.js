@@ -569,6 +569,11 @@ schema.methods.publishArticle = async function(options) {
   await this.changeStatus(normal);
   let columnPost;
   let articleUrl;
+
+  const {article: documentSource} = await DocumentModel.getDocumentSources();
+  const stableDocument = await DocumentModel.getStableDocumentBySource(documentSource, articleId);
+  const isModify = !!stableDocument;
+
   if(source === 'column') {
     //如果发表专栏的文章就将创建文章专栏分类引用记录 先查找是否存在引用，如果没有就创建一条新的引用
     columnPost = await ColumnPostModel.findOne({pid: articleId, type: articleType});
@@ -578,16 +583,18 @@ schema.methods.publishArticle = async function(options) {
     articleUrl = `/m/${columnPost.columnId}/a/${columnPost._id}`;
   } else if(source === 'zone') {
     //如果发布的article为空间文章就创建一条新的动态并绑定当前article
-    const {_id: momentId} = await MomentModel.createQuoteMomentAndPublish({
-      uid,
-      quoteType: articleQuoteType,
-      quoteId: articleId
-    });
-    await this.updateOne({
+    if(!isModify) {
+      const {_id: momentId} = await MomentModel.createQuoteMomentAndPublish({
+        uid,
+        quoteType: articleQuoteType,
+        quoteId: articleId
+      });
+    }
+    /*await this.updateOne({
       $set: {
         sid: momentId,
       }
-    });
+    });*/
     articleUrl = `/zone/a/${articleId}`;
   }
   //更新文章的最后修改时间
