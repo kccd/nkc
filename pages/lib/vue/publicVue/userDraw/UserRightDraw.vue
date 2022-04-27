@@ -53,9 +53,9 @@
 
 <script>
 import UserVue from "./UserVue";
-import userDrawCount from "./userDrawCount";
-import userLogin from "./userLogin";
-import userList from "./userList";
+import userDrawCount from "./UserDrawCount";
+import userLogin from "./UserLogin";
+import userList from "./UserList";
 import {nkcAPI} from "../../../js/netAPI";
 export default {
   data:() => ({
