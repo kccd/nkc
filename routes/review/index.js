@@ -223,6 +223,8 @@ router
         }
       });
     } else {
+      const documentStatus = await db.ArticleModel.getArticleStatus();
+      if(delType && !documentStatus[delType]) ctx.throw(400, '状态错误');
       const document = await db.DocumentModel.findOne({_id: docId});
       if(!document) ctx.throw(404, `未找到_ID为 ${docId}的文档`);
       if(document.reviewed) ctx.throw(400, '内容已经审核, 请刷新后重试');
