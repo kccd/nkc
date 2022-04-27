@@ -3026,11 +3026,6 @@
           "resolved": "https://registry.npmjs.org/eventemitter2/-/eventemitter2-6.4.4.tgz",
           "integrity": "sha512-HLU3NDY6wARrLCEwyGKRBvuWYyvW6mHYv72SJJAH3iJN3a6eVUvkjFkcxah1bcTgGVBBrFdIopBJPhCQFMLyXw=="
         },
-        "follow-redirects": {
-          "version": "1.14.9",
-          "resolved": "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.14.9.tgz",
-          "integrity": "sha512-MQDfihBQYMcyy5dhRDJUHcw7lb2Pv/TuE6xP1vyraLukNDHKbDxDNaOE3NbCAdKQApno+GPRyo1YAp89yCjK4w=="
-        },
         "ms": {
           "version": "2.1.2",
           "resolved": "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz",
@@ -4460,13 +4455,6 @@
       "integrity": "sha512-cD8FOb0tRH3uuEe6+evtAbgJtfxr7ly3fQjYcMcuPlgkwVS9xboaVIpcDV+cYQe+yGykgwZCs1pzjntcGa6l5g==",
       "requires": {
         "follow-redirects": "^1.14.7"
-      },
-      "dependencies": {
-        "follow-redirects": {
-          "version": "1.14.9",
-          "resolved": "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.14.9.tgz",
-          "integrity": "sha512-MQDfihBQYMcyy5dhRDJUHcw7lb2Pv/TuE6xP1vyraLukNDHKbDxDNaOE3NbCAdKQApno+GPRyo1YAp89yCjK4w=="
-        }
       }
     },
     "babel-cli": {
@@ -8970,6 +8958,11 @@
         "which": "^1.1.1"
       }
     },
+    "follow-redirects": {
+      "version": "1.14.7",
+      "resolved": "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.14.7.tgz",
+      "integrity": "sha512-+hbxoLbFMbRKDwohX8GkTataGqO6Jb7jGwpAlwgy2bIz25XtRm7KEzJM76R1WiNT5SwZkX4Y75SwBolkpmE7iQ=="
+    },
     "font-awesome": {
       "version": "4.7.0",
       "resolved": "https://registry.npmjs.org/font-awesome/-/font-awesome-4.7.0.tgz",
@@ -11550,7 +11543,6 @@
           "integrity": "sha512-hCx1oky9PFrJ611mf0ifBLBRW8lUUVRlFolb5gWRfIELabBlbp9xZvrqZLZAs+NxFnbfQoeGd8wDkygjg7U85w=="
         }
       }
-    },
     "marked": {
       "version": "4.0.14",
       "resolved": "https://registry.npmjs.org/marked/-/marked-4.0.14.tgz",
@@ -12154,9 +12146,9 @@
       }
     },
     "nodemailer": {
-      "version": "6.7.3",
-      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-6.7.3.tgz",
-      "integrity": "sha512-KUdDsspqx89sD4UUyUKzdlUOper3hRkDVkrKh/89G+d9WKsU5ox51NWS4tB1XR5dPUdR4SP0E3molyEfOvSa3g=="
+      "version": "6.7.2",
+      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-6.7.2.tgz",
+      "integrity": "sha512-Dz7zVwlef4k5R71fdmxwR8Q39fiboGbu3xgswkzGwczUfjp873rVxt1O46+Fh0j1ORnAC6L9+heI8uUpO6DT7Q=="
     },
     "nodemon": {
       "version": "2.0.7",
@@ -18147,11 +18139,6 @@
       "resolved": "https://registry.npmjs.org/ua-parser-js/-/ua-parser-js-0.7.28.tgz",
       "integrity": "sha512-6Gurc1n//gjp9eQNXjD9O3M/sMwVtN5S8Lv9bvOYBfKfDNiIIhqiyi01vMBO45u4zkDE420w/e0se7Vs+sIg+g==",
       "dev": true
-    },
-    "uc.micro": {
-      "version": "1.0.6",
-      "resolved": "https://registry.npmjs.org/uc.micro/-/uc.micro-1.0.6.tgz",
-      "integrity": "sha512-8Y75pvTYkLJW2hWQHXxoqRgV7qb9B+9vFEtidML+7koHUFapnVJAZ6cKs+Qjz5Aw3aZWHMC6u0wJE3At+nSGwA=="
     },
     "uglify-js": {
       "version": "3.13.4",
