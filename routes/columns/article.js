@@ -1,3 +1,4 @@
+
 const router = require('koa-router')();
 router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
@@ -6,7 +7,8 @@ router.get('/:aid', async (ctx, next)=>{
   ctx.template = 'columns/article.pug';
   const { user } = data;
   const {_id, aid} = params;
-  let columnPostData = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid, user.xsf);
+  let xsf = user ? user.xsf : 0;
+  let columnPostData = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid, xsf);
   data.columnPost = columnPostData;
   data.columnPost.collected = false;
   const {article, thread} = await db.ColumnPostModel.getColumnPostTypes();
