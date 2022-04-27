@@ -3,8 +3,7 @@
     to-column(ref="toColumn")
     blank(v-if="(!posts || posts.length === 0) && !loading")
     .user-post-list
-      span.m-r-05(v-if="pageButtons.length > 0")
-        paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
+      paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
       .paging-button(v-if="routeName === 'thread' && permissions.reviewed" )
         a.pointer.button.radius-left.radius-right(@click="managementPosts()") 管理
         span.post-management-button
@@ -19,6 +18,7 @@
           label
             input(type="checkbox" :value="post.pid" v-model="checkboxPosts")
         single-post(ref="singlePost" :post="post")
+      paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
 </template>
 <style lang="less" scoped>
 @import "../../../../../publicModules/base";

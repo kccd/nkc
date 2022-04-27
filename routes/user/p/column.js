@@ -98,11 +98,13 @@ module.exports = async (ctx, next) => {
       if(c.type === threadType) {
         t = threadObj[c.pid];
         if(t) {
+          const column = await c.extendColumnPost();
           t.type = 'thread';
           need_t.content = t.firstPost.c;
           need_t.title = t.firstPost.t;
           need_t.cover = t.firstPost.cover;
           need_t.toc = t.toc;
+          need_t.columnName = column.name;
           // need_t.t = t;
           need_t.commentCount = t.count;
           need_t.voteUp = t.firstPost.voteUp;
@@ -119,7 +121,7 @@ module.exports = async (ctx, next) => {
           need_t.title = t.document.title;
           need_t.cover = t.document.cover;
             //获取文章的专栏信息
-          need_t.threadName = column.name;
+          need_t.columnName = column.name;
           need_t.toc = t.toc;
           need_t.voteUp = t.voteUp;
           need_t.voteDown = t.voteDown;

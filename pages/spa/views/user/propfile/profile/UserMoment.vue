@@ -12,6 +12,7 @@
       )
       complaint(ref="complaint")
       violation-record(ref="violationRecord")
+    paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
 </template>
 <style lang="less">
 @import "../../../../../publicModules/base";
