@@ -92,6 +92,7 @@ router
       switch(source) {
         case documentSourcesObj.article: {
           const article = articlesObj[sid];
+          if(!article) break;
           const {articleUrl} = await db.ArticleModel.getArticleUrlBySource(
             article._id,
             article.source,

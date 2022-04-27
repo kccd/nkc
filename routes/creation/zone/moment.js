@@ -21,6 +21,15 @@ router
       }
       return await next();
     }
+    //获取当前用户对动态的审核权限
+    const permissions = {
+      reviewed: null,
+    };
+    if(user) {
+      if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {
+        permissions.reviewed = true;
+      }
+    }
     const {normal: normalStatus} = await db.MomentModel.getMomentStatus();
     // 获取动态列表
     const match = {
@@ -33,6 +42,7 @@ router
     const moments = await db.MomentModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.momentsData = await db.MomentModel.extendMomentsListData(moments, state.uid);
     data.paging = paging;
+    data.permissions = permissions;
     await next();
   })
   // 发表动态

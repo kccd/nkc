@@ -71,6 +71,8 @@ block content
               -let reviewData = article;
               include ../columns/article/module_review
               +thread
+            else if article.status === 'deleted'
+              .h4.text-center(style='color: #666;') 文章已被删除，不可查看
           else
             +thread
         .m-b-1

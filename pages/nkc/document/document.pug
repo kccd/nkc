@@ -31,7 +31,7 @@ block nkcContent
               span= document.username
             a.post-url(href=document.url target="_blank") 原文链接
             .post-options
-              if document.source === 'moment' && document.momentInfo.status === 'deleted'
+              if document.status === 'deleted'
                 span.status 已被删除
               if document.status === 'disabled'
                 span.status 已被屏蔽
@@ -43,20 +43,15 @@ block nkcContent
                 else
                   button.btn-xs.btn.btn-danger(onclick=`deleteMoment('${document.momentInfo.momentId}')`) 删除
           .post-body
-            if document.source === 'article'
-              .row
-                if document.abstract
-                  .col-xs-12.col-md-6
-                    .post-title=`中文摘要：${document.abstract || '无'}`
-                if document.abstractEN
-                  .col-xs-12.col-md-6
-                    .post-title=`英文摘要：${document.abstractEN || '无'}`
-                if document.keywords.length !== 0
-                  .col-xs-12.col-md-6
-                    .post-title=`中文关键词：${document.keywords.join(', ') || '无'}`
-                if document.keywordsEN.length !== 0
-                  .col-xs-12.col-md-6
-                    .post-title=`英文关键词：${document.keywordsEN.join(', ') || '无'}`
+            .row
+              .col-xs-12.col-md-6
+                .post-title=`中文摘要：${document.abstract || '无'}`
+              .col-xs-12.col-md-6
+                .post-title=`英文摘要：${document.abstractEN || '无'}`
+              .col-xs-12.col-md-6
+                .post-title=`中文关键词：${document.keywords.join(', ') || '无'}`
+              .col-xs-12.col-md-6
+                .post-title=`英文关键词：${document.keywordsEN.join(', ') || '无'}`
             .row
               .col-xs-12
                 .bg-danger.p-a-05

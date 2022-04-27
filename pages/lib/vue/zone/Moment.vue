@@ -1,7 +1,7 @@
 <template lang="pug">
 
   .single-moment-container(v-if="momentData")
-    moment-status(ref="momentStatus" :moment="momentData")
+    moment-status(ref="momentStatus" :moment="momentData" :permissions="permissions")
     .single-moment-top-container#comment-content
       //moment-option(
       //  ref="momentOption"
@@ -71,6 +71,7 @@
             :type="showPanelType"
             @post-comment="onPostComment"
             :focus="focus"
+            :permissions="permissions"
             )
 </template>
 
@@ -319,7 +320,7 @@
     * prop {Object} data 动态用于显示的数据 组装自 MomentModel.statics.extendMomentsListData
     * prop {String} focus 高亮的评论ID
     * */
-    props: ['data', 'focus'],
+    props: ['data', 'focus', 'permissions'],
     data: () => ({
       momentData: null,
       showPanelType: '', // comment, repost

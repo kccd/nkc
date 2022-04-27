@@ -8,9 +8,11 @@
         :moments="momentsData"
         @complaint="complaint"
         @violation-record="violationRecord"
+        :permissions="permissions"
       )
       complaint(ref="complaint")
       violation-record(ref="violationRecord")
+    paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
 </template>
 <style lang="less">
 @import "../../../../../publicModules/base";
@@ -36,13 +38,13 @@ export default {
     paging: {},
     uid: null,
     loading: false,
+    permissions: '',
   }),
   components: {
     "moments": Moments,
     "complaint": Complaint,
     "violation-record": ViolationRecord,
     "paging": Paging,
-
   },
   computed: {
     pageButtons() {
@@ -75,6 +77,7 @@ export default {
           self.t = res.t;
           self.paging = res.paging;
           self.momentsData = res.momentsData;
+          self.permissions = res.permissions;
         })
         .catch(err => {
           sweetError(err);

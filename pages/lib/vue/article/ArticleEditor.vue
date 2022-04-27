@@ -117,9 +117,6 @@
       color: #428bca;
       font-style: italic;
     }
-    .checkbox {
-      display: inline-block;
-    }
   }
 </style>
 
@@ -161,6 +158,7 @@ export default {
     // 是否允许触发contentChange
     contentChangeEventFlag: false,
     articles: [], //当前专栏正在编辑的文章
+    setInterval: null,
   }),
   components: {
     "document-editor": DocumentEditor,
@@ -183,7 +181,14 @@ export default {
     },
   },
   mounted() {
+    const self = this;
     this.getColumn();
+    self.setInterval = setInterval(function() {
+      self.autoSaveToDraft()
+    }, 60000);
+  },
+  destroyed() {
+    clearInterval(this.setInterval);
   },
   methods: {
     getRequest: getRequest,
@@ -338,26 +343,18 @@ export default {
       if(!url) return;
       window.history.replaceState(null, null, url);
     },
+    //保存草稿成功提示
+    saveToDraftSuccess() {
+      let time = new Date();
+      this.autoSaveInfo = "草稿已保存 " + timeFormat(time);
+    },
     //自动保存草稿 保存成功无提示
     autoSaveToDraft() {
       const self = this;
-      //是否开启自动保存功能 不传入time关闭自动保存功能
-      if(!self.time) return;
-      const {aid, mid} = self.getRequest();
-      //当处于专栏文章编辑器，地址栏不存在aid和mid时不需要保存
-      setTimeout(function() {
-        if(self.source === 'column' && !aid || !mid) {
-          return self.autoSaveToDraft();
-        };
-        self.post('save')
+      self.post('save')
         .then(() => {
-          return self.autoSaveToDraft();
+          self.saveToDraftSuccess();
         })
-        .catch(err => {
-          sweetError(err);
-          return self.autoSaveToDraft();
-        });
-      }, self.time);
     },
     //草稿保存成功
     saveDraftInfo(info) {

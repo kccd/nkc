@@ -2,7 +2,7 @@
   .moment
     paging(:pages="pages" :mb="1" @click-button="onSelectPage")
     blank(v-if="momentsData.length === 0")
-    moments(:moments="momentsData" v-else)
+    moments(:moments="momentsData" :permissions="permissions" v-else)
     paging(:pages="pages" @click-button="onSelectPage")
 </template>
 <style lang="less">
@@ -44,6 +44,7 @@
         nkcAPI(`/creation/zone/moment?page=${page}`, 'GET')
           .then(res => {
             self.momentsData = res.momentsData;
+            self.permissions = res.permissions;
             self.pages = res.paging.buttonValue;
           })
           .catch(sweetError)

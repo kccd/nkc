@@ -5,7 +5,7 @@
     .user-column-box(v-for="item in threads" v-else)
       .user-column-body
         .user-column-title
-          a.user-column-name(:href="item.homeUrl" target="_blank") {{item.threadName}}
+          a.user-column-name(:href="item.homeUrl" target="_blank") {{item.columnName}}
           span(
             data-type="nkcTimestamp"
             :data-time="(new Date(item.toc)).getTime()"
@@ -22,6 +22,7 @@
             a(:href="item.url" target="_blank").user-column-content-abstract {{item.content}}
             .user-column-content-cover
               img(:src="getUrl('postCover', item.cover)")
+    paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
 </template>
 <style lang="less">
 .user-column-thread{

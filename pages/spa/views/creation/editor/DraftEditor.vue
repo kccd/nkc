@@ -18,6 +18,9 @@
         button.btn.btn-default.m-r-05(@click="manuallySaveAsHistory" :disabled="!draftId") 保存
         button.btn.btn-default.m-r-05(@click="preview" :disabled="!draftId") 预览
         button.btn.btn-default.m-r-05(@click="history" :disabled="!draftId") 历史
+        .checkbox
+          .editor-auto-save(v-if="autoSaveInfo")
+            .fa.fa-check-circle &nbsp;{{ autoSaveInfo }}
 </template>
 
 <style lang="less" scoped>
@@ -75,7 +78,7 @@ a {
 <script>
 import DocumentEditor from '../../../../lib/vue/DocumentEditor';
 import {nkcAPI} from '../../../../lib/js/netAPI'
-import { getUrl } from '../../../../lib/js/tools'
+import { getUrl, timeFormat } from '../../../../lib/js/tools'
 import InfoBlock from '../../../components/InfoBlock';
 
 export default {
@@ -99,11 +102,20 @@ export default {
           page: 'draftEditor'
         }
       ],
-      editorInitOk: false
+      editorInitOk: false,
+      autoSaveInfo: null,
+      setInterval: '',//自动保存草稿计时器
     }
   },
   mounted() {
-    this.initId();
+    const self = this;
+    self.initId();
+    self.setInterval = setInterval(function() {
+      self.autoSaveToDraft()
+    }, 60000);
+  },
+  destroyed() {
+    clearInterval(this.setInterval);
   },
   components: {
     'document-editor': DocumentEditor,
@@ -223,7 +235,8 @@ export default {
       this
         .saveAsHistory()
         .then(() => {
-          sweetSuccess('快照保存成功');
+          sweetSuccess('保存成功');
+          this.saveToDraftSuccess();
         })
         .catch(sweetError);
     },
@@ -268,6 +281,19 @@ export default {
     // 调用编辑器显示保存状态信息 succeeded, failed, saving
     setSavedStatus(status) {
       this.$refs.documentEditor.setSavedStatus(status);
+    },
+    //保存草稿成功提示
+    saveToDraftSuccess() {
+      let time = new Date();
+      this.autoSaveInfo = "草稿已保存 " + timeFormat(time);
+    },
+    //自动保存草稿
+    autoSaveToDraft() {
+      const self = this;
+      this.post('save')
+      .then(() => {
+        self.saveToDraftSuccess();
+      })
     }
   }
 }
