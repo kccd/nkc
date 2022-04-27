@@ -922,7 +922,7 @@ resourceSchema.methods.updateForumsId = async function() {
 * @param {[String]} accessibleForumsId 访问能够访问的专业ID组成的数组
 * */
 resourceSchema.methods.checkAccessPermission = async function(accessibleForumsId) {
-  const {tou, references} = this;
+  const {tou, references, forumsId: oldForumsId} = this;
   if(references.length === 0) {
     // 不允许访问未使用过的资源
     throwErr(403, `权限不足`);
@@ -934,7 +934,15 @@ resourceSchema.methods.checkAccessPermission = async function(accessibleForumsId
     }
   }
   const now = Date.now();
-  if(tou === null || tou.getTime() < (now - 24 * 60 * 60 * 1000)) {
+  // 如果没有更新过资源的专业 ID 或
+  // 更新时间已超过 24 小时 或
+  // 当前资源的专业 ID 为空（未发布到任何专业）
+  // 则重新更新资源专业 ID
+  if(
+    tou === null ||
+    tou.getTime() < (now - 24 * 60 * 60 * 1000) ||
+    oldForumsId.length === 0
+  ) {
     // 需要更新 所在专业字段
     await this.updateForumsId();
   }
@@ -1016,7 +1024,7 @@ resourceSchema.methods.pushToMediaService = async function(filePath) {
   if(data.waterAdd) {
     coverPath = await SettingModel.getWatermarkCoverPathByUid(uid, data.waterType);
   }
-  await mediaClient(mediaServiceUrl, {
+  return await mediaClient(mediaServiceUrl, {
     coverPath,
     type: mediaType,
     filePath,
@@ -1187,6 +1195,7 @@ resourceSchema.methods.getMediaServiceDataAudio = async function() {
 *     @param {String} 在 store service 磁盘上的文件名
 * */
 resourceSchema.statics.updateResourceStatus = async (props) => {
+  // console.log(props,'props');
   const {rid, status, error, filesInfo = {}} = props;
   const ResourceModel = mongoose.model('resources');
   const FILE = require('../nkcModules/file');
@@ -1216,9 +1225,8 @@ resourceSchema.statics.updateResourceStatus = async (props) => {
       files: FILE.filterFilesInfo(filesInfo)
     }
   });
-
-  // 通过 socket 服务通知浏览器
-  sendDataMessage(resource.uid, {
+  // 通知浏览器 resource 已经处理完成
+ await sendDataMessage(resource.uid, {
     event: "fileTransformProcess",
     data: {rid: resource.rid, state: fileProcessState, err: error}
   });

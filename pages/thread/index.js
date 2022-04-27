@@ -1325,6 +1325,19 @@ if (NKC.configs.platform === 'reactNative') {
 //     }
 // 	})
 // });
+// 快捷键发表回复
+/*try {
+	ue.ready(function() {
+		ue.body.addEventListener("keydown", function(e) {
+			if (13 === e.keyCode && e.ctrlKey){
+				$("#ButtonReply").click();
+			}
+		})
+	});
+} catch (error) {
+
+}*/
+
 function getBlockId(val){
 	return val;
 }

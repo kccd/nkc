@@ -128,7 +128,6 @@ const fundApplicationFormSchema = new Schema({
 	  type: Number,
 	  default: null,
 	  index: 1,
-	  min: [1, '预计周期不能小于1']
   },
   threadsId: {
   	applying: {// 申请时附带的帖子
@@ -158,17 +157,14 @@ const fundApplicationFormSchema = new Schema({
     number: {
       type: String,
       default: null,
-	    maxlength: [30, '收款账号位数超过限制']
     },
 	  name: {
     	type: String,
 		  default: null,
-		  maxlength: [10, '户名字数超过限制']
 	  },
 	  bankName: {
     	type: String,
 		  default: null,
-		  maxlength: [10, '银行全称字数超过限制']
 	  }
   },
   projectId: {

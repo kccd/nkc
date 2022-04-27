@@ -10,6 +10,7 @@ block content
       include ../publicModules/checkDefaultUsername
       .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom.box-shadow-panel.p-r-0
         include ../publicModules/forums_nav/forums_tree
+        +renderCategoryForums
       .col-xs-12.col-md-7.box-shadow-panel.p-r-0
         if !state.isApp && data.user && state.subForums.length
           .m-b-1
@@ -86,7 +87,7 @@ block content
                 a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
             if (data.t === "thread" || data.t === "column" || data.t === "recommend" || data.t === "reply") && state.platform !== 'reactNative'
               .paging-button
-                a.radius-left.button(href=`/?t=reply` class=data.t === "reply" ? "active" : "" data-type="reload") 回复
+                a.radius-left.button(href=`/?t=reply` class=data.t === "reply" ? "active" : "" data-type="reload") 全部
                 a.button(href=`/?t=thread` class=data.t === "thread" ? "active" : "" data-type="reload") 文章
                 a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "" data-type="reload") 专栏
             if data.t === "subscribe"

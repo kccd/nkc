@@ -4,6 +4,7 @@ const nkcRender = require('../nkcModules/nkcRender');
 const {htmlToPlain, renderHTML} = nkcRender;
 const customCheerio = require('../nkcModules/nkcRender/customCheerio');
 const {getQueryObj, obtainPureText} = require('../nkcModules/apiFunction');
+const tools = require("../nkcModules/tools");
 const mongoose = settings.database;
 const {Schema} = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
@@ -1792,15 +1793,22 @@ postSchema.statics.extendActivityPosts = async (posts) => {
   };
   const usersId = new Set();
   const threadsId = new Set();
+  const postOfThreadsId = new Set();
   const firstPostsId = new Set();
   const threadFirstPosts = {};
+  const threadObj = {};
   const usersObj = {};
   for(const post of posts) {
     const {type, uid, tid, anonymous} = post;
     if(type === 'post') threadsId.add(tid);
+    if(type === 'thread') postOfThreadsId.add(tid);
     if(!anonymous) usersId.add(uid);
   }
   const threads = await ThreadModel.find({tid: {$in: [...threadsId]}}, {oc: 1});
+  const postOfThreads = await ThreadModel.find({tid: {$in: [...postOfThreadsId]}});
+  for(const thread of postOfThreads) {
+    threadObj[thread.tid] = thread;
+  }
   for(const thread of threads) {
     firstPostsId.add(thread.oc);
   }

@@ -110,6 +110,12 @@ var app = new Vue({
       NKC.methods.visitUrl("/search?c=" + this.strToBase64(this.c || "") + (this.t?"&t="+this.t:"") +"&d=" + this.options)
       // window.location.href = "/search?c=" + this.strToBase64(this.c || "") + (this.t?"&t="+this.t:"") +"&d=" + this.options;
     },
+    openComplexForm() {
+      if(this.complexOptions) {
+        return;
+      }
+      this.openMoreOptions();
+    },
     // 展开或者关闭更多搜索选项
     openMoreOptions: function() {
       var isOpen = this.complexOptions;
@@ -173,6 +179,9 @@ var app = new Vue({
     }
     if(NKC.modules.SubscribeTypes) {
       window.SubscribeTypes = new NKC.modules.SubscribeTypes();
+    }
+    if(data.form === 'complex') {
+      this.openComplexForm();
     }
   }
 });
