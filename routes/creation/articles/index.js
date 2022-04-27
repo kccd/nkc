@@ -1,5 +1,6 @@
 const router = require('koa-router')();
 const columnRouter = require("./column");
+const customCheerio = require('../../../nkcModules/nkcRender/customCheerio');
 router
   .get('/', async (ctx, next) => {
     await next();
@@ -54,7 +55,7 @@ router
   })
   .post('/editor', async (ctx, next) => {
     //创建，修改，编辑文章
-    const {db, data, state, body} = ctx;
+    const {db, data, state, body, nkcModules} = ctx;
     const {files, fields} = body;
     const {coverFile} = files;
     const {type, articleId, source, sid} = fields;
@@ -73,6 +74,15 @@ router
       selectCategory,
       authorInfos,
     } = JSON.parse(fields.article);
+    //内容校验
+    if(title && title.length > 100) ctx.throw(400, `标题不能超过100个字`);
+    const _content = customCheerio.load(content).text();
+    if(_content && _content.length > 100000) ctx.throw(400, `内容不能超过10万字`);
+    nkcModules.checkData.checkString(content, {
+      name: "内容",
+      minLength: 1,
+      maxLength: 2000000
+    });
     let article;
     if(type === 'create') {
       article = await db.ArticleModel.createArticle({

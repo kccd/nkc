@@ -5,6 +5,7 @@ const disabledRouter = require("./disabled");
 const unblockRouter = require("./unblock");
 const optionsRouter = require("./options");
 const ipInfoRouter = require("./ipInfo");
+const customCheerio = require("../../nkcModules/nkcRender/customCheerio");
 module.exports = router;
 router
   .get('/', async (ctx, next) => {
@@ -72,8 +73,15 @@ router
     if(!article) ctx.throw(400, '未找到文章，请刷新后重试');
     const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
     if(article.status !== normalStatus) {
-      return ctx.throw(403, '文章状态异常');
+      return ctx.throw(403, '文章状态异常,暂不可评论');
     }
+    const _content = customCheerio.load(content).text();
+    if(_content.length > 1000) ctx.throw(400, '内容不能超过1000字');
+    nkcModules.checkData.checkString(content, {
+      name: "内容",
+      minLength: 0,
+      maxLength: 2000
+    });
     if(!['modify', 'publish', 'create', 'save'].includes(type)) ctx.throw(400, `未知的提交类型 type: ${type}`);
     let comment;
     if(type === 'create') {
