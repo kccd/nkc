@@ -80,7 +80,7 @@ router
     if(_content && _content.length > 100000) ctx.throw(400, `内容不能超过10万字`);
     nkcModules.checkData.checkString(content, {
       name: "内容",
-      minLength: 1,
+      minLength: 0,
       maxLength: 2000000
     });
     let article;
