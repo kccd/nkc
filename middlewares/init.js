@@ -46,14 +46,6 @@ module.exports = async (ctx, next) => {
   });
   ctx.address = ip;
   ctx.port = port;
-  Object.defineProperty(ctx, 'template', {
-    get: function() {
-      return './pages/' + this.__templateFile
-    },
-    set: function(fileName) {
-      this.__templateFile = fileName
-    }
-  });
   try{
     ctx.data.operationId = nkcModules.permission.getOperationId(ctx.url, ctx.method);
   } catch(err) {
