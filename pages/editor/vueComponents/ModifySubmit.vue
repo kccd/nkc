@@ -91,7 +91,6 @@ export default {
     },
   },
   mounted() {
-    // console.log(this.$data,'有缓存的情况')
     this.setInterval = setInterval(this.autoSaveToDraft, this.saveDraftTimeout);
   },
   destroyed(){
@@ -122,6 +121,7 @@ export default {
     saveToDraftSuccess() {
       let time = new Date();
       this.autoSaveInfo = "草稿已保存 " + this.format(time);
+
     },
     autoSaveToDraft() {
       this.readyDataForSave();
@@ -176,16 +176,7 @@ export default {
             clearInterval(this.setInterval);
             this.setInterval = '';
             return sweetQuestion2(`您输入的内容发生了变化，是否还要继续保存？`)
-              // .then(() => {
-              //   console.log('保存')
-              //   return;
-              // })
-              // .catch((err) => {
-              //   console.log('取消')
-              //   sweetError(err);
-              // })
               .finally( ()=>{
-                // console.log('bc')
                 this.setInterval = setInterval(this.autoSaveToDraft, this.saveDraftTimeout)
               } )
           } else {
@@ -513,6 +504,7 @@ export default {
   }
 }
 .editor-auto-save {
+  min-height: 2.6rem;
   padding: 0.5rem 0;
   color: #9baec8;
 }

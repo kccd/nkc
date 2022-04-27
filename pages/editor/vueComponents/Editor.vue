@@ -1,5 +1,5 @@
 <template lang="pug">
-.editor
+.editor(v-if="show")
   .row
     .col-xs-12.col-md-9.m-b-2
       div
@@ -109,8 +109,9 @@ export default {
     hideType: ["newPost", "modifyPost"],
     pageData: {},
     pageState: {},
+    err: '',
+    show: false
   }),
-
   created() {
     let search = this.$route?.query;
     let url = `/editor/data`;
@@ -124,14 +125,21 @@ export default {
       .then((resData) => {
         this.pageData = resData;
         this.pageState = resData.state;
+        this.show = true;
       })
       .catch((err) => {
+        if(err.error){
+          this.err = err.error;
+          this.$emit('noPermission', err);
+          // sweetError('当前没有权限');
+          return
+        }
         sweetError(err);
       });
     window.addEventListener("pageshow", this.clearCache);
   },
   destroyed() {
-    window.removeEventListener("pageshow", this.clearCache);
+    this.clearCache && window.removeEventListener("pageshow", this.clearCache);
     this.pageData = {};
     this.pageState = {};
   },
