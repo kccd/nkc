@@ -8,6 +8,7 @@
         :moments="momentsData"
         @complaint="complaint"
         @violation-record="violationRecord"
+        :permissions="permissions"
       )
       complaint(ref="complaint")
       violation-record(ref="violationRecord")
@@ -36,13 +37,13 @@ export default {
     paging: {},
     uid: null,
     loading: false,
+    permissions: '',
   }),
   components: {
     "moments": Moments,
     "complaint": Complaint,
     "violation-record": ViolationRecord,
     "paging": Paging,
-
   },
   computed: {
     pageButtons() {
@@ -75,6 +76,7 @@ export default {
           self.t = res.t;
           self.paging = res.paging;
           self.momentsData = res.momentsData;
+          self.permissions = res.permissions;
         })
         .catch(err => {
           sweetError(err);

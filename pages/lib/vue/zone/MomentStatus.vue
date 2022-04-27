@@ -1,13 +1,16 @@
 <template lang="pug">
   .moment-status(v-if="moment && moment.status === 'unknown'")
-    .review 内容未审核
-    p 送审理由:{{moment.reason}}
-    | 通过审核请点击
-    button.btn.btn-xs.btn-default(@click="reviewMoment") 通过
-    | &nbsp; 按钮，不通过请点击
-    button.btn.btn-xs.btn-default(@click="deleteMoment") 删除
-    | 按钮。
-    a(href="/review", target="_blank") 待审核列表
+    div(v-if="permissions && permissions.reviewed")
+      .review 内容未审核
+      p 送审理由:{{moment.reason}}
+      | 通过审核请点击
+      button.btn.btn-xs.btn-default(@click="reviewMoment") 通过
+      | &nbsp; 按钮，不通过请点击
+      button.btn.btn-xs.btn-default(@click="deleteMoment") 删除
+      | 按钮。
+      a(href="/review", target="_blank") 待审核列表
+    div(v-else)
+      .review 内容审核中
   .moment-status(v-else-if="moment && moment.status === 'deleted'")
     .deleted 内容已被删除
   .moment-status(v-else-if="moment && moment.status === 'faulty'")
@@ -35,9 +38,8 @@
 import {nkcAPI} from "../../js/netAPI";
 
 export default {
-  props: ['moment'],
+  props: ['moment', 'permissions'],
   data: () => ({
-
   }),
   mounted() {
   },

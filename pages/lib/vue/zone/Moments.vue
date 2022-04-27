@@ -8,11 +8,12 @@
     //)
     complaint(ref="complaint")
     violation-record(ref="violationRecord")
-    moment-status(ref="momentStatus")
+    moment-status(ref="momentStatus" :permissions="permissions")
     .moment-container(:key="momentData.momentId" v-for="momentData in moments")
       moment(
         :data="momentData"
         @complaint="complaint"
+        :permissions="permissions"
       )
 </template>
 
@@ -31,7 +32,7 @@
   import MomentStatus from "./MomentStatus";
   import {EventBus} from "../../../spa/eventBus";
   export default {
-    props: ['moments'],
+    props: ['moments', 'permissions'],
     components: {
       'moment-option': MomentOption,
       'moment': Moment,

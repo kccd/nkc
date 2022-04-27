@@ -41,4 +41,6 @@ if !isIncluded('comment')
   if (data.columnPost.type === 'article' && data.columnPost.article.status && data.columnPost.article.status === 'normal') || (data.columnPost.thread && data.columnPost.thread.status && data.columnPost.thread.status === 'normal')
     #commentEditor.m-t-1(v-cloak)
       comment-editor(ref="commentEditor" source="comment" :sid="articleId" :comment="comment")
+  else
+    .h4.text-center(style='color: #666;') 暂不可评论
   +includeDeferJS('/publicModules/commentCenter/comment.js')

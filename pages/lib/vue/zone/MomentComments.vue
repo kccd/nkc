@@ -19,7 +19,7 @@
           v-for="(commentData, index) in commentsData"
           :class=`{'active': focusCommentId === commentData.momentCommentId, 'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted'}`
           )
-          moment-status(ref="momentStatus" :moment="commentData")
+          moment-status(ref="momentStatus" :moment="commentData" :permissions="permissions")
           .moment-comment-item-header
             a.moment-comment-avatar(:href="commentData.userHome" target="_blank")
               img(
@@ -173,7 +173,7 @@
   import MomentStatus from "./MomentStatus";
   import MomentOptionFixed from "./momentOption/MomentOptionFixed";
   export default {
-    props: ['mid', 'type', 'focus'],
+    props: ['mid', 'type', 'focus', 'permissions'],
     components: {
       'paging': Paging,
       'from-now': FromNow,

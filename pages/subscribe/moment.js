@@ -3,7 +3,6 @@ import Moments from '../lib/vue/zone/Moments';
 import Paging from '../lib/vue/Paging';
 import {getDataById} from "../lib/js/dataConversion";
 import {visitUrl} from "../lib/js/pageSwitch";
-
 const data = getDataById('data');
 const moment = new Vue({
   el: '#moment',
@@ -15,6 +14,7 @@ const moment = new Vue({
   data: {
     momentsData: data.momentsData,
     pages: data.paging.buttonValue,
+    permissions: data.permissions,
   },
   methods: {
     selectPage(num) {
