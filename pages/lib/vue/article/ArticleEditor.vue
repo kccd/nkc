@@ -184,6 +184,7 @@ export default {
   },
   mounted() {
     this.getColumn();
+    this.autoSaveToDraft();
   },
   methods: {
     getRequest: getRequest,
