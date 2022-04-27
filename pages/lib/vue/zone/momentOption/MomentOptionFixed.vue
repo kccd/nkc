@@ -28,7 +28,6 @@
       .option.time
         span {{timeFormat(toc)}}
 </template>
-
 <style lang="less" scoped>
 @import '../../../../publicModules/base';
 .moment-options{

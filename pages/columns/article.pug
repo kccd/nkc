@@ -59,6 +59,8 @@ block baseColumnContent
           -let reviewData = article
           include ./article/module_review
           +thread
+        else if article.status === 'deleted'
+          .h4.text-center(style='color: #666;') 文章已被删除，不可查看
       else
         +thread
   .article-common.m-b-1.box-shadow-panel(style="position: relative")#comment-content
