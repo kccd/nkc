@@ -52,7 +52,7 @@
 </style>
 
 <script>
-import userVue from "./userVue";
+import UserVue from "./UserVue";
 import userDrawCount from "./userDrawCount";
 import userLogin from "./userLogin";
 import userList from "./userList";
@@ -65,7 +65,7 @@ export default {
     drawState: {},
   }),
   components: {
-    "user-vue": userVue,
+    "user-vue": UserVue,
     "user-draw-count": userDrawCount,
     "user-login": userLogin,
     "user-list": userList,

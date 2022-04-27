@@ -1,4 +1,4 @@
-<template lang="pug">
+       <template lang="pug">
   .score-container(v-if="scores && scores.length || xsf")
     .user-scores(v-for="s in scores")
       .user-score(:title="s.name + ': ' + s.number/100")
