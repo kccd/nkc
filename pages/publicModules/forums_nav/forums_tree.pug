@@ -179,3 +179,13 @@ mixin renderForumsBreadcrumb(name, forums)
           -var {fid, name, cid} = n;
           span.m-r-05 /
           a.forum-block-name.forum-inline-name(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}` data-float-fid=fid)= name
+
+if state.categoryForums
+  for fc in state.categoryForums
+    if fc.forums.length
+      .m-b-1
+        .panel-header(title=fc.description)=fc.name
+        if 1 || fc.displayStyle === 'simple'
+          +renderSimpleForums(fc.forums)
+        else
+          +renderForums(fc.forums)

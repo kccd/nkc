@@ -113,7 +113,7 @@ func.save = async (docType, document) => {
   if(
     ![
       "user", "post", "thread", "column", "columnPage", "resource",
-      "document_article", "document_comment"
+      "document_article", "document_comment", "document_moment"
     ].includes(docType)
   ) throwErr(500, "docType error");
 
