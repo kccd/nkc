@@ -1,7 +1,7 @@
 const CommunicationClient = require('../tools/communicationClient');
 const communicationConfig = require('../config/communication');
 const {getUserInfo} = require('./cookie');
-const {port, address} = global.NKC;
+const {port, address} = global.NKC || {};
 let communicationClient;
 
 
@@ -65,7 +65,7 @@ function getCommunicationClient() {
       let redEnvelopeStatus = false;
       if (status && !close && !redEnvelopeSettings.random.close) {
         redEnvelopeStatus = true;
-      } 
+      }
       return {
         uid: user.uid,
         onlineStatus,

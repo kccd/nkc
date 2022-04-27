@@ -83,6 +83,12 @@ const schema = new Schema({
     }
     */
   },
+  // 附件是否被屏蔽
+  disabled: {
+    type: Boolean,
+    default: false,
+    index: 1
+  }
 }, {
   collection: 'attachments'
 });
@@ -280,7 +286,7 @@ schema.statics.savePostCover = async (pid, fileData) => {
       if(!resource) return;
       const {url} = await resource.getRemoteFile();
       file = await downloader(url);
-    } else if(typeof fileData === undefined) {
+    } else if(typeof fileData === 'undefined') {
       const extArr = ['jpg', 'jpeg', 'png'];
       const resource = await ResourceModel.findOne({ext: {$in: extArr}, references: pid});
       if(!resource) return;
@@ -922,5 +928,18 @@ schema.methods.updateFilesInfo = async function() {
     }
   });
 };
+/*
+* 屏蔽 attachment
+* @param {String} aid attachment ID
+* */
+schema.statics.disableAttachment = async (aid) => {
+  if(!aid) return;
+  const AttachmentModel = mongoose.model('attachments');
+  await AttachmentModel.updateOne({_id: aid}, {
+    $set: {
+      disabled: true
+    }
+  });
+}
 
 module.exports = mongoose.model('attachments', schema);

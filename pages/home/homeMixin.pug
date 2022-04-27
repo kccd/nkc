@@ -87,7 +87,7 @@ mixin renderHome(homeBlock)
                   if !goods.productSettings.priceShowToVisit && !data.user
                     .home-goods-price 登录可见
                   else
-                    -var minPrice, maxPrice;
+                    -var minPrice = undefined, maxPrice = undefined;
                     for p in goods.productParams
                       -var price = p.price;
                       if minPrice === undefined || minPrice > price

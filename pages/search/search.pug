@@ -3,7 +3,7 @@ block title
   title=`搜索 - ${state.serverSettings.websiteName}`
   +includeCSS("/search/search.css")
 block content
-  #data.hidden=objToStr({c: data.c, t: data.t, d: data.d, selectedForums: data.selectedForums, excludedForums: data.excludedForums, threadCategories: data.threadCategories})
+  #data.hidden=objToStr({c: data.c, t: data.t, d: data.d, selectedForums: data.selectedForums, excludedForums: data.excludedForums, threadCategories: data.threadCategories, form: data.form})
   .container-fluid.max-width
     .row#app(v-cloak)
       .col-xs-12.col-md-9

@@ -22,10 +22,14 @@ async function initConfig() {
   }
 }
 
-async function initAccount(username, password) {
+async function initAccount() {
   // 创建管理员账号
-  console.log(`creating the admin account`);
+  const accountConfig = require('../config/account.json');
   const db = require('../dataModels');
+  const count = await db.UserModel.countDocuments();
+  if(count !== 0) return;
+  console.log(`creating the admin account`);
+  const {username, password} = accountConfig;
   const user = await db.UserModel.createUser({});
   await user.updateOne({
     certs: ['dev'],
@@ -312,6 +316,7 @@ async function initUsersOnlineStatus() {
 async function init() {
   await initConfig();
   await initSettings();
+  await initAccount();
   await initRoles();
   await initKcksRecordsTypes();
   await initScoreOperations();
