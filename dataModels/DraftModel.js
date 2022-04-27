@@ -118,6 +118,8 @@ const draftSchema = new Schema({
     type: [Number],
     default: []
   }
+}, {
+  collection: 'drafts'
 });
 
 /*
