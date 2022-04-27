@@ -16,7 +16,7 @@ import {nkcAPI} from "../../../lib/js/netAPI";
 import {getState} from "../../../lib/js/state";
 import Panel from "./userPanel/Panel";
 import AccountUser from "./AccountUser";
-import Footer from "../../../lib/vue/publicVue/Footer/Footer"
+import Footer from "../../../lib/vue/publicVue/footer/Footer"
 import {setPageTitle} from "../../../lib/js/pageSwitch";
 export default {
   data:() => ({

@@ -1,4 +1,4 @@
-import User from '../views/user/user';
+import User from '../views/user/User';
 import UserFollowerAndFans from "../../lib/vue/publicVue/userFollowAndFans/UserFollowerAndFans";
 import UserMoment from "../views/user/propfile/profile/UserMoment";
 import UserPostList from "../views/user/propfile/profile/UserPostList";

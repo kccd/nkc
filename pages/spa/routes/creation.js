@@ -29,7 +29,7 @@ import ZoneMomentEditor from '../views/creation/editor/ZoneEditor/ZoneMomentEdit
 import Zone from '../views/creation/zone/Zone';
 import ZoneArticle from '../views/creation/zone/Article';
 import ZoneMoment from '../views/creation/zone/Moment';
-import ZoneDraft from '../views/creation/zone/draft';
+import ZoneDraft from '../views/creation/zone/Draft';
 import DraftEditor from '../views/creation/editor/DraftEditor';
 
 export const routesName = {
