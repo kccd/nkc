@@ -55,12 +55,13 @@
 </style>
 <script>
 import {getColumnInfo} from "../../../lib/js/column";
+import {getState} from "../../../lib/js/state";
 import LeftPanel from "./LeftPanel";
 import RightPanel from "./RightPanel";
 export default {
   props: ['navLinks', 'target-user', 'type', 'forums', "targetUserFans", "targetUserFollowers", "code","targetUserScores", "usersBlUid"],
   data: () => ({
-    targetColumn: getColumnInfo(),
+    targetColumn: '',
     leftPanelBoxOperation: false,
   }),
   components: {
@@ -68,6 +69,13 @@ export default {
     "right-panel": RightPanel
   },
   mounted() {
+    const self = this;
+    if(getState().uid) {
+      getColumnInfo()
+      .then(res => {
+        self.targetColumn = res;
+      })
+    }
   },
   methods: {
     clickLeftBox(){
