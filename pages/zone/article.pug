@@ -38,14 +38,21 @@ block content
       +articleEditTime(tlm, dt, toc)
       //- 文章用户其他操作
       .single-post-bottom#articleOption
-        if type === 'article'
-          a.single-comment-bottom-item(href="#container")
+        if data.user
+          if type === 'article'
+            a.single-comment-bottom-item(href="#container")
+              .fa.fa-comment-o.reply-icon
+              span 回复
+            .single-comment-bottom-item(data-type="articleOption" data-aid=article._id title="其他操作" data-direction="down")
+              .fa.fa-sliders.option-icon
+          else
+            .single-comment-bottom-item(data-type="articleOption" data-tid=article.tid data-collected=`${collected}` title="其他操作" data-direction="up")
+              .fa.fa-sliders.option-icon
+        else
+          a.single-comment-bottom-item(onclick="RootApp.openLoginPanel('login')")
             .fa.fa-comment-o.reply-icon
             span 回复
-          .single-comment-bottom-item(data-type="articleOption" data-aid=article._id title="其他操作" data-direction="down")
-            .fa.fa-sliders.option-icon
-        else
-          .single-comment-bottom-item(data-type="articleOption" data-tid=article.tid data-collected=`${collected}` title="其他操作" data-direction="up")
+          .single-comment-bottom-item(onclick="RootApp.openLoginPanel('login')" title="其他操作")
             .fa.fa-sliders.option-icon
   .hidden#data=objToStr({comments: data.comments, comment: data.comment, article, collectedCount, type, collected})
   .container-fluid.max-width
