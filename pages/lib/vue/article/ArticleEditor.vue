@@ -128,6 +128,7 @@ import {nkcAPI} from "../../js/netAPI";
 import {checkString} from "../../js/checkData";
 import {getLength} from "../../js/checkData";
 import {getColumnInfo} from "../../js/column";
+import {getState} from "../../js/state";
 import { getUrl } from '../../js/tools'
 
 export default {
@@ -206,6 +207,7 @@ export default {
     },
     getColumn() {
       const self = this;
+      if(!getState().uid) return;
       getColumnInfo()
         .then(res => {
           self.column = res;

@@ -67,16 +67,19 @@
 </style>
 <script>
 import {getColumnInfo} from "../../../../lib/js/column";
+import {getState} from "../../../../lib/js/state";
 export default {
   props: ['targetUser'],
   data: () => ({
     targetColumn: '',
   }),
   mounted() {
-    getColumnInfo()
-      .then(res => {
-        this.targetColumn = res.userColumn;
-      })
+    if(getState().uid) {
+      getColumnInfo()
+        .then(res => {
+          this.targetColumn = res.userColumn;
+        })
+    }
   },
   methods: {
     toRoute(name){

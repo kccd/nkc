@@ -148,6 +148,7 @@
 <script>
 import {DraggableElement} from "../../../js/draggable";
 import {getColumnInfo} from "../../../js/column";
+import {getState} from "../../../js/state";
 export default  {
   data: () => ({
     show: false,
@@ -187,12 +188,14 @@ export default  {
   }),
   mounted() {
     this.initDraggableElement();
-    getColumnInfo()
-    .then(res => {
-      if(res.userColumn) {
-        this.columnId = res.userColumn._id;
-      }
-    })
+    if(getState().uid) {
+      getColumnInfo()
+        .then(res => {
+          if(res.userColumn) {
+            this.columnId = res.userColumn._id;
+          }
+        })
+    }
   },
   destroyed(){
     this.draggableElement && this.draggableElement.destroy();
