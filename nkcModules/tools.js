@@ -34,7 +34,7 @@ var Tools = function() {
         return fileDomain + "/a/"+ id + t
       }
       case "userHomeBanner": {
-        return fileDomain + "/a/"+ id + t
+        return fileDomain + "/a/"+ id + t;
       }
       case "scoreIcon": {
         if(id === 'default') {

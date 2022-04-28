@@ -8,7 +8,7 @@
       .account-banner(v-if="targetUser" )
         //用户banner容器
         .account-user-banner-container
-          .account-user-banner(:style="`backgroundImage: url('${getUrl('userHomeBanner', targetUser.homeBanner)}')`" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userBanner', targetUser.homeBanner)})")
+          .account-user-banner(:style="`backgroundImage: url('${userHomeBannerUrl}')`")
             .account-box-mask
               .account-user-info.row
                 .account-user-avatar.col-xs-3.col-sm-2.col-md-2.hidden-xs
@@ -77,7 +77,7 @@
         background-position: center center;
         position: relative;
         .account-box-mask{
-          background: linear-gradient(rgba(0,0,0,0), 80%, rgba(0,0,0,1));
+          background: linear-gradient(rgba(0,0,0,0), 70%, rgba(20,20,20,0.6));
           height: 100%;
           .account-user-info {
             position: relative;
@@ -295,6 +295,17 @@ export default {
     })
     if(getState() && getState().isApp){
       this.stopInAndOut = true;
+    }
+  },
+  computed: {
+    userHomeBannerUrl() {
+      const {homeBanner} = this.targetUser;
+      if(!homeBanner) {
+        return this.getUrl('defaultFile', 'default_pf_banner.jpg')
+      } else {
+        return this.getUrl('userHomeBanner', homeBanner);
+      }
+
     }
   },
   mounted() {

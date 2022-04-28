@@ -3,7 +3,13 @@ const momentRouter = require('./moment');
 const nkcRender = require("../../nkcModules/nkcRender");
 router
   .use('/', async (ctx, next) => {
-    const {data, db, path, internalData} = ctx;
+    const {state, data, db, path, internalData} = ctx;
+
+    // 游客跳转到首页
+    if(!state.uid) {
+      return ctx.redirect('/');
+    }
+
     data.type = path.replace('/g/', '');
     data.navbar = {
       highlight: 'subscribe'
@@ -39,7 +45,7 @@ router
       fidOfCanGetThreads
     } = internalData;
     const {type} = data;
-    
+
     const columnsObj = {};
     const columnPostsObj = {};
     const subColumnPostsObj = {};
@@ -143,8 +149,8 @@ router
         forumsId,
         quote
       } = post;
-    
-    
+
+
       if(user.uid !== null) user.homeUrl = nkcModules.tools.getUrl('userHome', user.uid);
       user.name = user.username;
       user.id = user.uid;
@@ -155,7 +161,7 @@ router
         quote.user.name = quote.user.username;
         quote.user.dataFloatUid = quote.user.uid;
       }
-    
+
       let a;
       let postType = type === 'post'? '回复': '文章'
       if(subTid.includes(tid)) {
@@ -299,7 +305,7 @@ router
           .skip(paging.start)
           .limit(paging.perpage)
         posts = await db.PostModel.extendActivityPosts(posts);
-  
+
         for(let i = 0; i < posts.length; i++) {
           const post = posts[i];
           const a = extendPost(post);
