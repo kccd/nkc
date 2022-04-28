@@ -1,0 +1,45 @@
+extends ./columnBase
+block columnTitle
+  block baseColumnTitle
+  style.
+    body {
+      padding-top: 0;
+      background-color: #f6f6f6;
+    }
+    .col-xs-12 , .col-md-9{
+      padding-right: 0;
+    }
+  style=`body{background-color: ${data.column.color};}`
+
+block content
+  include ./modules/columnHeader
+  include ./modules/contribute
+  +mixinColumnHeader({
+    user: data.user,
+    column: data.column,
+    subColumnsId: state.subColumnsId,
+    navCategories: data.navCategories,
+    categories: data.categories,
+    hideBanner: false
+  })
+  .container-fluid.max-width
+    .column
+      .row
+        .col-xs-12.col-md-9.box-shadow-panel.m-t-1
+          block baseColumnContent
+        //- .col-xs-12.col-md-1.box-shadow-panel#rightDom
+          //- 滚动到页头页脚
+        .col-xs-12.col-md-3.box-shadow-panel.m-t-1
+          include ../publicModules/scrollTo.pug
+          include ./modules/management
+          include ./modules/info
+block scripts
+  include ../publicModules/nkcSource
+  include ../publicModules/commonModal/commonModal
+  include ../publicModules/selectColor
+  include ../publicModules/subscribeTypes/subscribeTypes
+
+  +includeJS("/columns/settings/page.js")
+  +includeJS("/columns/column.js")
+  +includeJS("/columns/management.js")
+  +mixinColumnNavLinkScript()

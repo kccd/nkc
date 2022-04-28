@@ -6,23 +6,25 @@ const db = require('../dataModels');
 const {logger} = nkcModules;
 const fs = require('fs');
 const fsPromise = fs.promises;
-const {promisify} = require('util');
+const path = require('path');
 const redis = require('../redis');
 const cookieConfig = require("../config/cookie");
 const {fileDomain} = require("../config/server");
 
+const errPage = fsPromise.readFile(path.resolve(__dirname, '../pages/error/404.html'), 'utf-8');
+
 const fsSync = {
-  access: promisify(fs.access),
-  unlink: promisify(fs.unlink),
-  rename: promisify(fs.rename),
-  writeFile: promisify(fs.writeFile),
-  mkdir: promisify(fs.mkdir),
-  exists: promisify(fs.exists),
+  access: fsPromise.access,
+  unlink: fsPromise.unlink,
+  rename: fsPromise.rename,
+  writeFile: fsPromise.writeFile,
+  mkdir: fsPromise.mkdir,
+  exists: fsPromise.exists,
   existsSync: fs.existsSync,
-  copyFile: promisify(fs.copyFile),
+  copyFile: fsPromise.copyFile,
   createReadStream: fs.createReadStream,
   createWriteStream: fs.createWriteStream,
-  stat: promisify(fs.stat)
+  stat: fsPromise.stat
 };
 
 module.exports = async (ctx, next) => {
@@ -47,42 +49,27 @@ module.exports = async (ctx, next) => {
   });
   ctx.address = ip;
   ctx.port = port;
-  Object.defineProperty(ctx, 'template', {
-    get: function() {
-      return './pages/' + this.__templateFile
-    },
-    set: function(fileName) {
-      this.__templateFile = fileName
-    }
-  });
   try{
     ctx.data.operationId = nkcModules.permission.getOperationId(ctx.url, ctx.method);
   } catch(err) {
     if(err.status === 404) {
       console.log(`未知请求：${ctx.address} ${ctx.method} ${ctx.url}`.bgRed);
-      ctx.template = "error/error.pug";
       ctx.status = 404;
-      ctx.data.status = 404;
-      ctx.data.url = ctx.url;
-      await body(ctx, () => {});
-    } else {
-      console.log(err);
+      ctx.type = "text/html; charset=utf-8";
+      return errPage.then( res => {
+        ctx.body = res.replace(/{{url}}/g, ctx.url);
+      })
+      .catch( err => {
+        console.error(err);
+        ctx.status = 500;
+        ctx.body = "糟糕！你访问的页面404了，请检查链接";
+      });
     }
-    return;
   }
+
   try {
+    ctx.internalData = {};
     ctx.body = ctx.request.body;
-    const _body= Object.assign({}, ctx.query, ctx.body);
-    if(_body.password) {
-      _body.password = (_body.password || "").slice(0, 2);
-    }
-    if(_body.oldPassword) {
-      _body.oldPassword = (_body.oldPassword || "").slice(0, 2);
-    }
-    if(_body.newPassword) {
-      _body.newPassword = (_body.newPassword || "").slice(0, 2);
-    }
-    ctx._body = _body;
     ctx.db = db;
 	  ctx.tools = tools;
     ctx.redis = redis;
@@ -213,7 +200,6 @@ module.exports = async (ctx, next) => {
 
 	  //error handling
     await next();
-
 		if(ctx.data && ctx.data.user && ctx.data.user.toObject) {
 			ctx.data.user = ctx.data.user.toObject();
 		}

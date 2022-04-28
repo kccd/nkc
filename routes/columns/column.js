@@ -11,6 +11,7 @@ const contactRouter = require("./contact");
 const topRouter = require("./top");
 const hotRouter = require('./hot');
 const pageRouter = require("./page");
+const articleRouter = require("./article");
 router
   .use("/", async (ctx, next) => {
     const {db, params, data, nkcModules} = ctx;
@@ -45,6 +46,16 @@ router
     }
     await next();
   })
+  .use(['/a', '/page'], async (ctx, next)=>{
+    const { data, db } = ctx;
+    const { column } = data;
+    // 专栏内容公共部分数据
+    data.column = await column.extendColumn();
+    data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
+    data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
+    data.timeline = await db.ColumnModel.getTimeline(column._id);
+    await next()
+  })
   .get("/", async (ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
     let {page = 0, c: categoriesIdString = ''} = query;
@@ -60,18 +71,24 @@ router
     const q = {
       columnId: column._id
     };
+    //当前用户能查看的文章
     const fidOfCanGetThread = await db.ForumModel.getReadableForumsIdByUid(data.user? data.user.uid: '');
     const sort = {};
     if(cid) {
+      //主分类
       const category = await db.ColumnPostCategoryModel.findOnly({_id: cid});
       if(category.columnId !== column._id) ctx.throw(400, `文章分类【${cid}】不存在或已被专栏主删除`);
       if(page === 0 && !mcid) {
         data.categoryDescription = await category.renderDescription();
       }
+      //主分类的子分类
       data.childCategories = await category.getChildCategories();
       data.category = category;
+      //分类下的文章数量
       data.categoryPostCount = await db.ColumnPostModel.countDocuments({columnId: column._id, cid: category._id});
+      //分类导航
       data.categoriesNav = await db.ColumnPostCategoryModel.getCategoryNav(category._id);
+      //子分类
       const minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id, data.category._id, true);
       data.minorCategories = minorCategories.filter(mc => {
         data.categoryPostCount += mc.count;
@@ -104,6 +121,7 @@ router
     const paging = nkcModules.apiFunction.paging(page, count, column.perpage);
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
     data.paging = paging;
+    //获取专栏文章
     data.columnPosts = await db.ColumnPostModel.extendColumnPosts(columnPosts, fidOfCanGetThread);
     data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
@@ -244,5 +262,6 @@ router
   .use("/page", pageRouter.routes(), pageRouter.allowedMethods())
   .use("/top", topRouter.routes(), topRouter.allowedMethods())
   .use("/hot", hotRouter.routes(), hotRouter.allowedMethods())
-  .use("/settings", settingsRouter.routes(), settingsRouter.allowedMethods());
+  .use("/settings", settingsRouter.routes(), settingsRouter.allowedMethods())
+  .use("/a", articleRouter.routes(), articleRouter.allowedMethods())
 module.exports = router;

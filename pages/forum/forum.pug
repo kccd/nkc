@@ -100,12 +100,16 @@ block content
                 for n in data.forumNav
                   -const {fid, name, cid} = n;
                   span.nav-delimiter >
-                  a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}` data-float-fid=fid)= name
+                  a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}`
+                    data-global-mouseover="showForumPanel"
+                    data-global-mouseout="hideForumPanel"
+                    data-global-data=objToStr({fid})
+                  )= name
               .thread-nav-right
                 if !data.forum.childrenForums || !data.forum.childrenForums.length
                   button.btn.btn-xs.btn-default.m-r-05(onclick='formSearchApp.switchForumSearch()') 搜索本专业
                   if !data.user
-                    button.forum-post-button.btn.btn-default.btn-xs(onclick='NKC.methods.toLogin()')
+                    button.forum-post-button.btn.btn-default.btn-xs(onclick='RootApp.openLoginPanel()')
                       .fa.fa-pencil-square-o
                       | &nbsp;发表文章
                   else if data.noPermissionReason
@@ -247,7 +251,11 @@ block content
               for founder in data.founderList
                 li.forum-founder-item
                   .forum-founder-avatar(style=`background-image: url(${tools.getUrl("userAvatar", founder.avatar)})`)
-                  a.fouum-founder-username(href=tools.getUrl("userHome", founder.uid) target="_blank" data-float-uid=founder.uid)= founder.username
+                  a.fouum-founder-username(href=tools.getUrl("userHome", founder.uid) target="_blank"
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    data-global-data=objToStr({uid: founder.uid})
+                  )= founder.username
         .m-b-1
           .panel-header 专业介绍
           .forum-description!= nkcRender.htmlFilter(data.forum.description) || "暂无专业介绍"
@@ -269,10 +277,18 @@ block content
               for u in data.moderators
                 a.forum-moderator(href=`/u/${u.uid}` target="_blank")
                   .forum-moderator-avatar
-                    img(src=tools.getUrl("userAvatar", u.avatar) data-float-uid=u.uid)
+                    img(src=tools.getUrl("userAvatar", u.avatar)
+                      data-global-mouseover="showUserPanel"
+                      data-global-mouseout="hideUserPanel"
+                      data-global-data=objToStr({uid: u.uid})
+                    )
                   .forum-moderator-info
                     .forum-moderator-name
-                      span(data-float-uid=u.uid)=u.username
+                      span(
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        data-global-data=objToStr({uid: u.uid})
+                      )=u.username
                     .forum-moderator-description=u.description || "暂无简介"
         //-if data.forum.parentForums && data.forum.parentForums.length > 0
           +forumPanel("上级专业", data.forum.parentForums)
@@ -280,32 +296,17 @@ block content
           +forumPanel("细分专业", data.forum.childrenForums)
         //-if data.forum.parentsId.length && data.sameLevelForums && data.sameLevelForums.length > 0
           +forumPanel("同级专业", data.sameLevelForums, true)
-        if data.forum.noticeThreads.length > 0
-          -let sideThreads = data.forum.noticeThreads;
-          -let sideThreadsHeader = "专业公告"
-          include ../publicModules/side_thread_list
+        include ../publicModules/side_thread_list
+        +sideThreadsPanel(data.forum.noticeThreads, "专业公告")
         .m-b-1
           .panel-header 分享
           include ../publicModules/share/forum
-        -let sideThreads = data.featuredThreads;
-        -let sideThreadsHeader = "精选文章"
-        include ../publicModules/side_thread_list
-        -sideThreads = data.latestThreads;
-        -sideThreadsHeader = "最新文章"
-        include ../publicModules/side_thread_list
-        if data.recommendThreads && data.recommendThreads.length > 0
-          -let sideThreads = data.recommendThreads;
-          -let sideThreadsHeader = "推荐文章"
-          include ../publicModules/side_thread_list
+        +sideThreadsPanel(data.featuredThreads, "精选文章")
+        +sideThreadsPanel(data.latestThreads, "最新文章")
+        +sideThreadsPanel(data.recommendThreads, "推荐文章")
         if data.user
-          if data.subThreads && data.subThreads.length > 0
-            -let sideThreads = data.subThreads;
-            -let sideThreadsHeader = "关注的文章"
-            include ../publicModules/side_thread_list
-          if data.userThreads && data.userThreads.length > 0
-            -let sideThreads = data.userThreads;
-            -let sideThreadsHeader = "我的文章"
-            include ../publicModules/side_thread_list
+          +sideThreadsPanel(data.subThreads, "关注的文章")
+          +sideThreadsPanel(data.userThreads, "我的文章")
         if data.subUsers && data.subUsers.length > 0
           .m-t-1
             .panel-header 关注者
@@ -323,15 +324,11 @@ block content
         include ../publicModules/scrollTo
 
 block scripts
-  //- 通用socket
-  if data.user
-    +includeJS('/message/connectSocket.js')
   include ../publicModules/subscribeTypes/subscribeTypes
   if data.type === "home"
     include ../publicModules/nkcSource
   //-include ../publicModules/toTop
   include ../publicModules/moveThread/moveThread
-  include ../publicModules/md5
   include ../publicModules/disabledPost/disabledPost
   include ../publicModules/resourceInfo/resourceInfo
   //include ../publicModules/downloadResource/downloadResource

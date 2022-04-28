@@ -1,0 +1,15 @@
+extends ./subscribe
+block sTitle
+  title=`最新动态 - ${remoteState.serverSettings.websiteName}`
+block sContent
+  include ../publicModules/moment/moment
+  #moment(v-cloak)
+    .m-b-1
+      moment-editor(@published='onPublished')
+    paging(:pages="pages" :mb='1' @click-button='selectPage')
+    moments(:moments="momentsData" :permissions="permissions")
+    paging(:pages="pages" @click-button='selectPage')
+  #data.hidden=objToStr({momentsData: data.momentsData, paging: data.paging, permissions: data.permissions})
+block sScripts
+  include ../publicModules/moment/momentSource
+  +includeJS('/subscribe/moment.js')

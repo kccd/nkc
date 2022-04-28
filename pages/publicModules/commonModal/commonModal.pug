@@ -9,8 +9,8 @@ if !isIncluded('commonModal')
           .quote-content(v-if="quote") {{quote}}
         .modal-body
           .form
-            .form-group(v-for="(d, index) in data")
-              h5(v-if="d.label") {{d.label}}
+            .form-group(v-for="(d, index) in data" v-if = "d.label !== '工具压缩包' || (d.label === '工具压缩包' && !link)")
+              h5(v-if="d.label") {{(link && d.label === '入口文件') ? '链接' : d.label}}
               //- 数字input
               input.form-control(v-if="d.dom === 'input' && d.type === 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model.number="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
               //- 非数字input

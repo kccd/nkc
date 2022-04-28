@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 const routers = require('../requireFolder')(__dirname);
 const userRouter = routers.user;
+const documentRouter = routers.document;
 const watermarkRouter = routers.watermark;
 const meRouter = routers.me;
 const threadRouter = routers.thread;
@@ -45,9 +46,11 @@ const verificationsRouter = routers.verifications;
 const libraryRouter = routers.library;
 const userAvatarRouter = routers.userAvatar;
 const userBannerRouter = routers.userBanner;
-const newResourceRouter = routers.newResource;
+const creationRouter = routers.creation;
 const librariesRouter = routers.libraries;
 const noteRouter = routers.note;
+// 编辑器公式展示
+const mathJaxRouter = routers.mathJax;
 // 网站工具
 const siteToolsRouter = routers.tools;
 // ip信息
@@ -64,6 +67,24 @@ const linkRouter = routers.link;
 const communityRouter = routers.community;
 // 网站 logo
 const logoRouter = routers.logo;
+// 产品管理系统
+const pimRouter = routers.pim;
+//手机浏览器滑动框
+const drawDataRouter = routers.drawData;
+// 书籍详细页
+const bookRouter = routers.book;
+//资源分组
+const resourceCategoryRouter = routers.resourceCategory;
+//图书评论
+const commentRouter = routers.comment;
+// 空间
+const zoneRouter = routers.zone;
+// 首页关注
+const subscribeRouter = routers.subscribe;
+//独立文章
+const articleRouter = routers.article;
+//动态
+const momentRouter = routers.moment;
 
 const path = require('path');
 
@@ -166,9 +187,21 @@ router.use("/ipinfo", ipinfoRouter.routes(), ipinfoRouter.allowedMethods());
 router.use('/blacklist', blacklistRouter.routes(), blacklistRouter.allowedMethods());
 router.use('/a', attachmentRouter.routes(), attachmentRouter.allowedMethods());
 router.use('/verifications', verificationsRouter.routes(), verificationsRouter.allowedMethods());
-router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods())
-router.use('/c', communityRouter.routes(), communityRouter.allowedMethods())
+router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods());
+router.use('/c', communityRouter.routes(), communityRouter.allowedMethods());
+router.use('/pim', pimRouter.routes(), pimRouter.allowedMethods());
 router.use("/l", linkRouter.routes(), linkRouter.allowedMethods());
 router.use("/wm", watermarkRouter.routes(), watermarkRouter.allowedMethods());
 router.use('/logo', logoRouter.routes(), logoRouter.allowedMethods());
+router.use('/creation', creationRouter.routes(), creationRouter.allowedMethods());
+router.use('/draw', drawDataRouter.routes(), drawDataRouter.allowedMethods());
+router.use('/mathJax', mathJaxRouter.routes(), mathJaxRouter.allowedMethods());
+router.use('/book', bookRouter.routes(), bookRouter.allowedMethods());
+router.use('/document', documentRouter.routes(), documentRouter.allowedMethods());
+router.use('/rc', resourceCategoryRouter.routes(), resourceCategoryRouter.allowedMethods());
+router.use('/comment', commentRouter.routes(), commentRouter.allowedMethods());
+router.use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods());
+router.use('/g', subscribeRouter.routes(), subscribeRouter.allowedMethods());
+router.use('/article', articleRouter.routes(), articleRouter.allowedMethods());
+router.use('/moment', momentRouter.routes(), momentRouter.allowedMethods());
 module.exports = router;

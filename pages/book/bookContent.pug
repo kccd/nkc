@@ -1,0 +1,39 @@
+extends ../bootstrap_base
+block title
+  title=data.bookContent.title
+  +includeCSS('/book/bookContent.css')
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-3.m-t-2
+        //-.book-cover
+          img(src=data.book.coverUrl)
+        //.book-name=data.book.name
+        .book-list
+          for list in data.list
+            a.book-list-item(href=list.url data-type=list.type data-status=list.status)
+              if !list.published
+                span.status [未发布]
+              else if list.hasBeta
+                span.status [编辑中]
+              else if list.status === 'unknown'
+                span.status [审核中]
+              else if list.status === 'faulty'
+                span.status [退修]
+              span=list.title
+      .col-xs-12.col-md-9.book-content-container
+        h1.book-content-title=data.bookContent.title
+        .book-content-info
+          span.m-r-05=`创建于 ${data.bookContent.time}`
+            if data.bookContent.mTime
+              span=`，编辑于 ${data.bookContent.mTime}`
+          if data.bookPermission
+            a(href=data.bookContentEditor target='_blank') 编辑
+        //-.book-content-cover
+          img(src=data.bookContent.coverUrl)
+        .book-content-content!=data.bookContent.content
+  .hidden#data=objToStr({note: data.bookContent.note})
+block scripts
+  include ../publicModules/nkcSource
+  include ../publicModules/NKCHighlighter/NKCHighlighter
+  +includeJS('/book/bookContent.js')

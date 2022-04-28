@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const FILE = require("../nkcModules/file");
 const Schema = mongoose.Schema;
 const schema = new Schema({
   // 附件ID mongoose.Types.ObjectId().toString()
@@ -13,7 +14,7 @@ const schema = new Schema({
     // problemImage,
     // recommendThreadCover,
     // fundAvatar, fundBanner
-    // scoreIcon
+    // scoreIcon, bookCover, articleCover
     type: String,
     required: true,
     index: 1
@@ -372,7 +373,7 @@ schema.statics.saveRecommendThreadCover = async (file, type) => {
 * @author pengxiguaa 2020-8-3
 * */
 schema.statics.saveDraftCover = async (did, file) => {
-  const DraftModel = mongoose.model('draft');
+  const DraftModel = mongoose.model('drafts');
   const AttachmentModel = mongoose.model('attachments');
   const FILE = require('../nkcModules/file');
   const draft = await DraftModel.findOne({did});
@@ -581,6 +582,45 @@ schema.statics.saveUserBanner = async (uid, file) => {
 };
 
 /*
+* 更新用户主页的背景
+* @param {String} uid 用户 ID
+* @param {File} file
+* @return {Object} attachment 对象
+* */
+schema.statics.saveUserHomeBanner = async (uid, file) => {
+  const AttachmentModel = mongoose.model('attachments');
+  const UserModel = mongoose.model('users');
+  const time = new Date();
+  const aid = await AttachmentModel.getNewId();
+  const FILE = require('../nkcModules/file');
+  const ext = await FILE.getFileExtension(file, ['jpeg', 'png', 'jpg']);
+  const attachment = await AttachmentModel.createAttachmentAndPushFile({
+    aid,
+    file,
+    ext,
+    uid,
+    sizeLimit: 20 * 1024 * 1024,
+    time,
+    type: 'userBanner',
+    images: [
+      {
+        type: 'def',
+        name: `${aid}.${ext}`,
+        height: 180,
+        width: 1270,
+        quality: 95
+      }
+    ]
+  });
+  await UserModel.updateOne({uid}, {
+    $set: {
+      homeBanner: attachment._id
+    }
+  });
+  return attachment;
+};
+
+/*
 * 保存专栏头像
 * @param {Number} columnId 专栏 ID
 * @param {File} file 文件对象
@@ -701,6 +741,68 @@ schema.statics.saveColumnBanner = async (columnId, file) => {
     await log.save();
   }
   return attachment;
+}
+
+schema.statics.saveBookCover = async (bookId, file) => {
+  const AttachmentModel = mongoose.model('attachments');
+  const BookModel = mongoose.model('books');
+  const FILE = require('../nkcModules/file');
+  const ext = await FILE.getFileExtension(file, ['jpg', 'png', 'jpeg']);
+  const aid = await AttachmentModel.getNewId();
+  const time = new Date();
+  const attachment = await AttachmentModel.createAttachmentAndPushFile({
+    aid,
+    file,
+    ext,
+    sizeLimit: 20 * 1024 * 1024,
+    time,
+    type: 'bookCover',
+    images: [
+      {
+        type: 'def',
+        name: `${aid}.${ext}`,
+        height: 300,
+        width: 900,
+        quality: 90
+      }
+    ]
+  });
+  await BookModel.updateOne({_id: bookId}, {
+    $set: {
+      cover: attachment._id
+    }
+  });
+}
+
+schema.statics.saveDocumentCover = async (documentId, file) => {
+  const AttachmentModel = mongoose.model('attachments');
+  const DocumentModel = mongoose.model('documents');
+  const FILE = require('../nkcModules/file');
+  const ext = await FILE.getFileExtension(file, ['jpg', 'png', 'jpeg']);
+  const aid = await AttachmentModel.getNewId();
+  const time = new Date();
+  const attachment = await AttachmentModel.createAttachmentAndPushFile({
+    aid,
+    file,
+    ext,
+    sizeLimit: 20 * 1024 * 1024,
+    time,
+    type: 'documentCover',
+    images: [
+      {
+        type: 'def',
+        name: `${aid}.${ext}`,
+        height: 300,
+        width: 600,
+        quality: 90
+      }
+    ]
+  });
+  await DocumentModel.updateOne({_id: documentId}, {
+    $set: {
+      cover: attachment._id
+    }
+  });
 }
 
 /*

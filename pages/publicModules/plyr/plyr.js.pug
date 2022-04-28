@@ -50,7 +50,7 @@ if !isIncluded('plyr')
             size = NKC.methods.tools.getSize(size);
             const url = audio.find('audio source').attr('src');
             // var url = "/r/" + rid + "?d=attachment";
-            var appAudio = $('<div class="app-audio"><div class="fa fa-play app-audio-icon" onclick="NKC.methods.rn.updateMusicListAndPlay(\'' + rid
+            var appAudio = $('<div class="app-audio"><div class="fa fa-play app-audio-icon" onclick="NKC.methods.updateAppMusicListAndPlay(\'' + rid
               + '\')"></div><div class="app-audio-container"><a class="app-audio-title" data-url="'+url+'" data-type="downloadPanel" data-id="' + rid
               + '">' + title
               + '</a><div class="app-audio-info"><span class="m-r-05">' + size
@@ -85,7 +85,6 @@ if !isIncluded('plyr')
         for(var i = 0; i < videos.length; i++) {
           var video = videos.eq(i);
           var title = video.attr("data-plyr-title");
-          var rid = video.attr("data-rid");
           var plyrDom = video.find('.plyr-dom');
           //- 通过 查看  video标签上 data-video-init 来判断 视频是否已经初始化
           //- true 代表已经初始化

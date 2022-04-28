@@ -24,6 +24,7 @@ if data.user
 
     .m-a-1
       include ../management/management
+      +managementPanel(data.managementData)
       //include ../subscribeTypes/subscribeTypesPanel
       include ../apps/apps
     if data.user && state.subForums && state.subForums.length > 0

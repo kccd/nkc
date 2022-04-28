@@ -1,3 +1,7 @@
+import {getCommentEditorConfigs} from '../../lib/js/editor';
+import Editor from '../../lib/vue/Editor';
+import {toLogin} from "../../lib/js/account";
+
 class SinglePostModule {
   constructor() {
     this.editors = {};
@@ -154,7 +158,7 @@ class SinglePostModule {
     }
     this.getPostComments(pid, page)
       .then(data => {
-       
+
         const { tid, htmlContent, paging, postPermission } = data;
         // htmlContent 是打开评论后显示的内容
         if(!window.UE && $(htmlContent).children('div').length <1) return screenTopWarning(`当前没有评论。如果要发表评论，请先登录。`);
@@ -174,6 +178,7 @@ class SinglePostModule {
         self.postPermission = postPermission;
         self.tid = tid;
         self.sendAnonymousPost = data.sendAnonymousPost;
+        //获取编辑器上的提示
         const comments = this.createCommentElements(pid);
         comments.html(htmlContent);
         loading.remove();
@@ -222,11 +227,9 @@ class SinglePostModule {
       });
   }
   initNKCSource() {
-    floatUserPanel.initPanel();
+    // floatUserPanel.initPanel();
     NKC.methods.initSharePanel();
     NKC.methods.initPostOption();
-    NKC.methods.initStickerViewer();
-    if (!NKC.configs.isApp) NKC.methods.initImageViewer();
     NKC.methods.replaceNKCUrl();
     NKC.methods.initVideo();
   }
@@ -249,6 +252,7 @@ class SinglePostModule {
     button.attr("data-show-number", "true");
     this.renderPostCommentNumber(pid);
   }
+  //显示评论按钮或折叠评论按钮
   renderPostCommentNumber(pid) {
     const button = this.getCommentButton(pid);
     const number = Number(button.attr("data-number"));
@@ -306,6 +310,7 @@ class SinglePostModule {
   getEditorAppData(pid) {
     return this.editors[pid];
   }
+
   // 获取编辑器dom
   getEditorApp(pid, parentDom, props = {}) {
     props.keepOpened = props.keepOpened || false;
@@ -320,16 +325,10 @@ class SinglePostModule {
       warningDom.html(this.postPermission.warning);
       editorContainer.append(warningDom);
       let editorDom, app;
-      if (this.postPermission.permit) {
-        editorDom = $(
-          `<div class="single-comment-editor" id="singlePostEditor_${pid}">`
-        );
-        const promptDom = $(
-          `<div class="single-comment-prompt">200字以内，仅用于支线交流，主线讨论请采用回复功能。</div>`
-        );
-        const buttonDom = $(
-          `<div class="single-comment-button" data-type="${pid}"></div>`
-        );
+      if(this.postPermission.permit) {
+        editorDom = $(`<div class="single-comment-editor" id="singlePostEditor_${pid}"><editor :configs="editorConfigs" ref="singleEditor_${pid}" @ready="removeEvent" :plugs="editorPlugs" /></div>`);
+        const promptDom = $(`<div class="single-comment-prompt">200字以内，仅用于支线交流，主线讨论请采用回复功能。</div>`);
+        const buttonDom = $(`<div class="single-comment-button" data-type="${pid}"></div>`);
         const onclick = `NKC.methods.${cancelEvent}("${pid}", true)`;
         if (this.sendAnonymousPost) {
           buttonDom.append(
@@ -380,11 +379,40 @@ class SinglePostModule {
         singleCommentBottom.append(editorContainer);
       }
 
-      if (editorDom) {
-        app = UE.getEditor(
-          editorDom.attr("id"),
-          NKC.configs.ueditor.commentConfigs
-        );
+
+      if(editorDom) {
+        const singleEditor = new Vue({
+          el: `#singlePostEditor_${pid}`,
+          data: {
+            editorPlugs: {
+              resourceSelector: true,
+              draftSelector: true,
+              stickerSelector: true,
+              xsfSelector: true,
+              mathJaxSelector: true,
+            }
+          },
+          mounted() {
+          },
+          computed: {
+            editorConfigs() {
+              return getCommentEditorConfigs();
+            },
+          },
+          components: {
+            'editor': Editor,
+          },
+          methods: {
+            removeEvent() {
+              this.$refs[`singleEditor_${pid}`].removeNoticeEvent();
+            },
+            getRef() {
+              return this.$refs[`singleEditor_${pid}`];
+            }
+          },
+        });
+        app = singleEditor.getRef();
+        // app = UE.getEditor(editorDom.attr('id'), NKC.configs.ueditor.commentConfigs);
       }
 
       editorContainer.hide();
@@ -404,8 +432,8 @@ class SinglePostModule {
   }
   // 打开回评输入框
   switchCommentForm(pid) {
-    if (!NKC.configs.uid) {
-      return NKC.methods.toLogin();
+    if(!NKC.configs.uid) {
+      return toLogin();
     }
     const singleComment = this.getSingleComment(pid);
     singleComment.find(".single-post-comment-error").remove();

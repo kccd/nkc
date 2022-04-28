@@ -13,7 +13,7 @@ block title
         height: 3rem;
       }
 block content
-  #data.hidden=objToStr({uid: data.targetUser.uid})
+  #data.hidden=objToStr({uid: data.targetUser.uid, momentsData: data.momentsData})
   .container-fluid.max-width
     include ../publicModules/mobile_drawer/mobile_drawer
     .row
@@ -61,7 +61,7 @@ block content
               if data.user
                 span.hidden-info 「信息不可见」
               else
-                span.pointer.hidden-info(onclick=`NKC.methods.toLogin()`) 「登录后可见」
+                span.pointer.hidden-info(onclick=`RootApp.openLoginPanel()`) 「登录后可见」
             else
               span=data.targetUser.username || data.targetUser.uid
           if data.targetUser.destroyed
@@ -72,8 +72,8 @@ block content
               include ./module_user_grade
             .user-certs=data.targetUser.info.certsName
             div
-              -const targetUserScores = data.targetUserScores;
               include ../publicModules/userScores
+              +userScores(data.targetUserScores)
           if !data.user || data.user.uid !== data.targetUser.uid
             .user-card-panel
               .user-button
@@ -91,9 +91,9 @@ block content
                   else
                     a(onclick=`NKC.methods.addUserToBlacklist("${data.targetUser.uid}", 'userCard')`) 加黑
                 else
-                  a(onclick="Login.open()") 私信
-                  a(onclick="Login.open()") 关注
-                  a(onclick="Login.open()") 加黑
+                  a(onclick="RootApp.openLoginPanel()") 私信
+                  a(onclick="RootApp.openLoginPanel()") 关注
+                  a(onclick="RootApp.openLoginPanel()") 加黑
           .user-number
             .col-xs-4
               .number=data.targetUser.threadCount - data.targetUser.disabledThreadsCount
@@ -113,7 +113,7 @@ block content
               if data.user
                 span.hidden-info 「信息不可见」
               else
-                span.pointer.hidden-info(onclick=`NKC.methods.toLogin()`) 「登录后可见」
+                span.pointer.hidden-info(onclick=`RootApp.openLoginPanel()`) 「登录后可见」
             else
               span!=markdown_safe(data.targetUser.description || "")
           .user-register.p-b-1=`${format("YYYY/MM/DD", data.targetUser.toc)}注册，${fromNow(data.targetUser.tlv)}活动`
@@ -162,7 +162,14 @@ block content
                 a.pointer.button(onclick="selectAll()") 全选
                 a.pointer.button.radius-right(onclick="toColumn()") 推送到专栏
           include ../publicModules/paging/paging
-          if data.t === "thread" || !data.t
+          if !data.t
+            if !data.momentsData || data.momentsData.length === 0
+              .user-list-warning 空空如也~
+            else
+              .p-t-1
+                #moment
+                  moments(:moments="momentsData")
+          else if ['thread', 'post'].includes(data.t)
             if data.posts.length === 0
               .user-list-warning 用户貌似未发表过任何内容~
             else
@@ -170,13 +177,13 @@ block content
               for post, index in data.posts
                 if index
                   hr
-                if data.paging.page === 0 && !data.t
+                if data.paging.page === 0 && data.t === 'post'
                   if index > 2 && !insert
                     -insert = true;
                     include ./summary
                     hr
                 include ./single_post
-              if data.paging.page === 0 && !data.t
+              if data.paging.page === 0 && data.t === 'post'
                 if !insert
                   include ./summary
           else
@@ -232,6 +239,8 @@ block content
             include ./side_user_list
 
 block scripts
+  if !data.t
+    include ../publicModules/moment/momentSource
   include ../publicModules/toTop/toTop
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatForumPanel/floatForumPanel
@@ -244,6 +253,6 @@ block scripts
     -const column = state.userColumn;
     include ../publicModules/toColumn/toColumn
   +includeJS("/echarts/dist/echarts.min.js")
-  if !data.t || data.paging.page !== 0
+  if data.t === 'post' || data.paging.page !== 0
     +includeJS("/user/summary.js")
   +includeJS("/user/user.js")

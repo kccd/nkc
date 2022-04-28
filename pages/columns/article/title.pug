@@ -1,0 +1,44 @@
+//-  文章的标题,作者等
+
+  @params {String} t 文章标题
+  @params {Array} authorInfos 文章作者
+
+  @params {String} uid 用户id
+  @params {String} userAvatar
+
+  @params {String} toc  文章创建时间
+  @params {String} originState  文章源
+  @params {String} name 专栏名
+  @params {String} _id 专栏ID
+mixin title(data)
+  -var {t, authorInfos, uid, toc, originState, name, _id, user} = data
+  +includeCSS('/columns/article/title.css')
+  .common-article-head
+    //-  hover显示作者信息
+    h1.common-article-title=t
+    p
+      if authorInfos
+        for authorInfo in authorInfos
+          span=authorInfo.name
+          span.common-article-author.fa.fa-envelope-open-o(onclick="displayAuthor('"+objToStr(authorInfo.contractObj)+"')")
+    p
+      if authorInfos
+        for authorInfo in authorInfos
+          span.common-article-author=authorInfo.agency
+    .common-article-info
+      a.common-article-author.jump.m-r-1(href=`/u/${uid}` target="_blank"
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        data-global-data=objToStr({uid})
+      )
+        img(src=tools.getUrl('userAvatar', user.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+        if authorInfos && authorInfos[0]
+          span.kcid=user.username
+      span.modify-time.m-r-1=`${dateString(toc)}`
+      if ['3','4','5','6'].includes(originState)
+        span#dropdown.m-r-1.origin.fa.fa-caret-square-o-down.origin-icon.dropdown(onclick="originTitle()") 原创
+          .dropdown-menu(aria-labelledby='dropdown-level')
+            span(style="padding:5px")!=`${getOriginLevel(originState)}`
+      a.column.jump.m-r-1(href=`/m/${_id}` target="_blank")=name
+  block scripts
+    +includeJS('/columns/article/title.js')

@@ -1,24 +1,23 @@
+import {
+  RNCloseWebview,
+  RNLogout,
+  RNOpenUpgradePage,
+} from "../../lib/js/reactNative";
+import {sweetError} from "../../lib/js/sweetAlert";
+
 window.closeWin = function() {
-  if(NKC.configs.platform === 'apiCloud') {
-    api.closeWin();
-  } else if(NKC.configs.platform === 'reactNative') {
-    NKC.methods.rn.emit('closeWebView', {drawer: true});
-  }
+  RNCloseWebview('closeWebView', {drawer: true});
 };
 window.logout = function() {
   nkcAPI("/logout", "GET")
     .then(() => {
-      if(NKC.configs.platform === 'apiCloud') {
-        emitEvent("logout");
-      } else if(NKC.configs.platform === 'reactNative') {
-        NKC.methods.rn.emit('logout');
-      }
+      RNLogout();
     })
     .catch(data => {
-      screenTopWarning(data);
+      sweetError(data);
     })
 };
 
-window.updateApp = function() {
-  NKC.methods.rn.emit('check_and_update_app');
+window.openUpgradePage = function() {
+  RNOpenUpgradePage();
 }

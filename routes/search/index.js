@@ -86,9 +86,13 @@ router
       options.fid = fidOfCanGetThreads;
     }
 
+    if(t === 'document_article' || t === 'document_comment') {
+      options.fid = [];
+    }
+
     // 加载分页设置
     const {searchThreadList, searchAllList, searchPostList, searchUserList,
-      searchColumnList, searchResourceList
+      searchColumnList, searchResourceList, searchDocumentList
     } = (await db.SettingModel.findById("page")).c;
 
     // 用户输入了搜索的关键词，进入高级搜索。
@@ -102,7 +106,6 @@ router
         resource.highlight = r.highlight;
         return resource;
       });
-
       // 根据分页设置，计算分页
       let perpage;
       if(t === "user") {
@@ -118,6 +121,8 @@ router
         perpage = searchColumnList;
       } else if(t === "resource") {
         perpage = searchResourceList;
+      } else if(t === 'document_article' || t === 'document_comment') {
+        perpage = searchDocumentList;
       } else {
         perpage = searchAllList;
         if(searchUserFromMongodb) {
@@ -150,6 +155,8 @@ router
       const columnId = new Set();
       const columnPageId = new Set();
       const resourceId = new Set();
+      const articleDocumentId = new Set();
+      const commentDocumentId = new Set();
       let threadCategoriesId = [];
       const highlightObj = {};
       results.map(r => {
@@ -164,34 +171,41 @@ router
           columnPageId.add(r.tid);
         } else if(r.docType === "resource") {
           resourceId.add(r.tid);
+        } else if(r.docType === "document_article") {
+          articleDocumentId.add(r.tid);
+        } else if(r.docType === "document_comment") {
+          commentDocumentId.add(r.tid);
         }
-
         if(r.highlight) {
-          if(r.docType === "post" || r.docType === "thread") {
-            highlightObj[r.pid + "_title"] = r.highlight.title;
+          if(r.docType === "post" || r.docType === "thread" || r.docType === 'document_article' || r.docType === 'document_comment') {
+            let _id =r.pid;
+            if(r.docType === 'document_article' || r.docType === 'document_comment') {
+              _id = r.tid;
+            }
+            highlightObj[_id + "_title"] = r.highlight.title;
             if(r.highlight.content) {
-              highlightObj[r.pid + "_content"] = "内容：" + r.highlight.content;
+              highlightObj[_id + "_content"] = "内容：" + r.highlight.content;
             }
             if(r.highlight.keywordsEN) {
-              highlightObj[r.pid + "_keywordsEN"] = "关键词：" + r.highlight.keywordsEN;
+              highlightObj[_id + "_keywordsEN"] = "关键词：" + r.highlight.keywordsEN;
             }
             if(r.highlight.keywordsCN) {
-              highlightObj[r.pid + "_keywordsCN"] = "关键词：" + r.highlight.keywordsCN;
+              highlightObj[_id + "_keywordsCN"] = "关键词：" + r.highlight.keywordsCN;
             }
             if(r.highlight.abstractEN) {
-              highlightObj[r.pid + "_abstractEN"] = "Abstract：" + r.highlight.abstractEN;
+              highlightObj[_id + "_abstractEN"] = "Abstract：" + r.highlight.abstractEN;
             }
             if(r.highlight.abstractCN) {
-              highlightObj[r.pid + "_abstractCN"] = "摘要：" + r.highlight.abstractCN;
+              highlightObj[_id + "_abstractCN"] = "摘要：" + r.highlight.abstractCN;
             }
             if(r.highlight.pid) {
-              highlightObj[r.pid + "_pid"] = "文号：" + r.highlight.pid;
+              highlightObj[_id + "_pid"] = "文号：" + r.highlight.pid;
             }
             if(r.highlight.aid) {
-              highlightObj[r.pid + "_aid"] = "基金编号：" + r.highlight.aid;
+              highlightObj[_id + "_aid"] = "基金编号：" + r.highlight.aid;
             }
             if(r.highlight.authors) {
-              highlightObj[r.pid + "_authors"] = "作者：" + r.highlight.authors;
+              highlightObj[_id + "_authors"] = "作者：" + r.highlight.authors;
             }
           } else if(r.docType === "user") {
             if(r.highlight.username) {
@@ -223,7 +237,7 @@ router
             }
           }
         }
-
+        
       });
       const posts = await db.PostModel.find({pid: {$in: [...pids]}, reviewed: true});
       posts.map(post => {
@@ -282,6 +296,21 @@ router
         const category = threadCategories[i];
         threadCategoriesObj[category.nodeId] = category;
       }
+
+      const articlesObj = {};
+      const commentObj = {}
+      const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
+      let articles = await db.ArticleModel.find({did: {$in: [...articleDocumentId]}, status: normalStatus});
+      let comments = await db.CommentModel.find({did: {$in: [...commentDocumentId]}, status: normalStatus});
+      articles = await db.ArticleModel.getArticlesInfo(articles);
+      comments = await db.CommentModel.getCommentInfo(comments);
+      for(const a of articles) {
+        articlesObj[a.did] = a;
+      }
+      for(const c of comments) {
+        commentObj[c.did] = c;
+      }
+
       // 根据文档类型，拓展数据
       loop1:
       for(const result of results) {
@@ -306,8 +335,6 @@ router
             if(!ctx.permission("displayDisabledPosts")) {
               m.disabled = false;
             }
-            // const obj = await db.ThreadModel.getPostStep(thread.tid, m);
-            // link = `/t/${thread.tid}?page=${obj.page}&highlight=${post.pid}#${post.pid}`;
             link = await db.PostModel.getUrl(post);
           }
 
@@ -420,6 +447,74 @@ router
           };
           r.t = nkcRender.htmlFilter(r.t);
           r.c = nkcRender.htmlFilter(r.c);
+        } else if(docType === 'document_article') {
+          //article文章搜索
+          const article = articlesObj[tid];
+          if(!article) continue;
+          const {document, user, column = ''} = article;
+          const articleUser = userObj[user.uid];
+          r = {
+            source: article.source,
+            docType,
+            documentId: document._id,
+            articleId: article._id,
+            link: article.url,
+            title: highlightObj[`${tid}_title`] || document.title || article.title,
+            abstract:
+              highlightObj[`${tid}_pid`] ||
+              highlightObj[`${tid}_aid`] ||
+              highlightObj[`${tid}_authors`] ||
+              highlightObj[`${tid}_keywordsEN`] ||
+              highlightObj[`${tid}_keywordsCN`] ||
+              highlightObj[`${tid}_abstractEN`] ||
+              highlightObj[`${tid}_abstractCN`] ||
+              highlightObj[`${tid}_content`] ||
+              "内容：" + nkcModules.apiFunction.obtainPureText(document.content, true, 200),
+            documentTime: document.toc,
+            articleTime: article.toc,
+            tid: document.did,
+            anonymous: document.anonymous,
+          }
+          if(!document.anonymous) {
+            r.documentUser = {
+              uid: articleUser.uid,
+              avatar: articleUser.avatar,
+              username: articleUser.username
+            }
+          }
+          if(column) {
+            r.column = column;
+          }
+          r.title = nkcRender.htmlFilter(r.title);
+          r.abstract = nkcRender.htmlFilter(r.abstract);
+        } else if(docType === 'document_comment') {
+          //comment搜索
+          const comment = commentObj[tid];
+          if(!comment) continue;
+          const {uid, commentDocument, articleDocument, url} = comment;
+          const commentUser = userObj[uid];
+          r = {
+            source: commentDocument.source,
+            documentId: commentDocument._id,
+            commentId: comment._id,
+            docType,
+            articleUrl: url,
+            articleTitle: articleDocument.title,
+            abstract:
+              highlightObj[`${tid}_authors`] ||
+              highlightObj[`${tid}_content`] ||
+              "内容：" + nkcModules.apiFunction.obtainPureText(commentDocument.content, true, 200),
+            articleTime: articleDocument.toc,
+            commentTime: commentDocument.toc,
+            user: commentUser,
+          };
+          if(!commentDocument.anonymous) {
+            r.commentUser = {
+              uid: commentUser.uid,
+              avatar: commentUser.avatar,
+              username: commentUser.username
+            }
+          }
         }
         data.results.push(r);
       }

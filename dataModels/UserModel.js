@@ -1,5 +1,4 @@
 const settings = require('../settings');
-const cheerio = require("cheerio");
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const getRedisKeys = require('../nkcModules/getRedisKeys');
@@ -145,6 +144,11 @@ const userSchema = new Schema({
   banner: {
     type: String,
     default: ""
+  },
+  //用户个人主页背景
+  homeBanner: {
+    type: String,
+    default: '',
   },
   // 支持数
   voteUpCount: {
@@ -410,7 +414,150 @@ userSchema.methods.getUsersThreads = async function() {
   let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: recycleId}, recycleMark: {"$nin":[true]}}).sort({toc: -1}).limit(8);
   return await ThreadModel.extendThreads(threads);
 };
+/*返回我看过的用户
+* @param {String} uid 用户id
+*/
+userSchema.statics.visitUserLogs = async (uid)=>{
+  const tools = require('../nkcModules/tools');
+  const UserModel = mongoose.model('users');
+  const UsersBehaviorModel = mongoose.model('usersBehaviors');
 
+  const visitUserlogs = await UsersBehaviorModel.find({ uid: uid, operationId: "visitUserCard", toUid: { $ne: uid } }, { uid: 1, toUid: 1, timeStamp: 1 }).sort({ timeStamp: -1 }).limit(25);
+  let usersId = visitUserlogs.map(u => u.toUid);
+  const users = await UserModel.find({ uid: { $in: usersId } });
+  const usersObj = {};
+  users.forEach(u =>{
+    u.avatar = tools.getUrl('userAvatar', u.avatar)
+    usersObj[u.uid] = u
+  });
+  const visitUsersId = [];
+  const newVisitUserLogs = []
+  for (let log of visitUserlogs) {
+    const user = usersObj[log.toUid];
+    if (user && !visitUsersId.includes(user.uid)) {
+      visitUsersId.push(user.uid);
+      log = log.toObject();
+      log.targetUser = user;
+      newVisitUserLogs.push(log);
+    }
+  }
+  return newVisitUserLogs
+}
+/* 返回我的读者排名
+* @param {String} uid 用户id
+*/
+userSchema.statics.visitSelfLogs = async (uid) =>{
+  const tools = require('../nkcModules/tools');
+  const UserModel = mongoose.model('users');
+  const UsersBehaviorModel = mongoose.model('usersBehaviors');
+
+  const visitSelfLogs = await UsersBehaviorModel.find({ uid: { $nin: ["", uid] }, operationId: "visitUserCard", toUid: uid }, { uid: 1, toUid: 1, timeStamp: 1 }).sort({ timeStamp: -1 }).limit(25);
+  let usersId = visitSelfLogs.map(u => u.uid);
+  const users = await UserModel.find({ uid: { $in: usersId } });
+  const usersObj = {};
+  users.forEach(u =>{
+    u.avatar = tools.getUrl('userAvatar', u.avatar);
+    usersObj[u.uid] = u;
+  });
+  const visitSelfUsersId = [];
+  const newVisitSelfLogs = [];
+  for (let log of visitSelfLogs) {
+    const user = usersObj[log.uid];
+    if (user && !visitSelfUsersId.includes(user.uid)) {
+      visitSelfUsersId.push(user.uid);
+      log = log.toObject();
+      log.user = user;
+      newVisitSelfLogs.push(log);
+    }
+  }
+  return newVisitSelfLogs
+}
+/* 查找看过的用户和我的读者排名
+* param {String} uid 用户id
+*/
+
+// userSchema.statics.visit = async (uid) =>{
+//   const UserModel = mongoose.model('users');
+//   const UsersBehaviorModel = mongoose.model('usersBehaviors');
+//   const tools = require('../nkcModules/tools');
+
+//    // 看过的用户
+//    const visitUserlogs = await UsersBehaviorModel.find({ uid: uid, operationId: "visitUserCard", toUid: { $ne: uid } }, { uid: 1, toUid: 1, timeStamp: 1 }).sort({ timeStamp: -1 }).limit(25);
+//    // 我的读者排名
+//    const visitSelfLogs = await UsersBehaviorModel.find({ uid: { $nin: ["", uid] }, operationId: "visitUserCard", toUid: uid }, { uid: 1, toUid: 1, timeStamp: 1 }).sort({ timeStamp: -1 }).limit(25);
+//    let usersId = visitUserlogs.map(u => u.toUid);
+//    usersId = usersId.concat(visitSelfLogs.map(u => u.uid));
+//    const users = await UserModel.find({ uid: { $in: usersId } });
+//    const usersObj = {};
+//    users.map(u =>{
+//     u.avatar = tools.getUrl('userAvatar', u.avatar)
+//     return usersObj[u.uid] = u
+//   });
+//    const data = {};
+//    data.visitUserLogs = [];
+//    const visitUsersId = [];
+//    const visitSelfUsersId = [];
+//    data.visitSelfLogs = [];
+//    for (let log of visitUserlogs) {
+//      const user = usersObj[log.toUid];
+//      if (user && !visitUsersId.includes(user.uid)) {
+//        visitUsersId.push(user.uid);
+//        log = log.toObject();
+//        log.targetUser = user;
+//        data.visitUserLogs.push(log);
+//      }
+//    }
+//    for (let log of visitSelfLogs) {
+//      const user = usersObj[log.uid];
+//      if (user && !visitSelfUsersId.includes(user.uid)) {
+//        visitSelfUsersId.push(user.uid);
+//        log = log.toObject();
+//        log.user = user;
+//        data.visitSelfLogs.push(log);
+//      }
+//    }
+//    return data;
+// }
+/*
+* 返回 用户近期阅读文章
+* param {String} uid 用户id
+*/
+userSchema.statics.recentReading = async (uid) =>{
+  const ThreadModel = mongoose.model('threads');
+  const UsersBehaviorModel = mongoose.model('usersBehaviors');
+
+  const logs = await UsersBehaviorModel.find({ uid, operationId: "visitThread" }, { tid: 1, timeStamp: 1 }).sort({ timeStamp: -1 }).limit(25);
+  const threadsId = logs.map(l => l.tid);
+  let threads = await ThreadModel.find({ tid: { $in: threadsId } });
+  threads = await ThreadModel.extendThreads(threads, {
+    forum: false,
+    category: false,
+    firstPost: true,
+    firstPostUser: true,
+    userInfo: false,
+    lastPost: false,
+    lastPostUser: false,
+    firstPostResource: false,
+    htmlToText: false,
+    count: 200,
+    showAnonymousUser: false,
+    excludeAnonymousPost: false,
+  });
+  const threadsObj = {};
+  threads.map(t => threadsObj[t.tid] = t);
+  const inserted = [];
+  const visitThreadLogs = [];
+  for (let log of logs) {
+    const thread = threadsObj[log.tid];
+    if (thread && !inserted.includes(thread.tid)) {
+      inserted.push(thread.tid);
+      log = log.toObject();
+      log.thread = thread;
+      visitThreadLogs.push(log);
+    }
+  }
+  return visitThreadLogs
+}
 
 /*
 * 拓展多个用户的隐私信息 手机号、邮箱等
@@ -594,9 +741,12 @@ userSchema.methods.updateUserMessage = async function() {
 		operationId: 'violation'
 	});
 
+  const {post: postSource} = await PostsVoteModel.getVoteSources();
+
   let voteUpCount = await PostsVoteModel.aggregate([
     {
       $match: {
+        source: postSource,
         tUid: this.uid,
         type: "up"
       }
@@ -612,6 +762,7 @@ userSchema.methods.updateUserMessage = async function() {
   let voteDownCount = await PostsVoteModel.aggregate([
     {
       $match: {
+        source: postSource,
         tUid: this.uid,
         type: "down"
       }
@@ -790,8 +941,9 @@ userSchema.statics.createUser = async (option) => {
 };
 
 userSchema.methods.extendDraftCount = async function() {
-  return this.draftCount = await mongoose.model("draft").countDocuments({uid: this.uid});
+  return this.draftCount = await mongoose.model("drafts").countDocuments({uid: this.uid});
 };
+
 
 userSchema.methods.extendGrade = async function() {
 	const UsersGradeModel = mongoose.model('usersGrades');
@@ -1014,7 +1166,8 @@ userSchema.statics.extendUsersInfo = async (users) => {
         name: column.name,
         banner: column.banner,
         avatar: column.avatar,
-        abbr: column.abbr
+        abbr: column.abbr,
+        subCount: column.subCount,
       }
     }
     for(const cert of certs) {
@@ -2313,6 +2466,39 @@ userSchema.methods.getUserOperationsId = async function() {
   }
   return [...new Set(operations)];
 };
+
+/*
+* 判断用户是否拥有某个权限
+* @param {String} operationId 权限名
+* @return {Boolean}
+* */
+userSchema.methods.hasPermission = async function(operationId) {
+  const operationsId = await this.getUserOperationsId();
+  return operationsId.includes(operationId);
+}
+
+/*
+* 判断用户是拥有指定权限集合中的某一个权限
+* @param {[String]} operationsId 权限名组成的数组
+* @return {Boolean}
+* */
+userSchema.methods.hasPermissionOr = async function(operationsId = []) {
+  const userOperationsId = await this.getUserOperationsId();
+  const newOperationsId = new Set(userOperationsId.concat(operationsId));
+  return newOperationsId.size !== (userOperationsId.length + operationsId.length);
+};
+
+/*
+* 判断用户是否拥有指定的所有权限
+* @param {[String]} operationsId 权限名组成的数组
+* @return {Boolean}
+* */
+userSchema.methods.hasPermissionAnd = async function(operationsId = []) {
+  const userOperationsId = await this.getUserOperationsId();
+  const newOperationsId = new Set(userOperationsId.concat(operationsId));
+  return newOperationsId.size === userOperationsId.length;
+}
+
 /*
 * 判断用户是否为顶级专家
 * @return {Boolean}
@@ -2471,26 +2657,8 @@ userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
   }
   const shouldVerifyPhoneNumber = await UsersPersonalModel.shouldVerifyPhoneNumber(uid);
   if(shouldVerifyPhoneNumber) {
-    const authSettings = await SettingModel.getSettings("auth");
-    const {
-      type: verifyPhoneNumberType,
-      reviewPostContent,
-      disablePublishContent
-    } = authSettings.verifyPhoneNumber;
-    let content;
-    if(verifyPhoneNumberType === 'reviewPost') {
-      content = reviewPostContent;
-    } else {
-      content = disablePublishContent;
-    }
     result.warning = result.warning || '';
-    const $$ = cheerio.load(`<div></div>`);
-    if(verifyPhoneNumberType === 'reviewPost' || !result.warning) {
-      $$('div').text(content);
-    }
-    const a = $$(`<span>请点击 <a href="/u/${uid}/settings/security" target="_blank">这里</a> 去验证手机号。</span>`);
-    $$('div').append(a);
-    result.warning += $$('body').html();
+    result.warning += `<div>请参与定期验证手机号，验证前你所发表的内容需通过审核后才能显示。<a href="/u/${uid}/settings/security" target="_blank">去验证</a></div>`;
   }
   return result;
 };
@@ -2553,6 +2721,21 @@ userSchema.methods.getOnlineStatus = async function() {
   if(this.online === 'app') return '手机在线';
   return '离线';
 };
+/*
+* 设置用户在线状态
+* @param {Boolean} online
+* @return {String} 在线状态
+* */
+userSchema.methods.setOnlineStatus = async function(online) {
+  if(!['', 'web', 'app'].includes(online)) throwErr(500, `用户在线状态设置错误`);
+  this.online = online;
+  await this.updateOne({
+    $set: {
+      online: this.online
+    }
+  });
+  return this.getOnlineStatus();
+}
 
 /*
 * 获取消息通知音链接

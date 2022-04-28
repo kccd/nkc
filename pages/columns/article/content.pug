@@ -1,0 +1,10 @@
+//-  文章正文
+ @param {String} c 文章内容
+mixin content(c)
+  +includeCSS('/columns/article/content.css')
+  //- p.content-title.line-title 正文
+  section.content
+    article!=c
+
+
+

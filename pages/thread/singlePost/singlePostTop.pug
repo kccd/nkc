@@ -6,7 +6,9 @@ if !isIncluded('singlePostTop')
     -var {cancelTopped} = props;
     .single-post-top
       .single-post-avatar(
-        data-float-uid=uid
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        data-global-data=objToStr({uid})
         )
         img(src=avatar class=banned?'user-banned-avatar':'')
       .single-post-user
@@ -15,7 +17,9 @@ if !isIncluded('singlePostTop')
             data-anonymous=!uid
             href=tools.getUrl('userHome', uid)
             target='_blank'
-            data-float-uid=uid
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid})
           )=username
           if !banned
             include ../../user/grade

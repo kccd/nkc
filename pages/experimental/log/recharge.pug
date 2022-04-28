@@ -45,7 +45,11 @@ block content
                 th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
                 th {{record._id}}
                 th
-                  a(:href="'/u/' + record.toUser.uid" target='_blank' :data-float-uid='record.toUser.uid') {{record.toUser.username}}
+                  a(:href="'/u/' + record.toUser.uid" target='_blank'
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    :data-global-data="objToStr({uid: record.toUser.uid})"
+                  ) {{record.toUser.username}}
                 th {{record.num/100}}
                 th {{record.ip}}:{{record.port}}
                 th {{record.verify?"是":"否"}}

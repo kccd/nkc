@@ -250,7 +250,27 @@ schema.statics.getChildCategoryId = async (categoryId) => {
   const results = await mongoose.model("columnPostCategories").getChildCategory(categoryId);
   return results.map(r => r._id);
 };
+/*
+ * 获取专栏下一篇文章的分类及其父级分类 
+ * @param {Array} ids columnPosts表的cid
+ * 
+ */
+schema.statics.getParentCategoryByIds = async (ids)=>{
+  // 只获取了第一个ID
+  const id = ids[0];
+  // console.log(id,'id')
+  const navList = [];
+  const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
 
+  async function currentCategory(id){
+    let nav = await ColumnPostCategoryModel.findOne({_id: id, type:'main'});
+    nav && navList.push(nav) && nav.parentId && await currentCategory(nav.parentId)
+  }
+  await currentCategory(id)
+  return navList.reverse()
+  
+  
+}
 /*
 * 操作分类内容时，移除不在该分类下的置顶文章
 * @param {Number} columnId 专栏ID
@@ -390,6 +410,24 @@ schema.methods.getChildCategories = async function() {
   }).sort({
     order: 1
   });
+}
+
+/*
+* 检测专栏分类是否合法
+* */
+schema.statics.checkColumnCategory = async function(selectCategory) {
+  const {selectedMainCategoriesId, selectedMinorCategoriesId} = selectCategory;
+  const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
+  const arr = selectedMainCategoriesId.concat(selectedMinorCategoriesId);
+  const categories = await ColumnPostCategoryModel.find({_id: {$in: arr}});
+  const obj = {};
+  for(const category of categories) {
+    obj[category._id] = category;
+  }
+  for(const id of arr) {
+    const category = obj[id];
+    if(!category) throwErr(401, `分类Id ${id}无效`);
+  }
 }
 
 module.exports = mongoose.model("columnPostCategories", schema);

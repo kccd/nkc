@@ -77,7 +77,11 @@ mixin renderHome(homeBlock)
                 .home-goods-description=goods.abstract
                 .home-goods-other
                   a.home-goods-user(href=`/u/${goods.user.uid}`)
-                    img(src=tools.getUrl("userAvatar", goods.user.avatar) data-float-uid=goods.user.uid)
+                    img(src=tools.getUrl("userAvatar", goods.user.avatar)
+                      data-global-mouseover="showUserPanel"
+                      data-global-mouseout="hideUserPanel"
+                      data-global-data=objToStr({uid: goods.user.uid})
+                    )
                     span=goods.user.username
                   .home-goods-price
                   if !goods.productSettings.priceShowToVisit && !data.user
@@ -96,7 +100,11 @@ mixin renderHome(homeBlock)
                       .home-goods-price=`￥${minPrice / 100} - ￥${maxPrice / 100}`
         .home-goods-forums 更多请访问：
           for f in data.goodsForums
-            a(href=`/f/${f.fid}` data-float-fid=f.fid)
+            a(href=`/f/${f.fid}`
+              data-global-mouseover="showForumPanel"
+              data-global-mouseout="hideForumPanel"
+              data-global-data=objToStr({fid: f.fid})
+            )
               if f.logo
                 img.home-goods-forum-icon(src=tools.getUrl("forumLogo", f.logo))
               else
@@ -160,26 +168,34 @@ mixin renderHome(homeBlock)
             .home-forums-parent-name=cf.name
             for f in cf.forums
               .home-forums-brief
-                a.home-forums-parent(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+                a.home-forums-parent(href=`/f/${f.fid}`
+                  data-global-mouseover="showForumPanel"
+                  data-global-mouseout="hideForumPanel"
+                  data-global-data=objToStr({fid: f.fid})
+                )=f.displayName
                 if f.childrenForums && f.childrenForums.length
                   span ：
                   for cf, index in f.childrenForums
                     if index !== 0
                       span |
-                    a.home-forums-child(href=`/f/${cf.fid}` data-float-fid=cf.fid style=`background-color: ${hexToRgba(f.color, 0.1)}`)=cf.displayName
+                    a.home-forums-child(href=`/f/${cf.fid}`
+                      data-global-mouseover="showForumPanel"
+                      data-global-mouseout="hideForumPanel"
+                      data-global-data=objToStr({fid: cf.fid})
+                      style=`background-color: ${hexToRgba(f.color, 0.1)}`)=cf.displayName
                       if cf.countPostsToday && cf.countPostsToday > 0
                         sup=cf.countPostsToday
   else if homeBlock._id === 'management'
     if permissionsOr(["nkcManagement", "visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs"])
       .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
         +homeBlockHeader(false, false)
-        -var hidePanelHeader = true;
         include ../publicModules/management/management
+        +managementPanel(homeBlock.data, {hidePanelHeader: true})
   else if homeBlock._id === 'webApply'
     .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
       +homeBlockHeader(false, false)
-      -var hidePanelHeader = true;
       include  ../publicModules/apps/apps
+      +appsPanel(homeBlock.data, {hidePanelHeader: true})
   else
     -var bgColor = homeBlock.blockStyle.backgroundColor || '#fff';
     .home-forums-list.m-b-1(

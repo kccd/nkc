@@ -399,6 +399,7 @@ schema.statics.getHomeBlockData = async (props) => {
   const HomeBlockModel = mongoose.model('homeBlocks');
   const ShopGoodsModel = mongoose.model('shopGoods');
   const {
+    user,
     fidOfCanGetThreads = [],
     showDisabledBlock = false
   } = props;
@@ -416,10 +417,10 @@ schema.statics.getHomeBlockData = async (props) => {
     hotColumns: await ColumnModel.getHomeHotColumns(),
     recommendThreadsMovable: movable,
     recommendThreadsFixed: fixed,
-    management: [],
+    management: await SettingModel.getManagementData(user),
     goods: [],
     forums: [],
-    webApply: [],
+    webApply: await SettingModel.getAppsData(),
   };
   // 热销商品
   if(showShopGoods) {

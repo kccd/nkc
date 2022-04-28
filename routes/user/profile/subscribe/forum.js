@@ -3,6 +3,7 @@ module.exports = async (ctx, next) => {
   let {page = 0, t} = query;
   const {match, forumCategories} = state;
   const fcId = forumCategories.map(f => f._id);
+  data.forumCategories = forumCategories;
   const {targetUser} = data;
   match.uid = targetUser.uid;
   match.type = "forum";

@@ -46,7 +46,11 @@ block nkcContent
                   img(:src="getUrl('sticker', s.rid)" :class="s.size")
               th {{format("YYYY/MM/DD HH:mm:ss", s.toc)}}
               th.user-avatar
-                img(:src="getUrl('userAvatar', s.user.avatar)" :data-float-uid="s.uid")
+                img(:src="getUrl('userAvatar', s.user.avatar)"
+                  data-global-mouseover="showUserPanel"
+                  data-global-mouseout="hideUserPanel"
+                  :data-global-data="objToStr({uid: s.uid})"
+                )
                 a(@click="visitUrl('/u/' + s.uid, true)") {{s.user.username}}
               th
                 span(v-if="s.shared") 已共享
@@ -76,19 +80,19 @@ block nkcContent
                         span 不通过
                     .radio
                       label.m-r-1
-                        input(type="radio" value="md" v-model="s.size")    
+                        input(type="radio" value="md" v-model="s.size")
                         span 大
                       label.m-r-1
-                        input(type="radio" value="sm" v-model="s.size")    
+                        input(type="radio" value="sm" v-model="s.size")
                         span 中
                       label.m-r-1
-                        input(type="radio" value="xs" v-model="s.size")    
-                        span 小    
+                        input(type="radio" value="xs" v-model="s.size")
+                        span 小
                     div(v-if="!s.status")
                       textarea.form-control(rows=3 v-model="s.reason" placeholder="请输入原因")
                     .m-t-05
                       button.btn.btn-primary.btn-xs(@click="submit([s])") 保存
-                else if data.t === "reviewed"      
+                else if data.t === "reviewed"
                   div
                     .radio
                       label.m-r-1
@@ -99,9 +103,9 @@ block nkcContent
                         span 中
                       label
                         input(type="radio" value="xs" v-model="s.size")
-                        span 小    
+                        span 小
                     .m-t-05
-                      button.btn.btn-primary.btn-xs(@click="submitSize([s])") 保存    
+                      button.btn.btn-primary.btn-xs(@click="submitSize([s])") 保存
       include ../../publicModules/paging/paging_input
 
 block nkcScripts

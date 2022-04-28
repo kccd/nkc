@@ -1,0 +1,35 @@
+.jump{
+  color: #337ab7;
+}
+.article-common-nav{
+  font-size: 1.3rem;
+  color: #282c37;
+  font-weight: 700;
+  &:hover{
+    color: #337ab7;
+  }
+}
+
+.jump:hover{
+  cursor: pointer;
+}
+header{
+  .path-navigation{
+    float: left;
+    span{
+      margin:0 5px;
+    }
+  }
+  .info-list {
+    float: right;
+    >span{
+      cursor: pointer;
+      margin:0 5px;
+    }
+  }
+}
+header::after{
+  content: '';
+  display: block;
+  clear: both;
+}

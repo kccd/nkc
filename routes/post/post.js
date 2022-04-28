@@ -54,5 +54,5 @@ router
     const template = Path.resolve("./pages/thread/comments.pug");
     data.html = nkcModules.render(template, data, ctx.state);
     await next();
-  });
+  })
 module.exports = router;

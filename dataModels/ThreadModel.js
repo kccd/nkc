@@ -17,6 +17,7 @@ const threadSchema = new Schema({
     default: 'article',
     index: 1
   },
+  //文章的评论数量
   count: {
     type: Number,
     default: 0
@@ -75,6 +76,7 @@ const threadSchema = new Schema({
 	  index: 1,
     default: false
   },
+  //文章内容第一个pid
   oc: {
     type: String,
     default: '',
@@ -306,6 +308,29 @@ threadSchema.virtual('reason')
 	.set(function(reason) {
 		this._reason = reason;
 	});
+/* 返回此片文章作者的通讯方式
+* @params {String} tid
+*/
+threadSchema.statics.getAuthorCommunicationMode = async (tid)=>{
+  const ThreadModel = mongoose.model('threads')
+  const communication = await ThreadModel.getThreadByTid(tid)
+  let communicationMode = ''
+  try {
+    communicationMode.value = communication.firstPost.authorInfos.contractObj
+  } catch (error) {
+    // const throwError = require("../nkcMOdules/throwError");
+    // throwError(400,'作者没有通讯方式')
+  }
+  return communicationMode
+}
+/*得到该整条记录
+*@params {String} tid
+*/
+threadSchema.statics.getThreadByTid = async (tid)=>{
+  const ThreadModel = mongoose.model('threads')
+  const thread = await ThreadModel.findOne({tid})
+  return await thread.extendFirstPost();
+}
 threadSchema.methods.extendFirstPost = async function() {
   const PostModel = mongoose.model('posts');
   return this.firstPost = await PostModel.findOnly({pid: this.oc})
@@ -771,7 +796,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
   const parentForumsId = new Set(), forumsObj = {}, categoryObj = {}, columnsObj = {};
 
   threads = threads.filter(thread => !!thread);
-
+  
   threads.map(thread => {
     if(!thread) return;
     thread.tcId = thread.tcId || [];
@@ -782,7 +807,6 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       thread.columns = [];
       columnIds = columnIds.concat(thread.columnsId);
       columnIds = [...new Set(columnIds)];
-
     }
     if(o.forum) {
       forumsId = forumsId.concat(thread.mainForumsId);
@@ -1656,7 +1680,7 @@ threadSchema.statics.postNewThread = async (options) => {
   const ThreadModel = mongoose.model("threads");
   const PostModel = mongoose.model("posts");
   const MessageModel = mongoose.model("messages");
-  const DraftModel = mongoose.model("draft");
+  const DraftModel = mongoose.model("drafts");
   const ReviewModel = mongoose.model("reviews");
   // 检测专业ID
   await ForumModel.checkForumCategoryBeforePost(options.fids);
@@ -2186,5 +2210,53 @@ threadSchema.methods.extendThreadCategories = async function() {
   this.threadCategoriesWarning = threadCategoriesWarning;
   return this.threadCategories = threadCategories;
 };
+
+/*
+* 根据专栏引用获取文章thread信息
+* */
+threadSchema.statics.getThreadInfoByColumn = async function(columnPost) {
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const UserModel = mongoose.model('users');
+  const ColumnModel = mongoose.model('columns');
+  const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
+  const ResourceModel = mongoose.model('resources');
+  const {getUrl} = require('../nkcModules/tools');
+  const {tid, pid, columnId, cid, mcid} = columnPost;
+  // thread 中 包括需要的 回复数 观看数
+  let thread = await ThreadModel.findThreadById(tid);
+  thread = thread.toObject()
+  // 文章主体内容
+  let post = await PostModel.getPostByPid(pid)
+  post = post.toObject()
+  // 查找用户
+  let user = await UserModel.findOne({uid: post.uid})
+  user = user.toObject()
+  // 收藏数
+  let collect = await ThreadModel.getCollectedCountByTid(tid)
+  //获取专栏名和id
+  let column = await ColumnModel.findOne({_id: columnId})
+  column = column.toObject()
+  // 获取当前专栏下一篇文章的分类及其父级
+  const mainCategory = await ColumnPostCategoryModel.getParentCategoryByIds(cid)
+  const auxiliaryCategory = await ColumnPostCategoryModel.getMinorCategories(columnId, mcid)
+  //获取文章的链接
+  const url = getUrl('thread', thread.tid);
+  //获取引用的所有资源
+  const resources = await ResourceModel.getResourcesByReference(pid);
+  return {
+    _id: columnPost._id,
+    thread,
+    article:post,
+    column,
+    collectedCount: collect,
+    resources,
+    user,
+    mainCategory,
+    auxiliaryCategory,
+    type: columnPost.type,
+    url,
+  };
+}
 
 module.exports = mongoose.model('threads', threadSchema);

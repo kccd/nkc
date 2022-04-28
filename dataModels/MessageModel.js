@@ -1,5 +1,4 @@
 const settings = require('../settings');
-const SettingModel = require('./SettingModel');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const tools = require("../nkcModules/tools");
@@ -317,6 +316,8 @@ messageSchema.statics.getSystemWarningInfo = async (uid, tUid) => {
 * */
 messageSchema.statics.getParametersData = async (message) => {
   const moment = require("moment");
+  const ArticleModel = mongoose.model("articles");
+  const DocumentModel = mongoose.model("documents");
   const PostModel = mongoose.model("posts");
   const UserModel = mongoose.model("users");
   const ThreadModel = mongoose.model("threads");
@@ -334,7 +335,10 @@ messageSchema.statics.getParametersData = async (message) => {
   const ThreadCategoryModel = mongoose.model('threadCategories');
   const ForumModel = mongoose.model('forums');
   const PreparationForumModel = mongoose.model('pForum');
+  const CommentModel = mongoose.model('comments');
+  const MomentModel = mongoose.model('moments');
   const apiFunction = require("../nkcModules/apiFunction");
+  const {htmlToPlain} = require("../nkcModules/nkcRender");
   const {getUrl, getAnonymousInfo} = require('../nkcModules/tools');
   const timeout = 72 * 60 * 60 * 1000;
   let parameters = {};
@@ -359,6 +363,41 @@ messageSchema.statics.getParametersData = async (message) => {
       postURL: await PostModel.getUrl(post),
       username: user.username,
       userURL: user.uid? getUrl('userHome', user.uid): ''
+    };
+  } else if (type === 'articleAt') {
+    //article文章@用户
+    const {did} = message.c;
+    const {stable: stableType} = await DocumentModel.getDocumentTypes();
+    const {normal: normalStatus} = await DocumentModel.getDocumentStatus();
+    const document = await DocumentModel.findOne({did, type: stableType, status: normalStatus});
+    const user = await UserModel.findOne({uid: document.uid});
+    if(!user) return null;
+    const article = await ArticleModel.findOne({did});
+    if(!article) return null;
+    const articles = await ArticleModel.extendArticles([article]);
+    parameters = {
+      username: user.username,
+      userURL: getUrl('userHome', document.uid),
+      reviewLink: articles[0].url,
+      title: articles[0].title,
+    };
+  } else if(type === 'commentAt') {
+    const {did} = message.c;
+    const {stable: stableType} = await DocumentModel.getDocumentTypes();
+    const {normal: normalStatus} = await DocumentModel.getDocumentStatus();
+    const document = await DocumentModel.findOne({did, type: stableType, status: normalStatus});
+    if(!document) return null;
+    const user = await UserModel.findOne({uid: document.uid});
+    if(!user) return null;
+    const {normal} = await CommentModel.getCommentStatus();
+    let comment = await CommentModel.findOne({did, status: normal});
+    if(!comment) return null;
+    comment = await CommentModel.getCommentInfo([comment]);
+    parameters = {
+      username: user.username,
+      userURL: getUrl('userHome', document.uid),
+      reviewLink: comment[0].url,
+      title: comment[0].articleDocument.title,
     };
   } else if(type === 'xsf') {
     const {pid, num} = message.c;
@@ -674,13 +713,62 @@ messageSchema.statics.getParametersData = async (message) => {
       noticeContent: content,
       cTitle: cTitle,
     };
-  } else if(["newReview", "passReview"].includes(type)) {
+  } else if(["bookInvitation"].includes(type)) {
+    const {bid, name, uid} = message.c;
+    const user = await UserModel.findOnly({uid});
+    const {username} = user;
+    if(!bid) return null;
+    parameters = {
+      reviewLink: `/book/${bid}/member/invitation`,
+      name,
+      username,
+      userURL: `/u/${uid}`,
+    };
+  }else if(["newReview", "passReview"].includes(type)) {
     const {pid} = message.c;
     const post = await PostModel.findOne({pid});
     if(!post) return null;
     parameters = {
       reviewLink: await PostModel.getUrl(post)
     };
+  } else if(["documentFaulty", "documentDisabled", "documentPassReview", "commentFaulty", "commentDisabled", "commentPassReview", "momentDelete", "momentPass"].includes(type)) {
+    //独立文章article 和 评论comment 审核
+    const {docId, reason} = message.c;
+    const document = await DocumentModel.findOne({_id: docId});
+    if(!document) return null;
+    if(document.source === 'article') {
+      let article = await ArticleModel.findOne({did: document.did}).sort({toc: -1});
+      article = await ArticleModel.extendArticles([article]);
+      if(!article[0]) return;
+      parameters = {
+        //获取document所在article的url
+        reviewLink: article[0].url || '',
+        reason: reason?reason:'未知',
+        title: document.title + article[0].url?'':'[文章已被删除]',
+      };
+    } else if (document.source === 'comment') {
+      const comment = await CommentModel.findOnly({_id: document.sid});
+      if(!comment) return;
+      const _comment = await CommentModel.extendReviewComments([comment]);
+      if(!_comment[0]) return;
+      parameters = {
+        //获取document所在comment的url
+        reviewLink: _comment[0].url || '',
+        content: htmlToPlain(document.content, 100),
+        reason: reason?reason:'未知',
+        title: _comment[0].title || '未知',
+      };
+    } else if(document.source === 'moment') {
+      const moment = await MomentModel.findOnly({_id: document.sid});
+      if(!moment) return null;
+      const _moment = (await MomentModel.extendMomentsData([moment]))[document.sid];
+      if(!_moment) return null;
+      parameters = {
+        reviewLink: _moment.url || '',
+        content: htmlToPlain(document.content, 100),
+        reason: reason?reason:'未知',
+      };
+    }
   } else if(["fundAdmin", "fundApplicant", "fundMember", "fundFinishProject"].includes(type)) {
     const {applicationFormId} = message.c;
     let applicationForm = await FundApplicationFormModel.findOne({_id: applicationFormId});
@@ -749,15 +837,16 @@ messageSchema.statics.getParametersData = async (message) => {
     votesId = votesId.map(v => {
       return mongoose.Types.ObjectId(v);
     });
-    const votes = await PostsVoteModel.find({_id: {$in: votesId}}, {
-      pid: 1, uid: 1
+    const {post: postSource} = await PostsVoteModel.getVoteSources();
+    const votes = await PostsVoteModel.find({source: postSource, _id: {$in: votesId}}, {
+      sid: 1, uid: 1
     });
     if(!votes.length) return null;
     const usersId = [];
     let pid = '';
     votes.map(v => {
       usersId.push(v.uid);
-      pid = v.pid;
+      pid = v.sid;
     });
     const users = await UserModel.find({uid: {$in: usersId}}, {username: 1});
     if(!users.length) return null;
@@ -822,6 +911,35 @@ messageSchema.statics.getParametersData = async (message) => {
       // CRTarget = tools.getUrl("library", contentId);
       // 投诉目标描述
       CRTargetDesc = library.name;
+    } else if(complaintType === 'comment') {
+      let comment = await CommentModel.findOne({_id: contentId});
+      if(!comment) return null;
+      comment = await CommentModel.getCommentInfo([comment]);
+      CRType = "评论";
+      // 投诉目标链接
+      CRTarget = comment[0].url;
+      // 投诉目标描述
+      CRTargetDesc = "点击查看";
+    } else if(complaintType === 'article') {
+      let article = await ArticleModel.findOnly({_id: contentId});
+      article = (await ArticleModel.getArticlesInfo([article]))[0];
+      if(!article) return null;
+      CRType = "文章";
+      // 投诉目标链接
+      CRTarget = article.url;
+      // 投诉目标描述
+      CRTargetDesc = "点击查看";
+    } else if(complaintType === 'moment') {
+      //动态投诉处理消息
+      let moment = await MomentModel.findOnly({_id: contentId});
+      if(!moment) return null;
+      moment = (await MomentModel.extendMomentsData([moment]))[contentId];
+      if(!moment) return null;
+      CRType = "动态";
+      //投诉的动态链接
+      CRTarget = moment.url;
+      //投书的动态描述
+      CRTargetDesc = "点击查看";
     } else {
       return null;
     }
@@ -1348,7 +1466,7 @@ messageSchema.statics.extendMessages = async (messages = []) => {
               return `
                 <button class="agree" onclick="window._messageFriendApplication('${uid}', 'agree')">同意</button>
                 <button class="disagree" onclick="window._messageFriendApplication('${uid}', 'disagree')">拒绝</button>
-                <button class="ignored" onclick="window._messageFriendApplication('${uid}', 'ignored')">忽略</button>` 
+                <button class="ignored" onclick="window._messageFriendApplication('${uid}', 'ignored')">忽略</button>`
             } else if(agree === 'true') {
               return `<div class="agree">已同意</div>`
             } else if(agree === 'false') {
@@ -1556,7 +1674,7 @@ messageSchema.statics.mySystemInfoMessageFilter = async (uid, messages) => {
       const userGrade = user.grade._id;
       const tlv = user.tlv;
       const conditionA = (() => {
-        for(cert of userCerts) {
+        for(const cert of userCerts) {
           if(conf.roles.includes(cert)) return true;
         }
       })();
@@ -1571,6 +1689,21 @@ messageSchema.statics.mySystemInfoMessageFilter = async (uid, messages) => {
     }
     return false;
   });
+}
+
+/*
+* 批量发送消息给用户
+* */
+messageSchema.statics.sendMessagesToUser = async function(messages) {
+  const socket = require('../nkcModules/socket');
+  const MessageModel = mongoose.model('messages');
+  for(const message of messages){
+    if(!message) continue;
+    const m = await MessageModel(message);
+    if(!m) continue;
+    m.save();
+    await socket.sendMessageToUser(m._id);
+  }
 }
 
 const MessageModel = mongoose.model('messages', messageSchema);

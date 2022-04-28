@@ -1,3 +1,5 @@
+//创建变量时必须都要使用var,不然使用的文件无法获取到函数内容
+
 var isNode = typeof window === 'undefined';
 
 var Tools = function() {
@@ -30,6 +32,9 @@ var Tools = function() {
       }
       case "userBanner": {
         return fileDomain + "/a/"+ id + t
+      }
+      case "userHomeBanner": {
+        return fileDomain + "/a/"+ id + t;
       }
       case "scoreIcon": {
         if(id === 'default') {
@@ -109,6 +114,10 @@ var Tools = function() {
       case 'mediaPicture': {
         return fileDomain + "/r/" + id + t;
       }
+      // 原图
+      case "resourceOrigin": {
+        return "/ro/" + id + t;
+      }
       // 用户上传的附件
       case "resource": {
         return fileDomain + "/r/" + id + t
@@ -143,6 +152,9 @@ var Tools = function() {
       }
       case "messageUserDetail": {
         return "/u/" + id + "?from=message"
+      }
+      case "statics": {
+        return "/statics/" + id;
       }
       case 'siteFile': {
         return "/statics/site/" + id;
@@ -189,6 +201,55 @@ var Tools = function() {
       case 'lifePhoto': {
         return '/photo/' + id
       }
+      case 'bookCover': {
+        return '/a/' + id + t;
+      }
+      case 'documentCover': {
+        return '/a/' + id;
+      }
+      case 'book': {
+        return '/book/' + id
+      }
+      case 'bookContent': {
+        return '/book/' + id + '?aid=' + size
+      }
+      case 'editBookArticle': {
+        return '/creation/articles/editor?bid=' + id + '&aid=' + size;
+      }
+      case 'aloneArticle': {
+        return '/article/' + id
+      }
+      case 'columnArticle': {
+        return '/m/' + id + '/a/' + size;
+      }
+      case 'columnArticleEditor': {
+        return '/creation/editor/column?mid='+id+'&aid=' + size;
+        // return '/column/editor?mid=' + id + '&aid=' + size;
+      }
+      case 'zoneArticleEditor': {
+        return '/creation/editor/zone/article?aid=' + size;
+      }
+      case 'zoneArticle': {
+        return '/zone/a/' + id;
+      }
+      case 'zoneMoment': {
+        return '/zone/m/' + id;
+      }
+      case 'columnThread': {
+        return '/m/' + id + '/a/' + size;
+      }
+      case 'downloadApp': {
+        return '/app/' + id + '/' + size
+      }
+      case 'preview': {
+        return '/document/preview?source=' + id + '&sid=' + size
+      }
+      case 'history': {
+        return '/document/history?source=' + id + '&sid=' + size
+      }
+      case 'draftEditor': {
+        return '/creation/editor/draft?id=' + id;
+      }
     }
   };
   self.getAnonymousInfo = function() {
@@ -201,6 +262,70 @@ var Tools = function() {
   self.floatUserInfo = function(uid) {
     return "floatUserPanel.open(this, '" + uid + "')";
   };
+  self.getRequest = function() {
+    var url = window.location.search; //获取url中"?"符后的字串
+    var theRequest = {};
+    if (url.indexOf("?") !== -1) {
+      var str = url.substr(1);
+      var strs = str.split("&");
+      for(var i = 0; i < strs.length; i ++) {
+        theRequest[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+      }
+    }
+    return theRequest;
+  };
+  //地址栏添加参数
+  // name {string} 参数名称
+  // value 参数值
+  self.addUrlParam = function(name, value) {
+    var currentUrl = window.location.href.split('#')[0];
+    if (/\?/g.test(currentUrl)) {
+      if (/name=[-\w]{4,25}/g.test(currentUrl)) {
+        currentUrl = currentUrl.replace(/name=[-\w]{4,25}/g, name + "=" + value);
+      } else {
+        currentUrl += "&" + name + "=" + value;
+      }
+    } else {
+      currentUrl += "?" + name + "=" + value;
+    }
+    if (window.location.href.split('#')[1]) {
+      currentUrl = currentUrl + '#' + window.location.href.split('#')[1]
+      window.history.replaceState(null, null, currentUrl);
+    } else {
+      window.history.replaceState(null, null, currentUrl);
+    }
+    return currentUrl;
+  };
+  //删除地址栏中的指定参数并返回删除参数后的地址
+  // paramKey {string} 需要删除的键
+  self.delUrlParam = function(paramKey) {
+    var url = window.location.href;    //页面url
+    var urlParam = window.location.search.substr(1);  //页面参数
+    var beforeUrl = url.substr(0, url.indexOf("?"));  //页面主地址（参数之前地址）
+    var nextUrl = "";
+    var arr = new Array();
+    if (urlParam != "") {
+      var urlParamArr = urlParam.split("&"); //将参数按照&符分成数组
+      for (var i = 0; i < urlParamArr.length; i++) {
+        var paramArr = urlParamArr[i].split("="); //将参数键，值拆开
+        //如果键与要删除的不一致，则加入到参数中
+        if (paramArr[0] !== paramKey) {
+          arr.push(urlParamArr[i]);
+        }
+      }
+    }
+    if (arr.length > 0) {
+      nextUrl = "?" + arr.join("&");
+    }
+    url = beforeUrl + nextUrl;
+    return url;
+  }
+
+  // pug渲染时藏数据，对应前端函数strToObj
+  self.objToStr = function(obj) {
+    return encodeURIComponent(JSON.stringify(obj));
+  }
+
   self.getSize = function(size, digits) {
     size = Number(size);
     if(digits === undefined) digits = 2;

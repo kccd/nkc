@@ -6,37 +6,67 @@ infoRouter
 		ctx.template = 'forum/settings/info.pug';
 		await next();
 	})
+	.put('/declare', async (ctx, next)=>{
+		const {data, db, body, nkcModules} = ctx;
+		const {forum} = data;
+		const { _declare } = body
+		await forum.updateOne({ _declare });
+		await next()
+	})
+	.put('/latestBlockNotice', async (ctx, next)=>{
+		const {data, db, body, nkcModules} = ctx;
+		const {forum} = data;
+		const { _latestBlockNotice } = body
+		await forum.updateOne({_latestBlockNotice });
+		await next()
+	})
 	.put('/', async (ctx, next) => {
 		const {data, db, body, nkcModules} = ctx;
 		const {forum} = data;
 		let {operation} = body;
-		if(operation === "updateDeclare") {
-			const {did, declare} = body;
-			// 富文本内容中每一个source添加引用
-			await db.ResourceModel.toReferenceSource("forum-" + forum.fid, declare);
-			// if(!declare) ctx.throw(400, '专业说明不能为空');
-			await forum.updateOne({declare});
-			if(did) {
-				await db.DraftModel.removeDraftById(did, data.user.uid);
-			}
-			data.redirect = `/f/${forum.fid}/home`;
-			return await next();
-		} else if(operation === "modifyForumLatestNotice") {
-			const {content} = body;
-			// 富文本内容中每一个source添加引用
-			await db.ResourceModel.toReferenceSource("forum-notice-" + forum.fid, content);
-			await forum.updateOne({latestBlockNotice: content});
-			data.redirect = `/f/${forum.fid}`;
-			return await next();
-		}
+		//修改专业说明
+		// if(operation === "updateDeclare") {
+		// 	const {did, declare} = body;
+		// 	// 富文本内容中每一个source添加引用
+		// 	await db.ResourceModel.toReferenceSource("forum-" + forum.fid, declare);
+		// 	// if(!declare) ctx.throw(400, '专业说明不能为空');
+		// 	await forum.updateOne({declare});
+		// 	if(did) {
+		// 		await db.DraftModel.removeDraftById(did, data.user.uid);
+		// 	}
+		// 	data.redirect = `/f/${forum.fid}/home`;
+		// 	return await next();
+		// } else if(operation === "modifyForumLatestNotice") {
+		// 	//修改专业最新页板块公告
+		// 	const {content} = body;
+		// 	// 富文本内容中每一个source添加引用
+		// 	await db.ResourceModel.toReferenceSource("forum-notice-" + forum.fid, content);
+		// 	await forum.updateOne({latestBlockNotice: content});
+		// 	data.redirect = `/f/${forum.fid}`;
+		// 	return await next();
+		// }
 		const {checkString} = nkcModules.checkData;
 
 		let {
 			displayName, abbr, color,
 			description, noticeThreadsId,
-			brief, basicThreadsId, valuableThreadsId, noteOfPost
+			brief, basicThreadsId, valuableThreadsId, noteOfPost,
+			content, did, declare,
 		} = JSON.parse(body.fields.forum);
+		//修改专业说明
+		// 富文本内容中每一个source添加引用
+		await db.ResourceModel.toReferenceSource("forum-" + forum.fid, declare);
+		// if(!declare) ctx.throw(400, '专业说明不能为空');
+		// await forum.updateOne({ declare, _declare: '' });
+		if(did) {
+			await db.DraftModel.removeDraftById(did, data.user.uid);
+		}
+		data.redirect = `/f/${forum.fid}/home`;
 
+		//修改专业最新页板块公告
+		// 富文本内容中每一个source添加引用
+		await db.ResourceModel.toReferenceSource("forum-notice-" + forum.fid, content);
+		data.redirect = `/f/${forum.fid}`;
 
 		const logoFile = body.files.logo;
 		const bannerFile = body.files.banner;
@@ -99,6 +129,7 @@ infoRouter
 			});
 		}
 		await db.ForumModel.saveForumToRedis(forum.fid);
+		await forum.updateOne({ latestBlockNotice: content, _latestBlockNotice: '', declare, _declare: ''});
 		await next();
 	});
 

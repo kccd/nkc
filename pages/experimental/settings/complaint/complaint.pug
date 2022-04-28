@@ -47,7 +47,9 @@ block eContent
                         a(
                           :href='getUrl("userHome", item.user.uid)'
                           target="_blank"
-                          :data-float-uid='item.user.uid'
+                          data-global-mouseover="showUserPanel"
+                          data-global-mouseout="hideUserPanel"
+                          :data-global-data="objToStr({uid: item.user.uid})"
                           ) {{item.user.username}}
                     th.text-center {{item.type}}
                     th.text-center {{item.description}}
@@ -69,4 +71,3 @@ block scripts
   include ../../../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../../../publicModules/commonModal/commonModal
   +includeJS('/experimental/settings/complaint/complaint.js')
-    

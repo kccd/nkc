@@ -1,0 +1,15 @@
+.thread-review-info
+  -let {document, reason} = reviewData || {};
+  -let {_id} = document || {};
+  if permission("review")
+    h4 内容未审核
+    if reason
+      p= "送审理由：" + reason
+    | 通过请点击
+    button.btn.btn-xs.btn-default(onclick='reviewArticle()') 通过
+    | &nbsp;  按钮，不通过请点击
+    button.btn.btn-xs.btn-default(onclick='disabledArticles()') 退修或删除
+    | 按钮。
+    a.thread-review-link(href=`/review` target="_blank") 待审核列表
+  else
+    | 审核中

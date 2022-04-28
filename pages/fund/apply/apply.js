@@ -5,7 +5,6 @@ import {debounce} from '../../lib/js/execution';
 const forumSelector = new NKC.modules.ForumSelector();
 const commonModal = new NKC.modules.CommonModal();
 const data = NKC.methods.getDataById('data');
-console.log(data);
 const {
   applicationForm,
   fund,
@@ -19,6 +18,8 @@ const {
 } = data.settingsData;
 
 const selectUser = new NKC.modules.SelectUser();
+import Editor from "../../lib/vue/Editor";
+import {getFundDescriptionEditorConfigs} from "../../lib/js/editor";
 const app = new Vue({
   el: '#app',
   data: {
@@ -40,10 +41,18 @@ const app = new Vue({
     saving: false,
 
     giveUpReason: '',
+    editorPlugs: {
+      resourceSelector: true,
+      draftSelector: true,
+      stickerSelector: true,
+      xsfSelector: true,
+      mathJaxSelector: true,
+    }
   },
   components: {
     'life-photo-panel': LifePhotoPanel,
-    'post-panel': PostPanel
+    'post-panel': PostPanel,
+    'editor': Editor,
   },
   computed: {
     // 文章对象
@@ -108,7 +117,10 @@ const app = new Vue({
       const {applying} = this.form.threadsId;
       const self = this;
       return applying.map(tid => self.postsObj[tid]);
-    }
+    },
+    editorConfigs() {
+      return getFundDescriptionEditorConfigs();
+    },
   },
   mounted() {
     const self = this;
@@ -132,7 +144,7 @@ const app = new Vue({
         return self.addMembers(data.usersId)
           .then(() => {
             // selectUser.close();
-            setTimeout(floatUserPanel.initPanel);
+            // setTimeout(floatUserPanel.initPanel);
           })
           .catch(err => {
             sweetError(err);
@@ -158,7 +170,6 @@ const app = new Vue({
         })
         .then(data => {
           self.members = data.members;
-          console.log(data.members)
         })
         .catch(sweetError);
     },
@@ -217,12 +228,10 @@ const app = new Vue({
     },
     // 初始化编辑器
     initEditor() {
-      const self = this;
-      this.editor = UE.getEditor('fundEditor', NKC.configs.ueditor.fundConfigs)
-      NKC.methods.ueditor.initDownloadEvent(this.editor);
-      this.editor.addListener('ready', () => {
-        self.editor.setContent(self.project.c);
-      });
+      // const self = this;
+      // this.editor = UE.getEditor('fundEditor', NKC.configs.ueditor.fundConfigs)
+      // NKC.methods.ueditor.initDownloadEvent(this.editor);
+      this.$refs.fundEditor.setContent(this.project.c);
     },
     // 添加关键词
     selectKeyword() {
@@ -253,7 +262,7 @@ const app = new Vue({
     },
     // 从编辑器获取内容
     getContent() {
-      return this.editor.getContent();
+      return this.$refs.fundEditor.getContent();
     },
     // 设置 project 项目内容
     setProjectContent() {
@@ -335,6 +344,7 @@ const app = new Vue({
         applicant
       })
         .then(data => {
+          self.$refs.fundEditor.removeNoticeEvent();
           self.submitting = false;
           NKC.methods.visitUrl(`/fund/a/${form._id}`);
         })

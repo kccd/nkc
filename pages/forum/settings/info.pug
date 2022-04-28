@@ -10,6 +10,7 @@ block content
       .col-xs-12.col-md-2
         include ../../module_forum_settings
       .col-xs-12.col-md-10#app(v-cloak)
+        image-selector(ref="imageSelector")
         .panel.panel-default
           .panel-heading
             span 基本信息设置
@@ -59,16 +60,21 @@ block content
                   textarea.form-control(placeholder='请输入发表说明' rows=5 v-model='forum.noteOfPost')
               .form-group
                 label.col-sm-2.control-label 专业说明
-                .col-sm-5
-                  button.btn.btn-default(@click=`toEditor`) 去编辑器
+                .col-sm-10
+                  span.editor-title(v-if="!professionalDescription" @click="showEditor(editorName.professionalDescription)") {{professionalDescriptionTitle}}
+                  editor(v-if="professionalDescription" :configs="EditorConfigs" ref="forumExplainEditor" @ready="editorReady(editorName.professionalDescription)" :plugs="editorPlugs" @content-change="professionalDescriptionContent")
+                  //-button.btn.btn-default(@click=`toEditor`) 去编辑器
               .form-group
                 label.col-sm-2.control-label 专业公告
                 .col-sm-5
                   input.form-control(placeholder='请输入文号' v-model='forum._noticeThreadsId')
               .form-group
                 label.col-sm-2.control-label 专业最新页板块公告
-                .col-sm-5
-                  button.btn.btn-default(@click=`toLatestNoticeEditor`) 去编辑器
+
+                .col-sm-10
+                  span.editor-title(v-if="!latestProfessional" @click="showEditor(editorName.latestProfessional)") {{latestProfessionalNoticeTitle}}
+                  editor(v-if="latestProfessional" :configs="EditorConfigs" ref="forumNoticeEditor" @ready="editorReady(editorName.latestProfessional)" :plugs="editorPlugs" @content-change="latestProfessionalContent")
+                  //-button.btn.btn-default(@click=`toLatestNoticeEditor`) 去编辑器
               .form-group
                 label.col-sm-2.control-label 快速入门
                 .col-sm-5

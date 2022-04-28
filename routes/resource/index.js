@@ -192,11 +192,12 @@ resourceRouter
     await next();
   })
   .post('/', async (ctx, next) => {
+    //用户上传文件
     const {db, data, nkcModules, state} = ctx;
     const {user} = data;
     const {files, fields} = ctx.body;
     const {file} = files;
-    const {type, share} = fields;
+    const {type, share, cid} = fields;
     if(!file) {
       ctx.throw(400, 'no file uploaded');
     }
@@ -211,7 +212,8 @@ resourceRouter
     const mediaType = db.ResourceModel.getMediaTypeByExtension(extension);
 
     const resourceType = mediaType === 'mediaPicture' && type === 'sticker'? 'sticker': 'resource';
-    const r = db.ResourceModel({
+
+    const resourceInfo = {
       rid,
       type: resourceType,
       oname: name,
@@ -222,7 +224,12 @@ resourceRouter
       toc: Date.now(),
       mediaType,
       state: 'inProcess'
-    });
+    };
+
+    if(cid && cid !== 'default' && cid !== 'all' && cid !== 'trash') resourceInfo.cid = cid;
+
+    const r = db.ResourceModel(resourceInfo);
+
     // 创建表情数据
     if(type === "sticker") {
       if(mediaType !== "mediaPicture") {
@@ -267,6 +274,18 @@ resourceRouter
         disabled: resource.disabled
       }
     })
+    await next();
+  })
+  .post('/:rid/del', async (ctx, next) => {
+    const {db, body} = ctx;
+    const {type, resources} = body;
+    let del;
+    if(type === 'delete') {
+      del = true;
+    } else {
+      del = false;
+    }
+    await db.ResourceModel.updateMany({rid: {$in: resources}}, {del});
     await next();
   })
   .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods())

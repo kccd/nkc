@@ -1,3 +1,5 @@
+import {getSocket} from "../lib/js/socket";
+const socket = getSocket();
 var SubscribeTypes, surveyForms = [], draftId = "", author = {};
 const commonModel = new NKC.modules.CommonModal();
 window.Attachments = undefined;
@@ -586,35 +588,6 @@ function extractfid(){
 	if(targetforum.length!==2)return screenTopWarning('请选择一个目标')
 	targetforum = targetforum[0]
 	return targetforum
-}
-
-function moveThreadTo(tid){
-	var fid = extractfid()
-	askCategoryOfForum(fid)
-		.then(function(cid){
-			return moveThread(tid,fid,cid)
-		})
-		.then(function(){
-			screenTopAlert('请刷新')
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error)
-		})
-}
-
-function askCategoryOfForum(fid){
-	fid = fid.toString()
-	return nkcAPI('/f/'+fid+'/category','GET',{})
-		.then(function(arr){
-			arr = arr.categorys;
-			if(!arr.length)return null
-			return screenTopQuestion('请选择一个分类：',['0:（无分类）'].concat(arr.map(function(i){return i.cid+':'+i.name})))
-		})
-		.then(function(str){
-			//console.log('selected:',str.split(':')[0]);
-			if(!str)return 0;
-			return str.split(':')[0]
-		})
 }
 
 function recycleThread(tid){
@@ -1258,6 +1231,7 @@ $(function() {
 			window.location.hash = hash;
 		}, 1000)
 	}
+
 	if(NKC.configs.uid && socket) {
 		NKC.methods.setThreadListNewPostCount($('#threadId').text().trim(), 0);
 		window.bulletComments = new NKC.modules.BulletComments({
@@ -1306,17 +1280,13 @@ function insertRenderedPost(renderedPost) {
 	var parentDom = $('.single-posts-container');
 	parentDom.append(JQDOM);
 	// 用户悬浮面板
-	floatUserPanel.initPanel();
+	// floatUserPanel.initPanel();
 	// 分享
 	NKC.methods.initSharePanel();
-	// 表情
-	NKC.methods.initStickerViewer();
 	// 视频音频组件渲染
 	NKC.methods.initVideo();
 	// 操作
 	NKC.methods.initPostOption();
-	// 图片预览
-	if(!NKC.configs.isApp) NKC.methods.initImageViewer();
 	// 外链复原
   NKC.methods.replaceNKCUrl();
 	// 划词笔记
@@ -1347,8 +1317,16 @@ if (NKC.configs.platform === 'reactNative') {
 }
 
 
+// // 快捷键发表回复
+// ue.ready(function() {
+// 	ue.body.addEventListener("keydown", function(e) {
+// 		if (13 === e.keyCode && e.ctrlKey){
+// 			$("#ButtonReply").click();
+//     }
+// 	})
+// });
 // 快捷键发表回复
-try {
+/*try {
 	ue.ready(function() {
 		ue.body.addEventListener("keydown", function(e) {
 			if (13 === e.keyCode && e.ctrlKey){
@@ -1357,9 +1335,9 @@ try {
 		})
 	});
 } catch (error) {
-	
-}
- 
+
+}*/
+
 function getBlockId(val){
 	return val;
 }
@@ -1438,8 +1416,6 @@ Object.assign(window, {
 	at,
 	goEditor,
 	extractfid,
-	moveThreadTo,
-	askCategoryOfForum,
 	recycleThread,
 	widerArea,
 	switchVInPersonalForum,

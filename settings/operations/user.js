@@ -1,7 +1,74 @@
 module.exports = {
 	GET: 'searchUser',
 	PARAMETER: {
+		profile: {
+			GET: "visitUserCard",
+			subUser: {
+				GET: "visitUserCard",
+			},
+			manage: {
+				GET: "getUserHomeCard"
+			},
+			column: {
+				GET: "getUserHomeCard",
+			},
+			moment: {
+				GET: "getUserHomeCard"
+			},
+			post: {
+				GET: "getUserHomeCard"
+			},
+			thread: {
+				GET: "getUserHomeCard"
+			},
+			note: {
+				GET: "userProfile"
+			},
+			draft: {
+				GET: "userProfile"
+			},
+			follower: {
+				GET: "getUserHomeCard",
+			},
+			fan: {
+				GET: "getUserHomeCard",
+			},
+			finance: {
+				GET: "getUserHomeCard",
+			},
+			subscribe: {
+				GET: "visitUserCard",
+				collection: {
+					GET: "getUserHomeCard"
+				},
+				column: {
+					GET: "getUserHomeCard"
+				},
+				user: {
+					GET: "getUserHomeCard"
+				},
+				forum: {
+					GET: "getUserHomeCard",
+				},
+				blacklist: {
+					GET: "getUserHomeCard",
+				}
+			},
+		},
+		userPanel: {
+			GET: 'visitUserCard',
+		},
 		GET: 'visitUserCard',
+		userHome: {
+			GET: "getUserHomeInfo"
+		},
+		navLinks: {
+			GET: "getUserHomeInfo",
+		},
+		userHomeCard: {
+			GET: "getUserHomeCard"
+		},
+		
 		verifiedAssets: {
 			PARAMETER: {
 				GET: "visitVerifiedUpload"
@@ -137,10 +204,6 @@ module.exports = {
 		subscribe: {
 			POST: 'subscribeUser',
 			DELETE: 'unSubscribeUser',
-			register: {
-				GET: 'visitSubscribeForums',
-				POST: 'submitSubscribeForums'
-			}
 		},
 		bills: {
 			GET: 'visitUserBills'
@@ -149,61 +212,61 @@ module.exports = {
       GET: "transferKcbToUser",
       POST: "transferKcbToUser"
     },
-		profile: {
-			GET: 'userProfile',
-			summary: {
-				pie: {
-					GET: "userProfile"
-				},
-				calendar: {
-					GET: "userProfile"
-				}
-			},
-			thread: {
-				GET: "userProfile"
-			},
-			post: {
-				GET: "userProfile"
-			},
-			draft: {
-				GET: "userProfile"
-			},
-			finance: {
-				GET: "userProfile"
-			},
-			follower: {
-				GET: "userProfile"
-			},
-			subscribe: {
-				user: {
-					GET: "userProfile"
-				},
-				topic: {
-					GET: "userProfile"
-				},
-				forum: {
-					GET: 'userProfile',
-				},
-				discipline: {
-					GET: "userProfile"
-				},
-				column: {
-					GET: "userProfile"
-				},
-				thread: {
-					GET: "userProfile"
-				},
-				collection: {
-					GET: "userProfile"
-				}
-			},
-			note: {
-				GET: "userProfile"
-			},
-			blacklist: {
-				GET: 'userProfile'
-			}
-		},
+		// profile: {
+		// 	GET: 'userProfile',
+		// 	summary: {
+		// 		pie: {
+		// 			GET: "userProfile"
+		// 		},
+		// 		calendar: {
+		// 			GET: "userProfile"
+		// 		}
+		// 	},
+		// 	thread: {
+		// 		GET: "userProfile"
+		// 	},
+		// 	post: {
+		// 		GET: "userProfile"
+		// 	},
+		// 	draft: {
+		// 		GET: "userProfile"
+		// 	},
+		// 	finance: {
+		// 		GET: "userProfile"
+		// 	},
+		// 	follower: {
+		// 		GET: "userProfile"
+		// 	},
+		// 	subscribe: {
+		// 		user: {
+		// 			GET: "userProfile"
+		// 		},
+		// 		topic: {
+		// 			GET: "userProfile"
+		// 		},
+		// 		forum: {
+		// 			GET: 'userProfile',
+		// 		},
+		// 		discipline: {
+		// 			GET: "userProfile"
+		// 		},
+		// 		column: {
+		// 			GET: "userProfile"
+		// 		},
+		// 		thread: {
+		// 			GET: "userProfile"
+		// 		},
+		// 		collection: {
+		// 			GET: "userProfile"
+		// 		}
+		// 	},
+		// 	note: {
+		// 		GET: "userProfile"
+		// 	},
+		// 	blacklist: {
+		// 		GET: 'userProfile'
+		// 	}
+		// },
 		destroy: {
     	GET: "destroyAccount",
 			POST: "destroyAccount"

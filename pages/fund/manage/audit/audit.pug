@@ -47,7 +47,11 @@ block fundContent
       .form-group
         label.control-label 用户：
         span
-          a(href=tools.getUrl('userHome', applicant.uid) target="_blank" data-float-uid=applicant.uid)= applicant.user.username
+          a(href=tools.getUrl('userHome', applicant.uid) target="_blank"
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid: applicant.uid})
+          )= applicant.user.username
       .form-group
         label.control-label 真实姓名：
         span= applicant.name
@@ -108,7 +112,11 @@ block fundContent
           span= projectPost.keyWordsEn.length ? projectPost.keyWordsEn.join(', ') : '无'
         .form-group
           label 学科分类：
-          a(href=tools.getUrl('forumHome', applicationForm.forum.fid) target="_blank" data-float-fid=applicationForm.category)=applicationForm.forum.displayName
+          a(href=tools.getUrl('forumHome', applicationForm.forum.fid) target="_blank"
+            data-global-mouseover="showForumPanel"
+            data-global-mouseout="hideForumPanel"
+            data-global-data=objToStr({fid: applicationForm.category})
+          )=applicationForm.forum.displayName
         .form-group
           label 研究周期：
           span=`${applicationForm.projectCycle} 天`
@@ -223,6 +231,5 @@ block fundScripts
   include ../../../publicModules/lazySizes
   include ../../../publicModules/plyr/plyr.js.pug
   include ../../../publicModules/imageViewer
-  include  ../../../publicModules/sticker/sticker
   include ../../../publicModules/nkcSource
   +includeJS('/fund/manage/audit/audit.js')

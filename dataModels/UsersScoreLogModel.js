@@ -6,6 +6,7 @@ const usersScoreLogSchema = new Schema({
 		default: '',
 		index: 1
 	},
+	//score
 	type: {
 		type: String,
 		required: true,
@@ -47,6 +48,11 @@ const usersScoreLogSchema = new Schema({
 		index: 1
 	},
 	pid: {
+		type: String,
+		default: '',
+		index: 1
+	},
+	docId: {
 		type: String,
 		default: '',
 		index: 1
@@ -173,13 +179,14 @@ usersScoreLogSchema.methods.extendOperation = async function() {
 
 usersScoreLogSchema.statics.insertLog = async (options) => {
   const UsersScoreLogModel = mongoose.model('usersScoreLogs');
-  const {user, type, typeIdOfScoreChange, port, ip, fid, pid, tid, description} = options;
+  const {user, type, typeIdOfScoreChange, port, ip, fid, pid, tid, description, docId} = options;
   if(!user) return;
   if(type === 'score') {
     let {key, change} = options;
     if(!change && change !== 0) change = 1;
     const q = {};
     q[key] = change;
+		//新建一条违规记录
     const log = UsersScoreLogModel({
       uid: user.uid,
       type: 'score',
@@ -193,6 +200,7 @@ usersScoreLogSchema.statics.insertLog = async (options) => {
       fid
     });
     await log.save();
+		//用户违规记录加1
     await user.updateOne({$inc: q});
     user[key] += change;
     await user.calculateScore();

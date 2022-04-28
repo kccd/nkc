@@ -71,8 +71,10 @@ block eContent
       .hidden#data=objToStr({certs: data.certs, grades: data.grades, reviewSettings: data.reviewSettings, users: data.users})
       #app(v-cloak)
         .col-xs-12.col-md-12
+          span.m-r-05 违规后免审核需发帖数：
+          input(type="number" min="0" v-model="violationCount")
           h5 当产生待审核的内容时，向拥有以下证书的用户发送通知。
-          .cert-panel
+          .cert-panel.m-t-1
             span(@click="removeCertId(c._id)" v-for="c in selectedCerts" :style="'background-color: ' + c.color") {{c.displayName}}
               .fa.fa-remove
             select.display-i-b.btn-sm.form-control(style="width: 10rem;" v-model="selectedCertId")

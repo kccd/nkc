@@ -42,7 +42,11 @@ div
               span 匿名
             else
               a.thread-user(href=`/u/${thread.uid}`)
-                img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar) data-float-uid=thread.uid)
+                img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar)
+                  data-global-mouseover="showUserPanel"
+                  data-global-mouseout="hideUserPanel"
+                  data-global-data=objToStr({uid: thread.uid})
+                )
                 span=thread.firstPost.user.username
             if thread.firstPost.voteUp
               .thread-thumbup

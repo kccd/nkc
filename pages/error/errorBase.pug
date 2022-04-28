@@ -10,6 +10,7 @@ block head
   +includeCSS("/publicModules/public.css")
   +includeCSS("/nkc_styles.css")
   +includeCSS("/error/error.css")
+  include ../publicModules/state
   block errorTitle
     title= `${data.status}${data.error ? ':' + data.error : ''}`
 
@@ -21,9 +22,9 @@ block body
         .error-list.b-s-10
           .error-header 根据有关政策，内容不予显示。
           h4.text-center
-            button.btn.btn-default.btn-sm(onclick="NKC.methods.toLogin('login')") 登录
-            | &nbsp;或
-            button.btn.btn-default.btn-sm(onclick="NKC.methods.toLogin('register')") 注册
+            a.btn.btn-default.btn-sm(href="/login") 登录
+            | &nbsp;或&nbsp;
+            a.btn.btn-default.btn-sm(href="/login?t=register") 注册
           .error-code
             span message：
             code= data.error
@@ -41,10 +42,6 @@ block body
     +includeJS("/external_pkgs/vue.js", true)
   +includeJS('/external_pkgs/polyfill/dist/polyfill.min.js', true)
   +includeJS("/publicModules/common.js")
+  +includeJS('/tools.js')
   +includeJS('/bootstrap/js/bootstrap.min.js')
-  if state.isApp && state.platform === 'apiCloud'
-    script!=`NKC.configs.isApp = true;NKC.configs.appOS="${state.appOS}";`
-    +includeJS("/appAPi/app.js")
   +includeJS("/interface_common.js")
-  if !data.user && data.status === 403
-    include ../publicModules/login/login

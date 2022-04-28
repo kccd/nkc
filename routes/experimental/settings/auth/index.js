@@ -6,7 +6,7 @@ router
     const authSettings = await db.SettingModel.findById("auth");
     data.authSettings = authSettings.c;
     data.certs = await db.RoleModel.find({type: "management"});
-    ctx.template = "/experimental/settings/auth/auth.pug";
+    ctx.template = "experimental/settings/auth/auth.pug";
     await next();
   })
   .put("/", async (ctx, next) => {

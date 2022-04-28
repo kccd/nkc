@@ -112,6 +112,7 @@ schema.statics.uploadSticker = async (options) => {
     rid
   };
   if(share) {
+    s.shared = true;
     s.reviewed = null;
   } else {
     s.reviewed = true;

@@ -20,7 +20,7 @@ func.init = async () => {
         mappings: {
           documents: {
             properties: {
-              docType: { // 文档类型：thread，user，post
+              docType: { // 文档类型：thread， user， post，document_article， document_comment
                 type: "keyword"
               },
               uid: {
@@ -103,18 +103,22 @@ func.init = async () => {
 
 /*
 * 更新数据，若数据不存在则创建
-* @param {String} docType 文档类型：user, post, thread
+* @param {String} docType 文档类型：user, post, thread, document_article
 * @param {Object} document 数据
 * @author pengxiguaa 2019-5-17
 * */
 func.save = async (docType, document) => {
   const apiFunction = require("../nkcModules/apiFunction");
   const FundApplicationFormModel = require("../dataModels/FundApplicationFormModel");
-  if(!["user", "post", "thread", "column", "columnPage", "resource"].includes(docType)) throwErr(500, "docType error");
+  if(
+    ![
+      "user", "post", "thread", "column", "columnPage", "resource",
+      "document_article", "document_comment", "document_moment"
+    ].includes(docType)
+  ) throwErr(500, "docType error");
 
   let aid = "";
   const {
-
     pid = "", toc = new Date(), tid = "", uid = "",
     mainForumsId = [],
     t = "", c = "",
@@ -148,6 +152,10 @@ func.save = async (docType, document) => {
     id = `columnPage_${tid}`;
   } else if(docType === "resource") {
     id = `resource_${tid}`;
+  } else if(docType === 'document_article') {
+    id = `article_${tid}`;
+  } else if(docType === 'document_comment') {
+    id = `comment_${tid}`;
   }
 
   return await client.index({
@@ -207,7 +215,7 @@ func.search = async (t, c, options) => {
 
   const {
     searchThreadList, searchPostList, searchAllList, searchUserList,
-    searchColumnList, searchResourceList
+    searchColumnList, searchResourceList, searchDocumentList
   } = await SettingModel.getSettings('page');
 
   let size;
@@ -221,6 +229,8 @@ func.search = async (t, c, options) => {
     size = searchColumnList;
   } else if(t === "resource") {
     size = searchResourceList;
+  } else if(t === "document_article" || t === "document_comment") {
+    size = searchDocumentList;
   } else {
     size = searchAllList;
   }
@@ -260,6 +270,7 @@ func.search = async (t, c, options) => {
     createMatch("keywordsEN", c, 80, relation),
     createMatch("keywordsCN", c, 80, relation),
   ];
+  //搜索文章
   if(t === 'thread' && onlyTitle) {
     threadConditions.length = 1;
   }
@@ -291,7 +302,7 @@ func.search = async (t, c, options) => {
                   must: [
                     {
                       match: {
-                        docType: "post"
+                        docType: 'post'
                       }
                     },
                     {
@@ -386,7 +397,50 @@ func.search = async (t, c, options) => {
                     }
                   ]
                 }
-              }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: 'document_article'
+                      }
+                    },
+                    {
+                      bool: {
+                        should: [
+                          createMatch("title", c, 5, relation),
+                          createMatch("content", c, 2, relation),
+                          createMatch("authors", c, 80, relation),
+                          createMatch("abstractEN", c, 50, relation),
+                          createMatch("abstractCN", c, 50, relation),
+                          createMatch("keywordsEN", c, 80, relation),
+                          createMatch("keywordsCN", c, 80, relation),
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: 'document_comment'
+                      }
+                    },
+                    {
+                      bool: {
+                        should: [
+                          createMatch("content", c, 2, relation),
+                          createMatch("authors", c, 80, relation),
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
             ]
           }
         }
@@ -395,16 +449,40 @@ func.search = async (t, c, options) => {
   };
   if(t === "post") {
     body.query.bool.must.push({
-      match: {
-        docType: "post"
+      bool: {
+        should: [
+          {
+            match: {
+              docType: "post"
+            }
+          },
+          {
+            match: {
+              docType: "document_comment"
+            }
+          }
+        ]
       }
     });
   } else if(t === "thread") {
-    body.query.bool.must.push({
-      match: {
-        docType: "thread"
+    body.query.bool.must.push(
+      {
+        bool: {
+          should: [
+            {
+              match: {
+                docType: "thread"
+              }
+            },
+            {
+              match: {
+                docType: "document_article"
+              }
+            }
+          ]
+        }
       }
-    });
+    );
   } else if(t === "user") {
     body.query.bool.must.push({
       match: {
@@ -432,6 +510,18 @@ func.search = async (t, c, options) => {
     body.query.bool.must.push({
       match: {
         docType: "resource"
+      }
+    });
+  } else if(t === "document_article") {
+    body.query.bool.must.push({
+      match: {
+        docType: "document_article",
+      }
+    });
+  } else if(t === "document_comment") {
+    body.query.bool.must.push({
+      match: {
+        docType: "document_comment"
       }
     });
   }
@@ -532,9 +622,12 @@ func.search = async (t, c, options) => {
           uid
         }
       };
+      //添加只查看该用户的搜索结果
       body.query.bool.must[0].bool.should[0].bool.must.push(authorMatch);
       body.query.bool.must[0].bool.should[1].bool.must.push(authorMatch);
       body.query.bool.must[0].bool.should[5].bool.must.push(authorMatch);
+      body.query.bool.must[0].bool.should[6].bool.must.push(authorMatch);
+      body.query.bool.must[0].bool.should[7].bool.must.push(authorMatch);
     }
 
     if(digest) {

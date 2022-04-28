@@ -1,3 +1,5 @@
+import {objToStr} from "../lib/js/tools";
+
 const data = NKC.methods.getDataById("data");
 data.ownStickers.map(s => {
   s.selected = false
@@ -15,11 +17,12 @@ const app = new Vue({
     }
   },
   mounted() {
-    NKC.methods.initStickerViewer();
+    // NKC.methods.initStickerViewer();
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
     visitUrl: NKC.methods.visitUrl,
+    objToStr: objToStr,
     switchManagement() {
       this.management = !this.management;
       this.changeStickersStatus(false);

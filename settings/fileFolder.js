@@ -32,7 +32,10 @@ module.exports = {
   recommendThreadCover: 'attachment/cover',
   // 上报问题 图片
   problemImage: 'attachment/problem',
-
+  // 文档封面
+  bookCover: 'attachment/cover',
+  // documentCover
+  documentCover: 'attachment/cover',
 
 
   // VerifiedUploadModel

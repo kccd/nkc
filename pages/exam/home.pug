@@ -85,6 +85,6 @@ block scripts
   script.
     $(function() {
       if (!NKC.configs.uid) {
-        $(".exam-link a").removeAttr("href").attr("onclick", "Login.open('login')").addClass("pointer");
+        $(".exam-link a").removeAttr("href").attr("onclick", "RootApp.openLoginPanel('login')").addClass("pointer");
       }
     });

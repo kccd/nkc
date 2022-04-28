@@ -33,7 +33,7 @@ verifyRouter
     data.auth2Content = authSettings.auth2Content;
     data.auth1Content = authSettings.auth1Content;
     data.authenticate = userPersonal.authenticate;
-    ctx.template = "/user/settings/verify/verify.pug";
+    ctx.template = "user/settings/verify/verify.pug";
     await next();
   })
   .post("/verify2_form", async (ctx, next) => {

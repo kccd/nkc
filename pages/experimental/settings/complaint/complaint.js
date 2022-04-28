@@ -1,3 +1,4 @@
+import {objToStr} from "../../../lib/js/tools";
 const commonModal = new NKC.modules.CommonModal();
 var data = NKC.methods.getDataById("data");
 
@@ -60,9 +61,10 @@ var app = new Vue({
     complaintSettings: data.complaintSettings,
   },
   mounted () {
-    floatUserPanel.initPanel();
+    // floatUserPanel.initPanel();
   },
   methods: {
+    objToStr: objToStr,
     getUrl: NKC.methods.tools.getUrl,
     timeFormat(time) {
       var fixTime = function(number) {

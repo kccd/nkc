@@ -8,9 +8,17 @@
         .col-xs-12.col-md-6(data-type='blacklist' data-id=b._id)
           .list-body
             .item-left
-              img(src=tools.getUrl('userAvatar', b.user.avatar) data-float-uid=b.user.uid)
+              img(src=tools.getUrl('userAvatar', b.user.avatar)
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                data-global-data=objToStr({uid: b.user.uid})
+              )
             .item-center
-              a.username(href=`/u/${b.user.uid}` target='_blank' data-float-uid=b.user.uid)=b.user.username
+              a.username(href=`/u/${b.user.uid}` target='_blank'
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                data-global-data=objToStr({uid: b.user.uid})
+              )=b.user.username
               .description(title=`${format('YYYY/MM/DD HH:mm:ss', b.toc)}`)=`${fromNow(b.toc)}`
                 | &nbsp;&nbsp;来自&nbsp;&nbsp;
                 span!=b.fromHTML

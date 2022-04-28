@@ -1,6 +1,10 @@
 .home-subscribe-forum-item
   .home-subscribe-forum-wrap
-    a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
+    a(href=`/f/${forum.fid}`
+      data-global-mouseover="showForumPanel"
+      data-global-mouseout="hideForumPanel"
+      data-global-data=objToStr({fid: forum.fid})
+    ).home-subscribe-forum
       .home-subscribe-forum-avatar
         if forum.logo
           img(src=tools.getUrl("forumLogo", forum.logo))

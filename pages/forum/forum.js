@@ -1,5 +1,11 @@
+import {getState} from '../lib/js/state';
+import {RNOpenEditorPage} from "../lib/js/reactNative";
+import {getSocket} from '../lib/js/socket';
+const socket = getSocket();
+const {isApp} = getState();
 const forumInfo = NKC.methods.getDataById('forumInfo');
 const {fid, page, digest, sort} = forumInfo;
+
 
 $(function() {
   const dom = $("#navbar_custom_dom");
@@ -49,20 +55,8 @@ function setThreadUrlSwitchStatus(status) {
 
 window.openEditSite = function() {
   const url = window.location.origin + "/editor?type=forum&id=" + fid;
-
-  if(NKC.configs.platform === 'reactNative') {
-    NKC.methods.rn.emit("openEditorPage", {
-      url: url
-    })
-  } else if(NKC.configs.platform === 'apiCloud') {
-    api.openWin({
-      name: url,
-      url: 'widget://html/common/editorInfo.html',
-      pageParam: {
-        realUrl: url,
-        shareType: "common"
-      }
-    })
+  if(isApp) {
+    RNOpenEditorPage("openEditorPage", url);
   } else {
     NKC.methods.visitUrl(url, true);
   }
@@ -172,8 +166,8 @@ function updateThreadListCount() {
 * @author pengxiguaa 2020-12-11
 * */
 function createMouseEvents() {
-  floatUserPanel.initPanel();
-  floatForumPanel.initPanel();
+  // floatUserPanel.initPanel();
+  // floatForumPanel.initPanel();
 }
 
 /*

@@ -39,6 +39,7 @@ $(function() {
   });
 });
 function initSortable() {
+  //在手机端不可拖动元素
   if(NKC.configs.isApp) return;
   const masterContainerL = document.getElementsByClassName('home-categories-left')[0];
   new Sortable(masterContainerL, {

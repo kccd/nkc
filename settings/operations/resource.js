@@ -8,6 +8,9 @@ module.exports = {
   banner: {
     PARAMETER: {
       POST: "modifyUserBanner",
+			homeBanner: {
+				POST: "modifyUserBanner",
+			}
     }
   },
 	shopLogo: {
@@ -34,6 +37,9 @@ module.exports = {
 			PUT: "modifyResources",
 			info: {
 			  GET: "getResourceInfo"
+			},
+			del: {
+				POST: "modifyResources"
 			},
 			pay: {
 				POST: "buyResource"

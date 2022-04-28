@@ -1,6 +1,7 @@
 NKC.modules.SelectColumnCategories = function() {
   var this_ = this;
   this_.dom = $("#moduleSelectColumnCategories");
+  if(!this_.dom.length) return;
   this_.columnId = this_.dom.attr("data-column-id");
   var toColumn = !!this_.dom.attr("data-to-column");
   this_.app = new Vue({

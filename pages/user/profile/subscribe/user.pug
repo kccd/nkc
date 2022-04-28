@@ -7,7 +7,11 @@ div
     for subscribe in data.subscribes
       .account-follower
         .account-follower-avatar
-          img.img(src=tools.getUrl("userAvatar", subscribe.targetUser.avatar, "sm") data-float-uid=subscribe.tUid)
+          img.img(src=tools.getUrl("userAvatar", subscribe.targetUser.avatar, "sm")
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid: subscribe.tUid})
+          )
         .account-follower-content
           .account-follower-name
             .account-follower-buttons(data-user=subscribe.tUid class=data.subUsersId.includes(subscribe.tUid)?"active":"")

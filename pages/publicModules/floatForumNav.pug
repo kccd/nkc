@@ -50,7 +50,11 @@ if !isIncluded('floatForumNav')
         .float-forum-container
           for f , index in arr
             -var {fid, displayName, cid} = f;
-            a.float-forum-item(href=tools.getUrl('forumHome', fid) + (cid?`?cat=${cid}`:'') data-float-fid=fid)= displayName
+            a.float-forum-item(href=tools.getUrl('forumHome', fid) + (cid?`?cat=${cid}`:'')
+              data-global-mouseover="showForumPanel"
+              data-global-mouseout="hideForumPanel"
+              data-global-data=objToStr({fid})
+              data-float-fid=fi)= displayName
 
     .float-forum-nav.disabled#floatForumNav
       +renderNav('所属专业', forums)

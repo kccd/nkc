@@ -54,6 +54,7 @@ router
     await next();
   })
   .put('/', async (ctx, next) => {
+    //更改分类顺序
     const {db, body, data} = ctx;
     const {categories} = body;
     for(const c of categories) {

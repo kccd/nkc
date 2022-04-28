@@ -20,14 +20,26 @@ const schema = new Schema({
     default: Date.now,
     index: 1
   },
-  // 拉黑的位置，名片：userCard, message, post
+  // 拉黑的位置，名片：userCard, message, post, userHome
   from: {
     type: String,
     required: true,
     index: 1,
   },
-  // 拉黑来源
+  // 拉黑来源 postId
   pid: {
+    type: String,
+    default: '',
+    index: 1
+  },
+  //拉黑来源 commentId
+  cid: {
+    type: String,
+    default: '',
+    index: 1
+  },
+  // 拉黑来源 articleId
+  aid: {
     type: String,
     default: '',
     index: 1
@@ -40,16 +52,17 @@ const schema = new Schema({
 * 添加用户到黑名单中
 * @param {String} uid 用户ID
 * @param {String} tUid 被拉黑用户ID
-* @param {String} type 拉黑来源，message: 消息系统, userCard: 用户名片, post: 文章/回复/评论
+* @param {String} type 拉黑来源，message: 消息系统, userCard: 用户名片, post: 文章/回复/评论, userHome: 主页
 * @param {String} pid 拉黑来源为post时所对应的pid
 * @return {Object} list 创建的拉黑记录
 * @author pengxiguaa 2020/06/05
 * */
-schema.statics.addUserToBlacklist = async (uid, tUid, from, pid = '') => {
+schema.statics.addUserToBlacklist = async (uid, tUid, from, pid = '', cid = '', aid = '') => {
   if(uid === tUid) throwErr(400, `不允许添加自己到黑名单`);
   const BL = mongoose.model('blacklists');
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
+  //查找被拉黑的用户
   const targetUser = await UserModel.findOne({uid: tUid});
   if(!targetUser) throwErr(400, `用户id错误 uid: ${tUid}`);
   let list = await BL.findOne({uid, tUid});
@@ -59,7 +72,9 @@ schema.statics.addUserToBlacklist = async (uid, tUid, from, pid = '') => {
     uid,
     tUid,
     from,
-    pid
+    pid,
+    cid,
+    aid,
   });
   await list.save();
   return list;

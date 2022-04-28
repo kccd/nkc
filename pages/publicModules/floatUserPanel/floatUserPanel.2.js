@@ -110,7 +110,6 @@ window.floatUserPanel = new Vue({
             if((left + panelWidth) > documentWidth) {
               left = documentWidth - panelWidth;
             }
-
             panel.css({
               top,
               left
@@ -143,7 +142,7 @@ window.floatUserPanel = new Vue({
                 subscribed: data.subscribed,
                 user: data.targetUser
               };
-              self.users[data.targetUser.uid] = userObj;
+                    self.users[data.targetUser.uid] = userObj;
               resolve(userObj);
             })
             .catch(err => {

@@ -1,20 +1,34 @@
 if !isIncluded('postActivity')
-  +includeCSS('/home/postActivity.css')
+  +includeCSS('/subscribe/postActivity.css')
   mixin postlatest(props)
-    -var {from, user, quote, title, content, toc, cover, url, type, parentPost, parentPostId} = props;
+    -var {from, user, quote, title, content, toc, cover, url, type, parentPost, parentPostId, tid, pid} = props;
     mixin postActivityHeader(headerData)
-      -var {toc, parentPost, showFrom, user, type} = headerData;
+      -var {toc, parentPost, showFrom, user, tid, pid, type} = headerData;
       .post-activity-header(class=headerData.from?'post-activity-main-header':'')
+        if canManagement
+          .checkbox.thread-checkbox
+            label
+              input(
+                type="checkbox"
+                data-thread-id=tid
+                data-post-id=pid
+              )
         .post-activity-avatar
           if headerData.user.avatar
-            img(src=headerData.user.avatar data-float-uid=headerData.user.uid || undefined style="cursor: pointer")
+            img(src=headerData.user.avatar
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: headerData.user.uid || undefined})
+              style="cursor: pointer")
           else
             div(style=`background-color: ${headerData.user.color}`)
         .post-activity-user
           if headerData.user.uid
             a(
               href=tools.getUrl('userHome', user.uid) target="_blank"
-              data-float-uid=headerData.user.uid || undefined
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: headerData.user.uid || undefined})
             ).post-activity-username=headerData.user.username
           else
             .post-activity-username=headerData.user.username
@@ -52,7 +66,7 @@ if !isIncluded('postActivity')
           //  .post-activity-cover(style=`background-image: url(${cover})`)
     .post-activity
       .post-activity-content
-        +postActivityHeader({type, user, toc, parentPost, showFrom: true, parentPostId})
+        +postActivityHeader({type, user, toc, parentPost, showFrom: true, parentPostId, tid, pid})
         +postActivityContent({title, content, cover, url, type})
       if quote
         .post-activity-content.post-activity-quote

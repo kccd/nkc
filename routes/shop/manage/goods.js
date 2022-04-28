@@ -21,7 +21,7 @@ router
     const paging = nkcModules.apiFunction.paging(page, count);
     const products = await db.ShopGoodsModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.products = await db.ShopGoodsModel.extendProductsInfo(products);
-    ctx.template = "/shop/manage/goods/goods.pug";
+    ctx.template = "shop/manage/goods/goods.pug";
     data.paging = paging;
     await next();
   });

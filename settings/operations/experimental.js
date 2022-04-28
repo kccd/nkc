@@ -277,6 +277,10 @@ module.exports = {
 			GET: 'visitEPostSettings',
 			PUT: 'modifyEPostSettings'
 		},
+    documentPost: {
+      GET: 'experimentalDocumentPostSettings',
+      PUT: 'experimentalDocumentPostSettings'
+    },
     sub: {
       GET: "experimentalSubSettings",
       PUT: "experimentalSubSettings"

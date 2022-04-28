@@ -12,8 +12,8 @@ if !isIncluded('downloadPanel')
         .draggable-panel-loading.p-t-1.p-b-3(v-else-if='error')
           .text-center.m-b-1.text-danger {{errorInfo}}
           button.btn.btn-default.btn-md(@click='reload') 重新加载
-          button.btn.btn-default.btn-md(onclick='NKC.methods.toLogin()') 登录
-          button.btn.btn-default.btn-md(onclick='NKC.methods.toLogin("register")') 注册
+          button.btn.btn-default.btn-md(onclick='RootApp.openLoginPanel()') 登录
+          button.btn.btn-default.btn-md(onclick='RootApp.openLoginPanel("register")') 注册
         .draggable-panel-content(v-else-if='resource')
           .download-panel
             .m-b-1.bg-warning.text-warning.p-a-05.bg-border.download-warning(v-if='downloadWarning') {{downloadWarning}}
@@ -45,4 +45,4 @@ if !isIncluded('downloadPanel')
               hr
               include ../fileCountLimitInfo
 
-  +includeJS('/publicModules/downloadPanel/downloadPanel.js')
+  +includeDeferJS('/publicModules/downloadPanel/downloadPanel.js')

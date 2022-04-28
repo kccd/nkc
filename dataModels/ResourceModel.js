@@ -91,7 +91,10 @@ const resourceSchema = new Schema({
     index: 1,
     default: "resource"
   },
-  // pid、"fund_" + applicationForumId, 表示哪些post引用了该资源
+  // 表示哪些post引用了该资源
+  // pid
+  // "fund_" + applicationForumId
+  // "document_" + documentId
   references: {
 	  type: [String],
     index: 1,
@@ -135,7 +138,18 @@ const resourceSchema = new Schema({
     type: Date,
     default: null
   },
-
+  //分组id
+  cid: {
+    type: String,
+    default: '',
+    index: 1,
+  },
+  //是否删除
+  del: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
   // 处理之后的文件信息
   // 图片：default, sm, md
   // 视频：sd, hd, fhd, cover
@@ -225,6 +239,14 @@ resourceSchema.virtual('visitorAccess')
     return this._visitorAccess = visitorAccess;
   });
 
+resourceSchema.virtual('mask')
+  .get(function() {
+    return this._mask;
+  })
+  .set(function(mask) {
+    return this._mask = mask;
+  })
+
 resourceSchema.virtual('token')
   .get(function() {
     return this._token;
@@ -234,7 +256,9 @@ resourceSchema.virtual('token')
   });
 
 /*
- * 文件是否存在
+ * 拓展附件信息
+ * 拓展了以下字段
+ * {String} mask 作为音视频时的播放器遮罩内容
  */
 resourceSchema.methods.setFileExist = async function(excludedMediaTypes = []) {
   const {files = {}, mediaType} = this;
@@ -248,6 +272,13 @@ resourceSchema.methods.setFileExist = async function(excludedMediaTypes = []) {
   if(['mediaVideo', 'mediaAudio', 'mediaAttachment'].includes(this.mediaType)) {
     const {visitorAccess} = await SettingModel.getSettings('download');
     this.visitorAccess = visitorAccess[this.mediaType];
+  }
+
+  // 加载音视频遮罩内容
+  if(['mediaVideo', 'mediaAudio'].includes(this.mediaType)) {
+    const {playerTips} = await SettingModel.getSettings('thread');
+    const {isDisplay, tipContent} = playerTips;
+    this.mask = isDisplay && tipContent.length > 0? tipContent: '';
   }
 
   // 拓展预览音视频的 token
@@ -425,7 +456,7 @@ resourceSchema.methods.getPDFPreviewFilePath = async function() {
 };
 
 // 检测html内容中的资源并将指定id存入resource.reference
-resourceSchema.statics.toReferenceSource = async function(id, declare) {
+resourceSchema.statics.toReferenceSource = async function(id, declare = '') {
   const model = mongoose.model("resources");
 	const $ = cheerio.load(declare);
   const resourcesId = [];
@@ -459,6 +490,34 @@ resourceSchema.statics.getResourcesByReference = async function(id) {
     await resource.setFileExist();
   }
   return resources;
+};
+
+/*
+* 指定引用ID，从已有resource中去掉当前引用ID，并给新指定的resource中添加引用ID
+* @param {[String]} resourcesId 需添加引用ID的资源ID
+* @param {String} referenceId 引用ID
+* */
+resourceSchema.statics.replaceReferencesById = async function(resourcesId, referenceId) {
+  const ResourceModel = mongoose.model('resources');
+  await ResourceModel.updateMany({
+    references: referenceId,
+    rid: {
+      $nin: resourcesId
+    }
+  }, {
+    $pull: {
+      references: referenceId
+    }
+  });
+  await ResourceModel.updateMany({
+    rid: {
+      $in: resourcesId
+    }
+  }, {
+    $addToSet: {
+      references: referenceId
+    }
+  });
 };
 
 /*
@@ -705,6 +764,14 @@ resourceSchema.methods.checkDownloadCost = async function(user) {
       description: ''
     };
   }
+  //如果存在用户并且资源是该用户上传的就可以免费下载
+  if(user && this.uid === user.uid) {
+    return {
+      needScore: false,
+      reason: 'self',
+      description: ''
+    }
+  }
   // 获取已开启的积分
   const enabledScoreTypes = await SettingModel.getEnabledScoresType();
   for(const typeName of enabledScoreTypes) {
@@ -852,10 +919,15 @@ resourceSchema.methods.updateForumsId = async function() {
 
 /*
 * 判断用户是否有权限访问资源
+* @param {[String]} accessibleForumsId 访问能够访问的专业ID组成的数组
 * */
 resourceSchema.methods.checkAccessPermission = async function(accessibleForumsId) {
-  const {tou, forumsId: oldForumsId} = this;
-  for(const id of this.references) {
+  const {tou, references, forumsId: oldForumsId} = this;
+  if(references.length === 0) {
+    // 不允许访问未使用过的资源
+    throwErr(403, `权限不足`);
+  }
+  for(const id of references) {
     // 非 post 引用的资源 直接放行
     if(id.includes('-')) {
       return;
@@ -1125,7 +1197,7 @@ resourceSchema.methods.getMediaServiceDataAudio = async function() {
 resourceSchema.statics.updateResourceStatus = async (props) => {
   // console.log(props,'props');
   const {rid, status, error, filesInfo = {}} = props;
-  const ResourceModel =await mongoose.model('resources');
+  const ResourceModel = mongoose.model('resources');
   const FILE = require('../nkcModules/file');
   const {sendDataMessage} = require('../nkcModules/socket');
   const resource = await ResourceModel.findOnly({rid});
@@ -1254,5 +1326,20 @@ resourceSchema.methods.updateFilesInfo = async function() {
   });
   return files;
 };
+
+/*
+* 指定资源ID，获取以资源ID为键资源对象为值的对象
+* @param {[String]} resourcesId 资源ID组成的数组
+* */
+resourceSchema.statics.getResourcesObjectByResourcesId = async (resourcesId) => {
+  const ResourceModel = mongoose.model('resources');
+  const resources = await ResourceModel.find({rid: {$in: resourcesId}});
+  const obj = {};
+  for(let i = 0; i < resources.length; i++) {
+    const resource = resources[i];
+    obj[resource.rid] = resource;
+  }
+  return obj;
+}
 
 module.exports = mongoose.model('resources', resourceSchema);

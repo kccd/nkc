@@ -61,21 +61,21 @@ new Vue({
             placeholder: "可缺省"
           },
           {
-            dom: "input",
-            label: "入口文件",
-            name: "entry",
-            value: entry,
-            placeholder: "必填，默认/index.html"
-          },
-          {
             dom: "radio",
-            label: "是否是站外站点",
+            label: "链接",
             value: isOtherSite,
             name: "isOtherSite",
             radios: [
               {name: "是", value: true},
               {name: "否", value: false}
             ]
+          },
+          {
+            dom: "input",
+            label: "入口文件",
+            name: "entry",
+            value: entry,
+            placeholder: "必填，默认/index.html"
           },
           {
             dom: "input",
@@ -148,15 +148,8 @@ new Vue({
             placeholder: "可缺省"
           },
           {
-            dom: "input",
-            label: "入口文件",
-            name: "entry",
-            value: "",
-            placeholder: "必填，默认/index.html"
-          },
-          {
             dom: "radio",
-            label: "是否是站外站点",
+            label: "链接",
             value: false,
             name: "isOtherSite",
             radios: [
@@ -164,6 +157,14 @@ new Vue({
               {name: "否", value: false}
             ]
           },
+          {
+            dom: "input",
+            label: "入口文件",
+            name: "entry",
+            value: "",
+            placeholder: "必填，默认/index.html"
+          },
+
           {
             dom: "input",
             label: "工具压缩包",

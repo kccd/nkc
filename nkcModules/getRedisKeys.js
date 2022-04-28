@@ -13,6 +13,10 @@ module.exports = (type, v1, v2) => {
     case 'timeToSetOtherUserOperationNumber': return `user:${v1}timeToSetOtherUserOperationNumber`; // 更新阅读量
     case 'operationStatistics': return `statistics:operation:${v1}`; // 操作统计
     case 'IPBlacklist': return `IPBlacklist`;
-    case 'resourceToken': return `resource:${v1}:token:${v2}`
+    case 'resourceToken': return `resource:${v1}:token:${v2}`;
+    case 'newArticleId': return `newArticleId`;
+    case 'newMomentId': return `newMomentId`;
+    case 'momentOrder': return `moment:${v1}:order`;
+    case 'commentOrder': return `comment:${v1}:order`;
   }
 }

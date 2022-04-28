@@ -73,13 +73,16 @@ var app = new Vue({
       if(this.order) return this.order.product.user;
     },
     refundMoneyMax: function() {
-      var maxMoney = 0;
       if(this.param) {
         return this.param.singlePrice * this.param.count;
       } else {
+        // 没发货的情况
+        if(this.order.shipToc === null){
+          return this.order.orderPrice + this.order.orderFreightPrice;
+        }
         return this.order.orderPrice
       }
-    }
+    },
   },
   mounted: function() {
     var data = document.getElementById('data');
@@ -110,7 +113,7 @@ var app = new Vue({
           setTimeout(function() {
             // window.location.href="/shop/order"
             openToNewLocation("/shop/order");
-          }, 2000); 
+          }, 2000);
         })
         .catch(function(data) {
           app.error = data.error || data;
@@ -130,7 +133,7 @@ var app = new Vue({
           app.info = "保存成功";
           setTimeout(function() {
             app.info = "";
-          }, 3000); 
+          }, 3000);
         })
         .catch(function(data) {
           app.error = data.error || data;
@@ -174,7 +177,9 @@ var app = new Vue({
         if(param) {
           if(newRefund.money*100 > param.productPrice) return this.error = "退款金额不能超过退款中的商品的金额";
         } else {
-          if(newRefund.money*100 > this.order.orderPrice) return this.error = "退款金额不能超过商品总金额";
+          // 1.1 * 100 不会得到预期结果
+          // 如果只考虑 最大两位小数 （parseInt(Number)）
+          if( parseInt(newRefund.money*100) > this.order.orderPrice + (!this.order.shipToc ? this.order.orderFreightPrice : 0) ) return this.error = "退款金额不能超过商品总金额";
         }
       }
       else return this.error = "请输入正确的退款金额";
@@ -222,7 +227,7 @@ var app = new Vue({
           }
         }
         app.uploadStatus = "上传中... " + (index+1) + "/" + arr.length + " " + p.toFixed(1) + "%";
-        
+
       })
         .then(function(data) {
           var cert = data.cert;
@@ -248,7 +253,7 @@ var app = new Vue({
       })
         .then(function() {
           window.location.reload();
-        })    
+        })
         .catch(function(data) {
           this.error = data.error || data;
         });
@@ -266,7 +271,7 @@ var app = new Vue({
           screenTopWarning(data);
         });
     },
-    
+
     refundType: function(t) {
       return {
         'money': '只退款',
@@ -274,6 +279,6 @@ var app = new Vue({
       }[t];
     }
   }
-});   
+});
 
 window.app = app;

@@ -42,7 +42,8 @@ const vipDisGroup = grades.map(g => {
   };
 });
 
-
+import Editor from "../../../lib/vue/Editor";
+import {getShopDescriptionEditorConfigs} from "../../../lib/js/editor";
 window.app = new Vue({
   el: "#app",
   data: {
@@ -110,8 +111,17 @@ window.app = new Vue({
     freightTemplates: product? product.freightTemplates: [],
     // 上架时间
     shelfType: "immediately", // 立即上架：immediately，timing: 定时上架，save: 暂存不发布
-    shelfTime: ""
-
+    shelfTime: "",
+    editorPlugs: {
+      resourceSelector: true,
+      draftSelector: true,
+      stickerSelector: true,
+      xsfSelector: true,
+      mathJaxSelector: true,
+    }
+  },
+  components: {
+    'editor': Editor,
   },
   watch: {
     shelfType() {
@@ -125,8 +135,8 @@ window.app = new Vue({
     } else {
       window.CommonModal = new NKC.modules.CommonModal();
       window.SelectForums = new NKC.modules.ForumSelector();
-      window.editor = UE.getEditor('container', NKC.configs.ueditor.shopConfigs);
-      NKC.methods.ueditor.initDownloadEvent(window.editor);
+      // window.editor = UE.getEditor('container', NKC.configs.ueditor.shopConfigs);
+      // NKC.methods.ueditor.initDownloadEvent(window.editor);
       this.initTime();
       this.addParam();
     }
@@ -164,7 +174,10 @@ window.app = new Vue({
     },
     freightTemplateNames() {
       return this.freightTemplates.map(f => f.name);
-    }
+    },
+    editorConfigs() {
+      return getShopDescriptionEditorConfigs();
+    },
   },
   methods: {
     save() {
@@ -175,7 +188,7 @@ window.app = new Vue({
         .then(() => {
           self.submitting = true;
           if(self.type === "create") {
-            self.content = editor.getContent();
+            self.content = self.$refs.shopEditor.getContent();
             if(!self.selectedShopForumId) throw "请选择商品分类";
             // if(!self.mainForums.length) throw "请选择商品辅助分类";
             body.mainForumsId = [self.selectedShopForumId].concat(self.mainForums.map(forum => forum.fid));
@@ -325,6 +338,7 @@ window.app = new Vue({
           return nkcAPI("/shop/manage/shelf", "POST", {post:  body});
         })
         .then(data => {
+          self.$refs.shopEditor.removeNoticeEvent();
           sweetSuccess("提交成功");
           self.submitting = false;
           self.showCloseInfo = false;

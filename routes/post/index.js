@@ -94,7 +94,8 @@ router
     };
     data.post = await db.PostModel.extendPost(post, extendPostOptions);
     data.postUrl = await db.PostModel.getUrl(data.post);
-    const voteUp = await db.PostsVoteModel.find({pid, type: 'up'}).sort({toc: 1});
+    const {post: postSource} = await db.PostsVoteModel.getVoteSources();
+    const voteUp = await db.PostsVoteModel.find({source: postSource, sid: pid, type: 'up'}).sort({toc: 1});
     const uid = new Set();
     for(const v of voteUp) {
       uid.add(v.uid);
@@ -514,5 +515,5 @@ router
   .use("/:pid/option", optionRouter.routes(), optionRouter.allowedMethods())
   .use('/:pid/comments', commentsRouter.routes(), commentsRouter.allowedMethods())
   .use('/:pid/comment', commentRouter.routes(), commentRouter.allowedMethods())
-  .use("/:pid/delete", deleteRouter.routes(), deleteRouter.allowedMethods());
+  .use("/:pid/delete", deleteRouter.routes(), deleteRouter.allowedMethods())
 module.exports = router;

@@ -1,5 +1,8 @@
 module.exports = {
 	GET: 'visitAppDownload',
+  upgrade: {
+    GET: 'APPUpgrade',
+  },
 	location: {
 		GET: "selectLocation",
 	},
@@ -12,8 +15,41 @@ module.exports = {
 	my: {
 		GET: "APPGetMy"
 	},
+  account: {
+    GET: 'APPGetAccountInfo'
+  },
 	download: {
 		GET: "appGetDownload"
+	},
+	profile: {
+		GET: "appVisitProfile",
+    blacklist: {
+      GET: 'appVisitProfile'
+    },
+    finance: {
+      GET: 'appVisitProfile'
+    },
+		sub: {
+			GET: "appVisitProfile",
+			user: {
+				GET: "appVisitProfile",
+			},
+			forum: {
+				GET: "appVisitProfile",
+			},
+			column: {
+				GET: "appVisitProfile",
+			},
+			thread: {
+				GET: "appVisitProfile",
+			},
+			fan: {
+				GET: "appVisitProfile",
+			},
+			follower: {
+				GET: "appVisitProfile",
+			},
+		},
 	},
 	scoreChange: {
 		PARAMETER: {

@@ -2,7 +2,6 @@ const Router = require('koa-router');
 const logoutRouter = require('./logout');
 const sendMessageRouter = require('./sendMessage');
 const otherRouter = new Router();
-const editorRouter = require('./editor');
 const shopLogo = require('./shopLogo');
 const resourcesRouter = require('./resources');
 const attachIconRouter = require('./attachIcon');
@@ -12,7 +11,6 @@ const photoRouter = require('./photo');
 const photoSmallRouter = require('./photo_small');
 const posterRouter = require('./poster');
 const pageRouter = require('./page');
-const appDownload = require("./appDownload");
 const founderInvite = require("./founderInvite");
 const testRouter = require('./test');
 otherRouter
@@ -42,7 +40,6 @@ otherRouter
 	})
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())
   .use('sendMessage', sendMessageRouter.routes(), sendMessageRouter.allowedMethods())
-  .use('edit', editorRouter.routes(), editorRouter.allowedMethods())
   .use('shopLogo', shopLogo.routes(), shopLogo.allowedMethods())
   .use('resources', resourcesRouter.routes(), resourcesRouter.allowedMethods())
   .use('rm', rmRouter.routes(), rmRouter.allowedMethods())
@@ -52,7 +49,6 @@ otherRouter
 	.use('photo_small', photoSmallRouter.routes(), photoSmallRouter.allowedMethods())
 	.use('page', pageRouter.routes(), pageRouter.allowedMethods())
   .use('poster', posterRouter.routes(), posterRouter.allowedMethods())
-	.use("appDownload", appDownload.routes(), appDownload.allowedMethods())
 	.use("founderInvite", founderInvite.routes(), founderInvite.allowedMethods())
   .use('test', testRouter.routes(), testRouter.allowedMethods());
 module.exports = otherRouter;

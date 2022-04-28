@@ -6,6 +6,11 @@ block title
   link(rel='stylesheet' href=`/mdui/css/mdui.min.css`)
   link(href=`/experimental/index.css?v=${startTime}` rel='stylesheet')
   title 发表设置
+  style.
+    .mdui-btn.active{
+      background-color: #2b90d9;
+      color:#fff;
+    }
 block content
 
   .container-fluid.max-width.mdui-m-b-5
@@ -16,9 +21,9 @@ block content
           .col-xs-12.col-md-12
             .row
               .col-sm-12.mdui-m-a-1
-                button.mdui-btn(:class='{"mdui-color-theme": type === "postToForum"}' @click='type = "postToForum"') 发表文章
-                button.mdui-btn(:class='{"mdui-color-theme": type === "postToThread"}' @click='type = "postToThread"') 发表回复
-                button.mdui-btn(:class='{"mdui-color-theme": type === "postLibrary"}' @click='type = "postLibrary"') 文库操作
+                button.mdui-btn(:class='{"active": type === "postToForum"}' @click='type = "postToForum"') 发表文章
+                button.mdui-btn(:class='{"active": type === "postToThread"}' @click='type = "postToThread"') 发表回复
+                button.mdui-btn(:class='{"active": type === "postLibrary"}' @click='type = "postLibrary"') 文库操作
                 //button.mdui-btn(:class='{"mdui-color-theme": type === "postResource"}' @click='type = "postResource"') 上传资源
               .col-sm-2.text-right
                 h4 最小认证等级
@@ -41,7 +46,7 @@ block content
                 <label class="mdui-radio">
                 <input type="radio" :value='3' v-model='postSettings[type].authLevelMin'/>
                 <i class="mdui-radio-icon"></i>
-                | 等级3（手持省份证照）
+                | 等级3（手持身份证照）
                 </label>
                 hr
             .row

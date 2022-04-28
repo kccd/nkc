@@ -1,38 +1,23 @@
-const Cookies = require('cookies-string-parse');
 const languages = require('../languages');
-const cookieConfig = require("../config/cookie");
 const translate = require('../nkcModules/translate');
 const {files: fileOperations} = require('../settings/operationsType');
+const {getUserInfo} = require('../nkcModules/cookie');
 
 module.exports = async (ctx, next) => {
 
   const isResourcePost = fileOperations.includes(ctx.data.operationId);
-  const {data, db, redis} = ctx;
-	// cookie
+  const {data, db, state} = ctx;
   let userInfo = ctx.getCookie("userInfo");
-	// let userInfo = ctx.cookies.get('userInfo', {signed: true});
 	if(!userInfo) {
 	  // 为了兼容app中的部分请求无法附带cookie，故将cookie放到了url中
-		try{
-      let {cookie} = ctx.query || {};
-      if(cookie) {
-        cookie = Buffer.from(cookie, 'base64').toString();
-        if(cookie) {
-          const cookies = new Cookies(cookie, {
-            keys: [cookieConfig.secret]
-          });
-          userInfo = cookies.get('userInfo', {signed: true});
-          if(userInfo) {
-            userInfo = Buffer.from(userInfo, "base64").toString();
-            userInfo = JSON.parse(userInfo);
-          }
-        }
-      }
-		} catch(err) {
-		  if(global.NKC.NODE_ENV !== 'production') console.log(err);
-		}
+    const {cookie} = ctx.query || {};
+    userInfo = getUserInfo(cookie);
 	}
-	let userOperationsId = [], userRoles = [], userGrade = {}, user, usersPersonal;
+	let userOperationsId = [];
+  let userRoles = [];
+  let userGrade = {};
+  let user;
+  let usersPersonal;
 	if(userInfo) {
 	  try {
 	    const {uid, lastLogin = ""} = userInfo;
@@ -47,7 +32,6 @@ module.exports = async (ctx, next) => {
     } catch(err) {
       ctx.clearCookie('userInfo');
     }
-
 	}
   let languageName = 'zh_cn';
 	if(!user) {
@@ -75,18 +59,13 @@ module.exports = async (ctx, next) => {
     if(ctx.data.operationId === "getResources" || !isResourcePost) {
       const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
       await db.UserModel.extendUsersInfo([user]);
-      const {
-        newSystemInfoCount,
-        newApplicationsCount,
-        newReminderCount,
-        newUsersMessagesCount
-      } = await user.getNewMessagesCount();
-      user.newMessage = newSystemInfoCount + newApplicationsCount + newReminderCount + newUsersMessagesCount;
+      // user.newMessage = newSystemInfoCount + newApplicationsCount + newReminderCount + newUsersMessagesCount;
       user.authLevel = await userPersonal.getAuthLevel();
       user.setPassword = userPersonal.password.salt && userPersonal.password.hash;
       user.boundMobile = userPersonal.nationCode && userPersonal.mobile;
       user.boundEmail = userPersonal.email;
       user.draftCount = await db.DraftModel.countDocuments({uid: user.uid});
+      //  需要更改为 socket 获取状态然后返回
       user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
       languageName = user.generalSettings.language;
       if(user.generalSettings.lotterySettings.status) {
@@ -99,33 +78,34 @@ module.exports = async (ctx, next) => {
         await user.generalSettings.updateOne({'draftFeeSettings.kcb': 0});
       }
       // 获取新点赞数
-      const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: oldUser.tlv}, type: "up"}, {_id: 1, uid: 1, pid: 1});
-      // 按post分组
-      let postGroups = {};
-      // 哪个post 哪些人
-      for(let vote of votes) {
-        let {_id, pid} = vote;
-        if(!postGroups[pid]) {
-          postGroups[pid] = [];
-        }
-        postGroups[pid].push(_id.toString());
-      }
-      // 最新点赞中包含多少个post就会生成多少条消息
-      for(let pid in postGroups) {
-        const votesId = postGroups[pid];
-        // 发系统通知
-        await db.MessageModel({
-          _id: await db.SettingModel.operateSystemID('messages', 1),
-          r: user.uid,
-          ty: 'STU',
-          port: ctx.port,
-          ip: ctx.address,
-          c: {
-            type: 'latestVotes',
-            votesId
-          }
-        }).save();
-      }
+      // const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: oldUser.tlv}, type: "up"}, {_id: 1, uid: 1, pid: 1});
+      // // 按post分组
+      // let postGroups = {};
+      // // 哪个post 哪些人
+      // for(let vote of votes) {
+      //   let {_id, pid} = vote;
+      //   if(!postGroups[pid]) {
+      //     postGroups[pid] = [];
+      //   }
+      //   postGroups[pid].push(_id.toString());
+      // }
+      // // 最新点赞中包含多少个post就会生成多少条消息
+      // for(let pid in postGroups) {
+      //   const votesId = postGroups[pid];
+      //   console.log('生成点赞 消息！');
+      //   // 发系统通知
+      //   await db.MessageModel({
+      //     _id: await db.SettingModel.operateSystemID('messages', 1),
+      //     r: user.uid,
+      //     ty: 'STU',
+      //     port: ctx.port,
+      //     ip: ctx.address,
+      //     c: {
+      //       type: 'latestVotes',
+      //       votesId
+      //     }
+      //   }).save();
+      // }
     }
     userGrade = await user.extendGrade();
     // 判断用户是否被封禁
@@ -175,6 +155,7 @@ module.exports = async (ctx, next) => {
 	data.userRoles = userRoles;
 	data.userGrade = userGrade;
   data.user = user;
+  state.user = user;
   ctx.state.uid = user? user.uid: null;
 
   // 专业树状结构

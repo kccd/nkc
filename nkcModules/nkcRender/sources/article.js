@@ -1,4 +1,4 @@
-const {getUrl, getSize} = require("../../tools");
+const {getUrl, getSize, objToStr} = require("../../tools");
 const cheerio = require("../customCheerio");
 const {htmlEscape} = require("../htmlEscape");
 const videoSize = require('../../../settings/video');
@@ -23,14 +23,14 @@ module.exports = {
     if(!width || !height) {
       return `
         <span data-tag="nkcsource" data-type="picture" data-id="${id}">
-          <img src="${url}" alt="${oname}" data-type="view" dataimg="content">
+          <img data-global-click="viewImage" data-global-long-press="downloadFile" data-global-data="${objToStr({name: oname, url})}" src="${url}" alt="${oname}" data-type="view" dataimg="content">
         </span>
       `.trim();
     } else {
       return `
         <span data-tag="nkcsource" data-type="picture" data-id="${id}" style="width: ${width}px;">
           <span style="padding-top: ${(height * 100) / width}%">
-            <img data-src="${url}" alt="${oname}" data-type="view" dataimg="content" class="lazyload">
+            <img data-global-click="viewImage" data-global-long-press="downloadFile" data-global-data="${objToStr({name: oname, url})}" data-src="${url}" alt="${oname}" data-type="view" dataimg="content" class="lazyload">
           </span>
         </span>
       `.trim();
@@ -40,7 +40,7 @@ module.exports = {
     const url = getUrl("sticker", id);
     return `
       <span data-tag="nkcsource" data-type="sticker" data-id="${id}">
-        <img src="${url}" alt="sticker">
+        <img src="${url}" alt="sticker" style="max-width: 200px" data-global-click="viewSticker" data-global-data="${objToStr({rid: id})}">
       </span>
     `.trim();
   },
@@ -152,7 +152,7 @@ module.exports = {
             </span>
         </span>
       `}
-      </span>  
+      </span>
     `.trim();
   },
   pre(html) {

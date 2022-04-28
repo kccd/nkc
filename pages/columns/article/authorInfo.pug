@@ -1,0 +1,25 @@
+//- 通信作者
+mixin authorInfo()
+  .modal.fade#moduleAuthor(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+    .modal-dialog.modal-sm(role="document")#moduleAuthorApp
+      .modal-content
+        .modal-header
+          button.close(data-dismiss="modal" aria-label="Close")
+            span(aria-hidden="true") &times;
+          h4.modal-title 通信作者
+        .modal-body
+          .form
+            .form-group()
+              h5 通信邮箱：
+              strong {{contract.contractEmail }}
+            .form-group()
+              h5 电话号码：
+              strong {{contract.contractTel }}
+            .form-group()
+              h5 通信地址：
+              strong {{contract.contractAdd }}
+            .form-group()
+              h5 邮政编码：
+              strong {{contract.contractCode }}
+  block scripts 
+    +includeJS('/columns/article/authorInfo.js')

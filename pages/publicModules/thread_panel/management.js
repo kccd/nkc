@@ -32,23 +32,47 @@ function getSelectedThreadsId() {
   };
 }
 
-
+//获取选中的post的id
 function getSelectedPostsId() {
   var dom = $(".thread-checkbox input");
   var postsId = [];
   for(var i = 0; i < dom.length; i++) {
     var d = dom.eq(i);
-    if(d.prop("checked")) {
+    if(d.prop("checked") && d.attr("data-post-id")) {
       postsId.push(d.attr("data-post-id"));
     }
   }
   return postsId;
 }
 
+//获取选中的document的id
+function getSelectedDocumentsId() {
+  var dom = $(".thread-checkbox input");
+  var postsId = [];
+  for(var i = 0; i < dom.length; i++) {
+    var d = dom.eq(i);
+    if(d.prop("checked") && d.attr("data-document-id")) {
+      postsId.push(d.attr("data-document-id"));
+    }
+  }
+  return postsId;
+}
+
+function reviewDocuments(arr, index) {
+  let d = arr[index];
+  if(!d) return;
+  return nkcAPI('/review', 'PUT', d)
+    .then(() => {
+      sweetSuccess('操作成功');
+    })
+};
+
 // 屏蔽POST(包含thread的oc)
 function disabledSelectedPosts() {
   var postsId = getSelectedPostsId();
-  if(postsId.length === 0) return screenTopWarning("请至少勾选一篇文章");
+  var documentsId = getSelectedDocumentsId();
+  var ids = postsId.concat(documentsId);
+  if(ids.length === 0) return screenTopWarning("请至少勾选一篇文章");
   DisabledPost.open(function(data) {
     var type = data.type;
     var reason = data.reason;
@@ -67,15 +91,39 @@ function disabledSelectedPosts() {
       url = "/threads/recycle";
     }
     DisabledPost.lock();
-    nkcAPI(url, method, body)
-      .then(function() {
-        screenTopAlert("操作成功");
+    Promise.resolve()
+      .then(() => {
+        if(postsId.length !== 0) {
+          return nkcAPI(url, method, body)
+            .then(function() {
+              screenTopAlert("操作成功");
+            })
+        }
+        return;
+      })
+      .then(() => {
+        if(documentsId.length !== 0) {
+          const arr = [];
+          for(const id of documentsId) {
+            arr.push({
+              delType: type === 'toDraft'?'faulty':'disabled',
+              docId: id,
+              type: 'document',
+              remindUser: remindUser,
+              violation: violation,
+              reason: reason
+            });
+          }
+          return reviewDocuments(arr, 0);
+        }
+        return;
+      })
+      .then(() => {
         DisabledPost.close();
         DisabledPost.unlock();
       })
-      .catch(function(data) {
-        screenTopWarning(data);
-        DisabledPost.unlock();
+      .catch(err => {
+        sweetError(err);
       })
   });
 }

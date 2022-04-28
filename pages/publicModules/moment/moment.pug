@@ -1,0 +1,129 @@
+if !isIncluded('publicModules/moment/moment.pug')
+  +includeCSS('/publicModules/moment/moment.css')
+  +includeDeferJS('/publicModules/moment/moment.js')
+  include ../../publicModules/mediaPreview/mediaPreview
+  mixin momentList(momentsData)
+    .moments-container
+      for momentData in momentsData
+        .moment-item
+          +singleMoment(momentData)
+
+  mixin momentFiles(files)
+    if files && files.length > 0
+      -var fileType = files[0].type;
+      -var fileCount = files.length;
+      .single-moment-files(
+        data-file-type=fileType
+        data-file-count=fileCount
+        )
+        for file in files
+          -var fixSize = "";
+          -var singleMomentFileStyle = '';
+          //- 仅只有一张图片时，设置图片站位
+          if fileType === "picture" && files.length === 1 && file.height && file.width
+            -var paddingTop = file.height * 100 / file.width;
+            -singleMomentFileStyle = `padding-top: ${paddingTop}%;`
+            -fixSize = "fix-size";
+          .single-moment-file(class=fixSize style=singleMomentFileStyle)
+            if fileType === 'video'
+              +singleVideo(file)
+            else
+              div(style=`background-image: url(${file.url})` class=fixSize)
+                img(
+                  data-src=file.url
+                  data-tag='nkcsource'
+                  data-type='picture'
+                  class="lazyload"
+                  alt=file.filename
+                  title=file.filename
+                  )
+
+
+  mixin singleMoment(momentData, quote)
+    -var {uid, toc, username, avatarUrl, userHome, time, content, voteUp, files} = momentData;
+    -var {momentId, quoteData, commentCount, voteType = ''} = momentData;
+    .single-moment-container(data-moment-id=momentId)
+      .single-moment-top-container
+        if !quote
+          .single-moment-left
+            .single-moment-avatar(
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid})
+              )
+              img(src=avatarUrl)
+        .single-moment-right
+          .single-moment-header
+            if quote
+              .single-moment-avatar
+                img(src=avatarUrl)
+            .single-moment-user(
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid})
+            )
+              a(href=userHome target="_blank")=username
+            .single-moment-time
+              +fromNow(toc)
+            if !quote
+              .single-moment-options
+                .fa.fa-ellipsis-h
+          .single-moment-content!=content
+          +momentFiles(files)
+      if !quote
+        if quoteData && quoteData.data
+          .single-moment-center-container
+            .single-moment-center-content
+              +quoteData(quoteData)
+        .single-moment-bottom-container
+          .single-moment-bottom
+            .single-moment-bottom-left(
+              data-moment-id=momentId
+              data-event-name='openCommentContainer'
+              )
+              .fa.fa-comment-o
+              span(class=commentCount===0? 'hidden': '')= commentCount
+            .single-moment-bottom-center.fa.fa-retweet(
+              data-moment-id=momentId
+              data-event-name='openReportContainer'
+            )
+            .single-moment-bottom-right(
+              data-moment-id=momentId
+              data-event-name='voteUp'
+              data-vote-type=voteType
+            )
+              .fa.fa-thumbs-o-up
+              span(class=voteUp===0? 'hidden': '')= voteUp
+          .single-moment-comment-container(v-if='!hidden' v-cloak)
+            moment-comments(:mid="momentId" :type='postType' ref='momentComments')
+
+
+
+  mixin quoteData(quoteData)
+    -var {quoteType, quoteId, data} = quoteData;
+    if quoteType === 'moment'
+      +quoteMoment(data)
+    if quoteType === 'article'
+      +quoteArticle(data)
+
+  mixin quoteMoment(data)
+    +singleMoment(data, true)
+
+  mixin quoteArticle(data)
+    .single-moment-header
+      .single-moment-avatar
+        img(src=data.avatarUrl)
+      .single-moment-user(
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        data-global-data=objToStr({uid: data.uid})
+      )
+        a(href=data.userHome target="_blank")=data.username
+      .single-moment-time
+        +fromNow(data.toc)
+    .single-moment-title
+      a(href="/" target='_blank')=data.title
+    .single-moment-abstract(class=data.coverUrl? 'cover': '')
+      if data.coverUrl
+        .single-moment-cover(style=`background-image: url(${data.coverUrl})`)
+      span=data.content

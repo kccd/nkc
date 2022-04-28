@@ -1,0 +1,31 @@
+//- 字段详情/pages/thread/singlePost/singlePost.pug
+if !isIncluded('singlePostBottom')
+  include ./singleCommentVote
+  mixin singleCommentBottom(props)
+    -var {cid, docId, props: comment} = props;
+    .single-post-bottom(id=`singleCommentBottom_${cid}` cid=cid)
+      violation-record(ref="violationRecord")
+      complaint(ref="complaint")
+      disabled-comment(ref="disabledComment")
+      comment-options(
+        ref="commentOptions"
+        @complaint="complaint"
+        @disable-comment="disableComment"
+        @violation-record="violationRecord"
+        @editor-comment="editorComment"
+      )
+      if data.user
+        .single-post-bottom-item.hidden.switch-hidden-status
+          .switch-hidden-status-button(onclick=`NKC.methods.switchCommentContent('${cid}')`)
+        .single-post-bottom-item(onclick=`window.commentEditor.quoteComment('${docId}')`)
+          .fa.fa-comment-o.reply-icon
+          span 引用
+        .single-post-bottom-item(data-type='CommentOption' data-cid=cid onclick=`window.singleCommentBottom['${cid}'].openOptions(this)` title='其他操作')
+          .fa.fa-sliders.option-icon
+      else
+        .single-post-bottom-item(onclick="RootApp.openLoginPanel('login')")
+          .fa.fa-comment-o.reply-icon
+          span 引用
+        .single-post-bottom-item(onclick="RootApp.openLoginPanel('login')" title='其他操作')
+          .fa.fa-sliders.option-icon
+      comment-post-editor(:ref=`"editorContainer"` cid=cid @close-editor="closePostCommentEditor")

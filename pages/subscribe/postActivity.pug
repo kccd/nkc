@@ -1,0 +1,84 @@
+if !isIncluded('postActivity')
+  +includeCSS('/subscribe/postActivity.css')
+  mixin postActivity(props)
+    -var {from, user, quote, title, content, toc, cover, url, type} = props;
+    mixin postActivityHeader(headerData)
+      -var {toc, type} = headerData;
+      .post-activity-header(class=headerData.from?'post-activity-main-header':'')
+        if headerData.user.uid
+          .post-activity-avatar(
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid: headerData.user.uid})
+          )
+            if headerData.user.avatar
+              img(src=headerData.user.avatar)
+            else
+              div(style=`background-color: ${headerData.user.color}`)
+        else
+          if headerData.user.dataFloatFid
+            .post-activity-avatar(
+              data-global-mouseover="showForumPanel"
+              data-global-mouseout="hideForumPanel"
+              data-global-data=objToStr({fid: headerData.user.dataFloatFid})
+            )
+              if headerData.user.avatar
+                img(src=headerData.user.avatar)
+              else
+                div(style=`background-color: ${headerData.user.color}`)
+          else
+            .post-activity-avatar
+              if headerData.user.avatar
+                img(src=headerData.user.avatar)
+              else
+                div(style=`background-color: ${headerData.user.color}`)
+        .post-activity-user
+          if headerData.user.homeUrl
+            if headerData.user.uid
+              a(
+                href=headerData.user.homeUrl target="_blank"
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                data-global-data=objToStr({uid: headerData.user.uid})
+                ).post-activity-username=headerData.user.name ||  headerData.user.username
+            else
+              if headerData.user.dataFloatFid
+                a(
+                  href=headerData.user.homeUrl target="_blank"
+                  data-global-mouseover="showForumPanel"
+                  data-global-mouseout="hideForumPanel"
+                  data-global-data=objToStr({fid: headerData.user.dataFloatFid})
+                ).post-activity-username=headerData.user.name || headerData.user.username
+              else
+                a(
+                  href=headerData.user.homeUrl target="_blank"
+                ).post-activity-username=headerData.user.name || headerData.user.username
+          else
+            .post-activity-username=headerData.user.name || headerData.user.username
+          if !headerData.from
+            +fromNow(toc)
+            span &nbsp;
+          if headerData.from
+            span.post-activity-from=`${headerData.from}`
+          if headerData.from
+            .post-activity-time-sm
+              +fromNow(toc)
+    mixin postActivityContent(contentData)
+      -var {cover, title, content, url} = contentData;
+      .post-activity-content
+        if title
+          a(href=url target="_blank").post-activity-title=title
+        .post-activity-content-container(class=cover? 'cover':'')
+          if content
+            a(href=url target="_blank").post-activity-abstract=content
+          if cover
+            .post-activity-cover(style=`background-image: url(${cover})`)
+    .post-activity
+      .post-activity-content
+        +postActivityHeader({from, user, toc, type})
+        +postActivityContent({title, content, cover, url})
+      if quote
+        .post-activity-content.post-activity-quote
+          +postActivityHeader(quote)
+          +postActivityContent(quote)
+

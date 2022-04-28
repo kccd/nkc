@@ -4,6 +4,16 @@ block title
     title 主页
   else
     title=`主页 - ${data.name}`
+    //- meta = `${}`
+  script.
+    const pathname = top.location.pathname.split('/')
+    if(pathname[1] === "creation" && pathname[2] === 'community'){
+      var style = document.createElement('style');
+      style.type = 'text/css';
+      // 为了应对一些页码或其他内部刷新
+      style.innerHTML="body{ background-color:white;padding-top:0;display:none;}";
+      document.getElementsByTagName('head').item(0).appendChild(style);
+    }
   +includeCSS("/user/profile/profile.css")
 block content
   .container-fluid.max-width
@@ -16,9 +26,10 @@ block content
                 a.app-nav(href=link.url class=link.type===data.type?"active":"" data-type="reload")=link.name
 
       else
-        .col-xs-12.col-md-3.box-shadow-panel
+        .col-xs-12.col-md-3.box-shadow-panel#get-left-user-info-list
           if data.type
             .account-nav-xs.hidden-md.hidden-lg=data.name
+          //- 用户信息面板
           .account-nav(class=data.type?"hidden-sm hidden-xs":"")
             .account-user-banner
               a(href=tools.getUrl('userBanner', data.targetUser.banner, 'lg') target="_blank")
@@ -34,9 +45,8 @@ block content
             .account-user-certs=data.targetUser.info.certsName
             .account-user-description!=markdown_safe(data.targetUser.description)
             .account-user-kcb
-              -const targetUserScores = data.targetUserScores;
-              -const targetUserXSF = data.targetUser.xsf;
               include ../../publicModules/userScores
+              +userScores(data.targetUserScores, data.targetUser.xsf)
             .account-user-toc= `注册于${format(`YYYY/MM/DD HH:mm:ss`, data.targetUser.toc)}`
             .account-code=`动态码：${data.code}`
             .account-user-links
@@ -65,6 +75,9 @@ block content
                 a(href=`/u/${data.targetUser.uid}/profile/finance?t=all`).col-xs-6.account-user-link
                   .fa.fa-file-text-o
                   | 我的账单
+                a(href=`/creation` target="_blank").col-xs-6.account-user-link
+                  .fa.fa-lightbulb-o
+                  | 创作中心
             for navLink in data.navLinks
               .account-ul
                 if navLink.name
@@ -75,7 +88,7 @@ block content
                       .name=link.name
                         span=link.count || ""
                       .fa.fa-angle-right
-      .col-xs-12.col-md-7.box-shadow-panel
+      .col-xs-12.col-md-7.box-shadow-panel#container-fluid-show
         if !data.type
           .account-info
             .row
@@ -128,7 +141,11 @@ block content
               for log in data.visitUserLogs
                 .account-logs-user
                   .account-logs-user-avatar
-                    img(src=tools.getUrl("userAvatar", log.targetUser.avatar, "sm") data-float-uid=log.toUid)
+                    img(src=tools.getUrl("userAvatar", log.targetUser.avatar, "sm")
+                      data-global-mouseover="showUserPanel"
+                      data-global-mouseout="hideUserPanel"
+                      data-global-data=objToStr({uid: log.toUid})
+                    )
                   .account-logs-user-info
                     a(href=`/u/${log.toUid}`).account-logs-user-name=log.targetUser.username
                     .account-logs-user-time
@@ -144,7 +161,11 @@ block content
               for log in data.visitSelfLogs
                 .account-logs-user
                   .account-logs-user-avatar
-                    img(src=tools.getUrl("userAvatar", log.user.avatar, "sm") data-float-uid=log.uid)
+                    img(src=tools.getUrl("userAvatar", log.user.avatar, "sm")
+                      data-global-mouseover="showUserPanel"
+                      data-global-mouseout="hideUserPanel"
+                      data-global-data=objToStr({uid: log.uid})
+                    )
                   .account-logs-user-info
                     a(href=`/u/${log.uid}`).account-logs-user-name=log.user.username
                     .account-logs-user-time
@@ -181,7 +202,7 @@ block content
           include ./subscribe/forum
       if !state.isApp
         .col-xs-12.col-md-2.box-shadow-panel.hidden-sm.hidden-xs
-          .account-nav
+          .account-nav.shopping-cart.common-hidden-profile
             .account-user-links
               .account-user-links
                 a(href=`/shop/order`).col-xs-12.account-user-link
@@ -200,6 +221,7 @@ block content
 
   .hidden#subUsersId=objToStr({threads: data.threads, subThreadsId: data.subThreadsId, collectionThreadsId: data.collectionThreadsId, subUsersId: data.subUsersId, subForumsId: data.subForumsId, subColumnsId: data.subColumnsId, subscribes: data.subscribesObj})
 block scripts
+
   include ../../publicModules/subscribeTypes/subscribeTypes
   include ../../publicModules/commonModal/commonModal
   include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
@@ -210,6 +232,19 @@ block scripts
     script.
       var SummaryCalendar = new NKC.modules.SummaryCalender($(".summary-calendar")[0]);
       var SummaryPie = new NKC.modules.SummaryPie($(".summary-pie")[0]);
+  if data.type === "thread" || data.type === "post" || data.type === "draft"  || data.type === "note"
+    script.
+      const pathname2 = top.location.pathname.split('/')
+      if(pathname2[1]==='creation' && pathname2[2] === 'community'){
+        var script = document.createElement('script');
+        script.src = "/user/profile/hidden.js";
+        var firstScript = document.getElementsByTagName('script')[0];
+        firstScript.parentNode.insertBefore(script,firstScript);
+
+      }
+    //- +includeJS('/user/profile/hidden.js')
+
   +includeJS("/user/profile/profile.js")
   if data.type === "note"
     +includeJS("/user/profile/note.js")
+

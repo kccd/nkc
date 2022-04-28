@@ -1,3 +1,4 @@
+import {objToStr} from "../../lib/js/tools";
 NKC.modules.SurveyForm = function(id) {
   var self = this;
   id = id || "#moduleSurveyForm";
@@ -115,6 +116,7 @@ NKC.modules.SurveyForm = function(id) {
       }
     },
     methods: {
+      objToStr: objToStr,
       format: NKC.methods.format,
       getUrl: NKC.methods.tools.getUrl,
       getColor: NKC.methods.getRandomColor,
@@ -325,10 +327,6 @@ NKC.modules.SurveyForm = function(id) {
         this.getSurveyById(surveyId);
       }
       this.checkTime();
-      setTimeout(function() {
-        floatUserPanel.initPanel();
-        NKC.methods.initImageViewer('.option-resource img');
-      }, 300);
     }
   });
   self.init = function(options) {

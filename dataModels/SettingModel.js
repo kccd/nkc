@@ -8,6 +8,7 @@ const PATH = require("path");
 const fs = require("fs");
 const statics = require("../settings/statics");
 const destroy = require("destroy");
+const {getUrl} = require("../nkcModules/tools");
 const fsPromise = fs.promises;
 
 const settingSchema = new Schema({
@@ -955,5 +956,149 @@ settingSchema.statics.saveSiteLog = async (filePath) => {
     width: 512,
   });
 }
+
+/*
+* 获取前台管理面板的入口以及未处理数目
+* @param {user schema}
+* @return {[Object]}
+*   @param {String} name 入口名称
+*   @param {String} url 入口链接
+*   @param {String} icon 图标名称
+*   @param {Number} count 待处理条数
+* */
+settingSchema.statics.getManagementData = async (user) => {
+  if(!user) return [];
+  const SettingModel = mongoose.model('settings');
+  const ForumModel = mongoose.model('forums');
+  const PostModel = mongoose.model('posts');
+  const ThreadModel = mongoose.model('threads');
+  const DocumentModel = mongoose.model('documents');
+  const ComplaintModel = mongoose.model('complaints');
+  const ProblemModel = mongoose.model('problems');
+  const results = [];
+  
+  if(await user.hasPermission('nkcManagement')) {
+    results.push({
+      name: '前台管理',
+      url: '/nkc',
+      icon: 'ft-layers',
+      count: 0,
+    });
+  }
+  if(await user.hasPermission('visitExperimentalStatus')) {
+    results.push({
+      name: '后台管理',
+      url: '/e',
+      icon: 'i-server',
+      count: 0
+    });
+  }
+  if(await user.hasPermission('review')) {
+    const recycleId = await SettingModel.getRecycleId();
+    const q = {
+      reviewed: false,
+      disabled: false,
+      mainForumsId: {$ne: recycleId}
+    };
+    const m = {
+      status: (await DocumentModel.getDocumentStatus()).unknown,
+      type: (await DocumentModel.getDocumentTypes()).stable,
+      source: (await DocumentModel.getDocumentSources()).article,
+    }
+    if(!await user.hasPermission("superModerator")) {
+      const forums = await ForumModel.find({moderators: user.uid}, {fid: 1});
+      const fid = forums.map(f => f.fid);
+      q.mainForumsId = {
+        $in: fid
+      }
+    }
+    const posts = await PostModel.find(q, {tid: 1, pid: 1});
+    const threads = await ThreadModel.find({tid: {$in: posts.map(post => post.tid)}}, {recycleMark: 1, oc: 1, tid: 1});
+    const threadsObj = {};
+    threads.map(thread => threadsObj[thread.tid] = thread);
+    let count = 0;
+    posts.map(post => {
+      const thread = threadsObj[post.tid];
+      if(thread && (thread.oc !== post.pid || !thread.recycleMark)) {
+        count++;
+      }
+    });
+    count += await DocumentModel.countDocuments(m);
+    results.push({
+      name: '内容审核',
+      url: '/review',
+      icon: 'fs-preview',
+      count
+    });
+  }
+  if(await user.hasPermission('complaintGet')) {
+    results.push({
+      name: '投诉列表',
+      url: '/complaint',
+      icon: 'ft-alert-triangle',
+      count: await ComplaintModel.countDocuments({resolved: false})
+    });
+  }
+  if(await user.hasPermission('visitProblemList')) {
+    results.push({
+      name: '问题列表',
+      url: '/problem/list',
+      icon: 'e-new',
+      count: await ProblemModel.countDocuments({resolved: false}),
+    });
+  }
+  if(await user.hasPermission('getLibraryLogs')) {
+    results.push({
+      name: '文库记录',
+      url: '/libraries/logs',
+      icon: 'i-library',
+      count: 0
+    });
+  }
+  return results;
+};
+
+/*
+* 获取应用列表应用入口
+* @param {[Object]}
+*   @param {String} name 应用名称
+*   @param {String} url 引用入口链接
+*   @param {String} icon 引用图标链接
+* */
+settingSchema.statics.getAppsData = async () => {
+  const SettingModel = mongoose.model('settings');
+  const {getUrl} = require('../nkcModules/tools');
+  const results = [];
+  const fundSettings = await SettingModel.getSettings('fund');
+  if(fundSettings.enableFund) {
+    results.push({
+      name: `${fundSettings.fundName}`,
+      url: '/fund',
+      icon: getUrl('statics', "apps/fund.png")
+    })
+  }
+  results.push({
+    name: '考试系统',
+    url: '/exam',
+    icon: getUrl('statics', "apps/exam.png"),
+  });
+  const homeSettings = await SettingModel.getSettings('home');
+  if(homeSettings.showActivityEnter) {
+    results.push({
+      name: '活动',
+      url: '/activity',
+      icon: getUrl('statics', "apps/activity.png")
+    });
+  }
+  const toolSettings = await SettingModel.getSettings("tools");
+  if(toolSettings.enabled) {
+    results.push({
+      name: '计算工具',
+      url: '/tools',
+      icon: getUrl('statics', "apps/tools.png")
+    });
+  }
+  return results;
+};
 
 module.exports = mongoose.model('settings', settingSchema);

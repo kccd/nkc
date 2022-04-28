@@ -40,6 +40,9 @@
   "digestPost": "回复被列入精选",
   "digestThread": "文章被列入精选",
   "at": "at信息",
+  "articleAt": "at信息",
+  "commentAt": "at信息",
+  "momentAt": "at信息",
   "xsf": "加学术分",
   "userAuthApply": "新的身份认证申请",
   "shopBuyerOrderChange": "【交易系统】订单状态更新",
@@ -109,5 +112,14 @@
   "securityApplicationRejected": "手机号申诉未通过审核",
   "fundFinishProject": "【基金系统】研究超时",
   "forumsName": "专业名称",
-  "threadCategoriesName": "文章属性"
+  "threadCategoriesName": "文章属性",
+  "documentPassReview": "文章通过审核",
+  "documentFaulty": "文章被退修",
+  "documentDisabled": "文章被屏蔽",
+  "commentPassReview": "评论通过审核",
+  "commentFaulty": "评论被退修",
+  "commentDisabled": "评论被屏蔽",
+  "bookInvitation": "图书创作邀请",
+  "momentDelete": "动态被删除",
+  "momentPass": "动态审核通过"
 }

@@ -58,7 +58,11 @@ block content
                     for n in data.threadNav
                       -const {fid, cid, name} = n;
                       span.nav-delimiter >
-                      a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}` data-float-fid=fid)= name
+                      a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}`
+                        data-global-mouseover="showForumPanel"
+                        data-global-mouseout="hideForumPanel"
+                        data-global-data=objToStr({fid})
+                      )= name
                   .thread-nav-right
                     .nav-count
                       .nav-post-id=`文号 ${data.thread.oc}`
@@ -73,7 +77,7 @@ block content
                       span 分享
                     -let collectEvent;
                     if !data.user
-                      -collectEvent = `NKC.methods.toLogin()`;
+                      -collectEvent = `RootApp.openLoginPanel()`;
                     else if data.collected
                       -collectEvent = `SubscribeTypes.collectionThread('${thread.tid}', false)`;
                     else
@@ -214,7 +218,11 @@ block content
                       if thread.type !== "fund"
                         .thread-info.text-center(style="margin-top:1.5rem")
                           if !thread.firstPost.anonymous
-                            a(href=`/u/${thread.uid}` data-float-uid=thread.uid target="_blank")
+                            a(href=`/u/${thread.uid}`
+                              data-global-mouseover="showUserPanel"
+                              data-global-mouseout="hideUserPanel"
+                              data-global-data=objToStr({uid: thread.uid})
+                              target="_blank")
                               img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
                               span= ` ${thread.firstPost.user.username}`
                           else
@@ -237,7 +245,11 @@ block content
                               if index > 0
                                 //-span ,&nbsp;
                                 span(style='color: #333;') ，
-                              a(href=`/f/${forum.fid}` data-float-fid=forum.fid)=forum.displayName
+                              a(href=`/f/${forum.fid}`
+                                data-global-mouseover="showForumPanel"
+                                data-global-mouseout="hideForumPanel"
+                                data-global-data=objToStr({fid: forum.fid})
+                              )=forum.displayName
                         if (post.abstractCn.length !== 0 || post.abstractEn.length !== 0) && data.thread.type !== "product"
                           .abstract(style="margin-top:1rem; word-break: break-all;")
                             if post.abstractCn.length !== 0
@@ -325,7 +337,11 @@ block content
                           for f,index in forums
                             if index !== 0
                               span &nbsp;/&nbsp;
-                            a(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+                            a(href=`/f/${f.fid}`
+                              data-global-mouseover="showForumPanel"
+                              data-global-mouseout="hideForumPanel"
+                              data-global-data=objToStr({fid: f.fid})
+                            )=f.displayName
                         span.m-r-1
                         //- 文章属性
                         for tc in data.thread.threadCategories
@@ -433,8 +449,11 @@ block content
                       | 楼的内容
                     .quote-content {{c}}
                 //- 编辑器的编辑框
-                .m-b-1(style="background-color:#fff;")
-                  script#container(name='content', type='text/plain')
+                .m-b-1#editorContainer(style="background-color:#fff;")
+                  if data.user
+                    editor#container(:configs="editorConfigs" ref="postEditor" @ready="removeEvent" :plugs="editorPlugs")
+                  //script#container(name='content', type='text/plain')
+
                 div
                   //- 发表并添加到专栏
                   label(style="font-size:16px") 专栏
@@ -478,9 +497,9 @@ block content
             else
               //- 游客
               p 想参与大家的讨论？现在就&nbsp;
-                a.pointer(onclick="NKC.methods.toLogin('login')") 登录
+                a.pointer(onclick="RootApp.openLoginPanel('login')") 登录
                 | &nbsp;或者&nbsp;
-                a.pointer(onclick="NKC.methods.toLogin('register')") 注册
+                a.pointer(onclick="RootApp.openLoginPanel('register')") 注册
                 | 。
           -var floatCategories = [];
           for f in data.threadNav
@@ -506,16 +525,9 @@ block content
               //- .panel-header 作者
               -const author = data.targetUser;
               include ./authorInfo
-            if data.targetUserThreads && data.targetUserThreads.length
-              -let sideThreads = data.targetUserThreads
-              -let sideThreadsHeader= "作者最新文章"
-              -let sideThreadsHideInfo = false;
-              include ../publicModules/side_thread_list
-          if data.sameThreads && data.sameThreads.length
-            -let sideThreads = data.sameThreads
-            -let sideThreadsHeader = "相似文章推荐"
-            -let sideThreadsHideInfo = false;
             include ../publicModules/side_thread_list
+            +sideThreadsPanel(data.targetUserThreads, "作者最新文章", false)
+            +sideThreadsPanel(data.sameThreads, "相似文章推荐", false)
           .hidden-sm.hidden-xs
             include ../publicModules/footer/footer_sm
 
@@ -562,7 +574,6 @@ block scripts
   +includeJS('/shop/shop.js')
   +includeJS("/publicModules/survey/form.js")
   include ../publicModules/nkcSource
-  //include ../publicModules/sticker/sticker
   include ../publicModules/selectResource/selectResource
   include ../publicModules/sticker/selectSticker
   include ../publicModules/selectDraft/selectDraft
@@ -582,16 +593,10 @@ block scripts
   include ../publicModules/bulletComments/bulletComments
   include ../publicModules/share/sharePanel
   include ../publicModules/commentControl/commentControl
-  //include ../publicModules/replaceNKCUrl
+  //include ../publicModules/replaceNKCRender
   include ../post/options/options
   include ../publicModules/commonModal/commonModal
 
-  //- 通用socket
-  if data.user
-    +includeJS('/message/connectSocket.js')
-  //- 下载资料询问框
-  //if state.downloadNeedScore
-  //include ../publicModules/downloadResource/downloadResource
   //- 违规记录模块 NKC.modules.violationRecord
   if permission("violationRecord")
     include ../publicModules/violationRecord/violationRecord.pug
@@ -609,8 +614,6 @@ block scripts
         -fid = f.fid;
     if fid
       script=`NKC.configs.fid = '${fid}';`
-  if data.user
-    include ../ueditor/ueditorBase
   if data.user && showEditor
     +includeJS("/thread/initPostInput.js")
   if state.userColumn && !data.addedToColumn && showEditor

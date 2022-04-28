@@ -4,13 +4,13 @@
       if data.user
         a(href=`/m/${data.column._id}/contribute` target="_blank") 投稿
       else
-        a.pointer(onclick="Login.open('login')") 投稿
+        a.pointer(onclick="RootApp.openLoginPanel('login')") 投稿
   else
     .column-button
       a(href="/editor?toColumn=true" target="_blank") 发表
   .column-button
     if !data.user
-      a(onclick='Login.open("login")') 关注
+      a(onclick='RootApp.openLoginPanel("login")') 关注
     else if state.subColumnsId.includes(data.column._id)
       a.subscribed(onclick=`SubscribeTypes.subscribeColumn(${data.column._id}, false)`) 取关
     else

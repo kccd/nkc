@@ -1,0 +1,28 @@
+extends ../../bootstrap_base
+block title
+  title 动态详情
+  +includeCSS('/zone/moment/moment.css')
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8.col-md-offset-2
+        .zone-moment-container
+          #app(v-cloak)
+            //动态操作
+            moment-option(
+              ref="momentOption"
+              @complaint="complaint"
+            )
+            complaint(ref="complaint")
+            violation-record(ref="violationRecord")
+            moment(
+              ref='moment'
+              :data="momentListData"
+              :focus='focusCommentId'
+              @open-option="openOption"
+              @option-comment-option="openOption"
+              )
+  .hidden#data=objToStr({momentListData: data.momentListData, commentId: data.commentId})
+block scripts
+  include ../../publicModules/moment/momentSource
+  +includeJS('/zone/moment/moment.js')

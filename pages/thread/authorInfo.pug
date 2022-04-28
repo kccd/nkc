@@ -31,7 +31,7 @@
     if data.user
       a.pointer(onclick=`NKC.methods.toChat("${author.uid}")` target='_blank').thread-author-link 私信
     else
-      a.pointer(onclick="NKC.methods.toLogin()").thread-author-link 私信
+      a.pointer(onclick="RootApp.openLoginPanel()").thread-author-link 私信
     if(data.userOperationsId.includes('bannedUser') && !author.certs.includes('banned'))
       a.pointer(onclick=`bannedUser("${author.uid}", true)`).thread-author-link 封禁此人
     if(data.userOperationsId.includes('unBannedUser') && author.certs.includes('banned'))

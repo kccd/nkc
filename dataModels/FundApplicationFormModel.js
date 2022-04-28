@@ -1593,6 +1593,10 @@ fundApplicationFormSchema.methods.extendApplicationFormBaseInfo = async function
   await this.extendThreads();
   await this.extendForum();
 };
+
+/*
+* 拓展基金的回复等
+* */
 fundApplicationFormSchema.methods.extendApplicationFormInfo = async function(uid, accessForumsId = []) {
   const {fund} = this;
   if(

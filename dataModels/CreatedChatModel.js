@@ -48,7 +48,7 @@ chatSchema.pre('save', function(next) {
   next();
 });
 
-/* 
+/*
   更新或创建‘已创建的聊天’中的记录
   若记录已存在则更新记录，若记录不存在则创建记录
   @param uid 当前用户ID

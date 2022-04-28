@@ -1,3 +1,6 @@
+import {RNUpdateLocalUser} from './lib/js/reactNative';
+import {getState} from './lib/js/state';
+const {isApp} = getState();
 function submit(id) {
 	var obj = {
 		description: $('#description').val(),
@@ -73,7 +76,7 @@ function selectBanner() {
       if (e.total === e.loaded) {
         $(".upload-info-banner").text('上传完成！');
         setTimeout(function () {
-          $(".upload-info-banner").text('');
+          $(".upload-ifo-bnanner").text('');
         }, 2000);
       }
     }, "POST")
@@ -86,7 +89,33 @@ function selectBanner() {
         screenTopWarning(data);
       });
   }, {
-    aspectRatio: 2
+    aspectRatio: 2,
+  });
+}
+function selectBackBanner() {
+  selectImage.show(function(data){
+    var user = NKC.methods.getDataById("data").user;
+    var formData = new FormData();
+    formData.append("file", data, Date.now() + '.png');
+    uploadFilePromise('/banner/' + user.uid + '/homeBanner', formData, function (e, percentage) {
+      $(".upload-info-home-banner").text('上传中...' + percentage);
+      if (e.total === e.loaded) {
+        $(".upload-info-home-banner").text('上传完成！');
+        setTimeout(function () {
+          $(".upload-info-home-banner").text('');
+        }, 2000);
+      }
+    }, "POST")
+      .then(function (data) {
+        $("#userBackBanner").attr("src", NKC.methods.tools.getUrl('userHomeBanner', data.user.homeBanner) + '&time=' + Date.now());
+        emitEventToUpdateLocalUser(data);
+        selectImage.close();
+      })
+      .catch(function (data) {
+        screenTopWarning(data);
+      });
+  }, {
+    aspectRatio: 7,
   });
 }
 
@@ -128,7 +157,7 @@ var app = new Vue({
 
 
 function emitEventToUpdateLocalUser(data) {
-  if(NKC.configs.isApp) NKC.methods.rn.emit("updateLocalUser", {});
+  if(isApp) RNUpdateLocalUser();
 }
 
 Object.assign(window, {
@@ -137,6 +166,7 @@ Object.assign(window, {
   getFocus,
   selectAvatar,
   selectBanner,
+  selectBackBanner,
   app,
   emitEventToUpdateLocalUser,
 });

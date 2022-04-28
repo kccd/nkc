@@ -51,6 +51,7 @@ const visitRouter = require('./visit');
 const ipRouter = require('./ip');
 const fundRouter = require('./fund');
 const complaintRouter = require('./complaint');
+const documentPostRouter = require('./documentPost');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -109,4 +110,5 @@ settingRouter
 	.use('/sensitiveWords', sensitiveWordsRouter.routes(), sensitiveWordsRouter.allowedMethods())
 	.use('/complaint', complaintRouter.routes(), complaintRouter.allowedMethods())
   .use('/threadCategory', threadCategoryRouter.routes(), threadCategoryRouter.allowedMethods())
+  .use('/documentPost', documentPostRouter.routes(), documentPostRouter.allowedMethods())
 module.exports = settingRouter;

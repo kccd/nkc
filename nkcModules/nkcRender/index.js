@@ -33,7 +33,12 @@ class NKCRender {
       type = "article",
       post = {},
       user = {},
+      source = 'post',
+      sid = ''
     } = options;
+    if(source === 'post') {
+      sid = options.post.pid
+    }
     const {resources = [], atUsers = []} = post;
     let html = post.c || "";
     // 序列化html
@@ -127,7 +132,7 @@ class NKCRender {
     }
 
     if(html) {
-      return `<div class="render-content math-jax" data-type="nkc-render-content" data-id="${id}">${html}</div>`;
+      return `<div class="render-content math-jax" data-type="nkc-render-content" data-id="${id}" data-source="${source}" data-sid="${sid}">${html}</div>`;
     } else {
       return '';
     }

@@ -9,6 +9,12 @@ const {canSendMessage, warningContent} = data.statusOfSendingMessage || {
 window.audio = audio;
 
 import {onWithdrawn, withdrawn} from '../message.2.0.js';
+import {
+  RNGetKeyboardStatus, RNTakeAudioAndSendToUser, RNTakePictureAndSendToUser,
+  RNTakeVideoAndSendToUser,
+  RNToast,
+  RNViewImage
+} from '../../lib/js/reactNative';
 
 window.app = new Vue({
   el: '#app',
@@ -51,9 +57,7 @@ window.app = new Vue({
     },
     toast(c) {
       c = c.error || c.message || c;
-      NKC.methods.rn.emit('toast', {
-        content: c
-      });
+      RNToast({content: c});
     },
     // 滚动内容到底部
     scrollToBottom() {
@@ -128,10 +132,7 @@ window.app = new Vue({
           u.url = window.location.origin + u.url;
         }
       });
-      NKC.methods.rn.emit('viewImage', {
-        index,
-        urls
-      })
+      RNViewImage(urls, index);
     },
     // 访问用户主页
     openUserHome(message) {
@@ -158,9 +159,9 @@ window.app = new Vue({
     // 发送消息
     sendMessage(type, c) {
       const self = this;
-      NKC.methods.rn.emit('getKeyboardStatus', {}, function(data) {
+      RNGetKeyboardStatus(data => {
         self.keepFocus(data.keyboardStatus === 'show');
-      })
+      });
       let message
 
       if(['sendText', 'sendFile'].includes(type)) {
@@ -307,13 +308,15 @@ window.app = new Vue({
     },
     // 调用原生拍照、录像和录音
     useCamera(type) {
-      let name = 'takePictureAndSendToUser';
+      let func;
       if(type === 'video') {
-        name = 'takeVideoAndSendToUser';
+        func = RNTakeVideoAndSendToUser;
       } else if(type === 'audio') {
-        name = 'recordAudioAndSendToUser';
+        func = RNTakeAudioAndSendToUser;
+      } else {
+        func = RNTakePictureAndSendToUser;
       }
-      NKC.methods.rn.emit(name, {
+      func({
         uid: this.tUser.uid,
         socketId: null
       });

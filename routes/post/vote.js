@@ -29,7 +29,8 @@ voteRouter
   .post('/up', async (ctx, next) => {
     const {data, db} = ctx;
     const {user, post, isModerator} = data;
-    let vote = await db.PostsVoteModel.findOne({uid: user.uid, pid: post.pid});
+    const {post: postSource} = await db.PostsVoteModel.getVoteSources();
+    let vote = await db.PostsVoteModel.findOne({source: postSource, uid: user.uid, sid: post.pid});
     // 普通用户1， 学者2， 专家5
     let weights = 1;
     if(user.xsf > 0) weights = 2;
@@ -38,13 +39,29 @@ voteRouter
     ctx.state._scoreOperationForumsId = thread.mainForumsId;
     if(!vote) {
       vote = db.PostsVoteModel({
+        source: postSource,
         uid: user.uid,
-        pid: post.pid,
+        sid: post.pid,
         type: 'up',
         tUid: post.uid,
         num: weights
       });
       await vote.save();
+      const message = await db.MessageModel.findOne({'c.votesId': {$in: [vote._id]}, r: user.uid});
+      //判断如果不存在消息就生成消息提示
+      if(!message) {
+        //生成点赞消息
+        await db.MessageModel({
+          _id: await db.SettingModel.operateSystemID('messages', 1),
+          r: post.uid,
+          ty: 'STU',
+          port: ctx.port,
+          ip: ctx.address,
+          c: {
+            type: 'latestVotes',
+            votesId: [vote._id],
+          }
+        }).save();
       await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
     } else {
       if(vote.type === 'up') {
@@ -55,6 +72,7 @@ voteRouter
         await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
       }
     }
+    };
     await post.updatePostsVote();
     data.post = post;
     await next();
@@ -62,7 +80,8 @@ voteRouter
   .post('/down', async (ctx, next) => {
     const {data, db} = ctx;
     const {user, post, isModerator} = data;
-    let vote = await db.PostsVoteModel.findOne({uid: user.uid, pid: post.pid});
+    const {post: postSource} = await db.PostsVoteModel.getVoteSources();
+    let vote = await db.PostsVoteModel.findOne({source: postSource, uid: user.uid, sid: post.pid});
     const thread = await post.extendThread();
     ctx.state._scoreOperationForumsId = thread.mainForumsId;
     // 普通用户1， 学者2， 专家5
@@ -71,8 +90,9 @@ voteRouter
     if(isModerator) weights = 5;
     if(!vote) {
       vote = db.PostsVoteModel({
+        source: postSource,
         uid: user.uid,
-        pid: post.pid,
+        sid: post.pid,
         type: 'down',
         tUid: post.uid,
         num: weights

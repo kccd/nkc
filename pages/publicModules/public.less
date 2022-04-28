@@ -647,7 +647,7 @@ footer.footer ul li{
   /*z-index: 10000;*/
   z-index: 500;
   left: 0;
-  line-height: 1rem;
+  //line-height: 1rem;
   background-color: rgba(0,0,0,0.2);
 }
 .nkc-drawer-left{
@@ -657,7 +657,7 @@ footer.footer ul li{
 .nkc-drawer-right.active, .nkc-drawer-left.active{
   height: 100%;
 }
-.nkc-drawer-right-body, .nkc-drawer-left-body{
+.nkc-drawer-right-body, .nkc-drawer-left-body {
   width: 70%;
   position: fixed;
   top: 0;
@@ -679,6 +679,19 @@ footer.footer ul li{
 }
 .nkc-drawer-left-body.active{
   left: 0;
+}
+.left-draw-loading{
+  .loading{
+    margin-top: 10rem;
+    text-align: center;
+    .fa{
+      font-size: 1.7rem;
+      margin-bottom: 0.2rem;
+    }
+    .loading-text{
+      font-size: 1.2rem;
+    }
+  }
 }
 .nkc-drawer-avatar{
   text-align: center;

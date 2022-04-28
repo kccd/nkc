@@ -1,4 +1,5 @@
 const Router = require("koa-router");
+const editorRouter = require('./editor');
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
@@ -43,6 +44,16 @@ router
       ],
     };
     ctx.template = "column/column.pug";
+    await next();
+  })
+  .get("/getColumn", async (ctx, next) => {
+    const {db, data, state} = ctx;
+    const column = {
+        userColumn: state.userColumn,
+        columnPermission: state.columnPermission,
+        addedToColumn: state.addedToColumn
+      };
+    data.column = column;
     await next();
   })
   .post("/", async (ctx, next) => {
@@ -111,5 +122,6 @@ router
       return ctx.redirect(url);
     }
     await next();
-  });
+  })
+  .use('/editor', editorRouter.routes(), editorRouter.allowedMethods())
 module.exports = router;

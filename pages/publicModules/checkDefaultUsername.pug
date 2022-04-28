@@ -1,4 +1,4 @@
--const reg = new RegExp(`^${state.serverSettings.websiteCode}-`);
+-const reg = new RegExp(`^${remoteState.serverSettings.websiteCode}-`);
 if data.user && (reg.test(data.user.username) || !data.user.username)
   .col-xs-12.m-b-1
     .home-warning

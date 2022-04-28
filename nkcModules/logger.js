@@ -89,7 +89,7 @@ module.exports = async (ctx) => {
       );
     }
     // 网站后台控制台监看请求记录
-    ctx.nkcModules.socket.sendConsoleMessage(d);
+    // ctx.nkcModules.socket.sendConsoleMessage(d);
   }
   // 统计请求
   try{

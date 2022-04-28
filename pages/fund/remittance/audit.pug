@@ -55,7 +55,9 @@ block fundContent
                       a(
                         href=tools.getUrl('userHome', r.user.uid)
                         target='_blank'
-                        data-float-uid=r.user.uid
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        data-global-data=objToStr({uid: r.user.uid})
                         )= r.user.username
 
                   th

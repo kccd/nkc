@@ -1,0 +1,64 @@
+if !isIncluded('comment')
+  +includeCSS('/publicModules/commentCenter/comment.css')
+  -var disableComment = permissionsOr(["movePostsToRecycle", "movePostsToDraft"]) && data.isModerator;
+  //- 发表人筛选
+  mixin articleNav
+    .paging-button
+      //- 当文章为专栏文章时
+      if data.columnPost.article
+        a.button.radius-left(href=`${data.columnPost.article.url}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
+        a.button.radius-right(href=`${data.columnPost.article.url}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
+      else
+        //- 当文章为空间文章时
+        a.button.radius-left(href=`${data.columnPost.thread.url}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
+        a.button.radius-right(href=`${data.columnPost.thread.url}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
+  //- 批量管理回复
+  mixin manageComments
+    .paging-button
+      a.button.radius-left(onclick="manageComments()") 管理
+      a.button(onclick="markAllComments()") 全选
+      a.button.radius-right(onclick="disabledMarkedComment()") 退修或屏蔽
+  .m-b--05
+    include ../../publicModules/paging/paging
+    +articleNav
+    if disableComment && data.comments.length !== 0
+      //- 回复批量管理
+      +manageComments
+  .p-a-0.comment-container.m-b-1
+    if data.comments && data.comments.length !== 0
+      .comment-list.m-t-1
+        include ./singleComment/singleComment
+        for comment in data.comments
+          +singleComment(comment)
+    else
+      .null.p-t-1 还没有人评论哦~~
+  .m-b--05
+    include ../../publicModules/paging/paging
+    +articleNav
+    if disableComment && data.comments.length !== 0
+      //- 回复批量管理
+      +manageComments
+  if (data.columnPost.type === 'article' && data.columnPost.article.status && data.columnPost.article.status === 'normal') || (data.columnPost.thread && data.columnPost.thread.status && data.columnPost.thread.status === 'normal')
+    if data.user
+      #commentEditor.m-t-1(v-cloak)
+        comment-editor(ref="commentEditor" source="comment" :sid="articleId" :comment="comment")
+    else
+      //- 游客
+      p.text-center.p-t-1 想参与大家的讨论？现在就&nbsp;
+        a.pointer(onclick="RootApp.openLoginPanel('login')") 登录
+        | &nbsp;或者&nbsp;
+        a.pointer(onclick="RootApp.openLoginPanel('register')") 注册
+        | 。
+  else
+    -var status = data.columnPost.article.status;
+    -var statusInfo = '';
+    if status === 'unknown'
+      -statusInfo = '未审核';
+    else if status === 'disabled'
+      -statusInfo = '禁用';
+    else if status === 'faulty'
+      -statusInfo = '退修'
+    else if status === 'deleted'
+      -statusInfo = '删除'
+    .h4.text-center(style='color: #666;')=`文章已被${statusInfo}，暂不可评论`
+  +includeDeferJS('/publicModules/commentCenter/comment.js')

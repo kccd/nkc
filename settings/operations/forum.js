@@ -26,6 +26,12 @@ module.exports = {
 		settings: {
 			GET: 'visitForumInfoSettings', // 查看专业基本信息设置
 			info: {
+				declare: {
+					PUT: 'saveForumDeclare',
+				}, // 保存编辑内容
+				latestBlockNotice: {
+					PUT: 'saveForumLatestBlockNotice'
+				}, // 保存编辑内容
 				GET: 'visitForumInfoSettings', // 查看专业基本信息设置
 				PUT: 'modifyForumInfo' // 修改专业基本信息设置
 			},

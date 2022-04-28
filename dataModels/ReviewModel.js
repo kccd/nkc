@@ -6,8 +6,14 @@ const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: Number,
   type: {
-    type: "String", // disabledPost, disabledThread, returnPost, returnThread, passPost, passThread
+    type: String, // disabledPost, disabledThread, returnPost, returnThread, passPost, passThread, disabledDocument, returnDocument, passDocument
     required: true,
+    index: 1
+  },
+  // 当审核对象为 document 时，此字段为 document innerId
+  docId: {
+    type: Number,
+    default: null,
     index: 1
   },
   pid: {
@@ -32,7 +38,7 @@ const schema = new Schema({
   },
   handlerId: {
     type: String,
-    required: true,
+    default: '',
     index: 1
   },
   reason: {
@@ -49,20 +55,55 @@ const schema = new Schema({
 * @param {Object} user 处理人ID
 * @author pengxiguaa 2019-6-3
 * */
-schema.statics.newReview = async (type, post, user, reason) => {
+schema.statics.newReview = async (type, post, user, reason, document) => {
   await mongoose.model("reviews")({
     _id: await mongoose.model("settings").operateSystemID("reviews", 1),
     type,
     reason,
-    pid: post.pid,
-    tid: post.tid,
-    uid: post.uid,
+    docId: document?document._id:'',
+    pid: post?post.pid:'',
+    tid: post?post.tid:'',
+    uid: post?post.uid:document.uid,
     handlerId: user.uid
   }).save();
 };
 
+//生成新的document审核
+schema.statics.newDocumentReview = async (type, documentId, uid, reason) => {
+  const ReviewModel = mongoose.model('reviews');
+  const SettingModel = mongoose.model('settings');
+  const review = ReviewModel({
+    _id: await SettingModel.operateSystemID('reviews', 1),
+    type,
+    reason,
+    docId: documentId,
+    uid,
+  });
+  await review.save();
+}
+
 const pureWordRegExp = /([^\u4e00-\u9fa5a-zA-Z0-9])/gi;
 const MatchedKeyword = { result: [] };
+
+/*
+* 获取触发的敏感词
+* @param {String} content 待检测的内容
+* @param {[String]} groupsId 敏感词组ID
+* @return {[String]} 触发的敏感词组成的数组
+* */
+schema.statics.matchKeywordsByGroupsId = async (content, groupsId) => {
+  const ReviewModel = mongoose.model('reviews');
+  const SettingModel = mongoose.model('settings');
+  const reviewSettings = await SettingModel.getSettings('review');
+  const keywordSettings = reviewSettings.keyword;
+  if(!keywordSettings) return [];
+  if(!keywordSettings.enable) return [];
+  const {wordGroup} = keywordSettings;
+  const groups = wordGroup.filter(group => groupsId.includes(group.id));
+  if(groups.length === 0) return [];
+  return await ReviewModel.matchKeywords(content, groups);
+};
+
 schema.statics.matchKeywords = async (content, groups) => {
   const SettingModel = mongoose.model('settings');
   const reviewSettings = await SettingModel.getSettings('review');
@@ -257,7 +298,7 @@ schema.statics.autoPushToReview = async function(post) {
       }
     }
 
-    
+
     const fid = post.mainForumsId[0];
     const forum = await ForumModel.findOne({ fid });
     const currentPostType = post.type;
@@ -288,7 +329,7 @@ schema.statics.autoPushToReview = async function(post) {
         return true;
       }*/
     }
-    
+
     // 六、专业审核设置了送审规则（按角色和等级的关系送审）
     const forumContentSettings = forumReviewSettings.content;
     if(forumContentSettings.range === "only_thread" && currentPostType === "thread"
@@ -342,6 +383,19 @@ schema.statics.autoPushToReview = async function(post) {
   // }
 
   return needReview;
+}
+/*
+* 更新审核记录的处理人uid
+* */
+schema.methods.updateReview = async function(props) {
+  const {uid, type, reason} = props;
+  await this.updateOne({
+    $set: {
+      handlerId: uid,
+      type,
+      reason,
+    }
+  });
 }
 
 module.exports = mongoose.model("reviews", schema);

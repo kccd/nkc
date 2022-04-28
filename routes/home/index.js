@@ -95,41 +95,8 @@ router
     data.t = threadListType;
     data.navbar = {highlight: threadListType};
 
-    // 管理 未处理条数
-    if(!state.isApp) {
-      if(ctx.permission("complaintGet")) {
-        data.unResolvedComplaintCount = await db.ComplaintModel.countDocuments({resolved: false});
-      }
-      if(ctx.permission("visitProblemList")) {
-        data.unResolvedProblemCount = await db.ProblemModel.countDocuments({resolved: false});
-      }
-      if(ctx.permission("review")) {
-        const q = {
-          reviewed: false,
-          disabled: false,
-          mainForumsId: {$ne: recycleId}
-        };
-        if(!ctx.permission("superModerator")) {
-          const forums = await db.ForumModel.find({moderators: data.user.uid}, {fid: 1});
-          const fid = forums.map(f => f.fid);
-          q.mainForumsId = {
-            $in: fid
-          }
-        }
-        const posts = await db.PostModel.find(q, {tid: 1, pid: 1});
-        const threads = await db.ThreadModel.find({tid: {$in: posts.map(post => post.tid)}}, {recycleMark: 1, oc: 1, tid: 1});
-        const threadsObj = {};
-        threads.map(thread => threadsObj[thread.tid] = thread);
-        let count = 0;
-        posts.map(post => {
-          const thread = threadsObj[post.tid];
-          if(thread && (thread.oc !== post.pid || !thread.recycleMark)) {
-            count++;
-          }
-        });
-        data.unReviewedCount = count;
-      }
-    }
+    // 管理面板需要的数据
+    data.managementData = await db.SettingModel.getManagementData(user);
 
 
     if(threadListType === "home") {
@@ -326,6 +293,7 @@ router
       const forumsObj = {};
       if(!d) d = "all";
       if(d === "all" || d === "column") {
+        //获取关注的专栏id
         subColumnId = await db.SubscribeModel.getUserSubColumnsId(data.user.uid);
         if(subColumnId.length) {
           const columns = await db.ColumnModel.find({
@@ -339,6 +307,7 @@ router
             columnsObj[c._id] = c;
           }
           subColumnId = columns.map(c => c._id);
+          //查找专栏文章引用
           const subColumnPosts = await db.ColumnPostModel.find({columnId: {$in: subColumnId}, hidden: false}, {pid: 1, columnId: 1});
           for(const sc of subColumnPosts) {
             subColumnPostsId.push(sc.pid);
@@ -402,7 +371,6 @@ router
           }
         ]
       };
-
       const count = await db.PostModel.countDocuments(q);
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
       let posts = await db.PostModel.find(q, {
@@ -563,27 +531,93 @@ router
       let sort = {tlm: -1};
       if(s === "toc") sort = {toc: -1};
       if(threadListType === "recommend") sort= {toc : -1};
-      threads = await db.ThreadModel.find(q, {
-        uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
-        tlm: 1, fid: 1, hasCover: 1,
-        mainForumsId: 1, hits: 1, count: 1,
-        digest: 1, reviewed: 1,
-        columnsId: 1,
-        categoriesId: 1,
-        disabled: 1, recycleMark: 1
-      }).skip(paging.start).limit(paging.perpage).sort(sort);
       let forum;
       if(threadListType === 'column') {
         forum = false;
+        const tidArr = [];
+        const aidArr = [];
+        const {thread: threadType, article: articleType} = await db.ColumnPostModel.getColumnPostTypes();
+        //查找文章专栏引用
+        const columnPosts = await db.ColumnPostModel.find({type: {$in: [threadType, articleType]}, hidden: false}).skip(paging.start).limit(paging.perpage).sort(sort);
+        for(const c of columnPosts) {
+          if(c.type === threadType) {
+            tidArr.push(c.pid);
+          } else if(c.type === articleType) {
+            aidArr.push(c.pid);
+          }
+        }
+        q.oc = {
+          $in: tidArr,
+        }
+        //查找出最新专栏下的社区文章
+        let columnThreads = await db.ThreadModel.find(q, {
+          uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
+          tlm: 1, fid: 1, hasCover: 1,
+          mainForumsId: 1, hits: 1, count: 1,
+          digest: 1, reviewed: 1,
+          columnsId: 1,
+          categoriesId: 1,
+          disabled: 1, recycleMark: 1
+        });
+        const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
+        let columnArticles = await db.ArticleModel.find({_id: {$in: aidArr}});
+        columnArticles = await db.ColumnPostModel.extendColumnArticles(columnArticles);
+        const articleObj = {};
+        for(const ca of columnArticles) {
+          articleObj[ca._id] = ca;
+        }
+        columnThreads = await db.ThreadModel.extendThreads(columnThreads, {
+          htmlToText: true,
+          removeLink: true,
+          forum,
+          extendColumns: t === 'column'?true:false
+        });
+        const threadObj = {};
+        for(const thread of columnThreads) {
+          if(thread) {
+            threadObj[thread.oc] = thread;
+          }
+        }
+        threads = [];
+        for(const c of columnPosts) {
+          let t;
+          if(c.type === threadType) {
+            t = threadObj[c.pid];
+            if(t) t.type = 'thread';
+          } else if(c.type === articleType){
+            t = articleObj[c.pid];
+            if(t) {
+              //获取当前引用的专栏
+              const column = await c.extendColumnPost();
+              t.type = 'article';
+              t.document.content = nkcModules.nkcRender.htmlToPlain(t.document.content, 200),
+              //获取文章的专栏信息
+              t.columns= [column];
+            }
+          }
+          if(t) {
+            t.url = `/m/${c.columnId}/a/${c._id}`;
+            threads.push(t);
+          }
+        }
       } else {
         forum = true;
+        threads = await db.ThreadModel.find(q, {
+          uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
+          tlm: 1, fid: 1, hasCover: 1,
+          mainForumsId: 1, hits: 1, count: 1,
+          digest: 1, reviewed: 1,
+          columnsId: 1,
+          categoriesId: 1,
+          disabled: 1, recycleMark: 1
+        }).skip(paging.start).limit(paging.perpage).sort(sort);
+        threads = await db.ThreadModel.extendThreads(threads, {
+          htmlToText: true,
+          removeLink: true,
+          forum,
+          extendColumns: t === 'column'?true:false
+        });
       }
-      threads = await db.ThreadModel.extendThreads(threads, {
-        htmlToText: true,
-        removeLink: true,
-        forum: forum,
-        extendColumns: t === 'column'?true:false
-      });
     }
     const superModerator = ctx.permission("superModerator");
     let canManageFid = [];
@@ -646,8 +680,7 @@ router
 
     // 是否启用了基金
     const fundSettings = await db.SettingModel.getSettings('fund');
-    // const fundSettings = await db.SettingModel.findOne({_id: 'fund'});
-    let enableFund = fundSettings.enableFund;
+    const enableFund = fundSettings.enableFund;
     if(enableFund) {
       // 基金名称
       data.fundName = fundSettings.fundName;
@@ -670,12 +703,7 @@ router
         }
       }
     }
-    data.enableFund = enableFund;
-    // 是否启用了网站工具
-    const toolSettings = await db.SettingModel.getSettings("tools");
-    data.siteToolEnabled = toolSettings.enabled;
-    // 是否显示“活动”入口
-    data.showActivityEnter = homeSettings.showActivityEnter;
+    data.appsData = await db.SettingModel.getAppsData();
     ctx.template = "home/home.pug";
     await next();
   });

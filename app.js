@@ -30,6 +30,9 @@ const {
   rateLimit,
   stayLogin,
   init,
+  initState,
+  initAddress,
+  initCtxMethods,
   body,
   urlRewrite,
   permission,
@@ -64,7 +67,10 @@ app
   .use(conditional())
   .use(etag())
   .use(urlRewrite)
+  .use(initAddress)
   .use(init)
+  .use(initCtxMethods)
+  .use(initState)
   .use(filterDomain)
   // IP 黑名单
   .use(IPLimit)

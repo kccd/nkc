@@ -5,7 +5,8 @@ const pug = require('pug');
 const jsdiff = require('diff');
 const settings = require('../settings');
 moment.locale('zh-cn');
-const languages = require('../languages');
+// const languages = require('../languages');
+const languages = require('./language');
 const tools = require("./tools");
 const htmlFilter = require('./nkcRender/htmlFilter');
 const hexToRgba = require('hex-to-rgba');
@@ -302,7 +303,7 @@ function getOriginLevel(index) {
 }
 
 
-let pugRender = (template, data, state) => {
+let pugRender = (template, data, state, remoteState) => {
 	data.userOperationsId = data.userOperationsId || [];
   const language = state && state.language? state.language: languages['zh_cn'];
   let options = {
@@ -358,6 +359,7 @@ let pugRender = (template, data, state) => {
       return true;
     },
     state,
+    remoteState,
 		_moduleState: {},
 		isIncluded: (name) => {
 			if(options._moduleState[name]) return true;

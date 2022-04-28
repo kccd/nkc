@@ -13,10 +13,18 @@ block settingsContent
           hr.m-b-05.m-t-05
         .column-fans-item
           .column-fans-avatar
-            img(src=tools.getUrl('userAvatar', u.avatar) data-float-uid=u.uid)
+            img(src=tools.getUrl('userAvatar', u.avatar)
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: u.uid})
+            )
           .column-fans-info
             .column-fans-name
-              a(href=tools.getUrl('userHome', u.uid) target='_blank' data-float-uid=u.uid)=u.username
+              a(href=tools.getUrl('userHome', u.uid) target='_blank'
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                data-global-data=objToStr({uid: u.uid})
+              )=u.username
             .column-fans-description=u.description || '暂无简介'
           .column-fans-options
             button.btn.btn-default(data-type='removeFans' data-uid=u.uid) 移除

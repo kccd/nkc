@@ -383,6 +383,7 @@ postSchema.virtual('usersVote')
     this._usersVote = t
   });
 
+
 postSchema.methods.extendThread = async function() {
   const ThreadModel = mongoose.model('threads');
   return this.thread = await ThreadModel.findOnly({tid: this.tid})
@@ -772,6 +773,7 @@ postSchema.statics.saveAllPostToElasticSearch = async function() {
   console.log(`【同步Post到ES】完成`);
 };
 
+//监听post数据库的save操作，将新增的记录内容保存到一条新建的search记录中以便于搜索
 postSchema.pre('save', async function(next) {
   // elasticSearch: insert/update data
   try{
@@ -852,12 +854,24 @@ const defaultOptions = {
   quote: true, // 仅支持同一篇文章
   toDraftReason: false
 };
+postSchema.statics.getPostByPid = async (pid)=>{
+  const PostModel = mongoose.model("posts");
+  return  PostModel.findOne({pid})
+
+}
 //拓展文章评论
 postSchema.statics.extendPost = async (post, options) => {
   const PostModel = mongoose.model("posts");
   const posts = await PostModel.extendPosts([post], options);
   return posts[0];
 };
+
+/*
+* 拓展post评论内容
+* @params {object} post 需要拓展的评论
+* @params {object} options 需要拓展post的内容
+* */
+
 postSchema.statics.extendPosts = async (posts, options) => {
   // 若需要判断用户是否点赞点踩，需要options.user
   const UserModel = mongoose.model('users');
@@ -969,9 +983,10 @@ postSchema.statics.extendPosts = async (posts, options) => {
     });
   }
   if(o.usersVote) {
-    const votes = await PostsVoteModel.find({uid: o.uid, pid: {$in: [...pid]}});
+    const {post: postSource} = await PostsVoteModel.getVoteSources();
+    const votes = await PostsVoteModel.find({source: postSource, uid: o.uid, sid: {$in: [...pid]}});
     for(const v of votes) {
-      voteObj[v.pid] = v.type;
+      voteObj[v.sid] = v.type;
     }
   }
 
@@ -1122,7 +1137,8 @@ postSchema.methods.updatePostsVote = async function() {
     postsId = [this.pid];
   }
 
-  const votes = await PostsVoteModel.find({pid: {$in: postsId}});
+  const {post: postSource} = await PostsVoteModel.getVoteSources();
+  const votes = await PostsVoteModel.find({source: postSource, sid: {$in: postsId}});
 
   let upNum = 0, downNum = 0;
   let upNumTotal = 0, downNumTotal = 0;
@@ -1130,12 +1146,12 @@ postSchema.methods.updatePostsVote = async function() {
   for(const vote of votes) {
     if(vote.type === 'up') {
       upNumTotal += vote.num;
-      if(vote.pid === this.pid) {
+      if(vote.sid === this.pid) {
         upNum += vote.num;
       }
     } else {
       downNumTotal += vote.num;
-      if(vote.pid === this.pid) {
+      if(vote.sid === this.pid) {
         downNum += vote.num;
       }
     }
@@ -1698,10 +1714,10 @@ postSchema.statics.renderSinglePostToHTML = async (pid) => {
   let html;
   if(!parentCommentId) {
     postData = (await PostModel.filterPostsInfo([postData]))[0];
-    html = render(PATH.resolve(__dirname, `../pages/thread/singlePost/singlePostPage.pug`), {postData});
+    html = render(PATH.resolve(__dirname, `../pages/thread/singlePost/singlePostPage.pug`), {postData}, {}, {startTime: global.NKC.startTime});
   } else {
     postData = (await PostModel.filterCommentsInfo([postData]))[0];
-    html = render(PATH.resolve(__dirname, `../pages/thread/singleComment/singleCommentPage.pug`), {postData});
+    html = render(PATH.resolve(__dirname, `../pages/thread/singleComment/singleCommentPage.pug`), {postData}, {}, {startTime: global.NKC.startTime});
   }
   return html;
 }
@@ -1903,5 +1919,19 @@ postSchema.statics.checkPostCommentPermission = async (pid, type) => {
     return ['rw'].includes(post.comment);
   }
 };
+
+/*
+* 拓展专栏文章回复
+* */
+postSchema.statics.extendPostsByColumn = async function(posts, options) {
+  const PostModel = mongoose.model('posts');
+  let results = posts;
+  results = await PostModel.extendPosts(results, options);
+  results = await PostModel.extendPosts(results);
+  results = await PostModel.filterPostsInfo(results);
+  results = results.reverse();
+  return results;
+}
+
 
 module.exports = mongoose.model('posts', postSchema);

@@ -34,12 +34,20 @@ block nkcContent
           tr(v-for='f in pForums')
             th {{timeFormat(f.toc)}}
             th
-              a(:href='getUrl("userHome", f.user.uid)' :data-float-uid="f.user.uid" target="_blank")
+              a(:href='getUrl("userHome", f.user.uid)'
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                :data-global-data="objToStr({uid: f.user.uid})"
+                target="_blank")
                 img.user-avatar(:src="getUrl('userAvatar', f.user.avatar)")
                 span {{f.user.username}}
             th
               div(v-for='u in f.founders')
-                a(:href='getUrl("userHome", u.user.uid)' :data-float-uid="u.user.uid" target="_blank")
+                a(:href='getUrl("userHome", u.user.uid)'
+                  data-global-mouseover="showUserPanel"
+                  data-global-mouseout="hideUserPanel"
+                  :data-global-data="objToStr({uid: u.user.uid})"
+                  target="_blank")
                   img.user-avatar(:src="getUrl('userAvatar', u.user.avatar)")
                   span {{u.user.username}}
                 span &nbsp;

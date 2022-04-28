@@ -5,32 +5,33 @@ block title
     body{
       background-color: #ffffff;
     }
-block content
-block scripts
-  script.
-    $(function() {
-      Login.open('login');
-    });
-
-  if state.isApp && state.platform === 'reactNative'
+  if remoteState.isApp && remoteState.platform === 'reactNative'
     style.
-      #moduleLogin{
-        height: 100%!important;
-        width: 100%!important;
+      .module-login {
+        height: 100% !important;
+        width: 100% !important;
       }
-      #moduleLogin>div{
+
+      .module-login > div {
         margin: 0;
         transition: none;
       }
-      #moduleLogin>div>div{
+
+      .module-login > div > div {
         border: none;
         border-radius: 0;
       }
-      #moduleLogin>div, #moduleLogin>div>div{
-        width: 100%!important;
-        height: 100%!important;
+
+      .module-login > div, .module-login > div > div {
+        width: 100% !important;
+        height: 100% !important;
       }
-      .modal-backdrop.in{
+
+      .modal-backdrop.in {
         opacity: 0;
       }
 
+block content
+  #data.hidden=objToStr({type: data.type})
+block scripts
+  +includeJS('/login/login.js')

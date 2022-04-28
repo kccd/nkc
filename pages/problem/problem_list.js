@@ -7,9 +7,9 @@ var app = new Vue({
   },
   mounted: function () {
     this.show = true;
-    setTimeout(function() {
+    /*setTimeout(function() {
       window.floatUserPanel && floatUserPanel.initPanel();
-    }, 500);
+    }, 500);*/
   },
   methods: {
     deleteType: function (cid, name) {

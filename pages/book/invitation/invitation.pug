@@ -1,0 +1,35 @@
+extends ../../bootstrap_base
+block title
+  title 专题创作邀请
+  style.
+    body{
+      background-color: #fff;
+    }
+    .info{
+      padding: 2rem 0;
+      font-size: 1.2rem;
+    }
+block content
+  .hidden#data=objToStr({bookId: data.bookId})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-6.col-md-offset-3
+        .info.text-center
+          if data.invitationStatus === 'none'
+            span 邀请链接已失效
+          else if data.invitationStatus === 'rejected'
+            span 您已拒绝当前邀请
+          else if data.invitationStatus === 'resolved'
+            span 您已接收当前邀请
+          else
+            .m-b-1
+              span 用户&nbsp;
+              a(href=data.inviter.userHome target="_blank")=data.inviter.username
+              span &nbsp;邀请您参与图书&nbsp;《
+              a(href=data.bookData.bookUrl target="_blank")=data.bookData.name
+              span 》&nbsp;的创作
+            div
+              button.m-r-05.btn.btn-xs.btn-success(onclick='modifyInvitationStatus(true)') 接受邀请
+              button.btn.btn-xs.btn-danger(onclick='modifyInvitationStatus(false)') 拒绝
+block scripts
+  +includeJS('/book/invitation/invitation.js')

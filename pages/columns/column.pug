@@ -4,6 +4,7 @@ block columnTitle
 block content
   include ./modules/columnHeader
   include ./modules/contribute
+  include ./modules/articleContribute
   +mixinColumnHeader({
     user: data.user,
     column: data.column,
@@ -27,7 +28,7 @@ block content
         span 子分类：
         for c in childCategories
           a.column-child-category(href=`/m/${column._id}?c=${c._id}`)=c.name
-  .hidden#data=objToStr({columnId: data.column._id, color: data.column.color, listColor: data.column.listColor, toolColor: data.column.toolColor})
+  .hidden#data=objToStr({columnId: data.column._id, color: data.column.color, listColor: data.column.listColor, toolColor: data.column.toolColor, user: data.user})
   .container-fluid.max-width
     .column
       .row
@@ -89,7 +90,10 @@ block content
             include ../publicModules/paging/paging_input
         .col-xs-12.col-md-3.box-shadow-panel.m-t-1
           -var columnToolStyle = `background-color: ${data.column.toolColor};`;
-          +mixinColumnContribute(data.user, data.column, columnToolStyle)
+          //--发表独立文章按钮
+          +mixinColumnArticleContribute(data.user, data.column, columnToolStyle)
+          //--投稿按钮
+          //- +mixinColumnContribute(data.user, data.column, columnToolStyle)
           include ./modules/management
           include ./modules/info
 block scripts

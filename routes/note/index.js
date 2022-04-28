@@ -41,6 +41,7 @@ router
       options.disabled = false;
       options.deleted = false;
     }
+    data.managementNote = ctx.permission('managementNote');
     data.note = await db.NoteModel.extendNote(note, options);
     ctx.template = "note/note.pug";
     await next();
@@ -100,6 +101,8 @@ router
     if(type === "post") {
       const post = await db.PostModel.findOnly({pid: targetId}, {cv: 1});
       cv = post.cv;
+    } else if(type === 'document') {
+      cv = null; // document 不同于 post，版本号不由自身的 cv 字段控制
     } else {
       ctx.throw(400, "未知划词类型");
     }
@@ -170,6 +173,7 @@ router
       options.deleted = false;
     }
     data.note = await db.NoteModel.extendNote(note, options);
+    data.managementNote = ctx.permission('managementNote');
     await next();
   });
 module.exports = router;

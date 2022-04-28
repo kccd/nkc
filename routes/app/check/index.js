@@ -7,7 +7,6 @@ checkRouter
     if(ctx.req.headers.cookie) {
       data.cookie = Buffer.from(ctx.req.headers.cookie).toString('base64');
     }
-    // 获取最新版本
     let { systemType, sysType, version} = query;
     if(!systemType) systemType = sysType;
     if (systemType) {
@@ -26,6 +25,14 @@ checkRouter
         data.latestVer = newVersion; // 兼容旧版APP的下载链接 2020-1-18，APP更新多个版本后可移除
       }
     }
+
+    /*
+    * app检测服务器地址是否正常工作
+    * 服务器收到请求后会将query中的origin原样返回给app
+    * */
+    const {origin} = query;
+    data.origin = origin;
+
     await next();
   });
 module.exports = checkRouter;

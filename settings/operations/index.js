@@ -22,13 +22,15 @@ const {
 	photo,
 	photo_small,
 } = resourceObj;
-
+const mathJax = require('./mathJax');
+const document = require('./document');
 const editor = require('./editor');
 const edit = require('./edit');
 const exam = require('./exam');
 const e = require('./experimental');
 const f = require('./forum');
 const survey = require("./survey");
+const creation = require("./creation");
 const fund = require('./fund');
 const login = require('./login');
 const logout = require('./logout');
@@ -65,7 +67,6 @@ const library = require("./library");
 const libraries = require("./libraries");
 const nkc = require("./nkc");
 const reader = require("./reader");
-const appDownload = require("./appDownload");
 const sticker = require("./sticker");
 const stickers = require("./stickers");
 const note = require("./note");
@@ -78,7 +79,16 @@ const payment = require('./payment');
 const link = require('./link');
 const community = require('./community');
 const watermark = require('./watermark');
+const drawData = require('./drawData');
 const logo = require('./logo');
+const book = require('./book');
+const pim = require('./pim');
+const rc = require('./rc');
+const comment = require("./comment");
+const zone = require('./zone');
+const subscribe = require('./subscribe');
+const article = require('./article');
+const moment = require ('./moment');
 const operationObj = {};
 
 
@@ -110,6 +120,7 @@ operationObj.defaultOperations = [
 	"managementNote", // 可屏蔽编辑任何人的笔记
 	"viewUserScores", // 可在用户名片页查看用户的积分
   "viewUserCode", // 可查看任意用户的动态码
+	"viewUserArticle", //查看任意用户的文章
 ];
 
 
@@ -141,7 +152,7 @@ operationObj.operationTree = {
 		'home.php': {
 			GET: 'discuz'
 		},
-
+		document, //文章
 		poster, //活动海报
 		avatar,// 用户头像
 		avatar_small,
@@ -252,8 +263,6 @@ operationObj.operationTree = {
     library, // 文库
     libraries, // 文库
 
-		appDownload, // 为了兼容旧版APP下载 2020-1-18，APP更新多个版本之后可移除该路由
-
 		reader, // 阅读器 pdf
 
 		sticker, // 表情中心
@@ -269,7 +278,18 @@ operationObj.operationTree = {
     c: community, // 社区
 		wm: watermark, //水印
     logo, // 网站 logo
+    creation, // 用户创作中心
+    pim, // 产品管理系统
     test,
+		draw: drawData, //获取手机浏览器左侧滑动框
+    mathJax, // 编辑器预览公式
+    book, // 书籍
+		rc, //资源分组
+    comment, // 评论系统
+    zone, // 空间
+    g: subscribe, // 关注
+		article, //独立文章
+		moment, //动态
 	}
 };
 module.exports = operationObj;

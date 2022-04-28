@@ -1,0 +1,25 @@
+if !isIncluded('singleComment')
+  include ./singleCommentQuote
+  include ./singleCommentContainer
+  +includeCSS("/publicModules/commentCenter/singleComment/singleComment.css")
+  +includeDeferJS("/publicModules/commentCenter/singleComment/singleComment.js")
+  mixin singleComment(props)
+    -var {user, content, _id, order, quote, isAuthor, reason, type, status, uid, toc, tlm, docId} = props;
+    .hidden(id=`comment_${_id}`)=objToStr({comment: props})
+    .single-post-container(
+      data-un-reviewed=status === 'unknown'
+      data-disabled=status === 'disabled'
+      data-return=status === 'faulty'
+      data-highlight=highlight === _id
+      data-cid=_id
+      data-hide='true'
+      id=highlight === _id? 'highlight': undefined
+      )
+      include ./singleCommentWarningInfo
+      +singleCommentWarningInfo({status, docId, cid: _id, reason})
+      include ./singleCommentTop
+      +singleCommentTop(Object.assign({}, user, {_id, docId, isAuthor, order, reviewed: status !== 'unknown', reason, toc, tlm}))
+      include ./singleCommentCenter
+      +singleCommentCenter({content, aid: _id, quote})
+      include ./singleCommentBottom
+      +singleCommentBottom({cid: _id, docId, props, user})

@@ -94,6 +94,7 @@ var app = new Vue({
       if(type === "post") t = "&t=post";
       if(type === "column") t = "&t=column";
       if(type === "resource") t= "&t=resource";
+      if(type === "document_article") t= "&t=document_article";
       // window.location.href = "/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options;
       NKC.methods.visitUrl("/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options)
     },

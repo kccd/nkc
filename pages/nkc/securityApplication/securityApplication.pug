@@ -47,7 +47,11 @@ block nkcContent
             th {{timeFormat(a.toc)}}
             th.avatar
               img(:src="getUrl('userAvatar', a.user.avatar)")
-              a(:href="getUrl('userHome', a.user.uid)" :data-float-uid='a.user.uid') {{a.user.username}}
+              a(:href="getUrl('userHome', a.user.uid)"
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                :data-global-data="objToStr({uid: a.user.uid})"
+                ) {{a.user.username}}
             th +{{a.newPhoneNumber.nationCode}} {{a.newPhoneNumber.number}}
             th +{{a.oldPhoneNumber.nationCode}} {{a.oldPhoneNumber.number}}
             th

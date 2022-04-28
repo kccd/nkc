@@ -1,0 +1,28 @@
+extends ../bootstrap_base
+block title
+  title=data.book.name
+  +includeCSS('/book/book.css')
+block content
+  .hidden#data=objToStr({bookId: data.book._id})
+  .container-fluid.max-width.book
+    .row
+      #comment-content.col-xs-12.col-md-6.col-md-offset-3
+        .book-cover
+          img(src=data.book.coverUrl)
+        .book-name=data.book.name
+        .book-description=data.book.description
+        .book-list
+          mixin bookList(data,level)
+            for item,i in data
+              if !!item
+                a.book-list-item(href=item.url || "#"  target=item.url ? "_blank" : '' style="margin-left:"+ (level * 24) + 'px')
+                  .book-list-item-name
+                    span=item.title
+                  .book-list-item-time=item.time
+                if item.child
+                  +bookList(item.child,level+1 )
+          +bookList(data.list, 0)
+        #book(v-cloak)
+          comment(:source="source" :sid="sid" ref="comment")
+block scripts
+  +includeJS('/book/book.js')

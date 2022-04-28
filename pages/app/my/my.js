@@ -1,3 +1,8 @@
+import {
+  RNOpenDownloadList,
+  RNOpenNativeScreen
+} from "../../lib/js/reactNative";
+
 const tabs = [
   {
     id: '/thread',
@@ -58,3 +63,12 @@ $(function() {
   //   },
   // });
 });
+
+
+window.openDownloadList = function() {
+  RNOpenDownloadList();
+}
+
+window.openNativeScreen = function() {
+  RNOpenNativeScreen('CreationScreen')
+}
