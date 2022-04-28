@@ -6,9 +6,12 @@ const db = require('../dataModels');
 const {logger} = nkcModules;
 const fs = require('fs');
 const fsPromise = fs.promises;
+const path = require('path');
 const redis = require('../redis');
 const cookieConfig = require("../config/cookie");
 const {fileDomain} = require("../config/server");
+
+const errPage = fs.promises.readFile(path.resolve(__dirname, '../pages/error/404.html'), 'utf-8');
 
 const fsSync = {
   access: fsPromise.access,
@@ -52,8 +55,15 @@ module.exports = async (ctx, next) => {
     if(err.status === 404) {
       console.log(`未知请求：${ctx.address} ${ctx.method} ${ctx.url}`.bgRed);
       ctx.status = 404;
-      ctx.body = 'not found';
-      return
+      ctx.type = "text/html; charset=utf-8";
+      return errPage.then( res => {
+        ctx.body = res.replace(/{{url}}/g, ctx.url);
+      })
+      .catch( err => {
+        console.error(err);
+        ctx.status = 500;
+        ctx.body = "糟糕！你访问的页面404了，请检查链接";
+      });
     }
   }
 
