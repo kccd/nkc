@@ -28,7 +28,7 @@ block content
         span 子分类：
         for c in childCategories
           a.column-child-category(href=`/m/${column._id}?c=${c._id}`)=c.name
-  .hidden#data=objToStr({columnId: data.column._id, color: data.column.color, listColor: data.column.listColor, toolColor: data.column.toolColor})
+  .hidden#data=objToStr({columnId: data.column._id, color: data.column.color, listColor: data.column.listColor, toolColor: data.column.toolColor, user: data.user})
   .container-fluid.max-width
     .column
       .row

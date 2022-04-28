@@ -1,7 +1,7 @@
 import {getDataById} from "../../lib/js/dataConversion";
 const data = getDataById('data');
 import CommentEditor from "../../lib/vue/comment/CommentEditor";
-if(data.type === 'article') {
+if(data.type === 'article' && $("#commentEditor").length !== 0) {
   window.commentEditor = new Vue({
     el: "#commentEditor",
     data: {

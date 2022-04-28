@@ -300,6 +300,7 @@ export default {
     getUserDraft(page=0) {
       this.loading = true;
       const self = this;
+      if(!self.uid) return;
       let url = `/u/${self.uid}/profile/draft?page=${page}`;
       nkcAPI(url, 'GET')
       .then(res => {

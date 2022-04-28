@@ -39,8 +39,16 @@ if !isIncluded('comment')
       //- 回复批量管理
       +manageComments
   if (data.columnPost.type === 'article' && data.columnPost.article.status && data.columnPost.article.status === 'normal') || (data.columnPost.thread && data.columnPost.thread.status && data.columnPost.thread.status === 'normal')
-    #commentEditor.m-t-1(v-cloak)
-      comment-editor(ref="commentEditor" source="comment" :sid="articleId" :comment="comment")
+    if data.user
+      #commentEditor.m-t-1(v-cloak)
+        comment-editor(ref="commentEditor" source="comment" :sid="articleId" :comment="comment")
+    else
+      //- 游客
+      p.text-center.p-t-1 想参与大家的讨论？现在就&nbsp;
+        a.pointer(onclick="RootApp.openLoginPanel('login')") 登录
+        | &nbsp;或者&nbsp;
+        a.pointer(onclick="RootApp.openLoginPanel('register')") 注册
+        | 。
   else
     -var status = data.columnPost.article.status;
     -var statusInfo = '';
