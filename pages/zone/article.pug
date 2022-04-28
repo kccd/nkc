@@ -13,7 +13,7 @@ block title
   -var {hits, count, oc, url} = thread
   -var {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt} = post
   title=t
-  -var showManagement = data.user && data.isModerator && permission('review');
+  -var showManagement = data.user && data.isModerator && permissionsOr(['pushThread', 'moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']);
   //- 与post隐藏相关的设置
   include ../thread/hidePostContentSettings
   if data.postHeight
@@ -23,7 +23,7 @@ block content
   mixin thread
     .m-b-1
       include ../columns/article/nav
-      +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url})
+      +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url, showManagement, user: data.user})
       include ../columns/article/setUp
       if type === 'article'
         //- 文章管理员操作

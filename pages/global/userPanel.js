@@ -1,6 +1,7 @@
 import UserPanel from "../lib/vue/publicVue/userPanel/UserPanel";
 //创建用户导航栏vue实例
 export const initUserPanel = function () {
+  if($('#userNav').length === 0) return;
   return new Vue({
     el: '#userNav',
     data: {

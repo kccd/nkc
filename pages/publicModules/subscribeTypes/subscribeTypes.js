@@ -1,4 +1,5 @@
 NKC.modules.SubscribeTypes = function() {
+  console.log('渲染关注组件');
   var this_ = this;
   this_.dom = $("#moduleSubscribeTypes");
   this_.app = new Vue({

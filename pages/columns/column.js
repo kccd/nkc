@@ -1,14 +1,13 @@
 import {toLogin} from "../lib/js/account";
-
+var data = NKC.methods.getDataById("data");
 $(function() {
   if(!window.CommonModal) {
     window.CommonModal = new NKC.modules.CommonModal();
   }
-  if(!window.SubscribeTypes) {
+  if(!window.SubscribeTypes && data.user) {
     SubscribeTypes = new NKC.modules.SubscribeTypes();
   }
 });
-var data = NKC.methods.getDataById("data");
 var bodyBackgroundColor = data.color;
 var listBackgroundColor = data.listColor;
 var toolsBackgroundColor = data.toolColor;
