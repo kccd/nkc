@@ -565,6 +565,8 @@ schema.methods.publishArticle = async function(options) {
   const {source, selectCategory} = options;
   const DocumentModel = mongoose.model('documents');
   const {did, uid, _id: articleId} = this;
+  //检测当前用户的发表权限
+  await DocumentModel.checkGlobalPostPermission(this.uid, 'article');
   //将当前article的状态改为正常
   await this.changeStatus(normal);
   let columnPost;
