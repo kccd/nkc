@@ -47,7 +47,7 @@
           .moment-comment-item-content(v-html="commentData.content")
       paging(:pages="pageButtons" @click-button="clickPageButton")
 
-    moment-comment-editor(:mid="momentId" :type="postType" @published="onPublished")
+    moment-comment-editor(:mid="momentId" :type="postType" @published="onPublished" v-if="logged")
 </template>
 
 <style lang="less" scoped>
@@ -172,6 +172,9 @@
   import MomentCommentEditor from './MomentCommentEditor';
   import MomentStatus from "./MomentStatus";
   import MomentOptionFixed from "./momentOption/MomentOptionFixed";
+  import {getState} from "../../js/state";
+  const {uid} = getState();
+
   export default {
     props: ['mid', 'type', 'focus', 'permissions'],
     components: {
@@ -182,6 +185,7 @@
       'moment-option': MomentOptionFixed
     },
     data: () => ({
+      logged: !!uid,
       commentsData: [],
       paging: null,
       sort: null,
