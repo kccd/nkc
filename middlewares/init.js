@@ -11,7 +11,7 @@ const redis = require('../redis');
 const cookieConfig = require("../config/cookie");
 const {fileDomain} = require("../config/server");
 
-const errPage = fs.promises.readFile(path.resolve(__dirname, '../pages/error/404.html'), 'utf-8');
+const errPage = fsPromise.readFile(path.resolve(__dirname, '../pages/error/404.html'), 'utf-8');
 
 const fsSync = {
   access: fsPromise.access,

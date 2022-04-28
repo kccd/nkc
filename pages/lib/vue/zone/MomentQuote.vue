@@ -14,7 +14,10 @@
       .moment-quote-files(v-if="quoteData.data.files && quoteData.data.files.length > 0")
         moment-files(:data="quoteData.data.files")
 
-  .moment-quote(v-if="data")
+  .moment-quote-lost(v-if="!quoteData.data")
+    .fa.fa-exclamation-circle
+    span 引用丢失
+  .moment-quote(v-else)
     .moment-quote-header
       .moment-quote-avatar(
         data-global-mouseover="showUserPanel"
@@ -44,6 +47,15 @@
 
 <style lang="less" scoped>
   @import "../../../publicModules/base";
+  .moment-quote-lost{
+    text-align: center;
+    font-size: 1rem;
+    .fa{
+      color: @accent;
+      font-size: 1.2rem;
+      margin-right: 0.3rem;
+    }
+  }
   .moment-quote-header{
     &>*{
       display: inline-block;

@@ -2,11 +2,30 @@ module.exports = async (ctx, next) => {
   const {data, db, nkcModules, query, state, permission} = ctx;
   const {page = 0} = query;
   const {targetUser, user} = data;
+  const {
+    normal: normalStatus,
+    faulty: faultyStatus,
+    unknown: unknownStatus,
+  } = await db.MomentModel.getMomentStatus();
   //获取用户动态列表
   const match = {
     uid: targetUser.uid,
-    status: (await db.MomentModel.getMomentStatus()).normal,
     parent: '',
+    $or: [
+      {
+        status: normalStatus
+      },
+      {
+        uid: state.uid,
+        status: {
+          $in: [
+            normalStatus,
+            faultyStatus,
+            unknownStatus,
+          ]
+        }
+      }
+    ]
   };
   //获取当前用户对动态的审核权限
   const permissions = {

@@ -14,11 +14,27 @@ router
     if(focus) {
       page = await db.MomentModel.getPageByMomentCommentId(focus);
     }
-    const {normal: normalStatus} = await db.MomentModel.getMomentStatus();
+    const {
+      normal: normalStatus,
+      faulty: faultyStatus,
+      unknown: unknownStatus,
+    } = await db.MomentModel.getMomentStatus();
     const match = {
       parent: moment._id,
       $or: [
-        {status: normalStatus}, {uid: user.uid}
+        {
+          status: normalStatus
+        },
+        {
+          uid: state.uid,
+          status: {
+            $in: [
+              normalStatus,
+              faultyStatus,
+              unknownStatus,
+            ]
+          }
+        }
       ]
     };
     if(user) {

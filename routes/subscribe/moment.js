@@ -7,10 +7,29 @@ router
     const {user}  = data;
     const subUid= await db.SubscribeModel.getUserSubUsersId(state.uid);
     subUid.push(state.uid);
+    const {
+      normal: normalStatus,
+      faulty: faultyStatus,
+      unknown: unknownStatus,
+    } = await db.MomentModel.getMomentStatus();
     const match = {
       uid: {$in: subUid},
-      status: (await db.MomentModel.getMomentStatus()).normal,
       parent: '',
+      $or: [
+        {
+          status: normalStatus
+        },
+        {
+          uid: state.uid,
+          status: {
+            $in: [
+              normalStatus,
+              faultyStatus,
+              unknownStatus,
+            ]
+          }
+        }
+      ]
     };
     //获取当前用户对动态的审核权限
     const permissions = {

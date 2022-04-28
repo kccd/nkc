@@ -12,6 +12,9 @@
       html{
         font-size: 12px;
       }
+      body{
+        padding: 10rem 0 0 0;
+      }
       .error-icon {
         color: #e85a71;
         text-align: center;
@@ -40,15 +43,15 @@
       .error-info {
         margin-top: 1rem;
         color: #282c37;
-        font-size: 1.2rem;
+        font-size: 1.25rem;
       }
       .error-info a {
         color: #2b90d9;
         font-weight: 700;
-      }
-      .error-info a:hover {
         text-decoration: none;
-        color: #282c37;
+      }
+      .error-info a:hover{
+        opacity: 0.7;
       }
       .b-s-10 {
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -62,18 +65,14 @@
   <body>
     <div class="error-icon">404 Not Found</div>
     <div class="error-list b-s-10">
-      <div class="error-header">糟糕！你访问的页面404了，请检查链接。</div>
+      <div class="error-header">糟糕！你访问的页面 404 了，请检查链接。</div>
       <div class="error-code">
         <span>URL:</span>
         <code>{{url}}</code>
       </div>
       <div class="error-info">
-        <a class="home-btn" href="/">
-          首页
-        </a>
-        <a href="/problem/add?c={{url}}">
-          上报问题
-        </a>
+        <a class="home-btn" href="/">网站首页</a>
+        <a href="/problem/add?c={{url}}">上报问题</a>
       </div>
     </div>
   </body>

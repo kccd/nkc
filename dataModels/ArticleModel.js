@@ -565,8 +565,13 @@ schema.methods.publishArticle = async function(options) {
   const {source, selectCategory} = options;
   const DocumentModel = mongoose.model('documents');
   const {did, uid, _id: articleId} = this;
+  const documentSources = await DocumentModel.getDocumentSources();
+  const articleSources = await ArticleModel.getArticleSources();
   //检测当前用户的发表权限
-  await DocumentModel.checkGlobalPostPermission(this.uid, 'article');
+  await DocumentModel.checkGlobalPostPermission(this.uid, documentSources.article);
+  if(source === articleSources.zone) {
+    await DocumentModel.checkGlobalPostPermission(this.uid, documentSources.moment);
+  }
   //将当前article的状态改为正常
   await this.changeStatus(normal);
   let columnPost;
@@ -576,14 +581,14 @@ schema.methods.publishArticle = async function(options) {
   const stableDocument = await DocumentModel.getStableDocumentBySource(documentSource, articleId);
   const isModify = !!stableDocument;
 
-  if(source === 'column') {
+  if(source === articleSources.column) {
     //如果发表专栏的文章就将创建文章专栏分类引用记录 先查找是否存在引用，如果没有就创建一条新的引用
     columnPost = await ColumnPostModel.findOne({pid: articleId, type: articleType});
     if(!columnPost) {
       columnPost = await ColumnPostModel.createColumnPost(this, selectCategory);
     }
     articleUrl = `/m/${columnPost.columnId}/a/${columnPost._id}`;
-  } else if(source === 'zone') {
+  } else if(source === articleSources.zone) {
     //如果发布的article为空间文章就创建一条新的动态并绑定当前article
     if(!isModify) {
       const {_id: momentId} = await MomentModel.createQuoteMomentAndPublish({
