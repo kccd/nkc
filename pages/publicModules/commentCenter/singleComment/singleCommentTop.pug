@@ -29,7 +29,7 @@ if !isIncluded('singleCommentTop')
             | &nbsp;修改于&nbsp;
             +fromNow(tlm)
       .single-post-floor
-        a(href=tools.getUrl('post', cid))=order + '楼'
+        span=order + '楼'
         .single-post-checkbox
           label
             input(type='checkbox' data-docId=docId)
