@@ -13,7 +13,7 @@ block title
   -var {hits, count, oc, url} = thread
   -var {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt} = post
   title=t
-  -var showManagement = data.user && data.isModerator && permissionsOr(['pushThread', 'moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']);
+  -var showManagement = data.user && permissionsOr(['review']);
   //- 与post隐藏相关的设置
   include ../thread/hidePostContentSettings
   if data.postHeight
@@ -58,8 +58,8 @@ block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-9.article-common.box-shadow-panel#comment-content
-        .m-b-1
-          if type === 'article' && article.status !== 'normal' && article.status !== undefined
+        if type === 'article' && article.status !== 'normal' && article.status !== undefined
+          div
             if article.status === 'faulty'
               .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${article.status === 'faulty' ? 'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;' : ''}`)
                 .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
@@ -80,8 +80,8 @@ block content
               +thread
             else if article.status === 'deleted'
               .h4.text-center(style='color: #666;') 文章已被删除，不可查看
-          else
-            +thread
+        else
+          +thread
         .m-b-1
           include ../publicModules/commentCenter/comment
       .col-xs-12.col-md-3.box-shadow-panel#rightDom

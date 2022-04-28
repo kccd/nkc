@@ -14,7 +14,7 @@ block baseColumnContent
   mixin thread
     .m-b-1
       include ./article/nav
-      +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url, showManagement, suer: data.user})
+      +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url, showManagement, user: data.user})
       include ./article/setUp
       //- 文章管理员操作
       +setUp()
