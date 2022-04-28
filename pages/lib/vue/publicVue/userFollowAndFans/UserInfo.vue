@@ -15,7 +15,7 @@
         a.username( :title="userData.username" :href="'/u/' + userData.uid" target="_blank") {{ userData.username }}
       .grade( :title="userData.info?userData.info.certsName:''" ) {{ userData.info?userData.info.certsName:'' }}
       .introduce( :title="userData.description" ) {{ userData.description || "暂未填写个人简介"}}
-    .follow-button( title="取消关注" @click="subscribe( userData.uid )" ) {{ subUid.includes(userData.uid) ? "取关" : "关注" }}
+    .follow-button( title="取消关注" @click="subscribe( userData.uid )" v-if="subUid" ) {{ subUid.includes(userData.uid) ? "取关" : "关注" }}
 </template>
 <script>
 import {getUrl} from "../../../js/tools";
@@ -36,7 +36,7 @@ export default {
     },
     subUid: {
       type: Array,
-      required: true,
+      required: false,
     }
   },
   watch: {
@@ -67,6 +67,7 @@ export default {
     objToStr: objToStr,
     subscribe(uid) {
       const self = this;
+      if(!self.subUid) return;
       const method = self.subUid.includes(uid) ? "DELETE" : "POST";
       nkcAPI("/u/" + uid + "/subscribe", method, { cid: [] })
         .then(() => {

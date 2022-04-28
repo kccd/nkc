@@ -65,7 +65,7 @@ export default {
   },
   mounted() {
     const self = this;
-    this.initData();
+    self.initData();
   },
   methods: {
     initData() {

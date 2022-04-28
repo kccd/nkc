@@ -326,10 +326,10 @@ export default {
         self.panelPermission = res.panelPermission;
         self.targetUser = res.targetUser;
         // self.usersBlUid = res.usersBlUid;
-        if(res.user.uid !== self.$route.params.uid){
+        if(res.user && res.user.uid !== self.$route.params.uid){
           self.subscribeBtn = true
         }
-        if(res.user.subUid.some((value)=>{ return value === res.targetUser.uid })){
+        if(res.user && res.user.subUid.some((value)=>{ return value === res.targetUser.uid })){
           self.subscribeBtnType = true
         }
       })

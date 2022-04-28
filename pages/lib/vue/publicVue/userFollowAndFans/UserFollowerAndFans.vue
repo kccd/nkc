@@ -26,7 +26,7 @@ export default {
     paging: '',
     routeName: '',
     loading: false,
-    userSubUid: '',
+    userSubUid: [],
   }),
   computed: {
     pageButtons() {

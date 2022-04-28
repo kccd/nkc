@@ -12,6 +12,7 @@
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {EventBus} from "../../../eventBus";
 import Complaint from "../../../../lib/vue/Complaint";
+import {getState} from "../../../../lib/js/state";
 export default {
   props: ["usersBlUid", "targetUser"],
   data: () => ({
@@ -31,10 +32,12 @@ export default {
   methods: {
     //举报
     userComplaint(){
+      if(!getState().uid) return window.RootApp.openLoginPanel('login');
       this.$refs.complaint.open('user',this.targetUser.uid)
     },
     //拉黑按钮操作
     blackListOperation(){
+      if(!getState().uid) return window.RootApp.openLoginPanel('login');
       const bool = this.usersBlUidList.indexOf(this.targetUser.uid,1) === -1;
       if(bool) this.addUserToBlackList(this.targetUser.uid,"userHome")
       else this.removeUserToBlackList(this.targetUser.uid)

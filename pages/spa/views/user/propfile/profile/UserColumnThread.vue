@@ -1,7 +1,7 @@
 <template lang="pug">
   .user-column-thread
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
-    blank(v-if="threads.length === 0")
+    blank(v-if="threads && threads.length === 0")
     .user-column-box(v-for="item in threads" v-else)
       .user-column-body
         .user-column-title
