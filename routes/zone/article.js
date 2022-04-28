@@ -5,7 +5,7 @@ router
     ctx.template = 'zone/article.pug'
     const { db, data, params, query, state, permission, nkcModules } = ctx;
     const { aid } = params;
-    const {pageSettings} = state;
+    const {pageSettings, uid} = state;
     const {user} = data;
     const {page = 0, last_pages, highlight, t} = query;
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
@@ -47,7 +47,10 @@ router
       if(permission('review')) {
         permissions.reviewed = true;
       } else {
-        match.status = commentStatus;
+        match.$or = [
+          {status: commentStatus},
+          {uid}
+        ];
       }
       //禁用和退修权限
       if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {

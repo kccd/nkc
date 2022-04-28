@@ -2,7 +2,7 @@
 const router = require('koa-router')();
 router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
-  const {pageSettings} = state;
+  const {pageSettings, uid} = state;
   const {page = 0, last_page, highlight, t, test} = query;
   ctx.template = 'columns/article.pug';
   const { user } = data;
@@ -45,7 +45,10 @@ router.get('/:aid', async (ctx, next)=>{
       if(permission('review')) {
         permissions.reviewed = true;
       } else {
-        match.status = commentStatus;
+        match.$or = [
+          {status: commentStatus},
+          {uid}
+        ];
       }
       //是否收藏文章
       const collection = await db.SubscribeModel.findOne({cancel: false, uid: data.user.uid, tid: article._id, type: "article"});
