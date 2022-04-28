@@ -12,6 +12,7 @@ const cookieConfig = require("../config/cookie");
 const {fileDomain} = require("../config/server");
 
 const errPage = fs.promises.readFile(path.resolve(__dirname, '../pages/error/404.html'), 'utf-8');
+
 const fsSync = {
   access: fsPromise.access,
   unlink: fsPromise.unlink,
@@ -57,6 +58,11 @@ module.exports = async (ctx, next) => {
       ctx.type = "text/html; charset=utf-8";
       return errPage.then( res => {
         ctx.body = res.replace(/{{url}}/g, ctx.url);
+      })
+      .catch( err => {
+        console.error(err);
+        ctx.status = 500;
+        ctx.body = "糟糕！你访问的页面404了，请检查链接";
       });
     }
   }
