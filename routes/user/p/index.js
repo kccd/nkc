@@ -64,7 +64,7 @@ router
     });
     //获取收藏的文章id
     const collectionThreadsId = await db.SubscribeModel.getUserCollectionThreadsId(targetUser.uid);
-    if(user.uid === targetUser.uid) {
+    if(user && user.uid === targetUser.uid) {
       data.navLinks = [
         {
           name: "我的关注",
@@ -149,8 +149,10 @@ router
 
     //用户的黑名单
     const match = {
-      uid: user.uid
     };
+    if(user) {
+      match.uid = user.uid;
+    }
     const bl = await db.BlacklistModel.find(match).sort({toc: -1});
     const usersId = bl.map(b => {
       return b.tUid

@@ -189,7 +189,9 @@ export default  {
     this.initDraggableElement();
     getColumnInfo()
     .then(res => {
-      this.columnId = res.userColumn._id;
+      if(res.userColumn) {
+        this.columnId = res.userColumn._id;
+      }
     })
   },
   destroyed(){
