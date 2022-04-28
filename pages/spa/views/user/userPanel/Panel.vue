@@ -77,7 +77,7 @@
         background-position: center center;
         position: relative;
         .account-box-mask{
-          background: linear-gradient(rgba(0,0,0,0), 70%, rgba(20,20,20,0.6));
+          background: linear-gradient(rgba(0,0,0,0), 80%, rgba(20,20,20,0.6));
           height: 100%;
           .account-user-info {
             position: relative;
