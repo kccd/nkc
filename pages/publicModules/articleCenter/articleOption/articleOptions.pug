@@ -1,7 +1,7 @@
 if !isIncluded('articleOptions')
   include ../../complaint/complaintBox.pug
   +includeCSS('/publicModules/articleCenter/articleOption/articleOptions.css')
-  #moduleArticleOptions(:style="'top:'+position.top+'px;left:'+position.left+'px'" v-show='show' @click='clickElement')
+  #moduleArticleOptions(:style="'top:'+position.top+'px;left:'+position.left+'px'" v-show='show' @click='clickElement' v-cloak)
     .post-options-panel(v-if='loading')
       .loading 加载中...
     .post-options-panel(v-else)

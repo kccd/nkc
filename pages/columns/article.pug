@@ -45,7 +45,7 @@ block baseColumnContent
           .single-comment-bottom-item(onclick="RootApp.openLoginPanel('login')")
             .fa.fa-sliders.option-icon
   .hidden#data=objToStr({comments: data.comments, comment: data.comment, article, collectedCount, type, collected})
-  .article-common.m-b-1.box-shadow-panel(v-cloak)
+  .article-common.m-b-1.box-shadow-panel
     .row
       if type === 'article' && article.status !== 'normal' && article.status !== undefined
         if article.status === 'faulty'
