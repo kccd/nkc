@@ -1,6 +1,5 @@
 import {nkcAPI} from "../../../lib/js/netAPI";
 import {getUrl} from "../../../lib/js/tools";
-
 window.articleOption = new Vue({
   el: '#moduleArticleOptions',
   data: {
