@@ -38,7 +38,7 @@ module.exports = async (ctx, next) => {
   }
   const count = await db.MomentModel.countDocuments(match);
   const paging = nkcModules.apiFunction.paging(page, count, 20);
-  const moments = await db.MomentModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+  const moments = await db.MomentModel.find(match).sort({top: -1}).skip(paging.start).limit(paging.perpage);
   data.paging = paging;
   data.permissions = permissions;
   data.momentsData = await db.MomentModel.extendMomentsListData(moments, state.uid);
