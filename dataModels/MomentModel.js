@@ -752,10 +752,13 @@ schema.statics.extendQuotesData = async (quotes, uid = '') => {
 schema.statics.getQuoteDefaultContent = async (quoteType) => {
   switch(quoteType) {
     case momentQuoteTypes.article: {
-      return '我发表了新的文章~'
+      return ''
     }
     case momentQuoteTypes.moment: {
-      return '我转发了动态~'
+      return ''
+    }
+    case momentQuoteTypes.post: {
+      return ''
     }
   }
 }
