@@ -13,11 +13,18 @@
   //   },
   // });
 // })
-Object.assign(window, {originTitle})
+Object.assign(window, { originTitle, turnUser })
 function originTitle(){
   if($('#dropdown').hasClass('open')){
     $('#dropdown').removeClass('open');
   }else{
     $('#dropdown').addClass('open');
   }
+}
+
+function turnUser(uid) {
+	if(uid) {
+		// window.location.href = "/u/"+uid;
+		openToNewLocation("/u/"+uid);
+	}
 }
