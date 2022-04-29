@@ -154,7 +154,6 @@ export default {
       .catch(err => {
         sweetError(err);
       })
-
     },
     open(props) {
       this.loading = true;

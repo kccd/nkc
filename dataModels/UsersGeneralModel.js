@@ -26,6 +26,10 @@ const usersGeneralSchema = new Schema({
     moment: {
       type: Number,
       default: 0
+    },
+    draft: {
+      type: Number,
+      default: 0
     }
   },
   /*

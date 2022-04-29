@@ -36,7 +36,9 @@ module.exports = async (ctx, next) => {
         (ctx.permission('movePostsToRecycle') || ctx.permission('movePostsToDraft'))
       )? true: null;
       //投诉权限
-      optionStatus.complaint = permission('complaintPost')?true:null;
+      if(uid !== comment.uid) {
+        optionStatus.complaint = permission('complaintPost')?true:null;
+      }
       //查看IP
       optionStatus.ipInfo = ctx.permission('ipinfo')? document.ip : null;
       // 未匿名

@@ -9,7 +9,7 @@
   @params {Number} collectedCount 收藏数
 
 mixin nav(data)
-  -var {_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url, showManagement} = data
+  -var {_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url, showManagement, user} = data
   +includeCSS('/columns/article/nav.css')
   header
     if mainCategory.length

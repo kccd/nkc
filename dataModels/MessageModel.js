@@ -1674,7 +1674,7 @@ messageSchema.statics.mySystemInfoMessageFilter = async (uid, messages) => {
       const userGrade = user.grade._id;
       const tlv = user.tlv;
       const conditionA = (() => {
-        for(cert of userCerts) {
+        for(const cert of userCerts) {
           if(conf.roles.includes(cert)) return true;
         }
       })();
