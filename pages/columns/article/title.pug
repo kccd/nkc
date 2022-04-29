@@ -12,33 +12,33 @@
   @params {String} _id 专栏ID
 mixin title(data)
   -var {t, authorInfos, uid, toc, originState, name, _id, user ,type} = data
+  if authorInfos && authorInfos.length  && type !== "product"
+    -var agencyIndex = 1;
+    -var agencyArray = [];
+    -var agencyAddArray = [];
+    -for(var i=0;i<authorInfos.length;i++) {
+      -if(authorInfos[i].agency){
+        -if(agencyArray.indexOf(authorInfos[i].agency) == -1){
+          -agencyArray.push(authorInfos[i].agency);
+          -if(authorInfos[i].agencyCountry && authorInfos[i].agencyCountry.length > 0){
+            -authorInfos[i].agencyAdd = authorInfos[i].agencyAdd.replace(/\//igm, " ");
+            -agencyAddArray.push(authorInfos[i].agency+"，"+authorInfos[i].agencyCountry+" "+authorInfos[i].agencyAdd);
+          -}else if(authorInfos[i].agencyAdd){
+            -agencyAddArray.push(authorInfos[i].agency+"，" + authorInfos[i].agencyAdd);
+          -}else{
+            -agencyAddArray.push(authorInfos[i].agency);
+          -}
+          -authorInfos[i].agencyIndex = agencyIndex;
+          -agencyIndex++;
+        -}else{
+          -authorInfos[i].agencyIndex = agencyArray.indexOf(authorInfos[i].agency)+1;
+        -}
+      -}
+    -}
   +includeCSS('/columns/article/title.css')
   .common-article-head
     //-  hover显示作者信息
     h1.common-article-title=t
-    if authorInfos && authorInfos.length  && type !== "product"
-      -var agencyIndex = 1;
-      -var agencyArray = [];
-      -var agencyAddArray = [];
-      -for(var i=0;i<authorInfos.length;i++) {
-        -if(authorInfos[i].agency){
-          -if(agencyArray.indexOf(authorInfos[i].agency) == -1){
-            -agencyArray.push(authorInfos[i].agency);
-            -if(authorInfos[i].agencyCountry && authorInfos[i].agencyCountry.length > 0){
-              -authorInfos[i].agencyAdd = authorInfos[i].agencyAdd.replace(/\//igm, " ");
-              -agencyAddArray.push(authorInfos[i].agency+"，"+authorInfos[i].agencyCountry+" "+authorInfos[i].agencyAdd);
-            -}else if(authorInfos[i].agencyAdd){
-              -agencyAddArray.push(authorInfos[i].agency+"，" + authorInfos[i].agencyAdd);
-            -}else{
-              -agencyAddArray.push(authorInfos[i].agency);
-            -}
-            -authorInfos[i].agencyIndex = agencyIndex;
-            -agencyIndex++;
-          -}else{
-            -authorInfos[i].agencyIndex = agencyArray.indexOf(authorInfos[i].agency)+1;
-          -}
-        -}
-      -}
     p
       if authorInfos && authorInfos.length
         for authorInfo in authorInfos
@@ -52,12 +52,13 @@ mixin title(data)
           if authorInfo.isContract && authorInfo.contractObj && authorInfo.contractObj.contractEmail
             span.common-article-author.fa.fa-envelope-open-o(onclick="displayAuthor('"+objToStr(authorInfo.contractObj)+"')")
     p
-      if authorInfos && authorInfos.length > 1
-        for agad,index in agencyAddArray
-          span.common-article-author!=`${index+1}.${agad}`
-      else if  authorInfos && authorInfos.length <= 1
-        for agad,index in agencyAddArray
-          span.common-article-author!=`${agad}`
+      if authorInfos && authorInfos.length
+        if authorInfos.length > 1
+          for agad,index in agencyAddArray
+            span.common-article-author!=`${index+1}.${agad}`
+        if authorInfos.length <= 1
+          for agad,index in agencyAddArray
+            span.common-article-author!=`${agad}`
     .common-article-info
       a.common-article-author.jump.m-r-1(href=`/u/${uid}` target="_blank"
         data-global-mouseover="showUserPanel"
