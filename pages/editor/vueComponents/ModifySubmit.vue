@@ -378,7 +378,6 @@ export default {
           // 锁住发表按钮
           this.disabledSubmit = true;
           type = this.type;
-          console.log(type,"文章type")
         })
         .then(() => {
           if (type === "newThread") {
