@@ -25,7 +25,7 @@
           .single-moment-time
             from-now(:time="momentData.toc")
           //- 其他操作
-          .single-moment-header-options.fa.fa-ellipsis-h(@click="openOption($event)" data-direction="down")
+          .single-moment-header-options.fa.fa-ellipsis-h(@click.stop="openOption($event)" data-direction="down")
             moment-option(
               ref="momentOption"
               @complaint="complaint"
@@ -381,7 +381,7 @@
         if(init === 'true') return;
         this.$refs.momentOption.open({DOM: $(target), moment: this.momentData});
         //阻止浏览器默认事件 阻止事件冒泡
-        // e.stopPropagation();
+        // e.preventDefault();
       },
       //投诉或举报
       complaint(mid) {

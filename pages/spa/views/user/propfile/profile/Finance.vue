@@ -206,7 +206,7 @@ export default {
     timeFormat: timeFormat,
     getUserAccountInfo(page=0, type=''){
       const self = this;
-      let url = `/u/${this.uid}/profile/finance?page=${page}`;
+      let url = `/u/${this.uid}/profile/financeData?page=${page}`;
       if(type){
         url += `&t=${type}`;
       }

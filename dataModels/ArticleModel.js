@@ -274,7 +274,6 @@ schema.statics.getZoneArticle = async (id)=>{
     userAvatar: user.avatar,
     thread: articleInfo,
     column: {},
-    collectedCount: '',
     mainCategory: [],
     auxiliaryCategory: [],
     user,
@@ -569,9 +568,6 @@ schema.methods.publishArticle = async function(options) {
   const articleSources = await ArticleModel.getArticleSources();
   //检测当前用户的发表权限
   await DocumentModel.checkGlobalPostPermission(this.uid, documentSources.article);
-  if(source === articleSources.zone) {
-    await DocumentModel.checkGlobalPostPermission(this.uid, documentSources.moment);
-  }
   //将当前article的状态改为正常
   await this.changeStatus(normal);
   let columnPost;
@@ -589,14 +585,6 @@ schema.methods.publishArticle = async function(options) {
     }
     articleUrl = `/m/${columnPost.columnId}/a/${columnPost._id}`;
   } else if(source === articleSources.zone) {
-    //如果发布的article为空间文章就创建一条新的动态并绑定当前article
-    if(!isModify) {
-      const {_id: momentId} = await MomentModel.createQuoteMomentAndPublish({
-        uid,
-        quoteType: articleQuoteType,
-        quoteId: articleId
-      });
-    }
     /*await this.updateOne({
       $set: {
         sid: momentId,
@@ -604,6 +592,7 @@ schema.methods.publishArticle = async function(options) {
     });*/
     articleUrl = `/zone/a/${articleId}`;
   }
+
   //更新文章的最后修改时间
   await this.updateOne({
     $set: {
@@ -611,6 +600,17 @@ schema.methods.publishArticle = async function(options) {
     }
   });
   await DocumentModel.publishDocumentByDid(did);
+
+  //如果发布的article为空间文章就创建一条新的动态并绑定当前article
+  if(!isModify) {
+    MomentModel.createQuoteMomentAndPublish({
+      uid,
+      quoteType: articleQuoteType,
+      quoteId: articleId
+    })
+      .catch(console.error);
+  }
+
   return articleUrl;
 }
 
@@ -1195,6 +1195,7 @@ schema.statics.getArticlesInfo = async function(articles) {
 *     @param {String} title 文章标题
 *     @param {String} content 文章内容摘要
 *     @param {String} coverUrl 文章封面图链接
+*     @param {String} statusInfo 文章状态的说明
 *     @param {String} username 发表人用户名
 *     @param {String} uid 发表人ID
 *     @param {String} avatarUrl 发表人头像链接
@@ -1218,6 +1219,7 @@ schema.statics.getArticlesDataByArticlesId = async function(articlesId, type = '
   const DocumentModel = mongoose.model('documents');
   const {article: articleSource} = await DocumentModel.getDocumentSources();
   const stableDocuments = await DocumentModel.getStableDocumentsBySource(articleSource, articlesId, 'object');
+  const articleStatus = await ArticleModel.getArticleStatus();
   const obj = {};
   for(const article of articles) {
     const articleUrl = await ArticleModel.getArticleUrlBySource(article._id, article.source, article.sid);
@@ -1226,19 +1228,52 @@ schema.statics.getArticlesDataByArticlesId = async function(articlesId, type = '
     const user = usersObj[article.uid];
     if(!user) continue;
     const {title, content, cover} = stableDocument;
-    obj[article._id] = {
-      title,
-      content: nkcRender.htmlToPlain(content, 200),
-      coverUrl: cover? getUrl('documentCover', cover): '',
-      username: user.username,
-      uid: user.uid,
-      avatarUrl: getUrl('userAvatar', user.avatar),
-      userHome: getUrl('userHome', user.uid),
-      time: timeFormat(article.toc),
-      toc: article.toc,
-      articleId: article._id,
-      url: articleUrl.articleUrl
-    };
+    let articleData;
+    if(article.status === articleStatus.normal) {
+      articleData = {
+        status: articleStatus.normal,
+        title,
+        content: nkcRender.htmlToPlain(content, 200),
+        coverUrl: cover? getUrl('documentCover', cover): '',
+        username: user.username,
+        uid: user.uid,
+        avatarUrl: getUrl('userAvatar', user.avatar),
+        userHome: getUrl('userHome', user.uid),
+        time: timeFormat(article.toc),
+        toc: article.toc,
+        articleId: article._id,
+        url: articleUrl.articleUrl
+      };
+    } else {
+      let articleDataContent = '';
+      switch(article.status) {
+        case articleStatus.disabled: {
+          articleDataContent = '内容已屏蔽';
+          break;
+        }
+        case articleStatus.faulty: {
+          articleDataContent = '内容已退回修改';
+          break;
+        }
+        case articleStatus.unknown: {
+          articleDataContent = '内容待审核';
+          break;
+        }
+        case articleStatus.deleted: {
+          articleDataContent = '内容已删除';
+          break;
+        }
+        default: {
+          articleDataContent = '内容暂不予显示';
+        }
+      }
+      // 待改，此处返回的字段之后两个字段，应包含全部字段，只不过字段内容为空
+      articleData = {
+        status: article.status,
+        statusInfo: articleDataContent
+      };
+    }
+    obj[article._id] = articleData;
   }
   if(type === 'object') {
     return obj;

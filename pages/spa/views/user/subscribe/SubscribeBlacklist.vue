@@ -136,7 +136,7 @@ export default {
     //获取用户黑名单
     getBlackList(page) {
       const self = this;
-      let url = `/u/${self.uid}/profile/subscribe/blacklist`;
+      let url = `/u/${self.uid}/profile/subscribe/blacklistData`;
       if(page) {
         if(url.indexOf('?') === -1) {
           url = url + `?page=${page}`;

@@ -17,6 +17,9 @@
   .moment-quote-lost(v-if="!quoteData.data")
     .fa.fa-exclamation-circle
     span 引用丢失
+  .moment-quote-lost(v-else-if="quoteData.data.status !== 'normal'")
+    .fa.fa-exclamation-circle
+    span {{quoteData.data.statusInfo}}
   .moment-quote(v-else)
     .moment-quote-header
       .moment-quote-avatar(
@@ -35,6 +38,8 @@
         from-now(:time="quoteData.data.toc")
       a.moment-quote-link(:href="quoteData.data.url" v-if="quoteData.quoteType === 'moment'") 详情
     .moment-quote-body(v-if="quoteData.quoteType === 'article'")
+      +articleBody
+    .moment-quote-body(v-else-if="quoteData.quoteType === 'post'")
       +articleBody
     .moment-quote-body(v-else-if="quoteData.quoteType === 'moment'")
       +momentBody

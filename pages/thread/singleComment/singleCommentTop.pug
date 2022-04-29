@@ -23,7 +23,7 @@ if !isIncluded('singleCommentTop')
             target='_blank'
             data-global-mouseover="showUserPanel"
             data-global-mouseout="hideUserPanel"
-            data-global-data=objToStr({uid: headerData.parentUser.uid})
+            data-global-data=objToStr({uid: parentUser.uid})
           )=parentUser.username
         span.single-comment-reply-button(onclick=`NKC.methods.switchCommentForm("${pid}")`) 回评
         if digest

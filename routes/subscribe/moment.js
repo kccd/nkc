@@ -43,7 +43,7 @@ router
     const count = await db.MomentModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count);
     const moments = await db.MomentModel.find(match)
-      .sort({toc: -1})
+      .sort({top: -1})
       .skip(paging.start)
       .limit(paging.perpage)
     data.momentsData = await db.MomentModel.extendMomentsListData(moments, state.uid);

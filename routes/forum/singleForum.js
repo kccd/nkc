@@ -108,6 +108,19 @@ router
 			await nkcModules.socket.sendForumMessage({tid: _post.tid, pid: _post.pid, state: ctx.state});
 		}
 
+    if(!_post.anonymous) {
+      // 生成动态
+      const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
+      db.MomentModel.createQuoteMomentAndPublish({
+        uid: _post.uid,
+        quoteType: momentQuoteTypes.post,
+        quoteId: _post.pid,
+      })
+        .catch(err => {
+          console.error(err);
+        });
+    }
+
 		// 发表文章后进行跳转
 		const type = ctx.request.accepts('json', 'html');
     if(type === 'html') {

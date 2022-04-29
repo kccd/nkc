@@ -61,7 +61,7 @@ router
         };
         const count = await db.MomentModel.countDocuments(match);
         paging = nkcModules.apiFunction.paging(page, count);
-        const moments = await db.MomentModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+        const moments = await db.MomentModel.find(match).sort({top: -1}).skip(paging.start).limit(paging.perpage);
         data.momentsData = await db.MomentModel.extendMomentsListData(moments, state.uid);
     } else if(t === 'post') {
         //获取用户回复列表
@@ -111,7 +111,7 @@ router
         paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList);
         const posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
         const results = [];
-    
+
         const tids = new Set(), threadsObj = {};
         posts.map(post => {
             tids.add(post.tid);
@@ -131,7 +131,7 @@ router
         threads.map(thread => {
             threadsObj[thread.tid] = thread;
         });
-    
+
         for(const post of posts) {
             const thread = threadsObj[post.tid];
             if(post.disabled || thread.disabled || thread.recycleMark) {
@@ -190,7 +190,7 @@ router
         }
         data.posts = results;
     } else if(t === 'thread') {
-    
+
     } else {
         //关注或粉丝
         if(Number(page) >= 1) {
@@ -205,7 +205,7 @@ router
                 }
             }
         }
-    
+
         if(t === "follow") {
             //关注的用户
             const q = {

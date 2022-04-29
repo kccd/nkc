@@ -132,7 +132,7 @@ export default {
     getColumns(page) {
       this.loading = true;
       const self = this;
-      let url = `/u/${self.uid}/profile/subscribe/column`;
+      let url = `/u/${self.uid}/profile/subscribe/columnData`;
       if(page) {
         if(url.indexOf('?') === -1) {
           url = url + `?page=${page}`;

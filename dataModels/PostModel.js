@@ -5,6 +5,7 @@ const {htmlToPlain, renderHTML} = nkcRender;
 const customCheerio = require('../nkcModules/nkcRender/customCheerio');
 const {getQueryObj, obtainPureText} = require('../nkcModules/apiFunction');
 const tools = require("../nkcModules/tools");
+const {timeFormat} = require("../nkcModules/tools");
 const mongoose = settings.database;
 const {Schema} = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
@@ -1927,11 +1928,97 @@ postSchema.statics.extendPostsByColumn = async function(posts, options) {
   const PostModel = mongoose.model('posts');
   let results = posts;
   results = await PostModel.extendPosts(results, options);
-  results = await PostModel.extendPosts(results);
+  // results = await PostModel.extendPosts(results);
   results = await PostModel.filterPostsInfo(results);
   results = results.reverse();
   return results;
 }
 
+postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
+  const PostModel = mongoose.model('posts');
+  const UserModel = mongoose.model('users');
+  const ForumModel = mongoose.model('forums');
+  const SettingModel = mongoose.model('settings');
+  const ThreadModel = mongoose.model('threads');
+  const nkcRender = require('../nkcModules/nkcRender');
+  const {getUrl, timeFormat} = require('../nkcModules/tools');
+  const recycleId = await SettingModel.getRecycleId();
+  const posts = await PostModel.find({
+    anonymous: false,
+    pid: {
+      $in: postsId,
+    }
+  }, {
+    t: 1,
+    c: 1,
+    tid: 1,
+    pid: 1,
+    toc: 1,
+    uid: 1,
+    cover: 1,
+    mainForumsId: 1,
+    disabled: 1,
+    toDraft: 1
+  });
+  const usersId = [];
+  const threadsId = [];
+  for(const post of posts) {
+    usersId.push(post.uid);
+    threadsId.push(post.tid);
+  }
+  const threads = await ThreadModel.find({tid: {$in: threadsId}}, {
+    recycleMark: 1,
+    tid: 1,
+  });
+  const threadsObj = {};
+  for(const thread of threads) {
+    threadsObj[thread.tid] = thread;
+  }
+  const userForumsId = await ForumModel.getReadableForumsIdByUid(uid);
+  const usersObj = await UserModel.getUsersObjectByUsersId(usersId);
+  const results = {};
+  for(const post of posts) {
+    const {
+      t,
+      c,
+      tid,
+      pid,
+      toc,
+      uid: postUid,
+      cover,
+      mainForumsId = [], disabled, toDraft} = post;
+    const thread = threadsObj[tid];
+    const result = {
+      status: 'normal',
+      statusInfo: '',
+    };
+    console.log(mainForumsId, userForumsId, uid)
+    if(!userForumsId.includes(mainForumsId[0])) {
+      result.status = 'permission';
+      result.statusInfo = '权限不足';
+    } else if(toDraft || thread.recycleMark) {
+      result.status = 'faulty';
+      result.statusInfo = '内容已退回修改';
+    } else if(disabled || mainForumsId.includes(recycleId)) {
+      result.status = 'disabled';
+      result.statusInfo = '内容已屏蔽';
+    } else {
+      const user = usersObj[postUid];
+      result.title = nkcRender.replaceLink(t);
+      result.content = nkcRender.replaceLink(nkcRender.htmlToPlain(c, 200));
+      result.coverUrl = cover? getUrl('postCover', cover): '';
+      result.username = user.username;
+      result.uid = postUid;
+      result.avatarUrl = getUrl('userAvatar', user.avatar);
+      result.userHome = getUrl('userHome', postUid);
+      result.time = timeFormat(toc);
+      result.toc = toc;
+      result.articleId = pid;
+      result.url = getUrl('thread', tid);
+    }
+    results[pid] = result;
+  }
+  return results;
+}
 
 module.exports = mongoose.model('posts', postSchema);

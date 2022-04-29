@@ -56,7 +56,7 @@
         .m-b-2(v-if="!hideType.includes(pageData.type)")
           //- 1.data包含 createSurveyPermission type post.surveyId
           investigation(ref="investigation", :data="pageData")
-        .m-b-2
+        .m-b-2(v-if= "!['modifyPost'].includes(pageData.type)")
           //- 1.state  
           column(
             ref="column",
@@ -175,8 +175,6 @@ export default {
         console.error("submitFn is not fined");
         return;
       }
-      // pageData.draftId
-      // pageData.post.parentPostId;
       // 每个组件下都有一个getData返回数据
       const refs = this.$refs;
       let submitData = {};
