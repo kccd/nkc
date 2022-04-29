@@ -27,7 +27,7 @@
       width: 100%;
       text-align: center;
       span {
-        padding:0.5rem 2.5rem 0.5rem 2.5rem;
+        padding:0.5rem 2rem 0.5rem 2rem;
         font-size: 1.5rem;
       }
       .active {
