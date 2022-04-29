@@ -10,14 +10,14 @@ router
     const {pageSettings} = state;
     const {user} = data;
     // data.complaintTypes = ctx.state.language.complaintTypes;
-  
+
     const {t, page=0, from} = query;
     data.t = t;
-  
+
     const targetUser = await db.UserModel.findById(uid);
     await targetUser.extendGrade();
     data.targetUser = targetUser;
-  
+
     if(state.uid !== targetUser.uid) {
       targetUser.description = nkcRender.replaceLink(targetUser.description);
     }
@@ -104,7 +104,7 @@ router
       data.userSubUid = state.subUsersId;
       data.userSubFid = state.subForumsId;
     }
-  
+
     const targetUserDigestThreads = await db.ThreadModel.find({
       mainForumsId: {
         $in: accessibleFid
@@ -114,7 +114,7 @@ router
       reviewed: true,
       digest: true
     }).sort({toc: -1}).limit(10);
-  
+
     data.targetUserDigestThreads = await db.ThreadModel.extendThreads(targetUserDigestThreads, {
       forum: true,
       firstPost: true,
@@ -127,10 +127,10 @@ router
       excludeAnonymousPost: true,
       removeLink: true,
     });
-  
+
     data.recommendThreads = await db.ThreadModel.getRecommendThreads(accessibleFid);
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(accessibleFid);
-  
+
     if(t !== "fans") {
       const sub = await db.SubscribeModel.find({
         type: "user",
@@ -144,7 +144,7 @@ router
       });
       data.targetUserFans = await db.UserModel.extendUsersInfo(targetUserFans);
     }
-  
+
     if(t !== "follow") {
       const sub = await db.SubscribeModel.find({
         type: "user",
@@ -158,15 +158,15 @@ router
       });
       data.targetUserFollowers = await db.UserModel.extendUsersInfo(targetUserFollowers);
     }
-  
+
     let paging = {};
-  
+
     let canManageFid = [];
-  
+
     if(data.user) {
       canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
     }
-  
+
     const superModerator = ctx.permission("superModerator");
     if(!t) {
       // 加载用户的动态
@@ -177,7 +177,7 @@ router
       };
       const count = await db.MomentModel.countDocuments(match);
       paging = nkcModules.apiFunction.paging(page, count);
-      const moments = await db.MomentModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+      const moments = await db.MomentModel.find(match).sort({top: -1}).skip(paging.start).limit(paging.perpage);
       data.momentsData = await db.MomentModel.extendMomentsListData(moments, state.uid);
     } else if(t === 'post') {
       if(Number(page) === 0) {
@@ -226,7 +226,7 @@ router
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList);
       const posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
       const results = [];
-    
+
       const tids = new Set(), threadsObj = {};
       posts.map(post => {
         tids.add(post.tid);
@@ -246,7 +246,7 @@ router
       threads.map(thread => {
         threadsObj[thread.tid] = thread;
       });
-    
+
       for(const post of posts) {
         const thread = threadsObj[post.tid];
         if(post.disabled || thread.disabled || thread.recycleMark) {
@@ -390,7 +390,7 @@ router
             continue;
           }
         }
-      
+
         const result = {
           postType: "postToForum",
           tid: thread.tid,
@@ -404,14 +404,14 @@ router
           link: `/t/${thread.tid}`,
           reviewed: thread.reviewed
         };
-      
+
         result.toDraft = thread.recycleMark;
         result.disabled = thread.disabled;
-      
+
         results.push(result);
       }
       data.posts = results;
-    
+
     } else {
       // 关注或粉丝
       if(Number(page) >= 1) {
@@ -426,7 +426,7 @@ router
           }
         }
       }
-    
+
       if(t === "follow") {
         const q = {
           uid: targetUser.uid,
@@ -455,7 +455,7 @@ router
         }
       }
     }
-  
+
     // 排除封禁用户和名片被屏蔽的用户
     if(data.users && data.users.length) {
       data.users = data.users.filter(u => {
@@ -463,7 +463,7 @@ router
         return !u.certs.includes('banned') && !u.hidden;
       });
     }
-  
+
     const behavior = {
       operationId: data.operationId,
       uid: data.user? data.user.uid: "",

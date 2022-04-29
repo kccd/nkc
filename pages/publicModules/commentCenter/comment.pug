@@ -60,5 +60,5 @@ if !isIncluded('comment')
       -statusInfo = '退修'
     else if status === 'deleted'
       -statusInfo = '删除'
-    .h4.text-center(style='color: #666;')=`文章${statusInfo}，暂不可评论`
+    .h4.text-center(style='color: #666;')=`文章状态【${statusInfo}】，暂不可评论`
   +includeDeferJS('/publicModules/commentCenter/comment.js')

@@ -233,7 +233,7 @@ export default {
     getForums(page) {
       this.loading = true;
       const self = this;
-      let url = `/u/${self.uid}/profile/subscribe/forum`;
+      let url = `/u/${self.uid}/profile/subscribe/forumData`;
       if(self.t) url = url + `?t=${self.t}`;
       if(page) {
         if(url.indexOf('?') === -1) {

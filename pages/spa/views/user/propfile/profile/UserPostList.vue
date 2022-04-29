@@ -97,7 +97,7 @@ export default {
       this.loading = true;
       const {uid, routeName} = this;
       const self= this;
-      let url = `/u/${uid}/profile/${routeName}`;
+      let url = `/u/${uid}/profile/${routeName}Data`;
       if(page) {
         const index = url .indexOf('?');
         if(index === -1) {

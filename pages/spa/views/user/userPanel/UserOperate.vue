@@ -40,10 +40,8 @@
     .account-user-link {
       text-decoration: none;
       color: #282c37;
-      height: 3rem;
-      line-height: 3rem;
       text-align: center;
-      padding: 0;
+      padding: 5px 0 5px 0;
       border-radius: 4px;
       cursor: pointer;
       transition: background-color 100ms;

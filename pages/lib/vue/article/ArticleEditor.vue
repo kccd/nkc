@@ -353,10 +353,12 @@ export default {
     //自动保存草稿 保存成功无提示
     autoSaveToDraft() {
       const self = this;
-      self.post('save')
-        .then(() => {
-          self.saveToDraftSuccess();
-        })
+      if(self.articleId) {
+        self.post('save')
+          .then(() => {
+            self.saveToDraftSuccess();
+          })
+      }
     },
     //草稿保存成功
     saveDraftInfo(info) {

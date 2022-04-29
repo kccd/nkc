@@ -1,7 +1,7 @@
 const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
-    const {db, data, query, nkcModules} = ctx;
+    const {db, data, query, state, nkcModules} = ctx;
     let {page = 0, t = ''} = query;
     const {getUrl} = nkcModules.tools;
     const {
@@ -56,7 +56,7 @@ router
     const usersObj = await db.UserModel.getUsersObjectByUsersId(usersId);
     const articlesObj = await db.ArticleModel.getArticlesObjectByArticlesId(articlesId);
     const momentsObj = await db.MomentModel.getMomentsObjectByMomentsId(momentsId);
-    const momentsList = await db.MomentModel.extendMomentsListData(Object.values(momentsObj));
+    const momentsList = await db.MomentModel.extendMomentsListData(Object.values(momentsObj), state.uid);
     const commentsObj = await db.CommentModel.getCommentsObjectByCommentsId(commentsId);
     const commentsInfo = await db.CommentModel.getCommentInfo(Object.values(commentsObj));
     const commentsUrl = {};

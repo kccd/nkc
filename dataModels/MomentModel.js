@@ -218,6 +218,8 @@ schema.statics.getNewId = async () => {
 schema.statics.createMomentCore = async (props) => {
   const {
     uid,
+    time,
+    publishTime, // 发表时间，默认不传，仅在生成引用动态时使用
     content = '',
     resourcesId = [],
     parent = '',
@@ -233,7 +235,7 @@ schema.statics.createMomentCore = async (props) => {
     minLength: 0,
     maxLength: 100000
   });
-  const toc = new Date();
+  const toc = time || new Date();
   const momentId = await MomentModel.getNewId();
   const document = await DocumentModel.createBetaDocument({
     uid,
@@ -250,6 +252,7 @@ schema.statics.createMomentCore = async (props) => {
     did: document.did,
     quoteId,
     quoteType,
+    top: publishTime,
     toc,
     files: resourcesId
   });
@@ -287,9 +290,11 @@ schema.statics.createMoment = async (props) => {
 * @return {moment schema}
 * */
 schema.statics.createQuoteMoment = async props => {
-  const {uid, content, resourcesId, quoteId, quoteType} = props;
+  const {time, uid, content, resourcesId, quoteId, quoteType} = props;
   const MomentModel = mongoose.model('moments');
   return await MomentModel.createMomentCore({
+    time,
+    publishTime: time,
     uid,
     content,
     resourcesId,
@@ -635,7 +640,7 @@ schema.methods.publishMomentComment = async function(postType, alsoPost) {
 };
 
 /*
-* 创建并发布一条引用类型的动态
+* 创建并发布一条引用类型的动态(无法发表前检测)
 * @param {Object}
   * @param {String} uid 发表人 ID
   * @param {String} quoteType 引用类型 momentQuoteType
@@ -645,17 +650,25 @@ schema.methods.publishMomentComment = async function(postType, alsoPost) {
 * @return {moment schema}
 * */
 schema.statics.createQuoteMomentAndPublish = async (props) => {
-  const {uid, quoteType, quoteId, content, resourcesId = []} = props;
+  const {time, uid, quoteType, quoteId, content, resourcesId = []} = props;
   const MomentModel = mongoose.model('moments');
+  const DocumentModel = mongoose.model('documents');
   const moment = await MomentModel.createQuoteMoment({
     uid,
+    time,
     resourcesId,
     quoteType,
     quoteId,
     content
   });
-  await moment.publish();
-  return moment;
+  const top = time || new Date();
+  await DocumentModel.publishDocumentByDid(moment.did);
+  await moment.updateOne({
+    $set: {
+      top,
+    }
+  });
+  await moment.updateResourceReferences();
 };
 
 /*
@@ -696,19 +709,24 @@ schema.statics.getMomentsByMomentsId = async (momentsId, type = 'array') => {
 schema.statics.extendQuotesData = async (quotes, uid = '') => {
   const MomentModel = mongoose.model('moments');
   const ArticleModel = mongoose.model('articles');
+  const PostModel = mongoose.model('posts');
   const quoteTypes = await MomentModel.getMomentQuoteTypes();
   const articlesId = [];
   const momentsId = [];
+  const postsId = [];
   for(const quote of quotes) {
     const [quoteType, quoteId] = quote.split(':');
     if(quoteType === quoteTypes.moment) momentsId.push(quoteId);
     if(quoteType === quoteTypes.article) articlesId.push(quoteId);
+    if(quoteType === quoteTypes.post) postsId.push(quoteId);
   }
   // 加载动态
   const moments = await MomentModel.getMomentsByMomentsId(momentsId);
   const momentsData = await MomentModel.extendMomentsData(moments, uid);
   // 加载文章
   const articlesData = await ArticleModel.getArticlesDataByArticlesId(articlesId);
+  // 加载社区文章
+  const postsData = await PostModel.getPostsDataByPostsId(postsId, uid);
   const results = {};
   for(const quote of quotes) {
     const [quoteType, quoteId] = quote.split(':');
@@ -717,6 +735,8 @@ schema.statics.extendQuotesData = async (quotes, uid = '') => {
       result =  momentsData[quoteId];
     } else if(quoteType === quoteTypes.article) {
       result = articlesData[quoteId];
+    } else if(quoteType === quoteTypes.post) {
+      result = postsData[quoteId];
     }
     if(!result) continue;
     results[quote] = result;
@@ -778,6 +798,7 @@ schema.statics.renderContent = async (content) => {
 *   @param {Date} toc 发表时间
 *   @param {String} content 动态内容
 *   @param {Number} voteUp 点赞数
+*   @param {String} statusInfo 动态状态的说明
 *   @param {String} url 动态详情页链接
 *   @param {[Object]} files 附带的资源
 *     @param {String} rid 资源ID
@@ -806,6 +827,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
   const PostsVoteModel = mongoose.model('postsVotes');
   const {getUrl, fromNow} = require('../nkcModules/tools');
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
+  const momentStatus = await MomentModel.getMomentStatus();
   const usersId = [];
   const momentsId = [];
   let resourcesId = [];
@@ -846,6 +868,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       quoteType,
       status,
     } = moment;
+
     let f = moment[field];
     const user = usersObj[uid];
     if(!user) continue;
@@ -930,12 +953,41 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       content,
       voteUp,
       status,
+      statusInfo: '',
       voteType: votesType[_id],
       commentCount: order,
       source: 'moment',
       files: filesData,
       url: getUrl('zoneMoment', _id),
     };
+
+    if(moment.status !== momentStatus.normal) {
+      let momentContent = '';
+      switch (moment.status) {
+        case momentStatus.disabled: {
+          momentContent = '内容已屏蔽';
+          break;
+        }
+        case momentStatus.faulty: {
+          momentContent = '内容已退回修改';
+          break;
+        }
+        case momentStatus.unknown: {
+          momentContent = '内容待审核';
+          break;
+        }
+        case momentStatus.deleted: {
+          momentContent = '内容已删除';
+          break;
+        }
+        default: {
+          momentContent = '内容暂不予显示';
+        }
+      }
+      // 待改，此处返回的字段之后两个字段，应包含全部字段，只不过字段内容为空
+      results[_id].statusInfo = momentContent;
+    }
+
   }
   return results;
 };
@@ -988,7 +1040,7 @@ schema.statics.extendMomentsListData = async (moments, uid = '') => {
        quotesId.push(`${quoteType}:${quoteId}`);
      }
   }
-  const quotesData = await MomentModel.extendQuotesData(quotesId);
+  const quotesData = await MomentModel.extendQuotesData(quotesId, uid);
   const results = [];
   for(const moment of moments) {
     const {quoteType, quoteId, _id} = moment;
