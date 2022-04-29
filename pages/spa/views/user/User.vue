@@ -64,7 +64,8 @@ export default {
         self.targetUserFollowers = res.targetUserFollowers;
         self.code = res.code;
         self.usersBlUid = res.usersBlUid;
-        setPageTitle(self.targetUser.username + '的主页');
+        const title = self.targetUser.username ? self.targetUser.username : '用户';
+        setPageTitle(title  + '的主页');
       })
       .catch(err => {
         sweetError(err);
