@@ -207,12 +207,15 @@ export default {
     },
     getColumn() {
       const self = this;
-      if(!getState().uid) return;
-      getColumnInfo()
-        .then(res => {
-          self.column = res;
-          self.columnId = res.userColumn._id
-        })
+      if(getState().uid) {
+        getColumnInfo()
+          .then(res => {
+            self.column = res;
+            if(res.userColumn) {
+              self.columnId = res.userColumn._id
+            }
+          })
+      }
     },
     //专栏分类发生改变
     categoryChange() {
