@@ -146,7 +146,7 @@ router
     data.targetUserFollowers = await db.UserModel.extendUsersInfo(targetUserFollowers);
     data.code = await db.UserModel.getCode(targetUser.uid);
     data.code = data.code.pop();
-
+    
     //用户的黑名单
     const match = {
     };
@@ -217,20 +217,37 @@ router
   .get('/subscribe', async (ctx, next) => {
     await next();
   })
-  .get('/subscribe/user', subUserRouter)
-  .get('/subscribe/forum', subForumRouter)
-  .get('/subscribe/column', subColumnRouter)
-  .get('/subscribe/collection', subCollectionRouter)
-  .get('/subscribe/blacklist', blacklistRouter)
-  .get('/subscribe/thread', subThreadRouter)
-  .get('/moment', momentRouter)
-  .get('/post', postRouter)
-  .get('/thread', threadRouter)
-  .get('/fan', fanRouter)
-  .get('/follower', followerRouter)
-  .get('/manage', manageRouter)
-  .get('/draft', draftRouter)
-  .get('/note', noteRouter)
-  .get('/finance',financeRouter)
-  .get('/column', columnRouter)
+  .get('/subscribe/user', async (ctx, next) => await next())
+  .get('/subscribe/userData', subUserRouter)
+  .get('/subscribe/forum', async (ctx, next) => await next())
+  .get('/subscribe/forumData', subForumRouter)
+  .get('/subscribe/column', async (ctx, next) => await next())
+  .get('/subscribe/columnData', subColumnRouter)
+  .get('/subscribe/collection', async (ctx, next) => await next())
+  .get('/subscribe/collectionData', subCollectionRouter)
+  .get('/subscribe/blacklist', async (ctx, next) => await next())
+  .get('/subscribe/blacklistData', blacklistRouter)
+  .get('/subscribe/thread', async (ctx, next) => await next())
+  .get('/subscribe/threadData', subThreadRouter)
+  .get('/moment', async (ctx , next) => await next())
+  .get('/momentData', momentRouter)
+  .get('/post', async (ctx, next) => await next())
+  .get('/postData', postRouter)
+  .get('/thread', async (ctx, next) => await next())
+  .get('/threadData', threadRouter)
+  .get('/fan', async (ctx, next) => await next())
+  .get('/fanData', fanRouter)
+  .get('/follower', async (ctx, next) => await next())
+  .get('/followerData', followerRouter)
+  .get('/manage', async (ctx, next) => await next())
+  .get('/manageData', manageRouter)
+  .get('/draft', async (ctx, next) => await next())
+  .get('/draftData', draftRouter)
+  .get('/note', async (ctx, next) => await next())
+  .get('/noteData', noteRouter)
+  .get('/finance', async (ctx, next) => await next())
+  .get('/financeData',financeRouter)
+  .get('/column', async (ctx, next) => await next())
+  .get('/columnData', columnRouter)
 module.exports = router;
+
