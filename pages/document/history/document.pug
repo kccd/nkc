@@ -26,7 +26,7 @@ block content
                     :class="",
                     href=`/document/history?source=${data.urlComponent.source}&sid=${data.urlComponent.sid}&page=${i}`
                   )=`${page.type === 'null' ? '...' : page.num}`
-        .col-xs-12.col-md-9.book-content-container
+        .col-xs-12.col-md-9.book-content-container.m-b-1
           if data.history.length
             .thread-nav-right
               .nav-count(title=`浏览数`)
@@ -65,7 +65,7 @@ block content
                 if data.document.origin == "3" || data.document.origin == "4" || data.document.origin == "5" || data.document.origin == "6"
                   span(style="color:#9baec8;margin-right:3px" onclick="originTitle()") 原创
               a.column.jump.m-r-1(href=`/m/${_id}` target="_blank")=name
-              
+
             if data.type !== "draft"
               if (data.document.abstract.length || data.document.abstractEN.length)
                 .abstract(style="margin-top:1rem; word-break: break-all;")

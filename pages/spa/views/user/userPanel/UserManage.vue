@@ -4,10 +4,10 @@
     .panel-header 管理
     .m-b-2
       .user-card-sub-div
-        a(:href="`/u/${targetUser.uid}/transaction`" target="_blank").m-r-05.btn.btn-default.btn-sm.m-b-05 查看地址
-        button.m-b-05.btn.btn-default.btn-sm.m-r-05(@click="violationRecord(targetUser.uid)") 违规信息
-        a(:href="`/u/${targetUser.uid}/alt`" target="_blank").m-r-05.btn.btn-default.btn-sm.m-b-05 查马甲
-        button.m-b-05.btn.btn-default.btn-sm.m-r-05(@click="checkUserCode()") 验证动态码
+        a(:href="`/u/${targetUser.uid}/transaction`" target="_blank" v-if="permissions.visitUserTransaction").m-r-05.btn.btn-default.btn-sm.m-b-05 查看地址
+        button.m-b-05.btn.btn-default.btn-sm.m-r-05(@click="violationRecord(targetUser.uid)" v-if="permissions.violationRecord") 违规信息
+        a(:href="`/u/${targetUser.uid}/alt`" target="_blank" v-if="permissions.getUserOtherAccount").m-r-05.btn.btn-default.btn-sm.m-b-05 查马甲
+        button.m-b-05.btn.btn-default.btn-sm.m-r-05(@click="checkUserCode()" v-if="permissions.viewUserCode") 验证动态码
 </template>
 <style lang="less" scoped>
 .user-manage {
@@ -45,7 +45,7 @@ export default {
     //获取用户管理权限
     getManage() {
       const self = this;
-      nkcAPI(`/u/${self.uid}/profile/manage`, 'GET')
+      nkcAPI(`/u/${self.uid}/profile/manageData`, 'GET')
       .then(res => {
         self.targetUser = res.targetUser;
         self.permissions = res.permissions;

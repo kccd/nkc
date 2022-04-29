@@ -7,7 +7,6 @@
 
 </style>
 <script>
-import {nkcAPI} from "../../../../lib/js/netAPI";
 import SidUsers from "./SidUsers";
 export default {
   props: ["targetUserFans", "targetUserFollowers"],

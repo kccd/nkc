@@ -254,7 +254,7 @@ export default {
     getSubUser(page) {
       const self = this;
       if(!self.uid) return sweetError('uid is undefined');
-      let url = `/u/${self.uid}/profile/subscribe/user`;
+      let url = `/u/${self.uid}/profile/subscribe/userData`;
       if(self.t) {
         url += `?t=${self.t}`;
       }

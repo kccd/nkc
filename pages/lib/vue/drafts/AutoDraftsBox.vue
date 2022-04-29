@@ -2,7 +2,7 @@
   div
     .paging-button
       a.button.m-r-05.radius-left.radius-right(@click="refresh") 刷新
-      span(v-for="(b, index) in paging.buttonValue")
+      span(v-for="(b, index) in paging.buttonValue" v-if="paging")
         span(v-if="b.type === 'active'")
           a.button.active(@click="getDrafts(b.num)"
             :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
@@ -224,11 +224,13 @@ export default {
     },
     getDrafts(page = 0) {
       const self = this;
-      nkcAPI(`/u/${this.uid}/profile/draft?page=${page}&perpage=${this.perpage}`, "GET")
+      nkcAPI(`/u/${this.uid}/profile/draftData?page=${page}&perpage=${this.perpage}`, "GET")
         .then(data => {
-          data.drafts.map(d => {
-            d.delay = 0;
-          });
+          if(data.drafts) {
+            data.drafts.map(d => {
+              d.delay = 0;
+            });
+          }
           self.drafts = data.drafts;
           self.paging = data.paging;
           self.loading = false;

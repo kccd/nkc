@@ -3,37 +3,64 @@ module.exports = {
 	PARAMETER: {
 		profile: {
 			GET: "visitUserCard",
-			subUser: {
-				GET: "visitUserCard",
-			},
 			manage: {
+				GET: "getUserHomeCard"
+			},
+			manageData: {
 				GET: "getUserHomeCard"
 			},
 			column: {
 				GET: "getUserHomeCard",
 			},
+			columnData: {
+				GET: "getUserHomeCard",
+			},
 			moment: {
+				GET: "getUserHomeCard"
+			},
+			momentData: {
 				GET: "getUserHomeCard"
 			},
 			post: {
 				GET: "getUserHomeCard"
 			},
+			postData: {
+				GET: "getUserHomeCard"
+			},
 			thread: {
+				GET: "getUserHomeCard"
+			},
+			threadData: {
 				GET: "getUserHomeCard"
 			},
 			note: {
 				GET: "userProfile"
 			},
+			noteData: {
+				GET: "userProfile"
+			},
 			draft: {
+				GET: "userProfile"
+			},
+			draftData: {
 				GET: "userProfile"
 			},
 			follower: {
 				GET: "getUserHomeCard",
 			},
+			followerData: {
+				GET: "getUserHomeCard",
+			},
 			fan: {
 				GET: "getUserHomeCard",
 			},
+			fanData: {
+				GET: "getUserHomeCard",
+			},
 			finance: {
+				GET: "getUserHomeCard",
+			},
+			financeData: {
 				GET: "getUserHomeCard",
 			},
 			subscribe: {
@@ -41,16 +68,31 @@ module.exports = {
 				collection: {
 					GET: "getUserHomeCard"
 				},
+				collectionData: {
+					GET: "getUserHomeCard"
+				},
 				column: {
+					GET: "getUserHomeCard"
+				},
+				columnData: {
 					GET: "getUserHomeCard"
 				},
 				user: {
 					GET: "getUserHomeCard"
 				},
+				userData: {
+					GET: "getUserHomeCard"
+				},
 				forum: {
 					GET: "getUserHomeCard",
 				},
+				forumData: {
+					GET: "getUserHomeCard",
+				},
 				blacklist: {
+					GET: "getUserHomeCard",
+				},
+				blacklistData: {
 					GET: "getUserHomeCard",
 				}
 			},
