@@ -68,16 +68,19 @@ export default {
     setInterval: '',
   }),
   watch: {
-    data(n) {
-      this.allowedAnonymousForumsId = n?.allowedAnonymousForumsId || [];
-      this.havePermissionToSendAnonymousPost =
-        n?.havePermissionToSendAnonymousPost || false;
-      if (n?.post) this.oldContent = n.post.c;
-      if (n?.type) this.type = n.type;
-      if (n?.forum) this.forum = n.forum;
-      if (n?.threda) this.threda = n.threda;
-      if (n?.post?.pid) this.pid = n.post.pid;
-    },
+    data : {
+      immediate: true,
+      handler(n){
+        this.allowedAnonymousForumsId = n?.allowedAnonymousForumsId || [];
+        this.havePermissionToSendAnonymousPost =
+          n?.havePermissionToSendAnonymousPost || false;
+        if (n?.post) this.oldContent = n.post.c;
+        if (n?.type) this.type = n.type;
+        if (n?.forum) this.forum = n.forum;
+        if (n?.threda) this.threda = n.threda;
+        if (n?.post?.pid) this.pid = n.post.pid;
+      }
+    }
   },
   computed: {
     selectedForumsId() {
@@ -375,6 +378,7 @@ export default {
           // 锁住发表按钮
           this.disabledSubmit = true;
           type = this.type;
+          console.log(type,"文章type")
         })
         .then(() => {
           if (type === "newThread") {
@@ -384,8 +388,6 @@ export default {
             this.checkAbstract(submitData.abstractCn, submitData.abstractEn);
             this.checkForums(submitData.fids);
             this.checkThreadCategory(this.data.threadCategories);
-            this.checkKeywords(submitData.keyWordsCn, submitData.keyWordsEn);
-            this.checkAuthorInfos(submitData.authorInfos);
             let formData = new FormData();
             formData.append("body", JSON.stringify({ post: submitData }));
             if (submitData.coverData) {

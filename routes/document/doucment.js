@@ -105,7 +105,7 @@ router
     }
   }
   // 在 历史记录中找到当前需要显示内容的文章
-  data.document = find(data.history, _id);
+  data.document = find(data.history, Number(_id));
   if(!data.document) ctx.throw(400, "当前文章不存在或正在进行编辑");
   if(data.document.uid !== state.uid){
     if(!permission("viewUserArticle")) ctx.throw(403, "没有权限")
