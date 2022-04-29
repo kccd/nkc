@@ -1927,7 +1927,7 @@ postSchema.statics.extendPostsByColumn = async function(posts, options) {
   const PostModel = mongoose.model('posts');
   let results = posts;
   results = await PostModel.extendPosts(results, options);
-  results = await PostModel.extendPosts(results);
+  // results = await PostModel.extendPosts(results);
   results = await PostModel.filterPostsInfo(results);
   results = results.reverse();
   return results;
