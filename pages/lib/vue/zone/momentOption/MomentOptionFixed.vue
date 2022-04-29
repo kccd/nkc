@@ -3,7 +3,7 @@
     .post-options-panel(v-if='loading')
       .loading 加载中...
     .post-options-panel(v-else)
-      a.option(v-if="moment.url" :href="moment.url")
+      a.option(v-if="moment.url" @click="toMoment(moment.url)" target="_blank")
         .fa.fa-newspaper-o
         span 查看详情
       a.option(v-if="options.delete" @click="deleteMoment")
@@ -91,6 +91,7 @@
 import {nkcAPI} from "../../../js/netAPI";
 import {timeFormat} from "../../../js/tools";
 import {EventBus} from "../../../../spa/eventBus";
+import {visitUrl} from "../../../js/pageSwitch";
 export default {
   data: () => ({
     uid: NKC.configs.uid,
@@ -123,6 +124,10 @@ export default {
         .catch(err => {
           sweetError(err);
         })
+    },
+    //评论详情
+    toMoment(url){
+      visitUrl(url,true)
     },
     open(props) {
       this.loading = true;

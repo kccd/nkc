@@ -208,5 +208,5 @@ export function initAppGlobalClickLinkEvent() {
     RNOpenNewPage(targetUrl, title);
     e.preventDefault();
   }, 1000);
-  document.addEventListener('click', handle);
+  document.addEventListener('click', handle, {passive: false});
 }
