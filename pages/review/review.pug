@@ -107,24 +107,33 @@ block content
                 .review-user
                   a(href=`/u/${r.user.uid}` target="_blank")=r.user.username
                   .review-info 类型：
-                    if r.content.source === 'column'
-                      .review-time 独立文章创作
-                    else if r.content.source === 'moment'
-                      .review-time 动态
+                    if r.document.source === 'article'
+                      if r.content.source === 'column'
+                        .review-time 专栏独立文章
+                      else if r.content.source === 'zone'
+                        .review-time 空间独立文章
+                      else
+                        .review-time 独立文章
+                    else if r.document.source === 'moment'
+                      if r.content.parent
+                        .review-time 动态评论
+                      else
+                        .review-time 动态
+                    else if r.document.source === 'comment'
+                      .review-time 独立文章评论
+                    else if r.document.source === 'draft'
+                      .review-time 图文片段
                     else
-                      .review-time 文章创作
+                      .review-time 未知内容
                   if r.document.source === 'article'
                     .review-info 标题：
                       .review-thread-title
                         a(href=`${r.content.url}` target="_blank" v-pre)=r.content.title
-                  else if r.document.source === 'moment'
+                  else
                     .review-info 链接：
                       .review-thread-title
-                        a(href=`${r.content.url}` target="_blank") 点击这里跳转
-                  else
-                    .review-info 图书标题：
-                      .review-thread-title
-                        span(v-pre)=r.content.bookName
+                        a(href=`${r.content.url}` target="_blank") 点击跳转
+
                 if r.reason
                   .review-info 理由：
                   span(v-pre)= r.reason
