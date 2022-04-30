@@ -1414,7 +1414,7 @@ export default {
             })
               .then(() => {
                 sweetSuccess('操作成功');
-                callback();
+                if(callback) callback();
                 self.getCategories();
               })
               .catch(err => {
@@ -1437,7 +1437,7 @@ export default {
         .then(() => {
           self.categoryLoading = true;
           sweetSuccess('操作成功');
-          callback();
+          if(callback) callback();
           self.getCategories();
           self.$refs.categoryModal.close();
         })
