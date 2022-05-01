@@ -53,16 +53,16 @@ block head
   if isReactNative
     +includeCSS('/publicModules/reactNative.css')
 
-  block title
-    meta(name="description" content="倡导科学理性，发展科技爱好")
-    title bootstrap_base
-
   // 每个页面都会引入的公共方法
   +includeJS('/publicModules/common.js')
   // 前后端公用的方法
   +includeJS('/tools.js')
   // 前后端公用的方法 数据类型检查相关
   +includeJS("/checkData.js")
+
+  block title
+    meta(name="description" content="倡导科学理性，发展科技爱好")
+    title bootstrap_base
 
 block body
 
