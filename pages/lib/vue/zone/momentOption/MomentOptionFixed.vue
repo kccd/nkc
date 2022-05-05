@@ -130,6 +130,7 @@ export default {
       visitUrl(url,true)
     },
     open(props) {
+      console.log('props',props)
       this.loading = true;
       const {moment, DOM, direction} = props;
       this.toc = null;
@@ -155,7 +156,7 @@ export default {
         docId = _id;
       } else {
         if(!this.moment) return;
-        docId = this.moment.momentCommentId?this.moment.momentCommentId:this.moment.momentId;
+        docId = this.moment.docId;
       }
       nkcAPI('/review' , 'PUT', {
         pass: true,
@@ -164,6 +165,9 @@ export default {
       })
         .then(res => {
           sweetSuccess('操作成功');
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
         })
         .catch(err => {
           sweetError(err);
