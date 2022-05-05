@@ -1,5 +1,5 @@
 <template lang="pug">
-  .container-fluid.max-width.clear-padding
+  .container-fluid.max-width
     .hidden-user-home-tip(v-if="targetUser && targetUser.hidden" )
       span 用户名片已被屏蔽
     .user-banner(@mouseenter="enter()" @mouseleave="leave()" v-if="targetUser").m-b-1

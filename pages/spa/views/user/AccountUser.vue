@@ -1,5 +1,5 @@
 <template lang="pug">
-  .container-fluid.max-width.clear-padding
+  .container-fluid.max-width
     .user-account.m-b-1(v-if="targetUser")
       .row
         //- 用户左侧面板
