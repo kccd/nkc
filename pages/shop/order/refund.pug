@@ -22,7 +22,7 @@ block content
           | ）
         h5 商品列表
         div(v-for="p in params")
-          img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+          img.m-r-1(:src= 'getUrl("resource", p.product.imgMaster, "sm")' style='height: 4rem;width: 4rem;vertical-align:top;')
           div.display-i-b
             a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name}})
             h5 商品ID：{{p.costId}}，
@@ -66,7 +66,7 @@ block content
                 |）
               h5 商品列表
               div(v-for="p in params")
-                img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                img.m-r-1(:src="getUrl('resource', p.product.imgMaster, 'sm')" style='height: 4rem;width: 4rem;vertical-align:top;')
                 div.display-i-b
                   a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name}})
                   h5 商品ID：{{p.costId}}，
@@ -83,7 +83,7 @@ block content
               .m-t-1(v-if='refund')
                 h4 退款中的商品
                 div(v-if='param')
-                  img.m-r-1(:src="'/rt/' + param.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                  img.m-r-1(:src="getUrl('resource', param.product.imgMaster, 'sm')" style='height: 4rem;width: 4rem;vertical-align:top;')
                   div.display-i-b
                     a(:href="'/shop/product/'+param.product.productId" target='_blank' :title="param.product.abstract") {{param.product.name}} ({{param.productParam.name}})
                     h5 商品单价：
@@ -92,7 +92,7 @@ block content
                       strong.text-danger {{param.count}}
                 div(v-else)
                   div(v-for="p in order.params" v-if="p.refundStatus === 'ing'")
-                    img.m-r-1(:src="'/rt/' +p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                    img.m-r-1(:src="getUrl('resource', p.product.imgMaster, 'sm')" style='height: 4rem;width: 4rem;vertical-align:top;')
                     div.display-i-b
                       a(:href="'/shop/product/' + p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name}})
                       h5 商品单价：
@@ -146,7 +146,7 @@ block content
                     div(v-for="p in params" style="border-bottom: 1px solid #eee" v-if='p.refundStatus === ""')
                       label.radio-inline
                         input(type="radio"  :value="p.costId" v-model="newRefund.paramId")
-                        img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                        img.m-r-1(:src="getUrl('resource', p.product.imgMaster, 'sm')" style='height: 4rem;width: 4rem;vertical-align:top;')
                         div.display-i-b
                           a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}}
                           h5 商品单价：

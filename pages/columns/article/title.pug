@@ -1,17 +1,15 @@
 //-  文章的标题,作者等
-
   @params {String} t 文章标题
   @params {Array} authorInfos 文章作者
-
   @params {String} uid 用户id
   @params {String} userAvatar
-
   @params {String} toc  文章创建时间
   @params {String} originState  文章源
   @params {String} name 专栏名
   @params {String} _id 专栏ID
+  @params {String} type 文章类型
 mixin title(data)
-  -var {t, authorInfos, uid, toc, originState, name, _id, user ,type} = data
+  -var {t, authorInfos, uid, toc, originState, name, _id, user ,type} = data;
   if authorInfos && authorInfos.length  && type !== "product"
     -var agencyIndex = 1;
     -var agencyArray = [];
@@ -46,7 +44,7 @@ mixin title(data)
             span.common-article-author-name(style="cursor: pointer;" onclick=`turnUser(${authorInfo.kcid})`)!=`${authorInfo.name}`
           else
             span.common-article-author-name!=`${authorInfo.name}`
-          if post.authorInfos.length > 1 && authorInfo.agencyIndex && agencyAddArray.length > 1
+          if authorInfos.length > 1 && authorInfo.agencyIndex && agencyAddArray.length > 1
             sup!=`${authorInfo.agencyIndex}`
           //- span.common-article-author-name=authorInfo.name
           if authorInfo.isContract && authorInfo.contractObj && authorInfo.contractObj.contractEmail

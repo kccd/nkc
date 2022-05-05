@@ -60,7 +60,7 @@ router
       refund.description = ctx.state.lang("shopRefundStatus", refund.status) || refund.status;
     }
     data.refund = refund;
-    ctx.template = '/shop/order/detail.pug';
+    ctx.template = 'shop/order/detail.pug';
     await next();
   })
   .use('/refund', refundRouter.routes(), refundRouter.allowedMethods());
