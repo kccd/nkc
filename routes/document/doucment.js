@@ -8,7 +8,6 @@ router
   const {db, data, state, query, permission} = ctx;
 
   const {sid, source} = query;
-  const {user} = data;
   const document = await db.DocumentModel.find({sid, source, uid: state.uid, type: "beta"}).sort({tlm: -1}).skip(0).limit(1);
   if(!document.length) ctx.throw(400, "该文章已被发布")
 
@@ -20,7 +19,7 @@ router
     if(!permission("viewUserArticle")) ctx.throw(403, "没有权限")
   }
   // 查询文章作者
-  data.articleAuthor = await db.UserModel.findOnly({uid: data.document.uid});
+  data.document.user = await db.UserModel.findOnly({uid: data.document.uid});
   const documentResourceId = await data.document.getResourceReferenceId();
   let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
   data.document.content = nkcRender.renderHTML({
@@ -30,23 +29,20 @@ router
       resources
     },
   });
-  data.document.user = user;
   await next();
 })
 .get('history', async (ctx, next)=>{
   //获取文档历史版本
   ctx.template = 'document/history/document.pug'
   const {db, data, state, query, permission, nkcModules} = ctx;
-  const {user} = data;
-
-  const {sid, source, page=1} = query;
+  const {sid, source, page=0} = query;
   data.type = source;
   const {betaHistory, stableHistory} = await db.DocumentModel.getDocumentTypes();
   const queryCriteria = { $and:[{ sid, source }, {type: {$in: [betaHistory, stableHistory]}}, {uid: state.uid}] };
   //  获取列表
   // 返回分页信息
   const count =  await db.DocumentModel.countDocuments(queryCriteria);
-  const paging = nkcModules.apiFunction.paging(page-1, count, 10);
+  const paging = nkcModules.apiFunction.paging(page, count, 10);
   data.paging = paging;
   data.history = await db.DocumentModel.find(queryCriteria).sort({tlm: -1}).skip(paging.start).limit(paging.perpage);
   if(data.history.length){
@@ -55,8 +51,7 @@ router
     if(data.document.uid !== state.uid){
       if(!permission("viewUserArticle")) ctx.throw(403, "没有权限")
     }
-    data.document.user = user;
-    data.articleAuthor = await db.UserModel.findOnly({uid: data.document.uid});
+    data.document.user = await db.UserModel.findOnly({uid: data.document.uid});
     const documentResourceId = await data.document.getResourceReferenceId();
     let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
     data.document.content = nkcRender.renderHTML({
@@ -92,14 +87,13 @@ router
 .get('history/:_id',async (ctx, next)=>{
   ctx.template = 'document/history/document.pug'
   const {db, data, params, state, query, permission, nkcModules} = ctx;
-  const { sid, source, page=1 } = query;
-  const {user} = data;
+  const { sid, source, page=0 } = query;
   const { _id } = params;
   data.type = source;
   const {betaHistory, stableHistory} = await db.DocumentModel.getDocumentTypes();
   const queryCriteria = { sid, source, type: {$in: [betaHistory, stableHistory]}, uid: state.uid };
   const count =  await db.DocumentModel.countDocuments(queryCriteria);
-  const paging = nkcModules.apiFunction.paging(page-1, count, 10);
+  const paging = nkcModules.apiFunction.paging(page, count, 10);
   data.type = source;
   data.history =  await db.DocumentModel.find(queryCriteria).sort({tlm:-1}).skip(paging.start).limit(paging.perpage);
   function find(data, id){
@@ -116,9 +110,8 @@ router
   if(data.document.uid !== state.uid){
     if(!permission("viewUserArticle")) ctx.throw(403, "没有权限")
   }
-  data.document.user = user;
   data.paging = paging;
-  data.articleAuthor = await db.UserModel.findOnly({uid: data.document.uid});
+  data.document.user = await db.UserModel.findOnly({uid: data.document.uid});
   const documentResourceId = await data.document.getResourceReferenceId();
   let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
   data.document.content = nkcRender.renderHTML({

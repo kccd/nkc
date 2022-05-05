@@ -13,15 +13,21 @@
   //   },
   // });
 // })
-Object.assign(window, { originTitle, turnUser })
-function originTitle(){
-  if($('#dropdown').hasClass('open')){
-    $('#dropdown').removeClass('open');
+Object.assign(window, { turnUser })
+document.onclick = function ({target}){
+  // console.dir(target)
+  if(target.outerText !== "原创"){
+    if($('#dropdown').hasClass('open')){
+      $('#dropdown').removeClass('open');
+    }
   }else{
-    $('#dropdown').addClass('open');
+    if($('#dropdown').hasClass('open')){
+      $('#dropdown').removeClass('open');
+    }else{
+      $('#dropdown').addClass('open');
+    }
   }
 }
-
 function turnUser(uid) {
 	if(uid) {
 		// window.location.href = "/u/"+uid;
