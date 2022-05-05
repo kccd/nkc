@@ -64,8 +64,8 @@ mixin title(data)
         data-global-data=objToStr({uid})
       )
         img(src=tools.getUrl('userAvatar', user.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
-        if authorInfos && authorInfos[0]
-          span.kcid=user.username
+        //- if authorInfos && authorInfos[0]
+        span.kcid=user.username
       span.modify-time.m-r-1=`${dateString(toc)}`
       if ['3','4','5','6'].includes(originState)
         span#dropdown.m-r-1.origin.fa.fa-caret-square-o-down.origin-icon.dropdown(onclick="originTitle()") 原创
