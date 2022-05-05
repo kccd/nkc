@@ -14,7 +14,21 @@
   // });
 // })
 Object.assign(window, { turnUser })
-document.onclick = function ({target}){
+document.addEventListener('click', (e) => {
+  const target = e.target;
+  if(target.outerText !== "原创"){
+    if($('#dropdown').hasClass('open')){
+      $('#dropdown').removeClass('open');
+    }
+  }else{
+    if($('#dropdown').hasClass('open')){
+      $('#dropdown').removeClass('open');
+    }else{
+      $('#dropdown').addClass('open');
+    }
+  }
+});
+/*document.onclick = function ({target}){
   // console.dir(target)
   if(target.outerText !== "原创"){
     if($('#dropdown').hasClass('open')){
@@ -27,7 +41,7 @@ document.onclick = function ({target}){
       $('#dropdown').addClass('open');
     }
   }
-}
+}*/
 function turnUser(uid) {
 	if(uid) {
 		// window.location.href = "/u/"+uid;
