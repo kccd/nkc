@@ -211,7 +211,7 @@ export default {
       getColumnInfo()
         .then(res => {
           self.column = res;
-          self.columnId = res.userColumn._id
+          self.columnId = res.userColumn?res.userColumn._id: null
         })
     },
     //专栏分类发生改变
