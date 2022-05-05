@@ -14,7 +14,7 @@
           span.fa.fa-columns &nbsp;开设专栏
           span.pull-right.fa.fa-angle-right
       li
-        a(onclick='RootApp.openChatPanel()')
+        a(href=`/message`)
           span.fa.fa-envelope-o &nbsp;消息中心
           span.nav-message-item-count(v-if="count && count > 0") {{count}}
           span.pull-right.fa.fa-angle-right
@@ -35,7 +35,7 @@
           span.pull-right.fa.fa-angle-right
     ul.user-drawer-list
       li
-        a(href=`/shop/order/order`)
+        a(href=`/shop/order`)
           span.fa.fa-file-text-o &nbsp;我的订单
           span.pull-right.fa.fa-angle-right
       li
