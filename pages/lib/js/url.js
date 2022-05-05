@@ -8,3 +8,20 @@ export function fixUrl(url) {
   }
   return url;
 }
+
+/*
+* 判断链接是否为绝对链接
+* @param {String} url
+* @return {Boolean}
+* */
+export function isAbsolutePath(url) {
+  const reg = /^https?:\/\/.*/i;
+  return reg.test(url);
+}
+
+/*
+* 判断连接是否为本站链接
+* */
+export function isSameDomain(url) {
+  return url.indexOf(location.host) !== -1 || /(^\.)|(^\/)/.test(url);
+}

@@ -242,7 +242,7 @@ export default {
       } else if(this.source === 'zone') {
         const {aid} = this.getRequest();
         if(aid) this.articleId = aid;
-      };
+      }
     },
     //根据articleId或者mid获取编辑器中的数据
     initData() {
@@ -263,7 +263,7 @@ export default {
           } else {
             return;
           }
-        };
+        }
         query = query + `&mid=${mid}`;
         if(aid) {
           query = query + `&mid=${mid}&aid=${aid}`;

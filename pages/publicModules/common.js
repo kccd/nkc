@@ -669,17 +669,17 @@ NKC.methods.replaceTextNodeUrl = function(textNode) {
 NKC.methods.ueditor = {
   // ueditor执行getContent时
   getContent: function(content){
-    content = NKC.methods.replaceTwemoji(content);
+    // content = NKC.methods.replaceTwemoji(content);
     return content;
   },
   // ueditor执行setContent时
   setContent: function(html) {
-    html = NKC.methods.replaceEmojiChar(html);
-    html = NKC.methods.addXsfDataMessage(html);
+    /*html = NKC.methods.replaceEmojiChar(html);
+    html = NKC.methods.addXsfDataMessage(html);*/
     return html;
   },
   insertContent: function(html) {
-    html = $("<div>"+html+"</div>");
+    /*html = $("<div>"+html+"</div>");
     var span = html.find("span.nkc-hl");
     span.css({
       "background-color": "",
@@ -687,18 +687,18 @@ NKC.methods.ueditor = {
     }).removeClass("nkc-hl");
     // 将文本节点中的链接替换成 a 标签
     NKC.methods.replaceDomTextUrl(html[0]);
-    html = html.html();
+    html = html.html();*/
     return html;
   },
   initDownloadEvent: function(editor) {
-    window.socket.on('fileTransformProcess', (data) => {
+    /*window.socket.on('fileTransformProcess', (data) => {
       if(!editor || !editor.fireEvent) return;
       editor.fireEvent('updateImageState', {
         id: data.rid,
         state: data.state === 'fileProcessFinish',
         src: NKC.methods.tools.getUrl('resource', data.rid)
       });
-    });
+    });*/
   }
 };
 
