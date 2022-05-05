@@ -91,8 +91,8 @@ router
         reason: reviewRecord? reviewRecord.reason : "",
       });
     }
-    
-    
+
+
     //先查找出需要审核的document
     let documents = await db.DocumentModel.find(m, {
       _id: 1,
@@ -166,7 +166,7 @@ router
     await next();
   })
   .put("/", async (ctx, next) => {
-    const {data, db, body} = ctx;
+    const {data, db, body, state} = ctx;
     let {pid, type: reviewType, docId, pass, reason, remindUser, violation, delType} = body;//remindUser 是否通知用户 violation 是否标记违规 delType 退修或禁用
     if(!reviewType) {
       if(pid) {
@@ -233,7 +233,13 @@ router
         //将document状态改为已审核状态
         await document.setStatus(normalStatus);
         //生成审核记录
-        await db.ReviewModel.newReview('passDocument', '', data.user, reason, document);
+        await db.ReviewModel.reviewDocument({
+          handlerId: state.uid,
+          reason,
+          documentId: document._id,
+          type: 'passDocument'
+        });
+        // await db.ReviewModel.newReview('passDocument', '', data.user, reason, document);
         let passType;
         if(document.source === 'article') {
           passType = "documentPassReview";
@@ -257,7 +263,13 @@ router
         //将document状态改为已审核状态
         await document.setStatus(delType);
         //生成审核记录
-        await db.ReviewModel.newReview('noPassDocument', '', data.user, reason, document);
+        await db.ReviewModel.reviewDocument({
+          handlerId: state.uid,
+          reason,
+          documentId: document._id,
+          type: 'deleteDocument'
+        });
+        // await db.ReviewModel.newReview('noPassDocument', '', data.user, reason, document);
         //如果标记用户违规了就给该用户新增违规记录
         if(violation) {
           //新增违规记录
