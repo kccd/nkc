@@ -22,15 +22,16 @@ block eContent
 
             tbody
               tr(v-for="review in reviews")
-                th {{format('YYYY-MM-DD HH:mm:ss', review.toc)}}
-                th {{review.type.indexOf("Post") === -1?"文章":"回复"}}
+                th {{review.time}}
+                th {{review.typeInfo}}
                 th
-                  a(:href="'/u/' + review.uid" target="_blank")
+                  a(:href="'/u/' + review.uid" target="_blank" v-if='review.user')
                     span {{review.user.username}}
                 th
-                  a(:href="review.link" target="_blank") {{review.thread.firstPost.t}}
+                  a(:href="review.link" target="_blank" v-if='review.thread') {{review.thread.firstPost.t}}
+                  a(:href="review.link" target="_blank" v-else) 查看详情
                 th
-                  a(:href="'/u/' + review.handlerId" target="_blank")
+                  a(:href="'/u/' + review.handlerId" target="_blank" v-if='review.handler')
                     span {{review.handler.username}}
                 th {{review.reason}}
                 th(:class="toCh(review.type)==='通过审核'?'text-success':'text-danger'") {{toCh(review.type)}}

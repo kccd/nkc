@@ -7533,7 +7533,7 @@
         me.filterOutputRule(root);
         me.fireEvent('aftergetcontent', cmd, root);
         var content = root.toHtml(formatter);
-        content = NKC.methods.ueditor.getContent(content);      // emoji图片换成字符
+        // content = NKC.methods.ueditor.getContent(content);      // emoji图片换成字符
         return content;
       },
 
@@ -7633,7 +7633,7 @@
       setContent: function (html, isAppendTo, notFireSelectionchange) {
         var me = this;
 
-        html = NKC.methods.ueditor.setContent(html);
+        // html = NKC.methods.ueditor.setContent(html);
         me.fireEvent('beforesetcontent', html);
         var root = UE.htmlparser(html);
         me.filterInputRule(root);
@@ -8346,7 +8346,7 @@
       initialContent: '',
       initialStyle: '',
       autoClearinitialContent: false,
-      iframeCssUrl: _url + 'themes/iframe.css?v=' + NKC.configs.startTime,
+      iframeCssUrl: _url + 'themes/iframe.css?v=' + Date.now(),
       textarea: 'editorValue',
       focus: false,
       focusInEnd: true,
@@ -10543,9 +10543,9 @@
       if (!html) {
         return;
       }
-      if (NKC && NKC.methods.ueditor.insertContent) {
+      /*if (NKC && NKC.methods.ueditor.insertContent) {
         html = NKC.methods.ueditor.insertContent(html);
-      }
+      }*/
       if (me.fireEvent('beforeinserthtml', html) === true) {
         return;
       }
@@ -14167,7 +14167,7 @@
 
 
     me.addListener('beforeinserthtml', function (evtName, html) {
-      html = NKC.methods.ueditor.setContent(html);
+      // html = NKC.methods.ueditor.setContent(html);
       var me = this,
         rng = me.selection.getRange(),
         pre = domUtils.findParentByTagName(rng.startContainer, 'pre', true);
@@ -23928,8 +23928,8 @@
       me.options.imgCount = 0;
       me.fireEvent("catchRemoteImage");
     });
-
-    me.addListener("catchRemoteImage", function () {
+    // 在 Editor.vue 中监听了 catchRemoteImage 时间，替换此处
+    /*me.addListener("catchRemoteImage", function () {
       var catcherLocalDomain = me.getOpt('catcherLocalDomain'),
         catcherActionUrl = me.getActionUrl(me.getOpt('catcherActionName')),
         catcherUrlPrefix = me.getOpt('catcherUrlPrefix'),
@@ -23998,7 +23998,7 @@
             } catch (e) {
               return;
             }
-            /* 获取源路径和新路径 */
+            /!* 获取源路径和新路径 *!/
             // var i, j, ci, cj, oldSrc, newSrc, list = info.list;
             var i, j, ci, cj, oldSrc, newSrc;
             for (i = 0; ci = imgs[i++];) {
@@ -24090,7 +24090,7 @@
       //     opt[catcherFieldName] = imgs;
       //     ajax.request(url, opt);
       // }
-    });
+    });*/
   };
 
 // plugins/snapscreen.js

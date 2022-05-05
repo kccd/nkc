@@ -86,7 +86,7 @@ router
       refund.description = ctx.state.lang("shopRefundStatus", refund.status) || refund.status;
     }
     data.refund = refund;
-    ctx.template = '/shop/order/detail.pug';
+    ctx.template = 'shop/order/detail.pug';
     await next();
   })
   // 提交订单，并跳转到支付

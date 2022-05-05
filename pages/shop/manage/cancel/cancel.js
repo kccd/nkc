@@ -1,3 +1,4 @@
+import { getUrl } from "../../../lib/js/tools";
 var app = new Vue({
   el: "#app",
   data: {
@@ -47,6 +48,7 @@ var app = new Vue({
     this.user = data.user;
   },
   methods: {
+    getUrl: getUrl,
     submit: function() {
       this.error = "";
       this.info = "";

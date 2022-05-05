@@ -30,14 +30,13 @@ for(var i = 0; i < data.results.length; i++) {
       did: d,
       pass: true,
       reason: "",
-      delType: source !== 'moment'?"faulty":"delete",
+      delType: source !== 'moment'?"faulty":"deleted",
       noticeType: [true],
       illegalType: false,
       articleId: aid,
       resetPostCount: '',
     };
   }
-  
 }
 
 var app = new Vue({
