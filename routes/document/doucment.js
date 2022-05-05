@@ -30,30 +30,32 @@ router
       resources
     },
   });
-  data.document.avatar = user.avatar;
+  data.document.user = user;
   await next();
 })
 .get('history', async (ctx, next)=>{
   //获取文档历史版本
   ctx.template = 'document/history/document.pug'
   const {db, data, state, query, permission, nkcModules} = ctx;
+  const {user} = data;
 
-  const {sid, source, page=0} = query;
+  const {sid, source, page=1} = query;
   data.type = source;
   const {betaHistory, stableHistory} = await db.DocumentModel.getDocumentTypes();
   const queryCriteria = { $and:[{ sid, source }, {type: {$in: [betaHistory, stableHistory]}}, {uid: state.uid}] };
   //  获取列表
   // 返回分页信息
   const count =  await db.DocumentModel.countDocuments(queryCriteria);
-  const paging = nkcModules.apiFunction.paging(page, count, 10);
+  const paging = nkcModules.apiFunction.paging(page-1, count, 10);
   data.paging = paging;
-  data.history = await await db.DocumentModel.find(queryCriteria).sort({tlm: -1}).skip(paging.start).limit(paging.perpage);
+  data.history = await db.DocumentModel.find(queryCriteria).sort({tlm: -1}).skip(paging.start).limit(paging.perpage);
   if(data.history.length){
     // 默认返回第一项内容
     data.document = data.history[0];
     if(data.document.uid !== state.uid){
       if(!permission("viewUserArticle")) ctx.throw(403, "没有权限")
     }
+    data.document.user = user;
     data.articleAuthor = await db.UserModel.findOnly({uid: data.document.uid});
     const documentResourceId = await data.document.getResourceReferenceId();
     let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
@@ -79,7 +81,7 @@ router
     }
     // data.bookId = bid
     // 包含了将此版本改为编辑版的url 组成
-    data.urlComponent = {_id: data.document._id, source: data.document.source, sid: data.document.sid, editorUrl};
+    data.urlComponent = {_id: data.document._id, source: data.document.source, sid: data.document.sid, editorUrl, page};
   }else{
     data.document = '';
     // data.bookId = ''
@@ -90,13 +92,14 @@ router
 .get('history/:_id',async (ctx, next)=>{
   ctx.template = 'document/history/document.pug'
   const {db, data, params, state, query, permission, nkcModules} = ctx;
-  const { sid, source, page=0 } = query;
+  const { sid, source, page=1 } = query;
+  const {user} = data;
   const { _id } = params;
   data.type = source;
   const {betaHistory, stableHistory} = await db.DocumentModel.getDocumentTypes();
   const queryCriteria = { sid, source, type: {$in: [betaHistory, stableHistory]}, uid: state.uid };
   const count =  await db.DocumentModel.countDocuments(queryCriteria);
-  const paging = nkcModules.apiFunction.paging(page, count, 10);
+  const paging = nkcModules.apiFunction.paging(page-1, count, 10);
   data.type = source;
   data.history =  await db.DocumentModel.find(queryCriteria).sort({tlm:-1}).skip(paging.start).limit(paging.perpage);
   function find(data, id){
@@ -106,10 +109,14 @@ router
   }
   // 在 历史记录中找到当前需要显示内容的文章
   data.document = find(data.history, Number(_id));
-  if(!data.document) ctx.throw(400, "当前文章不存在或正在进行编辑");
+  if(!data.document){
+    // 如果添加了很多历史记录，而没有刷新，直接点击历史就可能出现在当前页找不到指定的数据，因为数据发生了改变（主要是可能排在了其他页中）
+    data.document = data.history[0];
+  }
   if(data.document.uid !== state.uid){
     if(!permission("viewUserArticle")) ctx.throw(403, "没有权限")
   }
+  data.document.user = user;
   data.paging = paging;
   data.articleAuthor = await db.UserModel.findOnly({uid: data.document.uid});
   const documentResourceId = await data.document.getResourceReferenceId();
@@ -134,7 +141,7 @@ router
   if(typeof editorUrl === "undefined"){
     throw "editorUrl is not defined"
   }
-  data.urlComponent = {_id: data.document._id, source: data.document.source, sid: data.document.sid, editorUrl};
+  data.urlComponent = {_id: data.document._id, source: data.document.source, sid: data.document.sid, editorUrl, page};
   await next()
 })
 .post('history/:_id/edit',async (ctx, next)=>{

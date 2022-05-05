@@ -1,49 +1,50 @@
 <template lang="pug">
 .standard-fluid-max-container.clear-float
-  .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel.xs-p
-    .calendar.overflow-x
-      .min-h(ref="canvasDom")
-      #set-year
-        select(@change="summaryCalendar", v-model="selected")
-          template(v-for="year in years")
-            option(:key="year", :value="year") {{ year }}
-    .pie.overflow-x
-      #pie.min-h(ref="renderPie")
-    .account-logs
-      .account-header 最近阅读
-      .account-description
-      div
-        .account-logs-thread(v-for="(vt, i) in visitThreadLogs", :key="i")
-          span {{ setTime(vt.timeStamp) }}
-          span 看过
-          a.article-title(:title="vt.thread.firstPost.t" :href="'/t/' + vt.tid") {{ vt.thread.firstPost.t }}
-    .account-logs
-      .account-header 看过的用户
-      .account-description
-      div
-        div(v-if="!visitUserLogs.length")
-          .null 空空如也~
-        .account-logs-user(v-for="(log, i) in visitUserLogs", :key="i")
-          .account-logs-user-avatar
-            //- img(src=tools.getUrl("userAvatar", log.targetUser.avatar, "sm") data-float-uid=log.toUid)
-            img(:src="log.targetUser.avatar")
-          .account-logs-user-info
-            a.account-logs-user-name(:href="'/u/' + log.toUid") {{ log.targetUser.username }}
-            .account-logs-user-time {{ setTime(log.timeStamp) }}
+  .row
+    .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel.xs-p
+      .calendar.overflow-x
+        .min-h(ref="canvasDom")
+        #set-year
+          select(@change="summaryCalendar", v-model="selected")
+            template(v-for="year in years")
+              option(:key="year", :value="year") {{ year }}
+      .pie.overflow-x
+        #pie.min-h(ref="renderPie")
+      .account-logs
+        .account-header 最近阅读
+        .account-description
+        div
+          .account-logs-thread(v-for="(vt, i) in visitThreadLogs", :key="i")
+            span {{ setTime(vt.timeStamp) }}
+            span 看过
+            a.article-title(:title="vt.thread.firstPost.t" :href="'/t/' + vt.tid") {{ vt.thread.firstPost.t }}
+      .account-logs
+        .account-header 看过的用户
+        .account-description
+        div
+          div(v-if="!visitUserLogs.length")
+            .null 空空如也~
+          .account-logs-user(v-for="(log, i) in visitUserLogs", :key="i")
+            .account-logs-user-avatar
+              //- img(src=tools.getUrl("userAvatar", log.targetUser.avatar, "sm") data-float-uid=log.toUid)
+              img(:src="log.targetUser.avatar")
+            .account-logs-user-info
+              a.account-logs-user-name(:href="'/u/' + log.toUid") {{ log.targetUser.username }}
+              .account-logs-user-time {{ setTime(log.timeStamp) }}
 
-    .account-logs
-      .account-header 我的读者排名
-      .account-description
-      div
-        div(v-if="!visitSelfLogs.length")
-          .null 空空如也~
-        .account-logs-user(v-for="(log, i) in visitSelfLogs")
-          .account-logs-user-avatar
-            //- img(src=tools.getUrl("userAvatar", log.user.avatar, "sm") data-float-uid=log.uid)
-            img(:src="log.user.avatar")
-          .account-logs-user-info
-            a.account-logs-user-name(:href="'/u/' + log.uid") {{ log.user.username }}
-            .account-logs-user-time {{ setTime(log.timeStamp) }}
+      .account-logs
+        .account-header 我的读者排名
+        .account-description
+        div
+          div(v-if="!visitSelfLogs.length")
+            .null 空空如也~
+          .account-logs-user(v-for="(log, i) in visitSelfLogs")
+            .account-logs-user-avatar
+              //- img(src=tools.getUrl("userAvatar", log.user.avatar, "sm") data-float-uid=log.uid)
+              img(:src="log.user.avatar")
+            .account-logs-user-info
+              a.account-logs-user-name(:href="'/u/' + log.uid") {{ log.user.username }}
+              .account-logs-user-time {{ setTime(log.timeStamp) }}
 </template>
 
 <script>
