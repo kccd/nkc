@@ -1,5 +1,5 @@
 <template lang="pug">
-  .container-fluid.max-width
+  .container-fluid.max-width.clear-padding
     .user-account.m-b-1(v-if="targetUser")
       .row
         //- 用户左侧面板
@@ -19,6 +19,12 @@
 </template>
 <style lang="less">
 @import "../../../publicModules/base";
+.clear-padding{
+  @media (max-width: 992px){
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
 .left-panel-box{
   height: 100%;
 }

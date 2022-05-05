@@ -15,7 +15,10 @@
     a(:href="`/u/${targetUser.uid}/settings`" target='_blank').col-xs-6.account-user-link
       .fa.fa-cog
       | 资料设置
-    a(href="/message" target='_blank').col-xs-6.account-user-link
+    a(onclick='RootApp.openChatPanel()').col-xs-6.account-user-link.hidden-xs.hidden-sm
+      .fa.fa-comments
+      | 消息中心
+    a(href="/message" target="_blank").col-xs-6.account-user-link.hidden-md.hidden-lg
       .fa.fa-comments
       | 消息中心
     a(href="/sticker" target='_blank').col-xs-6.account-user-link

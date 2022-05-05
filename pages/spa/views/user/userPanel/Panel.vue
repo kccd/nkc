@@ -1,5 +1,5 @@
 <template lang="pug">
-  .container-fluid.max-width
+  .container-fluid.max-width.clear-padding
     .hidden-user-home-tip(v-if="targetUser && targetUser.hidden" )
       span 用户名片已被屏蔽
     .user-banner(@mouseenter="enter()" @mouseleave="leave()" v-if="targetUser").m-b-1
@@ -21,8 +21,10 @@
                     user-level(ref="userLevel" :target-user="targetUser")
                   .account-user-subscribe(v-if="subscribeBtn" ref="subscribeBox")
                     div(:class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
-                    div.link(@click.stop="toChat(targetUser.uid)" v-if="selfUid") 私信
-                    div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
+                    div.link.hidden-xs.hidden-sm(@click.stop="toChat(targetUser.uid)") 私信
+                    div.link.hidden-md.hidden-lg
+                      a(href=`/message` target='_blank') 私信
+                    //div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
                   .fa(v-if="subscribeBtn" :class="subscribeBtnBoxType ? 'fa-angle-up' : 'fa-angle-down'" @click.stop="subscribeBtnBoxChange(!subscribeBtnBoxType)")
           .account-nav
             .account-nav-box.row
@@ -46,7 +48,12 @@
 
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
-
+.clear-padding{
+  @media (max-width: 992px){
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
 .hidden-user-home-tip {
   line-height: 4rem;
   text-align: center;
@@ -185,6 +192,10 @@
                   @media (max-width: 991px){
                     display: block;
                     margin-bottom: 8px;
+                  }
+                  a{
+                    color: #0e0e0e;
+                    text-decoration: none;
                   }
                 }
                 .focus{

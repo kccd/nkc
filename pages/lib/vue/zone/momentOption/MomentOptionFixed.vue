@@ -155,7 +155,7 @@ export default {
         docId = _id;
       } else {
         if(!this.moment) return;
-        docId = this.moment.momentCommentId?this.moment.momentCommentId:this.moment.momentId;
+        docId = this.moment.docId;
       }
       nkcAPI('/review' , 'PUT', {
         pass: true,
@@ -164,6 +164,9 @@ export default {
       })
         .then(res => {
           sweetSuccess('操作成功');
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
         })
         .catch(err => {
           sweetError(err);
