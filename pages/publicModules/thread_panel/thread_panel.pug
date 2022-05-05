@@ -80,9 +80,11 @@ mixin displayColumn(columns)
   if columns
     for column in columns
       a.thread-column(href=`/m/${column._id}` target="_blank")=column.name
+-var lastPostUrl = '';
+-var hasReply = '';
 if thread.type === 'thread'
-  -const lastPostUrl = `/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`;
-  -const hasReply = thread.firstPost.pid !== thread.lastPost.pid;
+  -lastPostUrl = `/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`;
+  -hasReply = thread.firstPost.pid !== thread.lastPost.pid;
 -const threadListStyle = defaultThreadListStyle || state.threadListStyle;
 -var postCoverPosition = 'null';
 -var styleType = threadListStyle.type;

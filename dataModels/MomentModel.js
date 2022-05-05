@@ -988,7 +988,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
         }
       }
       // 待改，此处返回的字段之后两个字段，应包含全部字段，只不过字段内容为空
-      results[_id].statusInfo = momentContent;
+      results[f].statusInfo = momentContent;
     }
 
   }
