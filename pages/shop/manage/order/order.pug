@@ -48,7 +48,7 @@ block shopContent
                     a.value(href=`/u/${order.buyUid}`
                       data-global-mouseover="showUserPanel"
                       data-global-mouseout="hideUserPanel"
-                      data-global-data=objToStr({uid: order.buyUser})
+                      data-global-data=objToStr({uid: order.buyUser.uid})
                     )=order.buyUser.username
                     a.value.m-r-1(onclick=`NKC.methods.toChat("${order.buyUid}", '${order.buyUser.username}')` title=`联系买家(${order.buyUser.online ? "在线" : "离线"})`)
                       .fa.fa-commenting-o(class=order.buyUser.online ? "active" : "")
