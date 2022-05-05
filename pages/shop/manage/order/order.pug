@@ -50,7 +50,9 @@ block shopContent
                       data-global-mouseout="hideUserPanel"
                       data-global-data=objToStr({uid: order.buyUser.uid})
                     )=order.buyUser.username
-                    a.value.m-r-1(onclick=`NKC.methods.toChat("${order.buyUid}", '${order.buyUser.username}')` title=`联系买家(${order.buyUser.online ? "在线" : "离线"})`)
+                    a.value.m-r-1.hidden-xs.hidden-sm(onclick=`NKC.methods.toChat("${order.buyUid}", '${order.buyUser.username}')` title=`联系买家(${order.buyUser.online ? "在线" : "离线"})`)
+                      .fa.fa-commenting-o(class=order.buyUser.online ? "active" : "")
+                    a.value.m-r-1.hidden-md.hidden-lg(href=`/message?uid=${order.buyUid}` title=`联系买家(${order.buyUser.online ? "在线" : "离线"})`)
                       .fa.fa-commenting-o(class=order.buyUser.online ? "active" : "")
                     if order.orderStatus !== "unCost" && permission("transferKcbToUser")
                       button.order-button(onclick=`transfer('${order.buyUid}')`) 转账

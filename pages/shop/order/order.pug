@@ -44,8 +44,10 @@ block shopContent
                       data-global-mouseout="hideUserPanel"
                       data-global-data=objToStr({uid: order.sellUser.uid})
                     )=order.sellUser.username
-                    a.value(onclick=`NKC.methods.toChat("${order.sellUid}", '${order.sellUser.username}')` title=`联系卖家(${order.sellUser.online?"在线":"离线"})` target="_blank")
+                    a.value.hidden-xs.hidden-sm(onclick=`NKC.methods.toChat("${order.sellUid}", '${order.sellUser.username}')` title=`联系卖家(${order.sellUser.online?"在线":"离线"})` target="_blank")
                       .fa.fa-commenting-o(class=order.sellUser.online?"active":"")
+                    a.value.hidden-md.hidden-lg(href=`/message?uid=${order.sellUid}` title=`联系卖家(${order.sellUser.online ? "在线" : "离线"})`)
+                      .fa.fa-commenting-o(class=order.sellUser.online ? "active" : "")
               for param,key in order.params
                 tr
                   td
