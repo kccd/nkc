@@ -5,10 +5,13 @@ module.exports = async (ctx, next) => {
   const {targetUser} = data;
   const {match} = state;
   match.uid = targetUser.uid;
-  match.type = "collection";
+  match.type = {
+    $in: ['collection', 'article']
+  };
   match.cancel = false;
   const count = await db.SubscribeModel.countDocuments(match);
   const paging = nkcModules.apiFunction.paging(page, count);
+  //获取收藏的内容
   const subscribes = await db.SubscribeModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
   const subscribesObj = {};
   subscribes.map(s => subscribesObj[s.tid] = s);

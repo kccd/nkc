@@ -365,7 +365,37 @@ NKC.modules.SubscribeTypes = function() {
   this_.collectionThreadPromise = function(id, collection, cid) {
     return nkcAPI("/t/" + id + "/collection", "POST", {type: !!collection, cid: cid || []});
   };
-
+  
+  this_.collectionArticlePromise = function (id, collection, cid) {
+    return nkcAPI(`/article/${id}/collection`, "POST", {type: !!collection, cid: cid || []});
+  }
+  
+  //收藏独立文章
+  this_.collectionArticle = function (id, collection) {
+    if(collection) {
+      this_.open(function(cid) {
+        this_.collectionArticlePromise(id, collection, cid)
+          .then(function() {
+            this_.close();
+            sweetSuccess("收藏成功");
+          })
+          .catch(function(data) {
+            sweetError(data);
+          })
+      });
+    } else {
+      this_.collectionArticlePromise(id, collection)
+        .then(function() {
+          this_.close();
+          sweetSuccess("收藏已取消");
+        })
+        .catch(function(data) {
+          sweetError(data);
+        })
+    }
+  }
+  
+  //收藏社区文章
   this_.collectionThread = function(id, collection) {
     if(collection) {
       this_.open(function(cid) {

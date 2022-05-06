@@ -9,18 +9,24 @@
     complaint(ref="complaint")
     violation-record(ref="violationRecord")
     moment-status(ref="momentStatus" :permissions="permissions")
-    .moment-container(:key="momentData.momentId" v-for="momentData in moments")
+    .moment-container(:key="momentData.momentId" v-for="momentData in moments" v-if="moments.length !== 0")
       moment(
         :data="momentData"
         @complaint="complaint"
         :permissions="permissions"
       )
+    .null(v-else) 空空如也~
 </template>
 
 <style lang="less" scoped>
   .moment-container{
     border-bottom: 1px solid #eee;
     margin-bottom: 1.5rem;
+  }
+  .null {
+    margin-top: 5rem;
+    margin-bottom: 5rem;
+    text-align: center;
   }
 </style>
 

@@ -9,6 +9,7 @@
         span.post-management-button
           a.pointer.button(@click="selectAll()") 全选
           a.pointer.button.radius-right(@click="toColumn()") 推送到专栏
+      .user-list-warning(v-if="posts.length === 0") 加载中~
       .post-item(v-for="(post, index) in posts")
         hr(v-if="index")
         review(ref="review" :post="post" :permissions="permissions" @refresh="refreshPage" v-if="!post.reviewed")
