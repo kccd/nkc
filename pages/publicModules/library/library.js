@@ -1,3 +1,5 @@
+import {getFileMD5} from "../../lib/js/file";
+
 NKC.modules.Library = class {
   constructor(options) {
     const {lid, folderId, tLid, uploadResourcesId} = options;
@@ -364,7 +366,7 @@ NKC.modules.Library = class {
               }
               if(!file.folder) throw "未选择目录";
               if(file.type === "localFile") {
-                return NKC.methods.getFileMD5(file.data);
+                return getFileMD5(file.data)
               }
             })
             .then(data => {

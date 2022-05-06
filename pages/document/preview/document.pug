@@ -21,30 +21,34 @@ block content
             span 收藏
           .nav-count
             .fa.fa-cog
-        h1.book-content-title=data.document.title
-        .m-t-1.text-center
-          if data.document.authorInfos
-            for authorInfo in data.document.authorInfos
-              span=authorInfo.name
-              span.common-article-author.fa.fa-envelope-open-o(style="color:#000" onclick="displayAuthor('"+objToStr(authorInfo.contractObj)+"')")
-        .m-t-1.text-center
-          if data.document.authorInfos
-            for authorInfo in data.document.authorInfos
-              span.common-article-author=authorInfo.agency
-        .m-t-1.text-center
-          //- 用户头像
-          a(
-              data-global-mouseover="showUserPanel"
-              data-global-mouseout="hideUserPanel"
-              data-global-data=objToStr({uid:data.articleAuthor.uid})
-            )
-            img(src=tools.getUrl('userAvatar', data.articleAuthor.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
-            if data.articleAuthor
-            span.kcid=data.articleAuthor.username
-          span(style='color: #555555;margin-right:5px' title=format(`YYYY-MM-DD HH:mm:ss`, data.document.toc))= ` ${format(`YYYY-MM-DD HH:mm:ss`, data.document.toc)}`
-          if data.document.origin && data.document.origin !== "0"
-            if data.document.origin == "3" || data.document.origin == "4" || data.document.origin == "5" || data.document.origin == "6"
-              span(style="color:#9baec8;margin-right:3px") 原创
+        //- h1.book-content-title=data.document.title
+        //- .m-t-1.text-center
+        //-   if data.document.authorInfos
+        //-     for authorInfo in data.document.authorInfos
+        //-       span=authorInfo.name
+        //-       span.common-article-author.fa.fa-envelope-open-o(style="color:#000" onclick="displayAuthor('"+objToStr(authorInfo.contractObj)+"')")
+        //- .m-t-1.text-center
+        //-   if data.document.authorInfos
+        //-     for authorInfo in data.document.authorInfos
+        //-       span.common-article-author=authorInfo.agency
+        //- .m-t-1.text-center
+        //-   //- 用户头像
+        //-   a(
+        //-       data-global-mouseover="showUserPanel"
+        //-       data-global-mouseout="hideUserPanel"
+        //-       data-global-data=objToStr({uid:data.articleAuthor.uid})
+        //-     )
+        //-     img(src=tools.getUrl('userAvatar', data.articleAuthor.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+        //-     if data.articleAuthor
+        //-     span.kcid=data.articleAuthor.username
+        //-   span(style='color: #555555;margin-right:5px' title=format(`YYYY-MM-DD HH:mm:ss`, data.document.toc))= ` ${format(`YYYY-MM-DD HH:mm:ss`, data.document.toc)}`
+        //-   if data.document.origin && data.document.origin !== "0"
+        //-     if data.document.origin == "3" || data.document.origin == "4" || data.document.origin == "5" || data.document.origin == "6"
+        //-       span(style="color:#9baec8;margin-right:3px") 原创
+        //- h1=JSON.stringify(data.document)
+        -var {uid, origin: originState, toc, title: t, type, authorInfos, user} = data.document
+        include ../../columns/article/title
+        +title({uid, originState, toc, t, type, authorInfos, user})
         if data.type !== "draft"
           if (data.document.abstract.length || data.document.abstractEN.length) 
             .abstract(style="margin-top:1rem; word-break: break-all;")

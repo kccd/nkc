@@ -1992,7 +1992,6 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
       status: 'normal',
       statusInfo: '',
     };
-    console.log(mainForumsId, userForumsId, uid)
     if(!userForumsId.includes(mainForumsId[0])) {
       result.status = 'permission';
       result.statusInfo = '权限不足';

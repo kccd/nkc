@@ -1295,4 +1295,48 @@ schema.statics.getDocumentsBySource = async (type, source, sourcesId, format = '
   return documentsObj;
 }
 
+schema.statics.getDocumentsUrlByDocumentsId = async (documentsId) => {
+  const DocumentModel = mongoose.model('documents');
+  const ArticleModel = mongoose.model('articles');
+  const CommentModel = mongoose.model('comments');
+  const {getUrl} = require('../nkcModules/tools');
+  const documentSources = await DocumentModel.getDocumentSources();
+  const documents = await DocumentModel.find({_id: {$in: documentsId}});
+  const articlesId = [];
+  const commentsId = [];
+  for(const document of documents) {
+    const {source, sid} = document;
+    if(source === documentSources.article) {
+      articlesId.push(sid);
+    } else if(source === documentSources.comment) {
+      commentsId.push(sid);
+    }
+  }
+  const articlesObj = await ArticleModel.getArticlesObjectByArticlesId(articlesId);
+  const comments = await CommentModel.getCommentsObjectByCommentsId(commentsId);
+  const commentsInfo = await CommentModel.getCommentInfo(Object.values(comments));
+  const commentsUrl = {};
+  for(const commentInfo of commentsInfo) {
+    commentsUrl[commentInfo._id] = commentInfo.url;
+  }
+  const results = {};
+  for(const document of documents) {
+    const {_id, source, sid} = document;
+    let url = '';
+    if(source === documentSources.article) {
+      const article = articlesObj[sid];
+      if(article) {
+        const {articleUrl} = await ArticleModel.getArticleUrlBySource(article._id, article.source, article.sid);
+        url = articleUrl;
+      }
+    } else if(source === documentSources.moment) {
+      url = getUrl('zoneMoment', sid);
+    } else if(source === documentSources.comment) {
+      url = commentsUrl[sid];
+    }
+    results[_id] = url;
+  }
+  return results;
+};
+
 module.exports = mongoose.model('documents', schema);

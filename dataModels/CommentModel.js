@@ -468,10 +468,10 @@ schema.statics.extendReviewComments = async function(comments) {
     const articleDocument = stableArticleDocument || betaArticleDocument;
     const {did} = document;
     let url;
-    if(articlePosts.source === columnSource) {
+    if(articlePost.source === columnSource) {
       url = `/m/${columnPostObj[articlePost.sid].columnId}/a/${columnPostObj[articlePost.sid]._id}`;
-    } else if (articlePosts.source === zoneSource){
-      url =  `/zone/a/${articlePosts.sid}`;
+    } else if (articlePost.source === zoneSource){
+      url =  `/zone/a/${articlePost.sid}`;
     }
     const result = {
       _id,

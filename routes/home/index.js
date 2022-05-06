@@ -583,13 +583,13 @@ router
           let t;
           if(c.type === threadType) {
             t = threadObj[c.pid];
-            if(t) t.type = 'thread';
+            if(t) t.type = 'article';
           } else if(c.type === articleType){
             t = articleObj[c.pid];
             if(t) {
               //获取当前引用的专栏
               const column = await c.extendColumnPost();
-              t.type = 'article';
+              t.type = 'newArticle';
               t.document.content = nkcModules.nkcRender.htmlToPlain(t.document.content, 200),
               //获取文章的专栏信息
               t.columns= [column];

@@ -18,6 +18,12 @@ const friendRouter = require('./friend');
 const moment = require("moment");
 messageRouter
   .get('/', async (ctx, next) => {
+    const {query, data, db} = ctx;
+    const {uid} = query;
+    const targetUser = await db.UserModel.findOne({uid});
+    if(targetUser) {
+      data.targetUserId = uid;
+    }
     ctx.template = 'message/message.2.pug';
     await next();
   })

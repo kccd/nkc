@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: Number,
   type: {
-    type: String, // disabledPost, disabledThread, returnPost, returnThread, passPost, passThread, disabledDocument, returnDocument, passDocument
+    type: String, // disabledPost, disabledThread, returnPost, returnThread, passPost, passThread, disabledDocument, returnDocument, passDocument, deleteDocument
     required: true,
     index: 1
   },
@@ -36,15 +36,16 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  reason: {
+    type: String,
+    default: ""
+  },
   handlerId: {
     type: String,
     default: '',
     index: 1
   },
-  reason: {
-    type: String,
-    default: ""
-  }
+
 },{
   collection: "reviews"
 });
@@ -81,6 +82,28 @@ schema.statics.newDocumentReview = async (type, documentId, uid, reason) => {
   });
   await review.save();
 }
+
+schema.statics.reviewDocument = async (props) => {
+  const ReviewModel = mongoose.model('reviews');
+  const {
+    documentId,
+    handlerId,
+    reason,
+    type
+  } = props;
+  const review = await ReviewModel.findOne({
+    docId: documentId,
+    handlerId: ''
+  }).sort({toc: -1});
+  if(!review) return;
+  await review.updateOne({
+    $set: {
+      handlerId,
+      reason,
+      type
+    }
+  });
+};
 
 const pureWordRegExp = /([^\u4e00-\u9fa5a-zA-Z0-9])/gi;
 const MatchedKeyword = { result: [] };

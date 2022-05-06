@@ -79,10 +79,12 @@ router
         abstractEN = '',
         content = '',
         title = '',
-        keywords = [],
-        keywordsEN = [],
+        // keywords = [],
+        // keywordsEN = [],
         status = ''
       } = document;
+      const keywords = document.keywords || [];
+      const keywordsEN = document.keywordsEN || [];
       const user = usersObj[uid];
 
       let from;
@@ -149,8 +151,8 @@ router
         // 内容相关
         abstract,
         abstractEN,
-        keywords,
-        keywordsEN,
+        keywords: keywords || [],
+        keywordsEN: keywordsEN || [],
         title,
         content: nkcModules.nkcRender.renderHTML({
           type: 'article',

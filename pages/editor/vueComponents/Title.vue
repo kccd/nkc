@@ -16,7 +16,8 @@
     .editor-type-info(v-else-if="data.type === 'modifyPost'")
       .fa.fa-lightbulb-o
       |正在编辑文章《
-      a(:href="data.thread.url" target="_blank") {{data.thread.title}} | 》下的{{data.thread.comment ? "| 评论" : "| 回复"}}
+      a(:href="data.thread.url" target="_blank") {{data.thread.title}}
+      | 》下的{{data.thread.comment ? "评论" : "回复"}}
       .on-edit-notes
         .on-edit-label 您正在修改已经发表的内容，以下提示非常重要，请务必详读。
           a.detail(@click="openOnEditNotes = !openOnEditNotes") {{openOnEditNotes ?  "收起":"展开"}}
@@ -32,7 +33,7 @@
       | 正在编辑&nbsp;
       a(:href="data.forum.url" target="_blank") {{data.forum.title}}
       | &nbsp;的最新页板块公告
-    input.editor-title(placeholder="请输入标题..." v-model="titleValue" )  
+    input.editor-title(placeholder="请输入标题..." v-model="titleValue" )
 </template>
 <script>
 export default {

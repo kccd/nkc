@@ -752,10 +752,13 @@ schema.statics.extendQuotesData = async (quotes, uid = '') => {
 schema.statics.getQuoteDefaultContent = async (quoteType) => {
   switch(quoteType) {
     case momentQuoteTypes.article: {
-      return '我发表了新的文章~'
+      return '发表了新的文章~'
     }
     case momentQuoteTypes.moment: {
-      return '我转发了动态~'
+      return '转发了动态~'
+    }
+    case momentQuoteTypes.post: {
+      return '发表了新的文章~'
     }
   }
 }
@@ -985,7 +988,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
         }
       }
       // 待改，此处返回的字段之后两个字段，应包含全部字段，只不过字段内容为空
-      results[_id].statusInfo = momentContent;
+      results[f].statusInfo = momentContent;
     }
 
   }

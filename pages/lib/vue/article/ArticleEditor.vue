@@ -207,15 +207,12 @@ export default {
     },
     getColumn() {
       const self = this;
-      if(getState().uid) {
-        getColumnInfo()
-          .then(res => {
-            self.column = res;
-            if(res.userColumn) {
-              self.columnId = res.userColumn._id
-            }
-          })
-      }
+      if(!getState().uid) return;
+      getColumnInfo()
+        .then(res => {
+          self.column = res;
+          self.columnId = res.userColumn?res.userColumn._id: null
+        })
     },
     //专栏分类发生改变
     categoryChange() {
@@ -245,7 +242,7 @@ export default {
       } else if(this.source === 'zone') {
         const {aid} = this.getRequest();
         if(aid) this.articleId = aid;
-      };
+      }
     },
     //根据articleId或者mid获取编辑器中的数据
     initData() {
@@ -266,7 +263,7 @@ export default {
           } else {
             return;
           }
-        };
+        }
         query = query + `&mid=${mid}`;
         if(aid) {
           query = query + `&mid=${mid}&aid=${aid}`;

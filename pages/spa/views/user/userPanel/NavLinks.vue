@@ -44,7 +44,7 @@
         line-height: @liHeight;
         font-size: 1.6rem;
         top: 0;
-        width: @liHeight;
+        //width: @liHeight;
         text-align: center;
         right: 0;
       }

@@ -80,16 +80,19 @@ mixin displayColumn(columns)
   if columns
     for column in columns
       a.thread-column(href=`/m/${column._id}` target="_blank")=column.name
-if thread.type === 'thread'
-  -const lastPostUrl = `/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`;
-  -const hasReply = thread.firstPost.pid !== thread.lastPost.pid;
+-var lastPostUrl = '';
+-var hasReply = '';
+if thread.type !== 'newArticle'
+  -lastPostUrl = `/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`;
+  -hasReply = thread.firstPost.pid !== thread.lastPost.pid;
 -const threadListStyle = defaultThreadListStyle || state.threadListStyle;
 -var postCoverPosition = 'null';
 -var styleType = threadListStyle.type;
 - if (styleType === 'abstract') {
   -postCoverPosition = threadListStyle.cover;
 -}
-if thread.type === 'thread'
+
+if thread.type !== 'newArticle'
   -var threadPanelClass = !thread.reviewed || thread.recycleMark || thread.disabled?"reviewed":'';
 -if (styleType !== 'abstract') {
   -threadPanelClass += ' p-b-0';
@@ -98,7 +101,7 @@ if thread.type === 'thread'
 -var threadTitle;
 -var threadUrl;
 if data.t === 'column'
-  if thread.type === 'article'
+  if thread.type === 'newArticle'
     -threadTitle = thread.document.title;
   else
     -threadTitle = thread.firstPost.t;
@@ -106,7 +109,7 @@ if data.t === 'column'
 else
   -threadTitle = thread.firstPost.t;
   -threadUrl = `/t/${thread.tid}`;
-if data.t  === 'column' && thread.type === 'article'
+if data.t  === 'column' && thread.type === 'newArticle'
   .thread-panel(class=threadPanelClass)
     .thread-panel-body(class=styleType)
       if styleType === 'minimalist'
