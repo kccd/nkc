@@ -2,7 +2,7 @@
   .container-fluid.max-width
     .hidden-user-home-tip(v-if="targetUser && targetUser.hidden" )
       span 用户名片已被屏蔽
-    .user-banner(@mouseenter="enter()" @mouseleave="leave()" v-if="targetUser").m-b-1
+    .user-banner(@mouseenter="enter()" @mouseleave="leave()" v-if="targetUser").m-b-1.clearPaddingLeftByMargin.clearPaddingRightByMargin
       subscribe-types(ref="subscribeTypes")
         //用户名片
       .account-banner(v-if="targetUser" )
@@ -48,12 +48,6 @@
 
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
-.clear-padding{
-  @media (max-width: 992px){
-    padding-left: 0;
-    padding-right: 0;
-  }
-}
 .hidden-user-home-tip {
   line-height: 4rem;
   text-align: center;

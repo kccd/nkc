@@ -909,6 +909,18 @@ threadRouter
         parentCommentId: singlePostData.parentCommentId,
       };
     }
+    if(!_post.anonymous) {
+      // 生成动态
+      const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
+      db.MomentModel.createQuoteMomentAndPublish({
+        uid: _post.uid,
+        quoteType: momentQuoteTypes.post,
+        quoteId: _post.pid,
+      })
+        .catch(err => {
+          console.error(err);
+        });
+    }
 		await next();
   })
 	//.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())

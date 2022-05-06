@@ -1,7 +1,8 @@
 <template lang="pug">
   .user-column-thread
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
-    blank(v-if="threads && threads.length === 0")
+    .loading(v-if="loading") 加载中~
+    blank(v-else-if="threads && threads.length === 0")
     .user-column-box(v-for="item in threads" v-else)
       .user-column-body
         .user-column-title
@@ -24,7 +25,7 @@
               img(:src="getUrl('postCover', item.cover)")
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
 </template>
-<style lang="less">
+<style lang="less" scoped>
 .user-column-thread{
   a{
     cursor: pointer;
@@ -118,7 +119,6 @@ import {timeFormat, fromNow, getUrl} from "../../../../../lib/js/tools";
 import Paging from "../../../../../lib/vue/Paging";//改路径
 import Blank from '../../../../components/Blank';
 
-
 export default {
   data: () => ({
     uid: '',
@@ -150,9 +150,9 @@ export default {
     },
     //获取用户在专栏下发表的文章
     getColumnThreads(page) {
-     this.loading = true;
-     const self = this;
-      let url = `/u/${this.uid}/profile/columnData`;
+      const self = this;
+      self.loading = true;
+      let url = `/u/${self.uid}/profile/columnData`;
       if(page) {
         if(url.indexOf('?') === -1) {
           url = url + `?page=${page}`;
@@ -168,7 +168,7 @@ export default {
      .catch(err => {
        sweetError(err);
      })
-     this.loading = false;
+     self.loading = false;
     },
     //点击分页按钮
     clickBtn(num) {

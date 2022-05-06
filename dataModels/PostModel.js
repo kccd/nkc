@@ -5,7 +5,7 @@ const {htmlToPlain, renderHTML} = nkcRender;
 const customCheerio = require('../nkcModules/nkcRender/customCheerio');
 const {getQueryObj, obtainPureText} = require('../nkcModules/apiFunction');
 const tools = require("../nkcModules/tools");
-const {timeFormat} = require("../nkcModules/tools");
+const {timeFormat, getUrl} = require("../nkcModules/tools");
 const mongoose = settings.database;
 const {Schema} = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
@@ -1955,9 +1955,11 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
     pid: 1,
     toc: 1,
     uid: 1,
+    type: 1,
     cover: 1,
     mainForumsId: 1,
     disabled: 1,
+    parentPostId: 1,
     toDraft: 1
   });
   const usersId = [];
@@ -1968,24 +1970,38 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
   }
   const threads = await ThreadModel.find({tid: {$in: threadsId}}, {
     recycleMark: 1,
+    oc: 1,
     tid: 1,
   });
+  let threadsOC = [];
   const threadsObj = {};
   for(const thread of threads) {
+    if(!postsId.includes(thread.oc)) {
+      threadsOC.push(thread.oc);
+    }
     threadsObj[thread.tid] = thread;
+  }
+  let threadFirstPosts = await PostModel.find({pid: {$in: threadsOC}}, {
+    pid: 1,
+    tid: 1,
+    t: 1,
+    cover: 1,
+    c: 1,
+  });
+  threadFirstPosts = threadFirstPosts.concat(posts);
+  const threadFirstPostsObj = {};
+  for(const post of threadFirstPosts) {
+    threadFirstPostsObj[post.pid] = post;
   }
   const userForumsId = await ForumModel.getReadableForumsIdByUid(uid);
   const usersObj = await UserModel.getUsersObjectByUsersId(usersId);
   const results = {};
   for(const post of posts) {
     const {
-      t,
-      c,
       tid,
       pid,
-      toc,
+      type,
       uid: postUid,
-      cover,
       mainForumsId = [], disabled, toDraft} = post;
     const thread = threadsObj[tid];
     const result = {
@@ -2003,9 +2019,30 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
       result.statusInfo = '内容已屏蔽';
     } else {
       const user = usersObj[postUid];
-      result.title = nkcRender.replaceLink(t);
-      result.content = nkcRender.replaceLink(nkcRender.htmlToPlain(c, 200));
-      result.coverUrl = cover? getUrl('postCover', cover): '';
+      let threadPost;
+      let targetPost;
+      if(type === 'post') {
+        const firstPost = threadFirstPostsObj[thread.oc];
+        if(firstPost) {
+          threadPost = firstPost;
+          targetPost = post;
+        }
+      }
+      threadPost = threadPost || post;
+
+      let toc;
+      let replyContent;
+      let replyUrl;
+      if(targetPost) { // 回复或评论
+        toc = targetPost.toc;
+        replyContent = nkcRender.replaceLink(nkcRender.htmlToPlain(targetPost.c, 200));
+        replyUrl = getUrl('post', targetPost.pid);
+      } else { // 文章
+        toc = threadPost.toc;
+      }
+      result.title = nkcRender.replaceLink(threadPost.t);
+      result.content = nkcRender.replaceLink(nkcRender.htmlToPlain(threadPost.c, 200));
+      result.coverUrl = threadPost.cover? getUrl('postCover', threadPost.cover): '';
       result.username = user.username;
       result.uid = postUid;
       result.avatarUrl = getUrl('userAvatar', user.avatar);
@@ -2013,7 +2050,9 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
       result.time = timeFormat(toc);
       result.toc = toc;
       result.articleId = pid;
-      result.url = getUrl('thread', tid);
+      result.url = getUrl('thread', threadPost.tid);
+      result.replyUrl = replyUrl;
+      result.replyContent = replyContent;
     }
     results[pid] = result;
   }

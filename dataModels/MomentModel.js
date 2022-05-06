@@ -669,6 +669,7 @@ schema.statics.createQuoteMomentAndPublish = async (props) => {
     }
   });
   await moment.updateResourceReferences();
+  return moment;
 };
 
 /*
@@ -758,7 +759,7 @@ schema.statics.getQuoteDefaultContent = async (quoteType) => {
       return '转发了动态~'
     }
     case momentQuoteTypes.post: {
-      return '发表了新的文章~'
+      return '在社区发表了新内容~'
     }
   }
 }

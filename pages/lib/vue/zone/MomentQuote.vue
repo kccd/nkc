@@ -2,6 +2,8 @@
 
   mixin articleBody
     .moment-quote-body-article
+      .moment-quote-reply-abstract(v-if="quoteData.data.replyContent")
+        a(:href="quoteData.data.replyUrl" target="_blank") {{quoteData.data.replyContent}}
       .moment-quote-title
         a(:href="quoteData.data.url" target="_blank") {{quoteData.data.title}}
       .moment-quote-abstract(:class="{'cover': quoteData.data.coverUrl}")
@@ -102,6 +104,18 @@
           color: #333;
         }
         margin-bottom: 0.5rem;
+      }
+      .moment-quote-reply-abstract{
+        a{
+          max-height: 7rem;
+          .hideText(@line: 4);
+          font-size: 1.25rem;
+          margin-top: 0.3rem;
+          margin-bottom: 0.8rem;
+          color: #000;
+        }
+        border-bottom: 1px solid #dbdbdb;
+        margin-bottom: 0.8rem;
       }
       .moment-quote-abstract{
         max-height: 7rem;

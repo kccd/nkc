@@ -1,6 +1,7 @@
 const router = require('koa-router')();
 router
   .post('/', async (ctx, next) => {
+    //收藏独立文章
     const {db, data, params,body, state} = ctx;
     const {aid} = params;
     const {type, cid = []} = body;

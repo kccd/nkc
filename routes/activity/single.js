@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const nkcRender = require('../../nkcModules/nkcRender');
 const singleRouter = new Router();
 singleRouter
 	.get('/:acid', async (ctx, next) => {
@@ -29,6 +30,13 @@ singleRouter
       if(share.shareUrl.indexOf(ctx.path) == -1) ctx.throw(403, "无效的token")
     }
     const activity = await db.ActivityModel.findOnly({acid:acid});
+    activity.description = nkcRender.renderHTML({
+      type: 'article',
+      post: {
+        c: activity.description,
+        // resources
+      },
+    })
     if(activity.activityType == "close"){
       return ctx.throw(403, "该活动已被活动发布者被关闭")
     }
