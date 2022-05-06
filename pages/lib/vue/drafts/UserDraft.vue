@@ -1,11 +1,11 @@
 <template lang="pug">
   .user-draft(v-if="!loading" )
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
-    .paging-button.m-l-05(v-if="drafts.length && drafts.length !== 0")
+    .paging-button.m-l-05(v-if="drafts && drafts.length !== 0")
       a.button.radius-left(@click="selectAll()") 全选
       a.button.radius-right(@click="removeSelectedDrafts()") 删除已选
       a.button.radius-left.radius-right.m-l-05(@click="removeAll()") 清空草稿箱
-    .account-threads(v-if="drafts.length === 0")
+    .account-threads(v-else)
       .null 空空如也~~
     .account-thread.draft-list(v-for="draft in drafts")
       .account-post-thread-user
@@ -301,7 +301,7 @@ export default {
       this.loading = true;
       const self = this;
       if(!self.uid) return;
-      let url = `/u/${self.uid}/profile/draft?page=${page}`;
+      let url = `/u/${self.uid}/profile/draftData?page=${page}`;
       nkcAPI(url, 'GET')
       .then(res => {
         self.drafts = res.drafts;

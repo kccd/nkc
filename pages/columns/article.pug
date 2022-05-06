@@ -30,7 +30,7 @@ block baseColumnContent
       .single-post-bottom#articleOption
         if data.user
           if type === 'article'
-            a.single-comment-bottom-item(href="#container")
+            span.single-comment-bottom-item(onclick="window.location.href='#container'")
               .fa.fa-comment-o.reply-icon
               span 回复
             .single-comment-bottom-item(data-type="articleOption" data-aid=article._id title="其他操作" data-direction="down")
