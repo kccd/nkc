@@ -77,7 +77,7 @@ export default {
         if (n?.post) this.oldContent = n.post.c;
         if (n?.type) this.type = n.type;
         if (n?.forum) this.forum = n.forum;
-        if (n?.threda) this.threda = n.threda;
+        if (n?.thread) this.thread = n.thread;
         if (n?.post?.pid) this.pid = n.post.pid;
       }
     }
@@ -193,7 +193,7 @@ export default {
             desType = "forum";
           } else if (type === "newPost") {
             desType = "thread";
-            desTypeId = this.thread.tid;
+            desTypeId = this.thread?.tid;
           } else if (type === "modifyPost") {
             desType = "post";
             desTypeId = this.pid;
