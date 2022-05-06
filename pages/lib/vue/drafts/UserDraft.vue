@@ -5,7 +5,7 @@
       a.button.radius-left(@click="selectAll()") 全选
       a.button.radius-right(@click="removeSelectedDrafts()") 删除已选
       a.button.radius-left.radius-right.m-l-05(@click="removeAll()") 清空草稿箱
-    .account-threads(v-if="drafts && drafts.length === 0")
+    .account-threads(v-else)
       .null 空空如也~~
     .account-thread.draft-list(v-for="draft in drafts")
       .account-post-thread-user
