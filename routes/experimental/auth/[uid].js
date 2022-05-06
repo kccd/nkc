@@ -28,7 +28,7 @@ authRouter
 		data.cardAErrorInfo = verifiedUploadCardA?verifiedUploadCardA.errorInfo:'';
 		data.cardBErrorInfo = verifiedUploadCardB?verifiedUploadCardB.errorInfo:'';
     data.auth3Content = auth3Content;
-		ctx.template = '/experimental/auth/[uid]/index.pug';
+		ctx.template = 'experimental/auth/[uid]/index.pug';
 		await next();
 	})
 	.del('/', async (ctx, next) => {

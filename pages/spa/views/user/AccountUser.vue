@@ -4,13 +4,13 @@
       .row
         //- 用户左侧面板
         .col-xs-12.col-md-2.left-panel-container
-          .left-panel-box(:class="leftPanelBoxOperation ? 'left-panel-box-show' : 'left-panel-box-none'")
+          .left-panel-box(:class="leftPanelBoxOperation ? 'left-panel-box-show' : 'left-panel-box-none'").clearPaddingLeftByMargin.clearPaddingRightByMargin
             left-panel(:nav-links="navLinks" :users-bl-uid="usersBlUid" :target-user="targetUser" :code="code" :target-user-scores="targetUserScores")
-          .left-panel-box-operation.fa(@click="clickLeftBox" :class="leftPanelBoxOperation ? 'fa-angle-up' : 'fa-angle-down'")
+          .left-panel-box-operation.fa(@click="clickLeftBox" :class="leftPanelBoxOperation ? 'fa-angle-up' : 'fa-angle-down'").clearPaddingLeftByMargin.clearPaddingRightByMargin
 
         //- 用户中间面板 先hi用户的动态， 文章，恢复等信息
         .col-xs-12.col-md-7.center-panel-container
-          .user-container.p-r-0.m-b-1.box-shadow-panel
+          .user-container.p-r-0.m-b-1.box-shadow-panel.clearPaddingLeftByMargin.clearPaddingRightByMargin
             router-view
           //user-card(ref="userCard")
         //用户右侧面板
@@ -19,12 +19,7 @@
 </template>
 <style lang="less">
 @import "../../../publicModules/base";
-.clear-padding{
-  @media (max-width: 992px){
-    padding-left: 0;
-    padding-right: 0;
-  }
-}
+
 .left-panel-box{
   height: 100%;
 }
