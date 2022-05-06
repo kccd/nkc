@@ -89,6 +89,8 @@ block content
         include ../module_scrollTo.pug
   include ../publicModules/floatForumNav
   include ../publicModules/nkcSource
+  include ../columns/article/authorInfo.pug
+  +authorInfo()
   //- 下拉后左边显示的所属专业 上级专业 同级专业
   //- +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 block scripts
