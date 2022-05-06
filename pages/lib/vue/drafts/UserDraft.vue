@@ -304,7 +304,6 @@ export default {
       let url = `/u/${self.uid}/profile/draftData?page=${page}`;
       nkcAPI(url, 'GET')
       .then(res => {
-        console.log('drafts', res.drafts);
         self.drafts = res.drafts;
         self.paging = res.paging;
       })
