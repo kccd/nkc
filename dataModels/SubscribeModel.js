@@ -4,7 +4,7 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const redisClient = require('../settings/redisClient');
-
+const {obtainPureText} = require('../nkcModules/apiFunction');
 const schema = new Schema({
   _id: Number,
   // 关注时的时间
@@ -350,9 +350,11 @@ schema.statics.getUserCollectionThreadsId = async (uid) => {
   }
   return threadsId;
 };
+
+//保存用户收藏的社区文章和专栏文章
 schema.statics.saveUserCollectionThreadsId = async (uid) => {
   const subs = await mongoose.model("subscribes").find({
-    type: "collection",
+    type: {$in: ["collection", "article"]},
     cancel: false,
     uid
   }, {tid: 1}).sort({toc: -1});
@@ -596,12 +598,25 @@ schema.statics.autoAttentionForum = async function(options) {
   }
 };
 
+
+/*
+* 拓展收藏的文章
+* @params {object} subscribes 需要拓展的关注内容
+* return
+*   user:
+*   thread:
+*   forum:
+*   column:
+*   collection:
+*   article:
+* */
 schema.statics.extendSubscribes = async (subscribes) => {
   const UserModel = mongoose.model("users");
   const ForumModel = mongoose.model("forums");
   const ColumnModel = mongoose.model("columns");
   const ThreadModel = mongoose.model("threads");
-  const uid = new Set(), fid = new Set(), columnId = new Set(), tid = new Set();
+  const ArticleModel = mongoose.model('articles');
+  const uid = new Set(), fid = new Set(), columnId = new Set(), tid = new Set(), aid = new Set();
   subscribes.map(s => {
     const {type} = s;
     if(type === "user") {
@@ -615,6 +630,8 @@ schema.statics.extendSubscribes = async (subscribes) => {
       columnId.add(s.columnId);
     } else if(type === "collection") {
       tid.add(s.tid)
+    } else if(type === 'article') {
+      aid.add(s.tid);
     }
   });
   let users = await UserModel.find({uid: {$in: [...uid]}});
@@ -622,6 +639,12 @@ schema.statics.extendSubscribes = async (subscribes) => {
   const usersObj = {};
   users.map(u => {
     usersObj[u.uid] = u;
+  });
+  let articles = await ArticleModel.find({_id: {$in: [...aid]}});
+  articles = await ArticleModel.getArticlesInfo(articles);
+  const articleObj = {};
+  articles.map(a => {
+    articleObj[a._id] = a;
   });
   let threads = await ThreadModel.find({tid: {$in: [...tid]}});
   threads = await ThreadModel.extendThreads(threads, {
@@ -670,6 +693,31 @@ schema.statics.extendSubscribes = async (subscribes) => {
       subscribe.thread = threadsObj[tid];
       if(!subscribe.thread) {
         continue;
+      }
+    } else if(type === 'article') {
+      if(!articleObj[tid]) continue;
+      const {status, document, user, count, hits, source, toc, tlm, url, voteDown, voteUp, _id} = articleObj[tid];
+      const {cover, title, content, abstract,} = document;
+      subscribe.article = {
+        _id,
+        status,
+        document,
+        user,
+        count,
+        hits,
+        source,
+        toc,
+        tlm,
+        url,
+        voteDown,
+        voteUp,
+        cover,
+        title,
+        content: await obtainPureText(content, true, 100),
+        abstract,
+      };
+      if(source === 'column') {
+        subscribe.article.column = articleObj[tid].column;
       }
     }
     results.push(subscribe);

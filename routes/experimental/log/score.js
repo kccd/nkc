@@ -4,11 +4,19 @@ router
 	.get('/', async (ctx, next) => {
 		ctx.template = 'experimental/log/score.pug';
 		const {nkcModules, data, db, query} = ctx;
-		const {page = 0, type = 'kcb'} = query;
+		const {page = 0, type = 'kcb', t, c} = query;
 		data.type = type;
 		const q = {};
 		if(type) {
 			q.type = type;
+		}
+		if(t === "username") {
+			const tUser = await db.UserModel.findOne({usernameLowerCase: c.toLowerCase()});
+			if(tUser) {
+				q.uid = tUser.uid;
+			}
+		} else if(t === "uid") {
+			q.uid = c;
 		}
 		q.type = 'score';
 		data.type = 'score';

@@ -1,7 +1,7 @@
 <template lang="pug">
   .user-moment
     paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
-    .user-list-warning(v-if="(!momentsData || momentsData.length === 0) && !loading") 空空如也~
+    .user-list-warning(v-if="loading") 加载中~
     .moment-list(v-else)
       moments(
         ref="moments"
@@ -14,7 +14,7 @@
       violation-record(ref="violationRecord")
     paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
 </template>
-<style lang="less">
+<style lang="less" scoped>
 @import "../../../../../publicModules/base";
 .user-moment {
   .user-list-warning {
@@ -60,7 +60,6 @@ export default {
   methods: {
     //获取用户卡片信息
     getUserCardInfo(page) {
-      this.loading = true;
       const {uid} = this;
       const self= this;
       let url = `/u/${uid}/profile/momentData`;
@@ -72,6 +71,7 @@ export default {
           url = url + `&page=${page}`;
         }
       }
+      self.loading = true;
       nkcAPI(url, "GET")
         .then(res => {
           self.t = res.t;
@@ -82,7 +82,7 @@ export default {
         .catch(err => {
           sweetError(err);
         })
-      this.loading = false;
+      self.loading = false;
     },
     //投诉或举报
     complaint(mid) {

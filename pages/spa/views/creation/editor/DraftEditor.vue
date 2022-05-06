@@ -216,6 +216,9 @@ export default {
         .then(res => {
           self.draftId = res.draftId;
         })
+      .catch(err => {
+        sweetError(err);
+      })
     },
     submit() {
       const self = this;
@@ -290,10 +293,12 @@ export default {
     //自动保存草稿
     autoSaveToDraft() {
       const self = this;
-      this.post('save')
-      .then(() => {
-        self.saveToDraftSuccess();
-      })
+      if(self.draftId) {
+        self.post('save')
+          .then(() => {
+            self.saveToDraftSuccess();
+          })
+      }
     }
   }
 }

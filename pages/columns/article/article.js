@@ -82,17 +82,7 @@ function unblock() {
 function collectArticle() {
   const {_id} = article;
   const {collected} = data;
-  nkcAPI(`/article/${_id}/collection`, 'POST', {
-    type: !collected,
-  })
-    .then(() => {
-      if(collected) {
-        sweetSuccess(`已取消收藏`);
-      } else {
-        sweetSuccess(`已加入收藏`);
-      }
-    })
-    .catch(sweetError);
+  SubscribeTypes.collectionArticle(_id, !collected);
 }
 //收藏论坛文章
 function collectThread() {
