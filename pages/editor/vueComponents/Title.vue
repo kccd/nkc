@@ -1,8 +1,8 @@
 <template lang="pug">
   .title
     .editor-type-info(v-if="data.type === 'newPost'")
-      .fa.fa-lightbulb-o {{data.thread.comment ? "|正在回复文章《" : "|正在评论文章《"}}
-      a(:href="data.thread.url" target="_blank") {{data.thread.title}} {{!data.thread.comment ? "|》" : "|》下的回复"}}
+      .fa.fa-lightbulb-o {{data.thread.comment ? "正在回复文章《" : "正在评论文章《"}}
+      a(:href="data.thread.url" target="_blank") {{data.thread.title}} {{!data.thread.comment ? "》" : "》下的回复"}}
     .editor-type-info(v-else-if="data.type === 'modifyThread'")
       .fa.fa-lightbulb-o
       |正在编辑文章《

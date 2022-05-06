@@ -16,15 +16,16 @@
 Object.assign(window, { turnUser })
 document.addEventListener('click', (e) => {
   const target = e.target;
+  const dom = $('.origin.origin-icon.dropdown');
   if(target.outerText !== "原创"){
-    if($('#dropdown').hasClass('open')){
-      $('#dropdown').removeClass('open');
+    if(dom.hasClass('open')){
+      dom.removeClass('open');
     }
   }else{
-    if($('#dropdown').hasClass('open')){
-      $('#dropdown').removeClass('open');
+    if(dom.hasClass('open')){
+      dom.removeClass('open');
     }else{
-      $('#dropdown').addClass('open');
+      dom.addClass('open');
     }
   }
 });
