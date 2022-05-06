@@ -115,27 +115,27 @@ export function sweetQuestion(text) {
       })
   });
 }
-export function sweetQuestion2(text) {
-  text = text + "";
-  return new Promise(function(resolve, reject) {
-    Swal({
-      type: "question",
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-      text: text,
-      showCancelButton: true,
-      reverseButtons: true
-    })
-      .then(function(result) {
-        if(result.value === true) {
-          resolve();
-        }
-        else{
-          reject("用户取消保存")
-        }
-      })
-  });
-}
+// export function sweetQuestion2(text) {
+//   text = text + "";
+//   return new Promise(function(resolve, reject) {
+//     Swal({
+//       type: "question",
+//       confirmButtonText: "确定",
+//       cancelButtonText: "取消",
+//       text: text,
+//       showCancelButton: true,
+//       reverseButtons: true
+//     })
+//       .then(function(result) {
+//         if(result.value === true) {
+//           resolve();
+//         }
+//         else{
+//           reject("用户取消保存")
+//         }
+//       })
+//   });
+// }
 // html内容弹窗
 export function asyncSweetCustom(html) {
   return Swal({

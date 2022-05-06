@@ -34,9 +34,9 @@
 
 <script>
 import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
-import { sweetError, sweetQuestion2 } from "../../lib/js/sweetAlert.js";
+import { sweetError } from "../../lib/js/sweetAlert.js";
 import { timeFormat } from "../../lib/js/tools";
-import { screenTopWarning } from "../../lib/js/topAlert";
+// import { screenTopWarning } from "../../lib/js/topAlert";
 
 export default {
   props: {
@@ -172,20 +172,20 @@ export default {
       let type = this.type;
 
       return Promise.resolve()
-        .then(() => {
-          // 获取本次编辑器内容的全部长度
-          // const allContentLength = editor.getContent();
-          if (saveData.c.length < this.oldContent.length) {
-            clearInterval(this.setInterval);
-            this.setInterval = '';
-            return sweetQuestion2(`您输入的内容发生了变化，是否还要继续保存？`)
-              .finally( ()=>{
-                this.setInterval = setInterval(this.autoSaveToDraft, this.saveDraftTimeout)
-              } )
-          } else {
-            return;
-          }
-        })
+        // .then(() => {
+        //   // 获取本次编辑器内容的全部长度
+        //   // const allContentLength = editor.getContent();
+        //   if (saveData.c.length < this.oldContent.length) {
+        //     clearInterval(this.setInterval);
+        //     this.setInterval = '';
+        //     return sweetQuestion2(`您输入的内容发生了变化，是否还要继续保存？`)
+        //       .finally( ()=>{
+        //         this.setInterval = setInterval(this.autoSaveToDraft, this.saveDraftTimeout)
+        //       } )
+        //   } else {
+        //     return;
+        //   }
+        // })
         .then((res) => {
           // let post = this.getPost();
           let desType, desTypeId;
@@ -256,10 +256,10 @@ export default {
           this.saveToDraftSuccess();
         })
         .catch((data) => {
-          if(data === '用户取消保存'){
-            screenTopWarning(data)
-            return
-          }
+          // if(data === '用户取消保存'){
+          //   screenTopWarning(data)
+          //   return
+          // }
           sweetError("草稿保存失败：" + (data.error || data));
         })
     },
