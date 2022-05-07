@@ -1,14 +1,16 @@
 <template lang="pug">
   .user-moment
     paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
-    .user-list-warning(v-if="loading") 加载中~
+    .user-list-warning(v-if="!momentsData && loading") 加载中~
     .moment-list(v-else)
+      blank(v-if="momentsData && momentsData.length === 0 && !loading")
       moments(
         ref="moments"
         :moments="momentsData"
         @complaint="complaint"
         @violation-record="violationRecord"
         :permissions="permissions"
+        v-else
       )
       complaint(ref="complaint")
       violation-record(ref="violationRecord")
@@ -31,10 +33,11 @@ import Complaint from "../../../../../lib/vue/Complaint";
 import ViolationRecord from "../../../../../lib/vue/ViolationRecord";
 import Paging from "../../../../../lib/vue/Paging";
 import {nkcAPI} from "../../../../../lib/js/netAPI";
+import Blank from "../../../../components/Blank";
 
 export default {
   data: () => ({
-    momentsData: [],
+    momentsData: null,
     paging: {},
     uid: null,
     loading: false,
@@ -45,6 +48,7 @@ export default {
     "complaint": Complaint,
     "violation-record": ViolationRecord,
     "paging": Paging,
+    "blank": Blank
   },
   computed: {
     pageButtons() {
