@@ -58,11 +58,10 @@ router
     let body, files;
     if(ctx.body.fields) {
       body = JSON.parse(ctx.body.fields.body);
-      files = ctx.body.files;
     } else {
       body = ctx.body;
     }
-    
+
     const {library} = data;
 
     await library.ensurePermission(data.user, "createFile", ctx.permission("modifyAllResource"));
@@ -70,7 +69,7 @@ router
     const {rid, name, category, description} = body;
     const resource = await db.ResourceModel.findOne({rid});
     if(!resource) ctx.throw(400, `rid异常，数据库中无对应的resource数据。rid: ${rid}`);
-    
+
     const file = await db.LibraryModel.newFile({
       user: data.user,
       lid: library._id,

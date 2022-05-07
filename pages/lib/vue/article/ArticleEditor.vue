@@ -130,6 +130,7 @@ import {getLength} from "../../js/checkData";
 import {getColumnInfo} from "../../js/column";
 import {getState} from "../../js/state";
 import { getUrl } from '../../js/tools'
+import {visitUrl} from "../../js/pageSwitch";
 
 export default {
   props:['time', 'source', 'configs'],
@@ -199,11 +200,11 @@ export default {
     getLength: getLength,
     preview(){
       const url = getUrl('preview', "article", this.articleId);
-      window.open(url);
+      visitUrl(url,true)
     },
     history(){
       const url = getUrl('history', "article", this.articleId);
-      window.open(url);
+      visitUrl(url,true)
     },
     getColumn() {
       const self = this;

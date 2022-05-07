@@ -1972,6 +1972,7 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
     recycleMark: 1,
     oc: 1,
     tid: 1,
+    uid: 1,
   });
   let threadsOC = [];
   const threadsObj = {};
@@ -1980,11 +1981,14 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
       threadsOC.push(thread.oc);
     }
     threadsObj[thread.tid] = thread;
+    usersId.push(thread.uid);
   }
   let threadFirstPosts = await PostModel.find({pid: {$in: threadsOC}}, {
     pid: 1,
     tid: 1,
     t: 1,
+    toc: 1,
+    uid: 1,
     cover: 1,
     c: 1,
   });
@@ -2001,7 +2005,6 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
       tid,
       pid,
       type,
-      uid: postUid,
       mainForumsId = [], disabled, toDraft} = post;
     const thread = threadsObj[tid];
     const result = {
@@ -2018,7 +2021,6 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
       result.status = 'disabled';
       result.statusInfo = '内容已屏蔽';
     } else {
-      const user = usersObj[postUid];
       let threadPost;
       let targetPost;
       if(type === 'post') {
@@ -2029,30 +2031,34 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
         }
       }
       threadPost = threadPost || post;
-
-      let toc;
-      let replyContent;
-      let replyUrl;
-      if(targetPost) { // 回复或评论
-        toc = targetPost.toc;
-        replyContent = nkcRender.replaceLink(nkcRender.htmlToPlain(targetPost.c, 200));
-        replyUrl = getUrl('post', targetPost.pid);
-      } else { // 文章
-        toc = threadPost.toc;
-      }
+      const user = usersObj[threadPost.uid];
+      if(!user) continue;
+      // 文章相关
       result.title = nkcRender.replaceLink(threadPost.t);
       result.content = nkcRender.replaceLink(nkcRender.htmlToPlain(threadPost.c, 200));
       result.coverUrl = threadPost.cover? getUrl('postCover', threadPost.cover): '';
       result.username = user.username;
-      result.uid = postUid;
+      result.uid = user.uid;
       result.avatarUrl = getUrl('userAvatar', user.avatar);
-      result.userHome = getUrl('userHome', postUid);
-      result.time = timeFormat(toc);
-      result.toc = toc;
+      result.userHome = getUrl('userHome', user.uid);
+      result.time = timeFormat(threadPost.toc);
+      result.toc = threadPost.toc;
       result.articleId = pid;
       result.url = getUrl('thread', threadPost.tid);
-      result.replyUrl = replyUrl;
-      result.replyContent = replyContent;
+      // 回复，评论相关
+      if(targetPost) {
+        const targetUser = usersObj[targetPost.uid];
+        if(!targetUser) continue;
+        result.replyId = targetPost.pid;
+        result.replyToc = targetPost.toc;
+        result.replyTime = timeFormat(targetPost.toc);
+        result.replyUrl = getUrl('post', targetPost.pid);
+        result.replyContent = nkcRender.replaceLink(nkcRender.htmlToPlain(targetPost.c, 200));
+        result.replyUsername = targetUser.username;
+        result.replyUid = targetUser.uid;
+        result.replyAvatarUrl = getUrl('userAvatar', targetUser.avatar);
+        result.replyUserHome = getUrl('userHome', targetUser.uid);
+      }
     }
     results[pid] = result;
   }

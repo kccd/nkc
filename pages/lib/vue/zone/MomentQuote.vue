@@ -4,8 +4,12 @@
     .moment-quote-body-article
       .moment-quote-reply-abstract(v-if="quoteData.data.replyContent")
         a(:href="quoteData.data.replyUrl" target="_blank") {{quoteData.data.replyContent}}
+      .moment-quote-header.hidden-md.hidden-lg(v-if="showThreadHeader")
+        +threadHeader
       .moment-quote-title
         a(:href="quoteData.data.url" target="_blank") {{quoteData.data.title}}
+        .moment-quote-header-min.hidden-sm.hidden-xs(v-if="showThreadHeader")
+          +threadHeaderMin
       .moment-quote-abstract(:class="{'cover': quoteData.data.coverUrl}")
         .moment-quote-cover(v-if='quoteData.data.coverUrl' :style="'background-image: url('+quoteData.data.coverUrl+')'")
         span {{quoteData.data.content}}
@@ -16,6 +20,46 @@
       .moment-quote-files(v-if="quoteData.data.files && quoteData.data.files.length > 0")
         moment-files(:data="quoteData.data.files")
 
+  mixin topHeader
+    .moment-quote-avatar(
+      data-global-mouseover="showUserPanel"
+      data-global-mouseout="hideUserPanel"
+      :data-global-data="objToStr({uid: topHeaderInfo.uid})"
+    )
+      img(:src="topHeaderInfo.avatarUrl")
+    .moment-quote-username(
+      data-global-mouseover="showUserPanel"
+      data-global-mouseout="hideUserPanel"
+      :data-global-data="objToStr({uid: topHeaderInfo.uid})"
+    )
+      a(:href="topHeaderInfo.userHome" target="_blank") {{topHeaderInfo.username}}
+    .moment-quote-time
+      from-now(:time="topHeaderInfo.toc")
+    a.moment-quote-link(:href="topHeaderInfo.url" v-if="topHeaderInfo.url" target="_blank") 详情
+
+  mixin threadHeader
+    .moment-quote-avatar(
+      data-global-mouseover="showUserPanel"
+      data-global-mouseout="hideUserPanel"
+      :data-global-data="objToStr({uid: threadHeaderInfo.uid})"
+    )
+      img(:src="threadHeaderInfo.avatarUrl")
+    .moment-quote-username(
+      data-global-mouseover="showUserPanel"
+      data-global-mouseout="hideUserPanel"
+      :data-global-data="objToStr({uid: threadHeaderInfo.uid})"
+    )
+      a(:href="threadHeaderInfo.userHome" target="_blank") {{threadHeaderInfo.username}}
+    .moment-quote-time
+      from-now(:time="threadHeaderInfo.toc")
+    a.moment-quote-link(:href="threadHeaderInfo.url" v-if="threadHeaderInfo.url" target="_blank") 详情
+
+  mixin threadHeaderMin
+    |（
+    a(:href="threadHeaderInfo.userHome" target="_blank") {{threadHeaderInfo.username}}
+    from-now(:time="threadHeaderInfo.toc")
+    |）
+
   .moment-quote-lost(v-if="!quoteData.data")
     .fa.fa-exclamation-circle
     span 引用丢失
@@ -23,28 +67,16 @@
     .fa.fa-exclamation-circle
     span {{quoteData.data.statusInfo}}
   .moment-quote(v-else)
-    .moment-quote-header
-      .moment-quote-avatar(
-        data-global-mouseover="showUserPanel"
-        data-global-mouseout="hideUserPanel"
-        :data-global-data="objToStr({uid: quoteData.data.uid})"
-      )
-        img(:src="quoteData.data.avatarUrl")
-      .moment-quote-username(
-        data-global-mouseover="showUserPanel"
-        data-global-mouseout="hideUserPanel"
-        :data-global-data="objToStr({uid: quoteData.data.uid})"
-      )
-        a(:href="quoteData.data.userHome" target="_blank") {{quoteData.data.username}}
-      .moment-quote-time
-        from-now(:time="quoteData.data.toc")
-      a.moment-quote-link(:href="quoteData.data.url" v-if="quoteData.quoteType === 'moment'") 详情
-    .moment-quote-body(v-if="quoteData.quoteType === 'article'")
-      +articleBody
-    .moment-quote-body(v-else-if="quoteData.quoteType === 'post'")
-      +articleBody
-    .moment-quote-body(v-else-if="quoteData.quoteType === 'moment'")
-      +momentBody
+    div(v-if="['article', 'post'].includes(quoteData.quoteType)")
+      .moment-quote-header(v-if="showTopHeader")
+        +topHeader
+      .moment-quote-body
+        +articleBody
+    div(v-else)
+      .moment-quote-header
+        +topHeader
+      .moment-quote-body
+        +momentBody
 
 
 
@@ -61,6 +93,15 @@
       color: @accent;
       font-size: 1.2rem;
       margin-right: 0.3rem;
+    }
+  }
+  .moment-quote-header-min{
+    display: inline-block;
+    a{
+      font-size: 1.25rem!important;
+      margin-right: 0.5rem;
+      color: #2b90d9!important;
+      font-weight: normal!important;
     }
   }
   .moment-quote-header{
@@ -171,8 +212,9 @@
   import {objToStr} from "../../js/tools";
   import MomentFiles from './MomentFiles';
   import FromNow from '../FromNow';
+
   export default {
-    props: ['data'],
+    props: ['data', 'uid'],
     components: {
       'from-now': FromNow,
       'moment-files': MomentFiles,
@@ -181,8 +223,87 @@
 
     }),
     computed: {
+      momentUserId() {
+        return this.uid;
+      },
       quoteData() {
         return this.data;
+      },
+      disabledContent() {
+        const {quoteData} = this;
+        return !quoteData.data || quoteData.data.status !== 'normal';
+      },
+      hasReply() {
+        const {quoteData} = this;
+        return quoteData && quoteData.data && quoteData.data.replyId;
+      },
+      showTopHeader() {
+        const {momentUserId, quoteData, hasReply, disabledContent} = this;
+        if(disabledContent) return false;
+        if(hasReply) {
+          return quoteData.data.replyUid !== momentUserId;
+        } else {
+          return quoteData.data.uid !== momentUserId;
+        }
+      },
+      showThreadHeader() {
+        const {quoteData, disabledContent, hasReply} = this;
+        if(disabledContent) return false;
+        return hasReply && quoteData.data.uid !== quoteData.data.replyUid;
+      },
+      replyHeaderInfo() {
+        const {quoteData, disabledContent, hasReply} = this;
+        if(disabledContent) return {};
+        const {
+          replyUid,
+          replyUsername,
+          replyAvatarUrl,
+          replyUserHome,
+          replyToc,
+          replyTime,
+          replyUrl,
+        } = quoteData.data;
+        return {
+          uid: replyUid,
+          username: replyUsername,
+          avatarUrl: replyAvatarUrl,
+          userHome: replyUserHome,
+          toc: replyToc,
+          time: replyTime,
+          url: replyUrl,
+        }
+      },
+      threadHeaderInfo() {
+        const {quoteData, disabledContent} = this;
+        if(disabledContent) return {};
+        const {
+          uid,
+          avatarUrl,
+          username,
+          userHome,
+          toc,
+          time,
+          url,
+        } = quoteData.data;
+        return {
+          uid,
+          username,
+          avatarUrl,
+          userHome,
+          toc,
+          time,
+          url
+        }
+      },
+      topHeaderInfo() {
+        const {threadHeaderInfo, replyHeaderInfo, disabledContent, hasReply} = this;
+        if(disabledContent) return {};
+
+        if(hasReply) {
+          return replyHeaderInfo;
+        } else {
+          return threadHeaderInfo;
+        }
       }
     },
     methods: {

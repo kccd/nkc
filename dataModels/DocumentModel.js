@@ -465,10 +465,14 @@ schema.statics.createBetaDocumentByStableDocument = async function(did) {
 * 将开发版更新为正式版，将正式版更新为历史版
 * 将记录同步到搜索数据库
 * @param {Number} did 文档的引用 ID
+* @param {}
 * */
-schema.statics.publishDocumentByDid = async (did) => {
+schema.statics.publishDocumentByDid = async (did, options = {}) => {
   const DocumentModel = mongoose.model('documents');
   const {checkString} = require('../nkcModules/checkData');
+  const {
+    jumpReview = false, // 是否跳过审核
+  } = options;
   const {stable, beta} = await DocumentModel.getDocumentTypes();
   const type = [stable, beta];
   const documentsObj = {};
@@ -496,12 +500,13 @@ schema.statics.publishDocumentByDid = async (did) => {
     }
   });
   //是否需要审核
-  const needReview = await documentsObj.beta.getReviewStatusAndCreateReviewLog();
+  const needReview = jumpReview? false: (await documentsObj.beta.getReviewStatusAndCreateReviewLog());
   if(needReview) {
     await documentsObj.beta.setStatus((await DocumentModel.getDocumentStatus()).unknown);
   } else {
     //不需要审核
     //检测document中的@用户并发送消息给用户
+    await documentsObj.beta.setStatus((await DocumentModel.getDocumentStatus()).normal);
     await documentsObj.beta.sendMessageToAtUsers('article');
   }
   //同步到search数据库
@@ -1132,9 +1137,6 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function() {
   //如果需要审核，就生成审核记录
   if(needReview) {
     await ReviewModel.newDocumentReview(type, this._id, this.uid, reason);
-    await this.setStatus((await DocumentModel.getDocumentStatus()).unknown);
-  } else {
-    await this.setStatus((await DocumentModel.getDocumentStatus()).normal);
   }
   return needReview;
 }

@@ -796,7 +796,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
   const parentForumsId = new Set(), forumsObj = {}, categoryObj = {}, columnsObj = {};
 
   threads = threads.filter(thread => !!thread);
-  
+
   threads.map(thread => {
     if(!thread) return;
     thread.tcId = thread.tcId || [];
@@ -1698,6 +1698,8 @@ threadSchema.statics.postNewThread = async (options) => {
   // 自动送审
   const needReview = await ReviewModel.autoPushToReview(_post);
   if(!needReview) {
+    _post.reviewed = true;
+    thread.reviewed = true;
     await PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
     await ThreadModel.updateOne({tid: thread.tid}, {$set: {reviewed: true}});
   }else{
