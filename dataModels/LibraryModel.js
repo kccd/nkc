@@ -202,9 +202,34 @@ schema.statics.newFile = async (options = {}) => {
     category
   });
   await library.save();
+  await library.updateResourceReferences();
   await pl.computeCount();
   return library;
 };
+
+/*
+* 获取附件引用 ID
+* @return {String}
+* */
+schema.methods.getResourceReferenceId = async function() {
+  return `library-${this.lid}`;
+};
+
+/*
+* 更新附件引用
+* */
+schema.methods.updateResourceReferences = async function() {
+  const {rid, type} = this;
+  if(type !== 'file' || !rid) return;
+  const referenceId = await this.getResourceReferenceId();
+  const ResourceModel = mongoose.model('resources');
+  await ResourceModel.updateOne({rid}, {
+    $addToSet: {
+      references: referenceId
+    }
+  });
+};
+
 /*
   校验文件、文件夹名称及简介
 */
