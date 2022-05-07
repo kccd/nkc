@@ -23,3 +23,15 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: @line;
 }
+//消除padding,不用padding，是应为会导致出现左右滑动框
+.clearPaddingLeftByMargin{
+  @media (max-width: 992px){
+    margin-left: -15px;
+  }
+}
+
+.clearPaddingRightByMargin{
+  @media (max-width: 992px){
+    margin-right: -15px;
+  }
+}
