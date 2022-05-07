@@ -568,8 +568,6 @@ schema.methods.publishArticle = async function(options) {
   const articleSources = await ArticleModel.getArticleSources();
   //检测当前用户的发表权限
   await DocumentModel.checkGlobalPostPermission(this.uid, documentSources.article);
-  //将当前article的状态改为正常
-  await this.changeStatus(normal);
   let columnPost;
   let articleUrl;
 
