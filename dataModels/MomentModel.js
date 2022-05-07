@@ -653,11 +653,16 @@ schema.statics.createQuoteMomentAndPublish = async (props) => {
   const {time, uid, quoteType, quoteId, content, resourcesId = []} = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
-  let moment = await MomentModel.findOne({
-    uid,
-    quoteType,
-    quoteId,
-  });
+  const quoteTypes = await MomentModel.getMomentQuoteTypes();
+  let moment;
+  const isQuoteMoment = quoteType === quoteTypes.moment;
+  if(!isQuoteMoment) {
+     moment = await MomentModel.findOne({
+      uid,
+      quoteType,
+      quoteId,
+    });
+  }
   if(!moment) {
     moment = await MomentModel.createQuoteMoment({
       uid,
@@ -668,7 +673,10 @@ schema.statics.createQuoteMomentAndPublish = async (props) => {
       content
     });
     const top = time || new Date();
-    await DocumentModel.publishDocumentByDid(moment.did);
+    await DocumentModel.publishDocumentByDid(moment.did, {
+      jumpReview: !isQuoteMoment
+    });
+
     await moment.updateOne({
       $set: {
         top,
@@ -758,6 +766,7 @@ schema.statics.extendQuotesData = async (quotes, uid = '') => {
 * @return {String}
 * */
 schema.statics.getQuoteDefaultContent = async (quoteType) => {
+  return '';
   switch(quoteType) {
     case momentQuoteTypes.article: {
       return '发表了新的文章~'

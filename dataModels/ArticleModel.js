@@ -1232,6 +1232,7 @@ schema.statics.getArticlesDataByArticlesId = async function(articlesId, type = '
     if(article.status === articleStatus.normal) {
       articleData = {
         status: articleStatus.normal,
+        statusInfo: '',
         title,
         content: nkcRender.htmlToPlain(content, 200),
         coverUrl: cover? getUrl('documentCover', cover): '',

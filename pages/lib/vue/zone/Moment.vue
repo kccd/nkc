@@ -39,7 +39,7 @@
 
         //- 引用内容
         .single-moment-quote(v-if="momentData.quoteData")
-          moment-quote(:data="momentData.quoteData")
+          moment-quote(:data="momentData.quoteData" :uid="momentData.uid")
         //- 底部的操作按钮
         .single-moment-options
           .single-moment-options-left(
