@@ -249,7 +249,7 @@ router
           type: 'passDocument'
         });
         const {source} = document;
-        if(momentType[source]) {
+        if(momentType[source] && source !== 'moment') {
           //生成一条新的动态
           db.MomentModel.createQuoteMomentAndPublish({
             uid: document.uid,
