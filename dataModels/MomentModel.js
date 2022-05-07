@@ -653,22 +653,29 @@ schema.statics.createQuoteMomentAndPublish = async (props) => {
   const {time, uid, quoteType, quoteId, content, resourcesId = []} = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
-  const moment = await MomentModel.createQuoteMoment({
+  let moment = await MomentModel.findOne({
     uid,
-    time,
-    resourcesId,
     quoteType,
     quoteId,
-    content
   });
-  const top = time || new Date();
-  await DocumentModel.publishDocumentByDid(moment.did);
-  await moment.updateOne({
-    $set: {
-      top,
-    }
-  });
-  await moment.updateResourceReferences();
+  if(!moment) {
+    moment = await MomentModel.createQuoteMoment({
+      uid,
+      time,
+      resourcesId,
+      quoteType,
+      quoteId,
+      content
+    });
+    const top = time || new Date();
+    await DocumentModel.publishDocumentByDid(moment.did);
+    await moment.updateOne({
+      $set: {
+        top,
+      }
+    });
+    await moment.updateResourceReferences();
+  }
   return moment;
 };
 
