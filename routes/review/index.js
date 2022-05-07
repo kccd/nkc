@@ -178,7 +178,7 @@ router
     }
     let message;
     const {normal: normalStatus, faulty: faultyStatus, unknown: unknownStatus, disabled: disabledStatus} = await db.DocumentModel.getDocumentStatus();
-    const momentType = await db.MomentModel.getMomentQuoteTypes();
+    const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
     if(reviewType === 'post') {
       const post = await db.PostModel.findOne({pid});
 
@@ -205,7 +205,7 @@ router
       //为post生成一条新的动态
       db.MomentModel.createQuoteMomentAndPublish({
         uid: post.uid,
-        quoteType: momentType.post,
+        quoteType: momentQuoteTypes.post,
         quoteId: post.pid
       })
         .catch(console.error);
@@ -249,11 +249,11 @@ router
           type: 'passDocument'
         });
         const {source} = document;
-        if(momentType[source] && source !== 'moment') {
+        if(momentQuoteTypes[source] && source !== 'moment') {
           //生成一条新的动态
           db.MomentModel.createQuoteMomentAndPublish({
             uid: document.uid,
-            quoteType: momentType[source],
+            quoteType: momentQuoteTypes[source],
             quoteId: document.sid
           })
             .catch(console.error);
