@@ -204,8 +204,6 @@ schema.methods.publishComment = async function () {
   const {normal: normalStatus} = await CommentModel.getCommentStatus();
   //检测评论发布权限
   await DocumentModel.checkGlobalPostPermission(this.uid, 'comment');
-  //将comment的status改变为正常
-  await this.changeStatus(normalStatus);
   await DocumentModel.publishDocumentByDid(did);
 }
 
