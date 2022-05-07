@@ -860,7 +860,6 @@ export default {
         if(data.state === "fileProcessFailed") {
           sweetError(`文件处理失败\n${data.err}`);
         }
-        console.log('----')
         self.getResourcesDebounce(0);
       }
       socket.on("fileTransformProcess", this.socketEventListener);
