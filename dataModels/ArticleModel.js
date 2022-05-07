@@ -574,6 +574,7 @@ schema.methods.publishArticle = async function(options) {
   let articleUrl;
 
   const {article: documentSource} = await DocumentModel.getDocumentSources();
+  const {default: defaultStatus} = await ArticleModel.getArticleStatus();
   const stableDocument = await DocumentModel.getStableDocumentBySource(documentSource, articleId);
   const isModify = !!stableDocument;
 
@@ -601,8 +602,9 @@ schema.methods.publishArticle = async function(options) {
   });
   await DocumentModel.publishDocumentByDid(did);
 
-  //如果发布的article为空间文章就创建一条新的动态并绑定当前article
-  if(!isModify) {
+  //如果发布的article不需要审核，并且不存在该文章的动态时就为该文章创建一条新的动态
+  //不需要审核的文章状态不为默认状态
+  if(!isModify && !this.status !== defaultStatus) {
     MomentModel.createQuoteMomentAndPublish({
       uid,
       quoteType: articleQuoteType,
