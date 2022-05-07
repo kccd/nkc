@@ -3,7 +3,7 @@
     image-viewer(ref="imageViewer")
     resource-info(ref="resourceInfo")
     common-modal(ref="categoryModal")
-    select-category(ref="selectCategory" @edit-category="editResourceCategory" :categories="categories" @order-change="getResources(0)")
+    select-category(ref="selectCategory" @edit-category="editResourceCategory" :categories="categories" @order-change="getResourcesDebounce(0)")
     mixin resourcePaging
       .resource-paging(v-if="paging && paging.buttonValue")
         .paging-button(v-if="paging.buttonValue.length > 1")
@@ -14,11 +14,11 @@
         .paging-button(v-if="screenType !== 'sm'")
           span(v-for="(b, index) in paging.buttonValue")
             span(v-if="b.type === 'active'")
-              a.button.active(@click="getResources(b.num)"
+              a.button.active(@click="getResourcesDebounce(b.num)"
                 :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
               ) {{b.num+1}}
             span(v-else-if="b.type === 'common'")
-              a.button(@click="getResources(b.num)"
+              a.button(@click="getResourcesDebounce(b.num)"
                 :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
               ) {{b.num+1}}
             span(v-else)
@@ -692,6 +692,7 @@ const socket = getSocket();
 export default {
   props: ['watch-type'],
   data: () => ({
+    getResourcesDebounce: '',
     categoryLoading: true,//分组loading
     resourceType: 'all',
     resourceCategories: 'all',//用户自定义分组存储id
@@ -736,12 +737,16 @@ export default {
     'common-modal': CommonModal,
     'select-category': SelectCategory,
   },
+  created(){
+    this.getResourcesDebounce = debounce(this.getResources, 500)
+  },
   mounted() {
     if(this.watchType === 'category') {
-      this.getResources(0);
+      this.getResourcesDebounce(0);
     }
     this.initSocketEvent();
     this.initDragUploadEvent();
+    
   },
   destroyed() {
     this.removeSocketEvent();
@@ -855,7 +860,8 @@ export default {
         if(data.state === "fileProcessFailed") {
           sweetError(`文件处理失败\n${data.err}`);
         }
-        self.getResources(0);
+        console.log('----')
+        self.getResourcesDebounce(0);
       }
       socket.on("fileTransformProcess", this.socketEventListener);
     },
@@ -1066,13 +1072,13 @@ export default {
       this.resourceType = resourceType;
       this.pageType = pageType;
       this.fastSelect = fastSelect;
-      this.getResources(0);
+      this.getResourcesDebounce(0);
     },
     selectCategory: function(c) {
       this.category = c;
-      this.getResources(0);
+      this.getResourcesDebounce(0);
     },
-    getResources: debounce(function(skip = 0) {
+    getResources: function(skip = 0) {
       this.loading = true;
       let {
         quota,
@@ -1104,14 +1110,14 @@ export default {
         .catch(function(data) {
           sweetError(data);
         });
-    }, 500),
+    }, 
     changePage: function(type) {
       var paging = this.paging;
       if(paging.buttonValue.length <= 1) return;
       if(type === "last" && paging.page === 0) return;
       if(type === "next" && paging.page + 1 === paging.pageCount) return;
       var count = type === "last"? -1: 1;
-      this.getResources(paging.page + count);
+      this.getResourcesDebounce(paging.page + count);
     },
     clickInput: function() {
       if(this.files.length >= 20) sweetInfo("最多仅允许20个文件同时上传，请稍后再试。");
@@ -1199,7 +1205,7 @@ export default {
           if(self.category === "upload" && !self.files.length) {
             setTimeout(function() {
               self.category = "all";
-              self.getResources(0);
+              self.getResourcesDebounce(0);
             }, 1000)
           }
         })
@@ -1243,7 +1249,7 @@ export default {
     },
     crash: function() {
       var paging = this.paging;
-      this.getResources(paging.page);
+      this.getResourcesDebounce(paging.page);
     },
     done: function() {
 
@@ -1262,7 +1268,7 @@ export default {
       if(!paging || !paging.buttonValue.length) return;
       var lastNumber = paging.buttonValue[paging.buttonValue.length - 1].num;
       if(pageNumber < 0 || lastNumber < pageNumber) return sweetInfo("输入的页数超出范围");
-      this.getResources(pageNumber);
+      this.getResourcesDebounce(pageNumber);
     },
     getIndex: function(arr, r) {
       var index = -1;
@@ -1328,7 +1334,7 @@ export default {
     },
     selectResourceType: function(t) {
       this.resourceType = t;
-      this.getResources(0);
+      this.getResourcesDebounce(0);
     },
     takePicture: function() {
       const self = this;
@@ -1369,7 +1375,7 @@ export default {
           })
             .then(() => {
               self.selectedResources = [];
-              self.getResources(0);
+              self.getResourcesDebounce(0);
             })
             .catch(err => {
               sweetError(err);
@@ -1387,7 +1393,7 @@ export default {
         this.resourceType = 'all';
       }
       this.resourceCategories = _id;
-      this.getResources(0);
+      this.getResourcesDebounce(0);
     },
     //获取用户资源分组
     getCategories: debounce(function () {
@@ -1491,7 +1497,7 @@ export default {
           sweetSuccess('操作成功');
           self.resourceCategories = cid;
           self.selectedResources = [];
-          self.getResources(0);
+          self.getResourcesDebounce(0);
           self.$refs.selectCategory.close();
         })
         .catch(err => {
