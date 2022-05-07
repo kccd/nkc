@@ -107,8 +107,8 @@ router
 		if(thread.reviewed) {
 			await nkcModules.socket.sendForumMessage({tid: _post.tid, pid: _post.pid, state: ctx.state});
 		}
-
-    if(!_post.anonymous) {
+		//如果内容不匿名并且不需要审核就为内容生成一条新的动态
+    if(!_post.anonymous && _post.reviewed) {
       // 生成动态
       const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
       db.MomentModel.createQuoteMomentAndPublish({
