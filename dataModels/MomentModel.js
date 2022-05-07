@@ -19,6 +19,7 @@ const momentQuoteTypes = {
   article: 'article',
   post: 'post',
   moment: 'moment',
+  comment: 'comment',
 };
 
 const momentCommentPerPage = 10;
