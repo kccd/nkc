@@ -1,7 +1,5 @@
 const mongoose = require('../settings/database');
-const {htmlToPlain} = require("../nkcModules/nkcRender");
 const nkcRender = require("../nkcModules/nkcRender");
-const {getUrl} = require("../nkcModules/tools");
 const commentSource = {
         article: 'article',
         book: 'book'
@@ -827,6 +825,8 @@ schema.statics.getCommentsByCommentsId = async function (commentsId, uid) {
   const ArticleModel = mongoose.model('articles');
   const UserModel = mongoose.model('users');
   const ArticlePostModel = mongoose.model('articlePosts');
+  const nkcRender = require('../nkcModules/nkcRender');
+  const {getUrl, timeFormat} = require('../nkcModules/tools');
   //查找出评论
   let comments = await CommentModel.find({
     _id: {$in: commentsId},
@@ -839,13 +839,17 @@ schema.statics.getCommentsByCommentsId = async function (commentsId, uid) {
     usersId.push(comment.uid);
     articlePostsId.push(comment.sid);
   }
-  const userObj = await UserModel.getUsersObjectByUsersId(usersId);
   //查找出独立文章评论盒子
   const articlePosts = await ArticlePostModel.find({_id: {$in: articlePostsId}});
   for(const a of articlePosts) {
     articlesId.push(a.sid);
   }
   const articles = await ArticleModel.find({_id: {$in: articlesId}});
+  for(const article of articles) {
+    usersId.push(article.uid);
+  }
+  //获取用户信息
+  const userObj = await UserModel.getUsersObjectByUsersId(usersId);
   // console.log('comments', comments);
   const results = {};
   for(const comment of comments) {
@@ -857,14 +861,36 @@ schema.statics.getCommentsByCommentsId = async function (commentsId, uid) {
       articleDocument,
       url
     } = comment;
-    const {content: commentContent} = commentDocument;
-    const {content: articleContent, title, cover} = articleDocument;
+    const {content: commentContent, uid: commentUid} = commentDocument;
+    const {content: articleContent, title, cover, uid: articleUid} = articleDocument;
+    const articleUser = userObj[articleUid];
+    const commentUser = userObj[commentUid];
+    if(!articleUser || !commentUser) continue;
     results[comment._id] = {
       title: nkcRender.replaceLink(title),
+      status,
       content: nkcRender.replaceLink(nkcRender.htmlToPlain(articleContent, 200)),
       coverUrl: cover? getUrl('postCover', cover): '',
+      username: articleUser.username,
+      uid: articleUid,
+      avatarUrl: getUrl('userAvatar', articleUser.avatar),
+      userHome: getUrl('userHome', articleUser.uid),
+      time: timeFormat(articleDocument.toc),
+      toc: articleDocument.toc,
+      articleId: articleDocument._id,
+      url,
+      replyId: _id,
+      replyToc: commentDocument.toc,
+      replyTime: timeFormat(commentDocument.toc),
+      replyUrl: '',
+      replyContent: nkcRender.replaceLink(nkcRender.htmlToPlain(commentContent, 200)),
+      replyUsername: commentUser.username,
+      replyUid: commentUid,
+      replyAvatarUrl: getUrl('userAvatar', commentUser.avatar),
+      replyUserHome: getUrl('userHome', commentUid)
     }
   }
+  return results;
 }
 
 module.exports = mongoose.model('comments', schema);

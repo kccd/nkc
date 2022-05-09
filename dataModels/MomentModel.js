@@ -759,6 +759,8 @@ schema.statics.extendQuotesData = async (quotes, uid = '') => {
       result = articlesData[quoteId];
     } else if(quoteType === quoteTypes.post) {
       result = postsData[quoteId];
+    } else if(quoteType === quoteTypes.comment) {
+      result = commentsData[quoteId];
     }
     if(!result) continue;
     results[quote] = result;

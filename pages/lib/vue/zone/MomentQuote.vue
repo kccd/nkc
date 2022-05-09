@@ -67,7 +67,7 @@
     .fa.fa-exclamation-circle
     span {{quoteData.data.statusInfo}}
   .moment-quote(v-else)
-    div(v-if="['article', 'post'].includes(quoteData.quoteType)")
+    div(v-if="['article', 'post', 'comment'].includes(quoteData.quoteType)")
       .moment-quote-header(v-if="showTopHeader")
         +topHeader
       .moment-quote-body
