@@ -1,6 +1,6 @@
 if !isIncluded('singleCommentTop')
   mixin singleCommentTop(props)
-    -var {_id: cid, docId, username, toc, uid, avatar, home, gradeId, gradeName} = props;
+    -var {_id: cid, docId, did, username, toc, uid, avatar, home, gradeId, gradeName} = props;
     -var {reason, reviewed, isAuthor, order, tlm} = props;
     .single-post-top
       .single-post-avatar(
@@ -29,7 +29,7 @@ if !isIncluded('singleCommentTop')
             | &nbsp;修改于&nbsp;
             +fromNow(tlm)
       .single-post-floor
-        span=order + '楼'
+        a(href=tools.getUrl('columnsComment', data.originUrl, null, did, data.paging.page))=order + '楼'
         .single-post-checkbox
           label
             input(type='checkbox' data-docId=docId)
