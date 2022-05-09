@@ -1934,6 +1934,38 @@ postSchema.statics.extendPostsByColumn = async function(posts, options) {
   return results;
 }
 
+/*
+* 获取指定 ID 的 POST 数据
+* @param {[String]} postsId
+* @param {String} uid 访问者 UID
+* @return {[Object]}
+*   // 控制内容是否显示
+*   @param {String} statusInfo 内容状态说明
+*   @param {String} status 内容状态 normal 为正常，其余情况不包含以下数据
+*   // 文章信息
+*   @param {String} title 文章标题
+*   @param {String} content 文章内容摘要
+*   @param {String} coverUrl 文章封面图
+*   @param {String} username 文章作者用户名
+*   @param {String} uid 文章作者UID
+*   @param {String} avatarUrl 文章作者头像链接
+*   @param {String} userHome 文章作者个人主页链接
+*   @param {Date} toc 文章的发表时间
+*   @param {String} time 格式化后的文章发表时间
+*   @param {String} articleId 文章ID
+*   @param {String} url 文章页链接
+*   // 回复信息
+*   @param {String} replyId 回复ID
+*   @param {Date} replyToc 回复的发表时间
+*   @param {String} replyTime 格式化后的回复发表时间
+*   @param {String} replyUrl 回复页链接
+*   @param {String} replyContent 回复内容摘要
+*   @param {String} replyUsername 回复内容作者用户名
+*   @param {String} replyUid 回复内容作者用户UID
+*   @param {String} replyAvatarUrl 回复内容作者头像链接
+*   @param {String} replyUserHome 回复内容作者个人主页链接
+*
+* */
 postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
   const PostModel = mongoose.model('posts');
   const UserModel = mongoose.model('users');
