@@ -130,7 +130,12 @@ router
       //改变article的hasDraft状态
       await article.changeHasDraftStatus();
     }
-    data.articleCover = await article.getBetaDocumentCoverId();
+
+    if(type === 'publish') {
+      data.articleCover = await article.getStableDocumentCoverId();
+    } else {
+      data.articleCover = await article.getBetaDocumentCoverId();
+    }
     // 写文章后返回信息
     data.document = await db.DocumentModel.findOne({
       sid: article._id
