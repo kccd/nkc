@@ -834,8 +834,7 @@ threadRouter
         }
       });
       await message.save();
-
-      await ctx.nkcModules.socket.sendMessageToUser(message._id);
+      if(_post.reviewed) await ctx.nkcModules.socket.sendMessageToUser(message._id);
 		}
 		await thread.updateOne({$inc: [{count: 1}, {hits: 1}]});
 		const type = ctx.request.accepts('json', 'html');
@@ -865,7 +864,7 @@ threadRouter
             }
           });
           await message.save();
-          await ctx.nkcModules.socket.sendMessageToUser(message._id);
+          if(_post.reviewed) await ctx.nkcModules.socket.sendMessageToUser(message._id);
         }
         data.level1Comment = comment.parentPost.parentPostId === "";
         comment.parentPost = (await db.PostModel.extendPosts([comment.parentPost], extendPostOptions))[0];
