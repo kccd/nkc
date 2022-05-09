@@ -200,11 +200,24 @@ schema.statics.createComment = async (options) => {
 schema.methods.publishComment = async function () {
   const DocumentModel = mongoose.model('documents');
   const CommentModel = mongoose.model('comments');
+  const MomentModel = mongoose.model('moments');
   const {did} = this;
   const {normal: normalStatus} = await CommentModel.getCommentStatus();
+  const {comment: commentQuoteType} = await MomentModel.getMomentQuoteTypes();
   //检测评论发布权限
   await DocumentModel.checkGlobalPostPermission(this.uid, 'comment');
   await DocumentModel.publishDocumentByDid(did);
+  const newComment = await CommentModel.findOnly({_id: this._id});
+  //如果发布的article不需要审核，并且不存在该文章的动态时就为该文章创建一条新的动态
+  //不需要审核的文章状态不为默认状态
+  if(newComment.status === normalStatus) {
+    MomentModel.createQuoteMomentAndPublish({
+      uid: this.uid,
+      quoteType: commentQuoteType,
+      quoteId: this._id,
+    })
+      .catch(console.error);
+  }
 }
 
 /*
