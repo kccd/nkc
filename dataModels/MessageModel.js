@@ -560,6 +560,27 @@ messageSchema.statics.getParametersData = async (message) => {
       postURL: await PostModel.getUrl(post),
       postContent: apiFunction.obtainPureText(post.c)
     };
+  } else if(type === 'replyArticle') {
+    //独立文章通知作者文章被评论了
+    const {docId} = message.c;
+    const document = await DocumentModel.findOnly({_id: docId});
+    const {comment: commentSource} = await DocumentModel.getDocumentSources();
+    if(document.source !== commentSource) return console.log('document来源错误');
+    let comment = await CommentModel.findOnly({_id: document.sid});
+    if(!comment) return console.log('未找到comment');
+    comment = (await CommentModel.getCommentInfo([comment]))[0];
+    const {status, commentDocument, articleDocument} = comment;
+    const userObj = await UserModel.getUsersObjectByUsersId([commentDocument.uid]);
+    const user = userObj[commentDocument.uid];
+    parameters = {
+      userURL: user?getUrl('userHome', commentDocument.uid) : '',
+      username: user.username,
+      articleURL: comment.url,
+      articleTitle: articleDocument.title,
+      commentURL: '',
+      commentContent: apiFunction.obtainPureText(commentDocument.content),
+    };
+    
   } else if(type === 'comment') {
     const {pid} = message.c;
     const post = await PostModel.findOne({pid});

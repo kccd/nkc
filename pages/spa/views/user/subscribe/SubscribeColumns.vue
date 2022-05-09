@@ -2,7 +2,7 @@
   div(v-if="!loading")
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     .subscribe-columns
-      .null(v-if="!subscribes.length" ) 空空如也~~
+      .null(v-if="subscribes && !subscribes.length" ) 空空如也~~
       .account-follower(v-for="item in subscribes")
         .account-follower-avatar
           img.img(:src="getUrl('columnAvatar',item.column._id, 'sm')")

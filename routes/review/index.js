@@ -166,6 +166,7 @@ router
     await next();
   })
   .put("/", async (ctx, next) => {
+    //审核post和document
     const {data, db, body, state} = ctx;
     let {pid, type: reviewType, docId, pass, reason, remindUser, violation, delType} = body;//remindUser 是否通知用户 violation 是否标记违规 delType 退修或禁用
     if(!reviewType) {
@@ -177,6 +178,7 @@ router
     }
     let message;
     const {normal: normalStatus, faulty: faultyStatus, unknown: unknownStatus, disabled: disabledStatus} = await db.DocumentModel.getDocumentStatus();
+    const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
     if(reviewType === 'post') {
       const post = await db.PostModel.findOne({pid});
 
@@ -200,6 +202,13 @@ router
       await post.updateOne({
         reviewed: true
       });
+      //为post生成一条新的动态
+      db.MomentModel.createQuoteMomentAndPublish({
+        uid: post.uid,
+        quoteType: momentQuoteTypes.post,
+        quoteId: post.pid
+      })
+        .catch(console.error);
       const thread = await db.ThreadModel.findOnly({tid: post.tid});
       if(thread.oc === post.pid) {
         //将文章标记为已审核
@@ -227,7 +236,7 @@ router
       if(delType && !documentStatus[delType]) ctx.throw(400, '状态错误');
       const document = await db.DocumentModel.findOne({_id: docId});
       if(!document) ctx.throw(404, `未找到_ID为 ${docId}的文档`);
-      if(document.reviewed) ctx.throw(400, '内容已经审核, 请刷新后重试');
+      if(document.status !== unknownStatus) ctx.throw(400, '内容已经审核, 请刷新后重试');
       const targetUser = await db.UserModel.findOne({uid: document.uid});
       if(pass) {
         //将document状态改为已审核状态
@@ -239,12 +248,27 @@ router
           documentId: document._id,
           type: 'passDocument'
         });
-        // await db.ReviewModel.newReview('passDocument', '', data.user, reason, document);
+        const {source} = document;
+        if(momentQuoteTypes[source] && source !== 'moment') {
+          //生成一条新的动态
+          db.MomentModel.createQuoteMomentAndPublish({
+            uid: document.uid,
+            quoteType: momentQuoteTypes[source],
+            quoteId: document.sid
+          })
+            .catch(console.error);
+        }
+        await db.ReviewModel.newReview('passDocument', '', data.user, reason, document);
         let passType;
         if(document.source === 'article') {
           passType = "documentPassReview";
         } else if(document.source === 'comment') {
           passType = "commentPassReview";
+          //如果审核的内容是comment,就通知文章作者文章被评论
+          const comment = await db.CommentModel.findOnly({_id: document.sid});
+          if(comment.status === normalStatus) {
+            await comment.noticeAuthorComment();
+          }
         } else if(document.source === 'moment') {
           passType = "momentPass";
         }

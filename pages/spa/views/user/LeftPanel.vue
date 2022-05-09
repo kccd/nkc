@@ -1,6 +1,6 @@
 <template lang="pug">
   .left-panel.box-shadow-panel
-    //用户动态码和财政
+    //用户ID用户动态码和财政
     .m-b-1(v-if="isSelf")
       user-code-and-finance(ref="userProfileInfo" :target-user="targetUser" :code="code" :target-user-scores="targetUserScores")
     //用户信息

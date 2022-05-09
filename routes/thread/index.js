@@ -908,7 +908,8 @@ threadRouter
         parentCommentId: singlePostData.parentCommentId,
       };
     }
-    if(!_post.anonymous) {
+    //如果不是匿名发表并且不需要审核就生成一条新的动态
+    if(!_post.anonymous && _post.reviewed) {
       // 生成动态
       const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
       db.MomentModel.createQuoteMomentAndPublish({

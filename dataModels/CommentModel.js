@@ -1,5 +1,5 @@
 const mongoose = require('../settings/database');
-const {htmlToPlain} = require("../nkcModules/nkcRender");
+const nkcRender = require("../nkcModules/nkcRender");
 const commentSource = {
         article: 'article',
         book: 'book'
@@ -195,18 +195,32 @@ schema.statics.createComment = async (options) => {
 }
 
 /*
-* 发布comment
+* 发布comment, 检测评论的发表权限，不需要审核，即comment的状态为正常时，为评论生成一条新的动态并且通知作者文章文章被评论了
 * */
 schema.methods.publishComment = async function () {
   const DocumentModel = mongoose.model('documents');
   const CommentModel = mongoose.model('comments');
+  const MomentModel = mongoose.model('moments');
   const {did} = this;
   const {normal: normalStatus} = await CommentModel.getCommentStatus();
+  const {comment: commentQuoteType} = await MomentModel.getMomentQuoteTypes();
   //检测评论发布权限
   await DocumentModel.checkGlobalPostPermission(this.uid, 'comment');
-  //将comment的status改变为正常
-  await this.changeStatus(normalStatus);
   await DocumentModel.publishDocumentByDid(did);
+  const newComment = await CommentModel.findOnly({_id: this._id});
+  //如果发布的article不需要审核，并且不存在该文章的动态时就为该文章创建一条新的动态
+  //不需要审核的文章状态不为默认状态
+  if(newComment.status === normalStatus) {
+    //生成一条新动态
+    MomentModel.createQuoteMomentAndPublish({
+      uid: this.uid,
+      quoteType: commentQuoteType,
+      quoteId: this._id,
+    })
+      .catch(console.error);
+    //通知作者文章被评论了
+    this.noticeAuthorComment();
+  }
 }
 
 /*
@@ -737,12 +751,16 @@ schema.statics.getCommentInfo = async function(comments) {
   const ArticlePostModel = mongoose.model('articlePosts');
   const ColumnPostModel = mongoose.model('columnPosts');
   const DocumentModel = mongoose.model('documents');
+  const CommentModel = mongoose.model('comments');
   const commentsSid = [];
   const commentDid = [];
+  const commentsId = [];
   for(const comment of comments) {
     commentsSid.push(comment.sid);
     commentDid.push(comment.did);
+    commentsId.push(comment._id);
   }
+  const _comments = await CommentModel.find({_id: {$in: commentsId}});
   const {stable: stableType} = await DocumentModel.getDocumentTypes();
   const documents = await DocumentModel.find({did: commentDid, type: stableType});
   const commentDocumentsObj = {};
@@ -775,7 +793,7 @@ schema.statics.getCommentInfo = async function(comments) {
   }
   const results = [];
   const {column: columnSource, zone: zoneSource} = await ArticlePostModel.getArticlePostSources();
-  for(const comment of comments) {
+  for(const comment of _comments) {
     const {sid, _id, source, did} = comment;
     const articlePost = articlePostsObj[sid];
     const commentDocument = commentDocumentsObj[did] || null;
@@ -816,6 +834,111 @@ schema.statics.getCommentsObjectByCommentsId = async function(commentsId) {
     commentsObj[comment._id] = comment;
   }
   return commentsObj;
+}
+
+/*
+* 通过commentId获取comment
+* @params {Array} commentId 需要获取的评论的Id
+* */
+schema.statics.getCommentsByCommentsId = async function (commentsId, uid) {
+  const CommentModel = mongoose.model('comments');
+  const ArticleModel = mongoose.model('articles');
+  const UserModel = mongoose.model('users');
+  const ArticlePostModel = mongoose.model('articlePosts');
+  const nkcRender = require('../nkcModules/nkcRender');
+  const {getUrl, timeFormat} = require('../nkcModules/tools');
+  //查找出评论
+  let comments = await CommentModel.find({
+    _id: {$in: commentsId},
+  });
+  //获取评论信息
+  comments = await CommentModel.getCommentInfo(comments);
+  const usersId = [];
+  const articlesId = [];
+  const articlePostsId = [];
+  for(const comment of comments) {
+    usersId.push(comment.uid);
+    articlePostsId.push(comment.sid);
+  }
+  //查找出独立文章评论盒子
+  const articlePosts = await ArticlePostModel.find({_id: {$in: articlePostsId}});
+  for(const a of articlePosts) {
+    articlesId.push(a.sid);
+  }
+  const articles = await ArticleModel.find({_id: {$in: articlesId}});
+  for(const article of articles) {
+    usersId.push(article.uid);
+  }
+  //获取用户信息
+  const userObj = await UserModel.getUsersObjectByUsersId(usersId);
+  // console.log('comments', comments);
+  const results = {};
+  for(const comment of comments) {
+    const {
+      status,
+      did,
+      _id,
+      commentDocument,
+      articleDocument,
+      url
+    } = comment;
+    const {content: commentContent, uid: commentUid} = commentDocument;
+    const {content: articleContent, title, cover, uid: articleUid} = articleDocument;
+    const articleUser = userObj[articleUid];
+    const commentUser = userObj[commentUid];
+    if(!articleUser || !commentUser) continue;
+    results[comment._id] = {
+      title: nkcRender.replaceLink(title),
+      status,
+      content: nkcRender.replaceLink(nkcRender.htmlToPlain(articleContent, 200)),
+      coverUrl: cover? getUrl('postCover', cover): '',
+      username: articleUser.username,
+      uid: articleUid,
+      avatarUrl: getUrl('userAvatar', articleUser.avatar),
+      userHome: getUrl('userHome', articleUser.uid),
+      time: timeFormat(articleDocument.toc),
+      toc: articleDocument.toc,
+      articleId: articleDocument._id,
+      url,
+      replyId: _id,
+      replyToc: commentDocument.toc,
+      replyTime: timeFormat(commentDocument.toc),
+      replyUrl: '',
+      replyContent: nkcRender.replaceLink(nkcRender.htmlToPlain(commentContent, 200)),
+      replyUsername: commentUser.username,
+      replyUid: commentUid,
+      replyAvatarUrl: getUrl('userAvatar', commentUser.avatar),
+      replyUserHome: getUrl('userHome', commentUid)
+    }
+  }
+  return results;
+}
+
+/*
+* 通知文章作者文章被评论了
+* @params {}
+* */
+schema.methods.noticeAuthorComment = async function() {
+  const CommentModel = mongoose.model('comments');
+  const MessageModel = mongoose.model('messages');
+  const SettingModel = mongoose.model('settings');
+  const commentInfo = await CommentModel.getCommentInfo([this]);
+  const {status, commentDocument, articleDocument} = commentInfo[0];
+  const {normal: normalStatus} = await CommentModel.getCommentStatus();
+  //如果评论状态不正常或者评论的作者和文章作者为同一人时不需要通知
+  if(status !== normalStatus) return;
+  if(commentDocument.uid === articleDocument.uid) return;
+  //创建一条新的消息
+  const message = await MessageModel({
+    _id: await SettingModel.operateSystemID("messages", 1),
+    r: articleDocument.uid,
+    ty: "STU",
+    c: {
+      type: 'replyArticle',
+      docId: commentDocument._id,
+    }
+  });
+  await message.save();
 }
 
 module.exports = mongoose.model('comments', schema);

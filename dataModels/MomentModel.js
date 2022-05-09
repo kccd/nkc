@@ -19,6 +19,7 @@ const momentQuoteTypes = {
   article: 'article',
   post: 'post',
   moment: 'moment',
+  comment: 'comment',
 };
 
 const momentCommentPerPage = 10;
@@ -653,22 +654,37 @@ schema.statics.createQuoteMomentAndPublish = async (props) => {
   const {time, uid, quoteType, quoteId, content, resourcesId = []} = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
-  const moment = await MomentModel.createQuoteMoment({
-    uid,
-    time,
-    resourcesId,
-    quoteType,
-    quoteId,
-    content
-  });
-  const top = time || new Date();
-  await DocumentModel.publishDocumentByDid(moment.did);
-  await moment.updateOne({
-    $set: {
-      top,
-    }
-  });
-  await moment.updateResourceReferences();
+  const quoteTypes = await MomentModel.getMomentQuoteTypes();
+  let moment;
+  const isQuoteMoment = quoteType === quoteTypes.moment;
+  if(!isQuoteMoment) {
+     moment = await MomentModel.findOne({
+      uid,
+      quoteType,
+      quoteId,
+    });
+  }
+  if(!moment) {
+    moment = await MomentModel.createQuoteMoment({
+      uid,
+      time,
+      resourcesId,
+      quoteType,
+      quoteId,
+      content
+    });
+    const top = time || new Date();
+    await DocumentModel.publishDocumentByDid(moment.did, {
+      jumpReview: !isQuoteMoment
+    });
+
+    await moment.updateOne({
+      $set: {
+        top,
+      }
+    });
+    await moment.updateResourceReferences();
+  }
   return moment;
 };
 
@@ -700,7 +716,7 @@ schema.statics.getMomentsByMomentsId = async (momentsId, type = 'array') => {
 };
 
 /*
-* 拓展引用数据，引用的数据包含 moment, article, thread 等
+* 拓展引用数据，引用的数据包含 moment, article, thread, comment 等
 * @param {[String]} quotes 引用类型加引用ID组成的字符创 格式：`${quoteType}:${quoteId}`
 * @param {String} uid 访问者 ID
 * @return {Object} 键为 `${quoteType}:${quoteId}` 值为对象，对象属性如下：
@@ -711,23 +727,28 @@ schema.statics.extendQuotesData = async (quotes, uid = '') => {
   const MomentModel = mongoose.model('moments');
   const ArticleModel = mongoose.model('articles');
   const PostModel = mongoose.model('posts');
+  const CommentModel = mongoose.model('comments');
   const quoteTypes = await MomentModel.getMomentQuoteTypes();
   const articlesId = [];
   const momentsId = [];
   const postsId = [];
+  const commentsId = [];
   for(const quote of quotes) {
     const [quoteType, quoteId] = quote.split(':');
     if(quoteType === quoteTypes.moment) momentsId.push(quoteId);
     if(quoteType === quoteTypes.article) articlesId.push(quoteId);
     if(quoteType === quoteTypes.post) postsId.push(quoteId);
+    if(quoteType === quoteTypes.comment) commentsId.push(quoteId);
   }
   // 加载动态
   const moments = await MomentModel.getMomentsByMomentsId(momentsId);
   const momentsData = await MomentModel.extendMomentsData(moments, uid);
-  // 加载文章
+  // 加载独立文章
   const articlesData = await ArticleModel.getArticlesDataByArticlesId(articlesId);
   // 加载社区文章
   const postsData = await PostModel.getPostsDataByPostsId(postsId, uid);
+  //加载独立文章评论comment
+  const commentsData = await CommentModel.getCommentsByCommentsId(commentsId, uid);
   const results = {};
   for(const quote of quotes) {
     const [quoteType, quoteId] = quote.split(':');
@@ -738,6 +759,8 @@ schema.statics.extendQuotesData = async (quotes, uid = '') => {
       result = articlesData[quoteId];
     } else if(quoteType === quoteTypes.post) {
       result = postsData[quoteId];
+    } else if(quoteType === quoteTypes.comment) {
+      result = commentsData[quoteId];
     }
     if(!result) continue;
     results[quote] = result;
@@ -751,6 +774,7 @@ schema.statics.extendQuotesData = async (quotes, uid = '') => {
 * @return {String}
 * */
 schema.statics.getQuoteDefaultContent = async (quoteType) => {
+  return '';
   switch(quoteType) {
     case momentQuoteTypes.article: {
       return '发表了新的文章~'
@@ -1044,6 +1068,7 @@ schema.statics.extendMomentsListData = async (moments, uid = '') => {
        quotesId.push(`${quoteType}:${quoteId}`);
      }
   }
+  //拓展动态的引用数据
   const quotesData = await MomentModel.extendQuotesData(quotesId, uid);
   const results = [];
   for(const moment of moments) {

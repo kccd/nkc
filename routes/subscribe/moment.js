@@ -47,6 +47,11 @@ router
       .skip(paging.start)
       .limit(paging.perpage)
     data.momentsData = await db.MomentModel.extendMomentsListData(moments, state.uid);
+    // for(const moment of data.momentsData) {
+    //   if(moment.quoteData) {
+    //     console.log('momentsData', moment.quoteData.data);
+    //   }
+    // }
     data.paging = paging;
     data.permissions = permissions;
     ctx.template = 'subscribe/moment.pug';

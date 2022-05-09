@@ -424,12 +424,27 @@ schema.statics.createArticle = async (props) => {
   await article.save();
   return article;
 }
+/*
+* 获取编辑版封面图ID
+* @return {String}
+* */
 schema.methods.getBetaDocumentCoverId = async function() {
   const DocumentModel = mongoose.model('documents');
   const {article: documentSource} = await DocumentModel.getDocumentSources();
   const betaDocument = await DocumentModel.getBetaDocumentBySource(documentSource, this._id);
   return betaDocument? betaDocument.cover: '';
 };
+
+/*
+* 获取正式版封面图ID
+* @return {String}
+* */
+schema.methods.getStableDocumentCoverId = async function() {
+  const DocumentModel = mongoose.model('documents');
+  const {article: documentSource} = await DocumentModel.getDocumentSources();
+  const stableDocument = await DocumentModel.getStableDocumentBySource(documentSource, this._id);
+  return stableDocument? stableDocument.cover: '';
+}
 
 /*
 * 删除文章的草稿
@@ -568,12 +583,11 @@ schema.methods.publishArticle = async function(options) {
   const articleSources = await ArticleModel.getArticleSources();
   //检测当前用户的发表权限
   await DocumentModel.checkGlobalPostPermission(this.uid, documentSources.article);
-  //将当前article的状态改为正常
-  await this.changeStatus(normal);
   let columnPost;
   let articleUrl;
 
   const {article: documentSource} = await DocumentModel.getDocumentSources();
+  const {normal: normalStatus} = await ArticleModel.getArticleStatus();
   const stableDocument = await DocumentModel.getStableDocumentBySource(documentSource, articleId);
   const isModify = !!stableDocument;
 
@@ -600,9 +614,10 @@ schema.methods.publishArticle = async function(options) {
     }
   });
   await DocumentModel.publishDocumentByDid(did);
-
-  //如果发布的article为空间文章就创建一条新的动态并绑定当前article
-  if(!isModify) {
+  const newArticle = await ArticleModel.findOnly({_id: this._id});
+  //如果发布的article不需要审核，并且不存在该文章的动态时就为该文章创建一条新的动态
+  //不需要审核的文章状态不为默认状态
+  if(!isModify && newArticle.status === normalStatus) {
     MomentModel.createQuoteMomentAndPublish({
       uid,
       quoteType: articleQuoteType,
@@ -1232,6 +1247,7 @@ schema.statics.getArticlesDataByArticlesId = async function(articlesId, type = '
     if(article.status === articleStatus.normal) {
       articleData = {
         status: articleStatus.normal,
+        statusInfo: '',
         title,
         content: nkcRender.htmlToPlain(content, 200),
         coverUrl: cover? getUrl('documentCover', cover): '',

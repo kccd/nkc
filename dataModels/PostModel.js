@@ -1934,6 +1934,38 @@ postSchema.statics.extendPostsByColumn = async function(posts, options) {
   return results;
 }
 
+/*
+* 获取指定 ID 的 POST 数据
+* @param {[String]} postsId
+* @param {String} uid 访问者 UID
+* @return {[Object]}
+*   // 控制内容是否显示
+*   @param {String} statusInfo 内容状态说明
+*   @param {String} status 内容状态 normal 为正常，其余情况不包含以下数据
+*   // 文章信息
+*   @param {String} title 文章标题
+*   @param {String} content 文章内容摘要
+*   @param {String} coverUrl 文章封面图
+*   @param {String} username 文章作者用户名
+*   @param {String} uid 文章作者UID
+*   @param {String} avatarUrl 文章作者头像链接
+*   @param {String} userHome 文章作者个人主页链接
+*   @param {Date} toc 文章的发表时间
+*   @param {String} time 格式化后的文章发表时间
+*   @param {String} articleId 文章ID
+*   @param {String} url 文章页链接
+*   // 回复信息
+*   @param {String} replyId 回复ID
+*   @param {Date} replyToc 回复的发表时间
+*   @param {String} replyTime 格式化后的回复发表时间
+*   @param {String} replyUrl 回复页链接
+*   @param {String} replyContent 回复内容摘要
+*   @param {String} replyUsername 回复内容作者用户名
+*   @param {String} replyUid 回复内容作者用户UID
+*   @param {String} replyAvatarUrl 回复内容作者头像链接
+*   @param {String} replyUserHome 回复内容作者个人主页链接
+*
+* */
 postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
   const PostModel = mongoose.model('posts');
   const UserModel = mongoose.model('users');
@@ -1972,6 +2004,7 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
     recycleMark: 1,
     oc: 1,
     tid: 1,
+    uid: 1,
   });
   let threadsOC = [];
   const threadsObj = {};
@@ -1980,11 +2013,14 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
       threadsOC.push(thread.oc);
     }
     threadsObj[thread.tid] = thread;
+    usersId.push(thread.uid);
   }
   let threadFirstPosts = await PostModel.find({pid: {$in: threadsOC}}, {
     pid: 1,
     tid: 1,
     t: 1,
+    toc: 1,
+    uid: 1,
     cover: 1,
     c: 1,
   });
@@ -2001,7 +2037,6 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
       tid,
       pid,
       type,
-      uid: postUid,
       mainForumsId = [], disabled, toDraft} = post;
     const thread = threadsObj[tid];
     const result = {
@@ -2018,7 +2053,6 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
       result.status = 'disabled';
       result.statusInfo = '内容已屏蔽';
     } else {
-      const user = usersObj[postUid];
       let threadPost;
       let targetPost;
       if(type === 'post') {
@@ -2029,30 +2063,34 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
         }
       }
       threadPost = threadPost || post;
-
-      let toc;
-      let replyContent;
-      let replyUrl;
-      if(targetPost) { // 回复或评论
-        toc = targetPost.toc;
-        replyContent = nkcRender.replaceLink(nkcRender.htmlToPlain(targetPost.c, 200));
-        replyUrl = getUrl('post', targetPost.pid);
-      } else { // 文章
-        toc = threadPost.toc;
-      }
+      const user = usersObj[threadPost.uid];
+      if(!user) continue;
+      // 文章相关
       result.title = nkcRender.replaceLink(threadPost.t);
       result.content = nkcRender.replaceLink(nkcRender.htmlToPlain(threadPost.c, 200));
       result.coverUrl = threadPost.cover? getUrl('postCover', threadPost.cover): '';
       result.username = user.username;
-      result.uid = postUid;
+      result.uid = user.uid;
       result.avatarUrl = getUrl('userAvatar', user.avatar);
-      result.userHome = getUrl('userHome', postUid);
-      result.time = timeFormat(toc);
-      result.toc = toc;
+      result.userHome = getUrl('userHome', user.uid);
+      result.time = timeFormat(threadPost.toc);
+      result.toc = threadPost.toc;
       result.articleId = pid;
       result.url = getUrl('thread', threadPost.tid);
-      result.replyUrl = replyUrl;
-      result.replyContent = replyContent;
+      // 回复，评论相关
+      if(targetPost) {
+        const targetUser = usersObj[targetPost.uid];
+        if(!targetUser) continue;
+        result.replyId = targetPost.pid;
+        result.replyToc = targetPost.toc;
+        result.replyTime = timeFormat(targetPost.toc);
+        result.replyUrl = getUrl('post', targetPost.pid);
+        result.replyContent = nkcRender.replaceLink(nkcRender.htmlToPlain(targetPost.c, 200));
+        result.replyUsername = targetUser.username;
+        result.replyUid = targetUser.uid;
+        result.replyAvatarUrl = getUrl('userAvatar', targetUser.avatar);
+        result.replyUserHome = getUrl('userHome', targetUser.uid);
+      }
     }
     results[pid] = result;
   }
