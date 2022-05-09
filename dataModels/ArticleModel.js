@@ -572,7 +572,7 @@ schema.methods.publishArticle = async function(options) {
   let articleUrl;
 
   const {article: documentSource} = await DocumentModel.getDocumentSources();
-  const {default: defaultStatus} = await ArticleModel.getArticleStatus();
+  const {normal: normalStatus} = await ArticleModel.getArticleStatus();
   const stableDocument = await DocumentModel.getStableDocumentBySource(documentSource, articleId);
   const isModify = !!stableDocument;
 
@@ -599,10 +599,10 @@ schema.methods.publishArticle = async function(options) {
     }
   });
   await DocumentModel.publishDocumentByDid(did);
-
+  const newArticle = await ArticleModel.findOnly({_id: this._id});
   //如果发布的article不需要审核，并且不存在该文章的动态时就为该文章创建一条新的动态
   //不需要审核的文章状态不为默认状态
-  if(!isModify && !this.status !== defaultStatus) {
+  if(!isModify && newArticle.status === normalStatus) {
     MomentModel.createQuoteMomentAndPublish({
       uid,
       quoteType: articleQuoteType,
