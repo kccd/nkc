@@ -424,12 +424,27 @@ schema.statics.createArticle = async (props) => {
   await article.save();
   return article;
 }
+/*
+* 获取编辑版封面图ID
+* @return {String}
+* */
 schema.methods.getBetaDocumentCoverId = async function() {
   const DocumentModel = mongoose.model('documents');
   const {article: documentSource} = await DocumentModel.getDocumentSources();
   const betaDocument = await DocumentModel.getBetaDocumentBySource(documentSource, this._id);
   return betaDocument? betaDocument.cover: '';
 };
+
+/*
+* 获取正式版封面图ID
+* @return {String}
+* */
+schema.methods.getStableDocumentCoverId = async function() {
+  const DocumentModel = mongoose.model('documents');
+  const {article: documentSource} = await DocumentModel.getDocumentSources();
+  const stableDocument = await DocumentModel.getStableDocumentBySource(documentSource, this._id);
+  return stableDocument? stableDocument.cover: '';
+}
 
 /*
 * 删除文章的草稿
