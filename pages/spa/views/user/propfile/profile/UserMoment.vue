@@ -1,5 +1,5 @@
 <template lang="pug">
-  .user-moment
+  .user-moment.p-t-1
     paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
     .user-list-warning(v-if="!momentsData && loading") 加载中~
     .moment-list(v-else)
