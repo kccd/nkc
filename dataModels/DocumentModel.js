@@ -285,7 +285,6 @@ schema.statics.createBetaDocument = async (props) => {
     toc,
     source,
     sid,
-    reviewed = false,
     ip,
     port
   } = props;
@@ -316,7 +315,6 @@ schema.statics.createBetaDocument = async (props) => {
     type: (await DocumentModel.getDocumentTypes()).beta,
     source,
     sid,
-    reviewed,
     ip: await IPModel.saveIPAndGetToken(ip),
     port
   });

@@ -1,7 +1,7 @@
 <template lang="pug">
   .user-post
     to-column(ref="toColumn")
-    blank(v-if="(!posts || posts.length === 0) && !loading")
+
     .user-post-list
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
       .paging-button(v-if="routeName === 'thread' && permissions.reviewed" )
@@ -9,7 +9,8 @@
         span.post-management-button
           a.pointer.button(@click="selectAll()") 全选
           a.pointer.button.radius-right(@click="toColumn()") 推送到专栏
-      .user-list-warning(v-if="posts.length === 0") 加载中~
+      blank(v-if="(!posts || posts.length === 0) && !loading")
+      .user-list-warning(v-if="loading") 加载中~
       .post-item(v-for="(post, index) in posts")
         hr(v-if="index")
         review(ref="review" :post="post" :permissions="permissions" @refresh="refreshPage" v-if="!post.reviewed")
@@ -113,11 +114,11 @@ export default {
           self.paging = res.paging;
           self.posts = res.posts;
           self.permissions = res.permissions;
-          self.loading = false;
         })
         .catch(err => {
           sweetError(err);
         })
+      self.loading = false;
     },
     //刷新当前页面
     refreshPage() {

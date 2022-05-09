@@ -236,7 +236,7 @@ router
       if(delType && !documentStatus[delType]) ctx.throw(400, '状态错误');
       const document = await db.DocumentModel.findOne({_id: docId});
       if(!document) ctx.throw(404, `未找到_ID为 ${docId}的文档`);
-      if(document.reviewed) ctx.throw(400, '内容已经审核, 请刷新后重试');
+      if(document.status !== unknownStatus) ctx.throw(400, '内容已经审核, 请刷新后重试');
       const targetUser = await db.UserModel.findOne({uid: document.uid});
       if(pass) {
         //将document状态改为已审核状态
@@ -264,6 +264,11 @@ router
           passType = "documentPassReview";
         } else if(document.source === 'comment') {
           passType = "commentPassReview";
+          //如果审核的内容是comment,就通知文章作者文章被评论
+          const comment = await db.CommentModel.findOnly({_id: document.sid});
+          if(comment.status === normalStatus) {
+            await comment.noticeAuthorComment();
+          }
         } else if(document.source === 'moment') {
           passType = "momentPass";
         }

@@ -26,6 +26,11 @@
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
 </template>
 <style lang="less" scoped>
+.loading {
+  margin-top: 5rem;
+  margin-bottom: 5rem;
+  text-align: center;
+}
 .user-column-thread{
   a{
     cursor: pointer;

@@ -86,6 +86,18 @@ module.exports = {
     },
     {
       parameters: [
+        "userURL",
+        "username",
+        "articleURL",
+        "articleTitle",
+        "commentURL",
+        "commentContent"
+      ],
+      content: "用户[url=userURL(username)]在您的文章/回复[url=articleURL(articleTitle)]下发表了回复/评论，[url=commentURL(点击查看)]（可能因审核等原因延期显示）。  \n以下是回复/评论内容：[text=commentContent]",
+      type: "replyArticle"
+    },
+    {
+      parameters: [
         "reason",
         "threadTitle",
         "threadURL",

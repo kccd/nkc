@@ -3,7 +3,7 @@
   mixin articleBody
     .moment-quote-body-article
       .moment-quote-reply-abstract(v-if="quoteData.data.replyContent")
-        a(:href="quoteData.data.replyUrl" target="_blank") {{quoteData.data.replyContent}}
+        a(:href="quoteData.data.replyUrl || quoteData.data.url" target="_blank") {{quoteData.data.replyContent}}
       .moment-quote-header.hidden-md.hidden-lg(v-if="showThreadHeader")
         +threadHeader
       .moment-quote-title
