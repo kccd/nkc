@@ -1,5 +1,7 @@
 const mongoose = require('../settings/database');
 const {htmlToPlain} = require("../nkcModules/nkcRender");
+const nkcRender = require("../nkcModules/nkcRender");
+const {getUrl} = require("../nkcModules/tools");
 const commentSource = {
         article: 'article',
         book: 'book'
@@ -814,6 +816,55 @@ schema.statics.getCommentsObjectByCommentsId = async function(commentsId) {
     commentsObj[comment._id] = comment;
   }
   return commentsObj;
+}
+
+/*
+* 通过commentId获取comment
+* @params {Array} commentId 需要获取的评论的Id
+* */
+schema.statics.getCommentsByCommentsId = async function (commentsId, uid) {
+  const CommentModel = mongoose.model('comments');
+  const ArticleModel = mongoose.model('articles');
+  const UserModel = mongoose.model('users');
+  const ArticlePostModel = mongoose.model('articlePosts');
+  //查找出评论
+  let comments = await CommentModel.find({
+    _id: {$in: commentsId},
+  });
+  comments = await CommentModel.getCommentInfo(comments);
+  const usersId = [];
+  const articlesId = [];
+  const articlePostsId = [];
+  for(const comment of comments) {
+    usersId.push(comment.uid);
+    articlePostsId.push(comment.sid);
+  }
+  const userObj = await UserModel.getUsersObjectByUsersId(usersId);
+  //查找出独立文章评论盒子
+  const articlePosts = await ArticlePostModel.find({_id: {$in: articlePostsId}});
+  for(const a of articlePosts) {
+    articlesId.push(a.sid);
+  }
+  const articles = await ArticleModel.find({_id: {$in: articlesId}});
+  // console.log('comments', comments);
+  const results = {};
+  for(const comment of comments) {
+    const {
+      status,
+      did,
+      _id,
+      commentDocument,
+      articleDocument,
+      url
+    } = comment;
+    const {content: commentContent} = commentDocument;
+    const {content: articleContent, title, cover} = articleDocument;
+    results[comment._id] = {
+      title: nkcRender.replaceLink(title),
+      content: nkcRender.replaceLink(nkcRender.htmlToPlain(articleContent, 200)),
+      coverUrl: cover? getUrl('postCover', cover): '',
+    }
+  }
 }
 
 module.exports = mongoose.model('comments', schema);
