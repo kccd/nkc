@@ -308,7 +308,7 @@
         const remoteImages = [];
         for(let i = 0; i < images.length; i++) {
           const imageJQ = images.eq(i);
-          if(imageJQ.attr('data-type') === 'nkcsource') continue;
+          if(imageJQ.attr('data-tag') === 'nkcsource') continue;
           const src = imageJQ.attr('src');
           if(isSameDomain(src)) continue;
           remoteImages.push([imageJQ, src]);
