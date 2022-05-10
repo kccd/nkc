@@ -3,7 +3,7 @@ const router = require('koa-router')();
 router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
   const {pageSettings, uid} = state;
-  const {page = 0, last_page, highlight, t, test, did, redirect} = query;
+  const {page = 0, highlight, t} = query;
   ctx.template = 'columns/article.pug';
   const { user } = data;
   const {_id, aid} = params;
@@ -46,10 +46,10 @@ router.get('/:aid', async (ctx, next)=>{
       if(permission('review')) {
         permissions.reviewed = true;
       } else {
-        match.$or = [
-          {status: commentStatus},
-          {uid}
-        ];
+        // match.$or = [
+        //   {status: commentStatus},
+        //   {uid}
+        // ];
       }
       //是否收藏文章
       const collection = await db.SubscribeModel.findOne({cancel: false, uid: data.user.uid, tid: article._id, type: "article"});
@@ -66,7 +66,7 @@ router.get('/:aid', async (ctx, next)=>{
     if(articlePost) {
       count = await db.CommentModel.countDocuments(match);
     }
-    const paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
+    const paging = nkcModules.apiFunction.paging(page, count, 30);
     data.paging = paging;
     //获取该文章下当前用户编辑了未发布的评论内容 必须通过专栏评论盒子去查找评论，如果没有评论盒子评论就为空
     let comment = null;
@@ -79,6 +79,7 @@ router.get('/:aid', async (ctx, next)=>{
         sid: articlePost._id
       };
       comment = await db.CommentModel.getCommentsByArticleId({match: m});
+      //查找出文章下的所有评论
       comments = await db.CommentModel.getCommentsByArticleId({match, paging});
     }
     if(comments && comments.length !== 0) {
@@ -95,21 +96,6 @@ router.get('/:aid', async (ctx, next)=>{
     data.permissions = permissions;
     data.originUrl = state.url;//楼号a标签的href固定值+xxx
     data.comments = comments || [];
-    //楼层高亮显示跳转
-    var url = null
-    if(did){
-      const commentDid = comments.map(comment => comment.did);
-      const step = commentDid.indexOf(did);
-      if(step === -1) {
-        url = state.url;
-      }else {
-        url = `${state.url}?page=${page}&highlight=${did}#highlight`;
-      }
-
-      if(redirect === 'true'){
-        return ctx.redirect(url);
-      }
-    }
     //文章浏览数加一
     await article.addArticleHits();
   } else if(columnPostData.type === thread) {

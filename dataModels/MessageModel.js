@@ -577,7 +577,7 @@ messageSchema.statics.getParametersData = async (message) => {
       username: user.username,
       articleURL: comment.url,
       articleTitle: articleDocument.title,
-      commentURL: '',
+      commentURL: await CommentModel.getLocationUrl(comment._id),
       commentContent: apiFunction.obtainPureText(commentDocument.content),
     };
     
@@ -599,7 +599,7 @@ messageSchema.statics.getParametersData = async (message) => {
       username: user.username,
       articleURL: comment.url,
       articleTitle: articleDocument.title,
-      commentURL: '',
+      commentURL: await CommentModel.getLocationUrl(comment._id),
       commentContent: apiFunction.obtainPureText(commentDocument.content),
     };
   

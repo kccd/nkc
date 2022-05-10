@@ -178,6 +178,7 @@
         .catch(err => {
           self.setSavedStatus('failed');
           self.lockPost = false;
+          self.publishing = false;
           sweetError(err);
         })
       },

@@ -146,7 +146,7 @@ export default {
       this.lockPost = true;
       const self = this;
       self.setSavedStatus('saving');
-      return nkcAPI('/comment', 'POST', {
+      nkcAPI('/comment', 'POST', {
         content: self.commentContent,
         type,
         source: self.comment.source,
@@ -159,13 +159,15 @@ export default {
           if(type !== 'publish') {
             self.lockPost = false;
             self.type = 'modify';
+            if(type === 'save') sweetSuccess('保存成功');
           } else {
             self.contentChangeEventFlag = false;
             self.lockPost = false;
+            sweetSuccess('提交成功');
             //提交成功后关闭评论编辑器
             self.close();
           }
-          self.setSavedStatus('succeeded');
+          return self.setSavedStatus('succeeded');
         })
         .catch(err => {
           self.lockPost = false;
@@ -175,17 +177,11 @@ export default {
     },
     //提交正式版评论
     publishComment() {
-      this.post('publish')
-      .then(() => {
-        sweetSuccess('提交成功！');
-      });
+      this.post('publish');
     },
     //暂存评论
     saveComment() {
-      this.post('save')
-      .then(() => {
-        sweetSuccess('保存成功！');
-      });
+      this.post('save');
     }
   }
 }
