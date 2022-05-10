@@ -1005,7 +1005,7 @@ settingSchema.statics.getManagementData = async (user) => {
     const m = {
       status: (await DocumentModel.getDocumentStatus()).unknown,
       type: (await DocumentModel.getDocumentTypes()).stable,
-      source: (await DocumentModel.getDocumentSources()).article,
+      // source: (await DocumentModel.getDocumentSources()).article,
     }
     if(!await user.hasPermission("superModerator")) {
       const forums = await ForumModel.find({moderators: user.uid}, {fid: 1});
@@ -1025,6 +1025,7 @@ settingSchema.statics.getManagementData = async (user) => {
         count++;
       }
     });
+    //获取需要审核的document数量
     count += await DocumentModel.countDocuments(m);
     results.push({
       name: '内容审核',

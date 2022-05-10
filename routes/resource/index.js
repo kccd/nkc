@@ -286,6 +286,7 @@ resourceRouter
       del = false;
     }
     await db.ResourceModel.updateMany({rid: {$in: resources}}, {del});
+    await ctx.nkcModules.socket.sendResourcesMessage(ctx.state.uid);
     await next();
   })
   .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods())

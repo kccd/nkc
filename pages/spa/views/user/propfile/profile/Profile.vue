@@ -1,6 +1,6 @@
 <template lang="pug">
   .div
-    .paging-button
+    .paging-button(v-if="t !== 'moment' && t !== 'column'")
       //a.radius-left.button(@click="toRoute('moment')" :class="t === 'moment'?'active':''") 动态
       a.button(@click="toRoute('post')" :class="t === 'post'?'active':''" v-if="t ==='post' || t === 'thread'") 回复
       a.button(@click="toRoute('thread')" :class="t === 'thread'?'active':''" v-if="t ==='post' || t === 'thread'") 文章
