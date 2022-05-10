@@ -11,6 +11,10 @@ const shopOrdersSchema = new Schema({
     index: 1,
     required: true
   },
+  freightName: {
+    type: String,
+    default: '',
+  },
   // 商品id
   // productId: {
   //   type: String,

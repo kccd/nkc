@@ -3,10 +3,11 @@ const router = require('koa-router')();
 router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
   const {pageSettings, uid} = state;
-  const {page = 0, last_page, highlight, t, test} = query;
+  const {page = 0, last_page, highlight, t, test, did, redirect} = query;
   ctx.template = 'columns/article.pug';
   const { user } = data;
   const {_id, aid} = params;
+  data.highlight = highlight;
   let xsf = user ? user.xsf : 0;
   let columnPostData = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid, xsf);
   data.columnPost = columnPostData;
@@ -92,7 +93,23 @@ router.get('/:aid', async (ctx, next)=>{
     }
     data.article = _article;
     data.permissions = permissions;
+    data.originUrl = state.url;//楼号a标签的href固定值+xxx
     data.comments = comments || [];
+    //楼层高亮显示跳转
+    var url = null
+    if(did){
+      const commentDid = comments.map(comment => comment.did);
+      const step = commentDid.indexOf(did);
+      if(step === -1) {
+        url = state.url;
+      }else {
+        url = `${state.url}?page=${page}&highlight=${did}#highlight`;
+      }
+
+      if(redirect === 'true'){
+        return ctx.redirect(url);
+      }
+    }
     //文章浏览数加一
     await article.addArticleHits();
   } else if(columnPostData.type === thread) {

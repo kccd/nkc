@@ -519,7 +519,7 @@ async function sendMessageToUser(messageId, localId) {
       'STE': 'systemInfo',
       'newFriends': 'newFriends'
     };
-    await db.CreatedChatModel.createDefaultChat(messageTypes[ty], r);
+    await CreatedChatModel.createDefaultChat(messageTypes[ty], r);
   }
   socketClient.sendMessage(socketServiceName, {
     eventName: 'receiveMessage',
