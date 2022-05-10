@@ -170,6 +170,12 @@ block name
             //-     button#editTrackNum(onclick=`editTrackNum()`) 修改
             //-     button#saveTrackNum(onclick=`saveTrackNum(${order.sellUid}, ${order.orderId})` style="display:none;") 保存
           p
+            span.infoCaption 运单公司：
+            if order.trackName
+              span.infoListLiDd-noneWidth#trakcNumText!=`${order.trackName}`
+            else
+              span.infoListLiDd-noneWidth#trakcNumText 暂无物流信息
+          p
             span.infoCaption 运费模板：
             if order.freightName
               span.infoListLiDd-noneWidth#trakcNumText!=`${order.freightName}`
