@@ -8,21 +8,21 @@
         .editor-main-forum-avatar(
           :style="'background-color: ' + mainForum.color",
           v-if="!mainForum.logo",
-          data-global-mouseover="showUserPanel"
-          data-global-mouseout="hideUserPanel"
+          data-global-mouseover="showForumPanel"
+          data-global-mouseout="hideForumPanel"
           :data-global-data="objToStr({fid: mainForum.fid})"
         )
         img.editor-main-forum-avatar(
           :src="setUrl('forumLogo', mainForum.logo)",
           v-else,
-          data-global-mouseover="showUserPanel"
-          data-global-mouseout="hideUserPanel"
+          data-global-mouseover="showForumPanel"
+          data-global-mouseout="hideForumPanel"
           :data-global-data="objToStr({fid: mainForum.fid})"
         )
         .editor-main-forum-name
           span(
-            data-global-mouseover="showUserPanel"
-            data-global-mouseout="hideUserPanel"
+            data-global-mouseover="showForumPanel"
+            data-global-mouseout="hideForumPanel"
             :data-global-data="objToStr({fid: mainForum.fid})"
           ) {{ mainForum.fName }}
           | :
