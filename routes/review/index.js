@@ -264,7 +264,7 @@ router
           passType = "documentPassReview";
         } else if(document.source === 'comment') {
           passType = "commentPassReview";
-          //如果审核的内容是comment,就通知文章作者文章被评论
+          //如果审核的内容是comment,并且是第一次审核，即判断document的状态是否为unknown,就通知文章作者文章被评论
           const comment = await db.CommentModel.findOnly({_id: document.sid});
           if(comment.status === normalStatus) {
             await comment.noticeAuthorComment();
@@ -319,7 +319,7 @@ router
         } else if(document.source === 'moment') {
           messageType = 'momentDelete';
         }
-        message = await db.MessageModel({
+        message = db.MessageModel({
           _id: await db.SettingModel.operateSystemID("messages", 1),
           r: document.uid,
           ty: "STU",
@@ -335,6 +335,7 @@ router
     }
     if(message) {
       await message.save();
+      //通过socket通知作者
       await ctx.nkcModules.socket.sendMessageToUser(message._id);
     }
     await next();

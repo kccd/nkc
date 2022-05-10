@@ -1,5 +1,4 @@
 const mongoose = require('../settings/database');
-const nkcRender = require("../nkcModules/nkcRender");
 const commentSource = {
         article: 'article',
         book: 'book'
@@ -510,6 +509,7 @@ schema.methods.extendEditorComment = async function() {
   const CommentModel = mongoose.model('comments');
   const UserModel = mongoose.model('users');
   const {timeFormat, getUrl} = require('../nkcModules/tools');
+  const {htmlToPlain} = require("../nkcModules/nkcRender");
   const {comment: commentSource} = await DocumentModel.getDocumentSources();
   const {beta: betaType, stable: stableType} = await DocumentModel.getDocumentTypes();
   const {did, _id, toc, uid, sid} = this;
@@ -915,30 +915,69 @@ schema.statics.getCommentsByCommentsId = async function (commentsId, uid) {
 }
 
 /*
-* 通知文章作者文章被评论了
-* @params {}
+* 通知文章作者文章被评论了,如果回复存在引用就通知被引用回复的作者回复被引用了
 * */
 schema.methods.noticeAuthorComment = async function() {
   const CommentModel = mongoose.model('comments');
   const MessageModel = mongoose.model('messages');
   const SettingModel = mongoose.model('settings');
+  const DocumentModel = mongoose.model('documents');
+  const socket = require('../nkcModules/socket');
   const commentInfo = await CommentModel.getCommentInfo([this]);
   const {status, commentDocument, articleDocument} = commentInfo[0];
   const {normal: normalStatus} = await CommentModel.getCommentStatus();
-  //如果评论状态不正常或者评论的作者和文章作者为同一人时不需要通知
-  if(status !== normalStatus) return;
-  if(commentDocument.uid === articleDocument.uid) return;
-  //创建一条新的消息
-  const message = await MessageModel({
-    _id: await SettingModel.operateSystemID("messages", 1),
-    r: articleDocument.uid,
-    ty: "STU",
-    c: {
-      type: 'replyArticle',
-      docId: commentDocument._id,
-    }
-  });
-  await message.save();
+  Promise.resolve()
+    .then(async () => {
+      //如果评论状态不正常或者评论的作者和文章作者为同一人时不需要通知
+      if(status !== normalStatus) return;
+      if(commentDocument.uid === articleDocument.uid) return;
+      //去通知文章作者文章被回复
+      //创建一条新的消息
+      const message = MessageModel({
+        _id: await SettingModel.operateSystemID("messages", 1),
+        r: articleDocument.uid,
+        ty: "STU",
+        c: {
+          type: 'replyArticle',
+          docId: commentDocument._id,
+          quoteDid: commentDocument.quoteDid,
+        }
+      });
+      await message.save();
+      //通过socket通知作者
+      await socket.sendMessageToUser(message._id);
+      return;
+    })
+    .then(async () => {
+      //判断回复内容中是否存在引用，存在就去通知被引用回复的作者
+      if(commentDocument.quoteDid) {
+        //获取被引用回复的信息
+        const quoteDocument = await DocumentModel.findOnly({_id: commentDocument.quoteDid});
+        if (!quoteDocument) return console.log('未找到评论引用信息document');
+        const quoteComment = await CommentModel.findOnly({_id: quoteDocument.sid});
+        if (!quoteComment) return console.log('未找到评论引用信息comment');
+        const quoteInfo = (await CommentModel.getCommentInfo([quoteComment]))[0];
+        if (!quoteInfo) return console.log('未找到评论引用信息');
+        //通知被引用作者
+        const quoteMessage = MessageModel({
+          _id: await SettingModel.operateSystemID("messages", 1),
+          r: quoteInfo.commentDocument.uid,
+          ty: "STU",
+          c: {
+            type: 'replyComment',
+            docId: commentDocument._id,
+            quoteDid: commentDocument.quoteDid,
+          }
+        });
+        await quoteMessage.save();
+        //通过socket通知作者
+        return await socket.sendMessageToUser(quoteMessage._id);
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    })
+    
 }
 
 module.exports = mongoose.model('comments', schema);
