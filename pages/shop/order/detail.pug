@@ -168,19 +168,19 @@ block shopAccountContent
           p
             span.infoCaption 运单编号：
             if order.trackNumber
-              span.infoListLiDd!=`${order.trackNumber}`
+              span.infoListLiDd=`${order.trackNumber}`
             else
               span.infoListLiDd 暂无物流信息
           p
-            span.infoCaption 运单公司：
+            span.infoCaption 快递名称：
             if order.trackName
-              span.infoListLiDd!=`${order.trackName}`
+              span.infoListLiDd=`${order.trackName}`
             else
               span.infoListLiDd 暂无物流信息
-          p
+          //-p
             span.infoCaption 运费模板：
             if order.freightName
-              span.infoListLiDd-noneWidth#trakcNumText!=`${order.freightName}`
+              span.infoListLiDd-noneWidth#trakcNumText=`${order.freightName}`
             else
               span.infoListLiDd-noneWidth#trakcNumText 暂无物流信息
 
