@@ -95,7 +95,6 @@ router.get('/:aid', async (ctx, next)=>{
     data.permissions = permissions;
     data.originUrl = state.url;//楼号a标签的href固定值+xxx
     data.comments = comments || [];
-    console.log(comments)
     //楼层高亮显示跳转
     var url = null
     if(did){
