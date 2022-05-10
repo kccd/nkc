@@ -100,9 +100,12 @@ router.get('/:aid', async (ctx, next)=>{
     if(did){
       const commentDid = comments.map(comment => comment.did);
       const step = commentDid.indexOf(did);
-      if(step === -1) url = state.url;
-      let perpage = pageSettings.homeThreadList;
-      url = `${state.url}?page=${page}&highlight=${did}#highlight`;
+      if(step === -1) {
+        url = state.url;
+      }else {
+        url = `${state.url}?page=${page}&highlight=${did}#highlight`;
+      }
+
       if(redirect === 'true'){
         return ctx.redirect(url);
       }
