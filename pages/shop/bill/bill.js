@@ -221,7 +221,6 @@ const app = new Vue({
             })
             body.params.push(r);
           });
-          console.log(body);
           return nkcAPI("/shop/order", "POST", body);
         })
         .then(data => {
