@@ -822,8 +822,6 @@ threadRouter
 		// await db.UsersScoreLogModel.insertLog(obj);
 
 		if(!_post.hasQuote && thread.uid !== user.uid && postType !== "comment") {
-      // 审核通过添加记录
-      if(_post.reviewed) {
         const messageId = await db.SettingModel.operateSystemID('messages', 1);
         const message = await db.MessageModel({
           _id: messageId,
@@ -837,7 +835,6 @@ threadRouter
         });
         await message.save();
         await ctx.nkcModules.socket.sendMessageToUser(message._id);
-      }
 		}
 		await thread.updateOne({$inc: [{count: 1}, {hits: 1}]});
 		const type = ctx.request.accepts('json', 'html');
@@ -855,8 +852,6 @@ threadRouter
       if(comment.parentPostId) {
         comment.parentPost = await db.PostModel.findOnly({pid: comment.parentPostId});
         if(comment.parentPost.uid !== data.user.uid) {
-          // 审核通过添加记录
-          if(_post.reviewed) {
             const message = await db.MessageModel({
               _id: await db.SettingModel.operateSystemID("messages", 1),
               r: comment.parentPost.uid,
@@ -870,7 +865,6 @@ threadRouter
             });
             await message.save();
             await ctx.nkcModules.socket.sendMessageToUser(message._id);
-          }
         }
         data.level1Comment = comment.parentPost.parentPostId === "";
         comment.parentPost = (await db.PostModel.extendPosts([comment.parentPost], extendPostOptions))[0];

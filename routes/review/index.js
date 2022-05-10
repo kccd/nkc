@@ -184,6 +184,7 @@ router
 
       if(!post) ctx.throw(404, `未找到ID为${pid}的post`);
       if(post.reviewed) ctx.throw(400, "内容已经被审核过了，请刷新");
+
       const forums = await db.ForumModel.find({fid: {$in: post.mainForumsId}});
       //自己的专业自己可以审核
       let isModerator = ctx.permission('superModerator');
@@ -220,10 +221,8 @@ router
       await thread.updateThreadMessage(false);
       //生成审核记录
       await db.ReviewModel.newReview(type, post, data.user);
-      // if (thread.reviewed) 去通知作者 关键是怎么知道post是被退修的 看退修路由怎么处理的
-      const _id = await db.SettingModel.operateSystemID("messages", 1);
       message = await db.MessageModel({
-        _id,
+        _id: await db.SettingModel.operateSystemID("messages", 1),
         r: post.uid,
         ty: "STU",
         c: {
@@ -231,21 +230,6 @@ router
           pid: post.pid
         }
       });
-      // toDraft === true 被退修 toDraft === false 被屏蔽
-      // 给文章作者推送通知
-      if (thread.reviewed && typeof post.toDraft !== 'boolean') {
-        const message = await db.MessageModel({
-          _id,
-          r: thread.uid,
-          ty: "STU",
-          c: {
-            type: "passReview",
-            pid: post.pid
-          }
-        });
-        await message.save();
-        await ctx.nkcModules.socket.sendMessageToUser(message._id);
-      }
     } else {
       const documentStatus = await db.ArticleModel.getArticleStatus();
       if(delType && !documentStatus[delType]) ctx.throw(400, '状态错误');
