@@ -3,10 +3,11 @@ const router = require('koa-router')();
 router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
   const {pageSettings, uid} = state;
-  const {page = 0, last_page, highlight, t, test} = query;
+  const {page = 0, highlight, t} = query;
   ctx.template = 'columns/article.pug';
   const { user } = data;
   const {_id, aid} = params;
+  data.highlight = highlight;
   let xsf = user ? user.xsf : 0;
   let columnPostData = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid, xsf);
   data.columnPost = columnPostData;
@@ -45,10 +46,10 @@ router.get('/:aid', async (ctx, next)=>{
       if(permission('review')) {
         permissions.reviewed = true;
       } else {
-        match.$or = [
-          {status: commentStatus},
-          {uid}
-        ];
+        // match.$or = [
+        //   {status: commentStatus},
+        //   {uid}
+        // ];
       }
       //是否收藏文章
       const collection = await db.SubscribeModel.findOne({cancel: false, uid: data.user.uid, tid: article._id, type: "article"});
@@ -65,7 +66,7 @@ router.get('/:aid', async (ctx, next)=>{
     if(articlePost) {
       count = await db.CommentModel.countDocuments(match);
     }
-    const paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
+    const paging = nkcModules.apiFunction.paging(page, count, 30);
     data.paging = paging;
     //获取该文章下当前用户编辑了未发布的评论内容 必须通过专栏评论盒子去查找评论，如果没有评论盒子评论就为空
     let comment = null;
@@ -78,6 +79,7 @@ router.get('/:aid', async (ctx, next)=>{
         sid: articlePost._id
       };
       comment = await db.CommentModel.getCommentsByArticleId({match: m});
+      //查找出文章下的所有评论
       comments = await db.CommentModel.getCommentsByArticleId({match, paging});
     }
     if(comments && comments.length !== 0) {
@@ -92,6 +94,7 @@ router.get('/:aid', async (ctx, next)=>{
     }
     data.article = _article;
     data.permissions = permissions;
+    data.originUrl = state.url;//楼号a标签的href固定值+xxx
     data.comments = comments || [];
     //文章浏览数加一
     await article.addArticleHits();

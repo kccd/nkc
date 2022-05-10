@@ -101,41 +101,41 @@ block shopAccountContent
           li.orderStatusLi
             span.fa.fa-exclamation-circle.orderCloseStatusMark
             span.orderStatusText 订单已关闭
-          li.orderPrompt 
+          li.orderPrompt
             span=data.refund.description
         else
-          if order.orderStatus == "unCost"          
+          if order.orderStatus == "unCost"
             li.orderStatusLi
               span.fa.fa-exclamation-circle.orderStatusMark
               span.orderStatusText 等待买家付款
-            li.orderPrompt 
+            li.orderPrompt
               a.btn.btn-default.btn-sm(href=`/shop/pay?ordersId=${order.orderId}`) 立即付款
-            li.orderPrompt 
+            li.orderPrompt
               a.btn.btn-default.btn-sm(href=`/shop/order/${order.orderId}/refund`) 取消订单
           if order.orderStatus == "unShip"
             li.orderStatusLi
               span.fa.fa-exclamation-circle.orderStatusMark
               span.orderStatusText 等待商家发货
-            li.orderPrompt 
+            li.orderPrompt
               span 申请退款请前往到
-              span 
+              span
                 a(href=`/shop/order`) 已买到的宝贝
           if order.orderStatus == "unSign"
             li.orderStatusLi
               span.fa.fa-exclamation-circle.orderStatusMark
               span.orderStatusText 商家已发货，等待买家确认收货
-            li.orderPrompt 
+            li.orderPrompt
               button(onclick=`comfirmReceipt(${order.orderId})`) 确认收货
-            li.orderPrompt 
+            li.orderPrompt
               span 申请退款请前往到
-              span 
+              span
                 a(href=`/shop/order`) 已买到的宝贝
-            li.orderPrompt 
+            li.orderPrompt
               if !order.trackNumber || order.trackNumber == "no"
                 span 该商品无需物流配送
               else
                 span 点击查看商品的
-                span 
+                span
                   a(href=`/shop/order/${order.orderId}/logistics` ) 物流信息
           if order.orderStatus == "finish"
             li.orderStatusLi
@@ -146,15 +146,15 @@ block shopAccountContent
               if order.params && order.params.length && order.params[0].product && order.params[0].product.tid
                 span ，请前往参与
                 a.orderStatusTextLink(href=`/t/${order.params[0].product.tid}`) 讨论
-            li.orderPrompt 
+            li.orderPrompt
               span 如果没有收到货，或收到货后出现问题，您可以
-              span 
+              span
                 a.orderStatusTextLink(href=`/u/${order.sellUid}`) 联系卖家
               span 协商解决
     .col-sm-12.col-md-12.col-xs-12
       .panel.panel-default
         .panel-body
-          h4.infoTitle 
+          h4.infoTitle
             span 订单信息
           p
             span.infoCaption 收货地址：
@@ -168,11 +168,23 @@ block shopAccountContent
           p
             span.infoCaption 运单编号：
             if order.trackNumber
-              span.infoListLiDd!=`${order.trackNumber}`
+              span.infoListLiDd=`${order.trackNumber}`
             else
               span.infoListLiDd 暂无物流信息
+          p
+            span.infoCaption 快递名称：
+            if order.trackName
+              span.infoListLiDd=`${order.trackName}`
+            else
+              span.infoListLiDd 暂无物流信息
+          //-p
+            span.infoCaption 运费模板：
+            if order.freightName
+              span.infoListLiDd-noneWidth#trakcNumText=`${order.freightName}`
+            else
+              span.infoListLiDd-noneWidth#trakcNumText 暂无物流信息
 
-          h4.infoTitle 
+          h4.infoTitle
             span 时间信息
           p
             span.infoCaption 创建时间:

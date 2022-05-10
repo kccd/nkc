@@ -221,7 +221,6 @@ router
       await thread.updateThreadMessage(false);
       //生成审核记录
       await db.ReviewModel.newReview(type, post, data.user);
-
       message = await db.MessageModel({
         _id: await db.SettingModel.operateSystemID("messages", 1),
         r: post.uid,
@@ -236,9 +235,9 @@ router
       if(delType && !documentStatus[delType]) ctx.throw(400, '状态错误');
       const document = await db.DocumentModel.findOne({_id: docId});
       if(!document) ctx.throw(404, `未找到_ID为 ${docId}的文档`);
-      if(document.reviewed) ctx.throw(400, '内容已经审核, 请刷新后重试');
       const targetUser = await db.UserModel.findOne({uid: document.uid});
       if(pass) {
+        if(document.status === normalStatus) ctx.throw(400, '内容已经审核, 请刷新后重试');
         //将document状态改为已审核状态
         await document.setStatus(normalStatus);
         //生成审核记录
@@ -264,6 +263,12 @@ router
           passType = "documentPassReview";
         } else if(document.source === 'comment') {
           passType = "commentPassReview";
+          //如果审核的内容是comment,并且是第一次审核，即判断document的状态是否为unknown,就通知文章作者文章被评论
+          const comment = await db.CommentModel.findOnly({_id: document.sid});
+          if(comment.status === normalStatus) {
+            //通知作者
+            await comment.noticeAuthorComment();
+          }
         } else if(document.source === 'moment') {
           passType = "momentPass";
         }
@@ -278,6 +283,7 @@ router
         })
         await document.sendMessageToAtUsers('article');
       } else {
+        if(document.status === delType) ctx.throw(400, '内容已经退修/禁用, 请刷新后重试');
         if(!delType) ctx.throw(400, '请选择审核状态');
         //将document状态改为已审核状态
         await document.setStatus(delType);
@@ -314,7 +320,7 @@ router
         } else if(document.source === 'moment') {
           messageType = 'momentDelete';
         }
-        message = await db.MessageModel({
+        message = db.MessageModel({
           _id: await db.SettingModel.operateSystemID("messages", 1),
           r: document.uid,
           ty: "STU",
@@ -330,6 +336,7 @@ router
     }
     if(message) {
       await message.save();
+      //通过socket通知作者
       await ctx.nkcModules.socket.sendMessageToUser(message._id);
     }
     await next();

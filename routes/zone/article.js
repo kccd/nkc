@@ -7,13 +7,16 @@ router
     const { aid } = params;
     const {pageSettings, uid} = state;
     const {user} = data;
-    const {page = 0, last_pages, highlight, t} = query;
+    const {page = 0, last_pages, highlight, t, did, redirect} = query;
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     let article = await db.ArticleModel.findOnly({_id: aid});
     //查找文章的评论盒子
     const articlePost = await db.ArticlePostModel.findOne({sid: article._id, source: article.source});
     // 获取空间文章需要显示的数据
     const articleRelatedContent = await db.ArticleModel.getZoneArticle(article._id);
+    //点击楼层高亮需要url和highlight值
+    data.originUrl = state.url
+    data.highlight = highlight;
     data.columnPost = articleRelatedContent;
     data.article = article;
     const isModerator = await article.isModerator(state.uid);
@@ -98,6 +101,21 @@ router
     data.permissions = permissions;
     data.isModerator =  isModerator;
     data.comments = comments || [];
+
+    //楼层高亮显示跳转实现的从定向
+    /*var url = null
+    if(did){
+      const commentDid = comments.map(comment => comment.did);
+      const step = commentDid.indexOf(did);
+      if(step === -1) {
+        url = state.url;
+      }else {
+        url = `${state.url}?page=${page}&highlight=${did}#highlight`;
+      }
+      if(redirect === 'true'){
+        return ctx.redirect(url);
+      }
+    }*/
     //文章浏览数加一
     await article.addArticleHits();
     await next();

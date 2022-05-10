@@ -127,7 +127,7 @@ router
       if(!productUser) ctx.throw(404, `卖家ID不正确，uid:${uid}`);
       const orderId = await db.SettingModel.operateSystemID("shopOrders", 1);
       const cartArr = [], costArr = [], certArr = [];
-      let orderFreightPrice = 0, orderPrice = 0;
+      let orderFreightPrice = 0, orderPrice = 0, freightName_= '';
       // 同一买家 生成一个订单
       checkString(buyMessage, {
         name: "买家留言",
@@ -139,6 +139,7 @@ router
           productId, productParams,
           certId, freightTotal, priceTotal, freightName
         } = productObj;
+        freightName_ = freightName
         const product = await db.ShopGoodsModel.findOne({productId});
         if(!product) ctx.throw(404, `商品ID错误，productId: ${productId}`);
         if(product.productStatus === "stopsale") {
@@ -216,6 +217,7 @@ router
           sellUid: productUser.uid,
           orderFreightPrice,
           orderPrice,
+          freightName: freightName_,
           receiveAddress: `${location} ${address}`,
           receiveName: username,
           receiveMobile: mobile,
@@ -390,7 +392,8 @@ router
         buyMessage: post[bill].message,
         buyUid: user.uid,
         count: bill.productCount,
-        orderPrice: productPrice
+        orderPrice: productPrice,
+        freightName: freightName_,
       });
       await order.save();
       // 拓展订单并减库存

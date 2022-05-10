@@ -4,7 +4,7 @@ var isNode = typeof window === 'undefined';
 
 var Tools = function() {
   var self = this;
-  self.getUrl = function(type, id, size) {
+  self.getUrl = function(type, id, size, id2, page) {
     var fileDomain;
     if(isNode) {
       fileDomain = require('../config/server').fileDomain;

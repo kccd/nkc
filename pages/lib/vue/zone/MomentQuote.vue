@@ -3,7 +3,7 @@
   mixin articleBody
     .moment-quote-body-article
       .moment-quote-reply-abstract(v-if="quoteData.data.replyContent")
-        a(:href="quoteData.data.replyUrl" target="_blank") {{quoteData.data.replyContent}}
+        a(:href="quoteData.data.replyUrl || quoteData.data.url" target="_blank") {{quoteData.data.replyContent}}
       .moment-quote-header.hidden-md.hidden-lg(v-if="showThreadHeader")
         +threadHeader
       .moment-quote-title
@@ -67,7 +67,7 @@
     .fa.fa-exclamation-circle
     span {{quoteData.data.statusInfo}}
   .moment-quote(v-else)
-    div(v-if="['article', 'post'].includes(quoteData.quoteType)")
+    div(v-if="['article', 'post', 'comment'].includes(quoteData.quoteType)")
       .moment-quote-header(v-if="showTopHeader")
         +topHeader
       .moment-quote-body

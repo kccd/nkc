@@ -338,7 +338,7 @@ window.app = new Vue({
           return nkcAPI("/shop/manage/shelf", "POST", {post:  body});
         })
         .then(data => {
-          self.$refs.shopEditor.removeNoticeEvent();
+          if (self.$refs.shopEditor) self.$refs.shopEditor.removeNoticeEvent();
           sweetSuccess("提交成功");
           self.submitting = false;
           self.showCloseInfo = false;

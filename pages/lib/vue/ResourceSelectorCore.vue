@@ -860,15 +860,19 @@ export default {
         if(data.state === "fileProcessFailed") {
           sweetError(`文件处理失败\n${data.err}`);
         }
-        self.getResourcesDebounce(0);
+        self.getResourcesDebounce(0, data.requestType);
       }
       socket.on("fileTransformProcess", this.socketEventListener);
+      socket.on('resources', this.socketEventListener);
+      socket.on('group', this.socketEventListener);
     },
     // 销毁注册的 socket 事件
     removeSocketEvent() {
       if(!this.socketEventListener) return;
       // 销毁事件
       socket.off('fileTransformProcess', this.socketEventListener);
+      socket.off('resources', this.socketEventListener);
+      socket.off('group', this.socketEventListener);
     },
     initDragUploadEvent() {
       const $dragDom = $(this.$refs.pasteContent);
@@ -1077,7 +1081,7 @@ export default {
       this.category = c;
       this.getResourcesDebounce(0);
     },
-    getResources: function(skip = 0) {
+    getResources: function(skip = 0, reqType = 'all') {
       this.loading = true;
       let {
         quota,
@@ -1088,18 +1092,24 @@ export default {
       //当选择资源时每页16个，否则为18个
       if(this.watchType === 'category') quota = 18;
       // quota 每页数据量 skip 第几页 resource Type '全部 已上传 未上传' category 资源类型
-      const url = `/me/media?quota=${quota}&skip=${skip}&type=${resourceType}&c=${category}&resourceCategories=${resourceCategories}&t=${Date.now()}`;
+      const url = `/me/media?quota=${quota}&skip=${skip}&type=${resourceType}&c=${category}&resourceCategories=${resourceCategories}&t=${Date.now()}&reqType=${reqType}`;
       const self = this;
       nkcAPI(url, "GET")
         .then(function(data) {
-          self.categories = data.categories;
-          self.sizeLimit = data.sizeLimit;
-          self.paging = data.paging;
-          self.count = data.count;
-          self.pageNumber = self.paging.page + 1;
-          self.resources = data.resources;
-          self.loading = false;
-          self.categoryLoading = false;
+          if (reqType === "resources" ) {
+            self.resources = data.resources;
+          }else if (reqType === "group") {
+            self.categories = data.categories;
+          }else {
+            self.categories = data.categories;
+            self.sizeLimit = data.sizeLimit;
+            self.paging = data.paging;
+            self.count = data.count;
+            self.pageNumber = self.paging.page + 1;
+            self.resources = data.resources;
+            self.loading = false;
+            self.categoryLoading = false;
+          }
           if(self.watchType === 'select') {
             if(self.callback) {
               self.callback();

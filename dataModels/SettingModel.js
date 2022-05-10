@@ -976,12 +976,13 @@ settingSchema.statics.getManagementData = async (user) => {
   const ComplaintModel = mongoose.model('complaints');
   const ProblemModel = mongoose.model('problems');
   const results = [];
-  
+
   if(await user.hasPermission('nkcManagement')) {
     results.push({
       name: '前台管理',
       url: '/nkc',
       icon: 'ft-layers',
+      webIcon: 'fa-cogs',
       count: 0,
     });
   }
@@ -990,6 +991,7 @@ settingSchema.statics.getManagementData = async (user) => {
       name: '后台管理',
       url: '/e',
       icon: 'i-server',
+      webIcon: 'fa-cogs',
       count: 0
     });
   }
@@ -1003,7 +1005,7 @@ settingSchema.statics.getManagementData = async (user) => {
     const m = {
       status: (await DocumentModel.getDocumentStatus()).unknown,
       type: (await DocumentModel.getDocumentTypes()).stable,
-      source: (await DocumentModel.getDocumentSources()).article,
+      // source: (await DocumentModel.getDocumentSources()).article,
     }
     if(!await user.hasPermission("superModerator")) {
       const forums = await ForumModel.find({moderators: user.uid}, {fid: 1});
@@ -1023,11 +1025,13 @@ settingSchema.statics.getManagementData = async (user) => {
         count++;
       }
     });
+    //获取需要审核的document数量
     count += await DocumentModel.countDocuments(m);
     results.push({
       name: '内容审核',
       url: '/review',
       icon: 'fs-preview',
+      webIcon: 'fa-shield',
       count
     });
   }
@@ -1036,6 +1040,7 @@ settingSchema.statics.getManagementData = async (user) => {
       name: '投诉列表',
       url: '/complaint',
       icon: 'ft-alert-triangle',
+      webIcon: 'fa-minus-circle',
       count: await ComplaintModel.countDocuments({resolved: false})
     });
   }
@@ -1044,6 +1049,7 @@ settingSchema.statics.getManagementData = async (user) => {
       name: '问题列表',
       url: '/problem/list',
       icon: 'e-new',
+      webIcon: 'fa-exclamation-circle',
       count: await ProblemModel.countDocuments({resolved: false}),
     });
   }
@@ -1052,6 +1058,7 @@ settingSchema.statics.getManagementData = async (user) => {
       name: '文库记录',
       url: '/libraries/logs',
       icon: 'i-library',
+      webIcon: 'fa-book',
       count: 0
     });
   }

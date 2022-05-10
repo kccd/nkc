@@ -1,5 +1,5 @@
 <template lang="pug">
-  .user-column-thread
+  .user-column-thread.p-t-1
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     .loading(v-if="loading") 加载中~
     blank(v-else-if="threads && threads.length === 0")
@@ -26,6 +26,11 @@
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
 </template>
 <style lang="less" scoped>
+.loading {
+  margin-top: 5rem;
+  margin-bottom: 5rem;
+  text-align: center;
+}
 .user-column-thread{
   a{
     cursor: pointer;
