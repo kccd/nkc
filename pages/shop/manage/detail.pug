@@ -100,24 +100,24 @@ block name
           li.orderStatusLi
             span.fa.fa-exclamation-circle.orderCloseStatusMark
             span.orderStatusText 订单已关闭
-          li.orderPrompt 
+          li.orderPrompt
             if data.refund
               span=data.refund.description
         else
-          if order.orderStatus == "unCost"          
+          if order.orderStatus == "unCost"
             li.orderStatusLi
               span.fa.fa-exclamation-circle.orderStatusMark
               span.orderStatusText 等待买家付款
-            li.orderPrompt 
+            li.orderPrompt
               a(href=`/shop/manage/${data.user.uid}/order/cancel?orderId=${order.orderId}`) 取消订单
           if order.orderStatus == "unShip"
             li.orderStatusLi
               span.fa.fa-exclamation-circle.orderStatusMark
               span.orderStatusText 已付款，等待商家发货
-            li.orderPrompt 
-              span 
+            li.orderPrompt
+              span
                 button(onclick=`ship(${order.orderId})`) 发货
-            li.orderPrompt 
+            li.orderPrompt
               span 买家已付款，请尽快发货，否则买家有权申请退款
             li.orderPrompt
               span 如果无法发货，请及时与买家联系并说明情况
@@ -132,12 +132,12 @@ block name
                 span
                 button(onclick=`comfirmReceipt(${order.orderId})`) 提醒
               span 买家确认收货
-            li.orderPrompt 
+            li.orderPrompt
               if !order.trackNumber || order.trackNumber == "no"
                 span 该商品无须物流配送
               else
                 span 点击查看商品的
-                span 
+                span
                   a(onclick=`visitLogisticsInfo(${order.sellUid},${order.orderId})` style="cursor:pointer;") 物流信息
           if order.orderStatus == "finish"
             li.orderStatusLi
@@ -148,30 +148,35 @@ block name
     .col-sm-12.col-md-12.col-xs-12
       .panel.panel-default
         .panel-body
-          h4.infoTitle 
+          h4.infoTitle
             span 订单信息
           p
             span.infoCaption 收货地址：
             span.infoListLiDd!=`${order.receiveName}, ${order.receiveMobile}, ${order.receiveAddress}`
-          p 
+          p
             span.infoCaption 订单编号：
             span.infoListLiDd!=`${order.orderId}`
-          p 
+          p
             span.infoCaption 买家昵称：
             span.infoListLiDd!=`${order.buyUser.username}`
-          p 
+          p
             span.infoCaption 运单编号：
             if order.trackNumber
               span.infoListLiDd-noneWidth#trakcNumText!=`${order.trackNumber}`
             else
               span.infoListLiDd-noneWidth#trakcNumText 暂无物流信息
             //- if order.orderStatus == "unSign"
-            //-   span 
+            //-   span
             //-     button#editTrackNum(onclick=`editTrackNum()`) 修改
             //-     button#saveTrackNum(onclick=`saveTrackNum(${order.sellUid}, ${order.orderId})` style="display:none;") 保存
-                
+          p
+            span.infoCaption 运费模板：
+            if order.freightName
+              span.infoListLiDd-noneWidth#trakcNumText!=`${order.freightName}`
+            else
+              span.infoListLiDd-noneWidth#trakcNumText 暂无物流信息
 
-          h4.infoTitle 
+          h4.infoTitle
             span 时间信息
           p
             span.infoCaption 创建时间:
@@ -237,7 +242,7 @@ block manageScripts
     var Ship = new NKC.modules.ShopShip();
     function ship(orderId) {
       Ship.open(() => {
-      
+
       }, {
         orderId: orderId
       })
