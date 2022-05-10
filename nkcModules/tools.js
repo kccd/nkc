@@ -250,7 +250,7 @@ var Tools = function() {
       case 'draftEditor': {
         return '/creation/editor/draft?id=' + id;
       }
-      case "columnsComment": {
+      case "comment": {
         return id + `?page=${page}&did=${id2}&redirect=true`;
       }
     }
