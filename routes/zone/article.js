@@ -103,7 +103,7 @@ router
     data.comments = comments || [];
 
     //楼层高亮显示跳转实现的从定向
-    var url = null
+    /*var url = null
     if(did){
       const commentDid = comments.map(comment => comment.did);
       const step = commentDid.indexOf(did);
@@ -115,7 +115,7 @@ router
       if(redirect === 'true'){
         return ctx.redirect(url);
       }
-    }
+    }*/
     //文章浏览数加一
     await article.addArticleHits();
     await next();
