@@ -354,13 +354,14 @@ schema.statics.extendPostComments = async (props) => {
       sid,
       did,
       order: comment.order,
+      commentUrl: await CommentModel.getLocationUrl(comment._id),
       username,
       avatar: getUrl('userAvatar', avatar),
       userHome: `/u/${user.uid}`
     };
   }
   for(const document of documents) {
-    if(!document.quoteDid) continue;
+    if(!document.quoteDid || !documentObj[document.did]) continue;
     documentObj[document.did].quote = quoteObj[document.quoteDid];
   }
   const _comments = [];
@@ -385,6 +386,7 @@ schema.statics.extendPostComments = async (props) => {
         gradeId: userGrade._id,
         gradeName: userGrade.displayName,
       },
+      commentUrl: await CommentModel.getLocationUrl(c._id),
       isAuthor: m.uid === uid?true:false,
       quote: documentObj[c.did].quote || null,
     });
@@ -480,12 +482,7 @@ schema.statics.extendReviewComments = async function(comments) {
     const document = stableComment || betaComment;
     const articleDocument = stableArticleDocument || betaArticleDocument;
     const {did} = document;
-    let url;
-    if(articlePost.source === columnSource) {
-      url = `/m/${columnPostObj[articlePost.sid].columnId}/a/${columnPostObj[articlePost.sid]._id}`;
-    } else if (articlePost.source === zoneSource){
-      url =  `/zone/a/${articlePost.sid}`;
-    }
+    const url = await CommentModel.getLocationUrl(comment._id);
     const result = {
       _id,
       uid,
@@ -993,7 +990,21 @@ schema.methods.noticeAuthorComment = async function() {
     .catch(err => {
       console.log(err);
     })
-    
+}
+
+/*
+* 获取comment跳转定位地址
+* */
+schema.statics.getLocationUrl = async function(commentId) {
+  const CommentModel = mongoose.model('comments');
+  let comment = await CommentModel.findOnly({_id: commentId});
+  if(!comment) return;
+  comment = (await CommentModel.getCommentInfo([comment]))[0];
+  if(!comment) return;
+  let page = Math.floor(comment.order/30);
+  if(comment.order % 30 === 0) page = page -1;
+  let url = `${comment.url}?page=${page}&highlight=${comment._id}#highlight`;
+  return url;
 }
 
 module.exports = mongoose.model('comments', schema);
