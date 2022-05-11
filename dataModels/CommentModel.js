@@ -807,11 +807,15 @@ schema.statics.getCommentInfo = async function(comments) {
     } else if (articlePost.source === zoneSource){
       url =  `/zone/a/${articlePost.sid}`;
     }
+    let page = Math.floor(comment.order/30);
+    if(comment.order % 30 === 0) page = page -1;
+    const commentUrl = `${url}?page=${page}&highlight=${comment._id}#highlight`;
     results.push({
       ...comment.toObject(),
       commentDocument,
       articleDocument,
       url,
+      commentUrl,
     });
   }
   return results;
@@ -900,7 +904,7 @@ schema.statics.getCommentsByCommentsId = async function (commentsId, uid) {
       replyId: _id,
       replyToc: commentDocument.toc,
       replyTime: timeFormat(commentDocument.toc),
-      replyUrl: '',
+      replyUrl: comment.commentUrl,
       replyContent: nkcRender.replaceLink(nkcRender.htmlToPlain(commentContent, 200)),
       replyUsername: commentUser.username,
       replyUid: commentUid,
@@ -999,10 +1003,7 @@ schema.methods.getLocationUrl = async function() {
   const CommentModel = mongoose.model('comments');
   const comment = (await CommentModel.getCommentInfo([this]))[0];
   if(!comment) return;
-  let page = Math.floor(comment.order/30);
-  if(comment.order % 30 === 0) page = page -1;
-  let url = `${comment.url}?page=${page}&highlight=${comment._id}#highlight`;
-  return url;
+  return comment.commentUrl;
 }
 
 module.exports = mongoose.model('comments', schema);

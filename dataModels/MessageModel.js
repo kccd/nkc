@@ -561,14 +561,14 @@ messageSchema.statics.getParametersData = async (message) => {
       postContent: apiFunction.obtainPureText(post.c)
     };
   } else if(type === 'replyArticle') {
-    //独立文章通知作者文章被评论了
+    //独立文章通知作者文章被回复了
     const {docId} = message.c;
     const document = await DocumentModel.findOnly({_id: docId});
     const {comment: commentSource} = await DocumentModel.getDocumentSources();
     if(document.source !== commentSource) return console.log('document来源错误');
-    const _comment = await CommentModel.findOnly({_id: document.sid});
-    if(!_comment) return console.log('未找到comment');
-    const comment = (await CommentModel.getCommentInfo([_comment]))[0];
+    let comment = await CommentModel.findOnly({_id: document.sid});
+    if(!comment) return console.log('未找到comment');
+    comment = (await CommentModel.getCommentInfo([comment]))[0];
     const {status, commentDocument, articleDocument} = comment;
     const userObj = await UserModel.getUsersObjectByUsersId([commentDocument.uid]);
     const user = userObj[commentDocument.uid];
@@ -577,7 +577,7 @@ messageSchema.statics.getParametersData = async (message) => {
       username: user.username,
       articleURL: comment.url,
       articleTitle: articleDocument.title,
-      commentURL: await _comment.getLocationUrl(),
+      commentURL: comment.commentUrl,
       commentContent: apiFunction.obtainPureText(commentDocument.content),
     };
     
@@ -588,9 +588,9 @@ messageSchema.statics.getParametersData = async (message) => {
     const document = await DocumentModel.findOnly({_id: docId});
     const {comment: commentSource} = await DocumentModel.getDocumentSources();
     if(document.source !== commentSource) return console.log('document来源错误');
-    const _comment = await CommentModel.findOnly({_id: document.sid});
-    if(!_comment) return console.log('未找到comment');
-    const comment = (await CommentModel.getCommentInfo([_comment]))[0];
+    let comment = await CommentModel.findOnly({_id: document.sid});
+    if(!comment) return console.log('未找到comment');
+    comment = (await CommentModel.getCommentInfo([comment]))[0];
     const {status, commentDocument, articleDocument} = comment;
     const userObj = await UserModel.getUsersObjectByUsersId([commentDocument.uid]);
     const user = userObj[commentDocument.uid];
@@ -599,7 +599,7 @@ messageSchema.statics.getParametersData = async (message) => {
       username: user.username,
       articleURL: comment.url,
       articleTitle: articleDocument.title,
-      commentURL: await _comment.getLocationUrl(),
+      commentURL: comment.commentUrl,
       commentContent: apiFunction.obtainPureText(commentDocument.content),
     };
   
