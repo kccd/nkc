@@ -13,29 +13,9 @@ NKC.modules.CommonModal = function() {
       info: "",
       quote: "",
       data: {},
-      link: false,
-    },
-    watch: {
-      "data.5": {
-        deep: true,
-        handler(n) {
-          if(n.value) {
-            this.link = true;
-          }else{
-            this.link = false;
-          }
-        },
-
-      }
     },
     methods: {
       submit: function() {
-        if(this.link){
-          const reg = /^http(s)?:\/\/.+/;
-          if(!reg.test(this.data[6].value)){
-            throw "不是一个正确的网址"
-          }
-        }
         this_.callback(this.data);
       },
       pickedFile: function(index) {

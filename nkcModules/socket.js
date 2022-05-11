@@ -6,6 +6,15 @@ const db = require('../dataModels');
 
 const socketServiceName = communicationConfig.servicesName.socket;
 
+// 媒体管理，分组信息
+async function sendGroupMessage(uid) {
+  return sendDataMessage(uid, {event: 'group', data: { requestType: 'group' }})
+}
+// 媒体管理，资源信息
+async function sendResourcesMessage(uid) {
+  return sendDataMessage(uid, {event: 'resources', data: { requestType: 'resources' }})
+}
+
 async function sendConsoleMessage(data) {
   const roomName = getRoomName('console');
   const socketClient = await communication.getCommunicationClient();
@@ -603,6 +612,8 @@ async function getPageFromRenderService(templatePath, state, data) {
 }
 
 module.exports = {
+  sendGroupMessage,
+  sendResourcesMessage,
   sendConsoleMessage,
   sendUserMessage,
   sendDataMessage,

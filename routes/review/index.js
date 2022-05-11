@@ -221,7 +221,6 @@ router
       await thread.updateThreadMessage(false);
       //生成审核记录
       await db.ReviewModel.newReview(type, post, data.user);
-
       message = await db.MessageModel({
         _id: await db.SettingModel.operateSystemID("messages", 1),
         r: post.uid,

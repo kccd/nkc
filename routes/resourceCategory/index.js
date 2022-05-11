@@ -48,6 +48,7 @@ router
       //删除分组
       await db.ResourceCategoryModel.deleteOne({_id});
     }
+    await ctx.nkcModules.socket.sendGroupMessage(ctx.state.uid);
     await next();
   })
   .post('/move', async(ctx, next) => {
