@@ -354,7 +354,7 @@ schema.statics.extendPostComments = async (props) => {
       sid,
       did,
       order: comment.order,
-      commentUrl: await CommentModel.getLocationUrl(comment._id),
+      commentUrl: await comment.getLocationUrl(),
       username,
       avatar: getUrl('userAvatar', avatar),
       userHome: `/u/${user.uid}`
@@ -386,7 +386,7 @@ schema.statics.extendPostComments = async (props) => {
         gradeId: userGrade._id,
         gradeName: userGrade.displayName,
       },
-      commentUrl: await CommentModel.getLocationUrl(c._id),
+      commentUrl: await c.getLocationUrl(),
       isAuthor: m.uid === uid?true:false,
       quote: documentObj[c.did].quote || null,
     });
@@ -482,7 +482,7 @@ schema.statics.extendReviewComments = async function(comments) {
     const document = stableComment || betaComment;
     const articleDocument = stableArticleDocument || betaArticleDocument;
     const {did} = document;
-    const url = await CommentModel.getLocationUrl(comment._id);
+    const url = await comment.getLocationUrl();
     const result = {
       _id,
       uid,
@@ -995,11 +995,9 @@ schema.methods.noticeAuthorComment = async function() {
 /*
 * 获取comment跳转定位地址
 * */
-schema.statics.getLocationUrl = async function(commentId) {
+schema.methods.getLocationUrl = async function() {
   const CommentModel = mongoose.model('comments');
-  let comment = await CommentModel.findOnly({_id: commentId});
-  if(!comment) return;
-  comment = (await CommentModel.getCommentInfo([comment]))[0];
+  const comment = (await CommentModel.getCommentInfo([this]))[0];
   if(!comment) return;
   let page = Math.floor(comment.order/30);
   if(comment.order % 30 === 0) page = page -1;
