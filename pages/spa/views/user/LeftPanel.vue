@@ -23,7 +23,6 @@
 </template>
 <style lang="less">
 @import "../../../publicModules/base";
-
 </style>
 <script>
 import UserOperate from "./userPanel/UserOperate";
