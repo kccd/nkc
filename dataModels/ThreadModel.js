@@ -674,8 +674,8 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     lm: pid,
     tlm: nowTime
   });
-  // 如果存在引用，则给被引用者发送引用通知
-  if(quotePost) {
+  // 如果存在引用并且不需要审核，则给被引用者发送引用通知
+  if(quotePost && _post.reviewed) {
     const messageId = await SettingModel.operateSystemID('messages', 1);
     const message = MessageModel({
       _id: messageId,
@@ -1820,7 +1820,7 @@ threadSchema.methods.createNewPost = async function(post) {
   if(quote && quote[2] !== this.oc) {
     const quPid = quote[2];
     const quPost = await PostModel.findOne({pid: quPid});
-    if(quPost) {
+    if(quPost && _post.reviewed) {
       const reply = new ReplyModel({
         fromPid: pid,
         toPid: quPid,
@@ -1840,7 +1840,6 @@ threadSchema.methods.createNewPost = async function(post) {
       });
 
       await message.save();
-
       await socket.sendMessageToUser(message._id);
       // 如果引用作者的回复，则作者将只会收到 引用提醒
       if(quPost.uid === this.uid) {

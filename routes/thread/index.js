@@ -820,9 +820,9 @@ threadRouter
 		ctx.state._scoreOperationForumsId = data.thread.mainForumsId;
 		await db.KcbsRecordModel.insertSystemRecord('postToThread', user, ctx);
 		// await db.UsersScoreLogModel.insertLog(obj);
-
-		if(!_post.hasQuote && thread.uid !== user.uid && postType !== "comment") {
-        const messageId = await db.SettingModel.operateSystemID('messages', 1);
+    //如果存在引用,回复不需要审核并且文章作者和回复作者不是同一人就通知文章作者文章被回复
+		if(!_post.hasQuote && thread.uid !== user.uid && postType !== "comment" && _post.reviewed) {
+      const messageId = await db.SettingModel.operateSystemID('messages', 1);
         const message = await db.MessageModel({
           _id: messageId,
           r: thread.uid,
@@ -851,20 +851,20 @@ threadRouter
       comment = (await db.PostModel.extendPosts([comment], extendPostOptions))[0];
       if(comment.parentPostId) {
         comment.parentPost = await db.PostModel.findOnly({pid: comment.parentPostId});
-        if(comment.parentPost.uid !== data.user.uid) {
-            const message = await db.MessageModel({
-              _id: await db.SettingModel.operateSystemID("messages", 1),
-              r: comment.parentPost.uid,
-              ty: "STU",
-              ip: ctx.address,
-              port: ctx.port,
-              c: {
-                type: "comment",
-                pid: comment.pid
-              }
-            });
-            await message.save();
-            await ctx.nkcModules.socket.sendMessageToUser(message._id);
+        if(comment.parentPost.uid !== data.user.uid && comment.reviewed) {
+          const message = await db.MessageModel({
+            _id: await db.SettingModel.operateSystemID("messages", 1),
+            r: comment.parentPost.uid,
+            ty: "STU",
+            ip: ctx.address,
+            port: ctx.port,
+            c: {
+              type: "comment",
+              pid: comment.pid
+            }
+          });
+          await message.save();
+          await ctx.nkcModules.socket.sendMessageToUser(message._id);
         }
         data.level1Comment = comment.parentPost.parentPostId === "";
         comment.parentPost = (await db.PostModel.extendPosts([comment.parentPost], extendPostOptions))[0];
