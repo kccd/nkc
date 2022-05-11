@@ -54,11 +54,11 @@
               th
                 span(v-if="t === 'in'" )
                   span(v-if="item.to === 'bank'" ) {{nkcBankName}}
-                  span(v-else-if="item.to !=='bank' && item.toUser") {{item.toUser.username}}
+                  span(v-else-if="item.toUser") {{item.toUser.username}}
                   span(v-else) {{item.to}}
                 span(v-else-if="t === 'payout'" ) {{item.fromUser.username || nkcBankName}}
                   span(v-if="item.from === 'bank'" ) {{nkcBankName}}
-                  span(v-else-if="item.from !=='bank' && item.fromUser") {{item.fromUser.username}}
+                  span(v-else-if="item.fromUser") {{item.fromUser.username}}
                   span(v-else) {{item.from}}
               th {{item.num / 100}}
               th
