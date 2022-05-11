@@ -210,7 +210,7 @@ import { routesName } from "../routes/creation"
             },
             {
               type: routesName.creationCommunityThreadEditor,
-              title: '社区创作',
+              title: '社区发帖',
               url: '/creation/editor/community',
               icon: 'fa fa-columns'
             },

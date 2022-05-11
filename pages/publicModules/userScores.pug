@@ -6,7 +6,7 @@ if !isIncluded('publicModules/userScores.pug')
           .nkc-score(title=`${s.name}: ${s.number / 100}`)
             -var src;
             if !fullScoreIcon
-              -src = tools.getUrl('scoreIcon', s.icon)
+              -src = s.icon
             else
               -src= s.icon
             img(src=src)

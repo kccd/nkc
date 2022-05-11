@@ -1,6 +1,5 @@
 <template lang="pug">
   .user-info(v-if="targetUser")
-    .code {{'UID：'+targetUser.uid}}
     .code {{"动态码："+code}}
     user-scores(ref="userScore" :scores="targetUserScores" :xsf="targetUser.xsf" )
 </template>
