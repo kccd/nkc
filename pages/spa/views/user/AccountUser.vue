@@ -22,6 +22,8 @@
         //- 用户中间面板 先hi用户的动态， 文章，恢复等信息
         .col-xs-12.col-md-7.center-panel-container
           .user-container.p-r-0.m-b-1.box-shadow-panel.clearPaddingLeftByMargin.clearPaddingRightByMargin
+            .m-b-1
+              user-creation-home(:target-user="targetUser")
             router-view
           //user-card(ref="userCard")
         //用户右侧面板
@@ -77,6 +79,7 @@ import {getColumnInfo} from "../../../lib/js/column";
 import {getState} from "../../../lib/js/state";
 import LeftPanel from "./LeftPanel";
 import RightPanel from "./RightPanel";
+import UserCreationHome from "./userPanel/UserCreationHome";
 export default {
   props: ['navLinks', 'target-user', 'type', 'forums', "targetUserFans", "targetUserFollowers", "code","targetUserScores", "usersBlUid"],
   data: () => ({
@@ -86,7 +89,8 @@ export default {
   }),
   components: {
     "left-panel": LeftPanel,
-    "right-panel": RightPanel
+    "right-panel": RightPanel,
+    "user-creation-home": UserCreationHome
   },
   watch: {
     leftDrawFlag(oldValue, newValue) {
