@@ -125,7 +125,7 @@ block eContent
               span {{authenticate.video.message}}
             .row
               .col-xs-12.text-center
-                h5 手持身份证视频
+                //-h5 手持身份证视频
                 p(v-if="authenticate.video.status !== 'unsubmit'") 提示语：{{verifyDescription}}
                 .idcard-video
                   if(data.verifiedVideoState === 'usable')
