@@ -8,17 +8,17 @@ router
     let {page=0, t, c, d, form = ''} = query;
     const {user} = data;
     // 通过mongodb精准搜索用户名
-    let targetUser, existUser = false, searchUserFromMongodb = false;
-
+    let targetUser, existUser = false, searchUserFromMongodb = false, uidToUser;
+  
     if(c) {
       if(!d) {
         data.c = Buffer.from(encodeURIComponent(c)).toString("base64");
         d = Buffer.from(encodeURIComponent(JSON.stringify({a: 1}))).toString("base64");
       } else {
         data.c = c;
-        try{
+        try {
           c = decodeURIComponent(Buffer.from(c, "base64").toString());
-        }catch(err) {}
+        } catch(err) {}
       }
     }
     data.t = t;
@@ -127,6 +127,7 @@ router
         perpage = searchAllList;
         if(searchUserFromMongodb) {
           targetUser = await db.UserModel.findOne({usernameLowerCase: c.toLowerCase()});
+          uidToUser = await db.UserModel.findOne({uid: parseInt(c)});
         }
       }
       data.paging = nkcModules.apiFunction.paging(page, data.total, perpage);
@@ -139,6 +140,17 @@ router
           username: targetUser.username,
           highlight: {
             username: [`<span style="color: #e85a71;">${targetUser.username}</span>`]
+          }
+        });
+      }
+      if(uidToUser && Number(page) === 0) {
+        data.total++;
+        results.unshift({
+          uid: uidToUser.uid,
+          docType: "user",
+          username: uidToUser.username,
+          highlight: {
+            uid: [`<span style="color: #e85a71;">${uidToUser.uid}</span>`],
           }
         });
       }
@@ -210,6 +222,9 @@ router
           } else if(r.docType === "user") {
             if(r.highlight.username) {
               highlightObj[r.uid + "_username"] = r.highlight.username;
+            }
+            if(r.highlight.uid) {
+              highlightObj[r.uid + "_uid"] = r.highlight.uid;
             }
             if(r.highlight.description) {
               highlightObj[r.uid + "_description"] = r.highlight.description;
@@ -398,7 +413,8 @@ router
             docType,
             username: highlightObj[`${uid}_username`] || u.username,
             description: highlightObj[`${uid}_description`] || u.description,
-            user: u
+            user: u,
+            uid: highlightObj[`${uid}_uid`] || u.uid
           };
           r.username = nkcRender.htmlFilter(r.username);
           r.description = nkcRender.htmlFilter(r.description);
