@@ -430,7 +430,12 @@ fundSchema.methods.ensureOperatorPermission = function(type, user) {
 /*
 * 判断用户是申请了与当前基金项目冲突的基金申请
 * @param {String} userId 用户 UID
-* @return {String} 如果存在冲突，则返回冲突的相关说明，否则返回空字符串
+* @return {object} 如果存在冲突，则返回冲突的相关说明，否则返回空字符串
+*   info: {string} 冲突说明、
+*   lists: {array} 冲突申报列表
+*     t: {string} 申报名称
+*     url: {string} 申报链接
+*     toc: {string} 申报时间
 * */
 fundSchema.methods.getConflictingByUser = async function(userId) {
 	const FundApplicationFormModel = mongoose.model('fundApplicationForms');
