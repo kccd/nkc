@@ -144,8 +144,10 @@ router
     });
     data.targetUserFans = await db.UserModel.extendUsersInfo(targetUserFans);
     data.targetUserFollowers = await db.UserModel.extendUsersInfo(targetUserFollowers);
-    data.code = await db.UserModel.getCode(targetUser.uid);
-    data.code = data.code.pop();
+    if(state.uid === targetUser.uid) {
+      data.code = await db.UserModel.getCode(targetUser.uid);
+      data.code = data.code.pop();
+    }
     
     //用户的黑名单
     const match = {

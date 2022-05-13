@@ -430,13 +430,18 @@ fundSchema.methods.ensureOperatorPermission = function(type, user) {
 /*
 * 判断用户是申请了与当前基金项目冲突的基金申请
 * @param {String} userId 用户 UID
-* @return {String} 如果存在冲突，则返回冲突的相关说明，否则返回空字符串
+* @return {object} 如果存在冲突，则返回冲突的相关说明，否则返回空字符串
+*   info: {string} 冲突说明、
+*   lists: {array} 冲突申报列表
+*     t: {string} 申报名称
+*     url: {string} 申报链接
+*     toc: {string} 申报时间
 * */
 fundSchema.methods.getConflictingByUser = async function(userId) {
 	const FundApplicationFormModel = mongoose.model('fundApplicationForms');
 	const FundApplicationUserModel = mongoose.model('fundApplicationUsers');
+  const FundDocumentModel = mongoose.model('fundDocuments');
 	const FundBillModel = mongoose.model('fundBills');
-  const FundModel = mongoose.model('funds');
   const FundBlacklistModel = mongoose.model('fundBlacklist');
   if(await FundBlacklistModel.inBlacklist(userId)) {
     return '基金黑名单内的用户不能提交新的申请';
@@ -455,20 +460,20 @@ fundSchema.methods.getConflictingByUser = async function(userId) {
 	if(self) {
 		q.fundId = this._id;
 		const selfFunds = await FundApplicationFormModel.find(q);
-    const funds = await FundModel.extendUFuncInfo(selfFunds);
+    const lists = await FundDocumentModel.extendUFundDocumentInfo(selfFunds);
 		if(selfFunds.length !== 0) return {
       info: '当前基金下存在尚未结题的申报，请结题之后再提交新的申报',
-      funds
+      lists
     };
 	}
 	//与其他基金冲突
 	if(other) {
 		q['conflict.other'] = true;
 		const selfFunds = await FundApplicationFormModel.find(q);
-    const funds = await FundModel.extendUFuncInfo(selfFunds);
+    const lists = await FundDocumentModel.extendUFundDocumentInfo(selfFunds);
     if(selfFunds.length !== 0) return {
       info: '其他基金下存在尚未结题的申报，请结题之后再提交新的申报',
-      funds
+      lists
     };
 	}
 	//年申请次数限制
@@ -479,7 +484,7 @@ fundSchema.methods.getConflictingByUser = async function(userId) {
 		year,
 		useless: {$ne: 'delete'}
 	});
-	if(count >= this.applicationCountLimit) return '你今年申报当前基金的次数已用尽';
+	if(count >= this.applicationCountLimit) return {info: '你今年申报当前基金的次数已用尽'};
 
   // 是否担任其他团队的组员
   const applicationFormUsers = await FundApplicationUserModel.find({
@@ -494,17 +499,17 @@ fundSchema.methods.getConflictingByUser = async function(userId) {
   for(const a of applicationForms) {
     const status = await a.getStatus();
     if(![1, 5].includes(status.general)) {
-      return '尚未结题项目的团队成员不能提交新的申报';
+      return {info: '尚未结题项目的团队成员不能提交新的申报'};
     }
   }
 
-  if(!this.canApply) return '基金暂不接受新的申请';
-  if(this.history) return '当前基金已被设为历史基金，不再接受新的申请';
+  if(!this.canApply) return {info: '基金暂不接受新的申请'};
+  if(this.history) return {info: '当前基金已被设为历史基金，不再接受新的申请'};
 
   const balance = await FundBillModel.getBalance('fund', this._id);
-  if(balance <= 0) return `基金余额不足`;
+  if(balance <= 0) return {info: `基金余额不足`};
 
-	return '';
+	return {};
 };
 
 /*
@@ -543,7 +548,7 @@ fundSchema.statics.getConditionsOfApplication = async (userId, fundId) => {
     ['认证等级', authLevel, userAuthLevel, userAuthLevel >= authLevel]
   ];
   const infos = [];
-  if(info) infos.push(info.info);
+  if(info && info.info) infos.push(info.info);
   for(const t of table) {
     if(!t[3]) {
       infos.push(`${t[0]}未满足要求`);
@@ -553,7 +558,7 @@ fundSchema.statics.getConditionsOfApplication = async (userId, fundId) => {
     status: infos.length === 0,
     table,
     infos,
-    funds: info.funds,
+    lists: info.lists,
   };
 };
 

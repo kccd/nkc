@@ -15,6 +15,9 @@
     .col-xs-2
       .number {{targetUser.postCount - targetUser.disabledPostsCount + targetUser.commentCount}}
       .title 回复
+    .col-xs-2(v-if="code")
+      .number {{code}}
+      .title 动态码
     .clear
 </template>
 <style lang="less" scoped>
@@ -33,6 +36,6 @@
 </style>
 <script>
 export default {
- props: ['target-user'],
+ props: ['target-user', 'code'],
 }
 </script>
