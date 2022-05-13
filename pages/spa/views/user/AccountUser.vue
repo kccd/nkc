@@ -22,7 +22,7 @@
         //- 用户中间面板 先hi用户的动态， 文章，恢复等信息
         .col-xs-12.col-md-7.center-panel-container
           .user-container.p-r-0.m-b-1.box-shadow-panel.clearPaddingLeftByMargin.clearPaddingRightByMargin
-            .m-b-1
+            //.m-b-1
               user-creation-home(:target-user="targetUser")
             router-view
           //user-card(ref="userCard")

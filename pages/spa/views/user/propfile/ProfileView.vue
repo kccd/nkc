@@ -1,6 +1,6 @@
 <template lang="pug">
   .post-panel
-    .account-nav-middle
+    .account-nav-middle.hidden
       .nav.p-t-1
         span(@click="toRoute('moment')" :class="{'active': $route.name === 'moment'}") 动态
         span(@click="toRoute('post')" :class="{'active': $route.name === 'post'}") 社区
