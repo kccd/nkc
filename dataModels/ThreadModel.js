@@ -301,12 +301,12 @@ threadSchema.virtual('user')
   .set(function(u) {
     this._user = u;
   });
-threadSchema.virtual('reason')
+threadSchema.virtual('reviewReason')
 	.get(function() {
-		return this._reason
+		return this._reviewReason
 	})
-	.set(function(reason) {
-		this._reason = reason;
+	.set(function(reviewReason) {
+		this._reviewReason = reviewReason;
 	});
 /* 返回此片文章作者的通讯方式
 * @params {String} tid
@@ -756,6 +756,7 @@ const defaultOptions = {
   firstPostResource: false,
   htmlToText: false,
   count: 200,
+  reviewReason: true,
   showAnonymousUser: false,
   excludeAnonymousPost: false,
   removeLink: true,
@@ -828,7 +829,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       threadCategoryObj[nodeId] = threadCategories[i];
     }
   }
-
+  
   if(o.firstPost || o.lastPost) {
     const posts = await PostModel.find({pid: {$in: [...postsId]}}, {
       pid: 1,
@@ -846,13 +847,14 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       reviewed: 1,
       voteDown: 1,
       cover: 1,
-      abstractCn: 1
+      abstractCn: 1,
+      disabled: 1,
+      toDraft: 1,
     });
-    posts.map(post => {
+    posts.map(async post => {
       if(o.htmlToText) {
         post.c = obtainPureText(post.c, true, o.count);
       }
-      postsObj[post.pid] = post;
       if(o.firstPostUser || o.lastPostUser) {
         usersId.add(post.uid);
       }
@@ -862,6 +864,8 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         post.abstractCn = nkcRender.replaceLink(post.abstractCn);
         post.abstractEn = nkcRender.replaceLink(post.abstractEn);
       }
+  
+      postsObj[post.pid] = post;
     });
 
     if(o.firstPostUser || o.lastPostUser) {
