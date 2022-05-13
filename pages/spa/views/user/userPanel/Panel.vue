@@ -31,7 +31,7 @@
               .account-nav-left.col-xs-12.col-md-2.hidden-xs.hidden-sm
               .account-nav-middle.col-xs-12.col-md-7.p-l-0.hidden-xs.hidden-sm
                 span(@click="containerChange('moment')" :class="{'active': $route.name === 'moment'}") 动态
-                span(@click="containerChange('post')" :class="{'active': $route.name === 'post'}") 社区
+                span(@click="containerChange('post')" :class="{'active': ($route.name === 'post' || $route.name === 'thread')}") 社区
                 span(@click="containerChange('column')" :class="{'active': $route.name === 'column'}") 专栏
                 //span(@click="containerChange('follower')" :class="{'active': ($route.name === 'follower' || $route.name === 'fan')}") 关注
               .account-nav-right.col-xs-12.col-md-3

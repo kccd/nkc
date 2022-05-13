@@ -70,6 +70,13 @@ block fundContent
                           span.text-danger 未满足
             if data.conditions.infos.length
               .text-danger.m-b-1= data.conditions.infos.join('，')
+              .fund-list 申报列表:
+              for f in data.conditions.funds
+                .fund-list-item.m-b-05
+                  a(href=f.url target="_blank")=f.t
+                  .time=tools.timeFormat(f.toc)
+                .clear
+
             div
               if data.conditions.status
                 a.btn.btn-block.btn-primary.single-fund-button(href=`/fund/list/${data.fund._id}/add`) 申请基金
