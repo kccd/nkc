@@ -54,7 +54,7 @@ window.RootApp = new Vue({
       if(dom.width() !== 0) {
         dom.css({'width': '0', 'height': '0', 'opacity': '0'});
       }
-    }, false)
+    }, true)
   },
   methods: {
     //更新右侧抽屉消息条数

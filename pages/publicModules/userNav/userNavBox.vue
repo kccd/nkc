@@ -7,11 +7,12 @@
         .user-nav-avatar
           img(:src="user.userInfo.avatar")
         .user-nav-name {{user.userInfo.username}}
-        .user-nav-level
-          span.user-grade(:style="'color:' + user.userInfo.gradeColor")
-            span {{user.userInfo.gradeName}}
-            img.grade-icon(:src="user.userInfo.gradeIcon" :title="user.userInfo.gradeName")
-        .user-nav-certs {{user.userInfo.certsName}}
+        .user-score
+          .user-nav-level
+            span.user-grade(:style="'color:' + user.userInfo.gradeColor")
+              span {{user.userInfo.gradeName}}
+              img.grade-icon(:src="user.userInfo.gradeIcon" :title="user.userInfo.gradeName")
+          .user-nav-certs {{user.userInfo.certsName}}
         .user-nav-count
           user-score(:scores="user.userInfo.scores" :xsf="user.userInfo.xsf" :sicon="true" :xsficon="user.xsfIcon")
       .user-nav-links
@@ -141,26 +142,31 @@ export default {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
   }
-  .user-nav-level {
-    height: 1.5rem;
-    line-height: 1.5rem;
-    font-size: 1rem;
-    .user-grade {
-      padding: 2px 5px;
-      color: #ffffff;
-      border-radius: 2px;
-      .grade-icon {
-        height: 12px;
-        margin-top: -3px;
-        margin-left: 4px;
+  .user-score {
+    line-height: normal;
+    .user-nav-level {
+      display: inline-block;
+      height: 1.5rem;
+      line-height: 1.5rem;
+      font-size: 1rem;
+      .user-grade {
+        padding: 2px 5px;
+        color: #ffffff;
+        border-radius: 2px;
+        .grade-icon {
+          height: 12px;
+          margin-top: -3px;
+          margin-left: 4px;
+        }
       }
     }
-  }
-  .user-nav-certs {
-    height: 1.5rem;
-    line-height: 1.5rem;
-    color: #e85a71;
-    font-size: 1rem;
+    .user-nav-certs {
+      display: inline-block;
+      height: 1.5rem;
+      line-height: 1.5rem;
+      color: #e85a71;
+      font-size: 1rem;
+    }
   }
   .user-nav-count {
     height: 2rem;
