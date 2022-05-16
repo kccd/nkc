@@ -19,15 +19,6 @@
         a(:href="'/u/' + user.uid + '/profile'" target='_blank').col-xs-6.nav-user-link
           .fa.fa-user-circle
           | 我的主页
-        a(href="/creation" target='_blank').col-xs-6.nav-user-link
-          .fa.fa-lightbulb-o
-          | 创作中心
-        a(href="/sticker" target='_blank').col-xs-6.nav-user-link
-          .fa.fa-smile-o
-          | 我的表情
-        a(:href="'/u/' + user.uid + '/profile/subscribe/user'" target='_blank').col-xs-6.nav-user-link
-          .fa.fa-smile-o
-          | 我的关注
         a(:href="'/m/' + user.userInfo.columnId" target='_blank' v-if="user.userInfo.columnId").col-xs-6.nav-user-link
           .fa.fa-columns
           | 我的专栏
@@ -38,13 +29,19 @@
           .fa.fa-envelope-o
           | 消息中心
           .count(v-if="user.newMessageCount && user.newMessageCount > 0") {{user.newMessageCount}}
+        a(:href="'/u/' + user.uid + '/settings'" target='_blank').col-xs-6.nav-user-link
+          .fa.fa-cog
+          | 资料设置
         a(:href="'/creation/community/draft'" target='_blank').col-xs-6.nav-user-link
           .fa.fa-inbox
           | 社区草稿
           .count(:class="user.userInfo.draftCount? '':'hidden'") {{user.userInfo.draftCount}}
-        a(:href="'/u/' + user.uid + '/settings'" target='_blank').col-xs-6.nav-user-link
-          .fa.fa-cog
-          | 资料设置
+        a(href="/sticker" target='_blank').col-xs-6.nav-user-link
+          .fa.fa-smile-o
+          | 我的表情
+        a(:href="'/u/' + user.uid + '/profile/subscribe/user'" target='_blank').col-xs-6.nav-user-link
+          .fa.fa-star
+          | 我的关注
         a(:href="'/u/' + user.uid + '/profile/finance?t=all'" target='_blank').col-xs-6.nav-user-link
           .fa.fa-file-text-o
           | 我的账单

@@ -80,7 +80,7 @@
 <script>
 import {getUrl, fromNow} from "../../../../lib/js/tools";
 import {timeFormat} from "../../../../lib/js/time";
-import {marked} from 'marked';
+import {markdownToHTML} from "../../../../lib/js/dataConversion";
 import {getState} from "../../../../lib/js/state";
 const state = getState();
 export default {
@@ -94,7 +94,7 @@ export default {
   computed: {
     description() {
       const {description} = this.targetUser;
-      const content = marked(description);
+      const content = markdownToHTML(description, {});
       return content;
     }
   },

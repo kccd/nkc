@@ -2588,9 +2588,9 @@ img.emoji {
   top: 3rem;
   right: 0;
 }
-.nav-user-content>div{
-  height: 0;
+.nav-user-content>#userNavContainer{
   width: 0;
+  height: 0;
   opacity: 0;
   /* width: 22rem; */
   /* height: 34.5rem; */
@@ -2603,6 +2603,11 @@ img.emoji {
   #userNav {
     height: 100%;
   }
+}
+.nav-user-content>#userNavContainer.active{
+  width: 22rem;
+  height: 35.5rem;
+  opacity: 1;
 }
 .nav-user-content .nav-user-banner{
   height: 11rem;
