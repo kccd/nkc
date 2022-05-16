@@ -18,6 +18,15 @@
         a(:href="'/u/' + user.uid + '/profile'" target='_blank').col-xs-6.nav-user-link
           .fa.fa-user-circle
           | 我的主页
+        a(href="/creation" target='_blank').col-xs-6.nav-user-link
+          .fa.fa-lightbulb-o
+          | 创作中心
+        a(href="/sticker" target='_blank').col-xs-6.nav-user-link
+          .fa.fa-smile-o
+          | 我的表情
+        a(:href="'/u/' + user.uid + '/profile/subscribe/user'" target='_blank').col-xs-6.nav-user-link
+          .fa.fa-smile-o
+          | 我的关注
         a(:href="'/m/' + user.userInfo.columnId" target='_blank' v-if="user.userInfo.columnId").col-xs-6.nav-user-link
           .fa.fa-columns
           | 我的专栏

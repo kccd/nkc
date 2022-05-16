@@ -2,7 +2,8 @@ module.exports = async (ctx, next) => {
   //获取用户收藏的文章
   const {data, db, state, nkcModules, query} = ctx;
   const {page = 0} = query;
-  const {targetUser} = data;
+  const {targetUser, user} = data;
+  if(user.uid !== targetUser.uid) ctx.throw(401, '权限不足');
   const {match} = state;
   match.uid = targetUser.uid;
   match.type = {
