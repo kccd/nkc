@@ -27,26 +27,18 @@
                     //div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
                   .fa(v-if="subscribeBtn" :class="subscribeBtnBoxType ? 'fa-angle-up' : 'fa-angle-down'" @click.stop="subscribeBtnBoxChange(!subscribeBtnBoxType)")
           .account-user-base-info.hidden-md.hidden-sm.hidden-lg.col-xs-12
-            .user-info-item
-              .user-info-name UID：
-              .user-info-value {{targetUser.uid}}
-            .user-info-item
-              .user-info-name 动态码：
-              .user-info-value {{code}}
-            .user-info-item
-              .user-info-name 学术分：
-              .user-info-value {{targetUser.xsf}}
-            .user-info-item
-              .user-info-name 注册于：
-              .user-info-value {{timeFormat(targetUser.toc)}}
-            .user-info-item
-              .user-info-name 活动于：
-              .user-info-value
+            .row
+              .col-xs-6.m-b-05 {{websiteCode}}ID：{{targetUser.uid}}
+              .col-xs-6.m-b-05 学术分：{{targetUser.xsf}}
+              .col-xs-6.m-b-05(v-if="selfUid === targetUser.uid") 动态码：{{code}}
+            .row
+              .col-xs-6.m-b-05 注册：{{new Date(targetUser.toc).toLocaleDateString()}}
+              .col-xs-6.m-b-05 活动：
                 from-now(:time="targetUser.tlv")
-            .user-info-item
-              .user-info-name 简介：
-              .user-info-value(v-html="userDescription")
-
+            .row
+              .col-xs-12
+                span 个人简介：
+              .col-xs-12.m-b-05(v-html="userDescription")
 
               //-.form.form-horizontal
                 .form-group
@@ -66,23 +58,26 @@
             .account-nav-box.row
               .account-nav-left.col-xs-12.col-sm-2.col-md-2.hidden-xs.p-a-0
               .account-nav-center.col-xs-12.col-sm-10.col-md-10
-                .account-nav-item.m-r-3(@click="containerChange('moment')" :class="{'active': $route.name === 'moment'}")
+                .account-nav-item.m-r-2f5(@click="containerChange('moment')" :class="{'active': $route.name === 'moment'}")
                   .account-nav-item-name 动态
-                  .account-nav-item-value 193
-                .account-nav-item.m-r-3(@click="containerChange('post')" :class="{'active': ($route.name === 'post' || $route.name === 'thread')}")
+                  .account-nav-item-value {{targetUser.momentCount}}
+                .account-nav-item.m-r-2f5(@click="containerChange('post')" :class="{'active': ($route.name === 'post' || $route.name === 'thread')}")
                   .account-nav-item-name 社区
-                  .account-nav-item-value 23
-                .account-nav-item.m-r-3(@click="containerChange('column')" :class="{'active': $route.name === 'column'}")
+                  .account-nav-item-value {{targetUser.postCount + targetUser.threadCount - targetUser.disabledThreadsCount - targetUser.disabledPostsCount}}
+                .account-nav-item.m-r-2f5(@click="containerChange('column')" :class="{'active': $route.name === 'column'}")
                   .account-nav-item-name 专栏
-                  .account-nav-item-value 98
-                .account-nav-item.m-r-3.hidden-md.hidden-sm.hidden-lg(@click="containerChange('follower')" :class="{'active': $route.name === 'follower'}")
+                  .account-nav-item-value {{targetUser.columnThreadCount - targetUser.disabledColumnThreadCount}}
+                .account-nav-item.m-r-2f5.hidden-md.hidden-sm.hidden-lg(@click="containerChange('follower')" :class="{'active': $route.name === 'follower'}")
                   .account-nav-item-name 关注
                   .account-nav-item-value {{followersCount >= 1000 ? (followersCount/1000).toFixed(1)+'K' : followersCount}}
                 .account-nav-item.hidden-md.hidden-sm.hidden-lg(@click="containerChange('fan')" :class="{'active': $route.name === 'fan'}")
                   .account-nav-item-name 粉丝
                   .account-nav-item-value {{fansCount >= 1000 ? (fansCount/1000).toFixed(1)+'K' : fansCount}}
                 .pull-right.m-r-2.hidden-xs
-                  .account-nav-item.m-r-3(@click="containerChange('follower')" :class="{'active': $route.name === 'follower'}")
+                  .account-nav-item.m-r-2f5
+                    .account-nav-item-name 学术分
+                    .account-nav-item-value {{targetUser.xsf}}
+                  .account-nav-item.m-r-2f5(@click="containerChange('follower')" :class="{'active': $route.name === 'follower'}")
                     .account-nav-item-name 关注
                     .account-nav-item-value {{followersCount >= 1000 ? (followersCount/1000).toFixed(1)+'K' : followersCount}}
                   .account-nav-item(@click="containerChange('fan')" :class="{'active': $route.name === 'fan'}")
@@ -314,6 +309,11 @@
         height: @accountNavHeight;
         .account-nav-box{
           height: @accountNavHeight;
+          .pull-right .account-nav-item{
+            .account-nav-item-name{
+              font-size: 1.2rem;
+            }
+          }
           .account-nav-item{
             height: @accountNavHeight;
             display: inline-block;
@@ -398,12 +398,13 @@ import UserLevel from "./UserLevel";
 import AdminManage from "./AdminManage";
 import {marked} from 'marked'
 import FromNow from "../../../../lib/vue/FromNow";
-
+const state = getState();
 export default {
   props: ['targetUserScores', "fansCount",  "followersCount", "code"],
   data: () => ({
     uid: null,
-    selfUid: getState().uid,
+    websiteCode: (state.websiteCode || '').toUpperCase(),
+    selfUid: state.uid,
     panelPermission: null,
     targetUser: null,
     subscribeBtn: false,

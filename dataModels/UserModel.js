@@ -299,6 +299,15 @@ userSchema.virtual('commentCount')
     this._commentCount = commentCount;
   });
 
+userSchema.virtual('momentCount')
+  .get(function() {
+    return this._momentCount
+  })
+  .set(function(momentCount) {
+    this._momentCount = momentCount;
+  })
+
+
 userSchema.virtual('columnThreadCount')
   .get(function() {
     return this._columnThreadCount;
@@ -989,14 +998,19 @@ userSchema.methods.extendDraftCount = async function() {
 userSchema.methods.extendColumnAndZoneThreadCount = async function() {
   const ArticleModel = mongoose.model('articles');
   const CommentModel = mongoose.model('comments');
+  const MomentModel = mongoose.model('moments');
   const {column, zone} = await ArticleModel.getArticleSources();
   const {normal, disabled} = await ArticleModel.getArticleStatus();
+  const momentStatus = await MomentModel.getMomentStatus();
+  this.momentCount = await MomentModel.countDocuments({
+    uid: this.uid,
+    status: momentStatus.normal,
+  });
   this.columnThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: column, status: normal});
   this.disabledColumnThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: column, status: disabled});
   this.zoneThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: zone, status: normal});
   this.disabledZoneThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: zone, status: disabled});
   this.commentCount = await CommentModel.countDocuments({uid: this.uid, status: normal});
-  return;
 }
 
 

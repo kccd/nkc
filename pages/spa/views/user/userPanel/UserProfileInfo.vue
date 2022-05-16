@@ -1,7 +1,7 @@
 <template lang="pug">
   .user-info(v-if="targetUser")
     .user-information
-      .panel-header UID: {{targetUser.uid}}
+      .panel-header {{websiteCode}}ID: {{targetUser.uid}}
     .user-information
       .panel-header 个人简介
       .m-b-2
@@ -81,10 +81,13 @@
 import {getUrl, fromNow} from "../../../../lib/js/tools";
 import {timeFormat} from "../../../../lib/js/time";
 import {marked} from 'marked';
+import {getState} from "../../../../lib/js/state";
+const state = getState();
 export default {
   props: ['targetUser'],
   data: () => ({
     uid: '',
+    websiteCode: (state.websiteCode || '').toUpperCase(),
     userColumn: null,
     userInformation: null,
   }),

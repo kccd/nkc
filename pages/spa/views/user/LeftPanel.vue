@@ -1,22 +1,22 @@
 <template lang="pug">
   .left-panel.box-shadow-panel(v-if="targetUser")
     //- 用户ID用户动态码和财政
-    .m-b-1(v-if="isSelf")
+    .m-b-1(v-if="isSelf").hidden-xs.hidden-sm
       user-code-and-finance(ref="userProfileInfo" :target-user="targetUser" :code="code" :target-user-scores="targetUserScores")
     //- 用户信息
-    .m-b-1(v-if="targetUser")
+    .m-b-1(v-if="targetUser").hidden-xs.hidden-sm
       user-profile-info(ref="userProfileInfo" :target-user="targetUser" :code="code")
     //- 用户创作信息
-    .m-b-1.user-creation
+    //-.m-b-1.user-creation
       user-creation(:target-user="targetUser")
     //- 访客用户加黑举报操作
     .m-b-1(v-if="!isSelf")
       visitor-operate(:users-bl-uid="usersBlUid" :target-user="targetUser")
     //- 用户自己操作
-    .m-b-1(v-if="isSelf")
+    //-.m-b-1(v-if="isSelf")
       user-operate(:target-user="targetUser")
     //- 用户链接
-    .m-b-1(v-if="isSelf")
+    //-.m-b-1(v-if="isSelf")
       nav-links(ref="userLink" :nav-links="navLinks")
     user-manage(ref="userManage")
     //- 分享链接
