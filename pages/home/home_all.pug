@@ -3,7 +3,7 @@ block title
   include ../publicModules/web_header
   include ./homeMixin
   +includeCSS("/home/home_all.css")
-  +includeCSS("/swiper/swiper-bundle.min.css")
+  +includeCSS("/external_pkgs/swiper/swiper-bundle.min.css")
 block content
   .hidden#data=objToStr({threadCategories: data.threadCategories})
   .container-fluid.max-width
@@ -47,5 +47,5 @@ block scripts
   include ../publicModules/moveThread/moveThread
   include ../publicModules/commonModal/commonModal
 
-  +includeJS("/swiper/swiper-bundle.js")
+  +includeJS("/external_pkgs/swiper/swiper-bundle.min.js")
   +includeJS("/home/home_all.js")

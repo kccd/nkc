@@ -275,6 +275,54 @@ userSchema.virtual('draftCount')
 	.set(function(draftCount) {
 		this._draftCount = draftCount;
 	});
+userSchema.virtual('zoneThreadCount')
+  .get(function() {
+    return this._zoneThreadCount;
+  })
+  .set(function(zoneThreadCount) {
+    this._zoneThreadCount = zoneThreadCount;
+  });
+
+userSchema.virtual('disabledZoneThreadCount')
+  .get(function() {
+    return this._disabledZoneThreadCount;
+  })
+  .set(function(disabledZoneThreadCount) {
+    this._disabledZoneThreadCount = disabledZoneThreadCount;
+  });
+
+userSchema.virtual('commentCount')
+  .get(function() {
+    return this._commentCount;
+  })
+  .set(function(commentCount) {
+    this._commentCount = commentCount;
+  });
+
+userSchema.virtual('momentCount')
+  .get(function() {
+    return this._momentCount
+  })
+  .set(function(momentCount) {
+    this._momentCount = momentCount;
+  })
+
+
+userSchema.virtual('columnThreadCount')
+  .get(function() {
+    return this._columnThreadCount;
+  })
+  .set(function(columnThreadCount) {
+    this._columnThreadCount = columnThreadCount;
+  });
+
+userSchema.virtual('disabledColumnThreadCount')
+  .get(function() {
+    return this._disabledColumnThreadCount;
+  })
+  .set(function(disabledColumnThreadCount) {
+    this._disabledColumnThreadCount = disabledColumnThreadCount;
+  });
 
 userSchema.virtual('subscribeUsers')
 	.get(function() {
@@ -943,6 +991,27 @@ userSchema.statics.createUser = async (option) => {
 userSchema.methods.extendDraftCount = async function() {
   return this.draftCount = await mongoose.model("drafts").countDocuments({uid: this.uid});
 };
+
+/*
+* 拓展用户专栏文章数量
+* */
+userSchema.methods.extendColumnAndZoneThreadCount = async function() {
+  const ArticleModel = mongoose.model('articles');
+  const CommentModel = mongoose.model('comments');
+  const MomentModel = mongoose.model('moments');
+  const {column, zone} = await ArticleModel.getArticleSources();
+  const {normal, disabled} = await ArticleModel.getArticleStatus();
+  const momentStatus = await MomentModel.getMomentStatus();
+  this.momentCount = await MomentModel.countDocuments({
+    uid: this.uid,
+    status: momentStatus.normal,
+  });
+  this.columnThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: column, status: normal});
+  this.disabledColumnThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: column, status: disabled});
+  this.zoneThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: zone, status: normal});
+  this.disabledZoneThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: zone, status: disabled});
+  this.commentCount = await CommentModel.countDocuments({uid: this.uid, status: normal});
+}
 
 
 userSchema.methods.extendGrade = async function() {

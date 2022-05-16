@@ -1,10 +1,11 @@
 module.exports = async (ctx, next) => {
   const {data, db, query, nkcModules} = ctx;
-  const {user} = data;
+  const {user, targetUser} = data;
   const {page = 0} = query;
   const match = {
     uid: user.uid
   };
+  if(user.uid !== targetUser.uid) ctx.throw(401, '权限不足');
   const count = await db.BlacklistModel.countDocuments(match);
   const paging = nkcModules.apiFunction.paging(page, count);
   const bl = await db.BlacklistModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);

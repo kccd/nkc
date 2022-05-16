@@ -52,8 +52,14 @@
               th
                 .table-content(:title="item.description") {{item.description}}
               th
-                span(v-if="t === 'in'" ) {{item.toUser.username || nkcBankName}}
+                span(v-if="t === 'in'" )
+                  span(v-if="item.to === 'bank'" ) {{nkcBankName}}
+                  span(v-else-if="item.toUser") {{item.toUser.username}}
+                  span(v-else) {{item.to}}
                 span(v-else-if="t === 'payout'" ) {{item.fromUser.username || nkcBankName}}
+                  span(v-if="item.from === 'bank'" ) {{nkcBankName}}
+                  span(v-else-if="item.fromUser") {{item.fromUser.username}}
+                  span(v-else) {{item.from}}
               th {{item.num / 100}}
               th
                 a(:href="item.post.url" target="_blank" v-if="item.post" ) {{'文号（'+item.pid+'）'}}

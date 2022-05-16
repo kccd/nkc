@@ -179,5 +179,29 @@ documentSchema.pre('save', async function(next) {
 	}*/
 });
 
+documentSchema.statics.extendUFundDocumentInfo = async function(funds) {
+	const FundDocumentModel = mongoose.model('fundDocuments');
+	const {getUrl} = require("../nkcModules/tools");
+	const applicationsIds = [];
+	for(const f of funds) {
+		applicationsIds.push(f._id);
+	}
+	const fundDocuments = await FundDocumentModel.find({applicationFormId: {$in: applicationsIds}, type: 'project'});
+	const fundDocumentObj = {};
+	for(const f of fundDocuments) {
+		const {t, toc} = f;
+		fundDocumentObj[f.applicationFormId] = {
+			t,
+			url: getUrl('fundApplicationForm', f.applicationFormId),
+			toc
+		};
+	}
+	const results = [];
+	for(const f of funds) {
+		results.push(fundDocumentObj[f._id]);
+	}
+	return results;
+}
+
 const FundDocumentModel = mongoose.model('fundDocuments', documentSchema);
 module.exports = FundDocumentModel;

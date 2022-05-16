@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    panel(ref="panel" :fans-count="fansCount" :followers-count="followersCount"  v-if="targetUser")
+    panel(ref="panel" :fans-count="fansCount" :followers-count="followersCount" :code="code"  v-if="targetUser")
     account-user(ref="accountUser" :users-bl-uid="usersBlUid" :target-user-scores="targetUserScores" :target-user-fans="targetUserFans" :target-user-followers="targetUserFollowers" :target-user="targetUser" :nav-links="navLinks" :forums="subForums" :code="code")
     footer-vue(ref="footerVue")
 </template>

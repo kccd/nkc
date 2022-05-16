@@ -2,6 +2,7 @@ const Router = require("koa-router");
 const router = new Router();
 router
   .post("/", async (ctx, next) => {
+    //退修post
     const {data, db, body} = ctx;
     const {user} = data;
     const {postsId, reason, remindUser, violation} = body;

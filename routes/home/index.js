@@ -529,7 +529,7 @@ router
       const count = await db.ThreadModel.countDocuments(q);
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
       let sort = {tlm: -1};
-      if(s === "toc") sort = {toc: -1};
+      if(s === "toc" || threadListType === 'column') sort = {toc: -1};
       if(threadListType === "recommend") sort= {toc : -1};
       let forum;
       if(threadListType === 'column') {
