@@ -1,10 +1,11 @@
 module.exports = async (ctx, next) => {
   const {db, query, data, state, nkcModules} = ctx;
   let {page = 0, t} = query;
+  const {user, targetUser} = data;
   const {match, forumCategories} = state;
+  if(user.uid !== targetUser.uid) ctx.throw(401, '权限不足');
   const fcId = forumCategories.map(f => f._id);
   data.forumCategories = forumCategories;
-  const {targetUser} = data;
   match.uid = targetUser.uid;
   match.type = "forum";
   match.cancel = false;

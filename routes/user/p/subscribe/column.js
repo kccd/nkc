@@ -3,7 +3,8 @@ module.exports = async (ctx, next) => {
   const {nkcModules, db, data, state, query} = ctx;
   const {match} = state;
   const {page = 0} = query;
-  const {targetUser,user} = data;
+  const {targetUser, user} = data;
+  if(user.uid !== targetUser.uid) ctx.throw(401, '权限不足');
   match.uid = targetUser.uid;
   match.type = "column";
   match.cancel = false;

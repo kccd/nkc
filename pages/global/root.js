@@ -49,6 +49,12 @@ window.RootApp = new Vue({
     $(() => {
       // 这里的代码会在页面准备就绪之后执行
     });
+    document.addEventListener('click', function (e) {
+      const dom = $('.nav-user>.nav-user-content>div');
+      if(dom.width() !== 0) {
+        dom.css({'width': '0', 'height': '0', 'opacity': '0'});
+      }
+    }, true)
   },
   methods: {
     //更新右侧抽屉消息条数
@@ -57,6 +63,7 @@ window.RootApp = new Vue({
       userPanel.updateNewMessageCount(count);
     },
     showUserPanel() {
+      $('.nav-user>.nav-user-content>div').css({'width': '22rem', 'height': '38.5rem', 'opacity': '1'});
       userPanel.showDraw();
     },
     openLoginPanel(type) {

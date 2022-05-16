@@ -1,7 +1,7 @@
 <template lang="pug">
   .user-info(v-if="targetUser")
-    .code(v-if="code") {{"动态码："+code}}
-    user-scores(ref="userScore" :scores="targetUserScores" :xsf="targetUser.xsf" )
+    .code(v-if="code") {{"动态码：" + code}}
+    user-scores(ref="userScore" :scores="targetUserScores" :xsf="targetUser.xsf")
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
@@ -16,7 +16,7 @@
 import UserScoresVue from "../../../../lib/vue/publicVue/userDraw/UserScoresVue";
 import {getState} from "../../../../lib/js/state";
 export default {
-  props: ['targetUser', 'code',"targetUserScores"],
+  props: ['targetUser', 'code', "targetUserScores"],
   components:{
     "user-scores": UserScoresVue,
   },
