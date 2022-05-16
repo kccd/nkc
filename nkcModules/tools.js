@@ -1,5 +1,4 @@
 //创建变量时必须都要使用var,不然使用的文件无法获取到函数内容
-
 var isNode = typeof window === 'undefined';
 
 var Tools = function() {
@@ -325,6 +324,8 @@ var Tools = function() {
   self.objToStr = function(obj) {
     return encodeURIComponent(JSON.stringify(obj));
   }
+  
+  
 
   self.getSize = function(size, digits) {
     size = Number(size);

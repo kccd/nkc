@@ -57,16 +57,16 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             a(href=editorHref target='_blank') 创作中心
           li
             a(href='/creation' target="_blank") 创作中心
-          li.new-message.message-switch.pointer.message-count-container(class="hidden" onclick='RootApp.openChatPanel()')
+          li.new-message.message-switch.pointer.message-count-container(class="hidden" onclick="RootApp.openChatPanel()")
             span 消息
             .nav-user-avatar-count.message-switch.message-count(class="hidden")
 
-          li.dropdown.userInfo.nav-user(onclick="window.RootApp.showUserPanel()")
-            .nav-user-content
+          li.dropdown.userInfo.nav-user
+            .nav-user-content(onclick='window.RootApp.eventStop(event)')
               div
                 #userNav
                   user-panel(ref="userPanel")
-            img.nav-user-avatar-sm(src=remoteState.userInfo.avatar)
+            img.nav-user-avatar-sm(src=remoteState.userInfo.avatar onclick="window.RootApp.showUserPanel(event)")
         else
           li.userInfo
             a(onclick="RootApp.openLoginPanel()" title='还记得密码吗？') 登录

@@ -80,7 +80,7 @@
 <script>
 import {getUrl, fromNow} from "../../../../lib/js/tools";
 import {timeFormat} from "../../../../lib/js/time";
-import {marked} from 'marked';
+import {markdownToHTML} from "../../../../lib/js/dataConversion";
 export default {
   props: ['targetUser'],
   data: () => ({
@@ -91,7 +91,7 @@ export default {
   computed: {
     description() {
       const {description} = this.targetUser;
-      const content = marked(description);
+      const content = markdownToHTML(description, {});
       return content;
     }
   },
