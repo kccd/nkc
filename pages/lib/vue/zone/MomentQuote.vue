@@ -16,7 +16,7 @@
 
   mixin momentBody
     .moment-quote-body-moment
-      .moment-quote-content(v-html="quoteData.data.content")
+      .moment-quote-content.pointer(v-html="quoteData.data.content" @click="visitUrl(quoteData.data.url, true)")
       .moment-quote-files(v-if="quoteData.data.files && quoteData.data.files.length > 0")
         moment-files(:data="quoteData.data.files")
 
@@ -78,7 +78,11 @@
       .moment-quote-body
         +momentBody
 
-
+    moment-quote(
+      v-if="quoteData.data.quoteData"
+      :data="quoteData.data.quoteData"
+      :uid="quoteData.data.uid"
+      )
 
 
 
@@ -212,8 +216,10 @@
   import {objToStr} from "../../js/tools";
   import MomentFiles from './MomentFiles';
   import FromNow from '../FromNow';
+  import {visitUrl} from "../../js/pageSwitch";
 
   export default {
+    name: 'moment-quote',
     props: ['data', 'uid'],
     components: {
       'from-now': FromNow,
@@ -308,6 +314,7 @@
     },
     methods: {
       objToStr: objToStr,
+      visitUrl
     }
   }
 </script>

@@ -1,7 +1,9 @@
 <template lang="pug">
-  .row
-    paging.col-xs-12.col-md-12.m-l-1(ref="paging" :pages="pageButtons" @click-button="clickButton")
-    .user-list-warning(v-if="(!users || users.length === 0) && !loading") 空空如也~
+  .row.p-t-1
+    .col-xs-12
+      paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
+    .col-xs-12(v-if="(!users || users.length === 0) && !loading")
+      .user-list-warning 空空如也~
     //- user-info 数组中的一个用户对象
     .col-xs-12.col-md-6(v-for="user in users" v-else)
       .row
