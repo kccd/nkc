@@ -580,13 +580,16 @@ schema.methods.publish = async function() {
     }
   });
   await this.updateResourceReferences();
-  await this.updateMomentRepostCount();
+  await this.addParentMomentRepostCount();
 };
 
+
+
 /*
-* 更新被引用动态的引用数
+* 累加被引用动态的转发数
+* @param {Number} count 添加的条数
 * */
-schema.methods.updateMomentRepostCount = async function() {
+schema.methods.addParentMomentRepostCount = async function(count = 1) {
   const MomentModel = mongoose.model('moments');
   if(
     this.quoteType !== momentQuoteTypes.moment ||
@@ -597,7 +600,31 @@ schema.methods.updateMomentRepostCount = async function() {
     _id: this.quoteId,
   }, {
     $inc: {
-      repost: 1
+      repost: count
+    }
+  });
+}
+
+/*
+* 重新统计被引用动态的转发数
+* */
+schema.methods.updateParentMomentRepostCount = async function() {
+  const MomentModel = mongoose.model('moments');
+  if(
+    this.quoteType !== momentQuoteTypes.moment ||
+    !this.quoteId
+  ) return;
+
+  const count = await MomentModel.countDocuments({
+    quoteType: momentQuoteTypes.moment,
+    quoteId: this.quoteId
+  });
+
+  await MomentModel.updateOne({
+    _id: this.quoteId,
+  }, {
+    $set: {
+      repost: count
     }
   });
 }
@@ -709,7 +736,7 @@ schema.statics.createQuoteMomentAndPublish = async (props) => {
       }
     });
     await moment.updateResourceReferences();
-    await moment.updateMomentRepostCount();
+    await moment.addParentMomentRepostCount();
   }
   return moment;
 };
