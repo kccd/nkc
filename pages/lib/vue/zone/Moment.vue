@@ -31,7 +31,7 @@
               @complaint="complaint"
             )
         //- 动态内容
-        .single-moment-content(v-html="momentData.content")
+        .single-moment-content.pointer(v-html="momentData.content" @click="visitUrl(momentData.url, true)")
 
         //- 图片视频
         .single-moment-files
@@ -55,6 +55,7 @@
             @click="showPanel(panelTypes.repost)"
             )
             .fa.fa-retweet
+            span(v-if="momentData.repostCount > 0") {{momentData.repostCount}}
           .single-moment-options-right(
             title="点赞"
             :class="{'active': momentData.voteType === 'up'}"
@@ -153,6 +154,12 @@
       .single-moment-options-center{
         display: inline-block;
         padding: 0 1rem;
+        .fa{
+          margin-right: 0.5rem;
+        }
+        span{
+          font-size: 1.1rem;
+        }
       }
       .single-moment-options-right{
         position: absolute;
@@ -306,6 +313,7 @@
   import MomentComments from './MomentComments';
   import MomentQuote from './MomentQuote';
   import MomentStatus from "./MomentStatus";
+  import {visitUrl} from "../../js/pageSwitch";
   import MomentOptionFixed from "./momentOption/MomentOptionFixed";
   export default {
     components: {
@@ -339,6 +347,7 @@
     },
     methods: {
       objToStr: objToStr,
+      visitUrl,
       initData() {
         const {data} = this;
         this.momentData = JSON.parse(JSON.stringify(data));
@@ -362,11 +371,16 @@
         } else {
           this.showPanelType = type;
         }
-        if(this.showPanelType === this.panelTypes.comment) {
+
+        setTimeout(() => {
+          this.$refs.momentComments.init();
+        })
+
+        /*if(this.showPanelType === this.panelTypes.comment) {
           setTimeout(() => {
             this.$refs.momentComments.init();
           })
-        }
+        }*/
       },
       showCommentPanel() {
         this.showPanel(this.panelTypes.comment);

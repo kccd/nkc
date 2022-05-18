@@ -16,6 +16,9 @@ module.exports = {
       comments: {
         GET: 'getZoneMomentComments'
       },
+      repost: {
+        GET: 'getZoneMomentComments'
+      },
       comment: {
         PARAMETER: {
           DELETE: 'deleteZoneMomentComment',

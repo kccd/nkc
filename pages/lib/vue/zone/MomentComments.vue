@@ -1,5 +1,8 @@
 <template lang="pug">
-  .moment-commments
+  .moment-commments.p-t-1
+    .m-b-1
+      moment-comment-editor(:mid="momentId" :type="postType" @published="onPublished" v-if="logged")
+
     .moment-comment-nav(v-if="postType === 'comment'")
       .post-type 评论列表
       .sort-item(
@@ -8,16 +11,16 @@
         @click="setActiveNav(n.type)"
         ) {{n.name}}
     .moment-comment-nav(v-else)
-      .post-type 转发动态
-    .moment-comment-list-container(v-if="postType === 'comment'")
-      .moment-comment-null(v-if="commentsData.length === 0")
+      .post-type 转发列表
+    .moment-comment-list-container
+      .moment-comment-null.m-b-2(v-if="listData.length === 0")
         span(v-if="loading") 加载中...
         span(v-else) 空空如也~
       paging(:pages="pageButtons" @click-button="clickPageButton")
       .moment-comment-list
         .moment-comment-item(
-          v-for="(commentData, index) in commentsData"
-          :class=`{'active': focusCommentId === commentData.momentCommentId, 'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted'}`
+          v-for="(commentData, index) in listData"
+          :class=`{'active': postType === 'comment' && focusCommentId === commentData.momentCommentId, 'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted'}`
           )
           moment-status(ref="momentStatus" :moment="commentData" :permissions="permissions")
           .moment-comment-item-header
@@ -44,16 +47,15 @@
                   :ref="`momentOption_${index}`"
                   @complaint="complaint"
                 )
-          .moment-comment-item-content(v-html="commentData.content")
+          .moment-comment-item-content(v-html="commentData.content" v-if="postType === 'comment'")
+          .moment-comment-item-content.pointer(v-html="commentData.content" v-else @click="visitUrl(commentData.url, true)")
       paging(:pages="pageButtons" @click-button="clickPageButton")
-
-    moment-comment-editor(:mid="momentId" :type="postType" @published="onPublished" v-if="logged")
 </template>
 
 <style lang="less" scoped>
   @import '../../../publicModules/base';
   .moment-comment-nav{
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     .post-type{
       font-weight: 700;
       display: inline-block;
@@ -70,7 +72,7 @@
     }
   }
   .moment-comment-list-container{
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     .moment-comment-null{
       text-align: center;
     }
@@ -187,6 +189,7 @@
     data: () => ({
       logged: !!uid,
       commentsData: [],
+      repostData: [],
       paging: null,
       sort: null,
       loading: true,
@@ -215,18 +218,27 @@
       pageButtons() {
         return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
       },
-
+      listData() {
+        const {postType, commentsData, repostData} = this;
+        if(postType === 'comment') {
+          return commentsData;
+        } else {
+          return repostData;
+        }
+      }
     },
     methods: {
+      visitUrl,
       objToStr: objToStr,
       init() {
-        if(this.postType === 'comment') {
+        this.setActiveNav(this.nav[0].type);
+        /*if(this.postType === 'comment') {
           this.setActiveNav(this.nav[0].type);
-        }
+        }*/
       },
       setActiveNav(type) {
         this.sort = type;
-        this.getComments();
+        this.getList();
       },
       getComments(page = 0) {
         const self = this;
@@ -254,14 +266,36 @@
           })
           .catch(sweetError)
       },
+      getRepost(page = 0) {
+        const self = this;
+        const {
+          momentId
+        } = this;
+        const url = `/zone/m/${momentId}/repost?page=${page}`;
+        nkcAPI(url, 'GET')
+          .then(res => {
+            self.repostData = res.repostData;
+            self.paging = res.paging;
+            self.loading = false;
+          })
+          .catch(sweetError)
+      },
+      getList(page = 0) {
+        const {postType} = this;
+        if(postType === 'comment') {
+          this.getComments(page);
+        } else {
+          this.getRepost(page);
+        }
+      },
       clickPageButton(page) {
-        this.getComments(page);
+        this.getList(page);
       },
       onPublished(res) {
         const {momentCommentPage} = res;
         const {postType} = this;
         if(postType === 'comment') {
-          this.getComments(momentCommentPage);
+          this.getList(momentCommentPage);
           this.$emit('post-comment');
         } else {
           visitUrl(`/g/moment`);
@@ -270,7 +304,8 @@
       vote(commentData) {
         const voteType = 'up';
         const cancel = voteType === commentData.voteType;
-        momentVote(commentData.momentCommentId, voteType, cancel)
+        const momentId = this.postType === 'comment'? commentData.momentCommentId: commentData.momentId;
+        momentVote(momentId, voteType, cancel)
           .then(res => {
             const {voteUp} = res;
             commentData.voteUp = voteUp;
