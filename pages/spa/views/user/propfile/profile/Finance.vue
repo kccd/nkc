@@ -185,6 +185,7 @@ import Paging from "../../../../../lib/vue/Paging";
 import {getUrl} from "../../../../../lib/js/tools";
 
 export default {
+  props: ['targetUid'],
   data: () => ({
     targetUserScores: null,
     show: false,
@@ -194,12 +195,14 @@ export default {
     t: null,
     targetUser: null,
     paging: null,
+    uid: null,
   }),
   components: {
     "paging": Paging
   },
   created() {
-    this.uid = getState().uid;
+    const {uid} = this.$route.params;
+    this.uid = this.targetUid?this.targetUid:uid;
     this.getUserAccountInfo();
   },
   computed: {
@@ -215,7 +218,7 @@ export default {
     timeFormat: timeFormat,
     getUserAccountInfo(page=0, type=''){
       const self = this;
-      let url = `/u/${this.uid}/profile/financeData?page=${page}`;
+      let url = `/u/${self.uid}/profile/financeData?page=${page}`;
       if(type){
         url += `&t=${type}`;
       }
