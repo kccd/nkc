@@ -68,8 +68,16 @@ block fundContent
                           span.text-success 满足
                         else
                           span.text-danger 未满足
-            if data.conditions.infos.length
+            if data.conditions.infos && data.conditions.infos.length
               .text-danger.m-b-1= data.conditions.infos.join('，')
+            if data.conditions.lists && data.conditions.lists.length
+              .fund-list 未结题的申报:
+              for f in data.conditions.lists
+                .fund-list-item.m-b-05
+                  a(href=f.url target="_blank")=`${f.t || '未填写标题'}`
+                  .time=tools.timeFormat(f.toc)
+                .clear
+
             div
               if data.conditions.status
                 a.btn.btn-block.btn-primary.single-fund-button(href=`/fund/list/${data.fund._id}/add`) 申请基金

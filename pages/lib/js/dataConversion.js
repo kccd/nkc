@@ -4,6 +4,9 @@
 * @return {Object}
 * @author pengxiguaa 2019-7-26
 * */
+import {marked} from "marked";
+import createDOMPurify from "dompurify";
+
 export function strToObj(str) {
   return JSON.parse(decodeURIComponent(str));
 }
@@ -188,4 +191,12 @@ export function clearHighlightClass(content) {
   }).removeClass("nkc-hl");
   replaceDomTextWithUrl(container[0]);
   return container.html();
+}
+
+export function markdownToHTML(markdownContent) {
+  let html = marked(markdownContent);
+  html = createDOMPurify.sanitize(html, {
+    FORBID_TAGS: ['script']
+  });
+  return html;
 }

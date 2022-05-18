@@ -5,6 +5,10 @@
         a(:href="'/u/' + user.uid + '/profile'")
           span.fa.fa-user-circle-o &nbsp;个人主页
           span.pull-right.fa.fa-angle-right
+      li
+        a(href='/creation')
+          span.fa.fa-lightbulb-o &nbsp;创作中心
+          span.pull-right.fa.fa-angle-right
       li(v-if="column")
         a(:href="'/m/' + column._id")
           span.fa.fa-columns &nbsp;专栏

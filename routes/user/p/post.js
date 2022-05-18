@@ -19,7 +19,8 @@ module.exports = async (ctx, next) => {
   }
   const q = {
     uid,
-    mainForumsId: {$in: accessibleFid}
+    mainForumsId: {$in: accessibleFid},
+    type: 'post',
   };
   if(
     (!user || user.uid !== targetUser.uid) &&
@@ -130,10 +131,21 @@ module.exports = async (ctx, next) => {
       content: nkcModules.nkcRender.replaceLink(post.c),
       title: nkcModules.nkcRender.replaceLink(firstPost.t),
       link,
-      reviewed: post.reviewed
+      reviewed: post.reviewed,
     };
     result.toDraft = (result.postType === "postToForum" && thread.recycleMark) || (result.postType === "postToThread" && post.toDraft && post.disabled);
     result.disabled = (result.postType === "postToForum" && thread.disabled) || (result.postType === "postToThread" && !post.toDraft && post.disabled);
+    let postLogOne;
+    if(result.toDraft) {
+      postLogOne = await db.DelPostLogModel.findOne({"threadId": thread.tid, postId: post.pid, "postType": "post", "modifyType": false}).sort({toc: -1});
+    } else if (result.disabled) {
+      postLogOne = await db.DelPostLogModel.findOne({"threadId": thread.tid, postId: post.pid, "postType": "post", "modifyType": false}).sort({toc: -1});
+    } else {
+      postLogOne = await db.ReviewModel.findOne({pid: post.pid}).sort({toc: -1});
+    }
+    if(postLogOne) {
+      result.reviewReason = postLogOne.reason;
+    }
     results.push(result);
   }
   data.paging = paging;

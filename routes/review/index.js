@@ -202,6 +202,8 @@ router
       await post.updateOne({
         reviewed: true
       });
+      //通知作者文章/回复,被回复/评论了
+      await post.noticeAuthorReply();
       //为post生成一条新的动态
       db.MomentModel.createQuoteMomentAndPublish({
         uid: post.uid,
@@ -221,6 +223,7 @@ router
       await thread.updateThreadMessage(false);
       //生成审核记录
       await db.ReviewModel.newReview(type, post, data.user);
+      //生成通知消息
       message = await db.MessageModel({
         _id: await db.SettingModel.operateSystemID("messages", 1),
         r: post.uid,

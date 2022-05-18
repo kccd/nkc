@@ -48,6 +48,7 @@
                 data-global-mouseout="hideUserPanel"
                 data-global-data=objToStr({uid: result.user.uid})
               ).search-result-username!=result.username
+              .search-result-username!=`uid: ${result.uid}`
                 -let targetUser = result.user;
               .display-i-b
                 include ../user/module_user_grade
