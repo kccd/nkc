@@ -25,7 +25,6 @@
                     div.link.hidden-md.hidden-lg
                       a(href=`/message` target='_blank') 私信
                     //div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
-                  .fa(v-if="subscribeBtn" :class="subscribeBtnBoxType ? 'fa-angle-up' : 'fa-angle-down'" @click.stop="subscribeBtnBoxChange(!subscribeBtnBoxType)")
           .account-user-base-info.hidden-md.hidden-sm.hidden-lg.col-xs-12
             .row
               .col-xs-6.m-b-05 {{websiteCode}}ID：{{targetUser.uid}}
@@ -188,10 +187,11 @@
               }
             }
             .account-user-introduce {
-              padding: 0;
+              padding: 0 7rem 0 0;
               @media (max-width: 767px){
                 padding-left: 10.5rem;
                 padding-top: 0.5rem;
+
               }
               .account-user-avatar-xs{
                 position: absolute;
@@ -207,57 +207,32 @@
               .fa{
                 display: none;
               }
-              @media (max-width: 991px){
-                .fa{
-                  display: block;
-                  width: 40px;
-                  height: 20px;
-                  text-align: center;
-                  z-index: 100;
-                }
-                .fa-angle-down{
-                  position: absolute;
-                  top: 27px;
-                  right: 3.5rem;
-                  font-size: 2rem;
-                  color: #fff;
-                  &::before {
-                    content: "\f107";
-                  }
 
-                }
-                .fa-angle-up{
-                  position: absolute;
-                  top: 5rem;
-                  right: 3.5rem;
-                  font-size: 2rem;
-                  height: 40px;
-                  &:before {
-                    @media (max-width: 991px){
-                      content: "\f106";
-                    }
-                  }
-                }
-              }
               .account-user-name{
                 font-size: 1.7rem;
                 font-weight: bold;
                 text-shadow: 1px 0 2px #333;
                 margin-bottom: 0.5rem;
                 color: #fff;
+                overflow: hidden;
+                text-overflow:ellipsis;
+                white-space: nowrap;
                 @media (max-width: 767px){
                   font-size: 1.5rem;
                   padding-top: 0;
                 }
               }
               .account-user-certs{
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+                overflow: hidden;
                 color: #fff;
               }
               .account-user-subscribe{
                 position: absolute;
                 top: 0;
                 right: 2rem;
-                height: 3rem;
                 overflow: hidden;
                 z-index: 1;
                 div{
@@ -268,7 +243,7 @@
                   border: 1px solid #ccc;
                   border-radius: 5px;
                   cursor:pointer;
-                  padding: 3px 1rem;
+                  padding: 2px 6px;
                   margin-right: 1rem;
                   @media (max-width: 991px){
                     display: block;
@@ -409,7 +384,6 @@ export default {
     targetUser: null,
     subscribeBtn: false,
     subscribeBtnType: false,
-    subscribeBtnBoxType: false,
     usersBlUid: [],
     stopInAndOut: false,
   }),
@@ -499,12 +473,7 @@ export default {
             })
       }
     },
-    //主页关注私信按钮盒子展开
-    subscribeBtnBoxChange(bool){
-      this.subscribeBtnBoxType = bool;
-      if(bool) this.$refs.subscribeBox.style.height = '8rem';
-      else this.$refs.subscribeBox.style.height = '3rem';
-    },
+
     toChat(uid){
       NKC.methods.toChat(uid)
     },
