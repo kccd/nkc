@@ -4,14 +4,19 @@ const data = NKC.methods.getDataById("data");
 data.results.map(r => {
   r.buyMessage = "";
   r.products.map(p => {
+    const freight = p.freight;
     const product = p.product;
     if(!product.isFreePost) {
-      p.freightName = product.freightTemplates[0].name
+      const freightNames = product.freightTemplates.map(t => t.name);
+      if(freight && freight.name && freightNames.includes(freight.name)) {
+        p.freightName = freight.name;
+      } else {
+        p.freightName = product.freightTemplates[0].name
+      }
       p.certId = "";
     }
   })
 })
-
 const app = new Vue({
   el: "#app",
   data: {
