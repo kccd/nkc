@@ -1,29 +1,29 @@
 <template lang="pug">
   .user-column-thread.p-t-1
-    paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
-    .loading(v-if="loading") 加载中~
-    blank(v-else-if="threads && threads.length === 0")
-    .user-column-box(v-for="item in threads" v-else)
-      .user-column-body
-        .user-column-title
-          a.user-column-name(:href="item.homeUrl" target="_blank") {{item.columnName}}
-          span(
-            data-type="nkcTimestamp"
-            :data-time="(new Date(item.toc)).getTime()"
-            data-time-type='fromNow'
-            :title="timeFormat(item.toc)"
-          ) {{fromNow(item.toc)}}
-          .user-column-data
-            .fa.fa-thumbs-up(v-if="item.voteUp" ) {{item.voteUp}}
-            .fa.fa-eye(v-if="item.hits" ) {{item.hits}}
-            .fa.fa-comment(v-if="item.count" ) {{item.count}}
-        .user-column-content
-          a(:href="item.url" target="_blank").user-column-content-title {{item.title}}
-          .user-column-content-container
-            a(:href="item.url" target="_blank").user-column-content-abstract {{item.content}}
-            .user-column-content-cover
-              img(:src="getUrl('postCover', item.cover)")
-    paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
+      paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
+      .loading(v-if="loading") 加载中~
+      blank(v-else-if="threads && threads.length === 0")
+      .user-column-box(v-for="item in threads" v-else)
+        .user-column-body
+          .user-column-title
+            a.user-column-name(:href="item.homeUrl" target="_blank") {{item.columnName}}
+            span(
+              data-type="nkcTimestamp"
+              :data-time="(new Date(item.toc)).getTime()"
+              data-time-type='fromNow'
+              :title="timeFormat(item.toc)"
+            ) {{fromNow(item.toc)}}
+            .user-column-data
+              .fa.fa-thumbs-up(v-if="item.voteUp" ) {{item.voteUp}}
+              .fa.fa-eye(v-if="item.hits" ) {{item.hits}}
+              .fa.fa-comment(v-if="item.count" ) {{item.count}}
+          .user-column-content
+            a(:href="item.url" target="_blank").user-column-content-title {{item.title}}
+            .user-column-content-container
+              a(:href="item.url" target="_blank").user-column-content-abstract {{item.content}}
+              .user-column-content-cover
+                img(:src="getUrl('postCover', item.cover)")
+      paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
 </template>
 <style lang="less" scoped>
 .loading {
@@ -130,6 +130,7 @@ export default {
     loading: false,
     threads:null,
     paging: null,
+    t,
   }),
   components:{
     "paging": Paging,
@@ -150,7 +151,9 @@ export default {
     getUrl: getUrl,
     //获取基本数据
     initData() {
-     const {uid} = this.$route.params;
+     const {params, name} = this.$route;
+     const {uid} = params;
+     this.t = name;
      this.uid = uid;
     },
     //获取用户在专栏下发表的文章
@@ -178,6 +181,13 @@ export default {
     //点击分页按钮
     clickBtn(num) {
       this.getColumnThreads(num);
+    },
+    //跳转到指定路由
+    toRoute(name) {
+      this.t = name;
+      this.$router.push({
+        name
+      });
     },
   }
 }

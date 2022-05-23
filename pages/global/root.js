@@ -15,16 +15,13 @@ import {
 } from "./event";
 import {initUserPanel} from "./userPanel";
 import {subUsers} from "../lib/js/subscribe";
-let userPanel;
-$(() => {
-  userPanel = initUserPanel();
-})
 const {isApp, platform, uid} = getState();
 
 window.RootApp = new Vue({
   el: '#rootApp',
   data: {
     uid,
+    userPanel: null,
     isReactNative: isApp && platform === 'reactNative',
   },
   components: {
@@ -46,18 +43,17 @@ window.RootApp = new Vue({
     initGlobalLongPressEvent();
     initAppGlobalClickLinkEvent();
     initGlobalMouseOverEvent();
+    const self = this;
     $(() => {
       // 这里的代码会在页面准备就绪之后执行
+      self.userPanel = initUserPanel();
     });
   },
   methods: {
     //更新右侧抽屉消息条数
     updateNewMessageCount(count) {
       this.$refs.userRightDraw.updateNewMessageCount(count);
-      userPanel.updateNewMessageCount(count);
-    },
-    showUserPanel() {
-      userPanel.showDraw();
+      this.userPanel.updateNewMessageCount(count);
     },
     openLoginPanel(type) {
       if(this.isReactNative) {

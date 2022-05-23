@@ -1,6 +1,6 @@
 <template lang="pug">
-  .user-panel
-    .user-nav-container(v-if="show && !loading")
+  .user-panel(v-show="show" @click="stopEvent")
+    .user-nav-container(v-if="anvState && !loading")
       user-nav(:user="anvState")
     .left-draw-loading(v-else)
       .loading
@@ -32,6 +32,9 @@ export default {
   mounted() {
   },
   methods: {
+    stopEvent(e) {
+      e.stopPropagation();
+    },
     updateNewMessageCount(count) {
       this.anvState.newMessageCount = count;
     },
@@ -53,6 +56,18 @@ export default {
         this.getUserNavData()
       }
       this.show = true;
+      $('#userNavContainer').addClass('active');
+    },
+    hideDraw() {
+      this.show = false;
+      $('#userNavContainer').removeClass('active');
+    },
+    switchDraw() {
+      if(this.show) {
+        this.hideDraw();
+      } else {
+        this.showDraw();
+      }
     }
   }
 }

@@ -17,7 +17,8 @@
                   img(
                     :src="getUrl('userAvatar', u.avatar)"
                     )
-            a(:href="`/u/${targetUser.uid}/p/${type}`" v-if="sidUsers.length > 8").user-card-user-link 查看更多
+            .text-center
+              a(:href="`/u/${targetUser.uid}/p/${type}`" v-if="sidUsers.length > 8").user-card-user-link 查看更多
 </template>
 <style lang="less">
 .sub-fans {

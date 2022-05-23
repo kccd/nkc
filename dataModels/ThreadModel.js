@@ -301,12 +301,12 @@ threadSchema.virtual('user')
   .set(function(u) {
     this._user = u;
   });
-threadSchema.virtual('reason')
+threadSchema.virtual('reviewReason')
 	.get(function() {
-		return this._reason
+		return this._reviewReason
 	})
-	.set(function(reason) {
-		this._reason = reason;
+	.set(function(reviewReason) {
+		this._reviewReason = reviewReason;
 	});
 /* 返回此片文章作者的通讯方式
 * @params {String} tid
@@ -674,8 +674,8 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     lm: pid,
     tlm: nowTime
   });
-  // 如果存在引用，则给被引用者发送引用通知
-  if(quotePost) {
+  // 如果存在引用并且不需要审核，则给被引用者发送引用通知
+  if(quotePost && _post.reviewed) {
     const messageId = await SettingModel.operateSystemID('messages', 1);
     const message = MessageModel({
       _id: messageId,
@@ -756,6 +756,7 @@ const defaultOptions = {
   firstPostResource: false,
   htmlToText: false,
   count: 200,
+  reviewReason: true,
   showAnonymousUser: false,
   excludeAnonymousPost: false,
   removeLink: true,
@@ -828,7 +829,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       threadCategoryObj[nodeId] = threadCategories[i];
     }
   }
-
+  
   if(o.firstPost || o.lastPost) {
     const posts = await PostModel.find({pid: {$in: [...postsId]}}, {
       pid: 1,
@@ -846,13 +847,14 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       reviewed: 1,
       voteDown: 1,
       cover: 1,
-      abstractCn: 1
+      abstractCn: 1,
+      disabled: 1,
+      toDraft: 1,
     });
-    posts.map(post => {
+    posts.map(async post => {
       if(o.htmlToText) {
         post.c = obtainPureText(post.c, true, o.count);
       }
-      postsObj[post.pid] = post;
       if(o.firstPostUser || o.lastPostUser) {
         usersId.add(post.uid);
       }
@@ -862,6 +864,8 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         post.abstractCn = nkcRender.replaceLink(post.abstractCn);
         post.abstractEn = nkcRender.replaceLink(post.abstractEn);
       }
+  
+      postsObj[post.pid] = post;
     });
 
     if(o.firstPostUser || o.lastPostUser) {
@@ -1820,7 +1824,7 @@ threadSchema.methods.createNewPost = async function(post) {
   if(quote && quote[2] !== this.oc) {
     const quPid = quote[2];
     const quPost = await PostModel.findOne({pid: quPid});
-    if(quPost) {
+    if(quPost && _post.reviewed) {
       const reply = new ReplyModel({
         fromPid: pid,
         toPid: quPid,
@@ -1840,7 +1844,6 @@ threadSchema.methods.createNewPost = async function(post) {
       });
 
       await message.save();
-
       await socket.sendMessageToUser(message._id);
       // 如果引用作者的回复，则作者将只会收到 引用提醒
       if(quPost.uid === this.uid) {

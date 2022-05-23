@@ -1,16 +1,17 @@
 const languages = require("../../../nkcModules/language");
 module.exports = async (ctx, next) => {
-  const {nkcModules, query, data, db} = ctx;
+  const {state, nkcModules, query, data, db} = ctx;
   const {targetUser} = data;
   const {t, page} = query;
   // 用户积分
-  if(ctx.permission('viewUserScores')) {
-    data.targetUserScores = await db.UserModel.getUserScores(targetUser.uid);
-  };
+  if(targetUser.uid !== state.uid && !ctx.permission('viewUserScores')) {
+    ctx.throw(403, '权限不足');
+  }
+  data.targetUserScores = await db.UserModel.getUserScores(targetUser.uid);
   const q = {
     verify: true
   };
-  if(!t) {
+  if(t === 'in') {
     q.to = targetUser.uid;
   } else if(t === 'payout') {
     q.from = targetUser.uid;

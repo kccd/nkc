@@ -561,7 +561,7 @@ messageSchema.statics.getParametersData = async (message) => {
       postContent: apiFunction.obtainPureText(post.c)
     };
   } else if(type === 'replyArticle') {
-    //独立文章通知作者文章被评论了
+    //独立文章通知作者文章被回复了
     const {docId} = message.c;
     const document = await DocumentModel.findOnly({_id: docId});
     const {comment: commentSource} = await DocumentModel.getDocumentSources();
@@ -577,7 +577,7 @@ messageSchema.statics.getParametersData = async (message) => {
       username: user.username,
       articleURL: comment.url,
       articleTitle: articleDocument.title,
-      commentURL: await CommentModel.getLocationUrl(comment._id),
+      commentURL: comment.commentUrl,
       commentContent: apiFunction.obtainPureText(commentDocument.content),
     };
     
@@ -599,7 +599,7 @@ messageSchema.statics.getParametersData = async (message) => {
       username: user.username,
       articleURL: comment.url,
       articleTitle: articleDocument.title,
-      commentURL: await CommentModel.getLocationUrl(comment._id),
+      commentURL: comment.commentUrl,
       commentContent: apiFunction.obtainPureText(commentDocument.content),
     };
   

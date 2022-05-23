@@ -241,8 +241,12 @@
         });
       },
       initDomId() {
-        if(this.domId) return;
-        this.domId = `editor_id_${Date.now()}_${Math.round(Math.random() * 100000)}`;
+        const self = this;
+        return new Promise(resolve => {
+          if(self.domId) return resolve();
+          self.domId = `editor_id_${Date.now()}_${Math.round(Math.random() * 100000)}`;
+          self.$nextTick(resolve);
+        });
       },
       initEditor() {
         const self = this;

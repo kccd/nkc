@@ -70,6 +70,8 @@ userRouter
     await data.targetUser.extendGrade();
     await data.targetUser.extendDraftCount();
     await db.UserModel.extendUserInfo(data.targetUser);
+    //获取用户专栏文章数量
+    await data.targetUser.extendColumnAndZoneThreadCount();
     await next();
   })
   .use('/:uid', async (ctx, next) => {

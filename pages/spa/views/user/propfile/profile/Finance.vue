@@ -15,7 +15,7 @@
     .finance-context
       h4 我的资产
         small(v-for="item in targetUserScores").p-l-1.text-success {{item.name}}
-          strong.h4.text-danger {{item.number / 100}}
+          strong.h4.text-danger &nbsp;{{item.number / 100}}&nbsp;
           span {{item.unit}}
       .m-b-1
         a.btn.btn-success.btn-sm(href="/account/finance/recharge" target="_blank") 充值
@@ -52,8 +52,14 @@
               th
                 .table-content(:title="item.description") {{item.description}}
               th
-                span(v-if="t === 'in'" ) {{item.toUser.username || nkcBankName}}
-                span(v-else-if="t === 'payout'" ) {{item.fromUser.username || nkcBankName}}
+                span(v-if="t === 'in'" )
+                  span(v-if="item.from === 'bank'" ) {{nkcBankName}}
+                  a(:href='getUrl("userHome", item.fromUser.uid)' target="_blank" v-else-if="item.fromUser") {{item.fromUser.username}}
+                  span(v-else) {{item.from}}
+                span(v-else-if="t === 'payout'" )
+                  span(v-if="item.to === 'bank'" ) {{nkcBankName}}
+                  a(:href='getUrl("userHome", item.toUser.uid)' target="_blank" v-else-if="item.toUser") {{item.toUser.username}}
+                  span(v-else) {{item.to}}
               th {{item.num / 100}}
               th
                 a(:href="item.post.url" target="_blank" v-if="item.post" ) {{'文号（'+item.pid+'）'}}
@@ -176,7 +182,10 @@ import {nkcAPI} from "../../../../../lib/js/netAPI";
 import {timeFormat} from "../../../../../lib/js/time";
 import {getState} from "../../../../../lib/js/state";
 import Paging from "../../../../../lib/vue/Paging";
+import {getUrl} from "../../../../../lib/js/tools";
+
 export default {
+  props: ['targetUid'],
   data: () => ({
     targetUserScores: null,
     show: false,
@@ -186,12 +195,14 @@ export default {
     t: null,
     targetUser: null,
     paging: null,
+    uid: null,
   }),
   components: {
     "paging": Paging
   },
   created() {
-    this.uid = getState().uid;
+    const {uid} = this.$route.params;
+    this.uid = this.targetUid?this.targetUid:uid;
     this.getUserAccountInfo();
   },
   computed: {
@@ -203,10 +214,11 @@ export default {
     window.addEventListener("click", this.clickOther);
   },
   methods: {
+    getUrl,
     timeFormat: timeFormat,
     getUserAccountInfo(page=0, type=''){
       const self = this;
-      let url = `/u/${this.uid}/profile/financeData?page=${page}`;
+      let url = `/u/${self.uid}/profile/financeData?page=${page}`;
       if(type){
         url += `&t=${type}`;
       }

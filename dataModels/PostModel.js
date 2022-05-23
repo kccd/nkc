@@ -1,11 +1,7 @@
 const settings = require('../settings');
 const PATH = require('path');
 const nkcRender = require('../nkcModules/nkcRender');
-const {htmlToPlain, renderHTML} = nkcRender;
 const customCheerio = require('../nkcModules/nkcRender/customCheerio');
-const {getQueryObj, obtainPureText} = require('../nkcModules/apiFunction');
-const tools = require("../nkcModules/tools");
-const {timeFormat, getUrl} = require("../nkcModules/tools");
 const mongoose = settings.database;
 const {Schema} = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
@@ -2095,6 +2091,114 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
     results[pid] = result;
   }
   return results;
+}
+
+/*
+* 根据post通知文章作者文章被回复，回复被引用，只针对回复post
+* */
+postSchema.methods.noticeAuthorReply = async function() {
+  const MessageModel = mongoose.model('messages');
+  const PostModel = mongoose.model('posts');
+  const ThreadModel= mongoose.model('threads');
+  const SettingModel = mongoose.model('settings');
+  const socket = require('../nkcModules/socket');
+  const newPost = await PostModel.findOnly({pid: this.pid});
+  if(!newPost) return;
+  let {type, pid, tid, reviewed, disabled, toDraft, quote, parentPostId} = newPost;
+  if(type === 'thread') return;
+  //如果评论被已经审核成功,并且状态正常就创建消息通知
+  if(reviewed) {
+    Promise.resolve()
+      .then(async () => {
+        //如果存在引用就先判断引用的post是否存在,如果引用存在并且不是自己引用自己就通知被引用的作者
+        if(quote) {
+          let quotePost = await PostModel.findOne({tid, pid: quote.split(':').shift(), type: 'post'}, {cv:1, pid: 1, uid: 1});
+          if(quotePost && quotePost.uid !== this.uid) {
+            //消息是否已经发送过,如果数据库中存在消息就返回
+            const oldMessage = await MessageModel.findOne({
+              r: quotePost.uid,
+              ty: 'STU',
+              'c.type': 'replyPost',
+              'c.targetPid': pid,
+              'c.pid': quotePost.pid,
+            });
+            if(oldMessage) return;
+            const message = MessageModel({
+              _id: await SettingModel.operateSystemID('messages', 1),
+              r: quotePost.uid,
+              ty: 'STU',
+              c: {
+                type: 'replyPost',
+                targetPid: pid,
+                pid: quotePost.pid,
+              }
+            });
+    
+            await message.save();
+            return await socket.sendMessageToUser(message._id);
+          }
+        }
+      })
+      .then(async () => {
+        //如果post存在上级post并且不是自己回复自己就通知上层Post回复被评论了
+        if(parentPostId) {
+          let parentPost = await PostModel.findOnly({pid: parentPostId});
+          if(parentPost && parentPost.uid !== this.uid) {
+            const oldMessage = await MessageModel.findOne({
+              r: parentPost.uid,
+              ty: "STU",
+              ip: this.address,
+              port: this.port,
+              'c.type': 'comments',
+              'c.pid': this.pid,
+            });
+            if(oldMessage) return;
+            const message = await MessageModel({
+              _id: await SettingModel.operateSystemID("messages", 1),
+              r: parentPost.uid,
+              ty: "STU",
+              ip: this.address,
+              port: this.port,
+              c: {
+                type: "comment",
+                pid: this.pid,
+              }
+            });
+            await message.save();
+            return await socket.sendMessageToUser(message._id);
+          }
+        }
+      })
+      .then(async () => {
+        //通知文章作者文章被回复
+        const thread = await ThreadModel.findOnly({tid}, {tid: 1, pid: 1, oc: 1});
+        if(!thread) return console.log('未找到文章');
+        const oldMessage = await MessageModel.findOne({
+          r: thread.uid,
+          ty: 'STU',
+          'c.type': 'replyThread',
+          'c.targetPid': pid,
+          'c.pid': thread.oc,
+        });
+        if(oldMessage) return;
+        const messageId = await SettingModel.operateSystemID('messages', 1);
+        const message = await MessageModel({
+          _id: messageId,
+          r: thread.uid,
+          ty: 'STU',
+          c: {
+            type: 'replyThread',
+            targetPid: pid,
+            pid: thread.oc,
+          },
+        });
+        await message.save();
+        return await socket.sendMessageToUser(message._id);
+      })
+      .catch(err => {
+        console.log(err);
+      })
+  }
 }
 
 module.exports = mongoose.model('posts', postSchema);

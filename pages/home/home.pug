@@ -122,7 +122,10 @@ block content
                     h4
                       b 空空如也~
                 else
-                  -showPagingSortButton = true;
+                  if data.t === 'column'
+                    -showPagingSortButton = false;
+                  else if data.t === 'thread'
+                    -showPagingSortButton = true;
                   include ../publicModules/paging/paging
 
                   if data.t === 'thread' && data.paging.page === 0 && data.latestToppedThreads.length > 0

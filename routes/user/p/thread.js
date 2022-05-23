@@ -65,7 +65,8 @@ module.exports = async (ctx, next) => {
     lastPost: false,
     lastPostUser: false,
     firstPostResource: true,
-    htmlToText: true
+    htmlToText: true,
+    reviewReason: true,
   });
   const results = [];
   for (const thread of threads) {
@@ -104,12 +105,21 @@ module.exports = async (ctx, next) => {
       content: nkcModules.nkcRender.replaceLink(thread.firstPost.c),
       anonymous: thread.firstPost.anonymous,
       link: `/t/${thread.tid}`,
-      reviewed: thread.reviewed
+      reviewed: thread.reviewed,
     };
-    
     result.toDraft = thread.recycleMark;
     result.disabled = thread.disabled;
-    
+    let threadLogOne;
+    if(result.toDraft) {
+      threadLogOne = await db.DelPostLogModel.findOne({"threadId": thread.tid, "postType": "thread", "modifyType": false}).sort({toc: -1});
+    } else if (result.disabled) {
+      threadLogOne = await db.DelPostLogModel.findOne({"threadId": thread.tid, "postType": "thread", "modifyType": false}).sort({toc: -1});
+    } else {
+      threadLogOne = await db.ReviewModel.findOne({pid: thread.firstPost.pid}).sort({toc: -1});
+    }
+    if(threadLogOne) {
+      result.reviewReason = threadLogOne.reason;
+    }
     results.push(result);
   }
   data.paging = paging;

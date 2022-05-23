@@ -1,7 +1,9 @@
 <template lang="pug">
   .user-post
+    .paging-button
+      a.button(@click="toRoute('post')" :class="t === 'post'?'active':''") 回复
+      a.button(@click="toRoute('thread')" :class="t === 'thread'?'active':''") 文章
     to-column(ref="toColumn")
-
     .user-post-list
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
       .paging-button(v-if="routeName === 'thread' && permissions.reviewed" )
@@ -15,7 +17,9 @@
         hr(v-if="index")
         review(ref="review" :post="post" :permissions="permissions" @refresh="refreshPage" v-if="!post.reviewed")
         .thread-draft-info(v-else-if="post.toDraft") 退修中，仅自己可见，修改后对所有人可见
+          .reason 理由: {{post.reviewReason}}
         .thread-disabled-info(v-else-if="post.disabled" ) 已屏蔽，仅自己可见
+          .reason 理由: {{post.reviewReason}}
         .checkbox(v-if="managementBtn" )
           label
             input(type="checkbox" :value="post.pid" v-model="checkboxPosts")
@@ -25,6 +29,7 @@
 <style lang="less" scoped>
 @import "../../../../../publicModules/base";
 .user-post {
+  padding-top: 1rem;
   .user-list-warning {
     margin-top: 5rem;
     margin-bottom: 5rem;
@@ -59,6 +64,7 @@ export default {
     managementBtn: false,
     permissions: {},
     checkboxPosts: [],
+    t: '',
   }),
   components: {
     "blank": Blank,
@@ -82,7 +88,7 @@ export default {
   },
   methods: {
     initData() {
-      const {params, path} = this.$route;
+      const {params, path, name} = this.$route;
       const {uid: stateUid} = getState();
       const index = path.indexOf('thread');
       if(index === -1) {
@@ -91,6 +97,7 @@ export default {
         this.routeName = 'thread';
       }
       const {uid} = params;
+      this.t = name;
       this.uid = uid || stateUid;
       this.getPostList(0);
     },
@@ -110,7 +117,6 @@ export default {
       }
       nkcAPI(url, "GET")
         .then(res => {
-          self.t = res.t;
           self.paging = res.paging;
           self.posts = res.posts;
           self.permissions = res.permissions;
@@ -168,7 +174,14 @@ export default {
     //点击分页
     clickButton(num) {
       this.getPostList(num);
-    }
+    },
+    //跳转到指定路由
+    toRoute(name) {
+      this.t = name;
+      this.$router.push({
+        name
+      });
+    },
   }
 }
 </script>
