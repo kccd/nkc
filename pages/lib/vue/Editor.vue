@@ -345,7 +345,7 @@
               .attr('data-tag', 'nkcsource')
               .attr('data-type', 'picture')
               .attr('data-id', rid)
-            console.log(`外链图片下载成功，正在处理`);
+            console.log(`外链图片（${url}）下载成功，服务端正在处理。`);
           })
           .catch(err => {
             const defaultSrc = getUrl('defaultFile', 'picdefault.png');
