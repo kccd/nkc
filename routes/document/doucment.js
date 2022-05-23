@@ -8,6 +8,7 @@ router
   const {db, data, state, query, permission} = ctx;
 
   const {sid, source} = query;
+  // 需要返回 分类信息
   const document = await db.DocumentModel.find({sid, source, uid: state.uid, type: "beta"}).sort({tlm: -1}).skip(0).limit(1);
   if(!document.length) ctx.throw(400, "该文章已被发布")
 

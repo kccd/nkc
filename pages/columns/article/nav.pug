@@ -13,7 +13,7 @@ mixin nav(data)
   +includeCSS('/columns/article/nav.css')
   header
     -var mainCategoryId = '';
-    if mainCategory.length
+    if mainCategory && mainCategory.length
       p.path-navigation.hidden-xs
         //- a.jump(href=`/m`) 专栏
         //- span.nav-common >
@@ -26,7 +26,7 @@ mixin nav(data)
             span.nav-common /
       //- else
       //-   a.jump(href=`/m/${_id}`) 全部
-    if auxiliaryCategory.length && mainCategoryId
+    if mainCategory && auxiliaryCategory.length && mainCategoryId
       p.path-navigation.m-l-5.hidden-xs
         span.article-common-nav  辅分类:
         for category,i in auxiliaryCategory
