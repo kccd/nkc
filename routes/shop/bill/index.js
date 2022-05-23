@@ -41,14 +41,14 @@ router
     // 将商品按店家分类，将规格按商品分类
     const usersObj = {}, productsObj = {}, paramsObj  = {};
     for(const cart of data.cartsData) {
-      const {product, productParam, count, _id} = cart;
+      const {product, productParam, count, _id, freightId} = cart;
       usersObj[product.uid] = {
         user: product.user,
         products: []
       };
       productsObj[product.productId] = {
         product,
-        freight: product.isFreePost? "": product.freightTemplates[0],
+        freight: product.isFreePost? "": (product.freightTemplates[freightId]||product.freightTemplates[0]),
         params: []
       };
       paramsObj[productParam._id] = {
