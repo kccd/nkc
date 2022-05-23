@@ -30,7 +30,7 @@ mixin nav(data)
         for category,i in auxiliaryCategory
           a.article-common-nav(href=`/m/${_id}?c=${category._id}`)=category.name
           if auxiliaryCategory.length !== i+1
-            span.m-l-1.nav-common /
+            span.m-l-1.nav-common ,
 
     p.info-list
       if oc
