@@ -280,7 +280,9 @@
   import {DraggableElement} from "../js/draggable";
   import {fileToBase64} from "../js/file";
   import {screenTopWarning} from "../js/topAlert";
-  import { getSocket } from "../js/socket"
+  import { getSocket } from "../js/socket";
+  import { debounce } from "../js/execution";
+
   const socket = getSocket();
   export default {
     data: () => ({
@@ -301,9 +303,10 @@
       notesAboutUsing: ''
     }),
     mounted() {
-      socket.on('fileTransformProcess',(data)=>{
+      socket.on('fileTransformProcess', debounce(
+        (data)=>{
         this.getStickers()
-      })
+      } ,1000) )
       this.initDraggableElement();
     },
     destroyed(){
