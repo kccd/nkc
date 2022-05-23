@@ -93,6 +93,13 @@
       'drafts-selector': DraftsSelector,
     },
     data: () => ({
+      socketHandleResources: [
+        /*{
+          rid: String,
+          success: Boolean,
+        }*/
+      ],
+      socketHandleTimer: null,
       logged: !!state.uid,
       socket: null,
       domId: '',
@@ -205,34 +212,6 @@
         } else {
           self.showSavingInfoPanel(duration);
         }
-
-        /*if(info === 'saving') {
-          clearTimeout(self.savingInfoTimer);
-          clearTimeout(self.savedInfoTimer);
-          clearTimeout(self.savingInfoContentTimer);
-          self.savingInfoTimer = setTimeout(() => {
-            self.saveInfo = info;
-            self.saveInfoClass = info;
-          }, 200)
-        } else if(info === 'succeeded') {
-          clearTimeout(self.savingInfoTimer);
-          clearTimeout(self.savedInfoTimer);
-          clearTimeout(self.savingInfoContentTimer);
-          self.saveInfo = info;
-          self.saveInfoClass = info;
-          self.savedInfoTimer = setTimeout(() => {
-            self.saveInfoClass = '';
-            self.savingInfoContentTimer = setTimeout(() => {
-              self.saveInfo = '';
-            }, 200);
-          }, 1000);
-        } else if(info === 'failed') {
-          clearTimeout(self.savingInfoTimer);
-          clearTimeout(self.savedInfoTimer);
-          clearTimeout(self.savingInfoContentTimer);
-          self.saveInfo = info;
-          self.saveInfoClass = info;
-        }*/
       },
       contentChange(){
         const  _this = this;
@@ -279,30 +258,54 @@
           this.socket.off('fileTransformProcess', this.socketHandle);
           this.socket = null;
         }
+        this.clearSocketHandleTimer();
+      },
+      modifyUploadedResources() {
+        const {socketHandleResources} = this;
+        if(socketHandleResources.length === 0) return;
+        const content = this.getContent();
+        const container = $('<div></div>');
+        container.html(content);
+        for(const r of socketHandleResources) {
+          const {success, rid} = r;
+          const images = container.find(
+            `img[data-tag="nkcsource"][data-type="picture"][data-id="${rid}"]`
+          );
+          if(success) {
+            const imageSrc = getUrl('resource', rid);
+            images
+              .attr('src', imageSrc)
+              .attr('_src', imageSrc);
+          } else {
+            const defaultSrc = getUrl('defaultFile', 'picdefault.png');
+            images
+              .attr('src', defaultSrc)
+              .attr('_src', defaultSrc)
+              .removeAttr('data-tag')
+              .removeAttr('data-type')
+              .removeAttr('data-id')
+          }
+        }
+        this.socketHandleResources.length = 0;
+        this.setContent(container.html());
+      },
+      clearSocketHandleTimer() {
+        clearTimeout(this.socketHandleTimer);
       },
       socketHandle(e) {
         const {rid, state} = e;
-        const content =  this.getContent();
-        const container = $('<div></div>');
-        container.html(content);
-        const images = container.find(
-          `img[data-tag="nkcsource"][data-type="picture"][data-id="${rid}"]`
-        );
-        if(state === 'fileProcessFinish') {
-          const imageSrc = getUrl('resource', rid);
-          images
-            .attr('src', imageSrc)
-            .attr('_src', imageSrc);
-        } else {
-          const defaultSrc = getUrl('defaultFile', 'picdefault.png');
-          images
-            .attr('src', defaultSrc)
-            .attr('_src', defaultSrc)
-            .removeAttr('data-tag')
-            .removeAttr('data-type')
-            .removeAttr('data-id')
-        }
-        this.setContent(container.html());
+
+        this.socketHandleResources.push({
+          rid,
+          success: state === 'fileProcessFinish'
+        });
+
+        this.clearSocketHandleTimer();
+
+        const self = this;
+        this.socketHandleTimer = setTimeout(() => {
+          self.modifyUploadedResources();
+        }, 2000);
       },
       catchRemoteImage() {
         const content =  this.getContent();
