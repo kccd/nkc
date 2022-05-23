@@ -1348,7 +1348,7 @@ schema.statics.getArticleInfoByColumn = async function(columnPost) {
   let column = await ColumnModel.findOne({_id: columnId})
   column = column.toObject()
   const mainCategory = await ColumnPostCategoryModel.getParentCategoryByIds(cid)
-  const auxiliaryCategory = await ColumnPostCategoryModel.getMinorCategories(columnId, mcid)
+  const auxiliaryCategory = await ColumnPostCategoryModel.getArticleAllMinorCategories(mcid)
   return {
     _id: columnPost._id,
     thread: article,
