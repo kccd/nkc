@@ -9,9 +9,8 @@
 <script>
 import SidUsers from "./SidUsers";
 export default {
-  props: ["targetUserFans", "targetUserFollowers"],
+  props: ["targetUserFans", "targetUserFollowers", 'targetUser'],
   data: () => ({
-    targetUser: '',
   }),
   components: {
     "sid-users": SidUsers

@@ -18,7 +18,7 @@
                     :src="getUrl('userAvatar', u.avatar)"
                     )
             .text-center
-              a(:href="`/u/${targetUser.uid}/p/${type}`" v-if="sidUsers.length > 8").user-card-user-link 查看更多
+              a(:href="`/u/${targetUser.uid}/profile/${type}`" v-if="sidUsers.length > 8").user-card-user-link 查看更多
 </template>
 <style lang="less">
 .sub-fans {
@@ -35,7 +35,6 @@ import {objToStr} from "../../../../lib/js/tools";
 export default {
   props: ['targetUser', 'sidUsers', 'title', 'type'],
   data: () => ({
-
   }),
   methods: {
     getUrl: getUrl,
