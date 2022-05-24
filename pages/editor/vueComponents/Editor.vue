@@ -136,10 +136,11 @@ export default {
         if(err.error){
           this.err = err.error;
           this.$emit('noPermission', err);
+          sweetError(err.error);
+          
           // sweetError('当前没有权限');
-          return
+          // return
         }
-        sweetError(err);
       });
     window.addEventListener("pageshow", this.clearCache);
   },
