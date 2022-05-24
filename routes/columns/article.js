@@ -3,7 +3,8 @@ const router = require('koa-router')();
 router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
   const {pageSettings, uid} = state;
-  const {page = 0, highlight, t} = query;
+  const {highlight, t, last_page} = query;
+  let {page = 0} = query;
   ctx.template = 'columns/article.pug';
   const { user } = data;
   const {_id, aid} = params;
@@ -64,7 +65,14 @@ router.get('/:aid', async (ctx, next)=>{
     //获取评论分页
     let count = 0;
     if(articlePost) {
+      // 获取当前文章下回复的总数目
       count = await db.CommentModel.countDocuments(match);
+    }
+    const paging_ = nkcModules.apiFunction.paging(page, count, 30);
+    const {pageCount} = paging_;
+    // 访问最后一页
+    if(last_page) {
+      page = pageCount -1;
     }
     const paging = nkcModules.apiFunction.paging(page, count, 30);
     data.paging = paging;
