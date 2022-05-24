@@ -22,18 +22,19 @@
 1. install all the requirements
 2. clone this repo
 3. run `npm install` in your console
-4. npm start and you are able to access via localhost:1086
+4. run `npm run init` to initialize data
+5. npm start and you are able to access via localhost:1086
 
 ## How to call an API
 - In browser
 
-```html
-<script src='/interface_common.js'/>
-<script>
-  nkcAPI(`pathToYourTarget`, HTTP_Method, {someParameter:'someValue'})
-    .then(jalert)
-    .catch(jalert)
-</script>
+```javascript
+import {nkcAPI} from 'pages/lib/js/netAPI';
+import {sweetError, sweetSuccess} from 'pages/lib/js/sweetAlert';
+
+nkcAPI(`pathToYourTarget`, HTTP_Method, {someParameter:'someValue'})
+  .then(sweetSuccess)
+  .catch(sweetError)
 ```
 
 ## Future plans
