@@ -138,6 +138,9 @@
         }
       }
       .editor-authors {
+        input{
+          color: black
+        }
         color: #88919d;
         .editor-author input:focus{
           outline: none;
