@@ -186,7 +186,7 @@ export function initGlobalMouseOverEvent() {
 * */
 export function initAppGlobalClickLinkEvent() {
   if(!isReactNative) return;
-  // 限流 限制点击链接最小间隔时间为1000ms
+  // 限流 限制点击链接最小间隔时间为300ms
   // 防止app同时打开多个相同的页面
   const handle = throttle(function(e) {
     let element = e.target;
@@ -206,7 +206,9 @@ export function initAppGlobalClickLinkEvent() {
     const title = elementJQ.attr('title') || '';
     const targetUrl = RNUrlPathEval(window.location.href, href);
     RNOpenNewPage(targetUrl, title);
+  }, 300);
+  document.addEventListener('click', (e) => {
+    handle(e);
     e.preventDefault();
-  }, 1000);
-  document.addEventListener('click', handle, {passive: false});
+  });
 }
