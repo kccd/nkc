@@ -1,6 +1,22 @@
 const router = require('koa-router')();
 const nkcRender = require('../../nkcModules/nkcRender');
-
+/* 
+* 如果是专栏文章预览就返回分类信息
+*/
+// async function setCategory(data, state, db, source) {
+//   if(source === 'article'){
+//     const articleSource = await db.ArticleModel.findOne({_id: data.document.sid, uid: state.uid},{source: 1});
+//     if(articleSource.source === "column"){
+//       const category = await db.ColumnPostModel.findOne({pid: articleSource._id, tUid: state.uid}, { cid: 1, mcid: 1, columnId: 1 })
+//       const { cid, mcid, columnId } = category;
+//       const column = await db.ColumnModel.findOne({_id: columnId}, {name: 1})
+//       // 分类和专栏名
+//       data.mainCategory = await db.ColumnPostCategoryModel.getParentCategoryByIds(cid);
+//       data.auxiliaryCategory = await db.ColumnPostCategoryModel.getArticleAllMinorCategories(mcid);
+//       data.columnName = column.name;
+//     }  
+//   }
+// }
 router
 .get('preview', async (ctx, next) => {
   //获取文档预览信息
@@ -109,7 +125,7 @@ router
     data.document = data.history[0];
   }
   if(data.document.uid !== state.uid){
-    if(!permission("viewUserArticle")) ctx.throw(403, "没有权限")
+    if(!permission("viewUserArticle")) ctx.throw(403, "没有权限");
   }
   data.paging = paging;
   data.document.user = await db.UserModel.findOnly({uid: data.document.uid});

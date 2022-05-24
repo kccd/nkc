@@ -729,7 +729,8 @@ export default {
     imgInfo:{},
     reduction:[0,180,-180],
     minContainerHeight:500,
-    socketEventListenerDebounce: ""
+    socketEventListenerDebounce: "",
+    debounce: ""
   }),
   components: {
     'image-viewer': ImageViewer,
@@ -738,14 +739,14 @@ export default {
     'select-category': SelectCategory,
   },
   created(){
-    this.socketEventListenerDebounce = debounce(this.socketEventListener, 500);
+    this.debounce = debounce;
     this.getResourcesDebounce = debounce(this.getResources, 500)
   },
   mounted() {
     if(this.watchType === 'category') {
       this.getResourcesDebounce(0);
     }
-    this.initSocketEvent();
+    this.initSocketEvent();    
     this.initDragUploadEvent();
   },
   destroyed() {
@@ -862,6 +863,7 @@ export default {
         }
         self.getResources(0, data.requestType);
       }
+      this.socketEventListenerDebounce = this.debounce(this.socketEventListener, 500);
       // 统一用一个防抖函数，最大程度的减少相同请求
       socket.on("fileTransformProcess", this.socketEventListenerDebounce );
       socket.on('resources',this.socketEventListenerDebounce );
