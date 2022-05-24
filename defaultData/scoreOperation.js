@@ -21,6 +21,8 @@ module.exports = {
     'unDigestThread',
     'digestArticle',
     'unDigestArticle',
+    'digestComment',
+    'unDigestComment',
     'digestPost',
     'unDigestPost',
   ]

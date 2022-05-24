@@ -1,5 +1,5 @@
 module.exports = async (ctx, next) => {
-  const {db, data, state, params, query, permission} = ctx;
+  const {db, data, state, params, query, permission, permissionsOr} = ctx;
   const {_id} = params;
   const {aid} = query;
   const {user} = data;
@@ -20,15 +20,22 @@ module.exports = async (ctx, next) => {
     ipInfo: null,
     violation: null,
     blacklist: null,
+    digest: null,
   };
   if(user) {
+    data.digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
+    data.redEnvelopeSettings = await db.SettingModel.getSettings('redEnvelope');
     if(isComment) {
       //审核权限
       if(permission('review')) {
         optionStatus.reviewed = document.status
       }
-      //用户具有自己的评论的编辑权限
-      if(uid === comment.uid) {
+      //评论加精权限
+      if(ctx.permission('digestPost')) {
+        optionStatus.digest = comment.digest;
+      }
+      //用户具有自己的评论的编辑权限以及管理员编辑权限
+      if(uid === comment.uid || permissionsOr(['pushThread', 'moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop'])) {
         optionStatus.editor = true;
       }
       //退修禁用权限

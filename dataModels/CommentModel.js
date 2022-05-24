@@ -864,7 +864,7 @@ schema.statics.getCommentsObjectByCommentsId = async function(commentsId) {
 * 通过commentId获取comment
 * @params {Array} commentId 需要获取的评论的Id
 * */
-schema.statics.getCommentsByCommentsId = async function (commentsId, uid) {
+schema.statics.getCommentsByCommentsId = async function (commentsId) {
   const CommentModel = mongoose.model('comments');
   const ArticleModel = mongoose.model('articles');
   const UserModel = mongoose.model('users');

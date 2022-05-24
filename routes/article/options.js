@@ -36,8 +36,6 @@ router
     if(user) {
       data.digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
       data.redEnvelopeSettings = await db.SettingModel.getSettings('redEnvelope');
-    }
-    if(user) {
       if(permission('review')) {
         optionStatus.reviewed = document.status;
         optionStatus.history = true;
