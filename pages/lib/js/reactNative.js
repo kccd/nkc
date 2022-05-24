@@ -393,3 +393,12 @@ export function RNSaveImage(data) {
 export function RNOpenDownloadList() {
   RNEmit('openDownloadList');
 }
+
+/*
+* 同步网页 title
+* */
+export function RNSetPageTitle(title) {
+  RNEmit('syncPageTitle', {
+    title
+  });
+}
