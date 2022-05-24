@@ -133,6 +133,15 @@ module.exports = async (ctx, next) => {
 	    if(!ctx.data.userOperationsId) ctx.data.userOperationsId = [];
 	    return ctx.data.userOperationsId.includes(o);
     };
+    //权限判断 or
+    ctx.permissionsOr = (o) => {
+      for(const i of o) {
+        if(ctx.permission(i)) {
+          return true;
+        }
+      }
+      return false;
+    }
 
 	  // 设置cookie
     // @param {String} key cookie名

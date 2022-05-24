@@ -102,6 +102,18 @@ module.exports = [
     count: 0
   },
   {
+    _id: 'digestArticle',
+    description: '独立文章被加精',
+    num: -5,
+    count: 0
+  },
+  {
+    _id: 'unDigestArticle',
+    description: '独立文章被取消加精',
+    num: -5,
+    count: 0
+  },
+  {
     _id: 'waterPay',
     description: '购买水印服务',
     num: -200,

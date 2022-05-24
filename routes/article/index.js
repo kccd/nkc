@@ -3,6 +3,7 @@ const draftRouter = require('./draft');
 const optionsRouter = require('./options');
 const unblockRouter = require('./unblock');
 const collectionRouter = require('./collection');
+const digestRouter = require('./digest');
 router
   .del('/:aid', async (ctx, next) => {
     const {params, db, state} = ctx;
@@ -16,5 +17,6 @@ router
   .use('/:aid/options', optionsRouter.routes(), optionsRouter.allowedMethods())
   .use('/:aid/unblock', unblockRouter.routes(), unblockRouter.allowedMethods())
   .use('/:aid/collection', collectionRouter.routes(), collectionRouter.allowedMethods())
+  .use('/:aid/digest', digestRouter.routes(), digestRouter.allowedMethods())
 module.exports = router;
 

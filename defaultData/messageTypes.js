@@ -14,6 +14,21 @@ module.exports = {
     },
     {
       parameters: [
+        "articleTitle",
+        "articleURL"
+      ],
+      content: "您发表的文章[url=articleURL(articleTitle)]已被列入精选。",
+      type: "digestArticle"
+    },
+    {
+      parameters: [
+        "commentURL"
+      ],
+      content: "您发表的回复已被列入精选，[url=commentURL(查看)]。",
+      type: "digestComment"
+    },
+    {
+      parameters: [
         "postID",
         "postURL"
       ],

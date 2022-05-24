@@ -7,6 +7,7 @@ import UserFloatPanel from "../lib/vue/UserFloatPanel";
 import SubscribeTypes from "../lib/vue/SubscribeTypes";
 import FloatForumPanel from "../lib/vue/forum/FloatForumPanel";
 import Sticker from '../lib/vue/Sticker';
+import Digest from "../lib/vue/Digest";
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
@@ -32,6 +33,7 @@ window.RootApp = new Vue({
     "float-forum-panel": FloatForumPanel,
     "subscribe-types": SubscribeTypes,
     "sticker-panel": Sticker,
+    digest: Digest,
   },
   computed: {
     hasLogged() {
@@ -80,6 +82,13 @@ window.RootApp = new Vue({
     //关闭抽屉
     closeDraw(type) {
       this.$refs.userDraw.colseDraw(type);
+    },
+    //打开加精弹窗
+    openDigest(callback, options) {
+      this.$refs.digest.open(callback, options);
+    },
+    closeDigest() {
+      this.$refs.digest.close();
     },
     //关注取关用户
     subscribe(options) {
