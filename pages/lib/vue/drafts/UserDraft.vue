@@ -31,16 +31,16 @@
       a.account-post-content {{draft.c || "未填写内容"}}
       .text-right.m-t-05.draft-button
         button(@click="removeDraftSingle(draft.did)") 删除
-        span.dropdown(v-if="draft.desType === 'post'")
+        span.dropdown(v-if="draft.desType === 'post' && draft.type !== 'modifyPost'")
           button.p-a-0.m-a-0(style='color: #2b90d9' :id="`dLabel_${draft.did}`" type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false') 继续创作
             span.caret
           ul.dropdown-menu.dropdown-menu-right(:aria-labelledby="`dLabel_${draft.did}`")
             li
-              a(:shref="`/editor?type=redit&id=${draft.did}&o=copy`" target='_blank')
+              a(:href="`/editor?type=redit&id=${draft.did}&o=copy`" target='_blank')
                 .fa.fa-clone
                 span &nbsp;复制为新文章
             li
-              a(:shref="`/editor?type=redit&id=${draft.did}&o=update`" target='_blank')
+              a(:href="`/editor?type=redit&id=${draft.did}&o=update`" target='_blank')
                 .fa.fa-refresh
                 span &nbsp;更新已发布的文章
         a(:href="`/editor?type=redit&id=${draft.did}&o=update`" target='_blank' v-else) 继续创作

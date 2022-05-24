@@ -47,6 +47,9 @@ export default {
       type: Object,
       required: true,
     },
+    o: {
+      type: String,
+    }
   },
   data: () => ({
     type: "newThread",
@@ -79,6 +82,15 @@ export default {
         if (n?.forum) this.forum = n.forum;
         if (n?.thread) this.thread = n.thread;
         if (n?.post?.pid) this.pid = n.post.pid;
+      }
+    },
+    o: {
+      immediate: true,
+      handler(n) {
+        if (n && n === 'copy') {
+          // 考虑有回复 有文章
+          this.type = "newThread"
+        }
       }
     }
   },
@@ -381,6 +393,7 @@ export default {
         })
         .then(() => {
           if (type === "newThread") {
+            
             // 发新帖：从专业点发表、首页点发表、草稿箱
             this.checkTitle(submitData.t);
             this.checkContent(submitData.c);

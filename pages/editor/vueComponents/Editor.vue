@@ -6,6 +6,7 @@
         //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t  .clear-padding
         //- 2.notice editorSettings.onEditNotes
         article-title(
+          :o="o",
           ref="title",
           :data="pageData",
           :notice="(pageState.editorSettings && pageState.editorSettings.onEditNotes) || ''"
@@ -18,7 +19,7 @@
           @content-change="contentChange"
         ) 
         .m-b-2(
-          v-if="!['newPost', 'modifyThread', 'modifyPost'].includes(pageData.type)"
+          v-if="!['newPost', 'modifyThread', 'modifyPost'].includes(pageData.type) || o === 'copy'"
         )
           //- 1. @selected-forumids 选择的主分类后id给提交组件 2. data 包含 threadCategories minorForumCount mainForums 
           classification(
@@ -60,6 +61,7 @@
           //- 1.state  
           column(
             ref="column",
+            :o="o",
             :state="{ userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column: pageState.userColumn }",
             :data="{ addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn }"
           )
@@ -70,6 +72,7 @@
         ref="submit",
         :notice="pageState.editorSettings && pageState.editorSettings.notes",
         :data="pageData",
+        :o="o",
         @ready-data="readyData",
         @remove-editor="removeEditor"
       )
@@ -106,6 +109,8 @@ export default {
     column: Column,
   },
   data: () => ({
+    // 社区内容点击继续创作传递的参数o（复制为新文章或更新已发布文章）
+    o: reqUrl.o,
     hideType: ["newPost", "modifyPost"],
     pageData: {},
     pageState: {},
@@ -117,9 +122,9 @@ export default {
     let url = `/editor/data`;
     // 如果后台给了数据就用后台的 否则读取浏览器地址
     if (reqUrl && reqUrl.type && reqUrl.id) {
-      url = `/editor/data?type=${reqUrl.type}&id=${reqUrl.id}`;
+      url = `/editor/data?type=${reqUrl.type}&id=${reqUrl.id}&o=${reqUrl.o}`;
     } else if (search && search.type && search.id) {
-      url = `/editor/data?type=${search.type}&id=${search.id}`;
+      url = `/editor/data?type=${search.type}&id=${search.id}&o=${search.o}`;
     }
     nkcAPI(url, "get")
       .then((resData) => {

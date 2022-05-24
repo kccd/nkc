@@ -310,11 +310,12 @@ router
     const {user} = data;
     await db.UserModel.checkUserBaseInfo(user);
     ctx.template = "editor/editor.pug";
-    const {id, type} = query;
+    const {id, type, o} = query;
 
     data.reqUrl = {
      type,
-     id 
+     id,
+     o 
     }
     await next();
   })

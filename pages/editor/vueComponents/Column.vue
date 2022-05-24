@@ -5,8 +5,8 @@
       h5(v-if="state.columnPermission") 你还未开设专栏。
         a(href=`/column/apply` target="_blank") 立即开设
       h5(v-else) 目前还不能开设专栏，通常是因为你参与讨论较少或没有文章被列入精选。
-  div(v-else)
-    div(v-if="!data.addedToColumn") 
+  div(v-else-if = "state.userColumn")
+    div(v-if="!data.addedToColumn || o === 'copy'") 
       .moduleSelectColumnCategories(
       :data-column-id="state.column._id"
       :data-to-column='data.toColumn?"true":""'
@@ -91,6 +91,9 @@ export default {
     data: {
       type: Object,
       required: true
+    },
+    o: {
+      type: String
     }
   },
   watch: {
