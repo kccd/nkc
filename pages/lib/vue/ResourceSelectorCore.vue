@@ -721,7 +721,6 @@ export default {
     cropper: null,
 
     socketEventListener: null,
-
     count: {
       allCount: 0,//全部资源数量
       ungroupedCount: 0,//未分组资源数量
@@ -729,7 +728,9 @@ export default {
     },
     imgInfo:{},
     reduction:[0,180,-180],
-    minContainerHeight:500
+    minContainerHeight:500,
+    socketEventListenerDebounce: "",
+    debounce: ""
   }),
   components: {
     'image-viewer': ImageViewer,
@@ -738,15 +739,15 @@ export default {
     'select-category': SelectCategory,
   },
   created(){
+    this.debounce = debounce;
     this.getResourcesDebounce = debounce(this.getResources, 500)
   },
   mounted() {
     if(this.watchType === 'category') {
       this.getResourcesDebounce(0);
     }
-    this.initSocketEvent();
+    this.initSocketEvent();    
     this.initDragUploadEvent();
-    
   },
   destroyed() {
     this.removeSocketEvent();
@@ -860,19 +861,21 @@ export default {
         if(data.state === "fileProcessFailed") {
           sweetError(`文件处理失败\n${data.err}`);
         }
-        self.getResourcesDebounce(0, data.requestType);
+        self.getResources(0, data.requestType);
       }
-      socket.on("fileTransformProcess", this.socketEventListener);
-      socket.on('resources', this.socketEventListener);
-      socket.on('group', this.socketEventListener);
+      this.socketEventListenerDebounce = this.debounce(this.socketEventListener, 500);
+      // 统一用一个防抖函数，最大程度的减少相同请求
+      socket.on("fileTransformProcess", this.socketEventListenerDebounce );
+      socket.on('resources',this.socketEventListenerDebounce );
+      socket.on('group', this.socketEventListenerDebounce);
     },
     // 销毁注册的 socket 事件
     removeSocketEvent() {
       if(!this.socketEventListener) return;
       // 销毁事件
-      socket.off('fileTransformProcess', this.socketEventListener);
-      socket.off('resources', this.socketEventListener);
-      socket.off('group', this.socketEventListener);
+      socket.off('fileTransformProcess', this.socketEventListenerDebounce);
+      socket.off('resources', this.socketEventListenerDebounce);
+      socket.off('group', this.socketEventListenerDebounce);
     },
     initDragUploadEvent() {
       const $dragDom = $(this.$refs.pasteContent);

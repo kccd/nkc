@@ -329,7 +329,6 @@ export default {
       const { selectedForum, selectedThreadType } = this;
       if (!selectedForum) return sweetError(`请选择专业`);
       if (!selectedThreadType) return sweetError(`请选择文章分类`);
-      console.log(selectedForum)
       this.callback({
         forum: selectedForum,
         threadType: selectedThreadType === "none" ? null : selectedThreadType,

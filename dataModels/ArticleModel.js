@@ -656,7 +656,7 @@ schema.methods.saveArticle = async function() {
   const DocumentModel = mongoose.model('documents');
   const {article: documentSource} = await DocumentModel.getDocumentSources();
   //将测试版变为测试历史版
-  await DocumentModel.copyBetaToHistoryBySource(documentSource, this._id);
+  await DocumentModel.checkContentAndCopyBetaToHistoryBySource(documentSource, this._id);
 }
 schema.statics.checkArticleInfo = async (article) => {
   const {title, content} = article;
@@ -1348,7 +1348,7 @@ schema.statics.getArticleInfoByColumn = async function(columnPost) {
   let column = await ColumnModel.findOne({_id: columnId})
   column = column.toObject()
   const mainCategory = await ColumnPostCategoryModel.getParentCategoryByIds(cid)
-  const auxiliaryCategory = await ColumnPostCategoryModel.getMinorCategories(columnId, mcid)
+  const auxiliaryCategory = await ColumnPostCategoryModel.getArticleAllMinorCategories(mcid)
   return {
     _id: columnPost._id,
     thread: article,

@@ -290,7 +290,8 @@
         if(data.beep) {
           app.playAudio(data.beep);
         }
-        app.updateNewMessageCount(app.newMessageCount + 1);
+        app.newMessageCount += 1;
+        app.updateNewMessageCount(app.newMessageCount);
       });
       const newMessageCount = this.getNewMessageCountFromNKC();
       this.updateNewMessageCount(newMessageCount);
