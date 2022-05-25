@@ -1,14 +1,16 @@
 import {nkcAPI} from "../../../lib/js/netAPI";
 import {getUrl} from "../../../lib/js/tools";
+import {visitUrl} from "../../../lib/js/pageSwitch";
+
 window.articleOption = new Vue({
   el: '#moduleArticleOptions',
   data: {
     show: false,
-    
+
     loading: true,
-    
+
     jqDOM: null,
-    
+
     uid: NKC.configs.uid,
     // 类型 thread、post
     pid: '',
@@ -25,14 +27,14 @@ window.articleOption = new Vue({
       username: '',
       uid: ''
     },
-    
+
     article: null,
-  
+
     direction: null,
-    
+
     top: 300,
     left: 300,
-    
+
     domHeight: 0,
     domWidth: 0,
     optionStatus: {},
@@ -84,7 +86,7 @@ window.articleOption = new Vue({
     showHistory() {
       const {_id} = this.article;
       const url = getUrl('history', "article", _id);
-      window.open(url);
+      visitUrl(url, true);
     },
     open(props) {
       const {aid, direction, jqDOM, tid = '', collected = '',} = props;
@@ -120,7 +122,7 @@ window.articleOption = new Vue({
     },
     editArticle() {
       if(this.article) {
-        window.location.href = this.article.editorUrl;
+        visitUrl(this.article.editorUrl, true);
       }
     },
     toColumn() {
@@ -148,7 +150,7 @@ window.articleOption = new Vue({
         .catch(function(data) {
           sweetError(data);
         })
-      
+
     },
     viewAuthorInfo() {
       if(!window.UserInfo) {
@@ -202,7 +204,7 @@ window.articleOption = new Vue({
       if(this.type === 'article') {
         window.location.href = '#container';
       } else if(this.type === 'thread') {
-        window.location.href = `/t/${this.tid}#container`;
+        visitUrl(`/t/${this.tid}#container`, true);
       }
     },
     hidePostContent() {

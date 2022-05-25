@@ -12,25 +12,27 @@ mixin nav(data)
   -var {_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url, showManagement, user} = data
   +includeCSS('/columns/article/nav.css')
   header
-    if mainCategory.length
+    -var mainCategoryId = '';
+    if mainCategory && mainCategory.length
       p.path-navigation.hidden-xs
         //- a.jump(href=`/m`) 专栏
         //- span.nav-common >
         a.article-common-nav(href=`/m/${_id}`)=name
         span.nav-common /
         for category,i in mainCategory
+          -mainCategoryId = category._id;
           a.article-common-nav(href=`/m/${_id}?c=${category._id}`)=category.name
           if mainCategory.length !== i+1
             span.nav-common /
       //- else
       //-   a.jump(href=`/m/${_id}`) 全部
-    if auxiliaryCategory.length
+    if mainCategory && auxiliaryCategory.length && mainCategoryId
       p.path-navigation.m-l-5.hidden-xs
         span.article-common-nav  辅分类:
         for category,i in auxiliaryCategory
-          a.article-common-nav(href=`/m/${_id}?c=${category._id}`)=category.name
+          a.article-common-nav(href=`/m/${_id}?c=${mainCategoryId}-${category._id}`)=category.name
           if auxiliaryCategory.length !== i+1
-            span.m-l-1.nav-common ,
+            span.m-a-0.nav-common 、
 
     p.info-list
       if oc

@@ -18,15 +18,15 @@ router
     data.originUrl = state.url
     data.highlight = highlight;
     data.columnPost = articleRelatedContent;
-    data.article = article;
     const isModerator = await article.isModerator(state.uid);
     //获取当前文章信息
-    const _article = (await db.ArticleModel.extendDocumentsOfArticles([article], 'stable', [
-      '_id',
-      'uid',
-      'status'
-    ]))[0];
+    // const _article = (await db.ArticleModel.extendDocumentsOfArticles([article], 'stable', [
+    //   '_id',
+    //   'uid',
+    //   'status'
+    // ]))[0];
     const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
+    const _article = (await db.ArticleModel.getArticlesInfo([article]))[0];
     if(_article.document.status !== normalStatus && !isModerator) {
       if(!permission('review')) {
         return ctx.throw(403, '权限不足');
@@ -101,7 +101,7 @@ router
     data.permissions = permissions;
     data.isModerator =  isModerator;
     data.comments = comments || [];
-
+    data.article = _article;
     //楼层高亮显示跳转实现的从定向
     /*var url = null
     if(did){

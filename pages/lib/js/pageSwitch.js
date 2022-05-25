@@ -1,5 +1,5 @@
 import {getState} from './state';
-import {RNOpenNewPage} from "./reactNative";
+import {RNOpenNewPage, RNSetPageTitle} from "./reactNative";
 import {fixUrl} from "./url";
 
 /*
@@ -22,6 +22,7 @@ export function visitUrl(url, blank) {
   }
 }
 
-export function setPageTitle(content) {
-  $('title').text(content);
+export function setPageTitle(title) {
+  $('title').text(title);
+  RNSetPageTitle(title);
 }
