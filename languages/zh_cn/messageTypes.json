@@ -123,5 +123,7 @@
   "commentDisabled": "评论被屏蔽",
   "bookInvitation": "图书创作邀请",
   "momentDelete": "动态被删除",
-  "momentPass": "动态审核通过"
+  "momentPass": "动态审核通过",
+  "digestArticle": "文章被列入精选",
+  "digestComment": "回复被列入精选"
 }

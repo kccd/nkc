@@ -444,6 +444,23 @@ messageSchema.statics.getParametersData = async (message) => {
       threadTitle: firstPost.t,
       threadURL: getUrl('thread', thread.tid)
     };
+  } else if(type === 'digestArticle') {
+    const {aid} = message.c;
+    let article = await ArticleModel.findOnly({_id: aid});
+    if(!article) return null;
+    article = (await ArticleModel.getArticlesInfo([article]))[0];
+    parameters = {
+      articleTitle: article.document.title,
+      articleURL: article.url,
+    };
+  } else if(type === 'digestComment') {
+    const {cid} = message.c;
+    let comment = await CommentModel.findOnly({_id: cid});
+    if(!comment) return null;
+    comment = (await CommentModel.getCommentInfo([comment]))[0];
+    parameters = {
+      commentURL: comment.commentUrl,
+    };
   } else if(type === 'bannedThread') {
     const {tid, rea} = message.c;
     const thread = await ThreadModel.findOne({tid});

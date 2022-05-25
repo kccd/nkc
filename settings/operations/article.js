@@ -2,16 +2,24 @@ module.exports = {
   PARAMETER: {
     DELETE: "deleteArticle",
     options: {
-      GET: "getArticleOptions"
+      GET: "getArticleOptions",
     },
     unblock: {
-      POST: "unblockArticle"
+      POST: "unblockArticle",
     },
     draft: {
-      DELETE: "deleteArticleDraft"
+      DELETE: "deleteArticleDraft",
     },
     collection: {
-      POST: 'collectionArticle'
+      POST: 'collectionArticle',
+    },
+    digest: {
+      POST: 'digestArticle',
+      DELETE: 'unDigestArticle',
+    },
+    homeTop: {
+      POST: 'homeTop',
+      DELETE: 'homeTop',
     }
   }
 };

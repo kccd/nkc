@@ -3,6 +3,8 @@ const draftRouter = require('./draft');
 const optionsRouter = require('./options');
 const unblockRouter = require('./unblock');
 const collectionRouter = require('./collection');
+const digestRouter = require('./digest');
+const homeTopRouter = require('./homeTop');
 router
   .del('/:aid', async (ctx, next) => {
     const {params, db, state, permission} = ctx;
@@ -19,5 +21,7 @@ router
   .use('/:aid/options', optionsRouter.routes(), optionsRouter.allowedMethods())
   .use('/:aid/unblock', unblockRouter.routes(), unblockRouter.allowedMethods())
   .use('/:aid/collection', collectionRouter.routes(), collectionRouter.allowedMethods())
+  .use('/:aid/digest', digestRouter.routes(), digestRouter.allowedMethods())
+  .use('/:aid/homeTop', homeTopRouter.routes(), homeTopRouter.allowedMethods())
 module.exports = router;
 

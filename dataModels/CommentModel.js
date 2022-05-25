@@ -30,6 +30,29 @@ const schema = new mongoose.Schema({
     default: 0,
     index: 1
   },
+  //是否加精
+  digest: {
+    type: Boolean,
+    default: false,
+    index:1,
+  },
+  //加精时间
+  digestTime: {
+    type: Number,
+    default: null,
+    index: 1,
+  },
+  //支持数
+  voteUp: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+  //反对数
+  voteDown: {
+    type: Number,
+    index:1,
+  },
   // disabled: 被禁用的（已发布但被管理员禁用了）
   // faulty: 被退修的 （已发布但被管理员退修了）
   // unknown: 状态位置的 （已发布未审核
@@ -841,7 +864,7 @@ schema.statics.getCommentsObjectByCommentsId = async function(commentsId) {
 * 通过commentId获取comment
 * @params {Array} commentId 需要获取的评论的Id
 * */
-schema.statics.getCommentsByCommentsId = async function (commentsId, uid) {
+schema.statics.getCommentsByCommentsId = async function (commentsId) {
   const CommentModel = mongoose.model('comments');
   const ArticleModel = mongoose.model('articles');
   const UserModel = mongoose.model('users');

@@ -99,6 +99,15 @@ function collectThread() {
     .catch(sweetError);
 }
 
+//首页顶置
+function homeTop() {
+}
+
+//取消首页顶置
+function unHomeTop() {
+
+}
+
 function toUrl(url) {
   window.location.href = url;
 }

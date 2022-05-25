@@ -868,5 +868,9 @@
   "getUserHomeCard": "获取用户主页卡片内容列表",
   "getArticleInfo": "获取文章信息",
   "getZoneMomentOption": "获取空间操作权限",
-  "viewUserArticle": "查看任意用户的文章预览和历史"
+  "viewUserArticle": "查看任意用户的文章预览和历史",
+  "digestArticle": "将独立文章设置为精选",
+  "unDigestArticle": "取消将独立文章设置为精选",
+  "digestComment": "将回复设置为精选",
+  "unDigestComment": "取消回复精选"
 }
