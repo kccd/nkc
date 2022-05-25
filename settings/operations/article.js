@@ -17,5 +17,9 @@ module.exports = {
       POST: 'digestArticle',
       DELETE: 'unDigestArticle',
     },
+    homeTop: {
+      POST: 'homeTop',
+      DELETE: 'homeTop',
+    }
   }
 };

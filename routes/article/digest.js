@@ -76,6 +76,7 @@ router
     }
     await nkcModules.socket.sendMessageToUser(message._id);
     data.targetUser.kcb = await db.UserModel.updateUserKcb(data.targetUser.uid);
+    data.userScores = await db.UserModel.updateUserScores(targetUser.uid);
     await next();
   })
   .del('/', async (ctx, next) => {
@@ -90,7 +91,7 @@ router
     data.article = _article;
     if(!article.digest) ctx.throw(400, '文章未被加精，请刷新后重试');
     let additionalReward = 0;
-    const rewardLog = await db.KcbsRecordModel.findOne({type: 'digestArticleAdditional', aid}).sort({toc: -1});
+    const rewardLog = await db.KcbsRecordModel.findOne({type: 'digestArticleAdditional', pid: aid}).sort({toc: -1});
     if(rewardLog) {
     additionalReward = rewardLog.num;
     }
@@ -109,6 +110,7 @@ router
     log.change = -1;
     log.key = 'digestArticleCount';
     await db.UsersScoreLogModel.insertLog(log);
+    data.userScores = await db.UserModel.updateUserScores(targetUser.uid);
     await next();
   })
 
