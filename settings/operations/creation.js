@@ -10,6 +10,9 @@ module.exports = {
     visit:{
       GET: 'creationCenter',
     },
+    data:{
+      GET: 'creationCenter',
+    }
   },
   drafts: {
     GET: 'creationCenter',

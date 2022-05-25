@@ -1,5 +1,7 @@
 import {nkcAPI} from "../../../lib/js/netAPI";
 import {getUrl} from "../../../lib/js/tools";
+import {visitUrl} from "../../../lib/js/pageSwitch";
+
 import {screenTopAlert, screenTopWarning} from "../../../lib/js/topAlert";
 window.articleOption = new Vue({
   el: '#moduleArticleOptions',
@@ -85,7 +87,7 @@ window.articleOption = new Vue({
     showHistory() {
       const {_id} = this.article;
       const url = getUrl('history', "article", _id);
-      window.open(url);
+      visitUrl(url, true);
     },
     open(props) {
       const {aid, direction, jqDOM, tid = '', collected = '',} = props;
@@ -125,7 +127,7 @@ window.articleOption = new Vue({
     },
     editArticle() {
       if(this.article) {
-        window.location.href = this.article.editorUrl;
+        visitUrl(this.article.editorUrl, true);
       }
     },
     toColumn() {
@@ -207,7 +209,7 @@ window.articleOption = new Vue({
       if(this.type === 'article') {
         window.location.href = '#container';
       } else if(this.type === 'thread') {
-        window.location.href = `/t/${this.tid}#container`;
+        visitUrl(`/t/${this.tid}#container`, true);
       }
     },
     hidePostContent() {

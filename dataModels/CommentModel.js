@@ -282,7 +282,7 @@ schema.statics.setStatus = async function(did, status) {
 schema.methods.saveComment = async function () {
   const DocumentModel = mongoose.model('documents');
   const {comment: commentSource} = await DocumentModel.getDocumentSources();
-  await DocumentModel.copyBetaToHistoryBySource(commentSource, this._id);
+  await DocumentModel.checkContentAndCopyBetaToHistoryBySource(commentSource, this._id);
 }
 
 /*

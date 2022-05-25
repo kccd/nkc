@@ -1,5 +1,6 @@
 module.exports = {
   usersBehavior: [
+    'visitUserCard',
     'visitHome',         'postToForum',
     'visitForumLatest',  'viewForumFollowers',
     'submitLogin',       'logout',

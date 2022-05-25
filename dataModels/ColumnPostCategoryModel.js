@@ -251,9 +251,9 @@ schema.statics.getChildCategoryId = async (categoryId) => {
   return results.map(r => r._id);
 };
 /*
- * 获取专栏下一篇文章的分类及其父级分类 
+ * 获取专栏下一篇文章的分类及其父级分类
  * @param {Array} ids columnPosts表的cid
- * 
+ *
  */
 schema.statics.getParentCategoryByIds = async (ids)=>{
   // 只获取了第一个ID
@@ -268,8 +268,8 @@ schema.statics.getParentCategoryByIds = async (ids)=>{
   }
   await currentCategory(id)
   return navList.reverse()
-  
-  
+
+
 }
 /*
 * 操作分类内容时，移除不在该分类下的置顶文章
@@ -297,11 +297,20 @@ schema.statics.getCategories = async (columnId) => {
   return await ColumnPostCategoryModel.find({columnId}).sort({order: 1});
 };
 /*
-* 获取指定专栏的全部辅分类
-* @param {Number} columnId 专栏ID
-* @param {Number} cid 主分类ID
-* @param {Boolean} containChildCategoryPostCount 辅分类条数包含主分类以及主分类下的子分类文章的条数
+* 获取指定文章的辅分类
+* @param {Array} mcid 专栏ID
 * */
+schema.statics.getArticleAllMinorCategories = async (mcid) =>{
+  const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
+  const articleMinorCategories = await ColumnPostCategoryModel.find({_id: {$in: mcid}, type: 'minor'});
+  return articleMinorCategories
+};
+  /*
+  * 获取指定专栏的全部辅分类
+  * @param {Number} columnId 专栏ID
+  * @param {Number} cid 主分类ID
+  * @param {Boolean} containChildCategoryPostCount 辅分类条数包含主分类以及主分类下的子分类文章的条数
+  * */
 schema.statics.getMinorCategories = async (columnId, cid, containChildCategoryPostCount = false) => {
   const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
   const ColumnPostModel = mongoose.model('columnPosts');

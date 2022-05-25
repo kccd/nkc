@@ -36,11 +36,11 @@
             span.caret
           ul.dropdown-menu.dropdown-menu-right(:aria-labelledby="`dLabel_${draft.did}`")
             li
-              a(:shref="`/editor?type=redit&id=${draft.did}&o=copy`" target='_blank')
+              a(:href="`/editor?type=redit&id=${draft.did}&o=copy`" target='_blank')
                 .fa.fa-clone
                 span &nbsp;复制为新文章
             li
-              a(:shref="`/editor?type=redit&id=${draft.did}&o=update`" target='_blank')
+              a(:href="`/editor?type=redit&id=${draft.did}&o=update`" target='_blank')
                 .fa.fa-refresh
                 span &nbsp;更新已发布的文章
         a(:href="`/editor?type=redit&id=${draft.did}&o=update`" target='_blank' v-else) 继续创作

@@ -177,7 +177,7 @@ schema.statics.checkDraftInfo = async (draft) => {
 schema.methods.saveDraft = async function() {
   const DocumentModel = mongoose.model('documents');
   const {draft: documentSource} = await DocumentModel.getDocumentSources();
-  await DocumentModel.copyBetaToHistoryBySource(documentSource, this._id);
+  await DocumentModel.checkContentAndCopyBetaToHistoryBySource(documentSource, this._id);
 }
 
 

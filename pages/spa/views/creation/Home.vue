@@ -66,33 +66,39 @@ export default {
   computed: {},
   created() {
     this.user = getState();
-    this.getuser();
   },
   mounted() {
     this.dom = this.$refs.canvasDom;
-    this.setYear(this.selected);
-    this.getPie();
+    this.getuser();
+
+    // this.setYear(this.selected);
+    // this.getPie();
   },
   methods: {
     setTime(time) {
       return fromNow(time);
     },
-    async getuser() {
-      nkcAPI(`/creation/home/visit`, "GET")
+    getuser() {
+      nkcAPI(`/creation/home/data`, "GET")
         .then((data) => {
           this.visitThreadLogs = data.visitThreadLogs;
           this.visitUserLogs = data.visitUserLogs;
           this.visitSelfLogs = data.visitSelfLogs;
-        })
-        .catch(sweetError);
-    },
-    getPie() {
-      nkcAPI("/creation/home/active", "GET")
-        .then((data) => {
+          this.setYear();
+          this.renderCalendar(data.posts);
+          this.createYearList(data.user.toc);
           this.renderPie(data.pie);
+
         })
         .catch(sweetError);
     },
+    // getPie() {
+    //   nkcAPI("/creation/home/active", "GET")
+    //     .then((data) => {
+    //       this.renderPie(data.pie);
+    //     })
+    //     .catch(sweetError);
+    // },
     renderPie(data) {
       var forumsName = [],
         summaryData = [],
@@ -158,10 +164,10 @@ export default {
       };
       myChart.setOption(option);
     },
-    getData() {
+    getYear() {
       nkcAPI("/creation/home/calendar?year=" + this.selected, "GET")
         .then((data) => {
-          this.initEcharts(data.posts);
+          this.renderCalendar(data.posts);
           this.createYearList(data.user.toc);
         })
         .catch(sweetError);
@@ -174,7 +180,7 @@ export default {
         this.years.push(i);
       }
     },
-    initEcharts(data) {
+    renderCalendar(data) {
       if (this.myChart && this.myChart.dispose) {
         this.myChart.dispose();
       }
@@ -268,16 +274,16 @@ export default {
       this.myChart = echarts.init(this.dom);
       this.myChart.setOption(option);
     },
-    setYear(year) {
+    setYear(year, isGet) {
       if (year) year = parseInt(year);
-      this.selected = year || new Date().getFullYear();
+      this.selected = year = parseInt(year) || new Date().getFullYear();
       this.begin = new Date(this.selected + "-1-1 00:00:00").getTime();
       this.end = new Date(this.selected + 1 + "-1-1 00:00:00").getTime();
-      this.getData();
+      isGet && this.getYear();
     },
     summaryCalendar() {
       // console.log(year);
-      this.setYear(this.selected);
+      this.setYear(this.selected, true);
     },
     navTo(name) {
       this.$router.push({ name });

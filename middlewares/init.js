@@ -10,8 +10,8 @@ const path = require('path');
 const redis = require('../redis');
 const cookieConfig = require("../config/cookie");
 const {fileDomain} = require("../config/server");
-
-const errPage = fsPromise.readFile(path.resolve(__dirname, '../pages/error/404.html'), 'utf-8');
+const errorTips = require('../config/errorTips.json');
+const {getErrorPage404, getErrorPage500} = require('../nkcModules/errorPage');
 
 const fsSync = {
   access: fsPromise.access,
@@ -52,19 +52,15 @@ module.exports = async (ctx, next) => {
   try{
     ctx.data.operationId = nkcModules.permission.getOperationId(ctx.url, ctx.method);
   } catch(err) {
+    ctx.status = err.status;
     if(err.status === 404) {
+      ctx.body = getErrorPage404(ctx.url);
       console.log(`未知请求：${ctx.address} ${ctx.method} ${ctx.url}`.bgRed);
-      ctx.status = 404;
-      ctx.type = "text/html; charset=utf-8";
-      return errPage.then( res => {
-        ctx.body = res.replace(/{{url}}/g, ctx.url);
-      })
-      .catch( err => {
-        console.error(err);
-        ctx.status = 500;
-        ctx.body = "糟糕！你访问的页面404了，请检查链接";
-      });
+    } else {
+      ctx.body = getErrorPage500(ctx.url, err.message);
+      console.log(`内部错误：${err.message} ${ctx.address} ${ctx.method} ${ctx.url}`.bgRed);
     }
+    return;
   }
 
   try {
@@ -237,7 +233,7 @@ module.exports = async (ctx, next) => {
     } else {
       ctx.template = 'error/error.pug';
     }
-
+    ctx.data.errorTips = errorTips;
     ctx.data.error = error;
 	  ctx.data.status = ctx.status;
 	  ctx.data.url = ctx.url;
