@@ -11,7 +11,7 @@ import {
 import {getState} from "../lib/js/state";
 import {
   RNDownloadFile,
-  RNOpenNewPage, RNSaveImage,
+  RNOpenNewPageThrottle, RNSaveImage,
   RNUrlPathEval
 } from "../lib/js/reactNative";
 import {throttle} from "../lib/js/execution";
@@ -188,7 +188,7 @@ export function initAppGlobalClickLinkEvent() {
   if(!isReactNative) return;
   // 限流 限制点击链接最小间隔时间为300ms
   // 防止app同时打开多个相同的页面
-  const handle = throttle(function(e) {
+  const handle = function(e) {
     let element = e.target;
     let elementJQ = $(element);
     const tagName = element.nodeName.toLowerCase();
@@ -205,10 +205,8 @@ export function initAppGlobalClickLinkEvent() {
     if(!href) return;
     const title = elementJQ.attr('title') || '';
     const targetUrl = RNUrlPathEval(window.location.href, href);
-    RNOpenNewPage(targetUrl, title);
-  }, 300);
-  document.addEventListener('click', (e) => {
-    handle(e);
+    RNOpenNewPageThrottle(targetUrl, title);
     e.preventDefault();
-  });
+  }
+  document.addEventListener('click', handle);
 }

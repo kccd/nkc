@@ -195,6 +195,10 @@ export function RNOpenNewPage(url, title = '') {
   RNEmit('openNewPage', {href: url, title});
 }
 
+export const RNOpenNewPageThrottle = throttle(function(url, title = ''){
+  RNOpenNewPage(url, title);
+}, 100);
+
 /*
 * RN打开RN屏幕
 * @param {String} name 屏幕名
