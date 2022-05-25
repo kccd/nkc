@@ -134,7 +134,23 @@ const schema = new mongoose.Schema({
     index: 1
   },
   authorInfos: {
-    type: [Object],
+    type: [
+      Object,
+      /*{
+        name: '姓名',
+        kcid: 'ID',
+        agency: '机构名称',
+        agencyCountry: '未使用',
+        agencyAdd: '机构地址',
+        isContract: '包含通信作者信息',
+        contractObj: {
+          contractEmail: '通信作者邮箱',
+          contractTel: '通信作者电话',
+          contractAdd: '通讯作者地址',
+          contractCode: '通信作者邮政编码'
+        }
+      }*/
+    ],
     default: [],
     index: 1
   },
@@ -384,6 +400,39 @@ schema.statics.copyBetaToHistoryBySource = async (source, sid) => {
   if(!betaDocument) throwErr(400, `不存在编辑版，无法保存历史`);
   await betaDocument.copyToHistoryDocument();
 };
+
+/*
+* 根据来源加载编辑版
+* 判断当前距上次报错历史是否超过30分钟，超过30分钟则保存新历史，未超过则与历史版内容比较
+* 有变动则存新历史，没有变动则退出
+* @param {String} source 来源
+* @param {String} sid 来源 ID
+* */
+schema.statics.checkContentAndCopyBetaToHistoryBySource = async (source, sid) => {
+  const DocumentModel = mongoose.model('documents');
+  const betaDocument = await DocumentModel.getBetaDocumentBySource(source, sid);
+  if(!betaDocument) throwErr(400, '不存在编辑版，无法保存历史');
+  const time = Date.now();
+  const latestHistoryDocument = await DocumentModel.getLatestHistoryDocumentBySource(source, sid);
+  if(
+    // 如果没有历史版本则直接保存
+    !latestHistoryDocument ||
+    // 如果超过 30 分钟未保存历史则保存
+    time - latestHistoryDocument.toc.getTime() > 30 * 60 * 1000 ||
+    // 如果内容有变动则保存
+    betaDocument.cover !== latestHistoryDocument.cover ||
+    betaDocument.title !== latestHistoryDocument.title ||
+    betaDocument.content !== latestHistoryDocument.content ||
+    (betaDocument.keywordsEN || []).join('-') !== (latestHistoryDocument.keywordsEN || []).join('-') ||
+    (betaDocument.keywords || []).join('-') !== (latestHistoryDocument.keywords || []).join('-') ||
+    betaDocument.abstractEN !== latestHistoryDocument.abstractEN ||
+    betaDocument.abstract !== latestHistoryDocument.abstract ||
+    betaDocument.origin !== latestHistoryDocument.origin ||
+    betaDocument.wordCount !== latestHistoryDocument.wordCount ||
+    JSON.stringify(betaDocument.authorInfos) !== JSON.stringify(latestHistoryDocument.authorInfos)
+  ) return await betaDocument.copyToHistoryDocument();
+}
+
 // 将当前版本设置为编辑版，并设置最后修改时间
 schema.methods.modifyAsEditDocument = async function() {
   const DocumentModel = mongoose.model('documents');
@@ -607,6 +656,22 @@ schema.statics.getBetaDocumentBySource = async (source, sid) => {
     sid,
   });
 };
+
+schema.statics.getLatestHistoryDocumentBySource = async (source, sid) => {
+  const DocumentModel = mongoose.model('documents');
+  await DocumentModel.checkDocumentSource(source);
+  const documentTypes = await DocumentModel.getDocumentTypes();
+  return DocumentModel.findOne({
+    type: {
+      $in: [
+        documentTypes.betaHistory,
+        documentTypes.stableHistory
+      ]
+    },
+    source,
+    sid
+  }).sort({toc: -1});
+}
 
 /*
 * 根据来源获取稳定版内容

@@ -11,6 +11,10 @@ export function strToObj(str) {
   return JSON.parse(decodeURIComponent(str));
 }
 
+export function objToStr(obj) {
+  return encodeURIComponent(JSON.stringify(obj));
+}
+
 /*
 * 指定 DOM ID 获取放在 DOM 中的数据
 * @param {String} id
