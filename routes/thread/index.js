@@ -9,6 +9,14 @@ const closeRouter = require('./close');
 const subscribeRouter = require("./subscribe");
 const Path = require("path");
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
+
+function isIncludes(arr, id, type) {
+  for(const a of arr) {
+    if(a.id === id && a.type === type) return true;
+  }
+  return false;
+}
+
 threadRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, query, nkcModules} = ctx;
@@ -600,9 +608,9 @@ threadRouter
       movable.automaticallySelectedThreads
     );
 		data.homeAd = ads.map(a => a.tid).includes(tid);
-		data.homeTopped = data.homeSettings.toppedThreadsId.includes(tid);
-		data.latestTopped = data.homeSettings.latestToppedThreadsId.includes(tid);
-    data.communityTopped = data.homeSettings.communityToppedThreadsId.includes(tid);
+		data.homeTopped = isIncludes(data.homeSettings.toppedThreadsId, tid, 'thread');
+		data.latestTopped = isIncludes(data.homeSettings.latestToppedThreadsId, tid, 'thread');
+    data.communityTopped = isIncludes(data.homeSettings.communityToppedThreadsId, tid, 'thread');
 		if(thread.type === "product" && ctx.permission("pushGoodsToHome")) {
 		  data.goodsHomeTopped = data.homeSettings.shopGoodsId.includes(data.product.productId);
     }

@@ -1,5 +1,12 @@
-
 const router = require('koa-router')();
+
+function isIncludes(arr, id, type) {
+  for(const a of arr) {
+    if(a.id === id && a.type === type)  return true;
+  }
+  return false;
+}
+
 router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
   const {pageSettings, uid} = state;
@@ -13,6 +20,7 @@ router.get('/:aid', async (ctx, next)=>{
   data.columnPost = columnPostData;
   data.columnPost.collected = false;
   const {article, thread} = await db.ColumnPostModel.getColumnPostTypes();
+  const homeSettings = await db.SettingModel.getSettings("home");
   let isModerator;
   if(columnPostData.type === article) {
     //获取文章的评论信息
@@ -21,6 +29,7 @@ router.get('/:aid', async (ctx, next)=>{
     const article = await db.ArticleModel.findOnly({_id: _article._id});
     const articlePost = await db.ArticlePostModel.findOne({sid: article._id, source: article.source});
     isModerator = await article.isModerator(state.uid);
+    data.homeTopped = isIncludes(homeSettings.toppedThreadsId, article._id, 'article');
     const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
     if(_article.status !== normalStatus && !isModerator) {
       if(!permission('review')) {

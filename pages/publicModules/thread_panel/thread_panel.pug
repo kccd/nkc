@@ -100,7 +100,7 @@ if thread.type !== 'newArticle'
 //- -var threadTitle = tools.removeLink(thread.firstPost.t);
 -var threadTitle;
 -var threadUrl;
-if data.t === 'column'
+if data.t === 'column' || data.t === 'home'
   if thread.type === 'newArticle'
     -threadTitle = thread.document.title;
   else
@@ -109,7 +109,7 @@ if data.t === 'column'
 else
   -threadTitle = thread.firstPost.t;
   -threadUrl = `/t/${thread.tid}`;
-if data.t  === 'column' && thread.type === 'newArticle'
+if (data.t  === 'column' || data.t  === 'home') && thread.type === 'newArticle'
   .thread-panel(class=threadPanelClass)
     .thread-panel-body(class=styleType)
       if styleType === 'minimalist'

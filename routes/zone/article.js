@@ -1,4 +1,12 @@
 const router = require('koa-router')();
+
+function isIncludes(arr, id, type) {
+  for(const a of arr) {
+    if(a.id === id && a.type === type)  return true;
+  }
+  return false;
+}
+
 router
   .get('/:aid', async (ctx, next) => {
     //获取空间文章信息
@@ -14,10 +22,12 @@ router
     const articlePost = await db.ArticlePostModel.findOne({sid: article._id, source: article.source});
     // 获取空间文章需要显示的数据
     const articleRelatedContent = await db.ArticleModel.getZoneArticle(article._id);
+    const homeSettings = await db.SettingModel.getSettings("home");
     //点击楼层高亮需要url和highlight值
     data.originUrl = state.url
     data.highlight = highlight;
     data.columnPost = articleRelatedContent;
+    data.homeTopped = isIncludes(homeSettings.toppedThreadsId, article._id, 'article');
     const isModerator = await article.isModerator(state.uid);
     //获取当前文章信息
     // const _article = (await db.ArticleModel.extendDocumentsOfArticles([article], 'stable', [
