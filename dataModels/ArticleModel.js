@@ -504,9 +504,9 @@ schema.methods.deleteArticle = async function() {
   const {normal: normalStatus, deleted: deletedStatus} = await ArticleModel.getArticleStatus();
   const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
   const {status, source, _id} = this;
-  if(status !== normalStatus) {
-    throwErr(500, `文章状态异常 status=${this.status}`);
-  }
+  // if(status !== normalStatus) {
+  //   throwErr(500, `文章状态异常 status=${this.status}`);
+  // }
   // 删除草稿
   await this.deleteDraft();
   //根据文章id删除引用
@@ -907,6 +907,7 @@ schema.statics.extendArticlesList = async (articles) => {
       }
     }
     articlesList.push({
+      status,
       articleSource: source,
       articleSourceId: sid,
       articleId,

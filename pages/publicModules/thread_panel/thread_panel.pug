@@ -190,10 +190,10 @@ if (data.t  === 'column' || data.t  === 'home') && thread.type === 'newArticle'
                 .fa.fa-thumbs-up=`${thread.document.voteUp || ''}`
               if thread.hits
                 .fa.fa-eye=thread.hits
-              if thread.comment
+              if thread.count
                 .fa
-                  a.a-jump(href=`${threadUrl}#container` target="_blank")
-                    span.fa.fa-comment=thread.comment
+                  a.a-jump(href=`${threadUrl}?&last_page=true#container` target="_blank")
+                    span.fa.fa-comment=thread.count
 
 
 
@@ -384,7 +384,7 @@ else
                 .fa.fa-eye=` ${thread.hits}`
               if thread.count
                 .fa
-                  a.a-jump(href=`/t/${thread.tid}#container` target="_blank")
+                  a.a-jump(href=`/t/${thread.tid}?&last_page=true#container` target="_blank")
                     span.fa.fa-comment=` ${thread.count}`
 
 

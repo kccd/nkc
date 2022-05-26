@@ -95,6 +95,7 @@ const operationObj = {};
 // 默认操作类型，没有路由与之对应的操作权限
 operationObj.defaultOperations = [
 	'modifyOtherPosts',
+	'modifyOtherArticles',
 	'displayRecycleMarkThreads',
 	'displayDisabledPosts',
 	'displayPostHideHistories',

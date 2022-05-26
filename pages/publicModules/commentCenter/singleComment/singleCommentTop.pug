@@ -1,6 +1,6 @@
 if !isIncluded('singleCommentTop')
   mixin singleCommentTop(props)
-    -var {_id: cid, docId, did, username, toc, uid, avatar, home, gradeId, gradeName, commentUrl} = props;
+    -var {_id: cid, docId, did, username, toc, uid, avatar, home, gradeId, gradeName, commentUrl, digest} = props;
     -var {reason, reviewed, isAuthor, order, tlm} = props;
     .single-post-top
       .single-post-avatar(
@@ -23,6 +23,8 @@ if !isIncluded('singleCommentTop')
           +userGrade(gradeId, gradeName)
           if isAuthor
             span 作者
+          if digest
+            span.post-digest.fa.fa-star(title='精选内容')
         .single-post-toc
           +fromNow(toc)
           if tlm

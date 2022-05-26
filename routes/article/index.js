@@ -8,11 +8,14 @@ const homeTopRouter = require('./homeTop');
 const creditRouter = require('./credit');
 router
   .del('/:aid', async (ctx, next) => {
-    const {params, db, state} = ctx;
+    const {params, db, state, permission} = ctx;
     const {aid} = params;
+    const {uid} = state;//登录用户uid
     const article = await db.ArticleModel.getArticleByIdAndUid(aid, state.uid);
-    //删除已经发布的文章的同时删除该文章的所有草稿
-    await article.deleteArticle();
+    if(uid === article.uid || permission('deleteArticle')) {
+        //删除已经发布的文章的同时删除该文章的所有草稿
+        await article.deleteArticle();
+    }
     await next();
   })
   .use('/:aid/draft', draftRouter.routes(), draftRouter.allowedMethods())
