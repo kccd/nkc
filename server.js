@@ -17,8 +17,10 @@ global.NKC.address = serverConfig.address;
 
 const start = async () => {
   try {
+    const comm = require('./comm');
     const elasticSearch = require("./nkcModules/elasticSearch");
     const communication = require('./nkcModules/communication');
+    await comm.StartBroker();
     await dbStatus.database();
     console.log(`database connected`.green);
     await elasticSearch.init();

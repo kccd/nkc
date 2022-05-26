@@ -1,0 +1,266 @@
+{"ts":1653534316252,"level":"info","msg":"Moleculer v0.14.21 is starting...","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"broker"}
+{"ts":1653534316252,"level":"info","msg":"Namespace: <not defined>","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"broker"}
+{"ts":1653534316252,"level":"info","msg":"Node ID: undefined_192.168.11.176_15268","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"broker"}
+{"ts":1653534316255,"level":"info","msg":"Strategy: RandomStrategy","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"registry"}
+{"ts":1653534316255,"level":"info","msg":"Discoverer: LocalDiscoverer","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"registry"}
+{"ts":1653534316262,"level":"info","msg":"Serializer: JSONSerializer","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"broker"}
+{"ts":1653534316454,"level":"info","msg":"Validator: FastestValidator","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"broker"}
+{"ts":1653534316457,"level":"info","msg":"Registered 13 middleware(s).","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"broker"}
+{"ts":1653534316459,"level":"info","msg":"Transporter: TcpTransporter","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"broker"}
+{"ts":1653534317026,"level":"info","msg":"API Gateway server created.","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534317027,"level":"info","msg":"Register route to '/'","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534317148,"level":"info","msg":"","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534317250,"level":"info","msg":"Connecting to the transporter...","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"transit"}
+{"ts":1653534317254,"level":"info","msg":"TCP server is listening on port 13687","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"transporter"}
+{"ts":1653534317262,"level":"info","msg":"UDP Multicast Server is listening on 192.168.11.176:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"transporter"}
+{"ts":1653534317263,"level":"info","msg":"UDP Multicast Server is listening on 127.0.0.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"transporter"}
+{"ts":1653534317263,"level":"info","msg":"UDP Multicast Server is listening on 172.23.144.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"transporter"}
+{"ts":1653534317263,"level":"info","msg":"UDP Multicast Server is listening on 172.25.224.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"transporter"}
+{"ts":1653534317263,"level":"info","msg":"UDP Multicast Server is listening on 172.21.16.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"transporter"}
+{"ts":1653534317263,"level":"info","msg":"UDP Multicast Server is listening on 172.29.112.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"transporter"}
+{"ts":1653534317264,"level":"info","msg":"UDP discovery started.","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"transporter"}
+{"ts":1653534317264,"level":"info","msg":"TCP Transporter started.","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"transporter"}
+{"ts":1653534317780,"level":"info","msg":"'$node' service is registered.","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"registry"}
+{"ts":1653534317780,"level":"info","msg":"Service '$node' started.","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"$node","svc":"$node"}
+{"ts":1653534317781,"level":"error","msg":"Server error Error: listen EADDRINUSE: address already in use 0.0.0.0:3000\n    at Server.setupListenHandle [as _listen2] (node:net:1330:16)\n    at listenInCluster (node:net:1378:12)\n    at doListen (node:net:1516:7)\n    at processTicksAndRejections (node:internal/process/task_queues:84:21) {\n  code: 'EADDRINUSE',\n  errno: -4091,\n  syscall: 'listen',\n  address: '0.0.0.0',\n  port: 3000\n}","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534319499,"level":"info","msg":"Node 'nkc-websocket_20100' reconnected.","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"registry"}
+{"ts":1653534410100,"level":"info","msg":"Service '$node' stopped.","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"$node","svc":"$node"}
+{"ts":1653534410100,"level":"info","msg":"Service 'v1.nkc' stopped.","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534410102,"level":"info","msg":"UDP discovery stopped.","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"transporter"}
+{"ts":1653534410103,"level":"info","msg":"ServiceBroker is stopped. Good bye.","nodeID":"undefined_192.168.11.176_15268","ns":"","mod":"broker"}
+{"ts":1653534412804,"level":"info","msg":"Moleculer v0.14.21 is starting...","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"broker"}
+{"ts":1653534412804,"level":"info","msg":"Namespace: <not defined>","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"broker"}
+{"ts":1653534412804,"level":"info","msg":"Node ID: undefined_192.168.11.176_11148","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"broker"}
+{"ts":1653534412807,"level":"info","msg":"Strategy: RandomStrategy","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"registry"}
+{"ts":1653534412807,"level":"info","msg":"Discoverer: LocalDiscoverer","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"registry"}
+{"ts":1653534412816,"level":"info","msg":"Serializer: JSONSerializer","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"broker"}
+{"ts":1653534412838,"level":"info","msg":"Validator: FastestValidator","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"broker"}
+{"ts":1653534412856,"level":"info","msg":"Registered 13 middleware(s).","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"broker"}
+{"ts":1653534412859,"level":"info","msg":"Transporter: TcpTransporter","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"broker"}
+{"ts":1653534413033,"level":"info","msg":"API Gateway server created.","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534413034,"level":"info","msg":"Register route to '/'","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534413080,"level":"info","msg":"","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534413183,"level":"info","msg":"Connecting to the transporter...","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"transit"}
+{"ts":1653534413187,"level":"info","msg":"TCP server is listening on port 13783","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"transporter"}
+{"ts":1653534413196,"level":"info","msg":"UDP Multicast Server is listening on 192.168.11.176:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"transporter"}
+{"ts":1653534413197,"level":"info","msg":"UDP Multicast Server is listening on 127.0.0.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"transporter"}
+{"ts":1653534413197,"level":"info","msg":"UDP Multicast Server is listening on 172.23.144.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"transporter"}
+{"ts":1653534413197,"level":"info","msg":"UDP Multicast Server is listening on 172.25.224.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"transporter"}
+{"ts":1653534413197,"level":"info","msg":"UDP Multicast Server is listening on 172.21.16.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"transporter"}
+{"ts":1653534413198,"level":"info","msg":"UDP Multicast Server is listening on 172.29.112.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"transporter"}
+{"ts":1653534413198,"level":"info","msg":"UDP discovery started.","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"transporter"}
+{"ts":1653534413198,"level":"info","msg":"TCP Transporter started.","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"transporter"}
+{"ts":1653534413719,"level":"info","msg":"'$node' service is registered.","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"registry"}
+{"ts":1653534413720,"level":"info","msg":"Service '$node' started.","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"$node","svc":"$node"}
+{"ts":1653534413721,"level":"error","msg":"Server error Error: listen EADDRINUSE: address already in use 0.0.0.0:3000\n    at Server.setupListenHandle [as _listen2] (node:net:1330:16)\n    at listenInCluster (node:net:1378:12)\n    at doListen (node:net:1516:7)\n    at processTicksAndRejections (node:internal/process/task_queues:84:21) {\n  code: 'EADDRINUSE',\n  errno: -4091,\n  syscall: 'listen',\n  address: '0.0.0.0',\n  port: 3000\n}","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534415431,"level":"info","msg":"Node 'nkc-websocket_20100' reconnected.","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"registry"}
+{"ts":1653534510682,"level":"info","msg":"Service '$node' stopped.","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"$node","svc":"$node"}
+{"ts":1653534510682,"level":"info","msg":"Service 'v1.nkc' stopped.","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534510684,"level":"info","msg":"UDP discovery stopped.","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"transporter"}
+{"ts":1653534510685,"level":"info","msg":"ServiceBroker is stopped. Good bye.","nodeID":"undefined_192.168.11.176_11148","ns":"","mod":"broker"}
+{"ts":1653534512559,"level":"info","msg":"Moleculer v0.14.21 is starting...","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"broker"}
+{"ts":1653534512559,"level":"info","msg":"Namespace: <not defined>","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"broker"}
+{"ts":1653534512559,"level":"info","msg":"Node ID: undefined_192.168.11.176_17564","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"broker"}
+{"ts":1653534512562,"level":"info","msg":"Strategy: RandomStrategy","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"registry"}
+{"ts":1653534512562,"level":"info","msg":"Discoverer: LocalDiscoverer","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"registry"}
+{"ts":1653534512569,"level":"info","msg":"Serializer: JSONSerializer","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"broker"}
+{"ts":1653534512583,"level":"info","msg":"Validator: FastestValidator","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"broker"}
+{"ts":1653534512586,"level":"info","msg":"Registered 13 middleware(s).","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"broker"}
+{"ts":1653534512588,"level":"info","msg":"Transporter: TcpTransporter","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"broker"}
+{"ts":1653534512728,"level":"info","msg":"API Gateway server created.","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534512728,"level":"info","msg":"Register route to '/'","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534512771,"level":"info","msg":"","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534512868,"level":"info","msg":"Connecting to the transporter...","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"transit"}
+{"ts":1653534512871,"level":"info","msg":"TCP server is listening on port 13893","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"transporter"}
+{"ts":1653534512880,"level":"info","msg":"UDP Multicast Server is listening on 192.168.11.176:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"transporter"}
+{"ts":1653534512880,"level":"info","msg":"UDP Multicast Server is listening on 127.0.0.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"transporter"}
+{"ts":1653534512880,"level":"info","msg":"UDP Multicast Server is listening on 172.23.144.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"transporter"}
+{"ts":1653534512881,"level":"info","msg":"UDP Multicast Server is listening on 172.25.224.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"transporter"}
+{"ts":1653534512881,"level":"info","msg":"UDP Multicast Server is listening on 172.21.16.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"transporter"}
+{"ts":1653534512881,"level":"info","msg":"UDP Multicast Server is listening on 172.29.112.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"transporter"}
+{"ts":1653534512881,"level":"info","msg":"UDP discovery started.","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"transporter"}
+{"ts":1653534512882,"level":"info","msg":"TCP Transporter started.","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"transporter"}
+{"ts":1653534513401,"level":"info","msg":"'$node' service is registered.","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"registry"}
+{"ts":1653534513401,"level":"info","msg":"Service '$node' started.","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"$node","svc":"$node"}
+{"ts":1653534513402,"level":"error","msg":"Server error Error: listen EADDRINUSE: address already in use 0.0.0.0:3000\n    at Server.setupListenHandle [as _listen2] (node:net:1330:16)\n    at listenInCluster (node:net:1378:12)\n    at doListen (node:net:1516:7)\n    at processTicksAndRejections (node:internal/process/task_queues:84:21) {\n  code: 'EADDRINUSE',\n  errno: -4091,\n  syscall: 'listen',\n  address: '0.0.0.0',\n  port: 3000\n}","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534519134,"level":"info","msg":"Node 'nkc-websocket_20100' reconnected.","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"registry"}
+{"ts":1653534537189,"level":"info","msg":"Service '$node' stopped.","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"$node","svc":"$node"}
+{"ts":1653534537189,"level":"info","msg":"Service 'v1.nkc' stopped.","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534537191,"level":"info","msg":"UDP discovery stopped.","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"transporter"}
+{"ts":1653534537192,"level":"info","msg":"ServiceBroker is stopped. Good bye.","nodeID":"undefined_192.168.11.176_17564","ns":"","mod":"broker"}
+{"ts":1653534538948,"level":"info","msg":"Moleculer v0.14.21 is starting...","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"broker"}
+{"ts":1653534538948,"level":"info","msg":"Namespace: <not defined>","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"broker"}
+{"ts":1653534538948,"level":"info","msg":"Node ID: undefined_192.168.11.176_1612","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"broker"}
+{"ts":1653534538949,"level":"info","msg":"Strategy: RandomStrategy","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"registry"}
+{"ts":1653534538950,"level":"info","msg":"Discoverer: LocalDiscoverer","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"registry"}
+{"ts":1653534538957,"level":"info","msg":"Serializer: JSONSerializer","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"broker"}
+{"ts":1653534538972,"level":"info","msg":"Validator: FastestValidator","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"broker"}
+{"ts":1653534538975,"level":"info","msg":"Registered 13 middleware(s).","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"broker"}
+{"ts":1653534538977,"level":"info","msg":"Transporter: TcpTransporter","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"broker"}
+{"ts":1653534539120,"level":"info","msg":"API Gateway server created.","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534539120,"level":"info","msg":"Register route to '/'","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534539165,"level":"info","msg":"","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534539261,"level":"info","msg":"Connecting to the transporter...","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"transit"}
+{"ts":1653534539264,"level":"info","msg":"TCP server is listening on port 13933","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"transporter"}
+{"ts":1653534539273,"level":"info","msg":"UDP Multicast Server is listening on 192.168.11.176:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"transporter"}
+{"ts":1653534539273,"level":"info","msg":"UDP Multicast Server is listening on 127.0.0.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"transporter"}
+{"ts":1653534539274,"level":"info","msg":"UDP Multicast Server is listening on 172.23.144.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"transporter"}
+{"ts":1653534539274,"level":"info","msg":"UDP Multicast Server is listening on 172.25.224.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"transporter"}
+{"ts":1653534539274,"level":"info","msg":"UDP Multicast Server is listening on 172.21.16.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"transporter"}
+{"ts":1653534539274,"level":"info","msg":"UDP Multicast Server is listening on 172.29.112.1:4445. Membership: 239.0.0.0","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"transporter"}
+{"ts":1653534539275,"level":"info","msg":"UDP discovery started.","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"transporter"}
+{"ts":1653534539275,"level":"info","msg":"TCP Transporter started.","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"transporter"}
+{"ts":1653534539793,"level":"info","msg":"'$node' service is registered.","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"registry"}
+{"ts":1653534539793,"level":"info","msg":"Service '$node' started.","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"$node","svc":"$node"}
+{"ts":1653534539794,"level":"error","msg":"Server error Error: listen EADDRINUSE: address already in use 0.0.0.0:3000\n    at Server.setupListenHandle [as _listen2] (node:net:1330:16)\n    at listenInCluster (node:net:1378:12)\n    at doListen (node:net:1516:7)\n    at processTicksAndRejections (node:internal/process/task_queues:84:21) {\n  code: 'EADDRINUSE',\n  errno: -4091,\n  syscall: 'listen',\n  address: '0.0.0.0',\n  port: 3000\n}","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534543508,"level":"info","msg":"Node 'nkc-websocket_20100' reconnected.","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"registry"}
+{"ts":1653534573210,"level":"info","msg":"Service '$node' stopped.","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"$node","svc":"$node"}
+{"ts":1653534573210,"level":"info","msg":"Service 'v1.nkc' stopped.","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534573212,"level":"info","msg":"UDP discovery stopped.","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"transporter"}
+{"ts":1653534573213,"level":"info","msg":"ServiceBroker is stopped. Good bye.","nodeID":"undefined_192.168.11.176_1612","ns":"","mod":"broker"}
+{"ts":1653534575010,"level":"info","msg":"Moleculer v0.14.21 is starting...","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534575011,"level":"info","msg":"Namespace: NKC_MESH_PRODUCTION","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534575011,"level":"info","msg":"Node ID: nkc_main_192.168.11.176_3060","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534575012,"level":"info","msg":"Strategy: RandomStrategy","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534575013,"level":"info","msg":"Discoverer: LocalDiscoverer","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534575020,"level":"info","msg":"Serializer: JSONSerializer","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534575035,"level":"info","msg":"Validator: FastestValidator","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534575039,"level":"info","msg":"Registered 13 middleware(s).","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534575040,"level":"info","msg":"Transporter: TcpTransporter","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534575183,"level":"info","msg":"API Gateway server created.","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534575183,"level":"info","msg":"Register route to '/'","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534575227,"level":"info","msg":"","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534575321,"level":"info","msg":"Connecting to the transporter...","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"transit"}
+{"ts":1653534575324,"level":"info","msg":"TCP server is listening on port 13979","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534575333,"level":"info","msg":"UDP Multicast Server is listening on 192.168.11.176:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534575333,"level":"info","msg":"UDP Multicast Server is listening on 127.0.0.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534575333,"level":"info","msg":"UDP Multicast Server is listening on 172.23.144.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534575334,"level":"info","msg":"UDP Multicast Server is listening on 172.25.224.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534575334,"level":"info","msg":"UDP Multicast Server is listening on 172.21.16.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534575334,"level":"info","msg":"UDP Multicast Server is listening on 172.29.112.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534575334,"level":"info","msg":"UDP discovery started.","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534575335,"level":"info","msg":"TCP Transporter started.","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534575849,"level":"info","msg":"'$node' service is registered.","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534575849,"level":"info","msg":"Service '$node' started.","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"$node","svc":"$node"}
+{"ts":1653534575850,"level":"error","msg":"Server error Error: listen EADDRINUSE: address already in use 0.0.0.0:3000\n    at Server.setupListenHandle [as _listen2] (node:net:1330:16)\n    at listenInCluster (node:net:1378:12)\n    at doListen (node:net:1516:7)\n    at processTicksAndRejections (node:internal/process/task_queues:84:21) {\n  code: 'EADDRINUSE',\n  errno: -4091,\n  syscall: 'listen',\n  address: '0.0.0.0',\n  port: 3000\n}","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534601275,"level":"info","msg":"Service '$node' stopped.","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"$node","svc":"$node"}
+{"ts":1653534601275,"level":"info","msg":"Service 'v1.nkc' stopped.","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534601277,"level":"info","msg":"UDP discovery stopped.","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534601278,"level":"info","msg":"ServiceBroker is stopped. Good bye.","nodeID":"nkc_main_192.168.11.176_3060","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534603008,"level":"info","msg":"Moleculer v0.14.21 is starting...","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534603008,"level":"info","msg":"Namespace: NKC_MESH_PRODUCTION","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534603008,"level":"info","msg":"Node ID: nkc_main_192.168.11.176_13500","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534603010,"level":"info","msg":"Strategy: RandomStrategy","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534603010,"level":"info","msg":"Discoverer: LocalDiscoverer","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534603018,"level":"info","msg":"Serializer: JSONSerializer","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534603033,"level":"info","msg":"Validator: FastestValidator","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534603036,"level":"info","msg":"Registered 13 middleware(s).","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534603037,"level":"info","msg":"Transporter: TcpTransporter","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534603183,"level":"info","msg":"API Gateway server created.","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534603183,"level":"info","msg":"Register route to '/'","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534603227,"level":"info","msg":"","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534603344,"level":"info","msg":"Connecting to the transporter...","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"transit"}
+{"ts":1653534603347,"level":"info","msg":"TCP server is listening on port 14014","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534603356,"level":"info","msg":"UDP Multicast Server is listening on 192.168.11.176:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534603356,"level":"info","msg":"UDP Multicast Server is listening on 127.0.0.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534603356,"level":"info","msg":"UDP Multicast Server is listening on 172.23.144.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534603356,"level":"info","msg":"UDP Multicast Server is listening on 172.25.224.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534603357,"level":"info","msg":"UDP Multicast Server is listening on 172.21.16.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534603357,"level":"info","msg":"UDP Multicast Server is listening on 172.29.112.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534603357,"level":"info","msg":"UDP discovery started.","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534603357,"level":"info","msg":"TCP Transporter started.","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534603870,"level":"info","msg":"'$node' service is registered.","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534603870,"level":"info","msg":"Service '$node' started.","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"$node","svc":"$node"}
+{"ts":1653534603871,"level":"error","msg":"Server error Error: listen EADDRINUSE: address already in use 0.0.0.0:3000\n    at Server.setupListenHandle [as _listen2] (node:net:1330:16)\n    at listenInCluster (node:net:1378:12)\n    at doListen (node:net:1516:7)\n    at processTicksAndRejections (node:internal/process/task_queues:84:21) {\n  code: 'EADDRINUSE',\n  errno: -4091,\n  syscall: 'listen',\n  address: '0.0.0.0',\n  port: 3000\n}","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534644138,"level":"info","msg":"Service '$node' stopped.","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"$node","svc":"$node"}
+{"ts":1653534644138,"level":"info","msg":"Service 'v1.nkc' stopped.","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534644139,"level":"info","msg":"UDP discovery stopped.","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534644140,"level":"info","msg":"ServiceBroker is stopped. Good bye.","nodeID":"nkc_main_192.168.11.176_13500","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534645696,"level":"info","msg":"Moleculer v0.14.21 is starting...","nodeID":"nkc_main_192.168.11.176_5316","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534645696,"level":"info","msg":"Namespace: NKC_MESH_PRODUCTION","nodeID":"nkc_main_192.168.11.176_5316","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534645696,"level":"info","msg":"Node ID: nkc_main_192.168.11.176_5316","nodeID":"nkc_main_192.168.11.176_5316","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534645699,"level":"info","msg":"Strategy: RandomStrategy","nodeID":"nkc_main_192.168.11.176_5316","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534645699,"level":"info","msg":"Discoverer: LocalDiscoverer","nodeID":"nkc_main_192.168.11.176_5316","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534645706,"level":"info","msg":"Serializer: JSONSerializer","nodeID":"nkc_main_192.168.11.176_5316","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534645722,"level":"info","msg":"Validator: FastestValidator","nodeID":"nkc_main_192.168.11.176_5316","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534645725,"level":"info","msg":"Registered 13 middleware(s).","nodeID":"nkc_main_192.168.11.176_5316","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534645726,"level":"info","msg":"Transporter: TcpTransporter","nodeID":"nkc_main_192.168.11.176_5316","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534645872,"level":"info","msg":"API Gateway server created.","nodeID":"nkc_main_192.168.11.176_5316","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534645872,"level":"info","msg":"Register route to '/'","nodeID":"nkc_main_192.168.11.176_5316","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534645920,"level":"info","msg":"","nodeID":"nkc_main_192.168.11.176_5316","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534679428,"level":"info","msg":"Service '$node' stopped.","nodeID":"nkc_main_192.168.11.176_5316","ns":"NKC_MESH_PRODUCTION","mod":"$node","svc":"$node"}
+{"ts":1653534679428,"level":"info","msg":"Service 'v1.nkc' stopped.","nodeID":"nkc_main_192.168.11.176_5316","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534679432,"level":"info","msg":"ServiceBroker is stopped. Good bye.","nodeID":"nkc_main_192.168.11.176_5316","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534681303,"level":"info","msg":"Moleculer v0.14.21 is starting...","nodeID":"nkc_main_192.168.11.176_11436","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534681303,"level":"info","msg":"Namespace: NKC_MESH_PRODUCTION","nodeID":"nkc_main_192.168.11.176_11436","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534681304,"level":"info","msg":"Node ID: nkc_main_192.168.11.176_11436","nodeID":"nkc_main_192.168.11.176_11436","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534681306,"level":"info","msg":"Strategy: RandomStrategy","nodeID":"nkc_main_192.168.11.176_11436","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534681307,"level":"info","msg":"Discoverer: LocalDiscoverer","nodeID":"nkc_main_192.168.11.176_11436","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534681313,"level":"info","msg":"Serializer: JSONSerializer","nodeID":"nkc_main_192.168.11.176_11436","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534681328,"level":"info","msg":"Validator: FastestValidator","nodeID":"nkc_main_192.168.11.176_11436","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534681331,"level":"info","msg":"Registered 13 middleware(s).","nodeID":"nkc_main_192.168.11.176_11436","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534681332,"level":"info","msg":"Transporter: TcpTransporter","nodeID":"nkc_main_192.168.11.176_11436","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534681475,"level":"info","msg":"API Gateway server created.","nodeID":"nkc_main_192.168.11.176_11436","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534681475,"level":"info","msg":"Register route to '/'","nodeID":"nkc_main_192.168.11.176_11436","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534681519,"level":"info","msg":"","nodeID":"nkc_main_192.168.11.176_11436","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534696923,"level":"info","msg":"Service '$node' stopped.","nodeID":"nkc_main_192.168.11.176_11436","ns":"NKC_MESH_PRODUCTION","mod":"$node","svc":"$node"}
+{"ts":1653534696923,"level":"info","msg":"Service 'v1.nkc' stopped.","nodeID":"nkc_main_192.168.11.176_11436","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534696925,"level":"info","msg":"ServiceBroker is stopped. Good bye.","nodeID":"nkc_main_192.168.11.176_11436","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534699697,"level":"info","msg":"Moleculer v0.14.21 is starting...","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534699697,"level":"info","msg":"Namespace: NKC_MESH_PRODUCTION","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534699697,"level":"info","msg":"Node ID: nkc_main_192.168.11.176_1780","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534699699,"level":"info","msg":"Strategy: RandomStrategy","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534699699,"level":"info","msg":"Discoverer: LocalDiscoverer","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534699706,"level":"info","msg":"Serializer: JSONSerializer","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534699721,"level":"info","msg":"Validator: FastestValidator","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534699724,"level":"info","msg":"Registered 13 middleware(s).","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534699725,"level":"info","msg":"Transporter: TcpTransporter","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534699868,"level":"info","msg":"API Gateway server created.","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534699868,"level":"info","msg":"Register route to '/'","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534699912,"level":"info","msg":"","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534700012,"level":"info","msg":"Connecting to the transporter...","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"transit"}
+{"ts":1653534700015,"level":"info","msg":"TCP server is listening on port 14437","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534700024,"level":"info","msg":"UDP Multicast Server is listening on 192.168.11.176:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534700024,"level":"info","msg":"UDP Multicast Server is listening on 127.0.0.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534700025,"level":"info","msg":"UDP Multicast Server is listening on 172.23.144.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534700025,"level":"info","msg":"UDP Multicast Server is listening on 172.25.224.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534700025,"level":"info","msg":"UDP Multicast Server is listening on 172.21.16.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534700025,"level":"info","msg":"UDP Multicast Server is listening on 172.29.112.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534700026,"level":"info","msg":"UDP discovery started.","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534700026,"level":"info","msg":"TCP Transporter started.","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534700537,"level":"info","msg":"'$node' service is registered.","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534700538,"level":"info","msg":"Service '$node' started.","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"$node","svc":"$node"}
+{"ts":1653534700538,"level":"error","msg":"Server error Error: listen EADDRINUSE: address already in use 0.0.0.0:3000\n    at Server.setupListenHandle [as _listen2] (node:net:1330:16)\n    at listenInCluster (node:net:1378:12)\n    at doListen (node:net:1516:7)\n    at processTicksAndRejections (node:internal/process/task_queues:84:21) {\n  code: 'EADDRINUSE',\n  errno: -4091,\n  syscall: 'listen',\n  address: '0.0.0.0',\n  port: 3000\n}","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534743306,"level":"info","msg":"Service '$node' stopped.","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"$node","svc":"$node"}
+{"ts":1653534743306,"level":"info","msg":"Service 'v1.nkc' stopped.","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534743307,"level":"info","msg":"UDP discovery stopped.","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534743308,"level":"info","msg":"ServiceBroker is stopped. Good bye.","nodeID":"nkc_main_192.168.11.176_1780","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534745212,"level":"info","msg":"Moleculer v0.14.21 is starting...","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534745212,"level":"info","msg":"Namespace: NKC_MESH_PRODUCTION","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534745212,"level":"info","msg":"Node ID: nkc_main_192.168.11.176_3128","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534745214,"level":"info","msg":"Strategy: RandomStrategy","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534745214,"level":"info","msg":"Discoverer: LocalDiscoverer","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534745221,"level":"info","msg":"Serializer: JSONSerializer","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534745236,"level":"info","msg":"Validator: FastestValidator","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534745239,"level":"info","msg":"Registered 13 middleware(s).","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534745240,"level":"info","msg":"Transporter: TcpTransporter","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
+{"ts":1653534745384,"level":"info","msg":"API Gateway server created.","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534745384,"level":"info","msg":"Register route to '/'","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534745428,"level":"info","msg":"","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534745524,"level":"info","msg":"Connecting to the transporter...","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"transit"}
+{"ts":1653534745527,"level":"info","msg":"TCP server is listening on port 14498","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534745536,"level":"info","msg":"UDP Multicast Server is listening on 192.168.11.176:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534745536,"level":"info","msg":"UDP Multicast Server is listening on 127.0.0.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534745536,"level":"info","msg":"UDP Multicast Server is listening on 172.23.144.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534745536,"level":"info","msg":"UDP Multicast Server is listening on 172.25.224.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534745537,"level":"info","msg":"UDP Multicast Server is listening on 172.21.16.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534745537,"level":"info","msg":"UDP Multicast Server is listening on 172.29.112.1:4445. Membership: 239.0.0.0","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534745537,"level":"info","msg":"UDP discovery started.","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534745537,"level":"info","msg":"TCP Transporter started.","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534746059,"level":"info","msg":"'$node' service is registered.","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"registry"}
+{"ts":1653534746060,"level":"info","msg":"Service '$node' started.","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"$node","svc":"$node"}
+{"ts":1653534746061,"level":"error","msg":"Server error Error: listen EADDRINUSE: address already in use 0.0.0.0:3000\n    at Server.setupListenHandle [as _listen2] (node:net:1330:16)\n    at listenInCluster (node:net:1378:12)\n    at doListen (node:net:1516:7)\n    at processTicksAndRejections (node:internal/process/task_queues:84:21) {\n  code: 'EADDRINUSE',\n  errno: -4091,\n  syscall: 'listen',\n  address: '0.0.0.0',\n  port: 3000\n}","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534751122,"level":"info","msg":"Service '$node' stopped.","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"$node","svc":"$node"}
+{"ts":1653534751122,"level":"info","msg":"Service 'v1.nkc' stopped.","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"v1.nkc","svc":"nkc","ver":1}
+{"ts":1653534751123,"level":"info","msg":"UDP discovery stopped.","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"transporter"}
+{"ts":1653534751124,"level":"info","msg":"ServiceBroker is stopped. Good bye.","nodeID":"nkc_main_192.168.11.176_3128","ns":"NKC_MESH_PRODUCTION","mod":"broker"}
