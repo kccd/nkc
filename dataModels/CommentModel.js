@@ -315,7 +315,7 @@ schema.methods.modifyComment = async function (props) {
 * */
 schema.statics.extendPostComments = async (props) => {
   const ReviewModel = mongoose.model('reviews');
-  const {comments, uid, isModerator = '', permissions = {}} = props;
+  const {comments, uid, isModerator = '', permissions = {}, authorUid} = props;
   const DocumentModel = mongoose.model('documents');
   const UserModel = mongoose.model('users');
   const {htmlToPlain} = require("../nkcModules/nkcRender");
@@ -410,7 +410,7 @@ schema.statics.extendPostComments = async (props) => {
         gradeName: userGrade.displayName,
       },
       commentUrl: await c.getLocationUrl(),
-      isAuthor: m.uid === uid?true:false,
+      isAuthor: authorUid === m.uid?true:false,
       quote: documentObj[c.did].quote || null,
     });
   }

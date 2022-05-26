@@ -91,7 +91,7 @@ router.get('/:aid', async (ctx, next)=>{
       comments = await db.CommentModel.getCommentsByArticleId({match, paging});
     }
     if(comments && comments.length !== 0) {
-      comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions});
+      comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions, authorUid:article.uid});
     }
     if(comment && comment.length !== 0) {
       //拓展单个评论内容
@@ -110,7 +110,7 @@ router.get('/:aid', async (ctx, next)=>{
     //获取论坛文章的评论
     const thread = await db.ThreadModel.findOnly({tid: columnPostData.thread.tid});
     //
-    if(!thread) ctx.throw(400, '未找到文章，请刷洗');
+    if(!thread) ctx.throw(400, '未找到文章，请刷新');
     //判断用户是否具有专家权限
     isModerator = await db.ForumModel.isModerator(state.uid, thread.mainForumsId);
     //文章收藏数
