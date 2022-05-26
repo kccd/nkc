@@ -31,7 +31,6 @@ import ZoneArticle from '../views/creation/zone/Article';
 import ZoneMoment from '../views/creation/zone/Moment';
 import ZoneDraft from '../views/creation/zone/Draft';
 import DraftEditor from '../views/creation/editor/DraftEditor';
-import Editor from '../../editor/vueComponents/Editor.vue'
 export const routesName = {
   creation: 'creation',
   creationMaterial: 'creationMaterial',
@@ -135,8 +134,4 @@ export default [
       }
     ]
   },
-  {
-    path: '/editor',
-    component: 'Editor',
-  }
 ];
