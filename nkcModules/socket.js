@@ -45,7 +45,6 @@ async function sendDataMessage(uid, options) {
 async function sendForumMessage(data) {
   const ThreadModel = require('../dataModels/ThreadModel');
   const ForumModel = require('../dataModels/ForumModel');
-  const socketClient = communication.getCommunicationClient();
   const render = require('./render');
   const {tid, state, pid} = data;
   let thread = await ThreadModel.findOne({tid});
@@ -70,24 +69,6 @@ async function sendForumMessage(data) {
         digest: thread.digest,
         contentType,
       });
-      /*socketClient.sendMessage(socketServiceName, {
-        eventName: 'forumMessage',
-        roomName,
-        data: {
-          html,
-          pid,
-          tid,
-          digest: thread.digest,
-          contentType,
-        }
-      });*/
-      /*global.NKC.io.to(roomName).emit('forumMessage', {
-        html,
-        pid,
-        tid,
-        digest: thread.digest,
-        contentType,
-      });*/
       usedForumsId.push(forum.fid);
     }
   }
@@ -96,7 +77,6 @@ async function sendForumMessage(data) {
 async function sendPostMessage(pid) {
   const PostModel = require('../dataModels/PostModel');
   const ThreadModel = require('../dataModels/ThreadModel');
-  // const socketClient = communication.getCommunicationClient();
   const singlePostData = await PostModel.getSocketSinglePostData(pid);
   const {
     parentCommentId,
@@ -115,24 +95,6 @@ async function sendPostMessage(pid) {
     parentCommentId,
     html
   });
-  /*socketClient.sendMessage(socketServiceName, {
-    roomName,
-    eventName,
-    data: {
-      postId: post.pid,
-      comment,
-      parentPostId,
-      parentCommentId,
-      html
-    }
-  });*/
-  /*global.NKC.io.to(roomName).emit(eventName, {
-    postId: post.pid,
-    comment,
-    parentPostId,
-    parentCommentId,
-    html
-  });*/
 }
 
 
@@ -349,26 +311,16 @@ async function sendPostMessage(pid) {
 * 移除对话
 * */
 async function sendEventRemoveChat(type, uid, tUid) {
-  // const socketClient = communication.getCommunicationClient();
   const roomName = getRoomName('user', uid);
   await SendRoomMessageToWebsocketService([roomName], 'removeChat', {
     type,
     uid: tUid
   });
-  /*socketClient.sendMessage(socketServiceName, {
-    eventName: 'removeChat',
-    roomName: getRoomName('user', uid),
-    data: {
-      type,
-      uid: tUid
-    }
-  });*/
 }
 /*
 * 移除好友
 * */
 async function sendEventRemoveFriend(uid, tUid) {
-  // const socketClient = communication.getCommunicationClient();
   const roomName = getRoomName('user', uid);
   const tRoomName = getRoomName('user', tUid)
   await SendRoomMessageToWebsocketService([roomName], 'removeFriend', {
@@ -379,35 +331,15 @@ async function sendEventRemoveFriend(uid, tUid) {
     type: 'UTU',
     uid: uid
   });
-  /*socketClient.sendMessage(socketServiceName, {
-    eventName: 'removeFriend',
-    roomName: getRoomName('user', uid),
-    data: {
-      type: 'UTU',
-      uid: tUid
-    }
-  });
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'removeFriend',
-    roomName: getRoomName('user', tUid),
-    data: {
-      type: 'UTU',
-      uid: uid
-    }
-  });*/
 }
 
 /*
 * 移除分组
 * */
 async function sendEventRemoveCategory(uid, cid) {
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'removeCategory',
-    roomName: getRoomName('user', uid),
-    data: {
-      cid
-    }
+  const roomName = getRoomName('user', uid);
+  await SendRoomMessageToWebsocketService([roomName], 'removeCategory', {
+    cid
   });
 }
 
@@ -417,13 +349,9 @@ async function sendEventRemoveCategory(uid, cid) {
 async function sendEventUpdateCategoryList(uid) {
   const FriendsCategoryModel = require('../dataModels/FriendsCategoryModel');
   const categoryList = await FriendsCategoryModel.getCategories(uid);
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'updateCategoryList',
-    roomName: getRoomName('user', uid),
-    data: {
-      categoryList
-    }
+  const roomName = getRoomName('user', uid);
+  await SendRoomMessageToWebsocketService([roomName], 'updateCategoryList', {
+    categoryList
   });
 }
 /*
@@ -432,13 +360,9 @@ async function sendEventUpdateCategoryList(uid) {
 async function sendEventUpdateUserList(uid) {
   const FriendModel = require('../dataModels/FriendModel');
   const userList = await FriendModel.getFriends(uid);
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'updateUserList',
-    roomName: getRoomName('user', uid),
-    data: {
-      userList
-    }
+  const roomName = getRoomName('user', uid);
+  await SendRoomMessageToWebsocketService([roomName], 'updateUserList', {
+    userList
   });
 }
 
@@ -448,13 +372,9 @@ async function sendEventUpdateUserList(uid) {
 async function sendEventUpdateChatList(uid) {
   const CreatedChatModel = require('../dataModels/CreatedChatModel');
   const chatList = await CreatedChatModel.getCreatedChat(uid);
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'updateChatList',
-    roomName: getRoomName('user', uid),
-    data: {
-      chatList
-    }
+  const roomName = getRoomName('user', uid);
+  await SendRoomMessageToWebsocketService([roomName], 'updateChatList', {
+    chatList
   });
 }
 
@@ -462,22 +382,15 @@ async function sendEventUpdateChatList(uid) {
 * 撤回消息
 * */
 async function sendEventWithdrawn(uid, tUid, messageId) {
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'withdrawn',
-    roomName: getRoomName('user', uid),
-    data: {
-      messageId,
-      reEdit: true,
-    }
+  const roomName = getRoomName('user', uid);
+  const tRoomName = getRoomName('user', tUid);
+  await SendRoomMessageToWebsocketService([roomName], 'withdrawn', {
+    messageId,
+    reEdit: true,
   });
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'withdrawn',
-    roomName: getRoomName('user', tUid),
-    data: {
-      messageId,
-      reEdit: false
-    }
+  await SendRoomMessageToWebsocketService([tRoomName], 'withdrawn', {
+    messageId,
+    reEdit: false
   });
 }
 
@@ -485,14 +398,10 @@ async function sendEventWithdrawn(uid, tUid, messageId) {
 * 标记为已读
 * */
 async function sendEventMarkAsRead(type, uid, tUid) {
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'markAsRead',
-    roomName: getRoomName('user', uid),
-    data: {
-      type,
-      uid: tUid
-    }
+  const roomName = getRoomName('user', uid);
+  await SendRoomMessageToWebsocketService([roomName], 'markAsRead', {
+    type,
+    uid: tUid
   });
 }
 
@@ -505,13 +414,9 @@ async function sendEventMarkAsRead(type, uid, tUid) {
 async function sendEventUpdateChat(type, uid, tUid) {
   const CreatedChatModel = require('../dataModels/CreatedChatModel');
   const chat = await CreatedChatModel.getSingleChat(type, uid, tUid);
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'updateChat',
-    roomName: getRoomName('user', uid),
-    data: {
-      chat
-    }
+  const roomName = getRoomName('user', uid);
+  await SendRoomMessageToWebsocketService([roomName], 'updateChat', {
+    chat
   });
 }
 
