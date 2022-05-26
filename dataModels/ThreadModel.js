@@ -1712,9 +1712,10 @@ threadSchema.statics.postNewThread = async (options) => {
   // 发贴自动关注专业
   // await SubscribeModel.autoAttentionForum(options);
   // 发表文章删除草稿
-  if(options.did) {
-    await DraftModel.removeDraftById(options.did, options.uid);
-  }
+  // 取消删除草稿
+  // if(options.did) {
+  //   await DraftModel.removeDraftById(options.did, options.uid);
+  // }
   return _post;
 };
 

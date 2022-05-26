@@ -29,6 +29,7 @@ export default {
     content: "",
     quoteHtml: "",
     contentLength: "",
+    editorStatus: false,
   }),
   props: {
     c: {
@@ -45,6 +46,7 @@ export default {
           this.quoteHtml = quoteHtml[0];
         }
         this.content = n?.replace(reg, "") || "";
+        this.editorStatus && this.setContent(this.content)
       },
     },
     openOnEditNotes: function (val) {
@@ -57,8 +59,8 @@ export default {
     },
   },
   methods: {
-    setContent() {
-      this.$refs.threadEditor.setContent(this.content);
+    setContent(v) {
+      this.content && this.$refs.threadEditor.setContent(v || this.content);
     },
     getRef() {
       return this.$refs.threadEditor;
@@ -81,6 +83,7 @@ export default {
     },
     editorReady() {
       //编辑器准备就绪
+      this.editorStatus = true;
       this.setContent();
       // this.resetBodyPaddingTop();
     },

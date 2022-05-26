@@ -1,8 +1,8 @@
 <template lang="pug">
   .user-post
     .paging-button
-      a.button(@click="toRoute('post')" :class="t === 'post'?'active':''") 回复
-      a.button(@click="toRoute('thread')" :class="t === 'thread'?'active':''") 文章
+      a.button(@click="toRoute(postRouteName)" :class="t === 'post'?'active':''") 回复
+      a.button(@click="toRoute(threadRouteName)" :class="t === 'thread'?'active':''") 文章
     to-column(ref="toColumn")
     .user-post-list
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
@@ -54,8 +54,11 @@ import ToColumn from "../../../../../lib/vue/publicVue/toColumn/ToColumn";
 import {nkcAPI} from "../../../../../lib/js/netAPI";
 import {getState} from "../../../../../lib/js/state";
 import Blank from '../../../../components/Blank';
+import { routesName } from "../../../../routes/creation"
 export default {
   data: () => ({
+    postRouteName: routesName.creationCommunityPost,
+    threadRouteName: routesName.creationCommunityThread,
     posts: [],
     paging: {},
     loading: true,

@@ -385,8 +385,14 @@ router
       };
       selectedForumsId = thread.mainForumsId || [];
     } else if(type === "redit") { // 从草稿箱来
-      let {id, o} = query;
-      let draft = await db.DraftModel.findOne({did: id, uid: user.uid});
+      let {id, o, _id} = query;
+      // 社区的草稿只能使用_id 才能具体查找到一篇文章
+      let draft
+      if(_id){
+        draft = await db.DraftModel.findOne({_id, uid: user.uid});
+      }else{
+        draft = await db.DraftModel.findOne({did: id, uid: user.uid});
+      }
       if(!draft) ctx.throw(400, "草稿不存在或已被删除");
       draft = draft.toObject();
       if(!['copy', 'update'].includes(o)) {

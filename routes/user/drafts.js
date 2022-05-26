@@ -81,7 +81,7 @@ draftsRouter
     await next();
   })
   .post("/", async (ctx, next) => {
-    const {data, db, nkcModules} = ctx;
+    const {data, db, nkcModules, query} = ctx;
     let body, files;
     if(ctx.body.fields) {
       body = JSON.parse(ctx.body.fields.body);
@@ -93,6 +93,7 @@ draftsRouter
       post, // 草稿内容
       desType, // 草稿类型
       desTypeId, // 草稿类型对应的ID
+      // 以前的业务是编辑器提交一次创建一条新记录
       draftId, // 草稿ID
     } = body;
     let {
@@ -120,7 +121,17 @@ draftsRouter
     };
     if(draft) { // 存在草稿
       draftObj.tlm = Date.now();
-      await draft.updateOne(draftObj);
+      if(query.savetType === 'manual') {
+        // 如果是手动保存那么需要存历史
+        draftObj.type = "betaHistory"
+        await draft.updateOne(draftObj);
+        const preDraft = draft.toObject();
+        delete preDraft._id;
+        draft = db.DraftModel({...preDraft, ...draftObj});
+        await draft.save();
+      }else {
+        await draft.updateOne(draftObj);
+      }
       if(survey) { // 调查表数据
         if(draft.surveyId) { // 若草稿上已有调查表ID，则只需更新调查表数据。
           survey._id = draft.surveyId;

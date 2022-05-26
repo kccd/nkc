@@ -5,6 +5,13 @@
       div
         //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t  .clear-padding
         //- 2.notice editorSettings.onEditNotes
+        .article-box(v-if="drafts.length > 0")
+          .article-box-header 草稿
+          .article-box-text {{drafts[0].t || '未命名'}}
+          .article-box-option
+            button.btn.btn-xs.btn-primary.m-r-05(@click="editArticle(drafts[0]._id)") 继续编辑
+            button.btn.btn-xs.btn-default(@click="more") 查看更多
+            .fa.fa-remove(@click="close")
         article-title(
           :o="o",
           ref="title",
@@ -91,6 +98,8 @@ import Original from "./Original.vue";
 import Investigation from "./Investigation.vue";
 import Column from "./Column.vue";
 import { sweetError } from "../../lib/js/sweetAlert.js";
+import {getState} from "../../lib/js/state";
+import {getRequest, timeFormat, addUrlParam} from "../../lib/js/tools";
 
 window.reqUrl = NKC.methods.getDataById("data");
 
@@ -109,39 +118,27 @@ export default {
     column: Column,
   },
   data: () => ({
+    drafts: [],
     // 社区内容点击继续创作传递的参数o（复制为新文章或更新已发布文章）
     o: reqUrl.o,
     hideType: ["newPost", "modifyPost"],
     pageData: {},
     pageState: {},
     err: '',
-    show: false
+    show: false,
+    lockRequest: false
   }),
-  created() {
-    let search = this.$route?.query;
-    let url = `/editor/data`;
-    // 如果后台给了数据就用后台的 否则读取浏览器地址
-    if (reqUrl && reqUrl.type && reqUrl.id) {
-      url = `/editor/data?type=${reqUrl.type}&id=${reqUrl.id}&o=${reqUrl.o}`;
-    } else if (search && search.type && search.id) {
-      url = `/editor/data?type=${search.type}&id=${search.id}&o=${search.o}`;
+  watch: {
+    "$route.query": {
+      immediate: true,
+      handler(n){
+        this.getData(n)
+      }
     }
-    nkcAPI(url, "get")
-      .then((resData) => {
-        this.pageData = resData;
-        this.pageState = resData.state;
-        this.show = true;
-      })
-      .catch((err) => {
-        if(err.error){
-          this.err = err.error;
-          this.$emit('noPermission', err);
-          sweetError(err.error);
-          
-          // sweetError('当前没有权限');
-          // return
-        }
-      });
+  },
+  created() {
+    this.getData()
+    this.getUserDraft();
     window.addEventListener("pageshow", this.clearCache);
   },
   destroyed() {
@@ -150,16 +147,96 @@ export default {
     this.pageState = {};
   },
   methods: {
+    addUrlParam,
+    getUserDraft(page=0) {
+      if(this.lockRequest) return
+      const {uid: stateUid} = getState();
+      this.uid = stateUid;
+      const self = this;
+      // if(this.$route.query.aid) return;
+      if(!self.uid) return;
+      let url = `/u/${self.uid}/profile/draftData?page=${page}&perpage=1`;
+      nkcAPI(url, 'GET')
+      .then(res => {
+        self.drafts = res.drafts;
+        // self.paging = res.paging;
+      })
+      .catch(err => {
+        sweetError(err);
+      })
+    },
+    //继续编辑草稿
+    editArticle(aid) {
+      const self = this;
+      if(!aid) {sweetError("id不存在"); return};
+      //改变地址栏参数
+      self.addUrlParam('aid', aid);
+      this.getData()
+      self.drafts = [];
+    },
+    close() {
+      this.drafts = [];
+    },
+    more() {
+      // this.$router.replace({
+      //   path: '/creation/community/draft'
+      // });
+      location.href = '/creation/community/draft'
+    },
+    getData(search) {
+      if(!search) search = new URLSearchParams(location.search);
+      let url = `/editor/data`;
+      // 如果后台给了数据就用后台的 否则读取浏览器地址
+      if (reqUrl && reqUrl.type && reqUrl.id) {
+        url = `/editor/data?type=${reqUrl.type}&id=${reqUrl.id}&o=${reqUrl.o}`;
+      } else if (search) {
+        let type, id, o, aid;
+        // 读取浏览器地址栏参数
+        if(search.constructor.name === 'URLSearchParams'){
+          id = search.getAll('id')[0]
+          type = search.getAll('type')[0]
+          o = search.getAll('o')[0]
+          aid = search.getAll('aid')[0]
+
+          // 为对象时
+        }else{
+          type = search.type;
+          id = search.id;
+          o = search.o;
+          aid = search.aid
+          url = `/editor/data?type=${type}&id=${id}&o=${o}`;
+        }
+        if(aid){
+          url = `/editor/data?type=redit&_id=${aid}&o=update`;
+          this.lockRequest = true;
+        }
+      }
+      nkcAPI(url, "get")
+        .then((resData) => {
+          this.pageData = resData;
+          this.pageState = resData.state;
+          this.show = true;
+        })
+        .catch((err) => {
+          if(err.error){
+            this.err = err.error;
+            this.$emit('noPermission', err);
+            sweetError(err.error);
+          }
+        });
+    },
+    // 设置编辑器标题、内容
+    setValue(title, content){
+      this.$refs.title.setTitle(title);
+      this.$refs.content.setContent(content);
+    },
     clearCache(event) {
       if (
         event.persisted ||
         (window.performance && window.performance.navigation.type === 2)
-      ) {
-        // 清除缓存
-        $(".editor-title").val('');
-        $(".abstract-cn").val("");
-        $(".abstract-en").val("");
-        $(".agreement").prop("checked", true);
+      ) 
+      {
+        reload()
       }
     },
     // 控制 提交组件 是否可选匿名发表
@@ -174,6 +251,7 @@ export default {
     contentChange(length) {
       !this.hideType.includes(this.pageData.type) &&
         this.$refs.original.contentChange(length);
+      this.$refs.submit.saveToDraftBaseDebounce("automatic")
     },
     // 提交和保存时获取各组件数据
     readyData(submitFn) {
@@ -193,6 +271,7 @@ export default {
       }
       // 添加 草稿id 和 parentPostId
       submitData["did"] = this.pageData.draftId;
+      submitData["_id"] = this.pageData.post?._id;
       submitData["parentPostId"] = this.pageData.parentPostId;
       submitFn(submitData);
     },
@@ -205,16 +284,55 @@ export default {
   background-color: white !important;
 }
 </style>
-<style scoped>
+<style scoped lang="less">
+@import "../../publicModules/base";
 
-
-
-/* .box-shadow-panel > div {
-  box-shadow: none;
-  padding: 0;
-  background-color: #fff;
-  border-radius: 3px;
-} */
+.article-box {
+  @height: 3rem;
+  @padding: 1rem;
+  @boxHeaderWidth: 4rem;
+  @boxOptionWidth: 14rem;
+  height: @height;
+  line-height: @height;
+  padding-left: @boxHeaderWidth;
+  padding-right: @boxOptionWidth + 0.5rem;
+  width: 100%;
+  background-color: #d9edf7;
+  position: relative;
+  border: 1px solid #c6e5ff;
+  .article-box-header{
+    color: @primary;
+    font-size: 1.2rem;
+    font-weight: 700;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: @height;
+    line-height: @height;
+    width: @boxHeaderWidth;
+    text-align: center;
+  }
+  .article-box-text{
+    font-size: 1.3rem;
+    .hideText(@line: 1);
+  }
+  .article-box-option{
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: @height;
+    line-height: @height;
+    width: @boxOptionWidth;
+    text-align: right;
+    .fa{
+      height: @height;
+      cursor: pointer;
+      line-height: @height;
+      width: @height;
+      text-align: center;
+    }
+  }
+}
 @media (max-width: 992px) {
   .col-xs-12 {
     width: 100%;

@@ -17,6 +17,11 @@ const draftSchema = new Schema({
     type: String,
     default: ''
   },
+  // 草稿状态 编辑 编辑历史 发布历史
+  type: {
+    type: String,
+    default: 'beta'
+  },
   // 草稿类型
   desType: {
     type: String,

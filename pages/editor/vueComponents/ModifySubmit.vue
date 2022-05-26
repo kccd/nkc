@@ -29,13 +29,14 @@
         @click="readyData",
         :disabled="disabledSubmit || !checkProtocol"
       ) {{ disabledSubmit ? '提交中...' : '提交' }}
-      button.btn.btn-default(@click="saveToDraftBase('manual')") 存草稿
+      button.btn.btn-default(@click="saveToDraftBaseDebounce('manual')") 存草稿
 </template>
 
 <script>
 import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import { sweetError } from "../../lib/js/sweetAlert.js";
 import { timeFormat } from "../../lib/js/tools";
+import {debounce} from '../../lib/js/execution';
 // import { screenTopWarning } from "../../lib/js/topAlert";
 
 export default {
@@ -52,6 +53,7 @@ export default {
     }
   },
   data: () => ({
+    saveToDraftBaseDebounce: '',
     type: "newThread",
     disabledSubmit: false, // 锁定提交按钮
     checkProtocol: true, // 是否勾选协议
@@ -93,6 +95,9 @@ export default {
         }
       }
     }
+  },
+  created(){
+    this.saveToDraftBaseDebounce = debounce((saveType)=>{this.saveToDraftBase(saveType)}, 700)
   },
   computed: {
     selectedForumsId() {
@@ -178,26 +183,12 @@ export default {
       // }, this.saveDraftTimeout);
     },
     saveToDraftBase(savetType = "manual") {
-      if (savetType === "manual") this.readyDataForSave();
+      // if (savetType === "manual") 
+      this.readyDataForSave();
       const { saveData } = this;
       if (!saveData.c) return sweetError("请先输入内容");
       let type = this.type;
-
       return Promise.resolve()
-        // .then(() => {
-        //   // 获取本次编辑器内容的全部长度
-        //   // const allContentLength = editor.getContent();
-        //   if (saveData.c.length < this.oldContent.length) {
-        //     clearInterval(this.setInterval);
-        //     this.setInterval = '';
-        //     return sweetQuestion2(`您输入的内容发生了变化，是否还要继续保存？`)
-        //       .finally( ()=>{
-        //         this.setInterval = setInterval(this.autoSaveToDraft, this.saveDraftTimeout)
-        //       } )
-        //   } else {
-        //     return;
-        //   }
-        // })
         .then((res) => {
           // let post = this.getPost();
           let desType, desTypeId;
@@ -222,11 +213,12 @@ export default {
             throw "未知的草稿类型";
           }
           let formData = new FormData();
+
           formData.append(
             "body",
             JSON.stringify({
               post: saveData,
-              draftId: this.draftId,
+              draftId:saveData.did || this.draftId,
               desType: desType,
               desTypeId: desTypeId,
             })
@@ -241,7 +233,7 @@ export default {
           // 保存草稿
           // 当编辑器中的字数减少时提示用户是否需要保存，避免其他窗口的自动保存覆盖内容
           return nkcUploadFile(
-            "/u/" + NKC.configs.uid + "/drafts",
+            "/u/" + NKC.configs.uid + "/drafts?savetType=" + savetType,
             "POST",
             formData
           );
@@ -409,6 +401,8 @@ export default {
                 "cover.png"
               );
             }
+                console.log(submitData)
+                debugger
             return nkcUploadFile("/f/" + submitData.fids[0], "POST", formData);
           } else if (type === "newPost") {
             // 发表回复：从文章页点"去编辑器"、草稿箱
