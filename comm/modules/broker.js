@@ -1,6 +1,7 @@
 const Moleculer = require('moleculer');
 const address = require('address');
 const commConfig = require('../../config/comm.json');
+const path = require('path');
 const Broker = new Moleculer.ServiceBroker({
   namespace: commConfig.moleculer.namespace,
   nodeID: `${commConfig.moleculer.nodeID}_${address.ip()}_${process.pid}`,
@@ -12,7 +13,7 @@ const Broker = new Moleculer.ServiceBroker({
   logger: {
     type: 'File',
     options: {
-      folder: './log',
+      folder: path.resolve(__dirname, '../../logs'),
       filename: 'moleculer-{date}.log',
       formatter: 'json',
       eol: '\n',

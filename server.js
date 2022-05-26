@@ -9,6 +9,7 @@ require('colors');
 const http = require('http');
 const dbStatus = require('./settings/dbStatus');
 const serverConfig = require('./config/server');
+const comm = require("./comm");
 let server;
 
 global.NKC.port = Number(serverConfig.port) + global.NKC.processId;
@@ -20,8 +21,8 @@ const start = async () => {
     const comm = require('./comm');
     const elasticSearch = require("./nkcModules/elasticSearch");
     const communication = require('./nkcModules/communication');
-    await comm.StartBroker();
     await dbStatus.database();
+    await comm.StartBroker();
     console.log(`database connected`.green);
     await elasticSearch.init();
     communication.getCommunicationClient();

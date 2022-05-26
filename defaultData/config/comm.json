@@ -6,6 +6,11 @@
     "registry": {
       "strategy": "Random",
       "discoverer": "Local"
+    },
+    "web": {
+      "enabled": true,
+      "port": 20394,
+      "host": "0.0.0.0"
     }
   }
 }
