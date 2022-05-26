@@ -14,6 +14,12 @@ const xsfsRecordSchema = new Schema({
     required: true,
     index: 1
   },
+  //学术分记录类型 post thread comment article
+  recordType: {
+    type: String,
+    required: true,
+    index: 1
+  },
   num: {
     type: Number,
     required: true

@@ -47,6 +47,10 @@ router
         optionStatus.edit = true;
         optionStatus.history = true;
       }
+      // 评学术分
+      if(ctx.permission('creditXsf')) {
+        optionStatus.xsf = true;
+      }
       //退修禁用权限
       optionStatus.disabled = (
         (ctx.permission('movePostsToRecycle') || ctx.permission('movePostsToDraft'))

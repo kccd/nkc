@@ -5,6 +5,7 @@ const unblockRouter = require('./unblock');
 const collectionRouter = require('./collection');
 const digestRouter = require('./digest');
 const homeTopRouter = require('./homeTop');
+const creditRouter = require('./credit');
 router
   .del('/:aid', async (ctx, next) => {
     const {params, db, state} = ctx;
@@ -20,5 +21,6 @@ router
   .use('/:aid/collection', collectionRouter.routes(), collectionRouter.allowedMethods())
   .use('/:aid/digest', digestRouter.routes(), digestRouter.allowedMethods())
   .use('/:aid/homeTop', homeTopRouter.routes(), homeTopRouter.allowedMethods())
+  .use('/:aid/credit', creditRouter.routes(), creditRouter.allowedMethods())
 module.exports = router;
 

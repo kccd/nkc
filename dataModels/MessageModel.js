@@ -400,12 +400,26 @@ messageSchema.statics.getParametersData = async (message) => {
       title: comment[0].articleDocument.title,
     };
   } else if(type === 'xsf') {
-    const {pid, num} = message.c;
-    const post = await PostModel.findOne({pid});
-    if(!post) return null;
+    const {pid, num, cid, aid} = message.c;
+    let url;
+    if(pid) {
+      const post = await PostModel.findOne({pid});
+      if(!post) return null;
+      url = await PostModel.getUrl(post);
+    } else if(cid) {
+      let comment = await CommentModel.findOnly({_id: cid});
+      if(!comment) return null;
+      comment = (await CommentModel.getCommentInfo([comment]))[0];
+      url = comment.commentUrl;
+    } else if(aid) {
+      let article = await ArticleModel.findOnly({_id: aid});
+      if(!article) return null;
+      article = (await ArticleModel.getArticlesInfo([article]))[0];
+      url = article.url;
+    }
     parameters = {
-      postURL: await PostModel.getUrl(post),
-      xsfCount: num
+      postURL: url,
+      xsfCount: num,
     };
   } else if(type === 'scoreTransfer') {
     const {pid, uid, scoreType, number} = message.c;

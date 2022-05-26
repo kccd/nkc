@@ -237,8 +237,22 @@ window.articleOption = new Vue({
         });
     },
     addXSF() {
-      const {pid} = this;
-      credit(pid, 'xsf');
+      const {_id} = this.article;
+      window.RootApp.addXsf((data) => {
+        const {num, description} = data;
+        const obj = {
+          num,
+          description,
+        };
+        nkcAPI(`/article/${_id}/credit/xsf`, 'POST', obj)
+          .then(() => {
+            window.RootApp.closeXsf();
+            window.location.reload();
+          })
+          .catch(err => {
+            screenTopWarning(err);
+          })
+      }, {})
     },
     addKCB() {
       const {pid} = this;

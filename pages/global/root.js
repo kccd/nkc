@@ -8,6 +8,7 @@ import SubscribeTypes from "../lib/vue/SubscribeTypes";
 import FloatForumPanel from "../lib/vue/forum/FloatForumPanel";
 import Sticker from '../lib/vue/Sticker';
 import Digest from "../lib/vue/Digest";
+import AddXsf from "../lib/vue/AddXsf";
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
@@ -34,6 +35,7 @@ window.RootApp = new Vue({
     "subscribe-types": SubscribeTypes,
     "sticker-panel": Sticker,
     digest: Digest,
+    'add-xsf': AddXsf
   },
   computed: {
     hasLogged() {
@@ -89,6 +91,13 @@ window.RootApp = new Vue({
     },
     closeDigest() {
       this.$refs.digest.close();
+    },
+    //打开评学术分弹窗
+    addXsf(callback, options) {
+      this.$refs.addXsf.open(callback, options);
+    },
+    closeXsf() {
+      this.$refs.addXsf.close()
     },
     //关注取关用户
     subscribe(options) {

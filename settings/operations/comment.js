@@ -27,5 +27,19 @@ module.exports = {
       POST: 'digestComment',
       DELETE: 'unDigestComment',
     },
+    credit: {
+      xsf: {
+        POST: 'creditXsf',
+        PARAMETER: {
+          DELETE: 'cancelXsf'
+        }
+      },
+      kcb: {
+        POST: 'creditKcb',
+        PARAMETER: {
+          PUT: "modifyKcbRecordReason"
+        }
+      }
+    },
   }
 }

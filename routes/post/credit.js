@@ -42,7 +42,8 @@ router
       description,
       ip: ctx.address,
       port: ctx.port,
-      pid
+      pid,
+      recordType: 'post'
     });
     targetUser.xsf += num;
     await newRecord.save();
@@ -75,7 +76,7 @@ router
     const {reason} = query;
     const {user} = data;
     const {recordId, pid} = params;
-    const record = await db.XsfsRecordModel.findOnly({_id: recordId, pid});
+    const record = await db.XsfsRecordModel.findOnly({_id: recordId, pid, recordType: 'post'});
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
     const targetUser = await db.UserModel.findOnly({uid: post.uid});

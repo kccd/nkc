@@ -11,6 +11,9 @@
         .fa.fa-star(v-else)
         span(v-if='options.digest === false') 设为精选
         span(v-else) 取消精选
+      .option(v-if='options.xsf !== null' @click='addXSF')
+        .fa.fa-graduation-cap
+        span 评学术分
       .option(v-if="options.reviewed === 'unknown'" @click="passReview()")
         .fa.fa-check-circle-o
         span 通过审核
@@ -344,6 +347,40 @@ export default {
       } else {
         self.unDigestComment();
       }
+    },
+    //评学术分
+    addXSF() {
+      const {_id} = this.comment;
+      window.RootApp.addXsf((data) => {
+        const {num, description} = data;
+        const  obj = {
+          num,
+          description,
+        };
+        nkcAPI(`/comment/${_id}/credit/xsf`, 'POST', obj)
+          .then(() => {
+            window.RootApp.closeXsf();
+            window.location.reload();
+          })
+          .catch((err) => {
+            screenTopWarning(err);
+          })
+      }, {
+      })
+    },
+    //撤销学术分
+    cancelXsf() {
+      const {_id} = this.comment;
+      const reason = prompt('请输入原因：');
+      if(reason === null) return;
+      if(reason === '') return screenTopWarning('撤销原因不能为空');
+      nkcAPI(`/comment/${_id}/credit/xsf`)
+        .then(() => {
+          window.location.reload();
+        })
+        .catch((data) => {
+          screenTopWarning(data.error || data);
+        });
     }
   }
 }

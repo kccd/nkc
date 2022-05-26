@@ -369,7 +369,7 @@ kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
   const UserModel = mongoose.model("users");
   const SettingModel = mongoose.model('settings');
   const {
-    fromUser, toUser, num, description, post, ip, port
+    fromUser, toUser, num, description, post, ip, port, comment
   } = options;
   if(fromUser.uid === toUser.uid) throwErr(400, "无法对自己执行此操作");
   const _id = await SettingModel.operateSystemID('kcbsRecords', 1);
@@ -381,7 +381,7 @@ kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
     to: toUser.uid,
     num,
     description,
-    pid: post.pid,
+    pid: post.pid || comment._id,
     ip,
     port,
     type: 'creditKcb'

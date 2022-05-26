@@ -21,6 +21,7 @@ module.exports = async (ctx, next) => {
     violation: null,
     blacklist: null,
     digest: null,
+    xsf: null,
   };
   if(user) {
     data.digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
@@ -37,6 +38,10 @@ module.exports = async (ctx, next) => {
       //用户具有自己的评论的编辑权限以及管理员编辑权限
       if(uid === comment.uid || permissionsOr(['pushThread', 'moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop'])) {
         optionStatus.editor = true;
+      }
+      // 评学术分
+      if(ctx.permission('creditXsf')) {
+        optionStatus.xsf = true;
       }
       //退修禁用权限
       optionStatus.disabled = (

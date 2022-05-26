@@ -5,6 +5,7 @@ const disabledRouter = require("./disabled");
 const unblockRouter = require("./unblock");
 const optionsRouter = require("./options");
 const ipInfoRouter = require("./ipInfo");
+const creditRouter = require("./credit");
 const digestRouter = require("./digest");
 const customCheerio = require("../../nkcModules/nkcRender/customCheerio");
 module.exports = router;
@@ -136,3 +137,4 @@ router
   //获取评论作者的ip信息
   .get('/:_id/ipInfo', ipInfoRouter)
   .use('/:_id/digest', digestRouter.routes(), digestRouter.allowedMethods())
+  .use('/:_id/credit', creditRouter.routes(), creditRouter.allowedMethods())

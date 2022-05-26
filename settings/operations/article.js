@@ -20,6 +20,20 @@ module.exports = {
     homeTop: {
       POST: 'homeTop',
       DELETE: 'homeTop',
-    }
+    },
+    credit: {
+      xsf: {
+        POST: 'creditXsf',
+        PARAMETER: {
+          DELETE: 'cancelXsf'
+        }
+      },
+      kcb: {
+        POST: 'creditKcb',
+        PARAMETER: {
+          PUT: "modifyKcbRecordReason"
+        }
+      }
+    },
   }
 };
