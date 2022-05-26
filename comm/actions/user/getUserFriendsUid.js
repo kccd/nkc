@@ -5,10 +5,6 @@ module.exports = {
   },
   async handler(ctx) {
     const {uid} = ctx.params;
-    const friendsUid = await MessageModel.getUsersFriendsUid(uid);
-    return {
-      uid,
-      friendsUid
-    }
+    return await MessageModel.getUsersFriendsUid(uid);
   }
 }

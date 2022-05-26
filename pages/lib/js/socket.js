@@ -89,6 +89,10 @@ export function getSocket() {
     socket.on('disconnect', function() {
       console.log('socket连接已断开');
     });
+    socket.on('connect_error', function(err) {
+      console.log(err);
+    });
+    socket.on('test', console.log);
     window.socket = socket;
     return window.socket;
   }
