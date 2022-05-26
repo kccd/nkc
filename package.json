@@ -8,7 +8,7 @@
     "install": "node install.js",
     "reinstall": "node install.js -r",
     "start": "cross-env NODE_ENV=production node server.js ",
-    "serve": "node ./server.js",
+    "serve": "npm run init && node ./server.js",
     "test": "mocha -t 10000",
     "watch-node": "nodemon server.js",
     "watch-pages": "npm run build-pages -- -w",
