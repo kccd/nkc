@@ -1121,6 +1121,8 @@ postSchema.statics.extendPosts = async (posts, options) => {
   return results;
 };
 
+
+//更新post的点赞
 postSchema.methods.updatePostsVote = async function() {
   const PostModel = mongoose.model('posts');
   const PostsVoteModel = mongoose.model('postsVotes');

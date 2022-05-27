@@ -7,7 +7,8 @@ const Schema = mongoose.Schema;
 const voteSources = {
   post: 'post',
   article: 'article',
-  moment: 'moment'
+  moment: 'moment',
+  comment: 'comment',
 };
 
 

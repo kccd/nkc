@@ -7,6 +7,7 @@ const optionsRouter = require("./options");
 const ipInfoRouter = require("./ipInfo");
 const creditRouter = require("./credit");
 const digestRouter = require("./digest");
+const voteRouter = require('./vote');
 const customCheerio = require("../../nkcModules/nkcRender/customCheerio");
 module.exports = router;
 router
@@ -138,3 +139,4 @@ router
   .get('/:_id/ipInfo', ipInfoRouter)
   .use('/:_id/digest', digestRouter.routes(), digestRouter.allowedMethods())
   .use('/:_id/credit', creditRouter.routes(), creditRouter.allowedMethods())
+  .use('/:_id/vote', voteRouter.routes(), voteRouter.allowedMethods())

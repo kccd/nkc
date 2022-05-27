@@ -41,5 +41,13 @@ module.exports = {
         }
       }
     },
+    vote: {
+      up: {
+        POST: 'post-vote-up'
+      },
+      down: {
+        POST: 'post-vote-down'
+      }
+    },
   }
 }

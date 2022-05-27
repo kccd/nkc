@@ -1029,4 +1029,32 @@ schema.methods.getLocationUrl = async function() {
   return comment.commentUrl;
 }
 
+/*
+* 更新独立文章评论的点赞详情
+* */
+schema.methods.updateCommentsVote = async function() {
+  const PostsVoteModel = mongoose.model('postsVotes');
+  const {comment: commentSource} = await PostsVoteModel.getVoteSources();
+  const votes = await PostsVoteModel.find({source: commentSource, sid: this._id});
+  let upNum = 0;
+  let downNum = 0;
+  for(const vote of votes) {
+    if(vote.type === 'up') {
+      if(vote.sid === this._id) {
+        upNum += vote.num;
+      }
+    } else {
+      if(vote.sid === this.pid) {
+        downNum += vote.num;
+      }
+    }
+  }
+  this.voteUp = upNum;
+  this.voteDown = downNum;
+  await this.updateOne({
+    voteUp: upNum,
+    voteDown: downNum,
+  });
+}
+
 module.exports = mongoose.model('comments', schema);
