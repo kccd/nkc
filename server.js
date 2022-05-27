@@ -9,7 +9,6 @@ require('colors');
 const http = require('http');
 const dbStatus = require('./settings/dbStatus');
 const serverConfig = require('./config/server');
-const comm = require("./comm");
 let server;
 
 global.NKC.port = Number(serverConfig.port) + global.NKC.processId;
@@ -20,12 +19,10 @@ const start = async () => {
   try {
     const comm = require('./comm');
     const elasticSearch = require("./nkcModules/elasticSearch");
-    const communication = require('./nkcModules/communication');
     await dbStatus.database();
     await comm.StartBroker();
     console.log(`database connected`.green);
     await elasticSearch.init();
-    communication.getCommunicationClient();
     const app = require('./app');
     server = http.createServer(app);
     server.keepAliveTimeout = 10 * 1000;
@@ -36,7 +33,6 @@ const start = async () => {
 
     // 启动测试环境相关工具
     if(global.NKC.isDevelopment) {
-      require('./microServices/communication/server');
       require('./microServices/store/server');
       require('./timedTask');
     }

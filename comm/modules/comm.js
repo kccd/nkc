@@ -11,7 +11,26 @@ function BrokerCall(serviceActionName, params) {
   return Broker.call(serviceActionName, params);
 }
 
+const SocketServiceRoomMap = {
+  "console": "CONSOLE",
+  "user"   : (uid) => `USER:${uid}`,
+  "forum"  : (fid) => `FORUM:${fid}`,
+  "thread" : (tid) => `THREAD:${tid}`,
+  "post"   : (pid) => `POST:${pid}`,
+};
+
+function GetSocketServiceRoomName(type, ...params) {
+  let value = SocketServiceRoomMap[type];
+  let valueType = typeof value;
+  if(valueType === "function") {
+    return value.apply(null, params);
+  } else {
+    return value;
+  }
+}
+
 module.exports = {
   ServiceActionNames,
+  GetSocketServiceRoomName,
   BrokerCall
 };
