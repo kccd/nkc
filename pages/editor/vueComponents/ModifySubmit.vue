@@ -401,8 +401,6 @@ export default {
                 "cover.png"
               );
             }
-                console.log(submitData)
-                debugger
             return nkcUploadFile("/f/" + submitData.fids[0], "POST", formData);
           } else if (type === "newPost") {
             // 发表回复：从文章页点"去编辑器"、草稿箱

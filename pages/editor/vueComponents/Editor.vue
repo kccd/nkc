@@ -129,12 +129,13 @@ export default {
     lockRequest: false
   }),
   watch: {
-    "$route.query": {
-      immediate: true,
-      handler(n){
-        this.getData(n)
-      }
-    }
+    // "$route.query": {
+    //   immediate: true,
+    //   handler(n){
+    //     console.log('11')
+    //     this.getData(n)
+    //   }
+    // }
   },
   created() {
     this.getData()
