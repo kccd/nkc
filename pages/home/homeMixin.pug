@@ -1,5 +1,8 @@
-mixin renderHome(homeBlock)
-  -var hasPermission = permission('nkcManagementHome');
+mixin renderHome(homeBlock, options)
+  -options = options || {}
+  -var permissions = options.permissions || {};
+  -var defaultThreadListStyle = options.defaultThreadListStyle;
+  -var hasPermission = !!permissions.nkcManagementHome;
   -var disabled = homeBlock.disabled? 'disabled': '';
   mixin homeBlockHeader(hideHeader, showOptions)
     -var {_id, blockStyle, name} = homeBlock;
