@@ -3,8 +3,10 @@ module.exports = async (ctx) => {
   ctx.type = 'html';
   ctx.logIt = true;
   if(ctx.remoteTemplate) {
+    const pagesPath = PATH.resolve(__dirname, '../../pages');
+    const templatePath = PATH.resolve(pagesPath, ctx.remoteTemplate);
     ctx.body = await ctx.nkcModules.socket.getPageFromRenderService(
-      ctx.remoteTemplate,
+      templatePath,
       ctx.remoteState,
       ctx.data
     );

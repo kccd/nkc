@@ -37,7 +37,6 @@ const start = async () => {
     // 启动测试环境相关工具
     if(global.NKC.isDevelopment) {
       require('./microServices/communication/server');
-      require('./microServices/render/server');
       require('./microServices/store/server');
       require('./timedTask');
     }

@@ -1,6 +1,4 @@
 const getRoomName = require('../socket/util/getRoomName');
-const communication = require("./communication");
-const communicationConfig = require('../config/communication');
 const PATH = require('path');
 
 const {BrokerCall, ServiceActionNames} = require('../comm/modules/comm');
@@ -523,9 +521,8 @@ async function getMediaServiceUrl() {
 * 调用 render 服务渲染 pug
 * */
 async function getPageFromRenderService(templatePath, state, data) {
-  const communicationClient = communication.getCommunicationClient();
-  return await communicationClient.sendMessagePromise(communicationConfig.servicesName.render, {
-    templatePath,
+  return BrokerCall(ServiceActionNames.v1_render_render_pug_file, {
+    file: templatePath,
     state,
     data
   });
