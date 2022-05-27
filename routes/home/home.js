@@ -1,7 +1,11 @@
-module.exports = async (ctx, next) => {
-  const {data, db, state, internalData} = ctx;
-  const {fidOfCanGetThreads} = internalData;
+module.exports = async (options) => {
+  const {ctx, fidOfCanGetThreads} = options;
+  const {data, db, nkcModules, state} = ctx;
+  const {user} = data;
+
   const homeSettings = await db.SettingModel.getSettings("home");
+
+  // 最新文章
   const threads = await db.ThreadModel.find({
     mainForumsId: {$in: fidOfCanGetThreads},
     disabled: false,
@@ -46,14 +50,26 @@ module.exports = async (ctx, next) => {
     _fc.forums = forumsObj[_id] || [];
     if(_fc.forums.length) data.categoryForums.push(_fc);
   });
+
+  // 置顶专栏
+  // data.toppedColumns = await db.ColumnModel.getHomeToppedColumns();
   // 热销商品
+  // data.showShopGoods = homeSettings.showShopGoods;
   data.goodsForums = await db.ForumModel.find({kindName: "shop"});
+  // data.goods = await db.ShopGoodsModel.getHomeGoods();
   // 最新原创文章显示模式
   data.originalThreadDisplayMode = homeSettings.originalThreadDisplayMode;
   data.columnListPosition = homeSettings.columnListPosition;
+  // 首页置顶
+  // data.toppedThreads = await db.ThreadModel.getHomeToppedThreads(fidOfCanGetThreads);
+  // 浏览过的专业
+  /*if(data.user) {
+    const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 5);
+    data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
+  }*/
   // 是否有权限开办专业
   data.hasPermissionOpenNewForum = await db.PreparationForumModel.hasPermissionToCreatePForum(state.uid);
-
+  
   // 是否需要进行手机号验证
   data.needVerifyPhoneNumber = await db.UsersPersonalModel.shouldVerifyPhoneNumber(state.uid);
 
@@ -68,10 +84,5 @@ module.exports = async (ctx, next) => {
   });
   // 多维分类
   data.threadCategories = await db.ThreadCategoryModel.getCategoryTree({disabled: false});
-  data.permissions = {
-    nkcManagementHome: ctx.permission('nkcManagementHome')
-  };
-  data.threadListStyle = state.threadListStyle;
-  ctx.remoteTemplate = "home/home_all.pug";
-  await next();
+  ctx.template = "home/home_all.pug";
 };
