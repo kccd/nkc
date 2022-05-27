@@ -20,7 +20,6 @@ if !isIncluded('singlePostBottom')
         .single-post-bottom-item(onclick=`window.commentEditor.quoteComment('${docId}')`)
           .fa.fa-comment-o.reply-icon
           span 引用
-          -console.log(cid,docId)
         //.single-post-bottom-item
         //  if 1
         //    span.single-post-comment-button(
@@ -34,7 +33,8 @@ if !isIncluded('singlePostBottom')
         //    span.single-post-comment-button.disabled(title='当前回复不允许评论') 评论
         .single-post-bottom-item
           .post-vote-container
-            +singleCommentVote(cid, vote, voteUp)
+            comment-hit
+            //+singleCommentVote(cid, vote, voteUp)
         if permission('creditKcb')
           .single-post-bottom-item(onclick=`credit('${cid}', 'kcb')` title='鼓励')
             .fa.fa-cny.credit-kcb

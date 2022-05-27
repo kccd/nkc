@@ -33,6 +33,7 @@ import ViolationRecord from "../../lib/vue/ViolationRecord";
 import CommentPostEditor from "../../lib/vue/comment/CommentPostEditor";
 import {nkcAPI} from "../../lib/js/netAPI";
 import {screenTopAlert} from "../../lib/js/topAlert";
+import CommentHit from "../../lib/vue/comment/CommentHit";
 const singleBottomDom = $('.single-post-bottom');
 const singleCommentBottom = {};
 for(let i = 0;i < singleBottomDom.length;i++) {
@@ -49,7 +50,9 @@ for(let i = 0;i < singleBottomDom.length;i++) {
       "disabled-comment": DisabledComment,
       complaint: Complaint,
       "violation-record": ViolationRecord,
-      "comment-post-editor": CommentPostEditor
+      "comment-post-editor": CommentPostEditor,
+      "comment-hit": CommentHit
+
     },
     mounted() {
     },
@@ -122,7 +125,7 @@ for(let i = 0;i < singleBottomDom.length;i++) {
             sweetError(err);
           })
       }
-      
+
     }
   });
 }
