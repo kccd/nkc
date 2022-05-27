@@ -2,9 +2,9 @@ const ResourceModel = require("../../../dataModels/ResourceModel");
 module.exports = {
   params: {
     rid: 'string',
-    status: 'string',
+    status: 'boolean',
     error:'string',
-    filesInfo: 'array'
+    filesInfo: 'object'
   },
   handler(ctx) {
     const {rid, status, error, filesInfo} = ctx.params;

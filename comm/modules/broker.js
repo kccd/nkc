@@ -1,14 +1,15 @@
 const Moleculer = require('moleculer');
 const address = require('address');
-const commConfig = require('../../config/comm.json');
 const path = require('path');
+const {GetMoleculerConfigs} = require('./configs');
+const moleculerConfigs = GetMoleculerConfigs();
 const Broker = new Moleculer.ServiceBroker({
-  namespace: commConfig.moleculer.namespace,
-  nodeID: `${commConfig.moleculer.nodeID}_${address.ip()}_${process.pid}`,
-  transporter: commConfig.moleculer.transporter,
+  namespace: moleculerConfigs.namespace,
+  nodeID: `${moleculerConfigs.nodeID}_${address.ip()}_${process.pid}`,
+  transporter: moleculerConfigs.transporter,
   registry: {
-    strategy: commConfig.moleculer.registry.strategy,
-    discoverer: commConfig.moleculer.registry.discoverer,
+    strategy: moleculerConfigs.registry.strategy,
+    discoverer: moleculerConfigs.registry.discoverer,
   },
   logger: {
     type: 'File',

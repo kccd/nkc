@@ -5,15 +5,16 @@ const PATH = require('path');
 
 const {BrokerCall, ServiceActionNames} = require('../comm/modules/comm');
 
-function SendRoomMessageToWebsocketService(roomsName, eventName, data) {
-  return BrokerCall(ServiceActionNames.v1_websocket_send_room_message, {
-    rooms: roomsName,
+function SendMessageToWebsocketServiceRoom(roomName, eventName, data) {
+  BrokerCall(ServiceActionNames.v1_websocket_send_message_to_room, {
+    room: roomName,
     event: eventName,
     data
-  });
+  })
+    .catch(err => {
+      console.log(err.message)
+    });
 }
-
-const socketServiceName = communicationConfig.servicesName.socket;
 
 // 媒体管理，分组信息
 async function sendGroupMessage(uid) {
@@ -26,7 +27,7 @@ async function sendResourcesMessage(uid) {
 
 async function sendConsoleMessage(data) {
   const roomName = getRoomName('console');
-  return SendRoomMessageToWebsocketService([roomName], 'consoleMessage', data);
+  return SendMessageToWebsocketServiceRoom(roomName, 'consoleMessage', data);
 }
 
 async function sendUserMessage(channel, messageObject) {
@@ -39,7 +40,7 @@ async function sendDataMessage(uid, options) {
     data = {}
   } = options;
   const roomName = getRoomName('user', uid);
-  return SendRoomMessageToWebsocketService([roomName], event, data);
+  return SendMessageToWebsocketServiceRoom(roomName, event, data);
 }
 
 async function sendForumMessage(data) {
@@ -62,7 +63,7 @@ async function sendForumMessage(data) {
       if(usedForumsId.includes(forum.fid)) continue;
       const html = render(template, {singleThread: thread}, {...state, threadListStyle: forum.threadListStyle});
       const roomName = getRoomName('forum', forum.fid);
-      await SendRoomMessageToWebsocketService([roomName], 'forumMessage', {
+      await SendMessageToWebsocketServiceRoom(roomName, 'forumMessage', {
         html,
         pid,
         tid,
@@ -88,7 +89,7 @@ async function sendPostMessage(pid) {
   const eventName = await PostModel.getSocketEventName(pid);
   const thread = await ThreadModel.findOnly({tid: post.tid});
   const roomName = getRoomName('post', thread.oc);
-  await SendRoomMessageToWebsocketService([roomName], eventName, {
+  await SendMessageToWebsocketServiceRoom(roomName, eventName, {
     postId: post.pid,
     comment,
     parentPostId,
@@ -312,7 +313,7 @@ async function sendPostMessage(pid) {
 * */
 async function sendEventRemoveChat(type, uid, tUid) {
   const roomName = getRoomName('user', uid);
-  await SendRoomMessageToWebsocketService([roomName], 'removeChat', {
+  await SendMessageToWebsocketServiceRoom(roomName, 'removeChat', {
     type,
     uid: tUid
   });
@@ -323,11 +324,11 @@ async function sendEventRemoveChat(type, uid, tUid) {
 async function sendEventRemoveFriend(uid, tUid) {
   const roomName = getRoomName('user', uid);
   const tRoomName = getRoomName('user', tUid)
-  await SendRoomMessageToWebsocketService([roomName], 'removeFriend', {
+  await SendMessageToWebsocketServiceRoom(roomName, 'removeFriend', {
     type: 'UTU',
     uid: tUid
   });
-  await SendRoomMessageToWebsocketService([tRoomName], 'removeFriend', {
+  await SendMessageToWebsocketServiceRoom(tRoomName, 'removeFriend', {
     type: 'UTU',
     uid: uid
   });
@@ -338,7 +339,7 @@ async function sendEventRemoveFriend(uid, tUid) {
 * */
 async function sendEventRemoveCategory(uid, cid) {
   const roomName = getRoomName('user', uid);
-  await SendRoomMessageToWebsocketService([roomName], 'removeCategory', {
+  await SendMessageToWebsocketServiceRoom(roomName, 'removeCategory', {
     cid
   });
 }
@@ -350,7 +351,7 @@ async function sendEventUpdateCategoryList(uid) {
   const FriendsCategoryModel = require('../dataModels/FriendsCategoryModel');
   const categoryList = await FriendsCategoryModel.getCategories(uid);
   const roomName = getRoomName('user', uid);
-  await SendRoomMessageToWebsocketService([roomName], 'updateCategoryList', {
+  await SendMessageToWebsocketServiceRoom(roomName, 'updateCategoryList', {
     categoryList
   });
 }
@@ -361,7 +362,7 @@ async function sendEventUpdateUserList(uid) {
   const FriendModel = require('../dataModels/FriendModel');
   const userList = await FriendModel.getFriends(uid);
   const roomName = getRoomName('user', uid);
-  await SendRoomMessageToWebsocketService([roomName], 'updateUserList', {
+  await SendMessageToWebsocketServiceRoom(roomName, 'updateUserList', {
     userList
   });
 }
@@ -373,7 +374,7 @@ async function sendEventUpdateChatList(uid) {
   const CreatedChatModel = require('../dataModels/CreatedChatModel');
   const chatList = await CreatedChatModel.getCreatedChat(uid);
   const roomName = getRoomName('user', uid);
-  await SendRoomMessageToWebsocketService([roomName], 'updateChatList', {
+  await SendMessageToWebsocketServiceRoom(roomName, 'updateChatList', {
     chatList
   });
 }
@@ -384,11 +385,11 @@ async function sendEventUpdateChatList(uid) {
 async function sendEventWithdrawn(uid, tUid, messageId) {
   const roomName = getRoomName('user', uid);
   const tRoomName = getRoomName('user', tUid);
-  await SendRoomMessageToWebsocketService([roomName], 'withdrawn', {
+  await SendMessageToWebsocketServiceRoom(roomName, 'withdrawn', {
     messageId,
     reEdit: true,
   });
-  await SendRoomMessageToWebsocketService([tRoomName], 'withdrawn', {
+  await SendMessageToWebsocketServiceRoom(tRoomName, 'withdrawn', {
     messageId,
     reEdit: false
   });
@@ -399,7 +400,7 @@ async function sendEventWithdrawn(uid, tUid, messageId) {
 * */
 async function sendEventMarkAsRead(type, uid, tUid) {
   const roomName = getRoomName('user', uid);
-  await SendRoomMessageToWebsocketService([roomName], 'markAsRead', {
+  await SendMessageToWebsocketServiceRoom(roomName, 'markAsRead', {
     type,
     uid: tUid
   });
@@ -415,7 +416,7 @@ async function sendEventUpdateChat(type, uid, tUid) {
   const CreatedChatModel = require('../dataModels/CreatedChatModel');
   const chat = await CreatedChatModel.getSingleChat(type, uid, tUid);
   const roomName = getRoomName('user', uid);
-  await SendRoomMessageToWebsocketService([roomName], 'updateChat', {
+  await SendMessageToWebsocketServiceRoom(roomName, 'updateChat', {
     chat
   });
 }
@@ -435,7 +436,7 @@ async function sendMessageToUser(messageId, localId) {
   if(ty === 'UTU') {
     const sChat = await CreatedChatModel.getSingleChat(ty, s, r);
     const sRoomName = getRoomName('user', s);
-    await SendRoomMessageToWebsocketService([sRoomName], 'receiveMessage', {
+    await SendMessageToWebsocketServiceRoom(sRoomName, 'receiveMessage', {
       localId,
       message,
       chat: sChat
@@ -449,7 +450,7 @@ async function sendMessageToUser(messageId, localId) {
     await CreatedChatModel.createDefaultChat(messageTypes[ty], r);
   }
   const rRoomName = getRoomName('user', r);
-  await SendRoomMessageToWebsocketService([rRoomName], 'receiveMessage', {
+  await SendMessageToWebsocketServiceRoom(rRoomName, 'receiveMessage', {
     message,
     chat: rChat,
     beep: await UserModel.getMessageBeep(r, 'UTU')
@@ -468,18 +469,14 @@ async function sendSystemInfoToUser(messageId) {
   message = await MessageModel.extendMessage(message);
   // 获取能够接收此消息的用户
   const users = await UserModel.find({online: {$ne: ''}}, {uid: 1}).sort({toc: 1});
-  const socketClient = communication.getCommunicationClient();
   for(const u of users) {
     const rChat = await CreatedChatModel.getSingleChat('STE', u.uid);
-    socketClient.sendMessage(socketServiceName, {
-      eventName: 'receiveMessage',
-      roomName: getRoomName('user', u.uid),
-      data: {
-        message,
-        chat: rChat,
-        beep: await UserModel.getMessageBeep(u.uid, 'STE'),
-      }
-    })
+    const roomName = getRoomName('user', u.uid);
+    await SendMessageToWebsocketServiceRoom(roomName, 'receiveMessage', {
+      message,
+      chat: rChat,
+      beep: await UserModel.getMessageBeep(u.uid, 'STE'),
+    });
   }
 }
 
@@ -494,25 +491,24 @@ async function sendNewFriendApplication(applicationId) {
   const applicationMessage = await FriendsApplicationModel.getApplicationMessage(applicationId);
   const message = await MessageModel.extendMessage(applicationMessage);
   const chat = await CreatedChatModel.getSingleChat('newFriends', applicationMessage.tUid);
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'receiveMessage',
-    roomName: getRoomName('user', applicationMessage.tUid),
-    data: {
-      localId: applicationId,
-      message,
-      chat,
-      beep: await UserModel.getMessageBeep(applicationMessage.tUid, 'newFriends'),
-    }
-  })
+  const roomName = getRoomName('user', applicationMessage.tUid);
+  await SendMessageToWebsocketServiceRoom(roomName, 'receiveMessage', {
+    localId: applicationId,
+    message,
+    chat,
+    beep: await UserModel.getMessageBeep(applicationMessage.tUid, 'newFriends'),
+  });
 }
 
 /*
 * 获取媒体文件处理服务的信息
 * */
 async function getMediaServiceInfo() {
-  const socketClient = communication.getCommunicationClient();
-  return await socketClient.getServiceInfoPromise(communicationConfig.servicesName.media);
+  const mediaServerInfo = await BrokerCall(ServiceActionNames.v1_media_get_server_info, {});
+  return {
+    host: mediaServerInfo.host,
+    port: mediaServerInfo.port
+  };
 }
 
 /*
@@ -520,7 +516,7 @@ async function getMediaServiceInfo() {
 * */
 async function getMediaServiceUrl() {
   const mediaServiceInfo = await getMediaServiceInfo();
-  return `http://${mediaServiceInfo.serviceAddress}:${mediaServiceInfo.servicePort}`;
+  return `http://${mediaServiceInfo.host}:${mediaServiceInfo.port}`;
 }
 
 /*

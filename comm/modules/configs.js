@@ -7,6 +7,13 @@ function GetWebConfigs() {
   }
 }
 
+function GetMoleculerConfigs() {
+  return {
+    ...commConfig.moleculer
+  }
+}
+
 module.exports = {
   GetWebConfigs,
+  GetMoleculerConfigs
 }
