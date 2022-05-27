@@ -92,78 +92,78 @@ router
     }
     await next();
   })
-  // .post('/kcb', async (ctx, next) => {
-  //   //鼓励用户
-  //   const {db, data, params, permissio, body} = ctx;
-  //   const {user} = data;
-  //   const {id: cid} = params;
-  //   let {num, description} = body;
-  //   if(!permission('creditKcb')) ctx.throw(403, '权限不足');
-  //   const creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
-  //   num = Number(num);
-  //   if(num % 1 !== 0) ctx.throw(400, `${creditScore.name}仅支持小数点后两位`);
-  //   const comment = await db.CommentModel.findOnly({_id: cid});
-  //   if(comment.anonymous) ctx.throw(400, '无法鼓励匿名用户');
-  //   const targetUser = await db.UserModel.findOnly({uid: comment.uid});
-  //   if(targetUser.uid === user.uid) ctx.throw(400, '无法给自己鼓励');
-  //   const {normal} = await db.CommentModel.getCommentStatus();
-  //   if(comment.status !== normal) ctx.throw(403, '无法鼓励状态不正常的评论');
-  //   const creditSettings = await db.SettingModel.getCreditSettings();
-  //   await db.UserModel.updateUserScores(user.uid);
-  //   const userScore = await db.UserModel.getUserScore(user.uid, creditScore.type);
-  //   if(num < creditSettings.min) ctx.throw(400, `${creditScore.name}最少为${creditSettings.min/100}`);
-  //   if(num > creditSettings.max) ctx.throw(400, `${creditScore.name}不能大于${creditSettings.max/100}`);
-  //   // fromUser.kcb = await db.UserModel.updateUserKcb(fromUser.uid);
-  //   if(userScore < num) ctx.throw(400, `你的${creditScore.name}不足`);
-  //   if(description.length < 2) ctx.throw(400, '理由写的太少了');
-  //   if(description.length > 60) ctx.throw(400, '理由不能超过60个字符');
-  //   await db.KcbsRecordModel.insertUsersRecord({
-  //     fromUser: user,
-  //     toUser: targetUser,
-  //     comment,
-  //     description,
-  //     num,
-  //     ip: ctx.address,
-  //     port: ctx.port
-  //   });
-  //   await fromUser.calculateScore();
-  //   await toUser.calculateScore();
-  //
-  //   const updateObjForPost = {
-  //     username: user.username,
-  //     uid: user.uid,
-  //     pid: comment._id,
-  //     toc: Date.now(),
-  //     source: 'nkc',
-  //     reason: description,
-  //     type: 'kcb',
-  //     q: num
-  //   };
-  //   await post.updateOne({$push: {credits: updateObjForPost}});
-  //   await thread.updateThreadEncourage();
-  //   // 发消息
-  //   const message = db.MessageModel({
-  //     _id: await db.SettingModel.operateSystemID('messages', 1),
-  //     r: toUser.uid,
-  //     ty: 'STU',
-  //     port: ctx.port,
-  //     ip: ctx.address,
-  //     c: {
-  //       type: 'scoreTransfer',
-  //       pid: post.pid,
-  //       // userName: user.username,
-  //       uid: user.uid,
-  //       // kcb: num,
-  //       number: num,
-  //       // scoreName: creditScore.name,
-  //       scoreType: creditScore.type,
-  //       // threadTitle: post.t,
-  //       description,
-  //     }
-  //   });
-  //   await message.save();
-  //   await ctx.nkcModules.socket.sendMessageToUser(message._id);
-  //   await next();
-  // })
+  .post('/kcb', async (ctx, next) => {
+    //鼓励评论用户
+    const {db, data, params, permission, body} = ctx;
+    const {user} = data;
+    const {_id: cid} = params;
+    let {num, description} = body;
+    if(!permission('creditKcb')) ctx.throw(403, '权限不足');
+    const fromUser = user;
+    const creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
+    num = Number(num);
+    if(num % 1 !== 0) ctx.throw(400, `${creditScore.name}仅支持小数点后两位`);
+    const comment = await db.CommentModel.findOnly({_id: cid});
+    // if(comment.anonymous) ctx.throw(400, '无法鼓励匿名用户');
+    const toUser = await db.UserModel.findOnly({uid: comment.uid});
+    if(targetUser.uid === user.uid) ctx.throw(400, '无法给自己鼓励');
+    const {normal} = await db.CommentModel.getCommentStatus();
+    if(comment.status !== normal) ctx.throw(403, '无法鼓励状态不正常的评论');
+    const creditSettings = await db.SettingModel.getCreditSettings();
+    await db.UserModel.updateUserScores(user.uid);
+    const userScore = await db.UserModel.getUserScore(user.uid, creditScore.type);
+    if(num < creditSettings.min) ctx.throw(400, `${creditScore.name}最少为${creditSettings.min/100}`);
+    if(num > creditSettings.max) ctx.throw(400, `${creditScore.name}不能大于${creditSettings.max/100}`);
+    // fromUser.kcb = await db.UserModel.updateUserKcb(fromUser.uid);
+    if(userScore < num) ctx.throw(400, `你的${creditScore.name}不足`);
+    if(description.length < 2) ctx.throw(400, '理由写的太少了');
+    if(description.length > 60) ctx.throw(400, '理由不能超过60个字符');
+    await db.KcbsRecordModel.insertUsersRecord({
+      fromUser,
+      toUser,
+      comment,
+      description,
+      num,
+      ip: ctx.address,
+      port: ctx.port
+    });
+    await fromUser.calculateScore();
+    await toUser.calculateScore();
+
+    const updateObjForPost = {
+      username: user.username,
+      uid: fromUser.uid,
+      pid: comment._id,
+      toc: Date.now(),
+      source: 'nkc',
+      reason: description,
+      type: 'kcb',
+      q: num
+    };
+    await comment.updateOne({$push: {credits: updateObjForPost}});
+    // 发消息
+    const message = db.MessageModel({
+      _id: await db.SettingModel.operateSystemID('messages', 1),
+      r: toUser.uid,
+      ty: 'STU',
+      port: ctx.port,
+      ip: ctx.address,
+      c: {
+        type: 'scoreTransfer',
+        cid,
+        // userName: user.username,
+        uid: user.uid,
+        // kcb: num,
+        number: num,
+        // scoreName: creditScore.name,
+        scoreType: creditScore.type,
+        // threadTitle: post.t,
+        description,
+      }
+    });
+    await message.save();
+    await ctx.nkcModules.socket.sendMessageToUser(message._id);
+    await next();
+  })
 
 module.exports = router;
