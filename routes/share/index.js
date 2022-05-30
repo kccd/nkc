@@ -149,7 +149,7 @@ shareRouter
       }
     } else if(type === 'article') {
       let article = await db.ArticleModel.findOnly({_id: id});
-      article = await db.ArticleModel.getArticlesInfo([article]);
+      article = (await db.ArticleModel.getArticlesInfo([article]))[0];
       result.title = article.document.title;
       result.description = nkcModules.nkcRender.htmlToPlain(article.document.content, 100);
       if(article.document.cover) {

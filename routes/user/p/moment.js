@@ -1,12 +1,14 @@
 module.exports = async (ctx, next) => {
   const {data, db, nkcModules, query, state, permission} = ctx;
-  const {page = 0} = query;
+  const {page = 0, t = 'moment'} = query;
   const {targetUser, user} = data;
+  data.t = t;
   const {
     normal: normalStatus,
     faulty: faultyStatus,
     unknown: unknownStatus,
   } = await db.MomentModel.getMomentStatus();
+  const {moment: momentType} = await db.MomentModel.getMomentQuoteTypes();
   //获取用户动态列表
   const match = {
     uid: targetUser.uid,
@@ -27,6 +29,13 @@ module.exports = async (ctx, next) => {
       }
     ]
   };
+  if(t === 'moment') {
+    match.quoteType = momentType;
+  } else if(t === 'thread') {
+    match.quoteType = {
+      $ne: true,
+    }
+  }
   //获取当前用户对动态的审核权限
   const permissions = {
     reviewed: null,

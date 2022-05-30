@@ -45,7 +45,7 @@ block content
               span 回复
             .single-comment-bottom-item#CommentHitBox
               comment-hit(cid=article._id article='article' vote-up=article.voteUp vote-down=article.voteDown)
-            .single-post-bottom-item(data-type='share' data-share-type='comment' data-share-id=cid title='分享')
+            .single-post-bottom-item(data-type='share' data-share-type='article' data-share-id=article._id title='分享')
               .fa.fa-share-square-o.new-share-icon
             .single-comment-bottom-item(data-type="articleOption" data-aid=article._id title="其他操作" data-direction="down")
               .fa.fa-sliders.option-icon
@@ -89,6 +89,11 @@ block content
         .m-b-1
           include ../publicModules/commentCenter/comment
       .col-xs-12.col-md-3.box-shadow-panel#rightDom
+        if data.targetUser
+          .m-b-1
+            //- .panel-header 作者
+            -const author = data.targetUser;
+            include ../thread/authorInfo
         //- 滚动到页头页脚
         include ../module_scrollTo.pug
   include ../publicModules/floatForumNav

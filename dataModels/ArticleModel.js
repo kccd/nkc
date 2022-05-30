@@ -1427,4 +1427,11 @@ schema.methods.updateArticlesVote = async function () {
   });
 };
 
+/*
+* 拓展文章作者信息
+* */
+schema.methods.extendUser = async function() {
+  const UserModel = mongoose.model('users');
+  return this.user = await UserModel.findOnly({uid: this.uid});
+}
 module.exports = mongoose.model('articles', schema);

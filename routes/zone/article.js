@@ -18,6 +18,16 @@ router
     const {page = 0, last_pages, highlight, t, did, redirect} = query;
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     let article = await db.ArticleModel.findOnly({_id: aid});
+    if(1) {
+      data.targetUser = await article.extendUser();
+      data.targetUser.description = nkcModules.nkcRender.replaceLink(data.targetUser.description);
+      await data.targetUser.extendGrade();
+      await db.UserModel.extendUserInfo(data.targetUser);
+      // data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);
+      // if(data.targetColumn) {
+      //   data.ColumnPost = await db.ColumnPostModel.findOne({columnId: data.targetColumn._id, type : 'article', pid: article._id});
+      // }
+    }
     //查找文章的评论盒子
     const articlePost = await db.ArticlePostModel.findOne({sid: article._id, source: article.source});
     // 获取空间文章需要显示的数据
