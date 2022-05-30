@@ -860,7 +860,7 @@ schema.statics.getCommentsObjectByCommentsId = async function(commentsId) {
   return commentsObj;
 }
 
-/*
+/* -------------------------------------------------------暂定-------------------------------------------应当修改为通过comments去获取，而不需要再查询一遍
 * 通过commentId获取comment
 * @params {Array} commentId 需要获取的评论的Id
 * */

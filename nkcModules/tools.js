@@ -441,6 +441,14 @@ var Tools = function() {
     var reg = /(https?:\/\/)?([-0-9a-zA-Z]{1,256}\.)+[a-zA-Z]{2,6}/ig
     return content.replace(reg, '');
   };
+  
+  //通过指定字符将字符串分割成两部分
+  self.segmentation = function (str, char) {
+    var index = str.indexOf(char);
+    var result1 = str.substr(0,index+1);
+    var result2 = str.substr(index + 1,str.length-index-1);
+    return [result1, result2];
+  }
 };
 
 var elementIdChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';

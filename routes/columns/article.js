@@ -10,13 +10,14 @@ function isIncludes(arr, id, type) {
 router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
   const {pageSettings, uid} = state;
-  const {highlight, t, last_page} = query;
+  const {highlight, t, last_page, token} = query;
   let {page = 0} = query;
   ctx.template = 'columns/article.pug';
   const { user } = data;
   const {_id, aid} = params;
   data.highlight = highlight;
   let xsf = user ? user.xsf : 0;
+  
   let columnPostData = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid, xsf);
   data.columnPost = columnPostData;
   data.columnPost.collected = false;
@@ -28,6 +29,12 @@ router.get('/:aid', async (ctx, next)=>{
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     const _article = columnPostData.article;
     const article = await db.ArticleModel.findOnly({_id: _article._id});
+    // 验证权限 - new
+    // 如果是分享出去的连接，含有token，则允许直接访问
+    // 【待改】判断用户是否是通过分享链接阅读文章，如果是则越过权限
+    if(token && !await db.ShareModel.hasPermission(token, _article._id)) {
+      return ctx.throw(403, '权限不足');
+    }
     const articlePost = await db.ArticlePostModel.findOne({sid: article._id, source: article.source});
     isModerator = await article.isModerator(state.uid);
     data.homeTopped = isIncludes(homeSettings.toppedThreadsId, article._id, 'article');

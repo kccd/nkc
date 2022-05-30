@@ -62,7 +62,8 @@ voteRouter
             votesId: [vote._id],
           }
         }).save();
-      await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
+       await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
+      }
     } else {
       if(vote.type === 'up') {
         await vote.deleteOne();
@@ -71,7 +72,6 @@ voteRouter
         await vote.updateOne({tlm: Date.now(), type: 'up', num: weights});
         await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
       }
-    }
     };
     await post.updatePostsVote();
     data.post = post;
