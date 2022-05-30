@@ -196,7 +196,7 @@ threadRouter
       userRolesId: data.userRoles.map(role => role._id),
       userGradeId: data.userGrade._id
     });
-    if(!await db.ShareModel.hasPermission(token, thread.oc)) {
+    if(token && !await db.ShareModel.hasPermission(token, thread.oc)) {
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
     }
     // 获取当前用户有权查看文章的专业ID

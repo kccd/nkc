@@ -32,8 +32,9 @@ router.get('/:aid', async (ctx, next)=>{
     // 验证权限 - new
     // 如果是分享出去的连接，含有token，则允许直接访问
     // 【待改】判断用户是否是通过分享链接阅读文章，如果是则越过权限
-    if(token && !await db.ShareModel.hasPermission(token, _article._id)) {
-      return ctx.throw(403, '权限不足');
+    if(token) {
+      //如果存在token就验证token是否合法
+      await db.ShareModel.hasPermission(token, _article._id)
     }
     const articlePost = await db.ArticlePostModel.findOne({sid: article._id, source: article.source});
     isModerator = await article.isModerator(state.uid);
