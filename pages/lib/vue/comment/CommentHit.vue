@@ -1,38 +1,60 @@
 <template lang="pug">
   .posts-vote
-    .posts-vote-up(class=vote === 'up' ? 'active' : '' data-cid=cid @click="commentsVote(cid, 'up')")
+    .posts-vote-up(:class="voteUp_ > 0 ? 'active' : ''" data-cid=cid_ @click="commentsVote(cid_, 'up')")
       .fa.fa-caret-up
-      .posts-vote-number(data-cid=cid)= voteUp || ''
-    .posts-vote-down(class=vote === 'down' ? 'active' : '' data-cid=cid @click="commentsVote(cid, 'down')")
+      .posts-vote-number(data-cid=cid) {{voteUp_ > 0 ? voteUp_ : ''}}
+    .posts-vote-down(:class="voteDown_ > 0 ? 'active' : ''" data-cid=cid_ @click="commentsVote(cid_, 'down')")
       .fa.fa-caret-down
+      .posts-vote-number(data-cid=cid) {{voteDown_ > 0 ? voteDown_ : ''}}
+
 </template>
 
 <style lang="less" scoped>
 @import "../../../publicModules/base";
-//div{
-//  height: 100px;
-//  width: 100px;
-//  background: #0e0e0e;
-//}
+.posts-vote{
+  .posts-vote-up{
+    margin-right: 5px;
+  }
+}
 </style>
 
 <script>
 
-export default {
-  props: [],
-  data: () => ({
+import {toLogin} from "../../js/account";
+import {nkcAPI} from "../../js/netAPI";
 
+export default {
+  props: ['cid', 'voteUp', 'voteDown'],
+  data: () => ({
+    cid_: '',
+    voteUp_: '',
+    voteDown_: '',
   }),
   components: {
   },
-  computed: {
+  created() {
+    this.cid_ = this.cid
+    this.voteUp_ = this.voteUp
+    this.voteDown_ = this.voteDown
   },
   mounted() {
+
   },
   methods: {
-    commentsVote(){
-
+    commentsVote(cid,type){
+      self = this;
+      if(!NKC.configs.uid || type === 'login') return toLogin('login');
+      var url = '/comment/' + cid + '/vote/down';
+      if(type === 'up') {
+        url = '/comment/' + cid + '/vote/up';
+      }
+      nkcAPI(url, 'POST', {})
+        .then(function(data) {
+          self.voteUp_ = data.comment.voteUp;
+          self.voteDown_ = data.comment.voteDown;
+        })
     }
+
   }
 }
 </script>

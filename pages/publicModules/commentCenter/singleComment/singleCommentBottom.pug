@@ -2,7 +2,7 @@
 if !isIncluded('singlePostBottom')
   include ./singleCommentVote
   mixin singleCommentBottom(props)
-    -var {cid, docId, props: comment} = props;
+    -var {cid, docId, props: comment, voteDown, voteUp} = props;
     .single-post-bottom(id=`singleCommentBottom_${cid}` cid=cid)
       violation-record(ref="violationRecord")
       complaint(ref="complaint")
@@ -33,7 +33,7 @@ if !isIncluded('singlePostBottom')
         //    span.single-post-comment-button.disabled(title='当前回复不允许评论') 评论
         .single-post-bottom-item
           .post-vote-container
-            comment-hit
+            comment-hit(cid=cid, vote-down=voteDown vote-up=voteUp)
             //+singleCommentVote(cid, vote, voteUp)
         if permission('creditKcb')
           .single-post-bottom-item(onclick=`credit('${cid}', 'kcb')` title='鼓励')

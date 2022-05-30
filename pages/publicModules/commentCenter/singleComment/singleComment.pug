@@ -5,6 +5,7 @@ if !isIncluded('singleComment')
   +includeDeferJS("/publicModules/commentCenter/singleComment/singleComment.js")
   mixin singleComment(props)
     -var {user, content, _id, order, quote, isAuthor, reason, type, status, uid, toc, tlm, docId, did, commentUrl, digest} = props;
+    -var {voteUp, voteDown} = props
     .hidden(id=`comment_${_id}`)=objToStr({comment: props})
     .single-post-container(
       data-un-reviewed=status === 'unknown'
@@ -22,4 +23,4 @@ if !isIncluded('singleComment')
       include ./singleCommentCenter
       +singleCommentCenter({content, aid: _id, quote})
       include ./singleCommentBottom
-      +singleCommentBottom({cid: _id, docId, props, user})
+      +singleCommentBottom({cid: _id, docId, props, user, voteDown, voteUp})

@@ -1044,14 +1044,14 @@ schema.methods.updateCommentsVote = async function() {
         upNum += vote.num;
       }
     } else {
-      if(vote.sid === this.pid) {
+      if(vote.sid === this._id) {
         downNum += vote.num;
       }
     }
   }
   this.voteUp = upNum;
   this.voteDown = downNum;
-  await this.updateOne({
+  const b = await this.updateOne({
     voteUp: upNum,
     voteDown: downNum,
   });

@@ -13,27 +13,27 @@ router
     //独立文章点赞
     const {db, data} = ctx;
     const {comment, user} = data;
-    const {article: articleSource} = await db.PostsVoteModel.getVoteSources();
-    let vote = await db.PostsVoteModel.findOne({source: articleSource, uid: user.uid, sid: comment._id});
+    const {comment: commentSource} = await db.PostsVoteModel.getVoteSources();
+    let vote = await db.PostsVoteModel.findOne({source: commentSource, uid: user.uid, sid: comment._id});
     let weights = 1;
     if(user.xsf > 0) weights = 2;
     //生成点赞记录
     if(!vote)  {
-      vote = db.PostVoteModel({
-        source: articleSource,
+      vote = db.PostsVoteModel({
+        source: commentSource,
         uid: user.uid,
         sid: comment._id,
         type: 'up',
-        tUid: comment.uids,
+        tUid: comment.uid,
         num: weights,
       });
     }
     await vote.save();
-    const message = await db.MessageModel.findOne({'c.votesId': {$in: [vote._id]}, r: user.uid});
+    const message = await db.MessageModel.findOne({'c.votesId': {$in: [vote._id]}, r: comment.uid});
     //如果数据库中不存在消息就生成提示消息
     if(!message) {
       //生成提示消息
-      await db.MessageModel({
+      const a=await db.MessageModel({
         _id: await db.SettingModel.operateSystemID('messages', 1),
         r: comment.uid,
         ty: 'STU',
@@ -63,13 +63,13 @@ router
     //独立文章点踩
     const {db, data} = ctx;
     const {comment, user} = data;
-    const {article: articleSource} = await db.PostsVoteModel.getVoteSources();
-    let vote = await db.PostsVoteModel.findOne({source: articleSource, uid: user.uid, sid: post.pid});
-    let weights = 0;
+    const {comment: commentSource} = await db.PostsVoteModel.getVoteSources();
+    let vote = await db.PostsVoteModel.findOne({source: commentSource, uid: user.uid, sid: comment._id});
+    let weights = 1;
     if(user.xsf > 0) weights = 2;
     if(!vote) {
       vote = db.PostsVoteModel({
-        source: articleSource,
+        source: commentSource,
         uid: user.uid,
         sid: comment._id,
         type: 'down',
