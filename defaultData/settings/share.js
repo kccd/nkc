@@ -35,6 +35,16 @@ module.exports = {
       status: true,
       countLimit: 10,
       timeLimit: 12,
+    },
+    comment: {
+      status: true,
+      countLimit: 10,
+      timeLimit: 12,
+    },
+    article: {
+      status: true,
+      countLimit: 10,
+      timeLimit: 12,
     }
   }
 };

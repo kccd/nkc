@@ -66,6 +66,22 @@ module.exports = {
         order: 3,
         name: '回复',
         status: false,
+         kcb: 1,
+        maxKcb: 5,
+        count: 5
+      },
+      article: {
+        order: 2,
+        name: '文章',
+        status: false,
+        kcb: 1,
+        maxKcb: 5,
+        count: 5
+      },
+      comment: {
+        order: 3,
+        name: '回复',
+        status: false,
         kcb: 1,
         maxKcb: 5,
         count: 5

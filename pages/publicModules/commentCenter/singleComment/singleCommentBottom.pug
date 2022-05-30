@@ -38,7 +38,7 @@ if !isIncluded('singlePostBottom')
         if permission('creditKcb')
           .single-post-bottom-item(onclick=`credit('${cid}', 'kcb')` title='鼓励')
             .fa.fa-cny.credit-kcb
-        .single-post-bottom-item(data-type='share' data-share-type='post' data-share-id=cid title='分享')
+        .single-post-bottom-item(data-type='share' data-share-type='comment' data-share-id=cid title='分享')
           .fa.fa-share-square-o.new-share-icon
         .single-post-bottom-item(data-type='CommentOption' data-cid=cid onclick=`window.singleCommentBottom['${cid}'].openOptions(this)` title='其他操作')
           .fa.fa-sliders.option-icon

@@ -96,6 +96,7 @@ shareSchema.statics.hasPermission = async (token, id) => {
     await share.hit();
     return true;
   } catch(err) {
+    console.log('err', err);
     return false;
   }
 };
@@ -185,8 +186,6 @@ shareSchema.statics.getShareSettingsByPostId = async (pid) => {
 
 // 根据share的类型判断是否有效
 shareSchema.statics.ensureEffective = async function(token, id) {
-  const ForumModel = mongoose.model('forums');
-  const PostModel = mongoose.model('posts');
   const ShareModel = mongoose.model('share');
   const SettingModel = mongoose.model('settings');
   if(!token) {
@@ -216,6 +215,8 @@ shareSchema.statics.ensureEffective = async function(token, id) {
       case 'user': reg = RegExp(/\/u\/([0-9a-zA-Z]*)/ig);break;
       case 'fund': reg = RegExp(/\/fund\/list\/([0-9a-zA-Z]*)/ig);break;
       case 'fundForm': reg = RegExp(/\/fund\/a\/([0-9a-zA-Z]*)/ig);break;
+      case 'article': reg = RegExp(/\/m\/([0-9]*)\/a\/([0-9a-zA-Z]*)/ig);break;
+      case 'comment': reg = RegExp(/\/m\/([0-9]*)\/a\/([0-9a-zA-Z]*)/ig);break;
       default: throwErr(500, `分享类型错误`);
     }
     const arr = reg.exec(shareUrl);
@@ -381,9 +382,16 @@ shareSchema.statics.getNewToken = async () => {
   return token;
 };
 
+
+/*
+* 获取分享链接
+* */
 shareSchema.methods.getShareUrl = async function() {
-  const {targetId, tokenType, token} = this;
+  const {targetId, tokenType, token, shareUrl} = this;
   const PostModel = mongoose.model('posts');
+  const CommentModel = mongoose.model('comments');
+  const ArticleModel = mongoose.model('articles');
+  const {segmentation} = require("../nkcModules/tools");
   const t = `?token=${token}`;
   if(tokenType === 'post') {
     const post = await PostModel.findOne({pid: targetId}, {type: 1, tid: 1, pid: 1});
@@ -402,6 +410,17 @@ shareSchema.methods.getShareUrl = async function() {
     return `/fund/list/${targetId}${t}`;
   } else if(tokenType === 'fundForm') {
     return `/fund/a/${targetId}${t}`;
+  } else if(tokenType === 'comment') {
+    let comment = await CommentModel.findOnly({_id: targetId});
+    comment = (await CommentModel.getCommentInfo([comment]))[0];
+    let url  = comment.commentUrl;
+    const arr = segmentation(url, '?');
+    url = `${arr[0]}token=${token}&${arr[1]}`;
+    return url;
+  } else if(tokenType === 'article') {
+    let article = await ArticleModel.findOnly({_id: targetId});
+    article = (await ArticleModel.getArticlesInfo([article]))[0];
+    return `${article.url}${t}`;
   } else {
     return `/activity/single/${targetId}${t}`;
   }
