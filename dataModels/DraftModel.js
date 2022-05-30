@@ -17,10 +17,12 @@ const draftSchema = new Schema({
     type: String,
     default: ''
   },
-  // 草稿状态 编辑 编辑历史 发布历史
+  // 草稿状态:
+  // 编辑(beta) 编辑历史(betaHistory) 发布历史(stableHistory)
   type: {
     type: String,
-    default: 'beta'
+    default: 'beta',
+    index: 1
   },
   // 草稿类型
   desType: {
@@ -126,6 +128,17 @@ const draftSchema = new Schema({
 }, {
   collection: 'drafts'
 });
+
+const draftType = {
+  beta: 'beta',
+  betaHistory: 'betaHistory',
+  stableHistory: 'stableHistory'
+};
+/* 
+* 获取草稿的type
+* @return {Object}
+*/
+draftSchema.statics.getDraftType = async () => draftType
 
 /*
 * 通过草稿ID删除草稿，若草稿上有调查表ID则删除调查表

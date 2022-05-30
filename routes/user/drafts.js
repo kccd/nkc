@@ -123,7 +123,7 @@ draftsRouter
       draftObj.tlm = Date.now();
       if(query.savetType === 'manual') {
         // 如果是手动保存那么需要存历史
-        draftObj.type = "betaHistory"
+        draftObj.type = (await db.DraftModel.getDraftType()).betaHistory;
         await draft.updateOne(draftObj);
         const preDraft = draft.toObject();
         delete preDraft._id;

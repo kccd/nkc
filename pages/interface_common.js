@@ -527,7 +527,25 @@ function credit(pid, type, kcb) {
       }
     }
   });
-  creditDom.modal('show');
+  // 请求数据
+  let data;
+  nkcAPI(`/t/${location.pathname.split("/")[2]}/rewards` ,"GET")
+    .then((res) => {
+      data = res
+      // console.log(res);
+      const creditModel = $("#creditModel");
+      creditModel.attr('data-credit-score-name', data.creditScore.name);
+      const currency = $(".currency");
+      const xsfRange = $(".xsf-range");
+      const kcbRange = $(".kcb-range");
+      currency.text(`向作者转账${data.creditScore.name}以资鼓励`);
+      kcbRange.text(`（${data.creditSettings.min/100} - ${data.creditSettings.max/100}）`);
+      xsfRange.text(`（-${data.xsfSettings.reduceLimit} 到 ${data.xsfSettings.addLimit}）`)
+    })
+    .catch((err) => {
+      sweetError(err)
+    })
+    creditDom.modal('show');
 }
 
 /*if($('input[data-control="hue"]').length !== 0 && $('input[data-control="hue"]').minicolors) {
