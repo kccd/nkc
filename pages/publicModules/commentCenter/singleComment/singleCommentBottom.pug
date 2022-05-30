@@ -35,9 +35,9 @@ if !isIncluded('singlePostBottom')
           .post-vote-container
             comment-hit(cid=cid, vote-down=voteDown vote-up=voteUp)
             //+singleCommentVote(cid, vote, voteUp)
-        if permission('creditKcb')
-          .single-post-bottom-item(onclick=`credit('${cid}', 'kcb')` title='鼓励')
-            .fa.fa-cny.credit-kcb
+        //if permission('creditKcb')
+        //  .single-post-bottom-item(onclick=`credit('${cid}', 'kcb')` title='鼓励')
+        //    .fa.fa-cny.credit-kcb
         .single-post-bottom-item(data-type='share' data-share-type='comment' data-share-id=cid title='分享')
           .fa.fa-share-square-o.new-share-icon
         .single-post-bottom-item(data-type='CommentOption' data-cid=cid onclick=`window.singleCommentBottom['${cid}'].openOptions(this)` title='其他操作')

@@ -27,25 +27,25 @@ router
         tUid: comment.uid,
         num: weights,
       });
-    }
-    await vote.save();
-    const message = await db.MessageModel.findOne({'c.votesId': {$in: [vote._id]}, r: comment.uid});
-    //如果数据库中不存在消息就生成提示消息
-    if(!message) {
-      //生成提示消息
-      const a=await db.MessageModel({
-        _id: await db.SettingModel.operateSystemID('messages', 1),
-        r: comment.uid,
-        ty: 'STU',
-        port: ctx.port,
-        ip: ctx.address,
-        c: {
-          type: 'latestVotes',
-          votesId: [vote._id],
-        }
-      }).save();
-      //执行操作后的加减积分
-      await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
+      await vote.save();
+      const message = await db.MessageModel.findOne({'c.votesId': {$in: [vote._id]}, r: comment.uid});
+      //如果数据库中不存在消息就生成提示消息
+      if(!message) {
+        //生成提示消息
+        const a=await db.MessageModel({
+          _id: await db.SettingModel.operateSystemID('messages', 1),
+          r: comment.uid,
+          ty: 'STU',
+          port: ctx.port,
+          ip: ctx.address,
+          c: {
+            type: 'latestVotes',
+            votesId: [vote._id],
+          }
+        }).save();
+        //执行操作后的加减积分
+        await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
+      }
     } else {
       if(vote.type === 'up') {
         await vote.deleteOne();

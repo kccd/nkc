@@ -46,14 +46,14 @@ router
         }).save();
         //执行操作后的加减积分
         await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
+      }
+    } else {
+      if(vote.type === 'up') {
+        await vote.deleteOne();
+        await db.KcbsRecordModel.insertSystemRecord('unLiked', data.targetUser, ctx);
       } else {
-        if(vote.type === 'up') {
-          await vote.deleteOne();
-          await db.KcbsRecordModel.insertSystemRecord('unLiked', data.targetUser, ctx);
-        } else {
-          await vote.updateOne({tlm: Date.now(), type: 'up', num: weights});
-          await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
-        }
+        await vote.updateOne({tlm: Date.now(), type: 'up', num: weights});
+        await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
       }
     }
 
