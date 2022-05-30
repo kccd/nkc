@@ -20,43 +20,44 @@ router
     if(user.xsf > 0) weights = 2;
     //生成点赞记录
     if(!vote)  {
-      vote = db.PostVoteModel({
+      vote = db.PostsVoteModel({
         source: articleSource,
         uid: user.uid,
         sid: article._id,
         type: 'up',
-        tUid: article.uids,
+        tUid: article.uid,
         num: weights,
       });
-    }
-    await vote.save();
-    const message = await db.MessageModel.findOne({'c.votesId': {$in: [vote._id]}, r: user.uid});
-    //如果数据库中不存在消息就生成提示消息
-    if(!message) {
-      //生成提示消息
-      await db.MessageModel({
-        _id: await db.SettingModel.operateSystemID('messages', 1),
-        r: article.uid,
-        ty: 'STU',
-        port: ctx.port,
-        ip: ctx.address,
-        c: {
-          type: 'latestVotes',
-          votesId: [vote._id],
-        }
-      }).save();
-      //执行操作后的加减积分
-      await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
-    } else {
-      if(vote.type === 'up') {
-        await vote.deleteOne();
-        await db.KcbsRecordModel.insertSystemRecord('unLiked', data.targetUser, ctx);
-      } else {
-        await vote.updateOne({tlm: Date.now(), type: 'up', num: weights});
+      await vote.save();
+      //如果数据库中不存在消息就生成提示消息
+      const message = await db.MessageModel.findOne({'c.votesId': {$in: [vote._id]}, r: user.uid});
+      if(!message) {
+        //生成提示消息
+        await db.MessageModel({
+          _id: await db.SettingModel.operateSystemID('messages', 1),
+          r: article.uid,
+          ty: 'STU',
+          port: ctx.port,
+          ip: ctx.address,
+          c: {
+            type: 'latestVotes',
+            votesId: [vote._id],
+          }
+        }).save();
+        //执行操作后的加减积分
         await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
+      } else {
+        if(vote.type === 'up') {
+          await vote.deleteOne();
+          await db.KcbsRecordModel.insertSystemRecord('unLiked', data.targetUser, ctx);
+        } else {
+          await vote.updateOne({tlm: Date.now(), type: 'up', num: weights});
+          await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
+        }
       }
     }
-    await article.updateCommentsVote();
+
+    await article.updateArticlesVote();
     data.article = article;
     await next();
   })
@@ -66,7 +67,7 @@ router
     const {article, user} = data;
     const {article: articleSource} = await db.PostsVoteModel.getVoteSources();
     let vote = await db.PostsVoteModel.findOne({source: articleSource, uid: user.uid, sid: article._id});
-    let weights = 0;
+    let weights = 1;
     if(user.xsf > 0) weights = 2;
     if(!vote) {
       vote = db.PostsVoteModel({
@@ -86,7 +87,7 @@ router
         await db.KcbsRecordModel.insertSystemRecord('unLiked', data.targetUser, ctx);
       }
     }
-    await article.updateCommentsVote();
+    await article.updateArticlesVote();
     data.article = article;
     await next();
   })

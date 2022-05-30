@@ -1414,7 +1414,7 @@ schema.methods.updateArticlesVote = async function () {
         upNum += vote.num;
       }
     } else {
-      if(vote.sid === this.pid) {
+      if(vote.sid === this._id) {
         downNum += vote.num;
       }
     }

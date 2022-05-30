@@ -33,6 +33,8 @@ block baseColumnContent
             span.single-comment-bottom-item(onclick="window.location.href='#container'")
               .fa.fa-comment-o.reply-icon
               span 回复
+            .single-comment-bottom-item#CommentHitBox
+              comment-hit(cid=article._id article='article' vote-up=article.voteUp vote-down=article.voteDown)
             .single-comment-bottom-item(data-type="articleOption" data-aid=article._id title="其他操作" data-direction="down")
               .fa.fa-sliders.option-icon
           else
@@ -106,6 +108,7 @@ block scripts
   +includeJS("/columns/settings/page.js")
   +includeJS("/columns/column.js")
   +includeJS("/columns/management.js")
+  +includeJS("/columns/article.js")
   +mixinColumnNavLinkScript()
   +includeDeferJS('/columns/article/article.js', false)
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
