@@ -35,6 +35,8 @@ block baseColumnContent
               span 回复
             .single-comment-bottom-item#CommentHitBox
               comment-hit(cid=article._id article='article' vote-up=article.voteUp vote-down=article.voteDown)
+            .single-comment-bottom-item(data-type='share' data-share-type='comment' data-share-id=cid title='分享')
+              .fa.fa-share-square-o.new-share-icon
             .single-comment-bottom-item(data-type="articleOption" data-aid=article._id title="其他操作" data-direction="down")
               .fa.fa-sliders.option-icon
           else

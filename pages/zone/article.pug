@@ -43,6 +43,10 @@ block content
             a.single-comment-bottom-item(href="#container")
               .fa.fa-comment-o.reply-icon
               span 回复
+            .single-comment-bottom-item#CommentHitBox
+              comment-hit(cid=article._id article='article' vote-up=article.voteUp vote-down=article.voteDown)
+            .single-post-bottom-item(data-type='share' data-share-type='comment' data-share-id=cid title='分享')
+              .fa.fa-share-square-o.new-share-icon
             .single-comment-bottom-item(data-type="articleOption" data-aid=article._id title="其他操作" data-direction="down")
               .fa.fa-sliders.option-icon
           else
@@ -94,6 +98,7 @@ block content
   //- 下拉后左边显示的所属专业 上级专业 同级专业
   //- +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 block scripts
+  +includeJS("/columns/article.js")
   +includeDeferJS('/columns/article/article.js', false)
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../publicModules/articleCenter/articleOption/articleOptions
