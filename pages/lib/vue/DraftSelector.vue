@@ -195,18 +195,22 @@
       selectDraftType(type) {
         this.draftType = type;
         const self = this;
-        if(type === 'custom') {
-          setTimeout(() => {
+        setTimeout(() => {
+          if(type === 'custom') {
             self.$refs.customDraftsBox.getDrafts();
-          }, 100)
+          } else {
+            self.$refs.autoDraftsBox.open();
+          }
 
-        }
+        }, 100)
+
       },
       insert(data) {
         this.callback({content: data});
       },
       open(callback) {
         this.callback = callback;
+        this.$refs.autoDraftsBox.open();
         this.draggableElement.show();
       },
       close() {
