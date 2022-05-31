@@ -43,8 +43,30 @@ const schema = new mongoose.Schema({
     default: null,
     index: 1
   },
+  //是否加精
+  digest: {
+    type: Boolean,
+    default: false,
+    index:1,
+  },
+  //加精时间
+  digestTime: {
+    type: Number,
+    default: null,
+    index: 1,
+  },
+  //支持数
+  voteUp: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+  voteDown: {
+    type: Number,
+    index:1,
+  },
   // 文章状态
-  // normal: 正常的（已发布，未被删除）
+  // normal: 正常的（已发布，未被删除）this
   // default: 未发布的（正在编辑，待发布）
   // deleted: 被删除的（已发布，但被删除了）
   // cancelled: 被取消发表的（未发布过，在草稿箱被删除）
@@ -482,9 +504,9 @@ schema.methods.deleteArticle = async function() {
   const {normal: normalStatus, deleted: deletedStatus} = await ArticleModel.getArticleStatus();
   const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
   const {status, source, _id} = this;
-  if(status !== normalStatus) {
-    throwErr(500, `文章状态异常 status=${this.status}`);
-  }
+  // if(status !== normalStatus) {
+  //   throwErr(500, `文章状态异常 status=${this.status}`);
+  // }
   // 删除草稿
   await this.deleteDraft();
   //根据文章id删除引用
@@ -885,6 +907,7 @@ schema.statics.extendArticlesList = async (articles) => {
       }
     }
     articlesList.push({
+      status,
       articleSource: source,
       articleSourceId: sid,
       articleId,
@@ -1376,4 +1399,39 @@ schema.statics.getArticlesObjectByArticlesId = async (articlesId) => {
   return articlesObj;
 };
 
+/*
+*更新文章点赞数据
+* */
+schema.methods.updateArticlesVote = async function () {
+  const PostsVoteModel = mongoose.model('postsVotes');
+  const {article: articleSource} = await PostsVoteModel.getVoteSources();
+  const votes = await PostsVoteModel.find({source: articleSource, sid: this._id});
+  let upNum = 0;
+  let downNum = 0;
+  for(const vote of votes) {
+    if(vote.type === 'up') {
+      if(vote.sid === this._id) {
+        upNum += vote.num;
+      }
+    } else {
+      if(vote.sid === this._id) {
+        downNum += vote.num;
+      }
+    }
+  }
+  this.voteUp = upNum;
+  this.voteDown = downNum;
+  await this.updateOne({
+    voteUp: upNum,
+    voteDown: downNum,
+  });
+};
+
+/*
+* 拓展文章作者信息
+* */
+schema.methods.extendUser = async function() {
+  const UserModel = mongoose.model('users');
+  return this.user = await UserModel.findOnly({uid: this.uid});
+}
 module.exports = mongoose.model('articles', schema);

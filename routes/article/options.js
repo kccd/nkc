@@ -1,7 +1,7 @@
 const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
-    const {db, data, params, query, state, permission} = ctx;
+    const {db, data, params, state, permission, permissionsOr} = ctx;
     const {aid} = params;
     const {user} = data;
     const {uid} = state;
@@ -31,15 +31,25 @@ router
       blacklist: null,
       history: null,
       source: document.source,
+      digest: null,
     };
     if(user) {
+      data.digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
+      data.redEnvelopeSettings = await db.SettingModel.getSettings('redEnvelope');
       if(permission('review')) {
         optionStatus.reviewed = document.status;
         optionStatus.history = true;
       }
-      if(uid === article.uid) {
+      if(ctx.permission('digestPost')) {
+        optionStatus.digest = article.digest;
+      }
+      if(uid === article.uid || permissionsOr(['pushThread', 'moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop'])) {
         optionStatus.edit = true;
         optionStatus.history = true;
+      }
+      // 评学术分
+      if(ctx.permission('creditXsf')) {
+        optionStatus.xsf = true;
       }
       //退修禁用权限
       optionStatus.disabled = (
@@ -53,8 +63,8 @@ router
       // 未匿名
       if(!document.anonymous) {
         if(user.uid !== article.uid) {
-              // 黑名单
-              optionStatus.blacklist = await db.BlacklistModel.checkUser(user.uid, article.uid);
+          // 黑名单
+          optionStatus.blacklist = await db.BlacklistModel.checkUser(user.uid, article.uid);
         }
         // 违规记录
         optionStatus.violation = ctx.permission('violationRecord')? true: null;

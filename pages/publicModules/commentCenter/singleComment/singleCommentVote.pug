@@ -1,0 +1,8 @@
+if !isIncluded('singleCommentVote')
+  mixin singleCommentVote(cid, vote, voteUp)
+    .posts-vote
+      .posts-vote-up(class=vote === 'up' ? 'active' : '' data-cid=cid onclick=`commentsVote("${cid}", "up")`)
+        .fa.fa-caret-up
+        .posts-vote-number(data-cid=cid)= voteUp || ''
+      .posts-vote-down(class=vote === 'down' ? 'active' : '' data-cid=cid onclick=`commentsVote("${cid}", "down")`)
+        .fa.fa-caret-down

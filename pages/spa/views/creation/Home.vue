@@ -115,6 +115,9 @@ export default {
         });
       }
       // console.log(this.$refs.render-pie)
+      if(!this.$refs.renderPie){
+        return
+      }
       var myChart = echarts.init(this.$refs.renderPie);
       var option = {
         title: {

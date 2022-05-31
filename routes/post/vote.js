@@ -47,11 +47,11 @@ voteRouter
         num: weights
       });
       await vote.save();
-      const message = await db.MessageModel.findOne({'c.votesId': {$in: [vote._id]}, r: user.uid});
+      let message = await db.MessageModel.findOne({'c.votesId': {$in: [vote._id]}, r: user.uid});
       //判断如果不存在消息就生成消息提示
       if(!message) {
         //生成点赞消息
-        await db.MessageModel({
+        const message = await db.MessageModel({
           _id: await db.SettingModel.operateSystemID('messages', 1),
           r: post.uid,
           ty: 'STU',
@@ -62,7 +62,9 @@ voteRouter
             votesId: [vote._id],
           }
         }).save();
-      await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
+        await ctx.nkcModules.socket.sendMessageToUser(message._id);
+        await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
+      }
     } else {
       if(vote.type === 'up') {
         await vote.deleteOne();
@@ -71,7 +73,6 @@ voteRouter
         await vote.updateOne({tlm: Date.now(), type: 'up', num: weights});
         await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
       }
-    }
     };
     await post.updatePostsVote();
     data.post = post;

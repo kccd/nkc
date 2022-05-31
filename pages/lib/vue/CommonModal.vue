@@ -101,7 +101,6 @@ export default {
     initDraggableElement() {
       this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
       this.draggableElement.setPositionCenter()
-
     },
     submit: function() {
       this.callback(this.data);

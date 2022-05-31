@@ -139,6 +139,22 @@ shareRouter
       if(result.cover) {
         result.cover = nkcModules.tools.getUrl('forumLogo', result.cover);
       }
+    } else if(type === 'comment') {
+      let comment = await db.CommentModel.findOnly({_id: id});
+      comment = (await db.CommentModel.getCommentInfo([comment]))[0];
+      result.title = comment.articleDocument.title;
+      result.description = nkcModules.nkcRender.htmlToPlain(comment.commentDocument.content, 100);
+      if(comment.cover) {
+        result.cover = nkcModules.tools.getUrl('postCover', comment.cover);
+      }
+    } else if(type === 'article') {
+      let article = await db.ArticleModel.findOnly({_id: id});
+      article = (await db.ArticleModel.getArticlesInfo([article]))[0];
+      result.title = article.document.title;
+      result.description = nkcModules.nkcRender.htmlToPlain(article.document.content, 100);
+      if(article.document.cover) {
+        result.cover = nkcModules.tools.getUrl('postCover', article.document.cover);
+      }
     }
     const shareSettingsInfo = await db.SettingModel.getSettings('share');
     let setting = shareSettingsInfo[type];

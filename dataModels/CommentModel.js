@@ -30,6 +30,29 @@ const schema = new mongoose.Schema({
     default: 0,
     index: 1
   },
+  //是否加精
+  digest: {
+    type: Boolean,
+    default: false,
+    index:1,
+  },
+  //加精时间
+  digestTime: {
+    type: Number,
+    default: null,
+    index: 1,
+  },
+  //支持数
+  voteUp: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+  //反对数
+  voteDown: {
+    type: Number,
+    index:1,
+  },
   // disabled: 被禁用的（已发布但被管理员禁用了）
   // faulty: 被退修的 （已发布但被管理员退修了）
   // unknown: 状态位置的 （已发布未审核
@@ -162,7 +185,8 @@ schema.statics.createComment = async (options) => {
   const CommentModel = mongoose.model('comments');
   const ArticlePostModel = mongoose.model('articlePosts');
   const {comment: commentDocumentSource}  = await DocumentModel.getDocumentSources();
-  const cid = await SettingModel.getNewId();
+  //获取新的comment id
+  const cid = await CommentModel.getNewId();
   const document = await DocumentModel.createBetaDocument({
     uid,
     content,
@@ -292,7 +316,7 @@ schema.methods.modifyComment = async function (props) {
 * */
 schema.statics.extendPostComments = async (props) => {
   const ReviewModel = mongoose.model('reviews');
-  const {comments, uid, isModerator = '', permissions = {}} = props;
+  const {comments, uid, isModerator = '', permissions = {}, authorUid} = props;
   const DocumentModel = mongoose.model('documents');
   const UserModel = mongoose.model('users');
   const {htmlToPlain} = require("../nkcModules/nkcRender");
@@ -387,7 +411,7 @@ schema.statics.extendPostComments = async (props) => {
         gradeName: userGrade.displayName,
       },
       commentUrl: await c.getLocationUrl(),
-      isAuthor: m.uid === uid?true:false,
+      isAuthor: authorUid === m.uid?true:false,
       quote: documentObj[c.did].quote || null,
     });
   }
@@ -837,11 +861,11 @@ schema.statics.getCommentsObjectByCommentsId = async function(commentsId) {
   return commentsObj;
 }
 
-/*
+/* -------------------------------------------------------暂定-------------------------------------------应当修改为通过comments去获取，而不需要再查询一遍
 * 通过commentId获取comment
 * @params {Array} commentId 需要获取的评论的Id
 * */
-schema.statics.getCommentsByCommentsId = async function (commentsId, uid) {
+schema.statics.getCommentsByCommentsId = async function (commentsId) {
   const CommentModel = mongoose.model('comments');
   const ArticleModel = mongoose.model('articles');
   const UserModel = mongoose.model('users');
@@ -1004,6 +1028,71 @@ schema.methods.getLocationUrl = async function() {
   const comment = (await CommentModel.getCommentInfo([this]))[0];
   if(!comment) return;
   return comment.commentUrl;
+}
+
+/*
+* 更新独立文章评论的点赞详情
+* */
+schema.methods.updateCommentsVote = async function() {
+  const PostsVoteModel = mongoose.model('postsVotes');
+  const {comment: commentSource} = await PostsVoteModel.getVoteSources();
+  const votes = await PostsVoteModel.find({source: commentSource, sid: this._id});
+  let upNum = 0;
+  let downNum = 0;
+  for(const vote of votes) {
+    if(vote.type === 'up') {
+      if(vote.sid === this._id) {
+        upNum += vote.num;
+      }
+    } else {
+      if(vote.sid === this._id) {
+        downNum += vote.num;
+      }
+    }
+  }
+  this.voteUp = upNum;
+  this.voteDown = downNum;
+  const b = await this.updateOne({
+    voteUp: upNum,
+    voteDown: downNum,
+  });
+}
+
+
+/*
+* 获取新的 comment id
+* @return {String}
+* */
+schema.statics.getNewId = async () => {
+  const CommentModel = mongoose.model('comments');
+  const redLock = require('../nkcModules/redLock');
+  const getRedisKeys = require('../nkcModules/getRedisKeys');
+  const {getRandomString} = require('../nkcModules/apiFunction');
+  const key = getRedisKeys('newArticleId');
+  let newId = '';
+  let n = 10;
+  const lock = await redLock.lock(key, 10000);
+  try{
+    while(true) {
+      n -= 1;
+      const _id = getRandomString('a0', 6);
+      const comment = await CommentModel.findOne({
+        _id
+      }, {_id: 1});
+      if(!comment) {
+        newId = _id;
+        break;
+      }
+      if(n === 0) {
+        break
+      }
+    }
+  }catch(err) {}
+  await lock.unlock();
+  if(!newId) {
+    throwErr(500, 'comment id error');
+  }
+  return newId;
 }
 
 module.exports = mongoose.model('comments', schema);

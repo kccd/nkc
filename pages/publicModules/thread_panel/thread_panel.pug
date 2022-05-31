@@ -100,7 +100,7 @@ if thread.type !== 'newArticle'
 //- -var threadTitle = tools.removeLink(thread.firstPost.t);
 -var threadTitle;
 -var threadUrl;
-if data.t === 'column'
+if data.t === 'column' || data.t === 'home'
   if thread.type === 'newArticle'
     -threadTitle = thread.document.title;
   else
@@ -109,7 +109,7 @@ if data.t === 'column'
 else
   -threadTitle = thread.firstPost.t;
   -threadUrl = `/t/${thread.tid}`;
-if data.t  === 'column' && thread.type === 'newArticle'
+if (data.t  === 'column' || data.t  === 'home') && thread.type === 'newArticle'
   .thread-panel(class=threadPanelClass)
     .thread-panel-body(class=styleType)
       if styleType === 'minimalist'
@@ -190,10 +190,10 @@ if data.t  === 'column' && thread.type === 'newArticle'
                 .fa.fa-thumbs-up=`${thread.document.voteUp || ''}`
               if thread.hits
                 .fa.fa-eye=thread.hits
-              if thread.comment
+              if thread.count
                 .fa
-                  a.a-jump(href=`${threadUrl}#container` target="_blank")
-                    span.fa.fa-comment=thread.comment
+                  a.a-jump(href=`${threadUrl}?&last_page=true#container` target="_blank")
+                    span.fa.fa-comment=thread.count
 
 
 
@@ -384,7 +384,7 @@ else
                 .fa.fa-eye=` ${thread.hits}`
               if thread.count
                 .fa
-                  a.a-jump(href=`/t/${thread.tid}#container` target="_blank")
+                  a.a-jump(href=`/t/${thread.tid}?&last_page=true#container` target="_blank")
                     span.fa.fa-comment=` ${thread.count}`
 
 

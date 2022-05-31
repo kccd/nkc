@@ -6,7 +6,9 @@ xsfRouter
     let {page = 0, t = '', content = ''} = query;
     t = t.trim();
     content = content.trim();
-    const q = {};
+    const q = {
+      recordType: 'post'
+    };
     if(t === 'username') {
       const u = await db.UserModel.findOne({usernameLowerCase: content.toLowerCase()});
       if(!u) {

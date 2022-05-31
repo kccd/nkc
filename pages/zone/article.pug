@@ -43,6 +43,10 @@ block content
             a.single-comment-bottom-item(href="#container")
               .fa.fa-comment-o.reply-icon
               span 回复
+            .single-comment-bottom-item#CommentHitBox
+              comment-hit(cid=article._id article='article' vote-up=article.voteUp vote-down=article.voteDown)
+            .single-post-bottom-item(data-type='share' data-share-type='article' data-share-id=article._id title='分享')
+              .fa.fa-share-square-o.new-share-icon
             .single-comment-bottom-item(data-type="articleOption" data-aid=article._id title="其他操作" data-direction="down")
               .fa.fa-sliders.option-icon
           else
@@ -85,6 +89,11 @@ block content
         .m-b-1
           include ../publicModules/commentCenter/comment
       .col-xs-12.col-md-3.box-shadow-panel#rightDom
+        if data.targetUser
+          .m-b-1
+            //- .panel-header 作者
+            -const author = data.targetUser;
+            include ../thread/authorInfo
         //- 滚动到页头页脚
         include ../module_scrollTo.pug
   include ../publicModules/floatForumNav
@@ -94,6 +103,7 @@ block content
   //- 下拉后左边显示的所属专业 上级专业 同级专业
   //- +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 block scripts
+  +includeJS("/columns/article.js")
   +includeDeferJS('/columns/article/article.js', false)
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../publicModules/articleCenter/articleOption/articleOptions

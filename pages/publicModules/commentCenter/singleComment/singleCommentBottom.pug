@@ -2,7 +2,7 @@
 if !isIncluded('singlePostBottom')
   include ./singleCommentVote
   mixin singleCommentBottom(props)
-    -var {cid, docId, props: comment} = props;
+    -var {cid, docId, props: comment, voteDown, voteUp} = props;
     .single-post-bottom(id=`singleCommentBottom_${cid}` cid=cid)
       violation-record(ref="violationRecord")
       complaint(ref="complaint")
@@ -20,6 +20,26 @@ if !isIncluded('singlePostBottom')
         .single-post-bottom-item(onclick=`window.commentEditor.quoteComment('${docId}')`)
           .fa.fa-comment-o.reply-icon
           span 引用
+        //.single-post-bottom-item
+        //  if 1
+        //    span.single-post-comment-button(
+        //      onclick=`NKC.methods.switchComment("${cid}")`
+        //      data-show-number='true'
+        //      data-type='singleCommentButton'
+        //      data-pid=cid
+        //      data-number=count
+        //    )=`评论${count>0? `(${count})`:``}`
+        //  else
+        //    span.single-post-comment-button.disabled(title='当前回复不允许评论') 评论
+        .single-post-bottom-item
+          .post-vote-container
+            comment-hit(cid=cid, vote-down=voteDown vote-up=voteUp)
+            //+singleCommentVote(cid, vote, voteUp)
+        //if permission('creditKcb')
+        //  .single-post-bottom-item(onclick=`credit('${cid}', 'kcb')` title='鼓励')
+        //    .fa.fa-cny.credit-kcb
+        .single-post-bottom-item(data-type='share' data-share-type='comment' data-share-id=cid title='分享')
+          .fa.fa-share-square-o.new-share-icon
         .single-post-bottom-item(data-type='CommentOption' data-cid=cid onclick=`window.singleCommentBottom['${cid}'].openOptions(this)` title='其他操作')
           .fa.fa-sliders.option-icon
       else

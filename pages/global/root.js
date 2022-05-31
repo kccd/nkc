@@ -7,6 +7,8 @@ import UserFloatPanel from "../lib/vue/UserFloatPanel";
 import SubscribeTypes from "../lib/vue/SubscribeTypes";
 import FloatForumPanel from "../lib/vue/forum/FloatForumPanel";
 import Sticker from '../lib/vue/Sticker';
+import Digest from "../lib/vue/Digest";
+import AddXsf from "../lib/vue/AddXsf";
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
@@ -32,6 +34,8 @@ window.RootApp = new Vue({
     "float-forum-panel": FloatForumPanel,
     "subscribe-types": SubscribeTypes,
     "sticker-panel": Sticker,
+    digest: Digest,
+    'add-xsf': AddXsf
   },
   computed: {
     hasLogged() {
@@ -80,6 +84,20 @@ window.RootApp = new Vue({
     //关闭抽屉
     closeDraw(type) {
       this.$refs.userDraw.colseDraw(type);
+    },
+    //打开加精弹窗
+    openDigest(callback, options) {
+      this.$refs.digest.open(callback, options);
+    },
+    closeDigest() {
+      this.$refs.digest.close();
+    },
+    //打开评学术分弹窗
+    addXsf(callback, options) {
+      this.$refs.addXsf.open(callback, options);
+    },
+    closeXsf() {
+      this.$refs.addXsf.close()
     },
     //关注取关用户
     subscribe(options) {

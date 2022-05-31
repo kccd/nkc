@@ -939,7 +939,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
       if(!kcbsRecordsObj[r.pid]) kcbsRecordsObj[r.pid] = [];
       kcbsRecordsObj[r.pid].push(r);
     }
-    const xsfsRecords = await XsfsRecordModel.find({pid: {$in: [...pid]}, canceled: false}).sort({toc: 1});
+    const xsfsRecords = await XsfsRecordModel.find({pid: {$in: [...pid]}, canceled: false, recordType: 'post'}).sort({toc: 1});
     for(const r of xsfsRecords) {
       uid.add(r.operatorId);
       r.uid = "";
@@ -1125,6 +1125,8 @@ postSchema.statics.extendPosts = async (posts, options) => {
   return results;
 };
 
+
+//更新post的点赞
 postSchema.methods.updatePostsVote = async function() {
   const PostModel = mongoose.model('posts');
   const PostsVoteModel = mongoose.model('postsVotes');

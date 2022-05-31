@@ -1,8 +1,11 @@
 <template lang="pug">
   .user-moment.p-t-1
-    paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
+    .paging-button
+      a.button(@click="toType('moment')" :class="t === 'moment'?'active':''") 动态
+      a.button(@click="toType('thread')" :class="t === 'thread'?'active':''") 文章
     .user-list-warning(v-if="!momentsData && loading") 加载中~
     .moment-list(v-else)
+      paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
       blank(v-if="momentsData && momentsData.length === 0 && !loading")
       moments(
         ref="moments"
@@ -42,6 +45,7 @@ export default {
     uid: null,
     loading: false,
     permissions: '',
+    t: 'moment',
   }),
   components: {
     "moments": Moments,
@@ -63,10 +67,10 @@ export default {
   },
   methods: {
     //获取用户卡片信息
-    getUserCardInfo(page) {
+    getUserCardInfo(page, type) {
       const {uid} = this;
       const self= this;
-      let url = `/u/${uid}/profile/momentData`;
+      let url = `/u/${uid}/profile/momentData?t=${type}`;
       if(page) {
         const index = url .indexOf('?');
         if(index === -1) {
@@ -99,6 +103,10 @@ export default {
     //点击分页
     clickButton(num) {
       this.getUserCardInfo(num);
+    },
+    //跳转到动态指定类型
+    toType(type) {
+      this.getUserCardInfo(0, type);
     }
   }
 }

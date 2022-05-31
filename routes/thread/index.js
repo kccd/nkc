@@ -9,6 +9,14 @@ const closeRouter = require('./close');
 const subscribeRouter = require("./subscribe");
 const Path = require("path");
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
+
+function isIncludes(arr, id, type) {
+  for(const a of arr) {
+    if(a.id === id && a.type === type) return true;
+  }
+  return false;
+}
+
 threadRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, query, nkcModules} = ctx;
@@ -904,7 +912,7 @@ threadRouter
       userRolesId: data.userRoles.map(role => role._id),
       userGradeId: data.userGrade._id
     });
-    if(!await db.ShareModel.hasPermission(token, thread.oc)) {
+    if(token && !await db.ShareModel.hasPermission(token, thread.oc)) {
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
     }
     // 获取当前用户有权查看文章的专业ID
@@ -1316,9 +1324,9 @@ threadRouter
       movable.automaticallySelectedThreads
     );
 		data.homeAd = ads.map(a => a.tid).includes(tid);
-		data.homeTopped = data.homeSettings.toppedThreadsId.includes(tid);
-		data.latestTopped = data.homeSettings.latestToppedThreadsId.includes(tid);
-    data.communityTopped = data.homeSettings.communityToppedThreadsId.includes(tid);
+		data.homeTopped = isIncludes(data.homeSettings.toppedThreadsId, tid, 'thread');
+		data.latestTopped = isIncludes(data.homeSettings.latestToppedThreadsId, tid, 'thread');
+    data.communityTopped = isIncludes(data.homeSettings.communityToppedThreadsId, tid, 'thread');
 		if(thread.type === "product" && ctx.permission("pushGoodsToHome")) {
 		  data.goodsHomeTopped = data.homeSettings.shopGoodsId.includes(data.product.productId);
     }
@@ -1509,7 +1517,7 @@ threadRouter
 
     data.post = _post;
 		data.targetUser = await thread.extendUser();
-
+    
     data.blacklistUsersId = await db.BlacklistModel.getBlacklistUsersId(data.user.uid);
 
 		// 转发到专栏

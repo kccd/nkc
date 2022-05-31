@@ -2,15 +2,16 @@ import {nkcAPI} from "../../../lib/js/netAPI";
 import {getUrl} from "../../../lib/js/tools";
 import {visitUrl} from "../../../lib/js/pageSwitch";
 
+import {screenTopAlert, screenTopWarning} from "../../../lib/js/topAlert";
 window.articleOption = new Vue({
   el: '#moduleArticleOptions',
   data: {
     show: false,
-
+    
     loading: true,
-
+    
     jqDOM: null,
-
+    
     uid: NKC.configs.uid,
     // 类型 thread、post
     pid: '',
@@ -27,14 +28,14 @@ window.articleOption = new Vue({
       username: '',
       uid: ''
     },
-
+    
     article: null,
-
+  
     direction: null,
-
+    
     top: 300,
     left: 300,
-
+    
     domHeight: 0,
     domWidth: 0,
     optionStatus: {},
@@ -114,7 +115,11 @@ window.articleOption = new Vue({
           self.article = data.article;
           self.loading = false;
           self.show = true;
-          self.toc = data.toc
+          self.toc = data.toc;
+          self.digestData = {
+            digestRewardScore: data.digestRewardScore,
+            redEnvelopeSettings: data.redEnvelopeSettings,
+          };
         })
         .catch(err => {
           sweetError(err);
@@ -150,7 +155,7 @@ window.articleOption = new Vue({
         .catch(function(data) {
           sweetError(data);
         })
-
+      
     },
     viewAuthorInfo() {
       if(!window.UserInfo) {
@@ -232,8 +237,22 @@ window.articleOption = new Vue({
         });
     },
     addXSF() {
-      const {pid} = this;
-      credit(pid, 'xsf');
+      const {_id} = this.article;
+      window.RootApp.addXsf((data) => {
+        const {num, description} = data;
+        const obj = {
+          num,
+          description,
+        };
+        nkcAPI(`/article/${_id}/credit/xsf`, 'POST', obj)
+          .then(() => {
+            window.RootApp.closeXsf();
+            window.location.reload();
+          })
+          .catch(err => {
+            screenTopWarning(err);
+          })
+      }, {})
     },
     addKCB() {
       const {pid} = this;
@@ -380,6 +399,51 @@ window.articleOption = new Vue({
         window.complaintSelector = new NKC.modules.ComplaintSelector();
       complaintSelector.open("article", _id);
       self.close();
+    },
+    //独立文章取消精选
+    unDigestArticle() {
+      const self = this;
+      const {_id} = self.article;
+      nkcAPI('/article/'+_id+'/digest', 'DELETE', {})
+        .then(function() {
+          screenTopAlert('已取消精选');
+          self.optionStatus.digest = false;
+        })
+        .catch(function(data) {
+          screenTopWarning(data.error||data);
+        })
+    },
+    //独立文章加精
+    digestArticle(kcb) {
+      const self = this;
+      const {_id} = self.article;
+      return nkcAPI(`/article/${_id}/digest`, 'POST', {
+        kcb,
+      })
+        .then(() => {
+          screenTopAlert('操作成功');
+          self.optionStatus.digest = true;
+        })
+        .catch((data) => {
+          screenTopWarning(data.error || data);
+        })
+    },
+    //精选控制
+    articleDigest() {
+      const {digest} = this.optionStatus;
+      const self = this;
+      if(!digest) {
+        window.RootApp.openDigest((kcb)=> {
+          self.digestArticle(kcb)
+            .then(() => {
+              window.RootApp.closeDigest();
+            });
+        },{
+          digestData: self.digestData,
+        });
+      } else {
+        self.unDigestArticle();
+      }
     }
   }
 });

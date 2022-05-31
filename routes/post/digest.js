@@ -134,6 +134,7 @@ router
     }
     await ctx.nkcModules.socket.sendMessageToUser(message._id);
     data.targetUser.kcb = await db.UserModel.updateUserKcb(data.targetUser.uid);
+		data.userScores = await db.UserModel.updateUserScores(targetUser.uid);
 		await next();
 	})
 	.del('/', async (ctx, next) => {
@@ -197,6 +198,7 @@ router
 			await db.UsersScoreLogModel.insertLog(log);
       await nkcModules.elasticSearch.save("post", post);
 		}
+		data.userScores = await db.UserModel.updateUserScores(targetUser.uid);
 		await next();
 	});
 module.exports = router;

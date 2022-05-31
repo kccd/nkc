@@ -1155,6 +1155,8 @@ threadSchema.statics.publishArticle = async (options) => {
 threadSchema.statics.getHomeToppedThreads = async (fid = [], type) => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
   const ThreadModel = mongoose.model("threads");
+  const ArticleModel = mongoose.model('articles');
+  const {htmlToPlain} = require("../nkcModules/nkcRender");
   let toppedThreadsId;
   if(type === 'latest') {
     toppedThreadsId = homeSettings.latestToppedThreadsId;
@@ -1163,13 +1165,31 @@ threadSchema.statics.getHomeToppedThreads = async (fid = [], type) => {
   } else {
     toppedThreadsId = homeSettings.toppedThreadsId;
   }
+  const threadsId = [];
+  const articlesId = [];
+  for(const t of toppedThreadsId) {
+    const {type , id} = t;
+    if(type === 'thread') {
+      threadsId.push(id);
+    } else if(type === 'article') {
+      articlesId.push(id);
+    }
+  }
   let threads = await ThreadModel.find({
-    tid: {$in: toppedThreadsId},
+    tid: {$in: threadsId},
     mainForumsId: {$in: fid},
     disabled: false,
     recycleMark: {$ne: true},
     reviewed: true
   });
+  const {normal} = await ArticleModel.getArticleStatus();
+  let articles = await ArticleModel.find({
+    _id: {$in: articlesId},
+    status: normal,
+  });
+  const articlesObj = {};
+  articles = await ArticleModel.getArticlesInfo(articles);
+  articles.map(article => articlesObj[article._id] = article);
   threads = await ThreadModel.extendThreads(threads, {
     forum: true,
     category: false,
@@ -1180,8 +1200,17 @@ threadSchema.statics.getHomeToppedThreads = async (fid = [], type) => {
   const threadsObj = {};
   threads.map(thread => threadsObj[thread.tid] = thread);
   const results = [];
-  toppedThreadsId.map(tid => {
-    const thread = threadsObj[tid];
+  toppedThreadsId.map(t => {
+    const {type, id} = t;
+    let thread;
+    if(type === 'thread') {
+      thread = threadsObj[id];
+    } else if(type === 'article') {
+      thread = articlesObj[id];
+      thread.type = 'newArticle';
+      thread.document.content = htmlToPlain(thread.document.content, 200);
+      if(thread.column) thread.columns = [thread.column];
+    }
     if(thread) results.push(thread);
   });
   return results;

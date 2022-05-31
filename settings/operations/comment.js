@@ -6,22 +6,48 @@ module.exports = {
     DELETE: "deleteComment",
     GET: "getComments",
     quote: {
-      GET: "getComments"
+      GET: "getComments",
     },
     commentEditor: {
-      GET: "getComments"
+      GET: "getComments",
     },
     disabled: {
-      POST: "disabledComment"
+      POST: "disabledComment",
     },
     unblock: {
-      POST: "disabledComment"
+      POST: "disabledComment",
     },
     options: {
-      GET: "getCommentPermission"
+      GET: "getCommentPermission",
     },
     ipInfo: {
-      GET: "getCommentIpInfo"
-    }
+      GET: "getCommentIpInfo",
+    },
+    digest: {
+      POST: 'digestComment',
+      DELETE: 'unDigestComment',
+    },
+    credit: {
+      xsf: {
+        POST: 'creditXsf',
+        PARAMETER: {
+          DELETE: 'cancelXsf'
+        }
+      },
+      kcb: {
+        POST: 'creditKcb',
+        PARAMETER: {
+          PUT: "modifyKcbRecordReason"
+        }
+      }
+    },
+    vote: {
+      up: {
+        POST: 'post-vote-up'
+      },
+      down: {
+        POST: 'post-vote-down'
+      }
+    },
   }
 }

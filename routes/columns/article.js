@@ -1,26 +1,44 @@
-
 const router = require('koa-router')();
+
+function isIncludes(arr, id, type) {
+  for(const a of arr) {
+    if(a.id === id && a.type === type)  return true;
+  }
+  return false;
+}
+
 router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
   const {pageSettings, uid} = state;
-  const {page = 0, highlight, t} = query;
+  const {highlight, t, last_page, token} = query;
+  let {page = 0} = query;
   ctx.template = 'columns/article.pug';
   const { user } = data;
   const {_id, aid} = params;
   data.highlight = highlight;
   let xsf = user ? user.xsf : 0;
+  
   let columnPostData = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid, xsf);
   data.columnPost = columnPostData;
   data.columnPost.collected = false;
   const {article, thread} = await db.ColumnPostModel.getColumnPostTypes();
+  const homeSettings = await db.SettingModel.getSettings("home");
   let isModerator;
   if(columnPostData.type === article) {
     //获取文章的评论信息
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     const _article = columnPostData.article;
     const article = await db.ArticleModel.findOnly({_id: _article._id});
+    // 验证权限 - new
+    // 如果是分享出去的连接，含有token，则允许直接访问
+    // 【待改】判断用户是否是通过分享链接阅读文章，如果是则越过权限
+    if(token) {
+      //如果存在token就验证token是否合法
+      await db.ShareModel.hasPermission(token, _article._id)
+    }
     const articlePost = await db.ArticlePostModel.findOne({sid: article._id, source: article.source});
     isModerator = await article.isModerator(state.uid);
+    data.homeTopped = isIncludes(homeSettings.toppedThreadsId, article._id, 'article');
     const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
     if(_article.status !== normalStatus && !isModerator) {
       if(!permission('review')) {
@@ -64,7 +82,14 @@ router.get('/:aid', async (ctx, next)=>{
     //获取评论分页
     let count = 0;
     if(articlePost) {
+      // 获取当前文章下回复的总数目
       count = await db.CommentModel.countDocuments(match);
+    }
+    const paging_ = nkcModules.apiFunction.paging(page, count, 30);
+    const {pageCount} = paging_;
+    // 访问最后一页
+    if(last_page) {
+      page = pageCount -1;
     }
     const paging = nkcModules.apiFunction.paging(page, count, 30);
     data.paging = paging;
@@ -83,7 +108,7 @@ router.get('/:aid', async (ctx, next)=>{
       comments = await db.CommentModel.getCommentsByArticleId({match, paging});
     }
     if(comments && comments.length !== 0) {
-      comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions});
+      comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions, authorUid:article.uid});
     }
     if(comment && comment.length !== 0) {
       //拓展单个评论内容
@@ -102,7 +127,7 @@ router.get('/:aid', async (ctx, next)=>{
     //获取论坛文章的评论
     const thread = await db.ThreadModel.findOnly({tid: columnPostData.thread.tid});
     //
-    if(!thread) ctx.throw(400, '未找到文章，请刷洗');
+    if(!thread) ctx.throw(400, '未找到文章，请刷新');
     //判断用户是否具有专家权限
     isModerator = await db.ForumModel.isModerator(state.uid, thread.mainForumsId);
     //文章收藏数

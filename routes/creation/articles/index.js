@@ -7,8 +7,9 @@ router
   })
   .get('/editor', async (ctx, next) => {
     //获取独立文章信息
-    const {query, state, db, data} = ctx;
+    const {query, state, db, data, permission} = ctx;
     let {aid, mid, source} = query;
+    const {user} = data;
     if(!source) ctx.throw(401, '文章来源未知');
     let document;
     let article;
@@ -18,7 +19,21 @@ router
     const editorInfo = {};
     if(aid) {
       //通过aid获取article
-      article = await db.ArticleModel.findOnly({_id: aid, uid: state.uid, source: articleSource});
+      const _article = await db.ArticleModel.findOnly({_id: aid});
+      if(!permission('modifyOtherArticles')) {
+        if(user.uid !== _article.uid) ctx.throw(403, '您没有权限修改别人的文章');
+      }
+      if(_article.status === 'deleted') {
+        ctx.throw(403, '没有权限');
+      }
+      const articleObj = {
+        _id: aid,
+        source: articleSource
+      }
+      if(state.uid === _article.uid){
+        articleObj.uid = state.uid;
+      }
+      article = await db.ArticleModel.findOnly(articleObj);
       if(!article) ctx.throw(400, '未找到article,请刷新后重试');
       if(article.status === 'deleted') ctx.throw(403, '权限不足');
       const documentSource = (await db.DocumentModel.getDocumentSources()).article;
