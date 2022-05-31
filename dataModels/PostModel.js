@@ -2213,4 +2213,51 @@ postSchema.methods.noticeAuthorReply = async function() {
   }
 }
 
+// 定时屏蔽退修超时未修改的回复
+postSchema.statics.disableToDraftPosts = async function() {
+  const PostModel = mongoose.model('posts');
+  const UserModel = mongoose.model('users');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const DelPostLogModel = mongoose.model('delPostLog');
+  const nkcModules = require("../nkcModules");
+  const onLogs = await DelPostLogModel.find({
+    delType: 'toDraft',
+    postType: 'post',
+    modifyType: false,
+    toc: {
+      $lte: Date.now() - 4 * 24 * 60 * 60 * 1000
+    }
+  }).limit(1000);
+  for(const log of onLogs) {
+    const {postId} = log;
+    const post = await PostModel.findOne({pid: postId, type: 'post'});
+    await log.updateOne({
+      $set: {
+        modifyType: true,
+        delType: 'toRecycle'
+      }
+    });
+    if(post && post.toDraft) {
+      await post.updateOne({
+        $set: {
+          toDraft: false,
+          reviewed: true,
+        }
+      });
+      const user = await UserModel.findOnly({uid: post.uid});
+      await KcbsRecordModel.insertSystemRecord('postBlocked', user, {
+        state: {
+          _scoreOperationForumsId: post.mainForumsId,
+        },
+        data: {
+          user: {},
+          post
+        },
+        nkcModules,
+        db: require('./index')
+      });
+    }
+  }
+};
+
 module.exports = mongoose.model('posts', postSchema);
