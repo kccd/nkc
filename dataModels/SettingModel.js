@@ -1125,6 +1125,34 @@ settingSchema.statics.isIncludesOfArr = function(arr, field, value) {
     included: false,
     index: -1,
   }
+};
+
+/*
+* 判断对象中是否全部字段都满足条件
+* @params {object} obj 需要对比的对象
+* @params {object} options 用户传入需要对比的对象
+* @return {boolean} true/false
+* */
+settingSchema.statics.isEqualOfObj = function(obj, options) {
+  for(const i in options) {
+    if(options[i] !== obj[i]) return false;
+  }
+  return true;
 }
 
+/*
+* 判断对象数组中是否有一项全部满足条件
+* @params {array} arr 需要对比的对象数组
+* @params {object} options 用户传入需要对比的对象
+* @return {boolean} true/false
+* */
+settingSchema.statics.isEqualOfArr = function (arr, options) {
+  const SettingModel = mongoose.model('settings');
+  for(const a of arr) {
+    //判断是否满足条件,满足条件就返回true,直到最后不满足返回false
+    const flag = SettingModel.isEqualOfObj(a, options);
+    if(flag) return true;
+  }
+  return false;
+};
 module.exports = mongoose.model('settings', settingSchema);

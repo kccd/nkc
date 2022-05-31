@@ -42,7 +42,7 @@ router
     data.originUrl = state.url
     data.highlight = highlight;
     data.columnPost = articleRelatedContent;
-    data.homeTopped = isIncludes(homeSettings.toppedThreadsId, article._id, 'article');
+    data.homeTopped = await db.SettingModel.isEqualOfArr(homeSettings.toppedThreadsId, {id: article._id, type: 'article'});
     const isModerator = await article.isModerator(state.uid);
     //获取当前文章信息
     // const _article = (await db.ArticleModel.extendDocumentsOfArticles([article], 'stable', [
