@@ -1,4 +1,5 @@
 const router = require('koa-router')();
+const {renderMarkdown} = require('../../nkcModules/markdown');
 
 function isIncludes(arr, id, type) {
   for(const a of arr) {
@@ -20,7 +21,7 @@ router
     let article = await db.ArticleModel.findOnly({_id: aid});
     if(1) {
       data.targetUser = await article.extendUser();
-      data.targetUser.description = nkcModules.nkcRender.replaceLink(data.targetUser.description);
+      data.targetUser.description = renderMarkdown(nkcModules.nkcRender.replaceLink(data.targetUser.description));
       await data.targetUser.extendGrade();
       await db.UserModel.extendUserInfo(data.targetUser);
       // data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);

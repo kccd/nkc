@@ -96,7 +96,6 @@ shareSchema.statics.hasPermission = async (token, id) => {
     await share.hit();
     return true;
   } catch(err) {
-    console.log('err', err);
     return false;
   }
 };

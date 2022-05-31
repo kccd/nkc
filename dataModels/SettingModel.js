@@ -1108,4 +1108,23 @@ settingSchema.statics.getAppsData = async () => {
   return results;
 };
 
+/*
+* 判断字段内容是否存在对象数组中
+* */
+settingSchema.statics.isIncludesOfArr = function(arr, field, value) {
+  for(let i = 0; i < arr.length; i ++) {
+    const a = arr[i];
+    if(a[field] === value) {
+      return {
+        included: true,
+        index: i,
+      };
+    }
+  }
+  return {
+    included: false,
+    index: -1,
+  }
+}
+
 module.exports = mongoose.model('settings', settingSchema);
