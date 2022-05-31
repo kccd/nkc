@@ -558,7 +558,12 @@ threadRouter
       movable.automaticallySelectedThreads
     );
     homeAd = ads.map(a => a.tid).includes(thread.tid);
-    homeTopped = homeSettings.toppedThreadsId.includes(thread.tid);
+    for(const t of homeSettings.toppedThreadsId) {
+      if(t.id === thread.tid) {
+        homeTopped = true;
+        break;
+      }
+    }
     latestTopped = homeSettings.latestToppedThreadsId.includes(thread.tid);
     communityTopped = homeSettings.communityToppedThreadsId.includes(thread.tid);
 
@@ -1517,7 +1522,7 @@ threadRouter
 
     data.post = _post;
 		data.targetUser = await thread.extendUser();
-    
+
     data.blacklistUsersId = await db.BlacklistModel.getBlacklistUsersId(data.user.uid);
 
 		// 转发到专栏
