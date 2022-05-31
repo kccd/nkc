@@ -6,7 +6,9 @@
         //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t  .clear-padding
         //- 2.notice editorSettings.onEditNotes
         .article-box(v-if="drafts.length > 0")
-          .article-box-header 草稿
+          //- 字段含义来源 editor/index.js
+          .article-box-header.des-type {{ {forum: "新帖",newThread:"新帖", thread: "回复", newPost: "回复", post: "回复或文章", forumDeclare: "专业说明"}[drafts[0].desType] + "草稿" }}
+          //- .article-box-header 草稿
           .article-box-text {{drafts[0].t || '未命名'}}
           .article-box-option
             button.btn.btn-xs.btn-primary.m-r-05(@click="editArticle(drafts[0]._id)") 继续编辑
@@ -139,7 +141,7 @@ export default {
   },
   created() {
     this.getData()
-    this.getUserDraft();
+    // this.getUserDraft();
     window.addEventListener("pageshow", this.clearCache);
   },
   destroyed() {
@@ -150,6 +152,8 @@ export default {
   methods: {
     addUrlParam,
     getUserDraft(page=0) {
+      // 如果是修改评论文章或者回复 不获取草稿数据
+      if (["newPost", "modifyThread", "modifyPost", "modifyForumDeclare", "modifyForumLatestNotice"].includes(this.pageData.type)) return
       if(this.lockRequest) return
       const {uid: stateUid} = getState();
       this.uid = stateUid;
@@ -217,6 +221,7 @@ export default {
           this.pageData = resData;
           this.pageState = resData.state;
           this.show = true;
+          this.getUserDraft();
         })
         .catch((err) => {
           if(err.error){
@@ -252,7 +257,8 @@ export default {
     contentChange(length) {
       !this.hideType.includes(this.pageData.type) &&
         this.$refs.original.contentChange(length);
-      this.$refs.submit.saveToDraftBaseDebounce("automatic")
+      this.$refs.submit.saveToDraftBaseDebounce("automatic");
+      this.drafts = [];
     },
     // 提交和保存时获取各组件数据
     readyData(submitFn) {
@@ -289,13 +295,14 @@ export default {
 @import "../../publicModules/base";
 
 .article-box {
+  margin-bottom: 5px;
   @height: 3rem;
   @padding: 1rem;
   @boxHeaderWidth: 4rem;
   @boxOptionWidth: 14rem;
   height: @height;
   line-height: @height;
-  padding-left: @boxHeaderWidth;
+  // padding-left: @boxHeaderWidth;
   padding-right: @boxOptionWidth + 0.5rem;
   width: 100%;
   background-color: #d9edf7;
@@ -305,17 +312,23 @@ export default {
     color: @primary;
     font-size: 1.2rem;
     font-weight: 700;
-    position: absolute;
-    top: 0;
-    left: 0;
+    display: inline-block;
+    // position: absolute;
+    // top: 0;
+    // left: 0;
     height: @height;
     line-height: @height;
     width: @boxHeaderWidth;
     text-align: center;
   }
+  .des-type{
+    width: auto;
+    margin-right: 10px;
+  }
   .article-box-text{
     font-size: 1.3rem;
-    .hideText(@line: 1);
+     display: inline-block;
+    // .hideText(@line: 1);
   }
   .article-box-option{
     position: absolute;
@@ -379,7 +392,9 @@ export default {
     margin-right: -15px;
     margin-left: -15px;
 }
+.des-type{
 
+}
 .col-md-9 {
   position: relative;
   min-height: 1px;

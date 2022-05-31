@@ -35,9 +35,10 @@
 <script>
 import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import { sweetError } from "../../lib/js/sweetAlert.js";
-import { timeFormat } from "../../lib/js/tools";
+import { timeFormat, addUrlParam } from "../../lib/js/tools";
 import {debounce} from '../../lib/js/execution';
 // import { screenTopWarning } from "../../lib/js/topAlert";
+// import {getRequest, timeFormat, addUrlParam} from "../../lib/js/tools";
 
 export default {
   props: {
@@ -117,6 +118,7 @@ export default {
     clearInterval(this.setInterval)
   },
   methods: {
+    addUrlParam,
     checkString: NKC.methods.checkData.checkString,
     checkEmail: NKC.methods.checkData.checkEmail,
     visitUrl: NKC.methods.visitUrl,
@@ -173,8 +175,8 @@ export default {
       }
       // setTimeout(() => {
         this.saveToDraftBase("automatic")
-          // .then(() => {
-          //   this.autoSaveToDraft();
+          // .then((res) => {
+            
           // })
           .catch((data) => {
             sweetError("草稿保存失败：" + (data.error || data));
@@ -244,16 +246,17 @@ export default {
             this.oldContentLength = data.draft?.c?.length;
             this.oldContent = data.draft?.c;
           }
+          console.log(data)
           this.draftId = data.draft.did;
           if (data.draft.cover) {
             this.coverData = "";
             this.coverUrl = "";
             this.cover = data.draft.cover;
           }
-          return Promise.resolve();
+          return Promise.resolve(data);
         })
         .then((res) => {
-          // const postButton = getPostButton();
+          if(!location.search.includes("aid")) this.addUrlParam("aid", res.draft._id);
           if (type === "manual") {
             sweetSuccess("草稿已保存");
           }

@@ -1,5 +1,4 @@
 import {getSocket} from "../lib/js/socket";
-import { DraggableElement } from "../lib/js/draggable";
 
 const socket = getSocket();
 var SubscribeTypes, surveyForms = [], draftId = "", author = {};
@@ -7,14 +6,6 @@ const commonModel = new NKC.modules.CommonModal();
 window.Attachments = undefined;
 window.quotePostApp = undefined;
 $(document).ready(function(){
-	const container = document.querySelector('.credit-panel.bootstrap-modal .modal-content');
-  const heder = document.querySelector('.credit-panel .modal-header');
-  // 设置拖动效果
-	const dialog = new DraggableElement(
-    container,
-    heder
-  );
-	dialog.setPositionCenter()
   new Promise(function(resolve, reject) {
   	if(NKC.configs.isApp) {
   		setTimeout(function() {
