@@ -15,8 +15,8 @@ if data.cat
 //-  -query += `&s=${data.s}`;
 if showPagingDigestButton
   .paging-button
-    a.radius-left.button(href=`${state.url}` class=!data.d?"active": "" data-type="reload") 全部
-    a.radius-right.button(href=`${state.url}?d=true${query}` class=data.d?"active": "" data-type="reload") 精选
+    a.radius-left.button(href=`${remoteState.url}` class=!data.d?"active": "" data-type="reload") 全部
+    a.radius-right.button(href=`${remoteState.url}?d=true${query}` class=data.d?"active": "" data-type="reload") 精选
 if showPagingSortButton
   .paging-button
     a.radius-left.button(href=`?page=${page}${query}&s=tlm` class=data.s!=='toc'? "active": '' data-type="reload") 复序
@@ -51,7 +51,7 @@ if pageCount > 1
     ul(style='margin: 0')
       if min !== 0
         li
-          a(href=`${state.url}?page=${0}${skipId || ''}${query}` data-type="reload") 1
+          a(href=`${remoteState.url}?page=${0}${skipId || ''}${query}` data-type="reload") 1
         if min > 1
           li ...
       -for(let i = 0; i < pageCount; i++)
@@ -60,12 +60,12 @@ if pageCount > 1
           if(page === i)
             -active = 'active';
           li(class=active)
-            a(href=`${state.url}?page=${i}${skipId || ''}${query}` data-type="reload")= i+1
+            a(href=`${remoteState.url}?page=${i}${skipId || ''}${query}` data-type="reload")= i+1
       if max < pageCount - 1
         if max < pageCount - 2
           li ...
         li
-          a(href=`${state.url}?page=${pageCount - 1}${skipId || ''}${query}` data-type="reload")= pageCount
+          a(href=`${remoteState.url}?page=${pageCount - 1}${skipId || ''}${query}` data-type="reload")= pageCount
       if showPagingInput && (max < pageCount - 1 || min !== 0)
         li
           | 跳转到
@@ -73,4 +73,4 @@ if pageCount > 1
           |页
           button(
             id="paging_nav_button"
-            onclick=`var newPage = Number($("#paging_nav_input").val());openToNewLocation('${state.url}?page='+(newPage>0?newPage-1:0)+'${skipId || ''}${query}')`) 确定
+            onclick=`var newPage = Number($("#paging_nav_input").val());openToNewLocation('${remoteState.url}?page='+(newPage>0?newPage-1:0)+'${skipId || ''}${query}')`) 确定

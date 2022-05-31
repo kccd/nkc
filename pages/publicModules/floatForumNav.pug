@@ -49,8 +49,8 @@ if !isIncluded('floatForumNav')
         .float-forum-header=title
         .float-forum-container
           for f , index in arr
-            -var {fid, displayName, cid} = f;
-            a.float-forum-item(href=tools.getUrl('forumHome', fid) + (cid?`?cat=${cid}`:'')
+            -var {fid, displayName, cid, url = ''} = f;
+            a.float-forum-item(href=url
               data-global-mouseover="showForumPanel"
               data-global-mouseout="hideForumPanel"
               data-global-data=objToStr({fid})

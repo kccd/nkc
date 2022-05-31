@@ -1,6 +1,38 @@
 if creditPost && creditPost.credits && creditPost.credits.length > 0
   .nkcpanel.ThreadPostCredits
-    for c,index in creditPost.credits
+
+    -var {kcb = [], xsf = []} = creditPostData || {};
+
+    -kcb = kcb.concat(xsf);
+
+    if kcb && kcb.length > 0
+      for k in kcb
+        .ThreadPostCreditItem
+          span.TPCQ!= `${(k.number > 0 ? '+' : '')}${k.number} &nbsp;`
+          span.TPCType=`${k.name} `
+            | &nbsp;&nbsp;
+          span.TPCIA
+            a(href=k.userHome style='text-decoration: none;'
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: k.uid})
+            )
+              img.TPCIAI(src=k.avatar)
+              span.TPCIssuer &nbsp;#{k.username} &nbsp;&nbsp;
+          span.TPCDate=` ${format(`YYYY/MM/DD`, k.toc)} `
+          span.TPCReason #{k.description}
+
+
+          if k.type === 'xsf' && data.user && data.permissions.cancelXsf
+            a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${creditPost.pid}", ${k._id})`) 撤销
+          if k.type === 'kcb' && data.user && data.permissions.modifyKcbRecordReason
+            if !k.hide
+              a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${creditPost.pid}", ${k._id}, true)`) 屏蔽
+            else
+              a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${creditPost.pid}", ${k._id}, false)`) 取消屏蔽
+
+
+    //-for c,index in creditPost.credits
       .ThreadPostCreditItem
         -var number = c.num;
         if c.type === "creditKcb"
@@ -21,9 +53,9 @@ if creditPost && creditPost.credits && creditPost.credits.length > 0
             span.TPCIssuer &nbsp;#{c.fromUser.username} &nbsp;&nbsp;
         span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
         span.TPCReason #{c.description}
-        if c.type === 'xsf' && data.user && permission('cancelXsf')
+        if c.type === 'xsf' && data.user && ctx.permission.cancelXsf
           a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${creditPost.pid}", ${c._id})`) 撤销
-        if c.type === 'creditKcb' && data.user && permission('modifyKcbRecordReason')
+        if c.type === 'creditKcb' && data.user && ctx.permissions.modifyKcbRecordReason
           if !c.hideDescription
             a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${creditPost.pid}", ${c._id}, true)`) 屏蔽
           else

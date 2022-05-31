@@ -1024,6 +1024,9 @@ userSchema.methods.extendGrade = async function() {
 	  // 如果未找到对应的用户等级（通常发生在删除了积分值为0的配置）时，读取最小等级
 	  grade = await UsersGradeModel.findOne().sort({score: 1});
   }
+  if(grade) {
+    grade.iconUrl = await UsersGradeModel.getIconUrl(grade._id);
+  }
 	return this.grade = grade;
 };
 /*

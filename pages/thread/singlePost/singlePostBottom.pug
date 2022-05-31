@@ -30,7 +30,7 @@ if !isIncluded('singlePostBottom')
       .single-post-bottom-item
         .post-vote-container
           +singlePostVote(pid, vote, voteUp)
-      if permission('creditKcb')
+      if data.permissions && data.permissions.creditKcbPost
         .single-post-bottom-item(onclick=`credit('${pid}', 'kcb')` title='鼓励')
           .fa.fa-cny.credit-kcb
       .single-post-bottom-item(data-type='share' data-share-type='post' data-share-id=pid title='分享')

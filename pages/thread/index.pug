@@ -3,11 +3,12 @@ extends ../bootstrap_base.pug
 block title
   -let showEditor = true;
   -const thread = data.thread;
-  title= `${thread.firstPost.t} - ${state.serverSettings.websiteName}`
+
+  title= data.pageTitle
   meta#replytarget(value=`${data.replyTarget}`)
 
-  -const disablePost = permissionsOr(["movePostsToRecycle", "movePostsToDraft"]) && data.isModerator;
-  -const unblockPosts = permission("unblockPosts") && data.isModerator;
+  -const disablePost = data.permissions.disablePost;
+  -const unblockPosts = data.permissions.unblockPosts;
 
   if (thread.firstPost&&thread.firstPost.c)
     -var processed=thread.firstPost.c.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
@@ -19,8 +20,8 @@ block title
     +includeCSS("/jquery-ui-1.10.4.custom.css")
     +includeJS("/external_pkgs/imageToBig/preview.js")
     //include ../publicModules/plyr/plyr.css.pug
-  if !state.isApp
-    style=`body{background-color: ${(data.user?data.user.color:null) || state.serverSettings.backgroundColor}!important;`
+  if !remoteState.isApp
+    style=`body{background-color: ${(data.user?data.user.color:null) || data.serverBackgroundColor}!important;`
 
   style.
     #wrap {
@@ -35,7 +36,7 @@ block title
   include ../publicModules/floatForumNav
 
 block content
-  if !(state.isApp && state.platform === 'reactNative')
+  if !(remoteState.isApp && remoteState.platform === 'reactNative')
     include ../publicModules/mobile_drawer/right_drawer
   -const moveThread = data.isModerator || data.userOperationsId.includes('moveThread');
   -const {exactPost} = data
@@ -51,10 +52,10 @@ block content
           .m-b-1
             .row
               .thread-div
-                -const showManagement = data.user && data.isModerator && permissionsOr(['pushThread', 'moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']);
+                -const showManagement = data.permissions.showManagement;
                 .col-xs-12.col-md-12.thread-nav.p-t-1.p-b-2
                   .thread-nav-left.hidden-xs
-                    a.nav-link(href='/?t=home' title=state.serverSettings.brief) 主页
+                    a.nav-link(href='/?t=home' title=data.serverBrief) 主页
                     for n in data.threadNav
                       -const {fid, cid, name} = n;
                       span.nav-delimiter >
@@ -99,7 +100,7 @@ block content
                           div.managementDiv.m-b-1(style='display: none;margin-top: 1rem;')
                             .form-inline
                               //- 设置置顶
-                              if permission('pushThread')
+                              if data.permissions.pushThread
                                 button.btn.btn-default.btn-sm(onclick=`pushBlock('${data.thread.tid}')`) 推送到模块
                               if data.isModerator && data.userOperationsId.includes('toppedThread') && !thread.topped
                                 button.btn.btn-default.btn-sm#threadTop(onclick=`setTopped('${data.thread.tid}')`) 专业置顶
@@ -135,9 +136,9 @@ block content
                                 button.btn.btn-default.btn-sm(onclick=`closeThread('${data.thread.tid}')`) 关闭主题
                               if data.userOperationsId.includes('openThread') && thread.closed
                                 button.btn.btn-default.btn-sm(onclick=`openThread('${data.thread.tid}')`) 开放主题
-                              if permission("moveThreads")
+                              if data.permissions.moveThreads
                                 button.btn-sm.btn.btn-default(onclick="moveThread()") 移动
-                              if permissionsOr(["movePostsToDraft", "movePostsToRecycle"])
+                              if data.permissions.toDraftOrToRecycle
                                 button.btn-sm.btn.btn-danger(onclick="deleteThread()") 退修/删除
                             if data.thread.type === "fund"
                               h5.text-danger 基金类文章无法退修
@@ -223,12 +224,12 @@ block content
                               data-global-mouseout="hideUserPanel"
                               data-global-data=objToStr({uid: thread.uid})
                               target="_blank")
-                              img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+                              img(src=data.authorAvatarUrl style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
                               span= ` ${thread.firstPost.user.username}`
                           else
                             img(src=anonymousInfo.avatar style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
                             span.anonymous-name= ` ${anonymousInfo.username}`
-                          span(style='color: #555555;margin-right:5px' title=format(`YYYY-MM-DD HH:mm:ss`, thread.toc))= ` ${thread.toc.toLocaleDateString()}`
+                          span(style='color: #555555;margin-left:5px;margin-right:5px' title=format(`YYYY-MM-DD HH:mm:ss`, thread.toc))= format(`YYYY/MM/DD`, thread.toc)
                           if thread.firstPost.originState && thread.firstPost.originState !== "0"
                             -var levelText = getOriginLevel(thread.firstPost.originState);
                             if thread.firstPost.originState == "3" || thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
@@ -316,6 +317,7 @@ block content
 
                         +postEditTime(post.toc, post.tlm)
                         -const creditPost = data.thread.firstPost;
+                        -const creditPostData = data.firstPostCredit;
                         include ./postCredits
                       else
                         div.thread-content(style='max-height: 10rem;')
@@ -323,6 +325,7 @@ block content
                           div.ThreadPostBody#thread-content!= post.c
                           +postEditTime(post.toc, post.tlm)
                           -const creditPost = data.thread.firstPost;
+                          -const creditPostData = data.firstPostCredit;
                           include ./postCredits
                         .text-center
                           .showThreadContentBtn(onclick='showThreadContent()' hide-text='收起') 加载全文
@@ -362,7 +365,7 @@ block content
                             .pointer.inline-block(style="color: #aaa;margin-right: 2px;" onclick="showAttachments()")
                               .fa.fa-file-o
                               span &nbsp;查看附件
-                          if !thread.firstPost.anonymous && permission('creditKcb') && data.user && thread.firstPost.uid !== data.user.uid
+                          if data.permissions.creditKcb
                             .single-post-bottom-item
                               .fa.fa-cny.credit-kcb(title='鼓励' style='cursor:pointer;' onclick=`credit("${thread.firstPost.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励&nbsp;
                           .single-post-bottom-item(data-type='share' data-share-type='post' data-share-id=thread.firstPost.pid title='分享')
@@ -503,13 +506,13 @@ block content
                 | 。
           -var floatCategories = [];
           for f in data.threadNav
-            -var {fid, name, cid} = f;
+            -var {fid, name, cid, url} = f;
             if cid
-              -floatCategories.push({fid, cid, displayName: name});
+              -floatCategories.push({fid, cid, displayName: name, url});
           -var floatParentForums = [], floatParentForumsId = [];
           for f in data.forumsNav
             if f[0] && !floatParentForumsId.includes(f[0].fid)
-              -floatParentForums.push({fid: f[0].fid, displayName: f[0].displayName});
+              -floatParentForums.push({fid: f[0].fid, displayName: f[0].displayName, url: f[0].url});
               -floatParentForumsId.push(f[0].fid);
               //所属专业 所属分类 上级专业 同级专业
           +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
@@ -558,8 +561,8 @@ block content
 
     include ../debug_output.pug
     include ../publicModules/post_warning
-    if state.userColumn
-      -const column = state.userColumn
+    if data.userColumn
+      -const column = data.userColumn
       include ../publicModules/toColumn/toColumn
 
 block scripts
@@ -574,15 +577,15 @@ block scripts
   +includeJS('/shop/shop.js')
   +includeJS("/publicModules/survey/form.js")
   include ../publicModules/nkcSource
-  include ../publicModules/selectResource/selectResource
-  include ../publicModules/sticker/selectSticker
-  include ../publicModules/selectDraft/selectDraft
-  include ../publicModules/floatForumPanel/floatForumPanel
-  include ../publicModules/floatUserPanel/floatUserPanel.2.pug
-  include ../publicModules/insertHideContent/insertHideContent
+  //include ../publicModules/selectResource/selectResource
+  //include ../publicModules/sticker/selectSticker
+  //include ../publicModules/selectDraft/selectDraft
+  //include ../publicModules/floatForumPanel/floatForumPanel
+  //include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  //include ../publicModules/insertHideContent/insertHideContent
   //-include ../publicModules/highlight/highlight_editor
   //include ../publicModules/highlight/highlight
-  include ../publicModules/complaint/complaintBox
+  //include ../publicModules/complaint/complaintBox
   include ../publicModules/crop/crop
   include ../publicModules/moment
   include ../publicModules/hidePost/hidePost
@@ -598,10 +601,10 @@ block scripts
   include ../publicModules/commonModal/commonModal
 
   //- 违规记录模块 NKC.modules.violationRecord
-  if permission("violationRecord")
+  if data.permissions.violationRecord
     include ../publicModules/violationRecord/violationRecord.pug
   include ../MathJax.pug
-  if permission("viewNote")
+  if data.permissions.viewNote
     include ../publicModules/NKCHighlighter/NKCHighlighter
   //- include ../publicModules/postNotes/postNotes
   if data.attachmentsCount > 0
@@ -616,10 +619,10 @@ block scripts
       script=`NKC.configs.fid = '${fid}';`
   if data.user && showEditor
     +includeJS("/thread/initPostInput.js")
-  if state.userColumn && !data.addedToColumn && showEditor
+  if data.userColumn && !data.addedToColumn && showEditor
     +includeJS("/publicModules/toColumn/selectCategories.js")
   +includeJS("/thread/comments.js")
-  if permission("getPostAuthor")
+  if data.permissions.getPostAuthor
     include ../publicModules/floatUserPanel/userInfo
   //include ../publicModules/imageViewer
   +includeJS("/thread/index.js")

@@ -22,7 +22,7 @@ if !isIncluded('formVote')
           div
             for u in form.supporters
               a.m-r-05(
-                href=tools.getUrl('userHome', u.uid)
+                href=u.userHome
                 target="_blank"
                 data-global-mouseover="showUserPanel"
                 data-global-mouseout="hideUserPanel"
@@ -34,7 +34,7 @@ if !isIncluded('formVote')
           div
             for u in form.objectors
               a.m-r-05(
-                href=tools.getUrl('userHome', u.uid)
+                href=u.userHome
                 target="_blank"
                 data-global-mouseover="showUserPanel"
                 data-global-mouseout="hideUserPanel"

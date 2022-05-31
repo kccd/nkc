@@ -2,6 +2,7 @@ const settings = require('../settings');
 const PATH = require('path');
 const nkcRender = require('../nkcModules/nkcRender');
 const customCheerio = require('../nkcModules/nkcRender/customCheerio');
+const tools = require("../nkcModules/tools");
 const mongoose = settings.database;
 const {Schema} = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
@@ -950,6 +951,9 @@ postSchema.statics.extendPosts = async (posts, options) => {
     let users = await UserModel.find({uid: {$in: [...uid]}});
     if(o.userGrade) {
       grades = await UsersGradeModel.find().sort({score: -1});
+      for(const g of grades) {
+        g.iconUrl = await UsersGradeModel.getIconUrl(g._id);
+      }
     }
     users.map(user => {
       usersObj[user.uid] = user;
@@ -1495,7 +1499,9 @@ postSchema.statics.filterPostsInfo = async (posts) => {
         username: anonymousUser.username,
         avatar: anonymousUser.avatarUrl,
         gradeId: null,
+        gradeIconUrl: null,
         gradeName: null,
+        userHome: null,
         banned: false,
       }
     } else {
@@ -1504,6 +1510,8 @@ postSchema.statics.filterPostsInfo = async (posts) => {
         username: post.user.username,
         avatar: tools.getUrl('userAvatar', post.user.avatar),
         gradeId: post.user.grade._id,
+        gradeIconUrl: post.user.grade.iconUrl,
+        userHome: tools.getUrl('userHome', post.user.uid),
         gradeName: post.user.grade.displayName,
         banned: post.user.certs.includes('banned'),
       }
@@ -1514,9 +1522,11 @@ postSchema.statics.filterPostsInfo = async (posts) => {
       quote = {
         uid: post.quotePost.uid || null,
         username: post.quotePost.uid? post.quotePost.username: anonymousUser.username,
+        userHome: post.quotePost.uid? tools.getUrl('userHome', post.quotePost.uid): '',
         floor: post.quotePost.step,
         content: post.quotePost.c,
         pid: post.quotePost.pid,
+        postUrl: tools.getUrl('post', post.quotePost.pid, true),
       };
     }
 
@@ -1528,6 +1538,7 @@ postSchema.statics.filterPostsInfo = async (posts) => {
           _id,
           uid: fromUser.uid,
           username: fromUser.username,
+          userHome: tools.getUrl('userHome', fromUser.uid),
           avatar: tools.getUrl('userAvatar', fromUser.avatar),
           description,
           toc,
@@ -1566,6 +1577,7 @@ postSchema.statics.filterPostsInfo = async (posts) => {
       digest: post.digest,
       hide: post.hidePost || post.hide,
       cRead: ['r', 'rw'].includes(post.comment),
+      url: tools.getUrl('post', post.pid),
       user,
       quote,
       kcb,
@@ -2133,7 +2145,7 @@ postSchema.methods.noticeAuthorReply = async function() {
                 pid: quotePost.pid,
               }
             });
-    
+
             await message.save();
             return await socket.sendMessageToUser(message._id);
           }

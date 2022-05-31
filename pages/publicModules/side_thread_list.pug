@@ -14,11 +14,17 @@ if !isIncluded('publicModules/side_thread_list.pug')
                   data-global-data=objToStr({fid: t.forums[0].fid})
                 )= t.forums[0].displayName
                 if !t.firstPost.anonymous
-                  a(href=`/u/${t.uid}`
+                  a(
+                    href=`/u/${t.uid}`
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    data-global-data=objToStr({uid: t.uid})
+                    )=t.firstPost.user.username
+                  //-a(href=`/u/${t.uid}`
                     data-global-mouseover="showUserPanel"
                     data-global-mouseout="hideUserPanel"
                     data-global-data=objToStr({uid: t.firstPost.user.uid})
-                  )= t.firstPost.user.username
+                  //)= t.firstPost.user.username
                 else
                   span=anonymousInfo.username
                 +fromNow(t.toc)

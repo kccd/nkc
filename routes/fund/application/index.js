@@ -48,6 +48,9 @@ applicationRouter
     );
 		await applicationForm.extendApplicationFormInfo(state.uid, accessForumsId);
 		data.targetUserInFundBlacklist = await db.FundBlacklistModel.inBlacklist(applicationForm.uid);
+    data.permissions = {
+      modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
+    }
     ctx.template = 'fund/applicationForm/applicationForm.pug';
 		await next();
 	})

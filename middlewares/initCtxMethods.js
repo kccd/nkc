@@ -6,6 +6,20 @@ module.exports = async (ctx, next) => {
     if(!ctx.data.userOperationsId) ctx.data.userOperationsId = [];
     return ctx.data.userOperationsId.includes(o);
   };
+  ctx.permissionsOr = (operationsId) => {
+    ctx.data.userOperationsId = ctx.data.userOperationsId || [];
+    for(const id of operationsId) {
+      if(ctx.data.userOperationsId.includes(id)) return true;
+    }
+    return false;
+  };
+  ctx.permissionsAnd = (operationsId) => {
+    ctx.data.userOperationsId = ctx.data.userOperationsId || [];
+    for(const id of operationsId) {
+      if(!ctx.data.userOperationsId.includes(id)) return false;
+    }
+    return true;
+  };
 
   // 设置cookie
   // @param {String} key cookie名

@@ -71,7 +71,6 @@ NKC.modules.NKCHL = class {
               if($(window).width() < 768) {
                 NKC.methods.visitUrl(`/note?content=${content}&targetId=${self.id}&type=${self.type}&offset=${node.offset}&length=${node.length}`, true);
               } else {
-                debugger
                 self.newNote({
                   id: "",
                   content,

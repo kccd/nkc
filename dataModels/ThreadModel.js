@@ -829,7 +829,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       threadCategoryObj[nodeId] = threadCategories[i];
     }
   }
-  
+
   if(o.firstPost || o.lastPost) {
     const posts = await PostModel.find({pid: {$in: [...postsId]}}, {
       pid: 1,
@@ -864,7 +864,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         post.abstractCn = nkcRender.replaceLink(post.abstractCn);
         post.abstractEn = nkcRender.replaceLink(post.abstractEn);
       }
-  
+
       postsObj[post.pid] = post;
     });
 
@@ -2265,4 +2265,100 @@ threadSchema.statics.getThreadInfoByColumn = async function(columnPost) {
   };
 }
 
+
+threadSchema.statics.extendShopInfo = async function(praps) {
+  const ShopGoodsModel = mongoose.model('shopGoods');
+  // const ShopCartModel = mongoose.model('shopCarts');
+  const IPModel = mongoose.model('ips');
+  // const UserModel = mongoose.model('users');
+  const SettingModel = mongoose.model('settings');
+  const {tid, oc, uid, authLevel, address} = praps;
+
+  let product = null;
+  let vipDiscount = false;
+  let vipDisNum = 0;
+  let userAddress = "";
+  let closeSaleDescription = '';
+
+  const products = await ShopGoodsModel.find({tid: tid, oc: oc});
+  let productArr = await ShopGoodsModel.extendProductsInfo(products);
+  product = productArr[0];
+  // 判断是否使用会员价
+  let vipNum = 100;
+  if(product.vipDiscount) {
+    vipDiscount = true;
+    for(let v = 0; v < product.vipDisGroup.length; v ++) {
+      if(uid && Number(authLevel) === Number(product.vipDisGroup[v].vipLevel)) {
+        vipNum = product.vipDisGroup[v].vipNum;
+      }
+    }
+    vipDisNum = vipNum;
+  }else{
+    vipDiscount = false;
+    vipDisNum = vipNum;
+  }
+  /*// 选定规格
+  let paId = 0;
+  for(let a = 0; a < product.productParams.length; a ++){
+    if(paraId === product.productParams[a]._id){
+      paId = a;
+    }
+  }
+  data.paId = paId;
+  data.paraId = paraId;*/
+
+  /*if(uid) {
+    data.shopInfo = {
+      cartProductCount: await ShopCartModel.getProductCount(uid)
+    }
+  }*/
+  // 获取用户地址信息
+  if(uid){
+    try{
+      const ipInfo = await IPModel.getIPInfoByIP(address);
+      userAddress = ipInfo.location;
+    } catch(err) {}
+  }
+  try{
+    await SettingModel.checkShopSellerByUid(product.uid);
+  } catch(err) {
+    closeSaleDescription = err.message || err.stack || err.toString();
+  }
+  return {
+    closeSaleDescription,
+    userAddress,
+    product,
+    vipDiscount,
+    vipDisNum,
+    paId: 0,
+  }
+}
+
+threadSchema.statics.extendFundInfo = async function(props) {
+  const {tid, uid, accessForumsId, displayFundApplicationFormSecretInfoPermission = false} = props;
+  const FundApplicationFormModel = mongoose.model('fundApplicationForms');
+  const SettingModel = mongoose.model('settings');
+  const FundBlacklistModel = mongoose.model('fundBlacklist')
+  const applicationForm = await FundApplicationFormModel.findOnly({tid});
+  await applicationForm.extendApplicationFormBaseInfo(uid);
+  await applicationForm.extendApplicationFormInfo(uid, accessForumsId);
+  const fundSettings = await SettingModel.getSettings('fund');
+  const fund = applicationForm.fund;
+  const fundName = fundSettings.fundName;
+  const userFundRoles = await fund.getUserFundRoles(uid);
+  const targetUserInFundBlacklist = await FundBlacklistModel.inBlacklist(applicationForm.uid);
+  await applicationForm.hideApplicationFormInfoByUserId(uid, displayFundApplicationFormSecretInfoPermission);
+  const auditComments = applicationForm.auditComments;
+  const _applicationForm = applicationForm.toObject();
+  _applicationForm.auditComments = auditComments;
+  return {
+    applicationForm: _applicationForm,
+    fund,
+    fundName,
+    userFundRoles,
+    targetUserInFundBlacklist,
+  }
+}
+
 module.exports = mongoose.model('threads', threadSchema);
+

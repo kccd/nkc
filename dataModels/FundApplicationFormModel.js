@@ -514,6 +514,7 @@ fundApplicationFormSchema.methods.extendApplicant = async function(options={}) {
 	const {extendSecretInfo = true} = options;
 	const FundApplicationUserModel = mongoose.model('fundApplicationUsers');
 	const FundBlacklistModel = mongoose.model('fundBlacklist');
+  const tools = require('../nkcModules/tools');
 	const applicant= await FundApplicationUserModel.findOne({applicationFormId: this._id, uid: this.uid});
 	if(applicant) {
 		await applicant.extendUser();
@@ -523,24 +524,33 @@ fundApplicationFormSchema.methods.extendApplicant = async function(options={}) {
 		}
     applicant.inFundBlacklist = await FundBlacklistModel.inBlacklist(applicant.uid);
 	}
+  const _applicant = applicant.toObject();
+  _applicant.userHome = tools.getUrl('userHome', applicant.uid);
+  _applicant.userAvatar = tools.getUrl('userAvatar', applicant.user.avatar);
 	return this.applicant = applicant;
 };
 
 fundApplicationFormSchema.methods.extendMembers = async function() {
+  const tools = require('../nkcModules/tools');
   const FundApplicationUserModel = mongoose.model('fundApplicationUsers');
 	const applicationUsers = await FundApplicationUserModel.find({applicationFormId: this._id, uid: {$ne: this.uid}, removed: false}).sort({toc: 1});
 
 	return this.members = await Promise.all(applicationUsers.map(async aUser => {
 		await aUser.extendUser();
-		return aUser.toObject();
+		const u = aUser.toObject();
+    u.userHome = tools.getUrl('userHome', u.uid);
+    return u;
 	}));
 };
 
 fundApplicationFormSchema.methods.extendForum = async function() {
 	let forum;
+  const tools = require('../nkcModules/tools');
 	if(this.category) {
 	  const ForumModel = mongoose.model('forums');
-		forum = await ForumModel.findOne({fid: this.category});
+		const _forum = await ForumModel.findOne({fid: this.category});
+    forum = _forum.toObject();
+    forum.url = tools.getUrl('forumHome', forum.fid);
 	}
 	return this.forum = forum;
 };
@@ -590,6 +600,7 @@ fundApplicationFormSchema.methods.extendThreads = async function() {
 
 fundApplicationFormSchema.methods.extendSupporters = async function() {
 	const UserModel = mongoose.model('users');
+  const tools = require('../nkcModules/tools');
 	const supporters = [];
   const users = await UserModel.find({uid: {$in: this.supportersId}});
   const usersObj = {};
@@ -599,7 +610,9 @@ fundApplicationFormSchema.methods.extendSupporters = async function() {
   for(const uid of this.supportersId) {
     const user = usersObj[uid];
     if(user && !supporters.includes(user)) {
-      supporters.push(user);
+      const _user = user.toObject();
+      _user.userHome = tools.getUrl('userHome', _user.uid);
+      supporters.push(_user);
     }
   }
 	return this.supporters = supporters;
@@ -607,10 +620,13 @@ fundApplicationFormSchema.methods.extendSupporters = async function() {
 
 fundApplicationFormSchema.methods.extendObjectors = async function() {
 	const UserModel = mongoose.model('users');
+  const tools = require('../nkcModules/tools');
 	const objectors = [];
 	for(let uid of this.objectorsId) {
 		const user = await UserModel.findOnly({uid});
-		objectors.push(user);
+    const _user = user.toObject();
+    _user.userHome = tools.getUrl('userHome', _user.uid);
+		objectors.push(_user);
 	}
 	return this.objectors = objectors;
 };
