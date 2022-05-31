@@ -216,7 +216,7 @@ shareSchema.statics.ensureEffective = async function(token, id) {
       case 'fund': reg = RegExp(/\/fund\/list\/([0-9a-zA-Z]*)/ig);break;
       case 'fundForm': reg = RegExp(/\/fund\/a\/([0-9a-zA-Z]*)/ig);break;
       case 'article': reg = RegExp(/\/m\/([0-9]*)\/a\/([0-9a-zA-Z]*)/ig);break;
-      case 'comment': reg = RegExp(/\/m\/([0-9]*)\/a\/([0-9a-zA-Z]*)/ig);break;
+      case 'comment': reg = RegExp(/\/comment\/([0-9a-zA-Z]*)/ig);break;
       default: throwErr(500, `分享类型错误`);
     }
     const arr = reg.exec(shareUrl);
@@ -411,12 +411,12 @@ shareSchema.methods.getShareUrl = async function() {
   } else if(tokenType === 'fundForm') {
     return `/fund/a/${targetId}${t}`;
   } else if(tokenType === 'comment') {
-    let comment = await CommentModel.findOnly({_id: targetId});
-    comment = (await CommentModel.getCommentInfo([comment]))[0];
-    let url  = comment.commentUrl;
-    const arr = segmentation(url, '?');
-    url = `${arr[0]}token=${token}&${arr[1]}`;
-    return url;
+    // let comment = await CommentModel.findOnly({_id: targetId});
+    // comment = (await CommentModel.getCommentInfo([comment]))[0];
+    // let url  = comment.commentUrl;
+    // const arr = segmentation(url, '?');
+    // url = `${arr[0]}token=${token}&${arr[1]}`;
+    return `/comment/${targetId}${t}`;
   } else if(tokenType === 'article') {
     let article = await ArticleModel.findOnly({_id: targetId});
     article = (await ArticleModel.getArticlesInfo([article]))[0];

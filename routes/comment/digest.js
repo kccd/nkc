@@ -2,6 +2,7 @@ const router = require('koa-router')();
 
 router
   .post('/', async (ctx, next) => {
+    //评论加精，加精奖励科创币
     const {data, db, body, permission, params, nkcModules} = ctx;
     const {user} = data;
     const {_id: cid} = params;
@@ -78,6 +79,7 @@ router
     await next();
   })
   .del('/', async (ctx, next) => {
+    //评论取消加精，取消加精后扣除科创币
     const {data, params, permission, db} = ctx;
     const {_id: cid} = params;
     if(!permission('unDigestComment')) ctx.throw(401, '权限不足');

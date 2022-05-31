@@ -911,16 +911,24 @@ messageSchema.statics.getParametersData = async (message) => {
     votesId = votesId.map(v => {
       return mongoose.Types.ObjectId(v);
     });
-    const {post: postSource} = await PostsVoteModel.getVoteSources();
-    const votes = await PostsVoteModel.find({source: postSource, _id: {$in: votesId}}, {
-      sid: 1, uid: 1
+    const {post: postSource, article: articleSource, comment: commentSource} = await PostsVoteModel.getVoteSources();
+    const votes = await PostsVoteModel.find({source: {$in: [postSource, articleSource, commentSource]}, _id: {$in: votesId}}, {
+      sid: 1, uid: 1, source: 1,
     });
     if(!votes.length) return null;
     const usersId = [];
     let pid = '';
+    let aid = '';
+    let cid = '';
     votes.map(v => {
       usersId.push(v.uid);
-      pid = v.sid;
+      if(v.source === postSource) {
+        pid = v.sid;
+      } else if(v.source === articleSource){
+        aid = v.sid;
+      } else if(v.source === commentSource) {
+        cid = v.sid;
+      }
     });
     const users = await UserModel.find({uid: {$in: usersId}}, {username: 1});
     if(!users.length) return null;
@@ -931,15 +939,38 @@ messageSchema.statics.getParametersData = async (message) => {
     };
     // 目标post
     const post = await PostModel.findOne({pid}, {type: 1, tid: 1, t: 1, pid});
-    if(!post) return null;
-    // 如果是文章
-    if(post.type === "thread") {
-      parameters.LVTarget = getUrl('thread', post.tid);
-      parameters.LVTargetDesc = `文章《${post.t}》`;
-    } else if(post.type === "post") {
-      parameters.LVTarget = await PostModel.getUrl(post);
-      parameters.LVTargetDesc = `回复(点击查看)`;
+    // 目标 article
+    let article = await ArticleModel.findOne({_id: aid});
+    if(article) {
+      article = (await ArticleModel.getArticlesInfo([article]))[0];
     }
+    // 目标 comment
+    let comment = await CommentModel.findOne({_id: cid});
+    if(comment) {
+      comment = (await CommentModel.getCommentInfo([comment]))[0];
+    }
+    if(!post && !article && !comment) {
+      return null;
+    }
+    let url;
+    let t;
+    if(post) {
+      if(post.type === 'thread') {
+        url = getUrl('thread', post.tid);
+        t = `文章《${post.t}》`;
+      } else {
+        url = await PostModel.getUrl(post);
+        t = `回复(点击查看)`;
+      }
+    } else if(article) {
+      url = article.url;
+      t = `文章《${article.document.title}》`;
+    } else if(comment) {
+      url = comment.commentUrl;
+      t = `回复(点击查看)`;
+    }
+    parameters.LVTarget = url;
+    parameters.LVTargetDesc = t;
   } else if(type === 'complaintsResolve') {
     // 投诉类型
     const {complaintId} = message.c;

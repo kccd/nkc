@@ -185,7 +185,8 @@ schema.statics.createComment = async (options) => {
   const CommentModel = mongoose.model('comments');
   const ArticlePostModel = mongoose.model('articlePosts');
   const {comment: commentDocumentSource}  = await DocumentModel.getDocumentSources();
-  const cid = await SettingModel.getNewId();
+  //获取新的comment id
+  const cid = await CommentModel.getNewId();
   const document = await DocumentModel.createBetaDocument({
     uid,
     content,
@@ -1055,6 +1056,43 @@ schema.methods.updateCommentsVote = async function() {
     voteUp: upNum,
     voteDown: downNum,
   });
+}
+
+
+/*
+* 获取新的 comment id
+* @return {String}
+* */
+schema.statics.getNewId = async () => {
+  const CommentModel = mongoose.model('comments');
+  const redLock = require('../nkcModules/redLock');
+  const getRedisKeys = require('../nkcModules/getRedisKeys');
+  const {getRandomString} = require('../nkcModules/apiFunction');
+  const key = getRedisKeys('newArticleId');
+  let newId = '';
+  let n = 10;
+  const lock = await redLock.lock(key, 10000);
+  try{
+    while(true) {
+      n -= 1;
+      const _id = getRandomString('a0', 6);
+      const comment = await CommentModel.findOne({
+        _id
+      }, {_id: 1});
+      if(!comment) {
+        newId = _id;
+        break;
+      }
+      if(n === 0) {
+        break
+      }
+    }
+  }catch(err) {}
+  await lock.unlock();
+  if(!newId) {
+    throwErr(500, 'comment id error');
+  }
+  return newId;
 }
 
 module.exports = mongoose.model('comments', schema);

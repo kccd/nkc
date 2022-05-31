@@ -15,7 +15,7 @@ router
     const { aid } = params;
     const {pageSettings, uid} = state;
     const {user} = data;
-    const {page = 0, last_pages, highlight, t, did, redirect} = query;
+    const {page = 0, last_pages, highlight, t, did, redirect, token} = query;
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     let article = await db.ArticleModel.findOnly({_id: aid});
     if(1) {
@@ -27,6 +27,10 @@ router
       // if(data.targetColumn) {
       //   data.ColumnPost = await db.ColumnPostModel.findOne({columnId: data.targetColumn._id, type : 'article', pid: article._id});
       // }
+    }
+    if(token) {
+      //如果存在token就验证token是否合法
+      await db.ShareModel.hasPermission(token, article._id)
     }
     //查找文章的评论盒子
     const articlePost = await db.ArticlePostModel.findOne({sid: article._id, source: article.source});
