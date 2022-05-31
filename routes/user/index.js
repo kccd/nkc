@@ -89,6 +89,13 @@ userRouter
     await next();
   })
   .get('/:uid', async (ctx, next) => {
+    const {db, data, state} = ctx;
+    if(data.targetUser && state.uid && data.targetUser.uid !== state.uid) {
+      await db.UsersGeneralModel.updateUserAccessLogs(state.uid, data.targetUser.uid);
+    }
+    await next();
+  })
+  .get('/:uid', async (ctx, next) => {
     //访问用户个人主页
     //获取用户个人主页信息
     const {params, state, db, data, query, nkcModules} = ctx;
@@ -97,14 +104,14 @@ userRouter
     const {pageSettings} = state;
     const {user} = data;
     // data.complaintTypes = ctx.state.language.complaintTypes;
-  
+
     const {t, page=0, from} = query;
     data.t = t;
-  
+
     const targetUser = await db.UserModel.findById(uid);
     await targetUser.extendGrade();
     data.targetUser = targetUser;
-  
+
     if(state.uid !== targetUser.uid) {
       targetUser.description = nkcRender.replaceLink(targetUser.description);
     }

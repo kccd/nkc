@@ -859,6 +859,14 @@ threadRouter
     ctx.remoteTemplate = 'thread/index.pug';
     await next();
   })
+  .get('/:tid', async (ctx, next) => {
+    const {data, db, state} = ctx;
+    const {thread} = data;
+    if(thread && thread.tid && state.uid) {
+      await db.UsersGeneralModel.updateThreadAccessLogs(state.uid, thread.tid);
+    }
+    await next();
+  })
 	.get('/:tid', async (ctx, next) => {
     return await next();
     const {data, params, db, query, nkcModules, state} = ctx;

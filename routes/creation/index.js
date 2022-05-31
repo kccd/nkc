@@ -12,7 +12,7 @@ const communityRouter = require('./community');
 const columnRouter = require('./column');
 const editorRouter = require('./editor');
 const zoneRouter = require('./zone');
-const detailsRouter = require('./details');
+const homeRouter = require('./home');
 router
   .use('/', async (ctx, next) => {
     const {data, state, db} = ctx;
@@ -35,7 +35,7 @@ router
   .get('/', async (ctx, next) => {
     await next();
   })
-  .use('/:uid', detailsRouter.routes(), detailsRouter.allowedMethods())
+  .use('/home', homeRouter.routes(), homeRouter.allowedMethods())
   .use('/materials', materialsRouter.routes(), materialsRouter.allowedMethods())
   .use('/material', materialRouter.routes(), materialRouter.allowedMethods())
   .use('/categories', categoriesRouter.routes(), categoriesRouter.allowedMethods())
