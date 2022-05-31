@@ -45,7 +45,9 @@ block content
       .hidden#threadForumsId=objToStr({isLastPage: (data.paging.page + 1) === data.paging.pageCount, notes: data.notes, pid: data.thread.oc, tid: data.thread.tid, mainForumsId: data.thread.mainForumsId, categoriesId: data.thread.categoriesId, tcId: data.thread.tcId})
       if data.step
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
-      include ../module_credit
+      //- include ../module_credit
+      #module_credit
+        credit-model(v-show="show" :pid="pid" type="kcb" :kcb="kcb" @close="dialogClose")  
       include ../module_digest
       .row
         .col-xs-12.col-md-9#wrap.box-shadow-panel
