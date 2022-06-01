@@ -1,0 +1,268 @@
+if !isIncluded('publicModules/articlePanel')
+  +includeCSS('/publicModules/articlePanel/articlePanel.css')
+
+  //- style 数据格式
+    {
+      type: String, // 显示样式 abstract: 摘要模式, brief: 简略模式, minimalist: 极简模式
+      cover: String, // left, right
+    }
+
+
+  //- article 数据类型
+    {
+      type: String, // 内容类型
+      id: String, // 内容类型对应的 ID
+      user: {
+        uid: String,
+        avatarUrl: String,
+        homeUrl: String,
+        username: String,
+      },
+      content: {
+        time: Date,
+        coverUrl: String,
+        title: String,
+        url: String,
+        abstract: String,
+        readCount: Number,
+        voteUpCount: Number,
+        replyCount: Number
+      },
+      categories: [
+        {
+          type: String, // 分类类型，如果是forum，那么会添加鼠标悬浮面板
+          id: String,
+          name: String,
+          url: String,
+        }
+      ],
+      pages: [
+        {
+          name: String, // 评论分页名称
+          url: String, // 评论分页链接
+        }
+      ],
+      reply: { // 如果不存在回复则此字段为 null
+        user: {
+          uid: String,
+          avatarUrl: String,
+          homeUrl: String,
+          username: String,
+        },
+        content: {
+          time: Date,
+          url: String,
+          abstract: String,
+        }
+      }
+    }
+
+
+  -var ArticlePanelStyleType = {abstract: 'abstract', brief: 'brief', minimalist: 'minimalist'};
+  -var ArticlePanelStyleCover = {left: 'left', right: 'right'};
+  -var ArticlePanelCategoryType = {forum: 'forum'};
+
+
+  mixin ArticlesPanel(articles, style)
+    -var {type = ArticlePanelStyleType.abstract} = style || {};
+    .articles-panel
+      for article in articles
+        .articles-panel-item(
+          class=`style-${type}`
+          data-article-type=article.type
+          data-article-id=article.id
+          data-checkbox-show='false'
+          )
+          .articles-panel-checkbox
+            input(type='checkbox')
+          +ArticlePanel(article, style)
+
+  mixin ArticlePanel(article, style)
+    -var {type = ArticlePanelStyleType.abstract, cover = ArticlePanelStyleCover.right} = style || {};
+
+    if style.type === ArticlePanelStyleType.minimalist
+      +ArticlePanelXS(article)
+    else if style.type === ArticlePanelStyleType.abstract
+      +ArticlePanelMD(article, style.cover)
+    else if style.type === ArticlePanelStyleType.brief
+      +ArticlePanelSM(article)
+
+  mixin ArticlePanelMD(article, coverPosition)
+    -coverPosition = coverPosition || ArticlePanelStyleCover.right;
+    -var {user, categories, content, reply, pages} = article;
+
+    -var coverClass = '';
+    if content.coverUrl
+      -coverClass = `cover-${coverPosition}`;
+    .article-panel-md(class=coverClass)
+      if coverPosition === ArticlePanelStyleCover.left
+        .article-panel-left
+          .article-panel-cover(style=`background-image: url(${content.coverUrl})`)
+      .article-panel-center
+        .article-panel-header
+          -var data_global_mouseover='showUserPanel';
+          -var data_global_mouseout='hideUserPanel';
+          -var data_global_data=objToStr({uid: user.uid});
+          .article-panel-avatar(
+            data-global-mouseover=data_global_mouseover
+            data-global-mouseout=data_global_mouseout
+            data-global-data=data_global_data
+            )
+            img(src=user.avatarUrl)
+          .article-panel-username(
+            data-global-mouseover=data_global_mouseover
+            data-global-mouseout=data_global_mouseout
+            data-global-data=data_global_data
+            )
+            a(href=user.homeUrl target='_blank')=user.username
+          for c in categories
+            -var data_global_mouseover = '';
+            -var data_global_mouseout = '';
+            -var data_global_data = '';
+            if c.type === ArticlePanelCategoryType.forum
+              -data_global_mouseover='showForumPanel';
+              -data_global_mouseout='hideForumPanel';
+              -data_global_data=objToStr({fid: c.id});
+            .article-panel-category(
+              data-global-mouseover=data_global_mouseover
+              data-global-mouseout=data_global_mouseout
+              data-global-data=data_global_data
+            )
+              a(href=c.url target='_blank')=c.name
+          .article-panel-time
+            +fromNow(content.time)
+          .pull-right
+            if content.voteUpCount > 0
+              .article-panel-count
+                .fa.fa-thumbs-up
+                span=content.voteUpCount
+            if content.readCount > 0
+              .article-panel-count
+                .fa.fa-eye
+                span=content.readCount
+            if content.replyCount > 0
+              .article-panel-count
+                .fa.fa-comment
+                span=content.replyCount
+        .article-panel-title
+          a.article-panel-title-content(href=content.url target='_blank' class=pages.length > 0? 'm-r-05':'')
+            span=content.title
+          for page in pages
+            a.article-panel-title-page(class=page.url?'active':'' target='_blank' href=page.url)=page.name
+        .article-panel-content(class=coverClass)
+          if coverPosition === ArticlePanelStyleCover.left
+            .article-panel-content-left
+              .article-panel-content-cover(style=`background-image: url(${content.coverUrl})`)
+          .article-panel-content-center
+            .article-panel-abstract
+              a(href=content.url target='_blank')=content.abstract
+            if reply
+              .article-panel-reply
+                .article-panel-reply-time
+                  a(href=content.url target='_blank')
+                    +fromNow(reply.content.time)
+                .article-panel-reply-content
+                  a(href=reply.content.url target='_blank')=reply.content.abstract
+                .article-panel-reply-user
+                  a(href=reply.user.homeUrl target='_blank')
+                    img(src=reply.user.avatarUrl)
+          if coverPosition === ArticlePanelStyleCover.right
+            .article-panel-content-right
+              .article-panel-content-cover(style=`background-image: url(${content.coverUrl})`)
+      if coverPosition === ArticlePanelStyleCover.right
+        .article-panel-right
+          .article-panel-cover(style=`background-image: url(${content.coverUrl})`)
+
+
+
+
+  mixin ArticlePanelSM(data)
+    -var {user, content, categories, pages, reply} = data;
+    .article-panel-sm
+      -var data_global_mouseover = 'showUserPanel';
+      -var data_global_mouseout = 'hideUserPanel';
+      -var data_global_data = objToStr({uid: user.uid});
+      .article-panel-left(
+        data-global-mouseover=data_global_mouseover
+        data-global-mouseout=data_global_mouseout
+        data-global-data=data_global_data
+        )
+        a.article-panel-avatar(href=user.homeUrl target='_blank')
+          img(src=user.avatarUrl)
+      .article-panel-right
+        .article-panel-title
+          a.article-panel-title-content(href=content.url target='_blank' class=pages.length > 0? 'm-r-05':'')=content.title
+          for page in pages
+            a.article-panel-title-page(class=page.url?'active':'' target='_blank' href=page.url)=page.name
+        .article-panel-header
+          .article-panel-user(
+            data-global-mouseover=data_global_mouseover
+            data-global-mouseout=data_global_mouseout
+            data-global-data=data_global_data
+          )
+            a(href=user.homeUrl target='_blank')=user.username
+          .article-panel-time
+            +fromNow(content.time)
+          for c in categories
+            -var data_global_mouseover = '';
+            -var data_global_mouseout = '';
+            -var data_global_data = '';
+            if c.type === ArticlePanelCategoryType.forum
+              -data_global_mouseover = 'showForumPanel';
+              -data_global_mouseout = 'hideForumPanel';
+              -data_global_data = objToStr({fid: c.id});
+            .article-panel-category(
+              data-global-mouseover=data_global_mouseover
+              data-global-mouseout=data_global_mouseout
+              data-global-data=data_global_data
+            )
+              a(href=c.url target='_blank')=c.name
+          if reply
+            .article-panel-reply-user
+              .fa.fa-commenting-o
+              a(href=reply.user.homeUrl target='_blank')=reply.user.username
+            .article-panel-reply-time
+              a(href=reply.content.url target='_blank')
+                +fromNow(reply.content.time)
+          .pull-right
+            if content.voteUpCount > 0
+              .article-panel-count
+                .fa.fa-thumbs-up
+                span=content.voteUpCount
+            if content.readCount > 0
+              .article-panel-count
+                .fa.fa-eye
+                span=content.readCount
+            if reply && content.replyCount > 0
+              .article-panel-count
+                a(href=reply.content.url target='_blank')
+                  .fa.fa-comment
+                  span=content.replyCount
+
+
+
+
+
+  mixin ArticlePanelXS(data)
+    -var {user, content, reply, pages} = data;
+
+    .article-panel-xs
+      .article-panel-left
+        a.article-panel-avatar(href=user.homeUrl target='_blank')
+          img(src=user.avatarUrl)
+      .article-panel-center
+        .article-panel-title
+          a(href=content.url class=pages.length > 0?  'm-r-05':'' target='_blank').article-panel-title-content=content.title
+          for page in pages
+            a.article-panel-title-page(class=page.url ? 'active' : '' target='_blank' href=page.url)=page.name
+      .article-panel-right
+        .article-panel-time(title=tools.timeFormat(content.time))=tools.briefTime(content.time)
+        if reply
+          .article-panel-count=`/ ${content.replyCount} / `
+          .article-panel-time
+            a(
+              title=tools.timeFormat(reply.content.time)
+              href=reply.content.url
+              target='_blank'
+              )=tools.briefTime(reply.content.time)
+
