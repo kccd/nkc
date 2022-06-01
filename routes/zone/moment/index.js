@@ -11,14 +11,22 @@ router
     await next();
   })
   .get('/:mid', async (ctx, next) => {
-    const {query, data, state, internalData, db} = ctx;
+    const {data, state, internalData, db} = ctx;
     const {moment} = internalData;
-    const {cid = ''} = query;
-    const [momentListData] = await db.MomentModel.extendMomentsListData([moment], state.uid);
+    let targetMoment;
+    let commentId;
+    if(moment.parent) {
+      targetMoment = await db.MomentModel.findOnly({_id: moment.parent});
+      commentId = moment._id;
+    } else {
+      targetMoment = moment;
+      commentId = '';
+    }
+    const [momentListData] = await db.MomentModel.extendMomentsListData([targetMoment], state.uid);
     if(!momentListData) {
       ctx.throw(500, `动态数据错误 momentId=${moment._id}`);
     }
-    data.commentId = cid;
+    data.commentId = commentId;
     data.momentListData = momentListData;
     ctx.remoteTemplate = 'zone/moment/moment.pug';
     await next();
