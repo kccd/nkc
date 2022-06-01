@@ -85,6 +85,8 @@ const subscribeRouter = routers.subscribe;
 const articleRouter = routers.article;
 //动态
 const momentRouter = routers.moment;
+// 后台设置
+const settingRouter = routers.setting;
 
 const path = require('path');
 
@@ -204,4 +206,5 @@ router.use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods());
 router.use('/g', subscribeRouter.routes(), subscribeRouter.allowedMethods());
 router.use('/article', articleRouter.routes(), articleRouter.allowedMethods());
 router.use('/moment', momentRouter.routes(), momentRouter.allowedMethods());
+router.use('/setting', settingRouter.routes(), settingRouter.allowedMethods());
 module.exports = router;

@@ -330,7 +330,7 @@ function deleteForum(fid) {
 }
 
 
-var digestDom;
+// var digestDom;
 var creditDom;
 var postWarningDom;
 var creditScoreName = '';
@@ -341,12 +341,12 @@ $(function () {
 	}
 
 	// 精选弹窗
-  digestDom = $('#digestModel');
-  if(digestDom.length !== 0) {
-    digestDom.modal({
-      show: false
-    });
-  }
+  // digestDom = $('#digestModel');
+  // if(digestDom.length !== 0) {
+  //   digestDom.modal({
+  //     show: false
+  //   });
+  // }
   creditDom = $('#creditModel');
   if(creditDom.length !== 0) {
     creditDom.modal({
@@ -642,32 +642,36 @@ function digestPost(pid) {
     nkcAPI('/p/'+pid+'/digest', 'POST', obj)
       .then(function() {
         screenTopAlert('设置成功');
-        if(digestDom.length > 0) {
-          digestDom.modal('hide');
-        }
+        // if(digestDom.length > 0) {
+        //   digestDom.modal('hide');
+        // }
+        window.RootApp.closeDigest();
         window.location.reload();
       })
       .catch(function(data) {
         screenTopWarning(data.error||data);
       })
   };
-  if(digestDom.length === 0) {
-    return post({});
-  }
-  digestDom.one('show.bs.modal', function(event) {
-    var button = event.currentTarget.getElementsByTagName('button');
-    if(!button[2]) return;
-    button[2].onclick = function() {
-      var input = event.currentTarget.getElementsByTagName('input');
-      var num = input[0].value;
-      num = Number(num);
-      num = num*100;
-      if(typeof num !== "number" || num%1 !== 0) return screenTopWarning("请输入正确的数额");
-      var obj = {kcb: num};
-      post(obj);
-    }
+  window.RootApp.openDigest((kcb) => {
+    post({kcb});
   });
-  digestDom.modal('show');
+  // if(digestDom.length === 0) {
+  //   return post({});
+  // }
+  // digestDom.one('show.bs.modal', function(event) {
+  //   var button = event.currentTarget.getElementsByTagName('button');
+  //   if(!button[2]) return;
+  //   button[2].onclick = function() {
+  //     var input = event.currentTarget.getElementsByTagName('input');
+  //     var num = input[0].value;
+  //     num = Number(num);
+  //     num = num*100;
+  //     if(typeof num !== "number" || num%1 !== 0) return screenTopWarning("请输入正确的数额");
+  //     var obj = {kcb: num};
+  //     post(obj);
+  //   }
+  // });
+  // digestDom.modal('show');
 }
 // 取消回复精选
 function unDigestPost(pid) {

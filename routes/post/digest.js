@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 router
 	.post('/', async (ctx, next) => {
+		//文章和回复加精，加科创币
 		const {db, data, params, nkcModules, body} = ctx;
 		const {pid} = params;
 		let {kcb} = body;
@@ -138,6 +139,7 @@ router
 		await next();
 	})
 	.del('/', async (ctx, next) => {
+		//文章和回复取消加精，扣除科创比
 		const {db, params, data, nkcModules} = ctx;
 		const {pid} = params;
     const post = await db.PostModel.findOnly({pid});
@@ -163,11 +165,13 @@ router
 			}
 		}
 		let additionalReward = 0;
+		//查找奖励科创币记录，并扣除相应科创币
 		const rewardLog = await db.KcbsRecordModel.findOne({type: 'digestThreadAdditional', pid}).sort({toc: -1});
 		if(rewardLog) {
 		  additionalReward = rewardLog.num;
     }
 		post.digest = false;
+		//取消post精选
 		await post.updateOne({digest: false});
 		const log = {
 			user: targetUser,
@@ -180,8 +184,10 @@ router
 		};
 		ctx.state._scoreOperationForumsId = thread.mainForumsId;
 		if(thread.oc === pid) {
+			//取消文章精选
 			await thread.updateOne({digest: false});
 			// await db.UsersScoreLogModel.insertLog(log);
+			//执行科创币加减
       await db.KcbsRecordModel.insertSystemRecord('unDigestThread', data.targetUser, ctx, additionalReward);
 			log.type = 'score';
 			log.change = -1;
@@ -191,6 +197,7 @@ router
 		} else {
 			log.typeIdOfScoreChange = 'unDigestPost';
 			// await db.UsersScoreLogModel.insertLog(log);
+			//执行科创币加减
       await db.KcbsRecordModel.insertSystemRecord('unDigestPost', data.targetUser, ctx, additionalReward);
 			log.key = 'digestPostsCount';
 			log.change = -1;
@@ -198,6 +205,7 @@ router
 			await db.UsersScoreLogModel.insertLog(log);
       await nkcModules.elasticSearch.save("post", post);
 		}
+		//更新用户科创币
 		data.userScores = await db.UserModel.updateUserScores(targetUser.uid);
 		await next();
 	});

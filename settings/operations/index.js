@@ -89,6 +89,7 @@ const zone = require('./zone');
 const subscribe = require('./subscribe');
 const article = require('./article');
 const moment = require ('./moment');
+const setting = require('./setting');
 const operationObj = {};
 
 
@@ -285,12 +286,13 @@ operationObj.operationTree = {
 		draw: drawData, //获取手机浏览器左侧滑动框
     mathJax, // 编辑器预览公式
     book, // 书籍
-		rc, //资源分组
+		rc, // 资源分组
     comment, // 评论系统
     zone, // 空间
     g: subscribe, // 关注
-		article, //独立文章
-		moment, //动态
+		article, // 独立文章
+		moment, // 动态
+		setting, // 后台设置
 	}
 };
 module.exports = operationObj;

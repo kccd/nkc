@@ -873,5 +873,6 @@
   "digestArticle": "将独立文章设置为精选",
   "unDigestArticle": "取消将独立文章设置为精选",
   "digestComment": "将回复设置为精选",
-  "unDigestComment": "取消回复精选"
+  "unDigestComment": "取消回复精选",
+  "getSettings": "获取后台设置"
 }

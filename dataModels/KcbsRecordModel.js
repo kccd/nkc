@@ -176,6 +176,10 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
     throw err;
   }
 };
+
+/*
+* 执行科创币的加减
+* */
 kcbsRecordSchema.statics.insertSystemRecordContent = async (type, u, ctx, additionalReward) => {
   const SettingModel = mongoose.model('settings');
   const KcbsRecordModel = mongoose.model('kcbsRecords');

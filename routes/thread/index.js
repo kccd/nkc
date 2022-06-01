@@ -563,7 +563,6 @@ threadRouter
     homeTopped = await db.SettingModel.isEqualOfArr(homeSettings.toppedThreadsId, {id: thread.tid, type: 'thread'});
     latestTopped = await db.SettingModel.isEqualOfArr(homeSettings.latestToppedThreadsId, {id: thread.tid, type: 'thread'});
     communityTopped = await db.SettingModel.isEqualOfArr(homeSettings.communityToppedThreadsId, {id: thread.tid, type: 'thread'});
-    console.log('include', homeTopped, latestTopped, communityTopped);
     // 获取相似文章
     let fids = thread.mainForumsId.concat(thread.minorForumsId);
     fids = fids.filter(id => fidOfCanGetThreads.includes(id));
