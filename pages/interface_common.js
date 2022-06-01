@@ -573,6 +573,7 @@ function credit(pid, type, kcb) {
   app.type = type
   app.kcb = kcb
   app.show = true;
+  app.$refs.credit.open()
 }
 
 /*if($('input[data-control="hue"]').length !== 0 && $('input[data-control="hue"]').minicolors) {

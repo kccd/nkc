@@ -1,4 +1,6 @@
 {
+  "rewardXsf": "奖励学术分",
+  "rewardKcb": "奖励科创币",
   "getRewardConfiguration": "获取奖励配置信息",
   "saveForumLatestBlockNotice": "保存专业最新页板块公告编辑内容",
   "saveForumDeclare": "保存专业说明编辑内容",

@@ -9,7 +9,9 @@
         .modal-body
           .form
             .form-group
-              span.kcb-info.currency {{"向作者转账" + res.creditScore.name + "以资鼓励"}}
+              span.kcb-info.currency 向作者转账
+              span.kcb-info.currency.outstanding {{res.creditScore.name}}
+              span.kcb-info.currency 以资鼓励
             .form-group
               label 分值
               span.kcb-info.kcb-range(v-if="type === 'kcb'" style='display:inline-block;') {{"(" + res.creditSettings.min/100 + "-" + res.creditSettings.max/100 + ")"}}
@@ -22,7 +24,7 @@
               textarea.form-control.description(rows=3 v-model="description")
         .modal-footer
           button(type="button" class="btn btn-default" data-dismiss="modal" @click="close") 关闭
-          button(type="button" class="btn btn-primary" @click="submit" :disable="disable") 确认
+          button(type="button" class="btn btn-primary" @click="submit" :disable="disable") {{ disable ? "提交中..." : "确认"}}
 </template>
 
 <script>
@@ -37,12 +39,19 @@ export default {
       type: String,
       default: "kcb"
     },
-    pid: {
+    // 接收学术分或者kcb依据
+    id: {
       type: String,
       required: true
     },
     kcb: {
       type: Number,
+    },
+    // 文章类型。独立(zone)、专栏(column)、社区(thread)等
+    articleType: {
+      type: String,
+      // 
+      default: "thread"
     }
   },
   data: () => ({
@@ -54,17 +63,9 @@ export default {
     dialog: '',
     disable: false,
     description: '',
-    num: ''
+    num: '',
+    a: false,
   }),
-  created(){
-    nkcAPI(`/t/${location.pathname.split("/")[2]}/rewards` ,"GET")
-    .then((res) => {
-      this.res = res
-    })
-    .catch((err) => {
-      sweetError(err)
-    })
-  },
   mounted() {
     this.dialog = new DraggableElement(
       this.$refs.content,
@@ -76,7 +77,16 @@ export default {
     this.dialog.destroy();
   },
   methods: {
-    
+    open(){
+      // nkcAPI(`/t/${location.pathname.split("/")[2]}/rewards` ,"GET")
+      nkcAPI(`/credit?articleType=${this.articleType}` ,"GET")
+        .then((res) => {
+          this.res = res
+        })
+        .catch((err) => {
+          sweetError(err)
+        })
+    },
     close(){
       // 通知父组件关闭对话框
       this.$emit("close")
@@ -90,7 +100,8 @@ export default {
       if (this.type === "kcb"){
         if(this.num*100 > this.kcb) return screenTopWarning('你的' + this.res.creditScore.name + '不足');
       }
-      let url = '/p/'+this.pid+'/credit/' + this.type;
+      // let url = '/p/'+this.pid+'/credit/' + this.type;
+      let url = `/credit/${this.type}?articleType=${this.articleType}&id=${this.id}`
       nkcAPI(url, 'POST', obj)
         .then( () => {
           window.location.reload();
@@ -112,6 +123,9 @@ export default {
     -webkit-box-shadow: 0 5px 15px rgb(0 0 0 / 50%);
     box-shadow: 0 5px 15px rgb(0 0 0 / 50%);
   }
+}
+.outstanding {
+  color: #1269ff
 }
 .modal-content {
     position: relative;
