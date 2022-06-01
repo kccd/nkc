@@ -22,6 +22,10 @@ const kcbsRecordSchema = new Schema({
     index: 1
   },
   // 积分类型
+  // digestThread 加精社区文章
+  // digestPost 加精社区评论
+  // digestComment 加精独立文章评论
+  // digestArticle 加精独立文章
   scoreType: {
     type: String,
     required: true,
@@ -188,11 +192,12 @@ kcbsRecordSchema.statics.insertSystemRecordContent = async (type, u, ctx, additi
   const {address: ip, port, data, state = {}} = ctx;
   if(!u) return;
   let fid = '';
-  // 多专业情况下 所有有关积分的数据仅从第一个专业上读取
+  // 多专业情况下 所有有关积分的数据仅从第一个专业上读取, 获取第一个专业
   if(state._scoreOperationForumsId && state._scoreOperationForumsId.length) {
     fid = state._scoreOperationForumsId[0];
   }
-  const operation = await SettingModel.getScoreOperationsByType(type, fid); // 专业ID待传
+  // 获取积分策略对象
+  const operation = await SettingModel.getScoreOperationsByType(type, fid); // 专业ID待传\
   if(!operation) return;
   if(operation.from === 'default') fid = '';
   const enabledScores = await SettingModel.getEnabledScores();

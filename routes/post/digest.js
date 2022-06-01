@@ -42,7 +42,6 @@ router
 		}
 		const digestTime = Date.now();
 		post.digest = true;
-		await post.updateOne({digest: true, digestTime});
 		const log = {
 			user: targetUser,
 			type: 'kcb',
@@ -58,24 +57,24 @@ router
 		if(thread.oc === pid) {
 			await thread.updateOne({digest: true, digestTime});
 			// await db.UsersScoreLogModel.insertLog(log);
-      if(!redEnvelopeSettings.c.draftFee.close) {
-        const record = db.KcbsRecordModel({
-          _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
-          from: 'bank',
-					scoreType: digestRewardScore.type,
-          type: 'digestThreadAdditional',
-          to: data.targetUser.uid,
-          toc: digestTime,
-          port: ctx.port,
-          ip: ctx.address,
-          description: '',
-          num: num,
-          pid,
-          tid: thread.tid
-        });
-        await record.save();
-      }
-      await db.KcbsRecordModel.insertSystemRecord('digestThread', data.targetUser, ctx);
+      // if(!redEnvelopeSettings.c.draftFee.close) {
+      //   const record = db.KcbsRecordModel({
+      //     _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
+      //     from: 'bank',
+			// 		scoreType: digestRewardScore.type,
+      //     type: 'digestThreadAdditional',
+      //     to: data.targetUser.uid,
+      //     toc: digestTime,
+      //     port: ctx.port,
+      //     ip: ctx.address,
+      //     description: '',
+      //     num: num,
+      //     pid,
+      //     tid: thread.tid
+      //   });
+      //   await record.save();
+      // }
+      await db.PostModel.insertSystemRecord('digestThread', data.targetUser, ctx, num);
 			log.type = 'score';
 			log.key = 'digestThreadsCount';
 			await db.UsersScoreLogModel.insertLog(log);
@@ -95,24 +94,24 @@ router
 		} else {
 			log.typeIdOfScoreChange = 'digestPost';
 			// await db.UsersScoreLogModel.insertLog(log);
-      if(!redEnvelopeSettings.c.draftFee.close) {
-        const record = db.KcbsRecordModel({
-          _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
-          from: 'bank',
-					scoreType: digestRewardScore.type,
-          type: 'digestPostAdditional',
-          to: data.targetUser.uid,
-          toc: digestTime,
-          port: ctx.port,
-          ip: ctx.address,
-          description: '',
-          num: num,
-          pid,
-          tid: thread.tid
-        });
-        await record.save();
-      }
-      await db.KcbsRecordModel.insertSystemRecord('digestPost', data.targetUser, ctx);
+      // if(!redEnvelopeSettings.c.draftFee.close) {
+      //   const record = db.KcbsRecordModel({
+      //     _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
+      //     from: 'bank',
+			// 		scoreType: digestRewardScore.type,
+      //     type: 'digestPostAdditional',
+      //     to: data.targetUser.uid,
+      //     toc: digestTime,
+      //     port: ctx.port,
+      //     ip: ctx.address,
+      //     description: '',
+      //     num: num,
+      //     pid,
+      //     tid: thread.tid
+      //   });
+      //   await record.save();
+      // }
+      await db.PostModel.insertSystemRecord('digestPost', data.targetUser, ctx, num);
 			log.key = 'digestPostsCount';
 			log.type = 'score';
 			await db.UsersScoreLogModel.insertLog(log);
@@ -130,6 +129,7 @@ router
 			await message.save();
       await nkcModules.elasticSearch.save("post", post);
 		}
+		await post.updateOne({digest: true, digestTime});
 		if(!redEnvelopeSettings.c.draftFee.close) {
       await usersGeneralSettings.updateOne({$inc: {'draftFeeSettings.kcb': num}});
     }
@@ -188,7 +188,7 @@ router
 			await thread.updateOne({digest: false});
 			// await db.UsersScoreLogModel.insertLog(log);
 			//执行科创币加减
-      await db.KcbsRecordModel.insertSystemRecord('unDigestThread', data.targetUser, ctx, additionalReward);
+      await db.PostModel.insertSystemRecord('unDigestThread', data.targetUser, ctx);
 			log.type = 'score';
 			log.change = -1;
 			log.key = 'digestThreadsCount';
@@ -198,7 +198,7 @@ router
 			log.typeIdOfScoreChange = 'unDigestPost';
 			// await db.UsersScoreLogModel.insertLog(log);
 			//执行科创币加减
-      await db.KcbsRecordModel.insertSystemRecord('unDigestPost', data.targetUser, ctx, additionalReward);
+      await db.PostModel.insertSystemRecord('unDigestPost', data.targetUser, ctx);
 			log.key = 'digestPostsCount';
 			log.change = -1;
 			log.type = 'score';

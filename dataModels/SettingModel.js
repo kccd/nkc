@@ -625,7 +625,8 @@ settingSchema.statics.getScoreOperationsByType = async (type, fid = '') => {
   if(!scoreOperation) {
     scoreOperation = await SettingModel.getDefaultScoreOperationByType(type);
   }
-  if(scoreOperation.count !== 0) return scoreOperation;
+  // if(scoreOperation.count !== 0) return scoreOperation;
+  return scoreOperation;
 };
 /*
 * 获取所有默认积分策略操作对象
