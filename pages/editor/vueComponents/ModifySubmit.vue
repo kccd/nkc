@@ -246,7 +246,6 @@ export default {
             this.oldContentLength = data.draft?.c?.length;
             this.oldContent = data.draft?.c;
           }
-          console.log(data)
           this.draftId = data.draft.did;
           if (data.draft.cover) {
             this.coverData = "";
