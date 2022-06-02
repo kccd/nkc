@@ -24,6 +24,7 @@ router
       data.targetUser.description = renderMarkdown(nkcModules.nkcRender.replaceLink(data.targetUser.description));
       await data.targetUser.extendGrade();
       await db.UserModel.extendUserInfo(data.targetUser);
+      console.log('targetUser', data.targetUser);
       // data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);
       // if(data.targetColumn) {
       //   data.ColumnPost = await db.ColumnPostModel.findOne({columnId: data.targetColumn._id, type : 'article', pid: article._id});

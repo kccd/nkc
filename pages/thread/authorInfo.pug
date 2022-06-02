@@ -5,7 +5,7 @@
     else
       button.thread-author-subscribe.active(onclick=`SubscribeTypes.subscribeUser("${author.uid}", true)`) 关注
   .thread-author-avatar
-    img(src=author.avatar  style=(author.certs.indexOf('banned') >= 0 ? "filter: grayscale(1);": ""))
+    img(src=tools.getUrl('userAvatar', author.avatar)  style=(author.certs.indexOf('banned') >= 0 ? "filter: grayscale(1);": ""))
   .thread-author-base
     a(href=`/u/${author.uid}` target='_blank').thread-author-name=author.username
     .thread-author-cert
