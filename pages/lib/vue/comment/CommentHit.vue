@@ -1,20 +1,61 @@
 <template lang="pug">
-  .posts-vote
-    .posts-vote-up(:class="voteUp_ > 0 ? 'active' : ''" data-cid=cid_ @click="commentsVote(cid_, 'up')")
+  .comment-vote
+    .comment-vote-up(:class="voteUp_ > 0 ? 'active' : ''" data-cid=cid_ @click="commentsVote(cid_, 'up')")
       .fa.fa-caret-up
-      .posts-vote-number(data-cid=cid) {{voteUp_ > 0 ? voteUp_ : ''}}
-    .posts-vote-down(:class="voteDown_ > 0 ? 'active' : ''" data-cid=cid_ @click="commentsVote(cid_, 'down')")
+      .comment-vote-number(data-cid=cid) {{voteUp_ > 0 ? voteUp_ : ''}}
+    .comment-vote-down(:class="voteDown_ > 0 ? 'active' : ''" data-cid=cid_ @click="commentsVote(cid_, 'down')")
       .fa.fa-caret-down
-      .posts-vote-number(data-cid=cid)
+      .comment-vote-number(data-cid=cid)
 
 </template>
 
 <style lang="less" scoped>
 @import "../../../publicModules/base";
-.posts-vote{
-  .posts-vote-up{
-    margin-right: 5px;
-  }
+.comment-vote{
+  height: 1.3rem;
+  line-height: 1.3rem;
+  display: inline-block;
+  padding-right: 0.5rem;
+}
+.comment-vote>div{
+  vertical-align: top;
+  display: inline-block;
+  height: 1.3rem;
+  line-height: 1.3rem;
+  font-size: 1rem;
+  min-width: 1.5rem;
+  padding: 0 0.6rem;
+  cursor: pointer;
+  text-align: center;
+}.comment-vote>div:last-child{
+   line-height: 1.3rem;
+ }
+.comment-vote-up, .comment-vote-down{
+  /*background-color: #deedfa;*/
+  /*color: #3e9ef2;*/
+  color: #555;
+  border: 1px solid #aaa;
+  border-radius: 3px;
+  transition: color 0.3s, background-color 0.3s;
+}
+.comment-vote-up {
+  margin-right: 5px;
+}
+/*.comment-vote-up:hover, .comment-vote-down:hover, .comment-vote-up.active, .comment-vote-down.active{*/
+.comment-vote-up.active, .comment-vote-down.active{
+  background-color: #3e9ef2;
+  color: #fff;
+  border: 1px solid rgba(0,0,0,0);
+}
+.comment-vote-up.active .comment-vote-number{
+  color: #fff;
+}
+.comment-vote .comment-vote-number{
+  font-weight: 600;
+  display: inline;
+  color: #607a91;
+  max-width: 2.5rem;
+  line-height: 1.3rem;
 }
 </style>
 
