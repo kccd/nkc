@@ -134,7 +134,9 @@ router
       await usersGeneralSettings.updateOne({$inc: {'draftFeeSettings.kcb': num}});
     }
     await ctx.nkcModules.socket.sendMessageToUser(message._id);
-    data.targetUser.kcb = await db.UserModel.updateUserKcb(data.targetUser.uid);
+		// 更新用户科创币
+		data.targetUser.kcb = await db.UserModel.updateUserKcb(u.uid);
+		// 更新用户积分
 		data.userScores = await db.UserModel.updateUserScores(targetUser.uid);
 		await next();
 	})
@@ -205,8 +207,10 @@ router
 			await db.UsersScoreLogModel.insertLog(log);
       await nkcModules.elasticSearch.save("post", post);
 		}
-		//更新用户科创币
-		data.userScores = await db.UserModel.updateUserScores(targetUser.uid);
+		// 更新用户科创币
+		data.targetUser.kcb = await db.UserModel.updateUserKcb(u.uid);
+		//更新用户积分
+		data.userScores = await db.UserModel.updateUserScores(data.targetUser.uid);
 		await next();
 	});
 module.exports = router;
