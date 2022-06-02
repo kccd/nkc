@@ -1,4 +1,5 @@
 {
+  "getRewardConfiguration": "获取奖励配置信息",
   "saveForumLatestBlockNotice": "保存专业最新页板块公告编辑内容",
   "saveForumDeclare": "保存专业说明编辑内容",
   "column_article_get":"打开指定专栏下的一篇文章",

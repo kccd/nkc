@@ -173,6 +173,7 @@ threadRouter
     const {
       page = 0, pid, last_page, highlight, step, t
     } = query;
+
     let mainForum = null;
     let forumsNav = [];
     let threadNav = [];
@@ -1292,9 +1293,10 @@ threadRouter
       thread.firstPost.usersVote = vote?vote.type: '';
       // data.kcbSettings = await db.SettingModel.getSettings("kcb");
       data.digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
-      data.creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
-      data.creditSettings = await db.SettingModel.getCreditSettings();
-      data.xsfSettings = await db.SettingModel.getSettings("xsf");
+      // data.creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
+      // data.creditSettings = await db.SettingModel.getCreditSettings();
+      // data.xsfSettings = await db.SettingModel.getSettings("xsf");
+
       data.redEnvelopeSettings = await db.SettingModel.getSettings("redEnvelope");
     }
 		// 设置标志 是否关注，是否收藏

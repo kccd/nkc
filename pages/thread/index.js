@@ -1,4 +1,5 @@
 import {getSocket} from "../lib/js/socket";
+
 const socket = getSocket();
 var SubscribeTypes, surveyForms = [], draftId = "", author = {};
 const commonModel = new NKC.modules.CommonModal();
