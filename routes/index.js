@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 const routers = require('../requireFolder')(__dirname);
 const userRouter = routers.user;
+const creditRouter = routers.credit;
 const documentRouter = routers.document;
 const watermarkRouter = routers.watermark;
 const meRouter = routers.me;
@@ -142,6 +143,7 @@ router.use('/', async (ctx, next) => {
 });
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
+router.use('/credit', creditRouter.routes(), creditRouter.allowedMethods());
 router.use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
 router.use("/libraries", librariesRouter.routes(), librariesRouter.allowedMethods());
 router.use("/editor", editorRouter.routes(), editorRouter.allowedMethods());
