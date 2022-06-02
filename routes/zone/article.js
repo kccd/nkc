@@ -11,7 +11,7 @@ function isIncludes(arr, id, type) {
 router
   .get('/:aid', async (ctx, next) => {
     //获取空间文章信息
-    ctx.remoteTemplate = 'zone/article.pug'
+    ctx.template = 'zone/article.pug'
     const { db, data, params, query, state, permission, nkcModules } = ctx;
     const { aid } = params;
     const {pageSettings, uid} = state;
