@@ -87,11 +87,23 @@ export default {
       this.draggableElement.hide();
       this.show = false;
     },
-    open(callback, options) {
-      const {digestData} = options;
+    //获取精选设置
+    getDigestData() {
+      const self = this;
+      nkcAPI('/setting/digest', 'GET')
+        .then(res => {
+          self.digestData = {
+            redEnvelopeSettings: res.redEnvelopeSettings,
+            digestRewardScore: res.digestRewardScore,
+          };
+        })
+        .catch(err => {
+          screenTopWarning(err.error || err);
+        })
+    },
+    open(callback) {
       this.callback = callback;
-      this.digestCount = digestData.redEnvelopeSettings.draftFee.defaultCount/100;
-      this.digestData = digestData;
+      this.getDigestData()
       this.draggableElement.show();
       this.show = true;
     },

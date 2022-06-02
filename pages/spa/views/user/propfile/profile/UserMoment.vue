@@ -67,7 +67,7 @@ export default {
   },
   methods: {
     //获取用户卡片信息
-    getUserCardInfo(page, type) {
+    getUserCardInfo(page, type = 'moment') {
       const {uid} = this;
       const self= this;
       let url = `/u/${uid}/profile/momentData?t=${type}`;

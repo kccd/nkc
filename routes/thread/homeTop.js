@@ -29,9 +29,15 @@ homeTopRouter
 		const obj = {};
 		const homeSettings = await db.SettingModel.getSettings('home');
 		const threads = homeSettings[valueName];
-		if(!isIncludes(threads, tid)) threads.unshift({
+		//获取id是否存在对象数组中
+		const {included, index} = await db.SettingModel.isIncludesOfArr(threads, 'id', tid);
+		//如果存在就删除该索引
+		if(included) {
+			 threads.splice(index, 1);
+		}
+		threads.unshift({
 			type: 'thread',
-			Id: tid,
+			id: tid,
 		});
 		obj[`c.${valueName}`] = threads;
 		await db.SettingModel.updateOne({_id: "home"}, {

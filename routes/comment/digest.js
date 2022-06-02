@@ -41,9 +41,9 @@ router
     if(!redEnvelopeSetting.c.draftFee.close) {
       const record = db.KcbsRecordModel({
         _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
-        from: 'blank',
+        from: 'bank',
         scoreType: digestRewardScore.type,
-        type: 'digestCommentAdditional',
+        type: 'digestComment',
         to: targetUser.uid,
         toc: digestTime,
         port: ctx.port,
@@ -54,7 +54,6 @@ router
       });
       await record.save();
     }
-    await db.KcbsRecordModel.insertSystemRecord('digestComment', targetUser, ctx);
     log.type = 'score';
     log.key = 'digestCommentCount';
     await db.UsersScoreLogModel.insertLog(log);
@@ -74,7 +73,9 @@ router
       await usersGeneralSettings.updateOne({$inc: {'draftFeeSettings.kcb': num}});
     }
     await nkcModules.socket.sendMessageToUser(message._id);
+    //更新用户科创币
     data.targetUser.kcb = await db.UserModel.updateUserKcb(data.targetUser.uid);
+    //更新用户积分
     data.userScores = await db.UserModel.updateUserScores(targetUser.uid);
     await next();
   })
@@ -87,16 +88,36 @@ router
     if(!comment) ctx.throw(404, '未找到评论， 请刷新后重试');
     const _comment = (await db.CommentModel.getCommentsByCommentsId([comment._id]))[0];
     data.comment = _comment;
+    const redEnvelopeSetting = await db.SettingModel.findOnly({_id: 'redEnvelope'});
+    const digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
     const targetUser = await db.UserModel.findOnly({uid: comment.uid});
     data.targetUser = targetUser;
     if(!comment.digest) ctx.throw(400, '文章未被加精，请刷新后重试');
     let additionalReward = 0;
-    const rewardLog = await db.KcbsRecordModel.findOne({type: 'digestCommentAdditional', pid: cid}).sort({toc: -1});
+    const rewardLog = await db.KcbsRecordModel.findOne({type: 'digestComment', pid: cid}).sort({toc: -1});
     if(rewardLog) {
-      additionalReward = rewardLog.num;
+      additionalReward = 0 - rewardLog.num;
     }
+    const digestTime = Date.now();
     comment.digest = false;
-    await comment.updateOne({digest: false});
+    await comment.updateOne({digest: false, digestTime});
+    // 扣除科创币
+    if(!redEnvelopeSetting.c.draftFee.close) {
+      const record = db.KcbsRecordModel({
+        _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
+        from: 'bank',
+        scoreType: digestRewardScore.type,
+        type: 'unDigestComment',
+        to: targetUser.uid,
+        toc: digestTime,
+        port: ctx.port,
+        ip: ctx.address,
+        description: '',
+        num: additionalReward,
+        pid: comment._id,
+      });
+      await record.save();
+    }
     const log = {
       user: targetUser,
       type: 'kcb',
@@ -105,11 +126,13 @@ router
       pid: cid,
       ip: ctx.address,
     };
-    await db.KcbsRecordModel.insertSystemRecord('unDigestComment', data.targetUser, ctx, additionalReward);
     log.type = 'score';
     log.change = -1;
     log.key = 'digestCommentCount';
     await db.UsersScoreLogModel.insertLog(log);
+    // 更新用户科创币
+    await db.UserModel.updateUserKcb(data.targetUser.uid);
+    // 更新用户积分
     data.userScores = await db.UserModel.updateUserScores(targetUser.uid);
     await next();
   })

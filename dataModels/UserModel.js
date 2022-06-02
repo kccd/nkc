@@ -1161,6 +1161,8 @@ userSchema.statics.updateUserKcb= async (uid) => {
   const UserModel = mongoose.model("users");
   const SettingModel = mongoose.model("settings");
   const KcbsRecordModel = mongoose.model("kcbsRecords");
+  // 聚合 查找出用户的科创币转账记录并将num全部相加输出为total
+  // 查找出当前用户的所有科创币转账记录
   const fromRecords = await KcbsRecordModel.aggregate([
     {
       $match: {

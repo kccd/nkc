@@ -558,15 +558,12 @@ threadRouter
       movable.automaticallySelectedThreads
     );
     homeAd = ads.map(a => a.tid).includes(thread.tid);
-    for(const t of homeSettings.toppedThreadsId) {
-      if(t.id === thread.tid) {
-        homeTopped = true;
-        break;
-      }
-    }
-    latestTopped = homeSettings.latestToppedThreadsId.includes(thread.tid);
-    communityTopped = homeSettings.communityToppedThreadsId.includes(thread.tid);
-
+    // homeTopped = homeSettings.toppedThreadsId.includes(thread.tid);
+    // latestTopped = homeSettings.latestToppedThreadsId.includes(thread.tid);
+    // communityTopped = homeSettings.communityToppedThreadsId.includes(thread.tid);
+    homeTopped = await db.SettingModel.isEqualOfArr(homeSettings.toppedThreadsId, {id: thread.tid, type: 'thread'});
+    latestTopped = await db.SettingModel.isEqualOfArr(homeSettings.latestToppedThreadsId, {id: thread.tid, type: 'thread'});
+    communityTopped = await db.SettingModel.isEqualOfArr(homeSettings.communityToppedThreadsId, {id: thread.tid, type: 'thread'});
     // 获取相似文章
     let fids = thread.mainForumsId.concat(thread.minorForumsId);
     fids = fids.filter(id => fidOfCanGetThreads.includes(id));
@@ -1330,9 +1327,9 @@ threadRouter
       movable.automaticallySelectedThreads
     );
 		data.homeAd = ads.map(a => a.tid).includes(tid);
-		data.homeTopped = isIncludes(data.homeSettings.toppedThreadsId, tid, 'thread');
-		data.latestTopped = isIncludes(data.homeSettings.latestToppedThreadsId, tid, 'thread');
-    data.communityTopped = isIncludes(data.homeSettings.communityToppedThreadsId, tid, 'thread');
+		data.homeTopped = await db.SettingModel.isEqualOfArr(data.homeSettings.toppedThreadsId, {id: tid, type: 'thread'});
+		data.latestTopped = await db.SettingModel.isEqualOfArr(data.homeSettings.latestToppedThreadsId, {id: tid, type: 'thread'});
+    data.communityTopped = await db.SettingModel.isEqualOfArr(data.homeSettings.communityToppedThreadsId, {id: tid, type: 'thread'});
 		if(thread.type === "product" && ctx.permission("pushGoodsToHome")) {
 		  data.goodsHomeTopped = data.homeSettings.shopGoodsId.includes(data.product.productId);
     }
@@ -1523,7 +1520,7 @@ threadRouter
 
     data.post = _post;
 		data.targetUser = await thread.extendUser();
-
+    
     data.blacklistUsersId = await db.BlacklistModel.getBlacklistUsersId(data.user.uid);
 
 		// 转发到专栏

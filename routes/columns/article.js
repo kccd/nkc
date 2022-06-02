@@ -1,12 +1,5 @@
 const router = require('koa-router')();
 
-function isIncludes(arr, id, type) {
-  for(const a of arr) {
-    if(a.id === id && a.type === type)  return true;
-  }
-  return false;
-}
-
 router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
   const {pageSettings, uid} = state;
@@ -38,7 +31,7 @@ router.get('/:aid', async (ctx, next)=>{
     }
     const articlePost = await db.ArticlePostModel.findOne({sid: article._id, source: article.source});
     isModerator = await article.isModerator(state.uid);
-    data.homeTopped = isIncludes(homeSettings.toppedThreadsId, article._id, 'article');
+    data.homeTopped = await db.SettingModel.isEqualOfArr(homeSettings.toppedThreadsId, {id: article._id, type: 'article'});
     const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
     if(_article.status !== normalStatus && !isModerator) {
       if(!permission('review')) {

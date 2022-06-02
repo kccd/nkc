@@ -957,17 +957,17 @@ messageSchema.statics.getParametersData = async (message) => {
     if(post) {
       if(post.type === 'thread') {
         url = getUrl('thread', post.tid);
-        t = `文章《${post.t}》`;
+        t = `《${post.t}》`;
       } else {
         url = await PostModel.getUrl(post);
-        t = `回复(点击查看)`;
+        t = `(点击查看)`;
       }
     } else if(article) {
       url = article.url;
-      t = `文章《${article.document.title}》`;
+      t = `《${article.document.title}》`;
     } else if(comment) {
       url = comment.commentUrl;
-      t = `回复(点击查看)`;
+      t = `(点击查看)`;
     }
     parameters.LVTarget = url;
     parameters.LVTargetDesc = t;

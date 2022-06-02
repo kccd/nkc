@@ -33,6 +33,8 @@ block baseColumnContent
             span.single-comment-bottom-item(onclick="window.location.href='#container'")
               .fa.fa-comment-o.reply-icon
               span 回复
+            if article.digest
+              span.fa.fa-star.m-r-05(style='color: #ffbf16;font-size: 1.2rem' title='精选')
             .single-comment-bottom-item#CommentHitBox
               comment-hit(cid=article._id article='article' vote-up=article.voteUp vote-down=article.voteDown)
             .single-comment-bottom-item(data-type='share' data-share-type='article' data-share-id=article._id title='分享')

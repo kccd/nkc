@@ -1,12 +1,5 @@
 const router = require('koa-router')();
 
-function isIncludes(arr, id) {
-  for(const a of arr) {
-    if(a.id === id) return true;
-  }
-  return false;
-}
-
 router
   .use('/', async (ctx, next) => {
     const {body, query, data} = ctx;
@@ -28,7 +21,11 @@ router
     const obj = {};
     const homeSettings = await db.SettingModel.getSettings('home');
     const articles = homeSettings[valueName];
-    if(!isIncludes(articles, aid)) articles.unshift({
+    const {included, index} = await db.SettingModel.isIncludesOfArr(articles, 'id', aid);
+    if(included) {
+      articles.splice(index, 1);
+    }
+    articles.unshift({
       type: 'article',
       id: aid,
     });

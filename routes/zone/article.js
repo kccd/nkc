@@ -1,4 +1,5 @@
 const router = require('koa-router')();
+const {renderMarkdown} = require('../../nkcModules/markdown');
 
 function isIncludes(arr, id, type) {
   for(const a of arr) {
@@ -20,7 +21,7 @@ router
     let article = await db.ArticleModel.findOnly({_id: aid});
     if(1) {
       data.targetUser = await article.extendUser();
-      data.targetUser.description = nkcModules.nkcRender.replaceLink(data.targetUser.description);
+      data.targetUser.description = renderMarkdown(nkcModules.nkcRender.replaceLink(data.targetUser.description));
       await data.targetUser.extendGrade();
       await db.UserModel.extendUserInfo(data.targetUser);
       // data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);
@@ -41,7 +42,7 @@ router
     data.originUrl = state.url
     data.highlight = highlight;
     data.columnPost = articleRelatedContent;
-    data.homeTopped = isIncludes(homeSettings.toppedThreadsId, article._id, 'article');
+    data.homeTopped = await db.SettingModel.isEqualOfArr(homeSettings.toppedThreadsId, {id: article._id, type: 'article'});
     const isModerator = await article.isModerator(state.uid);
     //获取当前文章信息
     // const _article = (await db.ArticleModel.extendDocumentsOfArticles([article], 'stable', [
