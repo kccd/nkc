@@ -7,7 +7,7 @@ async function StartBroker() {
   await Broker.start();
   console.log(`Namespace: ${Broker.namespace}`);
   console.log(`NodeID: ${Broker.nodeID}`);
-  console.log(`Service: ${app.name} started`);
+  console.log(`Service: ${app.name}`);
   console.log(`Version: ${app.version}`);
   ConsoleApiServiceInfo();
 }

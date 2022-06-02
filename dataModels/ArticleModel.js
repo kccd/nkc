@@ -1434,4 +1434,45 @@ schema.methods.extendUser = async function() {
   const UserModel = mongoose.model('users');
   return this.user = await UserModel.findOnly({uid: this.uid});
 }
+
+/*
+* 拓展文章信息
+* */
+schema.statics.extendArticlesPanelData = async function(articles) {
+  const ArticleModel = mongoose.model('articles');
+  const nkcRender = require('../nkcModules/nkcRender');
+  const tools = require('../nkcModules/tools');
+  articles = await ArticleModel.getArticlesInfo(articles);
+  const _articles = [];
+  for(const article of articles) {
+    const {document, user: articleUser} = article;
+    const user = {
+      uid: articleUser.uid,
+      username: articleUser.username,
+      avatarUrl: tools.getUrl('userAvatar', articleUser.avatar),
+      homeUrl: tools.getUrl('userHome', articleUser.uid)
+    };
+    const content = {
+      time: article.tlm,
+      coverUrl: tools.getUrl('documentCover', document.cover),
+      title: document.title,
+      url: article.url,
+      abstract: nkcRender.htmlToPlain(document.content, 200),
+      readCount: article.hits,
+      voteUpCount: article.voteUp,
+      replyCount: article.count
+    };
+    _articles.push({
+      type: 'article',
+      id: article._id,
+      user,
+      pages: [],
+      categories: [],
+      content,
+      reply: null
+    });
+  }
+  return _articles;
+}
+
 module.exports = mongoose.model('articles', schema);

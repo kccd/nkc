@@ -62,9 +62,13 @@ if !isIncluded('publicModules/articlePanel')
   -var ArticlePanelStyleCover = {left: 'left', right: 'right'};
   -var ArticlePanelCategoryType = {forum: 'forum'};
 
+  -var DefaultStyle = {type: ArticlePanelStyleType.brief, cover: ArticlePanelStyleCover.right};
+
+  -var mouseEvent = {showUserPanel: 'showUserPanel', hideUserPanel: 'hideUserPanel', showForumPanel: 'showForumPanel', hideForumPanel: 'hideForumPanel'};
 
   mixin ArticlesPanel(articles, style)
-    -var {type = ArticlePanelStyleType.abstract} = style || {};
+    -style = style || DefaultStyle;
+    -var {type = ArticlePanelStyleType.abstract} = style;
     .articles-panel
       for article in articles
         .articles-panel-item(
@@ -78,7 +82,8 @@ if !isIncluded('publicModules/articlePanel')
           +ArticlePanel(article, style)
 
   mixin ArticlePanel(article, style)
-    -var {type = ArticlePanelStyleType.abstract, cover = ArticlePanelStyleCover.right} = style || {};
+    -style = style || DefaultStyle;
+    -var {type = ArticlePanelStyleType.abstract, cover = ArticlePanelStyleCover.right} = style;
 
     if style.type === ArticlePanelStyleType.minimalist
       +ArticlePanelXS(article)
@@ -100,8 +105,8 @@ if !isIncluded('publicModules/articlePanel')
           .article-panel-cover(style=`background-image: url(${content.coverUrl})`)
       .article-panel-center
         .article-panel-header
-          -var data_global_mouseover='showUserPanel';
-          -var data_global_mouseout='hideUserPanel';
+          -var data_global_mouseover=mouseEvent.showUserPanel;
+          -var data_global_mouseout=mouseEvent.hideUserPanel;
           -var data_global_data=objToStr({uid: user.uid});
           .article-panel-avatar(
             data-global-mouseover=data_global_mouseover
@@ -120,8 +125,8 @@ if !isIncluded('publicModules/articlePanel')
             -var data_global_mouseout = '';
             -var data_global_data = '';
             if c.type === ArticlePanelCategoryType.forum
-              -data_global_mouseover='showForumPanel';
-              -data_global_mouseout='hideForumPanel';
+              -data_global_mouseover=mouseEvent.showForumPanel;
+              -data_global_mouseout=mouseEvent.hideForumPanel;
               -data_global_data=objToStr({fid: c.id});
             .article-panel-category(
               data-global-mouseover=data_global_mouseover
@@ -163,7 +168,11 @@ if !isIncluded('publicModules/articlePanel')
                     +fromNow(reply.content.time)
                 .article-panel-reply-content
                   a(href=reply.content.url target='_blank')=reply.content.abstract
-                .article-panel-reply-user
+                .article-panel-reply-user(
+                  data-global-mouseover=mouseEvent.showUserPanel
+                  data-global-mouseout=mouseEvent.hideUserPanel
+                  data-global-data=objToStr({uid: reply.user.uid})
+                  )
                   a(href=reply.user.homeUrl target='_blank')
                     img(src=reply.user.avatarUrl)
           if coverPosition === ArticlePanelStyleCover.right
@@ -179,8 +188,8 @@ if !isIncluded('publicModules/articlePanel')
   mixin ArticlePanelSM(data)
     -var {user, content, categories, pages, reply} = data;
     .article-panel-sm
-      -var data_global_mouseover = 'showUserPanel';
-      -var data_global_mouseout = 'hideUserPanel';
+      -var data_global_mouseover = mouseEvent.showUserPanel;
+      -var data_global_mouseout = mouseEvent.hideUserPanel;
       -var data_global_data = objToStr({uid: user.uid});
       .article-panel-left(
         data-global-mouseover=data_global_mouseover
@@ -208,8 +217,8 @@ if !isIncluded('publicModules/articlePanel')
             -var data_global_mouseout = '';
             -var data_global_data = '';
             if c.type === ArticlePanelCategoryType.forum
-              -data_global_mouseover = 'showForumPanel';
-              -data_global_mouseout = 'hideForumPanel';
+              -data_global_mouseover = mouseEvent.showForumPanel;
+              -data_global_mouseout = mouseEvent.hideForumPanel;
               -data_global_data = objToStr({fid: c.id});
             .article-panel-category(
               data-global-mouseover=data_global_mouseover
@@ -218,7 +227,11 @@ if !isIncluded('publicModules/articlePanel')
             )
               a(href=c.url target='_blank')=c.name
           if reply
-            .article-panel-reply-user
+            .article-panel-reply-user(
+              data-global-mouseover=mouseEvent.showUserPanel
+              data-global-mouseout=mouseEvent.hideUserPanel
+              data-global-data=objToStr({uid: reply.user.uid})
+              )
               .fa.fa-commenting-o
               a(href=reply.user.homeUrl target='_blank')=reply.user.username
             .article-panel-reply-time
@@ -247,7 +260,11 @@ if !isIncluded('publicModules/articlePanel')
     -var {user, content, reply, pages} = data;
 
     .article-panel-xs
-      .article-panel-left
+      .article-panel-left(
+        data-global-mouseover=mouseEvent.showUserPanel
+        data-global-mouseout=mouseEvent.hideUserPanel
+        data-global-data=objToStr({uid: user.uid})
+        )
         a.article-panel-avatar(href=user.homeUrl target='_blank')
           img(src=user.avatarUrl)
       .article-panel-center

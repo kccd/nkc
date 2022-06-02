@@ -69,7 +69,7 @@ module.exports = async (options) => {
   }*/
   // 是否有权限开办专业
   data.hasPermissionOpenNewForum = await db.PreparationForumModel.hasPermissionToCreatePForum(state.uid);
-  
+
   // 是否需要进行手机号验证
   data.needVerifyPhoneNumber = await db.UsersPersonalModel.shouldVerifyPhoneNumber(state.uid);
 
@@ -82,6 +82,7 @@ module.exports = async (options) => {
     fidOfCanGetThreads: forumsId,
     showDisabledBlock: ctx.permission('nkcManagementHome')
   });
+  data.defaultThreadListStyle = state.threadListStyle;
   // 多维分类
   data.threadCategories = await db.ThreadCategoryModel.getCategoryTree({disabled: false});
   ctx.template = "home/home_all.pug";

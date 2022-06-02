@@ -1215,6 +1215,183 @@ threadSchema.statics.getHomeToppedThreads = async (fid = [], type) => {
   });
   return results;
 };
+
+/*
+* 获取首页置顶文章 适配 articlesPanel 组件
+* */
+threadSchema.statics.getHomeToppedArticles = async (fid = []) => {
+  const SettingModel = mongoose.model('settings');
+  const homeSettings = await SettingModel.getSettings('home');
+  const ThreadModel = mongoose.model('threads');
+  const ArticleModel = mongoose.model('articles');
+  const {normal} = await ArticleModel.getArticleStatus();
+  const {toppedThreadsId} = homeSettings;
+  const articlesId = [];
+  const threadsId = [];
+  for(const t of toppedThreadsId) {
+    if(t.type === 'article') {
+      articlesId.push(t.id);
+    } else if(t.type === 'thread') {
+      threadsId.push(t.id);
+    }
+  }
+  let threads = await ThreadModel.find({
+    tid: {$in: threadsId},
+    mainForumsId: {$in: fid},
+    disabled: false,
+    recycleMark: {
+      $ne: true
+    },
+    reviewed: true
+  });
+  threads = await ThreadModel.extendArticlesPanelData(threads);
+  const threadsObj = {};
+  for(const thread of threads) {
+    threadsObj[thread.id] = thread;
+  }
+  let articles = await ArticleModel.find({
+    _id: {
+      $in: articlesId
+    },
+    status: normal
+  });
+  articles = await ArticleModel.extendArticlesPanelData(articles);
+  const articlesObj = {};
+  for(const article of articles) {
+    articlesObj[article.id] = article;
+  }
+  const results = [];
+  for(const t of toppedThreadsId) {
+    if(t.type === 'article') {
+      const article = articlesObj[t.id];
+      if(article) {
+        results.push(article);
+      }
+    } else if(t.type === 'thread') {
+      const thread = threadsObj[t.id];
+      if(thread) {
+        results.push(thread);
+      }
+    }
+  }
+  return results;
+}
+
+threadSchema.statics.extendArticlesPanelData = async function(threads) {
+  const ThreadModel = mongoose.model('threads');
+  const SettingModel = mongoose.model('settings');
+  const pageSettings = await SettingModel.getSettings('page');
+  const tools = require('../nkcModules/tools');
+  const anonymousUser = tools.getAnonymousInfo();
+  threads = await ThreadModel.extendThreads(threads, {
+    forum: true,
+    category: true,
+    lastPost: true,
+    lastPostUser: true,
+    htmlToText: true,
+    removeLink: true,
+  });
+  const _threads = [];
+  for(const thread of threads) {
+    const {firstPost, lastPost} = thread;
+    if(!firstPost) continue;
+    let user;
+    if(thread.anonymous) {
+      user = {
+        uid: '',
+        username: anonymousUser.username,
+        avatarUrl: anonymousUser.avatarUrl,
+        homeUrl: ''
+      }
+    } else {
+      user = {
+        uid: thread.uid,
+        username: firstPost.user.username,
+        avatarUrl: tools.getUrl('userAvatar', firstPost.user.avatar),
+        homeUrl: tools.getUrl('userHome', thread.uid)
+      }
+    }
+    const content = {
+      time: thread.toc,
+      coverUrl: tools.getUrl('postCover', firstPost.cover),
+      title: firstPost.t,
+      url: tools.getUrl('thread', thread.tid),
+      abstract: firstPost.c,
+      readCount: thread.hits,
+      voteUpCount: firstPost.voteUp,
+      replyCount: thread.count
+    };
+    const categories = [{
+      type: 'forum',
+      id: thread.forums[0].fid,
+      name: thread.forums[0].displayName,
+      url: tools.getUrl('forumHome', thread.forums[0].fid)
+    }];
+    let reply = null;
+    if(lastPost) {
+      let rUser;
+      if(lastPost.anonymous) {
+        rUser = {
+          uid: '',
+          username: anonymousUser.username,
+          avatarUrl: anonymousUser.avatarUrl,
+          homeUrl: ''
+        }
+      } else {
+        rUser = {
+          uid: lastPost.uid,
+          username: lastPost.user.username,
+          avatarUrl: tools.getUrl('userAvatar', lastPost.user.avatar),
+          homeUrl: tools.getUrl('userHome', lastPost.uid)
+        }
+      }
+      reply = {
+        user: rUser,
+        content: {
+          time: lastPost.toc,
+          url: tools.getUrl('post', lastPost.pid),
+          abstract: lastPost.c
+        }
+      };
+    }
+    let pages = [];
+    const {threadPostList = 30} = pageSettings;
+    for(let i = 0; i < thread.count; i += threadPostList) {
+      const page = i / threadPostList;
+      if(page === 0) {
+        continue;
+      }
+      pages.push({
+        name: page + 1,
+        url: tools.getUrl('thread', thread.tid) + `?page=${page}`
+      });
+    }
+    const pagesLength = pages.length;
+    if(pagesLength >= 6) {
+      pages = [
+        pages[0],
+        pages[1],
+        {
+          name: '...',
+          url: ''
+        },
+        pages[pagesLength - 2],
+        pages[pagesLength - 1]
+      ];
+    }
+    _threads.push({
+      type: 'thread',
+      id: thread.tid,
+      user,
+      pages,
+      content,
+      categories,
+      reply,
+    });
+  }
+  return _threads;
+}
+
 /*
 * 获取最新页置顶的文章
 * */
