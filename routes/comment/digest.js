@@ -41,7 +41,7 @@ router
     if(!redEnvelopeSetting.c.draftFee.close) {
       const record = db.KcbsRecordModel({
         _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
-        from: 'blank',
+        from: 'bank',
         scoreType: digestRewardScore.type,
         type: 'digestCommentAdditional',
         to: targetUser.uid,
@@ -105,7 +105,7 @@ router
     if(!redEnvelopeSetting.c.draftFee.close) {
       const record = db.KcbsRecordModel({
         _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
-        from: 'blank',
+        from: 'bank',
         scoreType: digestRewardScore.type,
         type: 'unDigestComment',
         to: targetUser.uid,
