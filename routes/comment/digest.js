@@ -43,7 +43,7 @@ router
         _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
         from: 'bank',
         scoreType: digestRewardScore.type,
-        type: 'digestCommentAdditional',
+        type: 'digestComment',
         to: targetUser.uid,
         toc: digestTime,
         port: ctx.port,
