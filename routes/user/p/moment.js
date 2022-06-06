@@ -4,37 +4,51 @@ module.exports = async (ctx, next) => {
   const {targetUser, user} = data;
   data.t = t;
   const {
-    normal: normalStatus,
-    faulty: faultyStatus,
-    unknown: unknownStatus,
+    normal: normalMoment,
+    faulty: faultyMoment,
+    unknown: unknownMoment,
   } = await db.MomentModel.getMomentStatus();
-  const {moment: momentType} = await db.MomentModel.getMomentQuoteTypes();
-  //获取用户动态列表
-  const match = {
-    uid: targetUser.uid,
-    parent: '',
-    $or: [
-      {
-        status: normalStatus
-      },
-      {
-        uid: state.uid,
-        status: {
-          $in: [
-            normalStatus,
-            faultyStatus,
-            unknownStatus,
-          ]
-        }
-      }
-    ]
-  };
+  const {normal: normalArticle} = await db.ArticleModel.getArticleStatus();
+  const {zone: zoneSource} = await db.ArticleModel.getArticleSources();
+  
+  // const {moment: momentType, article: articleType} = await db.MomentModel.getMomentQuoteTypes();
+  let paging;
   if(t === 'moment') {
-    match.quoteType = momentType;
+    //获取用户动态列表
+    const match = {
+      uid: targetUser.uid,
+      parent: '',
+      $or: [
+        {
+          status: normalMoment
+        },
+        {
+          uid: state.uid,
+          status: {
+            $in: [
+              normalMoment,
+              faultyMoment,
+              unknownMoment,
+            ]
+          }
+        }
+      ]
+    };
+    const count = await db.MomentModel.countDocuments(match);
+    paging = nkcModules.apiFunction.paging(page, count, 20);
+    const moments = await db.MomentModel.find(match).sort({top: -1}).skip(paging.start).limit(paging.perpage);
+    data.momentsData = await db.MomentModel.extendMomentsListData(moments, state.uid);
   } else if(t === 'thread') {
-    match.quoteType = {
-      $ne: true,
-    }
+    //查找空间文章
+    const match = {
+      source: zoneSource,
+      uid: targetUser.uid,
+      status: normalArticle,
+    };
+    const count = await db.ArticleModel.countDocuments(match);
+    paging = nkcModules.apiFunction.paging(page, count, 20);
+    let zoneArticles = await db.ArticleModel.find(match).sort({toc: -1});
+    zoneArticles = await db.ArticleModel.getArticlesInfo(zoneArticles);
   }
   //获取当前用户对动态的审核权限
   const permissions = {
@@ -45,11 +59,8 @@ module.exports = async (ctx, next) => {
       permissions.reviewed = true;
     }
   }
-  const count = await db.MomentModel.countDocuments(match);
-  const paging = nkcModules.apiFunction.paging(page, count, 20);
-  const moments = await db.MomentModel.find(match).sort({top: -1}).skip(paging.start).limit(paging.perpage);
+  
   data.paging = paging;
   data.permissions = permissions;
-  data.momentsData = await db.MomentModel.extendMomentsListData(moments, state.uid);
   await next();
 }
