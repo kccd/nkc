@@ -49,6 +49,21 @@ module.exports = async (ctx, next) => {
     paging = nkcModules.apiFunction.paging(page, count, 20);
     let zoneArticles = await db.ArticleModel.find(match).sort({toc: -1});
     zoneArticles = await db.ArticleModel.getArticlesInfo(zoneArticles);
+    data.momentsData = [];
+    for(const article of zoneArticles) {
+      data.momentsData.push({
+        type: 'article',
+        content: nkcModules.nkcRender.htmlToPlain(article.document.content, 200),
+        title: article.document.title,
+        cover: article.document.cover,
+        toc: article.toc,
+        voteUp: article.voteUp,
+        voteDown: article.voteDown,
+        hits: article.hits,
+        count: article.count,
+        url: article.url,
+      });
+    }
   }
   //获取当前用户对动态的审核权限
   const permissions = {

@@ -3,7 +3,7 @@
     .user-column-box(v-for="item in articles")
       .user-column-body
         .user-column-title
-          a.user-column-name(:href="item.homeUrl" target="_blank") {{item.columnName}}
+          a.user-column-name(:href="item.homeUrl" target="_blank" v-if="item.columnName") {{item.columnName}}
           span(
             data-type="nkcTimestamp"
             :data-time="(new Date(item.toc)).getTime()"
