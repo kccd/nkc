@@ -1186,9 +1186,11 @@ schema.statics.getArticlesInfo = async function(articles) {
     let url;
     let editorUrl;
     const document = articleDocumentsObj[article.did];
-    let review
+    let review;
+    let documentResourceId;
     if(document) {
       review = (await ReviewModel.find({docId: document._id}).sort({toc: -1}).limit(1))[0];
+      documentResourceId = await document.getResourceReferenceId()
     }
     const columnPost = columnPostsObj[article._id];
     if(article.source === columnSource) {
@@ -1201,14 +1203,12 @@ schema.statics.getArticlesInfo = async function(articles) {
       editorUrl = `/creation/editor/zone/article?source=zone&aid=${article._id}`;
       url = `/zone/a/${article._id}`;
     }
-    const documentResourceId = await document.getResourceReferenceId()
     //获取文章引用的资源
     // const resources = await ResourceModel.getResourcesByReference(documentResourceId);
     const info = {
       ...article.toObject(),
       reason: review?review.reason:'',
       document,
-      documentResourceId,
       editorUrl,
       user: userObj[article.uid],
       count: articlePostsObj[article._id]?articlePostsObj[article._id].count : 0,
@@ -1216,6 +1216,9 @@ schema.statics.getArticlesInfo = async function(articles) {
     };
     if(article.source === 'column') {
       info.column = columnObj[columnPost.columnId];
+    }
+    if(documentResourceId) {
+    info.documentResourceId = documentResourceId;
     }
     results.push(info);
   }
