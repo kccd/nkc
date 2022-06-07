@@ -1,14 +1,24 @@
 <template lang="pug">
   .title
     .input-title(v-if="o !== 'copy'")
+      mixin threadLink
+        a(:href="data.thread.url" target="_blank") {{data.thread.title}}
       .editor-type-info(v-if="data.type === 'newPost'")
-        .fa.fa-lightbulb-o {{data.thread.comment ? "正在回复文章《" : "正在评论文章《"}}
-        a(:href="data.thread.url" target="_blank") {{data.thread.title}} {{!data.thread.comment ? "》" : "》下的回复"}}
+        div(v-if="data.thread.comment")
+          .fa.fa-lightbulb-o
+          span 正在评论文章《
+          +threadLink
+          span 》下的回复
+        div(v-else)
+          .fa.fa-lightbulb-o
+          span 正在回复文章《
+          +threadLink
+          span 》
       .editor-type-info(v-else-if="data.type === 'modifyThread'")
         .fa.fa-lightbulb-o
-        |正在编辑文章《
-        a(:href="data.thread.url" target="_blank") {{data.thread.title}}
-        |》
+        span 正在编辑文章《
+        +threadLink
+        span 》
         .on-edit-notes
           .on-edit-label 您正在修改已经发表的内容，以下提示非常重要，请务必详读123。
             a.detail(@click="openOnEditNotes = !openOnEditNotes") {{openOnEditNotes ? "收起":"展开"}}
@@ -16,24 +26,15 @@
         //- .on-edit-note-content(v-if="openOnEditNotes")!=nkcRender.plainEscape(state.editorSettings.onEditNotes)
       .editor-type-info(v-else-if="data.type === 'modifyPost'")
         .fa.fa-lightbulb-o
-        |正在编辑文章《
-        a(:href="data.thread.url" target="_blank") {{data.thread.title}}
-        | 》下的{{data.thread.comment ? "评论" : "回复"}}
+        span 正在编辑文章《
+        +threadLink
+        span(v-if="data.thread.comment") 》下的评论
+        span(v-else) 》下的回复
         .on-edit-notes
           .on-edit-label 您正在修改已经发表的内容，以下提示非常重要，请务必详读。
             a.detail(@click="openOnEditNotes = !openOnEditNotes") {{openOnEditNotes ?  "收起":"展开"}}
           .on-edit-note-content(v-if="openOnEditNotes") {{notice}}
         //- .on-edit-note-content(v-if="openOnEditNotes")!=nkcRender.plainEscape(state.editorSettings.onEditNotes)
-      .editor-type-info(v-else-if='data.type === "modifyForumDeclare"')
-        .fa.fa-lightbulb-o
-        | 正在编辑&nbsp;
-        a(:href="data.forum.url" target="_blank") {{data.forum.title}}
-        | &nbsp;的专业说明
-      .editor-type-info(v-else-if='data.type === "modifyForumLatestNotice"')
-        .fa.fa-lightbulb-o
-        | 正在编辑&nbsp;
-        a(:href="data.forum.url" target="_blank") {{data.forum.title}}
-        | &nbsp;的最新页板块公告
     input.editor-title(placeholder="请输入标题..." v-model="titleValue" )
 </template>
 <script>
