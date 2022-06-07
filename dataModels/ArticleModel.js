@@ -1186,10 +1186,13 @@ schema.statics.getArticlesInfo = async function(articles) {
     let url;
     let editorUrl;
     const document = articleDocumentsObj[article.did];
-    let review;
+    let reason;
     let documentResourceId;
     if(document) {
-      review = (await ReviewModel.find({docId: document._id}).sort({toc: -1}).limit(1))[0];
+      const review = (await ReviewModel.find({docId: document._id}).sort({toc: -1}).limit(1))[0];
+      if(review) {
+        reason = review.reason;
+      }
       documentResourceId = await document.getResourceReferenceId()
     }
     const columnPost = columnPostsObj[article._id];
@@ -1207,7 +1210,7 @@ schema.statics.getArticlesInfo = async function(articles) {
     // const resources = await ResourceModel.getResourcesByReference(documentResourceId);
     const info = {
       ...article.toObject(),
-      reason: review?review.reason:'',
+      reason: reason || '',
       document,
       editorUrl,
       user: userObj[article.uid],

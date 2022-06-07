@@ -125,6 +125,11 @@ router.get('/:aid', async (ctx, next)=>{
     //文章浏览数加一
     await article.addArticleHits();
   } else if(columnPostData.type === thread) {
+    const permissions = {
+      cancelXsf: ctx.permission('cancelXsf'),
+      modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
+    };
+    data.permissions = permissions;
     //获取论坛文章的评论
     const thread = await db.ThreadModel.findOnly({tid: columnPostData.thread.tid});
     //
@@ -176,7 +181,6 @@ router.get('/:aid', async (ctx, next)=>{
     //获取文章下的所有回复
     const paging = nkcModules.apiFunction.paging(page, count, pageSettings.threadPostList)
     data.paging = paging;
-    //加载回复
     let posts = await db.PostModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     const options = {
       uid: data.user?data.user.uid:'',
