@@ -1,12 +1,12 @@
 <template lang="pug">
-.column
+.column(v-if="state && data")
   .editor-header 专栏
   div(v-if="!state.userColumn")
       h5(v-if="state.columnPermission") 你还未开设专栏。
         a(href=`/column/apply` target="_blank") 立即开设
       h5(v-else) 目前还不能开设专栏，通常是因为你参与讨论较少或没有文章被列入精选。
   div(v-else-if = "state.userColumn")
-    div(v-if="!data.addedToColumn || o === 'copy'") 
+    div(v-if="!data.addedToColumn || o === 'copy'")
       .moduleSelectColumnCategories(
       :data-column-id="state.column._id"
       :data-to-column='data.toColumn?"true":""'
@@ -121,7 +121,10 @@ export default {
       }
     }
   },
+  mounted() {
+  },
   methods: {
+    //获取选择状态
     getStatus() {
       return {
         selectedMainCategories: this.selectedMainCategories,
@@ -131,16 +134,19 @@ export default {
         checkbox: this.choose.length > 0
       };
     },
+    //通过id获取著分类
     getMainCategoryById: function(_id) {
       for (var i = 0; i < this.mainCategories.length; i++) {
         if (this.mainCategories[i]._id === _id) return this.mainCategories[i];
       }
     },
+    //通过id获取主分类
     getMinorCategoryById: function(_id) {
       for (var i = 0; i < this.minorCategories.length; i++) {
         if (this.minorCategories[i]._id === _id) return this.minorCategories[i];
       }
     },
+    //获取分类信息
     getCategories: function() {
       nkcAPI("/m/" + this.columnId + "/category?from=fastPost", "GET")
         .then(data => {
@@ -161,6 +167,7 @@ export default {
           sweetError(data);
         });
     },
+    //保存分类
     saveCategory: function() {
       var app = this;
       this.error = "";

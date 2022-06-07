@@ -26,11 +26,11 @@
           ref="content",
           :c="pageData.post && pageData.post.c",
           @content-change="contentChange"
-        ) 
+        )
         .m-b-2(
           v-if="!['newPost', 'modifyThread', 'modifyPost'].includes(pageData.type) || o === 'copy'"
         )
-          //- 1. @selected-forumids 选择的主分类后id给提交组件 2. data 包含 threadCategories minorForumCount mainForums 
+          //- 1. @selected-forumids 选择的主分类后id给提交组件 2. data 包含 threadCategories minorForumCount mainForums
           classification(
             ref="classification",
             :data="pageData",
@@ -67,12 +67,12 @@
           //- 1.data包含 createSurveyPermission type post.surveyId
           investigation(ref="investigation", :data="pageData")
         .m-b-2(v-if= "!['modifyPost'].includes(pageData.type)")
-          //- 1.state  
+          //- 1.state
           column(
-            ref="column",
-            :o="o",
-            :state="{ userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column: pageState.userColumn }",
-            :data="{ addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn }"
+            ref = "column",
+            :o = "o",
+            :state = "{ userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column: pageState.userColumn }",
+            :data = "{ addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn }"
           )
     .col-xs-12.col-md-3
       //- 1.notice 温馨提示的内容  2.data 中只需要post therad type forum allowedAnonymousForumsId havePermissionToSendAnonymousPost threadCategories
@@ -240,7 +240,7 @@ export default {
       if (
         event.persisted ||
         (window.performance && window.performance.navigation.type === 2)
-      ) 
+      )
       {
         reload()
       }

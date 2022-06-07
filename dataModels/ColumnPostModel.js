@@ -238,6 +238,8 @@ schema.statics.getArticleDataById = async function(columnId, _id){
 }
 /*
 * 拓展专栏的内容
+* @params {array} columnPosts 需要拓展的专栏引用
+* @params {array} fidOfCanGetThread 当前访问者能访问的专业
 * */
 schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
   if (columnPosts.length === 0) return [];
@@ -317,10 +319,10 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
     _id: {$in: [...aid]}
   };
   const {normal} = await ArticleModel.getArticleStatus();
-  const {column: ArticleSource} = await ArticleModel.getArticleSources();
+  const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
   if (fidOfCanGetThread) {
     // articleMatch.status = normal;
-    articleMatch.source = ArticleSource;
+    articleMatch.source = {$in: [columnSource, zoneSource]};
   }
   let articles = await ArticleModel.find(articleMatch);
   const articleOptions = [
@@ -597,7 +599,17 @@ schema.statics.createColumnPost = async function(article, selectCategory) {
   const SettingModel = mongoose.model('settings');
   const ColumnPostModel = mongoose.model('columnPosts');
   const ColumnModel = mongoose.model('columns');
-  const {_id, sid, uid, toc} = article;
+  let {_id, sid, uid, toc} = article;
+  if(!sid) {
+    sid = selectCategory.selectedMainCategories[0].columnId
+  }
+  if(!sid) {
+    sid = selectCategory.selectedMinorCategoriess[0].columnId;
+  }
+  if(!sid) {
+    throw(500, '未找到分享的专栏');
+  }
+  //如果article存在sid,通过sid查找专栏
   const column = await ColumnModel.findOnly({_id: sid});
   const order = await ColumnPostModel.getCategoriesOrder(selectCategory.selectedMainCategoriesId);
   const columnPost = ColumnPostModel({

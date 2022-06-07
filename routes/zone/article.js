@@ -22,6 +22,7 @@ router
     if(1) {
       data.targetUser = await article.extendUser();
       data.targetUser.description = renderMarkdown(nkcModules.nkcRender.replaceLink(data.targetUser.description));
+      data.targetUser.avatar = nkcModules.tools.getUrl('userAvatar', data.targetUser.avatar);
       await data.targetUser.extendGrade();
       await db.UserModel.extendUserInfo(data.targetUser);
       // data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);
@@ -29,6 +30,14 @@ router
       //   data.ColumnPost = await db.ColumnPostModel.findOne({columnId: data.targetColumn._id, type : 'article', pid: article._id});
       // }
     }
+    if(state.userColumn) {
+      data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: state.userColumn._id, type: "article", pid: aid})) > 0;
+    }
+    data.columnInfo = {
+      userColumn: state.userColumn,
+      columnPermission: state.columnPermission,
+      column: state.userColumn,
+    };
     if(token) {
       //如果存在token就验证token是否合法
       await db.ShareModel.hasPermission(token, article._id)

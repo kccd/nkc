@@ -15,6 +15,12 @@
     .m-b-05#container
       editor(ref="editor" :configs="editorConfigs" @ready="editorReady" @content-change="editorContentChange" )
     .m-b-05
+      column(
+        ref="column"
+        :data="{addedToColumn: added}"
+        :state="columnInfo"
+        o="o"
+        )
       .checkbox
         label
           input(type="checkbox" value="true" v-model="checkProtocol")
@@ -65,12 +71,13 @@
 
 <script>
   import Editor from '../Editor';
-  import {getCommentEditorConfigs} from '../../js/editor';
+  import Column from "../../../editor/vueComponents/Column";
   const commentEditorConfigs = getCommentEditorConfigs();
+  import {getCommentEditorConfigs} from '../../js/editor';
   import {debounce} from "../../js/execution";
   import {nkcAPI} from "../../js/netAPI";
   export default {
-    props: ['source', 'sid', 'comment'],
+    props: ['source', 'sid', 'comment', 'column-info', 'to-column', 'added'],
     data: () => ({
       editorConfigs: commentEditorConfigs,
       quote: '',
@@ -84,7 +91,8 @@
       saving: false,
     }),
     components: {
-      'editor': Editor
+      'editor': Editor,
+      'column': Column
     },
     computed: {
     },
@@ -147,7 +155,7 @@
         this.lockPost = true;
         const self = this;
         self.setSavedStatus('saving');
-        return nkcAPI('/comment', 'POST', {
+        const data = {
           content: self.commentContent,
           type,
           source: self.source,
@@ -155,7 +163,13 @@
           commentType: self.comment?'comment':'article',
           quoteDid: self.quote?self.quote.docId:'',
           commentId: self.commentId,
-        })
+          toColumn: null,
+        };
+        const toColumn = self.$refs.column.getStatus();
+        if(toColumn.checkbox) {
+          data.toColumn = toColumn;
+        }
+        return nkcAPI('/comment', 'POST', data)
         .then(res => {
           self.commentId = res.commentId;
           if(type !== 'publish') {
