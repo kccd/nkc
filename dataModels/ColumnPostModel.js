@@ -240,6 +240,7 @@ schema.statics.getArticleDataById = async function(columnId, _id){
 * 拓展专栏的内容
 * @params {array} columnPosts 需要拓展的专栏引用
 * @params {array} fidOfCanGetThread 当前访问者能访问的专业
+* @return {array} results 返回拓展的文章信息列表
 * */
 schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
   if (columnPosts.length === 0) return [];
@@ -271,9 +272,9 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
     }
   };
   if (fidOfCanGetThread) {
-    threadMatch.recycleMark = {$ne: true};
-    threadMatch.disabled = false;
-    threadMatch.reviewed = true;
+    // threadMatch.recycleMark = {$ne: true};
+    // threadMatch.disabled = false;
+    // threadMatch.reviewed = true;
     threadMatch.mainForumsId = {$in: fidOfCanGetThread};
   }
   //查找文章对应的专栏
