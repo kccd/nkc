@@ -1,8 +1,8 @@
 if data.user && data.xsfSettings && data.creditScore
   .credit-panel.bootstrap-modal
     div(class="modal fade" id="creditModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-credit-score-name=data.creditScore.name).bootstrap-modal
-      //- div(class="modal-dialog modal-sm" role="document")
-      .modal-content(class=" modal-sm")
+      div(class="modal-dialog modal-sm" role="document")
+      .modal-content
         .modal-header
           button(type="button" class="close" data-dismiss="modal" aria-label="Close")
             span(aria-hidden="true") &times;

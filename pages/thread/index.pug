@@ -47,7 +47,7 @@ block content
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
       //- include ../module_credit
       #module_credit
-        credit-model(v-show="show" :id="pid" type="kcb" :kcb="kcb" @close="dialogClose" ref="credit" article-type="thread")  
+        credit-model(v-show="show" :id="pid" :type="type" :kcb="kcb" @close="dialogClose" ref="credit" article-type="thread")  
       include ../module_digest
       .row
         .col-xs-12.col-md-9#wrap.box-shadow-panel

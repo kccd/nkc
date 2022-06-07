@@ -1,30 +1,30 @@
 <template lang="pug">
-    .credit-panel( class="ib" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" :data-credit-score-name="res.creditScore.name").bootstrap-modal
+    //- .credit-panel( class="ib" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" :data-credit-score-name="res.creditScore.name").bootstrap-modal
       //- div(class="modal-dialog modal-sm" role="document")
-      .modal-content(class="modal-sm ib" ref="content")
-        .modal-header(ref="header")
-          button.close-icon(type="button" @click="close")
-            span() &times;
-          h4.modal-title {{ {xsf: '评学术分',kcb: '鼓励'}[type] }}
-        .modal-body
-          .form
-            .form-group
-              span.kcb-info.currency 向作者转账
-              span.kcb-info.currency.outstanding {{res.creditScore.name}}
-              span.kcb-info.currency 以资鼓励
-            .form-group
-              label 分值
-              span.kcb-info.kcb-range(v-if="type === 'kcb'" style='display:inline-block;') {{"(" + res.creditSettings.min/100 + "-" + res.creditSettings.max/100 + ")"}}
-              span.xsf-info.xsf-range(v-else style='display:inline-block;') {{"(" + res.xsfSettings.reduceLimit + "到" + res.xsfSettings.addLimit + ")"}}
-              input.form-control.num(value='1' type='number' v-model="num")
-            .form-group
-              label 原因
-              span.kcb-info(style='display:inline-block;') （不超过60个字）
-              span.xsf-info(style='display:inline-block;') （不超过500个字）
-              textarea.form-control.description(rows=3 v-model="description")
-        .modal-footer
-          button(type="button" class="btn btn-default" data-dismiss="modal" @click="close") 关闭
-          button(type="button" class="btn btn-primary" @click="submit" :disable="disable") {{ disable ? "提交中..." : "确认"}}
+    .modal-content(class="modal-sm ib" ref="content")
+      .credit-modal-header(ref="header")
+        .close-icon(type="button" @click="close")
+          span.fa.fa-remove
+        .modal-title {{ {xsf: '评学术分',kcb: '鼓励'}[type] }}
+      .modal-body
+        .form
+          .form-group(v-if="type === 'kcb'")
+            span.kcb-info.currency 向作者转账
+            span.kcb-info.currency.outstanding {{ res.creditScore.name }}
+            span.kcb-info.currency 以资鼓励
+          .form-group
+            label 分值
+            span.kcb-info.kcb-range(v-if="type === 'kcb'" style='display:inline-block;') {{"(" + res.creditSettings.min/100 + res.creditScore.unit + "-" + res.creditSettings.max/100 + res.creditScore.unit + ")"}}
+            span.xsf-info.xsf-range(v-else style='display:inline-block;') {{"(" + -res.xsfSettings.reduceLimit + "到" + res.xsfSettings.addLimit + ")"}}
+            input.form-control.num(value='1' type='number' v-model="num")
+          .form-group
+            label 原因
+            span.kcb-info(v-if="type === 'kcb'" style='display:inline-block;') （不超过60个字）
+            span.xsf-info(v-else style='display:inline-block;') （不超过500个字）
+            textarea.form-control.description(rows=3 v-model="description")
+      .modal-footer
+        button(type="button" class="btn btn-default" data-dismiss="modal" @click="close") 关闭
+        button(type="button" class="btn btn-primary" @click="submit" :disable="disable") {{ disable ? "提交中..." : "确认"}}
 </template>
 
 <script>
@@ -64,7 +64,6 @@ export default {
     disable: false,
     description: '',
     num: '',
-    a: false,
   }),
   mounted() {
     this.dialog = new DraggableElement(
@@ -89,15 +88,19 @@ export default {
     },
     close(){
       // 通知父组件关闭对话框
-      this.$emit("close")
+      this.$emit("close");
+      this.num = '';
+      this.description = '';
+
     },
     submit(){
       this.disable = true;
       const obj = {
-        num: this.num * 100,
+        num: this.num,
         description: this.description
       };
       if (this.type === "kcb"){
+        obj.num *= 100;
         if(this.num*100 > this.kcb) return screenTopWarning('你的' + this.res.creditScore.name + '不足');
       }
       // let url = '/p/'+this.pid+'/credit/' + this.type;
@@ -128,22 +131,21 @@ export default {
   color: #1269ff
 }
 .modal-content {
-    position: relative;
+    position: fixed;
     background-color: #fff;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     border: 1px solid #999;
-    border: 1px solid rgba(0, 0, 0, .2);
     border-radius: 6px;
     outline: 0;
     -webkit-box-shadow: 0 3px 9px rgb(0 0 0 / 50%);
     box-shadow: 0 3px 9px rgb(0 0 0 / 50%);
 }
-.modal-header{
+/* .modal-header{
   cursor: pointer;
   padding: 15px;
   border-bottom: 1px solid #e5e5e5;
-}
+} */
 .modal-body {
     position: relative;
     padding: 15px;
@@ -158,13 +160,26 @@ export default {
 }
 .close-icon{
   cursor: pointer;
-  float: right;
-  /* background: white; */
-  border: none;
+  color: #aaa;
+  width: 3rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 3rem;
+  line-height: 3rem;
+  text-align: center;
+}
+.close-icon:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+  color: #777;
 }
 .modal-title {
-    margin: 0;
-    line-height: 1.42857143;
+    height: 3rem;
+    line-height: 3rem;
+    background-color: #f6f6f6;
+    cursor: move;
+    font-weight: 700;
+    padding-left: 1rem;
 }
 .form-group {
     margin-bottom: 15px;

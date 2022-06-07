@@ -63,7 +63,7 @@ router
       description,
       ip: ctx.address,
       port: ctx.port,
-      id,
+      pid: id,
       recordType: 'post'
     });
     targetUser.xsf += num;
