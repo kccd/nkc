@@ -1,18 +1,18 @@
 const Router = require('koa-router');
 const operationRouter = new Router();
 operationRouter
-  //获取奖励的配置数据
-  .get("/rewards", async (ctx, next) => {
-    const { db, data } = ctx;
-    //
-    data.creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
-    // 
-    data.creditSettings = await db.SettingModel.getCreditSettings();
-    // 
-    data.xsfSettings = await db.SettingModel.getSettings("xsf");
+  // //获取奖励的配置数据
+  // .get("/rewards", async (ctx, next) => {
+  //   const { db, data } = ctx;
+  //   //
+  //   data.creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
+  //   // 
+  //   data.creditSettings = await db.SettingModel.getCreditSettings();
+  //   // 
+  //   data.xsfSettings = await db.SettingModel.getSettings("xsf");
     
-    await next();
-  }) 
+  //   await next();
+  // }) 
   // 收藏文章
   .post("/collection", async (ctx, next) => {
     const {body, params, db, data} = ctx;

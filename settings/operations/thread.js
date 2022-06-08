@@ -1,9 +1,6 @@
 module.exports = {
 	GET: 'getThreadByQuery',
 	PARAMETER: {
-		rewards: {
-			GET: 'getRewardConfiguration'
-		},
 		GET: 'visitThread',
 		POST: 'postToThread',
 		moveDraft: {

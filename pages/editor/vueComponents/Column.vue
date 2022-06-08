@@ -58,7 +58,7 @@
                     option(v-for="c in mainCategories" :value="c._id" v-html="c.str + c.name")
                 .form-group
                   h5.text-danger(v-if="error") {{error}}
-                  button.btn.btn-primary.btn-sm(@click="saveCategory") 保存
+                  button.btn.btn-primary.btn-sm.m-r-05(@click="saveCategory") 保存
                   button.btn.btn-default.btn-sm(@click="cancelAddCategory") 取消
     h5(v-else) 本文已经发表到专栏，如需从专栏撤稿，请到专栏管理界面操作。
 </template>

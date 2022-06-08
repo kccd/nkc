@@ -15,7 +15,6 @@
   height: 1.3rem;
   line-height: 1.3rem;
   display: inline-block;
-  padding-right: 0.5rem;
 }
 .comment-vote>div{
   vertical-align: top;
@@ -37,6 +36,9 @@
   border: 1px solid #aaa;
   border-radius: 3px;
   transition: color 0.3s, background-color 0.3s;
+  .fa{
+    margin: 0 0.15rem;
+  }
 }
 .comment-vote-up {
   margin-right: 5px;

@@ -36,30 +36,8 @@ block content
       +content(c)
       include ../columns/article/articleEditTime
       +articleEditTime(tlm, dt, toc)
-      //- 文章用户其他操作
-      .single-post-bottom#articleOption
-        if data.user
-          if type === 'article'
-            a.single-comment-bottom-item(href="#container")
-              .fa.fa-comment-o.reply-icon
-              span 回复
-            if article.digest
-              span.fa.fa-star.m-r-05(style='color: #ffbf16;font-size: 1.2rem' title='精选')
-            .single-comment-bottom-item#CommentHitBox
-              comment-hit(cid=article._id article='article' vote-up=article.voteUp vote-down=article.voteDown)
-            .single-post-bottom-item(data-type='share' data-share-type='article' data-share-id=article._id title='分享')
-              .fa.fa-share-square-o.new-share-icon
-            .single-comment-bottom-item(data-type="articleOption" data-aid=article._id title="其他操作" data-direction="down")
-              .fa.fa-sliders.option-icon
-          else
-            .single-comment-bottom-item(data-type="articleOption" data-tid=article.tid data-collected=`${collected}` title="其他操作" data-direction="up")
-              .fa.fa-sliders.option-icon
-        else
-          a.single-comment-bottom-item(onclick="RootApp.openLoginPanel('login')")
-            .fa.fa-comment-o.reply-icon
-            span 回复
-          .single-comment-bottom-item(onclick="RootApp.openLoginPanel('login')" title="其他操作")
-            .fa.fa-sliders.option-icon
+      include ../columns/article/articleOptions
+      +articleOptions({logged: !!data.user, type, _id: article._id, tid: article.tid, collected, digest: article.digest, voteUp: article.voteUp, voteDown: article.voteDown, replyCount: count || 0})
   .hidden#data=objToStr({comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn})
   .container-fluid.max-width
     .row
