@@ -19,8 +19,7 @@ router
     const {user} = data;
     const column = await db.ColumnModel.findById(_id);
     //获取当前用户是否能查看所有状态的文章
-    const isModerator = ctx.permissionsOr(['review', 'movePostsToDraft', 'movePostsToRecycle']) || user.uid === column.uid;
-    data.isModerator = isModerator;
+    data.isModerator = ctx.permissionsOr(['review', 'movePostsToDraft', 'movePostsToRecycle']) || (user && user.uid === column.uid);
     if(!column) {
       const u = await db.UserModel.findOne({uid: _id});
       if(u) {
@@ -75,7 +74,7 @@ router
     const q = {
       columnId: column._id
     };
-   
+
     //当前用户能查看的文章
     const fidOfCanGetThread = await db.ForumModel.getReadableForumsIdByUid(data.user? data.user.uid: '');
     const sort = {};

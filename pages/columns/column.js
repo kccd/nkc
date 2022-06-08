@@ -1,17 +1,23 @@
 import {toLogin} from "../lib/js/account";
+import {getState} from "../lib/js/state";
+
+const state = getState();
+const logged = !!state.uid;
+
 var data = NKC.methods.getDataById("data");
+var SubscribeTypes = window.SubscribeTypes;
+
 $(function() {
   if(!window.CommonModal) {
     window.CommonModal = new NKC.modules.CommonModal();
   }
-  if(!window.SubscribeTypes && data.user) {
+  if(!SubscribeTypes && logged) {
     SubscribeTypes = new NKC.modules.SubscribeTypes();
   }
 });
 var bodyBackgroundColor = data.color;
 var listBackgroundColor = data.listColor;
 var toolsBackgroundColor = data.toolColor;
-var SubscribeTypes = window.SubscribeTypes;
 var CommonModal = window.CommonModal;
 $(function() {
   NKC.methods.initSelectColor(function(color, id) {
