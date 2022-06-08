@@ -1,0 +1,70 @@
+if !isIncluded('columns/article/articleOptions')
+  -var types = {article: 'article', thread: 'thread'};
+  +includeCSS('/columns/article/articleOptions.css')
+  mixin articleOptions(props)
+    -var {logged, type, _id, tid, collected, digest, voteUp, voteDown, replyCount} = props;
+    .article-options
+
+      mixin replyItem
+        .article-options-item.reply-url(title='回复数')
+          -var url = '';
+          if logged
+            if type === types.article
+              -url = '#container';
+            else if type === types.thread
+              -url = tools.getUrl('thread', tid) + '#container';
+            else
+              -url = '#container';
+          else
+            -url = "RootApp.openLoginPanel('login')"
+          a(href=url)
+            .fa.fa-comment-o
+            span=replyCount
+
+      //- 回复按钮
+      +replyItem
+
+      if digest
+        .article-options-item.digest-content(title='精选')
+          .fa.fa-star
+
+      if type === types.article
+
+        //- 点赞
+        .article-options-item.vote-content#CommentHitBox
+          comment-hit(
+            cid=_id
+            article='article'
+            vote-up=voteUp
+            vote-down=voteDown
+            )
+
+        //- 分享按钮
+        .article-options-item.share-content(
+          data-type='share'
+          data-share-type='article'
+          data-share-id=_id
+          title='分享'
+        )
+          .fa.fa-share-square-o
+          span 分享
+
+        //- 其他操作
+        .article-options-item.other-options(
+          data-type="articleOption"
+          data-aid=_id
+          title="其他操作"
+          data-direction="down"
+        )
+          .fa.fa-sliders
+      else
+
+        //- 其他操作
+        .article-options-item.other-options(
+          data-type="articleOption"
+          data-tid=tid
+          data-collected=collected
+          title="其他操作"
+          data-direction="down"
+        )
+          .fa.fa-sliders

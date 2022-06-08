@@ -64,6 +64,7 @@ router
       type,
       commentId,
       commentType, //用于判断当前提交的数据的sid是articleId还是articlePostId
+      toColumn
     } = body;
     let articlePost;
     //当sid为comment的sid时
@@ -104,13 +105,21 @@ router
         content
       });
       if(type === 'publish') {
+        //获取推送到专栏信息
+        if(toColumn) {
+          //判断用户选择推送到专栏后是否选择专栏分类
+          if(!toColumn.selectedMainCategoriesId || toColumn.selectedMainCategoriesId.length === 0) ctx.throw(401, '未选择文章专栏分类');
+          //检测专栏分类是否有效
+          await db.ColumnPostCategoryModel.checkColumnCategory(toColumn);
+        }
         const key = await nkcModules.getRedisKeys('commentOrder', article._id);
         const lock = await nkcModules.redLock.lock(key, 6000);
         try{
           // 获取最新评论的楼层
           const order = await db.CommentModel.getCommentOrder(article._id);
           await comment.updateOrder(order);
-          await comment.publishComment();
+          //发布评论
+          await comment.publishComment(article, toColumn);
           //更新评论引用的评论数replies
           await db.ArticlePostModel.updateOrder(order, article._id);
           await lock.unlock();

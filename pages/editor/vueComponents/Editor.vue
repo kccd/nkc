@@ -26,11 +26,11 @@
           ref="content",
           :c="pageData.post && pageData.post.c",
           @content-change="contentChange"
-        ) 
+        )
         .m-b-2(
           v-if="!['newPost', 'modifyThread', 'modifyPost'].includes(pageData.type) || reqUrl.o === 'copy'"
         )
-          //- 1. @selected-forumids 选择的主分类后id给提交组件 2. data 包含 threadCategories minorForumCount mainForums 
+          //- 1. @selected-forumids 选择的主分类后id给提交组件 2. data 包含 threadCategories minorForumCount mainForums
           classification(
             ref="classification",
             :data="pageData",
@@ -67,7 +67,7 @@
           //- 1.data包含 createSurveyPermission type post.surveyId
           investigation(ref="investigation", :data="pageData")
         .m-b-2(v-if= "!['modifyPost'].includes(pageData.type)")
-          //- 1.state  
+          //- 1.state
           column(
             ref="column",
             :o="reqUrl.o",
@@ -251,7 +251,7 @@ export default {
       if (
         event.persisted ||
         (window.performance && window.performance.navigation.type === 2)
-      ) 
+      )
       {
         reload()
       }

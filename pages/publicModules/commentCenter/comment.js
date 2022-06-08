@@ -7,6 +7,8 @@ if(data.type === 'article' && $("#commentEditor").length !== 0) {
     data: {
       comment: data.comment || null,
       articleId: data.article._id || '',
+      columnInfo: data.columnInfo,
+      addedToColumn: data.addedToColumn,
     },
     components: {
       "comment-editor": CommentEditor
@@ -52,7 +54,6 @@ for(let i = 0;i < singleBottomDom.length;i++) {
       "violation-record": ViolationRecord,
       "comment-post-editor": CommentPostEditor,
       "comment-hit": CommentHit
-
     },
     mounted() {
     },

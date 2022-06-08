@@ -1,6 +1,6 @@
 .thread-review-info
-  -let {reviewPid, reviewType, reviewReason} = reviewData || {};
-  if permission("review") && reviewPid
+  -let {reviewPid, reviewType, reviewReason, reviewPermission} = reviewData || {};
+  if (reviewPermission || permission('review')) && reviewPid
     h4 内容未审核
     if reviewReason
       p= "送审理由：" + reviewReason

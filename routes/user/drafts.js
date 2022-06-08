@@ -120,18 +120,24 @@ draftsRouter
       parentPostId
     };
     if(draft) { // 存在草稿
-      draftObj.tlm = Date.now();
-      if(query.saveType === 'manual') {
-        // 如果是手动保存那么需要存历史
+        draftObj.tlm = Date.now();
+      // if(query.saveType === 'manual') {
+        if(draftObj.tlm > new Date(draft.tlm).getTime() > 30 * 6000){
+
+        }else {
+          // 比较内容长度
+          // draft.c
+          // draftObj.c
+        }
         await draft.updateOne(draftObj);
         draftObj.type = (await db.DraftModel.getDraftType()).betaHistory;
         const preDraft = draft.toObject();
         delete preDraft._id;
         draft = db.DraftModel({...preDraft, ...draftObj});
         await draft.save();
-      }else {
-        await draft.updateOne(draftObj);
-      }
+      // }else {
+      //   await draft.updateOne(draftObj);
+      // }
       if(survey) { // 调查表数据
         if(draft.surveyId) { // 若草稿上已有调查表ID，则只需更新调查表数据。
           survey._id = draft.surveyId;

@@ -168,6 +168,7 @@ router
   .put("/", async (ctx, next) => {
     //审核post和document
     const {data, db, body, state} = ctx;
+    const {user} = data;
     let {pid, type: reviewType, docId, pass, reason, remindUser, violation, delType} = body;//remindUser 是否通知用户 violation 是否标记违规 delType 退修或禁用
     if(!reviewType) {
       if(pid) {
@@ -290,13 +291,25 @@ router
         if(!delType) ctx.throw(400, '请选择审核状态');
         //将document状态改为已审核状态
         await document.setStatus(delType);
-        //生成审核记录
-        await db.ReviewModel.reviewDocument({
-          handlerId: state.uid,
+        //生成退修或删除记录
+        const delLog = db.DelPostLogModel({
+          delUserId: document.uid,
+          userId: user.uid,
+          delPostTitle: document?document.title : "",
           reason,
-          documentId: document._id,
-          type: 'deleteDocument'
+          postType: document.source,
+          threadId: document.sid,
+          postId: document._id,
+          delType: delType,
+          noticeType: remindUser
         });
+        await delLog.save();
+        // await db.ReviewModel.reviewDocument({
+        //   handlerId: state.uid,
+        //   reason,
+        //   documentId: document._id,
+        //   type: 'deleteDocument'
+        // });
         // await db.ReviewModel.newReview('noPassDocument', '', data.user, reason, document);
         //如果标记用户违规了就给该用户新增违规记录
         if(violation) {
@@ -311,30 +324,32 @@ router
             key: 'violationCount',
             description: reason || '屏蔽文档并标记为违规',
           });
+          await db.KcbsRecordModel.insertSystemRecord('violation', targetUser, ctx);
           //如果用户违规了就将用户图书中的reviewedCount.article设置为后台设置违规需要发的贴数，用户每发帖一次就将该数量减一，为零时不需要审核
           // await db.UserGeneralModel.resetReviewedCount(document.uid, ['article', 'comment']);
         }
-        if(!remindUser) return;
-        let messageType;
-        if(document.source === 'article') {
-          messageType = delType === 'faulty'?"documentFaulty":"documentDisabled";
-        } else if(document.source === 'comment') {
-          messageType = delType === 'faulty'?"commentFaulty":"commentDisabled";
-        } else if(document.source === 'moment') {
-          messageType = 'momentDelete';
-        }
-        message = db.MessageModel({
-          _id: await db.SettingModel.operateSystemID("messages", 1),
-          r: document.uid,
-          ty: "STU",
-          c: {
-            delType,
-            violation,//是否违规
-            type: messageType,
-            docId: document._id,
-            reason,
+        if(remindUser) {
+          let messageType;
+          if(document.source === 'article') {
+            messageType = delType === 'faulty'?"documentFaulty":"documentDisabled";
+          } else if(document.source === 'comment') {
+            messageType = delType === 'faulty'?"commentFaulty":"commentDisabled";
+          } else if(document.source === 'moment') {
+            messageType = 'momentDelete';
           }
-        });
+          message = db.MessageModel({
+            _id: await db.SettingModel.operateSystemID("messages", 1),
+            r: document.uid,
+            ty: "STU",
+            c: {
+              delType,
+              violation,//是否违规
+              type: messageType,
+              docId: document._id,
+              reason,
+            }
+          });
+        };
       }
     }
     if(message) {

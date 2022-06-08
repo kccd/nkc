@@ -142,6 +142,29 @@ const draftType = {
   stableHistory: 'stableHistory'
 };
 /* 
+* 
+*/
+draftSchema.statics.copyToBetaToHistory = async (draft, latestDraft) => {
+  const DraftModel = mongoose.model("drafts");
+  latestDraft.tlm = Date.now();
+  // 如果距离上一次编辑大于30分钟 或者内容长度差距大于100字符就可以提交
+  if(latestDraft.tlm > new Date(draft.tlm).getTime() < 30 * 6000){
+    return
+  }else {
+    // 比较内容长度
+    // draft.c
+    // latestDraft.c
+
+  }
+  // 
+  await draft.updateOne(latestDraft);
+  latestDraft.type = (await DraftModel.getDraftType()).betaHistory;
+  const preDraft = draft.toObject();
+  delete preDraft._id;
+  draft = db.DraftModel({...preDraft, ...latestDraft});
+  await draft.save();
+}
+/* 
 * 获取草稿的type
 * @return {Object}
 */

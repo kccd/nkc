@@ -1,8 +1,5 @@
 <template lang="pug">
-  .user-post
-    .paging-button
-      a.button(@click="toRoute(postRouteName)" :class="t === 'post'?'active':''") 回复
-      a.button(@click="toRoute(threadRouteName)" :class="t === 'thread'?'active':''") 文章
+  div.article-common.col-xs-12.col-md-9.m-b-1
     .user-post-list
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
       blank(v-if="(!posts || posts.length === 0) && !loading")
@@ -10,39 +7,17 @@
       post-list(ref="postList" :posts="posts" :permissions="permissions")
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
 </template>
-<style lang="less" scoped>
-@import "../../../../../publicModules/base";
-.user-post {
-  padding-top: 1rem;
-  .user-list-warning {
-    margin-top: 5rem;
-    margin-bottom: 5rem;
-    text-align: center;
-    font-size: 1.2rem;
-  }
-  .checkbox {
-    display: inline-block;
-    min-width: 15px;
-    min-height: 15px;
-  }
-  .checkbox label{
-    min-height: 15px;
-  }
-}
-</style>
 <script>
-import PostList from "../../../../../lib/vue/post/PostList";
-import Review from "../../../../../lib/vue/publicVue/postReview/Review";
-import Paging from "../../../../../lib/vue/Paging";
-import ToColumn from "../../../../../lib/vue/publicVue/toColumn/ToColumn";
-import Blank from '../../../../components/Blank';
-import {nkcAPI} from "../../../../../lib/js/netAPI";
-import {getState} from "../../../../../lib/js/state";
-import { routerName } from "../../../../routes/user"
+import PostList from "../../../../lib/vue/post/PostList";
+import Paging from "../../../../lib/vue/Paging";
+import Blank from "../../../components/Blank";
+import {routesName} from "../../../routes/creation";
+import {getState} from "../../../../lib/js/state";
+import {nkcAPI} from "../../../../lib/js/netAPI";
 export default {
   data: () => ({
-    postRouteName: routerName.post,
-    threadRouteName: routerName.thread,
+    postRouteName: routesName.creationCommunityPost,
+    threadRouteName: routesName.creationCommunityThread,
     posts: [],
     paging: {},
     loading: true,
@@ -53,12 +28,10 @@ export default {
     checkboxPosts: [],
     t: '',
   }),
-  components: {
-    "blank": Blank,
-    "review": Review,
-    "paging": Paging,
-    "to-column": ToColumn,
-    'post-list': PostList
+  components:{
+    'post-list': PostList,
+    'blank': Blank,
+    'paging': Paging
   },
   computed: {
     pageButtons() {
@@ -77,7 +50,12 @@ export default {
     initData() {
       const {params, path, name} = this.$route;
       const {uid: stateUid} = getState();
-      this.routeName = name;
+      const index = name.indexOf('creationCommunityThread');
+      if(index === -1) {
+        this.routeName = 'post';
+      } else {
+        this.routeName = 'thread';
+      }
       const {uid} = params;
       this.t = name;
       this.uid = uid || stateUid;
@@ -127,3 +105,8 @@ export default {
   }
 }
 </script>
+<style lang="less" scoped>
+.article-common{
+  padding: 0!important;
+}
+</style>

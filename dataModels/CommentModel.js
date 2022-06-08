@@ -220,10 +220,11 @@ schema.statics.createComment = async (options) => {
 /*
 * 发布comment, 检测评论的发表权限，不需要审核，即comment的状态为正常时，为评论生成一条新的动态并且通知作者文章文章被评论了
 * */
-schema.methods.publishComment = async function () {
+schema.methods.publishComment = async function (article, toColumn) {
   const DocumentModel = mongoose.model('documents');
   const CommentModel = mongoose.model('comments');
   const MomentModel = mongoose.model('moments');
+  const ColumnPostModel = mongoose.model('columnPosts');
   const {did} = this;
   const {normal: normalStatus} = await CommentModel.getCommentStatus();
   const {comment: commentQuoteType} = await MomentModel.getMomentQuoteTypes();
@@ -231,6 +232,14 @@ schema.methods.publishComment = async function () {
   await DocumentModel.checkGlobalPostPermission(this.uid, 'comment');
   await DocumentModel.publishDocumentByDid(did);
   const newComment = await CommentModel.findOnly({_id: this._id});
+  //将文章推送到专栏
+  if(toColumn) {
+    try{
+      await ColumnPostModel.createColumnPost(article, toColumn);
+    } catch (err) {
+      console.log(err);
+    }
+  }
   //如果发布的article不需要审核，并且不存在该文章的动态时就为该文章创建一条新的动态
   //不需要审核的文章状态不为默认状态
   if(newComment.status === normalStatus) {
@@ -319,6 +328,7 @@ schema.statics.extendPostComments = async (props) => {
   const {comments, uid, isModerator = '', permissions = {}, authorUid} = props;
   const DocumentModel = mongoose.model('documents');
   const UserModel = mongoose.model('users');
+  const DelPostLogModel = mongoose.model('delPostLog');
   const {htmlToPlain} = require("../nkcModules/nkcRender");
   const CommentModel = mongoose.model('comments');
   const {getUrl} = require('../nkcModules/tools');
@@ -338,7 +348,7 @@ schema.statics.extendPostComments = async (props) => {
   }
   const {comment: commentSource} = await DocumentModel.getDocumentSources();
   const {stable: stableType} = await DocumentModel.getDocumentTypes();
-  const {normal: normalStatus} = await DocumentModel.getDocumentStatus();
+  const {normal: normalStatus, unknown: unknownStatus, disabled: disabledStatus, faulty: faultyStatus} = await DocumentModel.getDocumentStatus();
   const documents = await DocumentModel.find({did: {$in: didArr}, source: commentSource, type: stableType});
   for(const d of documents) {
     //用户是否具有审核权限
@@ -347,9 +357,18 @@ schema.statics.extendPostComments = async (props) => {
         if((d.status !== normalStatus || d.type !== stableType) && !isModerator) continue;
       }
     }
-    let review;
-    if(d.status === 'faulty' || d.status === 'unknown') {
-      review = await ReviewModel.findOne({docId: d._id}).sort({toc: -1}).limit(1);
+    let delLog;
+    let reason;
+    //获取评论状态不正常的审核原因
+    if(d.status === unknownStatus) {
+      delLog = await ReviewModel.findOne({docId: document._id}).sort({toc: -1});
+    } else if(d.status === disabledStatus) {
+      delLog = await DelPostLogModel.findOne({postType: d.source, delType: disabledStatus, postId: d._id, delUserId: d.uid}).sort({toc: -1});
+    } else if(d.status === faultyStatus) {
+      delLog = await DelPostLogModel.findOne({postType: d.source, delType: faultyStatus, postId: d._id, delUserId: d.uid}).sort({toc: -1});
+    }
+    if(delLog) {
+      reason = delLog.reason;
     }
     if(d.quoteDid) quoteIdArr.push(d.quoteDid);
     const {content, _id, type, status} = d;
@@ -358,7 +377,7 @@ schema.statics.extendPostComments = async (props) => {
       _id,
       type,
       status,
-      reason: review?review.reason:'',
+      reason: reason?reason : '',
     };
   }
   //获取引用评论

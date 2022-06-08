@@ -1,0 +1,44 @@
+.article-options{
+  text-align: right;
+  .article-options-item{
+    display: inline-block;
+    margin-left: 0.5rem;
+    &.digest-content{
+      .fa{
+        color: #ffbf16;
+      }
+    }
+    &.reply-url{
+      a{
+        color: #000;
+        text-decoration: none;
+      }
+      .fa{
+        margin-right: 0.2rem;
+      }
+    }
+    &.vote-content{
+      vertical-align: text-bottom;
+      font-size: 0;
+    }
+    &.share-content{
+      color: #777;
+      cursor: pointer;
+      span{
+        font-size: 1rem;
+      }
+      .fa{
+        vertical-align: text-bottom;
+        margin-right: 0.2rem;
+      }
+    }
+    &.other-options{
+      color: #777;
+      cursor: pointer;
+      .fa{
+        vertical-align: top;
+        margin-top: 2px;
+      }
+    }
+  }
+}

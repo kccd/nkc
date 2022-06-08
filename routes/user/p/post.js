@@ -150,5 +150,6 @@ module.exports = async (ctx, next) => {
   }
   data.paging = paging;
   data.posts = results;
+  data.permissions.type = 'post';
   await next();
 }

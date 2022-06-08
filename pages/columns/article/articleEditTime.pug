@@ -5,4 +5,4 @@ if !isIncluded('postEditTime')
     @param {Date} dt  同 did 文档的最原始的创建时间
   mixin articleEditTime(tlm, dt ,toc)
     if new Date(toc).getTime() !== new Date(dt).getTime()
-      p.lighttext=`[修改于 ${fromNow(tlm)} - ${dateString(tlm)}]`
+      p.lighttext=`[修改于 ${fromNow(new Date(tlm))} - ${dateString(new Date(tlm))}]`

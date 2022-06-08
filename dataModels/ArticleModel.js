@@ -1128,6 +1128,7 @@ schema.statics.getArticlesInfo = async function(articles) {
   const DocumentModel = mongoose.model('documents');
   const ReviewModel = mongoose.model('reviews');
   const ArticlePostModel = mongoose.model('articlePosts');
+  const DelPostLogModel = mongoose.model('delPostLog');
   const columnArticlesId = [];
   const articlesDid = [];
   const articleId = [];
@@ -1152,6 +1153,7 @@ schema.statics.getArticlesInfo = async function(articles) {
   }
   const {article: articleSource} = await DocumentModel.getDocumentSources();
   const {stable: stableType} = await DocumentModel.getDocumentTypes();
+  const {unknown: unknownStatus, faulty: faultyStatus, disabled: disabledStatus} = await DocumentModel.getDocumentStatus();
   const articleDocuments = await DocumentModel.find({did: {$in: articlesDid}, source: articleSource, type: stableType});
   for(const d of articleDocuments) {
     articleDocumentsObj[d.did] = d;
@@ -1186,9 +1188,22 @@ schema.statics.getArticlesInfo = async function(articles) {
     let url;
     let editorUrl;
     const document = articleDocumentsObj[article.did];
-    let review
+    let reason;
+    let documentResourceId;
     if(document) {
-      review = (await ReviewModel.find({docId: document._id}).sort({toc: -1}).limit(1))[0];
+      const {status} = document;
+      let delLog;
+      if(status === unknownStatus) {
+        delLog = await ReviewModel.findOne({docId: document._id}).sort({toc: -1});
+      } else if(status === disabledStatus) {
+        delLog = await DelPostLogModel.findOne({postType: document.source, delType: disabledStatus, postId: document._id, delUserId: document.uid}).sort({toc: -1});
+      } else if(status === faultyStatus) {
+        delLog = await DelPostLogModel.findOne({postType: document.source, delType: faultyStatus, postId: document._id, delUserId: document.uid}).sort({toc: -1});
+      }
+      if(delLog) {
+        reason = delLog.reason;
+      }
+      documentResourceId = await document.getResourceReferenceId()
     }
     const columnPost = columnPostsObj[article._id];
     if(article.source === columnSource) {
@@ -1201,14 +1216,12 @@ schema.statics.getArticlesInfo = async function(articles) {
       editorUrl = `/creation/editor/zone/article?source=zone&aid=${article._id}`;
       url = `/zone/a/${article._id}`;
     }
-    const documentResourceId = await document.getResourceReferenceId()
     //获取文章引用的资源
     // const resources = await ResourceModel.getResourcesByReference(documentResourceId);
     const info = {
       ...article.toObject(),
-      reason: review?review.reason:'',
+      reason: reason || '',
       document,
-      documentResourceId,
       editorUrl,
       user: userObj[article.uid],
       count: articlePostsObj[article._id]?articlePostsObj[article._id].count : 0,
@@ -1216,6 +1229,9 @@ schema.statics.getArticlesInfo = async function(articles) {
     };
     if(article.source === 'column') {
       info.column = columnObj[columnPost.columnId];
+    }
+    if(documentResourceId) {
+    info.documentResourceId = documentResourceId;
     }
     results.push(info);
   }

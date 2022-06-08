@@ -8,10 +8,12 @@ const markNotes = require("../nkcModules/nkcRender/markNotes");
 * 上层 documentSources
 * */
 const documentStatus = {
-  'default': 'default', // 默认状态
+  'default': 'default', // 默认状态 创建了但未进行任何操作
   disabled: "disabled",// 禁用
+  unknown: 'unknown',// 未审核
   normal: "normal",// 正常状态 能被所有用户查看的文档
   faulty: "faulty", // 退修
+  cancelled: 'cancelled', // 取消发布
   unknown: "unknown"// 需要审核
 };
 
@@ -414,6 +416,9 @@ schema.statics.checkContentAndCopyBetaToHistoryBySource = async (source, sid) =>
   if(!betaDocument) throwErr(400, '不存在编辑版，无法保存历史');
   const time = Date.now();
   const latestHistoryDocument = await DocumentModel.getLatestHistoryDocumentBySource(source, sid);
+
+  let needHistory = false;
+
   if(
     // 如果没有历史版本则直接保存
     !latestHistoryDocument ||
@@ -421,16 +426,49 @@ schema.statics.checkContentAndCopyBetaToHistoryBySource = async (source, sid) =>
     time - latestHistoryDocument.toc.getTime() > 30 * 60 * 1000 ||
     // 如果内容有变动则保存
     betaDocument.cover !== latestHistoryDocument.cover ||
-    betaDocument.title !== latestHistoryDocument.title ||
-    betaDocument.content !== latestHistoryDocument.content ||
-    (betaDocument.keywordsEN || []).join('-') !== (latestHistoryDocument.keywordsEN || []).join('-') ||
-    (betaDocument.keywords || []).join('-') !== (latestHistoryDocument.keywords || []).join('-') ||
-    betaDocument.abstractEN !== latestHistoryDocument.abstractEN ||
-    betaDocument.abstract !== latestHistoryDocument.abstract ||
-    betaDocument.origin !== latestHistoryDocument.origin ||
-    betaDocument.wordCount !== latestHistoryDocument.wordCount ||
-    JSON.stringify(betaDocument.authorInfos) !== JSON.stringify(latestHistoryDocument.authorInfos)
-  ) return await betaDocument.copyToHistoryDocument();
+    betaDocument.origin !== latestHistoryDocument.origin
+  ) {
+    needHistory = true;
+  }
+
+  if(!needHistory) {
+
+    const {
+      title: betaTitle = '',
+      wordCount: betaWordCount = 0,
+      keywordsEN: betaKeywordsEN = [],
+      keywords: betaKeywords = [],
+      abstractEN: betaAbstractEN = '',
+      abstract: betaAbstract = '',
+    } = betaDocument;
+
+    const {
+      title: latestHistoryTitle = '',
+      wordCount: latestHistoryWordCount = 0,
+      keywordsEN: latestHistoryKeywordsEN = [],
+      keywords: latestHistoryKeywords = [],
+      abstractEN: latestHistoryAbstractEN = '',
+      abstract: latestHistoryAbstract = '',
+    } = latestHistoryDocument;
+
+    // 统计内容字数变动
+    let count = 0;
+    count += betaTitle.length - latestHistoryTitle.length;
+    count += betaWordCount - latestHistoryWordCount;
+    count += betaKeywords.join('').length - latestHistoryKeywords.join('').length;
+    count += betaKeywordsEN.join('').length - latestHistoryKeywordsEN.join('').length;
+    count += betaAbstract.length - latestHistoryAbstract.length;
+    count += betaAbstractEN.length - latestHistoryAbstractEN.length;
+    count = Math.abs(count);
+    // 若内容字数变动超过100，则存历史
+    if(count > 100) {
+      needHistory = true;
+    }
+  }
+
+  if(needHistory) {
+    await betaDocument.copyToHistoryDocument();
+  }
 }
 
 // 将当前版本设置为编辑版，并设置最后修改时间

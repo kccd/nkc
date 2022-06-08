@@ -238,8 +238,14 @@ schema.statics.getArticleDataById = async function(columnId, _id){
 }
 /*
 * 拓展专栏的内容
+* @params {array} columnPosts 需要拓展的专栏引用
+* @params {array} fidOfCanGetThread 当前访问者能访问的专业
+* @params {object} user 当前访问用户
+* @params {boolean} isModerator 是否有权查看状态不正常的文章
+* @return {array} results 返回拓展的文章信息列表
 * */
-schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
+schema.statics.extendColumnPosts = async (options) => {
+  const {columnPosts, fidOfCanGetThread, isModerator} = options;
   if (columnPosts.length === 0) return [];
   const PostModel = mongoose.model("posts");
   const ThreadModel = mongoose.model("threads");
@@ -247,6 +253,7 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
   const ColumnModel = mongoose.model("columns");
   const ArticleModel = mongoose.model('articles');
   const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
+  const {normal} = await ArticleModel.getArticleStatus();
   const pid = new Set();
   const tid = new Set();
   const uid = new Set();
@@ -269,10 +276,12 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
     }
   };
   if (fidOfCanGetThread) {
+    threadMatch.mainForumsId = {$in: fidOfCanGetThread};
+  }
+  if(!isModerator) {
     threadMatch.recycleMark = {$ne: true};
     threadMatch.disabled = false;
     threadMatch.reviewed = true;
-    threadMatch.mainForumsId = {$in: fidOfCanGetThread};
   }
   //查找文章对应的专栏
   const columns = await ColumnModel.find({_id: {$in: [...columnId]}});
@@ -303,9 +312,11 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
     pid: {$in: [...pid]}
   };
   if (fidOfCanGetThread) {
+    postMatch.mainForumsId = {$in: fidOfCanGetThread};
+  }
+  if(!isModerator) {
     postMatch.toDraft = {$ne: true};
     postMatch.disabled = false;
-    postMatch.mainForumsId = {$in: fidOfCanGetThread};
   }
   const posts = await PostModel.find(postMatch);
   posts.map(post => {
@@ -316,11 +327,13 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
   const articleMatch = {
     _id: {$in: [...aid]}
   };
-  const {normal} = await ArticleModel.getArticleStatus();
-  const {column: ArticleSource} = await ArticleModel.getArticleSources();
+  if(!isModerator) {
+    articleMatch.status = normal;
+  }
+  const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
   if (fidOfCanGetThread) {
     // articleMatch.status = normal;
-    articleMatch.source = ArticleSource;
+    articleMatch.source = {$in: [columnSource, zoneSource]};
   }
   let articles = await ArticleModel.find(articleMatch);
   const articleOptions = [
@@ -417,7 +430,14 @@ schema.statics.getCategoriesOrder = async (categoriesId) => {
   return order;
 };
 
-schema.statics.getToppedColumnPosts = async (columnId, fidOfCanGetThread, cid) => {
+/*
+* 拓展专栏首页专栏引用文章
+* @params {string} columnId 专栏 ID
+* @params {string} fidOfCanGetThread 当前用户能访问的专业ID
+* @params {array} cid 访问的分类id
+* */
+schema.statics.getToppedColumnPosts = async (options) => {
+  const {columnId, fidOfCanGetThread, cid, user, isModerator} = options;
   const ColumnPostModel = mongoose.model("columnPosts");
   const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
   const ColumnModel = mongoose.model("columns");
@@ -436,7 +456,7 @@ schema.statics.getToppedColumnPosts = async (columnId, fidOfCanGetThread, cid) =
     const columnPost = await ColumnPostModel.findOne({_id});
     if(columnPost) columnPosts.push(columnPost);
   }
-  return await ColumnPostModel.extendColumnPosts(columnPosts, fidOfCanGetThread);
+  return await ColumnPostModel.extendColumnPosts({columnPosts, fidOfCanGetThread, user, isModerator});
 };
 
 /*
@@ -597,7 +617,17 @@ schema.statics.createColumnPost = async function(article, selectCategory) {
   const SettingModel = mongoose.model('settings');
   const ColumnPostModel = mongoose.model('columnPosts');
   const ColumnModel = mongoose.model('columns');
-  const {_id, sid, uid, toc} = article;
+  let {_id, sid, uid, toc} = article;
+  if(!sid) {
+    sid = selectCategory.selectedMainCategories[0].columnId
+  }
+  if(!sid) {
+    sid = selectCategory.selectedMinorCategoriess[0].columnId;
+  }
+  if(!sid) {
+    throw(500, '未找到分享的专栏');
+  }
+  //如果article存在sid,通过sid查找专栏
   const column = await ColumnModel.findOnly({_id: sid});
   const order = await ColumnPostModel.getCategoriesOrder(selectCategory.selectedMainCategoriesId);
   const columnPost = ColumnPostModel({

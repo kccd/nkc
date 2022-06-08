@@ -29,7 +29,7 @@
         @click="readyData",
         :disabled="disabledSubmit || !checkProtocol"
       ) {{ disabledSubmit ? '提交中...' : '提交' }}
-      button.btn.btn-default(@click="saveToDraftBaseDebounce('manual')") {{ saveDraft ? "保存中" : "存草稿"}}
+      button.btn.btn-default(@click="saveToDraftBase('manual')") 存草稿
 </template>
 
 <script>
@@ -55,7 +55,6 @@ export default {
   },
   data: () => ({
     saveToDraftBaseDebounce: '',
-    saveDraft: false,
     type: "newThread",
     disabledSubmit: false, // 锁定提交按钮
     checkProtocol: true, // 是否勾选协议
@@ -99,7 +98,7 @@ export default {
     }
   },
   created(){
-    this.saveToDraftBaseDebounce = debounce((saveType)=>{this.saveToDraftBase(saveType)}, 700)
+    this.saveToDraftBaseDebounce = debounce((saveType)=>{this.saveToDraftBase(saveType)}, 2000)
   },
   computed: {
     selectedForumsId() {
@@ -144,7 +143,6 @@ export default {
     saveToDraftSuccess() {
       let time = new Date();
       this.autoSaveInfo = "草稿已保存 " + this.format(time);
-      this.saveDraft = false;
     },
     autoSaveToDraft() {
       this.readyDataForSave();
@@ -180,7 +178,6 @@ export default {
           });
     },
     saveToDraftBase(saveType = "manual") {
-      this.saveDraft = true;
       this.readyDataForSave();
       const { saveData } = this;
       if (!saveData.c) return sweetError("请先输入内容");
@@ -252,7 +249,7 @@ export default {
         })
         .then((res) => {
           if(!location.search.includes("aid")) this.addUrlParam("aid", res.draft._id);
-          if (type === "manual") {
+          if (saveType === "manual") {
             sweetSuccess("草稿已保存");
           }
           this.saveToDraftSuccess();
