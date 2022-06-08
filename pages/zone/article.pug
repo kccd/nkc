@@ -10,7 +10,7 @@ extends ../bootstrap_base
 block title
   -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, collected} = data.columnPost
   -var {_id, name} = column
-  -var {hits, count, oc, url} = thread
+  -var {hits, comment: count, oc, url} = thread
   -var {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt, authorInfos} = post
   title=t
   -var showManagement = data.user && permissionsOr(['review']);

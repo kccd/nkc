@@ -271,6 +271,15 @@ threadSchema.virtual('forums')
   .set(function(f) {
     this._forums = f
   });
+
+threadSchema.virtual('reason')
+  .get(function() {
+    return this._reason;
+  })
+  .set(function(reason) {
+    this._reason = reason;
+  });
+
 threadSchema.virtual('columns')
   .get(function() {
     return this._columns
