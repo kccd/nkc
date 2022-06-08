@@ -20,7 +20,7 @@
               .editor-cover-img
                 img(:src="coverLink")
               .m-t-05
-                button.btn.btn-default.btn-sm(@click="selectCover") 重新选择
+                button.btn.btn-default.btn-sm.m-r-05(@click="selectCover") 重新选择
                 button.btn.btn-default.btn-sm(@click="removeCover") 删除
       .form-group(v-if="formConfigs.abstract || formConfigs.abstractEN")
         .m-b-2
@@ -591,7 +591,7 @@ export default {
     watchContentChange: debounce(function() {
       this.updateContentLength();
       this.emitContentChangeEvent();
-    }, 500),
+    }, 2000),
   }
 }
 </script>

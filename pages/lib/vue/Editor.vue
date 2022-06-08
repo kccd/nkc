@@ -197,6 +197,8 @@
       },
       //更改内容保存信息
       changeSaveInfo(info) {
+        // 显示保存的提示可能会打扰到用户写作，暂时取消显示。
+        return;
         const self = this;
         if(!info) return;
         self.savingInfo = info;
@@ -205,13 +207,14 @@
         if(self.savingInfo === 'failed') {
           duration = 0;
         }
-        if(self.savingInfo === 'saving') {
-          self.savingInfoTimer = setTimeout(() => {
+
+        self.savingInfoTimer = setTimeout(() => {
+          if(self.savingInfo === 'saving') {
             self.showSavingInfoPanel(duration);
-          }, 500);
-        } else {
-          self.showSavingInfoPanel(duration);
-        }
+          } else {
+            self.showSavingInfoPanel(duration);
+          }
+        }, 2000);
       },
       contentChange(){
         const  _this = this;

@@ -6,7 +6,7 @@
         a(href=`/column/apply` target="_blank") 立即开设
       h5(v-else) 目前还不能开设专栏，通常是因为你参与讨论较少或没有文章被列入精选。
   div(v-else-if = "state.userColumn")
-    div(v-if="!data.addedToColumn || o === 'copy'") 
+    div(v-if="!data.addedToColumn || o === 'copy'")
       .moduleSelectColumnCategories(
       :data-column-id="state.column._id"
       :data-to-column='data.toColumn?"true":""'
@@ -58,7 +58,7 @@
                     option(v-for="c in mainCategories" :value="c._id" v-html="c.str + c.name")
                 .form-group
                   h5.text-danger(v-if="error") {{error}}
-                  button.btn.btn-primary.btn-sm(@click="saveCategory") 保存
+                  button.btn.btn-primary.btn-sm.m-r-05(@click="saveCategory") 保存
                   button.btn.btn-default.btn-sm(@click="cancelAddCategory") 取消
     h5(v-else) 本文已经发表到专栏，如需从专栏撤稿，请到专栏管理界面操作。
 </template>
