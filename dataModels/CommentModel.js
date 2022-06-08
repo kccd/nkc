@@ -220,10 +220,11 @@ schema.statics.createComment = async (options) => {
 /*
 * 发布comment, 检测评论的发表权限，不需要审核，即comment的状态为正常时，为评论生成一条新的动态并且通知作者文章文章被评论了
 * */
-schema.methods.publishComment = async function () {
+schema.methods.publishComment = async function (article, toColumn) {
   const DocumentModel = mongoose.model('documents');
   const CommentModel = mongoose.model('comments');
   const MomentModel = mongoose.model('moments');
+  const ColumnPostModel = mongoose.model('columnPosts');
   const {did} = this;
   const {normal: normalStatus} = await CommentModel.getCommentStatus();
   const {comment: commentQuoteType} = await MomentModel.getMomentQuoteTypes();
@@ -231,6 +232,14 @@ schema.methods.publishComment = async function () {
   await DocumentModel.checkGlobalPostPermission(this.uid, 'comment');
   await DocumentModel.publishDocumentByDid(did);
   const newComment = await CommentModel.findOnly({_id: this._id});
+  //将文章推送到专栏
+  if(toColumn) {
+    try{
+      await ColumnPostModel.createColumnPost(article, toColumn);
+    } catch (err) {
+      console.log(err);
+    }
+  }
   //如果发布的article不需要审核，并且不存在该文章的动态时就为该文章创建一条新的动态
   //不需要审核的文章状态不为默认状态
   if(newComment.status === normalStatus) {

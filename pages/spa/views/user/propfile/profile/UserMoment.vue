@@ -13,11 +13,16 @@
         @complaint="complaint"
         @violation-record="violationRecord"
         :permissions="permissions"
-        v-else
+        v-else-if="momentsData && momentsData.length !== 0 && t === 'moment'"
+      )
+      article-list(
+        ref="articleList"
+        :articles="momentsData"
+        v-else-if="momentsData && momentsData.length !== 0 && t === 'thread'"
       )
       complaint(ref="complaint")
       violation-record(ref="violationRecord")
-    paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
+      paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
 </template>
 <style lang="less" scoped>
 @import "../../../../../publicModules/base";
@@ -35,8 +40,9 @@ import Moments from "../../../../../lib/vue/zone/Moments";
 import Complaint from "../../../../../lib/vue/Complaint";
 import ViolationRecord from "../../../../../lib/vue/ViolationRecord";
 import Paging from "../../../../../lib/vue/Paging";
-import {nkcAPI} from "../../../../../lib/js/netAPI";
 import Blank from "../../../../components/Blank";
+import ArticleList from "../../../../../lib/vue/article/ArticleList";
+import {nkcAPI} from "../../../../../lib/js/netAPI";
 
 export default {
   data: () => ({
@@ -52,7 +58,8 @@ export default {
     "complaint": Complaint,
     "violation-record": ViolationRecord,
     "paging": Paging,
-    "blank": Blank
+    "blank": Blank,
+    "article-list": ArticleList
   },
   computed: {
     pageButtons() {

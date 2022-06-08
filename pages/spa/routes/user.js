@@ -69,12 +69,12 @@ export default [
               {
                 name: routerName.post,
                 path: '/u/:uid/profile/post',
-                component: UserPostList
+                component: UserPostList,
               },
               {
                 name: routerName.thread,
                 path: '/u/:uid/profile/thread',
-                component: UserPostList
+                component: UserPostList,
               },
               {
                 name: routerName.follower,

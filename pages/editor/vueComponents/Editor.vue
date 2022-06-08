@@ -69,10 +69,10 @@
         .m-b-2(v-if= "!['modifyPost'].includes(pageData.type)")
           //- 1.state
           column(
-            ref="column",
-            :o="o",
-            :state="{ userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column: pageState.userColumn }",
-            :data="{ addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn }"
+            ref = "column",
+            :o = "o",
+            :state = "{ userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column: pageState.userColumn }",
+            :data = "{ addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn }"
           )
     .col-xs-12.col-md-3
       //- 1.notice 温馨提示的内容  2.data 中只需要post therad type forum allowedAnonymousForumsId havePermissionToSendAnonymousPost threadCategories

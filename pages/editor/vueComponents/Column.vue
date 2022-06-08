@@ -1,5 +1,5 @@
 <template lang="pug">
-.column
+.column(v-if="state && data")
   .editor-header 专栏
   div(v-if="!state.userColumn")
       h5(v-if="state.columnPermission") 你还未开设专栏。
@@ -121,7 +121,10 @@ export default {
       }
     }
   },
+  mounted() {
+  },
   methods: {
+    //获取选择状态
     getStatus() {
       return {
         selectedMainCategories: this.selectedMainCategories,
@@ -131,16 +134,19 @@ export default {
         checkbox: this.choose.length > 0
       };
     },
+    //通过id获取著分类
     getMainCategoryById: function(_id) {
       for (var i = 0; i < this.mainCategories.length; i++) {
         if (this.mainCategories[i]._id === _id) return this.mainCategories[i];
       }
     },
+    //通过id获取主分类
     getMinorCategoryById: function(_id) {
       for (var i = 0; i < this.minorCategories.length; i++) {
         if (this.minorCategories[i]._id === _id) return this.minorCategories[i];
       }
     },
+    //获取分类信息
     getCategories: function() {
       nkcAPI("/m/" + this.columnId + "/category?from=fastPost", "GET")
         .then(data => {
@@ -161,6 +167,7 @@ export default {
           sweetError(data);
         });
     },
+    //保存分类
     saveCategory: function() {
       var app = this;
       this.error = "";

@@ -41,7 +41,13 @@ if !isIncluded('comment')
   if (data.columnPost.type === 'article' && data.columnPost.article.status && data.columnPost.article.status === 'normal') || (data.columnPost.thread && data.columnPost.thread.status && data.columnPost.thread.status === 'normal')
     if data.user
       #commentEditor.m-t-1(v-cloak)
-        comment-editor(ref="commentEditor" source="comment" :sid="articleId" :comment="comment")
+        comment-editor(
+          ref="commentEditor"
+          source="comment"
+          :sid="articleId"
+          :column-info="columnInfo"
+          :added="addedToColumn"
+          :comment="comment")
     else
       //- 游客
       p.text-center.p-t-1 想参与大家的讨论？现在就&nbsp;

@@ -13,8 +13,7 @@ import Drafts from '../views/creation/drafts/drafts';
 import Articles from '../views/creation/articles/Articles';
 import ArticlesColumn from '../views/creation/articles/Column';
 import Community from '../views/creation/community/Community';
-import CommunityThread from '../views/creation/community/Thread';
-import CommunityPost from '../views/creation/community/Post';
+import CreationPostList from "../views/creation/community/CreationPostList";
 import CommunityDraft from '../views/creation/community/Draft';
 import CommunityNote from '../views/creation/community/Note';
 import Column from '../views/creation/column/Column';
@@ -107,8 +106,8 @@ export default [
         path: '/creation/community',
         component: Community,
         children: [
-          {name: routesName.creationCommunityThread, path: 'thread', component: CommunityThread},
-          {name: routesName.creationCommunityPost, path: 'post', component: CommunityPost},
+          {name: routesName.creationCommunityThread, path: 'thread', component: CreationPostList},
+          {name: routesName.creationCommunityPost, path: 'post', component: CreationPostList},
           {name: routesName.creationCommunityDraft, path: 'draft', component: CommunityDraft},
           {name: routesName.creationCommunityNote, path: 'note', component: CommunityNote},
         ]

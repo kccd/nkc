@@ -2,6 +2,22 @@
 if thread
   -var {firstPost} = thread;
 .column-posts-post
+  if type === 'post'
+    if thread.disabled
+      .thread-disabled-info 文章已被封禁
+    else if thread.recycleMark
+      .thread-draft-info 文章已被退修
+    else if !thread.review
+      .thread-review-info 文章未审核
+  else if type === 'article'
+    if article.status === 'unknown'
+      .thread-review-info 文章未审核
+    else if article.status === 'disabled'
+      .thread-disabled-info 文章已被封禁
+    else if article.status === 'faulty'
+      .thread-draft-info 文章已被退修
+    else if article.status === 'deleted'
+      .thread-deleted-info 文章已被删除
   .column-post-body(class=(thread && thread.firstPost.cover) || (article && article.document.cover)?"cover":"")
     .column-post-cover
       if thread && thread.firstPost.cover
@@ -47,6 +63,14 @@ if thread
               span.column-post-author
                 img(src=anonymousInfo.avatar)
                 span.anonymous-name=anonymousInfo.username
+        else if article
+          a(href=`/u/${article.user.uid}` target="_blank"
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid: article.user.uid})
+          ).column-post-author
+            img(src=tools.getUrl('userAvatar', article.avatar, 'sm'))
+            span=article.user.username
         .column-post-time
           span.m-r-05
             //-=fromNow(toc)
