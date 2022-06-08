@@ -212,7 +212,6 @@ export default {
             throw "未知的草稿类型";
           }
           let formData = new FormData();
-          console.log(saveData.did, 'saveData.did')
           formData.append(
             "body",
             JSON.stringify({
@@ -243,7 +242,6 @@ export default {
             this.oldContentLength = data.draft?.c?.length;
             this.oldContent = data.draft?.c;
           }
-          console.log(data.draft?.did,'data.draft?.did')
           this.draftId = data.draft?.did;
           if (data.draft.cover) {
             this.coverData = "";
