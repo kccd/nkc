@@ -43,7 +43,7 @@ mixin nav(data)
       span(title="浏览数")
         .fa.fa-eye
         span=hits || 0
-      span(title='回复数' onclick="window.location.href='#container'")
+      span.pointer(title='回复数' onclick="window.location.href='#container'")
         .fa.fa-comment
         span=count || 0
       span.pointer

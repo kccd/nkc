@@ -26,8 +26,20 @@ block baseColumnContent
       +content(c)
       include ./article/articleEditTime
       +articleEditTime(tlm, dt, toc)
+      include ../columns/article/articleOptions
+      +articleOptions({
+        logged: !!data.user,
+        type,
+        _id: article._id,
+        tid: article.tid,
+        collected,
+        digest: article.digest,
+        voteUp: article.voteUp,
+        voteDown: article.voteDown,
+        replyCount: count || 0
+      })
       //- 文章用户其他操作
-      .single-post-bottom#articleOption
+      //-.single-post-bottom
         if data.user
           if type === 'article'
             span.single-comment-bottom-item(onclick="window.location.href='#container'")
