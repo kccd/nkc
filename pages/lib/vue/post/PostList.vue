@@ -1,7 +1,7 @@
 <template lang="pug">
   .post-list(v-if="posts.length !== 0")
     to-column(ref="toColumn")
-    .paging-button(v-if="permissions.reviewed" )
+    .paging-button(v-if="permissions.type === 'thread'")
       a.pointer.button.radius-left.radius-right(@click="managementPosts()") 管理
       span.post-management-button
         a.pointer.button(@click="selectAll()") 全选
@@ -86,12 +86,14 @@ export default {
     toColumn() {
       const self = this;
       this.$refs.toColumn.open(function (data){
-        const categoriesId = data.categoriesId;
+        const mainCategoriesId = data.mainCategoriesId;
+        const minorCategoriesId = data.minorCategoriesId;
         const columnId = data.columnId;
         nkcAPI('/m/' + columnId + '/post', 'POST', {
-          categoriesId,
-          type: 'addToColumnsId',
+          type: 'addToColumn',
           postsId: self.checkboxPosts,
+          mainCategoriesId: mainCategoriesId,
+          minorCategoriesId: minorCategoriesId,
         })
           .then(() => {
             sweetSuccess("操作成功");

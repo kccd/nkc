@@ -1,8 +1,5 @@
 <template lang="pug">
   div.article-common.col-xs-12.col-md-9.m-b-1
-    .paging-button
-      a.button(@click="toRoute(postRouteName)" :class="t === 'creationCommunityPost'?'active':''") 回复
-      a.button(@click="toRoute(threadRouteName)" :class="t === 'creationCommunityThread'?'active':''") 文章
     .user-post-list
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
       blank(v-if="(!posts || posts.length === 0) && !loading")
