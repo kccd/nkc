@@ -30,7 +30,7 @@ router.get('/:aid', async (ctx, next)=>{
       await db.ShareModel.hasPermission(token, _article._id)
     }
     if(state.userColumn) {
-      data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: state.userColumn._id, type: "article", pid: aid})) > 0;
+      data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: state.userColumn._id, type: "article", pid: article._id})) > 0;
     }
     data.columnInfo = {
       userColumn: state.userColumn,

@@ -47,7 +47,7 @@ block content
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
       //- include ../module_credit
       #module_credit
-        credit-model(v-show="show" :pid="pid" type="kcb" :kcb="kcb" @close="dialogClose")  
+        credit-model(v-show="show" :pid="pid" type="kcb" :kcb="kcb" @close="dialogClose")
       include ../module_digest
       .row
         .col-xs-12.col-md-9#wrap.box-shadow-panel
@@ -154,7 +154,7 @@ block content
                 .col-xs-12.col-md-12
                   .row
                     if !thread.reviewed
-                      -let reviewData = {reviewPid: thread.oc, reviewType: "thread", reviewReason: data.threadReviewReason}
+                      -let reviewData = {reviewPid: thread.oc, reviewType: "thread", reviewReason: data.threadReviewReason, reviewPermission: data.permissions.review}
                       include ../publicModules/module_review
                     .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${thread.recycleMark?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
                       if thread.recycleMark

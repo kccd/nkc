@@ -276,7 +276,6 @@ threadRouter
       const threadLogOne = await db.DelPostLogModel.findOne({"threadId":tid,"postType":"thread","delType":"toDraft","modifyType":false}).sort({toc: -1});
       thread.reason = threadLogOne.reason || '';
     }
-
     // 高亮楼层
     if(pid && step === undefined) {
       const url = await db.PostModel.getUrl(pid);

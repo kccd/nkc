@@ -110,9 +110,16 @@ export default {
   mounted() {
     const self = this;
     self.initId();
-    self.setInterval = setInterval(function() {
+    self.setInterval = setTimeout(function () {
       self.autoSaveToDraft()
-    }, 60000);
+        .then(() => {
+          self.autoSaveToDraft();
+        })
+        .catch((data) => {
+          sweetError('草稿保存失败：' + (data.error || data));
+          self.autoSaveToDraft();
+        })
+    }, 60000)
   },
   destroyed() {
     clearInterval(this.setInterval);

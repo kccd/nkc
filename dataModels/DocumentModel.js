@@ -8,10 +8,12 @@ const markNotes = require("../nkcModules/nkcRender/markNotes");
 * 上层 documentSources
 * */
 const documentStatus = {
-  'default': 'default', // 默认状态
+  'default': 'default', // 默认状态 创建了但未进行任何操作
   disabled: "disabled",// 禁用
+  unknown: 'unknown',// 未审核
   normal: "normal",// 正常状态 能被所有用户查看的文档
   faulty: "faulty", // 退修
+  cancelled: 'cancelled', // 取消发布
   unknown: "unknown"// 需要审核
 };
 

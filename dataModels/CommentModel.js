@@ -328,6 +328,7 @@ schema.statics.extendPostComments = async (props) => {
   const {comments, uid, isModerator = '', permissions = {}, authorUid} = props;
   const DocumentModel = mongoose.model('documents');
   const UserModel = mongoose.model('users');
+  const DelPostLogModel = mongoose.model('delPostLog');
   const {htmlToPlain} = require("../nkcModules/nkcRender");
   const CommentModel = mongoose.model('comments');
   const {getUrl} = require('../nkcModules/tools');
@@ -347,7 +348,7 @@ schema.statics.extendPostComments = async (props) => {
   }
   const {comment: commentSource} = await DocumentModel.getDocumentSources();
   const {stable: stableType} = await DocumentModel.getDocumentTypes();
-  const {normal: normalStatus} = await DocumentModel.getDocumentStatus();
+  const {normal: normalStatus, unknown: unknownStatus, disabled: disabledStatus, faulty: faultyStatus} = await DocumentModel.getDocumentStatus();
   const documents = await DocumentModel.find({did: {$in: didArr}, source: commentSource, type: stableType});
   for(const d of documents) {
     //用户是否具有审核权限
@@ -356,9 +357,18 @@ schema.statics.extendPostComments = async (props) => {
         if((d.status !== normalStatus || d.type !== stableType) && !isModerator) continue;
       }
     }
-    let review;
-    if(d.status === 'faulty' || d.status === 'unknown') {
-      review = await ReviewModel.findOne({docId: d._id}).sort({toc: -1}).limit(1);
+    let delLog;
+    let reason;
+    //获取评论状态不正常的审核原因
+    if(d.status === unknownStatus) {
+      delLog = await ReviewModel.findOne({docId: document._id}).sort({toc: -1});
+    } else if(d.status === disabledStatus) {
+      delLog = await DelPostLogModel.findOne({postType: d.source, delType: disabledStatus, postId: d._id, delUserId: d.uid}).sort({toc: -1});
+    } else if(d.status === faultyStatus) {
+      delLog = await DelPostLogModel.findOne({postType: d.source, delType: faultyStatus, postId: d._id, delUserId: d.uid}).sort({toc: -1});
+    }
+    if(delLog) {
+      reason = delLog.reason;
     }
     if(d.quoteDid) quoteIdArr.push(d.quoteDid);
     const {content, _id, type, status} = d;
@@ -367,7 +377,7 @@ schema.statics.extendPostComments = async (props) => {
       _id,
       type,
       status,
-      reason: review?review.reason:'',
+      reason: reason?reason : '',
     };
   }
   //获取引用评论

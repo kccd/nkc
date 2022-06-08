@@ -22,7 +22,7 @@ router
     const count = await db.ColumnPostModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
-    data.columnPosts = await db.ColumnPostModel.extendColumnPosts(columnPosts);
+    data.columnPosts = await db.ColumnPostModel.extendColumnPosts({columnPosts});
     data.paging = paging;
     await next();
   })

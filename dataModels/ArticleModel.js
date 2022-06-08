@@ -1128,6 +1128,7 @@ schema.statics.getArticlesInfo = async function(articles) {
   const DocumentModel = mongoose.model('documents');
   const ReviewModel = mongoose.model('reviews');
   const ArticlePostModel = mongoose.model('articlePosts');
+  const DelPostLogModel = mongoose.model('delPostLog');
   const columnArticlesId = [];
   const articlesDid = [];
   const articleId = [];
@@ -1152,6 +1153,7 @@ schema.statics.getArticlesInfo = async function(articles) {
   }
   const {article: articleSource} = await DocumentModel.getDocumentSources();
   const {stable: stableType} = await DocumentModel.getDocumentTypes();
+  const {unknown: unknownStatus, faulty: faultyStatus, disabled: disabledStatus} = await DocumentModel.getDocumentStatus();
   const articleDocuments = await DocumentModel.find({did: {$in: articlesDid}, source: articleSource, type: stableType});
   for(const d of articleDocuments) {
     articleDocumentsObj[d.did] = d;
@@ -1189,9 +1191,17 @@ schema.statics.getArticlesInfo = async function(articles) {
     let reason;
     let documentResourceId;
     if(document) {
-      const review = (await ReviewModel.find({docId: document._id}).sort({toc: -1}).limit(1))[0];
-      if(review) {
-        reason = review.reason;
+      const {status} = document;
+      let delLog;
+      if(status === unknownStatus) {
+        delLog = await ReviewModel.findOne({docId: document._id}).sort({toc: -1});
+      } else if(status === disabledStatus) {
+        delLog = await DelPostLogModel.findOne({postType: document.source, delType: disabledStatus, postId: document._id, delUserId: document.uid}).sort({toc: -1});
+      } else if(status === faultyStatus) {
+        delLog = await DelPostLogModel.findOne({postType: document.source, delType: faultyStatus, postId: document._id, delUserId: document.uid}).sort({toc: -1});
+      }
+      if(delLog) {
+        reason = delLog.reason;
       }
       documentResourceId = await document.getResourceReferenceId()
     }
