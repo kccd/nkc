@@ -24,7 +24,14 @@ const draftSchema = new Schema({
     default: 'beta',
     index: 1
   },
-  // 草稿类型
+  // 草稿类型 
+  // 如果 destype === forum 代表是新文章（newThread）
+  /*destype === forum 
+    newThread
+    destype === thread
+    newPost
+    destype === post
+    post.pid === thread.oc? "modifyThread": "modifyPost"; */
   desType: {
     type: String,
     default: 'forum',

@@ -8,7 +8,7 @@
       button.btn.btn-xs.btn-primary.m-r-05(@click="editArticle(drafts[0]._id)") 继续编辑
       button.btn.btn-xs.btn-default(@click="more") 查看更多
       .fa.fa-remove(@click="close")
-  editor(ref="editor" @noPermission="noPermission")
+  editor(ref="editor" @noPermission="noPermission" :req-url="reqUrl")
   .errInfo(v-if="err")
     .error-icon= `403 Forbidden`
     .error-list.b-s-10
@@ -38,6 +38,7 @@ const map = {
 };
 export default {
   data: () => ({
+    reqUrl: NKC.methods.getDataById("data"),
     drafts: [],
     err: "",
     errInfo: [],

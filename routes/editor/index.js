@@ -319,6 +319,7 @@ router
     }
     await next();
   })
+  // 获取指定草稿内容
   .get('/data', async (ctx, next)=>{
     const {db, data, query, state} = ctx;
     const {type} = query;
@@ -376,7 +377,6 @@ router
       if(data.post.parentPostId) {
         parentPostCount = await db.PostModel.countDocuments({pid: data.post.parentPostId});
       }
-
       data.thread = {
         tid: thread.tid,
         title: firstPost.t,
@@ -401,7 +401,6 @@ router
       const {
         mainForumsId, categoriesId, desType, desTypeId, parentPostId
       } = draft;
-
       // 更新原有内容
       if(o === 'update') {
         data.draftId = draft.did;
@@ -458,14 +457,14 @@ router
           comment: !!parentPost
         };
         selectedForumsId = thread.mainForumsId;
-      } else if(desType === "forumDeclare") { // 专业说明
-        data.type = "modifyForumDeclare";
-        const forum = await db.ForumModel.findOnly({fid: desTypeId});
-        data.forum = {
-          fid: forum.fid,
-          title: forum.displayName,
-          url: `/f/${forum.fid}`
-        };
+      // } else if(desType === "forumDeclare") { // 专业说明
+      //   data.type = "modifyForumDeclare";
+      //   const forum = await db.ForumModel.findOnly({fid: desTypeId});
+      //   data.forum = {
+      //     fid: forum.fid,
+      //     title: forum.displayName,
+      //     url: `/f/${forum.fid}`
+      //   };
       } else {
         ctx.throw(400, `未知的草稿类型：${desType}`);
       }

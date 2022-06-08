@@ -7,7 +7,7 @@
         //- 2.notice editorSettings.onEditNotes
         .article-box(v-if="drafts.length > 0")
           //- 字段含义来源 editor/index.js
-          .article-box-header.des-type {{ {forum: "新帖",newThread:"新帖", thread: "回复", newPost: "回复", post: "回复或文章", forumDeclare: "专业说明"}[drafts[0].desType] + "草稿" }}
+          .article-box-header.des-type {{ getTitle(drafts[0].desType) }}
           //- .article-box-header 草稿
           .article-box-text {{drafts[0].t || '未命名'}}
           .article-box-option
@@ -15,7 +15,7 @@
             button.btn.btn-xs.btn-default(@click="more") 查看更多
             .fa.fa-remove(@click="close")
         article-title(
-          :o="o",
+          :o="reqUrl.o",
           ref="title",
           :data="pageData",
           :notice="(pageState.editorSettings && pageState.editorSettings.onEditNotes) || ''"
@@ -28,7 +28,7 @@
           @content-change="contentChange"
         ) 
         .m-b-2(
-          v-if="!['newPost', 'modifyThread', 'modifyPost'].includes(pageData.type) || o === 'copy'"
+          v-if="!['newPost', 'modifyThread', 'modifyPost'].includes(pageData.type) || reqUrl.o === 'copy'"
         )
           //- 1. @selected-forumids 选择的主分类后id给提交组件 2. data 包含 threadCategories minorForumCount mainForums 
           classification(
@@ -70,7 +70,7 @@
           //- 1.state  
           column(
             ref="column",
-            :o="o",
+            :o="reqUrl.o",
             :state="{ userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column: pageState.userColumn }",
             :data="{ addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn }"
           )
@@ -81,7 +81,7 @@
         ref="submit",
         :notice="pageState.editorSettings && pageState.editorSettings.notes",
         :data="pageData",
-        :o="o",
+        :o="reqUrl.o",
         @ready-data="readyData",
         @remove-editor="removeEditor"
       )
@@ -103,8 +103,8 @@ import { sweetError } from "../../lib/js/sweetAlert.js";
 import {getState} from "../../lib/js/state";
 import {getRequest, timeFormat, addUrlParam} from "../../lib/js/tools";
 
-window.reqUrl = NKC.methods.getDataById("data");
-
+// window.reqUrl = NKC.methods.getDataById("data");
+// console.log(reqUrl,'req')
 export default {
   components: {
     "modify-submit": ModifySubmit,
@@ -119,10 +119,16 @@ export default {
     investigation: Investigation,
     column: Column,
   },
+  props: {
+    reqUrl: {
+      type: Object,
+      required: true
+    }
+  },
   data: () => ({
     drafts: [],
     // 社区内容点击继续创作传递的参数o（复制为新文章或更新已发布文章）
-    o: reqUrl.o,
+    // o: this.reqUrl.o,
     hideType: ["newPost", "modifyPost"],
     pageData: {},
     pageState: {},
@@ -144,6 +150,12 @@ export default {
     // this.getUserDraft();
     window.addEventListener("pageshow", this.clearCache);
   },
+  computed: {
+    getTitle(){
+      // , forumDeclare: "专业说明"
+      return (desType)=>({forum: "新帖", newThread:"新帖", thread: "回复", newPost: "回复", post: "回复或文章"}[desType] + "草稿")
+    }
+  },
   destroyed() {
     this.clearCache && window.removeEventListener("pageshow", this.clearCache);
     this.pageData = {};
@@ -153,7 +165,8 @@ export default {
     addUrlParam,
     getUserDraft(page=0) {
       // 如果是修改评论文章或者回复 不获取草稿数据
-      if (["newPost", "modifyThread", "modifyPost", "modifyForumDeclare", "modifyForumLatestNotice"].includes(this.pageData.type)) return
+      // , "modifyForumDeclare", "modifyForumLatestNotice"
+      if (["newPost", "modifyThread", "modifyPost"].includes(this.pageData.type)) return
       if(this.lockRequest) return
       const {uid: stateUid} = getState();
       this.uid = stateUid;
@@ -192,36 +205,34 @@ export default {
       if(!search) search = new URLSearchParams(location.search);
       let url = `/editor/data`;
       // 如果后台给了数据就用后台的 否则读取浏览器地址
-      if (reqUrl && reqUrl.type && reqUrl.id) {
-        url = `/editor/data?type=${reqUrl.type}&id=${reqUrl.id}&o=${reqUrl.o}`;
+      let type, id, o, aid;
+      // 如果是专业进来发文章 走第一个判断没问题。 但是点击 继续编辑后应该走最后一个
+      if (this.reqUrl && this.reqUrl.type && this.reqUrl.id) {
+        url = `/editor/data?type=${this.reqUrl.type}&id=${this.reqUrl.id}&o=${this.reqUrl.o}`;
       } else if (search) {
-        let type, id, o, aid;
         // 读取浏览器地址栏参数
         if(search.constructor.name === 'URLSearchParams'){
           id = search.getAll('id')[0]
           type = search.getAll('type')[0]
           o = search.getAll('o')[0]
           aid = search.getAll('aid')[0]
-
-          // 为对象时
-        }else{
-          type = search.type;
-          id = search.id;
-          o = search.o;
-          aid = search.aid
-          url = `/editor/data?type=${type}&id=${id}&o=${o}`;
-        }
-        if(aid){
-          url = `/editor/data?type=redit&_id=${aid}&o=update`;
-          this.lockRequest = true;
+          if(aid){
+            url = `/editor/data?type=redit&_id=${aid}&o=update`;
+            this.lockRequest = true;
+          }
         }
       }
+      // 处理如果是专业进来发文章 走第一个判断没问题。 点击继续编辑后
+      // 但是如果获取了后 本身草稿就是有状态的 比如属于某一个文章 或者是某一回复。而编辑器本身就对此状态就做了判断，会导致只显示某状态下的内容
       nkcAPI(url, "get")
         .then((resData) => {
           this.pageData = resData;
           this.pageState = resData.state;
           this.show = true;
-          this.getUserDraft();
+          // 专业进入不请求
+          if(this.reqUrl.type !== 'forum') {
+            this.getUserDraft();
+          }
         })
         .catch((err) => {
           if(err.error){
@@ -279,7 +290,7 @@ export default {
       // 添加 草稿id 和 parentPostId
       submitData["did"] = this.pageData.draftId;
       submitData["_id"] = this.pageData.post?._id;
-      submitData["parentPostId"] = this.pageData.parentPostId;
+      submitData["parentPostId"] = this.pageData.post?.parentPostId;
       submitFn(submitData);
     },
   },

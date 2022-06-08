@@ -29,7 +29,7 @@
         @click="readyData",
         :disabled="disabledSubmit || !checkProtocol"
       ) {{ disabledSubmit ? '提交中...' : '提交' }}
-      button.btn.btn-default(@click="saveToDraftBaseDebounce('manual')") 存草稿
+      button.btn.btn-default(@click="saveToDraftBaseDebounce('manual')") {{ saveDraft ? "保存中" : "存草稿"}}
 </template>
 
 <script>
@@ -55,6 +55,7 @@ export default {
   },
   data: () => ({
     saveToDraftBaseDebounce: '',
+    saveDraft: false,
     type: "newThread",
     disabledSubmit: false, // 锁定提交按钮
     checkProtocol: true, // 是否勾选协议
@@ -143,7 +144,7 @@ export default {
     saveToDraftSuccess() {
       let time = new Date();
       this.autoSaveInfo = "草稿已保存 " + this.format(time);
-
+      this.saveDraft = false;
     },
     autoSaveToDraft() {
       this.readyDataForSave();
@@ -173,19 +174,13 @@ export default {
       } else if (type === "newPost") {
         if (!saveData.title && !saveData.content) return;
       }
-      // setTimeout(() => {
         this.saveToDraftBase("automatic")
-          // .then((res) => {
-            
-          // })
           .catch((data) => {
             sweetError("草稿保存失败：" + (data.error || data));
-            // this.autoSaveToDraft();
           });
-      // }, this.saveDraftTimeout);
     },
-    saveToDraftBase(savetType = "manual") {
-      // if (savetType === "manual") 
+    saveToDraftBase(saveType = "manual") {
+      this.saveDraft = true;
       this.readyDataForSave();
       const { saveData } = this;
       if (!saveData.c) return sweetError("请先输入内容");
@@ -205,22 +200,24 @@ export default {
           } else if (type === "modifyThread") {
             desType = "post";
             desTypeId = this.pid;
-          } else if (type === "modifyForumDeclare") {
-            desType = "forumDeclare";
-            desTypeId = this.forum.fid;
-          } else if (type === "modifyForumLatestNotice") {
-            desType = "forumLatestNotice";
-            desTypeId = this.forum.fid;
-          } else {
+          } 
+          // else if (type === "modifyForumDeclare") {
+          //   desType = "forumDeclare";
+          //   desTypeId = this.forum.fid;
+          // } else if (type === "modifyForumLatestNotice") {
+          //   desType = "forumLatestNotice";
+          //   desTypeId = this.forum.fid;
+          // } 
+          else {
             throw "未知的草稿类型";
           }
           let formData = new FormData();
-
+          console.log(saveData.did, 'saveData.did')
           formData.append(
             "body",
             JSON.stringify({
               post: saveData,
-              draftId:saveData.did || this.draftId,
+              draftId: saveData?.did || this.draftId,
               desType: desType,
               desTypeId: desTypeId,
             })
@@ -235,7 +232,7 @@ export default {
           // 保存草稿
           // 当编辑器中的字数减少时提示用户是否需要保存，避免其他窗口的自动保存覆盖内容
           return nkcUploadFile(
-            "/u/" + NKC.configs.uid + "/drafts?savetType=" + savetType,
+            "/u/" + NKC.configs.uid + "/drafts?saveType=" + saveType,
             "POST",
             formData
           );
@@ -246,7 +243,8 @@ export default {
             this.oldContentLength = data.draft?.c?.length;
             this.oldContent = data.draft?.c;
           }
-          this.draftId = data.draft.did;
+          console.log(data.draft?.did,'data.draft?.did')
+          this.draftId = data.draft?.did;
           if (data.draft.cover) {
             this.coverData = "";
             this.coverUrl = "";
