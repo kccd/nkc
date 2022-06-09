@@ -88,12 +88,13 @@ block baseColumnContent
         else if article.status === 'deleted'
           .h4.text-center(style='color: #666;') 文章已被删除，不可查看
       else
-        if thread.disabled
-          .thread-disabled-info 文章已被封禁
-        else if thread.recycleMark
-          .thread-draft-info 文章已被退修
-        else if !thread.reviewed
-          .thread-review-info 文章未审核
+        if type === 'thread'
+          if thread.disabled
+            .thread-disabled-info 文章已被封禁
+          else if thread.recycleMark
+            .thread-draft-info 文章已被退修
+          else if !thread.reviewed
+            .thread-review-info 文章未审核
         +thread
   .article-common.m-b-1(style="position: relative")#comment-content
     div

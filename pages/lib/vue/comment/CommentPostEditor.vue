@@ -77,6 +77,7 @@ export default {
     //是否勾选协议
     protocol: true,
     commentContent: '',
+    setTimeout: null,
   }),
   components: {
     'editor': Editor,
@@ -131,9 +132,16 @@ export default {
       const data = this.$refs[`commentEditor_${this.comment._id}`].getContent();
       if(data) {
         this.commentContent = data;
-        this.post(this.type);
+        this.modifyPost();
       }
     }, 1000),
+    modifyPost() {
+      const self = this;
+      clearTimeout(self.setTimeout);
+      self.setTimeout = setTimeout(function () {
+        self.post(self.type);
+      }, 2000);
+    },
     //设置编辑器保存状态 succeeded failed saving
     setSavedStatus(type) {
       this.$refs[`commentEditor_${this.comment._id}`].changeSaveInfo(type);
@@ -142,6 +150,7 @@ export default {
     post(type) {
       if(!this.protocol) sweetWarning('请勾选协议！');
       if(!type) return;
+      if(type === 'publish') clearTimeout(this.setTimeout);
       if(this.lockPost) return;
       this.lockPost = true;
       const self = this;
