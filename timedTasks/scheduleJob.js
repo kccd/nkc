@@ -10,7 +10,7 @@ const db = require("../dataModels");
 const {
   PostModel, ThreadModel, UserModel, ActiveUserModel,
   ShopOrdersModel, ShopRefundModel, ShopGoodsModel,
-  SettingModel, ForumModel, VerificationModel
+  SettingModel, ForumModel, VerificationModel, DocumentModel
 } = db;
 
 const jobs = {};
@@ -95,13 +95,13 @@ jobs.moveRecycleMarkThreads = () => {
   });
 };
 
-// 自动将退修未修改的回复、评论移动到回收站
+// 自动将退修未修改的回复、评论移动到回收站(包含独立文章，回复，评论)
 jobs.disableToDraftPosts = () => {
   scheduleJob("30 * * * * *", async () => {
     await PostModel.disableToDraftPosts();
+    await DocumentModel.disabledToDraftDocuments();
   });
 }
-
 
 // jobs.checkKcbsRecords();
 const sleep = (t) => {
