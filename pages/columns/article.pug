@@ -70,6 +70,7 @@ block baseColumnContent
           div(style=`margin: 0.5rem 0 0 0;${article.status === 'faulty' ? 'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;' : ''}`)
             .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
             p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${article.reason}`
+            if permission('review')
             +thread
         else if article.status === 'disabled'
           div(style=`margin: 0.5rem 0 0 0;${article.status === 'disabled' ? 'border: 1px solid #666;padding: 0.5rem;border-radius: 5px;background-color: #fff;' : ''}`)
@@ -87,6 +88,12 @@ block baseColumnContent
         else if article.status === 'deleted'
           .h4.text-center(style='color: #666;') 文章已被删除，不可查看
       else
+        if thread.disabled
+          .thread-disabled-info 文章已被封禁
+        else if thread.recycleMark
+          .thread-draft-info 文章已被退修
+        else if !thread.reviewed
+          .thread-review-info 文章未审核
         +thread
   .article-common.m-b-1(style="position: relative")#comment-content
     div
