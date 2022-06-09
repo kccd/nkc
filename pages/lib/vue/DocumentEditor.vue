@@ -591,7 +591,7 @@ export default {
     watchContentChange: debounce(function() {
       this.updateContentLength();
       this.emitContentChangeEvent();
-    }, 2000),
+    }, 200),
   }
 }
 </script>
