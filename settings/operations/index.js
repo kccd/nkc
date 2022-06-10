@@ -24,6 +24,7 @@ const {
 } = resourceObj;
 const mathJax = require('./mathJax');
 const document = require('./document');
+const draft = require('./draft');
 const credit = require('./credit');
 const editor = require('./editor');
 const edit = require('./edit');
@@ -156,7 +157,8 @@ operationObj.operationTree = {
 			GET: 'discuz'
 		},
 		credit, // 奖励
-		document, //文章
+		document, // 预览文章或历史
+		draft, //预览草稿或历史
 		poster, //活动海报
 		avatar,// 用户头像
 		avatar_small,

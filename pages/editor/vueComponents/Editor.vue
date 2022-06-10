@@ -164,16 +164,23 @@ export default {
   methods: {
     addUrlParam,
     getUserDraft(page=0) {
+
       // 如果是修改评论文章或者回复 不获取草稿数据
       // , "modifyForumDeclare", "modifyForumLatestNotice"
-      if (["newPost", "modifyThread", "modifyPost"].includes(this.pageData.type)) return
+      // if (["newPost", "modifyThread", "modifyPost"].includes(this.pageData.type)) return
+      
       if(this.lockRequest) return
       const {uid: stateUid} = getState();
       this.uid = stateUid;
       const self = this;
       // if(this.$route.query.aid) return;
-      if(!self.uid) return;
+      if(!self.uid ) return;
       let url = `/u/${self.uid}/profile/draftData?page=${page}&perpage=1`;
+      // if(this.pageData.type)
+      // 编辑器类型 newpost modifyPost modifyThread  newThread
+      if (this.pageData.type) {
+        url += '&type=' + this.pageData.type
+      }
       nkcAPI(url, 'GET')
       .then(res => {
         self.drafts = res.drafts;
@@ -206,33 +213,42 @@ export default {
       let url = `/editor/data`;
       // 如果后台给了数据就用后台的 否则读取浏览器地址
       let type, id, o, aid;
-      // 如果是专业进来发文章 走第一个判断没问题。 但是点击 继续编辑后应该走最后一个
+      // 以前的链接当跳转过来走这
       if (this.reqUrl && this.reqUrl.type && this.reqUrl.id) {
         url = `/editor/data?type=${this.reqUrl.type}&id=${this.reqUrl.id}&o=${this.reqUrl.o}`;
-      } else if (search) {
+      }
+      // 继续编辑后拿草稿数据 
+      if (search) {
         // 读取浏览器地址栏参数
         if(search.constructor.name === 'URLSearchParams'){
           id = search.getAll('id')[0]
           type = search.getAll('type')[0]
           o = search.getAll('o')[0]
           aid = search.getAll('aid')[0]
+          url = `/editor/data?type=${type}&id=${id}&o=${o}`;
           if(aid){
             url = `/editor/data?type=redit&_id=${aid}&o=update`;
             this.lockRequest = true;
           }
         }
       }
-      // 处理如果是专业进来发文章 走第一个判断没问题。 点击继续编辑后
-      // 但是如果获取了后 本身草稿就是有状态的 比如属于某一个文章 或者是某一回复。而编辑器本身就对此状态就做了判断，会导致只显示某状态下的内容
       nkcAPI(url, "get")
         .then((resData) => {
+          // console.log(resData)
+          if(!resData.post) {
+            this.lockRequest = false;
+          }
+          // 专业进入
+          // if (this.pageData.type ==='newThread' &&  this.pageData.mainForums.length) {
+            
+          // }
           this.pageData = resData;
           this.pageState = resData.state;
           this.show = true;
           // 专业进入不请求
-          if(this.reqUrl.type !== 'forum') {
-            this.getUserDraft();
-          }
+          // if(this.reqUrl.type !== 'forum') {
+          // }
+          this.getUserDraft();
         })
         .catch((err) => {
           if(err.error){

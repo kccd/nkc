@@ -6,14 +6,9 @@ module.exports = {
     GET:'viewHistoryDocument',
     PARAMETER:{
       GET:'viewHistoryDocument',
-      // publish:{
-      //   GET:'historyPublish',
-      // },
       edit:{
-        POST:'historyEdit',
+        POST:'historyEditDocument',
       }
-      
     }
   }
-   
 }

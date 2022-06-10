@@ -206,11 +206,11 @@ export default {
     checkString: checkString,
     getLength: getLength,
     preview(){
-      const url = getUrl('preview', "article", this.articleId);
+      const url = getUrl('documentPreview', "article", this.articleId);
       visitUrl(url,true)
     },
     history(){
-      const url = getUrl('history', "article", this.articleId);
+      const url = getUrl('documentHistory', "article", this.articleId);
       visitUrl(url,true)
     },
     getColumn() {

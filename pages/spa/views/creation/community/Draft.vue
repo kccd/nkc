@@ -1,6 +1,7 @@
 <template lang="pug">
   div.article-common.col-xs-12.col-md-9.m-b-1
-    user-draft(ref="userDraft")
+    //-type = community 社区内容草稿 只显示beta版
+    user-draft(ref="userDraft" type='community')
 </template>
 
 <script>

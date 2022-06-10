@@ -30,12 +30,13 @@
         :disabled="disabledSubmit || !checkProtocol"
       ) {{ disabledSubmit ? '提交中...' : '提交' }}
       button.btn.btn-default(@click="saveToDraftBase('manual')") 存草稿
+      button.btn.btn-default(@click="history") 历史
 </template>
 
 <script>
 import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import { sweetError } from "../../lib/js/sweetAlert.js";
-import { timeFormat, addUrlParam } from "../../lib/js/tools";
+import { timeFormat, addUrlParam, getUrl } from "../../lib/js/tools";
 import {debounce} from '../../lib/js/execution';
 // import { screenTopWarning } from "../../lib/js/topAlert";
 // import {getRequest, timeFormat, addUrlParam} from "../../lib/js/tools";
@@ -72,6 +73,7 @@ export default {
     saveDraftTimeout: 60000,
     saveData: '',
     setInterval: '',
+    draft: ''
   }),
   watch: {
     data : {
@@ -122,6 +124,20 @@ export default {
     checkString: NKC.methods.checkData.checkString,
     checkEmail: NKC.methods.checkData.checkEmail,
     visitUrl: NKC.methods.visitUrl,
+    history() {
+      const desTypeMap = {
+        newThread: 'forum',
+        newPost: "thread",
+        modifyThread: 'post', 
+        modifyPost: 'post', 
+      }
+      // const aid = this.$route.query.aid;
+      const destype = desTypeMap[this.data.type] || this.draft.desType;
+      const did = this.data.draftId || this.draft.did;
+      if (!destype || !did) return sweetError("未选择草稿");
+      const url = getUrl('draftHistory', destype,  did);
+      window.open(url)
+    },
     checkAnonymous(selectedForumsId) {
       // let selectedForumsId = window.PostInfo.selectedForumsId;
       let havePermission = false;
@@ -172,10 +188,10 @@ export default {
       } else if (type === "newPost") {
         if (!saveData.title && !saveData.content) return;
       }
-        this.saveToDraftBase("automatic")
-          .catch((data) => {
-            sweetError("草稿保存失败：" + (data.error || data));
-          });
+      this.saveToDraftBase("automatic")
+        .catch((data) => {
+          sweetError("草稿保存失败：" + (data.error || data));
+        });
     },
     saveToDraftBase(saveType = "manual") {
       this.readyDataForSave();
@@ -234,6 +250,7 @@ export default {
           );
         })
         .then((data) => {
+          this.draft = data.draft;
           //保存草稿的全部内容长度
           if (data.contentLength) {
             this.oldContentLength = data.draft?.c?.length;
@@ -252,13 +269,10 @@ export default {
           if (saveType === "manual") {
             sweetSuccess("草稿已保存");
           }
+          // if(res.err) return
           this.saveToDraftSuccess();
         })
         .catch((data) => {
-          // if(data === '用户取消保存'){
-          //   screenTopWarning(data)
-          //   return
-          // }
           sweetError("草稿保存失败：" + (data.error || data));
         })
     },
@@ -501,6 +515,9 @@ export default {
 // }
 .btn-area{
   .btn:nth-child(1){
+    margin-right: 10px;
+  }
+  .btn:nth-child(2){
     margin-right: 10px;
   }
 }

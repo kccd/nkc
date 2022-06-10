@@ -465,7 +465,6 @@ schema.statics.checkContentAndCopyBetaToHistoryBySource = async (source, sid) =>
       needHistory = true;
     }
   }
-
   if(needHistory) {
     await betaDocument.copyToHistoryDocument();
   }

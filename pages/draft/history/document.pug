@@ -1,0 +1,76 @@
+extends ../../bootstrap_base
+block title
+  title=data.document.title || "未填写标题"
+  +includeCSS('/draft/history/history.css')
+  style.
+    body{
+      display: none;
+    }
+block content
+  .container-fluid.max-width
+    .row
+      if data.history.length
+        .col-xs-12.col-md-3.book-nav
+          .book-cover
+          //- 列表
+          .book-list
+            for list in data.history
+              p.title-list()
+                //- page 代表当前是第几页
+                a.book-list-item(href=`/draft/history/${list._id}?source=${list.desType}&page=${data.urlComponent.page}&did=${list.did}` )=`${list.t || "未填写标题"}`
+                span.history=`${list.type==='stableHistory'? '已发布' : '未发布' } `
+                span.time=`编辑于 ${format(`YYYY-MM-DD HH:mm:ss`, list.tlm)}`
+          //- 分页
+          if (data.paging.buttonValue && data.paging.buttonValue.length)
+            .paging
+              .post-list-paging
+                for page, i in data.paging.buttonValue
+                  a(
+                    href=`/draft/history?source=${data.urlComponent.source}&did=${data.urlComponent.did}&page=${i}`
+                  )=`${page.type === 'null' ? '...' : page.num+1}`
+        //- 内容
+        .col-xs-12.col-md-9.book-content-container.m-b-1
+          if data.history.length
+            include ../../columns/article/nav
+            +nav({})
+            -var {uid, origin: originState, toc, title: t, type, authorInfos, user} = data.document
+            include ../../columns/article/title
+            +title({uid, originState, toc, t, type, authorInfos, user})
+            if data.type !== "draft"
+              if (data.document.abstract && data.document.abstract.length || data.document.abstract && data.document.abstractEN.length)
+                .abstract(style="margin-top:1rem; word-break: break-all;")
+                  if data.document.abstract.length
+                    .panel.panel-default(style="border:0;margin-bottom:0")
+                      .panel-heading.paperHeader 中文摘要
+                      .panel-body!=LineFeedConversion(data.document.abstract)
+                  if data.document.abstractEN.length
+                    .panel.panel-default(style="border:0;margin-bottom:0")
+                      .panel-heading.paperHeader Abstract
+                      .panel-body!=LineFeedConversion(data.document.abstractEN)
+              if (data.document.keywords && data.document.keywords.length || data.document.keywordsEN && data.document.keywordsEN.length)
+                .keyWords(style="margin-top:1rem;")
+                  .panel.panel-default(style="border:0;margin-bottom:0")
+                    .panel-heading.paperHeader 关键词
+                    .panel-body(style="padding:5px")
+                      if data.document.keywords.length
+                        div
+                          for keyCn in data.document.keywords
+                            span.keyWordstagCn(style="cursor:pointer")!=keyCn
+                      if data.document.keywordsEN.length
+                        div(style="margin-top:5px")
+                          for keyEn in data.document.keywordsEN
+                            span.keyWordstagEn(style="cursor:pointer")!=keyEn
+              //- .book-content-content!=data.document.content
+            .book-content-content!=data.document.content
+            .btns
+              button.btn.btn-default.m-r-05(onclick=`saveArticle('${JSON.stringify(data.urlComponent)}')`) 编辑
+      else
+        h3 该文章还没有历史记录
+    include ../../columns/article/authorInfo.pug
+    +authorInfo()
+    include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+
+block scripts
+  //- include ../../columns/article/authorInfo.pug
+  include ../../publicModules/nkcSource
+  +includeJS('/draft/history/history.js')

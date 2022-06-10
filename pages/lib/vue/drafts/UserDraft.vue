@@ -265,6 +265,8 @@ import {getState} from "../../js/state";
 import {nkcAPI} from "../../js/netAPI";
 import {fromNow} from "../../js/tools";
 export default {
+  // 用来判断是社区内容草稿还是其他的草稿
+  props: ['type'],
   data: () => ({
     uid: '',
     paging: null,
@@ -302,6 +304,10 @@ export default {
       const self = this;
       if(!self.uid) return;
       let url = `/u/${self.uid}/profile/draftData?page=${page}`;
+      // 如果是社区内容草稿只显示编辑版草稿
+      if(this.type === 'community') {
+        url = `/u/${self.uid}/profile/draftData?page=${page}&type=${this.type}`
+      }
       nkcAPI(url, 'GET')
       .then(res => {
         self.drafts = res.drafts;

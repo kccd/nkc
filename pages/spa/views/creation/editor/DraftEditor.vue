@@ -162,12 +162,12 @@ export default {
   },
   methods: {
     preview(){
-      const url = getUrl('preview', "draft", this.draftId);
+      const url = getUrl('documentPreview', "draft", this.draftId);
       window.open(url);
     },
     history(){
       // if(!this.draftId) return
-      const url = getUrl('history', "draft", this.draftId);
+      const url = getUrl('documentHistory', "draft", this.draftId);
       window.open(url);
     },
     back() {

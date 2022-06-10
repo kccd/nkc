@@ -2,10 +2,46 @@ module.exports = async (ctx, next) => {
   //获取用户的草稿
   const {data, db, query, nkcModules} = ctx;
   const {targetUser} = data;
-  const {page = 0, perpage = 30} = query;
-  const count = await db.DraftModel.countDocuments({uid: targetUser.uid});
-  const paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
-  const drafts = await db.DraftModel.find({uid: targetUser.uid}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+  const {page = 0, perpage = 30, type, } = query;
+  let count, paging, drafts;
+  // 如果是社区内容草稿
+  
+  if(type === 'community') {
+    const beta = (await db.DraftModel.getType()).beta;
+    count = await db.DraftModel.countDocuments({uid: targetUser.uid, type: beta});
+    paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
+    drafts = await db.DraftModel.find({uid: targetUser.uid, type: beta}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+  } else if (type === 'newThread') {
+    // 如果打开编辑器是新文章，那么草稿只显示新文章
+    // newThread 等于 forum
+    const beta = (await db.DraftModel.getType()).beta;
+    const forum = (await db.DraftModel.getDesType()).forum; 
+    count = await db.DraftModel.countDocuments({uid: targetUser.uid, desType: forum});
+    paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
+    drafts = await db.DraftModel.find({uid: targetUser.uid, desType: forum, type: beta}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+  } else if (type === 'newPost') {
+    // 新回复
+    const beta = (await db.DraftModel.getType()).beta; 
+
+    const thread = (await db.DraftModel.getDesType()).thread; 
+    count = await db.DraftModel.countDocuments({uid: targetUser.uid, desType: thread});
+    paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
+    drafts = await db.DraftModel.find({uid: targetUser.uid, desType: thread, type: beta}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+  } else if (type === 'modifyThread' || type === 'modifyPost') {
+    // 修改回复或修改文章
+    // 怎么细分呢？？？？
+    const beta = (await db.DraftModel.getType()).beta; 
+    const post = (await db.DraftModel.getDesType()).post;  
+    count = await db.DraftModel.countDocuments({uid: targetUser.uid, desType: post});
+    paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
+    drafts = await db.DraftModel.find({uid: targetUser.uid, desType: post, type: beta}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+  } 
+  
+  else {
+    count = await db.DraftModel.countDocuments({uid: targetUser.uid});
+    paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
+    drafts = await db.DraftModel.find({uid: targetUser.uid}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+  }
   data.paging = paging;
   data.drafts = [];
   for(const draft of drafts) {
