@@ -411,7 +411,7 @@ shareSchema.methods.getShareUrl = async function() {
     return `/fund/a/${targetId}${t}`;
   } else if(tokenType === 'comment') {
     // let comment = await CommentModel.findOnly({_id: targetId});
-    // comment = (await CommentModel.getCommentInfo([comment]))[0];
+    // comment = (await CommentModel.getCommentsInfo([comment]))[0];
     // let url  = comment.commentUrl;
     // const arr = segmentation(url, '?');
     // url = `${arr[0]}token=${token}&${arr[1]}`;

@@ -140,7 +140,7 @@ router
     const {token} = query;
     const {_id} = params;
     let comment = await db.CommentModel.findOnly({_id});
-    comment = (await db.CommentModel.getCommentInfo([comment]))[0];
+    comment = (await db.CommentModel.getCommentsInfo([comment]))[0];
     //如果存在comment并且存在token就重定向到评论页面
     if(comment) {
       if(token && await db.ShareModel.hasPermission(token, comment._id)) {

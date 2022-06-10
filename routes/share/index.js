@@ -141,7 +141,7 @@ shareRouter
       }
     } else if(type === 'comment') {
       let comment = await db.CommentModel.findOnly({_id: id});
-      comment = (await db.CommentModel.getCommentInfo([comment]))[0];
+      comment = (await db.CommentModel.getCommentsInfo([comment]))[0];
       result.title = comment.articleDocument.title;
       result.description = nkcModules.nkcRender.htmlToPlain(comment.commentDocument.content, 100);
       if(comment.cover) {

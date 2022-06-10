@@ -1417,7 +1417,7 @@ schema.statics.getDocumentsUrlByDocumentsId = async (documentsId) => {
   }
   const articlesObj = await ArticleModel.getArticlesObjectByArticlesId(articlesId);
   const comments = await CommentModel.getCommentsObjectByCommentsId(commentsId);
-  const commentsInfo = await CommentModel.getCommentInfo(Object.values(comments));
+  const commentsInfo = await CommentModel.getCommentsInfo(Object.values(comments));
   const commentsUrl = {};
   for(const commentInfo of commentsInfo) {
     commentsUrl[commentInfo._id] = commentInfo.url;

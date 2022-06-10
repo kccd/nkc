@@ -392,7 +392,7 @@ messageSchema.statics.getParametersData = async (message) => {
     const {normal} = await CommentModel.getCommentStatus();
     let comment = await CommentModel.findOne({did, status: normal});
     if(!comment) return null;
-    comment = await CommentModel.getCommentInfo([comment]);
+    comment = await CommentModel.getCommentsInfo([comment]);
     parameters = {
       username: user.username,
       userURL: getUrl('userHome', document.uid),
@@ -409,7 +409,7 @@ messageSchema.statics.getParametersData = async (message) => {
     } else if(cid) {
       let comment = await CommentModel.findOnly({_id: cid});
       if(!comment) return null;
-      comment = (await CommentModel.getCommentInfo([comment]))[0];
+      comment = (await CommentModel.getCommentsInfo([comment]))[0];
       url = comment.commentUrl;
     } else if(aid) {
       let article = await ArticleModel.findOnly({_id: aid});
@@ -471,7 +471,7 @@ messageSchema.statics.getParametersData = async (message) => {
     const {cid} = message.c;
     let comment = await CommentModel.findOnly({_id: cid});
     if(!comment) return null;
-    comment = (await CommentModel.getCommentInfo([comment]))[0];
+    comment = (await CommentModel.getCommentsInfo([comment]))[0];
     parameters = {
       commentURL: comment.commentUrl,
     };
@@ -599,7 +599,7 @@ messageSchema.statics.getParametersData = async (message) => {
     if(document.source !== commentSource) return console.log('document来源错误');
     let comment = await CommentModel.findOnly({_id: document.sid});
     if(!comment) return console.log('未找到comment');
-    comment = (await CommentModel.getCommentInfo([comment]))[0];
+    comment = (await CommentModel.getCommentsInfo([comment]))[0];
     const {status, commentDocument, articleDocument} = comment;
     const userObj = await UserModel.getUsersObjectByUsersId([commentDocument.uid]);
     const user = userObj[commentDocument.uid];
@@ -621,7 +621,7 @@ messageSchema.statics.getParametersData = async (message) => {
     if(document.source !== commentSource) return console.log('document来源错误');
     let comment = await CommentModel.findOnly({_id: document.sid});
     if(!comment) return console.log('未找到comment');
-    comment = (await CommentModel.getCommentInfo([comment]))[0];
+    comment = (await CommentModel.getCommentsInfo([comment]))[0];
     const {status, commentDocument, articleDocument} = comment;
     const userObj = await UserModel.getUsersObjectByUsersId([commentDocument.uid]);
     const user = userObj[commentDocument.uid];
@@ -947,7 +947,7 @@ messageSchema.statics.getParametersData = async (message) => {
     // 目标 comment
     let comment = await CommentModel.findOne({_id: cid});
     if(comment) {
-      comment = (await CommentModel.getCommentInfo([comment]))[0];
+      comment = (await CommentModel.getCommentsInfo([comment]))[0];
     }
     if(!post && !article && !comment) {
       return null;
@@ -1019,7 +1019,7 @@ messageSchema.statics.getParametersData = async (message) => {
     } else if(complaintType === 'comment') {
       let comment = await CommentModel.findOne({_id: contentId});
       if(!comment) return null;
-      comment = await CommentModel.getCommentInfo([comment]);
+      comment = await CommentModel.getCommentsInfo([comment]);
       CRType = "评论";
       // 投诉目标链接
       CRTarget = comment[0].url;

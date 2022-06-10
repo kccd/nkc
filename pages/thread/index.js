@@ -1260,6 +1260,7 @@ function joinPostRoom() {
 	});
 }
 
+// 回复发表成功后将后台返回的内容动态插入最后一页评论页
 function insertRenderedPost(renderedPost) {
 	if(!renderedPost) return;
 // 排除自己的发表
