@@ -19,7 +19,8 @@
     if data.column.user.description
       .column-user-description=data.column.user.description
 .m-b-1.column-tool-container(style=columnToolStyle)
-  include ../../publicModules/share/column
+  #columnShare
+    share(:type='"column"' :id=`'${data.column._id}'`)
 if data.column.notice && (!data.column.noticeDisabled || canManagement)
   div.m-b-1.column-tool-container(style=columnToolStyle)
     .column-threads
@@ -90,3 +91,4 @@ if data.column.otherLinks && data.column.otherLinks.length > 0
         .column-links
           for link in data.column.otherLinks
             a(onclick=`openNewWindow('${link.url}')`)= link.name
++includeJS('/columns/modules/info.js')

@@ -6,7 +6,8 @@ import {
   closeUserFloatPanel,
   openForumFloatPanel,
   closeForumFloatPanel,
-  openStickerPanel
+  openStickerPanel,
+  openShareFloatPanel
 } from "./methods";
 import {getState} from "../lib/js/state";
 import {
@@ -105,6 +106,11 @@ function viewSticker(data) {
   openStickerPanel(data.rid, data.management || false);
 }
 
+function showSharePanel(data) {
+  const {type, id} = data;
+  openShareFloatPanel(type, id);
+}
+
 /*
 * data-global-click 和 data-global-long-press 合法的操作
 * */
@@ -118,6 +124,7 @@ const eventFunctions = {
   showForumPanel,
   hideForumPanel,
   viewSticker,
+  showSharePanel,
 }
 
 /*

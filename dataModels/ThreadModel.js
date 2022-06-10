@@ -1396,6 +1396,10 @@ threadSchema.statics.extendArticlesPanelData = async function(threads) {
       content,
       categories,
       reply,
+      status: {
+        type: 'normal',
+        desc: ''
+      }
     });
   }
   return _threads;

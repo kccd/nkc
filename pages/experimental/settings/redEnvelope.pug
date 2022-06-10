@@ -3,7 +3,15 @@ block eTitle
   title 奖励设置
 block eContent
   .container-fluid.max-width
-    #data.hidden=objToStr({redEnvelopeSettings: data.redEnvelopeSettings, draftFee: data.draftFee, share: data.share})
+    -
+      var dataString = objToStr({
+        redEnvelopeSettings: data.redEnvelopeSettings,
+        draftFee: data.draftFee,
+        shares: data.shares,
+        shareRegister: data.shareRegister
+      });
+
+    #data.hidden=dataString
     .row#app(v-cloak)
       .col-xs-12.col-md-12
         h4 一、随机红包设置
@@ -82,21 +90,22 @@ block eContent
               th 每天分享次数上限（超过后不给予奖励）
               th 状态
           tbody
-            tr(v-for='s in share' v-if="s.name !== '注册'")
+            tr(v-for='s in shares')
               th {{s.name}}
               th
                 input(v-model.number='s.kcb')
               th
                 input(v-model.number='s.maxKcb')
               th
-                input(v-model.number='s.count')
+                input(v-model.number='s.rewardCount')
               th
-                div(v-if='s.status')
-                  span 已开启
-                  button(@click='s.status = false') 关闭
-                div(v-else)
-                  span 已关闭
-                  button(@click='s.status = true') 打开
+                .radio
+                  label.m-r-1
+                    input(type='radio' :value="true" v-model='s.rewardStatus')
+                    span 开启
+                  label
+                    input(type='radio' :value="false" v-model='s.rewardStatus')
+                    span 关闭
         h5.text-danger=`当游客点击分享链接并且发生注册行为后，系统将根据以下设置给予分享者${data.shareRewardScore.name}奖励。`
         table.table.table-bordered
           thead
@@ -107,21 +116,22 @@ block eContent
               th=`每天获得注册奖励上限（${data.shareRewardScore.name}/${data.shareRewardScore.unit}）`
               th 状态
           tbody
-            tr(v-for='s in share' v-if="s.name === '注册'")
-              th {{s.name}}
+            tr
+              th {{shareRegister.name}}
               th
-                input(v-model.number='s.kcb')
+                input(v-model.number='shareRegister.kcb')
               th
-                input(v-model.number='s.maxKcb')
+                input(v-model.number='shareRegister.maxKcb')
               th
-                input(v-model.number='s.count')
+                input(v-model.number='shareRegister.count')
               th
-                div(v-if='s.status')
-                  span 已开启
-                  button(@click='s.status = false') 关闭
-                div(v-else)
-                  span 已关闭
-                  button(@click='s.status = true') 打开
+                .radio
+                  label.m-r-1
+                    input(type='radio' :value="true" v-model='shareRegister.status')
+                    span 开启
+                  label
+                    input(type='radio' :value="false" v-model='shareRegister.status')
+                    span 关闭
 
       .col-xs-12.col-md-12
         br

@@ -64,6 +64,10 @@ testRouter
             url: '/f/23?page=2'
           }
         ],
+        status: {
+          type: ['disabled', 'warning', 'danger', 'normal'][Math.round(Math.random() * 3)],
+          desc: '测试状态显示'
+        },
         content: {
           time: post.toc,
           coverUrl: tools.getUrl('postCover', post.cover),

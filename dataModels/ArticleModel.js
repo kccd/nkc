@@ -1485,6 +1485,10 @@ schema.statics.extendArticlesPanelData = async function(articles) {
       pages: [],
       categories: [],
       content,
+      status: {
+        type: 'normal',
+        desc: ''
+      },
       reply: null
     });
   }

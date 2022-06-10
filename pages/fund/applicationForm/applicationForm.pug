@@ -37,7 +37,11 @@ block fundContent
         +formStatus(form)
         +report(form, data.userFundRoles)
         +formVote(form, data.userFundRoles)
+        #applicationFormShare
+          .panel-header 分享
+          share(:type="'fundForm'" :id=`'${form._id}'`)
 
 block fundScripts
   include ../../publicModules/nkcSource
   include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  +includeJS('/fund/applicationForm/applicationForm.js')
