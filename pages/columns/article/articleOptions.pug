@@ -41,9 +41,8 @@ if !isIncluded('columns/article/articleOptions')
 
         //- 分享按钮
         .article-options-item.share-content(
-          data-type='share'
-          data-share-type='article'
-          data-share-id=_id
+          data-global-click='showSharePanel'
+          data-global-data=objToStr({type: 'article', id: _id})
           title='分享'
         )
           .fa.fa-share-square-o

@@ -88,6 +88,9 @@ block fundContent
           .pre-wrap=data.fund.description.detailed
         .m-b-1#donationApp
           donation(:fund=`'${data.fund._id}'`)
+          .m-t-2
+            .panel-header 分享
+            share(:type='"fund"' :id=`'${data.fund._id}'`)
 
 block fundScripts
   include ../../publicModules/floatUserPanel/floatUserPanel.2.pug

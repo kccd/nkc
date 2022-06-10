@@ -1280,10 +1280,6 @@ function insertRenderedPost(renderedPost) {
 	JQDOM = $(JQDOM)
 	var parentDom = $('.single-posts-container');
 	parentDom.append(JQDOM);
-	// 用户悬浮面板
-	// floatUserPanel.initPanel();
-	// 分享
-	NKC.methods.initSharePanel();
 	// 视频音频组件渲染
 	NKC.methods.initVideo();
 	// 操作

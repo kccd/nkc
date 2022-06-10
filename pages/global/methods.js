@@ -38,3 +38,7 @@ export function openStickerPanel(id, management = false) {
 export function closeStickerPanel() {
 
 }
+
+export function openShareFloatPanel(type, id) {
+  window.RootApp.$refs.shareFloatPanel.open(type, id);
+}

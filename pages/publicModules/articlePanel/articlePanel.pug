@@ -42,6 +42,10 @@ if !isIncluded('publicModules/articlePanel')
           url: String, // 评论分页链接
         }
       ],
+      status: {
+        type: String, // normal, warning, danger, disabled
+        desc: String, // 状态说明
+      }
       reply: { // 如果不存在回复则此字段为 null
         user: {
           uid: String,
@@ -58,19 +62,46 @@ if !isIncluded('publicModules/articlePanel')
     }
 
 
-  -var ArticlePanelStyleType = {abstract: 'abstract', brief: 'brief', minimalist: 'minimalist'};
-  -var ArticlePanelStyleCover = {left: 'left', right: 'right'};
-  -var ArticlePanelCategoryType = {forum: 'forum'};
+  -
+    var ArticlePanelStyleType = {
+      abstract: 'abstract',
+      brief: 'brief',
+      minimalist: 'minimalist'
+    };
+    var ArticlePanelStyleCover = {
+      left: 'left',
+      right: 'right'
+    };
+    var ArticlePanelCategoryType = {
+      forum: 'forum'
+    };
+    var DefaultStyle = {
+      type: ArticlePanelStyleType.brief,
+      cover: ArticlePanelStyleCover.right
+    };
+    var mouseEvent = {
+      showUserPanel: 'showUserPanel',
+      hideUserPanel: 'hideUserPanel',
+      showForumPanel: 'showForumPanel',
+      hideForumPanel: 'hideForumPanel'
+    };
+    var articleStatus = {
+      normal: 'normal',
+      warning: 'warning',
+      danger: 'danger',
+      disabled: 'disabled'
+    };
 
-  -var DefaultStyle = {type: ArticlePanelStyleType.brief, cover: ArticlePanelStyleCover.right};
-
-  -var mouseEvent = {showUserPanel: 'showUserPanel', hideUserPanel: 'hideUserPanel', showForumPanel: 'showForumPanel', hideForumPanel: 'hideForumPanel'};
-
+  //- 对外使用
+      集成了多选框
+      文章状态显示
   mixin ArticlesPanel(articles, style)
     -style = style || DefaultStyle;
     -var {type = ArticlePanelStyleType.abstract} = style;
     .articles-panel
       for article in articles
+        if article.status && article.status.type !== articleStatus.normal
+          .articles-panel-item-status(class=article.status.type)=article.status.desc
         .articles-panel-item(
           class=`style-${type}`
           data-article-type=article.type

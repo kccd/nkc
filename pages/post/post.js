@@ -1,4 +1,5 @@
 import {getSocket} from "../lib/js/socket";
+import Share from '../lib/vue/Share';
 
 const socket = getSocket();
 
@@ -78,6 +79,17 @@ function joinPostRoom() {
 if (NKC.configs.platform === 'reactNative') {
   window._userSelect = true;
 }
+
+const postShareElement = document.getElementById('postShare');
+if(postShareElement) {
+  const app = new Vue({
+    el: postShareElement,
+    components: {
+      share: Share
+    }
+  })
+}
+
 
 Object.assign(window, {
   joinPostRoom,

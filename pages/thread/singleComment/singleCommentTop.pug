@@ -35,7 +35,11 @@ if !isIncluded('singleCommentTop')
             +fromNow(tlm)
       .single-comment-options
         +singlePostVote(pid, vote, voteUp)
-        .single-post-bottom-item.icon-item(data-type='share' data-share-type='post' data-share-id=pid title='分享')
+        .single-post-bottom-item.icon-item(
+          data-global-click='showSharePanel'
+          data-global-data=objToStr({type: 'post', id: pid})
+          title='分享'
+          )
           .fa.fa-share-square-o.share-icon.option-icon
         .single-post-bottom-item.icon-item(data-type='postOption' data-pid=pid title='其他操作')
           .fa.fa-sliders.option-icon.option-icon

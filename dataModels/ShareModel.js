@@ -1,6 +1,20 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
+
+const shareTypes = {
+  thread: 'thread', // 分享社区文章
+  post: 'post', // 分享社区回复或评论
+  forum: 'forum', // 分享专业
+  user: 'user', // 分享用户
+  column: 'column', // 分享专栏
+  article: 'article', // 分享独立文章文章
+  fund: 'fund', // 分享基金项目
+  fundForm: 'fundForm', // 分享基金申请表
+  comment: 'comment', // 分享独立文章评论
+  activity: 'activity', // 分享活动
+};
+
 const shareSchema = new Schema({
   token: {
     type: String,
@@ -265,8 +279,12 @@ shareSchema.statics.ensureEffective = async function(token, id) {
 * */
 shareSchema.methods.computeReword = async function(type, ip, port) {
   const SettingModel = mongoose.model("settings");
-  const ShareLimitModel = mongoose.model("shareLimit");
   const {share} = await SettingModel.getSettings("redEnvelope");
+  const ShareModel = mongoose.model('share');
+  const UserModel = mongoose.model('users');
+  const shareSettings = await SettingModel.getSettings('share');
+  const translate = require('../nkcModules/translate');
+  const {languageNames} = require('../nkcModules/language');
   let {today} = require("../nkcModules/apiFunction");
   today = today();
   const {
@@ -278,9 +296,9 @@ shareSchema.methods.computeReword = async function(type, ip, port) {
     clickReward = false;
     createUserReward = false;
   }
-  const typeSettings = share[tokenType];
+  const typeSettings = shareSettings[tokenType];
   const registerSettings = share.register;
-  if(!typeSettings.status) clickReward = false;
+  if(!typeSettings.rewardStatus) clickReward = false;
   if(!registerSettings.status) createUserReward = false;
   if(!shareReward) clickReward = false;
   if(!registerReward) createUserReward = false;
@@ -290,22 +308,21 @@ shareSchema.methods.computeReword = async function(type, ip, port) {
   }
   if(kcbTotal >= typeSettings.maxKcb) clickReward = false;
   if(registerKcbTotal >= registerSettings.maxKcb) createUserReward = false;
-  const shares = await mongoose.model("share").find({toc: {$gte: today}, uid});
+  const shares = await ShareModel.find({toc: {$gte: today}, uid});
   let total = 0;
   for(const s of shares) {
     total += s.registerKcbTotal || 0;
   }
   // 针对注册，count字段表示的是"每天获得注册奖励的上限"
-  if(total >= registerSettings.count*100) createUserReward = false;
+  if(total >= registerSettings.count) createUserReward = false;
   const KcbsRecordModel = mongoose.model("kcbsRecords");
-  const shareLimit = await ShareLimitModel.findOnly({shareType: tokenType});
   const updateObj = {
     shareReward: !!clickReward,
     registerReward: !!createUserReward
   };
   let status = false;
   let num = 0;
-  const shareRewardScore = await mongoose.model('settings').getScoreByOperationType('shareRewardScore');
+  const shareRewardScore = await SettingModel.getScoreByOperationType('shareRewardScore');
   if(clickReward && type === "visit") {
     const record = await KcbsRecordModel({
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
@@ -321,7 +338,7 @@ shareSchema.methods.computeReword = async function(type, ip, port) {
       },
       ip,
       port,
-      description: `分享${shareLimit.shareName}`
+      description: `分享${translate(languageNames.zh_cn, 'share', tokenType)}`
     });
     await record.save();
     if(!updateObj.$inc) updateObj.$inc = {};
@@ -344,7 +361,7 @@ shareSchema.methods.computeReword = async function(type, ip, port) {
       },
       ip,
       port,
-      description: `分享${shareLimit.shareName}，完成注册`
+      description: `分享${translate(languageNames.zh_cn, 'share', tokenType)}，完成注册`
     });
     await record.save();
     if(!updateObj.$inc) updateObj.$inc = {};
@@ -354,7 +371,7 @@ shareSchema.methods.computeReword = async function(type, ip, port) {
   }
   await this.updateOne(updateObj);
   // await mongoose.model("users").updateUserKcb(uid);
-  await mongoose.model('users').updateUserScores(uid);
+  await UserModel.updateUserScores(uid);
   return {
     status,
     num
@@ -387,42 +404,167 @@ shareSchema.statics.getNewToken = async () => {
 * */
 shareSchema.methods.getShareUrl = async function() {
   const {targetId, tokenType, token, shareUrl} = this;
-  const PostModel = mongoose.model('posts');
-  const CommentModel = mongoose.model('comments');
+  const {getUrl} = require('../nkcModules/tools');
   const ArticleModel = mongoose.model('articles');
-  const {segmentation} = require("../nkcModules/tools");
   const t = `?token=${token}`;
-  if(tokenType === 'post') {
-    const post = await PostModel.findOne({pid: targetId}, {type: 1, tid: 1, pid: 1});
-    if(post.type === 'thread') {
-      return `/t/${post.tid}${t}`;
-    } else {
-      return `/p/${post.pid}${t}`;
+
+  switch(tokenType) {
+    case shareTypes.post: return getUrl('postHome', targetId) + t;
+    case shareTypes.thread: return getUrl('thread', targetId) + t;
+    case shareTypes.forum: return getUrl('forumHome', targetId) + t;
+    case shareTypes.user: return getUrl('userHome', targetId) + t;
+    case shareTypes.column: return getUrl('columnHome', targetId) + t;
+    case shareTypes.fund: return getUrl('singleFundHome', targetId) + t;
+    case shareTypes.fundForm: return getUrl('fundApplicationForm', targetId) + t;
+    case shareTypes.comment: return getUrl('comment', targetId) + t;
+    case shareTypes.article: {
+      let article = await ArticleModel.findOnly({_id: targetId});
+      article = (await ArticleModel.getArticlesInfo([article]))[0];
+      return article.url + t;
     }
-  } else if(tokenType === 'forum') {
-    return `/f/${targetId}${t}`;
-  } else if(tokenType === 'user') {
-    return `/u/${targetId}${t}`;
-  } else if(tokenType === 'column') {
-    return `/m/${targetId}${t}`;
-  } else if(tokenType === 'fund') {
-    return `/fund/list/${targetId}${t}`;
-  } else if(tokenType === 'fundForm') {
-    return `/fund/a/${targetId}${t}`;
-  } else if(tokenType === 'comment') {
-    // let comment = await CommentModel.findOnly({_id: targetId});
-    // comment = (await CommentModel.getCommentInfo([comment]))[0];
-    // let url  = comment.commentUrl;
-    // const arr = segmentation(url, '?');
-    // url = `${arr[0]}token=${token}&${arr[1]}`;
-    return `/comment/${targetId}${t}`;
-  } else if(tokenType === 'article') {
-    let article = await ArticleModel.findOnly({_id: targetId});
-    article = (await ArticleModel.getArticlesInfo([article]))[0];
-    return `${article.url}${t}`;
-  } else {
-    return `/activity/single/${targetId}${t}`;
+    case shareTypes.activity: return getUrl('activity', targetId) + t;
+    default:
+      return '/';
   }
+}
+
+/*
+* 获取分享类型
+* */
+shareSchema.statics.getShareTypes = async function() {
+  return shareTypes;
+}
+
+/*
+* 获取分享数据
+* @param {String} type 分享类型 取值为 shareTypes
+* @param {String} id 分享类型对应的 ID
+* @return {Object}
+*   @param {String} title 标题
+*   @param {String} cover 封面图链接
+*   @param {String} desc 摘要
+* */
+shareSchema.statics.getShareContent = async function(props) {
+  const PostModel = mongoose.model('posts');
+  const ForumModel = mongoose.model('forums');
+  const UserModel = mongoose.model('users');
+  const CommentModel = mongoose.model('comments');
+  const ThreadModel = mongoose.model('threads');
+  const FundModel = mongoose.model('funds');
+  const FundApplicationFormModel = mongoose.model('fundApplicationForms');
+  const ArticleModel = mongoose.model('articles');
+  const SettingModel = mongoose.model('settings');
+  const ColumnModel = mongoose.model('columns');
+  const {getUrl} = require('../nkcModules/tools');
+  const nkcRender = require('../nkcModules/nkcRender');
+
+  const {type, id, userRoles, userGrade, user} = props;
+
+  let shareContent = {
+    title: '',
+    cover: '',
+    desc: ''
+  };
+  if(!Object.values(shareTypes).includes(type)) {
+    throwErr(400, `未知的分享类型`);
+  }
+  if(type === shareTypes.post) {
+    const post = await PostModel.findOnly({pid: id}, {
+      t: 1,
+      cover: 1,
+      c: 1,
+    });
+    const thread = await post.extendThread();
+    const firstPost = await thread.extendFirstPost();
+    await thread.ensurePermission(userRoles, userGrade, user);
+    shareContent = {
+      title: firstPost.t,
+      cover: getUrl('postCover', post.cover),
+      desc: nkcRender.htmlToPlain(post.c, 100),
+    };
+  } else if(type === shareTypes.thread) {
+    const thread = await ThreadModel.findOnly({tid: id});
+    await thread.ensurePermission(userRoles, userGrade, user);
+    const targetPost = await PostModel.findOnly({pid: thread.oc}, {
+      t: 1,
+      cover: 1,
+      c: 1
+    });
+    shareContent = {
+      title: targetPost.t,
+      cover: getUrl('postCover', targetPost.cover),
+      desc: nkcRender.htmlToPlain(targetPost.c, 100),
+    };
+  } else if(type === shareTypes.forum) {
+    const forum = await ForumModel.findOnly({fid: id});
+    await forum.ensurePermission(userRoles, userGrade, user);
+    shareContent = {
+      title: `「专业」${forum.displayName}`,
+      cover: getUrl('forumLogo', forum.cover),
+      desc: forum.description
+    };
+  } else if(type === shareTypes.comment) {
+    let comment = await CommentModel.findOnly({_id: id});
+    comment = (await CommentModel.getCommentInfo([comment]))[0];
+    shareContent = {
+      title: comment.articleDocument.title,
+      cover: getUrl('documentCover', comment.cover),
+      desc: nkcRender.htmlToPlain(comment.commentDocument.content, 100),
+    };
+  } else if(type === shareTypes.article) {
+    let article = await ArticleModel.findOnly({_id: id});
+    article = (await ArticleModel.getArticlesInfo([article]))[0];
+    shareContent = {
+      title: article.document.title,
+      cover: getUrl('documentCover', article.document.cover),
+      desc: nkcRender.htmlToPlain(article.document.content, 100)
+    };
+  } else if(type === shareTypes.user) {
+    const targetUser = await UserModel.findOnly({uid: id});
+    shareContent = {
+      title: `「用户」${targetUser.username}`,
+      cover: getUrl('userAvatar', targetUser.avatar),
+      desc: targetUser.description
+    };
+  } else if(type === shareTypes.fund) {
+    const fund = await FundModel.findOnly({fundId: id});
+    const fundSettings = await SettingModel.getSettings('fund');
+    shareContent = {
+      title: `「${fundSettings.fundName}」${fund.name}`,
+      cover: getUrl('fundAvatar', fund.avatar),
+      desc: fund.description.brief
+    };
+  } else if(type === shareTypes.fundForm) {
+    const fundSettings = await SettingModel.getSettings('fund');
+    const form = await FundApplicationFormModel.findOnly({_id: id});
+    await form.extendFund();
+    await form.extendProject();
+    let title = '未填写标题', content = '未填写内容';
+    if(form.project) {
+      title = form.project.title;
+      content = form.project.content;
+    }
+    shareContent = {
+      title: `「${fundSettings.fundName}申请」${title}`,
+      cover: getUrl('fundAvatar', form.fund.avatar),
+      desc: nkcRender.htmlToPlain(content),
+    };
+  } else if(type === shareTypes.column) {
+    const column = await ColumnModel.findOnly({_id: Number(id)});
+    shareContent = {
+      title: `「专栏」${column.name}`,
+      cover: getUrl('columnAvatar', column.avatar),
+      desc: column.abbr,
+    };
+  }
+  return shareContent;
+}
+
+
+shareSchema.statics.getShareNameByType = async function(type) {
+  const {languageNames} = require('../nkcModules/language');
+  const translate = require('../nkcModules/translate');
+  return translate(languageNames.zh_cn, 'share', type);
 }
 
 module.exports = mongoose.model('share', shareSchema, 'share');

@@ -21,7 +21,8 @@
     user-manage(ref="userManage")
     //- 分享链接
     .m-b-1
-      share(ref="share" share-type="user" :share-title="targetUser.username || targetUser.uid" :share-id="targetUser.uid" :share-description="targetUser.description" :share-avatar="targetUser.avatar")
+      .panel-header 分享
+      share(ref="share" type='user' :id="targetUser.uid")
 
 </template>
 <style lang="less">
