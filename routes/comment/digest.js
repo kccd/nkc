@@ -105,10 +105,10 @@ router
     if(!redEnvelopeSetting.c.draftFee.close) {
       const record = db.KcbsRecordModel({
         _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
-        from: 'bank',
+        from: targetUser.uid,
         scoreType: digestRewardScore.type,
         type: 'unDigestComment',
-        to: targetUser.uid,
+        to: 'bank',
         toc: digestTime,
         port: ctx.port,
         ip: ctx.address,

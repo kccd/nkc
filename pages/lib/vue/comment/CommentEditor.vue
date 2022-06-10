@@ -89,6 +89,7 @@
       contentChangeEventFlag: false,
       publishing: false,
       saving: false,
+      setTimeout: null,
     }),
     components: {
       'editor': Editor,
@@ -118,8 +119,15 @@
           return;
         }
         this.commentContent = this.$refs.editor.getContent();
-        this.post(this.type);
+        this.modifyComment();
       }, 1000),
+      modifyComment() {
+        const self = this;
+        clearTimeout(self.setTimeout);
+        self.setTimeout = setTimeout(function () {
+          self.post(self.type);
+        }, 2000);
+      },
       //点击引用获取该楼层的引用信息
       changeQuote(docId, source) {
         if(!docId) return;
@@ -146,6 +154,7 @@
       post(type) {
         if(type === 'publish') {
           this.publishing = true;
+          clearTimeout(this.setTimeout);
         } else if(type === 'save') {
           this.saving = true;
         }

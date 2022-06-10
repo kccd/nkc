@@ -13,6 +13,8 @@ module.exports = {
     'postToThread',
     'threadBlocked',
     'postBlocked',
+    'articleBlocked',
+    'commentBlocked',
     'subscribeForum',
     'unSubscribeForum',
     'liked',

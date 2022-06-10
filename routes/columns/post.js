@@ -4,7 +4,7 @@ router
   .get("/", async (ctx, next) => {
     const {query, data, db, nkcModules} = ctx;
     const {page = 0, cid, mcid} = query;
-    const {column, user} = data;
+    const {column, user, isModerator} = data;
     if(column.uid !== user.uid && !ctx.permission('column_single_disabled')) ctx.throw(403, "权限不足");
     const q = {
       columnId: column._id
@@ -22,7 +22,7 @@ router
     const count = await db.ColumnPostModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
-    data.columnPosts = await db.ColumnPostModel.extendColumnPosts({columnPosts});
+    data.columnPosts = await db.ColumnPostModel.extendColumnPosts({columnPosts, isModerator});
     data.paging = paging;
     await next();
   })

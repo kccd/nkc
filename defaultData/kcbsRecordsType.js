@@ -36,6 +36,18 @@ module.exports = [
     count: 0
   },
   {
+    _id: 'articleBlocked',
+    description: '文章被屏蔽',
+    num: -10,
+    count: 0
+  },
+  {
+    _id: 'commentBlocked',
+    description: '回复被屏蔽',
+    num: -5,
+    count: 0
+  },
+  {
     _id: 'subscribeForum',
     description: '关注专业',
     num: 1,
