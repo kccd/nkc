@@ -263,7 +263,7 @@ export default {
             this.oldContent = data.draft?.c;
           }
           this.draftId = data.draft?.did;
-          if (data.draft.cover) {
+          if (data.draft?.cover) {
             this.coverData = "";
             this.coverUrl = "";
             this.cover = data.draft.cover;
