@@ -86,11 +86,13 @@ const schema = new mongoose.Schema({
   quoteType: {
     type: String,
     default: '',
+    index: 1,
   },
   // 引用类型对应的 ID
   quoteId: {
     type: String,
-    default: ''
+    default: '',
+    index: 1,
   },
   // 附加的图片或视频
   // 作为动态时此字段存储
@@ -405,6 +407,22 @@ schema.statics.getUnPublishedMomentCommentById = async (uid, mid) => {
     status: momentStatus.default
   });
 };
+/*
+* 通过发表人ID、动态ID以及评论ID获取当前动态下未发布的评论
+* @param {String} uid 发表人ID
+* @param {String} mid 动态ID
+* @param {String} commentId 评论ID
+* @return {moment schema or null}
+* */
+schema.statics.getUnPublishedMomentCommentByCommentId = async (commentId, uid, mid) => {
+  const MomentModel = mongoose.model('moments');
+  return MomentModel.findOne({
+    _id: commentId,
+    uid,
+    parent: mid,
+    status: momentStatus.default
+  });
+}
 
 /*
 * 通过发表人ID和动态ID获取当前动态下未发布的评论
@@ -454,6 +472,22 @@ schema.statics.getUnPublishedMomentByUid = async (uid) => {
     status: momentStatus.default,
   });
 };
+
+/*
+* 通过发表人ID、动态ID获取未发布的动态
+* @param {String} uid 发表人 ID
+* @param {String} momentId 动态 ID
+* @return {moment schema or null}
+* */
+schema.statics.getUnPublishedMomentByMomentId = async (momentId, uid) => {
+  const MomentModel = mongoose.model('moments');
+  return MomentModel.findOne({
+    uid,
+    parent: '',
+    _id: momentId,
+    status: momentStatus.default,
+  });
+}
 
 /*
 * 通过发表人 ID 获取未发布的动态数据

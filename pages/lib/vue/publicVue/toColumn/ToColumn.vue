@@ -85,7 +85,7 @@
                 button.btn.btn-default.btn-sm(@click="cancelAddCategory") 取消
                 button.btn.btn-primary.btn-sm(@click="saveCategory") 保存
         .m-t-1.m-b-1.text-right(v-if="!createCategory")
-          button(type="button" class="btn btn-sm btn-default" data-dismiss="modal") 取消
+          button(type="button" class="btn btn-sm btn-default" data-dismiss="modal").m-r-05 取消
           button(type="button" class="btn btn-sm btn-primary" @click="complete") 确定
 </template>
 <style lang="less">

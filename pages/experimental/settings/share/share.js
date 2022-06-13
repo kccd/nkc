@@ -1,15 +1,15 @@
-const data = NKC.methods.getDataById('data');
-
+import {getDataById} from "../../../lib/js/dataConversion";
+const data = getDataById('data');
 const app = new Vue({
   el: '#app',
   data: {
-    shareSettings: data.shareSettings
+    shares: data.shares
   },
   methods: {
     submit() {
-      const {shareSettings} = this;
+      const {shares} = this;
       return nkcAPI(`/e/settings/share`, 'PUT', {
-        shareSettings
+        shares
       })
         .then(() => {
           sweetSuccess(`提交成功`);

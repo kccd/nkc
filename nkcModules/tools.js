@@ -255,6 +255,12 @@ var Tools = function() {
       case 'draftEditor': {
         return '/creation/editor/draft?id=' + id;
       }
+      case 'comment': {
+        return '/comment/' + id
+      }
+      case 'activity': {
+        return '/activity/single/' + id
+      }
     }
   };
   self.getAnonymousInfo = function() {
@@ -330,8 +336,8 @@ var Tools = function() {
   self.objToStr = function(obj) {
     return encodeURIComponent(JSON.stringify(obj));
   }
-  
-  
+
+
 
   self.getSize = function(size, digits) {
     size = Number(size);
@@ -447,7 +453,7 @@ var Tools = function() {
     var reg = /(https?:\/\/)?([-0-9a-zA-Z]{1,256}\.)+[a-zA-Z]{2,6}/ig
     return content.replace(reg, '');
   };
-  
+
   //通过指定字符将字符串分割成两部分
   self.segmentation = function (str, char) {
     var index = str.indexOf(char);

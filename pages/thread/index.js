@@ -1232,22 +1232,24 @@ $(function() {
 			window.location.hash = hash;
 		}, 1000)
 	}
-
+	
+	//socket 连接当前房间
 	if(NKC.configs.uid && socket) {
 		NKC.methods.setThreadListNewPostCount($('#threadId').text().trim(), 0);
 		window.bulletComments = new NKC.modules.BulletComments({
 			offsetTop: NKC.configs.isApp? 20: 60
 		});
-		socket.on('connect', joinPostRoom)
+		if(socket.connected) {
+			joinPostRoom();
+		} else {
+			socket.on('connect', joinPostRoom)
+		}
 		socket.on('postMessage', function(data) {
 			insertRenderedPost(data);
 		});
 		socket.on('commentMessage', function(data) {
 			insertRenderedComment(data);
 		});
-		if(socket.connected) {
-			joinPostRoom();
-		}
 	}
 });
 
@@ -1260,6 +1262,7 @@ function joinPostRoom() {
 	});
 }
 
+// 回复发表成功后将后台返回的内容动态插入最后一页评论页
 function insertRenderedPost(renderedPost) {
 	if(!renderedPost) return;
 // 排除自己的发表
@@ -1280,10 +1283,6 @@ function insertRenderedPost(renderedPost) {
 	JQDOM = $(JQDOM)
 	var parentDom = $('.single-posts-container');
 	parentDom.append(JQDOM);
-	// 用户悬浮面板
-	// floatUserPanel.initPanel();
-	// 分享
-	NKC.methods.initSharePanel();
 	// 视频音频组件渲染
 	NKC.methods.initVideo();
 	// 操作

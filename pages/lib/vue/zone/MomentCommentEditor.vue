@@ -187,20 +187,25 @@
         const {
           content,
           momentId,
-          disableSavingCount
+          disableSavingCount,
+          momentCommentId
         } = this;
         const self = this;
         if(disableSavingCount > 0) {
           this.disableSavingCount --;
           return;
         }
+        const type = momentCommentId? 'modify': 'create';
         return nkcAPI(`/creation/zone/moment/${momentId}`, 'POST', {
-          type: 'modify',
+          type,
           content,
+          momentCommentId,
         })
         .then(res => {
           console.log(`动态已自动保存`);
-          self.momentCommentId = res.momentCommentId;
+          if(type === 'create') {
+            self.momentCommentId = res.momentCommentId;
+          }
         })
         .catch(err => {
           screenTopWarning(`动态保存失败：${err.error || err.message || err}`)
@@ -217,7 +222,7 @@
       },
       publish() {
         const self = this;
-        const {postType, alsoPost, content, momentId} = this;
+        const {postType, alsoPost, content, momentId, momentCommentId} = this;
         this.lockPost();
         return Promise.resolve()
           .then(() => {
@@ -227,6 +232,7 @@
               content,
               postType,
               alsoPost,
+              momentCommentId,
             })
           })
           .then(res => {

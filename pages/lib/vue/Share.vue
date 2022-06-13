@@ -1,174 +1,151 @@
 <template lang="pug">
-  .share-box
-    .panel-header 分享链接
-    .share(v-if="!getState.app")
-      .share-icon(@click="shareToOther(shareType, 'qq', shareTitle, shareId, shareDescription, shareAvatar)" title="分享给QQ好友")
-        img(src='/default/QQ.png')
-      .share-icon(@click="shareToOther(shareType, 'qzone', shareTitle, shareId, shareDescription, shareAvatar)" title="分享到QQ空间")
-        img(src='/default/qzone.png')
-      .share-icon(@click="shareToOther(shareType, 'weibo', shareTitle, shareId, shareDescription, shareAvatar)" title="分享到微博")
-        img(src='/default/weibo.png')
-      .share-icon(@click="shareShowWeChat()" title="分享到微信")
-        img(src='/default/weChat.png')
-      .share-icon(title="点击复制分享链接" @click="copyUrl")
-        #shareLinkButton
-          .fa.fa-link
-      .weChat-image
-        canvas.qrcode-canvas
+  .share-panel-icons
+    .share-panel-icon(v-for='p in platforms' @click='share(p.type)')
+      img(:src="getUrl('defaultFile', p.type + '.png')")
+    .share-panel-icon(@click="share('copy')" ref="clipboardButton")
+      .fa.fa-link
+    canvas(ref="weChatCanvas" v-show='showQR')
 </template>
 <style lang="less" scoped>
-.share-box{
-  transition: box-shadow 300ms;
-}
-.share{
-  padding: 0;
-  font-size: 0;
-  text-align: center;
-}
-.share-icon{
-  width: 3rem;
-  height: 3rem;
-  line-height: 3rem;
-  display: inline-block;
-  margin-right: 1px;
-  overflow: hidden;
-  cursor: pointer;
-  position: relative;
-  border-radius: 50%;
-  background-color: #fff;
-  box-shadow: 0 0 10px 0 rgba(0,0,0,0.1);
-}
-.share-icon>*{
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  height: 3rem;
-  width: 100%;
-  padding: 7px;
-  transition: top 200ms;
-}
-.share-icon>*:hover{
-  top: -20%
-}
-.share-icon>div{
-  line-height: 3rem;
-  text-align: center;
-}
-.share .fa{
-  font-size: 1.6rem;
-  color: #777;
-}
-.weChat-image{
-  text-align: center;
-  margin-top: 1rem;
-  display: none;
-}
+  .share-panel-icons{
+    text-align: center;
+    .share-panel-header{
+      text-align: left;
+    }
+    .share-panel-icon{
+      height: 3rem;
+      width: 3rem;
+      display: inline-block;
+      margin: 0 0.5rem;
+      cursor: pointer;
+      line-height: 3rem;
+      text-align: center;
+      background-color: #f4f4f4;
+      border-radius: 50%;
+      img{
+        width: 50%;
+        height: 50%;
+      }
+    }
+  }
 </style>
 <script>
-import {getState} from "../js/state";
-import {screenTopAlert} from "../js/topAlert";
+import {nkcAPI} from "../js/netAPI";
+import {sweetError} from "../js/sweetAlert";
+import {screenTopAlert, screenTopWarning} from "../js/topAlert";
+import {fixUrl} from "../js/url";
+import {getUrl} from "../js/tools";
+import ClipboardJS from "../../../public/clipboard/clipboard.min";
+import QRCode from 'qrcode/build/qrcode.min';
+
 export default {
-  props: ['shareType', 'shareTitle', 'share-id', 'share-description', 'share-avatar'],
+  props: ['type', 'id'],
   data: () => ({
+    content: {
+      title: '',
+      cover: '',
+      desc: '',
+      url: '',
+    },
+    loaded: false,
+    platforms: [
+      {
+        type: 'wechat',
+      },
+      {
+        type: 'QQ',
+      },
+      {
+        type: 'qzone',
+      },
+      {
+        type: 'weibo'
+      }
+    ],
+    showQR: false,
+    clipboard: null,
+    usedClipboardButton: null,
   }),
-  mounted() {
-    this.initQrcodeCanvas();
-  },
   computed: {
-    description() {
-      const {shareDescription} = this;
-      const reg = /[\n\r]/ig;
-      const description = (shareDescription || '').replace(reg, '');
-      return description;
+    panelTitle() {
+      return this.title || this.defaultTitle;
+    },
+    shareUrl() {
+      return window.location.origin + this.content.url;
     }
   },
   methods: {
-    getState: getState,
-    copyUrl() {
-      const copyTest = window.location.href;
-      const input = document.createElement('input');
-      input.value = copyTest;
-      document.body.appendChild(input);
-      input.select();
-      document.execCommand('Copy');
-      input.className = 'oInput';
-      input.style.display = 'none';
-      screenTopAlert('复制成功');
+    getUrl,
+    setShareInfo(type, id) {
+      const self = this;
+      return nkcAPI(`/s`, 'POST', {
+        type,
+        id
+      })
+        .then((res) => {
+          const {shareContent} = res;
+          self.content.title = shareContent.title;
+          self.content.cover = shareContent.cover;
+          self.content.desc = shareContent.desc;
+          self.content.url = shareContent.url;
+        })
     },
-    initQrcodeCanvas() {
-      const toCanvas = function(dom) {
-        const url = dom.getAttribute('data-url');
-        let path = dom.getAttribute("data-path");
-        let origin = dom.getAttribute("data-origin");
-        if (!origin) origin = window.location.origin;
-        if (!path) path = window.location.pathname;
-        QRCode.toCanvas(dom, url ? url : (origin + path), {
-          margin: 1,
-          width: 114,
-          color: {
-            dark: "#333333"
+    share(type) {
+      let newWindow = null;
+      const self = this;
+      if(['QQ', 'qzone', 'weibo'].includes(type)) {
+        newWindow = window.open();
+      }
+      return Promise.resolve()
+        .then(() => {
+          if(!self.loaded) {
+            return self.setShareInfo(self.type, self.id)
+              .then(() => {
+                return self.renderQR();
+              });
           }
-        }, function (err, url) {
-          if (err) {
-            console.log(err);
-            screenTopWarning(err);
+        })
+        .then(() => {
+          if(type === 'wechat') {
+            return self.showQR = !self.showQR;
+          }
+          const {url, title, desc, cover} = self.content;
+          const fixedUrl = fixUrl(url);
+          const fixedCover = fixUrl(cover);
+          if(type === 'copy') {
+            if(self.usedClipboardButton !== self.$refs.clipboardButton) {
+              self.clipboard = new ClipboardJS(self.$refs.clipboardButton, {
+                text: function(trigger) {
+                  return fixedUrl;
+                }
+              });
+              self.clipboard.on('success', function() {
+                screenTopAlert("链接已复制到粘贴板");
+              });
+              self.usedClipboardButton = self.$refs.clipboardButton;
+              self.$refs.clipboardButton.click();
+            }
+            return;
+          }
+          if(type === 'QQ') {
+            newWindow.location = `http://connect.qq.com/widget/shareqq/index.html?url=${fixedUrl}&title=${title}&pics=${fixedCover}&summary=${desc}`;
+          } else if(type === 'qzone') {
+            newWindow.location=`https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=${fixedUrl}&title=${title}&pics=${fixedCover}&summary=${desc}`;
           } else {
-            dom.setAttribute('data-init', 'true');
+            newWindow.location=`http://v.t.sina.com.cn/share/share.php?url=${fixedUrl}&title=${title}&pic=${fixedCover}`;
           }
+        })
+        .catch(err => {
+          newWindow.close();
+          sweetError(err)
         });
-      }
-      const qrcodeCanvas = document.getElementsByClassName("qrcode-canvas");
-      for (let i = 0; i < qrcodeCanvas.length; i++) {
-        const dom = qrcodeCanvas[i];
-        const init = dom.getAttribute("data-init");
-        if (init === 'true') continue;
-        toCanvas(dom);
-      }
     },
-    //分享到微信
-    shareShowWeChat() {
-      $(".weChat-image").toggle();
-    },
-    //分享到其他
-    shareToOther(shareType, type, title, pid, description, avatar) {
-      const origin = window.location.origin;
-      var lk = origin +'/default/logo3.png';
-      if(shareType === "column") {
-        lk = origin + "/a/" + avatar
-      } else if(shareType === "user") {
-        lk = origin + NKC.methods.tools.getUrl('userAvatar', pid)
-      }
-      const newLink = window.open();
-      const str = window.location.origin + window.location.pathname;
-      if(str){
-        const para = {
-          'str': str,
-          'type': shareType,
-          targetId: pid // 与type类型对应的Id
-        };
-        nkcAPI('/s', "POST", para)
-          .then(function(data) {
-            let newUrl = data.newUrl;
-            if(data.newUrl.indexOf('http') !== 0) {
-              newUrl = origin + newUrl;
-            }
-            if(type === "qq") {
-              newLink.location='http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+description;
-            }
-            if(type === "qzone") {
-              newLink.location='https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+description;
-            }
-            if(type === "weibo") {
-              newLink.location='http://v.t.sina.com.cn/share/share.php?url='+newUrl+'&title='+title+'&pic='+lk;
-            }
-          })
-          .catch(function(data) {
-            screenTopWarning(data || data.error);
-          })
-      }
+    renderQR() {
+      const {url} = this.content;
+      const fixedUrl = fixUrl(url);
+      QRCode.toCanvas(this.$refs.weChatCanvas, fixedUrl, (err) => {
+        if(err) screenTopWarning(err.message || err.toString())
+      })
     }
   }
 }

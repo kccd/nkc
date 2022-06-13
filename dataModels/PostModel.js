@@ -2247,6 +2247,7 @@ postSchema.statics.disableToDraftPosts = async function() {
         }
       });
       const user = await UserModel.findOnly({uid: post.uid});
+      //扣除用户科创币
       await KcbsRecordModel.insertSystemRecord('postBlocked', user, {
         state: {
           _scoreOperationForumsId: post.mainForumsId,

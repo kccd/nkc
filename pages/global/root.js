@@ -8,7 +8,8 @@ import SubscribeTypes from "../lib/vue/SubscribeTypes";
 import FloatForumPanel from "../lib/vue/forum/FloatForumPanel";
 import Sticker from '../lib/vue/Sticker';
 import Digest from "../lib/vue/Digest";
-import AddXsf from "../lib/vue/AddXsf";
+import Credit from '../lib/vue/Credit';
+import ShareFloatPanel from '../lib/vue/ShareFloatPanel';
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
@@ -34,8 +35,9 @@ window.RootApp = new Vue({
     "float-forum-panel": FloatForumPanel,
     "subscribe-types": SubscribeTypes,
     "sticker-panel": Sticker,
-    digest: Digest,
-    'add-xsf': AddXsf
+    'digest': Digest,
+    'credit': Credit,
+    'share-float-panel': ShareFloatPanel
   },
   computed: {
     hasLogged() {

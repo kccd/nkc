@@ -1,6 +1,26 @@
 @import '../base';
 
 .articles-panel{
+  .articles-panel-item-status{
+    padding: 0.3rem 0.3rem;
+    text-align: center;
+    font-size: 1rem;
+    &.disabled{
+      background-color: #333;
+      color: #ddd;
+    }
+    &.warning{
+      background-color: #FFBC42;
+      color: #fff;
+    }
+    &.danger{
+      background-color: #e85a71;
+      color: #fff;
+    }
+    &.normal{
+      display: none;
+    }
+  }
   .articles-panel-item{
     .articles-panel-checkbox{
       display: none;

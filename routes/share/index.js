@@ -141,7 +141,7 @@ shareRouter
       }
     } else if(type === 'comment') {
       let comment = await db.CommentModel.findOnly({_id: id});
-      comment = (await db.CommentModel.getCommentInfo([comment]))[0];
+      comment = (await db.CommentModel.getCommentsInfo([comment]))[0];
       result.title = comment.articleDocument.title;
       result.description = nkcModules.nkcRender.htmlToPlain(comment.commentDocument.content, 100);
       if(comment.cover) {
@@ -232,108 +232,89 @@ shareRouter
   })
   .post('/', async (ctx, next) => {
     const {data, body, db, nkcModules, state} = ctx;
-    const {ShareModel} = db;
-    let {str, type, targetId} = body;
+    let {type, id, targetId} = body;
+    id = id || targetId;
     const {user} = data;
-    const lock = await nkcModules.redLock.lock(`getShareToken:${user?user.uid:'visitor'}`, 6000);
-    let uid;
-    if(user){
-      uid = user.uid
-    }else{
-      uid = "visitor";
+    const uid = state.uid || 'visitor';
+    const shareTypes = await db.ShareModel.getShareTypes();
+    if(!Object.keys(shareTypes).includes(type)) ctx.throw(400, `分享类型错误 type=${type}`);
+    const shareSettings = await db.SettingModel.getSettings('share');
+    let targetShareSetting = shareSettings[type];
+    const targetShareRewardSetting = shareSettings[type];
+    if(type === shareTypes.post) {
+      targetShareSetting = await db.ShareModel.getShareSettingsByPostId(id);
     }
-    // 如果targetId不存在，则从url中获取
-    if(!targetId && (type === "thread" || type === "post" || type === "forum")) {
-      str.replace(/\/[tfp]\/([0-9]+)/ig, (c, v1) => {
-        targetId = v1;
-      });
-      /*let delParamUrl = str.replace("?", "");
-      let routerArr = delParamUrl.split("/");
-      targetId = routerArr[routerArr.length-1]*/
+    if(!targetShareSetting.status) {
+      const name = await db.ShareModel.getShareNameByType(type);
+      ctx.throw(403, `${name}分享功能已关闭`);
     }
-    // 若分享的是forum、thread或post则需验证权限
-    if(type === "thread") {
-      const thread = await db.ThreadModel.findOnly({tid: targetId});
-      await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-      type = 'post';
-      targetId = thread.oc;
-    } else if(type === "post") {
-      const post = await db.PostModel.findOnly({pid: targetId});
-      const thread = await post.extendThread();
-      await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-    } else if(type === "forum") {
-      const forum = await db.ForumModel.findOnly({fid: targetId});
-      await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
-    } else {
-      data.newUrl = str;
-      await lock.unlock();
-      return await next();
-    }
-
-    const shareSettingsInfo = await db.SettingModel.getSettings('share');
-    let setting = shareSettingsInfo[type];
-    if(type === 'post') {
-      setting = await db.ShareModel.getShareSettingsByPostId(targetId);
-    }
-
-    if(!setting.status) {
-      ctx.throw(403, `暂不允许分享`);
-    }
-
-    // 加载奖励设置，判断当天分享次数是否达到上限
-    const redEnvelopeSettings = await db.SettingModel.getSettings("redEnvelope");
-    const shareSettings = redEnvelopeSettings.share;
-    let share = {
-      tokenType: type,
-      shareUrl: str,
-      uid: uid,
-      targetId
-    };
-    const {count} = shareSettings[type];
-    if(!user) {
-      share.shareReward = false;
-      share.registerReward = false;
-    } else {
-      const today = nkcModules.apiFunction.today();
-      const shareCountByType = await db.ShareModel.countDocuments({uid: user.uid, toc: {$gte: today}, tokenType: type});
-      // 若此类型今日分享次数已达上限则不给予分享者奖励
-      if(shareCountByType >= count) share.shareReward = false;
-    }
-    // 生成token
-    let token;
+    const shareContent = await db.ShareModel.getShareContent({
+      type,
+      id,
+      userRoles: data.userRoles,
+      userGrade: data.userGrade,
+      user
+    });
+    const lock = await nkcModules.redLock.lock(`getShareToken:${uid}`, 6000);
     try{
-      token = await db.ShareModel.getNewToken();
-    } catch(err) {
+      const referer = ctx.get('referer');
+      // 加载奖励设置，判断当天分享次数是否达到上限
+      let share = {
+        tokenType: type,
+        shareUrl: referer,
+        uid,
+        targetId: id,
+      }
+      const {rewardCount} = targetShareRewardSetting;
+      if(!user) {
+        share.shareReward = false;
+        share.registerReward = false;
+      } else {
+        const today = nkcModules.apiFunction.today();
+        const shareCountByType = await db.ShareModel.countDocuments({
+          uid: user.uid,
+          toc: {
+            $gte: today
+          },
+          tokenType: type
+        });
+        if(shareCountByType >= rewardCount) share.shareReward = false;
+      }
+      const token = await db.ShareModel.getNewToken();
+      share.token = token;
+      const shareInfo = new db.ShareModel(share);
+      const sharesAccessLog = db.SharesAccessLogModel({
+        ip: ctx.address,
+        port: ctx.port,
+        token,
+        uid
+      });
+      await shareInfo.save();
+      await sharesAccessLog.save();
+      const shareLogs = db.ShareLogsModel({
+        id: await db.SettingModel.operateSystemID('shareLogs', 1),
+        uid,
+        shareUid: share.uid,
+        machine: ctx.get("User-Agent"),
+        referer: ctx.get("referer"),
+        ip: ctx.address,
+        port: ctx.port,
+        shareType: type,
+        code: token,
+        originUrl: referer,
+        type: "spo"
+      });
+      await shareLogs.save();
+      shareContent.url = `/s/${token}`;
       await lock.unlock();
-      ctx.throw(500, err.message);
+    } catch(err) {
+      await lock.unlock()
+      throw err;
     }
-    share.token = token;
-    const shareInfo = new ShareModel(share);
-    const sharesAccessLog = db.SharesAccessLogModel({
-      ip: ctx.address,
-      port: ctx.port,
-      token,
-      uid
-    });
-    await shareInfo.save();
-    await sharesAccessLog.save();
-    const shareLogs = db.ShareLogsModel({
-      id: await db.SettingModel.operateSystemID('shareLogs', 1),
-      uid: user ? user.uid : "visitor",
-      shareUid: share.uid,
-      machine: ctx.get("User-Agent"),
-      referer: ctx.get("referer"),
-      ip: ctx.address,
-      port: ctx.port,
-      shareType: type,
-      code: token,
-      originUrl: str,
-      type: "spo"
-    });
-    await shareLogs.save();
-    data.newUrl = "/s/" + token;
-    data.logoUrl = nkcModules.tools.getUrl('siteIcon', 'sm');
-    await lock.unlock();
+    data.shareContent = shareContent;
+    // 适配 APP
+    data.newUrl = data.shareContent.url;
+    data.logoUrl = data.shareContent.cover;
     await next();
   });
 module.exports = shareRouter;

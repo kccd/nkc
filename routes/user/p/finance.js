@@ -1,4 +1,3 @@
-const languages = require("../../../nkcModules/language");
 module.exports = async (ctx, next) => {
   const {state, nkcModules, query, data, db} = ctx;
   const {targetUser} = data;
@@ -31,8 +30,7 @@ module.exports = async (ctx, next) => {
   const kcbNumber = await db.KcbsRecordModel.extendKcbsRecords(kcbsRecords);
   data.kcbsRecords = kcbNumber.map((item)=>{
     const m = item;
-    m.lang = languages['zh_cn']['kcbsTypes'][item.type];
-
+    m.lang = nkcModules.translate(nkcModules.language.languageNames.zh_cn, 'kcbsTypes', item.type);
     return m;
   });
   data.paging = paging;

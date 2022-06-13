@@ -2,7 +2,6 @@ const Router = require('koa-router');
 const router = new Router();
 const routers = require('../requireFolder')(__dirname);
 const userRouter = routers.user;
-const creditRouter = routers.credit;
 const documentRouter = routers.document;
 const draftRouter = routers.draft;
 const watermarkRouter = routers.watermark;
@@ -88,7 +87,7 @@ const articleRouter = routers.article;
 //动态
 const momentRouter = routers.moment;
 // 后台设置
-const settingRouter = routers.setting;
+const settingsRouter = routers.settings;
 
 const path = require('path');
 
@@ -144,7 +143,6 @@ router.use('/', async (ctx, next) => {
 });
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
-router.use('/credit', creditRouter.routes(), creditRouter.allowedMethods());
 router.use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
 router.use("/libraries", librariesRouter.routes(), librariesRouter.allowedMethods());
 router.use("/editor", editorRouter.routes(), editorRouter.allowedMethods());
@@ -210,5 +208,5 @@ router.use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods());
 router.use('/g', subscribeRouter.routes(), subscribeRouter.allowedMethods());
 router.use('/article', articleRouter.routes(), articleRouter.allowedMethods());
 router.use('/moment', momentRouter.routes(), momentRouter.allowedMethods());
-router.use('/setting', settingRouter.routes(), settingRouter.allowedMethods());
+router.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods());
 module.exports = router;

@@ -45,9 +45,6 @@ block content
       .hidden#threadForumsId=objToStr({isLastPage: (data.paging.page + 1) === data.paging.pageCount, notes: data.notes, pid: data.thread.oc, tid: data.thread.tid, mainForumsId: data.thread.mainForumsId, categoriesId: data.thread.categoriesId, tcId: data.thread.tcId})
       if data.step
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
-      //- include ../module_credit
-      #module_credit
-        credit-model(v-show="show" :id="pid" :type="type" :kcb="kcb" @close="dialogClose" ref="credit" article-type="thread")
       include ../module_digest
       .row
         .col-xs-12.col-md-9#wrap.box-shadow-panel
@@ -75,9 +72,6 @@ block content
                     .nav-count(title=`回复数` onclick="window.location.href='#container'")
                       .fa.fa-comment
                       span=data.thread.count
-                    //-.nav-count
-                      //-.fa.fa-share-square-o
-                      span 分享
                     -let collectEvent;
                     if !data.user
                       -collectEvent = `RootApp.openLoginPanel()`;
@@ -369,8 +363,16 @@ block content
                               span &nbsp;查看附件
                           if data.permissions.creditKcb
                             .single-post-bottom-item
-                              .fa.fa-cny.credit-kcb(title='鼓励' style='cursor:pointer;' onclick=`credit("${thread.firstPost.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励&nbsp;
-                          .single-post-bottom-item(data-type='share' data-share-type='post' data-share-id=thread.firstPost.pid title='分享')
+                              .fa.fa-cny.credit-kcb.pointer(
+                                data-global-click='showCreditPanel'
+                                data-global-data=objToStr({creditType: 'kcb', contentType: 'post', contentId: thread.firstPost.pid})
+                                title='鼓励'
+                                ) &nbsp;鼓励&nbsp;
+                          .single-post-bottom-item(
+                            data-global-click='showSharePanel'
+                            data-global-data=objToStr({type: 'thread', id: thread.tid})
+                            title='分享'
+                            )
                             .fa.fa-share-square-o.share-icon &nbsp;分享
                           .single-post-bottom-item(data-type='postOption' data-pid=thread.firstPost.pid title='其他操作' data-direction='down')
                             .fa.fa-sliders.option-icon
@@ -596,7 +598,6 @@ block scripts
   include ../publicModules/disabledPost/disabledPost
   include ../ueditor/dialogs/mathformulaV2/mathformula
   include ../publicModules/bulletComments/bulletComments
-  include ../publicModules/share/sharePanel
   include ../publicModules/commentControl/commentControl
   //include ../publicModules/replaceNKCRender
   include ../post/options/options

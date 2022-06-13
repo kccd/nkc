@@ -58,7 +58,7 @@ router
     const momentsObj = await db.MomentModel.getMomentsObjectByMomentsId(momentsId);
     const momentsList = await db.MomentModel.extendMomentsListData(Object.values(momentsObj), state.uid);
     const commentsObj = await db.CommentModel.getCommentsObjectByCommentsId(commentsId);
-    const commentsInfo = await db.CommentModel.getCommentInfo(Object.values(commentsObj));
+    const commentsInfo = await db.CommentModel.getCommentsInfo(Object.values(commentsObj));
     const commentsUrl = {};
     for(const commentInfo of commentsInfo) {
       commentsUrl[commentInfo._id] = commentInfo.url;

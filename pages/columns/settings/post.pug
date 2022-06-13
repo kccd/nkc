@@ -71,11 +71,11 @@ block settingsContent
                 span 辅分类：
                   span(v-if='p.minorCategories.length === 0') 无
                   span(v-else v-for="c in p.minorCategories") {{c.name}}&nbsp;
-              b.text-danger(v-if="p.thread && p.thread.disabled") 文章已屏蔽，仅后台可见
+              b.text-danger(v-if="(p.thread && p.thread.disabled) || (p.article && p.article.status === 'disabled')") 文章已屏蔽，仅后台可见
               b.text-danger(v-else-if="p.post && p.post.disabled") 回复已屏蔽，仅后台可见
-              b.text-danger(v-else-if="p.thread && p.thread.recycleMark") 文章已退修，仅后台可见
+              b.text-danger(v-else-if="(p.thread && p.thread.recycleMark) || (p.article && p.article.status === 'faulty')") 文章已退修，仅后台可见
               b.text-danger(v-else-if="p.post && p.post.toDraft") 回复已退修，仅后台可见
-              b.text-danger(v-else-if="p.type === 'thread' && !p.thread.reviewed") 文章未审核，仅后台可见
+              b.text-danger(v-else-if="(p.type === 'thread' && !p.thread.reviewed) || (p.type === 'article' && p.article.status === 'unknown')") 文章未审核，仅后台可见
               b.text-danger(v-else-if="p.type === 'post' && !p.post.reviewed") 回复未审核，仅后台可见
               div.text-right
                 button.btn.btn-xs.btn-default(v-if="column.topped.indexOf(p._id) === -1" @click="movePost('columnTop', [p._id])") 首页置顶

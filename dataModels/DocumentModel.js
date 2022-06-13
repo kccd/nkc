@@ -1416,7 +1416,7 @@ schema.statics.getDocumentsUrlByDocumentsId = async (documentsId) => {
   }
   const articlesObj = await ArticleModel.getArticlesObjectByArticlesId(articlesId);
   const comments = await CommentModel.getCommentsObjectByCommentsId(commentsId);
-  const commentsInfo = await CommentModel.getCommentInfo(Object.values(comments));
+  const commentsInfo = await CommentModel.getCommentsInfo(Object.values(comments));
   const commentsUrl = {};
   for(const commentInfo of commentsInfo) {
     commentsUrl[commentInfo._id] = commentInfo.url;
@@ -1440,5 +1440,144 @@ schema.statics.getDocumentsUrlByDocumentsId = async (documentsId) => {
   }
   return results;
 };
+
+/*
+* 对document执行科创币的加减
+* */
+schema.statics.insertSystemRecordContent = async (type, user, ctx) => {
+  const SettingModel = mongoose.model('settings');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const UserModel = mongoose.model('users');
+  const KcbsTypeModel = mongoose.model('kcbsTypes');
+  const ScoreOperationLogModel = mongoose.model('scoreOperationLogs');
+  const {address: ip, port, data, state = {}} = ctx;
+  if(!user) return;
+  //获取后台积分设置
+  const enabledScores = await SettingModel.getEnabledScores();
+  let recordsId = [];
+  for(const enabledScore of enabledScores) {
+    const scoreType = enabledScore.type;
+    const kcbsType = await KcbsTypeModel.findOnly({_id: type});
+    const number = kcbsType.num * 100;
+    if(number === undefined) continue;
+    if(number === 0) continue;
+    let from, to;
+    let num = Math.abs(number);
+    if(number > 0) {
+      // 加分
+      from = 'bank';
+      to = user.uid;
+    } else {
+      // 减分
+      from = user.uid;
+      to = 'bank';
+    }
+    const kcbsRecordId = await SettingModel.operateSystemID('kcbsRecords', 1);
+    const newRecords = KcbsRecordModel({
+      _id: kcbsRecordId,
+      from,
+      to,
+      num,
+      scoreType,
+      type,
+      ip,
+      port,
+    });
+    if(data.targetUser && data.user) {
+      if(data.user !== user) {
+        newRecords.tUid = data.user.uid;
+      } else {
+        newRecords.tUid = data.targetUser.uid;
+      }
+    }
+    let document;
+    if(data.document) {
+      document = data.document;
+    }
+    if(document) {
+      newRecords.tid = document._id;
+    }
+    // 操作涉及到的资源的资源id
+    if(data.rid) {
+      newRecords.rid = data.rid;
+    }
+    if(data.problem) newRecords.problemId = data.problem._id;
+    await newRecords.save();
+    recordsId.push(kcbsRecordId);
+  }
+  // 已创建积分账单记录
+  if(recordsId.length) {
+    const scoreOperationLog = ScoreOperationLogModel({
+      _id: await SettingModel.operateSystemID('scoreOperationLogs', 1),
+      uid: user.uid,
+      type,
+      ip,
+      port,
+      recordsId
+    });
+    await scoreOperationLog.save();
+    await UserModel.updateUserScores(user.uid);
+  }
+}
+
+/*
+* 定时屏蔽退修超时未修改的document
+* */
+schema.statics.disabledToDraftDocuments = async function() {
+  const DocumentModel = mongoose.model('documents');
+  const UserModel = mongoose.model('users');
+  const DelPostLogModel = mongoose.model('delPostLog');
+  const nkcModules = require('../nkcModules');
+  const {article: articleSource, comment: commentSource} = await DocumentModel.getDocumentSources();
+  const {faulty: faultyStatus, disabled: disabledStatus} = await DocumentModel.getDocumentStatus();
+  const {stable: stableType} = await DocumentModel.getDocumentTypes();
+  const match = {
+    delType: faultyStatus,
+    postType: {$in: [articleSource, commentSource]},
+    modifyType: false,
+    toc: {
+      $lte: Date.now() - 3 * 24 * 60 * 1000,
+    }
+  };
+  //查找对document的退修记录
+  const onLog = await DelPostLogModel.find(match);
+  for(const log of onLog) {
+    const {postId}= log;
+    const document = await DocumentModel.findOne({_id: postId, type: stableType});
+    await log.updateOne({
+      $set: {
+        modifyType: true,
+        delType: 'faulty',
+      }
+    });
+    //如果document存在并且状态为退修状态
+    if(document && document.status === faultyStatus) {
+      //将document的状态改变为封禁状态，函数同时去改变document上层的状态
+      await document.setStatus(disabledStatus);
+      const delLog = await DelPostLogModel({
+        delUserId: document.uid,
+        delPostTitle: document?document.title : "",
+        reason: '退休超时未处理',
+        postType: document.source,
+        threadId: document.sid,
+        postId: document._id,
+        delType: disabledStatus,
+        noticeType: true,
+      });
+      await delLog.save();
+      const user = await UserModel.findOnly({uid: document.uid});
+      await DocumentModel.insertSystemRecordContent(`${document.source}Blocked`, user, {
+        state: {
+        },
+        data: {
+          user: {},
+          document,
+        },
+        nkcModules,
+        db: require('./index'),
+      });
+    }
+  }
+}
 
 module.exports = mongoose.model('documents', schema);

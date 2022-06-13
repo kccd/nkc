@@ -24,8 +24,11 @@ const {
 } = resourceObj;
 const mathJax = require('./mathJax');
 const document = require('./document');
+<<<<<<< HEAD
 const draft = require('./draft');
 const credit = require('./credit');
+=======
+>>>>>>> c612b2e1ee0a9c9922e1afb8a46d35eaae69482f
 const editor = require('./editor');
 const edit = require('./edit');
 const exam = require('./exam');
@@ -91,7 +94,7 @@ const zone = require('./zone');
 const subscribe = require('./subscribe');
 const article = require('./article');
 const moment = require ('./moment');
-const setting = require('./setting');
+const settings = require('./settings');
 const operationObj = {};
 
 
@@ -156,7 +159,6 @@ operationObj.operationTree = {
 		'home.php': {
 			GET: 'discuz'
 		},
-		credit, // 奖励
 		document, // 预览文章或历史
 		draft, //预览草稿或历史
 		poster, //活动海报
@@ -296,7 +298,7 @@ operationObj.operationTree = {
     g: subscribe, // 关注
 		article, // 独立文章
 		moment, // 动态
-		setting, // 后台设置
+    settings, // 加载系统设置
 	}
 };
 module.exports = operationObj;

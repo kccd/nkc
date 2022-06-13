@@ -318,7 +318,7 @@ router
       let articles = await db.ArticleModel.find({did: {$in: [...articleDocumentId]}, status: normalStatus});
       let comments = await db.CommentModel.find({did: {$in: [...commentDocumentId]}, status: normalStatus});
       articles = await db.ArticleModel.getArticlesInfo(articles);
-      comments = await db.CommentModel.getCommentInfo(comments);
+      comments = await db.CommentModel.getCommentsInfo(comments);
       for(const a of articles) {
         articlesObj[a.did] = a;
       }

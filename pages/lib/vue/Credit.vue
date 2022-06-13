@@ -1,74 +1,128 @@
 <template lang="pug">
-    //- .credit-panel( class="ib" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" :data-credit-score-name="res.creditScore.name").bootstrap-modal
-      //- div(class="modal-dialog modal-sm" role="document")
-    .modal-content(class="modal-sm ib" ref="content")
-      .credit-modal-header(ref="header")
-        .close-icon(type="button" @click="close")
-          span.fa.fa-remove
-        .modal-title {{ {xsf: '评学术分',kcb: '鼓励'}[type] }}
-      .modal-body
-        .form
-          .form-group(v-if="type === 'kcb'")
-            span.kcb-info.currency 向作者转账
-            span.kcb-info.currency.outstanding {{ res.creditScore.name }}
-            span.kcb-info.currency 以资鼓励
+  .nkc-credit(ref="content")
+    .nkc-credit-header(ref="creditHeader")
+      span {{headerTitle}}
+      .close-icon(type="button" @click="close")
+        span.fa.fa-remove
+    .nkc-credit-content(v-if="loading")
+      .p-t-2.p-b-2.text-center 加载中...
+    .nkc-credit-content(v-else)
+      .form
+        div(v-if="creditType === creditTypes.kcb")
+          .form-group
+            span 向作者转账{{creditScore.name}}以资鼓励
           .form-group
             label 分值
-            span.kcb-info.kcb-range(v-if="type === 'kcb'" style='display:inline-block;') {{"(" + res.creditSettings.min/100 + res.creditScore.unit + "-" + res.creditSettings.max/100 + res.creditScore.unit + ")"}}
-            span.xsf-info.xsf-range(v-else style='display:inline-block;') {{"(" + -res.xsfSettings.reduceLimit + "到" + res.xsfSettings.addLimit + ")"}}
-            input.form-control.num(value='1' type='number' v-model="num")
+            span （{{creditSettings.min / 100}} {{creditScore.unit}} - {{creditSettings.max / 100}} {{creditScore.unit}}）
+            input.form-control(type='number' v-model.number="kcbNumber")
+        div(v-else)
           .form-group
-            label 原因
-            span.kcb-info(v-if="type === 'kcb'" style='display:inline-block;') （不超过60个字）
-            span.xsf-info(v-else style='display:inline-block;') （不超过500个字）
-            textarea.form-control.description(rows=3 v-model="description")
-      .modal-footer
-        button(type="button" class="btn btn-default" data-dismiss="modal" @click="close") 关闭
-        button(type="button" class="btn btn-primary" @click="submit" :disable="disable") {{ disable ? "提交中..." : "确认"}}
+            label 分值
+            span （-{{xsfSettings.reduceLimit}} 到 {{xsfSettings.addLimit}}）
+            input.form-control(type='number' v-model.number="xsfNumber")
+        .form-group
+          label 原因（不超过 500 字）
+          textarea.form-control(rows="3" v-model="reason")
+      .m-b-05.text-right
+        button.btn.btn-sm.btn-default.m-r-05(@click="close") 取消
+        button.btn.btn-sm.btn-primary(v-if="submitting" disabled) 提交中...
+        button.btn.btn-sm.btn-primary(@click="submit" v-else) 提交
 </template>
+
+<style scoped lang="less">
+.nkc-credit {
+  display: none;
+  width: 30rem;
+  position: fixed;
+  background-color: #fff;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  border: 1px solid #f0f0f0;
+
+  .nkc-credit-header{
+    cursor: move;
+    height: 3rem;
+    line-height: 3rem;
+    background-color: #dadada;
+    padding-left: 1rem;
+    position: relative;
+    padding-right: 3rem;
+    .close-icon{
+      cursor: pointer;
+      width: 3rem;
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 3rem;
+      line-height: 3rem;
+      text-align: center;
+    }
+    .close-icon:hover {
+      background-color: red;
+      color: #fff;
+    }
+  }
+  .nkc-credit-content{
+    padding: 0.5rem 1rem;
+    .form-group{
+      margin-bottom: 1rem;
+    }
+  }
+  .nkc-credit-footer{
+
+  }
+}
+</style>
 
 <script>
 import { sweetError } from '../js/sweetAlert';
 import { DraggableElement } from "../js/draggable";
 
+export const creditTypes = {
+  xsf: 'xsf',
+  kcb: 'kcb'
+};
+
+const creditTypeNames = {
+  kcb: '鼓励',
+  xsf: '评学术分'
+};
+
+export const contentTypes = {
+  post: 'post',
+  article: 'article',
+  comment: 'comment',
+};
+
 export default {
-  name: "creditComponent",
-  props: {
-    type: {
-      //type = kcb || xsf
-      type: String,
-      default: "kcb"
-    },
-    // 接收学术分或者kcb依据
-    id: {
-      type: String,
-      required: true
-    },
-    kcb: {
-      type: Number,
-    },
-    // 文章类型。独立(zone)、专栏(column)、社区(thread)等
-    articleType: {
-      type: String,
-      // 
-      default: "thread"
+  data: () => ({
+
+    kcbNumber: 1,
+    xsfNumber: 1,
+    reason: '',
+
+    creditType: creditTypes.kcb,
+    contentId: '',
+    contentType: '',
+    creditScore: null,
+    userKcb: 0,
+    creditSettings: null,
+    xsfSettings: null,
+    loading: true,
+    submitting: false,
+    creditTypes,
+    creditTypeNames,
+  }),
+  computed: {
+    headerTitle() {
+      return creditTypeNames[this.creditType];
     }
   },
-  data: () => ({
-    res: {
-      creditSettings: {},
-      xsfSettings: {},
-      creditScore: {}
-    },
-    dialog: '',
-    disable: false,
-    description: '',
-    num: '',
-  }),
   mounted() {
     this.dialog = new DraggableElement(
       this.$refs.content,
-      this.$refs.header
+      this.$refs.creditHeader
     );
 	  this.dialog.setPositionCenter();
   },
@@ -76,157 +130,91 @@ export default {
     this.dialog.destroy();
   },
   methods: {
-    open(){
-      // nkcAPI(`/t/${location.pathname.split("/")[2]}/rewards` ,"GET")
-      nkcAPI(`/credit?articleType=${this.articleType}` ,"GET")
-        .then((res) => {
-          this.res = res
+    open(creditType, contentType, contentId){
+      const self = this;
+      self.creditType = creditType;
+      self.contentId = contentId;
+      self.contentType = contentType;
+      self.loading = true;
+      self.show();
+      return Promise.resolve()
+        .then(() => {
+          if(!contentId || !contentType) {
+            throw new Error(`未指定评分内容`);
+          }
+          return self.initSettings();
         })
-        .catch((err) => {
-          sweetError(err)
+        .then(() => {
+          self.loading = false;
         })
+        .catch(sweetError);
+    },
+    initSettings() {
+      const self = this;
+      return nkcAPI(`/settings/credit`, 'GET')
+        .then(res => {
+          const {
+            creditScore,
+            creditSettings,
+            xsfSettings
+          } = res;
+          self.creditScore = creditScore;
+          self.creditSettings = creditSettings;
+          self.xsfSettings = xsfSettings;
+        });
     },
     close(){
-      // 通知父组件关闭对话框
-      this.$emit("close");
-      this.num = '';
-      this.description = '';
-
+      this.dialog.hide();
+    },
+    show() {
+      this.dialog.show();
+    },
+    reset() {
+      this.kcbNumber = 0;
+      this.xsfNumber = 0;
+      this.reason = '';
     },
     submit(){
-      this.disable = true;
-      const obj = {
-        num: this.num,
-        description: this.description
-      };
-      if (this.type === "kcb"){
-        obj.num *= 100;
-        if(this.num*100 > this.kcb) return screenTopWarning('你的' + this.res.creditScore.name + '不足');
+      const {
+        reason,
+        xsfNumber,
+        kcbNumber,
+        creditType,
+        creditTypes,
+        contentId,
+        contentType,
+      } = this;
+      const self = this;
+      let url;
+      if(creditType === creditTypes.xsf) {
+        // 评学术分
+        if(contentType === contentTypes.post) {
+          url = `/p/${contentId}/credit/xsf`;
+        }
+      } else {
+        // 鼓励
+        if(contentType === contentTypes.post) {
+          url = `/p/${contentId}/credit/kcb`;
+        }
       }
-      // let url = '/p/'+this.pid+'/credit/' + this.type;
-      let url = `/credit/${this.type}?articleType=${this.articleType}&id=${this.id}`
-      nkcAPI(url, 'POST', obj)
-        .then( () => {
-          window.location.reload();
+
+      const body = {
+        num: creditType === creditTypes.xsf? xsfNumber: Math.round(kcbNumber * 100),
+        description: reason,
+      };
+      this.submitting = true;
+      return nkcAPI(url, 'POST', body)
+        .then(() => {
+          sweetSuccess('提交成功');
+          self.close();
+          self.submitting = false;
+          self.reset();
         })
-        .catch( data => {
-          screenTopWarning(data.error || data);
-          this.disable = false;
-      });
+        .catch(err => {
+          sweetError(err);
+          self.submitting = false;
+        });
     }
   }
 }
 </script>
-<style scoped>
-@media (min-width: 768px) {
-  .modal-sm {
-      width: 300px;
-  }
-  .modal-content {
-    -webkit-box-shadow: 0 5px 15px rgb(0 0 0 / 50%);
-    box-shadow: 0 5px 15px rgb(0 0 0 / 50%);
-  }
-}
-.outstanding {
-  color: #1269ff
-}
-.modal-content {
-    position: fixed;
-    background-color: #fff;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    border: 1px solid #999;
-    border-radius: 6px;
-    outline: 0;
-    -webkit-box-shadow: 0 3px 9px rgb(0 0 0 / 50%);
-    box-shadow: 0 3px 9px rgb(0 0 0 / 50%);
-}
-/* .modal-header{
-  cursor: pointer;
-  padding: 15px;
-  border-bottom: 1px solid #e5e5e5;
-} */
-.modal-body {
-    position: relative;
-    padding: 15px;
-}
-.modal-footer {
-    padding: 15px;
-    text-align: right;
-    border-top: 1px solid #e5e5e5;
-}
-.ib{
-  display: inline-block;
-}
-.close-icon{
-  cursor: pointer;
-  color: #aaa;
-  width: 3rem;
-  position: absolute;
-  top: 0;
-  right: 0;
-  height: 3rem;
-  line-height: 3rem;
-  text-align: center;
-}
-.close-icon:hover {
-  background-color: rgba(0, 0, 0, 0.08);
-  color: #777;
-}
-.modal-title {
-    height: 3rem;
-    line-height: 3rem;
-    background-color: #f6f6f6;
-    cursor: move;
-    font-weight: 700;
-    padding-left: 1rem;
-}
-.form-group {
-    margin-bottom: 15px;
-}
-label {
-    display: inline-block;
-    max-width: 100%;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-.form-control {
-    display: block;
-    width: 100%;
-    height: 34px;
-    padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.42857143;
-    color: #555;
-    background-color: #fff;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    -webkit-box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
-    box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
-    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-}
-textarea.form-control {
-    height: auto;
-}
-.btn-default {
-    color: #333;
-    background-color: #fff;
-    border-color: #ccc;
-}
-.modal-footer .btn + .btn {
-    margin-bottom: 0;
-    margin-left: 5px;
-}
-.credit-panel{
-  position: fixed;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10000;
-  height: 31rem;
-}
-</style>

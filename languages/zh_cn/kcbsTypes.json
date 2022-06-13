@@ -31,6 +31,8 @@
   "postToForum": "发表文章",
   "threadBlocked": "文章被屏蔽",
   "postBlocked": "回复被屏蔽",
+  "articleBlocked": "文章被屏蔽",
+  "commentBlocked": "回复被屏蔽",
   "subscribeForum": "关注专业",
   "unSubscribeForum": "取消关注专业",
   "followed": "被用户关注",
@@ -45,6 +47,10 @@
   "waterPay": "购买水印服务",
   "digestPost": "回复被加精",
   "unDigestPost": "回复被取消加精",
+  "digestArticle": "文章被加精",
+  "unDigestArticle": "文章被取消加精",
+  "digestComment": "回复被加精",
+  "unDigestComment": "回复被取消加精",
   "attachmentDownload": "附件下载",
 
   "scoreExchange": "积分兑换"

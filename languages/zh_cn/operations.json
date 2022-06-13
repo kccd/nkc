@@ -1,6 +1,4 @@
 {
-  "rewardXsf": "奖励学术分",
-  "rewardKcb": "奖励科创币",
   "getRewardConfiguration": "获取奖励配置信息",
   "saveForumLatestBlockNotice": "保存专业最新页板块公告编辑内容",
   "saveForumDeclare": "保存专业说明编辑内容",
@@ -253,7 +251,7 @@
   "modifyKcbSettings": "修改科创币设置",
   "modifyRoleUsers": "将用户从某个角色中移除",
   "modifyOtherPosts": "修改别人的文章回复",
-  "modifyOtherArticles": "修改别人的文章",
+  "modifyOtherArticles": "修改别人的独立文章",
   "displayRecycleMarkThreads": "显示被退回的文章",
   "displayDisabledPosts": "显示被屏蔽的post",
   "unDigestThread": "取消将文章设为文章优秀",
@@ -834,7 +832,6 @@
   "refundFundApplicationForm": "基金管理员确认退款",
   "experimentalThreadCategorySettings": "后台管理 - 设置 - 文章多维分类",
   "getWatermark": "获取水印图片",
-  "getAppsWatermark": "获取用户偏好设置水印",
   "getForumChildForums": "获取专业下的子专业信息",
   "getAppsWatermark": "获取用户偏好设置水印",
   "creationCenter": "访问创作中心",
@@ -878,7 +875,8 @@
   "viewUserArticle": "查看任意用户的文章预览和历史",
   "digestArticle": "将独立文章设置为精选",
   "unDigestArticle": "取消将独立文章设置为精选",
-  "digestComment": "将回复设置为精选",
-  "unDigestComment": "取消回复精选",
-  "getSettings": "获取后台设置"
+  "digestComment": "将独立文章回复设置为精选",
+  "unDigestComment": "取消将独立文章回复为精选",
+  "getDigestSettings": "获取加精设置",
+  "getCreditSettings": "获取评学术分、鼓励设置"
 }

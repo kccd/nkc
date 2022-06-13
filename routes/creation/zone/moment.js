@@ -48,29 +48,42 @@ router
   // 发表动态
   .post('/', async (ctx, next) => {
     const {db, body, state, data} = ctx;
-    const {type, content, resourcesId} = body;
-    if(!['modify', 'publish'].includes(type)) {
+    const {type, content, resourcesId, momentId} = body;
+    if(!['create', 'modify', 'publish'].includes(type)) {
       ctx.throw(403, `类型指定错误 type=${type}`);
     }
-    let moment = await db.MomentModel.getUnPublishedMomentByUid(state.uid);
-    if(!moment) {
-      if(content.length > 0) {
+    if(type === 'create') {
+      let moment = await db.MomentModel.getUnPublishedMomentByUid(state.uid);
+      if(moment) {
+        await moment.modifyMoment({
+          content,
+          resourcesId,
+        });
+      } else {
         moment = await db.MomentModel.createMoment({
           content,
           resourcesId,
           uid: state.uid
         });
       }
+      data.momentId = moment._id;
+    } else if(type === 'modify') {
+      const moment = await db.MomentModel.getUnPublishedMomentByMomentId(momentId, state.uid);
+      if(moment) {
+        await moment.modifyMoment({
+          content,
+          resourcesId,
+        });
+      }
     } else {
+      const moment = await db.MomentModel.getUnPublishedMomentByMomentId(momentId, state.uid);
+      if(!moment) ctx.throw(400, `数据异常 momentId=${momentId}`);
       await moment.modifyMoment({
         content,
-        resourcesId
+        resourcesId,
       });
-      if(type === 'publish') {
-        await moment.publish();
-      }
+      await moment.publish();
     }
-    data.momentId = moment? moment._id: '';
     await next();
   })
   // 发表评论
@@ -81,32 +94,42 @@ router
       type,
       content,
       postType,
-      alsoPost
+      alsoPost,
+      momentCommentId,
     } = body;
-    if(!['modify', 'publish'].includes(type)) {
+    if(!['create', 'modify', 'publish'].includes(type)) {
       ctx.throw(403, `类型指定错误 type=${type}`);
     }
 
-    let momentComment = await db.MomentModel.getUnPublishedMomentCommentById(state.uid, momentId);
-    if(!momentComment) {
-      if(content.length > 0) {
+    if(type === 'create') {
+      let momentComment = await db.MomentModel.getUnPublishedMomentCommentById(state.uid, momentId);
+      if(momentComment) {
+        await momentComment.modifyMoment({
+          content,
+          resourcesId: []
+        });
+      } else {
         momentComment = await db.MomentModel.createMomentComment({
           content,
           uid: state.uid,
           parent: momentId,
         });
       }
-    } else {
-      await momentComment.modifyMoment({
-        content,
-        resourcesId: []
-      });
-      if(type === 'publish') {
-        await momentComment.publishMomentComment(postType, alsoPost);
-        data.momentCommentPage = await db.MomentModel.getPageByOrder(momentComment.order);
+      data.momentCommentId = momentComment._id;
+    } else if(type === 'modify') {
+      const momentComment = await db.MomentModel.getUnPublishedMomentCommentByCommentId(momentCommentId, state.uid, momentId);
+      if(momentComment) {
+        await momentComment.modifyMoment({
+          content,
+          resourcesId: []
+        });
       }
+    } else {
+      const momentComment = await db.MomentModel.getUnPublishedMomentCommentByCommentId(momentCommentId, state.uid, momentId);
+      if(!momentComment) ctx.throw(400, `数据异常 momentCommentId=${momentCommentId}`);
+      await momentComment.publishMomentComment(postType, alsoPost);
+      data.momentCommentPage = await db.MomentModel.getPageByOrder(momentComment.order);
     }
-    data.momentCommentId = momentComment? momentComment._id: '';
     await next();
   })
 module.exports = router;

@@ -31,9 +31,17 @@ if !isIncluded('singlePostBottom')
         .post-vote-container
           +singlePostVote(pid, vote, voteUp)
       if data.permissions && data.permissions.creditKcbPost
-        .single-post-bottom-item(onclick=`credit('${pid}', 'kcb')` title='鼓励')
+        .single-post-bottom-item(
+          data-global-click='showCreditPanel'
+          data-global-data=objToStr({creditType: 'kcb', contentType: 'post', contentId: pid})
+          title='鼓励'
+          )
           .fa.fa-cny.credit-kcb
-      .single-post-bottom-item(data-type='share' data-share-type='post' data-share-id=pid title='分享')
+      .single-post-bottom-item(
+        data-global-click='showSharePanel'
+        data-global-data=objToStr({type: 'post', id: pid})
+        title='分享'
+        )
         .fa.fa-share-square-o.share-icon
       .single-post-bottom-item(data-type='postOption' data-pid=pid title='其他操作')
         .fa.fa-sliders.option-icon
