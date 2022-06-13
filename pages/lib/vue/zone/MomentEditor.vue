@@ -237,8 +237,8 @@
         return getLength(content);
       },
       allowedToPublish() {
-        const {contentLength, maxContentLength} = this;
-        return contentLength <= maxContentLength;
+        const {contentLength, maxContentLength, momentId} = this;
+        return momentId && contentLength <= maxContentLength;
       },
       remainingWords() {
         const {maxContentLength, contentLength} = this;
@@ -349,11 +349,12 @@
       },
       publishContent() {
         const self = this;
-        const {content, picturesId, videosId} = this;
+        const {content, picturesId, videosId, momentId} = this;
         const resourcesId = picturesId.length > 0? picturesId: videosId;
         self.lockButton();
         return nkcAPI(`/creation/zone/moment`, 'POST', {
           type: 'publish',
+          momentId,
           content,
           resourcesId
         })
@@ -382,18 +383,22 @@
       },
       onContentChange: debounce(function() {
         this.saveContent();
-      }, 500),
+      }, 2000),
       saveContent() {
-        const {content, picturesId, videosId} = this;
+        const {content, picturesId, videosId, momentId} = this;
         const self = this;
+        const type = momentId? 'modify': 'create';
         const resourcesId = picturesId.length > 0? picturesId: videosId;
         return nkcAPI(`/creation/zone/moment`, 'POST', {
-          type: 'modify',
+          type,
           content,
+          momentId,
           resourcesId
         })
         .then((res) => {
-          self.momentId = res.momentId;
+          if(type === 'create') {
+            self.momentId = res.momentId;
+          }
           console.log(`动态已自动保存`);
         })
         .catch(err => {

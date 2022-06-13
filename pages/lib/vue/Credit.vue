@@ -151,7 +151,6 @@ export default {
     },
     initSettings() {
       const self = this;
-      const {creditType} = self;
       return nkcAPI(`/settings/credit`, 'GET')
         .then(res => {
           const {
