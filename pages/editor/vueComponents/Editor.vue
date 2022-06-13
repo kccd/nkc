@@ -337,9 +337,6 @@ export default {
     line-height: @height;
     width: @boxHeaderWidth;
     text-align: center;
-  }
-  .des-type{
-    width: auto;
     margin-right: 10px;
   }
   .article-box-text{
@@ -408,9 +405,6 @@ export default {
 .row {
     margin-right: -15px;
     margin-left: -15px;
-}
-.des-type{
-
 }
 .col-md-9 {
   position: relative;

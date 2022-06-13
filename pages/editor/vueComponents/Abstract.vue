@@ -20,10 +20,13 @@
 </template>
 
 <script>
+import { debounce } from '../../lib/js/execution';
+
 export default {
   data: () => ({
     cn: "", // 中文摘要
     en: "", // 英文摘要
+    changeContentDebounce: ''
   }),
   props: {
     abstract: {
@@ -31,6 +34,9 @@ export default {
       type: Object,
       default: () => ({}),
     },
+  },
+  created() {
+    this.changeContentDebounce = debounce(this.changeContent, 2000);
   },
   computed: {
     abstractCnLength() {
@@ -49,8 +55,18 @@ export default {
         this.en = n.en || "";
       },
     },
+    en() {
+      this.changeContent()
+    },
+    cn() {
+      this.changeContent()
+    }
   },
   methods: {
+    changeContent() {
+      // 统一发送一个事件
+      console.log('emit')
+    },
     getData() {
       return {
         abstractCn: this.cn,

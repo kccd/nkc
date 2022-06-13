@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import { debounce } from '../../lib/js/execution';
 
 import ResourceSelector from "../../lib/vue/ResourceSelector";
 import ImageSelector from "../../lib/vue/ImageSelector";
@@ -27,7 +28,8 @@ export default {
     cover: "",
     coverUrl: "",
     type: "newThread",
-    coverData: ""
+    coverData: "",
+    changeContentDebounce: ''
   }),
   components: {
     "resource-selector": ResourceSelector,
@@ -38,6 +40,9 @@ export default {
       type: String
     }
   },
+  created() {
+    this.changeContentDebounce = debounce(this.changeContent, 2000);
+  },
   watch: {
     value: {
       immediate: true,
@@ -45,9 +50,15 @@ export default {
         if (!(typeof this.value === "undefined"))
           this.coverUrl = getUrl("postCover", n);
       }
+    },
+    coverUrl(n) {
+      this.changeContentDebounce()
     }
   },
   methods: {
+    changeContent() {
+      console.log('emit')
+    },
     selectCover() {
       this.$refs.resourceSelector.open(
         data => {

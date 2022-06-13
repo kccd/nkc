@@ -114,7 +114,7 @@ export default {
     },
   },
   mounted() {
-    this.setInterval = setInterval(this.autoSaveToDraft, this.saveDraftTimeout);
+    this.setInterval = setInterval(this.timingSaveToDraft, this.saveDraftTimeout);
   },
   destroyed(){
     clearInterval(this.setInterval)
@@ -160,7 +160,7 @@ export default {
       let time = new Date();
       this.autoSaveInfo = "草稿已保存 " + this.format(time);
     },
-    autoSaveToDraft() {
+    timingSaveToDraft() {
       this.readyDataForSave();
       let type = this.type;
       const { saveData } = this;
@@ -188,7 +188,7 @@ export default {
       } else if (type === "newPost") {
         if (!saveData.title && !saveData.content) return;
       }
-      this.saveToDraftBase("automatic")
+      this.saveToDraftBase("timing")
         .catch((data) => {
           sweetError("草稿保存失败：" + (data.error || data));
         });
@@ -238,6 +238,7 @@ export default {
               draftId: saveData?.did || this.draftId,
               desType: desType,
               desTypeId: desTypeId,
+              saveType
             })
           );
           if (saveData.coverData) {
@@ -250,7 +251,7 @@ export default {
           // 保存草稿
           // 当编辑器中的字数减少时提示用户是否需要保存，避免其他窗口的自动保存覆盖内容
           return nkcUploadFile(
-            "/u/" + NKC.configs.uid + "/drafts?saveType=" + saveType,
+            "/u/" + NKC.configs.uid + "/drafts",
             "POST",
             formData
           );
@@ -274,9 +275,8 @@ export default {
           if(!location.search.includes("aid")) this.addUrlParam("aid", res.draft._id);
           if (saveType === "manual") {
             sweetSuccess("草稿已保存");
+            this.saveToDraftSuccess();
           }
-          // if(res.err) return
-          this.saveToDraftSuccess();
         })
         .catch((data) => {
           sweetError("草稿保存失败：" + (data.error || data));
@@ -472,7 +472,6 @@ export default {
           } else if (NKC.configs.platform === "apiCloud") {
             this.visitUrl(data.redirect || "/");
             setTimeout(function () {
-              //  api ？？？
               api.closeWin();
             }, 1000);
           } else {
@@ -503,6 +502,16 @@ export default {
 }
 .col-xs-12{
   width: 100%;
+}
+@media screen and (max-width: 1311px) {
+  .modifySubmit {
+    max-width: 19rem
+  }
+}
+@media screen and (min-width: 1311px) {
+  .modifySubmit {
+    max-width: 25rem
+  }
 }
 @media screen and (max-width: 992px) {
   .col-xs-12 {
@@ -535,6 +544,7 @@ export default {
   padding: 0.5rem 0;
   color: #9baec8;
 }
+
 .modifySubmit {
   // background-color: transparent!important;
   button{
@@ -546,7 +556,7 @@ export default {
     }
   }
   @media (min-width: 992px) {
-    max-width: 25rem;
+    // max-width: 25rem;
     position: fixed;
   }
 }

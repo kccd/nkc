@@ -121,6 +121,7 @@
 import { getUrl, objToStr } from "../../lib/js/tools";
 // import { nkcAPI } from "../../lib/js/netAPI";
 import ForumSelector from "./ForumSelector.vue";
+import { debounce } from '../../lib/js/execution';
 
 
 export default {
@@ -129,7 +130,8 @@ export default {
     threadCategories: [],
     type: "newThread",
     minorForumCount: "",
-    show: false
+    show: false,
+    changeContentDebounce: ''
   }),
   components: {
     "forum-selector": ForumSelector
@@ -140,6 +142,9 @@ export default {
       type: Object
     }
   },
+  created(){
+    this.changeContentDebounce = debounce(this.changeContent, 2000);
+  },
   watch: {
     data: {
       immediate: true,
@@ -148,6 +153,19 @@ export default {
         this.minorForumCount = n.minorForumCount || [];
         this.selectedForums = n.mainForums || [];
       }
+    },
+    mainForum(n) {
+      console.log(n);
+      this.changeContentDebounce()
+    },
+    minorForums(n) {
+      console.log(n);
+      this.changeContentDebounce()
+    },
+    threadCategories(n) {
+      console.log('测试分')
+      this.changeContentDebounce()
+
     }
   },
   computed: {
@@ -179,6 +197,9 @@ export default {
     }
   },
   methods: {
+    changeContent() {
+      console.log('emit')
+    },
     objToStr(obj){
       return objToStr(obj)
     },
