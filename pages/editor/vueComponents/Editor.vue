@@ -174,8 +174,6 @@ export default {
       nkcAPI(url, 'GET')
       .then(res => {
         self.drafts = res.drafts;
-        console.log(res.drafts,'res.drafts')
-        // self.paging = res.paging;
       })
       .catch(err => {
         sweetError(err);
@@ -194,9 +192,6 @@ export default {
       this.drafts = [];
     },
     more() {
-      // this.$router.replace({
-      //   path: '/creation/community/draft'
-      // });
       location.href = '/creation/community/draft'
     },
     getData(search) {
@@ -225,9 +220,8 @@ export default {
       }
       nkcAPI(url, "get")
         .then((resData) => {
-          // console.log(resData.post,'resData.post')
-          // debugger;
-          if(resData.post && resData.post.type === 'betaHistory' || resData.post.type === 'stableHistory') {
+          // 如果文章已经变为历史版 
+          if(resData.post && ['betaHistory', 'stableHistory'].includes(resData.post.type)) {
             sweetError(err);
             setTimeout(() => {
               location.href = location.pathname
@@ -240,7 +234,7 @@ export default {
           if (resData.type ==='newThread' &&  resData.mainForums.length) {
             this.mainForums = resData.mainForums;  
           }
-          resData.mainForums = this.mainForums
+          resData.mainForums = this.mainForums;
           this.pageData = resData;
           this.pageState = resData.state;
           this.show = true;
