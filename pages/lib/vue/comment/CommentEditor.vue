@@ -27,8 +27,8 @@
           span 我已阅读并同意遵守与本次发表相关的全部协议。
           a(href="/protocol" target="_blank") 查看协议
     .m-b-05
-      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="!commentContent || lockPost" v-if="!publishing") 发布
-      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="!commentContent || lockPost" v-if="publishing") 发布中...
+      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="commentId && (!commentContent || lockPost)" v-if="!publishing") 发布
+      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="commentId && (!commentContent || lockPost)" v-if="publishing") 发布中...
         span.fa.fa-spinner.fa-spin
       button.m-r-05.btn.btn-default.btn-sm(@click="saveComment" :disabled="!commentContent || lockPost" v-if="!saving") 暂存
       button.m-r-05.btn.btn-default.btn-sm(@click="saveComment" :disabled="!commentContent || lockPost" v-if="saving") 暂存中...
@@ -90,6 +90,7 @@
       publishing: false,
       saving: false,
       setTimeout: null,
+      commentId: null,
     }),
     components: {
       'editor': Editor,
@@ -153,6 +154,7 @@
       //提交修改评论内容
       post(type) {
         if(type === 'publish') {
+          if(!this.commentId) return;
           this.publishing = true;
           clearTimeout(this.setTimeout);
         } else if(type === 'save') {
@@ -189,6 +191,9 @@
           } else {
             sweetSuccess('发布成功！');
             self.contentChangeEventFlag = false;
+            if(data.renderedComment) {
+              insertRenderedComment(data.renderedComment);
+            }
             //发布成功后通知上层将content清空
             self.clearContent();
             self.type = 'create';

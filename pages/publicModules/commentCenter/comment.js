@@ -1,5 +1,8 @@
 import {getDataById} from "../../lib/js/dataConversion";
+import {getSocket} from "../../lib/js/socket";
+const socket = getSocket();
 const data = getDataById('data');
+const {article} = data;
 import CommentEditor from "../../lib/vue/comment/CommentEditor";
 if(data.type === 'article' && $("#commentEditor").length !== 0) {
   window.commentEditor = new Vue({
@@ -43,6 +46,10 @@ for(let i = 0;i < singleBottomDom.length;i++) {
   if(!dom) continue;
   const cid = dom.attr('cid');
   if(!cid) continue;
+  initSingleCommentBottom(cid);
+}
+
+function initSingleCommentBottom(cid) {
   singleCommentBottom[cid] = new Vue({
     el: `#singleCommentBottom_${cid}`,
     data: {
@@ -67,6 +74,7 @@ for(let i = 0;i < singleBottomDom.length;i++) {
         const data = this.getDataById(`comment_${cid}`);
         const init = e.getAttribute('data-init');
         if(init === 'true') return;
+        console.log('更多操作');
         this.$refs.commentOptions.open({DOM: target, comment: data.comment, direction});
         //阻止事件冒泡到父级
         // event.stopPropagation();
@@ -126,7 +134,7 @@ for(let i = 0;i < singleBottomDom.length;i++) {
             sweetError(err);
           })
       }
-
+      
     }
   });
 }
@@ -191,11 +199,82 @@ function disabledArticleComment(commentsDocId) {
   NKC.methods.disabledDocuments(commentsDocId);
 }
 
+var nkchl = [];
+
+// 回复发表成功后将后台返回的内容动态插入最后一页评论页
+function insertRenderedComment(renderedComment) {
+  if(!renderedComment) return;
+  //排除自己的发表
+  if(renderedComment.comment && NKC.configs.uid !== renderedComment.comment.uid) {
+    bulletComments.add(renderedComment.comment);
+  }
+  //仅在最后一页时才动态插入内容
+  if(!data.isLastPage) return;
+  var JQDOM = $(renderedComment.html).find('.single-post-container');
+  JQDOM = JQDOM[0];
+  // 公式渲染
+  try{
+    MathJax.typesetPromise([JQDOM]);
+  } catch(err) {
+    console.log(err);
+  }
+  JQDOM = $(JQDOM);
+  var parentDom = $('.comment-list');
+  parentDom.append(JQDOM);
+  // 视频音频组件渲染
+  NKC.methods.initVideo();
+  // 操作
+  initSingleCommentBottom(renderedComment.comment.cid);
+  // 外链复原
+  NKC.methods.replaceNKCUrl();
+  // 划词笔记
+  // const elements = document.querySelectorAll(`[data-type="nkc-render-content"][data-id="${renderedComment.articleId}"]`);
+  // for(let i = 0; i < elements.length; i++) {
+  //   const element = elements[i];
+  //   nkchl.push(new NKC.modules.NKCHL({
+  //     type: 'comment',
+  //     targetId: renderedComment.commentId,
+  //     notes: [],
+  //     rootElement: element
+  //   }));
+  // }
+}
+
+$(function () {
+  if(NKC.configs.uid && socket) {
+    window.bulletComments = new NKC.modules.BulletComments({
+      offsetTop: NKC.configs.isApp? 20: 60
+    });
+    if(socket.connected) {
+      joinCommentRoom();
+    } else {
+      socket.on('connect', function () {
+        joinCommentRoom();
+      });
+    }
+    socket.on('articleCommentMessage', function (data) {
+      insertRenderedComment(data);
+    });
+  }
+});
+
+function joinCommentRoom() {
+  socket.emit('joinRoom', {
+    type: 'article',
+    data: {
+      articleId: article._id,
+    }
+  })
+}
+
 window.singleCommentBottom = singleCommentBottom;
 
 Object.assign(window, {
   getPostsDom,
   resetCheckbox,
+  insertRenderedComment,
+  initSingleCommentBottom,
+  joinCommentRoom,
   manageComments,
   getMarkedCommentDocId,
   markAllComments,

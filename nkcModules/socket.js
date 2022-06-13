@@ -78,7 +78,6 @@ async function sendForumMessage(data) {
 // 推送回复给当前文章房间的用户(独立文章)
 async function sendCommentMessage(cid) {
   const CommentModel = require('../dataModels/CommentModel');
-  const ArticleModel = require('../dataModels/ArticleModel');
   // 获取单条评论动态渲染推送的数据
   const singleCommentData = await CommentModel.getSocketSingleCommentData(cid);
   const {
@@ -87,8 +86,9 @@ async function sendCommentMessage(cid) {
   } = singleCommentData;
   const {article} = comment;
   const eventName = await CommentModel.getSocketEventName(cid);
-  const rooName = GetSocketServiceRoomName('comment', article._id);
+  const rooName = GetSocketServiceRoomName('article', article._id);
   await SendMessageToWebsocketServiceRoom(rooName, eventName, {
+    articleId: article._id,
     commentId: comment._id,
     comment,
     html,

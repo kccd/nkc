@@ -119,7 +119,7 @@ router
           const order = await db.CommentModel.getCommentOrder(article._id);
           await comment.updateOrder(order);
           //发布评论
-          await comment.publishComment(article, toColumn);
+          data.renderedComment = await comment.publishComment(article, toColumn);
           //更新评论引用的评论数replies
           await db.ArticlePostModel.updateOrder(order, article._id);
           await lock.unlock();

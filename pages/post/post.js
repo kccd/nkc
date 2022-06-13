@@ -49,7 +49,11 @@ $(function () {
     window.bulletComments = new NKC.modules.BulletComments({
       offsetTop: NKC.configs.isApp ? 20 : 60
     });
-    socket.on('connect', joinPostRoom)
+    if (socket.connected) {
+      joinPostRoom();
+    } else {
+      socket.on('connect', joinPostRoom)
+    }
     socket.on('commentMessage', function (data) {
       if (NKC.configs.uid !== data.comment.uid) {
         bulletComments.add(data.comment);
@@ -60,11 +64,7 @@ $(function () {
         data.html
       );
     });
-    if (socket.connected) {
-      joinPostRoom();
-    }
   }
-
 });
 
 function joinPostRoom() {
