@@ -376,7 +376,7 @@ schema.statics.extendPostComments = async (props) => {
     let reason;
     //获取评论状态不正常的审核原因
     if(d.status === unknownStatus) {
-      delLog = await ReviewModel.findOne({docId: document._id}).sort({toc: -1});
+      delLog = await ReviewModel.findOne({docId: d._id}).sort({toc: -1});
     } else if(d.status === disabledStatus) {
       delLog = await DelPostLogModel.findOne({postType: d.source, delType: disabledStatus, postId: d._id, delUserId: d.uid}).sort({toc: -1});
     } else if(d.status === faultyStatus) {
@@ -1236,16 +1236,7 @@ schema.statics.getSocketCommentByPid = async function(cid) {
   const nkcRender = require('../nkcModules/nkcRender');
   let comment = await CommentModel.findOnly({_id: cid});
   comment = await CommentModel.getCommentInfo(comment);
-  const {user, commentDocument, commentUrl} = comment;
-  return {
-    cid: comment._id,
-    avatarUrl: tools.getUrl('userAvatar', user.avatar),
-    uid: user.uid,
-    username: user.username,
-    content: nkcRender.htmlToPlain(commentDocument.content, 50),
-    contentUrl: commentUrl,
-    article: comment.article,
-  };
+  return comment;
 }
 
 /*

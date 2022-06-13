@@ -74,7 +74,6 @@ function initSingleCommentBottom(cid) {
         const data = this.getDataById(`comment_${cid}`);
         const init = e.getAttribute('data-init');
         if(init === 'true') return;
-        console.log('更多操作');
         this.$refs.commentOptions.open({DOM: target, comment: data.comment, direction});
         //阻止事件冒泡到父级
         // event.stopPropagation();
@@ -221,10 +220,11 @@ function insertRenderedComment(renderedComment) {
   JQDOM = $(JQDOM);
   var parentDom = $('.comment-list');
   parentDom.append(JQDOM);
+  $('#nullComments').remove();
   // 视频音频组件渲染
   NKC.methods.initVideo();
   // 操作
-  initSingleCommentBottom(renderedComment.comment.cid);
+  initSingleCommentBottom(renderedComment.commentId);
   // 外链复原
   NKC.methods.replaceNKCUrl();
   // 划词笔记

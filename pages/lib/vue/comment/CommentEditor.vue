@@ -195,8 +195,8 @@
           } else {
             screenTopAlert('发布成功');
             self.contentChangeEventFlag = false;
-            if(data.renderedComment) {
-              insertRenderedComment(data.renderedComment);
+            if(res.renderedComment) {
+              window.insertRenderedComment(res.renderedComment);
             }
             //发布成功后通知上层将content清空
             self.clearContent();

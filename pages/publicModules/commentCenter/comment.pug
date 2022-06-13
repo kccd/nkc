@@ -25,13 +25,12 @@ if !isIncluded('comment')
       //- 回复批量管理
       +manageComments
   .p-a-0.comment-container.m-b-1
-    if data.comments && data.comments.length !== 0
-      .comment-list.m-t-1
-        include ./singleComment/singleComment
-        for comment in data.comments
-          +singleComment(comment)
-    else
-      .null.p-t-1 还没有人评论哦~~
+    .comment-list.m-t-1
+      include ./singleComment/singleComment
+      for comment in data.comments
+        +singleComment(comment)
+    if !data.comments || data.comments.length === 0
+      .null.p-t-1#nullComments 还没有人评论哦~~
   .m-b--05
     include ../../publicModules/paging/paging
     +articleNav

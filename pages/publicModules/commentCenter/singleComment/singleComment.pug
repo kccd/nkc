@@ -6,7 +6,6 @@ if !isIncluded('singleComment')
   mixin singleComment(props)
     -var {user, content, _id, order, quote, isAuthor, reason, type, status, uid, toc, tlm, docId, did, commentUrl, digest} = props;
     -var {voteUp, voteDown} = props
-    .hidden(id=`comment_${_id}`)=objToStr({comment: props})
     .single-post-container(
       data-un-reviewed=status === 'unknown'
       data-disabled=status === 'disabled'
@@ -16,6 +15,7 @@ if !isIncluded('singleComment')
       data-hide=isAuthor? 'not': hide
       id=data.highlight === _id? 'highlight': undefined
       )
+      .hidden(id=`comment_${_id}`)=objToStr({comment: props})
       include ./singleCommentWarningInfo
       +singleCommentWarningInfo({status, docId, cid: _id, reason})
       include ./singleCommentTop
