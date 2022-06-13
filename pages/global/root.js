@@ -87,19 +87,15 @@ window.RootApp = new Vue({
     closeDraw(type) {
       this.$refs.userDraw.colseDraw(type);
     },
-    //打开加精弹窗
+    // 打开加精弹窗
     openDigest(callback, options) {
       this.$refs.digest.open(callback, options);
     },
     closeDigest() {
       this.$refs.digest.close();
     },
-    //打开评学术分弹窗
-    addXsf(callback, options) {
-      this.$refs.addXsf.open(callback, options);
-    },
-    closeXsf() {
-      this.$refs.addXsf.close()
+    openCredit(creditType, contentType, contentId) {
+      return this.$refs.credit.open(creditType, contentType, contentId);
     },
     //关注取关用户
     subscribe(options) {

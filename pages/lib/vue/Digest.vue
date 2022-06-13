@@ -90,7 +90,7 @@ export default {
     //获取精选设置
     getDigestData() {
       const self = this;
-      nkcAPI('/setting/digest', 'GET')
+      nkcAPI('/settings/digest', 'GET')
         .then(res => {
           self.digestData = {
             redEnvelopeSettings: res.redEnvelopeSettings,

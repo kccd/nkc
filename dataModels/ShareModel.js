@@ -505,7 +505,7 @@ shareSchema.statics.getShareContent = async function(props) {
     };
   } else if(type === shareTypes.comment) {
     let comment = await CommentModel.findOnly({_id: id});
-    comment = (await CommentModel.getCommentInfo([comment]))[0];
+    comment = await CommentModel.getCommentInfo(comment);
     shareContent = {
       title: comment.articleDocument.title,
       cover: getUrl('documentCover', comment.cover),

@@ -1,6 +1,7 @@
 import {nkcAPI} from "../../../lib/js/netAPI";
 import {getUrl} from "../../../lib/js/tools";
 import {visitUrl} from "../../../lib/js/pageSwitch";
+import {creditTypes, contentTypes} from "../../../lib/vue/Credit";
 
 import {screenTopAlert, screenTopWarning} from "../../../lib/js/topAlert";
 window.articleOption = new Vue({
@@ -238,21 +239,7 @@ window.articleOption = new Vue({
     },
     addXSF() {
       const {_id} = this.article;
-      window.RootApp.addXsf((data) => {
-        const {num, description} = data;
-        const obj = {
-          num,
-          description,
-        };
-        nkcAPI(`/article/${_id}/credit/xsf`, 'POST', obj)
-          .then(() => {
-            window.RootApp.closeXsf();
-            window.location.reload();
-          })
-          .catch(err => {
-            screenTopWarning(err);
-          })
-      }, {})
+      window.RootApp.openCredit(creditTypes.xsf, contentTypes.article, _id);
     },
     addKCB() {
       const {pid} = this;

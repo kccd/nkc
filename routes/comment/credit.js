@@ -32,7 +32,7 @@ router
       ip: ctx.address,
       port: ctx.port,
       pid: cid,
-      recordType: 'post',
+      type: 'post',
     });
     targetUser.xsf += num;
     await newRecord.save();
@@ -51,9 +51,7 @@ router
       ip: ctx.address,
       c: {
           type: 'xsf',
-          cid,
-          num,
-          description
+          record: _id,
       }
     });
     await message.save();

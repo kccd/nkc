@@ -88,7 +88,10 @@ router
     });
     if(!['modify', 'publish', 'create', 'save'].includes(type)) ctx.throw(400, `未知的提交类型 type: ${type}`);
     let comment;
-    if(type === 'create') {
+    if(commentId) {
+      comment = await db.CommentModel.findOne({_id: commentId});
+    }
+    if(type === 'create' && !comment) {
       comment = await db.CommentModel.createComment({
         uid: state.uid,
         content,
@@ -98,13 +101,17 @@ router
         ip: ctx.address,
         port: ctx.port
       });
-    } else {
-      comment = await db.CommentModel.findOne({_id: commentId});
+    } else if(comment) {
       await comment.modifyComment({
         quoteDid,
         content
       });
       if(type === 'publish') {
+        nkcModules.checkData.checkString(content, {
+          name: "内容",
+          minLength: 1,
+          maxLength: 2000
+        });
         //获取推送到专栏信息
         if(toColumn) {
           //判断用户选择推送到专栏后是否选择专栏分类
@@ -131,7 +138,7 @@ router
         await comment.saveComment()
       }
     }
-    data.commentId = comment._id;
+    if(comment) data.commentId = comment._id;
     await next();
   })
   .get('/:_id', async (ctx, next) => {

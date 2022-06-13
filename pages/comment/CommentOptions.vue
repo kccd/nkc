@@ -99,6 +99,7 @@
 import {timeFormat} from "../lib/js/tools";
 import {nkcAPI} from "../lib/js/netAPI";
 import {screenTopAlert} from "../lib/js/topAlert";
+import {creditTypes, contentTypes} from "../lib/vue/Credit";
 export default {
   data: () => ({
     show: false,
@@ -336,14 +337,7 @@ export default {
       const {digest} = this.options;
       const self = this;
       if(!digest) {
-        window.RootApp.openDigest((kcb) => {
-          self.digestComment(kcb)
-            .then(() => {
-              window.RootApp.closeDigest();
-            });
-        }, {
-          digestData: self.digestData,
-        })
+        window.RootApp.openCredit(creditTypes.xsf, contentTypes.comment, _id);
       } else {
         self.unDigestComment();
       }
@@ -351,22 +345,7 @@ export default {
     //评学术分
     addXSF() {
       const {_id} = this.comment;
-      window.RootApp.addXsf((data) => {
-        const {num, description} = data;
-        const  obj = {
-          num,
-          description,
-        };
-        nkcAPI(`/comment/${_id}/credit/xsf`, 'POST', obj)
-          .then(() => {
-            window.RootApp.closeXsf();
-            window.location.reload();
-          })
-          .catch((err) => {
-            screenTopWarning(err);
-          })
-      }, {
-      })
+      window.RootApp.openCredit(creditTypes.xsf, contentTypes.comment, _id);
     },
     //撤销学术分
     cancelXsf() {

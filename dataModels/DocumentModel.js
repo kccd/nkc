@@ -577,11 +577,12 @@ schema.statics.publishDocumentByDid = async (did, options = {}) => {
       maxLength: 500
     })
   }
-  //如果存在正式版就将正式版变为正式历史版
+  //如果存在正式版就将正式版变为正式历史版，更新修改时间
   if(documentsObj.stable) await documentsObj.stable.setAsHistoryDocument();
   await documentsObj.beta.updateOne({
     $set: {
-      type: type[0]
+      type: type[0],
+      tlm: documentsObj.stable ? new Date() : null,
     }
   });
   //是否需要审核

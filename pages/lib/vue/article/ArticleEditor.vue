@@ -26,8 +26,8 @@
           .editor-header 专栏文章分类
           select-column-categories(ref="selectColumnCategories" @change="categoryChange" :column-id="columnId")
     .m-b-1
-      button.btn.btn-primary.m-r-05(@click="publish" :disabled="lockPost") 发布
-      button.btn.btn-default.m-r-05(@click="saveArticle" :disabled="!articleId") 保存
+      button.btn.btn-primary.m-r-05(@click="publish" :disabled="lockPost || !articleId") 发布
+      button.btn.btn-default.m-r-05(@click="saveArticle" :disabled="!articleId || lockPost") 保存
       button.btn.btn-default.m-r-05(@click="preview" :disabled="!articleId") 预览
       button.btn.btn-default.m-r-05(@click="history" :disabled="!articleId") 历史
       .checkbox
@@ -499,6 +499,7 @@ export default {
             if(res.articleUrl) {
               window.location.href = res.articleUrl;
             }
+            self.articleId = null;
           } else if(type === 'save') {
             //草稿保存成功显示报讯成功信息
             const time = new Date();

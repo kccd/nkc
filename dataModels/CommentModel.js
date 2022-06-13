@@ -319,18 +319,16 @@ schema.methods.modifyComment = async function (props) {
   const DocumentModel = mongoose.model('documents');
   const {content, quoteDid} = props;
   const {did} = this;
-  const tlm = new Date();
   //通过id去更新document的内容
   await DocumentModel.updateDocumentByDid(did, {
     quoteDid,
     content,
-    tlm
   });
-  await this.updateOne({
-    $set: {
-      tlm,
-    }
-  });
+  // await this.updateOne({
+  //   $set: {
+  //     tlm,
+  //   }
+  // });
 }
 /*
 * 拓展展示的comment评论数据
@@ -1255,11 +1253,14 @@ schema.statics.getSocketCommentByPid = async function(cid) {
 * */
 schema.statics.renderSingleCommentToHtml = async (cid) => {
   const render = require('../nkcModules/render');
+  const UserModel = mongoose.model('users');
   const PATH = require('path');
   const CommentModel = mongoose.model('comments');
   let comment = await CommentModel.findOnly({_id: cid});
+  let user = await UserModel.findOnly({uid: comment.uid});
+  user = await UserModel.extendUserInfo(user);
   const commentData = await CommentModel.extendSingleComment(comment);
-  const html = render(PATH.resolve(__dirname, '../pages/publicModules/commentCenter/singleComment/singleCommentPage.pug'), {commentData}, {}, {startTime: global.NKC.startTime});
+  const html = render(PATH.resolve(__dirname, '../pages/publicModules/commentCenter/singleComment/singleCommentPage.pug'), {commentData, user}, {}, {startTime: global.NKC.startTime});
   return html;
 };
 

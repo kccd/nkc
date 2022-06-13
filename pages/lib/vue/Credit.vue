@@ -84,7 +84,7 @@ export const creditTypes = {
   kcb: 'kcb'
 };
 
-const creditTypeNames = {
+export const creditTypeNames = {
   kcb: '鼓励',
   xsf: '评学术分'
 };
@@ -191,14 +191,21 @@ export default {
         // 评学术分
         if(contentType === contentTypes.post) {
           url = `/p/${contentId}/credit/xsf`;
+        } else if(contentType === contentTypes.article) {
+          url = `/article/${contentId}/credit/xsf`;
+        } else if(contentType === contentTypes.comment) {
+          url = `/comment/${contentId}/credit/xsf`;
         }
       } else {
         // 鼓励
         if(contentType === contentTypes.post) {
           url = `/p/${contentId}/credit/kcb`;
+        } else if(contentType === contentTypes.article) {
+          url = `/article/${contentId}/credit/kcb`;
+        } else if(contentType === contentTypes.comment) {
+          url = `/comment/${contentId}/credit/kcb`;
         }
       }
-
       const body = {
         num: creditType === creditTypes.xsf? xsfNumber: Math.round(kcbNumber * 100),
         description: reason,

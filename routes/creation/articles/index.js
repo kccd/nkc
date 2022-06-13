@@ -99,7 +99,10 @@ router
       maxLength: 2000000
     });
     let article;
-    if(type === 'create') {
+    if(articleId) {
+      article = await db.ArticleModel.findOnly({_id: articleId});
+    }
+    if(type === 'create' && !article) {
       article = await db.ArticleModel.createArticle({
         uid: state.uid,
         title,
@@ -114,10 +117,9 @@ router
         sid,
         authorInfos
       });
-    } else {
+    } else if(article){
       if(!articleId) ctx.throw(401, '未接收文章ID');
       //编辑或发布
-      article = await db.ArticleModel.findOnly({_id: articleId});
       if(!article) ctx.throw(400, '未找到文章');
       await article.modifyArticle({
         title,
@@ -145,17 +147,18 @@ router
       //改变article的hasDraft状态
       await article.changeHasDraftStatus();
     }
-
     if(type === 'publish') {
       data.articleCover = await article.getStableDocumentCoverId();
     } else {
       data.articleCover = await article.getBetaDocumentCoverId();
     }
-    // 写文章后返回信息
-    data.document = await db.DocumentModel.findOne({
-      sid: article._id
-    });
-    data.articleId = article._id;
+    if(article) {
+      // 写文章后返回信息
+      data.document = await db.DocumentModel.findOne({
+        sid: article._id
+      });
+      data.articleId = article._id;
+    }
     await next();
   })
   .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
