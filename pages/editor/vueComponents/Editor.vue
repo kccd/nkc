@@ -5,9 +5,9 @@
       div
         //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t  .clear-padding
         //- 2.notice editorSettings.onEditNotes
-        .article-box(v-if="drafts.length > 0")
+        .article-box(v-if="drafts.length")
           //- 字段含义来源 editor/index.js
-          .article-box-header.des-type {{ getTitle(drafts[0].desType) }}
+          .article-box-header.des-type {{ getTitle }}
           //- .article-box-header 草稿
           .article-box-text {{drafts[0].t || '未命名'}}
           .article-box-option
@@ -142,8 +142,8 @@ export default {
   },
   computed: {
     getTitle(){
-      // , forumDeclare: "专业说明"
-      return (desType)=>({forum: "新帖", newThread:"新帖", thread: "回复", newPost: "回复", post: "回复或文章"}[desType] + "草稿")
+      // {forum: "新帖", newThread:"新帖", thread: "回复", newPost: "回复", post: "回复或文章"}[desType]
+      return "草稿"
     }
   },
   destroyed() {
@@ -174,6 +174,7 @@ export default {
       nkcAPI(url, 'GET')
       .then(res => {
         self.drafts = res.drafts;
+        console.log(res.drafts,'res.drafts')
         // self.paging = res.paging;
       })
       .catch(err => {
@@ -214,24 +215,26 @@ export default {
           id = search.get('id')
           type = search.get('type')
           o = search.get('o')
-          aid = search.get('aid')
         }
         if(type && id) {
-            url = `/editor/data?type=${type}&id=${id}&o=${o}`;
+          url = `/editor/data?type=${type}&id=${id}&o=${o}`;
         }
       }
       if(search.get('aid')){
         url = `/editor/data?type=redit&_id=${search.get('aid')}&o=update`;
-        this.lockRequest = true;
       }
       nkcAPI(url, "get")
         .then((resData) => {
-          
-          if(resData.post && resData.post.type !== 'beta') {
-            return Promise.reject('当前文章是历史版本');
+          // console.log(resData.post,'resData.post')
+          // debugger;
+          if(resData.post && resData.post.type === 'betaHistory' || resData.post.type === 'stableHistory') {
+            sweetError(err);
+            setTimeout(() => {
+              location.href = location.pathname
+            }, 2000) 
           }
-          if(!resData.post) {
-            this.lockRequest = false;
+          if(resData.post) {
+            this.lockRequest = true;
           }
           // 专业进入 需要把主分类和继续编辑得到的草稿内容合并
           if (resData.type ==='newThread' &&  resData.mainForums.length) {
@@ -249,10 +252,7 @@ export default {
             this.$emit('noPermission', err);
             return sweetError(err.error);
           }
-          sweetError(err);
-          setTimeout(() => {
-            location.href = location.pathname
-          }, 2000) 
+          
         });
     },
     // 设置编辑器标题、内容
