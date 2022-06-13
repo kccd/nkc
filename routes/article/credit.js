@@ -22,6 +22,7 @@ router
     if(description.length < 2) ctx.throw(400, '理由写的太少了');
     if(description.length > 500) ctx.throw(400, '理由不能超过500个字');
     const _id = await db.SettingModel.operateSystemID('xsfsRecords', 1);
+    const xsfsRecordTypes = await db.XsfsRecordModel.getXsfsRecordTypes();
     const newRecord = db.XsfsRecordModel({
       _id,
       uid: targetUser.uid,
@@ -31,7 +32,7 @@ router
       ip: ctx.address,
       port: ctx.port,
       pid: aid,
-      type: 'article',
+      type: xsfsRecordTypes.article,
     });
     targetUser.xsf += num;
     await newRecord.save();
@@ -49,8 +50,8 @@ router
       port: ctx.port,
       ip: ctx.address,
       c: {
-        recordId: _id,
         type: 'xsf',
+        recordId: _id
       }
     });
     await message.save();

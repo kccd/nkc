@@ -80,6 +80,7 @@ draftsRouter
     }
     await next();
   })
+  // 保存草稿
   .post("/", async (ctx, next) => {
     const {data, db, nkcModules, query} = ctx;
     let body, files;
@@ -93,7 +94,6 @@ draftsRouter
       post, // 草稿内容
       desType, // 草稿类型
       desTypeId, // 草稿类型对应的ID
-      // 以前的业务是编辑器提交一次创建一条新记录
       draftId, // 草稿ID
     } = body;
     let {
@@ -120,18 +120,7 @@ draftsRouter
       parentPostId
     };
     if(draft) { // 存在草稿
-      draftObj.tlm = Date.now();
-      if(query.savetType === 'manual') {
-        // 如果是手动保存那么需要存历史
-        draftObj.type = (await db.DraftModel.getDraftType()).betaHistory;
-        await draft.updateOne(draftObj);
-        const preDraft = draft.toObject();
-        delete preDraft._id;
-        draft = db.DraftModel({...preDraft, ...draftObj});
-        await draft.save();
-      }else {
-        await draft.updateOne(draftObj);
-      }
+      await db.DraftModel.checkContentAndCopyToBetaHistory(draft, draftObj);
       if(survey) { // 调查表数据
         if(draft.surveyId) { // 若草稿上已有调查表ID，则只需更新调查表数据。
           survey._id = draft.surveyId;
@@ -146,14 +135,16 @@ draftsRouter
         await db.SurveyModel.deleteOne({uid: user.uid, _id: draft.surveyId});
       }
     } else {
-      if(!["forum", "thread", "post", "forumDeclare", 'forumLatestNotice'].includes(desType)) ctx.throw(400, `未知的草稿类型：${desType}`);
+      // "forumDeclare", 'forumLatestNotice'
+      if(!["forum", "thread", "post"].includes(desType)) ctx.throw(400, `未知的草稿类型：${desType}`);
       if(desType === "thread") {
         await db.ThreadModel.findOnly({tid: desTypeId});
       } else if(desType === "post") {
         await db.PostModel.findOnly({pid: desTypeId});
-      } else if(["forumDeclare", 'forumLatestNotice'].includes(desType)) {
-        await db.ForumModel.findOnly({fid: desTypeId});
-      }
+      } 
+      // else if(["forumDeclare", 'forumLatestNotice'].includes(desType)) {
+      //   await db.ForumModel.findOnly({fid: desTypeId});
+      // }
       draftObj.desTypeId = desTypeId;
       draftObj.desType = desType;
       draftObj.uid = user.uid;

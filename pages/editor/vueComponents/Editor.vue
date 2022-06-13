@@ -5,9 +5,9 @@
       div
         //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t  .clear-padding
         //- 2.notice editorSettings.onEditNotes
-        .article-box(v-if="drafts.length > 0")
+        .article-box(v-if="drafts.length")
           //- 字段含义来源 editor/index.js
-          .article-box-header.des-type {{ {forum: "新帖",newThread:"新帖", thread: "回复", newPost: "回复", post: "回复或文章", forumDeclare: "专业说明"}[drafts[0].desType] + "草稿" }}
+          .article-box-header.des-type {{ getTitle }}
           //- .article-box-header 草稿
           .article-box-text {{drafts[0].t || '未命名'}}
           .article-box-option
@@ -15,7 +15,7 @@
             button.btn.btn-xs.btn-default(@click="more") 查看更多
             .fa.fa-remove(@click="close")
         article-title(
-          :o="o",
+          :o="reqUrl.o",
           ref="title",
           :data="pageData",
           :notice="(pageState.editorSettings && pageState.editorSettings.onEditNotes) || ''"
@@ -28,7 +28,7 @@
           @content-change="contentChange"
         )
         .m-b-2(
-          v-if="!['newPost', 'modifyThread', 'modifyPost'].includes(pageData.type) || o === 'copy'"
+          v-if="!['newPost', 'modifyThread', 'modifyPost'].includes(pageData.type) || reqUrl.o === 'copy'"
         )
           //- 1. @selected-forumids 选择的主分类后id给提交组件 2. data 包含 threadCategories minorForumCount mainForums
           classification(
@@ -69,10 +69,10 @@
         .m-b-2(v-if= "!['modifyPost'].includes(pageData.type)")
           //- 1.state
           column(
-            ref = "column",
-            :o = "o",
-            :state = "{ userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column: pageState.userColumn }",
-            :data = "{ addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn }"
+            ref="column",
+            :o="reqUrl.o",
+            :state="{ userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column: pageState.userColumn }",
+            :data="{ addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn }"
           )
     .col-xs-12.col-md-3
       //- 1.notice 温馨提示的内容  2.data 中只需要post therad type forum allowedAnonymousForumsId havePermissionToSendAnonymousPost threadCategories
@@ -81,7 +81,7 @@
         ref="submit",
         :notice="pageState.editorSettings && pageState.editorSettings.notes",
         :data="pageData",
-        :o="o",
+        :o="reqUrl.o",
         @ready-data="readyData",
         @remove-editor="removeEditor"
       )
@@ -103,8 +103,6 @@ import { sweetError } from "../../lib/js/sweetAlert.js";
 import {getState} from "../../lib/js/state";
 import {getRequest, timeFormat, addUrlParam} from "../../lib/js/tools";
 
-window.reqUrl = NKC.methods.getDataById("data");
-
 export default {
   components: {
     "modify-submit": ModifySubmit,
@@ -119,30 +117,34 @@ export default {
     investigation: Investigation,
     column: Column,
   },
+  props: {
+    reqUrl: {
+      type: Object,
+      required: true
+    }
+  },
   data: () => ({
     drafts: [],
     // 社区内容点击继续创作传递的参数o（复制为新文章或更新已发布文章）
-    o: reqUrl.o,
+    // o: this.reqUrl.o,
     hideType: ["newPost", "modifyPost"],
     pageData: {},
     pageState: {},
     err: '',
     show: false,
-    lockRequest: false
+    lockRequest: false,
+    mainForums: []
   }),
-  watch: {
-    // "$route.query": {
-    //   immediate: true,
-    //   handler(n){
-    //     console.log('11')
-    //     this.getData(n)
-    //   }
-    // }
-  },
   created() {
     this.getData()
     // this.getUserDraft();
     window.addEventListener("pageshow", this.clearCache);
+  },
+  computed: {
+    getTitle(){
+      // {forum: "新帖", newThread:"新帖", thread: "回复", newPost: "回复", post: "回复或文章"}[desType]
+      return "草稿"
+    }
   },
   destroyed() {
     this.clearCache && window.removeEventListener("pageshow", this.clearCache);
@@ -152,19 +154,26 @@ export default {
   methods: {
     addUrlParam,
     getUserDraft(page=0) {
+
       // 如果是修改评论文章或者回复 不获取草稿数据
-      if (["newPost", "modifyThread", "modifyPost", "modifyForumDeclare", "modifyForumLatestNotice"].includes(this.pageData.type)) return
+      // , "modifyForumDeclare", "modifyForumLatestNotice"
+      // if (["newPost", "modifyThread", "modifyPost"].includes(this.pageData.type)) return
+      
       if(this.lockRequest) return
       const {uid: stateUid} = getState();
       this.uid = stateUid;
       const self = this;
       // if(this.$route.query.aid) return;
-      if(!self.uid) return;
+      if(!self.uid ) return;
       let url = `/u/${self.uid}/profile/draftData?page=${page}&perpage=1`;
+      // if(this.pageData.type)
+      // 编辑器类型 newpost modifyPost modifyThread  newThread
+      if (this.pageData.type) {
+        url += '&type=' + this.pageData.type
+      }
       nkcAPI(url, 'GET')
       .then(res => {
         self.drafts = res.drafts;
-        // self.paging = res.paging;
       })
       .catch(err => {
         sweetError(err);
@@ -183,41 +192,49 @@ export default {
       this.drafts = [];
     },
     more() {
-      // this.$router.replace({
-      //   path: '/creation/community/draft'
-      // });
       location.href = '/creation/community/draft'
     },
     getData(search) {
       if(!search) search = new URLSearchParams(location.search);
       let url = `/editor/data`;
       // 如果后台给了数据就用后台的 否则读取浏览器地址
-      if (reqUrl && reqUrl.type && reqUrl.id) {
-        url = `/editor/data?type=${reqUrl.type}&id=${reqUrl.id}&o=${reqUrl.o}`;
-      } else if (search) {
-        let type, id, o, aid;
+      let type, id, o, aid;
+      // 链接跳转过来
+      if (this.reqUrl && this.reqUrl.type && this.reqUrl.id) {
+        url = `/editor/data?type=${this.reqUrl.type}&id=${this.reqUrl.id}&o=${this.reqUrl.o}`;
+      }
+      // 继续编辑后拿草稿数据 
+      else if (search) {
         // 读取浏览器地址栏参数
         if(search.constructor.name === 'URLSearchParams'){
-          id = search.getAll('id')[0]
-          type = search.getAll('type')[0]
-          o = search.getAll('o')[0]
-          aid = search.getAll('aid')[0]
-
-          // 为对象时
-        }else{
-          type = search.type;
-          id = search.id;
-          o = search.o;
-          aid = search.aid
+          id = search.get('id')
+          type = search.get('type')
+          o = search.get('o')
+        }
+        if(type && id) {
           url = `/editor/data?type=${type}&id=${id}&o=${o}`;
         }
-        if(aid){
-          url = `/editor/data?type=redit&_id=${aid}&o=update`;
-          this.lockRequest = true;
-        }
+      }
+      if(search.get('aid')){
+        url = `/editor/data?type=redit&_id=${search.get('aid')}&o=update`;
       }
       nkcAPI(url, "get")
         .then((resData) => {
+          // 如果文章已经变为历史版 
+          if(resData.post && ['betaHistory', 'stableHistory'].includes(resData.post.type)) {
+            sweetError(err);
+            setTimeout(() => {
+              location.href = location.pathname
+            }, 2000) 
+          }
+          if(resData.post) {
+            this.lockRequest = true;
+          }
+          // 专业进入 需要把主分类和继续编辑得到的草稿内容合并
+          if (resData.type ==='newThread' &&  resData.mainForums.length) {
+            this.mainForums = resData.mainForums;  
+          }
+          resData.mainForums = this.mainForums;
           this.pageData = resData;
           this.pageState = resData.state;
           this.show = true;
@@ -227,8 +244,9 @@ export default {
           if(err.error){
             this.err = err.error;
             this.$emit('noPermission', err);
-            sweetError(err.error);
+            return sweetError(err.error);
           }
+          
         });
     },
     // 设置编辑器标题、内容
@@ -272,14 +290,13 @@ export default {
       for (const key in refs) {
         if (refs.hasOwnProperty(key)) {
           const vue = refs[key];
-          // console.log(vue && vue.getData(),'vue')
           Object.assign(submitData, vue && vue.getData());
         }
       }
       // 添加 草稿id 和 parentPostId
       submitData["did"] = this.pageData.draftId;
       submitData["_id"] = this.pageData.post?._id;
-      submitData["parentPostId"] = this.pageData.parentPostId;
+      submitData["parentPostId"] = this.pageData.post?.parentPostId;
       submitFn(submitData);
     },
   },

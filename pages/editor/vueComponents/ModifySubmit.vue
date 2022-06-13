@@ -29,13 +29,14 @@
         @click="readyData",
         :disabled="disabledSubmit || !checkProtocol"
       ) {{ disabledSubmit ? '提交中...' : '提交' }}
-      button.btn.btn-default(@click="saveToDraftBaseDebounce('manual')") 存草稿
+      button.btn.btn-default(@click="saveToDraftBase('manual')") 存草稿
+      button.btn.btn-default(@click="history") 历史
 </template>
 
 <script>
 import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import { sweetError } from "../../lib/js/sweetAlert.js";
-import { timeFormat, addUrlParam } from "../../lib/js/tools";
+import { timeFormat, addUrlParam, getUrl } from "../../lib/js/tools";
 import {debounce} from '../../lib/js/execution';
 // import { screenTopWarning } from "../../lib/js/topAlert";
 // import {getRequest, timeFormat, addUrlParam} from "../../lib/js/tools";
@@ -72,6 +73,7 @@ export default {
     saveDraftTimeout: 60000,
     saveData: '',
     setInterval: '',
+    draft: ''
   }),
   watch: {
     data : {
@@ -98,7 +100,7 @@ export default {
     }
   },
   created(){
-    this.saveToDraftBaseDebounce = debounce((saveType)=>{this.saveToDraftBase(saveType)}, 700)
+    this.saveToDraftBaseDebounce = debounce((saveType)=>{this.saveToDraftBase(saveType)}, 2000)
   },
   computed: {
     selectedForumsId() {
@@ -122,6 +124,20 @@ export default {
     checkString: NKC.methods.checkData.checkString,
     checkEmail: NKC.methods.checkData.checkEmail,
     visitUrl: NKC.methods.visitUrl,
+    history() {
+      const desTypeMap = {
+        newThread: 'forum',
+        newPost: "thread",
+        modifyThread: 'post', 
+        modifyPost: 'post', 
+      }
+      // const aid = this.$route.query.aid;
+      const destype = desTypeMap[this.data.type] || this.draft.desType;
+      const did = this.data.draftId || this.draft.did;
+      if (!destype || !did) return sweetError("未选择草稿");
+      const url = getUrl('draftHistory', destype,  did);
+      window.open(url)
+    },
     checkAnonymous(selectedForumsId) {
       // let selectedForumsId = window.PostInfo.selectedForumsId;
       let havePermission = false;
@@ -143,7 +159,6 @@ export default {
     saveToDraftSuccess() {
       let time = new Date();
       this.autoSaveInfo = "草稿已保存 " + this.format(time);
-
     },
     autoSaveToDraft() {
       this.readyDataForSave();
@@ -173,22 +188,21 @@ export default {
       } else if (type === "newPost") {
         if (!saveData.title && !saveData.content) return;
       }
-      // setTimeout(() => {
-        this.saveToDraftBase("automatic")
-          // .then((res) => {
-            
-          // })
-          .catch((data) => {
-            sweetError("草稿保存失败：" + (data.error || data));
-            // this.autoSaveToDraft();
-          });
-      // }, this.saveDraftTimeout);
+      this.saveToDraftBase("automatic")
+        .catch((data) => {
+          sweetError("草稿保存失败：" + (data.error || data));
+        });
     },
-    saveToDraftBase(savetType = "manual") {
-      // if (savetType === "manual") 
+    saveToDraftBase(saveType = "manual") {
       this.readyDataForSave();
       const { saveData } = this;
-      if (!saveData.c) return sweetError("请先输入内容");
+      if (!saveData.c){
+        if(saveType === 'manual') {
+          return sweetError("请先输入内容")
+        }else {
+          return
+        }
+      };
       let type = this.type;
       return Promise.resolve()
         .then((res) => {
@@ -205,22 +219,23 @@ export default {
           } else if (type === "modifyThread") {
             desType = "post";
             desTypeId = this.pid;
-          } else if (type === "modifyForumDeclare") {
-            desType = "forumDeclare";
-            desTypeId = this.forum.fid;
-          } else if (type === "modifyForumLatestNotice") {
-            desType = "forumLatestNotice";
-            desTypeId = this.forum.fid;
-          } else {
+          } 
+          // else if (type === "modifyForumDeclare") {
+          //   desType = "forumDeclare";
+          //   desTypeId = this.forum.fid;
+          // } else if (type === "modifyForumLatestNotice") {
+          //   desType = "forumLatestNotice";
+          //   desTypeId = this.forum.fid;
+          // } 
+          else {
             throw "未知的草稿类型";
           }
           let formData = new FormData();
-
           formData.append(
             "body",
             JSON.stringify({
               post: saveData,
-              draftId:saveData.did || this.draftId,
+              draftId: saveData?.did || this.draftId,
               desType: desType,
               desTypeId: desTypeId,
             })
@@ -235,19 +250,20 @@ export default {
           // 保存草稿
           // 当编辑器中的字数减少时提示用户是否需要保存，避免其他窗口的自动保存覆盖内容
           return nkcUploadFile(
-            "/u/" + NKC.configs.uid + "/drafts?savetType=" + savetType,
+            "/u/" + NKC.configs.uid + "/drafts?saveType=" + saveType,
             "POST",
             formData
           );
         })
         .then((data) => {
+          this.draft = data.draft;
           //保存草稿的全部内容长度
           if (data.contentLength) {
             this.oldContentLength = data.draft?.c?.length;
             this.oldContent = data.draft?.c;
           }
-          this.draftId = data.draft.did;
-          if (data.draft.cover) {
+          this.draftId = data.draft?.did;
+          if (data.draft?.cover) {
             this.coverData = "";
             this.coverUrl = "";
             this.cover = data.draft.cover;
@@ -256,16 +272,13 @@ export default {
         })
         .then((res) => {
           if(!location.search.includes("aid")) this.addUrlParam("aid", res.draft._id);
-          if (type === "manual") {
+          if (saveType === "manual") {
             sweetSuccess("草稿已保存");
           }
+          // if(res.err) return
           this.saveToDraftSuccess();
         })
         .catch((data) => {
-          // if(data === '用户取消保存'){
-          //   screenTopWarning(data)
-          //   return
-          // }
           sweetError("草稿保存失败：" + (data.error || data));
         })
     },
@@ -507,7 +520,13 @@ export default {
 // @media (min-width: 992px){
 // }
 .btn-area{
+  .btn {
+    margin-bottom: 10px;
+  }
   .btn:nth-child(1){
+    margin-right: 10px;
+  }
+  .btn:nth-child(2){
     margin-right: 10px;
   }
 }
@@ -523,6 +542,7 @@ export default {
     min-width: 6rem;
     @media (max-width: 1100px) {
       min-width: 0;
+
     }
   }
   @media (min-width: 992px) {

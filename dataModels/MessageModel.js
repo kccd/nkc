@@ -611,7 +611,7 @@ messageSchema.statics.getParametersData = async (message) => {
       commentURL: comment.commentUrl,
       commentContent: apiFunction.obtainPureText(commentDocument.content),
     };
-    
+
   } else if(type === 'replyComment') {
     //独立文章通知作者文章被评论了
     const {docId, quoteDid} = message.c;
@@ -633,7 +633,7 @@ messageSchema.statics.getParametersData = async (message) => {
       commentURL: comment.commentUrl,
       commentContent: apiFunction.obtainPureText(commentDocument.content),
     };
-  
+
   } else if(type === 'comment') {
     const {pid} = message.c;
     const post = await PostModel.findOne({pid});
@@ -957,17 +957,21 @@ messageSchema.statics.getParametersData = async (message) => {
     if(post) {
       if(post.type === 'thread') {
         url = getUrl('thread', post.tid);
-        t = `《${post.t}》`;
+        t = `文章《${post.t}》`;
       } else {
         url = await PostModel.getUrl(post);
-        t = `(点击查看)`;
+        if(post.parentPostId) {
+          t = `评论（点击查看）`;
+        } else {
+          t = `回复（点击查看）`;
+        }
       }
     } else if(article) {
       url = article.url;
-      t = `《${article.document.title}》`;
+      t = `文章《${article.document.title}》`;
     } else if(comment) {
       url = comment.commentUrl;
-      t = `(点击查看)`;
+      t = `回复（点击查看）`;
     }
     parameters.LVTarget = url;
     parameters.LVTargetDesc = t;

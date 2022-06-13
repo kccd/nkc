@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongodb');
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
@@ -24,7 +25,14 @@ const draftSchema = new Schema({
     default: 'beta',
     index: 1
   },
-  // 草稿类型
+  // 草稿类型 
+  // 如果 destype === forum 代表是新文章（newThread）
+  /*destype === forum 
+    newThread
+    destype === thread
+    newPost
+    destype === post
+    post.pid === thread.oc? "modifyThread": "modifyPost"; */
   desType: {
     type: String,
     default: 'forum',
@@ -134,11 +142,180 @@ const draftType = {
   betaHistory: 'betaHistory',
   stableHistory: 'stableHistory'
 };
+const desType = {
+  forum: 'forum',
+  post: 'post',
+  thread: 'thread'
+};
 /* 
 * 获取草稿的type
 * @return {Object}
 */
-draftSchema.statics.getDraftType = async () => draftType
+draftSchema.statics.getType = async () => draftType;
+/* 
+* 获取草稿DesType
+* @return {Object}
+*/
+draftSchema.statics.getDesType = async () => desType;
+/* 获取最近的历史版本 
+*  @param {String} did 草稿did
+*/
+draftSchema.statics.getLatestHistoryDraft = async (did) => {
+  if(!did) throw "did 不存在"
+  const DraftModel = mongoose.model("drafts");
+  betaHistory = (await DraftModel.getType()).betaHistory;
+  stableHistory = (await DraftModel.getType()).stableHistory;
+  return DraftModel.findOne({did, type: {$in: [betaHistory, stableHistory]}}).sort({tlm: -1})
+}
+/* 
+* 创建历史版
+*/
+draftSchema.statics.createToBetaHistory = async (_id, desType, uid) => {
+  const DraftModel = mongoose.model("drafts");
+  const draft = (await DraftModel.findOne({_id, desType, uid})).toObject();
+  delete draft._id;
+  const betaHistory = (await DraftModel.getType()).betaHistory;
+  draft.type = betaHistory;
+  draft.tlm = Date.now();
+  const betaHistoryDraft = DraftModel(draft);
+  return await betaHistoryDraft.save();
+}
+/* 
+* 改为编辑历史版
+* @param {String} _id 草稿唯一id
+* @param {String} uid 访问的用户id
+* @param {String} desType 草稿类型
+*/
+draftSchema.statics.updateToBetaHistory = async (_id, desType, uid) => {
+  if(!_id || !desType || !uid) throw "参数不正确"
+  const DraftModel = mongoose.model("drafts");
+  const betaHistory = (await DraftModel.getType()).betaHistory;
+  return await DraftModel.updateOne({_id: ObjectId(_id), desType, uid},
+    {
+      $set: {
+        type: betaHistory,
+        tlm: new Date()
+      }
+    }
+    );
+}
+/* 
+* 改为编辑版
+* @param {String} _id 草稿唯一id
+* @param {String} uid 访问的用户id
+* @param {String} desType 草稿类型
+*/
+draftSchema.statics.updateToBeta = async (_id, desType, uid) => {
+  if(!_id || !desType || !uid) throw "参数不正确"
+  const DraftModel = mongoose.model("drafts");
+  const beta = (await DraftModel.getType()).beta;
+  return await DraftModel.updateOne({_id: ObjectId(_id), desType, uid},
+    { 
+      $set: {
+        type: beta,
+        tlm: new Date()
+      }
+    }
+    );
+}
+/* 
+* 找出编辑版草稿
+* @param {String} did 草稿id
+* @param {String} uid 访问的用户id
+* @param {String} desType 草稿类型
+*/
+draftSchema.statics.getBeta = async (did, desType, uid) => {
+  if(!did || !desType || !uid) throw "参数不正确"
+  const DraftModel = mongoose.model("drafts");
+  const beta = (await DraftModel.getType()).beta;
+  return await DraftModel.findOne({did, desType, uid, type: beta});
+  
+}
+/* 
+*
+*/
+/* 
+  点击保存时检查是否应该创建历史版本
+  @param {Object} draft 编辑版草稿
+  @param {Object} latestDraft 最新的草稿
+*/
+draftSchema.statics.checkContentAndCopyToBetaHistory = async (draft, latestDraft) => {
+  const DraftModel = mongoose.model("drafts");
+
+  const time = Date.now();
+  let needHistory = false;
+  // 获取最近创建的历史记录
+  const latestHistoryDraft = await DraftModel.getLatestHistoryDraft(draft.did)
+  if(
+    // 如果没有历史版本则直接保存
+    !latestHistoryDraft ||
+    // 如果超过 30 分钟未保存历史则保存
+    time - new Date(latestHistoryDraft.tlm).getTime() > 30 * 60 * 1000 ||
+    // 如果内容有变动则保存
+    draft.cover !== latestHistoryDraft.cover ||
+    String(draft.originState) !== String(latestHistoryDraft.originState)
+  ) {
+    needHistory = true;
+  }
+  if(!needHistory) {
+
+    const {
+      t: betaTitle = '',
+      c: betaC = '',
+      keyWordsEn: betaKeywordsEN = [],
+      keyWordsCn: betaKeywords = [],
+      abstractEn: betaAbstractEN = '',
+      abstractCn: betaAbstract = '',
+    } = draft;
+
+    const {
+      t: latestHistoryTitle = '',
+      c: latestC = '',
+      keyWordsEn: latestHistoryKeywordsEN = [],
+      keyWordsCn: latestHistoryKeywords = [],
+      abstractEn: latestHistoryAbstractEN = '',
+      abstractCn: latestHistoryAbstract = '',
+    } = latestDraft;
+
+    // 统计内容字数变动
+    let count = 0;
+    count += betaC.length - latestC.length;
+    count += betaTitle.length - latestHistoryTitle.length;
+    count += betaKeywords.join('').length - latestHistoryKeywords.join('').length;
+    count += betaKeywordsEN.join('').length - latestHistoryKeywordsEN.join('').length;
+    count += betaAbstract.length - latestHistoryAbstract.length;
+    count += betaAbstractEN.length - latestHistoryAbstractEN.length;
+    count = Math.abs(count);
+    // 若内容字数变动超过100，则存历史
+    if(count > 100) {
+      needHistory = true;
+    }
+  }
+  if(needHistory) {
+   await draft.copyToBetaHistory(draft, latestDraft);
+  }
+  latestDraft.tlm = Date.now();
+  // 当前编辑版更新为最新内容
+  await draft.updateOne(latestDraft);
+
+}
+/*更新当前编辑版，并复制一份当前编辑版为编辑历史版 
+  @param {Object} draft 编辑版草稿
+  @param {Object} latestDraft 最新的草稿
+*/
+draftSchema.methods.copyToBetaHistory = async (draft, latestDraft) => {
+  const DraftModel = mongoose.model("drafts");
+  // latestDraft.tlm = Date.now();
+  // // 当前编辑版更新为最新内容
+  // await draft.updateOne(latestDraft);
+  betaHistory = (await DraftModel.getType()).betaHistory;
+  const preDraft = draft.toObject();
+  delete preDraft._id;
+  // 创建一条编辑历史内容
+  draft = DraftModel({...preDraft, tlm: latestDraft.tlm , type: betaHistory});
+  await draft.save();
+}
+
 
 /*
 * 通过草稿ID删除草稿，若草稿上有调查表ID则删除调查表

@@ -240,10 +240,16 @@ var Tools = function() {
       case 'downloadApp': {
         return '/app/' + id + '/' + size
       }
-      case 'preview': {
+      case 'draftHistory': {
+        return '/draft/history?source=' + id + '&did=' + size
+      }
+      case 'draftPreview': {
+        return '/draft/preview?source=' + id + '&aid=' + size
+      }
+      case 'documentPreview': {
         return '/document/preview?source=' + id + '&sid=' + size
       }
-      case 'history': {
+      case 'documentHistory': {
         return '/document/history?source=' + id + '&sid=' + size
       }
       case 'draftEditor': {

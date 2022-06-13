@@ -18,7 +18,7 @@ block content
     .row
       .col-xs-12.box-shadow-panel
         #app-publish-article
-          editor
+          editor(:req-url="reqUrl")
   .hidden#data=objToStr(data.reqUrl)
 block scripts
   +includeJS("/editor/editor.js")

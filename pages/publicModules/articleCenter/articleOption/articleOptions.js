@@ -87,7 +87,9 @@ window.articleOption = new Vue({
     //查看文章历史
     showHistory() {
       const {_id} = this.article;
-      const url = getUrl('history', "article", _id);
+      // const url = getUrl('history', "article", _id);
+      // url 有改动
+      const url = getUrl('documentHistory', "article", _id);
       visitUrl(url, true);
     },
     open(props) {

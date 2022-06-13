@@ -71,6 +71,7 @@ mixin title(data)
         span.m-r-1.origin.fa.fa-caret-square-o-down.origin-icon.dropdown() 原创
           .dropdown-menu(aria-labelledby='dropdown-level')
             span(style="padding:5px")!=`${getOriginLevel(originState)}`
-      a.column.jump.m-r-1(href=`/m/${_id}` target="_blank")=name
+      if _id
+        a.column.jump.m-r-1(href=`/m/${_id}` target="_blank")=name
   block scripts
     +includeJS('/columns/article/title.js')

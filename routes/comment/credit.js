@@ -22,6 +22,7 @@ router
     if(num > 0 && num > addLimit) ctx.throw(400, `单次添加不能超过${addLimit}学术分`);
     if(description.length < 2) ctx.throw(400, '理由写的太少了');
     if(description.length > 500) ctx.throw(400, '理由不能超过500个字');
+    const xsfsRecordTypes = await db.XsfsRecordModel.getXsfsRecordTypes();
     const _id = await db.SettingModel.operateSystemID('xsfsRecords', 1);
     const newRecord = db.XsfsRecordModel({
       _id,
@@ -32,7 +33,7 @@ router
       ip: ctx.address,
       port: ctx.port,
       pid: cid,
-      type: 'post',
+      type: xsfsRecordTypes.comment,
     });
     targetUser.xsf += num;
     await newRecord.save();
@@ -50,8 +51,8 @@ router
       port: ctx.port,
       ip: ctx.address,
       c: {
-          type: 'xsf',
-          record: _id,
+        type: 'xsf',
+        recordId: _id,
       }
     });
     await message.save();
