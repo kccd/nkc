@@ -103,8 +103,6 @@ import { sweetError } from "../../lib/js/sweetAlert.js";
 import {getState} from "../../lib/js/state";
 import {getRequest, timeFormat, addUrlParam} from "../../lib/js/tools";
 
-// window.reqUrl = NKC.methods.getDataById("data");
-// console.log(reqUrl,'req')
 export default {
   components: {
     "modify-submit": ModifySubmit,
@@ -134,17 +132,9 @@ export default {
     pageState: {},
     err: '',
     show: false,
-    lockRequest: false
+    lockRequest: false,
+    mainForums: []
   }),
-  watch: {
-    // "$route.query": {
-    //   immediate: true,
-    //   handler(n){
-    //     console.log('11')
-    //     this.getData(n)
-    //   }
-    // }
-  },
   created() {
     this.getData()
     // this.getUserDraft();
@@ -213,49 +203,56 @@ export default {
       let url = `/editor/data`;
       // 如果后台给了数据就用后台的 否则读取浏览器地址
       let type, id, o, aid;
-      // 以前的链接当跳转过来走这
+      // 链接跳转过来
       if (this.reqUrl && this.reqUrl.type && this.reqUrl.id) {
         url = `/editor/data?type=${this.reqUrl.type}&id=${this.reqUrl.id}&o=${this.reqUrl.o}`;
       }
       // 继续编辑后拿草稿数据 
-      if (search) {
+      else if (search) {
         // 读取浏览器地址栏参数
         if(search.constructor.name === 'URLSearchParams'){
-          id = search.getAll('id')[0]
-          type = search.getAll('type')[0]
-          o = search.getAll('o')[0]
-          aid = search.getAll('aid')[0]
-          url = `/editor/data?type=${type}&id=${id}&o=${o}`;
-          if(aid){
-            url = `/editor/data?type=redit&_id=${aid}&o=update`;
-            this.lockRequest = true;
-          }
+          id = search.get('id')
+          type = search.get('type')
+          o = search.get('o')
+          aid = search.get('aid')
         }
+        if(type && id) {
+            url = `/editor/data?type=${type}&id=${id}&o=${o}`;
+        }
+      }
+      if(search.get('aid')){
+        url = `/editor/data?type=redit&_id=${search.get('aid')}&o=update`;
+        this.lockRequest = true;
       }
       nkcAPI(url, "get")
         .then((resData) => {
-          // console.log(resData)
+          
+          if(resData.post && resData.post.type !== 'beta') {
+            return Promise.reject('当前文章是历史版本');
+          }
           if(!resData.post) {
             this.lockRequest = false;
           }
-          // 专业进入
-          // if (this.pageData.type ==='newThread' &&  this.pageData.mainForums.length) {
-            
-          // }
+          // 专业进入 需要把主分类和继续编辑得到的草稿内容合并
+          if (resData.type ==='newThread' &&  resData.mainForums.length) {
+            this.mainForums = resData.mainForums;  
+          }
+          resData.mainForums = this.mainForums
           this.pageData = resData;
           this.pageState = resData.state;
           this.show = true;
-          // 专业进入不请求
-          // if(this.reqUrl.type !== 'forum') {
-          // }
           this.getUserDraft();
         })
         .catch((err) => {
           if(err.error){
             this.err = err.error;
             this.$emit('noPermission', err);
-            sweetError(err.error);
+            return sweetError(err.error);
           }
+          sweetError(err);
+          setTimeout(() => {
+            location.href = location.pathname
+          }, 2000) 
         });
     },
     // 设置编辑器标题、内容
@@ -299,7 +296,6 @@ export default {
       for (const key in refs) {
         if (refs.hasOwnProperty(key)) {
           const vue = refs[key];
-          // console.log(vue && vue.getData(),'vue')
           Object.assign(submitData, vue && vue.getData());
         }
       }

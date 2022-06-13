@@ -47,56 +47,7 @@ export default {
   components: {
     editor: Editor,
   },
-  // created(){
-  //   this.initData();
-  //   this.getUserDraft();
-  // },
   methods: {
-    // getRequest,
-    // timeFormat,
-    // addUrlParam,
-    // initData() {
-    //   const {uid} = this.$route.params;
-    //   const {uid: stateUid} = getState();
-    //   this.uid = uid || stateUid;
-    // },
-    // getUserDraft(page=0) {
-    //   const self = this;
-    //   if(this.$route.query.aid) return;
-    //   if(!self.uid) return;
-    //   this.loading = true;
-    //   let url = `/u/${self.uid}/profile/draftData?page=${page}&perpage=1`;
-    //   nkcAPI(url, 'GET')
-    //   .then(res => {
-    //     self.drafts = res.drafts;
-    //     // self.paging = res.paging;
-    //   })
-    //   .catch(err => {
-    //     sweetError(err);
-    //   })
-    //   self.loading = false;
-    // },
-    // //继续编辑草稿
-    // editArticle(aid) {
-    //   const self = this;
-    //   if(!aid) {sweetError("id不存在"); return};
-    //   //改变地址栏参数
-    //   // self.addUrlParam('aid', aid);
-    //   this.$router.replace({
-    //     path: `/creation/editor/community?aid=${aid}`
-    //   })
-    //   // this.$refs.editor.$forceUpdate();
-    //   // setValue(self.drafts[0].t, self.drafts[0].content);
-    //   self.drafts = [];
-    // },
-    // close() {
-    //   this.drafts = [];
-    // },
-    // more() {
-    //   this.$router.replace({
-    //     path: '/creation/community/draft'
-    //   });
-    // },
     noPermission(err) {
       this.err = err.status === 403;
       const error = err.error;

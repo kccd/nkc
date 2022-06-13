@@ -196,7 +196,13 @@ export default {
     saveToDraftBase(saveType = "manual") {
       this.readyDataForSave();
       const { saveData } = this;
-      if (!saveData.c) return sweetError("请先输入内容");
+      if (!saveData.c){
+        if(saveType === 'manual') {
+          return sweetError("请先输入内容")
+        }else {
+          return
+        }
+      };
       let type = this.type;
       return Promise.resolve()
         .then((res) => {

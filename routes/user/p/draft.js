@@ -5,7 +5,6 @@ module.exports = async (ctx, next) => {
   const {page = 0, perpage = 30, type, } = query;
   let count, paging, drafts;
   // 如果是社区内容草稿
-  
   if(type === 'community') {
     const beta = (await db.DraftModel.getType()).beta;
     count = await db.DraftModel.countDocuments({uid: targetUser.uid, type: beta});
