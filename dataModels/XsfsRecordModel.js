@@ -96,13 +96,14 @@ xsfsRecordSchema.virtual('fromUser')
   .set(function(p) {
     this._fromUser = p;
   });
-xsfsRecordSchema.virtual('type')
+
+/*xsfsRecordSchema.virtual('type')
   .get(function() {
     return this._type;
   })
   .set(function(p) {
     this._type = p;
-  });
+  });*/
 
 xsfsRecordSchema.statics.getXsfsRecordTypes = () => {
   return xsfsRecordTypes;
