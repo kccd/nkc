@@ -1,5 +1,12 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+
+const xsfsRecordTypes = {
+  post: 'post',
+  article: 'article',
+  comment: 'comment'
+};
+
 const xsfsRecordSchema = new Schema({
   _id: Number,
   // 学术分变化的人
@@ -14,8 +21,13 @@ const xsfsRecordSchema = new Schema({
     required: true,
     index: 1
   },
-  //学术分记录类型 post thread comment article
-  recordType: {
+  //学术分记录类型 post comment article
+  type: {
+    type: String,
+    required: true,
+    index: 1
+  },
+  pid: {
     type: String,
     required: true,
     index: 1
@@ -41,11 +53,6 @@ const xsfsRecordSchema = new Schema({
   port: {
     type: String,
     required: true
-  },
-  pid: {
-    type: String,
-    required: true,
-    index: 1
   },
   canceled: {
     type: Boolean,
@@ -96,6 +103,10 @@ xsfsRecordSchema.virtual('type')
   .set(function(p) {
     this._type = p;
   });
+
+xsfsRecordSchema.statics.getXsfsRecordTypes = () => {
+  return xsfsRecordTypes;
+};
 
 xsfsRecordSchema.statics.extendXsfsRecords = async (records) => {
   const UserModel = mongoose.model('users');
