@@ -66,7 +66,8 @@ router
     const {user} = data;
     const {id: cid, recordId}  = params;
     if(!permission('cancelXsf')) cxt.throw(403, '权限不足');
-    const record = await db.XsfsRecordModel.findOnly({_id: recordId, pid, recordType: 'post'});
+    const xsfsRecordTypes = await db.XsfsRecordModel.getXsfsRecordTypes();
+    const record = await db.XsfsRecordModel.findOnly({_id: recordId, pid: cid, type: xsfsRecordTypes.post});
     const comment = await db.CommentModel.findOnly({_id: cid});
     const targetUser = await db.UserModel.findOnly({uid: comment.uid});
     if(reason.length < 2) ctx.throw(400, '撤销原因写的太少啦~');

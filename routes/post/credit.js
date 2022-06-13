@@ -75,7 +75,8 @@ router
     const {reason} = query;
     const {user} = data;
     const {recordId, pid} = params;
-    const record = await db.XsfsRecordModel.findOnly({_id: recordId, pid, recordType: 'post'});
+    const xsfsRecordTypes = await db.XsfsRecordModel.getXsfsRecordTypes();
+    const record = await db.XsfsRecordModel.findOnly({_id: recordId, pid, type: xsfsRecordTypes.post});
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
     const targetUser = await db.UserModel.findOnly({uid: post.uid});

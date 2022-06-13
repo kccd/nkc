@@ -1,15 +1,12 @@
-extends ../../bootstrap_base
+extends ../experimental
 
-block title
-  -const mainContainer1400 = true;
+block eTitle
   +includeCSS('/experimental/index.css')
   title 评学术分记录
-block content
-
+block eContent
+  .hidden#data=objToStr({xsfsRecords: data.xsfsRecords, t: data.t, content: data.content})
   .container-fluid.max-width
     .row
-      include ../nav
-      .hidden(id='data')= JSON.stringify({xsfsRecords: data.xsfsRecords, t: data.t, content: data.content})
       #app(v-cloak)
         .col-xs-12.col-md-12
           h4 评学术分记录
@@ -28,7 +25,7 @@ block content
               a.btn.btn-default(type='submit' href='/e/log/kcb') 全部
             .text-danger= data.info
         .col-xs-12.col-md-12.table-responsive
-          include ../../interface_navigation_paging
+          include ../../publicModules/paging/paging
           table.table.table-bordered(style='font-size: 1rem;')
             thead
               tr
@@ -37,7 +34,7 @@ block content
                 th 学术分
                 th 操作者
                 th 评分理由
-                th 文号
+                th 链接
                 th 操作者IP
                 th 撤销
                 th 撤销者
@@ -46,29 +43,28 @@ block content
                 th 撤销者IP
             tbody
               tr(v-for='(record, index) of xsfsRecords')
-                th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
+                th {{record.time}}
                 th
-                  a(:href="'/u/' + record.user.uid" target='_blank') {{record.user.username}}
-                th {{record.num>0?'+' + record.num: record.num}}
+                  a(:href="record.user.homeUrl" target='_blank') {{record.user.username}}
+                th {{record.num > 0?'+' + record.num: record.num}}
                 th
-                  a(:href="'/u/' + record.operator.uid" target='_blank') {{record.operator.username}}
+                  a(:href="record.operator.homeUrl" target='_blank') {{record.operator.username}}
                 th {{record.description}}
                 th
-                  a(:href="record.post.url" target="_blank") {{record.pid}}
+                  a(:href="record.url" target="_blank") 查看详情
                 th
                   a(target='_blank' :href="'http://www.ip138.com/ips138.asp?ip='+record.ip+'&action=2'") {{record.ip}}
                 th
                   span(v-if='record.canceled').text-danger 是
                   span(v-else).text-success 否
                 th
-                  a(v-if='record.lmOperator' :href="'/u/' + record.lmOperator.uid" target='_blank') {{record.lmOperator.username}}
+                  a(v-if='record.lmOperator' :href="record.lmOperator.homeUrl" target='_blank') {{record.lmOperator.username}}
                 th
                   span(v-if='record.lmOperator') {{record.reason}}
                 th
-                  span(v-if='record.lmOperator') {{format('YYYY/MM/DD HH:mm:ss', record.tlm)}}
+                  span(v-if='record.lmOperator') {{record.mTime}}
                 th
-                  a(target='_blank' :href="'http://www.ip138.com/ips138.asp?ip='+record.lmOperatorIp+'&action=2'") {{record.lmOperatorIp}}
-          include ../../interface_navigation_paging
+                  a(target='_blank' :href="'http://www.ip138.com/ips138.asp?ip='+record.lmIp+'&action=2'") {{record.lmIp}}
+          include ../../publicModules/paging/paging_input
 block scripts
-  include ../../publicModules/moment
-  script(src=`/experimental/log/xsf.js?v=${global.NKC.startTime}`)
+  +includeJS('/experimental/log/xsf.js')
