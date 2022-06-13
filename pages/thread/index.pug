@@ -45,9 +45,6 @@ block content
       .hidden#threadForumsId=objToStr({isLastPage: (data.paging.page + 1) === data.paging.pageCount, notes: data.notes, pid: data.thread.oc, tid: data.thread.tid, mainForumsId: data.thread.mainForumsId, categoriesId: data.thread.categoriesId, tcId: data.thread.tcId})
       if data.step
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
-      //- include ../module_credit
-      #module_credit
-        credit-model(v-show="show" :id="pid" :type="type" :kcb="kcb" @close="dialogClose" ref="credit" article-type="thread")
       include ../module_digest
       .row
         .col-xs-12.col-md-9#wrap.box-shadow-panel
@@ -366,7 +363,11 @@ block content
                               span &nbsp;查看附件
                           if data.permissions.creditKcb
                             .single-post-bottom-item
-                              .fa.fa-cny.credit-kcb(title='鼓励' style='cursor:pointer;' onclick=`credit("${thread.firstPost.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励&nbsp;
+                              .fa.fa-cny.credit-kcb.pointer(
+                                data-global-click='showCreditPanel'
+                                data-global-data=objToStr({creditType: 'kcb', contentType: 'post', contentId: thread.firstPost.pid})
+                                title='鼓励'
+                                ) &nbsp;鼓励&nbsp;
                           .single-post-bottom-item(
                             data-global-click='showSharePanel'
                             data-global-data=objToStr({type: 'thread', id: thread.tid})

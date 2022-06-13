@@ -46,7 +46,10 @@ if !isIncluded('options')
       .option(v-if='xsf !== null' @click='addXSF')
         .fa.fa-graduation-cap
         span 评学术分
-      .option(v-if='kcb !== null' @click='addKCB')
+      .option(
+        v-if='kcb !== null'
+        @click='addKCB'
+        )
         .fa.fa-cny
         span 鼓励
       .option(v-if='digest !== null' @click='postDigest')

@@ -41,7 +41,11 @@ block content
                 include ../module_vote
                 +voteButtons(post, !!data.user)
                 if permission('creditKcb')
-                  .single-post-bottom-item(onclick=`credit('${post.pid}', 'kcb')` title='鼓励')
+                  .single-post-bottom-item(
+                    data-global-click=`showCreditPanel`
+                    data-global-data=objToStr({creditType: 'kcb', contentType: 'post', contentId: post.pid})
+                    title='鼓励'
+                    )
                     .fa.fa-cny.credit-kcb &nbsp;鼓励
                 .single-post-bottom-item(
                   data-global-click='showSharePanel'
@@ -102,7 +106,7 @@ block content
         .m-b-1
           .pid=`文号 / ${post.pid}`
           hr
-          #postShare
+          #postShare(v-cloak)
             share(:type='"post"' :id=`'${post.pid}'`)
         if !post.anonymous
           -var user = post.user

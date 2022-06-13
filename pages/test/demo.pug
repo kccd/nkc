@@ -9,6 +9,9 @@ block content
   include ../publicModules/articlePanel/articlePanel
   .container-fluid.max-width
     .row
+      .col-xs-12
+        #app
+          credit(ref='credit')
       .col-xs-12.col-md-7.col-md-offset-3.box-shadow-panel
         button(
           data-global-click='showSharePanel'
@@ -26,3 +29,4 @@ block content
 
 
 block scripts
+  +includeJS('/test/demo.js')

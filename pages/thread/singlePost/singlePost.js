@@ -54,46 +54,58 @@ class SinglePostModule {
   }
   // 隐藏post内容
   hidePostContent(pid) {
-    const container = $(`.single-post-container[data-pid="${pid}"]`);
-    const postCenter = container.find(".single-post-center");
-    const hidePostFloat = this.getPostHeightFloat();
-    const hidePostMaxHeight = this.getPostMaxHeight();
-    postCenter.css({
-      "max-height": hidePostMaxHeight * hidePostFloat + "px"
-    });
-    const buttonContainer = container.find(".switch-hidden-status");
-    const button = buttonContainer.find(".switch-hidden-status-button");
-    button.html(
-      `<div class="fa fa-angle-down"><strong> 加载全文</strong></div>`
-    );
-    container.attr("data-hidden", "true");
-    buttonContainer.removeClass("hidden");
+    const containers = $(`.single-post-container[data-pid="${pid}"]`);
+    for(let i = 0; i < containers.length; i++) {
+      const container = containers.eq(i);
+      if(container.attr('data-hide') === 'not') continue;
+      const postCenter = container.find(".single-post-center");
+      const hidePostFloat = this.getPostHeightFloat();
+      const hidePostMaxHeight = this.getPostMaxHeight();
+      postCenter.css({
+        "max-height": hidePostMaxHeight * hidePostFloat + "px"
+      });
+      const buttonContainer = container.find(".switch-hidden-status");
+      const button = buttonContainer.find(".switch-hidden-status-button");
+      button.html(
+        `<div class="fa fa-angle-down"><strong> 加载全文</strong></div>`
+      );
+      container.attr("data-hidden", "true");
+      buttonContainer.removeClass("hidden");
+    }
   }
   // 取消隐藏post内容
   showPostContent(pid) {
-    const container = $(`.single-post-container[data-pid="${pid}"]`);
-    const postCenter = container.find(".single-post-center");
-    postCenter.css({
-      "max-height": "none"
-    });
-    const buttonContainer = container.find(".switch-hidden-status");
-    const button = buttonContainer.find(".switch-hidden-status-button");
-    button.html(`<div class="fa fa-angle-up"> 收起</div>`);
-    container.attr("data-hidden", "false");
-    buttonContainer.removeClass("hidden");
+    const containers = $(`.single-post-container[data-pid="${pid}"]`);
+    for(let i = 0; i < containers.length; i++) {
+      const container = containers.eq(i);
+      if(container.attr('data-hide') === 'not') continue;
+      const postCenter = container.find(".single-post-center");
+      postCenter.css({
+        "max-height": "none"
+      });
+      const buttonContainer = container.find(".switch-hidden-status");
+      const button = buttonContainer.find(".switch-hidden-status-button");
+      button.html(`<div class="fa fa-angle-up"> 收起</div>`);
+      container.attr("data-hidden", "false");
+      buttonContainer.removeClass("hidden");
+    }
   }
   // 切换post隐藏状态
   switchPostContent(pid) {
-    const container = $(`.single-post-container[data-pid="${pid}"]`);
-    const hidden = container.attr("data-hidden");
-    if (hidden === "true") {
-      const scrollY = $(document).scrollTop();
-      this.showPostContent(pid);
-      scrollTo(0, scrollY);
-    } else {
-      const pagePosition = new NKC.modules.PagePosition();
-      this.hidePostContent(pid);
-      pagePosition.restore();
+    const containers = $(`.single-post-container[data-pid="${pid}"]`);
+    for(let i = 0; i < containers.length; i++) {
+      const container = containers.eq(i);
+      if(container.attr('data-hide') === 'not') continue;
+      const hidden = container.attr("data-hidden");
+      if (hidden === "true") {
+        const scrollY = $(document).scrollTop();
+        this.showPostContent(pid);
+        scrollTo(0, scrollY);
+      } else {
+        const pagePosition = new NKC.modules.PagePosition();
+        this.hidePostContent(pid);
+        pagePosition.restore();
+      }
     }
   }
   // 获取回复最外层dom

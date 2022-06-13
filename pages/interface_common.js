@@ -463,119 +463,6 @@ function cancelXsf(pid, id) {
 
 }
 
-function credit(pid, type, kcb) {
-  // var title = {
-  //   xsf: '评学术分',
-  //   kcb: '鼓励'
-  // }[type];
-  // creditDom.one('show.bs.modal', function(event) {
-  //   var button = event.currentTarget.getElementsByClassName('btn');
-  //   var t = event.currentTarget.getElementsByClassName('modal-title');
-  //   var kcbInfo = event.currentTarget.getElementsByClassName('kcb-info');
-  //   var xsfInfo = event.currentTarget.getElementsByClassName('xsf-info');
-  //   var num = event.currentTarget.getElementsByClassName('num')[0];
-  //   console.log(num);
-  //   var description = event.currentTarget.getElementsByClassName('description')[0];
-  //   if(type === 'kcb') {
-  //     for(var i = 0 ; i < xsfInfo.length; i++) {
-  //       xsfInfo[i].style.display = 'none';
-  //     }
-  //     for(var i = 0 ; i < kcbInfo.length; i++) {
-  //       kcbInfo[i].style.display = 'inline-block';
-  //     }
-  //     num.value = '';
-  //   } else {
-  //     num.value = '';
-  //     for(var i = 0 ; i < kcbInfo.length; i++) {
-  //       kcbInfo[i].style.display = 'none';
-  //     }
-  //     for(var i = 0 ; i < xsfInfo.length; i++) {
-  //       xsfInfo[i].style.display = 'inline-block';
-  //     }
-  //   }
-  //   description.value = '';
-  //   t[0].innerText = title;
-  //   // 确定
-  //   button[1].onclick = function() {
-  //     button[1].setAttribute("disabled", "disabled");
-  //     if(type === 'xsf') {
-  //       var obj = {
-  //         num: num.value,
-  //         description: description.value
-  //       };
-  //       return nkcAPI('/p/'+pid+'/credit/xsf', 'POST',obj)
-  //         .then(function(){
-  //           creditDom.modal('hide');
-  //           window.location.reload();
-  //         })
-  //         .catch(function(data) {
-  //           screenTopWarning(data.error)
-  //           button[1].removeAttribute("disabled");
-  //         })
-  //     } else if(type === 'kcb') {
-
-  //       if(num.value*100 > kcb) return screenTopWarning('你的'+creditScoreName+'不足');
-  //       var obj = {
-  //         num: num.value*100,
-  //         description: description.value
-  //       };
-  //       nkcAPI('/p/'+pid+'/credit/kcb', 'POST', obj)
-  //         .then(function() {
-  //           creditDom.modal('hide');
-  //           window.location.reload();
-  //         })
-  //         .catch(function(data) {
-  //           screenTopWarning(data.error || data);
-  //           button[1].removeAttribute("disabled");
-  //         });
-  //     }
-  //   }
-  // });
-  // //请求数据
-  // let data;
-  // nkcAPI(`/t/${location.pathname.split("/")[2]}/rewards` ,"GET")
-  //   .then((res) => {
-  //     data = res
-  //     // console.log(res);
-  //     const creditModel = $("#creditModel");
-  //     creditModel.attr('data-credit-score-name', data.creditScore.name);
-  //     const currency = $(".currency");
-  //     const xsfRange = $(".xsf-range");
-  //     const kcbRange = $(".kcb-range");
-  //     currency.text(`向作者转账${data.creditScore.name}以资鼓励`);
-  //     kcbRange.text(`（${data.creditSettings.min/100} - ${data.creditSettings.max/100}）`);
-  //     xsfRange.text(`（-${data.xsfSettings.reduceLimit} 到 ${data.xsfSettings.addLimit}）`)
-  //   })
-  //   .catch((err) => {
-  //     sweetError(err)
-  //   })
-  // creditDom.modal('show');
-  if(!app) {
-    app = new Vue({
-      el: "#module_credit",
-      data: {
-        pid,
-        type,
-        kcb,
-        show: true
-      },
-      components: {
-        "credit-model": Credit
-      },
-      methods: {
-        dialogClose(){
-          this.show = false
-        }
-      }
-    });
-  }
-  app.pid = pid
-  app.type = type
-  app.kcb = kcb
-  app.show = true;
-  app.$refs.credit.open()
-}
-
 /*if($('input[data-control="hue"]').length !== 0 && $('input[data-control="hue"]').minicolors) {
 	$('input[data-control="hue"]').minicolors({
 
@@ -1295,7 +1182,6 @@ Object.assign(window, {
   openPostWarningDom,
   submitPostWarning,
   cancelXsf,
-  credit,
   homeTop,
   unHomeTop,
   latestTop,

@@ -19,7 +19,7 @@
     if data.column.user.description
       .column-user-description=data.column.user.description
 .m-b-1.column-tool-container(style=columnToolStyle)
-  #columnShare
+  #columnShare(v-cloak)
     share(:type='"column"' :id=`'${data.column._id}'`)
 if data.column.notice && (!data.column.noticeDisabled || canManagement)
   div.m-b-1.column-tool-container(style=columnToolStyle)

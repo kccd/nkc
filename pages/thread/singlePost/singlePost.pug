@@ -74,7 +74,7 @@ if !isIncluded('singlePost')
   +includeJS('/thread/singlePost/singlePost.js')
   mixin singlePost(props)
     -var {pid, floor, toc, tlm, title, count, content, vote, reviewed, reviewReason, draft, url} = props;
-    -var {user, quote, kcb, xsf, isAuthor, disabled, voteUp} = props;
+    -var {user, quote, kcb, xsf, isAuthor, disabled, voteUp, disableAutoHideContent} = props;
     -var {digest, type, tid, highlight, hide} = props;
     -var {cancelTopped, hidePostBottom, cRead, hideComment} = props;
     .single-post-container(
@@ -83,7 +83,7 @@ if !isIncluded('singlePost')
       data-return=!!draft
       data-highlight=highlight === pid
       data-pid=pid
-      data-hide=isAuthor? 'not': hide
+      data-hide=isAuthor || disableAutoHideContent? 'not': hide
       id=highlight === pid? 'highlight': undefined
       )
       +singlePostWarningInfo({disabled, draft, reviewed, reviewReason, pid})
