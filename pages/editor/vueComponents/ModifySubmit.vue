@@ -520,6 +520,9 @@ export default {
 // @media (min-width: 992px){
 // }
 .btn-area{
+  .btn {
+    margin-bottom: 10px;
+  }
   .btn:nth-child(1){
     margin-right: 10px;
   }
@@ -539,6 +542,7 @@ export default {
     min-width: 6rem;
     @media (max-width: 1100px) {
       min-width: 0;
+
     }
   }
   @media (min-width: 992px) {
