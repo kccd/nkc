@@ -24,11 +24,7 @@ const {
 } = resourceObj;
 const mathJax = require('./mathJax');
 const document = require('./document');
-<<<<<<< HEAD
 const draft = require('./draft');
-const credit = require('./credit');
-=======
->>>>>>> c612b2e1ee0a9c9922e1afb8a46d35eaae69482f
 const editor = require('./editor');
 const edit = require('./edit');
 const exam = require('./exam');
