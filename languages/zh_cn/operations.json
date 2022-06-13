@@ -1,6 +1,4 @@
 {
-  "rewardXsf": "奖励学术分",
-  "rewardKcb": "奖励科创币",
   "getRewardConfiguration": "获取奖励配置信息",
   "saveForumLatestBlockNotice": "保存专业最新页板块公告编辑内容",
   "saveForumDeclare": "保存专业说明编辑内容",
@@ -831,7 +829,6 @@
   "refundFundApplicationForm": "基金管理员确认退款",
   "experimentalThreadCategorySettings": "后台管理 - 设置 - 文章多维分类",
   "getWatermark": "获取水印图片",
-  "getAppsWatermark": "获取用户偏好设置水印",
   "getForumChildForums": "获取专业下的子专业信息",
   "getAppsWatermark": "获取用户偏好设置水印",
   "creationCenter": "访问创作中心",
@@ -877,5 +874,6 @@
   "unDigestArticle": "取消将独立文章设置为精选",
   "digestComment": "将回复设置为精选",
   "unDigestComment": "取消回复精选",
-  "getSettings": "获取后台设置"
+  "getDigestSettings": "获取加精设置",
+  "getCreditSettings": "获取评学术分、鼓励设置"
 }

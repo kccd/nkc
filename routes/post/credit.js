@@ -62,9 +62,7 @@ router
       ip: ctx.address,
       c: {
         type: 'xsf',
-        pid,
-        num,
-        description
+        recordId: _id,
       }
     });
 		await message.save();
@@ -153,17 +151,6 @@ router
 		await fromUser.calculateScore();
 		await toUser.calculateScore();
 
-		const updateObjForPost = {
-			username: user.username,
-			uid: user.uid,
-			pid: post.pid,
-			toc: Date.now(),
-			source: 'nkc',
-			reason: description,
-			type: 'kcb',
-			q: num
-		};
-		await post.updateOne({$push: {credits: updateObjForPost}});
     await thread.updateThreadEncourage();
     // 发消息
     const message = db.MessageModel({

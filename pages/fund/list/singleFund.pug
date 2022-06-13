@@ -86,7 +86,7 @@ block fundContent
         //-.m-b-1
           .panel-header 补充说明
           .pre-wrap=data.fund.description.detailed
-        .m-b-1#donationApp
+        .m-b-1#donationApp(v-cloak)
           donation(:fund=`'${data.fund._id}'`)
           .m-t-2
             .panel-header 分享
