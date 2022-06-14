@@ -1,9 +1,9 @@
 <template lang="pug">
   .comment-vote
-    .comment-vote-up(:class="voteUp_ > 0 ? 'active' : ''" data-cid=cid_ @click="commentsVote(cid_, 'up')")
+    .comment-vote-up(:class="vote === 'up' ? 'active' : ''" data-cid=cid_ @click="commentsVote(cid_, 'up')")
       .fa.fa-caret-up
       .comment-vote-number(data-cid=cid) {{voteUp_ > 0 ? voteUp_ : ''}}
-    .comment-vote-down(:class="voteDown_ > 0 ? 'active' : ''" data-cid=cid_ @click="commentsVote(cid_, 'down')")
+    .comment-vote-down(:class="vote === 'down' ? 'active' : ''" data-cid=cid_ @click="commentsVote(cid_, 'down')")
       .fa.fa-caret-down
       .comment-vote-number(data-cid=cid)
 
@@ -67,7 +67,7 @@ import {toLogin} from "../../js/account";
 import {nkcAPI} from "../../js/netAPI";
 
 export default {
-  props: ['article', 'cid', 'voteUp', 'voteDown'],
+  props: ['article', 'cid', 'voteUp', 'voteDown', 'vote'],
   data: () => ({
     cid_: '',
     voteUp_: '',

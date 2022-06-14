@@ -144,19 +144,13 @@ router
   .get('/:_id', async (ctx, next) => {
     //获取文章评论跳转到文章并定位到评论
     const {data, db, params, permission, query, nkcModules} = ctx;
-    const {token} = query;
     const {_id} = params;
     let comment = await db.CommentModel.findOnly({_id});
-    comment = (await db.CommentModel.getCommentsInfo([comment]))[0];
     //如果存在comment并且存在token就重定向到评论页面
-    if(comment) {
-      if(token && await db.ShareModel.hasPermission(token, comment._id)) {
-        let url = comment.commentUrl;
-        const arr = nkcModules.tools.segmentation(url, '?');
-        url = `${arr[0]}token=${token}&${arr[1]}`;
-        return ctx.redirect(url);
-      }
-    }
+    let url = await comment.getLocationUrl();
+    // const arr = nkcModules.tools.segmentation(url, '?');
+    // url = `${arr[0]}token=${token}&${arr[1]}`;
+    return ctx.redirect(url);
     await next();
   })
   //获取评论的引用
