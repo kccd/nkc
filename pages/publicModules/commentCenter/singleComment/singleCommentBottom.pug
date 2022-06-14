@@ -38,6 +38,13 @@ if !isIncluded('singlePostBottom')
         //if permission('creditKcb')
         //  .single-post-bottom-item(onclick=`credit('${cid}', 'kcb')` title='鼓励')
         //    .fa.fa-cny.credit-kcb
+        if permission('creditKcb')
+          .single-post-bottom-item(
+            data-global-click=`showCreditPanel`
+            data-global-data=objToStr({creditType: 'kcb', contentType: 'comment', contentId: cid})
+            title='鼓励'
+          )
+            .fa.fa-cny.credit-kcb &nbsp;鼓励
         .single-post-bottom-item(
           data-global-click='showSharePanel'
           data-global-data=objToStr({type: 'comment', id: cid})

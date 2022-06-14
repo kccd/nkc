@@ -1,12 +1,14 @@
 if !isIncluded('singleCommentCenter')
   //-引用的回复
   include ./singleCommentQuote
+  //-引入学术分和鼓励
+  include ./singleCommentCredit
   mixin singleCommentCenter(props)
-    -var {quote, title, content, aid} = props;
+    -var {quote, title, content, cid, xsf, kcb} = props;
     .single-post-center
       if quote
         +singleCommentQuote(quote)
       .single-post-title=title
       .single-post-content!=content
-
+      +singleCommentCredit(cid, xsf.concat(kcb))
 

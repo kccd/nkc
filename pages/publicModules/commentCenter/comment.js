@@ -37,8 +37,9 @@ import Complaint from "../../lib/vue/Complaint";
 import ViolationRecord from "../../lib/vue/ViolationRecord";
 import CommentPostEditor from "../../lib/vue/comment/CommentPostEditor";
 import {nkcAPI} from "../../lib/js/netAPI";
-import {screenTopAlert} from "../../lib/js/topAlert";
+import {screenTopAlert, screenTopWarning} from "../../lib/js/topAlert";
 import CommentHit from "../../lib/vue/comment/CommentHit";
+import {contentTypes, creditTypes} from "../../lib/vue/Credit";
 const singleBottomDom = $('.single-post-bottom');
 const singleCommentBottom = {};
 for(let i = 0;i < singleBottomDom.length;i++) {
@@ -267,12 +268,51 @@ function joinCommentRoom() {
   })
 }
 
+//屏蔽鼓励原因
+function hideCommentKcbRecord(cid, recordId, hide) {
+  nkcAPI("/comment/" + cid + "/credit/kcb/" + recordId, "PUT", {
+    hide: !!hide
+  })
+    .then(function() {
+      if(hide) {
+        screenTopAlert("屏蔽成功");
+      } else {
+        screenTopAlert("已取消屏蔽");
+      }
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
+}
+
+//撤销学术分
+function cancelCommentXsf(cid, id) {
+  var reason = prompt('请输入撤销原因：');
+  if(reason === null) return;
+  if(reason === '') return screenTopWarning('撤销原因不能为空！');
+  nkcAPI('/comment/' + cid + '/credit/xsf/' + id + '?reason=' + reason, 'DELETE', {})
+    .then(function() {
+      window.location.reload();
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error || data);
+    })
+}
+
+//鼓励回复
+function creditKcbPanel(cid) {
+  window.RootApp.openCredit(creditTypes.kcb, contentTypes.comment, cid);
+}
+
 window.singleCommentBottom = singleCommentBottom;
 
 Object.assign(window, {
   getPostsDom,
   resetCheckbox,
   insertRenderedComment,
+  creditKcbPanel,
+  hideCommentKcbRecord,
+  cancelCommentXsf,
   initSingleCommentBottom,
   joinCommentRoom,
   manageComments,

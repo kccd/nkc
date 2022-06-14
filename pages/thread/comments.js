@@ -1,3 +1,6 @@
+import {nkcAPI} from "../lib/js/netAPI";
+import {screenTopAlert, screenTopWarning} from "../lib/js/topAlert";
+
 var editor = {};
 var draftsId = {};
 var timeout = {};

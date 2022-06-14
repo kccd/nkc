@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const tools = require("../nkcModules/tools");
 const Schema = mongoose.Schema;
 
 const xsfsRecordTypes = {
@@ -189,5 +190,39 @@ xsfsRecordSchema.statics.extendXsfsRecords = async (records) => {
   }
   return results;
 };
+
+/*
+* 处理comment的xsf和kcb纪录
+* */
+xsfsRecordSchema.statics.extendCredits = async (credits) => {
+  const tools = require('../nkcModules/tools');
+  const kcb = [];
+  const xsf = [];
+  for(const credit of credits) {
+    const {_id, hideDescription: hide, creditName, num, type, fromUser, description, toc} = credit;
+    const c = {
+      _id,
+      uid: fromUser.uid,
+      username: fromUser.username,
+      userHome: tools.getUrl('userHome', fromUser.uid),
+      avatar: tools.getUrl('userAvatar', fromUser.avatar),
+      description,
+      toc,
+      number: num
+    };
+    if(type === 'creditKcb') {
+      c.number = c.number / 100;
+      c.type = 'kcb';
+      c.name = creditName;
+      c.hide = hide;
+      kcb.push(c);
+    } else {
+      c.type = 'xsf';
+      c.name = '学术分';
+      xsf.push(c);
+    }
+  }
+  return {xsf, kcb};
+}
 
 module.exports = mongoose.model('xsfsRecords', xsfsRecordSchema);

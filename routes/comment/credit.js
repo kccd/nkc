@@ -60,14 +60,14 @@ router
     await next();
   })
   .del('/xsf/:recordId', async (ctx, next) => {
-    //册小学术分
+    //撤销学术分
     const {data, db, params, query, permission} = ctx;
     const {reason} = query;
     const {user} = data;
-    const {id: cid, recordId}  = params;
+    const {_id: cid, recordId}  = params;
     if(!permission('cancelXsf')) cxt.throw(403, '权限不足');
     const xsfsRecordTypes = await db.XsfsRecordModel.getXsfsRecordTypes();
-    const record = await db.XsfsRecordModel.findOnly({_id: recordId, pid: cid, type: xsfsRecordTypes.post});
+    const record = await db.XsfsRecordModel.findOnly({_id: recordId, pid: cid, type: xsfsRecordTypes.comment});
     const comment = await db.CommentModel.findOnly({_id: cid});
     const targetUser = await db.UserModel.findOnly({uid: comment.uid});
     if(reason.length < 2) ctx.throw(400, '撤销原因写的太少啦~');
@@ -104,9 +104,8 @@ router
     num = Number(num);
     if(num % 1 !== 0) ctx.throw(400, `${creditScore.name}仅支持小数点后两位`);
     const comment = await db.CommentModel.findOnly({_id: cid});
-    // if(comment.anonymous) ctx.throw(400, '无法鼓励匿名用户');
     const toUser = await db.UserModel.findOnly({uid: comment.uid});
-    if(targetUser.uid === user.uid) ctx.throw(400, '无法给自己鼓励');
+    if(fromUser.uid === toUser.uid) ctx.throw(400, '无法给自己鼓励');
     const {normal} = await db.CommentModel.getCommentStatus();
     if(comment.status !== normal) ctx.throw(403, '无法鼓励状态不正常的评论');
     const creditSettings = await db.SettingModel.getCreditSettings();
@@ -114,7 +113,6 @@ router
     const userScore = await db.UserModel.getUserScore(user.uid, creditScore.type);
     if(num < creditSettings.min) ctx.throw(400, `${creditScore.name}最少为${creditSettings.min/100}`);
     if(num > creditSettings.max) ctx.throw(400, `${creditScore.name}不能大于${creditSettings.max/100}`);
-    // fromUser.kcb = await db.UserModel.updateUserKcb(fromUser.uid);
     if(userScore < num) ctx.throw(400, `你的${creditScore.name}不足`);
     if(description.length < 2) ctx.throw(400, '理由写的太少了');
     if(description.length > 60) ctx.throw(400, '理由不能超过60个字符');
@@ -130,17 +128,17 @@ router
     await fromUser.calculateScore();
     await toUser.calculateScore();
 
-    const updateObjForPost = {
-      username: user.username,
-      uid: fromUser.uid,
-      pid: comment._id,
-      toc: Date.now(),
-      source: 'nkc',
-      reason: description,
-      type: 'kcb',
-      q: num
-    };
-    await comment.updateOne({$push: {credits: updateObjForPost}});
+    // const updateObjForPost = {
+    //   username: user.username,
+    //   uid: fromUser.uid,
+    //   pid: comment._id,
+    //   toc: Date.now(),
+    //   source: 'nkc',
+    //   reason: description,
+    //   type: 'kcb',
+    //   q: num
+    // };
+    // await comment.updateOne({$push: {credits: updateObjForPost}});
     // 发消息
     const message = db.MessageModel({
       _id: await db.SettingModel.operateSystemID('messages', 1),
@@ -165,5 +163,21 @@ router
     await ctx.nkcModules.socket.sendMessageToUser(message._id);
     await next();
   })
+  .put("/kcb/:recordId", async (ctx, next) => {
+    //屏蔽鼓励信息
+    const {db, body, params} = ctx;
+    const {recordId, _id} = params;
+    const {hide} = body;
+    await db.KcbsRecordModel.updateOne({
+      _id: recordId,
+      commentId: _id,
+      type: "creditKcb"
+    }, {
+      $set: {
+        hideDescription: !!hide
+      }
+    });
+    await next();
+  });
 
 module.exports = router;

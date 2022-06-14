@@ -243,9 +243,10 @@ window.articleOption = new Vue({
       const {_id} = this.article;
       window.RootApp.openCredit(creditTypes.xsf, contentTypes.article, _id);
     },
+    //鼓励科创币
     addKCB() {
-      const {pid} = this;
-      credit(pid, 'kcb');
+      const {_id} = this.article;
+      window.RootApp.openCredit(creditTypes.kcb, contentTypes.article, _id);
     },
     postDigest() {
       const {pid, digest} = this;

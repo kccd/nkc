@@ -25,6 +25,8 @@ block baseColumnContent
       include ./article/content
       +content(c)
       include ./article/articleEditTime
+      include ../publicModules/articleCenter/articleCredits
+      +articleCredits(article.kcb.concat(article.xsf), article._id, data.permissions)
       +articleEditTime(tlm, dt, toc)
       include ../columns/article/articleOptions
       +articleOptions({

@@ -344,6 +344,10 @@ schema.statics.extendPostComments = async (props) => {
   const DocumentModel = mongoose.model('documents');
   const UserModel = mongoose.model('users');
   const DelPostLogModel = mongoose.model('delPostLog');
+  const SettingModel = mongoose.model('settings');
+  const XsfsRecordModel = mongoose.model('xsfsRecords');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const creditScore = await SettingModel.getScoreByOperationType('creditScore');
   const {htmlToPlain} = require("../nkcModules/nkcRender");
   const CommentModel = mongoose.model('comments');
   const {getUrl} = require('../nkcModules/tools');
@@ -351,11 +355,31 @@ schema.statics.extendPostComments = async (props) => {
   const uidArr = [];
   const quoteIdArr = [];
   const documentObj = {};
+  const commentsId = [];
   const usersObj = {};
   const quoteObj = {};
   for(const c of comments) {
     didArr.push(c.did);
     uidArr.push(c.uid);
+    commentsId.push(c._id);
+  }
+  const kcbsRecordsObj = {};
+  const xsfsRecordsObj = {};
+  const xsfsRecordTypes = await XsfsRecordModel.getXsfsRecordTypes();
+  const xsfsRecords = await XsfsRecordModel.find({pid: {$in: commentsId}, canceled: false, type: xsfsRecordTypes.comment}).sort({toc: 1});
+  const kcbsRecords = await KcbsRecordModel.find({commentId: {$in: commentsId}, type: 'creditKcb'}).sort({toc: 1});
+  await KcbsRecordModel.hideSecretInfo(kcbsRecords);
+  for(const r of kcbsRecords) {
+    uidArr.push(r.from);
+    r.to = "";
+    if(!kcbsRecordsObj[r.commentId]) kcbsRecordsObj[r.commentId] = [];
+    kcbsRecordsObj[r.commentId].push(r);
+  }
+  for(const r of xsfsRecords) {
+    uidArr.push(r.operatorId);
+    r.uid = "";
+    if(!xsfsRecordsObj[r.pid]) xsfsRecordsObj[r.pid] = [];
+    xsfsRecordsObj[r.pid].push(r);
   }
   const users = await UserModel.find({uid: {$in: uidArr}});
   for(const user of users) {
@@ -427,6 +451,18 @@ schema.statics.extendPostComments = async (props) => {
     const user = usersObj[c.uid];
     const userGrade = await user.extendGrade();
     if(!documentObj[c.did]) continue;
+    let credits = xsfsRecordsObj[c._id] || [];
+    credits = credits.concat(...kcbsRecordsObj[c._id] || []);
+    for(const r of credits) {
+      if(r.from) {
+        r.fromUser = usersObj[r.from];
+        r.creditName = creditScore.name;
+      } else {
+        r.fromUser = usersObj[r.operatorId];
+        r.type = 'xsf';
+      }
+    }
+    const {xsf = [], kcb = []} = await XsfsRecordModel.extendCredits(credits);
     const m = c.toObject();
     _comments.push({
       ...m,
@@ -444,6 +480,8 @@ schema.statics.extendPostComments = async (props) => {
         gradeId: userGrade._id,
         gradeName: userGrade.displayName,
       },
+      xsf,
+      kcb,
       commentUrl: await c.getLocationUrl(),
       isAuthor: authorUid === m.uid ? true : false,
       quote: documentObj[c.did].quote || null,
@@ -892,8 +930,10 @@ schema.statics.getCommentsInfo = async function(comments) {
   const DocumentModel = mongoose.model('documents');
   const CommentModel = mongoose.model('comments');
   const UserModel = mongoose.model('users');
+  const SettingModel = mongoose.model('settings');
   const XsfsRecordModel = mongoose.model('xsfsRecords');
   const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const creditScore = await SettingModel.getScoreByOperationType('creditScore');
   const commentsSid = [];
   const commentDid = [];
   const commentsId = [];
@@ -906,8 +946,21 @@ schema.statics.getCommentsInfo = async function(comments) {
   }
   const kcbsRecordsObj = {};
   const xsfsRecordsObj = {};
-  const xsfsRecords = await XsfsRecordModel.find({pid: {$in: commentsId}, canceled: false, recordType: 'comment'}).sort({toc: 1});
-  const kcbsRecords = await KcbsRecordModel.find({type: 'creditKcb', pid: {$in: commentsId}}).sort({toc: 1});
+  const xsfsRecords = await XsfsRecordModel.find({pid: {$in: commentsId}, canceled: false, type: 'comment'}).sort({toc: 1});
+  const kcbsRecords = await KcbsRecordModel.find({commentId: {$in: commentsId}, type: 'creditKcb'}).sort({toc: 1});
+  await KcbsRecordModel.hideSecretInfo(kcbsRecords);
+  for(const r of kcbsRecords) {
+    uidArr.push(r.from);
+    r.to = "";
+    if(!kcbsRecordsObj[r.commentId]) kcbsRecordsObj[r.commentId] = [];
+    kcbsRecordsObj[r.commentId].push(r);
+  }
+  for(const r of xsfsRecords) {
+    uidArr.push(r.operatorId);
+    r.uid = "";
+    if(!xsfsRecordsObj[r.pid]) xsfsRecordsObj[r.pid] = [];
+    xsfsRecordsObj[r.pid].push(r);
+  }
   let users = await UserModel.find({uid: {$in: uidArr}});
   users = await UserModel.extendUsersInfo(users);
   const userObj = {};
@@ -966,6 +1019,17 @@ schema.statics.getCommentsInfo = async function(comments) {
     } else if (articlePost.source === zoneSource){
       url =  `/zone/a/${articlePost.sid}`;
     }
+    let credits = xsfsRecordsObj[_id] || [];
+    credits = credits.concat(kcbsRecordsObj[_id] || []);
+    for(const r of credits) {
+      if(r.from) {
+        r.fromUser = userObj[r.from];
+        r.creditName = creditScore.name;
+      } else {
+        r.fromUser = userObj[r.operatorId];
+        r.type = 'xsf';
+      }
+    }
     let page = Math.floor(comment.order/30);
     if(comment.order % 30 === 0) page = page -1;
     const commentUrl = `${url}?page=${page}&highlight=${comment._id}#highlight`;
@@ -978,11 +1042,11 @@ schema.statics.getCommentsInfo = async function(comments) {
       url,
       isAuthor: commentDocument.uid === articleDocument.uid,
       commentUrl,
+      credits,
     });
   }
   return results;
 }
-
 
 /*
 * 指定动态ID，获取动态对象

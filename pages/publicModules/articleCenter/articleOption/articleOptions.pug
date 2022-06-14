@@ -28,6 +28,9 @@ if !isIncluded('articleOptions')
         .option(v-if='optionStatus.xsf !== null' @click='addXSF')
           .fa.fa-graduation-cap
           span 评学术分
+        .option(v-if='optionStatus.kcb !== null' @click='addKCB')
+          .fa.fa-cny.credit-kcb
+          span 鼓励
         a.option(v-if='optionStatus.edit !== null' @click='editArticle')
           .fa.fa-edit
           span 编辑

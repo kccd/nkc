@@ -17,11 +17,11 @@ if !isIncluded('singleCommentCredit')
               span=username
             .time=format(`YYYY-MM-DD`, toc)
             .description=description
-            if type === 'xsf' && permissions.cancelXsf
-              a(onclick=`cancelXsf("${pid}", ${_id})`) 撤销
-            if type === 'kcb' && permissions.modifyKcbRecordReason
+            if type === 'xsf' && data.permissions.cancelXsf
+              a(onclick=`cancelCommentXsf("${cid}", ${_id})`) 撤销
+            if type === 'kcb' && data.permissions.modifyKcbRecordReason
               if !hide
-                a(onclick=`hideKcbRecordReason("${cid}", ${_id}, true)`) 屏蔽
+                a(onclick=`hideCommentKcbRecord("${cid}", ${_id}, true)`) 屏蔽
               else
-                a(onclick=`hideKcbRecordReason("${cid}", ${_id}, false)`) 取消屏蔽
+                a(onclick=`hideCommentKcbRecord("${cid}", ${_id}, false)`) 取消屏蔽
 

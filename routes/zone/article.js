@@ -77,6 +77,8 @@ router
       match.uid = _article.uid;
     }
     const permissions = {
+      cancelXsf: ctx.permission('cancelXsf'),
+      modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
     };
     //获取文章收藏数
     data.columnPost.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);

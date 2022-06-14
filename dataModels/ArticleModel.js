@@ -1129,6 +1129,10 @@ schema.statics.getArticlesInfo = async function(articles) {
   const ReviewModel = mongoose.model('reviews');
   const ArticlePostModel = mongoose.model('articlePosts');
   const DelPostLogModel = mongoose.model('delPostLog');
+  const SettingModel = mongoose.model('settings');
+  const XsfsRecordModel = mongoose.model('xsfsRecords');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const creditScore = await SettingModel.getScoreByOperationType('creditScore');
   const columnArticlesId = [];
   const articlesDid = [];
   const articleId = [];
@@ -1146,6 +1150,26 @@ schema.statics.getArticlesInfo = async function(articles) {
     articlesDid.push(article.did);
     uidArr.push(article.uid);
   }
+  //查找文章鼓励和学术分信息
+  const kcbsRecordsObj = {};
+  const xsfsRecordsObj = {};
+  const xsfsRecordTypes = await XsfsRecordModel.getXsfsRecordTypes();
+  const xsfsRecords = await XsfsRecordModel.find({pid: {$in: articleId}, canceled: false, type: xsfsRecordTypes.article}).sort({toc: 1});
+  const kcbsRecords = await KcbsRecordModel.find({articleId: {$in: articleId}, type: 'creditKcb'}).sort({toc: 1});
+  await KcbsRecordModel.hideSecretInfo(kcbsRecords);
+  for(const r of kcbsRecords) {
+    uidArr.push(r.from);
+    r.to = "";
+    if(!kcbsRecordsObj[r.articleId]) kcbsRecordsObj[r.articleId] = [];
+    kcbsRecordsObj[r.articleId].push(r);
+  }
+  for(const r of xsfsRecords) {
+    uidArr.push(r.operatorId);
+    r.uid = "";
+    if(!xsfsRecordsObj[r.pid]) xsfsRecordsObj[r.pid] = [];
+    xsfsRecordsObj[r.pid].push(r);
+  }
+  //查找用户信息
   let users = await UserModel.find({uid: {$in: uidArr}});
   users = await UserModel.extendUsersInfo(users);
   for(const user of users) {
@@ -1216,10 +1240,24 @@ schema.statics.getArticlesInfo = async function(articles) {
       editorUrl = `/creation/editor/zone/article?source=zone&aid=${article._id}`;
       url = `/zone/a/${article._id}`;
     }
+    let credits = xsfsRecordsObj[article._id] || [];
+    credits = credits.concat(...kcbsRecordsObj[article._id] || []);
+    for(const r of credits) {
+      if(r.from) {
+        r.fromUser = userObj[r.from];
+        r.creditName = creditScore.name;
+      } else {
+        r.fromUser = userObj[r.operatorId];
+        r.type = 'xsf';
+      }
+    }
+    const {xsf = [], kcb = []} = await XsfsRecordModel.extendCredits(credits);
     //获取文章引用的资源
     // const resources = await ResourceModel.getResourcesByReference(documentResourceId);
     const info = {
       ...article.toObject(),
+      xsf,
+      kcb,
       reason: reason || '',
       document,
       editorUrl,

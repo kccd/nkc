@@ -14,6 +14,9 @@
       .option(v-if='options.xsf !== null' @click='addXSF')
         .fa.fa-graduation-cap
         span 评学术分
+      .option(v-if='options.kcb !== null' @click='creditKcbPanel')
+        .fa.fa-cny.credit-kcb
+        span 鼓励
       .option(v-if="options.reviewed === 'unknown'" @click="passReview()")
         .fa.fa-check-circle-o
         span 通过审核
@@ -337,7 +340,14 @@ export default {
       const {digest} = this.options;
       const self = this;
       if(!digest) {
-        window.RootApp.openCredit(creditTypes.xsf, contentTypes.comment, _id);
+        window.RootApp.openDigest((kcb) => {
+          self.digestComment(kcb)
+            .then(() => {
+              window.RootApp.closeDigest();
+            });
+        }, {
+          digestData: self.digestData,
+        })
       } else {
         self.unDigestComment();
       }
@@ -360,6 +370,11 @@ export default {
         .catch((data) => {
           screenTopWarning(data.error || data);
         });
+    },
+    //鼓励
+    creditKcbPanel() {
+      const {_id} = this.comment;
+      window.RootApp.openCredit(creditTypes.kcb, contentTypes.comment, _id);
     }
   }
 }

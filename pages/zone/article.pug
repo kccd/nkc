@@ -34,6 +34,8 @@ block content
       +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
       include ../columns/article/content
       +content(c)
+      include ../publicModules/articleCenter/articleCredits
+      +articleCredits(article.kcb.concat(article.xsf), article._id, data.permissions)
       include ../columns/article/articleEditTime
       +articleEditTime(tlm, dt, toc)
       include ../columns/article/articleOptions
