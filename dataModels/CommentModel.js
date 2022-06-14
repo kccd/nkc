@@ -892,6 +892,8 @@ schema.statics.getCommentsInfo = async function(comments) {
   const DocumentModel = mongoose.model('documents');
   const CommentModel = mongoose.model('comments');
   const UserModel = mongoose.model('users');
+  const XsfsRecordModel = mongoose.model('xsfsRecords');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
   const commentsSid = [];
   const commentDid = [];
   const commentsId = [];
@@ -902,6 +904,10 @@ schema.statics.getCommentsInfo = async function(comments) {
     commentsId.push(comment._id);
     uidArr.push(comment.uid);
   }
+  const kcbsRecordsObj = {};
+  const xsfsRecordsObj = {};
+  const xsfsRecords = await XsfsRecordModel.find({pid: {$in: commentsId}, canceled: false, recordType: 'comment'}).sort({toc: 1});
+  const kcbsRecords = await KcbsRecordModel.find({type: 'creditKcb', pid: {$in: commentsId}}).sort({toc: 1});
   let users = await UserModel.find({uid: {$in: uidArr}});
   users = await UserModel.extendUsersInfo(users);
   const userObj = {};

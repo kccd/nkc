@@ -378,7 +378,6 @@ threadRouter
     let posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
     posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     posts = await db.PostModel.filterPostsInfo(posts);
-
     // 拓展待审回复的理由
     const _postsId = [];
     for(let i = 0; i < posts.length; i ++) {
