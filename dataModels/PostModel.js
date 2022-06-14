@@ -883,6 +883,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
   const XsfsRecordModel = mongoose.model('xsfsRecords');
   const SettingModel = mongoose.model('settings');
   const HistoryModel = mongoose.model('histories');
+  const xsfsRecordTypes = await XsfsRecordModel.getXsfsRecordTypes();
   const creditScore = await SettingModel.getScoreByOperationType('creditScore');
   const o = Object.assign({}, defaultOptions);
   Object.assign(o, options);
@@ -939,7 +940,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
       if(!kcbsRecordsObj[r.pid]) kcbsRecordsObj[r.pid] = [];
       kcbsRecordsObj[r.pid].push(r);
     }
-    const xsfsRecords = await XsfsRecordModel.find({pid: {$in: [...pid]}, canceled: false, recordType: 'post'}).sort({toc: 1});
+    const xsfsRecords = await XsfsRecordModel.find({pid: {$in: [...pid]}, canceled: false, type: xsfsRecordTypes.post}).sort({toc: 1});
     for(const r of xsfsRecords) {
       uid.add(r.operatorId);
       r.uid = "";

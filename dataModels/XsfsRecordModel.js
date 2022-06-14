@@ -110,35 +110,84 @@ xsfsRecordSchema.statics.getXsfsRecordTypes = () => {
 };
 
 xsfsRecordSchema.statics.extendXsfsRecords = async (records) => {
+  const {timeFormat, getUrl} = require('../nkcModules/tools');
   const UserModel = mongoose.model('users');
-  const PostModel = mongoose.model('posts');
-  const uid = new Set(), pid = new Set();
-  const usersObj = {}, postsObj = {};
-  records.map(r => {
-    uid.add(r.uid).add(r.operatorId);
-    if(r.lmOperatorId) uid.add(r.lmOperatorId);
-    pid.add(r.pid);
-  });
-  const posts = await PostModel.find({pid: {$in: [...pid]}});
-  const users = await UserModel.find({uid: {$in: [...uid]}});
-  users.map(u => {
-    if(!usersObj[u.uid]) usersObj[u.uid] = [];
-    usersObj[u.uid] = u;
-  });
-  await Promise.all(posts.map(async p => {
-    if(!postsObj[p.pid]) postsObj[p.pid] = [];
-    p = p.toObject();
-    p.url = await PostModel.getUrl(p);
-    postsObj[p.pid] = p;
-  }));
-  return records.map(r => {
-    r = r.toObject();
-    r.user = usersObj[r.uid];
-    r.operator = usersObj[r.operatorId];
-    if(r.lmOperatorId) r.lmOperator = usersObj[r.lmOperatorId];
-    r.post = postsObj[r.pid];
-    return r;
-  });
+  const ArticleModel = mongoose.model('articles');
+  const XsfsRecordModel = mongoose.model('xsfsRecords');
+  const xsfsRecordTypes = await XsfsRecordModel.getXsfsRecordTypes();
+  const usersId = [];
+  for(const r of records) {
+    const {uid, operatorId, lmOperatorId} = r;
+    usersId.push(uid, operatorId, lmOperatorId);
+  }
+  const usersObject = await UserModel.getUsersObjectByUsersId(usersId);
+  const results = [];
+  for(const r of records) {
+    const {
+      uid,
+      type,
+      pid,
+      reason,
+      num,
+      ip,
+      operatorId,
+      canceled,
+      lmOperatorId,
+      toc,
+      tlm,
+      description,
+      lmOperatorIp,
+    } = r;
+    const user = usersObject[uid];
+    const operator = usersObject[operatorId];
+    if(!user || !operator) continue;
+    const _lmOperator = usersObject[lmOperatorId];
+    let lmOperator = null;
+    if(_lmOperator) {
+      lmOperator = {
+        uid: _lmOperator.uid,
+        avatarUrl: getUrl('userAvatar', _lmOperator.avatar),
+        username: _lmOperator.username,
+        homeUrl: getUrl('userHome', _lmOperator.uid)
+      };
+    }
+    let url = '';
+    if(type === xsfsRecordTypes.post) {
+      url = getUrl('post', pid);
+    } else if(type === xsfsRecordTypes.article) {
+      const article = await ArticleModel.findOnly({_id: pid});
+      const {articleUrl} = await ArticleModel.getArticleUrlBySource(article._id, article.source, article.sid);
+      url = articleUrl;
+    } else if(type === xsfsRecordTypes.comment) {
+      url = getUrl('comment', pid);
+    }
+    const result = {
+      time: timeFormat(toc),
+      user: {
+        uid: user.uid,
+        avatarUrl: getUrl('userAvatar', user.avatar),
+        username: user.username,
+        homeUrl: getUrl('userHome', user.uid),
+      },
+      operator: {
+        uid: operator.uid,
+        avatarUrl: getUrl('userAvatar', operator.avatar),
+        username: operator.username,
+        homeUrl: getUrl('userHome', operator.uid)
+      },
+      num,
+      description,
+      reason,
+      ip,
+      canceled,
+      url,
+      lmOperator,
+      mTime: tlm? timeFormat(tlm): '',
+      lmIp: lmOperatorIp
+    };
+    results.push(result);
+  }
+  return results;
 };
 
 module.exports = mongoose.model('xsfsRecords', xsfsRecordSchema);

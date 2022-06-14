@@ -1,17 +1,5 @@
 <template lang="pug">
   .finance-box
-    //-.finance-head
-      .fa.fa-sliders.option-icon(@click.stop="operationShow")
-      .finance-head-link(v-show="show")
-        a(href=`/shop/order`)
-          .fa.fa-file-text-o
-          | 我的订单
-        a(href=`/shop/manage/order`)
-          .fa.fa-archive
-          | 我出售的
-        a(href=`/shop/cart`)
-          .fa.fa-shopping-cart
-          | 购物车
     .finance-context
       h4 我的资产
         small(v-for="item in targetUserScores").p-l-1.text-success {{item.name}}
@@ -62,7 +50,7 @@
                   span(v-else) {{item.to}}
               th {{item.num / 100}}
               th
-                a(:href="item.post.url" target="_blank" v-if="item.post" ) {{'文号（'+item.pid+'）'}}
+                a(:href="item.url" target="_blank" v-if="item.url" ) 查看详情
                 span(v-if="item.ordersId && item.ordersId.length !== 0" ) {{'订单号（'+item.ordersId.join(', ')}}
         table.table.table-bordered(v-else)
           thead
@@ -94,7 +82,7 @@
                 th
                     span(v-if="item.from === targetUser.uid" ) {{item.num / 100}}
                 th
-                  a(:href="item.post.url" target="_blank" v-if="item.post" ) {{'文号（'+item.pid+'）'}}
+                  a(:href="item.url" target="_blank" v-if="item.url" ) 查看详情
                   span(v-if="item.ordersId && item.ordersId.length !== 0" ) {{'订单号（'+item.ordersId.join(', ')+'）'}}
         .text-center(v-if="kcbsRecords && kcbsRecords.length === 0") 暂无记录
       .m-b-1(v-if="pageButtons.length > 0")
@@ -173,6 +161,9 @@
       margin-top: 1rem;
       font-size: 1rem;
     }
+  }
+  .table-content{
+    max-width: 10rem;
   }
 }
 
