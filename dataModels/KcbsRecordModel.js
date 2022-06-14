@@ -22,10 +22,6 @@ const kcbsRecordSchema = new Schema({
     index: 1
   },
   // 积分类型
-  // digestThread 加精社区文章
-  // digestPost 加精社区评论
-  // digestComment 加精独立文章评论
-  // digestArticle 加精独立文章
   scoreType: {
     type: String,
     required: true,
@@ -38,6 +34,11 @@ const kcbsRecordSchema = new Schema({
     index: 1,
   },
   // 交易类型
+  // digestThread 加精社区文章
+  // digestPost 加精社区评论
+  // digestComment 加精独立文章评论
+  // digestArticle 加精独立文章
+  // ...
   type: {
     type: String,
     required: true,
@@ -72,6 +73,18 @@ const kcbsRecordSchema = new Schema({
   port: {
     type: String,
     default: '0',
+  },
+  // 独立文章ID
+  articleId: {
+    type: String,
+    default: '',
+    index: 1
+  },
+  // 独立文章评论ID
+  commentId: {
+    type: String,
+    default: '',
+    index: 1
   },
   pid: {
     type: String,
@@ -407,6 +420,8 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
   const UserModel = mongoose.model('users');
   const ThreadModel = mongoose.model('threads');
   const PostModel = mongoose.model('posts');
+  const ArticleModel = mongoose.model('articles');
+  const {getUrl} = require('../nkcModules/tools');
   const ForumModel = mongoose.model('forums');
   const KcbsTypeModel = mongoose.model('kcbsTypes');
   const SettingModel = mongoose.model('settings');
@@ -415,7 +430,13 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
   scoreTypes.map(s => {
     scoreTypesObj[s.type] = s.name;
   });
-  const uid = new Set(), pid = new Set(), tid = new Set(), fid = new Set(), kcbsTypesId = new Set();
+  const uid = new Set();
+  const pid = new Set();
+  const tid = new Set();
+  const fid = new Set();
+  const kcbsTypesId = new Set();
+  // articleId
+  const aid = new Set();
   for(const r of records) {
     if(r.from !== 'bank') {
       uid.add(r.from);
@@ -427,6 +448,7 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
     if(r.tid) tid.add(r.tid);
     if(r.fid) fid.add(r.fid);
     if(r.tUid) uid.add(r.tUid);
+    if(r.articleId) aid.add(r.articleId);
     kcbsTypesId.add(r.type);
   }
   const usersObj = {}, threadsObj = {}, forumsObj = {}, postsObj = {}, typesObj = {};
@@ -435,6 +457,12 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
   const forums = await ForumModel.find({fid: {$in: [...fid]}});
   const posts = await PostModel.find({pid: {$in: [...pid]}});
   const types = await KcbsTypeModel.find({_id: {$in: [...kcbsTypesId]}});
+  const articlesObject = await ArticleModel.getArticlesObjectByArticlesId([...aid]);
+  const articlesUrl = {};
+  const articles = Object.values(articlesObject);
+  for(const a of articles) {
+    articlesUrl[a._id] = await ArticleModel.getArticleUrlBySource(a._id, a.source, a.sid);
+  }
   for(const t of types) {
     typesObj[t._id] = t;
   }
@@ -445,7 +473,7 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
     forumsObj[forum.fid] = forum;
   }
   for(const thread of threads) {
-    threadsObj[thread.fid] = thread;
+    threadsObj[thread.tid] = thread;
   }
   for(let post of posts) {
     post = post.toObject();
@@ -468,6 +496,46 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
     }
     r.scoreName = scoreTypesObj[r.scoreType];
     r.kcbsType = typesObj[r.type];
+
+    let url = '';
+
+    if(!url && r.pid) {
+      const post = postsObj[r.pid];
+      if(post) {
+        url = getUrl('post', r.pid);
+      }
+    }
+
+    if(!url && r.tid) {
+      const thread = threadsObj[r.tid];
+      if(thread) {
+        url = getUrl('thread', r.tid);
+      }
+    }
+
+    if(!url && r.fid) {
+      const forum = forumsObj[r.fid];
+      if(forum) {
+        url = getUrl('forum', r.fid);
+      }
+    }
+
+    if(!url && r.articleId) {
+      const articleUrl = articlesUrl[r.articleId];
+      if(articleUrl) {
+        url = articleUrl;
+      }
+    }
+
+    if(!url && r.commentId) {
+      const commentUrl = getUrl('comment', r.commentId);
+      if(commentUrl) {
+        url = commentUrl;
+      }
+    }
+
+    r.url = url;
+
     return r
   });
 };

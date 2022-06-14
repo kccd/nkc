@@ -11,8 +11,7 @@ router
     const digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
     const comment = await db.CommentModel.findOnly({_id: cid});
     if(!comment) ctx.throw(404, '为找到评论， 请刷新后重试');
-    const _comment = (await db.CommentModel.getCommentsByCommentsId([comment._id]))[0];
-    data.comment = _comment;
+    data.comment = (await db.CommentModel.getCommentsByCommentsId([comment._id]))[0];
     const targetUser = await db.UserModel.findOnly({uid: comment.uid});
     data.targetUser = targetUser;
     const redEnvelopeSetting = await db.SettingModel.findOnly({_id: 'redEnvelope'});
@@ -50,7 +49,7 @@ router
         ip: ctx.address,
         description: '',
         num,
-        pid: comment._id,
+        commentId: comment._id,
       });
       await record.save();
     }
@@ -86,8 +85,7 @@ router
     if(!permission('unDigestComment')) ctx.throw(401, '权限不足');
     const comment = await db.CommentModel.findOnly({_id: cid});
     if(!comment) ctx.throw(404, '未找到评论， 请刷新后重试');
-    const _comment = (await db.CommentModel.getCommentsByCommentsId([comment._id]))[0];
-    data.comment = _comment;
+    data.comment = (await db.CommentModel.getCommentsByCommentsId([comment._id]))[0];
     const redEnvelopeSetting = await db.SettingModel.findOnly({_id: 'redEnvelope'});
     const digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
     const targetUser = await db.UserModel.findOnly({uid: comment.uid});
@@ -114,7 +112,7 @@ router
         ip: ctx.address,
         description: '',
         num: additionalReward,
-        pid: comment._id,
+        commentId: comment._id,
       });
       await record.save();
     }

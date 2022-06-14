@@ -22,9 +22,9 @@ router
       if(num%1 !== 0) ctx.throw(400, `${digestRewardScore.name}仅支持到小数点后两位`);
       if(!redEnvelopeSetting.c.draftFee.close && (num < redEnvelopeSetting.c.draftFee.minCount || num > redEnvelopeSetting.c.draftFee.maxCount)) ctx.throw(400, `${digestRewardScore.name}数额不在范围内`);
     }
-  
+
     const usersGeneralSettings = await db.UsersGeneralModel.findOnly({uid: _article.user.uid});
-    
+
     if(article.digest) ctx.throw(400, '文章已被加精');
     const digestTime = Date.now();
     article.digest = true;
@@ -51,7 +51,7 @@ router
             ip: ctx.address,
             description: '',
             num,
-            pid: article._id,
+            articleId: article._id,
         });
         await record.save();
     }
@@ -115,7 +115,7 @@ router
         ip: ctx.address,
         description: '',
         num: additionalReward,
-        pid: article._id,
+        articleId: article._id,
       });
       await record.save();
     }
