@@ -556,6 +556,8 @@ schema.statics.extendSingleComment = async (comment) => {
     type: document.type,
     reason,
     tlm: document.tlm,
+    xsf: [],
+    kcb: [],
     user: {
       uid: user.uid,
       username: user.username,
