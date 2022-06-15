@@ -4,7 +4,7 @@ if !isIncluded('singleComment')
   +includeCSS("/publicModules/commentCenter/singleComment/singleComment.css")
   +includeDeferJS("/publicModules/commentCenter/singleComment/singleComment.js")
   mixin singleComment(props)
-    -var {user, content, _id, order, quote, isAuthor, reason, type, status, uid, toc, tlm, docId, did, commentUrl, digest, kcb, xsf} = props;
+    -var {user, content, _id, order, quote, isAuthor, reason, type, status, uid, toc, tlm, docId, did, commentUrl, digest, kcb, xsf, vote} = props;
     -var {voteUp, voteDown} = props
     .single-post-container(
       data-un-reviewed=status === 'unknown'
@@ -23,4 +23,4 @@ if !isIncluded('singleComment')
       include ./singleCommentCenter
       +singleCommentCenter({content, cid: _id, quote, kcb, xsf})
       include ./singleCommentBottom
-      +singleCommentBottom({cid: _id, docId, props, user, voteDown, voteUp})
+      +singleCommentBottom({cid: _id, docId, props, user, voteDown, voteUp, vote})

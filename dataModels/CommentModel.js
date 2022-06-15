@@ -336,6 +336,7 @@ schema.methods.modifyComment = async function (props) {
 * props: {
 *   comments {object} 需要拓展的评论
 *   uid {string} 当前用户的uid
+*   isModerator {boolean}
 * }
 * */
 schema.statics.extendPostComments = async (props) => {
@@ -347,6 +348,7 @@ schema.statics.extendPostComments = async (props) => {
   const SettingModel = mongoose.model('settings');
   const XsfsRecordModel = mongoose.model('xsfsRecords');
   const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const PostsVoteModel = mongoose.model('postsVotes');
   const creditScore = await SettingModel.getScoreByOperationType('creditScore');
   const {htmlToPlain} = require("../nkcModules/nkcRender");
   const CommentModel = mongoose.model('comments');
@@ -472,6 +474,7 @@ schema.statics.extendPostComments = async (props) => {
       type: documentObj[c.did].type,
       reason: documentObj[c.did]?documentObj[c.did].reason : null, //审核原因
       tlm: documentObj[c.did].tlm,
+      vote: await PostsVoteModel.getVoteByUid({uid, type: 'comment', id: c._id}),
       user: {
         uid: user.uid,
         username: user.username,

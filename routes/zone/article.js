@@ -19,17 +19,15 @@ router
     const {page = 0, last_pages, highlight, t, did, redirect, token} = query;
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     let article = await db.ArticleModel.findOnly({_id: aid});
-    if(1) {
-      data.targetUser = await article.extendUser();
-      data.targetUser.description = renderMarkdown(nkcModules.nkcRender.replaceLink(data.targetUser.description));
-      data.targetUser.avatar = nkcModules.tools.getUrl('userAvatar', data.targetUser.avatar);
-      await data.targetUser.extendGrade();
-      await db.UserModel.extendUserInfo(data.targetUser);
-      // data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);
-      // if(data.targetColumn) {
-      //   data.ColumnPost = await db.ColumnPostModel.findOne({columnId: data.targetColumn._id, type : 'article', pid: article._id});
-      // }
-    }
+    data.targetUser = await article.extendUser();
+    data.targetUser.description = renderMarkdown(nkcModules.nkcRender.replaceLink(data.targetUser.description));
+    data.targetUser.avatar = nkcModules.tools.getUrl('userAvatar', data.targetUser.avatar);
+    await data.targetUser.extendGrade();
+    await db.UserModel.extendUserInfo(data.targetUser);
+    // data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);
+    // if(data.targetColumn) {
+    //   data.ColumnPost = await db.ColumnPostModel.findOne({columnId: data.targetColumn._id, type : 'article', pid: article._id});
+    // }
     if(state.userColumn) {
       data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: state.userColumn._id, type: "article", pid: aid})) > 0;
     }
@@ -51,6 +49,7 @@ router
     data.originUrl = state.url
     data.highlight = highlight;
     data.columnPost = articleRelatedContent;
+    data.columnPost.article.vote = await db.PostsVoteModel.getVoteByUid({uid: user.uid, id: data.columnPost.article._id, type: 'article'});
     data.homeTopped = await db.SettingModel.isEqualOfArr(homeSettings.toppedThreadsId, {id: article._id, type: 'article'});
     const isModerator = await article.isModerator(state.uid);
     //获取当前文章信息

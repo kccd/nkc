@@ -1277,6 +1277,14 @@ schema.statics.getArticlesInfo = async function(articles) {
 }
 
 /*
+* 获取单个article的信息
+* */
+schema.statics.getArticleInfo = async (article) => {
+  const ArticleModel = mongoose.model('articles');
+  return (await ArticleModel.getArticlesInfo(article))[0];
+}
+
+/*
 * 通过指定文章ID获取文章数据
 * @param {[String]} articlesId 文章ID组成的数组
 * @param {String} type 返回的数据类型 array, object

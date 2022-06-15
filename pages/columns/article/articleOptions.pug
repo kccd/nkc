@@ -2,7 +2,7 @@ if !isIncluded('columns/article/articleOptions')
   -var types = {article: 'article', thread: 'thread'};
   +includeCSS('/columns/article/articleOptions.css')
   mixin articleOptions(props)
-    -var {logged, type, _id, tid, collected, digest, voteUp, voteDown, replyCount} = props;
+    -var {logged, type, _id, tid, collected, digest, voteUp, voteDown, replyCount, vote} = props;
     .article-options
 
       mixin replyItem
@@ -37,6 +37,7 @@ if !isIncluded('columns/article/articleOptions')
             article='article'
             vote-up=voteUp
             vote-down=voteDown
+            vote=vote
             )
         //- 鼓励
         if permission('creditKcb')

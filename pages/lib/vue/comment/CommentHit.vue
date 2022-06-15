@@ -1,9 +1,9 @@
 <template lang="pug">
   .comment-vote
-    .comment-vote-up(:class="vote === 'up' ? 'active' : ''" data-cid=cid_ @click="commentsVote(cid_, 'up')")
+    .comment-vote-up(:class="voteType === 'up' ? 'active' : ''" data-cid=cid_ @click="commentsVote(cid_, 'up')")
       .fa.fa-caret-up
       .comment-vote-number(data-cid=cid) {{voteUp_ > 0 ? voteUp_ : ''}}
-    .comment-vote-down(:class="vote === 'down' ? 'active' : ''" data-cid=cid_ @click="commentsVote(cid_, 'down')")
+    .comment-vote-down(:class="voteType === 'down' ? 'active' : ''" data-cid=cid_ @click="commentsVote(cid_, 'down')")
       .fa.fa-caret-down
       .comment-vote-number(data-cid=cid)
 
@@ -72,6 +72,7 @@ export default {
     cid_: '',
     voteUp_: '',
     voteDown_: '',
+    voteType: null,
   }),
   components: {
   },
@@ -81,11 +82,11 @@ export default {
     this.voteDown_ = this.voteDown
   },
   mounted() {
-
+    this.voteType = this.vote;
   },
   methods: {
-    commentsVote(cid,type){
-      self = this;
+    commentsVote(cid, type){
+      const self = this;
       if(!NKC.configs.uid || type === 'login') return toLogin('login');
       if(self.article){
         let url = '/article/' + cid + '/vote/down';
@@ -96,8 +97,9 @@ export default {
           .then(function(data) {
             self.voteUp_ = data.article.voteUp;
             self.voteDown_ = data.article.voteDown;
+            self.switchVote(type);
           })
-      }else {
+      } else {
         let url = '/comment/' + cid + '/vote/down';
         if(type === 'up') {
           url = '/comment/' + cid + '/vote/up';
@@ -106,9 +108,18 @@ export default {
           .then(function(data) {
             self.voteUp_ = data.comment.voteUp;
             self.voteDown_ = data.comment.voteDown;
+            self.switchVote(type);
           })
       }
 
+    },
+    switchVote(type) {
+      const {voteType} = this;
+      if(voteType === type) {
+        this.voteType = null;
+      } else {
+        this.voteType = type;
+      }
     }
 
   }
