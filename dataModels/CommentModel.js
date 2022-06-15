@@ -261,7 +261,7 @@ schema.methods.publishComment = async function (article, toColumn) {
       console.log(err);
     }
   } else {
-    // 如果需要审核就讲渲染好的内容返回
+    // 如果需要审核就将渲染好的内容返回
     const singleCommentData = await CommentModel.getSocketSingleCommentData(this._id);
     renderedComment = {
       articleId: article._id,

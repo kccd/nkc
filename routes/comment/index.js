@@ -73,7 +73,7 @@ router
       articlePost = await db.ArticlePostModel.findOnly({_id: sid});
       if(!articlePost) ctx.throw(400, '未找到引用，请刷新');
     }
-    let article = await db.ArticleModel.findOnly({_id: articlePost?articlePost.sid:sid});
+    let article = await db.ArticleModel.findOnly({_id: articlePost?articlePost.sid : sid});
     if(!article) ctx.throw(400, '未找到文章，请刷新后重试');
     const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
     if(article.status !== normalStatus) {

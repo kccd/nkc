@@ -1495,6 +1495,13 @@ schema.statics.extendArticlesPanelData = async function(articles) {
   const nkcRender = require('../nkcModules/nkcRender');
   const tools = require('../nkcModules/tools');
   articles = await ArticleModel.getArticlesInfo(articles);
+  const contentStatusTypes = {
+    normal: 'normal',
+    warning: 'warning',
+    danger: 'danger',
+    disabled: 'disabled',
+  };
+  const {unknown, disabled, faulty} = articleStatus;
   const _articles = [];
   for(const article of articles) {
     const {document, user: articleUser} = article;
@@ -1515,7 +1522,7 @@ schema.statics.extendArticlesPanelData = async function(articles) {
       voteUpCount: article.voteUp,
       replyCount: article.count
     };
-    _articles.push({
+    const result = {
       type: 'article',
       id: article._id,
       user,
@@ -1523,11 +1530,19 @@ schema.statics.extendArticlesPanelData = async function(articles) {
       categories: [],
       content,
       status: {
-        type: 'normal',
+        type: contentStatusTypes.normal,
         desc: ''
       },
       reply: null
-    });
+    };
+    if(article.status === unknown) {
+      result.status.type = contentStatusTypes.danger
+    } else if(article.status === disabled) {
+      result.status.type = contentStatusTypes.disabled
+    } else if(article.status === faulty) {
+      result.status.type = contentStatusTypes.warning
+    }
+    _articles.push(result);
   }
   return _articles;
 }

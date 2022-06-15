@@ -90,6 +90,146 @@ block eContent
                 label
                   input(type='radio' value='null' v-model='pageSettings.threadListStyle.cover')
                   span 不显示
+          .col-xs-12.col-md-12
+            h4 回复列表样式设置
+          .form-group
+            label.col-sm-3.control-label 显示模式
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='abstract' v-model='pageSettings.articlePanelStyle.common.type')
+                  span 摘要模式
+                label.m-r-1
+                  input(type='radio' value='brief' v-model='pageSettings.articlePanelStyle.common.type')
+                  span 简要模式
+                label
+                  input(type='radio' value='minimalist' v-model='pageSettings.articlePanelStyle.common.type')
+                  span 极简模式
+          .form-group
+            label.col-sm-3.control-label 封面图
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='left' v-model='pageSettings.articlePanelStyle.common.cover')
+                  span 左侧
+                label.m-r-1
+                  input(type='radio' value='right' v-model='pageSettings.articlePanelStyle.common.cover')
+                  span 右侧
+                label
+                  input(type='radio' value='null' v-model='pageSettings.articlePanelStyle.common.cover')
+                  span 不显示
+          .col-xs-12.col-md-12
+            h4 社区最新文章列表样式设置
+          .form-group
+            label.col-sm-3.control-label 显示模式
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='abstract' v-model='pageSettings.articlePanelStyle.latestCommunity.type')
+                  span 摘要模式
+                label.m-r-1
+                  input(type='radio' value='brief' v-model='pageSettings.articlePanelStyle.latestCommunity.type')
+                  span 简要模式
+                label
+                  input(type='radio' value='minimalist' v-model='pageSettings.articlePanelStyle.latestCommunity.type')
+                  span 极简模式
+          .form-group
+            label.col-sm-3.control-label 封面图
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='left' v-model='pageSettings.articlePanelStyle.latestCommunity.cover')
+                  span 左侧
+                label.m-r-1
+                  input(type='radio' value='right' v-model='pageSettings.articlePanelStyle.latestCommunity.cover')
+                  span 右侧
+                label
+                  input(type='radio' value='null' v-model='pageSettings.articlePanelStyle.latestCommunity.cover')
+                  span 不显示
+          .col-xs-12.col-md-12
+            h4 社区顶置最新文章列表样式设置
+          .form-group
+            label.col-sm-3.control-label 显示模式
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='abstract' v-model='pageSettings.articlePanelStyle.latestCommunityTopped.type')
+                  span 摘要模式
+                label.m-r-1
+                  input(type='radio' value='brief' v-model='pageSettings.articlePanelStyle.latestCommunityTopped.type')
+                  span 简要模式
+                label
+                  input(type='radio' value='minimalist' v-model='pageSettings.articlePanelStyle.latestCommunityTopped.type')
+                  span 极简模式
+          .form-group
+            label.col-sm-3.control-label 封面图
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='left' v-model='pageSettings.articlePanelStyle.latestCommunityTopped.cover')
+                  span 左侧
+                label.m-r-1
+                  input(type='radio' value='right' v-model='pageSettings.articlePanelStyle.latestCommunityTopped.cover')
+                  span 右侧
+                label
+                  input(type='radio' value='null' v-model='pageSettings.articlePanelStyle.latestCommunityTopped.cover')
+                  span 不显示
+          .col-xs-12.col-md-12
+            h4 空间最新文章列表样式设置
+          .form-group
+            label.col-sm-3.control-label 显示模式
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='abstract' v-model='pageSettings.articlePanelStyle.latestZone.type')
+                  span 摘要模式
+                label.m-r-1
+                  input(type='radio' value='brief' v-model='pageSettings.articlePanelStyle.latestZone.type')
+                  span 简要模式
+                label
+                  input(type='radio' value='minimalist' v-model='pageSettings.articlePanelStyle.latestZone.type')
+                  span 极简模式
+          .form-group
+            label.col-sm-3.control-label 封面图
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='left' v-model='pageSettings.articlePanelStyle.latestZone.cover')
+                  span 左侧
+                label.m-r-1
+                  input(type='radio' value='right' v-model='pageSettings.articlePanelStyle.latestZone.cover')
+                  span 右侧
+                label
+                  input(type='radio' value='null' v-model='pageSettings.articlePanelStyle.latestZone.cover')
+                  span 不显示
+          .col-xs-12.col-md-12
+            h4 专栏最新文章列表样式设置
+          .form-group
+            label.col-sm-3.control-label 显示模式
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='abstract' v-model='pageSettings.articlePanelStyle.latestColumn.type')
+                  span 摘要模式
+                label.m-r-1
+                  input(type='radio' value='brief' v-model='pageSettings.articlePanelStyle.latestColumn.type')
+                  span 简要模式
+                label
+                  input(type='radio' value='minimalist' v-model='pageSettings.articlePanelStyle.latestColumn.type')
+                  span 极简模式
+          .form-group
+            label.col-sm-3.control-label 封面图
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='left' v-model='pageSettings.articlePanelStyle.latestColumn.cover')
+                  span 左侧
+                label.m-r-1
+                  input(type='radio' value='right' v-model='pageSettings.articlePanelStyle.latestColumn.cover')
+                  span 右侧
+                label
+                  input(type='radio' value='null' v-model='pageSettings.articlePanelStyle.latestColumn.cover')
+                  span 不显示
           .form-group
             label.col-sm-3.control-label
             .col-sm-3
