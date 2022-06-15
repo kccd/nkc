@@ -71,7 +71,7 @@ export function GetSelectedArticlesInfo(container) {
   for(let i = 0; i < input.length; i++) {
     const _input = input.eq(i);
     if(!_input.prop('checked')) continue;
-    const item = _input.parent('.articles-panel-item');
+    const item = _input.parents('.articles-panel-item');
     if(item.length === 0) continue;
     articlesInfo.push({
       type: item.attr('data-article-type'),

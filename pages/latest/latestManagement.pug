@@ -1,0 +1,18 @@
+if !isIncluded('latest/management.pug')
+  mixin renderLatestManagement(move, remove)
+    span#latestManagement(v-cloak)
+      .paging-button
+        a.button.radius-left.radius-right(@click='switchStatus') 管理
+      .paging-button.latest-management-buttons(v-if='status === statusList.display')
+        a.button.radius-left(@click='selectAll') 全选
+        if move
+          a.button(@click='move') 移动
+        if remove
+          a.button.radius-right(@click='remove') 退修或删除
+  mixin renderLatestThreadManagement()
+    +renderLatestManagement(true, true)
+
+  mixin renderLatestArticleManagement()
+    +renderLatestManagement(false, true)
+
+  +includeJS('/latest/latestManagement.js')

@@ -4,21 +4,16 @@ router
     // 公共数据
     const {query, data, db} = ctx;
     let {t} = query;
-    const serverSettings = await db.SettingModel.getSettings('server');
-    const serverTitle = `${serverSettings.websiteName} - ${serverSettings.brief}`;
-    let pageTitle = `社区最新文章 - ${serverTitle}`;
     const communityTypes = {
       thread: 'thread',
       post: 'post'
     };
     if(t !== communityTypes.thread) {
       t = communityTypes.post;
-      pageTitle = `社区最新回复 - ${serverTitle}`;
     }
     data.communityTypes = communityTypes;
     data.t = t;
-    data.pageTitle = pageTitle;
-    ctx.remoteTemplate = 'latest/community.pug';
+    data.pageTitle = `社区最新 - ${data.pageTitle}`;
     await next();
   })
   // 回复
@@ -140,6 +135,7 @@ router
     }
     data.paging = paging;
     data.posts = posts;
+    ctx.remoteTemplate = 'latest/community/post.pug';
     await next();
   })
   // 文章
@@ -198,18 +194,11 @@ router
       categoriesId: 1,
       disabled: 1, recycleMark: 1
     }).skip(paging.start).limit(paging.perpage).sort(sort);
-    threads = await db.ThreadModel.extendThreads(threads, {
-      htmlToText: true,
-      removeLink: true,
-      forum: true,
-      extendColumns: false
-    });
 
-    const _threads = [];
     const superModerator = ctx.permission("superModerator");
-    for(const thread of threads) {
+    threads = threads.filter(thread => {
       if(thread.disabled || thread.recycleMark) {
-        if(!user) continue;
+        if(!user) return false;
         if(!superModerator) {
           let isModerator = false;
           const mainForumsId = thread.mainForumsId;
@@ -219,18 +208,19 @@ router
               break;
             }
           }
-          if(!isModerator) continue;
+          if(!isModerator) return false;
         }
       }
-      _threads.push(thread);
-    }
+      return true;
+    });
     data.s = s;
     data.latestCommunityArticlePanelStyle = pageSettings.articlePanelStyle.latestCommunity;
     data.latestCommunityToppedArticlePanelStyle = pageSettings.articlePanelStyle.latestCommunityTopped;
     data.paging = paging;
     const latestToppedThreads = await db.ThreadModel.getLatestToppedThreads(fidOfCanGetThreads);
-    data.articlesData = await db.ThreadModel.extendArticlesPanelData(_threads);
+    data.articlesPanelData = await db.ThreadModel.extendArticlesPanelData(threads);
     data.toppedArticlesData = await db.ThreadModel.extendArticlesPanelData(latestToppedThreads);
+    ctx.remoteTemplate = 'latest/community/thread.pug';
     await next();
   });
 module.exports = router;

@@ -1,0 +1,42 @@
+extends ./communityBase
+block communityTitle
+  title=data.pageTitle
+block communityContent
+
+  //- 管理
+  if data.permissions.isSuperModerator
+    include ../latestManagement
+    +renderLatestThreadManagement()
+
+
+  include ./communityTypes
+  +renderLatestCommunityTypes(data.t, data.communityTypes)
+
+  //- 文章排序方式
+  .paging-button
+    a.button.radius-left(
+      href=`/n/community?t=${data.t}&s=tlm`
+      class=data.s !== 'toc'? 'active': ''
+      ) 复序
+    a.button.radius-right(
+      href=`/n/community?t=${data.t}&s=toc`
+      class=data.s === 'toc'? 'active': ''
+      ) 贴序
+
+  include ../../publicModules/paging/paging
+
+  //- 社区最新页置顶
+  if data.toppedArticlesData && data.toppedArticlesData.length > 0
+    include ../../publicModules/articlePanel/articlePanel
+    +ArticlesPanel(data.toppedArticlesData, data.latestCommunityToppedArticlePanelStyle)
+    .topped-thread-header - 以上是置顶 -
+  //- 社区最新文章
+  if data.articlesPanelData && data.articlesPanelData.length > 0
+    include ../../publicModules/articlePanel/articlePanel
+    +ArticlesPanel(data.articlesPanelData, data.latestCommunityArticlePanelStyle)
+  else
+    .p-t-5.p-b-5.text-center 空空如也~
+
+  if data.paging && data.paging.buttonValue.length > 0
+    .m-t-1
+      include ../../publicModules/paging/paging_input

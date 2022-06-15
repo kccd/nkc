@@ -1,6 +1,6 @@
 extends ../bootstrap_base
 block title
-  block communityTitle
+  block latestTitle
 block content
   .container-fluid.max-width
     .row
@@ -11,7 +11,7 @@ block content
         +renderSubscribeForums(data.subscribeForums)
         +renderCategoryForums(data.categoryForums)
       .col-xs-12.col-md-7.box-shadow-panel.p-r-0
-        block communityContent
+        block latestContent
       .col-xs-12.col-md-3.hidden-xs.hidden-sm.box-shadow-panel
         include ../publicModules/canvas_logo
         +renderCanvasLogo(data.homeBigLogo)
@@ -25,4 +25,4 @@ block content
         +sideThreadsPanel(data.featuredThreads, '精选文章', false)
         +sideThreadsPanel(data.recommendThreads, '推荐文章', false)
 block scripts
-  block communityScripts
+  block latestScripts

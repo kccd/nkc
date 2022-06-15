@@ -14,6 +14,9 @@ router
       visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
     }
 
+    const serverSettings = await db.SettingModel.getSettings('server');
+    const pageTitle = `${serverSettings.websiteName} - ${serverSettings.brief}`;
+
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,
@@ -33,6 +36,10 @@ router
     data.visitedForums = visitedForums;
     data.categoryForums = state.categoryForums;
     data.subscribeForums = state.subForums;
+    data.permissions = {
+      isSuperModerator: ctx.permission("superModerator")
+    };
+    data.pageTitle = pageTitle
     internalData.fidOfCanGetThreads = fidOfCanGetThreads;
     await next();
   })

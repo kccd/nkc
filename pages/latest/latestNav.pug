@@ -1,8 +1,8 @@
 if !isIncluded('latest/community/nav.pug')
-mixin renderCommunityNav(activeType)
+mixin renderLatestNav(activeType)
   ul.community-nav.nav.nav-tabs.m-b-1
     li(role="presentation" class=activeType === 'community'? 'active': '')
-      a(href=`/n/community`) 论坛
+      a(href=`/n/community`) 社区
     li(role="presentation" class=activeType === 'zone'? 'active': '')
       a(href=`/n/zone`) 空间
     li(role="presentation" class=activeType === 'column'? 'active': '')
