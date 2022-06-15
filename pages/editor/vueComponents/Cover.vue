@@ -7,7 +7,7 @@
       .fa.fa-plus
     div(v-else)
       .editor-cover-img
-        img(:src="coverUrl" v-if="coverUrl")
+        img(:src="setUrl" v-if="url || coverUrl")
         //- img(:src="getUrl('postCover', cover)" v-else-if="cover")
       .m-t-05
         button.btn.btn-default.btn-sm(@click="selectCover") 重新选择
@@ -25,10 +25,15 @@ import { fileToBase64 } from "../../lib/js/file";
 import { getUrl } from "../../lib/js/tools";
 export default {
   data: () => ({
+    // 值用来转为路径
     cover: "",
+    // base64
     coverUrl: "",
-    type: "newThread",
+    // 图片对象
     coverData: "",
+    // 路径
+    url: '',
+    type: "newThread",
     changeContentDebounce: ''
   }),
   components: {
@@ -48,16 +53,23 @@ export default {
       immediate: true,
       handler(n) {
         if (!(typeof this.value === "undefined"))
-          this.coverUrl = getUrl("postCover", n);
+          this.url = getUrl("postCover", n);
+          this.cover = n;
       }
     },
-    coverUrl(n) {
+    coverUrl() {
       this.changeContentDebounce()
+    }
+  },
+  computed: {
+    setUrl() {
+      return this.url || this.coverUrl
     }
   },
   methods: {
     changeContent() {
-      console.log('emit')
+      // this.$emit('info-change');
+      this.$emit('info-change')
     },
     selectCover() {
       this.$refs.resourceSelector.open(
@@ -79,6 +91,8 @@ export default {
               fileToBase64(res)
                 .then(res => {
                   this.coverUrl = res;
+                  this.url = '';
+                  this.cover = '';
                 })
                 .catch(err => {
                   sweetError(err);
@@ -99,9 +113,14 @@ export default {
       );
     },
     removeCover() {
+      this.url = "";
       this.cover = "";
       this.coverData = "";
       this.coverUrl = "";
+    },
+    setCover(v) {
+      this.url = getUrl("postCover", v);
+      this.cover = v;
     },
     getData() {
       return {

@@ -59,10 +59,6 @@ export default {
     openOnEditNotes: localStorage.getItem("open-on-edit-notes") === "yes",
     titleChangeDebounce: ''
   }),
-  created() {
-    // this.debounce = debounce
-
-  },
   mounted() {
     this.titleChangeDebounce = debounce(this.titleChange, 2000);
 
@@ -88,7 +84,7 @@ export default {
       return { t: this.titleValue };
     },
     titleChange(){
-      console.log('emit')
+      this.$emit('info-change');
     }
   }
 };

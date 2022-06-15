@@ -90,7 +90,7 @@
       ) 添加
   div(v-if="threadCategories.length > 0")
     .editor-thread-category(
-      v-for="c in threadCategories",
+      v-for="(c, i) in threadCategories",
       v-if="c.nodes.length > 0"
     )
       .editor-header(:title="c.description") {{ c.name }}
@@ -101,13 +101,13 @@
       .editor-thread-category-nodes
         .editor-thread-category-node(
           v-for="n in c.nodes",
-          @click="selectThreadCategory(c, n)",
+          @click="selectThreadCategory(i, n)",
           :class="{ active: c.selectedNode === n }",
           :title="n.description"
         )
           span {{ n.name }}
         .editor-thread-category-node(
-          @click="selectThreadCategory(c, 'default')",
+          @click="selectThreadCategory(i, 'default')",
           :class="{ active: c.selectedNode === 'default' }"
         )
           span {{ c.nodeName }}
@@ -149,23 +149,30 @@ export default {
     data: {
       immediate: true,
       handler(n) {
+        // this.threadCategories = n.threadCategories || [];
         this.threadCategories = n.threadCategories || [];
+        this.threadCategories = this.selectionStatus(n.post?.tcId, n.threadCategories) || [];
         this.minorForumCount = n.minorForumCount || [];
         this.selectedForums = n.mainForums || [];
       }
     },
-    mainForum(n) {
-      console.log(n);
-      this.changeContentDebounce()
+    mainForum: {
+      deep: true,
+      handler() {
+        this.changeContentDebounce()
+      }
     },
-    minorForums(n) {
-      console.log(n);
-      this.changeContentDebounce()
+    minorForums: {
+      deep: true,
+      handler() {
+        this.changeContentDebounce()
+      }
     },
-    threadCategories(n) {
-      console.log('测试分')
-      this.changeContentDebounce()
-
+    threadCategories: {
+      deep: true,
+      handler(n) {
+        this.changeContentDebounce()
+      }
     }
   },
   computed: {
@@ -197,8 +204,21 @@ export default {
     }
   },
   methods: {
+    selectionStatus(tcId, threadCategories) {
+      if(!tcId && threadCategories) return threadCategories
+      if(!threadCategories && !threadCategories.length) return
+      for( let obj of threadCategories) {
+          obj.selectedNode = ''    
+          for (let node of obj.nodes) {
+            if(tcId.includes(node._id)) {
+              obj.selectedNode = node
+            }
+          }
+      }
+      return threadCategories;
+    },
     changeContent() {
-      console.log('emit')
+      this.$emit('info-change');
     },
     objToStr(obj){
       return objToStr(obj)
@@ -214,9 +234,9 @@ export default {
     setUrl(type, id) {
       return getUrl(type, id);
     },
-    selectThreadCategory(c, n) {
-      c.selectedNode = n;
-      this.$forceUpdate();
+    selectThreadCategory(i, n) {
+      this.$delete(this.threadCategories[i], 'selectedNode');
+      this.$set(this.threadCategories[i], 'selectedNode', n);
     },
     selectForumsByType(type) {
       let self = this;

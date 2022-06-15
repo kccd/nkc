@@ -56,16 +56,16 @@ export default {
       },
     },
     en() {
-      this.changeContent()
+      this.changeContentDebounce()
     },
     cn() {
-      this.changeContent()
+      this.changeContentDebounce()
     }
   },
   methods: {
     changeContent() {
       // 统一发送一个事件
-      console.log('emit')
+      this.$emit('info-change');
     },
     getData() {
       return {

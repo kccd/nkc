@@ -20,6 +20,7 @@ const commentsRouter = require('./comments');
 const commentRouter = require('./comment');
 const router = new Router();
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
+const { ObjectId } = require('mongodb');
 
 router
   .get('/:pid', async (ctx, next) => {
@@ -292,7 +293,7 @@ router
 
     const {
       columnMainCategoriesId = [], columnMinorCategoriesId = [], anonymous, t, c, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState,
-      survey, did, cover = ""
+      survey, did, cover = "", _id
     } = post;
     const {pid} = ctx.params;
     const {state, data, db, nkcModules} = ctx;
@@ -490,13 +491,23 @@ router
     }
 
     // 帖子曾经在草稿箱中，发表时，删除草稿
-    if(did) {
-      await db.DraftModel.removeDraftById(did, data.user.uid);
+    // if(did) {
+    //   await db.DraftModel.removeDraftById(did, data.user.uid);
+    // }
+    if(_id) {
+      const beta = (await db.DraftModel.getType()).beta;
+      const stableHistory = (await db.DraftModel.getType()).stableHistory;
+      const res =await db.DraftModel.updateOne({_id: ObjectId(_id), uid: data.user.uid, type: beta}, {
+        $set: {
+          type: stableHistory,
+          tlm: Date.now()
+        }
+      });
     }
     await targetUser.updateUserMessage();
-    if(!postReviewed) {
+    // if(!postReviewed) {
       // await db.MessageModel.sendReviewMessage(singlePost.pid);
-    }
+    // }
     await next();
   })
   .use("/:pid/hide", hideRouter.routes(), hideRouter.allowedMethods())

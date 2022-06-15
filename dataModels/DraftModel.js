@@ -232,8 +232,24 @@ draftSchema.statics.getBeta = async (did, desType, uid) => {
   
 }
 /* 
-*
+* 扩展threadCategories
+* param {Array} tcId 
 */
+draftSchema.statics.extendThreadCategories = async function(tcId) {
+  if(!tcId) throw "参数不存在"
+  const ThreadCategoryModel = mongoose.model('threadCategories');
+  const threadCategories = await ThreadCategoryModel.getCategoriesById(tcId);
+  const threadCategoriesWarning = [];
+  for(const tc of threadCategories) {
+    if(tc.categoryThreadWarning) {
+      threadCategoriesWarning.push(tc.categoryThreadWarning);
+    }
+    if(tc.nodeThreadWarning) {
+      threadCategoriesWarning.push(tc.nodeThreadWarning);
+    }
+  }
+  return  { threadCategories, threadCategoriesWarning }
+};
 /* 
   点击保存时检查是否应该创建历史版本
 */
@@ -304,12 +320,10 @@ draftSchema.methods.copyToBetaHistory = async function () {
   const preDraft = this.toObject();
   delete preDraft._id;
   const betaDraft = await DraftModel.findOne({did: this.did, type: beta});
-  console.log(betaDraft,'latestHistoryDraft')
   // 创建一条编辑历史内容
   const draft = DraftModel({...preDraft, tlm: betaDraft.tlm , type: betaHistory});
   await draft.save();
 }
-
 
 /*
 * 通过草稿ID删除草稿，若草稿上有调查表ID则删除调查表

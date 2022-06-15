@@ -27,7 +27,7 @@
     .btn-area
       button.btn.btn-theme(
         @click="readyData",
-        :disabled="disabledSubmit || !checkProtocol"
+        :disabled="submitStatus || (disabledSubmit || !checkProtocol)"
       ) {{ disabledSubmit ? '提交中...' : '提交' }}
       button.btn.btn-default(@click="saveToDraftBase('manual')") 存草稿
       button.btn.btn-default(@click="history") 历史
@@ -73,7 +73,9 @@ export default {
     saveDraftTimeout: 60000,
     saveData: '',
     setInterval: '',
-    draft: ''
+    draft: '',
+    // 判断是否有草稿ID
+    submitStatus: true
   }),
   watch: {
     data : {
@@ -121,6 +123,10 @@ export default {
   },
   methods: {
     addUrlParam,
+    // boolean
+    setSubmitStatus(v) {
+      this.submitStatus = v
+    },
     checkString: NKC.methods.checkData.checkString,
     checkEmail: NKC.methods.checkData.checkEmail,
     visitUrl: NKC.methods.visitUrl,
@@ -172,7 +178,7 @@ export default {
             saveData.t ||
             saveData.c ||
             !saveData.tcId ||
-            this.tcId.length ||
+            saveData.tcId.length ||
             saveData.cids.length ||
             saveData.fids.length ||
             saveData.cover ||
@@ -200,12 +206,29 @@ export default {
         if(saveType === 'manual') {
           return sweetError("请先输入内容")
         }else {
+          // 如果连内容都不存在
           return
         }
       };
+      // 如果没有内容不更新
+      // 主要问题是watch引起
+      if (
+          !(
+            saveData.t ||
+            saveData.c ||
+            saveData.tcId?.length ||
+            saveData.cids?.length ||
+            saveData.fids?.length ||
+            saveData.cover ||
+            saveData.keyWordsCn?.length ||
+            saveData.keyWordsEn?.length  ||
+            saveData.authorInfos?.length ||
+            saveData.survey
+          )
+        ) return
       let type = this.type;
       return Promise.resolve()
-        .then((res) => {
+        .then(() => {
           // let post = this.getPost();
           let desType, desTypeId;
           if (type === "newThread") {
@@ -231,6 +254,10 @@ export default {
             throw "未知的草稿类型";
           }
           let formData = new FormData();
+          if(saveData.cover) {
+            saveData.coverData = ''
+            saveData.coverUrl = ''
+          }
           formData.append(
             "body",
             JSON.stringify({
@@ -265,14 +292,15 @@ export default {
           }
           this.draftId = data.draft?.did;
           if (data.draft?.cover) {
-            this.coverData = "";
-            this.coverUrl = "";
-            this.cover = data.draft.cover;
+            this.$emit('cover-change',  data.draft.cover);
           }
           return Promise.resolve(data);
         })
         .then((res) => {
           if(!location.search.includes("aid")) this.addUrlParam("aid", res.draft._id);
+          // 解锁提交按钮
+          // this.$emit('save-draft-success');
+          this.setSubmitStatus(false);
           if (saveType === "manual") {
             sweetSuccess("草稿已保存");
             this.saveToDraftSuccess();
