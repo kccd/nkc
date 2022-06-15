@@ -53,18 +53,18 @@ block content
                   .panel.panel-default(style="border:0;margin-bottom:0")
                     .panel-heading.paperHeader Abstract
                     .panel-body!=LineFeedConversion(data.document.abstractEn)
-            if (data.document.keywordsCn && data.document.keywordsCn.length || data.document.keywordsEn && data.document.keywordsEn.length)
+            if (data.document.keyWordsCn && data.document.keyWordsCn.length || data.document.keyWordsEn && data.document.keyWordsEn.length)
               .keyWordsCn(style="margin-top:1rem;")
                 .panel.panel-default(style="border:0;margin-bottom:0")
                   .panel-heading.paperHeader 关键词
                   .panel-body(style="padding:5px")
-                    if data.document.keywordsCn.length
+                    if data.document.keyWordsCn.length
                       div
-                        for keyCn in data.document.keywordsCn
+                        for keyCn in data.document.keyWordsCn
                           span.keyWordstagCn(style="cursor:pointer")!=keyCn
-                    if data.document.keywordsEn.length
+                    if data.document.keyWordsEn.length
                       div(style="margin-top:5px")
-                        for keyEn in data.document.keywordsEn
+                        for keyEn in data.document.keyWordsEn
                           span.keyWordstagEn(style="cursor:pointer")!=keyEn
               //- .book-content-content!=data.document.content
             .book-content-content!=data.document.content
