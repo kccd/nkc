@@ -10,7 +10,8 @@ block content
       include ../publicModules/checkDefaultUsername
       .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom.box-shadow-panel.p-r-0
         include ../publicModules/forums_nav/forums_tree
-        +renderCategoryForums
+        +renderVisitedForums(data.visitedForums)
+        +renderCategoryForums(state.categoryForums)
       .col-xs-12.col-md-7.box-shadow-panel.p-r-0
         if !state.isApp && data.user && state.subForums.length
           .m-b-1
@@ -150,6 +151,7 @@ block content
         .hidden-xs.hidden-sm#rightDom.box-shadow-panel
           .hidden-xs.hidden-sm.m-b-1
             include ../publicModules/canvas_logo
+            +renderCanvasLogo(data.homeBigLogo)
           include ../publicModules/improveUserInfo
           include ../publicModules/management/management
           +managementPanel(data.managementData)

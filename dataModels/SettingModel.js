@@ -909,12 +909,17 @@ settingSchema.statics.restrictAccess = async (props) => {
  */
 settingSchema.statics.getHomeBigLogo = async () => {
   const SettingModel = mongoose.model('settings');
+  const {getUrl} = require('../nkcModules/tools');
   const homeSettings = await SettingModel.getSettings('home');
+  const urls = [];
   if(!homeSettings.homeBigLogo || !(homeSettings.homeBigLogo.length)) {
-    return [];
+    urls.push(getUrl('siteFile', 'kclogo_misaka1.png'));
   } else {
-    return homeSettings.homeBigLogo;
+    for(const logo of homeSettings.homeBigLogo) {
+      urls.push(getUrl('homeBigLogo', logo));
+    }
   }
+  return urls;
 }
 
 

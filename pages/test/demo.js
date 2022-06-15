@@ -5,6 +5,6 @@ const app = new Vue({
     credit: Credit
   },
   mounted() {
-    this.$refs.credit.open(creditTypes.xsf, contentTypes.post, '904546');
+    // this.$refs.credit.open(creditTypes.xsf, contentTypes.post, '904546');
   }
 })

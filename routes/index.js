@@ -88,6 +88,8 @@ const articleRouter = routers.article;
 const momentRouter = routers.moment;
 // 后台设置
 const settingsRouter = routers.settings;
+// 最新页
+const latestRouter = routers.latest;
 
 const path = require('path');
 
@@ -209,4 +211,5 @@ router.use('/g', subscribeRouter.routes(), subscribeRouter.allowedMethods());
 router.use('/article', articleRouter.routes(), articleRouter.allowedMethods());
 router.use('/moment', momentRouter.routes(), momentRouter.allowedMethods());
 router.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods());
+router.use('/n', latestRouter.routes(), latestRouter.allowedMethods());
 module.exports = router;

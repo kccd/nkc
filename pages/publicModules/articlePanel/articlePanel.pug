@@ -23,6 +23,7 @@ if !isIncluded('publicModules/articlePanel')
         coverUrl: String,
         title: String,
         url: String,
+        digest: Boolean,
         abstract: String,
         readCount: Number,
         voteUpCount: Number,
@@ -182,7 +183,7 @@ if !isIncluded('publicModules/articlePanel')
                 span=content.replyCount
         .article-panel-title
           a.article-panel-title-content(href=content.url target='_blank' class=pages.length > 0? 'm-r-05':'')
-            span=content.title
+            span(class=content.digest? 'digest': '')=content.title
           for page in pages
             a.article-panel-title-page(class=page.url?'active':'' target='_blank' href=page.url)=page.name
         .article-panel-content(class=coverClass)
@@ -231,7 +232,8 @@ if !isIncluded('publicModules/articlePanel')
           img(src=user.avatarUrl)
       .article-panel-right
         .article-panel-title
-          a.article-panel-title-content(href=content.url target='_blank' class=pages.length > 0? 'm-r-05':'')=content.title
+          a.article-panel-title-content(href=content.url target='_blank' class=pages.length > 0? 'm-r-05':'')
+            span(class=content.digest? 'digest': '')=content.title
           for page in pages
             a.article-panel-title-page(class=page.url?'active':'' target='_blank' href=page.url)=page.name
         .article-panel-header
@@ -300,7 +302,8 @@ if !isIncluded('publicModules/articlePanel')
           img(src=user.avatarUrl)
       .article-panel-center
         .article-panel-title
-          a(href=content.url class=pages.length > 0?  'm-r-05':'' target='_blank').article-panel-title-content=content.title
+          a(href=content.url class=pages.length > 0?  'm-r-05':'' target='_blank').article-panel-title-content
+            span(class=content.digest? 'digest': '')=content.title
           for page in pages
             a.article-panel-title-page(class=page.url ? 'active' : '' target='_blank' href=page.url)=page.name
       .article-panel-right

@@ -1,0 +1,9 @@
+if !isIncluded('latest/community/nav.pug')
+mixin renderCommunityNav(activeType)
+  ul.community-nav.nav.nav-tabs.m-b-1
+    li(role="presentation" class=activeType === 'community'? 'active': '')
+      a(href=`/n/community`) 论坛
+    li(role="presentation" class=activeType === 'zone'? 'active': '')
+      a(href=`/n/zone`) 空间
+    li(role="presentation" class=activeType === 'column'? 'active': '')
+      a(href=`/n/column`) 专栏
