@@ -4,8 +4,8 @@
     .paging-button(v-if="permissions.type === 'thread'")
       a.pointer.button.radius-left.radius-right(@click="managementPosts()") 管理
       span.post-management-button
-        a.pointer.button(@click="selectAll()") 全选
-        a.pointer.button.radius-right(@click="toColumn()") 推送到专栏
+        a.pointer.button(@click="selectAll()" v-if="managementBtn") 全选
+        a.pointer.button.radius-right(@click="toColumn()" v-if="managementBtn") 推送到专栏
     .post-item(v-for="(post, index) in posts")
       hr(v-if="index")
       review(ref="review" :post="post" :permissions="permissions" @refresh="refreshPage" v-if="!post.reviewed")
