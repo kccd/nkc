@@ -72,6 +72,7 @@ testRouter
           time: post.toc,
           coverUrl: tools.getUrl('postCover', post.cover),
           title: post.t,
+          digest: post.digest,
           url: tools.getUrl('thread', thread.tid),
           abstract: ctx.nkcModules.nkcRender.htmlToPlain(post.c, 200),
           readCount: thread.hits,

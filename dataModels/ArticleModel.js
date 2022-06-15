@@ -55,16 +55,6 @@ const schema = new mongoose.Schema({
     default: null,
     index: 1,
   },
-  //支持数
-  voteUp: {
-    type: Number,
-    default: 0,
-    index: 1
-  },
-  voteDown: {
-    type: Number,
-    index:1,
-  },
   // 文章状态
   // normal: 正常的（已发布，未被删除）this
   // default: 未发布的（正在编辑，待发布）
@@ -1519,6 +1509,7 @@ schema.statics.extendArticlesPanelData = async function(articles) {
       coverUrl: tools.getUrl('documentCover', document.cover),
       title: document.title,
       url: article.url,
+      digest: article.digest,
       abstract: nkcRender.htmlToPlain(document.content, 200),
       readCount: article.hits,
       voteUpCount: article.voteUp,

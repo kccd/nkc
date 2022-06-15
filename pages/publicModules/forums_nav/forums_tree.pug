@@ -52,7 +52,7 @@ mixin renderForums(forums)
 mixin renderSimpleForums(forums)
   for forum in forums
     .forum-simple
-      a.forum-parent(href=tools.getUrl('forumHome', forum.fid)
+      a.forum-parent(href=`/f/${forum.fid}`
         data-global-mouseover="showForumPanel"
         data-global-mouseout="hideForumPanel"
         data-global-data=objToStr({fid: forum.fid})
@@ -62,7 +62,7 @@ mixin renderSimpleForums(forums)
           span ：
         else
           span |
-        a.forum-child(href=tools.getUrl('forumHome', cf.fid)
+        a.forum-child(href=`/f/${cf.fid}`
           data-global-mouseover="showForumPanel"
           data-global-mouseout="hideForumPanel"
           data-global-data=objToStr({fid: cf.fid})
@@ -104,7 +104,7 @@ mixin renderSimpleForums(forums)
             .forum-block-info
               a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
 
-if data.user && data.forum && state.subForums && state.subForums.length >0
+//-if data.user && data.forum && state.subForums && state.subForums.length >0
   .m-b-1
     .panel-header 关注的专业
       .panel-header-right-button
@@ -124,7 +124,7 @@ if data.user && data.forum && state.subForums && state.subForums.length >0
               else
                 .forum-block-icon(style=`background-color: ${forum.color}`)
             a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
-if data.visitedForums && data.visitedForums.length
+//-if data.visitedForums && data.visitedForums.length
   .m-b-1
     .panel-header 最近访问
     .home-topic-item-div
@@ -148,9 +148,37 @@ if data.visitedForums && data.visitedForums.length
     .forum-block
       .forum-block-info
         a(href=`/?t=latest`).forum-block-name 最新文章
-mixin renderCategoryForums
-  if state.categoryForums
-    for fc in state.categoryForums
+mixin renderSubscribeForums(forums)
+  if forums && forums.length > 0
+    .m-b-1
+      .panel-header 关注的专业
+        .panel-header-right-button
+          a(href=`/u/${data.user.uid}/profile/subscribe/forum` target="_blank") 管理
+      .home-topic-item-div
+        for forum in forums
+          a.forum-inline-name.forum-block-name(href=`/f/${forum.fid}`
+            data-global-mouseover="showForumPanel"
+            data-global-mouseout="hideForumPanel"
+            data-global-data=objToStr({fid: forum.fid})
+          )=forum.displayName
+
+mixin renderVisitedForums(forums)
+  if forums && forums.length > 0
+    .m-b-1
+      .panel-header 最近访问
+      .home-topic-item-div
+        for forum in forums
+          a(href=`/f/${forum.fid}`
+            data-global-mouseover="showForumPanel"
+            data-global-mouseout="hideForumPanel"
+            data-global-data=objToStr({fid: forum.fid})
+          ).forum-inline-name.forum-block-name=forum.displayName
+
+mixin renderCategoryForums(categoryForums)
+  if !categoryForums && state && state.categoryForums
+    -categoryForums = state.categoryForums
+  if categoryForums
+    for fc in categoryForums
       if fc.forums.length
         .m-b-1
           .panel-header(title=fc.description)=fc.name
@@ -174,13 +202,13 @@ mixin renderForumsBreadcrumb(name, forums)
     .m-b-1
       .panel-header=name
       .home-topic-item-div.bread-crumb
-        a.forum-block-name.forum-inline-name(href='/?t=home' title=state.serverSettings.brief) 主页
+        a.forum-block-name.forum-inline-name(href='/?t=home' title=remoteState.serverSettings.brief) 主页
         for n in forums
           -var {fid, name, cid} = n;
           span.m-r-05 /
           a.forum-block-name.forum-inline-name(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}` data-float-fid=fid)= name
 
-if state.categoryForums
+//-if state.categoryForums
   for fc in state.categoryForums
     if fc.forums.length
       .m-b-1

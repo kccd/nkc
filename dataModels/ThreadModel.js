@@ -855,6 +855,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       voteUp: 1,
       reviewed: 1,
       voteDown: 1,
+      digest: 1,
       cover: 1,
       abstractCn: 1,
       disabled: 1,
@@ -964,7 +965,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         }
         firstPost.user = user;
       }
-      thread.firstPost = firstPost;
+      thread.firstPost = firstPost.toObject();
     }
     if(o.lastPost) {
       if(!thread.lm || thread.lm === thread.oc) {
@@ -981,7 +982,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
           }
           lastPost.user = user;
         }
-        thread.lastPost = lastPost;
+        thread.lastPost = lastPost.toObject();
       }
 
     }
@@ -1292,6 +1293,12 @@ threadSchema.statics.extendArticlesPanelData = async function(threads) {
   const pageSettings = await SettingModel.getSettings('page');
   const tools = require('../nkcModules/tools');
   const anonymousUser = tools.getAnonymousInfo();
+  const contentStatusTypes = {
+    normal: 'normal',
+    warning: 'warning',
+    danger: 'danger',
+    disabled: 'disabled',
+  };
   threads = await ThreadModel.extendThreads(threads, {
     forum: true,
     category: true,
@@ -1324,6 +1331,7 @@ threadSchema.statics.extendArticlesPanelData = async function(threads) {
       time: thread.toc,
       coverUrl: tools.getUrl('postCover', firstPost.cover),
       title: firstPost.t,
+      digest: firstPost.digest,
       url: tools.getUrl('thread', thread.tid),
       abstract: firstPost.c,
       readCount: thread.hits,
@@ -1388,6 +1396,20 @@ threadSchema.statics.extendArticlesPanelData = async function(threads) {
         pages[pagesLength - 1]
       ];
     }
+    const status = {
+      type: contentStatusTypes.normal,
+      desc: ''
+    };
+    if(!thread.reviewed) {
+      status.type = contentStatusTypes.danger;
+      status.desc = '审核中';
+    } else if(thread.disabled) {
+      status.type = contentStatusTypes.disabled;
+      status.desc = '已屏蔽，仅自己可见';
+    } else if(thread.recycleMark) {
+      status.type = contentStatusTypes.warning;
+      status.desc = '退修中，仅自己可见，修改后对所有人可见';
+    }
     _threads.push({
       type: 'thread',
       id: thread.tid,
@@ -1396,10 +1418,7 @@ threadSchema.statics.extendArticlesPanelData = async function(threads) {
       content,
       categories,
       reply,
-      status: {
-        type: 'normal',
-        desc: ''
-      }
+      status,
     });
   }
   return _threads;

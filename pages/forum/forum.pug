@@ -40,6 +40,8 @@ block content
     .row
       .col-xs-12.col-md-2.hidden-sm.hidden-xs.box-shadow-panel.p-r-0
         include ../publicModules/forums_nav/forums_tree
+        +renderVisitedForums(data.visitedForums)
+        +renderSubscribeForums(state.subForums)
         +renderForumsPanel("细分专业", data.forum.childrenForums)
         +renderForumsPanel("同级专业", data.sameLevelForums)
         +renderForumsBreadcrumb("上级专业", data.forumNav)

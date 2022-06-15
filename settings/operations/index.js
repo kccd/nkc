@@ -91,6 +91,7 @@ const subscribe = require('./subscribe');
 const article = require('./article');
 const moment = require ('./moment');
 const settings = require('./settings');
+const latest = require('./latest');
 const operationObj = {};
 
 
@@ -295,6 +296,7 @@ operationObj.operationTree = {
 		article, // 独立文章
 		moment, // 动态
     settings, // 加载系统设置
+    n: latest, // 最新页
 	}
 };
 module.exports = operationObj;

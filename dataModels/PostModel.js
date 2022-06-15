@@ -1846,7 +1846,8 @@ postSchema.statics.extendActivityPosts = async (posts) => {
       uid,
       avatar: tools.getUrl('userAvatar', avatar),
       username,
-      banned: certs.includes("banned")
+      banned: certs.includes("banned"),
+      homeUrl: tools.getUrl('userHome', uid),
     };
   }
   const results = [];

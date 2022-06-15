@@ -17,6 +17,29 @@ module.exports = {
     threadListStyle: {
       type: 'abstract', // 显示类型 abstract: 摘要模式, brief: 简略模式, minimalist: 极简模式
       cover: 'left', // 封面图位置 left: 左侧, right: 右侧, null: 不显示封面图
-    }
+    },
+
+    articlePanelStyle: {
+      common: {
+        type: 'abstract',
+        cover: 'left'
+      },
+      latestCommunity: {
+        type: 'abstract',
+        cover: 'left'
+      },
+      latestCommunityTopped: {
+        type: 'minimalist',
+        cover: 'left'
+      },
+      latestZone: {
+        type: 'abstract',
+        cover: 'left'
+      },
+      latestColumn: {
+        type: 'abstract',
+        cover: 'left'
+      }
+    },
   }
 };

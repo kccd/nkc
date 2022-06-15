@@ -28,6 +28,7 @@ block content
       .col-xs-12.col-md-4.box-shadow-panel.p-l-0
         .m-b-1
           include ../publicModules/canvas_logo
+          +renderCanvasLogo(data.homeBigLogo)
         include ../publicModules/improveUserInfo
         if data.notices && data.notices.length
           .home-forums-other.m-b-1

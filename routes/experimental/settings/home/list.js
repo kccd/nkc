@@ -4,7 +4,7 @@ router
   .get('/', async (ctx, next) => {
     const {db, data, nkcModules} = ctx;
     data.homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
-    let homeBigLogo = await db.SettingModel.getHomeBigLogo();
+    const homeBigLogo = data.homeSettings.homeBigLogo || [];
     data.homeBigLogo = homeBigLogo.map(attachId => {
       return {
         aid: attachId,
