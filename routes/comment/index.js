@@ -73,7 +73,7 @@ router
       articlePost = await db.ArticlePostModel.findOnly({_id: sid});
       if(!articlePost) ctx.throw(400, '未找到引用，请刷新');
     }
-    let article = await db.ArticleModel.findOnly({_id: articlePost?articlePost.sid:sid});
+    let article = await db.ArticleModel.findOnly({_id: articlePost?articlePost.sid : sid});
     if(!article) ctx.throw(400, '未找到文章，请刷新后重试');
     const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
     if(article.status !== normalStatus) {
@@ -144,19 +144,13 @@ router
   .get('/:_id', async (ctx, next) => {
     //获取文章评论跳转到文章并定位到评论
     const {data, db, params, permission, query, nkcModules} = ctx;
-    const {token} = query;
     const {_id} = params;
     let comment = await db.CommentModel.findOnly({_id});
-    comment = (await db.CommentModel.getCommentsInfo([comment]))[0];
     //如果存在comment并且存在token就重定向到评论页面
-    if(comment) {
-      if(token && await db.ShareModel.hasPermission(token, comment._id)) {
-        let url = comment.commentUrl;
-        const arr = nkcModules.tools.segmentation(url, '?');
-        url = `${arr[0]}token=${token}&${arr[1]}`;
-        return ctx.redirect(url);
-      }
-    }
+    let url = await comment.getLocationUrl();
+    // const arr = nkcModules.tools.segmentation(url, '?');
+    // url = `${arr[0]}token=${token}&${arr[1]}`;
+    return ctx.redirect(url);
     await next();
   })
   //获取评论的引用

@@ -1267,6 +1267,14 @@ schema.statics.getArticlesInfo = async function(articles) {
 }
 
 /*
+* 获取单个article的信息
+* */
+schema.statics.getArticleInfo = async (article) => {
+  const ArticleModel = mongoose.model('articles');
+  return (await ArticleModel.getArticlesInfo(article))[0];
+}
+
+/*
 * 通过指定文章ID获取文章数据
 * @param {[String]} articlesId 文章ID组成的数组
 * @param {String} type 返回的数据类型 array, object
@@ -1486,9 +1494,25 @@ schema.statics.extendArticlesPanelData = async function(articles) {
   const ArticleModel = mongoose.model('articles');
   const nkcRender = require('../nkcModules/nkcRender');
   const tools = require('../nkcModules/tools');
+  const CommentModel = mongoose.model('comments');
+  const ArticlePostModel = mongoose.model('articlePosts');
   articles = await ArticleModel.getArticlesInfo(articles);
+  const contentStatusTypes = {
+    normal: 'normal',
+    warning: 'warning',
+    danger: 'danger',
+    disabled: 'disabled',
+  };
+  const {unknown, disabled, faulty} = articleStatus;
   const _articles = [];
   for(const article of articles) {
+    const articlePost = await ArticlePostModel.findOne({sid: article._id});
+    //查找文章最后一条评论
+    let comment = null;
+    if(articlePost) {
+      comment = await CommentModel.findOne({sid: articlePost._id});
+      comment = await CommentModel.getCommentInfo(comment);
+    }
     const {document, user: articleUser} = article;
     const user = {
       uid: articleUser.uid,
@@ -1507,7 +1531,7 @@ schema.statics.extendArticlesPanelData = async function(articles) {
       voteUpCount: article.voteUp,
       replyCount: article.count
     };
-    _articles.push({
+    const result = {
       type: 'article',
       id: article._id,
       user,
@@ -1515,11 +1539,37 @@ schema.statics.extendArticlesPanelData = async function(articles) {
       categories: [],
       content,
       status: {
-        type: 'normal',
+        type: contentStatusTypes.normal,
         desc: ''
       },
       reply: null
-    });
+    };
+    if(article.status === unknown) {
+      result.status.type = contentStatusTypes.danger
+    } else if(article.status === disabled) {
+      result.status.type = contentStatusTypes.disabled
+    } else if(article.status === faulty) {
+      result.status.type = contentStatusTypes.warning
+    }
+    if(comment) {
+      const {user, commentDocument, commentUrl} = comment;
+      const {uid, username, avatar} = user;
+      const rUser = {
+        uid,
+        username,
+        avatarUrl: tools.getUrl('userAvatar', avatar),
+        homeUrl: tools.getUrl('userHome', uid),
+      };
+      result.reply = {
+        user: rUser,
+        content: {
+          time: commentDocument.toc,
+          url: commentUrl,
+          abstract: nkcRender.htmlToPlain(commentDocument.content, 200),
+        },
+      };
+    }
+    _articles.push(result);
   }
   return _articles;
 }

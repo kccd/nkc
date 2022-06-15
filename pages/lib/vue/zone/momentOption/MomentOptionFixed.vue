@@ -36,6 +36,7 @@
   right: 0;
   .loading{
     text-align: center;
+    font-size: 1.2rem;
   }
   .post-options-panel{
     padding: 0.5rem 0;
