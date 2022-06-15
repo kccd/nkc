@@ -9,7 +9,7 @@ const closeRouter = require('./close');
 const subscribeRouter = require("./subscribe");
 const Path = require("path");
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
-
+const { ObjectId } = require('mongodb') 
 function isIncludes(arr, id, type) {
   for(const a of arr) {
     if(a.id === id && a.type === type) return true;
@@ -219,7 +219,6 @@ threadRouter
 
     // 拓展文章属性
     await thread.extendThreadCategories();
-
     const authorId = thread.uid;
 
     // 拓展文章所属专业
@@ -1613,7 +1612,16 @@ threadRouter
     // if(did) {
     //   await db.DraftModel.removeDraftById(did, data.user.uid);
     // }
-
+    if(post._id) {
+      const beta = (await db.DraftModel.getType()).beta;
+			const stableHistory = (await db.DraftModel.getType()).stableHistory;
+			await db.DraftModel.updateOne({_id: ObjectId(post._id), uid: state.uid, type: beta}, {
+				$set: {
+					type: stableHistory,
+					tlm: Date.now()
+				}
+			})
+    }
 		// 回复自动关注文章
     const subQuery = {
       type: "thread",

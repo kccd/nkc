@@ -19,6 +19,7 @@
           ref="title",
           :data="pageData",
           :notice="(pageState.editorSettings && pageState.editorSettings.onEditNotes) || ''"
+          @info-change="infoChange"
         )
         //- @content-change="contentChange"
         //- 1. @content-change 编辑器内容改变触发 2. c 编辑器内容  newPost
@@ -35,37 +36,43 @@
             ref="classification",
             :data="pageData",
             @selected-forumids="selectedForumIds"
+            @info-change="infoChange"
           )
         .m-b-2(v-if="!hideType.includes(pageData.type)")
           //- 1.value 封面图值
-          cover(ref="cover", :value="pageData.post && pageData.post.cover")
+          cover(ref="cover", :value="pageData.post && pageData.post.cover" @info-change="infoChange")
+          
         .m-b-2(v-if="!hideType.includes(pageData.type)")
           //- 1 abstract 中英文摘要
           abstract(
             ref="abstract",
             :abstract="{ cn: pageData.post && pageData.post.abstractCn, en: pageData.post && pageData.post.abstractEn }"
+            @info-change="infoChange"
           )
         .m-b-2(v-if="!hideType.includes(pageData.type)")
           //- 1.keywords 中英文关键字
           key-word(
             ref="keyWord",
             :keywords="{ cn: pageData.post && pageData.post.keyWordsCn, en: pageData.post && pageData.post.keyWordsEn }"
+            @info-change="infoChange"
           )
         .m-b-2(v-if="!hideType.includes(pageData.type)")
           //- 1.author 作者信息
           author-info(
             ref="authorInfo",
             :author="pageData.post && pageData.post.authorInfos"
+            @info-change="infoChange"
           )
         .m-b-2(v-if="!hideType.includes(pageData.type)")
           //- 1.original 包含最小字数和文章状态
           original(
             ref="original",
             :original="{ wordLimit: pageData.originalWordLimit, state: pageData.post && pageData.post.originState }"
+            @info-change="infoChange"
           )
         .m-b-2(v-if="!hideType.includes(pageData.type)")
           //- 1.data包含 createSurveyPermission type post.surveyId
-          investigation(ref="investigation", :data="pageData")
+          investigation(ref="investigation", :data="pageData" @info-change="infoChange")
         .m-b-2(v-if= "!['modifyPost'].includes(pageData.type)")
           //- 1.state
           column(
@@ -73,6 +80,7 @@
             :o="reqUrl.o",
             :state="{ userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column: pageState.userColumn }",
             :data="{ addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn }"
+            @info-change="infoChange"
           )
     .col-xs-12.col-md-3
       //- 1.notice 温馨提示的内容  2.data 中只需要post therad type forum allowedAnonymousForumsId havePermissionToSendAnonymousPost threadCategories
@@ -83,7 +91,9 @@
         :data="pageData",
         :o="reqUrl.o",
         @ready-data="readyData",
-        @remove-editor="removeEditor"
+        @remove-editor="removeEditor",
+        @cover-change="coverChange"
+        @save-draft-success="saveDraftSuccess"
       )
 </template>
 
@@ -153,6 +163,9 @@ export default {
   },
   methods: {
     addUrlParam,
+    coverChange(v) {
+      this.$refs.cover.setCover(v)
+    },
     getUserDraft(page=0) {
 
       // 如果是修改评论文章或者回复 不获取草稿数据
@@ -189,7 +202,7 @@ export default {
       self.drafts = [];
     },
     close() {
-      this.drafts = [];
+      if (this.drafts.length) this.drafts = [];
     },
     more() {
       location.href = '/creation/community/draft'
@@ -278,6 +291,20 @@ export default {
       this.$refs.submit.saveToDraftBaseDebounce("automatic");
       this.drafts = [];
     },
+    // coverUrlChange() {
+    //   // 此时上传数据应该是最新的coverData
+    //   this.$refs.submit.saveToDraftBase("automatic");
+
+    // },
+    // 编辑器其他部分内容改变
+    infoChange() {
+      this.$refs.submit.saveToDraftBase("automatic");
+    },
+    // 保存草稿成功后执行
+    saveDraftSuccess() {
+      this.close();
+      this.$refs.submit.setSubmitStatus(false);
+    },
     // 提交和保存时获取各组件数据
     readyData(submitFn) {
       if (!submitFn) {
@@ -293,9 +320,12 @@ export default {
           Object.assign(submitData, vue && vue.getData());
         }
       }
+      // this.pageData.post?._id 
+        // 请求前一截url
       // 添加 草稿id 和 parentPostId
       submitData["did"] = this.pageData.draftId;
-      submitData["_id"] = this.pageData.post?._id;
+      submitData["_id"] = new URLSearchParams(location.search).get('aid') 
+        || this.pageData.post?._id;
       submitData["parentPostId"] = this.pageData.post?.parentPostId;
       submitFn(submitData);
     },
@@ -337,9 +367,6 @@ export default {
     line-height: @height;
     width: @boxHeaderWidth;
     text-align: center;
-  }
-  .des-type{
-    width: auto;
     margin-right: 10px;
   }
   .article-box-text{
@@ -408,9 +435,6 @@ export default {
 .row {
     margin-right: -15px;
     margin-left: -15px;
-}
-.des-type{
-
 }
 .col-md-9 {
   position: relative;

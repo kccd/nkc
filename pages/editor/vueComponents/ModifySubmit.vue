@@ -27,7 +27,7 @@
     .btn-area
       button.btn.btn-theme(
         @click="readyData",
-        :disabled="disabledSubmit || !checkProtocol"
+        :disabled="submitStatus || (disabledSubmit || !checkProtocol)"
       ) {{ disabledSubmit ? '提交中...' : '提交' }}
       button.btn.btn-default(@click="saveToDraftBase('manual')") 存草稿
       button.btn.btn-default(@click="history") 历史
@@ -73,7 +73,9 @@ export default {
     saveDraftTimeout: 60000,
     saveData: '',
     setInterval: '',
-    draft: ''
+    draft: '',
+    // 判断是否有草稿ID
+    submitStatus: true
   }),
   watch: {
     data : {
@@ -114,13 +116,17 @@ export default {
     },
   },
   mounted() {
-    this.setInterval = setInterval(this.autoSaveToDraft, this.saveDraftTimeout);
+    this.setInterval = setInterval(this.timingSaveToDraft, this.saveDraftTimeout);
   },
   destroyed(){
     clearInterval(this.setInterval)
   },
   methods: {
     addUrlParam,
+    // boolean
+    setSubmitStatus(v) {
+      this.submitStatus = v
+    },
     checkString: NKC.methods.checkData.checkString,
     checkEmail: NKC.methods.checkData.checkEmail,
     visitUrl: NKC.methods.visitUrl,
@@ -160,7 +166,7 @@ export default {
       let time = new Date();
       this.autoSaveInfo = "草稿已保存 " + this.format(time);
     },
-    autoSaveToDraft() {
+    timingSaveToDraft() {
       this.readyDataForSave();
       let type = this.type;
       const { saveData } = this;
@@ -172,7 +178,7 @@ export default {
             saveData.t ||
             saveData.c ||
             !saveData.tcId ||
-            this.tcId.length ||
+            saveData.tcId.length ||
             saveData.cids.length ||
             saveData.fids.length ||
             saveData.cover ||
@@ -188,7 +194,7 @@ export default {
       } else if (type === "newPost") {
         if (!saveData.title && !saveData.content) return;
       }
-      this.saveToDraftBase("automatic")
+      this.saveToDraftBase("timing")
         .catch((data) => {
           sweetError("草稿保存失败：" + (data.error || data));
         });
@@ -200,12 +206,29 @@ export default {
         if(saveType === 'manual') {
           return sweetError("请先输入内容")
         }else {
+          // 如果连内容都不存在
           return
         }
       };
+      // 如果没有内容不更新
+      // 主要问题是watch引起
+      if (
+          !(
+            saveData.t ||
+            saveData.c ||
+            saveData.tcId?.length ||
+            saveData.cids?.length ||
+            saveData.fids?.length ||
+            saveData.cover ||
+            saveData.keyWordsCn?.length ||
+            saveData.keyWordsEn?.length  ||
+            saveData.authorInfos?.length ||
+            saveData.survey
+          )
+        ) return
       let type = this.type;
       return Promise.resolve()
-        .then((res) => {
+        .then(() => {
           // let post = this.getPost();
           let desType, desTypeId;
           if (type === "newThread") {
@@ -231,6 +254,10 @@ export default {
             throw "未知的草稿类型";
           }
           let formData = new FormData();
+          if(saveData.cover) {
+            saveData.coverData = ''
+            saveData.coverUrl = ''
+          }
           formData.append(
             "body",
             JSON.stringify({
@@ -238,6 +265,7 @@ export default {
               draftId: saveData?.did || this.draftId,
               desType: desType,
               desTypeId: desTypeId,
+              saveType
             })
           );
           if (saveData.coverData) {
@@ -250,7 +278,7 @@ export default {
           // 保存草稿
           // 当编辑器中的字数减少时提示用户是否需要保存，避免其他窗口的自动保存覆盖内容
           return nkcUploadFile(
-            "/u/" + NKC.configs.uid + "/drafts?saveType=" + saveType,
+            "/u/" + NKC.configs.uid + "/drafts",
             "POST",
             formData
           );
@@ -264,19 +292,19 @@ export default {
           }
           this.draftId = data.draft?.did;
           if (data.draft?.cover) {
-            this.coverData = "";
-            this.coverUrl = "";
-            this.cover = data.draft.cover;
+            this.$emit('cover-change',  data.draft.cover);
           }
           return Promise.resolve(data);
         })
         .then((res) => {
           if(!location.search.includes("aid")) this.addUrlParam("aid", res.draft._id);
+          // 解锁提交按钮
+          // this.$emit('save-draft-success');
+          this.setSubmitStatus(false);
           if (saveType === "manual") {
             sweetSuccess("草稿已保存");
+            this.saveToDraftSuccess();
           }
-          // if(res.err) return
-          this.saveToDraftSuccess();
         })
         .catch((data) => {
           sweetError("草稿保存失败：" + (data.error || data));
@@ -472,7 +500,6 @@ export default {
           } else if (NKC.configs.platform === "apiCloud") {
             this.visitUrl(data.redirect || "/");
             setTimeout(function () {
-              //  api ？？？
               api.closeWin();
             }, 1000);
           } else {
@@ -503,6 +530,16 @@ export default {
 }
 .col-xs-12{
   width: 100%;
+}
+@media screen and (max-width: 1311px) {
+  .modifySubmit {
+    max-width: 19rem
+  }
+}
+@media screen and (min-width: 1311px) {
+  .modifySubmit {
+    max-width: 25rem
+  }
 }
 @media screen and (max-width: 992px) {
   .col-xs-12 {
@@ -535,6 +572,7 @@ export default {
   padding: 0.5rem 0;
   color: #9baec8;
 }
+
 .modifySubmit {
   // background-color: transparent!important;
   button{
@@ -546,7 +584,7 @@ export default {
     }
   }
   @media (min-width: 992px) {
-    max-width: 25rem;
+    // max-width: 25rem;
     position: fixed;
   }
 }

@@ -16,7 +16,7 @@
 
   //- .modal.fade(v-if="showModel", )
   //-   .modal-dialog.modal-sm
-  .modal-content(ref="model" v-show="showModel")
+  .modal-key-word(ref="model" v-show="showModel")
     .modal-header(ref="addKeyword")
       .fa.fa-remove.close-modal(@click="close")
       .modal-title {{ title }}
@@ -83,6 +83,7 @@
 
 <script>
 import { DraggableElement } from "../../lib/js/draggable";
+import { debounce } from '../../lib/js/execution';
 
 export default {
   data: () => ({
@@ -104,7 +105,8 @@ export default {
     showModel: false,
     keyWordsCn: [], // 中文关键词
     keyWordsEn: [], // 英文关键词
-    draggableElement: {}
+    draggableElement: {},
+    changeContentDebounce: ''
   }),
   props: {
     keywords: {
@@ -124,6 +126,15 @@ export default {
         }
       },
     },
+    keyWordsWatch: {
+      deep: true,
+      handler() {
+        this.changeContentDebounce()
+      }
+    },
+  },
+  created(){
+    this.changeContentDebounce = debounce(this.changeContent, 2000);
   },
   mounted(){
     this.draggableElement = new DraggableElement(
@@ -137,6 +148,9 @@ export default {
     this.draggableElement && this.draggableElement.destroy();
   },
   methods: {
+    changeContent() {
+      this.$emit('info-change');
+    },
     close() {
       this.showModel = false;
     },
@@ -144,10 +158,9 @@ export default {
       this.showModel = true;
     },
     submit() {
-      this.keyWordsEn = [];
-      this.keyWordsCn = [];
       let keywordCn = this.data[0].value;
       if (keywordCn) {
+        this.keyWordsCn = [];
         keywordCn = keywordCn.replace(/，/gi, ",");
         let cnArr = keywordCn.split(",");
         for (let i = 0; i < cnArr.length; i++) {
@@ -162,6 +175,7 @@ export default {
 
       let keywordEn = this.data[1].value;
       if (keywordEn) {
+        this.keyWordsEn = [];
         keywordEn = keywordEn.replace(/，/gi, ",");
         let enArr = keywordEn.split(",");
         for (let i = 0; i < enArr.length; i++) {
@@ -182,7 +196,8 @@ export default {
     },
     removeKeyword(index, arr) {
       arr.splice(index, 1);
-    },
+      this.$set(this.data[index], "value", "");
+      },
     addKeyword() {
       this.open();
     },
@@ -195,6 +210,12 @@ export default {
     },
   },
   computed: {
+    keyWordsWatch() {
+      return {
+        cn: this.keyWordsCn,
+        en: this.keyWordsEn
+      }
+    },
     keywordsLength: function () {
       return this.keyWordsEn.length + this.keyWordsCn.length;
     },
@@ -203,10 +224,18 @@ export default {
 </script>
 
 <style scoped lang="less">
-.modal-content{
+.modal-body {
+    position: relative;
+    padding: 15px;
+}
+.key-word .modal-key-word{
   position: fixed;
   top: 20%;
   min-width: 25rem;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  box-shadow: 0 0 5px rgba(0,0,0,.2);
+  background: white;
 }
 textarea {
   margin: 0;
@@ -293,10 +322,13 @@ h5:nth-child(1) {
 }
 
 .modal-footer {
+  padding: 15px;
+  text-align: right;
   border-top: 0;
   padding-top: 0;
 }
 .modal-header {
+  border-bottom: 1px solid #e5e5e5;
   line-height: 2.8rem;
   color: #000;
   padding: 0;
@@ -305,7 +337,7 @@ h5:nth-child(1) {
   position: relative;
   background-color: #f6f6f6;
   // padding-right: 2.8rem;
-  border-radius: 3px 3px 0 0;
+  border-radius: 6px 6px 0 0;
   user-select: none;
 }
 .form-group {
