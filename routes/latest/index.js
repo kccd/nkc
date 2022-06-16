@@ -46,6 +46,9 @@ router
       highlight: 'latest'
     };
 
+    // 新用户
+    data.newUsers = await db.ActiveUserModel.getNewUsersFromCache();
+
     await next();
   })
   .use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods())
