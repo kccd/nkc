@@ -11,13 +11,11 @@ block zoneContent
 
   #latestZoneMoments(v-cloak)
 
-    if data.t === data.zoneTypes.moment
-      .m-b-1.p-t-05
-        moment-editor(@published='published')
-
     include ./zoneTypes
     +renderLatestZoneTypes(data.t, data.zoneTypes)
 
+    .m-b-1.p-t-05
+      moment-editor(@published='published')
 
     include ../../publicModules/paging/paging
     moments(:moments="momentsData" :permissions="permissions" v-if='momentsData.length > 0')
