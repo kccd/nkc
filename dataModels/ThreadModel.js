@@ -1412,6 +1412,7 @@ threadSchema.statics.extendArticlesPanelData = async function(threads) {
     }
     _threads.push({
       type: 'thread',
+      oc: thread.oc,
       id: thread.tid,
       user,
       pages,

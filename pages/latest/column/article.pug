@@ -3,7 +3,7 @@ block columnTitle
   title=data.pageTitle
 block columnContent
   include ./columnTypes
-  +renderLatestColumnTypes(data.t, data.columnTypes)
+  //+renderLatestColumnTypes(data.t, data.columnTypes)
   include ../../publicModules/paging/paging
   if data.articlesPanelData && data.articlesPanelData.length > 0
     include ../../publicModules/articlePanel/articlePanel

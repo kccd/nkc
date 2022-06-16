@@ -1,7 +1,7 @@
 const mongoose = require('../settings/database');
 const commentSource = {
         article: 'article',
-        book: 'book'
+  
       };
 const commentStatus = {
         normal: 'normal',

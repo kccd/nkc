@@ -30,13 +30,13 @@ router
       unknown: unknownStatus,
     } = await db.ArticleModel.getArticleStatus();
     //获取专栏引用类型
-    const {threadType, articleType} = await db.ColumnPostModel.getColumnPostTypes();
+    const {thread: threadType, article: articleType} = await db.ColumnPostModel.getColumnPostTypes();
     const tidArr = [];
     const aidArr = [];
-    const match = {
-      status: normalStatus,
-    };
-    const count = await db.ThreadModel.countDocuments();
+    
+    const pageSettings = await db.SettingModel.getSettings('page');
+    //查找所有专栏引用
+    const count = await db.ColumnPostModel.countDocuments().sort({toc: -1});
     const paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
     //查找文章专栏引用
     const columnPosts = await db.ColumnPostModel.find({type: {$in: [threadType, articleType]}, hidden: false}).skip(paging.start).limit(paging.perpage).sort({toc: -1});
@@ -48,9 +48,18 @@ router
       }
     }
     const q = {
+      oc: {$in: tidArr},
       mainForumsId: {
         $in: fidOfCanGetThreads
       }
+    };
+    const match = {
+      _id: {$in: aidArr},
+      $or: [
+        {
+          status: normalStatus,
+        }
+      ]
     };
     let canManageFid = [];
     if(user) {
@@ -61,11 +70,7 @@ router
         q.$or = [
           {
             reviewed: true
-          },/*
-            {
-              reviewed: false,
-              uid: user.uid
-            },*/
+          },
           {
             reviewed: false,
             mainForumsId: {
@@ -74,6 +79,18 @@ router
           }
         ]
       }
+      match.$or.push(
+      {
+        uid: state.uid,
+        status: {
+          $in: [
+            normalStatus,
+            faultyStatus,
+            disabledStatus,
+            unknownStatus,
+          ]
+        }
+      })
     } else {
       q.reviewed = true;
     }
@@ -87,113 +104,112 @@ router
       categoriesId: 1,
       disabled: 1, recycleMark: 1
     });
+    const superModerator = ctx.permission("superModerator");
+    columnThreads = columnThreads.filter(thread => {
+      if(thread.disabled || thread.recycleMark) {
+        if(!user) return false;
+        if(!superModerator) {
+          let isModerator = false;
+          const mainForumsId = thread.mainForumsId;
+          for (const fid of mainForumsId) {
+            if (canManageFid.includes(fid)) {
+              isModerator = true;
+              break;
+            }
+          }
+          if(!isModerator) return false;
+        }
+      }
+      return true;
+    });
+    columnThreads = await db.ThreadModel.extendArticlesPanelData(columnThreads);
+    const threadObj = {};
+    for(const thread of columnThreads) {
+      threadObj[thread.oc] = thread;
+    }
     //查找最新专栏文章的独立文章
-    let columnArticles = await db.ArticleModel.find({_id: {$in: aidArr}});
+    let columnArticles = await db.ArticleModel.find(match);
     //拓展独立文章
     columnArticles = await db.ArticleModel.extendArticlesPanelData(columnArticles);
     const articleObj = {};
     for(const ca of columnArticles) {
-      articleObj[ca._id] = ca;
+      articleObj[ca.id] = ca;
     }
-    
-    const threadObj = {};
-    for(const thread of columnThreads) {
-      if(thread) {
-        threadObj[thread.oc] = thread;
+    const threads = [];
+    for(const c of columnPosts) {
+      let thread;
+      if(c.type === threadType) {
+        thread = threadObj[c.pid];
+      } else if(c.type === articleType) {
+        thread = articleObj[c.pid];
       }
+      if(thread) threads.push(thread);
     }
-    // let match ={
-    //   status: normalStatus,
-    // };
-    // if(state.uid) {
-    //   match = {
-    //     $or: [
-    //       {
-    //         status: normalStatus,
-    //       },
-    //       {
-    //         uid: state.uid,
-    //         status: {
-    //           $in: [
-    //             normalStatus,
-    //             faultyStatus,
-    //             disabledStatus,
-    //             unknownStatus,
-    //           ]
-    //         }
-    //       }
-    //     ]
-    //   }
-    // }
-    // const articles = await db.ArticleModel
-    //   .find(match)
-    //   .sort({toc: -1})
-    //   .skip(paging.start)
-    //   .limit(paging.perpage);
-    // const pageSettings = await db.SettingModel.getSettings('page');
-    
     data.latestColumnArticlePanelStyle = pageSettings.articlePanelStyle.latestColumn;
-    data.articlesPanelData = await db.ArticleModel.extendArticlesPanelData(articles);
+    data.articlesPanelData = threads;
     data.paging = paging;
     ctx.remoteTemplate = 'latest/column/article.pug';
     await next();
   })
-  .get('/', async (ctx, next) => {
-    //拓展最新页专栏文章评论列表
-    const {db, state, data, query, nkcModules, permission} = ctx;
-    const {t, columnTypes} = data;
-    if(t !== columnTypes.comment) {
-      return await next();
-    }
-    const {page = 0} = query;
-    const {
-      unknown: unknownStatus,
-      faulty: faultyStatus,
-      normal: normalStatus,
-      disabled: disabledStatus,
-    } = await db.CommentModel.getCommentStatus();
-    let match = {
-      status: normalStatus
-    };
-    //获取当前用户对独立文章评论的审核权限
-    const permissions = {
-      reviewed: null,
-    };
-    if(state.uid) {
-      //加载自己非正常状态的评论
-      match = {
-        $or: [
-          {
-            status: normalStatus,
-          },
-          {
-            uid: state.uid,
-            status: {
-              $in: [
-                normalStatus,
-                faultyStatus,
-                disabledStatus,
-                unknownStatus,
-              ]
-            }
-          }
-        ]
-      };
-      if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {
-        permissions.reviewed = true;
-      }
-    }
-    const count = await db.CommentModel.countDocuments(match);
-    const paging = nkcModules.apiFunction.paging(page, count);
-    const comments = await db.CommentModel
-      .find(match)
-      .sort({toc: -1})
-      .skip(paging.start)
-      .limit(paging.perpage);
-    data.commentDatas = await db.CommentModel.extendCommentsListsData(comments, state.uid);
-    data.paging = paging;
-    data.permissions;
-    ctx.remoteTemplate = 'latest/column/comment.pug';
-    await next();
-  })
+  // .get('/', async (ctx, next) => {
+  //   //拓展最新页专栏文章评论列表
+  //   const {db, state, data, query, nkcModules, permission} = ctx;
+  //   const {t, columnTypes} = data;
+  //   if(t !== columnTypes.comment) {
+  //     return await next();
+  //   }
+  //   const {page = 0} = query;
+  //   const {
+  //     unknown: unknownStatus,
+  //     faulty: faultyStatus,
+  //     normal: normalStatus,
+  //     disabled: disabledStatus,
+  //   } = await db.CommentModel.getCommentStatus();
+  //   const {} = await db.CommentModel.getCommentSources();
+  //   let match = {
+  //     source:
+  //     status: normalStatus
+  //   };
+  //   //获取当前用户对独立文章评论的审核权限
+  //   const permissions = {
+  //     reviewed: null,
+  //   };
+  //   if(state.uid) {
+  //     //加载自己非正常状态的评论
+  //     match = {
+  //       $or: [
+  //         {
+  //           status: normalStatus,
+  //         },
+  //         {
+  //           uid: state.uid,
+  //           status: {
+  //             $in: [
+  //               normalStatus,
+  //               faultyStatus,
+  //               disabledStatus,
+  //               unknownStatus,
+  //             ]
+  //           }
+  //         }
+  //       ]
+  //     };
+  //     if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {
+  //       permissions.reviewed = true;
+  //     }
+  //   }
+  //   const count = await db.CommentModel.countDocuments(match);
+  //   const paging = nkcModules.apiFunction.paging(page, count);
+  //   const comments = await db.CommentModel
+  //     .find(match)
+  //     .sort({toc: -1})
+  //     .skip(paging.start)
+  //     .limit(paging.perpage);
+  //   data.commentDatas = await db.CommentModel.extendCommentsListsData(comments, state.uid);
+  //   data.paging = paging;
+  //   data.permissions;
+  //   ctx.remoteTemplate = 'latest/column/comment.pug';
+  //   await next();
+  // })
+
 module.exports = router;
