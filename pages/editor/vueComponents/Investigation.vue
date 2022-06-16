@@ -323,7 +323,7 @@ export default {
   },
   computed: {
     selectedUsers: function() {
-      var uid = this.survey.permission.uid || [];
+      var uid = this.survey?.permission?.uid || [];
       var arr = [];
       for (var i = 0; i < uid.length; i++) {
         var u = this.getUserById(uid[i]);
@@ -332,8 +332,9 @@ export default {
       return arr;
     },
     changeData() {
-      // const { survey, selectedUsers, timeStart, timeEnd } = this
-      return { survey: this.survey, timeStart: this.timeStart, timeEnd: this.timeEnd }
+      const { survey, selectedUsers, timeStart, timeEnd } = this;
+      return { survey, selectedUsers, timeStart, timeEnd }
+      // return { survey: this.survey, timeStart: this.timeStart, timeEnd: this.timeEnd }
     },
     rewardKcbTotal: function() {
       var survey = this.survey;
@@ -343,7 +344,7 @@ export default {
       return "";
     },
     rewardWarning: function() {
-      var targetUser = this.targetUser;
+      // var targetUser = this.targetUser;
       var survey = this.survey;
       var surveyRewardScore = this.surveyRewardScore;
       var targetUserSurveyRewardScore = this.targetUserSurveyRewardScore;

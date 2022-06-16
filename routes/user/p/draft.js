@@ -2,7 +2,7 @@ module.exports = async (ctx, next) => {
   //获取用户的草稿
   const {data, db, query, nkcModules} = ctx;
   const {targetUser} = data;
-  const {page = 0, perpage = 30, type, } = query;
+  const {page = 0, perpage = 30, type } = query;
   let count, paging, drafts;
   // 如果是社区内容草稿
   if(type === 'community') {
@@ -19,16 +19,18 @@ module.exports = async (ctx, next) => {
     paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
     drafts = await db.DraftModel.find({uid: targetUser.uid, desType: forum, type: beta}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
   } else if (type === 'newPost') {
+    // 需要显示当前文章下的回复草稿
     // 新回复
+    const { desTypeId } = query;
+    if(!desTypeId) ctx.throw(400, 'desTypeId不存在')
     const beta = (await db.DraftModel.getType()).beta; 
 
     const thread = (await db.DraftModel.getDesType()).thread; 
     count = await db.DraftModel.countDocuments({uid: targetUser.uid, desType: thread});
     paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
-    drafts = await db.DraftModel.find({uid: targetUser.uid, desType: thread, type: beta}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    drafts = await db.DraftModel.find({ uid: targetUser.uid, desType: thread, type: beta, desTypeId }).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
   } else if (type === 'modifyThread' || type === 'modifyPost') {
     // 修改回复或修改文章
-    // 怎么细分呢？？？？
     const beta = (await db.DraftModel.getType()).beta; 
     const post = (await db.DraftModel.getDesType()).post;  
     count = await db.DraftModel.countDocuments({uid: targetUser.uid, desType: post});
