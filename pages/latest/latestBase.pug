@@ -24,5 +24,7 @@ block content
         +sideThreadsPanel(data.noticeThreads, '公告通知', true)
         +sideThreadsPanel(data.featuredThreads, '精选文章', false)
         +sideThreadsPanel(data.recommendThreads, '推荐文章', false)
+        include ../publicModules/activeUsers/activeUsers
+        +newUsersSmall(data.newUsers)
 block scripts
   block latestScripts

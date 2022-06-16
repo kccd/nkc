@@ -1,5 +1,6 @@
 import {getDataById} from "../../lib/js/dataConversion";
 import Moments from '../../lib/vue/zone/Moments';
+import MomentEditor from "../../lib/vue/zone/MomentEditor";
 const momentElementId = 'latestZoneMoments';
 
 $(function() {
@@ -7,7 +8,7 @@ $(function() {
   if(element) {
     initMomentVueApp();
   }
-})
+});
 
 
 function initMomentVueApp() {
@@ -16,10 +17,16 @@ function initMomentVueApp() {
     el: `#${momentElementId}`,
     components: {
       moments: Moments,
+      'moment-editor': MomentEditor
     },
     data: {
       momentsData,
       permissions,
+    },
+    methods: {
+      published() {
+        window.location.reload();
+      }
     }
   });
 }

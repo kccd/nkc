@@ -8,8 +8,8 @@ router
       thread: 'thread',
       post: 'post'
     };
-    if(t !== communityTypes.thread) {
-      t = communityTypes.post;
+    if(t !== communityTypes.post) {
+      t = communityTypes.thread;
     }
     data.communityTypes = communityTypes;
     data.t = t;

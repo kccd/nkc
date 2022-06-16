@@ -3,9 +3,9 @@ if !isIncluded('latest/community/communityTypes')
     -activeType = activeType || types.post;
     .paging-button
       a.button.radius-left(
-        href=`/n/community`
+        href=`/n/community?t=post`
         class=activeType === types.post ? 'active' : ''
-      ) 回复
+      ) 全部
       a.button.radius-right(
         href=`/n/community?t=thread`
         class=activeType === types.thread ? 'active' : ''

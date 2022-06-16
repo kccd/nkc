@@ -41,6 +41,14 @@ router
     };
     data.pageTitle = pageTitle
     internalData.fidOfCanGetThreads = fidOfCanGetThreads;
+
+    data.navbar = {
+      highlight: 'latest'
+    };
+
+    // 新用户
+    data.newUsers = await db.ActiveUserModel.getNewUsersFromCache();
+
     await next();
   })
   .use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods())

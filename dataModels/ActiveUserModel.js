@@ -131,6 +131,7 @@ activeUserSchema.statics.getActiveUsersFromCache = async () => {
 * */
 activeUserSchema.statics.getNewUsersFromCache = async () => {
   let newUsers = await redisClient.getAsync('newUsers');
+  const {getUrl} = require('../nkcModules/tools');
   try{
     newUsers = JSON.parse(newUsers);
   } catch(err) {
@@ -138,6 +139,10 @@ activeUserSchema.statics.getNewUsersFromCache = async () => {
       console.log(err);
     }
     newUsers = [];
+  }
+  for(const u of newUsers) {
+    u.avatarUrl = getUrl('userAvatar', u.avatar);
+    u.homeUrl = getUrl('userHome', u.uid);
   }
   return newUsers;
 };
