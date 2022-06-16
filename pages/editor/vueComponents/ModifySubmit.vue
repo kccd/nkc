@@ -29,8 +29,8 @@
         @click="readyData",
         :disabled="submitStatus || (disabledSubmit || !checkProtocol)"
       ) {{ disabledSubmit ? '提交中...' : '提交' }}
-      button.btn.btn-default(@click="saveToDraftBase('manual')") 存草稿
-      button.btn.btn-default(@click="history") 历史
+      button.btn.btn-default(@click="saveToDraftBase('manual')" :disabled="submitStatus") 存草稿
+      button.btn.btn-default(@click="history" :disabled="submitStatus") 历史
 </template>
 
 <script>
