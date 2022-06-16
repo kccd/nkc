@@ -278,7 +278,7 @@ export default {
         _id = momentId;
       }
       if(!_id) return;
-      sweetQuestion("删除后不可回复，你确定要删除吗？")
+      sweetQuestion("删除后不可恢复，确定要删除吗？")
         .then(() => {
           nkcAPI(`/moment/${_id}`, 'DELETE', {
           })
