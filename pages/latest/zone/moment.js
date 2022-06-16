@@ -8,7 +8,7 @@ $(function() {
   if(element) {
     initMomentVueApp();
   }
-})
+});
 
 
 function initMomentVueApp() {

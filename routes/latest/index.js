@@ -41,6 +41,11 @@ router
     };
     data.pageTitle = pageTitle
     internalData.fidOfCanGetThreads = fidOfCanGetThreads;
+
+    data.navbar = {
+      highlight: 'latest'
+    };
+
     await next();
   })
   .use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods())
