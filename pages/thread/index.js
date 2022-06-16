@@ -1,7 +1,7 @@
 import {getSocket} from "../lib/js/socket";
 
 const socket = getSocket();
-var SubscribeTypes, surveyForms = [], draftId = "", author = {};
+var surveyForms = [], draftId = "", author = {};
 const commonModel = new NKC.modules.CommonModal();
 window.Attachments = undefined;
 window.quotePostApp = undefined;
@@ -27,7 +27,7 @@ $(document).ready(function(){
     moduleToColumn.init();
   }
   if(!window.SubscribeTypes && NKC.modules.SubscribeTypes) {
-    SubscribeTypes = new NKC.modules.SubscribeTypes();
+    window.SubscribeTypes = new NKC.modules.SubscribeTypes();
   }
 
 	if($("#container").length) {
@@ -1232,7 +1232,7 @@ $(function() {
 			window.location.hash = hash;
 		}, 1000)
 	}
-	
+
 	//socket 连接当前房间
 	if(NKC.configs.uid && socket) {
 		NKC.methods.setThreadListNewPostCount($('#threadId').text().trim(), 0);
