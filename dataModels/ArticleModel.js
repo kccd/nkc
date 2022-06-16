@@ -1180,7 +1180,6 @@ schema.statics.getArticlesInfo = async function(articles) {
     columnsId.push(columnPost.columnId);
     columnPostsObj[columnPost.pid] =columnPost;
   }
-
   const columns = await ColumnModel.find({_id: {$in: columnsId}});
   for(const column of columns) {
     columnObj[column._id] = {
@@ -1545,13 +1544,17 @@ schema.statics.extendArticlesPanelData = async function(articles) {
       reply: null
     };
     if(article.status === unknown) {
-      result.status.type = contentStatusTypes.danger
+      result.status.type = contentStatusTypes.danger;
+      result.status.desc = '审核中';
     } else if(article.status === disabled) {
-      result.status.type = contentStatusTypes.disabled
+      result.status.type = contentStatusTypes.disabled;
+      result.status.desc = '已屏蔽，仅自己可见';
     } else if(article.status === faulty) {
-      result.status.type = contentStatusTypes.warning
+      result.status.type = contentStatusTypes.warning;
+      result.status.desc = '退修中，仅自己可见，修改后对所有人可见';
     }
     if(comment) {
+      //拓展reply
       const {user, commentDocument, commentUrl} = comment;
       const {uid, username, avatar} = user;
       const rUser = {

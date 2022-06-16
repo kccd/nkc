@@ -1,0 +1,12 @@
+if !isIncluded('latest/column/zoneTypes')
+  mixin renderLatestColumnTypes(activeType, types)
+    -activeType = activeType || types.article;
+    .paging-button
+      a.button.radius-left(
+        href=`/n/column`
+        class=activeType === types.article ? 'active' : ''
+      ) 文章
+      a.button.radius-right(
+        href=`/n/column?t=comment`
+        class=activeType === types.comment ? 'active' : ''
+      ) 回复
