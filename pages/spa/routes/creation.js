@@ -30,6 +30,9 @@ import ZoneArticle from '../views/creation/zone/Article';
 import ZoneMoment from '../views/creation/zone/Moment';
 import ZoneDraft from '../views/creation/zone/Draft';
 import DraftEditor from '../views/creation/editor/DraftEditor';
+
+import Collections from '../views/creation/collections/Collections';
+
 export const routesName = {
   creation: 'creation',
   creationMaterial: 'creationMaterial',
@@ -61,7 +64,8 @@ export const routesName = {
   creationZone: 'creationZone',
   creationZoneMoment: 'creationZoneMoment',
   creationZoneArticle: 'creationZoneArticle',
-  creationZoneDraft: 'creationZoneDraft'
+  creationZoneDraft: 'creationZoneDraft',
+  creationCollections: 'creationCollections'
 }
 
 export default [
@@ -71,6 +75,7 @@ export default [
     component: Creation,
     children: [
       // {name: 'home', path: '/creation', component: Home},
+      {name: routesName.creationCollections, path: '/creation/collections', component: Collections},
       {name: routesName.creationMaterials, path: '/creation/materials', component: Materials},
       {name: routesName.creationMaterial, path: '/creation/material/:id', component: Material},
       {name: routesName.creationBooks, path: '/creation/books', component: Books},
