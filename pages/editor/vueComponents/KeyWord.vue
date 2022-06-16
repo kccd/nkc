@@ -74,11 +74,11 @@
               span {{ r.name }}
     .modal-footer
       .options-button
-        button.btn.btn-default.btn-close(
+        button.btn.btn-default.keyword-btn-close(
           data-dismiss="modal",
           @click="close"
         ) 关闭
-        button.btn.active.btn-primary(@click="submit") 确定
+        button.btn.active.btn-primary.keyword-btn-determine(@click="submit") 确定
 </template>
 
 <script>
@@ -106,7 +106,7 @@ export default {
     keyWordsCn: [], // 中文关键词
     keyWordsEn: [], // 英文关键词
     draggableElement: {},
-    changeContentDebounce: ''
+    changeContentDebounce: '',
   }),
   props: {
     keywords: {
@@ -224,6 +224,12 @@ export default {
 </script>
 
 <style scoped lang="less">
+.keyword-btn-close {
+  margin-right: 0.8rem;
+}
+.keyword-btn-determine {
+  margin-left: 0;
+}
 .modal-body {
     position: relative;
     padding: 15px;
@@ -380,7 +386,7 @@ h5:nth-child(1) {
   vertical-align: top;
   background-color: #2b90d9;
   color: #fff;
-  margin: 0 0.5rem 0.5rem 0;
+  margin: 0 0.8rem 0.8rem 0;
   line-height: 2.4rem;
 }
 .editor-keyword .fa {

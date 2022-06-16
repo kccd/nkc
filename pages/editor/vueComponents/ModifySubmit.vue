@@ -205,9 +205,6 @@ export default {
       if (!saveData.c){
         if(saveType === 'manual') {
           return sweetError("请先输入内容")
-        }else {
-          // 如果连内容都不存在
-          return
         }
       };
       // 如果没有内容不更新

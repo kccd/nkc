@@ -150,7 +150,6 @@ export default {
       immediate: true,
       handler(n) {
         // this.threadCategories = n.threadCategories || [];
-        this.threadCategories = n.threadCategories || [];
         this.threadCategories = this.selectionStatus(n.post?.tcId, n.threadCategories) || [];
         this.minorForumCount = n.minorForumCount || [];
         this.selectedForums = n.mainForums || [];

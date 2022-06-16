@@ -112,6 +112,7 @@ import Column from "./Column.vue";
 import { sweetError } from "../../lib/js/sweetAlert.js";
 import {getState} from "../../lib/js/state";
 import {getRequest, timeFormat, addUrlParam} from "../../lib/js/tools";
+import { debounce } from '../../lib/js/execution';
 
 export default {
   components: {
@@ -143,12 +144,14 @@ export default {
     err: '',
     show: false,
     lockRequest: false,
-    mainForums: []
+    mainForums: [],
+    infoSubmitDebounce: ''
   }),
   created() {
     this.getData()
     // this.getUserDraft();
     window.addEventListener("pageshow", this.clearCache);
+    this.infoSubmitDebounce = debounce(this.infoSubmit, 2000);
   },
   computed: {
     getTitle(){
@@ -184,6 +187,8 @@ export default {
       if (this.pageData.type) {
         url += '&type=' + this.pageData.type
       }
+      if(this.pageData.type === "newPost") 
+        url += "&desTypeId=" + this.pageData.thread.tid
       nkcAPI(url, 'GET')
       .then(res => {
         self.drafts = res.drafts;
@@ -284,7 +289,7 @@ export default {
     removeEditor() {
       this.$refs.content.removeEditor();
     },
-    // 编辑器内容改变
+    // 编辑器内容改变 通知原创组件
     contentChange(length) {
       !this.hideType.includes(this.pageData.type) &&
         this.$refs.original.contentChange(length);
@@ -298,6 +303,9 @@ export default {
     // },
     // 编辑器其他部分内容改变
     infoChange() {
+      this.infoSubmitDebounce();
+    },
+    infoSubmit(){
       this.$refs.submit.saveToDraftBase("automatic");
     },
     // 保存草稿成功后执行
@@ -307,10 +315,8 @@ export default {
     },
     // 提交和保存时获取各组件数据
     readyData(submitFn) {
-      if (!submitFn) {
-        console.error("submitFn is not fined");
-        return;
-      }
+      if (!submitFn) 
+        throw("callback is is undefined");
       // 每个组件下都有一个getData返回数据
       const refs = this.$refs;
       let submitData = {};

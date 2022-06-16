@@ -199,6 +199,20 @@ draftSchema.statics.updateToBetaHistory = async (_id, desType, uid) => {
     }
     );
 }
+draftSchema.methods.updateToBetaHistory = async function () {
+  if(!this._id || !this.desType || !this.uid) throw "参数不正确"
+  const DraftModel = mongoose.model("drafts");
+  const betaHistory = (await DraftModel.getType()).betaHistory;
+  return await DraftModel.updateOne({_id: ObjectId(this._id), desType: this.desType, uid: this.uid},
+    {
+      $set: {
+        type: betaHistory,
+        tlm: new Date()
+      }
+    }
+    );
+}
+
 /* 
 * 改为编辑版
 * @param {String} _id 草稿唯一id
