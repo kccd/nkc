@@ -1502,15 +1502,17 @@ schema.statics.extendArticlesPanelData = async function(articles) {
     danger: 'danger',
     disabled: 'disabled',
   };
-  const {unknown, disabled, faulty} = articleStatus;
+  const {unknown, disabled, faulty, normal} = articleStatus;
   const _articles = [];
   for(const article of articles) {
     const articlePost = await ArticlePostModel.findOne({sid: article._id});
     //查找文章最后一条评论
     let comment = null;
     if(articlePost) {
-      comment = await CommentModel.findOne({sid: articlePost._id});
-      comment = await CommentModel.getCommentInfo(comment);
+      comment = await CommentModel.findOne({sid: articlePost._id, status: normal}).sort({order: -1});
+      if(comment) {
+        comment = await CommentModel.getCommentInfo(comment);
+      }
     }
     const {document, user: articleUser} = article;
     const user = {
