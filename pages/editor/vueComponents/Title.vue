@@ -38,6 +38,8 @@
     input.editor-title(placeholder="请输入标题..." v-model="titleValue" )
 </template>
 <script>
+import { debounce } from '../../lib/js/execution';
+
 export default {
   props: {
     data: {
@@ -54,8 +56,13 @@ export default {
   },
   data: () => ({
     titleValue: "",
-    openOnEditNotes: localStorage.getItem("open-on-edit-notes") === "yes"
+    openOnEditNotes: localStorage.getItem("open-on-edit-notes") === "yes",
+    titleChangeDebounce: ''
   }),
+  mounted() {
+    this.titleChangeDebounce = debounce(this.titleChange, 2000);
+
+  },
   watch: {
     openOnEditNotes(boolean) {
       localStorage.setItem("open-on-edit-notes", boolean ? "yes" : "no");
@@ -65,11 +72,19 @@ export default {
       handler(n) {
         this.titleValue = n?.post?.t || "";
       }
+    },
+    titleValue(n) {
+      if (n.trim()) {
+        this.titleChangeDebounce()
+      }
     }
   },
   methods: {
     getData() {
       return { t: this.titleValue };
+    },
+    titleChange(){
+      this.$emit('info-change');
     }
   }
 };

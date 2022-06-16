@@ -7,7 +7,7 @@
       .fa.fa-plus
     div(v-else)
       .editor-cover-img
-        img(:src="coverUrl" v-if="coverUrl")
+        img(:src="setUrl" v-if="url || coverUrl")
         //- img(:src="getUrl('postCover', cover)" v-else-if="cover")
       .m-t-05
         button.btn.btn-default.btn-sm(@click="selectCover") 重新选择
@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import { debounce } from '../../lib/js/execution';
 
 import ResourceSelector from "../../lib/vue/ResourceSelector";
 import ImageSelector from "../../lib/vue/ImageSelector";
@@ -24,10 +25,16 @@ import { fileToBase64 } from "../../lib/js/file";
 import { getUrl } from "../../lib/js/tools";
 export default {
   data: () => ({
+    // 值用来转为路径
     cover: "",
+    // base64
     coverUrl: "",
+    // 图片对象
+    coverData: "",
+    // 路径
+    url: '',
     type: "newThread",
-    coverData: ""
+    changeContentDebounce: ''
   }),
   components: {
     "resource-selector": ResourceSelector,
@@ -38,16 +45,32 @@ export default {
       type: String
     }
   },
+  created() {
+    this.changeContentDebounce = debounce(this.changeContent, 2000);
+  },
   watch: {
     value: {
       immediate: true,
       handler(n) {
         if (!(typeof this.value === "undefined"))
-          this.coverUrl = getUrl("postCover", n);
+          this.url = getUrl("postCover", n);
+          this.cover = n;
       }
+    },
+    coverUrl() {
+      this.changeContentDebounce()
+    }
+  },
+  computed: {
+    setUrl() {
+      return this.url || this.coverUrl
     }
   },
   methods: {
+    changeContent() {
+      // this.$emit('info-change');
+      this.$emit('info-change')
+    },
     selectCover() {
       this.$refs.resourceSelector.open(
         data => {
@@ -68,6 +91,8 @@ export default {
               fileToBase64(res)
                 .then(res => {
                   this.coverUrl = res;
+                  this.url = '';
+                  this.cover = '';
                 })
                 .catch(err => {
                   sweetError(err);
@@ -88,9 +113,14 @@ export default {
       );
     },
     removeCover() {
+      this.url = "";
       this.cover = "";
       this.coverData = "";
       this.coverUrl = "";
+    },
+    setCover(v) {
+      this.url = getUrl("postCover", v);
+      this.cover = v;
     },
     getData() {
       return {

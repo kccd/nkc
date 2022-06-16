@@ -1,6 +1,6 @@
 extends ../../bootstrap_base
 block title
-  title=data.document.title || "未填写标题"
+  title=data.document.t || "未填写标题"
   +includeCSS('/draft/history/history.css')
   style.
     body{
@@ -31,35 +31,41 @@ block content
         //- 内容
         .col-xs-12.col-md-9.book-content-container.m-b-1
           if data.history.length
+            
             include ../../columns/article/nav
             +nav({})
-            -var {uid, origin: originState, toc, title: t, type, authorInfos, user} = data.document
+            //- threadCategory
+            if data.document.threadCategoriesWarning && data.document.threadCategoriesWarning.length
+              .bg-warning.text-warning.p-a-1.bg-border
+                for tcw in data.document.threadCategoriesWarning
+                  div=tcw
+            
+            -var {uid, originState, toc, t, type, authorInfos, user} = data.document
             include ../../columns/article/title
             +title({uid, originState, toc, t, type, authorInfos, user})
-            if data.type !== "draft"
-              if (data.document.abstract && data.document.abstract.length || data.document.abstract && data.document.abstractEN.length)
-                .abstract(style="margin-top:1rem; word-break: break-all;")
-                  if data.document.abstract.length
-                    .panel.panel-default(style="border:0;margin-bottom:0")
-                      .panel-heading.paperHeader 中文摘要
-                      .panel-body!=LineFeedConversion(data.document.abstract)
-                  if data.document.abstractEN.length
-                    .panel.panel-default(style="border:0;margin-bottom:0")
-                      .panel-heading.paperHeader Abstract
-                      .panel-body!=LineFeedConversion(data.document.abstractEN)
-              if (data.document.keywords && data.document.keywords.length || data.document.keywordsEN && data.document.keywordsEN.length)
-                .keyWords(style="margin-top:1rem;")
+            if (data.document.abstractCn && data.document.abstractCn.length || data.document.abstractCn && data.document.abstractEn.length)
+              .abstractCn(style="margin-top:1rem; word-break: break-all;")
+                if data.document.abstractCn.length
                   .panel.panel-default(style="border:0;margin-bottom:0")
-                    .panel-heading.paperHeader 关键词
-                    .panel-body(style="padding:5px")
-                      if data.document.keywords.length
-                        div
-                          for keyCn in data.document.keywords
-                            span.keyWordstagCn(style="cursor:pointer")!=keyCn
-                      if data.document.keywordsEN.length
-                        div(style="margin-top:5px")
-                          for keyEn in data.document.keywordsEN
-                            span.keyWordstagEn(style="cursor:pointer")!=keyEn
+                    .panel-heading.paperHeader 中文摘要
+                    .panel-body!=LineFeedConversion(data.document.abstractCn)
+                if data.document.abstractEn.length
+                  .panel.panel-default(style="border:0;margin-bottom:0")
+                    .panel-heading.paperHeader Abstract
+                    .panel-body!=LineFeedConversion(data.document.abstractEn)
+            if (data.document.keyWordsCn && data.document.keyWordsCn.length || data.document.keyWordsEn && data.document.keyWordsEn.length)
+              .keyWordsCn(style="margin-top:1rem;")
+                .panel.panel-default(style="border:0;margin-bottom:0")
+                  .panel-heading.paperHeader 关键词
+                  .panel-body(style="padding:5px")
+                    if data.document.keyWordsCn.length
+                      div
+                        for keyCn in data.document.keyWordsCn
+                          span.keyWordstagCn(style="cursor:pointer")!=keyCn
+                    if data.document.keyWordsEn.length
+                      div(style="margin-top:5px")
+                        for keyEn in data.document.keyWordsEn
+                          span.keyWordstagEn(style="cursor:pointer")!=keyEn
               //- .book-content-content!=data.document.content
             .book-content-content!=data.document.content
             .btns

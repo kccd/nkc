@@ -64,6 +64,8 @@
 </template>
 
 <script>
+// import { debounce } from '../../lib/js/execution';
+
 export default {
   data: () => ({
     loaded: false,
@@ -81,7 +83,8 @@ export default {
       description: "",
       type: "main"
     },
-    columnId: ""
+    columnId: "",
+    // changeContentDebounce: ''
   }),
   props: {
     state: {
@@ -119,11 +122,15 @@ export default {
         this.minorCategories = [];
         this.selectedMinorCategoriesId = [];
       }
-    }
+    },
   },
-  mounted() {
-  },
+  // created(){
+  //   this.changeContentDebounce = debounce(this.changeContent, 2000);
+  // },
   methods: {
+    // changeContent() {
+    //   this.$emit('info-change');
+    // },
     //获取选择状态
     getStatus() {
       return {
@@ -207,6 +214,12 @@ export default {
     }
   },
   computed: {
+    // mainAndMinorCategories() {
+    //   return {
+    //     main: this.selectedMainCategories,
+    //     minor: this.selectedMinorCategories
+    //   }
+    // },
     selectedMainCategories: function() {
       var arr = [];
       for (var i = 0; i < this.selectedMainCategoriesId.length; i++) {

@@ -160,7 +160,7 @@ draftSchema.statics.getDesType = async () => desType;
 /* 获取最近的历史版本 
 *  @param {String} did 草稿did
 */
-draftSchema.statics.getLatestHistoryDraft = async (did) => {
+draftSchema.statics.getLatestHistoryByDid = async (did) => {
   if(!did) throw "did 不存在"
   const DraftModel = mongoose.model("drafts");
   betaHistory = (await DraftModel.getType()).betaHistory;
@@ -232,28 +232,41 @@ draftSchema.statics.getBeta = async (did, desType, uid) => {
   
 }
 /* 
-*
+* 扩展threadCategories
+* param {Array} tcId 
 */
+draftSchema.statics.extendThreadCategories = async function(tcId) {
+  if(!tcId) throw "参数不存在"
+  const ThreadCategoryModel = mongoose.model('threadCategories');
+  const threadCategories = await ThreadCategoryModel.getCategoriesById(tcId);
+  const threadCategoriesWarning = [];
+  for(const tc of threadCategories) {
+    if(tc.categoryThreadWarning) {
+      threadCategoriesWarning.push(tc.categoryThreadWarning);
+    }
+    if(tc.nodeThreadWarning) {
+      threadCategoriesWarning.push(tc.nodeThreadWarning);
+    }
+  }
+  return  { threadCategories, threadCategoriesWarning }
+};
 /* 
   点击保存时检查是否应该创建历史版本
-  @param {Object} draft 编辑版草稿
-  @param {Object} latestDraft 最新的草稿
 */
-draftSchema.statics.checkContentAndCopyToBetaHistory = async (draft, latestDraft) => {
+draftSchema.methods.checkContentAndCopyToBetaHistory = async function () {
   const DraftModel = mongoose.model("drafts");
-
   const time = Date.now();
   let needHistory = false;
   // 获取最近创建的历史记录
-  const latestHistoryDraft = await DraftModel.getLatestHistoryDraft(draft.did)
+  const latestHistoryDraft = await DraftModel.getLatestHistoryByDid(this.did);
   if(
     // 如果没有历史版本则直接保存
     !latestHistoryDraft ||
     // 如果超过 30 分钟未保存历史则保存
     time - new Date(latestHistoryDraft.tlm).getTime() > 30 * 60 * 1000 ||
     // 如果内容有变动则保存
-    draft.cover !== latestHistoryDraft.cover ||
-    String(draft.originState) !== String(latestHistoryDraft.originState)
+    this.cover !== latestHistoryDraft.cover ||
+    String(this.originState) !== String(latestHistoryDraft.originState)
   ) {
     needHistory = true;
   }
@@ -266,7 +279,7 @@ draftSchema.statics.checkContentAndCopyToBetaHistory = async (draft, latestDraft
       keyWordsCn: betaKeywords = [],
       abstractEn: betaAbstractEN = '',
       abstractCn: betaAbstract = '',
-    } = draft;
+    } = this;
 
     const {
       t: latestHistoryTitle = '',
@@ -275,7 +288,7 @@ draftSchema.statics.checkContentAndCopyToBetaHistory = async (draft, latestDraft
       keyWordsCn: latestHistoryKeywords = [],
       abstractEn: latestHistoryAbstractEN = '',
       abstractCn: latestHistoryAbstract = '',
-    } = latestDraft;
+    } = latestHistoryDraft;
 
     // 统计内容字数变动
     let count = 0;
@@ -292,30 +305,25 @@ draftSchema.statics.checkContentAndCopyToBetaHistory = async (draft, latestDraft
     }
   }
   if(needHistory) {
-   await draft.copyToBetaHistory(draft, latestDraft);
+   await this.copyToBetaHistory();
   }
-  latestDraft.tlm = Date.now();
-  // 当前编辑版更新为最新内容
-  await draft.updateOne(latestDraft);
-
 }
-/*更新当前编辑版，并复制一份当前编辑版为编辑历史版 
-  @param {Object} draft 编辑版草稿
-  @param {Object} latestDraft 最新的草稿
+/*复制一份当前编辑版为编辑历史版 
 */
-draftSchema.methods.copyToBetaHistory = async (draft, latestDraft) => {
+draftSchema.methods.copyToBetaHistory = async function () {
   const DraftModel = mongoose.model("drafts");
   // latestDraft.tlm = Date.now();
   // // 当前编辑版更新为最新内容
   // await draft.updateOne(latestDraft);
-  betaHistory = (await DraftModel.getType()).betaHistory;
-  const preDraft = draft.toObject();
+  const betaHistory = (await DraftModel.getType()).betaHistory;
+  const beta = (await DraftModel.getType()).beta;
+  const preDraft = this.toObject();
   delete preDraft._id;
+  const betaDraft = await DraftModel.findOne({did: this.did, type: beta});
   // 创建一条编辑历史内容
-  draft = DraftModel({...preDraft, tlm: latestDraft.tlm , type: betaHistory});
+  const draft = DraftModel({...preDraft, tlm: betaDraft.tlm , type: betaHistory});
   await draft.save();
 }
-
 
 /*
 * 通过草稿ID删除草稿，若草稿上有调查表ID则删除调查表

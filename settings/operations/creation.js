@@ -183,5 +183,11 @@ module.exports = {
     draft: {
       GET: 'creationCenter'
     }
+  },
+  collections: {
+    GET: 'creationCenter',
+    data: {
+      GET: 'creationCenter'
+    }
   }
 }

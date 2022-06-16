@@ -82,7 +82,7 @@ draftsRouter
   })
   // 保存草稿
   .post("/", async (ctx, next) => {
-    const {data, db, nkcModules, query} = ctx;
+    const {data, db, nkcModules} = ctx;
     let body, files;
     if(ctx.body.fields) {
       body = JSON.parse(ctx.body.fields.body);
@@ -95,6 +95,7 @@ draftsRouter
       desType, // 草稿类型
       desTypeId, // 草稿类型对应的ID
       draftId, // 草稿ID
+      saveType
     } = body;
     let {
       t = "", c = "", l = "html", abstractEn = "", abstractCn = "",
@@ -117,10 +118,15 @@ draftsRouter
       categoriesId: cids,
       cover,
       authorInfos, originState, anonymous,
-      parentPostId
+      parentPostId,
+      tlm: Date.now()
     };
     if(draft) { // 存在草稿
-      await db.DraftModel.checkContentAndCopyToBetaHistory(draft, draftObj);
+      // 更新草稿
+      await draft.updateOne(draftObj);
+      if (saveType !== 'automatic') {
+        await draft.checkContentAndCopyToBetaHistory();
+      }
       if(survey) { // 调查表数据
         if(draft.surveyId) { // 若草稿上已有调查表ID，则只需更新调查表数据。
           survey._id = draft.surveyId;

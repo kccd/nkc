@@ -56,6 +56,9 @@ router
   if(data.history.length){
     // 默认返回第一项内容
     data.document = data.history[0];
+    const {threadCategoriesWarning, threadCategories} = await db.DraftModel.extendThreadCategories(data.document.tcId);
+    data.document.threadCategoriesWarning = threadCategoriesWarning;
+    data.document.threadCategories = threadCategories;
     if(data.document.uid !== state.uid){
       if(!permission("viewUserArticle")) ctx.throw(403, "没有权限")
     }
@@ -108,6 +111,9 @@ router
     // 如果添加了很多历史记录，而没有刷新，直接点击历史就可能出现在当前页找不到指定的数据，因为数据发生了改变（主要是可能排在了其他页中）
     data.document = data.history[0];
   }
+  const {threadCategoriesWarning, threadCategories} = await db.DraftModel.extendThreadCategories(data.document.tcId);
+  data.document.threadCategoriesWarning = threadCategoriesWarning;
+  data.document.threadCategories = threadCategories;
   if(data.document.uid !== state.uid){
     if(!permission("viewUserArticle")) ctx.throw(403, "没有权限");
   }
@@ -135,7 +141,6 @@ router
   const { _id } = params;
   const DraftModel = db.DraftModel;
   const betaDraft = await DraftModel.getBeta(did, source, state.uid);
-  console.log(betaDraft,'betaDraft')
   if(!betaDraft) ctx.throw(400, "草稿未找到")
   await DraftModel.updateToBeta(_id, source, state.uid);
   await DraftModel.createToBetaHistory(_id, source, state.uid);

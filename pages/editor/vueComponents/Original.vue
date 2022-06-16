@@ -8,10 +8,13 @@
 </template>
 
 <script>
+import { debounce } from '../../lib/js/execution';
+
 export default {
   data: () => ({
     originState: 0,
-    contentLength: 0
+    contentLength: 0,
+    changeContentDebounce: ''
   }),
   props: {
     original: {
@@ -25,6 +28,9 @@ export default {
       handler(n) {
         this.originState = n.state || 0;
       }
+    },
+    originState() {
+      this.changeContentDebounce();
     }
   },
   computed: {
@@ -44,7 +50,13 @@ export default {
       };
     }
   },
+  created(){
+    this.changeContentDebounce = debounce(this.changeContent, 2000);
+  },
   methods: {
+    changeContent() {
+      this.$emit('info-change');
+    },
     contentChange(length) {
       this.contentLength = length;
     },

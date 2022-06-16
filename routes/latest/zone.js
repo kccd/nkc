@@ -3,6 +3,14 @@ const zoneTypes = {
   moment: 'moment',
   article: 'article'
 };
+
+// 缓存动态总条数
+const momentsCount = {
+  number: 0, // 数据数目
+  timestamp: 0, // 更新时间 ms
+  interval: 30 * 60 * 1000, // 有效时间 ms
+};
+
 router
   .use('/', async (ctx, next) => {
     const {query, data, db} = ctx;
@@ -22,32 +30,11 @@ router
       return await next();
     }
     const {page = 0} = query;
-    const {
-      normal: normalStatus,
-      faulty: faultyStatus,
-      unknown: unknownStatus,
-    } = await db.MomentModel.getMomentStatus();
+    const momentStatus = await db.MomentModel.getMomentStatus();
     const match = {
       parent: '',
-      $or: [
-        {
-          status: normalStatus
-        }
-      ]
+      status: momentStatus.normal
     };
-    if(state.uid) {
-      // 加载自己非正常状态的动态
-      match.$or.push({
-        uid: state.uid,
-        status: {
-          $in: [
-            normalStatus,
-            faultyStatus,
-            unknownStatus,
-          ]
-        }
-      });
-    }
     //获取当前用户对动态的审核权限
     const permissions = {
       reviewed: null,
@@ -57,7 +44,15 @@ router
         permissions.reviewed = true;
       }
     }
-    const count = await db.MomentModel.countDocuments(match);
+    let count;
+    const now = Date.now();
+    if(now - momentsCount.timestamp > momentsCount.interval) {
+      count = await db.MomentModel.countDocuments(match);
+      momentsCount.number = count;
+      momentsCount.timestamp = now;
+    } else {
+      count = momentsCount.number;
+    }
     const paging = nkcModules.apiFunction.paging(page, count);
     const moments = await db.MomentModel
       .find(match)

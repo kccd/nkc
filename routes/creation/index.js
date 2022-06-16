@@ -12,6 +12,7 @@ const communityRouter = require('./community');
 const columnRouter = require('./column');
 const editorRouter = require('./editor');
 const zoneRouter = require('./zone');
+const collectionRouter = require('./collections');
 const homeRouter = require('./home');
 router
   .use('/', async (ctx, next) => {
@@ -49,4 +50,5 @@ router
   .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
   .use('/editor', editorRouter.routes(), editorRouter.allowedMethods())
   .use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods())
+  .use('/collections', collectionRouter.routes(), collectionRouter.allowedMethods())
 module.exports = router;

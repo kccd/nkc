@@ -51,9 +51,12 @@
 
 <script>
 import { getState } from "../../lib/js/state";
+import { debounce } from '../../lib/js/execution';
+
 export default {
   data: () => ({
     authorInfos: [],
+    changeContentDebounce: ''
   }),
   props: {
     author: {
@@ -69,8 +72,18 @@ export default {
         }
       }
     },
+    authorInfos: {
+      deep: true,
+      handler() {this.changeContentDebounce()}
+    }
+  },
+  created(){
+    this.changeContentDebounce = debounce(this.changeContent, 2000);
   },
   methods: {
+    changeContent() {
+      this.$emit('info-change');
+    },
     websiteUserId() {
       return getState().websiteCode + "ID";
     },

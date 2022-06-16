@@ -122,12 +122,16 @@ router
           console.error(err);
         });
     }
-		await db.DraftModel.updateOne({_id: ObjectId(_id), uid: state.uid}, {
-			$set: {
-				type: "stableHistory",
-				tlm: Date.now()
-			}
-		})
+		if(_id) {
+			const beta = (await db.DraftModel.getType()).beta;
+			const stableHistory = (await db.DraftModel.getType()).stableHistory;
+			await db.DraftModel.updateOne({_id: ObjectId(_id), uid: state.uid, type: beta}, {
+				$set: {
+					type: stableHistory,
+					tlm: Date.now()
+				}
+			})
+		}
 		// 发表文章后进行跳转
 		const type = ctx.request.accepts('json', 'html');
     if(type === 'html') {

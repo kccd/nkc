@@ -259,6 +259,7 @@
 import { nkcAPI } from "../../lib/js/netAPI";
 import SelectUser from "./SelectUser"
 import ResourceSelector from "../../lib/vue/ResourceSelector";
+import { debounce } from '../../lib/js/execution';
 
 export default {
   data: () => ({
@@ -290,7 +291,8 @@ export default {
     error: "",
     createSurveyPermission: '',
     type: '',
-    post: ''
+    post: '',
+    changeContentDebounce: ''
   }),
   props: {
     data: {
@@ -311,6 +313,12 @@ export default {
         this.post = n.post;
         this.initPostSurvey();
       }
+    },
+    changeData: {
+      deep: true,
+      handler() {
+        this.changeContentDebounce()
+      }
     }
   },
   computed: {
@@ -322,6 +330,10 @@ export default {
         if (u) arr.push(u);
       }
       return arr;
+    },
+    changeData() {
+      // const { survey, selectedUsers, timeStart, timeEnd } = this
+      return { survey: this.survey, timeStart: this.timeStart, timeEnd: this.timeEnd }
     },
     rewardKcbTotal: function() {
       var survey = this.survey;
@@ -372,6 +384,7 @@ export default {
   },
   created() {
     this.requestData();
+    this.changeContentDebounce = debounce(this.changeContent, 2000);
   },
   mounted() {
     this.$nextTick(() => {
@@ -380,6 +393,9 @@ export default {
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
+    changeContent() {
+      this.$emit('info-change');
+    },
     init(options) {
       options = options || {};
       if (options.pid) this.newSurvey.pid = options.pid;
