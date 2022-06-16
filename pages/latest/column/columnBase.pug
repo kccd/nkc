@@ -1,0 +1,10 @@
+extends ../latestBase
+block latestTitle
+  block columnTitle
+block latestContent
+  div
+    include ../latestNav
+    +renderLatestNav('column')
+    block columnContent
+block latestScripts
+  block columnScripts
