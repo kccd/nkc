@@ -1,7 +1,7 @@
 <template lang="pug">
   .subscribe-black-list(v-if="targetUser")
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
-    .null(v-if="!bl" ) 空空如也~~
+    .null(v-if="bl && bl.length === 0" ) 空空如也~~
     .black-list-box(v-else)
       .col-xs-12.col-md-6(v-for="item in bl")
         .list-body
