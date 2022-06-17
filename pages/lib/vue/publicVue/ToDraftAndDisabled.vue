@@ -21,10 +21,9 @@ export default {
   },
   methods: {
     //打开退修和审核弹窗
-    open(arr) {
+    open(arr, callback) {
       const self = this;
       self.$refs.disabled.open(function(data) {
-        console.log('delType', data.delType);
         const documentArr = [];
         const postArr = [];
         for(const item of arr) {
@@ -48,9 +47,14 @@ export default {
             });
           }
         }
-        self.post(postArr, 0);
-        self.document(documentArr, 0);
-        self.$refs.disabled.close();
+        try{
+          self.post(postArr, 0);
+          self.document(documentArr, 0);
+          self.$refs.disabled.close();
+        } catch(err) {
+          console.log(err)
+        }
+        callback();
       });
     },
     //提交post

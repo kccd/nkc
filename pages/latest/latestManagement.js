@@ -2,6 +2,7 @@ import {
   SwitchArticlePanelCheckBoxDisplayStatus,
   SwitchSelectArticlePanelCheckBox,
   GetSelectedArticlesInfo,
+  CancelSelectAllArticlePanelCheckBox,
 } from "../lib/js/articlePanel";
 import ToDraftAndDisabled from "../lib/vue/publicVue/ToDraftAndDisabled";
 const elementId = 'latestManagement';
@@ -89,7 +90,9 @@ function initVueApp() {
       // 退修或删除
       remove() {
         const info = this.getSelectedInfo();
-        this.$refs.disabledDraft.open(info);
+        this.$refs.disabledDraft.open(info, function () {
+          CancelSelectAllArticlePanelCheckBox();
+        })
       }
     }
   });
