@@ -32,6 +32,7 @@ router
       history: null,
       source: document.source,
       digest: null,
+      xsf: null,
     };
     if(user) {
       data.digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
