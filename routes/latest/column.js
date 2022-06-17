@@ -23,6 +23,9 @@ router
       return await next();
     }
     const {page = 0} = query;
+    const permissions = {
+      reviewed: null,
+    };
     const {
       normal: normalStatus,
       disabled: disabledStatus,
@@ -63,9 +66,10 @@ router
     };
     let canManageFid = [];
     if(user) {
+      if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {
+        permissions.reviewed = true;
+      }
       canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
-    }
-    if(user) {
       if(!ctx.permission("superModerator")) {
         q.$or = [
           {
@@ -145,6 +149,7 @@ router
       }
       if(thread) threads.push(thread);
     }
+    data.permissions = permissions;
     data.latestColumnArticlePanelStyle = pageSettings.articlePanelStyle.latestColumn;
     data.articlesPanelData = threads;
     data.paging = paging;

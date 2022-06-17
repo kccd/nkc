@@ -3,8 +3,9 @@ block columnTitle
   title=data.pageTitle
 block columnContent
   //- 管理
-  include ../latestManagement
-  +renderLatestArticleManagement()
+  if data.permissions.reviewed
+    include ../latestManagement
+    +renderLatestArticleManagement()
   //include ./columnTypes
   //+renderLatestColumnTypes(data.t, data.columnTypes)
   include ../../publicModules/paging/paging

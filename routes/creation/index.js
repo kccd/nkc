@@ -14,6 +14,7 @@ const editorRouter = require('./editor');
 const zoneRouter = require('./zone');
 const collectionRouter = require('./collections');
 const homeRouter = require('./home');
+const blackListRouter = require('./blackList');
 router
   .use('/', async (ctx, next) => {
     const {data, state, db} = ctx;
@@ -51,4 +52,5 @@ router
   .use('/editor', editorRouter.routes(), editorRouter.allowedMethods())
   .use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods())
   .use('/collections', collectionRouter.routes(), collectionRouter.allowedMethods())
+  .use('/blackLists', blackListRouter.routes(), blackListRouter.allowedMethods())
 module.exports = router;

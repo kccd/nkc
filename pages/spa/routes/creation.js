@@ -33,6 +33,8 @@ import DraftEditor from '../views/creation/editor/DraftEditor';
 
 import Collections from '../views/creation/collections/Collections';
 
+import BlackLists from "../views/creation/collections/BlackLists";
+
 export const routesName = {
   creation: 'creation',
   creationMaterial: 'creationMaterial',
@@ -65,7 +67,8 @@ export const routesName = {
   creationZoneMoment: 'creationZoneMoment',
   creationZoneArticle: 'creationZoneArticle',
   creationZoneDraft: 'creationZoneDraft',
-  creationCollections: 'creationCollections'
+  creationCollections: 'creationCollections',
+  creationBlackLists: 'creationBlackLists'
 }
 
 export default [
@@ -76,6 +79,7 @@ export default [
     children: [
       // {name: 'home', path: '/creation', component: Home},
       {name: routesName.creationCollections, path: '/creation/collections', component: Collections},
+      {name: routesName.creationBlackLists, path: '/creation/blackLists', component: BlackLists},
       {name: routesName.creationMaterials, path: '/creation/materials', component: Materials},
       {name: routesName.creationMaterial, path: '/creation/material/:id', component: Material},
       {name: routesName.creationBooks, path: '/creation/books', component: Books},
