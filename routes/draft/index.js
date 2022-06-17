@@ -141,12 +141,14 @@ router
   const { _id } = params;
   const DraftModel = db.DraftModel;
   const betaDraft = await DraftModel.getBeta(did, source, state.uid);
-  if(!betaDraft) ctx.throw(400, "草稿未找到")
-  await DraftModel.updateToBeta(_id, source, state.uid);
-  await DraftModel.createToBetaHistory(_id, source, state.uid);
-  // 正在编辑改为历史
-  await DraftModel.updateToBetaHistory(betaDraft._id, source, state.uid);
-  
+  if(betaDraft) {
+    await DraftModel.updateToBeta(_id, source, state.uid);
+    await DraftModel.createToBetaHistory(_id, source, state.uid);
+    // 正在编辑改为历史
+    await betaDraft.updateToBetaHistory()
+  }
+  // 如果betaDraft不存在那么用户可能已经把编辑版本进行了发布，或者恶意行为
+  // if(!betaDraft) ctx.throw(400, "草稿未找到")
   await next()
 })
 module.exports = router;
