@@ -974,7 +974,8 @@ schema.statics.getCommentsInfo = async function(comments) {
   })
   const _comments = await CommentModel.find({_id: {$in: commentsId}});
   const {stable: stableType} = await DocumentModel.getDocumentTypes();
-  const documents = await DocumentModel.find({did: commentDid, type: stableType});
+  const {comment} = await DocumentModel.getDocumentSources();
+  const documents = await DocumentModel.find({did: commentDid, type: stableType, source: comment});
   const commentDocumentsObj = {};
   for(const d of documents) {
     commentDocumentsObj[d.did] = d;
