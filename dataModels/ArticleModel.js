@@ -1533,8 +1533,9 @@ schema.statics.extendArticlesPanelData = async function(articles) {
       replyCount: article.count
     };
     const result = {
-      type: 'article',
+      type: 'document',
       id: article._id,
+      pid: document._id,
       user,
       pages: [],
       categories: [],

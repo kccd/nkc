@@ -2,7 +2,10 @@ extends ./columnBase
 block columnTitle
   title=data.pageTitle
 block columnContent
-  include ./columnTypes
+  //- 管理
+  include ../latestManagement
+  +renderLatestArticleManagement()
+  //include ./columnTypes
   //+renderLatestColumnTypes(data.t, data.columnTypes)
   include ../../publicModules/paging/paging
   if data.articlesPanelData && data.articlesPanelData.length > 0

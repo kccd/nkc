@@ -1411,9 +1411,10 @@ threadSchema.statics.extendArticlesPanelData = async function(threads) {
       status.desc = '退修中，仅自己可见，修改后对所有人可见';
     }
     _threads.push({
-      type: 'thread',
+      type: 'post',
       oc: thread.oc,
       id: thread.tid,
+      pid: thread.oc,
       user,
       pages,
       content,

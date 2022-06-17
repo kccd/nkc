@@ -107,7 +107,8 @@ if !isIncluded('publicModules/articlePanel')
         .articles-panel-item(
           class=`style-${type}`
           data-article-type=article.type
-          data-article-id=article.id
+          data-article-id=article.pid
+          data-article-tid=article.id
           data-checkbox-show='false'
           )
           .articles-panel-checkbox
